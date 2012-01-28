@@ -67,7 +67,7 @@ Plotter.prototype.drawEdge = function(edge) {
 
 Plotter.prototype.drawNode = function(node) {
   this.ctx.globalCompositeOperation = 'source-over';
-
+console.log('drawNode',node);
   this.ctx.fillStyle = node['color'];
   this.ctx.beginPath();
   this.ctx.arc(node['displayX'],

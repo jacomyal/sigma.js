@@ -28,12 +28,13 @@ Sigma.prototype.draw = function() {
   this.plotter.currentNodeIndex = 0;
 
   // Start workers:
+  var _self = this;
   sigma.scheduler.addListener(
     'killed',
     function(e) {
-      if (e.content['name'] == 'node') {
+      if (e.content['name'] == 'node_'+this.id) {
         sigma.scheduler.stop().removeListener('killed', _self.onWorkerKilled);
-        sigma.scheduler.addWorker(_self.worker_drawEdge, 'edge').start();
+        sigma.scheduler.addWorker(_self.plotter.worker_drawEdge, 'edge', false).start();
       }
     }
   ).addWorker(
