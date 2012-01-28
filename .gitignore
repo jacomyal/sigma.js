@@ -1,0 +1,6 @@
+# Build results / binary files
+build/compiler.jar
+build/*.js
+
+# HTML dev file
+index.html
