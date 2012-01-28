@@ -19,6 +19,9 @@ function Sigma(root, id) {
 }
 
 Sigma.prototype.draw = function() {
+  // Remove workers:
+  sigma.scheduler.removeWorker(self.plotter.worker_drawEdge).removeWorker(self.plotter.worker_drawNode);
+
   // Rescale graph:
   this.graph.rescale(this.width, this.height);
 
