@@ -24,11 +24,11 @@ sigma.scheduler = (function() {
 
   this.frameInjector = function() {
     while (_self.isRunning && _self.workers.length && _self.routine()) {}
-    
+
     if (!_self.isRunning || !_self.workers.length) {
       _self.dispatch('stop');
       _self.isRunning = false;
-    }else {
+    } else {
       _self.startTime = (new Date()).getTime();
       _self.frames++;
       _self.delay = _self.effectiveTime - _self.frameTime;
@@ -79,7 +79,7 @@ sigma.scheduler = (function() {
     if (v == undefined) {
       this.workers = [];
       stop();
-    }else {
+    } else {
       this.workers = this.workers.filter(function(e) {
         return (typeof v == 'string') ? e['name'] != v : e['w'] != v;
       });
@@ -96,7 +96,7 @@ sigma.scheduler = (function() {
       this.frames = 0;
       this.time = (new Date()).getTime();
       return this;
-    }else {
+    } else {
       return this.fpsReq;
     }
   };
@@ -104,7 +104,7 @@ sigma.scheduler = (function() {
   this.getFPS = function() {
     if (this.isRunning) {
       return this.frames / ((new Date()).getTime() - this.time) * 1000;
-    }else {
+    } else {
       return false;
     }
   };

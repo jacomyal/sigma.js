@@ -12,8 +12,12 @@ function Plotter(ctx, graph, w, h) {
   this.worker_drawEdge = function() {
     var c = self.graph.edges.length;
     while (self.currentEdgeIndex < c &&
-           !self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['source']) &&
-           !self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['target'])) {
+           !self.isOnScreen(
+             self.graph.edges[self.currentEdgeIndex]['source']
+            ) &&
+           !self.isOnScreen(
+             self.graph.edges[self.currentEdgeIndex]['target'])
+           ) {
       self.currentEdgeIndex++;
     }
 
@@ -84,7 +88,7 @@ Plotter.prototype.isOnScreen = function(node) {
     throw (new Error('A node\'s coordinate is not a number' +
                     '(id: ' + node['id'] + ')'));
   }
-  
+
   return (node['displayX'] + node['displaySize'] > -this.width / 3) &&
     (node['displayX'] - node['displaySize'] < this.width * 4 / 3) &&
     (node['displayY'] + node['displaySize'] > -this.height / 3) &&

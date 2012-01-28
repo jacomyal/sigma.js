@@ -19,8 +19,14 @@ function Sigma(root, id) {
 }
 
 Sigma.prototype.draw = function() {
+  var self = this;
+
   // Remove workers:
-  sigma.scheduler.removeWorker(self.plotter.worker_drawEdge).removeWorker(self.plotter.worker_drawNode);
+  sigma.scheduler.removeWorker(
+    'node_' + self.id
+  ).removeWorker(
+    'edge_' + self.id
+  ).stop();
 
   // Rescale graph:
   this.graph.rescale(this.width, this.height);
@@ -32,13 +38,16 @@ Sigma.prototype.draw = function() {
   this.plotter.currentNodeIndex = 0;
 
   // Start workers:
-  var self = this;
   sigma.scheduler.addListener(
     'killed',
     function(e) {
-      if (e.content['name'] == 'node_'+self.id) {
+      if (e.content['name'] == 'node_' + self.id) {
         sigma.scheduler.stop().removeListener('killed', self.onWorkerKilled);
-        sigma.scheduler.addWorker(self.plotter.worker_drawEdge, 'edge', false).start();
+        sigma.scheduler.addWorker(
+          self.plotter.worker_drawEdge,
+          'edge_' + self.id,
+          false
+        ).start();
       }
     }
   ).addWorker(
