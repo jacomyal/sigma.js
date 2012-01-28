@@ -24,7 +24,7 @@ sigma.scheduler = (function() {
 
   this.frameInjector = function() {
     while (_self.isRunning && _self.workers.length && _self.routine()) {}
-
+    
     if (!_self.isRunning || !_self.workers.length) {
       _self.dispatch('stop');
       _self.isRunning = false;

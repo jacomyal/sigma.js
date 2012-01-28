@@ -1,5 +1,5 @@
 function Plotter(ctx, graph, w, h) {
-  var _self = this;
+  var self = this;
 
   this.ctx = ctx;
   this.graph = graph;
@@ -10,18 +10,17 @@ function Plotter(ctx, graph, w, h) {
   this.currentNodeIndex = 0;
 
   this.worker_drawEdge = function() {
-    var c = _self.graph.edges.length, iOS = _self.graph.isOnScreen;
-
-    while (_self.currentEdgeIndex < c &&
-           !iOS(_self.graph.edges[_self.currentEdgeIndex]['source']) &&
-           !iOS(_self.graph.edges[_self.currentEdgeIndex]['target'])) {
-      _self.currentEdgeIndex++;
+    var c = self.graph.edges.length;
+    while (self.currentEdgeIndex < c &&
+           !self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['source']) &&
+           !self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['target'])) {
+      self.currentEdgeIndex++;
     }
 
-    if (_self.currentEdgeIndex < c &&
-        (iOS(_self.graph.edges[_self.currentEdgeIndex]['source']) ||
-        iOS(_self.graph.edges[_self.currentEdgeIndex]['target']))) {
-      _self.drawEdge(_self.graph.edges[_self.currentEdgeIndex++]);
+    if (self.currentEdgeIndex < c &&
+        (self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['source']) ||
+        self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['target']))) {
+      self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
       return true;
     }else {
       return false;
@@ -29,15 +28,15 @@ function Plotter(ctx, graph, w, h) {
   }
 
   this.worker_drawNode = function() {
-    var c = _self.graph.nodes.length;
-    while (_self.currentNodeIndex < c &&
-           !_self.isOnScreen(_self.graph.nodes[_self.currentNodeIndex])) {
-      _self.currentNodeIndex++;
+    var c = self.graph.nodes.length;
+    while (self.currentNodeIndex < c &&
+           !self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
+      self.currentNodeIndex++;
     }
 
-    if (_self.currentNodeIndex < c &&
-        _self.isOnScreen(_self.graph.nodes[_self.currentNodeIndex])) {
-      _self.drawNode(_self.graph.nodes[_self.currentNodeIndex++]);
+    if (self.currentNodeIndex < c &&
+        self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
+      self.drawNode(self.graph.nodes[self.currentNodeIndex++]);
       return true;
     }else {
       return false;
@@ -67,7 +66,6 @@ Plotter.prototype.drawEdge = function(edge) {
 
 Plotter.prototype.drawNode = function(node) {
   this.ctx.globalCompositeOperation = 'source-over';
-console.log('drawNode',node);
   this.ctx.fillStyle = node['color'];
   this.ctx.beginPath();
   this.ctx.arc(node['displayX'],
@@ -86,7 +84,7 @@ Plotter.prototype.isOnScreen = function(node) {
     throw (new Error('A node\'s coordinate is not a number' +
                     '(id: ' + node['id'] + ')'));
   }
-
+  
   return (node['displayX'] + node['displaySize'] > -this.width / 3) &&
     (node['displayX'] - node['displaySize'] < this.width * 4 / 3) &&
     (node['displayY'] + node['displaySize'] > -this.height / 3) &&

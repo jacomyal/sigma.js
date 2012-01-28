@@ -106,3 +106,75 @@ Graph.prototype.addEdge = function(id, source, target, params) {
 
   return this;
 };
+
+Graph.prototype.rescale = function(w, h, sMin, sMax, tMin, tMax) {
+  var weightMax = 0, sizeMax = 0;
+  var self = this;
+
+  this.nodes.forEach(function(node) {
+    sizeMax = Math.max(node['size'], sizeMax);
+  });
+
+  this.edges.forEach(function(edge) {
+    weightMax = Math.max(edge['size'], weightMax);
+  });
+
+  if (sizeMax == 0) {
+    return;
+  }
+
+  if (weightMax == 0) {
+    return;
+  }
+
+  // Recenter the nodes:
+  var xMin, xMax, yMin, yMax;
+  this.nodes.forEach(function(node) {
+    xMax = Math.max(node['x'], xMax || node['x']);
+    xMin = Math.min(node['x'], xMin || node['x']);
+    yMax = Math.max(node['y'], yMax || node['y']);
+    yMin = Math.min(node['y'], yMin || node['y']);
+  });
+
+  var scale = Math.min(0.9 * w / (xMax - xMin),
+                       0.9 * h / (yMax - yMin));
+
+  // Size homothetic parameters:
+  var a, b;
+  if (!sMax && !sMin) {
+    a = 1;
+    b = 0;
+  }else if (sMax == sMin) {
+    a = 0;
+    b = sMax;
+  }else {
+    a = (sMax - sMin) / sizeMax;
+    b = sMin;
+  }
+
+  var c, d;
+  if (!tMax && !tMin) {
+    c = 1;
+    d = 0;
+  }else if (tMax == tMin) {
+    c = 0;
+    d = tMin;
+  }else {
+    c = (tMax - tMin) / weightMax;
+    d = tMin;
+  }
+
+  // Rescale the nodes:
+  this.nodes.forEach(function(node) {
+    node['displaySize'] = node['size'] * a + b;
+
+    if (!node['isFixed']) {
+      node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
+      node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
+    }
+  });
+
+  this.edges.forEach(function(edge) {
+    edge['displaySize'] = edge['size'] * c + d;
+  });
+};

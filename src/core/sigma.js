@@ -1,5 +1,4 @@
 function Sigma(root, id) {
-  var _self = this;
   this.id = id;
 
   this.dom = root;
@@ -20,21 +19,23 @@ function Sigma(root, id) {
 }
 
 Sigma.prototype.draw = function() {
+  // Rescale graph:
+  this.graph.rescale(this.width, this.height);
+
   // Clear scene:
   this.canvas.width = this.canvas.width;
 
-  // Draw nodes and edges:
   this.plotter.currentEdgeIndex = 0;
   this.plotter.currentNodeIndex = 0;
 
   // Start workers:
-  var _self = this;
+  var self = this;
   sigma.scheduler.addListener(
     'killed',
     function(e) {
-      if (e.content['name'] == 'node_'+this.id) {
-        sigma.scheduler.stop().removeListener('killed', _self.onWorkerKilled);
-        sigma.scheduler.addWorker(_self.plotter.worker_drawEdge, 'edge', false).start();
+      if (e.content['name'] == 'node_'+self.id) {
+        sigma.scheduler.stop().removeListener('killed', self.onWorkerKilled);
+        sigma.scheduler.addWorker(self.plotter.worker_drawEdge, 'edge', false).start();
       }
     }
   ).addWorker(
