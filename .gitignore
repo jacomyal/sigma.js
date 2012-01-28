@@ -2,5 +2,5 @@
 build/compiler.jar
 build/*.js
 
-# HTML dev file
-index.html
+# Debug
+debug/
