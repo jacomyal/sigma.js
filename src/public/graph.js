@@ -1,4 +1,4 @@
-function Graph() {
+sigma.classes.Graph = function() {
   sigma.classes.EventDispatcher.call(this);
 
   this.nodes = [];
@@ -7,7 +7,7 @@ function Graph() {
   this.edgesIndex = {};
 }
 
-Graph.prototype.addNode = function(id, params) {
+sigma.classes.Graph.prototype.addNode = function(id, params) {
   if (this.nodesIndex[id]) {
     throw new Error('Node "' + id + '" already exists.');
   }
@@ -55,7 +55,7 @@ Graph.prototype.addNode = function(id, params) {
   return this;
 };
 
-Graph.prototype.addEdge = function(id, source, target, params) {
+sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
   if (this.edgesIndex[id]) {
     throw new Error('Edge "' + id + '" already exists.');
   }
@@ -107,7 +107,7 @@ Graph.prototype.addEdge = function(id, source, target, params) {
   return this;
 };
 
-Graph.prototype.rescale = function(w, h, sMin, sMax, tMin, tMax) {
+sigma.classes.Graph.prototype.rescale = function(w, h, sMin, sMax, tMin, tMax) {
   var weightMax = 0, sizeMax = 0;
   var self = this;
 

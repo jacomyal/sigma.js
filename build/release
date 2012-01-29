@@ -1,3 +1,3 @@
 #!/bin/bash
 cat  ./src/intro.js `find ./src/core -name "*.js"` ./src/outro.js `find ./src/public -name "*.js"` > build/sigma.concat.js;
-#java -jar build/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js build/sigma.concat.js --js_output_file build/sigma.minified.js;
+#java -jar build/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js build/sigma.concat.js --js_output_file build/sigma.minified.js --externs src/externals.js;

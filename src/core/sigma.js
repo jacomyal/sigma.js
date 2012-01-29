@@ -7,6 +7,7 @@ function Sigma(root, id) {
 
   this.canvas = document.createElement('canvas');
   this.canvas.style.position = 'absolute';
+  this.canvas.setAttribute('id', 'sigma_'+this.id);
   this.canvas.setAttribute('class', 'sigma_canvas');
   this.canvas.setAttribute('width', this.width + 'px');
   this.canvas.setAttribute('height', this.height + 'px');
@@ -14,9 +15,21 @@ function Sigma(root, id) {
 
   this.ctx = this.canvas.getContext('2d');
 
-  this.graph = new Graph();
+  // Intern classes:
+  this.graph = new sigma.classes.Graph();
   this.plotter = new Plotter(this.ctx, this.graph, this.width, this.height);
+  this.mousecaptor = new MouseCaptor(this.canvas, this.graph);
 }
+
+Sigma.prototype.resize = function() {
+  this.width = this.dom.offsetWidth;
+  this.height = this.dom.offsetHeight;
+
+  this.canvas.setAttribute('width', this.width + 'px');
+  this.canvas.setAttribute('height', this.height + 'px');
+
+  this.draw();
+};
 
 Sigma.prototype.draw = function() {
   var self = this;
