@@ -5,7 +5,7 @@ sigma.classes.Graph = function() {
   this.nodesIndex = {};
   this.edges = [];
   this.edgesIndex = {};
-}
+};
 
 sigma.classes.Graph.prototype.addNode = function(id, params) {
   if (this.nodesIndex[id]) {

@@ -7,7 +7,7 @@ function Sigma(root, id) {
 
   this.canvas = document.createElement('canvas');
   this.canvas.style.position = 'absolute';
-  this.canvas.setAttribute('id', 'sigma_'+this.id);
+  this.canvas.setAttribute('id', 'sigma_' + this.id);
   this.canvas.setAttribute('class', 'sigma_canvas');
   this.canvas.setAttribute('width', this.width + 'px');
   this.canvas.setAttribute('height', this.height + 'px');
