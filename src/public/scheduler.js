@@ -105,7 +105,7 @@ sigma.scheduler = (function() {
       }
       stop();
     } else {
-      var n;
+      var n = (typeof v == 'string') ? v : '';
       this.workers = this.workers.filter(function(e) {
         if ((typeof v == 'string') ? e['name'] == v : e['w'] == v) {
           n = e['name'];
@@ -114,7 +114,7 @@ sigma.scheduler = (function() {
         return true;
       });
 
-      if (n && emptyQueue) {
+      if (emptyQueue) {
         this.queue = this.queue.filter(function(e) {
           return e['parent'] != n;
         });
