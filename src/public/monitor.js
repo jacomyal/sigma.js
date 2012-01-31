@@ -7,5 +7,9 @@ sigma.monitor = (function() {
     return sigma.scheduler.workers.length;
   }
 
+  this.getQueueLength = function() {
+    return sigma.scheduler.queue.length;
+  }
+
   return this;
 })();
