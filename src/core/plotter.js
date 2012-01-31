@@ -1,7 +1,8 @@
-function Plotter(ctx, graph, w, h) {
+function Plotter(nodesCtx, edgesCtx, graph, w, h) {
   var self = this;
 
-  this.ctx = ctx;
+  this.nodesCtx = nodesCtx;
+  this.edgesCtx = edgesCtx;
   this.graph = graph;
   this.width = w;
   this.height = h;
@@ -24,7 +25,7 @@ function Plotter(ctx, graph, w, h) {
          ) {
         self.currentEdgeIndex++;
       }else {
-        self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
+        self.drawCurveEdge(self.graph.edges[self.currentEdgeIndex++]);
       }
     }
 
@@ -46,39 +47,57 @@ function Plotter(ctx, graph, w, h) {
   }
 }
 
-Plotter.prototype.drawEdge = function(edge) {
+Plotter.prototype.drawCurveEdge = function(edge) {
   var x1 = edge['source']['displayX'];
   var y1 = edge['source']['displayY'];
   var x2 = edge['target']['displayX'];
   var y2 = edge['target']['displayY'];
 
-  this.ctx.globalCompositeOperation = 'destination-over';
+  var ctx = this.edgesCtx;
 
-  this.ctx.strokeStyle = edge['color'];
-  this.ctx.lineWidth = edge['displaySize'];
-  this.ctx.beginPath();
-  this.ctx.moveTo(x1, y1);
-  this.ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
-                            (y1 + y2) / 2 + (x1 - x2) / 4,
-                            x2,
-                            y2);
+  ctx.strokeStyle = edge['color'];
+  ctx.lineWidth = edge['displaySize'];
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
+                       (y1 + y2) / 2 + (x1 - x2) / 4,
+                       x2,
+                       y2);
 
-  this.ctx.stroke();
+  ctx.stroke();
+};
+
+Plotter.prototype.drawStraightEdge = function(edge) {
+  var x1 = edge['source']['displayX'];
+  var y1 = edge['source']['displayY'];
+  var x2 = edge['target']['displayX'];
+  var y2 = edge['target']['displayY'];
+
+  var ctx = this.edgesCtx;
+
+  ctx.strokeStyle = edge['color'];
+  ctx.lineWidth = edge['displaySize'];
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+
+  ctx.stroke();
 };
 
 Plotter.prototype.drawNode = function(node) {
-  this.ctx.globalCompositeOperation = 'source-over';
-  this.ctx.fillStyle = node['color'];
-  this.ctx.beginPath();
-  this.ctx.arc(node['displayX'],
-               node['displayY'],
-               node['displaySize'],
-               0,
-               Math.PI * 2,
-               true);
+  var ctx = this.nodesCtx;
 
-  this.ctx.closePath();
-  this.ctx.fill();
+  ctx.fillStyle = node['color'];
+  ctx.beginPath();
+  ctx.arc(node['displayX'],
+          node['displayY'],
+          node['displaySize'],
+          0,
+          Math.PI * 2,
+          true);
+
+  ctx.closePath();
+  ctx.fill();
 };
 
 Plotter.prototype.isOnScreen = function(node) {
