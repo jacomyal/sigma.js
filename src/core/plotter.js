@@ -9,8 +9,8 @@ function Plotter(ctx, graph, w, h) {
   this.currentEdgeIndex = 0;
   this.currentNodeIndex = 0;
 
-  this.edgesSpeed = 10;
-  this.nodesSpeed = 10;
+  this.edgesSpeed = 200;
+  this.nodesSpeed = 200;
 
   this.worker_drawEdge = function() {
     var c = self.graph.edges.length;
