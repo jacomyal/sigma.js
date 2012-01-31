@@ -178,3 +178,16 @@ sigma.classes.Graph.prototype.rescale = function(w, h, sMin, sMax, tMin, tMax) {
     edge['displaySize'] = edge['size'] * c + d;
   });
 };
+
+sigma.classes.Graph.prototype.translate = function(sceneX, sceneY, ratio, pow) {
+  var sizeRatio = Math.pow(ratio, pow || 1 / 2);
+
+  this.nodes.forEach(function(node) {
+    if (!node['isFixed']) {
+      node['displayX'] = node['displayX'] * ratio + sceneX;
+      node['displayY'] = node['displayY'] * ratio + sceneY;
+    }
+
+    node['displaySize'] = node['displaySize'] * sizeRatio;
+  });
+};
