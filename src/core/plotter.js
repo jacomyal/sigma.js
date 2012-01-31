@@ -9,42 +9,40 @@ function Plotter(ctx, graph, w, h) {
   this.currentEdgeIndex = 0;
   this.currentNodeIndex = 0;
 
+  this.edgesSpeed = 10;
+  this.nodesSpeed = 10;
+
   this.worker_drawEdge = function() {
     var c = self.graph.edges.length;
-    while (self.currentEdgeIndex < c &&
-           !self.isOnScreen(
-             self.graph.edges[self.currentEdgeIndex]['source']
-            ) &&
-           !self.isOnScreen(
-             self.graph.edges[self.currentEdgeIndex]['target'])
-           ) {
-      self.currentEdgeIndex++;
+    var i = 0;
+    while (i++< self.edgesSpeed && self.currentEdgeIndex < c) {
+      if (!self.isOnScreen(
+           self.graph.edges[self.currentEdgeIndex]['source']
+         ) &&
+         !self.isOnScreen(
+           self.graph.edges[self.currentEdgeIndex]['target'])
+         ) {
+        self.currentEdgeIndex++;
+      }else {
+        self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
+      }
     }
 
-    if (self.currentEdgeIndex < c &&
-        (self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['source']) ||
-        self.isOnScreen(self.graph.edges[self.currentEdgeIndex]['target']))) {
-      self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
-      return true;
-    }else {
-      return false;
-    }
+    return self.currentEdgeIndex < c;
   }
 
   this.worker_drawNode = function() {
     var c = self.graph.nodes.length;
-    while (self.currentNodeIndex < c &&
-           !self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
-      self.currentNodeIndex++;
+    var i = 0;
+    while (i++< self.nodesSpeed && self.currentNodeIndex < c) {
+      if (!self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
+        self.currentNodeIndex++;
+      }else {
+        self.drawNode(self.graph.nodes[self.currentNodeIndex++]);
+      }
     }
 
-    if (self.currentNodeIndex < c &&
-        self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
-      self.drawNode(self.graph.nodes[self.currentNodeIndex++]);
-      return true;
-    }else {
-      return false;
-    }
+    return self.currentNodeIndex < c;
   }
 }
 
