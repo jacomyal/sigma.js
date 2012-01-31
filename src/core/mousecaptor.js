@@ -10,6 +10,8 @@ function MouseCaptor(canvas, graph) {
   this.mouseY = 0;
   this.oldMouseX = 0;
   this.oldMouseY = 0;
+  this.startX = 0;
+  this.startY = 0;
 
   this.isMouseDown = false;
   this.triggerDrag = false;
@@ -19,48 +21,63 @@ function MouseCaptor(canvas, graph) {
   this.stageY = 0;
   this.ratio = 1;
 
-  this.moveHandler = function(event) {
-    self.oldMouseX = event.mouseX;
-    self.oldMouseY = event.mouseY;
+  // CALLBACKS
+  function moveHandler(event) {
+    self.oldMouseX = self.mouseX;
+    self.oldMouseY = self.mouseY;
 
     self.mouseX = event.offsetX;
     self.mouseY = event.offsetY;
 
-    self.isMouseDown && self.drag(event);
+    self.isMouseDown && drag(event);
   };
 
-  this.upHandler = function(event) {
+  function upHandler(event) {
     self.isMouseDown = false;
 
-    self.stopDrag();
+    stopDrag();
   };
 
-  this.downHandler = function(event) {
+  function downHandler(event) {
     self.isMouseDown = true;
-    self.oldMouseX = event.mouseX;
-    self.oldMouseY = event.mouseY;
+    self.oldMouseX = self.mouseX;
+    self.oldMouseY = self.mouseY;
 
     self.triggerDrag = false;
 
-    self.startDrag();
+    startDrag();
   };
 
-  this.canvas.onmousemove = this.moveHandler;
-  this.canvas.onmousedown = this.downHandler;
-  document.onmouseup = this.upHandler;
+  function wheelHandler(event) {
+    self.ratio += event.wheelDelta / 10;
+  };
 
-  this.startDrag = function(event) {
-    // TODO
+  // CUSTOM ACTIONS
+  function startDrag(event) {
+    self.startX = self.mouseX;
+    self.startY = self.mouseY;
+
     self.dispatch('startdrag', event);
   };
 
-  this.stopDrag = function(event) {
+  function stopDrag(event) {
     // TODO
     self.dispatch('stopdrag', event);
   };
 
-  this.drag = function(event) {
-    // TODO
-    self.dispatch('drag', event);
+  function drag(event) {
+    self.dispatch('drag', {
+      dx: self.mouseX - self.startX,
+      dy: self.mouseY - self.startY,
+      x: self.mouseX,
+      y: self.mouseY,
+      ratio: self.ratio
+    });
   };
+
+  // ADD CALLBACKS
+  this.canvas.onmousewheel = wheelHandler;
+  this.canvas.onmousemove = moveHandler;
+  this.canvas.onmousedown = downHandler;
+  document.onmouseup = upHandler;
 }
