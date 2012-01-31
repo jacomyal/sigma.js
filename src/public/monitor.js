@@ -11,5 +11,9 @@ sigma.monitor = (function() {
     return sigma.scheduler.queue.length;
   }
 
+  this.getScheduleTime = function() {
+    return sigma.scheduler.startTime - sigma.scheduler.time;
+  }
+
   return this;
 })();

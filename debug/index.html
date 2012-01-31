@@ -36,6 +36,7 @@
           document.getElementById('fps').textContent = Math.round(sigma.monitor.getFPS()*10)/10||'-';
           document.getElementById('workers').textContent = sigma.monitor.getWorkersCount();
           document.getElementById('queue').textContent = sigma.monitor.getQueueLength();
+          document.getElementById('schedule').textContent = sigma.monitor.getScheduleTime();
 
           // Draw status
           document.getElementById('nodesdrawn').textContent = s.plotter.currentNodeIndex;
@@ -147,6 +148,7 @@
       Queue: <span id="queue">-</span> workers<br>
       Nodes: <span id="nodesdrawn">-</span>/<span id="nodestotal">-</span> nodes drawn<br />
       Edges: <span id="edgesdrawn">-</span>/<span id="edgestotal">-</span> edges drawn<br />
+      Whole schedule time spent: <span id="schedule">-</span> ms<br>
       <br />
       Mouse X: <span id="mousex">-</span><br />
       Mouse Y: <span id="mousey">-</span><br />
