@@ -34,9 +34,9 @@ Sigma.prototype.resize = function() {
 Sigma.prototype.clearSchedule = function() {
   var self = this;
   sigma.scheduler.removeWorker(
-    'node_' + self.id, true
+    'node_' + self.id, 2
   ).removeWorker(
-    'edge_' + self.id, true
+    'edge_' + self.id, 2
   ).stop();
 };
 

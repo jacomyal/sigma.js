@@ -97,10 +97,16 @@ sigma.scheduler = (function() {
     return this;
   };
 
-  this.removeWorker = function(v, emptyQueue) {
+  // queueStatus:
+  //  - 0: nothing
+  //  - 1: trigger queue
+  //  - 2: empty queue
+  this.removeWorker = function(v, queueStatus) {
+    var self = this;
+    
     if (v == undefined) {
       this.workers = [];
-      if (emptyQueue) {
+      if (queueStatus>0) {
         this.queue = [];
       }
       stop();
@@ -114,8 +120,11 @@ sigma.scheduler = (function() {
         return true;
       });
 
-      if (emptyQueue) {
+      if (queueStatus>0) {
         this.queue = this.queue.filter(function(e) {
+          if(queueStatus==1 && e['parent'] == n){
+            this.workers.push(e);
+          }
           return e['parent'] != n;
         });
       }
