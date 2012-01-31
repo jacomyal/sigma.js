@@ -56,7 +56,7 @@ sigma.scheduler = (function() {
     if (!this.workers[this.index]['w']()) {
       var n = this.workers[this.index]['name'];
 
-      this.queue.filter(function(e) {
+      this.queue = this.queue.filter(function(e) {
         (e['parent'] == n) && this.workers.push({
           'name': e['name'],
           'w': e['w']

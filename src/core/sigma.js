@@ -31,15 +31,20 @@ Sigma.prototype.resize = function() {
   this.draw();
 };
 
-Sigma.prototype.draw = function(nodes, edges, scheduled) {
+Sigma.prototype.clearSchedule = function() {
   var self = this;
-
-  // Remove workers:
   sigma.scheduler.removeWorker(
     'node_' + self.id, true
   ).removeWorker(
     'edge_' + self.id, true
   ).stop();
+};
+
+Sigma.prototype.draw = function(nodes, edges, scheduled) {
+  var self = this;
+
+  // Remove workers:
+  this.clearSchedule();
 
   // Rescale graph:
   this.graph.rescale(this.width, this.height);
@@ -57,12 +62,12 @@ Sigma.prototype.draw = function(nodes, edges, scheduled) {
   // Start workers:
   sigma.scheduler.addWorker(
     this.plotter.worker_drawNode,
-    'node_' + this.id,
+    'node_' + self.id,
     false
   ).queueWorker(
     this.plotter.worker_drawEdge,
-    'edge_' + this.id,
-    'node_' + this.id
+    'edge_' + self.id,
+    'node_' + self.id
   ).start();
 };
 
