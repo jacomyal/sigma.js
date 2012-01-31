@@ -4,12 +4,13 @@ sigma.scheduler = (function() {
 
   window.requestAnimFrame = (function() {
     return function(callback) {
-      window.setTimeout(callback, 0);
-    };
+        window.setTimeout(callback, 0);
+      };
   })();
 
   this.isRunning = false;
   this.fpsReq = 30;
+  this.queue = [];
   this.workers = [];
   this.frameTime = 1000 / this.fpsReq;
   this.correctedFrameTime = this.frameTime;
@@ -53,6 +54,16 @@ sigma.scheduler = (function() {
   this.routine = function() {
     this.index = this.index % this.workers.length;
     if (!this.workers[this.index]['w']()) {
+      var n = this.workers[this.index]['name'];
+
+      this.queue.filter(function(e) {
+        (e['parent'] == n) && this.workers.push({
+          'name': e['name'],
+          'w': e['w']
+        });
+        return e['parent'] != n;
+      });
+
       this.dispatch('killed', this.workers.splice(this.index--, 1)[0]);
     }
 
@@ -70,14 +81,44 @@ sigma.scheduler = (function() {
     return this;
   };
 
-  this.removeWorker = function(v) {
+  this.queueWorker = function(w, name, parent) {
+    if (!this.workers.some(function(e) {
+      return e['name'] == parent;
+    })) {
+      throw new Error('Parent worker is not attached.');
+    }
+
+    this.queue.push({
+      'parent': parent,
+      'name': name,
+      'w': w
+    });
+
+    return this;
+  };
+
+  this.removeWorker = function(v, emptyQueue) {
     if (v == undefined) {
       this.workers = [];
+      if (emptyQueue) {
+        this.queue = [];
+      }
       stop();
     } else {
+      var n;
       this.workers = this.workers.filter(function(e) {
-        return (typeof v == 'string') ? e['name'] != v : e['w'] != v;
+        if ((typeof v == 'string') ? e['name'] == v : e['w'] == v) {
+          n = e['name'];
+          return false;
+        }
+        return true;
       });
+
+      if (n && emptyQueue) {
+        this.queue = this.queue.filter(function(e) {
+          return e['parent'] != n;
+        });
+      }
     }
 
     this.isRunning = !!(!this.workers.length || (stop() && false));

@@ -31,42 +31,38 @@ Sigma.prototype.resize = function() {
   this.draw();
 };
 
-Sigma.prototype.draw = function() {
+Sigma.prototype.draw = function(nodes, edges, scheduled) {
   var self = this;
 
   // Remove workers:
   sigma.scheduler.removeWorker(
-    'node_' + self.id
+    'node_' + self.id, true
   ).removeWorker(
-    'edge_' + self.id
+    'edge_' + self.id, true
   ).stop();
 
   // Rescale graph:
   this.graph.rescale(this.width, this.height);
+  this.graph.translate(
+    this.mousecaptor.stageX,
+    this.mousecaptor.stageY,
+    this.mousecaptor.ratio
+  );
 
   // Clear scene:
   this.canvas.width = this.canvas.width;
-
   this.plotter.currentEdgeIndex = 0;
   this.plotter.currentNodeIndex = 0;
 
   // Start workers:
-  sigma.scheduler.addListener(
-    'killed',
-    function(e) {
-      if (e.content['name'] == 'node_' + self.id) {
-        sigma.scheduler.stop().removeListener('killed', self.onWorkerKilled);
-        sigma.scheduler.addWorker(
-          self.plotter.worker_drawEdge,
-          'edge_' + self.id,
-          false
-        ).start();
-      }
-    }
-  ).addWorker(
+  sigma.scheduler.addWorker(
     this.plotter.worker_drawNode,
     'node_' + this.id,
     false
+  ).queueWorker(
+    this.plotter.worker_drawEdge,
+    'edge_' + this.id,
+    'node_' + this.id
   ).start();
 };
 
