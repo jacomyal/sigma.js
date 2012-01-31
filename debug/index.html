@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xml:lang="fr" lang="fr">
+  <title>sigma.js | debug</title>
+  <script type="text/javascript" src="../build/sigma.concat.js"></script>
+  <script type="text/javascript">
+    var s;
+    
+    function init(){
+      if(!s){
+        // INIT SIGMA:
+        s = sigma.fps(60).init(document.getElementById('graph'));
+        window.SIGMA = s;
+  
+        // INIT GRAPH:
+        var N = 400, E = 12000, g = s.getGraph();
+        for(var i=0;i<N;i++){
+          g.addNode('n'+i,{
+            'x': 2000*Math.random(),
+            'y': 1000*Math.random(),
+            'size': 1+3*Math.random(),
+            'color': '#'+Math.floor(Math.random()*16777215).toString(16)
+          });
+        }
+        for(var i=0;i<E;i++){
+          g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
+            'size': 0.4
+          });
+        }
+
+        window.onresize = function(){
+          s.resize();
+        };
+
+        window.setInterval(function(){
+          // Scheduler status
+          document.getElementById('fps').textContent = Math.round(sigma.monitor.getFPS()*10)/10||'-';
+          document.getElementById('workers').textContent = sigma.monitor.getWorkersCount();
+          document.getElementById('queue').textContent = sigma.monitor.getQueueLength();
+
+          // Draw status
+          document.getElementById('nodesdrawn').textContent = s.plotter.currentNodeIndex;
+          document.getElementById('edgesdrawn').textContent = s.plotter.currentEdgeIndex;
+          document.getElementById('nodestotal').textContent = s.getGraph().nodes.length;
+          document.getElementById('edgestotal').textContent = s.getGraph().edges.length;
+
+          // Mouse status
+          document.getElementById('mousex').textContent = s.mousecaptor.mouseX;
+          document.getElementById('mousey').textContent = s.mousecaptor.mouseY;
+          document.getElementById('mousedown').textContent = s.mousecaptor.isMouseDown;
+        },10);
+      }
+
+      s.draw();
+    }
+  </script>
+  <style type="text/css">
+    body{
+      padding: 0;
+      margin: 0;
+    }
+    div#header{
+      background: url("./header_bg.png");
+      text-shadow: #006 0 2px 0;
+      height: 49px;
+      line-height: 53px;
+      font-size: 24px;
+      font-family: Georgia;
+      color: #fff;
+    }
+    div#header span.fat{
+      font-size: 30px;
+    }
+    div#graph{
+      position: absolute;
+      top: 49px;
+      bottom: 0;
+      width: 100%;
+      background: #000;
+    }
+    div#toplayer{
+      position: absolute;
+      padding-top: 10px;
+      margin-left: -400px;
+      width: 800px;
+      left: 50%;
+    }
+    div#toplayer > div#background{
+      position: absolute;
+      left: -10px;
+      right: -10px;
+      top: 0;
+      bottom: -10px;
+      border-radius: 0 0 10px 10px;
+      -moz-border-radius: 0 0 10px 10px;
+      -webkit-border-radius: 0 0 10px 10px;
+      opacity: 0;
+      background: #333;
+      border: 1px #000 solid;
+      -webkit-transition-property: opacity;
+      -webkit-transition-duration: 0.4s;
+      -moz-transition-property: opacity;
+      -moz-transition-duration: 0.4s;
+      transition-property: opacity;
+      transition-duration: 0.4s;
+    }
+    div#toplayer:hover > div#background{
+      opacity: 0.5;
+      display: block;
+    }
+    div#monitoring{
+      position: relative;
+      display: inline-block;
+      color: #ddf;
+      text-shadow: #000 0 1px 0;
+      font-family: "Lucida Console";
+      width: 45%;
+      font-size: 12px;
+    }
+    div#buttons{
+      display: inline-block;
+      position: absolute;
+      text-align: right;
+      width: 45%;
+      right: 0;
+    }
+    input[type="button"]{
+      cursor: pointer;
+      margin: 5px;
+    }
+    .centered{
+      position: relative;
+      width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="graph"></div>
+  <div id="header">
+    <div class="centered"><span class="fat">sigma.js</span> - debug</div>
+  </div>
+  <div id="toplayer">
+    <div id="background"></div>
+    <div id="monitoring">
+      FPS: <span id="fps">-</span> fps<br>
+      Workers: <span id="workers">-</span> workers<br>
+      Queue: <span id="queue">-</span> workers<br>
+      Nodes: <span id="nodesdrawn">-</span>/<span id="nodestotal">-</span> nodes drawn<br />
+      Edges: <span id="edgesdrawn">-</span>/<span id="edgestotal">-</span> edges drawn<br />
+      <br />
+      Mouse X: <span id="mousex">-</span><br />
+      Mouse Y: <span id="mousey">-</span><br />
+      Is mouse down: <span id="mousedown">false</span><br />
+    </div>
+    <div id="buttons">
+      <input type="button" value="initialize sigma.js" onclick="init();"></input>
+    </div>
+  </div>
+</body>
+</html>
