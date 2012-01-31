@@ -103,10 +103,10 @@ sigma.scheduler = (function() {
   //  - 2: empty queue
   this.removeWorker = function(v, queueStatus) {
     var self = this;
-    
+
     if (v == undefined) {
       this.workers = [];
-      if (queueStatus>0) {
+      if (queueStatus > 0) {
         this.queue = [];
       }
       stop();
@@ -120,9 +120,9 @@ sigma.scheduler = (function() {
         return true;
       });
 
-      if (queueStatus>0) {
+      if (queueStatus > 0) {
         this.queue = this.queue.filter(function(e) {
-          if(queueStatus==1 && e['parent'] == n){
+          if (queueStatus == 1 && e['parent'] == n) {
             this.workers.push(e);
           }
           return e['parent'] != n;
