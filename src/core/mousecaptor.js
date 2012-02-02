@@ -43,12 +43,24 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function upHandler(event) {
+    self.oldMouseX = self.mouseX;
+    self.oldMouseY = self.mouseY;
+
+    self.mouseX = event.offsetX;
+    self.mouseY = event.offsetY;
+
     self.isMouseDown = false;
 
     stopDrag();
   };
 
   function downHandler(event) {
+    self.oldMouseX = self.mouseX;
+    self.oldMouseY = self.mouseY;
+
+    self.mouseX = event.offsetX;
+    self.mouseY = event.offsetY;
+
     self.isMouseDown = true;
     self.oldMouseX = self.mouseX;
     self.oldMouseY = self.mouseY;
@@ -59,21 +71,28 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function wheelHandler(event) {
+    self.oldMouseX = self.mouseX;
+    self.oldMouseY = self.mouseY;
+
+    self.mouseX = event.offsetX;
+    self.mouseY = event.offsetY;
+
     startZooming(event.wheelDelta);
   };
 
   // CUSTOM ACTIONS
   function startDrag() {
+    self.oldStageX = self.stageX;
+    self.oldStageY = self.stageY;
     self.startX = self.mouseX;
     self.startY = self.mouseY;
-
     self.dispatch('startdrag');
   };
 
   function stopDrag() {
-    self.oldStageX = self.stageX;
-    self.oldStageY = self.stageY;
-    self.dispatch('stopdrag');
+    if (self.oldStageX != self.stageX || self.oldStageY != self.stageY) {
+      self.dispatch('stopdrag');
+    }
   };
 
   function drag() {
@@ -84,21 +103,15 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function startZooming(delta) {
+    window.clearInterval(self.zoomID);
+
     self.oldRatio = self.ratio;
     self.targetRatio = self.ratio * (delta > 0 ? 2 : 1 / 2);
     self.progress = 0;
 
-    /*sigma.scheduler.addWorker(
-      zooming,
-      'zooming_'+self.id,
-      false
-    ).queueWorker(
-      stopZooming,
-      'stopzooming_'+self.id,
-      'zooming_'+self.id
-    ).start();*/
-
+    zooming();
     self.zoomID = window.setInterval(zooming, 50);
+    self.dispatch('startzooming');
   };
 
   function stopZooming() {
@@ -108,38 +121,34 @@ function MouseCaptor(canvas, graph, id) {
     self.stageX = self.mouseX +
                   (self.stageX - self.mouseX) *
                   self.ratio /
-                  self.ratio;
+                  oldRatio;
     self.stageY = self.mouseY +
                   (self.stageY - self.mouseY) *
                   self.ratio /
-                  self.ratio;
+                  oldRatio;
 
     self.dispatch('stopzooming');
-    return false;
   };
 
   function zooming() {
-    self.progress += 0.05;
-    var k = sigma.easing.quadratic.easeinout(self.progress);
+    self.progress += 0.1;
+    var k = sigma.easing.linear.easenone(self.progress);
     var oldRatio = self.ratio;
 
     self.ratio = self.oldRatio * (1 - k) + self.targetRatio * k;
     self.stageX = self.mouseX +
                   (self.stageX - self.mouseX) *
                   self.ratio /
-                  self.ratio;
+                  oldRatio;
     self.stageY = self.mouseY +
                   (self.stageY - self.mouseY) *
                   self.ratio /
-                  self.ratio;
+                  oldRatio;
 
-    dispatch('zooming');
-
-    //return self.progress<1;
-
+    self.dispatch('zooming');
     if (self.progress > 1) {
       window.clearInterval(self.zoomID);
-      window.setTimeout(stopZooming, 50);
+      stopZooming();
     }
   };
 
