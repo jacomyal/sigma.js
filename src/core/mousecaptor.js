@@ -112,10 +112,13 @@ function MouseCaptor(canvas, graph, id) {
 
     self.oldRatio = self.ratio;
     self.targetRatio = self.ratio * (delta > 0 ? 2 : 1 / 2);
-    self.targetRatio = Math.min(Math.max(self.targetRatio,self.limits.minRatio),self.limits.maxRatio);
+    self.targetRatio = Math.min(
+      Math.max(self.targetRatio, self.limits.minRatio),
+      self.limits.maxRatio
+    );
     self.progress = 0;
 
-    if(self.ratio!=self.targetRatio){
+    if (self.ratio != self.targetRatio) {
       zooming();
       self.zoomID = window.setInterval(zooming, 50);
       self.dispatch('startzooming');

@@ -1,17 +1,21 @@
-function Plotter(nodesCtx, edgesCtx, graph, w, h) {
+function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h) {
   var self = this;
 
   this.nodesCtx = nodesCtx;
   this.edgesCtx = edgesCtx;
+  this.labelsCtx = labelsCtx;
+
   this.graph = graph;
   this.width = w;
   this.height = h;
 
   this.currentEdgeIndex = 0;
   this.currentNodeIndex = 0;
+  this.currentLabelIndex = 0;
 
   this.edgesSpeed = 200;
   this.nodesSpeed = 200;
+  this.labelsSpeed = 200;
 
   this.worker_drawEdge = function() {
     var c = self.graph.edges.length;
@@ -44,6 +48,20 @@ function Plotter(nodesCtx, edgesCtx, graph, w, h) {
     }
 
     return self.currentNodeIndex < c;
+  }
+
+  this.worker_drawLabel = function() {
+    var c = self.graph.nodes.length;
+    var i = 0;
+    while (i++< self.labelsSpeed && self.currentLabelIndex < c) {
+      if (!self.isOnScreen(self.graph.nodes[self.currentLabelIndex])) {
+        self.currentLabelIndex++;
+      }else {
+        self.drawLabel(self.graph.nodes[self.currentLabelIndex++]);
+      }
+    }
+
+    return self.currentLabelIndex < c;
   }
 }
 
@@ -98,6 +116,18 @@ Plotter.prototype.drawNode = function(node) {
 
   ctx.closePath();
   ctx.fill();
+};
+
+Plotter.prototype.drawLabel = function(node) {
+  var ctx = this.labelsCtx;
+
+  ctx.font = node['displaySize'] * 1.5 + 'px Calibri,Geneva,Arial';
+  ctx.fillStyle = node['color'];
+  ctx.fillText(
+    node['label'],
+    node['displayX'] + node['displaySize'] * 1.5,
+    node['displayY'] + node['displaySize'] / 2
+  );
 };
 
 Plotter.prototype.isOnScreen = function(node) {

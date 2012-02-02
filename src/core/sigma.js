@@ -5,37 +5,24 @@ function Sigma(root, id) {
   this.width = this.dom.offsetWidth;
   this.height = this.dom.offsetHeight;
 
-  this.nodesCanvas = document.createElement('canvas');
-  this.nodesCanvas.style.position = 'absolute';
-  this.nodesCanvas.setAttribute('id', 'sigma_' + this.id);
-  this.nodesCanvas.setAttribute('class', 'sigma_nodes_canvas');
-  this.nodesCanvas.setAttribute('width', this.width + 'px');
-  this.nodesCanvas.setAttribute('height', this.height + 'px');
-
-  this.edgesCanvas = document.createElement('canvas');
-  this.edgesCanvas.style.position = 'absolute';
-  this.edgesCanvas.setAttribute('id', 'sigma_' + this.id);
-  this.edgesCanvas.setAttribute('class', 'sigma_nodes_canvas');
-  this.edgesCanvas.setAttribute('width', this.width + 'px');
-  this.edgesCanvas.setAttribute('height', this.height + 'px');
-
-  this.dom.appendChild(this.edgesCanvas);
-  this.dom.appendChild(this.nodesCanvas);
-
-  this.nodesCtx = this.nodesCanvas.getContext('2d');
-  this.edgesCtx = this.edgesCanvas.getContext('2d');
+  this.canvas = {};
+  this.initCanvas('edges');
+  this.initCanvas('nodes');
+  this.initCanvas('labels');
+  this.initCanvas('mouse');
 
   // Intern classes:
   this.graph = new sigma.classes.Graph();
   this.plotter = new Plotter(
-    this.nodesCtx,
-    this.edgesCtx,
+    this.canvas.nodes.getContext('2d'),
+    this.canvas.edges.getContext('2d'),
+    this.canvas.labels.getContext('2d'),
     this.graph,
     this.width,
     this.height
   );
   this.mousecaptor = new MouseCaptor(
-    this.nodesCanvas,
+    this.canvas.mouse,
     this.graph,
     this.id
   );
@@ -43,9 +30,9 @@ function Sigma(root, id) {
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-    self.draw(true, false, false, true);
+    self.draw(true, false, true, true);
   }).addListener('stopdrag stopzooming', function(e) {
-    self.draw(true, true, false, true);
+    self.draw(true, true, true, true);
   });
 }
 
@@ -53,13 +40,12 @@ Sigma.prototype.resize = function() {
   this.width = this.dom.offsetWidth;
   this.height = this.dom.offsetHeight;
 
-  this.nodesCanvas.setAttribute('width', this.width + 'px');
-  this.nodesCanvas.setAttribute('height', this.height + 'px');
+  for (var k in this.canvas) {
+    this.canvas[k].setAttribute('width', this.width + 'px');
+    this.canvas[k].setAttribute('height', this.height + 'px');
+  }
 
-  this.edgesCanvas.setAttribute('width', this.width + 'px');
-  this.edgesCanvas.setAttribute('height', this.height + 'px');
-
-  this.draw(true, true, false, true);
+  this.draw(true, true, true, true);
 };
 
 Sigma.prototype.clearSchedule = function() {
@@ -68,7 +54,20 @@ Sigma.prototype.clearSchedule = function() {
     'node_' + self.id, 2
   ).removeWorker(
     'edge_' + self.id, 2
+  ).removeWorker(
+    'label_' + self.id, 2
   ).stop();
+};
+
+Sigma.prototype.initCanvas = function(type) {
+  this.canvas[type] = document.createElement('canvas');
+  this.canvas[type].style.position = 'absolute';
+  this.canvas[type].setAttribute('id', 'sigma_' + type + '_' + this.id);
+  this.canvas[type].setAttribute('class', 'sigma_' + type + '_canvas');
+  this.canvas[type].setAttribute('width', this.width + 'px');
+  this.canvas[type].setAttribute('height', this.height + 'px');
+
+  this.dom.appendChild(this.canvas[type]);
 };
 
 Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
@@ -86,10 +85,13 @@ Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
   );
 
   // Clear scene:
-  this.nodesCanvas.width = this.nodesCanvas.width;
-  this.edgesCanvas.width = this.edgesCanvas.width;
+  for (var k in this.canvas) {
+    this.canvas[k].width = this.canvas[k].width;
+  }
+
   this.plotter.currentEdgeIndex = 0;
   this.plotter.currentNodeIndex = 0;
+  this.plotter.currentLabelIndex = 0;
 
   // Start workers:
   if (nodes) {
@@ -97,6 +99,12 @@ Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
       this.plotter.worker_drawNode,
       'node_' + self.id,
       false
+    );
+
+    labels && sigma.scheduler.queueWorker(
+      this.plotter.worker_drawLabel,
+      'label_' + self.id,
+      'node_' + self.id
     );
 
     edges && sigma.scheduler.queueWorker(
@@ -110,6 +118,20 @@ Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
     sigma.scheduler.addWorker(
       this.plotter.worker_drawEdge,
       'edge_' + self.id,
+      false
+    );
+
+    labels && sigma.scheduler.addWorker(
+      this.plotter.worker_drawLabel,
+      'label_' + self.id,
+      false
+    );
+
+    sigma.scheduler.start();
+  }else if (labels) {
+    sigma.scheduler.addWorker(
+      this.plotter.worker_drawLabel,
+      'label_' + self.id,
       false
     ).start();
   }else {
