@@ -43,10 +43,8 @@ function Sigma(root, id) {
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-    console.log(e['type']);
     self.draw(true, false, false, true);
   }).addListener('stopdrag stopzooming', function(e) {
-    console.log(e['type']);
     self.draw(true, true, false, true);
   });
 }
