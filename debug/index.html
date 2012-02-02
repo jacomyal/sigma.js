@@ -9,7 +9,6 @@
       if(!s){
         // INIT SIGMA:
         s = sigma.fps(60).init(document.getElementById('graph'));
-        window.SIGMA = s;
   
         // INIT GRAPH:
         var N = 600, E = 12000, g = s.getGraph();
@@ -23,7 +22,7 @@
         }
         for(var i=0;i<E;i++){
           g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
-            'size': 0.4
+            'size': 0.2
           });
         }
 
@@ -48,8 +47,25 @@
           document.getElementById('mousex').textContent = s.mousecaptor.mouseX;
           document.getElementById('mousey').textContent = s.mousecaptor.mouseY;
           document.getElementById('mousedown').textContent = s.mousecaptor.isMouseDown;
+
+          // Scene status
+          document.getElementById('stagex').textContent = Math.round(s.mousecaptor.stageX*10)/10;
+          document.getElementById('stagey').textContent = Math.round(s.mousecaptor.stageY*10)/10;
+          document.getElementById('ratio').textContent = Math.round(s.mousecaptor.ratio*10)/10;
         },10);
       }
+
+      s.draw(true,true);
+    }
+
+    function resetPosition(){
+      if(!s){
+        return;
+      }
+
+      s.mousecaptor.stageX = 0;
+      s.mousecaptor.stageY = 0;
+      s.mousecaptor.ratio = 1;
 
       s.draw(true,true);
     }
@@ -153,9 +169,14 @@
       Mouse X: <span id="mousex">-</span><br />
       Mouse Y: <span id="mousey">-</span><br />
       Is mouse down: <span id="mousedown">false</span><br />
+      <br />
+      Stage X: <span id="stagex">-</span><br />
+      Stage Y: <span id="stagey">-</span><br />
+      Zoom ratio: <span id="ratio">-</span><br />
     </div>
     <div id="buttons">
       <input type="button" value="initialize sigma.js" onclick="init();"></input>
+      <input type="button" value="reset position" onclick="resetPosition();"></input>
     </div>
   </div>
 </body>
