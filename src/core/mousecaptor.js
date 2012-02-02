@@ -31,6 +31,11 @@ function MouseCaptor(canvas, graph, id) {
 
   this.progress = 0;
 
+  this.limits = {
+    minRatio: 1,
+    maxRatio: 10
+  };
+
   // CALLBACKS
   function moveHandler(event) {
     self.oldMouseX = self.mouseX;
@@ -107,11 +112,14 @@ function MouseCaptor(canvas, graph, id) {
 
     self.oldRatio = self.ratio;
     self.targetRatio = self.ratio * (delta > 0 ? 2 : 1 / 2);
+    self.targetRatio = Math.min(Math.max(self.targetRatio,self.limits.minRatio),self.limits.maxRatio);
     self.progress = 0;
 
-    zooming();
-    self.zoomID = window.setInterval(zooming, 50);
-    self.dispatch('startzooming');
+    if(self.ratio!=self.targetRatio){
+      zooming();
+      self.zoomID = window.setInterval(zooming, 50);
+      self.dispatch('startzooming');
+    }
   };
 
   function stopZooming() {
@@ -132,7 +140,7 @@ function MouseCaptor(canvas, graph, id) {
 
   function zooming() {
     self.progress += 0.1;
-    var k = sigma.easing.linear.easenone(self.progress);
+    var k = sigma.easing.quadratic.easeout(self.progress);
     var oldRatio = self.ratio;
 
     self.ratio = self.oldRatio * (1 - k) + self.targetRatio * k;
