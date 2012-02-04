@@ -121,13 +121,15 @@ Plotter.prototype.drawNode = function(node) {
 Plotter.prototype.drawLabel = function(node) {
   var ctx = this.labelsCtx;
 
-  ctx.font = node['displaySize'] * 1.5 + 'px Calibri,Geneva,Arial';
-  ctx.fillStyle = node['color'];
-  ctx.fillText(
-    node['label'],
-    node['displayX'] + node['displaySize'] * 1.5,
-    node['displayY'] + node['displaySize'] / 2
-  );
+  if (node['displaySize'] * 2 >= 10) {
+    ctx.font = node['displaySize'] * 2 + 'px Calibri,Geneva,Arial';
+    ctx.fillStyle = node['color'];
+    ctx.fillText(
+      node['label'],
+      node['displayX'] + node['displaySize'] * 1.5,
+      node['displayY'] + node['displaySize'] / 2
+    );
+  }
 };
 
 Plotter.prototype.isOnScreen = function(node) {

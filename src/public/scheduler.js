@@ -53,6 +53,7 @@ sigma.scheduler = (function() {
 
   this.routine = function() {
     this.index = this.index % this.workers.length;
+
     if (!this.workers[this.index]['w']()) {
       var n = this.workers[this.index]['name'];
 
@@ -82,10 +83,10 @@ sigma.scheduler = (function() {
   };
 
   this.queueWorker = function(w, name, parent) {
-    if (!this.workers.some(function(e) {
+    if (!this.workers.concat(this.queue).some(function(e) {
       return e['name'] == parent;
     })) {
-      throw new Error('Parent worker is not attached.');
+      throw new Error('Parent worker "' + parent + '" of "' + name + '" is not attached.');
     }
 
     this.queue.push({
