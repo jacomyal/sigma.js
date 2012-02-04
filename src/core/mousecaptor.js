@@ -33,7 +33,7 @@ function MouseCaptor(canvas, graph, id) {
 
   this.limits = {
     minRatio: 1,
-    maxRatio: 10
+    maxRatio: 16
   };
 
   // CALLBACKS

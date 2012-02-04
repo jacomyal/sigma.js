@@ -86,7 +86,9 @@ sigma.scheduler = (function() {
     if (!this.workers.concat(this.queue).some(function(e) {
       return e['name'] == parent;
     })) {
-      throw new Error('Parent worker "' + parent + '" of "' + name + '" is not attached.');
+      throw new Error(
+        'Parent worker "' + parent + '" of "' + name + '" is not attached.'
+      );
     }
 
     this.queue.push({

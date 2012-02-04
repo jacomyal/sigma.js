@@ -121,9 +121,9 @@ Plotter.prototype.drawNode = function(node) {
 Plotter.prototype.drawLabel = function(node) {
   var ctx = this.labelsCtx;
 
-  if (node['displaySize'] * 2 >= 10) {
+  if (node['displaySize'] * 2 >= 8) {
     ctx.font = node['displaySize'] * 2 + 'px Calibri,Geneva,Arial';
-    ctx.fillStyle = node['color'];
+    ctx.fillStyle = '#fff';
     ctx.fillText(
       node['label'],
       node['displayX'] + node['displaySize'] * 1.5,
