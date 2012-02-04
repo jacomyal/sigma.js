@@ -4,145 +4,28 @@ forceatlas2.ForceAtlas2 = function(graph) {
   var self = this;
   this.graph = graph;
 
-  // Behavior
-  this.linLogMode = false;
-  this.outboundAttractionDistribution = false;
-  this.adjustSizes = false;
-  this.edgeWeightInfluence = 0;
-  // Tuning
-  this.scalingRatio = 1;
-  this.strongGravityMode = false;
-  this.gravity = 1;
-  // Performance
-  this.jitterTolerance = 1;
-  this.barnesHutOptimize = false;
-  this.barnesHutTheta = 1.2;
+  this.p = {
+    linLogMode: false,
+    outboundAttractionDistribution: false,
+    adjustSizes: false,
+    edgeWeightInfluence: 0,
+    scalingRatio: 1,
+    strongGravityMode: false,
+    gravity: 1,
+    jitterTolerance: 1,
+    barnesHutOptimize: false,
+    barnesHutTheta: 1.2,
+    speed: 1,
+    outboundAttCompensation: 1,
+    totalSwinging: 0,
+    totalEffectiveTraction: 0,
+    complexIntervals: 10,
+    simpleIntervals: 100
+  };
 
-  // Atomizing
-  this.state = {step: 0, index: 0};   // The state tracked from one atomic "go" to another
-  this.complexIntervals = 10;     // Short interval for costly operations
-  this.simpleIntervals = 100;     // Large interval for cheap operations
-
-  // Info
-  this.totalSwinging = 0;  // How much irregular movement
-  this.totalEffectiveTraction = 0;  // Hom much useful movement
-
-  // other...
-  this.speed = 1;
+  // The state tracked from one atomic "go" to another
+  this.state = {step: 0, index: 0};
   this.rootRegion;
-  this.outboundAttCompensation = 1;
-
-  // Getters & Setters
-  this.setLinLogMode = function(x) {
-    if (self.state.step == 0) {
-      self.linLogMode = x;
-      return true;
-    }
-    return false;
-  }
-  this.getLinLogMode = function() {
-    return linLogMode;
-  }
-  this.setOutboundAttractionDistribution = function(x) {
-    if (self.state.step == 0) {
-      self.outboundAttractionDistribution = x;
-      return true;
-    }
-    return false;
-  }
-  this.getOutboundAttractionDistribution = function() {
-    return outboundAttractionDistribution;
-  }
-  this.setAdjustSizes = function(x) {
-    if (self.state.step == 0) {
-      self.adjustSizes = x;
-      return true;
-    }
-    return false;
-  }
-  this.getAdjustSizes = function() {
-    return adjustSizes;
-  }
-  this.setEdgeWeightInfluence = function(x) {
-    if (self.state.step == 0) {
-      self.edgeWeightInfluence = x;
-      return true;
-    }
-    return false;
-  }
-  this.getEdgeWeightInfluence = function() {
-    return edgeWeightInfluence;
-  }
-  this.setScalingRatio = function(x) {
-    if (self.state.step == 0) {
-      self.scalingRatio = x;
-      return true;
-    }
-    return false;
-  }
-  this.getScalingRatio = function() {
-    return scalingRatio;
-  }
-  this.setStrongGravityMode = function(x) {
-    if (self.state.step == 0) {
-      self.strongGravityMode = x;
-      return true;
-    }
-    return false;
-  }
-  this.getStrongGravityMode = function() {
-    return strongGravityMode;
-  }
-  this.setGravity = function(x) {
-    if (self.state.step == 0) {
-      self.gravity = x;
-      return true;
-    }
-    return false;
-  }
-  this.getGravity = function() {
-    return gravity;
-  }
-  this.setJitterTolerance = function(x) {
-    if (self.state.step == 0) {
-      self.jitterTolerance = x;
-      return true;
-    }
-    return false;
-  }
-  this.getJitterTolerance = function() {
-    return jitterTolerance;
-  }
-  this.setBarnesHutOptimize = function(x) {
-    if (self.state.step == 0) {
-      self.barnesHutOptimize = x;
-      return true;
-    }
-    return false;
-  }
-  this.getBarnesHutOptimize = function() {
-    return barnesHutOptimize;
-  }
-  this.setBarnesHutTheta = function(x) {
-    if (self.state.step == 0) {
-      self.barnesHutTheta = x;
-      return true;
-    }
-    return false;
-  }
-  this.getBarnesHutTheta = function() {
-    return barnesHutTheta;
-  }
-  // Monitoring
-  this.getTotalSwinging = function() {
-    return self.totalSwinging;
-  }
-  this.getTotalEffectiveTraction = function() {
-    return self.totalEffectiveTraction;
-  }
-  this.getTractionPerNode = function() {
-    return self.totalEffectiveTraction / graph.nodes.length;
-  }
 
   // Runtime (the ForceAtlas2 itself)
   this.init = function() {
@@ -163,11 +46,16 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
   this.atomicGo = function() {
     var graph = self.graph;
+    var nodes = graph.nodes;
+    var edges = graph.edges;
+
+    var cInt = self.p.complexIntervals;
+    var sInt = self.p.simpleIntervals;
 
     switch (self.state.step) {
       case 0: // Pass init
         // Initialise layout data
-        graph.nodes.forEach(function(n) {
+        nodes.forEach(function(n) {
           n.fa2.mass = 1 + n.degree;
           n.fa2.old_dx = n.fa2.dx;
           n.fa2.old_dy = n.fa2.dx;
@@ -176,18 +64,18 @@ forceatlas2.ForceAtlas2 = function(graph) {
         });
 
         // If Barnes Hut active, initialize root region
-        if (self.barnesHutOptimize) {
-          self.rootRegion = forceatlas2.Region(graph.nodes, 0);
+        if (self.p.barnesHutOptimize) {
+          self.rootRegion = new forceatlas2.Region(nodes, 0);
           self.rootRegion.buildSubRegions();
         }
 
         // If outboundAttractionDistribution active, compensate.
-        if (self.outboundAttractionDistribution) {
-          self.outboundAttCompensation = 0;
-          graph.nodes.forEach(function(n) {
-            self.outboundAttCompensation += n.fa2.mass;
+        if (self.p.outboundAttractionDistribution) {
+          self.p.outboundAttCompensation = 0;
+          nodes.forEach(function(n) {
+            self.p.outboundAttCompensation += n.fa2.mass;
           });
-          self.outboundAttCompensation /= graph.nodes.length;
+          self.p.outboundAttCompensation /= nodes.length;
         }
         self.state.step = 1;
         self.state.index = 0;
@@ -195,30 +83,44 @@ forceatlas2.ForceAtlas2 = function(graph) {
         break;
 
       case 1: // Repulsion
-        var Repulsion = self.ForceFactory.buildRepulsion(self.adjustSizes, self.scalingRatio);
-        if (self.barnesHutOptimize) {
+        var Repulsion = self.ForceFactory.buildRepulsion(
+          self.p.adjustSizes,
+          self.p.scalingRatio
+        );
+
+        if (self.p.barnesHutOptimize) {
           var rootRegion = self.rootRegion;
-          var barnesHutTheta = self.barnesHutTheta; // Pass to the scope of forEach
-          for (var i = self.state.index; i < graph.nodes.length && i < self.state.index + self.complexIntervals; i++) {
-            var n = graph.nodes[i];
+
+          // Pass to the scope of forEach
+          var barnesHutTheta = self.p.barnesHutTheta;
+          for (
+            var i = self.state.index;
+            i < nodes.length && i < self.state.index + cInt;
+            i++
+          ) {
+            var n = nodes[i];
             rootRegion.applyForce(n, Repulsion, barnesHutTheta);
           }
-          if (i == graph.nodes.length) {
+          if (i == nodes.length) {
             self.state.step = 2;
             self.state.index = 0;
           } else {
             self.state.index = i;
           }
         } else {
-          for (var i1 = self.state.index; i1 < graph.nodes.length && i1 < self.state.index + self.complexIntervals; i1++) {
-            var n1 = graph.nodes[i1];
-            graph.nodes.forEach(function(n2,i2) {
+          for (
+            var i1 = self.state.index;
+            i1 < nodes.length && i1 < self.state.index + cInt;
+            i1++
+          ) {
+            var n1 = nodes[i1];
+            nodes.forEach(function(n2,i2) {
               if (i2 < i1) {
                 Repulsion.apply_nn(n1, n2);
               }
             });
           }
-          if (i1 == graph.nodes.length) {
+          if (i1 == nodes.length) {
             self.state.step = 2;
             self.state.index = 0;
           } else {
@@ -229,15 +131,28 @@ forceatlas2.ForceAtlas2 = function(graph) {
         break;
 
       case 2: // Gravity
-        var Gravity = (self.strongGravityMode) ? (self.ForceFactory.getStrongGravity(self.scalingRatio)) : (self.ForceFactory.buildRepulsion(self.adjustSizes, self.scalingRatio));
+        var Gravity = (self.p.strongGravityMode) ?
+                      (self.ForceFactory.getStrongGravity(
+                        self.p.scalingRatio
+                      )) :
+                      (self.ForceFactory.buildRepulsion(
+                        self.p.adjustSizes,
+                        self.p.scalingRatio
+                      ));
         // Pass gravity and scalingRatio to the scope of the function
-        var gravity = self.gravity,
-        scalingRatio = self.scalingRatio;
-        for (var i = self.state.index; i < graph.nodes.length && i < self.state.index + self.simpleIntervals; i++) {
-          var n = graph.nodes[i];
+        var gravity = self.p.gravity,
+        scalingRatio = self.p.scalingRatio;
+
+        for (
+          var i = self.state.index;
+          i < nodes.length && i < self.state.index + sInt;
+          i++
+        ) {
+          var n = nodes[i];
           Gravity.apply_g(n, gravity / scalingRatio);
         }
-        if (i == graph.nodes.length) {
+
+        if (i == nodes.length) {
           self.state.step = 3;
           self.state.index = 0;
         } else {
@@ -247,76 +162,117 @@ forceatlas2.ForceAtlas2 = function(graph) {
         break;
 
       case 3: // Attraction
-        var Attraction = self.ForceFactory.buildAttraction(self.linLogMode, self.outboundAttractionDistribution, self.adjustSizes, 1 * ((self.outboundAttractionDistribution) ? (self.outboundAttCompensation) : (1)));
-        if (self.edgeWeightInfluence == 0) {
-          for (var i = self.state.index; i < graph.edges.length && i < self.state.index + self.complexIntervals; i++) {
-            var e = graph.edges[i];
+        var Attraction = self.ForceFactory.buildAttraction(
+          self.p.linLogMode,
+          self.p.outboundAttractionDistribution,
+          self.p.adjustSizes,
+          1 * ((self.p.outboundAttractionDistribution) ?
+            (self.p.outboundAttCompensation) :
+            (1))
+        );
+
+        var i = self.state.index;
+        if (self.p.edgeWeightInfluence == 0) {
+          while(i < edges.length && i < self.state.index + cInt){
+            var e = edges[i++];
             Attraction.apply_nn(e.source, e.target, 1);
           }
-        } else if (self.edgeWeightInfluence == 1) {
-          for (var i = self.state.index; i < graph.edges.length && i < self.state.index + self.complexIntervals; i++) {
-            var e = graph.edges[i];
+        } else if (self.p.edgeWeightInfluence == 1) {
+          while(i < edges.length && i < self.state.index + cInt){
+            var e = edges[i++];
             Attraction.apply_nn(e.source, e.target, e.weight || 1);
           }
         } else {
-          for (var i = self.state.index; i < graph.edges.length && i < self.state.index + self.complexIntervals; i++) {
-            var e = graph.edges[i];
-            Attraction.apply_nn(e.source, e.target, Math.pow(e.weight || 1, self.edgeWeightInfluence));
+          while(i < edges.length && i < self.state.index + cInt){
+            var e = edges[i++];
+            Attraction.apply_nn(
+              e.source, e.target,
+              Math.pow(e.weight || 1, self.p.edgeWeightInfluence)
+            );
           }
         }
-        if (i == graph.edges.length) {
+
+        if (i == edges.length) {
           self.state.step = 4;
           self.state.index = 0;
         } else {
           self.state.index = i;
         }
+
         return true;
         break;
 
       case 4: // Auto adjust speed
         var totalSwinging = 0;  // How much irregular movement
         var totalEffectiveTraction = 0;  // Hom much useful movement
-        graph.nodes.forEach(function(n) {
+
+        nodes.forEach(function(n) {
           var fixed = n.fixed || false;
           if (!fixed) {
-            var swinging = Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) + Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
-            totalSwinging += n.fa2.mass * swinging;   // If the node has a burst change of direction, then it's not converging.
-            totalEffectiveTraction += n.fa2.mass * 0.5 * Math.sqrt(Math.pow(n.fa2.old_dx + n.fa2.dx, 2) + Math.pow(n.fa2.old_dy + n.fa2.dy, 2));
+            var swinging = Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) +
+                           Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
+            
+            // If the node has a burst change of direction, then it's not converging.
+            totalSwinging += n.fa2.mass * swinging;
+            totalEffectiveTraction += n.fa2.mass *
+                                      0.5 *
+                                      Math.sqrt(
+                                        Math.pow(n.fa2.old_dx + n.fa2.dx, 2) +
+                                        Math.pow(n.fa2.old_dy + n.fa2.dy, 2)
+                                      );
           }
         });
-        self.totalSwinging = totalSwinging;
-        self.totalEffectiveTraction = totalEffectiveTraction;
-        // We want that swingingMovement < tolerance * convergenceMovement
-        var targetSpeed = self.jitterTolerance * self.jitterTolerance * self.totalEffectiveTraction / self.totalSwinging;
 
-        // But the speed shoudn't rise too much too quickly, since it would make the convergence drop dramatically.
+        self.p.totalSwinging = totalSwinging;
+        self.p.totalEffectiveTraction = totalEffectiveTraction;
+
+        // We want that swingingMovement < tolerance * convergenceMovement
+        var targetSpeed = Math.pow(self.p.jitterTolerance, 2) *
+                          self.p.totalEffectiveTraction /
+                          self.p.totalSwinging;
+
+        // But the speed shoudn't rise too much too quickly,
+        // since it would make the convergence drop dramatically.
         var maxRise = 0.5;   // Max rise: 50%
-        self.speed = self.speed + Math.min(targetSpeed - self.speed, maxRise * self.speed);
+        self.p.speed = self.p.speed +
+                       Math.min(
+                         targetSpeed - self.p.speed,
+                         maxRise * self.p.speed
+                       );
 
         // Save old coordinates
-        graph.nodes.forEach(function(n) {
+        nodes.forEach(function(n) {
           n.old_x = +n.x;
           n.old_y = +n.y;
         });
+
         self.state.step = 5;
         return true;
         break;
 
       case 5: // Apply forces
-        var i;
-        if (self.adjustSizes) {
-          var speed = self.speed;
-          // If nodes overlap prevention is active, it's not possible to trust the swinging mesure.
-          for (i = self.state.index; i < graph.nodes.length && i < self.state.index + self.simpleIntervals; i++) {
-            var n = graph.nodes[i];
+        var i = self.state.index;
+        if (self.p.adjustSizes) {
+          var speed = self.p.speed;
+          // If nodes overlap prevention is active,
+          // it's not possible to trust the swinging mesure.
+          while(i < nodes.length && i < self.state.index + sInt){
+            var n = nodes[i++];
             var fixed = n.fixed || false;
             if (!fixed) {
               // Adaptive auto-speed: the speed of each node is lowered
               // when the node swings.
-              var swinging = Math.sqrt((n.fa2.old_dx - n.fa2.dx) * (n.fa2.old_dx - n.fa2.dx) + (n.fa2.old_dy - n.fa2.dy) * (n.fa2.old_dy - n.fa2.dy));
+              var swinging = Math.sqrt(
+                (n.fa2.old_dx - n.fa2.dx) *
+                (n.fa2.old_dx - n.fa2.dx) +
+                (n.fa2.old_dy - n.fa2.dy) * 
+                (n.fa2.old_dy - n.fa2.dy)
+              );
               var factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
 
-              var df = Math.sqrt(Math.pow(n.fa2.dx, 2) + Math.pow(n.fa2.dy, 2));
+              var df = Math.sqrt(Math.pow(n.fa2.dx, 2) +
+                       Math.pow(n.fa2.dy, 2));
+
               factor = Math.min(factor * df, 10) / df;
 
               n.x += n.fa2.dx * factor;
@@ -324,14 +280,19 @@ forceatlas2.ForceAtlas2 = function(graph) {
             }
           }
         } else {
-          var speed = self.speed;
-          for (i = self.state.index; i < graph.nodes.length && i < self.state.index + self.simpleIntervals; i++) {
-            var n = graph.nodes[i];
+          var speed = self.p.speed;
+          while(i < nodes.length && i < self.state.index + sInt){
+            var n = nodes[i++];
             var fixed = n.fixed || false;
             if (!fixed) {
               // Adaptive auto-speed: the speed of each node is lowered
               // when the node swings.
-              var swinging = Math.sqrt((n.fa2.old_dx - n.fa2.dx) * (n.fa2.old_dx - n.fa2.dx) + (n.fa2.old_dy - n.fa2.dy) * (n.fa2.old_dy - n.fa2.dy));
+              var swinging = Math.sqrt(
+                (n.fa2.old_dx - n.fa2.dx) *
+                (n.fa2.old_dx - n.fa2.dx) +
+                (n.fa2.old_dy - n.fa2.dy) *
+                (n.fa2.old_dy - n.fa2.dy)
+              );
               var factor = speed / (1 + speed * Math.sqrt(swinging));
 
               n.x += n.fa2.dx * factor;
@@ -340,7 +301,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
           }
         }
 
-        if (i == graph.nodes.length) {
+        if (i == nodes.length) {
           self.state.step = 0;
           self.state.index = 0;
           return false;
@@ -351,7 +312,6 @@ forceatlas2.ForceAtlas2 = function(graph) {
         break;
 
       default:
-        //Liste d'instructions;
         throw new Error('ForceAtlas2 - atomic state error');
         break;
     }
@@ -369,33 +329,51 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
     // Tuning
     if (graph.nodes.length >= 100) {
-      this.scalingRatio = 2.0;
+      this.p.scalingRatio = 2.0;
     } else {
-      this.scalingRatio = 10.0;
+      this.p.scalingRatio = 10.0;
     }
-    this.strongGravityMode = false;
-    this.gravity = 1;
+    this.p.strongGravityMode = false;
+    this.p.gravity = 1;
 
     // Behavior
-    this.outboundAttractionDistribution = false;
-    this.linLogMode = false;
-    this.adjustSizes = false;
-    this.edgeWeightInfluence = 1;
+    this.p.outboundAttractionDistribution = false;
+    this.p.linLogMode = false;
+    this.p.adjustSizes = false;
+    this.p.edgeWeightInfluence = 1;
 
     // Performance
     if (graph.nodes.length >= 50000) {
-      this.jitterTolerance = 10;
+      this.p.jitterTolerance = 10;
     } else if (graph.nodes.length >= 5000) {
-      this.jitterTolerance = 1;
+      this.p.jitterTolerance = 1;
     } else {
-      this.jitterTolerance = 0.1;
+      this.p.jitterTolerance = 0.1;
     }
     if (graph.nodes.length >= 1000) {
-      this.barnesHutOptimize = true;
+      this.p.barnesHutOptimize = true;
     } else {
-      this.barnesHutOptimize = false;
+      this.p.barnesHutOptimize = false;
     }
-    this.barnesHutTheta = 1.2;
+    this.p.barnesHutTheta = 1.2;
+  }
+
+  this.params = function(a1, a2) {
+    if (typeof a1 == 'string' && a2 == undefined) {
+      return this.p[a1];
+    } else {
+      var o = (typeof a1 == 'object' && a2 == undefined) ? a1 : {};
+      if (typeof a1 == 'string') {
+        o[a1] = a2;
+      }
+
+      for (var k in o) {
+        if (this.p[k] != undefined) {
+          this.p[k] = o[k];
+        }
+      }
+      return this;
+    }
   }
 
   // All the different forces
@@ -748,7 +726,6 @@ forceatlas2.ForceAtlas2 = function(graph) {
       }
     },
 
-
     // Attraction force: Linear, distributed by Degree, with Anti-Collision
     logAttraction_degreeDistributed_antiCollision: function(c) {
       this.coefficient = c;
@@ -845,12 +822,12 @@ forceatlas2.Region = function(nodes, depth) {
 
       if (topleftNodes.length > 0) {
         if (nextDepth <= this.depthLimit && topleftNodes.length < this.nodes.length) {
-          var subregion = forceatlas2.Region(topleftNodes, nextDepth);
+          var subregion = new forceatlas2.Region(topleftNodes, nextDepth);
           subregions.push(subregion);
         } else {
           topleftNodes.forEach(function(n) {
             var oneNodeList = [n];
-            var subregion = forceatlas2.Region(oneNodeList, nextDepth);
+            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
             subregions.push(subregion);
           });
         }
@@ -858,36 +835,36 @@ forceatlas2.Region = function(nodes, depth) {
 
       if (bottomleftNodes.length > 0) {
         if (nextDepth <= this.depthLimit && bottomleftNodes.length < this.nodes.length) {
-          var subregion = forceatlas2.Region(bottomleftNodes, nextDepth);
+          var subregion = new forceatlas2.Region(bottomleftNodes, nextDepth);
           subregions.push(subregion);
         } else {
           bottomleftNodes.forEach(function(n) {
             var oneNodeList = [n];
-            var subregion = forceatlas2.Region(oneNodeList, nextDepth);
+            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
             subregions.push(subregion);
           });
         }
       }
       if (bottomrightNodes.length > 0) {
         if (nextDepth <= this.depthLimit && bottomrightNodes.length < this.nodes.length) {
-          var subregion = forceatlas2.Region(bottomrightNodes, nextDepth);
+          var subregion = new forceatlas2.Region(bottomrightNodes, nextDepth);
           subregions.push(subregion);
         } else {
           bottomrightNodes.forEach(function(n) {
             var oneNodeList = [n];
-            var subregion = forceatlas2.Region(oneNodeList, nextDepth);
+            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
             subregions.push(subregion);
           });
         }
       }
       if (toprightNodes.length > 0) {
         if (nextDepth <= this.depthLimit && toprightNodes.length < this.nodes.length) {
-          var subregion = forceatlas2.Region(toprightNodes, nextDepth);
+          var subregion = new forceatlas2.Region(toprightNodes, nextDepth);
           subregions.push(subregion);
         } else {
           toprightNodes.forEach(function(n) {
             var oneNodeList = [n];
-            var subregion = forceatlas2.Region(oneNodeList, nextDepth);
+            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
             subregions.push(subregion);
           });
         }
