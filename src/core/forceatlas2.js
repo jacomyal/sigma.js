@@ -96,7 +96,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
           for (
             var i = self.state.index;
             i < nodes.length && i < self.state.index + cInt;
-            i++
+            i++;
           ) {
             var n = nodes[i];
             rootRegion.applyForce(n, Repulsion, barnesHutTheta);
@@ -111,10 +111,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
           for (
             var i1 = self.state.index;
             i1 < nodes.length && i1 < self.state.index + cInt;
-            i1++
+            i1++;
           ) {
             var n1 = nodes[i1];
-            nodes.forEach(function(n2,i2) {
+            nodes.forEach(function(n2, i2) {
               if (i2 < i1) {
                 Repulsion.apply_nn(n1, n2);
               }
@@ -146,7 +146,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
         for (
           var i = self.state.index;
           i < nodes.length && i < self.state.index + sInt;
-          i++
+          i++;
         ) {
           var n = nodes[i];
           Gravity.apply_g(n, gravity / scalingRatio);
@@ -173,17 +173,17 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         var i = self.state.index;
         if (self.p.edgeWeightInfluence == 0) {
-          while(i < edges.length && i < self.state.index + cInt){
+          while (i < edges.length && i < self.state.index + cInt) {
             var e = edges[i++];
             Attraction.apply_nn(e.source, e.target, 1);
           }
         } else if (self.p.edgeWeightInfluence == 1) {
-          while(i < edges.length && i < self.state.index + cInt){
+          while (i < edges.length && i < self.state.index + cInt) {
             var e = edges[i++];
             Attraction.apply_nn(e.source, e.target, e.weight || 1);
           }
         } else {
-          while(i < edges.length && i < self.state.index + cInt){
+          while (i < edges.length && i < self.state.index + cInt) {
             var e = edges[i++];
             Attraction.apply_nn(
               e.source, e.target,
@@ -211,8 +211,9 @@ forceatlas2.ForceAtlas2 = function(graph) {
           if (!fixed) {
             var swinging = Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) +
                            Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
-            
-            // If the node has a burst change of direction, then it's not converging.
+
+            // If the node has a burst change of direction,
+            // then it's not converging.
             totalSwinging += n.fa2.mass * swinging;
             totalEffectiveTraction += n.fa2.mass *
                                       0.5 *
@@ -256,7 +257,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
           var speed = self.p.speed;
           // If nodes overlap prevention is active,
           // it's not possible to trust the swinging mesure.
-          while(i < nodes.length && i < self.state.index + sInt){
+          while (i < nodes.length && i < self.state.index + sInt) {
             var n = nodes[i++];
             var fixed = n.fixed || false;
             if (!fixed) {
@@ -265,7 +266,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
               var swinging = Math.sqrt(
                 (n.fa2.old_dx - n.fa2.dx) *
                 (n.fa2.old_dx - n.fa2.dx) +
-                (n.fa2.old_dy - n.fa2.dy) * 
+                (n.fa2.old_dy - n.fa2.dy) *
                 (n.fa2.old_dy - n.fa2.dy)
               );
               var factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
@@ -281,7 +282,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
           }
         } else {
           var speed = self.p.speed;
-          while(i < nodes.length && i < self.state.index + sInt){
+          while (i < nodes.length && i < self.state.index + sInt) {
             var n = nodes[i++];
             var fixed = n.fixed || false;
             if (!fixed) {
@@ -390,33 +391,33 @@ forceatlas2.ForceAtlas2 = function(graph) {
       return new this.strongGravity(coefficient);
     },
 
-    buildAttraction: function(logAttraction, distributedAttraction, adjustBySize, coefficient) {
+    buildAttraction: function(logAttr, distributedAttr, adjustBySize, c) {
       if (adjustBySize) {
-        if (logAttraction) {
-          if (distributedAttraction) {
-            return new this.logAttraction_degreeDistributed_antiCollision(coefficient);
+        if (logAttr) {
+          if (distributedAttr) {
+            return new this.logAttraction_degreeDistributed_antiCollision(c);
           } else {
-            return new this.logAttraction_antiCollision(coefficient);
+            return new this.logAttraction_antiCollision(c);
           }
         } else {
-          if (distributedAttraction) {
-            return new this.linAttraction_degreeDistributed_antiCollision(coefficient);
+          if (distributedAttr) {
+            return new this.linAttraction_degreeDistributed_antiCollision(c);
           } else {
-            return new this.linAttraction_antiCollision(coefficient);
+            return new this.linAttraction_antiCollision(c);
           }
         }
       } else {
-        if (logAttraction) {
-          if (distributedAttraction) {
-            return new this.logAttraction_degreeDistributed(coefficient);
+        if (logAttr) {
+          if (distributedAttr) {
+            return new this.logAttraction_degreeDistributed(c);
           } else {
-            return new this.logAttraction(coefficient);
+            return new this.logAttraction(c);
           }
         } else {
-          if (distributedAttraction) {
-            return new this.linAttraction_massDistributed(coefficient);
+          if (distributedAttr) {
+            return new this.linAttraction_massDistributed(c);
           } else {
-            return new this.linAttraction(coefficient);
+            return new this.linAttraction(c);
           }
         }
       }
@@ -433,7 +434,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = this.coefficient * n1.fa2.mass * n2.fa2.mass / distance / distance;
+          var factor = this.coefficient *
+                       n1.fa2.mass *
+                       n2.fa2.mass /
+                       Math.pow(distance, 2);
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -451,7 +455,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = this.coefficient * n.fa2.mass * r.getMass() / distance / distance;
+          var factor = this.coefficient *
+                       n.fa2.mass *
+                       r.getMass() /
+                       Math.pow(distance, 2);
 
           n.fa2.dx += xDist * factor;
           n.fa2.dy += yDist * factor;
@@ -476,15 +483,20 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
     linRepulsion_antiCollision: function(c) {
       this.coefficient = c;
-      this.apply_nn = function(n1,n2) {
+      this.apply_nn = function(n1, n2) {
         // Get the distance
         var xDist = n1.x - n2.x;
         var yDist = n1.y - n2.y;
-        var distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.size - n2.size;
+        var distance = Math.sqrt(xDist * xDist + yDist * yDist) -
+                       n1.size -
+                       n2.size;
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = this.coefficient * n1.fa2.mass * n2.fa2.mass / distance / distance;
+          var factor = this.coefficient *
+                       n1.fa2.mass *
+                       n2.fa2.mass /
+                       Math.pow(distance, 2);
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -511,7 +523,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = this.coefficient * n.fa2.mass * r.getMass() / distance / distance;
+          var factor = this.coefficient *
+                       n.fa2.mass *
+                       r.getMass() /
+                       Math.pow(distance, 2);
 
           n.fa2.dx += xDist * factor;
           n.fa2.dy += yDist * factor;
@@ -539,10 +554,11 @@ forceatlas2.ForceAtlas2 = function(graph) {
       }
     },
 
-    // Repulsion force: Strong Gravity (as a Repulsion Force because it is easier)
+    // Repulsion force: Strong Gravity
+    // (as a Repulsion Force because it is easier)
     strongGravity: function(c) {
       this.coefficient = c;
-      this.apply_nn = function(n1,n2) {
+      this.apply_nn = function(n1, n2) {
         // Not Relevant
       }
       this.apply_nr = function(n, r) {
@@ -619,7 +635,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = -this.coefficient * e * Math.log(1 + distance) / distance;
+          var factor = -this.coefficient *
+                       e *
+                       Math.log(1 + distance) /
+                       distance;
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -643,7 +662,11 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = -this.coefficient * e * Math.log(1 + distance) / distance / n1.fa2.mass;
+          var factor = -this.coefficient *
+                       e *
+                       Math.log(1 + distance) /
+                       distance /
+                       n1.fa2.mass;
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -715,7 +738,10 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = -this.coefficient * e * Math.log(1 + distance) / distance;
+          var factor = -this.coefficient *
+                       e *
+                       Math.log(1 + distance) /
+                       distance;
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -738,7 +764,11 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         if (distance > 0) {
           // NB: factor = force / distance
-          var factor = -this.coefficient * e * Math.log(1 + distance) / distance / n1.fa2.mass;
+          var factor = -this.coefficient *
+                       e *
+                       Math.log(1 + distance) /
+                       distance /
+                       n1.fa2.mass;
 
           n1.fa2.dx += xDist * factor;
           n1.fa2.dy += yDist * factor;
@@ -777,10 +807,15 @@ forceatlas2.Region = function(nodes, depth) {
       massCenterY = massSumY / mass;
 
       // Compute size
-      var size = -10000000000;
+      var size;
       this.nodes.forEach(function(n) {
-        var distance = Math.sqrt((n.x - massCenterX) * (n.x - massCenterX) + (n.y - massCenterY) * (n.y - massCenterY));
-        size = Math.max(size, 2 * distance);
+        var distance = Math.sqrt(
+          (n.x - massCenterX) *
+          (n.x - massCenterX) +
+          (n.y - massCenterY) *
+          (n.y - massCenterY)
+        );
+        size = Math.max(size || (2 * distance), 2 * distance);
       });
 
       this.mass = mass;
@@ -801,74 +836,39 @@ forceatlas2.Region = function(nodes, depth) {
       var massCenterY = this.massCenterY;
       var nextDepth = this.depth + 1;
 
+      var self = this;
+
       this.nodes.forEach(function(n) {
         var nodesColumn = (n.x < massCenterX) ? (leftNodes) : (rightNodes);
         nodesColumn.push(n);
       });
 
-      var topleftNodes = [];
-      var bottomleftNodes = [];
+      var tl = [], bl = [], br = [], tr = [];
+
       leftNodes.forEach(function(n) {
-        var nodesLine = (n.y < massCenterY) ? (topleftNodes) : (bottomleftNodes);
+        var nodesLine = (n.y < massCenterY) ? (tl) : (bl);
         nodesLine.push(n);
       });
 
-      var bottomrightNodes = [];
-      var toprightNodes = [];
       rightNodes.forEach(function(n) {
-        var nodesLine = (n.y < massCenterY) ? (toprightNodes) : (bottomrightNodes);
+        var nodesLine = (n.y < massCenterY) ? (tr) : (br);
         nodesLine.push(n);
       });
 
-      if (topleftNodes.length > 0) {
-        if (nextDepth <= this.depthLimit && topleftNodes.length < this.nodes.length) {
-          var subregion = new forceatlas2.Region(topleftNodes, nextDepth);
+      [tl, bl, br, tr].filter(function(a) {
+        return a.length;
+      }).forEach(function(a) {
+        if (nextDepth <= self.depthLimit && a.length < self.nodes.length) {
+          var subregion = new forceatlas2.Region(a, nextDepth);
           subregions.push(subregion);
         } else {
-          topleftNodes.forEach(function(n) {
+          a.forEach(function(n) {
             var oneNodeList = [n];
             var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
             subregions.push(subregion);
           });
         }
-      }
-
-      if (bottomleftNodes.length > 0) {
-        if (nextDepth <= this.depthLimit && bottomleftNodes.length < this.nodes.length) {
-          var subregion = new forceatlas2.Region(bottomleftNodes, nextDepth);
-          subregions.push(subregion);
-        } else {
-          bottomleftNodes.forEach(function(n) {
-            var oneNodeList = [n];
-            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
-            subregions.push(subregion);
-          });
-        }
-      }
-      if (bottomrightNodes.length > 0) {
-        if (nextDepth <= this.depthLimit && bottomrightNodes.length < this.nodes.length) {
-          var subregion = new forceatlas2.Region(bottomrightNodes, nextDepth);
-          subregions.push(subregion);
-        } else {
-          bottomrightNodes.forEach(function(n) {
-            var oneNodeList = [n];
-            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
-            subregions.push(subregion);
-          });
-        }
-      }
-      if (toprightNodes.length > 0) {
-        if (nextDepth <= this.depthLimit && toprightNodes.length < this.nodes.length) {
-          var subregion = new forceatlas2.Region(toprightNodes, nextDepth);
-          subregions.push(subregion);
-        } else {
-          toprightNodes.forEach(function(n) {
-            var oneNodeList = [n];
-            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
-            subregions.push(subregion);
-          });
-        }
-      }
+      });
 
       this.subregions = subregions;
 
@@ -883,7 +883,13 @@ forceatlas2.Region = function(nodes, depth) {
       var regionNode = this.nodes[0];
       Force.apply_nn(n, regionNode);
     } else {
-      var distance = Math.sqrt((n.x - this.massCenterX) * (n.x - this.massCenterX) + (n.y - this.massCenterY) * (n.y - this.massCenterY));
+      var distance = Math.sqrt(
+        (n.x - this.massCenterX) *
+        (n.x - this.massCenterX) +
+        (n.y - this.massCenterY) *
+        (n.y - this.massCenterY)
+      );
+
       if (distance * theta > this.size) {
         Force.apply_nr(n, this);
       } else {
