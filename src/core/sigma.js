@@ -26,14 +26,43 @@ function Sigma(root, id) {
     this.graph,
     this.id
   );
+  this.forceatlas2 = new forceatlas2.ForceAtlas2(
+    this.graph
+  );
 
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-    self.draw(true, false, true, true);
+    self.draw(true, false, true, false);
   }).addListener('stopdrag stopzooming', function(e) {
     self.draw(true, true, true, true);
   });
+
+  // Specific methods:
+  this.onWorkerKilled = function(e) {
+    if (e.content.name == 'draw_' + self.id) {
+      sigma.scheduler.removeListener('killed', self.onWorkerKilled);
+      self.computeOneStep();
+    }
+  };
+
+  this.computeOneStep = function() {
+    sigma.scheduler.addWorker(
+      self.forceatlas2.atomicGo,
+      'layout_' + self.id,
+      false
+    ).queueWorker(
+      function() {
+        self.draw(true, false, true, false);
+        return false;
+      },
+      'draw_' + self.id,
+      'layout_' + self.id
+    ).addListener(
+      'killed',
+      self.onWorkerKilled
+    ).start();
+  };
 }
 
 Sigma.prototype.resize = function() {
@@ -70,6 +99,23 @@ Sigma.prototype.initCanvas = function(type) {
   this.dom.appendChild(this.canvas[type]);
 };
 
+Sigma.prototype.startLayout = function() {
+  this.stopLayout();
+  this.forceatlas2.init();
+  this.computeOneStep();
+};
+
+Sigma.prototype.stopLayout = function() {
+  sigma.scheduler.removeWorker(
+    'draw_' + this.id, 2
+  ).removeWorker(
+    'layout_' + this.id, 2
+  ).addListener(
+    'killed',
+    this.onWorkerKilled
+  );
+};
+
 Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
   var self = this;
 
@@ -95,46 +141,61 @@ Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
 
   // Start workers:
   if (nodes) {
-    sigma.scheduler.addWorker(
-      this.plotter.worker_drawNode,
-      'node_' + self.id,
-      false
-    );
+    if (scheduled) {
+      sigma.scheduler.addWorker(
+        this.plotter.worker_drawNode,
+        'node_' + self.id,
+        false
+      );
 
-    labels && sigma.scheduler.queueWorker(
-      this.plotter.worker_drawLabel,
-      'label_' + self.id,
-      'node_' + self.id
-    );
+      labels && sigma.scheduler.queueWorker(
+        this.plotter.worker_drawLabel,
+        'label_' + self.id,
+        'node_' + self.id
+      );
 
-    edges && sigma.scheduler.queueWorker(
-      this.plotter.worker_drawEdge,
-      'edge_' + self.id,
-      'node_' + self.id
-    );
+      edges && sigma.scheduler.queueWorker(
+        this.plotter.worker_drawEdge,
+        'edge_' + self.id,
+        'node_' + self.id
+      );
 
-    sigma.scheduler.start();
-  }else if (edges) {
-    sigma.scheduler.addWorker(
-      this.plotter.worker_drawEdge,
-      'edge_' + self.id,
-      false
-    );
+      sigma.scheduler.start();
+    } else {
+      while (this.plotter.worker_drawNode()) {}
+      while (labels && this.plotter.worker_drawLabel()) {}
+      while (edges && this.plotter.worker_drawEdge()) {}
+    }
+  } else if (edges) {
+    if (scheduled) {
+      sigma.scheduler.addWorker(
+        this.plotter.worker_drawEdge,
+        'edge_' + self.id,
+        false
+      );
 
-    labels && sigma.scheduler.addWorker(
-      this.plotter.worker_drawLabel,
-      'label_' + self.id,
-      false
-    );
+      labels && sigma.scheduler.addWorker(
+        this.plotter.worker_drawLabel,
+        'label_' + self.id,
+        false
+      );
 
-    sigma.scheduler.start();
-  }else if (labels) {
-    sigma.scheduler.addWorker(
-      this.plotter.worker_drawLabel,
-      'label_' + self.id,
-      false
-    ).start();
-  }else {
+      sigma.scheduler.start();
+    } else {
+      while (this.plotter.worker_drawEdge()) {}
+      while (labels && this.plotter.worker_drawLabel()) {}
+    }
+  } else if (labels) {
+    if (scheduled) {
+      sigma.scheduler.addWorker(
+        this.plotter.worker_drawLabel,
+        'label_' + self.id,
+        false
+      ).start();
+    } else {
+      while (this.plotter.worker_drawLabel()) {}
+    }
+  } else {
     throw new Error('Nothing to draw');
   }
 };

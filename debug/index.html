@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xml:lang="fr" lang="fr">
+<head>
   <title>sigma.js | debug</title>
   <script type="text/javascript" src="../build/sigma.concat.js"></script>
   <script type="text/javascript">
@@ -9,22 +10,44 @@
       if(!s){
         // INIT SIGMA:
         s = sigma.fps(60).init(document.getElementById('graph'));
+        window.S = s;
   
         // INIT GRAPH:
-        var N = 600, E = 12000, g = s.getGraph();
-        for(var i=0;i<N;i++){
-          g.addNode('n'+i,{
-            'x': 2000*Math.random(),
-            'y': 1000*Math.random(),
-            'size': 1+3*Math.random(),
-            'label': 'Node number '+i,
-            'color': '#fff'//+Math.floor(Math.random()*16777215).toString(16)
+        var N = 500, E = 10000, C = 20, g = s.getGraph();
+        window.clusters = [];
+
+        for(var i=0;i<C;i++){
+          window.clusters.push({
+            'id': i,
+            'color': '#'+((Math.random()*16777215)|0).toString(16),
+            'degree': 3+((10*Math.random)|0),
+            'nodes': []
           });
         }
-        for(var i=0;i<E;i++){
-          g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
-            'size': 0.3
+
+        for(var i=0;i<N;i++){
+          var cluster = clusters[(Math.random()*C)|0];
+          g.addNode('n'+i,{
+            'x': 1000*Math.random(),
+            'y': 1000*Math.random(),
+            'label': 'Node number '+i,
+            'color': cluster['color'],
+            'cluster': cluster['id']
           });
+          cluster.nodes.push('n'+i);
+        }
+
+        for(var i=0;i<E;i++){
+          if(Math.random()<0.3){
+            g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
+              'size': 0.3
+            });
+          }else{
+            var cluster = clusters[(Math.random()*C)|0], n = cluster.nodes.length;
+            g.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
+              'size': 0.3
+            });
+          }
         }
 
         window.onresize = function(){
@@ -56,7 +79,7 @@
         },10);
       }
 
-      s.draw(true,true,true);
+      s.draw(true,true,true,true);
     }
 
     function resetPosition(){
@@ -68,7 +91,15 @@
       s.mousecaptor.stageY = 0;
       s.mousecaptor.ratio = 1;
 
-      s.draw(true,true,true);
+      s.draw(true,true,true,true);
+    }
+
+    function startLayout(){
+      s && s.startLayout(true);
+    }
+
+    function stopLayout(){
+      s && s.stopLayout(true);
     }
   </script>
   <style type="text/css">
@@ -178,6 +209,8 @@
     <div id="buttons">
       <input type="button" value="initialize sigma.js" onclick="init();"></input>
       <input type="button" value="reset position" onclick="resetPosition();"></input>
+      <input type="button" value="apply layout" onclick="startLayout();"></input>
+      <input type="button" value="kill layout" onclick="stopLayout();"></input>
     </div>
   </div>
 </body>
