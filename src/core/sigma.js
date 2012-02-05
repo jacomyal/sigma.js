@@ -96,10 +96,10 @@ Sigma.prototype.resize = function(w, h) {
     this.canvas[k].setAttribute('height', this.height + 'px');
   }
 
-  self.draw(
-    self.p.auto && 2 || self.p.nodes,
-    self.p.auto && 1 || self.p.edges,
-    self.p.auto && 2 || self.p.labels
+  this.draw(
+    this.p.auto && 2 || this.p.nodes,
+    this.p.auto && 1 || this.p.edges,
+    this.p.auto && 2 || this.p.labels
   );
   return this;
 };
