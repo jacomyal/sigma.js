@@ -51,6 +51,65 @@ sigma.classes.Graph.prototype.addNode = function(id, params) {
   return this;
 };
 
+sigma.classes.Graph.prototype.dropNode = function(v) {
+  var a = (v instanceof Array ? v : [v]) || [];
+  var self = this;
+
+  a.forEach(function(id) {
+    if (self.nodesIndex[id]) {
+      // TODO
+      // Make this better
+      var index = null;
+      self.nodes.some(function(n, i) {
+        if (n['id'] == id) {
+          index = i;
+          return true;
+        }
+        return false;
+      });
+
+      index != null && self.nodes.splice(i, 1);
+      delete self.nodesIndex[id];
+
+      var edgesToRemove = [];
+      self.edges = self.edges.filter(function(e) {
+        if (e['source']['id'] == id || e['target']['id'] == id) {
+          delete self.edgesIndex[e['id']];
+          return false;
+        }
+        return true;
+      });
+    }
+  });
+
+  return this;
+};
+
+sigma.classes.Graph.prototype.dropEdge = function(v) {
+  var a = (v instanceof Array ? v : [v]) || [];
+  var self = this;
+
+  a.forEach(function(id) {
+    if (self.edgesIndex[id]) {
+      // TODO
+      // Make this better
+      var index = null;
+      self.edges.some(function(n, i) {
+        if (n['id'] == id) {
+          index = i;
+          return true;
+        }
+        return false;
+      });
+
+      index != null && self.edges.splice(i, 1);
+      delete self.edgesIndex[id];
+    }
+  });
+
+  return this;
+};
+
 sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
   if (this.edgesIndex[id]) {
     throw new Error('Edge "' + id + '" already exists.');

@@ -5,22 +5,22 @@ function SigmaPublic(inst) {
   this.sigmaConfig = function(a1, a2) {
     var res = s.config(a1, a2);
     return res == s ? this : res;
-  }
+  };
 
   this.drawConfig = function(a1, a2) {
     var res = s.plotter.config(a1, a2);
     return res == s.plotter ? this : res;
-  }
+  };
 
   this.layoutConfig = function(a1, a2) {
     var res = s.forceatlas2.config(a1, a2);
     return res == s.forceatlas2 ? this : res;
-  }
+  };
 
   this.draw = function(nodes, edges, labels) {
     s.draw(nodes, edges, labels);
     return this;
-  }
+  };
 
   this.getMouse = function() {
     return {
@@ -28,7 +28,7 @@ function SigmaPublic(inst) {
       mouseY: s.mousecaptor.mouseY,
       down: s.mousecaptor.isMouseDown
     };
-  }
+  };
 
   // Actions:
   this.position = function(stageX, stageY, ratio) {
@@ -51,20 +51,46 @@ function SigmaPublic(inst) {
 
       return this;
     }
-  }
+  };
 
   this.resize = function(w, h) {
     s.resize(w, h);
     return this;
-  }
+  };
 
   this.startLayout = function() {
     s.startLayout();
-  }
+  };
 
   this.stopLayout = function() {
     s.stopLayout();
+  };
+
+  this.addNode = function(id, params) {
+    s.graph.addNode(id, params);
+    return this;
+  };
+
+  this.addEdge = function(id, source, target, params) {
+    s.graph.addEdge(id, source, target, params);
+    return this;
+  };
+
+  this.dropNode = function(v) {
+    s.graph.dropNode(v);
+    return this;
+  };
+
+  this.dropEdge = function(v) {
+    s.graph.dropEdge(v);
+    return this;
+  };
+
+  this.getNodesCount = function() {
+    return s.graph.nodes.length;
   }
 
-  this.graph = s.graph;
+  this.getEdgesCount = function() {
+    return s.graph.edges.length;
+  }
 }

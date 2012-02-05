@@ -33,7 +33,6 @@
         var E = gup('edges') || 10000;
         var C = gup('clusters') || 20;
         var d = gup('clustering') || 0.5;
-        var g = s.graph;
         window.clusters = [];
 
         for(var i=0;i<C;i++){
@@ -47,7 +46,7 @@
 
         for(var i=0;i<N;i++){
           var cluster = clusters[(Math.random()*C)|0];
-          g.addNode('n'+i,{
+          s.addNode('n'+i,{
             'x': 1000*Math.random(),
             'y': 1000*Math.random(),
             'label': 'Node number '+i,
@@ -60,12 +59,12 @@
 
         for(var i=0;i<E;i++){
           if(Math.random()<1-d){
-            g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
+            s.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
               'size': 0.3
             });
           }else{
             var cluster = clusters[(Math.random()*C)|0], n = cluster.nodes.length;
-            g.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
+            s.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
               'size': 0.3
             });
           }
@@ -83,8 +82,8 @@
           document.getElementById('schedule').textContent = sigma.monitor.getScheduleTime();
 
           // Draw status
-          document.getElementById('nodestotal').textContent = s.graph.nodes.length;
-          document.getElementById('edgestotal').textContent = s.graph.edges.length;
+          document.getElementById('nodestotal').textContent = s.getNodesCount();
+          document.getElementById('edgestotal').textContent = s.getEdgesCount();
 
           // Mouse status
           var ms = s.getMouse();
