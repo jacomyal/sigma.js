@@ -42,9 +42,9 @@ function Sigma(root, id) {
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-    self.draw(true, false, true, false);
+    self.draw(2, 0, 2);
   }).addListener('stopdrag stopzooming', function(e) {
-    self.draw(true, true, true, true);
+    self.draw(2, 1, 2);
   });
 
   // Specific methods:
@@ -62,7 +62,7 @@ function Sigma(root, id) {
       false
     ).queueWorker(
       function() {
-        self.draw(true, false, true, false);
+        self.draw(2, 0, 2);
         return false;
       },
       'draw_' + self.id,
@@ -83,7 +83,7 @@ Sigma.prototype.resize = function() {
     this.canvas[k].setAttribute('height', this.height + 'px');
   }
 
-  this.draw(true, true, true, true);
+  this.draw(2, 1, 2);
 };
 
 Sigma.prototype.clearSchedule = function() {
@@ -125,7 +125,11 @@ Sigma.prototype.stopLayout = function() {
   );
 };
 
-Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
+// nodes, edges, labels:
+// - 0: Don't display them
+// - 1: Display them (asynchronous)
+// - 2: Display them (synchronous)
+Sigma.prototype.draw = function(nodes, edges, labels) {
   var self = this;
 
   // Remove workers:
@@ -148,65 +152,74 @@ Sigma.prototype.draw = function(nodes, edges, labels, scheduled) {
   this.plotter.currentNodeIndex = 0;
   this.plotter.currentLabelIndex = 0;
 
-  // Start workers:
-  if (nodes) {
-    if (scheduled) {
+  var previous = null;
+  var start = false;
+
+  if(nodes){
+    if(nodes>1){
+      // TODO: Make this better
+      while (this.plotter.worker_drawNode()) {}
+    }else{
       sigma.scheduler.addWorker(
         this.plotter.worker_drawNode,
         'node_' + self.id,
         false
       );
 
-      labels && sigma.scheduler.queueWorker(
-        this.plotter.worker_drawLabel,
-        'label_' + self.id,
-        'node_' + self.id
-      );
-
-      edges && sigma.scheduler.queueWorker(
-        this.plotter.worker_drawEdge,
-        'edge_' + self.id,
-        'node_' + self.id
-      );
-
-      sigma.scheduler.start();
-    } else {
-      while (this.plotter.worker_drawNode()) {}
-      while (labels && this.plotter.worker_drawLabel()) {}
-      while (edges && this.plotter.worker_drawEdge()) {}
+      start = true;
+      previous = 'node_' + self.id;
     }
-  } else if (edges) {
-    if (scheduled) {
-      sigma.scheduler.addWorker(
-        this.plotter.worker_drawEdge,
-        'edge_' + self.id,
-        false
-      );
-
-      labels && sigma.scheduler.addWorker(
-        this.plotter.worker_drawLabel,
-        'label_' + self.id,
-        false
-      );
-
-      sigma.scheduler.start();
-    } else {
-      while (this.plotter.worker_drawEdge()) {}
-      while (labels && this.plotter.worker_drawLabel()) {}
-    }
-  } else if (labels) {
-    if (scheduled) {
-      sigma.scheduler.addWorker(
-        this.plotter.worker_drawLabel,
-        'label_' + self.id,
-        false
-      ).start();
-    } else {
-      while (this.plotter.worker_drawLabel()) {}
-    }
-  } else {
-    throw new Error('Nothing to draw');
   }
+
+  if(labels){
+    if(labels>1){
+      // TODO: Make this better
+      while (this.plotter.worker_drawLabel()) {}
+    }else{
+      if(previous){
+        sigma.scheduler.queueWorker(
+          this.plotter.worker_drawLabel,
+          'label_' + self.id,
+          previous
+        );
+      }else{
+        sigma.scheduler.addWorker(
+          this.plotter.worker_drawLabel,
+          'label_' + self.id,
+          false
+        );
+      }
+
+      start = true;
+      previous = 'label_' + self.id;
+    }
+  }
+
+  if(edges){
+    if(edges>1){
+      // TODO: Make this better
+      while (this.plotter.worker_drawEdge()) {}
+    }else{
+      if(previous){
+        sigma.scheduler.queueWorker(
+          this.plotter.worker_drawEdge,
+          'edge_' + self.id,
+          previous
+        );
+      }else{
+        sigma.scheduler.addWorker(
+          this.plotter.worker_drawEdge,
+          'edge_' + self.id,
+          false
+        );
+      }
+
+      start = true;
+      previous = 'edge_' + self.id;
+    }
+  }
+
+  start && sigma.scheduler.start();
 };
 
 Sigma.prototype.getGraph = function() {
