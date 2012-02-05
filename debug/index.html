@@ -23,8 +23,8 @@
     function init(){
       if(!s){
         // INIT SIGMA:
-        s = sigma.fps(60).init(document.getElementById('graph')).config({
-          font: 'Lobster'
+        s = sigma.init(document.getElementById('graph')).drawConfig({
+          font: 'Terminal Dosis'
         });
         window.S = s;
   
@@ -33,7 +33,7 @@
         var E = gup('edges') || 10000;
         var C = gup('clusters') || 20;
         var d = gup('clustering') || 0.5;
-        var g = s.getGraph();
+        var g = s.graph;
         window.clusters = [];
 
         for(var i=0;i<C;i++){
@@ -83,20 +83,20 @@
           document.getElementById('schedule').textContent = sigma.monitor.getScheduleTime();
 
           // Draw status
-          document.getElementById('nodesdrawn').textContent = s.plotter.currentNodeIndex;
-          document.getElementById('edgesdrawn').textContent = s.plotter.currentEdgeIndex;
-          document.getElementById('nodestotal').textContent = s.getGraph().nodes.length;
-          document.getElementById('edgestotal').textContent = s.getGraph().edges.length;
+          document.getElementById('nodestotal').textContent = s.graph.nodes.length;
+          document.getElementById('edgestotal').textContent = s.graph.edges.length;
 
           // Mouse status
-          document.getElementById('mousex').textContent = s.mousecaptor.mouseX;
-          document.getElementById('mousey').textContent = s.mousecaptor.mouseY;
-          document.getElementById('mousedown').textContent = s.mousecaptor.isMouseDown;
+          var ms = s.getMouse();
+          document.getElementById('mousex').textContent = ms.mouseX;
+          document.getElementById('mousey').textContent = ms.mouseY;
+          document.getElementById('mousedown').textContent = ms.down;
 
           // Scene status
-          document.getElementById('stagex').textContent = Math.round(s.mousecaptor.stageX*10)/10;
-          document.getElementById('stagey').textContent = Math.round(s.mousecaptor.stageY*10)/10;
-          document.getElementById('ratio').textContent = Math.round(s.mousecaptor.ratio*10)/10;
+          var st = s.getStage();
+          document.getElementById('stagex').textContent = Math.round(st.stageX*10)/10;
+          document.getElementById('stagey').textContent = Math.round(st.stageY*10)/10;
+          document.getElementById('ratio').textContent = Math.round(st.ratio*10)/10;
         },10);
       }
 
@@ -116,11 +116,11 @@
     }
 
     function startLayout(){
-      s && s.startLayout(true);
+      s && s.startLayout();
     }
 
     function stopLayout(){
-      s && s.stopLayout(true);
+      s && s.stopLayout();
     }
   </script>
   <style type="text/css">
@@ -215,8 +215,8 @@
       FPS: <span id="fps">-</span> fps<br>
       Workers: <span id="workers">-</span> workers<br>
       Queue: <span id="queue">-</span> workers<br>
-      Nodes: <span id="nodesdrawn">-</span>/<span id="nodestotal">-</span> nodes drawn<br />
-      Edges: <span id="edgesdrawn">-</span>/<span id="edgestotal">-</span> edges drawn<br />
+      Nodes: <span id="nodestotal">-</span> nodes<br />
+      Edges: <span id="edgestotal">-</span> edges<br />
       Whole schedule time spent: <span id="schedule">-</span> ms<br>
       <br />
       Mouse X: <span id="mousex">-</span><br />

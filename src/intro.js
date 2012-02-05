@@ -6,16 +6,10 @@ var id = 0;
 // Define packages:
 s.tools = {};
 s.classes = {};
+s.instances = {};
 
 s.init = function(dom) {
-  return new Sigma(dom, (id++).toString());
+  var inst = new Sigma(dom, (id++).toString());
+  s.instances[id.toString()] = inst;
+  return new SigmaPublic(inst);
 };
-
-s.fps = function(v) {
-  if (v != undefined) {
-    this.scheduler.fps(v);
-    return this;
-  }else {
-    this.scheduler.fps(v);
-  }
-}

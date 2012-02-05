@@ -2,8 +2,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   sigma.classes.Cascade.call(this);
   var self = this;
 
-  this.params = {
-    font: 'Terminal Dosis'
+  this.p = {
+    font: 'Arial'
   };
 
   for (var k in params) {
@@ -133,7 +133,7 @@ Plotter.prototype.drawLabel = function(node) {
   var ctx = this.labelsCtx;
 
   if (node['displaySize'] * 2 >= 8) {
-    ctx.font = node['displaySize'] * 2 + 'px ' + this.params.font;
+    ctx.font = node['displaySize'] * 2 + 'px ' + this.p.font;
     ctx.fillStyle = '#fff';
     ctx.fillText(
       node['label'],
