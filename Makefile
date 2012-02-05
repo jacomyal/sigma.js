@@ -3,6 +3,11 @@ MINIFY_PATH=build/sigma.min.js
 CLOSURE=build/compiler.jar
 
 all: clean concat minify-simple
+check:
+	gjslint --nojsdoc -r src/
+fix:
+	fixjsstyle --nojsdoc -r src/
+	gjslint --nojsdoc -r src/
 clean:
 	rm ${MINIFY_PATH} ${CONCAT_PATH}
 concat:
