@@ -12,7 +12,7 @@ sigma.scheduler = (function() {
 
   this.delay = 0;
 
-  this.injectFrame = function(callback){
+  this.injectFrame = function(callback) {
     window.setTimeout(callback, 0);
     return self;
   }

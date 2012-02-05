@@ -5,9 +5,9 @@ function Sigma(root, id) {
   // TODO
   this.p = {
     auto: true,
-    displayEdges: true,
-    displayNodes: true,
-    displayLabels: true
+    nodes: 2,
+    edges: 0,
+    labels: 2
   };
 
   this.dom = root;
@@ -42,15 +42,27 @@ function Sigma(root, id) {
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-    self.draw(2, 0, 2);
+    self.draw(
+      self.p.auto && 2 || self.p.nodes,
+      self.p.auto && 0 || self.p.edges,
+      self.p.auto && 2 || self.p.labels
+    );
   }).addListener('stopdrag stopzooming', function(e) {
-    self.draw(2, 1, 2);
+    self.draw(
+      self.p.auto && 2 || self.p.nodes,
+      self.p.auto && 1 || self.p.edges,
+      self.p.auto && 2 || self.p.labels
+    );
   });
 
   // Specific methods:
   this.onWorkerKilled = function(e) {
     if (e.content.name == 'layout_' + self.id) {
-      self.draw(2, 0, 2);
+      self.draw(
+        self.p.auto && 2 || self.p.nodes,
+        self.p.auto && 0 || self.p.edges,
+        self.p.auto && 2 || self.p.labels
+      );
       sigma.scheduler.removeListener(
         'killed',
         self.onWorkerKilled
@@ -84,7 +96,11 @@ Sigma.prototype.resize = function(w, h) {
     this.canvas[k].setAttribute('height', this.height + 'px');
   }
 
-  this.draw(2, 1, 2);
+  self.draw(
+    self.p.auto && 2 || self.p.nodes,
+    self.p.auto && 1 || self.p.edges,
+    self.p.auto && 2 || self.p.labels
+  );
   return this;
 };
 
@@ -138,6 +154,10 @@ Sigma.prototype.stopLayout = function() {
 Sigma.prototype.draw = function(nodes, edges, labels) {
   var self = this;
 
+  var n = nodes == undefined ? self.p.nodes : nodes;
+  var e = edges == undefined ? self.p.edges : edges;
+  var l = labels == undefined ? self.p.labels : labels;
+
   // Remove workers:
   this.clearSchedule();
 
@@ -161,8 +181,8 @@ Sigma.prototype.draw = function(nodes, edges, labels) {
   var previous = null;
   var start = false;
 
-  if (nodes) {
-    if (nodes > 1) {
+  if (n) {
+    if (n > 1) {
       // TODO: Make this better
       while (this.plotter.worker_drawNode()) {}
     }else {
@@ -177,8 +197,8 @@ Sigma.prototype.draw = function(nodes, edges, labels) {
     }
   }
 
-  if (labels) {
-    if (labels > 1) {
+  if (l) {
+    if (l > 1) {
       // TODO: Make this better
       while (this.plotter.worker_drawLabel()) {}
     }else {
@@ -201,8 +221,8 @@ Sigma.prototype.draw = function(nodes, edges, labels) {
     }
   }
 
-  if (edges) {
-    if (edges > 1) {
+  if (e) {
+    if (e > 1) {
       // TODO: Make this better
       while (this.plotter.worker_drawEdge()) {}
     }else {
