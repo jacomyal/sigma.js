@@ -1,6 +1,7 @@
 var forceatlas2 = {};
 
 forceatlas2.ForceAtlas2 = function(graph) {
+  sigma.classes.Cascade.call(this);
   var self = this;
   this.graph = graph;
 
@@ -93,12 +94,9 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
           // Pass to the scope of forEach
           var barnesHutTheta = self.p.barnesHutTheta;
-          for (
-            var i = self.state.index;
-            i < nodes.length && i < self.state.index + cInt;
-            i++;
-          ) {
-            var n = nodes[i];
+          var i = self.state.index;
+          while (i < nodes.length && i < self.state.index + cInt) {
+            var n = nodes[i++];
             rootRegion.applyForce(n, Repulsion, barnesHutTheta);
           }
           if (i == nodes.length) {
@@ -108,12 +106,9 @@ forceatlas2.ForceAtlas2 = function(graph) {
             self.state.index = i;
           }
         } else {
-          for (
-            var i1 = self.state.index;
-            i1 < nodes.length && i1 < self.state.index + cInt;
-            i1++;
-          ) {
-            var n1 = nodes[i1];
+          var i1 = self.state.index;
+          while (i1 < nodes.length && i1 < self.state.index + cInt) {
+            var n1 = nodes[i1++];
             nodes.forEach(function(n2, i2) {
               if (i2 < i1) {
                 Repulsion.apply_nn(n1, n2);
@@ -143,12 +138,9 @@ forceatlas2.ForceAtlas2 = function(graph) {
         var gravity = self.p.gravity,
         scalingRatio = self.p.scalingRatio;
 
-        for (
-          var i = self.state.index;
-          i < nodes.length && i < self.state.index + sInt;
-          i++;
-        ) {
-          var n = nodes[i];
+        var i = self.state.index;
+        while (i < nodes.length && i < self.state.index + sInt) {
+          var n = nodes[i++];
           Gravity.apply_g(n, gravity / scalingRatio);
         }
 
@@ -359,24 +351,6 @@ forceatlas2.ForceAtlas2 = function(graph) {
     this.p.barnesHutTheta = 1.2;
   }
 
-  this.params = function(a1, a2) {
-    if (typeof a1 == 'string' && a2 == undefined) {
-      return this.p[a1];
-    } else {
-      var o = (typeof a1 == 'object' && a2 == undefined) ? a1 : {};
-      if (typeof a1 == 'string') {
-        o[a1] = a2;
-      }
-
-      for (var k in o) {
-        if (this.p[k] != undefined) {
-          this.p[k] = o[k];
-        }
-      }
-      return this;
-    }
-  }
-
   // All the different forces
   this.ForceFactory = {
     buildRepulsion: function(adjustBySize, coefficient) {
@@ -449,15 +423,15 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
       this.apply_nr = function(n, r) {
         // Get the distance
-        var xDist = n.x - r.getMassCenterX();
-        var yDist = n.y - r.getMassCenterY();
+        var xDist = n.x - r.config('massCenterX');
+        var yDist = n.y - r.config('massCenterY');
         var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
         if (distance > 0) {
           // NB: factor = force / distance
           var factor = this.coefficient *
                        n.fa2.mass *
-                       r.getMass() /
+                       r.config('mass') /
                        Math.pow(distance, 2);
 
           n.fa2.dx += xDist * factor;
@@ -783,14 +757,18 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
 // The Region class, as used by the Barnes Hut optimization
 forceatlas2.Region = function(nodes, depth) {
+  sigma.classes.Cascade.call(this);
   this.depthLimit = 20;
-  this.mass = 0;
-  this.massCenterX = 0;
-  this.massCenterY = 0;
   this.size = 0;
   this.nodes = nodes;
   this.subregions = [];
   this.depth = depth;
+
+  this.p = {
+    mass: 0,
+    massCenterX: 0,
+    massCenterY: 0
+  };
 
   this.updateMassAndGeometry = function() {
     if (this.nodes.length > 1) {
@@ -818,9 +796,9 @@ forceatlas2.Region = function(nodes, depth) {
         size = Math.max(size || (2 * distance), 2 * distance);
       });
 
-      this.mass = mass;
-      this.massCenterX = massCenterX;
-      this.massCenterY = massCenterY;
+      this.p.mass = mass;
+      this.p.massCenterX = massCenterX;
+      this.p.massCenterY = massCenterY;
       this.size = size;
     }
   }
@@ -832,8 +810,8 @@ forceatlas2.Region = function(nodes, depth) {
       var leftNodes = [];
       var rightNodes = [];
       var subregions = [];
-      var massCenterX = this.massCenterX;
-      var massCenterY = this.massCenterY;
+      var massCenterX = this.p.massCenterX;
+      var massCenterY = this.p.massCenterY;
       var nextDepth = this.depth + 1;
 
       var self = this;
@@ -884,10 +862,10 @@ forceatlas2.Region = function(nodes, depth) {
       Force.apply_nn(n, regionNode);
     } else {
       var distance = Math.sqrt(
-        (n.x - this.massCenterX) *
-        (n.x - this.massCenterX) +
-        (n.y - this.massCenterY) *
-        (n.y - this.massCenterY)
+        (n.x - this.p.massCenterX) *
+        (n.x - this.p.massCenterX) +
+        (n.y - this.p.massCenterY) *
+        (n.y - this.p.massCenterY)
       );
 
       if (distance * theta > this.size) {
@@ -898,29 +876,5 @@ forceatlas2.Region = function(nodes, depth) {
         });
       }
     }
-  }
-
-  this.getMass = function() {
-    return this.mass;
-  }
-
-  this.setMass = function(mass) {
-    this.mass = mass;
-  }
-
-  this.getMassCenterX = function() {
-    return this.massCenterX;
-  }
-
-  this.setMassCenterX = function(massCenterX) {
-    this.massCenterX = massCenterX;
-  }
-
-  this.getMassCenterY = function() {
-    return this.massCenterY;
-  }
-
-  this.setMassCenterY = function(massCenterY) {
-    this.massCenterY = massCenterY;
   }
 };

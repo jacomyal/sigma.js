@@ -1,5 +1,14 @@
 function Sigma(root, id) {
+  sigma.classes.Cascade.call(this);
   this.id = id;
+
+  this.p = {
+    auto: true,
+    displayEdges: true,
+    displayNodes: true,
+    displayLabels: true,
+    font: 'Calibri,Geneva,Arial'
+  };
 
   this.dom = root;
   this.width = this.dom.offsetWidth;

@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xml:lang="fr" lang="fr">
 <head>
   <title>sigma.js | debug</title>
+  <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Terminal+Dosis' rel='stylesheet' type='text/css'>
   <script type="text/javascript" src="../build/sigma.concat.js"></script>
   <script type="text/javascript">
     var s;
@@ -21,21 +23,24 @@
     function init(){
       if(!s){
         // INIT SIGMA:
-        s = sigma.fps(60).init(document.getElementById('graph'));
+        s = sigma.fps(60).init(document.getElementById('graph')).config({
+          font: 'Lobster'
+        });
         window.S = s;
   
         // INIT GRAPH:
-        var N = gup('nodes')||500;
-        var E = gup('edges')||10000;
-        var C = gup('clusters')||20;
-        var d = gup('clustering')||0.5;
+        var N = gup('nodes') || 500;
+        var E = gup('edges') || 10000;
+        var C = gup('clusters') || 20;
+        var d = gup('clustering') || 0.5;
         var g = s.getGraph();
         window.clusters = [];
 
         for(var i=0;i<C;i++){
           window.clusters.push({
             'id': i,
-            'color': '#'+((Math.random()*16777215)|0).toString(16),
+            //'color': '#'+((Math.random()*16777215)|0).toString(16),
+            'color': 'rgb('+Math.round(Math.random()*256)+','+Math.round(Math.random()*256)+','+Math.round(Math.random()*256)+')',
             'nodes': []
           });
         }
@@ -54,7 +59,7 @@
         }
 
         for(var i=0;i<E;i++){
-          if(Math.random()<d){
+          if(Math.random()<1-d){
             g.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
               'size': 0.3
             });
@@ -129,7 +134,7 @@
       height: 49px;
       line-height: 53px;
       font-size: 24px;
-      font-family: Georgia;
+      font-family: Lobster;
       color: #fff;
     }
     div#header span.fat{

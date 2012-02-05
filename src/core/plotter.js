@@ -1,5 +1,16 @@
-function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h) {
+function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
+  sigma.classes.Cascade.call(this);
   var self = this;
+
+  this.params = {
+    font: 'Terminal Dosis'
+  };
+
+  for (var k in params) {
+    if (this.params[k] != undefined) {
+      this.params[k] = params[k];
+    }
+  }
 
   this.nodesCtx = nodesCtx;
   this.edgesCtx = edgesCtx;
@@ -122,7 +133,7 @@ Plotter.prototype.drawLabel = function(node) {
   var ctx = this.labelsCtx;
 
   if (node['displaySize'] * 2 >= 8) {
-    ctx.font = node['displaySize'] * 2 + 'px Calibri,Geneva,Arial';
+    ctx.font = node['displaySize'] * 2 + 'px ' + this.params.font;
     ctx.fillStyle = '#fff';
     ctx.fillText(
       node['label'],
@@ -134,12 +145,13 @@ Plotter.prototype.drawLabel = function(node) {
 
 Plotter.prototype.isOnScreen = function(node) {
   if (isNaN(node['x']) || isNaN(node['y'])) {
-    throw (new Error('A node\'s coordinate is not a number' +
-                    '(id: ' + node['id'] + ')'));
+    throw (new Error(
+      'A node\'s coordinate is not a number (id: ' + node['id'] + ')')
+    );
   }
 
   return (node['displayX'] + node['displaySize'] > -this.width / 3) &&
-    (node['displayX'] - node['displaySize'] < this.width * 4 / 3) &&
-    (node['displayY'] + node['displaySize'] > -this.height / 3) &&
-    (node['displayY'] - node['displaySize'] < this.height * 4 / 3);
+         (node['displayX'] - node['displaySize'] < this.width * 4 / 3) &&
+         (node['displayY'] + node['displaySize'] > -this.height / 3) &&
+         (node['displayY'] - node['displaySize'] < this.height * 4 / 3);
 };
