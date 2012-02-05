@@ -137,8 +137,6 @@ Sigma.prototype.startLayout = function() {
 
 Sigma.prototype.stopLayout = function() {
   sigma.scheduler.removeWorker(
-    'draw_' + this.id, 2
-  ).removeWorker(
     'layout_' + this.id, 2
   ).addListener(
     'killed',
@@ -201,14 +199,14 @@ Sigma.prototype.draw = function(nodes, edges, labels) {
     if (l > 1) {
       // TODO: Make this better
       while (this.plotter.worker_drawLabel()) {}
-    }else {
+    } else {
       if (previous) {
         sigma.scheduler.queueWorker(
           this.plotter.worker_drawLabel,
           'label_' + self.id,
           previous
         );
-      }else {
+      } else {
         sigma.scheduler.addWorker(
           this.plotter.worker_drawLabel,
           'label_' + self.id,
