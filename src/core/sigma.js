@@ -2,12 +2,12 @@ function Sigma(root, id) {
   sigma.classes.Cascade.call(this);
   this.id = id;
 
+  // TODO
   this.p = {
     auto: true,
     displayEdges: true,
     displayNodes: true,
-    displayLabels: true,
-    font: 'Calibri,Geneva,Arial'
+    displayLabels: true
   };
 
   this.dom = root;
@@ -49,9 +49,12 @@ function Sigma(root, id) {
 
   // Specific methods:
   this.onWorkerKilled = function(e) {
-    if (e.content.name == 'draw_' + self.id) {
-      sigma.scheduler.removeListener('killed', self.onWorkerKilled);
-      self.computeOneStep();
+    if (e.content.name == 'layout_' + self.id) {
+      self.draw(2, 0, 2);
+      sigma.scheduler.removeListener(
+        'killed',
+        self.onWorkerKilled
+      ).injectFrame(self.computeOneStep);
     }
   };
 
@@ -60,13 +63,6 @@ function Sigma(root, id) {
       self.forceatlas2.atomicGo,
       'layout_' + self.id,
       false
-    ).queueWorker(
-      function() {
-        self.draw(2, 0, 2);
-        return false;
-      },
-      'draw_' + self.id,
-      'layout_' + self.id
     ).addListener(
       'killed',
       self.onWorkerKilled

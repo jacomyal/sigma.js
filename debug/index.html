@@ -93,7 +93,7 @@
           document.getElementById('mousedown').textContent = ms.down;
 
           // Scene status
-          var st = s.getStage();
+          var st = s.position();
           document.getElementById('stagex').textContent = Math.round(st.stageX*10)/10;
           document.getElementById('stagey').textContent = Math.round(st.stageY*10)/10;
           document.getElementById('ratio').textContent = Math.round(st.ratio*10)/10;
@@ -107,10 +107,7 @@
       if(!s){
         return;
       }
-
-      s.mousecaptor.stageX = 0;
-      s.mousecaptor.stageY = 0;
-      s.mousecaptor.ratio = 1;
+      s.position(0,0,1);
 
       s.draw(2, 1, 2);
     }
@@ -121,6 +118,7 @@
 
     function stopLayout(){
       s && s.stopLayout();
+      s && s.draw(2, 1, 2);
     }
   </script>
   <style type="text/css">

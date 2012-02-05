@@ -2,14 +2,8 @@ sigma.scheduler = (function() {
   sigma.classes.EventDispatcher.call(this);
   var self = this;
 
-  window.requestAnimFrame = (function() {
-    return function(callback) {
-        window.setTimeout(callback, 0);
-      };
-  })();
-
   this.isRunning = false;
-  this.fpsReq = 30;
+  this.fpsReq = 60;
   this.queue = [];
   this.workers = [];
   this.frameTime = 1000 / this.fpsReq;
@@ -18,18 +12,22 @@ sigma.scheduler = (function() {
 
   this.delay = 0;
 
+  this.injectFrame = function(callback){
+    window.setTimeout(callback, 0);
+    return self;
+  }
+
   this.frameInjector = function() {
     while (self.isRunning && self.workers.length && self.routine()) {}
 
     if (!self.isRunning || !self.workers.length) {
-      self.dispatch('stop');
-      self.isRunning = false;
+      self.stop();
     } else {
       self.startTime = (new Date()).getTime();
       self.frames++;
       self.delay = self.effectiveTime - self.frameTime;
       self.correctedFrameTime = self.frameTime - self.delay;
-      window.requestAnimFrame(self.frameInjector);
+      self.injectFrame(self.frameInjector);
     }
   };
 
@@ -42,13 +40,14 @@ sigma.scheduler = (function() {
     this.time = this.startTime;
 
     this.dispatch('start');
-    this.frameInjector();
+    this.injectFrame(this.frameInjector);
     return this;
   };
 
   this.stop = function() {
-    this.isRunning = false;
-    return this;
+    self.dispatch('stop');
+    self.isRunning = false;
+    return self;
   };
 
   this.routine = function() {

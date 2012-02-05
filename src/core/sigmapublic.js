@@ -1,6 +1,7 @@
 function SigmaPublic(inst) {
   var s = inst;
 
+  // Config:
   this.sigmaConfig = function(a1, a2) {
     var res = s.config(a1, a2);
     return res == s ? this : res;
@@ -29,12 +30,27 @@ function SigmaPublic(inst) {
     };
   }
 
-  this.getStage = function(a1, a2) {
-    return {
-      stageX: s.mousecaptor.stageX,
-      stageY: s.mousecaptor.stageY,
-      ratio: s.mousecaptor.ratio
-    };
+  // Actions:
+  this.position = function(stageX, stageY, ratio) {
+    if (arguments.length == 0) {
+      return {
+        stageX: s.mousecaptor.stageX,
+        stageY: s.mousecaptor.stageY,
+        ratio: s.mousecaptor.ratio
+      };
+    }else {
+      s.mousecaptor.stageX = stageX != undefined ?
+        stageX :
+        s.mousecaptor.stageX;
+      s.mousecaptor.stageY = stageY != undefined ?
+        stageY :
+        s.mousecaptor.stageY;
+      s.mousecaptor.ratio = ratio != undefined ?
+        ratio :
+        s.mousecaptor.ratio;
+
+      return this;
+    }
   }
 
   this.resize = function(w, h) {
