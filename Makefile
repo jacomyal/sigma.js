@@ -4,10 +4,9 @@ CLOSURE=build/compiler.jar
 
 all: clean concat minify-simple
 check:
-	gjslint --nojsdoc -r src/
+	gjslint --nojsdoc -r src/ -x "src/intro.js,src/outro.js"
 fix:
 	fixjsstyle --nojsdoc -r src/
-	gjslint --nojsdoc -r src/
 clean:
 	rm ${MINIFY_PATH} ${CONCAT_PATH}
 concat:
