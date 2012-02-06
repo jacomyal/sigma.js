@@ -170,8 +170,6 @@ Sigma.prototype.stopLayout = function() {
 Sigma.prototype.draw = function(nodes, edges, labels, safe) {
   var self = this;
 
-  console.log(safe);
-
   if (safe && this.busy) {
     return this;
   }

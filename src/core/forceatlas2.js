@@ -20,8 +20,8 @@ forceatlas2.ForceAtlas2 = function(graph) {
     outboundAttCompensation: 1,
     totalSwinging: 0,
     totalEffectiveTraction: 0,
-    complexIntervals: 5000,
-    simpleIntervals: 5000
+    complexIntervals: 500,
+    simpleIntervals: 1000
   };
 
   // The state tracked from one atomic "go" to another

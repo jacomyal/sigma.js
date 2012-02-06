@@ -36,36 +36,41 @@ function MouseCaptor(canvas, graph, id) {
     maxRatio: 16
   };
 
+  // UTILS
+  function getX(e){
+    return e.offsetX!=undefined && e.offsetX ||
+           e.clientX!=undefined && e.clientX;
+  };
+
+  function getY(e){
+    return e.offsetY!=undefined && e.offsetY ||
+           e.clientY!=undefined && e.clientY;
+  };
+
+  function getDelta(e){
+    console.log(e);
+    return e.wheelDelta!=undefined && e.wheelDelta ||
+           e.detail!=undefined && -e.detail;
+  };
+
   // CALLBACKS
   function moveHandler(event) {
     self.oldMouseX = self.mouseX;
     self.oldMouseY = self.mouseY;
 
-    self.mouseX = event.offsetX;
-    self.mouseY = event.offsetY;
+    self.mouseX = getX(event);
+    self.mouseY = getY(event);
 
     self.isMouseDown && drag(event);
   };
 
   function upHandler(event) {
-    self.oldMouseX = self.mouseX;
-    self.oldMouseY = self.mouseY;
-
-    self.mouseX = event.offsetX;
-    self.mouseY = event.offsetY;
-
     self.isMouseDown = false;
 
     stopDrag();
   };
 
   function downHandler(event) {
-    self.oldMouseX = self.mouseX;
-    self.oldMouseY = self.mouseY;
-
-    self.mouseX = event.offsetX;
-    self.mouseY = event.offsetY;
-
     self.isMouseDown = true;
     self.oldMouseX = self.mouseX;
     self.oldMouseY = self.mouseY;
@@ -76,13 +81,7 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function wheelHandler(event) {
-    self.oldMouseX = self.mouseX;
-    self.oldMouseY = self.mouseY;
-
-    self.mouseX = event.offsetX;
-    self.mouseY = event.offsetY;
-
-    startZooming(event.wheelDelta);
+    startZooming(getDelta(event));
   };
 
   // CUSTOM ACTIONS
