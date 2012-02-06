@@ -2,7 +2,7 @@ function SigmaPublic(inst) {
   var s = inst;
 
   // Config:
-  this.sigmaConfig = function(a1, a2) {
+  this.config = function(a1, a2) {
     var res = s.config(a1, a2);
     return res == s ? this : res;
   };
@@ -83,6 +83,11 @@ function SigmaPublic(inst) {
 
   this.dropEdge = function(v) {
     s.graph.dropEdge(v);
+    return this;
+  };
+
+  this.emptyGraph = function() {
+    s.graph.empty();
     return this;
   };
 

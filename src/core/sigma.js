@@ -7,7 +7,10 @@ function Sigma(root, id) {
     auto: true,
     nodes: 2,
     edges: 0,
-    labels: 2
+    labels: 2,
+    lastNodes: 2,
+    lastEdges: 0,
+    lastLabels: 2
   };
 
   this.dom = root;
@@ -42,26 +45,28 @@ function Sigma(root, id) {
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
+console.log(self.p.auto);
     self.draw(
-      self.p.auto && 2 || self.p.nodes,
-      self.p.auto && 0 || self.p.edges,
-      self.p.auto && 2 || self.p.labels
+      self.p.auto ? 2 : self.p.nodes,
+      self.p.auto ? 0 : self.p.edges,
+      self.p.auto ? 2 : self.p.labels
     );
   }).addListener('stopdrag stopzooming', function(e) {
     self.draw(
-      self.p.auto && 2 || self.p.nodes,
-      self.p.auto && 1 || self.p.edges,
-      self.p.auto && 2 || self.p.labels
+      self.p.auto ? 2 : self.p.nodes,
+      self.p.auto ? 1 : self.p.edges,
+      self.p.auto ? 2 : self.p.labels
     );
   });
 
-  // Specific methods:
+  // The following methods are not declared in the prototype
+  // due to the scope issues (TODO: find a solution)
   this.onWorkerKilled = function(e) {
     if (e.content.name == 'layout_' + self.id) {
       self.draw(
-        self.p.auto && 2 || self.p.nodes,
-        self.p.auto && 0 || self.p.edges,
-        self.p.auto && 2 || self.p.labels
+        self.p.auto ? 2 : self.p.nodes,
+        self.p.auto ? 0 : self.p.edges,
+        self.p.auto ? 2 : self.p.labels
       );
       sigma.scheduler.removeListener(
         'killed',
@@ -97,9 +102,9 @@ Sigma.prototype.resize = function(w, h) {
   }
 
   this.draw(
-    this.p.auto && 2 || this.p.nodes,
-    this.p.auto && 1 || this.p.edges,
-    this.p.auto && 2 || this.p.labels
+    this.p.auto ? 2 : this.p.nodes,
+    this.p.auto ? 1 : this.p.edges,
+    this.p.auto ? 2 : this.p.labels
   );
   return this;
 };
@@ -142,6 +147,8 @@ Sigma.prototype.stopLayout = function() {
     'killed',
     this.onWorkerKilled
   );
+
+  this.draw();
   return this;
 };
 
@@ -155,6 +162,10 @@ Sigma.prototype.draw = function(nodes, edges, labels) {
   var n = nodes == undefined ? self.p.nodes : nodes;
   var e = edges == undefined ? self.p.edges : edges;
   var l = labels == undefined ? self.p.labels : labels;
+
+  self.p.lastNodes = n;
+  self.p.lastEdges = e;
+  self.p.lastLabels = l;
 
   // Remove workers:
   this.clearSchedule();
