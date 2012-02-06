@@ -37,20 +37,20 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   // UTILS
-  function getX(e){
-    return e.offsetX!=undefined && e.offsetX ||
-           e.clientX!=undefined && e.clientX;
+  function getX(e) {
+    return e.offsetX != undefined && e.offsetX ||
+           e.clientX != undefined && e.clientX;
   };
 
-  function getY(e){
-    return e.offsetY!=undefined && e.offsetY ||
-           e.clientY!=undefined && e.clientY;
+  function getY(e) {
+    return e.offsetY != undefined && e.offsetY ||
+           e.clientY != undefined && e.clientY;
   };
 
-  function getDelta(e){
+  function getDelta(e) {
     console.log(e);
-    return e.wheelDelta!=undefined && e.wheelDelta ||
-           e.detail!=undefined && -e.detail;
+    return e.wheelDelta != undefined && e.wheelDelta ||
+           e.detail != undefined && -e.detail;
   };
 
   // CALLBACKS
