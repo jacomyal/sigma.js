@@ -3,7 +3,25 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   var self = this;
 
   this.p = {
-    font: 'Arial'
+    // LABELS:
+    //   Edge color:
+    //   - 'node'
+    //   - default (then defaultLabelColor or node['color']
+    //              will be used instead)
+    labelColor: 'none',
+    defaultLabelColor: '#000',
+    font: 'Arial',
+    // EDGES:
+    //   Edge color:
+    //   - 'source'
+    //   - 'target'
+    //   - default (then defaultEdgeColor or edge['color']
+    //              will be used instead)
+    edgeColor: 'source',
+    defaultEdgeColor: '#aaa',
+    defaultEdgeType: 'line',
+    // NODES:
+    defaultNodeColor: '#aaa'
   };
 
   for (var k in params) {
@@ -40,7 +58,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
          ) {
         self.currentEdgeIndex++;
       }else {
-        self.drawCurveEdge(self.graph.edges[self.currentEdgeIndex++]);
+        self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
       }
     }
 
@@ -76,43 +94,6 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   }
 }
 
-Plotter.prototype.drawCurveEdge = function(edge) {
-  var x1 = edge['source']['displayX'];
-  var y1 = edge['source']['displayY'];
-  var x2 = edge['target']['displayX'];
-  var y2 = edge['target']['displayY'];
-
-  var ctx = this.edgesCtx;
-
-  ctx.strokeStyle = edge['color'];
-  ctx.lineWidth = edge['displaySize'];
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
-                       (y1 + y2) / 2 + (x1 - x2) / 4,
-                       x2,
-                       y2);
-
-  ctx.stroke();
-};
-
-Plotter.prototype.drawStraightEdge = function(edge) {
-  var x1 = edge['source']['displayX'];
-  var y1 = edge['source']['displayY'];
-  var x2 = edge['target']['displayX'];
-  var y2 = edge['target']['displayY'];
-
-  var ctx = this.edgesCtx;
-
-  ctx.strokeStyle = edge['color'];
-  ctx.lineWidth = edge['displaySize'];
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-
-  ctx.stroke();
-};
-
 Plotter.prototype.drawNode = function(node) {
   var ctx = this.nodesCtx;
 
@@ -129,12 +110,62 @@ Plotter.prototype.drawNode = function(node) {
   ctx.fill();
 };
 
+Plotter.prototype.drawEdge = function(edge) {
+  var x1 = edge['source']['displayX'];
+  var y1 = edge['source']['displayY'];
+  var x2 = edge['target']['displayX'];
+  var y2 = edge['target']['displayY'];
+  var color = edge['color'];
+
+  if (!color) {
+    switch (this.p.edgeColor) {
+      case 'source':
+        color = edge['source']['color'] || this.p.defaultNodeColor;
+        break;
+      case 'target':
+        color = edge['target']['color'] || this.p.defaultNodeColor;
+        break;
+      default:
+        color = this.p.defaultEdgeColor;
+        break;
+    }
+  }
+
+  var ctx = this.edgesCtx;
+
+  switch (edge['type'] || this.p.defaultEdgeType) {
+    case 'curve':
+      ctx.strokeStyle = color;
+      ctx.lineWidth = edge['displaySize'] / 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
+                           (y1 + y2) / 2 + (x1 - x2) / 4,
+                           x2,
+                           y2);
+      ctx.stroke();
+      break;
+    case 'line':
+    default:
+      ctx.strokeStyle = color;
+      ctx.lineWidth = edge['displaySize'] / 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+
+      ctx.stroke();
+      break;
+  }
+};
+
 Plotter.prototype.drawLabel = function(node) {
   var ctx = this.labelsCtx;
 
   if (node['displaySize'] * 2 >= 8) {
     ctx.font = node['displaySize'] * 2 + 'px ' + this.p.font;
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = this.p.labelColor == 'node' ?
+                    (node['color'] || this.p.defaultNodeColor) :
+                    this.p.defaultLabelColor;
     ctx.fillText(
       node['label'],
       node['displayX'] + node['displaySize'] * 1.5,

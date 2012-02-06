@@ -21,7 +21,6 @@ sigma.classes.Graph.prototype.addNode = function(id, params) {
     'displayX': 0,
     'displayY': 0,
     'displaySize': 1,
-    'color': '#fff',
     'label': id,
     'id': id,
     'attr': {}
@@ -85,31 +84,6 @@ sigma.classes.Graph.prototype.dropNode = function(v) {
   return this;
 };
 
-sigma.classes.Graph.prototype.dropEdge = function(v) {
-  var a = (v instanceof Array ? v : [v]) || [];
-  var self = this;
-
-  a.forEach(function(id) {
-    if (self.edgesIndex[id]) {
-      // TODO
-      // Make this better
-      var index = null;
-      self.edges.some(function(n, i) {
-        if (n['id'] == id) {
-          index = i;
-          return true;
-        }
-        return false;
-      });
-
-      index != null && self.edges.splice(i, 1);
-      delete self.edgesIndex[id];
-    }
-  });
-
-  return this;
-};
-
 sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
   if (this.edgesIndex[id]) {
     throw new Error('Edge "' + id + '" already exists.');
@@ -132,7 +106,6 @@ sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
     'size': 1,
     'weight': 1,
     'displaySize': 0.5,
-    'color': this.nodesIndex[source]['color'],
     'label': id,
     'id': id,
     'attr': {}
@@ -146,7 +119,10 @@ sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
         e[k] = +params[k];
         break;
       case 'color':
-        e[k] = Color.hex(params[k]);
+        e[k] = params[k].toString();
+        break;
+      case 'type':
+        e[k] = params[k].toString();
         break;
       case 'label':
         e[k] = params[k];
@@ -158,6 +134,31 @@ sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
 
   this.edges.push(e);
   this.edgesIndex[id] = e;
+
+  return this;
+};
+
+sigma.classes.Graph.prototype.dropEdge = function(v) {
+  var a = (v instanceof Array ? v : [v]) || [];
+  var self = this;
+
+  a.forEach(function(id) {
+    if (self.edgesIndex[id]) {
+      // TODO
+      // Make this better
+      var index = null;
+      self.edges.some(function(n, i) {
+        if (n['id'] == id) {
+          index = i;
+          return true;
+        }
+        return false;
+      });
+
+      index != null && self.edges.splice(i, 1);
+      delete self.edgesIndex[id];
+    }
+  });
 
   return this;
 };
