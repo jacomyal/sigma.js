@@ -24,7 +24,8 @@
       if(!s){
         // INIT SIGMA:
         s = sigma.init(document.getElementById('graph')).drawConfig({
-          font: 'Terminal Dosis'
+          font: 'Terminal Dosis',
+          defaultLabelColor: '#000'
         });
         window.S = s;
   
@@ -60,12 +61,14 @@
         for(var i=0;i<E;i++){
           if(Math.random()<1-d){
             s.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
-              'size': 0.3
+              'size': 2,
+              'color': '#999'
             });
           }else{
             var cluster = clusters[(Math.random()*C)|0], n = cluster.nodes.length;
             s.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
-              'size': 0.3
+              'size': 1,
+              'type': 'curve'
             });
           }
         }
@@ -142,7 +145,7 @@
       top: 49px;
       bottom: 0;
       width: 100%;
-      background: #000;
+      background: #fff;
     }
     div#toplayer{
       position: absolute;
@@ -161,7 +164,7 @@
       -moz-border-radius: 0 0 10px 10px;
       -webkit-border-radius: 0 0 10px 10px;
       opacity: 0;
-      background: #333;
+      background: #ccc;
       border: 1px #000 solid;
       -webkit-transition-property: opacity;
       -webkit-transition-duration: 0.4s;
@@ -177,8 +180,7 @@
     div#monitoring{
       position: relative;
       display: inline-block;
-      color: #ddf;
-      text-shadow: #000 0 1px 0;
+      color: #000;
       font-family: "Lucida Console";
       width: 45%;
       font-size: 12px;
