@@ -1,10 +1,6 @@
 sigma.classes.Graph = function() {
   sigma.classes.EventDispatcher.call(this);
-
-  this.nodes = [];
-  this.nodesIndex = {};
-  this.edges = [];
-  this.edgesIndex = {};
+  this.empty();
 };
 
 sigma.classes.Graph.prototype.addNode = function(id, params) {
@@ -21,8 +17,8 @@ sigma.classes.Graph.prototype.addNode = function(id, params) {
     'displayX': 0,
     'displayY': 0,
     'displaySize': 1,
-    'label': id,
-    'id': id,
+    'label': id.toString(),
+    'id': id.toString(),
     'attr': {}
   };
 
@@ -45,7 +41,7 @@ sigma.classes.Graph.prototype.addNode = function(id, params) {
   }
 
   this.nodes.push(n);
-  this.nodesIndex[id] = n;
+  this.nodesIndex[id.toString()] = n;
 
   return this;
 };
@@ -67,7 +63,7 @@ sigma.classes.Graph.prototype.dropNode = function(v) {
         return false;
       });
 
-      index != null && self.nodes.splice(i, 1);
+      index != null && self.nodes.splice(index, 1);
       delete self.nodesIndex[id];
 
       var edgesToRemove = [];
@@ -78,6 +74,8 @@ sigma.classes.Graph.prototype.dropNode = function(v) {
         }
         return true;
       });
+    }else {
+      sigma.debug('Node "' + id + '" does not exist.');
     }
   });
 
@@ -106,8 +104,8 @@ sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
     'size': 1,
     'weight': 1,
     'displaySize': 0.5,
-    'label': id,
-    'id': id,
+    'label': id.toString(),
+    'id': id.toString(),
     'attr': {}
   };
   e['source']['degree']++;
@@ -133,7 +131,7 @@ sigma.classes.Graph.prototype.addEdge = function(id, source, target, params) {
   }
 
   this.edges.push(e);
-  this.edgesIndex[id] = e;
+  this.edgesIndex[id.toString()] = e;
 
   return this;
 };
@@ -155,10 +153,21 @@ sigma.classes.Graph.prototype.dropEdge = function(v) {
         return false;
       });
 
-      index != null && self.edges.splice(i, 1);
+      index != null && self.edges.splice(index, 1);
       delete self.edgesIndex[id];
+    }else {
+      sigma.debug('Edge "' + id + '" does not exist.');
     }
   });
+
+  return this;
+};
+
+sigma.classes.Graph.prototype.empty = function() {
+  this.nodes = [];
+  this.nodesIndex = {};
+  this.edges = [];
+  this.edgesIndex = {};
 
   return this;
 };
