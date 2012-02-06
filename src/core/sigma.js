@@ -42,21 +42,26 @@ function Sigma(root, id) {
     this.graph
   );
 
+  this.busy = false;
+
   // Interaction listeners:
   var self = this;
   this.mousecaptor.addListener('drag zooming', function(e) {
-console.log(self.p.auto);
-    self.draw(
-      self.p.auto ? 2 : self.p.nodes,
-      self.p.auto ? 0 : self.p.edges,
-      self.p.auto ? 2 : self.p.labels
-    );
+    if (!self.busy) {
+      self.draw(
+        self.p.auto ? 2 : self.p.nodes,
+        self.p.auto ? 0 : self.p.edges,
+        self.p.auto ? 2 : self.p.labels
+      );
+    }
   }).addListener('stopdrag stopzooming', function(e) {
-    self.draw(
-      self.p.auto ? 2 : self.p.nodes,
-      self.p.auto ? 1 : self.p.edges,
-      self.p.auto ? 2 : self.p.labels
-    );
+    if (!self.busy) {
+      self.draw(
+        self.p.auto ? 2 : self.p.nodes,
+        self.p.auto ? 1 : self.p.edges,
+        self.p.auto ? 2 : self.p.labels
+      );
+    }
   });
 
   // The following methods are not declared in the prototype
@@ -76,14 +81,19 @@ console.log(self.p.auto);
   };
 
   this.computeOneStep = function() {
-    sigma.scheduler.addWorker(
-      self.forceatlas2.atomicGo,
-      'layout_' + self.id,
-      false
-    ).addListener(
-      'killed',
-      self.onWorkerKilled
-    ).start();
+    if (self.busy) {
+      sigma.scheduler.addWorker(
+        self.forceatlas2.atomicGo,
+        'layout_' + self.id,
+        false
+      ).addListener(
+        'killed',
+        self.onWorkerKilled
+      ).start();
+    }else {
+      self.busy = false;
+      self.draw();
+    }
   };
 }
 
@@ -134,13 +144,6 @@ Sigma.prototype.initCanvas = function(type) {
 };
 
 Sigma.prototype.startLayout = function() {
-  this.stopLayout();
-  this.forceatlas2.init();
-  this.computeOneStep();
-  return this;
-};
-
-Sigma.prototype.stopLayout = function() {
   sigma.scheduler.removeWorker(
     'layout_' + this.id, 2
   ).addListener(
@@ -148,7 +151,15 @@ Sigma.prototype.stopLayout = function() {
     this.onWorkerKilled
   );
 
-  this.draw();
+  this.busy = true;
+
+  this.forceatlas2.init();
+  this.computeOneStep();
+  return this;
+};
+
+Sigma.prototype.stopLayout = function() {
+  this.busy = false;
   return this;
 };
 
@@ -156,8 +167,14 @@ Sigma.prototype.stopLayout = function() {
 // - 0: Don't display them
 // - 1: Display them (asynchronous)
 // - 2: Display them (synchronous)
-Sigma.prototype.draw = function(nodes, edges, labels) {
+Sigma.prototype.draw = function(nodes, edges, labels, safe) {
   var self = this;
+
+  console.log(safe);
+
+  if (safe && this.busy) {
+    return this;
+  }
 
   var n = nodes == undefined ? self.p.nodes : nodes;
   var e = edges == undefined ? self.p.edges : edges;

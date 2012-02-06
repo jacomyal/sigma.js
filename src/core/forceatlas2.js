@@ -20,8 +20,8 @@ forceatlas2.ForceAtlas2 = function(graph) {
     outboundAttCompensation: 1,
     totalSwinging: 0,
     totalEffectiveTraction: 0,
-    complexIntervals: 10,
-    simpleIntervals: 100
+    complexIntervals: 5000,
+    simpleIntervals: 5000
   };
 
   // The state tracked from one atomic "go" to another
@@ -30,6 +30,8 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
   // Runtime (the ForceAtlas2 itself)
   this.init = function() {
+    self.state = {step: 0, index: 0};
+
     self.graph.nodes.forEach(function(n) {
       n.fa2 = {
         mass: 1 + n.degree,

@@ -17,8 +17,8 @@ function SigmaPublic(inst) {
     return res == s.forceatlas2 ? this : res;
   };
 
-  this.draw = function(nodes, edges, labels) {
-    s.draw(nodes, edges, labels);
+  this.draw = function(nodes, edges, labels, safe) {
+    s.draw(nodes, edges, labels, safe);
     return this;
   };
 
