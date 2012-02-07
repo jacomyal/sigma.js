@@ -48,7 +48,6 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function getDelta(e) {
-    console.log(e);
     return e.wheelDelta != undefined && e.wheelDelta ||
            e.detail != undefined && -e.detail;
   };
@@ -163,6 +162,7 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   // ADD CALLBACKS
+  // TODO: Improve browsers compatibility
   this.canvas.onmousewheel = wheelHandler;
   this.canvas.onmousemove = moveHandler;
   this.canvas.onmousedown = downHandler;
