@@ -46,7 +46,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   this.nodesSpeed = 200;
   this.labelsSpeed = 200;
 
-  this.worker_drawEdge = function() {
+  function worker_drawEdge() {
     var c = self.graph.edges.length;
     var i = 0;
     while (i++< self.edgesSpeed && self.currentEdgeIndex < c) {
@@ -58,131 +58,138 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
          ) {
         self.currentEdgeIndex++;
       }else {
-        self.drawEdge(self.graph.edges[self.currentEdgeIndex++]);
+        drawEdge(self.graph.edges[self.currentEdgeIndex++]);
       }
     }
 
     return self.currentEdgeIndex < c;
-  }
+  };
 
-  this.worker_drawNode = function() {
+  function worker_drawNode() {
     var c = self.graph.nodes.length;
     var i = 0;
     while (i++< self.nodesSpeed && self.currentNodeIndex < c) {
       if (!self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
         self.currentNodeIndex++;
       }else {
-        self.drawNode(self.graph.nodes[self.currentNodeIndex++]);
+        drawNode(self.graph.nodes[self.currentNodeIndex++]);
       }
     }
 
     return self.currentNodeIndex < c;
-  }
+  };
 
-  this.worker_drawLabel = function() {
+  function worker_drawLabel() {
     var c = self.graph.nodes.length;
     var i = 0;
     while (i++< self.labelsSpeed && self.currentLabelIndex < c) {
       if (!self.isOnScreen(self.graph.nodes[self.currentLabelIndex])) {
         self.currentLabelIndex++;
       }else {
-        self.drawLabel(self.graph.nodes[self.currentLabelIndex++]);
+        drawLabel(self.graph.nodes[self.currentLabelIndex++]);
       }
     }
 
     return self.currentLabelIndex < c;
-  }
-}
+  };
 
-Plotter.prototype.drawNode = function(node) {
-  var ctx = this.nodesCtx;
+  function drawNode(node) {
+    var ctx = self.nodesCtx;
 
-  ctx.fillStyle = node['color'];
-  ctx.beginPath();
-  ctx.arc(node['displayX'],
-          node['displayY'],
-          node['displaySize'],
-          0,
-          Math.PI * 2,
-          true);
+    ctx.fillStyle = node['color'];
+    ctx.beginPath();
+    ctx.arc(node['displayX'],
+            node['displayY'],
+            node['displaySize'],
+            0,
+            Math.PI * 2,
+            true);
 
-  ctx.closePath();
-  ctx.fill();
-};
+    ctx.closePath();
+    ctx.fill();
+  };
 
-Plotter.prototype.drawEdge = function(edge) {
-  var x1 = edge['source']['displayX'];
-  var y1 = edge['source']['displayY'];
-  var x2 = edge['target']['displayX'];
-  var y2 = edge['target']['displayY'];
-  var color = edge['color'];
+  function drawEdge(edge) {
+    var x1 = edge['source']['displayX'];
+    var y1 = edge['source']['displayY'];
+    var x2 = edge['target']['displayX'];
+    var y2 = edge['target']['displayY'];
+    var color = edge['color'];
 
-  if (!color) {
-    switch (this.p.edgeColor) {
-      case 'source':
-        color = edge['source']['color'] || this.p.defaultNodeColor;
+    if (!color) {
+      switch (self.p.edgeColor) {
+        case 'source':
+          color = edge['source']['color'] ||
+                  self.p.defaultNodeColor;
+          break;
+        case 'target':
+          color = edge['target']['color'] ||
+                  self.p.defaultNodeColor;
+          break;
+        default:
+          color = self.p.defaultEdgeColor;
+          break;
+      }
+    }
+
+    var ctx = self.edgesCtx;
+
+    switch (edge['type'] || self.p.defaultEdgeType) {
+      case 'curve':
+        ctx.strokeStyle = color;
+        ctx.lineWidth = edge['displaySize'] / 3;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
+                             (y1 + y2) / 2 + (x1 - x2) / 4,
+                             x2,
+                             y2);
+        ctx.stroke();
         break;
-      case 'target':
-        color = edge['target']['color'] || this.p.defaultNodeColor;
-        break;
+      case 'line':
       default:
-        color = this.p.defaultEdgeColor;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = edge['displaySize'] / 3;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+
+        ctx.stroke();
         break;
     }
-  }
+  };
 
-  var ctx = this.edgesCtx;
+  function drawLabel(node) {
+    var ctx = self.labelsCtx;
 
-  switch (edge['type'] || this.p.defaultEdgeType) {
-    case 'curve':
-      ctx.strokeStyle = color;
-      ctx.lineWidth = edge['displaySize'] / 3;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
-                           (y1 + y2) / 2 + (x1 - x2) / 4,
-                           x2,
-                           y2);
-      ctx.stroke();
-      break;
-    case 'line':
-    default:
-      ctx.strokeStyle = color;
-      ctx.lineWidth = edge['displaySize'] / 3;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
+    if (node['displaySize'] * 2 >= 8) {
+      ctx.font = node['displaySize'] * 2 + 'px ' + self.p.font;
+      ctx.fillStyle = self.p.labelColor == 'node' ?
+                      (node['color'] || self.p.defaultNodeColor) :
+                      self.p.defaultLabelColor;
+      ctx.fillText(
+        node['label'],
+        node['displayX'] + node['displaySize'] * 1.5,
+        node['displayY'] + node['displaySize'] / 2
+      );
+    }
+  };
 
-      ctx.stroke();
-      break;
-  }
-};
+  function isOnScreen(node) {
+    if (isNaN(node['x']) || isNaN(node['y'])) {
+      throw (new Error(
+        'A node\'s coordinate is not a number (id: ' + node['id'] + ')')
+      );
+    }
 
-Plotter.prototype.drawLabel = function(node) {
-  var ctx = this.labelsCtx;
+    return (node['displayX'] + node['displaySize'] > -self.width / 3) &&
+           (node['displayX'] - node['displaySize'] < self.width * 4 / 3) &&
+           (node['displayY'] + node['displaySize'] > -self.height / 3) &&
+           (node['displayY'] - node['displaySize'] < self.height * 4 / 3);
+  };
 
-  if (node['displaySize'] * 2 >= 8) {
-    ctx.font = node['displaySize'] * 2 + 'px ' + this.p.font;
-    ctx.fillStyle = this.p.labelColor == 'node' ?
-                    (node['color'] || this.p.defaultNodeColor) :
-                    this.p.defaultLabelColor;
-    ctx.fillText(
-      node['label'],
-      node['displayX'] + node['displaySize'] * 1.5,
-      node['displayY'] + node['displaySize'] / 2
-    );
-  }
-};
-
-Plotter.prototype.isOnScreen = function(node) {
-  if (isNaN(node['x']) || isNaN(node['y'])) {
-    throw (new Error(
-      'A node\'s coordinate is not a number (id: ' + node['id'] + ')')
-    );
-  }
-
-  return (node['displayX'] + node['displaySize'] > -this.width / 3) &&
-         (node['displayX'] - node['displaySize'] < this.width * 4 / 3) &&
-         (node['displayY'] + node['displaySize'] > -this.height / 3) &&
-         (node['displayY'] - node['displaySize'] < this.height * 4 / 3);
-};
+  this.worker_drawLabel = worker_drawLabel;
+  this.worker_drawEdge = worker_drawEdge;
+  this.worker_drawNode = worker_drawNode;
+  this.isOnScreen = isOnScreen;
+}

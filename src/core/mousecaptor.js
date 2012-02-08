@@ -113,7 +113,9 @@ function MouseCaptor(canvas, graph, id) {
     window.clearInterval(self.zoomID);
 
     self.oldRatio = self.ratio;
-    self.targetRatio = self.ratio * (delta > 0 ? self.p.zoomMultiply : 1 / self.p.zoomMultiply);
+    self.targetRatio = self.ratio * (delta > 0 ?
+                       self.p.zoomMultiply :
+                       1 / self.p.zoomMultiply);
     self.targetRatio = Math.min(
       Math.max(self.targetRatio, self.p.minRatio),
       self.p.maxRatio

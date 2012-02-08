@@ -1,4 +1,5 @@
 function Sigma(root, id) {
+  var self = this;
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
@@ -19,10 +20,10 @@ function Sigma(root, id) {
   this.height = this.dom.offsetHeight;
 
   this.canvas = {};
-  this.initCanvas('edges');
-  this.initCanvas('nodes');
-  this.initCanvas('labels');
-  this.initCanvas('mouse');
+  initCanvas('edges');
+  initCanvas('nodes');
+  initCanvas('labels');
+  initCanvas('mouse');
 
   // Intern classes:
   this.graph = new sigma.classes.Graph();
@@ -46,8 +47,7 @@ function Sigma(root, id) {
   this.busy = false;
 
   // Interaction listeners:
-  var self = this;
-  this.mousecaptor.bind('drag zooming', function(e) {
+  self.mousecaptor.bind('drag zooming', function(e) {
     if (!self.busy) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
@@ -67,7 +67,7 @@ function Sigma(root, id) {
 
   // The following methods are not declared in the prototype
   // due to the scope issues (TODO: find a solution)
-  this.onWorkerKilled = function(e) {
+  function onWorkerKilled(e) {
     if (e.content.name == 'layout_' + self.id) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
@@ -81,7 +81,7 @@ function Sigma(root, id) {
     }
   };
 
-  this.computeOneStep = function() {
+  function computeOneStep() {
     if (self.busy) {
       sigma.scheduler.addWorker(
         self.forceatlas2.atomicGo,
@@ -96,185 +96,195 @@ function Sigma(root, id) {
       self.draw();
     }
   };
-}
 
-Sigma.prototype.resize = function(w, h) {
-  if (w != undefined && h != undefined) {
-    this.width = w;
-    this.height = h;
-  }else {
-    this.width = this.dom.offsetWidth;
-    this.height = this.dom.offsetHeight;
-  }
-
-  for (var k in this.canvas) {
-    this.canvas[k].setAttribute('width', this.width + 'px');
-    this.canvas[k].setAttribute('height', this.height + 'px');
-  }
-
-  this.draw(
-    this.p.lastNodes,
-    this.p.lastEdges,
-    this.p.lastLabels,
-    true
-  );
-  return this;
-};
-
-Sigma.prototype.clearSchedule = function() {
-  var self = this;
-  sigma.scheduler.removeWorker(
-    'node_' + self.id, 2
-  ).removeWorker(
-    'edge_' + self.id, 2
-  ).removeWorker(
-    'label_' + self.id, 2
-  ).stop();
-  return this;
-};
-
-Sigma.prototype.initCanvas = function(type) {
-  this.canvas[type] = document.createElement('canvas');
-  this.canvas[type].style.position = 'absolute';
-  this.canvas[type].setAttribute('id', 'sigma_' + type + '_' + this.id);
-  this.canvas[type].setAttribute('class', 'sigma_' + type + '_canvas');
-  this.canvas[type].setAttribute('width', this.width + 'px');
-  this.canvas[type].setAttribute('height', this.height + 'px');
-
-  this.dom.appendChild(this.canvas[type]);
-  return this;
-};
-
-Sigma.prototype.startLayout = function() {
-  sigma.scheduler.removeWorker(
-    'layout_' + this.id, 2
-  ).bind(
-    'killed',
-    this.onWorkerKilled
-  );
-
-  this.busy = true;
-
-  this.forceatlas2.init();
-  this.computeOneStep();
-  return this;
-};
-
-Sigma.prototype.stopLayout = function() {
-  this.busy = false;
-  return this;
-};
-
-// nodes, edges, labels:
-// - 0: Don't display them
-// - 1: Display them (asynchronous)
-// - 2: Display them (synchronous)
-Sigma.prototype.draw = function(nodes, edges, labels, safe) {
-  var self = this;
-
-  if (safe && this.busy) {
-    return this;
-  }
-
-  var n = nodes == undefined ? self.p.nodes : nodes;
-  var e = edges == undefined ? self.p.edges : edges;
-  var l = labels == undefined ? self.p.labels : labels;
-
-  self.p.lastNodes = n;
-  self.p.lastEdges = e;
-  self.p.lastLabels = l;
-
-  // Remove workers:
-  this.clearSchedule();
-
-  // Rescale graph:
-  this.graph.rescale(this.width, this.height);
-  this.graph.translate(
-    this.mousecaptor.stageX,
-    this.mousecaptor.stageY,
-    this.mousecaptor.ratio
-  );
-
-  // Clear scene:
-  for (var k in this.canvas) {
-    this.canvas[k].width = this.canvas[k].width;
-  }
-
-  this.plotter.currentEdgeIndex = 0;
-  this.plotter.currentNodeIndex = 0;
-  this.plotter.currentLabelIndex = 0;
-
-  var previous = null;
-  var start = false;
-
-  if (n) {
-    if (n > 1) {
-      // TODO: Make this better
-      while (this.plotter.worker_drawNode()) {}
+  function resize(w, h) {
+    if (w != undefined && h != undefined) {
+      self.width = w;
+      self.height = h;
     }else {
-      sigma.scheduler.addWorker(
-        this.plotter.worker_drawNode,
-        'node_' + self.id,
-        false
-      );
-
-      start = true;
-      previous = 'node_' + self.id;
+      self.width = self.dom.offsetWidth;
+      self.height = self.dom.offsetHeight;
     }
-  }
 
-  if (l) {
-    if (l > 1) {
-      // TODO: Make this better
-      while (this.plotter.worker_drawLabel()) {}
-    } else {
-      if (previous) {
-        sigma.scheduler.queueWorker(
-          this.plotter.worker_drawLabel,
-          'label_' + self.id,
-          previous
-        );
-      } else {
-        sigma.scheduler.addWorker(
-          this.plotter.worker_drawLabel,
-          'label_' + self.id,
-          false
-        );
-      }
-
-      start = true;
-      previous = 'label_' + self.id;
+    for (var k in self.canvas) {
+      self.canvas[k].setAttribute('width', self.width + 'px');
+      self.canvas[k].setAttribute('height', self.height + 'px');
     }
-  }
 
-  if (e) {
-    if (e > 1) {
-      // TODO: Make this better
-      while (this.plotter.worker_drawEdge()) {}
-    }else {
-      if (previous) {
-        sigma.scheduler.queueWorker(
-          this.plotter.worker_drawEdge,
-          'edge_' + self.id,
-          previous
-        );
+    self.draw(
+      self.p.lastNodes,
+      self.p.lastEdges,
+      self.p.lastLabels,
+      true
+    );
+    return self;
+  };
+
+  function clearSchedule() {
+    sigma.scheduler.removeWorker(
+      'node_' + self.id, 2
+    ).removeWorker(
+      'edge_' + self.id, 2
+    ).removeWorker(
+      'label_' + self.id, 2
+    ).stop();
+    return self;
+  };
+
+  function initCanvas(type) {
+    self.canvas[type] = document.createElement('canvas');
+    self.canvas[type].style.position = 'absolute';
+    self.canvas[type].setAttribute('id', 'sigma_' + type + '_' + self.id);
+    self.canvas[type].setAttribute('class', 'sigma_' + type + '_canvas');
+    self.canvas[type].setAttribute('width', self.width + 'px');
+    self.canvas[type].setAttribute('height', self.height + 'px');
+
+    self.dom.appendChild(self.canvas[type]);
+    return self;
+  };
+
+  function startLayout() {
+    sigma.scheduler.removeWorker(
+      'layout_' + self.id, 2
+    ).bind(
+      'killed',
+      self.onWorkerKilled
+    );
+
+    self.busy = true;
+
+    self.forceatlas2.init();
+    self.computeOneStep();
+    return self;
+  };
+
+  function stopLayout() {
+    self.busy = false;
+    return self;
+  };
+
+  // nodes, edges, labels:
+  // - 0: Don't display them
+  // - 1: Display them (asynchronous)
+  // - 2: Display them (synchronous)
+  function draw(nodes, edges, labels, safe) {
+
+    if (safe && self.busy) {
+      return self;
+    }
+
+    var n = nodes == undefined ? self.p.nodes : nodes;
+    var e = edges == undefined ? self.p.edges : edges;
+    var l = labels == undefined ? self.p.labels : labels;
+
+    self.p.lastNodes = n;
+    self.p.lastEdges = e;
+    self.p.lastLabels = l;
+
+    // Remove workers:
+    self.clearSchedule();
+
+    // Rescale graph:
+    self.graph.rescale(self.width, self.height);
+    self.graph.translate(
+      self.mousecaptor.stageX,
+      self.mousecaptor.stageY,
+      self.mousecaptor.ratio
+    );
+
+    // Clear scene:
+    for (var k in self.canvas) {
+      self.canvas[k].width = self.canvas[k].width;
+    }
+
+    self.plotter.currentEdgeIndex = 0;
+    self.plotter.currentNodeIndex = 0;
+    self.plotter.currentLabelIndex = 0;
+
+    var previous = null;
+    var start = false;
+
+    if (n) {
+      if (n > 1) {
+        // TODO: Make self better
+        while (self.plotter.worker_drawNode()) {}
       }else {
         sigma.scheduler.addWorker(
-          this.plotter.worker_drawEdge,
-          'edge_' + self.id,
+          self.plotter.worker_drawNode,
+          'node_' + self.id,
           false
         );
+
+        start = true;
+        previous = 'node_' + self.id;
       }
-
-      start = true;
-      previous = 'edge_' + self.id;
     }
-  }
 
-  start && sigma.scheduler.start();
-  return this;
-};
+    if (l) {
+      if (l > 1) {
+        // TODO: Make self better
+        while (self.plotter.worker_drawLabel()) {}
+      } else {
+        if (previous) {
+          sigma.scheduler.queueWorker(
+            self.plotter.worker_drawLabel,
+            'label_' + self.id,
+            previous
+          );
+        } else {
+          sigma.scheduler.addWorker(
+            self.plotter.worker_drawLabel,
+            'label_' + self.id,
+            false
+          );
+        }
 
-Sigma.prototype.getGraph = function() {
-  return this.graph;
-};
+        start = true;
+        previous = 'label_' + self.id;
+      }
+    }
+
+    if (e) {
+      if (e > 1) {
+        // TODO: Make self better
+        while (self.plotter.worker_drawEdge()) {}
+      }else {
+        if (previous) {
+          sigma.scheduler.queueWorker(
+            self.plotter.worker_drawEdge,
+            'edge_' + self.id,
+            previous
+          );
+        }else {
+          sigma.scheduler.addWorker(
+            self.plotter.worker_drawEdge,
+            'edge_' + self.id,
+            false
+          );
+        }
+
+        start = true;
+        previous = 'edge_' + self.id;
+      }
+    }
+
+    start && sigma.scheduler.start();
+    return self;
+  };
+
+  function getGraph() {
+    return self.graph;
+  };
+
+  this.getGraph = getGraph;
+  this.resize = resize;
+
+  this.onWorkerKilled = onWorkerKilled;
+  this.computeOneStep = computeOneStep;
+
+  this.stopLayout = stopLayout;
+  this.startLayout = startLayout;
+  this.clearSchedule = clearSchedule;
+  
+  this.draw = draw;
+}

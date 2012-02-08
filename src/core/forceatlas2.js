@@ -771,112 +771,113 @@ forceatlas2.Region = function(nodes, depth) {
     massCenterX: 0,
     massCenterY: 0
   };
-
-  this.updateMassAndGeometry = function() {
-    if (this.nodes.length > 1) {
-      // Compute Mass
-      var mass = 0;
-      var massSumX = 0;
-      var massSumY = 0;
-      this.nodes.forEach(function(n) {
-        mass += n.fa2.mass;
-        massSumX += n.x * n.fa2.mass;
-        massSumY += n.y * n.fa2.mass;
-      });
-      var massCenterX = massSumX / mass;
-      massCenterY = massSumY / mass;
-
-      // Compute size
-      var size;
-      this.nodes.forEach(function(n) {
-        var distance = Math.sqrt(
-          (n.x - massCenterX) *
-          (n.x - massCenterX) +
-          (n.y - massCenterY) *
-          (n.y - massCenterY)
-        );
-        size = Math.max(size || (2 * distance), 2 * distance);
-      });
-
-      this.p.mass = mass;
-      this.p.massCenterX = massCenterX;
-      this.p.massCenterY = massCenterY;
-      this.size = size;
-    }
-  }
-
+  
   this.updateMassAndGeometry();
+}
 
-  this.buildSubRegions = function() {
-    if (this.nodes.length > 1) {
-      var leftNodes = [];
-      var rightNodes = [];
-      var subregions = [];
-      var massCenterX = this.p.massCenterX;
-      var massCenterY = this.p.massCenterY;
-      var nextDepth = this.depth + 1;
+forceatlas2.Region.prototype.updateMassAndGeometry = function() {
+  if (this.nodes.length > 1) {
+    // Compute Mass
+    var mass = 0;
+    var massSumX = 0;
+    var massSumY = 0;
+    this.nodes.forEach(function(n) {
+      mass += n.fa2.mass;
+      massSumX += n.x * n.fa2.mass;
+      massSumY += n.y * n.fa2.mass;
+    });
+    var massCenterX = massSumX / mass;
+    massCenterY = massSumY / mass;
 
-      var self = this;
-
-      this.nodes.forEach(function(n) {
-        var nodesColumn = (n.x < massCenterX) ? (leftNodes) : (rightNodes);
-        nodesColumn.push(n);
-      });
-
-      var tl = [], bl = [], br = [], tr = [];
-
-      leftNodes.forEach(function(n) {
-        var nodesLine = (n.y < massCenterY) ? (tl) : (bl);
-        nodesLine.push(n);
-      });
-
-      rightNodes.forEach(function(n) {
-        var nodesLine = (n.y < massCenterY) ? (tr) : (br);
-        nodesLine.push(n);
-      });
-
-      [tl, bl, br, tr].filter(function(a) {
-        return a.length;
-      }).forEach(function(a) {
-        if (nextDepth <= self.depthLimit && a.length < self.nodes.length) {
-          var subregion = new forceatlas2.Region(a, nextDepth);
-          subregions.push(subregion);
-        } else {
-          a.forEach(function(n) {
-            var oneNodeList = [n];
-            var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
-            subregions.push(subregion);
-          });
-        }
-      });
-
-      this.subregions = subregions;
-
-      subregions.forEach(function(subregion) {
-        subregion.buildSubRegions();
-      });
-    }
-  }
-
-  this.applyForce = function(n, Force, theta) {
-    if (this.nodes.length < 2) {
-      var regionNode = this.nodes[0];
-      Force.apply_nn(n, regionNode);
-    } else {
+    // Compute size
+    var size;
+    this.nodes.forEach(function(n) {
       var distance = Math.sqrt(
-        (n.x - this.p.massCenterX) *
-        (n.x - this.p.massCenterX) +
-        (n.y - this.p.massCenterY) *
-        (n.y - this.p.massCenterY)
+        (n.x - massCenterX) *
+        (n.x - massCenterX) +
+        (n.y - massCenterY) *
+        (n.y - massCenterY)
       );
+      size = Math.max(size || (2 * distance), 2 * distance);
+    });
 
-      if (distance * theta > this.size) {
-        Force.apply_nr(n, this);
+    this.p.mass = mass;
+    this.p.massCenterX = massCenterX;
+    this.p.massCenterY = massCenterY;
+    this.size = size;
+  }
+};
+
+
+forceatlas2.Region.prototype.buildSubRegions = function() {
+  if (this.nodes.length > 1) {
+    var leftNodes = [];
+    var rightNodes = [];
+    var subregions = [];
+    var massCenterX = this.p.massCenterX;
+    var massCenterY = this.p.massCenterY;
+    var nextDepth = this.depth + 1;
+
+    var self = this;
+
+    this.nodes.forEach(function(n) {
+      var nodesColumn = (n.x < massCenterX) ? (leftNodes) : (rightNodes);
+      nodesColumn.push(n);
+    });
+
+    var tl = [], bl = [], br = [], tr = [];
+
+    leftNodes.forEach(function(n) {
+      var nodesLine = (n.y < massCenterY) ? (tl) : (bl);
+      nodesLine.push(n);
+    });
+
+    rightNodes.forEach(function(n) {
+      var nodesLine = (n.y < massCenterY) ? (tr) : (br);
+      nodesLine.push(n);
+    });
+
+    [tl, bl, br, tr].filter(function(a) {
+      return a.length;
+    }).forEach(function(a) {
+      if (nextDepth <= self.depthLimit && a.length < self.nodes.length) {
+        var subregion = new forceatlas2.Region(a, nextDepth);
+        subregions.push(subregion);
       } else {
-        this.subregions.forEach(function(subregion) {
-          subregion.applyForce(n, Force, theta);
+        a.forEach(function(n) {
+          var oneNodeList = [n];
+          var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
+          subregions.push(subregion);
         });
       }
+    });
+
+    this.subregions = subregions;
+
+    subregions.forEach(function(subregion) {
+      subregion.buildSubRegions();
+    });
+  }
+};
+
+forceatlas2.Region.prototype.applyForce = function(n, Force, theta) {
+  if (this.nodes.length < 2) {
+    var regionNode = this.nodes[0];
+    Force.apply_nn(n, regionNode);
+  } else {
+    var distance = Math.sqrt(
+      (n.x - this.p.massCenterX) *
+      (n.x - this.p.massCenterX) +
+      (n.y - this.p.massCenterY) *
+      (n.y - this.p.massCenterY)
+    );
+
+    if (distance * theta > this.size) {
+      Force.apply_nr(n, this);
+    } else {
+      this.subregions.forEach(function(subregion) {
+        subregion.applyForce(n, Force, theta);
+      });
     }
   }
 };
