@@ -2,7 +2,7 @@ sigma.classes.EventDispatcher = function() {
   var _h = {};
   var _self = this;
 
-  function removeListener(events, handler) {
+  function unbind(events, handler) {
     if (!events) {
       _h = {};
     }
@@ -26,7 +26,7 @@ sigma.classes.EventDispatcher = function() {
     return _self;
   }
 
-  function addListener(events, handler) {
+  function bind(events, handler) {
     if (!handler || !events) return;
 
     var eArray = ((typeof events) == 'string') ? events.split(' ') : events;
@@ -51,7 +51,7 @@ sigma.classes.EventDispatcher = function() {
   }
 
   /* PUBLIC INTERFACE: */
-  this.removeListener = removeListener;
-  this.addListener = addListener;
+  this.unbind = unbind;
+  this.bind = bind;
   this.dispatch = dispatch;
 };
