@@ -1,10 +1,19 @@
 function MouseCaptor(canvas, graph, id) {
   var self = this;
+  sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
   this.canvas = canvas;
   this.graph = graph;
   this.id = id;
+
+  this.p = {
+    minRatio: 1,
+    maxRatio: 16,
+    zoomDelta: 0.1,
+    zoomMultiply: 2,
+    directZooming: false
+  };
 
   // MOUSE
   this.mouseX = 0;
@@ -30,11 +39,6 @@ function MouseCaptor(canvas, graph, id) {
   this.targetRatio = 1;
 
   this.progress = 0;
-
-  this.limits = {
-    minRatio: 1,
-    maxRatio: 16
-  };
 
   // UTILS
   function getX(e) {
@@ -109,12 +113,12 @@ function MouseCaptor(canvas, graph, id) {
     window.clearInterval(self.zoomID);
 
     self.oldRatio = self.ratio;
-    self.targetRatio = self.ratio * (delta > 0 ? 2 : 1 / 2);
+    self.targetRatio = self.ratio * (delta > 0 ? self.p.zoomMultiply : 1 / self.p.zoomMultiply);
     self.targetRatio = Math.min(
-      Math.max(self.targetRatio, self.limits.minRatio),
-      self.limits.maxRatio
+      Math.max(self.targetRatio, self.p.minRatio),
+      self.p.maxRatio
     );
-    self.progress = 0;
+    self.progress = self.p.directZooming ? 1 - self.p.zoomDelta : 0;
 
     if (self.ratio != self.targetRatio) {
       zooming();
@@ -140,7 +144,7 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function zooming() {
-    self.progress += 0.1;
+    self.progress += self.p.zoomDelta;
     var k = sigma.easing.quadratic.easeout(self.progress);
     var oldRatio = self.ratio;
 

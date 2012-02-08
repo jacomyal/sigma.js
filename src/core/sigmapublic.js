@@ -7,14 +7,19 @@ function SigmaPublic(inst) {
     return res == s ? this : res;
   };
 
-  this.drawConfig = function(a1, a2) {
+  this.config_drawing = function(a1, a2) {
     var res = s.plotter.config(a1, a2);
     return res == s.plotter ? this : res;
   };
 
-  this.layoutConfig = function(a1, a2) {
+  this.config_layout = function(a1, a2) {
     var res = s.forceatlas2.config(a1, a2);
     return res == s.forceatlas2 ? this : res;
+  };
+
+  this.config_mouse = function(a1, a2) {
+    var res = s.mousecaptor.config(a1, a2);
+    return res == s.mousecaptor ? this : res;
   };
 
   this.draw = function(nodes, edges, labels, safe) {

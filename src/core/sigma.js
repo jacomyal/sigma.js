@@ -1,8 +1,9 @@
 function Sigma(root, id) {
   sigma.classes.Cascade.call(this);
+  sigma.classes.EventDispatcher.call(this);
+
   this.id = id;
 
-  // TODO
   this.p = {
     auto: true,
     nodes: 2,
@@ -46,7 +47,7 @@ function Sigma(root, id) {
 
   // Interaction listeners:
   var self = this;
-  this.mousecaptor.addListener('drag zooming', function(e) {
+  this.mousecaptor.bind('drag zooming', function(e) {
     if (!self.busy) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
@@ -54,7 +55,7 @@ function Sigma(root, id) {
         self.p.auto ? 2 : self.p.labels
       );
     }
-  }).addListener('stopdrag stopzooming', function(e) {
+  }).bind('stopdrag stopzooming', function(e) {
     if (!self.busy) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
@@ -73,7 +74,7 @@ function Sigma(root, id) {
         self.p.auto ? 0 : self.p.edges,
         self.p.auto ? 2 : self.p.labels
       );
-      sigma.scheduler.removeListener(
+      sigma.scheduler.unbind(
         'killed',
         self.onWorkerKilled
       ).injectFrame(self.computeOneStep);
@@ -86,7 +87,7 @@ function Sigma(root, id) {
         self.forceatlas2.atomicGo,
         'layout_' + self.id,
         false
-      ).addListener(
+      ).bind(
         'killed',
         self.onWorkerKilled
       ).start();
@@ -112,9 +113,10 @@ Sigma.prototype.resize = function(w, h) {
   }
 
   this.draw(
-    this.p.auto ? 2 : this.p.nodes,
-    this.p.auto ? 1 : this.p.edges,
-    this.p.auto ? 2 : this.p.labels
+    this.p.lastNodes,
+    this.p.lastEdges,
+    this.p.lastLabels,
+    true
   );
   return this;
 };
@@ -146,7 +148,7 @@ Sigma.prototype.initCanvas = function(type) {
 Sigma.prototype.startLayout = function() {
   sigma.scheduler.removeWorker(
     'layout_' + this.id, 2
-  ).addListener(
+  ).bind(
     'killed',
     this.onWorkerKilled
   );
