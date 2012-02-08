@@ -276,11 +276,8 @@ function Sigma(root, id) {
     return self.graph;
   };
 
-  this.getGraph = getGraph;
   this.resize = resize;
-
-  this.onWorkerKilled = onWorkerKilled;
-  this.computeOneStep = computeOneStep;
+  this.getGraph = getGraph;
 
   this.stopLayout = stopLayout;
   this.startLayout = startLayout;
