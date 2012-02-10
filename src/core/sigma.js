@@ -19,6 +19,8 @@ function Sigma(root, id) {
   this.width = this.dom.offsetWidth;
   this.height = this.dom.offsetHeight;
 
+  this.tasks = {};
+
   this.canvas = {};
   initCanvas('edges');
   initCanvas('nodes');
@@ -40,15 +42,10 @@ function Sigma(root, id) {
     this.graph,
     this.id
   );
-  this.forceatlas2 = new forceatlas2.ForceAtlas2(
-    this.graph
-  );
-
-  this.busy = false;
 
   // Interaction listeners:
   self.mousecaptor.bind('drag zooming', function(e) {
-    if (!self.busy) {
+    if (getRunningTasks() == 0) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
         self.p.auto ? 0 : self.p.edges,
@@ -56,7 +53,7 @@ function Sigma(root, id) {
       );
     }
   }).bind('stopdrag stopzooming', function(e) {
-    if (!self.busy) {
+    if (getRunningTasks() == 0) {
       self.draw(
         self.p.auto ? 2 : self.p.nodes,
         self.p.auto ? 1 : self.p.edges,
@@ -64,38 +61,6 @@ function Sigma(root, id) {
       );
     }
   });
-
-  // The following methods are not declared in the prototype
-  // due to the scope issues (TODO: find a solution)
-  function onWorkerKilled(e) {
-    if (e.content.name == 'layout_' + self.id) {
-      self.draw(
-        self.p.auto ? 2 : self.p.nodes,
-        self.p.auto ? 0 : self.p.edges,
-        self.p.auto ? 2 : self.p.labels
-      );
-      sigma.scheduler.unbind(
-        'killed',
-        self.onWorkerKilled
-      ).injectFrame(self.computeOneStep);
-    }
-  };
-
-  function computeOneStep() {
-    if (self.busy) {
-      sigma.scheduler.addWorker(
-        self.forceatlas2.atomicGo,
-        'layout_' + self.id,
-        false
-      ).bind(
-        'killed',
-        self.onWorkerKilled
-      ).start();
-    }else {
-      self.busy = false;
-      self.draw();
-    }
-  };
 
   function resize(w, h) {
     if (w != undefined && h != undefined) {
@@ -143,24 +108,78 @@ function Sigma(root, id) {
     return self;
   };
 
-  function startLayout() {
-    sigma.scheduler.removeWorker(
-      'layout_' + self.id, 2
-    ).bind(
-      'killed',
-      self.onWorkerKilled
-    );
+  // addTask() will execute the worker while it returns
+  // 'true'. Then, it will execute the condition, and starts
+  // again if it is 'true'.
+  function addTask(id, worker, condition) {
+    if (self.tasks[id + '_ext_' + self.id] != undefined) {
+      return self;
+    }
 
-    self.busy = true;
+    self.tasks[id + '_ext_' + self.id] = {
+      'worker': worker,
+      'condition': condition
+    };
 
-    self.forceatlas2.init();
-    self.computeOneStep();
+    getRunningTasks() == 0 && startTasks();
     return self;
   };
 
-  function stopLayout() {
-    self.busy = false;
+  function removeTask(id) {
+    if (self.tasks[id + '_ext_' + self.id]) {
+      self.tasks[id + '_ext_' + self.id].on = false;
+    }
+    self.tasks[id + '_ext_' + self.id].delete = true;
     return self;
+  };
+
+  function getRunningTasks() {
+    return Object.keys(self.tasks).filter(function(id) {
+      return !!self.tasks[id].on;
+    }).length;
+  };
+
+  function startTasks() {
+    if (!Object.keys(self.tasks).length) {
+      self.draw();
+    }else {
+      self.draw(
+        self.p.auto ? 2 : self.p.nodes,
+        self.p.auto ? 0 : self.p.edges,
+        self.p.auto ? 2 : self.p.labels
+      );
+
+      sigma.scheduler.unbind('killed', onTaskEnded);
+      sigma.scheduler.injectFrame(function() {
+        for (var k in self.tasks) {
+          self.tasks[k].on = true;
+          sigma.scheduler.addWorker(
+            self.tasks[k].worker,
+            k,
+            false
+          );
+        }
+      });
+
+      sigma.scheduler.bind('killed', onTaskEnded).start();
+    }
+
+    return self;
+  };
+
+  function onTaskEnded(e) {
+    if (self.tasks[e.content.name] != undefined) {
+      if (self.tasks[e.content.name]. delete ||
+          !self.tasks[e.content.name].condition()) {
+        delete self.tasks[e.content.name];
+      }else {
+        self.tasks[e.content.name].on = false;
+      }
+
+      if (getRunningTasks() == 0) {
+        startTasks();
+      }
+    }
   };
 
   // nodes, edges, labels:
@@ -168,8 +187,7 @@ function Sigma(root, id) {
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-
-    if (safe && self.busy) {
+    if (safe && getRunningTasks() > 0) {
       return self;
     }
 
@@ -206,7 +224,7 @@ function Sigma(root, id) {
 
     if (n) {
       if (n > 1) {
-        // TODO: Make self better
+        // TODO: Make this better
         while (self.plotter.worker_drawNode()) {}
       }else {
         sigma.scheduler.addWorker(
@@ -222,7 +240,7 @@ function Sigma(root, id) {
 
     if (l) {
       if (l > 1) {
-        // TODO: Make self better
+        // TODO: Make this better
         while (self.plotter.worker_drawLabel()) {}
       } else {
         if (previous) {
@@ -246,7 +264,7 @@ function Sigma(root, id) {
 
     if (e) {
       if (e > 1) {
-        // TODO: Make self better
+        // TODO: Make this better
         while (self.plotter.worker_drawEdge()) {}
       }else {
         if (previous) {
@@ -279,9 +297,12 @@ function Sigma(root, id) {
   this.resize = resize;
   this.getGraph = getGraph;
 
+  this.addTask = addTask;
+  this.removeTask = removeTask;
+
   this.stopLayout = stopLayout;
   this.startLayout = startLayout;
   this.clearSchedule = clearSchedule;
-  
+
   this.draw = draw;
 }

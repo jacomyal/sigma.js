@@ -20,5 +20,5 @@ The Makefile actions `check` and `fix` will respectively apply **gjslint** and *
 
 To build sigma.js:
 
-1. First, use `make concat` to concatenate the different JS files into 'build/sigma.concat.js'.
-2. Then, use `make minify-simple` or `make minify-advanced` to minify `make concat` result (*Warning*: `make minify-advanced` uses Closure advanced minify mode which is pretty agressive on renaming, and this minification has not been tested yet).
+1. Use `make concat` to concatenate the different JS files into 'build/sigma.concat.js'.
+2. Use `make minify-simple` or `make minify-advanced` to minify concatenation result (*Warning*: `make minify-advanced` uses Closure advanced minify mode which is pretty agressive on renaming, and this minification has not been tested yet).

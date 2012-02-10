@@ -3,8 +3,9 @@
 <head>
   <title>sigma.js | debug</title>
   <script type="text/javascript" src="../build/sigma.concat.js"></script>
+  <script type="text/javascript" src="../plugins/forceatlas2.js"></script>
   <script type="text/javascript">
-    var s;
+    var s, f;
 
     function gup(name){
       name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
@@ -32,8 +33,8 @@
         window.S = s;
   
         // INIT GRAPH:
-        var N = gup('nodes') || 1000;
-        var E = gup('edges') || 10000;
+        var N = gup('nodes') || 500;
+        var E = gup('edges') || 5000;
         var C = gup('clusters') || 10;
         var d = gup('clustering') || 0.5;
         window.clusters = [];
@@ -48,7 +49,7 @@
 
         for(var i=0;i<N;i++){
           var cluster = clusters[(Math.random()*C)|0];
-          s.addNode('n'+i,{
+          s.getGraph().addNode('n'+i,{
             'x': 1000*Math.random(),
             'y': 1000*Math.random(),
             'label': 'Node number '+i,
@@ -61,16 +62,20 @@
 
         for(var i=0;i<E;i++){
           if(Math.random()<1-d){
-            s.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
+            s.getGraph().addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
               'size': 1
             });
           }else{
             var cluster = clusters[(Math.random()*C)|0], n = cluster.nodes.length;
-            s.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
+            s.getGraph().addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
               'size': 1
             });
           }
         }
+
+        f = new forceatlas2.ForceAtlas2(s.getGraph());
+        //f.setAutoSettings();
+        f.init();
 
         window.onresize = function(){
           s.resize();
@@ -119,11 +124,17 @@
     }
 
     function startLayout(){
-      s && s.startLayout();
+      if(s && f){
+        s.addTask('fa', f.atomicGo, function(){
+          return true;
+        });
+      }
     }
 
     function stopLayout(){
-      s && s.stopLayout();
+      if(s && f){
+        s.removeTask('fa');
+      }
     }
   </script>
   <style type="text/css">

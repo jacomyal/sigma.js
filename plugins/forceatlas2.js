@@ -351,6 +351,8 @@ forceatlas2.ForceAtlas2 = function(graph) {
       this.p.barnesHutOptimize = false;
     }
     this.p.barnesHutTheta = 1.2;
+
+    return this;
   }
 
   // All the different forces

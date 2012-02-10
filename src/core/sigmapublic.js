@@ -63,33 +63,19 @@ function SigmaPublic(inst) {
     return this;
   };
 
-  this.startLayout = function() {
-    s.startLayout();
-  };
-
-  this.stopLayout = function() {
-    s.stopLayout();
-  };
-
-  this.addNode = function(id, params) {
-    s.graph.addNode(id, params);
+  this.addTask = function(id, worker, condition) {
+    s.addTask(id, worker, condition);
     return this;
-  };
+  }
 
-  this.addEdge = function(id, source, target, params) {
-    s.graph.addEdge(id, source, target, params);
+  this.removeTask = function(id) {
+    s.removeTask(id);
     return this;
-  };
+  }
 
-  this.dropNode = function(v) {
-    s.graph.dropNode(v);
-    return this;
-  };
-
-  this.dropEdge = function(v) {
-    s.graph.dropEdge(v);
-    return this;
-  };
+  this.getGraph = function() {
+    return s.graph;
+  }
 
   this.emptyGraph = function() {
     s.graph.empty();

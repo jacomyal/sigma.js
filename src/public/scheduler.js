@@ -32,16 +32,16 @@ sigma.scheduler = (function() {
   };
 
   this.start = function() {
-    this.isRunning = true;
-    this.index = 0;
-    this.frames = 0;
+    self.isRunning = true;
+    self.index = 0;
+    self.frames = 0;
 
-    this.startTime = (new Date()).getTime();
-    this.time = this.startTime;
+    self.startTime = (new Date()).getTime();
+    self.time = self.startTime;
 
-    this.dispatch('start');
-    this.injectFrame(this.frameInjector);
-    return this;
+    self.dispatch('start');
+    self.injectFrame(self.frameInjector);
+    return self;
   };
 
   this.stop = function() {
@@ -73,6 +73,10 @@ sigma.scheduler = (function() {
   };
 
   this.addWorker = function(w, name, autostart) {
+    if (typeof w != 'function') {
+      throw new Error('Worker "' + name + '" is not a function');
+    }
+
     this.workers.push({
       'name': name,
       'w': w
@@ -82,6 +86,10 @@ sigma.scheduler = (function() {
   };
 
   this.queueWorker = function(w, name, parent) {
+    if (typeof w != 'function') {
+      throw new Error('Worker "' + name + '" is not a function');
+    }
+
     if (!this.workers.concat(this.queue).some(function(e) {
       return e['name'] == parent;
     })) {
