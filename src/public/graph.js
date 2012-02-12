@@ -4,6 +4,10 @@ sigma.classes.Graph = function() {
   sigma.classes.EventDispatcher.call(self);
 
   this.p = {
+    minNodeSize: 0,
+    maxNodeSize: 0,
+    minEdgeSize: 0,
+    maxEdgeSize: 0,
     //   Scaling mode:
     //   - 'inside' (default)
     //   - 'outside'
@@ -173,7 +177,7 @@ sigma.classes.Graph = function() {
     return self;
   };
 
-  function rescale(w, h, sMin, sMax, tMin, tMax) {
+  function rescale(w, h) {
     var weightMax = 0, sizeMax = 0;
 
     self.nodes.forEach(function(node) {
@@ -209,27 +213,27 @@ sigma.classes.Graph = function() {
 
     // Size homothetic parameters:
     var a, b;
-    if (!sMax && !sMin) {
+    if (!self.p.maxNodeSize && !self.p.minNodeSize) {
       a = 1;
       b = 0;
-    }else if (sMax == sMin) {
+    }else if (self.p.maxNodeSize == self.p.minNodeSize) {
       a = 0;
-      b = sMax;
+      b = self.p.maxNodeSize;
     }else {
-      a = (sMax - sMin) / sizeMax;
-      b = sMin;
+      a = (self.p.maxNodeSize - self.p.minNodeSize) / sizeMax;
+      b = self.p.minNodeSize;
     }
 
     var c, d;
-    if (!tMax && !tMin) {
+    if (!self.p.maxEdgeSize && !self.p.minEdgeSize) {
       c = 1;
       d = 0;
-    }else if (tMax == tMin) {
+    }else if (self.p.maxEdgeSize == self.p.minEdgeSize) {
       c = 0;
-      d = tMin;
+      d = self.p.minEdgeSize;
     }else {
-      c = (tMax - tMin) / weightMax;
-      d = tMin;
+      c = (self.p.maxEdgeSize - self.p.minEdgeSize) / weightMax;
+      d = self.p.minEdgeSize;
     }
 
     // Rescale the nodes:

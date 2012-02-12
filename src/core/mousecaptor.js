@@ -174,8 +174,8 @@ function MouseCaptor(canvas, graph, id) {
 
   // ADD CALLBACKS
   // TODO: Improve browsers compatibility
-  this.canvas.onmousewheel = wheelHandler;
-  this.canvas.onmousemove = moveHandler;
-  this.canvas.onmousedown = downHandler;
-  document.onmouseup = upHandler;
+  this.canvas.addEventListener('mousewheel', wheelHandler);
+  this.canvas.addEventListener('mousemove', moveHandler);
+  this.canvas.addEventListener('mousedown', downHandler);
+  document.addEventListener('mouseup', upHandler);
 }

@@ -2,6 +2,8 @@
 
 *sigma.js* is a JavaScript library to visualize and explore graphs using the HTML5 canvas element.
 
+
+
 Use
 ---
 
