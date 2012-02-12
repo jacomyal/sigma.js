@@ -24,7 +24,6 @@ function MouseCaptor(canvas, graph, id) {
   this.startY = 0;
 
   this.isMouseDown = false;
-  this.triggerDrag = false;
 
   // SCENE
   this.oldStageX = 0;
@@ -81,7 +80,6 @@ function MouseCaptor(canvas, graph, id) {
     self.oldMouseX = self.mouseX;
     self.oldMouseY = self.mouseY;
 
-    self.triggerDrag = false;
 
     startDrag();
   };
@@ -113,6 +111,10 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function startZooming(delta) {
+    if (self.isMouseDown) {
+      return;
+    }
+
     window.clearInterval(self.zoomID);
 
     self.oldRatio = self.ratio;

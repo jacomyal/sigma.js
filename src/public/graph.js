@@ -1,8 +1,14 @@
 sigma.classes.Graph = function() {
   var self = this;
+  sigma.classes.Cascade.call(self);
   sigma.classes.EventDispatcher.call(self);
 
-  empty();
+  this.p = {
+    //   Scaling mode:
+    //   - 'inside' (default)
+    //   - 'outside'
+    scalingMode: 'inside'
+  };
 
   function addNode(id, params) {
     if (self.nodesIndex[id]) {
@@ -52,8 +58,6 @@ sigma.classes.Graph = function() {
 
     a.forEach(function(id) {
       if (self.nodesIndex[id]) {
-        // TODO
-        // Make self better
         var index = null;
         self.nodes.some(function(n, i) {
           if (n['id'] == id) {
@@ -141,8 +145,6 @@ sigma.classes.Graph = function() {
 
     a.forEach(function(id) {
       if (self.edgesIndex[id]) {
-        // TODO
-        // Make self better
         var index = null;
         self.edges.some(function(n, i) {
           if (n['id'] == id) {
@@ -199,8 +201,11 @@ sigma.classes.Graph = function() {
       yMin = Math.min(node['y'], yMin || node['y']);
     });
 
-    var scale = Math.min(0.9 * w / (xMax - xMin),
-                         0.9 * h / (yMax - yMin));
+    var scale = self.p.scalingMode == 'outside' ?
+                Math.max(0.95 * w / (xMax - xMin),
+                         0.95 * h / (yMax - yMin)) :
+                Math.min(0.95 * w / (xMax - xMin),
+                         0.95 * h / (yMax - yMin));
 
     // Size homothetic parameters:
     var a, b;
@@ -264,6 +269,8 @@ sigma.classes.Graph = function() {
       node['hover'] = dX < s && dY < s && Math.sqrt(dX * dX + dY * dY) < s;
     });
   }
+
+  empty();
 
   this.addNode = addNode;
   this.addEdge = addEdge;

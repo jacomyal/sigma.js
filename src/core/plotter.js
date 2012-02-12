@@ -3,6 +3,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   var self = this;
 
   this.p = {
+    // -------
     // LABELS:
     //   Label color:
     //   - 'node'
@@ -16,6 +17,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     //              will be used instead)
     labelBGColor: 'default',
     defaultLabelBGColor: '#fff',
+    //   Label shadow:
+    labelShadow: true,
+    labelShadowColor: '#000',
     //   Label hover color:
     //   - 'node'
     //   - default (then defaultLabelHoverColor
@@ -33,6 +37,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     labelSizeRatio: 2,    // for proportional display only
     labelThreshold: 6,
     font: 'Arial',
+    // ------
     // EDGES:
     //   Edge color:
     //   - 'source'
@@ -42,6 +47,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     edgeColor: 'source',
     defaultEdgeColor: '#aaa',
     defaultEdgeType: 'line',
+    // ------
     // NODES:
     defaultNodeColor: '#aaa',
     // HOVER:
@@ -217,7 +223,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
       ctx.fillText(
         node['label'],
         node['displayX'] + node['displaySize'] * 1.5,
-        node['displayY'] + fontSize / 2 - 1
+        node['displayY'] + fontSize / 2 - 3
       );
     }
   };
@@ -237,17 +243,31 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
 
     // Label background:
     ctx.beginPath();
+
+    if (self.p.labelShadow) {
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = self.p.labelShadowColor;
+    }
+
     sigma.tools.drawRoundRect(
       ctx,
-      node['displayX'] - node['displaySize'],
+      node['displayX'] - fontSize / 2 - 2,
       node['displayY'] - fontSize / 2 - 2,
-      ctx.measureText(node['label']).width + node['displaySize'] * 3 + 2,
+      ctx.measureText(node['label']).width +
+        node['displaySize'] * 1.5 +
+        fontSize / 2 + 4,
       fontSize + 4,
       fontSize / 2 + 2,
       'left'
     );
     ctx.closePath();
     ctx.fill();
+
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
 
     // Node border:
     ctx.beginPath();
@@ -285,7 +305,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     ctx.fillText(
       node['label'],
       node['displayX'] + node['displaySize'] * 1.5,
-      node['displayY'] + fontSize / 2 - 1
+      node['displayY'] + fontSize / 2 - 3
     );
   }
 

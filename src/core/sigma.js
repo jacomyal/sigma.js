@@ -7,9 +7,9 @@ function Sigma(root, id) {
 
   this.p = {
     auto: true,
-    nodes: 2,
-    edges: 0,
-    labels: 2,
+    drawNodes: 2,
+    drawEdges: 1,
+    drawLabels: 2,
     lastNodes: 2,
     lastEdges: 0,
     lastLabels: 2
@@ -39,6 +39,7 @@ function Sigma(root, id) {
     this.width,
     this.height
   );
+
   this.mousecaptor = new MouseCaptor(
     this.canvas.mouse,
     this.graph,
@@ -49,17 +50,18 @@ function Sigma(root, id) {
   self.mousecaptor.bind('drag zooming', function(e) {
     if (getRunningTasks() == 0) {
       self.draw(
-        self.p.auto ? 2 : self.p.nodes,
-        self.p.auto ? 0 : self.p.edges,
-        self.p.auto ? 2 : self.p.labels
+        self.p.auto ? 2 : self.p.drawNodes,
+        self.p.auto ? 0 : self.p.drawEdges,
+        self.p.auto ? 2 : self.p.drawLabels
       );
     }
   }).bind('stopdrag stopzooming', function(e) {
     if (getRunningTasks() == 0) {
       self.draw(
-        self.p.auto ? 2 : self.p.nodes,
-        self.p.auto ? 1 : self.p.edges,
-        self.p.auto ? 2 : self.p.labels
+        self.p.auto ? 2 : self.p.drawNodes,
+        self.p.auto ? 1 : self.p.drawEdges,
+        self.p.auto ? 2 : self.p.drawLabels,
+        true
       );
     }
   }).bind('move', drawHover);
@@ -146,9 +148,9 @@ function Sigma(root, id) {
       self.draw();
     }else {
       self.draw(
-        self.p.auto ? 2 : self.p.nodes,
-        self.p.auto ? 0 : self.p.edges,
-        self.p.auto ? 2 : self.p.labels
+        self.p.auto ? 2 : self.p.drawNodes,
+        self.p.auto ? 0 : self.p.drawEdges,
+        self.p.auto ? 2 : self.p.drawLabels
       );
 
       sigma.scheduler.unbind('killed', onTaskEnded);
@@ -193,9 +195,9 @@ function Sigma(root, id) {
       return self;
     }
 
-    var n = nodes == undefined ? self.p.nodes : nodes;
-    var e = edges == undefined ? self.p.edges : edges;
-    var l = labels == undefined ? self.p.labels : labels;
+    var n = nodes == undefined ? self.p.drawNodes : nodes;
+    var e = edges == undefined ? self.p.drawEdges : edges;
+    var l = labels == undefined ? self.p.drawLabels : labels;
 
     self.p.lastNodes = n;
     self.p.lastEdges = e;
@@ -231,7 +233,6 @@ function Sigma(root, id) {
 
     if (n) {
       if (n > 1) {
-        // TODO: Make this better
         while (self.plotter.worker_drawNode()) {}
       }else {
         sigma.scheduler.addWorker(
@@ -247,7 +248,6 @@ function Sigma(root, id) {
 
     if (l) {
       if (l > 1) {
-        // TODO: Make this better
         while (self.plotter.worker_drawLabel()) {}
       } else {
         if (previous) {
@@ -271,7 +271,6 @@ function Sigma(root, id) {
 
     if (e) {
       if (e > 1) {
-        // TODO: Make this better
         while (self.plotter.worker_drawEdge()) {}
       }else {
         if (previous) {
