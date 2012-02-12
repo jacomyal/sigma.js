@@ -57,7 +57,7 @@ var json_graph_api = {
 				var size = 1;
 				var x = 100 - 200*Math.random();
 				var y = 100 - 200*Math.random();
-				var color = {r:0, g:0, b:0};
+				var color;
 				
 				var sizeNodes = nodeNode.getElementsByTagName('size');
 				if(sizeNodes.length>0){
@@ -91,11 +91,7 @@ var json_graph_api = {
 				}
 
 				// Hack for sigma.js
-				try{
-					graph.addNode(id,node);
-				}catch(e){
-					console.log('catch error',e);	
-				}
+				graph.addNode(id,node);
 			}
 		}
 
