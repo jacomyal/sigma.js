@@ -9,7 +9,7 @@ function MouseCaptor(canvas, graph, id) {
 
   this.p = {
     minRatio: 1,
-    maxRatio: 16,
+    maxRatio: 32,
     zoomDelta: 0.1,
     zoomMultiply: 2,
     directZooming: false
@@ -43,11 +43,13 @@ function MouseCaptor(canvas, graph, id) {
   // UTILS
   function getX(e) {
     return e.offsetX != undefined && e.offsetX ||
+           e.layerX != undefined && e.layerX ||
            e.clientX != undefined && e.clientX;
   };
 
   function getY(e) {
     return e.offsetY != undefined && e.offsetY ||
+           e.layerY != undefined && e.layerY ||
            e.clientY != undefined && e.clientY;
   };
 
@@ -65,6 +67,7 @@ function MouseCaptor(canvas, graph, id) {
     self.mouseY = getY(event);
 
     self.isMouseDown && drag(event);
+    self.dispatch('move');
   };
 
   function upHandler(event) {

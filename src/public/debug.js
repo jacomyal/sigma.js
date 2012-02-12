@@ -1,6 +1,6 @@
 sigma.debugMode = 0;
 
-sigma.debug = function() {
+sigma.log = function() {
   if (sigma.debugMode == 1) {
     for (var k in arguments) {
       console.log(arguments[k]);

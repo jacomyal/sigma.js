@@ -25,6 +25,7 @@ function Sigma(root, id) {
   initCanvas('edges');
   initCanvas('nodes');
   initCanvas('labels');
+  initCanvas('hover');
   initCanvas('mouse');
 
   // Intern classes:
@@ -33,6 +34,7 @@ function Sigma(root, id) {
     this.canvas.nodes.getContext('2d'),
     this.canvas.edges.getContext('2d'),
     this.canvas.labels.getContext('2d'),
+    this.canvas.hover.getContext('2d'),
     this.graph,
     this.width,
     this.height
@@ -60,7 +62,7 @@ function Sigma(root, id) {
         self.p.auto ? 2 : self.p.labels
       );
     }
-  });
+  }).bind('move', drawHover);
 
   function resize(w, h) {
     if (w != undefined && h != undefined) {
@@ -129,7 +131,7 @@ function Sigma(root, id) {
     if (self.tasks[id + '_ext_' + self.id]) {
       self.tasks[id + '_ext_' + self.id].on = false;
     }
-    self.tasks[id + '_ext_' + self.id].delete = true;
+    self.tasks[id + '_ext_' + self.id]['delete'] = true;
     return self;
   };
 
@@ -169,7 +171,7 @@ function Sigma(root, id) {
 
   function onTaskEnded(e) {
     if (self.tasks[e.content.name] != undefined) {
-      if (self.tasks[e.content.name]. delete ||
+      if (self.tasks[e.content.name]['delete'] ||
           !self.tasks[e.content.name].condition()) {
         delete self.tasks[e.content.name];
       }else {
@@ -212,7 +214,12 @@ function Sigma(root, id) {
 
     // Clear scene:
     for (var k in self.canvas) {
-      self.canvas[k].width = self.canvas[k].width;
+      self.canvas[k].getContext('2d').clearRect(
+        0,
+        0,
+        self.canvas[k].width,
+        self.canvas[k].height
+      );
     }
 
     self.plotter.currentEdgeIndex = 0;
@@ -290,19 +297,31 @@ function Sigma(root, id) {
     return self;
   };
 
-  function getGraph() {
-    return self.graph;
-  };
+  function drawHover() {
+    self.canvas.hover.getContext('2d').clearRect(
+      0,
+      0,
+      self.canvas.hover.width,
+      self.canvas.hover.height
+    );
 
-  this.resize = resize;
-  this.getGraph = getGraph;
+    self.graph.checkHover(
+      self.mousecaptor.mouseX,
+      self.mousecaptor.mouseY
+    );
+
+    self.graph.nodes.forEach(function(node) {
+      if (node['hover']) {
+        self.plotter.drawHoverNode(node);
+      }
+    });
+  }
+
 
   this.addTask = addTask;
   this.removeTask = removeTask;
-
-  this.stopLayout = stopLayout;
-  this.startLayout = startLayout;
   this.clearSchedule = clearSchedule;
 
   this.draw = draw;
+  this.resize = resize;
 }

@@ -75,7 +75,7 @@ sigma.classes.Graph = function() {
           return true;
         });
       }else {
-        sigma.debug('Node "' + id + '" does not exist.');
+        sigma.log('Node "' + id + '" does not exist.');
       }
     });
 
@@ -155,7 +155,7 @@ sigma.classes.Graph = function() {
         index != null && self.edges.splice(index, 1);
         delete self.edgesIndex[id];
       }else {
-        sigma.debug('Edge "' + id + '" does not exist.');
+        sigma.log('Edge "' + id + '" does not exist.');
       }
     });
 
@@ -255,12 +255,23 @@ sigma.classes.Graph = function() {
     });
   };
 
-  self.addNode = addNode;
-  self.addEdge = addEdge;
-  self.dropNode = dropNode;
-  self.dropEdge = dropEdge;
+  function checkHover(mX, mY) {
+    var dX, dY, s;
+    self.nodes.forEach(function(node) {
+      dX = Math.abs(node['displayX'] - mX);
+      dY = Math.abs(node['displayY'] - mY);
+      s = node['displaySize'];
+      node['hover'] = dX < s && dY < s && Math.sqrt(dX * dX + dY * dY) < s;
+    });
+  }
 
-  self.empty = empty;
-  self.rescale = rescale;
-  self.translate = translate;
+  this.addNode = addNode;
+  this.addEdge = addEdge;
+  this.dropNode = dropNode;
+  this.dropEdge = dropEdge;
+
+  this.empty = empty;
+  this.rescale = rescale;
+  this.translate = translate;
+  this.checkHover = checkHover;
 };

@@ -1,15 +1,37 @@
-function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
+function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   sigma.classes.Cascade.call(this);
   var self = this;
 
   this.p = {
     // LABELS:
-    //   Edge color:
+    //   Label color:
     //   - 'node'
-    //   - default (then defaultLabelColor or node['color']
+    //   - default (then defaultLabelColor
     //              will be used instead)
-    labelColor: 'none',
+    labelColor: 'default',
     defaultLabelColor: '#000',
+    //   Label background color:
+    //   - 'node'
+    //   - default (then defaultLabelBGColor
+    //              will be used instead)
+    labelBGColor: 'default',
+    defaultLabelBGColor: '#fff',
+    //   Label hover color:
+    //   - 'node'
+    //   - default (then defaultLabelHoverColor
+    //              will be used instead)
+    labelHoverColor: 'default',
+    defaultLabelHoverColor: '#000',
+    //   Label size:
+    //   - 'fixed'
+    //   - 'proportional'
+    //   Label size:
+    //   - 'fixed'
+    //   - 'proportional'
+    labelSize: 'fixed',
+    defaultLabelSize: 12, // for fixed display only
+    labelSizeRatio: 2,    // for proportional display only
+    labelThreshold: 6,
     font: 'Arial',
     // EDGES:
     //   Edge color:
@@ -21,7 +43,21 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
     defaultEdgeColor: '#aaa',
     defaultEdgeType: 'line',
     // NODES:
-    defaultNodeColor: '#aaa'
+    defaultNodeColor: '#aaa',
+    // HOVER:
+    //   Node hover color:
+    //   - 'node'
+    //   - default (then defaultNodeHoverColor
+    //              will be used instead)
+    nodeHoverColor: 'node',
+    defaultNodeHoverColor: '#fff',
+    //   Node border color:
+    //   - 'node'
+    //   - default (then defaultNodeBorderColor
+    //              will be used instead)
+    borderSize: 0,
+    nodeBorderColor: 'node',
+    defaultNodeBorderColor: '#fff'
   };
 
   for (var k in params) {
@@ -33,6 +69,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   this.nodesCtx = nodesCtx;
   this.edgesCtx = edgesCtx;
   this.labelsCtx = labelsCtx;
+  this.hoverCtx = hoverCtx;
 
   this.graph = graph;
   this.width = w;
@@ -49,6 +86,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   function worker_drawEdge() {
     var c = self.graph.edges.length;
     var i = 0;
+
     while (i++< self.edgesSpeed && self.currentEdgeIndex < c) {
       if (!self.isOnScreen(
            self.graph.edges[self.currentEdgeIndex]['source']
@@ -68,6 +106,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   function worker_drawNode() {
     var c = self.graph.nodes.length;
     var i = 0;
+
     while (i++< self.nodesSpeed && self.currentNodeIndex < c) {
       if (!self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
         self.currentNodeIndex++;
@@ -82,6 +121,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   function worker_drawLabel() {
     var c = self.graph.nodes.length;
     var i = 0;
+
     while (i++< self.labelsSpeed && self.currentLabelIndex < c) {
       if (!self.isOnScreen(self.graph.nodes[self.currentLabelIndex])) {
         self.currentLabelIndex++;
@@ -107,6 +147,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
 
     ctx.closePath();
     ctx.fill();
+
+    node['hover'] && drawHoverNode(node);
   };
 
   function drawEdge(edge) {
@@ -162,18 +204,90 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   function drawLabel(node) {
     var ctx = self.labelsCtx;
 
-    if (node['displaySize'] * 2 >= 8) {
-      ctx.font = node['displaySize'] * 2 + 'px ' + self.p.font;
+    if (node['displaySize'] >= self.p.labelThreshold) {
+      var fontSize = self.p.labelSize == 'fixed' ?
+                     self.p.defaultLabelSize :
+                     self.p.labelSizeRatio * node['displaySize'];
+
+      ctx.font = fontSize + 'px ' + self.p.font;
+
       ctx.fillStyle = self.p.labelColor == 'node' ?
                       (node['color'] || self.p.defaultNodeColor) :
                       self.p.defaultLabelColor;
       ctx.fillText(
         node['label'],
         node['displayX'] + node['displaySize'] * 1.5,
-        node['displayY'] + node['displaySize'] / 2
+        node['displayY'] + fontSize / 2 - 1
       );
     }
   };
+
+  function drawHoverNode(node) {
+    var ctx = self.hoverCtx;
+
+    var fontSize = self.p.labelSize == 'fixed' ?
+                   self.p.defaultLabelSize :
+                   self.p.labelSizeRatio * node['displaySize'];
+
+    ctx.font = fontSize + 'px ' + self.p.font;
+
+    ctx.fillStyle = self.p.labelBGColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultLabelBGColor;
+
+    // Label background:
+    ctx.beginPath();
+    sigma.tools.drawRoundRect(
+      ctx,
+      node['displayX'] - node['displaySize'],
+      node['displayY'] - fontSize / 2 - 2,
+      ctx.measureText(node['label']).width + node['displaySize'] * 3 + 2,
+      fontSize + 4,
+      fontSize / 2 + 2,
+      'left'
+    );
+    ctx.closePath();
+    ctx.fill();
+
+    // Node border:
+    ctx.beginPath();
+    ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultNodeBorderColor;
+    ctx.arc(node['displayX'],
+            node['displayY'],
+            node['displaySize'] + self.p.borderSize,
+            0,
+            Math.PI * 2,
+            true);
+    ctx.closePath();
+    ctx.fill();
+
+    // Node:
+    ctx.beginPath();
+    ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultNodeHoverColor;
+    ctx.arc(node['displayX'],
+            node['displayY'],
+            node['displaySize'],
+            0,
+            Math.PI * 2,
+            true);
+
+    ctx.closePath();
+    ctx.fill();
+
+    // Label:
+    ctx.fillStyle = self.p.labelHoverColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultLabelHoverColor;
+    ctx.fillText(
+      node['label'],
+      node['displayX'] + node['displaySize'] * 1.5,
+      node['displayY'] + fontSize / 2 - 1
+    );
+  }
 
   function isOnScreen(node) {
     if (isNaN(node['x']) || isNaN(node['y'])) {
@@ -191,5 +305,6 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, graph, w, h, params) {
   this.worker_drawLabel = worker_drawLabel;
   this.worker_drawEdge = worker_drawEdge;
   this.worker_drawNode = worker_drawNode;
+  this.drawHoverNode = drawHoverNode;
   this.isOnScreen = isOnScreen;
 }
