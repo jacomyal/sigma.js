@@ -21,15 +21,14 @@ function Sigma(root, id) {
 
   this.tasks = {};
 
-  this.canvas = {};
-  initCanvas('edges');
-  initCanvas('nodes');
-  initCanvas('labels');
-  initCanvas('hover');
-  initCanvas('mouse');
-
   // Intern classes:
   this.graph = new sigma.classes.Graph();
+
+  this.canvas = {};
+  initDOM('edges', 'canvas');
+  initDOM('nodes', 'canvas');
+  initDOM('labels', 'canvas');
+  initDOM('hover', 'canvas');
   this.plotter = new Plotter(
     this.canvas.nodes.getContext('2d'),
     this.canvas.edges.getContext('2d'),
@@ -40,6 +39,13 @@ function Sigma(root, id) {
     this.height
   );
 
+  initDOM('monitor', 'div');
+  this.monitor = new Monitor(
+    this,
+    this.canvas.monitor
+  );
+
+  initDOM('mouse', 'canvas');
   this.mousecaptor = new MouseCaptor(
     this.canvas.mouse,
     this.graph,
@@ -100,11 +106,11 @@ function Sigma(root, id) {
     return self;
   };
 
-  function initCanvas(type) {
-    self.canvas[type] = document.createElement('canvas');
+  function initDOM(type, dom) {
+    self.canvas[type] = document.createElement(dom);
     self.canvas[type].style.position = 'absolute';
     self.canvas[type].setAttribute('id', 'sigma_' + type + '_' + self.id);
-    self.canvas[type].setAttribute('class', 'sigma_' + type + '_canvas');
+    self.canvas[type].setAttribute('class', 'sigma_' + type + '_' + dom);
     self.canvas[type].setAttribute('width', self.width + 'px');
     self.canvas[type].setAttribute('height', self.height + 'px');
 
@@ -216,12 +222,14 @@ function Sigma(root, id) {
 
     // Clear scene:
     for (var k in self.canvas) {
-      self.canvas[k].getContext('2d').clearRect(
-        0,
-        0,
-        self.canvas[k].width,
-        self.canvas[k].height
-      );
+      if (self.canvas[k].nodeName.toLowerCase() == 'canvas') {
+        self.canvas[k].getContext('2d').clearRect(
+          0,
+          0,
+          self.canvas[k].width,
+          self.canvas[k].height
+        );
+      }
     }
 
     self.plotter.currentEdgeIndex = 0;

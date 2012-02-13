@@ -173,10 +173,8 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   // ADD CALLBACKS
-  // TODO: Improve browsers compatibility
   this.canvas.addEventListener('DOMMouseScroll', wheelHandler, false);
   this.canvas.addEventListener('mousewheel', wheelHandler);
-  console.log('bim');
   this.canvas.addEventListener('mousemove', moveHandler);
   this.canvas.addEventListener('mousedown', downHandler);
   document.addEventListener('mouseup', upHandler);

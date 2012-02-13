@@ -48,17 +48,17 @@ sigma.tools.drawRoundRect = function(ctx, x, y, w, h, ellipse, corners) {
   ctx.lineTo(x, y + e);
 };
 
-sigma.tools.rgbToHex = function(R,G,B) {
-  return sigma.tools.toHex(R)+sigma.tools.toHex(G)+sigma.tools.toHex(B);
+sigma.tools.rgbToHex = function(R, G, B) {
+  return sigma.tools.toHex(R) + sigma.tools.toHex(G) + sigma.tools.toHex(B);
 };
 
 sigma.tools.toHex = function(n) {
-  n = parseInt(n,10);
+  n = parseInt(n, 10);
 
-  if(isNaN(n)) {
+  if (isNaN(n)) {
     return '00';
   }
-  n = Math.max(0,Math.min(n,255));
-  return '0123456789ABCDEF'.charAt((n-n%16)/16) +
-         '0123456789ABCDEF'.charAt(n%16);
+  n = Math.max(0, Math.min(n, 255));
+  return '0123456789ABCDEF'.charAt((n - n % 16) / 16) +
+         '0123456789ABCDEF'.charAt(n % 16);
 };

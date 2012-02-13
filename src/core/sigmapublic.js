@@ -116,4 +116,13 @@ function SigmaPublic(inst) {
   this.getEdgesCount = function() {
     return s.graph.edges.length;
   };
+
+  // Monitoring
+  this.activateMonitoring = function() {
+    return s.monitor.activate();
+  };
+
+  this.desactivate = function() {
+    return s.monitor.desactivate();
+  };
 }
