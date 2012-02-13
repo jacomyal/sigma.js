@@ -34,7 +34,7 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
           </a>
@@ -53,19 +53,25 @@
     </div>
 
     <div class="container-fluid">
-      <div class="span6">
-        <h2>Force Atlas 2 layout example</h2>
+      <div class="row-fluid">
+        <div class="span6">
+          <h2>Force Atlas 2 layout example</h2>
+        </div>
+        <div id="control-buttons" class="span6">
+          <a class="btn" href="#" onclick="startLayout();">Start layout</a>
+          <a class="btn" href="#" onclick="stopLayout();">Stop layout</a>
+          <a class="btn" href="#" onclick="resetPosition();">Reset zoom</a>
+        </div>
       </div>
-      <div id="control-buttons" class="span6">
-        <a class="btn" href="#" onclick="startLayout();">Start layout</a>
-        <a class="btn" href="#" onclick="stopLayout();">Stop layout</a>
-        <a class="btn" href="#" onclick="resetPosition();">Reset zoom</a>
+      <div class="row-fluid">
+        <div class="span12">
+          <div id="sigma-container"></div>
+        </div>
       </div>
-      <div class="span12">
-        <div id="sigma-container"></div>
-      </div>
-      <div class="span12">
-        <a href="https://gephi.org/2011/forceatlas2-the-new-version-of-our-home-brew-layout/" target="_blank">ForceAtlas 2</a> is a graph layout algorithm developed by <a href="http://www.medialab.sciences-po.fr/en/team-en/mathieu-jacomy-en/" target="_blank">Mathieu Jacomy</a>, much thanks to him for this JavaScript implementation.
+      <div class="row-fluid">
+        <div class="span12">
+          <a href="https://gephi.org/2011/forceatlas2-the-new-version-of-our-home-brew-layout/" target="_blank">ForceAtlas 2</a> is a graph layout algorithm developed by <a href="http://www.medialab.sciences-po.fr/en/team-en/mathieu-jacomy-en/" target="_blank">Mathieu Jacomy</a>, much thanks to him for this JavaScript implementation.
+        </div>
       </div>
     </div>
 

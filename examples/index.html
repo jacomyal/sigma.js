@@ -34,7 +34,7 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
           </a>
@@ -53,19 +53,25 @@
     </div>
 
     <div class="container-fluid">
-      <div class="span6">
-        <h2>Basic example</h2>
+      <div class="row-fluid">
+        <div class="span6">
+          <h2>Basic example</h2>
+        </div>
+        <div id="control-buttons" class="span6">
+          <a class="btn" onclick="resetPosition();">Reset zoom</a>
+        </div>
       </div>
-      <div id="control-buttons" class="span6">
-        <a class="btn" onclick="resetPosition();">Reset zoom</a>
+      <div class="row-fluid">
+        <div class="span12">
+          <div id="sigma-container"></div>
+        </div>
       </div>
-      <div class="span12">
-        <div id="sigma-container"></div>
-      </div>
-      <div class="span12">
-        <p>
-          The graph is based on character coappearances in Victor Hugo's <em>Les Misérables</em> (dataset available <a href="http://wiki.gephi.org/index.php/Datasets" target="_blank">here</a>).
-        </p>
+      <div class="row-fluid">
+        <div class="span12">
+          <p>
+            The graph is based on character coappearances in Victor Hugo's <em>Les Misérables</em> (dataset available <a href="http://wiki.gephi.org/index.php/Datasets" target="_blank">here</a>).
+          </p>
+        </div>
       </div>
     </div>
 
