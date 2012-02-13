@@ -3,7 +3,8 @@
 var json_graph_api = {
 	parseGEXF: function(gexf, graph){
 		var viz='http://www.gexf.net/1.2draft/viz';	// Vis namespace
-		
+		var i, j, k;
+
 		// Parse Attributes
 		// This is confusing, so I'll comment heavily
 		var nodesAttributes = [];	// The list of attributes of the nodes of the graph that we build in json
@@ -14,8 +15,8 @@ var json_graph_api = {
 			var attributesNode = attributesNodes[i];	// attributesNode is each xml node 'attributes' (plural)
 			if(attributesNode.getAttribute('class') == 'node'){
 				var attributeNodes = attributesNode.getElementsByTagName('attribute');	// The list of xml nodes 'attribute' (no 's')
-				for(ii = 0; ii<attributeNodes.length; ii++){
-					var attributeNode = attributeNodes[ii];	// Each xml node 'attribute'
+				for(j = 0; j<attributeNodes.length; j++){
+					var attributeNode = attributeNodes[j];	// Each xml node 'attribute'
 					
 					var id = attributeNode.getAttribute('id'),
 						title = attributeNode.getAttribute('title'),
@@ -27,8 +28,8 @@ var json_graph_api = {
 				}
 			} else if(attributesNode.getAttribute('class') == 'edge'){
 				var attributeNodes = attributesNode.getElementsByTagName('attribute');	// The list of xml nodes 'attribute' (no 's')
-				for(ii = 0; ii<attributeNodes.length; ii++){
-					var attributeNode = attributeNodes[ii];	// Each xml node 'attribute'
+				for(j = 0; j<attributeNodes.length; j++){
+					var attributeNode = attributeNodes[j];	// Each xml node 'attribute'
 					
 					var id = attributeNode.getAttribute('id'),
 						title = attributeNode.getAttribute('title'),
@@ -47,9 +48,12 @@ var json_graph_api = {
 		for(i=0; i<nodesNodes.length; i++){
 			var nodesNode = nodesNodes[i];	// Each xml node 'nodes' (plural)
 			var nodeNodes = nodesNode.getElementsByTagName('node');	// The list of xml nodes 'node' (no 's')
-			for(ii=0; ii<nodeNodes.length; ii++){
-				var nodeNode = nodeNodes[ii];	// Each xml node 'node' (no 's')
+
+			for(j=0; j<nodeNodes.length; j++){
+				var nodeNode = nodeNodes[j];	// Each xml node 'node' (no 's')
 				
+				window.NODE = nodeNode;
+
 				var id = nodeNode.getAttribute('id');
 				var label = nodeNode.getAttribute('label') || id;
 				
@@ -60,17 +64,28 @@ var json_graph_api = {
 				var color;
 				
 				var sizeNodes = nodeNode.getElementsByTagName('size');
+				sizeNodes = sizeNodes.length ? 
+										sizeNodes : 
+										nodeNode.getElementsByTagNameNS('*','size');
 				if(sizeNodes.length>0){
 					sizeNode = sizeNodes[0];
 					size = parseFloat(sizeNode.getAttribute('value'));
 				}
+
 				var positionNodes = nodeNode.getElementsByTagName('position');
+				positionNodes = positionNodes.length ? 
+												positionNodes : 
+												nodeNode.getElementsByTagNameNS('*','position');
 				if(positionNodes.length>0){
 					var positionNode = positionNodes[0];
 					x = parseFloat(positionNode.getAttribute('x'));
 					y = parseFloat(positionNode.getAttribute('y'));
 				}
+
 				var colorNodes = nodeNode.getElementsByTagName('color');
+				colorNodes = colorNodes.length ? 
+										 colorNodes : 
+										 nodeNode.getElementsByTagNameNS('*','color');
 				if(colorNodes.length>0){
 					colorNode = colorNodes[0];
 					color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
@@ -83,8 +98,8 @@ var json_graph_api = {
 				
 				// Attribute values
 				var attvalueNodes = nodeNode.getElementsByTagName('attvalue');
-				for(iii=0; iii<attvalueNodes.length; iii++){
-					var attvalueNode = attvalueNodes[iii];
+				for(k=0; k<attvalueNodes.length; k++){
+					var attvalueNode = attvalueNodes[k];
 					var attr = attvalueNode.getAttribute('for');
 					var val = attvalueNode.getAttribute('value');
 					node.attributes.push({attr:attr, val:val});
@@ -101,14 +116,14 @@ var json_graph_api = {
 		for(i=0; i<edgesNodes.length; i++){
 			var edgesNode = edgesNodes[i];
 			var edgeNodes = edgesNode.getElementsByTagName('edge');
-			for(ii=0; ii<edgeNodes.length; ii++){
-				var edgeNode = edgeNodes[ii];
+			for(j=0; j<edgeNodes.length; j++){
+				var edgeNode = edgeNodes[j];
 				var source = edgeNode.getAttribute('source');
 				var target = edgeNode.getAttribute('target');
-				var edge = {id:ii, sourceID:source, targetID:target, attributes:[]};
+				var edge = {id:j, sourceID:source, targetID:target, attributes:[]};
 				var attvalueNodes = edgeNode.getElementsByTagName('attvalue');
-				for(iii=0; iii<attvalueNodes.length; iii++){
-					var attvalueNode = attvalueNodes[iii];
+				for(k=0; k<attvalueNodes.length; k++){
+					var attvalueNode = attvalueNodes[k];
 					var attr = attvalueNode.getAttribute('for');
 					var al = attvalueNode.getAttribute('value');
 					edge.attributes.push({attr:attr, val:val});
