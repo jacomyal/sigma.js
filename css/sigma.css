@@ -1,0 +1,12 @@
+div.sigma_monitor_div {
+  overflow: hidden;
+  line-height: 12px;
+  padding: 5px;
+}
+div.sigma_monitor_div *{
+  font-family: monospace;
+  line-height: 4px;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: -moz-none;
+}
