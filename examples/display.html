@@ -23,12 +23,15 @@
       }
       div#sigma-container-1{
         background-color: #EEE;
+        color: #000;
       }
       div#sigma-container-2{
         background-color: #000;
+        color: #fff;
       }
       div#sigma-container-3{
         background-color: #600;
+        color: #fff;
       }
       div#control-buttons{
         text-align: right;
@@ -172,6 +175,10 @@
             minRatio: 0.5,
             maxRatio: 2
           });
+
+          s1.activateMonitoring();
+          s2.activateMonitoring();
+          s3.activateMonitoring();
 
           $.ajax({
             url: 'les_miserables.gexf',
