@@ -138,8 +138,8 @@ function Sigma(root, id) {
   function removeTask(id) {
     if (self.tasks[id + '_ext_' + self.id]) {
       self.tasks[id + '_ext_' + self.id].on = false;
+      self.tasks[id + '_ext_' + self.id]['del'] = true;
     }
-    self.tasks[id + '_ext_' + self.id]['delete'] = true;
     return self;
   };
 
@@ -179,7 +179,7 @@ function Sigma(root, id) {
 
   function onTaskEnded(e) {
     if (self.tasks[e.content.name] != undefined) {
-      if (self.tasks[e.content.name]['delete'] ||
+      if (self.tasks[e.content.name]['del'] ||
           !self.tasks[e.content.name].condition()) {
         delete self.tasks[e.content.name];
       }else {

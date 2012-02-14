@@ -4,6 +4,7 @@ sigma.scheduler = (function() {
 
   this.isRunning = false;
   this.fpsReq = 60;
+  this.lastFPS = 0;
   this.queue = [];
   this.workers = [];
   this.frameTime = 1000 / this.fpsReq;
@@ -157,11 +158,16 @@ sigma.scheduler = (function() {
   };
 
   this.getFPS = function() {
-    if (this.isRunning) {
-      return this.frames / ((new Date()).getTime() - this.time) * 1000;
-    } else {
-      return false;
+    if (self.isRunning) {
+      self.lastFPS =
+        Math.round(
+          self.frames /
+          ((new Date()).getTime() - self.time) *
+          10000
+        ) / 10;
     }
+
+    return self.lastFPS;
   };
 
   return this;
