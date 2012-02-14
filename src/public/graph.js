@@ -188,13 +188,8 @@ sigma.classes.Graph = function() {
       weightMax = Math.max(edge['size'], weightMax);
     });
 
-    if (sizeMax == 0) {
-      return;
-    }
-
-    if (weightMax == 0) {
-      return;
-    }
+    sizeMax = sizeMax || 1;
+    weightMax = weightMax || 1;
 
     // Recenter the nodes:
     var xMin, xMax, yMin, yMax;
