@@ -1,3 +1,4 @@
+
 ****   Bugs   ****
   - Problem with 'stopdragging' and 'stop
     zooming' while computing layout
