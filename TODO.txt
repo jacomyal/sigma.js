@@ -1,0 +1,20 @@
+****   Bugs   ****
+  - Problem with 'stopdragging' and 'stop
+    zooming' while computing layout
+    > Sometimes the edges are drawni while
+      they shouldn't
+
+****   Core   ****
+  - Caching nodes 
+  - Caching labels
+  - Improving configs API
+  - Documentation
+  - Testing for the following classes:
+    > Scheduler
+    > Sigma (especially the tasks)
+    > Graph (coherence)
+
+****   Others   ****
+  - Define some typical plugins type that
+    would directly modify the public API
+    > Update architecture in consequences
