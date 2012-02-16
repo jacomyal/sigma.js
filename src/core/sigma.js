@@ -171,7 +171,7 @@ function Sigma(root, id) {
         }
       });
 
-      sigma.scheduler.bind('killed', onTaskEnded).start();
+      sigma.scheduler.bind('killed', onTaskEnded).run();
     }
 
     return self;
@@ -300,7 +300,7 @@ function Sigma(root, id) {
       }
     }
 
-    start && sigma.scheduler.start();
+    start && sigma.scheduler.run();
     return self;
   };
 

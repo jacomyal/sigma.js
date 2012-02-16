@@ -13,11 +13,6 @@ sigma.scheduler = (function() {
 
   this.delay = 0;
 
-  this.injectFrame = function(callback) {
-    window.setTimeout(callback, 0);
-    return self;
-  }
-
   this.frameInjector = function() {
     while (self.isRunning && self.workers.length && self.routine()) {}
 
@@ -32,7 +27,34 @@ sigma.scheduler = (function() {
     }
   };
 
-  this.start = function() {
+  this.routine = function() {
+    self.index = self.index % self.workers.length;
+
+    if (!self.workers[self.index]['w']()) {
+      var n = self.workers[self.index]['name'];
+
+      self.queue = self.queue.filter(function(e) {
+        (e['parent'] == n) && self.workers.push({
+          'name': e['name'],
+          'w': e['w']
+        });
+        return e['parent'] != n;
+      });
+
+      self.dispatch('killed', self.workers.splice(self.index--, 1)[0]);
+    }
+
+    self.index++;
+    self.effectiveTime = (new Date()).getTime() - self.startTime;
+    return self.effectiveTime <= self.correctedFrameTime;
+  };
+
+  this.injectFrame = function(callback) {
+    window.setTimeout(callback, 0);
+    return self;
+  }
+
+  this.run = function() {
     self.isRunning = true;
     self.index = 0;
     self.frames = 0;
@@ -51,39 +73,17 @@ sigma.scheduler = (function() {
     return self;
   };
 
-  this.routine = function() {
-    this.index = this.index % this.workers.length;
-
-    if (!this.workers[this.index]['w']()) {
-      var n = this.workers[this.index]['name'];
-
-      this.queue = this.queue.filter(function(e) {
-        (e['parent'] == n) && this.workers.push({
-          'name': e['name'],
-          'w': e['w']
-        });
-        return e['parent'] != n;
-      });
-
-      this.dispatch('killed', this.workers.splice(this.index--, 1)[0]);
-    }
-
-    this.index++;
-    this.effectiveTime = (new Date()).getTime() - this.startTime;
-    return this.effectiveTime <= this.correctedFrameTime;
-  };
-
   this.addWorker = function(w, name, autostart) {
     if (typeof w != 'function') {
       throw new Error('Worker "' + name + '" is not a function');
     }
 
-    this.workers.push({
+    self.workers.push({
       'name': name,
       'w': w
     });
-    this.isRunning = !!(this.isRunning || (autostart && start()) || true);
-    return this;
+    self.isRunning = !!(self.isRunning || (autostart && run()) || true);
+    return self;
   };
 
   this.queueWorker = function(w, name, parent) {
@@ -91,7 +91,7 @@ sigma.scheduler = (function() {
       throw new Error('Worker "' + name + '" is not a function');
     }
 
-    if (!this.workers.concat(this.queue).some(function(e) {
+    if (!self.workers.concat(self.queue).some(function(e) {
       return e['name'] == parent;
     })) {
       throw new Error(
@@ -99,13 +99,13 @@ sigma.scheduler = (function() {
       );
     }
 
-    this.queue.push({
+    self.queue.push({
       'parent': parent,
       'name': name,
       'w': w
     });
 
-    return this;
+    return self;
   };
 
   // queueStatus:
@@ -113,17 +113,15 @@ sigma.scheduler = (function() {
   //  - 1: trigger queue
   //  - 2: empty queue
   this.removeWorker = function(v, queueStatus) {
-    var self = this;
-
     if (v == undefined) {
-      this.workers = [];
+      self.workers = [];
       if (queueStatus > 0) {
-        this.queue = [];
+        self.queue = [];
       }
       stop();
     } else {
       var n = (typeof v == 'string') ? v : '';
-      this.workers = this.workers.filter(function(e) {
+      self.workers = self.workers.filter(function(e) {
         if ((typeof v == 'string') ? e['name'] == v : e['w'] == v) {
           n = e['name'];
           return false;
@@ -132,28 +130,28 @@ sigma.scheduler = (function() {
       });
 
       if (queueStatus > 0) {
-        this.queue = this.queue.filter(function(e) {
+        self.queue = self.queue.filter(function(e) {
           if (queueStatus == 1 && e['parent'] == n) {
-            this.workers.push(e);
+            self.workers.push(e);
           }
           return e['parent'] != n;
         });
       }
     }
 
-    this.isRunning = !!(!this.workers.length || (stop() && false));
-    return this;
+    self.isRunning = !!(!self.workers.length || (stop() && false));
+    return self;
   };
 
   this.fps = function(v) {
     if (v != undefined) {
-      this.fpsReq = Math.abs(1 * v);
-      this.frameTime = 1000 / this.fpsReq;
-      this.frames = 0;
-      this.time = (new Date()).getTime();
-      return this;
+      self.fpsReq = Math.abs(1 * v);
+      self.frameTime = 1000 / self.fpsReq;
+      self.frames = 0;
+      self.time = (new Date()).getTime();
+      return self;
     } else {
-      return this.fpsReq;
+      return self.fpsReq;
     }
   };
 
@@ -169,6 +167,6 @@ sigma.scheduler = (function() {
 
     return self.lastFPS;
   };
-
+  
   return this;
 })();
