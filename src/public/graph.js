@@ -244,6 +244,8 @@ sigma.classes.Graph = function() {
     self.edges.forEach(function(edge) {
       edge['displaySize'] = edge['size'] * c + d;
     });
+
+    return self;
   };
 
   function translate(sceneX, sceneY, ratio, pow) {
@@ -257,16 +259,33 @@ sigma.classes.Graph = function() {
 
       node['displaySize'] = node['displaySize'] * sizeRatio;
     });
+
+    return self;
   };
 
   function checkHover(mX, mY) {
-    var dX, dY, s;
+    var dX, dY, s, over = [], out = [];
     self.nodes.forEach(function(node) {
       dX = Math.abs(node['displayX'] - mX);
       dY = Math.abs(node['displayY'] - mY);
       s = node['displaySize'];
-      node['hover'] = dX < s && dY < s && Math.sqrt(dX * dX + dY * dY) < s;
+
+      var oldH = node['hover'];
+      var newH = dX < s && dY < s && Math.sqrt(dX * dX + dY * dY) < s;
+
+      if (oldH && !newH) {
+        node['hover'] = false;
+        over.push(node);
+      }else if (newH && !oldH) {
+        node['hover'] = true;
+        out.push(node);
+      }
     });
+
+    over.length && self.dispatch('overnodes', over);
+    out.length && self.dispatch('outnodes', out);
+
+    return self;
   }
 
   empty();

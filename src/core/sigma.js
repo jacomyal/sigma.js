@@ -67,6 +67,19 @@ function Sigma(root, id) {
       self.p.auto ? 2 : self.p.drawLabels,
       true
     );
+  }).bind('mousedown mouseup', function(e) {
+    var targeted = self.graph.nodes.filter(function(n) {
+      return !!n['hover'];
+    });
+
+    if (targeted.length) {
+      self.dispatch(
+        e['type'] == 'mousedown' ?
+          'downnodes' :
+          'upnodes',
+        targeted
+      );
+    }
   }).bind('move', drawHover);
 
   function resize(w, h) {

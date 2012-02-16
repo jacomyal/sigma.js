@@ -122,4 +122,13 @@ function SigmaPublic(sigmaInstance) {
   this.desactivate = function() {
     return s.monitor.desactivate();
   };
+
+  // Events
+  s.bind('downnodes upnodes', function(e) {
+    self.dispatch(e.type, e.content);
+  });
+
+  s.graph.bind('overnodes outnodes', function(e) {
+    self.dispatch(e.type, e.content);
+  });
 }

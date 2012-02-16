@@ -72,6 +72,8 @@ function MouseCaptor(canvas, graph, id) {
   function upHandler(event) {
     self.isMouseDown = false;
 
+    self.dispatch('mouseup');
+
     stopDrag();
   };
 
@@ -80,6 +82,7 @@ function MouseCaptor(canvas, graph, id) {
     self.oldMouseX = self.mouseX;
     self.oldMouseY = self.mouseY;
 
+    self.dispatch('mousedown');
 
     startDrag();
   };
