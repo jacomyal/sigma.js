@@ -36,6 +36,17 @@ To build sigma.js:
 * Use `make concat` to concatenate the different JS files into 'build/sigma.concat.js'.
 * Use `make minify-simple` or `make minify-advanced` to minify concatenation result (*Warning*: `make minify-advanced` uses Closure advanced minify mode which is pretty agressive on renaming, and this minification has not been tested yet).
 
+How it works
+------------
+
+
+
+###A word about scalability
+
+A lagging Web application on the web is bad for UX, but a Web application that makes the whole browser being laggy is worse. That's why *sigma.js* **inserts frames** at the middle of its computings / drawings, to keep everything as fluid as possible, event when dealing with quite big graphs.
+
+And for the layout, the **ForceAtlas2** plugin uses Barnes-Hut like approximation of the repulsion force, that makes the layout computing pretty scalable.
+
 
 Questions?
 ----------
