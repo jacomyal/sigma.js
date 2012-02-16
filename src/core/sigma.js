@@ -53,23 +53,20 @@ function Sigma(root, id) {
   );
 
   // Interaction listeners:
-  self.mousecaptor.bind('drag zooming', function(e) {
-    if (getRunningTasks() == 0) {
-      self.draw(
-        self.p.auto ? 2 : self.p.drawNodes,
-        self.p.auto ? 0 : self.p.drawEdges,
-        self.p.auto ? 2 : self.p.drawLabels
-      );
-    }
+  this.mousecaptor.bind('drag zooming', function(e) {
+    self.draw(
+      self.p.auto ? 2 : self.p.drawNodes,
+      self.p.auto ? 0 : self.p.drawEdges,
+      self.p.auto ? 2 : self.p.drawLabels,
+      true
+    );
   }).bind('stopdrag stopzooming', function(e) {
-    if (getRunningTasks() == 0) {
-      self.draw(
-        self.p.auto ? 2 : self.p.drawNodes,
-        self.p.auto ? 1 : self.p.drawEdges,
-        self.p.auto ? 2 : self.p.drawLabels,
-        true
-      );
-    }
+    self.draw(
+      self.p.auto ? 2 : self.p.drawNodes,
+      self.p.auto ? 1 : self.p.drawEdges,
+      self.p.auto ? 2 : self.p.drawLabels,
+      true
+    );
   }).bind('move', drawHover);
 
   function resize(w, h) {
@@ -131,7 +128,7 @@ function Sigma(root, id) {
       'condition': condition
     };
 
-    getRunningTasks() == 0 && startTasks();
+    getTasksCount(true) == 0 && startTasks();
     return self;
   };
 
@@ -143,10 +140,12 @@ function Sigma(root, id) {
     return self;
   };
 
-  function getRunningTasks() {
-    return Object.keys(self.tasks).filter(function(id) {
-      return !!self.tasks[id].on;
-    }).length;
+  function getTasksCount(running) {
+    return running ?
+      Object.keys(self.tasks).filter(function(id) {
+        return !!self.tasks[id].on;
+      }).length :
+      Object.keys(self.tasks).length;
   };
 
   function startTasks() {
@@ -186,7 +185,7 @@ function Sigma(root, id) {
         self.tasks[e.content.name].on = false;
       }
 
-      if (getRunningTasks() == 0) {
+      if (getTasksCount(true) == 0) {
         startTasks();
       }
     }
@@ -197,7 +196,7 @@ function Sigma(root, id) {
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-    if (safe && getRunningTasks() > 0) {
+    if (safe && getTasksCount() > 0) {
       return self;
     }
 
