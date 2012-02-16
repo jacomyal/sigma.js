@@ -4,8 +4,7 @@
 
 
 
-Use
----
+##Use
 
 To initialize sigma.js on a DOM element, use:
     var instance = sigma.init(domElement);
@@ -24,8 +23,7 @@ To fill the graph, use:
 See '**src/core/sigmapublic.js**' for an exhaustive list of the different available public methods.
 
 
-Build
------
+##Build
 
 I uses **gjslint** and **fixjsstyle** from [Google Closure Linter](http://code.google.com/closure/utilities/docs/linter_howto.html) to keep *sigma.js*'s code readable, and the [Closure Compiler](http://code.google.com/closure/compiler/) to minify the sources.
 
@@ -36,19 +34,23 @@ To build sigma.js:
 * Use `make concat` to concatenate the different JS files into 'build/sigma.concat.js'.
 * Use `make minify-simple` or `make minify-advanced` to minify concatenation result (*Warning*: `make minify-advanced` uses Closure advanced minify mode which is pretty agressive on renaming, and this minification has not been tested yet).
 
-How it works
-------------
+##How it works
 
 
 
 ###A word about scalability
 
-A lagging Web application on the web is bad for UX, but a Web application that makes the whole browser being laggy is worse. That's why *sigma.js* **inserts frames** at the middle of its computings / drawings, to keep everything as fluid as possible, event when dealing with quite big graphs.
+A lagging Web application on the web is bad for UX, but a Web application that makes the whole browser being laggy is worse. That's why *sigma.js* **inserts frames** at the middle of its computings / drawings, to keep everything as fluid as possible, even when dealing with quite big graphs.
 
-And for the layout, the **ForceAtlas2** plugin uses Barnes-Hut like approximation of the repulsion force, that makes the layout computing pretty scalable.
+About the layout, the **ForceAtlas2** plugin uses Barnes-Hut like approximation of the repulsion force, that makes the layout computing pretty scalable.
+
+##Thanks
+*sigma.js* is mostly inspired by [Gephi](http://gephi.org) and [Antonin Rohmer](http://antonin.rohmer.free.fr/)'s works on Web graph drawing (one example [here](http://www.guardian.co.uk/news/datablog/interactive/2011/sep/07/norway-breivik-manifesto-mapped)).
+
+Much thanks also to [Mathieu Jacomy](http://www.medialab.sciences-po.fr/fr/team/mathieu-jacomy/) for his help on the API and his experienced advices.
 
 
-Questions?
-----------
+##Questions?
+
 
 For any question / bug / feature request, use the [Issues](http://github.com/jacomyal/sigma.js/issues) tab.
