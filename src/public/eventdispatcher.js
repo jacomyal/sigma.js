@@ -2,6 +2,48 @@ sigma.classes.EventDispatcher = function() {
   var _h = {};
   var _self = this;
 
+  function one(events, handler) {
+    if (!handler || !events) {
+      return _self;
+    }
+
+    var eArray = ((typeof events) == 'string') ? events.split(' ') : events;
+
+    eArray.forEach(function(event) {
+      if (!_h[event]) {
+        _h[event] = [];
+      }
+
+      _h[event].push({
+        'h': handler,
+        'one': true
+      });
+    });
+
+    return _self;
+  }
+
+  function bind(events, handler) {
+    if (!handler || !events) {
+      return _self;
+    }
+
+    var eArray = ((typeof events) == 'string') ? events.split(' ') : events;
+
+    eArray.forEach(function(event) {
+      if (!_h[event]) {
+        _h[event] = [];
+      }
+
+      _h[event].push({
+        'h': handler,
+        'one': false
+      });
+    });
+
+    return _self;
+  }
+
   function unbind(events, handler) {
     if (!events) {
       _h = {};
@@ -11,8 +53,10 @@ sigma.classes.EventDispatcher = function() {
 
     if (handler) {
       eArray.forEach(function(event) {
-        while (_h[event] && _h[event].indexOf(handler) >= 0) {
-          _h[event].splice(_h[event].indexOf(handler), 1);
+        if (_h[event]) {
+          _h[event] = _h[event].filter(function(e) {
+            return e['h'] != handler;
+          });
         }
 
         if (_h[event] && _h[event].length == 0) {
@@ -20,38 +64,35 @@ sigma.classes.EventDispatcher = function() {
         }
       });
     }else {
-      eArray.forEach(function(event) { delete _h[event]; });
+      eArray.forEach(function(event) {
+        delete _h[event];
+      });
     }
 
     return _self;
   }
 
-  function bind(events, handler) {
-    if (!handler || !events) return;
-
-    var eArray = ((typeof events) == 'string') ? events.split(' ') : events;
-
-    eArray.forEach(function(event) {
-      if (!_h[event]) _h[event] = [];
-      _h[event].push(handler);
-    });
-
-    return _self;
-  }
-
   function dispatch(type, content) {
-    _h[type] && _h[type].forEach(function(handler) {
-      handler({
-        'type': type,
-        'content': content,
-        'target': _self
+    if (_h[type]) {
+      _h[type].forEach(function(e) {
+        e['h']({
+          'type': type,
+          'content': content,
+          'target': _self
+        });
       });
-    });
+
+      _h[type] = _h[type].filter(function(e) {
+        return !e['one'];
+      });
+    }
+
     return _self;
   }
 
   /* PUBLIC INTERFACE: */
-  this.unbind = unbind;
+  this.one = one;
   this.bind = bind;
+  this.unbind = unbind;
   this.dispatch = dispatch;
 };
