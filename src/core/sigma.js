@@ -299,6 +299,8 @@ function Sigma(root, id) {
       }
     }
 
+    drawHover();
+
     start && sigma.scheduler.run();
     return self;
   };

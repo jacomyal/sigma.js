@@ -1,30 +1,27 @@
-function SigmaPublic(inst) {
-  var s = inst;
+function SigmaPublic(sigmaInstance) {
+  var s = sigmaInstance;
+  var self = this;
+  sigma.classes.EventDispatcher.call(this);
 
   // Config:
   this.config = function(a1, a2) {
     var res = s.config(a1, a2);
-    return res == s ? this : res;
+    return res == s ? self : res;
   };
 
   this.config_drawing = function(a1, a2) {
     var res = s.plotter.config(a1, a2);
-    return res == s.plotter ? this : res;
-  };
-
-  this.config_layout = function(a1, a2) {
-    var res = s.forceatlas2.config(a1, a2);
-    return res == s.forceatlas2 ? this : res;
+    return res == s.plotter ? self : res;
   };
 
   this.config_mouse = function(a1, a2) {
     var res = s.mousecaptor.config(a1, a2);
-    return res == s.mousecaptor ? this : res;
+    return res == s.mousecaptor ? self : res;
   };
 
   this.config_graph = function(a1, a2) {
     var res = s.graph.config(a1, a2);
-    return res == s.graph ? this : res;
+    return res == s.graph ? self : res;
   };
 
   this.getMouse = function() {
@@ -54,50 +51,50 @@ function SigmaPublic(inst) {
         ratio :
         s.mousecaptor.ratio;
 
-      return this;
+      return self;
     }
   };
 
   this.resize = function(w, h) {
     s.resize(w, h);
-    return this;
+    return self;
   };
 
   this.draw = function(nodes, edges, labels, safe) {
     s.draw(nodes, edges, labels, safe);
-    return this;
+    return self;
   };
 
   // Tasks methods:
   this.addTask = function(id, worker, condition) {
     s.addTask(id, worker, condition);
-    return this;
+    return self;
   };
 
   this.removeTask = function(id) {
     s.removeTask(id);
-    return this;
+    return self;
   };
 
   // Graph methods:
   this.addNode = function(id, params) {
     s.graph.addNode(id, params);
-    return this;
+    return self;
   };
 
   this.addEdge = function(id, source, target, params) {
     s.graph.addEdge(id, source, target, params);
-    return this;
+    return self;
   }
 
   this.dropNode = function(v) {
     s.graph.dropNode(v);
-    return this;
+    return self;
   };
 
   this.dropEdge = function(v) {
     s.graph.dropEdge(v);
-    return this;
+    return self;
   };
 
   this.getGraph = function() {
@@ -106,7 +103,7 @@ function SigmaPublic(inst) {
 
   this.emptyGraph = function() {
     s.graph.empty();
-    return this;
+    return self;
   };
 
   this.getNodesCount = function() {

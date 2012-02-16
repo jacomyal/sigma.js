@@ -167,6 +167,6 @@ sigma.scheduler = (function() {
 
     return self.lastFPS;
   };
-  
+
   return this;
 })();
