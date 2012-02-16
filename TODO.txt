@@ -1,8 +1,4 @@
 ****   Bugs   ****
-  - Problem with 'stopdragging' and 'stop
-    zooming' while computing layout
-    > Sometimes the edges are drawni while
-      they shouldn't
   - Bug with the rollover (it doesn't refresh
     often enough)
 
