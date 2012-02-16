@@ -3,6 +3,8 @@
     zooming' while computing layout
     > Sometimes the edges are drawni while
       they shouldn't
+  - Bug with the rollover (it doesn't refresh
+    often enough)
 
 ****   Core   ****
   - Caching nodes 
@@ -13,6 +15,8 @@
     > Scheduler
     > Sigma (especially the tasks)
     > Graph (coherence)
+  - Define nodes / edges iterators
+  - Define nodes / edges interfaces
 
 ****   Others   ****
   - Define some typical plugins type that
