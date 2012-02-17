@@ -1,7 +1,5 @@
 
 ****   Bugs   ****
-  - Bug with the rollover (it doesn't refresh
-    often enough)
 
 ****   Core   ****
   - Caching nodes 
@@ -14,8 +12,11 @@
     > Graph (coherence)
   - Define nodes / edges iterators
   - Define nodes / edges interfaces
+  - Merge generators management in scheduler,
+    with tasks management
 
 ****   Others   ****
   - Define some typical plugins type that
     would directly modify the public API
     > Update architecture in consequences
+  - Implement multitouch features
