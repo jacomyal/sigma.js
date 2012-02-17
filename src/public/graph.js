@@ -1,4 +1,4 @@
-sigma.classes.Graph = function() {
+sigma.graph = function() {
   var self = this;
   sigma.classes.Cascade.call(self);
   sigma.classes.EventDispatcher.call(self);

@@ -9,12 +9,12 @@ function Monitor(instance, dom) {
     fps: 40,
     dom: dom,
     globalProbes: {
-      'Tasks': function() { return sigma.scheduler.tasks.length; },
-      'Queue': function() { return sigma.scheduler.queuedTasks.length; },
+      'Tasks': function() { return sigma.chronos.tasks.length; },
+      'Queue': function() { return sigma.chronos.queuedTasks.length; },
       'Time (ms)': function() {
-        return sigma.scheduler.startTime - sigma.scheduler.time;
+        return sigma.chronos.startTime - sigma.chronos.time;
       },
-      'FPS': sigma.scheduler.getFPS
+      'FPS': sigma.chronos.getFPS
     },
     localProbes: {
       'Nodes count': function() { return self.sigma.graph.nodes.length; },

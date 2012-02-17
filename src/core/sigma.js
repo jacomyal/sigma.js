@@ -20,7 +20,7 @@ function Sigma(root, id) {
   this.height = this.dom.offsetHeight;
 
   // Intern classes:
-  this.graph = new sigma.classes.Graph();
+  this.graph = new sigma.graph();
 
   this.canvas = {};
   initDOM('edges', 'canvas');
@@ -80,7 +80,7 @@ function Sigma(root, id) {
     }
   }).bind('move', drawHover);
 
-  sigma.scheduler.bind('startgenerators', function() {
+  sigma.chronos.bind('startgenerators', function() {
     self.draw(
       self.p.auto ? 2 : self.p.drawNodes,
       self.p.auto ? 0 : self.p.drawEdges,
@@ -118,7 +118,7 @@ function Sigma(root, id) {
   };
 
   function clearSchedule() {
-    sigma.scheduler.removeTask(
+    sigma.chronos.removeTask(
       'node_' + self.id, 2
     ).removeTask(
       'edge_' + self.id, 2
@@ -145,9 +145,9 @@ function Sigma(root, id) {
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-    if (safe && Object.keys(sigma.scheduler.generators).some(function(id){
+    if (safe && Object.keys(sigma.chronos.generators).some(function(id) {
       var m = id.match(/_ext_(.*)$/);
-      return m && (m[1]==self.id);
+      return m && (m[1] == self.id);
     })) {
       return self;
     }
@@ -194,7 +194,7 @@ function Sigma(root, id) {
       if (n > 1) {
         while (self.plotter.task_drawNode()) {}
       }else {
-        sigma.scheduler.addTask(
+        sigma.chronos.addTask(
           self.plotter.task_drawNode,
           'node_' + self.id,
           false
@@ -210,13 +210,13 @@ function Sigma(root, id) {
         while (self.plotter.task_drawLabel()) {}
       } else {
         if (previous) {
-          sigma.scheduler.queueTask(
+          sigma.chronos.queueTask(
             self.plotter.task_drawLabel,
             'label_' + self.id,
             previous
           );
         } else {
-          sigma.scheduler.addTask(
+          sigma.chronos.addTask(
             self.plotter.task_drawLabel,
             'label_' + self.id,
             false
@@ -233,13 +233,13 @@ function Sigma(root, id) {
         while (self.plotter.task_drawEdge()) {}
       }else {
         if (previous) {
-          sigma.scheduler.queueTask(
+          sigma.chronos.queueTask(
             self.plotter.task_drawEdge,
             'edge_' + self.id,
             previous
           );
         }else {
-          sigma.scheduler.addTask(
+          sigma.chronos.addTask(
             self.plotter.task_drawEdge,
             'edge_' + self.id,
             false
@@ -253,7 +253,7 @@ function Sigma(root, id) {
 
     drawHover();
 
-    start && sigma.scheduler.run();
+    start && sigma.chronos.run();
     return self;
   };
 

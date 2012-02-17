@@ -154,7 +154,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   };
 
   function drawNode(node) {
-    var size = Math.round(node['displaySize']*10)/10;
+    var size = Math.round(node['displaySize'] * 10) / 10;
     var ctx = self.nodesCtx;
 
     ctx.fillStyle = node['color'];

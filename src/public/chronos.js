@@ -1,4 +1,4 @@
-sigma.scheduler = new (function() {
+sigma.chronos = new (function() {
   sigma.classes.EventDispatcher.call(this);
   var self = this;
 

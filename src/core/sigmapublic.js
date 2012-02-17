@@ -67,12 +67,12 @@ function SigmaPublic(sigmaInstance) {
 
   // Tasks methods:
   this.addGenerator = function(id, task, condition) {
-    sigma.scheduler.addGenerator(id + '_ext_' + s.id, task, condition);
+    sigma.chronos.addGenerator(id + '_ext_' + s.id, task, condition);
     return self;
   };
 
   this.removeGenerator = function(id) {
-    sigma.scheduler.removeGenerator(id + '_ext_' + s.id);
+    sigma.chronos.removeGenerator(id + '_ext_' + s.id);
     return self;
   };
 
