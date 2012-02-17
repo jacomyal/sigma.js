@@ -66,13 +66,13 @@ function SigmaPublic(sigmaInstance) {
   };
 
   // Tasks methods:
-  this.addTask = function(id, worker, condition) {
-    s.addTask(id, worker, condition);
+  this.addGenerator = function(id, task, condition) {
+    s.addGenerator(id, task, condition);
     return self;
   };
 
-  this.removeTask = function(id) {
-    s.removeTask(id);
+  this.removeGenerator = function(id) {
+    s.removeGenerator(id);
     return self;
   };
 

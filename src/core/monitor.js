@@ -9,8 +9,8 @@ function Monitor(instance, dom) {
     fps: 40,
     dom: dom,
     globalProbes: {
-      'Workers': function() { return sigma.scheduler.workers.length; },
-      'Queue': function() { return sigma.scheduler.queue.length; },
+      'Tasks': function() { return sigma.scheduler.tasks.length; },
+      'Queue': function() { return sigma.scheduler.queuedTasks.length; },
       'Time (ms)': function() {
         return sigma.scheduler.startTime - sigma.scheduler.time;
       },

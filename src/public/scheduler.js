@@ -5,18 +5,19 @@ sigma.scheduler = (function() {
   this.isRunning = false;
   this.fpsReq = 60;
   this.lastFPS = 0;
-  this.queue = [];
-  this.workers = [];
   this.frameTime = 1000 / this.fpsReq;
   this.correctedFrameTime = this.frameTime;
   this.frames = 0;
 
+  this.queuedTasks = [];
+  this.tasks = [];
+
   this.delay = 0;
 
   this.frameInjector = function() {
-    while (self.isRunning && self.workers.length && self.routine()) {}
+    while (self.isRunning && self.tasks.length && self.routine()) {}
 
-    if (!self.isRunning || !self.workers.length) {
+    if (!self.isRunning || !self.tasks.length) {
       self.stop();
     } else {
       self.startTime = (new Date()).getTime();
@@ -28,20 +29,20 @@ sigma.scheduler = (function() {
   };
 
   this.routine = function() {
-    self.index = self.index % self.workers.length;
+    self.index = self.index % self.tasks.length;
 
-    if (!self.workers[self.index]['w']()) {
-      var n = self.workers[self.index]['name'];
+    if (!self.tasks[self.index]['task']()) {
+      var n = self.tasks[self.index]['name'];
 
-      self.queue = self.queue.filter(function(e) {
-        (e['parent'] == n) && self.workers.push({
+      self.queuedTasks = self.queuedTasks.filter(function(e) {
+        (e['parent'] == n) && self.tasks.push({
           'name': e['name'],
-          'w': e['w']
+          'task': e['task']
         });
         return e['parent'] != n;
       });
 
-      self.dispatch('killed', self.workers.splice(self.index--, 1)[0]);
+      self.dispatch('killed', self.tasks.splice(self.index--, 1)[0]);
     }
 
     self.index++;
@@ -73,36 +74,36 @@ sigma.scheduler = (function() {
     return self;
   };
 
-  this.addWorker = function(w, name, autostart) {
-    if (typeof w != 'function') {
-      throw new Error('Worker "' + name + '" is not a function');
+  this.addTask = function(task, name, autostart) {
+    if (typeof task != 'function') {
+      throw new Error('Task "' + name + '" is not a function');
     }
 
-    self.workers.push({
+    self.tasks.push({
       'name': name,
-      'w': w
+      'task': task
     });
     self.isRunning = !!(self.isRunning || (autostart && run()) || true);
     return self;
   };
 
-  this.queueWorker = function(w, name, parent) {
-    if (typeof w != 'function') {
-      throw new Error('Worker "' + name + '" is not a function');
+  this.queueTask = function(task, name, parent) {
+    if (typeof task != 'function') {
+      throw new Error('Task "' + name + '" is not a function');
     }
 
-    if (!self.workers.concat(self.queue).some(function(e) {
+    if (!self.tasks.concat(self.queuedTasks).some(function(e) {
       return e['name'] == parent;
     })) {
       throw new Error(
-        'Parent worker "' + parent + '" of "' + name + '" is not attached.'
+        'Parent task "' + parent + '" of "' + name + '" is not attached.'
       );
     }
 
-    self.queue.push({
+    self.queuedTasks.push({
       'parent': parent,
       'name': name,
-      'w': w
+      'task': task
     });
 
     return self;
@@ -110,19 +111,19 @@ sigma.scheduler = (function() {
 
   // queueStatus:
   //  - 0: nothing
-  //  - 1: trigger queue
-  //  - 2: empty queue
-  this.removeWorker = function(v, queueStatus) {
+  //  - 1: trigger queuedTasks
+  //  - 2: empty queuedTasks
+  this.removeTask = function(v, queueStatus) {
     if (v == undefined) {
-      self.workers = [];
+      self.tasks = [];
       if (queueStatus > 0) {
-        self.queue = [];
+        self.queuedTasks = [];
       }
       stop();
     } else {
       var n = (typeof v == 'string') ? v : '';
-      self.workers = self.workers.filter(function(e) {
-        if ((typeof v == 'string') ? e['name'] == v : e['w'] == v) {
+      self.tasks = self.tasks.filter(function(e) {
+        if ((typeof v == 'string') ? e['name'] == v : e['task'] == v) {
           n = e['name'];
           return false;
         }
@@ -130,16 +131,16 @@ sigma.scheduler = (function() {
       });
 
       if (queueStatus > 0) {
-        self.queue = self.queue.filter(function(e) {
+        self.queuedTasks = self.queuedTasks.filter(function(e) {
           if (queueStatus == 1 && e['parent'] == n) {
-            self.workers.push(e);
+            self.tasks.push(e);
           }
           return e['parent'] != n;
         });
       }
     }
 
-    self.isRunning = !!(!self.workers.length || (stop() && false));
+    self.isRunning = !!(!self.tasks.length || (stop() && false));
     return self;
   };
 

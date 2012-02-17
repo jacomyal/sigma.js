@@ -89,7 +89,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   this.nodesSpeed = 200;
   this.labelsSpeed = 200;
 
-  function worker_drawEdge() {
+  function task_drawEdge() {
     var c = self.graph.edges.length;
     var i = 0;
 
@@ -109,7 +109,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     return self.currentEdgeIndex < c;
   };
 
-  function worker_drawNode() {
+  function task_drawNode() {
     var c = self.graph.nodes.length;
     var i = 0;
 
@@ -124,7 +124,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     return self.currentNodeIndex < c;
   };
 
-  function worker_drawLabel() {
+  function task_drawLabel() {
     var c = self.graph.nodes.length;
     var i = 0;
 
@@ -322,9 +322,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
            (node['displayY'] - node['displaySize'] < self.height * 4 / 3);
   };
 
-  this.worker_drawLabel = worker_drawLabel;
-  this.worker_drawEdge = worker_drawEdge;
-  this.worker_drawNode = worker_drawNode;
+  this.task_drawLabel = task_drawLabel;
+  this.task_drawEdge = task_drawEdge;
+  this.task_drawNode = task_drawNode;
   this.drawHoverNode = drawHoverNode;
   this.isOnScreen = isOnScreen;
 }

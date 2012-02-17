@@ -19,7 +19,7 @@ function Sigma(root, id) {
   this.width = this.dom.offsetWidth;
   this.height = this.dom.offsetHeight;
 
-  this.tasks = {};
+  this.generators = {};
 
   // Intern classes:
   this.graph = new sigma.classes.Graph();
@@ -106,11 +106,11 @@ function Sigma(root, id) {
   };
 
   function clearSchedule() {
-    sigma.scheduler.removeWorker(
+    sigma.scheduler.removeTask(
       'node_' + self.id, 2
-    ).removeWorker(
+    ).removeTask(
       'edge_' + self.id, 2
-    ).removeWorker(
+    ).removeTask(
       'label_' + self.id, 2
     ).stop();
     return self;
@@ -128,41 +128,41 @@ function Sigma(root, id) {
     return self;
   };
 
-  // addTask() will execute the worker while it returns
+  // addTask() will execute the task while it returns
   // 'true'. Then, it will execute the condition, and starts
   // again if it is 'true'.
-  function addTask(id, worker, condition) {
-    if (self.tasks[id + '_ext_' + self.id] != undefined) {
+  function addGenerator(id, task, condition) {
+    if (self.generators[id + '_ext_' + self.id] != undefined) {
       return self;
     }
 
-    self.tasks[id + '_ext_' + self.id] = {
-      'worker': worker,
+    self.generators[id + '_ext_' + self.id] = {
+      'task': task,
       'condition': condition
     };
 
-    getTasksCount(true) == 0 && startTasks();
+    getGeneratorsCount(true) == 0 && startGenerators();
     return self;
   };
 
-  function removeTask(id) {
-    if (self.tasks[id + '_ext_' + self.id]) {
-      self.tasks[id + '_ext_' + self.id].on = false;
-      self.tasks[id + '_ext_' + self.id]['del'] = true;
+  function removeGenerator(id) {
+    if (self.generators[id + '_ext_' + self.id]) {
+      self.generators[id + '_ext_' + self.id].on = false;
+      self.generators[id + '_ext_' + self.id]['del'] = true;
     }
     return self;
   };
 
-  function getTasksCount(running) {
+  function getGeneratorsCount(running) {
     return running ?
-      Object.keys(self.tasks).filter(function(id) {
-        return !!self.tasks[id].on;
+      Object.keys(self.generators).filter(function(id) {
+        return !!self.generators[id].on;
       }).length :
-      Object.keys(self.tasks).length;
+      Object.keys(self.generators).length;
   };
 
-  function startTasks() {
-    if (!Object.keys(self.tasks).length) {
+  function startGenerators() {
+    if (!Object.keys(self.generators).length) {
       self.draw();
     }else {
       self.draw(
@@ -173,10 +173,10 @@ function Sigma(root, id) {
 
       sigma.scheduler.unbind('killed', onTaskEnded);
       sigma.scheduler.injectFrame(function() {
-        for (var k in self.tasks) {
-          self.tasks[k].on = true;
-          sigma.scheduler.addWorker(
-            self.tasks[k].worker,
+        for (var k in self.generators) {
+          self.generators[k].on = true;
+          sigma.scheduler.addTask(
+            self.generators[k].task,
             k,
             false
           );
@@ -190,16 +190,16 @@ function Sigma(root, id) {
   };
 
   function onTaskEnded(e) {
-    if (self.tasks[e.content.name] != undefined) {
-      if (self.tasks[e.content.name]['del'] ||
-          !self.tasks[e.content.name].condition()) {
-        delete self.tasks[e.content.name];
+    if (self.generators[e.content.name] != undefined) {
+      if (self.generators[e.content.name]['del'] ||
+          !self.generators[e.content.name].condition()) {
+        delete self.generators[e.content.name];
       }else {
-        self.tasks[e.content.name].on = false;
+        self.generators[e.content.name].on = false;
       }
 
-      if (getTasksCount(true) == 0) {
-        startTasks();
+      if (getGeneratorsCount(true) == 0) {
+        startGenerators();
       }
     }
   };
@@ -209,7 +209,7 @@ function Sigma(root, id) {
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-    if (safe && getTasksCount() > 0) {
+    if (safe && getGeneratorsCount() > 0) {
       return self;
     }
 
@@ -221,7 +221,7 @@ function Sigma(root, id) {
     self.p.lastEdges = e;
     self.p.lastLabels = l;
 
-    // Remove workers:
+    // Remove tasks:
     self.clearSchedule();
 
     // Rescale graph:
@@ -253,10 +253,10 @@ function Sigma(root, id) {
 
     if (n) {
       if (n > 1) {
-        while (self.plotter.worker_drawNode()) {}
+        while (self.plotter.task_drawNode()) {}
       }else {
-        sigma.scheduler.addWorker(
-          self.plotter.worker_drawNode,
+        sigma.scheduler.addTask(
+          self.plotter.task_drawNode,
           'node_' + self.id,
           false
         );
@@ -268,17 +268,17 @@ function Sigma(root, id) {
 
     if (l) {
       if (l > 1) {
-        while (self.plotter.worker_drawLabel()) {}
+        while (self.plotter.task_drawLabel()) {}
       } else {
         if (previous) {
-          sigma.scheduler.queueWorker(
-            self.plotter.worker_drawLabel,
+          sigma.scheduler.queueTask(
+            self.plotter.task_drawLabel,
             'label_' + self.id,
             previous
           );
         } else {
-          sigma.scheduler.addWorker(
-            self.plotter.worker_drawLabel,
+          sigma.scheduler.addTask(
+            self.plotter.task_drawLabel,
             'label_' + self.id,
             false
           );
@@ -291,17 +291,17 @@ function Sigma(root, id) {
 
     if (e) {
       if (e > 1) {
-        while (self.plotter.worker_drawEdge()) {}
+        while (self.plotter.task_drawEdge()) {}
       }else {
         if (previous) {
-          sigma.scheduler.queueWorker(
-            self.plotter.worker_drawEdge,
+          sigma.scheduler.queueTask(
+            self.plotter.task_drawEdge,
             'edge_' + self.id,
             previous
           );
         }else {
-          sigma.scheduler.addWorker(
-            self.plotter.worker_drawEdge,
+          sigma.scheduler.addTask(
+            self.plotter.task_drawEdge,
             'edge_' + self.id,
             false
           );
@@ -338,9 +338,8 @@ function Sigma(root, id) {
     });
   }
 
-
-  this.addTask = addTask;
-  this.removeTask = removeTask;
+  this.addGenerator = addGenerator;
+  this.removeGenerator = removeGenerator;
   this.clearSchedule = clearSchedule;
 
   this.draw = draw;

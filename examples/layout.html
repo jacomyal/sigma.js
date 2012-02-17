@@ -188,7 +188,7 @@
 
       function startLayout(){
         if(s && f){
-          s.addTask('fa', f.atomicGo, function(){
+          s.addGenerator('fa', f.atomicGo, function(){
             return true;
           });
         }
@@ -196,7 +196,7 @@
 
       function stopLayout(){
         if(s && f){
-          s.removeTask('fa');
+          s.removeGenerator('fa');
         }
       }
 
