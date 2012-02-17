@@ -48,6 +48,44 @@ sigma.tools.drawRoundRect = function(ctx, x, y, w, h, ellipse, corners) {
   ctx.lineTo(x, y + e);
 };
 
+sigma.tools.getRGB = function(s, asArray) {
+  s = s.toString();
+  var res = {
+    'r': 0,
+    'g': 0,
+    'b': 0
+  };
+
+  if (s.length >= 3) {
+    if (s.charAt(0) == '#') {
+      var l = s.length - 1;
+      if (l == 6) {
+        res = {
+          'r': parseInt(s.charAt(1) + s.charAt(2), 16),
+          'g': parseInt(s.charAt(3) + s.charAt(4), 16),
+          'b': parseInt(s.charAt(5) + s.charAt(5), 16)
+        };
+      }else if (l == 3) {
+        res = {
+          'r': parseInt(s.charAt(1) + s.charAt(1), 16),
+          'g': parseInt(s.charAt(2) + s.charAt(2), 16),
+          'b': parseInt(s.charAt(3) + s.charAt(3), 16)
+        };
+      }
+    }
+  }
+
+  if (asArray) {
+    res = [
+      res['r'],
+      res['g'],
+      res['b']
+    ];
+  }
+
+  return res;
+};
+
 sigma.tools.rgbToHex = function(R, G, B) {
   return sigma.tools.toHex(R) + sigma.tools.toHex(G) + sigma.tools.toHex(B);
 };
