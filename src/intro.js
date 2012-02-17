@@ -1,4 +1,4 @@
-var sigma = (function() {
+var sigma = new (function() {
 // Define local shortcut:
 var s = {};
 var id = 0;
