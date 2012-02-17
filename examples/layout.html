@@ -159,6 +159,12 @@
 
           s.activateMonitoring();
 
+          s.bind('overnodes outnodes downnodes upnodes',function(e){
+            console.log(e.type, e.content.map(function(n){
+              return n.id;
+            }).join(', '));
+          });
+
           // Here is the code to initialize properly FA2:
           f = new forceatlas2.ForceAtlas2(s.getGraph());
           f.setAutoSettings();
