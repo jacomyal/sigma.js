@@ -3,7 +3,7 @@ function Sigma(root, id) {
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
-  this.id = id;
+  this.id = id.toString();
 
   this.p = {
     auto: true,
@@ -18,8 +18,6 @@ function Sigma(root, id) {
   this.dom = root;
   this.width = this.dom.offsetWidth;
   this.height = this.dom.offsetHeight;
-
-  this.generators = {};
 
   // Intern classes:
   this.graph = new sigma.classes.Graph();
@@ -82,7 +80,19 @@ function Sigma(root, id) {
     }
   }).bind('move', drawHover);
 
+  sigma.scheduler.bind('startgenerators', function() {
+    self.draw(
+      self.p.auto ? 2 : self.p.drawNodes,
+      self.p.auto ? 0 : self.p.drawEdges,
+      self.p.auto ? 2 : self.p.drawLabels
+    );
+  }).bind('stopgenerators', function() {
+    self.draw();
+  });
+
   function resize(w, h) {
+    var oldW = self.width, oldH = self.height;
+
     if (w != undefined && h != undefined) {
       self.width = w;
       self.height = h;
@@ -91,17 +101,19 @@ function Sigma(root, id) {
       self.height = self.dom.offsetHeight;
     }
 
-    for (var k in self.canvas) {
-      self.canvas[k].setAttribute('width', self.width + 'px');
-      self.canvas[k].setAttribute('height', self.height + 'px');
-    }
+    if (oldW != self.width || oldH != self.height) {
+      for (var k in self.canvas) {
+        self.canvas[k].setAttribute('width', self.width + 'px');
+        self.canvas[k].setAttribute('height', self.height + 'px');
+      }
 
-    self.draw(
-      self.p.lastNodes,
-      self.p.lastEdges,
-      self.p.lastLabels,
-      true
-    );
+      self.draw(
+        self.p.lastNodes,
+        self.p.lastEdges,
+        self.p.lastLabels,
+        true
+      );
+    }
     return self;
   };
 
@@ -128,88 +140,15 @@ function Sigma(root, id) {
     return self;
   };
 
-  // addTask() will execute the task while it returns
-  // 'true'. Then, it will execute the condition, and starts
-  // again if it is 'true'.
-  function addGenerator(id, task, condition) {
-    if (self.generators[id + '_ext_' + self.id] != undefined) {
-      return self;
-    }
-
-    self.generators[id + '_ext_' + self.id] = {
-      'task': task,
-      'condition': condition
-    };
-
-    getGeneratorsCount(true) == 0 && startGenerators();
-    return self;
-  };
-
-  function removeGenerator(id) {
-    if (self.generators[id + '_ext_' + self.id]) {
-      self.generators[id + '_ext_' + self.id].on = false;
-      self.generators[id + '_ext_' + self.id]['del'] = true;
-    }
-    return self;
-  };
-
-  function getGeneratorsCount(running) {
-    return running ?
-      Object.keys(self.generators).filter(function(id) {
-        return !!self.generators[id].on;
-      }).length :
-      Object.keys(self.generators).length;
-  };
-
-  function startGenerators() {
-    if (!Object.keys(self.generators).length) {
-      self.draw();
-    }else {
-      self.draw(
-        self.p.auto ? 2 : self.p.drawNodes,
-        self.p.auto ? 0 : self.p.drawEdges,
-        self.p.auto ? 2 : self.p.drawLabels
-      );
-
-      sigma.scheduler.unbind('killed', onTaskEnded);
-      sigma.scheduler.injectFrame(function() {
-        for (var k in self.generators) {
-          self.generators[k].on = true;
-          sigma.scheduler.addTask(
-            self.generators[k].task,
-            k,
-            false
-          );
-        }
-      });
-
-      sigma.scheduler.bind('killed', onTaskEnded).run();
-    }
-
-    return self;
-  };
-
-  function onTaskEnded(e) {
-    if (self.generators[e.content.name] != undefined) {
-      if (self.generators[e.content.name]['del'] ||
-          !self.generators[e.content.name].condition()) {
-        delete self.generators[e.content.name];
-      }else {
-        self.generators[e.content.name].on = false;
-      }
-
-      if (getGeneratorsCount(true) == 0) {
-        startGenerators();
-      }
-    }
-  };
-
   // nodes, edges, labels:
   // - 0: Don't display them
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-    if (safe && getGeneratorsCount() > 0) {
+    if (safe && Object.keys(sigma.scheduler.generators).some(function(id){
+      var m = id.match(/_ext_(.*)$/);
+      return m && (m[1]==self.id);
+    })) {
       return self;
     }
 
@@ -338,10 +277,7 @@ function Sigma(root, id) {
     });
   }
 
-  this.addGenerator = addGenerator;
-  this.removeGenerator = removeGenerator;
-  this.clearSchedule = clearSchedule;
-
   this.draw = draw;
   this.resize = resize;
+  this.clearSchedule = clearSchedule;
 }

@@ -1,4 +1,4 @@
-sigma.scheduler = (function() {
+sigma.scheduler = new (function() {
   sigma.classes.EventDispatcher.call(this);
   var self = this;
 
@@ -9,12 +9,22 @@ sigma.scheduler = (function() {
   this.correctedFrameTime = this.frameTime;
   this.frames = 0;
 
+  this.generators = {};
   this.queuedTasks = [];
   this.tasks = [];
 
   this.delay = 0;
 
-  this.frameInjector = function() {
+  // -----------
+  // FRAMES    :
+  // -----------
+  function injectFrame(callback) {
+    window.setTimeout(callback, 0);
+    return self;
+  }
+
+  function frameInjector() {
+    self.dispatch('frameinserted');
     while (self.isRunning && self.tasks.length && self.routine()) {}
 
     if (!self.isRunning || !self.tasks.length) {
@@ -24,11 +34,16 @@ sigma.scheduler = (function() {
       self.frames++;
       self.delay = self.effectiveTime - self.frameTime;
       self.correctedFrameTime = self.frameTime - self.delay;
+
+      self.dispatch('insertframe');
       self.injectFrame(self.frameInjector);
     }
   };
 
-  this.routine = function() {
+  // -----------
+  // TASKS     :
+  // -----------
+  function routine() {
     self.index = self.index % self.tasks.length;
 
     if (!self.tasks[self.index]['task']()) {
@@ -50,12 +65,7 @@ sigma.scheduler = (function() {
     return self.effectiveTime <= self.correctedFrameTime;
   };
 
-  this.injectFrame = function(callback) {
-    window.setTimeout(callback, 0);
-    return self;
-  }
-
-  this.run = function() {
+  function run() {
     self.isRunning = true;
     self.index = 0;
     self.frames = 0;
@@ -64,17 +74,18 @@ sigma.scheduler = (function() {
     self.time = self.startTime;
 
     self.dispatch('start');
+    self.dispatch('insertframe');
     self.injectFrame(self.frameInjector);
     return self;
   };
 
-  this.stop = function() {
+  function stop() {
     self.dispatch('stop');
     self.isRunning = false;
     return self;
   };
 
-  this.addTask = function(task, name, autostart) {
+  function addTask(task, name, autostart) {
     if (typeof task != 'function') {
       throw new Error('Task "' + name + '" is not a function');
     }
@@ -87,7 +98,7 @@ sigma.scheduler = (function() {
     return self;
   };
 
-  this.queueTask = function(task, name, parent) {
+  function queueTask(task, name, parent) {
     if (typeof task != 'function') {
       throw new Error('Task "' + name + '" is not a function');
     }
@@ -113,7 +124,7 @@ sigma.scheduler = (function() {
   //  - 0: nothing
   //  - 1: trigger queuedTasks
   //  - 2: empty queuedTasks
-  this.removeTask = function(v, queueStatus) {
+  function removeTask(v, queueStatus) {
     if (v == undefined) {
       self.tasks = [];
       if (queueStatus > 0) {
@@ -144,7 +155,85 @@ sigma.scheduler = (function() {
     return self;
   };
 
-  this.fps = function(v) {
+  // -----------
+  // GENERATORS:
+  // -----------
+  // addGenerator() will execute the task while it returns
+  // 'true'. Then, it will execute the condition, and starts
+  // the task back again if it is 'true'.
+  function addGenerator(id, task, condition) {
+    if (self.generators[id] != undefined) {
+      return self;
+    }
+
+    self.generators[id] = {
+      'task': task,
+      'condition': condition
+    };
+
+    self.getGeneratorsCount(true) == 0 && self.startGenerators();
+    return self;
+  };
+
+  function removeGenerator(id) {
+    if (self.generators[id]) {
+      self.generators[id].on = false;
+      self.generators[id]['del'] = true;
+    }
+    return self;
+  };
+
+  function getGeneratorsCount(running) {
+    return running ?
+      Object.keys(self.generators).filter(function(id) {
+        return !!self.generators[id].on;
+      }).length :
+      Object.keys(self.generators).length;
+  };
+
+  function startGenerators() {
+    if (!Object.keys(self.generators).length) {
+      self.dispatch('stopgenerators');
+    }else {
+      self.dispatch('startgenerators');
+
+      self.unbind('killed', onTaskEnded);
+      self.injectFrame(function() {
+        for (var k in self.generators) {
+          self.generators[k].on = true;
+          self.addTask(
+            self.generators[k].task,
+            k,
+            false
+          );
+        }
+      });
+
+      self.bind('killed', onTaskEnded).run();
+    }
+
+    return self;
+  };
+
+  function onTaskEnded(e) {
+    if (self.generators[e.content.name] != undefined) {
+      if (self.generators[e.content.name]['del'] ||
+          !self.generators[e.content.name].condition()) {
+        delete self.generators[e.content.name];
+      }else {
+        self.generators[e.content.name].on = false;
+      }
+
+      if (self.getGeneratorsCount(true) == 0) {
+        self.startGenerators();
+      }
+    }
+  };
+
+  // -----------
+  // FPS       :
+  // -----------
+  function fps(v) {
     if (v != undefined) {
       self.fpsReq = Math.abs(1 * v);
       self.frameTime = 1000 / self.fpsReq;
@@ -156,7 +245,7 @@ sigma.scheduler = (function() {
     }
   };
 
-  this.getFPS = function() {
+  function getFPS() {
     if (self.isRunning) {
       self.lastFPS =
         Math.round(
@@ -168,6 +257,22 @@ sigma.scheduler = (function() {
 
     return self.lastFPS;
   };
+
+  this.injectFrame = injectFrame;
+  this.frameInjector = frameInjector;
+  this.routine = routine;
+  this.run = run;
+  this.stop = stop;
+  this.addTask = addTask;
+  this.queueTask = queueTask;
+  this.removeTask = removeTask;
+  this.addGenerator = addGenerator;
+  this.removeGenerator = removeGenerator;
+  this.getGeneratorsCount = getGeneratorsCount;
+  this.startGenerators = startGenerators;
+  this.onTaskEnded = onTaskEnded;
+  this.fps = fps;
+  this.getFPS = getFPS;
 
   return this;
 })();
