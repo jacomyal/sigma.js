@@ -5,6 +5,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   this.p = {
     // -------
     // LABELS:
+    // -------
     //   Label color:
     //   - 'node'
     //   - default (then defaultLabelColor
@@ -39,6 +40,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     font: 'Arial',
     // ------
     // EDGES:
+    // ------
     //   Edge color:
     //   - 'source'
     //   - 'target'
@@ -49,6 +51,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     defaultEdgeType: 'line',
     // ------
     // NODES:
+    // ------
     defaultNodeColor: '#aaa',
     // HOVER:
     //   Node hover color:
@@ -76,6 +79,17 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   this.edgesCtx = edgesCtx;
   this.labelsCtx = labelsCtx;
   this.hoverCtx = hoverCtx;
+
+  // ImageData for caching nodes and labels:
+  this.cacheNodes = {};
+  this.cacheLabels = {};
+
+  this.dataNodes = {};
+  this.dataLabels = {};
+
+  this.cacheCanvas = document.createElement('canvas');
+  this.cacheCanvas.width = '100px';
+  this.cacheCanvas.height = '100px';
 
   this.graph = graph;
   this.width = w;
@@ -140,13 +154,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   };
 
   function drawNode(node) {
+    var size = Math.round(node['displaySize']*10)/10;
     var ctx = self.nodesCtx;
 
     ctx.fillStyle = node['color'];
     ctx.beginPath();
     ctx.arc(node['displayX'],
             node['displayY'],
-            node['displaySize'],
+            size,
             0,
             Math.PI * 2,
             true);
@@ -307,12 +322,12 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
       node['displayX'] + node['displaySize'] * 1.5,
       node['displayY'] + fontSize / 2 - 3
     );
-  }
+  };
 
   function isOnScreen(node) {
     if (isNaN(node['x']) || isNaN(node['y'])) {
-      throw (new Error(
-        'A node\'s coordinate is not a number (id: ' + node['id'] + ')')
+      throw (new Error('A node\'s coordinate is not a ' +
+                       'number (id: ' + node['id'] + ')')
       );
     }
 
@@ -322,9 +337,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
            (node['displayY'] - node['displaySize'] < self.height * 4 / 3);
   };
 
+  function applyDrawing() {
+
+  }
+
   this.task_drawLabel = task_drawLabel;
   this.task_drawEdge = task_drawEdge;
   this.task_drawNode = task_drawNode;
   this.drawHoverNode = drawHoverNode;
+  this.applyDrawing = applyDrawing;
   this.isOnScreen = isOnScreen;
 }
