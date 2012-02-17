@@ -275,10 +275,10 @@ sigma.classes.Graph = function() {
 
       if (oldH && !newH) {
         node['hover'] = false;
-        over.push(node);
+        out.push(node);
       }else if (newH && !oldH) {
         node['hover'] = true;
-        out.push(node);
+        over.push(node);
       }
     });
 
