@@ -282,7 +282,7 @@ sigma.chronos = new (function() {
       }).length :
       Object.keys(generators).length;
   };
-  
+
   /**
    * getGeneratorsIDs returns the array of the generators IDs.
    * @return {Array} The array of IDs.
