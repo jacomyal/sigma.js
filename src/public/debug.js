@@ -13,3 +13,4 @@ sigma.log = function() {
 
   return sigma;
 };
+

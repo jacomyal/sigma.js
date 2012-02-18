@@ -20,7 +20,7 @@ function Sigma(root, id) {
   this.height = this.dom.offsetHeight;
 
   // Intern classes:
-  this.graph = new sigma.graph();
+  this.graph = new Graph();
 
   this.canvas = {};
   initDOM('edges', 'canvas');
@@ -124,7 +124,7 @@ function Sigma(root, id) {
       'edge_' + self.id, 2
     ).removeTask(
       'label_' + self.id, 2
-    ).stop();
+    ).stopTasks();
     return self;
   };
 
@@ -145,7 +145,7 @@ function Sigma(root, id) {
   // - 1: Display them (asynchronous)
   // - 2: Display them (synchronous)
   function draw(nodes, edges, labels, safe) {
-    if (safe && Object.keys(sigma.chronos.generators).some(function(id) {
+    if (safe && sigma.chronos.getGeneratorsIDs().some(function(id) {
       var m = id.match(/_ext_(.*)$/);
       return m && (m[1] == self.id);
     })) {
@@ -253,7 +253,7 @@ function Sigma(root, id) {
 
     drawHover();
 
-    start && sigma.chronos.run();
+    start && sigma.chronos.runTasks();
     return self;
   };
 
@@ -281,3 +281,4 @@ function Sigma(root, id) {
   this.resize = resize;
   this.clearSchedule = clearSchedule;
 }
+

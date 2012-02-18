@@ -100,3 +100,35 @@ sigma.tools.toHex = function(n) {
   return '0123456789ABCDEF'.charAt((n - n % 16) / 16) +
          '0123456789ABCDEF'.charAt(n % 16);
 };
+
+sigma.tools.getCustomArrayHelper = function(array, type, property) {
+  var helpers = [
+    'forEach',
+    'map',
+    'some',
+    'filter'
+  ];
+
+  if(helpers.indexOf(type) == -1) {
+    throw new Error('Unvalid helper type '+type+'.');
+  }
+
+  return function(fun) {
+    var a = array;
+
+    if(property){
+      if(typeof property == 'function'){
+        a = array.map(function(e){
+          return property(e);
+        });
+      }else{
+        a = array.map(function(e){
+          return e[property.toString()];
+        });
+      }
+    }
+
+    return a['type']
+  }
+};
+

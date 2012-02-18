@@ -182,3 +182,4 @@ function MouseCaptor(canvas, graph, id) {
   this.canvas.addEventListener('mousedown', downHandler);
   document.addEventListener('mouseup', upHandler);
 }
+

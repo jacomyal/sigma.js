@@ -1,4 +1,4 @@
-sigma.graph = function() {
+function Graph() {
   var self = this;
   sigma.classes.Cascade.call(self);
   sigma.classes.EventDispatcher.call(self);
@@ -299,4 +299,5 @@ sigma.graph = function() {
   this.rescale = rescale;
   this.translate = translate;
   this.checkHover = checkHover;
-};
+}
+

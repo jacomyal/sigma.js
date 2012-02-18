@@ -348,3 +348,4 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
   this.applyDrawing = applyDrawing;
   this.isOnScreen = isOnScreen;
 }
+

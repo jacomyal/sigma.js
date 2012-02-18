@@ -2,23 +2,21 @@ function Monitor(instance, dom) {
   var self = this;
   sigma.classes.Cascade.call(this);
 
-  this.sigma = instance;
+  this.instance = instance;
   this.monitoring = false;
 
   this.p = {
     fps: 40,
     dom: dom,
     globalProbes: {
-      'Tasks': function() { return sigma.chronos.tasks.length; },
-      'Queue': function() { return sigma.chronos.queuedTasks.length; },
-      'Time (ms)': function() {
-        return sigma.chronos.startTime - sigma.chronos.time;
-      },
+      'Time (ms)': sigma.chronos.getExecutionTime,
+      'Queue': sigma.chronos.getQueuedTasksCount,
+      'Tasks': sigma.chronos.getTasksCount,
       'FPS': sigma.chronos.getFPS
     },
     localProbes: {
-      'Nodes count': function() { return self.sigma.graph.nodes.length; },
-      'Edges count': function() { return self.sigma.graph.edges.length; }
+      'Nodes count': function() { return self.instance.graph.nodes.length; },
+      'Edges count': function() { return self.instance.graph.edges.length; }
     }
   };
 
@@ -62,3 +60,4 @@ function Monitor(instance, dom) {
   this.activate = activate;
   this.desactivate = desactivate;
 }
+

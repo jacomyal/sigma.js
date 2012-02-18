@@ -96,3 +96,4 @@ sigma.classes.EventDispatcher = function() {
   this.unbind = unbind;
   this.dispatch = dispatch;
 };
+

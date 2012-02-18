@@ -132,3 +132,4 @@ function SigmaPublic(sigmaInstance) {
     self.dispatch(e.type, e.content);
   });
 }
+
