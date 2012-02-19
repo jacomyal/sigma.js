@@ -129,9 +129,9 @@
         s.position(0,0,1);
 
         s.draw(
-          s.properties('lastNodes'),
-          s.properties('lastEdges'),
-          s.properties('lastLabels'),
+          s.configProperties('lastNodes'),
+          s.configProperties('lastEdges'),
+          s.configProperties('lastLabels'),
           true
         );
       }
