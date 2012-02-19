@@ -161,7 +161,7 @@ function Sigma(root, id) {
     self.p.lastLabels = l;
 
     // Remove tasks:
-    self.clearSchedule();
+    clearSchedule();
 
     // Rescale graph:
     self.graph.rescale(self.width, self.height);
@@ -251,6 +251,10 @@ function Sigma(root, id) {
       }
     }
 
+    self.dispatch(
+      'draw'
+    );
+
     drawHover();
 
     start && sigma.chronos.runTasks();
@@ -279,6 +283,5 @@ function Sigma(root, id) {
 
   this.draw = draw;
   this.resize = resize;
-  this.clearSchedule = clearSchedule;
 }
 
