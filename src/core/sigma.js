@@ -281,7 +281,15 @@ function Sigma(root, id) {
     });
   }
 
+  // Apply plugins:
+  for (var i = 0; i < local.plugins.length; i++) {
+    local.plugins[i](this);
+  }
+
   this.draw = draw;
   this.resize = resize;
+  this.initDOM = initDOM;
+  this.drawHover = drawHover;
+  this.clearSchedule = clearSchedule;
 }
 

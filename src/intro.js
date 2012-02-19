@@ -2,6 +2,7 @@
 var sigma = {};
 sigma.tools = {};
 sigma.classes = {};
+sigma.instances = {};
 
 // Adding Array helpers, if not present yet:
 (function() {

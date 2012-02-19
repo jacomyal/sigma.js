@@ -10,7 +10,7 @@ fix:
 clean:
 	rm ${MINIFY_PATH} ${CONCAT_PATH}
 concat:
-	cat ./src/intro.js `find ./src/classes -name "*.js"` ./src/sigmaintro.js `find ./src/core -name "*.js"` ./src/sigmaoutro.js `find ./src/public -name "*.js"` > ${CONCAT_PATH}
+	cat ./src/intro.js `find ./src/classes -name "*.js"` ./src/sigmaintro.js `find ./src/core -name "*.js"` `find ./src/public -name "*.js"` ./src/sigmaoutro.js > ${CONCAT_PATH}
 minify-simple: clean concat
 	java -jar ${CLOSURE} --compilation_level SIMPLE_OPTIMIZATIONS --js ${CONCAT_PATH} --js_output_file ${MINIFY_PATH}
 minify-advanced: clean concat

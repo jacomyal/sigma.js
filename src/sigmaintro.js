@@ -1,7 +1,10 @@
 (function() {
 // Define local shortcut:
 var id = 0;
-sigma.instances = {};
+
+// Define local package:
+var local = {};
+local.plugins = [];
 
 sigma.init = function(dom) {
   var inst = new Sigma(dom, (id++).toString());
