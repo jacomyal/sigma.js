@@ -87,7 +87,7 @@
         if(!s){
           // INIT SIGMA:
           sigma.debugMode = 1;
-          s = sigma.init(document.getElementById('sigma-container')).config_drawing({
+          s = sigma.init(document.getElementById('sigma-container')).drawingProperties({
             // Labels:
             font: '"Helvetica Neue",Helvetica,Arial,sans-serif',
             defaultLabelColor: '#000',
@@ -97,12 +97,12 @@
             labelThreshold: 9,
             // Edges
             defaultEdgeType: 'curve'
-          }).config_graph({
+          }).graphProperties({
             minNodeSize: 3,
             maxNodeSize: 16,
             minEdgeSize: 4,
             maxEdgeSize: 4
-          }).config_mouse({
+          }).mouseProperties({
             minRatio: 1,
             maxRatio: 5
           });
@@ -129,9 +129,9 @@
         s.position(0,0,1);
 
         s.draw(
-          s.config('lastNodes'),
-          s.config('lastEdges'),
-          s.config('lastLabels'),
+          s.properties('lastNodes'),
+          s.properties('lastEdges'),
+          s.properties('lastLabels'),
           true
         );
       }

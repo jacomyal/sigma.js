@@ -110,7 +110,7 @@
           s2 = sigma.init(document.getElementById('sigma-container-2'))
           s3 = sigma.init(document.getElementById('sigma-container-3'))
 
-          s1.config_drawing({
+          s1.drawingProperties({
             // Labels:
             font: '"Helvetica Neue",Helvetica,Arial,sans-serif',
             defaultLabelColor: '#000',
@@ -120,18 +120,18 @@
             labelThreshold: 9,
             // Edges
             defaultEdgeType: 'curve'
-          }).config_graph({
+          }).graphProperties({
             minNodeSize: 3,
             maxNodeSize: 16,
             minEdgeSize: 4,
             maxEdgeSize: 4,
             scalingMode: 'outside'
-          }).config_mouse({
+          }).mouseProperties({
             minRatio: 0.5,
             maxRatio: 2
           });
 
-          s2.config_drawing({
+          s2.drawingProperties({
             // Labels:
             font: 'Arial,sans-serif',
             defaultLabelColor: '#fff',
@@ -143,18 +143,18 @@
             defaultEdgeType: 'line',
             edgeColor: 'default',
             defaultEdgeColor: '#999'
-          }).config_graph({
+          }).graphProperties({
             minNodeSize: 2,
             maxNodeSize: 10,
             minEdgeSize: 4,
             maxEdgeSize: 4,
             scalingMode: 'outside'
-          }).config_mouse({
+          }).mouseProperties({
             minRatio: 0.5,
             maxRatio: 2
           });
 
-          s3.config_drawing({
+          s3.drawingProperties({
             // Labels:
             font: 'Lobster,sans-serif',
             defaultLabelColor: '#000',
@@ -165,13 +165,13 @@
             labelColor: 'node',
             // Edges
             defaultEdgeType: 'line'
-          }).config_graph({
+          }).graphProperties({
             minNodeSize: 3,
             maxNodeSize: 14,
             minEdgeSize: 4,
             maxEdgeSize: 4,
             scalingMode: 'outside'
-          }).config_mouse({
+          }).mouseProperties({
             minRatio: 0.5,
             maxRatio: 2
           });
@@ -211,23 +211,23 @@
         s3.position(0,0,1);
 
         s1.draw(
-          s1.config('lastNodes'),
-          s1.config('lastEdges'),
-          s1.config('lastLabels'),
+          s1.properties('lastNodes'),
+          s1.properties('lastEdges'),
+          s1.properties('lastLabels'),
           true
         );
 
         s2.draw(
-          s2.config('lastNodes'),
-          s2.config('lastEdges'),
-          s2.config('lastLabels'),
+          s2.properties('lastNodes'),
+          s2.properties('lastEdges'),
+          s2.properties('lastLabels'),
           true
         );
 
         s3.draw(
-          s3.config('lastNodes'),
-          s3.config('lastEdges'),
-          s3.config('lastLabels'),
+          s3.properties('lastNodes'),
+          s3.properties('lastEdges'),
+          s3.properties('lastLabels'),
           true
         );
       }

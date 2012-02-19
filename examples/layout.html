@@ -99,7 +99,7 @@
         if(!s){
           // INIT SIGMA:
           sigma.debugMode = 1;
-          s = sigma.init(document.getElementById('sigma-container')).config_drawing({
+          s = sigma.init(document.getElementById('sigma-container')).drawingProperties({
             // Labels:
             font: '"Helvetica Neue",Helvetica,Arial,sans-serif',
             defaultLabelColor: '#000',
@@ -185,9 +185,9 @@
         s.position(0,0,1);
 
         s.draw(
-          s.config('lastNodes'),
-          s.config('lastEdges'),
-          s.config('lastLabels'),
+          s.properties('lastNodes'),
+          s.properties('lastEdges'),
+          s.properties('lastLabels'),
           true
         );
       }
