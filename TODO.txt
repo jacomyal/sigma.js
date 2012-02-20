@@ -1,10 +1,8 @@
-
 ****   Bugs   ****
 
 ****   Core   ****
   - Caching nodes 
   - Caching labels
-  - Improving configs API
   - Documentation
   - Testing for the following classes:
     > Chronos

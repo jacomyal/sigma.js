@@ -3,37 +3,126 @@
  * It has been designed to make possible to execute heavy computing tasks
  * for the browser, without freezing it.
  * @constructor
+ * @extends sigma.classes.EventDispatcher
+ * @this {Chronos}
  */
 sigma.chronos = new (function() {
   sigma.classes.EventDispatcher.call(this);
 
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {Chronos}
+   */
   var self = this;
 
+  /**
+   * Indicates whether any task is actively running or not.
+   * @private
+   * @type {boolean}
+   */
   var isRunning = false;
 
+  /**
+   * Indicates the FPS "goal", that will define the theoretical
+   * frame length.
+   * @private
+   * @type {number}
+   */
   var fpsReq = 60;
+
+  /**
+   * Stores the last computed FPS value (FPS is computed only when any
+   * task is running).
+   * @private
+   * @type {number}
+   */
   var lastFPS = 0;
+
+  /**
+   * The number of frames inserted since the last start.
+   * @private
+   * @type {number}
+   */
   var framesCount = 0;
+
+  /**
+   * The theoretical frame time.
+   * @private
+   * @type {number}
+   */
+  var frameTime = 1000 / fpsReq;
+
+  /**
+   * The theoretical frame length, minus the last measured delay.
+   * @private
+   * @type {number}
+   */
   var correctedFrameTime = frameTime;
 
-  var frameTime = 1000 / fpsReq;
+  /**
+   * The measured length of the last frame.
+   * @private
+   * @type {number}
+   */
   var effectiveTime = 0;
+
+  /**
+   * The time passed since the last runTasks action.
+   * @private
+   * @type {number}
+   */
   var currentTime = 0;
+
+  /**
+   * The time when the last frame was inserted.
+   * @private
+   * @type {number}
+   */
   var startTime = 0;
+
+  /**
+   * The difference between the theoretical frame length and the
+   * last measured frame length.
+   * @private
+   * @type {number}
+   */
   var delay = 0;
 
+  /**
+   * The container of all active generators.
+   * @private
+   * @type {Object.<string, Object>}
+   */
   var generators = {};
-  var queuedTasks = [];
+
+  /**
+   * The array of all the referenced and active tasks.
+   * @private
+   * @type {Array.<Object>}
+   */
   var tasks = [];
 
+  /**
+   * The array of all the referenced and queued tasks.
+   * @private
+   * @type {Array.<Object>}
+   */
+  var queuedTasks = [];
+
+  /**
+   * The index of the next task to execute.
+   * @private
+   * @type {number}
+   */
   var taskIndex = 0;
 
 
   /**
-   * insertFrame will insert a frame before executing the callback.
-   * @param  {Function} callback The callback to execute after having
-   *                             inserted the frame.
-   * @return {sigma.chronos} Returns itself.
+   * Inserts a frame before executing the callback.
+   * @param  {function()} callback The callback to execute after having
+   *                               inserted the frame.
+   * @return {Chronos} Returns itself.
    */
   function insertFrame(callback) {
     window.setTimeout(callback, 0);
@@ -41,8 +130,7 @@ sigma.chronos = new (function() {
   }
 
   /**
-   * frameInserter is the local method that executes routine, and inserts
-   * frames when needed.
+   * The local method that executes routine, and inserts frames when needed.
    * It dispatches a "frameinserted" event after having inserted any frame,
    * and an "insertframe" event before.
    * @private
@@ -65,24 +153,24 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * routine is the local method that executes the tasks, and compares
-   * the current frame length to the ideal frame length.
+   * The local method that executes the tasks, and compares the current frame
+   * length to the ideal frame length.
    * @private
-   * @return {Boolean} Returns false if the current frame should be ended,
+   * @return {boolean} Returns false if the current frame should be ended,
    *                   and true else.
    */
   function routine() {
     taskIndex = taskIndex % tasks.length;
 
-    if (!tasks[taskIndex]['task']()) {
-      var n = tasks[taskIndex]['name'];
+    if (!tasks[taskIndex].task()) {
+      var n = tasks[taskIndex].taskName;
 
       queuedTasks = queuedTasks.filter(function(e) {
-        (e['parent'] == n) && tasks.push({
-          'name': e['name'],
-          'task': e['task']
+        (e.taskParent == n) && tasks.push({
+          taskName: e.taskName,
+          task: e.task
         });
-        return e['parent'] != n;
+        return e.taskParent != n;
       });
 
       self.dispatch('killed', tasks.splice(taskIndex--, 1)[0]);
@@ -94,8 +182,8 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * runTasks will start tasks execution.
-   * @return {sigma.chronos} Returns itself.
+   * Starts tasks execution.
+   * @return {Chronos} Returns itself.
    */
   function runTasks() {
     isRunning = true;
@@ -112,8 +200,8 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * stopTasks will stop tasks execution, and dispatch a "stop" event.
-   * @return {sigma.chronos} Returns itself.
+   * Stops tasks execution, and dispatch a "stop" event.
+   * @return {Chronos} Returns itself.
    */
   function stopTasks() {
     self.dispatch('stop');
@@ -125,14 +213,14 @@ sigma.chronos = new (function() {
    * A task is a function that will be executed continuously while it returns
    * true. As soon as it return false, the task will be removed.
    * If several tasks are present, they will be executed in parallele.
-   * addTask will add the task to this execution process.
-   * @param {Function} task     The task to add.
-   * @param {String} name       The name of the worker, used for
-   *                            managing the different running tasks.
-   * @param {Boolean} autostart If true, sigma.chronos will start
-   *                            automatically if it is not working
-   *                            yet.
-   * @return {sigma.chronos} Returns itself.
+   * This method will add the task to this execution process.
+   * @param {function(): boolean} task     The task to add.
+   * @param {string} name                  The name of the worker, used for
+   *                                       managing the different tasks.
+   * @param {boolean} autostart            If true, sigma.chronos will start
+   *                                       automatically if it is not working
+   *                                       yet.
+   * @return {Chronos} Returns itself.
    */
   function addTask(task, name, autostart) {
     if (typeof task != 'function') {
@@ -140,21 +228,22 @@ sigma.chronos = new (function() {
     }
 
     tasks.push({
-      'name': name,
-      'task': task
+      taskName: name,
+      task: task
     });
+
     isRunning = !!(isRunning || (autostart && runTasks()) || true);
     return self;
   };
 
   /**
-   * queueTask will add a task that will be start to be executed as soon
-   * as a task named as the parent will be removed.
-   * @param {Function} task     The task to add.
-   * @param {String} name       The name of the worker, used for
-   *                            managing the different running tasks.
-   * @param {tring} parent      The name of the parent task.
-   * @return {sigma.chronos} Returns itself.
+   * Will add a task that will be start to be executed as soon as a task
+   * named as the parent will be removed.
+   * @param {function(): boolean} task     The task to add.
+   * @param {string} name                  The name of the worker, used for
+   *                                       managing the different tasks.
+   * @param {string} parent                The name of the parent task.
+   * @return {Chronos} Returns itself.
    */
   function queueTask(task, name, parent) {
     if (typeof task != 'function') {
@@ -162,7 +251,7 @@ sigma.chronos = new (function() {
     }
 
     if (!tasks.concat(queuedTasks).some(function(e) {
-      return e['name'] == parent;
+      return e.taskName == parent;
     })) {
       throw new Error(
         'Parent task "' + parent + '" of "' + name + '" is not attached.'
@@ -170,25 +259,25 @@ sigma.chronos = new (function() {
     }
 
     queuedTasks.push({
-      'parent': parent,
-      'name': name,
-      'task': task
+      taskParent: parent,
+      taskName: name,
+      task: task
     });
 
     return self;
   };
 
   /**
-   * removeTask will remove a task.
-   * @param  {String} v           If v is undefined, then every tasks will
+   * Removes a task.
+   * @param  {string} v           If v is undefined, then every tasks will
    *                              be removed. If not, each task named v will
    *                              be removed.
-   * @param  {Number} queueStatus Determines the queued tasks behaviour. If 0,
+   * @param  {number} queueStatus Determines the queued tasks behaviour. If 0,
    *                              then nothing will happen. If 1, the tasks
    *                              queued to any removed task will be triggered.
    *                              If 2, the tasks queued to any removed task
    *                              will be removed as well.
-   * @return {sigma.chronos} Returns itself.
+   * @return {Chronos} Returns itself.
    */
   function removeTask(v, queueStatus) {
     if (v == undefined) {
@@ -203,8 +292,8 @@ sigma.chronos = new (function() {
     } else {
       var n = (typeof v == 'string') ? v : '';
       tasks = tasks.filter(function(e) {
-        if ((typeof v == 'string') ? e['name'] == v : e['task'] == v) {
-          n = e['name'];
+        if ((typeof v == 'string') ? e.taskName == v : e.task == v) {
+          n = e.taskName;
           return false;
         }
         return true;
@@ -212,10 +301,10 @@ sigma.chronos = new (function() {
 
       if (queueStatus > 0) {
         queuedTasks = queuedTasks.filter(function(e) {
-          if (queueStatus == 1 && e['parent'] == n) {
+          if (queueStatus == 1 && e.taskParent == n) {
             tasks.push(e);
           }
-          return e['parent'] != n;
+          return e.taskParent != n;
         });
       }
     }
@@ -235,10 +324,10 @@ sigma.chronos = new (function() {
    * by one: When the first stops, the second will start, etc. When
    * they are all ended, then the conditions will be tested to know
    * which generators have to be started again.
-   * @param {String} id          The generators ID.
-   * @param {Function} task      The generator's task.
-   * @param {Function} condition The generator's condition.
-   * @return {sigma.chronos} Returns itself.
+   * @param {string} id                     The generators ID.
+   * @param {function(): boolean} task      The generator's task.
+   * @param {function(): boolean} condition The generator's condition.
+   * @return {Chronos} Returns itself.
    */
   function addGenerator(id, task, condition) {
     if (generators[id] != undefined) {
@@ -246,8 +335,8 @@ sigma.chronos = new (function() {
     }
 
     generators[id] = {
-      'task': task,
-      'condition': condition
+      task: task,
+      condition: condition
     };
 
     getGeneratorsCount(true) == 0 && startGenerators();
@@ -255,25 +344,26 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * removeGenerator will remove a generator. It means that the task
-   * will continue being executed until it returns false, but then the
+   * Removes a generator. It means that the task will continue being eecuted
+   * until it returns false, but then the
    * condition will not be tested.
-   * @param  {String} id The generator's ID.
-   * @return {sigma.chronos} Returns itself.
+   * @param  {string} id The generator's ID.
+   * @return {Chronos} Returns itself.
    */
   function removeGenerator(id) {
     if (generators[id]) {
       generators[id].on = false;
-      generators[id]['del'] = true;
+      generators[id].del = true;
     }
     return self;
   };
 
   /**
-   * getGeneratorsCount returns the number of generators.
-   * @param  {Boolean} running If true, returns the number of active
+   * Returns the number of generators.
+   * @private
+   * @param  {boolean} running If true, returns the number of active
    *                          generators instead.
-   * @return {sigma.chronos} Returns itself.
+   * @return {Chronos} Returns itself.
    */
   function getGeneratorsCount(running) {
     return running ?
@@ -284,8 +374,8 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * getGeneratorsIDs returns the array of the generators IDs.
-   * @return {Array} The array of IDs.
+   * Returns the array of the generators IDs.
+   * @return {array.<string>} The array of IDs.
    */
   function getGeneratorsIDs() {
     return Object.keys(generators);
@@ -296,7 +386,7 @@ sigma.chronos = new (function() {
    * is the next to start when another one stops. It will dispatch
    * a "stopgenerators" event if there is no more generator to start,
    * and a "startgenerators" event else.
-   * @return {sigma.chronos} Returns itself.
+   * @return {Chronos} Returns itself.
    */
   function startGenerators() {
     if (!Object.keys(generators).length) {
@@ -323,18 +413,19 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * onTaskEnded will be triggered everytime the task of a generator stops,
+   * A callback triggered everytime the task of a generator stops, that will
    * test the related generator's condition, and see if there is still any
    * generator to start.
+   * @private
    * @param  {Object} e The sigma.chronos "killed" event.
    */
   function onTaskEnded(e) {
-    if (generators[e.content.name] != undefined) {
-      if (generators[e.content.name]['del'] ||
-          !generators[e.content.name].condition()) {
-        delete generators[e.content.name];
+    if (generators[e['content'].taskName] != undefined) {
+      if (generators[e['content'].taskName].del ||
+          !generators[e['content'].taskName].condition()) {
+        delete generators[e['content'].taskName];
       }else {
-        generators[e.content.name].on = false;
+        generators[e['content'].taskName].on = false;
       }
 
       if (getGeneratorsCount(true) == 0) {
@@ -344,18 +435,17 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * frequency will either set or returns the fpsReq property. This property
-   * determines the number of frames that should be inserted per second.
-   * @param  {Number} v The frequency asked.
-   * @return {not indicated} Returns the frequency if v is undefined, and
-   *                         itself else.
+   * Either set or returns the fpsReq property. This property determines
+   * the number of frames that should be inserted per second.
+   * @param  {?number} v The frequency asked.
+   * @return {Chronos|number} Returns the frequency if v is undefined, and
+   *                          itself else.
    */
   function frequency(v) {
     if (v != undefined) {
       fpsReq = Math.abs(1 * v);
       frameTime = 1000 / fpsReq;
       framesCount = 0;
-      currentTime = (new Date()).getTime();
       return self;
     } else {
       return fpsReq;
@@ -363,9 +453,9 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * getFPS returns the actual average number of frames that are inserted per
+   * Returns the actual average number of frames that are inserted per
    * second.
-   * @return {Number} The actual average FPS.
+   * @return {number} The actual average FPS.
    */
   function getFPS() {
     if (isRunning) {
@@ -381,25 +471,25 @@ sigma.chronos = new (function() {
   };
 
   /**
-   * getTasksCount returns the number of tasks.
-   * @return {Number} The number of tasks.
+   * Returns the number of tasks.
+   * @return {number} The number of tasks.
    */
   function getTasksCount() {
     return tasks.length;
   }
 
   /**
-   * getQueuedTasksCount returns the number of queued tasks.
-   * @return {Number} The number of queued tasks.
+   * Returns the number of queued tasks.
+   * @return {number} The number of queued tasks.
    */
   function getQueuedTasksCount() {
     return queuedTasks.length;
   }
 
   /**
-   * getExecutionTime returns how long sigma.chronos has active tasks running
+   * Returns how long sigma.chronos has active tasks running
    * without interuption for, in ms.
-   * @return {Number} The time chronos is running without interuption for.
+   * @return {number} The time chronos is running without interuption for.
    */
   function getExecutionTime() {
     return startTime - currentTime;

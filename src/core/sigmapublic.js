@@ -4,22 +4,22 @@ function SigmaPublic(sigmaInstance) {
   sigma.classes.EventDispatcher.call(this);
 
   // Config:
-  this.config = function(a1, a2) {
+  this.configProperties = function(a1, a2) {
     var res = s.config(a1, a2);
     return res == s ? self : res;
   };
 
-  this.config_drawing = function(a1, a2) {
+  this.drawingProperties = function(a1, a2) {
     var res = s.plotter.config(a1, a2);
     return res == s.plotter ? self : res;
   };
 
-  this.config_mouse = function(a1, a2) {
+  this.mouseProperties = function(a1, a2) {
     var res = s.mousecaptor.config(a1, a2);
     return res == s.mousecaptor ? self : res;
   };
 
-  this.config_graph = function(a1, a2) {
+  this.graphProperties = function(a1, a2) {
     var res = s.graph.config(a1, a2);
     return res == s.graph ? self : res;
   };
@@ -119,7 +119,7 @@ function SigmaPublic(sigmaInstance) {
     return s.monitor.activate();
   };
 
-  this.desactivate = function() {
+  this.desactivateMonitoring = function() {
     return s.monitor.desactivate();
   };
 
