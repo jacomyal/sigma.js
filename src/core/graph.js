@@ -334,7 +334,7 @@ function Graph() {
           node['attr'][k] = copy[k];
       }
     }
-    
+
   };
 
   function checkEdge(edge, copy) {
@@ -356,11 +356,11 @@ function Graph() {
           edge['attr'][k] = copy[k];
       }
     }
-    
+
   };
 
   function iterNodes(fun, ids) {
-    var a = ids ? ids.map(function(id){
+    var a = ids ? ids.map(function(id) {
       return self.nodesIndex[id];
     }) : self.nodes;
 
@@ -368,7 +368,7 @@ function Graph() {
   };
 
   function iterEdges(fun, ids) {
-    var a = ids ? ids.map(function(id){
+    var a = ids ? ids.map(function(id) {
       return self.edgesIndex[id];
     }) : self.edges;
 
