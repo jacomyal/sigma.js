@@ -304,7 +304,7 @@ function Graph() {
     };
   };
 
-  function cloneEdge(node) {
+  function cloneEdge(edge) {
     return {
       'source': edge['source']['id'],
       'target': edge['target']['id'],
@@ -350,7 +350,7 @@ function Graph() {
         case 'color':
         case 'type':
         case 'label':
-          edge[k] = copy[k].toString();
+          edge[k] = (copy[k] || '').toString();
           break;
         default:
           edge['attr'][k] = copy[k];
@@ -364,7 +364,14 @@ function Graph() {
       return self.nodesIndex[id];
     }) : self.nodes;
 
-    return a.map(cloneNode).forEach(fun).forEach(checkNode);
+    var aCopies = a.map(cloneNode)
+    aCopies.forEach(fun);
+
+    a.forEach(function(n, i) {
+      checkNode(n, aCopies[i]);
+    });
+
+    return self;
   };
 
   function iterEdges(fun, ids) {
@@ -372,7 +379,14 @@ function Graph() {
       return self.edgesIndex[id];
     }) : self.edges;
 
-    return a.map(cloneEdge).forEach(fun).forEach(checkEdge);
+    var aCopies = a.map(cloneEdge)
+    aCopies.forEach(fun);
+
+    a.forEach(function(e, i) {
+      checkEdge(e, aCopies[i]);
+    });
+
+    return self;
   };
 
   empty();
