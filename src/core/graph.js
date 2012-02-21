@@ -286,7 +286,108 @@ function Graph() {
     out.length && self.dispatch('outnodes', out);
 
     return self;
-  }
+  };
+
+  function cloneNode(node) {
+    return {
+      'x': node['x'],
+      'y': node['y'],
+      'size': node['size'],
+      'degree': node['degree'],
+      'displayX': node['displayX'],
+      'displayY': node['displayY'],
+      'displaySize': node['displaySize'],
+      'label': node['label'],
+      'id': node['id'],
+      'color': node['color'],
+      'attr': node['attr']
+    };
+  };
+
+  function cloneEdge(edge) {
+    return {
+      'source': edge['source']['id'],
+      'target': edge['target']['id'],
+      'size': edge['size'],
+      'weight': edge['weight'],
+      'displaySize': edge['displaySize'],
+      'label': edge['label'],
+      'id': edge['id'],
+      'attr': edge['attr'],
+      'color': edge['color']
+    };
+  };
+
+  function checkNode(node, copy) {
+    for (var k in copy) {
+      switch (k) {
+        case 'x':
+        case 'y':
+        case 'size':
+          node[k] = +copy[k];
+          break;
+        case 'color':
+        case 'label':
+          node[k] = copy[k].toString();
+          break;
+        default:
+          node['attr'][k] = copy[k];
+      }
+    }
+
+  };
+
+  function checkEdge(edge, copy) {
+    for (var k in copy) {
+      switch (k) {
+        case 'size':
+          edge[k] = +copy[k];
+          break;
+        case 'source':
+        case 'target':
+          edge[k] = self.nodesIndex[k] || edge[k];
+          break;
+        case 'color':
+        case 'type':
+        case 'label':
+          edge[k] = (copy[k] || '').toString();
+          break;
+        default:
+          edge['attr'][k] = copy[k];
+      }
+    }
+
+  };
+
+  function iterNodes(fun, ids) {
+    var a = ids ? ids.map(function(id) {
+      return self.nodesIndex[id];
+    }) : self.nodes;
+
+    var aCopies = a.map(cloneNode);
+    aCopies.forEach(fun);
+
+    a.forEach(function(n, i) {
+      checkNode(n, aCopies[i]);
+    });
+
+    return self;
+  };
+
+  function iterEdges(fun, ids) {
+    var a = ids ? ids.map(function(id) {
+      return self.edgesIndex[id];
+    }) : self.edges;
+
+    var aCopies = a.map(cloneEdge);
+    aCopies.forEach(fun);
+
+    a.forEach(function(e, i) {
+      checkEdge(e, aCopies[i]);
+    });
+
+    return self;
+  };
 
   empty();
 
@@ -294,6 +395,9 @@ function Graph() {
   this.addEdge = addEdge;
   this.dropNode = dropNode;
   this.dropEdge = dropEdge;
+
+  this.iterEdges = iterEdges;
+  this.iterNodes = iterNodes;
 
   this.empty = empty;
   this.rescale = rescale;
