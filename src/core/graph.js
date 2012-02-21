@@ -364,7 +364,7 @@ function Graph() {
       return self.nodesIndex[id];
     }) : self.nodes;
 
-    var aCopies = a.map(cloneNode)
+    var aCopies = a.map(cloneNode);
     aCopies.forEach(fun);
 
     a.forEach(function(n, i) {
@@ -379,7 +379,7 @@ function Graph() {
       return self.edgesIndex[id];
     }) : self.edges;
 
-    var aCopies = a.map(cloneEdge)
+    var aCopies = a.map(cloneEdge);
     aCopies.forEach(fun);
 
     a.forEach(function(e, i) {
