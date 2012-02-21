@@ -4,7 +4,7 @@ CLOSURE=build/compiler.jar
 
 all: clean concat minify-simple
 check:
-	gjslint --nojsdoc -r src/ -x "src/sigmaintro.js,src/sigmaoutro.js,src/intro.js"
+	gjslint --nojsdoc -r src/ -x "src/sigmaintro.js,src/sigmaoutro.js"
 fix:
 	fixjsstyle --nojsdoc -r src/
 clean:

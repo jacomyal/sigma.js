@@ -177,9 +177,9 @@ function MouseCaptor(canvas, graph, id) {
 
   // ADD CALLBACKS
   this.canvas.addEventListener('DOMMouseScroll', wheelHandler, false);
-  this.canvas.addEventListener('mousewheel', wheelHandler);
-  this.canvas.addEventListener('mousemove', moveHandler);
-  this.canvas.addEventListener('mousedown', downHandler);
-  document.addEventListener('mouseup', upHandler);
+  this.canvas.addEventListener('mousewheel', wheelHandler, true);
+  this.canvas.addEventListener('mousemove', moveHandler, true);
+  this.canvas.addEventListener('mousedown', downHandler, true);
+  document.addEventListener('mouseup', upHandler, true);
 }
 
