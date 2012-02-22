@@ -8,10 +8,6 @@
     > Chronos
     > Sigma (especially the tasks)
     > Graph (coherence)
-  - Define nodes / edges iterators
-  - Define nodes / edges interfaces
-  - Merge generators management in chronos,
-    with tasks management
 
 ****   Others   ****
   - Define some typical plugins type that

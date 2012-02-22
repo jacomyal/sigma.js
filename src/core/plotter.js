@@ -105,15 +105,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
 
   function task_drawEdge() {
     var c = self.graph.edges.length;
-    var i = 0;
+    var s, t, i = 0;
 
     while (i++< self.edgesSpeed && self.currentEdgeIndex < c) {
-      if (!self.isOnScreen(
-           self.graph.edges[self.currentEdgeIndex]['source']
-         ) &&
-         !self.isOnScreen(
-           self.graph.edges[self.currentEdgeIndex]['target'])
-         ) {
+      s = self.graph.edges[self.currentEdgeIndex]['source'];
+      t = self.graph.edges[self.currentEdgeIndex]['target'];
+      if (s['hidden'] ||
+          t['hidden'] ||
+          (!self.isOnScreen(s) && !self.isOnScreen(t))) {
         self.currentEdgeIndex++;
       }else {
         drawEdge(self.graph.edges[self.currentEdgeIndex++]);
@@ -331,7 +330,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
       );
     }
 
-    return (node['displayX'] + node['displaySize'] > -self.width / 3) &&
+    return !node['hidden'] &&
+           (node['displayX'] + node['displaySize'] > -self.width / 3) &&
            (node['displayX'] - node['displaySize'] < self.width * 4 / 3) &&
            (node['displayY'] + node['displaySize'] > -self.height / 3) &&
            (node['displayY'] - node['displaySize'] < self.height * 4 / 3);

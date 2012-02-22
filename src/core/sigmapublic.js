@@ -124,6 +124,14 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
+  this.getNodes = function(ids) {
+    return s.graph.getNodes(ids);
+  };
+
+  this.getEdges = function(ids) {
+    return s.graph.getEdges(ids);
+  };
+
   // Monitoring
   this.activateMonitoring = function() {
     return s.monitor.activate();
