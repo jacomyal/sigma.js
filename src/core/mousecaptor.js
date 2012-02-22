@@ -91,12 +91,12 @@ function MouseCaptor(canvas, graph, id) {
   function wheelHandler(event) {
     startZooming(getDelta(event));
 
-    if(self.p['blockScroll']){
+    if (self.p['blockScroll']) {
       if (event.preventDefault) {
         event.preventDefault();
       } else {
         event.returnValue = false;
-      } 
+      }
     }
   };
 
