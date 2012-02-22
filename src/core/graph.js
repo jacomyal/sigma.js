@@ -27,7 +27,9 @@ function Graph() {
     //   Scaling mode:
     //   - 'inside' (default)
     //   - 'outside'
-    scalingMode: 'inside'
+    scalingMode: 'inside',
+    nodesPowRatio: 0.5,
+    edgesPowRatio: 0
   };
 
   /**
@@ -354,18 +356,22 @@ function Graph() {
    * Computes the display x, y and size of each node, relatively to the
    * original values and the borders determined in the parameters, such as
    * each node is in the described area.
-   * @param  {number} w The area width (actually the width of the DOM root).
-   * @param  {number} h The area height (actually the height of the DOM root).
+   * @param  {number} w           The area width (actually the width of the DOM
+   *                              root).
+   * @param  {number} h           The area height (actually the height of the
+   *                              DOM root).
+   * @param  {boolean} parseNodes Indicates if the nodes have to be parsed.
+   * @param  {boolean} parseEdges Indicates if the edges have to be parsed.
    * @return {Graph} Returns itself.
    */
-  function rescale(w, h) {
+  function rescale(w, h, parseNodes, parseEdges) {
     var weightMax = 0, sizeMax = 0;
 
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       sizeMax = Math.max(node['size'], sizeMax);
     });
 
-    self.edges.forEach(function(edge) {
+    parseEdges && self.edges.forEach(function(edge) {
       weightMax = Math.max(edge['size'], weightMax);
     });
 
@@ -374,7 +380,7 @@ function Graph() {
 
     // Recenter the nodes:
     var xMin, xMax, yMin, yMax;
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       xMax = Math.max(node['x'], xMax || node['x']);
       xMin = Math.min(node['x'], xMin || node['x']);
       yMax = Math.max(node['y'], yMax || node['y']);
@@ -413,7 +419,7 @@ function Graph() {
     }
 
     // Rescale the nodes:
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       node['displaySize'] = node['size'] * a + b;
 
       if (!node['fixed']) {
@@ -422,7 +428,7 @@ function Graph() {
       }
     });
 
-    self.edges.forEach(function(edge) {
+    parseEdges && self.edges.forEach(function(edge) {
       edge['displaySize'] = edge['size'] * c + d;
     });
 
@@ -432,24 +438,27 @@ function Graph() {
   /**
    * Translates the display values of the nodes and edges relatively to the
    * scene position and zoom ratio.
-   * @param  {number} sceneX The x position of the scene.
-   * @param  {number} sceneY The y position of the scene.
-   * @param  {number} ratio  The zoom ratio of the scene.
-   * @param  {number} pow    A ratio that is the power used to transform the
-   *                         values. If 1, then the nodes diameter will always
-   *                         be proportional to the zoom ratio.
+   * @param  {number} sceneX      The x position of the scene.
+   * @param  {number} sceneY      The y position of the scene.
+   * @param  {number} ratio       The zoom ratio of the scene.
+   * @param  {boolean} parseNodes Indicates if the nodes have to be parsed.
+   * @param  {boolean} parseEdges Indicates if the edges have to be parsed.
    * @return {Graph} Returns itself.
    */
-  function translate(sceneX, sceneY, ratio, pow) {
-    var sizeRatio = Math.pow(ratio, pow || 1 / 2);
-
-    self.nodes.forEach(function(node) {
+  function translate(sceneX, sceneY, ratio, parseNodes, parseEdges) {
+    var sizeRatio = Math.pow(ratio, self.p.nodesPowRatio);
+    parseNodes && self.nodes.forEach(function(node) {
       if (!node['fixed']) {
         node['displayX'] = node['displayX'] * ratio + sceneX;
         node['displayY'] = node['displayY'] * ratio + sceneY;
       }
 
       node['displaySize'] = node['displaySize'] * sizeRatio;
+    });
+
+    sizeRatio = Math.pow(ratio, self.p.edgesPowRatio);
+    parseEdges && self.edges.forEach(function(edge) {
+      edge['displaySize'] = edge['displaySize'] * sizeRatio;
     });
 
     return self;

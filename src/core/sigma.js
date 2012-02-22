@@ -258,11 +258,19 @@ function Sigma(root, id) {
     clearSchedule();
 
     // Rescale graph:
-    self.graph.rescale(self.width, self.height);
+    self.graph.rescale(
+      self.width,
+      self.height,
+      nodes > 0,
+      edges > 0
+    );
+
     self.graph.translate(
       self.mousecaptor.stageX,
       self.mousecaptor.stageY,
-      self.mousecaptor.ratio
+      self.mousecaptor.ratio,
+      nodes > 0,
+      edges > 0
     );
 
     // Clear scene:

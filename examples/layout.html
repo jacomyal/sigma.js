@@ -106,10 +106,11 @@
             defaultLabelSize: 14,
             defaultLabelBGColor: '#fff',
             defaultLabelHoverColor: '#000',
-            labelThreshold: 7,
+            labelThreshold: 5,
             // Edges
             defaultEdgeType: 'curve'
           }).mouseProperties({
+            maxRatio: 50,
             blockScroll: true
           });
     
@@ -139,7 +140,7 @@
               'x': 1000*Math.random(),
               'y': 1000*Math.random(),
               'label': 'Node number '+i,
-              'size': 1+3*Math.random(),
+              'size': 0.5+2*Math.random(),
               'color': cluster['color'],
               'cluster': cluster['id']
             });
@@ -149,12 +150,12 @@
           for(var i=0;i<E;i++){
             if(Math.random()<1-d){
               s.addEdge('e'+i,'n'+(Math.random()*N|0),'n'+(Math.random()*N|0),{
-                'size': 1.6
+                'size': 0.5
               });
             }else{
               var cluster = clusters[(Math.random()*C)|0], n = cluster.nodes.length;
               s.addEdge('e'+i,cluster.nodes[Math.random()*n|0],cluster.nodes[Math.random()*n|0],{
-                'size': 1.6
+                'size': 0.5
               });
             }
           }
