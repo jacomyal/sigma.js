@@ -13,8 +13,7 @@ function MouseCaptor(canvas, graph, id) {
     zoomDelta: 0.1,
     zoomMultiply: 2,
     directZooming: false,
-    stopScrolling: false,
-    stopDragging: false
+    blockScroll: false
   };
 
   // MOUSE
@@ -69,9 +68,6 @@ function MouseCaptor(canvas, graph, id) {
 
     self.isMouseDown && drag(event);
     self.dispatch('move');
-
-    self.p['stopDragging'] && event.stopPropagation();
-    return self.p['stopDragging'];
   };
 
   function upHandler(event) {
@@ -80,9 +76,6 @@ function MouseCaptor(canvas, graph, id) {
     self.dispatch('mouseup');
 
     stopDrag();
-
-    self.p['stopDragging'] && event.stopPropagation();
-    return self.p['stopDragging'];
   };
 
   function downHandler(event) {
@@ -93,16 +86,18 @@ function MouseCaptor(canvas, graph, id) {
     self.dispatch('mousedown');
 
     startDrag();
-
-    self.p['stopDragging'] && event.stopPropagation();
-    return self.p['stopDragging'];
   };
 
   function wheelHandler(event) {
     startZooming(getDelta(event));
 
-    self.p['stopScrolling'] && event.stopPropagation();
-    return self.p['stopScrolling'];
+    if(self.p['blockScroll']){
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      } 
+    }
   };
 
   // CUSTOM ACTIONS
