@@ -114,6 +114,24 @@ function SigmaPublic(sigmaInstance) {
     return s.graph.edges.length;
   };
 
+  this.iterNodes = function(fun, ids) {
+    s.graph.iterNodes(fun, ids);
+    return self;
+  };
+
+  this.iterEdges = function(fun, ids) {
+    s.graph.iterEdges(fun, ids);
+    return self;
+  };
+
+  this.getNodes = function(ids) {
+    return s.graph.getNodes(ids);
+  };
+
+  this.getEdges = function(ids) {
+    return s.graph.getEdges(ids);
+  };
+
   // Monitoring
   this.activateMonitoring = function() {
     return s.monitor.activate();

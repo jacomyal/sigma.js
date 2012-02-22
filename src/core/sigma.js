@@ -141,9 +141,9 @@ function Sigma(root, id) {
   };
 
   // nodes, edges, labels:
-  // - 0: Don't display them
-  // - 1: Display them (asynchronous)
-  // - 2: Display them (synchronous)
+  // - 0: Don't display
+  // - 1: Display (asynchronous)
+  // - 2: Display (synchronous)
   function draw(nodes, edges, labels, safe) {
     if (safe && sigma.chronos.getGeneratorsIDs().some(function(id) {
       var m = id.match(/_ext_(.*)$/);

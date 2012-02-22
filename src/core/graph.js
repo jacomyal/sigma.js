@@ -25,6 +25,8 @@ function Graph() {
       'y': 0,
       'size': 1,
       'degree': 0,
+      'fixed': false,
+      'hidden': false,
       'displayX': 0,
       'displayY': 0,
       'displaySize': 1,
@@ -40,9 +42,11 @@ function Graph() {
         case 'size':
           n[k] = +params[k];
           break;
-        case 'color':
-          n[k] = params[k];
+        case 'fixed':
+        case 'hidden':
+          n[k] = !!params[k];
           break;
+        case 'color':
         case 'label':
           n[k] = params[k];
           break;
@@ -55,6 +59,53 @@ function Graph() {
     self.nodesIndex[id.toString()] = n;
 
     return self;
+  };
+
+  function cloneNode(node) {
+    return {
+      'x': node['x'],
+      'y': node['y'],
+      'size': node['size'],
+      'degree': node['degree'],
+      'displayX': node['displayX'],
+      'displayY': node['displayY'],
+      'displaySize': node['displaySize'],
+      'label': node['label'],
+      'id': node['id'],
+      'color': node['color'],
+      'fixed': node['fixed'],
+      'hidden': node['hidden'],
+      'attr': node['attr']
+    };
+  };
+
+  function checkNode(node, copy) {
+    for (var k in copy) {
+      switch (k) {
+        case 'id':
+        case 'degree':
+        case 'displayX':
+        case 'displayY':
+        case 'displaySize':
+          break;
+        case 'x':
+        case 'y':
+        case 'size':
+          node[k] = +copy[k];
+          break;
+        case 'fixed':
+        case 'hidden':
+          node[k] = !!copy[k];
+          break;
+        case 'color':
+        case 'label':
+          node[k] = copy[k].toString();
+          break;
+        default:
+          node['attr'][k] = copy[k];
+      }
+    }
+
   };
 
   function dropNode(v) {
@@ -142,6 +193,48 @@ function Graph() {
     self.edgesIndex[id.toString()] = e;
 
     return self;
+  };
+
+  function cloneEdge(edge) {
+    return {
+      'source': edge['source']['id'],
+      'target': edge['target']['id'],
+      'size': edge['size'],
+      'type': edge['type'],
+      'weight': edge['weight'],
+      'displaySize': edge['displaySize'],
+      'label': edge['label'],
+      'id': edge['id'],
+      'attr': edge['attr'],
+      'color': edge['color']
+    };
+  };
+
+  function checkEdge(edge, copy) {
+    for (var k in copy) {
+      switch (k) {
+        case 'id':
+        case 'weight':
+        case 'displaySize':
+          break;
+        case 'size':
+          edge[k] = +copy[k];
+          break;
+        case 'source':
+        case 'target':
+          edge[k] = self.nodesIndex[k] || edge[k];
+          break;
+        case 'color':
+        case 'type':
+        case 'label':
+        case 'type':
+          edge[k] = (copy[k] || '').toString();
+          break;
+        default:
+          edge['attr'][k] = copy[k];
+      }
+    }
+
   };
 
   function dropEdge(v) {
@@ -235,7 +328,7 @@ function Graph() {
     self.nodes.forEach(function(node) {
       node['displaySize'] = node['size'] * a + b;
 
-      if (!node['isFixed']) {
+      if (!node['fixed']) {
         node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
         node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
       }
@@ -252,7 +345,7 @@ function Graph() {
     var sizeRatio = Math.pow(ratio, pow || 1 / 2);
 
     self.nodes.forEach(function(node) {
-      if (!node['isFixed']) {
+      if (!node['fixed']) {
         node['displayX'] = node['displayX'] * ratio + sceneX;
         node['displayY'] = node['displayY'] * ratio + sceneY;
       }
@@ -266,6 +359,11 @@ function Graph() {
   function checkHover(mX, mY) {
     var dX, dY, s, over = [], out = [];
     self.nodes.forEach(function(node) {
+      if (node['hidden']) {
+        node['hover'] = false;
+        return;
+      }
+
       dX = Math.abs(node['displayX'] - mX);
       dY = Math.abs(node['displayY'] - mY);
       s = node['displaySize'];
@@ -276,7 +374,7 @@ function Graph() {
       if (oldH && !newH) {
         node['hover'] = false;
         out.push(node);
-      }else if (newH && !oldH) {
+      } else if (newH && !oldH) {
         node['hover'] = true;
         over.push(node);
       }
@@ -286,7 +384,53 @@ function Graph() {
     out.length && self.dispatch('outnodes', out);
 
     return self;
-  }
+  };
+
+  function iterNodes(fun, ids) {
+    var a = ids ? ids.map(function(id) {
+      return self.nodesIndex[id];
+    }) : self.nodes;
+
+    var aCopies = a.map(cloneNode);
+    aCopies.forEach(fun);
+
+    a.forEach(function(n, i) {
+      checkNode(n, aCopies[i]);
+    });
+
+    return self;
+  };
+
+  function iterEdges(fun, ids) {
+    var a = ids ? ids.map(function(id) {
+      return self.edgesIndex[id];
+    }) : self.edges;
+
+    var aCopies = a.map(cloneEdge);
+    aCopies.forEach(fun);
+
+    a.forEach(function(e, i) {
+      checkEdge(e, aCopies[i]);
+    });
+
+    return self;
+  };
+
+  function getNodes(ids) {
+    var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
+      return cloneNode(self.nodesIndex[id]);
+    });
+
+    return (ids instanceof Array ? a : a[0]);
+  };
+
+  function getEdges(ids) {
+    var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
+      return cloneEdge(self.edgesIndex[id]);
+    });
+
+    return (ids instanceof Array ? a : a[0]);
+  };
 
   empty();
 
@@ -294,6 +438,12 @@ function Graph() {
   this.addEdge = addEdge;
   this.dropNode = dropNode;
   this.dropEdge = dropEdge;
+
+  this.iterEdges = iterEdges;
+  this.iterNodes = iterNodes;
+
+  this.getEdges = getEdges;
+  this.getNodes = getNodes;
 
   this.empty = empty;
   this.rescale = rescale;
