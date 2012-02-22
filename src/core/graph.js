@@ -150,7 +150,8 @@ function Graph() {
 
   /**
    * Deletes one or several nodes from the graph, and the related edges.
-   * @param  {(string|Array.<string>)} v A string ID, or an Array of several IDs.
+   * @param  {(string|Array.<string>)} v A string ID, or an Array of several
+   *                                     IDs.
    * @return {Graph} Returns itself.
    */
   function dropNode(v) {
@@ -308,7 +309,8 @@ function Graph() {
 
   /**
    * Deletes one or several edges from the graph.
-   * @param  {(string|Array.<string>)} v A string ID, or an Array of several IDs.
+   * @param  {(string|Array.<string>)} v A string ID, or an Array of several
+   *                                     IDs.
    * @return {Graph} Returns itself.
    */
   function dropEdge(v) {
