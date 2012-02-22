@@ -438,7 +438,7 @@ sigma.chronos = new (function() {
    * Either set or returns the fpsReq property. This property determines
    * the number of frames that should be inserted per second.
    * @param  {?number} v The frequency asked.
-   * @return {Chronos|number} Returns the frequency if v is undefined, and
+   * @return {(Chronos|number)} Returns the frequency if v is undefined, and
    *                          itself else.
    */
   function frequency(v) {
