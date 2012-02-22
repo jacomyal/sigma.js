@@ -4,8 +4,8 @@
  * @this {Graph}
  */
 function Graph() {
-  sigma.classes.Cascade.call(self);
-  sigma.classes.EventDispatcher.call(self);
+  sigma.classes.Cascade.call(this);
+  sigma.classes.EventDispatcher.call(this);
 
   /**
    * Represents "this", without the well-known scope issue.
