@@ -181,6 +181,8 @@ function Sigma(root, id) {
         self.domElements[k].setAttribute('height', self.height + 'px');
       }
 
+      self.plotter.resize(self.width, self.height);
+
       self.draw(
         self.p.lastNodes,
         self.p.lastEdges,

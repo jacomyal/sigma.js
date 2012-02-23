@@ -1,6 +1,8 @@
 /**
  * The graph data model used in sigma.js.
  * @constructor
+ * @extends sigma.classes.Cascade
+ * @extends sigma.classes.EventDispatcher
  * @this {Graph}
  */
 function Graph() {

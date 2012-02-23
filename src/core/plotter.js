@@ -1,7 +1,38 @@
-function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
+/**
+ * This class draws the graph on the different canvas DOM elements. It just
+ * contains all the different methods to draw the graph, synchronously or
+ * pseudo-asynchronously.
+ * @constructor
+ * @param {CanvasRenderingContext2D} nodesCtx  Context dedicated to draw nodes.
+ * @param {CanvasRenderingContext2D} edgesCtx  Context dedicated to draw edges.
+ * @param {CanvasRenderingContext2D} labelsCtx Context dedicated to draw
+ *                                             labels.
+ * @param {CanvasRenderingContext2D} hoverCtx  Context dedicated to draw hover
+ *                                             nodes labels.
+ * @param {Graph} graph                        A reference to the graph to
+ *                                             draw.
+ * @param {number} w                           The width of the DOM root
+ *                                             element.
+ * @param {number} h                           The width of the DOM root
+ *                                             element.
+ * @extends sigma.classes.Cascade
+ * @this {Plotter}
+ */
+function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   sigma.classes.Cascade.call(this);
+
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {Plotter}
+   */
   var self = this;
 
+  /**
+   * The different parameters that define how this instance should work.
+   * @see sigma.classes.Cascade
+   * @type {Object}
+   */
   this.p = {
     // -------
     // LABELS:
@@ -66,95 +97,159 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     //              will be used instead)
     borderSize: 0,
     nodeBorderColor: 'node',
-    defaultNodeBorderColor: '#fff'
+    defaultNodeBorderColor: '#fff',
+    // --------
+    // PROCESS:
+    // --------
+    edgesSpeed: 200,
+    nodesSpeed: 200,
+    labelsSpeed: 200
   };
 
-  for (var k in params) {
-    if (this.params[k] != undefined) {
-      this.params[k] = params[k];
-    }
-  }
+  /**
+   * The canvas context dedicated to draw the nodes.
+   * @type {CanvasRenderingContext2D}
+   */
+  var nodesCtx = nodesCtx;
 
-  this.nodesCtx = nodesCtx;
-  this.edgesCtx = edgesCtx;
-  this.labelsCtx = labelsCtx;
-  this.hoverCtx = hoverCtx;
+  /**
+   * The canvas context dedicated to draw the edges.
+   * @type {CanvasRenderingContext2D}
+   */
+  var edgesCtx = edgesCtx;
 
-  // ImageData for caching nodes and labels:
-  this.cacheNodes = {};
-  this.cacheLabels = {};
+  /**
+   * The canvas context dedicated to draw the labels.
+   * @type {CanvasRenderingContext2D}
+   */
+  var labelsCtx = labelsCtx;
 
-  this.dataNodes = {};
-  this.dataLabels = {};
+  /**
+   * The canvas context dedicated to draw the hover nodes.
+   * @type {CanvasRenderingContext2D}
+   */
+  var hoverCtx = hoverCtx;
 
-  this.cacheCanvas = document.createElement('canvas');
-  this.cacheCanvas.width = '100px';
-  this.cacheCanvas.height = '100px';
+  /**
+   * A reference to the graph to draw.
+   * @type {Graph}
+   */
+  var graph = graph;
 
-  this.graph = graph;
-  this.width = w;
-  this.height = h;
+  /**
+   * The width of the stage to draw on.
+   * @type {number}
+   */
+  var width = w;
 
+  /**
+   * The height of the stage to draw on.
+   * @type {number}
+   */
+  var height = h;
+
+  /**
+   * The index of the next edge to draw.
+   * @type {number}
+   */
   this.currentEdgeIndex = 0;
+
+  /**
+   * The index of the next node to draw.
+   * @type {number}
+   */
   this.currentNodeIndex = 0;
+
+  /**
+   * The index of the next label to draw.
+   * @type {number}
+   */
   this.currentLabelIndex = 0;
 
-  this.edgesSpeed = 200;
-  this.nodesSpeed = 200;
-  this.labelsSpeed = 200;
-
+  /**
+   * An atomic function to drawn the N next edges, with N as edgesSpeed.
+   * The counter is {@link this.currentEdgeIndex}.
+   * This function has been designed to work with {@link sigma.chronos}, that
+   * will insert frames at the middle of the calls, to make the edges drawing
+   * process fluid for the user.
+   * @see sigma.chronos
+   * @return {boolean} Returns true if all the edges are drawn and false else.
+   */
   function task_drawEdge() {
-    var c = self.graph.edges.length;
+    var c = graph.edges.length;
     var s, t, i = 0;
 
-    while (i++< self.edgesSpeed && self.currentEdgeIndex < c) {
-      s = self.graph.edges[self.currentEdgeIndex]['source'];
-      t = self.graph.edges[self.currentEdgeIndex]['target'];
+    while (i++< self.p.edgesSpeed && self.currentEdgeIndex < c) {
+      s = graph.edges[self.currentEdgeIndex]['source'];
+      t = graph.edges[self.currentEdgeIndex]['target'];
       if (s['hidden'] ||
           t['hidden'] ||
           (!self.isOnScreen(s) && !self.isOnScreen(t))) {
         self.currentEdgeIndex++;
       }else {
-        drawEdge(self.graph.edges[self.currentEdgeIndex++]);
+        drawEdge(graph.edges[self.currentEdgeIndex++]);
       }
     }
 
     return self.currentEdgeIndex < c;
   };
 
+  /**
+   * An atomic function to drawn the N next nodes, with N as nodesSpeed.
+   * The counter is {@link this.currentEdgeIndex}.
+   * This function has been designed to work with {@link sigma.chronos}, that
+   * will insert frames at the middle of the calls, to make the nodes drawing
+   * process fluid for the user.
+   * @see sigma.chronos
+   * @return {boolean} Returns true if all the nodes are drawn and false else.
+   */
   function task_drawNode() {
-    var c = self.graph.nodes.length;
+    var c = graph.nodes.length;
     var i = 0;
 
-    while (i++< self.nodesSpeed && self.currentNodeIndex < c) {
-      if (!self.isOnScreen(self.graph.nodes[self.currentNodeIndex])) {
+    while (i++< self.p.nodesSpeed && self.currentNodeIndex < c) {
+      if (!self.isOnScreen(graph.nodes[self.currentNodeIndex])) {
         self.currentNodeIndex++;
       }else {
-        drawNode(self.graph.nodes[self.currentNodeIndex++]);
+        drawNode(graph.nodes[self.currentNodeIndex++]);
       }
     }
 
     return self.currentNodeIndex < c;
   };
 
+  /**
+   * An atomic function to drawn the N next labels, with N as labelsSpeed.
+   * The counter is {@link this.currentEdgeIndex}.
+   * This function has been designed to work with {@link sigma.chronos}, that
+   * will insert frames at the middle of the calls, to make the labels drawing
+   * process fluid for the user.
+   * @see sigma.chronos
+   * @return {boolean} Returns true if all the labels are drawn and false else.
+   */
   function task_drawLabel() {
-    var c = self.graph.nodes.length;
+    var c = graph.nodes.length;
     var i = 0;
 
-    while (i++< self.labelsSpeed && self.currentLabelIndex < c) {
-      if (!self.isOnScreen(self.graph.nodes[self.currentLabelIndex])) {
+    while (i++< self.p.labelsSpeed && self.currentLabelIndex < c) {
+      if (!self.isOnScreen(graph.nodes[self.currentLabelIndex])) {
         self.currentLabelIndex++;
       }else {
-        drawLabel(self.graph.nodes[self.currentLabelIndex++]);
+        drawLabel(graph.nodes[self.currentLabelIndex++]);
       }
     }
 
     return self.currentLabelIndex < c;
   };
 
+  /**
+   * Draws one node to the corresponding canvas.
+   * @param  {Object} node The node to draw.
+   * @return {Plotter} Returns itself.
+   */
   function drawNode(node) {
     var size = Math.round(node['displaySize'] * 10) / 10;
-    var ctx = self.nodesCtx;
+    var ctx = nodesCtx;
 
     ctx.fillStyle = node['color'];
     ctx.beginPath();
@@ -169,8 +264,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     ctx.fill();
 
     node['hover'] && drawHoverNode(node);
+    return self;
   };
 
+  /**
+   * Draws one edge to the corresponding canvas.
+   * @param  {Object} edge The edge to draw.
+   * @return {Plotter} Returns itself.
+   */
   function drawEdge(edge) {
     var x1 = edge['source']['displayX'];
     var y1 = edge['source']['displayY'];
@@ -194,7 +295,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
       }
     }
 
-    var ctx = self.edgesCtx;
+    var ctx = edgesCtx;
 
     switch (edge['type'] || self.p.defaultEdgeType) {
       case 'curve':
@@ -219,10 +320,17 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
         ctx.stroke();
         break;
     }
+
+    return self;
   };
 
+  /**
+   * Draws one label to the corresponding canvas.
+   * @param  {Object} node The label to draw.
+   * @return {Plotter} Returns itself.
+   */
   function drawLabel(node) {
-    var ctx = self.labelsCtx;
+    var ctx = labelsCtx;
 
     if (node['displaySize'] >= self.p.labelThreshold) {
       var fontSize = self.p.labelSize == 'fixed' ?
@@ -236,14 +344,21 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
                       self.p.defaultLabelColor;
       ctx.fillText(
         node['label'],
-        node['displayX'] + node['displaySize'] * 1.5,
-        node['displayY'] + fontSize / 2 - 3
+        Math.round(node['displayX'] + node['displaySize'] * 1.5),
+        Math.round(node['displayY'] + fontSize / 2 - 3)
       );
     }
+
+    return self;
   };
 
+  /**
+   * Draws one hover node to the corresponding canvas.
+   * @param  {Object} node The hover node to draw.
+   * @return {Plotter} Returns itself.
+   */
   function drawHoverNode(node) {
-    var ctx = self.hoverCtx;
+    var ctx = hoverCtx;
 
     var fontSize = self.p.labelSize == 'fixed' ?
                    self.p.defaultLabelSize :
@@ -321,8 +436,18 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
       Math.round(node['displayX'] + node['displaySize'] * 1.5),
       Math.round(node['displayY'] + fontSize / 2 - 3)
     );
+
+    return self;
   };
 
+  /**
+   * Determines if a node is on the screen or not. The limits here are
+   * bigger than the actual screen, to avoid seeing labels disappear during
+   * the graph manipulation.
+   * @param  {Object}  node The node to check if it is on or out the screen.
+   * @return {boolean} Returns false if the node is hidden or not on the screen
+   *                   or true else.
+   */
   function isOnScreen(node) {
     if (isNaN(node['x']) || isNaN(node['y'])) {
       throw (new Error('A node\'s coordinate is not a ' +
@@ -331,21 +456,30 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     }
 
     return !node['hidden'] &&
-           (node['displayX'] + node['displaySize'] > -self.width / 3) &&
-           (node['displayX'] - node['displaySize'] < self.width * 4 / 3) &&
-           (node['displayY'] + node['displaySize'] > -self.height / 3) &&
-           (node['displayY'] - node['displaySize'] < self.height * 4 / 3);
+           (node['displayX'] + node['displaySize'] > -width / 3) &&
+           (node['displayX'] - node['displaySize'] < width * 4 / 3) &&
+           (node['displayY'] + node['displaySize'] > -height / 3) &&
+           (node['displayY'] - node['displaySize'] < height * 4 / 3);
   };
 
-  function applyDrawing() {
+  /**
+   * Resizes this instance.
+   * @param  {number} w The new width.
+   * @param  {number} h The new height.
+   * @return {Plotter} Returns itself.
+   */
+  function resize(w, h) {
+    width = w;
+    height = h;
 
+    return self;
   }
 
   this.task_drawLabel = task_drawLabel;
   this.task_drawEdge = task_drawEdge;
   this.task_drawNode = task_drawNode;
   this.drawHoverNode = drawHoverNode;
-  this.applyDrawing = applyDrawing;
   this.isOnScreen = isOnScreen;
+  this.resize = resize;
 }
 

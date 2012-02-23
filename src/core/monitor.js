@@ -1,6 +1,8 @@
 /**
  * A class to monitor some local / global probes directly on an instance,
  * inside a div DOM element.
+ * It executes different methods (called "probes") regularly, and displays
+ * the results on the element.
  * @constructor
  * @extends sigma.classes.Cascade
  * @param {Sigma} instance The instance to monitor.
@@ -30,7 +32,8 @@ function Monitor(instance, dom) {
   this.monitoring = false;
 
   /**
-   * The different parameters that define how this instance should work.
+   * The different parameters that define how this instance should work. It
+   * also contains the different probes.
    * @see sigma.classes.Cascade
    * @type {Object}
    */
