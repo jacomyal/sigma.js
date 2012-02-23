@@ -1,10 +1,22 @@
 /**
  * sigma.js custom event dispatcher class.
  * @constructor
- * @this {EventDispatcher}
+ * @this {sigma.classes.EventDispatcher}
  */
 sigma.classes.EventDispatcher = function() {
+  /**
+   * An object containing all the different handlers bound to one or many
+   * events, indexed by these events.
+   * @private
+   * @type {Object.<string,Object>}
+   */
   var _h = {};
+
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {sigma.classes.EventDispatcher}
+   */
   var _self = this;
 
   /**
@@ -13,7 +25,7 @@ sigma.classes.EventDispatcher = function() {
    * @param  {string} events            The name of the event (or the events
    *                                    separated by spaces).
    * @param  {function(Object)} handler The handler to bind.
-   * @return {EventDispatcher} Returns itself.
+   * @return {sigma.classes.EventDispatcher} Returns itself.
    */
   function one(events, handler) {
     if (!handler || !events) {
@@ -42,7 +54,7 @@ sigma.classes.EventDispatcher = function() {
    * @param  {string} events            The name of the event (or the events
    *                                    separated by spaces).
    * @param  {function(Object)} handler The handler to bind.
-   * @return {EventDispatcher} Returns itself.
+   * @return {sigma.classes.EventDispatcher} Returns itself.
    */
   function bind(events, handler) {
     if (!handler || !events) {
@@ -73,7 +85,7 @@ sigma.classes.EventDispatcher = function() {
    * @param  {?function(Object)} handler The handler to unbind. If undefined,
    *                                     each handler bound to the event or the
    *                                     events will be unbound.
-   * @return {EventDispatcher} Returns itself.
+   * @return {sigma.classes.EventDispatcher} Returns itself.
    */
   function unbind(events, handler) {
     if (!events) {
@@ -107,7 +119,7 @@ sigma.classes.EventDispatcher = function() {
    * Executes each handler bound to the event
    * @param  {string} type     The type of the event.
    * @param  {?Object} content The content of the event (optional).
-   * @return {EventDispatcher} Returns itself.
+   * @return {sigma.classes.EventDispatcher} Returns itself.
    */
   function dispatch(type, content) {
     if (_h[type]) {

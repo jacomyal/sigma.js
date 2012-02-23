@@ -2,9 +2,11 @@
  * Sigma is the main class. It represents the core of any instance id sigma.js.
  * It is private and can be initialized only from inside sigma.js. To see its
  * public interface, see {@link SigmaPublic}.
- * It owns its own {@link Graph}, {@link MouseCaptor}, {@link Plotter} and
- * {@link Monitor}.
+ * It owns its own {@link Graph}, {@link MouseCaptor}, {@link Plotter}
+ * and {@link Monitor}.
  * @constructor
+ * @extends sigma.classes.Cascade
+ * @extends sigma.classes.EventDispatcher
  * @param {element} root The DOM root of this instance (a div, for example).
  * @param {string} id    The ID of this instance.
  * @this {Sigma}
@@ -16,7 +18,7 @@ function Sigma(root, id) {
   /**
    * Represents "this", without the well-known scope issue.
    * @private
-   * @type {Chronos}
+   * @type {sigma.chronos}
    */
   var self = this;
 
@@ -28,6 +30,7 @@ function Sigma(root, id) {
 
   /**
    * The different parameters that define how this instance should work.
+   * @see sigma.classes.Cascade
    * @type {Object}
    */
   this.p = {

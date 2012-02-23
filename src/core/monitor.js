@@ -1,10 +1,39 @@
+/**
+ * A class to monitor some local / global probes directly on an instance,
+ * inside a div DOM element.
+ * @constructor
+ * @extends sigma.classes.Cascade
+ * @param {Sigma} instance The instance to monitor.
+ * @param {element} dom    The div DOM element to draw write on.
+ * @this {Monitor}
+ */
 function Monitor(instance, dom) {
-  var self = this;
   sigma.classes.Cascade.call(this);
 
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {Monitor}
+   */
+  var self = this;
+
+  /**
+   * {@link Sigma} instance owning this Monitor instance.
+   * @type {Sigma}
+   */
   this.instance = instance;
+
+  /**
+   * Determines if the monitoring is activated or not.
+   * @type {Boolean}
+   */
   this.monitoring = false;
 
+  /**
+   * The different parameters that define how this instance should work.
+   * @see sigma.classes.Cascade
+   * @type {Object}
+   */
   this.p = {
     fps: 40,
     dom: dom,
@@ -20,6 +49,12 @@ function Monitor(instance, dom) {
     }
   };
 
+  /**
+   * Activates the monitoring: Some texts describing some values about sigma.js
+   * or the owning {@link Sigma} instance will appear over the graph, but
+   * beneath the mouse sensible DOM element.
+   * @return {Monitor} Returns itself.
+   */
   function activate() {
     if (!self.monitoring) {
       self.monitoring = window.setInterval(routine, 1000 / self.p.fps);
@@ -28,6 +63,11 @@ function Monitor(instance, dom) {
     return self;
   }
 
+  /**
+   * Desactivates the monitoring: Will disappear, and stop computing the
+   * different probes.
+   * @return {Monitor} Returns itself.
+   */
   function desactivate() {
     if (self.monitoring) {
       window.clearInterval(self.monitoring);
@@ -39,6 +79,11 @@ function Monitor(instance, dom) {
     return self;
   }
 
+  /**
+   * The private method dedicated to compute the different values to observe.
+   * @private
+   * @return {Monitor} Returns itself.
+   */
   function routine() {
     var s = '';
 

@@ -267,13 +267,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
 
     sigma.tools.drawRoundRect(
       ctx,
-      node['displayX'] - fontSize / 2 - 2,
-      node['displayY'] - fontSize / 2 - 2,
-      ctx.measureText(node['label']).width +
+      Math.round(node['displayX'] - fontSize / 2 - 2),
+      Math.round(node['displayY'] - fontSize / 2 - 2),
+      Math.round(ctx.measureText(node['label']).width +
         node['displaySize'] * 1.5 +
-        fontSize / 2 + 4,
-      fontSize + 4,
-      fontSize / 2 + 2,
+        fontSize / 2 + 4),
+      Math.round(fontSize + 4),
+      Math.round(fontSize / 2 + 2),
       'left'
     );
     ctx.closePath();
@@ -288,8 +288,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
-    ctx.arc(node['displayX'],
-            node['displayY'],
+    ctx.arc(Math.round(node['displayX']),
+            Math.round(node['displayY']),
             node['displaySize'] + self.p.borderSize,
             0,
             Math.PI * 2,
@@ -302,8 +302,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
     ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeHoverColor;
-    ctx.arc(node['displayX'],
-            node['displayY'],
+    ctx.arc(Math.round(node['displayX']),
+            Math.round(node['displayY']),
             node['displaySize'],
             0,
             Math.PI * 2,
@@ -318,8 +318,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h, params) {
                     self.p.defaultLabelHoverColor;
     ctx.fillText(
       node['label'],
-      node['displayX'] + node['displaySize'] * 1.5,
-      node['displayY'] + fontSize / 2 - 3
+      Math.round(node['displayX'] + node['displaySize'] * 1.5),
+      Math.round(node['displayY'] + fontSize / 2 - 3)
     );
   };
 
