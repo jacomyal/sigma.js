@@ -1,9 +1,9 @@
 ****   Bugs   ****
 
 ****   Core   ****
-  - Caching nodes 
-  - Caching labels
-  - Documentation
+  - Caching nodes                           - Next version
+  - Caching labels                          - Next version
+  - Documentation                           - Already started (main classes)
   - Testing for the following classes:
     > Chronos
     > Sigma (especially the tasks)
@@ -13,4 +13,10 @@
   - Define some typical plugins type that
     would directly modify the public API
     > Update architecture in consequences
-  - Implement multitouch features
+  - Implement multitouch features           - Next version
+  - Improve Makefile
+    > Propose to download closure.jar if
+      not found
+    > Propose to install gjslint and
+      fixjsstyle if not found
+    > mkdir ./build if not found
