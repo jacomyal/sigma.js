@@ -1,93 +1,172 @@
-function MouseCaptor(canvas, graph, id) {
-  var self = this;
+/**
+ * Thie class listen to all the different mouse events, to normalize them and
+ * dispatch action events instead (from "startzooming" to "isdragging", etc).
+ * @constructor
+ * @extends sigma.classes.Cascade
+ * @extends sigma.classes.EventDispatcher
+ * @param {element} dom The DOM element to bind the handlers on.
+ * @this {MouseCaptor}
+ */
+function MouseCaptor(dom) {
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
-  this.canvas = canvas;
-  this.graph = graph;
-  this.id = id;
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {MouseCaptor}
+   */
+  var self = this;
 
+  /**
+   * The DOM element to bind the handlers on.
+   * @type {element}
+   */
+  var dom = dom;
+
+  /**
+   * The different parameters that define how this instance should work.
+   * @see sigma.classes.Cascade
+   * @type {Object}
+   */
   this.p = {
     minRatio: 1,
     maxRatio: 32,
     zoomDelta: 0.1,
     zoomMultiply: 2,
     directZooming: false,
-    blockScroll: false
+    blockScroll: true
   };
 
-  // MOUSE
-  this.mouseX = 0;
-  this.mouseY = 0;
-  this.oldMouseX = 0;
-  this.oldMouseY = 0;
-  this.startX = 0;
-  this.startY = 0;
+  var oldMouseX = 0;
+  var oldMouseY = 0;
+  var startX = 0;
+  var startY = 0;
 
-  this.isMouseDown = false;
+  var oldStageX = 0;
+  var oldStageY = 0;
+  var oldRatio = 1;
+  var targetRatio = 1;
 
-  // SCENE
-  this.oldStageX = 0;
-  this.oldStageY = 0;
-  this.oldRatio = 1;
+  var progress = 0;
+
   this.stageX = 0;
   this.stageY = 0;
   this.ratio = 1;
 
-  this.targetStageX = 0;
-  this.targetStageY = 0;
-  this.targetRatio = 1;
+  this.mouseX = 0;
+  this.mouseY = 0;
 
-  this.progress = 0;
+  this.isMouseDown = false;
 
-  // UTILS
+  /**
+   * Extract the local X position from a mouse event.
+   * @private
+   * @param  {event} e A mouse event.
+   * @return {number} The local X value of the mouse.
+   */
   function getX(e) {
     return e.offsetX != undefined && e.offsetX ||
            e.layerX != undefined && e.layerX ||
            e.clientX != undefined && e.clientX;
   };
 
+  /**
+   * Extract the local Y position from a mouse event.
+   * @private
+   * @param  {event} e A mouse event.
+   * @return {number} The local Y value of the mouse.
+   */
   function getY(e) {
     return e.offsetY != undefined && e.offsetY ||
            e.layerY != undefined && e.layerY ||
            e.clientY != undefined && e.clientY;
   };
 
+  /**
+   * Extract the wheel delta from a mouse event.
+   * @private
+   * @param  {event} e A mouse event.
+   * @return {number} The wheel delta of the mouse.
+   */
   function getDelta(e) {
     return e.wheelDelta != undefined && e.wheelDelta ||
            e.detail != undefined && -e.detail;
   };
 
-  // CALLBACKS
+  /**
+   * The handler listening to the 'move' mouse event. It will set the mouseX
+   * and mouseY values as the mouse position values, prevent the default event,
+   * and dispatch a 'move' event.
+   * @private
+   * @param  {event} event A 'move' mouse event.
+   */
   function moveHandler(event) {
-    self.oldMouseX = self.mouseX;
-    self.oldMouseY = self.mouseY;
+    oldMouseX = self.mouseX;
+    oldMouseY = self.mouseY;
 
     self.mouseX = getX(event);
     self.mouseY = getY(event);
 
     self.isMouseDown && drag(event);
     self.dispatch('move');
+
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else {
+      event.returnValue = false;
+    }
   };
 
+  /**
+   * The handler listening to the 'up' mouse event. It will set the isMouseDown
+   * value as false, dispatch a 'mouseup' event, and trigger stopDrag().
+   * @private
+   * @param  {event} event A 'up' mouse event.
+   */
   function upHandler(event) {
     self.isMouseDown = false;
 
     self.dispatch('mouseup');
 
     stopDrag();
+
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else {
+      event.returnValue = false;
+    }
   };
 
+  /**
+   * The handler listening to the 'down' mouse event. It will set the
+   * isMouseDown value as true, dispatch a 'mousedown' event, and trigger
+   * startDrag().
+   * @private
+   * @param  {event} event A 'down' mouse event.
+   */
   function downHandler(event) {
     self.isMouseDown = true;
-    self.oldMouseX = self.mouseX;
-    self.oldMouseY = self.mouseY;
+    oldMouseX = self.mouseX;
+    oldMouseY = self.mouseY;
 
     self.dispatch('mousedown');
 
     startDrag();
+
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else {
+      event.returnValue = false;
+    }
   };
 
+  /**
+   * The handler listening to the 'wheel' mouse event. It will trigger
+   * startZooming() with the event delta as parameter.
+   * @private
+   * @param  {event} event A 'down' mouse event.
+   */
   function wheelHandler(event) {
     startZooming(getDelta(event));
 
@@ -100,24 +179,23 @@ function MouseCaptor(canvas, graph, id) {
     }
   };
 
-  // CUSTOM ACTIONS
   function startDrag() {
-    self.oldStageX = self.stageX;
-    self.oldStageY = self.stageY;
-    self.startX = self.mouseX;
-    self.startY = self.mouseY;
+    oldStageX = self.stageX;
+    oldStageY = self.stageY;
+    startX = self.mouseX;
+    startY = self.mouseY;
     self.dispatch('startdrag');
   };
 
   function stopDrag() {
-    if (self.oldStageX != self.stageX || self.oldStageY != self.stageY) {
+    if (oldStageX != self.stageX || oldStageY != self.stageY) {
       self.dispatch('stopdrag');
     }
   };
 
   function drag() {
-    self.stageX = self.mouseX - self.startX + self.oldStageX;
-    self.stageY = self.mouseY - self.startY + self.oldStageY;
+    self.stageX = self.mouseX - startX + oldStageX;
+    self.stageY = self.mouseY - startY + oldStageY;
 
     self.dispatch('drag');
   };
@@ -129,17 +207,17 @@ function MouseCaptor(canvas, graph, id) {
 
     window.clearInterval(self.zoomID);
 
-    self.oldRatio = self.ratio;
-    self.targetRatio = self.ratio * (delta > 0 ?
+    oldRatio = self.ratio;
+    targetRatio = self.ratio * (delta > 0 ?
                        self.p.zoomMultiply :
                        1 / self.p.zoomMultiply);
-    self.targetRatio = Math.min(
-      Math.max(self.targetRatio, self.p.minRatio),
+    targetRatio = Math.min(
+      Math.max(targetRatio, self.p.minRatio),
       self.p.maxRatio
     );
-    self.progress = self.p.directZooming ? 1 - self.p.zoomDelta : 0;
+    progress = self.p.directZooming ? 1 - self.p.zoomDelta : 0;
 
-    if (self.ratio != self.targetRatio) {
+    if (self.ratio != targetRatio) {
       zooming();
       self.zoomID = window.setInterval(zooming, 50);
       self.dispatch('startzooming');
@@ -149,7 +227,7 @@ function MouseCaptor(canvas, graph, id) {
   function stopZooming() {
     var oldRatio = self.ratio;
 
-    self.ratio = self.targetRatio;
+    self.ratio = targetRatio;
     self.stageX = self.mouseX +
                   (self.stageX - self.mouseX) *
                   self.ratio /
@@ -163,11 +241,11 @@ function MouseCaptor(canvas, graph, id) {
   };
 
   function zooming() {
-    self.progress += self.p.zoomDelta;
-    var k = sigma.easing.quadratic.easeout(self.progress);
+    progress += self.p.zoomDelta;
+    var k = sigma.easing.quadratic.easeout(progress);
     var oldRatio = self.ratio;
 
-    self.ratio = self.oldRatio * (1 - k) + self.targetRatio * k;
+    self.ratio = oldRatio * (1 - k) + targetRatio * k;
     self.stageX = self.mouseX +
                   (self.stageX - self.mouseX) *
                   self.ratio /
@@ -178,17 +256,17 @@ function MouseCaptor(canvas, graph, id) {
                   oldRatio;
 
     self.dispatch('zooming');
-    if (self.progress > 1) {
+    if (progress > 1) {
       window.clearInterval(self.zoomID);
       stopZooming();
     }
   };
 
   // ADD CALLBACKS
-  this.canvas.addEventListener('DOMMouseScroll', wheelHandler, true);
-  this.canvas.addEventListener('mousewheel', wheelHandler, true);
-  this.canvas.addEventListener('mousemove', moveHandler, true);
-  this.canvas.addEventListener('mousedown', downHandler, true);
+  dom.addEventListener('DOMMouseScroll', wheelHandler, true);
+  dom.addEventListener('mousewheel', wheelHandler, true);
+  dom.addEventListener('mousemove', moveHandler, true);
+  dom.addEventListener('mousedown', downHandler, true);
   document.addEventListener('mouseup', upHandler, true);
 }
 

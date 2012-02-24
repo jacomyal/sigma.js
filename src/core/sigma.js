@@ -112,7 +112,6 @@ function Sigma(root, id) {
    */
   this.mousecaptor = new MouseCaptor(
     this.domElements.mouse,
-    this.graph,
     this.id
   );
 
