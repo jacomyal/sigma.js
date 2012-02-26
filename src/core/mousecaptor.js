@@ -163,9 +163,9 @@ function MouseCaptor(dom) {
 
   /**
    * The handler listening to the 'wheel' mouse event. It will trigger
-   * startZooming() with the event delta as parameter.
+   * {@link startZooming} with the event delta as parameter.
    * @private
-   * @param  {event} event A 'down' mouse event.
+   * @param  {event} event A 'wheel' mouse event.
    */
   function wheelHandler(event) {
     startZooming(getDelta(event));
@@ -179,6 +179,10 @@ function MouseCaptor(dom) {
     }
   };
 
+  /**
+   * Will start computing the scene X and Y, until {@link stopDrag} is
+   * triggered.
+   */
   function startDrag() {
     oldStageX = self.stageX;
     oldStageY = self.stageY;
@@ -187,12 +191,19 @@ function MouseCaptor(dom) {
     self.dispatch('startdrag');
   };
 
+  /**
+   * Stops computing the scene position.
+   */
   function stopDrag() {
     if (oldStageX != self.stageX || oldStageY != self.stageY) {
       self.dispatch('stopdrag');
     }
   };
 
+  /**
+   * Computes the position of the scene, relatively to the mouse position, and
+   * dispatches a "drag" event.
+   */
   function drag() {
     self.stageX = self.mouseX - startX + oldStageX;
     self.stageY = self.mouseY - startY + oldStageY;
@@ -200,6 +211,12 @@ function MouseCaptor(dom) {
     self.dispatch('drag');
   };
 
+  /**
+   * Will start computing the scene zoom ratio, until {@link stopZooming} is
+   * triggered.
+   * @param {number} delta The delta from the mouse event that triggered the
+   *                       zoom.
+   */
   function startZooming(delta) {
     if (self.isMouseDown) {
       return;
@@ -224,6 +241,9 @@ function MouseCaptor(dom) {
     }
   };
 
+  /**
+   * Stops computing the scene zooming ratio.
+   */
   function stopZooming() {
     var oldRatio = self.ratio;
 
@@ -240,6 +260,10 @@ function MouseCaptor(dom) {
     self.dispatch('stopzooming');
   };
 
+  /**
+   * Computes the zooming ratio of the scene, relatively to the last mouse
+   * event delta received, and dispatches a "zooming" event.
+   */
   function zooming() {
     progress += self.p.zoomDelta;
     var k = sigma.easing.quadratic.easeout(progress);
