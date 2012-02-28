@@ -64,6 +64,8 @@ function Graph() {
 
     for (var k in params) {
       switch (k) {
+        case 'id':
+          break;
         case 'x':
         case 'y':
         case 'size':
@@ -231,6 +233,10 @@ function Graph() {
 
     for (var k in params) {
       switch (k) {
+        case 'id':
+        case 'source':
+        case 'target':
+          break;
         case 'size':
           e[k] = +params[k];
           break;
@@ -390,10 +396,10 @@ function Graph() {
     });
 
     var scale = self.p.scalingMode == 'outside' ?
-                Math.max(0.95 * w / (xMax - xMin),
-                         0.95 * h / (yMax - yMin)) :
-                Math.min(0.95 * w / (xMax - xMin),
-                         0.95 * h / (yMax - yMin));
+                Math.max(0.95 * w / Math.max(xMax - xMin, 1),
+                         0.95 * h / Math.max(yMax - yMin, 1)) :
+                Math.min(0.95 * w / Math.max(xMax - xMin, 1),
+                         0.95 * h / Math.max(yMax - yMin, 1));
 
     // Size homothetic parameters:
     var a, b;
