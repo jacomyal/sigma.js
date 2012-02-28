@@ -1,5 +1,5 @@
 /**
- * Thie class listen to all the different mouse events, to normalize them and
+ * This class listen to all the different mouse events, to normalize them and
  * dispatch action events instead (from "startzooming" to "isdragging", etc).
  * @constructor
  * @extends sigma.classes.Cascade
@@ -35,7 +35,8 @@ function MouseCaptor(dom) {
     zoomDelta: 0.1,
     zoomMultiply: 2,
     directZooming: false,
-    blockScroll: true
+    blockScroll: true,
+    mouseEnabled: true
   };
 
   var oldMouseX = 0;
@@ -125,16 +126,16 @@ function MouseCaptor(dom) {
    * @param  {event} event A 'up' mouse event.
    */
   function upHandler(event) {
-    self.isMouseDown = false;
+    if (self.p.mouseEnabled) {
+      self.isMouseDown = false;
+      self.dispatch('mouseup');
+      stopDrag();
 
-    self.dispatch('mouseup');
-
-    stopDrag();
-
-    if (event.preventDefault) {
-      event.preventDefault();
-    } else {
-      event.returnValue = false;
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
     }
   };
 
@@ -146,18 +147,20 @@ function MouseCaptor(dom) {
    * @param  {event} event A 'down' mouse event.
    */
   function downHandler(event) {
-    self.isMouseDown = true;
-    oldMouseX = self.mouseX;
-    oldMouseY = self.mouseY;
+    if (self.p.mouseEnabled) {
+      self.isMouseDown = true;
+      oldMouseX = self.mouseX;
+      oldMouseY = self.mouseY;
 
-    self.dispatch('mousedown');
+      self.dispatch('mousedown');
 
-    startDrag();
+      startDrag();
 
-    if (event.preventDefault) {
-      event.preventDefault();
-    } else {
-      event.returnValue = false;
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
     }
   };
 
@@ -168,13 +171,15 @@ function MouseCaptor(dom) {
    * @param  {event} event A 'wheel' mouse event.
    */
   function wheelHandler(event) {
-    startZooming(getDelta(event));
+    if (self.p.mouseEnabled) {
+      startZooming(getDelta(event));
 
-    if (self.p['blockScroll']) {
-      if (event.preventDefault) {
-        event.preventDefault();
-      } else {
-        event.returnValue = false;
+      if (self.p['blockScroll']) {
+        if (event.preventDefault) {
+          event.preventDefault();
+        } else {
+          event.returnValue = false;
+        }
       }
     }
   };
