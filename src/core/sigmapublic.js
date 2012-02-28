@@ -101,6 +101,28 @@ function SigmaPublic(sigmaInstance) {
     return s.graph;
   };
 
+  this.pushGraph = function(object, safe) {
+    object.nodes && object.nodes.forEach(function(node) {
+      node['id'] && (!safe || !s.graph.nodesIndex[node['id']]) &&
+                    self.addNode(node['id'], node);
+    });
+
+    var isEdgeValid;
+    object.edges && object.edges.forEach(function(edge) {
+      validID = edge['source'] && edge['target'] && edge['id'];
+      validID &&
+        (!safe || !s.graph.edgesIndex[edge['id']]) &&
+        self.addNode(
+          edge['id'],
+          edge['source'],
+          edge['target'],
+          edge
+        );
+    });
+
+    return self;
+  };
+
   this.emptyGraph = function() {
     s.graph.empty();
     return self;
