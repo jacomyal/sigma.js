@@ -34,15 +34,19 @@ To build sigma.js:
 * Use `make concat` to concatenate the different JS files into 'build/sigma.concat.js'.
 * Use `make minify-simple` or `make minify-advanced` to minify concatenation result (*Warning*: `make minify-advanced` uses Closure advanced minify mode which is pretty agressive on renaming, and this minification has not been tested yet).
 
+## Features
+* Pseudo-asynchronous edges drawing, to avoid browser freezing
+* Custom interaction events
+* Mouse interaction (touch / multitouch not yet implemented)
+* A lot of properties to customize (per instance) :
+    * Default nodes / edges / labels appearance
+    * Enable / disable mouse interaction
+* Embedded monitoring panel
+* GEXF and ForceAtlas2 plugins
+
 ##How it works
-
-
-
 ###A word about scalability
-
 A lagging Web application on the web is bad for UX, but a Web application that makes the whole browser being laggy is worse. That's why *sigma.js* **inserts frames** at the middle of its computings / drawings, to keep everything as fluid as possible, even when dealing with quite big graphs.
-
-About the layout, the **ForceAtlas2** plugin uses Barnes-Hut like approximation of the repulsion force, that makes the layout computing pretty scalable.
 
 ##Thanks
 *sigma.js* is mostly inspired by [Gephi](http://gephi.org) and [Antonin Rohmer](http://antonin.rohmer.free.fr/)'s works on Web graph drawing (one example [here](http://www.guardian.co.uk/news/datablog/interactive/2011/sep/07/norway-breivik-manifesto-mapped)).

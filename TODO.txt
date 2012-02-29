@@ -3,11 +3,16 @@
 ****   Core   ****
   - Caching nodes                           - Next version
   - Caching labels                          - Next version
-  - Documentation                           - Already started (main classes)
+  - Documentation                           - Most have been done, still have to compile
+                                              and make a style for it.
   - Testing for the following classes:
     > Chronos
     > Sigma (especially the tasks)
     > Graph (coherence)
+
+****   API   ****
+  - Auto-resizing option
+  - Possibility to highlight nodes
 
 ****   Others   ****
   - Define some typical plugins type that
@@ -20,3 +25,4 @@
     > Propose to install gjslint and
       fixjsstyle if not found
     > mkdir ./build if not found
+  - Make an easy / light example template
