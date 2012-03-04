@@ -8,6 +8,10 @@
   - Caching labels                          - Next version
   - Documentation                           - Most have been done, still have to compile
                                               and make a style for it.
+  - Adding a parameter that is true if
+    everything looks fine to execute
+    sigma.js, and false else (like if
+    Canvas is not supported)
   - Testing for the following classes:
     > Chronos
     > Sigma (especially the tasks)
