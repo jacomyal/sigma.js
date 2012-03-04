@@ -1,3 +1,4 @@
 # Build results / binary files
 build/compiler.jar
 build/*.js
+doc/
