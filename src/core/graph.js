@@ -400,10 +400,10 @@ function Graph() {
     });
 
     var scale = self.p.scalingMode == 'outside' ?
-                Math.max(0.95 * w / Math.max(xMax - xMin, 1),
-                         0.95 * h / Math.max(yMax - yMin, 1)) :
-                Math.min(0.95 * w / Math.max(xMax - xMin, 1),
-                         0.95 * h / Math.max(yMax - yMin, 1));
+                Math.max(w / Math.max(xMax - xMin, 1),
+                         h / Math.max(yMax - yMin, 1)) :
+                Math.min(w / Math.max(xMax - xMin, 1),
+                         h / Math.max(yMax - yMin, 1));
 
     // Size homothetic parameters:
     var a, b;

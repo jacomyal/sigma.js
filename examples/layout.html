@@ -59,8 +59,8 @@
           <h2>Force Atlas 2 layout example</h2>
         </div>
         <div id="control-buttons" class="span6">
-          <a class="btn" onclick="startLayout();">Start layout</a>
-          <a class="btn" onclick="stopLayout();">Stop layout</a>
+          <a class="btn" onclick="s.startForceAtlas2();">Start layout</a>
+          <a class="btn" onclick="s.stopForceAtlas2();">Stop layout</a>
           <a class="btn" onclick="resetPosition();">Reset zoom</a>
         </div>
       </div>
@@ -110,13 +110,14 @@
             // Edges
             defaultEdgeType: 'curve'
           }).mouseProperties({
+            minRatio: 0.2,
             maxRatio: 50,
             blockScroll: true,
             mouseEnabled: true
           }).graphProperties({
             edgesPowRatio: 0.4
           });
-    
+
           // INIT GRAPH:
           //
           // The graph is generated in different clusters
@@ -165,16 +166,7 @@
 
           s.activateMonitoring();
 
-          //s.bind('overnodes outnodes downnodes upnodes',function(e){
-          //  console.log(e.type, e.content.map(function(n){
-          //    return n.id;
-          //  }).join(', '));
-          //});
-
           // Here is the code to initialize properly FA2:
-          f = new forceatlas2.ForceAtlas2(s.getGraph());
-          f.setAutoSettings();
-          f.init();
 
           window.onresize = function(){
             s.resize();
@@ -198,30 +190,9 @@
         );
       }
 
-      function startLayout(){
-        if(s && f){
-          s.addGenerator('fa', f.atomicGo, function(){
-            return true;
-          });
-        }
-      }
-
-      function stopLayout(){
-        if(s && f){
-          s.removeGenerator('fa');
-        }
-      }
-
       $(document).ready(function(){
         init();
-        //startLayout();
-        
-        s.draw(
-          s.configProperties('lastNodes'),
-          s.configProperties('lastEdges'),
-          s.configProperties('lastLabels'),
-          true
-        );
+        s.startForceAtlas2();
       });
     </script>
 

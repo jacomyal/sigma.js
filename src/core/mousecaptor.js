@@ -30,9 +30,9 @@ function MouseCaptor(dom) {
    * @type {Object}
    */
   this.p = {
-    margin: 200,
     minRatio: 1,
     maxRatio: 32,
+    marginRatio: 1,
     zoomDelta: 0.1,
     zoomMultiply: 2,
     directZooming: false,
@@ -305,13 +305,14 @@ function MouseCaptor(dom) {
    * @return {MouseCaptor} Returns itself.
    */
   function checkBorders(b, width, height) {
-    if (!isNaN(b.minX) && !isNaN(b.maxX)) {
+    // TODO : Find the good formula
+    /*if (!isNaN(b.minX) && !isNaN(b.maxX)) {
       self.stageX = Math.min(
         self.stageX = Math.max(
           self.stageX,
-          (b.minX - width) * self.ratio + self.p.margin
+          (b.minX - width) * self.ratio + self.p.marginRatio*(b.maxX - b.minX)
         ),
-        (b.maxX - width) * self.ratio + width - self.p.margin
+        (b.maxX - width) * self.ratio + width - self.p.marginRatio*(b.maxX - b.minX)
       );
     }
 
@@ -319,11 +320,11 @@ function MouseCaptor(dom) {
       self.stageY = Math.min(
         self.stageY = Math.max(
           self.stageY,
-          (b.minY - height) * self.ratio + self.p.margin
+          (b.minY - height) * self.ratio + self.p.marginRatio*(b.maxY - b.minY)
         ),
-        (b.maxY - height) * self.ratio + height - self.p.margin
+        (b.maxY - height) * self.ratio + height - self.p.marginRatio*(b.maxY - b.minY)
       );
-    }
+    }*/
 
     return self;
   };

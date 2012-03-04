@@ -30,7 +30,7 @@ sigma.chronos = new (function() {
    * @private
    * @type {number}
    */
-  var fpsReq = 60;
+  var fpsReq = 80;
 
   /**
    * Stores the last computed FPS value (FPS is computed only when any
