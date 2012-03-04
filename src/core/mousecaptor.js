@@ -30,6 +30,7 @@ function MouseCaptor(dom) {
    * @type {Object}
    */
   this.p = {
+    margin: 200,
     minRatio: 1,
     maxRatio: 32,
     zoomDelta: 0.1,
@@ -210,10 +211,14 @@ function MouseCaptor(dom) {
    * dispatches a "drag" event.
    */
   function drag() {
-    self.stageX = self.mouseX - startX + oldStageX;
-    self.stageY = self.mouseY - startY + oldStageY;
+    var newStageX = self.mouseX - startX + oldStageX;
+    var newStageY = self.mouseY - startY + oldStageY;
 
-    self.dispatch('drag');
+    if (newStageX != self.stageX || newStageY != self.stageY) {
+      self.stageX = newStageX;
+      self.stageY = newStageY;
+      self.dispatch('drag');
+    }
   };
 
   /**
@@ -291,11 +296,45 @@ function MouseCaptor(dom) {
     }
   };
 
+  /**
+   * Checks that there is always a part of the graph that is displayed, to
+   * avoid the user to drag the graph out of the stage.
+   * @param  {Object} b      An object containing the borders of the graph.
+   * @param  {number} width  The width of the stage.
+   * @param  {number} height The height of the stage.
+   * @return {MouseCaptor} Returns itself.
+   */
+  function checkBorders(b, width, height) {
+    if (!isNaN(b.minX) && !isNaN(b.maxX)) {
+      self.stageX = Math.min(
+        self.stageX = Math.max(
+          self.stageX,
+          (b.minX - width) * self.ratio + self.p.margin
+        ),
+        (b.maxX - width) * self.ratio + width - self.p.margin
+      );
+    }
+
+    if (!isNaN(b.minY) && !isNaN(b.maxY)) {
+      self.stageY = Math.min(
+        self.stageY = Math.max(
+          self.stageY,
+          (b.minY - height) * self.ratio + self.p.margin
+        ),
+        (b.maxY - height) * self.ratio + height - self.p.margin
+      );
+    }
+
+    return self;
+  };
+
   // ADD CALLBACKS
   dom.addEventListener('DOMMouseScroll', wheelHandler, true);
   dom.addEventListener('mousewheel', wheelHandler, true);
   dom.addEventListener('mousemove', moveHandler, true);
   dom.addEventListener('mousedown', downHandler, true);
   document.addEventListener('mouseup', upHandler, true);
+
+  this.checkBorders = checkBorders;
 }
 

@@ -146,11 +146,15 @@ function Sigma(root, id) {
   }).bind('move', drawHover);
 
   sigma.chronos.bind('startgenerators', function() {
-    self.draw(
-      self.p.auto ? 2 : self.p.drawNodes,
-      self.p.auto ? 0 : self.p.drawEdges,
-      self.p.auto ? 2 : self.p.drawLabels
-    );
+    if (sigma.chronos.getGeneratorsIDs().some(function(id) {
+      return !!id.match(new RegExp('_ext_' + self.id + '$', ''));
+    })) {
+      self.draw(
+        self.p.auto ? 2 : self.p.drawNodes,
+        self.p.auto ? 0 : self.p.drawEdges,
+        self.p.auto ? 2 : self.p.drawLabels
+      );
+    }
   }).bind('stopgenerators', function() {
     self.draw();
   });
@@ -244,8 +248,7 @@ function Sigma(root, id) {
    */
   function draw(nodes, edges, labels, safe) {
     if (safe && sigma.chronos.getGeneratorsIDs().some(function(id) {
-      var m = id.match(/_ext_(.*)$/);
-      return m && (m[1] == self.id);
+      return !!id.match(new RegExp('_ext_' + self.id + '$', ''));
     })) {
       return self;
     }
@@ -267,6 +270,12 @@ function Sigma(root, id) {
       self.height,
       nodes > 0,
       edges > 0
+    ).setBorders();
+
+    self.mousecaptor.checkBorders(
+      self.graph.borders,
+      self.width,
+      self.height
     );
 
     self.graph.translate(

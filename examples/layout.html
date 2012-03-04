@@ -214,7 +214,14 @@
 
       $(document).ready(function(){
         init();
-        startLayout();
+        //startLayout();
+        
+        s.draw(
+          s.configProperties('lastNodes'),
+          s.configProperties('lastEdges'),
+          s.configProperties('lastLabels'),
+          true
+        );
       });
     </script>
 

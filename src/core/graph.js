@@ -35,6 +35,13 @@ function Graph() {
   };
 
   /**
+   * Contains the borders of the graph. These are useful to avoid the user to
+   * drag the graph out of the canvas.
+   * @type {Object}
+   */
+  this.borders = {};
+
+  /**
    * Inserts a node in the graph.
    * @param {string} id     The node's ID.
    * @param {object} params An object containing the different parameters
@@ -54,9 +61,6 @@ function Graph() {
       'degree': 0,
       'fixed': false,
       'hidden': false,
-      'displayX': 0,
-      'displayY': 0,
-      'displaySize': 1,
       'label': id.toString(),
       'id': id.toString(),
       'attr': {}
@@ -473,6 +477,44 @@ function Graph() {
   };
 
   /**
+   * Determines the borders of the graph as it will be drawn. It is used to
+   * avoid the user to drag the graph out of the canvas.
+   */
+  function setBorders() {
+    self.borders = {};
+
+    self.nodes.forEach(function(node) {
+      self.borders.minX = Math.min(
+        self.borders.minX == undefined ?
+          node['displayX'] - node['displaySize'] :
+          self.borders.minX,
+        node['displayX'] - node['displaySize']
+      );
+
+      self.borders.maxX = Math.max(
+        self.borders.maxX == undefined ?
+          node['displayX'] + node['displaySize'] :
+          self.borders.maxX,
+        node['displayX'] + node['displaySize']
+      );
+
+      self.borders.minY = Math.min(
+        self.borders.minY == undefined ?
+          node['displayY'] - node['displaySize'] :
+          self.borders.minY,
+        node['displayY'] - node['displaySize']
+      );
+
+      self.borders.maxY = Math.max(
+        self.borders.maxY == undefined ?
+          node['displayY'] - node['displaySize'] :
+          self.borders.maxY,
+        node['displayY'] - node['displaySize']
+      );
+    });
+  }
+
+  /**
    * Checks which nodes are under the (mX, mY) points, representing the mouse
    * position.
    * @param  {[type]} mX The mouse X position.
@@ -595,6 +637,7 @@ function Graph() {
   this.empty = empty;
   this.rescale = rescale;
   this.translate = translate;
+  this.setBorders = setBorders;
   this.checkHover = checkHover;
 }
 

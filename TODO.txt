@@ -1,4 +1,7 @@
 ****   Bugs   ****
+  - mouseEnabled==false && hover
+  - Fix drag'n'drop + borders checking
+    (I think an event is just missing)
 
 ****   Core   ****
   - Caching nodes                           - Next version
@@ -25,4 +28,5 @@
     > Propose to install gjslint and
       fixjsstyle if not found
     > mkdir ./build if not found
+    > Insert headers to compiled files
   - Make an easy / light example template
