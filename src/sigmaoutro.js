@@ -1,2 +1,3 @@
+sigma.publicPrototype = SigmaPublic.prototype;
 })();
 
