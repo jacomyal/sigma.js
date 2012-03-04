@@ -1,6 +1,6 @@
-var forceatlas2 = {};
+sigma.forceatlas2 = sigma.forceatlas2 || {};
 
-forceatlas2.ForceAtlas2 = function(graph) {
+sigma.forceatlas2.ForceAtlas2 = function(graph) {
   sigma.classes.Cascade.call(this);
   var self = this;
   this.graph = graph;
@@ -41,6 +41,8 @@ forceatlas2.ForceAtlas2 = function(graph) {
         dy: 0
       };
     });
+
+    return self;
   }
 
   this.go = function() {
@@ -68,7 +70,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
 
         // If Barnes Hut active, initialize root region
         if (self.p.barnesHutOptimize) {
-          self.rootRegion = new forceatlas2.Region(nodes, 0);
+          self.rootRegion = new sigma.forceatlas2.Region(nodes, 0);
           self.rootRegion.buildSubRegions();
         }
 
@@ -760,7 +762,7 @@ forceatlas2.ForceAtlas2 = function(graph) {
 };
 
 // The Region class, as used by the Barnes Hut optimization
-forceatlas2.Region = function(nodes, depth) {
+sigma.forceatlas2.Region = function(nodes, depth) {
   sigma.classes.Cascade.call(this);
   this.depthLimit = 20;
   this.size = 0;
@@ -777,7 +779,7 @@ forceatlas2.Region = function(nodes, depth) {
   this.updateMassAndGeometry();
 }
 
-forceatlas2.Region.prototype.updateMassAndGeometry = function() {
+sigma.forceatlas2.Region.prototype.updateMassAndGeometry = function() {
   if (this.nodes.length > 1) {
     // Compute Mass
     var mass = 0;
@@ -811,7 +813,7 @@ forceatlas2.Region.prototype.updateMassAndGeometry = function() {
 };
 
 
-forceatlas2.Region.prototype.buildSubRegions = function() {
+sigma.forceatlas2.Region.prototype.buildSubRegions = function() {
   if (this.nodes.length > 1) {
     var leftNodes = [];
     var rightNodes = [];
@@ -843,12 +845,12 @@ forceatlas2.Region.prototype.buildSubRegions = function() {
       return a.length;
     }).forEach(function(a) {
       if (nextDepth <= self.depthLimit && a.length < self.nodes.length) {
-        var subregion = new forceatlas2.Region(a, nextDepth);
+        var subregion = new sigma.forceatlas2.Region(a, nextDepth);
         subregions.push(subregion);
       } else {
         a.forEach(function(n) {
           var oneNodeList = [n];
-          var subregion = new forceatlas2.Region(oneNodeList, nextDepth);
+          var subregion = new sigma.forceatlas2.Region(oneNodeList, nextDepth);
           subregions.push(subregion);
         });
       }
@@ -862,7 +864,7 @@ forceatlas2.Region.prototype.buildSubRegions = function() {
   }
 };
 
-forceatlas2.Region.prototype.applyForce = function(n, Force, theta) {
+sigma.forceatlas2.Region.prototype.applyForce = function(n, Force, theta) {
   if (this.nodes.length < 2) {
     var regionNode = this.nodes[0];
     Force.apply_nn(n, regionNode);
@@ -882,4 +884,20 @@ forceatlas2.Region.prototype.applyForce = function(n, Force, theta) {
       });
     }
   }
+};
+
+sigma.publicPrototype.startForceAtlas2 = function() {
+  if(!this.forceatlas2) {
+    this.forceatlas2 = new sigma.forceatlas2.ForceAtlas2(this.getGraph());
+    this.forceatlas2.setAutoSettings();
+    this.forceatlas2.init();
+  }
+
+  this.addGenerator('forceatlas2', this.forceatlas2.atomicGo, function(){
+    return true;
+  });
+};
+
+sigma.publicPrototype.stopForceAtlas2 = function() {
+  this.removeGenerator('forceatlas2');
 };
