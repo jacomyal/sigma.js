@@ -3,6 +3,10 @@ function SigmaPublic(sigmaInstance) {
   var self = this;
   sigma.classes.EventDispatcher.call(this);
 
+  this.kill = function() {
+    // TODO
+  };
+
   // Config:
   this.configProperties = function(a1, a2) {
     var res = s.config(a1, a2);
