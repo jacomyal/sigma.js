@@ -235,9 +235,10 @@ function Sigma(root, id) {
   /**
    * Starts the graph drawing process. The three first parameters indicate
    * how the different layers have to be drawn:
-   * . 0: The layer is not drawn.
-   * . 1: The layer is drawn progressively.
-   * . 2: The layer is drawn directly.
+   * . -1: The layer is not drawn, but it is not erased.
+   * . 0:  The layer is not drawn.
+   * . 1:  The layer is drawn progressively.
+   * . 2:  The layer is drawn directly.
    * @param  {?number} nodes  Determines if and how the nodes must be drawn.
    * @param  {?number} edges  Determines if and how the edges must be drawn.
    * @param  {?number} labels Determines if and how the labels must be drawn.
@@ -253,9 +254,15 @@ function Sigma(root, id) {
       return self;
     }
 
-    var n = nodes == undefined ? self.p.drawNodes : nodes;
-    var e = edges == undefined ? self.p.drawEdges : edges;
-    var l = labels == undefined ? self.p.drawLabels : labels;
+    var n = (nodes == undefined) ? self.p.drawNodes : nodes;
+    var e = (edges == undefined) ? self.p.drawEdges : edges;
+    var l = (labels == undefined) ? self.p.drawLabels : labels;
+
+    var params = {
+      nodes: n,
+      edges: e,
+      labels: l
+    };
 
     self.p.lastNodes = n;
     self.p.lastEdges = e;
@@ -268,8 +275,8 @@ function Sigma(root, id) {
     self.graph.rescale(
       self.width,
       self.height,
-      nodes > 0,
-      edges > 0
+      n > 0,
+      e > 0
     ).setBorders();
 
     self.mousecaptor.checkBorders(
@@ -282,13 +289,16 @@ function Sigma(root, id) {
       self.mousecaptor.stageX,
       self.mousecaptor.stageY,
       self.mousecaptor.ratio,
-      nodes > 0,
-      edges > 0
+      n > 0,
+      e > 0
     );
 
     // Clear scene:
     for (var k in self.domElements) {
-      if (self.domElements[k].nodeName.toLowerCase() == 'canvas') {
+      if (
+        self.domElements[k].nodeName.toLowerCase() == 'canvas' &&
+        (params[k] == undefined || params[k] >= 0)
+      ) {
         self.domElements[k].getContext('2d').clearRect(
           0,
           0,
