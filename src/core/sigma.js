@@ -421,5 +421,9 @@ function Sigma(root, id) {
   this.resize = resize;
   this.drawHover = drawHover;
   this.clearSchedule = clearSchedule;
+
+  window.addEventListener('resize', function() {
+    self.resize();
+  });
 }
 
