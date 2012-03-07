@@ -310,9 +310,12 @@ function MouseCaptor(dom) {
       self.stageX = Math.min(
         self.stageX = Math.max(
           self.stageX,
-          (b.minX - width) * self.ratio + self.p.marginRatio*(b.maxX - b.minX)
+          (b.minX - width) * self.ratio +
+            self.p.marginRatio*(b.maxX - b.minX)
         ),
-        (b.maxX - width) * self.ratio + width - self.p.marginRatio*(b.maxX - b.minX)
+        (b.maxX - width) * self.ratio +
+          width -
+          self.p.marginRatio*(b.maxX - b.minX)
       );
     }
 
@@ -320,9 +323,12 @@ function MouseCaptor(dom) {
       self.stageY = Math.min(
         self.stageY = Math.max(
           self.stageY,
-          (b.minY - height) * self.ratio + self.p.marginRatio*(b.maxY - b.minY)
+          (b.minY - height) * self.ratio +
+            self.p.marginRatio*(b.maxY - b.minY)
         ),
-        (b.maxY - height) * self.ratio + height - self.p.marginRatio*(b.maxY - b.minY)
+        (b.maxY - height) * self.ratio +
+          height -
+          self.p.marginRatio*(b.maxY - b.minY)
       );
     }*/
 
