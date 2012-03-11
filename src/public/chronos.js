@@ -3,8 +3,9 @@
  * It has been designed to make possible to execute heavy computing tasks
  * for the browser, without freezing it.
  * @constructor
+ * @extends sigma.classes.Cascade
  * @extends sigma.classes.EventDispatcher
- * @this {Chronos}
+ * @this {sigma.chronos}
  */
 sigma.chronos = new (function() {
   sigma.classes.EventDispatcher.call(this);
@@ -12,7 +13,7 @@ sigma.chronos = new (function() {
   /**
    * Represents "this", without the well-known scope issue.
    * @private
-   * @type {Chronos}
+   * @type {sigma.chronos}
    */
   var self = this;
 
@@ -29,7 +30,7 @@ sigma.chronos = new (function() {
    * @private
    * @type {number}
    */
-  var fpsReq = 60;
+  var fpsReq = 80;
 
   /**
    * Stores the last computed FPS value (FPS is computed only when any
@@ -122,7 +123,7 @@ sigma.chronos = new (function() {
    * Inserts a frame before executing the callback.
    * @param  {function()} callback The callback to execute after having
    *                               inserted the frame.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function insertFrame(callback) {
     window.setTimeout(callback, 0);
@@ -183,7 +184,7 @@ sigma.chronos = new (function() {
 
   /**
    * Starts tasks execution.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function runTasks() {
     isRunning = true;
@@ -201,7 +202,7 @@ sigma.chronos = new (function() {
 
   /**
    * Stops tasks execution, and dispatch a "stop" event.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function stopTasks() {
     self.dispatch('stop');
@@ -220,7 +221,7 @@ sigma.chronos = new (function() {
    * @param {boolean} autostart            If true, sigma.chronos will start
    *                                       automatically if it is not working
    *                                       yet.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function addTask(task, name, autostart) {
     if (typeof task != 'function') {
@@ -243,7 +244,7 @@ sigma.chronos = new (function() {
    * @param {string} name                  The name of the worker, used for
    *                                       managing the different tasks.
    * @param {string} parent                The name of the parent task.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function queueTask(task, name, parent) {
     if (typeof task != 'function') {
@@ -277,7 +278,7 @@ sigma.chronos = new (function() {
    *                              queued to any removed task will be triggered.
    *                              If 2, the tasks queued to any removed task
    *                              will be removed as well.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function removeTask(v, queueStatus) {
     if (v == undefined) {
@@ -327,7 +328,7 @@ sigma.chronos = new (function() {
    * @param {string} id                     The generators ID.
    * @param {function(): boolean} task      The generator's task.
    * @param {function(): boolean} condition The generator's condition.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function addGenerator(id, task, condition) {
     if (generators[id] != undefined) {
@@ -348,7 +349,7 @@ sigma.chronos = new (function() {
    * until it returns false, but then the
    * condition will not be tested.
    * @param  {string} id The generator's ID.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function removeGenerator(id) {
     if (generators[id]) {
@@ -363,7 +364,7 @@ sigma.chronos = new (function() {
    * @private
    * @param  {boolean} running If true, returns the number of active
    *                          generators instead.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function getGeneratorsCount(running) {
     return running ?
@@ -386,7 +387,7 @@ sigma.chronos = new (function() {
    * is the next to start when another one stops. It will dispatch
    * a "stopgenerators" event if there is no more generator to start,
    * and a "startgenerators" event else.
-   * @return {Chronos} Returns itself.
+   * @return {sigma.chronos} Returns itself.
    */
   function startGenerators() {
     if (!Object.keys(generators).length) {
@@ -438,7 +439,7 @@ sigma.chronos = new (function() {
    * Either set or returns the fpsReq property. This property determines
    * the number of frames that should be inserted per second.
    * @param  {?number} v The frequency asked.
-   * @return {Chronos|number} Returns the frequency if v is undefined, and
+   * @return {(Chronos|number)} Returns the frequency if v is undefined, and
    *                          itself else.
    */
   function frequency(v) {

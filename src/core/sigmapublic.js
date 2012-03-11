@@ -3,6 +3,12 @@ function SigmaPublic(sigmaInstance) {
   var self = this;
   sigma.classes.EventDispatcher.call(this);
 
+  this._core = sigmaInstance;
+
+  this.kill = function() {
+    // TODO
+  };
+
   // Config:
   this.configProperties = function(a1, a2) {
     var res = s.config(a1, a2);
@@ -97,8 +103,26 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
-  this.getGraph = function() {
-    return s.graph;
+  this.pushGraph = function(object, safe) {
+    object.nodes && object.nodes.forEach(function(node) {
+      node['id'] && (!safe || !s.graph.nodesIndex[node['id']]) &&
+                    self.addNode(node['id'], node);
+    });
+
+    var isEdgeValid;
+    object.edges && object.edges.forEach(function(edge) {
+      validID = edge['source'] && edge['target'] && edge['id'];
+      validID &&
+        (!safe || !s.graph.edgesIndex[edge['id']]) &&
+        self.addNode(
+          edge['id'],
+          edge['source'],
+          edge['target'],
+          edge
+        );
+    });
+
+    return self;
   };
 
   this.emptyGraph = function() {

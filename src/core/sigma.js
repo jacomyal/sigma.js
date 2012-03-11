@@ -1,10 +1,38 @@
+/**
+ * Sigma is the main class. It represents the core of any instance id sigma.js.
+ * It is private and can be initialized only from inside sigma.js. To see its
+ * public interface, see {@link SigmaPublic}.
+ * It owns its own {@link Graph}, {@link MouseCaptor}, {@link Plotter}
+ * and {@link Monitor}.
+ * @constructor
+ * @extends sigma.classes.Cascade
+ * @extends sigma.classes.EventDispatcher
+ * @param {element} root The DOM root of this instance (a div, for example).
+ * @param {string} id    The ID of this instance.
+ * @this {Sigma}
+ */
 function Sigma(root, id) {
-  var self = this;
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {Sigma}
+   */
+  var self = this;
+
+  /**
+   * The ID of the instance.
+   * @type {string}
+   */
   this.id = id.toString();
 
+  /**
+   * The different parameters that define how this instance should work.
+   * @see sigma.classes.Cascade
+   * @type {Object}
+   */
   this.p = {
     auto: true,
     drawNodes: 2,
@@ -12,41 +40,79 @@ function Sigma(root, id) {
     drawLabels: 2,
     lastNodes: 2,
     lastEdges: 0,
-    lastLabels: 2
+    lastLabels: 2,
+    drawHoverNodes: true
   };
 
-  this.dom = root;
-  this.width = this.dom.offsetWidth;
-  this.height = this.dom.offsetHeight;
+  /**
+   * The root DOM element of this instance, containing every other elements.
+   * @type {element}
+   */
+  this.domRoot = root;
 
-  // Intern classes:
+  /**
+   * The width of this instance - initially, the root's width.
+   * @type {number}
+   */
+  this.width = this.domRoot.offsetWidth;
+
+  /**
+   * The height of this instance - initially, the root's height.
+   * @type {number}
+   */
+  this.height = this.domRoot.offsetHeight;
+
+  /**
+   * The graph of this instance - initiallyempty.
+   * @type {Graph}
+   */
   this.graph = new Graph();
 
-  this.canvas = {};
+  /**
+   * An object referencing every DOM elements used by this instance.
+   * @type {Object}
+   */
+  this.domElements = {};
+
   initDOM('edges', 'canvas');
   initDOM('nodes', 'canvas');
   initDOM('labels', 'canvas');
   initDOM('hover', 'canvas');
+  initDOM('monitor', 'div');
+  initDOM('mouse', 'canvas');
+
+  /**
+   * The class dedicated to manage the drawing process of the graph of the
+   * different canvas.
+   * @type {Plotter}
+   */
   this.plotter = new Plotter(
-    this.canvas.nodes.getContext('2d'),
-    this.canvas.edges.getContext('2d'),
-    this.canvas.labels.getContext('2d'),
-    this.canvas.hover.getContext('2d'),
+    this.domElements.nodes.getContext('2d'),
+    this.domElements.edges.getContext('2d'),
+    this.domElements.labels.getContext('2d'),
+    this.domElements.hover.getContext('2d'),
     this.graph,
     this.width,
     this.height
   );
 
-  initDOM('monitor', 'div');
+  /**
+   * The class dedicated to monitor different probes about the running
+   * processes or the data, such as the number of nodes or edges, or how
+   * many times the graph is drawn per second.
+   * @type {Monitor}
+   */
   this.monitor = new Monitor(
     this,
-    this.canvas.monitor
+    this.domElements.monitor
   );
 
-  initDOM('mouse', 'canvas');
+  /**
+   * The class dedicated to manage the different mouse events.
+   * @type {MouseCaptor}
+   */
   this.mousecaptor = new MouseCaptor(
-    this.canvas.mouse,
-    this.graph,
+    this.domElements.mouse,
     this.id
   );
 
@@ -68,6 +134,8 @@ function Sigma(root, id) {
   }).bind('mousedown mouseup', function(e) {
     var targeted = self.graph.nodes.filter(function(n) {
       return !!n['hover'];
+    }).map(function(n) {
+      return n.id;
     });
 
     if (targeted.length) {
@@ -81,15 +149,27 @@ function Sigma(root, id) {
   }).bind('move', drawHover);
 
   sigma.chronos.bind('startgenerators', function() {
-    self.draw(
-      self.p.auto ? 2 : self.p.drawNodes,
-      self.p.auto ? 0 : self.p.drawEdges,
-      self.p.auto ? 2 : self.p.drawLabels
-    );
+    if (sigma.chronos.getGeneratorsIDs().some(function(id) {
+      return !!id.match(new RegExp('_ext_' + self.id + '$', ''));
+    })) {
+      self.draw(
+        self.p.auto ? 2 : self.p.drawNodes,
+        self.p.auto ? 0 : self.p.drawEdges,
+        self.p.auto ? 2 : self.p.drawLabels
+      );
+    }
   }).bind('stopgenerators', function() {
     self.draw();
   });
 
+  /**
+   * Resizes the element, and redraws the graph with the last settings.
+   * @param  {?number} w The new width (if undefined, it will use the root
+   *                     width).
+   * @param  {?number} h The new height (if undefined, it will use the root
+   *                     height).
+   * @return {Sigma} Returns itself.
+   */
   function resize(w, h) {
     var oldW = self.width, oldH = self.height;
 
@@ -97,15 +177,17 @@ function Sigma(root, id) {
       self.width = w;
       self.height = h;
     }else {
-      self.width = self.dom.offsetWidth;
-      self.height = self.dom.offsetHeight;
+      self.width = self.domRoot.offsetWidth;
+      self.height = self.domRoot.offsetHeight;
     }
 
     if (oldW != self.width || oldH != self.height) {
-      for (var k in self.canvas) {
-        self.canvas[k].setAttribute('width', self.width + 'px');
-        self.canvas[k].setAttribute('height', self.height + 'px');
+      for (var k in self.domElements) {
+        self.domElements[k].setAttribute('width', self.width + 'px');
+        self.domElements[k].setAttribute('height', self.height + 'px');
       }
+
+      self.plotter.resize(self.width, self.height);
 
       self.draw(
         self.p.lastNodes,
@@ -117,6 +199,11 @@ function Sigma(root, id) {
     return self;
   };
 
+  /**
+   * Kills every drawing task currently running. Basically, it stops this
+   * instance's drawing process.
+   * @return {Sigma} Returns itself.
+   */
   function clearSchedule() {
     sigma.chronos.removeTask(
       'node_' + self.id, 2
@@ -128,33 +215,57 @@ function Sigma(root, id) {
     return self;
   };
 
-  function initDOM(type, dom) {
-    self.canvas[type] = document.createElement(dom);
-    self.canvas[type].style.position = 'absolute';
-    self.canvas[type].setAttribute('id', 'sigma_' + type + '_' + self.id);
-    self.canvas[type].setAttribute('class', 'sigma_' + type + '_' + dom);
-    self.canvas[type].setAttribute('width', self.width + 'px');
-    self.canvas[type].setAttribute('height', self.height + 'px');
+  /**
+   * Initialize a DOM element, that will be stores by this instance, to make
+   * automatic these elements resizing.
+   * @private
+   * @param  {string} id   The element's ID.
+   * @param  {string} type The element's nodeName (Example : canvas, div, ...).
+   * @return {Sigma} Returns itself.
+   */
+  function initDOM(id, type) {
+    self.domElements[id] = document.createElement(type);
+    self.domElements[id].style.position = 'absolute';
+    self.domElements[id].setAttribute('id', 'sigma_' + id + '_' + self.id);
+    self.domElements[id].setAttribute('class', 'sigma_' + id + '_' + type);
+    self.domElements[id].setAttribute('width', self.width + 'px');
+    self.domElements[id].setAttribute('height', self.height + 'px');
 
-    self.dom.appendChild(self.canvas[type]);
+    self.domRoot.appendChild(self.domElements[id]);
     return self;
   };
 
-  // nodes, edges, labels:
-  // - 0: Don't display
-  // - 1: Display (asynchronous)
-  // - 2: Display (synchronous)
+  /**
+   * Starts the graph drawing process. The three first parameters indicate
+   * how the different layers have to be drawn:
+   * . -1: The layer is not drawn, but it is not erased.
+   * . 0:  The layer is not drawn.
+   * . 1:  The layer is drawn progressively.
+   * . 2:  The layer is drawn directly.
+   * @param  {?number} nodes  Determines if and how the nodes must be drawn.
+   * @param  {?number} edges  Determines if and how the edges must be drawn.
+   * @param  {?number} labels Determines if and how the labels must be drawn.
+   * @param  {?boolean} safe  If true, nothing will happen if any generator
+   *                          affiliated to this instance is currently running
+   *                          (an iterative layout, for example).
+   * @return {Sigma} Returns itself.
+   */
   function draw(nodes, edges, labels, safe) {
     if (safe && sigma.chronos.getGeneratorsIDs().some(function(id) {
-      var m = id.match(/_ext_(.*)$/);
-      return m && (m[1] == self.id);
+      return !!id.match(new RegExp('_ext_' + self.id + '$', ''));
     })) {
       return self;
     }
 
-    var n = nodes == undefined ? self.p.drawNodes : nodes;
-    var e = edges == undefined ? self.p.drawEdges : edges;
-    var l = labels == undefined ? self.p.drawLabels : labels;
+    var n = (nodes == undefined) ? self.p.drawNodes : nodes;
+    var e = (edges == undefined) ? self.p.drawEdges : edges;
+    var l = (labels == undefined) ? self.p.drawLabels : labels;
+
+    var params = {
+      nodes: n,
+      edges: e,
+      labels: l
+    };
 
     self.p.lastNodes = n;
     self.p.lastEdges = e;
@@ -164,21 +275,42 @@ function Sigma(root, id) {
     clearSchedule();
 
     // Rescale graph:
-    self.graph.rescale(self.width, self.height);
+    self.graph.rescale(
+      self.width,
+      self.height,
+      n > 0,
+      e > 0
+    ).setBorders();
+
+    self.mousecaptor.checkBorders(
+      self.graph.borders,
+      self.width,
+      self.height
+    );
+
     self.graph.translate(
       self.mousecaptor.stageX,
       self.mousecaptor.stageY,
-      self.mousecaptor.ratio
+      self.mousecaptor.ratio,
+      n > 0,
+      e > 0
+    );
+
+    self.dispatch(
+      'graphscaled'
     );
 
     // Clear scene:
-    for (var k in self.canvas) {
-      if (self.canvas[k].nodeName.toLowerCase() == 'canvas') {
-        self.canvas[k].getContext('2d').clearRect(
+    for (var k in self.domElements) {
+      if (
+        self.domElements[k].nodeName.toLowerCase() == 'canvas' &&
+        (params[k] == undefined || params[k] >= 0)
+      ) {
+        self.domElements[k].getContext('2d').clearRect(
           0,
           0,
-          self.canvas[k].width,
-          self.canvas[k].height
+          self.domElements[k].width,
+          self.domElements[k].height
         );
       }
     }
@@ -261,24 +393,33 @@ function Sigma(root, id) {
     return self;
   };
 
+  /**
+   * Draws the hover nodes labels. This method is applied directly, and does
+   * not use the pseudo-asynchronous tasks process.
+   * @return {Sigma} Returns itself.
+   */
   function drawHover() {
-    self.canvas.hover.getContext('2d').clearRect(
-      0,
-      0,
-      self.canvas.hover.width,
-      self.canvas.hover.height
-    );
+    if (self.p.drawHoverNodes) {
+      self.domElements.hover.getContext('2d').clearRect(
+        0,
+        0,
+        self.domElements.hover.width,
+        self.domElements.hover.height
+      );
 
-    self.graph.checkHover(
-      self.mousecaptor.mouseX,
-      self.mousecaptor.mouseY
-    );
+      self.graph.checkHover(
+        self.mousecaptor.mouseX,
+        self.mousecaptor.mouseY
+      );
 
-    self.graph.nodes.forEach(function(node) {
-      if (node['hover']) {
-        self.plotter.drawHoverNode(node);
-      }
-    });
+      self.graph.nodes.forEach(function(node) {
+        if (node['hover']) {
+          self.plotter.drawHoverNode(node);
+        }
+      });
+    }
+
+    return self;
   }
 
   // Apply plugins:
@@ -288,8 +429,11 @@ function Sigma(root, id) {
 
   this.draw = draw;
   this.resize = resize;
-  this.initDOM = initDOM;
   this.drawHover = drawHover;
   this.clearSchedule = clearSchedule;
+
+  window.addEventListener('resize', function() {
+    self.resize();
+  });
 }
 

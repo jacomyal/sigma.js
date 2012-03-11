@@ -1,8 +1,26 @@
+/**
+ * The graph data model used in sigma.js.
+ * @constructor
+ * @extends sigma.classes.Cascade
+ * @extends sigma.classes.EventDispatcher
+ * @this {Graph}
+ */
 function Graph() {
-  var self = this;
-  sigma.classes.Cascade.call(self);
-  sigma.classes.EventDispatcher.call(self);
+  sigma.classes.Cascade.call(this);
+  sigma.classes.EventDispatcher.call(this);
 
+  /**
+   * Represents "this", without the well-known scope issue.
+   * @private
+   * @type {Graph}
+   */
+  var self = this;
+
+  /**
+   * The different parameters that determine how the nodes and edges should be
+   * translated and rescaled.
+   * @type {Object}
+   */
   this.p = {
     minNodeSize: 0,
     maxNodeSize: 0,
@@ -11,9 +29,25 @@ function Graph() {
     //   Scaling mode:
     //   - 'inside' (default)
     //   - 'outside'
-    scalingMode: 'inside'
+    scalingMode: 'inside',
+    nodesPowRatio: 0.5,
+    edgesPowRatio: 0
   };
 
+  /**
+   * Contains the borders of the graph. These are useful to avoid the user to
+   * drag the graph out of the canvas.
+   * @type {Object}
+   */
+  this.borders = {};
+
+  /**
+   * Inserts a node in the graph.
+   * @param {string} id     The node's ID.
+   * @param {object} params An object containing the different parameters
+   *                        of the node.
+   * @return {Graph} Returns itself.
+   */
   function addNode(id, params) {
     if (self.nodesIndex[id]) {
       throw new Error('Node "' + id + '" already exists.');
@@ -27,9 +61,6 @@ function Graph() {
       'degree': 0,
       'fixed': false,
       'hidden': false,
-      'displayX': 0,
-      'displayY': 0,
-      'displaySize': 1,
       'label': id.toString(),
       'id': id.toString(),
       'attr': {}
@@ -37,6 +68,8 @@ function Graph() {
 
     for (var k in params) {
       switch (k) {
+        case 'id':
+          break;
         case 'x':
         case 'y':
         case 'size':
@@ -61,6 +94,12 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Generates the clone of a node, to make it easier to be exported.
+   * @private
+   * @param  {Object} node The node to clone.
+   * @return {Object} The clone of the node.
+   */
   function cloneNode(node) {
     return {
       'x': node['x'],
@@ -79,10 +118,20 @@ function Graph() {
     };
   };
 
+  /**
+   * Checks the clone of a node, and inserts its values when possible. For
+   * example, it is possible to modify the size or the color of a node, but it
+   * is not possible to modify its display values or its id.
+   * @private
+   * @param  {Object} node The original node.
+   * @param  {Object} copy The clone.
+   * @return {Graph} Returns itself.
+   */
   function checkNode(node, copy) {
     for (var k in copy) {
       switch (k) {
         case 'id':
+        case 'attr':
         case 'degree':
         case 'displayX':
         case 'displayY':
@@ -106,8 +155,15 @@ function Graph() {
       }
     }
 
+    return self;
   };
 
+  /**
+   * Deletes one or several nodes from the graph, and the related edges.
+   * @param  {(string|Array.<string>)} v A string ID, or an Array of several
+   *                                     IDs.
+   * @return {Graph} Returns itself.
+   */
   function dropNode(v) {
     var a = (v instanceof Array ? v : [v]) || [];
 
@@ -141,6 +197,15 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Inserts an edge in the graph.
+   * @param {string} id     The edge ID.
+   * @param {string} source The ID of the edge source.
+   * @param {string} target The ID of the edge target.
+   * @param {object} params An object containing the different parameters
+   *                        of the edge.
+   * @return {Graph} Returns itself.
+   */
   function addEdge(id, source, target, params) {
     if (self.edgesIndex[id]) {
       throw new Error('Edge "' + id + '" already exists.');
@@ -172,6 +237,10 @@ function Graph() {
 
     for (var k in params) {
       switch (k) {
+        case 'id':
+        case 'source':
+        case 'target':
+          break;
         case 'size':
           e[k] = +params[k];
           break;
@@ -195,6 +264,12 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Generates the clone of a edge, to make it easier to be exported.
+   * @private
+   * @param  {Object} edge The edge to clone.
+   * @return {Object} The clone of the edge.
+   */
   function cloneEdge(edge) {
     return {
       'source': edge['source']['id'],
@@ -210,6 +285,15 @@ function Graph() {
     };
   };
 
+  /**
+   * Checks the clone of an edge, and inserts its values when possible. For
+   * example, it is possible to modify the label or the type of an edge, but it
+   * is not possible to modify its display values or its id.
+   * @private
+   * @param  {Object} edge The original edge.
+   * @param  {Object} copy The clone.
+   * @return {Graph} Returns itself.
+   */
   function checkEdge(edge, copy) {
     for (var k in copy) {
       switch (k) {
@@ -225,7 +309,6 @@ function Graph() {
           edge[k] = self.nodesIndex[k] || edge[k];
           break;
         case 'color':
-        case 'type':
         case 'label':
         case 'type':
           edge[k] = (copy[k] || '').toString();
@@ -235,8 +318,15 @@ function Graph() {
       }
     }
 
+    return self;
   };
 
+  /**
+   * Deletes one or several edges from the graph.
+   * @param  {(string|Array.<string>)} v A string ID, or an Array of several
+   *                                     IDs.
+   * @return {Graph} Returns itself.
+   */
   function dropEdge(v) {
     var a = (v instanceof Array ? v : [v]) || [];
 
@@ -261,6 +351,10 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Deletes every nodes and edges from the graph.
+   * @return {Graph} Returns itself.
+   */
   function empty() {
     self.nodes = [];
     self.nodesIndex = {};
@@ -270,14 +364,26 @@ function Graph() {
     return self;
   };
 
-  function rescale(w, h) {
+  /**
+   * Computes the display x, y and size of each node, relatively to the
+   * original values and the borders determined in the parameters, such as
+   * each node is in the described area.
+   * @param  {number} w           The area width (actually the width of the DOM
+   *                              root).
+   * @param  {number} h           The area height (actually the height of the
+   *                              DOM root).
+   * @param  {boolean} parseNodes Indicates if the nodes have to be parsed.
+   * @param  {boolean} parseEdges Indicates if the edges have to be parsed.
+   * @return {Graph} Returns itself.
+   */
+  function rescale(w, h, parseNodes, parseEdges) {
     var weightMax = 0, sizeMax = 0;
 
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       sizeMax = Math.max(node['size'], sizeMax);
     });
 
-    self.edges.forEach(function(edge) {
+    parseEdges && self.edges.forEach(function(edge) {
       weightMax = Math.max(edge['size'], weightMax);
     });
 
@@ -286,7 +392,7 @@ function Graph() {
 
     // Recenter the nodes:
     var xMin, xMax, yMin, yMax;
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       xMax = Math.max(node['x'], xMax || node['x']);
       xMin = Math.min(node['x'], xMin || node['x']);
       yMax = Math.max(node['y'], yMax || node['y']);
@@ -294,10 +400,10 @@ function Graph() {
     });
 
     var scale = self.p.scalingMode == 'outside' ?
-                Math.max(0.95 * w / (xMax - xMin),
-                         0.95 * h / (yMax - yMin)) :
-                Math.min(0.95 * w / (xMax - xMin),
-                         0.95 * h / (yMax - yMin));
+                Math.max(w / Math.max(xMax - xMin, 1),
+                         h / Math.max(yMax - yMin, 1)) :
+                Math.min(w / Math.max(xMax - xMin, 1),
+                         h / Math.max(yMax - yMin, 1));
 
     // Size homothetic parameters:
     var a, b;
@@ -325,7 +431,7 @@ function Graph() {
     }
 
     // Rescale the nodes:
-    self.nodes.forEach(function(node) {
+    parseNodes && self.nodes.forEach(function(node) {
       node['displaySize'] = node['size'] * a + b;
 
       if (!node['fixed']) {
@@ -334,17 +440,26 @@ function Graph() {
       }
     });
 
-    self.edges.forEach(function(edge) {
+    parseEdges && self.edges.forEach(function(edge) {
       edge['displaySize'] = edge['size'] * c + d;
     });
 
     return self;
   };
 
-  function translate(sceneX, sceneY, ratio, pow) {
-    var sizeRatio = Math.pow(ratio, pow || 1 / 2);
-
-    self.nodes.forEach(function(node) {
+  /**
+   * Translates the display values of the nodes and edges relatively to the
+   * scene position and zoom ratio.
+   * @param  {number} sceneX      The x position of the scene.
+   * @param  {number} sceneY      The y position of the scene.
+   * @param  {number} ratio       The zoom ratio of the scene.
+   * @param  {boolean} parseNodes Indicates if the nodes have to be parsed.
+   * @param  {boolean} parseEdges Indicates if the edges have to be parsed.
+   * @return {Graph} Returns itself.
+   */
+  function translate(sceneX, sceneY, ratio, parseNodes, parseEdges) {
+    var sizeRatio = Math.pow(ratio, self.p.nodesPowRatio);
+    parseNodes && self.nodes.forEach(function(node) {
       if (!node['fixed']) {
         node['displayX'] = node['displayX'] * ratio + sceneX;
         node['displayY'] = node['displayY'] * ratio + sceneY;
@@ -353,9 +468,59 @@ function Graph() {
       node['displaySize'] = node['displaySize'] * sizeRatio;
     });
 
+    sizeRatio = Math.pow(ratio, self.p.edgesPowRatio);
+    parseEdges && self.edges.forEach(function(edge) {
+      edge['displaySize'] = edge['displaySize'] * sizeRatio;
+    });
+
     return self;
   };
 
+  /**
+   * Determines the borders of the graph as it will be drawn. It is used to
+   * avoid the user to drag the graph out of the canvas.
+   */
+  function setBorders() {
+    self.borders = {};
+
+    self.nodes.forEach(function(node) {
+      self.borders.minX = Math.min(
+        self.borders.minX == undefined ?
+          node['displayX'] - node['displaySize'] :
+          self.borders.minX,
+        node['displayX'] - node['displaySize']
+      );
+
+      self.borders.maxX = Math.max(
+        self.borders.maxX == undefined ?
+          node['displayX'] + node['displaySize'] :
+          self.borders.maxX,
+        node['displayX'] + node['displaySize']
+      );
+
+      self.borders.minY = Math.min(
+        self.borders.minY == undefined ?
+          node['displayY'] - node['displaySize'] :
+          self.borders.minY,
+        node['displayY'] - node['displaySize']
+      );
+
+      self.borders.maxY = Math.max(
+        self.borders.maxY == undefined ?
+          node['displayY'] - node['displaySize'] :
+          self.borders.maxY,
+        node['displayY'] - node['displaySize']
+      );
+    });
+  }
+
+  /**
+   * Checks which nodes are under the (mX, mY) points, representing the mouse
+   * position.
+   * @param  {number} mX The mouse X position.
+   * @param  {number} mY The mouse Y position.
+   * @return {Graph} Returns itself.
+   */
   function checkHover(mX, mY) {
     var dX, dY, s, over = [], out = [];
     self.nodes.forEach(function(node) {
@@ -373,10 +538,10 @@ function Graph() {
 
       if (oldH && !newH) {
         node['hover'] = false;
-        out.push(node);
+        out.push(node.id);
       } else if (newH && !oldH) {
         node['hover'] = true;
-        over.push(node);
+        over.push(node.id);
       }
     });
 
@@ -386,6 +551,13 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Applies a function to a clone of each node (or indicated nodes), and then
+   * tries to apply the modifications made on the clones to the original nodes.
+   * @param  {function(Object)} fun The function to execute.
+   * @param  {?Array.<string>} ids  An Array of node IDs (optional).
+   * @return {Graph} Returns itself.
+   */
   function iterNodes(fun, ids) {
     var a = ids ? ids.map(function(id) {
       return self.nodesIndex[id];
@@ -401,6 +573,13 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Applies a function to a clone of each edge (or indicated edges), and then
+   * tries to apply the modifications made on the clones to the original edges.
+   * @param  {function(Object)} fun The function to execute.
+   * @param  {?Array.<string>} ids  An Array of edge IDs (optional).
+   * @return {Graph} Returns itself.
+   */
   function iterEdges(fun, ids) {
     var a = ids ? ids.map(function(id) {
       return self.edgesIndex[id];
@@ -416,6 +595,11 @@ function Graph() {
     return self;
   };
 
+  /**
+   * Returns a specific node clone or an array of specified node clones.
+   * @param  {(string|Array.<string>)} ids The ID or an array of node IDs.
+   * @return {(Object|Array.<Object>)} The clone or the array of clones.
+   */
   function getNodes(ids) {
     var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
       return cloneNode(self.nodesIndex[id]);
@@ -424,6 +608,11 @@ function Graph() {
     return (ids instanceof Array ? a : a[0]);
   };
 
+  /**
+   * Returns a specific edge clone or an array of specified edge clones.
+   * @param  {(string|Array.<string>)} ids The ID or an array of edge IDs.
+   * @return {(Object|Array.<Object>)} The clone or the array of clones.
+   */
   function getEdges(ids) {
     var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
       return cloneEdge(self.edgesIndex[id]);
@@ -448,6 +637,7 @@ function Graph() {
   this.empty = empty;
   this.rescale = rescale;
   this.translate = translate;
+  this.setBorders = setBorders;
   this.checkHover = checkHover;
 }
 
