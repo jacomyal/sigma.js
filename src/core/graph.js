@@ -517,8 +517,8 @@ function Graph() {
   /**
    * Checks which nodes are under the (mX, mY) points, representing the mouse
    * position.
-   * @param  {[type]} mX The mouse X position.
-   * @param  {[type]} mY The mouse Y position.
+   * @param  {number} mX The mouse X position.
+   * @param  {number} mY The mouse Y position.
    * @return {Graph} Returns itself.
    */
   function checkHover(mX, mY) {
@@ -538,10 +538,10 @@ function Graph() {
 
       if (oldH && !newH) {
         node['hover'] = false;
-        out.push(node);
+        out.push(node.id);
       } else if (newH && !oldH) {
         node['hover'] = true;
-        over.push(node);
+        over.push(node.id);
       }
     });
 

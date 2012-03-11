@@ -1,5 +1,6 @@
+// Mathieu Jacomy @ Sciences Po Médialab & WebAtlas
+// (requires sigma.js to be loaded)
 sigma.forceatlas2 = sigma.forceatlas2 || {};
-
 sigma.forceatlas2.ForceAtlas2 = function(graph) {
   sigma.classes.Cascade.call(this);
   var self = this;
@@ -888,7 +889,7 @@ sigma.forceatlas2.Region.prototype.applyForce = function(n, Force, theta) {
 
 sigma.publicPrototype.startForceAtlas2 = function() {
   if(!this.forceatlas2) {
-    this.forceatlas2 = new sigma.forceatlas2.ForceAtlas2(this.getGraph());
+    this.forceatlas2 = new sigma.forceatlas2.ForceAtlas2(this._core.graph);
     this.forceatlas2.setAutoSettings();
     this.forceatlas2.init();
   }

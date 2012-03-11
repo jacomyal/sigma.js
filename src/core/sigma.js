@@ -18,7 +18,7 @@ function Sigma(root, id) {
   /**
    * Represents "this", without the well-known scope issue.
    * @private
-   * @type {sigma.chronos}
+   * @type {Sigma}
    */
   var self = this;
 
@@ -40,7 +40,8 @@ function Sigma(root, id) {
     drawLabels: 2,
     lastNodes: 2,
     lastEdges: 0,
-    lastLabels: 2
+    lastLabels: 2,
+    drawHoverNodes: true
   };
 
   /**
@@ -133,6 +134,8 @@ function Sigma(root, id) {
   }).bind('mousedown mouseup', function(e) {
     var targeted = self.graph.nodes.filter(function(n) {
       return !!n['hover'];
+    }).map(function(n) {
+      return n.id;
     });
 
     if (targeted.length) {
@@ -293,6 +296,10 @@ function Sigma(root, id) {
       e > 0
     );
 
+    self.dispatch(
+      'graphscaled'
+    );
+
     // Clear scene:
     for (var k in self.domElements) {
       if (
@@ -392,23 +399,26 @@ function Sigma(root, id) {
    * @return {Sigma} Returns itself.
    */
   function drawHover() {
-    self.domElements.hover.getContext('2d').clearRect(
-      0,
-      0,
-      self.domElements.hover.width,
-      self.domElements.hover.height
-    );
+    if (self.p.drawHoverNodes) {
+      self.domElements.hover.getContext('2d').clearRect(
+        0,
+        0,
+        self.domElements.hover.width,
+        self.domElements.hover.height
+      );
 
-    self.graph.checkHover(
-      self.mousecaptor.mouseX,
-      self.mousecaptor.mouseY
-    );
+      self.graph.checkHover(
+        self.mousecaptor.mouseX,
+        self.mousecaptor.mouseY
+      );
 
-    self.graph.nodes.forEach(function(node) {
-      if (node['hover']) {
-        self.plotter.drawHoverNode(node);
-      }
-    });
+      self.graph.nodes.forEach(function(node) {
+        if (node['hover']) {
+          self.plotter.drawHoverNode(node);
+        }
+      });
+    }
+
     return self;
   }
 

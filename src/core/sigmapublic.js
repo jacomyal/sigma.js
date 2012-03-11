@@ -3,6 +3,8 @@ function SigmaPublic(sigmaInstance) {
   var self = this;
   sigma.classes.EventDispatcher.call(this);
 
+  this._core = sigmaInstance;
+
   this.kill = function() {
     // TODO
   };
@@ -99,10 +101,6 @@ function SigmaPublic(sigmaInstance) {
   this.dropEdge = function(v) {
     s.graph.dropEdge(v);
     return self;
-  };
-
-  this.getGraph = function() {
-    return s.graph;
   };
 
   this.pushGraph = function(object, safe) {
