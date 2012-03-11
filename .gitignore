@@ -3,3 +3,4 @@ build/compiler.jar
 build/*.js
 doc/
 examples/
+css/
