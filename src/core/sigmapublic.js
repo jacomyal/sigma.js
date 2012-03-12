@@ -61,6 +61,10 @@ function SigmaPublic(sigmaInstance) {
     }
   };
 
+  this.goTo = function(stageX, stageY, ratio) {
+    s.mousecaptor.interpolate(stageX, stageY, ratio);
+  };
+
   this.resize = function(w, h) {
     s.resize(w, h);
     return self;
