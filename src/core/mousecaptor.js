@@ -1,6 +1,7 @@
 /**
  * This class listen to all the different mouse events, to normalize them and
- * dispatch action events instead (from "startzooming" to "isdragging", etc).
+ * dispatch action events instead (from "startinterpolate" to "isdragging",
+ * etc).
  * @constructor
  * @extends sigma.classes.Cascade
  * @extends sigma.classes.EventDispatcher
@@ -34,9 +35,11 @@ function MouseCaptor(dom) {
     maxRatio: 32,
     marginRatio: 1,
     zoomDelta: 0.1,
+    dragDelta: 0.3,
     zoomMultiply: 2,
     directZooming: false,
     blockScroll: true,
+    inertia: 1,
     mouseEnabled: true
   };
 
@@ -48,9 +51,19 @@ function MouseCaptor(dom) {
   var oldStageX = 0;
   var oldStageY = 0;
   var oldRatio = 1;
+
   var targetRatio = 1;
+  var targetStageX = 0;
+  var targetStageY = 0;
+
+  var lastStageX = 0;
+  var lastStageX2 = 0;
+  var lastStageY = 0;
+  var lastStageY2 = 0;
 
   var progress = 0;
+  var isZooming = false;
+  var isDragging = false;
 
   this.stageX = 0;
   this.stageY = 0;
@@ -127,7 +140,7 @@ function MouseCaptor(dom) {
    * @param  {event} event A 'up' mouse event.
    */
   function upHandler(event) {
-    if (self.p.mouseEnabled) {
+    if (self.p.mouseEnabled && self.isMouseDown) {
       self.isMouseDown = false;
       self.dispatch('mouseup');
       stopDrag();
@@ -167,13 +180,19 @@ function MouseCaptor(dom) {
 
   /**
    * The handler listening to the 'wheel' mouse event. It will trigger
-   * {@link startZooming} with the event delta as parameter.
+   * {@link startInterpolate} with the event delta as parameter.
    * @private
    * @param  {event} event A 'wheel' mouse event.
    */
   function wheelHandler(event) {
     if (self.p.mouseEnabled) {
-      startZooming(getDelta(event));
+      startInterpolate(
+        self.stageX,
+        self.stageY,
+        self.ratio * (getDelta(event) > 0 ?
+          self.p.zoomMultiply :
+          1 / self.p.zoomMultiply)
+      );
 
       if (self.p['blockScroll']) {
         if (event.preventDefault) {
@@ -194,6 +213,12 @@ function MouseCaptor(dom) {
     oldStageY = self.stageY;
     startX = self.mouseX;
     startY = self.mouseY;
+
+    lastStageX = self.stageX;
+    lastStageX2 = self.stageX;
+    lastStageY = self.stageY;
+    lastStageY2 = self.stageY;
+
     self.dispatch('startdrag');
   };
 
@@ -202,7 +227,11 @@ function MouseCaptor(dom) {
    */
   function stopDrag() {
     if (oldStageX != self.stageX || oldStageY != self.stageY) {
-      self.dispatch('stopdrag');
+      startInterpolate(
+        self.stageX + self.p.inertia * (self.stageX - lastStageX2),
+        self.stageY + self.p.inertia * (self.stageY - lastStageY2),
+        self.ratio
+      );
     }
   };
 
@@ -215,6 +244,12 @@ function MouseCaptor(dom) {
     var newStageY = self.mouseY - startY + oldStageY;
 
     if (newStageX != self.stageX || newStageY != self.stageY) {
+      lastStageX2 = lastStageX;
+      lastStageY2 = lastStageY;
+
+      lastStageX = newStageX;
+      lastStageY = newStageY;
+
       self.stageX = newStageX;
       self.stageY = newStageY;
       self.dispatch('drag');
@@ -222,39 +257,54 @@ function MouseCaptor(dom) {
   };
 
   /**
-   * Will start computing the scene zoom ratio, until {@link stopZooming} is
+   * Will start computing the scene zoom ratio, until {@link stopInterpolate} is
    * triggered.
-   * @param {number} delta The delta from the mouse event that triggered the
-   *                       zoom.
+   * @param {number} x     The new stage X.
+   * @param {number} y     The new stage Y.
+   * @param {number} ratio The new zoom ratio.
    */
-  function startZooming(delta) {
+  function startInterpolate(x, y, ratio) {
     if (self.isMouseDown) {
       return;
     }
 
     window.clearInterval(self.zoomID);
 
+    oldStageX = self.stageX;
+    targetStageX = x;
+
+    oldStageY = self.stageY;
+    targetStageY = y;
+
     oldRatio = self.ratio;
-    targetRatio = self.ratio * (delta > 0 ?
-                       self.p.zoomMultiply :
-                       1 / self.p.zoomMultiply);
+    targetRatio = ratio;
     targetRatio = Math.min(
       Math.max(targetRatio, self.p.minRatio),
       self.p.maxRatio
     );
-    progress = self.p.directZooming ? 1 - self.p.zoomDelta : 0;
 
-    if (self.ratio != targetRatio) {
-      zooming();
-      self.zoomID = window.setInterval(zooming, 50);
-      self.dispatch('startzooming');
+    isDragging = (x != undefined && x != self.stageX) ||
+                 (y != undefined && y != self.stageY);
+    isZooming = ratio != undefined && ratio != self.ratio;
+    progress = self.p.directZooming ?
+      1 - (isZooming ? self.p.zoomDelta : self.p.dragDelta) :
+      0;
+
+    if (
+      self.ratio != targetRatio ||
+      self.stageX != targetStageX ||
+      self.stageY != targetStageY
+    ) {
+      interpolate();
+      self.zoomID = window.setInterval(interpolate, 50);
+      self.dispatch('startinterpolate');
     }
   };
 
   /**
-   * Stops computing the scene zooming ratio.
+   * Stops the move interpolation.
    */
-  function stopZooming() {
+  function stopInterpolate() {
     var oldRatio = self.ratio;
 
     self.ratio = targetRatio;
@@ -267,32 +317,42 @@ function MouseCaptor(dom) {
                   self.ratio /
                   oldRatio;
 
-    self.dispatch('stopzooming');
+    self.dispatch('stopinterpolate');
   };
 
   /**
-   * Computes the zooming ratio of the scene, relatively to the last mouse
-   * event delta received, and dispatches a "zooming" event.
+   * Computes the interpolate ratio and the position of the scene, relatively
+   * to the last mouse event delta received, and dispatches a "interpolate"
+   * event.
    */
-  function zooming() {
-    progress += self.p.zoomDelta;
+  function interpolate() {
+    progress += (isZooming ? self.p.zoomDelta : self.p.dragDelta);
     var k = sigma.easing.quadratic.easeout(progress);
     var oldRatio = self.ratio;
 
     self.ratio = oldRatio * (1 - k) + targetRatio * k;
-    self.stageX = self.mouseX +
-                  (self.stageX - self.mouseX) *
-                  self.ratio /
-                  oldRatio;
-    self.stageY = self.mouseY +
-                  (self.stageY - self.mouseY) *
-                  self.ratio /
-                  oldRatio;
 
-    self.dispatch('zooming');
+    if (isDragging) {
+      self.stageX = oldStageX * (1 - k) + targetStageX * k;
+      self.stageY = oldStageY * (1 - k) + targetStageY * k;
+    }
+
+    if (isZooming) {
+      self.stageX = self.mouseX +
+                    (self.stageX - self.mouseX) *
+                    self.ratio /
+                    oldRatio;
+
+      self.stageY = self.mouseY +
+                    (self.stageY - self.mouseY) *
+                    self.ratio /
+                    oldRatio;
+    }
+
+    self.dispatch('interpolate');
     if (progress > 1) {
       window.clearInterval(self.zoomID);
-      stopZooming();
+      stopInterpolate();
     }
   };
 
@@ -343,5 +403,6 @@ function MouseCaptor(dom) {
   document.addEventListener('mouseup', upHandler, true);
 
   this.checkBorders = checkBorders;
+  this.interpolate = startInterpolate;
 }
 
