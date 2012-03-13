@@ -187,8 +187,8 @@ function MouseCaptor(dom) {
   function wheelHandler(event) {
     if (self.p.mouseEnabled) {
       startInterpolate(
-        self.stageX,
-        self.stageY,
+        self.mouseX,
+        self.mouseY,
         self.ratio * (getDelta(event) > 0 ?
           self.p.zoomMultiply :
           1 / self.p.zoomMultiply)
@@ -268,7 +268,7 @@ function MouseCaptor(dom) {
       return;
     }
 
-    window.clearInterval(self.zoomID);
+    window.clearInterval(self.interpolationID);
 
     oldStageX = self.stageX;
     targetStageX = x;
@@ -283,10 +283,13 @@ function MouseCaptor(dom) {
       self.p.maxRatio
     );
 
-    isDragging = (x != undefined && x != self.stageX) ||
-                 (y != undefined && y != self.stageY);
     isZooming = ratio != undefined && ratio != self.ratio;
-    progress = self.p.directZooming ?
+    isDragging =
+      (x != undefined && x != self.stageX) ||
+      (y != undefined && y != self.stageY);
+
+    progress =
+      self.p.directZooming ?
       1 - (isZooming ? self.p.zoomDelta : self.p.dragDelta) :
       0;
 
@@ -296,7 +299,7 @@ function MouseCaptor(dom) {
       self.stageY != targetStageY
     ) {
       interpolate();
-      self.zoomID = window.setInterval(interpolate, 50);
+      self.interpolationID = window.setInterval(interpolate, 50);
       self.dispatch('startinterpolate');
     }
   };
@@ -308,12 +311,12 @@ function MouseCaptor(dom) {
     var oldRatio = self.ratio;
 
     self.ratio = targetRatio;
-    self.stageX = self.mouseX +
-                  (self.stageX - self.mouseX) *
+    self.stageX = targetStageX +
+                  (self.stageX - targetStageX) *
                   self.ratio /
                   oldRatio;
-    self.stageY = self.mouseY +
-                  (self.stageY - self.mouseY) *
+    self.stageY = targetStageY +
+                  (self.stageY - targetStageY) *
                   self.ratio /
                   oldRatio;
 
@@ -327,31 +330,31 @@ function MouseCaptor(dom) {
    */
   function interpolate() {
     progress += (isZooming ? self.p.zoomDelta : self.p.dragDelta);
+    progress = Math.min(progress, 1);
+
     var k = sigma.easing.quadratic.easeout(progress);
     var oldRatio = self.ratio;
 
     self.ratio = oldRatio * (1 - k) + targetRatio * k;
 
-    if (isDragging) {
+    if (isZooming) {
+      self.stageX = targetStageX +
+                    (self.stageX - targetStageX) *
+                    self.ratio /
+                    oldRatio;
+
+      self.stageY = targetStageY +
+                    (self.stageY - targetStageY) *
+                    self.ratio /
+                    oldRatio;
+    } else {
       self.stageX = oldStageX * (1 - k) + targetStageX * k;
       self.stageY = oldStageY * (1 - k) + targetStageY * k;
     }
 
-    if (isZooming) {
-      self.stageX = self.mouseX +
-                    (self.stageX - self.mouseX) *
-                    self.ratio /
-                    oldRatio;
-
-      self.stageY = self.mouseY +
-                    (self.stageY - self.mouseY) *
-                    self.ratio /
-                    oldRatio;
-    }
-
     self.dispatch('interpolate');
-    if (progress > 1) {
-      window.clearInterval(self.zoomID);
+    if (progress >= 1) {
+      window.clearInterval(self.interpolationID);
       stopInterpolate();
     }
   };

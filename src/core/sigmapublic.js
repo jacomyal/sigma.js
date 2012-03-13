@@ -9,6 +9,10 @@ function SigmaPublic(sigmaInstance) {
     // TODO
   };
 
+  this.getID = function() {
+    return s.id;
+  };
+
   // Config:
   this.configProperties = function(a1, a2) {
     var res = s.config(a1, a2);
@@ -63,6 +67,7 @@ function SigmaPublic(sigmaInstance) {
 
   this.goTo = function(stageX, stageY, ratio) {
     s.mousecaptor.interpolate(stageX, stageY, ratio);
+    return self;
   };
 
   this.resize = function(w, h) {
