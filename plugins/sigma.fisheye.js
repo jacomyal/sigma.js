@@ -2,7 +2,7 @@ sigma.classes.FishEye = function(sig) {
   sigma.classes.Cascade.call(this);
 
   var self = this;
-  var isRunning = false;
+  var isActivated = false;
 
   this.p = {
     radius: 200,
@@ -20,7 +20,7 @@ sigma.classes.FishEye = function(sig) {
       yDist = node.displayY - mouseY;
       dist  = Math.sqrt(xDist*xDist + yDist*yDist);
 
-      if(dist<radius){
+      if(dist < radius){
         newDist = powerExp/(powerExp-1)*radius*(1-Math.exp(-dist/radius*power));
         newSize = powerExp/(powerExp-1)*radius*(1-Math.exp(-dist/radius*power));
 
@@ -42,27 +42,53 @@ sigma.classes.FishEye = function(sig) {
   }
 
   this.handler = handler;
+  this.activated = function(v) {
+    if(v==undefined){
+      return isActivated;
+    }else{
+      isActivated = v;
+      return this;
+    }
+  };
+
+  this.refresh = function(){};
 };
 
 sigma.publicPrototype.activateFishEye = function() {
   if(!this.fisheye) {
-    var fe = new sigma.classes.FishEye(this._core);
-    this.fisheye = {
-      isRunning: false,
-      apply: fe.handler,
-      config: fe.config
+    var sigmaInstance = this;
+    var fe = new sigma.classes.FishEye(sigmaInstance._core);
+    sigmaInstance.fisheye = fe;
+
+    fe.refresh = function refresh() {
+      sigmaInstance.draw(2,2,2);
     };
   }
 
-  if(!this.fisheye.isRunning){
-    this._core.bind('graphscaled', this.fisheye.apply);
-    this.fisheye.isRunning = true;
+  if(!this.fisheye.activated()){
+    this.fisheye.activated(true);
+    this._core.bind('graphscaled', this.fisheye.handler);
+    document.getElementById(
+      'sigma_mouse_'+this.getID()
+    ).addEventListener('mousemove',this.fisheye.refresh,true);
   }
+
+  return this;
 };
 
 sigma.publicPrototype.desactivateFishEye = function() {
-  if(this.fisheye && this.fisheye.isRunning){
-    this._core.unbind('graphscaled', this.fisheye.apply);
-    this.fisheye.isRunning = false;
+  if(this.fisheye && this.fisheye.activated()){
+    this.fisheye.activated(false);
+    this._core.unbind('graphscaled', this.fisheye.handler);
+    document.getElementById(
+      'sigma_mouse_'+this.getID()
+    ).removeEventListener('mousemove',this.fisheye.refresh,true);
   }
+
+  return this;
+};
+
+sigma.publicPrototype.fishEyeProperties = function(a1, a2) {
+  var res = this.fisheye.config(a1, a2);
+  return res == s ? this.fisheye : res;
 };
