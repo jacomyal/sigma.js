@@ -63,7 +63,6 @@ function MouseCaptor(dom) {
 
   var progress = 0;
   var isZooming = false;
-  var isDragging = false;
 
   this.stageX = 0;
   this.stageY = 0;
@@ -269,6 +268,7 @@ function MouseCaptor(dom) {
     }
 
     window.clearInterval(self.interpolationID);
+    isZooming = ratio != undefined;
 
     oldStageX = self.stageX;
     targetStageX = x;
@@ -277,16 +277,11 @@ function MouseCaptor(dom) {
     targetStageY = y;
 
     oldRatio = self.ratio;
-    targetRatio = ratio;
+    targetRatio = ratio || self.ratio;
     targetRatio = Math.min(
       Math.max(targetRatio, self.p.minRatio),
       self.p.maxRatio
     );
-
-    isZooming = ratio != undefined && ratio != self.ratio;
-    isDragging =
-      (x != undefined && x != self.stageX) ||
-      (y != undefined && y != self.stageY);
 
     progress =
       self.p.directZooming ?
@@ -310,15 +305,20 @@ function MouseCaptor(dom) {
   function stopInterpolate() {
     var oldRatio = self.ratio;
 
-    self.ratio = targetRatio;
-    self.stageX = targetStageX +
-                  (self.stageX - targetStageX) *
-                  self.ratio /
-                  oldRatio;
-    self.stageY = targetStageY +
-                  (self.stageY - targetStageY) *
-                  self.ratio /
-                  oldRatio;
+    if (isZooming) {
+      self.ratio = targetRatio;
+      self.stageX = targetStageX +
+                    (self.stageX - targetStageX) *
+                    self.ratio /
+                    oldRatio;
+      self.stageY = targetStageY +
+                    (self.stageY - targetStageY) *
+                    self.ratio /
+                    oldRatio;
+    }else {
+      self.stageX = targetStageX;
+      self.stageY = targetStageY;
+    }
 
     self.dispatch('stopinterpolate');
   };

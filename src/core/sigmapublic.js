@@ -70,6 +70,28 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
+  this.zoomTo = function(x, y, ratio) {
+    ratio = Math.min(
+              Math.max(s.mousecaptor.config('minRatio'), ratio),
+              s.mousecaptor.config('maxRatio')
+            );
+    if (ratio == s.mousecaptor.ratio) {
+      s.mousecaptor.interpolate(
+        x - s.width,
+        y - s.height
+      );
+    }else {
+      s.mousecaptor.interpolate(
+        (ratio * x - s.mousecaptor.ratio * s.width/2) /
+        (ratio - s.mousecaptor.ratio),
+        (ratio * y - s.mousecaptor.ratio * s.height/2) /
+        (ratio - s.mousecaptor.ratio),
+        ratio
+      );
+    }
+    return self;
+  };
+
   this.resize = function(w, h) {
     s.resize(w, h);
     return self;
