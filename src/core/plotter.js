@@ -49,15 +49,24 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     //              will be used instead)
     labelBGColor: 'default',
     defaultLabelBGColor: '#fff',
-    //   Label shadow:
-    labelShadow: true,
-    labelShadowColor: '#000',
+    //   Label hover shadow:
+    labelHoverShadow: true,
+    labelHoverShadowColor: '#000',
     //   Label hover color:
     //   - 'node'
     //   - default (then defaultLabelHoverColor
     //              will be used instead)
     labelHoverColor: 'default',
     defaultLabelHoverColor: '#000',
+    //   Label active shadow:
+    labelActiveShadow: true,
+    labelActiveShadowColor: '#000',
+    //   Label active color:
+    //   - 'node'
+    //   - default (then defaultLabelActiveColor
+    //              will be used instead)
+    labelActiveColor: 'default',
+    defaultLabelActiveColor: '#000',
     //   Label size:
     //   - 'fixed'
     //   - 'proportional'
@@ -91,6 +100,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     //              will be used instead)
     nodeHoverColor: 'node',
     defaultNodeHoverColor: '#fff',
+    // ACTIVE:
+    //   Node active color:
+    //   - 'node'
+    //   - default (then defaultNodeActiveColor
+    //              will be used instead)
+    nodeActiveColor: 'node',
+    defaultNodeActiveColor: '#fff',
     //   Node border color:
     //   - 'node'
     //   - default (then defaultNodeBorderColor
@@ -373,11 +389,11 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     // Label background:
     ctx.beginPath();
 
-    if (self.p.labelShadow) {
+    if (self.p.labelHoverShadow) {
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
       ctx.shadowBlur = 4;
-      ctx.shadowColor = self.p.labelShadowColor;
+      ctx.shadowColor = self.p.labelHoverShadowColor;
     }
 
     sigma.tools.drawRoundRect(
@@ -441,6 +457,98 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   };
 
   /**
+   * Draws one active node to the corresponding canvas.
+   * @param  {Object} node The active node to draw.
+   * @return {Plotter} Returns itself.
+   */
+  function drawActiveNode(node) {
+    var ctx = hoverCtx;
+
+    if (!isOnScreen(node)) {
+      return self;
+    }
+
+    var fontSize = self.p.labelSize == 'fixed' ?
+                   self.p.defaultLabelSize :
+                   self.p.labelSizeRatio * node['displaySize'];
+
+    ctx.font = fontSize + 'px ' + self.p.font;
+
+    ctx.fillStyle = self.p.labelBGColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultLabelBGColor;
+
+    // Label background:
+    ctx.beginPath();
+
+    if (self.p.labelActiveShadow) {
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = self.p.labelActiveShadowColor;
+    }
+
+    sigma.tools.drawRoundRect(
+      ctx,
+      Math.round(node['displayX'] - fontSize / 2 - 2),
+      Math.round(node['displayY'] - fontSize / 2 - 2),
+      Math.round(ctx.measureText(node['label']).width +
+        node['displaySize'] * 1.5 +
+        fontSize / 2 + 4),
+      Math.round(fontSize + 4),
+      Math.round(fontSize / 2 + 2),
+      'left'
+    );
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
+
+    // Node border:
+    ctx.beginPath();
+    ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultNodeBorderColor;
+    ctx.arc(Math.round(node['displayX']),
+            Math.round(node['displayY']),
+            node['displaySize'] + self.p.borderSize,
+            0,
+            Math.PI * 2,
+            true);
+    ctx.closePath();
+    ctx.fill();
+
+    // Node:
+    ctx.beginPath();
+    ctx.fillStyle = self.p.nodeActiveColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultNodeActiveColor;
+    ctx.arc(Math.round(node['displayX']),
+            Math.round(node['displayY']),
+            node['displaySize'],
+            0,
+            Math.PI * 2,
+            true);
+
+    ctx.closePath();
+    ctx.fill();
+
+    // Label:
+    ctx.fillStyle = self.p.labelActiveColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultLabelActiveColor;
+    ctx.fillText(
+      node['label'],
+      Math.round(node['displayX'] + node['displaySize'] * 1.5),
+      Math.round(node['displayY'] + fontSize / 2 - 3)
+    );
+
+    return self;
+  };
+
+  /**
    * Determines if a node is on the screen or not. The limits here are
    * bigger than the actual screen, to avoid seeing labels disappear during
    * the graph manipulation.
@@ -478,6 +586,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   this.task_drawLabel = task_drawLabel;
   this.task_drawEdge = task_drawEdge;
   this.task_drawNode = task_drawNode;
+  this.drawActiveNode = drawActiveNode;
   this.drawHoverNode = drawHoverNode;
   this.isOnScreen = isOnScreen;
   this.resize = resize;

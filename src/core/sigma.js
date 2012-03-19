@@ -138,6 +138,12 @@ function Sigma(root, id) {
       return n.id;
     });
 
+    self.dispatch(
+      e['type'] == 'mousedown' ?
+        'downgraph' :
+        'upgraph'
+    );
+
     if (targeted.length) {
       self.dispatch(
         e['type'] == 'mousedown' ?
@@ -388,6 +394,7 @@ function Sigma(root, id) {
     );
 
     drawHover();
+    drawActive();
 
     start && sigma.chronos.runTasks();
     return self;
@@ -413,7 +420,31 @@ function Sigma(root, id) {
       );
 
       self.graph.nodes.forEach(function(node) {
-        if (node['hover']) {
+        if (node.hover) {
+          self.plotter.drawHoverNode(node);
+        }
+      });
+    }
+
+    return self;
+  }
+
+  /**
+   * Draws the active nodes labels. This method is applied directly, and does
+   * not use the pseudo-asynchronous tasks process.
+   * @return {Sigma} Returns itself.
+   */
+  function drawActive() {
+    if (self.p.drawActiveNodes) {
+      self.domElements.hover.getContext('2d').clearRect(
+        0,
+        0,
+        self.domElements.hover.width,
+        self.domElements.hover.height
+      );
+
+      self.graph.nodes.forEach(function(node) {
+        if (node.active) {
           self.plotter.drawHoverNode(node);
         }
       });
@@ -430,6 +461,7 @@ function Sigma(root, id) {
   this.draw = draw;
   this.resize = resize;
   this.drawHover = drawHover;
+  this.drawActive = drawActive;
   this.clearSchedule = clearSchedule;
 
   window.addEventListener('resize', function() {

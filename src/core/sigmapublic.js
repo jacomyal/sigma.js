@@ -77,8 +77,8 @@ function SigmaPublic(sigmaInstance) {
             );
     if (ratio == s.mousecaptor.ratio) {
       s.mousecaptor.interpolate(
-        x - s.width,
-        y - s.height
+        x - s.width / 2 + s.mousecaptor.stageX,
+        y - s.height / 2 + s.mousecaptor.stageY
       );
     }else {
       s.mousecaptor.interpolate(
@@ -197,7 +197,7 @@ function SigmaPublic(sigmaInstance) {
   };
 
   // Events
-  s.bind('downnodes upnodes', function(e) {
+  s.bind('downnodes upnodes downgraph upgraph', function(e) {
     self.dispatch(e.type, e.content);
   });
 
