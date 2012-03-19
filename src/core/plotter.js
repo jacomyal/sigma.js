@@ -488,7 +488,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
                fontSize + 'px ' +
                (self.p.activeFont || self.p.font || '');
-console.log(ctx.font);
+
     ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultActiveLabelBGColor;
