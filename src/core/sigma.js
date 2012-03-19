@@ -41,7 +41,8 @@ function Sigma(root, id) {
     lastNodes: 2,
     lastEdges: 0,
     lastLabels: 2,
-    drawHoverNodes: true
+    drawHoverNodes: true,
+    drawActiveNodes: true
   };
 
   /**
@@ -152,7 +153,17 @@ function Sigma(root, id) {
         targeted
       );
     }
-  }).bind('move', drawHover);
+  }).bind('move', function() {
+    self.domElements.hover.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.hover.width,
+      self.domElements.hover.height
+    );
+
+    drawHover();
+    drawActive();
+  });
 
   sigma.chronos.bind('startgenerators', function() {
     if (sigma.chronos.getGeneratorsIDs().some(function(id) {
@@ -393,12 +404,29 @@ function Sigma(root, id) {
       'draw'
     );
 
-    drawHover();
-    drawActive();
+    self.refresh();
 
     start && sigma.chronos.runTasks();
     return self;
   };
+
+  /**
+   * Draws the hover and active nodes labels.
+   * @return {Sigma} Returns itself.
+   */
+  function refresh() {
+    self.domElements.hover.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.hover.width,
+      self.domElements.hover.height
+    );
+
+    drawHover();
+    drawActive();
+
+    return self;
+  }
 
   /**
    * Draws the hover nodes labels. This method is applied directly, and does
@@ -407,20 +435,13 @@ function Sigma(root, id) {
    */
   function drawHover() {
     if (self.p.drawHoverNodes) {
-      self.domElements.hover.getContext('2d').clearRect(
-        0,
-        0,
-        self.domElements.hover.width,
-        self.domElements.hover.height
-      );
-
       self.graph.checkHover(
         self.mousecaptor.mouseX,
         self.mousecaptor.mouseY
       );
 
       self.graph.nodes.forEach(function(node) {
-        if (node.hover) {
+        if (node.hover && !node.active) {
           self.plotter.drawHoverNode(node);
         }
       });
@@ -436,16 +457,9 @@ function Sigma(root, id) {
    */
   function drawActive() {
     if (self.p.drawActiveNodes) {
-      self.domElements.hover.getContext('2d').clearRect(
-        0,
-        0,
-        self.domElements.hover.width,
-        self.domElements.hover.height
-      );
-
       self.graph.nodes.forEach(function(node) {
         if (node.active) {
-          self.plotter.drawHoverNode(node);
+          self.plotter.drawActiveNode(node);
         }
       });
     }
@@ -460,6 +474,7 @@ function Sigma(root, id) {
 
   this.draw = draw;
   this.resize = resize;
+  this.refresh = refresh;
   this.drawHover = drawHover;
   this.drawActive = drawActive;
   this.clearSchedule = clearSchedule;

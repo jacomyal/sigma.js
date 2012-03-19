@@ -102,6 +102,11 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
+  this.refresh = function() {
+    s.refresh();
+    return self;
+  };
+
   // Tasks methods:
   this.addGenerator = function(id, task, condition) {
     sigma.chronos.addGenerator(id + '_ext_' + s.id, task, condition);

@@ -39,7 +39,7 @@ function MouseCaptor(dom) {
     zoomMultiply: 2,
     directZooming: false,
     blockScroll: true,
-    inertia: 1,
+    inertia: 1.1,
     mouseEnabled: true
   };
 
@@ -228,8 +228,7 @@ function MouseCaptor(dom) {
     if (oldStageX != self.stageX || oldStageY != self.stageY) {
       startInterpolate(
         self.stageX + self.p.inertia * (self.stageX - lastStageX2),
-        self.stageY + self.p.inertia * (self.stageY - lastStageY2),
-        self.ratio
+        self.stageY + self.p.inertia * (self.stageY - lastStageY2)
       );
     }
   };

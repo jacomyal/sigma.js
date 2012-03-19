@@ -60,6 +60,7 @@ function Graph() {
       'size': 1,
       'degree': 0,
       'fixed': false,
+      'active': false,
       'hidden': false,
       'label': id.toString(),
       'id': id.toString(),
@@ -76,6 +77,7 @@ function Graph() {
           n[k] = +params[k];
           break;
         case 'fixed':
+        case 'active':
         case 'hidden':
           n[k] = !!params[k];
           break;
@@ -113,6 +115,7 @@ function Graph() {
       'id': node['id'],
       'color': node['color'],
       'fixed': node['fixed'],
+      'active': node['active'],
       'hidden': node['hidden'],
       'attr': node['attr']
     };
@@ -143,6 +146,7 @@ function Graph() {
           node[k] = +copy[k];
           break;
         case 'fixed':
+        case 'active':
         case 'hidden':
           node[k] = !!copy[k];
           break;

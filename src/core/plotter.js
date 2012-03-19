@@ -43,12 +43,12 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     //              will be used instead)
     labelColor: 'default',
     defaultLabelColor: '#000',
-    //   Label background color:
+    //   Label hover background color:
     //   - 'node'
-    //   - default (then defaultLabelBGColor
+    //   - default (then defaultHoverLabelBGColor
     //              will be used instead)
-    labelBGColor: 'default',
-    defaultLabelBGColor: '#fff',
+    labelHoverBGColor: 'default',
+    defaultHoverLabelBGColor: '#fff',
     //   Label hover shadow:
     labelHoverShadow: true,
     labelHoverShadowColor: '#000',
@@ -58,6 +58,12 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     //              will be used instead)
     labelHoverColor: 'default',
     defaultLabelHoverColor: '#000',
+    //   Label active background color:
+    //   - 'node'
+    //   - default (then defaultActiveLabelBGColor
+    //              will be used instead)
+    labelActiveBGColor: 'default',
+    defaultActiveLabelBGColor: '#fff',
     //   Label active shadow:
     labelActiveShadow: true,
     labelActiveShadowColor: '#000',
@@ -78,6 +84,11 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     labelSizeRatio: 2,    // for proportional display only
     labelThreshold: 6,
     font: 'Arial',
+    hoverFont: '',
+    activeFont: '',
+    fontStyle: '',
+    hoverFontStyle: '',
+    activeFontStyle: '',
     // ------
     // EDGES:
     // ------
@@ -353,7 +364,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                      self.p.defaultLabelSize :
                      self.p.labelSizeRatio * node['displaySize'];
 
-      ctx.font = fontSize + 'px ' + self.p.font;
+      ctx.font = self.p.fontStyle + fontSize + 'px ' + self.p.font;
 
       ctx.fillStyle = self.p.labelColor == 'node' ?
                       (node['color'] || self.p.defaultNodeColor) :
@@ -380,11 +391,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
 
-    ctx.font = fontSize + 'px ' + self.p.font;
+    ctx.font = (self.p.hoverFontStyle || self.p.fontStyle || '') + ' ' +
+               fontSize + 'px ' +
+               (self.p.hoverFont || self.p.font || '');
 
-    ctx.fillStyle = self.p.labelBGColor == 'node' ?
+    ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultLabelBGColor;
+                    self.p.defaultHoverLabelBGColor;
 
     // Label background:
     ctx.beginPath();
@@ -472,11 +485,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
 
-    ctx.font = fontSize + 'px ' + self.p.font;
-
-    ctx.fillStyle = self.p.labelBGColor == 'node' ?
+    ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
+               fontSize + 'px ' +
+               (self.p.activeFont || self.p.font || '');
+console.log(ctx.font);
+    ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultLabelBGColor;
+                    self.p.defaultActiveLabelBGColor;
 
     // Label background:
     ctx.beginPath();
