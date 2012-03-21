@@ -4,7 +4,7 @@
 ****   Core   ****
   - Caching nodes drawing                   - Next version
   - Caching labels drawing                  - Next version
-  - Documentation                           - Most have been done, still have to compile
+  - Documentation                           - Most has been done, still have to compile
                                               and make a template for it.
   - Adding a parameter that is true if
     everything looks fine to execute
@@ -15,22 +15,8 @@
     > Sigma
     > Graph (coherence)
 
-****   API   ****
-  - Auto-resizing option
-  - Possibility to highlight nodes
-    (must look different from hover
-    effect)
-
 ****   Others   ****
-  - Define some typical plugins type that
-    would directly modify the public API
-    > Update architecture in consequences
   - Implement multitouch features           - Next version
-  - Improve Makefile
-    > Propose to download closure.jar if
-      not found
-    > Propose to install gjslint and
-      fixjsstyle if not found
-    > mkdir ./build if not found
-    > Insert headers to compiled files
-  - Make an easy / light example template
+  - Change the code such as it is possible
+    to use the MINIDY_ADVANCED Closure
+    option.
