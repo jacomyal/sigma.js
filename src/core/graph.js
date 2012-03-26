@@ -59,6 +59,8 @@ function Graph() {
       'y': 0,
       'size': 1,
       'degree': 0,
+      'inDegree': 0,
+      'outDegree': 0,
       'fixed': false,
       'active': false,
       'hidden': false,
@@ -108,6 +110,8 @@ function Graph() {
       'y': node['y'],
       'size': node['size'],
       'degree': node['degree'],
+      'inDegree': node['inDegree'],
+      'outDegree': node['outDegree'],
       'displayX': node['displayX'],
       'displayY': node['displayY'],
       'displaySize': node['displaySize'],
@@ -136,6 +140,8 @@ function Graph() {
         case 'id':
         case 'attr':
         case 'degree':
+        case 'inDegree':
+        case 'outDegree':
         case 'displayX':
         case 'displayY':
         case 'displaySize':
@@ -187,8 +193,15 @@ function Graph() {
 
         var edgesToRemove = [];
         self.edges = self.edges.filter(function(e) {
-          if (e['source']['id'] == id || e['target']['id'] == id) {
+          if (e['source']['id'] == id) {
             delete self.edgesIndex[e['id']];
+            e['target']['degree']--;
+            e['target']['inDegree']--;
+            return false;
+          }else if (e['target']['id'] == id) {
+            delete self.edgesIndex[e['id']];
+            e['source']['degree']--;
+            e['source']['outDegree']--;
             return false;
           }
           return true;
@@ -236,8 +249,11 @@ function Graph() {
       'id': id.toString(),
       'attr': {}
     };
+
     e['source']['degree']++;
+    e['source']['outDegree']++;
     e['target']['degree']++;
+    e['target']['inDegree']++;
 
     for (var k in params) {
       switch (k) {
@@ -336,6 +352,11 @@ function Graph() {
 
     a.forEach(function(id) {
       if (self.edgesIndex[id]) {
+        self.edgesIndex[id]['source']['degree']--;
+        self.edgesIndex[id]['source']['outDegree']--;
+        self.edgesIndex[id]['target']['degree']--;
+        self.edgesIndex[id]['target']['inDegree']--;
+
         var index = null;
         self.edges.some(function(n, i) {
           if (n['id'] == id) {
