@@ -136,7 +136,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       for(k=0; k<attvalueNodes.length; k++){
         var attvalueNode = attvalueNodes[k];
         var attr = attvalueNode.getAttribute('for');
-        var al = attvalueNode.getAttribute('value');
+        var val = attvalueNode.getAttribute('value');
         edge.attributes.push({attr:attr, val:val});
       }
 
