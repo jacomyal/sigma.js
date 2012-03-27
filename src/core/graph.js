@@ -223,7 +223,7 @@ function Graph() {
    *                        of the edge.
    * @return {Graph} Returns itself.
    */
-  function addEdge(id, source, target, params, weight) {
+  function addEdge(id, source, target, params) {
     if (self.edgesIndex[id]) {
       throw new Error('Edge "' + id + '" already exists.');
     }
@@ -238,21 +238,17 @@ function Graph() {
       throw new Error(s);
     }
 
-    if(!weight) {
-      weight = 1;
-    }
-
     params = params || {};
     var e = {
       'source': self.nodesIndex[source],
       'target': self.nodesIndex[target],
       'size': 1,
-      'weight': weight,
+      'weight': 1,
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
-      'attr': {},
-      'hidden': false
+      'hidden': false,
+      'attr': {}
     };
 
     e['source']['degree']++;
@@ -266,10 +262,11 @@ function Graph() {
         case 'source':
         case 'target':
           break;
-        case 'hidden':          
+        case 'hidden':
           e[k] = !!params[k];
           break;
         case 'size':
+        case 'weight':
           e[k] = +params[k];
           break;
         case 'color':
@@ -307,6 +304,7 @@ function Graph() {
       'weight': edge['weight'],
       'displaySize': edge['displaySize'],
       'label': edge['label'],
+      'hidden': edge['hidden'],
       'id': edge['id'],
       'attr': edge['attr'],
       'color': edge['color']
@@ -326,9 +324,9 @@ function Graph() {
     for (var k in copy) {
       switch (k) {
         case 'id':
-        case 'weight':
         case 'displaySize':
           break;
+        case 'weight':
         case 'size':
           edge[k] = +copy[k];
           break;

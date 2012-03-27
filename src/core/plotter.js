@@ -207,9 +207,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var s, t, i = 0;
 
     while (i++< self.p.edgesSpeed && self.currentEdgeIndex < c) {
-      e = graph.edges[self.currentEdgeIndex];      
+      e = graph.edges[self.currentEdgeIndex];
       s = e['source'];
-      t = e['target'];            
+      t = e['target'];
       if (e['hidden'] ||
           s['hidden'] ||
           t['hidden'] ||
