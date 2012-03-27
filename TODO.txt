@@ -18,5 +18,5 @@
 ****   Others   ****
   - Implement multitouch features           - Next version
   - Change the code such as it is possible
-    to use the MINIDY_ADVANCED Closure
+    to use the MINIFY_ADVANCED Closure
     option.
