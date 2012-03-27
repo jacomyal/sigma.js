@@ -223,7 +223,7 @@ function Graph() {
    *                        of the edge.
    * @return {Graph} Returns itself.
    */
-  function addEdge(id, source, target, params) {
+  function addEdge(id, source, target, params, weight) {
     if (self.edgesIndex[id]) {
       throw new Error('Edge "' + id + '" already exists.');
     }
@@ -238,12 +238,16 @@ function Graph() {
       throw new Error(s);
     }
 
+    if(!weight) {
+      weight = 1;
+    }
+
     params = params || {};
     var e = {
       'source': self.nodesIndex[source],
       'target': self.nodesIndex[target],
       'size': 1,
-      'weight': 1,
+      'weight': weight,
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
