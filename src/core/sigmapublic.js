@@ -124,8 +124,8 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
-  this.addEdge = function(id, source, target, params) {
-    s.graph.addEdge(id, source, target, params);
+  this.addEdge = function(id, source, target, params, weight) {
+    s.graph.addEdge(id, source, target, params, weight);
     return self;
   }
 

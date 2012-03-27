@@ -223,7 +223,7 @@ function Graph() {
    *                        of the edge.
    * @return {Graph} Returns itself.
    */
-  function addEdge(id, source, target, params) {
+  function addEdge(id, source, target, params, weight) {
     if (self.edgesIndex[id]) {
       throw new Error('Edge "' + id + '" already exists.');
     }
@@ -238,16 +238,21 @@ function Graph() {
       throw new Error(s);
     }
 
+    if(!weight) {
+      weight = 1;
+    }
+
     params = params || {};
     var e = {
       'source': self.nodesIndex[source],
       'target': self.nodesIndex[target],
       'size': 1,
-      'weight': 1,
+      'weight': weight,
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
-      'attr': {}
+      'attr': {},
+      'hidden': false
     };
 
     e['source']['degree']++;
@@ -260,6 +265,9 @@ function Graph() {
         case 'id':
         case 'source':
         case 'target':
+          break;
+        case 'hidden':          
+          e[k] = !!params[k];
           break;
         case 'size':
           e[k] = +params[k];
@@ -327,6 +335,9 @@ function Graph() {
         case 'source':
         case 'target':
           edge[k] = self.nodesIndex[k] || edge[k];
+          break;
+        case 'hidden':
+          edge[k] = !!copy[k];
           break;
         case 'color':
         case 'label':
