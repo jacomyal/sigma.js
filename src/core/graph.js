@@ -251,7 +251,8 @@ function Graph() {
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
-      'attr': {}
+      'attr': {},
+      'hidden': false
     };
 
     e['source']['degree']++;
@@ -264,6 +265,9 @@ function Graph() {
         case 'id':
         case 'source':
         case 'target':
+          break;
+        case 'hidden':          
+          e[k] = !!params[k];
           break;
         case 'size':
           e[k] = +params[k];
@@ -331,6 +335,9 @@ function Graph() {
         case 'source':
         case 'target':
           edge[k] = self.nodesIndex[k] || edge[k];
+          break;
+        case 'hidden':
+          edge[k] = !!copy[k];
           break;
         case 'color':
         case 'label':
