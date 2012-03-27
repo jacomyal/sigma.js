@@ -11,7 +11,7 @@ check:
 fix:
 	fixjsstyle --nojsdoc -r src/
 clean:
-	rm ${MINIFY_PATH} ${CONCAT_PATH}
+	rm -f ${MINIFY_PATH} ${CONCAT_PATH}
 concat:
 	[ -d ${BUILD} ] || mkdir ${BUILD}
 	cat ./src/intro.js `find ./src/classes -name "*.js"` ./src/sigmaintro.js `find ./src/core -name "*.js"` `find ./src/public -name "*.js"` ./src/sigmaoutro.js > ${CONCAT_PATH}
