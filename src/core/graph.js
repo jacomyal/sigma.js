@@ -247,6 +247,7 @@ function Graph() {
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
+      'hidden': false,
       'attr': {}
     };
 
@@ -261,7 +262,11 @@ function Graph() {
         case 'source':
         case 'target':
           break;
+        case 'hidden':
+          e[k] = !!params[k];
+          break;
         case 'size':
+        case 'weight':
           e[k] = +params[k];
           break;
         case 'color':
@@ -299,6 +304,7 @@ function Graph() {
       'weight': edge['weight'],
       'displaySize': edge['displaySize'],
       'label': edge['label'],
+      'hidden': edge['hidden'],
       'id': edge['id'],
       'attr': edge['attr'],
       'color': edge['color']
@@ -318,15 +324,18 @@ function Graph() {
     for (var k in copy) {
       switch (k) {
         case 'id':
-        case 'weight':
         case 'displaySize':
           break;
+        case 'weight':
         case 'size':
           edge[k] = +copy[k];
           break;
         case 'source':
         case 'target':
           edge[k] = self.nodesIndex[k] || edge[k];
+          break;
+        case 'hidden':
+          edge[k] = !!copy[k];
           break;
         case 'color':
         case 'label':

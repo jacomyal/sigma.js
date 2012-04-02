@@ -131,12 +131,24 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var source = edgeNode.getAttribute('source');
       var target = edgeNode.getAttribute('target');
       var label = edgeNode.getAttribute('label');
-      var edge = {id:j, sourceID:source, targetID:target,label:label, attributes:[]};
+      var edge = {
+        id:         j,
+        sourceID:   source,
+        targetID:   target,
+        label:      label,
+        attributes: []
+      };
+
+      var weight = edgeNode.getAttribute('weight');
+      if(weight!=undefined){
+        edge['weight'] = weight;
+      }
+
       var attvalueNodes = edgeNode.getElementsByTagName('attvalue');
       for(k=0; k<attvalueNodes.length; k++){
         var attvalueNode = attvalueNodes[k];
         var attr = attvalueNode.getAttribute('for');
-        var al = attvalueNode.getAttribute('value');
+        var val = attvalueNode.getAttribute('value');
         edge.attributes.push({attr:attr, val:val});
       }
 
