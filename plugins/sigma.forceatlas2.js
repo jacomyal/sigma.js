@@ -62,21 +62,21 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       case 0: // Pass init
         // Initialise layout data
         nodes.forEach(function(n) {
-					if(n.fa2) {
-						n.fa2.mass = 1 + n.degree;
-						n.fa2.old_dx = n.fa2.dx;
-						n.fa2.old_dy = n.fa2.dx;
-						n.fa2.dx = 0;
-						n.fa2.dy = 0;
-					} else {
-						n.fa2 = {
-							mass: 1 + n.degree,
-							old_dx: 0,
-							old_dy: 0,
-							dx: 0,
-							dy: 0
-						};
-					}
+          if(n.fa2) {
+            n.fa2.mass = 1 + n.degree;
+            n.fa2.old_dx = n.fa2.dx;
+            n.fa2.old_dy = n.fa2.dx;
+            n.fa2.dx = 0;
+            n.fa2.dy = 0;
+          } else {
+            n.fa2 = {
+              mass: 1 + n.degree,
+              old_dx: 0,
+              old_dy: 0,
+              dx: 0,
+              dy: 0
+            };
+          }
         });
 
         // If Barnes Hut active, initialize root region
@@ -113,7 +113,7 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
           while (i < nodes.length && i < self.state.index + cInt) {
             var n = nodes[i++];
             if(n.fa2)
-							rootRegion.applyForce(n, Repulsion, barnesHutTheta);
+              rootRegion.applyForce(n, Repulsion, barnesHutTheta);
           }
           if (i == nodes.length) {
             self.state.step = 2;
@@ -126,11 +126,11 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
           while (i1 < nodes.length && i1 < self.state.index + cInt) {
             var n1 = nodes[i1++];
             if(n1.fa2)
-							nodes.forEach(function(n2, i2) {
-								if (i2 < i1 && n2.fa2) {
-									Repulsion.apply_nn(n1, n2);
-								}
-							});
+              nodes.forEach(function(n2, i2) {
+                if (i2 < i1 && n2.fa2) {
+                  Repulsion.apply_nn(n1, n2);
+                }
+              });
           }
           if (i1 == nodes.length) {
             self.state.step = 2;
@@ -159,7 +159,7 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
         while (i < nodes.length && i < self.state.index + sInt) {
           var n = nodes[i++];
           if (n.fa2)
-						Gravity.apply_g(n, gravity / scalingRatio);
+            Gravity.apply_g(n, gravity / scalingRatio);
         }
 
         if (i == nodes.length) {
@@ -421,27 +421,27 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     linRepulsion: function(c) {
       this.coefficient = c;
       this.apply_nn = function(n1, n2) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = this.coefficient *
-												 n1.fa2.mass *
-												 n2.fa2.mass /
-												 Math.pow(distance, 2);
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = this.coefficient *
+                         n1.fa2.mass *
+                         n2.fa2.mass /
+                         Math.pow(distance, 2);
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
 
       this.apply_nr = function(n, r) {
@@ -481,38 +481,38 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     linRepulsion_antiCollision: function(c) {
       this.coefficient = c;
       this.apply_nn = function(n1, n2) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist) -
-												 n1.size -
-												 n2.size;
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist) -
+                         n1.size -
+                         n2.size;
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = this.coefficient *
-												 n1.fa2.mass *
-												 n2.fa2.mass /
-												 Math.pow(distance, 2);
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = this.coefficient *
+                         n1.fa2.mass *
+                         n2.fa2.mass /
+                         Math.pow(distance, 2);
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
 
-					} else if (distance < 0) {
-						var factor = 100 * this.coefficient * n1.fa2.mass * n2.fa2.mass;
+          } else if (distance < 0) {
+            var factor = 100 * this.coefficient * n1.fa2.mass * n2.fa2.mass;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
 
       this.apply_nr = function(n, r) {
@@ -586,21 +586,21 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
 
-					// NB: factor = force / distance
-					var factor = -this.coefficient * e;
+          // NB: factor = force / distance
+          var factor = -this.coefficient * e;
 
-					n1.fa2.dx += xDist * factor;
-					n1.fa2.dy += yDist * factor;
+          n1.fa2.dx += xDist * factor;
+          n1.fa2.dy += yDist * factor;
 
-					n2.fa2.dx -= xDist * factor;
-					n2.fa2.dy -= yDist * factor;
-				}
+          n2.fa2.dx -= xDist * factor;
+          n2.fa2.dy -= yDist * factor;
+        }
       }
     },
 
@@ -610,21 +610,21 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
 
-					// NB: factor = force / distance
-					var factor = -this.coefficient * e / n1.fa2.mass;
+          // NB: factor = force / distance
+          var factor = -this.coefficient * e / n1.fa2.mass;
 
-					n1.fa2.dx += xDist * factor;
-					n1.fa2.dy += yDist * factor;
+          n1.fa2.dx += xDist * factor;
+          n1.fa2.dy += yDist * factor;
 
-					n2.fa2.dx -= xDist * factor;
-					n2.fa2.dy -= yDist * factor;
-				}
+          n2.fa2.dx -= xDist * factor;
+          n2.fa2.dy -= yDist * factor;
+        }
       }
     },
 
@@ -634,27 +634,27 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient *
-												 e *
-												 Math.log(1 + distance) /
-												 distance;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     },
 
@@ -664,28 +664,28 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient *
-												 e *
-												 Math.log(1 + distance) /
-												 distance /
-												 n1.fa2.mass;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance /
+                         n1.fa2.mass;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     },
 
@@ -695,24 +695,24 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient * e;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient * e;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     },
 
@@ -722,24 +722,24 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient * e / n1.fa2.mass;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient * e / n1.fa2.mass;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     },
 
@@ -749,27 +749,27 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient *
-												 e *
-												 Math.log(1 + distance) /
-												 distance;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     },
 
@@ -778,28 +778,28 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       this.coefficient = c;
 
       this.apply_nn = function(n1, n2, e) {
-				if(n1.fa2 && n2.fa2)
-				{
-					// Get the distance
-					var xDist = n1.x - n2.x;
-					var yDist = n1.y - n2.y;
-					var distance = Math.sqrt(xDist * xDist + yDist * yDist);
+        if(n1.fa2 && n2.fa2)
+        {
+          // Get the distance
+          var xDist = n1.x - n2.x;
+          var yDist = n1.y - n2.y;
+          var distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
-					if (distance > 0) {
-						// NB: factor = force / distance
-						var factor = -this.coefficient *
-												 e *
-												 Math.log(1 + distance) /
-												 distance /
-												 n1.fa2.mass;
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -this.coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance /
+                         n1.fa2.mass;
 
-						n1.fa2.dx += xDist * factor;
-						n1.fa2.dy += yDist * factor;
+            n1.fa2.dx += xDist * factor;
+            n1.fa2.dy += yDist * factor;
 
-						n2.fa2.dx -= xDist * factor;
-						n2.fa2.dy -= yDist * factor;
-					}
-				}
+            n2.fa2.dx -= xDist * factor;
+            n2.fa2.dy -= yDist * factor;
+          }
+        }
       }
     }
   };
