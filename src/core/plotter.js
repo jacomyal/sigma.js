@@ -361,7 +361,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   function drawLabel(node) {
     var ctx = labelsCtx;
 
-    if (node['displaySize'] >= self.p.labelThreshold) {
+    if (node['displaySize'] >= self.p.labelThreshold || node['forceLabel']) {
       var fontSize = self.p.labelSize == 'fixed' ?
                      self.p.defaultLabelSize :
                      self.p.labelSizeRatio * node['displaySize'];
