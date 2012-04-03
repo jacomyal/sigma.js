@@ -55,17 +55,22 @@ function Graph() {
 
     params = params || {};
     var n = {
+      // Numbers :
       'x': 0,
       'y': 0,
       'size': 1,
       'degree': 0,
       'inDegree': 0,
       'outDegree': 0,
+      // Flags :
       'fixed': false,
       'active': false,
       'hidden': false,
+      'forceLabel': false,
+      // Strings :
       'label': id.toString(),
       'id': id.toString(),
+      // Custom attributes :
       'attr': {}
     };
 
@@ -81,6 +86,7 @@ function Graph() {
         case 'fixed':
         case 'active':
         case 'hidden':
+        case 'forceLabel':
           n[k] = !!params[k];
           break;
         case 'color':
@@ -121,6 +127,7 @@ function Graph() {
       'fixed': node['fixed'],
       'active': node['active'],
       'hidden': node['hidden'],
+      'forceLabel': node['forceLabel'],
       'attr': node['attr']
     };
   };
@@ -154,11 +161,12 @@ function Graph() {
         case 'fixed':
         case 'active':
         case 'hidden':
+        case 'forceLabel':
           node[k] = !!copy[k];
           break;
         case 'color':
         case 'label':
-          node[k] = copy[k].toString();
+          node[k] = (copy[k] || '').toString();
           break;
         default:
           node['attr'][k] = copy[k];
