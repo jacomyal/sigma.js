@@ -441,16 +441,31 @@ function Graph() {
       yMin = Math.min(node['y'], yMin || node['y']);
     });
 
-    xMax += self.p.maxNodeSize || sizeMax;
-    xMin -= self.p.maxNodeSize || sizeMax;
-    yMax += self.p.maxNodeSize || sizeMax;
-    yMin -= self.p.maxNodeSize || sizeMax;
-
+    // First, we compute the scaling ratio, without considering the sizes
+    // of the nodes : Each node will have its center in the canvas, but might
+    // be partially out of it.
     var scale = self.p.scalingMode == 'outside' ?
                 Math.max(w / Math.max(xMax - xMin, 1),
                          h / Math.max(yMax - yMin, 1)) :
                 Math.min(w / Math.max(xMax - xMin, 1),
                          h / Math.max(yMax - yMin, 1));
+
+    // Then, we correct that scaling ratio considering a margin, which is
+    // basically the size of the biggest node.
+    // This has to be done as a correction since to compare the size of the
+    // biggest node to the X and Y values, we have to first get an
+    // approximation of the scaling ratio.
+    var margin = (self.p.maxNodeSize || sizeMax) / scale;
+    xMax += margin;
+    xMin -= margin;
+    yMax += margin;
+    yMin -= margin;
+
+    scale = self.p.scalingMode == 'outside' ?
+            Math.max(w / Math.max(xMax - xMin, 1),
+                     h / Math.max(yMax - yMin, 1)) :
+            Math.min(w / Math.max(xMax - xMin, 1),
+                     h / Math.max(yMax - yMin, 1));
 
     // Size homothetic parameters:
     var a, b;
@@ -481,15 +496,9 @@ function Graph() {
     parseNodes && self.nodes.forEach(function(node) {
       node['displaySize'] = node['size'] * a + b;
 
-      if (
-        !node['fixed'] ||
-        node['displayX'] == undefined ||
-        node['displayY'] == undefined
-      ) {
-        node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale +
-                           w / 2;
-        node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale +
-                           h / 2;
+      if (!node['fixed']) {
+        node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
+        node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
       }
     });
 
