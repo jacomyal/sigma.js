@@ -441,16 +441,16 @@ function Graph() {
       yMin = Math.min(node['y'], yMin || node['y']);
     });
 
+    xMax += self.p.maxNodeSize || sizeMax;
+    xMin -= self.p.maxNodeSize || sizeMax;
+    yMax += self.p.maxNodeSize || sizeMax;
+    yMin -= self.p.maxNodeSize || sizeMax;
+
     var scale = self.p.scalingMode == 'outside' ?
                 Math.max(w / Math.max(xMax - xMin, 1),
                          h / Math.max(yMax - yMin, 1)) :
                 Math.min(w / Math.max(xMax - xMin, 1),
                          h / Math.max(yMax - yMin, 1));
-
-    xMax += self.p.maxNodeSize;
-    xMin -= self.p.maxNodeSize;
-    yMax += self.p.maxNodeSize;
-    yMin -= self.p.maxNodeSize;            
 
     // Size homothetic parameters:
     var a, b;
@@ -481,20 +481,15 @@ function Graph() {
     parseNodes && self.nodes.forEach(function(node) {
       node['displaySize'] = node['size'] * a + b;
 
-      if (!node['fixed']) {
-        node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
-        node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
-
-        if(node['displayX'] < self.p.maxNodeSize) {
-          node['displayX'] += self.p.maxNodeSize;
-        } else if(node['displayX'] >= (w - self.p.maxNodeSize)) {
-          node['displayX'] -= self.p.maxNodeSize;
-        }
-        if(node['displayY'] < self.p.maxNodeSize) {
-          node['displayY'] += self.p.maxNodeSize;
-        } else if(node['displayY'] >= (h - self.p.maxNodeSize)) {
-          node['displayY'] -= self.p.maxNodeSize;
-        }
+      if (
+        !node['fixed'] ||
+        node['displayX'] == undefined ||
+        node['displayY'] == undefined
+      ) {
+        node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale +
+                           w / 2;
+        node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale +
+                           h / 2;
       }
     });
 
