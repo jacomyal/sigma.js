@@ -286,6 +286,11 @@ function Graph() {
         case 'label':
           e[k] = params[k];
           break;
+        case 'attributes':
+          for(j in params[k]) {
+            e['attr'][params[k][j].attr] = params[k][j].val;
+          }
+          break;
         default:
           e['attr'][k] = params[k];
       }
@@ -351,7 +356,7 @@ function Graph() {
           edge[k] = (copy[k] || '').toString();
           break;
         default:
-          edge['attr'][k] = copy[k];
+          edge[k] = copy[k];
       }
     }
 
