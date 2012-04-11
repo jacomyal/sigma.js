@@ -344,11 +344,11 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     } else {
       this.p.scalingRatio = 0.1;
     }
-    this.p.strongGravityMode = true;
-    this.p.gravity = 10;
+    this.p.strongGravityMode = false;
+    this.p.gravity = 1;
 
     // Behavior
-    this.p.outboundAttractionDistribution = true;
+    this.p.outboundAttractionDistribution = false;
     this.p.linLogMode = false;
     this.p.adjustSizes = false;
     this.p.edgeWeightInfluence = 1;
