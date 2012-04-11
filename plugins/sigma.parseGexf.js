@@ -102,6 +102,8 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
         color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
                                          parseFloat(colorNode.getAttribute('g')),
                                          parseFloat(colorNode.getAttribute('b')));
+      } else {
+        color = sigmaInstance.drawingProperties('defaultNodeColor');
       }
       
       // Create Node
