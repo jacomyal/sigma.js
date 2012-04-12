@@ -3,7 +3,6 @@
 sigma.publicPrototype.parseGexf = function(gexfPath) {
   // Load XML file:
   var gexfhttp, gexf;
-  var sigmaInstance = this;
   gexfhttp = window.XMLHttpRequest ?
     new XMLHttpRequest() :
     new ActiveXObject('Microsoft.XMLHTTP');
@@ -13,6 +12,14 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   gexfhttp.send();
   gexf = gexfhttp.responseXML;
 
+  this.parseGexfDocument(gexf);
+}
+
+// Parse the given GEXF document. Is used by parseGexf, but
+// can also handle GEXF documents that have been created using
+// XSLT.
+sigma.publicPrototype.parseGexfDocument = function(gexf) {
+  var sigmaInstance = this;
   var viz='http://www.gexf.net/1.2draft/viz'; // Vis namespace
   var i, j, k;
 
