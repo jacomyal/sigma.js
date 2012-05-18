@@ -200,8 +200,10 @@ function Sigma(root, id) {
 
     if (oldW != self.width || oldH != self.height) {
       for (var k in self.domElements) {
-        self.domElements[k].setAttribute('width', self.width + 'px');
-        self.domElements[k].setAttribute('height', self.height + 'px');
+        if (self.domElements.hasOwnProperty(k)) {
+          self.domElements[k].setAttribute('width', self.width + 'px');
+          self.domElements[k].setAttribute('height', self.height + 'px');
+        }
       }
 
       self.plotter.resize(self.width, self.height);

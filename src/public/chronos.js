@@ -398,12 +398,14 @@ sigma.chronos = new (function() {
       self.unbind('killed', onTaskEnded);
       insertFrame(function() {
         for (var k in generators) {
-          generators[k].on = true;
-          addTask(
-            generators[k].task,
-            k,
-            false
-          );
+          if (generators.hasOwnProperty(k)) {
+            generators[k].on = true;
+            addTask(
+              generators[k].task,
+              k,
+              false
+            );
+          }
         }
       });
 

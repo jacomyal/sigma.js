@@ -104,6 +104,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     // NODES:
     // ------
     defaultNodeColor: '#aaa',
+    defaultNodeShape: 'circle',
     // HOVER:
     //   Node hover color:
     //   - 'node'
@@ -278,16 +279,48 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
    */
   function drawNode(node) {
     var size = Math.round(node['displaySize'] * 10) / 10;
+    var shape = node['shape'];
     var ctx = nodesCtx;
 
     ctx.fillStyle = node['color'];
     ctx.beginPath();
-    ctx.arc(node['displayX'],
-            node['displayY'],
-            size,
-            0,
-            Math.PI * 2,
-            true);
+    switch(shape) {
+    case 'square':
+      var radius = Math.sqrt(Math.PI) * size / 2;
+      ctx.fillRect(node['displayX'] - radius,
+        node['displayY'] - radius,
+        radius,
+        radius);
+      break;
+    case 'triangle':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2;
+      ctx.moveTo(node['displayX'] - radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
+      break;
+    case 'star':
+      var numPoints = 5;
+      var outerRadius = Math.sqrt(Math.PI) * size;
+      var innerRadius = outerRadius / 2;
+      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius);
+      for (var i = 1; i < numPoints * 2; i++) {
+        var r = innerRadius;
+        if (i % 2 === 1) {
+          r = outerRadius;
+        }
+        var dx = r * Math.sin(i * Math.PI / numPoints);
+        var dy = - r * Math.cos(i * Math.PI / numPoints);
+        ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
+      }
+      break;
+    default:
+      ctx.arc(node['displayX'],
+        node['displayY'],
+        size,
+        0,
+        Math.PI * 2,
+        true);
 
     ctx.closePath();
     ctx.fill();
@@ -389,6 +422,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   function drawHoverNode(node) {
     var ctx = hoverCtx;
 
+    var shape = node['shape'];
+    var size = node['size'];
+
     var fontSize = self.p.labelSize == 'fixed' ?
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
@@ -434,12 +470,44 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
-            0,
-            Math.PI * 2,
-            true);
+    switch(shape) {
+    case 'square':
+        var radius = Math.sqrt(Math.PI) * size / 2 + self.p.borderSize;
+        ctx.strokeRect(node['displayX'] - radius,
+            node['displayY'] - radius,
+            radius,
+            radius);
+        break;
+    case 'triangle':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2 + self.p.borderSize;
+      ctx.moveTo(node['displayX'] - radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
+      break;
+    case 'star':
+      var numPoints = 5;
+      var outerRadius = Math.sqrt(Math.PI) * size;
+      var innerRadius = outerRadius / 2;
+      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius - self.p.borderSize);
+      for (var i = 1; i < numPoints * 2; i++) {
+        var r = innerRadius + self.p.borderSize;
+        if (i % 2 === 1) {
+          r = outerRadius + self.p.borderSize;
+        }
+        var dx = r * Math.sin(i * Math.PI / numPoints);
+        var dy = - r * Math.cos(i * Math.PI / numPoints);
+        ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
+      }
+      break;
+    default:
+      ctx.arc(node['displayX'],
+      node['displayY'],
+        size + self.p.borderSize,
+        0,
+        Math.PI * 2,
+        true);
+    }
     ctx.closePath();
     ctx.fill();
 
@@ -448,12 +516,44 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeHoverColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'],
-            0,
-            Math.PI * 2,
-            true);
+    switch(shape) {
+    case 'square':
+      var radius = Math.sqrt(Math.PI) * size / 2;
+      ctx.fillRect(node['displayX'] - radius,
+        node['displayY'] - radius,
+        radius,
+        radius);
+      break;
+    case 'triangle':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2;
+      ctx.moveTo(node['displayX'] - radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY'] - radius);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
+      break;
+    case 'star':
+      var numPoints = 5;
+      var outerRadius = Math.sqrt(Math.PI) * size;
+      var innerRadius = outerRadius / 2;
+      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius);
+      for (var i = 1; i < numPoints * 2; i++) {
+          var r = innerRadius;
+          if (i % 2 === 1) {
+              r = outerRadius;
+          }
+          var dx = r * Math.sin(i * Math.PI / numPoints);
+          var dy = - r * Math.cos(i * Math.PI / numPoints);
+          ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
+      }
+      break;
+    default:                    
+      ctx.arc(node['displayX'],
+          node['displayY'],
+          size,
+          0,
+          Math.PI * 2,
+          true);
+    }
 
     ctx.closePath();
     ctx.fill();
@@ -463,9 +563,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultLabelHoverColor;
     ctx.fillText(
-      node['label'],
-      Math.round(node['displayX'] + node['displaySize'] * 1.5),
-      Math.round(node['displayY'] + fontSize / 2 - 3)
+        node['label'],
+        Math.round(node['displayX'] + size * 1.5),
+        Math.round(node['displayY'] + fontSize / 2 - 3)
     );
 
     return self;

@@ -118,7 +118,7 @@ sigma.instances = {};
           }
         }
         return result;
-      }
+      };
     })();
   }
 })();
