@@ -104,6 +104,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     // NODES:
     // ------
     defaultNodeColor: '#aaa',
+    defaultNodeShape: 'circle',
     // HOVER:
     //   Node hover color:
     //   - 'node'
@@ -278,16 +279,28 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
    */
   function drawNode(node) {
     var size = Math.round(node['displaySize'] * 10) / 10;
+    var shape = node['shape'];
+    if(!shape) {
+      shape = self.p.defaultNodeShape;
+    }
     var ctx = nodesCtx;
 
     ctx.fillStyle = node['color'];
     ctx.beginPath();
-    ctx.arc(node['displayX'],
+    switch(shape) {
+      case 'square':
+      ctx.fillRect(node['displayX'], 
             node['displayY'],
-            size,
-            0,
-            Math.PI * 2,
-            true);
+            size * 2,
+            size * 2);
+      break;
+    default:
+      ctx.arc(node['displayX'],
+              node['displayY'],
+              size,
+              0,
+              Math.PI * 2,
+              true);
 
     ctx.closePath();
     ctx.fill();
@@ -389,6 +402,11 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   function drawHoverNode(node) {
     var ctx = hoverCtx;
 
+    var nodeShape = node['shape'];
+    if(!nodeShape) {
+      nodeShape = self.p.defaultNodeShape;
+    }
+
     var fontSize = self.p.labelSize == 'fixed' ?
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
@@ -434,12 +452,21 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
-            0,
-            Math.PI * 2,
-            true);
+    switch(nodeShape) {
+    case 'square':
+      ctx.strokeRect(node['displayX'],
+              node['displayY'],
+              (node['displaySize'] * 2) + self.p.borderSize,
+              (node['displaySize'] * 2) + self.p.borderSize);
+      break;
+    default:
+      ctx.arc(Math.round(node['displayX']),
+              Math.round(node['displayY']),
+              node['displaySize'] + self.p.borderSize,
+              0,
+              Math.PI * 2,
+              true);
+    }
     ctx.closePath();
     ctx.fill();
 
@@ -448,12 +475,21 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeHoverColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'],
-            0,
-            Math.PI * 2,
-            true);
+    switch(nodeShape) {
+    case 'square':
+      ctx.fillRect(node['displayX'],
+            node['displayY'],
+            node['displaySize'] * 2,
+            node['displaySize'] * 2);
+      break;
+    default:                    
+      ctx.arc(Math.round(node['displayX']),
+              Math.round(node['displayY']),
+              node['displaySize'],
+              0,
+              Math.PI * 2,
+              true);
+    }
 
     ctx.closePath();
     ctx.fill();

@@ -166,6 +166,7 @@ function Graph() {
           break;
         case 'color':
         case 'label':
+        case 'shape':
           node[k] = (copy[k] || '').toString();
           break;
         default:
