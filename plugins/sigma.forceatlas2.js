@@ -22,7 +22,8 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     totalSwinging: 0,
     totalEffectiveTraction: 0,
     complexIntervals: 500,
-    simpleIntervals: 1000
+    simpleIntervals: 1000,
+    layoutHiddenNodes: true
   };
 
   // The state tracked from one atomic "go" to another
@@ -34,13 +35,15 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     self.state = {step: 0, index: 0};
 
     self.graph.nodes.forEach(function(n) {
-      n.fa2 = {
-        mass: 1 + n.degree,
-        old_dx: 0,
-        old_dy: 0,
-        dx: 0,
-        dy: 0
-      };
+      if (self.p.layoutHiddenNodes || (!self.p.layoutHiddenNodes && !n.hidden)) {
+        n.fa2 = {
+          mass: 1 + n.degree,
+          old_dx: 0,
+          old_dy: 0,
+          dx: 0,
+          dy: 0
+        };
+      }
     });
 
     return self;
@@ -62,20 +65,22 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
       case 0: // Pass init
         // Initialise layout data
         nodes.forEach(function(n) {
-          if(n.fa2) {
-            n.fa2.mass = 1 + n.degree;
-            n.fa2.old_dx = n.fa2.dx;
-            n.fa2.old_dy = n.fa2.dx;
-            n.fa2.dx = 0;
-            n.fa2.dy = 0;
-          } else {
-            n.fa2 = {
-              mass: 1 + n.degree,
-              old_dx: 0,
-              old_dy: 0,
-              dx: 0,
-              dy: 0
-            };
+          if (self.p.layoutHiddenNodes || (!self.p.layoutHiddenNodes && !n.hidden)) {
+            if(n.fa2) {
+              n.fa2.mass = 1 + n.degree;
+              n.fa2.old_dx = n.fa2.dx;
+              n.fa2.old_dy = n.fa2.dx;
+              n.fa2.dx = 0;
+              n.fa2.dy = 0;
+            } else {
+              n.fa2 = {
+                mass: 1 + n.degree,
+                old_dx: 0,
+                old_dy: 0,
+                dx: 0,
+                dy: 0
+              };
+            }
           }
         });
 
