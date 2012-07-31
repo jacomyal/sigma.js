@@ -40,7 +40,8 @@ function MouseCaptor(dom) {
     directZooming: false,
     blockScroll: true,
     inertia: 1.1,
-    mouseEnabled: true
+    mouseEnabled: true,
+	touchEnabled: true
   };
 
   var oldMouseX = 0;
@@ -72,6 +73,7 @@ function MouseCaptor(dom) {
   this.mouseY = 0;
 
   this.isMouseDown = false;
+  this.isTouchDown = false;
 
   /**
    * Extract the local X position from a mouse event.
@@ -132,11 +134,57 @@ function MouseCaptor(dom) {
     }
   };
 
+
+  /**
+   * The handler listening to the 'touchmove' touch event. It will set the mouseX
+   * and mouseY values as the mouse position values, prevent the default event,
+   * and dispatch a 'move' event.
+   * @private
+   * @param  {event} event A 'move' mouse event.
+   */
+  function touchmoveHandler(event) {
+	var touch = event.targetTouches[0]; // First finger only for now
+    oldMouseX = self.mouseX;
+    oldMouseY = self.mouseY;
+
+    self.mouseX = touch.pageX;
+    self.mouseY = touch.pageY;
+
+    self.isTouchDown && drag(event);
+    self.dispatch('move');
+
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else {
+      event.returnValue = false;
+    }
+  };
+
+  /**
+   * The handler listening to the 'touchstop' touch event. It will set the isTouchDown
+   * value as false, dispatch a 'mouseup' event, and trigger stopDrag().
+   * @private
+   * @param  {event} event An 'up' mouse event.
+   */
+  function touchupHandler(event) {
+    if (self.p.touchEnabled && self.isTouchDown) {
+      self.isTouchDown = false;
+      self.dispatch('mouseup');
+      stopDrag();
+
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
+    }
+  };
+
   /**
    * The handler listening to the 'up' mouse event. It will set the isMouseDown
    * value as false, dispatch a 'mouseup' event, and trigger stopDrag().
    * @private
-   * @param  {event} event A 'up' mouse event.
+   * @param  {event} event An 'up' mouse event.
    */
   function upHandler(event) {
     if (self.p.mouseEnabled && self.isMouseDown) {
@@ -151,6 +199,32 @@ function MouseCaptor(dom) {
       }
     }
   };
+
+  /**
+   * The handler listening to the 'touchstart' touch event. It will set the
+   * isTouchDown value as true, dispatch a 'mousedown' event, and trigger
+   * startDrag().
+   * @private
+   * @param  {event} event A 'down' mouse event.
+   */
+  function touchdownHandler(event) {
+    if (self.p.touchEnabled) {
+      self.isTouchDown = true;
+      oldMouseX = self.mouseX;
+      oldMouseY = self.mouseY;
+
+      self.dispatch('mousedown');
+
+      startDrag();
+
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
+    }
+  };
+
 
   /**
    * The handler listening to the 'down' mouse event. It will set the
@@ -403,6 +477,11 @@ function MouseCaptor(dom) {
   dom.addEventListener('mousemove', moveHandler, true);
   dom.addEventListener('mousedown', downHandler, true);
   document.addEventListener('mouseup', upHandler, true);
+
+
+  dom.addEventListener('touchmove', touchmoveHandler, true);
+  // dom.addEventListener('touchstart', touchdownHandler, true);
+  // document.addEventListener('touchstop', touchupHandler, true);
 
   this.checkBorders = checkBorders;
   this.interpolate = startInterpolate;
