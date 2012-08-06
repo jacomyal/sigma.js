@@ -1,3 +1,31 @@
+function touchHandler(event)
+{
+    //alert("handler");
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = "";
+         switch(event.type)
+    {
+        case "touchstart": type = "mousedown"; break;
+        case "touchmove":  type="mousemove"; break;        
+        case "touchend":   type="mouseup"; break;
+        default: return;
+    }
+
+//             initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+  //             screenX, screenY, clientX, clientY, ctrlKey, 
+    //           altKey, shiftKey, metaKey, button, relatedTarget);
+    
+    var simulatedEvent = document.createEvent("MouseEvent");
+    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+                              first.posX, first.posY, 
+                              first.clientX, first.clientY, false, 
+                              false, false, false, 0/*left*/, null);
+    first.target.dispatchEvent(simulatedEvent);
+    event.preventDefault();
+}
+
+
 /**
  * This class listen to all the different mouse events, to normalize them and
  * dispatch action events instead (from "startinterpolate" to "isdragging",
@@ -147,8 +175,8 @@ function MouseCaptor(dom) {
     oldMouseX = self.mouseX;
     oldMouseY = self.mouseY;
 
-    self.mouseX = touch.pageX;
-    self.mouseY = touch.pageY;
+    self.mouseX = getX(touch.pageX);
+    self.mouseY = getY(touch.pageY);
 
     self.isTouchDown && drag(event);
     self.dispatch('move');
@@ -479,9 +507,10 @@ function MouseCaptor(dom) {
   document.addEventListener('mouseup', upHandler, true);
 
 
-  dom.addEventListener('touchmove', touchmoveHandler, true);
-  // dom.addEventListener('touchstart', touchdownHandler, true);
-  // document.addEventListener('touchstop', touchupHandler, true);
+  dom.addEventListener("touchstart", touchHandler, true);
+  dom.addEventListener("touchmove", touchHandler, true);
+  document.addEventListener("touchend", touchHandler, true);
+  dom.addEventListener("touchcancel", touchHandler, true);
 
   this.checkBorders = checkBorders;
   this.interpolate = startInterpolate;
