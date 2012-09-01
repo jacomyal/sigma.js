@@ -23,22 +23,22 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   var edgesAttributes = [];   // The list of attributes of the edges of the graph that we build in json
   var edgesAttributesDict = {};
   var attributesNodes = gexf.getElementsByTagName('attributes');  // In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
-  
+
   for(i = 0; i<attributesNodes.length; i++){
     var attributesNode = attributesNodes[i];  // attributesNode is each xml node 'attributes' (plural)
     if(attributesNode.getAttribute('class') == 'node'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-        
+
         var attribute = {id:id, title:title, type:type};
         nodesAttributes.push(attribute);
         nodesAttributesDict[id] = title
-        
+
       }
     } else if(attributesNode.getAttribute('class') == 'edge'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
@@ -142,6 +142,14 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
         label:      label,
         attributes: {}
       };
+
+      var attrs = edgeNode.attributes;
+      for(var i=0;i<attrs.length;i++) {
+          var n = attrs[i].name;
+          if(n == 'source' || n =='target' || n=='label')
+              continue;
+          edge.attributes[n]=attrs[i].value;
+      }
 
       var weight = edgeNode.getAttribute('weight');
       if(weight!=undefined){
