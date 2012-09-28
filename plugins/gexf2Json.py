@@ -159,7 +159,7 @@ for edgesNode in edgesNodes:
 
 fhOutput = open(sys.argv[2],"w")
 j={"nodes":jsonNodes,"edges":jsonEdges}
-if len(sys.argv)>=4 and "pretty"==lower(sys.argv[3]):
+if len(sys.argv)>=4 and "pretty"==(sys.argv[3]).lower():
 	json.dump(j,fhOutput,indent=4)
 else:
 	json.dump(j,fhOutput)
