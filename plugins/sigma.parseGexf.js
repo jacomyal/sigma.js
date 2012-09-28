@@ -1,4 +1,4 @@
-// Mathieu Jacomy @ Sciences Po MÃ©dialab & WebAtlas
+// Mathieu Jacomy @ Sciences Po Médialab & WebAtlas
 // (requires sigma.js to be loaded)
 sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
   // Load XML file:
@@ -19,23 +19,26 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
   // Parse Attributes
   // This is confusing, so I'll comment heavily
   var nodesAttributes = [];   // The list of attributes of the nodes of the graph that we build in json
+  var nodesAttributesDict = {};
   var edgesAttributes = [];   // The list of attributes of the edges of the graph that we build in json
+  var edgesAttributesDict = {};
   var attributesNodes = gexf.getElementsByTagName('attributes');  // In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
-  
+
   for(i = 0; i<attributesNodes.length; i++){
     var attributesNode = attributesNodes[i];  // attributesNode is each xml node 'attributes' (plural)
     if(attributesNode.getAttribute('class') == 'node'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-        
+
         var attribute = {id:id, title:title, type:type};
         nodesAttributes.push(attribute);
-        
+        nodesAttributesDict[id] = title
+
       }
     } else if(attributesNode.getAttribute('class') == 'edge'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
@@ -48,6 +51,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
           
         var attribute = {id:id, title:title, type:type};
         edgesAttributes.push(attribute);
+        edgesAttributesDict[id] = title
         
       }
     }
@@ -105,7 +109,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
       }
       
       // Create Node
-      var node = {label:label, size:size, x:x, y:y, attributes:[], color:color};  // The graph node
+      var node = {label:label, size:size, x:x, y:y, attributes:{}, color:color};  // The graph node
       
       // Attribute values
       var attvalueNodes = nodeNode.getElementsByTagName('attvalue');
@@ -113,7 +117,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
         var attvalueNode = attvalueNodes[k];
         var attr = attvalueNode.getAttribute('for');
         var val = attvalueNode.getAttribute('value');
-        node.attributes.push({attr:attr, val:val});
+        node.attributes[nodesAttributesDict[attr]] = val;
       }
 
       sigmaInstance.addNode(id,node);
@@ -136,12 +140,15 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
         sourceID:   source,
         targetID:   target,
         label:      label,
-        attributes: []
+        attributes: {}
       };
 
-      var weight = edgeNode.getAttribute('weight');
-      if(weight!=undefined){
-        edge['weight'] = weight;
+      var attrs = edgeNode.attributes;
+      for(var i=0;i<attrs.length;i++) {
+          var n = attrs[i].name;
+          if(n == 'source' || n =='target' || n=='label')
+              continue;
+          edge.attributes[n]=attrs[i].value;
       }
 
       var attvalueNodes = edgeNode.getElementsByTagName('attvalue');
@@ -149,11 +156,11 @@ sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
         var attvalueNode = attvalueNodes[k];
         var attr = attvalueNode.getAttribute('for');
         var val = attvalueNode.getAttribute('value');
-        edge.attributes.push({attr:attr, val:val});
+        edge.attributes[edgesAttributesDict[attr]] = val;
       }
 
       sigmaInstance.addEdge(edgeId++,source,target,edge);
     }
   }
-if (callback) callback.call(this);//Trigger the data ready function
+  if (callback) callback.call(this);//Trigger the data ready function
 };
