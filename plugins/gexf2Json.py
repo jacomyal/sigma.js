@@ -34,20 +34,24 @@ gexf = xml.dom.minidom.parse(sys.argv[1])
 
 #Parse Attributes
 nodesAttributes = []#The list of attributes of the nodes of the graph that we build in json
+nodesAttributesDict={}
 edgesAttributes = []#The list of attributes of the edges of the graph that we build in json
+edgesAttributesDict={}
+
 #In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
 attributesNodes = gexf.getElementsByTagName("attributes")
-for attr in attributesNodes:
-	if (attr.getAttribute("class") == "node"):
-		attributeNodes = attr.getElementsByTagName("attribute")#The list of xml nodes 'attribute' (no 's')
+for attributesNode in attributesNodes:
+	if (attributesNode.getAttribute("class") == "node"):
+		attributeNodes = attributesNode.getElementsByTagName("attribute")#The list of xml nodes 'attribute' (no 's')
 		for attributeNodes in attributeNodes:
 			id = attributeNodes.getAttribute('id')
 			title = attributeNodes.getAttribute('title')
 			type = attributeNodes.getAttribute('type')
 			attribute = {"id":id, "title":title, "type":type}
-        	nodesAttributes.append(attribute);
-	elif (attr.getAttribute("class")=="edge"):
-		attributeNodes = attr.getElementsByTagName('attribute')#The list of xml nodes 'attribute' (no 's')
+			nodesAttributes.append(attribute)
+			nodesAttributesDict[id]=title
+	elif (attributesNode.getAttribute("class")=="edge"):
+		attributeNodes = attributesNode.getElementsByTagName('attribute')#The list of xml nodes 'attribute' (no 's')
 		for attributeNode in attributeNodes:
 			#Each xml node 'attribute'
 			id = attributeNode.getAttribute('id')
@@ -56,7 +60,8 @@ for attr in attributesNodes:
 		  	
 		  	attribute = {"id":id, "title":title, "type":type}
 		  	edgesAttributes.append(attribute)
-	 
+		  	edgesAttributesDict[id]=title
+
 jsonNodes = []#The nodes of the graph
 nodesNodes = gexf.getElementsByTagName("nodes")#The list of xml nodes 'nodes' (plural)
 
@@ -100,14 +105,14 @@ for nodes in nodesNodes:
 						int(colorNode.getAttribute('b')))
 		
 		#Create Node
-		node = {"id":id,"label":label, "size":size, "x":x, "y":y, "attributes":[], "color":color};  #The graph node
+		node = {"id":id,"label":label, "size":size, "x":x, "y":y, "attributes":{}, "color":color};  #The graph node
 	  
 		#Attribute values
 		attvalueNodes = nodeEl.getElementsByTagName("attvalue")
 		for attvalueNode in attvalueNodes:
 			attr = attvalueNode.getAttribute('for');
 			val = attvalueNode.getAttribute('value');
-			node["attributes"].append({"attr":attr, "val":val})
+			node["attributes"][nodesAttributesDict[attr]]=val
 
 		jsonNodes.append(node)
 
@@ -128,17 +133,27 @@ for edgesNode in edgesNodes:
 		    "sourceID":   source,
 		    "targetID":   target,
 		    "label":      label,
-		    "attributes": []
+		    "attributes": {}
 		}
+		
+		#Anything besies source,target,label that is inside the actual edge tag
+		attrs = edgeNode.attributes #NamedNodeMap in python
+		for i in range(0,attrs.length):
+			item=attrs.item(i)#xml.dom.minidom.Attr
+			n=item.name
+			if(n == 'source' or n =='target' or n=='label'):
+				continue;
+			edge["attributes"][n]=item.value
 
-		if(edgeNode.hasAttribute("weight")):
-			edge["weight"] = edgeNode.getAttribute('weight')
+		#Redundant from block above
+		#if(edgeNode.hasAttribute("weight")):
+		#	edge["weight"] = edgeNode.getAttribute('weight')
 
 		attvalueNodes = edgeNode.getElementsByTagName('attvalue')
 		for attvalueNode in attvalueNodes:
 			attr = attvalueNode.getAttribute('for')
 			val = attvalueNode.getAttribute('value')
-			edge["attributes"].append({"attr":attr, "val":val})
+			edge["attributes"][edgesAttributesDict[attr]]=val
 
 		jsonEdges.append(edge)
 
