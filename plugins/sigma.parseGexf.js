@@ -1,6 +1,6 @@
 // Mathieu Jacomy @ Sciences Po Médialab & WebAtlas
 // (requires sigma.js to be loaded)
-sigma.publicPrototype.parseGexf = function(gexfPath) {
+sigma.publicPrototype.parseGexf = function(gexfPath,callback) {
   // Load XML file:
   var gexfhttp, gexf;
   var sigmaInstance = this;
@@ -155,4 +155,5 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       sigmaInstance.addEdge(edgeId++,source,target,edge);
     }
   }
+if (callback) callback.call(this);//Trigger the data ready function
 };
