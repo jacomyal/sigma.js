@@ -125,6 +125,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     borderSize: 0,
     nodeBorderColor: 'node',
     defaultNodeBorderColor: '#fff',
+    // drawBorder: true,
     // --------
     // PROCESS:
     // --------
@@ -279,6 +280,26 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   function drawNode(node) {
     var size = Math.round(node['displaySize'] * 10) / 10;
     var ctx = nodesCtx;
+
+    // Node border:
+
+    if (node['drawBorder']) {
+
+    ctx.beginPath();
+    ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
+                    (node['color'] || self.p.defaultNodeColor) :
+                    self.p.defaultNodeBorderColor;
+    ctx.arc(Math.round(node['displayX']),
+            Math.round(node['displayY']),
+            node['displaySize'] + self.p.borderSize,
+            0,
+            Math.PI * 2,
+            true);
+    ctx.closePath();
+    ctx.fill();
+
+
+    }
 
     ctx.fillStyle = node['color'];
     ctx.beginPath();

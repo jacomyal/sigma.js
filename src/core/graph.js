@@ -67,6 +67,7 @@ function Graph() {
       'active': false,
       'hidden': false,
       'forceLabel': false,
+      'drawBorder': false,
       // Strings :
       'label': id.toString(),
       'id': id.toString(),
@@ -87,6 +88,7 @@ function Graph() {
         case 'active':
         case 'hidden':
         case 'forceLabel':
+        case 'drawBorder':
           n[k] = !!params[k];
           break;
         case 'color':
@@ -125,6 +127,7 @@ function Graph() {
       'id': node['id'],
       'color': node['color'],
       'fixed': node['fixed'],
+      'drawBorder': node['drawBorder'],
       'active': node['active'],
       'hidden': node['hidden'],
       'forceLabel': node['forceLabel'],
@@ -162,6 +165,7 @@ function Graph() {
         case 'active':
         case 'hidden':
         case 'forceLabel':
+        case 'drawBorder':
           node[k] = !!copy[k];
           break;
         case 'color':
