@@ -140,7 +140,7 @@ function Graph() {
     };*/
     var clone = {};
     for (var k in node) {
-    	clone[k] = noode[k];
+    	clone[k] = node[k];
     }
     return clone;
   };
