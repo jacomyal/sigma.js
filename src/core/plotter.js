@@ -125,8 +125,10 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     borderSize: 0,
     nodeBorderColor: 'node',
     defaultNodeBorderColor: '#fff',
-    //hover -- border only on hover, always = hover and static
-    defaultBorderAction: 'hover',
+    //none -- border determined on per node basis (default),
+    //hover -- border only on hover
+    //always -- hover and static
+    defaultBorderAction: 'node',
     // drawBorder: true,
     // --------
     // PROCESS:
@@ -285,7 +287,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
     // Node border:
 
-    if (self.p.defaultBorderAction!=="hover") {
+    if (self.p.defaultBorderAction==="always" ||
+    	(self.p.defaultBorderAction==="node" && node['drawBorder'])) {
 
     ctx.beginPath();
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
