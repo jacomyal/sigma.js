@@ -336,7 +336,10 @@ function Graph() {
     };*/
     var clone = {};
     for (k in edge) {
-    	clone[k] = edge[k];
+    	if (k=="source" || k=="target")
+    		clone[k]=edge[k].id;
+    	else
+    		clone[k] = edge[k];
     }
     return clone;
   };
