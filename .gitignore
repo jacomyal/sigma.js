@@ -4,3 +4,4 @@ build/*.js
 doc/
 examples/
 css/
+node_modules/

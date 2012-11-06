@@ -42,9 +42,9 @@ Some full examples are available at [sigmajs.org/examples.html](http://sigmajs.o
 ###Build
 To build *sigma.js* :
 
-* Download the [Google Closure Compiler](http://code.google.com/closure/compiler/) and put the .jar file in `/build`
-* Use `make minify-simple` or `make minify-advanced` to minify concatenation result (*Warning*: `make minify-advanced` is pretty agressive on renaming, and this minification has not been tested yet).
-* You can also just use `make concat` to obtain an unminified but working version of *sigma.js*, without the need of the Closure Compiler
+* Install [NPM][http://npmjs.org/] (included in recent versions of Node.JS)
+* Use `make minify` to minify concatenation result with [UglifyJS2](http://lisperator.net/uglifyjs/).
+* You can also just use `make concat` to obtain an unminified but working version of *sigma.js*, without the need of NPM
 
 ###Thanks
 *sigma.js* is mostly inspired by [Gephi](http://gephi.org) and the maps of [Antonin Rohmer](http://antonin.rohmer.free.fr/) from [Linkfluence](http://labs.linkfluence.net) (one nice example [here](http://www.guardian.co.uk/news/datablog/interactive/2011/sep/07/norway-breivik-manifesto-mapped)) - thanks to him also for his wise advices.
