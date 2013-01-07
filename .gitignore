@@ -6,3 +6,4 @@ examples/
 css/
 # My text editor file backups
 *~
+.DS_Store 
