@@ -11,15 +11,19 @@ This method will return an object, with its own graph and the different public m
 
 To fill the graph, use :
 
-    sigInst.addNode('hello',{
-      'label': 'Hello'
-    }).addNode('world',{
-      'label': 'World!'
+    sigInst.addNode('hello', {
+      label: 'Hello',
+      x: Math.random(),
+      y: Math.random()
+    }).addNode('world', {
+      label: 'World!',
+      x: Math.random(),
+      y: Math.random()
     }).addEdge('hello','world');
 
 Also, a lot of different parameters are available to customize the way your instance work. For example :
 
-    instance.drawingProperties({
+    sigInst.drawingProperties({
       defaultEdgeType: 'curve'
     }).mouseProperties({
       maxRatio: 32
