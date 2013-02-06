@@ -67,16 +67,20 @@ function Graph() {
       'active': false,
       'hidden': false,
       'forceLabel': false,
+      'drawBorder': false,
       // Strings :
       'label': id.toString(),
-      'id': id.toString(),
+      'id': id.toString()//,
       // Custom attributes :
-      'attr': {}
+      //'attr': {}
     };
 
     for (var k in params) {
       switch (k) {
         case 'id':
+        case 'degree':
+        case 'inDegree':
+        case 'outDegree':
           break;
         case 'x':
         case 'y':
@@ -87,14 +91,17 @@ function Graph() {
         case 'active':
         case 'hidden':
         case 'forceLabel':
+        case 'drawBorder':
           n[k] = !!params[k];
           break;
-        case 'color':
+        /*case 'color':
         case 'label':
           n[k] = params[k];
           break;
         default:
-          n['attr'][k] = params[k];
+          n['attr'][k] = params[k];*/
+        default:
+          n[k] = params[k];
       }
     }
 
@@ -111,7 +118,7 @@ function Graph() {
    * @return {Object} The clone of the node.
    */
   function cloneNode(node) {
-    return {
+    /*return {
       'x': node['x'],
       'y': node['y'],
       'size': node['size'],
@@ -125,11 +132,17 @@ function Graph() {
       'id': node['id'],
       'color': node['color'],
       'fixed': node['fixed'],
+      'drawBorder': node['drawBorder'],
       'active': node['active'],
       'hidden': node['hidden'],
       'forceLabel': node['forceLabel'],
       'attr': node['attr']
-    };
+    };*/
+    var clone = {};
+    for (var k in node) {
+    	clone[k] = node[k];
+    }
+    return clone;
   };
 
   /**
@@ -145,7 +158,7 @@ function Graph() {
     for (var k in copy) {
       switch (k) {
         case 'id':
-        case 'attr':
+        //case 'attr':
         case 'degree':
         case 'inDegree':
         case 'outDegree':
@@ -162,6 +175,7 @@ function Graph() {
         case 'active':
         case 'hidden':
         case 'forceLabel':
+        case 'drawBorder':
           node[k] = !!copy[k];
           break;
         case 'color':
@@ -169,7 +183,7 @@ function Graph() {
           node[k] = (copy[k] || '').toString();
           break;
         default:
-          node['attr'][k] = copy[k];
+          node[k] = copy[k];
       }
     }
 
@@ -262,8 +276,8 @@ function Graph() {
       'displaySize': 0.5,
       'label': id.toString(),
       'id': id.toString(),
-      'hidden': false,
-      'attr': {}
+      'hidden': false//,
+      //'attr': {}
     };
 
     e['source']['degree']++;
@@ -276,6 +290,7 @@ function Graph() {
         case 'id':
         case 'source':
         case 'target':
+        case 'displaySize':
           break;
         case 'hidden':
           e[k] = !!params[k];
@@ -293,8 +308,10 @@ function Graph() {
         case 'label':
           e[k] = params[k];
           break;
+        //default:
+        //  e['attr'][k] = params[k];
         default:
-          e['attr'][k] = params[k];
+        	e[k] = params[k];
       }
     }
 
@@ -311,7 +328,7 @@ function Graph() {
    * @return {Object} The clone of the edge.
    */
   function cloneEdge(edge) {
-    return {
+    /*return {
       'source': edge['source']['id'],
       'target': edge['target']['id'],
       'size': edge['size'],
@@ -323,7 +340,15 @@ function Graph() {
       'id': edge['id'],
       'attr': edge['attr'],
       'color': edge['color']
-    };
+    };*/
+    var clone = {};
+    for (k in edge) {
+    	if (k=="source" || k=="target")
+    		clone[k]=edge[k].id;
+    	else
+    		clone[k] = edge[k];
+    }
+    return clone;
   };
 
   /**
@@ -358,7 +383,7 @@ function Graph() {
           edge[k] = (copy[k] || '').toString();
           break;
         default:
-          edge['attr'][k] = copy[k];
+          edge[k] = copy[k];
       }
     }
 
