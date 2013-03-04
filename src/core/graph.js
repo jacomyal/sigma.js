@@ -31,7 +31,8 @@ function Graph() {
     //   - 'outside'
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
-    edgesPowRatio: 0
+    edgesPowRatio: 0,
+    cartesian: false
   };
 
   /**
@@ -468,6 +469,10 @@ function Graph() {
     yMax += margin;
     yMin -= margin;
 
+    // x- and y-ratios for preserving cartesian coordinates.
+    var xScale = w / (2 * Math.max(Math.abs(xMax), Math.abs(xMin)) + 2 * margin);
+    var yScale = h / (2 * Math.max(Math.abs(yMax), Math.abs(yMin)) + 2 * margin);
+
     scale = self.p.scalingMode == 'outside' ?
             Math.max(w / Math.max(xMax - xMin, 1),
                      h / Math.max(yMax - yMin, 1)) :
@@ -504,8 +509,13 @@ function Graph() {
       node['displaySize'] = node['size'] * a + b;
 
       if (!node['fixed']) {
-        node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
-        node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
+        if (self.p.cartesian) {
+            node['displayX'] = node['x'] * xScale + w / 2;
+            node['displayY'] = -node['y'] * yScale + h / 2;
+        } else {
+            node['displayX'] = (node['x'] - (xMax + xMin) / 2) * scale + w / 2;
+            node['displayY'] = (node['y'] - (yMax + yMin) / 2) * scale + h / 2;
+        }
       }
     });
 
