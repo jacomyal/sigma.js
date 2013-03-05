@@ -475,8 +475,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
         var radius = Math.sqrt(Math.PI) * size / 2 + self.p.borderSize;
         ctx.strokeRect(node['displayX'] - radius,
             node['displayY'] - radius,
-            radius,
-            radius);
+            2 * radius,
+            2 * radius);
         break;
     case 'triangle':
       var radius = Math.sqrt(2 * Math.PI) * size / 2 + self.p.borderSize;
@@ -521,8 +521,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       var radius = Math.sqrt(Math.PI) * size / 2;
       ctx.fillRect(node['displayX'] - radius,
         node['displayY'] - radius,
-        radius,
-        radius);
+        2 * radius,
+        2 * radius);
       break;
     case 'triangle':
       var radius = Math.sqrt(2 * Math.PI) * size / 2;
