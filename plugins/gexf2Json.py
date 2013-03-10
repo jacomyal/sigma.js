@@ -147,9 +147,9 @@ for edgesNode in edgesNodes:
 				continue;
 			edge["attributes"][n]=item.value
 
-		#Redundant from block above
-		#if(edgeNode.hasAttribute("weight")):
-		#	edge["weight"] = edgeNode.getAttribute('weight')
+		#Add size attribute and make it the same as weight
+		if(edgeNode.hasAttribute("weight")):
+			edge["size"] = edgeNode.getAttribute('weight')
 
 		attvalueNodes = edgeNode.getElementsByTagName('attvalue')
 		for attvalueNode in attvalueNodes:
