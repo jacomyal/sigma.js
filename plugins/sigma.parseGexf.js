@@ -73,10 +73,12 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var x = 100 - 200*Math.random();
       var y = 100 - 200*Math.random();
       var color;
-      
+
+      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null)
+
       var sizeNodes = nodeNode.getElementsByTagName('size');
-      sizeNodes = sizeNodes.length ? 
-                  sizeNodes : 
+      sizeNodes = sizeNodes.length || poorBrowserXmlNsSupport ?
+                  sizeNodes :
                   nodeNode.getElementsByTagNameNS('*','size');
       if(sizeNodes.length>0){
         sizeNode = sizeNodes[0];
@@ -84,8 +86,8 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       }
 
       var positionNodes = nodeNode.getElementsByTagName('position');
-      positionNodes = positionNodes.length ? 
-                      positionNodes : 
+      positionNodes = positionNodes.length || poorBrowserXmlNsSupport ?
+                      positionNodes :
                       nodeNode.getElementsByTagNameNS('*','position');
       if(positionNodes.length>0){
         var positionNode = positionNodes[0];
@@ -94,8 +96,8 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       }
 
       var colorNodes = nodeNode.getElementsByTagName('color');
-      colorNodes = colorNodes.length ? 
-                   colorNodes : 
+      colorNodes = colorNodes.length || poorBrowserXmlNsSupport ?
+                   colorNodes :
                    nodeNode.getElementsByTagNameNS('*','color');
       if(colorNodes.length>0){
         colorNode = colorNodes[0];
@@ -142,6 +144,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var weight = edgeNode.getAttribute('weight');
       if(weight!=undefined){
         edge['weight'] = weight;
+        edge['size'] = weight;
       }
 
       var attvalueNodes = edgeNode.getElementsByTagName('attvalue');

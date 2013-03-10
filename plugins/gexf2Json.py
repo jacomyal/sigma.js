@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import pprint
 import xml.dom.minidom
 from xml.dom.minidom import Node
@@ -57,7 +58,7 @@ for attributesNode in attributesNodes:
 			id = attributeNode.getAttribute('id')
 		  	title = attributeNode.getAttribute('title')
 		  	type = attributeNode.getAttribute('type')
-		  	
+
 		  	attribute = {"id":id, "title":title, "type":type}
 		  	edgesAttributes.append(attribute)
 		  	edgesAttributesDict[id]=title
@@ -72,7 +73,7 @@ for nodes in nodesNodes:
 		id = nodeEl.getAttribute('id')
 		title = nodeEl.getAttribute('title')
 		label = nodeEl.getAttribute('label') if nodeEl.hasAttribute("label") else id
-	  
+
 		#viz
 		size = 1
 		x = 100 - 200*random.random()
@@ -85,7 +86,7 @@ for nodes in nodesNodes:
 		if(len(sizeNodes)>0):
 			sizeNode = sizeNodes[0];
 			size = float(sizeNode.getAttribute('value'))
-		
+
 		#SAH save as sizeNodes
 		positionNodes = nodeEl.getElementsByTagName('position')
 		positionNodes = positionNodes if len(positionNodes)!=0 else nodeEl.getElementsByTagNameNS('*','position')
@@ -93,8 +94,8 @@ for nodes in nodesNodes:
 			positionNode = positionNodes[0]
 			x = float(positionNode.getAttribute('x'))
 			y = float(positionNode.getAttribute('y'))
-		
-		
+
+
 		#SAH: really couldn't this be a function by now; same as above
 		colorNodes = nodeEl.getElementsByTagName('color')
 		colorNodes = colorNodes if len(colorNodes)!=0 else nodeEl.getElementsByTagNameNS('*','color')
@@ -103,16 +104,17 @@ for nodes in nodesNodes:
 			color = '#'+rgb2hex(int(colorNode.getAttribute('r')),
 						int(colorNode.getAttribute('g')),
 						int(colorNode.getAttribute('b')))
-		
+
 		#Create Node
 		node = {"id":id,"label":label, "size":size, "x":x, "y":y, "attributes":{}, "color":color};  #The graph node
-	  
+
 		#Attribute values
 		attvalueNodes = nodeEl.getElementsByTagName("attvalue")
 		for attvalueNode in attvalueNodes:
 			attr = attvalueNode.getAttribute('for');
 			val = attvalueNode.getAttribute('value');
-			node["attributes"][nodesAttributesDict[attr]]=val
+			if attr in nodesAttributesDict:
+				node["attributes"][nodesAttributesDict[attr]]=val
 
 		jsonNodes.append(node)
 
@@ -127,7 +129,7 @@ for edgesNode in edgesNodes:
 		label = edgeNode.getAttribute("label")
 		id = edgeNode.getAttribute("id") if edgeNode.hasAttribute("id") else edgeId
 		edgeId=edgeId+1
-		
+
 		edge = {
 		    "id":         id,
 		    "sourceID":   source,
@@ -135,7 +137,7 @@ for edgesNode in edgesNodes:
 		    "label":      label,
 		    "attributes": {}
 		}
-		
+
 		#Anything besies source,target,label that is inside the actual edge tag
 		attrs = edgeNode.attributes #NamedNodeMap in python
 		for i in range(0,attrs.length):
