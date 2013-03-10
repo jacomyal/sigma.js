@@ -74,7 +74,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var y = 100 - 200*Math.random();
       var color;
 
-      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null)
+      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null);
 
       var sizeNodes = nodeNode.getElementsByTagName('size');
       sizeNodes = sizeNodes.length || poorBrowserXmlNsSupport ?
