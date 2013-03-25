@@ -321,6 +321,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
         0,
         Math.PI * 2,
         true);
+    }
 
     ctx.closePath();
     ctx.fill();
