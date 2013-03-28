@@ -682,18 +682,19 @@ function Graph() {
    */
   function getNodes(ids) {
     var a = (ids instanceof Array ? ids : [ids]) || [];
+    var result;
 
     if (self.p.safe) {
-      a.map(function(id) {
+      result = a.map(function(id) {
         return cloneNode(self.nodesIndex[id]);
       });
     } else {
-      a.map(function(id) {
+      result = a.map(function(id) {
         return self.nodesIndex[id];
       });
     }
 
-    return (ids instanceof Array ? a : a[0]);
+    return (ids instanceof Array ? result : result[0]);
   };
 
   /**
@@ -705,18 +706,19 @@ function Graph() {
    */
   function getEdges(ids) {
     var a = (ids instanceof Array ? ids : [ids]) || [];
+    var result;
 
     if (self.p.safe) {
-      a.map(function(id) {
+      result = a.map(function(id) {
         return cloneEdge(self.edgesIndex[id]);
       });
     } else {
-      a.map(function(id) {
+      result = a.map(function(id) {
         return self.edgesIndex[id];
       });
     }
 
-    return (ids instanceof Array ? a : a[0]);
+    return (ids instanceof Array ? result : result[0]);
   };
 
   empty();
