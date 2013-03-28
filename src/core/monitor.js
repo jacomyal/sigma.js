@@ -92,12 +92,16 @@ function Monitor(instance, dom) {
 
     s += '<p>GLOBAL :</p>';
     for (var k in self.p.globalProbes) {
-      s += '<p>' + k + ' : ' + self.p.globalProbes[k]() + '</p>';
+      if (self.p.globalProbes.hasOwnProperty(k)) {
+        s += '<p>' + k + ' : ' + self.p.globalProbes[k]() + '</p>';
+      }
     }
 
     s += '<br><p>LOCAL :</p>';
     for (var k in self.p.localProbes) {
-      s += '<p>' + k + ' : ' + self.p.localProbes[k]() + '</p>';
+      if (self.p.localProbes.hasOwnproperty(k)) {
+        s += '<p>' + k + ' : ' + self.p.localProbes[k]() + '</p>';
+      }
     }
 
     self.p.dom.innerHTML = s;

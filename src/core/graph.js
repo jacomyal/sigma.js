@@ -68,6 +68,7 @@ function Graph() {
       'hidden': false,
       'forceLabel': false,
       // Strings :
+      'shape': 'circle',
       'label': id.toString(),
       'id': id.toString(),
       // Custom attributes :
@@ -75,26 +76,29 @@ function Graph() {
     };
 
     for (var k in params) {
-      switch (k) {
-        case 'id':
-          break;
-        case 'x':
-        case 'y':
-        case 'size':
-          n[k] = +params[k];
-          break;
-        case 'fixed':
-        case 'active':
-        case 'hidden':
-        case 'forceLabel':
-          n[k] = !!params[k];
-          break;
-        case 'color':
-        case 'label':
-          n[k] = params[k];
-          break;
-        default:
-          n['attr'][k] = params[k];
+      if (params.hasOwnProperty(k)) {
+        switch (k) {
+          case 'id':
+            break;
+          case 'x':
+          case 'y':
+          case 'size':
+            n[k] = +params[k];
+            break;
+          case 'fixed':
+          case 'active':
+          case 'hidden':
+          case 'forceLabel':
+            n[k] = !!params[k];
+            break;
+          case 'color':
+          case 'label':
+          case 'shape':
+            n[k] = params[k];
+            break;
+          default:
+            n['attr'][k] = params[k];
+        }
       }
     }
 
@@ -143,33 +147,36 @@ function Graph() {
    */
   function checkNode(node, copy) {
     for (var k in copy) {
-      switch (k) {
-        case 'id':
-        case 'attr':
-        case 'degree':
-        case 'inDegree':
-        case 'outDegree':
-        case 'displayX':
-        case 'displayY':
-        case 'displaySize':
-          break;
-        case 'x':
-        case 'y':
-        case 'size':
-          node[k] = +copy[k];
-          break;
-        case 'fixed':
-        case 'active':
-        case 'hidden':
-        case 'forceLabel':
-          node[k] = !!copy[k];
-          break;
-        case 'color':
-        case 'label':
-          node[k] = (copy[k] || '').toString();
-          break;
-        default:
-          node['attr'][k] = copy[k];
+      if (copy.hasOwnProperty(k)) {
+        switch (k) {
+          case 'id':
+          case 'attr':
+          case 'degree':
+          case 'inDegree':
+          case 'outDegree':
+          case 'displayX':
+          case 'displayY':
+          case 'displaySize':
+            break;
+          case 'x':
+          case 'y':
+          case 'size':
+            node[k] = +copy[k];
+            break;
+          case 'fixed':
+          case 'active':
+          case 'hidden':
+          case 'forceLabel':
+            node[k] = !!copy[k];
+            break;
+          case 'color':
+          case 'label':
+          case 'shape':
+            node[k] = (copy[k] || '').toString();
+            break;
+          default:
+            node['attr'][k] = copy[k];
+        }
       }
     }
 
@@ -272,29 +279,31 @@ function Graph() {
     e['target']['inDegree']++;
 
     for (var k in params) {
-      switch (k) {
-        case 'id':
-        case 'source':
-        case 'target':
-          break;
-        case 'hidden':
-          e[k] = !!params[k];
-          break;
-        case 'size':
-        case 'weight':
-          e[k] = +params[k];
-          break;
-        case 'color':
-          e[k] = params[k].toString();
-          break;
-        case 'type':
-          e[k] = params[k].toString();
-          break;
-        case 'label':
-          e[k] = params[k];
-          break;
-        default:
-          e['attr'][k] = params[k];
+      if (params.hasOwnProperty(k)) {
+        switch (k) {
+          case 'id':
+          case 'source':
+          case 'target':
+            break;
+          case 'hidden':
+            e[k] = !!params[k];
+            break;
+          case 'size':
+          case 'weight':
+            e[k] = +params[k];
+            break;
+          case 'color':
+            e[k] = params[k].toString();
+            break;
+          case 'type':
+            e[k] = params[k].toString();
+            break;
+          case 'label':
+            e[k] = params[k];
+            break;
+          default:
+            e['attr'][k] = params[k];
+        }
       }
     }
 
@@ -337,28 +346,30 @@ function Graph() {
    */
   function checkEdge(edge, copy) {
     for (var k in copy) {
-      switch (k) {
-        case 'id':
-        case 'displaySize':
-          break;
-        case 'weight':
-        case 'size':
-          edge[k] = +copy[k];
-          break;
-        case 'source':
-        case 'target':
-          edge[k] = self.nodesIndex[k] || edge[k];
-          break;
-        case 'hidden':
-          edge[k] = !!copy[k];
-          break;
-        case 'color':
-        case 'label':
-        case 'type':
-          edge[k] = (copy[k] || '').toString();
-          break;
-        default:
-          edge['attr'][k] = copy[k];
+      if (copy.hasOwnProperty(k)) {
+        switch (k) {
+          case 'id':
+          case 'displaySize':
+            break;
+          case 'weight':
+          case 'size':
+            edge[k] = +copy[k];
+            break;
+          case 'source':
+          case 'target':
+            edge[k] = self.nodesIndex[k] || edge[k];
+            break;
+          case 'hidden':
+            edge[k] = !!copy[k];
+            break;
+          case 'color':
+          case 'label':
+          case 'type':
+            edge[k] = (copy[k] || '').toString();
+            break;
+          default:
+            edge['attr'][k] = copy[k];
+        }
       }
     }
 

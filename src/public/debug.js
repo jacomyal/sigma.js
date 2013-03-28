@@ -3,11 +3,15 @@ sigma.debugMode = 0;
 sigma.log = function() {
   if (sigma.debugMode == 1) {
     for (var k in arguments) {
-      console.log(arguments[k]);
+      if (arguments.hasOwnProperty(k)) {
+        console.log(arguments[k]);
+      }
     }
-  }else if (sigma.debugMode > 1) {
+  } else if (sigma.debugMode > 1) {
     for (var k in arguments) {
-      throw new Error(arguments[k]);
+      if (arguments.hasOwnProperty(k)) {
+        throw new Error(arguments[k]);
+      }
     }
   }
 
