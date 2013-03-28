@@ -289,8 +289,8 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       var radius = Math.sqrt(Math.PI) * size / 2;
       ctx.fillRect(node['displayX'] - radius,
         node['displayY'] - radius,
-        radius,
-        radius);
+        radius * 2,
+        radius * 2);
       break;
     case 'triangle':
       var radius = Math.sqrt(2 * Math.PI) * size / 2;
@@ -299,18 +299,26 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       ctx.lineTo(node['displayX'], node['displayY'] + radius);
       ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
       break;
+    case 'diamond':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2;
+      ctx.moveTo(node['displayX'] - radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY']);
+      break;
     case 'star':
       var numPoints = 5;
       var outerRadius = Math.sqrt(Math.PI) * size;
       var innerRadius = outerRadius / 2;
-      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius);
+      ctx.moveTo(node['displayX'], node['displayY'] + innerRadius);
       for (var i = 1; i < numPoints * 2; i++) {
         var r = innerRadius;
         if (i % 2 === 1) {
           r = outerRadius;
         }
         var dx = r * Math.sin(i * Math.PI / numPoints);
-        var dy = - r * Math.cos(i * Math.PI / numPoints);
+        var dy = r * Math.cos(i * Math.PI / numPoints);
         ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
       }
       break;
@@ -471,14 +479,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
-    switch(shape) {
+    switch (shape) {
     case 'square':
-        var radius = Math.sqrt(Math.PI) * size / 2 + self.p.borderSize;
-        ctx.strokeRect(node['displayX'] - radius,
-            node['displayY'] - radius,
-            2 * radius,
-            2 * radius);
-        break;
+      var radius = Math.sqrt(Math.PI) * size / 2 + self.p.borderSize;
+      ctx.strokeRect(node['displayX'] - radius,
+        node['displayY'] - radius,
+        2 * radius,
+        2 * radius);
+      break;
     case 'triangle':
       var radius = Math.sqrt(2 * Math.PI) * size / 2 + self.p.borderSize;
       ctx.moveTo(node['displayX'] - radius, node['displayY'] - radius);
@@ -486,24 +494,32 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       ctx.lineTo(node['displayX'], node['displayY'] + radius);
       ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
       break;
+    case 'diamond':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2 + self.p.borderSize;
+      ctx.moveTo(node['displayX'] - radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY']);
+      break;
     case 'star':
       var numPoints = 5;
       var outerRadius = Math.sqrt(Math.PI) * size;
       var innerRadius = outerRadius / 2;
-      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius - self.p.borderSize);
+      ctx.moveTo(node['displayX'], node['displayY'] + innerRadius + self.p.borderSize);
       for (var i = 1; i < numPoints * 2; i++) {
         var r = innerRadius + self.p.borderSize;
         if (i % 2 === 1) {
           r = outerRadius + self.p.borderSize;
         }
         var dx = r * Math.sin(i * Math.PI / numPoints);
-        var dy = - r * Math.cos(i * Math.PI / numPoints);
+        var dy = r * Math.cos(i * Math.PI / numPoints);
         ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
       }
       break;
     default:
       ctx.arc(node['displayX'],
-      node['displayY'],
+        node['displayY'],
         size + self.p.borderSize,
         0,
         Math.PI * 2,
@@ -517,7 +533,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeHoverColor;
-    switch(shape) {
+    switch (shape) {
     case 'square':
       var radius = Math.sqrt(Math.PI) * size / 2;
       ctx.fillRect(node['displayX'] - radius,
@@ -532,28 +548,36 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       ctx.lineTo(node['displayX'], node['displayY'] + radius);
       ctx.lineTo(node['displayX'] - radius, node['displayY'] - radius);
       break;
+    case 'diamond':
+      var radius = Math.sqrt(2 * Math.PI) * size / 2;
+      ctx.moveTo(node['displayX'] - radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] - radius);
+      ctx.lineTo(node['displayX'] + radius, node['displayY']);
+      ctx.lineTo(node['displayX'], node['displayY'] + radius);
+      ctx.lineTo(node['displayX'] - radius, node['displayY']);
+      break;
     case 'star':
       var numPoints = 5;
       var outerRadius = Math.sqrt(Math.PI) * size;
       var innerRadius = outerRadius / 2;
-      ctx.moveTo(node['displayX'], node['displayY'] - outerRadius);
+      ctx.moveTo(node['displayX'], node['displayY'] + innerRadius);
       for (var i = 1; i < numPoints * 2; i++) {
-          var r = innerRadius;
-          if (i % 2 === 1) {
-              r = outerRadius;
-          }
-          var dx = r * Math.sin(i * Math.PI / numPoints);
-          var dy = - r * Math.cos(i * Math.PI / numPoints);
-          ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
+        var r = innerRadius;
+        if (i % 2 === 1) {
+          r = outerRadius;
+        }
+        var dx = r * Math.sin(i * Math.PI / numPoints);
+        var dy = r * Math.cos(i * Math.PI / numPoints);
+        ctx.lineTo(node['displayX'] + dx, node['displayY'] + dy);
       }
       break;
-    default:                    
+    default:
       ctx.arc(node['displayX'],
-          node['displayY'],
-          size,
-          0,
-          Math.PI * 2,
-          true);
+        node['displayY'],
+        size,
+        0,
+        Math.PI * 2,
+        true);
     }
 
     ctx.closePath();
