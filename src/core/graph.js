@@ -31,7 +31,8 @@ function Graph() {
     //   - 'outside'
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
-    edgesPowRatio: 0
+    edgesPowRatio: 0,
+    safe: true
   };
 
   /**
@@ -632,12 +633,16 @@ function Graph() {
       return self.nodesIndex[id];
     }) : self.nodes;
 
-    var aCopies = a.map(cloneNode);
-    aCopies.forEach(fun);
+    if (self.p.safe) {
+      var aCopies = a.map(cloneNode);
+      aCopies.forEach(fun);
 
-    a.forEach(function(n, i) {
-      checkNode(n, aCopies[i]);
-    });
+      a.forEach(function(n, i) {
+        checkNode(n, aCopies[i]);
+      });
+    } else {
+      a.forEach(fun);
+    }
 
     return self;
   };
@@ -654,12 +659,16 @@ function Graph() {
       return self.edgesIndex[id];
     }) : self.edges;
 
-    var aCopies = a.map(cloneEdge);
-    aCopies.forEach(fun);
+    if (self.p.safe) {
+      var aCopies = a.map(cloneEdge);
+      aCopies.forEach(fun);
 
-    a.forEach(function(e, i) {
-      checkEdge(e, aCopies[i]);
-    });
+      a.forEach(function(e, i) {
+        checkEdge(e, aCopies[i]);
+      });
+    } else {
+      a.forEach(fun);
+    }
 
     return self;
   };
@@ -667,27 +676,49 @@ function Graph() {
   /**
    * Returns a specific node clone or an array of specified node clones.
    * @param  {(string|Array.<string>)} ids The ID or an array of node IDs.
-   * @return {(Object|Array.<Object>)} The clone or the array of clones.
+   * @return {(Object|Array.<Object>)} If safe, then the clone or the array
+   *                                   of clones. Otherwise the node or
+   *                                   array of nodes.
    */
   function getNodes(ids) {
-    var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
-      return cloneNode(self.nodesIndex[id]);
-    });
+    var a = (ids instanceof Array ? ids : [ids]) || [];
+    var result;
 
-    return (ids instanceof Array ? a : a[0]);
+    if (self.p.safe) {
+      result = a.map(function(id) {
+        return cloneNode(self.nodesIndex[id]);
+      });
+    } else {
+      result = a.map(function(id) {
+        return self.nodesIndex[id];
+      });
+    }
+
+    return (ids instanceof Array ? result : result[0]);
   };
 
   /**
    * Returns a specific edge clone or an array of specified edge clones.
    * @param  {(string|Array.<string>)} ids The ID or an array of edge IDs.
-   * @return {(Object|Array.<Object>)} The clone or the array of clones.
+   * @return {(Object|Array.<Object>)} If safe, then the clone or the array
+   *                                   of clones. Otherwise the edge or
+   *                                   array of edges.
    */
   function getEdges(ids) {
-    var a = ((ids instanceof Array ? ids : [ids]) || []).map(function(id) {
-      return cloneEdge(self.edgesIndex[id]);
-    });
+    var a = (ids instanceof Array ? ids : [ids]) || [];
+    var result;
 
-    return (ids instanceof Array ? a : a[0]);
+    if (self.p.safe) {
+      result = a.map(function(id) {
+        return cloneEdge(self.edgesIndex[id]);
+      });
+    } else {
+      result = a.map(function(id) {
+        return self.edgesIndex[id];
+      });
+    }
+
+    return (ids instanceof Array ? result : result[0]);
   };
 
   empty();
