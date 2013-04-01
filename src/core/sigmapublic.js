@@ -150,7 +150,7 @@ function SigmaPublic(sigmaInstance) {
       validID = edge['source'] && edge['target'] && edge['id'];
       validID &&
         (!safe || !s.graph.edgesIndex[edge['id']]) &&
-        self.addNode(
+        self.addEdge(
           edge['id'],
           edge['source'],
           edge['target'],
