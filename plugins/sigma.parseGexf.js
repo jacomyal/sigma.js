@@ -121,18 +121,18 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   }
 
   var edges = [];
-  var edgeId = 0;
   var edgesNodes = gexf.getElementsByTagName('edges');
   for(i=0; i<edgesNodes.length; i++){
     var edgesNode = edgesNodes[i];
     var edgeNodes = edgesNode.getElementsByTagName('edge');
     for(j=0; j<edgeNodes.length; j++){
       var edgeNode = edgeNodes[j];
+      var id = edgeNode.getAttribute('id');
       var source = edgeNode.getAttribute('source');
       var target = edgeNode.getAttribute('target');
       var label = edgeNode.getAttribute('label');
       var edge = {
-        id:         j,
+        id:         id,
         sourceID:   source,
         targetID:   target,
         label:      label,
@@ -152,7 +152,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
         edge.attributes.push({attr:attr, val:val});
       }
 
-      sigmaInstance.addEdge(edgeId++,source,target,edge);
+      sigmaInstance.addEdge(id,source,target,edge);
     }
   }
 };
