@@ -13,7 +13,6 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   gexfhttp.send();
   gexf = gexfhttp.responseXML;
 
-  var viz='http://www.gexf.net/1.2draft/viz'; // Vis namespace
   var i, j, k;
 
   // Parse Attributes
@@ -74,21 +73,19 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var y = 100 - 200*Math.random();
       var color;
 
-      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null);
-
       var sizeNodes = nodeNode.getElementsByTagName('size');
-      sizeNodes = sizeNodes.length || poorBrowserXmlNsSupport ?
+      sizeNodes = sizeNodes.length ?
                   sizeNodes :
-                  nodeNode.getElementsByTagNameNS('*','size');
+                  nodeNode.getElementsByTagName('viz:size');
       if(sizeNodes.length>0){
         sizeNode = sizeNodes[0];
         size = parseFloat(sizeNode.getAttribute('value'));
       }
 
       var positionNodes = nodeNode.getElementsByTagName('position');
-      positionNodes = positionNodes.length || poorBrowserXmlNsSupport ?
+      positionNodes = positionNodes.length ?
                       positionNodes :
-                      nodeNode.getElementsByTagNameNS('*','position');
+                      nodeNode.getElementsByTagName('viz:position');
       if(positionNodes.length>0){
         var positionNode = positionNodes[0];
         x = parseFloat(positionNode.getAttribute('x'));
@@ -96,9 +93,9 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       }
 
       var colorNodes = nodeNode.getElementsByTagName('color');
-      colorNodes = colorNodes.length || poorBrowserXmlNsSupport ?
+      colorNodes = colorNodes.length ?
                    colorNodes :
-                   nodeNode.getElementsByTagNameNS('*','color');
+                   nodeNode.getElementsByTagName('viz:color');
       if(colorNodes.length>0){
         colorNode = colorNodes[0];
         color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
