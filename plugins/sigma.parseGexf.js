@@ -55,6 +55,13 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   
   var nodes = []; // The nodes of the graph
   var nodesNodes = gexf.getElementsByTagName('nodes') // The list of xml nodes 'nodes' (plural)
+  var getElementsByTagNameNS = function(node, ns, tagName) {
+	  if (node.getElementsByTagNameNS) {
+		  return node.getElementsByTagNameNS(ns, tagName);
+	  }
+
+	  return node.getElementsByTagName(ns + ':' + tagName);
+  };
   
   for(i=0; i<nodesNodes.length; i++){
     var nodesNode = nodesNodes[i];  // Each xml node 'nodes' (plural)
@@ -74,21 +81,19 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       var y = 100 - 200*Math.random();
       var color;
 
-      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null);
-
       var sizeNodes = nodeNode.getElementsByTagName('size');
-      sizeNodes = sizeNodes.length || poorBrowserXmlNsSupport ?
+      sizeNodes = sizeNodes.length ?
                   sizeNodes :
-                  nodeNode.getElementsByTagNameNS('*','size');
+                  getElementsByTagNameNS(nodeNode, 'viz','size');
       if(sizeNodes.length>0){
         sizeNode = sizeNodes[0];
         size = parseFloat(sizeNode.getAttribute('value'));
       }
 
       var positionNodes = nodeNode.getElementsByTagName('position');
-      positionNodes = positionNodes.length || poorBrowserXmlNsSupport ?
+      positionNodes = positionNodes.length ?
                       positionNodes :
-                      nodeNode.getElementsByTagNameNS('*','position');
+                      getElementsByTagNameNS(nodeNode, 'viz','position');
       if(positionNodes.length>0){
         var positionNode = positionNodes[0];
         x = parseFloat(positionNode.getAttribute('x'));
@@ -96,9 +101,9 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       }
 
       var colorNodes = nodeNode.getElementsByTagName('color');
-      colorNodes = colorNodes.length || poorBrowserXmlNsSupport ?
+      colorNodes = colorNodes.length ?
                    colorNodes :
-                   nodeNode.getElementsByTagNameNS('*','color');
+                   getElementsByTagNameNS(nodeNode, 'viz','color');
       if(colorNodes.length>0){
         colorNode = colorNodes[0];
         color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
