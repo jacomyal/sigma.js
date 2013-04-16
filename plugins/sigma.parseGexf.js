@@ -8,9 +8,9 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
     new XMLHttpRequest() :
     new ActiveXObject('Microsoft.XMLHTTP');
 
-if (gexfhttp.overrideMimeType) {
+  if (gexfhttp.overrideMimeType) {
     gexfhttp.overrideMimeType('text/xml');
-}
+  }
 
   gexfhttp.open('GET', gexfPath, false);
   gexfhttp.send();
@@ -23,53 +23,53 @@ if (gexfhttp.overrideMimeType) {
   var nodesAttributes = [];   // The list of attributes of the nodes of the graph that we build in json
   var edgesAttributes = [];   // The list of attributes of the edges of the graph that we build in json
   var attributesNodes = gexf.getElementsByTagName('attributes');  // In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
-  
+
   for(i = 0; i<attributesNodes.length; i++){
     var attributesNode = attributesNodes[i];  // attributesNode is each xml node 'attributes' (plural)
     if(attributesNode.getAttribute('class') == 'node'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-        
+
         var attribute = {id:id, title:title, type:type};
         nodesAttributes.push(attribute);
-        
+
       }
     } else if(attributesNode.getAttribute('class') == 'edge'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-          
+
         var attribute = {id:id, title:title, type:type};
         edgesAttributes.push(attribute);
-        
+
       }
     }
   }
-  
+
   var nodes = []; // The nodes of the graph
   var nodesNodes = gexf.getElementsByTagName('nodes') // The list of xml nodes 'nodes' (plural)
-  
+
   for(i=0; i<nodesNodes.length; i++){
     var nodesNode = nodesNodes[i];  // Each xml node 'nodes' (plural)
     var nodeNodes = nodesNode.getElementsByTagName('node'); // The list of xml nodes 'node' (no 's')
 
     for(j=0; j<nodeNodes.length; j++){
       var nodeNode = nodeNodes[j];  // Each xml node 'node' (no 's')
-      
+
       window.NODE = nodeNode;
 
       var id = nodeNode.getAttribute('id');
       var label = nodeNode.getAttribute('label') || id;
-      
+
       //viz
       var size = 1;
       var x = 100 - 200*Math.random();
@@ -105,10 +105,10 @@ if (gexfhttp.overrideMimeType) {
                                          parseFloat(colorNode.getAttribute('g')),
                                          parseFloat(colorNode.getAttribute('b')));
       }
-      
+
       // Create Node
       var node = {label:label, size:size, x:x, y:y, attributes:[], color:color};  // The graph node
-      
+
       // Attribute values
       var attvalueNodes = nodeNode.getElementsByTagName('attvalue');
       for(k=0; k<attvalueNodes.length; k++){
