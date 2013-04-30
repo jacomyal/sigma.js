@@ -130,7 +130,10 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     // --------
     edgesSpeed: 200,
     nodesSpeed: 200,
-    labelsSpeed: 200
+    labelsSpeed: 200,
+    // ---------
+    // Directed var (added by JCM)    
+    directed: 0
   };
 
   /**
@@ -307,6 +310,154 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var x2 = edge['target']['displayX'];
     var y2 = edge['target']['displayY'];
     var color = edge['color'];
+	var directed = self.p.directed
+
+	// JM: I got this arrow-drawing code from Patrick Horgan (see below)
+
+	// Copyright Patrick Horgan patrick at dbp-consulting dot com
+	// Permission to use granted as long as you keep this notice intact
+	// use strict is everywhere because some browsers still don't support
+	// using it once for the whole file and need per method/function
+	// use.
+	// Part is derivitive of work by Juan Mendes as noted below as appropriate.
+	// Some things depend on code in http://dbp-consulting/scripts/utilities.js
+
+	var drawHead=function(ctx,x0,y0,x1,y1,x2,y2,style,color)
+	{
+	  'use strict';
+	  // all cases do this.
+	  ctx.save();
+	  ctx.beginPath();
+	  ctx.moveTo(x0,y0);
+	  ctx.lineTo(x1,y1);
+	  ctx.lineTo(x2,y2);
+	  switch(style){
+		case 0:
+		  // curved filled, add the bottom as an arcTo curve and fill
+		  var backdist=Math.sqrt(((x2-x0)*(x2-x0))+((y2-y0)*(y2-y0)));
+		  ctx.arcTo(x1,y1,x0,y0,.55*backdist);
+		  ctx.fillStyle = color;
+		  ctx.fill();
+		  break;
+		case 1:
+		  // straight filled, add the bottom as a line and fill.
+		  ctx.lineTo(x0,y0);
+		  ctx.fillStyle = color;
+		  ctx.fill();
+		  break;
+		case 2:
+		  // unfilled head, just stroke.
+		  ctx.strokeStyle = color;
+		  ctx.stroke();
+		  break;
+		case 3:
+		  //filled head, add the bottom as a quadraticCurveTo curve and fill
+		  var cpx=(x0+x1+x2)/3;
+		  var cpy=(y0+y1+y2)/3;
+		  ctx.quadraticCurveTo(cpx,cpy,x0,y0);
+		  ctx.fillStyle = color;
+		  ctx.fill();
+		  break;
+		case 4:
+		  //filled head, add the bottom as a bezierCurveTo curve and fill
+		  var cp1x, cp1y, cp2x, cp2y,backdist;
+		  var shiftamt=5;
+		  if(x2==x0){
+		// Avoid a divide by zero if x2==x0
+		backdist=y2-y0;
+		cp1x=(x1+x0)/2;
+		cp2x=(x1+x0)/2;
+		cp1y=y1+backdist/shiftamt;
+		cp2y=y1-backdist/shiftamt;
+		  }else{
+		backdist=Math.sqrt(((x2-x0)*(x2-x0))+((y2-y0)*(y2-y0)));
+		var xback=(x0+x2)/2;
+		var yback=(y0+y2)/2;
+		var xmid=(xback+x1)/2;
+		var ymid=(yback+y1)/2;
+
+		var m=(y2-y0)/(x2-x0);
+		var dx=(backdist/(2*Math.sqrt(m*m+1)))/shiftamt;
+		var dy=m*dx;
+		cp1x=xmid-dx;
+		cp1y=ymid-dy;
+		cp2x=xmid+dx;
+		cp2y=ymid+dy;
+		  }
+
+		  ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x0,y0);
+		  ctx.fillStyle = color;
+		  ctx.fill();
+		  break;
+	  }
+	  ctx.restore();
+	};
+
+	var drawArrow=function(ctx,x1,y1,x2,y2,style,which,angle,d,color)
+	{
+	  'use strict';
+	  style=typeof(style)!='undefined'? style:3;
+	  which=typeof(which)!='undefined'? which:1; // end point gets arrow
+	  angle=typeof(angle)!='undefined'? angle:Math.PI/8;
+	  d    =typeof(d)    !='undefined'? d    :10;
+	  // default to using drawHead to draw the head, but if the style
+	  // argument is a function, use it instead
+	  var toDrawHead=typeof(style)!='function'?drawHead:style;
+
+	  // For ends with arrow we actually want to stop before we get to the arrow
+	  // so that wide lines won't put a flat end on the arrow.
+	  //
+	  var dist=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+	  var ratio=(dist-d/3)/dist;
+	  var tox, toy,fromx,fromy;
+	  if(which&1){
+		tox=x1+(x2-x1)*ratio;
+		toy=y1+(y2-y1)*ratio;
+	  }else{
+		tox=x2;
+		toy=y2;
+	  }
+	  if(which&2){
+		fromx=x1+(x2-x1)*(1-ratio);
+		fromy=y1+(y2-y1)*(1-ratio);
+	  }else{
+		fromx=x1;
+		fromy=y1;
+	  }
+	  
+	  // Draw the shaft of the arrow
+	  ctx.beginPath();
+	  ctx.moveTo(fromx,fromy);
+	  ctx.lineTo(tox,toy);
+	  ctx.strokeStyle = color;
+	  ctx.stroke();
+
+	  // calculate the angle of the line
+	  var lineangle=Math.atan2(y2-y1,x2-x1);
+	  // h is the line length of a side of the arrow head
+	  var h=Math.abs(d/Math.cos(angle));
+
+	  if(which&1){	// handle far end arrow head
+		var angle1=lineangle+Math.PI+angle;
+		var topx=x2+Math.cos(angle1)*h;
+		var topy=y2+Math.sin(angle1)*h;
+		var angle2=lineangle+Math.PI-angle;
+		var botx=x2+Math.cos(angle2)*h;
+		var boty=y2+Math.sin(angle2)*h;	
+		toDrawHead(ctx,topx,topy,x2,y2,botx,boty,style,color);
+	  }
+	  if(which&2){ // handle near end arrow head
+		var angle1=lineangle+angle;
+		var topx=x1+Math.cos(angle1)*h;
+		var topy=y1+Math.sin(angle1)*h;
+		var angle2=lineangle-angle;
+		var botx=x1+Math.cos(angle2)*h;
+		var boty=y1+Math.sin(angle2)*h;
+		toDrawHead(ctx,topx,topy,x1,y1,botx,boty,style,color);
+	  }
+	}
+
+
 
     if (!color) {
       switch (self.p.edgeColor) {
@@ -324,31 +475,41 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       }
     }
 
+	var drawUndirectedEdge=function(ctx,x1,y1,x2,y2,color)
+	{
+		switch (edge['type'] || self.p.defaultEdgeType) {
+		  case 'curve':
+			ctx.strokeStyle = color;
+			ctx.lineWidth = edge['displaySize'] / 3;
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
+								 (y1 + y2) / 2 + (x1 - x2) / 4,
+								 x2,
+								 y2);
+			ctx.stroke();
+			break;
+		  case 'line':
+		  default:
+			ctx.strokeStyle = color;
+			ctx.lineWidth = edge['displaySize'] / 3;
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+
+			ctx.stroke();
+			break;
+		}
+	}
+	
     var ctx = edgesCtx;
+    ctx.lineWidth=3;
 
-    switch (edge['type'] || self.p.defaultEdgeType) {
-      case 'curve':
-        ctx.strokeStyle = color;
-        ctx.lineWidth = edge['displaySize'] / 3;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
-                             (y1 + y2) / 2 + (x1 - x2) / 4,
-                             x2,
-                             y2);
-        ctx.stroke();
-        break;
-      case 'line':
-      default:
-        ctx.strokeStyle = color;
-        ctx.lineWidth = edge['displaySize'] / 3;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-
-        ctx.stroke();
-        break;
-    }
+	if(directed==1){
+		drawArrow(ctx,x1,y1,x2,y2,3,1,0.34,20,color);
+	}else{
+		drawUndirectedEdge(ctx,x1,y1,x2,y2,color);
+	}
 
     return self;
   };
