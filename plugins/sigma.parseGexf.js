@@ -16,6 +16,11 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   gexfhttp.send();
   gexf = gexfhttp.responseXML;
 
+  return this.parseGexfXmlDoc (gexf);
+};
+
+sigma.publicPrototype.parseGexfXmlDoc = function(gexf) {
+  var sigmaInstance = this;
   var i, j, k;
 
   // Parse Attributes
