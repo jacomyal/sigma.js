@@ -285,8 +285,7 @@ function Graph() {
           e[k] = +params[k];
           break;
         case 'color':
-          e[k] = params[k].toString();
-          break;
+        case 'arrow':
         case 'type':
           e[k] = params[k].toString();
           break;
@@ -316,6 +315,7 @@ function Graph() {
       'target': edge['target']['id'],
       'size': edge['size'],
       'type': edge['type'],
+      'arrow': edge['arrow'],
       'weight': edge['weight'],
       'displaySize': edge['displaySize'],
       'label': edge['label'],
@@ -354,6 +354,7 @@ function Graph() {
           break;
         case 'color':
         case 'label':
+        case 'arrow':
         case 'type':
           edge[k] = (copy[k] || '').toString();
           break;
@@ -537,9 +538,9 @@ function Graph() {
       node['displaySize'] = node['displaySize'] * sizeRatio;
     });
 
-    sizeRatio = Math.pow(ratio, self.p.edgesPowRatio);
     parseEdges && self.edges.forEach(function(edge) {
-      edge['displaySize'] = edge['displaySize'] * sizeRatio;
+      edge['displaySize'] = edge['displaySize'] * Math.pow(ratio, self.p.edgesPowRatio);
+      edge['arrowDisplaySize'] = edge['displaySize'] * 3 * sizeRatio;     // (edge['displaySize']+1) * 2.5 * sizeRatio;
     });
 
     return self;
