@@ -31,7 +31,10 @@ function Graph() {
     //   - 'outside'
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
-    edgesPowRatio: 0
+    edgesPowRatio: 0,
+    // Increasing / decreasing the following parameter will respectively make
+    // arrows bigger / smaller relatively to their edges.
+    arrowRatio: 3
   };
 
   /**
@@ -539,8 +542,14 @@ function Graph() {
     });
 
     parseEdges && self.edges.forEach(function(edge) {
-      edge['displaySize'] = edge['displaySize'] * Math.pow(ratio, self.p.edgesPowRatio);
-      edge['arrowDisplaySize'] = edge['displaySize'] * 3 * sizeRatio;     // (edge['displaySize']+1) * 2.5 * sizeRatio;
+      edge['displaySize'] =
+        edge['displaySize'] *
+        Math.pow(ratio, self.p.edgesPowRatio);
+
+      edge['arrowDisplaySize'] =
+        edge['displaySize'] *
+        self.p.arrowRatio *
+        sizeRatio;
     });
 
     return self;
