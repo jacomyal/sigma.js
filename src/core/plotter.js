@@ -273,6 +273,30 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   };
 
   /**
+   * Draws one filled circle shape to the corresponding canvas.
+   * @param  {Object} canvas context to draw on
+   * @param  {string} designated color
+   * @param  {float}  display X for center
+   * @param  {float}  display Y for center
+   * @param  {float}  display size - all objects pixels must be inside
+   * @param  {Object} node The node to draw - unused here but other implementations
+   *                       may take additional data from it - @see Plotter.prototype functions
+   */
+  function drawFilledCircle(ctx, color, x, y, size, node) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x,
+            y,
+            size,
+            0,
+            Math.PI * 2,
+            true);
+
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  /**
    * Draws one node to the corresponding canvas.
    * @param  {Object} node The node to draw.
    * @return {Plotter} Returns itself.
@@ -281,7 +305,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var size = Math.round(node['displaySize'] * 10) / 10;
     var ctx = nodesCtx;
 
-    ctx.fillStyle = node['color'];
+    /*ctx.fillStyle = node['color'];
     ctx.beginPath();
     ctx.arc(node['displayX'],
             node['displayY'],
@@ -291,7 +315,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
             true);
 
     ctx.closePath();
-    ctx.fill();
+    ctx.fill();*/
+	drawNodeShape(	ctx, 
+					node['color'],
+					node['displayX'],
+					node['displayY'],
+					size,
+					node);					
 
     node['hover'] && drawHoverNode(node);
     return self;
@@ -497,7 +527,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.shadowBlur = 0;
 
     // Node border:
-    ctx.beginPath();
+    /*ctx.beginPath();
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
@@ -508,10 +538,19 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
             Math.PI * 2,
             true);
     ctx.closePath();
-    ctx.fill();
+    ctx.fill();*/
+	var color = self.p.nodeBorderColor == 'node' ?
+                (node['color'] || self.p.defaultNodeColor) :
+                self.p.defaultNodeBorderColor;
+	drawHoverNodeBorder(ctx, 
+						color,
+						Math.round(node['displayX']),
+						Math.round(node['displayY']),
+						node['displaySize'] + self.p.borderSize,
+						node);					
 
     // Node:
-    ctx.beginPath();
+    /*ctx.beginPath();
     ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeHoverColor;
@@ -523,7 +562,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
             true);
 
     ctx.closePath();
-    ctx.fill();
+    ctx.fill();*/
+	var color = self.p.nodeHoverColor == 'node' ?
+                (node['color'] || self.p.defaultNodeColor) :
+                self.p.defaultNodeHoverColor;
+	drawHoverNodeShape(	ctx, 
+						color,
+						Math.round(node['displayX']),
+						Math.round(node['displayY']),
+						node['displaySize'],
+						node);					
 
     // Label:
     ctx.fillStyle = self.p.labelHoverColor == 'node' ?
@@ -591,7 +639,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.shadowBlur = 0;
 
     // Node border:
-    ctx.beginPath();
+    /*ctx.beginPath();
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeBorderColor;
@@ -602,10 +650,19 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
             Math.PI * 2,
             true);
     ctx.closePath();
-    ctx.fill();
+    ctx.fill();*/
+	var color = self.p.nodeBorderColor == 'node' ?
+                (node['color'] || self.p.defaultNodeColor) :
+                self.p.defaultNodeBorderColor;
+	drawActiveNodeBorder(ctx, 
+						color,
+						Math.round(node['displayX']),
+						Math.round(node['displayY']),
+						node['displaySize'] + self.p.borderSize,
+						node);					
 
     // Node:
-    ctx.beginPath();
+    /*ctx.beginPath();
     ctx.fillStyle = self.p.nodeActiveColor == 'node' ?
                     (node['color'] || self.p.defaultNodeColor) :
                     self.p.defaultNodeActiveColor;
@@ -617,7 +674,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
             true);
 
     ctx.closePath();
-    ctx.fill();
+    ctx.fill();*/
+	var color = self.p.nodeActiveColor == 'node' ?
+                (node['color'] || self.p.defaultNodeColor) :
+                self.p.defaultNodeActiveColor;
+	drawActiveNodeShape(ctx, 
+						color,
+						Math.round(node['displayX']),
+						Math.round(node['displayY']),
+						node['displaySize'],
+						node);					
 
     // Label:
     ctx.fillStyle = self.p.labelActiveColor == 'node' ?
@@ -743,7 +809,15 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
     return nodeCoordinates;
   };
+  
+  /* overridable node shape drawing functions */
+  Plotter.prototype.drawNodeShape = drawPaintedCircle;
+  Plotter.prototype.drawHoverNodeBorder = drawPaintedCircle;
+  Plotter.prototype.drawHoverNodeShape = drawPaintedCircle;
+  Plotter.prototype.drawActiveNodeBorder = drawPaintedCircle;
+  Plotter.prototype.drawActiveNodeShape = drawPaintedCircle;
 
+  /* public methods */
   this.task_drawLabel = task_drawLabel;
   this.task_drawEdge = task_drawEdge;
   this.task_drawNode = task_drawNode;
