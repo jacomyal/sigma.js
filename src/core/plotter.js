@@ -215,10 +215,10 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
           s['hidden'] ||
           t['hidden'] ||
           (!self.isOnScreen(s) && !self.isOnScreen(t))) {
-        self.currentEdgeIndex++;
-      }else {
-        drawEdge(graph.edges[self.currentEdgeIndex++]);
-      }
+            self.currentEdgeIndex++;
+          }else {
+            drawEdge(graph.edges[self.currentEdgeIndex++]);
+          }
     }
 
     return self.currentEdgeIndex < c;
@@ -286,16 +286,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(x,
-            y,
-            size,
-            0,
-            Math.PI * 2,
-            true);
+        y,
+        size,
+        0,
+        Math.PI * 2,
+        true);
 
     ctx.closePath();
     ctx.fill();
   }
-  
+
   /**
    * Draws one node to the corresponding canvas.
    * @param  {Object} node The node to draw.
@@ -306,22 +306,22 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var ctx = nodesCtx;
 
     /*ctx.fillStyle = node['color'];
-    ctx.beginPath();
-    ctx.arc(node['displayX'],
-            node['displayY'],
-            size,
-            0,
-            Math.PI * 2,
-            true);
+      ctx.beginPath();
+      ctx.arc(node['displayX'],
+      node['displayY'],
+      size,
+      0,
+      Math.PI * 2,
+      true);
 
-    ctx.closePath();
-    ctx.fill();*/
-	drawNodeShape(	ctx, 
-					node['color'],
-					node['displayX'],
-					node['displayY'],
-					size,
-					node);					
+      ctx.closePath();
+      ctx.fill();*/
+    self.drawNodeShape(  ctx, 
+        node['color'],
+        node['displayX'],
+        node['displayY'],
+        size,
+        node);          
 
     node['hover'] && drawHoverNode(node);
     return self;
@@ -336,24 +336,24 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     // Using array for coordinates so we can easily modify/return from
     // applyArrow():
     var sourceCoordinates = [
-          edge['source']['displayX'],
-          edge['source']['displayY']
+      edge['source']['displayX'],
+      edge['source']['displayY']
         ],
-        targetCoordinates = [
-          edge['target']['displayX'],
-          edge['target']['displayY']
+      targetCoordinates = [
+        edge['target']['displayX'],
+      edge['target']['displayY']
         ],
-        color = edge['color'];
+      color = edge['color'];
 
     if (!color) {
       switch (self.p.edgeColor) {
         case 'source':
           color = edge['source']['color'] ||
-                  self.p.defaultNodeColor;
+            self.p.defaultNodeColor;
           break;
         case 'target':
           color = edge['target']['color'] ||
-                  self.p.defaultNodeColor;
+            self.p.defaultNodeColor;
           break;
         default:
           color = self.p.defaultEdgeColor;
@@ -368,45 +368,45 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
         ctx.strokeStyle = color;
 
         var controlPointX =
-              (sourceCoordinates[0] + targetCoordinates[0]) / 2 +
-              (targetCoordinates[1] - sourceCoordinates[1]) / 4,
-            controlPointY =
-              (sourceCoordinates[1] + targetCoordinates[1]) / 2 +
-              (sourceCoordinates[0] - targetCoordinates[0]) / 4;
+          (sourceCoordinates[0] + targetCoordinates[0]) / 2 +
+          (targetCoordinates[1] - sourceCoordinates[1]) / 4,
+          controlPointY =
+            (sourceCoordinates[1] + targetCoordinates[1]) / 2 +
+            (sourceCoordinates[0] - targetCoordinates[0]) / 4;
 
         // Assignment is redundant here but makes it clear that this call
         // mutates sourceCoordinates:
         if (isArrowDrawRequired('source', edge['arrow'])) {
           sourceCoordinates = applyArrow(
-            ctx,
-            sourceCoordinates,
-            edge['source']['displaySize'],
-            controlPointX,
-            controlPointY,
-            edge['arrowDisplaySize']
-          );
+              ctx,
+              sourceCoordinates,
+              edge['source']['displaySize'],
+              controlPointX,
+              controlPointY,
+              edge['arrowDisplaySize']
+              );
         }
 
         // Assignment is redundant here but makes it clear that this call
         // mutates targetCoordinates:
         if (isArrowDrawRequired('target', edge['arrow'])) {
           targetCoordinates = applyArrow(
-            ctx,
-            targetCoordinates,
-            edge['target']['displaySize'],
-            controlPointX,
-            controlPointY,
-            edge['arrowDisplaySize']
-          );
+              ctx,
+              targetCoordinates,
+              edge['target']['displaySize'],
+              controlPointX,
+              controlPointY,
+              edge['arrowDisplaySize']
+              );
         }
 
         ctx.lineWidth = edge['displaySize'] / 3;
         ctx.beginPath();
         ctx.moveTo(sourceCoordinates[0], sourceCoordinates[1]);
         ctx.quadraticCurveTo(controlPointX,
-                             controlPointY,
-                             targetCoordinates[0],
-                             targetCoordinates[1]);
+            controlPointY,
+            targetCoordinates[0],
+            targetCoordinates[1]);
 
         ctx.stroke();
         break;
@@ -418,24 +418,24 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
         // mutates sourceCoordinates:
         if (isArrowDrawRequired('source', edge['arrow'])) {
           sourceCoordinates = applyArrow(ctx,
-            sourceCoordinates,
-            edge['source']['displaySize'],
-            targetCoordinates[0],
-            targetCoordinates[1],
-            edge['arrowDisplaySize']
-          );
+              sourceCoordinates,
+              edge['source']['displaySize'],
+              targetCoordinates[0],
+              targetCoordinates[1],
+              edge['arrowDisplaySize']
+              );
         }
 
         // Assignment is redundant here but makes it clear that this call
         // mutates targetCoordinates:
         if (isArrowDrawRequired('target', edge['arrow'])) {
           targetCoordinates = applyArrow(ctx,
-            targetCoordinates,
-            edge['target']['displaySize'],
-            sourceCoordinates[0],
-            sourceCoordinates[1],
-            edge['arrowDisplaySize']
-          );
+              targetCoordinates,
+              edge['target']['displaySize'],
+              sourceCoordinates[0],
+              sourceCoordinates[1],
+              edge['arrowDisplaySize']
+              );
         }
 
         ctx.lineWidth = edge['displaySize'] / 3;
@@ -460,19 +460,19 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
     if (node['displaySize'] >= self.p.labelThreshold || node['forceLabel']) {
       var fontSize = self.p.labelSize == 'fixed' ?
-                     self.p.defaultLabelSize :
-                     self.p.labelSizeRatio * node['displaySize'];
+        self.p.defaultLabelSize :
+        self.p.labelSizeRatio * node['displaySize'];
 
       ctx.font = self.p.fontStyle + fontSize + 'px ' + self.p.font;
 
       ctx.fillStyle = self.p.labelColor == 'node' ?
-                      (node['color'] || self.p.defaultNodeColor) :
-                      self.p.defaultLabelColor;
+        (node['color'] || self.p.defaultNodeColor) :
+        self.p.defaultLabelColor;
       ctx.fillText(
-        node['label'],
-        Math.round(node['displayX'] + node['displaySize'] * 1.5),
-        Math.round(node['displayY'] + fontSize / 2 - 3)
-      );
+          node['label'],
+          Math.round(node['displayX'] + node['displaySize'] * 1.5),
+          Math.round(node['displayY'] + fontSize / 2 - 3)
+          );
     }
 
     return self;
@@ -487,16 +487,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var ctx = hoverCtx;
 
     var fontSize = self.p.labelSize == 'fixed' ?
-                   self.p.defaultLabelSize :
-                   self.p.labelSizeRatio * node['displaySize'];
+      self.p.defaultLabelSize :
+      self.p.labelSizeRatio * node['displaySize'];
 
     ctx.font = (self.p.hoverFontStyle || self.p.fontStyle || '') + ' ' +
-               fontSize + 'px ' +
-               (self.p.hoverFont || self.p.font || '');
+      fontSize + 'px ' +
+      (self.p.hoverFont || self.p.font || '');
 
     ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultHoverLabelBGColor;
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultHoverLabelBGColor;
 
     // Label background:
     ctx.beginPath();
@@ -509,16 +509,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     }
 
     sigma.tools.drawRoundRect(
-      ctx,
-      Math.round(node['displayX'] - fontSize / 2 - 2),
-      Math.round(node['displayY'] - fontSize / 2 - 2),
-      Math.round(ctx.measureText(node['label']).width +
-        node['displaySize'] * 1.5 +
-        fontSize / 2 + 4),
-      Math.round(fontSize + 4),
-      Math.round(fontSize / 2 + 2),
-      'left'
-    );
+        ctx,
+        Math.round(node['displayX'] - fontSize / 2 - 2),
+        Math.round(node['displayY'] - fontSize / 2 - 2),
+        Math.round(ctx.measureText(node['label']).width +
+          node['displaySize'] * 1.5 +
+          fontSize / 2 + 4),
+        Math.round(fontSize + 4),
+        Math.round(fontSize / 2 + 2),
+        'left'
+        );
     ctx.closePath();
     ctx.fill();
 
@@ -528,60 +528,60 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
     // Node border:
     /*ctx.beginPath();
-    ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultNodeBorderColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
-            0,
-            Math.PI * 2,
-            true);
-    ctx.closePath();
-    ctx.fill();*/
-	var color = self.p.nodeBorderColor == 'node' ?
-                (node['color'] || self.p.defaultNodeColor) :
-                self.p.defaultNodeBorderColor;
-	drawHoverNodeBorder(ctx, 
-						color,
-						Math.round(node['displayX']),
-						Math.round(node['displayY']),
-						node['displaySize'] + self.p.borderSize,
-						node);					
+      ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeBorderColor;
+      ctx.arc(Math.round(node['displayX']),
+      Math.round(node['displayY']),
+      node['displaySize'] + self.p.borderSize,
+      0,
+      Math.PI * 2,
+      true);
+      ctx.closePath();
+      ctx.fill();*/
+    var color = self.p.nodeBorderColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeBorderColor;
+    self.drawHoverNodeBorder(ctx, 
+        color,
+        Math.round(node['displayX']),
+        Math.round(node['displayY']),
+        node['displaySize'] + self.p.borderSize,
+        node);
 
     // Node:
     /*ctx.beginPath();
-    ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultNodeHoverColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'],
-            0,
-            Math.PI * 2,
-            true);
+      ctx.fillStyle = self.p.nodeHoverColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeHoverColor;
+      ctx.arc(Math.round(node['displayX']),
+      Math.round(node['displayY']),
+      node['displaySize'],
+      0,
+      Math.PI * 2,
+      true);
 
-    ctx.closePath();
-    ctx.fill();*/
-	var color = self.p.nodeHoverColor == 'node' ?
-                (node['color'] || self.p.defaultNodeColor) :
-                self.p.defaultNodeHoverColor;
-	drawHoverNodeShape(	ctx, 
-						color,
-						Math.round(node['displayX']),
-						Math.round(node['displayY']),
-						node['displaySize'],
-						node);					
+      ctx.closePath();
+      ctx.fill();*/
+    var color = self.p.nodeHoverColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeHoverColor;
+    self.drawHoverNodeShape(  ctx, 
+        color,
+        Math.round(node['displayX']),
+        Math.round(node['displayY']),
+        node['displaySize'],
+        node);
 
     // Label:
     ctx.fillStyle = self.p.labelHoverColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultLabelHoverColor;
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultLabelHoverColor;
     ctx.fillText(
-      node['label'],
-      Math.round(node['displayX'] + node['displaySize'] * 1.5),
-      Math.round(node['displayY'] + fontSize / 2 - 3)
-    );
+        node['label'],
+        Math.round(node['displayX'] + node['displaySize'] * 1.5),
+        Math.round(node['displayY'] + fontSize / 2 - 3)
+        );
 
     return self;
   };
@@ -599,16 +599,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     }
 
     var fontSize = self.p.labelSize == 'fixed' ?
-                   self.p.defaultLabelSize :
-                   self.p.labelSizeRatio * node['displaySize'];
+      self.p.defaultLabelSize :
+      self.p.labelSizeRatio * node['displaySize'];
 
     ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
-               fontSize + 'px ' +
-               (self.p.activeFont || self.p.font || '');
+      fontSize + 'px ' +
+      (self.p.activeFont || self.p.font || '');
 
     ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultActiveLabelBGColor;
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultActiveLabelBGColor;
 
     // Label background:
     ctx.beginPath();
@@ -621,16 +621,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     }
 
     sigma.tools.drawRoundRect(
-      ctx,
-      Math.round(node['displayX'] - fontSize / 2 - 2),
-      Math.round(node['displayY'] - fontSize / 2 - 2),
-      Math.round(ctx.measureText(node['label']).width +
-        node['displaySize'] * 1.5 +
-        fontSize / 2 + 4),
-      Math.round(fontSize + 4),
-      Math.round(fontSize / 2 + 2),
-      'left'
-    );
+        ctx,
+        Math.round(node['displayX'] - fontSize / 2 - 2),
+        Math.round(node['displayY'] - fontSize / 2 - 2),
+        Math.round(ctx.measureText(node['label']).width +
+          node['displaySize'] * 1.5 +
+          fontSize / 2 + 4),
+        Math.round(fontSize + 4),
+        Math.round(fontSize / 2 + 2),
+        'left'
+        );
     ctx.closePath();
     ctx.fill();
 
@@ -640,60 +640,60 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
     // Node border:
     /*ctx.beginPath();
-    ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultNodeBorderColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
-            0,
-            Math.PI * 2,
-            true);
-    ctx.closePath();
-    ctx.fill();*/
-	var color = self.p.nodeBorderColor == 'node' ?
-                (node['color'] || self.p.defaultNodeColor) :
-                self.p.defaultNodeBorderColor;
-	drawActiveNodeBorder(ctx, 
-						color,
-						Math.round(node['displayX']),
-						Math.round(node['displayY']),
-						node['displaySize'] + self.p.borderSize,
-						node);					
+      ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeBorderColor;
+      ctx.arc(Math.round(node['displayX']),
+      Math.round(node['displayY']),
+      node['displaySize'] + self.p.borderSize,
+      0,
+      Math.PI * 2,
+      true);
+      ctx.closePath();
+      ctx.fill();*/
+    var color = self.p.nodeBorderColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeBorderColor;
+    self.drawActiveNodeBorder(ctx, 
+        color,
+        Math.round(node['displayX']),
+        Math.round(node['displayY']),
+        node['displaySize'] + self.p.borderSize,
+        node);          
 
     // Node:
     /*ctx.beginPath();
-    ctx.fillStyle = self.p.nodeActiveColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultNodeActiveColor;
-    ctx.arc(Math.round(node['displayX']),
-            Math.round(node['displayY']),
-            node['displaySize'],
-            0,
-            Math.PI * 2,
-            true);
+      ctx.fillStyle = self.p.nodeActiveColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeActiveColor;
+      ctx.arc(Math.round(node['displayX']),
+      Math.round(node['displayY']),
+      node['displaySize'],
+      0,
+      Math.PI * 2,
+      true);
 
-    ctx.closePath();
-    ctx.fill();*/
-	var color = self.p.nodeActiveColor == 'node' ?
-                (node['color'] || self.p.defaultNodeColor) :
-                self.p.defaultNodeActiveColor;
-	drawActiveNodeShape(ctx, 
-						color,
-						Math.round(node['displayX']),
-						Math.round(node['displayY']),
-						node['displaySize'],
-						node);					
+      ctx.closePath();
+      ctx.fill();*/
+    var color = self.p.nodeActiveColor == 'node' ?
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultNodeActiveColor;
+    self.drawActiveNodeShape(ctx, 
+        color,
+        Math.round(node['displayX']),
+        Math.round(node['displayY']),
+        node['displaySize'],
+        node);          
 
     // Label:
     ctx.fillStyle = self.p.labelActiveColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultLabelActiveColor;
+      (node['color'] || self.p.defaultNodeColor) :
+      self.p.defaultLabelActiveColor;
     ctx.fillText(
-      node['label'],
-      Math.round(node['displayX'] + node['displaySize'] * 1.5),
-      Math.round(node['displayY'] + fontSize / 2 - 3)
-    );
+        node['label'],
+        Math.round(node['displayX'] + node['displaySize'] * 1.5),
+        Math.round(node['displayY'] + fontSize / 2 - 3)
+        );
 
     return self;
   };
@@ -709,120 +709,120 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   function isOnScreen(node) {
     if (isNaN(node['x']) || isNaN(node['y'])) {
       throw (new Error('A node\'s coordinate is not a ' +
-                       'number (id: ' + node['id'] + ')')
-      );
-    }
+            'number (id: ' + node['id'] + ')')
+            );
+          }
 
-    return !node['hidden'] &&
-           (node['displayX'] + node['displaySize'] > -width / 3) &&
-           (node['displayX'] - node['displaySize'] < width * 4 / 3) &&
-           (node['displayY'] + node['displaySize'] > -height / 3) &&
-           (node['displayY'] - node['displaySize'] < height * 4 / 3);
-  };
+          return !node['hidden'] &&
+          (node['displayX'] + node['displaySize'] > -width / 3) &&
+          (node['displayX'] - node['displaySize'] < width * 4 / 3) &&
+          (node['displayY'] + node['displaySize'] > -height / 3) &&
+          (node['displayY'] - node['displaySize'] < height * 4 / 3);
+          };
 
-  /**
-   * Resizes this instance.
-   * @param  {number} w The new width.
-   * @param  {number} h The new height.
-   * @return {Plotter} Returns itself.
-   */
-  function resize(w, h) {
-    width = w;
-    height = h;
+          /**
+           * Resizes this instance.
+           * @param  {number} w The new width.
+           * @param  {number} h The new height.
+           * @return {Plotter} Returns itself.
+           */
+          function resize(w, h) {
+            width = w;
+            height = h;
 
-    return self;
-  };
+            return self;
+          };
 
-  /**
-   * Helper function that tells us if a 'source'/'target' arrow setting
-   * applies, based on active edge/plotter settings.
-   * @param  {string}  arrowheadLocation  'source' or 'target'.
-   * @param  {string}  edgeArrowSetting   arrow setting ('none', 'source',
-   *                                      'target', 'both') on the edge itself,
-   *                                      if any.
-   * @return {boolean} Returns true if draw is required for the passed-in
-   *                   arrowheadLocation.
-   */
-  function isArrowDrawRequired(arrowheadLocation, edgeArrowSetting) {
-    return (
-      edgeArrowSetting == arrowheadLocation ||
-      edgeArrowSetting == 'both' ||
-      (
-        !edgeArrowSetting &&
-        (
-          self.p.defaultEdgeArrow == arrowheadLocation ||
-          self.p.defaultEdgeArrow == 'both'
-        )
-      )
-    );
-  };
+          /**
+           * Helper function that tells us if a 'source'/'target' arrow setting
+           * applies, based on active edge/plotter settings.
+           * @param  {string}  arrowheadLocation  'source' or 'target'.
+           * @param  {string}  edgeArrowSetting   arrow setting ('none', 'source',
+           *                                      'target', 'both') on the edge itself,
+           *                                      if any.
+           * @return {boolean} Returns true if draw is required for the passed-in
+           *                   arrowheadLocation.
+           */
+          function isArrowDrawRequired(arrowheadLocation, edgeArrowSetting) {
+            return (
+                edgeArrowSetting == arrowheadLocation ||
+                edgeArrowSetting == 'both' ||
+                (
+                 !edgeArrowSetting &&
+                 (
+                  self.p.defaultEdgeArrow == arrowheadLocation ||
+                  self.p.defaultEdgeArrow == 'both'
+                 )
+                )
+                );
+          };
 
-  /**
-   * Helper function that draws an arrowhead at a node's border based on the
-   * node's center coordinates and size, as well as a set of "control"
-   * coordinates. Future implementations could add a nodeShape parm to this
-   * function.
-   * For efficiency, nodeCoordinates parm is mutated according to calculated
-   * arrowhead tip coordinates.
-   * @param {CanvasRenderingContext2D} ctx  The context within which to draw
-   *                                        arrows.
-   * @param {Array} nodeCoordinates         [x,y] coordinate of center of node.
-   *    THIS FUNCTION ADJUSTS THE COORDINATES IN THIS ARRAY TO MATCH THE
-   *    INTERSECTION BETWEEN THE NODE BORDER AND THE LINE FROM THE CENTER OF
-   *    THE NODE TO THE CONTROL COORDINATES.
-   *    Parm mutation here favors performance but may be considered bad form
-   *    in the general case.
-   * @param {number} nodeSize               The size of the node. For circle
-   *                                        nodes (the only supported node
-   *                                        shape as of 2013-05-14), size is
-   *                                        radius.
-   * @param {number} ctrlX                  x-coordinate of the control point.
-   * @param {number} ctrlY                  y-coordinate of the control point.
-   * @param {number} size                   length of arrowhead.
-   * @return {Array} Returns the mutated (arrowhead) coordinates.
-   */
-  function applyArrow(ctx, nodeCoordinates, nodeSize, ctrlX, ctrlY, size) {
-    // Calculate and re-assign edge connection coordinates (at node border
-    // instead of node center):
-    var xDiff = nodeCoordinates[0] - ctrlX;
-    var yDiff = nodeCoordinates[1] - ctrlY;
-    var ratio = nodeSize / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+          /**
+           * Helper function that draws an arrowhead at a node's border based on the
+           * node's center coordinates and size, as well as a set of "control"
+           * coordinates. Future implementations could add a nodeShape parm to this
+           * function.
+           * For efficiency, nodeCoordinates parm is mutated according to calculated
+           * arrowhead tip coordinates.
+           * @param {CanvasRenderingContext2D} ctx  The context within which to draw
+           *                                        arrows.
+           * @param {Array} nodeCoordinates         [x,y] coordinate of center of node.
+           *    THIS FUNCTION ADJUSTS THE COORDINATES IN THIS ARRAY TO MATCH THE
+           *    INTERSECTION BETWEEN THE NODE BORDER AND THE LINE FROM THE CENTER OF
+           *    THE NODE TO THE CONTROL COORDINATES.
+           *    Parm mutation here favors performance but may be considered bad form
+           *    in the general case.
+           * @param {number} nodeSize               The size of the node. For circle
+           *                                        nodes (the only supported node
+           *                                        shape as of 2013-05-14), size is
+           *                                        radius.
+           * @param {number} ctrlX                  x-coordinate of the control point.
+           * @param {number} ctrlY                  y-coordinate of the control point.
+           * @param {number} size                   length of arrowhead.
+           * @return {Array} Returns the mutated (arrowhead) coordinates.
+           */
+          function applyArrow(ctx, nodeCoordinates, nodeSize, ctrlX, ctrlY, size) {
+            // Calculate and re-assign edge connection coordinates (at node border
+            // instead of node center):
+            var xDiff = nodeCoordinates[0] - ctrlX;
+            var yDiff = nodeCoordinates[1] - ctrlY;
+            var ratio = nodeSize / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 
-    nodeCoordinates[0] = nodeCoordinates[0] - xDiff * ratio;
-    nodeCoordinates[1] = nodeCoordinates[1] - yDiff * ratio;
+            nodeCoordinates[0] = nodeCoordinates[0] - xDiff * ratio;
+            nodeCoordinates[1] = nodeCoordinates[1] - yDiff * ratio;
 
-    // Draw arrowhead:
-    ctx.lineWidth = 0;
-    ctx.fillStyle = ctx.strokeStyle;
-    sigma.tools.drawArrowhead(
-      ctx,
-      nodeCoordinates[0],
-      nodeCoordinates[1],
-      size,
-      sigma.tools.getIncidenceAngle(
-        ctrlX,
-        ctrlY,
-        nodeCoordinates[0],
-        nodeCoordinates[1]
-      )
-    );
+            // Draw arrowhead:
+            ctx.lineWidth = 0;
+            ctx.fillStyle = ctx.strokeStyle;
+            sigma.tools.drawArrowhead(
+                ctx,
+                nodeCoordinates[0],
+                nodeCoordinates[1],
+                size,
+                sigma.tools.getIncidenceAngle(
+                  ctrlX,
+                  ctrlY,
+                  nodeCoordinates[0],
+                  nodeCoordinates[1]
+                  )
+                );
 
-    return nodeCoordinates;
-  };
-  
-  /* overridable node shape drawing functions */
-  Plotter.prototype.drawNodeShape = drawPaintedCircle;
-  Plotter.prototype.drawHoverNodeBorder = drawPaintedCircle;
-  Plotter.prototype.drawHoverNodeShape = drawPaintedCircle;
-  Plotter.prototype.drawActiveNodeBorder = drawPaintedCircle;
-  Plotter.prototype.drawActiveNodeShape = drawPaintedCircle;
+            return nodeCoordinates;
+          };
 
-  /* public methods */
-  this.task_drawLabel = task_drawLabel;
-  this.task_drawEdge = task_drawEdge;
-  this.task_drawNode = task_drawNode;
-  this.drawActiveNode = drawActiveNode;
-  this.drawHoverNode = drawHoverNode;
-  this.isOnScreen = isOnScreen;
-  this.resize = resize;
+          /* overridable node shape drawing functions */
+          Plotter.prototype.drawNodeShape = drawFilledCircle;
+          Plotter.prototype.drawHoverNodeBorder = drawFilledCircle;
+          Plotter.prototype.drawHoverNodeShape = drawFilledCircle;
+          Plotter.prototype.drawActiveNodeBorder = drawFilledCircle;
+          Plotter.prototype.drawActiveNodeShape = drawFilledCircle;
+
+          /* public methods */
+          this.task_drawLabel = task_drawLabel;
+          this.task_drawEdge = task_drawEdge;
+          this.task_drawNode = task_drawNode;
+          this.drawActiveNode = drawActiveNode;
+          this.drawHoverNode = drawHoverNode;
+          this.isOnScreen = isOnScreen;
+          this.resize = resize;
 }
