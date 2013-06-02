@@ -1,10 +1,11 @@
 // ron.peleg@gmail.com (https://github.com/rpeleg1970)
 // (requires sigma.js to be loaded)
 sigma.nodeShapes = sigma.nodeShapes || {};
-sigma.nodeShapes.NodeShapes = function(graph) {
+sigma.nodeShapes.NodeShapes = function(graph,plotter) {
   sigma.classes.Cascade.call(this);
   var self = this;
   this.graph = graph;
+  this.plotter = plotter;
 
   this.p = {
     /* TODO add configuration here */
@@ -14,27 +15,27 @@ sigma.nodeShapes.NodeShapes = function(graph) {
 
   this.init = function() {
     // mainain original node-drawing functions
-    self.originalFunctions['drawNodeShape']   = Plotter.prototype.drawNodeShape;
-    self.originalFunctions['drawHoverNodeBorder']  = Plotter.prototype.drawHoverNodeBorder;
-    self.originalFunctions['drawHoverNodeShape']  = Plotter.prototype.drawHoverNodeShape;
-    self.originalFunctions['drawActiveNodeBorder']  = Plotter.prototype.drawActiveNodeBorder;
-    self.originalFunctions['drawActiveNodeShape']  = Plotter.prototype.drawActiveNodeShape;
+    self.originalFunctions['drawNodeShape']   = plotter.drawNodeShape;
+    self.originalFunctions['drawHoverNodeBorder']  = plotter.drawHoverNodeBorder;
+    self.originalFunctions['drawHoverNodeShape']  = plotter.drawHoverNodeShape;
+    self.originalFunctions['drawActiveNodeBorder']  = plotter.drawActiveNodeBorder;
+    self.originalFunctions['drawActiveNodeShape']  = plotter.drawActiveNodeShape;
 
     // override node-drawing
-    Plotter.prototype.drawNodeShape   = drawShapedNode;
-    // Plotter.prototype.drawHoverNodeBorder  = drawShapedNodeBorder;
-    Plotter.prototype.drawHoverNodeShape  = drawShapedNode;
-    // Plotter.prototype.drawActiveNodeBorder  = drawShapedNodeBorder;
-    Plotter.prototype.drawActiveNodeShape  = drawShapedNode;
+    plotter.drawNodeShape   = drawShapedNode;
+    // plotter.drawHoverNodeBorder  = drawShapedNodeBorder;
+    plotter.drawHoverNodeShape  = drawShapedNode;
+    // plotter.drawActiveNodeBorder  = drawShapedNodeBorder;
+    plotter.drawActiveNodeShape  = drawShapedNode;
   };
 
   this.finalize = function() {
     // restore original node-drawing functions
-    Plotter.prototype.drawNodeShape   = self.originalFunctions['drawNodeShape'];
-    Plotter.prototype.drawHoverNodeBorder  = self.originalFunctions['drawHoverNodeBorder'];
-    Plotter.prototype.drawHoverNodeShape  = self.originalFunctions['drawHoverNodeShape'];
-    Plotter.prototype.drawActiveNodeBorder  = self.originalFunctions['drawActiveNodeBorder'];
-    Plotter.prototype.drawActiveNodeShape  = self.originalFunctions['drawActiveNodeShape'];
+    plotter.drawNodeShape   = self.originalFunctions['drawNodeShape'];
+    plotter.drawHoverNodeBorder  = self.originalFunctions['drawHoverNodeBorder'];
+    plotter.drawHoverNodeShape  = self.originalFunctions['drawHoverNodeShape'];
+    plotter.drawActiveNodeBorder  = self.originalFunctions['drawActiveNodeBorder'];
+    plotter.drawActiveNodeShape  = self.originalFunctions['drawActiveNodeShape'];
   };
 
   /**
@@ -75,17 +76,29 @@ sigma.nodeShapes.NodeShapes = function(graph) {
       var iw = node.attr.image.w;
 
       // create new IMG or get from imgCache
+      var image = imgCache[url];
+      if(!image) {
+        image = document.createElement('IMG');
+        image.src = url;
+        imgCache[url] = image;
+      }
 
-      // calculate position by proportions
-
-      // draw
+      // calculate position and draw
+      var xratio = (iw<ih) ? (iw/ih) : 1;
+      var yratio = (ih<iw) ? (ih/iw) : 1;
+      var r = size;
+      ctx.drawImage(image,
+                  x+Math.sin(-3.142/4)*r*xratio,
+                  y-Math.cos(-3.142/4)*r*yratio,
+                  r*xratio*2*Math.sin(-3.142/4)*(-1),
+                  r*yratio*2*Math.cos(-3.142/4));
     }
   }
 
 };
 
 sigma.publicPrototype.startNodeShapes = function() {
-  this.nodeShapes = new sigma.nodeShapes.NodeShapes(this._core.graph);
+  this.nodeShapes = new sigma.nodeShapes.NodeShapes(this._core.graph, this._core.plotter);
   this.nodeShapes.init();
 };
 

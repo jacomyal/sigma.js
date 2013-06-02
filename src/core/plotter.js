@@ -811,11 +811,11 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
           };
 
           /* overridable node shape drawing functions */
-          Plotter.prototype.drawNodeShape = drawFilledCircle;
-          Plotter.prototype.drawHoverNodeBorder = drawFilledCircle;
-          Plotter.prototype.drawHoverNodeShape = drawFilledCircle;
-          Plotter.prototype.drawActiveNodeBorder = drawFilledCircle;
-          Plotter.prototype.drawActiveNodeShape = drawFilledCircle;
+          this.drawNodeShape = drawFilledCircle;
+          this.drawHoverNodeBorder = drawFilledCircle;
+          this.drawHoverNodeShape = drawFilledCircle;
+          this.drawActiveNodeBorder = drawFilledCircle;
+          this.drawActiveNodeShape = drawFilledCircle;
 
           /* public methods */
           this.task_drawLabel = task_drawLabel;
