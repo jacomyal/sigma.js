@@ -23,6 +23,26 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
       'drawActiveNodeShape': plotter.drawActiveNodeShape
     });
 
+    var squareFunc = function(ctx,color,x,y,size,node) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      size
+      ctx.fillRect(
+          x+Math.sin(-3.142/4)*size,
+          y-Math.cos(-3.142/4)*size,
+          size*2*Math.sin(-3.142/4)*(-1),
+          size*2*Math.cos(-3.142/4));
+      ctx.closePath();
+      ctx.fill();
+    }
+    self.addShapeFunctions('square', {
+      'drawNodeShape': squareFunc,
+      'drawHoverNodeBorder': squareFunc,
+      'drawHoverNodeShape': squareFunc,
+      'drawActiveNodeBorder': squareFunc,
+      'drawActiveNodeShape': squareFunc
+    });
+
     // override node-drawing, with wrappers that switch on node.attr.shape,
     // and add images on top of the non-border drawing functions
     plotter.drawNodeShape   = drawNodeShapeWImage;
