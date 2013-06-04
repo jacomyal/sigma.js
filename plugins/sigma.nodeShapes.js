@@ -1,5 +1,69 @@
 // ron.peleg@gmail.com (https://github.com/rpeleg1970)
 // (requires sigma.js to be loaded)
+
+// some plug-in related additions to sigma.tools
+sigma.tools.drawSquare = function(ctx,color,x,y,size,node) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.fillRect(
+      x+Math.sin(-3.142/4)*size,
+      y-Math.cos(-3.142/4)*size,
+      size*2*Math.sin(-3.142/4)*(-1),
+      size*2*Math.cos(-3.142/4));
+  ctx.closePath();
+  ctx.fill();
+}
+
+sigma.tools.drawDiamond = function(ctx,color,x,y,size,node) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x-size, y);
+  ctx.lineTo(x, y-size);
+  ctx.lineTo(x+size, y);
+  ctx.lineTo(x, y+size);
+  ctx.moveTo(x-size, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+sigma.tools.drawTriangle = function(ctx,color,x,y,size,node) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  // equilateral, standing on base
+  ctx.moveTo(x, y-size);
+  ctx.lineTo(x+Math.sin(2*Math.PI/3)*size, y-Math.cos(2*Math.PI/3)*size);
+  ctx.lineTo(x+Math.sin(2*Math.PI*2/3)*size, y-Math.cos(2*Math.PI*2/3)*size);
+  ctx.moveTo(x, y+size);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/*
+ * this function expects the following hash on node.attr.shape:
+ * {
+ *   name: star
+ *   numPoints: number of points in star, default 5
+ *   innerRatio: ratio of inner radius to size (==outer radius)
+ * }
+ */
+sigma.tools.drawStar = function(ctx,color,x,y,size,node) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  var pcount = node.attr.shape.numPoints || 5;
+  var inRatio = node.attr.shape.innerRatio || 0.5;
+  var outR = size;
+  var inR = size*inRatio;
+  var angleOffset = Math.PI/pcount; // offset of inner angles
+  ctx.moveTo(x, y-size); // first point on outer radius, top
+  for(var i=0; i<pcount; i++) {
+    ctx.lineTo(x+Math.sin(angleOffset+2*Math.PI*i/pcount)*inR, y-Math.cos(angleOffset+2*Math.PI*i/pcount)*inR);
+    ctx.lineTo(x+Math.sin(2*Math.PI*(i+1)/pcount)*outR, y-Math.cos(2*Math.PI*(i+1)/pcount)*outR);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+// Main plug-in goes here
 sigma.nodeShapes = sigma.nodeShapes || {};
 sigma.nodeShapes.NodeShapes = function(graph,plotter) {
   sigma.classes.Cascade.call(this);
@@ -23,24 +87,36 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
       'drawActiveNodeShape': plotter.drawActiveNodeShape
     });
 
-    var squareFunc = function(ctx,color,x,y,size,node) {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      size
-      ctx.fillRect(
-          x+Math.sin(-3.142/4)*size,
-          y-Math.cos(-3.142/4)*size,
-          size*2*Math.sin(-3.142/4)*(-1),
-          size*2*Math.cos(-3.142/4));
-      ctx.closePath();
-      ctx.fill();
-    }
     self.addShapeFunctions('square', {
-      'drawNodeShape': squareFunc,
-      'drawHoverNodeBorder': squareFunc,
-      'drawHoverNodeShape': squareFunc,
-      'drawActiveNodeBorder': squareFunc,
-      'drawActiveNodeShape': squareFunc
+      'drawNodeShape': sigma.tools.drawSquare,
+      'drawHoverNodeBorder': sigma.tools.drawSquare,
+      'drawHoverNodeShape': sigma.tools.drawSquare,
+      'drawActiveNodeBorder': sigma.tools.drawSquare,
+      'drawActiveNodeShape': sigma.tools.drawSquare
+    });
+
+    self.addShapeFunctions('diamond', {
+      'drawNodeShape': sigma.tools.drawDiamond,
+      'drawHoverNodeBorder': sigma.tools.drawDiamond,
+      'drawHoverNodeShape': sigma.tools.drawDiamond,
+      'drawActiveNodeBorder': sigma.tools.drawDiamond,
+      'drawActiveNodeShape': sigma.tools.drawDiamond
+    });
+
+    self.addShapeFunctions('triangle', {
+      'drawNodeShape': sigma.tools.drawTriangle,
+      'drawHoverNodeBorder': sigma.tools.drawTriangle,
+      'drawHoverNodeShape': sigma.tools.drawTriangle,
+      'drawActiveNodeBorder': sigma.tools.drawTriangle,
+      'drawActiveNodeShape': sigma.tools.drawTriangle
+    });
+
+    self.addShapeFunctions('star', {
+      'drawNodeShape': sigma.tools.drawStar,
+      'drawHoverNodeBorder': sigma.tools.drawStar,
+      'drawHoverNodeShape': sigma.tools.drawStar,
+      'drawActiveNodeBorder': sigma.tools.drawStar,
+      'drawActiveNodeShape': sigma.tools.drawStar
     });
 
     // override node-drawing, with wrappers that switch on node.attr.shape,
@@ -93,12 +169,20 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
   /**
    * draws image on node
    * @see this.addShapeFunctions for explanation on function prototype
+   * this function expects the following hash on node.attr.image:
+   * {
+   *   url: url to image
+   *   h: image height, used with width to calculate ratio
+   *   w: image width
+   *   scale: 0<-->1, how to scale down image below the node radius/size
+   * }
    */
   function drawImageOnNode(ctx, color, x, y, size, node) {
-    if(node.attr.image) {
+    if(node.attr.image && node.attr.image.url) {
       var url = node.attr.image.url;
-      var ih = node.attr.image.h;
-      var iw = node.attr.image.w;
+      var ih = node.attr.image.h || 10; // 10 is arbitrary, anyway only the ratio counts
+      var iw = node.attr.image.w || 10;
+      var scale = node.attr.image.scale || 0.85;
 
       // create new IMG or get from imgCache
       var image = imgCache[url];
@@ -111,7 +195,7 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
       // calculate position and draw
       var xratio = (iw<ih) ? (iw/ih) : 1;
       var yratio = (ih<iw) ? (ih/iw) : 1;
-      var r = size;
+      var r = size*scale;
       ctx.drawImage(image,
                   x+Math.sin(-3.142/4)*r*xratio,
                   y-Math.cos(-3.142/4)*r*yratio,
@@ -125,7 +209,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
    * @see this.addShapeFunctions for explanation on function prototype
    */
   function drawNodeShapeWImage(ctx, color, x, y, size, node) {
-    var functions = shapeFunctions[node.attr.shape] || shapeFunctions['circle'];
+    var functions = shapeFunctions['circle'];
+    if(node.attr && node.attr.shape && node.attr.shape.name) {
+      functions = shapeFunctions[node.attr.shape.name];
+    }
     functions['drawNodeShape'](ctx, color, x, y, size, node);
     drawImageOnNode(ctx, color, x, y, size, node);
   }
@@ -135,7 +222,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
    * @see this.addShapeFunctions for explanation on function prototype
    */
   function drawHoverNodeShapeWImage(ctx, color, x, y, size, node) {
-    var functions = shapeFunctions[node.attr.shape] || shapeFunctions['circle'];
+    var functions = shapeFunctions['circle'];
+    if(node.attr && node.attr.shape && node.attr.shape.name) {
+      functions = shapeFunctions[node.attr.shape.name];
+    }
     functions['drawHoverNodeShape'](ctx, color, x, y, size, node);
     drawImageOnNode(ctx, color, x, y, size, node);
   }
@@ -145,7 +235,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
    * @see this.addShapeFunctions for explanation on function prototype
    */
   function drawHoverNodeShapeBorder(ctx, color, x, y, size, node) {
-    var functions = shapeFunctions[node.attr.shape] || shapeFunctions['circle'];
+    var functions = shapeFunctions['circle'];
+    if(node.attr && node.attr.shape && node.attr.shape.name) {
+      functions = shapeFunctions[node.attr.shape.name];
+    }
     functions['drawHoverNodeBorder'](ctx, color, x, y, size, node);
   }
 
@@ -154,7 +247,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
    * @see this.addShapeFunctions for explanation on function prototype
    */
   function drawActiveNodeShapeWImage(ctx, color, x, y, size, node) {
-    var functions = shapeFunctions[node.attr.shape] || shapeFunctions['circle'];
+    var functions = shapeFunctions['circle'];
+    if(node.attr && node.attr.shape && node.attr.shape.name) {
+      functions = shapeFunctions[node.attr.shape.name];
+    }
     functions['drawActiveNodeShape'](ctx, color, x, y, size, node);
     drawImageOnNode(ctx, color, x, y, size, node);
   }
@@ -164,7 +260,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
    * @see this.addShapeFunctions for explanation on function prototype
    */
   function drawActiveNodeShapeBorder(ctx, color, x, y, size, node) {
-    var functions = shapeFunctions[node.attr.shape] || shapeFunctions['circle'];
+    var functions = shapeFunctions['circle'];
+    if(node.attr && node.attr.shape && node.attr.shape.name) {
+      functions = shapeFunctions[node.attr.shape.name];
+    }
     functions['drawActiveNodeBorder'](ctx, color, x, y, size, node);
   }
 };
