@@ -65,10 +65,10 @@ sigma.tools.drawStar = function(ctx,color,x,y,size,node) {
 
 // Main plug-in goes here
 sigma.nodeShapes = sigma.nodeShapes || {};
-sigma.nodeShapes.NodeShapes = function(graph,plotter) {
+sigma.nodeShapes.NodeShapes = function(siginst,plotter) {
   sigma.classes.Cascade.call(this);
   var self = this;
-  this.graph = graph;
+  this.sigInst= siginst;
   this.plotter = plotter;
 
   this.p = {
@@ -189,6 +189,10 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
       if(!image) {
         image = document.createElement('IMG');
         image.src = url;
+        image.onload = function(){
+          console.log("redraw on image load");
+          self.sigInst.draw();
+        };
         imgCache[url] = image;
       }
 
@@ -269,8 +273,12 @@ sigma.nodeShapes.NodeShapes = function(graph,plotter) {
 };
 
 sigma.publicPrototype.startNodeShapes = function() {
-  this.nodeShapes = new sigma.nodeShapes.NodeShapes(this._core.graph, this._core.plotter);
+  this.nodeShapes = new sigma.nodeShapes.NodeShapes(this, this._core.plotter);
   this.nodeShapes.init();
+};
+
+sigma.publicPrototype.addShapeFunctions = function(name,funcs) {
+  this.nodeShapes.addShapeFunctions(name,funcs);
 };
 
 sigma.publicPrototype.stopNodeShapes = function() {
