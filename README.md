@@ -31,12 +31,12 @@ Also, a lot of different parameters are available to customize the way your inst
 
 will set the maximum zooming ratio to 32/1, and display each edge as a curve if its type is not indicated.
 
-Some full examples are available at [sigmajs.org/examples.html](http://sigmajs.org/examples.html). You can also check '**src/core/sigmapublic.js**' for an exhaustive list of the different available public methods.
+Some full examples are available at [sigmajs.org/examples.html](http://sigmajs.org/examples.html). You can also check [src/core/sigmapublic.js](https://github.com/jacomyal/sigma.js/blob/master/src/core/sigmapublic.js) for an exhaustive list of the different available public methods.
 
 ###Features
 * Chainable methods
 * Custom events management
-* Possibility to add plugins, including :
+* Possibility to add plugins. Bundled plugins include :
     * [GEXF](http://gexf.net/format/) parser
     * [ForceAtlas2](https://gephi.org/2011/forceatlas2-the-new-version-of-our-home-brew-layout/) layout algorithm
 * Simple and accessible public API
@@ -53,7 +53,7 @@ To build *sigma.js* :
 ###Thanks
 *sigma.js* is mostly inspired by [Gephi](http://gephi.org) and the maps of [Antonin Rohmer](http://antonin.rohmer.free.fr/) from [Linkfluence](http://labs.linkfluence.net) (one nice example [here](http://www.guardian.co.uk/news/datablog/interactive/2011/sep/07/norway-breivik-manifesto-mapped)) - thanks to him also for his wise advices.
 
-Much thanks also to [Mathieu Jacomy](http://www.medialab.sciences-po.fr/fr/team/mathieu-jacomy/) for having developped the main plugins, and for his help on the API and his experienced advices.
+Much thanks also to [Mathieu Jacomy](http://www.medialab.sciences-po.fr/fr/team/mathieu-jacomy/) for having developed the main plugins, and for his help on the API and his experienced advice.
 
 ###Want to contribute?
 The `TODO.txt` file at the root of the project contains different ideas of features that would improve *sigma.js*. You can also fill an [issue ticket](http://github.com/jacomyal/sigma.js/issues) if you find a bug.
