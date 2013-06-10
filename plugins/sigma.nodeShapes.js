@@ -41,6 +41,29 @@ sigma.tools.drawTriangle = function(ctx,color,x,y,size,node) {
 /*
  * this function expects the following hash on node.attr.shape:
  * {
+ *   name: iso-poly
+ *   numPoints: number of points in isosceles polygon, default 5
+ *   rotate: degrees to rotate clockwise (0 is default, one corner at 12
+ *   o'clock)
+ * }
+ */
+sigma.tools.drawIsoPoly = function(ctx,color,x,y,size,node) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  var pcount = node.attr.shape.numPoints || 5;
+  var rotate = (node.attr.shape.rotate || 0)*Math.PI/180;
+  var radius = size;
+  ctx.moveTo(x+radius*Math.sin(rotate), y-radius*Math.cos(rotate)); // first point on outer radius, angle 'rotate'
+  for(var i=1; i<pcount; i++) {
+    ctx.lineTo(x+Math.sin(rotate+2*Math.PI*i/pcount)*radius, y-Math.cos(rotate+2*Math.PI*i/pcount)*radius);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+/*
+ * this function expects the following hash on node.attr.shape:
+ * {
  *   name: star
  *   numPoints: number of points in star, default 5
  *   innerRatio: ratio of inner radius to size (==outer radius)
@@ -117,6 +140,14 @@ sigma.nodeShapes.NodeShapes = function(siginst,plotter) {
       'drawHoverNodeShape': sigma.tools.drawStar,
       'drawActiveNodeBorder': sigma.tools.drawStar,
       'drawActiveNodeShape': sigma.tools.drawStar
+    });
+
+    self.addShapeFunctions('iso-poly', {
+      'drawNodeShape': sigma.tools.drawIsoPoly,
+      'drawHoverNodeBorder': sigma.tools.drawIsoPoly,
+      'drawHoverNodeShape': sigma.tools.drawIsoPoly,
+      'drawActiveNodeBorder': sigma.tools.drawIsoPoly,
+      'drawActiveNodeShape': sigma.tools.drawIsoPoly
     });
 
     // override node-drawing, with wrappers that switch on node.attr.shape,
