@@ -41,13 +41,13 @@ sigma.tools.drawTriangle = function(ctx,color,x,y,size,node) {
 /*
  * this function expects the following hash on node.attr.shape:
  * {
- *   name: iso-poly
- *   numPoints: number of points in isosceles polygon, default 5
+ *   name: equilat-poly
+ *   numPoints: number of points in equilateral polygon, default 5
  *   rotate: degrees to rotate clockwise (0 is default, one corner at 12
  *   o'clock)
  * }
  */
-sigma.tools.drawIsoPoly = function(ctx,color,x,y,size,node) {
+sigma.tools.drawEquilatPoly = function(ctx,color,x,y,size,node) {
   ctx.fillStyle = color;
   ctx.beginPath();
   var pcount = node.attr.shape.numPoints || 5;
@@ -142,12 +142,12 @@ sigma.nodeShapes.NodeShapes = function(siginst,plotter) {
       'drawActiveNodeShape': sigma.tools.drawStar
     });
 
-    self.addShapeFunctions('iso-poly', {
-      'drawNodeShape': sigma.tools.drawIsoPoly,
-      'drawHoverNodeBorder': sigma.tools.drawIsoPoly,
-      'drawHoverNodeShape': sigma.tools.drawIsoPoly,
-      'drawActiveNodeBorder': sigma.tools.drawIsoPoly,
-      'drawActiveNodeShape': sigma.tools.drawIsoPoly
+    self.addShapeFunctions('equilat-poly', {
+      'drawNodeShape': sigma.tools.drawEquilatPoly,
+      'drawHoverNodeBorder': sigma.tools.drawEquilatPoly,
+      'drawHoverNodeShape': sigma.tools.drawEquilatPoly,
+      'drawActiveNodeBorder': sigma.tools.drawEquilatPoly,
+      'drawActiveNodeShape': sigma.tools.drawEquilatPoly
     });
 
     // override node-drawing, with wrappers that switch on node.attr.shape,
