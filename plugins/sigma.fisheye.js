@@ -51,6 +51,14 @@ sigma.classes.FishEye = function(sig) {
     }
   };
 
+  this.redraw = true;
+
+  sig.mousecaptor.bind("startinterpolate", function() {
+    self.redraw = false;
+  }).bind("stopinterpolate", function() {
+    self.redraw = true;
+  })
+
   this.refresh = function(){};
 };
 
@@ -61,7 +69,7 @@ sigma.publicPrototype.activateFishEye = function() {
     sigmaInstance.fisheye = fe;
 
     fe.refresh = function refresh() {
-      sigmaInstance.draw(2,2,2);
+      if(this.redraw) sigmaInstance.draw(2,2,2);
     };
   }
 
