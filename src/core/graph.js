@@ -32,7 +32,7 @@ function Graph() {
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
     edgesPowRatio: 0,
-    sideMargin: 5,
+    sideMargin: 0,
     // Increasing / decreasing the following parameter will respectively make
     // arrows bigger / smaller relatively to their edges.
     arrowRatio: 3
