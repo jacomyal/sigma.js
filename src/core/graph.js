@@ -32,6 +32,7 @@ function Graph() {
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
     edgesPowRatio: 0,
+    sideMargin: 5,
     // Increasing / decreasing the following parameter will respectively make
     // arrows bigger / smaller relatively to their edges.
     arrowRatio: 3
@@ -466,7 +467,7 @@ function Graph() {
     // This has to be done as a correction since to compare the size of the
     // biggest node to the X and Y values, we have to first get an
     // approximation of the scaling ratio.
-    var margin = (self.p.maxNodeSize || sizeMax) / scale;
+    var margin = (self.p.maxNodeSize || sizeMax) / scale + self.p.sideMargin;
     xMax += margin;
     xMin -= margin;
     yMax += margin;
