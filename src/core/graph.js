@@ -53,7 +53,7 @@ function Graph() {
    * @return {Graph} Returns itself.
    */
   function addNode(id, params) {
-    if (self.nodesIndex[id]) {
+    if (self.nodesIndex[id] && typeof self.nodesIndex[id] !== 'function') {
       throw new Error('Node "' + id + '" already exists.');
     }
 
