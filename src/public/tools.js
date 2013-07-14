@@ -48,6 +48,40 @@ sigma.tools.drawRoundRect = function(ctx, x, y, w, h, ellipse, corners) {
   ctx.lineTo(x, y + e);
 };
 
+/**
+ * Draws a filled arrowhead shape to the corresponding canvas.
+ * @param  {CanvasRenderingContext2D} ctx  The context within which to draw the
+ *                                         arrowhead.
+ * @param  {number} x0                     The x-coordinate of the tip of the
+ *                                         arrowhead.
+ * @param  {number} y0                     The y-coordinate of the tip of the
+ *                                         arrowhead.
+ * @param  {number} size                   The length of the arrowhead.
+ * @param  {number} rotationAngle          The angle of rotation of the
+ *                                         arrowhead, in degrees.
+ * @return {undefined}
+ */
+sigma.tools.drawArrowhead = function(ctx, x0, y0, size, rotationAngle) {
+  // Angle between one side of arrowhead and shaft:
+  var ARROW_SHARPNESS = 22;
+
+  ctx.beginPath();
+
+  ctx.moveTo(x0, y0);
+
+  // (Math.PI / 180) === 0.017453292519943295
+  var coef = 0.017453292519943295;
+  var x1 = x0 + Math.cos(coef * (ARROW_SHARPNESS + rotationAngle)) * size;
+  var y1 = y0 + Math.sin(coef * (ARROW_SHARPNESS + rotationAngle)) * size;
+  var x2 = x0 + Math.cos(coef * (rotationAngle - ARROW_SHARPNESS)) * size;
+  var y2 = y0 + Math.sin(coef * (rotationAngle - ARROW_SHARPNESS)) * size;
+
+  ctx.lineTo(x1, y1);
+  ctx.quadraticCurveTo((x0 + x1 + x2) / 3, (y0 + y1 + y2) / 3, x2, y2);
+  ctx.lineTo(x0, y0);
+  ctx.fill();
+};
+
 sigma.tools.getRGB = function(s, asArray) {
   s = s.toString();
   var res = {
@@ -101,3 +135,24 @@ sigma.tools.toHex = function(n) {
          '0123456789ABCDEF'.charAt(n % 16);
 };
 
+/**
+ * Provides the angle of incidence of the end point of a line or quadratic
+ * curve, in degrees.
+ * @param  {number} x1  The x-coordinate of the start point of the line or
+ *                      control point of the quadratic curve.
+ * @param  {number} y1  The y-coordinate of the start point of the line or
+ *                      control point of the quadratic curve.
+ * @param  {number} x2  The x-coordinate of the line or quadratic curve end
+ *                      point.
+ * @param  {number} y2  The y-coordinate of the line or quadratic curve end
+ *                      point.
+ * @return {number}     Returns the angle of incidence of the end point of the
+ *                      line or quadratic curve cooresponding to the coordinate
+ *                      parms, in degrees.
+ */
+sigma.tools.getIncidenceAngle = function(x1, y1, x2, y2) {
+    return (
+      (x1 <= x2 ? 180 : 0) +
+      Math.atan(((y2 - y1) / (x2 - x1))) * 180 / Math.PI
+    );
+};

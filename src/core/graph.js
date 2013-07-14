@@ -31,7 +31,11 @@ function Graph() {
     //   - 'outside'
     scalingMode: 'inside',
     nodesPowRatio: 0.5,
-    edgesPowRatio: 0
+    edgesPowRatio: 0,
+    sideMargin: 0,
+    // Increasing / decreasing the following parameter will respectively make
+    // arrows bigger / smaller relatively to their edges.
+    arrowRatio: 3
   };
 
   /**
@@ -285,8 +289,7 @@ function Graph() {
           e[k] = +params[k];
           break;
         case 'color':
-          e[k] = params[k].toString();
-          break;
+        case 'arrow':
         case 'type':
           e[k] = params[k].toString();
           break;
@@ -316,6 +319,7 @@ function Graph() {
       'target': edge['target']['id'],
       'size': edge['size'],
       'type': edge['type'],
+      'arrow': edge['arrow'],
       'weight': edge['weight'],
       'displaySize': edge['displaySize'],
       'label': edge['label'],
@@ -354,6 +358,7 @@ function Graph() {
           break;
         case 'color':
         case 'label':
+        case 'arrow':
         case 'type':
           edge[k] = (copy[k] || '').toString();
           break;
@@ -462,7 +467,7 @@ function Graph() {
     // This has to be done as a correction since to compare the size of the
     // biggest node to the X and Y values, we have to first get an
     // approximation of the scaling ratio.
-    var margin = (self.p.maxNodeSize || sizeMax) / scale;
+    var margin = (self.p.maxNodeSize || sizeMax) / scale + self.p.sideMargin;
     xMax += margin;
     xMin -= margin;
     yMax += margin;
@@ -537,9 +542,15 @@ function Graph() {
       node['displaySize'] = node['displaySize'] * sizeRatio;
     });
 
-    sizeRatio = Math.pow(ratio, self.p.edgesPowRatio);
     parseEdges && self.edges.forEach(function(edge) {
-      edge['displaySize'] = edge['displaySize'] * sizeRatio;
+      edge['displaySize'] =
+        edge['displaySize'] *
+        Math.pow(ratio, self.p.edgesPowRatio);
+
+      edge['arrowDisplaySize'] =
+        edge['displaySize'] *
+        self.p.arrowRatio *
+        sizeRatio;
     });
 
     return self;

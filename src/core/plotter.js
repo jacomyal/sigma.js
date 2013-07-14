@@ -100,6 +100,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     edgeColor: 'source',
     defaultEdgeColor: '#aaa',
     defaultEdgeType: 'line',
+    defaultEdgeArrow: 'none',
     // ------
     // NODES:
     // ------
@@ -302,11 +303,17 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
    * @return {Plotter} Returns itself.
    */
   function drawEdge(edge) {
-    var x1 = edge['source']['displayX'];
-    var y1 = edge['source']['displayY'];
-    var x2 = edge['target']['displayX'];
-    var y2 = edge['target']['displayY'];
-    var color = edge['color'];
+    // Using array for coordinates so we can easily modify/return from
+    // applyArrow():
+    var sourceCoordinates = [
+          edge['source']['displayX'],
+          edge['source']['displayY']
+        ],
+        targetCoordinates = [
+          edge['target']['displayX'],
+          edge['target']['displayY']
+        ],
+        color = edge['color'];
 
     if (!color) {
       switch (self.p.edgeColor) {
@@ -329,22 +336,82 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     switch (edge['type'] || self.p.defaultEdgeType) {
       case 'curve':
         ctx.strokeStyle = color;
+
+        var controlPointX =
+              (sourceCoordinates[0] + targetCoordinates[0]) / 2 +
+              (targetCoordinates[1] - sourceCoordinates[1]) / 4,
+            controlPointY =
+              (sourceCoordinates[1] + targetCoordinates[1]) / 2 +
+              (sourceCoordinates[0] - targetCoordinates[0]) / 4;
+
+        // Assignment is redundant here but makes it clear that this call
+        // mutates sourceCoordinates:
+        if (isArrowDrawRequired('source', edge['arrow'])) {
+          sourceCoordinates = applyArrow(
+            ctx,
+            sourceCoordinates,
+            edge['source']['displaySize'],
+            controlPointX,
+            controlPointY,
+            edge['arrowDisplaySize']
+          );
+        }
+
+        // Assignment is redundant here but makes it clear that this call
+        // mutates targetCoordinates:
+        if (isArrowDrawRequired('target', edge['arrow'])) {
+          targetCoordinates = applyArrow(
+            ctx,
+            targetCoordinates,
+            edge['target']['displaySize'],
+            controlPointX,
+            controlPointY,
+            edge['arrowDisplaySize']
+          );
+        }
+
         ctx.lineWidth = edge['displaySize'] / 3;
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.quadraticCurveTo((x1 + x2) / 2 + (y2 - y1) / 4,
-                             (y1 + y2) / 2 + (x1 - x2) / 4,
-                             x2,
-                             y2);
+        ctx.moveTo(sourceCoordinates[0], sourceCoordinates[1]);
+        ctx.quadraticCurveTo(controlPointX,
+                             controlPointY,
+                             targetCoordinates[0],
+                             targetCoordinates[1]);
+
         ctx.stroke();
         break;
       case 'line':
       default:
         ctx.strokeStyle = color;
+
+        // Assignment is redundant here but makes it clear that this call
+        // mutates sourceCoordinates:
+        if (isArrowDrawRequired('source', edge['arrow'])) {
+          sourceCoordinates = applyArrow(ctx,
+            sourceCoordinates,
+            edge['source']['displaySize'],
+            targetCoordinates[0],
+            targetCoordinates[1],
+            edge['arrowDisplaySize']
+          );
+        }
+
+        // Assignment is redundant here but makes it clear that this call
+        // mutates targetCoordinates:
+        if (isArrowDrawRequired('target', edge['arrow'])) {
+          targetCoordinates = applyArrow(ctx,
+            targetCoordinates,
+            edge['target']['displaySize'],
+            sourceCoordinates[0],
+            sourceCoordinates[1],
+            edge['arrowDisplaySize']
+          );
+        }
+
         ctx.lineWidth = edge['displaySize'] / 3;
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
+        ctx.moveTo(sourceCoordinates[0], sourceCoordinates[1]);
+        ctx.lineTo(targetCoordinates[0], targetCoordinates[1]);
 
         ctx.stroke();
         break;
@@ -598,7 +665,84 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     height = h;
 
     return self;
-  }
+  };
+
+  /**
+   * Helper function that tells us if a 'source'/'target' arrow setting
+   * applies, based on active edge/plotter settings.
+   * @param  {string}  arrowheadLocation  'source' or 'target'.
+   * @param  {string}  edgeArrowSetting   arrow setting ('none', 'source',
+   *                                      'target', 'both') on the edge itself,
+   *                                      if any.
+   * @return {boolean} Returns true if draw is required for the passed-in
+   *                   arrowheadLocation.
+   */
+  function isArrowDrawRequired(arrowheadLocation, edgeArrowSetting) {
+    return (
+      edgeArrowSetting == arrowheadLocation ||
+      edgeArrowSetting == 'both' ||
+      (
+        !edgeArrowSetting &&
+        (
+          self.p.defaultEdgeArrow == arrowheadLocation ||
+          self.p.defaultEdgeArrow == 'both'
+        )
+      )
+    );
+  };
+
+  /**
+   * Helper function that draws an arrowhead at a node's border based on the
+   * node's center coordinates and size, as well as a set of "control"
+   * coordinates. Future implementations could add a nodeShape parm to this
+   * function.
+   * For efficiency, nodeCoordinates parm is mutated according to calculated
+   * arrowhead tip coordinates.
+   * @param {CanvasRenderingContext2D} ctx  The context within which to draw
+   *                                        arrows.
+   * @param {Array} nodeCoordinates         [x,y] coordinate of center of node.
+   *    THIS FUNCTION ADJUSTS THE COORDINATES IN THIS ARRAY TO MATCH THE
+   *    INTERSECTION BETWEEN THE NODE BORDER AND THE LINE FROM THE CENTER OF
+   *    THE NODE TO THE CONTROL COORDINATES.
+   *    Parm mutation here favors performance but may be considered bad form
+   *    in the general case.
+   * @param {number} nodeSize               The size of the node. For circle
+   *                                        nodes (the only supported node
+   *                                        shape as of 2013-05-14), size is
+   *                                        radius.
+   * @param {number} ctrlX                  x-coordinate of the control point.
+   * @param {number} ctrlY                  y-coordinate of the control point.
+   * @param {number} size                   length of arrowhead.
+   * @return {Array} Returns the mutated (arrowhead) coordinates.
+   */
+  function applyArrow(ctx, nodeCoordinates, nodeSize, ctrlX, ctrlY, size) {
+    // Calculate and re-assign edge connection coordinates (at node border
+    // instead of node center):
+    var xDiff = nodeCoordinates[0] - ctrlX;
+    var yDiff = nodeCoordinates[1] - ctrlY;
+    var ratio = nodeSize / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+    nodeCoordinates[0] = nodeCoordinates[0] - xDiff * ratio;
+    nodeCoordinates[1] = nodeCoordinates[1] - yDiff * ratio;
+
+    // Draw arrowhead:
+    ctx.lineWidth = 0;
+    ctx.fillStyle = ctx.strokeStyle;
+    sigma.tools.drawArrowhead(
+      ctx,
+      nodeCoordinates[0],
+      nodeCoordinates[1],
+      size,
+      sigma.tools.getIncidenceAngle(
+        ctrlX,
+        ctrlY,
+        nodeCoordinates[0],
+        nodeCoordinates[1]
+      )
+    );
+
+    return nodeCoordinates;
+  };
 
   this.task_drawLabel = task_drawLabel;
   this.task_drawEdge = task_drawEdge;
@@ -608,4 +752,3 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
   this.isOnScreen = isOnScreen;
   this.resize = resize;
 }
-

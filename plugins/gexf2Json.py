@@ -126,24 +126,22 @@ for edgesNode in edgesNodes:
 	for edgeNode in edgeNodes:
 		source = edgeNode.getAttribute("source")
 		target = edgeNode.getAttribute("target")
-		label = edgeNode.getAttribute("label")
-		id = edgeNode.getAttribute("id") if edgeNode.hasAttribute("id") else edgeId
 		edgeId=edgeId+1
+		size=edgeNode.getAttribute("weight") if nodeEl.hasAttribute("weight") else 1
 
 		edge = {
-		    "id":         id,
 		    "sourceID":   source,
 		    "targetID":   target,
-		    "label":      label,
+		    "size":	size,
 		    "attributes": {}
 		}
 
-		#Anything besies source,target,label that is inside the actual edge tag
+		#Anything besies source,target,weight that is inside the actual edge tag
 		attrs = edgeNode.attributes #NamedNodeMap in python
 		for i in range(0,attrs.length):
 			item=attrs.item(i)#xml.dom.minidom.Attr
 			n=item.name
-			if(n == 'source' or n =='target' or n=='label'):
+			if(n == 'source' or n =='target' or n=='weight' or n=='id'):
 				continue;
 			edge["attributes"][n]=item.value
 
@@ -155,7 +153,12 @@ for edgesNode in edgesNodes:
 		for attvalueNode in attvalueNodes:
 			attr = attvalueNode.getAttribute('for')
 			val = attvalueNode.getAttribute('value')
-			edge["attributes"][edgesAttributesDict[attr]]=val
+			if attr in edgesAttributesDict:
+				attr=edgesAttributesDict[attr]
+			if attr=="weight":
+				edge["size"]=val
+			else:
+				edge["attributes"][attr]=val
 
 		jsonEdges.append(edge)
 

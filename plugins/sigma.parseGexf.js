@@ -8,12 +8,14 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
     new XMLHttpRequest() :
     new ActiveXObject('Microsoft.XMLHTTP');
 
-  gexfhttp.overrideMimeType('text/xml');
+  if (gexfhttp.overrideMimeType) {
+    gexfhttp.overrideMimeType('text/xml');
+  }
+
   gexfhttp.open('GET', gexfPath, false);
   gexfhttp.send();
   gexf = gexfhttp.responseXML;
 
-  var viz='http://www.gexf.net/1.2draft/viz'; // Vis namespace
   var i, j, k;
 
   // Parse Attributes
@@ -21,74 +23,72 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   var nodesAttributes = [];   // The list of attributes of the nodes of the graph that we build in json
   var edgesAttributes = [];   // The list of attributes of the edges of the graph that we build in json
   var attributesNodes = gexf.getElementsByTagName('attributes');  // In the gexf (that is an xml), the list of xml nodes 'attributes' (note the plural 's')
-  
+
   for(i = 0; i<attributesNodes.length; i++){
     var attributesNode = attributesNodes[i];  // attributesNode is each xml node 'attributes' (plural)
     if(attributesNode.getAttribute('class') == 'node'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-        
+
         var attribute = {id:id, title:title, type:type};
         nodesAttributes.push(attribute);
-        
+
       }
     } else if(attributesNode.getAttribute('class') == 'edge'){
       var attributeNodes = attributesNode.getElementsByTagName('attribute');  // The list of xml nodes 'attribute' (no 's')
       for(j = 0; j<attributeNodes.length; j++){
         var attributeNode = attributeNodes[j];  // Each xml node 'attribute'
-        
+
         var id = attributeNode.getAttribute('id'),
           title = attributeNode.getAttribute('title'),
           type = attributeNode.getAttribute('type');
-          
+
         var attribute = {id:id, title:title, type:type};
         edgesAttributes.push(attribute);
-        
+
       }
     }
   }
-  
+
   var nodes = []; // The nodes of the graph
   var nodesNodes = gexf.getElementsByTagName('nodes') // The list of xml nodes 'nodes' (plural)
-  
+
   for(i=0; i<nodesNodes.length; i++){
     var nodesNode = nodesNodes[i];  // Each xml node 'nodes' (plural)
     var nodeNodes = nodesNode.getElementsByTagName('node'); // The list of xml nodes 'node' (no 's')
 
     for(j=0; j<nodeNodes.length; j++){
       var nodeNode = nodeNodes[j];  // Each xml node 'node' (no 's')
-      
+
       window.NODE = nodeNode;
 
       var id = nodeNode.getAttribute('id');
       var label = nodeNode.getAttribute('label') || id;
-      
+
       //viz
       var size = 1;
       var x = 100 - 200*Math.random();
       var y = 100 - 200*Math.random();
       var color;
 
-      var poorBrowserXmlNsSupport = (nodeNode.getElementsByTagNameNS == null)
-
       var sizeNodes = nodeNode.getElementsByTagName('size');
-      sizeNodes = sizeNodes.length || poorBrowserXmlNsSupport ?
+      sizeNodes = sizeNodes.length ?
                   sizeNodes :
-                  nodeNode.getElementsByTagNameNS('*','size');
+                  nodeNode.getElementsByTagName('viz:size');
       if(sizeNodes.length>0){
         sizeNode = sizeNodes[0];
         size = parseFloat(sizeNode.getAttribute('value'));
       }
 
       var positionNodes = nodeNode.getElementsByTagName('position');
-      positionNodes = positionNodes.length || poorBrowserXmlNsSupport ?
+      positionNodes = positionNodes.length ?
                       positionNodes :
-                      nodeNode.getElementsByTagNameNS('*','position');
+                      nodeNode.getElementsByTagName('viz:position');
       if(positionNodes.length>0){
         var positionNode = positionNodes[0];
         x = parseFloat(positionNode.getAttribute('x'));
@@ -96,19 +96,19 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
       }
 
       var colorNodes = nodeNode.getElementsByTagName('color');
-      colorNodes = colorNodes.length || poorBrowserXmlNsSupport ?
+      colorNodes = colorNodes.length ?
                    colorNodes :
-                   nodeNode.getElementsByTagNameNS('*','color');
+                   nodeNode.getElementsByTagName('viz:color');
       if(colorNodes.length>0){
         colorNode = colorNodes[0];
         color = '#'+sigma.tools.rgbToHex(parseFloat(colorNode.getAttribute('r')),
                                          parseFloat(colorNode.getAttribute('g')),
                                          parseFloat(colorNode.getAttribute('b')));
       }
-      
+
       // Create Node
       var node = {label:label, size:size, x:x, y:y, attributes:[], color:color};  // The graph node
-      
+
       // Attribute values
       var attvalueNodes = nodeNode.getElementsByTagName('attvalue');
       for(k=0; k<attvalueNodes.length; k++){
@@ -123,18 +123,18 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
   }
 
   var edges = [];
-  var edgeId = 0;
   var edgesNodes = gexf.getElementsByTagName('edges');
   for(i=0; i<edgesNodes.length; i++){
     var edgesNode = edgesNodes[i];
     var edgeNodes = edgesNode.getElementsByTagName('edge');
     for(j=0; j<edgeNodes.length; j++){
       var edgeNode = edgeNodes[j];
+      var id = edgeNode.getAttribute('id');
       var source = edgeNode.getAttribute('source');
       var target = edgeNode.getAttribute('target');
       var label = edgeNode.getAttribute('label');
       var edge = {
-        id:         j,
+        id:         id,
         sourceID:   source,
         targetID:   target,
         label:      label,
@@ -155,7 +155,7 @@ sigma.publicPrototype.parseGexf = function(gexfPath) {
         edge.attributes.push({attr:attr, val:val});
       }
 
-      sigmaInstance.addEdge(edgeId++,source,target,edge);
+      sigmaInstance.addEdge(id,source,target,edge);
     }
   }
 };
