@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import pprint
 import xml.dom.minidom
-from xml.dom.minidom import Node
 import sys
 from optparse import OptionParser
 import json
@@ -127,7 +125,7 @@ for edgesNode in edgesNodes:
 		source = edgeNode.getAttribute("source")
 		target = edgeNode.getAttribute("target")
 		edgeId=edgeId+1
-		size=edgeNode.getAttribute("weight") if nodeEl.hasAttribute("weight") else 1
+		size=float(edgeNode.getAttribute("weight")) if edgeNode.hasAttribute("weight") else 1
 
 		edge = {
 		    "sourceID":   source,
@@ -144,10 +142,6 @@ for edgesNode in edgesNodes:
 			if(n == 'source' or n =='target' or n=='weight' or n=='id'):
 				continue;
 			edge["attributes"][n]=item.value
-
-		#Redundant from block above
-		#if(edgeNode.hasAttribute("weight")):
-		#	edge["weight"] = edgeNode.getAttribute('weight')
 
 		attvalueNodes = edgeNode.getElementsByTagName('attvalue')
 		for attvalueNode in attvalueNodes:
