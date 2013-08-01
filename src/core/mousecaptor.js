@@ -230,6 +230,7 @@ function MouseCaptor(dom) {
         self.stageX + self.p.inertia * (self.stageX - lastStageX2),
         self.stageY + self.p.inertia * (self.stageY - lastStageY2)
       );
+      self.dispatch('stopdrag');
     }
   };
 

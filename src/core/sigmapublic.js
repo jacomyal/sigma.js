@@ -201,9 +201,6 @@ function SigmaPublic(sigmaInstance) {
     return s.monitor.desactivate();
   };
 
-  this.isOnScreen = function(node) {
-    return s.plotter.isOnScreen(node);
-  };
 
   // Events
   s.bind('downnodes upnodes downgraph upgraph', function(e) {
