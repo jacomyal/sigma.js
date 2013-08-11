@@ -118,7 +118,7 @@ function Sigma(root, id) {
     this.id
   );
 
-  // Interaction listeners:
+      // Interaction listeners:
   this.mousecaptor.bind('drag interpolate', function(e) {
     self.draw(
       self.p.auto ? 2 : self.p.drawNodes,

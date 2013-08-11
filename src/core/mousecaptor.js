@@ -40,7 +40,8 @@ function MouseCaptor(dom) {
     directZooming: false,
     blockScroll: true,
     inertia: 1.1,
-    mouseEnabled: true
+    mouseEnabled: true,
+    disableDrag: false
   };
 
   var oldMouseX = 0;
@@ -122,7 +123,7 @@ function MouseCaptor(dom) {
     self.mouseX = getX(event);
     self.mouseY = getY(event);
 
-    self.isMouseDown && drag(event);
+    self.isMouseDown && !self.p.disableDrag && drag(event);
     self.dispatch('move');
 
     if (event.preventDefault) {
