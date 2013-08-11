@@ -435,7 +435,7 @@ function Sigma(root, id) {
    * @return {Sigma} Returns itself.
    */
   function drawHover() {
-    if (self.p.drawHoverNodes || self.p.forceCheckHover) {
+    if (self.p.drawHoverNodes) {
       self.graph.checkHover(
         self.mousecaptor.mouseX,
         self.mousecaptor.mouseY
@@ -447,6 +447,13 @@ function Sigma(root, id) {
         }
       });
     }
+
+    if (self.p.forceCheckHover) {
+      self.graph.checkHover(
+        self.mousecaptor.mouseX,
+        self.mousecaptor.mouseY
+      );
+    };
 
     return self;
   }
