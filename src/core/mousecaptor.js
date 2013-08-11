@@ -41,7 +41,8 @@ function MouseCaptor(dom) {
     blockScroll: true,
     inertia: 1.1,
     mouseEnabled: true,
-    disableDrag: false
+    disableDrag: false,
+    disableZoom: false
   };
 
   var oldMouseX = 0;
@@ -185,6 +186,8 @@ function MouseCaptor(dom) {
    * @param  {event} event A 'wheel' mouse event.
    */
   function wheelHandler(event) {
+    if (self.p.disableZoom) 
+      return;
     if (self.p.mouseEnabled) {
       startInterpolate(
         self.mouseX,
