@@ -407,7 +407,7 @@ function MouseCaptor(dom) {
   dom.addEventListener('mousewheel', wheelHandler, true);
   dom.addEventListener('mousemove', moveHandler, true);
   dom.addEventListener('mousedown', downHandler, true);
-  document.addEventListener('mouseup', upHandler, true);
+  dom.addEventListener('mouseup', upHandler, true);
 
   this.checkBorders = checkBorders;
   this.interpolate = startInterpolate;
