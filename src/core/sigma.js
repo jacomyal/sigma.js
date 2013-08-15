@@ -411,6 +411,35 @@ function Sigma(root, id) {
     return self;
   };
 
+  function redraw(nodes, edges, labels, safe) {
+    self.domElements.hover.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.hover.width,
+      self.domElements.hover.height
+    );
+    self.domElements.nodes.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.nodes.width,
+      self.domElements.nodes.height
+    );
+    self.domElements.edges.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.edges.width,
+      self.domElements.edges.height
+    );
+    self.domElements.labels.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.labels.width,
+      self.domElements.labels.height
+    );
+    draw(nodes, edges, labels, safe);
+  }
+
+
   /**
    * Draws the hover and active nodes labels.
    * @return {Sigma} Returns itself.
@@ -481,6 +510,7 @@ function Sigma(root, id) {
   }
 
   this.draw = draw;
+  this.redraw = redraw;
   this.resize = resize;
   this.refresh = refresh;
   this.drawHover = drawHover;

@@ -102,6 +102,11 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
+  this.redraw = function(nodes, edges, labels, safe) {
+    s.redraw(nodes, edges, labels, safe);
+    return self;
+  }
+
   this.refresh = function() {
     s.refresh();
     return self;
