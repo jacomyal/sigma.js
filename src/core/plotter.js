@@ -300,7 +300,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.closePath();
     ctx.fill();
 
-    node['hover'] && drawHoverNode(node);
+    // node['hover'] && drawHoverNode(node);
     return self;
   };
 
