@@ -504,6 +504,7 @@ function Sigma(root, id) {
     return self;
   }
 
+
   // Apply plugins:
   for (var i = 0; i < local.plugins.length; i++) {
     local.plugins[i](this);
