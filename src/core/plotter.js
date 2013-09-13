@@ -565,6 +565,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
 
+    if (self.p.labelActiveShadow) {
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = self.p.labelActiveShadowColor;
+    }
+
     if (activeNodeType != 'circle') {
       ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
                  fontSize + 'px ' +
@@ -577,12 +584,6 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       // Label background:
       ctx.beginPath();
 
-      if (self.p.labelActiveShadow) {
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.shadowBlur = 4;
-        ctx.shadowColor = self.p.labelActiveShadowColor;
-      }
 
       sigma.tools.drawRoundRect(
         ctx,
@@ -602,10 +603,11 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     } 
 
 
-
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 0;
+    if (activeNodeType == 'label') {
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 0;
+    }
 
     // Node border:
     ctx.beginPath();
