@@ -154,7 +154,7 @@ function Sigma(root, id) {
         targeted
       );
     }
-  }).bind('dbclick', function(e) {
+  }).bind('dblclick', function(e) {
     var targeted = self.graph.nodes.filter(function(n) {
       return !!n['hover'];
     }).map(function(n) {
