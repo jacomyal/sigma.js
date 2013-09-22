@@ -212,6 +212,11 @@ function SigmaPublic(sigmaInstance) {
     self.dispatch(e.type, e.content);
   });
 
+
+  s.bind('dbclicknodes dblclickgraph', function(e){
+    self.dispatch(e.type, e.content);
+  });
+
   s.graph.bind('overnodes outnodes', function(e) {
     self.dispatch(e.type, e.content);
   });

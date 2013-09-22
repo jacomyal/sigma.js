@@ -154,6 +154,19 @@ function Sigma(root, id) {
         targeted
       );
     }
+  }).bind('dbclick', function(e) {
+    var targeted = self.graph.nodes.filter(function(n) {
+      return !!n['hover'];
+    }).map(function(n) {
+      return n.id;
+    });
+
+    self.dispatch('dbclickgraph');
+
+    if (targeted.length) {
+      self.dispatch('dbclicknodes', targeted);
+    }
+
   }).bind('move', function() {
     self.domElements.hover.getContext('2d').clearRect(
       0,
