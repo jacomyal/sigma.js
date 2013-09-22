@@ -161,10 +161,10 @@ function Sigma(root, id) {
       return n.id;
     });
 
-    self.dispatch('dbclickgraph');
+    self.dispatch('dblclickgraph');
 
     if (targeted.length) {
-      self.dispatch('dbclicknodes', targeted);
+      self.dispatch('dblclicknodes', targeted);
     }
 
   }).bind('move', function() {

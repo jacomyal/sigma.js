@@ -213,7 +213,7 @@ function SigmaPublic(sigmaInstance) {
   });
 
 
-  s.bind('dbclicknodes dblclickgraph', function(e){
+  s.bind('dblclicknodes dblclickgraph', function(e){
     self.dispatch(e.type, e.content);
   });
 
