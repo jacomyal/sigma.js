@@ -75,6 +75,10 @@ function MouseCaptor(dom) {
 
   this.isMouseDown = false;
 
+  this.alreadyClicked = false;
+
+  this.timeout = null;
+
   /**
    * Extract the local X position from a mouse event.
    * @private
@@ -143,8 +147,19 @@ function MouseCaptor(dom) {
   function upHandler(event) {
     if (self.p.mouseEnabled && self.isMouseDown) {
       self.isMouseDown = false;
-      self.dispatch('mouseup');
-      stopDrag();
+
+      if (self.alreadyClicked) {
+        self.alreadyClicked = false;
+        clearTimeout(self.timeout);
+        self.dispatch('dblclick');
+      } else {
+        self.alreadyClicked = true;
+        self.timeout = setTimeout(function(){
+          self.alreadyClicked = false;
+          self.dispatch('mouseup');
+          stopDrag();
+        }, 500);
+      }
 
       if (event.preventDefault) {
         event.preventDefault();

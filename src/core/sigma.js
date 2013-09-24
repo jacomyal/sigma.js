@@ -15,6 +15,13 @@ function Sigma(root, id) {
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
+  /*
+   * double click state 
+   */
+
+   var alreadyClicked = false;
+
+
   /**
    * Represents "this", without the well-known scope issue.
    * @private

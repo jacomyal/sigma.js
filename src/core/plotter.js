@@ -609,6 +609,14 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       ctx.shadowBlur = 0;
     }
 
+
+    var activeNodeSize;
+    if (activeNodeType != 'circle') {
+      activeNodeSize = node['displaySize'];
+    } else {
+      activeNodeSize = fontSize;
+    }
+
     // Node border:
     ctx.beginPath();
     ctx.fillStyle = self.p.nodeBorderColor == 'node' ?
@@ -616,7 +624,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                     self.p.defaultNodeBorderColor;
     ctx.arc(Math.round(node['displayX']),
             Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
+            activeNodeSize + self.p.borderSize,
             0,
             Math.PI * 2,
             true);
@@ -630,7 +638,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                     self.p.defaultNodeActiveColor;
     ctx.arc(Math.round(node['displayX']),
             Math.round(node['displayY']),
-            node['displaySize'],
+            activeNodeSize,
             0,
             Math.PI * 2,
             true);
