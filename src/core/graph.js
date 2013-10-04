@@ -445,12 +445,12 @@ function Graph() {
     weightMax = weightMax || 1;
 
     // Recenter the nodes:
-    var xMin, xMax, yMin, yMax;
+    var xMin = yMin = Infinity, xMax = yMax = Infinity;
     parseNodes && self.nodes.forEach(function(node) {
-      xMax = Math.max(node['x'], xMax || node['x']);
-      xMin = Math.min(node['x'], xMin || node['x']);
-      yMax = Math.max(node['y'], yMax || node['y']);
-      yMin = Math.min(node['y'], yMin || node['y']);
+      xMax = Math.max(node['x'], xMax);
+      xMin = Math.min(node['x'], xMin);
+      yMax = Math.max(node['y'], yMax);
+      yMin = Math.min(node['y'], yMin);
     });
 
     // First, we compute the scaling ratio, without considering the sizes
