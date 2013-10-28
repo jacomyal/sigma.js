@@ -101,6 +101,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     defaultEdgeColor: '#aaa',
     defaultEdgeType: 'line',
     defaultEdgeArrow: 'none',
+    edgeLabels: false,
     // ------
     // NODES:
     // ------
@@ -414,23 +415,23 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
         ctx.lineTo(targetCoordinates[0], targetCoordinates[1]);
 
         ctx.stroke();
-		
-		if(edge["label"]){
-		  var p1 = {};
-		  p1.x = sourceCoordinates[0];
-		  p1.y = sourceCoordinates[1];
-		  var p2 = {};
-		  p2.x = targetCoordinates[0];
-		  p2.y = targetCoordinates[1];
-		  drawLineEdgeLabel(ctx,edge["label"],p1,p2);
-		}
         break;
+    }
+    
+    if(self.p.edgeLabels && edge['label']){
+      var p1 = {};
+      p1.x = sourceCoordinates[0];
+      p1.y = sourceCoordinates[1];
+      var p2 = {};
+      p2.x = targetCoordinates[0];
+      p2.y = targetCoordinates[1];
+      drawEdgeLabel(ctx,edge['label'],p1,p2, color);
     }
 
     return self;
   };
   
-  function drawLineEdgeLabel(ctx, text, p1, p2) {
+  function drawEdgeLabel(ctx, text, p1, p2, color) {
     var alignment = 'center';
     var padding = 10;
 
@@ -457,8 +458,9 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.textAlign = alignment;
     ctx.translate(p.x + dx * pad, p.y + dy * pad);
     ctx.rotate(angle);
-	var fontSize = self.p.defaultLabelSize;
-	ctx.font = self.p.fontStyle + fontSize + 'px ' + self.p.font;
+  	var fontSize = self.p.defaultLabelSize;
+  	ctx.font = self.p.fontStyle + fontSize + 'px ' + self.p.font;
+    ctx.fillStyle = color;
     ctx.fillText(text, 0, -5);
     ctx.restore();
   };
