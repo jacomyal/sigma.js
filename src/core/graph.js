@@ -159,11 +159,11 @@ function Graph() {
         case 'displayX':
         case 'displayY':
         case 'displaySize':
-        case 'opacity':
           break;
         case 'x':
         case 'y':
         case 'size':
+        case 'opacity':
           node[k] = +copy[k];
           break;
         case 'fixed':

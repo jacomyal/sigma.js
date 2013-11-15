@@ -617,10 +617,10 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
 
 
     var activeNodeSize;
-    if (activeNodeType != 'circle') {
+    if (activeNodeType != 'circle' || self.p.labelSize == 'fixed') {
       activeNodeSize = node['displaySize'];
     } else {
-      activeNodeSize = fontSize;
+      activeNodeSize = Math.round(node['displaySize']) + fontSize / 2;
     }
 
     // Node border:
