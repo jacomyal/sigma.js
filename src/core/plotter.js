@@ -288,6 +288,12 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var size = Math.round(node['displaySize'] * 10) / 10;
     var ctx = nodesCtx;
 
+    if (node.opacity) {
+      ctx.globalAlpha = node.opacity;
+    } else {
+      ctx.globalAlpha = 1.0;
+    }
+
     ctx.fillStyle = node['color'];
     ctx.beginPath();
     ctx.arc(node['displayX'],

@@ -66,6 +66,7 @@ function Graph() {
       'degree': 0,
       'inDegree': 0,
       'outDegree': 0,
+      'opacity': 1.0,
       // Flags :
       'fixed': false,
       'active': false,
@@ -85,6 +86,7 @@ function Graph() {
         case 'x':
         case 'y':
         case 'size':
+        case 'opacity':
           n[k] = +params[k];
           break;
         case 'fixed':
@@ -120,6 +122,7 @@ function Graph() {
       'y': node['y'],
       'size': node['size'],
       'degree': node['degree'],
+      'opacity': node['opacity'],
       'inDegree': node['inDegree'],
       'outDegree': node['outDegree'],
       'displayX': node['displayX'],
@@ -156,6 +159,7 @@ function Graph() {
         case 'displayX':
         case 'displayY':
         case 'displaySize':
+        case 'opacity':
           break;
         case 'x':
         case 'y':
