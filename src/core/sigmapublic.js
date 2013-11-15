@@ -102,6 +102,11 @@ function SigmaPublic(sigmaInstance) {
     return self;
   };
 
+  this.redraw = function(nodes, edges, labels, safe) {
+    s.redraw(nodes, edges, labels, safe);
+    return self;
+  }
+
   this.refresh = function() {
     s.refresh();
     return self;
@@ -201,8 +206,14 @@ function SigmaPublic(sigmaInstance) {
     return s.monitor.desactivate();
   };
 
+
   // Events
   s.bind('downnodes upnodes downgraph upgraph', function(e) {
+    self.dispatch(e.type, e.content);
+  });
+
+
+  s.bind('dblclicknodes dblclickgraph', function(e){
     self.dispatch(e.type, e.content);
   });
 

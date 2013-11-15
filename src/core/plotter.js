@@ -34,6 +34,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
    * @type {Object}
    */
   this.p = {
+    // ACTIVE:
+    //   Active node form
+    //   - 'circle' (without text)
+    //   - default (then defaultLabelColor
+    //              will be used instead)
+    activeNodeType: 'circle',
+    defaultActiveNodeType: 'label',
     // -------
     // LABELS:
     // -------
@@ -281,6 +288,12 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     var size = Math.round(node['displaySize'] * 10) / 10;
     var ctx = nodesCtx;
 
+    if (node.opacity) {
+      ctx.globalAlpha = node.opacity;
+    } else {
+      ctx.globalAlpha = 1.0;
+    }
+
     ctx.fillStyle = node['color'];
     ctx.beginPath();
     ctx.arc(node['displayX'],
@@ -293,7 +306,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.closePath();
     ctx.fill();
 
-    node['hover'] && drawHoverNode(node);
+    // node['hover'] && drawHoverNode(node);
     return self;
   };
 
@@ -550,20 +563,13 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       return self;
     }
 
+    var activeNodeType = self.p.activeNodeType == 'circle' ? 
+                         self.p.activeNodeType : 
+                         self.p.defaultActiveNodeType;
+
     var fontSize = self.p.labelSize == 'fixed' ?
                    self.p.defaultLabelSize :
                    self.p.labelSizeRatio * node['displaySize'];
-
-    ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
-               fontSize + 'px ' +
-               (self.p.activeFont || self.p.font || '');
-
-    ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultActiveLabelBGColor;
-
-    // Label background:
-    ctx.beginPath();
 
     if (self.p.labelActiveShadow) {
       ctx.shadowOffsetX = 0;
@@ -572,23 +578,50 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
       ctx.shadowColor = self.p.labelActiveShadowColor;
     }
 
-    sigma.tools.drawRoundRect(
-      ctx,
-      Math.round(node['displayX'] - fontSize / 2 - 2),
-      Math.round(node['displayY'] - fontSize / 2 - 2),
-      Math.round(ctx.measureText(node['label']).width +
-        node['displaySize'] * 1.5 +
-        fontSize / 2 + 4),
-      Math.round(fontSize + 4),
-      Math.round(fontSize / 2 + 2),
-      'left'
-    );
-    ctx.closePath();
-    ctx.fill();
+    if (activeNodeType != 'circle') {
+      ctx.font = (self.p.activeFontStyle || self.p.fontStyle || '') + ' ' +
+                 fontSize + 'px ' +
+                 (self.p.activeFont || self.p.font || '');
 
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 0;
+      ctx.fillStyle = self.p.labelHoverBGColor == 'node' ?
+                      (node['color'] || self.p.defaultNodeColor) :
+                      self.p.defaultActiveLabelBGColor;
+
+      // Label background:
+      ctx.beginPath();
+
+
+      sigma.tools.drawRoundRect(
+        ctx,
+        Math.round(node['displayX'] - fontSize / 2 - 2),
+        Math.round(node['displayY'] - fontSize / 2 - 2),
+        Math.round(ctx.measureText(node['label']).width +
+          node['displaySize'] * 1.5 +
+          fontSize / 2 + 4),
+        Math.round(fontSize + 4),
+        Math.round(fontSize / 2 + 2),
+        'left'
+      );
+
+      ctx.closePath();
+      ctx.fill();
+      
+    } 
+
+
+    if (activeNodeType == 'label') {
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 0;
+    }
+
+
+    var activeNodeSize;
+    if (activeNodeType != 'circle' || self.p.labelSize == 'fixed') {
+      activeNodeSize = node['displaySize'];
+    } else {
+      activeNodeSize = Math.round(node['displaySize']) + fontSize / 2;
+    }
 
     // Node border:
     ctx.beginPath();
@@ -597,7 +630,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                     self.p.defaultNodeBorderColor;
     ctx.arc(Math.round(node['displayX']),
             Math.round(node['displayY']),
-            node['displaySize'] + self.p.borderSize,
+            activeNodeSize + self.p.borderSize,
             0,
             Math.PI * 2,
             true);
@@ -611,7 +644,7 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
                     self.p.defaultNodeActiveColor;
     ctx.arc(Math.round(node['displayX']),
             Math.round(node['displayY']),
-            node['displaySize'],
+            activeNodeSize,
             0,
             Math.PI * 2,
             true);
@@ -620,14 +653,16 @@ function Plotter(nodesCtx, edgesCtx, labelsCtx, hoverCtx, graph, w, h) {
     ctx.fill();
 
     // Label:
-    ctx.fillStyle = self.p.labelActiveColor == 'node' ?
-                    (node['color'] || self.p.defaultNodeColor) :
-                    self.p.defaultLabelActiveColor;
-    ctx.fillText(
-      node['label'],
-      Math.round(node['displayX'] + node['displaySize'] * 1.5),
-      Math.round(node['displayY'] + fontSize / 2 - 3)
-    );
+    if (activeNodeType != 'circle') {
+      ctx.fillStyle = self.p.labelActiveColor == 'node' ?
+                      (node['color'] || self.p.defaultNodeColor) :
+                      self.p.defaultLabelActiveColor;
+      ctx.fillText(
+        node['label'],
+        Math.round(node['displayX'] + node['displaySize'] * 1.5),
+        Math.round(node['displayY'] + fontSize / 2 - 3)
+      );
+    }
 
     return self;
   };

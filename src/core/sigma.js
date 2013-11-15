@@ -15,6 +15,13 @@ function Sigma(root, id) {
   sigma.classes.Cascade.call(this);
   sigma.classes.EventDispatcher.call(this);
 
+  /*
+   * double click state 
+   */
+
+   var alreadyClicked = false;
+
+
   /**
    * Represents "this", without the well-known scope issue.
    * @private
@@ -42,7 +49,8 @@ function Sigma(root, id) {
     lastEdges: 0,
     lastLabels: 2,
     drawHoverNodes: true,
-    drawActiveNodes: true
+    drawActiveNodes: true,
+    forceCheckHover: false
   };
 
   /**
@@ -117,7 +125,7 @@ function Sigma(root, id) {
     this.id
   );
 
-  // Interaction listeners:
+      // Interaction listeners:
   this.mousecaptor.bind('drag interpolate', function(e) {
     self.draw(
       self.p.auto ? 2 : self.p.drawNodes,
@@ -153,6 +161,19 @@ function Sigma(root, id) {
         targeted
       );
     }
+  }).bind('dblclick', function(e) {
+    var targeted = self.graph.nodes.filter(function(n) {
+      return !!n['hover'];
+    }).map(function(n) {
+      return n.id;
+    });
+
+    self.dispatch('dblclickgraph');
+
+    if (targeted.length) {
+      self.dispatch('dblclicknodes', targeted);
+    }
+
   }).bind('move', function() {
     self.domElements.hover.getContext('2d').clearRect(
       0,
@@ -410,6 +431,35 @@ function Sigma(root, id) {
     return self;
   };
 
+  function redraw(nodes, edges, labels, safe) {
+    self.domElements.hover.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.hover.width,
+      self.domElements.hover.height
+    );
+    self.domElements.nodes.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.nodes.width,
+      self.domElements.nodes.height
+    );
+    self.domElements.edges.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.edges.width,
+      self.domElements.edges.height
+    );
+    self.domElements.labels.getContext('2d').clearRect(
+      0,
+      0,
+      self.domElements.labels.width,
+      self.domElements.labels.height
+    );
+    draw(nodes, edges, labels, safe);
+  }
+
+
   /**
    * Draws the hover and active nodes labels.
    * @return {Sigma} Returns itself.
@@ -447,6 +497,13 @@ function Sigma(root, id) {
       });
     }
 
+    if (self.p.forceCheckHover) {
+      self.graph.checkHover(
+        self.mousecaptor.mouseX,
+        self.mousecaptor.mouseY
+      );
+    };
+
     return self;
   }
 
@@ -467,12 +524,14 @@ function Sigma(root, id) {
     return self;
   }
 
+
   // Apply plugins:
   for (var i = 0; i < local.plugins.length; i++) {
     local.plugins[i](this);
   }
 
   this.draw = draw;
+  this.redraw = redraw;
   this.resize = resize;
   this.refresh = refresh;
   this.drawHover = drawHover;

@@ -40,7 +40,9 @@ function MouseCaptor(dom) {
     directZooming: false,
     blockScroll: true,
     inertia: 1.1,
-    mouseEnabled: true
+    mouseEnabled: true,
+    disableDrag: false,
+    disableZoom: false
   };
 
   var oldMouseX = 0;
@@ -72,6 +74,10 @@ function MouseCaptor(dom) {
   this.mouseY = 0;
 
   this.isMouseDown = false;
+
+  this.alreadyClicked = false;
+
+  this.timeout = null;
 
   /**
    * Extract the local X position from a mouse event.
@@ -122,7 +128,7 @@ function MouseCaptor(dom) {
     self.mouseX = getX(event);
     self.mouseY = getY(event);
 
-    self.isMouseDown && drag(event);
+    self.isMouseDown && !self.p.disableDrag && drag(event);
     self.dispatch('move');
 
     if (event.preventDefault) {
@@ -141,8 +147,19 @@ function MouseCaptor(dom) {
   function upHandler(event) {
     if (self.p.mouseEnabled && self.isMouseDown) {
       self.isMouseDown = false;
-      self.dispatch('mouseup');
-      stopDrag();
+
+      if (self.alreadyClicked) {
+        self.alreadyClicked = false;
+        clearTimeout(self.timeout);
+        self.dispatch('dblclick');
+      } else {
+        self.alreadyClicked = true;
+        self.timeout = setTimeout(function(){
+          self.alreadyClicked = false;
+          self.dispatch('mouseup');
+          stopDrag();
+        }, 500);
+      }
 
       if (event.preventDefault) {
         event.preventDefault();
@@ -178,12 +195,31 @@ function MouseCaptor(dom) {
   };
 
   /**
+   * The handler listening to the 'dbclick' mouse event. It will dispatch
+   * a 'dbclick' event
+   * @private
+   * @param  {event} event A 'dbclick' mouse event.
+   */
+  function dblclickHandler(event) {
+    if (self.p.mouseEnabled) {
+      self.dispatch('dbclick');
+      if (event.preventDefault) {
+        event.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
+    }
+  }
+
+  /**
    * The handler listening to the 'wheel' mouse event. It will trigger
    * {@link startInterpolate} with the event delta as parameter.
    * @private
    * @param  {event} event A 'wheel' mouse event.
    */
   function wheelHandler(event) {
+    if (self.p.disableZoom) 
+      return;
     if (self.p.mouseEnabled) {
       startInterpolate(
         self.mouseX,
@@ -230,6 +266,7 @@ function MouseCaptor(dom) {
         self.stageX + self.p.inertia * (self.stageX - lastStageX2),
         self.stageY + self.p.inertia * (self.stageY - lastStageY2)
       );
+      self.dispatch('stopdrag');
     }
   };
 
@@ -402,7 +439,8 @@ function MouseCaptor(dom) {
   dom.addEventListener('mousewheel', wheelHandler, true);
   dom.addEventListener('mousemove', moveHandler, true);
   dom.addEventListener('mousedown', downHandler, true);
-  document.addEventListener('mouseup', upHandler, true);
+  dom.addEventListener('mouseup', upHandler, true);
+  dom.addEventListener('dblclick', dblclickHandler, true);
 
   this.checkBorders = checkBorders;
   this.interpolate = startInterpolate;
