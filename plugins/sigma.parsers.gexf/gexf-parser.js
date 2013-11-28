@@ -368,33 +368,68 @@
   //=================
 
   // Fetching GEXF with XHR
-  function _fetch(gexf_url) {
+  function _fetch(gexf_url, callback) {
+    var xhr = (function() {
+      if (window.XMLHttpRequest)
+        return new XMLHttpRequest();
 
-    // TODO: Decide of an asynchronous policy
-    // XHR Request
-    var request = window.XMLHttpRequest ?
-      new XMLHttpRequest() :
-      new ActiveXObject('Microsoft.XMLHTTP');
+      var names,
+          i;
 
-    // Callback
-    // request.onreadystatechange = function(){
+      if (window.ActiveXObject) {
+        names = [
+          'Msxml2.XMLHTTP.6.0',
+          'Msxml2.XMLHTTP.3.0',
+          'Msxml2.XMLHTTP',
+          'Microsoft.XMLHTTP'
+        ];
 
-    // }
+        for (i in names)
+          try {
+            return new ActiveXObject(names[i]);
+          } catch (e) {}
+      }
 
-    request.overrideMimeType('text/xml');
-    request.open('GET', gexf_url, false);
-    request.send();
+      return null;
+    })();
 
-    // Returning GEXF
-    return request.responseXML;
+    if (!xhr)
+      throw 'XMLHttpRequest not supported, cannot load the file.';
+
+    if (typeof callback === 'function') {
+      xhr.overrideMimeType('text/xml');
+      xhr.open('GET', gexf_url, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4)
+          callback(xhr.responseXML);
+      };
+      xhr.send();
+
+      // Returning XHR object
+      return xhr;
+    } else {
+      xhr.overrideMimeType('text/xml');
+      xhr.open('GET', gexf_url, false);
+      xhr.send();
+
+      // Returning GEXF content
+      return xhr.responseXML;
+    }
   }
 
   // Parsing the GEXF File
-  // TODO: parse xml or url
-  function _parse(gexf_url) {
+  function _parse(gexf) {
+    return graph(gexf);
+  }
 
-    // Composing Graph
-    return graph(_fetch(gexf_url));
+  // Fetch and parse the GEXF File
+  function _fetchAndParse(gexf_url, callback) {
+    if (typeof callback === 'function') {
+      return _fetch(gexf_url, function(gexf) {
+        callback(graph(gexf));
+      });
+    } else
+      return graph(_fetch(gexf_url));
   }
 
 
@@ -407,6 +442,7 @@
 
     // Functions
     parse: _parse,
+    fetch: _fetchAndParse,
 
     // Version
     version: '0.1'

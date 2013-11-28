@@ -30,56 +30,57 @@
     var i,
         l,
         arr,
-        obj,
-        graph = GexfParser.parse(url);
+        obj;
 
-    // Adapt the graph:
-    arr = graph.nodes;
-    for (i = 0, l = arr.length; i < l; i++) {
-      obj = arr[i];
-
-      obj.id = obj.id;
-      obj.x = obj.viz.position.x;
-      obj.y = obj.viz.position.y;
-      obj.size = obj.viz.size;
-      obj.color = obj.viz.color;
-    }
-
-    arr = graph.edges;
-    for (i = 0, l = arr.length; i < l; i++) {
-      obj = arr[i];
-
-      obj.id = typeof obj.id === 'string' ? obj.id : edgeId();
-      obj.size = obj.weight;
-      obj.source = '' + obj.source;
-      obj.target = '' + obj.target;
-    }
-
-    // Update the instance's graph:
-    if (sig instanceof sigma) {
-      sig.graph.clear();
-
+    GexfParser.fetch(url, function(graph) {
+      // Adapt the graph:
       arr = graph.nodes;
-      for (i = 0, l = arr.length; i < l; i++)
-        sig.graph.addNode(arr[i]);
+      for (i = 0, l = arr.length; i < l; i++) {
+        obj = arr[i];
+
+        obj.id = obj.id;
+        obj.x = obj.viz.position.x;
+        obj.y = obj.viz.position.y;
+        obj.size = obj.viz.size;
+        obj.color = obj.viz.color;
+      }
 
       arr = graph.edges;
-      for (i = 0, l = arr.length; i < l; i++)
-        sig.graph.addEdge(arr[i]);
+      for (i = 0, l = arr.length; i < l; i++) {
+        obj = arr[i];
 
-    // ...or instanciate sigma if needed:
-    } else if (typeof sig === 'object') {
-      sig.graph = graph;
-      sig = new sigma(sig);
+        obj.id = typeof obj.id === 'string' ? obj.id : edgeId();
+        obj.size = obj.weight;
+        obj.source = '' + obj.source;
+        obj.target = '' + obj.target;
+      }
 
-    // ...or it's finally the callback:
-    } else if (typeof sig === 'function') {
-      sig = null;
-      callback = sig;
-    }
+      // Update the instance's graph:
+      if (sig instanceof sigma) {
+        sig.graph.clear();
 
-    // Call the callback if specified:
-    if (callback)
-      callback(sig || graph);
+        arr = graph.nodes;
+        for (i = 0, l = arr.length; i < l; i++)
+          sig.graph.addNode(arr[i]);
+
+        arr = graph.edges;
+        for (i = 0, l = arr.length; i < l; i++)
+          sig.graph.addEdge(arr[i]);
+
+      // ...or instanciate sigma if needed:
+      } else if (typeof sig === 'object') {
+        sig.graph = graph;
+        sig = new sigma(sig);
+
+      // ...or it's finally the callback:
+      } else if (typeof sig === 'function') {
+        sig = null;
+        callback = sig;
+      }
+
+      // Call the callback if specified:
+      if (callback)
+        callback(sig || graph);
+    });
   };
 }).call(this);
