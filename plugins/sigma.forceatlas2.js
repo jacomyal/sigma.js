@@ -11,7 +11,7 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
     outboundAttractionDistribution: false,
     adjustSizes: false,
     edgeWeightInfluence: 0,
-    scalingRatio: 1,
+    scalingRatio: 0.1,
     strongGravityMode: false,
     gravity: 1,
     jitterTolerance: 1,
@@ -340,9 +340,9 @@ sigma.forceatlas2.ForceAtlas2 = function(graph) {
 
     // Tuning
     if (graph.nodes.length >= 100) {
-      this.p.scalingRatio = 2.0;
+      this.p.scalingRatio = 0.5;
     } else {
-      this.p.scalingRatio = 10.0;
+      this.p.scalingRatio = 0.1;
     }
     this.p.strongGravityMode = false;
     this.p.gravity = 1;

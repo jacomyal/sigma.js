@@ -97,6 +97,11 @@ function Graph() {
         case 'label':
           n[k] = params[k];
           break;
+        case 'attributes':
+          for(j in params[k]) {
+            n['attr'][params[k][j].attr] = params[k][j].val;
+          }
+          break;
         default:
           n['attr'][k] = params[k];
       }
@@ -173,7 +178,7 @@ function Graph() {
           node[k] = (copy[k] || '').toString();
           break;
         default:
-          node['attr'][k] = copy[k];
+          node[k] = copy[k];
       }
     }
 
@@ -296,6 +301,11 @@ function Graph() {
         case 'label':
           e[k] = params[k];
           break;
+        case 'attributes':
+          for(j in params[k]) {
+            e['attr'][params[k][j].attr] = params[k][j].val;
+          }
+          break;
         default:
           e['attr'][k] = params[k];
       }
@@ -363,7 +373,7 @@ function Graph() {
           edge[k] = (copy[k] || '').toString();
           break;
         default:
-          edge['attr'][k] = copy[k];
+          edge[k] = copy[k];
       }
     }
 
