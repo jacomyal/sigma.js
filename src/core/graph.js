@@ -230,6 +230,11 @@ function Graph() {
       return true;
     });
 
+	// update the node index
+    a.forEach(function(id) {
+    	delete self.nodesIndex[id.toString()];
+    });
+	
     return self;
   };
 
