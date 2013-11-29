@@ -35,6 +35,9 @@ function Sigma(root, id) {
    */
   this.p = {
     auto: true,
+    dragNodes: 2,
+    dragEdges: 1,
+    dragLabels: 2,
     drawNodes: 2,
     drawEdges: 1,
     drawLabels: 2,
@@ -120,9 +123,9 @@ function Sigma(root, id) {
   // Interaction listeners:
   this.mousecaptor.bind('drag interpolate', function(e) {
     self.draw(
-      self.p.auto ? 2 : self.p.drawNodes,
-      self.p.auto ? 0 : self.p.drawEdges,
-      self.p.auto ? 2 : self.p.drawLabels,
+      self.p.auto ? 2 : self.p.dragNodes,
+      self.p.auto ? 0 : self.p.dragEdges,
+      self.p.auto ? 2 : self.p.dragLabels,
       true
     );
   }).bind('stopdrag stopinterpolate', function(e) {
