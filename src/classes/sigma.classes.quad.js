@@ -262,12 +262,29 @@
 
 
   /**
-   * Quad Methods
+   * Quad Functions
    * ------------
    *
-   * The Quadtree methods themselves
+   * The Quadtree functions themselves.
+   * For each of those functions, we consider that in a splitted quad, the
+   * index of each node is the following:
+   * 0: top left
+   * 1: top right
+   * 2: bottom left
+   * 3: bottom right
+   *
+   * Moreover, the hereafter quad's philosophy is to consider that if an element
+   * collides with more than one nodes, this element belongs to each of the
+   * nodes it collides with where other would let it lie on a higher node.
    */
 
+  /**
+   * Get the index of the node containing the point in the quad
+   *
+   * @param  {object}  point      A point defined by coordinates (x, y).
+   * @param  {object}  quadBounds Boundaries of the quad (x, y, width, heigth).
+   * @return {integer}            The index of the node containing the point.
+   */
   function _quadIndex(point, quadBounds) {
     var xmp = quadBounds.x + quadBounds.width / 2,
         ymp = quadBounds.y + quadBounds.height / 2,
@@ -288,20 +305,38 @@
     }
   }
 
-  function _quadIndexes(sizedPoint, quadCorners) {
+  /**
+   * Get a list of indexes of nodes containing an axis-aligned rectangle
+   *
+   * @param  {object}  rectangle   A rectangle defined by two points (x1, y1),
+   *                               (x2, y2) and height.
+   * @param  {array}   quadCorners An array of the quad nodes' corners.
+   * @return {array}               An array of indexes containing one to
+   *                               four integers.
+   */
+  function _quadIndexes(rectangle, quadCorners) {
     var indexes = [];
 
     // Iterating through quads
     for (var i = 0; i < 4; i++)
-      if ((sizedPoint.x2 >= quadCorners[i][0].x) &&
-          (sizedPoint.x1 <= quadCorners[i][1].x) &&
-          (sizedPoint.y1 + sizedPoint.height >= quadCorners[i][0].y) &&
-          (sizedPoint.y1 <= quadCorners[i][2].y))
+      if ((rectangle.x2 >= quadCorners[i][0].x) &&
+          (rectangle.x1 <= quadCorners[i][1].x) &&
+          (rectangle.y1 + rectangle.height >= quadCorners[i][0].y) &&
+          (rectangle.y1 <= quadCorners[i][2].y))
         indexes.push(i);
 
     return indexes;
   }
 
+  /**
+   * Get a list of indexes of nodes containing a non-axis-aligned rectangle
+   *
+   * @param  {array}  corners      An array containing each corner of the
+   *                               rectangle defined by its coordinates (x, y).
+   * @param  {array}  quadCorners  An array of the quad nodes' corners.
+   * @return {array}               An array of indexes containing one to
+   *                               four integers.
+   */
   function _quadCollision(corners, quadCorners) {
     var indexes = [];
 
@@ -313,6 +348,14 @@
     return indexes;
   }
 
+  /**
+   * Subdivide a quad by creating a node at a precise index. The function does
+   * not generate all four nodes not to potentially create unused nodes.
+   *
+   * @param  {integer}  index The index of the node to create.
+   * @param  {object}   quad  The quad object to subdivide.
+   * @return {object}         A new quad representing the node created.
+   */
   function _quadSubdivide(index, quad) {
     var next = quad.level + 1,
         subw = Math.round(quad.bounds.width / 2),
@@ -349,6 +392,17 @@
     );
   }
 
+  /**
+   * Recursively insert an element into the quadtree. Only points
+   * with size, i.e. axis-aligned squares, may be inserted with this
+   * method.
+   *
+   * @param  {object}  el         The element to insert in the quadtree.
+   * @param  {object}  sizedPoint A sized point defined by two top points
+   *                              (x1, y1), (x2, y2) and height.
+   * @param  {object}  quad       The quad in which to insert the element.
+   * @return {undefined}          The function does not return anything.
+   */
   function _quadInsert(el, sizedPoint, quad) {
     if (quad.level < quad.maxLevel) {
 
@@ -373,6 +427,15 @@
     }
   }
 
+  /**
+   * Recursively retrieve every elements held by the node containing the
+   * searched point.
+   *
+   * @param  {object}  point The searched point (x, y).
+   * @param  {object}  quad  The searched quad.
+   * @return {array}         An array of elements contained in the relevant
+   *                         node.
+   */
   function _quadRetrievePoint(point, quad) {
     if (quad.level < quad.maxLevel) {
       var index = _quadIndex(point, quad.bounds);
@@ -390,6 +453,22 @@
     }
   }
 
+  /**
+   * Recursively retrieve every elements contained within an rectangular area
+   * that may or may not be axis-aligned.
+   *
+   * @param  {object|array} rectData       The searched area defined either by
+   *                                       an array of four corners (x, y) in
+   *                                       the case of a non-axis-aligned
+   *                                       rectangle or an object with two top
+   *                                       points (x1, y1), (x2, y2) and height.
+   * @param  {object}       quad           The searched quad.
+   * @param  {function}     collisionFunc  The collision function used to search
+   *                                       for node indexes.
+   * @param  {array?}       els            The retrieved elements.
+   * @return {array}                       An array of elements contained in the
+   *                                       area.
+   */
   function _quadRetrieveArea(rectData, quad, collisionFunc, els) {
     els = els || {};
 
@@ -412,7 +491,16 @@
     return els;
   }
 
-  // Compute quad bounds with four corners ?
+  /**
+   * Creates the quadtree object itself.
+   *
+   * @param  {object}   bounds       The boundaries of the quad defined by an
+   *                                 origin (x, y), width and heigth.
+   * @param  {integer}  level        The level of the quad in the tree.
+   * @param  {integer}  maxElements  The max number of element in a leaf node.
+   * @param  {integer}  maxLevel     The max recursion level of the tree.
+   * @return {object}                The quadtree object.
+   */
   function _quadTree(bounds, level, maxElements, maxLevel) {
     return {
       level: level || 0,
@@ -430,9 +518,16 @@
    * Sigma Quad Constructor
    * ----------------------
    *
-   * The quad api as exposed to sigma.
+   * The quad API as exposed to sigma.
    */
 
+  /**
+   * The quad core that will become the sigma interface with the quadtree.
+   *
+   * property {object} _tree  Property holding the quadtree object.
+   * property {object} _geom  Exposition of the _geom namespace for testing.
+   * property {object} _cache Cache for the area method.
+   */
   var quad = function() {
     this._tree = {};
     this._geom = _geom;
@@ -442,6 +537,22 @@
     };
   };
 
+  /**
+   * Index a graph by inserting its nodes into the quadtree.
+   *
+   * @param  {array}  nodes   An array of nodes to index.
+   * @param  {object} params  An object of parameters with at least the quad
+   *                          bounds.
+   * @return {object}         The quadtree object.
+   *
+   * Parameters:
+   * ----------
+   * bounds:      {object}   boundaries of the quad defined by its origin (x, y)
+   *                         width and heigth.
+   * prefix:      {string?}  a prefix for node geometric attributes.
+   * maxElements: {integer?} the max number of elements in a leaf node.
+   * maxLevel:    {integer?} the max recursion level of the tree.
+   */
   quad.prototype.index = function(nodes, params) {
 
     // Enforcing presence of boundaries
@@ -478,12 +589,27 @@
     return this._tree;
   };
 
-  // Discuss api passing object or x, y ?
+  /**
+   * Retrieve every graph nodes held by the quadtree node containing the
+   * searched point.
+   *
+   * @param  {number} x of the point.
+   * @param  {number} y of the point.
+   * @return {array}  An array of nodes retrieved.
+   */
   quad.prototype.point = function(x, y) {
     return _quadRetrievePoint({x: x, y: y}, this._tree) || [];
   };
 
-  // passing x1, y1, x2, y2, height
+  /**
+   * Retrieve every graph nodes within a rectangular area. The methods keep the
+   * last area queried in cache for optimization reason and will act differently
+   * for the same reason if the area is axis-aligned or not.
+   *
+   * @param  {object} A rectangle defined by two top points (x1, y1), (x2, y2)
+   *                  and height.
+   * @return {array}  An array of nodes retrieved.
+   */
   quad.prototype.area = function(rect) {
     var serialized = JSON.stringify(rect),
         collisionFunc,
