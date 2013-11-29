@@ -474,6 +474,12 @@
       );
     }
 
+    // Reset cache:
+    this._cache = {
+      query: false,
+      result: false
+    };
+
     // remove?
     return this._tree;
   };
