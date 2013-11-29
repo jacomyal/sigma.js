@@ -701,6 +701,17 @@ function Graph() {
     return (ids instanceof Array ? a : a[0]);
   };
 
+  /**
+   * Retrieves whether or not a node exists by id.
+   *  
+   * @param {string} id    The node's ID to retrieve.
+   * @return {bool}        Whether or not the node is exists.
+   */
+  function hasNode(id) {
+    return typeof(self.nodesIndex[id]) != 'undefined';
+  };
+
+
   empty();
 
   this.addNode = addNode;
@@ -713,6 +724,8 @@ function Graph() {
 
   this.getEdges = getEdges;
   this.getNodes = getNodes;
+
+  this.hasNode  = hasNode;
 
   this.empty = empty;
   this.rescale = rescale;

@@ -191,6 +191,11 @@ function SigmaPublic(sigmaInstance) {
   this.getEdges = function(ids) {
     return s.graph.getEdges(ids);
   };
+  
+  this.hasNode = function(id) {
+    return s.graph.hasNode(id);
+  };
+
 
   // Monitoring
   this.activateMonitoring = function() {
