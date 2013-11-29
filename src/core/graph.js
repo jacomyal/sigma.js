@@ -85,12 +85,12 @@ function Graph() {
         case 'x':
         case 'y':
         case 'size':
+        case 'forceLabel':
           n[k] = +params[k];
           break;
         case 'fixed':
         case 'active':
         case 'hidden':
-        case 'forceLabel':
           n[k] = !!params[k];
           break;
         case 'color':
@@ -160,12 +160,12 @@ function Graph() {
         case 'x':
         case 'y':
         case 'size':
+        case 'forceLabel':
           node[k] = +copy[k];
           break;
         case 'fixed':
         case 'active':
         case 'hidden':
-        case 'forceLabel':
           node[k] = !!copy[k];
           break;
         case 'color':
