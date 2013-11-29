@@ -1,0 +1,7 @@
+{
+  "name": "sigma.js",
+  "version": "0.0.1",
+  "devDependencies": {
+    "uglify-js2": ">= 2.1.6"
+  }
+}
