@@ -212,7 +212,7 @@ function Graph() {
     });
 
     indexesToRemove.forEach(function(index) {
-      self.nodes.splice(index, 1);
+      delete self.nodesIndex[self.nodes.splice(index, 1)[0]['id']];
     });
 
     self.edges = self.edges.filter(function(e) {
