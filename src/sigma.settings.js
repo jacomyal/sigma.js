@@ -68,26 +68,22 @@
     labelHoverColor: 'default',
     // {string}
     defaultLabelHoverColor: '#000',
-    // {numbers} The different drawing modes:
-    //           0: Not displayed.
-    //           1: Displayed in several frames.
-    //           2: Displayed continuously.
-    drawLabels: 2,
-    drawEdges: 1,
-    drawNodes: 2,
+    // {booleans} The different drawing modes:
+    //           false: Layered not displayed.
+    //           true: Layered displayed.
+    drawLabels: true,
+    drawEdges: true,
+    drawNodes: true,
+    // {boolean} Indicates if the edges must be drawn in several frames or in
+    //           one frame, as the nodes and labels are drawn.
+    batchEdgesDrawing: true,
     // {boolean} Indicates if the edges must be hidden during dragging and
     //           animations.
     hideEdgesOnMove: true,
     // {numbers} The different batch sizes, when elements are displayed in
-    //           several frames (for the canvas renderer).
+    //           several frames.
     canvasEdgesBatchSize: 500,
-    canvasNodesBatchSize: 500,
-    canvasLabelsBatchSize: 500,
-    // {numbers} The different batch sizes, when elements are displayed in
-    //           several frames (for the WebGL renderer).
     webglEdgesBatchSize: 1000,
-    webglNodesBatchSize: 1000,
-    webglLabelsBatchSize: 1000,
 
 
 

@@ -153,7 +153,7 @@
       s = new sigma({
         graph: g,
         settings: {
-          drawEdges: 0,
+          drawEdges: false,
           hideEdgesOnMove: true,
           skipErrors: true
         }
@@ -169,8 +169,8 @@
         type: 'webgl',
         camera: 'cam1',
         settings: {
-          drawEdges: 2,
           hideEdgesOnMove: false,
+          batchEdgesDrawing: false,
           defaultLabelColor: '#fff'
         }
       });

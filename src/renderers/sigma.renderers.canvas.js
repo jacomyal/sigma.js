@@ -113,17 +113,27 @@
         k,
         l,
         o,
+        id,
+        end,
+        job,
+        start,
+        edges,
+        renderers,
+        batchSize,
         index = {},
         graph = this.graph,
         prefix = this.options.prefix || '',
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes'),
-        drawLabels = this.settings(options, 'drawLabels');
+        drawLabels = this.settings(options, 'drawLabels'),
+        embedSettings = this.settings.embedObjects(options, {
+          prefix: this.options.prefix
+        });
 
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
       if (this.camera.isAnimated || this.camera.isMoving)
-        drawEdges = 0;
+        drawEdges = false;
 
     // Apply the camera's view:
     this.camera.applyView(
@@ -152,63 +162,61 @@
     for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
       index[a[i].id] = a[i];
 
-    if (drawEdges)
+    // Draw edges:
+    // - If settings('batchEdgesDrawing') is true, the edges are displayed per
+    //   batches. If not, they are drawn in one frame.
+    if (drawEdges) {
+      // First, let's identify which edges to draw. To do this, we just draw
+      // every edges that have at least one extremity displayed, according to
+      // the quadtree:
       for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
         o = a[i];
         if (index[o.source] || index[o.target])
           this.edgesOnScreen.push(o);
       }
 
-    if (drawEdges)
-      this.drawEdges(drawEdges === 2, options);
-    if (drawNodes)
-      this.drawNodes(drawNodes === 2, options);
-    if (drawLabels)
-      this.drawLabels(drawLabels === 2, options);
-
-    this.dispatchEvent('render');
-
-    return this;
-  };
-
-  sigma.renderers.canvas.prototype.drawEdges = function(synchronous, options) {
-    var a,
-        i,
-        l,
-        o,
-        id,
-        job,
-        end,
-        start,
-        graph = this.graph,
-        renderers = sigma.canvas.edges,
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
-        }),
+      // If the "batchEdgesDrawing" settings is true, edges are batched:
+      if (this.settings(options, 'batchEdgesDrawing')) {
+        id = 'edges_' + this.conradId;
         batchSize = embedSettings('canvasEdgesBatchSize');
 
-    if (synchronous)
-      for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
-        o = a[i];
-        (renderers[o.type] || renderers.def)(
-          o,
-          graph.nodes(o.source),
-          graph.nodes(o.target),
-          this.contexts.edges,
-          embedSettings
-        );
-      }
-    else {
-      id = 'edges_' + this.conradId;
+        edges = this.edgesOnScreen;
+        l = edges.length;
 
-      a = this.edgesOnScreen;
-      l = a.length;
+        start = 0;
+        end = Math.min(edges.length, start + batchSize);
 
-      start = 0;
-      end = Math.min(a.length, start + batchSize);
+        job = function() {
+          renderers = sigma.canvas.edges;
+          for (i = start; i < end; i++) {
+            o = edges[i];
+            (renderers[o.type] || renderers.def)(
+              o,
+              graph.nodes(o.source),
+              graph.nodes(o.target),
+              this.contexts.edges,
+              embedSettings
+            );
+          }
 
-      job = function() {
-        for (i = start; i < end; i++) {
+          // Catch job's end:
+          if (end === edges.length) {
+            delete this.jobs[id];
+            return false;
+          }
+
+          start = end + 1;
+          end = Math.min(edges.length, start + batchSize);
+          return true;
+        };
+
+        this.jobs[id] = job;
+        conrad.addJob(id, job.bind(this));
+
+      // If not, they are drawn in one frame:
+      } else {
+        renderers = sigma.canvas.edges;
+        for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
           (renderers[o.type] || renderers.def)(
             o,
@@ -218,123 +226,36 @@
             embedSettings
           );
         }
-
-        // Catch job's end:
-        if (end === a.length) {
-          delete this.jobs[id];
-          return false;
-        }
-
-        start = end + 1;
-        end = Math.min(a.length, start + batchSize);
-        return true;
-      };
-
-      this.jobs[id] = job;
-      conrad.addJob(id, job.bind(this));
+      }
     }
-  };
 
-  sigma.renderers.canvas.prototype.drawNodes = function(synchronous, options) {
-    var a,
-        i,
-        l,
-        o,
-        renderers = sigma.canvas.nodes,
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
-        }),
-        batchSize = embedSettings('canvasNodesBatchSize');
-
-    if (synchronous)
+    // Draw nodes:
+    // - No batching
+    if (drawNodes) {
+      renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         (renderers[a[i].type] || renderers.def)(
           a[i],
           this.contexts.nodes,
           embedSettings
         );
-    else {
-      id = 'nodes_' + this.conradId;
-
-      a = this.nodesOnScreen;
-      l = a.length;
-
-      start = 0;
-      end = Math.min(a.length, start + batchSize);
-
-      job = function() {
-        for (i = start; i < end; i++)
-          (renderers[a[i].type] || renderers.def)(
-            a[i],
-            this.contexts.nodes,
-            embedSettings
-          );
-
-        // Catch job's end:
-        if (end === a.length) {
-          delete this.jobs[id];
-          return false;
-        }
-
-        start = end + 1;
-        end = Math.min(a.length, start + batchSize);
-        return true;
-      };
-
-      this.jobs[id] = job;
-      conrad.addJob(id, job.bind(this));
     }
-  };
 
-  sigma.renderers.canvas.prototype.drawLabels = function(synchronous, options) {
-    var a,
-        i,
-        l,
-        o,
-        renderers = sigma.canvas.labels,
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
-        }),
-        batchSize = embedSettings('canvasLabelsBatchSize');
-
-    if (synchronous)
+    // Draw labels:
+    // - No batching
+    if (drawLabels) {
+      renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         (renderers[a[i].type] || renderers.def)(
           a[i],
           this.contexts.labels,
           embedSettings
         );
-    else {
-      id = 'labels_' + this.conradId;
-
-      a = this.nodesOnScreen;
-      l = a.length;
-
-      start = 0;
-      end = Math.min(a.length, start + batchSize);
-
-      job = function() {
-        for (i = start; i < end; i++)
-          (renderers[a[i].type] || renderers.def)(
-            a[i],
-            this.contexts.labels,
-            embedSettings
-          );
-
-        // Catch job's end:
-        if (end === a.length) {
-          delete this.jobs[id];
-          return false;
-        }
-
-        start = end + 1;
-        end = Math.min(a.length, start + batchSize);
-        return true;
-      };
-
-      this.jobs[id] = job;
-      conrad.addJob(id, job.bind(this));
     }
+
+    this.dispatchEvent('render');
+
+    return this;
   };
 
   /**

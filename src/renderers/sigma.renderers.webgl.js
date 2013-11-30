@@ -242,7 +242,7 @@
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
       if (this.camera.isAnimated || this.camera.isMoving)
-        drawEdges = 0;
+        drawEdges = false;
 
     // Clear and resize canvases:
     this.clear();
@@ -259,32 +259,7 @@
         conrad.killJob(k);
 
     if (drawEdges) {
-      if (drawEdges === 2) {
-        for (k in this.edgeFloatArrays) {
-          renderer = sigma.webgl.edges[k];
-
-          // Check program:
-          if (!this.edgePrograms[k])
-            this.edgePrograms[k] = renderer.initProgram(edgesGl);
-
-          // Render
-          if (this.edgeFloatArrays[k]) {
-            edgesGl.useProgram(this.edgePrograms[k]);
-            renderer.render(
-              edgesGl,
-              this.edgePrograms[k],
-              this.edgeFloatArrays[k].array,
-              {
-                matrix: matrix,
-                width: this.width,
-                height: this.height,
-                ratio: this.camera.ratio,
-                scalingRatio: this.settings('webglOversamplingRatio')
-              }
-            );
-          }
-        }
-      } else {
+      if (this.settings(options, 'batchEdgesDrawing'))
         (function() {
           var a,
               k,
@@ -368,6 +343,31 @@
           this.jobs[id] = job;
           conrad.addJob(id, job.bind(this));
         }).call(this);
+      else {
+        for (k in this.edgeFloatArrays) {
+          renderer = sigma.webgl.edges[k];
+
+          // Check program:
+          if (!this.edgePrograms[k])
+            this.edgePrograms[k] = renderer.initProgram(edgesGl);
+
+          // Render
+          if (this.edgeFloatArrays[k]) {
+            edgesGl.useProgram(this.edgePrograms[k]);
+            renderer.render(
+              edgesGl,
+              this.edgePrograms[k],
+              this.edgeFloatArrays[k].array,
+              {
+                matrix: matrix,
+                width: this.width,
+                height: this.height,
+                ratio: this.camera.ratio,
+                scalingRatio: this.settings('webglOversamplingRatio')
+              }
+            );
+          }
+        }
       }
     }
 
