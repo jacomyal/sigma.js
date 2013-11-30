@@ -250,6 +250,12 @@ test('Basic manipulation', function() {
     [[], []],
     '"clear" empties the nodes and edges arrays.'
   );
+
+  myGraph = new sigma.classes.graph();
+  myGraph.read(graph);
+
+  deepEqual(myGraph.nodes(), graph.nodes, '"read" adds properly the nodes.');
+  deepEqual(myGraph.edges(), graph.edges, '"read" adds properly the edges.');
 });
 
 test('Methods and attached functions', function() {

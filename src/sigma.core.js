@@ -187,13 +187,7 @@
 
     // Check if there is already a graph to fill in:
     if (typeof _conf.graph === 'object' && _conf.graph) {
-      a = _conf.graph.nodes || [];
-      for (i = 0, l = a.length; i < l; i++)
-        this.graph.addNode(a[i]);
-
-      a = _conf.graph.edges || [];
-      for (i = 0, l = a.length; i < l; i++)
-        this.graph.addEdge(a[i]);
+      this.graph.read(_conf.graph);
 
       // If a graph is given to the to the instance, the "refresh" method is
       // directly called:

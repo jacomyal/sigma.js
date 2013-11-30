@@ -545,6 +545,51 @@
   });
 
   /**
+   * This method reads an object and adds the nodes and edges, through the
+   * proper methods "addNode" and "addEdge".
+   *
+   * Here is an example:
+   *
+   *  > var myGraph = new graph();
+   *  > myGraph.read({
+   *  >   nodes: [
+   *  >     { id: 'n0' },
+   *  >     { id: 'n1' }
+   *  >   ],
+   *  >   edges: [
+   *  >     {
+   *  >       id: 'e0',
+   *  >       source: 'n0',
+   *  >       target: 'n1'
+   *  >     }
+   *  >   ]
+   *  > });
+   *  >
+   *  > console.log(
+   *  >   myGraph.nodes().length,
+   *  >   myGraph.edges().length
+   *  > ); // outputs 2 1
+   *
+   * @param  {object} g The graph object.
+   * @return {object}   The graph instance.
+   */
+  graph.addMethod('read', function(g) {
+    var i,
+        a,
+        l;
+
+    a = g.nodes || [];
+    for (i = 0, l = a.length; i < l; i++)
+      this.addNode(a[i]);
+
+    a = g.edges || [];
+    for (i = 0, l = a.length; i < l; i++)
+      this.addEdge(a[i]);
+
+    return this;
+  });
+
+  /**
    * This methods returns one or several nodes, depending on how it is called.
    *
    * To get the array of nodes, call "nodes" without argument. To get a
