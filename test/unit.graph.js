@@ -309,7 +309,331 @@ test('Methods and attached functions', function() {
   );
 });
 
-test('Indexes', function() {
+test('Builtin indexes', function() {
+  var graph = {
+        nodes: [
+          {
+            id: 'n0',
+            label: 'Node 0',
+            myNodeAttr: 123
+          },
+          {
+            id: 'n1',
+            label: 'Node 1'
+          },
+          {
+            id: 'n2',
+            label: 'Node 2'
+          }
+        ],
+        edges: [
+          {
+            id: 'e0',
+            source: 'n0',
+            target: 'n1',
+            myEdgeAttr: 123
+          },
+          {
+            id: 'e1',
+            source: 'n1',
+            target: 'n2'
+          }
+        ]
+      };
+
+  sigma.classes.graph.addMethod('retrieveIndexes', function() {
+    return {
+      'inIndex': this.inNeighborsIndex,
+      'outIndex': this.outNeighborsIndex,
+      'allIndex': this.allNeighborsIndex,
+      'inCount': this.inNeighborsCount,
+      'outCount': this.outNeighborsCount,
+      'allCount': this.allNeighborsCount
+    }
+  });
+
+  var g = new sigma.classes.graph();
+  g.read(graph);
+
+  var index = g.retrieveIndexes();
+
+  deepEqual(
+    index['inIndex'],
+    {
+      n0: {},
+      n1: {
+        n0: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      },
+      n2: {
+        n1: {
+          e1: {
+            id: "e1",
+            source: "n1",
+            target: "n2"
+          }
+        }
+      }
+    },
+    'Incoming index up to date'
+  );
+
+  deepEqual(
+    index['inCount'],
+    {
+      n0: 0,
+      n1: 1,
+      n2: 1
+    },
+    'Incoming count up to date'
+  );
+
+  deepEqual(
+    index['outIndex'],
+    {
+      n0: {
+        n1: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      },
+      n1: {
+        n2: {
+          e1: {
+            id: "e1",
+            source: "n1",
+            target: "n2"
+          }
+        }
+      },
+      n2: {}
+    },
+    'Outcoming index up to date'
+  );
+
+  deepEqual(
+    index['outCount'],
+    {
+      n0: 1,
+      n1: 1,
+      n2: 0
+    },
+    'Outcoming count up to date'
+  );
+
+  deepEqual(
+    index['allIndex'],
+    {
+      n0: {
+        n1: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      },
+      n1: {
+        n0: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        },
+        n2: {
+          e1: {
+            id: "e1",
+            source: "n1",
+            target: "n2"
+          }
+        }
+      },
+      n2: {
+        n1: {
+          e1: {
+            id: "e1",
+            source: "n1",
+            target: "n2"
+          }
+        }
+      }
+    },
+    'Full index up to date'
+  );
+
+  deepEqual(
+    index['allCount'],
+    {
+      n0: 1,
+      n1: 2,
+      n2: 1
+    },
+    'Full count up to date'
+  );
+
+  g.dropNode('n2');
+
+  deepEqual(
+    index['inIndex'],
+    {
+      n0: {},
+      n1: {
+        n0: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      }
+    },
+    'Incoming index up to date after having dropped a node'
+  );
+
+  deepEqual(
+    index['inCount'],
+    {
+      n0: 0,
+      n1: 1
+    },
+    'Incoming count up to date after having dropped a node'
+  );
+
+  deepEqual(
+    index['outIndex'],
+    {
+      n0: {
+        n1: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      },
+      n1: {}
+    },
+    'Outcoming index up to date after having dropped a node'
+  );
+
+  deepEqual(
+    index['outCount'],
+    {
+      n0: 1,
+      n1: 0
+    },
+    'Outcoming count up to date after having dropped a node'
+  );
+
+  deepEqual(
+    index['allIndex'],
+    {
+      n0: {
+        n1: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      },
+      n1: {
+        n0: {
+          e0: {
+            id: "e0",
+            myEdgeAttr: 123,
+            source: "n0",
+            target: "n1"
+          }
+        }
+      }
+    },
+    'Full index up to date after having dropped a node'
+  );
+
+  deepEqual(
+    index['allCount'],
+    {
+      n0: 1,
+      n1: 1
+    },
+    'Full count up to date after having dropped a node'
+  );
+
+  g.dropEdge('e0');
+
+  deepEqual(
+    index['inIndex'],
+    {
+      n0: {},
+      n1: {}
+    },
+    'Incoming index up to date after having dropped an edge'
+  );
+
+  deepEqual(
+    index['inCount'],
+    {
+      n0: 0,
+      n1: 0
+    },
+    'Incoming count up to date after having dropped an edge'
+  );
+
+  deepEqual(
+    index['outIndex'],
+    {
+      n0: {},
+      n1: {}
+    },
+    'Outcoming index up to date after having dropped an edge'
+  );
+
+  deepEqual(
+    index['outCount'],
+    {
+      n0: 0,
+      n1: 0
+    },
+    'Outcoming count up to date after having dropped an edge'
+  );
+
+  deepEqual(
+    index['allIndex'],
+    {
+      n0: {},
+      n1: {}
+    },
+    'Full index up to date after having dropped an edge'
+  );
+
+  deepEqual(
+    index['allCount'],
+    {
+      n0: 0,
+      n1: 0
+    },
+    'Full count up to date after having dropped an edge'
+  );
+});
+
+test('Custom indexes', function() {
   var myGraph;
 
   sigma.classes.graph.addIndex('nodesCount', {

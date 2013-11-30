@@ -391,17 +391,25 @@
     this.edgesArray.push(validEdge);
     this.edgesIndex[validEdge.id] = validEdge;
 
-    this.inNeighborsIndex[edge.target][edge.source] =
-      (this.inNeighborsIndex[edge.target][edge.source] || 0) + 1;
-    this.outNeighborsIndex[edge.source][edge.target] =
-      (this.outNeighborsIndex[edge.source][edge.target] || 0) + 1;
-    this.allNeighborsIndex[edge.source][edge.target] =
-      (this.allNeighborsIndex[edge.source][edge.target] || 0) + 1;
-    this.allNeighborsIndex[edge.target][edge.source] =
-      (this.allNeighborsIndex[edge.target][edge.source] || 0) + 1;
+    if (!this.inNeighborsIndex[edge.target][edge.source])
+      this.inNeighborsIndex[edge.target][edge.source] = {};
+    this.inNeighborsIndex[edge.target][edge.source][edge.id] = edge;
 
-    this.inNeighborsCount[edge.source]++;
-    this.outNeighborsCount[edge.target]++;
+    if (!this.outNeighborsIndex[edge.source][edge.target])
+      this.outNeighborsIndex[edge.source][edge.target] = {};
+    this.outNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+
+    if (!this.allNeighborsIndex[edge.source][edge.target])
+      this.allNeighborsIndex[edge.source][edge.target] = {};
+    this.allNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+
+    if (!this.allNeighborsIndex[edge.target][edge.source])
+      this.allNeighborsIndex[edge.target][edge.source] = {};
+    this.allNeighborsIndex[edge.target][edge.source][edge.id] = edge;
+
+    // Keep counts up to date:
+    this.inNeighborsCount[edge.target]++;
+    this.outNeighborsCount[edge.source]++;
     this.allNeighborsCount[edge.target]++;
     this.allNeighborsCount[edge.source]++;
 
@@ -483,15 +491,26 @@
         break;
       }
 
-    this.inNeighborsIndex[edge.target][edge.source]--;
-    this.outNeighborsIndex[edge.source][edge.target]--;
-    this.allNeighborsIndex[edge.source][edge.target]--;
-    this.allNeighborsIndex[edge.target][edge.source]--;
+    delete this.inNeighborsIndex[edge.target][edge.source][edge.id];
+    if (!Object.keys(this.inNeighborsIndex[edge.target][edge.source]).length)
+      delete this.inNeighborsIndex[edge.target][edge.source];
 
-    this.inNeighborsIndex[edge.target]--;
-    this.outNeighborsIndex[edge.source]--;
-    this.allNeighborsIndex[edge.source]--;
-    this.allNeighborsIndex[edge.target]--;
+    delete this.outNeighborsIndex[edge.source][edge.target][edge.id];
+    if (!Object.keys(this.outNeighborsIndex[edge.source][edge.target]).length)
+      delete this.outNeighborsIndex[edge.source][edge.target];
+
+    delete this.allNeighborsIndex[edge.source][edge.target][edge.id];
+    if (!Object.keys(this.allNeighborsIndex[edge.source][edge.target]).length)
+      delete this.allNeighborsIndex[edge.source][edge.target];
+
+    delete this.allNeighborsIndex[edge.target][edge.source][edge.id];
+    if (!Object.keys(this.allNeighborsIndex[edge.target][edge.source]).length)
+      delete this.allNeighborsIndex[edge.target][edge.source];
+
+    this.inNeighborsCount[edge.target]--;
+    this.outNeighborsCount[edge.source]--;
+    this.allNeighborsCount[edge.source]--;
+    this.allNeighborsCount[edge.target]--;
 
     return this;
   });
