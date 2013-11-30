@@ -89,7 +89,7 @@
           label: 'Node' + i,
           x: Math.cos(2 * i * Math.PI / N),
           y: Math.sin(2 * i * Math.PI / N),
-          size: 0.5 + 4.5 * Math.random(),
+          size: Math.random(),
           color: o.color
         });
         o.nodes.push('n' + i);
@@ -99,7 +99,6 @@
         if (Math.random() < 1 - d)
           g.edges.push({
             id: 'e' + i,
-            size: 0.5,
             source: 'n' + ((Math.random() * N) | 0),
             target: 'n' + ((Math.random() * N) | 0)
           });
@@ -107,7 +106,6 @@
           o = cs[(Math.random() * C) | 0]
           g.edges.push({
             id: 'e' + i,
-            size: 0.5,
             source: o.nodes[(Math.random() * o.nodes.length) | 0],
             target: o.nodes[(Math.random() * o.nodes.length) | 0]
           });

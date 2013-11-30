@@ -75,7 +75,7 @@
           label: 'Node ' + i,
           x: Math.random(),
           y: Math.random(),
-          size: 4 + (3 * Math.random()) | 0,
+          size: Math.random(),
           color: '#666'
         });
 
@@ -84,7 +84,7 @@
           id: 'e' + i,
           source: 'n' + (Math.random() * N | 0),
           target: 'n' + (Math.random() * N | 0),
-          size: 1 + Math.random(),
+          size: Math.random(),
           color: '#ccc'
         });
 

@@ -63,22 +63,9 @@
        * The object given as the second parameter is the base of the instance
        * configuration object. The plugin will just add the "graph" key to it
        * before the instanciation.
-       *
-       * The settings are set to fine-tune the appearance of the graph.
        */
       sigma.parsers.gexf('data/arctic.gexf', {
-        container: 'graph-container',
-        settings: {
-          labelThreshold: 8,
-          minNodeSize: 1,
-          maxNodeSize: 8,
-          minEdgeSize: 0.5,
-          maxEdgeSize: 0.5,
-          zoomMin: 0.0625,
-          zoomMax: 1,
-          hideEdgesOnMove: false,
-          batchEdgesDrawing: false
-        }
+        container: 'graph-container'
       });
     </script>
   </body>

@@ -151,12 +151,7 @@
       }
 
       s = new sigma({
-        graph: g,
-        settings: {
-          drawEdges: false,
-          hideEdgesOnMove: true,
-          skipErrors: true
-        }
+        graph: g
       });
 
       // Initialize cameras:
@@ -169,8 +164,6 @@
         type: 'webgl',
         camera: 'cam1',
         settings: {
-          hideEdgesOnMove: false,
-          batchEdgesDrawing: false,
           defaultLabelColor: '#fff'
         }
       });
@@ -178,7 +171,10 @@
       s.addRenderer({
         container: document.getElementById('canvas2'),
         type: 'canvas',
-        camera: 'cam1'
+        camera: 'cam1',
+        settings: {
+          drawEdges: false
+        }
       });
 
       s.addRenderer({

@@ -343,13 +343,22 @@
     });
 
     // Bind events:
-    if (renderer.bind) {
-      renderer.bind('clickNode', this._handler);
-      renderer.bind('overNode', this._handler);
-      renderer.bind('outNode', this._handler);
-      renderer.bind('downNode', this._handler);
-      renderer.bind('upNode', this._handler);
-    }
+    if (renderer.bind)
+      renderer.bind(
+        [
+          'clickNode',
+          'clickNodes',
+          'overNode',
+          'overNodes',
+          'outNode',
+          'outNodes',
+          'downNode',
+          'downNodes',
+          'upNode',
+          'upNodes'
+        ],
+        this._handler
+      );
 
     // Reference the renderer by its camera:
     this.renderersPerCamera[camera.id].push(renderer);

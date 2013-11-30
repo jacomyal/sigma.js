@@ -81,6 +81,8 @@
        * the users will drag any of the renderers, it will move the other one
        * as well.
        *
+       * Also, settings are different fo both renderers.
+       *
        * It might look a bit useless (I prefer overkill...), but it makes
        * possible to develop renderers linked by their camera, for example to
        * implement a minimap.
@@ -116,12 +118,10 @@
         type: 'webgl',
         camera: cam,
         settings: {
-          batchEdgesDrawing: false,
+          defaultLabelColor: '#fff',
           defaultNodeColor: '#999',
           defaultEdgeColor: '#333',
-          edgeColor: 'default',
-          defaultLabelColor: '#fff',
-          hideEdgesOnMove: false
+          edgeColor: 'default'
         }
       });
 
@@ -130,10 +130,12 @@
         type: 'canvas',
         camera: cam,
         settings: {
+          batchEdgesDrawing: true,
+          hideEdgesOnMove: true,
+          defaultLabelColor: '#000',
           defaultNodeColor: '#666',
           defaultEdgeColor: '#999',
-          edgeColor: 'default',
-          defaultLabelColor: '#000'
+          edgeColor: 'default'
         }
       });
 
