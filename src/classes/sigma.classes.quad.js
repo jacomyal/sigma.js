@@ -529,8 +529,8 @@
    * property {object} _cache Cache for the area method.
    */
   var quad = function() {
-    this._tree = {};
     this._geom = _geom;
+    this._tree = null;
     this._cache = {
       query: false,
       result: false
@@ -604,7 +604,9 @@
    * @return {array}  An array of nodes retrieved.
    */
   quad.prototype.point = function(x, y) {
-    return _quadRetrievePoint({x: x, y: y}, this._tree) || [];
+    return this._tree ?
+      _quadRetrievePoint({x: x, y: y}, this._tree) || [] :
+      [];
   };
 
   /**
@@ -636,11 +638,13 @@
     }
 
     // Retrieving nodes
-    var nodes = _quadRetrieveArea(
-      rectData,
-      this._tree,
-      collisionFunc
-    );
+    var nodes = this._tree ?
+      _quadRetrieveArea(
+        rectData,
+        this._tree,
+        collisionFunc
+      ) :
+      [];
 
     // Object to array
     var nodesArray = [];
