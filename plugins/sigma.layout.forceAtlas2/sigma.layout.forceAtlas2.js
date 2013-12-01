@@ -993,15 +993,16 @@
     var self = this;
 
     function addJob() {
-      conrad.addJob({
-        id: 'forceatlas2_' + self.id,
-        job: self.forceatlas2.atomicGo,
-        end: function() {
-          self.refresh();
-          if (self.forceatlas2.isRunning)
-            addJob();
-        }
-      });
+      if (!conrad.hasJob('forceatlas2_' + self.id))
+        conrad.addJob({
+          id: 'forceatlas2_' + self.id,
+          job: self.forceatlas2.atomicGo,
+          end: function() {
+            self.refresh();
+            if (self.forceatlas2.isRunning)
+              addJob();
+          }
+        });
     }
 
     addJob();
