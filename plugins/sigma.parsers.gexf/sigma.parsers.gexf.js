@@ -39,10 +39,14 @@
         obj = arr[i];
 
         obj.id = obj.id;
-        obj.x = obj.viz.position.x;
-        obj.y = obj.viz.position.y;
-        obj.size = obj.viz.size;
-        obj.color = obj.viz.color;
+        if (obj.viz && typeof obj.viz === 'object') {
+          if (obj.viz.position && typeof obj.viz.position === 'object') {
+            obj.x = obj.viz.position.x;
+            obj.y = obj.viz.position.y;
+          }
+          obj.size = obj.viz.size;
+          obj.color = obj.viz.color;
+        }
       }
 
       arr = graph.edges;
