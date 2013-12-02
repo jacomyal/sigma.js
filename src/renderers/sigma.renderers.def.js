@@ -19,7 +19,7 @@
   }
 
   // Copy the good renderer:
-  sigma.renderers.def = true ?
+  sigma.renderers.def = webgl ?
     sigma.renderers.webgl :
     sigma.renderers.canvas;
 }).call(this);
