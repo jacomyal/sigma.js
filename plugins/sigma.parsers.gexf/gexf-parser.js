@@ -1,26 +1,22 @@
-/*
-| -------------------------------------------------------------------
-|  GEXF Parser
-| -------------------------------------------------------------------
-|
-|
-| Author : PLIQUE Guillaume (Yomguithereal)
-| URL: https://github.com/Yomguithereal/gexf-parser
-| Version : 1.0
-*/
-
-(function(undefined) {
+;(function(undefined) {
   'use strict';
 
-  // Helpers
-  //=========
+  /**
+   * GEXF Parser
+   * ============
+   *
+   * Author: PLIQUE Guillaume (Yomguithereal)
+   * URL: https://github.com/Yomguithereal/gexf-parser
+   * Version: 1.0
+   */
 
-  // Using prototypes was a bad idea for cross-browser compatibility
-  // I decided to go back to functions
-
-  var helpers = {
-
-    // Transform a NodeList Object to iterable array
+  /**
+   * Helper Namespace
+   * -----------------
+   *
+   * A useful batch of function dealing with DOM operations and types.
+   */
+  var _helpers = {
     nodeListToArray: function(nodeList) {
 
       // Return array
@@ -34,8 +30,14 @@
 
       return children;
     },
+    nodeListEach: function(nodeList, func) {
 
-    // Transform a NodeList Object into an indexed hash
+      // Iterating
+      for (var i = 0, len = nodeList.length; i < len; ++i) {
+        if (nodeList[i].nodeName !== '#text')
+          func(nodeList[i]);
+      }
+    },
     nodeListToHash: function(nodeList, filter) {
 
       // Return object
@@ -51,8 +53,6 @@
 
       return children;
     },
-
-    // Transform NamedNodeMap into hash of attributes
     namedNodeMapToObject: function(nodeMap) {
 
         // Return object
@@ -65,21 +65,17 @@
 
       return attributes;
     },
-
-    // Get first el by namespaced tag name
-    getFirstElementByTagNS: function(node, ns_tag) {
-      var el = node.getElementsByTagName(ns_tag[1])[0];
+    getFirstElementByTagNS: function(node, ns, tag) {
+      var el = node.getElementsByTagName(tag)[0];
 
       if (!el)
-        el = node.getElementsByTagNameNS(ns_tag[0], ns_tag[1])[0];
+        el = node.getElementsByTagNameNS(ns, tag)[0];
 
       if (!el)
-        el = node.getElementsByTagName(ns_tag.join(':'))[0];
+        el = node.getElementsByTagName(ns + ':' + tag)[0];
 
       return el;
     },
-
-    // Type Enforcing
     enforceType: function(type, value) {
 
       switch (type) {
@@ -96,82 +92,119 @@
       }
 
       return value;
+    },
+    getRGB: function(values) {
+      return (values[3]) ?
+        'rgba(' + values.join(',') + ')' :
+        'rgb(' + values.slice(0, -1).join(',') + ')';
     }
-
   };
 
 
-  //------------------------------------------------------------------
+  /**
+   * Parser Core Functions
+   * ----------------------
+   *
+   * The XML parser's functions themselves.
+   */
+
+  /**
+   * Node structure.
+   * A function returning an object guarded with default value.
+   *
+   * @param  {object} properties The node properties.
+   * @return {object}            The guarded node object.
+   */
+  function Node(properties) {
+
+    // Possible Properties
+    return {
+      id: properties.id,
+      label: properties.label,
+      attributes: properties.attributes || {},
+      viz: properties.viz || {}
+    };
+  }
 
 
-  // Structures
-  //============
+  /**
+   * Edge structure.
+   * A function returning an object guarded with default value.
+   *
+   * @param  {object} properties The edge properties.
+   * @return {object}            The guarded edge object.
+   */
+  function Edge(properties) {
 
-  // Graph Struct
-  //--------------
-  function graph(xml) {
+    // Possible Properties
+    return {
+      id: properties.id,
+      type: properties.type || 'undirected',
+      label: properties.label || '',
+      source: properties.source,
+      target: properties.target,
+      weight: +properties.weight || 1.0,
+      viz: properties.viz || {}
+    };
+  }
 
-    // TODO: Controls GEXF
-    // TODO: Hierarchy and Philogeny
-    // TODO: Dynamics
-    // TODO: Drop map instructions if performances were to be bad
-    // TODO: dealing with viz on edges tags
+  /**
+   * Graph parser.
+   * This structure parse a gexf string and return an object containing the
+   * parsed graph.
+   *
+   * @param  {string} xml The xml string of the gexf file to parse.
+   * @return {object}     The parsed graph.
+   */
+  function Graph(xml) {
+    var _xml = {};
 
     // Basic Properties
-    //
-    var _root_el = xml.getElementsByTagName('gexf')[0];
-    var _graph_el = xml.getElementsByTagName('graph')[0];
-    var _meta_el = xml.getElementsByTagName('meta')[0];
-    var _model_els = xml.getElementsByTagName('attribute');
-    var _node_els = xml.getElementsByTagName('node');
-    var _edge_els = xml.getElementsByTagName('edge');
+    //------------------
+    _xml.els = {
+      root: xml.getElementsByTagName('gexf')[0],
+      graph: xml.getElementsByTagName('graph')[0],
+      meta: xml.getElementsByTagName('meta')[0],
+      model: xml.getElementsByTagName('attribute'),
+      nodes: xml.getElementsByTagName('node'),
+      edges: xml.getElementsByTagName('edge')
+    };
 
-    var _hasViz = _root_el.getAttribute('xmlns:viz') !== null;
+    _xml.hasViz = !!_xml.els.root.getAttribute('xmlns:viz');
+    _xml.version = _xml.els.root.getAttribute('version') || '1.0';
+    _xml.mode = _xml.els.graph.getAttribute('mode') || 'static';
+
+    var edgeType = _xml.els.graph.getAttribute('defaultedgetype');
+    _xml.defaultEdgetype = edgeType || 'undirected';
+
 
     // Parser Functions
-    //
-
-    // Graph Version
-    function _version() {
-      return _root_el.getAttribute('version') || '1.0';
-    }
-
-    // Graph Mode
-    function _mode() {
-      return _graph_el.getAttribute('mode') || 'static';
-    }
-
-    // Default Edge Type
-    function _defaultEdgeType() {
-      return _graph_el.getAttribute('defaultedgetype') || 'undirected';
-    }
+    //------------------
 
     // Meta Data
     function _metaData() {
 
       var metas = {};
-      if (!_meta_el)
+      if (!_xml.els.meta)
         return metas;
 
       // Last modified date
-      metas.lastmodifieddate = _meta_el.getAttribute('lastmodifieddate');
+      metas.lastmodifieddate = _xml.els.meta.getAttribute('lastmodifieddate');
 
       // Other information
-      var meta_children = helpers.nodeListToArray(_meta_el.childNodes);
-
-      meta_children.map(function(child) {
+      _helpers.nodeListEach(_xml.els.meta.childNodes, function(child) {
         metas[child.tagName.toLowerCase()] = child.textContent;
       });
 
       return metas;
     }
 
-    // Models
+    // Model
     function _model() {
       var attributes = [];
 
       // Iterating through attributes
-      helpers.nodeListToArray(_model_els).map(function(attr) {
+      _helpers.nodeListEach(_xml.els.model, function(attr) {
 
         // Properties
         var properties = {
@@ -180,8 +213,8 @@
           title: attr.getAttribute('title') || ''
         };
 
-        // Getting default
-        var default_el = helpers.nodeListToArray(attr.childNodes);
+        // Defaults
+        var default_el = _helpers.nodeListToArray(attr.childNodes);
 
         if (default_el.length > 0)
           properties.defaultValue = default_el[0].textContent;
@@ -190,9 +223,7 @@
         attributes.push(properties);
       });
 
-      return {
-        attributes: attributes
-      };
+      return attributes;
     }
 
     // Nodes
@@ -200,7 +231,7 @@
       var nodes = [];
 
       // Iteration through nodes
-      helpers.nodeListToArray(_node_els).map(function(n) {
+      _helpers.nodeListEach(_xml.els.nodes, function(n) {
 
         // Basic properties
         var properties = {
@@ -209,14 +240,15 @@
         };
 
         // Retrieving data from nodes if any
-        if (model.attributes.length > 0)
+        if (model.length > 0)
           properties.attributes = _nodeData(model, n);
 
         // Retrieving viz information
-        if (_hasViz)
+        if (_xml.hasViz)
           properties.viz = _nodeViz(n);
 
-        nodes.push(node(properties));
+        // Pushing node
+        nodes.push(Node(properties));
       });
 
       return nodes;
@@ -229,8 +261,8 @@
       var attvalues_els = node.getElementsByTagName('attvalue');
 
       // Getting Node Indicated Attributes
-      var ah = helpers.nodeListToHash(attvalues_els, function(el) {
-        var attributes = helpers.namedNodeMapToObject(el.attributes);
+      var ah = _helpers.nodeListToHash(attvalues_els, function(el) {
+        var attributes = _helpers.namedNodeMapToObject(el.attributes);
         var key = attributes.id || attributes['for'];
 
         // Returning object
@@ -239,13 +271,13 @@
 
 
       // Iterating through model
-      model.attributes.map(function(a) {
+      model.map(function(a) {
 
         // Default value?
         var att_title = a.title.toLowerCase();
         data[att_title] = !(a.id in ah) && 'defaultValue' in a ?
-          helpers.enforceType(a.type, a.defaultValue) :
-          helpers.enforceType(a.type, ah[a.id]);
+          _helpers.enforceType(a.type, a.defaultValue) :
+          _helpers.enforceType(a.type, ah[a.id]);
 
       });
 
@@ -257,37 +289,34 @@
       var viz = {};
 
       // Color
-      var color_el = helpers.getFirstElementByTagNS(node, ['viz', 'color']);
+      var color_el = _helpers.getFirstElementByTagNS(node, 'viz', 'color');
 
       if (color_el) {
         var color = ['r', 'g', 'b', 'a'].map(function(c) {
           return color_el.getAttribute(c);
         });
 
-        viz.color = (color[4]) ?
-          'rgba(' + color.join(',') + ')' :
-          'rgb(' + color.slice(0, -1).join(',') + ')';
+        viz.color = _helpers.getRGB(color);
       }
 
       // Position
-      var pos_tag = ['viz', 'position'];
-      var position_el = helpers.getFirstElementByTagNS(node, pos_tag);
+      var pos_el = _helpers.getFirstElementByTagNS(node, 'viz', 'position');
 
-      if (position_el) {
+      if (pos_el) {
         viz.position = {};
 
         ['x', 'y', 'z'].map(function(p) {
-          viz.position[p] = +position_el.getAttribute(p);
+          viz.position[p] = +pos_el.getAttribute(p);
         });
       }
 
       // Size
-      var size_el = helpers.getFirstElementByTagNS(node, ['viz', 'size']);
+      var size_el = _helpers.getFirstElementByTagNS(node, 'viz', 'size');
       if (size_el)
         viz.size = +size_el.getAttribute('value');
 
       // Shape
-      var shape_el = helpers.getFirstElementByTagNS(node, ['viz', 'shape']);
+      var shape_el = _helpers.getFirstElementByTagNS(node, 'viz', 'shape');
       if (shape_el)
         viz.shape = shape_el.getAttribute('value');
 
@@ -299,76 +328,78 @@
       var edges = [];
 
       // Iteration through edges
-      helpers.nodeListToArray(_edge_els).map(function(e) {
+      _helpers.nodeListEach(_xml.els.edges, function(e) {
 
         // Creating the edge
-        var properties = helpers.namedNodeMapToObject(e.attributes);
+        var properties = _helpers.namedNodeMapToObject(e.attributes);
         if (!('type' in properties)) {
           properties.type = default_type;
         }
 
-        edges.push(edge(properties));
+        // Retrieving viz information
+        if (_xml.hasViz)
+          properties.viz = _edgeViz(e);
+
+        edges.push(Edge(properties));
       });
 
       return edges;
     }
 
+    // Viz information from edges
+    function _edgeViz(edge) {
+      var viz = {};
 
-    // Properties
-    //
-    var model = _model();
-    var defaultedgetype = _defaultEdgeType();
+      // Color
+      var color_el = _helpers.getFirstElementByTagNS(edge, 'viz', 'color');
+
+      if (color_el) {
+        var color = ['r', 'g', 'b', 'a'].map(function(c) {
+          return color_el.getAttribute(c);
+        });
+
+        viz.color = _helpers.getRGB(color);
+      }
+
+      // Shape
+      var shape_el = _helpers.getFirstElementByTagNS(edge, 'viz', 'shape');
+      if (shape_el)
+        viz.shape = shape_el.getAttribute('value');
+
+      // Thickness
+      var thick_el = _helpers.getFirstElementByTagNS(edge, 'viz', 'thickness');
+      if (thick_el)
+        viz.thickness = +thick_el.getAttribute('value');
+
+      return viz;
+    }
+
+
+    // Returning the Graph
+    //---------------------
+    _xml.model = _model();
 
     return {
-      version: _version(),
-      mode: _mode(),
-      defaultEdgeType: defaultedgetype,
+      version: _xml.version,
+      mode: _xml.mode,
+      defaultEdgeType: _xml.defaultEdgetype,
       meta: _metaData(),
-      model: model,
-      nodes: _nodes(model),
-      edges: _edges(defaultedgetype)
+      model: _xml.model,
+      nodes: _nodes(_xml.model),
+      edges: _edges(_xml.defaultEdgetype)
     };
   }
 
 
-  // Node Struct
-  //-------------
-  function node(properties) {
-
-    // Possible Properties
-    return {
-      id: properties.id,
-      label: properties.label,
-      attributes: properties.attributes || {},
-      viz: properties.viz || {}
-    };
-  }
-
-
-  // Edge Struct
-  //-------------
-  function edge(properties) {
-
-    // Possible Properties
-    return {
-      id: properties.id,
-      type: properties.type || 'undirected',
-      label: properties.label || '',
-      source: properties.source,
-      target: properties.target,
-      weight: +properties.weight || 1.0
-    };
-  }
-
-
-  //------------------------------------------------------------------
-
-
-  // Inner Functions
-  //=================
+  /**
+   * Public API
+   * -----------
+   *
+   * User-accessible functions.
+   */
 
   // Fetching GEXF with XHR
-  function _fetch(gexf_url, callback) {
+  function fetch(gexf_url, callback) {
     var xhr = (function() {
       if (window.XMLHttpRequest)
         return new XMLHttpRequest();
@@ -418,31 +449,30 @@
   }
 
   // Parsing the GEXF File
-  function _parse(gexf) {
-    return graph(gexf);
+  function parse(gexf) {
+    return Graph(gexf);
   }
 
   // Fetch and parse the GEXF File
-  function _fetchAndParse(gexf_url, callback) {
+  function fetchAndParse(gexf_url, callback) {
     if (typeof callback === 'function') {
-      return _fetch(gexf_url, function(gexf) {
-        callback(graph(gexf));
+      return fetch(gexf_url, function(gexf) {
+        callback(Graph(gexf));
       });
     } else
-      return graph(_fetch(gexf_url));
+      return Graph(fetch(gexf_url));
   }
 
 
-  //------------------------------------------------------------------
-
-
-  // Public API
-  //============
+  /**
+   * Exporting
+   * ----------
+   */
   this.GexfParser = {
 
     // Functions
-    parse: _parse,
-    fetch: _fetchAndParse,
+    parse: parse,
+    fetch: fetchAndParse,
 
     // Version
     version: '0.1'
