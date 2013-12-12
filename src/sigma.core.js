@@ -208,7 +208,7 @@
    * This methods will instanciate and reference a new camera. If no id is
    * specified, then an automatic id will be generated.
    *
-   * @param  {?string}      id Eventually the camera id.
+   * @param  {?string}              id Eventually the camera id.
    * @return {sigma.classes.camera}    The fresh new camera instance.
    */
   sigma.prototype.addCamera = function(id) {
@@ -428,7 +428,8 @@
       c = this.cameras[k];
       if (
         c.settings('autoRescale') &&
-        this.renderersPerCamera[c.id]
+        this.renderersPerCamera[c.id] &&
+        this.renderersPerCamera[c.id].length
       )
         sigma.middlewares.rescale.call(
           this,
@@ -438,6 +439,12 @@
             width: this.renderersPerCamera[c.id][0].width,
             height: this.renderersPerCamera[c.id][0].height
           }
+        );
+      else
+        sigma.middlewares.copy.call(
+          this,
+          a.length ? 'ready:' : '',
+          c.readPrefix
         );
 
       // Find graph boundaries:
@@ -514,8 +521,9 @@
    * per frame, unless you are using the "force" flag.
    *
    * @param  {sigma.classes.camera} camera The camera to render.
-   * @param  {?boolean}     force  If true, will render the camera directly.
-   * @return {sigma}               Returns the instance itself.
+   * @param  {?boolean}             force  If true, will render the camera
+   *                                       directly.
+   * @return {sigma}                       Returns the instance itself.
    */
   sigma.prototype.renderCamera = function(camera, force) {
     var i,

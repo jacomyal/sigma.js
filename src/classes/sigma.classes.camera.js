@@ -86,11 +86,7 @@
   sigma.classes.camera.prototype.applyView = function(read, write, options) {
     options = options || {};
     write = write !== undefined ? write : this.prefix;
-    read = read !== undefined ? read : (
-      this.settings('autoRescale') ?
-        this.readPrefix :
-        'ready:'
-    );
+    read = read !== undefined ? read : this.readPrefix;
 
     var nodes = options.nodes || this.graph.nodes(),
         edges = options.edges || this.graph.edges();
