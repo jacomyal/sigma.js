@@ -88,6 +88,15 @@ module.exports = function(grunt) {
           'build/sigma.min.js': coreJsFiles
         }
       }
+    },
+    concat: {
+      options: {
+        separator: ';'
+      },
+      dist: {
+        src: coreJsFiles,
+        dest: 'build/sigma.js'
+      }
     }
   });
 
