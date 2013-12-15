@@ -22,6 +22,9 @@
     if (size < settings('labelThreshold'))
       return;
 
+    if (typeof node.label !== 'string')
+      return;
+
     fontSize = (settings('labelSize') === 'fixed') ?
       settings('defaultLabelSize') :
       settings('labelSizeRatio') * size;
