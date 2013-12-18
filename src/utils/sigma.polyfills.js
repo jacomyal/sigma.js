@@ -41,9 +41,9 @@
     };
 
   /**
-   * Function.prototype.bind polyfill found on MSDN.
-   * Code distributed under the CC Licence:
-   *  > http://creativecommons.org/licenses/by-sa/2.5/
+   * Function.prototype.bind polyfill found on MDN.
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
+   * Public domain
    */
   if (!Function.prototype.bind)
     Function.prototype.bind = function(oThis) {
