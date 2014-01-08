@@ -46,7 +46,8 @@ module.exports = function(grunt) {
   ];
 
   var pluginFiles = [
-    'plugins/sigma.layout.forceAtlas2.js'
+    'plugins/sigma.layout.forceAtlas2/*.js',
+    'plugins/sigma.parsers.gexf/*.js'
   ];
 
   // Project configuration:
@@ -67,7 +68,8 @@ module.exports = function(grunt) {
       all: coreJsFiles.concat(pluginFiles),
       options: {
         '-W055': true,
-        '-W040': true
+        '-W040': true,
+        '-W064': true
       }
     },
     qunit: {
@@ -80,12 +82,20 @@ module.exports = function(grunt) {
       }
     },
     uglify: {
-      options: {
-        banner: '/* sigma.js - <%= pkg.description %> - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n'
-      },
       prod: {
         files: {
           'build/sigma.min.js': coreJsFiles
+        },
+        options: {
+          banner: '/* sigma.js - <%= pkg.description %> - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n'
+        }
+      },
+      plugins: {
+        files: {
+          'build/sigma.plugins.min.js': pluginFiles
+        },
+        options: {
+          banner: '/* sigma.js plugins - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n'
         }
       }
     },
