@@ -27,21 +27,11 @@
  * from, out of or in connection with the software or the use or other dealings
  * in the Software.
  */
-;(function(undefined) {
-  /**
-   * CODING CONVENTION:
-   * ******************
-   *
-   * First, here are the prefixing convention
-   *  . foobar:   Local variable.
-   *  . _foobar:  Private variable, directly related to conrad core.
-   *  . __foobar: Tooling function.
-   */
-
+(function(global) {
   'use strict';
 
   // Check that conrad.js has not been loaded yet:
-  if (this.conrad)
+  if (global.conrad)
     throw new Error('conrad already exists');
 
 
@@ -128,7 +118,7 @@
    *
    * @type {Object}
    */
-  var _handlers = {};
+  var _handlers = Object.create(null);
 
 
   /**
@@ -140,10 +130,10 @@
    * Will execute the handler everytime that the indicated event (or the
    * indicated events) will be triggered.
    *
-   * @param  {string}           events  The name of the event (or the events
-   *                                    separated by spaces).
-   * @param  {function(Object)} handler The handler to bind.
-   * @return {Object}           Returns conrad.
+   * @param  {string|array|object} events  The name of the event (or the events
+   *                                       separated by spaces).
+   * @param  {function(Object)}    handler The handler to bind.
+   * @return {Object}                      Returns conrad.
    */
   function _bind(events, handler) {
     var i,
@@ -151,16 +141,16 @@
         eArray;
 
     if (!arguments.length)
-      return this;
+      return;
     else if (
       arguments.length === 1 &&
-      typeof arguments[0] === 'object'
+      Object(arguments[0]) === arguments[0]
     )
       for (events in arguments[0])
         _bind(events, arguments[0][events]);
     else if (arguments.length > 1) {
       eArray =
-        Object.prototype.toString.call(events) === '[object Array]' ?
+        Array.isArray(events) ?
           events :
           events.split(/ /);
 
@@ -177,8 +167,6 @@
         });
       }
     }
-
-    return this;
   }
 
   /**
@@ -197,17 +185,13 @@
         j,
         a,
         event,
-        eArray = Object.prototype.toString.call(events) === '[object Array]' ?
+        eArray = Array.isArray(events) ?
                    events :
                    events.split(/ /);
 
-    if (!arguments.length) {
-      for (i in _handlers)
-        delete _handlers[i];
-      return this;
-    }
-
-    if (handler) {
+    if (!arguments.length)
+      _handlers = Object.create(null);
+    else if (handler) {
       for (i in eArray) {
         event = eArray[i];
         if (_handlers[event]) {
@@ -225,8 +209,6 @@
     } else
       for (i in eArray)
         delete _handlers[eArray[i]];
-
-    return this;
   }
 
   /**
@@ -242,7 +224,7 @@
         j,
         event,
         eventName,
-        eArray = Object.prototype.toString.call(events) === '[object Array]' ?
+        eArray = Array.isArray(events) ?
                    events :
                    events.split(/ /);
 
@@ -258,11 +240,11 @@
         };
 
         for (j in _handlers[eventName])
-          _handlers[eventName][j].handler(event);
+          try {
+            _handlers[eventName][j].handler(event);
+          } catch (e) {}
       }
     }
-
-    return this;
   }
 
   /**
@@ -489,7 +471,7 @@
         o;
 
     // Array of jobs:
-    if (Object.prototype.toString.call(v1) === '[object Array]') {
+    if (Array.isArray(v1)) {
       // Keep conrad to start until the last job is added:
       _noStart = true;
 
@@ -608,7 +590,7 @@
         found = false;
 
     // Array of job ids:
-    if (Object.prototype.toString.call(v1) === '[object Array]')
+    if (Array.isArray(v1))
       for (i = 0, l = v1.length; i < l; i++)
         _killJob(v1[i]);
 
@@ -735,7 +717,7 @@
    * @return {Boolean} Returns _isRunning.
    */
   function _getIsRunning() {
-    return !!_isRunning;
+    return _isRunning;
   }
 
   /**
@@ -918,7 +900,7 @@
     if (!item)
       return item;
 
-    if (Object.prototype.toString.call(item) === '[object Array]') {
+    if (Array.isArray(item)) {
       result = [];
       for (i = 0, l = item.length; i < l; i++)
         result.push(__clone(item[i]));
@@ -957,12 +939,20 @@
     return Date.now ? Date.now() : new Date().getTime();
   }
 
+  /**
+   * Polyfill for the Array.isArray function:
+   */
+  if (!Array.isArray)
+    Array.isArray = function(v) {
+      return Object.prototype.toString.call(v) === '[object Array]';
+    };
+
 
   /**
    * EXPORT PUBLIC API:
    * ******************
    */
-  this.conrad = {
+  var conrad = {
     hasJob: _hasJob,
     addJob: _addJob,
     killJob: _killJob,
@@ -979,4 +969,11 @@
     // Version:
     version: '0.1.0'
   };
-}).call(this);
+
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports)
+      exports = module.exports = conrad;
+    exports.conrad = conrad;
+  } else
+    global.conrad = conrad;
+})(this);
