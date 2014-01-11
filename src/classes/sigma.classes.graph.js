@@ -4,15 +4,34 @@
   var _methods = {},
       _indexes = {},
       _initBindings = {},
-      _methodBindings = {};
+      _methodBindings = {},
+      _defaultSettings = {
+        immutable: true,
+        clone: true
+      },
+      _defaultSettingsFunction = function(key) {
+        return _defaultSettings[key];
+      };
 
   /**
    * The graph constructor. It initializes the data and the indexes, and binds
    * the custom indexes and methods to its own scope.
    *
-   * @return {graph} The new graph instance.
+   * Recognized parameters:
+   * **********************
+   * Here is the exhaustive list of every accepted parameters in the settings
+   * object:
+   *
+   *   {boolean} clone     Indicates if the data have to be cloned in methods
+   *                       to add nodes or edges.
+   *   {boolean} immutable Indicates if nodes "id" values and edges "id",
+   *                       "source" and "target" values must be set as
+   *                       immutable.
+   *
+   * @param  {?configurable} settings Eventually a settings function.
+   * @return {graph}                  The new graph instance.
    */
-  var graph = function() {
+  var graph = function(settings) {
     var k,
         fn,
         data;
@@ -25,6 +44,11 @@
      * and it is possible to add other type of data in it.
      */
     data = {
+      /**
+       * SETTINGS FUNCTION:
+       * ******************
+       */
+      settings: settings || _defaultSettingsFunction,
 
       /**
        * MAIN DATA:
@@ -284,8 +308,9 @@
    * string under the key "id". Except for this, it is possible to add any
    * other attribute, that will be preserved all along the manipulations.
    *
-   * The node will be cloned when added to the graph, to prevent its id to be
-   * writable in the future.
+   * If the graph option "clone" has a truthy value, the node will be cloned
+   * when added to the graph. Also, if the graph option "immutable" has a
+   * truthy value, its id will be defined as immutable.
    *
    * @param  {object} node The node to add.
    * @return {object}      The graph instance.
@@ -305,16 +330,22 @@
         id = node.id,
         validNode = {};
 
-    // Add the id such that it is not possible to modify it:
-    Object.defineProperty(validNode, 'id', {
-      value: node.id,
-      enumerable: true
-    });
+    // Check the "clone" option:
+    if (this.settings('clone')) {
+      for (k in node)
+        if (k !== 'id')
+          validNode[k] = node[k];
+    } else
+      validNode = node;
 
-    // Add other attributes:
-    for (k in node)
-      if (k !== 'id')
-        validNode[k] = node[k];
+    // Check the "immutable" option:
+    if (this.settings('immutable'))
+      Object.defineProperty(validNode, 'id', {
+        value: id,
+        enumerable: true
+      });
+    else
+      validNode.id = id;
 
     // Add empty containers for edges indexes:
     this.inNeighborsIndex[id] = {};
@@ -340,8 +371,9 @@
    * add any other attribute, that will be preserved all along the
    * manipulations.
    *
-   * The edge will be cloned when added to the graph, to prevent its id, source
-   * and target to be writable in the future.
+   * If the graph option "clone" has a truthy value, the edge will be cloned
+   * when added to the graph. Also, if the graph option "immutable" has a
+   * truthy value, its id, source and target will be defined as immutable.
    *
    * @param  {object} edge The edge to add.
    * @return {object}      The graph instance.
@@ -363,29 +395,38 @@
     if (this.edgesIndex[edge.id])
       throw 'The edge "' + edge.id + '" already exists.';
 
-    var k, validEdge = {};
+    var k,
+        validEdge = {};
 
-    // Add the id, the source and the target such that it is not possible to
-    // modify it:
-    Object.defineProperty(validEdge, 'id', {
-      value: edge.id,
-      enumerable: true
-    });
+    // Check the "clone" option:
+    if (this.settings('clone')) {
+      for (k in edge)
+        if (k !== 'id' && k !== 'source' && k !== 'target')
+          validEdge[k] = edge[k];
+    } else
+      validEdge = edge;
 
-    Object.defineProperty(validEdge, 'source', {
-      value: edge.source,
-      enumerable: true
-    });
+    // Check the "immutable" option:
+    if (this.settings('immutable')) {
+      Object.defineProperty(validEdge, 'id', {
+        value: edge.id,
+        enumerable: true
+      });
 
-    Object.defineProperty(validEdge, 'target', {
-      value: edge.target,
-      enumerable: true
-    });
+      Object.defineProperty(validEdge, 'source', {
+        value: edge.source,
+        enumerable: true
+      });
 
-    // Add other attributes:
-    for (k in edge)
-      if (k !== 'id' && k !== 'source' && k !== 'target')
-        validEdge[k] = edge[k];
+      Object.defineProperty(validEdge, 'target', {
+        value: edge.target,
+        enumerable: true
+      });
+    } else {
+      validEdge.id = edge.id;
+      validEdge.source = edge.source;
+      validEdge.target = edge.target;
+    }
 
     // Add the edge to indexes:
     this.edgesArray.push(validEdge);

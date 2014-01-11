@@ -135,7 +135,7 @@
 
     // Initialize locked attributes:
     Object.defineProperty(this, 'graph', {
-      value: new sigma.classes.graph(),
+      value: new sigma.classes.graph(this.settings),
       configurable: true
     });
     Object.defineProperty(this, 'middlewares', {

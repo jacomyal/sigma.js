@@ -9,6 +9,18 @@
 
   var settings = {
     /**
+     * GRAPH SETTINGS:
+     * ***************
+     */
+    // {boolean} Indicates if the data have to be cloned in methods to add
+    //           nodes or edges.
+    clone: true,
+    // {boolean} Indicates if nodes "id" values and edges "id", "source" and
+    //           "target" values must be set as immutable.
+    immutable: true,
+
+
+    /**
      * RENDERERS SETTINGS:
      * *******************
      */

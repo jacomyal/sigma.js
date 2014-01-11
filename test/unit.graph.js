@@ -3,6 +3,8 @@ module('sigma.classes.graph');
 test('Basic manipulation', function() {
   var a,
       k,
+      opts = {},
+      settings = new sigma.classes.configurable(opts),
       graph = {
         nodes: [
           {
@@ -17,6 +19,10 @@ test('Basic manipulation', function() {
           {
             id: 'n2',
             label: 'Node 2'
+          },
+          {
+            id: 'n3',
+            label: 'Node 3'
           }
         ],
         edges: [
@@ -30,19 +36,36 @@ test('Basic manipulation', function() {
             id: 'e1',
             source: 'n1',
             target: 'n2'
+          },
+          {
+            id: 'e2',
+            source: 'n1',
+            target: 'n3'
+          },
+          {
+            id: 'e3',
+            source: 'n2',
+            target: 'n3'
           }
         ]
       };
 
   // Initialize the graph:
-  var myGraph = new sigma.classes.graph();
-  for (k in graph.nodes)
-    myGraph.addNode(graph.nodes[k]);
-  for (k in graph.edges)
-    myGraph.addEdge(graph.edges[k]);
+  var myGraph = new sigma.classes.graph(settings);
 
+  opts.immutable = opts.clone = true;
+  myGraph.addNode(graph.nodes[0]);
+  opts.clone = false;
+  myGraph.addNode(graph.nodes[1]);
+  myGraph.addNode(graph.nodes[2]);
+  myGraph.addNode(graph.nodes[3]);
 
-
+  opts.immutable = opts.clone = true;
+  myGraph.addEdge(graph.edges[0]);
+  opts.clone = false;
+  myGraph.addEdge(graph.edges[1]);
+  myGraph.addEdge(graph.edges[2]);
+  myGraph.addEdge(graph.edges[3]);
 
   // NODES:
   // ******
@@ -55,21 +78,30 @@ test('Basic manipulation', function() {
   notStrictEqual(
     graph.nodes[0],
     myGraph.nodes(graph.nodes[0].id),
-    '"addNode" creates a new object.'
+    'With {clone: true}, "addNode" creates a new object.'
   );
 
-  notStrictEqual(
-    graph.nodes[0],
-    myGraph.nodes(graph.nodes[0].id),
-    '"addNode" creates a new object.'
+  equal(
+    graph.nodes[1],
+    myGraph.nodes(graph.nodes[1].id),
+    'With {clone: false}, "addNode" keeps the same object.'
   );
 
   myGraph.nodes(graph.nodes[0].id).id = 'new_n0';
   strictEqual(
     graph.nodes[0].id,
     myGraph.nodes(graph.nodes[0].id).id,
-    'Node ids in the graph are not writable.'
+    'With {immutable: true}, node ids in the graph are not writable.'
   );
+
+  var node = myGraph.nodes(graph.nodes[1].id);
+  node.id = 'new_n0';
+  strictEqual(
+    'new_n0',
+    node.id,
+    'With {immutable: false}, node ids in the graph are writable.'
+  );
+  node.id = 'n1';
 
   myGraph.nodes(graph.nodes[0].id).label = 'New node 0';
   strictEqual(
@@ -127,35 +159,52 @@ test('Basic manipulation', function() {
   notStrictEqual(
     graph.edges[0],
     myGraph.edges(graph.edges[0].id),
-    '"addEdge" creates a new object.'
+    'With {clone: true}, "addEdge" creates a new object.'
   );
 
-  notStrictEqual(
-    graph.edges[0],
-    myGraph.edges(graph.edges[0].id),
-    '"addEdge" creates a new object.'
+  equal(
+    graph.edges[1],
+    myGraph.edges(graph.edges[1].id),
+    'With {clone: false}, "addEdge" keeps the same object.'
   );
 
   myGraph.edges(graph.edges[0].id).id = 'new_e0';
-  strictEqual(
-    graph.edges[0].id,
-    myGraph.edges(graph.edges[0].id).id,
-    'Edge ids in the graph are not writable.'
-  );
-
   myGraph.edges(graph.edges[0].id).source = 'undefined_node';
-  strictEqual(
-    graph.edges[0].source,
-    myGraph.edges(graph.edges[0].id).source,
-    'Edge sources in the graph are not writable.'
+  myGraph.edges(graph.edges[0].id).target = 'undefined_node';
+  deepEqual(
+    [
+      graph.edges[0].id,
+      graph.edges[0].source,
+      graph.edges[0].target
+    ],
+    [
+      myGraph.edges(graph.edges[0].id).id,
+      myGraph.edges(graph.edges[0].id).source,
+      myGraph.edges(graph.edges[0].id).target
+    ],
+    'With {immutable: true}, edge sources, targets and ids in the graph are not writable.'
   );
 
-  myGraph.edges(graph.edges[0].id).target = 'undefined_node';
-  strictEqual(
-    graph.edges[0].target,
-    myGraph.edges(graph.edges[0].id).target,
-    'Edge sources in the graph are not writable.'
+  var edge = myGraph.edges(graph.edges[1].id);
+  edge.id = 'new_e0';
+  edge.source = 'undefined_node';
+  edge.target = 'undefined_node';
+  deepEqual(
+    [
+      'new_e0',
+      'undefined_node',
+      'undefined_node'
+    ],
+    [
+      edge.id,
+      edge.source,
+      edge.target
+    ],
+    'With {immutable: false}, edge sources, targets and ids in the graph are writable.'
   );
+  edge.id = 'e1';
+  edge.source = 'n1';
+  edge.target = 'n2';
 
   myGraph.edges(graph.edges[0].id).myEdgeAttr = 456;
   strictEqual(
@@ -207,12 +256,12 @@ test('Basic manipulation', function() {
   myGraph.dropNode('n0');
   deepEqual(
     myGraph.nodes().map(function(n) { return n.id }),
-    ['n1', 'n2'],
+    ['n1', 'n2', 'n3'],
     '"dropNode" actually drops the node.'
   );
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e1'],
+    ['e1', 'e2', 'e3'],
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
@@ -226,8 +275,8 @@ test('Basic manipulation', function() {
 
   myGraph.dropEdge('e1');
   deepEqual(
-    myGraph.edges(),
-    [],
+    myGraph.edges().map(function(e) { return e.id }),
+    ['e2', 'e3'],
     '"dropEdge" actually drops the edge.'
   );
 
