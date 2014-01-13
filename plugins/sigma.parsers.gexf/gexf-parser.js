@@ -66,15 +66,26 @@
       return attributes;
     },
     getFirstElementByTagNS: function(node, ns, tag) {
-      var el = node.getElementsByTagName(tag)[0];
+      var el = node.getElementsByTagName(ns + ':' + tag)[0];
 
       if (!el)
         el = node.getElementsByTagNameNS(ns, tag)[0];
 
       if (!el)
-        el = node.getElementsByTagName(ns + ':' + tag)[0];
+        el = node.getElementsByTagName(tag)[0];
 
       return el;
+    },
+    getAttributeNS: function(node, ns, attribute) {
+      var attr_value = node.getAttribute(ns + ':' + attribute);
+
+      if (attr_value === undefined)
+        attr_value = node.getAttributeNS(ns, attribute);
+
+      if (attr_value === undefined)
+        attr_value = node.getAttribute(attribute);
+
+      return attr_value;
     },
     enforceType: function(type, value) {
 
@@ -170,7 +181,7 @@
       edges: xml.getElementsByTagName('edge')
     };
 
-    _xml.hasViz = !!_xml.els.root.getAttribute('xmlns:viz');
+    _xml.hasViz = !!_helpers.getAttributeNS(_xml.els.root, 'xmlns', 'viz');
     _xml.version = _xml.els.root.getAttribute('version') || '1.0';
     _xml.mode = _xml.els.graph.getAttribute('mode') || 'static';
 
@@ -427,25 +438,36 @@
     if (!xhr)
       throw 'XMLHttpRequest not supported, cannot load the file.';
 
-    if (typeof callback === 'function') {
+    // Async?
+    var async = (typeof callback === 'function'),
+        getResult;
+
+    // If we can't override MIME type, we are on IE 9
+    // We'll be parsing the response string then.
+    if (xhr.overrideMimeType) {
       xhr.overrideMimeType('text/xml');
-      xhr.open('GET', gexf_url, true);
+      getResult = function(r) {
+        return r.responseXML;
+      };
+    }
+    else {
+      getResult = function(r) {
+        var p = new DOMParser();
+        return p.parseFromString(r.responseText, 'application/xml');
+      };
+    }
+
+    xhr.open('GET', gexf_url, async);
+
+    if (async)
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4)
-          callback(xhr.responseXML);
+          callback(getResult(xhr));
       };
-      xhr.send();
 
-      // Returning XHR object
-      return xhr;
-    } else {
-      xhr.overrideMimeType('text/xml');
-      xhr.open('GET', gexf_url, false);
-      xhr.send();
+    xhr.send();
 
-      // Returning GEXF content
-      return xhr.responseXML;
-    }
+    return (async) ? xhr : getResult(xhr);
   }
 
   // Parsing the GEXF File
