@@ -14,25 +14,28 @@
   }
 
   /**
-   * This function loads a GEXF file and creates a new sigma instance or
-   * updates the graph of a given instance. It is possible to give a callback
-   * that will be executed at the end of the process.
+   * If the first arguments is a valid URL, this function loads a GEXF file and
+   * creates a new sigma instance or updates the graph of a given instance. It
+   * is possible to give a callback that will be executed at the end of the
+   * process. And if the first argument is a DOM element, it will skip the
+   * loading step and parse the given XML tree to fill the graph.
    *
-   * @param  {string}       url      The URL of the GEXF file.
-   * @param  {object|sigma} sig      A sigma configuration object or a sigma
-   *                                 instance.
-   * @param  {?function}    callback Eventually a callback to execute after
-   *                                 having parsed the file. It will be called
-   *                                 with the related sigma instance as
-   *                                 parameter.
+   * @param  {string|DOMElement} target   The URL of the GEXF file or a valid
+   *                                      GEXF tree.
+   * @param  {object|sigma}      sig      A sigma configuration object or a
+   *                                      sigma instance.
+   * @param  {?function}         callback Eventually a callback to execute
+   *                                      after having parsed the file. It will
+   *                                      be called with the related sigma
+   *                                      instance as parameter.
    */
-  sigma.parsers.gexf = function(url, sig, callback) {
+  sigma.parsers.gexf = function(target, sig, callback) {
     var i,
         l,
         arr,
         obj;
 
-    GexfParser.fetch(url, function(graph) {
+    function parse(graph) {
       // Adapt the graph:
       arr = graph.nodes;
       for (i = 0, l = arr.length; i < l; i++) {
@@ -83,8 +86,16 @@
       }
 
       // Call the callback if specified:
-      if (callback)
+      if (callback) {
         callback(sig || graph);
-    });
+        return;
+      } else
+        return graph;
+    }
+
+    if (typeof target === 'string')
+      GexfParser.fetch(target, parse);
+    else if (typeof target === 'object')
+      return parse(GexfParser.parse(target));
   };
 }).call(this);
