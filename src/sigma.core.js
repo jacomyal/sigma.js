@@ -346,6 +346,7 @@
     if (renderer.bind)
       renderer.bind(
         [
+          'click',
           'clickNode',
           'clickNodes',
           'overNode',

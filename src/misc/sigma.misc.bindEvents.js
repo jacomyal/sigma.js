@@ -91,6 +91,8 @@
         if (!self.settings('eventsEnabled'))
           return;
 
+        self.dispatchEvent('click', e.data);
+
         nodes = getNodes(e);
 
         if (nodes.length) {
