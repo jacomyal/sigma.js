@@ -30,6 +30,7 @@ module.exports = function(grunt) {
     'src/renderers/webgl/sigma.webgl.nodes.fast.js',
     'src/renderers/webgl/sigma.webgl.edges.def.js',
     'src/renderers/webgl/sigma.webgl.edges.fast.js',
+    'src/renderers/webgl/sigma.webgl.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.labels.def.js',
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',

@@ -327,7 +327,7 @@
 
           'void main() {',
             // Find the good point:
-            'vec2 position = normalize(a_pos2 - a_pos1);',
+            'vec2 pos = normalize(a_pos2 - a_pos1);',
 
             'mat2 matrix = (1.0 - a_head) *',
               '(',
@@ -338,13 +338,13 @@
                 '(a_headPosition * a_headPosition - 1.0) * mat2(1.0)',
               ');',
 
-            'position = a_pos1 + (',
+            'pos = a_pos1 + (',
               // Deal with body:
-              '(1.0 - a_head) * a_thickness * u_ratio * matrix * position +',
+              '(1.0 - a_head) * a_thickness * u_ratio * matrix * pos +',
               // Deal with head:
-              'a_head * u_arrowHead * a_thickness * u_ratio * matrix * position +',
+              'a_head * u_arrowHead * a_thickness * u_ratio * matrix * pos +',
               // Deal with delay:
-              'a_delay * position * (',
+              'a_delay * pos * (',
                 'a_tSize / u_nodeRatio +',
                 'u_arrowHead * a_thickness * u_ratio',
               ')',
@@ -352,7 +352,7 @@
 
             // Scale from [[-1 1] [-1 1]] to the container:
             'gl_Position = vec4(',
-              '((u_matrix * vec3(position, 1)).xy /',
+              '((u_matrix * vec3(pos, 1)).xy /',
                 'u_resolution * 2.0 - 1.0) * vec2(1, -1),',
               '0,',
               '1',
