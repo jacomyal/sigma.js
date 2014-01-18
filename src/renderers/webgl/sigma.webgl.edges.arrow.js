@@ -4,23 +4,24 @@
   sigma.utils.pkg('sigma.webgl.edges');
 
   /**
-   * This edge renderer will display edges as lines going from the source node
+   * This edge renderer will display edges as arrows going from the source node
    * to the target node. To deal with edge thicknesses, the lines are made of
-   * two triangles forming rectangles, with the gl.TRIANGLES drawing mode.
+   * three triangles: two forming rectangles, with the gl.TRIANGLES drawing
+   * mode.
    *
-   * It is expensive, since drawing a single edge requires 6 points, each
-   * having 7 attributes (source position, target position, thickness, color
-   * and a flag indicating which vertice of the rectangle it is).
+   * It is expensive, since drawing a single edge requires 9 points, each
+   * having a lot of attributes.
    */
-  sigma.webgl.edges.def = {
-    POINTS: 6,
-    ATTRIBUTES: 7,
+  sigma.webgl.edges.arrow = {
+    POINTS: 9,
+    ATTRIBUTES: 11,
     addEdge: function(edge, source, target, data, i, prefix, settings) {
       var w = (edge[prefix + 'size'] || 1) / 2,
           x1 = source[prefix + 'x'],
           y1 = source[prefix + 'y'],
           x2 = target[prefix + 'x'],
           y2 = target[prefix + 'y'],
+          targetSize = target[prefix + 'size'],
           color = edge.color;
 
       if (!color)
@@ -44,6 +45,10 @@
       data[i++] = x2;
       data[i++] = y2;
       data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
       data[i++] = 0.0;
       data[i++] = color;
 
@@ -52,31 +57,35 @@
       data[i++] = x1;
       data[i++] = y1;
       data[i++] = w;
+      data[i++] = targetSize;
       data[i++] = 1.0;
-      data[i++] = color;
-
-      data[i++] = x2;
-      data[i++] = y2;
-      data[i++] = x1;
-      data[i++] = y1;
-      data[i++] = w;
-      data[i++] = 0.0;
-      data[i++] = color;
-
-      data[i++] = x2;
-      data[i++] = y2;
-      data[i++] = x1;
-      data[i++] = y1;
-      data[i++] = w;
-      data[i++] = 0.0;
-      data[i++] = color;
-
-      data[i++] = x1;
-      data[i++] = y1;
-      data[i++] = x2;
-      data[i++] = y2;
-      data[i++] = w;
       data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = color;
+
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = color;
+
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
       data[i++] = color;
 
       data[i++] = x1;
@@ -84,23 +93,84 @@
       data[i++] = x2;
       data[i++] = y2;
       data[i++] = w;
+      data[i++] = targetSize;
       data[i++] = 0.0;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = color;
+
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = 0.0;
+      data[i++] = color;
+
+      // Arrow head:
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 1.0;
+      data[i++] = -1.0;
+      data[i++] = color;
+
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = color;
+
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = w;
+      data[i++] = targetSize;
+      data[i++] = 1.0;
+      data[i++] = 0.0;
+      data[i++] = 1.0;
+      data[i++] = 1.0;
       data[i++] = color;
     },
     render: function(gl, program, data, params) {
       var buffer;
 
       // Define attributes:
-      var colorLocation =
-            gl.getAttribLocation(program, 'a_color'),
-          positionLocation1 =
-            gl.getAttribLocation(program, 'a_position1'),
+      var positionLocation1 =
+            gl.getAttribLocation(program, 'a_pos1'),
           positionLocation2 =
-            gl.getAttribLocation(program, 'a_position2'),
+            gl.getAttribLocation(program, 'a_pos2'),
           thicknessLocation =
             gl.getAttribLocation(program, 'a_thickness'),
+          targetSizeLocation =
+            gl.getAttribLocation(program, 'a_tSize'),
+          delayLocation =
+            gl.getAttribLocation(program, 'a_delay'),
           minusLocation =
             gl.getAttribLocation(program, 'a_minus'),
+          headLocation =
+            gl.getAttribLocation(program, 'a_head'),
+          headPositionLocation =
+            gl.getAttribLocation(program, 'a_headPosition'),
+          colorLocation =
+            gl.getAttribLocation(program, 'a_color'),
           resolutionLocation =
             gl.getUniformLocation(program, 'u_resolution'),
           matrixLocation =
@@ -111,6 +181,10 @@
             gl.getUniformLocation(program, 'u_matrixHalfPiMinus'),
           ratioLocation =
             gl.getUniformLocation(program, 'u_ratio'),
+          nodeRatioLocation =
+            gl.getUniformLocation(program, 'u_nodeRatio'),
+          arrowHeadLocation =
+            gl.getUniformLocation(program, 'u_arrowHead'),
           scaleLocation =
             gl.getUniformLocation(program, 'u_scale');
 
@@ -123,6 +197,12 @@
         ratioLocation,
         params.ratio / Math.pow(params.ratio, params.settings('edgesPowRatio'))
       );
+      gl.uniform1f(
+        nodeRatioLocation,
+        Math.pow(params.ratio, params.settings('nodesPowRatio')) /
+        params.ratio
+      );
+      gl.uniform1f(arrowHeadLocation, 5.0);
       gl.uniform1f(scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
       gl.uniformMatrix2fv(
@@ -136,11 +216,15 @@
         sigma.utils.matrices.rotation(-Math.PI / 2, true)
       );
 
-      gl.enableVertexAttribArray(colorLocation);
       gl.enableVertexAttribArray(positionLocation1);
       gl.enableVertexAttribArray(positionLocation2);
       gl.enableVertexAttribArray(thicknessLocation);
+      gl.enableVertexAttribArray(targetSizeLocation);
+      gl.enableVertexAttribArray(delayLocation);
       gl.enableVertexAttribArray(minusLocation);
+      gl.enableVertexAttribArray(headLocation);
+      gl.enableVertexAttribArray(headPositionLocation);
+      gl.enableVertexAttribArray(colorLocation);
 
       gl.vertexAttribPointer(positionLocation1,
         2,
@@ -163,19 +247,47 @@
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
         16
       );
-      gl.vertexAttribPointer(minusLocation,
+      gl.vertexAttribPointer(targetSizeLocation,
         1,
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
         20
       );
-      gl.vertexAttribPointer(colorLocation,
+      gl.vertexAttribPointer(delayLocation,
         1,
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
         24
+      );
+      gl.vertexAttribPointer(minusLocation,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        28
+      );
+      gl.vertexAttribPointer(headLocation,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        32
+      );
+      gl.vertexAttribPointer(headPositionLocation,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        36
+      );
+      gl.vertexAttribPointer(colorLocation,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        40
       );
 
       gl.drawArrays(
@@ -192,14 +304,20 @@
       vertexShader = sigma.utils.loadShader(
         gl,
         [
-          'attribute vec2 a_position1;',
-          'attribute vec2 a_position2;',
+          'attribute vec2 a_pos1;',
+          'attribute vec2 a_pos2;',
           'attribute float a_thickness;',
+          'attribute float a_tSize;',
+          'attribute float a_delay;',
           'attribute float a_minus;',
+          'attribute float a_head;',
+          'attribute float a_headPosition;',
           'attribute float a_color;',
 
           'uniform vec2 u_resolution;',
           'uniform float u_ratio;',
+          'uniform float u_nodeRatio;',
+          'uniform float u_arrowHead;',
           'uniform float u_scale;',
           'uniform mat3 u_matrix;',
           'uniform mat2 u_matrixHalfPi;',
@@ -209,13 +327,28 @@
 
           'void main() {',
             // Find the good point:
-            'vec2 position = a_thickness * u_ratio *',
-              'normalize(a_position2 - a_position1);',
+            'vec2 position = normalize(a_pos2 - a_pos1);',
 
-            'mat2 matrix = a_minus * u_matrixHalfPiMinus +',
-              '(1.0 - a_minus) * u_matrixHalfPi;',
+            'mat2 matrix = (1.0 - a_head) *',
+              '(',
+                'a_minus * u_matrixHalfPiMinus +',
+                '(1.0 - a_minus) * u_matrixHalfPi',
+              ') + a_head * (',
+                'a_headPosition * u_matrixHalfPiMinus * 0.6 +',
+                '(a_headPosition * a_headPosition - 1.0) * mat2(1.0)',
+              ');',
 
-            'position = matrix * position + a_position1;',
+            'position = a_pos1 + (',
+              // Deal with body:
+              '(1.0 - a_head) * a_thickness * u_ratio * matrix * position +',
+              // Deal with head:
+              'a_head * u_arrowHead * a_thickness * u_ratio * matrix * position +',
+              // Deal with delay:
+              'a_delay * position * (',
+                'a_tSize / u_nodeRatio +',
+                'u_arrowHead * a_thickness * u_ratio',
+              ')',
+            ');',
 
             // Scale from [[-1 1] [-1 1]] to the container:
             'gl_Position = vec4(',

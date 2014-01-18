@@ -141,7 +141,7 @@
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.edges[a[i].type]) ? k : 'def';
+      k = (a[i].type && sigma.webgl.edges[a[i].type]) ? a[i].type : 'def';
 
       if (!this.edgeFloatArrays[k])
         this.edgeFloatArrays[k] = {
@@ -300,6 +300,7 @@
                 this.edgePrograms[a[i]],
                 arr,
                 {
+                  settings: this.settings,
                   matrix: matrix,
                   width: this.width,
                   height: this.height,
@@ -359,6 +360,7 @@
               this.edgePrograms[k],
               this.edgeFloatArrays[k].array,
               {
+                settings: this.settings,
                 matrix: matrix,
                 width: this.width,
                 height: this.height,
@@ -391,6 +393,7 @@
             this.nodePrograms[k],
             this.nodeFloatArrays[k].array,
             {
+              settings: this.settings,
               matrix: matrix,
               width: this.width,
               height: this.height,
