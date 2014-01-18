@@ -108,11 +108,21 @@ module.exports = function(grunt) {
         src: coreJsFiles,
         dest: 'build/sigma.js'
       }
+    },
+    sed: {
+      version: {
+        recursive: true,
+        path: 'examples/',
+        pattern: /<!-- START SIGMA IMPORTS -->[\s\S]*<!-- END SIGMA IMPORTS -->/g,
+        replacement: ['<!-- START SIGMA IMPORTS -->'].concat(coreJsFiles.map(function(path) {
+          return '<script src="../' + path + '"></script>';
+        }).concat('<!-- END SIGMA IMPORTS -->')).join('\n    ')
+      }
     }
   });
 
   require('load-grunt-tasks')(grunt);
 
   // By default, will check lint, hint, test and minify:
-  grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'uglify']);
+  grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
 };
