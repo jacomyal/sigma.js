@@ -35,6 +35,7 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',
     'src/renderers/canvas/sigma.canvas.edges.def.js',
+    'src/renderers/canvas/sigma.canvas.edges.arrow.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',

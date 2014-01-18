@@ -4,18 +4,31 @@
   sigma.utils.pkg('sigma.canvas.edges');
 
   /**
-   * The default edge renderer. It renders the node as a simple line.
+   * This edge renderer will display edges as arrows going from the source node
+   * to the target node.
    *
    * @param  {object}                   node     The node object.
    * @param  {CanvasRenderingContext2D} context  The canvas context.
    * @param  {configurable}             settings The settings function.
    */
-  sigma.canvas.edges.def = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor');
+        defaultEdgeColor = settings('defaultEdgeColor'),
+        thickness = edge[prefix + 'size'] || 1,
+        tSize = target[prefix + 'size'],
+        sX = source[prefix + 'x'],
+        sY = source[prefix + 'y'],
+        tX = target[prefix + 'x'],
+        tY = target[prefix + 'y'],
+        aSize = thickness * 2.5,
+        d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
+        aX = sX + (tX - sX) * (d - aSize - tSize) / d,
+        aY = sY + (tY - sY) * (d - aSize - tSize) / d,
+        vX = (tX - sX) * aSize / d,
+        vY = (tY - sY) * aSize / d;
 
     if (!color)
       switch (edgeColor) {
@@ -31,16 +44,22 @@
       }
 
     context.strokeStyle = color;
-    context.lineWidth = edge[prefix + 'size'] || 1;
+    context.lineWidth = thickness;
     context.beginPath();
-    context.moveTo(
-      source[prefix + 'x'],
-      source[prefix + 'y']
-    );
+    context.moveTo(sX, sY);
     context.lineTo(
-      target[prefix + 'x'],
-      target[prefix + 'y']
+      aX,
+      aY
     );
     context.stroke();
+
+    context.fillStyle = color;
+    context.beginPath();
+    context.moveTo(aX + vX, aY + vY);
+    context.lineTo(aX + vY * 0.6, aY - vX * 0.6);
+    context.lineTo(aX - vY * 0.6, aY + vX * 0.6);
+    context.lineTo(aX + vX, aY + vY);
+    context.closePath();
+    context.fill();
   };
 })();
