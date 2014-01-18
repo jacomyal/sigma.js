@@ -211,6 +211,28 @@
   };
 
   /**
+   * Returns the offset of a DOM element.
+   *
+   * @param  {DOMElement} dom The element to retrieve the position.
+   * @return {object}         The offset of the DOM element (top, left).
+   */
+  sigma.utils.getOffset = function(dom) {
+    var left = 0,
+        top = 0;
+
+    while (dom) {
+      top = top + parseInt(dom.offsetTop);
+      left = left + parseInt(dom.offsetLeft);
+      dom = dom.offsetParent;
+    }
+
+    return {
+      top: top,
+      left: left
+    };
+  };
+
+  /**
    * Simulates a "double click" event.
    *
    * @param  {HTMLElement} target   The event target.

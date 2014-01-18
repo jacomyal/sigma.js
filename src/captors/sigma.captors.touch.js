@@ -62,6 +62,14 @@
     _target.addEventListener('touchleave', _handleLeave);
     _target.addEventListener('touchmove', _handleMove);
 
+    function position(e) {
+      var offset = sigma.utils.getOffset(_target);
+
+      return {
+        x: e.pageX - offset.left,
+        y: e.pageY - offset.top
+      };
+    }
 
 
 
@@ -78,7 +86,9 @@
         var x0,
             x1,
             y0,
-            y1;
+            y1,
+            pos0,
+            pos1;
 
         _downTouches = e.touches;
 
@@ -93,18 +103,21 @@
             _lastCameraX = _camera.x;
             _lastCameraY = _camera.y;
 
-            _startTouchX0 = sigma.utils.getX(_downTouches[0]);
-            _startTouchY0 = sigma.utils.getY(_downTouches[0]);
+            pos0 = position(_downTouches[0]);
+            _startTouchX0 = pos0.x;
+            _startTouchY0 = pos0.y;
 
             break;
           case 2:
             _camera.isMoving = true;
             _touchMode = 2;
 
-            x0 = sigma.utils.getX(_downTouches[0]);
-            y0 = sigma.utils.getY(_downTouches[0]);
-            x1 = sigma.utils.getX(_downTouches[1]);
-            y1 = sigma.utils.getY(_downTouches[1]);
+            pos0 = position(_downTouches[0]);
+            pos1 = position(_downTouches[1]);
+            x0 = pos0.x;
+            y0 = pos0.y;
+            x1 = pos1.x;
+            y1 = pos1.y;
 
             _lastCameraX = _camera.x;
             _lastCameraY = _camera.y;
@@ -209,6 +222,8 @@
             cos,
             sin,
             end,
+            pos0,
+            pos1,
             diff,
             start,
             dAngle,
@@ -230,8 +245,9 @@
 
         switch (_touchMode) {
           case 1:
-            x0 = sigma.utils.getX(_downTouches[0]);
-            y0 = sigma.utils.getY(_downTouches[0]);
+            pos0 = position(_downTouches[0]);
+            x0 = pos0.x;
+            y0 = pos0.y;
 
             diff = _camera.cameraPosition(
               x0 - _startTouchX0,
@@ -255,10 +271,12 @@
             }
             break;
           case 2:
-            x0 = sigma.utils.getX(_downTouches[0]);
-            y0 = sigma.utils.getY(_downTouches[0]);
-            x1 = sigma.utils.getX(_downTouches[1]);
-            y1 = sigma.utils.getY(_downTouches[1]);
+            pos0 = position(_downTouches[0]);
+            pos1 = position(_downTouches[1]);
+            x0 = pos0.x;
+            y0 = pos0.y;
+            x1 = pos1.x;
+            y1 = pos1.y;
 
             start = _camera.cameraPosition(
               (_startTouchX0 + _startTouchX1) / 2 - e.target.width / 2,
