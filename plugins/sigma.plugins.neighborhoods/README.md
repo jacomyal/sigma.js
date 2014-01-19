@@ -5,25 +5,20 @@ Plugin developed by [Alexis Jacomy](https://github.com/jacomyal).
 
 ---
 
-This plugin provides a single function, `sigma.parsers.json()`, that will load a JSON encoded file, parse it, eventually instanciate sigma and fill the graph with the `graph.read()` method. The main goal is to avoid using jQuery only to load an external JSON file.
+This plugin provides a method to retrieve the neighborhood of a node. Basically, it loads a graph and stores it in a headless `sigma.classes.graph` instance, that you can query to retrieve neighborhoods.
 
-The most basic way to use this helper is to call it with a path and a sigma configuration object. It will then instanciate sigma, but after having added the graph into the config object.
+It is useful for people who want to provide a neighborhoods navigation inside a big graph instead of just displaying it, and without having to deploy an API or the list of every neighborhoods. But please note that this plugin is here as an example of what you can do with the graph model, and do not hesitate to try customizing your navigation through graphs.
 
-````javascript
-sigma.parsers.json(
-  'myGraph.json',
-  { container: 'myContainer' }
-);
-````
+This plugin also adds to the graph model a method called "neighborhood". Check the code for more information.
 
-It is also possible to update an existing instance's graph instead.
+Here is how to use it:
 
 ````javascript
-sigma.parsers.json(
-  'myGraph.json',
-  myExistingInstance,
-  function() {
-    myExistingInstance.refresh();
-  }
-);
+var db = new sigma.plugins.neighborhoods();
+db.load('path/to/my/graph.json', function() {
+  var nodeId = 'anyNodeID';
+  mySigmaInstance
+    .read(db.neighborhood(nodeId))
+    .refresh();
+});
 ````

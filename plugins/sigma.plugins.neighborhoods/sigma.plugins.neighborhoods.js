@@ -1,30 +1,24 @@
 /**
- * This plugin "emulates" a graph database that provides a unique method to
- * retrieve the neighborhood of a node. Basically, it loads a graph and stores
- * it in a headless sigma.classes.graph instance.
+ * This plugin provides a method to retrieve the neighborhood of a node.
+ * Basically, it loads a graph and stores it in a headless sigma.classes.graph
+ * instance, that you can query to retrieve neighborhoods.
  *
  * It is useful for people who want to provide a neighborhoods navigation
- * inside a big graph instead of just displaying it.
+ * inside a big graph instead of just displaying it, and without having to
+ * deploy an API or the list of every neighborhoods.
  *
  * This plugin also adds to the graph model a method called "neighborhood".
- * Check the comments of the method for more information.
+ * Check the code for more information.
  *
- * Here is how the plugin works:
+ * Here is how to use it:
  *
- * 1. Initialize it like this:
  *  > var db = new sigma.plugins.neighborhoods();
- *  > db.init('path/to/my/graph.json');
- *
- * 2. Wait for it to be ready, by using its "onready" method:
- *  > db.onready(function() {
- *  >   console.log('db is ready!');
+ *  > db.load('path/to/my/graph.json', function() {
+ *  >   var nodeId = 'anyNodeID';
+ *  >   mySigmaInstance
+ *  >     .read(db.neighborhood(nodeId))
+ *  >     .refresh();
  *  > });
- *
- * 3. Retrieve the neighborhood of a node:
- *  > var centerNodeID = 'anyNodeID';
- *  > mySigmaInstance
- *  >   .read(db.neighborhood(centerNodeID))
- *  >   .refresh();
  */
 (function() {
   'use strict';
@@ -119,32 +113,23 @@
         graph = new sigma.classes.graph();
 
     /**
-     * This method just returns the neighborhood of a node
+     * This method just returns the neighborhood of a node.
      *
-     * @param  {[type]}   centerNodeID [description]
-     * @param  {Function} callback     [description]
-     * @return {[type]}                [description]
+     * @param  {string} centerNodeID The ID of the center node.
+     * @return {object}              Returns the neighborhood.
      */
-    this.getNeighborhood = function(centerNodeID, callback) {
-      return ready ?
-        graph.neighborhood(centerNodeID) :
-        {
-          nodes: [],
-          edges: []
-        };
+    this.neighborhood = function(centerNodeID) {
+      return graph.neighborhood(centerNodeID);
     };
-    this.onready = function(callback) {
-      if (ready)
-        callback();
-      else
-        readyCallbacks.push(callback);
 
-      return this;
-    };
-    this.init = function(path) {
-      // Reset unready state:
-      ready = false;
-
+    /**
+     * This method loads the JSON graph at "path", stores it in the local graph
+     * instance, and executes the callback.
+     *
+     * @param {string}    path     The path of the JSON graph file.
+     * @param {?function} callback Eventually a callback to execute.
+     */
+    this.load = function(path, callback) {
       // Quick XHR polyfill:
       var xhr = (function() {
         if (window.XMLHttpRequest)
@@ -176,13 +161,10 @@
       xhr.open('GET', path, true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-          // When the file is loaded, we can initialize everything and execute
-          // the "ready" callbacks:
           graph.clear().read(JSON.parse(xhr.responseText));
-          ready = true;console.log(readyCallbacks.length);
-          readyCallbacks.forEach(function(fn) {console.log('asklmhas');
-            fn();
-          });
+
+          if (callback)
+            callback();
         }
       };
 
@@ -190,6 +172,15 @@
       xhr.send();
 
       return this;
+    };
+
+    /**
+     * This method cleans the graph instance "reads" a graph into it.
+     *
+     * @param {object} g The graph object to read.
+     */
+    this.read = function(g) {
+      graph.clear().read(g);
     };
   };
 }).call(window);

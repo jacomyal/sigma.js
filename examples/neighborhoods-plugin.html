@@ -65,6 +65,19 @@
     <script src="../plugins/sigma.layout.forceAtlas2/sigma.layout.forceAtlas2.js"></script>
     <script src="../plugins/sigma.plugins.neighborhoods/sigma.plugins.neighborhoods.js"></script>
     <script>
+      /**
+       * This example shows how to explore the neighborhoods inside a graph,
+       * with a simple example plugin.
+       *
+       * Basically, a graph is loaded into a kind of database mockup (the
+       * sigma.plugins.neighborhoods plugin) that provides a method to retrieve
+       * the neighborhood (or ego-centered network) of a specified node. Then,
+       * a sigma instance will display only this graph, instead of the global
+       * one.
+       *
+       * And also, if you are looking for an exemple of graph custom method or
+       * how to use the graph model outside of sigma, this is the place.
+       */
       var s = new sigma({
             container: 'graph-container',
             settings: {
@@ -92,44 +105,42 @@
         });
       });
 
-      db.onready(function() {
+      db.load('data/arctic.json', function() {
         // Out function to initialize sigma on a new neighborhood:
         function refreshGraph(centerNodeId) {
-          db.loadNeighborhood(centerNodeId, function(graph) {
-            // First, let's stop the ForceAtlas2 algorithm:
-            s.stopForceAtlas2();
+          // First, let's stop the ForceAtlas2 algorithm:
+          s.stopForceAtlas2();
 
-            // Restart the camera:
-            s.cameras[0].goTo({
-              x: 0,
-              y: 0,
-              angle: 0,
-              ratio: 1
-            });
-
-            // Empty the graph:
-            s.graph.clear();
-
-            // Read the graph:
-            s.graph.read(graph);
-
-            // Randomize the positions of the nodes and initialize their size:
-            var i,
-                nodes = s.graph.nodes(),
-                len = nodes.length;
-
-            for (i = 0; i < len; i++) {
-              nodes[i].x = Math.cos(Math.PI * 2 * i / len);
-              nodes[i].y = Math.sin(Math.PI * 2 * i / len);
-            }
-
-            // Refresh the display:
-            s.refresh();
-
-            // Start the ForceAtlas2 algorithm:
-            s.startForceAtlas2();
-            document.getElementById('toggle-layout').innerHTML = 'Stop layout';
+          // Restart the camera:
+          s.cameras[0].goTo({
+            x: 0,
+            y: 0,
+            angle: 0,
+            ratio: 1
           });
+
+          // Empty the graph:
+          s.graph.clear();
+
+          // Read the graph:
+          s.graph.read(db.neighborhood(centerNodeId));
+
+          // Randomize the positions of the nodes and initialize their size:
+          var i,
+              nodes = s.graph.nodes(),
+              len = nodes.length;
+
+          for (i = 0; i < len; i++) {
+            nodes[i].x = Math.cos(Math.PI * 2 * i / len);
+            nodes[i].y = Math.sin(Math.PI * 2 * i / len);
+          }
+
+          // Refresh the display:
+          s.refresh();
+
+          // Start the ForceAtlas2 algorithm:
+          s.startForceAtlas2();
+          document.getElementById('toggle-layout').innerHTML = 'Stop layout';
         }
 
         // Let's now bind this new function to the "clickNode" event:
@@ -140,7 +151,7 @@
 
         // And finally, let's initialize the first graph:
         refreshGraph('1');
-      }).init('data/arctic.json');
+      });
     </script>
   </body>
 </html>
