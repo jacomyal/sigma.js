@@ -1,10 +1,10 @@
 ;(function(undefined) {
   'use strict';
 
-  var _methods = {},
-      _indexes = {},
-      _initBindings = {},
-      _methodBindings = {},
+  var _methods = Object.create(null),
+      _indexes = Object.create(null),
+      _initBindings = Object.create(null),
+      _methodBindings = Object.create(null),
       _defaultSettings = {
         immutable: true,
         clone: true
@@ -62,8 +62,8 @@
        * ***************
        * These indexes just index data by ids.
        */
-      nodesIndex: {},
-      edgesIndex: {},
+      nodesIndex: Object.create(null),
+      edgesIndex: Object.create(null),
 
       /**
        * LOCAL INDEXES:
@@ -71,13 +71,13 @@
        * These indexes refer from node to nodes. Each key is an id, and each
        * value is the array of the ids of related nodes.
        */
-      inNeighborsIndex: {},
-      outNeighborsIndex: {},
-      allNeighborsIndex: {},
+      inNeighborsIndex: Object.create(null),
+      outNeighborsIndex: Object.create(null),
+      allNeighborsIndex: Object.create(null),
 
-      inNeighborsCount: {},
-      outNeighborsCount: {},
-      allNeighborsCount: {}
+      inNeighborsCount: Object.create(null),
+      outNeighborsCount: Object.create(null),
+      allNeighborsCount: Object.create(null)
     };
 
     // Execute bindings:
@@ -135,7 +135,7 @@
     var k;
 
     for (k in obj)
-      if (obj.hasOwnProperty(k))
+      if (!('hasOwnProperty' in obj) || obj.hasOwnProperty(k))
         delete obj[k];
 
     return obj;
@@ -177,7 +177,7 @@
       throw 'The method "' + methodName + '" already exists.';
 
     _methods[methodName] = fn;
-    _methodBindings[methodName] = {};
+    _methodBindings[methodName] = Object.create(null);
 
     return this;
   };
@@ -328,7 +328,7 @@
 
     var k,
         id = node.id,
-        validNode = {};
+        validNode = Object.create(null);
 
     // Check the "clone" option:
     if (this.settings('clone')) {
@@ -348,9 +348,9 @@
       validNode.id = id;
 
     // Add empty containers for edges indexes:
-    this.inNeighborsIndex[id] = {};
-    this.outNeighborsIndex[id] = {};
-    this.allNeighborsIndex[id] = {};
+    this.inNeighborsIndex[id] = Object.create(null);
+    this.outNeighborsIndex[id] = Object.create(null);
+    this.allNeighborsIndex[id] = Object.create(null);
 
     this.inNeighborsCount[id] = 0;
     this.outNeighborsCount[id] = 0;
@@ -396,7 +396,7 @@
       throw 'The edge "' + edge.id + '" already exists.';
 
     var k,
-        validEdge = {};
+        validEdge = Object.create(null);
 
     // Check the "clone" option:
     if (this.settings('clone')) {
@@ -433,19 +433,19 @@
     this.edgesIndex[validEdge.id] = validEdge;
 
     if (!this.inNeighborsIndex[edge.target][edge.source])
-      this.inNeighborsIndex[edge.target][edge.source] = {};
+      this.inNeighborsIndex[edge.target][edge.source] = Object.create(null);
     this.inNeighborsIndex[edge.target][edge.source][edge.id] = edge;
 
     if (!this.outNeighborsIndex[edge.source][edge.target])
-      this.outNeighborsIndex[edge.source][edge.target] = {};
+      this.outNeighborsIndex[edge.source][edge.target] = Object.create(null);
     this.outNeighborsIndex[edge.source][edge.target][edge.id] = edge;
 
     if (!this.allNeighborsIndex[edge.source][edge.target])
-      this.allNeighborsIndex[edge.source][edge.target] = {};
+      this.allNeighborsIndex[edge.source][edge.target] = Object.create(null);
     this.allNeighborsIndex[edge.source][edge.target][edge.id] = edge;
 
     if (!this.allNeighborsIndex[edge.target][edge.source])
-      this.allNeighborsIndex[edge.target][edge.source] = {};
+      this.allNeighborsIndex[edge.target][edge.source] = Object.create(null);
     this.allNeighborsIndex[edge.target][edge.source][edge.id] = edge;
 
     // Keep counts up to date:
@@ -778,7 +778,7 @@
    * *******
    */
   if (typeof sigma !== 'undefined') {
-    sigma.classes = sigma.classes || {};
+    sigma.classes = sigma.classes || Object.create(null);
     sigma.classes.graph = graph;
   } else if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports)

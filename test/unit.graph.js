@@ -145,6 +145,12 @@ test('Basic manipulation', function() {
     'Adding an already existing node throws an error.'
   );
 
+  myGraph.addNode({ id: 'prototype' }).addNode({ id: 'constructor' });
+  ok(
+    myGraph.nodes('prototype') && myGraph.nodes('constructor'),
+    '"constructor" and "prototype" are valid node IDs.'
+  );
+  myGraph.dropNode('prototype').dropNode('constructor');
 
 
 
