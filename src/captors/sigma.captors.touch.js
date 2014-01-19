@@ -52,10 +52,12 @@
         _touchMode,
 
         _isMoving,
+        _doubleTap,
         _movingTimeoutId;
 
     sigma.classes.dispatcher.extend(this);
 
+    sigma.utils.doubleClick(_target, 'touchstart', _doubleTapHandler);
     _target.addEventListener('touchstart', _handleStart);
     _target.addEventListener('touchend', _handleLeave);
     _target.addEventListener('touchcancel', _handleLeave);
@@ -162,8 +164,10 @@
         _downTouches = e.touches;
         var inertiaRatio = _settings('touchInertiaRatio');
 
-        if (_movingTimeoutId)
+        if (_movingTimeoutId) {
+          _isMoving = false;
           clearTimeout(_movingTimeoutId);
+        }
 
         switch (_touchMode) {
           case 2:
@@ -214,7 +218,7 @@
      * @param {event} e A touch event.
      */
     function _handleMove(e) {
-      if (_settings('touchEnabled')) {
+      if (!_doubleTap && _settings('touchEnabled')) {
         var x0,
             x1,
             y0,
@@ -341,6 +345,72 @@
         }
 
         e.preventDefault();
+        return false;
+      }
+    }
+
+    /**
+     * The handler listening to the double tap custom event. It will
+     * basically zoom into the graph.
+     *
+     * @param {event} e A touch event.
+     */
+    function _doubleTapHandler(e) {
+      var pos,
+          count,
+          ratio,
+          newRatio;
+
+
+      if (e.touches && e.touches.length === 1 && _settings('touchEnabled')) {
+        _doubleTap = true;
+
+        ratio = 1 / _settings('doubleClickZoomingRatio');
+
+        // Deal with min / max:
+        newRatio = Math.max(
+          _settings('zoomMin'),
+          Math.min(
+            _settings('zoomMax'),
+            _camera.ratio * ratio
+          )
+        );
+        ratio = newRatio / _camera.ratio;
+
+        // Check that the new ratio is different from the initial one:
+        if (newRatio !== _camera.ratio) {
+          count = sigma.misc.animation.killAll(_camera);
+
+          pos = position(e.touches[0]);
+          pos = _camera.cameraPosition(
+            pos.x - e.target.width / 2,
+            pos.y - e.target.height / 2,
+            true
+          );
+
+          sigma.misc.animation.camera(
+            _camera,
+            {
+              x: pos.x * (1 - ratio) + _camera.x,
+              y: pos.y * (1 - ratio) + _camera.y,
+              ratio: newRatio
+            },
+            {
+              easing: count ? 'quadraticOut' : 'quadraticInOut',
+              duration: _settings('doubleClickZoomDuration'),
+              onComplete: function() {
+                _doubleTap = false;
+              }
+            }
+          );
+        }
+
+        if (e.preventDefault)
+          e.preventDefault();
+        else
+          e.returnValue = false;
+
+        e.stopPropagation();
         return false;
       }
     }

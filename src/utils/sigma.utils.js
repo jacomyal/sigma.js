@@ -236,13 +236,14 @@
    * Simulates a "double click" event.
    *
    * @param  {HTMLElement} target   The event target.
+   * @param  {string}      type     The event type.
    * @param  {function}    callback The callback to execute.
    */
-  sigma.utils.doubleClick = function(target, callback) {
+  sigma.utils.doubleClick = function(target, type, callback) {
     var clicks = 0,
         self = this;
 
-    target.addEventListener('click', function(e) {
+    target.addEventListener(type, function(e) {
       clicks++;
 
       if (clicks === 2) {
