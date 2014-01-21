@@ -84,7 +84,7 @@
 
     fn = function() {
       var coef,
-          t = (sigma.utils.dateNow() - start) / o.duration;
+          t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
 
       // If the animation is over:
       if (t >= 1) {

@@ -72,11 +72,13 @@
     });
 
     // Initialize the DOM elements:
-    this.initDOM('canvas', 'edges', true);
-    this.initDOM('canvas', 'nodes', true);
+    this.initDOM('canvas', 'scene', true);
     this.initDOM('canvas', 'labels');
     this.initDOM('canvas', 'mouse');
     this.contexts.hover = this.contexts.mouse;
+
+    this.contexts.nodes = this.contexts.scene;
+    this.contexts.edges = this.contexts.scene;
 
     // Initialize captors:
     this.captors = [];
