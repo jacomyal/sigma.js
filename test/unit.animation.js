@@ -7,7 +7,7 @@ asyncTest('Camera animation', function() {
 
   var hasTestedFrame,
       graph = new sigma.classes.graph(),
-      camera = new sigma.classes.camera('myCam', graph, sigma.classes.configurable());
+      camera = new sigma.classes.camera('myCam', graph, sigma.classes.configurable(sigma.settings));
 
   // Fill the graph:
   graph.addNode({

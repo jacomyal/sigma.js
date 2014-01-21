@@ -48,6 +48,9 @@
    * @return {camera}             Returns the camera.
    */
   sigma.classes.camera.prototype.goTo = function(coordinates) {
+    if (!this.settings('enableCamera'))
+      return this;
+
     var i,
         l,
         c = coordinates || {},
