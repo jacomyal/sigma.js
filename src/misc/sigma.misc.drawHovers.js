@@ -53,12 +53,13 @@
           });
 
       // Render
-      for (k in hoveredNodes)
-        (renderers[hoveredNodes[k].type] || renderers.def)(
-          hoveredNodes[k],
-          self.contexts.hover,
-          embedSettings
-        );
+      if (embedSettings('enableHovering'))
+        for (k in hoveredNodes)
+          (renderers[hoveredNodes[k].type] || renderers.def)(
+            hoveredNodes[k],
+            self.contexts.hover,
+            embedSettings
+          );
     }
   };
 }).call(this);

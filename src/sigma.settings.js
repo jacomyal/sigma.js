@@ -178,6 +178,14 @@
     // {boolean} Determines whether the "rescale" middleware has to be called
     //           automatically for each camera on refresh.
     autoRescale: true,
+    // {boolean} If set to false, the camera method "goTo" will basically do
+    //           nothing.
+    enableCamera: true,
+    // {boolean} If set to false, the nodes cannot be hovered.
+    enableHovering: true,
+    // {boolean} If set to true, the rescale middleware will ignore node sizes
+    //           to determine the graphs boundings.
+    rescaleIgnoreSize: false,
     // {boolean} Determines if the core has to try to catch errors on
     //           rendering.
     skipErrors: false,

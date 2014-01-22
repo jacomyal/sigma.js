@@ -68,7 +68,11 @@
      * approximation of the scaling ratio.
      **/
     margin =
-      (settings('maxNodeSize') || sizeMax) / scale +
+      (
+        settings('rescaleIgnoreSize') ?
+          0 :
+          (settings('maxNodeSize') || sizeMax) / scale
+      ) +
       (settings('sideMargin') || 0);
     maxX += margin;
     minX -= margin;

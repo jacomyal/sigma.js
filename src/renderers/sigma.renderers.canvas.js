@@ -64,9 +64,20 @@
     this.options.prefix = 'renderer' + this.conradId + ':';
 
     // Initialize the DOM elements:
-    this.initDOM('canvas', 'edges');
-    this.initDOM('canvas', 'nodes');
-    this.initDOM('canvas', 'labels');
+    if (
+      !this.settings('batchEdgesDrawing')
+    ) {
+      this.initDOM('canvas', 'scene');
+      this.contexts.edges = this.contexts.scene;
+      this.contexts.nodes = this.contexts.scene;
+      this.contexts.labels = this.contexts.scene;
+    } else {
+      this.initDOM('canvas', 'edges');
+      this.initDOM('canvas', 'scene');
+      this.contexts.nodes = this.contexts.scene;
+      this.contexts.labels = this.contexts.scene;
+    }
+
     this.initDOM('canvas', 'mouse');
     this.contexts.hover = this.contexts.mouse;
 

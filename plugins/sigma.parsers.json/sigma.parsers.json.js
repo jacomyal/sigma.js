@@ -74,8 +74,8 @@
 
         // ...or it's finally the callback:
         } else if (typeof sig === 'function') {
-          sig = null;
           callback = sig;
+          sig = null;
         }
 
         // Call the callback if specified:

@@ -146,7 +146,7 @@ test('Position', function() {
   }
 
   var pos,
-      camera = new sigma.classes.camera();
+      camera = new sigma.classes.camera('myCam', undefined, sigma.classes.configurable(sigma.settings));
 
   camera.goTo({
     x: 2,
