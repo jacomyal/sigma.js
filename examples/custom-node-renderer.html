@@ -160,6 +160,68 @@
         return renderer;
       })();
 
+      var starShape = function(node,x,y,size,context) {
+        var pcount = node.numPoints || 5,
+        inRatio = node.innerRatio || 0.5,
+        outR = size,
+        inR = size*inRatio,
+        angleOffset = Math.PI/pcount;
+        context.moveTo(x, y-size); // first point on outer radius, top
+        for(var i=0; i<pcount; i++) {
+          context.lineTo(x+Math.sin(angleOffset+2*Math.PI*i/pcount)*inR,
+          y-Math.cos(angleOffset+2*Math.PI*i/pcount)*inR);
+          context.lineTo(x+Math.sin(2*Math.PI*(i+1)/pcount)*outR,
+          y-Math.cos(2*Math.PI*(i+1)/pcount)*outR);
+        }
+      }
+
+      var starShape = function(node,x,y,size,context) {
+        var pcount = node.numPoints || 5,
+        inRatio = node.innerRatio || 0.5,
+        outR = size,
+        inR = size*inRatio,
+        angleOffset = Math.PI/pcount;
+        context.moveTo(x, y-size); // first point on outer radius, top
+        for(var i=0; i<pcount; i++) {
+          context.lineTo(x+Math.sin(angleOffset+2*Math.PI*i/pcount)*inR,
+          y-Math.cos(angleOffset+2*Math.PI*i/pcount)*inR);
+          context.lineTo(x+Math.sin(2*Math.PI*(i+1)/pcount)*outR,
+          y-Math.cos(2*Math.PI*(i+1)/pcount)*outR);
+        }
+      }
+
+      var renderer = function(drawShape) {
+
+        // Return the renderer itself:
+        return function(node, context, settings) {
+          var args = arguments,
+              prefix = settings('prefix') || '',
+              size = node[prefix + 'size'],
+              color = node.color || settings('defaultNodeColor'),
+              x = node[prefix + 'x']
+              y = node[prefix + 'y'];
+
+            context.save();
+            // Draw shape
+            context.beginPath();
+            context.fillStyle = color;
+            drawShape(node,x,y,size,context);
+            context.closePath();
+            context.fill();
+
+            // Draw the border:
+            context.beginPath();
+            context.lineWidth = size / 5;
+            context.strokeStyle = node.color || settings('defaultNodeColor');
+            drawShape(node,x,y,size,context);
+            context.closePath();
+            context.stroke();
+            context.restore();
+        };
+
+      };
+
+      sigma.canvas.nodes.star = renderer(starShape);
       // Now that's the renderer has been implemented, let's generate a graph
       // to render:
       var i,
@@ -191,7 +253,7 @@
         g.nodes.push({
           id: 'n' + i,
           label: 'Node ' + i,
-          type: img ? 'image' : 'def',
+          type: img ? 'image' : 'star',
           url: img ? urls[Math.floor(Math.random() * urls.length)] : null,
           x: Math.random(),
           y: Math.random(),
