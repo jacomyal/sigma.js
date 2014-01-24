@@ -9,6 +9,7 @@
         bottom: 0;
         left: 0;
         right: 0;
+        background: #333333;
       }
 
       #graph-container {
@@ -54,6 +55,7 @@
     <script src="../src/misc/sigma.misc.bindEvents.js"></script>
     <script src="../src/misc/sigma.misc.drawHovers.js"></script>
     <!-- END SIGMA IMPORTS -->
+    <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
     <script>
       /**
        * This is a basic example on how to develop a custom node renderer. In
@@ -160,6 +162,7 @@
         return renderer;
       })();
 
+
       // Now that's the renderer has been implemented, let's generate a graph
       // to render:
       var i,
@@ -185,20 +188,40 @@
             '#b956af'
           ];
 
-      // Generate a random graph, with ~30% nodes having the type "image":
+      // Generate a random graph, going through the different shapes
       for (i = 0; i < N; i++) {
-        img = Math.random() >= 0.7;
-        g.nodes.push({
+        var node = {
           id: 'n' + i,
           label: 'Node ' + i,
-          type: img ? 'image' : 'def',
-          url: img ? urls[Math.floor(Math.random() * urls.length)] : null,
+          type: ['image','star','square','diamond','equilateral','pacman'][Math.round(Math.random()*5)],
           x: Math.random(),
           y: Math.random(),
           size: Math.random(),
           color: colors[Math.floor(Math.random() * colors.length)]
-        });
+        };
+        switch(node.type) {
+          case "equilateral":
+            node.equilateral = {
+              rotate: Math.random()*45,
+              numPoints: Math.round(5 + Math.random()*3)
+            }
+            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
+            break;
+          case "star":
+            node.star = {
+              innerRatio: 0.4 + Math.random()*0.2,
+              numPoints: Math.round(5 + Math.random()*3)
+            }
+            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
+            break;
+          case "image":
+            node.url =  urls[Math.floor(Math.random() * urls.length)];
+          default:
+          break;
+        }
+        g.nodes.push(node);
       }
+
 
       for (i = 0; i < E; i++)
         g.edges.push({
