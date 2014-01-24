@@ -588,7 +588,7 @@
 
     // Kill each camera:
     for (k in this.cameras)
-      this.killCamera(this.camera[k]);
+      this.killCamera(this.cameras[k]);
 
     delete this.renderers;
     delete this.cameras;
