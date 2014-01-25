@@ -155,7 +155,10 @@
       }
 
       s = new sigma({
-        graph: g
+        graph: g,
+        settings: {
+          skipErrors: true
+        }
       });
 
       // Initialize cameras:
