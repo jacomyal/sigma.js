@@ -50,7 +50,9 @@ module.exports = function(grunt) {
   var pluginFiles = [
     'plugins/sigma.layout.forceAtlas2/*.js',
     'plugins/sigma.parsers.gexf/*.js',
-    'plugins/sigma.parsers.json/*.js'
+    'plugins/sigma.parsers.json/*.js',
+    'plugins/sigma.plugins.animate/*.js',
+    'plugins/sigma.plugins.neighborhoods/*.js'
   ];
 
   // Project configuration:
