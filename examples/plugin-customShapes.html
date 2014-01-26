@@ -55,6 +55,7 @@
     <script src="../src/misc/sigma.misc.bindEvents.js"></script>
     <script src="../src/misc/sigma.misc.drawHovers.js"></script>
     <!-- END SIGMA IMPORTS -->
+    <script src="../plugins/sigma.renderers.customShapes/shape-library.js"></script>
     <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
     <script>
       /**
@@ -193,7 +194,7 @@
         var node = {
           id: 'n' + i,
           label: 'Node ' + i,
-          type: ['image','star','square','diamond','equilateral','pacman'][Math.round(Math.random()*5)],
+          type: ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
           x: Math.random(),
           y: Math.random(),
           size: Math.random(),
@@ -210,7 +211,7 @@
           case "star":
             node.star = {
               innerRatio: 0.4 + Math.random()*0.2,
-              numPoints: Math.round(5 + Math.random()*3)
+              numPoints: Math.round(4 + Math.random()*3)
             }
             node.borderColor = colors[Math.floor(Math.random()* colors.length)];
             break;
