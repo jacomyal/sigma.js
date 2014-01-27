@@ -5,8 +5,8 @@
     throw 'sigma is not declared';
 
   /**
-   * Sigma ForceAtlas2 Webworker
-   * ============================
+   * Sigma ForceAtlas2.1 Webworker
+   * ==============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
@@ -21,10 +21,17 @@
    * to be passed afterwards as a BLOB object to the supervisor.
    */
 
-  var _wrapper = function() {
-    var _this = this;
+  // TODO: rewrite the Force Factory
+  var Worker = function() {
 
-    // Helpers Namespace
+    /**
+     * Worker Properties
+     */
+    var _w = {};
+
+    /**
+     * Helpers namespace
+     */
     var _helpers = {
       extend: function() {
         var i,
@@ -39,22 +46,33 @@
       }
     };
 
+    /**
+     * Matrices properties accessors
+     */
     function _np(i, prop) {
       switch (prop) {
-        case 'dy':
+        case 'y':
           return i + 1;
           break;
-        case 'old_dx':
+        case 'dx':
           return i + 2;
           break;
-        case 'old_dy':
+        case 'dy':
           return i + 3;
           break;
-        case 'size':
+        case 'old_dx':
           return i + 4;
+          break;
+        case 'old_dy':
+          return i + 5;
+          break;
         case 'degree':
         case 'mass':
-          return i + 5;
+          return i + 6;
+          break;
+        case 'size':
+          return i + 7;
+          break;
         default:
           return i;
       }
@@ -73,9 +91,905 @@
       }
     }
 
-    // Default Configuration
-    var _defaults = {
-      autoSettings: true,
+    /**
+     * Worker functions
+     * -----------------
+     */
+    function _init(nodes, eges, config) {
+      var i,
+          l;
+
+      // Merging configuration
+      _w.p = _helpers.extend(
+        config || {},
+        this.defaults
+      );
+
+      // Storing nodes
+      _w.nodes = nodes;
+      _w.edges = nodes;
+      _w.ppn = 8;
+      _w.ppe = 3;
+      _w.nIndex = [];
+      _w.eIndex = [];
+
+      // Building node index
+      for (i = 0, l = _w.nodes.byteLength; i < l; i += _w.ppn) {
+        _w.nIndex.push(i);
+      }
+
+      // Building edge index
+      for (i = 0, l = _w.edges.byteLength; i < l; i += _w.ppe) {
+        _w.eIndex.push(i);
+      }
+
+      // State
+      _w.state = {step: 0, index: 0};
+      _w.rootRegion = false;
+    }
+
+    function _setAutoSettings() {
+      var nlen = _w.nodes.byteLength / _w.ppn;
+
+      // Tuning
+      if (nlen >= 100)
+        _w.p.scalingRatio = 2.0;
+      else
+        _w.p.scalingRatio = 10.0;
+
+      _w.p.strongGravityMode = false;
+      _w.p.gravity = 1;
+
+      // Behaviour
+      _w.p.outboundAttractionDistribution = false;
+      _w.p.linLogMode = false;
+      _w.p.adjustSizes = false;
+      _w.p.edgeWeightInfluence = 1;
+
+      // Tweak
+      if (nlen >= 1000)
+        _w.p.barnesHutOptimize = true;
+      else
+        _w.p.barnesHutOptimize = false;
+
+      _w.p.jitterTolerance = 1;
+      _w.p.barnesHutTheta = 1.2;
+    }
+
+    /**
+     * Algorithm's pass
+     */
+    function _atomicGo() {
+      var nodes = _w.nodes,
+          edges = _w.edges,
+          cInt = _w.p.complexIntervals,
+          sInt = _w.p.simpleIntervals,
+          i,
+          n,
+          l;
+
+      switch (_w.state.step) {
+        case 0: // Pass init
+          // Initialise layout data
+          if (_w.p.outboundAttCompensation)
+            _w.p.outboundAttCompensation = 0;
+
+          for (i = 0, l = _w.nIndex.length; i < l; i++) {
+            n = _w.nIndex[i];
+
+            nodes[_np(n, 'old_dx')] = nodes[_np(n, 'dx')];
+            nodes[_np(n, 'old_dy')] = nodes[_np(n, 'dy')];
+
+            if (_w.p.outboundAttractionDistribution) {
+              _w.p.outboundAttCompensation  += nodes[_np(n, 'mass')]
+            }
+          }
+
+          _w.p.outboundAttCompensation /= l;
+
+          // If Barnes Hut active, initialize root region
+          if (_w.p.barnesHutOptimize) {
+            _w.rootRegion = new Region(nIndex, 0);
+            _w.rootRegion.buildSubRegions();
+          }
+
+          _w.state.step = 1;
+          _w.state.index = 0;
+          return true;
+          break;
+
+        case 1: // Repulsion
+          var Repulsion = _forceFactory.buildRepulsion(
+            _w.p.adjustSizes,
+            _w.p.scalingRatio
+          );
+
+          if (_w.p.barnesHutOptimize) {
+            var rootRegion = _w.rootRegion;
+
+            // Pass to the scope of forEach
+            var barnesHutTheta = _w.p.barnesHutTheta;
+            var i = _w.state.index;
+            while (i < nIndex.length && i < _w.state.index + cInt) {
+              var n = nodes[nIndex[i + 1]];
+              rootRegion.applyForce(n, Repulsion, barnesHutTheta);
+            }
+            if (i == nIndex.length) {
+              _w.state.step = 2;
+              _w.state.index = 0;
+            } else {
+              _w.state.index = i;
+            }
+          } else {
+            var i1 = _w.state.index;
+            while (i1 < nIndex.length && i1 < _w.state.index + cInt) {
+              var n1 = nodes[nIndex[i1 + 1]];
+              for (i = 0, l = nIndex.length; i < l; i++) {
+                if (i < i1) {
+                  Repulsion.apply_nn(n1, nodes[nIndex[i]]);
+                }
+              }
+            }
+            if (i1 == nIndex.length) {
+              _w.state.step = 2;
+              _w.state.index = 0;
+            } else {
+              _w.state.index = i1;
+            }
+          }
+          return true;
+          break;
+
+        case 2: // Gravity
+          var Gravity = (_w.p.strongGravityMode) ?
+                        (_forceFactory.getStrongGravity(
+                          _w.p.scalingRatio
+                        )) :
+                        (_forceFactory.buildRepulsion(
+                          _w.p.adjustSizes,
+                          _w.p.scalingRatio
+                        ));
+          // Pass gravity and scalingRatio to the scope of the function
+          var gravity = _w.p.gravity,
+              scalingRatio = _w.p.scalingRatio;
+
+          var i = _w.state.index;
+          while (i < nIndex.length && i < _w.state.index + sInt) {
+            var n = nodes[nIndex[i++]];
+            Gravity.apply_g(n, gravity / scalingRatio);
+          }
+
+          if (i == nIndex.length) {
+            _w.state.step = 3;
+            _w.state.index = 0;
+          } else {
+            _w.state.index = i;
+          }
+          return true;
+          break;
+
+        case 3: // Attraction
+          var Attraction = _forceFactory.buildAttraction(
+            _w.p.linLogMode,
+            _w.p.outboundAttractionDistribution,
+            _w.p.adjustSizes,
+            1 * ((_w.p.outboundAttractionDistribution) ?
+              (_w.p.outboundAttCompensation) :
+              (1))
+          );
+
+          // CURSOR
+          var i = _w.state.index;
+          if (_w.p.edgeWeightInfluence == 0) {
+            while (i < edges.length && i < _w.state.index + cInt) {
+              var e = edges[i++];
+              Attraction.apply_nn(e.source, e.target, 1);
+            }
+          } else if (_w.p.edgeWeightInfluence == 1) {
+            while (i < edges.length && i < _w.state.index + cInt) {
+              var e = edges[i++];
+              Attraction.apply_nn(e.source, e.target, e.weight || 1);
+            }
+          } else {
+            while (i < edges.length && i < _w.state.index + cInt) {
+              var e = edges[i++];
+              Attraction.apply_nn(
+                e.source, e.target,
+                Math.pow(e.weight || 1, _w.p.edgeWeightInfluence)
+              );
+            }
+          }
+
+          if (i == edges.length) {
+            _w.state.step = 4;
+            _w.state.index = 0;
+          } else {
+            _w.state.index = i;
+          }
+
+          return true;
+          break;
+
+        case 4: // Auto adjust speed
+          var totalSwinging = 0;  // How much irregular movement
+          var totalEffectiveTraction = 0;  // Hom much useful movement
+
+          nodes.forEach(function(n) {
+            var fixed = n.fixed || false;
+            if (!fixed) {
+              var swinging = Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) +
+                             Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
+
+              // If the node has a burst change of direction,
+              // then it's not converging.
+              totalSwinging += n.fa2.mass * swinging;
+              totalEffectiveTraction += n.fa2.mass *
+                                        0.5 *
+                                        Math.sqrt(
+                                          Math.pow(n.fa2.old_dx + n.fa2.dx, 2) +
+                                          Math.pow(n.fa2.old_dy + n.fa2.dy, 2)
+                                        );
+            }
+          });
+
+          _w.p.totalSwinging = totalSwinging;
+          _w.p.totalEffectiveTraction = totalEffectiveTraction;
+
+          // We want that swingingMovement < tolerance * convergenceMovement
+          /*var targetSpeed = Math.pow(_w.p.jitterTolerance, 2) *
+                            _w.p.totalEffectiveTraction /
+                            _w.p.totalSwinging;*/
+          /// Tweak start
+          // Optimize jitter tolerance:
+          // var jitterTolerance = Math.max(_w.p.jitterTolerance, Math.min(5, _w.p.totalEffectiveTraction / Math.pow(nodes.length, 2)))
+          var estimatedOptimalJitterTolerance = 0.02 * Math.sqrt(nodes.length) // The 'right' jitter tolerance for this network. Bigger networks need more tolerance.
+            ,minJT = Math.sqrt(estimatedOptimalJitterTolerance)
+            ,maxJT = 10
+            ,jitterTolerance = _w.p.jitterTolerance * Math.max(minJT, Math.min(maxJT, estimatedOptimalJitterTolerance * _w.p.totalEffectiveTraction / Math.pow(nodes.length, 2)))
+
+          var minSpeedEfficiency = 0.05;
+          
+          // Protection against erratic behavior
+          if(_w.p.totalSwinging / _w.p.totalEffectiveTraction > 2.0){
+              if(_w.p.speedEfficiency > minSpeedEfficiency)
+                  _w.p.speedEfficiency *= 0.5;
+              jt = Math.max(jitterTolerance, _w.p.jitterTolerance);
+          }
+
+          var targetSpeed = jitterTolerance *
+                            _w.p.speedEfficiency *
+                            _w.p.totalEffectiveTraction /
+                            _w.p.totalSwinging;
+
+          // Speed efficiency is how the speed really corresponds to the swinging vs. convergence tradeoff
+          // We adjust it slowly and carefully
+          if(_w.p.totalSwinging > jitterTolerance * _w.p.totalEffectiveTraction){
+            if(_w.p.speedEfficiency > minSpeedEfficiency)
+              _w.p.speedEfficiency *= 0.7
+          } else {
+            if(_w.p.speed < 1000)
+              _w.p.speedEfficiency *= 1.3
+          }
+
+          /// End tweak
+
+          // But the speed shoudn't rise too much too quickly,
+          // since it would make the convergence drop dramatically.
+          var maxRise = 0.5;   // Max rise: 50%
+          _w.p.speed = _w.p.speed +
+                         Math.min(
+                           targetSpeed - _w.p.speed,
+                           maxRise * _w.p.speed
+                         );
+          
+          // console.log('speed '+Math.floor(1000*_w.p.speed)/1000+' sEff '+Math.floor(1000*_w.p.speedEfficiency)/1000+' jitter '+Math.floor(1000*jitterTolerance)/1000+' swing '+Math.floor(_w.p.totalSwinging/nodes.length)+' conv '+Math.floor(_w.p.totalEffectiveTraction/nodes.length));
+
+          // Save old coordinates
+          nodes.forEach(function(n) {
+            n.old_x = +n.x;
+            n.old_y = +n.y;
+          });
+
+          _w.state.step = 5;
+          return true;
+          break;
+
+        case 5: // Apply forces
+          var i = _w.state.index;
+          if (_w.p.adjustSizes) {
+            var speed = _w.p.speed;
+            // If nodes overlap prevention is active,
+            // it's not possible to trust the swinging mesure.
+            while (i < nodes.length && i < _w.state.index + sInt) {
+              var n = nodes[i++];
+              var fixed = n.fixed || false;
+              if (!fixed) {
+                // Adaptive auto-speed: the speed of each node is lowered
+                // when the node swings.
+                var swinging = n.fa2.mass * Math.sqrt(  // tweak
+                // var swinging = Math.sqrt(
+                  (n.fa2.old_dx - n.fa2.dx) *
+                  (n.fa2.old_dx - n.fa2.dx) +
+                  (n.fa2.old_dy - n.fa2.dy) *
+                  (n.fa2.old_dy - n.fa2.dy)
+                );
+                var factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
+
+                var df = Math.sqrt(Math.pow(n.fa2.dx, 2) +
+                         Math.pow(n.fa2.dy, 2));
+
+                factor = Math.min(factor * df, 10) / df;
+
+                n.x += n.fa2.dx * factor;
+                n.y += n.fa2.dy * factor;
+              }
+            }
+          } else {
+            var speed = _w.p.speed;
+            while (i < nodes.length && i < _w.state.index + sInt) {
+              var n = nodes[i++];
+              var fixed = n.fixed || false;
+              if (!fixed) {
+                // Adaptive auto-speed: the speed of each node is lowered
+                // when the node swings.
+                var swinging = n.fa2.mass * Math.sqrt(  // tweak
+                // var swinging = Math.sqrt(
+                  (n.fa2.old_dx - n.fa2.dx) *
+                  (n.fa2.old_dx - n.fa2.dx) +
+                  (n.fa2.old_dy - n.fa2.dy) *
+                  (n.fa2.old_dy - n.fa2.dy)
+                );
+  //              var factor = speed / (1 + speed * Math.sqrt(swinging));
+                var factor = speed / (1 + Math.sqrt(speed * swinging)); // Tweak
+
+                n.x += n.fa2.dx * factor;
+                n.y += n.fa2.dy * factor;
+              }
+            }
+          }
+
+          if (i == nodes.length) {
+            _w.state.step = 0;
+            _w.state.index = 0;
+            return false;
+          } else {
+            _w.state.index = i;
+            return true;
+          }
+          break;
+
+        default:
+          throw 'ForceAtlas2 - atomic state error';
+          break;
+      }
+    }
+
+    /**
+     * Force Factory Namespace
+     * ------------------------
+     */
+    var _forceFactory = {
+      buildRepulsion: function(adjustBySize, coefficient) {
+        if (adjustBySize)
+          return new this.linRepulsion_antiCollision(coefficient);
+        else
+          return new this.linRepulsion(coefficient);
+      },
+      getStrongGravity: function(coefficient) {
+        return new this.strongGravity(coefficient);
+      },
+      buildAttraction: function(logAttr, distributedAttr, adjustBySize, c) {
+        if (adjustBySize) {
+          if (logAttr) {
+            if (distributedAttr) {
+              return new this.logAttraction_degreeDistributed_antiCollision(c);
+            } else {
+              return new this.logAttraction_antiCollision(c);
+            }
+          } else {
+            if (distributedAttr) {
+              return new this.linAttraction_degreeDistributed_antiCollision(c);
+            } else {
+              return new this.linAttraction_antiCollision(c);
+            }
+          }
+        } else {
+          if (logAttr) {
+            if (distributedAttr) {
+              return new this.logAttraction_degreeDistributed(c);
+            } else {
+              return new this.logAttraction(c);
+            }
+          } else {
+            if (distributedAttr) {
+              return new this.linAttraction_massDistributed(c);
+            } else {
+              return new this.linAttraction(c);
+            }
+          }
+        }
+      },
+      linRepulsion: function(coefficient) {
+        this.apply_nn = function(n1, n2) {
+
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient *
+                         _w.nodes[_np(n1, 'mass')] *
+                         _w.nodes[_np(n2, 'mass')] /
+                         Math.pow(distance, 2);
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+
+        this.apply_nr = function(n, r) {
+
+          // Get the distance
+          var xDist = _w.nodes[n] - r.massCenterX,
+              yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient *
+                         _w.nodes[_np(n, 'mass')] *
+                         r.mass /
+                         Math.pow(distance, 2);
+
+            _w.nodes[_np(n, 'dx')] += xDist * factor;
+            _w.nodes[_np(n, 'dy')] += yDist * factor;
+          }
+        }
+
+        this.apply_g = function(n, g) {
+          // Get the distance
+          var xDist = _w.nodes[n],
+              yDist = _w.nodes[_np(n, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient * _w.nodes[_np(n, 'mass')] * g / distance;
+
+            w.nodes[n] -= xDist * factor;
+            w.nodes[_np(n, 'y')] -= yDist * factor;
+          }
+        }
+      },
+      linRepulsion_antiCollision: function(coefficient) {
+        this.apply_nn = function(n1, n2) {
+
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist) -
+                         _w.nodes[_np(n1, 'size')] -
+                         _w.nodes[_np(n2, 'size')];
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient *
+                         _w.nodes[_np(n1, 'mass')] *
+                         _w.nodes[_np(n2, 'mass')] /
+                         Math.pow(distance, 2);
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+
+          } else if (distance < 0) {
+            var factor = 100 * coefficient *
+                         w.nodes[_np(n1, 'mass')] *
+                         w.nodes[_np(n2, 'mass')];
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+
+        this.apply_nr = function(n, r) {
+
+          // Get the distance
+          var xDist = _w.nodes[n] - r.massCenterX,
+              yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient *
+                         _w.nodes[_np(n, 'mass')] *
+                         r.mass /
+                         Math.pow(distance, 2);
+
+            _w.nodes[_np(n, 'dx')] += xDist * factor;
+            _w.nodes[_np(n, 'dy')] += yDist * factor;
+          } else if (distance < 0) {
+            var factor = -coefficient *
+                         _w.nodes[_np(n, 'mass')] *
+                         r.mass /
+                         distance;
+
+            _w.nodes[_np(n, 'dx')] += xDist * factor;
+            _w.nodes[_np(n, 'dy')] += yDist * factor;
+          }
+        }
+
+        this.apply_g = function(n, g) {
+          // Get the distance
+          var xDist = _w.nodes[n],
+              yDist = _w.nodes[_np(n, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient * _w.nodes[_np(n, 'mass')] * g / distance;
+
+            _w.nodes[_np(n, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      strongGravity: function(coefficient) {
+        this.apply_g = function(n, g) {
+          // Get the distance
+          var xDist = _w.nodes[n],
+              yDist = _w.nodes[_np(n, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = coefficient * _w.nodes[_np(n, 'mass')] * g;
+
+            _w.nodes[_np(n, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      linAttraction: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              factor = -coefficient * e;
+
+          _w.nodes[_np(n1, 'dx')] += xDist * factor;
+          _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+          _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+          _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+        }
+      },
+      linAttraction_massDistributed: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              factor = -coefficient * e / w.nodes[_np(n1, 'mass')];
+
+          _w.nodes[_np(n1, 'dx')] += xDist * factor;
+          _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+          _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+          _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+        }
+      },
+      logAttraction: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance;
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      logAttraction_degreeDistributed: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance /
+                         _w.nodes[_np(n1, 'mass')];
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      linAttraction_antiCollision: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient * e;
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      linAttraction_degreeDistributed_antiCollision: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient * e / _w.nodes[_np(n1, 'mass')];
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      logAttraction_antiCollision: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance;
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      },
+      logAttraction_degreeDistributed_antiCollision: function(coefficient) {
+        this.apply_nn = function(n1, n2, e) {
+          // Get the distance
+          var xDist = _w.nodes[n1] - _w.nodes[n2],
+              yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+          if (distance > 0) {
+            // NB: factor = force / distance
+            var factor = -coefficient *
+                         e *
+                         Math.log(1 + distance) /
+                         distance /
+                         _w.nodes[_np(n1, 'mass')];
+
+            _w.nodes[_np(n1, 'dx')] += xDist * factor;
+            _w.nodes[_np(n1, 'dy')] += yDist * factor;
+
+            _w.nodes[_np(n2, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n2, 'dy')] -= yDist * factor;
+          }
+        }
+      }
+    };
+
+    /**
+     * Barnes Hut Region
+     * ------------------
+     */
+    function Region(nodesIndexes, depth) {
+
+      // Properties
+      this.depthLimit = 20;
+      this.size = 0;
+      this.nodes = nodesIndexes;
+      this.subregions = [];
+      this.depth = depth;
+
+      this.p = {
+        mass: 0,
+        massCenterX: 0,
+        massCenterY: 0
+      };
+
+      this.updateMassAndGeometry();
+    }
+
+    Region.prototype.updateMassAndGeometry = function() {
+      if (this.nodes.length > 1) {
+        // Compute Mass
+        var mass = 0,
+            massSumX = 0,
+            massSumY = 0,
+            size,
+            distance
+            curmass,
+            i,
+            n;
+
+        for (i = 0, l = this.nodes.length; i < l; i++) {
+          n = this.nodes[i];
+
+          // Mass
+          curmass = _w.nodes[_np(n), 'mass'];
+          mass += curmass;
+          massSumX += _w.nodes[n] * curmass;
+          massSumY += _w.nodes[_np(n), 'y'] * curmass;
+        }
+
+        var massCenterX = massSumX / mass,
+            massCenterY = massSumY / mass;
+
+        for (i = 0, l = this.nodes.length; i < l; i++) {
+          n = this.nodes[i];
+
+          // Size
+          distance = Math.sqrt(
+            (_w.nodes[n] - massCenterX) *
+            (_w.nodes[n] - massCenterX) +
+            (_w.nodes[_np(n, 'y')] - massCenterY) *
+            (_w.nodes[_np(n, 'y')] - massCenterY)
+          );
+
+          size = Math.max(size || (2 * distance), 2 * distance);
+        }
+
+        this.p.mass = mass;
+        this.p.massCenterX = massCenterX;
+        this.p.massCenterY = massCenterY;
+        this.size = size;
+      }
+    };
+
+    Region.prototype.buildSubRegions = function() {
+      if (this.nodes.length > 1) {
+        var leftNodes = [],
+            rightNodes = [],
+            subregions = [],
+            massCenterX = this.p.massCenterX,
+            massCenterY = this.p.massCenterY,
+            nextDepth = this.depth + 1,
+            nodesColumn,
+            nodeLine,
+            i,
+            j;
+
+        for (i = 0, l = this.nodes.length; i < l; i++) {
+          nodesColumn = (_w.nodes[this.nodes[i]] < massCenterX) ?
+            (leftNodes) :
+            (rightNodes);
+          nodesColumn.push(n);
+        }
+
+        var tl = [], bl = [], br = [], tr = [];
+
+        for (i = 0, l = leftNodes.length; i < l; i++) {
+          nodesLine = (_w.nodes[_np(this.nodes[i], 'y')] < massCenterY) ?
+            (tl) :
+            (bl);
+          nodesLine.push(n);
+        }
+
+        for (i = 0, l = rightNodes.length; i < l; i++) {
+          nodesLine = (_w.nodes[_np(this.nodes[i], 'y')] < massCenterY) ?
+            (tr) :
+            (br);
+          nodesLine.push(n);
+        }
+
+        var todo = [tl, bl, br, tr],
+            subregion,
+            tab;
+        for (i = 0; i < 4; i++) {
+          tab = todo[i];
+
+          if (tab.length > 0) {
+            if (nextDepth <= this.depthLimit &&
+                tab.length < this.nodes.length) {
+              subregion = new Region(a, nextDepth);
+              subregions.push(subregion);
+            } else {
+              for (j = 0; j < tab.length; j++) {
+                var oneNodeList = [n];
+                subregion = Region(oneNodeList, nextDepth);
+                subregions.push(subregion);
+              }
+            }
+          }
+        }
+
+        this.subregions = subregions;
+        for (i = 0, l = this.subregions.length; i < l; i++) {
+          this.subregions[i].buildSubRegions();
+        }
+      }
+    };
+
+    Region.prototype.applyForce = function(n, Force, theta) {
+      if (this.nodes.length < 2) {
+        var regionNode = this.nodes[0];
+        Force.apply_nn(n, regionNode);
+      } else {
+        var distance = Math.sqrt(
+          (_w.nodes[n] - this.p.massCenterX) *
+          (_w.nodes[n] - this.p.massCenterX) +
+          (_w.nodes[_np(n, 'y')] - this.p.massCenterY) *
+          (_w.nodes[_np(n, 'y')] - this.p.massCenterY)
+        );
+
+        if (distance * theta > this.size) {
+          Force.apply_nr(n, this);
+        } else {
+          for (var i = 0, l = this.subregions.length; i < l; i++) {
+            this.subregions[i].applyForce(n, Force, theta);
+          }
+        }
+      }
+    };
+
+    /**
+     * Message Receiver
+     * -----------------
+     */
+    this.onmessage = function(e) {
+
+      if (e.data.header = 'start') {
+        var nodes = new Float64Array(e.data.nodes),
+            edges = new Float64Array(e.data.edges);
+
+        _init(nodes, edges, e.data.config);
+      }
+    };
+
+    /**
+     * ForceAtlas2 Defaults
+     */
+    _w.defaults = {
       linLogMode: false,
       outboundAttractionDistribution: false,
       adjustSizes: false,
@@ -90,341 +1004,9 @@
       outboundAttCompensation: 1,
       totalSwinging: 0,
       totalEffectiveTraction: 0,
+      speedEfficiency: 1, // tweak
       complexIntervals: 500,
       simpleIntervals: 1000
-    };
-
-    // Worker State
-    this.state = {step: 0, index: 0};
-
-    // Mesage Receiver
-    this.onmessage = function(e) {
-      this.p = _helpers.extend(
-        e.data.config || {},
-        _defaults
-      );
-          
-      this.nodes = new Float64Array(e.data.nodes);
-      this.edges = new Float64Array(e.data.edges);
-    };
-
-    // Algorithm run
-    this.atomicGo = function() {
-      var i,
-          n,
-          e,
-          l,
-          fixed,
-          swinging,
-          factor,
-          graph = _this.graph,
-          nIndex = graph.nodes,
-          eIndex = graph.edges,
-          nodes = nIndex(),
-          edges = eIndex(),
-          cInt = this.p.complexIntervals,
-          sInt = this.p.simpleIntervals;
-
-      switch (_this.state.step) {
-        // Pass init
-        case 0:
-          // Initialise layout data
-          for (i = 0, l = nodes.length; i < l; i++) {
-            n = nodes[i];
-            if (n.fa2)
-              n.fa2 = {
-                mass: 1 + _this.graph.degree(n.id),
-                old_dx: n.fa2.dx || 0,
-                old_dy: n.fa2.dy || 0,
-                dx: 0,
-                dy: 0
-              };
-            else
-              n.fa2 = {
-                mass: 1 + _this.graph.degree(n.id),
-                old_dx: 0,
-                old_dy: 0,
-                dx: 0,
-                dy: 0
-              };
-          }
-
-          // If Barnes Hut is active, initialize root region
-          if (_this.p.barnesHutOptimize) {
-            _this.rootRegion = new forceatlas2.Region(nodes, 0);
-            _this.rootRegion.buildSubRegions();
-          }
-
-          // If outboundAttractionDistribution active, compensate.
-          if (_this.p.outboundAttractionDistribution) {
-            _this.p.outboundAttCompensation = 0;
-            for (i = 0, l = nodes.length; i < l; i++) {
-              n = nodes[i];
-              _this.p.outboundAttCompensation += n.fa2.mass;
-            }
-            _this.p.outboundAttCompensation /= nodes.length;
-          }
-
-          _this.state.step = 1;
-          _this.state.index = 0;
-          return true;
-
-         // Repulsion
-        case 1:
-          var n1,
-              n2,
-              i1,
-              i2,
-              rootRegion,
-              barnesHutTheta,
-              Repulsion = _this.ForceFactory.buildRepulsion(
-                _this.p.adjustSizes,
-                _this.p.scalingRatio
-              );
-
-          if (_this.p.barnesHutOptimize) {
-            rootRegion = _this.rootRegion;
-
-            // Pass to the scope of forEach
-            barnesHutTheta = _this.p.barnesHutTheta;
-            i = _this.state.index;
-
-            while (i < nodes.length && i < _this.state.index + cInt)
-              if ((n = nodes[i++]).fa2)
-                rootRegion.applyForce(n, Repulsion, barnesHutTheta);
-
-            if (i === nodes.length)
-              _this.state = {
-                step: 2,
-                index: 0
-              };
-            else
-              _this.state.index = i;
-          } else {
-            i1 = _this.state.index;
-
-            while (i1 < nodes.length && i1 < _this.state.index + cInt)
-              if ((n1 = nodes[i1++]).fa2)
-                for (i2 = 0; i2 < i1; i2++)
-                  if ((n2 = nodes[i2]).fa2)
-                    Repulsion.apply_nn(n1, n2);
-
-            if (i1 === nodes.length)
-              _this.state = {
-                step: 2,
-                index: 0
-              };
-            else
-              _this.state.index = i1;
-          }
-          return true;
-
-         // Gravity
-        case 2:
-          var Gravity =
-            _this.p.strongGravityMode ?
-              _this.ForceFactory.getStrongGravity(
-                _this.p.scalingRatio
-              ) :
-              _this.ForceFactory.buildRepulsion(
-                _this.p.adjustSizes,
-                _this.p.scalingRatio
-              ),
-            // Pass gravity and scalingRatio to the scope of the function
-            gravity = _this.p.gravity,
-            scalingRatio = _this.p.scalingRatio;
-
-          i = _this.state.index;
-          while (i < nodes.length && i < _this.state.index + sInt) {
-            n = nodes[i++];
-            if (n.fa2)
-              Gravity.apply_g(n, gravity / scalingRatio);
-          }
-
-          if (i === nodes.length)
-            _this.state = {
-              step: 3,
-              index: 0
-            };
-          else
-            _this.state.index = i;
-          return true;
-
-        // Attraction
-        case 3:
-          var Attraction = _this.ForceFactory.buildAttraction(
-                _this.p.linLogMode,
-                _this.p.outboundAttractionDistribution,
-                _this.p.adjustSizes,
-                _this.p.outboundAttractionDistribution ?
-                  _this.p.outboundAttCompensation :
-                  1
-              );
-
-          i = _this.state.index;
-          if (_this.p.edgeWeightInfluence === 0)
-            while (i < edges.length && i < _this.state.index + cInt) {
-              e = edges[i++];
-              Attraction.apply_nn(nIndex(e.source), nIndex(e.target), 1);
-            }
-          else if (_this.p.edgeWeightInfluence === 1)
-            while (i < edges.length && i < _this.state.index + cInt) {
-              e = edges[i++];
-              Attraction.apply_nn(
-                nIndex(e.source),
-                nIndex(e.target),
-                e.weight || 1
-              );
-            }
-          else
-            while (i < edges.length && i < _this.state.index + cInt) {
-              e = edges[i++];
-              Attraction.apply_nn(
-                nIndex(e.source), nIndex(e.target),
-                Math.pow(e.weight || 1, _this.p.edgeWeightInfluence)
-              );
-            }
-
-          if (i === edges.length)
-            _this.state = {
-              step: 4,
-              index: 0
-            };
-          else
-            _this.state.index = i;
-
-          return true;
-
-        // Auto adjust speed
-        case 4:
-          var maxRise,
-              targetSpeed,
-              totalSwinging = 0, // How much irregular movement
-              totalEffectiveTraction = 0; // Hom much useful movement
-
-          for (i = 0, l = nodes.length; i < l; i++) {
-            n = nodes[i];
-
-            fixed = n.fixed || false;
-            if (!fixed && n.fa2) {
-              swinging =
-                Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) +
-                Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
-
-              // If the node has a burst change of direction,
-              // then it's not converging.
-              totalSwinging += n.fa2.mass * swinging;
-              totalEffectiveTraction += n.fa2.mass *
-                0.5 *
-                Math.sqrt(
-                  Math.pow(n.fa2.old_dx + n.fa2.dx, 2) +
-                  Math.pow(n.fa2.old_dy + n.fa2.dy, 2)
-                );
-            }
-          }
-
-          _this.p.totalSwinging = totalSwinging;
-          _this.p.totalEffectiveTraction = totalEffectiveTraction;
-
-          // We want that swingingMovement < tolerance * convergenceMovement
-          targetSpeed =
-            Math.pow(_this.p.jitterTolerance, 2) *
-            _this.p.totalEffectiveTraction /
-            _this.p.totalSwinging;
-
-          // But the speed shoudn't rise too much too quickly,
-          // since it would make the convergence drop dramatically.
-          // Max rise: 50%
-          maxRise = 0.5;
-          _this.p.speed =
-            _this.p.speed +
-            Math.min(
-              targetSpeed - _this.p.speed,
-              maxRise * _this.p.speed
-            );
-
-          // Save old coordinates
-          for (i = 0, l = nodes.length; i < l; i++) {
-            n = nodes[i];
-            n.old_x = +n.x;
-            n.old_y = +n.y;
-          }
-
-          _this.state.step = 5;
-          return true;
-
-        // Apply forces
-        case 5:
-          var df,
-              speed;
-
-          i = _this.state.index;
-          if (_this.p.adjustSizes) {
-            speed = _this.p.speed;
-            // If nodes overlap prevention is active,
-            // it's not possible to trust the swinging mesure.
-            while (i < nodes.length && i < _this.state.index + sInt) {
-              n = nodes[i++];
-              fixed = n.fixed || false;
-              if (!fixed && n.fa2) {
-                // Adaptive auto-speed: the speed of each node is lowered
-                // when the node swings.
-                swinging = Math.sqrt(
-                  (n.fa2.old_dx - n.fa2.dx) *
-                  (n.fa2.old_dx - n.fa2.dx) +
-                  (n.fa2.old_dy - n.fa2.dy) *
-                  (n.fa2.old_dy - n.fa2.dy)
-                );
-                factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
-
-                df =
-                  Math.sqrt(Math.pow(n.fa2.dx, 2) +
-                  Math.pow(n.fa2.dy, 2));
-
-                factor = Math.min(factor * df, 10) / df;
-
-                n.x += n.fa2.dx * factor;
-                n.y += n.fa2.dy * factor;
-              }
-            }
-          } else {
-            speed = _this.p.speed;
-            while (i < nodes.length && i < _this.state.index + sInt) {
-              n = nodes[i++];
-              fixed = n.fixed || false;
-              if (!fixed && n.fa2) {
-                // Adaptive auto-speed: the speed of each node is lowered
-                // when the node swings.
-                swinging = Math.sqrt(
-                  (n.fa2.old_dx - n.fa2.dx) *
-                  (n.fa2.old_dx - n.fa2.dx) +
-                  (n.fa2.old_dy - n.fa2.dy) *
-                  (n.fa2.old_dy - n.fa2.dy)
-                );
-
-                factor = speed / (1 + speed * Math.sqrt(swinging));
-
-                n.x += n.fa2.dx * factor;
-                n.y += n.fa2.dy * factor;
-              }
-            }
-          }
-
-          if (i === nodes.length) {
-            _this.state = {
-              step: 0,
-              index: 0
-            };
-            return false;
-          } else {
-            _this.state.index = i;
-            return true;
-          }
-          break;
-
-        default:
-          throw new Error('ForceAtlas2 - atomic state error');
-      }
     };
   };
 
@@ -432,8 +1014,7 @@
    * Exporting
    * ----------
    */
-
   sigma.prototype.getForceAtlas2Worker = function() {
-    return ';(' + _wrapper.toString() + ').call(this);';
+    return ';(' + Worker.toString() + ').call(this);';
   };
 }).call(this);

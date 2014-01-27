@@ -5,7 +5,7 @@
     throw 'sigma is not declared';
 
   /**
-   * Sigma ForceAtlas2 Supervisor
+   * Sigma ForceAtlas2.1 Supervisor
    * =============================
    *
    * Author: Guillaume Plique (Yomguithereal)
@@ -25,12 +25,14 @@
   function Supervisor(graph, workerFunc, options) {
     var _this = this;
 
-    // TODO: later, check if transferable is an option
+    // TODO: later, check if transferable is possible
     // Window URL Polyfill
     window.URL = window.URL || window.webkitURL;
 
     // Properties
     this.graph = graph;
+    this.ppn = 8;
+    this.ppe = 3;
 
     var blob = this.makeBlob(workerFunc);
     this.worker = new Worker(URL.createObjectURL(blob));
@@ -70,45 +72,52 @@
   Supervisor.prototype.graphToByteArrays = function() {
     var nodes = this.graph.nodes(),
         edges = this.graph.edges(),
-        nbytes = nodes.length * 6,
-        ebytes = nodes.length * 3,
+        nbytes = nodes.length * this.ppn,
+        ebytes = nodes.length * this.ppe,
+        nIndex = {},
         i,
         j,
         l;
 
     // Allocating Byte arrays with correct nb of bytes
+    // TODO: Float32Array?
     this.nodesByteArray = new Float64Array(nbytes);
     this.edgesByteArray = new Float64Array(ebytes);
 
     // Iterate through nodes
     for (i = j = 0, l = nodes.length; i < l; i++) {
+
+      // Populating index
+      nIndex[nodes[i].id] = i;
+
+      // Populating byte array
       this.nodesByteArray[j] = nodes[i].x;
       this.nodesByteArray[j + 1] = nodes[i].y;
       this.nodesByteArray[j + 2] = 0;
       this.nodesByteArray[j + 3] = 0;
-      this.nodesByteArray[j + 4] = nodes[i].size;
-      this.nodesByteArray[j + 5] = this.graph.degree(nodes[i].id);
-      j += 6;
+      this.nodesByteArray[j + 4] = 0;
+      this.nodesByteArray[j + 5] = 0;
+      this.nodesByteArray[j + 6] = 1 + this.graph.degree(nodes[i].id);
+      this.nodesByteArray[j + 7] = nodes[i].size;
+      j += this.ppn;
     }
 
     // Iterate through edges
-    // TODO: get node index for source/target
     for (i = j = 0, l = edges.length; i < l; i++) {
-      this.edgesByteArray[j] = 0;
-      this.edgesByteArray[j + 1] = 0;
+      this.edgesByteArray[j] = nIndex[edges[i].source];
+      this.edgesByteArray[j + 1] = nIndex[edges[i].target];
       this.edgesByteArray[j + 2] = edges[i].weight || 0;
-      j += 3;
+      j += this.ppe;
     }
   };
-
-  Supervisor.prototype.sendConfiguration = function() {};
 
   Supervisor.prototype.sendByteArrayToWorker = function() {
     this.worker.postMessage(
       {
+        header: 'start',
         config: {},
         nodes: this.nodesByteArray.buffer,
-        edges: this.edgesByteArray
+        edges: this.edgesByteArray.buffer
       },
       [this.nodesByteArray.buffer, this.edgesByteArray.buffer]
     );
