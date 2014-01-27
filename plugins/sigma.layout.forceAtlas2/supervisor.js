@@ -22,7 +22,7 @@
    * Supervisor Object
    * ------------------
    */
-  function Supervisor(graph, workerFunc, options) {
+  function Supervisor(sigInst, workerFunc, options) {
     var _this = this;
 
     // TODO: later, check if transferable is possible
@@ -30,12 +30,27 @@
     window.URL = window.URL || window.webkitURL;
 
     // Properties
-    this.graph = graph;
+    this.sigInst = sigInst;
+    this.graph = this.sigInst.graph;
     this.ppn = 8;
     this.ppe = 3;
 
     var blob = this.makeBlob(workerFunc);
     this.worker = new Worker(URL.createObjectURL(blob));
+
+    // Worker message receiver
+    this.worker.onmessage = function(e) {
+
+      // Retrieving data
+      _this.nodesByteArray = new Float64Array(e.data.nodes);
+      _this.edgesByteArray = new Float64Array(e.data.edges);
+
+      // Applying layout
+      _this.applyLayoutChanges();
+
+      // Send data back to worker and loop
+      _this.sendByteArrayToWorker();
+    };
 
     // Post Message Polyfill
     this.worker.postMessage = 
@@ -45,9 +60,7 @@
     this.graphToByteArrays();
 
     // Sending to worker
-    console.log(this.nodesByteArray.byteLength, this.edgesByteArray.byteLength);
-    this.sendByteArrayToWorker();
-    console.log(this.nodesByteArray.byteLength, this.edgesByteArray.byteLength);
+    this.sendByteArrayToWorker('start');
   }
 
   Supervisor.prototype.makeBlob = function(workerFunc) {
@@ -111,19 +124,42 @@
     }
   };
 
-  Supervisor.prototype.sendByteArrayToWorker = function() {
-    this.worker.postMessage(
-      {
-        header: 'start',
-        config: {},
-        nodes: this.nodesByteArray.buffer,
-        edges: this.edgesByteArray.buffer
-      },
-      [this.nodesByteArray.buffer, this.edgesByteArray.buffer]
-    );
+  // TODO: send edges only once.
+  // make a better send function
+  Supervisor.prototype.applyLayoutChanges = function() {
+    var nodes = this.graph.nodes(),
+        j = 0,
+        realIndex;
+
+    // Moving nodes
+    for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
+      nodes[j].x = this.nodesByteArray[i];
+      nodes[j].y = this.nodesByteArray[i + 1];
+      j++;
+    }
+
+    // Refreshing
+    this.sigInst.refresh();
   };
 
-   /**
+  Supervisor.prototype.sendByteArrayToWorker = function(header) {
+    console.log('sending...');
+    var content = {
+      header: header || 'loop',
+      nodes: this.nodesByteArray.buffer,
+      edges: this.edgesByteArray.buffer 
+    };
+
+    var buffers = [this.nodesByteArray.buffer, this.edgesByteArray.buffer];
+
+    if (header === 'start')
+      content.config = {};
+
+    this.worker.postMessage(content, buffers);
+  };
+
+
+  /**
    * Interface
    * ----------
    */
@@ -132,7 +168,7 @@
   sigma.prototype.stopForceAtlas2 = function() {};
 
   sigma.prototype.testFA2Supervisor = function() {
-    new Supervisor(this.graph, this.getForceAtlas2Worker());
+    new Supervisor(this, this.getForceAtlas2Worker());
     return this;
   };
 }).call(this);

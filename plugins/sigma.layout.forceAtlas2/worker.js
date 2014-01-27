@@ -25,9 +25,29 @@
   var Worker = function() {
 
     /**
-     * Worker Properties
+     * ForceAtlas2 Defaults
      */
-    var _w = {};
+    var _w = {
+      defaults: {
+        linLogMode: false,
+        outboundAttractionDistribution: false,
+        adjustSizes: false,
+        edgeWeightInfluence: 0,
+        scalingRatio: 1,
+        strongGravityMode: false,
+        gravity: 1,
+        jitterTolerance: 1,
+        barnesHutOptimize: false,
+        barnesHutTheta: 1.2,
+        speed: 1,
+        outboundAttCompensation: 1,
+        totalSwinging: 0,
+        totalEffectiveTraction: 0,
+        speedEfficiency: 1, // tweak
+        complexIntervals: 500,
+        simpleIntervals: 1000
+      }
+    };
 
     /**
      * Helpers namespace
@@ -49,7 +69,11 @@
     /**
      * Matrices properties accessors
      */
+
+    // TODO: drop bug checking tests
     function _np(i, prop) {
+      if (i !== parseInt(i))
+        throw arguments.callee.caller.name + ' dropped a non int.';
       switch (prop) {
         case 'y':
           return i + 1;
@@ -79,6 +103,8 @@
     }
 
     function _ep(i, prop) {
+      if (i !== parseInt(i))
+        throw arguments.callee.caller.toString() + ' dropped a non int.';
       switch (prop) {
         case 'target':
           return i + 1;
@@ -95,31 +121,31 @@
      * Worker functions
      * -----------------
      */
-    function _init(nodes, eges, config) {
+    function _init(nodes, edges, config) {
       var i,
           l;
 
       // Merging configuration
       _w.p = _helpers.extend(
         config || {},
-        this.defaults
+        _w.defaults
       );
 
       // Storing nodes
       _w.nodes = nodes;
-      _w.edges = nodes;
+      _w.edges = edges;
       _w.ppn = 8;
       _w.ppe = 3;
       _w.nIndex = [];
       _w.eIndex = [];
 
       // Building node index
-      for (i = 0, l = _w.nodes.byteLength; i < l; i += _w.ppn) {
+      for (i = 0, l = _w.nodes.length; i < l; i += _w.ppn) {
         _w.nIndex.push(i);
       }
 
       // Building edge index
-      for (i = 0, l = _w.edges.byteLength; i < l; i += _w.ppe) {
+      for (i = 0, l = _w.edges.length; i < l; i += _w.ppe) {
         _w.eIndex.push(i);
       }
 
@@ -129,7 +155,7 @@
     }
 
     function _setAutoSettings() {
-      var nlen = _w.nodes.byteLength / _w.ppn;
+      var nlen = _w.nodes.length / _w.ppn;
 
       // Tuning
       if (nlen >= 100)
@@ -148,7 +174,8 @@
 
       // Tweak
       if (nlen >= 1000)
-        _w.p.barnesHutOptimize = true;
+        // TODO: reactivate Barnes Hut
+        _w.p.barnesHutOptimize = false;
       else
         _w.p.barnesHutOptimize = false;
 
@@ -159,14 +186,23 @@
     /**
      * Algorithm's pass
      */
+
+    function _go() {
+      while (_atomicGo()) {}
+    }
+
     function _atomicGo() {
       var nodes = _w.nodes,
           edges = _w.edges,
+          nIndex = _w.nIndex,
+          eIndex = _w.eIndex,
           cInt = _w.p.complexIntervals,
           sInt = _w.p.simpleIntervals,
           j,
           n,
-          l;
+          l,
+          i,
+          e;
 
       switch (_w.state.step) {
         case 0: // Pass init
@@ -174,8 +210,8 @@
           if (_w.p.outboundAttCompensation)
             _w.p.outboundAttCompensation = 0;
 
-          for (j = 0, l = _w.nIndex.length; j < l; j++) {
-            n = _w.nIndex[j];
+          for (j = 0, l = nIndex.length; j < l; j++) {
+            n = nIndex[j];
 
             nodes[_np(n, 'old_dx')] = nodes[_np(n, 'dx')];
             nodes[_np(n, 'old_dy')] = nodes[_np(n, 'dy')];
@@ -209,9 +245,9 @@
 
             // Pass to the scope of forEach
             var barnesHutTheta = _w.p.barnesHutTheta;
-            var i = _w.state.index;
+            i = _w.state.index;
             while (i < nIndex.length && i < _w.state.index + cInt) {
-              var n = nodes[nIndex[i + 1]];
+              n = nodes[nIndex[i++]];
               rootRegion.applyForce(n, Repulsion, barnesHutTheta);
             }
             if (i == nIndex.length) {
@@ -223,10 +259,10 @@
           } else {
             var i1 = _w.state.index;
             while (i1 < nIndex.length && i1 < _w.state.index + cInt) {
-              var n1 = nodes[nIndex[i1 + 1]];
+              var n1 = nIndex[i1++];
               for (j = 0, l = nIndex.length; j < l; j++) {
                 if (j < i1) {
-                  Repulsion.apply_nn(n1, nodes[nIndex[j]]);
+                  Repulsion.apply_nn(n1, nIndex[j]);
                 }
               }
             }
@@ -255,7 +291,7 @@
 
           var i = _w.state.index;
           while (i < nIndex.length && i < _w.state.index + sInt) {
-            var n = nodes[nIndex[i++]];
+            var n = nIndex[i++];
             Gravity.apply_g(n, gravity / scalingRatio);
           }
 
@@ -284,8 +320,8 @@
             while (i < eIndex.length && i < _w.state.index + cInt) {
               var e = edges[eIndex[i++]];
               Attraction.apply_nn(
-                nodes[edges[_ep(e, 'source')]],
-                nodes[edges[_ep(e, 'target')]],
+                edges[_ep(e, 'source')],
+                edges[_ep(e, 'target')],
                 1
               );
             }
@@ -293,19 +329,19 @@
             while (i < eIndex.length && i < _w.state.index + cInt) {
               var e = edges[eIndex[i++]];
               Attraction.apply_nn(
-                nodes[edges[_ep(e, 'source')]],
-                nodes[edges[_ep(e, 'target')]],
-                nodes[edges[_ep(e, 'weigth')]] || 1
+                edges[_ep(e, 'source')],
+                edges[_ep(e, 'target')],
+                edges[_ep(e, 'weigth')] || 1
               );
             }
           } else {
             while (i < eIndex.length && i < _w.state.index + cInt) {
               var e = edges[eIndex[i++]];
               Attraction.apply_nn(
-                nodes[edges[_ep(e, 'source')]],
-                nodes[edges[_ep(e, 'target')]],
+                edges[_ep(e, 'source')],
+                edges[_ep(e, 'target')],
                 Math.pow(
-                  nodes[edges[_ep(e, 'weigth')]] || 1,
+                  edges[_ep(e, 'weigth')] || 1,
                   _w.p.edgeWeightInfluence
                 )
               );
@@ -427,7 +463,7 @@
             // If nodes overlap prevention is active,
             // it's not possible to trust the swinging mesure.
             while (i < nIndex.length && i < _w.state.index + sInt) {
-              n = _w.nIndex[i];
+              n = _w.nIndex[i++];
               fixed = !!nodes[_np(n, 'fixed')] || false;
               if (!fixed) {
                 // Adaptive auto-speed: the speed of each node is lowered
@@ -453,7 +489,7 @@
           } else {
             var speed = _w.p.speed;
             while (i < nIndex.length && i < _w.state.index + sInt) {
-              n = _w.nIndex[i];
+              n = _w.nIndex[i++];
               fixed = !!nodes[_np(n, 'fixed')] || false;
               if (!fixed) {
                 // Adaptive auto-speed: the speed of each node is lowered
@@ -467,7 +503,6 @@
                 );
   //              var factor = speed / (1 + speed * Math.sqrt(swinging));
                 var factor = speed / (1 + Math.sqrt(speed * swinging)); // Tweak
-
                 nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
                 nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
               }
@@ -537,7 +572,6 @@
       },
       linRepulsion: function(coefficient) {
         this.apply_nn = function(n1, n2) {
-
           // Get the distance
           var xDist = _w.nodes[n1] - _w.nodes[n2],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
@@ -587,8 +621,8 @@
             // NB: factor = force / distance
             var factor = coefficient * _w.nodes[_np(n, 'mass')] * g / distance;
 
-            w.nodes[n] -= xDist * factor;
-            w.nodes[_np(n, 'y')] -= yDist * factor;
+            _w.nodes[n] -= xDist * factor;
+            _w.nodes[_np(n, 'y')] -= yDist * factor;
           }
         }
       },
@@ -873,7 +907,7 @@
             massSumX = 0,
             massSumY = 0,
             size,
-            distance
+            distance,
             curmass,
             i,
             n;
@@ -923,9 +957,11 @@
             nodesColumn,
             nodeLine,
             i,
+            n,
             j;
 
         for (i = 0, l = this.nodes.length; i < l; i++) {
+          n = _w.nodes[this.nodes[i]];
           nodesColumn = (_w.nodes[this.nodes[i]] < massCenterX) ?
             (leftNodes) :
             (rightNodes);
@@ -999,40 +1035,50 @@
     };
 
     /**
-     * Message Receiver
+     * Message Operator
      * -----------------
      */
+    function _sendDataBackToSupervisor() {
+      postMessage(
+        {
+          nodes: _w.nodes.buffer,
+          edges: _w.edges.buffer
+        },
+        [_w.nodes.buffer, _w.edges.buffer]
+      );
+    }
+
+    function _oneGo() {
+      _go();
+      _sendDataBackToSupervisor();
+    }
+
+    // TODO: do we need to send back and forth every time?
+    // in fact, we could copy just once in worker
     this.onmessage = function(e) {
 
-      if (e.data.header = 'start') {
-        var nodes = new Float64Array(e.data.nodes),
-            edges = new Float64Array(e.data.edges);
+      switch (e.data.header) {
 
-        _init(nodes, edges, e.data.config);
+        case 'start':
+          var nodes = new Float64Array(e.data.nodes),
+              edges = new Float64Array(e.data.edges);
+
+          _init(nodes, edges, e.data.config);
+          _setAutoSettings();
+
+          // First Pass
+          _oneGo();
+          break;
+
+        case 'loop':
+          _w.nodes = new Float64Array(e.data.nodes);
+          _w.edges = new Float64Array(e.data.edges);
+
+          _oneGo();
+          break;
+
+        default:
       }
-    };
-
-    /**
-     * ForceAtlas2 Defaults
-     */
-    _w.defaults = {
-      linLogMode: false,
-      outboundAttractionDistribution: false,
-      adjustSizes: false,
-      edgeWeightInfluence: 0,
-      scalingRatio: 1,
-      strongGravityMode: false,
-      gravity: 1,
-      jitterTolerance: 1,
-      barnesHutOptimize: false,
-      barnesHutTheta: 1.2,
-      speed: 1,
-      outboundAttCompensation: 1,
-      totalSwinging: 0,
-      totalEffectiveTraction: 0,
-      speedEfficiency: 1, // tweak
-      complexIntervals: 500,
-      simpleIntervals: 1000
     };
   };
 
