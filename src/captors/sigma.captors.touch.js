@@ -338,8 +338,8 @@
             break;
         }
 
-        // e.preventDefault();
-        // return false;
+        e.preventDefault();
+        return false;
       }
     }
 
