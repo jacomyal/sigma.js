@@ -17,7 +17,7 @@
    * Worker Function Wrapper
    * ------------------------
    *
-   * The worker has to been wrapped into a single stringified function
+   * The worker has to be wrapped into a single stringified function
    * to be passed afterwards as a BLOB object to the supervisor.
    */
 
@@ -70,7 +70,7 @@
         case 'mass':
           return i + 6;
           break;
-        case 'size':
+        case 'fixed':
           return i + 7;
           break;
         default:
@@ -164,7 +164,7 @@
           edges = _w.edges,
           cInt = _w.p.complexIntervals,
           sInt = _w.p.simpleIntervals,
-          i,
+          j,
           n,
           l;
 
@@ -174,8 +174,8 @@
           if (_w.p.outboundAttCompensation)
             _w.p.outboundAttCompensation = 0;
 
-          for (i = 0, l = _w.nIndex.length; i < l; i++) {
-            n = _w.nIndex[i];
+          for (j = 0, l = _w.nIndex.length; j < l; j++) {
+            n = _w.nIndex[j];
 
             nodes[_np(n, 'old_dx')] = nodes[_np(n, 'dx')];
             nodes[_np(n, 'old_dy')] = nodes[_np(n, 'dy')];
@@ -224,9 +224,9 @@
             var i1 = _w.state.index;
             while (i1 < nIndex.length && i1 < _w.state.index + cInt) {
               var n1 = nodes[nIndex[i1 + 1]];
-              for (i = 0, l = nIndex.length; i < l; i++) {
-                if (i < i1) {
-                  Repulsion.apply_nn(n1, nodes[nIndex[i]]);
+              for (j = 0, l = nIndex.length; j < l; j++) {
+                if (j < i1) {
+                  Repulsion.apply_nn(n1, nodes[nIndex[j]]);
                 }
               }
             }
@@ -281,26 +281,38 @@
           // CURSOR
           var i = _w.state.index;
           if (_w.p.edgeWeightInfluence == 0) {
-            while (i < edges.length && i < _w.state.index + cInt) {
-              var e = edges[i++];
-              Attraction.apply_nn(e.source, e.target, 1);
+            while (i < eIndex.length && i < _w.state.index + cInt) {
+              var e = edges[eIndex[i++]];
+              Attraction.apply_nn(
+                nodes[edges[_ep(e, 'source')]],
+                nodes[edges[_ep(e, 'target')]],
+                1
+              );
             }
           } else if (_w.p.edgeWeightInfluence == 1) {
-            while (i < edges.length && i < _w.state.index + cInt) {
-              var e = edges[i++];
-              Attraction.apply_nn(e.source, e.target, e.weight || 1);
+            while (i < eIndex.length && i < _w.state.index + cInt) {
+              var e = edges[eIndex[i++]];
+              Attraction.apply_nn(
+                nodes[edges[_ep(e, 'source')]],
+                nodes[edges[_ep(e, 'target')]],
+                nodes[edges[_ep(e, 'weigth')]] || 1
+              );
             }
           } else {
-            while (i < edges.length && i < _w.state.index + cInt) {
-              var e = edges[i++];
+            while (i < eIndex.length && i < _w.state.index + cInt) {
+              var e = edges[eIndex[i++]];
               Attraction.apply_nn(
-                e.source, e.target,
-                Math.pow(e.weight || 1, _w.p.edgeWeightInfluence)
+                nodes[edges[_ep(e, 'source')]],
+                nodes[edges[_ep(e, 'target')]],
+                Math.pow(
+                  nodes[edges[_ep(e, 'weigth')]] || 1,
+                  _w.p.edgeWeightInfluence
+                )
               );
             }
           }
 
-          if (i == edges.length) {
+          if (i == eIndex.length) {
             _w.state.step = 4;
             _w.state.index = 0;
           } else {
@@ -311,26 +323,32 @@
           break;
 
         case 4: // Auto adjust speed
-          var totalSwinging = 0;  // How much irregular movement
-          var totalEffectiveTraction = 0;  // Hom much useful movement
+          var totalSwinging = 0,  // How much irregular movement
+              totalEffectiveTraction = 0,
+              fixed,
+              swinging;  // Hom much useful movement
 
-          nodes.forEach(function(n) {
-            var fixed = n.fixed || false;
+          for (j = 0, l = _w.nIndex.length; j < l; j++) {
+            n = _w.nIndex[j];
+            fixed = !!nodes[_np(n, 'fixed')] || false;
             if (!fixed) {
-              var swinging = Math.sqrt(Math.pow(n.fa2.old_dx - n.fa2.dx, 2) +
-                             Math.pow(n.fa2.old_dy - n.fa2.dy, 2));
+              swinging = Math.sqrt(Math.pow(
+                nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')], 2) +
+                Math.pow(nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')], 2));
 
-              // If the node has a burst change of direction,
-              // then it's not converging.
-              totalSwinging += n.fa2.mass * swinging;
-              totalEffectiveTraction += n.fa2.mass *
+              totalSwinging += nodes[_np(n, 'mass')] * swinging;
+              totalEffectiveTraction += nodes[_np(n, 'mass')] *
                                         0.5 *
                                         Math.sqrt(
-                                          Math.pow(n.fa2.old_dx + n.fa2.dx, 2) +
-                                          Math.pow(n.fa2.old_dy + n.fa2.dy, 2)
+                                          Math.pow(
+                                            nodes[_np(n, 'old_dx')] +
+                                            nodes[_np(n, 'dx')], 2) +
+                                          Math.pow(
+                                            nodes[_np(n, 'old_dy')] +
+                                            nodes[_np(n, 'dy')], 2)
                                         );
             }
-          });
+          }
 
           _w.p.totalSwinging = totalSwinging;
           _w.p.totalEffectiveTraction = totalEffectiveTraction;
@@ -342,10 +360,16 @@
           /// Tweak start
           // Optimize jitter tolerance:
           // var jitterTolerance = Math.max(_w.p.jitterTolerance, Math.min(5, _w.p.totalEffectiveTraction / Math.pow(nodes.length, 2)))
-          var estimatedOptimalJitterTolerance = 0.02 * Math.sqrt(nodes.length) // The 'right' jitter tolerance for this network. Bigger networks need more tolerance.
+          var estimatedOptimalJitterTolerance = 0.02 * Math.sqrt(nIndex.length) // The 'right' jitter tolerance for this network. Bigger networks need more tolerance.
             ,minJT = Math.sqrt(estimatedOptimalJitterTolerance)
             ,maxJT = 10
-            ,jitterTolerance = _w.p.jitterTolerance * Math.max(minJT, Math.min(maxJT, estimatedOptimalJitterTolerance * _w.p.totalEffectiveTraction / Math.pow(nodes.length, 2)))
+            ,jitterTolerance = _w.p.jitterTolerance *
+              Math.max(
+                minJT,
+                Math.min(
+                  maxJT,
+                  estimatedOptimalJitterTolerance *
+                    _w.p.totalEffectiveTraction / Math.pow(nIndex.length, 2)))
 
           var minSpeedEfficiency = 0.05;
           
@@ -385,70 +409,72 @@
           // console.log('speed '+Math.floor(1000*_w.p.speed)/1000+' sEff '+Math.floor(1000*_w.p.speedEfficiency)/1000+' jitter '+Math.floor(1000*jitterTolerance)/1000+' swing '+Math.floor(_w.p.totalSwinging/nodes.length)+' conv '+Math.floor(_w.p.totalEffectiveTraction/nodes.length));
 
           // Save old coordinates
-          nodes.forEach(function(n) {
-            n.old_x = +n.x;
-            n.old_y = +n.y;
-          });
+          for (j = 0, l = _w.nIndex.length; j < l; j++) {
+            n = _w.nIndex[j];
+            nodes[_np(n, 'old_x')] = nodes[_np(n)];
+            nodes[_np(n, 'old_y')] = nodes[_np(n, 'y')];
+          }
 
           _w.state.step = 5;
           return true;
           break;
 
         case 5: // Apply forces
-          var i = _w.state.index;
+          var i = _w.state.index,
+              fixed;
           if (_w.p.adjustSizes) {
             var speed = _w.p.speed;
             // If nodes overlap prevention is active,
             // it's not possible to trust the swinging mesure.
-            while (i < nodes.length && i < _w.state.index + sInt) {
-              var n = nodes[i++];
-              var fixed = n.fixed || false;
+            while (i < nIndex.length && i < _w.state.index + sInt) {
+              n = _w.nIndex[i];
+              fixed = !!nodes[_np(n, 'fixed')] || false;
               if (!fixed) {
                 // Adaptive auto-speed: the speed of each node is lowered
                 // when the node swings.
-                var swinging = n.fa2.mass * Math.sqrt(  // tweak
+                var swinging = nodes[_np(n, 'mass')] * Math.sqrt(  // tweak
                 // var swinging = Math.sqrt(
-                  (n.fa2.old_dx - n.fa2.dx) *
-                  (n.fa2.old_dx - n.fa2.dx) +
-                  (n.fa2.old_dy - n.fa2.dy) *
-                  (n.fa2.old_dy - n.fa2.dy)
+                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) *
+                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) +
+                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')]) *
+                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')])
                 );
                 var factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
 
-                var df = Math.sqrt(Math.pow(n.fa2.dx, 2) +
-                         Math.pow(n.fa2.dy, 2));
+                var df = Math.sqrt(Math.pow(nodes[_np(n, 'dx')], 2) +
+                         Math.pow(nodes[_np(n, 'dy')], 2));
 
                 factor = Math.min(factor * df, 10) / df;
 
-                n.x += n.fa2.dx * factor;
-                n.y += n.fa2.dy * factor;
+                nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
+                nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
               }
             }
           } else {
             var speed = _w.p.speed;
-            while (i < nodes.length && i < _w.state.index + sInt) {
-              var n = nodes[i++];
-              var fixed = n.fixed || false;
+            while (i < nIndex.length && i < _w.state.index + sInt) {
+              n = _w.nIndex[i];
+              fixed = !!nodes[_np(n, 'fixed')] || false;
               if (!fixed) {
                 // Adaptive auto-speed: the speed of each node is lowered
                 // when the node swings.
-                var swinging = n.fa2.mass * Math.sqrt(  // tweak
+                var swinging = nodes[_np(n, 'mass')] * Math.sqrt(  // tweak
                 // var swinging = Math.sqrt(
-                  (n.fa2.old_dx - n.fa2.dx) *
-                  (n.fa2.old_dx - n.fa2.dx) +
-                  (n.fa2.old_dy - n.fa2.dy) *
-                  (n.fa2.old_dy - n.fa2.dy)
+                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) *
+                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) +
+                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')]) *
+                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')])
                 );
   //              var factor = speed / (1 + speed * Math.sqrt(swinging));
                 var factor = speed / (1 + Math.sqrt(speed * swinging)); // Tweak
 
-                n.x += n.fa2.dx * factor;
-                n.y += n.fa2.dy * factor;
+                nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
+                nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
               }
             }
           }
 
-          if (i == nodes.length) {
+          if (i == nIndex.length) {
             _w.state.step = 0;
             _w.state.index = 0;
             return false;

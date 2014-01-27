@@ -98,7 +98,7 @@
       this.nodesByteArray[j + 4] = 0;
       this.nodesByteArray[j + 5] = 0;
       this.nodesByteArray[j + 6] = 1 + this.graph.degree(nodes[i].id);
-      this.nodesByteArray[j + 7] = nodes[i].size;
+      this.nodesByteArray[j + 7] = 0;
       j += this.ppn;
     }
 
