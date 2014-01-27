@@ -181,9 +181,9 @@
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
-      self.bind('render', onMove);
     }
 
     for (i = 0, l = this.captors.length; i < l; i++)

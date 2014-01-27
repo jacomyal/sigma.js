@@ -144,11 +144,9 @@
               Math.pow(_startTouchX1 - _startTouchX0, 2)
             );
 
-            break;
+            e.preventDefault();
+            return false;
         }
-
-        e.preventDefault();
-        return false;
       }
     }
 
@@ -173,15 +171,17 @@
           case 2:
             if (e.touches.length === 1) {
               _handleStart(e);
+
+              e.preventDefault();
               break;
             }
             /* falls through */
           case 1:
             _camera.isMoving = false;
-            _self.dispatchEvent('mouseup');
             _self.dispatchEvent('stopDrag');
 
-            if (_isMoving)
+            if (_isMoving) {
+              _doubleTap = false;
               sigma.misc.animation.camera(
                 _camera,
                 {
@@ -195,18 +195,12 @@
                   duration: _settings('touchInertiaDuration')
                 }
               );
-            else
-              _camera.goTo({
-                x: _camera.x,
-                y: _camera.y
-              });
+            }
 
+            _isMoving = false;
             _touchMode = 0;
             break;
         }
-
-        e.preventDefault();
-        return false;
       }
     }
 
@@ -344,8 +338,8 @@
             break;
         }
 
-        e.preventDefault();
-        return false;
+        // e.preventDefault();
+        // return false;
       }
     }
 
