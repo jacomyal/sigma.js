@@ -14,23 +14,55 @@
     return shapes;
   }
 
-  var drawSquare = function(node,x,y,size,context) {
-    context.fillRect(
-        x+Math.sin(-3.142/4)*size,
-        y-Math.cos(-3.142/4)*size,
-        size*2*Math.sin(-3.142/4)*(-1),
-        size*2*Math.cos(-3.142/4));
+  /**
+   * For the standard closed shapes - the shape fill and border are drawn the
+   * same, with some minor differences for fill and border. To facilitate this we
+   * create the generic draw functions, that take a shape drawing func and
+   * return a shape-renderer/border-renderer
+   * ----------
+   */
+  var genericDrawShape = function(shapeFunc) {
+    return function(node,x,y,size,color,context) {
+      context.fillStyle = color;
+      context.beginPath();
+      shapeFunc(node,x,y,size,context);
+      context.closePath();
+      context.fill();
+    };
   }
-  register("square",drawSquare,drawSquare);
+
+  var genericDrawBorder = function(shapeFunc) {
+    return function(node,x,y,size,color,context) {
+      context.strokeStyle = color;
+      context.lineWidth = size / 5;
+      context.beginPath();
+      shapeFunc(node,x,y,size,context);
+      context.closePath();
+      context.stroke();
+    };
+  }
+
+  /**
+   * We now proced to use the generics to define our standard shape/border
+   * drawers: square, diamond, equilateral (polygon), and star
+   * ----------
+   */
+  var drawSquare = function(node,x,y,size,context) {
+    var rotate = Math.PI*45/180; // 45 deg rotation of a diamond shape
+    context.moveTo(x+size*Math.sin(rotate), y-size*Math.cos(rotate)); // first point on outer radius, dwangle 'rotate'
+    for(var i=1; i<4; i++) {
+      context.lineTo(x+Math.sin(rotate+2*Math.PI*i/4)*size, y-Math.cos(rotate+2*Math.PI*i/4)*size);
+    }
+  }
+  register("square",genericDrawShape(drawSquare),genericDrawBorder(drawSquare));
 
   var drawDiamond = function(node,x,y,size,context) {
     context.moveTo(x-size, y);
     context.lineTo(x, y-size);
     context.lineTo(x+size, y);
     context.lineTo(x, y+size);
-    context.moveTo(x-size, y);
   }
-  register("diamond",drawDiamond,drawDiamond);
+  register("diamond",genericDrawShape(drawDiamond),genericDrawBorder(drawDiamond));
 
   var drawEquilateral = function(node,x,y,size,context) {
     var pcount = (node.equilateral && node.equilateral.numPoints) || 5;
@@ -41,7 +73,7 @@
       context.lineTo(x+Math.sin(rotate+2*Math.PI*i/pcount)*radius, y-Math.cos(rotate+2*Math.PI*i/pcount)*radius);
     }
   }
-  register("equilateral",drawEquilateral,drawEquilateral);
+  register("equilateral",genericDrawShape(drawEquilateral),genericDrawBorder(drawEquilateral));
 
 
   var starShape = function(node,x,y,size,context) {
@@ -58,10 +90,15 @@
           y-Math.cos(2*Math.PI*(i+1)/pcount)*outR);
     }
   }
-  register("star",starShape,starShape);
+  register("star",genericDrawShape(starShape),genericDrawBorder(starShape));
 
-  var drawPacman = function(node,x,y,size,context) {
-    context.save();
+  /**
+   * An example of a non standard shape (pacman). Here we WILL NOT use the
+   * genericDraw functions, but rather register a full custom node renderer for
+   * fill, and skip the border renderer which is irrelevant for this shape
+   * ----------
+   */
+  var drawPacman = function(node,x,y,size,color,context) {
     context.fillStyle = 'yellow';
     context.beginPath();
     context.arc(x,y,size,1.25*Math.PI,0,false);
@@ -83,7 +120,6 @@
     context.arc(x+4*size/9,y-size/3,size/8,0,2*Math.PI,false);
     context.closePath();
     context.fill();
-    context.restore();
   }
   register("pacman",drawPacman,null);
 

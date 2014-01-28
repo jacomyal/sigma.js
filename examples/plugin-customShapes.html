@@ -203,7 +203,7 @@
         switch(node.type) {
           case "equilateral":
             node.equilateral = {
-              rotate: Math.random()*45,
+              rotate: Math.random()*45, // random rotate up to 45 deg
               numPoints: Math.round(5 + Math.random()*3)
             }
             node.borderColor = colors[Math.floor(Math.random()* colors.length)];
@@ -213,6 +213,10 @@
               innerRatio: 0.4 + Math.random()*0.2,
               numPoints: Math.round(4 + Math.random()*3)
             }
+            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
+            break;
+          case "square":
+          case "diamond":
             node.borderColor = colors[Math.floor(Math.random()* colors.length)];
             break;
           case "image":

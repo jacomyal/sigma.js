@@ -25,21 +25,12 @@
 
       // Draw shape
       if(drawShape) {
-        context.beginPath();
-        context.fillStyle = color;
-        drawShape(node,x,y,size,context);
-        context.closePath();
-        context.fill();
+        drawShape(node,x,y,size,color,context);
       }
 
       // Draw the border:
       if(drawBorder) {
-        context.beginPath();
-        context.lineWidth = size / 5;
-        context.strokeStyle = borderColor;
-        drawBorder(node,x,y,size,context);
-        context.closePath();
-        context.stroke();
+        drawBorder(node,x,y,size,borderColor,context);
       }
       
       // TODO add image
