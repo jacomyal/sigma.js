@@ -43,7 +43,6 @@
 
       // Retrieving data
       _this.nodesByteArray = new Float64Array(e.data.nodes);
-      _this.edgesByteArray = new Float64Array(e.data.edges);
 
       // Applying layout
       _this.applyLayoutChanges();
@@ -124,8 +123,7 @@
     }
   };
 
-  // TODO: send edges only once.
-  // make a better send function
+  // TODO: make a better send function
   Supervisor.prototype.applyLayoutChanges = function() {
     var nodes = this.graph.nodes(),
         j = 0,
@@ -146,14 +144,16 @@
     console.log('sending...');
     var content = {
       header: header || 'loop',
-      nodes: this.nodesByteArray.buffer,
-      edges: this.edgesByteArray.buffer 
+      nodes: this.nodesByteArray.buffer
     };
 
-    var buffers = [this.nodesByteArray.buffer, this.edgesByteArray.buffer];
+    var buffers = [this.nodesByteArray.buffer];
 
-    if (header === 'start')
+    if (header === 'start') {
       content.config = {};
+      content.edges = this.edgesByteArray.buffer;
+      buffers.push(this.edgesByteArray.buffer);
+    }
 
     this.worker.postMessage(content, buffers);
   };

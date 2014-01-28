@@ -27,7 +27,6 @@
     /**
      * ForceAtlas2 Defaults
      */
-     tada = 2
     var _w = {
       defaults: {
         linLogMode: false,
@@ -86,6 +85,9 @@
       if (i !== parseInt(i))
         throw arguments.callee.caller.name + ' dropped a non int.';
       switch (prop) {
+        case 'x':
+          return i;
+          break;
         case 'y':
           return i + 1;
           break;
@@ -108,7 +110,7 @@
           return i + 7;
           break;
         default:
-          return i;
+          throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
       }
     }
 
@@ -168,7 +170,7 @@
     }
 
     function _setAutoSettings() {
-      var nlen = _w.nodes.length / _w.ppn;
+      var nlen = _w.nIndex.length;
 
       // Tuning
       if (nlen >= 100)
@@ -220,26 +222,32 @@
       switch (_w.state.step) {
         case 0: // Pass init
           // Initialise layout data
-          if (_w.p.outboundAttCompensation)
-            _w.p.outboundAttCompensation = 0;
+          console.log(nodes[1]);
 
           for (j = 0, l = nIndex.length; j < l; j++) {
             n = nIndex[j];
 
             nodes[_np(n, 'old_dx')] = nodes[_np(n, 'dx')];
             nodes[_np(n, 'old_dy')] = nodes[_np(n, 'dy')];
-
-            if (_w.p.outboundAttractionDistribution) {
-              _w.p.outboundAttCompensation  += nodes[_np(n, 'mass')]
-            }
+            nodes[_np(n, 'dx')] = 0;
+            nodes[_np(n, 'dy')] = 0;
           }
-
-          _w.p.outboundAttCompensation /= l;
 
           // If Barnes Hut active, initialize root region
           if (_w.p.barnesHutOptimize) {
             _w.rootRegion = new Region(nIndex, 0);
             _w.rootRegion.buildSubRegions();
+          }
+
+          // If outboundAttractionDistribution active, compensate.
+          if (_w.p.outboundAttractionDistribution) {
+            _w.p.outboundAttCompensation = 0;
+
+            for (j = 0, l = nIndex.length; j < l; j++) {
+              n = nIndex[j];
+              _w.p.outboundAttCompensation += nodes[_np(n, 'mass')];
+            }
+            _w.p.outboundAttCompensation /= nIndex.length;
           }
 
           _w.state.step = 1;
@@ -461,8 +469,8 @@
           // Save old coordinates
           for (j = 0, l = _w.nIndex.length; j < l; j++) {
             n = _w.nIndex[j];
-            nodes[_np(n, 'old_x')] = +nodes[_np(n)];
-            nodes[_np(n, 'old_y')] = +nodes[_np(n, 'y')];
+            nodes[_np(n, 'old_dx')] = +nodes[_np(n, 'x')];
+            nodes[_np(n, 'old_dy')] = +nodes[_np(n, 'y')];
           }
 
           _w.state.step = 5;
@@ -590,7 +598,7 @@
       linRepulsion: function(coefficient) {
         this.apply_nn = function(n1, n2) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -612,7 +620,7 @@
         this.apply_nr = function(n, r) {
 
           // Get the distance
-          var xDist = _w.nodes[n] - r.massCenterX,
+          var xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
               yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -630,15 +638,15 @@
 
         this.apply_g = function(n, g) {
           // Get the distance
-          var xDist = _w.nodes[n],
+          var xDist = _w.nodes[_np(n, 'x')],
               yDist = _w.nodes[_np(n, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
           if (distance > 0) {
             // NB: factor = force / distance
             var factor = coefficient * _w.nodes[_np(n, 'mass')] * g / distance;
-            _w.nodes[n] -= xDist * factor;
-            _w.nodes[_np(n, 'y')] -= yDist * factor;
+            _w.nodes[_np(n, 'dx')] -= xDist * factor;
+            _w.nodes[_np(n, 'dy')] -= yDist * factor;
           }
         }
       },
@@ -646,7 +654,7 @@
         this.apply_nn = function(n1, n2) {
 
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist) -
                          _w.nodes[_np(n1, 'size')] -
@@ -681,7 +689,7 @@
         this.apply_nr = function(n, r) {
 
           // Get the distance
-          var xDist = _w.nodes[n] - r.massCenterX,
+          var xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
               yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -707,7 +715,7 @@
 
         this.apply_g = function(n, g) {
           // Get the distance
-          var xDist = _w.nodes[n],
+          var xDist = _w.nodes[_np(n, 'x')],
               yDist = _w.nodes[_np(n, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -723,7 +731,7 @@
       strongGravity: function(coefficient) {
         this.apply_g = function(n, g) {
           // Get the distance
-          var xDist = _w.nodes[n],
+          var xDist = _w.nodes[_np(n, 'x')],
               yDist = _w.nodes[_np(n, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -737,10 +745,9 @@
         }
       },
       linAttraction: function(coefficient) {
-        // ERROR
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               factor = -coefficient * e;
 
@@ -754,9 +761,9 @@
       linAttraction_massDistributed: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
-              factor = -coefficient * e / w.nodes[_np(n1, 'mass')];
+              factor = -coefficient * e / _w.nodes[_np(n1, 'mass')];
 
           _w.nodes[_np(n1, 'dx')] += xDist * factor;
           _w.nodes[_np(n1, 'dy')] += yDist * factor;
@@ -768,7 +775,7 @@
       logAttraction: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -790,7 +797,7 @@
       logAttraction_degreeDistributed: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -813,7 +820,7 @@
       linAttraction_antiCollision: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -832,7 +839,7 @@
       linAttraction_degreeDistributed_antiCollision: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -851,7 +858,7 @@
       logAttraction_antiCollision: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -873,7 +880,7 @@
       logAttraction_degreeDistributed_antiCollision: function(coefficient) {
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
-          var xDist = _w.nodes[n1] - _w.nodes[n2],
+          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -935,7 +942,7 @@
           // Mass
           curmass = _w.nodes[_np(n, 'mass')];
           mass += curmass;
-          massSumX += _w.nodes[n] * curmass;
+          massSumX += _w.nodes[_np(n, 'x')] * curmass;
           massSumY += _w.nodes[_np(n, 'y')] * curmass;
         }
 
@@ -947,8 +954,8 @@
 
           // Size
           distance = Math.sqrt(
-            (_w.nodes[n] - massCenterX) *
-            (_w.nodes[n] - massCenterX) +
+            (_w.nodes[_np(n, 'x')] - massCenterX) *
+            (_w.nodes[_np(n, 'x')] - massCenterX) +
             (_w.nodes[_np(n, 'y')] - massCenterY) *
             (_w.nodes[_np(n, 'y')] - massCenterY)
           );
@@ -978,7 +985,7 @@
             j;
 
         for (i = 0, l = this.nodes.length; i < l; i++) {
-          n = _w.nodes[this.nodes[i]];
+          n = this.nodes[i];
           nodesColumn = (_w.nodes[this.nodes[i]] < massCenterX) ?
             (leftNodes) :
             (rightNodes);
@@ -988,6 +995,7 @@
         var tl = [], bl = [], br = [], tr = [];
 
         for (i = 0, l = leftNodes.length; i < l; i++) {
+          n = this.nodes[i];
           nodesLine = (_w.nodes[_np(this.nodes[i], 'y')] < massCenterY) ?
             (tl) :
             (bl);
@@ -995,6 +1003,7 @@
         }
 
         for (i = 0, l = rightNodes.length; i < l; i++) {
+          n = this.nodes[i];
           nodesLine = (_w.nodes[_np(this.nodes[i], 'y')] < massCenterY) ?
             (tr) :
             (br);
@@ -1010,12 +1019,12 @@
           if (tab.length > 0) {
             if (nextDepth <= this.depthLimit &&
                 tab.length < this.nodes.length) {
-              subregion = new Region(a, nextDepth);
+              subregion = new Region(tab, nextDepth);
               subregions.push(subregion);
             } else {
               for (j = 0; j < tab.length; j++) {
-                var oneNodeList = [n];
-                subregion = Region(oneNodeList, nextDepth);
+                var oneNodeList = [];
+                subregion = new Region(oneNodeList, nextDepth);
                 subregions.push(subregion);
               }
             }
@@ -1057,11 +1066,8 @@
      */
     function _sendDataBackToSupervisor() {
       postMessage(
-        {
-          nodes: _w.nodes.buffer,
-          edges: _w.edges.buffer
-        },
-        [_w.nodes.buffer, _w.edges.buffer]
+        {nodes: _w.nodes.buffer},
+        [_w.nodes.buffer]
       );
     }
 
@@ -1089,8 +1095,6 @@
 
         case 'loop':
           _w.nodes = new Float64Array(e.data.nodes);
-          _w.edges = new Float64Array(e.data.edges);
-
           _oneGo();
           break;
 
