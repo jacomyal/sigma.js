@@ -10,4 +10,3 @@ TODOS:
 * Add images
 * Clean up the example page
 * Proper README
-* break out shapes to a separate shape-library file
