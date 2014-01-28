@@ -102,7 +102,8 @@
           self.dispatchEvent('clickNodes', {
             node: nodes
           });
-        }
+        } else
+          self.dispatchEvent('clickStage');
       }
 
       function onOut(e) {

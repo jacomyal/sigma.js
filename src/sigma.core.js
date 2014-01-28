@@ -347,6 +347,7 @@
       renderer.bind(
         [
           'click',
+          'clickStage',
           'clickNode',
           'clickNodes',
           'overNode',
