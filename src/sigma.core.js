@@ -505,9 +505,10 @@
         try {
           this.renderers[a[i]].render();
         } catch (e) {
-          console.log(
-            'Warning: The renderer "' + a[i] + '" crashed on ".render()"'
-          );
+          if (this.settings('verbose'))
+            console.log(
+              'Warning: The renderer "' + a[i] + '" crashed on ".render()"'
+            );
         }
       else
         this.renderers[a[i]].render();
@@ -539,9 +540,10 @@
           try {
             a[i].render();
           } catch (e) {
-            console.log(
-              'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
-            );
+            if (this.settings('verbose'))
+              console.log(
+                'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
+              );
           }
         else
           a[i].render();
@@ -553,9 +555,12 @@
             try {
               a[i].render();
             } catch (e) {
-              console.log(
-                'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
-              );
+              if (this.settings('verbose'))
+                console.log(
+                  'Warning: The renderer "' +
+                    a[i].id +
+                    '" crashed on ".render()"'
+                );
             }
           else
             a[i].render();
@@ -588,7 +593,7 @@
 
     // Kill each camera:
     for (k in this.cameras)
-      this.killCamera(this.camera[k]);
+      this.killCamera(this.cameras[k]);
 
     delete this.renderers;
     delete this.cameras;
