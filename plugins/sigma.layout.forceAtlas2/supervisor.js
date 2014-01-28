@@ -86,7 +86,7 @@
     var nodes = this.graph.nodes(),
         edges = this.graph.edges(),
         nbytes = nodes.length * this.ppn,
-        ebytes = nodes.length * this.ppe,
+        ebytes = edges.length * this.ppe,
         nIndex = {},
         i,
         j,
@@ -101,7 +101,7 @@
     for (i = j = 0, l = nodes.length; i < l; i++) {
 
       // Populating index
-      nIndex[nodes[i].id] = i;
+      nIndex[nodes[i].id] = j;
 
       // Populating byte array
       this.nodesByteArray[j] = nodes[i].x;

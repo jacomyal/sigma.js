@@ -27,6 +27,7 @@
     /**
      * ForceAtlas2 Defaults
      */
+     tada = 2
     var _w = {
       defaults: {
         linLogMode: false,
@@ -66,12 +67,22 @@
       }
     };
 
+    // TODO: drop after debug
+    function _t(v) {
+      if (isNaN(v) && v !== undefined)
+        console.log('NaN alert');
+      else if (v === undefined)
+        console.log('undefined alert');
+    }
+
     /**
      * Matrices properties accessors
      */
 
     // TODO: drop bug checking tests
     function _np(i, prop) {
+      if (i % _w.ppn !== 0)
+        throw arguments.callee.caller + ' dropped a non correct (' + i + ').';
       if (i !== parseInt(i))
         throw arguments.callee.caller.name + ' dropped a non int.';
       switch (prop) {
@@ -90,7 +101,6 @@
         case 'old_dy':
           return i + 5;
           break;
-        case 'degree':
         case 'mass':
           return i + 6;
           break;
@@ -104,8 +114,11 @@
 
     function _ep(i, prop) {
       if (i !== parseInt(i))
-        throw arguments.callee.caller.toString() + ' dropped a non int.';
+        throw arguments.callee.caller.name + ' dropped a non int.';
       switch (prop) {
+        case 'source':
+          return i;
+          break;
         case 'target':
           return i + 1;
           break;
@@ -113,7 +126,7 @@
           return i + 2;
           break;
         default:
-          return i;
+          throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
       }
     }
 
@@ -319,6 +332,7 @@
           if (_w.p.edgeWeightInfluence == 0) {
             while (i < eIndex.length && i < _w.state.index + cInt) {
               var e = edges[eIndex[i++]];
+
               Attraction.apply_nn(
                 edges[_ep(e, 'source')],
                 edges[_ep(e, 'target')],
@@ -331,7 +345,7 @@
               Attraction.apply_nn(
                 edges[_ep(e, 'source')],
                 edges[_ep(e, 'target')],
-                edges[_ep(e, 'weigth')] || 1
+                edges[_ep(e, 'weight')] || 1
               );
             }
           } else {
@@ -341,7 +355,7 @@
                 edges[_ep(e, 'source')],
                 edges[_ep(e, 'target')],
                 Math.pow(
-                  edges[_ep(e, 'weigth')] || 1,
+                  edges[_ep(e, 'weight')] || 1,
                   _w.p.edgeWeightInfluence
                 )
               );
@@ -405,7 +419,7 @@
                 Math.min(
                   maxJT,
                   estimatedOptimalJitterTolerance *
-                    _w.p.totalEffectiveTraction / Math.pow(nIndex.length, 2)))
+                    _w.p.totalEffectiveTraction / Math.pow(nIndex.length, 2)));
 
           var minSpeedEfficiency = 0.05;
           
@@ -447,8 +461,8 @@
           // Save old coordinates
           for (j = 0, l = _w.nIndex.length; j < l; j++) {
             n = _w.nIndex[j];
-            nodes[_np(n, 'old_x')] = nodes[_np(n)];
-            nodes[_np(n, 'old_y')] = nodes[_np(n, 'y')];
+            nodes[_np(n, 'old_x')] = +nodes[_np(n)];
+            nodes[_np(n, 'old_y')] = +nodes[_np(n, 'y')];
           }
 
           _w.state.step = 5;
@@ -466,6 +480,7 @@
               n = _w.nIndex[i++];
               fixed = !!nodes[_np(n, 'fixed')] || false;
               if (!fixed) {
+
                 // Adaptive auto-speed: the speed of each node is lowered
                 // when the node swings.
                 var swinging = nodes[_np(n, 'mass')] * Math.sqrt(  // tweak
@@ -501,7 +516,9 @@
                   (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')]) *
                   (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')])
                 );
+
   //              var factor = speed / (1 + speed * Math.sqrt(swinging));
+  // NaN Here!!!
                 var factor = speed / (1 + Math.sqrt(speed * swinging)); // Tweak
                 nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
                 nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
@@ -620,7 +637,6 @@
           if (distance > 0) {
             // NB: factor = force / distance
             var factor = coefficient * _w.nodes[_np(n, 'mass')] * g / distance;
-
             _w.nodes[n] -= xDist * factor;
             _w.nodes[_np(n, 'y')] -= yDist * factor;
           }
@@ -721,6 +737,7 @@
         }
       },
       linAttraction: function(coefficient) {
+        // ERROR
         this.apply_nn = function(n1, n2, e) {
           // Get the distance
           var xDist = _w.nodes[n1] - _w.nodes[n2],
@@ -916,10 +933,10 @@
           n = this.nodes[i];
 
           // Mass
-          curmass = _w.nodes[_np(n), 'mass'];
+          curmass = _w.nodes[_np(n, 'mass')];
           mass += curmass;
           massSumX += _w.nodes[n] * curmass;
-          massSumY += _w.nodes[_np(n), 'y'] * curmass;
+          massSumY += _w.nodes[_np(n, 'y')] * curmass;
         }
 
         var massCenterX = massSumX / mass,
