@@ -96,12 +96,11 @@ module.exports = function(grunt) {
         }
       },
       plugins: {
-        files: {
-          'build/sigma.plugins.min.js': pluginFiles
-        },
-        options: {
-          banner: '/* sigma.js plugins - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n'
-        }
+        files: pluginFiles.reduce(function(res, path) {
+          var dest = 'build/' + path.replace(/\/\*\.js$/, '.min.js');
+          res[dest] = path;
+          return res;
+        }, {})
       }
     },
     concat: {
@@ -122,6 +121,19 @@ module.exports = function(grunt) {
           return '<script src="../' + path + '"></script>';
         }).concat('<!-- END SIGMA IMPORTS -->')).join('\n    ')
       }
+    },
+    zip: {
+      release: {
+        dest: 'build/release-v<%= pkg.version %>.zip',
+        src: [
+          'README.md',
+          'build/sigma.min.js',
+          'build/plugins/*.min.js'
+        ],
+        router: function(filepath) {
+          return filepath.replace(/build\//, '');
+        }
+      }
     }
   });
 
@@ -129,4 +141,5 @@ module.exports = function(grunt) {
 
   // By default, will check lint, hint, test and minify:
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
+  grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify', 'zip']);
 };
