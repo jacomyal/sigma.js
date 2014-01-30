@@ -1,4 +1,13 @@
-<img src="http://sigmajs.org/img/sigmajs.png"></img>
+sigma.js - v0.1
+===============
+
+---
+
+### Note about this specific branch
+
+This branch contains the first version of sigma, which is now **deprecated**. The current version is on the `master` branch of the [Github repository](https://github.com/jacomyal/sigma.js).
+
+---
 
 *sigma.js* is a free and open-source JavaScript library to draw graphs, using the HTML5 canvas element. It has been especially designed to share interactive network maps on a Web page or to explore dynamically a network database. It is distributed under the [MIT License](https://github.com/jacomyal/sigma.js/blob/master/LICENSE.txt).
 
