@@ -620,7 +620,7 @@
   sigma.instances = function(id) {
     return arguments.length ?
       __instances[id] :
-      sigma.utils.extends({}, __instances);
+      sigma.utils.extend({}, __instances);
   };
 
 
