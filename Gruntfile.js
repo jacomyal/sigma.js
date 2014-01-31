@@ -142,4 +142,7 @@ module.exports = function(grunt) {
   // By default, will check lint, hint, test and minify:
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
   grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify', 'zip']);
+
+  // For travis-ci.org, only launch tests:
+  grunt.registerTask('travis', ['qunit']);
 };

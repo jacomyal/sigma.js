@@ -19,5 +19,8 @@
     "load-grunt-tasks": "~0.2.0",
     "grunt-sed": "~0.1.1",
     "grunt-zip": "~0.12.0"
+  },
+  "scripts": {
+    "test": "grunt travis"
   }
 }
