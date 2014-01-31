@@ -55,26 +55,18 @@
     <script src="../src/misc/sigma.misc.bindEvents.js"></script>
     <script src="../src/misc/sigma.misc.drawHovers.js"></script>
     <!-- END SIGMA IMPORTS -->
+    <!-- PLUG-IN IMPORTS -->
     <script src="../plugins/sigma.renderers.customShapes/shape-library.js"></script>
     <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
+    <!-- END PLUG-IN IMPORTS -->
     <script>
       /**
-       * This is a basic example on how to develop a custom node renderer. In
-       * this example, the renderer will display an image clipped in a disc,
-       * with a border colored according the node's "color" value.
-       *
-       * If a node as the value "image" to its attribute "type", then it will
-       * displayed with the node renderer "sigma.canvas.nodes.image", with the
-       * url being its "url" value.
-       *
-       * IMPORTANT: This node renderer just works with the canvas renderer. If
-       * you do want to display images with the WebGL renderer, you will have
-       * to develop a specific WebGL node renderer.
+       * IMPORTANT: This only works with the canvas renderer. TBD in the future
+       * will also support the WebGL renderer.
        */
       sigma.utils.pkg('sigma.canvas.nodes');
 
-      // Now that's the renderer has been implemented, let's generate a graph
-      // to render:
+      // generate a random graph
       var i,
           s,
           img,
@@ -90,7 +82,6 @@
             'img/img3.png',
             'img/img4.png'
           ],
-          loaded = 0,
           colors = [
             '#617db4',
             '#668f3c',
@@ -103,23 +94,30 @@
         var node = {
           id: 'n' + i,
           label: 'Node ' + i,
+          // note the ShapeLibrary.enumerate() returns the names of all
+          // supported renderers
           type: ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
           x: Math.random(),
           y: Math.random(),
           size: Math.random(),
-          color: colors[Math.floor(Math.random() * colors.length)]
+          color: colors[Math.floor(Math.random() * colors.length)],
+          borderColor: colors[Math.floor(Math.random()* colors.length)]
         };
+
+        if(Math.random()>0.75 && node.type!='pacman') { // ~0.75 of the (non-pacman)shapes will have an image
+          node.image = {
+            url: urls[Math.floor(Math.random() * urls.length)],
+            // scale/clip are ratio values applied on top of 'size'
+            scale: 1.3,
+            clip: 0.85
+          }
+        }
+
         switch(node.type) {
           case "equilateral":
             node.equilateral = {
               rotate: Math.random()*45, // random rotate up to 45 deg
               numPoints: Math.round(5 + Math.random()*3)
-            }
-            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
-            node.image = {
-              url: urls[Math.floor(Math.random() * urls.length)],
-              scale: 1.3,
-              clip: 0.85
             }
             break;
           case "star":
@@ -127,12 +125,20 @@
               innerRatio: 0.4 + Math.random()*0.2,
               numPoints: Math.round(4 + Math.random()*3)
             }
-            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
+            if(node.image) {
+              // note clip/scale are ratio values. So we fit them to the inner ratio of the star shape
+              node.image.clip = node.star.innerRatio *0.95;
+              node.image.scale = node.star.innerRatio *1.2;
+            }
             break;
           case "square":
           case "diamond":
+            if(node.image) {
+              // note clip/scale are ratio values. So we fit them to the borders of the square shape
+              node.image.clip = 0.7;
+            }
+            break;
           case "circle":
-            node.borderColor = colors[Math.floor(Math.random()* colors.length)];
             break;
         }
         g.nodes.push(node);
