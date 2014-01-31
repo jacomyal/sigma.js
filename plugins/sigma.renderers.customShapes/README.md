@@ -36,7 +36,7 @@ The list of available renderer types can be obtained by calling `ShapeLibrary.en
 
 ## Images
 You can add an image to any node, simply by adding `node.image` property, with the following content:
-````
+````javascript
 node.image = {
   url: /* mandatory image URL */,
   clip: /* Ratio of image clipping disk compared to node size (def 1.0) - see example to how we adapt this to differenmt shapes */,
