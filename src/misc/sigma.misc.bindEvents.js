@@ -56,6 +56,7 @@
           s = n[prefix + 'size'];
 
           if (
+            !n.hidden &&
             modifiedX > x - s &&
             modifiedX < x + s &&
             modifiedY > y - s &&
@@ -102,7 +103,8 @@
           self.dispatchEvent('clickNodes', {
             node: nodes
           });
-        }
+        } else
+          self.dispatchEvent('clickStage');
       }
 
       function onOut(e) {

@@ -133,6 +133,7 @@
         batchSize,
         index = {},
         graph = this.graph,
+        nodes = this.graph.nodes,
         prefix = this.options.prefix || '',
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes'),
@@ -177,12 +178,16 @@
     // - If settings('batchEdgesDrawing') is true, the edges are displayed per
     //   batches. If not, they are drawn in one frame.
     if (drawEdges) {
-      // First, let's identify which edges to draw. To do this, we just draw
-      // every edges that have at least one extremity displayed, according to
-      // the quadtree:
+      // First, let's identify which edges to draw. To do this, we just keep
+      // every edges that have at least one extremity displayed according to
+      // the quadtree and the "hidden" attribute. We also do not keep hidden
+      // edges.
       for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
         o = a[i];
-        if (index[o.source] || index[o.target])
+        if (
+          (index[o.source] || index[o.target]) &&
+          (!o.hidden && !nodes(o.source).hidden && !nodes(o.target).hidden)
+        )
           this.edgesOnScreen.push(o);
       }
 
@@ -245,11 +250,12 @@
     if (drawNodes) {
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        (renderers[a[i].type] || renderers.def)(
-          a[i],
-          this.contexts.nodes,
-          embedSettings
-        );
+        if (!a[i].hidden)
+          (renderers[a[i].type] || renderers.def)(
+            a[i],
+            this.contexts.nodes,
+            embedSettings
+          );
     }
 
     // Draw labels:
@@ -257,11 +263,12 @@
     if (drawLabels) {
       renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        (renderers[a[i].type] || renderers.def)(
-          a[i],
-          this.contexts.labels,
-          embedSettings
-        );
+        if (!a[i].hidden)
+          (renderers[a[i].type] || renderers.def)(
+            a[i],
+            this.contexts.labels,
+            embedSettings
+          );
     }
 
     this.dispatchEvent('render');

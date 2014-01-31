@@ -97,6 +97,9 @@
       s.bind('overNode outNode clickNode', function(e) {
         console.log(e.type, e.data.node.label);
       });
+      s.bind('clickStage', function(e) {
+        console.log(e.type);
+      });
     </script>
   </body>
 </html>

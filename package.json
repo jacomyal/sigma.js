@@ -17,6 +17,10 @@
     "grunt-contrib-jshint": "~0.7.1",
     "grunt-contrib-concat": "~0.3.0",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-sed": "~0.1.1"
+    "grunt-sed": "~0.1.1",
+    "grunt-zip": "~0.12.0"
+  },
+  "scripts": {
+    "test": "grunt travis"
   }
 }
