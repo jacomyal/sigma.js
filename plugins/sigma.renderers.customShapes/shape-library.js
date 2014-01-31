@@ -56,6 +56,11 @@
   }
   register("square",genericDrawShape(drawSquare),genericDrawBorder(drawSquare));
 
+  var drawCircle = function(node,x,y,size,context) {
+    context.arc(x,y,size,0,Math.PI*2,true);
+  }
+  register("circle",genericDrawShape(drawCircle),genericDrawBorder(drawCircle));
+
   var drawDiamond = function(node,x,y,size,context) {
     context.moveTo(x-size, y);
     context.lineTo(x, y-size);
