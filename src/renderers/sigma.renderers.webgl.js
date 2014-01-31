@@ -174,15 +174,21 @@
             a.length * renderer.POINTS * renderer.ATTRIBUTES
           );
 
-        renderer.addEdge(
-          a[i],
-          graph.nodes(a[i].source),
-          graph.nodes(a[i].target),
-          this.edgeFloatArrays[k].array,
-          i * renderer.POINTS * renderer.ATTRIBUTES,
-          options.prefix,
-          this.settings
-        );
+        // Just check that the edge and both its extremities are visible:
+        if (
+          !a[i].hidden &&
+          !graph.nodes(a[i].source).hidden &&
+          !graph.nodes(a[i].target).hidden
+        )
+          renderer.addEdge(
+            a[i],
+            graph.nodes(a[i].source),
+            graph.nodes(a[i].target),
+            this.edgeFloatArrays[k].array,
+            i * renderer.POINTS * renderer.ATTRIBUTES,
+            options.prefix,
+            this.settings
+          );
       }
     }
 
@@ -196,13 +202,17 @@
             a.length * renderer.POINTS * renderer.ATTRIBUTES
           );
 
-        renderer.addNode(
-          a[i],
-          this.nodeFloatArrays[k].array,
-          i * renderer.POINTS * renderer.ATTRIBUTES,
-          options.prefix,
-          this.settings
-        );
+        // Just check that the edge and both its extremities are visible:
+        if (
+          !a[i].hidden
+        )
+          renderer.addNode(
+            a[i],
+            this.nodeFloatArrays[k].array,
+            i * renderer.POINTS * renderer.ATTRIBUTES,
+            options.prefix,
+            this.settings
+          );
       }
     }
 
@@ -431,10 +441,11 @@
       };
 
       for (i = 0, l = a.length; i < l; i++)
-        (
-          sigma.canvas.labels[a[i].type] ||
-          sigma.canvas.labels.def
-        )(a[i], this.contexts.labels, o);
+        if (!a[i].hidden)
+          (
+            sigma.canvas.labels[a[i].type] ||
+            sigma.canvas.labels.def
+          )(a[i], this.contexts.labels, o);
     }
 
     this.dispatchEvent('render');

@@ -55,11 +55,12 @@
       // Render
       if (embedSettings('enableHovering'))
         for (k in hoveredNodes)
-          (renderers[hoveredNodes[k].type] || renderers.def)(
-            hoveredNodes[k],
-            self.contexts.hover,
-            embedSettings
-          );
+          if (!hoveredNodes[k].hidden)
+            (renderers[hoveredNodes[k].type] || renderers.def)(
+              hoveredNodes[k],
+              self.contexts.hover,
+              embedSettings
+            );
     }
   };
 }).call(this);
