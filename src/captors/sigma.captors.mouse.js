@@ -137,6 +137,9 @@
 
         _camera.isMoving = false;
 
+        var x = sigma.utils.getX(e),
+            y = sigma.utils.getY(e);
+
         if (_isMoving) {
           sigma.misc.animation.killAll(_camera);
           sigma.misc.animation.camera(
@@ -153,13 +156,18 @@
             }
           );
         } else if (
-          _startMouseX !== sigma.utils.getX(e) ||
-          _startMouseY !== sigma.utils.getY(e)
+          _startMouseX !== x ||
+          _startMouseY !== y
         )
           _camera.goTo({
             x: _camera.x,
             y: _camera.y
           });
+
+        _self.dispatchEvent('mouseup', {
+          x: x - e.target.width / 2,
+          y: y - e.target.height / 2
+        });
 
         // Update _isMoving flag:
         _isMoving = false;
@@ -184,6 +192,11 @@
 
         _startMouseX = sigma.utils.getX(e);
         _startMouseY = sigma.utils.getY(e);
+
+        _self.dispatchEvent('mouseup', {
+          x: _startMouseX - e.target.width / 2,
+          y: _startMouseY - e.target.height / 2
+        });
       }
     }
 

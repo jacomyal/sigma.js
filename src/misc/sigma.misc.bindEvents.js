@@ -56,6 +56,7 @@
           s = n[prefix + 'size'];
 
           if (
+            !n.hidden &&
             modifiedX > x - s &&
             modifiedX < x + s &&
             modifiedY > y - s &&
@@ -102,7 +103,8 @@
           self.dispatchEvent('clickNodes', {
             node: nodes
           });
-        }
+        } else
+          self.dispatchEvent('clickStage');
       }
 
       function onOut(e) {
@@ -181,9 +183,9 @@
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
-      self.bind('render', onMove);
     }
 
     for (i = 0, l = this.captors.length; i < l; i++)

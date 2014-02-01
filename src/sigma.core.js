@@ -347,6 +347,7 @@
       renderer.bind(
         [
           'click',
+          'clickStage',
           'clickNode',
           'clickNodes',
           'overNode',
@@ -505,9 +506,10 @@
         try {
           this.renderers[a[i]].render();
         } catch (e) {
-          console.log(
-            'Warning: The renderer "' + a[i] + '" crashed on ".render()"'
-          );
+          if (this.settings('verbose'))
+            console.log(
+              'Warning: The renderer "' + a[i] + '" crashed on ".render()"'
+            );
         }
       else
         this.renderers[a[i]].render();
@@ -539,9 +541,10 @@
           try {
             a[i].render();
           } catch (e) {
-            console.log(
-              'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
-            );
+            if (this.settings('verbose'))
+              console.log(
+                'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
+              );
           }
         else
           a[i].render();
@@ -553,9 +556,12 @@
             try {
               a[i].render();
             } catch (e) {
-              console.log(
-                'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
-              );
+              if (this.settings('verbose'))
+                console.log(
+                  'Warning: The renderer "' +
+                    a[i].id +
+                    '" crashed on ".render()"'
+                );
             }
           else
             a[i].render();
@@ -614,7 +620,7 @@
   sigma.instances = function(id) {
     return arguments.length ?
       __instances[id] :
-      sigma.utils.extends({}, __instances);
+      sigma.utils.extend({}, __instances);
   };
 
 
