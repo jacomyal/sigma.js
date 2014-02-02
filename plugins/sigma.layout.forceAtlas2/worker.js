@@ -79,57 +79,43 @@
      */
 
     // TODO: drop bug checking tests
-    function _np(i, prop) {
-      if (i % _w.ppn !== 0)
-        throw arguments.callee.caller + ' dropped a non correct (' + i + ').';
+    var _npIndex = {
+      x: 0,
+      y: 1,
+      dx: 2,
+      dy: 3,
+      old_dx: 4,
+      old_dy: 5,
+      mass: 6,
+      fixed: 7
+    };
+    function _np(i, prop, log) {
+      if ((i % _w.ppn) !== 0)
+        throw log + ' dropped a non correct (' + i + ').';
       if (i !== parseInt(i))
-        throw arguments.callee.caller.name + ' dropped a non int.';
-      switch (prop) {
-        case 'x':
-          return i;
-          break;
-        case 'y':
-          return i + 1;
-          break;
-        case 'dx':
-          return i + 2;
-          break;
-        case 'dy':
-          return i + 3;
-          break;
-        case 'old_dx':
-          return i + 4;
-          break;
-        case 'old_dy':
-          return i + 5;
-          break;
-        case 'mass':
-          return i + 6;
-          break;
-        case 'fixed':
-          return i + 7;
-          break;
-        default:
-          throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
-      }
+        throw log + ' dropped a non int.';
+
+      if (prop in _npIndex)
+        return i + _npIndex[prop];
+      else
+        throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
     }
 
-    function _ep(i, prop) {
+    var _epIndex = {
+      source: 0,
+      target: 1,
+      weight: 2
+    };
+    function _ep(i, prop, log) {
+      if ((i % _w.ppe) !== 0)
+        throw log + ' dropped a non correct (' + i + ').';
       if (i !== parseInt(i))
-        throw arguments.callee.caller.name + ' dropped a non int.';
-      switch (prop) {
-        case 'source':
-          return i;
-          break;
-        case 'target':
-          return i + 1;
-          break;
-        case 'weight':
-          return i + 2;
-          break;
-        default:
-          throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
-      }
+        throw log + ' dropped a non int.';
+
+      if (prop in _epIndex)
+        return i + _epIndex[prop];
+      else
+        throw 'ForceAtlas2.Worker - Inexistant property given (' + prop + ').';
     }
 
     /**
@@ -222,15 +208,13 @@
       switch (_w.state.step) {
         case 0: // Pass init
           // Initialise layout data
-          console.log(nodes[1]);
-
           for (j = 0, l = nIndex.length; j < l; j++) {
             n = nIndex[j];
 
-            nodes[_np(n, 'old_dx')] = nodes[_np(n, 'dx')];
-            nodes[_np(n, 'old_dy')] = nodes[_np(n, 'dy')];
-            nodes[_np(n, 'dx')] = 0;
-            nodes[_np(n, 'dy')] = 0;
+            nodes[_np(n, 'old_dx', 'init')] = nodes[_np(n, 'dx', 'init')];
+            nodes[_np(n, 'old_dy', 'init')] = nodes[_np(n, 'dy', 'init')];
+            nodes[_np(n, 'dx', 'init')] = 0;
+            nodes[_np(n, 'dy', 'init')] = 0;
           }
 
           // If Barnes Hut active, initialize root region
@@ -245,7 +229,7 @@
 
             for (j = 0, l = nIndex.length; j < l; j++) {
               n = nIndex[j];
-              _w.p.outboundAttCompensation += nodes[_np(n, 'mass')];
+              _w.p.outboundAttCompensation += nodes[_np(n, 'mass', 'init')];
             }
             _w.p.outboundAttCompensation /= nIndex.length;
           }
@@ -339,31 +323,31 @@
           var i = _w.state.index;
           if (_w.p.edgeWeightInfluence == 0) {
             while (i < eIndex.length && i < _w.state.index + cInt) {
-              var e = edges[eIndex[i++]];
+              var e = eIndex[i++];
 
               Attraction.apply_nn(
-                edges[_ep(e, 'source')],
-                edges[_ep(e, 'target')],
+                edges[_ep(e, 'source', 'edgeWeightInfluence 0')],
+                edges[_ep(e, 'target', 'edgeWeightInfluence 0')],
                 1
               );
             }
           } else if (_w.p.edgeWeightInfluence == 1) {
             while (i < eIndex.length && i < _w.state.index + cInt) {
-              var e = edges[eIndex[i++]];
+              var e = eIndex[i++];
               Attraction.apply_nn(
-                edges[_ep(e, 'source')],
-                edges[_ep(e, 'target')],
-                edges[_ep(e, 'weight')] || 1
+                edges[_ep(e, 'source', 'edgeWeightInfluence 1')],
+                edges[_ep(e, 'target', 'edgeWeightInfluence 1')],
+                edges[_ep(e, 'weight', 'edgeWeightInfluence 1')] || 1
               );
             }
           } else {
             while (i < eIndex.length && i < _w.state.index + cInt) {
-              var e = edges[eIndex[i++]];
+              var e = eIndex[i++];
               Attraction.apply_nn(
-                edges[_ep(e, 'source')],
-                edges[_ep(e, 'target')],
+                edges[_ep(e, 'source', 'edgeWeightInfluence other')],
+                edges[_ep(e, 'target', 'edgeWeightInfluence other')],
                 Math.pow(
-                  edges[_ep(e, 'weight')] || 1,
+                  edges[_ep(e, 'weight', 'edgeWeightInfluence other')] || 1,
                   _w.p.edgeWeightInfluence
                 )
               );
@@ -388,22 +372,22 @@
 
           for (j = 0, l = _w.nIndex.length; j < l; j++) {
             n = _w.nIndex[j];
-            fixed = !!nodes[_np(n, 'fixed')] || false;
+            fixed = !!nodes[_np(n, 'fixed', 'auto adjust speed')] || false;
             if (!fixed) {
               swinging = Math.sqrt(Math.pow(
-                nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')], 2) +
-                Math.pow(nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')], 2));
+                nodes[_np(n, 'old_dx', 'auto adjust speed')] - nodes[_np(n, 'dx', 'auto adjust speed')], 2) +
+                Math.pow(nodes[_np(n, 'old_dy', 'auto adjust speed')] - nodes[_np(n, 'dy', 'auto adjust speed')], 2));
 
-              totalSwinging += nodes[_np(n, 'mass')] * swinging;
-              totalEffectiveTraction += nodes[_np(n, 'mass')] *
+              totalSwinging += nodes[_np(n, 'mass', 'auto adjust speed')] * swinging;
+              totalEffectiveTraction += nodes[_np(n, 'mass', 'auto adjust speed')] *
                                         0.5 *
                                         Math.sqrt(
                                           Math.pow(
-                                            nodes[_np(n, 'old_dx')] +
-                                            nodes[_np(n, 'dx')], 2) +
+                                            nodes[_np(n, 'old_dx', 'auto adjust speed')] +
+                                            nodes[_np(n, 'dx', 'auto adjust speed')], 2) +
                                           Math.pow(
-                                            nodes[_np(n, 'old_dy')] +
-                                            nodes[_np(n, 'dy')], 2)
+                                            nodes[_np(n, 'old_dy', 'auto adjust speed')] +
+                                            nodes[_np(n, 'dy', 'auto adjust speed')], 2)
                                         );
             }
           }
@@ -430,7 +414,7 @@
                     _w.p.totalEffectiveTraction / Math.pow(nIndex.length, 2)));
 
           var minSpeedEfficiency = 0.05;
-          
+
           // Protection against erratic behavior
           if(_w.p.totalSwinging / _w.p.totalEffectiveTraction > 2.0){
               if(_w.p.speedEfficiency > minSpeedEfficiency)
@@ -463,14 +447,14 @@
                            targetSpeed - _w.p.speed,
                            maxRise * _w.p.speed
                          );
-          
+
           // console.log('speed '+Math.floor(1000*_w.p.speed)/1000+' sEff '+Math.floor(1000*_w.p.speedEfficiency)/1000+' jitter '+Math.floor(1000*jitterTolerance)/1000+' swing '+Math.floor(_w.p.totalSwinging/nodes.length)+' conv '+Math.floor(_w.p.totalEffectiveTraction/nodes.length));
 
           // Save old coordinates
           for (j = 0, l = _w.nIndex.length; j < l; j++) {
             n = _w.nIndex[j];
-            nodes[_np(n, 'old_dx')] = +nodes[_np(n, 'x')];
-            nodes[_np(n, 'old_dy')] = +nodes[_np(n, 'y')];
+            nodes[_np(n, 'old_dx', 'auto adjust speed')] = +nodes[_np(n, 'x', 'auto adjust speed')];
+            nodes[_np(n, 'old_dy', 'auto adjust speed')] = +nodes[_np(n, 'y', 'auto adjust speed')];
           }
 
           _w.state.step = 5;
@@ -486,50 +470,50 @@
             // it's not possible to trust the swinging mesure.
             while (i < nIndex.length && i < _w.state.index + sInt) {
               n = _w.nIndex[i++];
-              fixed = !!nodes[_np(n, 'fixed')] || false;
+              fixed = !!nodes[_np(n, 'fixed', 'apply forces')] || false;
               if (!fixed) {
 
                 // Adaptive auto-speed: the speed of each node is lowered
                 // when the node swings.
-                var swinging = nodes[_np(n, 'mass')] * Math.sqrt(  // tweak
+                var swinging = nodes[_np(n, 'mass', 'apply forces')] * Math.sqrt(  // tweak
                 // var swinging = Math.sqrt(
-                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) *
-                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) +
-                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')]) *
-                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')])
+                  (nodes[_np(n, 'old_dx', 'apply forces')] - nodes[_np(n, 'dx', 'apply forces')]) *
+                  (nodes[_np(n, 'old_dx', 'apply forces')] - nodes[_np(n, 'dx', 'apply forces')]) +
+                  (nodes[_np(n, 'old_dy', 'apply forces')] - nodes[_np(n, 'dy', 'apply forces')]) *
+                  (nodes[_np(n, 'old_dy', 'apply forces')] - nodes[_np(n, 'dy', 'apply forces')])
                 );
                 var factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
 
-                var df = Math.sqrt(Math.pow(nodes[_np(n, 'dx')], 2) +
-                         Math.pow(nodes[_np(n, 'dy')], 2));
+                var df = Math.sqrt(Math.pow(nodes[_np(n, 'dx', 'apply forces')], 2) +
+                         Math.pow(nodes[_np(n, 'dy', 'apply forces')], 2));
 
                 factor = Math.min(factor * df, 10) / df;
 
-                nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
-                nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
+                nodes[_np(n, 'x', 'apply forces')] += nodes[_np(n, 'dx', 'apply forces')] * factor;
+                nodes[_np(n, 'y', 'apply forces')] += nodes[_np(n, 'dy', 'apply forces')] * factor;
               }
             }
           } else {
             var speed = _w.p.speed;
             while (i < nIndex.length && i < _w.state.index + sInt) {
               n = _w.nIndex[i++];
-              fixed = !!nodes[_np(n, 'fixed')] || false;
+              fixed = !!nodes[_np(n, 'fixed', 'apply forces')] || false;
               if (!fixed) {
                 // Adaptive auto-speed: the speed of each node is lowered
                 // when the node swings.
-                var swinging = nodes[_np(n, 'mass')] * Math.sqrt(  // tweak
+                var swinging = nodes[_np(n, 'mass', 'apply forces')] * Math.sqrt(  // tweak
                 // var swinging = Math.sqrt(
-                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) *
-                  (nodes[_np(n, 'old_dx')] - nodes[_np(n, 'dx')]) +
-                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')]) *
-                  (nodes[_np(n, 'old_dy')] - nodes[_np(n, 'dy')])
+                  (nodes[_np(n, 'old_dx', 'apply forces')] - nodes[_np(n, 'dx', 'apply forces')]) *
+                  (nodes[_np(n, 'old_dx', 'apply forces')] - nodes[_np(n, 'dx', 'apply forces')]) +
+                  (nodes[_np(n, 'old_dy', 'apply forces')] - nodes[_np(n, 'dy', 'apply forces')]) *
+                  (nodes[_np(n, 'old_dy', 'apply forces')] - nodes[_np(n, 'dy', 'apply forces')])
                 );
 
   //              var factor = speed / (1 + speed * Math.sqrt(swinging));
   // NaN Here!!!
                 var factor = speed / (1 + Math.sqrt(speed * swinging)); // Tweak
-                nodes[_np(n, 'x')] += nodes[_np(n, 'dx')] * factor;
-                nodes[_np(n, 'y')] += nodes[_np(n, 'dy')] * factor;
+                nodes[_np(n, 'x', 'apply forces')] += nodes[_np(n, 'dx', 'apply forces')] * factor;
+                nodes[_np(n, 'y', 'apply forces')] += nodes[_np(n, 'dy', 'apply forces')] * factor;
               }
             }
           }

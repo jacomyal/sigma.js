@@ -52,7 +52,7 @@
     };
 
     // Post Message Polyfill
-    this.worker.postMessage = 
+    this.worker.postMessage =
       this.worker.webkitPostMessage || this.worker.postMessage;
 
     // Filling byteArrays
@@ -141,7 +141,6 @@
   };
 
   Supervisor.prototype.sendByteArrayToWorker = function(header) {
-    console.log('sending...');
     var content = {
       header: header || 'loop',
       nodes: this.nodesByteArray.buffer
