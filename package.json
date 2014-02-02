@@ -18,9 +18,11 @@
     "grunt-contrib-concat": "~0.3.0",
     "load-grunt-tasks": "~0.2.0",
     "grunt-sed": "~0.1.1",
-    "grunt-zip": "~0.12.0"
+    "grunt-zip": "~0.12.0",
+    "http-server": "~0.6.1"
   },
   "scripts": {
+    "start": "http-server -p 8000",
     "test": "grunt travis"
   }
 }
