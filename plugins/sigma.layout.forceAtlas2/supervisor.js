@@ -42,7 +42,7 @@
     this.worker.onmessage = function(e) {
 
       // Retrieving data
-      _this.nodesByteArray = new Float64Array(e.data.nodes);
+      _this.nodesByteArray = new Float32Array(e.data.nodes);
 
       // Applying layout
       _this.applyLayoutChanges();
@@ -92,9 +92,8 @@
         l;
 
     // Allocating Byte arrays with correct nb of bytes
-    // TODO: Float32Array?
-    this.nodesByteArray = new Float64Array(nbytes);
-    this.edgesByteArray = new Float64Array(ebytes);
+    this.nodesByteArray = new Float32Array(nbytes);
+    this.edgesByteArray = new Float32Array(ebytes);
 
     // Iterate through nodes
     for (i = j = 0, l = nodes.length; i < l; i++) {
