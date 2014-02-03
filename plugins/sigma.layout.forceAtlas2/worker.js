@@ -1095,7 +1095,49 @@
    * Exporting
    * ----------
    */
+  function _crush(fnString) {
+    var pattern,
+        i,
+        l;
+
+    var np = [
+      'x',
+      'y',
+      'dx',
+      'dy',
+      'old_dx',
+      'old_dy',
+      'mass',
+      'fixed'
+    ];
+
+    var ep = [
+      'source',
+      'target',
+      'weight'
+    ];
+
+    // Replacing matrix accessors by incremented indexes
+    for (i = 0, l = np.length; i < l; i++) {
+      pattern = new RegExp('_np\\((\\w{1,2}), \'' + np[i] + '\'\\)', 'g');
+      fnString = fnString.replace(
+        pattern,
+        (i === 0) ? '$1' : '$1 + ' + i
+      );
+    }
+
+    for (i = 0, l = ep.length; i < l; i++) {
+      pattern = new RegExp('_ep\\((\\w{1,2}), \'' + ep[i] + '\'\\)', 'g');
+      fnString = fnString.replace(
+        pattern,
+        (i === 0) ? '$1' : '$1 + ' + i
+      );
+    }
+
+    return fnString;
+  }
+
   sigma.prototype.getForceAtlas2Worker = function() {
-    return ';(' + Worker.toString() + ').call(this);';
+    return ';(' + _crush(Worker.toString()) + ').call(this);';
   };
 }).call(this);
