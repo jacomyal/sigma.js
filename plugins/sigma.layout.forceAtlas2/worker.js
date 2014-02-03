@@ -1119,7 +1119,7 @@
 
     // Replacing matrix accessors by incremented indexes
     for (i = 0, l = np.length; i < l; i++) {
-      pattern = new RegExp('_np\\((\\w{1,2}), \'' + np[i] + '\'\\)', 'g');
+      pattern = new RegExp('_np\\(([^,]*), \'' + np[i] + '\'\\)', 'g');
       fnString = fnString.replace(
         pattern,
         (i === 0) ? '$1' : '$1 + ' + i
@@ -1127,7 +1127,7 @@
     }
 
     for (i = 0, l = ep.length; i < l; i++) {
-      pattern = new RegExp('_ep\\((\\w{1,2}), \'' + ep[i] + '\'\\)', 'g');
+      pattern = new RegExp('_ep\\(([^,]*), \'' + ep[i] + '\'\\)', 'g');
       fnString = fnString.replace(
         pattern,
         (i === 0) ? '$1' : '$1 + ' + i
