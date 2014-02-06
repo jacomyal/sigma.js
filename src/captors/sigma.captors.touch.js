@@ -265,6 +265,11 @@
                 y: newStageY
               });
 
+              _self.dispatchEvent('mousemove', {
+                x: pos0.x - e.target.width / 2,
+                y: pos0.y - e.target.height / 2
+              });
+
               _self.dispatchEvent('drag');
             }
             break;
