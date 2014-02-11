@@ -137,6 +137,7 @@
    */
   function _bind(events, handler) {
     var i,
+        i_end,
         event,
         eArray;
 
@@ -154,7 +155,7 @@
           events :
           events.split(/ /);
 
-      for (i in eArray) {
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
 
         if (!_handlers[event])
@@ -182,7 +183,9 @@
    */
   function _unbind(events, handler) {
     var i,
+        i_end,
         j,
+        j_end,
         a,
         event,
         eArray = Array.isArray(events) ?
@@ -192,11 +195,11 @@
     if (!arguments.length)
       _handlers = Object.create(null);
     else if (handler) {
-      for (i in eArray) {
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
         if (_handlers[event]) {
           a = [];
-          for (j in _handlers[event])
+          for (j = 0, j_end = _handlers[event].length; j !== j_end; j += 1)
             if (_handlers[event][j].handler !== handler)
               a.push(_handlers[event][j]);
 
@@ -207,7 +210,7 @@
           delete _handlers[event];
       }
     } else
-      for (i in eArray)
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1)
         delete _handlers[eArray[i]];
   }
 
@@ -222,6 +225,8 @@
   function _dispatch(events, data) {
     var i,
         j,
+        i_end,
+        j_end,
         event,
         eventName,
         eArray = Array.isArray(events) ?
@@ -230,7 +235,7 @@
 
     data = data === undefined ? {} : data;
 
-    for (i in eArray) {
+    for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
       eventName = eArray[i];
 
       if (_handlers[eventName]) {
@@ -239,7 +244,7 @@
           data: data || {}
         };
 
-        for (j in _handlers[eventName])
+        for (j = 0, j_end = _handlers[eventName].length; j !== j_end; j += 1)
           try {
             _handlers[eventName][j].handler(event);
           } catch (e) {}
