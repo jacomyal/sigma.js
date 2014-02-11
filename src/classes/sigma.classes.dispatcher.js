@@ -26,6 +26,7 @@
    */
   dispatcher.prototype.bind = function(events, handler) {
     var i,
+        i_end,
         event,
         eArray;
 
@@ -41,7 +42,7 @@
     ) {
       eArray = typeof events === 'string' ? events.split(' ') : events;
 
-      for (i in eArray) {
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
 
         // Check that event is not '':
@@ -77,22 +78,24 @@
   dispatcher.prototype.unbind = function(events, handler) {
     var i,
         j,
+        i_end,
+        j_end,
         a,
         event,
         eArray = typeof events === 'string' ? events.split(' ') : events;
 
     if (!arguments.length) {
-      for (i in this._handlers)
+      for (i = 0, i_end = this._handlers.length; i !== i_end; i += 1)
         delete this._handlers[i];
       return this;
     }
 
     if (handler) {
-      for (i in eArray) {
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
         if (this._handlers[event]) {
           a = [];
-          for (j in this._handlers[event])
+          for (j = 0, j_end = this._handlers[event].length; j !== j_end; j += 1)
             if (this._handlers[event][j].handler !== handler)
               a.push(this._handlers[event][j]);
 
@@ -103,7 +106,7 @@
           delete this._handlers[event];
       }
     } else
-      for (i in eArray)
+      for (i = 0, i_end = eArray.length; i !== i_end; i += 1)
         delete this._handlers[eArray[i]];
 
     return this;
@@ -120,6 +123,8 @@
   dispatcher.prototype.dispatchEvent = function(events, data) {
     var i,
         j,
+        i_end,
+        j_end,
         a,
         event,
         eventName,
@@ -128,14 +133,14 @@
 
     data = data === undefined ? {} : data;
 
-    for (i in eArray) {
+    for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
       eventName = eArray[i];
 
       if (this._handlers[eventName]) {
         event = self.getEvent(eventName, data);
         a = [];
 
-        for (j in this._handlers[eventName]) {
+        for (j = 0, j_end = this._handlers[eventName].length; j !== j_end; j += 1) {
           this._handlers[eventName][j].handler(event);
           if (!this._handlers[eventName][j].one)
             a.push(this._handlers[eventName][j]);
