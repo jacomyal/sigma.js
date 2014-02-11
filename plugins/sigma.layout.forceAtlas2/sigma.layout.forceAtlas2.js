@@ -1011,9 +1011,6 @@
   };
 
   sigma.prototype.stopForceAtlas2 = function() {
-    if (conrad.hasJob('forceatlas2_' + this.id))
-      conrad.killJob('forceatlas2_' + this.id);
-
     if ((this.forceatlas2 || {}).isRunning) {
       this.forceatlas2.state = {
         step: 0,
@@ -1022,6 +1019,9 @@
       this.forceatlas2.isRunning = false;
       this.forceatlas2.clean();
     }
+
+    if (conrad.hasJob('forceatlas2_' + this.id))
+      conrad.killJob('forceatlas2_' + this.id);
 
     return this;
   };
