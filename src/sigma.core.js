@@ -348,8 +348,11 @@
         [
           'click',
           'clickStage',
+          'doubleClickStage',
           'clickNode',
           'clickNodes',
+          'doubleClickNode',
+          'doubleClickNodes',
           'overNode',
           'overNodes',
           'outNode',

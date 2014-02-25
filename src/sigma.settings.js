@@ -134,7 +134,9 @@
     touchEnabled: true,
     // {boolean}
     mouseEnabled: true,
-    // {boolean} Defined whether the custom events such as "clickNode" can be
+    // {boolean}
+    doubleClickEnabled: true,
+    // {boolean} Defines whether the custom events such as "clickNode" can be
     //           used.
     eventsEnabled: true,
     // {number} Defines by how much multiplicating the zooming level when the

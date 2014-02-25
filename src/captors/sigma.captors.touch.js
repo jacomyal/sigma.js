@@ -375,12 +375,16 @@
           )
         );
         ratio = newRatio / _camera.ratio;
+        pos = position(e.touches[0]);
+
+        _self.dispatchEvent('doubleclick', {
+          x: pos.x - e.target.width / 2,
+          y: pos.y - e.target.height / 2
+        });
 
         // Check that the new ratio is different from the initial one:
-        if (newRatio !== _camera.ratio) {
+        if (_settings('doubleClickEnabled') && (newRatio !== _camera.ratio)) {
           count = sigma.misc.animation.killAll(_camera);
-
-          pos = position(e.touches[0]);
           pos = _camera.cameraPosition(
             pos.x - e.target.width / 2,
             pos.y - e.target.height / 2,

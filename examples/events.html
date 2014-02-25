@@ -90,14 +90,20 @@
 
       s = new sigma({
         graph: g,
-        container: 'graph-container'
+        container: 'graph-container',
+        settings: {
+          doubleClickEnabled: false
+        }
       });
 
       // Bind the events:
-      s.bind('overNode outNode clickNode', function(e) {
+      s.bind('overNode outNode clickNode doubleClickNode', function(e) {
         console.log(e.type, e.data.node.label);
       });
       s.bind('clickStage', function(e) {
+        console.log(e.type);
+      });
+      s.bind('doubleClickStage', function(e) {
         console.log(e.type);
       });
     </script>
