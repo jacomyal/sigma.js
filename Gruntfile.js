@@ -52,16 +52,17 @@ module.exports = function(grunt) {
     'plugins/sigma.parsers.gexf/*.js',
     'plugins/sigma.parsers.json/*.js',
     'plugins/sigma.plugins.animate/*.js',
-    'plugins/sigma.plugins.neighborhoods/*.js'
+    'plugins/sigma.plugins.neighborhoods/*.js',
+    'plugins/sigma.renderers.customShapes/*.js'
   ];
 
   // Project configuration:
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     closureLint: {
-      app:{
+      app: {
         closureLinterPath: '/usr/local/bin',
-        src: coreJsFiles.concat(pluginFiles),
+        src: coreJsFiles,
         options: {
           stdout: true,
           strict: true,
@@ -70,7 +71,7 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      all: coreJsFiles.concat(pluginFiles),
+      all: coreJsFiles,
       options: {
         '-W055': true,
         '-W040': true,
