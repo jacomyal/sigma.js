@@ -121,7 +121,7 @@ module.exports = function(grunt) {
         pattern: /<!-- START SIGMA IMPORTS -->[\s\S]*<!-- END SIGMA IMPORTS -->/g,
         replacement: ['<!-- START SIGMA IMPORTS -->'].concat(coreJsFiles.map(function(path) {
           return '<script src="../' + path + '"></script>';
-        }).concat('<!-- END SIGMA IMPORTS -->')).join('\n    ')
+        }).concat('<!-- END SIGMA IMPORTS -->')).join('\n')
       }
     },
     zip: {
