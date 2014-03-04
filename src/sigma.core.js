@@ -158,6 +158,11 @@
       value: {},
       configurable: true
     });
+    Object.defineProperty(this, 'camera', {
+      get: function() {
+        return this.cameras[0];
+      }
+    });
 
     // Add a custom handler, to redispatch events from renderers:
     this._handler = (function(e) {

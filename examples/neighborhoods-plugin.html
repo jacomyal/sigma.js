@@ -79,7 +79,7 @@ document.getElementById('toggle-layout').addEventListener('click', function() {
   }
 });
 document.getElementById('restart-camera').addEventListener('click', function() {
-  s.cameras[0].goTo({
+  s.camera.goTo({
     x: 0,
     y: 0,
     angle: 0,
@@ -94,7 +94,7 @@ db.load('data/arctic.json', function() {
     s.stopForceAtlas2();
 
     // Restart the camera:
-    s.cameras[0].goTo({
+    s.camera.goTo({
       x: 0,
       y: 0,
       angle: 0,
