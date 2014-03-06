@@ -978,12 +978,12 @@
     }
   };
 
-  sigma.prototype.startForceAtlas2 = function() {
+  sigma.prototype.startForceAtlas2 = function(options) {
     if ((this.forceatlas2 || {}).isRunning)
       return this;
 
     if (!this.forceatlas2) {
-      this.forceatlas2 = new forceatlas2.ForceAtlas2(this.graph);
+      this.forceatlas2 = new forceatlas2.ForceAtlas2(this.graph, options || {});
       this.forceatlas2.setAutoSettings();
       this.forceatlas2.init();
     }
