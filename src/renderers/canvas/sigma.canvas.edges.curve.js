@@ -46,5 +46,14 @@
       target[prefix + 'y']
     );
     context.stroke();
+
+    if (settings('drawEdgeLabels'))
+      sigma.canvas.labels.edges.def(
+        edge,
+        source,
+        target,
+        context,
+        settings
+    );
   };
 })();

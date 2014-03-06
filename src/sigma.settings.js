@@ -42,7 +42,7 @@
     // {string} Example: 'bold'
     fontStyle: '',
     // {string} Indicates how to choose the labels color. Available values:
-    //          "node", "default"
+    //          "node", "edge", "default"
     labelColor: 'default',
     // {string} Indicates how to choose the labels size. Available values:
     //          "fixed", "proportional"
@@ -51,6 +51,10 @@
     labelSizeRatio: 1,
     // {number} The minimum size a node must have to see its label displayed.
     labelThreshold: 8,
+    // {number} The ratio between the font size of the label and the edge size.
+    edgeLabelSizeRatio: 1,
+    // {number} The number of digits to appear after the decimal point.
+    edgeLabelDecimals: 4,
     // {number} The oversampling factor used in WebGL renderer.
     webglOversamplingRatio: 2,
     // {number} The size of the border of hovered nodes.
@@ -86,6 +90,7 @@
     //           false: Layered not displayed.
     //           true: Layered displayed.
     drawLabels: true,
+    drawEdgeLabels: false,
     drawEdges: true,
     drawNodes: true,
     // {boolean} Indicates if the edges must be drawn in several frames or in
