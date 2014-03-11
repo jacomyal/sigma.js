@@ -254,7 +254,7 @@
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[o.type] || renderers.def)(
+          (renderers[a[i].type] || renderers.def)(
             a[i],
             this.contexts.nodes,
             embedSettings
