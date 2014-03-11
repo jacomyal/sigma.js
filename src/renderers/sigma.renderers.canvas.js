@@ -206,7 +206,7 @@
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
-            (renderers[o.type] || renderers.def)(
+            ((renderers[o.type] || renderers.def)[o.head] || renderers.def.def)(
               o,
               graph.nodes(o.source),
               graph.nodes(o.target),
@@ -234,7 +234,7 @@
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
-          (renderers[o.type] || renderers.def)(
+          ((renderers[o.type] || renderers.def)[o.head] || renderers.def.def)(
             o,
             graph.nodes(o.source),
             graph.nodes(o.target),
@@ -251,7 +251,7 @@
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[a[i].type] || renderers.def)(
+          (renderers[o.type] || renderers.def)(
             a[i],
             this.contexts.nodes,
             embedSettings
