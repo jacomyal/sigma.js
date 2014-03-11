@@ -57,8 +57,8 @@
  * you do want to display images with the WebGL renderer, you will have
  * to develop a specific WebGL edge renderer.
  */
-sigma.utils.pkg('sigma.canvas.edges');
-sigma.canvas.edges.t = function(edge, source, target, context, settings) {
+sigma.utils.pkg('sigma.canvas.edges.t');
+sigma.canvas.edges.t.def = function(edge, source, target, context, settings) {
   var color = edge.color,
       prefix = settings('prefix') || '',
       edgeColor = settings('edgeColor'),
