@@ -130,6 +130,7 @@
         start,
         edges,
         renderers,
+        rendererType,
         batchSize,
         index = {},
         graph = this.graph,
@@ -206,7 +207,8 @@
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
-            ((renderers[o.type] || renderers.def)[o.head] || renderers.def.def)(
+            rendererType = renderers[o.type] || renderers.def;
+            (rendererType[o.head] || rendererType.def)(
               o,
               graph.nodes(o.source),
               graph.nodes(o.target),
@@ -234,7 +236,8 @@
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
-          ((renderers[o.type] || renderers.def)[o.head] || renderers.def.def)(
+          rendererType = renderers[o.type] || renderers.def;
+          (rendererType[o.head] || rendererType.def)(
             o,
             graph.nodes(o.source),
             graph.nodes(o.target),
