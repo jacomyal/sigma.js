@@ -72,13 +72,18 @@
     });
 
     // Initialize the DOM elements:
-    this.initDOM('canvas', 'scene', true);
+    if (this.settings(options, 'batchEdgesDrawing')) {
+      this.initDOM('canvas', 'edges', true);
+      this.initDOM('canvas', 'nodes', true);
+    } else {
+      this.initDOM('canvas', 'scene', true);
+      this.contexts.nodes = this.contexts.scene;
+      this.contexts.edges = this.contexts.scene;
+    }
+
     this.initDOM('canvas', 'labels');
     this.initDOM('canvas', 'mouse');
     this.contexts.hover = this.contexts.mouse;
-
-    this.contexts.nodes = this.contexts.scene;
-    this.contexts.edges = this.contexts.scene;
 
     // Initialize captors:
     this.captors = [];
