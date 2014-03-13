@@ -984,7 +984,10 @@
 
     if (!this.forceatlas2) {
       this.forceatlas2 = new forceatlas2.ForceAtlas2(this.graph, options || {});
-      this.forceatlas2.setAutoSettings();
+
+      if (this.forceatlas2.p.autoSettings)
+        this.forceatlas2.setAutoSettings();
+
       this.forceatlas2.init();
     }
 
