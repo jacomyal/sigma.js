@@ -30,7 +30,7 @@
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
-<script src="../plugins/sigma.plugins.dragNodes.js"></script>
+<script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
 <!-- END SIGMA IMPORTS -->
 <div id="container">
   <style>
@@ -85,7 +85,6 @@ for (i = 0; i < E; i++)
 
 // Instanciate sigma:
 s = new sigma({
-  type: 'canvas',
   graph: g,
   container: 'graph-container'
 });
