@@ -24,14 +24,8 @@
    * **********************
    * @param  {sigma}    s         The related sigma instance.
    * @param  {renderer} renderer  The related renderer instance.
-   * @param  {string}   realCoors The identifier of the real coordinates of the
-   *                              node in the container.
-   *                              Example for `WebGL`: 'cam0'
-   *                              Example for `Canvas`: 'renderer1'
-   *                              You can see these attributes on a JavaScript
-   *                              debugger or console as part of the nodes.
    */
-  sigma.plugins.dragNodes = function(s, renderer, realCoors) {
+  sigma.plugins.dragNodes = function(s, renderer) {
 
     var _container = renderer.container,
         _mouse = _container.lastChild,
@@ -40,7 +34,13 @@
         _node = null,
         _isOverNode = false,
         _isMouseOverCanvas = false,
-        _realCoors = realCoors;
+        _prefix = '';
+
+    if (renderer instanceof sigma.renderers.webgl) {
+      _prefix = renderer.options.prefix.substr(5);
+    } else {
+      _prefix = renderer.options.prefix;
+    }
 
     var nodeMouseOver = function(event) {
       if (!_isOverNode) {
@@ -99,8 +99,8 @@
         var aux = {
           x: n.x * cos + n.y * sin,
           y: n.y * cos - n.x * sin,
-          renX: n[_realCoors + ':x'],
-          renY: n[_realCoors + ':y'],
+          renX: n[_prefix + 'x'],
+          renY: n[_prefix + 'y'],
         };
         ref.push(aux);
       }

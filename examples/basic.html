@@ -55,7 +55,6 @@
  */
 var i,
     s,
-    r,
     N = 100,
     E = 500,
     g = {
@@ -89,7 +88,5 @@ s = new sigma({
   container: 'graph-container'
 });
 
-r = s.renderers[0];
-
-sigma.plugins.dragNodes(s, r, 'cam0');
+sigma.plugins.dragNodes(s, s.renderers[0]);
 </script>

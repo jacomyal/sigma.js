@@ -94,9 +94,6 @@
 
 var i,
     s,
-    r0,
-    r1,
-    r2,
     o,
     N = 100,
     E = 500,
@@ -183,13 +180,9 @@ s.addRenderer({
   camera: 'cam2'
 });
 
-r0 = s.renderers[0];
-r1 = s.renderers[1];
-r2 = s.renderers[2];
-
-sigma.plugins.dragNodes(s, r0, 'camcam1');
-sigma.plugins.dragNodes(s, r1, 'renderer2');
-sigma.plugins.dragNodes(s, r2, 'renderer3');
+for(i in s.renderers) {
+  sigma.plugins.dragNodes(s, s.renderers[i]);
+}
 
 // Start the layout algorithm:
 s.startForceAtlas2();
