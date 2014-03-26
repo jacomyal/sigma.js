@@ -22,20 +22,21 @@
    *
    * Recognized parameters:
    * **********************
-   * @param  {sigma}    s         The related sigma instance.
-   * @param  {renderer} renderer  The related renderer instance.
+   * @param  {sigma}    s        The related sigma instance.
+   * @param  {renderer} renderer The related renderer instance.
    */
   sigma.plugins.dragNodes = function(s, renderer) {
 
-    var _container = renderer.container,
+    var _body = document.body,
+        _container = renderer.container,
         _mouse = _container.lastChild,
-        _body = document.body,
         _camera = renderer.camera,
         _node = null,
+        _prefix = '',
         _isOverNode = false,
-        _isMouseOverCanvas = false,
-        _prefix = '';
+        _isMouseOverCanvas = false;
 
+    // It removes the initial substring ('read_') if it's a WegGL renderer.
     if (renderer instanceof sigma.renderers.webgl) {
       _prefix = renderer.options.prefix.substr(5);
     } else {
@@ -112,8 +113,8 @@
         (ref[1].y - ref[0].y) + ref[0].y;
 
       // Rotating the coordinates.
-      _node.x = x * cos - y * sin;;
-      _node.y = y * cos + x * sin;;
+      _node.x = x * cos - y * sin;
+      _node.y = y * cos + x * sin;
 
       s.refresh();
     };
