@@ -35,88 +35,105 @@
 <!-- END SIGMA IMPORTS -->
 <div id="container">
   <style>
-    #graph-container {
+    #svg {
       top: 0;
       bottom: 0;
       left: 0;
-      right: 0;
+      right: 50%;
+      color: #fff;
+      background: #000;
       position: absolute;
     }
+
+    #canvas {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: 0;
+      color: #000;
+      background: #fff;
+      position: absolute;
+    }
+
+    .label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+      font-family: sans-serif;
+    }
   </style>
-  <div id="graph-container"></div>
+  <div id="svg">
+    <div class="label">SVG renderer</div>
+  </div>
+  <div id="canvas">
+    <div class="label">Canvas renderer</div>
+  </div>
 </div>
-<script src="../plugins/sigma.layout.forceAtlas2/sigma.layout.forceAtlas2.js"></script>
 <script>
 /**
- * Just a simple example to show how to use the sigma.layout.forceAtlas2
- * plugin:
+ * This example spawns two different renderers with the same camera. When
+ * the users will drag any of the renderers, it will move the other one
+ * as well.
  *
- * A random graph is generated, such that its nodes are separated in some
- * distinct clusters. Each cluster has its own color, and the density of
- * links is stronger inside the clusters. So, we expect the algorithm to
- * regroup the nodes of each cluster.
+ * Also, settings are different fo both renderers.
+ *
+ * It might look a bit useless (I prefer overkill...), but it makes
+ * possible to develop renderers linked by their camera, for example to
+ * implement a minimap.
  */
+
 var i,
-    s,
-    o,
-    N = 1775,
-    E = 5232,
-    C = 5,
-    d = 0.5,
-    cs = [],
-    g = {
-      nodes: [],
-      edges: []
-    };
+    N = 100,
+    E = 500,
+    s = new sigma(),
+    cam = s.addCamera();
 
-// Generate the graph:
-for (i = 0; i < C; i++)
-  cs.push({
-    id: i,
-    nodes: [],
-    color: '#' + (
-      Math.floor(Math.random() * 16777215).toString(16) + '000000'
-    ).substr(0, 6)
-  });
-
-for (i = 0; i < N; i++) {
-  o = cs[(Math.random() * C) | 0];
-  g.nodes.push({
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  s.graph.addNode({
     id: 'n' + i,
-    label: 'Node' + i,
-    x: Math.cos(2 * i * Math.PI / N),
-    y: Math.sin(2 * i * Math.PI / N),
-    size: Math.random(),
-    color: o.color
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: 4 + (3 * Math.random()) | 0
   });
-  o.nodes.push('n' + i);
-}
 
-for (i = 0; i < E; i++) {
-  if (Math.random() < 1 - d)
-    g.edges.push({
-      id: 'e' + i,
-      source: 'n' + ((Math.random() * N) | 0),
-      target: 'n' + ((Math.random() * N) | 0)
-    });
-  else {
-    o = cs[(Math.random() * C) | 0]
-    g.edges.push({
-      id: 'e' + i,
-      source: o.nodes[(Math.random() * o.nodes.length) | 0],
-      target: o.nodes[(Math.random() * o.nodes.length) | 0]
-    });
-  }
-}
+for (i = 0; i < E; i++)
+  s.graph.addEdge({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: 1 + Math.random()
+  });
 
-s = new sigma({
-  graph: g,
-  container: 'graph-container',
+// Initialize two distinct renderers, each with its own settings:
+s.addRenderer({
+  container: document.getElementById('svg'),
+  type: 'svg',
+  camera: cam,
   settings: {
-    drawEdges: false
+    defaultLabelColor: '#fff',
+    defaultNodeColor: '#999',
+    defaultEdgeColor: '#333',
+    edgeColor: 'default'
   }
 });
 
-// Start the ForceAtlas2 algorithm:
-s.startForceAtlas2();
+s.addRenderer({
+  container: document.getElementById('canvas'),
+  type: 'canvas',
+  camera: cam,
+  settings: {
+    batchEdgesDrawing: true,
+    hideEdgesOnMove: true,
+    defaultLabelColor: '#000',
+    defaultNodeColor: '#666',
+    defaultEdgeColor: '#999',
+    edgeColor: 'default'
+  }
+});
+
+// Refresh the instance to refresh the new renderers:
+s.refresh();
 </script>

@@ -23,6 +23,7 @@ module.exports = function(grunt) {
     // Renderers:
     'src/renderers/sigma.renderers.canvas.js',
     'src/renderers/sigma.renderers.webgl.js',
+    'src/renderers/sigma.renderers.svg.js',
     'src/renderers/sigma.renderers.def.js',
 
     // Sub functions per engine:
@@ -37,6 +38,7 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.edges.def.js',
     'src/renderers/canvas/sigma.canvas.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.edges.curve.js',
+    'src/renderers/svg/sigma.svg.nodes.def.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',
