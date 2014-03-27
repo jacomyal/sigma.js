@@ -1,7 +1,7 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges.curve');
+  sigma.utils.pkg('sigma.canvas.edges');
 
   /**
    * This edge renderer will display edges as curves with arrow heading.
@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.curve.arrow = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.curvedArrow = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),

@@ -1,7 +1,7 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges.def');
+  sigma.utils.pkg('sigma.canvas.edges');
 
   /**
    * The default edge renderer. It renders the node as a simple line.
@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.def.def = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.def = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),

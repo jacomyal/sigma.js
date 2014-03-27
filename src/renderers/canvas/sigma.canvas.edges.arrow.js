@@ -1,7 +1,7 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges.def');
+  sigma.utils.pkg('sigma.canvas.edges');
 
   /**
    * This edge renderer will display edges as arrows going from the source node
@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.def.arrow = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
