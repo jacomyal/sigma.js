@@ -22,10 +22,10 @@
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.def.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.def.arrow.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.curve.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.curve.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
@@ -57,8 +57,8 @@
  * you do want to display images with the WebGL renderer, you will have
  * to develop a specific WebGL edge renderer.
  */
-sigma.utils.pkg('sigma.canvas.edges.t');
-sigma.canvas.edges.t.def = function(edge, source, target, context, settings) {
+sigma.utils.pkg('sigma.canvas.edges');
+sigma.canvas.edges.t = function(edge, source, target, context, settings) {
   var color = edge.color,
       prefix = settings('prefix') || '',
       edgeColor = settings('edgeColor'),
