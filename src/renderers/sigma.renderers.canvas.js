@@ -130,6 +130,7 @@
         start,
         edges,
         renderers,
+        rendererType,
         batchSize,
         index = {},
         graph = this.graph,

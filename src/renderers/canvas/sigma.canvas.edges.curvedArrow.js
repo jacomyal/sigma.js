@@ -4,15 +4,15 @@
   sigma.utils.pkg('sigma.canvas.edges');
 
   /**
-   * This edge renderer will display edges as arrows going from the source node
-   *
+   * This edge renderer will display edges as curves with arrow heading.
+   * 
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
    * @param  {object}                   target node  The edge target node.
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.curvedArrow = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
@@ -22,14 +22,17 @@
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
+        controlX = (source[prefix + 'x'] + target[prefix + 'x']) / 2 + (target[prefix + 'y'] - source[prefix + 'y']) / 4,
+        controlY = (source[prefix + 'y'] + target[prefix + 'y']) / 2 + (source[prefix + 'x'] - target[prefix + 'x']) / 4,
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
         aSize = thickness * 2.5,
-        d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
-        aX = sX + (tX - sX) * (d - aSize - tSize) / d,
-        aY = sY + (tY - sY) * (d - aSize - tSize) / d,
-        vX = (tX - sX) * aSize / d,
-        vY = (tY - sY) * aSize / d;
+        d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
+        aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,
+        aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,
+        vX = (tX - controlX) * aSize / d,
+        vY = (tY - controlY) * aSize / d;
+
 
     if (!color)
       switch (edgeColor) {
@@ -48,10 +51,7 @@
     context.lineWidth = thickness;
     context.beginPath();
     context.moveTo(sX, sY);
-    context.lineTo(
-      aX,
-      aY
-    );
+    context.quadraticCurveTo(controlX, controlY, aX, aY);
     context.stroke();
 
     context.fillStyle = color;
@@ -62,14 +62,5 @@
     context.lineTo(aX + vX, aY + vY);
     context.closePath();
     context.fill();
-
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );
   };
 })();
