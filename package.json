@@ -10,6 +10,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "grunt-cli": "^0.1.13",
     "grunt": "~0.4.1",
     "grunt-contrib-qunit": "~0.3.0",
     "grunt-contrib-uglify": "~0.2.7",
@@ -23,6 +24,7 @@
   },
   "scripts": {
     "start": "http-server -p 8000",
-    "test": "grunt travis"
+    "test": "grunt travis",
+    "build": "grunt uglify"
   }
 }
