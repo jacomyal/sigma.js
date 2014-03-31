@@ -107,13 +107,11 @@
         k,
         l,
         o,
-        id,
-        end,
-        job,
+        source,
+        target,
         start,
         edges,
         renderers,
-        batchSize,
         index = {},
         graph = this.graph,
         nodes = this.graph.nodes,
@@ -158,6 +156,24 @@
           }
         );
 
+    // Display edges
+    // TODO: display on move?
+    if (drawEdges)
+      for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
+        source = nodes(a[i].source);
+        target = nodes(a[i].target);
+
+        this.updateDOMElement(
+          this.domElements.edges[a[i].id],
+          {
+            'stroke-width': a[i].weigth,
+            x1: source[prefix + 'x'],
+            y1: source[prefix + 'y'],
+            x2: target[prefix + 'x'],
+            y2: target[prefix + 'y']
+          }
+        );
+       }
 
     this.dispatchEvent('render');
 
@@ -209,26 +225,7 @@
         i,
         l;
 
-    // Creating the nodes elements
-    renderers = sigma.svg.nodes;
-    if (drawNodes)
-      for (a = nodes(), i = 0, l = a.length; i < l; i++) {
-        el = a[i];
-        if (!el.hidden) {
-          this.domElements.nodes[el.id] =
-            (renderers[el.type] || renderers.def)(
-              el,
-              this.domElements.graph,
-              embedSettings
-            );
-
-          // Attaching the nodes elements
-          // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.nodes[el.id]);
-        }
-      }
-
-    // Creating the eges elements
+    // Creating the edges elements
     renderers = sigma.svg.edges;
     if (drawEdges)
       for (a = edges(), i = 0, l = a.length; i < l; i++) {
@@ -250,6 +247,25 @@
 
       }
 
+    // Creating the nodes elements
+    renderers = sigma.svg.nodes;
+    if (drawNodes)
+      for (a = nodes(), i = 0, l = a.length; i < l; i++) {
+        el = a[i];
+        if (!el.hidden) {
+          this.domElements.nodes[el.id] =
+            (renderers[el.type] || renderers.def)(
+              el,
+              this.domElements.graph,
+              embedSettings
+            );
+
+          // Attaching the nodes elements
+          // TODO: display opt or dom inclusion opt
+          this.domElements.graph.appendChild(this.domElements.nodes[el.id]);
+        }
+      }
+
     return this;
    };
 
@@ -264,6 +280,7 @@
     var att;
 
     // TODO: optimize with document fragments later
+    // TODO: do not update if not changed
     for (att in attributes) {
       el.setAttributeNS(null, att, attributes[att]);
     }
