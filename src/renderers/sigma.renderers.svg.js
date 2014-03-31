@@ -36,13 +36,13 @@
     sigma.classes.dispatcher.extend(this);
 
     // Initialize main attributes:
-    Object.defineProperty(this, 'conradId', {
-      value: sigma.utils.id()
-    });
     this.graph = graph;
     this.camera = camera;
-    this.contexts = {};
-    this.domElements = {};
+    this.domElements = {
+      graph: null,
+      nodes: {},
+      edges: {}
+    };
     this.options = options;
     this.container = this.options.container;
     this.settings = (
@@ -52,23 +52,42 @@
         settings.embedObjects(options.settings) :
         settings;
 
+    // SVG xmlns
     this.settings('xmlns', 'http://www.w3.org/2000/svg');
 
-    // Node indexes:
+    // Indexes:
     this.nodesOnScreen = [];
     this.edgesOnScreen = [];
 
-    // Conrad related attributes:
-    this.jobs = {};
-
     // Find the prefix:
-    this.options.prefix = 'renderer' + this.conradId + ':';
+    this.options.prefix = 'renderer' + sigma.utils.id() + ':';
 
     // Initialize the DOM elements
-    this.initDOM('svg', 'scene');
-    this.contexts.edges = this.contexts.scene;
-    this.contexts.nodes = this.contexts.scene;
-    this.contexts.labels = this.contexts.scene;
+    this.initDOM('svg');
+    this.createDOMElements();
+
+    // Initialize captors:
+    this.captors = [];
+    a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
+    for (i = 0, l = a.length; i < l; i++) {
+      fn = typeof a[i] === 'function' ? a[i] : sigma.captors[a[i]];
+      this.captors.push(
+        new fn(
+          this.domElements.graph,
+          this.camera,
+          this.settings
+        )
+      );
+    }
+
+    // Bind resize:
+    window.addEventListener('resize', function() {
+      self.resize();
+    });
+
+    // Deal with sigma events:
+    sigma.misc.bindEvents.call(this, this.options.prefix);
+    // sigma.misc.drawHovers.call(this, this.options.prefix);
 
     // Resize
     this.resize(false);
@@ -111,11 +130,6 @@
       if (this.camera.isAnimated || this.camera.isMoving)
         drawEdges = false;
 
-    // Kill running jobs:
-    for (k in this.jobs)
-      if (conrad.hasJob(k))
-        conrad.killJob(k);
-
     // Apply the camera's view:
     this.camera.applyView(
       undefined,
@@ -132,21 +146,18 @@
       this.camera.getRectangle(this.width, this.height)
     );
 
-    for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-      index[a[i].id] = a[i];
+    // Display nodes
+    if (drawNodes)
+      for (i = 0, l = this.nodesOnScreen.length; i < l; i++)
+        this.updateDOMElement(
+          this.domElements.nodes[this.nodesOnScreen[i].id],
+          {
+            cx: this.nodesOnScreen[i][prefix + 'x'],
+            cy: this.nodesOnScreen[i][prefix + 'y'],
+            r: this.nodesOnScreen[i][prefix + 'size']
+          }
+        );
 
-    // Draw nodes:
-    // - No batching
-    if (drawNodes) {
-      renderers = sigma.svg.nodes;
-      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        if (!a[i].hidden)
-          (renderers[a[i].type] || renderers.def)(
-            a[i],
-            this.contexts.nodes,
-            embedSettings
-          );
-    }
 
     this.dispatchEvent('render');
 
@@ -161,19 +172,103 @@
    * @param  {string} tag The label tag.
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
-  sigma.renderers.svg.prototype.initDOM = function(tag, id) {
+  sigma.renderers.svg.prototype.initDOM = function(tag) {
     var dom = document.createElementNS(this.settings('xmlns'), tag);
 
     dom.style.position = 'absolute';
-    dom.setAttribute('class', 'sigma-' + id);
+    dom.setAttribute('class', 'sigma-svg');
 
     // Setting SVG namespace
-    dom.setAttribute('xmlns', this.settings.xmlns);
+    dom.setAttribute('xmlns', this.settings('xmlns'));
     dom.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     dom.setAttribute('version', '1.1');
 
-    this.domElements[id] = dom;
-    this.contexts[id] = this.container.appendChild(dom);
+    this.domElements.graph = this.container.appendChild(dom);
+  };
+
+  /**
+   * This method creates a the necessary SVG DOM elements such as nodes edges
+   * and labels.
+   *
+   * @return {sigma.renderers.svg}            Returns the instance itself.
+   */
+   sigma.renderers.svg.prototype.createDOMElements = function() {
+    var nodes = this.graph.nodes,
+        edges = this.graph.edges,
+        prefix = this.options.prefix || '',
+        drawEdges = this.settings('drawEdges'),
+        drawNodes = this.settings('drawNodes'),
+        drawLabels = this.settings('drawLabels'),
+        embedSettings = this.settings.embedObjects({
+          prefix: this.options.prefix
+        });
+
+    var renderers,
+        el,
+        a,
+        i,
+        l;
+
+    // Creating the nodes elements
+    renderers = sigma.svg.nodes;
+    if (drawNodes)
+      for (a = nodes(), i = 0, l = a.length; i < l; i++) {
+        el = a[i];
+        if (!el.hidden) {
+          this.domElements.nodes[el.id] =
+            (renderers[el.type] || renderers.def)(
+              el,
+              this.domElements.graph,
+              embedSettings
+            );
+
+          // Attaching the nodes elements
+          // TODO: display opt or dom inclusion opt
+          this.domElements.graph.appendChild(this.domElements.nodes[el.id]);
+        }
+      }
+
+    // Creating the eges elements
+    renderers = sigma.svg.edges;
+    if (drawEdges)
+      for (a = edges(), i = 0, l = a.length; i < l; i++) {
+        el = a[i];
+        if (!el.hidden) {
+          this.domElements.edges[el.id] =
+            (renderers[el.type] || renderers.def)(
+              el,
+              nodes(el.source),
+              nodes(el.target),
+              this.domElements.graph,
+              embedSettings
+            );
+
+          // Attaching the nodes elements
+          // TODO: display opt or dom inclusion opt
+          this.domElements.graph.appendChild(this.domElements.edges[el.id]);
+        }
+
+      }
+
+    return this;
+   };
+
+  /**
+   * This method update a SVG DOM element's attributes.
+   *
+   * @param  {DOMElement}                el         The element to update.
+   * @param  {object}                    attributes The attributes to update.
+   * @return {sigma.renderers.svg}                  Returns the instance itself.
+   */
+  sigma.renderers.svg.prototype.updateDOMElement = function(el, attributes) {
+    var att;
+
+    // TODO: optimize with document fragments later
+    for (att in attributes) {
+      el.setAttributeNS(null, att, attributes[att]);
+    }
+
+    return this;
   };
 
   /**
@@ -185,8 +280,7 @@
    * @return {sigma.renderers.canvas}        Returns the instance itself.
    */
   sigma.renderers.svg.prototype.resize = function(w, h) {
-    var k,
-        oldWidth = this.width,
+    var oldWidth = this.width,
         oldHeight = this.height,
         pixelRatio = 1;
 
@@ -202,14 +296,12 @@
     }
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
-      for (k in this.domElements) {
-        this.domElements[k].style.width = w + 'px';
-        this.domElements[k].style.height = h + 'px';
+      this.domElements.graph.style.width = w + 'px';
+      this.domElements.graph.style.height = h + 'px';
 
-        if (this.domElements[k].tagName.toLowerCase() === 'svg') {
-          this.domElements[k].setAttribute('width', (w * pixelRatio));
-          this.domElements[k].setAttribute('height', (h * pixelRatio));
-        }
+      if (this.domElements.graph.tagName.toLowerCase() === 'svg') {
+        this.domElements.graph.setAttribute('width', (w * pixelRatio));
+        this.domElements.graph.setAttribute('height', (h * pixelRatio));
       }
     }
 
@@ -226,4 +318,5 @@
    * They are stored in different files, in the "./svg" folder.
    */
   sigma.utils.pkg('sigma.svg.nodes');
+  sigma.utils.pkg('sigma.svg.edges');
 }).call(this);
