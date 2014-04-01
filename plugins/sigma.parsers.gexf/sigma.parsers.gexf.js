@@ -94,8 +94,8 @@
     }
 
     if (typeof target === 'string')
-      GexfParser.fetch(target, parse);
+      gexf.fetch(target, parse);
     else if (typeof target === 'object')
-      return parse(GexfParser.parse(target));
+      return parse(gexf.parse(target));
   };
 }).call(this);
