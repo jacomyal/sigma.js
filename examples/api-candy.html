@@ -30,7 +30,6 @@
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
-<script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.layout.forceAtlas2/sigma.layout.forceAtlas2.js"></script>
 <div id="container">
@@ -180,15 +179,6 @@ s.addRenderer({
   camera: 'cam2'
 });
 
-for(i in s.renderers) {
-  sigma.plugins.dragNodes(s, s.renderers[i]);
-}
-
 // Start the layout algorithm:
 s.startForceAtlas2();
-
-// Stop the layout algorithm after 2 seconds:
-setTimeout(function() {
-  s.stopForceAtlas2();
-}, 2000);
 </script>

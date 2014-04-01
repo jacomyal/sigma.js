@@ -26,6 +26,15 @@
    * @param  {renderer} renderer The related renderer instance.
    */
   sigma.plugins.dragNodes = function(s, renderer) {
+    // A quick hardcoded rule to prevent people from using this plugin with the
+    // WebGL renderer (which is impossible at the moment):
+    if (
+      sigma.renderers.webgl &&
+      renderer instanceof sigma.renderers.webgl
+    )
+      throw new Error(
+        'The sigma.plugins.dragNodes is not compatible with the WebGL renderer'
+      );
 
     var _body = document.body,
         _container = renderer.container,
