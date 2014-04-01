@@ -6,7 +6,9 @@
   /**
    * This edge renderer will display edges as curves.
    *
-   * @param  {object}                   node     The node object.
+   * @param  {object}                   edge     The edge object.
+   * @param  {object}                   source   The source node object.
+   * @param  {object}                   target   The target node object.
    * @param  {CanvasRenderingContext2D} context  The canvas context.
    * @param  {configurable}             settings The settings function.
    */
