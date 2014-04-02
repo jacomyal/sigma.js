@@ -64,6 +64,7 @@ module.exports = function(grunt) {
     closureLint: {
       app: {
         closureLinterPath: '/usr/local/bin',
+        command: 'gjslint',
         src: coreJsFiles,
         options: {
           stdout: true,

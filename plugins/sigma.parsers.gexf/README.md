@@ -5,9 +5,9 @@ Plugin developed by [Alexis Jacomy](https://github.com/jacomyal), on top of [gex
 
 ---
 
-This plugin provides a single function, `sigma.parsers.gexf()`, that will load a GEXF encoded file, parse it, and instanciate sigma.
+This plugin provides a single function, `sigma.parsers.gexf()`, that will load a GEXF encoded file, parse it, and instantiate sigma.
 
-The most basic way to use this helper is to call it with a path and a sigma configuration object. It will then instanciate sigma, but after having added the graph into the config object.
+The most basic way to use this helper is to call it with a path and a sigma configuration object. It will then instantiate sigma, but after having added the graph into the config object.
 
 ````javascript
 sigma.parsers.gexf(
