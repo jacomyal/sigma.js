@@ -57,9 +57,16 @@
         obj = arr[i];
 
         obj.id = typeof obj.id === 'string' ? obj.id : edgeId();
-        obj.size = obj.weight;
         obj.source = '' + obj.source;
         obj.target = '' + obj.target;
+
+        if (obj.viz && typeof obj.viz === 'object') {
+          obj.color = obj.viz.color;
+          obj.size = obj.viz.thickness;
+        }
+
+        // Weight over viz.thickness?
+        obj.size = obj.weight;
       }
 
       // Update the instance's graph:
