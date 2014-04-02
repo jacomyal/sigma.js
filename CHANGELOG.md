@@ -1,5 +1,22 @@
 ## sigma.js - changelog:
 
+#### 1.0.2 - release (April 2, 2014)
+
+  - Added Canvas curved edge renderer
+  - Fully refactored examples
+  - Fixed [#211](https://github.com/jacomyal/sigma.js/issues/211): Added default camera getter
+  - Fixes on ForceAtlas2 API (thanks to [@adkatrit](https://github.com/adkatrit))
+  - Added Canvas curved arrows edge renderer (thanks to [@ssidorchick](https://github.com/ssidorchick))
+  - Fixed [#220](https://github.com/jacomyal/sigma.js/issues/220): WebGL edges batch rendering fixed
+  - Fixed [#175](https://github.com/jacomyal/sigma.js/issues/175): Disable setAutoSettings in ForceAtlas2
+  - Fixed some minor typos (thanks to [@anirvan](https://github.com/anirvan))
+  - Added the `sigma.plugins.dragNodes` plugin for the Canvas renderer (thanks to [@josemazo](https://github.com/josemazo))
+  - Fixed `gjslint.py does not exist` error (thanks to [@jeroencoumans](https://github.com/jeroencoumans))
+  - Made it easier to build for newbies by not requiring global `grunt-cli` (thanks to [@eins78](https://github.com/eins78))
+  - Some minor changes on docs and GEXF parser (thanks to [@Yomguithereal](https://github.com/Yomguithereal))
+  - Added current version number as `sigma.version`
+  - Fixed [#236](https://github.com/jacomyal/sigma.js/issues/236): Implemented `kill` renderers method
+
 #### 1.0.1 - release (February 26, 2014)
 
   - Custom node shapes and images plug-in (thanks to [@rpeleg1970](https://github.com/rpeleg1970))
