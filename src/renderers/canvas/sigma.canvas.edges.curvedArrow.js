@@ -1,18 +1,18 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  var edgesPackage = sigma.utils.pkg('sigma.canvas.edges');
 
   /**
    * This edge renderer will display edges as curves with arrow heading.
-   * 
+   *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
    * @param  {object}                   target node  The edge target node.
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.curvedArrow = function(edge, source, target, context, settings) {
+  edgesPackage.curvedArrow = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
@@ -22,8 +22,10 @@
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
-        controlX = (source[prefix + 'x'] + target[prefix + 'x']) / 2 + (target[prefix + 'y'] - source[prefix + 'y']) / 4,
-        controlY = (source[prefix + 'y'] + target[prefix + 'y']) / 2 + (source[prefix + 'x'] - target[prefix + 'x']) / 4,
+        controlX = (source[prefix + 'x'] + target[prefix + 'x']) / 2 +
+                   (target[prefix + 'y'] - source[prefix + 'y']) / 4,
+        controlY = (source[prefix + 'y'] + target[prefix + 'y']) / 2 +
+                   (source[prefix + 'x'] - target[prefix + 'x']) / 4,
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
         aSize = thickness * 2.5,
@@ -32,7 +34,6 @@
         aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,
         vX = (tX - controlX) * aSize / d,
         vY = (tY - controlY) * aSize / d;
-
 
     if (!color)
       switch (edgeColor) {
