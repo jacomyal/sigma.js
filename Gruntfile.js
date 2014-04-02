@@ -54,6 +54,7 @@ module.exports = function(grunt) {
     'plugins/sigma.parsers.gexf/*.js',
     'plugins/sigma.parsers.json/*.js',
     'plugins/sigma.plugins.animate/*.js',
+    'plugins/sigma.plugins.dragNodes/*.js',
     'plugins/sigma.plugins.neighborhoods/*.js',
     'plugins/sigma.renderers.customShapes/*.js'
   ];
