@@ -27,11 +27,15 @@
     update: function(node, circle, settings) {
       var prefix = settings('prefix') || '';
 
+      // Applying changes
+      // TODO: optimize - check if necessary
       circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
       circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
       circle.setAttributeNS(null, 'r', node[prefix + 'size']);
       circle.setAttributeNS(
         null, 'fill', node.color || settings('defaultNodeColor'));
+
+      return this;
     },
     hide: function(node) {
 

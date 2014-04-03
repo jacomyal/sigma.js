@@ -42,8 +42,16 @@
 
       return line;
     },
-    update: function() {
+    update: function(edge, line, source, target, settings) {
+      var prefix = settings('prefix') || '';
 
+      line.setAttributeNS(null, 'stroke-width', edge.weigth);
+      line.setAttributeNS(null, 'x1', source[prefix + 'x']);
+      line.setAttributeNS(null, 'y1', source[prefix + 'y']);
+      line.setAttributeNS(null, 'x2', target[prefix + 'x']);
+      line.setAttributeNS(null, 'y2', target[prefix + 'y']);
+
+      return this;
     },
     hide: function() {
 

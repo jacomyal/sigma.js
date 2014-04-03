@@ -147,31 +147,29 @@
     // Display nodes
     renderers = sigma.svg.nodes;
     if (drawNodes)
-      for (i = 0, l = this.nodesOnScreen.length; i < l; i++)
-        (renderers[this.nodesOnScreen[i].type] || renderers.def).update(
-          this.nodesOnScreen[i],
-          this.domElements.nodes[this.nodesOnScreen[i].id],
+      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
+        (renderers[a.type] || renderers.def).update(
+          a[i],
+          this.domElements.nodes[a[i].id],
           embedSettings
         );
 
     // Display edges
     // TODO: display on move?
-    // if (drawEdges)
-    //   for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-    //     source = nodes(a[i].source);
-    //     target = nodes(a[i].target);
+    renderers = sigma.svg.edges;
+    if (drawEdges)
+      for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
+        source = nodes(a[i].source);
+        target = nodes(a[i].target);
 
-    //     this.updateDOMElement(
-    //       this.domElements.edges[a[i].id],
-    //       {
-    //         'stroke-width': a[i].weigth,
-    //         x1: source[prefix + 'x'],
-    //         y1: source[prefix + 'y'],
-    //         x2: target[prefix + 'x'],
-    //         y2: target[prefix + 'y']
-    //       }
-    //     );
-    //    }
+        (renderers[a[i].type] || renderers.def).update(
+          a[i],
+          this.domElements.edges[a[i].id],
+          source,
+          target,
+          embedSettings
+        );
+       }
 
     this.dispatchEvent('render');
 
