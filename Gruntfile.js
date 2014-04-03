@@ -49,6 +49,9 @@ module.exports = function(grunt) {
     'src/misc/sigma.misc.drawHovers.js'
   ];
 
+  var npmJsFiles = coreJsFiles.slice(0);
+  npmJsFiles.splice(2, 0, 'src/sigma.export.js');
+
   var pluginFiles = [
     'plugins/sigma.layout.forceAtlas2/*.js',
     'plugins/sigma.parsers.gexf/*.js',
@@ -110,11 +113,15 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        separator: ';'
+        separator: '\n'
       },
       dist: {
         src: coreJsFiles,
         dest: 'build/sigma.js'
+      },
+      require: {
+        src: npmJsFiles,
+        dest: 'build/sigma.require.js'
       }
     },
     sed: {
@@ -147,6 +154,7 @@ module.exports = function(grunt) {
   // By default, will check lint, hint, test and minify:
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
   grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify', 'zip']);
+  grunt.registerTask('npmPrePublish', ['uglify:plugins', 'concat:require']);
 
   // For travis-ci.org, only launch tests:
   grunt.registerTask('travis', ['qunit']);

@@ -647,11 +647,7 @@
    */
   if (typeof this.sigma !== 'undefined')
     throw 'An object called sigma is already in the global scope.';
-  else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
-      exports = module.exports = sigma;
-    exports.sigma = sigma;
-  } else
-    this.sigma = sigma;
+
+  this.sigma = sigma;
 
 }).call(this);

@@ -1,4 +1,4 @@
-;(function(undefined) {
+;(function(global) {
   'use strict';
 
   if (typeof sigma === 'undefined')
@@ -9,7 +9,7 @@
 
   // Check if WebGL is enabled:
   var canvas,
-      webgl = !!window.WebGLRenderingContext;
+      webgl = !!global.WebGLRenderingContext;
   if (webgl) {
     canvas = document.createElement('canvas');
     webgl = !!(
@@ -22,4 +22,4 @@
   sigma.renderers.def = webgl ?
     sigma.renderers.webgl :
     sigma.renderers.canvas;
-}).call(this);
+})(this);
