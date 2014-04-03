@@ -22,7 +22,7 @@
    */
   sigma.renderers.svg = function(graph, camera, settings, options) {
     if (typeof options !== 'object')
-      throw 'sigma.renderers.canvas: Wrong arguments.';
+      throw 'sigma.renderers.svg: Wrong arguments.';
 
     if (!(options.container instanceof HTMLElement))
       throw 'Container not found.';
@@ -138,11 +138,29 @@
       }
     );
 
+    // Hiding everything
+    this.hideDOMElements(this.domElements.nodes, sigma.svg.nodes);
+    this.hideDOMElements(this.domElements.edges, sigma.svg.edges);
+
     // Find which nodes are on screen
     this.edgesOnScreen = [];
     this.nodesOnScreen = this.camera.quadtree.area(
       this.camera.getRectangle(this.width, this.height)
     );
+
+    // Node index
+    for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
+      index[a[i].id] = a[i];
+
+    // Find which edges are on screen
+    for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
+      o = a[i];
+      if (
+        (index[o.source] || index[o.target]) &&
+        (!o.hidden && !nodes(o.source).hidden && !nodes(o.target).hidden)
+      )
+        this.edgesOnScreen.push(o);
+    }
 
     // Display nodes
     renderers = sigma.svg.nodes;
@@ -158,7 +176,7 @@
     // TODO: display on move?
     renderers = sigma.svg.edges;
     if (drawEdges)
-      for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
+      for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
         source = nodes(a[i].source);
         target = nodes(a[i].target);
 
@@ -264,12 +282,31 @@
    };
 
   /**
+   * This method hides a batch of SVG DOM elements.
+   *
+   * @param  {array}                  elements  An array of elements to hide.
+   * @param  {object}                 renderer  The renderer to use.
+   * @return {sigma.renderers.svg}              Returns the instance itself.
+   */
+  sigma.renderers.svg.prototype.hideDOMElements = function(elements, renderer) {
+    var el,
+        i;
+
+    for (i in elements) {
+      el = elements[i];
+      (renderer[el.type] || renderer.def).hide(el);
+    } 
+
+    return this;
+  };
+
+  /**
    * This method resizes each DOM elements in the container and stores the new
    * dimensions. Then, it renders the graph.
    *
    * @param  {?number}                width  The new width of the container.
    * @param  {?number}                height The new height of the container.
-   * @return {sigma.renderers.canvas}        Returns the instance itself.
+   * @return {sigma.renderers.svg}           Returns the instance itself.
    */
   sigma.renderers.svg.prototype.resize = function(w, h) {
     var oldWidth = this.width,

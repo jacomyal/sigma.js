@@ -35,10 +35,14 @@
       circle.setAttributeNS(
         null, 'fill', node.color || settings('defaultNodeColor'));
 
+      // Showing
+      circle.style.display = '';
+
       return this;
     },
-    hide: function(node) {
-
+    hide: function(circle) {
+      circle.style.display = 'none';
+      return this;
     }
   };
 })();
