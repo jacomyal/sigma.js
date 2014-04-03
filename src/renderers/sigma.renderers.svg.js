@@ -145,35 +145,33 @@
     );
 
     // Display nodes
+    renderers = sigma.svg.nodes;
     if (drawNodes)
       for (i = 0, l = this.nodesOnScreen.length; i < l; i++)
-        this.updateDOMElement(
+        (renderers[this.nodesOnScreen[i].type] || renderers.def).update(
+          this.nodesOnScreen[i],
           this.domElements.nodes[this.nodesOnScreen[i].id],
-          {
-            cx: this.nodesOnScreen[i][prefix + 'x'],
-            cy: this.nodesOnScreen[i][prefix + 'y'],
-            r: this.nodesOnScreen[i][prefix + 'size']
-          }
+          embedSettings
         );
 
     // Display edges
     // TODO: display on move?
-    if (drawEdges)
-      for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-        source = nodes(a[i].source);
-        target = nodes(a[i].target);
+    // if (drawEdges)
+    //   for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
+    //     source = nodes(a[i].source);
+    //     target = nodes(a[i].target);
 
-        this.updateDOMElement(
-          this.domElements.edges[a[i].id],
-          {
-            'stroke-width': a[i].weigth,
-            x1: source[prefix + 'x'],
-            y1: source[prefix + 'y'],
-            x2: target[prefix + 'x'],
-            y2: target[prefix + 'y']
-          }
-        );
-       }
+    //     this.updateDOMElement(
+    //       this.domElements.edges[a[i].id],
+    //       {
+    //         'stroke-width': a[i].weigth,
+    //         x1: source[prefix + 'x'],
+    //         y1: source[prefix + 'y'],
+    //         x2: target[prefix + 'x'],
+    //         y2: target[prefix + 'y']
+    //       }
+    //     );
+    //    }
 
     this.dispatchEvent('render');
 
@@ -232,11 +230,10 @@
         el = a[i];
         if (!el.hidden) {
           this.domElements.edges[el.id] =
-            (renderers[el.type] || renderers.def)(
+            (renderers[el.type] || renderers.def).create(
               el,
               nodes(el.source),
               nodes(el.target),
-              this.domElements.graph,
               embedSettings
             );
 
@@ -254,9 +251,8 @@
         el = a[i];
         if (!el.hidden) {
           this.domElements.nodes[el.id] =
-            (renderers[el.type] || renderers.def)(
+            (renderers[el.type] || renderers.def).create(
               el,
-              this.domElements.graph,
               embedSettings
             );
 
@@ -268,25 +264,6 @@
 
     return this;
    };
-
-  /**
-   * This method update a SVG DOM element's attributes.
-   *
-   * @param  {DOMElement}                el         The element to update.
-   * @param  {object}                    attributes The attributes to update.
-   * @return {sigma.renderers.svg}                  Returns the instance itself.
-   */
-  sigma.renderers.svg.prototype.updateDOMElement = function(el, attributes) {
-    var att;
-
-    // TODO: optimize with document fragments later
-    // TODO: do not update if not changed
-    for (att in attributes) {
-      el.setAttributeNS(null, att, attributes[att]);
-    }
-
-    return this;
-  };
 
   /**
    * This method resizes each DOM elements in the container and stores the new
