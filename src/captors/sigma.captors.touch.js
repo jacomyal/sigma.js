@@ -221,7 +221,7 @@
     }
 
     /**
-     * The handler listening to the 'touchmove' event. It will effectively draf
+     * The handler listening to the 'touchmove' event. It will effectively drag
      * the graph, and eventually zooms and turn it if the user is using two
      * fingers.
      *
