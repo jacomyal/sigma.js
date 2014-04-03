@@ -87,7 +87,9 @@
     });
 
     // Deal with sigma events:
-    sigma.misc.bindEvents.call(this, this.options.prefix);
+    // TODO: keep an option to override the DOM events?
+    sigma.misc.bindDOMEvents.call(this, this.domElements.graph);
+    // sigma.misc.bindEvents.call(this, this.options.prefix);
     // sigma.misc.drawHovers.call(this, this.options.prefix);
 
     // Resize
@@ -170,7 +172,7 @@
     subrenderers = sigma.svg.labels;
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
-        
+
         // Node
         (renderers[a.type] || renderers.def).update(
           a[i],
@@ -219,7 +221,7 @@
     var dom = document.createElementNS(this.settings('xmlns'), tag);
 
     dom.style.position = 'absolute';
-    dom.setAttribute('class', 'sigma-svg');
+    dom.setAttribute('class', this.settings('classPrefix') + '-svg');
 
     // Setting SVG namespace
     dom.setAttribute('xmlns', this.settings('xmlns'));
@@ -321,7 +323,7 @@
     for (i in elements) {
       el = elements[i];
       (renderer[el.type] || renderer.def).hide(el);
-    } 
+    }
 
     return this;
   };

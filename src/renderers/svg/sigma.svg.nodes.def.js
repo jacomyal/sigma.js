@@ -16,8 +16,8 @@
           circle = document.createElementNS(settings('xmlns'), 'circle');
 
       // Defining the node's circle
-      circle.setAttributeNS(null, 'id', node.id);
-      circle.setAttributeNS(null, 'class', 'node');
+      circle.setAttributeNS(null, 'data-node-id', node.id);
+      circle.setAttributeNS(null, 'class', settings('classPrefix') + '-node');
       circle.setAttributeNS(
         null, 'fill', node.color || settings('defaultNodeColor'));
 

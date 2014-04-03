@@ -36,8 +36,8 @@
       var line = document.createElementNS(settings('xmlns'), 'line');
 
       // Attributes
-      line.setAttributeNS(null, 'id', edge.id);
-      line.setAttributeNS(null, 'class', 'edge');
+      line.setAttributeNS(null, 'data-edge-id', edge.id);
+      line.setAttributeNS(null, 'class', settings('classPrefix') + '-edge');
       line.setAttributeNS(null, 'stroke', color);
 
       return line;
