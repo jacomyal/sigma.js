@@ -10,17 +10,31 @@
    * @param  {DOMElement}               context  The SVG context.
    * @param  {configurable}             settings The settings function.
    */
-  sigma.svg.nodes.def = function(node, context, settings) {
-    var prefix = settings('prefix') || '',
-        circle = document.createElementNS(settings('xmlns'), 'circle');
+  sigma.svg.nodes.def = {
+    create: function(node, settings) {
+      var prefix = settings('prefix') || '',
+          circle = document.createElementNS(settings('xmlns'), 'circle');
 
-    // Defining the node's circle
-    circle.setAttributeNS(null, 'id', node.id);
-    circle.setAttributeNS(null, 'class', 'node');
-    circle.setAttributeNS(
-      null, 'fill', node.color || settings('defaultNodeColor'));
+      // Defining the node's circle
+      circle.setAttributeNS(null, 'id', node.id);
+      circle.setAttributeNS(null, 'class', 'node');
+      circle.setAttributeNS(
+        null, 'fill', node.color || settings('defaultNodeColor'));
 
-    // Returning the DOM Element
-    return circle;
+      // Returning the DOM Element
+      return circle;
+    },
+    update: function(node, circle, settings) {
+      var prefix = settings('prefix') || '';
+
+      circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
+      circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
+      circle.setAttributeNS(null, 'r', node[prefix + 'size']);
+      circle.setAttributeNS(
+        null, 'fill', node.color || settings('defaultNodeColor'));
+    },
+    hide: function(node) {
+
+    }
   };
 })();
