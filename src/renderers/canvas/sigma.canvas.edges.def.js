@@ -4,11 +4,13 @@
   sigma.utils.pkg('sigma.canvas.edges');
 
   /**
-   * The default edge renderer. It renders the node as a simple line.
+   * The default edge renderer. It renders the edge as a simple line.
    *
-   * @param  {object}                   node     The node object.
-   * @param  {CanvasRenderingContext2D} context  The canvas context.
-   * @param  {configurable}             settings The settings function.
+   * @param  {object}                   edge         The edge object.
+   * @param  {object}                   source node  The edge source node.
+   * @param  {object}                   target node  The edge target node.
+   * @param  {CanvasRenderingContext2D} context      The canvas context.
+   * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.def = function(edge, source, target, context, settings) {
     var color = edge.color,
@@ -42,5 +44,14 @@
       target[prefix + 'y']
     );
     context.stroke();
+
+    if (settings('drawEdgeLabels'))
+      sigma.canvas.labels.edges.def(
+        edge,
+        source,
+        target,
+        context,
+        settings
+    );
   };
 })();

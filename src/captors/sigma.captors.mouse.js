@@ -60,6 +60,23 @@
 
 
 
+    /**
+     * This method unbinds every handlers that makes the captor work.
+     */
+    this.kill = function() {
+      sigma.utils.unbindDoubleClick(_target, 'click');
+      _target.removeEventListener('DOMMouseScroll', _wheelHandler);
+      _target.removeEventListener('mousewheel', _wheelHandler);
+      _target.removeEventListener('mousemove', _moveHandler);
+      _target.removeEventListener('mousedown', _downHandler);
+      _target.removeEventListener('click', _clickHandler);
+      _target.removeEventListener('mouseout', _outHandler);
+      document.removeEventListener('mouseup', _upHandler);
+    };
+
+
+
+
     // MOUSE EVENTS:
     // *************
 

@@ -36,8 +36,9 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',
     'src/renderers/canvas/sigma.canvas.edges.def.js',
-    'src/renderers/canvas/sigma.canvas.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.edges.curve.js',
+    'src/renderers/canvas/sigma.canvas.edges.arrow.js',
+    'src/renderers/canvas/sigma.canvas.edges.curvedArrow.js',
     'src/renderers/svg/sigma.svg.nodes.def.js',
     'src/renderers/svg/sigma.svg.edges.def.js',
 
@@ -56,6 +57,7 @@ module.exports = function(grunt) {
     'plugins/sigma.parsers.gexf/*.js',
     'plugins/sigma.parsers.json/*.js',
     'plugins/sigma.plugins.animate/*.js',
+    'plugins/sigma.plugins.dragNodes/*.js',
     'plugins/sigma.plugins.neighborhoods/*.js',
     'plugins/sigma.renderers.customShapes/*.js'
   ];
@@ -66,6 +68,7 @@ module.exports = function(grunt) {
     closureLint: {
       app: {
         closureLinterPath: '/usr/local/bin',
+        command: 'gjslint',
         src: coreJsFiles,
         options: {
           stdout: true,

@@ -241,9 +241,14 @@
    */
   sigma.utils.doubleClick = function(target, type, callback) {
     var clicks = 0,
-        self = this;
+        self = this,
+        handlers;
 
-    target.addEventListener(type, function(e) {
+    target._doubleClickHandler = target._doubleClickHandler || {};
+    target._doubleClickHandler[type] = target._doubleClickHandler[type] || [];
+    handlers = target._doubleClickHandler[type];
+
+    handlers.push(function(e) {
       clicks++;
 
       if (clicks === 2) {
@@ -254,7 +259,26 @@
           clicks = 0;
         }, sigma.settings.doubleClickTimeout);
       }
-    }, false);
+    });
+
+    target.addEventListener(type, handlers[handlers.length - 1], false);
+  };
+
+  /**
+   * Unbind simulated "double click" events.
+   *
+   * @param  {HTMLElement} target   The event target.
+   * @param  {string}      type     The event type.
+   */
+  sigma.utils.unbindDoubleClick = function(target, type) {
+    var handler,
+        handlers = (target._doubleClickHandler || {})[type] || [];
+
+    while ((handler = handlers.pop())) {
+      target.removeEventListener(type, handler);
+    }
+
+    delete (target._doubleClickHandler || {})[type];
   };
 
 

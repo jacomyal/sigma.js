@@ -6,9 +6,11 @@
   /**
    * This edge renderer will display edges as curves.
    *
-   * @param  {object}                   node     The node object.
-   * @param  {CanvasRenderingContext2D} context  The canvas context.
-   * @param  {configurable}             settings The settings function.
+   * @param  {object}                   edge         The edge object.
+   * @param  {object}                   source node  The edge source node.
+   * @param  {object}                   target node  The edge target node.
+   * @param  {CanvasRenderingContext2D} context      The canvas context.
+   * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.curve = function(edge, source, target, context, settings) {
     var color = edge.color,

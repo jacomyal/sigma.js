@@ -633,6 +633,13 @@
 
 
 
+  /**
+   * The current version of sigma:
+   */
+  sigma.version = '1.0.2';
+
+
+
 
   /**
    * EXPORT:

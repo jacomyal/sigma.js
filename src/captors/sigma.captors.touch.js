@@ -58,11 +58,11 @@
     sigma.classes.dispatcher.extend(this);
 
     sigma.utils.doubleClick(_target, 'touchstart', _doubleTapHandler);
-    _target.addEventListener('touchstart', _handleStart);
-    _target.addEventListener('touchend', _handleLeave);
-    _target.addEventListener('touchcancel', _handleLeave);
-    _target.addEventListener('touchleave', _handleLeave);
-    _target.addEventListener('touchmove', _handleMove);
+    _target.addEventListener('touchstart', _handleStart, false);
+    _target.addEventListener('touchend', _handleLeave, false);
+    _target.addEventListener('touchcancel', _handleLeave, false);
+    _target.addEventListener('touchleave', _handleLeave, false);
+    _target.addEventListener('touchmove', _handleMove, false);
 
     function position(e) {
       var offset = sigma.utils.getOffset(_target);
@@ -72,6 +72,22 @@
         y: e.pageY - offset.top
       };
     }
+
+
+
+
+    /**
+     * This method unbinds every handlers that makes the captor work.
+     */
+    this.kill = function() {
+      sigma.utils.unbindDoubleClick(_target, 'touchstart');
+      _target.addEventListener('touchstart', _handleStart);
+      _target.addEventListener('touchend', _handleLeave);
+      _target.addEventListener('touchcancel', _handleLeave);
+      _target.addEventListener('touchleave', _handleLeave);
+      _target.addEventListener('touchmove', _handleMove);
+    };
+
 
 
 
