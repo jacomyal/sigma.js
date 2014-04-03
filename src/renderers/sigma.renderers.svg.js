@@ -41,7 +41,8 @@
     this.domElements = {
       graph: null,
       nodes: {},
-      edges: {}
+      edges: {},
+      labels: {}
     };
     this.options = options;
     this.container = this.options.container;
@@ -112,6 +113,7 @@
         start,
         edges,
         renderers,
+        subrenderers,
         index = {},
         graph = this.graph,
         nodes = this.graph.nodes,
@@ -141,6 +143,7 @@
     // Hiding everything
     this.hideDOMElements(this.domElements.nodes, sigma.svg.nodes);
     this.hideDOMElements(this.domElements.edges, sigma.svg.edges);
+    this.hideDOMElements(this.domElements.labels, sigma.svg.labels);
 
     // Find which nodes are on screen
     this.edgesOnScreen = [];
@@ -164,16 +167,26 @@
 
     // Display nodes
     renderers = sigma.svg.nodes;
+    subrenderers = sigma.svg.labels;
     if (drawNodes)
-      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
+      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
+        
+        // Node
         (renderers[a.type] || renderers.def).update(
           a[i],
           this.domElements.nodes[a[i].id],
           embedSettings
         );
 
+        // Label
+        (subrenderers[a.type] || subrenderers.def).update(
+          a[i],
+          this.domElements.labels[a[i].id],
+          embedSettings
+        );
+      }
+
     // Display edges
-    // TODO: display on move?
     renderers = sigma.svg.edges;
     if (drawEdges)
       for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
@@ -234,6 +247,7 @@
         });
 
     var renderers,
+        subrenderers,
         el,
         a,
         i,
@@ -260,8 +274,9 @@
 
       }
 
-    // Creating the nodes elements
+    // Creating the nodes and labels elements
     renderers = sigma.svg.nodes;
+    subrenderers = sigma.svg.labels;
     if (drawNodes)
       for (a = nodes(), i = 0, l = a.length; i < l; i++) {
         el = a[i];
@@ -275,6 +290,17 @@
           // Attaching the nodes elements
           // TODO: display opt or dom inclusion opt
           this.domElements.graph.appendChild(this.domElements.nodes[el.id]);
+
+          // Labels
+          if (drawLabels) {
+            this.domElements.labels[el.id] =
+            (subrenderers[el.type] || subrenderers.def).create(
+              el,
+              embedSettings
+            );
+
+            this.domElements.graph.appendChild(this.domElements.labels[el.id]);
+          }
         }
       }
 
@@ -348,4 +374,5 @@
    */
   sigma.utils.pkg('sigma.svg.nodes');
   sigma.utils.pkg('sigma.svg.edges');
+  sigma.utils.pkg('sigma.svg.labels');
 }).call(this);
