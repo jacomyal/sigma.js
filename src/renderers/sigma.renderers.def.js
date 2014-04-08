@@ -12,10 +12,14 @@
       webgl = !!global.WebGLRenderingContext;
   if (webgl) {
     canvas = document.createElement('canvas');
-    webgl = !!(
-      canvas.getContext('webgl') ||
-      canvas.getContext('experimental-webgl')
-    );
+    try {
+      webgl = !!(
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl')
+      );
+    } catch (e) {
+      webgl = false;
+    }
   }
 
   // Copy the good renderer:
