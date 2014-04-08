@@ -277,16 +277,10 @@
           );
 
           animation = {
-            animate: false,
             duration: _settings('doubleClickZoomDuration')
           };
 
-          sigma.utils.zoomTo(
-            _camera,_settings,
-            pos,
-            ratio,
-            animation
-          );
+          sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
         if (e.preventDefault)
@@ -322,11 +316,10 @@
         );
 
         animation = {
-          animate: true,
           duration: _settings('mouseZoomDuration')
         };
 
-        sigma.utils.zoomTo(_camera, _settings, pos, ratio, animation);
+        sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
 
         if (e.preventDefault)
           e.preventDefault();

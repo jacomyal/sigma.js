@@ -373,7 +373,6 @@
     function _doubleTapHandler(e) {
       var pos,
           ratio,
-          onComplete,
           animation;
 
       if (e.touches && e.touches.length === 1 && _settings('touchEnabled')) {
@@ -395,14 +394,13 @@
           );
 
           animation = {
-            animate: true,
             duration: _settings('doubleClickZoomDuration'),
             onComplete: function() {
               _doubleTap = false;
             }
           };
 
-          sigma.utils.zoomTo(_camera, _settings, pos, ratio, animation);
+          sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
         if (e.preventDefault)
