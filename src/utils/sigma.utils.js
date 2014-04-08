@@ -281,6 +281,57 @@
     delete (target._doubleClickHandler || {})[type];
   };
 
+  /**
+   *
+   */
+  sigma.utils.zoomTo = function(camera, settings, pos, ratio, animation) {
+    var count,
+        newRatio,
+        animationSettings,
+        coordinates;
+
+    // Deal with min / max:
+    newRatio = Math.max(
+      settings('zoomMin'),
+      Math.min(
+        settings('zoomMax'),
+        camera.ratio * ratio
+      )
+    );
+
+    // Check that the new ratio is different from the initial one:
+    if (newRatio !== camera.ratio) {
+      // Create the coordinates element.
+      ratio = newRatio / camera.ratio;
+      coordinates = {
+        x: pos.x * (1 - ratio) + camera.x,
+        y: pos.y * (1 - ratio) + camera.y,
+        ratio: newRatio
+      };
+
+      if (animation.animate) {
+        // Create the animation setings.
+        count = sigma.misc.animation.killAll(camera);
+        animationSettings = {
+          easing: count ? 'quadraticOut' : 'quadraticInOut',
+          duration: animation.duration
+        };
+        if (animation.onComplete) {
+          animationSettings = sigma.utils.extend(
+            animationSettings,
+            {
+              onComplete: animation.onComplete
+            }
+          );
+        }
+
+        sigma.misc.animation.camera(camera, coordinates, animationSettings);
+      } else {
+        camera.goTo(coordinates);
+      }
+    }
+  };
+
 
 
 

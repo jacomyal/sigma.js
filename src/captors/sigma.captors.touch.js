@@ -372,56 +372,37 @@
      */
     function _doubleTapHandler(e) {
       var pos,
-          count,
           ratio,
-          newRatio;
-
+          onComplete,
+          animation;
 
       if (e.touches && e.touches.length === 1 && _settings('touchEnabled')) {
         _doubleTap = true;
 
         ratio = 1 / _settings('doubleClickZoomingRatio');
 
-        // Deal with min / max:
-        newRatio = Math.max(
-          _settings('zoomMin'),
-          Math.min(
-            _settings('zoomMax'),
-            _camera.ratio * ratio
-          )
-        );
-        ratio = newRatio / _camera.ratio;
         pos = position(e.touches[0]);
-
         _self.dispatchEvent('doubleclick', {
           x: pos.x - e.target.width / 2,
           y: pos.y - e.target.height / 2
         });
 
-        // Check that the new ratio is different from the initial one:
-        if (_settings('doubleClickEnabled') && (newRatio !== _camera.ratio)) {
-          count = sigma.misc.animation.killAll(_camera);
+        if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
             pos.x - e.target.width / 2,
             pos.y - e.target.height / 2,
             true
           );
 
-          sigma.misc.animation.camera(
-            _camera,
-            {
-              x: pos.x * (1 - ratio) + _camera.x,
-              y: pos.y * (1 - ratio) + _camera.y,
-              ratio: newRatio
-            },
-            {
-              easing: count ? 'quadraticOut' : 'quadraticInOut',
-              duration: _settings('doubleClickZoomDuration'),
-              onComplete: function() {
-                _doubleTap = false;
-              }
+          animation = {
+            animate: true,
+            duration: _settings('doubleClickZoomDuration'),
+            onComplete: function() {
+              _doubleTap = false;
             }
-          );
+          };
+
+          sigma.utils.zoomTo(_camera, _settings, pos, ratio, animation);
         }
 
         if (e.preventDefault)

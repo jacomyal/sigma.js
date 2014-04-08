@@ -258,49 +258,34 @@
      */
     function _doubleClickHandler(e) {
       var pos,
-          count,
           ratio,
-          newRatio;
+          animation;
 
       if (_settings('mouseEnabled')) {
         ratio = 1 / _settings('doubleClickZoomingRatio');
-
-        // Deal with min / max:
-        newRatio = Math.max(
-          _settings('zoomMin'),
-          Math.min(
-            _settings('zoomMax'),
-            _camera.ratio * ratio
-          )
-        );
-        ratio = newRatio / _camera.ratio;
 
         _self.dispatchEvent('doubleclick', {
           x: _startMouseX - e.target.width / 2,
           y: _startMouseY - e.target.height / 2
         });
 
-        // Check that the new ratio is different from the initial one:
-        if (_settings('doubleClickEnabled') && (newRatio !== _camera.ratio)) {
-          count = sigma.misc.animation.killAll(_camera);
-
+        if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
             sigma.utils.getX(e) - e.target.width / 2,
             sigma.utils.getY(e) - e.target.height / 2,
             true
           );
 
-          sigma.misc.animation.camera(
-            _camera,
-            {
-              x: pos.x * (1 - ratio) + _camera.x,
-              y: pos.y * (1 - ratio) + _camera.y,
-              ratio: newRatio
-            },
-            {
-              easing: count ? 'quadraticOut' : 'quadraticInOut',
-              duration: _settings('doubleClickZoomDuration')
-            }
+          animation = {
+            animate: false,
+            duration: _settings('doubleClickZoomDuration')
+          };
+
+          sigma.utils.zoomTo(
+            _camera,_settings,
+            pos,
+            ratio,
+            animation
           );
         }
 
@@ -322,48 +307,26 @@
      */
     function _wheelHandler(e) {
       var pos,
-          count,
           ratio,
-          newRatio;
+          animation;
 
       if (_settings('mouseEnabled')) {
         ratio = sigma.utils.getDelta(e) > 0 ?
           1 / _settings('zoomingRatio') :
           _settings('zoomingRatio');
 
-        // Deal with min / max:
-        newRatio = Math.max(
-          _settings('zoomMin'),
-          Math.min(
-            _settings('zoomMax'),
-            _camera.ratio * ratio
-          )
+        pos = _camera.cameraPosition(
+          sigma.utils.getX(e) - e.target.width / 2,
+          sigma.utils.getY(e) - e.target.height / 2,
+          true
         );
-        ratio = newRatio / _camera.ratio;
 
-        // Check that the new ratio is different from the initial one:
-        if (newRatio !== _camera.ratio) {
-          count = sigma.misc.animation.killAll(_camera);
+        animation = {
+          animate: true,
+          duration: _settings('mouseZoomDuration')
+        };
 
-          pos = _camera.cameraPosition(
-            sigma.utils.getX(e) - e.target.width / 2,
-            sigma.utils.getY(e) - e.target.height / 2,
-            true
-          );
-
-          sigma.misc.animation.camera(
-            _camera,
-            {
-              x: pos.x * (1 - ratio) + _camera.x,
-              y: pos.y * (1 - ratio) + _camera.y,
-              ratio: newRatio
-            },
-            {
-              easing: count ? 'quadraticOut' : 'quadraticInOut',
-              duration: _settings('mouseZoomDuration')
-            }
-          );
-        }
+        sigma.utils.zoomTo(_camera, _settings, pos, ratio, animation);
 
         if (e.preventDefault)
           e.preventDefault();
