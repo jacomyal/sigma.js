@@ -58,11 +58,11 @@
     sigma.classes.dispatcher.extend(this);
 
     sigma.utils.doubleClick(_target, 'touchstart', _doubleTapHandler);
-    _target.addEventListener('touchstart', _handleStart);
-    _target.addEventListener('touchend', _handleLeave);
-    _target.addEventListener('touchcancel', _handleLeave);
-    _target.addEventListener('touchleave', _handleLeave);
-    _target.addEventListener('touchmove', _handleMove);
+    _target.addEventListener('touchstart', _handleStart, false);
+    _target.addEventListener('touchend', _handleLeave, false);
+    _target.addEventListener('touchcancel', _handleLeave, false);
+    _target.addEventListener('touchleave', _handleLeave, false);
+    _target.addEventListener('touchmove', _handleMove, false);
 
     function position(e) {
       var offset = sigma.utils.getOffset(_target);
@@ -72,6 +72,22 @@
         y: e.pageY - offset.top
       };
     }
+
+
+
+
+    /**
+     * This method unbinds every handlers that makes the captor work.
+     */
+    this.kill = function() {
+      sigma.utils.unbindDoubleClick(_target, 'touchstart');
+      _target.addEventListener('touchstart', _handleStart);
+      _target.addEventListener('touchend', _handleLeave);
+      _target.addEventListener('touchcancel', _handleLeave);
+      _target.addEventListener('touchleave', _handleLeave);
+      _target.addEventListener('touchmove', _handleMove);
+    };
+
 
 
 
@@ -265,6 +281,11 @@
                 y: newStageY
               });
 
+              _self.dispatchEvent('mousemove', {
+                x: pos0.x - e.target.width / 2,
+                y: pos0.y - e.target.height / 2
+              });
+
               _self.dispatchEvent('drag');
             }
             break;
@@ -351,52 +372,35 @@
      */
     function _doubleTapHandler(e) {
       var pos,
-          count,
           ratio,
-          newRatio;
-
+          animation;
 
       if (e.touches && e.touches.length === 1 && _settings('touchEnabled')) {
         _doubleTap = true;
 
         ratio = 1 / _settings('doubleClickZoomingRatio');
 
-        // Deal with min / max:
-        newRatio = Math.max(
-          _settings('zoomMin'),
-          Math.min(
-            _settings('zoomMax'),
-            _camera.ratio * ratio
-          )
-        );
-        ratio = newRatio / _camera.ratio;
+        pos = position(e.touches[0]);
+        _self.dispatchEvent('doubleclick', {
+          x: pos.x - e.target.width / 2,
+          y: pos.y - e.target.height / 2
+        });
 
-        // Check that the new ratio is different from the initial one:
-        if (newRatio !== _camera.ratio) {
-          count = sigma.misc.animation.killAll(_camera);
-
-          pos = position(e.touches[0]);
+        if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
             pos.x - e.target.width / 2,
             pos.y - e.target.height / 2,
             true
           );
 
-          sigma.misc.animation.camera(
-            _camera,
-            {
-              x: pos.x * (1 - ratio) + _camera.x,
-              y: pos.y * (1 - ratio) + _camera.y,
-              ratio: newRatio
-            },
-            {
-              easing: count ? 'quadraticOut' : 'quadraticInOut',
-              duration: _settings('doubleClickZoomDuration'),
-              onComplete: function() {
-                _doubleTap = false;
-              }
+          animation = {
+            duration: _settings('doubleClickZoomDuration'),
+            onComplete: function() {
+              _doubleTap = false;
             }
-          );
+          };
+
+          sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
         if (e.preventDefault)

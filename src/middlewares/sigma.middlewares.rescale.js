@@ -96,10 +96,10 @@
       b = 0;
     } else if (settings('maxNodeSize') === settings('minNodeSize')) {
       a = 0;
-      b = settings('maxNodeSize');
+      b = +settings('maxNodeSize');
     } else {
       a = (settings('maxNodeSize') - settings('minNodeSize')) / sizeMax;
-      b = settings('minNodeSize');
+      b = +settings('minNodeSize');
     }
 
     if (!settings('maxEdgeSize') && !settings('minEdgeSize')) {
@@ -107,10 +107,10 @@
       d = 0;
     } else if (settings('maxEdgeSize') === settings('minEdgeSize')) {
       c = 0;
-      d = settings('minEdgeSize');
+      d = +settings('minEdgeSize');
     } else {
       c = (settings('maxEdgeSize') - settings('minEdgeSize')) / weightMax;
-      d = settings('minEdgeSize');
+      d = +settings('minEdgeSize');
     }
 
     // Rescale the nodes and edges:

@@ -35,7 +35,9 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',
     'src/renderers/canvas/sigma.canvas.edges.def.js',
+    'src/renderers/canvas/sigma.canvas.edges.curve.js',
     'src/renderers/canvas/sigma.canvas.edges.arrow.js',
+    'src/renderers/canvas/sigma.canvas.edges.curvedArrow.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',
@@ -47,21 +49,27 @@ module.exports = function(grunt) {
     'src/misc/sigma.misc.drawHovers.js'
   ];
 
+  var npmJsFiles = coreJsFiles.slice(0);
+  npmJsFiles.splice(2, 0, 'src/sigma.export.js');
+
   var pluginFiles = [
     'plugins/sigma.layout.forceAtlas2/*.js',
     'plugins/sigma.parsers.gexf/*.js',
     'plugins/sigma.parsers.json/*.js',
     'plugins/sigma.plugins.animate/*.js',
-    'plugins/sigma.plugins.neighborhoods/*.js'
+    'plugins/sigma.plugins.dragNodes/*.js',
+    'plugins/sigma.plugins.neighborhoods/*.js',
+    'plugins/sigma.renderers.customShapes/*.js'
   ];
 
   // Project configuration:
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     closureLint: {
-      app:{
+      app: {
         closureLinterPath: '/usr/local/bin',
-        src: coreJsFiles.concat(pluginFiles),
+        command: 'gjslint',
+        src: coreJsFiles,
         options: {
           stdout: true,
           strict: true,
@@ -70,7 +78,7 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      all: coreJsFiles.concat(pluginFiles),
+      all: coreJsFiles,
       options: {
         '-W055': true,
         '-W040': true,
@@ -105,11 +113,15 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        separator: ';'
+        separator: '\n'
       },
       dist: {
         src: coreJsFiles,
         dest: 'build/sigma.js'
+      },
+      require: {
+        src: npmJsFiles,
+        dest: 'build/sigma.require.js'
       }
     },
     sed: {
@@ -119,7 +131,7 @@ module.exports = function(grunt) {
         pattern: /<!-- START SIGMA IMPORTS -->[\s\S]*<!-- END SIGMA IMPORTS -->/g,
         replacement: ['<!-- START SIGMA IMPORTS -->'].concat(coreJsFiles.map(function(path) {
           return '<script src="../' + path + '"></script>';
-        }).concat('<!-- END SIGMA IMPORTS -->')).join('\n    ')
+        }).concat('<!-- END SIGMA IMPORTS -->')).join('\n')
       }
     },
     zip: {
@@ -142,6 +154,7 @@ module.exports = function(grunt) {
   // By default, will check lint, hint, test and minify:
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
   grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify', 'zip']);
+  grunt.registerTask('npmPrePublish', ['uglify:plugins', 'concat:require']);
 
   // For travis-ci.org, only launch tests:
   grunt.registerTask('travis', ['qunit']);

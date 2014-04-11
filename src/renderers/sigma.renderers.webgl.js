@@ -72,13 +72,18 @@
     });
 
     // Initialize the DOM elements:
-    this.initDOM('canvas', 'scene', true);
+    if (this.settings(options, 'batchEdgesDrawing')) {
+      this.initDOM('canvas', 'edges', true);
+      this.initDOM('canvas', 'nodes', true);
+    } else {
+      this.initDOM('canvas', 'scene', true);
+      this.contexts.nodes = this.contexts.scene;
+      this.contexts.edges = this.contexts.scene;
+    }
+
     this.initDOM('canvas', 'labels');
     this.initDOM('canvas', 'mouse');
     this.contexts.hover = this.contexts.mouse;
-
-    this.contexts.nodes = this.contexts.scene;
-    this.contexts.edges = this.contexts.scene;
 
     // Initialize captors:
     this.captors = [];
@@ -95,9 +100,11 @@
     }
 
     // Bind resize:
-    window.addEventListener('resize', function() {
-      _self.resize();
-    });
+    window.addEventListener(
+      'resize',
+      this.boundResize = this.resize.bind(this),
+      false
+    );
 
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.camera.prefix);
@@ -559,6 +566,31 @@
     this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
 
     return this;
+  };
+
+  /**
+   * This method kills contexts and other attributes.
+   */
+  sigma.renderers.webgl.prototype.kill = function() {
+    var k,
+        captor;
+
+    // Unbind resize:
+    window.removeEventListener('resize', this.boundResize);
+
+    // Kill captors:
+    while ((captor = this.captors.pop()))
+      captor.kill();
+    delete this.captors;
+
+    // Kill contexts:
+    for (k in this.domElements) {
+      this.domElements[k].parentNode.removeChild(this.domElements[k]);
+      delete this.domElements[k];
+      delete this.contexts[k];
+    }
+    delete this.domElements;
+    delete this.contexts;
   };
 
 

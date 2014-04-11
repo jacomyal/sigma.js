@@ -96,9 +96,11 @@
     }
 
     // Bind resize:
-    window.addEventListener('resize', function() {
-      self.resize();
-    });
+    window.addEventListener(
+      'resize',
+      this.boundResize = this.resize.bind(this),
+      false
+    );
 
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.options.prefix);
@@ -130,7 +132,9 @@
         start,
         edges,
         renderers,
+        rendererType,
         batchSize,
+        tempGCO,
         index = {},
         graph = this.graph,
         nodes = this.graph.nodes,
@@ -203,6 +207,9 @@
         end = Math.min(edges.length, start + batchSize);
 
         job = function() {
+          tempGCO = this.contexts.edges.globalCompositeOperation;
+          this.contexts.edges.globalCompositeOperation = 'destination-over';
+
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
@@ -214,6 +221,9 @@
               embedSettings
             );
           }
+
+          // Restore original globalCompositeOperation:
+          this.contexts.edges.globalCompositeOperation = tempGCO;
 
           // Catch job's end:
           if (end === edges.length) {
@@ -359,6 +369,31 @@
         this.domElements[k].width = this.domElements[k].width;
 
     return this;
+  };
+
+  /**
+   * This method kills contexts and other attributes.
+   */
+  sigma.renderers.canvas.prototype.kill = function() {
+    var k,
+        captor;
+
+    // Unbind resize:
+    window.removeEventListener('resize', this.boundResize);
+
+    // Kill captors:
+    while ((captor = this.captors.pop()))
+      captor.kill();
+    delete this.captors;
+
+    // Kill contexts:
+    for (k in this.domElements) {
+      this.domElements[k].parentNode.removeChild(this.domElements[k]);
+      delete this.domElements[k];
+      delete this.contexts[k];
+    }
+    delete this.domElements;
+    delete this.contexts;
   };
 
 

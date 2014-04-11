@@ -4,7 +4,7 @@
   sigma.utils.pkg('sigma.canvas.edges');
 
   /**
-   * The default edge renderer. It renders the edge as a simple line.
+   * This edge renderer will display edges as curves.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.def = function(edge, source, target, context, settings) {
+  sigma.canvas.edges.curve = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
@@ -39,19 +39,14 @@
       source[prefix + 'x'],
       source[prefix + 'y']
     );
-    context.lineTo(
+    context.quadraticCurveTo(
+      (source[prefix + 'x'] + target[prefix + 'x']) / 2 +
+        (target[prefix + 'y'] - source[prefix + 'y']) / 4,
+      (source[prefix + 'y'] + target[prefix + 'y']) / 2 +
+        (source[prefix + 'x'] - target[prefix + 'x']) / 4,
       target[prefix + 'x'],
       target[prefix + 'y']
     );
     context.stroke();
-
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );
   };
 })();

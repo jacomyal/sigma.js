@@ -1,4 +1,4 @@
-;(function(undefined) {
+;(function(global) {
   'use strict';
 
   /**
@@ -12,19 +12,19 @@
       lastTime = 0,
       vendors = ['ms', 'moz', 'webkit', 'o'];
 
-  for (x = 0; x < vendors.length && !window.requestAnimationFrame; x++) {
-    window.requestAnimationFrame =
-      window[vendors[x] + 'RequestAnimationFrame'];
-    window.cancelAnimationFrame =
-      window[vendors[x] + 'CancelAnimationFrame'] ||
-      window[vendors[x] + 'CancelRequestAnimationFrame'];
+  for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
+    global.requestAnimationFrame =
+      global[vendors[x] + 'RequestAnimationFrame'];
+    global.cancelAnimationFrame =
+      global[vendors[x] + 'CancelAnimationFrame'] ||
+      global[vendors[x] + 'CancelRequestAnimationFrame'];
   }
 
-  if (!window.requestAnimationFrame)
-    window.requestAnimationFrame = function(callback, element) {
+  if (!global.requestAnimationFrame)
+    global.requestAnimationFrame = function(callback, element) {
       var currTime = new Date().getTime(),
           timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-          id = window.setTimeout(
+          id = global.setTimeout(
             function() {
               callback(currTime + timeToCall);
             },
@@ -35,8 +35,8 @@
       return id;
     };
 
-  if (!window.cancelAnimationFrame)
-    window.cancelAnimationFrame = function(id) {
+  if (!global.cancelAnimationFrame)
+    global.cancelAnimationFrame = function(id) {
       clearTimeout(id);
     };
 
@@ -74,4 +74,4 @@
 
       return fBound;
     };
-}).call(this);
+})(this);

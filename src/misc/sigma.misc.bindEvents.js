@@ -107,6 +107,25 @@
           self.dispatchEvent('clickStage');
       }
 
+      function onDoubleClick(e) {
+        if (!self.settings('eventsEnabled'))
+          return;
+
+        self.dispatchEvent('doubleClick', e.data);
+
+        nodes = getNodes(e);
+
+        if (nodes.length) {
+          self.dispatchEvent('doubleClickNode', {
+            node: nodes[0]
+          });
+          self.dispatchEvent('doubleClickNodes', {
+            node: nodes
+          });
+        } else
+          self.dispatchEvent('doubleClickStage');
+      }
+
       function onOut(e) {
         if (!self.settings('eventsEnabled'))
           return;
@@ -186,6 +205,8 @@
       captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
+      captor.bind('doubleclick', onDoubleClick);
+      self.bind('render', onMove);
     }
 
     for (i = 0, l = this.captors.length; i < l; i++)

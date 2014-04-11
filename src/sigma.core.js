@@ -158,6 +158,11 @@
       value: {},
       configurable: true
     });
+    Object.defineProperty(this, 'camera', {
+      get: function() {
+        return this.cameras[0];
+      }
+    });
 
     // Add a custom handler, to redispatch events from renderers:
     this._handler = (function(e) {
@@ -348,8 +353,11 @@
         [
           'click',
           'clickStage',
+          'doubleClickStage',
           'clickNode',
           'clickNodes',
+          'doubleClickNode',
+          'doubleClickNodes',
           'overNode',
           'overNodes',
           'outNode',
@@ -625,6 +633,13 @@
 
 
 
+  /**
+   * The current version of sigma:
+   */
+  sigma.version = '1.0.2';
+
+
+
 
   /**
    * EXPORT:
@@ -632,11 +647,7 @@
    */
   if (typeof this.sigma !== 'undefined')
     throw 'An object called sigma is already in the global scope.';
-  else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
-      exports = module.exports = sigma;
-    exports.sigma = sigma;
-  } else
-    this.sigma = sigma;
+
+  this.sigma = sigma;
 
 }).call(this);
