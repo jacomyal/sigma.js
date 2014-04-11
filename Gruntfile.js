@@ -41,6 +41,7 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.edges.curvedArrow.js',
     'src/renderers/svg/sigma.svg.nodes.def.js',
     'src/renderers/svg/sigma.svg.edges.def.js',
+    'src/renderers/svg/sigma.svg.labels.def.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',
@@ -49,6 +50,7 @@ module.exports = function(grunt) {
     // Miscellaneous:
     'src/misc/sigma.misc.animation.js',
     'src/misc/sigma.misc.bindEvents.js',
+    'src/misc/sigma.misc.bindDOMEvents.js',
     'src/misc/sigma.misc.drawHovers.js'
   ];
 

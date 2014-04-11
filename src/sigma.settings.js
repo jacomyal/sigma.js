@@ -27,6 +27,8 @@
      * *******************
      */
     // {string}
+    classPrefix: 'sigma',
+    // {string}
     defaultLabelColor: '#000',
     // {string}
     defaultEdgeColor: '#000',

@@ -36,17 +36,29 @@
       var line = document.createElementNS(settings('xmlns'), 'line');
 
       // Attributes
-      line.setAttributeNS(null, 'id', edge.id);
-      line.setAttributeNS(null, 'class', 'edge');
+      line.setAttributeNS(null, 'data-edge-id', edge.id);
+      line.setAttributeNS(null, 'class', settings('classPrefix') + '-edge');
       line.setAttributeNS(null, 'stroke', color);
 
       return line;
     },
-    update: function() {
+    update: function(edge, line, source, target, settings) {
+      var prefix = settings('prefix') || '';
 
+      line.setAttributeNS(null, 'stroke-width', edge[prefix + 'size'] || 1);
+      line.setAttributeNS(null, 'x1', source[prefix + 'x']);
+      line.setAttributeNS(null, 'y1', source[prefix + 'y']);
+      line.setAttributeNS(null, 'x2', target[prefix + 'x']);
+      line.setAttributeNS(null, 'y2', target[prefix + 'y']);
+
+      // Showing
+      line.style.display = '';
+
+      return this;
     },
-    hide: function() {
-
+    hide: function(line) {
+      line.style.display = 'none';
+      return this;
     }
   };
 })();

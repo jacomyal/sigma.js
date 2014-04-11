@@ -16,8 +16,8 @@
           circle = document.createElementNS(settings('xmlns'), 'circle');
 
       // Defining the node's circle
-      circle.setAttributeNS(null, 'id', node.id);
-      circle.setAttributeNS(null, 'class', 'node');
+      circle.setAttributeNS(null, 'data-node-id', node.id);
+      circle.setAttributeNS(null, 'class', settings('classPrefix') + '-node');
       circle.setAttributeNS(
         null, 'fill', node.color || settings('defaultNodeColor'));
 
@@ -27,14 +27,22 @@
     update: function(node, circle, settings) {
       var prefix = settings('prefix') || '';
 
+      // Applying changes
+      // TODO: optimize - check if necessary
       circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
       circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
       circle.setAttributeNS(null, 'r', node[prefix + 'size']);
       circle.setAttributeNS(
         null, 'fill', node.color || settings('defaultNodeColor'));
-    },
-    hide: function(node) {
 
+      // Showing
+      circle.style.display = '';
+
+      return this;
+    },
+    hide: function(circle) {
+      circle.style.display = 'none';
+      return this;
     }
   };
 })();

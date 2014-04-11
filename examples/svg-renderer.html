@@ -29,10 +29,12 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
 <script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
 <script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <div id="container">
@@ -115,6 +117,7 @@ s.addRenderer({
   type: 'svg',
   camera: cam,
   settings: {
+    hideEdgesOnMove: true,
     defaultLabelColor: '#fff',
     defaultNodeColor: '#999',
     defaultEdgeColor: '#333',
@@ -134,6 +137,10 @@ s.addRenderer({
     defaultEdgeColor: '#999',
     edgeColor: 'default'
   }
+});
+
+s.bind('clickNode doubleClickNode clickStage doubleClickStage', function(e) {
+  console.log(e);
 });
 
 // Refresh the instance to refresh the new renderers:
