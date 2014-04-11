@@ -1,5 +1,5 @@
 {
-  "name": "sigma-js",
+  "name": "sigma",
   "version": "1.0.2",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
@@ -9,6 +9,7 @@
     "url": "http://github.com/jacomyal/sigma.js.git"
   },
   "license": "MIT",
+  "main": "build/sigma.require.js",
   "devDependencies": {
     "grunt-cli": "^0.1.13",
     "grunt": "~0.4.4",
@@ -25,6 +26,7 @@
   "scripts": {
     "start": "http-server -p 8000",
     "test": "grunt travis",
-    "build": "grunt uglify"
+    "build": "grunt uglify",
+    "prepublish": "grunt npmPrePublish"
   }
 }

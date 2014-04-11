@@ -979,6 +979,6 @@
     if (typeof module !== 'undefined' && module.exports)
       exports = module.exports = conrad;
     exports.conrad = conrad;
-  } else
-    global.conrad = conrad;
+  }
+  global.conrad = conrad;
 })(this);

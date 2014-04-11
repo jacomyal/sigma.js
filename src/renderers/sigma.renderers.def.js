@@ -1,4 +1,4 @@
-;(function(undefined) {
+;(function(global) {
   'use strict';
 
   if (typeof sigma === 'undefined')
@@ -9,17 +9,21 @@
 
   // Check if WebGL is enabled:
   var canvas,
-      webgl = !!window.WebGLRenderingContext;
+      webgl = !!global.WebGLRenderingContext;
   if (webgl) {
     canvas = document.createElement('canvas');
-    webgl = !!(
-      canvas.getContext('webgl') ||
-      canvas.getContext('experimental-webgl')
-    );
+    try {
+      webgl = !!(
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl')
+      );
+    } catch (e) {
+      webgl = false;
+    }
   }
 
   // Copy the good renderer:
   sigma.renderers.def = webgl ?
     sigma.renderers.webgl :
     sigma.renderers.canvas;
-}).call(this);
+})(this);
