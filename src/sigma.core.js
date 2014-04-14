@@ -362,6 +362,8 @@
           'overNodes',
           'outNode',
           'outNodes',
+          'overEdge',
+          'outEdge',
           'downNode',
           'downNodes',
           'upNode',
