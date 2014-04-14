@@ -163,6 +163,28 @@
         return this.cameras[0];
       }
     });
+    Object.defineProperty(this, 'events', {
+      value: [
+        'click',
+        'clickStage',
+        'doubleClickStage',
+        'clickNode',
+        'clickNodes',
+        'doubleClickNode',
+        'doubleClickNodes',
+        'overNode',
+        'overNodes',
+        'outNode',
+        'outNodes',
+        'overEdge',
+        'outEdge',
+        'downNode',
+        'downNodes',
+        'upNode',
+        'upNodes'
+      ],
+      configurable: true
+    });
 
     // Add a custom handler, to redispatch events from renderers:
     this._handler = (function(e) {
@@ -350,25 +372,7 @@
     // Bind events:
     if (renderer.bind)
       renderer.bind(
-        [
-          'click',
-          'clickStage',
-          'doubleClickStage',
-          'clickNode',
-          'clickNodes',
-          'doubleClickNode',
-          'doubleClickNodes',
-          'overNode',
-          'overNodes',
-          'outNode',
-          'outNodes',
-          'overEdge',
-          'outEdge',
-          'downNode',
-          'downNodes',
-          'upNode',
-          'upNodes'
-        ],
+        this.events,
         this._handler
       );
 
