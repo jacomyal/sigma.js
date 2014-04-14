@@ -237,6 +237,8 @@
    *
    * @return {sigma.renderers.svg}            Returns the instance itself.
    */
+
+   // TODO: Append labels after nodes for z-index purposes
    sigma.renderers.svg.prototype.createDOMElements = function() {
     var nodes = this.graph.nodes,
         edges = this.graph.edges,

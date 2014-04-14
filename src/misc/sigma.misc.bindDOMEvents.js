@@ -18,20 +18,43 @@
     var self = this,
         graph = this.graph;
 
+    // DOMElement abstraction
+    function Element(domElement) {
+
+      // Helpers
+      this.attr = function(attrName) {
+        return domElement.getAttributeNS(null, attrName);
+      };
+
+      // Properties
+      this.tag = domElement.tagName;
+      this.class = this.attr('class');
+      this.id = this.attr('id');
+
+      // Methods
+      this.isNode = function() {
+        return this.class === self.settings('classPrefix') + '-node';
+      };
+
+      this.isEdge = function() {
+        return this.class === self.settings('classPrefix') + '-edge';
+      };
+    }
+
     // Click
     function click(e) {
       if (!self.settings('eventsEnabled'))
-          return;
+        return;
 
       // Generic event
       self.dispatchEvent('click', e);
 
       // Are we on a node?
-      var targetClass = e.target.getAttributeNS(null, 'class');
+      var element = new Element(e.target);
 
-      if (targetClass === self.settings('classPrefix') + '-node')
+      if (element.isNode())
         self.dispatchEvent('clickNode', {
-          node: graph.nodes(e.target.getAttributeNS(null, 'data-node-id'))
+          node: graph.nodes(element.attr('data-node-id'))
         });
       else
         self.dispatchEvent('clickStage');
@@ -40,111 +63,78 @@
     // Double click
     function doubleClick(e) {
       if (!self.settings('eventsEnabled'))
-          return;
+        return;
 
       // Generic event
       self.dispatchEvent('doubleClick', e);
 
       // Are we on a node?
-      var targetClass = e.target.getAttributeNS(null, 'class');
+      var element = new Element(e.target);
 
-      if (targetClass === self.settings('classPrefix') + '-node')
+      if (element.isNode())
         self.dispatchEvent('doubleClickNode', {
-          node: graph.nodes(e.target.getAttributeNS(null, 'data-node-id'))
+          node: graph.nodes(element.attr('data-node-id'))
         });
       else
         self.dispatchEvent('doubleClickStage');
     }
 
-    // Registering events
-    container.addEventListener('click', click);
+    // On out
+    function onOut(e) {
+      if (!self.settings('eventsEnabled') || e.fromElement === null)
+        return;
+
+      var from = new Element(e.fromElement);
+
+      if (from.isNode()) {
+        self.dispatchEvent('outNode', {
+          node: graph.nodes(from.attr('data-node-id'))
+        });
+      }
+      else if (from.isEdge()) {
+        var edge = graph.edges(from.attr('data-edge-id'));
+        self.dispatchEvent('outEdge', {
+          edge: edge,
+          source: graph.nodes(edge.source),
+          target: graph.nodes(edge.target)
+        });
+      }
+    }
+
+    // On move
+    function onOver(e) {
+      if (!self.settings('eventsEnabled') || e.toElement === null)
+        return;
+
+      var to = new Element(e.toElement);
+
+      if (to.isNode()) {
+        self.dispatchEvent('overNode', {
+          node: graph.nodes(to.attr('data-node-id'))
+        });
+      }
+      else if (to.isEdge()) {
+        var edge = graph.edges(to.attr('data-edge-id'));
+        self.dispatchEvent('overEdge', {
+          edge: edge,
+          source: graph.nodes(edge.source),
+          target: graph.nodes(edge.target)
+        });
+      }
+    }
+
+    // Registering Events:
+
+    // Click
+    container.addEventListener('click', click, false);
     sigma.utils.doubleClick(container, 'click', doubleClick);
 
-    // function bindCaptor(captor) {
-    //   var nodes,
-    //       over = {};
+    // Touch counterparts
+    container.addEventListener('touchstart', click, false);
+    sigma.utils.doubleClick(container, 'touchstart', click);
 
-    //   function onOut(e) {
-    //     if (!self.settings('eventsEnabled'))
-    //       return;
-
-    //     var k,
-    //         i,
-    //         l,
-    //         out = [];
-
-    //     for (k in over)
-    //       out.push(over[k]);
-
-    //     over = {};
-    //     // Dispatch both single and multi events:
-    //     for (i = 0, l = out.length; i < l; i++)
-    //       self.dispatchEvent('outNode', {
-    //         node: out[i]
-    //       });
-    //     if (out.length)
-    //       self.dispatchEvent('outNodes', {
-    //         nodes: out
-    //       });
-    //   }
-
-    //   function onMove(e) {
-    //     if (!self.settings('eventsEnabled'))
-    //       return;
-
-    //     nodes = getNodes(e);
-
-    //     var i,
-    //         k,
-    //         n,
-    //         newOut = [],
-    //         newOvers = [],
-    //         currentOvers = {},
-    //         l = nodes.length;
-
-    //     // Check newly overred nodes:
-    //     for (i = 0; i < l; i++) {
-    //       n = nodes[i];
-    //       currentOvers[n.id] = n;
-    //       if (!over[n.id]) {
-    //         newOvers.push(n);
-    //         over[n.id] = n;
-    //       }
-    //     }
-
-    //     // Check no more overred nodes:
-    //     for (k in over)
-    //       if (!currentOvers[k]) {
-    //         newOut.push(over[k]);
-    //         delete over[k];
-    //       }
-
-    //     // Dispatch both single and multi events:
-    //     for (i = 0, l = newOvers.length; i < l; i++)
-    //       self.dispatchEvent('overNode', {
-    //         node: newOvers[i]
-    //       });
-    //     for (i = 0, l = newOut.length; i < l; i++)
-    //       self.dispatchEvent('outNode', {
-    //         node: newOut[i]
-    //       });
-    //     if (newOvers.length)
-    //       self.dispatchEvent('overNodes', {
-    //         nodes: newOvers
-    //       });
-    //     if (newOut.length)
-    //       self.dispatchEvent('outNodes', {
-    //         nodes: newOut
-    //       });
-    //   }
-
-    //   // Bind events:
-    //   captor.bind('click', onClick);
-    //   captor.bind('mouseup', onMove);
-    //   captor.bind('mousemove', onMove);
-    //   captor.bind('mouseout', onOut);
-    //   captor.bind('doubleclick', onDoubleClick);
-    //   self.bind('render', onMove);
-    // }
+    // Hover
+    container.addEventListener('mouseout', onOut, false);
+    container.addEventListener('mouseover', onOver, false);
   };
 }).call(this);
