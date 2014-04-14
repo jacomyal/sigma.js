@@ -24,7 +24,7 @@
       text.setAttributeNS(null, 'data-label-target', node.id);
       text.setAttributeNS(null, 'class', settings('classPrefix') + '-label');
       text.setAttributeNS(null, 'font-size', fontSize);
-      text.setAttributeNS(null, 'font-family', settings('fontStyle') || '');
+      text.setAttributeNS(null, 'font-family', settings('font'));
       text.setAttributeNS(null, 'fill', fontColor);
 
       text.innerHTML = node.label;

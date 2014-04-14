@@ -89,8 +89,6 @@
     // Deal with sigma events:
     // TODO: keep an option to override the DOM events?
     sigma.misc.bindDOMEvents.call(this, this.domElements.graph);
-    // sigma.misc.bindEvents.call(this, this.options.prefix);
-    // sigma.misc.drawHovers.call(this, this.options.prefix);
 
     // Resize
     this.resize(false);
