@@ -134,6 +134,7 @@
         renderers,
         rendererType,
         batchSize,
+        tempGCO,
         index = {},
         graph = this.graph,
         nodes = this.graph.nodes,
@@ -206,6 +207,9 @@
         end = Math.min(edges.length, start + batchSize);
 
         job = function() {
+          tempGCO = this.contexts.edges.globalCompositeOperation;
+          this.contexts.edges.globalCompositeOperation = 'destination-over';
+
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
@@ -217,6 +221,9 @@
               embedSettings
             );
           }
+
+          // Restore original globalCompositeOperation:
+          this.contexts.edges.globalCompositeOperation = tempGCO;
 
           // Catch job's end:
           if (end === edges.length) {
