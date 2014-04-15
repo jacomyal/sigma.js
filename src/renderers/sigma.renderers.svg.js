@@ -251,8 +251,7 @@
         });
 
     var renderers,
-        subrenderers,
-        el,
+        o,
         a,
         i,
         l;
@@ -261,51 +260,58 @@
     renderers = sigma.svg.edges;
     if (drawEdges)
       for (a = edges(), i = 0, l = a.length; i < l; i++) {
-        el = a[i];
-        if (!el.hidden) {
-          this.domElements.edges[el.id] =
-            (renderers[el.type] || renderers.def).create(
-              el,
-              nodes(el.source),
-              nodes(el.target),
+        o = a[i];
+        if (!o.hidden) {
+          this.domElements.edges[o.id] =
+            (renderers[o.type] || renderers.def).create(
+              o,
+              nodes(o.source),
+              nodes(o.target),
               embedSettings
             );
 
           // Attaching the nodes elements
           // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.edges[el.id]);
+          this.domElements.graph.appendChild(this.domElements.edges[o.id]);
         }
 
       }
 
-    // Creating the nodes and labels elements
+    // Creating the nodes elements
     renderers = sigma.svg.nodes;
-    subrenderers = sigma.svg.labels;
     if (drawNodes)
       for (a = nodes(), i = 0, l = a.length; i < l; i++) {
-        el = a[i];
-        if (!el.hidden) {
-          this.domElements.nodes[el.id] =
-            (renderers[el.type] || renderers.def).create(
-              el,
+        o = a[i];
+        if (!o.hidden) {
+          this.domElements.nodes[o.id] =
+            (renderers[o.type] || renderers.def).create(
+              o,
               embedSettings
             );
 
           // Attaching the nodes elements
           // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.nodes[el.id]);
+          this.domElements.graph.appendChild(this.domElements.nodes[o.id]);
+        }
+      }
 
-          // Labels
-          if (drawLabels) {
-            this.domElements.labels[el.id] =
-            (subrenderers[el.type] || subrenderers.def).create(
-              el,
+    // Creating the labels elements
+    renderers = sigma.svg.labels;
+    if (drawLabels)
+      for (i = 0; i < l; i++) {
+        o = a[i];
+        if (!o.hidden) {
+          this.domElements.labels[o.id] =
+            (renderers[o.type] || renderers.def).create(
+              o,
               embedSettings
             );
 
-            this.domElements.graph.appendChild(this.domElements.labels[el.id]);
-          }
+          // Attaching the label elements
+          // TODO: display opt or dom inclusion opt
+          this.domElements.graph.appendChild(this.domElements.labels[o.id]);
         }
+
       }
 
     return this;
@@ -319,12 +325,12 @@
    * @return {sigma.renderers.svg}              Returns the instance itself.
    */
   sigma.renderers.svg.prototype.hideDOMElements = function(elements, renderer) {
-    var el,
+    var o,
         i;
 
     for (i in elements) {
-      el = elements[i];
-      (renderer[el.type] || renderer.def).hide(el);
+      o = elements[i];
+      (renderer[o.type] || renderer.def).hide(o);
     }
 
     return this;
