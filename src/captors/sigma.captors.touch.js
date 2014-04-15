@@ -282,8 +282,8 @@
               });
 
               _self.dispatchEvent('mousemove', {
-                x: pos0.x - e.target.width / 2,
-                y: pos0.y - e.target.height / 2
+                x: pos0.x - sigma.utils.getWidth(e) / 2,
+                y: pos0.y - sigma.utils.getHeight(e) / 2
               });
 
               _self.dispatchEvent('drag');
@@ -298,13 +298,15 @@
             y1 = pos1.y;
 
             start = _camera.cameraPosition(
-              (_startTouchX0 + _startTouchX1) / 2 - e.target.width / 2,
-              (_startTouchY0 + _startTouchY1) / 2 - e.target.height / 2,
+              (_startTouchX0 + _startTouchX1) / 2 -
+                sigma.utils.getWidth(e) / 2,
+              (_startTouchY0 + _startTouchY1) / 2 -
+                sigma.utils.getHeight(e) / 2,
               true
             );
             end = _camera.cameraPosition(
-              (x0 + x1) / 2 - e.target.width / 2,
-              (y0 + y1) / 2 - e.target.height / 2,
+              (x0 + x1) / 2 - sigma.utils.getWidth(e) / 2,
+              (y0 + y1) / 2 - sigma.utils.getHeight(e) / 2,
               true
             );
 
@@ -382,14 +384,14 @@
 
         pos = position(e.touches[0]);
         _self.dispatchEvent('doubleclick', {
-          x: pos.x - e.target.width / 2,
-          y: pos.y - e.target.height / 2
+          x: pos.x - sigma.utils.getWidth(e) / 2,
+          y: pos.y - sigma.utils.getHeight(e) / 2
         });
 
         if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
-            pos.x - e.target.width / 2,
-            pos.y - e.target.height / 2,
+            pos.x - sigma.utils.getWidth(e) / 2,
+            pos.y - sigma.utils.getHeight(e) / 2,
             true
           );
 

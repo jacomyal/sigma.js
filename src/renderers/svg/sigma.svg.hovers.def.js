@@ -52,12 +52,12 @@
         e = Math.round(fontSize / 2 + 2);
 
         // Rectangle
-        d =  'M' + x + ',' + (y + e) +
+        d = 'M' + x + ',' + (y + e) +
             // ' A' + x + ',' + y + ' ' + (x + e) + ' ' + y + ' ' + e +
             ' L' + (x + w) + ',' + y +
             ' L' + (x + w) + ',' + (y + h) +
             ' L' + (x + e) + ',' + (y + h) +
-            // ' A' + x + ',' + (y + h) + ' ' + x + ' ' + (y + h - e) + ' ' + e +
+          // ' A' + x + ',' + (y + h) + ' ' + x + ' ' + (y + h - e) + ' ' + e +
             ' L' + x + ',' + (y + e);
 
         rectangle.setAttributeNS(null, 'd', d);

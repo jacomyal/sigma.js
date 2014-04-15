@@ -270,9 +270,32 @@
    * @return {number}   The width of the event's target.
    */
   sigma.utils.getWidth = function(e) {
+    var w = (e.target.ownerSVGElement === undefined ||
+             e.target.ownerSVGElement === null) ?
+              e.target.width :
+              e.target.ownerSVGElement.width;
+
     return (
-      (e.target.width !== undefined && e.target.width) ||
-      (e.target.getBBox !== undefined && e.target.getBBox().width)
+      (typeof w === 'number' && w) ||
+      (w !== undefined && w.baseVal !== undefined && w.baseVal.value)
+    );
+  };
+
+  /**
+   * Extract the height from a mouse or touch event.
+   *
+   * @param  {event}  e A mouse or touch event.
+   * @return {number}   The height of the event's target.
+   */
+  sigma.utils.getHeight = function(e) {
+    var h = (e.target.ownerSVGElement === undefined ||
+             e.target.ownerSVGElement === null) ?
+              e.target.height :
+              e.target.ownerSVGElement.height;
+
+    return (
+      (typeof h === 'number' && h) ||
+      (h !== undefined && h.baseVal !== undefined && h.baseVal.value)
     );
   };
 
