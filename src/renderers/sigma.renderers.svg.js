@@ -42,7 +42,8 @@
       graph: null,
       nodes: {},
       edges: {},
-      labels: {}
+      labels: {},
+      hovers: {}
     };
     this.options = options;
     this.container = this.options.container;
@@ -89,6 +90,7 @@
     // Deal with sigma events:
     // TODO: keep an option to override the DOM events?
     sigma.misc.bindDOMEvents.call(this, this.domElements.graph);
+    this.bindHovers(this.options.prefix);
 
     // Resize
     this.resize(false);
@@ -326,6 +328,60 @@
     }
 
     return this;
+  };
+
+  /**
+   * This method binds the hover events to the renderer.
+   *
+   * @param  {string} prefix The renderer prefix.
+   */
+  // TODO: add option about whether to display hovers or not
+  sigma.renderers.svg.prototype.bindHovers = function(prefix) {
+    var renderers = sigma.svg.hovers,
+        self = this;
+
+    function overNode(e) {
+      var node = e.data.node,
+          embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
+
+      if (!embedSettings('enableHovering'))
+        return;
+
+      var hover = (renderers[node.type] || renderers.def).create(
+        node,
+        embedSettings
+      );
+
+      self.domElements.hovers[node.id] = hover;
+
+      // Inserting in DOM
+      self.domElements.graph.insertBefore(
+        hover,
+        self.domElements.nodes[node.id]
+      );
+    }
+
+    function outNode(e) {
+      var node = e.data.node,
+          embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
+
+      if (!embedSettings('enableHovering'))
+        return;
+
+      // Deleting element
+      self.domElements.graph.removeChild(
+        self.domElements.hovers[node.id]
+      );
+      delete self.domElements.hovers[node.id];
+    }
+
+    // Binding events
+    this.bind('overNode', overNode);
+    this.bind('outNode', outNode);
   };
 
   /**

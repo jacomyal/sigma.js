@@ -264,6 +264,19 @@
   };
 
   /**
+   * Extract the width from a mouse or touch event.
+   *
+   * @param  {event}  e A mouse or touch event.
+   * @return {number}   The width of the event's target.
+   */
+  sigma.utils.getWidth = function(e) {
+    return (
+      (e.target.width !== undefined && e.target.width) ||
+      (e.target.getBBox !== undefined && e.target.getBBox().width)
+    );
+  };
+
+  /**
    * Extract the wheel delta from a mouse or touch event.
    *
    * @param  {event}  e A mouse or touch event.

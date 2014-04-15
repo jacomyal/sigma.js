@@ -303,6 +303,7 @@
       var pos,
           ratio,
           animation;
+          console.log(e);
 
       if (_settings('mouseEnabled')) {
         ratio = sigma.utils.getDelta(e) > 0 ?

@@ -10,8 +10,6 @@
    * @param  {DOMElement}               context  The SVG context.
    * @param  {configurable}             settings The settings function.
    */
-
-  // TODO: use a path, rather?
   sigma.svg.edges.def = {
     create: function(edge, source, target, settings) {
       var color = edge.color,

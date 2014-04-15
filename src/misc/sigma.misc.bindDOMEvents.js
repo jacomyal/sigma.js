@@ -124,6 +124,8 @@
     }
 
     // Registering Events:
+    var i,
+        o;
 
     // Click
     container.addEventListener('click', click, false);
@@ -131,10 +133,21 @@
 
     // Touch counterparts
     container.addEventListener('touchstart', click, false);
-    sigma.utils.doubleClick(container, 'touchstart', click);
+    sigma.utils.doubleClick(container, 'touchstart', doubleClick);
 
     // Hover
-    container.addEventListener('mouseout', onOut, false);
-    container.addEventListener('mouseover', onOver, false);
+    for (i in this.domElements.nodes) {
+      o = this.domElements.nodes[i];
+
+      o.addEventListener('mouseenter', onOver, false);
+      o.addEventListener('mouseleave', onOut, false);
+    }
+
+    for (i in this.domElements.edges) {
+      o = this.domElements.edges[i];
+
+      o.addEventListener('mouseenter', onOver, false);
+      o.addEventListener('mouseleave', onOut, false);
+    }
   };
 }).call(this);
