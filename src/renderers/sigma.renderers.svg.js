@@ -356,7 +356,10 @@
 
       self.domElements.hovers[node.id] = hover;
 
-      // Inserting in DOM
+      // Placing the target node on top
+      self.domElements.graph.appendChild(self.domElements.nodes[node.id]);
+
+      // Inserting the hover in the dom
       self.domElements.graph.insertBefore(
         hover,
         self.domElements.nodes[node.id]

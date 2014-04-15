@@ -58,6 +58,9 @@
         });
       else
         self.dispatchEvent('clickStage');
+
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     // Double click
@@ -77,14 +80,19 @@
         });
       else
         self.dispatchEvent('doubleClickStage');
+
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     // On out
     function onOut(e) {
-      if (!self.settings('eventsEnabled') || e.fromElement === null)
+      var target = e.fromElement || e.relatedTarget;
+
+      if (!self.settings('eventsEnabled') || target === null)
         return;
 
-      var from = new Element(e.fromElement);
+      var from = new Element(target);
 
       if (from.isNode()) {
         self.dispatchEvent('outNode', {
@@ -99,14 +107,19 @@
           target: graph.nodes(edge.target)
         });
       }
+
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     // On move
     function onOver(e) {
-      if (!self.settings('eventsEnabled') || e.toElement === null)
+      var target = e.toElement || e.target;
+
+      if (!self.settings('eventsEnabled') || target === null)
         return;
 
-      var to = new Element(e.toElement);
+      var to = new Element(target);
 
       if (to.isNode()) {
         self.dispatchEvent('overNode', {
@@ -121,6 +134,9 @@
           target: graph.nodes(edge.target)
         });
       }
+
+      e.preventDefault();
+      e.stopPropagation();
     }
 
     // Registering Events:
