@@ -545,11 +545,11 @@
      * ------------------------
      */
     var _forceFactory = {
-      buildRepulsion: function(adjustBySize, coefficient) {
+      buildRepulsion: function(adjustBySize) {
         if (adjustBySize)
-          return new this.linRepulsion_antiCollision(coefficient);
+          return this.linRepulsion_antiCollision;
         else
-          return new this.linRepulsion(coefficient);
+          return this.linRepulsion;
       },
       getStrongGravity: function(coefficient) {
         return new this.strongGravity(coefficient);
@@ -585,19 +585,20 @@
           }
         }
       },
-      linRepulsion: function(coefficient) {
-        this.apply_nn = function(n1, n2) {
+      linRepulsion: {
+        apply_nn: function(n1, n2) {
           // Get the distance
-          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
-              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+              distanceSq = xDist * xDist + yDist * yDist;
 
-          if (distance > 0) {
+          if (distanceSq > 0) {
             // NB: factor = force / distance
             var factor = coefficient *
                          _w.nodes[_np(n1, 'mass')] *
                          _w.nodes[_np(n2, 'mass')] /
-                         Math.pow(distance, 2);
+                         distanceSq;
 
             _w.nodes[_np(n1, 'dx')] += xDist * factor;
             _w.nodes[_np(n1, 'dy')] += yDist * factor;
@@ -605,30 +606,31 @@
             _w.nodes[_np(n2, 'dx')] -= xDist * factor;
             _w.nodes[_np(n2, 'dy')] -= yDist * factor;
           }
-        }
+        },
 
-        this.apply_nr = function(n, r) {
-
+        apply_nr: function(n, r) {
           // Get the distance
-          var xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
               yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
-              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+              distanceSq = xDist * xDist + yDist * yDist;
 
-          if (distance > 0) {
+          if (distanceSq > 0) {
             // NB: factor = force / distance
             var factor = coefficient *
                          _w.nodes[_np(n, 'mass')] *
                          r.mass /
-                         Math.pow(distance, 2);
+                         distanceSq;
 
             _w.nodes[_np(n, 'dx')] += xDist * factor;
             _w.nodes[_np(n, 'dy')] += yDist * factor;
           }
-        }
+        },
 
-        this.apply_g = function(n, g) {
+        apply_g: function(n, g) {
           // Get the distance
-          var xDist = _w.nodes[_np(n, 'x')],
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n, 'x')],
               yDist = _w.nodes[_np(n, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -640,11 +642,12 @@
           }
         }
       },
-      linRepulsion_antiCollision: function(coefficient) {
-        this.apply_nn = function(n1, n2) {
+      linRepulsion_antiCollision: {
+        apply_nn: function(n1, n2) {
 
           // Get the distance
-          var xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n1, 'x')] - _w.nodes[_np(n2, 'x')],
               yDist = _w.nodes[_np(n1, 'y')] - _w.nodes[_np(n2, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist) -
                          _w.nodes[_np(n1, 'size')] -
@@ -674,12 +677,12 @@
             _w.nodes[_np(n2, 'dx')] -= xDist * factor;
             _w.nodes[_np(n2, 'dy')] -= yDist * factor;
           }
-        }
+        },
 
-        this.apply_nr = function(n, r) {
-
+        apply_nr: function(n, r) {
           // Get the distance
-          var xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n, 'x')] - r.massCenterX,
               yDist = _w.nodes[_np(n, 'y')] - r.massCenterY,
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
@@ -701,11 +704,12 @@
             _w.nodes[_np(n, 'dx')] += xDist * factor;
             _w.nodes[_np(n, 'dy')] += yDist * factor;
           }
-        }
+        },
 
-        this.apply_g = function(n, g) {
+        apply_g: function(n, g) {
           // Get the distance
-          var xDist = _w.nodes[_np(n, 'x')],
+          var coefficient = _w.p.scalingRatio,
+              xDist = _w.nodes[_np(n, 'x')],
               yDist = _w.nodes[_np(n, 'y')],
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
