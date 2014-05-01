@@ -33,7 +33,7 @@ The plugin implements the following shapes. To set a shape renderer, you simply 
   * `cross`: plus shape. you can control additional properties in this polygon by setting more values as follows:
 ````javascript
   node.cross = {
-    line_width: /* width of cross arms */,
+    lineWeight: /* width of cross arms */,
   }
 ````
   * `pacman`: an example of a more exotic renderer

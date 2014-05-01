@@ -70,19 +70,19 @@
   register("diamond",genericDrawShape(drawDiamond),genericDrawBorder(drawDiamond));
 
   var drawCross = function(node,x,y,size,context) {
-  	var line_weight = (node.cross && node.cross.line_weight) || 5;
-    context.moveTo(x-size, y-line_weight);
-    context.lineTo(x-size, y+line_weight);
-    context.lineTo(x-line_weight, y+line_weight);
-    context.lineTo(x-line_weight, y+size);
-    context.lineTo(x+line_weight, y+size);
-    context.lineTo(x+line_weight, y+line_weight);
-    context.lineTo(x+size, y+line_weight);
-    context.lineTo(x+size, y-line_weight);
-    context.lineTo(x+line_weight, y-line_weight);
-    context.lineTo(x+line_weight, y-size);
-    context.lineTo(x-line_weight, y-size);
-    context.lineTo(x-line_weight, y-line_weight);
+  	var lineWeight = (node.cross && node.cross.lineWeight) || 5;
+    context.moveTo(x-size, y-lineWeight);
+    context.lineTo(x-size, y+lineWeight);
+    context.lineTo(x-lineWeight, y+lineWeight);
+    context.lineTo(x-lineWeight, y+size);
+    context.lineTo(x+lineWeight, y+size);
+    context.lineTo(x+lineWeight, y+lineWeight);
+    context.lineTo(x+size, y+lineWeight);
+    context.lineTo(x+size, y-lineWeight);
+    context.lineTo(x+lineWeight, y-lineWeight);
+    context.lineTo(x+lineWeight, y-size);
+    context.lineTo(x-lineWeight, y-size);
+    context.lineTo(x-lineWeight, y-lineWeight);
   }
   register("cross",genericDrawShape(drawCross),genericDrawBorder(drawCross));
 
