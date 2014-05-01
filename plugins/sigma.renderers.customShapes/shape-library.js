@@ -69,6 +69,23 @@
   }
   register("diamond",genericDrawShape(drawDiamond),genericDrawBorder(drawDiamond));
 
+  var drawCross = function(node,x,y,size,context) {
+  	var line_weight = (node.cross && node.cross.line_weight) || 5;
+    context.moveTo(x-size, y-line_weight);
+    context.lineTo(x-size, y+line_weight);
+    context.lineTo(x-line_weight, y+line_weight);
+    context.lineTo(x-line_weight, y+size);
+    context.lineTo(x+line_weight, y+size);
+    context.lineTo(x+line_weight, y+line_weight);
+    context.lineTo(x+size, y+line_weight);
+    context.lineTo(x+size, y-line_weight);
+    context.lineTo(x+line_weight, y-line_weight);
+    context.lineTo(x+line_weight, y-size);
+    context.lineTo(x-line_weight, y-size);
+    context.lineTo(x-line_weight, y-line_weight);
+  }
+  register("cross",genericDrawShape(drawCross),genericDrawBorder(drawCross));
+
   var drawEquilateral = function(node,x,y,size,context) {
     var pcount = (node.equilateral && node.equilateral.numPoints) || 5;
     var rotate = ((node.equilateral && node.equilateral.rotate) || 0)*Math.PI/180;
