@@ -160,7 +160,7 @@
 
     // Hover
     // OPTIMIZE: This is barely optimal
-    // Find a way without mergin mouseenter and mouseout events.
+    // Find a way without merging mouseenter and mouseout events.
     container.addEventListener('mouseout', onOut, false);
     for (i in this.domElements.nodes) {
       o = this.domElements.nodes[i];

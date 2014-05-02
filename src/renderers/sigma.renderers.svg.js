@@ -352,7 +352,8 @@
   // TODO: add option about whether to display hovers or not
   sigma.renderers.svg.prototype.bindHovers = function(prefix) {
     var renderers = sigma.svg.hovers,
-        self = this;
+        self = this,
+        hoveredNode;
 
     function overNode(e) {
       var node = e.data.node,
@@ -373,6 +374,7 @@
 
       // Inserting the hover in the dom
       self.domElements.graph.appendChild(hover);
+      hoveredNode = node;
     }
 
     function outNode(e) {
@@ -388,12 +390,43 @@
       self.domElements.graph.removeChild(
         self.domElements.hovers[node.id]
       );
+      hoveredNode = null;
       delete self.domElements.hovers[node.id];
+    }
+
+    // OPTIMIZE: perform a real update rather than a deletion
+    function update() {
+      if (!hoveredNode)
+        return;
+
+      var embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
+
+      // Deleting element before update
+      self.domElements.graph.removeChild(
+        self.domElements.hovers[hoveredNode.id]
+      );
+      delete self.domElements.hovers[hoveredNode.id];
+
+      var hover = (renderers[hoveredNode.type] || renderers.def).create(
+        hoveredNode,
+        self.measurementCanvas,
+        embedSettings
+      );
+
+      self.domElements.hovers[hoveredNode.id] = hover;
+
+      // Inserting the hover in the dom
+      self.domElements.graph.appendChild(hover);
     }
 
     // Binding events
     this.bind('overNode', overNode);
     this.bind('outNode', outNode);
+
+    // Update on render
+    this.bind('render', update);
   };
 
   /**
