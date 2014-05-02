@@ -92,9 +92,16 @@
       if (!self.settings('eventsEnabled') || target === null)
         return;
 
-      var from = new Element(target);
+      var from = new Element(target),
+          to = new Element(e.toElement || e.target);
 
       if (from.isNode()) {
+        var fromNodeId = from.attr('data-node-id'),
+            toNodeId = to.attr('data-node-id');
+
+        if (fromNodeId === toNodeId)
+          return;
+
         self.dispatchEvent('outNode', {
           node: graph.nodes(from.attr('data-node-id'))
         });
@@ -152,11 +159,14 @@
     sigma.utils.doubleClick(container, 'touchstart', doubleClick);
 
     // Hover
+    // OPTIMIZE: This is barely optimal
+    // Find a way without mergin mouseenter and mouseout events.
+    container.addEventListener('mouseout', onOut, false);
     for (i in this.domElements.nodes) {
       o = this.domElements.nodes[i];
 
       o.addEventListener('mouseenter', onOver, false);
-      o.addEventListener('mouseleave', onOut, false);
+      // o.addEventListener('mouseleave', onOut, false);
     }
 
     for (i in this.domElements.edges) {

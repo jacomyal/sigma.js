@@ -38,7 +38,8 @@
       var group = document.createElementNS(settings('xmlns'), 'g'),
           rectangle = document.createElementNS(settings('xmlns'), 'rect'),
           circle = document.createElementNS(settings('xmlns'), 'circle'),
-          text = document.createElementNS(settings('xmlns'), 'text');
+          text = document.createElementNS(settings('xmlns'), 'text'),
+          nodeCircle;
 
       // Defining properties
       group.setAttributeNS(null, 'class', settings('classPrefix') + '-hover');
@@ -57,9 +58,7 @@
           Math.round(node[prefix + 'y'] + fontSize / 3));
 
         // Measures
-        // OPTIMIZE: The width of a SVG element is not computed before its
-        // insertion into the dom. It would be nice to find a workaround.
-        // Replace the hardcoded 54 below
+        // OPTIMIZE: Find a better way than a measurement canvas
         x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
         y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
         w = Math.round(
@@ -81,12 +80,18 @@
         rectangle.setAttributeNS(null, 'y', node[prefix + 'y'] - e);
         rectangle.setAttributeNS(null, 'width', w);
         rectangle.setAttributeNS(null, 'height', h);
+
+        // Node
+        var nodeRenderer = sigma.svg.nodes[node.type] || sigma.svg.nodes.def;
+        nodeCircle = nodeRenderer.create(node, settings);
+        nodeRenderer.update(node, nodeCircle, settings);
       }
 
       // Appending childs
       group.appendChild(circle);
       group.appendChild(rectangle);
       group.appendChild(text);
+      group.appendChild(nodeCircle);
 
       return group;
     }
