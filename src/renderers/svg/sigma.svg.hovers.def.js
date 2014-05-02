@@ -7,12 +7,6 @@
   // Initialize packages:
   sigma.utils.pkg('sigma.svg.hovers');
 
-  function arcTo(x1, y1, x2, y2, r) {
-    return 'A' + x1 + ',' + x2 +
-           ' ' + r + ' 0,0 ' +
-           x2 + ',' + y2;
-  }
-
   /**
    * This hover renderer will basically display the label with a background.
    *
@@ -21,7 +15,7 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.svg.hovers.def = {
-    create: function(node, settings) {
+    create: function(node, measurementCanvas, settings) {
 
       // Defining visual properties
       var x,
@@ -69,7 +63,8 @@
         x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
         y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
         w = Math.round(
-          54 + fontSize / 2 + size + 7
+          measurementCanvas.measureText(node.label).width +
+            fontSize / 2 + size + 9
         );
         h = Math.round(fontSize + 4);
         e = Math.round(fontSize / 2 + 2);

@@ -45,6 +45,7 @@
       labels: {},
       hovers: {}
     };
+    this.measurementCanvas = null;
     this.options = options;
     this.container = this.options.container;
     this.settings = (
@@ -228,7 +229,14 @@
     dom.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     dom.setAttribute('version', '1.1');
 
+    // Creating the measurement canvas
+    var canvas = document.createElement('canvas');
+    canvas.setAttribute('class', 'sigma-measurement-canvas');
+
+    // Appending elements
     this.domElements.graph = this.container.appendChild(dom);
+    this.container.appendChild(canvas);
+    this.measurementCanvas = canvas.getContext('2d');
   };
 
   /**
@@ -357,6 +365,7 @@
 
       var hover = (renderers[node.type] || renderers.def).create(
         node,
+        self.measurementCanvas,
         embedSettings
       );
 
