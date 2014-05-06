@@ -5,7 +5,7 @@
     throw 'sigma is not declared';
 
   /**
-   * Sigma ForceAtlas2.1 Supervisor
+   * Sigma ForceAtlas2.5 Supervisor
    * =============================
    *
    * Author: Guillaume Plique (Yomguithereal)
@@ -13,33 +13,44 @@
    */
 
   /**
-   * Helpers Namespace
+   * Feature detection
    * ------------------
    */
-  var _helpers = {};
+  var webWorkers = 'Worker' in window;
 
   /**
    * Supervisor Object
    * ------------------
    */
-  function Supervisor(sigInst, workerFunc, options) {
-    var _this = this;
+  function Supervisor(sigInst, options) {
+    var _this = this,
+        workerFn = sigInst.getForceAtlas2Worker();
 
-    // TODO: later, check if transferable is possible
     // Window URL Polyfill
     window.URL = window.URL || window.webkitURL;
 
     // Properties
     this.sigInst = sigInst;
     this.graph = this.sigInst.graph;
-    this.ppn = 8;
+    this.ppn = 10;
     this.ppe = 3;
+    this.running = false;
 
-    var blob = this.makeBlob(workerFunc);
-    this.worker = new Worker(URL.createObjectURL(blob));
+    // Web worker or classic DOM events?
+    if (webWorkers) {
+      var blob = this.makeBlob(workerFn);
+      this.worker = new Worker(URL.createObjectURL(blob));
+
+      // Post Message Polyfill
+      this.worker.postMessage =
+        this.worker.webkitPostMessage || this.worker.postMessage;
+    }
+    else {
+
+    }
 
     // Worker message receiver
-    this.worker.onmessage = function(e) {
+    this.worker.addEventListener('message', function(e) {
 
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
@@ -49,11 +60,7 @@
 
       // Send data back to worker and loop
       _this.sendByteArrayToWorker();
-    };
-
-    // Post Message Polyfill
-    this.worker.postMessage =
-      this.worker.webkitPostMessage || this.worker.postMessage;
+    });
 
     // Filling byteArrays
     this.graphToByteArrays();
@@ -62,11 +69,11 @@
     this.sendByteArrayToWorker('start');
   }
 
-  Supervisor.prototype.makeBlob = function(workerFunc) {
+  Supervisor.prototype.makeBlob = function(workerFn) {
     var blob;
 
     try {
-      blob = new Blob([workerFunc], {type: 'application/javascript'});
+      blob = new Blob([workerFn], {type: 'application/javascript'});
     }
     catch (e) {
       window.BlobBuilder = window.BlobBuilder ||
@@ -74,7 +81,7 @@
                            window.MozBlobBuilder;
 
       blob = new BlobBuilder();
-      blob.append(workerFunc);
+      blob.append(workerFn);
       blob = blob.getBlob();
     }
 
@@ -109,7 +116,9 @@
       this.nodesByteArray[j + 4] = 0;
       this.nodesByteArray[j + 5] = 0;
       this.nodesByteArray[j + 6] = 1 + this.graph.degree(nodes[i].id);
-      this.nodesByteArray[j + 7] = 0;
+      this.nodesByteArray[j + 7] = 1;
+      this.nodesByteArray[j + 8] = nodes[i].size;
+      this.nodesByteArray[j + 9] = 0;
       j += this.ppn;
     }
 
@@ -139,15 +148,15 @@
     this.sigInst.refresh();
   };
 
-  Supervisor.prototype.sendByteArrayToWorker = function(header) {
+  Supervisor.prototype.sendByteArrayToWorker = function(action) {
     var content = {
-      header: header || 'loop',
+      action: action || 'loop',
       nodes: this.nodesByteArray.buffer
     };
 
     var buffers = [this.nodesByteArray.buffer];
 
-    if (header === 'start') {
+    if (action === 'start') {
       content.config = {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
@@ -161,12 +170,25 @@
    * Interface
    * ----------
    */
+  var supervisor;
 
-  sigma.prototype.startForceAtlas2 = function() {};
-  sigma.prototype.stopForceAtlas2 = function() {};
+  sigma.prototype.startForceAtlas2 = function() {
+
+    // Create supervisor if undefined
+    // Start algorithm
+  };
+  sigma.prototype.stopForceAtlas2 = function() {
+
+    // Pause algorithm
+  };
+  sigma.prototype.killForceAtlas2 = function() {
+
+    // Stop and kill worker
+    // Kill supervisor
+  };
 
   sigma.prototype.testFA2Supervisor = function() {
-    new Supervisor(this, this.getForceAtlas2Worker());
+    supervisor = new Supervisor(this);
     return this;
   };
 }).call(this);
