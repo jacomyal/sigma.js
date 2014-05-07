@@ -209,7 +209,11 @@
       var n, n1, n2, e, s, t, w;
 
       var rootRegion,
-          outboundAttCompensation;
+          outboundAttCompensation,
+          xDist,
+          yDist,
+          distance,
+          factor;
 
 
       // 1) Initializing layout data
@@ -242,6 +246,7 @@
 
       // 2) Repulsion
       //--------------
+      // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
 
       if (W.settings.barnesHutOptimize) {
 
@@ -253,7 +258,62 @@
         for (n1 = 0; n1 < W.nodesLength; n1 += W.ppn) {
           for (n2 = 0; n2 < W.nodesLength; n2 += W.ppn) {
 
-            // TODO: apply repulsion
+            // Common to both methods
+            xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
+            yDist = W.nodeMatrix[np(n1, 'y')] - W.nodeMatrix[np(n2, 'y')];
+
+            if (W.settings.adjustSize) {
+
+              //-- Anticollision Linear Repulsion
+              distance = Math.sqrt(xDist * xDist + yDist * yDist) -
+                W.nodeMatrix[np(n1, 'size')] -
+                W.nodeMatrix[np(n2, 'size')];
+
+              if (distance > 0) {
+                factor = W.settings.scalingRatio *
+                  W.nodeMatrix[np(n1, 'mass')] *
+                  W.nodeMatrix[np(n2, 'mass')] /
+                  distance / distance;
+
+                // Updating nodes' dx and dy
+                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+
+                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+              }
+              else if (distance < 0) {
+                factor = 100 * W.settings.scalingRatio *
+                  W.nodeMatrix[np(n1, 'mass')] *
+                  W.nodeMatrix[np(n2, 'mass')];
+
+                // Updating nodes' dx and dy
+                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+
+                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+              }
+            }
+            else {
+
+              //-- Linear Repulsion
+              distance = Math.sqrt(xDist * xDist + yDist * yDist);
+
+              if (distance > 0) {
+                factor = W.settings.scalingRatio *
+                  W.nodeMatrix[np(n1, 'mass')] *
+                  W.nodeMatrix[np(n2, 'mass')] /
+                  distance / distance;
+
+                // Updating nodes' dx and dy
+                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+
+                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+              }
+            }
           }
         }
       }
