@@ -379,12 +379,14 @@
     // Sending data back to the supervisor
     var sendNewCoords;
 
-    if (Object(this.document) === this.document) {
+    if (typeof window !== 'undefined' && window.document) {
 
       // From same document as sigma
       sendNewCoords = function() {
         var e = new Event('newCoords');
-        e.nodes = W.nodeMatrix.buffer;
+        e.data = {
+          nodes: W.nodeMatrix.buffer
+        };
         requestAnimationFrame(function() {
           document.dispatchEvent(e);
         });

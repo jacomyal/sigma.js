@@ -47,10 +47,13 @@
     }
     else {
 
+      // TODO: do we crush?
+      eval(workerFn);
     }
 
     // Worker message receiver
-    this.worker.addEventListener('message', function(e) {
+    var msgName = (this.worker) ? 'message' : 'newCoords';
+    (this.worker || document).addEventListener(msgName, function(e) {
 
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
@@ -162,7 +165,10 @@
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    this.worker.postMessage(content, buffers);
+    if (webWorkers)
+      this.worker.postMessage(content, buffers);
+    else
+      window.postMessage(content, '*')
   };
 
 
