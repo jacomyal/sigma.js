@@ -63,6 +63,9 @@
 
       // Send data back to worker and loop
       _this.sendByteArrayToWorker();
+
+      // Rendering graph
+      _this.sigInst.refresh();
     });
 
     // Filling byteArrays
@@ -146,9 +149,6 @@
       nodes[j].y = this.nodesByteArray[i + 1];
       j++;
     }
-
-    // Refreshing
-    this.sigInst.refresh();
   };
 
   Supervisor.prototype.sendByteArrayToWorker = function(action) {

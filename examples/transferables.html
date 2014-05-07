@@ -70,8 +70,8 @@
       var i,
           s,
           o,
-          N = 1775,
-          E = 5232,
+          N = 1000,
+          E = 5000,
           C = 5,
           d = 0.5,
           cs = [],
@@ -117,7 +117,7 @@
           });
         }
       }
-
+      sigma.renderers.def = sigma.renderers.canvas;
       s = new sigma({
         graph: g,
         container: 'graph-container',

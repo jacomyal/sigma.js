@@ -31,6 +31,7 @@
       ppe: 3,
       maxForce: 10,
       iterations: 0,
+      converged: false,
       settings: {
         linLogMode: false,
         outboundAttractionDistribution: false,
@@ -40,14 +41,13 @@
         strongGravityMode: false,
         gravity: 1,
         barnesHutOptimize: false,
+
+        // Are those settings
         barnesHutTheta: 1.2,
         outboundAttCompensation: 1,
         totalSwinging: 0,
         totalEffectiveTraction: 0,
         speedEfficiency: 1,
-        complexIntervals: 500,
-        simpleIntervals: 1000,
-        converged: false
       }
     };
 
@@ -206,12 +206,14 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var n, n1, n2, e, s, t, w;
+      var n, n1, n2, e, w, g;
 
       var rootRegion,
           outboundAttCompensation,
+          coefficient,
           xDist,
           yDist,
+          ewc,
           distance,
           factor;
 
@@ -236,11 +238,11 @@
       // If outbound attraction distribution, compensate
       if (W.settings.outboundAttractionDistribution) {
         outboundAttCompensation = 0;
-        for (n = 0, l = W.nodes.length; n < l; n++) {
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
           outboundAttCompensation += W.nodeMatrix[np(n, 'mass')];
         }
 
-        outboundAttCompensation /= l;
+        outboundAttCompensation /= W.nodesLength;
       }
 
 
@@ -291,8 +293,8 @@
                 W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
                 W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+                W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
+                W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
               }
             }
             else {
@@ -310,8 +312,8 @@
                 W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
                 W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+                W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
+                W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
               }
             }
           }
@@ -321,21 +323,180 @@
 
       // 3) Gravity
       //------------
+      g = W.settings.gravity / W.settings.scalingRatio;
+      coefficient = W.settings.scalingRatio;
       for (n = 0; n < W.nodesLength; n += W.ppn) {
 
-        // TODO: apply gravity
+        // Common to both methods
+        xDist = W.nodeMatrix[np(n, 'x')];
+        yDist = W.nodeMatrix[np(n, 'y')];
+        distance = Math.sqrt(
+          Math.pow(xDist, 2) + Math.pow(yDist, 2)
+        );
+
+        if (W.settings.strongGravityMode) {
+
+          //-- Strong gravity
+          if (distance > 0)
+            factor = coefficient * W.nodeMatrix[np(n, 'mass')] * g;
+        }
+        else {
+
+          //-- Linear Anti-collision Repulsion n
+          if (distance > 0)
+            factor = coefficient * W.nodeMatrix[np(n, 'mass')] * g / distance;
+        }
       }
+
+      // Updating node's dx and dy
+      W.nodeMatrix[np(n, 'dx')] -= xDist * factor;
+      W.nodeMatrix[np(n, 'dy')] -= yDist * factor;
 
 
       // 4) Attraction
       //---------------
+      coefficient = 1 *
+        (W.settings.outboundAttractionDistribution ?
+          outboundAttCompensation :
+          1);
+
+      // TODO: simplify distance
+      // TODO: coefficient is always used as -c --> optimize?
       for (e = 0; e < W.edgesLength; e += W.ppe) {
-        s = W.edgeMatrix[ep(e, 'source')];
-        t = W.edgeMatrix[ep(e, 'target')];
+        n1 = W.edgeMatrix[ep(e, 'source')];
+        n2 = W.edgeMatrix[ep(e, 'target')];
         w = W.edgeMatrix[ep(e, 'weight')];
 
-        // TODO: apply attraction
+        // Edge weight influence
+        if (W.settings.edgeWeightInfluence === 0)
+          ewc = 1
+        else if (W.settings.edgeWeightInfluence === 1)
+          ewc = w;
+        else
+          ewc = Math.pow(w, W.settings.edgeWeightInfluence);
+
+        // Common measures
+        xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
+        yDist = W.nodeMatrix[np(n1, 'y')] - W.nodeMatrix[np(n2, 'y')];
+
+        // Applying attraction to nodes
+        if (W.settings.adjustSizes) {
+          if (W.settings.linLogMode) {
+            if (W.settings.outboundAttractionDistribution) {
+
+              //-- LinLog Degree Distributed Anti-collision Attraction
+              distance = Math.sqrt(
+                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+                W.nodeMatrix[np(n1, 'size')] -
+                W.nodeMatrix[np(n2, 'size')]
+              );
+
+              if (distance > 0) {
+                factor = -coefficient * ewc * Math.log(1 + distance) /
+                distance /
+                W.nodeMatrix[np(n1, 'mass')];
+              }
+            }
+            else {
+
+              //-- LinLog Anti-collision Attraction
+              distance = Math.sqrt(
+                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+                W.nodeMatrix[np(n1, 'size')] -
+                W.nodeMatrix[np(n2, 'size')]
+              );
+
+              if (distance > 0) {
+                factor = -coefficient * ewc * Math.log(1 + distance) / distance;
+              }
+            }
+          }
+          else {
+            if (W.settings.outboundAttractionDistribution) {
+
+              //-- Linear Degree Distributed Anti-collision Attraction
+              distance = Math.sqrt(
+                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+                W.nodeMatrix[np(n1, 'size')] -
+                W.nodeMatrix[np(n2, 'size')]
+              );
+
+              if (distance > 0) {
+                factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
+              }
+            }
+            else {
+
+              //-- Linear Anti-collision Attraction
+              distance = Math.sqrt(
+                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+                W.nodeMatrix[np(n1, 'size')] -
+                W.nodeMatrix[np(n2, 'size')]
+              );
+
+              if (distance > 0) {
+                factor = -coefficient * ewc;
+              }
+            }
+          }
+        }
+        else {
+          if (W.settings.linLogMode) {
+            if (W.settings.outboundAttractionDistribution) {
+
+              //-- LinLog Degree Distributed Attraction
+              distance = Math.sqrt(
+                Math.pow(xDist, 2) + Math.pow(yDist, 2)
+              );
+
+              if (distance > 0) {
+                factor = -coefficient * ewc * Math.log(1 + distance) /
+                  distance /
+                  W.nodeMatrix[np(n1, 'mass')];
+              }
+            }
+            else {
+
+              //-- LinLog Attraction
+              distance = Math.sqrt(
+                Math.pow(xDist, 2) + Math.pow(yDist, 2)
+              );
+
+              if (distance > 0)
+                factor = -coefficient * ewc * Math.log(1 + distance) / distance;
+            }
+          }
+          else {
+            if (W.settings.outboundAttractionDistribution) {
+
+              //-- Linear Attraction Mass Distributed
+              // NOTE: Distance is set to 1 to override condition
+              distance = 1;
+              factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
+            }
+            else {
+              
+              //-- Linear Attraction
+              // NOTE: Distance is set to 1 to override condition
+              distance = 1;
+              factor = -coefficient * ewc;
+            }
+          }
+        }
+
+        // Updating nodes' dx and dy
+        // TODO: if condition or factor = 1?
+        if (distance > 0) {
+
+          // Updating nodes' dx and dy
+          W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
+          W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+
+          W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
+          W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
+        }
       }
+
 
       // 5) Apply Forces
       //-----------------
