@@ -381,16 +381,17 @@
 
         // Applying attraction to nodes
         if (W.settings.adjustSizes) {
+
+          distance = Math.sqrt(
+            (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+            W.nodeMatrix[np(n1, 'size')] -
+            W.nodeMatrix[np(n2, 'size')]
+          );
+
           if (W.settings.linLogMode) {
             if (W.settings.outboundAttractionDistribution) {
 
               //-- LinLog Degree Distributed Anti-collision Attraction
-              distance = Math.sqrt(
-                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
-                W.nodeMatrix[np(n1, 'size')] -
-                W.nodeMatrix[np(n2, 'size')]
-              );
-
               if (distance > 0) {
                 factor = -coefficient * ewc * Math.log(1 + distance) /
                 distance /
@@ -400,12 +401,6 @@
             else {
 
               //-- LinLog Anti-collision Attraction
-              distance = Math.sqrt(
-                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
-                W.nodeMatrix[np(n1, 'size')] -
-                W.nodeMatrix[np(n2, 'size')]
-              );
-
               if (distance > 0) {
                 factor = -coefficient * ewc * Math.log(1 + distance) / distance;
               }
@@ -415,12 +410,6 @@
             if (W.settings.outboundAttractionDistribution) {
 
               //-- Linear Degree Distributed Anti-collision Attraction
-              distance = Math.sqrt(
-                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
-                W.nodeMatrix[np(n1, 'size')] -
-                W.nodeMatrix[np(n2, 'size')]
-              );
-
               if (distance > 0) {
                 factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
               }
@@ -428,12 +417,6 @@
             else {
 
               //-- Linear Anti-collision Attraction
-              distance = Math.sqrt(
-                (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
-                W.nodeMatrix[np(n1, 'size')] -
-                W.nodeMatrix[np(n2, 'size')]
-              );
-
               if (distance > 0) {
                 factor = -coefficient * ewc;
               }
@@ -441,14 +424,15 @@
           }
         }
         else {
+
+          distance = Math.sqrt(
+            Math.pow(xDist, 2) + Math.pow(yDist, 2)
+          );
+
           if (W.settings.linLogMode) {
             if (W.settings.outboundAttractionDistribution) {
 
               //-- LinLog Degree Distributed Attraction
-              distance = Math.sqrt(
-                Math.pow(xDist, 2) + Math.pow(yDist, 2)
-              );
-
               if (distance > 0) {
                 factor = -coefficient * ewc * Math.log(1 + distance) /
                   distance /
@@ -458,10 +442,6 @@
             else {
 
               //-- LinLog Attraction
-              distance = Math.sqrt(
-                Math.pow(xDist, 2) + Math.pow(yDist, 2)
-              );
-
               if (distance > 0)
                 factor = -coefficient * ewc * Math.log(1 + distance) / distance;
             }
@@ -470,14 +450,14 @@
             if (W.settings.outboundAttractionDistribution) {
 
               //-- Linear Attraction Mass Distributed
-              // NOTE: Distance is set to 1 to override condition
+              // NOTE: Distance is set to 1 to override next condition
               distance = 1;
               factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
             }
             else {
               
               //-- Linear Attraction
-              // NOTE: Distance is set to 1 to override condition
+              // NOTE: Distance is set to 1 to override next condition
               distance = 1;
               factor = -coefficient * ewc;
             }
