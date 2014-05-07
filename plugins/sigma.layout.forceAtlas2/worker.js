@@ -46,10 +46,7 @@
         strongGravityMode: false,
         gravity: 1,
         barnesHutOptimize: false,
-
-        // Are those settings?
-        barnesHutTheta: 1.2,
-        outboundAttCompensation: 1
+        barnesHutTheta: 1.2
       }
     };
 
@@ -348,6 +345,7 @@
         }
       }
 
+      // Returning the object
       return r;
     }
 
