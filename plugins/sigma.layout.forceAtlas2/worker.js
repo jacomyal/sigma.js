@@ -29,7 +29,7 @@
     var W = {
       ppn: 10,
       ppe: 3,
-      maxRise: 0.5,
+      maxForce: 10,
       iterations: 0,
       settings: {
         linLogMode: false,
@@ -39,10 +39,8 @@
         scalingRatio: 1,
         strongGravityMode: false,
         gravity: 1,
-        jitterTolerance: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 1.2,
-        speed: 1,
         outboundAttCompensation: 1,
         totalSwinging: 0,
         totalEffectiveTraction: 0,
@@ -197,15 +195,9 @@
       W.nodeMatrix = nodes;
       W.edgeMatrix = edges;
 
-      // Helper arrays
-      W.nodes = [];
-      W.edges = [];
-
-      for (i = 0, l = W.nodeMatrix.length; i < l; i += W.ppn)
-        W.nodes.push(i);
-
-      for (i = 0, l = W.edgeMatrix.length; i < l; i += W.ppe)
-        W.edges.push(i);
+      // Length
+      W.nodesLength = W.nodeMatrix.length;
+      W.edgesLength = W.edgeMatrix.length;
     }
 
     /**
@@ -214,7 +206,7 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var l, m, n, n1, n2, e, s, t, w;
+      var n, n1, n2, e, s, t, w;
 
       var rootRegion,
           outboundAttCompensation;
@@ -224,7 +216,7 @@
       //-----------------------------
 
       // Resetting positions
-      for (n = 0, l = W.nodes.length; n < l; n++) {
+      for (n = 0; n < W.nodesLength; n += W.ppn) {
         W.nodeMatrix[np(n, 'old_dx')] = W.nodeMatrix[np(n, 'dx')];
         W.nodeMatrix[np(n, 'old_dy')] = W.nodeMatrix[np(n, 'dy')];
         W.nodeMatrix[np(n, 'dx')] = 0;
@@ -258,8 +250,8 @@
       else {
 
         // Square iteration
-        for (n1 = 0, l = W.nodes.length; n1 < l; n1++) {
-          for (n2 = 0, m = W.nodes.length; n2 < m; n2++) {
+        for (n1 = 0; n1 < W.nodesLength; n1 += W.ppn) {
+          for (n2 = 0; n2 < W.nodesLength; n2 += W.ppn) {
 
             // TODO: apply repulsion
           }
@@ -269,7 +261,7 @@
 
       // 3) Gravity
       //------------
-      for (n = 0, l = W.nodes.length; n < l; n++) {
+      for (n = 0; n < W.nodesLength; n += W.ppn) {
 
         // TODO: apply gravity
       }
@@ -277,7 +269,7 @@
 
       // 4) Attraction
       //---------------
-      for (e = 0, l = W.edges.length; e < l; e++) {
+      for (e = 0; e < W.edgesLength; e += W.ppe) {
         s = W.edgeMatrix[ep(e, 'source')];
         t = W.edgeMatrix[ep(e, 'target')];
         w = W.edgeMatrix[ep(e, 'weight')];
@@ -285,97 +277,98 @@
         // TODO: apply attraction
       }
 
-
-      // 5) Adjust Speed
+      // 5) Apply Forces
       //-----------------
-      var totalSwinging, totalEffectiveTraction = 0,
+      var force,
           swinging,
-          targetSpeed,
-          speed;
+          traction,
+          nodespeed;
 
-      // !!!TODO!!!: speed is NaN
-
-      // MATH: clean this up
-      for (n = 0, l = W.nodes.length; n < l; n++) {
-        if (!W.nodeMatrix[np(n, 'fixed')]) {
-          swinging = Math.sqrt(
-            Math.pow(
-              W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')], 2) +
-            Math.pow(
-              W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')], 2)
-          );
-
-          totalSwinging += W.nodeMatrix[np(n, 'mass')] * swinging;
-          totalEffectiveTraction += W.nodeMatrix[np(n, 'mass')] * 0.5 *
-            Math.pow(
-              W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')], 2) +
-            Math.pow(
-              W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')], 2);
-        }
-      }
-
-      targetSpeed = Math.pow(W.settings.jitterTolerance, 2) *
-        totalEffectiveTraction / totalSwinging;
-
-      speed = speed + Math.min(targetSpeed - speed, W.maxRise * speed);
-
-
-      // 6) Apply Forces
-      //-----------------
-      var factor,
-          df;
-
-      // MATH: some code is repeated from previous step
-      // TODO: possible to drop following condition to make this more concise
+      // MATH: sqrt and square distances
       if (W.settings.adjustSizes) {
 
-        for (n = 0, l = W.nodes.length; n < l; n++) {
-
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
           if (!W.nodeMatrix[np(n, 'fixed')]) {
-            swinging = Math.sqrt(
-              Math.pow(
-                W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')], 2) +
-              Math.pow(
-                W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')], 2)
-            );
-
-            factor = 0.1 * speed / (1 + speed * Math.sqrt(swinging));
-
-            df = Math.sqrt(
+            force = Math.sqrt(
               Math.pow(W.nodeMatrix[np(n, 'dx')], 2) +
               Math.pow(W.nodeMatrix[np(n, 'dy')], 2)
             );
 
-            factor = Math.min(factor * df, 10) / df;
+            if (force > W.maxForce) {
+              W.nodeMatrix[np(n, 'dx')] =
+                W.nodeMatrix[np(n, 'dx')] * maxForce / force;
+              W.nodeMatrix[np(n, 'dy')] =
+                W.nodeMatrix[np(n, 'dy')] * maxForce / force;
+            }
 
-            // Updating node's X and Y
-            W.nodeMatrix[np(n, 'x')] = W.nodeMatrix[np(n, 'dx')] * factor;
-            W.nodeMatrix[np(n, 'y')] = W.nodeMatrix[np(n, 'dy')] * factor;
+            swinging = W.nodeMatrix[np(n, 'mass')] *
+              Math.sqrt(
+                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) *
+                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) +
+                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')]) *
+                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')])
+              );
+
+            traction = Math.sqrt(
+              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) *
+              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) +
+              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')]) *
+              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')])
+            ) / 2;
+
+            nodespeed =
+              0.1 * Math.log(1 + traction) / (1 + Math.sqrt(swinging));
+
+            // Updating node's positon
+            W.nodeMatrix[np(n, 'x')] =
+              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] * nodespeed;
+            W.nodeMatrix[np(n, 'y')] =
+              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] * nodespeed;
           }
         }
       }
       else {
 
-        for (n = 0, l = W.nodes.length; n < l; n++) {
-
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
           if (!W.nodeMatrix[np(n, 'fixed')]) {
 
-            swinging = Math.sqrt(
-              Math.pow(
-                W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')], 2) +
-              Math.pow(
-                W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')], 2)
-            );
+            swinging = W.nodeMatrix[np(n, 'mass')] *
+              Math.sqrt(
+                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) *
+                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) +
+                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')]) *
+                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')])
+              );
 
-            factor = speed / (1 + speed * Math.sqrt(swinging));
+            traction = Math.sqrt(
+              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) *
+              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) +
+              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')]) *
+              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')])
+            ) / 2;
 
-            // Updating node's X and Y
-            W.nodeMatrix[np(n, 'x')] = W.nodeMatrix[np(n, 'dx')] * factor;
-            W.nodeMatrix[np(n, 'y')] = W.nodeMatrix[np(n, 'dy')] * factor;
+            nodespeed = W.nodeMatrix[np(n, 'convergence')] *
+              Math.log(1 + traction) / (1 + Math.sqrt(swinging));
+
+            // Updating node convergence
+            W.nodeMatrix[np(n, 'convergence')] =
+              Math.min(1, Math.sqrt(
+                nodespeed *
+                (Math.pow(W.nodeMatrix[np(n, 'dx')], 2) +
+                 Math.pow(W.nodeMatrix[np(n, 'dy')], 2)) /
+                (1 + Math.sqrt(swinging))
+              ));
+
+            // Updating node's positon
+            W.nodeMatrix[np(n, 'x')] =
+              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] * nodespeed;
+            W.nodeMatrix[np(n, 'y')] =
+              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] * nodespeed;
           }
         }
       }
 
+      // Counting one more iteration
       W.iterations++;
     }
 
