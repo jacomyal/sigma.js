@@ -31,10 +31,10 @@
       // Properties
       ppn: 10,
       ppe: 3,
+      ppq: 2,
       maxForce: 10,
       iterations: 0,
       converged: false,
-      barnesHutDepthLimit: 20,
 
       // Possible to change through config
       settings: {
@@ -46,7 +46,8 @@
         strongGravityMode: false,
         gravity: 1,
         barnesHutOptimize: false,
-        barnesHutTheta: 1.2
+        barnesHutTheta: 1.2,
+        barnesHutDepthLimit: 4
       }
     };
 
@@ -126,230 +127,6 @@
     }
 
     /**
-     * Barnes-Hut function
-     */
-    function BarnesHut(nodes, depth) {
-      var i, j, n, l, mass, size, distance;
-
-      // Region
-      var r = {
-        size: 0,
-        nodes: nodes,
-        subregions: [],
-        depth: depth,
-        mass: 0,
-        massCenterX: 0,
-        massCenterY: 0,
-        massSumX: 0,
-        massSumY: 0
-      };
-
-      // Updating mass and geometry
-      if (r.nodes.length > 1) {
-
-        // Iterating through nodes
-        for (i = 0, l = r.nodes.length; i < l; i++) {
-          n = r.nodes[i];
-
-          mass = W.nodeMatrix[np(n, 'mass')];
-          r.mass += mass;
-          r.massSumX += W.nodeMatrix[np(n, 'x')] * mass;
-          r.massSumY += W.nodeMatrix[np(n, 'y')] * mass;
-        }
-
-        var massCenterX = r.massSumX / r.mass,
-            massCenterY = r.massSumY / r.mass;
-
-        // Computing size
-        // MATH: something is amiss in the max thingy under here
-        for (i = 0, l = r.nodes.length; i < l; i++) {
-          n = r.nodes[i];
-
-          distance = 2 * Math.sqrt(
-            Math.pow((W.nodeMatrix[np(n, 'x')] - r.massCenterX), 2) +
-            Math.pow((W.nodeMatrix[np(n, 'y')] - r.massCenterY), 2)
-          );
-          size = (size === undefined) ?
-            distance :
-            Math.max(size, distance);
-        }
-      }
-
-      // Updating region
-      r.massCenterX = massCenterX;
-      r.massCenterY = massCenterY;
-      r.size = size;
-
-      // Build subregions
-      if (r.nodes.length > 1) {
-        var subareas = [[], [], [], []],
-            nextDepth = r.depth + 1;
-
-        // TODO: write this better. this is a scandal.
-        for (i = 0, l = r.nodes.length; i < l; i++) {
-          n = r.nodes[i];
-
-          if (W.nodeMatrix[np(n, 'x')] < r.massCenterX) {
-            
-            // Left
-            if ((W.nodeMatrix[np(n, 'y')] < r.massCenterY))
-              subareas[0].push(n);
-            else
-              subareas[1].push(n);
-          }
-          else {
-            
-            // Right
-            if ((W.nodeMatrix[np(n, 'y')] < r.massCenterY))
-              subareas[2].push(n);
-            else
-              subareas[3].push(n);
-          }
-        }
-
-        for (i = 0; i < 4; i++) {
-          if (subareas[i].length > 0) {
-            if (nextDepth <= W.barnesHutDepthLimit &&
-                subareas[i].length < r.nodes.length) {
-              r.subregions.push(BarnesHut(subareas[i], nextDepth));
-            }
-            else {
-              for (j = 0, l = subareas[i].length; j < l; j++)
-                r.subregions.push(
-                  BarnesHut([subareas[i][j]], nextDepth)
-                );
-            }
-          }
-        }
-      }
-
-      // Forces application
-      r.applyForce = function(n) {
-        var coefficient = W.settings.scalingRatio,
-            xDist,
-            yDist,
-            distance,
-            factor,
-            n1,
-            n2,
-            i,
-            l;
-
-        if (this.nodes.length < 2) {
-          n1 = n;
-          n2 = this.nodes[0];
-
-          // Apply the force node to node
-          // Common to both methods
-          xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
-          yDist = W.nodeMatrix[np(n1, 'y')] - W.nodeMatrix[np(n2, 'y')];
-
-          if (W.settings.adjustSize) {
-
-            //-- Anticollision Linear Repulsion
-            distance = Math.sqrt(xDist * xDist + yDist * yDist) -
-              W.nodeMatrix[np(n1, 'size')] -
-              W.nodeMatrix[np(n2, 'size')];
-
-            if (distance > 0) {
-              factor = coefficient *
-                W.nodeMatrix[np(n1, 'mass')] *
-                W.nodeMatrix[np(n2, 'mass')] /
-                distance / distance;
-
-              // Updating nodes' dx and dy
-              W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-              W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
-
-              W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
-              W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
-            }
-            else if (distance < 0) {
-              factor = 100 * coefficient *
-                W.nodeMatrix[np(n1, 'mass')] *
-                W.nodeMatrix[np(n2, 'mass')];
-
-              // Updating nodes' dx and dy
-              W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-              W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
-
-              W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
-              W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
-            }
-          }
-          else {
-
-            //-- Linear Repulsion
-            distance = Math.sqrt(xDist * xDist + yDist * yDist);
-
-            if (distance > 0) {
-              factor = W.settings.scalingRatio *
-                W.nodeMatrix[np(n1, 'mass')] *
-                W.nodeMatrix[np(n2, 'mass')] /
-                distance / distance;
-
-              // Updating nodes' dx and dy
-              W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-              W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
-
-              W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
-              W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
-            }
-          }
-        }
-        else {
-          distance = Math.sqrt(
-            (Math.pow(W.nodeMatrix[np(n, 'x')], 2)) +
-            (Math.pow(W.nodeMatrix[np(n, 'y')], 2))
-          );
-
-          if (distance * W.settings.barnesHutTheta > this.size) {
-            xDist = W.nodeMatrix[np(n, 'x')] - this.massCenterX;
-            yDist = W.nodeMatrix[np(n, 'y')] - this.massCenterY;
-
-            if (W.settings.adjustSize) {
-
-              //-- Linear Anti-collision Repulsion
-              if (distance > 0) {
-                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  this.mass / distance / distance;
-
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
-              }
-              else if (distance < 0) {
-                factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  this.mass /distance;
-
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
-              }
-            }
-            else {
-
-              //-- Linear Repulsion
-              if (distance > 0) {
-                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  this.mass / distance / distance;
-
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
-              }
-            }
-          }
-          else {
-            for (i = 0, l = this.subregions.length; i < l; i++) {
-              this.subregions[i].applyForce(n);
-            }
-          }
-        }
-      }
-
-      // Returning the object
-      return r;
-    }
-
-    /**
      * Algorithm initialization
      */
 
@@ -372,7 +149,7 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var n, n1, n2, e, w, g;
+      var a, i, j, l, n, n1, n2, q, e, w, g;
 
       var barnesHutNodes = [],
           rootRegion,
@@ -388,21 +165,12 @@
       // 1) Initializing layout data
       //-----------------------------
 
-      // Resetting positions
+      // Resetting positions & computing max values
       for (n = 0; n < W.nodesLength; n += W.ppn) {
         W.nodeMatrix[np(n, 'old_dx')] = W.nodeMatrix[np(n, 'dx')];
         W.nodeMatrix[np(n, 'old_dy')] = W.nodeMatrix[np(n, 'dy')];
         W.nodeMatrix[np(n, 'dx')] = 0;
         W.nodeMatrix[np(n, 'dy')] = 0;
-      }
-
-      // Barnes-Hut root region
-      if (W.settings.barnesHutOptimize) {
-
-        for (n = 0; n < W.nodesLength; n += W.ppn) {
-          barnesHutNodes.push(n);
-        }
-        rootRegion = BarnesHut(barnesHutNodes)
       }
 
       // If outbound attraction distribution, compensate
@@ -416,16 +184,72 @@
       }
 
 
+      // 1.bis) Barnes-Hut computation
+      //------------------------------
+      if (W.settings.barnesHutOptimize) {
+
+        // Necessary variables
+        // UInt16 should be enough, if not, switch to UInt32
+        var quadNb = Math.pow(2, 2 * W.settings.barnesHutDepthLimit),
+            quadRowNb = Math.pow(2, W.settings.barnesHutDepthLimit),
+            quads = new UInt16Array(quadNb),
+            quadsProperties = new Float32Array(quadNb * W.ppq),
+            quadsSteps = new UInt16Array(quadNb),
+            quadsAcc = new UInt16Array(quadNb),
+            nodesQuads = new UInt16Array(W.nodesLength),
+            quadsNodes = new UInt16Array(W.nodesLength),
+            maxX = 0,
+            maxY = 0,
+            minX = 0,
+            minY = 0,
+            xIndex,
+            yIndex;
+
+        // Retrieving max values
+        // OPTIMIZE: this could be computed on the n loop preceding this one
+        // but at the cost of doing it even when Barnes-Hut is disabled
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
+          maxX = Math.max(maxX, W.nodeMatrix[np(n, 'x')]);
+          minX = Math.min(minX, W.nodeMatrix[np(n, 'x')]);
+          maxY = Math.max(maxY, W.nodeMatrix[np(n, 'y')]);
+          minY = Math.min(minY, W.nodeMatrix[np(n, 'y')]);
+        }
+
+        // Adding epsilon to max values
+        maxX += 0.0001 * (maxX - minX);
+        maxY += 0.0001 * (maxY - minY);
+
+        // Assigning nodes to quads
+        for (n = 0, i = 0; n < W.nodesLength; n += W.ppn, i++) {
+          xIndex = ((W.nodeMatrix[np(n, 'x')] - minX) / (maxX - minX) *
+            Math.pow(2, W.settings.barnesHutDepthLimit)) | 0;
+
+          yIndex = ((W.nodeMatrix[np(n, 'y')] - minY) / (maxY - minY) *
+            Math.pow(2, W.settings.barnesHutDepthLimit)) | 0;
+
+          // OPTIMIZE: possible to gain some really little time here
+          quads[xIndex * quadRowNb + yIndex] += 1;
+          nodesQuads[i] = xIndex * quadRowNb + yIndex;
+        }
+
+        // Computing quad steps
+        // ALEXIS: here we need to build the second array containing nodes ids
+        // in order for the quads iteration in force applications later.
+        for (a = 0, i = 0; i < quadNb; i++) {
+          a += quads[i];
+          quadsSteps[i] = a;
+        }
+      }
+
+
       // 2) Repulsion
       //--------------
       // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
 
       if (W.settings.barnesHutOptimize) {
 
-        // Applying repulsion through regions
-        for (n = 0; n < W.nodesLength; n += W.ppn) {
-          rootRegion.applyForce(n);
-        }
+        // Applying forces through Barnes-Hut
+        // TODO
       }
       else {
 
