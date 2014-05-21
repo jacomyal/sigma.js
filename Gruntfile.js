@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function(grunt) {
   var coreJsFiles = [
     // Core:
@@ -52,19 +54,34 @@ module.exports = function(grunt) {
   var npmJsFiles = coreJsFiles.slice(0);
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
-  var pluginFiles = [
-    'plugins/sigma.layout.forceAtlas2/*.js',
-    'plugins/sigma.parsers.gexf/*.js',
-    'plugins/sigma.parsers.json/*.js',
-    'plugins/sigma.plugins.animate/*.js',
-    'plugins/sigma.plugins.dragNodes/*.js',
-    'plugins/sigma.plugins.neighborhoods/*.js',
-    'plugins/sigma.renderers.customShapes/*.js'
+  var plugins = [
+    'layout.forceAtlas2',
+    'parsers.gexf',
+    'parsers.json',
+    'plugins.animate',
+    'plugins.dragNodes',
+    'plugins.neighborhoods',
+    'renderers.customShapes'
   ];
+
+  var pluginFiles = [],
+      subGrunts = {};
+
+  plugins.forEach(function(p) {
+    var dir = 'plugins/sigma.' + p + '/';
+
+    if (fs.existsSync(dir + 'Gruntfile.js'))
+      subGrunts[p] = {
+        gruntfile: dir + 'Gruntfile.js'
+      };
+    else
+      pluginFiles.push(dir + '*.js');
+  });
 
   // Project configuration:
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    grunt: subGrunts,
     closureLint: {
       app: {
         closureLinterPath: '/usr/local/bin',
