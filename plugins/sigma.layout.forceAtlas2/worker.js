@@ -52,21 +52,19 @@
     };
 
     /**
-     * Helpers namespace
+     * Helpers
      */
-    var helpers = {
-      extend: function() {
-        var i,
-            k,
-            res = {},
-            l = arguments.length;
+    function extend() {
+      var i,
+          k,
+          res = {},
+          l = arguments.length;
 
-        for (i = l - 1; i >= 0; i--)
-          for (k in arguments[i])
-            res[k] = arguments[i][k];
-        return res;
-      }
-    };
+      for (i = l - 1; i >= 0; i--)
+        for (k in arguments[i])
+          res[k] = arguments[i][k];
+      return res;
+    }
 
     /**
      * Matrices properties accessors
@@ -101,7 +99,7 @@
       if (p in nodeProperties)
         return i + nodeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' + 
+        throw 'ForceAtlas2.Worker - ' +
               'Inexistant node property given (' + p + ').';
     }
 
@@ -116,7 +114,7 @@
       if (p in edgeProperties)
         return i + edgeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' + 
+        throw 'ForceAtlas2.Worker - ' +
               'Inexistant edge property given (' + p + ').';
     }
 
@@ -132,6 +130,7 @@
 
     // TODO: autosettings
     function init(nodes, edges, config) {
+      config = config || {};
       var i, l;
 
       // Matrices
@@ -141,6 +140,11 @@
       // Length
       W.nodesLength = W.nodeMatrix.length;
       W.edgesLength = W.edgeMatrix.length;
+
+      // Merging configuration
+      // OVERRIDE: we disable barnesHut by default until coded
+      config.barnesHutOptimize = false;
+      W.settings = extend(config, W.settings);
     }
 
     /**
@@ -453,7 +457,7 @@
               factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
             }
             else {
-              
+
               //-- Linear Attraction
               // NOTE: Distance is set to 1 to override next condition
               distance = 1;
@@ -685,6 +689,7 @@
   }
 
   sigma.prototype.getForceAtlas2Worker = function() {
-    return ';(' + crush(Worker.toString()) + ').call(this);';
+    var fnString = crush ? crush(Worker.toString()) : Worker.toString();
+    return ';(' + fnString + ').call(this);';
   };
 }).call(this);
