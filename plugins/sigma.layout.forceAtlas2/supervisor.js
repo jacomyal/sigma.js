@@ -34,6 +34,9 @@
     this.graph = this.sigInst.graph;
     this.ppn = 10;
     this.ppe = 3;
+
+    // State
+    this.started = false;
     this.running = false;
 
     // Web worker or classic DOM events?
@@ -62,7 +65,8 @@
       _this.applyLayoutChanges();
 
       // Send data back to worker and loop
-      _this.sendByteArrayToWorker();
+      if (_this.running)
+        _this.sendByteArrayToWorker();
 
       // Rendering graph
       _this.sigInst.refresh();
@@ -70,9 +74,6 @@
 
     // Filling byteArrays
     this.graphToByteArrays();
-
-    // Sending to worker
-    this.sendByteArrayToWorker('start');
   }
 
   Supervisor.prototype.makeBlob = function(workerFn) {
@@ -171,30 +172,72 @@
       window.postMessage(content, '*')
   };
 
+  Supervisor.prototype.start = function() {
+    if (this.running)
+      return;
+
+    this.running = true;
+
+    if (!this.started) {
+
+      // Sending init message to worker
+      this.sendByteArrayToWorker('start');
+      this.started = true;
+    }
+    else {
+      this.sendByteArrayToWorker();
+    }
+  };
+
+  Supervisor.prototype.stop = function() {
+    if (!this.running)
+      return;
+
+    this.running = false;
+  };
+
+  // TODO: kill polyfill when worker is not true worker
+  Supervisor.prototype.killWorker = function() {
+    this.worker.terminate();
+  };
 
   /**
    * Interface
    * ----------
    */
-  var supervisor;
+  var supervisor = null;
 
   sigma.prototype.startForceAtlas2 = function() {
 
     // Create supervisor if undefined
+    if (!supervisor)
+      supervisor = new Supervisor(this);
+
     // Start algorithm
+    supervisor.start();
+
+    return this;
   };
+
   sigma.prototype.stopForceAtlas2 = function() {
 
     // Pause algorithm
+    supervisor.stop();
+
+    return this;
   };
+
   sigma.prototype.killForceAtlas2 = function() {
 
-    // Stop and kill worker
-    // Kill supervisor
-  };
+    // Stop Algorithm
+    supervisor.stop();
 
-  sigma.prototype.testFA2Supervisor = function() {
-    supervisor = new Supervisor(this);
+    // Kill Worker
+    supervisor.killWorker();
+
+    // Kill supervisor
+    supervisor = null;
+
     return this;
   };
 }).call(this);
