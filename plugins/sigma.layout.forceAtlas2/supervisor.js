@@ -61,15 +61,18 @@
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
 
-      // Applying layout
-      _this.applyLayoutChanges();
+      // If ForceAtlas2 is running, we act accordingly
+      if (_this.running) {
 
-      // Send data back to worker and loop
-      if (_this.running)
+        // Applying layout
+        _this.applyLayoutChanges();
+
+        // Send data back to worker and loop
         _this.sendByteArrayToWorker();
 
-      // Rendering graph
-      _this.sigInst.refresh();
+        // Rendering graph
+        _this.sigInst.refresh();
+      }
     });
 
     // Filling byteArrays
