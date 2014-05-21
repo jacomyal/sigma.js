@@ -2,6 +2,7 @@ sigma.layout.forceAtlas2
 ========================
 
 Algorithm by [Mathieu Jacomy](https://github.com/jacomyma).
+
 Plugin by [Guillaume Plique](https://github.com/Yomguithereal).
 
 ---
@@ -13,6 +14,7 @@ For optimization purposes, the algorithm's computations are delegated to a web w
 ## Methods
 
 **sigma.startForceAtlas2**
+
 Start or unpause the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
@@ -20,6 +22,7 @@ sigmaInstance.startForceAtlas2(config);
 ```
 
 **sigma.stopForceAtlas2**
+
 Pause the layout.
 
 ```js
@@ -27,6 +30,7 @@ sigmaInstance.stopForceAtlas2();
 ```
 
 **sigma.configForceAtlas2**
+
 Change the layout's configuration after this one has started or is paused.
 
 ```js
@@ -34,6 +38,7 @@ sigmaInstance.configForceAtlas2(config);
 ```
 
 **sigma.killForceAtlas2**
+
 Completely stop the layout and terminate the assiociated worker. You can still restart it later, but a new worker will have to initialize.
 
 ```js
