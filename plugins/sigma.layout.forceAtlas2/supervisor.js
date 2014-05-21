@@ -236,7 +236,7 @@
 
   sigma.prototype.stopForceAtlas2 = function() {
     if (!supervisor)
-      return;
+      return this;
 
     // Pause algorithm
     supervisor.stop();
@@ -246,7 +246,7 @@
 
   sigma.prototype.killForceAtlas2 = function() {
     if (!supervisor)
-      return;
+      return this;
 
     // Stop Algorithm
     supervisor.stop();
@@ -262,8 +262,10 @@
 
   sigma.prototype.configForceAtlas2 = function(config) {
     if (!supervisor)
-      return;
+      return this;
 
     supervisor.configure(config);
+
+    return this;
   };
 }).call(this);
