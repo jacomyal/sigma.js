@@ -155,7 +155,7 @@
     }
   };
 
-  Supervisor.prototype.sendByteArrayToWorker = function(action) {
+  Supervisor.prototype.sendByteArrayToWorker = function(action, config) {
     var content = {
       action: action || 'loop',
       nodes: this.nodesByteArray.buffer
@@ -164,7 +164,7 @@
     var buffers = [this.nodesByteArray.buffer];
 
     if (action === 'start') {
-      content.config = {};
+      content.config = config || {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
     }
@@ -172,10 +172,10 @@
     if (webWorkers)
       this.worker.postMessage(content, buffers);
     else
-      window.postMessage(content, '*')
+      window.postMessage(content, '*');
   };
 
-  Supervisor.prototype.start = function() {
+  Supervisor.prototype.start = function(config) {
     if (this.running)
       return;
 
@@ -184,7 +184,7 @@
     if (!this.started) {
 
       // Sending init message to worker
-      this.sendByteArrayToWorker('start');
+      this.sendByteArrayToWorker('start', config);
       this.started = true;
     }
     else {
@@ -204,25 +204,39 @@
     this.worker.terminate();
   };
 
+  Supervisor.prototype.configure = function(config) {
+    if (!this.started)
+      return;
+
+    var data = {action: 'config', config: config};
+
+    if (webWorkers)
+      this.worker.postMessage(data);
+    else
+      window.postMessage(data, '*');
+  };
+
   /**
    * Interface
    * ----------
    */
   var supervisor = null;
 
-  sigma.prototype.startForceAtlas2 = function() {
+  sigma.prototype.startForceAtlas2 = function(config) {
 
     // Create supervisor if undefined
     if (!supervisor)
       supervisor = new Supervisor(this);
 
     // Start algorithm
-    supervisor.start();
+    supervisor.start(config);
 
     return this;
   };
 
   sigma.prototype.stopForceAtlas2 = function() {
+    if (!supervisor)
+      return;
 
     // Pause algorithm
     supervisor.stop();
@@ -231,6 +245,8 @@
   };
 
   sigma.prototype.killForceAtlas2 = function() {
+    if (!supervisor)
+      return;
 
     // Stop Algorithm
     supervisor.stop();
@@ -242,5 +258,12 @@
     supervisor = null;
 
     return this;
+  };
+
+  sigma.prototype.configForceAtlas2 = function(config) {
+    if (!supervisor)
+      return;
+
+    supervisor.configure(config);
   };
 }).call(this);

@@ -142,9 +142,14 @@
       W.edgesLength = W.edgeMatrix.length;
 
       // Merging configuration
+      configure(config);
+    }
+
+    function configure(o) {
+
       // OVERRIDE: we disable barnesHut by default until coded
-      config.barnesHutOptimize = false;
-      W.settings = extend(config, W.settings);
+      o.barnesHutOptimize = false;
+      W.settings = extend(o, W.settings);
     }
 
     /**
@@ -629,6 +634,12 @@
         case 'loop':
           W.nodeMatrix = new Float32Array(e.data.nodes);
           run();
+          break;
+
+        case 'config':
+
+          // Merging new settings
+          configure(e.data.config);
           break;
 
         default:
