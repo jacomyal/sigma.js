@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     forceAtlas2: {
       prod: {
         files: {
-          'build/plugins/sigma.layout.forceAtlas2.js': files
+          'build/plugins/sigma.layout.forceAtlas2.min.js': files
         }
       }
     }
