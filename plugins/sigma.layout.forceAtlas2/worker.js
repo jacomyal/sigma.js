@@ -333,6 +333,7 @@
       g = W.settings.gravity / W.settings.scalingRatio;
       coefficient = W.settings.scalingRatio;
       for (n = 0; n < W.nodesLength; n += W.ppn) {
+        factor = 0;
 
         // Common to both methods
         xDist = W.nodeMatrix[np(n, 'x')];
@@ -353,11 +354,12 @@
           if (distance > 0)
             factor = coefficient * W.nodeMatrix[np(n, 'mass')] * g / distance;
         }
+
+        // Updating node's dx and dy
+        W.nodeMatrix[np(n, 'dx')] -= xDist * factor;
+        W.nodeMatrix[np(n, 'dy')] -= yDist * factor;
       }
 
-      // Updating node's dx and dy
-      W.nodeMatrix[np(n, 'dx')] -= xDist * factor;
-      W.nodeMatrix[np(n, 'dy')] -= yDist * factor;
 
 
       // 4) Attraction
@@ -639,7 +641,9 @@
         case 'config':
 
           // Merging new settings
+          console.log(JSON.stringify(e.data.config, undefined, 2));
           configure(e.data.config);
+          console.log(JSON.stringify(W.settings, undefined, 2));
           break;
 
         default:
