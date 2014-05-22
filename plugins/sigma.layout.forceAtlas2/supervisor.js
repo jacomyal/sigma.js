@@ -34,6 +34,7 @@
     this.graph = this.sigInst.graph;
     this.ppn = 10;
     this.ppe = 3;
+    this.config = {};
 
     // State
     this.started = false;
@@ -164,7 +165,7 @@
     var buffers = [this.nodesByteArray.buffer];
 
     if (action === 'start') {
-      content.config = config || {};
+      content.config = this.config || {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
     }
@@ -175,7 +176,7 @@
       window.postMessage(content, '*');
   };
 
-  Supervisor.prototype.start = function(config) {
+  Supervisor.prototype.start = function() {
     if (this.running)
       return;
 
@@ -184,7 +185,7 @@
     if (!this.started) {
 
       // Sending init message to worker
-      this.sendByteArrayToWorker('start', config);
+      this.sendByteArrayToWorker('start');
       this.started = true;
     }
     else {
@@ -205,10 +206,14 @@
   };
 
   Supervisor.prototype.configure = function(config) {
+
+    // Setting configuration
+    this.config = config;
+
     if (!this.started)
       return;
 
-    var data = {action: 'config', config: config};
+    var data = {action: 'config', config: this.config};
 
     if (webWorkers)
       this.worker.postMessage(data);
@@ -262,10 +267,14 @@
 
   sigma.prototype.configForceAtlas2 = function(config) {
     if (!supervisor)
-      return this;
+      supervisor = new Supervisor(this);
 
     supervisor.configure(config);
 
     return this;
+  };
+
+  sigma.prototype.isForceAtlas2Running = function(config) {
+    return supervisor && supervisor.running;
   };
 }).call(this);

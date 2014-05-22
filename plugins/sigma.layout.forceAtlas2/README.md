@@ -15,7 +15,7 @@ For optimization purposes, the algorithm's computations are delegated to a web w
 
 **sigma.startForceAtlas2**
 
-Start or unpause the layout. It is possible to pass a configuration if this is the first time you start the layout.
+Starts or unpauses the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
 sigmaInstance.startForceAtlas2(config);
@@ -23,7 +23,7 @@ sigmaInstance.startForceAtlas2(config);
 
 **sigma.stopForceAtlas2**
 
-Pause the layout.
+Pauses the layout.
 
 ```js
 sigmaInstance.stopForceAtlas2();
@@ -31,7 +31,7 @@ sigmaInstance.stopForceAtlas2();
 
 **sigma.configForceAtlas2**
 
-Change the layout's configuration after this one has started or is paused.
+Changes the layout's configuration.
 
 ```js
 sigmaInstance.configForceAtlas2(config);
@@ -39,10 +39,18 @@ sigmaInstance.configForceAtlas2(config);
 
 **sigma.killForceAtlas2**
 
-Completely stop the layout and terminate the assiociated worker. You can still restart it later, but a new worker will have to initialize.
+Completely stops the layout and terminates the assiociated worker. You can still restart it later, but a new worker will have to initialize.
 
 ```js
 sigmaInstance.killForceAtlas2();
+```
+
+**sigma.isForceAtlas2Running**
+
+Returns whether ForceAtlas2 is running.
+
+```js
+sigmaInstance.isForceAtlas2Running();
 ```
 
 ## Configuration
