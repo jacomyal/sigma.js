@@ -641,9 +641,7 @@
         case 'config':
 
           // Merging new settings
-          console.log(JSON.stringify(e.data.config, undefined, 2));
           configure(e.data.config);
-          console.log(JSON.stringify(W.settings, undefined, 2));
           break;
 
         default:
