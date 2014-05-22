@@ -62,6 +62,7 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
+* **slowDown** *number* `1`
 
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.

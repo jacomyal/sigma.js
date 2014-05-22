@@ -45,6 +45,7 @@
         scalingRatio: 1,
         strongGravityMode: false,
         gravity: 1,
+        slowDown: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 1.2,
         barnesHutDepthLimit: 4
@@ -531,9 +532,11 @@
 
             // Updating node's positon
             W.nodeMatrix[np(n, 'x')] =
-              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] * nodespeed;
+              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
+              (nodespeed / W.settings.slowDown);
             W.nodeMatrix[np(n, 'y')] =
-              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] * nodespeed;
+              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
+              (nodespeed / W.settings.slowDown);
           }
         }
       }
@@ -571,9 +574,11 @@
 
             // Updating node's positon
             W.nodeMatrix[np(n, 'x')] =
-              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] * nodespeed;
+              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
+              (nodespeed / W.settings.slowDown);
             W.nodeMatrix[np(n, 'y')] =
-              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] * nodespeed;
+              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
+              (nodespeed / W.settings.slowDown);
           }
         }
       }
