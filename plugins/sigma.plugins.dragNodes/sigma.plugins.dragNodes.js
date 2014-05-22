@@ -96,36 +96,45 @@
     };
 
     var nodeMouseMove = function(event) {
-      var x = event.pageX - _container.offsetLeft,
-          y = event.pageY - _container.offsetTop,
-          cos = Math.cos(_camera.angle),
-          sin = Math.sin(_camera.angle),
-          nodes = s.graph.nodes(),
-          ref = [];
-
-      // Getting and derotating the reference coordinates.
-      for (var i = 0; i < 2; i++) {
-        var n = nodes[i];
-        var aux = {
-          x: n.x * cos + n.y * sin,
-          y: n.y * cos - n.x * sin,
-          renX: n[_prefix + 'x'],
-          renY: n[_prefix + 'y'],
-        };
-        ref.push(aux);
+      if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        clearTimeout(timeOut);
+        var timeOut = setTimeout(executeNodeMouseMove, 0);
+      } else {
+        executeNodeMouseMove();
       }
 
-      // Applying linear interpolation.
-      x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-        (ref[1].x - ref[0].x) + ref[0].x;
-      y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-        (ref[1].y - ref[0].y) + ref[0].y;
+      function executeNodeMouseMove() {
+        var x = event.pageX - _container.offsetLeft,
+            y = event.pageY - _container.offsetTop,
+            cos = Math.cos(_camera.angle),
+            sin = Math.sin(_camera.angle),
+            nodes = s.graph.nodes(),
+            ref = [];
 
-      // Rotating the coordinates.
-      _node.x = x * cos - y * sin;
-      _node.y = y * cos + x * sin;
+        // Getting and derotating the reference coordinates.
+        for (var i = 0; i < 2; i++) {
+          var n = nodes[i];
+          var aux = {
+            x: n.x * cos + n.y * sin,
+            y: n.y * cos - n.x * sin,
+            renX: n[_prefix + 'x'],
+            renY: n[_prefix + 'y'],
+          };
+          ref.push(aux);
+        }
 
-      s.refresh();
+        // Applying linear interpolation.
+        x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
+          (ref[1].x - ref[0].x) + ref[0].x;
+        y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
+          (ref[1].y - ref[0].y) + ref[0].y;
+
+        // Rotating the coordinates.
+        _node.x = x * cos - y * sin;
+        _node.y = y * cos + x * sin;
+
+        s.refresh();
+      }
     };
 
     renderer.bind('overNode', nodeMouseOver);
