@@ -504,9 +504,9 @@
 
             if (force > W.maxForce) {
               W.nodeMatrix[np(n, 'dx')] =
-                W.nodeMatrix[np(n, 'dx')] * maxForce / force;
+                W.nodeMatrix[np(n, 'dx')] * W.maxForce / force;
               W.nodeMatrix[np(n, 'dy')] =
-                W.nodeMatrix[np(n, 'dy')] * maxForce / force;
+                W.nodeMatrix[np(n, 'dy')] * W.maxForce / force;
             }
 
             swinging = W.nodeMatrix[np(n, 'mass')] *
