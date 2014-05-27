@@ -48,7 +48,8 @@
         slowDown: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 1.2,
-        barnesHutDepthLimit: 4
+        barnesHutDepthLimit: 4,
+        initialIterations: 0
       }
     };
 
@@ -600,7 +601,8 @@
       sendNewCoords = function() {
         var e = new Event('newCoords');
         e.data = {
-          nodes: W.nodeMatrix.buffer
+          nodes: W.nodeMatrix.buffer,
+          iterations: W.iterations
         };
         requestAnimationFrame(function() {
           document.dispatchEvent(e);
@@ -611,8 +613,10 @@
 
       // From a WebWorker
       sendNewCoords = function() {
-        self.postMessage(
-          {nodes: W.nodeMatrix.buffer},
+        self.postMessage({
+            nodes: W.nodeMatrix.buffer,
+            iterations: W.iterations
+          },
           [W.nodeMatrix.buffer]
         );
       };
@@ -633,6 +637,11 @@
             new Float32Array(e.data.edges),
             e.data.config
           );
+
+          // Initial iterations (if necessary)
+          var initPasses = e.data.config.initialIterations - 1;
+          for(var i = 0 ; i < initPasses ; i++)
+            pass();
 
           // First iteration
           run();
