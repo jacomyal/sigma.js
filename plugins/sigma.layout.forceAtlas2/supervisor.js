@@ -165,7 +165,7 @@
     var buffers = [this.nodesByteArray.buffer];
 
     if (action === 'start') {
-      content.config = this.config || {};
+      content.config = config || {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
     }
@@ -176,16 +176,17 @@
       window.postMessage(content, '*');
   };
 
-  Supervisor.prototype.start = function() {
+  Supervisor.prototype.start = function(config) {
     if (this.running)
       return;
 
     this.running = true;
+    this.config = config;
 
     if (!this.started) {
 
       // Sending init message to worker
-      this.sendByteArrayToWorker('start');
+      this.sendByteArrayToWorker('start', config);
       this.started = true;
     }
     else {
