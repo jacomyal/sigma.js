@@ -42,7 +42,8 @@
         _camera = renderer.camera,
         _node = null,
         _prefix = '',
-        _isOverNode = false,
+        _isOverNode = 0,
+        _isMouseDown = false,
         _isMouseOverCanvas = false;
 
     // It removes the initial substring ('read_') if it's a WegGL renderer.
@@ -53,29 +54,27 @@
     }
 
     var nodeMouseOver = function(event) {
-      if (!_isOverNode) {
+      _isOverNode++;
+      if (_isOverNode && !_isMouseDown) {
         _node = event.data.node;
         _mouse.addEventListener('mousedown', nodeMouseDown);
-        _isOverNode = true;
       }
     };
 
     var treatOutNode = function(event) {
-      if (_isOverNode) {
+      _isOverNode--;
+      if (!_isOverNode) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
-        _isOverNode = false;
       }
     };
 
     var nodeMouseDown = function(event) {
+      _isMouseDown = true;
       var size = s.graph.nodes().length;
       if (size > 1) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
-
-        renderer.unbind('outNode', treatOutNode);
-
         // Deactivate drag graph.
         renderer.settings({mouseEnabled: false, enableHovering: false});
         s.refresh();
@@ -83,13 +82,10 @@
     };
 
     var nodeMouseUp = function(event) {
+      _isMouseDown = false;
       _mouse.addEventListener('mousedown', nodeMouseDown);
       _body.removeEventListener('mousemove', nodeMouseMove);
       _body.removeEventListener('mouseup', nodeMouseUp);
-
-      treatOutNode();
-      renderer.bind('outNode', treatOutNode);
-
       // Activate drag graph.
       renderer.settings({mouseEnabled: true, enableHovering: true});
       s.refresh();
