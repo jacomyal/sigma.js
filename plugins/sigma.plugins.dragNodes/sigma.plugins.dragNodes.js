@@ -65,11 +65,12 @@
     };
 
     var treatOutNode = function(event) {
-      // Check if there is an index of the node in the array and remove it
+      // Remove the node from the array
       var indexCheck = _isOverNode.map(function(e) { return e; }).indexOf(event.data.node);
       _isOverNode.splice(indexCheck, 1);
 
       if(_isOverNode.length && ! _isMouseDown) {
+        // On out, set the current node to be the next stated in array
         _node = _isOverNode[_isOverNode.length - 1];
       } else {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
