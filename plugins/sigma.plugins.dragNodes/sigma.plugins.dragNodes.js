@@ -42,7 +42,7 @@
         _camera = renderer.camera,
         _node = null,
         _prefix = '',
-        _isOverNode = [],
+        _hoverStack = [],
         _isMouseDown = false,
         _isMouseOverCanvas = false;
 
@@ -55,23 +55,23 @@
 
     var nodeMouseOver = function(event) {
       // Add node to array of current nodes over
-      _isOverNode.push(event.data.node);
+      _hoverStack.push(event.data.node);
 
-      if(_isOverNode.length && ! _isMouseDown) {
+      if(_hoverStack.length && ! _isMouseDown) {
         // Set the current node to be the last one in the array
-        _node = _isOverNode[_isOverNode.length - 1];
+        _node = _hoverStack[_hoverStack.length - 1];
         _mouse.addEventListener('mousedown', nodeMouseDown);
       }
     };
 
     var treatOutNode = function(event) {
       // Remove the node from the array
-      var indexCheck = _isOverNode.map(function(e) { return e; }).indexOf(event.data.node);
-      _isOverNode.splice(indexCheck, 1);
+      var indexCheck = _hoverStack.map(function(e) { return e; }).indexOf(event.data.node);
+      _hoverStack.splice(indexCheck, 1);
 
-      if(_isOverNode.length && ! _isMouseDown) {
+      if(_hoverStack.length && ! _isMouseDown) {
         // On out, set the current node to be the next stated in array
-        _node = _isOverNode[_isOverNode.length - 1];
+        _node = _hoverStack[_hoverStack.length - 1];
       } else {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
       }
