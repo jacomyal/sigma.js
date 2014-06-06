@@ -54,33 +54,25 @@
     }
 
     var nodeMouseOver = function(event) {
-      // Deal with overNode being triggered multiple times
-      if(!event.data.node.over) {
-        event.data.node.over = true;
-        // Add node to array of current nodes over
-        _isOverNode.push(event.data.node);
+      // Add node to array of current nodes over
+      _isOverNode.push(event.data.node);
 
-        if(_isOverNode.length && ! _isMouseDown) {
-          // Set the current node to be the last one in the array
-          _node = _isOverNode[_isOverNode.length - 1];
-          _mouse.addEventListener('mousedown', nodeMouseDown);
-        }
+      if(_isOverNode.length && ! _isMouseDown) {
+        // Set the current node to be the last one in the array
+        _node = _isOverNode[_isOverNode.length - 1];
+        _mouse.addEventListener('mousedown', nodeMouseDown);
       }
     };
 
     var treatOutNode = function(event) {
-      // Deal with outNode being triggered multiple times
-      if(event.data.node.over) {
-        event.data.node.over = false;
-        // Check if there is an index of the node in the array and remove it
-        var indexCheck = _isOverNode.map(function(e) { return e; }).indexOf(event.data.node);
-        _isOverNode.splice(indexCheck, 1);
+      // Check if there is an index of the node in the array and remove it
+      var indexCheck = _isOverNode.map(function(e) { return e; }).indexOf(event.data.node);
+      _isOverNode.splice(indexCheck, 1);
 
-        if(_isOverNode.length && ! _isMouseDown) {
-          _node = _isOverNode[_isOverNode.length - 1];
-        } else {
-          _mouse.removeEventListener('mousedown', nodeMouseDown);
-        }
+      if(_isOverNode.length && ! _isMouseDown) {
+        _node = _isOverNode[_isOverNode.length - 1];
+      } else {
+        _mouse.removeEventListener('mousedown', nodeMouseDown);
       }
     };
 
