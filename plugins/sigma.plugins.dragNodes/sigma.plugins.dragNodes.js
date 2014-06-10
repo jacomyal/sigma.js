@@ -24,9 +24,30 @@
    * **********************
    * @param  {sigma}    s        The related sigma instance.
    * @param  {renderer} renderer The related renderer instance.
+   * @param {options} options Options to enable or disable features.
    */
-  sigma.plugins.dragNodes = function(s, renderer) {
-    // A quick hardcoded rule to prevent people from using this plugin with the
+  sigma.plugins.dragNodes = function(s, renderer, options) {
+
+    
+	//copy drawEdges value in case it was already disabled
+	var oldDrawEdges = renderer.settings("drawEdges");
+	//Creating options to disable touch or mouse drags as well as hiding edges while dragging
+    var defaults = {
+        enableTouchDrag: true,
+        enableMouseDrag: true,
+        hideEdgeDragging: false
+    };
+    if (typeof options === 'object'){
+        for (var i in defaults){
+            if(typeof options[i] === "undefined")
+                options[i] = defaults[i];    
+        }
+    }
+    else{
+        options = defaults
+    }
+	
+	// A quick hardcoded rule to prevent people from using this plugin with the
     // WebGL renderer (which is impossible at the moment):
     if (
       sigma.renderers.webgl &&
@@ -77,8 +98,11 @@
         renderer.unbind('outNode', treatOutNode);
 
         // Deactivate drag graph.
-        renderer.settings({mouseEnabled: false, enableHovering: false});
-        s.refresh();
+        renderer.settings({mouseEnabled: false, enableHovering: false, touchEnabled: false});
+        if(options['hideEdgeDragging']){
+			renderer.settings({drawEdges: false});
+		}
+		s.refresh();
       }
     };
 
@@ -91,7 +115,10 @@
       renderer.bind('outNode', treatOutNode);
 
       // Activate drag graph.
-      renderer.settings({mouseEnabled: true, enableHovering: true});
+      renderer.settings({mouseEnabled: true, enableHovering: true, touchEnabled: true});
+	  if(options['hideEdgeDragging']){
+			renderer.settings({drawEdges: oldDrawEdges});
+		}
       s.refresh();
     };
 
@@ -124,12 +151,77 @@
       // Rotating the coordinates.
       _node.x = x * cos - y * sin;
       _node.y = y * cos + x * sin;
-
       s.refresh();
     };
+	
+	var nodeTouchOver = function(event) {
 
-    renderer.bind('overNode', nodeMouseOver);
-    renderer.bind('outNode', treatOutNode);
+		_node = event.data.node;
+		_mouse.addEventListener('touchmove', nodeTouchMove);
+		_mouse.addEventListener('touchend', nodeTouchEnd);
+	};
+	
+	var nodeTouchEnd = function(event){
+		
+		_mouse.removeEventListener('touchmove', nodeTouchMove);
+		_mouse.removeEventListener('touchend', nodeTouchEnd);
+		renderer.settings({mouseEnabled: true, enableHovering: true, touchEnabled: true});
+		if(options['hideEdgeDragging']){
+			renderer.settings({drawEdges: oldDrawEdges});
+		}
+		
+		s.refresh();
+	
+	}
+	
+	//New move function because event X and Y coordinates are located somewhere else - YP
+	var nodeTouchMove = function(event) {
+		//Added option to hide Edges when dragging
+		if(options['hideEdgeDragging']){
+			renderer.settings({drawEdges: false});
+		}
+		renderer.settings({mouseEnabled: false, enableHovering: false, touchEnabled: false});
+        s.refresh();
+		var x = event.targetTouches[0].clientX - _container.offsetLeft,
+          y = event.targetTouches[0].clientY - _container.offsetTop,
+          cos = Math.cos(_camera.angle),
+          sin = Math.sin(_camera.angle),
+          nodes = s.graph.nodes(),
+          ref = [];
+
+      // Getting and derotating the reference coordinates.
+      for (var i = 0; i < 2; i++) {
+        var n = nodes[i];
+        var aux = {
+          x: n.x * cos + n.y * sin,
+          y: n.y * cos - n.x * sin,
+          renX: n[_prefix + 'x'],
+          renY: n[_prefix + 'y'],
+        };
+        ref.push(aux);
+      }
+
+      // Applying linear interpolation.
+      x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
+        (ref[1].x - ref[0].x) + ref[0].x;
+      y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
+        (ref[1].y - ref[0].y) + ref[0].y;
+	  _node.x = x * cos - y * sin;
+      _node.y = y * cos + x * sin;
+      s.refresh();
+	  
+	
+	};
+
+	if(options['enableTouchDrag']){
+		renderer.bind('overNode',  nodeTouchOver);
+	}
+	if(options['enableMouseDrag']){
+		renderer.bind('overNode', nodeMouseOver);
+		renderer.bind('outNode', treatOutNode);
+	}
+    
+	
   };
 
 }).call(window);
