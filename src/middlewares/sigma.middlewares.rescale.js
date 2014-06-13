@@ -60,6 +60,8 @@
         h / Math.max(maxY - minY, 1)
       );
 
+    if(settings('fixedScaling') && !this.graph.initScale) this.graph.initScale = scale;
+
     /**
      * Then, we correct that scaling ratio considering a margin, which is
      * basically the size of the biggest node.
@@ -89,6 +91,8 @@
         w / Math.max(maxX - minX, 1),
         h / Math.max(maxY - minY, 1)
       );
+
+    if(settings('fixedScaling') && !this.graph.initScale) this.graph.initScale = scale;
 
     // Size homothetic parameters:
     if (!settings('maxNodeSize') && !settings('minNodeSize')) {
@@ -120,9 +124,9 @@
     for (i = 0, l = n.length; i < l; i++) {
       n[i][writePrefix + 'size'] = n[i][readPrefix + 'size'] * a + b;
       n[i][writePrefix + 'x'] =
-        (n[i][readPrefix + 'x'] - (maxX + minX) / 2) * scale;
+        (n[i][readPrefix + 'x'] - (maxX + minX) / 2) * (this.graph.initScale || scale);
       n[i][writePrefix + 'y'] =
-        (n[i][readPrefix + 'y'] - (maxY + minY) / 2) * scale;
+        (n[i][readPrefix + 'y'] - (maxY + minY) / 2) * (this.graph.initScale || scale);
     }
   };
 
