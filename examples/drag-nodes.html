@@ -33,6 +33,8 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -91,4 +93,9 @@ s = new sigma({
 
 // Initialize the dragNodes plugin:
 sigma.plugins.dragNodes(s, s.renderers[0]);
+
+s.startForceAtlas2();
+setTimeout(function() {
+  s.killForceAtlas2();
+},2000)
 </script>

@@ -20,7 +20,8 @@
    * @param {object}  options     The parameters.
    */
   sigma.middlewares.rescale = function(readPrefix, writePrefix, options) {
-    var i,
+    var _this = this,
+        i,
         l,
         a,
         b,
@@ -60,7 +61,7 @@
         h / Math.max(maxY - minY, 1)
       );
 
-    if(settings('fixedScaling') && !this.graph.initScale) this.graph.initScale = scale;
+    setTimeout(function() { if(settings('fixedScaling') && !_this.graph.initScale && !_this.isForceAtlas2Running()) _this.graph.initScale = scale },50);
 
     /**
      * Then, we correct that scaling ratio considering a margin, which is
@@ -92,7 +93,7 @@
         h / Math.max(maxY - minY, 1)
       );
 
-    if(settings('fixedScaling') && !this.graph.initScale) this.graph.initScale = scale;
+    setTimeout(function() { if(settings('fixedScaling') && !_this.graph.initScale && !_this.isForceAtlas2Running()) _this.graph.initScale = scale },50);
 
     // Size homothetic parameters:
     if (!settings('maxNodeSize') && !settings('minNodeSize')) {
