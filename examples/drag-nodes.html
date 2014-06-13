@@ -81,7 +81,12 @@ sigma.renderers.def = sigma.renderers.canvas
 // Instanciate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container'
+  container: 'graph-container',
+  settings: {
+    fixedScaling: true,
+    zoomMin: 0,
+    zoomMax: 100
+  }
 });
 
 // Initialize the dragNodes plugin:
