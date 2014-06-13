@@ -33,6 +33,7 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+<script src="../plugins/sigma.events.drag/sigma.events.drag.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -86,4 +87,13 @@ s = new sigma({
 
 // Initialize the dragNodes plugin:
 sigma.plugins.dragNodes(s, s.renderers[0]);
+
+// Handle 'drag' and 'drop' events:
+var _dragListener = new sigma.events.drag(s.renderers[0]);
+_dragListener.bind('drag', function(e) {
+    console.log(e.type);
+});
+_dragListener.bind('drop', function(e) {
+    console.log(e.type);
+});
 </script>
