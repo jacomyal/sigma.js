@@ -28,7 +28,7 @@
                    (source[prefix + 'x'] - target[prefix + 'x']) / 4,
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
-        aSize = thickness * 2.5,
+        aSize = Math.max(thickness * 2.5, settings('minArrowSize')),
         d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
         aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,
         aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,
