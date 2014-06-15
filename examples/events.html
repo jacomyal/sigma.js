@@ -88,12 +88,12 @@ s = new sigma({
 
 // Bind the events:
 s.bind('overNode outNode clickNode doubleClickNode', function(e) {
-  console.log(e.type, e.data.node.label);
+  console.log(e.type, e.data.node.label, e.data.captor);
 });
 s.bind('clickStage', function(e) {
-  console.log(e.type);
+  console.log(e.type, e.data.captor);
 });
 s.bind('doubleClickStage', function(e) {
-  console.log(e.type);
+  console.log(e.type, e.data.captor);
 });
 </script>
