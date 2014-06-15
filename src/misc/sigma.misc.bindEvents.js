@@ -126,6 +126,23 @@
           self.dispatchEvent('doubleClickStage');
       }
 
+      function onRightClick(e) {
+        if (!self.settings('eventsEnabled'))
+          return;
+
+        self.dispatchEvent('rightClick', e.data);
+
+        if (nodes.length) {
+          self.dispatchEvent('rightClickNode', {
+            node: nodes[0]
+          });
+          self.dispatchEvent('rightClickNodes', {
+            node: nodes
+          });
+        } else
+          self.dispatchEvent('rightClickStage');
+      }
+
       function onOut(e) {
         if (!self.settings('eventsEnabled'))
           return;
@@ -202,10 +219,12 @@
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mousedown', onMove);
       captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
       captor.bind('doubleclick', onDoubleClick);
+      captor.bind('rightclick', onRightClick);
       self.bind('render', onMove);
     }
 
