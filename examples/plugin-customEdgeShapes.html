@@ -95,7 +95,7 @@ for (i = 0; i < E; i++) {
     target: 'n' + (Math.random() * N | 0),
     // note the EdgeShapeLibrary.enumerate() returns the names of all
     // supported renderers
-    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*2)],
+    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*3)],
     size: Math.random()
   });
 }
@@ -110,8 +110,10 @@ s = new sigma({
     type: 'canvas'
   },
   settings: {
+    minNodeSize: 1,
+    maxNodeSize: 10,
     minEdgeSize: 0.1,
-    maxEdgeSize: 1,
+    maxEdgeSize: 2,
   }
 });
 CustomEdgeShapes.init(s);
