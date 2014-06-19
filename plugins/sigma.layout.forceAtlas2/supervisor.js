@@ -156,7 +156,7 @@
     }
   };
 
-  Supervisor.prototype.sendByteArrayToWorker = function(action, config) {
+  Supervisor.prototype.sendByteArrayToWorker = function(action) {
     var content = {
       action: action || 'loop',
       nodes: this.nodesByteArray.buffer
@@ -233,8 +233,12 @@
     if (!supervisor)
       supervisor = new Supervisor(this);
 
+    // Configuration provided?
+    if (config)
+      supervisor.configure(config);
+
     // Start algorithm
-    supervisor.start(config);
+    supervisor.start();
 
     return this;
   };
