@@ -222,7 +222,147 @@
     }
   };
 
+  /**
+   * Return the euclidian distance between two points of a plane
+   * with an orthonormal basis.
+   *
+   * @param  {number} x1  The X coordinate of the first point.
+   * @param  {number} y1  The Y coordinate of the first point.
+   * @param  {number} x2  The X coordinate of the second point.
+   * @param  {number} y2  The Y coordinate of the second point.
+   * @return {number}     The euclidian distance.
+   */
+  sigma.utils.getDistance = function (x0, y0, x1, y1) {
+    return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
+  };
 
+  /**
+    * Check if a point is on a line segment.
+    *
+    * @param  {number} x       The X coordinate of the point to check.
+    * @param  {number} y       The Y coordinate of the point to check.
+    * @param  {number} x1      The X coordinate of the line starting point.
+    * @param  {number} y1      The Y coordinate of the line starting point.
+    * @param  {number} x2      The X coordinate of the line ending point.
+    * @param  {number} y2      The Y coordinate of the line ending point.
+    * @param  {number} epsilon The precision (consider the line thickness).
+    * @return {boolean}        True if point is "close to" the line
+    *                          segment, false otherwise.
+  */
+  sigma.utils.isPointOnSegment = function(x ,y, x1, y1, x2, y2, epsilon) {
+    // http://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment
+    var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
+        d = sigma.utils.getDistance(x1, y1, x2, y2),
+        nCrossProduct = crossProduct / d; // normalized cross product
+
+    //console.log(nCrossProduct, epsilon);
+
+    return (nCrossProduct < epsilon &&
+     Math.min(x1, x2) <= x && x <= Math.max(x1, x2) &&
+     Math.min(y1, y2) <= y && y <= Math.max(y1, y2));
+  };
+
+  /**
+   * Return the control point coordinates for a quadratic bezier curve.
+   *
+   * @param  {object} start  The node starting point.
+   * @param  {object} end    The node ending point.
+   * @param  {string} prefix The prefix of the coordinates.
+   * @return  {x,y}          The control point coordinates.
+   */
+  sigma.utils.getCP = function(start, end, prefix) {
+    return {
+      x: (start[prefix + 'x'] + end[prefix + 'x']) / 2 +
+         (end[prefix + 'y'] - start[prefix + 'y']) / 4,
+      y: (start[prefix + 'y'] + end[prefix + 'y']) / 2 +
+         (start[prefix + 'x'] - end[prefix + 'x']) / 4
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the quadratic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach 
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the ending point.
+    * @param  {number} y2 The Y coordinate of the ending point.
+    * @param  {number} xi The X coordinate of the control point.
+    * @param  {number} yi The Y coordinate of the control point.
+    * @return {object}    {x,y}.
+  */
+  sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
+    // see http://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
+    // see http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+    return {
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2, 
+      y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
+    };
+  };
+
+  /**
+    * EXPERIMENTAL: Check if a point is on a quadratic bezier curve segment.
+    *
+    * @param  {number} x       The X coordinate of the point to check.
+    * @param  {number} y       The Y coordinate of the point to check.
+    * @param  {number} x1      The X coordinate of the curve starting point.
+    * @param  {number} y1      The Y coordinate of the curve starting point.
+    * @param  {number} x2      The X coordinate of the curve ending point.
+    * @param  {number} y2      The Y coordinate of the curve ending point.
+    * @param  {number} cpx     The X coordinate of the curve control point.
+    * @param  {number} cpy     The Y coordinate of the curve control point.
+    * @param  {number} epsilon The precision (consider the line thickness).
+    * @return {boolean}        True if (x,y) is on the curve segment,
+    *                          false otherwise.
+  */
+  sigma.utils.isPointOnQuadraticCurve = function(x ,y, x1, y1, x2, y2, cpx, cpy, epsilon) {
+    // Fails if the point is too far from the extremities of the segment,
+    // preventing for more costly computation:
+    var dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
+    if (Math.abs(x - x1) > dP1P2 || Math.abs(y - y1) > dP1P2) {
+      return false;
+    }
+
+    var dP1 = sigma.utils.getDistance(x, y, x1, y1),
+        dP2 = sigma.utils.getDistance(x, y, x2, y2),
+        _dt,
+        t = 0.5,
+        r = (dP1 < dP2) ? -0.1 : 0.1,
+        rThreshold = 0.025,
+        //dThreshold = Math.log(1 + w) * epsilon / 20,
+        // get x(t), y(t):
+        pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
+        dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+    while (t >= 0 && t <= 1 && 
+      (dt > epsilon) && 
+      (r > rThreshold || r < -rThreshold)) {
+      // console.log(t);
+      _dt = dt;
+      pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
+      dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+      if (dt > _dt) {
+        // not the right direction:
+        // halfstep in the opposite direction
+        r = -r / 2;
+        t += r;
+      } 
+      else if (t + r < 0 || t + r > 1) {
+        // oops, we've gone too far:
+        // revert with a halfstep
+        r = r / 2;
+        dt = _dt;
+      }
+      else {
+        // progress:
+        t += r;
+      }
+    }
+    return dt < epsilon;
+  };
 
 
   /**

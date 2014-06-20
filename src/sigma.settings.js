@@ -82,6 +82,13 @@
     labelHoverColor: 'default',
     // {string}
     defaultLabelHoverColor: '#000',
+    // {string} Indicates how to choose the edges hover color. Available values:
+    //          "edge", "default"
+    edgeHoverColor: 'edge',
+    // {number} The size multiplicator of hovered edges.
+    edgeHoverSizeRatio: 1,
+    // {string}
+    defaultEdgeHoverColor: '#000',
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
@@ -187,6 +194,8 @@
     enableCamera: true,
     // {boolean} If set to false, the nodes cannot be hovered.
     enableHovering: true,
+    // {boolean} If set to false, the edges cannot be hovered.
+    enableEdgeHovering: true,
     // {boolean} If set to true, the rescale middleware will ignore node sizes
     //           to determine the graphs boundings.
     rescaleIgnoreSize: false,

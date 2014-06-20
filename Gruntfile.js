@@ -17,6 +17,7 @@ module.exports = function(grunt) {
     'src/classes/sigma.classes.graph.js',
     'src/classes/sigma.classes.camera.js',
     'src/classes/sigma.classes.quad.js',
+    'src/classes/sigma.classes.edgequad.js',
 
     // Captors:
     'src/captors/sigma.captors.mouse.js',
@@ -35,6 +36,7 @@ module.exports = function(grunt) {
     'src/renderers/webgl/sigma.webgl.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.labels.def.js',
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',
     'src/renderers/canvas/sigma.canvas.edges.def.js',
     'src/renderers/canvas/sigma.canvas.edges.curve.js',

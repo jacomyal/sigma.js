@@ -19,6 +19,7 @@
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
         thickness = edge[prefix + 'size'] || 1,
+        thickness = (edge.hover) ? settings('edgeHoverSizeRatio') * thickness : thickness,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
@@ -47,6 +48,14 @@
           color = defaultEdgeColor;
           break;
       }
+
+    if (edge.hover) {
+      if (settings('edgeHoverColor') === 'edge') {
+        color = edge.hover_color || color;
+      } else {
+        color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+      }
+    }
 
     context.strokeStyle = color;
     context.lineWidth = thickness;

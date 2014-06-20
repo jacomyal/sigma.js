@@ -15,9 +15,11 @@
   sigma.canvas.edges.curve = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor');
+        defaultEdgeColor = settings('defaultEdgeColor'),
+        cp = sigma.utils.getCP(source, target, prefix);
 
     if (!color)
       switch (edgeColor) {
@@ -32,18 +34,25 @@
           break;
       }
 
+    if (edge.hover) {
+      if (settings('edgeHoverColor') === 'edge') {
+        color = edge.hover_color || color;
+      } else {
+        color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+      }
+      size *= settings('edgeHoverSizeRatio');
+    }
+
     context.strokeStyle = color;
-    context.lineWidth = edge[prefix + 'size'] || 1;
+    context.lineWidth = size;
     context.beginPath();
     context.moveTo(
       source[prefix + 'x'],
       source[prefix + 'y']
     );
     context.quadraticCurveTo(
-      (source[prefix + 'x'] + target[prefix + 'x']) / 2 +
-        (target[prefix + 'y'] - source[prefix + 'y']) / 4,
-      (source[prefix + 'y'] + target[prefix + 'y']) / 2 +
-        (source[prefix + 'x'] - target[prefix + 'x']) / 4,
+      cp.x,
+      cp.y,
       target[prefix + 'x'],
       target[prefix + 'y']
     );
