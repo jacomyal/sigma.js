@@ -76,6 +76,14 @@
 
         renderer.unbind('outNode', treatOutNode);
 
+        // Do not refresh edgequadtree during drag:
+        var k,
+            c;
+        for (k in s.cameras) {
+          c = s.cameras[k];
+          c.edgequadtree._enabled = false;
+        }
+
         // Deactivate drag graph.
         renderer.settings({mouseEnabled: false, enableHovering: false});
         s.refresh();
@@ -89,6 +97,15 @@
 
       treatOutNode();
       renderer.bind('outNode', treatOutNode);
+
+
+      // Allow to refresh edgequadtree:
+      var k,
+          c;
+      for (k in s.cameras) {
+        c = s.cameras[k];
+        c.edgequadtree._enabled = true;
+      }
 
       // Activate drag graph.
       renderer.settings({mouseEnabled: true, enableHovering: true});
