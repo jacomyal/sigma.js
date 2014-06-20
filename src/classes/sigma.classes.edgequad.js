@@ -610,7 +610,7 @@
   edgequad.prototype.index = function(graph, params) {
     if (!this._enabled)
       return this._tree;
-console.log('j indexe !');
+
     // Enforcing presence of boundaries
     if (!params.bounds)
       throw 'sigma.classes.edgequad.index: bounds information not given.';
