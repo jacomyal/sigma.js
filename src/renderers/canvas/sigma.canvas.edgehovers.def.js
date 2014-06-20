@@ -23,7 +23,8 @@
         h,
         e,
         prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'];
+        size = edge[prefix + 'size'],
+        edgeHoverHighlightNodes = settings('edgeHoverHighlightNodes');
 
     // Edge:
     var edgeRenderer = sigma.canvas.edges[edge.type] || sigma.canvas.edges.def;
@@ -37,5 +38,26 @@
     var nodeRenderer = sigma.canvas.nodes[target.type] || sigma.canvas.nodes.def;
     nodeRenderer(target, context, settings);
 
+    // Circle around the node:
+    function drawCircle(node) {
+      context.beginPath();
+      context.lineWidth = 0.5;
+      context.fillStyle = node.color;
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'] * 1.618,
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.stroke();
+    }
+
+    if (edgeHoverHighlightNodes == 'circle') {
+      drawCircle(source);
+      drawCircle(target);
+    }
   };
 }).call(this);

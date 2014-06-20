@@ -89,6 +89,9 @@
     edgeHoverSizeRatio: 1,
     // {string}
     defaultEdgeHoverColor: '#000',
+    // {string} Indicates how to highlight the hovered edge extremities.
+    //          Available values: "circle"
+    edgeHoverHighlightNodes: '',
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
