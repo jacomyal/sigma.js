@@ -576,9 +576,10 @@
   /**
    * The edgequad core that will become the sigma interface with the quadtree.
    *
-   * property {object} _tree  Property holding the quadtree object.
-   * property {object} _geom  Exposition of the _geom namespace for testing.
-   * property {object} _cache Cache for the area method.
+   * property {object} _tree     Property holding the quadtree object.
+   * property {object} _geom     Exposition of the _geom namespace for testing.
+   * property {object} _cache    Cache for the area method.
+   * property {boolean} _enabled Can index and retreive elements.
    */
   var edgequad = function() {
     this._geom = _geom;
@@ -587,6 +588,7 @@
       query: false,
       result: false
     };
+    this._enabled = true;
   };
 
   /**
@@ -606,7 +608,9 @@
    * maxLevel:    {integer?} the max recursion level of the tree.
    */
   edgequad.prototype.index = function(graph, params) {
-
+    if (!this._enabled)
+      return this._tree;
+console.log('j indexe !');
     // Enforcing presence of boundaries
     if (!params.bounds)
       throw 'sigma.classes.edgequad.index: bounds information not given.';
@@ -662,6 +666,9 @@
    * @return {array}  An array of edges retrieved.
    */
   edgequad.prototype.point = function(x, y) {
+    if (!this._enabled)
+      return [];
+
     return this._tree ?
       _quadRetrievePoint({x: x, y: y}, this._tree) || [] :
       [];
@@ -677,6 +684,9 @@
    * @return {array}  An array of edges retrieved.
    */
   edgequad.prototype.area = function(rect) {
+    if (!this._enabled)
+      return [];
+
     var serialized = JSON.stringify(rect),
         collisionFunc,
         rectData;
