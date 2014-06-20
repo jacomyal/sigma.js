@@ -558,8 +558,8 @@
       level: level || 0,
       bounds: bounds,
       corners: _geom.splitSquare(bounds),
-      maxElements: maxElements || 20,
-      maxLevel: maxLevel || 4,
+      maxElements: maxElements || 40,
+      maxLevel: maxLevel || 8,
       elements: [],
       nodes: []
     };
