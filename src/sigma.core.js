@@ -490,15 +490,16 @@
       });
 
       // Refresh edgequadtree:
-      c.edgequadtree.index(this.graph, {
-        prefix: c.readPrefix,
-        bounds: {
-          x: bounds.minX,
-          y: bounds.minY,
-          width: bounds.maxX - bounds.minX,
-          height: bounds.maxY - bounds.minY
-        }
-      });
+      if (c.settings('drawEdges'))
+        c.edgequadtree.index(this.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
     }
 
     // Call each renderer:
