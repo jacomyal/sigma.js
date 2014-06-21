@@ -70,7 +70,7 @@
   register("diamond",genericDrawShape(drawDiamond),genericDrawBorder(drawDiamond));
 
   var drawCross = function(node,x,y,size,context) {
-  	var lineWeight = (node.cross && node.cross.lineWeight) || 5;
+    var lineWeight = (node.cross && node.cross.lineWeight) || 5;
     context.moveTo(x-size, y-lineWeight);
     context.lineTo(x-size, y+lineWeight);
     context.lineTo(x-lineWeight, y+lineWeight);
