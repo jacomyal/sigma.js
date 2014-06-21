@@ -220,7 +220,7 @@
       );
 
       // Refresh edgequadtree:
-      if (c.settings('drawEdges'))
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
         c.edgequadtree.index(this.sigInst.graph, {
           prefix: c.readPrefix,
           bounds: {

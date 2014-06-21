@@ -197,8 +197,8 @@
     enableCamera: true,
     // {boolean} If set to false, the nodes cannot be hovered.
     enableHovering: true,
-    // {boolean} If set to false, the edges cannot be hovered.
-    enableEdgeHovering: true,
+    // {boolean} If set to true, the edges can be hovered.
+    enableEdgeHovering: false,
     // {boolean} If set to true, the rescale middleware will ignore node sizes
     //           to determine the graphs boundings.
     rescaleIgnoreSize: false,
