@@ -490,7 +490,7 @@
       });
 
       // Refresh edgequadtree:
-      if (c.settings('drawEdges'))
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
         c.edgequadtree.index(this.graph, {
           prefix: c.readPrefix,
           bounds: {
