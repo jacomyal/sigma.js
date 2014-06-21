@@ -19,7 +19,6 @@
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
         thickness = edge[prefix + 'size'] || 1,
-        thickness = (edge.hover) ? settings('edgeHoverSizeRatio') * thickness : thickness,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
@@ -28,8 +27,10 @@
         controlY = (source[prefix + 'y'] + target[prefix + 'y']) / 2 +
                    (source[prefix + 'x'] - target[prefix + 'x']) / 4,
         tX = target[prefix + 'x'],
-        tY = target[prefix + 'y'],
-        aSize = thickness * 2.5,
+        tY = target[prefix + 'y'];
+
+    thickness = (edge.hover) ? settings('edgeHoverSizeRatio') * thickness : thickness;
+    var aSize = thickness * 2.5,
         d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
         aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,
         aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,

@@ -35,7 +35,7 @@
     nodeRenderer(source, context, settings);
 
     // Target Node:
-    var nodeRenderer = sigma.canvas.nodes[target.type] || sigma.canvas.nodes.def;
+    nodeRenderer = sigma.canvas.nodes[target.type] || sigma.canvas.nodes.def;
     nodeRenderer(target, context, settings);
 
     // Circle around the node:
