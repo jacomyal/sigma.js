@@ -10,7 +10,7 @@
   /**
    * This label renderer will just display the label on the line of the edge.
    * The label is rendered at half distance of the edge extremities, and is
-   * always oriented from left to right on the left side of the line.
+   * always oriented from left to right on the top side of the line.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -22,9 +22,13 @@
     if (typeof edge.label !== 'string' || source == target)
       return;
 
+    var prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1;
+
+    if (size < settings('edgeLabelThreshold'))
+      return;
+console.log(size, settings('edgeLabelThreshold'));
     var fontSize,
-        prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
         x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
         y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
         dX = target[prefix + 'x'] - source[prefix + 'x'],
@@ -32,12 +36,18 @@
         sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
         angle = Math.atan2(dY * sign, dX * sign);
 
-    fontSize = (settings('labelSize') === 'fixed') ?
-      settings('defaultLabelSize') :
-      settings('labelSizeRatio') * size;
-
-    if (fontSize < settings('labelThreshold'))
-      return;
+    // The font size is sublineraly proportional to the edge size, in order to
+    // avoid very large labels on screen.
+    // This is achieved by f(x) = x * x^(-a), where 'x' is the size and 'a' is
+    // the edgeLabelSizePowRatio.
+    // We garantee that for size = 1, fontSize = defaultEdgeLabelSize by adding
+    // this number as a multiplicator, thus the final form:
+    // f(x) = b * x * x^(-a)
+    fontSize = (settings('edgeLabelSize') === 'fixed') ?
+      settings('defaultEdgeLabelSize') :
+      settings('defaultEdgeLabelSize') *
+      size * 
+      Math.pow(size, - settings('edgeLabelSizePowRatio'));
 
     context.save();
 
@@ -45,7 +55,7 @@
       fontSize + 'px ' + settings('font');
     context.fillStyle = (settings('edgeLabelColor') === 'edge') ?
       (edge.color || settings('defaultEdgeColor')) :
-      settings('defaultLabelColor');
+      settings('defaultEdgeLabelColor');
 
     context.textAlign = "center";
     context.textBaseline = "alphabetic";
