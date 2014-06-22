@@ -45,13 +45,13 @@
     );
     context.stroke();
 
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
+    /*if (settings('drawEdgeLabels'))
+      sigma.canvas.edges.labels.def(
         edge,
         source,
         target,
         context,
         settings
-    );
+    );*/
   };
 })();

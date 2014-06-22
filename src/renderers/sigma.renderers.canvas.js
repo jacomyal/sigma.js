@@ -142,6 +142,7 @@
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes'),
         drawLabels = this.settings(options, 'drawLabels'),
+        drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
         embedSettings = this.settings.embedObjects(options, {
           prefix: this.options.prefix
         });
@@ -222,6 +223,22 @@
             );
           }
 
+          // Draw edge labels:
+          if (drawEdgeLabels) {
+            renderers = sigma.canvas.edges.labels;
+            for (i = start; i < end; i++) {
+              o = edges[i];
+              if (!o.hidden)
+                (renderers[o.type] || renderers.def)(
+                  o,
+                  graph.nodes(o.source),
+                  graph.nodes(o.target),
+                  this.contexts.labels,
+                  embedSettings
+                );
+            }
+          }
+
           // Restore original globalCompositeOperation:
           this.contexts.edges.globalCompositeOperation = tempGCO;
 
@@ -251,6 +268,21 @@
             this.contexts.edges,
             embedSettings
           );
+        }
+
+        // Draw edge labels:
+        // - No batching
+        if (drawEdgeLabels) {
+          renderers = sigma.canvas.edges.labels;
+          for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++)
+            if (!a[i].hidden)
+              (renderers[a[i].type] || renderers.def)(
+                a[i],
+                graph.nodes(a[i].source),
+                graph.nodes(a[i].target),
+                this.contexts.labels,
+                embedSettings
+              );
         }
       }
     }

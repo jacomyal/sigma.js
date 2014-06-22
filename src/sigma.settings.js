@@ -44,6 +44,9 @@
     // {string} Indicates how to choose the labels color. Available values:
     //          "node", "default"
     labelColor: 'default',
+    // {string} Indicates how to choose the edge labels color. Available values:
+    //          "edge", "default"
+    edgeLabelColor: 'default',
     // {string} Indicates how to choose the labels size. Available values:
     //          "fixed", "proportional"
     labelSize: 'fixed',
@@ -86,6 +89,10 @@
     //           false: Layered not displayed.
     //           true: Layered displayed.
     drawLabels: true,
+    // {booleans} The different drawing modes:
+    //           false: Layered not displayed.
+    //           true: Layered displayed.
+    drawEdgeLabels: true,
     drawEdges: true,
     drawNodes: true,
     // {boolean} Indicates if the edges must be drawn in several frames or in
