@@ -223,6 +223,46 @@
   };
 
 
+  /**
+   * Return the control point coordinates for a quadratic bezier curve.
+   *
+   * @param  {object} start  The node starting point.
+   * @param  {object} end    The node ending point.
+   * @param  {string} prefix The prefix of the coordinates.
+   * @return  {x,y}          The control point coordinates.
+   */
+  sigma.utils.getCP = function(start, end, prefix) {
+    return {
+      x: (start[prefix + 'x'] + end[prefix + 'x']) / 2 +
+         (end[prefix + 'y'] - start[prefix + 'y']) / 4,
+      y: (start[prefix + 'y'] + end[prefix + 'y']) / 2 +
+         (start[prefix + 'x'] - end[prefix + 'x']) / 4
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the quadratic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach 
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the ending point.
+    * @param  {number} y2 The Y coordinate of the ending point.
+    * @param  {number} xi The X coordinate of the control point.
+    * @param  {number} yi The Y coordinate of the control point.
+    * @return {object}    {x,y}.
+  */
+  sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
+    // see http://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
+    // see http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+    return {
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2, 
+      y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
+    };
+  };
+
 
 
   /**

@@ -21,6 +21,8 @@
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curvedArrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
@@ -89,6 +91,10 @@ s = new sigma({
     type: 'canvas'
   },
   settings: {
+    //edgesPowRatio: 1,
+    //minEdgeSize: 0.5,
+    //maxEdgeSize: 10,
+    //edgeLabelSize: 'proportional'
     //batchEdgesDrawing: true
   }
 });

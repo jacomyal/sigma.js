@@ -8,9 +8,9 @@
   sigma.utils.pkg('sigma.canvas.edges.labels');
 
   /**
-   * This label renderer will just display the label on the line of the edge.
+   * This label renderer will just display the label on the curve of the edge.
    * The label is rendered at half distance of the edge extremities, and is
-   * always oriented from left to right on the top side of the line.
+   * always oriented from left to right on the top side of the curve.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -18,7 +18,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.labels.def = function(edge, source, target, context, settings) {    
+  sigma.canvas.edges.labels.curve = function(edge, source, target, context, settings) {    
     if (typeof edge.label !== 'string' || source == target)
       return;
 
@@ -29,12 +29,12 @@
       return;
 
     var fontSize,
-        x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
-        y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
         dX = target[prefix + 'x'] - source[prefix + 'x'],
         dY = target[prefix + 'y'] - source[prefix + 'y'],
         sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
-        angle = Math.atan2(dY * sign, dX * sign);
+        angle = Math.atan2(dY * sign, dX * sign),
+        cp = sigma.utils.getCP(source, target, prefix),
+        t = 0.5;  //length of the curve
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
@@ -60,7 +60,17 @@
     context.textAlign = "center";
     context.textBaseline = "alphabetic";
 
-    context.translate(x ,y);
+    var c = sigma.utils.getPointOnQuadraticCurve(
+      t,
+      source[prefix + 'x'],
+      source[prefix + 'y'],
+      target[prefix + 'x'],
+      target[prefix + 'y'],
+      cp.x,
+      cp.y
+    );
+
+    context.translate(c.x , c.y);
     context.rotate(angle);
     context.fillText(
       edge.label,
