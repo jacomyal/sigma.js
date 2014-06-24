@@ -22,7 +22,7 @@
           x2 = target[prefix + 'x'],
           y2 = target[prefix + 'y'],
           targetSize = target[prefix + 'size'],
-          color = edge.color;
+          color = (edge.active) ? edge.active_color || edge.color : edge.color;
 
       if (!color)
         switch (settings('edgeColor')) {

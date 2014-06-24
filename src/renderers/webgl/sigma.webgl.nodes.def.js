@@ -18,8 +18,10 @@
     POINTS: 3,
     ATTRIBUTES: 5,
     addNode: function(node, data, i, prefix, settings) {
-      var color = sigma.utils.floatColor(
-        node.color || settings('defaultNodeColor')
+      var color = (node.active) ? 
+        node.active_color || node.color : node.color;
+      color = sigma.utils.floatColor(
+        color || settings('defaultNodeColor')
       );
 
       data[i++] = node[prefix + 'x'];

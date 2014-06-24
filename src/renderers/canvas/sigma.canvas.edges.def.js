@@ -13,7 +13,7 @@
    * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.def = function(edge, source, target, context, settings) {
-    var color = edge.color,
+    var color = (edge.active) ? edge.active_color || edge.color : edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),

@@ -13,7 +13,10 @@
   sigma.canvas.nodes.def = function(node, context, settings) {
     var prefix = settings('prefix') || '';
 
-    context.fillStyle = node.color || settings('defaultNodeColor');
+    var color = (node.active) ? 
+      node.active_color || node.color : node.color;
+
+    context.fillStyle = color || settings('defaultNodeColor');
     context.beginPath();
     context.arc(
       node[prefix + 'x'],
