@@ -72,7 +72,7 @@ for (i = 0; i < N; i++)
     size: Math.random(),
     color: '#666',
     active_size: 1.5,
-    active_color: 'rgb(236, 81, 72)',
+    //active_color: 'rgb(236, 81, 72)',
     active: [false, true][Math.random() * 1.05 | 0]
   });
 
@@ -84,8 +84,9 @@ for (i = 0; i < E; i++)
     size: Math.random(),
     color: '#ccc',
     active_size: 1.5,
-    active_color: 'rgb(236, 81, 72)',
-    active: [false, true][Math.random() * 1.05 | 0]
+    //active_color: 'rgb(236, 81, 72)',
+    active: [false, true][Math.random() * 1.05 | 0],
+    //type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0]
   });
 
 // Instanciate sigma:
@@ -96,7 +97,20 @@ s = new sigma({
     type: 'canvas'
   }*/
   container: 'graph-container'
+  ,
+  settings: {
+    borderSize: 2,
+    outerBorderSize: 1,
+    defaultNodeBorderColor: '#fff',
+    defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
+  }
 });
+
+s.graph.activateNodes('n0');
+s.graph.activateEdges('e0');
+
+s.graph.activateNodes('n0', false);
+s.graph.activateNodes(['n0', 'n1']);
 
 console.log(s.graph.activeNodes().length + ' active nodes');
 console.log(s.graph.activeEdges().length + ' active edges');
