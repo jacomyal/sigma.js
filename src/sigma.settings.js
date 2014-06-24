@@ -33,9 +33,9 @@
     // {string}
     defaultNodeColor: '#000',
     // {string}
-    defaultActiveEdgeColor: 'rgb(236, 81, 72)',
+    defaultEdgeActiveColor: 'rgb(236, 81, 72)',
     // {string}
-    defaultActiveNodeColor: 'rgb(236, 81, 72)',
+    defaultNodeActiveColor: 'rgb(236, 81, 72)',
     // {string}
     defaultLabelSize: 14,
     // {string} Indicates how to choose the edges color. Available values:

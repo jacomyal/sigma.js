@@ -14,7 +14,7 @@
    */
   edgesPackage.curvedArrow = function(edge, source, target, context, settings) {
     var color = (edge.active) ? 
-          edge.active_color || settings('defaultActiveEdgeColor') : 
+          edge.active_color || settings('defaultEdgeActiveColor') : 
           edge.color || settings('defaultEdgeColor'),
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),

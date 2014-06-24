@@ -14,7 +14,7 @@
     var prefix = settings('prefix') || '';
 
     var color = (node.active) ? 
-      node.active_color || settings('defaultActiveNodeColor') : 
+      node.active_color || settings('defaultNodeActiveColor') : 
       node.color || settings('defaultNodeColor');
 
     context.fillStyle = color;

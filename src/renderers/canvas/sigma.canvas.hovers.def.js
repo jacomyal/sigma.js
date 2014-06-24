@@ -27,7 +27,7 @@
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size,
         color = (node.active) ? 
-          node.active_color || settings('defaultActiveNodeColor'): 
+          node.active_color || settings('defaultNodeActiveColor'): 
           node.color || settings('defaultNodeColor');
 
     // Label background:
