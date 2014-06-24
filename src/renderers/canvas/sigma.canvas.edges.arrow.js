@@ -13,7 +13,9 @@
    * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
-    var color = (edge.active) ? edge.active_color || edge.color : edge.color,
+    var color = (edge.active) ? 
+          edge.active_color || settings('defaultActiveEdgeColor') : 
+          edge.color || settings('defaultEdgeColor'),
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),

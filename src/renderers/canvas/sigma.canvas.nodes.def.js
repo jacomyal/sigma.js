@@ -14,9 +14,10 @@
     var prefix = settings('prefix') || '';
 
     var color = (node.active) ? 
-      node.active_color || node.color : node.color;
+      node.active_color || settings('defaultActiveNodeColor') : 
+      node.color || settings('defaultNodeColor');
 
-    context.fillStyle = color || settings('defaultNodeColor');
+    context.fillStyle = color;
     context.beginPath();
     context.arc(
       node[prefix + 'x'],

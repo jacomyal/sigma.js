@@ -27,7 +27,8 @@
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size,
         color = (node.active) ? 
-          node.active_color || node.color : node.color;;
+          node.active_color || settings('defaultActiveNodeColor'): 
+          node.color || settings('defaultNodeColor');
 
     // Label background:
     context.font = (fontStyle ? fontStyle + ' ' : '') +
