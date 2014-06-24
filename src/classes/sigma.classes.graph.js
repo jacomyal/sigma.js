@@ -770,6 +770,300 @@
     throw 'edges: Wrong arguments.';
   });
 
+  /**
+   * This methods set one or several nodes as 'active', depending on how it is
+   * called.
+   *
+   * To activate the array of nodes, call "activateNodes" without argument. 
+   * To activate a specific node, call it with the id of the node. To activate
+   * multiple nodes, call it with an array of ids. To deactivate a node or a
+   * set of nodes, call it with the second argument to "false".
+   *
+   * @param  {(string|array)} v        Eventually one id, an array of ids.
+   * @param  {?boolean}       isActive The 'active' value.
+   * @return {sigma.classes.graph}     Returns the instance itself.
+   */
+  graph.addMethod('activateNodes', function(v, isActive) {
+    // Activate all nodes:
+    if (!arguments.length) {
+      this.nodesArray.forEach(function(o) {
+        o.active = true;
+      });
+    }
+    else if (arguments.length === 1 && typeof v === 'boolean') {
+      this.nodesArray.forEach(function(o) {
+        o.active = !!v;
+      });
+    }
+
+    // Activate one node:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        this.nodesIndex[v].active = true;
+        
+      }
+      else if (arguments.length === 2) {
+        this.nodesIndex[v].active = !!isActive;
+      }
+      else
+        throw 'activateNodes: Wrong arguments.';
+    }
+
+    // Activate a set of nodes:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string')
+            this.nodesIndex[v[i]].active = true;
+          else
+            throw 'activateNodes: Wrong arguments.';
+      }
+      else if (arguments.length === 2) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string')
+            this.nodesIndex[v[i]].active = !!isActive;
+          else
+            throw 'activateNodes: Wrong arguments.';
+      }
+      else
+        throw 'activateNodes: Wrong arguments.';
+    }
+    return this;
+  });
+
+  /**
+   * This methods set one or several edges as 'active', depending on how it is
+   * called.
+   *
+   * To activate the array of edges, call "activateEdges" without argument. 
+   * To activate a specific edge, call it with the id of the edge. To activate
+   * multiple edges, call it with an array of ids. To deactivate a edge or a
+   * set of edges, call it with the second argument to "false".
+   *
+   * @param  {(string|array)} v        Eventually one id, an array of ids.
+   * @param  {?boolean}       isActive The 'active' value.
+   * @return {sigma.classes.graph}     Returns the instance itself.
+   */
+  graph.addMethod('activateEdges', function(v, isActive) {
+    // Activate all edges:
+    if (!arguments.length) {
+      this.edgesArray.forEach(function(o) {
+        o.active = true;
+      });
+    }
+    else if (arguments.length === 1 && typeof v === 'boolean') {
+      this.edgesArray.forEach(function(o) {
+        o.active = !!v;
+      });
+    }
+
+    // Activate one edge:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        this.edgesIndex[v].active = true;
+        
+      }
+      else if (arguments.length === 2) {
+        this.edgesIndex[v].active = !!isActive;
+      }
+      else
+        throw 'activateEdges: Wrong arguments.';
+    }
+
+    // Activate a set of edges:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string')
+            this.edgesIndex[v[i]].active = true;
+          else
+            throw 'activateEdges: Wrong arguments.';
+      }
+      else if (arguments.length === 2) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string')
+            this.edgesIndex[v[i]].active = !!isActive;
+          else
+            throw 'activateEdges: Wrong arguments.';
+      }
+      else
+        throw 'activateEdges: Wrong arguments.';
+    }
+    return this;
+  });
+
+  graph.addIndex('activeNodesIndex', {
+    constructor: function() {
+      this.activeNodesIndex = Object.create(null);
+    },
+    addNode: function(n) {
+      if (n.active)
+        this.activeNodesIndex[n.id] = this.nodesIndex[n.id];
+    },
+    dropNode: function(n) {
+      delete this.activeNodesIndex[n.id];
+    },
+    activateNodes: function(v, isActive) {
+      // Index all nodes
+      if (!arguments.length) {
+        this.nodesArray.forEach(function(o) {
+          this.activeNodesIndex[o.id] = o;
+        }, this);
+      }
+      else if (arguments.length === 1 && typeof v === 'boolean') {
+        if (v) {
+          this.nodesArray.forEach(function(o) {
+            this.activeNodesIndex[o.id] = o;
+          }, this);
+        } else {
+          this.activeNodesIndex = Object.create(null);
+        }
+      }
+
+      // Index one node:
+      else if (typeof v === 'string') {
+        if (arguments.length === 1) {
+          this.activeNodesIndex[v] = this.nodesIndex[v];
+        }
+        else if (arguments.length === 2) {
+          if (isActive)
+            this.activeNodesIndex[v] = this.nodesIndex[v];
+          else
+            delete this.activeNodesIndex[v];
+        }
+        else
+          throw 'activateNodesIndex: Wrong arguments.';
+      }
+
+      // Index a set of nodes:
+      else if (Object.prototype.toString.call(v) === '[object Array]') {
+        var i,
+            l,
+            a = [];
+
+        if (arguments.length === 1) {
+          for (i = 0, l = v.length; i < l; i++)
+            if (typeof v[i] === 'string')
+              this.activeNodesIndex[v[i]] = this.nodesIndex[v[i]];
+            else
+              throw 'activateNodesIndex: Wrong arguments.';
+        }
+        else if (arguments.length === 2) {
+          for (i = 0, l = v.length; i < l; i++)
+            if (typeof v[i] === 'string') {
+              if (isActive)
+                this.activeNodesIndex[v[i]] = this.nodesIndex[v[i]];
+              else
+                delete this.activeNodesIndex[v[i]];
+            }
+            else
+              throw 'activateNodesIndex: Wrong arguments.';
+        }
+        else
+          throw 'activateNodesIndex: Wrong arguments.';
+      }
+    }
+  });
+
+  graph.addIndex('activeEdgesIndex', {
+    constructor: function() {
+      this.activeEdgesIndex = Object.create(null);
+    },
+    addEdge: function(e) {
+      if (e.active)
+        this.activeEdgesIndex[e.id] = this.edgesIndex[e.id];
+    },
+    dropEdge: function(e) {
+      delete this.activeEdgesIndex[e.id];
+    },
+    activateEdges: function(v, isActive) {
+      // Index all edges
+      if (!arguments.length) {
+        this.edgesArray.forEach(function(o) {
+          this.activeEdgesIndex[o.id] = o;
+        }, this);
+      }
+      else if (arguments.length === 1 && typeof v === 'boolean') {
+        if (v) {
+          this.edgesArray.forEach(function(o) {
+            this.activeEdgesIndex[o.id] = o;
+          }, this);
+        } else {
+          this.activeEdgesIndex = Object.create(null);
+        }
+      }
+
+      // Index one edge:
+      else if (typeof v === 'string') {
+        if (arguments.length === 1) {
+          this.activeEdgesIndex[v] = this.edgesIndex[v];
+        }
+        else if (arguments.length === 2) {
+          if (isActive)
+            this.activeEdgesIndex[v] = this.edgesIndex[v];
+          else
+            delete this.activeEdgesIndex[v];
+        }
+        else
+          throw 'activeEdgesIndex: Wrong arguments.';
+      }
+
+      // Index a set of edges:
+      else if (Object.prototype.toString.call(v) === '[object Array]') {
+        var i,
+            l,
+            a = [];
+
+        if (arguments.length === 1) {
+          for (i = 0, l = v.length; i < l; i++)
+            if (typeof v[i] === 'string')
+              this.activeEdgesIndex[v[i]] = this.edgesIndex[v[i]];
+            else
+              throw 'activeEdgesIndex: Wrong arguments.';
+        }
+        else if (arguments.length === 2) {
+          for (i = 0, l = v.length; i < l; i++)
+            if (typeof v[i] === 'string') {
+              if (isActive)
+                this.activeEdgesIndex[v[i]] = this.edgesIndex[v[i]];
+              else
+                delete this.activeEdgesIndex[v[i]];
+            }
+            else
+              throw 'activeEdgesIndex: Wrong arguments.';
+        }
+        else
+          throw 'activeEdgesIndex: Wrong arguments.';
+      }
+    }
+  });
+
+  graph.addMethod('activeNodes', function() {
+    // Return an array of the active nodes:
+    var a = [];
+    for(var id in this.activeNodesIndex) {
+        a.push(this.activeNodesIndex[id]);
+    }
+    return a;
+  });
+
+  graph.addMethod('activeEdges', function() {
+    // Return an array of the active edges:
+    var a = [];
+    for(var id in this.activeEdgesIndex) {
+        a.push(this.activeEdgesIndex[id]);
+    }
+    return a;
+  });
+
 
 
 
