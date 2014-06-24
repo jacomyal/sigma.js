@@ -18,9 +18,9 @@
     POINTS: 3,
     ATTRIBUTES: 5,
     addNode: function(node, data, i, prefix, settings) {
-      var color = (node.active) ? 
-        node.active_color || settings('defaultNodeActiveColor') : 
-        node.color || settings('defaultNodeColor');
+      var color = node.active ? 
+            node.active_color || settings('defaultNodeActiveColor') : 
+            node.color || defaultNodeColor;
       color = sigma.utils.floatColor(
         color || settings('defaultNodeColor')
       );

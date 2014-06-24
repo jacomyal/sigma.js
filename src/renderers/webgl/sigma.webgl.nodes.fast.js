@@ -24,9 +24,9 @@
     POINTS: 1,
     ATTRIBUTES: 4,
     addNode: function(node, data, i, prefix, settings) {
-      var color = (node.active) ? 
-        node.active_color || settings('defaultNodeActiveColor') : 
-        node.color || settings('defaultNodeColor');
+      var color = node.active ? 
+            node.active_color || settings('defaultNodeActiveColor') : 
+            node.color || defaultNodeColor;
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
       data[i++] = node[prefix + 'size'];
