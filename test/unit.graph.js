@@ -315,6 +315,7 @@ test('Basic manipulation', function() {
 
 test('Methods and attached functions', function() {
   var counter,
+      colorPalette = { Person: '#C3CBE1', Place: '#9BDEBD' },
       myGraph;
 
   counter = 0;
@@ -322,16 +323,25 @@ test('Methods and attached functions', function() {
     counter++;
   });
 
+  sigma.classes.graph.attachBefore('addNode', 'applyNodeColorPalette', function(n) {
+    n.color = colorPalette[n.category];
+  });
+
   sigma.classes.graph.addMethod('getNodeLabel', function(nId) {
     return (this.nodesIndex[nId] || {}).label;
   });
 
   myGraph = new sigma.classes.graph();
-  myGraph.addNode({ id: 'n0', label: 'My node' });
+  myGraph.addNode({ id: 'n0', label: 'My node', category: 'Person' });
   strictEqual(
     1,
     counter,
     'Attached functions are effectively executed when the anchor method is called.'
+  );
+  strictEqual(
+    myGraph.nodes('n0').color,
+    '#C3CBE1',
+    'Attached "before" functions are effectively executed before when the anchor method is called.'
   );
   strictEqual(
     myGraph.getNodeLabel('n0'),
@@ -353,6 +363,22 @@ test('Methods and attached functions', function() {
     },
     /The method "undefinedMethod" does not exist./,
     'Attaching a function to an unexisting method when throws an error.'
+  );
+
+  throws(
+    function() {
+      sigma.classes.graph.attachBefore('addNode', 'applyNodeColorPalette', function() {});
+    },
+    /A function "applyNodeColorPalette" is already attached to the method "addNode"/,
+    'Attaching a "before" function to a method when there is already a "before" function attached to this method under the same key throws an error.'
+  );
+
+  throws(
+    function() {
+      sigma.classes.graph.attachBefore('undefinedMethod', 'applyNodeColorPalette', function() {});
+    },
+    /The method "undefinedMethod" does not exist./,
+    'Attaching a "before" function to an unexisting method when throws an error.'
   );
 
   throws(

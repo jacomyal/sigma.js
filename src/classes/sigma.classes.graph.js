@@ -5,6 +5,7 @@
       _indexes = Object.create(null),
       _initBindings = Object.create(null),
       _methodBindings = Object.create(null),
+      _methodBeforeBindings = Object.create(null),
       _defaultSettings = {
         immutable: true,
         clone: true
@@ -109,6 +110,10 @@
       var k,
           res;
 
+      // Execute "before" bound functions:
+      for (k in _methodBeforeBindings[methodName])
+        _methodBeforeBindings[methodName][k].apply(scope, arguments);
+
       // Apply the method:
       res = fn.apply(scope, arguments);
 
@@ -178,6 +183,7 @@
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
+    _methodBeforeBindings[methodName] = Object.create(null);
 
     return this;
   };
@@ -185,7 +191,9 @@
   /**
    * This global methods attaches a function to a method. Anytime the specified
    * method is called, the attached function is called right after, with the
-   * same arguments and in the same scope.
+   * same arguments and in the same scope. The attached function is called 
+   * right before if the last argument is true, unless the method is the graph 
+   * constructor.
    *
    * To attach a function to the graph constructor, use 'constructor' as the
    * method name (first argument).
@@ -204,18 +212,32 @@
    *  > myGraph.addNode({ id: '1' }).addNode({ id: '2' });
    *  > console.log(timesAddNodeCalled); // outputs 2
    *
+   * The idea for calling a function before is to provide pre-processors, for
+   * instance:
+   *
+   *  > var colorPalette = { Person: '#C3CBE1', Place: '#9BDEBD' };
+   *  > graph.attach('addNode', 'applyNodeColorPalette', function(n) {
+   *  >   n.color = colorPalette[n.category];
+   *  > }, true);
+   *  > 
+   *  > var myGraph = new graph();
+   *  > myGraph.addNode({ id: 'n0', category: 'Person' });
+   *  > console.log(myGraph.nodes('n0').color); // outputs '#C3CBE1'
+   *
    * @param  {string}   methodName The name of the related method or
    *                               "constructor".
    * @param  {string}   key        The key to identify the function to attach.
    * @param  {function} fn         The function to bind.
+   * @param  {boolean}  before     If true the function is called right before.
    * @return {object}              The global graph constructor.
    */
-  graph.attach = function(methodName, key, fn) {
+  graph.attach = function(methodName, key, fn, before) {
     if (
       typeof methodName !== 'string' ||
       typeof key !== 'string' ||
       typeof fn !== 'function' ||
-      arguments.length !== 3
+      arguments.length < 3 ||
+      arguments.length > 4
     )
       throw 'attach: Wrong arguments.';
 
@@ -224,10 +246,18 @@
     if (methodName === 'constructor')
       bindings = _initBindings;
     else {
-      if (!_methodBindings[methodName])
+      if (before) {
+        if (!_methodBeforeBindings[methodName])
         throw 'The method "' + methodName + '" does not exist.';
 
-      bindings = _methodBindings[methodName];
+        bindings = _methodBeforeBindings[methodName];
+      }
+      else {
+        if (!_methodBindings[methodName])
+          throw 'The method "' + methodName + '" does not exist.';
+
+        bindings = _methodBindings[methodName];
+      }
     }
 
     if (bindings[key])
@@ -237,6 +267,13 @@
     bindings[key] = fn;
 
     return this;
+  };
+
+  /**
+   * Alias of attach(methodName, key, fn, true).
+   */
+  graph.attachBefore = function(methodName, key, fn) {
+    return this.attach(methodName, key, fn, true);
   };
 
   /**
