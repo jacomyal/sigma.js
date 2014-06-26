@@ -129,6 +129,12 @@ test('Basic manipulation', function() {
     '"nodes" with a strings array as arguments returns the array of specified nodes.'
   );
 
+  deepEqual(
+    myGraph.adjacentNodes('n0'),
+    [graph.nodes[1]],
+    '"adjacentNodes" returns the adjacent nodes of a specified node'
+  );
+
   throws(
     function() {
       myGraph.nodes(['n0', 'n1', 123]);
@@ -236,6 +242,12 @@ test('Basic manipulation', function() {
     myGraph.edges(['e0', 'e0']),
     [graph.edges[0], graph.edges[0]],
     '"edges" with a strings array as arguments returns the array of specified edge.'
+  );
+
+  deepEqual(
+    myGraph.adjacentEdges('n0'),
+    [graph.edges[0]],
+    '"adjacentEdges" returns the adjacent edges of a specified node'
   );
 
   throws(
