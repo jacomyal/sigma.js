@@ -40,6 +40,7 @@
     this.camera = camera;
     this.domElements = {
       graph: null,
+      groups: {},
       nodes: {},
       edges: {},
       labels: {},
@@ -219,10 +220,14 @@
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
   sigma.renderers.svg.prototype.initDOM = function(tag) {
-    var dom = document.createElementNS(this.settings('xmlns'), tag);
+    var dom = document.createElementNS(this.settings('xmlns'), tag),
+        c = this.settings('classPrefix'),
+        g,
+        l,
+        i;
 
     dom.style.position = 'absolute';
-    dom.setAttribute('class', this.settings('classPrefix') + '-svg');
+    dom.setAttribute('class', c + '-svg');
 
     // Setting SVG namespace
     dom.setAttribute('xmlns', this.settings('xmlns'));
@@ -231,10 +236,24 @@
 
     // Creating the measurement canvas
     var canvas = document.createElement('canvas');
-    canvas.setAttribute('class', 'sigma-measurement-canvas');
+    canvas.setAttribute('class', c + '-measurement-canvas');
 
     // Appending elements
     this.domElements.graph = this.container.appendChild(dom);
+
+    // Creating groups
+    var groups = ['edges', 'nodes', 'labels', 'hovers'];
+    for (i = 0, l = groups.length; i < l; i++) {
+      g = document.createElementNS(this.settings('xmlns'), 'g');
+
+      g.setAttributeNS(null, 'id', c + '-group-' + groups[i]);
+      g.setAttributeNS(null, 'class', c + '-group');
+
+      this.domElements.groups[groups[i]] =
+        this.domElements.graph.appendChild(g);
+    }
+
+    // Appending measurement canvas
     this.container.appendChild(canvas);
     this.measurementCanvas = canvas.getContext('2d');
   };
@@ -250,6 +269,7 @@
    sigma.renderers.svg.prototype.createDOMElements = function() {
     var nodes = this.graph.nodes,
         edges = this.graph.edges,
+        groups = this.domElements.groups,
         prefix = this.options.prefix || '',
         drawEdges = this.settings('drawEdges'),
         drawNodes = this.settings('drawNodes'),
@@ -280,7 +300,7 @@
 
           // Attaching the nodes elements
           // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.edges[o.id]);
+          groups.edges.appendChild(this.domElements.edges[o.id]);
         }
 
       }
@@ -299,10 +319,11 @@
 
           // Attaching the nodes elements
           // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.nodes[o.id]);
+          groups.nodes.appendChild(this.domElements.nodes[o.id]);
         }
       }
 
+    // TODO: we can do a single loop here
     // Creating the labels elements
     renderers = sigma.svg.labels;
     if (drawLabels)
@@ -317,7 +338,7 @@
 
           // Attaching the label elements
           // TODO: display opt or dom inclusion opt
-          this.domElements.graph.appendChild(this.domElements.labels[o.id]);
+          groups.labels.appendChild(this.domElements.labels[o.id]);
         }
 
       }
@@ -373,7 +394,7 @@
       self.domElements.hovers[node.id] = hover;
 
       // Inserting the hover in the dom
-      self.domElements.graph.appendChild(hover);
+      self.domElements.groups.hovers.appendChild(hover);
       hoveredNode = node;
     }
 
@@ -387,7 +408,7 @@
         return;
 
       // Deleting element
-      self.domElements.graph.removeChild(
+      self.domElements.groups.hovers.removeChild(
         self.domElements.hovers[node.id]
       );
       hoveredNode = null;
@@ -404,7 +425,7 @@
           });
 
       // Deleting element before update
-      self.domElements.graph.removeChild(
+      self.domElements.groups.hovers.removeChild(
         self.domElements.hovers[hoveredNode.id]
       );
       delete self.domElements.hovers[hoveredNode.id];
@@ -418,7 +439,7 @@
       self.domElements.hovers[hoveredNode.id] = hover;
 
       // Inserting the hover in the dom
-      self.domElements.graph.appendChild(hover);
+      self.domElements.groups.hovers.appendChild(hover);
     }
 
     // Binding events
