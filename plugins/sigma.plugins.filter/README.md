@@ -1,7 +1,7 @@
 sigma.plugins.filter
 ==================
 
-Plugin developed by [Sébastien Heymann](seb@linkurio.us) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Sébastien Heymann](sheymann) for [Linkurious](https://github.com/Linkurious).
 
 ---
 ## General
@@ -49,7 +49,6 @@ Predicate processors are functions which wrap one predicate and apply it to the 
 For each node of the graph, the `nodesBy` processor sets the attribute `hidden` to false if the predicate is true for the node. It also sets the `hidden` attribute of edges to true if one of the edge's extremities is hidden. For instance:
 
 ````javascript
-filter = new sigma.plugins.filter(sigInst);
 // Only connected nodes (i.e. nodes of positive degree) should be visible:
 filter.nodesBy(function(n) {
   return this.degree(n.id) > 0;
@@ -59,7 +58,6 @@ filter.nodesBy(function(n) {
 For each edge of the graph, the `edgesBy` processor sets the attribute `hidden` to false if the predicate is true for the edge. For instance:
 
 ````javascript
-filter = new sigma.plugins.filter(sigInst);
 // Only edges of size above one should be visible:
 filter.edgesBy(function(e) {
   return e.size > 1;
@@ -69,15 +67,14 @@ filter.edgesBy(function(e) {
 For each neighbor node of a specified node, the `neighborsOf` processor sets the attribute `hidden` to true if it is not directly connected to the node. It also sets the `hidden` attribute of edges to true if one of the edge's extremities is hidden. For instance:
 
 ````javascript
-filter = new sigma.plugins.filter(sigInst);
 // Only neighbors of the node 'n0' should be visible:
 filter.neighborsOf('n0');
 ````
 
-Processors instanciated with a predicate are called filters. **Filters are not applied until the `apply()` method is called.**
+Processors instanciated with a predicate are called filters. **Filters are not applied until the `apply` method is called.**
 
-## Filters chaining
-Combining filters is easy! Declare one filter after another, then call the `apply()` method to execute them on the graph in that order. For instance:
+## Filters chain
+Combining filters is easy! Declare one filter after another, then call the `apply` method to execute them on the graph in that order. For instance:
 
 ````javascript
 // graph = {
@@ -87,7 +84,6 @@ Combining filters is easy! Declare one filter after another, then call the `appl
 //     {id:'e1', source:'n1', target:'n2', size:0.5},
 //     {id:'e2', source:'n1', target:'n2'}]
 // }
-filter = new sigma.plugins.filter(sigInst);
 filter
     .nodesBy(function(n) {
       return this.degree(n.id) > 0;
@@ -115,10 +111,10 @@ filter
 // all nodes are hidden
 ````
 
-Filters are internally stored in an array.
+Filters are internally stored in an array called the `chain`.
 
 ## Undo filters
-Undoing filters means to remove them from the internal filters chain. Filters can be undone easily. Choose which filter(s) to undo, or undo all of them at once.
+Undoing filters means to remove them from the `chain`. Filters can be undone easily. Choose which filter(s) to undo, or undo all of them at once.
 
 Filters can be associated with keys at declaration, where keys are any string you give. For instance, the following filter has the key *node-animal*:
 
@@ -139,21 +135,29 @@ filter
 Multiple filters can be undone at once, for instance:
 
 ````javascript
-filter.undo('node-animal', 'edge-size', 'high-node-degree')
-// don't forget to `apply()` anytime!
+filter.undo('node-animal', 'edge-size', 'high-node-degree');
+// don't forget to call `apply()` anytime!
+````
+
+Alternative syntax:
+
+````javascript
+var a = ['node-animal', 'edge-size', 'high-node-degree'];
+filter.undo(a);
+// don't forget to call `apply()` anytime!
 ````
 
 Finally, undo all filters (with or without keys) as follows:
 
 ````javascript
-filter.undo()
-// don't forget to `apply()` anytime!
+filter.undo();
+// don't forget to call `apply()` anytime!
 ````
 
 Warning: you can't declare two filters with the same key, or it will throw an exception.
 
-## Export the filters chain
-The filters chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `filter.processors.nodes`, `filter.processors.edges`, `filter.processors.neighbors`. The predicate value is a copy of the predicate function. Dump the internal chain of filters as follows:
+## Export the chain
+The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `filter.processors.nodes`, `filter.processors.edges`, `filter.processors.neighbors`. The predicate value is a copy of the predicate function. Dump the `chain` using the `export` method as follows:
 
 ````javascript
 var chain = filter.export();
@@ -166,11 +170,10 @@ var chain = filter.export();
 // ]
 ````
 
-## Import a filters chain
-You can load a filters chain as well:
+## Import a chain
+You can load a filters chain using the `import` method:
 
 ````javascript
-var filter = new sigma.plugins.filter(s);
 var chain = [
   {
     key: 'my-filter',
