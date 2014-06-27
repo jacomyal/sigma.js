@@ -11,39 +11,95 @@
    * Sigma Filter
    * =============================
    *
-   * Author: Sébastien Heymann (Linkurious)
-   * Version: 0.1
+   * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
+   * @version 0.1
    */
 
    var _g = undefined,
        _s = undefined,
        _chain = [], // chain of wrapped filters
-       _keysIndex = Object.create(null);
+       _keysIndex = Object.create(null),
+       Processors = {};   // available predicate processors
+
 
   /**
-   * Filter Object
+   * Library of processors
    * ------------------
-   * @param  {sigma} s The related sigma instance.
    */
-  function Filter(s) {
-    _s = s;
-    _g = s.graph;
+
+   /**
+    *
+    * @param  {function} fn The predicate.
+    */
+  Processors.nodes = function nodes(fn) {
+    var n = _g.nodes(),
+        ln = n.length,
+        e = _g.edges(),
+        le = e.length;
+
+    // hide node, or keep former value
+    while(ln--)
+      n[ln].hidden = !fn.call(_g, n[ln]) || n[ln].hidden;
+    
+    while(le--)
+      if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
+        e[le].hidden = true;
   };
 
+   /**
+    *
+    * @param  {function} fn The predicate.
+    */
+  Processors.edges = function edges(fn) {
+    var e = _g.edges(),
+        le = e.length;
+
+    // hide edge, or keep former value
+    while(le--)
+      e[le].hidden = !fn.call(_g, e[le]) || e[le].hidden;
+  };
+
+   /**
+    *
+    * @param  {string} id The center node.
+    */
+  Processors.neighbors = function neighbors(id) {
+    var n = _g.nodes(),
+        ln = n.length,
+        e = _g.edges(),
+        le = e.length,
+        neighbors = _g.adjacentNodes(id),
+        nn = neighbors.length,
+        no = {};
+    
+    while(nn--)
+      no[neighbors[nn].id] = true;
+
+    while(ln--)
+      if (n[ln].id !== id && !(n[ln].id in no))
+        n[ln].hidden = true;
+    
+    while(le--)
+      if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
+        e[le].hidden = true;
+  };
+
+
   /**
-   * Add a filter to the chain of filters.
+   * This function adds a filter to the chain of filters.
    *
-   * @param  {function} wrapper The wrapped predicate.
-   * @param  {?string}   key    The key to identify the filter.
+   * @param  {function} fn  The filter (i.e. predicate processor).
+   * @param  {function} p   The predicate.
+   * @param  {?string}  key The key to identify the filter.
    */
-  function register(wrapper, key) {
+  function register(fn, p, key) {
     if (key != undefined && typeof key !== 'string')
       throw 'The filter key "'+ key.toString() +'" must be a string.';
 
     if (key != undefined && !key.length)
       throw 'The filter key must be a non-empty string.';
     
-    if (typeof wrapper !== 'function')
+    if (typeof fn !== 'function')
       throw 'The predicate of key "'+ key +'" must be a function.';
     
     if ('undo' === key)
@@ -57,12 +113,13 @@
 
     _chain.push({
       'key': key,
-      'fn': wrapper
+      'processor': fn,
+      'predicate': p
     });
   };
 
   /**
-   * Drop a set of filters from the chain.
+   * This function removes a set of filters from the chain.
    *
    * @param {object} o The filter keys.
    */
@@ -75,18 +132,19 @@
       delete _keysIndex[key];
   };
 
+
+
+
   /**
-   * Clone the filter chain and return the copy.
-   *
-   * > filter = new sigma.plugins.filter(s);
-   * > var filters = filter.chain();
-   *
-   * @return {object}   The cloned chain of filters.
+   * Filter Object
+   * ------------------
+   * @param  {sigma} s The related sigma instance.
    */
-  Filter.prototype.chain = function() {
-    // Clone the array of filters:
-    return _chain.slice(0);
+  function Filter(s) {
+    _s = s;
+    _g = s.graph;
   };
+
 
   /**
    * This method is used to filter the nodes. The method must be called with
@@ -98,7 +156,7 @@
    * adds the anonymous function to the chain of filters. The filter is not
    * executed until the apply() method is called.
    * 
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter.nodesBy(function(n) {
    * >   return this.degree(n.id) > 0;
    * > }, 'degreeNotNull');
@@ -109,20 +167,7 @@
    */
   Filter.prototype.nodesBy = function(fn, key) {
     // Wrap the predicate to be applied on the graph and add it to the chain.
-    register(function() {
-      var n = _g.nodes(),
-          ln = n.length,
-          e = _g.edges(),
-          le = e.length;
-
-      // hide node, or keep former value
-      while(ln--)
-        n[ln].hidden = !fn.call(_s.graph, n[ln]) || n[ln].hidden;
-      
-      while(le--)
-        if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
-          e[le].hidden = true;
-    }, key);
+    register(Processors.nodes, fn, key);
     
     return this;
   };
@@ -137,7 +182,7 @@
    * adds the anonymous function to the chain of filters. The filter is not
    * executed until the apply() method is called.
    *
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter.edgesBy(function(e) {
    * >   return e.size > 1;
    * > }, 'edgeSize');
@@ -148,14 +193,7 @@
    */
   Filter.prototype.edgesBy = function(fn, key) {
     // Wrap the predicate to be applied on the graph and add it to the chain.
-    register(function() {
-      var e = _g.edges(),
-          le = e.length;
-
-      // hide edge, or keep former value
-      while(le--)
-        e[le].hidden = !fn(e[le]) || e[le].hidden;
-    }, key);
+    register(Processors.edges, fn, key);
 
     return this;
   };
@@ -166,7 +204,7 @@
    * may take an identifier as argument to undo the filter later. The filter
    * is not executed until the apply() method is called.
    *
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter.neighborsOf('n0');
    *
    * @param  {string}               id  The node id.
@@ -180,26 +218,7 @@
       throw 'The node id must be a non-empty string.';
 
     // Wrap the predicate to be applied on the graph and add it to the chain.
-    register(function() {
-      var n = _g.nodes(),
-          ln = n.length,
-          e = _g.edges(),
-          le = e.length,
-          neighbors = _g.adjacentNodes(id),
-          nn = neighbors.length,
-          no = {};
-      
-      while(nn--)
-        no[neighbors[nn].id] = true;
-
-      while(ln--)
-        if (n[ln].id !== id && !(n[ln].id in no))
-          n[ln].hidden = true;
-      
-      while(le--)
-        if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
-          e[le].hidden = true;
-    }, key);
+    register(Processors.neighbors, id, key);
 
     return this;
   };
@@ -208,7 +227,7 @@
    * This method is used to execute the chain of filters and to refresh the
    * display.
    *
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter
    * >   .nodesBy(function(n) {
    * >     return this.degree(n.id) > 0;
@@ -219,7 +238,7 @@
    */
   Filter.prototype.apply = function() {
     for (var i = 0, len = _chain.length; i < len; ++i) {
-      _chain[i].fn();
+      _chain[i].processor(_chain[i].predicate);
     };
 
     if (_chain[0] && 'undo' === _chain[0].key) {
@@ -232,7 +251,7 @@
   };
 
   /**
-   * This methods undoes one or several filters, depending on how it is called.
+   * This method undoes one or several filters, depending on how it is called.
    *
    * To undo all filters, call "undo" without argument. To undo a specific
    * filter, call it with the key of the filter. To undo multiple filters, call
@@ -240,7 +259,7 @@
    * filter, in the same order. The undo is not executed until the apply()
    * method is called. For instance:
    *
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter
    * >   .nodesBy(function(n) {
    * >     return this.degree(n.id) > 0;
@@ -281,7 +300,7 @@
 
     unregister(q);
 
-    function wrapper() {
+    function processor() {
       var n = _g.nodes(),
           ln = n.length,
           e = _g.edges(),
@@ -296,17 +315,47 @@
 
     _chain.unshift({
       'key': 'undo',
-      'fn': wrapper
+      'processor': processor
     });
 
     return this;
   };
 
+  // fast deep copy function
+  function deepCopy(o) {
+    var copy = Object.create(null);
+    for (var i in o) {
+      if (typeof o[i] === "object" && o[i] !== null) {
+        copy[i] = deepCopy(o[i]);
+      }
+      else if (typeof o[i] === "function" && o[i] !== null) {
+        // clone function:
+        eval(" copy[i] = " +  o[i].toString());
+        //copy[i] = o[i].bind(_g);
+      }
+        
+      else
+        copy[i] = o[i];
+    }
+    return copy;
+  };
+
+  function cloneChain(chain) {
+    // Clone the array of filters:
+    var copy = chain.slice(0);
+    for (var i = 0, len = copy.length; i < len; i++) {
+      copy[i] = deepCopy(copy[i]);
+      if (typeof copy[i].processor === "function")
+        copy[i].processor = 'filter.processors.' + copy[i].processor.name;
+    };
+    return copy;
+  }
+
   /**
    * This method is used to empty the chain of filters.
    * Prefer the undo() method to reset filters.
    *
-   * > filter = new sigma.plugins.filter(s);
+   * > var filter = new sigma.plugins.filter(s);
    * > filter.clear();
    *
    * @return {sigma.plugins.filter} Returns the instance.
@@ -314,6 +363,78 @@
   Filter.prototype.clear = function() {
     _chain.length = 0; // clear the array
     _keysIndex = Object.create(null);
+    return this;
+  };
+
+  /**
+   * This method clones the filter chain and return the copy.
+   *
+   * > var filter = new sigma.plugins.filter(s);
+   * > var chain = filter.export();
+   *
+   * @return {object}   The cloned chain of filters.
+   */
+  Filter.prototype.export = function() {
+    var c = cloneChain(_chain);
+    return c;
+  };
+
+  /**
+   * This method sets the chain of filters with the specified chain.
+   *
+   * > var filter = new sigma.plugins.filter(s);
+   * > var chain = [
+   * >   {
+   * >     key: 'my-filter',
+   * >     predicate: function(n) {...},
+   * >     processor: 'filter.processors.nodes'
+   * >   }, ...
+   * > ];
+   * > filter.import(chain);
+   *
+   * @param {array} chain The chain of filters.
+   * @return {sigma.plugins.filter} Returns the instance.
+   */
+  Filter.prototype.import = function(chain) {
+    if (chain === undefined)
+      throw 'Wrong arguments.';
+
+    if (Object.prototype.toString.call(chain) !== '[object Array]')
+      throw 'The chain" must be an array.';
+
+    var copy = cloneChain(chain);
+
+    for (var i = 0, len = copy.length; i < len; i++) {
+      if (copy[i].predicate === undefined || copy[i].processor === undefined)
+        throw 'Wrong arguments.';
+
+      if (copy[i].key != undefined && typeof copy[i].key !== 'string')
+        throw 'The filter key "'+ copy[i].key.toString() +'" must be a string.';
+
+      if (typeof copy[i].predicate !== 'function')
+        throw 'The predicate of key "'+ copy[i].key +'" must be a function.';
+      
+      if (typeof copy[i].processor !== 'string')
+        throw 'The processor of key "'+ copy[i].key +'" must be a string.';
+
+      // Replace the processor name by the corresponding function:
+      switch(copy[i].processor) {
+        case 'filter.processors.nodes':
+          copy[i].processor = Processors.nodes;
+          break;
+        case 'filter.processors.edges':
+          copy[i].processor = Processors.edges;
+          break;
+        case 'filter.processors.neighbors':
+          copy[i].processor = Processors.neighbors;
+          break;
+        default:
+          throw 'Unknown processor ' + copy[i].processor;
+      }
+    };
+
+    _chain = copy;
+
     return this;
   };
 

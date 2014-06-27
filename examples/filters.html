@@ -61,6 +61,7 @@
     }
     #control-pane > div {
       margin: 10px;
+      overflow-x: auto;
     }
     .line {
       clear: both;
@@ -86,6 +87,10 @@
       padding: 8px 12px;
       font-weight: 700;
     }
+    .hidden {
+      display: none;
+      visibility: hidden;
+    }
 
     input[type=range] {
       width: 160px;
@@ -108,7 +113,9 @@
     <span class="line"></span>
     <div>
       <button id="reset-btn">Reset filters</button>
+      <button id="export-btn">Export</button>
     </div>
+    <div id="dump" class="hidden"></div>
   </div>
 </div>
 <script>
@@ -117,6 +124,9 @@
  */
 var filter;
 
+/**
+ * DOM utility functions
+ */
 var _ = {
   $: function (id) {
     return document.getElementById(id);
@@ -124,8 +134,55 @@ var _ = {
 
   all: function (selectors) {
     return document.querySelectorAll(selectors);
+  },
+
+  removeClass: function(selectors, cssClass) {
+    var nodes = document.querySelectorAll(selectors);
+    var l = nodes.length;
+    for ( i = 0 ; i < l; i++ ) {
+      var el = nodes[i];
+      // Bootstrap compatibility
+      el.className = el.className.replace(cssClass, '');
+    }
+  },
+
+  addClass: function (selectors, cssClass) {
+    var nodes = document.querySelectorAll(selectors);
+    var l = nodes.length;
+    for ( i = 0 ; i < l; i++ ) {
+      var el = nodes[i];
+      // Bootstrap compatibility
+      if (-1 == el.className.indexOf(cssClass)) {
+        el.className += ' ' + cssClass;
+      }
+    }
+  },
+
+  show: function (selectors) {
+    this.removeClass(selectors, 'hidden');
+  },
+
+  hide: function (selectors) {
+    this.addClass(selectors, 'hidden');
+  },
+
+  toggle: function (selectors, cssClass) {
+    var cssClass = cssClass || "hidden";
+    var nodes = document.querySelectorAll(selectors);
+    var l = nodes.length;
+    for ( i = 0 ; i < l; i++ ) {
+      var el = nodes[i];
+      //el.style.display = (el.style.display != 'none' ? 'none' : '' );
+      // Bootstrap compatibility
+      if (-1 !== el.className.indexOf(cssClass)) {
+        el.className = el.className.replace(cssClass, '');
+      } else {
+        el.className += ' ' + cssClass;
+      }
+    }
   }
 };
+
 
 function updatePane (graph, filter) {
   // get max degree
@@ -153,8 +210,19 @@ function updatePane (graph, filter) {
   // reset button
   _.$('reset-btn').addEventListener("click", function(e) {
     _.$('min-degree').value = 0;
+    _.$('min-degree-val').textContent = '0';
     _.$('node-category').selectedIndex = 0;
     filter.undo().apply();
+    _.$('dump').textContent = '';
+    _.hide('#dump');
+  });
+
+  // export button
+  _.$('export-btn').addEventListener("click", function(e) {
+    var chain = filter.export();
+    console.log(chain);
+    _.$('dump').textContent = JSON.stringify(chain);
+    _.show('#dump');
   });
 }
 

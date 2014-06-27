@@ -68,36 +68,30 @@ test('API', function() {
   // Initialize the filter:
   filter = new sigma.plugins.filter(s);
 
-  s.graph.addNode(graph.nodes[0]);
-  s.graph.addNode(graph.nodes[1]);
-  s.graph.addNode(graph.nodes[2]);
-  s.graph.addNode(graph.nodes[3]);
-  s.graph.addNode(graph.nodes[4]);
+  s.graph.read(graph);
 
-  s.graph.addEdge(graph.edges[0]);
-  s.graph.addEdge(graph.edges[1]);
-  s.graph.addEdge(graph.edges[2]);
-  s.graph.addEdge(graph.edges[3]);
-
+  // helper function
   function hiddenNodes() {
     return s.graph.nodes().filter(function(n) {
       return n.hidden;
     });
   };
 
+  // helper function
   function hiddenEdges() {
     return s.graph.edges().filter(function(e) {
       return e.hidden;
     });
   };
 
-  // Hide isolated nodes (i.e. degree(n) = 0)
+  // Show non-isolated nodes only
   function degreePredicate(n) {
     return this.degree(n.id) > 0;
   };
 
+  // Show edges without the myEdgeAttr attribute or with myEdgeAttr > 1
   function myEdgeAttrPredicate(e) {
-    return e.myEdgeAttr > 1;
+    return e.myEdgeAttr === undefined || e.myEdgeAttr > 1;
   };
 
   // Register the filter
@@ -137,6 +131,21 @@ test('API', function() {
   );
 
 
+  // Undo all filters
+  filter.undo().apply();
+
+  // Register an edge filter
+  filter
+    .edgesBy(myEdgeAttrPredicate)
+    .apply();
+
+  deepEqual(
+    hiddenEdges(),
+    [s.graph.edges('e0'), s.graph.edges('e1'), s.graph.edges('e3')],
+    '"apply" applies an edgesBy filter'
+  );
+
+
   // Register two filters and apply them
   filter
     .nodesBy(degreePredicate)
@@ -160,19 +169,19 @@ test('API', function() {
     .apply();
 
   deepEqual(
-    filter.chain().map(function(o) { return o.key }),
+    filter.export().map(function(o) { return o.key }),
     ['degree', 'attr'],
-    'The filter chain is exported'
+    'The filters chain is exported'
   );
 
 
-  // Clear the filter chain
+  // Clear the filters chain
   filter.clear();
   
   deepEqual(
-    filter.chain(),
+    filter.export(),
     [],
-    'The filter chain is cleared'
+    'The filters chain is cleared'
   );
 
   // Undo all filters
@@ -190,7 +199,7 @@ test('API', function() {
 
   deepEqual(
     hiddenNodes(),
-    [s.graph.nodes('n0') , s.graph.nodes('n4') ],
+    [s.graph.nodes('n4') ],
     '"undo" undoes the filters before it in the chain, and not the filters after it'
   );
 
@@ -200,7 +209,7 @@ test('API', function() {
 
   deepEqual(
     hiddenNodes(),
-    [s.graph.nodes('n0') , s.graph.nodes('n4') ],
+    [s.graph.nodes('n4') ],
     '"apply" is called multiple times'
   );
 
@@ -217,7 +226,101 @@ test('API', function() {
     '"undo" is called with multiple arguments'
   );
 
-  filter.undo().apply();
+
+  // Import an empty chain
+  filter.import([]);
+
+  strictEqual(
+    filter.export().length,
+    0,
+    'The empty chain is imported'
+  );
+
+
+  // Import a chain of filters
+  var chain = [
+    {
+      key: 'my-filter',
+      predicate: degreePredicate,
+      processor: 'filter.processors.nodes'
+    }
+  ];
+
+  filter.import(chain).apply();
+
+  deepEqual(
+    filter.export().map(function(o) { 
+      return {
+        key: o.key, 
+        predicate: o.predicate.toString(), 
+        processor: o.processor 
+      };
+    }),
+    [{
+      key: 'my-filter', 
+      predicate: degreePredicate.toString(),
+      processor: 'filter.processors.nodes'
+    }],
+    'The filters chain is imported'
+  );
+
+
+  // export > import > export
+  var dumpedChain = filter.import(filter.export()).export();
+
+  deepEqual(
+    chain.map(function(o) { 
+      return {
+        key: o.key, 
+        predicate: o.predicate.toString(), 
+        processor: o.processor 
+      };
+    }),
+    dumpedChain.map(function(o) { 
+      return {
+        key: o.key, 
+        predicate: o.predicate.toString(), 
+        processor: o.processor 
+      };
+    }),
+    'The exported filters chain is imported'
+  );
+
+
+  // check chain duplication
+  filter.clear();
+
+  strictEqual(
+    dumpedChain.length,
+    1,
+    'The exported chain is a deep copy of the internal chain'
+  );
+
+
+  // check chain duplication
+  filter.import(chain);
+  chain.length = 0;
+  degreePredicate = null;
+
+  deepEqual(
+    filter.export().map(function(o) { 
+      return {
+        key: o.key, 
+        predicate: o.predicate.toString().replace(/\s+/g, ' '), 
+        processor: o.processor 
+      };
+    }),
+    [
+      {
+        key: 'my-filter',
+        predicate: function degreePredicate(n) {
+          return this.degree(n.id) > 0;
+        }.toString().replace(/\s+/g, ' '),
+        processor: 'filter.processors.nodes'
+      }
+    ],
+    'The internal chain is a deep copy of the imported chain'
+  );
 
 
   throws(
