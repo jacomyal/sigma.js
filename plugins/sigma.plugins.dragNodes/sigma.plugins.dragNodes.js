@@ -52,6 +52,19 @@
       _prefix = renderer.options.prefix;
     }
 
+    // Calculates the global offset of the given element more accurately than
+    // element.offsetTop and element.offsetLeft.
+    var calculateOffset = function(element) {
+      var style = window.getComputedStyle(element);
+      var getCssProperty = function(prop) {
+        return parseInt(style.getPropertyValue(prop).replace('px', '')) || 0;
+      };
+      return {
+        left: element.getBoundingClientRect().left + getCssProperty('padding-left'),
+        top: element.getBoundingClientRect().top + getCssProperty('padding-top')
+      };
+    };
+
     var nodeMouseOver = function(event) {
       if (!_isOverNode) {
         _node = event.data.node;
@@ -96,8 +109,9 @@
     };
 
     var nodeMouseMove = function(event) {
-      var x = event.pageX - _container.offsetLeft,
-          y = event.pageY - _container.offsetTop,
+      var offset = calculateOffset(_container),
+          x = event.pageX - offset.left,
+          y = event.pageY - offset.top,
           cos = Math.cos(_camera.angle),
           sin = Math.sin(_camera.angle),
           nodes = s.graph.nodes(),
