@@ -61,6 +61,7 @@ module.exports = function(grunt) {
     'plugins.animate',
     'plugins.dragNodes',
     'plugins.neighborhoods',
+    'statistics.HITS',
     'renderers.customShapes'
   ];
 
