@@ -152,6 +152,4 @@
     }
   )
 
-  sigma.utils.pkg('sigma.plugins')
-
 }).call(window)
