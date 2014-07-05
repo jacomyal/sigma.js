@@ -28,7 +28,7 @@
   "scripts": {
     "start": "http-server -p 8000",
     "test": "grunt travis",
-    "build": "grunt uglify",
+    "build": "grunt build",
     "prepublish": "grunt npmPrePublish"
   }
 }

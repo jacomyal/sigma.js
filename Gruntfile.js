@@ -172,6 +172,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify']);
   grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify', 'zip']);
   grunt.registerTask('npmPrePublish', ['uglify:plugins', 'grunt', 'concat:require']);
+  grunt.registerTask('build', ['uglify', 'grunt', 'concat:require']);
 
   // For travis-ci.org, only launch tests:
   grunt.registerTask('travis', ['qunit']);
