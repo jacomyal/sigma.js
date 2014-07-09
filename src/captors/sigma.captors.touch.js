@@ -284,6 +284,8 @@
               _self.dispatchEvent('mousemove', {
                 x: pos0.x - e.target.width / 2,
                 y: pos0.y - e.target.height / 2,
+                clientX: e.clientX,
+                clientY: e.clientY,
                 ctrlKey: e.ctrlKey,
                 metaKey: e.metaKey,
                 altKey: e.altKey,
@@ -388,6 +390,8 @@
         _self.dispatchEvent('doubleclick', {
           x: pos.x - e.target.width / 2,
           y: pos.y - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,

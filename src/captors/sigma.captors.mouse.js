@@ -96,6 +96,8 @@
         _self.dispatchEvent('mousemove', {
           x: sigma.utils.getX(e) - e.target.width / 2,
           y: sigma.utils.getY(e) - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
@@ -188,6 +190,8 @@
         _self.dispatchEvent('mouseup', {
           x: x - e.target.width / 2,
           y: y - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
@@ -221,6 +225,8 @@
         _self.dispatchEvent('mouseup', {
           x: _startMouseX - e.target.width / 2,
           y: _startMouseY - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
@@ -251,6 +257,8 @@
         _self.dispatchEvent('click', {
           x: sigma.utils.getX(e) - e.target.width / 2,
           y: sigma.utils.getY(e) - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
@@ -283,6 +291,8 @@
         _self.dispatchEvent('doubleclick', {
           x: _startMouseX - e.target.width / 2,
           y: _startMouseY - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
