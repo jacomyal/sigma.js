@@ -113,7 +113,7 @@
 
   /**
    * We now proced to use the generics to define our standard shape drawers:
-   * solid, dotted, dashed
+   * solid, dotted, dashed, tapered, parallel
    * ----------
    */
   var drawSolidLine = function(edge, source, target, color, prefix, context) {
@@ -169,6 +169,51 @@
     context.lineTo(c.xi_prime, c.yi_prime);
   };
   register("tapered", genericDrawShape(drawTapered));
+
+  /**
+   * Draw two parallel lines.
+   */
+  var drawParallelLines = function(edge, source, target, color, prefix, context) {
+    var size = edge['renderer1:size'],
+        dist = distance(
+          source['renderer1:x'], 
+          source['renderer1:y'], 
+          target['renderer1:x'], 
+          target['renderer1:y']
+    );
+
+    // Intersection points of the source node circle
+    var c = circleIntersection(
+      source['renderer1:x'], 
+      source['renderer1:y'], 
+      size,
+      target['renderer1:x'], 
+      target['renderer1:y'], 
+      dist);
+
+    // Intersection points of the target node circle
+    var d = circleIntersection(
+      target['renderer1:x'], 
+      target['renderer1:y'], 
+      size,
+      source['renderer1:x'], 
+      source['renderer1:y'], 
+      dist);
+
+
+    context.strokeStyle = color;
+    context.lineWidth = edge[prefix + 'size'] || 1;
+    context.beginPath();
+    context.moveTo(c.xi, c.yi);
+    context.lineTo(d.xi_prime, d.yi_prime);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(c.xi_prime, c.yi_prime);
+    context.lineTo(d.xi, d.yi);
+    context.stroke();
+  };
+  register("parallel", genericDrawShape(drawParallelLines));
 
 
   /**

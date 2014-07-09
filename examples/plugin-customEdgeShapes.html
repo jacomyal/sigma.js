@@ -57,8 +57,8 @@ sigma.utils.pkg('sigma.canvas.nodes');
 var i,
     s,
     img,
-    N = 100,
-    E = 500,
+    N = 10,
+    E = 50,
     g = {
       nodes: [],
       edges: []
@@ -95,7 +95,7 @@ for (i = 0; i < E; i++) {
     target: 'n' + (Math.random() * N | 0),
     // note the EdgeShapeLibrary.enumerate() returns the names of all
     // supported renderers
-    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*3)],
+    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*4)],
     size: Math.random()
   });
 }
