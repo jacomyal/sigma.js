@@ -33,6 +33,7 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.popup/sigma.plugins.popup.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -79,7 +80,13 @@ for (i = 0; i < N; i++)
     x: Math.random(),
     y: Math.random(),
     size: Math.random(),
-    color: '#666'
+    color: '#666',
+    data: {
+      name: 'Jean',
+      gender: 'Male',
+      age: 28,
+      city: 'Paris'
+    }
   });
 
 for (i = 0; i < E; i++)
@@ -99,7 +106,23 @@ s = new sigma({
 
 // Instanciate the popup plugin:
 sigma.plugins.popup.nodes(s, {
+  show: 'overNode',
+  hide: 'outNode',
   cssClass: 'node-popup',
-  template: "<div>Hello world!</div>"
+  template: 
+  '<div>' +
+  ' {{label}}' +
+  '  <table>' +
+  '  <tr><td>Name</td> <td>{{data.name}}</td></tr>' +
+  '  <tr><td>Gender</td> <td>{{data.gender}}</td></tr>' +
+  '  <tr><td>Age</td> <td>{{data.age}}</td></tr>' +
+  '  <tr><td>City</td> <td>{{data.city}}</td></tr>' +
+  '  </table>' +
+  '  Number of connections: {{degree}}' +
+  '</div>',
+  renderer: function(node, template) {
+    node.degree = this.degree(node.id);
+    return Mustache.render(template, node);
+  }
 });
 </script>
