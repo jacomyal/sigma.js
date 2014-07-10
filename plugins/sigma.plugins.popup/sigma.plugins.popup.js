@@ -220,7 +220,7 @@
   };
 
   /**
-   * This function will display a popup when a node event is triggered. It will
+   * This function will display a popup when a sigma event is fired. It will
    * basically create a DOM element, fill it with the template or the result of
    * the renderer function, set its position and CSS class, and insert the
    * element as a child of the sigma container. Only one popup may exist.
