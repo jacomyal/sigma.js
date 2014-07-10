@@ -44,24 +44,96 @@
       position: absolute;
     }
 
-    .node-popup {
-      background-color: #ffffff;
-      border: 1px solid #dddddd;
+    .sigma-popup {
       max-width: 240px;
       max-height: 280px;
+      background-color: rgb(249, 247, 237);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+
+    .sigma-popup-header {
+      font-variant: small-caps;
+      font-size: 120%;
+      color: #437356;
+      border-bottom: 1px solid #aac789;
       padding: 10px;
     }
+
+    .sigma-popup-body {
+      padding: 10px;
+    }
+
+    .sigma-popup-body th {
+      color: #999;
+      text-align: left;
+    }
+
+    .sigma-popup-footer {
+      padding: 10px;
+      border-top: 1px solid #aac789;
+    }
+
+    .sigma-popup > .arrow {
+      border-width: 10px;
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-color: transparent;
+      border-style: solid;
+    }
+
+    .sigma-popup.top {
+      margin-top: -12px;
+    }
+    .sigma-popup.top > .arrow {
+      left: 50%;
+      bottom: -10px;
+      margin-left: -10px;
+      border-top-color: rgb(249, 247, 237);
+      border-bottom-width: 0;
+    }
+
+    .sigma-popup.bottom {
+      margin-top: 12px;
+    }
+    .sigma-popup.bottom > .arrow {
+      left: 50%;
+      top: -10px;
+      margin-left: -10px;
+      border-bottom-color: rgb(249, 247, 237);
+      border-top-width: 0;
+    }
+
+    .sigma-popup.left {
+      margin-left: -12px;
+    }
+    .sigma-popup.left > .arrow {
+      top: 50%;
+      right: -10px;
+      margin-top: -10px;
+      border-left-color: rgb(249, 247, 237);
+      border-right-width: 0;
+    }
+
+    .sigma-popup.right {
+      margin-left: 12px;
+    }
+    .sigma-popup.right > .arrow {
+      top: 50%;
+      left: -10px;
+      margin-top: -10px;
+      border-right-color: rgb(249, 247, 237);
+      border-left-width: 0;
+    }
+
   </style>
   <div id="graph-container"></div>
 </div>
 <script>
 /**
- * This is a basic example on how to instanciate sigma. A random graph is
- * generated and stored in the "graph" variable, and then sigma is
- * instanciated directly with the graph.
- *
- * The simple instanciation of sigma is enough to make it render the graph
- * on the screen, since the graph is given directly to the constructor.
+ * This is an example on how to use node popups based on a random graph.
  */
 var i,
     s,
@@ -104,25 +176,39 @@ s = new sigma({
   container: 'graph-container'
 });
 
-// Instanciate the popup plugin:
-sigma.plugins.popup.nodes(s, {
-  show: 'overNode',
-  hide: 'outNode',
-  cssClass: 'node-popup',
-  template: 
-  '<div>' +
-  ' {{label}}' +
-  '  <table>' +
-  '  <tr><td>Name</td> <td>{{data.name}}</td></tr>' +
-  '  <tr><td>Gender</td> <td>{{data.gender}}</td></tr>' +
-  '  <tr><td>Age</td> <td>{{data.age}}</td></tr>' +
-  '  <tr><td>City</td> <td>{{data.city}}</td></tr>' +
-  '  </table>' +
-  '  Number of connections: {{degree}}' +
-  '</div>',
-  renderer: function(node, template) {
-    node.degree = this.degree(node.id);
-    return Mustache.render(template, node);
+// Minimal example of the popup plugin instanciation:
+/*sigma.plugins.popup(s, {
+  node: {
+    template: 'Hello node!'
+  }
+});*/
+
+// Instanciate the popup plugin with a Mustache renderer for node popups:
+sigma.plugins.popup(s, {
+  node: {
+    show: 'overNode',
+    hide: 'outNode',
+    cssClass: 'sigma-popup',
+    position: 'top',
+    //autoadjust: true,
+    template: 
+    '<div class="arrow"></div>' +
+    ' <div class="sigma-popup-header">{{label}}</div>' +
+    '  <div class="sigma-popup-body">' +
+    '    <table>' +
+    '      <tr><th>Name</th> <td>{{data.name}}</td></tr>' +
+    '      <tr><th>Gender</th> <td>{{data.gender}}</td></tr>' +
+    '      <tr><th>Age</th> <td>{{data.age}}</td></tr>' +
+    '      <tr><th>City</th> <td>{{data.city}}</td></tr>' +
+    '    </table>' +
+    '  </div>' +
+    '  <div class="sigma-popup-footer">Number of connections: {{degree}}</div>',
+    renderer: function(node, template) {
+      // The function context is s.graph
+      node.degree = this.degree(node.id);
+      return Mustache.render(template, node);
+    }
   }
 });
+
 </script>
