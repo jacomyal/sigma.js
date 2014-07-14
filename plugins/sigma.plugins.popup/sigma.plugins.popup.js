@@ -118,8 +118,8 @@
     _popup.style.position = 'absolute';
 
     // Default position is mouse position:
-    _popup.style.left = x;
-    _popup.style.top = y;
+    _popup.style.left = x + 'px';
+    _popup.style.top = y + 'px';
 
     // Insert the element in the DOM:
     s.renderers[0].container.appendChild(_popup);
@@ -135,26 +135,26 @@
     if (options.position === 'top') {
       // New position vertically aligned and on top of the mouse:
       _popup.className = options.cssClass + ' top';
-      _popup.style.left = x - (popupRect.right - popupRect.left) / 2;
-      _popup.style.top = y - (popupRect.bottom - popupRect.top);
+      _popup.style.left = x - (popupRect.right - popupRect.left) / 2 + 'px';
+      _popup.style.top = y - (popupRect.bottom - popupRect.top) + 'px';
     }
     else if (options.position === 'bottom') {
       // New position vertically aligned and on bottom of the mouse:
       _popup.className = options.cssClass + ' bottom';
-      _popup.style.left = x - (popupRect.right - popupRect.left) / 2;
-      _popup.style.top = y;
+      _popup.style.left = x - (popupRect.right - popupRect.left) / 2 + 'px';
+      _popup.style.top = y + 'px';
     }
     else if (options.position === 'left') {
       // New position vertically aligned and on bottom of the mouse:
       _popup.className = options.cssClass+ ' left';
-      _popup.style.left = x - (popupRect.right - popupRect.left);
-      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2;
+      _popup.style.left = x - (popupRect.right - popupRect.left) + 'px';
+      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2 + 'px';
     }
     else if (options.position === 'right') {
       // New position vertically aligned and on bottom of the mouse:
       _popup.className = options.cssClass + ' right';
-      _popup.style.left = x;
-      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2;
+      _popup.style.left = x + 'px';
+      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2 + 'px';
     }
     
     // Update offset
@@ -172,28 +172,28 @@
         if (options.position === 'top' || options.position === 'bottom') {
           _popup.className = options.cssClass + ' top';
         }
-        _popup.style.top = y - popupRect.bottom + popupRect.top;
+        _popup.style.top = y - popupRect.bottom + popupRect.top + 'px';
       }
       else if (offsetTop < 0) {
         _popup.className = options.cssClass;
         if (options.position === 'top' || options.position === 'bottom') {
           _popup.className = options.cssClass + ' bottom';
         }
-        _popup.style.top = y;
+        _popup.style.top = y + 'px';
       }
       if (offsetRight < 0) {
         _popup.className = options.cssClass;
         if (options.position === 'left' || options.position === 'right') {
           _popup.className = options.cssClass + ' left';
         }
-        _popup.style.left = x - popupRect.right + popupRect.left;
+        _popup.style.left = x - popupRect.right + popupRect.left + 'px';
       }
       else if (offsetLeft < 0) {
         _popup.className = options.cssClass;
         if (options.position === 'left' || options.position === 'right') {
           _popup.className = options.cssClass + ' right';
         }
-        _popup.style.left = x;
+        _popup.style.left = x + 'px';
       }
     }
   };
@@ -369,7 +369,15 @@
           }, settings.doubleClickDelay);
         })
       }
-    }    
+    }
+
+    // Prevent the browser context menu to appear
+    // if the right click event is already handled:
+    if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
+      s.renderers[0].container.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+      });
+    }
   };
 
 }).call(window);
