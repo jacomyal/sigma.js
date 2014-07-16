@@ -106,6 +106,14 @@ s = new sigma({
   }
 });
 
+s.graph.bind('activeNodes', function(event) {
+  console.log('active nodes:', event.data.nodes);
+});
+
+s.graph.bind('activeEdges', function(event) {
+  console.log('active edges:', event.data.edges);
+});
+
 s.graph.activateNodes('n0');
 s.graph.activateEdges('e0');
 

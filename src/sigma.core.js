@@ -365,7 +365,9 @@
           'downNode',
           'downNodes',
           'upNode',
-          'upNodes'
+          'upNodes',
+          'activeNodes',
+          'activeEdges'
         ],
         this._handler
       );
