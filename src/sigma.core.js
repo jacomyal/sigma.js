@@ -164,7 +164,7 @@
       }
     });
 
-    // Add a custom handler, to redispatch events from renderers:
+    // Add a custom handler, to redispatch events from graph and renderers:
     this._handler = (function(e) {
       var k,
           data = {};
@@ -175,6 +175,17 @@
       data.renderer = e.target;
       this.dispatchEvent(e.type, data);
     }).bind(this);
+
+
+    // Bind graph events:
+    if (this.graph.bind)
+      this.graph.bind(
+        [
+          'activeNodes',
+          'activeEdges'
+        ],
+        this._handler
+      );
 
     // Initialize renderers:
     a = _conf.renderers || [];
