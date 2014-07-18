@@ -23,9 +23,14 @@
         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'],
+        defaultNodeColor = settings('defaultNodeColor'),
+        borderSize = settings('borderSize'),
         fontSize = (settings('labelSize') === 'fixed') ?
           settings('defaultLabelSize') :
-          settings('labelSizeRatio') * size;
+          settings('labelSizeRatio') * size,
+        color = (node.active) ? 
+          node.active_color || settings('defaultNodeActiveColor'): 
+          node.color || defaultNodeColor;
 
     // Label background:
     context.font = (fontStyle ? fontStyle + ' ' : '') +
@@ -33,7 +38,7 @@
 
     context.beginPath();
     context.fillStyle = settings('labelHoverBGColor') === 'node' ?
-      (node.color || settings('defaultNodeColor')) :
+      (color || defaultNodeColor) :
       settings('defaultHoverLabelBGColor');
 
     if (settings('labelHoverShadow')) {
@@ -44,7 +49,10 @@
     }
 
     if (typeof node.label === 'string') {
-      x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
+      x = Math.round(node[prefix + 'x'] + 
+        borderSize + 
+        settings('outerBorderSize') - 
+        fontSize / 2 - 2);
       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
       w = Math.round(
         context.measureText(node.label).width + fontSize / 2 + size + 7
@@ -69,15 +77,15 @@
     }
 
     // Node border:
-    if (settings('borderSize') > 0) {
+    if (borderSize > 0) {
       context.beginPath();
       context.fillStyle = settings('nodeBorderColor') === 'node' ?
-        (node.color || settings('defaultNodeColor')) :
+        (color || defaultNodeColor) :
         settings('defaultNodeBorderColor');
       context.arc(
         node[prefix + 'x'],
         node[prefix + 'y'],
-        size + settings('borderSize'),
+        size + borderSize,
         0,
         Math.PI * 2,
         true
@@ -93,12 +101,16 @@
     // Display the label:
     if (typeof node.label === 'string') {
       context.fillStyle = (settings('labelHoverColor') === 'node') ?
-        (node.color || settings('defaultNodeColor')) :
+        (color || defaultNodeColor) :
         settings('defaultLabelHoverColor');
 
       context.fillText(
         node.label,
-        Math.round(node[prefix + 'x'] + size + 3),
+        Math.round(node[prefix + 'x'] + 
+          size + 
+          borderSize + 
+          settings('outerBorderSize') +
+          3),
         Math.round(node[prefix + 'y'] + fontSize / 3)
       );
     }

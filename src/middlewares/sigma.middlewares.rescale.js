@@ -114,11 +114,21 @@
     }
 
     // Rescale the nodes and edges:
-    for (i = 0, l = e.length; i < l; i++)
-      e[i][writePrefix + 'size'] = e[i][readPrefix + 'size'] * c + d;
+    var size;
+    for (i = 0, l = e.length; i < l; i++) {
+      size = e[i].active && !readPrefix.length ? 
+          e[i].active_size || e[i].size :
+          e[i][readPrefix + 'size'];
+
+      e[i][writePrefix + 'size'] = size * c + d;
+    }
 
     for (i = 0, l = n.length; i < l; i++) {
-      n[i][writePrefix + 'size'] = n[i][readPrefix + 'size'] * a + b;
+      size = n[i].active && !readPrefix.length ? 
+          n[i].active_size || n[i].size :
+          n[i][readPrefix + 'size'];
+
+      n[i][writePrefix + 'size'] = size * a + b;
       n[i][writePrefix + 'x'] =
         (n[i][readPrefix + 'x'] - (maxX + minX) / 2) * scale;
       n[i][writePrefix + 'y'] =

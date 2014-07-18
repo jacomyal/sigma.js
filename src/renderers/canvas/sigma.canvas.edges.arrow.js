@@ -13,7 +13,9 @@
    * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
-    var color = edge.color,
+    var color = edge.active ? 
+          edge.active_color || settings('defaultEdgeActiveColor') : 
+          edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
@@ -44,7 +46,15 @@
           break;
       }
 
-    context.strokeStyle = color;
+    if (edge.active) {
+      context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
+        (color || defaultEdgeColor) :
+        settings('defaultEdgeActiveColor');
+    }
+    else {
+      context.strokeStyle = color;
+    }
+
     context.lineWidth = thickness;
     context.beginPath();
     context.moveTo(sX, sY);

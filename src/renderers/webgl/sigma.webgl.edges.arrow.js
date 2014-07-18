@@ -22,7 +22,9 @@
           x2 = target[prefix + 'x'],
           y2 = target[prefix + 'y'],
           targetSize = target[prefix + 'size'],
-          color = edge.color;
+          color = edge.active ? 
+            edge.active_color || settings('defaultEdgeActiveColor') : 
+            edge.color;
 
       if (!color)
         switch (settings('edgeColor')) {
@@ -36,6 +38,12 @@
             color = settings('defaultEdgeColor');
             break;
         }
+
+      if (edge.active) {
+        color = settings('edgeActiveColor') === 'edge' ?
+          (color || defaultEdgeColor) :
+          settings('defaultEdgeActiveColor');
+      }
 
       // Normalize color:
       color = sigma.utils.floatColor(color);

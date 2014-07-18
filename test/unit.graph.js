@@ -313,6 +313,223 @@ test('Basic manipulation', function() {
   deepEqual(myGraph.edges(), graph.edges, '"read" adds properly the edges.');
 });
 
+test('Advanced manipulation', function() {
+  var a,
+      k,
+      opts = {},
+      settings = new sigma.classes.configurable(opts),
+      graph = {
+        nodes: [
+          {
+            id: 'n0',
+            label: 'Node 0',
+            myNodeAttr: 123
+          },
+          {
+            id: 'n1',
+            label: 'Node 1'
+          },
+          {
+            id: 'n2',
+            label: 'Node 2'
+          },
+          {
+            id: 'n3',
+            label: 'Node 3'
+          }
+        ],
+        edges: [
+          {
+            id: 'e0',
+            source: 'n0',
+            target: 'n1',
+            myEdgeAttr: 123
+          },
+          {
+            id: 'e1',
+            source: 'n1',
+            target: 'n2'
+          },
+          {
+            id: 'e2',
+            source: 'n1',
+            target: 'n3'
+          },
+          {
+            id: 'e3',
+            source: 'n2',
+            target: 'n3'
+          }
+        ]
+      };
+
+  // Initialize the graph:
+  var myGraph = new sigma.classes.graph(settings);
+
+  opts.immutable = opts.clone = true;
+  myGraph.addNode(graph.nodes[0]);
+  opts.clone = false;
+  myGraph.addNode(graph.nodes[1]);
+  myGraph.addNode(graph.nodes[2]);
+  myGraph.addNode(graph.nodes[3]);
+
+  opts.immutable = opts.clone = true;
+  myGraph.addEdge(graph.edges[0]);
+  opts.clone = false;
+  myGraph.addEdge(graph.edges[1]);
+  myGraph.addEdge(graph.edges[2]);
+  myGraph.addEdge(graph.edges[3]);
+
+
+  // (DE)ACTIVATING NODES:
+  // *********************
+  // all nodes:
+  myGraph.activateNodes();
+  equal(
+    myGraph.activeNodes().length, 
+    graph.nodes.length, 
+    'activeNodes() adds all nodes to activeNodesIndex');
+  myGraph.activateNodes(false);
+  equal(
+    myGraph.activeNodes().length, 
+    0, 
+    'activeNodes(false) removes all nodes from activeNodesIndex');
+  myGraph.activateNodes(true);
+  equal(
+    myGraph.activeNodes().length, 
+    graph.nodes.length, 
+    'activeNodes(true) adds all nodes to activeNodesIndex');
+  myGraph.activateNodes(false);
+
+  // one node:
+  myGraph.activateNodes('n0');
+  equal(
+    myGraph.nodes('n0').active, 
+    true, 
+    'activateNodes(nid) sets the node attribute "active" to true');
+  equal(
+    myGraph.activeNodes().length, 
+    1, 
+    'activateNodes(nid) adds one node to activeNodesIndex');
+  
+  myGraph.activateNodes('n0', false);
+  equal(
+    myGraph.nodes('n0').active, 
+    false, 
+    'activateNodes(nid, false) sets the node attribute "active" to false');
+  equal(
+    myGraph.activeNodes().length, 
+    0, 
+    'activateNodes(nid, false) removes one node from activeNodesIndex');
+  
+  myGraph.activateNodes('n0', true);
+  equal(
+    myGraph.nodes('n0').active, 
+    true, 
+    'activateNodes(nid, true) sets the node attribute "active" to true');
+  equal(
+    myGraph.activeNodes().length, 
+    1, 
+    'activateNodes(nid, true) adds one node to activeNodesIndex');
+  myGraph.activateNodes(false);
+
+  // a set of nodes:
+  myGraph.activateNodes(['n0', 'n1']);
+  equal(
+    myGraph.nodes('n0').active && myGraph.nodes('n1').active, 
+    true, 
+    'activateNodes([nid, nid]) sets the attribute "active" of the nodes to true');
+  equal(
+    myGraph.activeNodes().length, 
+    2, 
+    'activateNodes([nid, nid]) adds the nodes to activeNodesIndex');
+  
+  myGraph.activateNodes(['n0', 'n1'], false);
+  equal(
+    myGraph.nodes('n0').active || myGraph.nodes('n1').active, 
+    false, 
+    'activateNodes([nid, nid], false) sets the attribute "active" of the nodes to false');
+  equal(
+    myGraph.activeNodes().length, 
+    0, 
+    'activateNodes([nid, nid]) removes the nodes to activeNodesIndex');
+  
+
+  // (DE)ACTIVATING EDGES:
+  // *********************
+  // all edges:
+  myGraph.activateEdges();
+  equal(
+    myGraph.activeEdges().length, 
+    graph.edges.length, 
+    'activateEdges() adds all edges to activeEdgesIndex');
+  myGraph.activateEdges(false);
+  equal(
+    myGraph.activeEdges().length, 
+    0, 
+    'activateEdges(false) removes all edges from activeEdgesIndex');
+  myGraph.activateEdges(true);
+  equal(
+    myGraph.activeEdges().length, 
+    graph.edges.length, 
+    'activateEdges(true) adds all edges to activeEdgesIndex');
+  myGraph.activateEdges(false);
+
+  // one edge:
+  myGraph.activateEdges('e0');
+  equal(
+    myGraph.edges('e0').active, 
+    true, 
+    'activateEdges(nid) sets the edge attribute "active" to true');
+  equal(
+    myGraph.activeEdges().length, 
+    1, 
+    'activateEdges(nid) adds one edge to activeEdgesIndex');
+  
+  myGraph.activateEdges('e0', false);
+  equal(
+    myGraph.edges('e0').active, 
+    false, 
+    'activateEdges(nid, false) sets the edge attribute "active" to false');
+  equal(
+    myGraph.activeEdges().length, 
+    0, 
+    'activateEdges(nid, false) removes one edge from activeEdgesIndex');
+  
+  myGraph.activateEdges('e0', true);
+  equal(
+    myGraph.edges('e0').active, 
+    true, 
+    'activateEdges(nid, true) sets the edge attribute "active" to true');
+  equal(
+    myGraph.activeEdges().length, 
+    1, 
+    'activateEdges(nid, true) adds one edge to activeEdgesIndex');
+  myGraph.activateEdges(false);
+
+  // a set of edges:
+  myGraph.activateEdges(['e0', 'e1']);
+  equal(
+    myGraph.edges('e0').active && myGraph.edges('e1').active, 
+    true, 
+    'activateEdges([nid, nid]) sets the attribute "active" of the edges to true');
+  equal(
+    myGraph.activeEdges().length, 
+    2, 
+    'activateEdges([nid, nid]) adds the edges to activeEdgesIndex');
+  
+  myGraph.activateEdges(['e0', 'e1'], false);
+  equal(
+    myGraph.edges('e0').active || myGraph.edges('e1').active, 
+    false, 
+    'activateEdges([nid, nid], false) sets the attribute "active" of the edges to false');
+  equal(
+    myGraph.activeEdges().length, 
+    0, 
+    'activateEdges([nid, nid]) removes the edges to activeEdgesIndex');
+  
+});
+
 test('Methods and attached functions', function() {
   var counter,
       myGraph;

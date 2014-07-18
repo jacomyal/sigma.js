@@ -17,7 +17,9 @@
   sigma.canvas.labels.def = function(node, context, settings) {
     var fontSize,
         prefix = settings('prefix') || '',
-        size = node[prefix + 'size'];
+        size = node[prefix + 'size'],
+        fontStyle = node.active ? 
+          settings('activeFontStyle') : settings('fontStyle');
 
     if (size < settings('labelThreshold'))
       return;
@@ -29,15 +31,29 @@
       settings('defaultLabelSize') :
       settings('labelSizeRatio') * size;
 
-    context.font = (settings('fontStyle') ? settings('fontStyle') + ' ' : '') +
-      fontSize + 'px ' + settings('font');
-    context.fillStyle = (settings('labelColor') === 'node') ?
-      (node.color || settings('defaultNodeColor')) :
-      settings('defaultLabelColor');
+    context.font = (fontStyle ? fontStyle + ' ' : '') +
+      fontSize + 'px ' +
+      (node.active ?
+        settings('activeFont') || settings('font') :
+        settings('font'));
+
+    if (node.active)
+      context.fillStyle =
+        (settings('labelActiveColor') === 'node') ?
+        node.active_color || settings('defaultNodeActiveColor') :
+        settings('defaultLabelActiveColor');
+    else
+      context.fillStyle = 
+        (settings('labelColor') === 'node') ?
+        node.color || settings('defaultNodeColor') :
+        settings('defaultLabelColor');
 
     context.fillText(
       node.label,
-      Math.round(node[prefix + 'x'] + size + 3),
+      Math.round(node[prefix + 'x'] + 
+        size + 
+        (node.active ? settings('borderSize') + settings('outerBorderSize') : 0) +
+        3),
       Math.round(node[prefix + 'y'] + fontSize / 3)
     );
   };
