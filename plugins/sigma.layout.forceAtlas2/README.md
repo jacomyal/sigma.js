@@ -64,7 +64,9 @@ sigmaInstance.isForceAtlas2Running();
 * **gravity** *number* `1`
 * **slowDown** *number* `1`
 
+* **worker** *boolean* `true`: should the layout use a web worker?
+
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
 
-2. The layout won't stop by itself, so I you want it to stop, you have to trigger it explicitely.
+2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.

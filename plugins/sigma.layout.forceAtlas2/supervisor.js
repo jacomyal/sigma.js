@@ -11,12 +11,13 @@
    * Author: Guillaume Plique (Yomguithereal)
    * Version: 0.1
    */
+  var _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  var webWorkers = 'Worker' in window;
+  var webWorkers = 'Worker' in _root;
 
   /**
    * Supervisor Object
@@ -35,13 +36,15 @@
     this.ppn = 10;
     this.ppe = 3;
     this.config = {};
+    this.shouldUseWorker =
+      options.worker === false ? false : true && webWorkers;
 
     // State
     this.started = false;
     this.running = false;
 
     // Web worker or classic DOM events?
-    if (webWorkers) {
+    if (this.shouldUseWorker) {
       var blob = this.makeBlob(workerFn);
       this.worker = new Worker(URL.createObjectURL(blob));
 
@@ -170,7 +173,7 @@
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(content, buffers);
     else
       window.postMessage(content, '*');
@@ -202,7 +205,7 @@
 
   // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
-    this.worker.terminate();
+    this.worker && this.worker.terminate();
   };
 
   Supervisor.prototype.configure = function(config) {
@@ -215,7 +218,7 @@
 
     var data = {action: 'config', config: this.config};
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(data);
     else
       window.postMessage(data, '*');
@@ -229,7 +232,9 @@
 
     // Create supervisor if undefined
     if (!this.supervisor)
-      this.supervisor = new Supervisor(this);
+      this.supervisor = new Supervisor(this, config.worker !== undefined ? {
+        worker: config.worker
+      } : {});
 
     // Configuration provided?
     if (config)
@@ -269,7 +274,9 @@
 
   sigma.prototype.configForceAtlas2 = function(config) {
     if (!this.supervisor)
-      this.supervisor = new Supervisor(this);
+      this.supervisor = new Supervisor(this, config.worker !== undefined ? {
+        worker: config.worker
+      } : {});
 
     this.supervisor.configure(config);
 
