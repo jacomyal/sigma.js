@@ -225,60 +225,58 @@
    * Interface
    * ----------
    */
-  var supervisor = null;
-
   sigma.prototype.startForceAtlas2 = function(config) {
 
     // Create supervisor if undefined
-    if (!supervisor)
-      supervisor = new Supervisor(this);
+    if (!this.supervisor)
+      this.supervisor = new Supervisor(this);
 
     // Configuration provided?
     if (config)
-      supervisor.configure(config);
+      this.supervisor.configure(config);
 
     // Start algorithm
-    supervisor.start();
+    this.supervisor.start();
 
     return this;
   };
 
   sigma.prototype.stopForceAtlas2 = function() {
-    if (!supervisor)
+    if (!this.supervisor)
       return this;
 
     // Pause algorithm
-    supervisor.stop();
+    this.supervisor.stop();
 
     return this;
   };
 
   sigma.prototype.killForceAtlas2 = function() {
-    if (!supervisor)
+    if (!this.supervisor)
       return this;
 
     // Stop Algorithm
-    supervisor.stop();
+    this.supervisor.stop();
 
     // Kill Worker
-    supervisor.killWorker();
+    this.supervisor.killWorker();
 
     // Kill supervisor
-    supervisor = null;
+    this.supervisor = null;
 
     return this;
   };
 
   sigma.prototype.configForceAtlas2 = function(config) {
-    if (!supervisor)
-      supervisor = new Supervisor(this);
+    if (!this.supervisor)
+      this.supervisor = new Supervisor(this);
 
-    supervisor.configure(config);
+    this.supervisor.configure(config);
 
     return this;
   };
 
   sigma.prototype.isForceAtlas2Running = function(config) {
-    return supervisor && supervisor.running;
+    return this.supervisor && this.supervisor.running;
   };
 }).call(this);
