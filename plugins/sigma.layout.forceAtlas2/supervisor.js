@@ -25,10 +25,13 @@
    */
   function Supervisor(sigInst, options) {
     var _this = this,
-        workerFn = sigInst.getForceAtlas2Worker();
+        workerFn = sigInst.getForceAtlas2Worker &&
+          sigInst.getForceAtlas2Worker();
 
-    // Window URL Polyfill
-    window.URL = window.URL || window.webkitURL;
+    options = options || {};
+
+    // _root URL Polyfill
+    _root.URL = _root.URL || _root.webkitURL;
 
     // Properties
     this.sigInst = sigInst;
@@ -38,6 +41,7 @@
     this.config = {};
     this.shouldUseWorker =
       options.worker === false ? false : true && webWorkers;
+    this.workerUrl = options.workerUrl;
 
     // State
     this.started = false;
@@ -45,8 +49,13 @@
 
     // Web worker or classic DOM events?
     if (this.shouldUseWorker) {
-      var blob = this.makeBlob(workerFn);
-      this.worker = new Worker(URL.createObjectURL(blob));
+      if (!this.workerUrl) {
+        var blob = this.makeBlob(workerFn);
+        this.worker = new Worker(URL.createObjectURL(blob));
+      }
+      else {
+        this.worker = new Worker(this.workerUrl);
+      }
 
       // Post Message Polyfill
       this.worker.postMessage =
@@ -90,9 +99,9 @@
       blob = new Blob([workerFn], {type: 'application/javascript'});
     }
     catch (e) {
-      window.BlobBuilder = window.BlobBuilder ||
-                           window.WebKitBlobBuilder ||
-                           window.MozBlobBuilder;
+      _root.BlobBuilder = _root.BlobBuilder ||
+                           _root.WebKitBlobBuilder ||
+                           _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -176,7 +185,7 @@
     if (this.shouldUseWorker)
       this.worker.postMessage(content, buffers);
     else
-      window.postMessage(content, '*');
+      _root.postMessage(content, '*');
   };
 
   Supervisor.prototype.start = function() {
@@ -221,7 +230,7 @@
     if (this.shouldUseWorker)
       this.worker.postMessage(data);
     else
-      window.postMessage(data, '*');
+      _root.postMessage(data, '*');
   };
 
   /**
@@ -232,9 +241,7 @@
 
     // Create supervisor if undefined
     if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config.worker !== undefined ? {
-        worker: config.worker
-      } : {});
+      this.supervisor = new Supervisor(this, config);
 
     // Configuration provided?
     if (config)
@@ -274,9 +281,7 @@
 
   sigma.prototype.configForceAtlas2 = function(config) {
     if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config.worker !== undefined ? {
-        worker: config.worker
-      } : {});
+      this.supervisor = new Supervisor(this, config);
 
     this.supervisor.configure(config);
 
