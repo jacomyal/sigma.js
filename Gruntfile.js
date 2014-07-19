@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function(grunt) {
   var coreJsFiles = [
     // Core:
@@ -59,19 +61,34 @@ module.exports = function(grunt) {
   var npmJsFiles = coreJsFiles.slice(0);
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
-  var pluginFiles = [
-    'plugins/sigma.layout.forceAtlas2/*.js',
-    'plugins/sigma.parsers.gexf/*.js',
-    'plugins/sigma.parsers.json/*.js',
-    'plugins/sigma.plugins.animate/*.js',
-    'plugins/sigma.plugins.dragNodes/*.js',
-    'plugins/sigma.plugins.neighborhoods/*.js',
-    'plugins/sigma.renderers.customShapes/*.js'
+  var plugins = [
+    'layout.forceAtlas2',
+    'parsers.gexf',
+    'parsers.json',
+    'plugins.animate',
+    'plugins.dragNodes',
+    'plugins.neighborhoods',
+    'renderers.customShapes'
   ];
+
+  var pluginFiles = [],
+      subGrunts = {};
+
+  plugins.forEach(function(p) {
+    var dir = 'plugins/sigma.' + p + '/';
+
+    if (fs.existsSync(dir + 'Gruntfile.js'))
+      subGrunts[p] = {
+        gruntfile: dir + 'Gruntfile.js'
+      };
+    else
+      pluginFiles.push(dir + '*.js');
+  });
 
   // Project configuration:
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    grunt: subGrunts,
     closureLint: {
       app: {
         closureLinterPath: '/usr/local/bin',
@@ -159,9 +176,10 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   // By default, will check lint, hint, test and minify:
-  grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify']);
-  grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'uglify', 'zip']);
-  grunt.registerTask('npmPrePublish', ['uglify:plugins', 'concat:require']);
+  grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify']);
+  grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify', 'zip']);
+  grunt.registerTask('npmPrePublish', ['uglify:plugins', 'grunt', 'concat:require']);
+  grunt.registerTask('build', ['uglify', 'grunt', 'concat:require']);
 
   // For travis-ci.org, only launch tests:
   grunt.registerTask('travis', ['qunit']);

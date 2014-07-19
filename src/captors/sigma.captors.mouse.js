@@ -210,7 +210,7 @@
         _startMouseX = sigma.utils.getX(e);
         _startMouseY = sigma.utils.getY(e);
 
-        _self.dispatchEvent('mouseup', {
+        _self.dispatchEvent('mousedown', {
           x: _startMouseX - sigma.utils.getWidth(e) / 2,
           y: _startMouseY - sigma.utils.getHeight(e) / 2
         });

@@ -21,12 +21,14 @@
     "load-grunt-tasks": "~0.4.0",
     "grunt-sed": "~0.1.1",
     "grunt-zip": "~0.13.0",
-    "http-server": "~0.6.1"
+    "http-server": "~0.6.1",
+    "grunt-grunt": "^0.2.2",
+    "uglify-js": "^2.4.13"
   },
   "scripts": {
     "start": "http-server -p 8000",
     "test": "grunt travis",
-    "build": "grunt uglify",
+    "build": "grunt build",
     "prepublish": "grunt npmPrePublish"
   }
 }

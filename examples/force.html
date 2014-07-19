@@ -51,7 +51,8 @@
   </style>
   <div id="graph-container"></div>
 </div>
-<script src="../plugins/sigma.layout.forceAtlas2/sigma.layout.forceAtlas2.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
 /**
  * Just a simple example to show how to use the sigma.layout.forceAtlas2
@@ -65,8 +66,8 @@
 var i,
     s,
     o,
-    N = 1775,
-    E = 5232,
+    N = 1000,
+    E = 5000,
     C = 5,
     d = 0.5,
     cs = [],

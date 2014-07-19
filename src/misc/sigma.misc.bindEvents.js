@@ -202,6 +202,7 @@
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mousedown', onMove);
       captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);

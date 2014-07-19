@@ -112,6 +112,10 @@
         case 'double':
           value = +value;
           break;
+
+        case 'liststring':
+          value = value ? value.split('|') : [];
+          break;
       }
 
       return value;
@@ -283,8 +287,7 @@
       model.map(function(a) {
 
         // Default value?
-        var att_title = a.title.toLowerCase();
-        data[att_title] = !(a.id in ah) && 'defaultValue' in a ?
+        data[a.id] = !(a.id in ah) && 'defaultValue' in a ?
           _helpers.enforceType(a.type, a.defaultValue) :
           _helpers.enforceType(a.type, ah[a.id]);
 
