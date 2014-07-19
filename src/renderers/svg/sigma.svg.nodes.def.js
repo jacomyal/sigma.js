@@ -3,6 +3,9 @@
 
   sigma.utils.pkg('sigma.svg.nodes');
 
+  // TODO: udate documentation for subrendererers + maybe externalize important
+  // things
+
   /**
    * The default node renderer. It renders the node as a simple disc.
    *

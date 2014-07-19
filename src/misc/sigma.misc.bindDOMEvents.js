@@ -33,11 +33,15 @@
 
       // Methods
       this.isNode = function() {
-        return this.class === self.settings('classPrefix') + '-node';
+        return !!~this.class.indexOf(self.settings('classPrefix') + '-node');
       };
 
       this.isEdge = function() {
-        return this.class === self.settings('classPrefix') + '-edge';
+        return !!~this.class.indexOf(self.settings('classPrefix') + '-edge');
+      };
+
+      this.isHover = function() {
+        return !!~this.class.indexOf(self.settings('classPrefix') + '-hover');
       };
     }
 

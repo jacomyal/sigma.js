@@ -15,7 +15,7 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.svg.hovers.def = {
-    create: function(node, measurementCanvas, settings) {
+    create: function(node, nodeCircle, measurementCanvas, settings) {
 
       // Defining visual properties
       var x,
@@ -38,8 +38,7 @@
       var group = document.createElementNS(settings('xmlns'), 'g'),
           rectangle = document.createElementNS(settings('xmlns'), 'rect'),
           circle = document.createElementNS(settings('xmlns'), 'circle'),
-          text = document.createElementNS(settings('xmlns'), 'text'),
-          nodeCircle;
+          text = document.createElementNS(settings('xmlns'), 'text');
 
       // Defining properties
       group.setAttributeNS(null, 'class', settings('classPrefix') + '-hover');
@@ -80,11 +79,6 @@
         rectangle.setAttributeNS(null, 'y', node[prefix + 'y'] - e);
         rectangle.setAttributeNS(null, 'width', w);
         rectangle.setAttributeNS(null, 'height', h);
-
-        // Node
-        var nodeRenderer = sigma.svg.nodes[node.type] || sigma.svg.nodes.def;
-        nodeCircle = nodeRenderer.create(node, settings);
-        nodeRenderer.update(node, nodeCircle, settings);
       }
 
       // Appending childs

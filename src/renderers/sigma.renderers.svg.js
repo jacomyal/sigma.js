@@ -91,7 +91,7 @@
     // Deal with sigma events:
     // TODO: keep an option to override the DOM events?
     sigma.misc.bindDOMEvents.call(this, this.domElements.graph);
-    // this.bindHovers(this.options.prefix);
+    this.bindHovers(this.options.prefix);
 
     // Resize
     this.resize(false);
@@ -350,6 +350,7 @@
 
       var hover = (renderers[node.type] || renderers.def).create(
         node,
+        self.domElements.nodes[node.id],
         self.measurementCanvas,
         embedSettings
       );
@@ -376,6 +377,11 @@
       );
       hoveredNode = null;
       delete self.domElements.hovers[node.id];
+
+      // Reinstate
+      self.domElements.groups.nodes.appendChild(
+        self.domElements.nodes[node.id]
+      );
     }
 
     // OPTIMIZE: perform a real update rather than a deletion
@@ -395,6 +401,7 @@
 
       var hover = (renderers[hoveredNode.type] || renderers.def).create(
         hoveredNode,
+        self.domElements.nodes[hoveredNode.id],
         self.measurementCanvas,
         embedSettings
       );
