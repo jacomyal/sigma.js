@@ -68,7 +68,6 @@
 
     // Initialize the DOM elements
     this.initDOM('svg');
-    this.createDOMElements();
 
     // Initialize captors:
     this.captors = [];
@@ -92,7 +91,7 @@
     // Deal with sigma events:
     // TODO: keep an option to override the DOM events?
     sigma.misc.bindDOMEvents.call(this, this.domElements.graph);
-    this.bindHovers(this.options.prefix);
+    // this.bindHovers(this.options.prefix);
 
     // Resize
     this.resize(false);
@@ -110,6 +109,7 @@
     var a,
         i,
         k,
+        e,
         l,
         o,
         source,
@@ -145,6 +145,7 @@
     );
 
     // Hiding everything
+    // TODO: find a more sensible way to perform this operation
     this.hideDOMElements(this.domElements.nodes, sigma.svg.nodes);
     this.hideDOMElements(this.domElements.edges, sigma.svg.edges);
     this.hideDOMElements(this.domElements.labels, sigma.svg.labels);
@@ -170,20 +171,48 @@
     }
 
     // Display nodes
+    //---------------
     renderers = sigma.svg.nodes;
     subrenderers = sigma.svg.labels;
+
+    //-- First we create the nodes which are not already created
+    if (drawNodes)
+      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
+        if (!a[i].hidden && !this.domElements.nodes[a[i].id]) {
+
+          // Node
+          e = (renderers[a[i].type] || renderers.def).create(
+            a[i],
+            embedSettings
+          );
+
+          this.domElements.nodes[a[i].id] = e;
+          this.domElements.groups.nodes.appendChild(e);
+
+          // Label
+          e = (subrenderers[a[i].type] || subrenderers.def).create(
+            a[i],
+            embedSettings
+          );
+
+          this.domElements.labels[a[i].id] = e;
+          this.domElements.groups.labels.appendChild(e);
+        }
+      }
+
+    //-- Second we update the nodes
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
 
         // Node
-        (renderers[a.type] || renderers.def).update(
+        (renderers[a[i].type] || renderers.def).update(
           a[i],
           this.domElements.nodes[a[i].id],
           embedSettings
         );
 
         // Label
-        (subrenderers[a.type] || subrenderers.def).update(
+        (subrenderers[a[i].type] || subrenderers.def).update(
           a[i],
           this.domElements.labels[a[i].id],
           embedSettings
@@ -191,7 +220,29 @@
       }
 
     // Display edges
+    //---------------
     renderers = sigma.svg.edges;
+
+    //-- First we create the edges which are not already created
+    if (drawEdges)
+      for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
+        if (!this.domElements.edges[a[i].id]) {
+          source = nodes(a[i].source);
+          target = nodes(a[i].target);
+
+          e = (renderers[a[i].type] || renderers.def).create(
+            a[i],
+            source,
+            target,
+            embedSettings
+          );
+
+          this.domElements.edges[a[i].id] = e;
+          this.domElements.groups.edges.appendChild(e);
+        }
+       }
+
+    //-- Second we update the edges
     if (drawEdges)
       for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
         source = nodes(a[i].source);
@@ -257,94 +308,6 @@
     this.container.appendChild(canvas);
     this.measurementCanvas = canvas.getContext('2d');
   };
-
-  /**
-   * This method creates a the necessary SVG DOM elements such as nodes edges
-   * and labels.
-   *
-   * @return {sigma.renderers.svg}            Returns the instance itself.
-   */
-
-   // TODO: Append labels after nodes for z-index purposes
-   sigma.renderers.svg.prototype.createDOMElements = function() {
-    var nodes = this.graph.nodes,
-        edges = this.graph.edges,
-        groups = this.domElements.groups,
-        prefix = this.options.prefix || '',
-        drawEdges = this.settings('drawEdges'),
-        drawNodes = this.settings('drawNodes'),
-        drawLabels = this.settings('drawLabels'),
-        embedSettings = this.settings.embedObjects({
-          prefix: this.options.prefix
-        });
-
-    var renderers,
-        o,
-        a,
-        i,
-        l;
-
-    // Creating the edges elements
-    renderers = sigma.svg.edges;
-    if (drawEdges)
-      for (a = edges(), i = 0, l = a.length; i < l; i++) {
-        o = a[i];
-        if (!o.hidden) {
-          this.domElements.edges[o.id] =
-            (renderers[o.type] || renderers.def).create(
-              o,
-              nodes(o.source),
-              nodes(o.target),
-              embedSettings
-            );
-
-          // Attaching the nodes elements
-          // TODO: display opt or dom inclusion opt
-          groups.edges.appendChild(this.domElements.edges[o.id]);
-        }
-
-      }
-
-    // Creating the nodes elements
-    renderers = sigma.svg.nodes;
-    if (drawNodes)
-      for (a = nodes(), i = 0, l = a.length; i < l; i++) {
-        o = a[i];
-        if (!o.hidden) {
-          this.domElements.nodes[o.id] =
-            (renderers[o.type] || renderers.def).create(
-              o,
-              embedSettings
-            );
-
-          // Attaching the nodes elements
-          // TODO: display opt or dom inclusion opt
-          groups.nodes.appendChild(this.domElements.nodes[o.id]);
-        }
-      }
-
-    // TODO: we can do a single loop here
-    // Creating the labels elements
-    renderers = sigma.svg.labels;
-    if (drawLabels)
-      for (i = 0; i < l; i++) {
-        o = a[i];
-        if (!o.hidden) {
-          this.domElements.labels[o.id] =
-            (renderers[o.type] || renderers.def).create(
-              o,
-              embedSettings
-            );
-
-          // Attaching the label elements
-          // TODO: display opt or dom inclusion opt
-          groups.labels.appendChild(this.domElements.labels[o.id]);
-        }
-
-      }
-
-    return this;
-   };
 
   /**
    * This method hides a batch of SVG DOM elements.
