@@ -85,70 +85,55 @@
       e.stopPropagation();
     }
 
-    // On out
-    function onOut(e) {
-      var target = e.fromElement || e.relatedTarget;
-
-      if (!self.settings('eventsEnabled') || target === null)
-        return;
-
-      var from = new Element(target),
-          to = new Element(e.toElement || e.target);
-
-      if (from.isNode()) {
-        var fromNodeId = from.attr('data-node-id'),
-            toNodeId = to.attr('data-node-id');
-
-        if (fromNodeId === toNodeId)
-          return;
-
-        self.dispatchEvent('outNode', {
-          node: graph.nodes(from.attr('data-node-id'))
-        });
-      }
-      else if (from.isEdge()) {
-        var edge = graph.edges(from.attr('data-edge-id'));
-        self.dispatchEvent('outEdge', {
-          edge: edge,
-          source: graph.nodes(edge.source),
-          target: graph.nodes(edge.target)
-        });
-      }
-
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    // On move
+    // On over
     function onOver(e) {
       var target = e.toElement || e.target;
 
-      if (!self.settings('eventsEnabled') || target === null)
+      if (!self.settings('eventsEnabled') || !target)
         return;
 
-      var to = new Element(target);
+      var el = new Element(target);
 
-      if (to.isNode()) {
+      if (el.isNode()) {
         self.dispatchEvent('overNode', {
-          node: graph.nodes(to.attr('data-node-id'))
+          node: graph.nodes(el.attr('data-node-id'))
         });
       }
-      else if (to.isEdge()) {
-        var edge = graph.edges(to.attr('data-edge-id'));
+      else if (el.isEdge()) {
+        var edge = graph.edges(el.attr('data-edge-id'));
         self.dispatchEvent('overEdge', {
           edge: edge,
           source: graph.nodes(edge.source),
           target: graph.nodes(edge.target)
         });
       }
+    }
 
-      e.preventDefault();
-      e.stopPropagation();
+    // On out
+    function onOut(e) {
+      var target = e.fromElement || e.relatedTarget;
+
+      if (!self.settings('eventsEnabled'))
+        return;
+
+      var el = new Element(target);
+
+      if (el.isNode()) {
+        self.dispatchEvent('outNode', {
+          node: graph.nodes(el.attr('data-node-id'))
+        });
+      }
+      else if (el.isEdge()) {
+        var edge = graph.edges(el.attr('data-edge-id'));
+        self.dispatchEvent('outEdge', {
+          edge: edge,
+          source: graph.nodes(edge.source),
+          target: graph.nodes(edge.target)
+        });
+      }
     }
 
     // Registering Events:
-    var i,
-        o;
 
     // Click
     container.addEventListener('click', click, false);
@@ -158,22 +143,10 @@
     container.addEventListener('touchstart', click, false);
     sigma.utils.doubleClick(container, 'touchstart', doubleClick);
 
-    // Hover
-    // OPTIMIZE: This is barely optimal
-    // Find a way without merging mouseenter and mouseout events.
-    container.addEventListener('mouseout', onOut, false);
-    for (i in this.domElements.nodes) {
-      o = this.domElements.nodes[i];
+    // Mouseover
+    container.addEventListener('mouseover', onOver, true);
 
-      o.addEventListener('mouseenter', onOver, false);
-      // o.addEventListener('mouseleave', onOut, false);
-    }
-
-    for (i in this.domElements.edges) {
-      o = this.domElements.edges[i];
-
-      o.addEventListener('mouseenter', onOver, false);
-      o.addEventListener('mouseleave', onOut, false);
-    }
+    // Mouseout
+    container.addEventListener('mouseout', onOut, true);
   };
 }).call(this);
