@@ -206,7 +206,13 @@ sigma.plugins.popup(s, {
     renderer: function(node, template) {
       // The function context is s.graph
       node.degree = this.degree(node.id);
+
+      // Returns an HTML string:
       return Mustache.render(template, node);
+
+      // Returns a DOM Element:
+      //var el = document.createElement('div');
+      //return el.innerHTML = Mustache.render(template, node);
     }
   }
 });

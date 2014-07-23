@@ -113,12 +113,19 @@
     _popup = document.createElement('div');
     if (options.renderer) {
       // Copy the object:
-      var clone = Object.create(null), 
+      var clone = Object.create(null),
+          renderer, 
           k;
       for (k in o)
         clone[k] = o[k];
 
-      _popup.innerHTML = options.renderer.call(s.graph, clone, options.template);
+      renderer = options.renderer.call(s.graph, clone, options.template);
+
+      if (typeof renderer === 'string')
+         _popup.innerHTML = renderer;
+      else
+          // renderer is a dom element:
+         _popup.appendChild(renderer);
     } else {
       _popup.innerHTML = options.template;
     }
@@ -253,9 +260,9 @@
    *   {?string}   template   The HTML template. It is directly inserted inside
    *                          a div element unless a renderer is specified.
    *   {?function} renderer   This function may process the template or be used
-   *                          independently. It should return an HTML string.
-   *                          It is executed at runtime. Its context is
-   *                          sigma.graph.
+   *                          independently. It should return an HTML string or
+   *                          a DOM element. It is executed at runtime. Its
+   *                          context is sigma.graph.
    *   {?string}   cssClass   The CSS class attached to the top div element.
    *                          Default value: "sigma-popup".
    *   {?string}   position   The position of the popup regarding the mouse. If
