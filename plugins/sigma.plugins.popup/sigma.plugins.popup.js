@@ -287,9 +287,12 @@
    * @param {object} options An object with options.
    */
   sigma.plugins.popup = function(s, options) {
+    var _self = this;
     var so = extend(options.stage, settings.stage);
     var no = extend(options.node, settings.node);
     var eo = extend(options.edge, settings.edge);
+
+    sigma.classes.dispatcher.extend(this);
 
     // STAGE POPUP:
     if (options.stage) {
@@ -321,17 +324,23 @@
             so,
             clientX,
             clientY);
+
+          _self.dispatchEvent('shown');
         }, so.delay);     
       });
 
       s.bind(so.hide, function(event) {
+        var p = _popup;
         cancelPopup();
+        if (p)
+          _self.dispatchEvent('hidden');
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
           cancelPopup();
           _doubleClick = true;
+          _self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -370,17 +379,23 @@
             no,
             clientX,
             clientY);
+
+          _self.dispatchEvent('shown');
         }, no.delay);     
       });
 
       s.bind(no.hide, function(event) {
+        var p = _popup;
         cancelPopup();
+        if (p)
+          _self.dispatchEvent('hidden');
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
           cancelPopup();
           _doubleClick = true;
+          _self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -419,17 +434,23 @@
             eo,
             clientX,
             clientY);
+
+          _self.dispatchEvent('shown');
         }, eo.delay);     
       });
 
       s.bind(eo.hide, function(event) {
+        var p = _popup;
         cancelPopup();
+        if (p)
+          _self.dispatchEvent('hidden');
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
           cancelPopup();
           _doubleClick = true;
+          _self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -444,6 +465,8 @@
         event.preventDefault();
       });
     }
+
+    return this;
   };
 
 }).call(window);

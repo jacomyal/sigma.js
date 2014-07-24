@@ -184,7 +184,7 @@ s = new sigma({
 });*/
 
 // Instanciate the popup plugin with a Mustache renderer for node popups:
-sigma.plugins.popup(s, {
+var popup = sigma.plugins.popup(s, {
   node: {
     show: 'overNode',
     hide: 'outNode',
@@ -217,4 +217,11 @@ sigma.plugins.popup(s, {
   }
 });
 
+popup.bind('shown', function(event) {
+  console.log('popup shown', event);
+});
+
+popup.bind('hidden', function(event) {
+  console.log('popup hidden', event);
+});
 </script>
