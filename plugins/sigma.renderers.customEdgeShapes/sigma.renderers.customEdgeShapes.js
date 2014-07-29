@@ -21,7 +21,9 @@
   var register = function(name,drawShape) {
     sigma.canvas.edges[name] = function(edge, source, target, context, settings) {
       var prefix = settings('prefix') || '',
-          color = edge.color,
+          color = edge.active ? 
+            edge.active_color || settings('defaultEdgeActiveColor') : 
+            edge.color,
           edgeColor = settings('edgeColor'),
           defaultNodeColor = settings('defaultNodeColor'),
           defaultEdgeColor = settings('defaultEdgeColor');
@@ -41,6 +43,15 @@
       }
 
       context.save();
+
+      if (edge.active) {
+        context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
+          (color || defaultEdgeColor) :
+          settings('defaultEdgeActiveColor');
+      }
+      else {
+        context.strokeStyle = color;
+      }
 
       if(drawShape) {
         drawShape(edge, source, target, color, prefix, context);
