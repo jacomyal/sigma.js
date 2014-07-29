@@ -81,7 +81,7 @@
         for (i = 0, l = arr.length; i < l; i++)
           sig.graph.addEdge(arr[i]);
 
-      // ...or instanciate sigma if needed:
+      // ...or instantiate sigma if needed:
       } else if (typeof sig === 'object') {
         sig.graph = graph;
         sig = new sigma(sig);

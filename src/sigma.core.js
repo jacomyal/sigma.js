@@ -11,7 +11,7 @@
    * in the configuration.
    *
    * @param  {?*}    conf The configuration of the instance. There are a lot of
-   *                      different recognized forms to instanciate sigma, check
+   *                      different recognized forms to instantiate sigma, check
    *                      example files, documentation in this file and unit
    *                      tests to know more.
    * @return {sigma}      The fresh new sigma instance.
@@ -19,8 +19,8 @@
    * Instanciating sigma:
    * ********************
    * If no parameter is given to the constructor, the instance will be created
-   * without any renderer or camera. It will just instanciate the graph, and
-   * other modules will have to be instanciated through the public methods,
+   * without any renderer or camera. It will just instantiate the graph, and
+   * other modules will have to be instantiated through the public methods,
    * like "addRenderer" etc:
    *
    *  > s0 = new sigma();
@@ -210,7 +210,7 @@
 
 
   /**
-   * This methods will instanciate and reference a new camera. If no id is
+   * This methods will instantiate and reference a new camera. If no id is
    * specified, then an automatic id will be generated.
    *
    * @param  {?string}              id Eventually the camera id.
@@ -275,7 +275,7 @@
   };
 
   /**
-   * This methods will instanciate and reference a new renderer. The "type"
+   * This methods will instantiate and reference a new renderer. The "type"
    * argument can be the constructor or its name in the "sigma.renderers"
    * package. If no type is specified, then "sigma.renderers.def" will be used.
    * If no id is specified, then an automatic id will be generated.
@@ -340,7 +340,7 @@
     if (this.cameras[camera.id] !== camera)
       throw 'sigma.addRenderer: The camera is not properly referenced.';
 
-    // Instanciate:
+    // Instantiate:
     renderer = new fn(this.graph, camera, this.settings, o);
     this.renderers[id] = renderer;
     Object.defineProperty(renderer, 'id', {
