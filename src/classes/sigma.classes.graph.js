@@ -771,6 +771,47 @@
   });
 
 
+  /**
+   * This methods returns an array of nodes that are adjacent to a node.
+   *
+   * @param  {string} id The node id.
+   * @return {array}     The array of adjacent nodes.
+   */
+  graph.addMethod('adjacentNodes', function(id) {
+    if (typeof id !== 'string')
+      throw 'adjacentNodes: the node id must be a string.';
+
+    var target,
+        nodes = [];
+    for(target in this.allNeighborsIndex[id]) {
+      nodes.push(this.nodesIndex[target]);
+    }
+    return nodes;
+  });
+
+  /**
+   * This methods returns an array of edges that are adjacent to a node.
+   *
+   * @param  {string} id The node id.
+   * @return {array}     The array of adjacent edges.
+   */
+  graph.addMethod('adjacentEdges', function(id) {
+    if (typeof id !== 'string')
+      throw 'adjacentEdges: the node id must be a string.';
+
+    var a = this.allNeighborsIndex[id],
+        eid,
+        target,
+        edges = [];
+    for(target in a) {
+      for(eid in a[target]) {
+        edges.push(a[target][eid]);
+      }
+    }
+    return edges;
+  });
+
+
 
 
   /**
