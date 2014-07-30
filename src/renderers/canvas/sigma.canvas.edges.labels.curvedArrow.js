@@ -18,7 +18,8 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.labels.curvedArrow = function(edge, source, target, context, settings) {    
+  sigma.canvas.edges.labels.curvedArrow =
+    function(edge, source, target, context, settings) {
     sigma.canvas.edges.labels.curve(edge, source, target, context, settings);
   };
 }).call(this);

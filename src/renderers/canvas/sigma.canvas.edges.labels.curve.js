@@ -18,7 +18,8 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.labels.curve = function(edge, source, target, context, settings) {    
+  sigma.canvas.edges.labels.curve =
+    function(edge, source, target, context, settings) {
     if (typeof edge.label !== 'string' || source == target)
       return;
 
@@ -46,7 +47,7 @@
     fontSize = (settings('edgeLabelSize') === 'fixed') ?
       settings('defaultEdgeLabelSize') :
       settings('defaultEdgeLabelSize') *
-      size * 
+      size *
       Math.pow(size, - settings('edgeLabelSizePowRatio'));
 
     context.save();
@@ -57,8 +58,8 @@
       (edge.color || settings('defaultEdgeColor')) :
       settings('defaultEdgeLabelColor');
 
-    context.textAlign = "center";
-    context.textBaseline = "alphabetic";
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
 
     var c = sigma.utils.getPointOnQuadraticCurve(
       t,
@@ -70,7 +71,7 @@
       cp.y
     );
 
-    context.translate(c.x , c.y);
+    context.translate(c.x, c.y);
     context.rotate(angle);
     context.fillText(
       edge.label,

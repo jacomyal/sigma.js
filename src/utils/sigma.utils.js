@@ -244,7 +244,7 @@
     * Compute the coordinates of the point positioned
     * at length t in the quadratic bezier curve.
     *
-    * @param  {number} t  In [0,1] the step percentage to reach 
+    * @param  {number} t  In [0,1] the step percentage to reach
     *                     the point in the curve from the context point.
     * @param  {number} x1 The X coordinate of the context point.
     * @param  {number} y1 The Y coordinate of the context point.
@@ -255,10 +255,11 @@
     * @return {object}    {x,y}.
   */
   sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
-    // see http://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
-    // see http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+// http://stackoverflow.com/questions/5634460/
+//   quadratic-bezier-curve-calculate-point
+// http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
     return {
-      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2, 
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2,
       y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
     };
   };

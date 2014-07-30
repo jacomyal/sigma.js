@@ -62,7 +62,8 @@
     //          "fixed", "proportional"
     edgeLabelSize: 'fixed',
     // {string} The opposite power ratio between the font size of the label and
-    // the edge size: Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
+    // the edge size:
+    //   Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
     edgeLabelSizePowRatio: 0.8,
     // {number} The minimum size an edge must have to see its label displayed.
     edgeLabelThreshold: 1,

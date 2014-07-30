@@ -41,9 +41,9 @@
       source[prefix + 'y']
     );
     context.quadraticCurveTo(
-      cp.x, 
-      cp.y, 
-      target[prefix + 'x'], 
+      cp.x,
+      cp.y,
+      target[prefix + 'x'],
       target[prefix + 'y']
     );
     context.stroke();
