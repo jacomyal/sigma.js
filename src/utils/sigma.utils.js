@@ -250,12 +250,10 @@
     *                          segment, false otherwise.
   */
   sigma.utils.isPointOnSegment = function(x, y, x1, y1, x2, y2, epsilon) {
-    // http://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment
+    // http://stackoverflow.com/a/328122
     var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
         d = sigma.utils.getDistance(x1, y1, x2, y2),
         nCrossProduct = crossProduct / d; // normalized cross product
-
-    //console.log(nCrossProduct, epsilon);
 
     return (nCrossProduct < epsilon &&
      Math.min(x1, x2) <= x && x <= Math.max(x1, x2) &&
@@ -294,9 +292,7 @@
     * @return {object}    {x,y}.
   */
   sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
-// http://stackoverflow.com/questions/5634460/
-//   quadratic-bezier-curve-calculate-point
-// http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+    // http://stackoverflow.com/a/5634528
     return {
       x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2,
       y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
@@ -333,7 +329,7 @@
         t = 0.5,
         r = (dP1 < dP2) ? -0.1 : 0.1,
         rThreshold = 0.025,
-        //dThreshold = Math.log(1 + w) * epsilon / 20,
+        // dThreshold = Math.log(1 + w) * epsilon / 20,
         // get x(t), y(t):
         pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
         dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
@@ -341,7 +337,6 @@
     while (t >= 0 && t <= 1 &&
       (dt > epsilon) &&
       (r > rThreshold || r < -rThreshold)) {
-      // console.log(t);
       _dt = dt;
       pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
       dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
