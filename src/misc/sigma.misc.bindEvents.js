@@ -337,7 +337,8 @@
 
         var i,
             k,
-            n,
+            node,
+            edge,
             newOutNodes = [],
             newOverNodes = [],
             currentOverNodes = {},
@@ -349,11 +350,11 @@
 
         // Check newly overred nodes:
         for (i = 0; i < l; i++) {
-          n = nodes[i];
-          currentOverNodes[n.id] = n;
-          if (!overNodes[n.id]) {
-            newOverNodes.push(n);
-            overNodes[n.id] = n;
+          node = nodes[i];
+          currentOverNodes[node.id] = node;
+          if (!overNodes[node.id]) {
+            newOverNodes.push(node);
+            overNodes[node.id] = node;
           }
         }
 
@@ -388,11 +389,11 @@
 
         // Check newly overred edges:
         for (i = 0; i < le; i++) {
-          e = edges[i];
-          currentOverEdges[e.id] = e;
-          if (!overEdges[e.id]) {
-            newOverEdges.push(e);
-            overEdges[e.id] = e;
+          edge = edges[i];
+          currentOverEdges[edge.id] = edge;
+          if (!overEdges[edge.id]) {
+            newOverEdges.push(edge);
+            overEdges[edge.id] = edge;
           }
         }
 
