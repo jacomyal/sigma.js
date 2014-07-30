@@ -45,10 +45,17 @@
           prefix: prefix
         });
 
-      //Single hover
-      if(embedSettings('enableHovering') && embedSettings('singleHover') && hoveredNodes.length) {
-        if(! hoveredNodes[hoveredNodes.length - 1].hidden) {
-          (renderers[hoveredNodes[hoveredNodes.length - 1].type] || renderers.def)(
+      // Single hover
+      if (
+        embedSettings('enableHovering') &&
+        embedSettings('singleHover') &&
+        hoveredNodes.length
+      ) {
+        if (! hoveredNodes[hoveredNodes.length - 1].hidden) {
+          (
+            renderers[hoveredNodes[hoveredNodes.length - 1].type] ||
+            renderers.def
+          )(
             hoveredNodes[hoveredNodes.length - 1],
             self.contexts.hover,
             embedSettings
@@ -56,11 +63,14 @@
         }
       }
 
-      //Multiple hover
-      if(embedSettings('enableHovering') && !embedSettings('singleHover') && hoveredNodes.length) {
-        for(var i=0; i<hoveredNodes.length; i++) {
-          console.log('yep');
-          if(! hoveredNodes[i].hidden) {
+      // Multiple hover
+      if (
+        embedSettings('enableHovering') &&
+        !embedSettings('singleHover') &&
+        hoveredNodes.length
+      ) {
+        for (var i = 0; i < hoveredNodes.length; i++) {
+          if (! hoveredNodes[i].hidden) {
             (renderers[hoveredNodes[i].type] || renderers.def)(
               hoveredNodes[i],
               self.contexts.hover,
