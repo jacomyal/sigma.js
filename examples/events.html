@@ -76,7 +76,6 @@ for (i = 0; i < E; i++)
     id: 'e' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
-    //type: 'curve',
     size: Math.random(),
     color: '#ccc',
     hover_color: '#000'
@@ -84,7 +83,6 @@ for (i = 0; i < E; i++)
 
 s = new sigma({
   graph: g,
-  //container: 'graph-container',
   renderer: {
     container: document.getElementById('graph-container'),
     type: 'canvas'
@@ -106,7 +104,7 @@ s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) 
   console.log(e.type, e.data.node.label, e.data.captor);
 });
 s.bind('overEdge outEdge clickEdge doubleClickEdge', function(e) {
-  //console.log(e.type, e.data.edge);
+  console.log(e.type, e.data.edge, e.data.captor);
 });
 s.bind('clickStage', function(e) {
   console.log(e.type, e.data.captor);
