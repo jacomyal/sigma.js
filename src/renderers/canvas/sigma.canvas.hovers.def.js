@@ -16,16 +16,16 @@
    */
   sigma.canvas.hovers.def = function(node, context, settings) {
     var x,
-      y,
-      w,
-      h,
-      e,
-      fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
-      prefix = settings('prefix') || '',
-      size = node[prefix + 'size'],
-      fontSize = (settings('labelSize') === 'fixed') ?
-        settings('defaultLabelSize') :
-        settings('labelSizeRatio') * size;
+        y,
+        w,
+        h,
+        e,
+        fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
+        prefix = settings('prefix') || '',
+        size = node[prefix + 'size'],
+        fontSize = (settings('labelSize') === 'fixed') ?
+          settings('defaultLabelSize') :
+          settings('labelSizeRatio') * size;
 
     // Label background:
     context.font = (fontStyle ? fontStyle + ' ' : '') +
@@ -47,7 +47,7 @@
       x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
       w = Math.round(
-          context.measureText(node.label).width + fontSize / 2 + size + 7
+        context.measureText(node.label).width + fontSize / 2 + size + 7
       );
       h = Math.round(fontSize + 4);
       e = Math.round(fontSize / 2 + 2);
@@ -77,9 +77,9 @@
       context.arc(
         node[prefix + 'x'],
         node[prefix + 'y'],
-          size + settings('borderSize'),
+        size + settings('borderSize'),
         0,
-          Math.PI * 2,
+        Math.PI * 2,
         true
       );
       context.closePath();
