@@ -208,8 +208,8 @@
   /**
    * This global methods attaches a function to a method. Anytime the specified
    * method is called, the attached function is called right after, with the
-   * same arguments and in the same scope. The attached function is called 
-   * right before if the last argument is true, unless the method is the graph 
+   * same arguments and in the same scope. The attached function is called
+   * right before if the last argument is true, unless the method is the graph
    * constructor.
    *
    * To attach a function to the graph constructor, use 'constructor' as the
@@ -236,7 +236,7 @@
    *  > graph.attach('addNode', 'applyNodeColorPalette', function(n) {
    *  >   n.color = colorPalette[n.category];
    *  > }, true);
-   *  > 
+   *  >
    *  > var myGraph = new graph();
    *  > myGraph.addNode({ id: 'n0', category: 'Person' });
    *  > console.log(myGraph.nodes('n0').color); // outputs '#C3CBE1'
