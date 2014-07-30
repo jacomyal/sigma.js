@@ -232,7 +232,7 @@
    * @param  {number} y2  The Y coordinate of the second point.
    * @return {number}     The euclidian distance.
    */
-  sigma.utils.getDistance = function (x0, y0, x1, y1) {
+  sigma.utils.getDistance = function(x0, y0, x1, y1) {
     return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
   };
 
@@ -249,7 +249,7 @@
     * @return {boolean}        True if point is "close to" the line
     *                          segment, false otherwise.
   */
-  sigma.utils.isPointOnSegment = function(x ,y, x1, y1, x2, y2, epsilon) {
+  sigma.utils.isPointOnSegment = function(x, y, x1, y1, x2, y2, epsilon) {
     // http://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment
     var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
         d = sigma.utils.getDistance(x1, y1, x2, y2),
@@ -283,7 +283,7 @@
     * Compute the coordinates of the point positioned
     * at length t in the quadratic bezier curve.
     *
-    * @param  {number} t  In [0,1] the step percentage to reach 
+    * @param  {number} t  In [0,1] the step percentage to reach
     *                     the point in the curve from the context point.
     * @param  {number} x1 The X coordinate of the context point.
     * @param  {number} y1 The Y coordinate of the context point.
@@ -294,10 +294,11 @@
     * @return {object}    {x,y}.
   */
   sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
-    // see http://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
-    // see http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+// http://stackoverflow.com/questions/5634460/
+//   quadratic-bezier-curve-calculate-point
+// http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
     return {
-      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2, 
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2,
       y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
     };
   };
@@ -317,7 +318,8 @@
     * @return {boolean}        True if (x,y) is on the curve segment,
     *                          false otherwise.
   */
-  sigma.utils.isPointOnQuadraticCurve = function(x ,y, x1, y1, x2, y2, cpx, cpy, epsilon) {
+  sigma.utils.isPointOnQuadraticCurve =
+    function(x, y, x1, y1, x2, y2, cpx, cpy, epsilon) {
     // Fails if the point is too far from the extremities of the segment,
     // preventing for more costly computation:
     var dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
@@ -336,8 +338,8 @@
         pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
         dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
 
-    while (t >= 0 && t <= 1 && 
-      (dt > epsilon) && 
+    while (t >= 0 && t <= 1 &&
+      (dt > epsilon) &&
       (r > rThreshold || r < -rThreshold)) {
       // console.log(t);
       _dt = dt;
@@ -349,7 +351,7 @@
         // halfstep in the opposite direction
         r = -r / 2;
         t += r;
-      } 
+      }
       else if (t + r < 0 || t + r > 1) {
         // oops, we've gone too far:
         // revert with a halfstep

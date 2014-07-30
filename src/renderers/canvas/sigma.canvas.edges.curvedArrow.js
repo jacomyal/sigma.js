@@ -29,7 +29,8 @@
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
-    thickness = (edge.hover) ? settings('edgeHoverSizeRatio') * thickness : thickness;
+    thickness = (edge.hover) ?
+      settings('edgeHoverSizeRatio') * thickness : thickness;
     var aSize = thickness * 2.5,
         d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
         aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,

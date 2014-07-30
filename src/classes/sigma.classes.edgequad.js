@@ -5,7 +5,8 @@
    * Sigma Quadtree Module for edges
    * ===============================
    *
-   * Author: Sébastien Heymann, from the quad of Guillaume Plique (Yomguithereal)
+   * Author: Sébastien Heymann,
+   *   from the quad of Guillaume Plique (Yomguithereal)
    * Version: 0.2
    */
 
