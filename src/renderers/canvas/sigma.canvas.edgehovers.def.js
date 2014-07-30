@@ -16,7 +16,8 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edgehovers.def = function(edge, source, target, context, settings) {
+  sigma.canvas.edgehovers.def =
+    function(edge, source, target, context, settings) {
     var x,
         y,
         w,
@@ -31,7 +32,8 @@
     edgeRenderer(edge, source, target, context, settings);
 
     // Source Node:
-    var nodeRenderer = sigma.canvas.nodes[source.type] || sigma.canvas.nodes.def;
+    var nodeRenderer =
+      sigma.canvas.nodes[source.type] || sigma.canvas.nodes.def;
     nodeRenderer(source, context, settings);
 
     // Target Node:

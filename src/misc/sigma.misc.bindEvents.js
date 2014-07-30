@@ -141,9 +141,10 @@
           target = self.graph.nodes(edge.target);
           // (HACK) we can't get edge[prefix + 'size'] on WebGL renderer:
           s = edge[prefix + 'size'] ||
-              (edge.size || 0) / Math.pow(self.camera.ratio, self.settings('edgesPowRatio'));
-          
-          // First, let's identify which edges are drawn. To do this, we just keep
+              (edge.size || 0) /
+              Math.pow(self.camera.ratio, self.settings('edgesPowRatio'));
+
+          // First, let's identify which edges are drawn. To do this, we keep
           // every edges that have at least one extremity displayed according to
           // the quadtree and the "hidden" attribute. We also do not keep hidden
           // edges.
@@ -153,8 +154,16 @@
             !edge.hidden &&
             !source.hidden && !target.hidden &&
             (nodeIndex[edge.source] || nodeIndex[edge.target]) &&
-            sigma.utils.getDistance(source[prefix + 'x'], source[prefix + 'y'], modifiedX, modifiedY) > source[prefix + 'size'] &&
-            sigma.utils.getDistance(target[prefix + 'x'], target[prefix + 'y'], modifiedX, modifiedY) > target[prefix + 'size']
+            sigma.utils.getDistance(
+              source[prefix + 'x'],
+              source[prefix + 'y'],
+              modifiedX,
+              modifiedY) > source[prefix + 'size'] &&
+            sigma.utils.getDistance(
+              target[prefix + 'x'],
+              target[prefix + 'y'],
+              modifiedX,
+              modifiedY) > target[prefix + 'size']
           ) {
             if (edge.type == 'curve' || edge.type == 'curvedArrow') {
               cp = sigma.utils.getCP(source, target, prefix);
