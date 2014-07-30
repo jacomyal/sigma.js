@@ -318,7 +318,8 @@
         // Dispatch both single and multi events:
         for (i = 0, l = outEdges.length; i < le; i++)
           self.dispatchEvent('outEdge', {
-            edge: outEdges[i]
+            edge: outEdges[i],
+            captor: e.data
           });
         if (outNodes.length)
           self.dispatchEvent('outEdges', {
