@@ -142,7 +142,7 @@
           // (HACK) we can't get edge[prefix + 'size'] on WebGL renderer:
           s = edge[prefix + 'size'] ||
               (edge.size || 0) / Math.pow(self.camera.ratio, self.settings('edgesPowRatio'));
-          
+
           // First, let's identify which edges are drawn. To do this, we just keep
           // every edges that have at least one extremity displayed according to
           // the quadtree and the "hidden" attribute. We also do not keep hidden
@@ -208,20 +208,24 @@
 
         if (nodes.length) {
           self.dispatchEvent('clickNode', {
-            node: nodes[0]
+            node: nodes[0],
+            captor: e.data
           });
           self.dispatchEvent('clickNodes', {
-            node: nodes
+            node: nodes,
+            captor: e.data
           });
         } else if (edges.length) {
           self.dispatchEvent('clickEdge', {
-            edge: edges[0]
+            edge: edges[0],
+            captor: e.data
           });
           self.dispatchEvent('clickEdges', {
-            edge: edges
+            edge: edges,
+            captor: e.data
           });
         } else
-          self.dispatchEvent('clickStage');
+          self.dispatchEvent('clickStage', {captor: e.data});
       }
 
       function onDoubleClick(e) {
@@ -235,20 +239,43 @@
 
         if (nodes.length) {
           self.dispatchEvent('doubleClickNode', {
-            node: nodes[0]
+            node: nodes[0],
+            captor: e.data
           });
           self.dispatchEvent('doubleClickNodes', {
-            node: nodes
+            node: nodes,
+            captor: e.data
           });
         } else if (edges.length) {
           self.dispatchEvent('doubleClickEdge', {
-            edge: edges[0]
+            edge: edges[0],
+            captor: e.data
           });
           self.dispatchEvent('doubleClickEdges', {
-            edge: edges
+            edge: edges,
+            captor: e.data
           });
         } else
-          self.dispatchEvent('doubleClickStage');
+          self.dispatchEvent('doubleClickStage', {captor: e.data});
+      }
+
+      function onRightClick(e) {
+        if (!self.settings('eventsEnabled'))
+          return;
+
+        self.dispatchEvent('rightClick', e.data);
+
+        if (nodes.length) {
+          self.dispatchEvent('rightClickNode', {
+            node: nodes[0],
+            captor: e.data
+          });
+          self.dispatchEvent('rightClickNodes', {
+            node: nodes,
+            captor: e.data
+          });
+        } else
+          self.dispatchEvent('rightClickStage', {captor: e.data});
       }
 
       function onOut(e) {
@@ -269,11 +296,13 @@
         // Dispatch both single and multi events:
         for (i = 0, l = outNodes.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: outNodes[i]
+            node: outNodes[i],
+            captor: e.data
           });
         if (outNodes.length)
           self.dispatchEvent('outNodes', {
-            nodes: outNodes
+            nodes: outNodes,
+            captor: e.data
           });
 
         overEdges = {};
@@ -284,7 +313,8 @@
           });
         if (outNodes.length)
           self.dispatchEvent('outEdges', {
-            edges: outEdges
+            edges: outEdges,
+            captor: e.data
           });
       }
 
@@ -327,19 +357,23 @@
         // Dispatch both single and multi events:
         for (i = 0, l = newOverNodes.length; i < l; i++)
           self.dispatchEvent('overNode', {
-            node: newOverNodes[i]
+            node: newOverNodes[i],
+            captor: e.data
           });
         for (i = 0, l = newOutNodes.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: newOutNodes[i]
+            node: newOutNodes[i],
+            captor: e.data
           });
         if (newOverNodes.length)
           self.dispatchEvent('overNodes', {
-            nodes: newOverNodes
+            nodes: newOverNodes,
+            captor: e.data
           });
         if (newOutNodes.length)
           self.dispatchEvent('outNodes', {
-            nodes: newOutNodes
+            nodes: newOutNodes,
+            captor: e.data
           });
 
         // Check newly overred edges:
@@ -351,39 +385,45 @@
             overEdges[e.id] = e;
           }
         }
-//console.log(currentOverEdges, overEdges, newOverEdges.length);
+
         // Check no more overred edges:
         for (k in overEdges)
           if (!currentOverEdges[k]) {
             newOutEdges.push(overEdges[k]);
             delete overEdges[k];
           }
-//console.log('newOverEdges', newOverEdges);
+
         // Dispatch both single and multi events:
         for (i = 0, le = newOverEdges.length; i < le; i++)
           self.dispatchEvent('overEdge', {
-            edge: newOverEdges[i]
+            edge: newOverEdges[i],
+            captor: e.data
           });
         for (i = 0, le = newOutEdges.length; i < le; i++)
           self.dispatchEvent('outEdge', {
-            edge: newOutEdges[i]
+            edge: newOutEdges[i],
+            captor: e.data
           });
         if (newOverEdges.length)
           self.dispatchEvent('overEdges', {
-            edges: newOverEdges
+            edges: newOverEdges,
+            captor: e.data
           });
         if (newOutEdges.length)
           self.dispatchEvent('outEdges', {
-            edges: newOutEdges
+            edges: newOutEdges,
+            captor: e.data
           });
       }
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mousedown', onMove);
       captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
       captor.bind('doubleclick', onDoubleClick);
+      captor.bind('rightclick', onRightClick);
       self.bind('render', onMove);
     }
 

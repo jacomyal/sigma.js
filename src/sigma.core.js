@@ -355,8 +355,10 @@
       renderer.bind(
         [
           'click',
+          'rightClick',
           'clickStage',
           'doubleClickStage',
+          'rightClickStage',
           'clickNode',
           'clickNodes',
           'clickEdge',
@@ -365,6 +367,8 @@
           'doubleClickNodes',
           'doubleClickEdge',
           'doubleClickEdges',
+          'rightClickNode',
+          'rightClickNodes',
           'overNode',
           'overNodes',
           'overEdge',
