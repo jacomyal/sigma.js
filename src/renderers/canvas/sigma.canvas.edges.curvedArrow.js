@@ -13,8 +13,8 @@
    * @param  {configurable}             settings     The settings function.
    */
   edgesPackage.curvedArrow = function(edge, source, target, context, settings) {
-    var color = edge.active ? 
-          edge.active_color || settings('defaultEdgeActiveColor') : 
+    var color = edge.active ?
+          edge.active_color || settings('defaultEdgeActiveColor') :
           edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),

@@ -116,7 +116,7 @@
     // Rescale the nodes and edges:
     var size;
     for (i = 0, l = e.length; i < l; i++) {
-      size = e[i].active && !readPrefix.length ? 
+      size = e[i].active && !readPrefix.length ?
           e[i].active_size || e[i].size :
           e[i][readPrefix + 'size'];
 
@@ -124,7 +124,7 @@
     }
 
     for (i = 0, l = n.length; i < l; i++) {
-      size = n[i].active && !readPrefix.length ? 
+      size = n[i].active && !readPrefix.length ?
           n[i].active_size || n[i].size :
           n[i][readPrefix + 'size'];
 

@@ -15,8 +15,8 @@
         defaultNodeColor = settings('defaultNodeColor'),
         borderSize = settings('borderSize'),
         outerBorderSize = settings('outerBorderSize'),
-        color = node.active ? 
-          node.active_color || settings('defaultNodeActiveColor') : 
+        color = node.active ?
+          node.active_color || settings('defaultNodeActiveColor') :
           node.color || defaultNodeColor;
 
     // Node border:
@@ -63,7 +63,7 @@
     else {
       context.fillStyle = color;
     }
-    
+
     context.beginPath();
     context.arc(
       node[prefix + 'x'],

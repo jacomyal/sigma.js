@@ -797,7 +797,7 @@
    * This methods set one or several nodes as 'active', depending on how it is
    * called.
    *
-   * To activate the array of nodes, call "activateNodes" without argument. 
+   * To activate the array of nodes, call "activateNodes" without argument.
    * To activate a specific node, call it with the id of the node. To activate
    * multiple nodes, call it with an array of ids. To deactivate a node or a
    * set of nodes, call it with the second argument to "false".
@@ -823,7 +823,7 @@
     else if (typeof v === 'string') {
       if (arguments.length === 1) {
         this.nodesIndex[v].active = true;
-        
+
       }
       else if (arguments.length === 2) {
         this.nodesIndex[v].active = !!isActive;
@@ -862,7 +862,7 @@
    * This methods set one or several edges as 'active', depending on how it is
    * called.
    *
-   * To activate the array of edges, call "activateEdges" without argument. 
+   * To activate the array of edges, call "activateEdges" without argument.
    * To activate a specific edge, call it with the id of the edge. To activate
    * multiple edges, call it with an array of ids. To deactivate a edge or a
    * set of edges, call it with the second argument to "false".
@@ -888,7 +888,7 @@
     else if (typeof v === 'string') {
       if (arguments.length === 1) {
         this.edgesIndex[v].active = true;
-        
+
       }
       else if (arguments.length === 2) {
         this.edgesIndex[v].active = !!isActive;
@@ -1080,7 +1080,7 @@
   graph.addMethod('activeNodes', function() {
     // Return an array of the active nodes:
     var a = [];
-    for(var id in this.activeNodesIndex) {
+    for (var id in this.activeNodesIndex) {
         a.push(this.activeNodesIndex[id]);
     }
     return a;
@@ -1089,7 +1089,7 @@
   graph.addMethod('activeEdges', function() {
     // Return an array of the active edges:
     var a = [];
-    for(var id in this.activeEdgesIndex) {
+    for (var id in this.activeEdgesIndex) {
         a.push(this.activeEdgesIndex[id]);
     }
     return a;

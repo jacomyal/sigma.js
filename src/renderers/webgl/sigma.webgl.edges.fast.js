@@ -18,8 +18,8 @@
           y1 = source[prefix + 'y'],
           x2 = target[prefix + 'x'],
           y2 = target[prefix + 'y'],
-          color = edge.active ? 
-            edge.active_color || settings('defaultEdgeActiveColor') : 
+          color = edge.active ?
+            edge.active_color || settings('defaultEdgeActiveColor') :
             edge.color;
 
       if (!color)

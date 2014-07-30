@@ -28,8 +28,8 @@
         fontSize = (settings('labelSize') === 'fixed') ?
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size,
-        color = (node.active) ? 
-          node.active_color || settings('defaultNodeActiveColor'): 
+        color = (node.active) ?
+          node.active_color || settings('defaultNodeActiveColor') :
           node.color || defaultNodeColor;
 
     // Label background:
@@ -49,9 +49,9 @@
     }
 
     if (typeof node.label === 'string') {
-      x = Math.round(node[prefix + 'x'] + 
-        borderSize + 
-        settings('outerBorderSize') - 
+      x = Math.round(node[prefix + 'x'] +
+        borderSize +
+        settings('outerBorderSize') -
         fontSize / 2 - 2);
       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
       w = Math.round(
@@ -106,9 +106,9 @@
 
       context.fillText(
         node.label,
-        Math.round(node[prefix + 'x'] + 
-          size + 
-          borderSize + 
+        Math.round(node[prefix + 'x'] +
+          size +
+          borderSize +
           settings('outerBorderSize') +
           3),
         Math.round(node[prefix + 'y'] + fontSize / 3)
