@@ -173,13 +173,30 @@
     )
       throw 'addMethod: Wrong arguments.';
 
-    if (_methods[methodName])
+    if (_methods[methodName] || graph[methodName])
       throw 'The method "' + methodName + '" already exists.';
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
 
     return this;
+  };
+
+  /**
+   * This global method returns true if the method has already been added, and
+   * false else.
+   *
+   * Here are some examples:
+   *
+   *  > graph.hasMethod('addNode'); // returns true
+   *  > graph.hasMethod('hasMethod'); // returns true
+   *  > graph.hasMethod('unexistingMethod'); // returns false
+   *
+   * @param  {string}  methodName The name of the method.
+   * @return {boolean}            The result.
+   */
+  graph.hasMethod = function(methodName) {
+    return !!(_methods[methodName] || graph[methodName]);
   };
 
   /**
@@ -768,47 +785,6 @@
     }
 
     throw 'edges: Wrong arguments.';
-  });
-
-
-  /**
-   * This methods returns an array of nodes that are adjacent to a node.
-   *
-   * @param  {string} id The node id.
-   * @return {array}     The array of adjacent nodes.
-   */
-  graph.addMethod('adjacentNodes', function(id) {
-    if (typeof id !== 'string')
-      throw 'adjacentNodes: the node id must be a string.';
-
-    var target,
-        nodes = [];
-    for(target in this.allNeighborsIndex[id]) {
-      nodes.push(this.nodesIndex[target]);
-    }
-    return nodes;
-  });
-
-  /**
-   * This methods returns an array of edges that are adjacent to a node.
-   *
-   * @param  {string} id The node id.
-   * @return {array}     The array of adjacent edges.
-   */
-  graph.addMethod('adjacentEdges', function(id) {
-    if (typeof id !== 'string')
-      throw 'adjacentEdges: the node id must be a string.';
-
-    var a = this.allNeighborsIndex[id],
-        eid,
-        target,
-        edges = [];
-    for(target in a) {
-      for(eid in a[target]) {
-        edges.push(a[target][eid]);
-      }
-    }
-    return edges;
   });
 
 

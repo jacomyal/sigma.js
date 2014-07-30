@@ -129,12 +129,6 @@ test('Basic manipulation', function() {
     '"nodes" with a strings array as arguments returns the array of specified nodes.'
   );
 
-  deepEqual(
-    myGraph.adjacentNodes('n0'),
-    [graph.nodes[1]],
-    '"adjacentNodes" returns the adjacent nodes of a specified node'
-  );
-
   throws(
     function() {
       myGraph.nodes(['n0', 'n1', 123]);
@@ -244,12 +238,6 @@ test('Basic manipulation', function() {
     '"edges" with a strings array as arguments returns the array of specified edge.'
   );
 
-  deepEqual(
-    myGraph.adjacentEdges('n0'),
-    [graph.edges[0]],
-    '"adjacentEdges" returns the adjacent edges of a specified node'
-  );
-
   throws(
     function() {
       myGraph.edges(['e0', 123]);
@@ -334,9 +322,27 @@ test('Methods and attached functions', function() {
     counter++;
   });
 
+  strictEqual(
+    false,
+    sigma.classes.graph.hasMethod('getNodeLabel'),
+    'sigma.classes.hasMethod returns false if the method does not exist.'
+  );
+
   sigma.classes.graph.addMethod('getNodeLabel', function(nId) {
     return (this.nodesIndex[nId] || {}).label;
   });
+
+  strictEqual(
+    true,
+    sigma.classes.graph.hasMethod('getNodeLabel'),
+    'sigma.classes.hasMethod returns true if the method has been added with addMethod.'
+  );
+
+  strictEqual(
+    true,
+    sigma.classes.graph.hasMethod('hasMethod'),
+    'sigma.classes.hasMethod returns true if the method is implemented in the core.'
+  );
 
   myGraph = new sigma.classes.graph();
   myGraph.addNode({ id: 'n0', label: 'My node' });
