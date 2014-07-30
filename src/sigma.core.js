@@ -352,12 +352,16 @@
       renderer.bind(
         [
           'click',
+          'rightClick',
           'clickStage',
           'doubleClickStage',
+          'rightClickStage',
           'clickNode',
           'clickNodes',
           'doubleClickNode',
           'doubleClickNodes',
+          'rightClickNode',
+          'rightClickNodes',
           'overNode',
           'overNodes',
           'outNode',
