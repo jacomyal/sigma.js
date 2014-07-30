@@ -12,7 +12,7 @@ module.exports = function(grunt) {
   // Project configuration:
   grunt.initConfig({
     forceAtlas2: {
-      prod: {
+      prod: {
         files: {
           'build/plugins/sigma.layout.forceAtlas2.min.js': files
         }

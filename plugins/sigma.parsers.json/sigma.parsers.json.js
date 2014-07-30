@@ -67,7 +67,7 @@
           sig.graph.clear();
           sig.graph.read(graph);
 
-        // ...or instanciate sigma if needed:
+        // ...or instantiate sigma if needed:
         } else if (typeof sig === 'object') {
           sig.graph = graph;
           sig = new sigma(sig);
