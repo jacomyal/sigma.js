@@ -137,10 +137,9 @@
           if (Math.abs((tempRes[hubList[i].id].hub - res[hubList[i].id].hub) / res[hubList[i].id].hub) >= epsilon)
             done = false
         }
-
         res = tempRes
         
-        tempRes = []
+        tempRes = {}
 
         if (done)
           break
