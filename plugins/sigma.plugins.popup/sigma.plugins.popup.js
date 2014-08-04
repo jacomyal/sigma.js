@@ -18,7 +18,7 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.1
+   * @version 0.2
    */
 
   var settings = {
@@ -293,6 +293,13 @@
     var eo = extend(options.edge, settings.edge);
 
     sigma.classes.dispatcher.extend(this);
+
+    // INTERFACE:
+    this.close = function() {
+      cancelPopup();
+      return this;
+    };
+
 
     // STAGE POPUP:
     if (options.stage) {
