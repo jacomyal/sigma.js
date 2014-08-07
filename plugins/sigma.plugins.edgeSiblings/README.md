@@ -1,7 +1,7 @@
 sigma.plugins.edgeSiblings
 ==================
 
-Plugin developed by [Sébastien Heymann](sheymann) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious).
 
 ---
 ## General
@@ -22,25 +22,25 @@ The type of edges which contain siblings is `parallel`. They are true containers
 Read a graph by preventing parallel edges:
 
 ```javascript
-var myGraph = new graph();
- myGraph.readWithSiblings({
-   nodes: [
-     { id: 'n0' },
-     { id: 'n1' }
-   ],
-   edges: [
-     {
-       id: 'e0',
-       source: 'n0',
-       target: 'n1'
-     },
-     {
-       id: 'e1',
-       source: 'n0',
-       target: 'n1'
-     }
-   ]
- });
+var myGraph = new sigma.classes.graph();
+myGraph.readWithSiblings({
+  nodes: [
+    { id: 'n0' },
+    { id: 'n1' }
+  ],
+  edges: [
+    {
+      id: 'e0',
+      source: 'n0',
+      target: 'n1'
+    },
+    {
+      id: 'e1',
+      source: 'n0',
+      target: 'n1'
+    }
+  ]
+});
 
 console.log(
   myGraph.nodes().length,
@@ -73,7 +73,10 @@ console.log(
 Use `graph.addEdgeSibling` to add any edge:
 
 ```javascript
-var myGraph = new graph();
+var myGraph = new sigma.classes.graph();
+
+myGraph.addNode({id:'n0'});
+myGraph.addNode({id:'n1'});
 
 myGraph.addEdgeSibling({
   id: 'e0',
@@ -92,8 +95,7 @@ console.log(
   myGraph.edges().length,
   myGraph.edges()[0].siblings
 ); // outputs:
-// 1,
-// { 'e0':{...}, 'e1':{...} }
+// 1, { 'e0':{object}, 'e1':{object} }
 ```
 
 Use `graph.dropEdgeSibling` to drop any edge:
@@ -104,14 +106,14 @@ myGraph.dropEdgeSibling('e0');
 console.log(
   myGraph.edges()
 ); // outputs:
-//  {
+//  [{
 //    'e1': {
 //      id: 'e1',
 //      source: 'n0',
 //      target: 'n1',
 //      attrY: 'y'
 //    }
-//  }
+//  }]
 ```
 
 ## Graph indexes
