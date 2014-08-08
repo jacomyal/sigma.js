@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" version="1.2" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd">
+  <meta lastmodifieddate="2014-08-07">
+    <creator>Gephi 0.8.1</creator>
+    <description></description>
+  </meta>
+  <graph defaultedgetype="undirected" mode="static">
+    <attributes class="node" mode="static">
+      <attribute id="latitude" title="latitude" type="float"></attribute>
+      <attribute id="longitude" title="longitude" type="float"></attribute>
+      <attribute id="modularity_class" title="Modularity Class" type="integer">
+        <default>0</default>
+      </attribute>
+    </attributes>
+    <nodes>
+      <node id="n1" label="n1">
+        <attvalues>
+          <attvalue for="latitude" value="50.93"></attvalue>
+          <attvalue for="longitude" value="2.48"></attvalue>
+          <attvalue for="modularity_class" value="0"></attvalue>
+        </attvalues>
+        <viz:size value="32.800003"></viz:size>
+        <viz:position x="-44.549004" y="2010.9304" z="0.0"></viz:position>
+        <viz:color r="247" g="74" b="74"></viz:color>
+      </node>
+      <node id="n2" label="n2">
+        <attvalues>
+          <attvalue for="latitude" value="50.88"></attvalue>
+          <attvalue for="longitude" value="2.0"></attvalue>
+          <attvalue for="modularity_class" value="0"></attvalue>
+        </attvalues>
+        <viz:size value="23.2"></viz:size>
+        <viz:position x="-205.39857" y="1984.3617" z="0.0"></viz:position>
+        <viz:color r="247" g="74" b="74"></viz:color>
+      </node>
+      <node id="n4" label="n4">
+        <attvalues>
+          <attvalue for="latitude" value="49.4"></attvalue>
+          <attvalue for="longitude" value="0.19"></attvalue>
+          <attvalue for="modularity_class" value="0"></attvalue>
+        </attvalues>
+        <viz:size value="42.4"></viz:size>
+        <viz:position x="-811.93536" y="1210.4564" z="0.0"></viz:position>
+        <viz:color r="247" g="74" b="74"></viz:color>
+      </node>
+      <node id="n5" label="n5">
+        <attvalues>
+          <attvalue for="latitude" value="48.49"></attvalue>
+          <attvalue for="longitude" value="-1.92"></attvalue>
+          <attvalue for="modularity_class" value="0"></attvalue>
+        </attvalues>
+        <viz:size value="42.4"></viz:size>
+        <viz:position x="-1519.0032" y="746.13965" z="0.0"></viz:position>
+        <viz:color r="247" g="74" b="74"></viz:color>
+      </node>
+      <node id="n6" label="n6">
+        <attvalues>
+          <attvalue for="latitude" value="48.26"></attvalue>
+          <attvalue for="longitude" value="-4.38"></attvalue>
+          <attvalue for="modularity_class" value="0"></attvalue>
+        </attvalues>
+        <viz:size value="13.6"></viz:size>
+        <viz:position x="-2343.3572" y="630.10645" z="0.0"></viz:position>
+        <viz:color r="247" g="74" b="74"></viz:color>
+      </node>
+      <node id="n7" label="n7">
+        <attvalues>
+          <attvalue for="latitude" value="47.15"></attvalue>
+          <attvalue for="longitude" value="-2.09"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="52.0"></viz:size>
+        <viz:position x="-1575.9708" y="77.34003" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+      <node id="n8" label="n8">
+        <attvalues>
+          <attvalue for="latitude" value="46.02"></attvalue>
+          <attvalue for="longitude" value="-1.04"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="52.0"></viz:size>
+        <viz:position x="-1224.1124" y="-473.6557" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+      <node id="n9" label="n9">
+        <attvalues>
+          <attvalue for="latitude" value="43.22"></attvalue>
+          <attvalue for="longitude" value="-1.85"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="23.2"></viz:size>
+        <viz:position x="-1495.546" y="-1792.2694" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n10" label="n10">
+        <attvalues>
+          <attvalue for="latitude" value="42.38"></attvalue>
+          <attvalue for="longitude" value="3.18"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="4.0"></viz:size>
+        <viz:position x="190.02327" y="-2175.9167" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n11" label="n11">
+        <attvalues>
+          <attvalue for="latitude" value="43.47"></attvalue>
+          <attvalue for="longitude" value="4.04"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="32.800003"></viz:size>
+        <viz:position x="478.212" y="-1677.0706" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n12" label="n12">
+        <attvalues>
+          <attvalue for="latitude" value="42.9"></attvalue>
+          <attvalue for="longitude" value="6.59"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="23.2"></viz:size>
+        <viz:position x="1332.7253" y="-1939.0361" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n13" label="n13">
+        <attvalues>
+          <attvalue for="latitude" value="43.62"></attvalue>
+          <attvalue for="longitude" value="7.66"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="42.4"></viz:size>
+        <viz:position x="1691.2856" y="-1607.7249" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n14" label="n14">
+        <attvalues>
+          <attvalue for="latitude" value="46.05"></attvalue>
+          <attvalue for="longitude" value="6.19"></attvalue>
+          <attvalue for="modularity_class" value="1"></attvalue>
+        </attvalues>
+        <viz:size value="52.0"></viz:size>
+        <viz:position x="1198.684" y="-459.17484" z="0.0"></viz:position>
+        <viz:color r="74" g="247" b="74"></viz:color>
+      </node>
+      <node id="n15" label="n15">
+        <attvalues>
+          <attvalue for="latitude" value="47.43"></attvalue>
+          <attvalue for="longitude" value="7.65"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="42.4"></viz:size>
+        <viz:position x="1687.9347" y="215.67168" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+      <node id="n16" label="n16">
+        <attvalues>
+          <attvalue for="latitude" value="48.9"></attvalue>
+          <attvalue for="longitude" value="8.32"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="32.800003"></viz:size>
+        <viz:position x="1912.4537" y="954.29047" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+      <node id="n17" label="n17">
+        <attvalues>
+          <attvalue for="latitude" value="49.83"></attvalue>
+          <attvalue for="longitude" value="4.94"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="52.0"></viz:size>
+        <viz:position x="779.80493" y="1432.8538" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+      <node id="Paris" label="Paris">
+        <attvalues>
+          <attvalue for="latitude" value="48.72"></attvalue>
+          <attvalue for="longitude" value="2.46"></attvalue>
+          <attvalue for="modularity_class" value="2"></attvalue>
+        </attvalues>
+        <viz:size value="100.0"></viz:size>
+        <viz:position x="-51.251064" y="862.6979" z="0.0"></viz:position>
+        <viz:color r="74" g="74" b="247"></viz:color>
+      </node>
+    </nodes>
+    <edges>
+      <edge id="8" source="n1" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="7" source="n2" target="n4">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="28" source="n4" target="n1">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="30" source="n4" target="n7">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="26" source="n5" target="n1">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="27" source="n5" target="n2">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="0" source="n6" target="n5">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="29" source="n7" target="n5">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="1" source="n7" target="n8">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="17" source="n7" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="10" source="n8" target="n13">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="18" source="n8" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="15" source="n9" target="n8">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="34" source="n10" target="n9">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="31" source="n10" target="n11">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="11" source="n11" target="n13">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="13" source="n11" target="n14">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="32" source="n12" target="n10">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="12" source="n12" target="n11">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="23" source="n12" target="n13">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="33" source="n13" target="n10">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="25" source="n13" target="n14">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="14" source="n14" target="n9">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="5" source="n14" target="n17">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="19" source="n14" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="6" source="n15" target="n8">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="20" source="n15" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="4" source="n16" target="n15">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="24" source="n16" target="Paris">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="9" source="n17" target="n7">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="2" source="Paris" target="n4">
+        <attvalues></attvalues>
+      </edge>
+      <edge id="3" source="Paris" target="n17">
+        <attvalues></attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>
