@@ -99,7 +99,8 @@
    *                          values: "top", "bottom", "left", "right".
    *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the popup
    *                          position to be fully included in the body area.
-   *                          Doesn't work on Firefox 30.
+   *                          Doesn't work on Firefox 30. Better work on
+   *                          elements with fixed width and height.
    *
    * @param {sigma}  s       The related sigma instance.
    * @param {object} o       The node or the edge.
@@ -139,81 +140,89 @@
     _popup.style.left = x + 'px';
     _popup.style.top = y + 'px';
 
-    // Insert the element in the DOM:
-    s.renderers[0].container.appendChild(_popup);
+    // Execute after rendering:
+    setTimeout(function() {
+      if (!_popup)
+        return;
 
-    // Find offset:
-    var bodyRect = document.body.getBoundingClientRect(),
-        popupRect = _popup.getBoundingClientRect(),
-        offsetTop =  popupRect.top - bodyRect.top,
-        offsetBottom = bodyRect.bottom - popupRect.bottom,
-        offsetLeft =  popupRect.left - bodyRect.left,
-        offsetRight = bodyRect.right - popupRect.right;
+      // Insert the element in the DOM:
+      s.renderers[0].container.appendChild(_popup);
 
-    if (options.position === 'top') {
-      // New position vertically aligned and on top of the mouse:
-      _popup.className = options.cssClass + ' top';
-      _popup.style.left = x - (popupRect.right - popupRect.left) / 2 + 'px';
-      _popup.style.top = y - (popupRect.bottom - popupRect.top) + 'px';
-    }
-    else if (options.position === 'bottom') {
-      // New position vertically aligned and on bottom of the mouse:
-      _popup.className = options.cssClass + ' bottom';
-      _popup.style.left = x - (popupRect.right - popupRect.left) / 2 + 'px';
-      _popup.style.top = y + 'px';
-    }
-    else if (options.position === 'left') {
-      // New position vertically aligned and on bottom of the mouse:
-      _popup.className = options.cssClass+ ' left';
-      _popup.style.left = x - (popupRect.right - popupRect.left) + 'px';
-      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2 + 'px';
-    }
-    else if (options.position === 'right') {
-      // New position vertically aligned and on bottom of the mouse:
-      _popup.className = options.cssClass + ' right';
-      _popup.style.left = x + 'px';
-      _popup.style.top = y - (popupRect.bottom - popupRect.top) / 2 + 'px';
-    }
-    
-    // Update offset
-    popupRect = _popup.getBoundingClientRect();
-    offsetTop = popupRect.top - bodyRect.top;
-    offsetBottom = bodyRect.bottom - popupRect.bottom;
-    offsetLeft = popupRect.left - bodyRect.left;
-    offsetRight = bodyRect.right - popupRect.right;
-
-    // Adjust position to keep the popup inside body:
-    // FIXME: doesn't work on Firefox
-    if (options.autoadjust) {
-      if (offsetBottom < 0) {
-        _popup.className = options.cssClass;
-        if (options.position === 'top' || options.position === 'bottom') {
-          _popup.className = options.cssClass + ' top';
-        }
-        _popup.style.top = y - popupRect.bottom + popupRect.top + 'px';
+      // Find offset:
+      var bodyRect = document.body.getBoundingClientRect(),
+          popupRect = _popup.getBoundingClientRect(),
+          offsetTop =  popupRect.top - bodyRect.top,
+          offsetBottom = bodyRect.bottom - popupRect.bottom,
+          offsetLeft =  popupRect.left - bodyRect.left,
+          offsetRight = bodyRect.right - popupRect.right;
+      
+      if (options.position === 'top') {
+        // New position vertically aligned and on top of the mouse:
+        _popup.className = options.cssClass + ' top';
+        _popup.style.left = x - (popupRect.width / 2) + 'px';
+        _popup.style.top = y - popupRect.height + 'px';
       }
-      else if (offsetTop < 0) {
-        _popup.className = options.cssClass;
-        if (options.position === 'top' || options.position === 'bottom') {
-          _popup.className = options.cssClass + ' bottom';
-        }
+      else if (options.position === 'bottom') {
+        // New position vertically aligned and on bottom of the mouse:
+        _popup.className = options.cssClass + ' bottom';
+        _popup.style.left = x - (popupRect.width / 2) + 'px';
         _popup.style.top = y + 'px';
       }
-      if (offsetRight < 0) {
-        _popup.className = options.cssClass;
-        if (options.position === 'left' || options.position === 'right') {
-          _popup.className = options.cssClass + ' left';
-        }
-        _popup.style.left = x - popupRect.right + popupRect.left + 'px';
+      else if (options.position === 'left') {
+        // New position vertically aligned and on bottom of the mouse:
+        _popup.className = options.cssClass+ ' left';
+        _popup.style.left = x - popupRect.width + 'px';
+        _popup.style.top = y - (popupRect.height / 2) + 'px';
       }
-      else if (offsetLeft < 0) {
-        _popup.className = options.cssClass;
-        if (options.position === 'left' || options.position === 'right') {
-          _popup.className = options.cssClass + ' right';
-        }
+      else if (options.position === 'right') {
+        // New position vertically aligned and on bottom of the mouse:
+        _popup.className = options.cssClass + ' right';
         _popup.style.left = x + 'px';
+        _popup.style.top = y - (popupRect.height / 2) + 'px';
       }
-    }
+
+      // Adjust position to keep the popup inside body:
+      // FIXME: doesn't work on Firefox
+      if (options.autoadjust) {
+
+        // Update offset
+        popupRect = _popup.getBoundingClientRect();
+        offsetTop = popupRect.top - bodyRect.top;
+        offsetBottom = bodyRect.bottom - popupRect.bottom;
+        offsetLeft = popupRect.left - bodyRect.left;
+        offsetRight = bodyRect.right - popupRect.right;
+
+        if (offsetBottom < 0) {
+          _popup.className = options.cssClass;
+          if (options.position === 'top' || options.position === 'bottom') {
+            _popup.className = options.cssClass + ' top';
+          }
+          _popup.style.top = y - popupRect.height + 'px';
+        }
+        else if (offsetTop < 0) {
+          _popup.className = options.cssClass;
+          if (options.position === 'top' || options.position === 'bottom') {
+            _popup.className = options.cssClass + ' bottom';
+          }
+          _popup.style.top = y + 'px';
+        }
+        if (offsetRight < 0) {
+          //! incorrect popupRect.width on non fixed width element.
+          _popup.className = options.cssClass;
+          if (options.position === 'left' || options.position === 'right') {
+            _popup.className = options.cssClass + ' left';
+          }
+          _popup.style.left = x - popupRect.width + 'px';
+        }
+        else if (offsetLeft < 0) {
+          _popup.className = options.cssClass;
+          if (options.position === 'left' || options.position === 'right') {
+            _popup.className = options.cssClass + ' right';
+          }
+          _popup.style.left = x + 'px';
+        }
+      }
+    }, 0);
   };
 
   /**
@@ -273,7 +282,8 @@
    *   {?number}   delay      The delay in milliseconds to show the popup.
    *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the popup
    *                          position to be fully included in the body area.
-   *                          Doesn't work on Firefox 30.
+   *                          Doesn't work on Firefox 30. Better work on
+   *                          elements with fixed width and height.
    *
    * > sigma.plugins.popup(s, {
    * >   node: {
