@@ -26,6 +26,8 @@
    * @param  {renderer} renderer The related renderer instance.
    */
   sigma.plugins.dragNodes = function(s, renderer) {
+    sigma.classes.dispatcher.extend(this);
+
     // A quick hardcoded rule to prevent people from using this plugin with the
     // WebGL renderer (which is impossible at the moment):
     if (
@@ -36,15 +38,18 @@
         'The sigma.plugins.dragNodes is not compatible with the WebGL renderer'
       );
 
-    var _body = document.body,
+    var _self = this,
+        _body = document.body,
         _container = renderer.container,
         _mouse = _container.lastChild,
         _camera = renderer.camera,
         _node = null,
         _prefix = '',
         _hoverStack = [],
+        _hoverIndex = {},
         _isMouseDown = false,
-        _isMouseOverCanvas = false;
+        _isMouseOverCanvas = false,
+        _drag = false;
 
     // It removes the initial substring ('read_') if it's a WegGL renderer.
     if (renderer instanceof sigma.renderers.webgl) {
@@ -67,8 +72,14 @@
     };
 
     var nodeMouseOver = function(event) {
+      // Don't treat the node if it is already registered
+      if (_hoverIndex[event.data.node.id]) {
+        return;
+      }
+
       // Add node to array of current nodes over
       _hoverStack.push(event.data.node);
+      _hoverIndex[event.data.node.id] = true;
 
       if(_hoverStack.length && ! _isMouseDown) {
         // Set the current node to be the last one in the array
@@ -81,6 +92,7 @@
       // Remove the node from the array
       var indexCheck = _hoverStack.map(function(e) { return e; }).indexOf(event.data.node);
       _hoverStack.splice(indexCheck, 1);
+      delete _hoverIndex[event.data.node.id];
 
       if(_hoverStack.length && ! _isMouseDown) {
         // On out, set the current node to be the next stated in array
@@ -101,6 +113,12 @@
         // Deactivate drag graph.
         renderer.settings({mouseEnabled: false, enableHovering: false});
         s.refresh();
+
+        _self.dispatchEvent('startdrag', {
+          node: _node,
+          captor: event,
+          renderer: renderer
+        });
       }
     };
 
@@ -113,6 +131,20 @@
       // Activate drag graph.
       renderer.settings({mouseEnabled: true, enableHovering: true});
       s.refresh();
+
+      if (_drag) {
+        _self.dispatchEvent('drop', {
+          node: _node,
+          captor: event,
+          renderer: renderer
+        });
+      }
+      _self.dispatchEvent('dragend', {
+        node: _node,
+        captor: event,
+        renderer: renderer
+      });
+      _drag = false;
     };
 
     var nodeMouseMove = function(event) {
@@ -155,11 +187,20 @@
         _node.y = y * cos + x * sin;
 
         s.refresh();
+
+        _drag = true;
+        _self.dispatchEvent('drag', {
+          node: _node,
+          captor: event,
+          renderer: renderer
+        });
       }
     };
 
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
+
+    return this;
   };
 
 }).call(window);
