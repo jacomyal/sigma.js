@@ -45,7 +45,7 @@
         if (obj.viz && typeof obj.viz === 'object') {
           if (obj.viz.position && typeof obj.viz.position === 'object') {
             obj.x = obj.viz.position.x;
-            obj.y = obj.viz.position.y;
+            obj.y = -obj.viz.position.y; // Needed otherwise it's up side down
           }
           obj.size = obj.viz.size;
           obj.color = obj.viz.color;
@@ -81,7 +81,7 @@
         for (i = 0, l = arr.length; i < l; i++)
           sig.graph.addEdge(arr[i]);
 
-      // ...or instanciate sigma if needed:
+      // ...or instantiate sigma if needed:
       } else if (typeof sig === 'object') {
         sig.graph = graph;
         sig = new sigma(sig);

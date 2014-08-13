@@ -1,4 +1,4 @@
-;(function() {
+  ;(function() {
   'use strict';
 
   sigma.utils.pkg('sigma.canvas.edges');
@@ -19,7 +19,21 @@
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
-        cp = sigma.utils.getCP(source, target, prefix);
+        cp = {},
+        sSize = source[prefix + 'size'],
+        sX = source[prefix + 'x'],
+        sY = source[prefix + 'y'],
+        tX = target[prefix + 'x'],
+        tY = target[prefix + 'y'];
+
+    if (source.id === target.id) {
+      cp.x = sX - sSize * 7;
+      cp.y = sY;
+      cp.x2 = sX;
+      cp.y2 = sY + sSize * 7;
+    } else {
+      cp = sigma.utils.getCP(source, target, prefix);
+    }
 
     if (!color)
       switch (edgeColor) {
@@ -46,16 +60,12 @@
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
-    context.moveTo(
-      source[prefix + 'x'],
-      source[prefix + 'y']
-    );
-    context.quadraticCurveTo(
-      cp.x,
-      cp.y,
-      target[prefix + 'x'],
-      target[prefix + 'y']
-    );
+    context.moveTo(sX, sY);
+    if (source.id === target.id) {
+      context.bezierCurveTo(cp.x2, cp.y2, cp.x, cp.y, tX, tY);
+    } else {
+      context.quadraticCurveTo(cp.x, cp.y, tX, tY);
+    }
     context.stroke();
   };
 })();

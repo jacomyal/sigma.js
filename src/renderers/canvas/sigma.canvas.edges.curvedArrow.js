@@ -18,25 +18,33 @@
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
+        cp = {},
         thickness = edge[prefix + 'size'] || 1,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
-        controlX = (source[prefix + 'x'] + target[prefix + 'x']) / 2 +
-                   (target[prefix + 'y'] - source[prefix + 'y']) / 4,
-        controlY = (source[prefix + 'y'] + target[prefix + 'y']) / 2 +
-                   (source[prefix + 'x'] - target[prefix + 'x']) / 4,
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
     thickness = (edge.hover) ?
       settings('edgeHoverSizeRatio') * thickness : thickness;
-    var aSize = thickness * 2.5,
-        d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
-        aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,
-        aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,
-        vX = (tX - controlX) * aSize / d,
-        vY = (tY - controlY) * aSize / d;
+    
+
+    if (source.id === target.id) {
+      cp.x = sX - tSize * 7;
+      cp.y = sY;
+      cp.x2 = sX;
+      cp.y2 = sY + tSize * 7;
+    } else {
+      cp = sigma.utils.getCP(source, target, prefix);
+    }
+
+    var d = Math.sqrt(Math.pow(tX - cp.x, 2) + Math.pow(tY - cp.y, 2)),
+        aSize = thickness * 2.5,
+        aX = cp.x + (tX - cp.x) * (d - aSize - tSize) / d,
+        aY = cp.y + (tY - cp.y) * (d - aSize - tSize) / d,
+        vX = (tX - cp.x) * aSize / d,
+        vY = (tY - cp.y) * aSize / d;
 
     if (!color)
       switch (edgeColor) {
@@ -60,10 +68,14 @@
     }
 
     context.strokeStyle = color;
-    context.lineWidth = thickness;
+    context.lineWidth = edge[prefix + 'size'] || 1;
     context.beginPath();
     context.moveTo(sX, sY);
-    context.quadraticCurveTo(controlX, controlY, aX, aY);
+    if (source.id === target.id) {
+      context.bezierCurveTo(cp.x2, cp.y2, cp.x, cp.y, aX, aY);
+    } else {
+      context.quadraticCurveTo(cp.x, cp.y, aX, aY);
+    }
     context.stroke();
 
     context.fillStyle = color;

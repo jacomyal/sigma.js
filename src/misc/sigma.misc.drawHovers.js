@@ -8,7 +8,7 @@
   sigma.utils.pkg('sigma.misc');
 
   /**
-   * This method listens to "overNodes", "outNodes", "overNodes" and "outNodes"
+   * This method listens to "overNode", "outNode", "overEdge" and "outEdge"
    * events from a renderer and renders the nodes differently on the top layer.
    * The goal is to make any node label readable with the mouse, and to
    * highlight hovered nodes and edges.
@@ -17,57 +17,35 @@
    */
   sigma.misc.drawHovers = function(prefix) {
     var self = this,
-        hoveredNodes = {},
-        hoveredEdges = {};
+        hoveredNodes = [],
+        hoveredEdges = [];
 
-    this.bind('overNodes', function(event) {
-      var n = event.data.nodes,
-          l = n.length,
-          i;
-
-      for (i = 0; i < l; i++) {
-        self.graph.hoverNode(n[i].id);
-        hoveredNodes[n[i].id] = n[i];
-      }
-
+    this.bind('overNode', function(event) {
+      hoveredNodes.push(event.data.node);
       draw();
     });
-    this.bind('outNodes', function(event) {
-      var n = event.data.nodes,
-          l = n.length,
-          i;
 
-      for (i = 0; i < l; i++) {
-        self.graph.hoverNode(n[i].id, false);
-        delete hoveredNodes[n[i].id];
-      }
-
+    this.bind('outNode', function(event) {
+      var indexCheck = hoveredNodes.map(function(n) {
+        return n;
+      }).indexOf(event.data.node);
+      hoveredNodes.splice(indexCheck, 1);
       draw();
     });
-    this.bind('overEdges', function(event) {
-      var e = event.data.edges,
-          l = e.length,
-          i;
 
-      for (i = 0; i < l; i++) {
-        self.graph.hoverEdge(e[i].id);
-        hoveredEdges[e[i].id] = e[i];
-      }
-
+    this.bind('overEdge', function(event) {
+      hoveredEdges.push(event.data.edge);
       draw();
     });
-    this.bind('outEdges', function(event) {
-      var e = event.data.edges,
-          l = e.length,
-          i;
 
-      for (i = 0; i < l; i++) {
-        self.graph.hoverEdge(e[i].id, false);
-        delete hoveredEdges[e[i].id];
-      }
-
+    this.bind('outEdge', function(event) {
+      var indexCheck = hoveredEdges.map(function(e) {
+        return e;
+      }).indexOf(event.data.edge);
+      hoveredEdges.splice(indexCheck, 1);
       draw();
     });
+
     this.bind('render', function(event) {
       draw();
     });
@@ -76,36 +54,84 @@
       // Clear self.contexts.hover:
       self.contexts.hover.canvas.width = self.contexts.hover.canvas.width;
 
-      var k,
+      var i,
           nodeRenderers = sigma.canvas.hovers,
           edgeRenderers = sigma.canvas.edgehovers,
           embedSettings = self.settings.embedObjects({
             prefix: prefix
           });
 
-      // Edge render
-      if (embedSettings('enableEdgeHovering')) {
-        for (k in hoveredEdges)
-          if (!hoveredEdges[k].hidden) {
-            (edgeRenderers[hoveredEdges[k].type] || edgeRenderers.def)(
-              hoveredEdges[k],
-              self.graph.nodes(hoveredEdges[k].source),
-              self.graph.nodes(hoveredEdges[k].target),
+      // Edge render: single hover
+      if (embedSettings('enableEdgeHovering') &&
+        embedSettings('singleHover') &&
+        hoveredEdges.length
+      ) {
+        i = hoveredEdges.length - 1;
+        if (! hoveredEdges[i].hidden) {
+          (
+            edgeRenderers[hoveredEdges[i].type] ||
+            edgeRenderers.def
+          )(
+            hoveredEdges[i],
+            self.graph.nodes(hoveredEdges[i].source),
+            self.graph.nodes(hoveredEdges[i].target),
+            self.contexts.hover,
+            embedSettings
+          );
+        }
+      }
+
+      // Edge render: multiple hover
+      if (embedSettings('enableEdgeHovering') &&
+        !embedSettings('singleHover') &&
+        hoveredEdges.length
+      ) {
+        for (i = 0; i < hoveredEdges.length; i++) {
+          if (! hoveredEdges[i].hidden) {
+            (edgeRenderers[hoveredEdges[i].type] || edgeRenderers.def) (
+              hoveredEdges[i],
+              self.graph.nodes(hoveredEdges[i].source),
+              self.graph.nodes(hoveredEdges[i].target),
               self.contexts.hover,
               embedSettings
             );
           }
+        }
       }
 
-      // Node render
-      if (embedSettings('enableHovering')) {
-        for (k in hoveredNodes)
-          if (!hoveredNodes[k].hidden)
-            (nodeRenderers[hoveredNodes[k].type] || nodeRenderers.def)(
-              hoveredNodes[k],
+      // Node render: single hover
+      if (embedSettings('enableHovering') &&
+        embedSettings('singleHover') &&
+        hoveredNodes.length
+      ) {
+        i = hoveredNodes.length - 1;
+        if (! hoveredNodes[i].hidden) {
+          (
+            nodeRenderers[hoveredNodes[i].type] ||
+            nodeRenderers.def
+          )(
+            hoveredNodes[i],
+            self.contexts.hover,
+            embedSettings
+          );
+        }
+      }
+
+      // Node render: multiple hover
+      if (
+        embedSettings('enableHovering') &&
+        !embedSettings('singleHover') &&
+        hoveredNodes.length
+      ) {
+        for (i = 0; i < hoveredNodes.length; i++) {
+          if (! hoveredNodes[i].hidden) {
+            (nodeRenderers[hoveredNodes[i].type] || nodeRenderers.def) (
+              hoveredNodes[i],
               self.contexts.hover,
               embedSettings
             );
+          }
+        }
       }
     }
   };
