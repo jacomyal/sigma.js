@@ -12,6 +12,7 @@
   sigma.utils.pkg('sigma.plugins');
 
   var _self,
+      _s,
       _body,
       _renderer,
       _mouse,
@@ -72,7 +73,7 @@
 
   function nodeMouseDown(event) {
     _isMouseDown = true;
-    var size = s.graph.nodes().length;
+    var size = _s.graph.nodes().length;
     if (size > 0) {
       _mouse.removeEventListener('mousedown', nodeMouseDown);
       _body.addEventListener('mousemove', nodeMouseMove);
@@ -81,8 +82,8 @@
       // Do not refresh edgequadtree during drag:
       var k,
           c;
-      for (k in s.cameras) {
-        c = s.cameras[k];
+      for (k in _s.cameras) {
+        c = _s.cameras[k];
         if (c.edgequadtree !== undefined) {
           c.edgequadtree._enabled = false;
         }
@@ -90,7 +91,7 @@
 
       // Deactivate drag graph.
       _renderer.settings({mouseEnabled: false, enableHovering: false});
-      s.refresh();
+      _s.refresh();
 
       _self.dispatchEvent('startdrag', {
         node: _node,
@@ -110,8 +111,8 @@
     // Allow to refresh edgequadtree:
     var k,
         c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
+    for (k in _s.cameras) {
+      c = _s.cameras[k];
       if (c.edgequadtree !== undefined) {
         c.edgequadtree._enabled = true;
       }
@@ -119,7 +120,7 @@
 
     // Activate drag graph.
     _renderer.settings({mouseEnabled: true, enableHovering: true});
-    s.refresh();
+    _s.refresh();
 
     if (_drag) {
       _self.dispatchEvent('drop', {
@@ -150,7 +151,7 @@
           y = event.pageY - offset.top,
           cos = Math.cos(_camera.angle),
           sin = Math.sin(_camera.angle),
-          nodes = s.graph.nodes(),
+          nodes = _s.graph.nodes(),
           ref = [];
 
       // Getting and derotating the reference coordinates.
@@ -175,7 +176,7 @@
       _node.x = x * cos - y * sin;
       _node.y = y * cos + x * sin;
 
-      s.refresh();
+      _s.refresh();
 
       _drag = true;
       _self.dispatchEvent('drag', {
@@ -223,6 +224,7 @@
 
     // Init variables:
     _self = this;
+    _s = s;
     _body = document.body;
     _renderer = renderer;
     _mouse = renderer.container.lastChild;
