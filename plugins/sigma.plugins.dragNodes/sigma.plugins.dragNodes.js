@@ -272,12 +272,14 @@
    * This method removes the event listeners and kills the dragNodes instance.
    */
   sigma.plugins.killDragNodes = function() {
-    _mouse.removeEventListener('mousedown', nodeMouseDown);
-    _body.removeEventListener('mousemove', nodeMouseMove);
-    _body.removeEventListener('mouseup', nodeMouseUp);
-    _renderer.unbind('overNode', nodeMouseOver);
-    _renderer.unbind('outNode', treatOutNode);
-    _instance = null;
+    if (_instance instanceof DragNodes) {
+      _mouse.removeEventListener('mousedown', nodeMouseDown);
+      _body.removeEventListener('mousemove', nodeMouseMove);
+      _body.removeEventListener('mouseup', nodeMouseUp);
+      _renderer.unbind('overNode', nodeMouseOver);
+      _renderer.unbind('outNode', treatOutNode);
+      _instance = null;
+    }
   };
 
 }).call(window);
