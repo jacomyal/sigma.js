@@ -532,11 +532,13 @@
    *  This function kills the popup instance.
    */
   sigma.plugins.killPopup = function() {
-    _instance.unbindEvents();
-    _instance = null;
-    _popup = null;
-    _timeoutHandle = null;
-    _doubleClick = false;
+    if (_instance instanceof Popup) {
+      _instance.unbindEvents();
+      _instance = null;
+      _popup = null;
+      _timeoutHandle = null;
+      _doubleClick = false;
+    }
   };
 
 }).call(window);
