@@ -13,13 +13,19 @@ To use, include all .js files under this folder. Then initialize it as follows:
 var dragListener = new sigma.plugins.dragNodes(sigInst, renderer);
 ````
 
+Kills the plugin as follows:
+
+````javascript
+sigma.plugins.killDragNodes();
+````
+
 ## Events
 
 This plugin provides the following events fired by the instance of the plugin:
-* startdrag: fired at the beginning of the drag
-* drag: fired while the node is dragged
-* drop: fired at the end of the drag if the node has been dragged
-* dragend: fired at the end of the drag
+* `startdrag`: fired at the beginning of the drag
+* `drag`: fired while the node is dragged
+* `drop`: fired at the end of the drag if the node has been dragged
+* `dragend`: fired at the end of the drag
 
 Exemple of event binding:
 
