@@ -17,7 +17,7 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.2
+   * @version 0.3
    */
 
   var settings = {
@@ -302,12 +302,42 @@
 
     sigma.classes.dispatcher.extend(this);
 
+    function contextmenuListener(event) {
+      event.preventDefault();
+    };
+
     // INTERFACE:
     this.close = function() {
       cancelPopup();
       return this;
     };
 
+    this.unbindEvents = function() {
+      if (options.stage) {
+        s.unbind(so.show);
+        s.unbind(so.hide);
+        if (so.show !== 'doubleClickStage') {
+          s.unbind('doubleClickStage');
+        }
+      }
+      if (options.node) {
+        s.unbind(no.show);
+        s.unbind(no.hide);
+        if (no.show !== 'doubleClickNode') {
+          s.unbind('doubleClickNode');
+        }
+      }
+      if (options.edge) {
+        s.unbind(eo.show);
+        s.unbind(eo.hide);
+        if (eo.show !== 'doubleClickEdge') {
+          s.unbind('doubleClickEdge');
+        }
+      }
+      if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
+        s.renderers[0].container.removeEventListener('contextmenu', contextmenuListener);
+      }
+    };
 
     // STAGE POPUP:
     if (options.stage) {
@@ -476,9 +506,7 @@
     // Prevent the browser context menu to appear
     // if the right click event is already handled:
     if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
-      s.renderers[0].container.addEventListener('contextmenu', function(event) {
-        event.preventDefault();
-      });
+      s.renderers[0].container.addEventListener('contextmenu', contextmenuListener);
     }
   };
 
@@ -498,6 +526,17 @@
       _instance = new Popup(s, options);
     }
     return _instance;
+  };
+
+  /**
+   *  This function kills the popup instance.
+   */
+  sigma.plugins.killPopup = function() {
+    _instance.unbindEvents();
+    _instance = null;
+    _popup = null;
+    _timeoutHandle = null;
+    _doubleClick = false;
   };
 
 }).call(window);
