@@ -486,27 +486,35 @@
     this.edgesArray.push(validEdge);
     this.edgesIndex[validEdge.id] = validEdge;
 
-    if (!this.inNeighborsIndex[edge.target][edge.source])
-      this.inNeighborsIndex[edge.target][edge.source] = Object.create(null);
-    this.inNeighborsIndex[edge.target][edge.source][edge.id] = edge;
+    if (!this.inNeighborsIndex[validEdge.target][validEdge.source])
+      this.inNeighborsIndex[validEdge.target][validEdge.source] =
+        Object.create(null);
+    this.inNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+      validEdge;
 
-    if (!this.outNeighborsIndex[edge.source][edge.target])
-      this.outNeighborsIndex[edge.source][edge.target] = Object.create(null);
-    this.outNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+    if (!this.outNeighborsIndex[validEdge.source][validEdge.target])
+      this.outNeighborsIndex[validEdge.source][validEdge.target] =
+        Object.create(null);
+    this.outNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
+      validEdge;
 
-    if (!this.allNeighborsIndex[edge.source][edge.target])
-      this.allNeighborsIndex[edge.source][edge.target] = Object.create(null);
-    this.allNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+    if (!this.allNeighborsIndex[validEdge.source][validEdge.target])
+      this.allNeighborsIndex[validEdge.source][validEdge.target] =
+        Object.create(null);
+    this.allNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
+      validEdge;
 
-    if (!this.allNeighborsIndex[edge.target][edge.source])
-      this.allNeighborsIndex[edge.target][edge.source] = Object.create(null);
-    this.allNeighborsIndex[edge.target][edge.source][edge.id] = edge;
+    if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
+      this.allNeighborsIndex[validEdge.target][validEdge.source] =
+        Object.create(null);
+    this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+      validEdge;
 
     // Keep counts up to date:
-    this.inNeighborsCount[edge.target]++;
-    this.outNeighborsCount[edge.source]++;
-    this.allNeighborsCount[edge.target]++;
-    this.allNeighborsCount[edge.source]++;
+    this.inNeighborsCount[validEdge.target]++;
+    this.outNeighborsCount[validEdge.source]++;
+    this.allNeighborsCount[validEdge.target]++;
+    this.allNeighborsCount[validEdge.source]++;
 
     return this;
   });
