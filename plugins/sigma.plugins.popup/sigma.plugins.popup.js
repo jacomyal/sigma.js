@@ -11,7 +11,6 @@
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
-  sigma.utils.pkg('sigma.plugins.popup');
 
   /**
    * Sigma Popup
@@ -55,8 +54,7 @@
     doubleClickDelay: 800
   };
 
-  var _instance,
-      _popup,
+  var _popup,
       _timeoutHandle,
       _doubleClick = false;
 
@@ -297,12 +295,7 @@
    * @param {sigma}  s       The related sigma instance.
    * @param {object} options An object with options.
    */
-  sigma.plugins.popup = function(s, options) {
-    if (_instance !== undefined) {
-      return _instance;
-    }
-
-    _instance = this;
+  function Popup(s, options) {
     var so = extend(options.stage, settings.stage);
     var no = extend(options.node, settings.node);
     var eo = extend(options.edge, settings.edge);
@@ -487,8 +480,24 @@
         event.preventDefault();
       });
     }
+  };
 
-    return this;
+  /**
+   * Interface
+   * ------------------
+   */
+  var _instance = null;
+
+  /**
+   * @param {sigma}  s The related sigma instance.
+   * @param {object} options An object with options.
+   */
+  sigma.plugins.popup = function(s, options) {
+    // Create object if undefined
+    if (!_instance) {
+      _instance = new Popup(s, options);
+    }
+    return _instance;
   };
 
 }).call(window);
