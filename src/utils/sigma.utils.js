@@ -328,13 +328,15 @@
         _dt,
         t = 0.5,
         r = (dP1 < dP2) ? -0.1 : 0.1,
-        rThreshold = 0.025,
+        rThreshold = 0.0025,
+        i = 1000,
         // dThreshold = Math.log(1 + w) * epsilon / 20,
         // get x(t), y(t):
         pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
         dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
 
-    while (t >= 0 && t <= 1 &&
+    while (i-- > 0 &&
+      t >= 0 && t <= 1 &&
       (dt > epsilon) &&
       (r > rThreshold || r < -rThreshold)) {
       _dt = dt;
@@ -358,6 +360,7 @@
         t += r;
       }
     }
+
     return dt < epsilon;
   };
 

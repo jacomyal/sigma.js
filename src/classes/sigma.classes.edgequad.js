@@ -42,7 +42,7 @@
      * Transforms a graph edge with x1, y1, x2, y2 and size into an
      * axis-aligned square.
      *
-     * @param  {object} A graph edge with at least twp points
+     * @param  {object} A graph edge with at least two points
      *                  (x1, y1), (x2, y2) and a size.
      * @return {object} A square: two points (x1, y1), (x2, y2) and height.
      */
@@ -87,6 +87,41 @@
         x2: e.x1 + e.size,
         y2: e.y2 - e.size,
         height: e.y1 - e.y2 + e.size * 2
+      };
+    },
+
+    /**
+     * Transforms a graph edge of type 'curve' with x1, y1, x2, y2,
+     * control point and size into an axis-aligned square.
+     *
+     * @param  {object} A graph edge with at least two points
+     *                  (x1, y1), (x2, y2), a control point cp and a size.
+     * @return {object} A square: two points (x1, y1), (x2, y2) and height.
+     */
+    quadraticCurveToSquare: function(e, cp) {
+      var pt = sigma.utils.getPointOnQuadraticCurve(
+        0.5,
+        e.x1,
+        e.y1,
+        e.x2,
+        e.y2,
+        cp.x,
+        cp.y
+      );
+
+      // Bounding box of the two points and the point at the middle of the
+      // curve:
+      var minX = Math.min(e.x1, e.x2, pt.x),
+          maxX = Math.max(e.x1, e.x2, pt.x),
+          minY = Math.min(e.y1, e.y2, pt.y),
+          maxY = Math.max(e.y1, e.y2, pt.y);
+
+      return {
+        x1: minX - e.size,
+        y1: minY - e.size,
+        x2: maxX + e.size,
+        y2: minY - e.size,
+        height: maxY - minY + e.size * 2
       };
     },
 
@@ -632,20 +667,29 @@
     // Inserting graph edges into the tree
     for (var i = 0, l = edges.length; i < l; i++) {
       var source = graph.nodes(edges[i].source),
-          target = graph.nodes(edges[i].target);
+          target = graph.nodes(edges[i].target),
+          e = {
+            x1: source[prefix + 'x'],
+            y1: source[prefix + 'y'],
+            x2: target[prefix + 'x'],
+            y2: target[prefix + 'y'],
+            size: edges[i][prefix + 'size'] || 0
+          };
 
       // Inserting edge
-      _quadInsert(
-        edges[i],
-        _geom.lineToSquare({
-          x1: source[prefix + 'x'],
-          y1: source[prefix + 'y'],
-          x2: target[prefix + 'x'],
-          y2: target[prefix + 'y'],
-          size: edges[i][prefix + 'size'] || 0
-        }),
-        this._tree
-      );
+      if (edges[i].type === 'curve') {
+        var cp = sigma.utils.getCP(source, target, prefix);
+        _quadInsert(
+          edges[i],
+          _geom.quadraticCurveToSquare(e, cp),
+          this._tree);
+      }
+      else {
+        _quadInsert(
+          edges[i],
+          _geom.lineToSquare(e),
+          this._tree);
+      }
     }
 
     // Reset cache:
