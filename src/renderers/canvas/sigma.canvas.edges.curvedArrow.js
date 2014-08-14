@@ -28,7 +28,6 @@
 
     thickness = (edge.hover) ?
       settings('edgeHoverSizeRatio') * thickness : thickness;
-    
 
     if (source.id === target.id) {
       cp.x = sX - tSize * 7;

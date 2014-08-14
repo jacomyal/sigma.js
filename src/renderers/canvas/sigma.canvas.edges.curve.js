@@ -1,4 +1,4 @@
-  ;(function() {
+;(function() {
   'use strict';
 
   sigma.utils.pkg('sigma.canvas.edges');
