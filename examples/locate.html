@@ -129,19 +129,6 @@ var $ = function (id) {
   return document.getElementById(id);
 };
 
-function resetCamera(s) {
-  sigma.misc.animation.camera(
-    s.camera, 
-    {
-      x: 0, 
-      y: 0, 
-      ratio: 1
-    },
-    { duration:300 }
-  );
-};
-
-
 // Initialize sigma with a dataset:
 sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   container: 'graph-container',
@@ -154,9 +141,14 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
     //scalingMode: 'outside'
   }
 }, function(s) {
-  window.s = s;
+  var conf = {
+    focusOut: true,
+    zoomDef: 1
+  };
+  var locate = sigma.plugins.locate(s, conf);
 
-  //sigma.utils.zoomTo(s.camera, 0, 0, 10);
+  if (!s.settings('autoRescale'))
+    sigma.utils.zoomTo(s.camera, 0, 0, conf.zoomDef);
 
   var categories = {};
   
@@ -182,19 +174,18 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   $('reset-btn').addEventListener("click", function(e) {
     $('nodelist').selectedIndex = 0;
     $('node-category').selectedIndex = 0;
-    resetCamera(s);
+    locate.center(conf.zoomDef, { duration: 800 });
   });
 
   function locateNode (e) {
     var nid = e.target[e.target.selectedIndex].value;
     if (nid == '') {
-      resetCamera(s);
+      locate.reset(1, { duration:300 });
     }
     else {
-      sigma.plugins.locateNodes(
-        s, 
+      locate.nodes(
         nid,
-        { duration:300 }
+        { duration: 800 }
       );
     }
   };
@@ -202,22 +193,23 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   function locateNodesByCategory(e) {
     var c = e.target[e.target.selectedIndex].value;
     if (c == '') {
-      resetCamera(s);
+      locate.center(1, { duration:300 });
     }
     else {
       var nodes = s.graph.nodes().filter(function(n) {
         return n.attributes.modularity_class == c;
       });
 
-      sigma.plugins.locateNodes(
-        s, 
+      locate.nodes(
         nodes,
-        { duration:300 }
+        { duration: 800 }
       );
     }
   };
 
   $('nodelist').addEventListener("change", locateNode);
   $('node-category').addEventListener("change", locateNodesByCategory);
+
+  window.s = s; // just for easy introspection
 });
 </script>
