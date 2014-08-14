@@ -35,6 +35,7 @@
 
     this.bind('overEdge', function(event) {
       hoveredEdges.push(event.data.edge);
+      self.graph.hoverEdge(event.data.edge.id);
       draw();
     });
 
@@ -43,6 +44,7 @@
         return e;
       }).indexOf(event.data.edge);
       hoveredEdges.splice(indexCheck, 1);
+      self.graph.hoverEdge(event.data.edge.id, false);
       draw();
     });
 
