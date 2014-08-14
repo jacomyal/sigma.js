@@ -106,20 +106,26 @@
           selected = [],
           modifiedX = mX + self.width / 2,
           modifiedY = mY + self.height / 2,
+          isCanvas,
           point = self.camera.cameraPosition(
             mX,
             mY
-          ),
-          nodesOnScreen = self.camera.quadtree.area(
-            self.camera.getRectangle(self.width, self.height)
           ),
           edges = self.camera.edgequadtree.point(
             point.x,
             point.y
           );
 
-      for (a = nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        nodeIndex[a[i].id] = a[i];
+      isCanvas = (
+        sigma.renderers.canvas && self instanceof sigma.renderers.canvas);
+
+      if (isCanvas) {
+        var nodesOnScreen = self.camera.quadtree.area(
+          self.camera.getRectangle(self.width, self.height)
+        );
+        for (a = nodesOnScreen, i = 0, l = a.length; i < l; i++)
+          nodeIndex[a[i].id] = a[i];
+      }
 
       function insertEdge(selected, edge) {
         inserted = false;
@@ -150,10 +156,12 @@
           // edges.
           // Then, let's check if the mouse is on the edge (we suppose that it
           // is a line segment).
+
           if (
             !edge.hidden &&
             !source.hidden && !target.hidden &&
-            (nodeIndex[edge.source] || nodeIndex[edge.target]) &&
+            (!isCanvas ||
+              (nodeIndex[edge.source] || nodeIndex[edge.target])) &&
             sigma.utils.getDistance(
               source[prefix + 'x'],
               source[prefix + 'y'],
