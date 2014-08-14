@@ -16,7 +16,13 @@ See the following [example code](../../examples/filters.html) and [unit tests](.
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var filter = new sigma.plugins.filter(sigInst);
+var filter = sigma.plugins.filter(sigInst);
+````
+
+Kill the plugin instance as follows:
+
+````javascript
+sigma.plugins.killFilter();
 ````
 
 ## Predicates
