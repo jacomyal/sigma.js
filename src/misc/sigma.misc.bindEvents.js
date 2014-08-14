@@ -97,6 +97,7 @@
           a,
           edge,
           s,
+          maxEpsilon = self.settings('edgeHoverPrecision'),
           source,
           target,
           cp,
@@ -141,8 +142,7 @@
           target = self.graph.nodes(edge.target);
           // (HACK) we can't get edge[prefix + 'size'] on WebGL renderer:
           s = edge[prefix + 'size'] ||
-              (edge.size || 0) /
-              Math.pow(self.camera.ratio, self.settings('edgesPowRatio'));
+              edge['read_' + prefix + 'size'];
 
           // First, let's identify which edges are drawn. To do this, we keep
           // every edges that have at least one extremity displayed according to
@@ -177,7 +177,7 @@
                 target[prefix + 'y'],
                 cp.x,
                 cp.y,
-                Math.max(s, 10)
+                Math.max(s, maxEpsilon)
               )) {
                 insertEdge(selected, edge);
               }
@@ -189,7 +189,7 @@
                 source[prefix + 'y'],
                 target[prefix + 'x'],
                 target[prefix + 'y'],
-                Math.max(s, 5)
+                Math.max(s, maxEpsilon)
               )) {
               insertEdge(selected, edge);
             }
