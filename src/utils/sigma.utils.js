@@ -300,7 +300,7 @@
   };
 
   /**
-    * EXPERIMENTAL: Check if a point is on a quadratic bezier curve segment.
+    * Check if a point is on a quadratic bezier curve segment with a thickness.
     *
     * @param  {number} x       The X coordinate of the point to check.
     * @param  {number} y       The Y coordinate of the point to check.
@@ -325,25 +325,27 @@
 
     var dP1 = sigma.utils.getDistance(x, y, x1, y1),
         dP2 = sigma.utils.getDistance(x, y, x2, y2),
-        _dt,
         t = 0.5,
-        r = (dP1 < dP2) ? -0.1 : 0.1,
-        rThreshold = 0.0025,
-        i = 1000,
-        // dThreshold = Math.log(1 + w) * epsilon / 20,
-        // get x(t), y(t):
+        r = (dP1 < dP2) ? -0.01 : 0.01,
+        rThreshold = 0.001,
+        i = 100,
         pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
-        dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+        dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
+        old_dt;
 
+    // This algorithm minimizes the distance from the point to the curve. It
+    // find the optimal t value where t=0 is the source point and t=1 is the
+    // target point of the curve, starting from t=0.5.
+    // It terminates because it runs a maximum of i interations.
     while (i-- > 0 &&
       t >= 0 && t <= 1 &&
       (dt > epsilon) &&
       (r > rThreshold || r < -rThreshold)) {
-      _dt = dt;
+      old_dt = dt;
       pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
       dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
 
-      if (dt > _dt) {
+      if (dt > old_dt) {
         // not the right direction:
         // halfstep in the opposite direction
         r = -r / 2;
@@ -353,7 +355,7 @@
         // oops, we've gone too far:
         // revert with a halfstep
         r = r / 2;
-        dt = _dt;
+        dt = old_dt;
       }
       else {
         // progress:
