@@ -174,20 +174,49 @@
               modifiedY) > target[prefix + 'size']
           ) {
             if (edge.type == 'curve' || edge.type == 'curvedArrow') {
-              cp = sigma.utils.getCP(source, target, prefix);
-              if (
-                sigma.utils.isPointOnQuadraticCurve(
-                modifiedX,
-                modifiedY,
-                source[prefix + 'x'],
-                source[prefix + 'y'],
-                target[prefix + 'x'],
-                target[prefix + 'y'],
-                cp.x,
-                cp.y,
-                Math.max(s, maxEpsilon)
-              )) {
-                insertEdge(selected, edge);
+              if (source.id === target.id) {
+                cp = sigma.utils.getSelfLoopControlPoints(
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  source[prefix + 'size']
+                );
+                if (
+                  sigma.utils.isPointOnBezierCurve(
+                  modifiedX,
+                  modifiedY,
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y'],
+                  cp.x1,
+                  cp.y1,
+                  cp.x2,
+                  cp.y2,
+                  Math.max(s, maxEpsilon)
+                )) {
+                  insertEdge(selected, edge);
+                }
+              }
+              else {
+                cp = sigma.utils.getQuadraticControlPoint(
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y']);
+                if (
+                  sigma.utils.isPointOnQuadraticCurve(
+                  modifiedX,
+                  modifiedY,
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y'],
+                  cp.x,
+                  cp.y,
+                  Math.max(s, maxEpsilon)
+                )) {
+                  insertEdge(selected, edge);
+                }
               }
             } else if (
                 sigma.utils.isPointOnSegment(

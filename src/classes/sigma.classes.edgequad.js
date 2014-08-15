@@ -94,9 +94,10 @@
      * Transforms a graph edge of type 'curve' with x1, y1, x2, y2,
      * control point and size into an axis-aligned square.
      *
-     * @param  {object} A graph edge with at least two points
-     *                  (x1, y1), (x2, y2), a control point cp and a size.
-     * @return {object} A square: two points (x1, y1), (x2, y2) and height.
+     * @param  {object} e  A graph edge with at least two points
+     *                     (x1, y1), (x2, y2) and a size.
+     * @param  {object} cp A control point (x,y).
+     * @return {object}    A square: two points (x1, y1), (x2, y2) and height.
      */
     quadraticCurveToSquare: function(e, cp) {
       var pt = sigma.utils.getPointOnQuadraticCurve(
@@ -122,6 +123,32 @@
         x2: maxX + e.size,
         y2: minY - e.size,
         height: maxY - minY + e.size * 2
+      };
+    },
+
+    /**
+     * Transforms a graph self loop into an axis-aligned square.
+     *
+     * @param  {object} n A graph node with a point (x, y) and a size.
+     * @return {object}   A square: two points (x1, y1), (x2, y2) and height.
+     */
+    selfLoopToSquare: function(n) {
+      // Fitting to the curve is too costly, we compute a larger bounding box
+      // using the control points:
+      var cp = sigma.utils.getSelfLoopControlPoints(n.x, n.y, n.size);
+
+      // Bounding box of the point and the two control points:
+      var minX = Math.min(n.x, cp.x1, cp.x2),
+          maxX = Math.max(n.x, cp.x1, cp.x2),
+          minY = Math.min(n.y, cp.y1, cp.y2),
+          maxY = Math.max(n.y, cp.y1, cp.y2);
+
+      return {
+        x1: minX - n.size,
+        y1: minY - n.size,
+        x2: maxX + n.size,
+        y2: minY - n.size,
+        height: maxY - minY + n.size * 2
       };
     },
 
@@ -652,7 +679,12 @@
       throw 'sigma.classes.edgequad.index: bounds information not given.';
 
     // Prefix
-    var prefix = params.prefix || '';
+    var prefix = params.prefix || '',
+        cp,
+        source,
+        target,
+        n,
+        e;
 
     // Building the tree
     this._tree = _quadTree(
@@ -666,23 +698,36 @@
 
     // Inserting graph edges into the tree
     for (var i = 0, l = edges.length; i < l; i++) {
-      var source = graph.nodes(edges[i].source),
-          target = graph.nodes(edges[i].target),
-          e = {
-            x1: source[prefix + 'x'],
-            y1: source[prefix + 'y'],
-            x2: target[prefix + 'x'],
-            y2: target[prefix + 'y'],
-            size: edges[i][prefix + 'size'] || 0
-          };
+      source = graph.nodes(edges[i].source);
+      target = graph.nodes(edges[i].target);
+      e = {
+        x1: source[prefix + 'x'],
+        y1: source[prefix + 'y'],
+        x2: target[prefix + 'x'],
+        y2: target[prefix + 'y'],
+        size: edges[i][prefix + 'size'] || 0
+      };
 
       // Inserting edge
-      if (edges[i].type === 'curve') {
-        var cp = sigma.utils.getCP(source, target, prefix);
-        _quadInsert(
-          edges[i],
-          _geom.quadraticCurveToSquare(e, cp),
-          this._tree);
+      if (edges[i].type === 'curve' || edges[i].type === 'curvedArrow') {
+        if (source.id === target.id) {
+          n = {
+            x: source[prefix + 'x'],
+            y: source[prefix + 'y'],
+            size: source[prefix + 'size'] || 0
+          };
+          _quadInsert(
+            edges[i],
+            _geom.selfLoopToSquare(n),
+            this._tree);
+        }
+        else {
+          cp = sigma.utils.getQuadraticControlPoint(e.x1, e.y1, e.x2, e.y2);
+          _quadInsert(
+            edges[i],
+            _geom.quadraticCurveToSquare(e, cp),
+            this._tree);
+        }
       }
       else {
         _quadInsert(

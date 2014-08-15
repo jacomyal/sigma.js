@@ -16,7 +16,7 @@
     function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
+        size = settings('edgeHoverSizeRatio') * (edge[prefix + 'size'] || 1),
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
@@ -27,14 +27,9 @@
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
-    if (source.id === target.id) {
-      cp.x = sX - sSize * 7;
-      cp.y = sY;
-      cp.x2 = sX;
-      cp.y2 = sY + sSize * 7;
-    } else {
-      cp = sigma.utils.getCP(source, target, prefix);
-    }
+    cp = (source.id === target.id) ?
+      sigma.utils.getSelfLoopControlPoints(sX, sY, sSize) :
+      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {
@@ -54,14 +49,13 @@
     } else {
       color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
-    size *= settings('edgeHoverSizeRatio');
 
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
     context.moveTo(sX, sY);
     if (source.id === target.id) {
-      context.bezierCurveTo(cp.x2, cp.y2, cp.x, cp.y, tX, tY);
+      context.bezierCurveTo(cp.x1, cp.y1, cp.x2, cp.y2, tX, tY);
     } else {
       context.quadraticCurveTo(cp.x, cp.y, tX, tY);
     }
