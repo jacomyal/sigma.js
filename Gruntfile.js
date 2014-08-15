@@ -36,12 +36,16 @@ module.exports = function(grunt) {
     'src/renderers/webgl/sigma.webgl.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.labels.def.js',
     'src/renderers/canvas/sigma.canvas.hovers.def.js',
-    'src/renderers/canvas/sigma.canvas.edgehovers.def.js',
     'src/renderers/canvas/sigma.canvas.nodes.def.js',
     'src/renderers/canvas/sigma.canvas.edges.def.js',
     'src/renderers/canvas/sigma.canvas.edges.curve.js',
     'src/renderers/canvas/sigma.canvas.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.edges.curvedArrow.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.def.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.curve.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.arrow.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js',
+    'src/renderers/canvas/sigma.canvas.extremities.def.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',

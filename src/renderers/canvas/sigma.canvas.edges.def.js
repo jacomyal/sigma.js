@@ -33,15 +33,6 @@
           break;
       }
 
-    if (edge.hover) {
-      if (settings('edgeHoverColor') === 'edge') {
-        color = edge.hover_color || color;
-      } else {
-        color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
-      }
-      size *= settings('edgeHoverSizeRatio');
-    }
-
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();

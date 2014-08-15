@@ -1,14 +1,10 @@
-;(function(undefined) {
+;(function() {
   'use strict';
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
-
-  // Initialize packages:
   sigma.utils.pkg('sigma.canvas.edgehovers');
 
   /**
-   * This hover renderer will display the edge with a modified color or size.
+   * This hover renderer will display the edge with a different color or size.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -18,48 +14,56 @@
    */
   sigma.canvas.edgehovers.def =
     function(edge, source, target, context, settings) {
-    var x,
-        y,
-        w,
-        h,
-        e,
+      var color = edge.color,
         prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'],
-        edgeHoverHighlightNodes = settings('edgeHoverHighlightNodes');
+        size = edge[prefix + 'size'] || 1,
+        edgeColor = settings('edgeColor'),
+        defaultNodeColor = settings('defaultNodeColor'),
+        defaultEdgeColor = settings('defaultEdgeColor');
 
-    // Edge:
-    var edgeRenderer = sigma.canvas.edges[edge.type] || sigma.canvas.edges.def;
-    edgeRenderer(edge, source, target, context, settings);
+    if (!color)
+      switch (edgeColor) {
+        case 'source':
+          color = source.color || defaultNodeColor;
+          break;
+        case 'target':
+          color = target.color || defaultNodeColor;
+          break;
+        default:
+          color = defaultEdgeColor;
+          break;
+      }
 
-    // Source Node:
-    var nodeRenderer =
-      sigma.canvas.nodes[source.type] || sigma.canvas.nodes.def;
-    nodeRenderer(source, context, settings);
-
-    // Target Node:
-    nodeRenderer = sigma.canvas.nodes[target.type] || sigma.canvas.nodes.def;
-    nodeRenderer(target, context, settings);
-
-    // Circle around the node:
-    function drawCircle(node) {
-      context.beginPath();
-      context.lineWidth = 0.5;
-      context.fillStyle = node.color;
-      context.arc(
-        node[prefix + 'x'],
-        node[prefix + 'y'],
-        node[prefix + 'size'] * 1.618,
-        0,
-        Math.PI * 2,
-        true
-      );
-      context.closePath();
-      context.stroke();
+    if (settings('edgeHoverColor') === 'edge') {
+      color = edge.hover_color || color;
+    } else {
+      color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
+    size *= settings('edgeHoverSizeRatio');
 
-    if (edgeHoverHighlightNodes == 'circle') {
-      drawCircle(source);
-      drawCircle(target);
-    }
+    context.strokeStyle = color;
+    context.lineWidth = size;
+    context.beginPath();
+    context.moveTo(
+      source[prefix + 'x'],
+      source[prefix + 'y']
+    );
+    context.lineTo(
+      target[prefix + 'x'],
+      target[prefix + 'y']
+    );
+    context.stroke();
+
+    if (settings('drawEdgeLabels'))
+      sigma.canvas.labels.edges.def(
+        edge,
+        source,
+        target,
+        context,
+        settings
+    );
+
+  //var edgeRenderer = sigma.canvas.edges[edge.type] || sigma.canvas.edges.def;
+  //edgeRenderer(edge, source, target, context, settings);
   };
-}).call(this);
+})();

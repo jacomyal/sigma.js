@@ -1,10 +1,10 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg('sigma.canvas.edgehovers');
 
   /**
-   * This edge renderer will display edges as arrows going from the source node
+   * This hover renderer will display the edge with a different color or size.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -12,12 +12,14 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.arrow = function(edge, source, target, context, settings) {
+  sigma.canvas.edgehovers.curvedArrow =
+    function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
+        cp = {},
         size = edge[prefix + 'size'] || 1,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
@@ -25,12 +27,24 @@
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
-    var aSize = size * 2.5,
-        d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
-        aX = sX + (tX - sX) * (d - aSize - tSize) / d,
-        aY = sY + (tY - sY) * (d - aSize - tSize) / d,
-        vX = (tX - sX) * aSize / d,
-        vY = (tY - sY) * aSize / d;
+    size = (edge.hover) ?
+      settings('edgeHoverSizeRatio') * size : size;
+
+    if (source.id === target.id) {
+      cp.x = sX - tSize * 7;
+      cp.y = sY;
+      cp.x2 = sX;
+      cp.y2 = sY + tSize * 7;
+    } else {
+      cp = sigma.utils.getCP(source, target, prefix);
+    }
+
+    var d = Math.sqrt(Math.pow(tX - cp.x, 2) + Math.pow(tY - cp.y, 2)),
+        aSize = size * 2.5,
+        aX = cp.x + (tX - cp.x) * (d - aSize - tSize) / d,
+        aY = cp.y + (tY - cp.y) * (d - aSize - tSize) / d,
+        vX = (tX - cp.x) * aSize / d,
+        vY = (tY - cp.y) * aSize / d;
 
     if (!color)
       switch (edgeColor) {
@@ -45,14 +59,21 @@
           break;
       }
 
+    if (settings('edgeHoverColor') === 'edge') {
+      color = edge.hover_color || color;
+    } else {
+      color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+    }
+
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
     context.moveTo(sX, sY);
-    context.lineTo(
-      aX,
-      aY
-    );
+    if (source.id === target.id) {
+      context.bezierCurveTo(cp.x2, cp.y2, cp.x, cp.y, aX, aY);
+    } else {
+      context.quadraticCurveTo(cp.x, cp.y, aX, aY);
+    }
     context.stroke();
 
     context.fillStyle = color;
@@ -63,14 +84,5 @@
     context.lineTo(aX + vX, aY + vY);
     context.closePath();
     context.fill();
-
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );
   };
 })();

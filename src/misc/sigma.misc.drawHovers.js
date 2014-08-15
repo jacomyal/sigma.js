@@ -57,49 +57,14 @@
       self.contexts.hover.canvas.width = self.contexts.hover.canvas.width;
 
       var i,
+          source,
+          target,
           nodeRenderers = sigma.canvas.hovers,
           edgeRenderers = sigma.canvas.edgehovers,
+          extremitiesRenderers = sigma.canvas.extremities,
           embedSettings = self.settings.embedObjects({
             prefix: prefix
           });
-
-      // Edge render: single hover
-      if (embedSettings('enableEdgeHovering') &&
-        embedSettings('singleHover') &&
-        hoveredEdges.length
-      ) {
-        i = hoveredEdges.length - 1;
-        if (! hoveredEdges[i].hidden) {
-          (
-            edgeRenderers[hoveredEdges[i].type] ||
-            edgeRenderers.def
-          )(
-            hoveredEdges[i],
-            self.graph.nodes(hoveredEdges[i].source),
-            self.graph.nodes(hoveredEdges[i].target),
-            self.contexts.hover,
-            embedSettings
-          );
-        }
-      }
-
-      // Edge render: multiple hover
-      if (embedSettings('enableEdgeHovering') &&
-        !embedSettings('singleHover') &&
-        hoveredEdges.length
-      ) {
-        for (i = 0; i < hoveredEdges.length; i++) {
-          if (! hoveredEdges[i].hidden) {
-            (edgeRenderers[hoveredEdges[i].type] || edgeRenderers.def) (
-              hoveredEdges[i],
-              self.graph.nodes(hoveredEdges[i].source),
-              self.graph.nodes(hoveredEdges[i].target),
-              self.contexts.hover,
-              embedSettings
-            );
-          }
-        }
-      }
 
       // Node render: single hover
       if (embedSettings('enableHovering') &&
@@ -127,11 +92,121 @@
       ) {
         for (i = 0; i < hoveredNodes.length; i++) {
           if (! hoveredNodes[i].hidden) {
-            (nodeRenderers[hoveredNodes[i].type] || nodeRenderers.def) (
+            (
+              nodeRenderers[hoveredNodes[i].type] ||
+              nodeRenderers.def
+            ) (
               hoveredNodes[i],
               self.contexts.hover,
               embedSettings
             );
+          }
+        }
+      }
+
+      // Edge render: single hover
+      if (embedSettings('enableEdgeHovering') &&
+        embedSettings('singleHover') &&
+        hoveredEdges.length
+      ) {
+        i = hoveredEdges.length - 1;
+        source = self.graph.nodes(hoveredEdges[i].source);
+        target = self.graph.nodes(hoveredEdges[i].target);
+        if (! hoveredEdges[i].hidden) {
+          (
+            edgeRenderers[hoveredEdges[i].type] ||
+            edgeRenderers.def
+          ) (
+            hoveredEdges[i],
+            source,
+            target,
+            self.contexts.hover,
+            embedSettings
+          );
+          if (embedSettings('edgeHoverExtremities')) {
+            (
+              extremitiesRenderers[hoveredEdges[i].type] ||
+              extremitiesRenderers.def
+            )(
+              hoveredEdges[i],
+              source,
+              target,
+              self.contexts.hover,
+              embedSettings
+            );
+          }
+          else {
+            // Avoid edges rendered over nodes:
+            (
+              sigma.canvas.nodes[source.type] ||
+              sigma.canvas.nodes.def
+            ) (
+              source,
+              self.contexts.hover,
+              embedSettings
+            );
+            (
+              sigma.canvas.nodes[target.type] ||
+              sigma.canvas.nodes.def
+            ) (
+              target,
+              self.contexts.hover,
+              embedSettings
+            );
+          }
+        }
+      }
+
+      // Edge render: multiple hover
+      if (embedSettings('enableEdgeHovering') &&
+        !embedSettings('singleHover') &&
+        hoveredEdges.length
+      ) {
+        for (i = 0; i < hoveredEdges.length; i++) {
+          source = self.graph.nodes(hoveredEdges[i].source);
+          target = self.graph.nodes(hoveredEdges[i].target);
+          if (! hoveredEdges[i].hidden) {
+            (
+              edgeRenderers[hoveredEdges[i].type] ||
+              edgeRenderers.def
+            ) (
+              hoveredEdges[i],
+              source,
+              target,
+              self.contexts.hover,
+              embedSettings
+            );
+            if (embedSettings('edgeHoverExtremities')) {
+              (
+                extremitiesRenderers[hoveredEdges[i].type] ||
+                extremitiesRenderers.def
+              )(
+                hoveredEdges[i],
+                source,
+                target,
+                self.contexts.hover,
+                embedSettings
+              );
+            }
+            else {
+            // Avoid edges rendered over nodes:
+            (
+              sigma.canvas.nodes[source.type] ||
+              sigma.canvas.nodes.def
+            ) (
+              source,
+              self.contexts.hover,
+              embedSettings
+            );
+            (
+              sigma.canvas.nodes[target.type] ||
+              sigma.canvas.nodes.def
+            ) (
+              target,
+              self.contexts.hover,
+              embedSettings
+            );
+          }
           }
         }
       }
