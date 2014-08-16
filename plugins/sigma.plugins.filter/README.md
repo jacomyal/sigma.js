@@ -1,7 +1,9 @@
 sigma.plugins.filter
 ==================
 
-Plugin developed by [Sébastien Heymann](sheymann) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious) and published under the licence [GNU GPLv3](LICENSE) unless otherwise noticed by Linkurious.
+
+Contact: seb@linkurio.us
 
 ---
 ## General
@@ -16,7 +18,13 @@ See the following [example code](../../examples/filters.html) and [unit tests](.
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var filter = new sigma.plugins.filter(sigInst);
+var filter = sigma.plugins.filter(sigInst);
+````
+
+Kill the plugin instance as follows:
+
+````javascript
+sigma.plugins.killFilter();
 ````
 
 ## Predicates

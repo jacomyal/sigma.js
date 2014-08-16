@@ -486,19 +486,33 @@
    * Interface
    * ------------------
    *
-   * > var filter = new sigma.plugins.filter(s);
+   * > var filter = sigma.plugins.filter(s);
    */
-  var filter = null;
+  var _instance = null;
 
   /**
    * @param  {sigma} s The related sigma instance.
    */
   sigma.plugins.filter = function(s) {
     // Create filter if undefined
-    if (!filter) {
-      filter = new Filter(s);
+    if (!_instance) {
+      _instance = new Filter(s);
     }
-    return filter;
+    return _instance;
+  };
+
+  /**
+   *  This function kills the filter instance.
+   */
+  sigma.plugins.killFilter = function() {
+    if (_instance instanceof Filter) {
+      _instance.undo().apply();
+      _instance.clear();
+    }
+    _instance = null;
+    _g = null;
+    _s = null;
+    Processors = {};
   };
 
 }).call(this);
