@@ -1,7 +1,9 @@
 sigma.plugins.popup
 =====================
 
-Plugin developed by [Sébastien Heymann](sheymann) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious) and published under the license [GNU GPLv3](LICENSE) unless otherwise noticed by Linkurious.
+
+Contact: seb@linkurio.us
 
 ---
 
