@@ -63,6 +63,7 @@ module.exports = function(grunt) {
     'plugins.filter',
     'plugins.locate',
     'plugins.neighborhoods',
+    'plugins.popup',
     'statistics.HITS',
     'renderers.customShapes'
   ];
