@@ -1,0 +1,215 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.parsers.gexf/gexf-parser.js"></script>
+<script src="../plugins/sigma.parsers.gexf/sigma.parsers.gexf.js"></script>
+<script src="../plugins/sigma.plugins.locate/sigma.plugins.locate.js"></script>
+<div id="container">
+  <style>
+    body {
+      color: #333;
+      font-size: 14px;
+      font-family: sans-serif;
+    }
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+    #control-pane {
+      top: 10px;
+      /*bottom: 10px;*/
+      right: 10px;
+      position: absolute;
+      width: 230px;
+      background-color: rgb(249, 247, 237);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #control-pane > div {
+      margin: 10px;
+      overflow-x: auto;
+    }
+    .line {
+      clear: both;
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 12px 0 0 0;
+      border-bottom: 1px solid #aac789;
+      background: transparent;
+    }
+    h2, h3, h4 {
+      padding: 0;
+      font-variant: small-caps;
+    }
+    .green {
+      color: #437356;
+    }
+    h2.underline {
+      color: #437356;
+      background: #f4f0e4;
+      margin: 0;
+      border-radius: 2px;
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+    .hidden {
+      display: none;
+      visibility: hidden;
+    }
+
+    input[type=range] {
+      width: 160px;
+    }
+  </style>
+  <div id="graph-container"></div>
+  <div id="control-pane">
+    <h2 class="underline">locate</h2>
+    
+    <div>
+      <h3>a node</h3>
+      <select id="nodelist">
+        <option value="" selected>All nodes</option>
+      </select>
+    </div>
+    <div>
+      <h3>a group of nodes</h3>
+      <select id="node-category">
+        <option value="" selected>All groups</option>
+      </select>
+    </div>
+    <span class="line"></span>
+    <div>
+      <button id="reset-btn">Reset view</button>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * This is an example on how to use sigma locate plugin on a real-world graph.
+ */
+
+/**
+ * DOM utility function
+ */
+var $ = function (id) {
+  return document.getElementById(id);
+};
+
+// Initialize sigma with a dataset:
+sigma.parsers.gexf('data/standard_graph_communities.gexf', {
+  container: 'graph-container',
+  settings: {
+    edgeColor: 'default',
+    defaultEdgeColor: '#ccc',
+    zoomMin: 0.01,
+    zoomMax: 10,
+    //autoRescale: false,
+    //scalingMode: 'outside'
+  }
+}, function(s) {
+  var conf = {
+    focusOut: true,
+    zoomDef: 1
+  };
+  var locate = sigma.plugins.locate(s, conf);
+
+  if (!s.settings('autoRescale'))
+    sigma.utils.zoomTo(s.camera, 0, 0, conf.zoomDef);
+
+  var categories = {};
+  
+  // read nodes
+  var nodelistElt = $('nodelist');
+  s.graph.nodes().forEach(function(n) {
+    var optionElt = document.createElement("option");
+    optionElt.text = n.id;
+    nodelistElt.add(optionElt);
+
+    categories[n.attributes.modularity_class] = true;
+  });
+  
+  // node category
+  var nodecategoryElt = $('node-category');
+  Object.keys(categories).forEach(function(c) {
+    var optionElt = document.createElement("option");
+    optionElt.text = c;
+    nodecategoryElt.add(optionElt);
+  });
+
+  // reset button
+  $('reset-btn').addEventListener("click", function(e) {
+    $('nodelist').selectedIndex = 0;
+    $('node-category').selectedIndex = 0;
+    locate.center(conf.zoomDef, { duration: 800 });
+  });
+
+  function locateNode (e) {
+    var nid = e.target[e.target.selectedIndex].value;
+    if (nid == '') {
+      locate.reset(1, { duration:300 });
+    }
+    else {
+      locate.nodes(
+        nid,
+        { duration: 800 }
+      );
+    }
+  };
+
+  function locateNodesByCategory(e) {
+    var c = e.target[e.target.selectedIndex].value;
+    if (c == '') {
+      locate.center(1, { duration:300 });
+    }
+    else {
+      var nodes = s.graph.nodes().filter(function(n) {
+        return n.attributes.modularity_class == c;
+      });
+
+      locate.nodes(
+        nodes,
+        { duration: 800 }
+      );
+    }
+  };
+
+  $('nodelist').addEventListener("change", locateNode);
+  $('node-category').addEventListener("change", locateNodesByCategory);
+
+  window.s = s; // just for easy introspection
+});
+</script>
