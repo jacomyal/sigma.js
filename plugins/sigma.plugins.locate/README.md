@@ -17,6 +17,12 @@ To use it, include all .js files under this folder. Then initialize it as follow
 var locate = sigma.plugins.locate(sigInst);
 ````
 
+Kill the plugin instance as follows:
+
+````javascript
+sigma.plugins.killLocate();
+````
+
 ## Configuration
 
 The plugin can jump to a halfway point when animating the camera from its current position to the target position. The expected behavior is to zoom out to reach that point in order to help the user orientate in space (see Google Maps for instance). To enable this behavior, initialize the plugin as follows:
