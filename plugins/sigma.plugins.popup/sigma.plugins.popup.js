@@ -277,7 +277,8 @@
    *                          it is not specified, the popup top-left corner is
    *                          positionned at the mouse position. Available
    *                          values: "top", "bottom", "left", "right".
-   *   {?number}   delay      The delay in milliseconds to show the popup.
+   *   {?number}   delay      The delay in miliseconds before displaying the
+   *                          popup after the show event is triggered.
    *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the popup
    *                          position to be fully included in the body area.
    *                          Doesn't work on Firefox 30. Better work on
@@ -289,6 +290,9 @@
    * >   },
    * >   edge: {
    * >     template: 'Hello edge!'
+   * >   },
+   * >   stage: {
+   * >     template: 'Hello stage!'
    * >   }
    * > });
    *
