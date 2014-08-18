@@ -183,8 +183,8 @@
       var n = _s.graph.nodes(v);
 
       t = {
-        x: n[s.camera.readPrefix + 'x'],
-        y: n[s.camera.readPrefix + 'y'],
+        x: n[_s.camera.readPrefix + 'x'],
+        y: n[_s.camera.readPrefix + 'y'],
         ratio: _s.settings('autoRescale') ?
           _s.settings('zoomMin') : _o.zoomDef
       }
@@ -197,16 +197,16 @@
       var minX, maxX, minY, maxY;
 
       minX = Math.min.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'x'];
+        return n[_s.camera.readPrefix + 'x'];
       }));
       maxX = Math.max.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'x'];
+        return n[_s.camera.readPrefix + 'x'];
       }));
       minY = Math.min.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'y'];
+        return n[_s.camera.readPrefix + 'y'];
       }));
       maxY = Math.max.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'y'];
+        return n[_s.camera.readPrefix + 'y'];
       }));
 
       t = target(minX, maxX, minY, maxY);
@@ -283,20 +283,20 @@
           minX, maxX, minY, maxY;
 
       minX = Math.min(
-        snode[s.camera.readPrefix + 'x'],
-        tnode[s.camera.readPrefix + 'x']
+        snode[_s.camera.readPrefix + 'x'],
+        tnode[_s.camera.readPrefix + 'x']
       );
       maxX = Math.max(
-        snode[s.camera.readPrefix + 'x'],
-        tnode[s.camera.readPrefix + 'x']
+        snode[_s.camera.readPrefix + 'x'],
+        tnode[_s.camera.readPrefix + 'x']
       );
       minY = Math.min(
-        snode[s.camera.readPrefix + 'y'],
-        tnode[s.camera.readPrefix + 'y']
+        snode[_s.camera.readPrefix + 'y'],
+        tnode[_s.camera.readPrefix + 'y']
       );
       maxY = Math.max(
-        snode[s.camera.readPrefix + 'y'],
-        tnode[s.camera.readPrefix + 'y']
+        snode[_s.camera.readPrefix + 'y'],
+        tnode[_s.camera.readPrefix + 'y']
       );
 
       t = target(minX, maxX, minY, maxY);
@@ -310,26 +310,26 @@
 
       minX = Math.min.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'x'],
-          e.target[s.camera.readPrefix + 'x']
+          e.source[_s.camera.readPrefix + 'x'],
+          e.target[_s.camera.readPrefix + 'x']
         );
       }));
       maxX = Math.max.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'x'],
-          e.target[s.camera.readPrefix + 'x']
+          e.source[_s.camera.readPrefix + 'x'],
+          e.target[_s.camera.readPrefix + 'x']
         );
       }));
       minY = Math.min.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'y'],
-          e.target[s.camera.readPrefix + 'y']
+          e.source[_s.camera.readPrefix + 'y'],
+          e.target[_s.camera.readPrefix + 'y']
         );
       }));
       maxY = Math.max.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'y'],
-          e.target[s.camera.readPrefix + 'y']
+          e.source[_s.camera.readPrefix + 'y'],
+          e.target[_s.camera.readPrefix + 'y']
         );
       }));
 
