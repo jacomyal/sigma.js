@@ -20,9 +20,6 @@
 <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.labels.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curve.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curvedArrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
@@ -35,6 +32,8 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.customEdgeShapes/shape-library.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.renderers.customEdgeShapes.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -47,68 +46,29 @@
   </style>
   <div id="graph-container"></div>
 </div>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
 /**
- * This is a basic example on how to develop a custom edge renderer. In
- * this example, the renderer will display the edge as a path made of two
- * segments, an horizontal one and a vertical one. To make it just a bit
- * "more readable", I also used the FA2 plugin (but it is actually  still
- * not readable).
- *
- * IMPORTANT: This edge renderer just works with the canvas renderer. If
- * you do want to display images with the WebGL renderer, you will have
- * to develop a specific WebGL edge renderer.
+ * IMPORTANT: This only works with the canvas renderer. TBD in the future
+ * will also support the WebGL renderer.
  */
-sigma.utils.pkg('sigma.canvas.edges');
-sigma.canvas.edges.t = function(edge, source, target, context, settings) {
-  var color = edge.color,
-      prefix = settings('prefix') || '',
-      edgeColor = settings('edgeColor'),
-      defaultNodeColor = settings('defaultNodeColor'),
-      defaultEdgeColor = settings('defaultEdgeColor');
+sigma.utils.pkg('sigma.canvas.nodes');
 
-  if (!color)
-    switch (edgeColor) {
-      case 'source':
-        color = source.color || defaultNodeColor;
-        break;
-      case 'target':
-        color = target.color || defaultNodeColor;
-        break;
-      default:
-        color = defaultEdgeColor;
-        break;
-    }
-
-  context.strokeStyle = color;
-  context.lineWidth = edge[prefix + 'size'] || 1;
-  context.beginPath();
-  context.moveTo(
-    source[prefix + 'x'],
-    source[prefix + 'y']
-  );
-  context.lineTo(
-    source[prefix + 'x'],
-    target[prefix + 'y']
-  );
-  context.lineTo(
-    target[prefix + 'x'],
-    target[prefix + 'y']
-  );
-  context.stroke();
-};
-
-// Now, let's use the renderer
+// generate a random graph
 var i,
     s,
-    N = 50,
-    E = 150,
+    img,
+    N = 10,
+    E = 50,
     g = {
       nodes: [],
       edges: []
     },
+    urls = [
+      'img/img1.png',
+      'img/img2.png',
+      'img/img3.png',
+      'img/img4.png'
+    ],
     colors = [
       '#617db4',
       '#668f3c',
@@ -116,8 +76,8 @@ var i,
       '#b956af'
     ];
 
-// Generate a random graph:
-for (i = 0; i < N; i++)
+// Generate a random graph, going through the different edge shapes
+for (i = 0; i < N; i++) {
   g.nodes.push({
     id: 'n' + i,
     label: 'Node ' + i,
@@ -126,17 +86,20 @@ for (i = 0; i < N; i++)
     size: Math.random(),
     color: colors[Math.floor(Math.random() * colors.length)]
   });
+}
 
-for (i = 0; i < E; i++)
+for (i = 0; i < E; i++) {
   g.edges.push({
     id: 'e' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
-    size: Math.random(),
-    type: 't'
+    // note the EdgeShapeLibrary.enumerate() returns the names of all
+    // supported renderers
+    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*4)],
+    size: Math.random()
   });
+}
 
-// Instantiate sigma:
 s = new sigma({
   graph: g,
   renderer: {
@@ -145,9 +108,14 @@ s = new sigma({
     // renderer type set as "canvas" is necessary here.
     container: document.getElementById('graph-container'),
     type: 'canvas'
+  },
+  settings: {
+    minNodeSize: 1,
+    maxNodeSize: 10,
+    minEdgeSize: 0.1,
+    maxEdgeSize: 2,
   }
 });
-
-// Start the ForceAtlas2 algorithm:
-s.startForceAtlas2();
+CustomEdgeShapes.init(s);
+s.refresh();
 </script>

@@ -1,9 +1,6 @@
 ;(function(undefined) {
   'use strict';
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
-
   /**
    * Sigma ForceAtlas2.5 Webworker
    * ==============================
@@ -12,6 +9,9 @@
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
    * Version: 0.1
    */
+
+  var _root = this,
+      inWebWorker = !('document' in _root);
 
   /**
    * Worker Function Wrapper
@@ -706,8 +706,23 @@
     return fnString;
   }
 
-  sigma.prototype.getForceAtlas2Worker = function() {
+  // Exporting
+  function getWorkerFn() {
     var fnString = crush ? crush(Worker.toString()) : Worker.toString();
     return ';(' + fnString + ').call(this);';
-  };
+  }
+
+  if (inWebWorker) {
+
+    // We are in a webworker, so we launch the Worker function
+    eval(getWorkerFn());
+  }
+  else {
+
+    // We are requesting the worker from sigma, we retrieve it therefore
+    if (typeof sigma === 'undefined')
+      throw 'sigma is not declared';
+
+    sigma.prototype.getForceAtlas2Worker = getWorkerFn;
+  }
 }).call(this);
