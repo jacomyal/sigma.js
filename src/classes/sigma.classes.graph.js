@@ -832,35 +832,6 @@
     throw 'edges: Wrong arguments.';
   });
 
-  /**
-   * This methods set the "hover" attribute of a node.
-   *
-   * To hover the node, call "hoverNode(id)". To un-hover the node,
-   * call "hoverNode(id, false)".
-   *
-   * @param  {string}   id      The node id.
-   * @param  {?boolean} isHover The hover value.
-   */
-  graph.addMethod('hoverNode', function(id, isHover) {
-    isHover = (isHover === undefined) ? true : !!isHover;
-    this.nodesIndex[id].hover = isHover;
-  });
-
-  /**
-   * This methods set the "hover" attribute of an edge.
-   *
-   * To hover the edge, call "hoverEdge(id)". To un-hover the edge,
-   * call "hoverEdge(id, false)".
-   *
-   * @param  {string}   id      The edge id.
-   * @param  {?boolean} isHover The hover value.
-   */
-  graph.addMethod('hoverEdge', function(id, isHover) {
-    isHover = (isHover === undefined) ? true : !!isHover;
-    this.edgesIndex[id].hover = isHover;
-  });
-
-
 
   /**
    * EXPORT:
