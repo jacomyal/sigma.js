@@ -25,16 +25,43 @@ sigma.plugins.killLocate();
 
 ## Configuration
 
-The plugin can jump to a halfway point when animating the camera from its current position to the target position. The expected behavior is to zoom out to reach that point in order to help the user orientate in space (see Google Maps for instance). To enable this behavior, initialize the plugin as follows:
+Configure the plugin as follows:
 
 ````javascript
 var locate = sigma.plugins.locate(sigInst, {
+  // ANIMATION SETTINGS:
+  // **********
+  animation: {
+    node: {
+      duration: 300
+    },
+    edge: {
+      duration: 300
+    },
+    center: {
+      duration: 300
+    }
+  },
+  // GLOBAL SETTINGS:
+  // **********
   focusOut: true,
   zoomDef: 1
 });
 ````
 
-where `focusOut=true` enables the behavior discussed above, and the `zoomDef` number gives the zoom ratio of the camera above the halfway point. If `zoomDef` is missing the plugin uses the `zoomMax` value of sigma settings instead.
+ * **animation**
+   * The different animation options when calling `nodes()`, `edges()`, and `center()`. See [`sigma.misc.animation.camera`](https://github.com/jacomyal/sigma.js/blob/master/src/misc/sigma.misc.animation.js#l47) for a list of accepted parameters.
+   * type: *object*
+   * default value: see above
+ * **focusOut**
+   * Make to zoom out to reach a halfway point between the current position to the target position during camera animation, to help the user orientate in space (see Google Maps for instance).
+   * type: *boolean*
+   * default value: `false`
+ * **zoomDef**
+   * The zoom ratio of the camera above the halfway point. If `zoomDef` is missing the plugin uses the `zoomMax` value of sigma settings instead.
+   * type: *number*
+   * default value: `null`
+
 
 ## Status
 
@@ -72,7 +99,7 @@ These functions may take an optional parameter to configure the animation, e.g.:
 locate.nodes(n, {duration: 800});
 ````
 
-This object is the option parameter of `sigma.misc.animation.camera`. See the doc of the function for more information. 
+See [`sigma.misc.animation.camera`](https://github.com/jacomyal/sigma.js/blob/master/src/misc/sigma.misc.animation.js#l47) for a list of accepted parameters in this object.
 
 ## Known bugs
 

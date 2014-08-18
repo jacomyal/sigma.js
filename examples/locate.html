@@ -142,7 +142,18 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   }
 }, function(s) {
   var conf = {
-    focusOut: true,
+    animation: {
+      node: {
+        duration: 800
+      },
+      edge: {
+        duration: 800
+      },
+      center: {
+        duration: 300
+      }
+    },
+    //focusOut: true,
     zoomDef: 1
   };
   var locate = sigma.plugins.locate(s, conf);
@@ -174,36 +185,30 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   $('reset-btn').addEventListener("click", function(e) {
     $('nodelist').selectedIndex = 0;
     $('node-category').selectedIndex = 0;
-    locate.center(conf.zoomDef, { duration: 800 });
+    locate.center(conf.zoomDef);
   });
 
   function locateNode (e) {
     var nid = e.target[e.target.selectedIndex].value;
     if (nid == '') {
-      locate.reset(1, { duration:300 });
+      locate.center(1);
     }
     else {
-      locate.nodes(
-        nid,
-        { duration: 800 }
-      );
+      locate.nodes(nid);
     }
   };
 
   function locateNodesByCategory(e) {
     var c = e.target[e.target.selectedIndex].value;
     if (c == '') {
-      locate.center(1, { duration:300 });
+      locate.center(1);
     }
     else {
       var nodes = s.graph.nodes().filter(function(n) {
         return n.attributes.modularity_class == c;
       });
 
-      locate.nodes(
-        nodes,
-        { duration: 800 }
-      );
+      locate.nodes(nodes);
     }
   };
 
