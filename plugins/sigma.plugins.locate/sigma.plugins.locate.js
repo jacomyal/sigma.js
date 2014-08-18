@@ -18,7 +18,37 @@
    * @version 0.1
    */
 
+  /**
+  * The default settings.
+  *
+  * Here is the exhaustive list of every accepted parameters in the animation
+  * object:
+  *
+  *   {?number}            duration   The duration of the animation.
+  *   {?function}          onNewFrame A callback to execute when the animation
+  *                                   enters a new frame.
+  *   {?function}          onComplete A callback to execute when the animation
+  *                                   is completed or killed.
+  *   {?(string|function)} easing     The name of a function from the package
+  *                                   sigma.utils.easings, or a custom easing
+  *                                   function.
+  */
   var settings = {
+    // ANIMATION SETTINGS:
+    // **********
+    animation: {
+      node: {
+        duration: 300
+      },
+      edge: {
+        duration: 300
+      },
+      center: {
+        duration: 300
+      }
+    },
+    // GLOBAL SETTINGS:
+    // **********
     // If true adds a halfway point while animating the camera.
     focusOut: false,
     // The default zoom ratio, sigma zoomMax otherwise.
@@ -176,6 +206,7 @@
       throw 'locate.nodes: options must be an object.'
 
     var t,
+        animationOpts = extend(options, _o.animation.node),
         ratio = _s.camera.ratio;
 
     // One node:
@@ -183,8 +214,8 @@
       var n = _s.graph.nodes(v);
 
       t = {
-        x: n[s.camera.readPrefix + 'x'],
-        y: n[s.camera.readPrefix + 'y'],
+        x: n[_s.camera.readPrefix + 'x'],
+        y: n[_s.camera.readPrefix + 'y'],
         ratio: _s.settings('autoRescale') ?
           _s.settings('zoomMin') : _o.zoomDef
       }
@@ -197,16 +228,16 @@
       var minX, maxX, minY, maxY;
 
       minX = Math.min.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'x'];
+        return n[_s.camera.readPrefix + 'x'];
       }));
       maxX = Math.max.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'x'];
+        return n[_s.camera.readPrefix + 'x'];
       }));
       minY = Math.min.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'y'];
+        return n[_s.camera.readPrefix + 'y'];
       }));
       maxY = Math.max.apply(Math, v.map(function(n) {
-        return n[s.camera.readPrefix + 'y'];
+        return n[_s.camera.readPrefix + 'y'];
       }));
 
       t = target(minX, maxX, minY, maxY);
@@ -223,12 +254,12 @@
           ratio: _o.zoomDef
         },
         {
-          duration: 800,
+          duration: animationOpts.duration,
           onComplete: function() {
             sigma.misc.animation.camera(
               _s.camera,
               t,
-              options
+              animationOpts
             );
           }
         }
@@ -237,7 +268,7 @@
       sigma.misc.animation.camera(
         _s.camera,
         t,
-        options
+        animationOpts
       );
     }
   };
@@ -272,7 +303,8 @@
     if (arguments.length === 3 && typeof options !== "object")
       throw 'locate.edges: options must be an object.'
 
-    var t, 
+    var t,
+        animationOpts = extend(options, _o.animation.edge),
         ratio = _s.camera.ratio;
 
     // One edge:
@@ -283,20 +315,20 @@
           minX, maxX, minY, maxY;
 
       minX = Math.min(
-        snode[s.camera.readPrefix + 'x'],
-        tnode[s.camera.readPrefix + 'x']
+        snode[_s.camera.readPrefix + 'x'],
+        tnode[_s.camera.readPrefix + 'x']
       );
       maxX = Math.max(
-        snode[s.camera.readPrefix + 'x'],
-        tnode[s.camera.readPrefix + 'x']
+        snode[_s.camera.readPrefix + 'x'],
+        tnode[_s.camera.readPrefix + 'x']
       );
       minY = Math.min(
-        snode[s.camera.readPrefix + 'y'],
-        tnode[s.camera.readPrefix + 'y']
+        snode[_s.camera.readPrefix + 'y'],
+        tnode[_s.camera.readPrefix + 'y']
       );
       maxY = Math.max(
-        snode[s.camera.readPrefix + 'y'],
-        tnode[s.camera.readPrefix + 'y']
+        snode[_s.camera.readPrefix + 'y'],
+        tnode[_s.camera.readPrefix + 'y']
       );
 
       t = target(minX, maxX, minY, maxY);
@@ -310,26 +342,26 @@
 
       minX = Math.min.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'x'],
-          e.target[s.camera.readPrefix + 'x']
+          e.source[_s.camera.readPrefix + 'x'],
+          e.target[_s.camera.readPrefix + 'x']
         );
       }));
       maxX = Math.max.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'x'],
-          e.target[s.camera.readPrefix + 'x']
+          e.source[_s.camera.readPrefix + 'x'],
+          e.target[_s.camera.readPrefix + 'x']
         );
       }));
       minY = Math.min.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'y'],
-          e.target[s.camera.readPrefix + 'y']
+          e.source[_s.camera.readPrefix + 'y'],
+          e.target[_s.camera.readPrefix + 'y']
         );
       }));
       maxY = Math.max.apply(Math, v.map(function(e) {
         return Math.min(
-          e.source[s.camera.readPrefix + 'y'],
-          e.target[s.camera.readPrefix + 'y']
+          e.source[_s.camera.readPrefix + 'y'],
+          e.target[_s.camera.readPrefix + 'y']
         );
       }));
 
@@ -347,12 +379,12 @@
           ratio: _o.zoomDef
         },
         {
-          duration: 800,
+          duration: animationOpts.duration,
           onComplete: function() {
             sigma.misc.animation.camera(
               _s.camera, 
               t,
-              options
+              animationOpts
             );
           }
         }
@@ -361,7 +393,7 @@
       sigma.misc.animation.camera(
         _s.camera, 
         t,
-        options
+        animationOpts
       );
     }
   };
@@ -390,10 +422,9 @@
    *                           animation.
    */
   Locate.prototype.center = function(ratio, options) {
+    var animationOpts = extend(options, _o.animation.center);
     if (_s.graph.nodes().length) {
-      _instance.nodes(_s.graph.nodes(), {
-        duration: 800
-      });
+      _instance.nodes(_s.graph.nodes(), animationOpts);
     }
     else {
       sigma.misc.animation.camera(
@@ -403,7 +434,7 @@
           y: 0, 
           ratio: ratio
         },
-        options
+        animationOpts
       );
     }
   };
