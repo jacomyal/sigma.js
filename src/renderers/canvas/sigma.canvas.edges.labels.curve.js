@@ -20,7 +20,7 @@
    */
   sigma.canvas.edges.labels.curve =
     function(edge, source, target, context, settings) {
-    if (typeof edge.label !== 'string' || source == target)
+    if (typeof edge.label !== 'string')
       return;
 
     var prefix = settings('prefix') || '',
@@ -30,11 +30,16 @@
       return;
 
     var fontSize,
-        dX = target[prefix + 'x'] - source[prefix + 'x'],
-        dY = target[prefix + 'y'] - source[prefix + 'y'],
-        sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
-        angle = Math.atan2(dY * sign, dX * sign),
-        cp = sigma.utils.getCP(source, target, prefix),
+        sX = source[prefix + 'x'],
+        sY = source[prefix + 'y'],
+        tX = target[prefix + 'x'],
+        tY = target[prefix + 'y'],
+        dX = tX - sX,
+        dY = tY - sY,
+        sign = (sX < tX) ? 1 : -1,
+        cp,
+        c,
+        angle,
         t = 0.5;  //length of the curve
 
     // The font size is sublineraly proportional to the edge size, in order to
@@ -61,15 +66,19 @@
     context.textAlign = 'center';
     context.textBaseline = 'alphabetic';
 
-    var c = sigma.utils.getPointOnQuadraticCurve(
-      t,
-      source[prefix + 'x'],
-      source[prefix + 'y'],
-      target[prefix + 'x'],
-      target[prefix + 'y'],
-      cp.x,
-      cp.y
-    );
+    if (source.id === target.id) {
+      cp = sigma.utils.getSelfLoopControlPoints(
+        sX, sY, source[prefix + 'size']
+      );
+      c = sigma.utils.getPointOnBezierCurve(
+        t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
+      );
+      angle = Math.atan2(1, 1); // 45°
+    } else {
+      cp = sigma.utils.getCP(source, target, prefix);
+      c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
+      angle = Math.atan2(dY * sign, dX * sign);
+    }
 
     context.translate(c.x, c.y);
     context.rotate(angle);
