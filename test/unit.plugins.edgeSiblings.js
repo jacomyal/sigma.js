@@ -101,8 +101,8 @@ test('API', function() {
   );
 
   ok(
-    s.graph.edges('e0').size === undefined, 
-    '"addEdgeSibling" removes the size of edges with sibling.'
+    s.graph.edges('e0').size == 1, 
+    '"addEdgeSibling" set the size of edges with sibling to 1.'
   );
   
   ok(
