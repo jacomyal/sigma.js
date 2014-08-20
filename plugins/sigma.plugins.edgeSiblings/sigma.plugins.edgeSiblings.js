@@ -102,7 +102,7 @@
    * To get the array of edges, call "edges" without argument. To get a
    * specific edge, call it with the id of the edge. The get multiple edge,
    * call it with an array of ids, and it will return the array of edges, in
-   * the same order. If some edges are siblings, their containers are return
+   * the same order. If some edges are siblings, their containers are returned
    * instead.
    *
    * @param  {?(string|array)} v Eventually one id, an array of ids.
@@ -203,7 +203,7 @@
    * To get the array of edges, call "edges" without argument. To get a
    * specific edge, call it with the id of the edge. The get multiple edge,
    * call it with an array of ids, and it will return the array of edges, in
-   * the same order. If some edges are siblings, their containers are return
+   * the same order. If some edges are siblings, their containers are returned
    * instead.
    *
    * @param  {?(string|array)} v Eventually one id, an array of ids.
@@ -280,9 +280,9 @@
    * This method drops an edge from the graph. An error is thrown if the edge
    * does not exist.
    *
-   * If the edge is a sibling, it drops the sibling. If a single sibling
-   * remains after the removal, it transforms the edge used as a container into
-   * a normal edge.
+   * If the edge is a sibling, it will drop the sibling. If a single sibling
+   * remains after the removal, it will transform the edge used as a container
+   * into a regular edge.
    *
    * If parallel edges exist, i.e. multiple edges may contain the sibling, it
    * will drop the first sibling found in a parallel edge.

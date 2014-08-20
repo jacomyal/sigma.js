@@ -15,7 +15,7 @@ To use, include all .js files under this folder.
 
 Edge siblings are similar to parallel edges, except that they are not registered in the graph structure of sigma.js. Instead, existing edges store them in a specific property called `siblings`. Edge siblings are therefore not used by Sigma.js but are still accessible from plugins and third-party code.
 
-The type of edges which contain siblings is `parallel`. They are true containers: they contain a copy of themselves as siblings because they have a size of 1, they do not have color or label anymore, and one should not rely on the other attributes. Containers take the identifier of the first edge between the extremities that is added in the graph.
+The type of edges which contain siblings is `parallel`. They are true containers: they contain a copy of themselves as siblings because they have a size of 1, they do not have color or label anymore, and one should not rely on the other attributes. Containers take the `id` of the first edge between the extremities that is added in the graph.
 
 ## Graph methods
 
@@ -29,7 +29,7 @@ The following graph methods should be used instead of regular graph methods to e
 **edgeSiblings()** : *array*
 **edgeSiblings( *string* )** : *object*
 **edgeSiblings( *array* )** : *array*
- * This methods is used to retrieve edges from the graph. If no argument is given, then an array containing references to every edge will be returned. The method can also be called with the ID of an edge to only retrieve the related edge, or an array of IDs to obtain an array of the specified edges. If some edges are siblings, their containers are return instead.
+ * This methods is used to retrieve edges from the graph. If no argument is given, then an array containing references to every edge will be returned. The method can also be called with the ID of an edge to only retrieve the related edge, or an array of IDs to obtain an array of the specified edges. If some edges are siblings, their containers are returned instead.
 
 ```javascript
 var myGraph = new sigma.classes.graph();
@@ -38,7 +38,7 @@ var e0 = myGraph.edgeSiblings('e0');
 
 **addEdgeSibling( *object* )** : *graph*
  * This method adds an edge to the graph. The edge must be an object, with a string under the key `id`, and strings under the keys `source` and `target` that are existing node IDs. Except for this, it is possible to add any other attribute that will be preserved along all manipulations. If the graph option `clone` has the value 'true', the edge will be cloned when added to the graph. Also, if the graph option `immutable` has the value 'true', its `id`, `source` and `target` will be defined as immutable.
- * If an edge already exists between the source and target nodes, it will add the edge as a sibling of the existing edge. It will copy the existing edge as a sibling, set its type as "parallel", remove its label and color, and reset its size. If parallel edges already exist, it will add the edge as a sibling to one of these edges (in this case the operation is not deterministic). It may appen when graph.addEdge or graph.read is used.
+ * If an edge already exists between the source and target nodes, it will add the edge as a sibling of the existing edge. It will copy the existing edge as a sibling, set its type as "parallel", remove its label and color, and reset its size. If parallel edges already exist, it will add the edge as a sibling to one of these edges (in this case the operation is not deterministic). It may happen when graph.addEdge or graph.read is used.
  * The method returns the graph instance.
 
 ```javascript
@@ -66,7 +66,7 @@ console.log(
 ```
 
 **dropEdgeSibling( *string* )** : *graph*
- * This method takes an existing edge `id` as argument and drops the related edge from the graph. An error is thrown if the edge does not exist. If the edge is a sibling, it drops the sibling. If a single sibling remains after the removal, it transforms the edge used as a container into a normal edge. If parallel edges exist, i.e. multiple edges may contain the sibling, it will drop the first sibling found in a parallel edge.
+ * This method takes an existing edge `id` as argument and drops the related edge from the graph. An error is thrown if the edge does not exist. If the edge is a sibling, it will drop the sibling. If a single sibling remains after the removal, it will transform the edge used as a container into a regular edge. If parallel edges exist, i.e. multiple edges may contain the sibling, it will drop the first sibling found in a parallel edge.
  * The method returns the graph instance.
 
 ```javascript
