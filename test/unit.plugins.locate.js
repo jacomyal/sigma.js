@@ -3,6 +3,7 @@ module('sigma.plugins.locate');
 asyncTest('API', function(assert) {
   // The number of assertions expected to run within the test:
   expect(9);
+  start();
 
   var dom = document.createElement('DIV');
 
@@ -66,77 +67,78 @@ asyncTest('API', function(assert) {
     'The camera is initialized with default settings.'
   );
   
+  stop();
   locate.nodes('n0', {
     onComplete: function() {
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [1, 2],
         '"nodes" with a node updates the camera position.'
       );
-      start();
     }
   });
 
+  stop();
   locate.nodes(['n0', 'n1'], {
     onComplete: function() {
-      stop();
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [1.5, 1.5],
         '"nodes" with multiple node updates the camera position.'
       );
-      start();
     }
   });
 
+  stop();
   locate.edges('e0', {
     onComplete: function() {
-      stop();
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [1.5, 1.5],
         '"edges" with an edge updates the camera position.'
       );
-      start();
     }
   });
 
+  stop();
   locate.edges(['e0', 'e1'], {
     onComplete: function() {
-      stop();
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [1.5, 1],
         '"edges" with multiple edges updates the camera position.'
       );
-      start();
     }
   });
 
+  stop();
   locate.center(1, {
     onComplete: function() {
-      stop();
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [1.5, 1],
         '"center" updates the camera position to the equidistant position from all nodes.'
       );
-      start();
     }
   });
 
   s.graph.clear();
 
 
+  stop();
   locate.center(1, {
     onComplete: function() {
-      stop();
+      start();
       deepEqual(
         [s.camera.x, s.camera.y],
         [0, 0],
         '"center" updates the camera position to 0,0 if the graph is empty.'
       );
-      start();
     }
   });
 
@@ -158,7 +160,7 @@ asyncTest('API', function(assert) {
   );
 
 
-  sigma.plugins.killLocate();
+ // sigma.plugins.killLocate();
 
   // Restore previous state:
   document.body.removeChild(dom);
