@@ -133,6 +133,52 @@ test('API', function() {
 
 
 
+  deepEqual(
+    s.graph.edgeSiblings(),
+    s.graph.edges(),
+    '"edgeSiblings" with no argument returns all edges.'
+  );
+  
+  deepEqual(
+    s.graph.edgeSiblings('e0').siblings,
+    {
+      'e0': e0,
+      'e1': e1,
+      'e2': e2
+    },
+    '"edgeSiblings" with a container returns the edge.'
+  );
+  
+  deepEqual(
+    s.graph.edgeSiblings('e1'),
+    s.graph.edges('e0'),
+    '"edgeSiblings" with a sibling returns its container.'
+  );
+  
+  deepEqual(
+    s.graph.edgeSiblings('e3'),
+    e3,
+    '"edgeSiblings" with an edge returns the edge.'
+  );
+
+  deepEqual(
+    s.graph.edgeSiblings('ex'),
+    undefined,
+    '"edgeSiblings" with an unknown edge returns undefined.'
+  );
+
+  deepEqual(
+    s.graph.edgeSiblings(['e0', 'e1', 'e3']),
+    [
+      s.graph.edgeSiblings('e0'),
+      s.graph.edgeSiblings('e1'),
+      s.graph.edgeSiblings('e3')
+    ],
+    '"edgeSiblings" with a mixed array of edges and siblings returns an array of edges.'
+  );
+
+
+
   s.graph.dropEdgeSibling('e2');
 
   deepEqual(

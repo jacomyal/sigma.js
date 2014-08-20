@@ -11,8 +11,8 @@
   /**
    * Fast deep copy function.
    *
-   * @param {object} o The object.
-   * @return {object}  The copy.
+   * @param  {object} o The object.
+   * @return {object}   The copy.
    */
   function deepCopy(o) {
     var copy = Object.create(null);
@@ -25,11 +25,119 @@
         eval(" copy[i] = " +  o[i].toString());
         //copy[i] = o[i].bind(_g);
       }
-
       else
         copy[i] = o[i];
     }
     return copy;
+  };
+
+
+  /**
+   * This method finds an edge in the graph. If the edge is a sibling, it
+   * returns the container of the sibling.
+   *
+   * @param  {string} id The edge identifier.
+   * @return {object}    The edge or its container.
+   */
+  function find(id) {
+    var sibling,
+        edges,
+        e;
+
+    // Cases:
+    //   single edge
+    //   1 sibling and container has same id
+    //   2+ siblings and container has same id
+    //   has siblings and container has different id
+
+    if (sibling = this.siblingEdgesIndex[id]) {
+      edges = this.allNeighborsIndex[sibling.source][sibling.target];
+
+      if (Object.keys(edges).length === 1) {
+        e = this.edges(Object.keys(edges)[0]);
+        if (e.type !== 'parallel')
+          throw 'The sibling container must be of type "parallel".';
+        
+        if (e.siblings === undefined)
+          throw 'The sibling container has no "siblings" key.';
+        
+        if (Object.keys(e.siblings).length < 2)
+          throw 'The sibling container must have more than one sibling.';
+        
+        if (e.siblings[id] === undefined)
+          throw 'Sibling container found but the edge sibling is missing.'
+
+        return e;
+      } 
+      else if (Object.keys(edges).length > 1) {
+        // We have parallel edges in the graph structure, maybe because
+        // graph.addEdge() has been called directly.
+        var eid;
+        for (eid in edges) {
+          e = this.edges(eid);
+          if (e.type === 'parallel' && e.siblings !== undefined) {
+            // The edge contains siblings, but does it contain our sibling?
+            if (Object.keys(e.siblings).length) {
+              if (e.siblings[id] !== undefined) {
+                return e;
+              }
+            }
+            else
+              throw 'Edge sibling found but its container is missing.';
+          }
+        };
+        throw 'Edge sibling found but its container is missing.';
+      }
+      else // Object.keys(edges).length == 0
+        throw 'Edge sibling found but its container is missing.';
+    }
+    else
+      return this.edgesIndex[id];
+  };
+
+
+  /**
+   * This methods returns one or several edges, depending on how it is called.
+   *
+   * To get the array of edges, call "edges" without argument. To get a
+   * specific edge, call it with the id of the edge. The get multiple edge,
+   * call it with an array of ids, and it will return the array of edges, in
+   * the same order. If some edges are siblings, their containers are return
+   * instead.
+   *
+   * @param  {?(string|array)} v Eventually one id, an array of ids.
+   * @return {object|array}      The related edge or array of edges.
+   */
+  function get(v) {
+    // Clone the array of edges and return it:
+    if (!arguments.length || v === undefined)
+      return this.edgesArray.slice(0);
+
+    // Return the related edge or edge container:
+    if (arguments.length === 1 && typeof v === 'string') {
+      return find.call(this, v);
+    }
+
+    // Return an array of the related edge or edge container:
+    if (
+      arguments.length === 1 &&
+      Object.prototype.toString.call(v) === '[object Array]'
+    ) {
+      var i,
+          l,
+          a = [];
+
+      for (i = 0, l = v.length; i < l; i++)
+        if (typeof v[i] === 'string') {
+          a.push(find.call(this, v[i]));
+        }
+        else
+          throw 'Wrong arguments.';
+
+      return a;
+    }
+
+    throw 'Wrong arguments.';
   };
 
   /**
@@ -43,7 +151,7 @@
    * @param {object} c The sibling container.
    * @param {object} s The edge sibling.
    */
-  function addEdgeSibling(c, s) {
+  function add(c, s) {
     if (!c.siblings) {
       var copy = deepCopy(c);
       c.siblings = {};
@@ -70,7 +178,7 @@
    * @param {object} c   The sibling container.
    * @param {string} sid The sibling id.
    */
-  function dropEdgeSibling(c, sid) {
+  function drop(c, sid) {
     delete c.siblings[sid];
     delete this.siblingEdgesIndex[sid];
     
@@ -87,6 +195,24 @@
 
 
   // Add custom graph methods:
+
+
+  /**
+   * This methods returns one or several edges, depending on how it is called.
+   *
+   * To get the array of edges, call "edges" without argument. To get a
+   * specific edge, call it with the id of the edge. The get multiple edge,
+   * call it with an array of ids, and it will return the array of edges, in
+   * the same order. If some edges are siblings, their containers are return
+   * instead.
+   *
+   * @param  {?(string|array)} v Eventually one id, an array of ids.
+   * @return {object|array}      The related edge or array of edges.
+   */
+  if (!sigma.classes.graph.hasMethod('edgeSiblings'))
+    sigma.classes.graph.addMethod('edgeSiblings', function(v) {
+      return get.call(this, v);
+    });
 
   /**
    * This method adds an edge to the graph. The edge must be an object, with a
@@ -136,7 +262,7 @@
       if (edges !== undefined && Object.keys(edges).length) {
         // An edge already exists, we make it a container and add a sibling:
         var otherEdge = this.edges(edges[Object.keys(edges)[0]].id);
-        addEdgeSibling.call(
+        add.call(
           this, 
           otherEdge, 
           edge
@@ -146,6 +272,8 @@
         // No edge exists between source and target, we add a normal edge:
         this.addEdge(edge);
       }
+
+      return this;
     });
 
   /**
@@ -168,64 +296,14 @@
       if (typeof id !== 'string' || arguments.length !== 1)
         throw 'dropEdgeSibling: Wrong arguments.';
 
-      // Cases:
-      //   single edge
-      //   1 sibling and container has same id
-      //   2+ siblings and container has same id
-      //   has siblings and container has different id
-
-      var sibling = this.siblingEdgesIndex[id];
-
-      if (sibling === undefined) {
-        // single edge:
-        this.dropEdge(id);
-      } 
-      else {
-        var edges = this.allNeighborsIndex[sibling.source][sibling.target];
-
-        if (Object.keys(edges).length === 1) {
-          var e = this.edges(Object.keys(edges)[0]);
-          if (e.type !== 'parallel')
-            throw 'The sibling container must be of type "parallel".';
-          
-          if (e.siblings === undefined)
-            throw 'The sibling container has no "siblings" key.';
-          
-          if (Object.keys(e.siblings).length < 2)
-            throw 'The sibling container must have more than one sibling.';
-          
-          if (e.siblings[id] === undefined)
-            throw 'Sibling container found but the edge sibling is missing.'
-
-          dropEdgeSibling.call(this, e, id);
-        } 
-        else if (Object.keys(edges).length > 1) {
-          // We have parallel edges, maybe because graph.addEdge() has been
-          // called directly.
-          var eid, 
-              found = false;
-          for (eid in edges) {
-            var e = this.edges(eid);
-            if (!found && e.type === 'parallel' && e.siblings !== undefined) {
-              // The edge contains siblings, but does it contain our sibling?
-              if (Object.keys(e.siblings).length) {
-                if (e.siblings[id] !== undefined) {
-                  found = true;
-                  dropEdgeSibling.call(this, e, id);
-                }
-              } else {
-                throw 'Edge sibling found but its container is missing.';
-              }
-            }
-          };
-          if (!found)
-            throw 'Edge sibling found but its container is missing.';
-        }
-        else {
-          // Object.keys(edges).length == 0
-          throw 'Edge sibling found but its container is missing.';
-        }
+      if (this.siblingEdgesIndex[id]) {
+        var container = find.call(this, id);
+        drop.call(this, container, id);
       }
+      else
+        this.dropEdge(id);
+
+      return this;
     });
 
   /**
