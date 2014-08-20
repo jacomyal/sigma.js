@@ -197,6 +197,7 @@
    * @param  {string|array}  v       Eventually one node id, an array of ids.
    * @param  {?object}       options A dictionary with options for a possible
    *                                 animation.
+   * @return {sigma.plugins.locate}  Returns the instance itself.
    */
   Locate.prototype.nodes = function(v, options) {
     if (arguments.length < 1)
@@ -206,12 +207,15 @@
       throw 'locate.nodes: options must be an object.'
 
     var t,
+        n,
         animationOpts = extend(options, _o.animation.node),
         ratio = _s.camera.ratio;
 
     // One node:
     if (typeof v === 'string') {
-      var n = _s.graph.nodes(v);
+      n = _s.graph.nodes(v);
+      if (n === undefined)
+        throw 'locate.nodes: Wrong arguments.';
 
       t = {
         x: n[_s.camera.readPrefix + 'x'],
@@ -227,16 +231,31 @@
     ) {
       var minX, maxX, minY, maxY;
 
-      minX = Math.min.apply(Math, v.map(function(n) {
+      minX = Math.min.apply(Math, v.map(function(id) {
+        n = _s.graph.nodes(id);
+        if (n === undefined)
+          throw 'locate.nodes: Wrong arguments.';
+
         return n[_s.camera.readPrefix + 'x'];
       }));
-      maxX = Math.max.apply(Math, v.map(function(n) {
+      maxX = Math.max.apply(Math, v.map(function(id) {
+        n = _s.graph.nodes(id);
+        if (n === undefined)
+          throw 'locate.nodes: Wrong arguments.';
         return n[_s.camera.readPrefix + 'x'];
       }));
-      minY = Math.min.apply(Math, v.map(function(n) {
+      minY = Math.min.apply(Math, v.map(function(id) {
+        n = _s.graph.nodes(id);
+        if (n === undefined)
+          throw 'locate.nodes: Wrong arguments.';
+        
         return n[_s.camera.readPrefix + 'y'];
       }));
-      maxY = Math.max.apply(Math, v.map(function(n) {
+      maxY = Math.max.apply(Math, v.map(function(id) {
+        n = _s.graph.nodes(id);
+        if (n === undefined)
+          throw 'locate.nodes: Wrong arguments.';
+        
         return n[_s.camera.readPrefix + 'y'];
       }));
 
@@ -271,6 +290,8 @@
         animationOpts
       );
     }
+
+    return this;
   };
 
 
@@ -295,6 +316,7 @@
    * @param  {string|array}  v       Eventually one edge id, an array of ids.
    * @param  {?object}       options A dictionary with options for a possible
    *                                 animation.
+   * @return {sigma.plugins.locate}  Returns the instance itself.
    */
   Locate.prototype.edges = function(v, options) {
     if (arguments.length < 1)
@@ -304,13 +326,17 @@
       throw 'locate.edges: options must be an object.'
 
     var t,
+        e,
         animationOpts = extend(options, _o.animation.edge),
         ratio = _s.camera.ratio;
 
     // One edge:
     if (typeof v === 'string') {
-      var e = _s.graph.edges(v),
-          snode = _s.graph.nodes(e.source),
+      e = _s.graph.edges(v);
+      if (e === undefined)
+        throw 'locate.edges: Wrong arguments.';
+
+      var snode = _s.graph.nodes(e.source),
           tnode = _s.graph.nodes(e.target),
           minX, maxX, minY, maxY;
 
@@ -340,32 +366,79 @@
     ) {
       var minX, maxX, minY, maxY;
 
-      minX = Math.min.apply(Math, v.map(function(e) {
-        return Math.min(
-          e.source[_s.camera.readPrefix + 'x'],
-          e.target[_s.camera.readPrefix + 'x']
-        );
-      }));
-      maxX = Math.max.apply(Math, v.map(function(e) {
-        return Math.min(
-          e.source[_s.camera.readPrefix + 'x'],
-          e.target[_s.camera.readPrefix + 'x']
-        );
-      }));
-      minY = Math.min.apply(Math, v.map(function(e) {
-        return Math.min(
-          e.source[_s.camera.readPrefix + 'y'],
-          e.target[_s.camera.readPrefix + 'y']
-        );
-      }));
-      maxY = Math.max.apply(Math, v.map(function(e) {
-        return Math.min(
-          e.source[_s.camera.readPrefix + 'y'],
-          e.target[_s.camera.readPrefix + 'y']
-        );
-      }));
+      var allx = v.map(function(id) {
+        e = _s.graph.edges(id);
+        if (e === undefined)
+          throw 'locate.edges: Wrong arguments.';
 
-      t = target(minX, maxX, minY, maxY, s);
+        return [
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
+        ]
+      });
+      // Flatten the array:
+      allx = [].concat.apply([], allx);
+
+      var ally = v.map(function(id) {
+        e = _s.graph.edges(id);
+        if (e === undefined)
+          throw 'locate.edges: Wrong arguments.';
+
+        return [
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
+        ]
+      });
+      // Flatten the array:
+      ally = [].concat.apply([], ally);
+
+      minX = Math.min.apply(Math, allx);
+      maxX = Math.max.apply(Math, allx);
+      minY = Math.min.apply(Math, ally);
+      maxY = Math.max.apply(Math, ally);
+
+      /*minX = Math.min.apply(Math, v.map(function(id) {
+        e = _s.graph.edges(id);
+      if (e === undefined)
+        throw 'locate.edges: Wrong arguments.';
+
+        return Math.min(
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
+        );
+      }));
+      maxX = Math.max.apply(Math, v.map(function(id) {
+        e = _s.graph.edges(id);
+      if (e === undefined)
+        throw 'locate.edges: Wrong arguments.';
+
+        return Math.min(
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
+        );
+      }));
+      minY = Math.min.apply(Math, v.map(function(id) {
+        e = _s.graph.edges(id);
+      if (e === undefined)
+        throw 'locate.edges: Wrong arguments.';
+
+        return Math.min(
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
+        );
+      }));
+      maxY = Math.max.apply(Math, v.map(function(id) {
+        e = _s.graph.edges(id);
+      if (e === undefined)
+        throw 'locate.edges: Wrong arguments.';
+
+        return Math.min(
+          _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
+          _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
+        );
+      }));*/
+
+      t = target(minX, maxX, minY, maxY);
     }
     else
       throw 'locate.edges: Wrong arguments.';
@@ -396,11 +469,15 @@
         animationOpts
       );
     }
+
+    return this;
   };
 
 
   /**
-   * This function will reset the location and zoom ratio of the camera.
+   * This method moves the camera to the equidistant position from all nodes,
+   * or to the coordinates (0, 0) if the graph is empty, given a final zoom
+   * ratio.
    *
    * Recognized parameters:
    * **********************
@@ -417,14 +494,17 @@
    *                                   function.
    *
    *
-   * @param  {number}  ratio   The target zoom ratio.
-   * @param  {?object} options A dictionary with options for a possible
-   *                           animation.
+   * @param  {number}  ratio        The final zoom ratio.
+   * @param  {?object} options      A dictionary with options for a possible
+   *                                animation.
+   * @return {sigma.plugins.locate} Returns the instance itself.
    */
   Locate.prototype.center = function(ratio, options) {
     var animationOpts = extend(options, _o.animation.center);
     if (_s.graph.nodes().length) {
-      _instance.nodes(_s.graph.nodes(), animationOpts);
+      _instance.nodes(_s.graph.nodes().map(function(n) {
+        return n.id;
+      }), animationOpts);
     }
     else {
       sigma.misc.animation.camera(
@@ -437,6 +517,8 @@
         animationOpts
       );
     }
+
+    return this;
   };
 
   /**

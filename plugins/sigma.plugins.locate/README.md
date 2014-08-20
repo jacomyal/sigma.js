@@ -67,36 +67,51 @@ var locate = sigma.plugins.locate(sigInst, {
 
 Beta
 
-## Usage
+## Public methods
 
-Locate a single node:
-
-````javascript
-locate.nodes(n);
-````
-
-Locate multiple nodes:
+**nodes( *string, ?object* )** : *sigma.plugins.locate*
+**nodes( *array, ?object* )** : *sigma.plugins.locate*
+ * This method locates a node or a set of nodes in the visualization given their IDs. It will move the camera to the equidistant position from the specific nodes. It may change the zoom ratio of the camera to focus on the node or to fit the screen on the set of nodes.
+ * The method returns the instance itself.
 
 ````javascript
-locate.nodes([n0, n1]);
+// Locate a single node:
+locate.nodes('n0');
+
+// Locate multiple nodes:
+locate.nodes(['n0', 'n1']);
 ````
 
-Locate a single edge:
+**edges( *string, ?object* )** : *sigma.plugins.locate*
+**edges( *array, ?object* )** : *sigma.plugins.locate*
+ * This method locates an edge or a set of edges in the visualization given their IDs. It will move the camera to the equidistant position from the specific edge extremities. It may change the zoom ratio of the camera to to fit the screen on the edge(s).
+ * The method returns the instance itself.
 
 ````javascript
-locate.edges(e);
+// Locate a single edge:
+locate.edges('e0');
+
+// Locate multiple edges:
+locate.edges(['e0', 'e1']);
 ````
 
-Locate multiple edges:
+**center( *number, ?object* )** : *sigma.plugins.locate*
+ * This method moves the camera to the equidistant position from all nodes, or to the coordinates (0, 0) if the graph is empty, given a final zoom ratio.
+ * The method returns the instance itself.
 
 ````javascript
-locate.edges([e0, e1]);
+locate.center(1);
 ````
+
+#### Optional argument
 
 These functions may take an optional parameter to configure the animation, e.g.:
 
 ````javascript
-locate.nodes(n, {duration: 800});
+locate.nodes('n0', {
+duration: 800,
+onComplete: function() {/* do something when it's done. */}
+});
 ````
 
 See [`sigma.misc.animation.camera`](https://github.com/jacomyal/sigma.js/blob/master/src/misc/sigma.misc.animation.js#l47) for a list of accepted parameters in this object.
