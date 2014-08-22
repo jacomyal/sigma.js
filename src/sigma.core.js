@@ -640,7 +640,7 @@
   /**
    * The current version of sigma:
    */
-  sigma.version = '1.0.2';
+  sigma.version = '1.0.3';
 
 
 
