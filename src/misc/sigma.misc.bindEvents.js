@@ -86,6 +86,22 @@
 
 
     function getEdges(e) {
+      if (!self.settings('enableEdgeHovering')) {
+        // No event if the setting is off:
+        return [];
+      }
+
+      var isCanvas = (
+        sigma.renderers.canvas && self instanceof sigma.renderers.canvas);
+
+      if (!isCanvas) {
+        // A quick hardcoded rule to prevent people from using this feature
+        // with the WebGL renderer (which is not good enough at the moment):
+        throw new Error(
+          'The edge events feature is not compatible with the WebGL renderer'
+        );
+      }
+
       if (e) {
         mX = 'x' in e.data ? e.data.x : mX;
         mY = 'y' in e.data ? e.data.y : mY;
@@ -106,7 +122,6 @@
           selected = [],
           modifiedX = mX + self.width / 2,
           modifiedY = mY + self.height / 2,
-          isCanvas,
           point = self.camera.cameraPosition(
             mX,
             mY
@@ -115,9 +130,6 @@
             point.x,
             point.y
           );
-
-      isCanvas = (
-        sigma.renderers.canvas && self instanceof sigma.renderers.canvas);
 
       if (isCanvas) {
         var nodesOnScreen = self.camera.quadtree.area(
