@@ -1,4 +1,4 @@
-module('sigma.plugins.filter');
+module('sigma.helpers.graph');
 
 test('Custom graph methods', function() {
   var myGraph = new sigma.classes.graph();
@@ -57,5 +57,33 @@ test('Custom graph methods', function() {
     myGraph.adjacentEdges('n0'),
     [ myGraph.edges('e0') ],
     '"adjacentEdges" returns the adjacent edges of a specified node'
+  );
+
+  myGraph.dropEdges('e3');
+  deepEqual(
+    myGraph.edges(),
+    [ myGraph.edges('e0'), myGraph.edges('e1'), myGraph.edges('e2') ],
+    '"dropEdges" drops one edge'
+  );
+
+  myGraph.dropEdges(['e1', 'e2']);
+  deepEqual(
+    myGraph.edges(),
+    [ myGraph.edges('e0') ],
+    '"dropEdges" drops multiple edges'
+  );
+
+  myGraph.dropNodes('n3');
+  deepEqual(
+    myGraph.nodes(),
+    [ myGraph.nodes('n0'), myGraph.nodes('n1'), myGraph.nodes('n2') ],
+    '"dropNodes" drops one node'
+  );
+
+  myGraph.dropNodes(['n1', 'n2']);
+  deepEqual(
+    myGraph.nodes(),
+    [ myGraph.nodes('n0') ],
+    '"dropNodes" drops multiple nodes'
   );
 });
