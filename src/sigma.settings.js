@@ -29,11 +29,15 @@
     // {string}
     defaultLabelColor: '#000',
     // {string}
+    defaultEdgeLabelColor: '#000',
+    // {string}
     defaultEdgeColor: '#000',
     // {string}
     defaultNodeColor: '#000',
     // {string}
     defaultLabelSize: 14,
+    // {string}
+    defaultEdgeLabelSize: 10,
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
     edgeColor: 'source',
@@ -44,6 +48,9 @@
     // {string} Indicates how to choose the labels color. Available values:
     //          "node", "default"
     labelColor: 'default',
+    // {string} Indicates how to choose the edge labels color. Available values:
+    //          "edge", "default"
+    edgeLabelColor: 'default',
     // {string} Indicates how to choose the labels size. Available values:
     //          "fixed", "proportional"
     labelSize: 'fixed',
@@ -51,6 +58,15 @@
     labelSizeRatio: 1,
     // {number} The minimum size a node must have to see its label displayed.
     labelThreshold: 8,
+    // {string} Indicates how to choose the edge labels size. Available values:
+    //          "fixed", "proportional"
+    edgeLabelSize: 'fixed',
+    // {string} The opposite power ratio between the font size of the label and
+    // the edge size:
+    //   Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
+    edgeLabelSizePowRatio: 0.8,
+    // {number} The minimum size an edge must have to see its label displayed.
+    edgeLabelThreshold: 1,
     // {number} The oversampling factor used in WebGL renderer.
     webglOversamplingRatio: 2,
     // {number} The size of the border of hovered nodes.
@@ -88,6 +104,10 @@
     //           false: Layered not displayed.
     //           true: Layered displayed.
     drawLabels: true,
+    // {booleans} The different drawing modes:
+    //           false: Layered not displayed.
+    //           true: Layered displayed.
+    drawEdgeLabels: true,
     drawEdges: true,
     drawNodes: true,
     // {boolean} Indicates if the edges must be drawn in several frames or in

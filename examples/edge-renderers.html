@@ -20,6 +20,9 @@
 <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.labels.curvedArrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
@@ -51,8 +54,8 @@
  */
 var i,
     s,
-    N = 100,
-    E = 500,
+    N = 10,
+    E = 50,
     g = {
       nodes: [],
       edges: []
@@ -72,6 +75,7 @@ for (i = 0; i < N; i++)
 for (i = 0; i < E; i++)
   g.edges.push({
     id: 'e' + i,
+    label: 'Edge ' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
@@ -85,6 +89,13 @@ s = new sigma({
   renderer: {
     container: document.getElementById('graph-container'),
     type: 'canvas'
+  },
+  settings: {
+    //edgesPowRatio: 1,
+    //minEdgeSize: 0.5,
+    //maxEdgeSize: 10,
+    //edgeLabelSize: 'proportional'
+    //batchEdgesDrawing: true
   }
 });
 </script>

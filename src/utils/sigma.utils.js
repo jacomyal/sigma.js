@@ -223,6 +223,97 @@
   };
 
 
+  /**
+   * Return the control point coordinates for a quadratic bezier curve.
+   *
+   * @param  {object} start  The node starting point.
+   * @param  {object} end    The node ending point.
+   * @param  {string} prefix The prefix of the coordinates.
+   * @return  {x,y}          The control point coordinates.
+   */
+  sigma.utils.getCP = function(start, end, prefix) {
+    return {
+      x: (start[prefix + 'x'] + end[prefix + 'x']) / 2 +
+         (end[prefix + 'y'] - start[prefix + 'y']) / 4,
+      y: (start[prefix + 'y'] + end[prefix + 'y']) / 2 +
+         (start[prefix + 'x'] - end[prefix + 'x']) / 4
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the quadratic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the ending point.
+    * @param  {number} y2 The Y coordinate of the ending point.
+    * @param  {number} xi The X coordinate of the control point.
+    * @param  {number} yi The Y coordinate of the control point.
+    * @return {object}    {x,y}.
+  */
+  sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
+// http://stackoverflow.com/questions/5634460/
+//   quadratic-bezier-curve-calculate-point
+// http://www.html5canvastutorials.com/tutorials/html5-canvas-quadratic-curves/
+    return {
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * xi + Math.pow(t, 2) * x2,
+      y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * yi + Math.pow(t, 2) * y2
+    };
+  };
+
+  /**
+   * Return the coordinates of the two control points for a self loop (i.e.
+   * where the start point is also the end point) computed as a cubic bezier
+   * curve.
+   *
+   * @param  {number} x    The X coordinate of the node.
+   * @param  {number} y    The Y coordinate of the node.
+   * @param  {number} size The node size.
+   * @return {x1,y1,x2,y2} The coordinates of the two control points.
+   */
+  sigma.utils.getSelfLoopControlPoints = function(x , y, size) {
+    return {
+      x1: x - size * 7,
+      y1: y,
+      x2: x,
+      y2: y + size * 7
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the cubic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the end point.
+    * @param  {number} y2 The Y coordinate of the end point.
+    * @param  {number} cx The X coordinate of the first control point.
+    * @param  {number} cy The Y coordinate of the first control point.
+    * @param  {number} dx The X coordinate of the second control point.
+    * @param  {number} dy The Y coordinate of the second control point.
+    * @return {object}    {x,y} The point at t.
+  */
+  sigma.utils.getPointOnBezierCurve =
+    function(t, x1, y1, x2, y2, cx, cy, dx, dy) {
+    // http://stackoverflow.com/a/15397596
+    // Blending functions:
+    var B0_t = Math.pow(1 - t, 3),
+        B1_t = 3 * t * Math.pow(1 - t, 2),
+        B2_t = 3 * Math.pow(t, 2) * (1 - t),
+        B3_t = Math.pow(t, 3);
+
+    return {
+      x: (B0_t * x1) + (B1_t * cx) + (B2_t * dx) + (B3_t * x2),
+      y: (B0_t * y1) + (B1_t * cy) + (B2_t * dy) + (B3_t * y2)
+    };
+  };
+
 
 
   /**
