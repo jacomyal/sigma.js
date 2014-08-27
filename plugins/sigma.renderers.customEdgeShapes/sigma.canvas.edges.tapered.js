@@ -61,17 +61,9 @@
     context.moveTo(tX, tY);
     context.lineTo(c.xi, c.yi);
     context.lineTo(c.xi_prime, c.yi_prime);
+    context.closePath();
     context.fill();
 
     context.restore();
-
-    /*if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );*/
   };
 })();

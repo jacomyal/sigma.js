@@ -50,14 +50,5 @@
     context.stroke();
 
     context.restore();
-
-    /*if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );*/
   };
 })();

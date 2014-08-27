@@ -53,22 +53,15 @@
     context.beginPath();
     context.moveTo(c.xi, c.yi);
     context.lineTo(d.xi_prime, d.yi_prime);
+    context.closePath();
     context.stroke();
 
     context.beginPath();
     context.moveTo(c.xi_prime, c.yi_prime);
     context.lineTo(d.xi, d.yi);
+    context.closePath();
     context.stroke();
 
     context.restore();
-
-    /*if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );*/
   };
 })();
