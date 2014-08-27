@@ -1,13 +1,10 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg('sigma.canvas.edgehovers');
 
   /**
-   * This method renders the edge as a tapered line.
-   * Danny Holten, Petra Isenberg, Jean-Daniel Fekete, and J. Van Wijk (2010)
-   * Performance Evaluation of Tapered, Curved, and Animated Directed-Edge
-   * Representations in Node-Link Graphs. Research Report, Sep 2010.
+   * This hover renderer will display the edge with a different color or size.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -15,7 +12,8 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.tapered = function(edge, source, target, context, settings) {
+  sigma.canvas.edgehovers.tapered =
+    function(edge, source, target, context, settings) {
     // The goal is to draw a triangle where the target node is a point of 
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
@@ -44,6 +42,13 @@
           color = defaultEdgeColor;
           break;
       }
+
+    if (settings('edgeHoverColor') === 'edge') {
+      color = edge.hover_color || color;
+    } else {
+      color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+    }
+    size *= settings('edgeHoverSizeRatio');
 
     // Intersection points:
     var c = sigma.utils.getCircleIntersection(sX, sY, size, tX, tY, dist);

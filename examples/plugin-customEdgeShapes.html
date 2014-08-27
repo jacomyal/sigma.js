@@ -42,6 +42,10 @@
 <script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.dotted.js"></script>
 <script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.parallel.js"></script>
 <script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.tapered.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.dashed.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.dotted.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.parallel.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.tapered.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -122,7 +126,9 @@ s = new sigma({
     minNodeSize: 1,
     maxNodeSize: 10,
     minEdgeSize: 0.1,
-    maxEdgeSize: 2
+    maxEdgeSize: 2,
+    enableEdgeHovering: true,
+    edgeHoverSizeRatio: 2
   }
 });
 </script>
