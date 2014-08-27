@@ -99,6 +99,7 @@ for (i = 0; i < E; i++) {
   if (Math.random() < 1 - d)
     g.edges.push({
       id: 'e' + i,
+      label: 'Edge ' + i,
       source: 'n' + ((Math.random() * N) | 0),
       target: 'n' + ((Math.random() * N) | 0)
     });

@@ -104,6 +104,7 @@ for (i = 0; i < N; i++)
 for (i = 0; i < E; i++)
   s.graph.addEdge({
     id: 'e' + i,
+    label: 'Edge ' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
     size: 1 + Math.random()
