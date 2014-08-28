@@ -19,7 +19,9 @@
     // The goal is to draw a triangle where the target node is a point of 
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
-    var color = edge.color,
+    var color = edge.active ?
+          edge.active_color || settings('defaultEdgeActiveColor') :
+          edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),
@@ -50,11 +52,19 @@
 
     context.save();
 
+    if (edge.active) {
+      context.fillStyle = settings('edgeActiveColor') === 'edge' ?
+        (color || defaultEdgeColor) :
+        settings('defaultEdgeActiveColor');
+    }
+    else {
+      context.fillStyle = color;
+    }
+
     // Turn transparency on:
     context.globalAlpha = 0.65;
 
     // Draw the triangle:
-    context.fillStyle = color;
     context.beginPath();
     context.moveTo(tX, tY);
     context.lineTo(c.xi, c.yi);

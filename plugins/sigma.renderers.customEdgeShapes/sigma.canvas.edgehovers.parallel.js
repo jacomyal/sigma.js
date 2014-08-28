@@ -14,7 +14,9 @@
    */
   sigma.canvas.edgehovers.parallel =
     function(edge, source, target, context, settings) {
-    var color = edge.color,
+    var color = edge.active ?
+          edge.active_color || settings('defaultEdgeActiveColor') :
+          edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),

@@ -17,7 +17,9 @@
     // The goal is to draw a triangle where the target node is a point of 
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
-    var color = edge.color,
+    var color = edge.active ?
+          edge.active_color || settings('defaultEdgeActiveColor') :
+          edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),

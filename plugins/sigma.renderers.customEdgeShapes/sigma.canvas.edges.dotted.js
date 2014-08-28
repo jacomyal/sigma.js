@@ -13,7 +13,9 @@
    * @param  {configurable}             settings     The settings function.
    */
   sigma.canvas.edges.dotted = function(edge, source, target, context, settings) {
-    var color = edge.color,
+    var color = edge.active ?
+          edge.active_color || settings('defaultEdgeActiveColor') :
+          edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),
@@ -35,8 +37,16 @@
 
     context.save();
 
+    if (edge.active) {
+      context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
+        (color || defaultEdgeColor) :
+        settings('defaultEdgeActiveColor');
+    }
+    else {
+      context.strokeStyle = color;
+    }
+
     context.setLineDash([2]);
-    context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
     context.moveTo(
