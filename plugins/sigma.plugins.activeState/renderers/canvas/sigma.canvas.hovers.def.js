@@ -74,7 +74,7 @@
     }
 
     // Node border:
-    if (settings('borderSize') > 0) {
+    if (borderSize > 0) {
       context.beginPath();
       context.fillStyle = settings('nodeBorderColor') === 'node' ?
         (node.color || settings('defaultNodeColor')) :
@@ -82,7 +82,7 @@
       context.arc(
         node[prefix + 'x'],
         node[prefix + 'y'],
-        size + settings('borderSize'),
+        size + borderSize,
         0,
         Math.PI * 2,
         true
@@ -106,6 +106,7 @@
         Math.round(node[prefix + 'x'] +
           size +
           borderSize +
+          settings('outerBorderSize') +
           3),
         Math.round(node[prefix + 'y'] + fontSize / 3)
       );

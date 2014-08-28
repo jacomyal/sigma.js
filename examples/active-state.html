@@ -97,7 +97,7 @@ for (i = 0; i < E; i++)
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
     color: '#ccc',
-    //active_color: '#000',
+    //active_color: '#000', //'rgb(236, 81, 72)'
     active: [false, true][Math.random() * 1.05 | 0],
     //type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0]
   });
@@ -105,16 +105,17 @@ for (i = 0; i < E; i++)
 // Instanciate sigma:
 s = new sigma({
   graph: g,
-  renderer: {
+  /*renderer: {
     container: document.getElementById('graph-container'),
     type: 'canvas'
-  }
-  //container: 'graph-container'
+  }*/
+  container: 'graph-container'
   ,
   settings: {
     borderSize: 2,
     outerBorderSize: 1,
     defaultNodeBorderColor: '#fff',
+    nodeBorderColor: 'default',
     defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
   }
 });
@@ -132,11 +133,12 @@ var activeEdgesCallback = _.debounce(function(event) {
 }, 250);
 activeState.bind('activeEdges', activeEdgesCallback);
 
-/*activeState.addNodes('n0');
+activeState.addNodes('n0');
 activeState.addEdges('e0');
 
 activeState.dropNodes('n0');
-activeState.addNodes(['n0', 'n1']);*/
+activeState.addNodes(['n0', 'n1']);
+s.refresh();
 
 console.log(activeState.nodes().length + ' active nodes');
 console.log(activeState.edges().length + ' active edges');

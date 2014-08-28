@@ -11,6 +11,10 @@
   * Extended sigma settings for sigma.plugins.activeState.
   */
   var settings = {
+    /**
+     * ACTIVE STATE SETTINGS:
+     * **********************
+     */
     // {string} The active node's label font. If not specified, will heritate
     //          the "font" value.
     activeFont: '',
@@ -26,6 +30,22 @@
     edgeActiveColor: 'edge',
     // {string}
     defaultEdgeActiveColor: 'rgb(236, 81, 72)',
+
+    /**
+     * NODE BORDERS SETTINGS:
+     * **********************
+     */
+    // {string} Indicates how to choose the nodes border color.
+    //          Available values: "node", "default"
+    nodeBorderColor: 'node,',
+    // defaultNodeBorderColor is already available in sigma.settings.
+    // {string} Indicates how to choose the nodes outer border color.
+    //          Available values: "node", "default"
+    nodeOuterBorderColor: '',
+    // {number} The size of the outer border of hovered and active nodes.
+    outerBorderSize: 0,
+    // {string} The default hovered and active node outer border's color.
+    defaultNodeOuterBorderColor: '#000'
   };
 
   // Export the previously designed settings:

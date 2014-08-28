@@ -52,7 +52,9 @@
       node.label,
       Math.round(node[prefix + 'x'] +
         size +
-        (node.active ? settings('borderSize') : 0) +
+        (node.active ?
+          settings('borderSize') + settings('outerBorderSize') :
+          0) +
         3),
       Math.round(node[prefix + 'y'] + fontSize / 3)
     );
