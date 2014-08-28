@@ -129,7 +129,7 @@ We extend Sigma.js settings in a transparent way to render active nodes and edge
    * type: *string*
    * default value: `#000`
 
-The default values provided by the plugin may be overriden when instantiating Sigma, e.g.:
+The default values provided by the plugin may be overridden when instantiating Sigma, e.g.:
 
 ````javascript
 var sigInst = new sigma({
@@ -153,4 +153,4 @@ Finally, the node renderers take the borders sizes into account in the distance 
 
 #### Limitations
 
-WebGL renderers ignore borders like in vanilla renderers.
+WebGL node renderers ignore borders.
