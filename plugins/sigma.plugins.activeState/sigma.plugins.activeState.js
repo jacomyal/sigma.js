@@ -112,9 +112,24 @@
    */
   function ActiveState(g) {
     _instance = this;
-    _activeNodesIndex = _activeNodesIndex || Object.create(null);
-    _activeEdgesIndex = _activeEdgesIndex || Object.create(null);
     _g = g;
+
+    if (_activeNodesIndex === null) {
+      // It happens after a kill. Index nodes:
+      _activeNodesIndex = Object.create(null);
+      g.nodes().forEach(function(o) {
+        if (o.active)
+          _activeNodesIndex[o.id] = o;
+      });
+    }
+    if (_activeEdgesIndex === null) {
+      // It happens after a kill. Index edges:
+      _activeEdgesIndex = Object.create(null);
+      g.edges().forEach(function(o) {
+        if (o.active)
+          _activeEdgesIndex[o.id] = o;
+      });
+    }
 
     sigma.classes.dispatcher.extend(this);
   };

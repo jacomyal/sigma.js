@@ -215,4 +215,26 @@ test('Standard manipulation', function() {
     2, 
     '"addEdges" adds the edges to activeEdgesIndex');
   
+  // kills the plugin instance:
+  activeState.addNodes(['n0', 'n1']);
+  sigma.plugins.killActiveState();
+  equal(
+    activeState.nodes().length, 
+    0,
+    '"killActiveState" clears activeNodesIndex');
+  equal(
+    activeState.edges().length, 
+    0,
+    '"killActiveState" clears activeEdgesIndex');
+
+  // re-instiantiate the plugin:
+  activeState = sigma.plugins.activeState(myGraph);
+  equal(
+    activeState.nodes().length, 
+    2,
+    '"activeState" recovers activeNodesIndex after a kill');
+  equal(
+    activeState.edges().length, 
+    2,
+    '"activeState" recovers activeEdgesIndex after a kill');
 });
