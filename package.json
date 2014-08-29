@@ -3,12 +3,15 @@
   "version": "1.0.2",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
-  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "bugs": {
+    "url": "http://github.com/jacomyal/sigma.js/issues"
+  },
   "repository": {
     "type": "git",
     "url": "http://github.com/jacomyal/sigma.js.git"
   },
   "license": "MIT",
+  "main": "build/sigma.require.js",
   "devDependencies": {
     "grunt-cli": "^0.1.13",
     "grunt": "~0.4.4",
@@ -26,5 +29,11 @@
     "start": "http-server -p 8000",
     "test": "grunt travis",
     "build": "grunt uglify"
-  }
+  },
+  "readme": "[![Build Status](https://travis-ci.org/jacomyal/sigma.js.png)](https://travis-ci.org/jacomyal/sigma.js)\n\nsigma.js - v1.0.2\n=================\n\nSigma is a JavaScript library dedicated to graph drawing.\n\n### Resources\n\n[The website](http://sigmajs.org) provides a global overview of the project, and the documentation is available in the [Github Wiki](https://github.com/jacomyal/sigma.js/wiki).\n\nAlso, the `plugins` and `examples` directories contain some various use-cases, that might help you understanding how to use sigma.\n\n### How to use it\n\nTo use it, clone the repository:\n\n```\ngit clone git@github.com:jacomyal/sigma.js.git\n```\n\nTo build the code:\n\n - Install [Node.js](http://nodejs.org/).\n - Install [gjslint](https://developers.google.com/closure/utilities/docs/linter_howto?hl=en).\n - Use `npm install` to install sigma development dependencies.\n - Use `npm run build` to minify the code with [Uglify](https://github.com/mishoo/UglifyJS). The minified file `sigma.min.js` will then be accessible in the `build/` folder.\n\nAlso, you can customize the build by adding or removing files from the `coreJsFiles` array in `Gruntfile.js` before applying the grunt task.\n\n### Contributing\n\nYou can contribute by submitting [issues tickets](http://github.com/jacomyal/sigma.js/issues) and proposing [pull requests](http://github.com/jacomyal/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request by running the command `grunt`.\n\nThe whole source code is validated by the [Google Closure Linter](https://developers.google.com/closure/utilities/) and [JSHint](http://www.jshint.com/), and the comments are written in [JSDoc](http://en.wikipedia.org/wiki/JSDoc) (tags description is available [here](https://developers.google.com/closure/compiler/docs/js-for-compiler)).\n",
+  "readmeFilename": "README.md",
+  "_id": "sigma-js@1.0.2",
+  "_shasum": "4f320371f2c5f2ab5f6efc465cf501096f2405b2",
+  "_resolved": "git+ssh://git@github.com:edmodo/sigma.js#7b9b021651e63bbc7be76261e31b84f5de087f66",
+  "_from": "sigma@git+ssh://git@github.com:edmodo/sigma.js#7b9b021651e63bbc7be76261e31b84f5de087f66"
 }
