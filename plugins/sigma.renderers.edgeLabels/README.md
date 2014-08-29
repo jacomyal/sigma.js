@@ -11,7 +11,7 @@ This plugin displays edge labels.
 
 See the following [example](../../examples/edge-renderers.html) for full usage.
 
-To use, include all .js files under this folder.
+To use it, include all .js files under this folder.
 
 ## Settings
 
@@ -32,9 +32,14 @@ This plugin extends Sigma.js settings in a transparent way to render edge labels
    * available values: `fixed`, `proportional`
 
  * **edgeLabelSizePowRatio**
-   * The opposite power ratio between the font size of the label and the edge size: `Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize`.
+   * The opposite power ratio between the font size of the label and the edge size.
    * type: *number*
    * default value: `0.8`
+
+````javascript
+// Formula:
+Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
+````
 
  * **edgeLabelThreshold**
    * The minimum size an edge must have to see its label displayed.
