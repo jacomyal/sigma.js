@@ -30,6 +30,7 @@
       return;
 
     var fontSize,
+        sSize = source[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
         tX = target[prefix + 'x'],
@@ -37,10 +38,22 @@
         dX = tX - sX,
         dY = tY - sY,
         sign = (sX < tX) ? 1 : -1,
-        cp,
+        cp = {},
         c,
         angle,
         t = 0.5;  //length of the curve
+
+    if (source.id === target.id) {
+      cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize);
+      c = sigma.utils.getPointOnBezierCurve(
+        t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
+      );
+      angle = Math.atan2(1, 1); // 45°
+    } else {
+      cp = sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
+      c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
+      angle = Math.atan2(dY * sign, dX * sign);
+    }
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
@@ -65,20 +78,6 @@
 
     context.textAlign = 'center';
     context.textBaseline = 'alphabetic';
-
-    if (source.id === target.id) {
-      cp = sigma.utils.getSelfLoopControlPoints(
-        sX, sY, source[prefix + 'size']
-      );
-      c = sigma.utils.getPointOnBezierCurve(
-        t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
-      );
-      angle = Math.atan2(1, 1); // 45°
-    } else {
-      cp = sigma.utils.getCP(source, target, prefix);
-      c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
-      angle = Math.atan2(dY * sign, dX * sign);
-    }
 
     context.translate(c.x, c.y);
     context.rotate(angle);
