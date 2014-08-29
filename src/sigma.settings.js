@@ -88,6 +88,10 @@
     //           false: Layered not displayed.
     //           true: Layered displayed.
     drawLabels: true,
+    // {booleans} The different drawing modes:
+    //           false: Layered not displayed.
+    //           true: Layered displayed.
+    drawEdgeLabels: false,
     drawEdges: true,
     drawNodes: true,
     // {boolean} Indicates if the edges must be drawn in several frames or in
