@@ -992,6 +992,9 @@
     }
 
     this.forceatlas2.isRunning = true;
+    this.forceatlas2.iterationsCount = 0;
+    this.forceatlas2.iterations = options.iterations;
+    this.forceatlas2.finished = options.finished;
 
     var self = this;
 
@@ -1001,9 +1004,12 @@
           id: 'forceatlas2_' + self.id,
           job: self.forceatlas2.atomicGo,
           end: function() {
-            if (self.forceatlas2.isRunning) {
+            if (self.forceatlas2.isRunning && self.forceatlas2.iterationsCount < self.forceatlas2.iterations) {
+              self.forceatlas2.iterationsCount++;
               addJob();
             } else {
+              self.forceatlas2.finished();
+              self.stopForceAtlas2();
               self.refresh();
             }
           }
@@ -1022,6 +1028,7 @@
         index: 0
       };
       this.forceatlas2.isRunning = false;
+      this.forceatlas2.iterationsCount = 0;
       this.forceatlas2.clean();
     }
 
