@@ -1001,9 +1001,11 @@
           id: 'forceatlas2_' + self.id,
           job: self.forceatlas2.atomicGo,
           end: function() {
-            self.refresh();
-            if (self.forceatlas2.isRunning)
+            if (self.forceatlas2.isRunning) {
               addJob();
+            } else {
+              self.refresh();
+            }
           }
         });
     }
