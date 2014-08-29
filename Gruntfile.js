@@ -62,8 +62,9 @@ module.exports = function(grunt) {
     'plugins.dragNodes',
     'plugins.filter',
     'plugins.neighborhoods',
-    'statistics.HITS',
-    'renderers.customShapes'
+    'renderers.customShapes',
+    'renderers.edgeLabels',
+    'statistics.HITS'
   ];
 
   var pluginFiles = [],
