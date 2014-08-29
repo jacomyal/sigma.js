@@ -3,12 +3,15 @@
   "version": "1.0.2",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
-  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "bugs": {
+    "url": "http://github.com/jacomyal/sigma.js/issues"
+  },
   "repository": {
     "type": "git",
     "url": "http://github.com/jacomyal/sigma.js.git"
   },
   "license": "MIT",
+  "main": "build/sigma.require.js",
   "devDependencies": {
     "grunt-cli": "^0.1.13",
     "grunt": "~0.4.4",
