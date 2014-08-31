@@ -68,8 +68,8 @@
       var offset = sigma.utils.getOffset(_target);
 
       return {
-        x: e.pageX - offset.left,
-        y: e.pageY - offset.top
+        x: e.clientX - offset.left,
+        y: e.clientY - offset.top
       };
     }
 
