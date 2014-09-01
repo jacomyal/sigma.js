@@ -98,6 +98,16 @@
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
 
+        // Do not refresh edgequadtree during drag:
+        var k,
+            c;
+        for (k in s.cameras) {
+          c = s.cameras[k];
+          if (c.edgequadtree !== undefined) {
+            c.edgequadtree._enabled = false;
+          }
+        }
+
         // Deactivate drag graph.
         renderer.settings({mouseEnabled: false, enableHovering: false});
         s.refresh();
@@ -109,6 +119,16 @@
       _mouse.addEventListener('mousedown', nodeMouseDown);
       _body.removeEventListener('mousemove', nodeMouseMove);
       _body.removeEventListener('mouseup', nodeMouseUp);
+
+      // Allow to refresh edgequadtree:
+      var k,
+          c;
+      for (k in s.cameras) {
+        c = s.cameras[k];
+        if (c.edgequadtree !== undefined) {
+          c.edgequadtree._enabled = true;
+        }
+      }
 
       // Activate drag graph.
       renderer.settings({mouseEnabled: true, enableHovering: true});

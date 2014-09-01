@@ -236,6 +236,9 @@
     // Add a quadtree to the camera:
     camera.quadtree = new sigma.classes.quad();
 
+    // Add an edgequadtree to the camera:
+    camera.edgequadtree = new sigma.classes.edgequad();
+
     camera.bind('coordinatesUpdated', function(e) {
       self.renderCamera(camera, camera.isAnimated);
     });
@@ -358,18 +361,30 @@
           'rightClickStage',
           'clickNode',
           'clickNodes',
+          'clickEdge',
+          'clickEdges',
           'doubleClickNode',
           'doubleClickNodes',
+          'doubleClickEdge',
+          'doubleClickEdges',
           'rightClickNode',
           'rightClickNodes',
           'overNode',
           'overNodes',
+          'overEdge',
+          'overEdges',
           'outNode',
           'outNodes',
+          'outEdge',
+          'outEdges',
           'downNode',
           'downNodes',
+          'downEdge',
+          'downEdges',
           'upNode',
-          'upNodes'
+          'upNodes',
+          'upEdge',
+          'upEdges'
         ],
         this._handler
       );
@@ -477,6 +492,18 @@
           height: bounds.maxY - bounds.minY
         }
       });
+
+      // Refresh edgequadtree:
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+        c.edgequadtree.index(this.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
     }
 
     // Call each renderer:
