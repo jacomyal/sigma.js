@@ -1,0 +1,412 @@
+;(function(undefined) {
+  'use strict';
+
+  if (typeof sigma === 'undefined')
+    throw 'sigma is not declared';
+
+  // Initialize package:
+  sigma.utils.pkg('sigma.plugins');
+
+  /**
+   * Sigma ActiveState
+   * =============================
+   *
+   * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
+   * @version 0.1
+   */
+
+  var _instance = null,
+      // Indexes are working now, i.e. before the ActiveState constructor is
+      // called, to index active nodes and edges when a graph object is passed
+      // to sigma at instantiation.
+      _activeNodesIndex = Object.create(null),
+      _activeEdgesIndex = Object.create(null),
+      _g = null;
+
+
+  /**
+   * Dispatch the 'activeNodes' event.
+   */
+  function dispatchNodeEvent() {
+    if(_instance !== null) {
+      _instance.dispatchEvent('activeNodes');
+    }
+  };
+
+  /**
+   * Dispatch the 'activeEdges' event.
+   */
+  function dispatchEdgeEvent() {
+    if(_instance !== null) {
+      _instance.dispatchEvent('activeEdges');
+    }
+  };
+
+  /**
+   * Attach methods to the graph to keep indexes updated.
+   * They may be called before the ActiveState constructor is called.
+   * ------------------
+   */
+
+  // Index the node after its insertion in the graph if `n.active` is `true`.
+  sigma.classes.graph.attach(
+    'addNode',
+    'sigma.plugins.activeState.addNode',
+    function(n) {
+      if (n.active) {
+        _activeNodesIndex[n.id] = this.nodesIndex[n.id];
+        dispatchNodeEvent();
+      }
+    }
+  );
+
+  // Index the edge after its insertion in the graph if `e.active` is `true`.
+  sigma.classes.graph.attach(
+    'addEdge',
+    'sigma.plugins.activeState.addEdge',
+    function(e) {
+      if (e.active) {
+        _activeEdgesIndex[e.id] = this.edgesIndex[e.id];
+        dispatchEdgeEvent();
+      }
+    }
+  );
+
+  // Deindex the node before its deletion from the graph if `n.active` is
+  // `true`.
+  sigma.classes.graph.attachBefore(
+    'dropNode',
+    'sigma.plugins.activeState.dropNode',
+    function(id) {
+      if (this.nodesIndex[id] !== undefined) {
+        var active = this.nodesIndex[id].active;
+        delete _activeNodesIndex[id];
+        if (active) {
+          dispatchNodeEvent();
+        }
+      }
+    }
+  );
+
+  // Deindex the edge before its deletion from the graph if `e.active` is
+  // `true`.
+  sigma.classes.graph.attachBefore(
+    'dropEdge',
+    'sigma.plugins.activeState.dropEdge',
+    function(id) {
+      if (this.edgesIndex[id] !== undefined) {
+        var active = this.edgesIndex[id].active;
+        delete _activeEdgesIndex[id];
+        if (active) {
+          dispatchEdgeEvent();
+        }
+      }
+    }
+  );
+
+  /**
+   * ActiveState Object
+   * ------------------
+   * @param  {sigma.classes.graph} g     The related graph instance.
+   * @return {sigma.plugins.activeState} The instance itself.
+   */
+  function ActiveState(g) {
+    _instance = this;
+    _g = g;
+
+    if (_activeNodesIndex === null) {
+      // It happens after a kill. Index nodes:
+      _activeNodesIndex = Object.create(null);
+      g.nodes().forEach(function(o) {
+        if (o.active)
+          _activeNodesIndex[o.id] = o;
+      });
+    }
+    if (_activeEdgesIndex === null) {
+      // It happens after a kill. Index edges:
+      _activeEdgesIndex = Object.create(null);
+      g.edges().forEach(function(o) {
+        if (o.active)
+          _activeEdgesIndex[o.id] = o;
+      });
+    }
+
+    sigma.classes.dispatcher.extend(this);
+  };
+
+  /**
+   * This methods set one or several nodes as 'active', depending on how it is
+   * called.
+   *
+   * To activate the array of nodes, call it without argument.
+   * To activate a specific node, call it with the id of the node. To activate
+   * multiple nodes, call it with an array of ids.
+   *
+   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.addNodes = function(v) {
+    var n;
+
+    // Activate all nodes:
+    if (!arguments.length) {
+      _g.nodes().forEach(function(o) {
+        o.active = true;
+        _activeNodesIndex[o.id] = o;
+      });
+    }
+
+    // Activate one node:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        n = _g.nodes(v);
+        n.active = true;
+        _activeNodesIndex[v] = n;
+      }
+      else
+        throw 'activateState.addNodes: Wrong arguments.';
+    }
+
+    // Activate a set of nodes:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string') {
+            n = _g.nodes(v[i]);
+            n.active = true;
+            _activeNodesIndex[v[i]] = n;
+          }
+          else
+            throw 'activateState.addNodes: Wrong arguments.';
+      }
+      else
+        throw 'activateState.addNodes: Wrong arguments.';
+    }
+
+    dispatchNodeEvent();
+    return this;
+  };
+
+  /**
+   * This methods set one or several edges as 'active', depending on how it is
+   * called.
+   *
+   * To activate the array of edges, call it without argument.
+   * To activate a specific edge, call it with the id of the edge. To activate
+   * multiple edges, call it with an array of ids.
+   *
+   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.addEdges = function(v) {
+    var e;
+
+    // Activate all edges:
+    if (!arguments.length) {
+      _g.edges().forEach(function(o) {
+        o.active = true;
+        _activeEdgesIndex[o.id] = o;
+      });
+    }
+
+    // Activate one edge:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        e = _g.edges(v);
+        e.active = true;
+        _activeEdgesIndex[v] = e;
+      }
+      else
+        throw 'activateState.addEdges: Wrong arguments.';
+    }
+
+    // Activate a set of edges:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string') {
+            e = _g.edges(v[i]);
+            e.active = true;
+            _activeEdgesIndex[v[i]] = e;
+          }
+          else
+            throw 'activateState.addEdges: Wrong arguments.';
+      }
+      else
+        throw 'activateState.addEdges: Wrong arguments.';
+    }
+
+    dispatchEdgeEvent();
+    return this;
+  };
+
+  /**
+   * This methods set one or several nodes as 'inactive', depending on how it
+   * is called.
+   *
+   * To deactivate the array of nodes, call it without argument.
+   * To deactivate a specific node, call it with the id of the node. To
+   * deactivate multiple nodes, call it with an array of ids.
+   *
+   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.dropNodes = function(v) {
+    // Deactivate all nodes:
+    if (!arguments.length) {
+      _g.nodes().forEach(function(o) {
+        o.active = false;
+        delete _activeNodesIndex[o.id];
+      });
+    }
+
+    // Deactivate one node:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        _g.nodes(v).active = false;
+        delete _activeNodesIndex[v];
+      }
+      else
+        throw 'activateState.dropNodes: Wrong arguments.';
+    }
+
+    // Deactivate a set of nodes:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string') {
+            _g.nodes(v[i]).active = false;
+            delete _activeNodesIndex[v[i]];
+          }
+          else
+            throw 'activateState.dropNodes: Wrong arguments.';
+      }
+      else
+        throw 'activateState.dropNodes: Wrong arguments.';
+    }
+
+    dispatchNodeEvent();
+    return this;
+  };
+
+  /**
+   * This methods set one or several edges as 'inactive', depending on how it
+   * is called.
+   *
+   * To deactivate the array of edges, call it without argument.
+   * To deactivate a specific edge, call it with the id of the edge. To
+   * deactivate multiple edges, call it with an array of ids.
+   *
+   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.dropEdges = function(v) {
+    // Deactivate all edges:
+    if (!arguments.length) {
+      _g.edges().forEach(function(o) {
+        o.active = false;
+        delete _activeEdgesIndex[o.id];
+      });
+    }
+
+    // Deactivate one edge:
+    else if (typeof v === 'string') {
+      if (arguments.length === 1) {
+        _g.edges(v).active = false;
+        delete _activeEdgesIndex[v];
+      }
+      else
+        throw 'activateState.dropEdges: Wrong arguments.';
+    }
+
+    // Deactivate a set of edges:
+    else if (Object.prototype.toString.call(v) === '[object Array]') {
+      var i,
+          l,
+          a = [];
+
+      if (arguments.length === 1) {
+        for (i = 0, l = v.length; i < l; i++)
+          if (typeof v[i] === 'string') {
+            _g.edges(v[i]).active = false;
+            delete _activeEdgesIndex[v[i]];
+          }
+          else
+            throw 'activateState.dropEdges: Wrong arguments.';
+      }
+      else
+        throw 'activateState.dropEdges: Wrong arguments.';
+    }
+
+    dispatchEdgeEvent();
+    return this;
+  };
+
+  /**
+   * This method returns an array of the active nodes.
+   * @return {array} The active nodes.
+   */
+  ActiveState.prototype.nodes = function() {
+    var id,
+        a = [];
+    for (id in _activeNodesIndex) {
+        a.push(_activeNodesIndex[id]);
+    }
+    return a;
+  };
+
+  /**
+   * This method returns an array of the active edges.
+   * @return {array} The active edges.
+   */
+  ActiveState.prototype.edges = function() {
+    var id,
+        a = [];
+    for (id in _activeEdgesIndex) {
+        a.push(_activeEdgesIndex[id]);
+    }
+    return a;
+  };
+
+
+  /**
+   * Interface
+   * ------------------
+   */
+
+  /**
+   * @param {sigma.classes.graph} g The related graph instance.
+   */
+  sigma.plugins.activeState = function(g) {
+    // Create object if undefined
+    if (!_instance) {
+      _instance = new ActiveState(g);
+    }
+    return _instance;
+  };
+
+  /**
+   *  This function kills the activeState instance.
+   */
+  sigma.plugins.killActiveState = function() {
+    if (_instance instanceof ActiveState) {
+      _instance = null;
+      _activeNodesIndex = null;
+      _activeEdgesIndex = null;
+      _g = null;
+    }
+  };
+
+}).call(this);
