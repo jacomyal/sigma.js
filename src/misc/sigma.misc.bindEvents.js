@@ -332,6 +332,15 @@
             node: nodes,
             captor: e.data
           });
+        } else if (edges.length) {
+          self.dispatchEvent('rightClickEdge', {
+            edge: edges[0],
+            captor: e.data
+          });
+          self.dispatchEvent('rightClickEdges', {
+            edge: edges,
+            captor: e.data
+          });
         } else
           self.dispatchEvent('rightClickStage', {captor: e.data});
       }
