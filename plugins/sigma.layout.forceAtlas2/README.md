@@ -5,6 +5,8 @@ Algorithm by [Mathieu Jacomy](https://github.com/jacomyma).
 
 Plugin by [Guillaume Plique](https://github.com/Yomguithereal).
 
+Auto-stop condition by [Sébastien Heymann](https://github.com/sheymann).
+
 ---
 
 This plugin implements [ForceAtlas2](http://www.medialab.sciences-po.fr/publications/Jacomy_Heymann_Venturini-Force_Atlas2.pdf), a force-directed layout algorithm.
@@ -65,6 +67,7 @@ sigmaInstance.isForceAtlas2Running();
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
 * **slowDown** *number* `1`
+* **autoStop** *boolean* `false`
 
 *Supervisor configuration*
 
@@ -74,4 +77,4 @@ sigmaInstance.isForceAtlas2Running();
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
 
-2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
+2. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you will have to trigger it explicitely.

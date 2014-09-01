@@ -34,6 +34,8 @@
       ppq: 2,
       maxForce: 10,
       iterations: 0,
+      maxIterations: 1000,
+      avgDistanceThreshold: 0.01,
       converged: false,
 
       // Possible to change through config
@@ -48,7 +50,8 @@
         slowDown: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 1.2,
-        barnesHutDepthLimit: 4
+        barnesHutDepthLimit: 4,
+        autoStop: false
       }
     };
 
@@ -167,6 +170,8 @@
           coefficient,
           xDist,
           yDist,
+          oldxDist,
+          oldyDist,
           ewc,
           distance,
           factor;
@@ -493,7 +498,8 @@
       var force,
           swinging,
           traction,
-          nodespeed;
+          nodespeed,
+          alldistance = 0;
 
       // MATH: sqrt and square distances
       if (W.settings.adjustSizes) {
@@ -530,6 +536,9 @@
             nodespeed =
               0.1 * Math.log(1 + traction) / (1 + Math.sqrt(swinging));
 
+            oldxDist = W.nodeMatrix[np(n, 'x')];
+            oldyDist = W.nodeMatrix[np(n, 'y')];
+
             // Updating node's positon
             W.nodeMatrix[np(n, 'x')] =
               W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
@@ -537,6 +546,13 @@
             W.nodeMatrix[np(n, 'y')] =
               W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
+
+            xDist = W.nodeMatrix[np(n, 'x')];
+            yDist = W.nodeMatrix[np(n, 'y')];
+            distance = Math.sqrt(
+              Math.pow(xDist - oldxDist, 2) + Math.pow(yDist - oldyDist, 2)
+            );
+            alldistance += distance;
           }
         }
       }
@@ -572,6 +588,9 @@
                 (1 + Math.sqrt(swinging))
               ));
 
+            oldxDist = W.nodeMatrix[np(n, 'x')];
+            oldyDist = W.nodeMatrix[np(n, 'y')];
+
             // Updating node's positon
             W.nodeMatrix[np(n, 'x')] =
               W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
@@ -579,12 +598,29 @@
             W.nodeMatrix[np(n, 'y')] =
               W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
+
+            xDist = W.nodeMatrix[np(n, 'x')];
+            yDist = W.nodeMatrix[np(n, 'y')];
+            distance = Math.sqrt(
+              Math.pow(xDist - oldxDist, 2) + Math.pow(yDist - oldyDist, 2)
+            );
+            alldistance += distance;
           }
         }
       }
 
       // Counting one more iteration
       W.iterations++;
+
+      // Auto stop.
+      // The greater the ratio nb nodes / nb edges,
+      // the greater the number of iterations needed to converge.
+      if (W.settings.autoStop) {
+        W.converged = (
+          W.iterations > W.maxIterations || 
+          alldistance / W.nodesLength < W.avgDistanceThreshold
+        );
+      }
     }
 
     /**
@@ -600,7 +636,8 @@
       sendNewCoords = function() {
         var e = new Event('newCoords');
         e.data = {
-          nodes: W.nodeMatrix.buffer
+          nodes: W.nodeMatrix.buffer,
+          converged: W.converged
         };
         requestAnimationFrame(function() {
           document.dispatchEvent(e);
@@ -612,7 +649,10 @@
       // From a WebWorker
       sendNewCoords = function() {
         self.postMessage(
-          {nodes: W.nodeMatrix.buffer},
+          {
+            nodes: W.nodeMatrix.buffer,
+            converged: W.converged
+          },
           [W.nodeMatrix.buffer]
         );
       };
