@@ -32,7 +32,7 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.plugins.popup/sigma.plugins.popup.js"></script>
+<script src="../plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
 <div id="container">
   <style>
@@ -44,7 +44,7 @@
       position: absolute;
     }
 
-    .sigma-popup {
+    .sigma-tooltip {
       max-width: 240px;
       max-height: 280px;
       background-color: rgb(249, 247, 237);
@@ -52,7 +52,7 @@
       border-radius: 6px;
     }
 
-    .sigma-popup-header {
+    .sigma-tooltip-header {
       font-variant: small-caps;
       font-size: 120%;
       color: #437356;
@@ -60,21 +60,21 @@
       padding: 10px;
     }
 
-    .sigma-popup-body {
+    .sigma-tooltip-body {
       padding: 10px;
     }
 
-    .sigma-popup-body th {
+    .sigma-tooltip-body th {
       color: #999;
       text-align: left;
     }
 
-    .sigma-popup-footer {
+    .sigma-tooltip-footer {
       padding: 10px;
       border-top: 1px solid #aac789;
     }
 
-    .sigma-popup > .arrow {
+    .sigma-tooltip > .arrow {
       border-width: 10px;
       position: absolute;
       display: block;
@@ -84,10 +84,10 @@
       border-style: solid;
     }
 
-    .sigma-popup.top {
+    .sigma-tooltip.top {
       margin-top: -12px;
     }
-    .sigma-popup.top > .arrow {
+    .sigma-tooltip.top > .arrow {
       left: 50%;
       bottom: -10px;
       margin-left: -10px;
@@ -95,10 +95,10 @@
       border-bottom-width: 0;
     }
 
-    .sigma-popup.bottom {
+    .sigma-tooltip.bottom {
       margin-top: 12px;
     }
-    .sigma-popup.bottom > .arrow {
+    .sigma-tooltip.bottom > .arrow {
       left: 50%;
       top: -10px;
       margin-left: -10px;
@@ -106,10 +106,10 @@
       border-top-width: 0;
     }
 
-    .sigma-popup.left {
+    .sigma-tooltip.left {
       margin-left: -12px;
     }
-    .sigma-popup.left > .arrow {
+    .sigma-tooltip.left > .arrow {
       top: 50%;
       right: -10px;
       margin-top: -10px;
@@ -117,10 +117,10 @@
       border-right-width: 0;
     }
 
-    .sigma-popup.right {
+    .sigma-tooltip.right {
       margin-left: 12px;
     }
-    .sigma-popup.right > .arrow {
+    .sigma-tooltip.right > .arrow {
       top: 50%;
       left: -10px;
       margin-top: -10px;
@@ -133,7 +133,7 @@
 </div>
 <script>
 /**
- * This is an example on how to use node popups based on a random graph.
+ * This is an example on how to use node tooltips based on a random graph.
  */
 var i,
     s,
@@ -176,25 +176,25 @@ s = new sigma({
   container: 'graph-container'
 });
 
-// Minimal example of the popup plugin instanciation:
-/*sigma.plugins.popup(s, {
+// Minimal example of the tooltip plugin instanciation:
+/*sigma.plugins.tooltip(s, {
   node: {
     template: 'Hello node!'
   }
 });*/
 
-// Instanciate the popup plugin with a Mustache renderer for node popups:
-var popup = sigma.plugins.popup(s, {
+// Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
+var tooltips = sigma.plugins.tooltips(s, {
   node: {
     show: 'overNode',
     hide: 'outNode',
-    cssClass: 'sigma-popup',
+    cssClass: 'sigma-tooltip',
     position: 'top',
     //autoadjust: true,
     template: 
     '<div class="arrow"></div>' +
-    ' <div class="sigma-popup-header">{{label}}</div>' +
-    '  <div class="sigma-popup-body">' +
+    ' <div class="sigma-tooltip-header">{{label}}</div>' +
+    '  <div class="sigma-tooltip-body">' +
     '    <table>' +
     '      <tr><th>Name</th> <td>{{data.name}}</td></tr>' +
     '      <tr><th>Gender</th> <td>{{data.gender}}</td></tr>' +
@@ -202,7 +202,7 @@ var popup = sigma.plugins.popup(s, {
     '      <tr><th>City</th> <td>{{data.city}}</td></tr>' +
     '    </table>' +
     '  </div>' +
-    '  <div class="sigma-popup-footer">Number of connections: {{degree}}</div>',
+    '  <div class="sigma-tooltip-footer">Number of connections: {{degree}}</div>',
     renderer: function(node, template) {
       // The function context is s.graph
       node.degree = this.degree(node.id);
@@ -217,11 +217,11 @@ var popup = sigma.plugins.popup(s, {
   }
 });
 
-popup.bind('shown', function(event) {
-  console.log('popup shown', event);
+tooltips.bind('shown', function(event) {
+  console.log('tooltip shown', event);
 });
 
-popup.bind('hidden', function(event) {
-  console.log('popup hidden', event);
+tooltips.bind('hidden', function(event) {
+  console.log('tooltip hidden', event);
 });
 </script>
