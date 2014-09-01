@@ -71,6 +71,7 @@ module.exports = function(grunt) {
     'plugins.locate',
     'plugins.neighborhoods',
     'plugins.popup',
+    'plugins.select',
     'statistics.HITS',
     'renderers.customShapes'
   ];
