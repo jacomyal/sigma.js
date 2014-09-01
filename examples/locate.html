@@ -212,6 +212,8 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
     else {
       var nodes = s.graph.nodes().filter(function(n) {
         return n.attributes.modularity_class == c;
+      }).map(function(n) {
+        return n.id;
       });
 
       locate.nodes(nodes);
