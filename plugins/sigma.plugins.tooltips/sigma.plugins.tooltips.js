@@ -1,7 +1,8 @@
 /**
- * This plugin provides a method to display a popup at a specific event, e.g.
- * to display some node properties on node hover. Check the sigma.plugins.popup
- * function doc or the examples/popup.html code sample to know more.
+ * This plugin provides a method to display a tooltip at a specific event, e.g.
+ * to display some node properties on node hover. Check the
+ * sigma.plugins.tooltip function doc or the examples/tooltip.html code sample
+ * to know more.
  */
 (function() {
   'use strict';
@@ -13,7 +14,7 @@
   sigma.utils.pkg('sigma.plugins');
 
   /**
-   * Sigma Popup
+   * Sigma tooltip
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
@@ -24,7 +25,7 @@
     stage: {
       show: 'rightClickStage',
       hide: 'clickStage',
-      cssClass: 'sigma-popup',
+      cssClass: 'sigma-tooltip',
       position: '',       // top | bottom | left | right
       autoadjust: false,
       delay: 0,
@@ -34,7 +35,7 @@
     node: {
       show: 'clickNode',
       hide: 'clickStage',
-      cssClass: 'sigma-popup',
+      cssClass: 'sigma-tooltip',
       position: '',       // top | bottom | left | right
       autoadjust: false,
       delay: 0,
@@ -44,7 +45,7 @@
     edge: {
       show: 'clickEdge',
       hide: 'clickStage',
-      cssClass: 'sigma-popup',
+      cssClass: 'sigma-tooltip',
       position: '',       // top | bottom | left | right
       autoadjust: false,
       delay: 0,
@@ -54,7 +55,7 @@
     doubleClickDelay: 800
   };
 
-  var _popup,
+  var _tooltip,
       _timeoutHandle,
       _doubleClick = false;
 
@@ -75,7 +76,7 @@
   };
 
   /**
-   * This function removes the existing popup and creates a new popup for a
+   * This function removes the existing tooltip and creates a new tooltip for a
    * specified node or edge.
    *
    * Recognized parameters:
@@ -90,14 +91,15 @@
    *                          It is executed at runtime. Its context is
    *                          sigma.graph.
    *   {?string}   cssClass   The CSS class attached to the top div element.
-   *                          Default value: "sigma-popup".
-   *   {?string}   position   The position of the popup regarding the mouse. If
-   *                          it is not specified, the popup top-left corner is
-   *                          positionned at the mouse position. Available
-   *                          values: "top", "bottom", "left", "right".
-   *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the popup
-   *                          position to be fully included in the body area.
-   *                          Doesn't work on Firefox 30. Better work on
+   *                          Default value: "sigma-tooltip".
+   *   {?string}   position   The position of the tooltip regarding the mouse.
+   *                          If it is not specified, the tooltip top-left
+   *                          corner is positionned at the mouse position.
+   *                          Available values: "top", "bottom", "left",
+   *                          "right".
+   *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the
+   *                          tooltip position to be fully included in the body
+   *                          area. Doesn't work on Firefox 30. Better work on
    *                          elements with fixed width and height.
    *
    * @param {sigma}  s       The related sigma instance.
@@ -106,11 +108,11 @@
    * @param {number} x       The X coordinate of the mouse.
    * @param {number} y       The Y coordinate of the mouse.
    */
-  function createPopup(s, o, options, x, y) {
-    removePopup();
+  function createtooltip(s, o, options, x, y) {
+    removetooltip();
 
     // Create the DOM element:
-    _popup = document.createElement('div');
+    _tooltip = document.createElement('div');
     if (options.renderer) {
       // Copy the object:
       var clone = Object.create(null),
@@ -122,147 +124,148 @@
       renderer = options.renderer.call(s.graph, clone, options.template);
 
       if (typeof renderer === 'string')
-         _popup.innerHTML = renderer;
+         _tooltip.innerHTML = renderer;
       else
           // renderer is a dom element:
-         _popup.appendChild(renderer);
+         _tooltip.appendChild(renderer);
     } else {
-      _popup.innerHTML = options.template;
+      _tooltip.innerHTML = options.template;
     }
 
     // Style it:
-    _popup.className = options.cssClass;
-    _popup.style.position = 'absolute';
+    _tooltip.className = options.cssClass;
+    _tooltip.style.position = 'absolute';
 
     // Default position is mouse position:
-    _popup.style.left = x + 'px';
-    _popup.style.top = y + 'px';
+    _tooltip.style.left = x + 'px';
+    _tooltip.style.top = y + 'px';
 
     // Execute after rendering:
     setTimeout(function() {
-      if (!_popup)
+      if (!_tooltip)
         return;
 
       // Insert the element in the DOM:
-      s.renderers[0].container.appendChild(_popup);
+      s.renderers[0].container.appendChild(_tooltip);
 
       // Find offset:
       var bodyRect = document.body.getBoundingClientRect(),
-          popupRect = _popup.getBoundingClientRect(),
-          offsetTop =  popupRect.top - bodyRect.top,
-          offsetBottom = bodyRect.bottom - popupRect.bottom,
-          offsetLeft =  popupRect.left - bodyRect.left,
-          offsetRight = bodyRect.right - popupRect.right;
+          tooltipRect = _tooltip.getBoundingClientRect(),
+          offsetTop =  tooltipRect.top - bodyRect.top,
+          offsetBottom = bodyRect.bottom - tooltipRect.bottom,
+          offsetLeft =  tooltipRect.left - bodyRect.left,
+          offsetRight = bodyRect.right - tooltipRect.right;
       
       if (options.position === 'top') {
         // New position vertically aligned and on top of the mouse:
-        _popup.className = options.cssClass + ' top';
-        _popup.style.left = x - (popupRect.width / 2) + 'px';
-        _popup.style.top = y - popupRect.height + 'px';
+        _tooltip.className = options.cssClass + ' top';
+        _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
+        _tooltip.style.top = y - tooltipRect.height + 'px';
       }
       else if (options.position === 'bottom') {
         // New position vertically aligned and on bottom of the mouse:
-        _popup.className = options.cssClass + ' bottom';
-        _popup.style.left = x - (popupRect.width / 2) + 'px';
-        _popup.style.top = y + 'px';
+        _tooltip.className = options.cssClass + ' bottom';
+        _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
+        _tooltip.style.top = y + 'px';
       }
       else if (options.position === 'left') {
         // New position vertically aligned and on bottom of the mouse:
-        _popup.className = options.cssClass+ ' left';
-        _popup.style.left = x - popupRect.width + 'px';
-        _popup.style.top = y - (popupRect.height / 2) + 'px';
+        _tooltip.className = options.cssClass+ ' left';
+        _tooltip.style.left = x - tooltipRect.width + 'px';
+        _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
       }
       else if (options.position === 'right') {
         // New position vertically aligned and on bottom of the mouse:
-        _popup.className = options.cssClass + ' right';
-        _popup.style.left = x + 'px';
-        _popup.style.top = y - (popupRect.height / 2) + 'px';
+        _tooltip.className = options.cssClass + ' right';
+        _tooltip.style.left = x + 'px';
+        _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
       }
 
-      // Adjust position to keep the popup inside body:
+      // Adjust position to keep the tooltip inside body:
       // FIXME: doesn't work on Firefox
       if (options.autoadjust) {
 
         // Update offset
-        popupRect = _popup.getBoundingClientRect();
-        offsetTop = popupRect.top - bodyRect.top;
-        offsetBottom = bodyRect.bottom - popupRect.bottom;
-        offsetLeft = popupRect.left - bodyRect.left;
-        offsetRight = bodyRect.right - popupRect.right;
+        tooltipRect = _tooltip.getBoundingClientRect();
+        offsetTop = tooltipRect.top - bodyRect.top;
+        offsetBottom = bodyRect.bottom - tooltipRect.bottom;
+        offsetLeft = tooltipRect.left - bodyRect.left;
+        offsetRight = bodyRect.right - tooltipRect.right;
 
         if (offsetBottom < 0) {
-          _popup.className = options.cssClass;
+          _tooltip.className = options.cssClass;
           if (options.position === 'top' || options.position === 'bottom') {
-            _popup.className = options.cssClass + ' top';
+            _tooltip.className = options.cssClass + ' top';
           }
-          _popup.style.top = y - popupRect.height + 'px';
+          _tooltip.style.top = y - tooltipRect.height + 'px';
         }
         else if (offsetTop < 0) {
-          _popup.className = options.cssClass;
+          _tooltip.className = options.cssClass;
           if (options.position === 'top' || options.position === 'bottom') {
-            _popup.className = options.cssClass + ' bottom';
+            _tooltip.className = options.cssClass + ' bottom';
           }
-          _popup.style.top = y + 'px';
+          _tooltip.style.top = y + 'px';
         }
         if (offsetRight < 0) {
-          //! incorrect popupRect.width on non fixed width element.
-          _popup.className = options.cssClass;
+          //! incorrect tooltipRect.width on non fixed width element.
+          _tooltip.className = options.cssClass;
           if (options.position === 'left' || options.position === 'right') {
-            _popup.className = options.cssClass + ' left';
+            _tooltip.className = options.cssClass + ' left';
           }
-          _popup.style.left = x - popupRect.width + 'px';
+          _tooltip.style.left = x - tooltipRect.width + 'px';
         }
         else if (offsetLeft < 0) {
-          _popup.className = options.cssClass;
+          _tooltip.className = options.cssClass;
           if (options.position === 'left' || options.position === 'right') {
-            _popup.className = options.cssClass + ' right';
+            _tooltip.className = options.cssClass + ' right';
           }
-          _popup.style.left = x + 'px';
+          _tooltip.style.left = x + 'px';
         }
       }
     }, 0);
   };
 
   /**
-   * This function removes the popup element from the DOM.
+   * This function removes the tooltip element from the DOM.
    */
-  function removePopup() {
-    if (_popup && _popup.parentNode) {
+  function removetooltip() {
+    if (_tooltip && _tooltip.parentNode) {
       // Remove from the DOM:
-      _popup.parentNode.removeChild(_popup);
-      _popup = null;
+      _tooltip.parentNode.removeChild(_tooltip);
+      _tooltip = null;
     }
   };
 
   /**
-   * This function clears a potential timeout function related to the popup
-   * and removes the popup.
+   * This function clears a potential timeout function related to the tooltip
+   * and removes the tooltip.
    */
-  function cancelPopup() {
+  function canceltooltip() {
     clearTimeout(_timeoutHandle);
     _timeoutHandle = false;
-    removePopup();
+    removetooltip();
   };
 
   /**
-   * This function will display a popup when a sigma event is fired. It will
+   * This function will display a tooltip when a sigma event is fired. It will
    * basically create a DOM element, fill it with the template or the result of
    * the renderer function, set its position and CSS class, and insert the
-   * element as a child of the sigma container. Only one popup may exist.
+   * element as a child of the sigma container. Only one tooltip may exist.
    *
    * Recognized parameters of options:
    * *********************************
-   * Enable node popups by adding the "node" key to the options object.
-   * Enable edge popups by adding the "edge" key to the options object.
-   * Each value must be an object. Here is the exhaustive list of every accepted
-   * parameters in these objects:
+   * Enable node tooltips by adding the "node" key to the options object.
+   * Enable edge tooltips by adding the "edge" key to the options object.
+   * Each value must be an object. Here is the exhaustive list of every
+   * accepted parameters in these objects:
    *
-   *   {?string}   show       The event that triggers the popup. Default values:
-   *                          "clickNode", "clickEdge". Other suggested values:
-   *                          "overNode", "doubleClickNode", "rightClickNode",
-   *                          "overEdge", "doubleClickEdge", "rightClickEdge".
-   *                          "doubleClickNode", "rightClickNode".
-   *   {?string}   hide       The event that hides the popup. Default value:
+   *   {?string}   show       The event that triggers the tooltip. Default
+   *                          values: "clickNode", "clickEdge". Other suggested
+   *                          values: "overNode", "doubleClickNode",
+   *                          "rightClickNode", "overEdge", "doubleClickEdge",
+   *                          "rightClickEdge", "doubleClickNode",
+   *                          "rightClickNode".
+   *   {?string}   hide       The event that hides the tooltip. Default value:
    *                          "clickStage". Other suggested values: "outNode",
    *                          "outEdge".
    *   {?string}   template   The HTML template. It is directly inserted inside
@@ -272,19 +275,20 @@
    *                          a DOM element. It is executed at runtime. Its
    *                          context is sigma.graph.
    *   {?string}   cssClass   The CSS class attached to the top div element.
-   *                          Default value: "sigma-popup".
-   *   {?string}   position   The position of the popup regarding the mouse. If
-   *                          it is not specified, the popup top-left corner is
-   *                          positionned at the mouse position. Available
-   *                          values: "top", "bottom", "left", "right".
+   *                          Default value: "sigma-tooltip".
+   *   {?string}   position   The position of the tooltip regarding the mouse.
+   *                          If it is not specified, the tooltip top-left
+   *                          corner is positionned at the mouse position.
+   *                          Available values: "top", "bottom", "left",
+   *                          "right".
    *   {?number}   delay      The delay in miliseconds before displaying the
-   *                          popup after the show event is triggered.
-   *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the popup
-   *                          position to be fully included in the body area.
-   *                          Doesn't work on Firefox 30. Better work on
+   *                          tooltip after the show event is triggered.
+   *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the
+   *                          tooltip position to be fully included in the body
+   *                          area. Doesn't work on Firefox 30. Better work on
    *                          elements with fixed width and height.
    *
-   * > sigma.plugins.popup(s, {
+   * > sigma.plugins.tooltip(s, {
    * >   node: {
    * >     template: 'Hello node!'
    * >   },
@@ -299,7 +303,7 @@
    * @param {sigma}  s       The related sigma instance.
    * @param {object} options An object with options.
    */
-  function Popup(s, options) {
+  function Tooltips(s, options) {
     var so = extend(options.stage, settings.stage);
     var no = extend(options.node, settings.node);
     var eo = extend(options.edge, settings.edge);
@@ -312,7 +316,7 @@
 
     // INTERFACE:
     this.close = function() {
-      cancelPopup();
+      canceltooltip();
       return this;
     };
 
@@ -338,15 +342,20 @@
           s.unbind('doubleClickEdge');
         }
       }
-      if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
-        s.renderers[0].container.removeEventListener('contextmenu', contextmenuListener);
+      if (no.show === 'rightClickNode' ||
+          eo.show === 'rightClickEdge') {
+        s.renderers[0].container.removeEventListener(
+          'contextmenu',
+          contextmenuListener
+        );
       }
     };
 
-    // STAGE POPUP:
+    // STAGE tooltip:
     if (options.stage) {
-      if (options.stage.renderer !== undefined && typeof options.stage.renderer !== 'function')
-        throw 'The render of the stage popup must be a function.';
+      if (options.stage.renderer !== undefined &&
+          typeof options.stage.renderer !== 'function')
+        throw 'The render of the stage tooltip must be a function.';
 
       if (options.stage.position !== undefined) {
         if (options.stage.position !== 'top' &&
@@ -367,7 +376,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createPopup(
+          createtooltip(
             s,
             null,
             so,
@@ -379,15 +388,15 @@
       });
 
       s.bind(so.hide, function(event) {
-        var p = _popup;
-        cancelPopup();
+        var p = _tooltip;
+        canceltooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
-          cancelPopup();
+          canceltooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
@@ -397,10 +406,11 @@
       }
     }
 
-    // NODE POPUP:
+    // NODE tooltip:
     if (options.node) {
-      if (options.node.renderer !== undefined && typeof options.node.renderer !== 'function')
-        throw 'The render of the node popup must be a function.';
+      if (options.node.renderer !== undefined && 
+          typeof options.node.renderer !== 'function')
+        throw 'The render of the node tooltip must be a function.';
 
       if (options.node.position !== undefined) {
         if (options.node.position !== 'top' &&
@@ -422,7 +432,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createPopup(
+          createtooltip(
             s,
             n,
             no,
@@ -434,15 +444,15 @@
       });
 
       s.bind(no.hide, function(event) {
-        var p = _popup;
-        cancelPopup();
+        var p = _tooltip;
+        canceltooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
-          cancelPopup();
+          canceltooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
@@ -452,10 +462,11 @@
       }
     }
 
-    // EDGE POPUP:
+    // EDGE tooltip:
     if (options.edge) {
-      if (options.edge.renderer !== undefined && typeof options.edge.renderer !== 'function')
-        throw 'The render of the edge popup must be a function.';
+      if (options.edge.renderer !== undefined &&
+          typeof options.edge.renderer !== 'function')
+        throw 'The render of the edge tooltip must be a function.';
 
       if (options.edge.position !== undefined) {
         if (options.edge.position !== 'top' &&
@@ -477,7 +488,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createPopup(
+          createtooltip(
             s,
             e,
             eo,
@@ -489,15 +500,15 @@
       });
 
       s.bind(eo.hide, function(event) {
-        var p = _popup;
-        cancelPopup();
+        var p = _tooltip;
+        canceltooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
-          cancelPopup();
+          canceltooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
@@ -510,7 +521,10 @@
     // Prevent the browser context menu to appear
     // if the right click event is already handled:
     if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
-      s.renderers[0].container.addEventListener('contextmenu', contextmenuListener);
+      s.renderers[0].container.addEventListener(
+        'contextmenu',
+        contextmenuListener
+      );
     }
   };
 
@@ -521,25 +535,25 @@
   var _instance = null;
 
   /**
-   * @param {sigma}  s The related sigma instance.
+   * @param {sigma}  s       The related sigma instance.
    * @param {object} options An object with options.
    */
-  sigma.plugins.popup = function(s, options) {
+  sigma.plugins.tooltips = function(s, options) {
     // Create object if undefined
     if (!_instance) {
-      _instance = new Popup(s, options);
+      _instance = new Tooltips(s, options);
     }
     return _instance;
   };
 
   /**
-   *  This function kills the popup instance.
+   *  This function kills the tooltips instance.
    */
-  sigma.plugins.killPopup = function() {
-    if (_instance instanceof Popup) {
+  sigma.plugins.killTooltips = function() {
+    if (_instance instanceof tooltip) {
       _instance.unbindEvents();
       _instance = null;
-      _popup = null;
+      _tooltip = null;
       _timeoutHandle = null;
       _doubleClick = false;
     }

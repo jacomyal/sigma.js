@@ -72,7 +72,7 @@ module.exports = function(grunt) {
     'plugins.filter',
     'plugins.locate',
     'plugins.neighborhoods',
-    'plugins.popup',
+    'plugins.tooltips',
     'plugins.select',
     'renderers.customEdgeShapes',
     'renderers.customShapes',
