@@ -108,7 +108,7 @@ s = new sigma({
 s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
   console.log(e.type, e.data.node.label, e.data.captor);
 });
-s.bind('overEdge outEdge clickEdge doubleClickEdge', function(e) {
+s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
   console.log(e.type, e.data.edge, e.data.captor);
 });
 s.bind('clickStage', function(e) {
