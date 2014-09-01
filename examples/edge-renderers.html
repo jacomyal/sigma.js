@@ -38,6 +38,10 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -52,13 +56,13 @@
 </div>
 <script>
 /**
- * This is a basic example to show all the different available edge renderers
- * for the canvas renderer.
+ * This example shows the available edge label renderers for the canvas
+ * renderer.
  */
 var i,
     s,
-    N = 100,
-    E = 500,
+    N = 10,
+    E = 50,
     g = {
       nodes: [],
       edges: []
@@ -78,11 +82,12 @@ for (i = 0; i < N; i++)
 for (i = 0; i < E; i++)
   g.edges.push({
     id: 'e' + i,
+    label: 'Edge ' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
     color: '#ccc',
-    type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0]
+    type: ['line', 'curve', 'arrow', 'curvedArrow'][Math.random() * 4 | 0]
   });
 
 // Instantiate sigma:
@@ -91,6 +96,9 @@ s = new sigma({
   renderer: {
     container: document.getElementById('graph-container'),
     type: 'canvas'
+  },
+  settings: {
+    edgeLabelSize: 'proportional'
   }
 });
 </script>
