@@ -550,7 +550,7 @@
    *  This function kills the tooltips instance.
    */
   sigma.plugins.killTooltips = function() {
-    if (_instance instanceof tooltip) {
+    if (_instance instanceof Tooltips) {
       _instance.unbindEvents();
       _instance = null;
       _tooltip = null;
