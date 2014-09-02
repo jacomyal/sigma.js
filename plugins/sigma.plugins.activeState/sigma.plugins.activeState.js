@@ -369,16 +369,18 @@
 
     a = Object.keys(_activeNodesIndex);
 
-    for (id in _activeNodesIndex) {
-      _g.adjacentNodes(id).forEach(function (adj) {
-        a.push(adj.id);
-      });
-    };
+    if (a.length) {
+      for (id in _activeNodesIndex) {
+        _g.adjacentNodes(id).forEach(function (adj) {
+          a.push(adj.id);
+        });
+      };
 
-    _enableEvents = false;
-    this.dropNodes().dropEdges();
-    _enableEvents = true;
-    this.addNodes(a);
+      _enableEvents = false;
+      this.dropNodes().dropEdges();
+      _enableEvents = true;
+      this.addNodes(a);
+    }
 
     return this;
   };
