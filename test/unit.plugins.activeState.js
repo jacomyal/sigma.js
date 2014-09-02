@@ -237,4 +237,45 @@ test('Standard manipulation', function() {
     activeState.edges().length, 
     2,
     '"activeState" recovers activeEdgesIndex after a kill');
+
+  // Advanced manipulation
+
+  activeState.invertNodes();
+  deepEqual(
+    activeState.nodes(),
+    [graph.nodes[2], graph.nodes[3]], 
+    '"invertNodes" drops the currenct nodes and adds the other nodes');
+
+  activeState
+    .addEdges('e0')
+    .addNeighbors();
+
+  deepEqual(
+    activeState.nodes(),
+    [graph.nodes[2], graph.nodes[3], graph.nodes[1]], 
+    '"addNeighbors" adds all node neighbors');
+
+  equal(
+    activeState.edges().length,
+    0, 
+    '"addNeighbors" drops all edges');
+
+  activeState.setNodesBy(function(n) {
+    return this.degree(n.id) === 1;
+  });
+  equal(
+    activeState.nodes().length,
+    1, 
+    '"setNodesBy" drops the currenct nodes and adds the nodes that pass a predicate');
+
+  activeState
+    .dropNodes()
+    .addEdges('e0')
+    .invertEdges();
+
+  deepEqual(
+    activeState.edges(),
+    [graph.edges[1], graph.edges[2], graph.edges[3]], 
+    '"invertEdges" drops the currenct edges and adds the other edges');
+
 });
