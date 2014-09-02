@@ -21,14 +21,15 @@
       // to sigma at instantiation.
       _activeNodesIndex = Object.create(null),
       _activeEdgesIndex = Object.create(null),
-      _g = null;
+      _g = null,
+      _enableEvents = true;
 
 
   /**
    * Dispatch the 'activeNodes' event.
    */
   function dispatchNodeEvent() {
-    if(_instance !== null) {
+    if(_instance !== null && _enableEvents) {
       _instance.dispatchEvent('activeNodes');
     }
   };
@@ -37,7 +38,7 @@
    * Dispatch the 'activeEdges' event.
    */
   function dispatchEdgeEvent() {
-    if(_instance !== null) {
+    if(_instance !== null && _enableEvents) {
       _instance.dispatchEvent('activeEdges');
     }
   };
@@ -135,10 +136,10 @@
   };
 
   /**
-   * This methods set one or several nodes as 'active', depending on how it is
-   * called.
+   * This method will set one or several nodes as 'active', depending on how it
+   * is called.
    *
-   * To activate the array of nodes, call it without argument.
+   * To activate allnodes, call it without argument.
    * To activate a specific node, call it with the id of the node. To activate
    * multiple nodes, call it with an array of ids.
    *
@@ -192,10 +193,10 @@
   };
 
   /**
-   * This methods set one or several edges as 'active', depending on how it is
-   * called.
+   * This method will set one or several edges as 'active', depending on how it
+   * is called.
    *
-   * To activate the array of edges, call it without argument.
+   * To activate all edges, call it without argument.
    * To activate a specific edge, call it with the id of the edge. To activate
    * multiple edges, call it with an array of ids.
    *
@@ -249,10 +250,10 @@
   };
 
   /**
-   * This methods set one or several nodes as 'inactive', depending on how it
-   * is called.
+   * This method will set one or several nodes as 'inactive', depending on how
+   * it is called.
    *
-   * To deactivate the array of nodes, call it without argument.
+   * To deactivate all nodes, call it without argument.
    * To deactivate a specific node, call it with the id of the node. To
    * deactivate multiple nodes, call it with an array of ids.
    *
@@ -302,10 +303,10 @@
   };
 
   /**
-   * This methods set one or several edges as 'inactive', depending on how it
-   * is called.
+   * This method will set one or several edges as 'inactive', depending on how
+   * it is called.
    *
-   * To deactivate the array of edges, call it without argument.
+   * To deactivate all edges, call it without argument.
    * To deactivate a specific edge, call it with the id of the edge. To
    * deactivate multiple edges, call it with an array of ids.
    *
@@ -351,6 +352,136 @@
     }
 
     dispatchEdgeEvent();
+    return this;
+  };
+
+  /**
+   * This method will set the neighbors of all active nodes as 'active'.
+   *
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.addNeighbors = function() {
+    if (!('adjacentNodes' in _g))
+      throw 'Missing method graph.adjacentNodes';
+
+    var a,
+        id;
+
+    a = Object.keys(_activeNodesIndex);
+
+    for (id in _activeNodesIndex) {
+      _g.adjacentNodes(id).forEach(function (adj) {
+        a.push(adj.id);
+      });
+    };
+
+    _enableEvents = false;
+    this.dropNodes().dropEdges();
+    _enableEvents = true;
+    this.addNodes(a);
+
+    return this;
+  };
+
+  /**
+   * This method will set the nodes that pass a specified truth test (i.e.
+   * predicate) as 'active', or as 'inactive' otherwise. The method must be
+   * called with the predicate, which is a function that takes a node as
+   * argument and returns a boolean. The context of the predicate is
+   * {{sigma.graph}}.
+   *
+   * // Activate isolated nodes:
+   * > var activeState = new sigma.plugins.activeState(sigInst.graph);
+   * > activeState.setNodesBy(function(n) {
+   * >   return this.degree(n.id) === 0;
+   * > });
+   *
+   * @param  {function}                  fn The predicate.
+   * @return {sigma.plugins.activeState}    Returns the instance itself.
+   */
+  ActiveState.prototype.setNodesBy = function(fn) {
+    var a = [];
+
+    _g.nodes().forEach(function (o) {
+      if (fn.call(_g, o)) {
+        a.push(o.id);
+      }
+    });
+
+    _enableEvents = false;
+    this.dropNodes();
+    _enableEvents = true;
+    this.addNodes(a);
+
+    return this;
+  };
+
+  /**
+   * This method will set the edges that pass a specified truth test (i.e.
+   * predicate) as 'active', or as 'inactive' otherwise. The method must be
+   * called with the predicate, which is a function that takes a node as
+   * argument and returns a boolean. The context of the predicate is
+   * {{sigma.graph}}.
+   *
+   * @param  {function}                  fn The predicate.
+   * @return {sigma.plugins.activeState}    Returns the instance itself.
+   */
+  ActiveState.prototype.setEdgesBy = function(fn) {
+    var a = [];
+
+    _g.edges().forEach(function (o) {
+      if (fn.call(_g, o)) {
+        a.push(o.id);
+      }
+    });
+
+    _enableEvents = false;
+    this.dropEdges();
+    _enableEvents = true;
+    this.addEdges(a);
+
+    return this;
+  };
+
+  /**
+   * This method will set the active nodes as 'inactive' and the other nodes as
+   * 'active'.
+   *
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.invertNodes = function() {
+    var a = _g.nodes().filter(function (o) {
+      return !o.active;
+    }).map(function (o) {
+      return o.id;
+    });
+
+    _enableEvents = false;
+    this.dropNodes();
+    _enableEvents = true;
+    this.addNodes(a);
+
+    return this;
+  };
+
+  /**
+   * This method will set the active edges as 'inactive' and the other edges as
+   * 'active'.
+   *
+   * @return {sigma.plugins.activeState} Returns the instance itself.
+   */
+  ActiveState.prototype.invertEdges = function() {
+    var a = _g.edges().filter(function (o) {
+      return !o.active;
+    }).map(function (o) {
+      return o.id;
+    });
+
+    _enableEvents = false;
+    this.dropEdges();
+    _enableEvents = true;
+    this.addEdges(a);
+
     return this;
   };
 
