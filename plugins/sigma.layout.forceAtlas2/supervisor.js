@@ -74,6 +74,7 @@
       // Stop ForceAtlas2 if it has converged
       if (e.data.converged) {
         _this.running = false;
+        _this.enableEdgequadtree();
       }
 
       // Retrieving data
@@ -193,41 +194,27 @@
       _root.postMessage(content, '*');
   };
 
-  Supervisor.prototype.start = function() {
-    if (this.running)
-      return;
-
-    this.running = true;
-
+  Supervisor.prototype.disableEdgequadtree = function() {
     // Do not refresh edgequadtree during layout:
     var k,
         c;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
-      c.edgequadtree._enabled = false;
-    }
-
-    if (!this.started) {
-
-      // Sending init message to worker
-      this.sendByteArrayToWorker('start');
-      this.started = true;
-    }
-    else {
-      this.sendByteArrayToWorker();
+      if (c.edgequadtree !== undefined)
+        c.edgequadtree._enabled = false;
     }
   };
 
-  Supervisor.prototype.stop = function() {
-    if (!this.running)
-      return;
-
+  Supervisor.prototype.enableEdgequadtree = function() {
     // Allow to refresh edgequadtree:
     var k,
         c,
         bounds;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
+      if (c.edgequadtree === undefined)
+        return;
+      
       c.edgequadtree._enabled = true;
 
       // Find graph boundaries:
@@ -248,7 +235,38 @@
           }
         });
     }
+  }
 
+  Supervisor.prototype.start = function() {
+    if (this.running)
+      return;
+
+    this.running = true;
+    this.disableEdgequadtree();
+
+    // Do not refresh edgequadtree during layout:
+    var k,
+        c;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = false;
+    }
+
+    if (!this.started) {
+      // Sending init message to worker
+      this.sendByteArrayToWorker('start');
+      this.started = true;
+    }
+    else {
+      this.sendByteArrayToWorker();
+    }
+  };
+
+  Supervisor.prototype.stop = function() {
+    if (!this.running)
+      return;
+
+    this.enableEdgequadtree();
     this.running = false;
   };
 
