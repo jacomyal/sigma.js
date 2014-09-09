@@ -114,6 +114,10 @@ activeState.bind('activeNodes', activeNodesCallback);
 
 We extend Sigma.js settings in a transparent way to render active nodes and edges, see [settings.js](settings.js):
 
+ * **defaultLabelActiveColor**
+   * type: *string*
+   * default value: `#000`
+
  * **activeFont**
    * The active node's label font. If not specified, will heritate the `font` value.
    * type: *string*
@@ -123,6 +127,12 @@ We extend Sigma.js settings in a transparent way to render active nodes and edge
    * Example: `bold`
    * type: *string*
    * default value: ``
+
+ * **labelActiveColor**
+   * Indicates how to choose the labels color of active nodes.
+   * type: *string*
+   * default value: `default`
+   * available values: `node`, `default`
 
  * **nodeActiveColor**
    * Indicates how to choose the active nodes color.
