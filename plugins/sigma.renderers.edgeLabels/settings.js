@@ -18,6 +18,8 @@
     // {string}
     defaultEdgeLabelColor: '#000',
     // {string}
+    defaultEdgeLabelActiveColor: '#000',
+    // {string}
     defaultEdgeLabelSize: 10,
     // {string} Indicates how to choose the edge labels size. Available values:
     //          "fixed", "proportional"

@@ -21,6 +21,10 @@ This plugin extends Sigma.js settings in a transparent way to render edge labels
    * type: *string*
    * default value: `#000`
 
+ * **defaultEdgeLabelActiveColor**
+   * type: *string*
+   * default value: `rgb(236, 81, 72)`
+
  * **defaultEdgeLabelSize**
    * type: *number*
    * default value: `10`
@@ -66,3 +70,7 @@ This plugin provides the following edge label renderers:
 - `arrow` (use default)
 - `curve`
 - `curvedArrow`
+
+## Compatibility
+
+This plugin is compatible with `sigma.plugins.activeState`.

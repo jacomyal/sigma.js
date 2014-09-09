@@ -55,11 +55,30 @@
 
     context.save();
 
-    context.font = (settings('fontStyle') ? settings('fontStyle') + ' ' : '') +
-      fontSize + 'px ' + settings('font');
-    context.fillStyle = (settings('edgeLabelColor') === 'edge') ?
-      (edge.color || settings('defaultEdgeColor')) :
-      settings('defaultEdgeLabelColor');
+    if (edge.active) {
+      context.font = [
+        settings('activeFontStyle'),
+        fontSize + 'px',
+        settings('activeFont') || settings('font')
+      ].join(' ');
+
+      context.fillStyle =
+        settings('edgeActiveColor') === 'edge' ?
+        (edge.active_color || settings('defaultEdgeActiveColor')) :
+        settings('defaultEdgeLabelActiveColor');
+    }
+    else {
+      context.font = [
+        settings('fontStyle'),
+        fontSize + 'px',
+        settings('font')
+      ].join(' ');
+
+      context.fillStyle =
+        (settings('edgeLabelColor') === 'edge') ?
+        (edge.color || settings('defaultEdgeColor')) :
+        settings('defaultEdgeLabelColor');
+    }
 
     context.textAlign = 'center';
     context.textBaseline = 'alphabetic';
