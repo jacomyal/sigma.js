@@ -29,6 +29,9 @@
     if (size < settings('edgeLabelThreshold'))
       return;
 
+    if (0 === settings('edgeLabelSizePowRatio'))
+      throw '"edgeLabelSizePowRatio" must not be 0.';
+
     var fontSize,
         x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
         y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
@@ -39,16 +42,16 @@
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
-    // This is achieved by f(x) = x * x^(-a), where 'x' is the size and 'a' is
-    // the edgeLabelSizePowRatio.
-    // We garantee that for size = 1, fontSize = defaultEdgeLabelSize by adding
-    // this number as a multiplicator, thus the final form:
-    // f(x) = b * x * x^(-a)
+    // This is achieved by f(x) = x * x^(-1/ a), where 'x' is the size and 'a'
+    // is the edgeLabelSizePowRatio. Notice that f(1) = 1.
+    // The final form is:
+    // f'(x) = b * x * x^(-1 / a), thus f'(1) = b. Application:
+    // fontSize = defaultEdgeLabelSize if edgeLabelSizePowRatio = 1
     fontSize = (settings('edgeLabelSize') === 'fixed') ?
       settings('defaultEdgeLabelSize') :
       settings('defaultEdgeLabelSize') *
       size *
-      Math.pow(size, - settings('edgeLabelSizePowRatio'));
+      Math.pow(size, -1 / settings('edgeLabelSizePowRatio'));
 
     context.save();
 
