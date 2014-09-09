@@ -38,7 +38,7 @@ This plugin extends Sigma.js settings in a transparent way to render edge labels
 
 ````javascript
 // Formula:
-Math.pow(size, - edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
+Math.pow(size, - 1 / edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
 ````
 
  * **edgeLabelThreshold**
