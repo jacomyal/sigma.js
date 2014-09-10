@@ -71,12 +71,6 @@
     var msgName = (this.worker) ? 'message' : 'newCoords';
     (this.worker || document).addEventListener(msgName, function(e) {
 
-      // Stop ForceAtlas2 if it has converged
-      if (e.data.converged) {
-        _this.running = false;
-        _this.enableEdgequadtree();
-      }
-
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
 
@@ -93,6 +87,12 @@
         _this.sigInst.refresh();
       }
     });
+
+    // Stop ForceAtlas2 if it has converged
+    if (e.data.converged) {
+      _this.running = false;
+      _this.enableEdgequadtree();
+    }
 
     // Filling byteArrays
     this.graphToByteArrays();
