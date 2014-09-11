@@ -237,7 +237,9 @@
     camera.quadtree = new sigma.classes.quad();
 
     // Add an edgequadtree to the camera:
-    camera.edgequadtree = new sigma.classes.edgequad();
+    if (sigma.classes.edgequad !== undefined) {
+      camera.edgequadtree = new sigma.classes.edgequad();
+    }
 
     camera.bind('coordinatesUpdated', function(e) {
       self.renderCamera(camera, camera.isAnimated);
@@ -496,7 +498,9 @@
       });
 
       // Refresh edgequadtree:
-      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+      if (c.edgequadtree !== undefined && c.settings('drawEdges') &&
+        c.settings('enableEdgeHovering')) {
+
         c.edgequadtree.index(this.graph, {
           prefix: c.readPrefix,
           bounds: {
@@ -506,6 +510,7 @@
             height: bounds.maxY - bounds.minY
           }
         });
+      }
     }
 
     // Call each renderer:

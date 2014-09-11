@@ -126,10 +126,7 @@
             mX,
             mY
           ),
-          edges = self.camera.edgequadtree.point(
-            point.x,
-            point.y
-          );
+          edges = [];
 
       if (isCanvas) {
         var nodesOnScreen = self.camera.quadtree.area(
@@ -137,6 +134,13 @@
         );
         for (a = nodesOnScreen, i = 0, l = a.length; i < l; i++)
           nodeIndex[a[i].id] = a[i];
+      }
+
+      if (self.camera.edgequadtree !== undefined) {
+        edges = self.camera.edgequadtree.point(
+          point.x,
+          point.y
+        );
       }
 
       function insertEdge(selected, edge) {
