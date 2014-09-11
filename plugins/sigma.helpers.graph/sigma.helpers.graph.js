@@ -61,40 +61,6 @@
     });
 
   /**
-   * This methods set the "hover" attribute of a node.
-   *
-   * To hover the node, call "hoverNode(id)". To un-hover the node,
-   * call "hoverNode(id, false)".
-   *
-   * @param  {string}   id      The node id.
-   * @param  {?boolean} isHover The hover value.
-   * @return {sigma.graph}      The instance itself.
-   */
-  if (!sigma.classes.graph.hasMethod('hoverNode'))
-    sigma.classes.graph.addMethod('hoverNode', function(id, isHover) {
-      isHover = (isHover === undefined) ? true : !!isHover;
-      this.nodesIndex[id].hover = isHover;
-      return this;
-    });
-
-  /**
-   * This methods set the "hover" attribute of an edge.
-   *
-   * To hover the edge, call "hoverEdge(id)". To un-hover the edge,
-   * call "hoverEdge(id, false)".
-   *
-   * @param  {string}   id      The edge id.
-   * @param  {?boolean} isHover The hover value.
-   * @return {sigma.graph}      The instance itself.
-   */
-  if (!sigma.classes.graph.hasMethod('hoverEdge'))
-    sigma.classes.graph.addMethod('hoverEdge', function(id, isHover) {
-      isHover = (isHover === undefined) ? true : !!isHover;
-      this.edgesIndex[id].hover = isHover;
-      return this;
-    });
-
-  /**
    * This methods returns an array of nodes that are adjacent to a node.
    *
    * @param  {string} id The node id.
