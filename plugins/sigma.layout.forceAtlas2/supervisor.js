@@ -244,14 +244,6 @@
     this.running = true;
     this.disableEdgequadtree();
 
-    // Do not refresh edgequadtree during layout:
-    var k,
-        c;
-    for (k in this.sigInst.cameras) {
-      c = this.sigInst.cameras[k];
-      c.edgequadtree._enabled = false;
-    }
-
     if (!this.started) {
       // Sending init message to worker
       this.sendByteArrayToWorker('start');
