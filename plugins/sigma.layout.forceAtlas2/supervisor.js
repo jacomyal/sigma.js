@@ -86,13 +86,13 @@
         // Rendering graph
         _this.sigInst.refresh();
       }
-    });
 
-    // Stop ForceAtlas2 if it has converged
-    if (e.data.converged) {
-      _this.running = false;
-      _this.enableEdgequadtree();
-    }
+      // Stop ForceAtlas2 if it has converged
+      if (e.data.converged) {
+        _this.running = false;
+        _this.enableEdgequadtree();
+      }
+    });
 
     // Filling byteArrays
     this.graphToByteArrays();
