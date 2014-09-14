@@ -15,13 +15,18 @@
    * Autostop author: Sébastien Heymann @ Linkurious
    * Version: 0.1
    */
+  var _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  var webWorkers = 'Worker' in window;
+  var webWorkers = 'Worker' in _root;
 
+  /**
+   * Event emitter Object
+   * ------------------
+   */
   var eventEmitter = {};
   sigma.classes.dispatcher.extend(eventEmitter);
 
@@ -31,7 +36,9 @@
    */
   function Supervisor(sigInst, options) {
     // Window URL Polyfill
-    window.URL = window.URL || window.webkitURL;
+    _root.URL = _root.URL || _root.webkitURL;
+
+    options = options || {};
 
     // Properties
     this.sigInst = sigInst;
@@ -40,6 +47,9 @@
     this.ppe = 3;
     this.config = {};
     this.worker = null;
+    this.shouldUseWorker =
+      options.worker === false ? false : true && webWorkers;
+    this.workerUrl = options.workerUrl;
 
     // State
     this.started = false;
@@ -55,9 +65,9 @@
       blob = new Blob([workerFn], {type: 'application/javascript'});
     }
     catch (e) {
-      window.BlobBuilder = window.BlobBuilder ||
-                           window.WebKitBlobBuilder ||
-                           window.MozBlobBuilder;
+      _root.BlobBuilder = _root.BlobBuilder ||
+                           _root.WebKitBlobBuilder ||
+                           _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -141,7 +151,7 @@
     if (webWorkers)
       this.worker.postMessage(content, buffers);
     else
-      window.postMessage(content, '*');
+      _root.postMessage(content, '*');
   };
 
   Supervisor.prototype.disableEdgequadtree = function() {
@@ -219,10 +229,15 @@
         workerFn = sigma.layouts.getForceAtlas2Worker();
 
     // Web worker or classic DOM events?
-    if (webWorkers) {
-      var blob = this.makeBlob(workerFn);
-      this.worker = new Worker(URL.createObjectURL(blob));
-
+    if (this.shouldUseWorker) {
+      if (!this.workerUrl) {
+        var blob = this.makeBlob(workerFn);
+        this.worker = new Worker(URL.createObjectURL(blob));
+      }
+      else {
+        this.worker = new Worker(this.workerUrl);
+      }
+      
       // Post Message Polyfill
       this.worker.postMessage =
         this.worker.webkitPostMessage || this.worker.postMessage;
@@ -287,7 +302,7 @@
     if (webWorkers)
       this.worker.postMessage(data);
     else
-      window.postMessage(data, '*');
+      _root.postMessage(data, '*');
   };
 
   /**

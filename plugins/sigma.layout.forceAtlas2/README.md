@@ -17,7 +17,7 @@ For optimization purposes, the algorithm's computations are delegated to a web w
 
 **sigma.startForceAtlas2**
 
-Starts or unpauses the layout. It is possible to pass a configuration if this is the first time you start the layout.
+Starts or resumes the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
 sigmaInstance.startForceAtlas2(config);
@@ -25,7 +25,7 @@ sigmaInstance.startForceAtlas2(config);
 
 **sigma.stopForceAtlas2**
 
-Pauses the layout.
+Stops the layout.
 
 ```js
 sigmaInstance.stopForceAtlas2();
@@ -41,7 +41,7 @@ sigmaInstance.configForceAtlas2(config);
 
 **sigma.killForceAtlas2**
 
-Completely stops the layout and terminates the assiociated worker. You can still restart it later, but a new worker will have to initialize.
+Stops the layout and terminates the associated worker. You can still restart it later, but a new worker will have to be initialized.
 
 ```js
 sigmaInstance.killForceAtlas2();
@@ -57,6 +57,8 @@ sigmaInstance.isForceAtlas2Running();
 
 ## Configuration
 
+*Algorithm configuration*
+
 * **linLogMode**: *boolean* `false`
 * **outboundAttractionDistribution** *boolean* `false`
 * **adjustSizes** *boolean* `false`
@@ -66,6 +68,11 @@ sigmaInstance.isForceAtlas2Running();
 * **gravity** *number* `1`
 * **slowDown** *number* `1`
 * **autoStop** *boolean* `false`
+
+*Supervisor configuration*
+
+* **worker** *boolean* `true`: should the layout use a web worker?
+* **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
 
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
