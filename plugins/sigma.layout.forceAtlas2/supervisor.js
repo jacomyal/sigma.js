@@ -4,34 +4,34 @@
   if (typeof sigma === 'undefined')
     throw 'sigma is not declared';
 
+  // Initialize package:
+  sigma.utils.pkg('sigma.layouts');
+
   /**
    * Sigma ForceAtlas2.5 Supervisor
    * =============================
    *
    * Author: Guillaume Plique (Yomguithereal)
+   * Autostop author: Sébastien Heymann @ Linkurious
    * Version: 0.1
    */
-  var _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  var webWorkers = 'Worker' in _root;
+  var webWorkers = 'Worker' in window;
+
+  var eventEmitter = {};
+  sigma.classes.dispatcher.extend(eventEmitter);
 
   /**
    * Supervisor Object
    * ------------------
    */
   function Supervisor(sigInst, options) {
-    var _this = this,
-        workerFn = sigInst.getForceAtlas2Worker &&
-          sigInst.getForceAtlas2Worker();
-
-    options = options || {};
-
-    // _root URL Polyfill
-    _root.URL = _root.URL || _root.webkitURL;
+    // Window URL Polyfill
+    window.URL = window.URL || window.webkitURL;
 
     // Properties
     this.sigInst = sigInst;
@@ -39,63 +39,13 @@
     this.ppn = 10;
     this.ppe = 3;
     this.config = {};
-    this.shouldUseWorker =
-      options.worker === false ? false : true && webWorkers;
-    this.workerUrl = options.workerUrl;
+    this.worker = null;
 
     // State
     this.started = false;
     this.running = false;
 
-    // Web worker or classic DOM events?
-    if (this.shouldUseWorker) {
-      if (!this.workerUrl) {
-        var blob = this.makeBlob(workerFn);
-        this.worker = new Worker(URL.createObjectURL(blob));
-      }
-      else {
-        this.worker = new Worker(this.workerUrl);
-      }
-
-      // Post Message Polyfill
-      this.worker.postMessage =
-        this.worker.webkitPostMessage || this.worker.postMessage;
-    }
-    else {
-
-      // TODO: do we crush?
-      eval(workerFn);
-    }
-
-    // Worker message receiver
-    var msgName = (this.worker) ? 'message' : 'newCoords';
-    (this.worker || document).addEventListener(msgName, function(e) {
-
-      // Retrieving data
-      _this.nodesByteArray = new Float32Array(e.data.nodes);
-
-      // If ForceAtlas2 is running, we act accordingly
-      if (_this.running) {
-
-        // Applying layout
-        _this.applyLayoutChanges();
-
-        // Send data back to worker and loop
-        _this.sendByteArrayToWorker();
-
-        // Rendering graph
-        _this.sigInst.refresh();
-      }
-
-      // Stop ForceAtlas2 if it has converged
-      if (e.data.converged) {
-        _this.running = false;
-        _this.enableEdgequadtree();
-      }
-    });
-
-    // Filling byteArrays
-    this.graphToByteArrays();
+    this.initWorker();
   }
 
   Supervisor.prototype.makeBlob = function(workerFn) {
@@ -105,9 +55,9 @@
       blob = new Blob([workerFn], {type: 'application/javascript'});
     }
     catch (e) {
-      _root.BlobBuilder = _root.BlobBuilder ||
-                           _root.WebKitBlobBuilder ||
-                           _root.MozBlobBuilder;
+      window.BlobBuilder = window.BlobBuilder ||
+                           window.WebKitBlobBuilder ||
+                           window.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -188,10 +138,10 @@
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    if (this.shouldUseWorker)
+    if (webWorkers)
       this.worker.postMessage(content, buffers);
     else
-      _root.postMessage(content, '*');
+      window.postMessage(content, '*');
   };
 
   Supervisor.prototype.disableEdgequadtree = function() {
@@ -248,6 +198,7 @@
       // Sending init message to worker
       this.sendByteArrayToWorker('start');
       this.started = true;
+      eventEmitter.dispatchEvent('start');
     }
     else {
       this.sendByteArrayToWorker();
@@ -260,11 +211,67 @@
 
     this.enableEdgequadtree();
     this.running = false;
+    eventEmitter.dispatchEvent('stop');
+  };
+
+  Supervisor.prototype.initWorker = function() {
+    var _this = this,
+        workerFn = sigma.layouts.getForceAtlas2Worker();
+
+    // Web worker or classic DOM events?
+    if (webWorkers) {
+      var blob = this.makeBlob(workerFn);
+      this.worker = new Worker(URL.createObjectURL(blob));
+
+      // Post Message Polyfill
+      this.worker.postMessage =
+        this.worker.webkitPostMessage || this.worker.postMessage;
+    }
+    else {
+
+      // TODO: do we crush?
+      eval(workerFn);
+    }
+
+    // Worker message receiver
+    var msgName = (this.worker) ? 'message' : 'newCoords';
+    (this.worker || document).addEventListener(msgName, function(e) {
+
+      // Retrieving data
+      _this.nodesByteArray = new Float32Array(e.data.nodes);
+
+      // If ForceAtlas2 is running, we act accordingly
+      if (_this.running) {
+
+        // Applying layout
+        _this.applyLayoutChanges();
+
+        // Send data back to worker and loop
+        _this.sendByteArrayToWorker();
+
+        // Rendering graph
+        _this.sigInst.refresh();
+      }
+
+      // Stop ForceAtlas2 if it has converged
+      if (e.data.converged && _this.running) {
+        _this.running = false;
+        _this.enableEdgequadtree();
+        _this.killWorker();
+        eventEmitter.dispatchEvent('stop');
+      }
+    });
+
+    // Filling byteArrays
+    this.graphToByteArrays();
   };
 
   // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
-    this.worker && this.worker.terminate();
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
   };
 
   Supervisor.prototype.configure = function(config) {
@@ -277,68 +284,74 @@
 
     var data = {action: 'config', config: this.config};
 
-    if (this.shouldUseWorker)
+    if (webWorkers)
       this.worker.postMessage(data);
     else
-      _root.postMessage(data, '*');
+      window.postMessage(data, '*');
   };
 
   /**
    * Interface
    * ----------
    */
-  sigma.prototype.startForceAtlas2 = function(config) {
+  var supervisor = null;
+
+  sigma.layouts.startForceAtlas2 = function(sigInst, config) {
 
     // Create supervisor if undefined
-    if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config);
+    if (!supervisor) {
+      supervisor = new Supervisor(sigInst);
+    }
+    else if (!supervisor.running) {
+      supervisor.killWorker();
+      supervisor.initWorker();
+      supervisor.started = false;
+    }
 
     // Configuration provided?
     if (config)
-      this.supervisor.configure(config);
+      supervisor.configure(config);
 
     // Start algorithm
-    this.supervisor.start();
+    supervisor.start();
 
-    return this;
+    return eventEmitter;
   };
 
-  sigma.prototype.stopForceAtlas2 = function() {
-    if (!this.supervisor)
-      return this;
+  sigma.layouts.stopForceAtlas2 = function() {
+    if (!supervisor)
+      return;
 
-    // Pause algorithm
-    this.supervisor.stop();
+    // Stop algorithm
+    supervisor.stop();
 
-    return this;
+    return supervisor;
   };
 
-  sigma.prototype.killForceAtlas2 = function() {
-    if (!this.supervisor)
-      return this;
+  sigma.layouts.killForceAtlas2 = function() {
+    if (!supervisor)
+      return;
 
     // Stop Algorithm
-    this.supervisor.stop();
+    supervisor.stop();
 
     // Kill Worker
-    this.supervisor.killWorker();
+    supervisor.killWorker();
 
     // Kill supervisor
-    this.supervisor = null;
-
-    return this;
+    supervisor = null;
   };
 
-  sigma.prototype.configForceAtlas2 = function(config) {
-    if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config);
+  sigma.layouts.configForceAtlas2 = function(sigInst, config) {
+    if (!supervisor)
+      supervisor = new Supervisor(sigInst);
 
-    this.supervisor.configure(config);
+    supervisor.configure(config);
 
-    return this;
+    return eventEmitter;
   };
 
-  sigma.prototype.isForceAtlas2Running = function(config) {
-    return this.supervisor && this.supervisor.running;
+  sigma.layouts.isForceAtlas2Running = function() {
+    return supervisor && supervisor.running;
   };
 }).call(this);
