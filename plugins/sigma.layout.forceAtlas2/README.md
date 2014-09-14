@@ -20,7 +20,7 @@ For optimization purposes, the algorithm's computations are delegated to a web w
 Starts or resumes the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
-sigmaInstance.startForceAtlas2(config);
+sigmaInstance.startForceAtlas2(sigInst, config);
 ```
 
 **sigma.stopForceAtlas2**
@@ -36,7 +36,7 @@ sigmaInstance.stopForceAtlas2();
 Changes the layout's configuration.
 
 ```js
-sigmaInstance.configForceAtlas2(config);
+sigmaInstance.configForceAtlas2(sigInst, config);
 ```
 
 **sigma.killForceAtlas2**
