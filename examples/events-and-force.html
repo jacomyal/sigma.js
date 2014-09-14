@@ -115,7 +115,14 @@ s.bind('doubleClickStage rightClickStage', function(e) {
 });
 
 // Start the ForceAtlas2 algorithm:
-s.startForceAtlas2({
+var fa = sigma.layouts.configForceAtlas2(s, {
   autoStop: true
 });
+
+// Bind the events:
+fa.bind('start stop', function(e) {
+  console.log(e.type);
+});
+
+sigma.layouts.startForceAtlas2();
 </script>

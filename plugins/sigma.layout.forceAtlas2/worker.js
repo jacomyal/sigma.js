@@ -4,12 +4,16 @@
   if (typeof sigma === 'undefined')
     throw 'sigma is not declared';
 
+  // Initialize package:
+  sigma.utils.pkg('sigma.layouts');
+
   /**
    * Sigma ForceAtlas2.5 Webworker
    * ==============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
+   * Autostop author: Sébastien Heymann @ Linkurious
    * Version: 0.1
    */
 
@@ -746,7 +750,7 @@
     return fnString;
   }
 
-  sigma.prototype.getForceAtlas2Worker = function() {
+  sigma.layouts.getForceAtlas2Worker = function() {
     var fnString = crush ? crush(Worker.toString()) : Worker.toString();
     return ';(' + fnString + ').call(this);';
   };
