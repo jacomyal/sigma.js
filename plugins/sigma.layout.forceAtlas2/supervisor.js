@@ -360,8 +360,14 @@
   };
 
   sigma.layouts.configForceAtlas2 = function(sigInst, config) {
-    if (!supervisor)
+    if (!supervisor) {
       supervisor = new Supervisor(sigInst);
+    }
+    else if (!supervisor.running) {
+      supervisor.killWorker();
+      supervisor.initWorker();
+      supervisor.started = false;
+    }
 
     supervisor.configure(config);
 
