@@ -355,6 +355,8 @@
 
     // Kill supervisor
     supervisor = null;
+
+    eventEmitter = {};
   };
 
   sigma.layouts.configForceAtlas2 = function(sigInst, config) {
