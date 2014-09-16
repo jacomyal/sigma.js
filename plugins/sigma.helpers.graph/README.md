@@ -21,6 +21,15 @@ This plugin extends the [Graph API](https://github.com/jacomyal/sigma.js/wiki/Gr
 **adjacentEdges( *string* )** : *array*
  * This methods is used to retrieve the adjacent edges of a specified node from the graph. The method must be called with the ID of a node.
 
+**fixNode( *string* )** : *graph*
+ * This methods will set the value of `fixed` to `true` on a specified node. The method must be called with the ID of a node.
+
+**unfixNode( *string* )** : *graph*
+ * This methods will set the value of `fixed` to `false` on a specified node. The method must be called with the ID of a node.
+
+**getFixedNodes()** : *array*
+ * This methods returns the list of fixed nodes.
+
 See the following [unit tests](../../test/unit.helpers.graph.js) for full usage.
 
 To use, include all .js files under this folder.
