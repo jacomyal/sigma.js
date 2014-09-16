@@ -4,6 +4,100 @@
   if (typeof sigma === 'undefined')
     throw 'sigma is not declared';
 
+  var _fixedNodesIndex = Object.create(null);
+
+  /**
+   * Sigma Graph Helpers
+   * =============================
+   *
+   * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
+   * @version 0.1
+   */
+
+  /**
+   * Attach methods to the graph to keep indexes updated.
+   * ------------------
+   */
+
+  // Index the node after its insertion in the graph if `n.fixed` is `true`.
+  sigma.classes.graph.attach(
+    'addNode',
+    'sigma.helpers.graph.addNode',
+    function(n) {
+      if (n.fixed) {
+        _fixedNodesIndex[n.id] = this.nodesIndex[n.id];
+      }
+    }
+  );
+
+  // Deindex the node before its deletion from the graph.
+  sigma.classes.graph.attachBefore(
+    'dropNode',
+    'sigma.helpers.graph.dropNode',
+    function(id) {
+      delete _fixedNodesIndex[id];
+    }
+  );
+
+  // Deindex all nodes before the graph is cleared.
+  sigma.classes.graph.attachBefore(
+    'clear',
+    'sigma.helpers.graph.clear',
+    function() {
+      var k;
+
+      for (k in _fixedNodesIndex)
+        if (!('hasOwnProperty' in _fixedNodesIndex) || _fixedNodesIndex.hasOwnProperty(k))
+          delete _fixedNodesIndex[k];
+      
+      _fixedNodesIndex = Object.create(null);
+    }
+  );
+
+  /**
+   * This methods will set the value of `fixed` to `true` on a specified node.
+   *
+   * @param {string}     The node id.
+   */
+  if (!sigma.classes.graph.hasMethod('fixNode'))
+    sigma.classes.graph.addMethod('fixNode', function(id) {
+      if (this.nodesIndex[id]) {
+        this.nodesIndex[id].fixed = true;
+        _fixedNodesIndex[id] = this.nodesIndex[id];
+      }
+      return this;
+    });
+
+  /**
+   * This methods will set the value of `fixed` to `false` on a specified node.
+   *
+   * @param {string}     The node id.
+   */
+  if (!sigma.classes.graph.hasMethod('unfixNode'))
+    sigma.classes.graph.addMethod('unfixNode', function(id) {
+      if (this.nodesIndex[id]) {
+        delete this.nodesIndex[id].fixed;
+        delete _fixedNodesIndex[id];
+      }
+      return this;
+    });
+
+  /**
+   * This methods returns the list of fixed nodes.
+   *
+   * @return {array}     The array of fixed nodes.
+   */
+  if (!sigma.classes.graph.hasMethod('getFixedNodes'))
+    sigma.classes.graph.addMethod('getFixedNodes', function() {
+      var nid,
+          nodes = [];
+      for(nid in _fixedNodesIndex) {
+        nodes.push(this.nodesIndex[nid]);
+      }
+      return nodes;
+    });
+
+
   /**
    * This methods drops a set of nodes from the graph.
    *

@@ -11,7 +11,8 @@ test('Custom graph methods', function() {
       },
       {
         id: 'n1',
-        label: 'Node 1'
+        label: 'Node 1',
+        fixed: true
       },
       {
         id: 'n2',
@@ -46,6 +47,11 @@ test('Custom graph methods', function() {
       }
     ]
   });
+
+  equal(
+    myGraph.getFixedNodes().length, 
+    1,
+    '"graph.read" adds fixed nodes to fixedNodesIndex');
 
   deepEqual(
     myGraph.adjacentNodes('n0'),
@@ -86,4 +92,26 @@ test('Custom graph methods', function() {
     [ myGraph.nodes('n0') ],
     '"dropNodes" drops multiple nodes'
   );
+
+  myGraph.fixNode('n0');
+
+  equal(
+    myGraph.getFixedNodes().length, 
+    1,
+    '"graph.fixNode" locks a node');
+
+  myGraph.unfixNode('n0');
+
+  equal(
+    myGraph.getFixedNodes().length, 
+    0,
+    '"graph.unfixNode" releases a node');
+
+  myGraph.fixNode('n0');
+  myGraph.clear();
+
+  equal(
+    myGraph.getFixedNodes().length, 
+    0,
+    '"graph.clear" empties fixedNodesIndex');
 });
