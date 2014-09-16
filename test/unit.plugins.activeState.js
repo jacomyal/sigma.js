@@ -278,4 +278,18 @@ test('Standard manipulation', function() {
     [graph.edges[1], graph.edges[2], graph.edges[3]], 
     '"invertEdges" drops the currenct edges and adds the other edges');
 
+
+  // CLEAR GRAPH:
+  // *********************
+  myGraph.clear();
+
+  equal(
+    activeState.nodes().length,
+    0, 
+    '"graph.clear" drops all nodes');
+
+  equal(
+    activeState.edges().length,
+    0, 
+    '"graph.clear" drops all edges');
 });
