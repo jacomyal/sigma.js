@@ -105,6 +105,17 @@
     }
   );
 
+  // Deindex all nodes and edges before the graph is cleared.
+  sigma.classes.graph.attachBefore(
+    'clear',
+    'sigma.plugins.activeState.clear',
+    function() {
+      _activeNodesIndex = Object.create(null);
+      _activeEdgesIndex = Object.create(null);
+      dispatchEdgeEvent();
+    }
+  );
+
   /**
    * ActiveState Object
    * ------------------
