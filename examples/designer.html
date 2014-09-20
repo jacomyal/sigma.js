@@ -32,8 +32,8 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.plugins.artist/colorbrewer/colorbrewer.js"></script>
-<script src="../plugins/sigma.plugins.artist/sigma.plugins.artist.js"></script>
+<script src="../plugins/sigma.plugins.designer/colorbrewer/colorbrewer.js"></script>
+<script src="../plugins/sigma.plugins.designer/sigma.plugins.designer.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -150,30 +150,30 @@ var styles = {
   }
 };
 
-// Instanciate the artist:
-var theArtist = sigma.plugins.artist(s, styles, myPalette);
+// Instanciate the designer:
+var theDesigner = sigma.plugins.designer(s, styles, myPalette);
 
 // Play:
-theArtist
-  .paintAll()
+theDesigner
+  .makeAll()
   //.deprecate()
-  //.paint('nodes')
-  //.paint('nodes', 'color')
-  //.paint('nodes', 'size')
+  //.make('nodes')
+  //.make('nodes', 'color')
+  //.make('nodes', 'size')
   //.omit('nodes', 'color')
   //.omit('nodes', 'size')
-  //.paint('nodes')
+  //.make('nodes')
   //.omitAll()
   //.disown()
 ;
 
 // Dump palette and styles:
-//console.log(theArtist.talk());
+//console.log(theDesigner.talk());
 
 /*console.log('styles bound to each node for the property "' + styles.nodes.color.by + '"',
-  theArtist.nodes(styles.nodes.color.by)
+  theDesigner.nodes(styles.nodes.color.by)
 );*/
 
 // Bye bye black bird:
-//sigma.plugins.killArtist();
+//sigma.plugins.killDesigner();
 </script>

@@ -13,7 +13,7 @@
   };
 
   /**
-   * Sigma Artist
+   * Sigma Designer
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
@@ -371,13 +371,13 @@
 
 
   /**
-   * Artist Object
+   * Designer Object
    * ------------------
    * @param  {sigma}   s       The related sigma instance.
-   * @param  {object}  styles  The styles of the artist.
+   * @param  {object}  styles  The styles of the designer.
    * @param  {?object} palette The color palette.
    */
-  function Artist(s, styles, palette) {
+  function Designer(s, styles, palette) {
     _s = s;
     _mappings = sigma.utils.extend(styles || {}, settings);
     _palette = palette || {};
@@ -392,14 +392,14 @@
   };
 
   /**
-   * This method will import the styles of the artist. Styles are mappings
+   * This method will import the styles of the designer. Styles are mappings
    * between visual variables and data properties on nodes and edges. It will
    * deprecate existing styles.
    *
-   * @param  {object} styles The styles of the artist.
-   * @return {Artist}        The instance.
+   * @param  {object} styles The styles of the designer.
+   * @return {Designer}        The instance.
    */
-  Artist.prototype.learnStyles = function(styles) {
+  Designer.prototype.learnStyles = function(styles) {
     _mappings = sigma.utils.extend(styles || {}, settings);
 
     _visionOnNodes.mappings = _mappings.nodes;
@@ -410,13 +410,13 @@
   };
 
   /**
-   * This method will import the color palette of the artist. It will deprecate
+   * This method will import the color palette of the designer. It will deprecate
    * existing styles.
    *
-   * @param  {object} palette The color palette of the artist.
-   * @return {Artist}         The instance.
+   * @param  {object} palette The color palette of the designer.
+   * @return {Designer}         The instance.
    */
-  Artist.prototype.learnColors = function(palette) {
+  Designer.prototype.learnColors = function(palette) {
     _palette = palette || {};
 
     this.deprecate();
@@ -424,11 +424,11 @@
   };
 
   /**
-   * This method will export the styles and palette of the artist.
+   * This method will export the styles and palette of the designer.
    *
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.talk = function() {
+  Designer.prototype.talk = function() {
     return {
       styles: deepCopy(_mappings),
       palette: deepCopy(_palette)
@@ -442,7 +442,7 @@
    * @param  {function} fn The property accessor.
    * @return {object}      The styles.
    */
-  Artist.prototype.nodes = function(fn) {
+  Designer.prototype.nodes = function(fn) {
     return _visionOnNodes.get(fn);
   };
 
@@ -453,7 +453,7 @@
    * @param  {function} fn The property accessor.
    * @return {object}      The styles.
    */
-  Artist.prototype.edges = function(fn) {
+  Designer.prototype.edges = function(fn) {
     return _visionOnEdges.get(fn);
   };
 
@@ -466,11 +466,11 @@
    *                             "nodes", "edges".
    * @param  {string} visualVar  The visual variable. Available values:
    *                             "color", "size", "label".
-   * @return {Artist}            The instance.
+   * @return {Designer}            The instance.
    */
-  Artist.prototype.paint = function(target, visualVar) {
+  Designer.prototype.make = function(target, visualVar) {
     if (!target)
-      throw '"Artist.paint": Missing target';
+      throw '"Designer.make": Missing target';
 
     var m,
         v;
@@ -485,7 +485,7 @@
         v = _visionOnEdges;
         break;
       default:
-        throw '"Artist.paint": Unknown target ' + target;
+        throw '"Designer.make": Unknown target ' + target;
     }
 
     if (!visualVar) {
@@ -508,11 +508,11 @@
   /**
    * This method will apply all styles on nodes and edges.
    *
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.paintAll = function() {
-    this.paint('nodes');
-    this.paint('edges');
+  Designer.prototype.makeAll = function() {
+    this.make('nodes');
+    this.make('edges');
     return this;
   };
 
@@ -525,11 +525,11 @@
    *                             "nodes", "edges".
    * @param  {string} visualVar  The visual variable. Available values:
    *                             "color", "size", "label".
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.omit = function(target, visualVar) {
+  Designer.prototype.omit = function(target, visualVar) {
     if (!target)
-      throw '"Artist.omit": Missing target';
+      throw '"Designer.omit": Missing target';
 
     var m,
         v;
@@ -544,7 +544,7 @@
         v = _visionOnEdges;
         break;
       default:
-        throw '"Artist.omit": Unknown target ' + target;
+        throw '"Designer.omit": Unknown target ' + target;
     }
 
     if (!visualVar) {
@@ -567,9 +567,9 @@
   /**
    * This method will undo all styles on nodes and edges.
    *
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.omitAll = function() {
+  Designer.prototype.omitAll = function() {
     this.omit('nodes');
     this.omit('edges');
     return this;
@@ -577,12 +577,12 @@
 
   /**
    * This method is used when the styles are deprecated, for instance when the
-   * graph has changed. Each property style will be repainted the next time it
-   * is called using `.paint()`, `.paintAll()`, `.nodes()`, or `.edges()`.
+   * graph has changed. Each property style will be remakeed the next time it
+   * is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`.
    *
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.deprecate = function() {
+  Designer.prototype.deprecate = function() {
     Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
       _visionOnNodes.deprecated[prop] = true;
     });
@@ -597,9 +597,9 @@
    * This method is used to clear all styles. It will refresh the display. Use
    * `.omitAll()` instead to undo styles without losing the configuration.
    *
-   * @return {Artist}  The instance.
+   * @return {Designer}  The instance.
    */
-  Artist.prototype.disown = function() {
+  Designer.prototype.disown = function() {
     this.omitAll();
     _mappings = sigma.utils.extend({}, settings);
     
@@ -622,29 +622,29 @@
    * Interface
    * ------------------
    *
-   * > var artist = sigma.plugins.artist(s, options);
+   * > var designer = sigma.plugins.designer(s, options);
    */
   var _instance = null;
 
   /**
    * @param  {sigma}   s       The related sigma instance.
-   * @param  {object}  styles  The styles of the artist.
+   * @param  {object}  styles  The styles of the designer.
    * @param  {?object} palette The color palette.
-   * @return {Artist}          The instance.
+   * @return {Designer}          The instance.
    */
-  sigma.plugins.artist = function(s, styles, palette) {
+  sigma.plugins.designer = function(s, styles, palette) {
     // Create instance if undefined
     if (!_instance) {
-      _instance = new Artist(s, styles, palette);
+      _instance = new Designer(s, styles, palette);
     }
     return _instance;
   };
 
   /**
-   *  This function kills the artist instance.
+   *  This function kills the designer instance.
    */
-  sigma.plugins.killArtist = function() {
-    if (_instance instanceof Artist) {
+  sigma.plugins.killDesigner = function() {
+    if (_instance instanceof Designer) {
       _instance.disown();
     }
     _instance = null;
