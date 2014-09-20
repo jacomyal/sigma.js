@@ -59,6 +59,7 @@ module.exports = function(grunt) {
     'parsers.gexf',
     'parsers.json',
     'plugins.animate',
+    'plugins.designer',
     'plugins.dragNodes',
     'plugins.filter',
     'plugins.neighborhoods',
