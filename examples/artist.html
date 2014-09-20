@@ -102,6 +102,7 @@ s = new sigma({
 });
 
 
+// Create a custom color palette:
 var myPalette = {
   aQualitativeScheme: { 
     'A': '#7fc97f',
@@ -113,8 +114,9 @@ var myPalette = {
   }
 };
 
-// see http://bl.ocks.org/mbostock/5577023 for a comprehensive guide
-// to the colorbrewer palette
+// For a professional palette, see http://colorbrewer2.org/
+// See http://bl.ocks.org/mbostock/5577023 for a comprehensive guide
+// of the colorbrewer palette available in sigma.plugins.artist.
 
 var styles = {
   nodes: {
@@ -148,8 +150,10 @@ var styles = {
   }
 };
 
+// Instanciate the artist:
 var theArtist = sigma.plugins.artist(s, styles, myPalette);
 
+// Play:
 theArtist
   .paintAll()
   //.deprecate()
@@ -163,11 +167,13 @@ theArtist
   //.disown()
 ;
 
+// Dump palette and styles:
 //console.log(theArtist.talk());
 
 /*console.log('styles bound to each node for the property "' + styles.nodes.color.by + '"',
   theArtist.nodes(styles.nodes.color.by)
 );*/
 
+// Bye bye black bird:
 //sigma.plugins.killArtist();
 </script>

@@ -11,14 +11,15 @@ This plugin provides an artist for you to paint the graph like a boss. The artis
 
 The artist is **lazy**: she will not look for changes on the graph. Deprecate the artist yourself so that she will paint the graph correctly the next time you will ask it.
 
-The artist is **open minded**: the color palette may contain sequential and qualitative data schemes, and the styles can be bound to any node or edge attribute.
+The artist is **open minded**: the color palette may contain sequential, diverging and qualitative data schemes, and the styles can be bound to any node or edge attribute.
 
 This plugin comes with fancy developer features:
-- Define your own styles on nodes and edges.
+- Define the styles to apply on nodes and edges.
 - Use accessors to find the properties of nodes and edges.
-- Use accessors to find the right color schemes in palettes.
+- Use accessors to find the right color schemes in the palette.
 - Register multiple styles before applying them anytime at once.
-- Undo any style. 
+- Index the nodes and edges properties on demand only, for performance reasons.
+- Undo any style.
 - Chain all methods for concise (coding) style.
 
 See the following [example code](../../examples/artist.html) and [unit tests](../../test/unit.plugins.artist.js) for full usage.
@@ -85,6 +86,30 @@ var theArtist = sigma.plugins.artist(sigInst, myStyles, myPalette);
 ```
 
 The [ColorBrewer palette](colorbrewer/colorbrewer.js) is provided to get started quickly with good color schemes.
+
+## Get styles
+Get the styles bound to each node of the graph for a specified property. For instance, get the styles of the nodes which have the property used to color them:
+
+```js
+var boundStyles = theArtist.nodes(myStyles.nodes.color.by);
+/* {
+  propA: {
+    items: *array*
+    ratio: *number*
+    orig_styles: *object*
+    styles: {
+      color: *function*
+    }
+  },
+  propB: ...
+} */
+```
+
+Same example with edges:
+
+```js
+var boundStyles = theArtist.edges(myStyles.edges.color.by);
+```
 
 ## Apply styles
 Apply all styles:
