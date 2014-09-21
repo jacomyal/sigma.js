@@ -27,7 +27,7 @@ See the following [example code](../../examples/designer.html) and [unit tests](
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var theDesigner = sigma.plugins.designer(sigInst, styles, palette);
+var designer = sigma.plugins.designer(sigInst, specs);
 ````
 
 Kill the plugin instance as follows:
@@ -82,7 +82,10 @@ var myStyles = {
   }
 };
 
-var theDesigner = sigma.plugins.designer(sigInst, myStyles, myPalette);
+var designer = sigma.plugins.designer(sigInst, {
+  styles: myStyles,
+  palette: myPalette
+});
 ```
 
 The [ColorBrewer palette](colorbrewer/colorbrewer.js) is provided to get started quickly with good color schemes.
@@ -91,7 +94,7 @@ The [ColorBrewer palette](colorbrewer/colorbrewer.js) is provided to get started
 The styles are bound to each node or edge of the graph, for the specified properties, before being applied at will. You may get them anytime with the `.nodes()` and `.edges()` method. For instance, get the styles of the nodes which have the property used to color them:
 
 ```js
-var boundStyles = theDesigner.nodes(myStyles.nodes.color.by);
+var boundStyles = designer.nodes(myStyles.nodes.color.by);
 /* {
   propA: {
     items: *array*
@@ -108,111 +111,116 @@ var boundStyles = theDesigner.nodes(myStyles.nodes.color.by);
 Same example with edges:
 
 ```js
-var boundStyles = theDesigner.edges(myStyles.edges.color.by);
+var boundStyles = designer.edges(myStyles.edges.color.by);
 ```
 
 ## Apply styles
 Apply all styles:
 
 ```js
-theDesigner.makeAll();
+designer.makeAll();
 ```
 
 Apply all nodes styles:
 
 ```js
-theDesigner.make('nodes');
+designer.make('nodes');
 ```
 
 Apply a specified nodes style like the color:
 
 ```js
-theDesigner.make('nodes', 'color');
+designer.make('nodes', 'color');
 ```
 
 Apply all edges styles:
 
 ```js
-theDesigner.make('edges');
+designer.make('edges');
 ```
 
 Apply a specified edges style like the size:
 
 ```js
-theDesigner.make('edges', 'size');
+designer.make('edges', 'size');
 ```
 
 ## Restore original styles
 Undo all styles:
 
 ```js
-theDesigner.omitAll();
+designer.omitAll();
 ```
 
 Undo all nodes styles:
 
 ```js
-theDesigner.omit('nodes');
+designer.omit('nodes');
 ```
 
 Undo a specified nodes style like the color:
 
 ```js
-theDesigner.omit('nodes', 'color');
+designer.omit('nodes', 'color');
 ```
 
 Undo all edges styles:
 
 ```js
-theDesigner.omit('edges');
+designer.omit('edges');
 ```
 
 Undo a specified nodes style like the size:
 
 ```js
-theDesigner.omit('nodes', 'size');
+designer.omit('nodes', 'size');
 ```
 
 ## Deprecate the designer's vision
 The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called:
 
 ```js
-theDesigner.deprecate();
-theDesigner.make('nodes', 'color'); // refresh node colors
-theDesigner.makeAll(); // refresh all styles but node colors
+designer.deprecate();
+designer.make('nodes', 'color'); // refresh node colors
+designer.makeAll(); // refresh all styles but node colors
 ```
 
 ## Clear all styles
 All styles are cleared and the designer forgets the palette and styles:
 
 ```js
-theDesigner.disown();
-theDesigner.makeAll(); // does nothing
+designer.disown();
+designer.makeAll(); // does nothing
 ```
 
 ## Import styles and palette
-Teach your designer new palette and styles:
+Set a new palette and new styles:
 
 ```js
-theDesigner
-  .learnColors(myPalette)
-  .learnStyles(myStyles);
+designer.newSpecs({
+  styles: myStyles,
+  palette: myPalette
+});
 ```
 
 ## Export styles and palette
-Dump the palette and styles to save and restore them later:
+Dump the palette and styles, to save and restore them later:
 
 ```js
-var o = theDesigner.talk();
+var specs = designer.giveSpecs();
 
-theDesigner.disown();
-theDesigner
-  .learnColors(o.palette)
-  .learnStyles(o.styles);
-theDesigner.makeAll(); // it works, bitches!
+designer.disown();
+designer.newSpecs({
+  styles: specs.styles,
+  palette: specs.palette
+});
+designer.makeAll(); // it works, bitches!
 
 // or:
 sigma.plugins.killDesigner();
-var rebornDesigner = sigma.plugins.designer(sigInst, o.styles, o.palette);
-rebornDesigner.makeAll(); // yeah!
+var newDesigner = sigma.plugins.designer(sigInst, {
+  styles: specs.styles,
+  palette: specs.palette
+});
+newDesigner.makeAll(); // yeah!
 ```
