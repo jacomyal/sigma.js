@@ -197,7 +197,7 @@ designer.makeAll(); // does nothing
 Set a new palette and new styles:
 
 ```js
-designer.newSpecs({
+designer.setSpecs({
   styles: myStyles,
   palette: myPalette
 });
@@ -207,10 +207,10 @@ designer.newSpecs({
 Dump the palette and styles, to save and restore them later:
 
 ```js
-var specs = designer.giveSpecs();
+var specs = designer.getSpecs();
 
 designer.disown();
-designer.newSpecs({
+designer.setSpecs({
   styles: specs.styles,
   palette: specs.palette
 });
