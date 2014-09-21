@@ -121,28 +121,28 @@ var myPalette = {
 var myStyles = {
   nodes: {
     label: {
-      by: function(node) { return node.id; },
+      by: 'id',
       format: function(value) { return '#' + value; }
     },
     size: {
-      by: function(node) { return node.data.quantity; },
+      by: 'data.quantity',
       // min/max used if sigma autoRescale: false
       min: 1,
       max: 10
     },
     color: {
-      by: function(node) { return node.data.quality; },
+      by: 'data.quality',
       scheme: function(palette) { return palette.aQualitativeScheme; }
     },
   },
   edges: {
     color: {
-      by: function(edge) { return edge.data.quantity; },
+      by: 'data.quantity',
       //scheme: function(palette) { return palette.Reds[7]; }
       scheme: function(palette) { return palette.sequentialGreen[7]; }
     },
     size: {
-      by: function(edge) { return edge.data.quantity; },
+      by: 'data.quantity',
       // min/max used if sigma autoRescale: false
       min: 0.5,
       max: 4
@@ -156,6 +156,9 @@ var designer = sigma.plugins.designer(s, {
   palette: myPalette
 });
 
+// Remove a style from the specs:
+// designer.specs().styles.nodes.size = null;
+
 // Play:
 designer
   .makeAll()
@@ -165,6 +168,7 @@ designer
   //.make('nodes', 'size')
   //.omit('nodes', 'color')
   //.omit('nodes', 'size')
+  //.omit('edges', 'color')
   //.make('nodes')
   //.omitAll()
   //.disown()
