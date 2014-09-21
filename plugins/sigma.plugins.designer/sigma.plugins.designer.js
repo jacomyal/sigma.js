@@ -300,6 +300,7 @@
    * This method will apply a mapping between a visual variable and a property.
    * It will update the vision on the property if it is deprecated or missing.
    * It will stores the original value of the visual variable for each item.
+   * If the new value is `undefined`, it will keep the original value.
    * Available visual variables are stored in `_visualVars`.
    *
    * @param {string}   visualVar The name of the visual variable.
@@ -324,7 +325,9 @@
             o.styles[visualVar]) {
           
           o.orig_styles[visualVar] = o.orig_styles[visualVar] || item[visualVar];
-          item[visualVar] = o.styles[visualVar](item);
+          var newVal = o.styles[visualVar](item);
+          if (newVal !== undefined)
+            item[visualVar] = o.styles[visualVar](item);
         }
       });
     });
