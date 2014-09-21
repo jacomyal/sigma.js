@@ -27,6 +27,17 @@
        _visionOnEdges = null,
        _visualVars = ['color', 'size', 'label'];
 
+  /**
+   * Convert Javascript string in dot notation into an object reference.
+   *
+   * @param  {object} obj The object.
+   * @param  {string} str The string to convert, e.g. 'a.b.etc'.
+   * @return {?}          The object reference.
+   */
+  function strToObjectRef(obj, str) {
+    // http://stackoverflow.com/a/6393943
+    return str.split('.').reduce(function(obj, i) { return obj[i] }, obj);
+  }
 
   /**
    * Fast deep copy function.
@@ -119,28 +130,30 @@
    * This method will index the collection with the specified property, and
    * will compute all styles related to the specified property for each item.
    *
-   * @param  {function}  fn The property accessor.
+   * @param  {string}  key The property accessor.
    */
-  Vision.prototype.update = function(fn) {
-    //console.log('update', this);
+  Vision.prototype.update = function(key) {
     var self = this;
 
-    if (fn === undefined)
+    if (key === undefined)
       throw 'Missing property accessor';
-    if (typeof fn !== 'function')
-      throw 'The property accessor "'+ fn +'" must be a function.';
+    if (typeof key !== 'string')
+      throw 'The property accessor "'+ key +'" must be a string.';
 
     var val,
-        key = fn.toString(),
+        fn,
         isSequential = true;
     
+    fn = function(item, key) { return strToObjectRef(item, key); };
+
     // Index the collection:
     this.idx[key] = {};
     this.dataset(_s).forEach(function (item) {
-      val = fn(item);
+      val = fn(item, key);
       if (val !== undefined) {
         if (self.idx[key][val] === undefined) {
           self.idx[key][val] = {
+            key: val,
             items: [],
             styles: {},
             orig_styles: {}
@@ -181,6 +194,7 @@
     // Visual variables mapped to the specified property:
     visualVars = Object.keys(this.mappings).filter(function (visualVar) {
       return (
+        (self.mappings[visualVar]) &&
         (self.mappings[visualVar].by !== undefined) &&
         (self.mappings[visualVar].by.toString() == key)
       );
@@ -254,7 +268,7 @@
 
           case 'label':
             self.idx[key][val].styles.label = function(item) {
-              return format(fn(item));
+              return format(fn(item, key));
             };
             break;
 
@@ -273,24 +287,22 @@
    * This method will return the vision on a specified property. It will update
    * the vision on the property if it is deprecated or missing.
    *
-   * @param  {function}  fn  The property accessor.
-   * @return {object}        The vision on the property.
+   * @param  {string} key  The property accessor.
+   * @return {object}      The vision on the property.
    */
-  Vision.prototype.get = function (fn) {
-    if (fn === undefined)
+  Vision.prototype.get = function (key) {
+    if (key === undefined)
       throw 'Missing property accessor';
-    if (typeof fn !== 'function')
-      throw 'The property accessor "'+ fn +'" must be a function.';
-
-    var key = fn.toString();
+    if (typeof key !== 'string')
+      throw 'The property accessor "'+ key +'" must be a string.';
 
     // lazy updating:
     if (this.deprecated[key])
-      this.update(fn);
+      this.update(key);
 
     // lazy indexing:
     if (this.idx[key] === undefined)
-      this.update(fn);
+      this.update(key);
 
     return this.idx[key];
   };
@@ -302,19 +314,19 @@
    * If the new value is `undefined`, it will keep the original value.
    * Available visual variables are stored in `_visualVars`.
    *
-   * @param {string}   visualVar The name of the visual variable.
-   * @param {function} fn        The property accessor.
+   * @param {string} visualVar The name of the visual variable.
+   * @param {string} key       The property accessor.
    */
-  Vision.prototype.applyStyle = function(visualVar, fn) {
-    if (fn === undefined)
+  Vision.prototype.applyStyle = function(visualVar, key) {
+    if (key === undefined)
       throw 'Missing property accessor';
-    if (typeof fn !== 'function')
-      throw 'The property accessor "'+ fn +'" must be a function.';
+    if (typeof key !== 'string')
+      throw 'The property accessor "'+ key +'" must be a string.';
 
     if (_visualVars.indexOf(visualVar) == -1)
       throw 'Unknown style "' + visualVar + '"';
 
-    var idxp = this.get(fn);
+    var idxp = this.get(key);
 
     Object.keys(idxp).forEach(function (val) {
       var o = idxp[val];
@@ -338,21 +350,19 @@
    * will do nothing if the vision on the property is missing.
    * Available visual variables are stored in `_visualVars`.
    *
-   * @param {string}   visualVar The name of the visual variable.
-   * @param {function} fn        The property accessor.
+   * @param {string} visualVar The name of the visual variable.
+   * @param {string} key       The property accessor.
    */
-  Vision.prototype.undoStyle = function(visualVar, fn) {
+  Vision.prototype.undoStyle = function(visualVar, key) {
     var self = this;
 
-    if (fn === undefined)
+    if (key === undefined)
       throw 'Missing property accessor';
-    if (typeof fn !== 'function')
-      throw 'The property accessor "'+ fn +'" must be a function.';
+    if (typeof key !== 'string')
+      throw 'The property accessor "'+ key +'" must be a string.';
 
     if (_visualVars.indexOf(visualVar) == -1)
       throw 'Unknown style';
-
-    var key = fn.toString();
 
     if (this.idx[key] === undefined)
       return;
@@ -360,11 +370,12 @@
     Object.keys(this.idx[key]).forEach(function (val) {
       var o = self.idx[key][val];
       o.items.forEach(function (item) {
-        if (item !== undefined &&
-            o.orig_styles !== undefined &&
-            o.orig_styles[visualVar]) {
+        if (item !== undefined) {
           
-          item[visualVar] = o.orig_styles[visualVar];
+          if (o.orig_styles === undefined)
+            delete item[visualVar];
+          else
+            item[visualVar] = o.orig_styles[visualVar];
         }
       });
       delete o.orig_styles[visualVar];
@@ -402,7 +413,7 @@
    * @param  {?object}  specs The specs object contains `palette` and `styles`.
    * @return {Designer}       The instance.
    */
-  Designer.prototype.setSpecs = function(specs) {
+  Designer.prototype.extendSpecs = function(specs) {
     _mappings = sigma.utils.extend((specs || {}).styles || _mappings, settings);
     _palette = (specs || {}).palette || _palette;
 
@@ -418,10 +429,10 @@
    *
    * @return {Designer}  The instance.
    */
-  Designer.prototype.getSpecs = function() {
+  Designer.prototype.specs = function() {
     return {
-      styles: deepCopy(_mappings),
-      palette: deepCopy(_palette)
+      styles: _mappings,
+      palette: _palette
     };
   };
 
@@ -429,22 +440,31 @@
    * This method is used to get the styles bound to each node of the graph for
    * a specified property.
    *
-   * @param  {function} fn The property accessor.
-   * @return {object}      The styles.
+   * @param  {string} key The property accessor. Use a dot notation like 
+   *                      'data.myProperty'.
+   * @return {object}     The styles.
    */
-  Designer.prototype.nodes = function(fn) {
-    return _visionOnNodes.get(fn);
+  Designer.prototype.nodes = function(key) {
+    return _visionOnNodes.get(key);
   };
 
   /**
    * This method is used to get the styles bound to each edge of the graph for
    * a specified property.
    *
-   * @param  {function} fn The property accessor.
+   * @param  {string} key The property accessor. Use a dot notation like 
+   *                      'data.myProperty'.
    * @return {object}      The styles.
    */
-  Designer.prototype.edges = function(fn) {
-    return _visionOnEdges.get(fn);
+  Designer.prototype.edges = function(key) {
+    return _visionOnEdges.get(key);
+  };
+
+  Designer.prototype.inspect = function() {
+    return {
+      nodes: deepCopy(_visionOnNodes),
+      edges: deepCopy(_visionOnEdges)
+    };
   };
 
   /**
@@ -481,10 +501,11 @@
     if (!visualVar) {
       // apply all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        v.applyStyle(visuVar, m[visuVar].by);
+        if (m[visuVar])
+          v.applyStyle(visuVar, m[visuVar].by);
       });
     }
-    else {
+    else if (m[visualVar]) {
       // apply the style of the specified visual variable:
       v.applyStyle(visualVar, m[visualVar].by);
     }
@@ -543,7 +564,7 @@
         v.undoStyle(visuVar, m[visuVar].by);
       });
     }
-    else {
+    else if (m[visualVar]) {
       // undo the style of the specified visual variable:
       v.undoStyle(visualVar, m[visualVar].by);
     }

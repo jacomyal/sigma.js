@@ -197,17 +197,25 @@ designer.makeAll(); // does nothing
 Set a new palette and new styles:
 
 ```js
-designer.setSpecs({
+designer.extendSpecs({
   styles: myStyles,
   palette: myPalette
 });
+```
+
+## Remove a style from the specs
+For instance, removes the node size:
+
+```js
+designer.specs().styles.nodes.size = null;
+designer.deprecate();
 ```
 
 ## Export styles and palette
 Dump the palette and styles, to save and restore them later:
 
 ```js
-var specs = designer.getSpecs();
+var specs = designer.specs();
 
 designer.disown();
 designer.setSpecs({
