@@ -402,7 +402,7 @@
    * @param  {?object}  specs The specs object contains `palette` and `styles`.
    * @return {Designer}       The instance.
    */
-  Designer.prototype.newSpecs = function(specs) {
+  Designer.prototype.setSpecs = function(specs) {
     _mappings = sigma.utils.extend((specs || {}).styles || _mappings, settings);
     _palette = (specs || {}).palette || _palette;
 
@@ -418,7 +418,7 @@
    *
    * @return {Designer}  The instance.
    */
-  Designer.prototype.giveSpecs = function() {
+  Designer.prototype.getSpecs = function() {
     return {
       styles: deepCopy(_mappings),
       palette: deepCopy(_palette)
