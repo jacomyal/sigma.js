@@ -54,27 +54,27 @@ var myPalette = {
 var myStyles = {
   nodes: {
     label: {
-      by: function(node) { return node.id; },
+      by: 'id',
       format: function(value) { return '#' + value; }
     },
     size: {
-      by: function(node) { return node.data.quantity; },
+      by: 'data.quantity',
       // min/max used if sigma settings {autoRescale: false}
       min: 1,
       max: 10
     },
     color: {
-      by: function(node) { return node.data.quality; },
+      by: 'data.quality',
       scheme: function(palette) { return palette.aQualitativeScheme; }
     },
   },
   edges: {
     color: {
-      by: function(edge) { return edge.data.quantity; },
+      by: 'data.quantity',
       scheme: function(palette) { return palette.sequentialGreen[7]; }
     },
     size: {
-      by: function(edge) { return edge.data.quantity; },
+      by: 'data.quantity',
       // min/max used if sigma settings {autoRescale: false}
       min: 0.5,
       max: 4
