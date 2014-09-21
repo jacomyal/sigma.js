@@ -109,8 +109,10 @@ var myPalette = {
     'B': '#beaed4',
     'C': '#fdc086'
   },
-  sequentialGreen: {
-    7: ["#edf8fb","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"]
+  colorbrewer: {
+    sequentialGreen: {
+      7: ["#edf8fb","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"]
+    }
   }
 };
 
@@ -132,14 +134,14 @@ var myStyles = {
     },
     color: {
       by: 'data.quality',
-      scheme: function(palette) { return palette.aQualitativeScheme; }
+      scheme: 'aQualitativeScheme'
     },
   },
   edges: {
     color: {
       by: 'data.quantity',
-      //scheme: function(palette) { return palette.Reds[7]; }
-      scheme: function(palette) { return palette.sequentialGreen[7]; }
+      scheme: 'colorbrewer.sequentialGreen',
+      bins: 7
     },
     size: {
       by: 'data.quantity',
