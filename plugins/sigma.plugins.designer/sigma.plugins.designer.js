@@ -243,7 +243,6 @@
               };
             }
             else {
-              // quantitative data:
               self.idx[key][val].styles.color = function() {
                 if (scheme(_palette) === undefined)
                   throw 'The color scheme must be qualitative, i.e. a dict of value => color';
@@ -383,8 +382,8 @@
    */
   function Designer(s, specs) {
     _s = s;
-    _mappings = sigma.utils.extend(specs.styles || {}, settings);
-    _palette = specs.palette || {};
+    _mappings = sigma.utils.extend((specs || {}).styles || {}, settings);
+    _palette = (specs || {}).palette || {};
 
     _visionOnNodes = new Vision(function(s) {
       return s.graph.nodes();
@@ -400,12 +399,12 @@
    * between visual variables and data properties on nodes and edges. It will
    * deprecate existing styles.
    *
-   * @param  {object}   specs The specs object contains `palette` and `styles`.
+   * @param  {?object}  specs The specs object contains `palette` and `styles`.
    * @return {Designer}       The instance.
    */
   Designer.prototype.newSpecs = function(specs) {
-    _mappings = sigma.utils.extend(specs.styles || _mappings, settings);
-    _palette = specs.palette || _palette;
+    _mappings = sigma.utils.extend((specs || {}).styles || _mappings, settings);
+    _palette = (specs || {}).palette || _palette;
 
     _visionOnNodes.mappings = _mappings.nodes;
     _visionOnEdges.mappings = _mappings.edges;
