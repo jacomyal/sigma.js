@@ -118,7 +118,7 @@ var myPalette = {
 // See http://bl.ocks.org/mbostock/5577023 for a comprehensive guide
 // of the colorbrewer palette available in sigma.plugins.artist.
 
-var styles = {
+var myStyles = {
   nodes: {
     label: {
       by: function(node) { return node.id; },
@@ -151,10 +151,13 @@ var styles = {
 };
 
 // Instanciate the designer:
-var theDesigner = sigma.plugins.designer(s, styles, myPalette);
+var designer = sigma.plugins.designer(s, {
+  styles: myStyles,
+  palette: myPalette
+});
 
 // Play:
-theDesigner
+designer
   .makeAll()
   //.deprecate()
   //.make('nodes')
@@ -168,10 +171,10 @@ theDesigner
 ;
 
 // Dump palette and styles:
-//console.log(theDesigner.talk());
+//console.log(designer.giveSpecs());
 
 /*console.log('styles bound to each node for the property "' + styles.nodes.color.by + '"',
-  theDesigner.nodes(styles.nodes.color.by)
+  designer.nodes(styles.nodes.color.by)
 );*/
 
 // Bye bye black bird:

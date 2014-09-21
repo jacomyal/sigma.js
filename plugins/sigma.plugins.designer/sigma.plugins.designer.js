@@ -373,14 +373,15 @@
   /**
    * Designer Object
    * ------------------
-   * @param  {sigma}   s       The related sigma instance.
-   * @param  {object}  styles  The styles of the designer.
-   * @param  {?object} palette The color palette.
+   * @param  {sigma}   s      The related sigma instance.
+   * @param  {?object} specs  The specs object contains `palette` and `styles`.
+   *                          Styles are mappings between visual variables and
+   *                          data properties on nodes and edges.
    */
-  function Designer(s, styles, palette) {
+  function Designer(s, specs) {
     _s = s;
-    _mappings = sigma.utils.extend(styles || {}, settings);
-    _palette = palette || {};
+    _mappings = sigma.utils.extend(specs.styles || {}, settings);
+    _palette = specs.palette || {};
 
     _visionOnNodes = new Vision(function(s) {
       return s.graph.nodes();
@@ -392,32 +393,19 @@
   };
 
   /**
-   * This method will import the styles of the designer. Styles are mappings
+   * This method will configure the palette and styles. Styles are mappings
    * between visual variables and data properties on nodes and edges. It will
    * deprecate existing styles.
    *
-   * @param  {object} styles The styles of the designer.
-   * @return {Designer}        The instance.
+   * @param  {object}   specs The specs object contains `palette` and `styles`.
+   * @return {Designer}       The instance.
    */
-  Designer.prototype.learnStyles = function(styles) {
-    _mappings = sigma.utils.extend(styles || {}, settings);
+  Designer.prototype.newSpecs = function(specs) {
+    _mappings = sigma.utils.extend(specs.styles || _mappings, settings);
+    _palette = specs.palette || _palette;
 
     _visionOnNodes.mappings = _mappings.nodes;
     _visionOnEdges.mappings = _mappings.edges;
-
-    this.deprecate();
-    return this;
-  };
-
-  /**
-   * This method will import the color palette of the designer. It will deprecate
-   * existing styles.
-   *
-   * @param  {object} palette The color palette of the designer.
-   * @return {Designer}         The instance.
-   */
-  Designer.prototype.learnColors = function(palette) {
-    _palette = palette || {};
 
     this.deprecate();
     return this;
@@ -428,7 +416,7 @@
    *
    * @return {Designer}  The instance.
    */
-  Designer.prototype.talk = function() {
+  Designer.prototype.giveSpecs = function() {
     return {
       styles: deepCopy(_mappings),
       palette: deepCopy(_palette)
