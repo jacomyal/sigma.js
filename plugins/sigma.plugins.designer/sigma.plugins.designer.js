@@ -141,15 +141,17 @@
       throw 'The property accessor "'+ key +'" must be a string.';
 
     var val,
-        fn,
+        byFn,
+        schemeFn,
         isSequential = true;
     
-    fn = function(item, key) { return strToObjectRef(item, key); };
+    byFn = function(item, key) { return strToObjectRef(item, key); };
+    schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
 
     // Index the collection:
     this.idx[key] = {};
     this.dataset(_s).forEach(function (item) {
-      val = fn(item, key);
+      val = byFn(item, key);
       if (val !== undefined) {
         if (self.idx[key][val] === undefined) {
           self.idx[key][val] = {
@@ -189,6 +191,7 @@
         colorHist,
         sizeHist,
         scheme,
+        bins,
         visualVars;
 
     // Visual variables mapped to the specified property:
@@ -206,11 +209,13 @@
         case 'color':
           scheme = self.mappings.color.scheme;
 
-          if (typeof scheme !== 'function')
-            throw '"' + visualVar + '.scheme" must be a function';
+          if (typeof scheme !== 'string')
+            throw '"' + visualVar + '.scheme" must be a string';
 
-          if (isSequential)
-            colorHist = histogram(Object.keys(self.idx[key]), 7);
+          if (isSequential) {
+            bins = self.mappings.color.bins;
+            colorHist = histogram(Object.keys(self.idx[key]), bins);
+          }
           break;
 
         case 'label':
@@ -253,22 +258,22 @@
             if (isSequential) {
               self.idx[key][val].styles.color = function() {
                 var bin = colorHist[val];
-                return scheme(_palette)[bin];
+                return schemeFn(_palette, scheme)[bins][bin];
               };
             }
             else {
               self.idx[key][val].styles.color = function() {
-                if (scheme(_palette) === undefined)
+                if (schemeFn(_palette, scheme) === undefined)
                   throw 'The color scheme must be qualitative, i.e. a dict of value => color';
                 
-                return scheme(_palette)[val];
+                return schemeFn(_palette, scheme)[val];
               };
             }
             break;
 
           case 'label':
             self.idx[key][val].styles.label = function(item) {
-              return format(fn(item, key));
+              return format(byFn(item, key));
             };
             break;
 
