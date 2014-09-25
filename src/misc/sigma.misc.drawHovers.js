@@ -16,18 +16,18 @@
    */
   sigma.misc.drawHovers = function(prefix) {
     var self = this,
-      hoveredNodes = [];
+        hoveredNodes = {};
 
     this.bind('overNode', function(event) {
-      hoveredNodes.push(event.data.node);
-      draw();
+      var node = event.data.node;
+      if (!node.hidden) {
+        hoveredNodes[node.id] = node;
+        draw();
+      }
     });
 
     this.bind('outNode', function(event) {
-      var indexCheck = hoveredNodes.map(function(n) {
-        return n;
-      }).indexOf(event.data.node);
-      hoveredNodes.splice(indexCheck, 1);
+      delete hoveredNodes[event.data.node.id];
       draw();
     });
 
@@ -40,47 +40,39 @@
       self.contexts.hover.canvas.width = self.contexts.hover.canvas.width;
 
       var k,
-        renderers = sigma.canvas.hovers,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+          hoveredNode,
+          renderers = sigma.canvas.hovers,
+          embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
 
       // Single hover
       if (
         embedSettings('enableHovering') &&
         embedSettings('singleHover') &&
-        hoveredNodes.length
+        Object.keys(hoveredNodes).length
       ) {
-        if (! hoveredNodes[hoveredNodes.length - 1].hidden) {
-          (
-            renderers[hoveredNodes[hoveredNodes.length - 1].type] ||
-            renderers.def
-          )(
-            hoveredNodes[hoveredNodes.length - 1],
-            self.contexts.hover,
-            embedSettings
-          );
-        }
+        hoveredNode = hoveredNodes[Object.keys(hoveredNodes)[0]];
+        (renderers[hoveredNode.type] || renderers.def)(
+          hoveredNode,
+          self.contexts.hover,
+          embedSettings
+        );
       }
 
       // Multiple hover
       if (
         embedSettings('enableHovering') &&
-        !embedSettings('singleHover') &&
-        hoveredNodes.length
+        !embedSettings('singleHover')
       ) {
-        for (var i = 0; i < hoveredNodes.length; i++) {
-          if (! hoveredNodes[i].hidden) {
-            (renderers[hoveredNodes[i].type] || renderers.def)(
-              hoveredNodes[i],
-              self.contexts.hover,
-              embedSettings
-            );
-          }
+        for (k in hoveredNodes) {
+          (renderers[hoveredNodes[k].type] || renderers.def)(
+            hoveredNodes[k],
+            self.contexts.hover,
+            embedSettings
+          );
         }
       }
-
-
     }
   };
 }).call(this);
