@@ -13,6 +13,16 @@ This plugin makes downloading an image version of the graph rendered with canvas
 myRenderer.snapshot();
 ```
 
+*Complex usage*
+
+```js
+myRenderer.snapshot({
+  format: 'jpg',
+  background: 'white',
+  labels: false
+});
+```
+
 *Parameters*
 
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
