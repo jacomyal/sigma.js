@@ -270,8 +270,7 @@
    * @return {number}   The width of the event's target.
    */
   sigma.utils.getWidth = function(e) {
-    var w = (e.target.ownerSVGElement === undefined ||
-             e.target.ownerSVGElement === null) ?
+    var w = (!e.target.ownerSVGElement) ?
               e.target.width :
               e.target.ownerSVGElement.width;
 
@@ -288,8 +287,7 @@
    * @return {number}   The height of the event's target.
    */
   sigma.utils.getHeight = function(e) {
-    var h = (e.target.ownerSVGElement === undefined ||
-             e.target.ownerSVGElement === null) ?
+    var h = (!e.target.ownerSVGElement) ?
               e.target.height :
               e.target.ownerSVGElement.height;
 
