@@ -15,36 +15,36 @@ test('Constructor polymorphism', function() {
   };
 
   s = new sigma();
-  equal(Object.keys(s.renderers).length, 0, '"new sigma()" instanciate sigma without any renderer.');
+  equal(Object.keys(s.renderers).length, 0, '"new sigma()" instantiate sigma without any renderer.');
 
   s = new sigma('abc');
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma("abc")" instanciate the default renderer in the div #abc.');
+  }, '"new sigma("abc")" instantiate the default renderer in the div #abc.');
 
   s = new sigma(['abc']);
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma(["abc"])" instanciate the default renderer in the div #abc.');
+  }, '"new sigma(["abc"])" instantiate the default renderer in the div #abc.');
 
   s = new sigma(document.getElementById('abc'));
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma(document.getElementById("abc"))" instanciate the default renderer in the div #abc.');
+  }, '"new sigma(document.getElementById("abc"))" instantiate the default renderer in the div #abc.');
 
   s = new sigma({
     container: 'abc'
   });
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma({ container: "abc" })" instanciate the default renderer in the div #abc.');
+  }, '"new sigma({ container: "abc" })" instantiate the default renderer in the div #abc.');
 
   s = new sigma({
     container: document.getElementById('abc')
   });
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma({ container: document.getElementById("abc") })" instanciate the default renderer in the div #abc.');
+  }, '"new sigma({ container: document.getElementById("abc") })" instantiate the default renderer in the div #abc.');
 
   s = new sigma(['abc', 'abc']);
   deepEqual([
@@ -53,7 +53,7 @@ test('Constructor polymorphism', function() {
   ], [
     { container: dom },
     { container: dom }
-  ], '"new sigma(["abc", "abc"])" instanciate the default renderer in the div #abc twice.');
+  ], '"new sigma(["abc", "abc"])" instantiate the default renderer in the div #abc twice.');
 
   s = new sigma({
     renderers: [{
@@ -62,7 +62,7 @@ test('Constructor polymorphism', function() {
   });
   deepEqual(s.renderers[0].options, {
     container: dom
-  }, '"new sigma({ renderers: [{ container: document.getElementById("abc") }] })" instanciate the default renderer in the div #abc.');
+  }, '"new sigma({ renderers: [{ container: document.getElementById("abc") }] })" instantiate the default renderer in the div #abc.');
 
   // Restore previous state:
   sigma.renderers.def = tmp
@@ -70,7 +70,7 @@ test('Constructor polymorphism', function() {
 
   throws(function() {
     s = new sigma('abcd');
-  }, /Container not found./, 'Trying to instanciate sigma with a string that is not the ID of an HTMLElement will throw an error.');
+  }, /Container not found./, 'Trying to instantiate sigma with a string that is not the ID of an HTMLElement will throw an error.');
 });
 
 test('Public methods', function() {

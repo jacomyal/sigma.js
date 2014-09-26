@@ -283,7 +283,13 @@
 
               _self.dispatchEvent('mousemove', {
                 x: pos0.x - sigma.utils.getWidth(e) / 2,
-                y: pos0.y - sigma.utils.getHeight(e) / 2
+                y: pos0.y - sigma.utils.getHeight(e) / 2,
+                clientX: e.clientX,
+                clientY: e.clientY,
+                ctrlKey: e.ctrlKey,
+                metaKey: e.metaKey,
+                altKey: e.altKey,
+                shiftKey: e.shiftKey
               });
 
               _self.dispatchEvent('drag');
@@ -385,7 +391,13 @@
         pos = position(e.touches[0]);
         _self.dispatchEvent('doubleclick', {
           x: pos.x - sigma.utils.getWidth(e) / 2,
-          y: pos.y - sigma.utils.getHeight(e) / 2
+          y: pos.y - sigma.utils.getHeight(e) / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
         if (_settings('doubleClickEnabled')) {

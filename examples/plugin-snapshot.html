@@ -39,6 +39,7 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.snapshot/sigma.renderers.snapshot.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -53,9 +54,12 @@
 </div>
 <script>
 /**
- * This example is a copy of "basic.html", but with event bindings after.
- * Open your browser's console to see the "click", "overNode" and
- * "outNode" events logged.
+ * This is a basic example on how to instantiate sigma. A random graph is
+ * generated and stored in the "graph" variable, and then sigma is instantiated
+ * directly with the graph.
+ *
+ * The simple instance of sigma is enough to make it render the graph on the on
+ * the screen, since the graph is given directly to the constructor.
  */
 var i,
     s,
@@ -66,6 +70,7 @@ var i,
       edges: []
     };
 
+// Generate a random graph:
 for (i = 0; i < N; i++)
   g.nodes.push({
     id: 'n' + i,
@@ -85,22 +90,15 @@ for (i = 0; i < E; i++)
     color: '#ccc'
   });
 
+// sigma.renderers.def = sigma.renderers.canvas;
+
+// Instantiate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container',
-  settings: {
-    doubleClickEnabled: false
-  }
+  container: 'graph-container'
 });
 
-// Bind the events:
-s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
-  console.log(e.type, e.data.node.label, e.data.captor);
-});
-s.bind('clickStage', function(e) {
-  console.log(e.type, e.data.captor);
-});
-s.bind('doubleClickStage rightClickStage', function(e) {
-  console.log(e.type, e.data.captor);
-});
+setTimeout(function() {
+  console.log(s.renderers[0].snapshot({format: 'png', background: 'white', filename: 'my-graph.png', labels: false}));
+}, 1000);
 </script>

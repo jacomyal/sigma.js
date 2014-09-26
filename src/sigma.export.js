@@ -4,6 +4,15 @@ var sigma = this.sigma,
 
 sigma.conrad = conrad;
 
+// Dirty polyfills to permit sigma usage in node
+if (HTMLElement === undefined)
+  var HTMLElement = function() {};
+
+if (window === undefined)
+  var window = {
+    addEventListener: function() {}
+  };
+
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports)
     exports = module.exports = sigma;

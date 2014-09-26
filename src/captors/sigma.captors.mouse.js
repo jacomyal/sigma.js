@@ -95,7 +95,13 @@
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('mousemove', {
           x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2
+          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
       if (_settings('mouseEnabled') && _isMouseDown) {
@@ -183,7 +189,13 @@
 
         _self.dispatchEvent('mouseup', {
           x: x - sigma.utils.getWidth(e) / 2,
-          y: y - sigma.utils.getHeight(e) / 2
+          y: y - sigma.utils.getHeight(e) / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
         // Update _isMoving flag:
@@ -199,8 +211,6 @@
      */
     function _downHandler(e) {
       if (_settings('mouseEnabled')) {
-        _isMouseDown = true;
-
         _startCameraX = _camera.x;
         _startCameraY = _camera.y;
 
@@ -210,10 +220,40 @@
         _startMouseX = sigma.utils.getX(e);
         _startMouseY = sigma.utils.getY(e);
 
-        _self.dispatchEvent('mousedown', {
-          x: _startMouseX - sigma.utils.getWidth(e) / 2,
-          y: _startMouseY - sigma.utils.getHeight(e) / 2
-        });
+        switch (e.which) {
+          case 2:
+            // Middle mouse button pressed
+            // Do nothing.
+            break;
+          case 3:
+            // Right mouse button pressed
+            _self.dispatchEvent('rightclick', {
+              x: _startMouseX - sigma.utils.getWidth(e) / 2,
+              y: _startMouseY - sigma.utils.getHeight(e) / 2,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              ctrlKey: e.ctrlKey,
+              metaKey: e.metaKey,
+              altKey: e.altKey,
+              shiftKey: e.shiftKey
+            });
+            break;
+          // case 1:
+          default:
+            // Left mouse button pressed
+            _isMouseDown = true;
+
+            _self.dispatchEvent('mousedown', {
+              x: _startMouseX - sigma.utils.getWidth(e) / 2,
+              y: _startMouseY - sigma.utils.getHeight(e) / 2,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              ctrlKey: e.ctrlKey,
+              metaKey: e.metaKey,
+              altKey: e.altKey,
+              shiftKey: e.shiftKey
+            });
+        }
       }
     }
 
@@ -238,7 +278,13 @@
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('click', {
           x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2
+          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
       if (e.preventDefault)
@@ -266,7 +312,13 @@
 
         _self.dispatchEvent('doubleclick', {
           x: _startMouseX - sigma.utils.getWidth(e) / 2,
-          y: _startMouseY - sigma.utils.getHeight(e) / 2
+          y: _startMouseY - sigma.utils.getHeight(e) / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
         if (_settings('doubleClickEnabled')) {
