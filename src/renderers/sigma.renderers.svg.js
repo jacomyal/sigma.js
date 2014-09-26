@@ -57,7 +57,7 @@
         settings;
 
     // Is the renderer meant to be freestyle?
-    this.settings('freestyle', !!this.options.freestyle);
+    this.settings('freeStyle', !!this.options.freeStyle);
 
     // SVG xmlns
     this.settings('xmlns', 'http://www.w3.org/2000/svg');
