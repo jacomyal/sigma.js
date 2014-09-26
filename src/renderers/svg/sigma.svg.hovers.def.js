@@ -8,13 +8,20 @@
   sigma.utils.pkg('sigma.svg.hovers');
 
   /**
-   * This hover renderer will basically display the label with a background.
-   *
-   * @param  {object}                   node     The node object.
-   * @param  {CanvasRenderingContext2D} context  The SVG context.
-   * @param  {configurable}             settings The settings function.
+   * The default hover renderer.
    */
   sigma.svg.hovers.def = {
+
+    /**
+     * SVG Element creation.
+     *
+     * @param  {object}           node               The node object.
+     * @param  {CanvasElement}    measurementCanvas  A fake canvas handled by
+     *                            the svg to perform some measurements and
+     *                            passed by the renderer.
+     * @param  {DOMElement}       nodeCircle         The node DOM Element.
+     * @param  {configurable}     settings           The settings function.
+     */
     create: function(node, nodeCircle, measurementCanvas, settings) {
 
       // Defining visual properties

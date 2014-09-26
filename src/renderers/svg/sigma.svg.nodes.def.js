@@ -3,17 +3,17 @@
 
   sigma.utils.pkg('sigma.svg.nodes');
 
-  // TODO: udate documentation for subrendererers + maybe externalize important
-  // things
-
   /**
    * The default node renderer. It renders the node as a simple disc.
-   *
-   * @param  {object}                   node     The node object.
-   * @param  {DOMElement}               context  The SVG context.
-   * @param  {configurable}             settings The settings function.
    */
   sigma.svg.nodes.def = {
+
+    /**
+     * SVG Element creation.
+     *
+     * @param  {object}                   node     The node object.
+     * @param  {configurable}             settings The settings function.
+     */
     create: function(node, settings) {
       var prefix = settings('prefix') || '',
           circle = document.createElementNS(settings('xmlns'), 'circle');
@@ -27,6 +27,14 @@
       // Returning the DOM Element
       return circle;
     },
+
+    /**
+     * SVG Element update.
+     *
+     * @param  {object}                   node     The node object.
+     * @param  {DOMElement}               circle   The node DOM element.
+     * @param  {configurable}             settings The settings function.
+     */
     update: function(node, circle, settings) {
       var prefix = settings('prefix') || '';
 
@@ -46,6 +54,12 @@
 
       return this;
     },
+
+    /**
+     * SVG Element hide.
+     *
+     * @param  {DOMElement}               circle   The circle DOM element.
+     */
     hide: function(circle) {
       circle.style.display = 'none';
       return this;

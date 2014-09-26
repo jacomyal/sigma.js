@@ -7,7 +7,17 @@
   // Initialize packages:
   sigma.utils.pkg('sigma.svg.labels');
 
+  /**
+   * The default label renderer. It renders the label as a simple text.
+   */
   sigma.svg.labels.def = {
+
+    /**
+     * SVG Element creation.
+     *
+     * @param  {object}                   node       The node object.
+     * @param  {configurable}             settings   The settings function.
+     */
     create: function(node, settings) {
       var prefix = settings('prefix') || '',
           size = node[prefix + 'size'],
@@ -31,6 +41,14 @@
 
       return text;
     },
+
+    /**
+     * SVG Element update.
+     *
+     * @param  {object}                   node     The node object.
+     * @param  {DOMElement}               text     The label DOM element.
+     * @param  {configurable}             settings The settings function.
+     */
     update: function(node, text, settings) {
       var prefix = settings('prefix') || '',
           size = node[prefix + 'size'];
@@ -57,6 +75,12 @@
 
       return this;
     },
+
+    /**
+     * SVG Element hide.
+     *
+     * @param  {DOMElement}               text   The text DOM element.
+     */
     hide: function(text) {
       text.style.display = 'none';
       return this;

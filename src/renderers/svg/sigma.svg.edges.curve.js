@@ -4,13 +4,18 @@
   sigma.utils.pkg('sigma.svg.edges');
 
   /**
-   * The default edge renderer. It renders the edge as a simple line.
-   *
-   * @param  {object}                   node     The node object.
-   * @param  {DOMElement}               context  The SVG context.
-   * @param  {configurable}             settings The settings function.
+   * The curve edge renderer. It renders the node as a bezier curve.
    */
   sigma.svg.edges.curve = {
+
+    /**
+     * SVG Element creation.
+     *
+     * @param  {object}                   edge       The edge object.
+     * @param  {object}                   source     The source node object.
+     * @param  {object}                   target     The target node object.
+     * @param  {configurable}             settings   The settings function.
+     */
     create: function(edge, source, target, settings) {
       var color = edge.color,
           prefix = settings('prefix') || '',
@@ -40,6 +45,16 @@
 
       return path;
     },
+
+    /**
+     * SVG Element update.
+     *
+     * @param  {object}                   edge       The edge object.
+     * @param  {DOMElement}               line       The line DOM Element.
+     * @param  {object}                   source     The source node object.
+     * @param  {object}                   target     The target node object.
+     * @param  {configurable}             settings   The settings function.
+     */
     update: function(edge, path, source, target, settings) {
       var prefix = settings('prefix') || '';
 
@@ -65,6 +80,12 @@
 
       return this;
     },
+
+    /**
+     * SVG Element hide.
+     *
+     * @param  {DOMElement}               line   The line DOM element.
+     */
     hide: function(path) {
       path.style.display = 'none';
       return this;
