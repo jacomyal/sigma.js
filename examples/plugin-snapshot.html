@@ -31,8 +31,8 @@
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
-<script src="../plugins/sigma.renderers.snapshot/sigma.renderers.snapshot.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.snapshot/sigma.renderers.snapshot.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -92,6 +92,6 @@ s = new sigma({
 });
 
 setTimeout(function() {
-  s.renderers[0].snapshot({format: 'png', background: 'white', filename: 'my-graph.png', labels: false});
+  console.log(s.renderers[0].snapshot({format: 'png', background: 'white', filename: 'my-graph.png', labels: false}));
 }, 1000);
 </script>

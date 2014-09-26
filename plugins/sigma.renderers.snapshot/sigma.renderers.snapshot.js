@@ -4,7 +4,7 @@
    * Sigma Renderer Snapshot Utility
    * ================================
    *
-   * The aim of this plugin is to enable users to download a static image
+   * The aim of this plugin is to enable users to retrieve a static image
    * of the graph being rendered.
    *
    * Author: Guillaume Plique (Yomguithereal)
@@ -99,16 +99,21 @@
       doneContexts.push(context);
     });
 
-    download(
-      merged.toDataURL(TYPES[params.format || 'png']),
-      params.format || 'png',
-      params.filename
-    );
+    var dataUrl = merged.toDataURL(TYPES[params.format || 'png']);
+
+    if (params.download)
+      download(
+        dataUrl,
+        params.format || 'png',
+        params.filename
+      );
 
     // Cleaning
     delete mergedContext;
     delete merged;
     delete doneContexts;
+
+    return dataUrl;
   }
 
   // Extending canvas and webl renderers
