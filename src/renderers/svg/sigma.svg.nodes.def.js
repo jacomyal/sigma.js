@@ -35,8 +35,11 @@
       circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
       circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
       circle.setAttributeNS(null, 'r', node[prefix + 'size']);
-      circle.setAttributeNS(
-        null, 'fill', node.color || settings('defaultNodeColor'));
+
+      // Updating only if not freestyle
+      if (!settings('freestyle'))
+        circle.setAttributeNS(
+          null, 'fill', node.color || settings('defaultNodeColor'));
 
       // Showing
       circle.style.display = '';

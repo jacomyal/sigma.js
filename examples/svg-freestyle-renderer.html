@@ -39,6 +39,10 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.plugins.neighborhoods/sigma.plugins.neighborhoods.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="lib/jquery-2.1.1.min.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -47,18 +51,31 @@
       left: 0;
       right: 0;
       position: absolute;
+      background-color: #455660;
+    }
+    .sigma-edge {
+      stroke: #14191C;
+    }
+    .sigma-node {
+      fill: green;
+      stroke: #14191C;
+      stroke-width: 2px;
+    }
+    .sigma-node:hover {
+      fill: blue;
+    }
+    .muted {
+      fill-opacity: 0.1;
+      stroke-opacity: 0.1;
     }
   </style>
   <div id="graph-container"></div>
 </div>
 <script>
 /**
- * This is a basic example on how to instantiate sigma. A random graph is
- * generated and stored in the "graph" variable, and then sigma is instantiated
- * directly with the graph.
- *
- * The simple instance of sigma is enough to make it render the graph on the on
- * the screen, since the graph is given directly to the constructor.
+ * This is a basic example of how one could spawn a freestyle svg renderer
+ * to achieve his/her goal through css and jQuery to display fancy graphs
+ * but somewhat less performant.
  */
 var i,
     s,
@@ -68,7 +85,7 @@ var i,
       nodes: [],
       edges: []
     };
-sigma.renderers.def = sigma.renderers.svg;
+
 // Generate a random graph:
 for (i = 0; i < N; i++)
   g.nodes.push({
@@ -92,6 +109,51 @@ for (i = 0; i < E; i++)
 // Instantiate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container'
+  settings: {
+    enableHovering: false
+  }
+});
+
+s.addRenderer({
+  id: 'main',
+  type: 'svg',
+  container: document.getElementById('graph-container'),
+  freestyle: true
+});
+
+s.refresh();
+
+// Binding silly interactions
+function mute(node) {
+  if (!~node.getAttribute('class').search(/muted/))
+    node.setAttributeNS(null, 'class', node.getAttribute('class') + ' muted');
+}
+
+function unmute(node) {
+  node.setAttributeNS(null, 'class', node.getAttribute('class').replace(/(\s|^)muted(\s|$)/g, '$2'));
+}
+
+$('.sigma-node').click(function() {
+
+  // Muting
+  $('.sigma-node, .sigma-edge').each(function() {
+    mute(this);
+  });
+
+  // Unmuting neighbors
+  var neighbors = s.graph.neighborhood($(this).attr('data-node-id'));
+  neighbors.nodes.forEach(function(node) {
+    unmute($('[data-node-id="' + node.id + '"]')[0]);
+  });
+
+  neighbors.edges.forEach(function(edge) {
+    unmute($('[data-edge-id="' + edge.id + '"]')[0]);
+  });
+});
+
+s.bind('clickStage', function() {
+  $('.sigma-node, .sigma-edge').each(function() {
+    unmute(this);
+  });
 });
 </script>
