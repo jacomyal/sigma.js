@@ -312,6 +312,10 @@
         container: o
       };
 
+    // If the container still is a string, we get it by id
+    if (typeof o.container === 'string')
+      o.container = document.getElementById(o.container);
+
     // Reference the new renderer:
     if (!('id' in o)) {
       id = 0;
