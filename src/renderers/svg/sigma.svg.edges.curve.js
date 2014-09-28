@@ -79,16 +79,6 @@
       path.style.display = '';
 
       return this;
-    },
-
-    /**
-     * SVG Element hide.
-     *
-     * @param  {DOMElement}               line   The line DOM element.
-     */
-    hide: function(path) {
-      path.style.display = 'none';
-      return this;
     }
   };
 })();

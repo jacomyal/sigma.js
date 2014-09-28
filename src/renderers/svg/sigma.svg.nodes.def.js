@@ -53,16 +53,6 @@
       circle.style.display = '';
 
       return this;
-    },
-
-    /**
-     * SVG Element hide.
-     *
-     * @param  {DOMElement}               circle   The circle DOM element.
-     */
-    hide: function(circle) {
-      circle.style.display = 'none';
-      return this;
     }
   };
 })();

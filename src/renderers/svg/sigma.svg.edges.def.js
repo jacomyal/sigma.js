@@ -68,16 +68,6 @@
       line.style.display = '';
 
       return this;
-    },
-
-    /**
-     * SVG Element hide.
-     *
-     * @param  {DOMElement}               line   The line DOM element.
-     */
-    hide: function(line) {
-      line.style.display = 'none';
-      return this;
     }
   };
 })();

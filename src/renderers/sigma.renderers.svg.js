@@ -149,9 +149,9 @@
 
     // Hiding everything
     // TODO: find a more sensible way to perform this operation
-    this.hideDOMElements(this.domElements.nodes, sigma.svg.nodes);
-    this.hideDOMElements(this.domElements.edges, sigma.svg.edges);
-    this.hideDOMElements(this.domElements.labels, sigma.svg.labels);
+    this.hideDOMElements(this.domElements.nodes);
+    this.hideDOMElements(this.domElements.edges);
+    this.hideDOMElements(this.domElements.labels);
 
     // Find which nodes are on screen
     this.edgesOnScreen = [];
@@ -319,13 +319,13 @@
    * @param  {object}                 renderer  The renderer to use.
    * @return {sigma.renderers.svg}              Returns the instance itself.
    */
-  sigma.renderers.svg.prototype.hideDOMElements = function(elements, renderer) {
+  sigma.renderers.svg.prototype.hideDOMElements = function(elements) {
     var o,
         i;
 
     for (i in elements) {
       o = elements[i];
-      (renderer[o.type] || renderer.def).hide(o);
+      sigma.svg.utils.hide(o);
     }
 
     return this;

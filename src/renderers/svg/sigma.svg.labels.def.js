@@ -74,16 +74,6 @@
       text.style.display = '';
 
       return this;
-    },
-
-    /**
-     * SVG Element hide.
-     *
-     * @param  {DOMElement}               text   The text DOM element.
-     */
-    hide: function(text) {
-      text.style.display = 'none';
-      return this;
     }
   };
 }).call(this);
