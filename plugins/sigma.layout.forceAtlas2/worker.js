@@ -67,6 +67,16 @@
       return res;
     }
 
+    function __emptyObject(obj) {
+      var k;
+
+      for (k in obj)
+        if (!('hasOwnProperty' in obj) || obj.hasOwnProperty(k))
+          delete obj[k];
+
+      return obj;
+    }
+
     /**
      * Matrices properties accessors
      */
@@ -625,7 +635,7 @@
     }
 
     // On supervisor message
-    self.addEventListener('message', function(e) {
+    var listener = function(e) {
       switch (e.data.action) {
         case 'start':
           init(
@@ -649,9 +659,19 @@
           configure(e.data.config);
           break;
 
+        case 'kill':
+
+          // Deleting context for garbage collection
+          __emptyObject(W);
+          self.removeEventListener('message', listener);
+          break;
+
         default:
       }
-    });
+    };
+
+    // Adding event listener
+    self.addEventListener('message', listener);
   };
 
 
