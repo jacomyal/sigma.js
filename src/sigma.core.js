@@ -598,6 +598,9 @@
   sigma.prototype.kill = function() {
     var k;
 
+    // Dispatching event
+    this.dispatchEvent('kill');
+
     // Kill graph:
     this.graph.kill();
 
