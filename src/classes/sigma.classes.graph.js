@@ -437,7 +437,7 @@
     if (Object(edge) !== edge || arguments.length !== 1)
       throw 'addEdge: Wrong arguments.';
 
-    if (typeof edge.id !== 'string' && typeof node.id !== 'number')
+    if (typeof edge.id !== 'string' && typeof edge.id !== 'number')
       throw 'The edge must have a string or number id.';
 
     if ((typeof edge.source !== 'string' && typeof edge.source !== 'number') ||
