@@ -105,7 +105,7 @@
       if ((i % W.ppn) !== 0)
         throw 'np: non correct (' + i + ').';
       if (i !== parseInt(i))
-        throw '_np: non int.';
+        throw 'np: non int.';
 
       if (p in nodeProperties)
         return i + nodeProperties[p];
@@ -135,6 +135,7 @@
         throw 'NaN alert!';
     }
 
+
     /**
      * Algorithm initialization
      */
@@ -159,7 +160,7 @@
     function configure(o) {
 
       // OVERRIDE: we disable barnesHut by default until coded
-      o.barnesHutOptimize = false;
+      // o.barnesHutOptimize = false;
       W.settings = extend(o, W.settings);
     }
 
@@ -169,17 +170,19 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var a, i, j, l, n, n1, n2, q, e, w, g;
+      var a, i, j, l, r, n, n1, n2, q, e, w, g, k, m;
 
-      var barnesHutNodes = [],
-          rootRegion,
+      var barnesHutMatrix,
           outboundAttCompensation,
           coefficient,
           xDist,
           yDist,
           ewc,
+          mass,
           distance,
-          factor;
+          size,
+          factor,
+          nodes;
 
 
       // 1) Initializing layout data
@@ -206,58 +209,93 @@
 
       // 1.bis) Barnes-Hut computation
       //------------------------------
+
+      // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
+        var parent,
+            massCenterX,
+            massCenterY;
 
-        // Necessary variables
-        // UInt16 should be enough, if not, switch to UInt32
-        var quadNb = Math.pow(2, 2 * W.settings.barnesHutDepthLimit),
-            quadRowNb = Math.pow(2, W.settings.barnesHutDepthLimit),
-            quads = new UInt16Array(quadNb),
-            quadsProperties = new Float32Array(quadNb * W.ppq),
-            quadsSteps = new UInt16Array(quadNb),
-            quadsAcc = new UInt16Array(quadNb),
-            nodesQuads = new UInt16Array(W.nodesLength),
-            quadsNodes = new UInt16Array(W.nodesLength),
-            maxX = 0,
-            maxY = 0,
-            minX = 0,
-            minY = 0,
-            xIndex,
-            yIndex;
+        // Setting up
+        barnesHutMatrix = [];
 
-        // Retrieving max values
-        // OPTIMIZE: this could be computed on the n loop preceding this one
-        // but at the cost of doing it even when Barnes-Hut is disabled
+        // Initial nodes holder
+        nodes = [];
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          maxX = Math.max(maxX, W.nodeMatrix[np(n, 'x')]);
-          minX = Math.min(minX, W.nodeMatrix[np(n, 'x')]);
-          maxY = Math.max(maxY, W.nodeMatrix[np(n, 'y')]);
-          minY = Math.min(minY, W.nodeMatrix[np(n, 'y')]);
+          nodes.push(n);
         }
 
-        // Adding epsilon to max values
-        maxX += 0.0001 * (maxX - minX);
-        maxY += 0.0001 * (maxY - minY);
+        // Max length = (4^n+1 - 1) / 3
+        l = (Math.pow(4, (W.settings.barnesHutDepthLimit + 1)) - 1) / 3;
+        barnesHutMatrix.length = l;
 
-        // Assigning nodes to quads
-        for (n = 0, i = 0; n < W.nodesLength; n += W.ppn, i++) {
-          xIndex = ((W.nodeMatrix[np(n, 'x')] - minX) / (maxX - minX) *
-            Math.pow(2, W.settings.barnesHutDepthLimit)) | 0;
+        // Iteration length = (4^n - 1) / 3
+        m = (Math.pow(4, W.settings.barnesHutDepthLimit) - 1) / 3;
 
-          yIndex = ((W.nodeMatrix[np(n, 'y')] - minY) / (maxY - minY) *
-            Math.pow(2, W.settings.barnesHutDepthLimit)) | 0;
+        for (i = 0; i < l; i++) {
 
-          // OPTIMIZE: possible to gain some really little time here
-          quads[xIndex * quadRowNb + yIndex] += 1;
-          nodesQuads[i] = xIndex * quadRowNb + yIndex;
-        }
+          // Defining region
+          r = i ? barnesHutMatrix[i] : {
+            nodes: nodes
+          };
 
-        // Computing quad steps
-        // ALEXIS: here we need to build the second array containing nodes ids
-        // in order for the quads iteration in force applications later.
-        for (a = 0, i = 0; i < quadNb; i++) {
-          a += quads[i];
-          quadsSteps[i] = a;
+          // TODO: do we need an object here? or his a simple node array valid?
+          r.mass = 0;
+          r.massCenterX = 0;
+          r.massCenterY = 0;
+          r.massSumX = 0;
+          r.massSumY = 0;
+
+          // Iterating through nodes to split regions
+          if (r.nodes.length) {
+            for (j = 0, k = r.nodes.length; j < k; j++) {
+              n = r.nodes[j];
+
+              mass = W.nodeMatrix[np(n, 'mass')];
+              r.mass += mass;
+              r.massSumX += W.nodeMatrix[np(n, 'x')] * mass;
+              r.massSumY += W.nodeMatrix[np(n, 'y')] * mass;
+            }
+
+            r.massCenterX = r.massSumX / r.mass;
+            r.massCenterY = r.massSumY / r.mass;
+          }
+
+          // Adding to index
+          barnesHutMatrix[i] = r;
+
+          // Continue if we went over m and are now at leaf level
+          if (i >= m)
+            continue;
+
+          // Defining subregions
+          for (j = 1; j <= 4; j++) {
+
+            // To get child = (i << 2) + j
+            barnesHutMatrix[(i << 2) + j] = {nodes: []};
+          }
+
+          // Attributing nodes to subregions
+          for (j = 0, k = r.nodes.length; j < k; j++) {
+            n = r.nodes[j];
+
+            if (W.nodeMatrix[np(n, 'x')] < r.massCenterX) {
+
+              // Left
+              if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
+                barnesHutMatrix[(i << 2) + 1].nodes.push(n);
+              else
+                barnesHutMatrix[(i << 2) + 2].nodes.push(n);
+            }
+            else {
+
+              // Right
+              if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
+                barnesHutMatrix[(i << 2) + 3].nodes.push(n);
+              else
+                barnesHutMatrix[(i << 2) + 4].nodes.push(n);
+            }
+          }
         }
       }
 
@@ -267,9 +305,60 @@
       // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
 
       if (W.settings.barnesHutOptimize) {
+        coefficient = W.settings.scalingRatio;
 
-        // Applying forces through Barnes-Hut
-        // TODO
+        // Applying repulsion through regions
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
+
+          // Computing leaf quad nodes iteration
+          m = Math.pow(4, W.settings.barnesHutDepthLimit) - 1;
+          l = barnesHutMatrix.length;
+          for (i = barnesHutMatrix.length - m; i < l; i++) {
+            r = barnesHutMatrix[i];
+
+            // If no nodes we continue
+            if (!r.nodes.length)
+              continue;
+
+            distance = Math.sqrt(
+              (Math.pow(W.nodeMatrix[np(n, 'x')], 2)) +
+              (Math.pow(W.nodeMatrix[np(n, 'y')], 2))
+            );
+
+            xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
+            yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
+
+            if (W.settings.adjustSize) {
+
+              //-- Linear Anti-collision Repulsion
+              if (distance > 0) {
+                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                  r.mass / distance / distance;
+
+                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+              }
+              else if (distance < 0) {
+                factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
+                  r.mass / distance;
+
+                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+              }
+            }
+            else {
+
+              //-- Linear Repulsion
+              if (distance > 0) {
+                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                  r.mass / distance / distance;
+
+                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+              }
+            }
+          }
+        }
       }
       else {
 
