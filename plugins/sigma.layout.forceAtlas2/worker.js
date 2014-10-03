@@ -324,16 +324,17 @@
 
         // Applying repulsion through regions
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          distance = Math.sqrt(
-            (Math.pow(W.nodeMatrix[np(n, 'x')], 2)) +
-            (Math.pow(W.nodeMatrix[np(n, 'y')], 2))
-          );
 
           // Computing leaf quad nodes iteration
           // m = Math.pow(4, W.settings.barnesHutDepthLimit) - 1;
           l = barnesHutMatrix.length;
           for (i = 0; i < l; i++) {
             r = barnesHutMatrix[i];
+
+            distance = Math.sqrt(
+              (Math.pow(W.nodeMatrix[np(n, 'x')] - r.massCenterX, 2)) +
+              (Math.pow(W.nodeMatrix[np(n, 'y')] - r.massCenterY, 2))
+            );
 
             // If no nodes we continue
             if (!r.nodes.length)
