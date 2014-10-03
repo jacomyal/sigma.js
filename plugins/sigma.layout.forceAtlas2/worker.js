@@ -212,6 +212,8 @@
 
       // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
+        var massSumX,
+            massSumY;
 
         // Setting up
         barnesHutMatrix = [];
@@ -240,9 +242,10 @@
           r.mass = 0;
           r.massCenterX = 0;
           r.massCenterY = 0;
-          r.massSumX = 0;
-          r.massSumY = 0;
           r.size = 0;
+
+          massSumX = 0;
+          massSumY = 0;
 
           // Iterating through nodes to split regions
           if (r.nodes.length) {
@@ -251,12 +254,12 @@
 
               mass = W.nodeMatrix[np(n, 'mass')];
               r.mass += mass;
-              r.massSumX += W.nodeMatrix[np(n, 'x')] * mass;
-              r.massSumY += W.nodeMatrix[np(n, 'y')] * mass;
+              massSumX += W.nodeMatrix[np(n, 'x')] * mass;
+              massSumY += W.nodeMatrix[np(n, 'y')] * mass;
             }
 
-            r.massCenterX = r.massSumX / r.mass;
-            r.massCenterY = r.massSumY / r.mass;
+            r.massCenterX = massSumX / r.mass;
+            r.massCenterY = massSumY / r.mass;
 
             // Computing size
             for (j = 0, k = r.nodes.length; j < k; j++) {
