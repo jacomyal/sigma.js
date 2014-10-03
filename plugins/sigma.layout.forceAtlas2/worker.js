@@ -212,9 +212,6 @@
 
       // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
-        var parent,
-            massCenterX,
-            massCenterY;
 
         // Setting up
         barnesHutMatrix = [];
@@ -245,6 +242,7 @@
           r.massCenterY = 0;
           r.massSumX = 0;
           r.massSumY = 0;
+          r.size = 0;
 
           // Iterating through nodes to split regions
           if (r.nodes.length) {
@@ -259,6 +257,19 @@
 
             r.massCenterX = r.massSumX / r.mass;
             r.massCenterY = r.massSumY / r.mass;
+
+            // Computing size
+            for (j = 0, k = r.nodes.length; j < k; j++) {
+              n = r.nodes[j];
+
+              distance = 2 * Math.sqrt(
+                Math.pow((W.nodeMatrix[np(n, 'x')] - r.massCenterX), 2) +
+                Math.pow((W.nodeMatrix[np(n, 'y')] - r.massCenterY), 2)
+              );
+              r.size = (r.size === 0) ?
+                distance :
+                Math.max(r.size, distance);
+            }
           }
 
           // Adding to index
@@ -276,6 +287,7 @@
           }
 
           // Attributing nodes to subregions
+          // NOTE: side attribution is not that relevant
           for (j = 0, k = r.nodes.length; j < k; j++) {
             n = r.nodes[j];
 
@@ -285,15 +297,15 @@
               if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
                 barnesHutMatrix[(i << 2) + 1].nodes.push(n);
               else
-                barnesHutMatrix[(i << 2) + 2].nodes.push(n);
+                barnesHutMatrix[(i << 2) + 4].nodes.push(n);
             }
             else {
 
               // Right
               if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
-                barnesHutMatrix[(i << 2) + 3].nodes.push(n);
+                barnesHutMatrix[(i << 2) + 2].nodes.push(n);
               else
-                barnesHutMatrix[(i << 2) + 4].nodes.push(n);
+                barnesHutMatrix[(i << 2) + 3].nodes.push(n);
             }
           }
         }
@@ -309,21 +321,23 @@
 
         // Applying repulsion through regions
         for (n = 0; n < W.nodesLength; n += W.ppn) {
+          distance = Math.sqrt(
+            (Math.pow(W.nodeMatrix[np(n, 'x')], 2)) +
+            (Math.pow(W.nodeMatrix[np(n, 'y')], 2))
+          );
 
           // Computing leaf quad nodes iteration
-          m = Math.pow(4, W.settings.barnesHutDepthLimit) - 1;
+          // m = Math.pow(4, W.settings.barnesHutDepthLimit) - 1;
           l = barnesHutMatrix.length;
-          for (i = barnesHutMatrix.length - m; i < l; i++) {
+          for (i = 0; i < l; i++) {
             r = barnesHutMatrix[i];
 
             // If no nodes we continue
             if (!r.nodes.length)
               continue;
 
-            distance = Math.sqrt(
-              (Math.pow(W.nodeMatrix[np(n, 'x')], 2)) +
-              (Math.pow(W.nodeMatrix[np(n, 'y')], 2))
-            );
+            if (distance * W.settings.barnesHutTheta <= r.size)
+              continue;
 
             xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
             yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
