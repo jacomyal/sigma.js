@@ -5,6 +5,7 @@
       _indexes = Object.create(null),
       _initBindings = Object.create(null),
       _methodBindings = Object.create(null),
+      _methodBeforeBindings = Object.create(null),
       _defaultSettings = {
         immutable: true,
         clone: true
@@ -109,6 +110,10 @@
       var k,
           res;
 
+      // Execute "before" bound functions:
+      for (k in _methodBeforeBindings[methodName])
+        _methodBeforeBindings[methodName][k].apply(scope, arguments);
+
       // Apply the method:
       res = fn.apply(scope, arguments);
 
@@ -173,19 +178,39 @@
     )
       throw 'addMethod: Wrong arguments.';
 
-    if (_methods[methodName])
+    if (_methods[methodName] || graph[methodName])
       throw 'The method "' + methodName + '" already exists.';
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
+    _methodBeforeBindings[methodName] = Object.create(null);
 
     return this;
   };
 
   /**
+   * This global method returns true if the method has already been added, and
+   * false else.
+   *
+   * Here are some examples:
+   *
+   *  > graph.hasMethod('addNode'); // returns true
+   *  > graph.hasMethod('hasMethod'); // returns true
+   *  > graph.hasMethod('unexistingMethod'); // returns false
+   *
+   * @param  {string}  methodName The name of the method.
+   * @return {boolean}            The result.
+   */
+  graph.hasMethod = function(methodName) {
+    return !!(_methods[methodName] || graph[methodName]);
+  };
+
+  /**
    * This global methods attaches a function to a method. Anytime the specified
    * method is called, the attached function is called right after, with the
-   * same arguments and in the same scope.
+   * same arguments and in the same scope. The attached function is called
+   * right before if the last argument is true, unless the method is the graph
+   * constructor.
    *
    * To attach a function to the graph constructor, use 'constructor' as the
    * method name (first argument).
@@ -204,18 +229,32 @@
    *  > myGraph.addNode({ id: '1' }).addNode({ id: '2' });
    *  > console.log(timesAddNodeCalled); // outputs 2
    *
+   * The idea for calling a function before is to provide pre-processors, for
+   * instance:
+   *
+   *  > var colorPalette = { Person: '#C3CBE1', Place: '#9BDEBD' };
+   *  > graph.attach('addNode', 'applyNodeColorPalette', function(n) {
+   *  >   n.color = colorPalette[n.category];
+   *  > }, true);
+   *  >
+   *  > var myGraph = new graph();
+   *  > myGraph.addNode({ id: 'n0', category: 'Person' });
+   *  > console.log(myGraph.nodes('n0').color); // outputs '#C3CBE1'
+   *
    * @param  {string}   methodName The name of the related method or
    *                               "constructor".
    * @param  {string}   key        The key to identify the function to attach.
    * @param  {function} fn         The function to bind.
+   * @param  {boolean}  before     If true the function is called right before.
    * @return {object}              The global graph constructor.
    */
-  graph.attach = function(methodName, key, fn) {
+  graph.attach = function(methodName, key, fn, before) {
     if (
       typeof methodName !== 'string' ||
       typeof key !== 'string' ||
       typeof fn !== 'function' ||
-      arguments.length !== 3
+      arguments.length < 3 ||
+      arguments.length > 4
     )
       throw 'attach: Wrong arguments.';
 
@@ -224,10 +263,18 @@
     if (methodName === 'constructor')
       bindings = _initBindings;
     else {
-      if (!_methodBindings[methodName])
+      if (before) {
+        if (!_methodBeforeBindings[methodName])
         throw 'The method "' + methodName + '" does not exist.';
 
-      bindings = _methodBindings[methodName];
+        bindings = _methodBeforeBindings[methodName];
+      }
+      else {
+        if (!_methodBindings[methodName])
+          throw 'The method "' + methodName + '" does not exist.';
+
+        bindings = _methodBindings[methodName];
+      }
     }
 
     if (bindings[key])
@@ -237,6 +284,13 @@
     bindings[key] = fn;
 
     return this;
+  };
+
+  /**
+   * Alias of attach(methodName, key, fn, true).
+   */
+  graph.attachBefore = function(methodName, key, fn) {
+    return this.attach(methodName, key, fn, true);
   };
 
   /**
@@ -432,27 +486,35 @@
     this.edgesArray.push(validEdge);
     this.edgesIndex[validEdge.id] = validEdge;
 
-    if (!this.inNeighborsIndex[edge.target][edge.source])
-      this.inNeighborsIndex[edge.target][edge.source] = Object.create(null);
-    this.inNeighborsIndex[edge.target][edge.source][edge.id] = edge;
+    if (!this.inNeighborsIndex[validEdge.target][validEdge.source])
+      this.inNeighborsIndex[validEdge.target][validEdge.source] =
+        Object.create(null);
+    this.inNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+      validEdge;
 
-    if (!this.outNeighborsIndex[edge.source][edge.target])
-      this.outNeighborsIndex[edge.source][edge.target] = Object.create(null);
-    this.outNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+    if (!this.outNeighborsIndex[validEdge.source][validEdge.target])
+      this.outNeighborsIndex[validEdge.source][validEdge.target] =
+        Object.create(null);
+    this.outNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
+      validEdge;
 
-    if (!this.allNeighborsIndex[edge.source][edge.target])
-      this.allNeighborsIndex[edge.source][edge.target] = Object.create(null);
-    this.allNeighborsIndex[edge.source][edge.target][edge.id] = edge;
+    if (!this.allNeighborsIndex[validEdge.source][validEdge.target])
+      this.allNeighborsIndex[validEdge.source][validEdge.target] =
+        Object.create(null);
+    this.allNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
+      validEdge;
 
-    if (!this.allNeighborsIndex[edge.target][edge.source])
-      this.allNeighborsIndex[edge.target][edge.source] = Object.create(null);
-    this.allNeighborsIndex[edge.target][edge.source][edge.id] = edge;
+    if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
+      this.allNeighborsIndex[validEdge.target][validEdge.source] =
+        Object.create(null);
+    this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+      validEdge;
 
     // Keep counts up to date:
-    this.inNeighborsCount[edge.target]++;
-    this.outNeighborsCount[edge.source]++;
-    this.allNeighborsCount[edge.target]++;
-    this.allNeighborsCount[edge.source]++;
+    this.inNeighborsCount[validEdge.target]++;
+    this.outNeighborsCount[validEdge.source]++;
+    this.allNeighborsCount[validEdge.target]++;
+    this.allNeighborsCount[validEdge.source]++;
 
     return this;
   });

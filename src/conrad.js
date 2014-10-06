@@ -893,7 +893,7 @@
   /**
    * This function simply clones an object. This object must contain only
    * objects, arrays and immutable values. Since it is not public, it does not
-   * deal with cyclic references, DOM elements and instanciated objects - so
+   * deal with cyclic references, DOM elements and instantiated objects - so
    * use it carefully.
    *
    * @param  {Object} The object to clone.

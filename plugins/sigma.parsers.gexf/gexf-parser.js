@@ -112,6 +112,10 @@
         case 'double':
           value = +value;
           break;
+
+        case 'liststring':
+          value = value ? value.split('|') : [];
+          break;
       }
 
       return value;

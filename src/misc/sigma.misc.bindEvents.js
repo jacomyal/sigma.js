@@ -98,13 +98,15 @@
 
         if (nodes.length) {
           self.dispatchEvent('clickNode', {
-            node: nodes[0]
+            node: nodes[0],
+            captor: e.data
           });
           self.dispatchEvent('clickNodes', {
-            node: nodes
+            node: nodes,
+            captor: e.data
           });
         } else
-          self.dispatchEvent('clickStage');
+          self.dispatchEvent('clickStage', {captor: e.data});
       }
 
       function onDoubleClick(e) {
@@ -117,13 +119,34 @@
 
         if (nodes.length) {
           self.dispatchEvent('doubleClickNode', {
-            node: nodes[0]
+            node: nodes[0],
+            captor: e.data
           });
           self.dispatchEvent('doubleClickNodes', {
-            node: nodes
+            node: nodes,
+            captor: e.data
           });
         } else
-          self.dispatchEvent('doubleClickStage');
+          self.dispatchEvent('doubleClickStage', {captor: e.data});
+      }
+
+      function onRightClick(e) {
+        if (!self.settings('eventsEnabled'))
+          return;
+
+        self.dispatchEvent('rightClick', e.data);
+
+        if (nodes.length) {
+          self.dispatchEvent('rightClickNode', {
+            node: nodes[0],
+            captor: e.data
+          });
+          self.dispatchEvent('rightClickNodes', {
+            node: nodes,
+            captor: e.data
+          });
+        } else
+          self.dispatchEvent('rightClickStage', {captor: e.data});
       }
 
       function onOut(e) {
@@ -142,11 +165,13 @@
         // Dispatch both single and multi events:
         for (i = 0, l = out.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: out[i]
+            node: out[i],
+            captor: e.data
           });
         if (out.length)
           self.dispatchEvent('outNodes', {
-            nodes: out
+            nodes: out,
+            captor: e.data
           });
       }
 
@@ -184,28 +209,34 @@
         // Dispatch both single and multi events:
         for (i = 0, l = newOvers.length; i < l; i++)
           self.dispatchEvent('overNode', {
-            node: newOvers[i]
+            node: newOvers[i],
+            captor: e.data
           });
         for (i = 0, l = newOut.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: newOut[i]
+            node: newOut[i],
+            captor: e.data
           });
         if (newOvers.length)
           self.dispatchEvent('overNodes', {
-            nodes: newOvers
+            nodes: newOvers,
+            captor: e.data
           });
         if (newOut.length)
           self.dispatchEvent('outNodes', {
-            nodes: newOut
+            nodes: newOut,
+            captor: e.data
           });
       }
 
       // Bind events:
       captor.bind('click', onClick);
+      captor.bind('mousedown', onMove);
       captor.bind('mouseup', onMove);
       captor.bind('mousemove', onMove);
       captor.bind('mouseout', onOut);
       captor.bind('doubleclick', onDoubleClick);
+      captor.bind('rightclick', onRightClick);
       self.bind('render', onMove);
     }
 
