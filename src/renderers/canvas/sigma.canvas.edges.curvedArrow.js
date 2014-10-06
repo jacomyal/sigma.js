@@ -39,7 +39,7 @@
     }
 
     var d = Math.sqrt(Math.pow(tX - controlX, 2) + Math.pow(tY - controlY, 2)),
-        aSize = (edge[prefix + 'size'] || 1) * 2.5,
+        aSize = Math.max((edge[prefix + 'size'] || 1) * 2.5, settings('minArrowSize')),
         aX = controlX + (tX - controlX) * (d - aSize - tSize) / d,
         aY = controlY + (tY - controlY) * (d - aSize - tSize) / d,
         vX = (tX - controlX) * aSize / d,
