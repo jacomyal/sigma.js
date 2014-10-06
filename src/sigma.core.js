@@ -236,6 +236,11 @@
     // Add a quadtree to the camera:
     camera.quadtree = new sigma.classes.quad();
 
+    // Add an edgequadtree to the camera:
+    if (sigma.classes.edgequad !== undefined) {
+      camera.edgequadtree = new sigma.classes.edgequad();
+    }
+
     camera.bind('coordinatesUpdated', function(e) {
       self.renderCamera(camera, camera.isAnimated);
     });
@@ -312,6 +317,10 @@
         container: o
       };
 
+    // If the container still is a string, we get it by id
+    if (typeof o.container === 'string')
+      o.container = document.getElementById(o.container);
+
     // Reference the new renderer:
     if (!('id' in o)) {
       id = 0;
@@ -358,18 +367,32 @@
           'rightClickStage',
           'clickNode',
           'clickNodes',
+          'clickEdge',
+          'clickEdges',
           'doubleClickNode',
           'doubleClickNodes',
+          'doubleClickEdge',
+          'doubleClickEdges',
           'rightClickNode',
           'rightClickNodes',
+          'rightClickEdge',
+          'rightClickEdges',
           'overNode',
           'overNodes',
+          'overEdge',
+          'overEdges',
           'outNode',
           'outNodes',
+          'outEdge',
+          'outEdges',
           'downNode',
           'downNodes',
+          'downEdge',
+          'downEdges',
           'upNode',
-          'upNodes'
+          'upNodes',
+          'upEdge',
+          'upEdges'
         ],
         this._handler
       );
@@ -477,6 +500,21 @@
           height: bounds.maxY - bounds.minY
         }
       });
+
+      // Refresh edgequadtree:
+      if (c.edgequadtree !== undefined && c.settings('drawEdges') &&
+        c.settings('enableEdgeHovering')) {
+
+        c.edgequadtree.index(this.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
+      }
     }
 
     // Call each renderer:
@@ -594,6 +632,9 @@
   sigma.prototype.kill = function() {
     var k;
 
+    // Dispatching event
+    this.dispatchEvent('kill');
+
     // Kill graph:
     this.graph.kill();
 
@@ -640,7 +681,7 @@
   /**
    * The current version of sigma:
    */
-  sigma.version = '1.0.2';
+  sigma.version = '1.0.3';
 
 
 

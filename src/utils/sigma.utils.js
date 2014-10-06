@@ -310,6 +310,271 @@
     };
   };
 
+  /**
+   * Return the euclidian distance between two points of a plane
+   * with an orthonormal basis.
+   *
+   * @param  {number} x1  The X coordinate of the first point.
+   * @param  {number} y1  The Y coordinate of the first point.
+   * @param  {number} x2  The X coordinate of the second point.
+   * @param  {number} y2  The Y coordinate of the second point.
+   * @return {number}     The euclidian distance.
+   */
+  sigma.utils.getDistance = function(x0, y0, x1, y1) {
+    return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
+  };
+
+  /**
+    * Check if a point is on a line segment.
+    *
+    * @param  {number} x       The X coordinate of the point to check.
+    * @param  {number} y       The Y coordinate of the point to check.
+    * @param  {number} x1      The X coordinate of the line start point.
+    * @param  {number} y1      The Y coordinate of the line start point.
+    * @param  {number} x2      The X coordinate of the line end point.
+    * @param  {number} y2      The Y coordinate of the line end point.
+    * @param  {number} epsilon The precision (consider the line thickness).
+    * @return {boolean}        True if point is "close to" the line
+    *                          segment, false otherwise.
+  */
+  sigma.utils.isPointOnSegment = function(x, y, x1, y1, x2, y2, epsilon) {
+    // http://stackoverflow.com/a/328122
+    var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
+        d = sigma.utils.getDistance(x1, y1, x2, y2),
+        nCrossProduct = crossProduct / d; // normalized cross product
+
+    return (nCrossProduct < epsilon &&
+     Math.min(x1, x2) <= x && x <= Math.max(x1, x2) &&
+     Math.min(y1, y2) <= y && y <= Math.max(y1, y2));
+  };
+
+  /**
+   * Return the control point coordinates for a quadratic bezier curve.
+   *
+   * @param  {number} x1  The X coordinate of the start point.
+   * @param  {number} y1  The Y coordinate of the start point.
+   * @param  {number} x2  The X coordinate of the end point.
+   * @param  {number} y2  The Y coordinate of the end point.
+   * @return {x,y}        The control point coordinates.
+   */
+  sigma.utils.getQuadraticControlPoint = function(x1, y1, x2, y2) {
+    return {
+      x: (x1 + x2) / 2 + (y2 - y1) / 4,
+      y: (y1 + y2) / 2 + (x1 - x2) / 4
+    };
+  };
+
+  /**
+   * Return the coordinates of the two control points for a self loop (i.e.
+   * where the start point is also the end point) computed as a cubic bezier
+   * curve.
+   *
+   * @param  {number} x    The X coordinate of the node.
+   * @param  {number} y    The Y coordinate of the node.
+   * @param  {number} size The node size.
+   * @return {x1,y1,x2,y2} The coordinates of the two control points.
+   */
+  sigma.utils.getSelfLoopControlPoints = function(x , y, size) {
+    return {
+      x1: x - size * 7,
+      y1: y,
+      x2: x,
+      y2: y + size * 7
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the quadratic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the end point.
+    * @param  {number} y2 The Y coordinate of the end point.
+    * @param  {number} cx The X coordinate of the control point.
+    * @param  {number} cy The Y coordinate of the control point.
+    * @return {object}    {x,y} The point at t.
+  */
+  sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, cx, cy) {
+    // http://stackoverflow.com/a/5634528
+    return {
+      x: Math.pow(1 - t, 2) * x1 + 2 * (1 - t) * t * cx + Math.pow(t, 2) * x2,
+      y: Math.pow(1 - t, 2) * y1 + 2 * (1 - t) * t * cy + Math.pow(t, 2) * y2
+    };
+  };
+
+  /**
+    * Compute the coordinates of the point positioned
+    * at length t in the cubic bezier curve.
+    *
+    * @param  {number} t  In [0,1] the step percentage to reach
+    *                     the point in the curve from the context point.
+    * @param  {number} x1 The X coordinate of the context point.
+    * @param  {number} y1 The Y coordinate of the context point.
+    * @param  {number} x2 The X coordinate of the end point.
+    * @param  {number} y2 The Y coordinate of the end point.
+    * @param  {number} cx The X coordinate of the first control point.
+    * @param  {number} cy The Y coordinate of the first control point.
+    * @param  {number} dx The X coordinate of the second control point.
+    * @param  {number} dy The Y coordinate of the second control point.
+    * @return {object}    {x,y} The point at t.
+  */
+  sigma.utils.getPointOnBezierCurve =
+    function(t, x1, y1, x2, y2, cx, cy, dx, dy) {
+    // http://stackoverflow.com/a/15397596
+    // Blending functions:
+    var B0_t = Math.pow(1 - t, 3),
+        B1_t = 3 * t * Math.pow(1 - t, 2),
+        B2_t = 3 * Math.pow(t, 2) * (1 - t),
+        B3_t = Math.pow(t, 3);
+
+    return {
+      x: (B0_t * x1) + (B1_t * cx) + (B2_t * dx) + (B3_t * x2),
+      y: (B0_t * y1) + (B1_t * cy) + (B2_t * dy) + (B3_t * y2)
+    };
+  };
+
+
+  /**
+    * Check if a point is on a quadratic bezier curve segment with a thickness.
+    *
+    * @param  {number} x       The X coordinate of the point to check.
+    * @param  {number} y       The Y coordinate of the point to check.
+    * @param  {number} x1      The X coordinate of the curve start point.
+    * @param  {number} y1      The Y coordinate of the curve start point.
+    * @param  {number} x2      The X coordinate of the curve end point.
+    * @param  {number} y2      The Y coordinate of the curve end point.
+    * @param  {number} cpx     The X coordinate of the curve control point.
+    * @param  {number} cpy     The Y coordinate of the curve control point.
+    * @param  {number} epsilon The precision (consider the line thickness).
+    * @return {boolean}        True if (x,y) is on the curve segment,
+    *                          false otherwise.
+  */
+  sigma.utils.isPointOnQuadraticCurve =
+    function(x, y, x1, y1, x2, y2, cpx, cpy, epsilon) {
+    // Fails if the point is too far from the extremities of the segment,
+    // preventing for more costly computation:
+    var dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
+    if (Math.abs(x - x1) > dP1P2 || Math.abs(y - y1) > dP1P2) {
+      return false;
+    }
+
+    var dP1 = sigma.utils.getDistance(x, y, x1, y1),
+        dP2 = sigma.utils.getDistance(x, y, x2, y2),
+        t = 0.5,
+        r = (dP1 < dP2) ? -0.01 : 0.01,
+        rThreshold = 0.001,
+        i = 100,
+        pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
+        dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
+        old_dt;
+
+    // This algorithm minimizes the distance from the point to the curve. It
+    // find the optimal t value where t=0 is the start point and t=1 is the end
+    // point of the curve, starting from t=0.5.
+    // It terminates because it runs a maximum of i interations.
+    while (i-- > 0 &&
+      t >= 0 && t <= 1 &&
+      (dt > epsilon) &&
+      (r > rThreshold || r < -rThreshold)) {
+      old_dt = dt;
+      pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
+      dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+      if (dt > old_dt) {
+        // not the right direction:
+        // halfstep in the opposite direction
+        r = -r / 2;
+        t += r;
+      }
+      else if (t + r < 0 || t + r > 1) {
+        // oops, we've gone too far:
+        // revert with a halfstep
+        r = r / 2;
+        dt = old_dt;
+      }
+      else {
+        // progress:
+        t += r;
+      }
+    }
+
+    return dt < epsilon;
+  };
+
+
+  /**
+    * Check if a point is on a cubic bezier curve segment with a thickness.
+    *
+    * @param  {number} x       The X coordinate of the point to check.
+    * @param  {number} y       The Y coordinate of the point to check.
+    * @param  {number} x1      The X coordinate of the curve start point.
+    * @param  {number} y1      The Y coordinate of the curve start point.
+    * @param  {number} x2      The X coordinate of the curve end point.
+    * @param  {number} y2      The Y coordinate of the curve end point.
+    * @param  {number} cpx1    The X coordinate of the 1st curve control point.
+    * @param  {number} cpy1    The Y coordinate of the 1st curve control point.
+    * @param  {number} cpx2    The X coordinate of the 2nd curve control point.
+    * @param  {number} cpy2    The Y coordinate of the 2nd curve control point.
+    * @param  {number} epsilon The precision (consider the line thickness).
+    * @return {boolean}        True if (x,y) is on the curve segment,
+    *                          false otherwise.
+  */
+  sigma.utils.isPointOnBezierCurve =
+    function(x, y, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2, epsilon) {
+    // Fails if the point is too far from the extremities of the segment,
+    // preventing for more costly computation:
+    var dP1CP1 = sigma.utils.getDistance(x1, y1, cpx1, cpy1);
+    if (Math.abs(x - x1) > dP1CP1 || Math.abs(y - y1) > dP1CP1) {
+      return false;
+    }
+
+    var dP1 = sigma.utils.getDistance(x, y, x1, y1),
+        dP2 = sigma.utils.getDistance(x, y, x2, y2),
+        t = 0.5,
+        r = (dP1 < dP2) ? -0.01 : 0.01,
+        rThreshold = 0.001,
+        i = 100,
+        pt = sigma.utils.getPointOnBezierCurve(
+          t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2),
+        dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
+        old_dt;
+
+    // This algorithm minimizes the distance from the point to the curve. It
+    // find the optimal t value where t=0 is the start point and t=1 is the end
+    // point of the curve, starting from t=0.5.
+    // It terminates because it runs a maximum of i interations.
+    while (i-- > 0 &&
+      t >= 0 && t <= 1 &&
+      (dt > epsilon) &&
+      (r > rThreshold || r < -rThreshold)) {
+      old_dt = dt;
+      pt = sigma.utils.getPointOnBezierCurve(
+        t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2);
+      dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+      if (dt > old_dt) {
+        // not the right direction:
+        // halfstep in the opposite direction
+        r = -r / 2;
+        t += r;
+      }
+      else if (t + r < 0 || t + r > 1) {
+        // oops, we've gone too far:
+        // revert with a halfstep
+        r = r / 2;
+        dt = old_dt;
+      }
+      else {
+        // progress:
+        t += r;
+      }
+    }
+
+    return dt < epsilon;
+  };
 
 
   /**
