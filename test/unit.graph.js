@@ -131,10 +131,10 @@ test('Basic manipulation', function() {
 
   throws(
     function() {
-      myGraph.nodes(['n0', 'n1', 123]);
+      myGraph.nodes(['n0', 'n1', {}]);
     },
     /nodes: Wrong arguments/,
-    '"nodes" with an array containing a non-string value throws an error.'
+    '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(
@@ -240,10 +240,10 @@ test('Basic manipulation', function() {
 
   throws(
     function() {
-      myGraph.edges(['e0', 123]);
+      myGraph.edges(['e0', {}]);
     },
     /edges: Wrong arguments/,
-    '"edges" with an array containing a non-string value throws an error.'
+    '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(

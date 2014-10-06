@@ -32,6 +32,7 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.snapshot/sigma.renderers.snapshot.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -44,79 +45,53 @@
   </style>
   <div id="graph-container"></div>
 </div>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
 /**
- * Just a simple example to show how to use the sigma.layout.forceAtlas2
- * plugin:
+ * This is a basic example on how to instantiate sigma. A random graph is
+ * generated and stored in the "graph" variable, and then sigma is instantiated
+ * directly with the graph.
  *
- * A random graph is generated, such that its nodes are separated in some
- * distinct clusters. Each cluster has its own color, and the density of
- * links is stronger inside the clusters. So, we expect the algorithm to
- * regroup the nodes of each cluster.
+ * The simple instance of sigma is enough to make it render the graph on the on
+ * the screen, since the graph is given directly to the constructor.
  */
 var i,
     s,
-    o,
-    N = 1000,
-    E = 5000,
-    C = 5,
-    d = 0.5,
-    cs = [],
+    N = 100,
+    E = 500,
     g = {
       nodes: [],
       edges: []
     };
 
-// Generate the graph:
-for (i = 0; i < C; i++)
-  cs.push({
-    id: i,
-    nodes: [],
-    color: '#' + (
-      Math.floor(Math.random() * 16777215).toString(16) + '000000'
-    ).substr(0, 6)
-  });
-
-for (i = 0; i < N; i++) {
-  o = cs[(Math.random() * C) | 0];
+// Generate a random graph:
+for (i = 0; i < N; i++)
   g.nodes.push({
     id: 'n' + i,
-    label: 'Node' + i,
-    x: Math.cos(2 * i * Math.PI / N),
-    y: Math.sin(2 * i * Math.PI / N),
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
     size: Math.random(),
-    color: o.color
+    color: '#666'
   });
-  o.nodes.push('n' + i);
-}
 
-for (i = 0; i < E; i++) {
-  if (Math.random() < 1 - d)
-    g.edges.push({
-      id: 'e' + i,
-      source: 'n' + ((Math.random() * N) | 0),
-      target: 'n' + ((Math.random() * N) | 0)
-    });
-  else {
-    o = cs[(Math.random() * C) | 0]
-    g.edges.push({
-      id: 'e' + i,
-      source: o.nodes[(Math.random() * o.nodes.length) | 0],
-      target: o.nodes[(Math.random() * o.nodes.length) | 0]
-    });
-  }
-}
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
 
+// sigma.renderers.def = sigma.renderers.canvas;
+
+// Instantiate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container',
-  settings: {
-    drawEdges: false
-  }
+  container: 'graph-container'
 });
 
-// Start the ForceAtlas2 algorithm:
-s.startForceAtlas2({worker: true});
+setTimeout(function() {
+  console.log(s.renderers[0].snapshot({format: 'png', background: 'white', filename: 'my-graph.png', labels: false}));
+}, 1000);
 </script>
