@@ -180,6 +180,11 @@ module.exports = function(grunt) {
           return filepath.replace(/build\//, '');
         }
       }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.config.js'
+      }
     }
   });
 
@@ -194,4 +199,7 @@ module.exports = function(grunt) {
 
   // For travis-ci.org, only launch tests:
   grunt.registerTask('travis', ['qunit']);
+
+  // For Test corverage
+  grunt.loadNpmTasks('grunt-karma');
 };
