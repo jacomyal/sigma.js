@@ -182,8 +182,11 @@
           distance,
           size,
           factor,
-          nodes;
-
+          nodes,
+          lvl,
+          maxl,
+          child,
+          q0,q1,q2,q3;
 
       // 1) Initializing layout data
       //-----------------------------
@@ -213,10 +216,13 @@
       // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
         var massSumX,
-            massSumY;
+            massSumY,
+            walker_location,
+            locations_index;
 
         // Setting up
         barnesHutMatrix = [];
+        walker_location = [0];
 
         // Initial nodes holder
         nodes = [];
@@ -224,18 +230,51 @@
           nodes.push(n);
         }
 
+        // Max level
+        maxl = W.settings.barnesHutDepthLimit
+
         // Max length = (4^n+1 - 1) / 3
-        l = (Math.pow(4, (W.settings.barnesHutDepthLimit + 1)) - 1) / 3;
+        l = (Math.pow(4, (maxl + 1)) - 1) / 3;
         barnesHutMatrix.length = l;
 
-        // Iteration length = (4^n - 1) / 3
-        m = (Math.pow(4, W.settings.barnesHutDepthLimit) - 1) / 3;
+        // Build Locations Index
+        locations_index = {};
+        i = 0
+        while(i < l) {
+          locations_index[walker_location.join('')] = i
+          
+          // Next iteration
+          // console.log('i: ' + i + ' - loc: ' + walker_location.join(' '))
+          i++
+          if(walker_location.length <= maxl){
+            walker_location.push(0)
+          } else {
+            if(walker_location[maxl] < 3){
+              walker_location[maxl]++
+            } else {
+              lvl = maxl
+              while(lvl > 0){
+                walker_location.pop()
+                lvl--
+                if(walker_location[lvl] < 3){
+                  walker_location[lvl]++
+                  break;
+                }
+              }
+            }
+          }
 
-        for (i = 0; i < l; i++) {
+        }
+        walker_location = [0];
+
+        // Iterate
+        i = 0
+        while(i < l) {
 
           // Defining region
           r = i ? barnesHutMatrix[i] : {
-            nodes: nodes
+            nodes: nodes,
+            jump: -1
           };
 
           // TODO: do we need an object here? or his a simple node array valid?
@@ -278,39 +317,67 @@
           // Adding to index
           barnesHutMatrix[i] = r;
 
-          // Continue if we went over m and are now at leaf level
-          if (i >= m)
-            continue;
+          // Create sub-regions if we are not at leaf level          
+          if (walker_location.length <= maxl){
 
-          // Defining subregions
-          for (j = 1; j <= 4; j++) {
+            // Defining subregions
+            q0 = locations_index[walker_location.slice(0).concat([0]).join('')]
+            q1 = locations_index[walker_location.slice(0).concat([1]).join('')]
+            q2 = locations_index[walker_location.slice(0).concat([2]).join('')]
+            q3 = locations_index[walker_location.slice(0).concat([3]).join('')]
+            barnesHutMatrix[q0] = {nodes: [], jump:q1}
+            barnesHutMatrix[q1] = {nodes: [], jump:q2}
+            barnesHutMatrix[q2] = {nodes: [], jump:q3}
+            barnesHutMatrix[q3] = {nodes: [], jump:r.jump}
+            // console.log('create ' + q0 + ' as child of ' + i + ' with jump ' + q1)
+            // console.log('create ' + q1 + ' as child of ' + i + ' with jump ' + q2)
+            // console.log('create ' + q2 + ' as child of ' + i + ' with jump ' + q3)
+            // console.log('create ' + q3 + ' as child of ' + i + ' with jump ' + r.jump)
 
-            // To get child = (i << 2) + j
-            barnesHutMatrix[(i << 2) + j] = {nodes: []};
+            // Attributing nodes to subregions
+            // NOTE: side attribution is not that relevant
+            for (j = 0, k = r.nodes.length; j < k; j++) {
+              n = r.nodes[j];
+
+              if (W.nodeMatrix[np(n, 'x')] < r.massCenterX) {
+
+                // Left
+                if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
+                  barnesHutMatrix[q0].nodes.push(n);
+                else
+                  barnesHutMatrix[q1].nodes.push(n);
+              }
+              else {
+
+                // Right
+                if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
+                  barnesHutMatrix[q2].nodes.push(n);
+                else
+                  barnesHutMatrix[q3].nodes.push(n);
+              }
+            }
           }
 
-          // Attributing nodes to subregions
-          // NOTE: side attribution is not that relevant
-          for (j = 0, k = r.nodes.length; j < k; j++) {
-            n = r.nodes[j];
-
-            if (W.nodeMatrix[np(n, 'x')] < r.massCenterX) {
-
-              // Left
-              if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
-                barnesHutMatrix[(i << 2) + 1].nodes.push(n);
-              else
-                barnesHutMatrix[(i << 2) + 4].nodes.push(n);
-            }
-            else {
-
-              // Right
-              if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
-                barnesHutMatrix[(i << 2) + 2].nodes.push(n);
-              else
-                barnesHutMatrix[(i << 2) + 3].nodes.push(n);
+          // Next iteration
+          i++
+          if(walker_location.length <= maxl){
+            walker_location.push(0)
+          } else {
+            if(walker_location[maxl] < 3){
+              walker_location[maxl]++
+            } else {
+              lvl = maxl
+              while(lvl > 0){
+                walker_location.pop()
+                lvl--
+                if(walker_location[lvl] < 3){
+                  walker_location[lvl]++
+                  break;
+                }
+              }
             }
           }
+          
         }
       }
 
@@ -326,9 +393,10 @@
         for (n = 0; n < W.nodesLength; n += W.ppn) {
 
           // Computing leaf quad nodes iteration
-          // m = Math.pow(4, W.settings.barnesHutDepthLimit) - 1;
           l = barnesHutMatrix.length;
-          for (i = 0; i < l; i++) {
+          i = 0
+
+          while (i < l) {
             r = barnesHutMatrix[i];
 
             distance = Math.sqrt(
@@ -337,11 +405,15 @@
             );
 
             // If no nodes we continue
-            if (!r.nodes.length)
+            if (!r.nodes.length){
+              i++
               continue;
+            }
 
-            if (distance * W.settings.barnesHutTheta <= r.size)
+            if (distance * W.settings.barnesHutTheta <= r.size){
+              i++
               continue;
+            }
 
             xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
             yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
@@ -374,6 +446,12 @@
                 W.nodeMatrix[np(n, 'dx')] += xDist * factor;
                 W.nodeMatrix[np(n, 'dy')] += yDist * factor;
               }
+            }
+
+            i = r.jump;
+
+            if(i<0){
+              break;
             }
           }
         }
