@@ -27,6 +27,10 @@
      * *******************
      */
     // {string}
+    defaultNodeType: 'def',
+    // {string}
+    defaultEdgeType: 'def',
+    // {string}
     defaultLabelColor: '#000',
     // {string}
     defaultEdgeColor: '#000',
