@@ -46,6 +46,11 @@ test('Basic manipulation', function() {
             id: 'e3',
             source: 'n2',
             target: 'n3'
+          },
+          {
+            id: 'e4',
+            source: 'n2',
+            target: 'n2'
           }
         ]
       };
@@ -66,6 +71,7 @@ test('Basic manipulation', function() {
   myGraph.addEdge(graph.edges[1]);
   myGraph.addEdge(graph.edges[2]);
   myGraph.addEdge(graph.edges[3]);
+  myGraph.addEdge(graph.edges[4]);
 
   // NODES:
   // ******
@@ -267,7 +273,7 @@ test('Basic manipulation', function() {
   );
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e1', 'e2', 'e3'],
+    ['e1', 'e2', 'e3', 'e4'],
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
@@ -282,8 +288,15 @@ test('Basic manipulation', function() {
   myGraph.dropEdge('e1');
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e2', 'e3'],
+    ['e2', 'e3', 'e4'],
     '"dropEdge" actually drops the edge.'
+  );
+
+  myGraph.dropEdge('e4');
+  deepEqual(
+    myGraph.edges().map(function(e) { return e.id }),
+    ['e2', 'e3'],
+    '"dropEdge" with a self loops works. (#286)'
   );
 
   throws(
