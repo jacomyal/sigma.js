@@ -79,7 +79,7 @@ var s = new sigma({
 
 document.getElementById('toggle-layout').addEventListener('click', function() {
   if ((s.supervisor || {}).running) {
-    s.stopForceAtlas2();
+    s.killForceAtlas2();
     document.getElementById('toggle-layout').innerHTML = 'Start layout';
   } else {
     s.startForceAtlas2({worker: true});
@@ -99,7 +99,7 @@ db.load('data/arctic.json', function() {
   // Out function to initialize sigma on a new neighborhood:
   function refreshGraph(centerNodeId) {
     // First, let's stop the ForceAtlas2 algorithm:
-    s.stopForceAtlas2();
+    s.killForceAtlas2();
 
     // Restart the camera:
     s.camera.goTo({
