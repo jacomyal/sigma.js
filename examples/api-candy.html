@@ -116,7 +116,9 @@ for (i = 0; i < C; i++)
   cs.push({
     id: i,
     nodes: [],
-    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
+    color: '#' + (
+      Math.floor(Math.random() * 16777215).toString(16) + '000000'
+    ).substr(0, 6)
   });
 
 for (i = 0; i < N; i++) {
