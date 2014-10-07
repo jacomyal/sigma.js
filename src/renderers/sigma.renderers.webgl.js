@@ -324,7 +324,10 @@
                   width: this.width,
                   height: this.height,
                   ratio: this.camera.ratio,
-                  scalingRatio: this.settings('webglOversamplingRatio'),
+                  scalingRatio: this.settings(
+                    options,
+                    'webglOversamplingRatio'
+                  ),
                   start: start,
                   count: end - start
                 }
@@ -384,7 +387,7 @@
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
-                scalingRatio: this.settings('webglOversamplingRatio')
+                scalingRatio: this.settings(options, 'webglOversamplingRatio')
               }
             );
           }
@@ -417,7 +420,7 @@
               width: this.width,
               height: this.height,
               ratio: this.camera.ratio,
-              scalingRatio: this.settings('webglOversamplingRatio')
+              scalingRatio: this.settings(options, 'webglOversamplingRatio')
             }
           );
         }
