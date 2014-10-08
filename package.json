@@ -26,9 +26,7 @@
     "uglify-js": "^2.4.15",
     "karma": "~0.12.24",
     "karma-qunit": "~0.1.4",
-    "karma-coverage": "~0.2.6",
-    "grunt-karma": "~0.9.0",
-    "karma-phantomjs-launcher": "~0.1.4"
+    "karma-coverage": "~0.2.6"
   },
   "scripts": {
     "start": "http-server -p 8000",
