@@ -170,7 +170,7 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var a, i, j, l, r, n, n1, n2, q, e, w, g, k, m;
+      var a, i, j, l, r, n, n1, n2, q, q2, e, w, g, k, m;
 
       var barnesHutMatrix,
           outboundAttCompensation,
@@ -184,7 +184,7 @@
           factor,
           nodes,
           lvl,
-          maxl,
+          // maxl, full barnes hut
           child,
           q0,q1,q2,q3;
 
@@ -215,167 +215,250 @@
 
       // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
-        var massSumX,
-            massSumY,
-            walker_location,
-            locations_index;
+        var minX = Number.MAX_VALUE,
+            maxX = -Number.MAX_VALUE,
+            minY = Number.MAX_VALUE,
+            maxY = -Number.MAX_VALUE;
 
         // Setting up
         barnesHutMatrix = [];
-        walker_location = [0];
 
         // Initial nodes holder
         nodes = [];
         for (n = 0; n < W.nodesLength; n += W.ppn) {
           nodes.push(n);
+          minX = Math.min(minX, W.nodeMatrix[np(n, 'x')]);
+          maxX = Math.max(maxX, W.nodeMatrix[np(n, 'x')]);
+          minY = Math.min(minY, W.nodeMatrix[np(n, 'y')]);
+          maxY = Math.max(maxY, W.nodeMatrix[np(n, 'y')]);
         }
 
-        // Max level
-        maxl = W.settings.barnesHutDepthLimit
+        // Build the Barnes Hut Tree
+        barnesHutMatrix.push([  // Root region
+          -1,                               // Node
+          (minX + maxX) / 2,                // x center
+          (minY + maxY) / 2,                // y center
+          Math.max(maxX-minX, maxY-minY),   // Size (half-width of the square)
+          -1,                               // Next sibling index
+          -1,                               // First child index
+          0,                                // Mass
+          0,                                // Mass center x
+          0                                 // Mass center y
+        ]);
 
-        // Max length = (4^n+1 - 1) / 3
-        l = (Math.pow(4, (maxl + 1)) - 1) / 3;
-        barnesHutMatrix.length = l;
+        // Add each node in the tree
+        for (n = 0; n < W.nodesLength; n += W.ppn) {
+          r = barnesHutMatrix[0];   // Current region
+                                    // We start with root region
+          // console.log(n + ' >root region')
+          while(true){
+            // console.log('MATRIX ' + barnesHutMatrix.map(function(d){return d[0]}).join(' '))
 
-        // Build Locations Index
-        locations_index = {};
-        i = 0
-        while(i < l) {
-          locations_index[walker_location.join('')] = i
-          
-          // Next iteration
-          // console.log('i: ' + i + ' - loc: ' + walker_location.join(' '))
-          i++
-          if(walker_location.length <= maxl){
-            walker_location.push(0)
-          } else {
-            if(walker_location[maxl] < 3){
-              walker_location[maxl]++
-            } else {
-              lvl = maxl
-              while(lvl > 0){
-                walker_location.pop()
-                lvl--
-                if(walker_location[lvl] < 3){
-                  walker_location[lvl]++
-                  break;
+            // Are there sub-regions ?
+
+            if(r[5] >= 0){ // We look at first child index
+              // console.log('...sub');
+              // There are sub-regions
+
+              // We just iterate to find a "leave" of the tree
+              // that is an empty region or a region with a single node
+              // (see next case)
+
+              // Find the quadrant of n
+              if(W.nodeMatrix[np(n, 'x')]<r[1]){
+                if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                  // Top Left quarter
+                  // console.log(n + ' TL quarter >' + r[5] + ' r=' + r.join(' '))
+                  q = barnesHutMatrix[r[5]]
+                } else {
+                  // Bottom Left quarter
+                  // console.log(n + ' BL quarter >' + (r[5]+1) + ' r=' + r.join(' '))
+                  q = barnesHutMatrix[r[5]+1]
+                }
+              } else {
+                if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                  // Top Right quarter
+                  // console.log(n + ' TR quarter >' + (r[5]+2) + ' r=' + r.join(' '))
+                  q = barnesHutMatrix[r[5]+2]
+                } else {
+                  // Bottom Right quarter
+                  // console.log(n + ' BR quarter >' + (r[5]+3) + ' r=' + r.join(' '))
+                  q = barnesHutMatrix[r[5]+3]
                 }
               }
-            }
-          }
 
-        }
-        walker_location = [0];
+              // Update center of mass and mass (we only do it for non-leave regions)
+              r[7] = (r[7] * r[6] + W.nodeMatrix[np(n, 'x')] * W.nodeMatrix[np(n, 'mass')]) / (r[6] + W.nodeMatrix[np(n, 'mass')]);
+              r[8] = (r[8] * r[6] + W.nodeMatrix[np(n, 'y')] * W.nodeMatrix[np(n, 'mass')]) / (r[6] + W.nodeMatrix[np(n, 'mass')]);
+              r[6] += W.nodeMatrix[np(n, 'mass')];
 
-        // Iterate
-        i = 0
-        while(i < l) {
+              // Iterate on the right quadrant
+              r = q;
+              continue;
 
-          // Defining region
-          r = i ? barnesHutMatrix[i] : {
-            nodes: nodes,
-            jump: -1,
-            lvl: 0
-          };
-
-          // TODO: do we need an object here? or his a simple node array valid?
-          r.mass = 0;
-          r.massCenterX = 0;
-          r.massCenterY = 0;
-          r.size = 0;
-
-          massSumX = 0;
-          massSumY = 0;
-
-          // Iterating through nodes to split regions
-          if (r.nodes.length) {
-            for (j = 0, k = r.nodes.length; j < k; j++) {
-              n = r.nodes[j];
-
-              mass = W.nodeMatrix[np(n, 'mass')];
-              r.mass += mass;
-              massSumX += W.nodeMatrix[np(n, 'x')] * mass;
-              massSumY += W.nodeMatrix[np(n, 'y')] * mass;
-            }
-
-            r.massCenterX = massSumX / r.mass;
-            r.massCenterY = massSumY / r.mass;
-
-            // Computing size
-            for (j = 0, k = r.nodes.length; j < k; j++) {
-              n = r.nodes[j];
-
-              distance = 2 * Math.sqrt(
-                Math.pow((W.nodeMatrix[np(n, 'x')] - r.massCenterX), 2) +
-                Math.pow((W.nodeMatrix[np(n, 'y')] - r.massCenterY), 2)
-              );
-              r.size = (r.size === 0) ?
-                distance :
-                Math.max(r.size, distance);
-            }
-          }
-
-          // Adding to index
-          barnesHutMatrix[i] = r;
-
-          // Create sub-regions if we are not at leaf level          
-          if (walker_location.length <= maxl){
-
-            // Defining subregions
-            q0 = locations_index[walker_location.slice(0).concat([0]).join('')]
-            q1 = locations_index[walker_location.slice(0).concat([1]).join('')]
-            q2 = locations_index[walker_location.slice(0).concat([2]).join('')]
-            q3 = locations_index[walker_location.slice(0).concat([3]).join('')]
-            barnesHutMatrix[q0] = {nodes: [], lvl: r.lvl+1, jump:q1}
-            barnesHutMatrix[q1] = {nodes: [], lvl: r.lvl+1, jump:q2}
-            barnesHutMatrix[q2] = {nodes: [], lvl: r.lvl+1, jump:q3}
-            barnesHutMatrix[q3] = {nodes: [], lvl: r.lvl+1, jump:r.jump}
-
-            // Attributing nodes to subregions
-            // NOTE: side attribution is not that relevant
-            for (j = 0, k = r.nodes.length; j < k; j++) {
-              n = r.nodes[j];
-
-              if (W.nodeMatrix[np(n, 'x')] < r.massCenterX) {
-
-                // Left
-                if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
-                  barnesHutMatrix[q0].nodes.push(n);
-                else
-                  barnesHutMatrix[q1].nodes.push(n);
-              }
-              else {
-
-                // Right
-                if (W.nodeMatrix[np(n, 'y')] < r.massCenterY)
-                  barnesHutMatrix[q2].nodes.push(n);
-                else
-                  barnesHutMatrix[q3].nodes.push(n);
-              }
-            }
-          }
-
-          // Next iteration
-          i++
-          if(walker_location.length <= maxl){
-            walker_location.push(0)
-          } else {
-            if(walker_location[maxl] < 3){
-              walker_location[maxl]++
             } else {
-              lvl = maxl
-              while(lvl > 0){
-                walker_location.pop()
-                lvl--
-                if(walker_location[lvl] < 3){
-                  walker_location[lvl]++
-                  break;
+              // console.log('...no sub');
+              // There are no sub-regions: we are in a "leave"
+
+              // Is there a node in this leave?
+              if(r[0] < 0){
+
+                // There is no node in region:
+                // we record node n and go on
+                r[0] = n;
+
+                // console.log(n + ' No node: we record');
+                break;
+
+              } else {
+                // console.log(n + ' Node in same region...');
+
+                // There is a node in this region
+
+                // We will need to create sub-regions, stick the two
+                // nodes (the old one r[0] and the new one n) in two
+                // subregions. If they fall in the same quadrant,
+                // we will iterate.
+
+                // Create sub-regions
+
+                r[5] = barnesHutMatrix.length;  // first child index
+                w = r[3]/2  // new size (half)
+
+                // NB: we use screen coordinates
+                // from Top Left to Bottom Right
+
+                // console.log('Create items ' + r[5] + ' to ' + (r[5]+3))
+                // Top Left sub-region
+                barnesHutMatrix[r[5]] = [
+                  -1,             // Node
+                  r[1] - w,       // x center
+                  r[2] - w,       // y center
+                  w,              // Size (half-width of the square)
+                  r[5] + 1,        // Next sibling index
+                  -1,             // First child index
+                  0,              // Mass
+                  0,              // Mass center x
+                  0               // Mass center y
+                ]
+
+                // Bottom Left sub-region
+                barnesHutMatrix[r[5]+1] = [
+                  -1,             // Node
+                  r[1] - w,       // x center
+                  r[2] + w,       // y center
+                  w,              // Size (half-width of the square)
+                  r[5] + 2,        // Next sibling index
+                  -1,             // First child index
+                  0,              // Mass
+                  0,              // Mass center x
+                  0               // Mass center y
+                ]
+
+                // Top Right sub-region
+                barnesHutMatrix[r[5]+2] = [
+                  -1,             // Node
+                  r[1] + w,       // x center
+                  r[2] - w,       // y center
+                  w,              // Size (half-width of the square)
+                  r[5] + 3,        // Next sibling index
+                  -1,             // First child index
+                  0,              // Mass
+                  0,              // Mass center x
+                  0               // Mass center y
+                ]
+
+                // Bottom Right sub-region
+                barnesHutMatrix[r[5]+3] = [
+                  -1,             // Node
+                  r[1] + w,       // x center
+                  r[2] + w,       // y center
+                  w,              // Size (half-width of the square)
+                  r[4],           // Next sibling index -> Jump to parent's next sibling
+                  -1,             // First child index
+                  0,              // Mass
+                  0,              // Mass center x
+                  0               // Mass center y
+                ]
+
+                // Now the goal is to find two different sub-regions
+                // for the two nodes: the one previously recorded (r[0])
+                // and the one we want to add (n)
+
+                // Find the quadrant of r[0] (old node)
+                if(W.nodeMatrix[np(r[0], 'x')]<r[1]){
+                  if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
+                    // Top Left quarter
+                    // console.log('old node in TL ' + (r[5]))
+                    q = barnesHutMatrix[r[5]]
+                  } else {
+                    // Bottom Left quarter
+                    // console.log('old node in BL ' + (r[5]+1))
+                    q = barnesHutMatrix[r[5]+1]
+                  }
+                } else {
+                  if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
+                    // Top Right quarter
+                    // console.log('old node in TR ' + (r[5]+2))
+                    q = barnesHutMatrix[r[5]+2]
+                  } else {
+                    // Bottom Right quarter
+                    // console.log('old node in BR ' + (r[5]+3))
+                    q = barnesHutMatrix[r[5]+3]
+                  }
                 }
+
+                // We remove r[0] from the region r, add its mass to r and record it in q
+                r[6] = W.nodeMatrix[np(r[0], 'mass')];  // Mass
+                r[7] = W.nodeMatrix[np(r[0], 'x')];  // Mass center x
+                r[8] = W.nodeMatrix[np(r[0], 'y')];  // Mass center y
+                q[0] = r[0];
+                r[0] = -1;
+
+                // Find the quadrant of n
+                if(W.nodeMatrix[np(n, 'x')]<r[1]){
+                  if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                    // Top Left quarter
+                    // console.log(n + ' TL quarter >' + (r[5]))
+                    q2 = barnesHutMatrix[r[5]]
+                  } else {
+                    // Bottom Left quarter
+                    // console.log(n + ' BL quarter >' + (r[5]+1))
+                    q2 = barnesHutMatrix[r[5]+1]
+                  }
+                } else {
+                  if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                    // Top Right quarter
+                    // console.log(n + ' TR quarter >' + (r[5]+2))
+                    q2 = barnesHutMatrix[r[5]+2]
+                  } else {
+                    // Bottom Right quarter
+                    // console.log(n + ' BR quarter >' + (r[5]+3))
+                    q2 = barnesHutMatrix[r[5]+3]
+                  }
+                }
+
+                if(q == q2){
+                  
+                  // If both nodes are in the same quadrant,
+                  // we have to try it again on this quadrant
+                  // console.log('Both nodes in same quadrant')
+                  r = q;
+                  continue;
+                }
+                
+                // If both quadrants are different, we record n
+                // in its quadrant
+                // console.log('Different quadrants We record  >Break')
+                q2[0] = n
+                break;
               }
+
             }
           }
-          
+ 
         }
+        
       }
 
 
@@ -390,71 +473,118 @@
         for (n = 0; n < W.nodesLength; n += W.ppn) {
 
           // Computing leaf quad nodes iteration
-          l = barnesHutMatrix.length;
-          i = 0
 
-          while (i < l) {
-            r = barnesHutMatrix[i];
+          r = barnesHutMatrix[0]; // Starting with root region
+          while (true) {
 
-            // If no node we continue
-            if (!r.nodes.length){
-              i = r.jump;
-              if(i<0)
-                break;
-              continue;
-            }
+            if(r[5] >= 0){
 
-            distance = Math.sqrt(
-              (Math.pow(W.nodeMatrix[np(n, 'x')] - r.massCenterX, 2)) +
-              (Math.pow(W.nodeMatrix[np(n, 'y')] - r.massCenterY, 2))
-            );
+              // The region has sub-regions
 
-            // If the region is small enough for the distance, we compute
-            if (r.size / distance < W.settings.barnesHutTheta){
-              
-              xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
-              yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
+              // We run the Barnes Hut test to see if we are at the right distance
+              distance = Math.sqrt(
+                (Math.pow(W.nodeMatrix[np(n, 'x')] - r[7], 2)) +
+                (Math.pow(W.nodeMatrix[np(n, 'y')] - r[8], 2))
+              );
+              if (2 * r[3] / distance < W.settings.barnesHutTheta){
 
-              if (W.settings.adjustSize) {
+                // We treat the region as a single body, and we repulse
 
-                //-- Linear Anti-collision Repulsion
-                if (distance > 0) {
-                  factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                    r.mass / distance / distance;
+                xDist = W.nodeMatrix[np(n, 'x')] - r[7];
+                yDist = W.nodeMatrix[np(n, 'y')] - r[8];
 
-                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                if (W.settings.adjustSize) {
+
+                  //-- Linear Anti-collision Repulsion
+                  if (distance > 0) {
+                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      r[6] / distance / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
+                  else if (distance < 0) {
+                    factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      r[6] / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
                 }
-                else if (distance < 0) {
-                  factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
-                    r.mass / distance;
+                else {
 
-                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  //-- Linear Repulsion
+                  if (distance > 0) {
+                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      r[6] / distance / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
                 }
+
+                // When this is done, we iterate. We have to look at the next sibling.
+                if(r[4] < 0)
+                  break;  // No next sibling: we have finished the tree
+                r = barnesHutMatrix[r[4]]
+                continue;
+
+              } else {
+
+                // The region is too close and we have to look at sub-regions
+                r = barnesHutMatrix[r[5]]
+                continue;
               }
-              else {
 
-                //-- Linear Repulsion
-                if (distance > 0) {
-                  factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                    r.mass / distance / distance;
+            } else {
 
-                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+              // The region has no sub-region
+              // If there is a node r[0] and it is not n, then repulse
+
+              if(r[0] >= 0 && r[0] !== n){
+                xDist = W.nodeMatrix[np(n, 'x')] - W.nodeMatrix[np(r[0], 'x')];
+                yDist = W.nodeMatrix[np(n, 'y')] - W.nodeMatrix[np(r[0], 'y')];
+
+                if (W.settings.adjustSize) {
+
+                  //-- Linear Anti-collision Repulsion
+                  if (distance > 0) {
+                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      W.nodeMatrix[np(r[0], 'mass')] / distance / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
+                  else if (distance < 0) {
+                    factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      W.nodeMatrix[np(r[0], 'mass')] / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
                 }
+                else {
+
+                  //-- Linear Repulsion
+                  if (distance > 0) {
+                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                      W.nodeMatrix[np(r[0], 'mass')] / distance / distance;
+
+                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  }
+                }
+
               }
 
-              i = r.jump;
-              if(i<0)
-                break;
+              // When this is done, we iterate. We have to look at the next sibling.
+              if(r[4] < 0)
+                break;  // No next sibling: we have finished the tree
+              r = barnesHutMatrix[r[4]]
+              continue;
+
             }
 
-            // At this point we look for smaller quadrants
-            else {
-              i++
-              continue;
-            }
 
             
 
