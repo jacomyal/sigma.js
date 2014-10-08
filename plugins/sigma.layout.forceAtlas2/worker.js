@@ -48,7 +48,7 @@
         slowDown: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 1.2,
-        barnesHutDepthLimit: 4
+        barnesHutDepthLimit: 3
       }
     };
 
@@ -274,7 +274,8 @@
           // Defining region
           r = i ? barnesHutMatrix[i] : {
             nodes: nodes,
-            jump: -1
+            jump: -1,
+            lvl: 0
           };
 
           // TODO: do we need an object here? or his a simple node array valid?
@@ -325,14 +326,10 @@
             q1 = locations_index[walker_location.slice(0).concat([1]).join('')]
             q2 = locations_index[walker_location.slice(0).concat([2]).join('')]
             q3 = locations_index[walker_location.slice(0).concat([3]).join('')]
-            barnesHutMatrix[q0] = {nodes: [], jump:q1}
-            barnesHutMatrix[q1] = {nodes: [], jump:q2}
-            barnesHutMatrix[q2] = {nodes: [], jump:q3}
-            barnesHutMatrix[q3] = {nodes: [], jump:r.jump}
-            // console.log('create ' + q0 + ' as child of ' + i + ' with jump ' + q1)
-            // console.log('create ' + q1 + ' as child of ' + i + ' with jump ' + q2)
-            // console.log('create ' + q2 + ' as child of ' + i + ' with jump ' + q3)
-            // console.log('create ' + q3 + ' as child of ' + i + ' with jump ' + r.jump)
+            barnesHutMatrix[q0] = {nodes: [], lvl: r.lvl+1, jump:q1}
+            barnesHutMatrix[q1] = {nodes: [], lvl: r.lvl+1, jump:q2}
+            barnesHutMatrix[q2] = {nodes: [], lvl: r.lvl+1, jump:q3}
+            barnesHutMatrix[q3] = {nodes: [], lvl: r.lvl+1, jump:r.jump}
 
             // Attributing nodes to subregions
             // NOTE: side attribution is not that relevant
@@ -399,60 +396,68 @@
           while (i < l) {
             r = barnesHutMatrix[i];
 
+            // If no node we continue
+            if (!r.nodes.length){
+              i = r.jump;
+              if(i<0)
+                break;
+              continue;
+            }
+
             distance = Math.sqrt(
               (Math.pow(W.nodeMatrix[np(n, 'x')] - r.massCenterX, 2)) +
               (Math.pow(W.nodeMatrix[np(n, 'y')] - r.massCenterY, 2))
             );
 
-            // If no nodes we continue
-            if (!r.nodes.length){
-              i++
-              continue;
-            }
+            // If the region is small enough for the distance, we compute
+            if (r.size / distance < W.settings.barnesHutTheta){
+              
+              xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
+              yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
 
-            if (distance * W.settings.barnesHutTheta <= r.size){
-              i++
-              continue;
-            }
+              if (W.settings.adjustSize) {
 
-            xDist = W.nodeMatrix[np(n, 'x')] - r.massCenterX;
-            yDist = W.nodeMatrix[np(n, 'y')] - r.massCenterY;
+                //-- Linear Anti-collision Repulsion
+                if (distance > 0) {
+                  factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    r.mass / distance / distance;
 
-            if (W.settings.adjustSize) {
+                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                }
+                else if (distance < 0) {
+                  factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    r.mass / distance;
 
-              //-- Linear Anti-collision Repulsion
-              if (distance > 0) {
-                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  r.mass / distance / distance;
-
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                }
               }
-              else if (distance < 0) {
-                factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  r.mass / distance;
+              else {
 
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                //-- Linear Repulsion
+                if (distance > 0) {
+                  factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    r.mass / distance / distance;
+
+                  W.nodeMatrix[np(n, 'dx')] += xDist * factor;
+                  W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                }
               }
+
+              i = r.jump;
+              if(i<0)
+                break;
             }
+
+            // At this point we look for smaller quadrants
             else {
-
-              //-- Linear Repulsion
-              if (distance > 0) {
-                factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                  r.mass / distance / distance;
-
-                W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n, 'dy')] += yDist * factor;
-              }
+              i++
+              continue;
             }
 
-            i = r.jump;
+            
 
-            if(i<0){
-              break;
-            }
           }
         }
       }
