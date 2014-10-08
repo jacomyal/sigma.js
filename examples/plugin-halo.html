@@ -145,16 +145,8 @@ s.bind('overNodes', function(e) {
     })
   });
 
-  // Add hovered nodes to the array
-  if (e.data.nodes.length === 1) {
-    adjacentNodes.push(e.data.nodes[0]);
-  }
-  else {
-    adjacentNodes = adjacentNodes.concat(e.data.nodes);
-  }
-
-  // Remove duplicates
-  adjacentNodes = arrayUnique(adjacentNodes);
+  // Add hovered nodes to the array and remove duplicates:
+  adjacentNodes = arrayUnique(adjacentNodes.concat(e.data.nodes));
 
   // Get adjacent edges:
   e.data.nodes.forEach(function(node) {
@@ -163,7 +155,7 @@ s.bind('overNodes', function(e) {
     })
   });
 
-  // Remove duplicates
+  // Remove duplicates:
   adjacentEdges = arrayUnique(adjacentEdges);
 
   // Render halo:

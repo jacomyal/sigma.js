@@ -85,15 +85,17 @@ myRenderer.halo({
 
 ## Advanced usage
 
+Render the halo behind a subset of nodes as follows:
+
 ````javascript
-// Render the halo behind a subset of nodes:
 myRenderer.halo({
   nodes: s.graph.nodes().filter(function(node) { return node.size > 0.5; })
 });
 ````
 
+Render the halo behind hovered nodes and their adjacent nodes as follows:
+
 ````javascript
-// Render the halo behind hovered nodes and their adjacent nodes:
 s.bind('overNodes', function(e) {
   var adjacentNodes = [];
 
@@ -104,16 +106,8 @@ s.bind('overNodes', function(e) {
     })
   });
 
-  // Add hovered nodes to the array
-  if (e.data.nodes.length === 1) {
-    adjacentNodes.push(e.data.nodes[0]);
-  }
-  else {
-    adjacentNodes = adjacentNodes.concat(e.data.nodes);
-  }
-
-  // Remove duplicates
-  adjacentNodes = arrayUnique(adjacentNodes);
+  // Add hovered nodes to the array and remove duplicates:
+  adjacentNodes = arrayUnique(adjacentNodes.concat(e.data.nodes));
 
   // Render halo:
   myRenderer.halo({
