@@ -60,6 +60,8 @@
     // {number} The hovered node's label font. If not specified, will heritate
     //          the "font" value.
     hoverFont: '',
+    // {boolean} If true, then only one node can be hovered at a time.
+    singleHover: false,
     // {string} Example: 'bold'
     hoverFontStyle: '',
     // {string} Indicates how to choose the hovered nodes shadow color.
@@ -82,6 +84,16 @@
     labelHoverColor: 'default',
     // {string}
     defaultLabelHoverColor: '#000',
+    // {string} Indicates how to choose the edges hover color. Available values:
+    //          "edge", "default"
+    edgeHoverColor: 'edge',
+    // {number} The size multiplicator of hovered edges.
+    edgeHoverSizeRatio: 1,
+    // {string}
+    defaultEdgeHoverColor: '#000',
+    // {boolean} Indicates if the edge extremities must be hovered when the
+    //           edge is hovered.
+    edgeHoverExtremities: false,
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
@@ -122,6 +134,8 @@
     maxEdgeSize: 1,
     minNodeSize: 1,
     maxNodeSize: 8,
+    // {number} Defines the minimal edge's arrow display size.
+    minArrowSize: 0,
 
 
 
@@ -187,6 +201,10 @@
     enableCamera: true,
     // {boolean} If set to false, the nodes cannot be hovered.
     enableHovering: true,
+    // {boolean} If set to true, the edges can be hovered.
+    enableEdgeHovering: false,
+    // {number} The size of the area around the edges to activate hovering.
+    edgeHoverPrecision: 5,
     // {boolean} If set to true, the rescale middleware will ignore node sizes
     //           to determine the graphs boundings.
     rescaleIgnoreSize: false,

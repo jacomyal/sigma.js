@@ -475,7 +475,8 @@
    */
   sigma.renderers.webgl.prototype.initDOM = function(tag, id, webgl) {
     var gl,
-        dom = document.createElement(tag);
+        dom = document.createElement(tag),
+        self = this;
 
     dom.style.position = 'absolute';
     dom.setAttribute('class', 'sigma-' + id);
@@ -483,10 +484,22 @@
     this.domElements[id] = dom;
     this.container.appendChild(dom);
 
-    if (tag.toLowerCase() === 'canvas')
+    if (tag.toLowerCase() === 'canvas') {
       this.contexts[id] = dom.getContext(webgl ? 'experimental-webgl' : '2d', {
         preserveDrawingBuffer: true
       });
+
+      // Adding webgl context loss listeners
+      if (webgl) {
+        dom.addEventListener('webglcontextlost', function(e) {
+          e.preventDefault();
+        }, false);
+
+        dom.addEventListener('webglcontextrestored', function(e) {
+          self.render();
+        }, false);
+      }
+    }
   };
 
   /**

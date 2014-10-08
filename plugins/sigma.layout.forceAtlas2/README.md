@@ -74,7 +74,16 @@ sigmaInstance.isForceAtlas2Running();
 * **worker** *boolean* `true`: should the layout use a web worker?
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
 
+*Supervisor configuration*
+
+* **worker** *boolean* `true`: should the layout use a web worker?
+* **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
+
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
 
+<<<<<<< HEAD
 2. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you have to trigger it explicitely.
+=======
+2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
+>>>>>>> origin/master

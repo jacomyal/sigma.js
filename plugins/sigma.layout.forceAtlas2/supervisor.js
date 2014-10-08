@@ -66,8 +66,8 @@
     }
     catch (e) {
       _root.BlobBuilder = _root.BlobBuilder ||
-                           _root.WebKitBlobBuilder ||
-                           _root.MozBlobBuilder;
+                          _root.WebKitBlobBuilder ||
+                          _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -148,7 +148,7 @@
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(content, buffers);
     else
       _root.postMessage(content, '*');
@@ -249,8 +249,8 @@
     }
 
     // Worker message receiver
-    var msgName = (this.worker) ? 'message' : 'newCoords';
-    (this.worker || document).addEventListener(msgName, function(e) {
+    this.msgName = (this.worker) ? 'message' : 'newCoords';
+    this.listener = function(e) {
 
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
@@ -275,17 +275,27 @@
         _this.killWorker();
         eventEmitter.dispatchEvent('stop');
       }
-    });
+    };
+
+    (this.worker || document).addEventListener(this.msgName, this.listener);
 
     // Filling byteArrays
     this.graphToByteArrays();
+
+    // Binding on kill to properly terminate layout when parent is killed
+    _this.sigInst.bind('kill', function() {
+      _this.sigInst.killForceAtlas2();
+    });
   };
 
   // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
     if (this.worker) {
       this.worker.terminate();
-      this.worker = null;
+    }
+    else {
+      _root.postMessage({action: 'kill'}, '*');
+      document.removeEventListener(this.msgName, this.listener);
     }
   };
 
@@ -299,7 +309,7 @@
 
     var data = {action: 'config', config: this.config};
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(data);
     else
       _root.postMessage(data, '*');

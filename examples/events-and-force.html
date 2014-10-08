@@ -114,8 +114,9 @@ s.bind('doubleClickStage rightClickStage', function(e) {
   console.log(e.type, e.data.captor);
 });
 
-// Start the ForceAtlas2 algorithm:
+// Configure the ForceAtlas2 algorithm:
 var fa = sigma.layouts.configForceAtlas2(s, {
+  worker: true,
   autoStop: true
 });
 
@@ -124,5 +125,6 @@ fa.bind('start stop', function(e) {
   console.log(e.type);
 });
 
+// Start the ForceAtlas2 algorithm:
 sigma.layouts.startForceAtlas2();
 </script>
