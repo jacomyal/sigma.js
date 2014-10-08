@@ -1,6 +1,5 @@
 node_modules/*
 build/*
-coverage/*
 *.tgz
 *.log
 *.swp
