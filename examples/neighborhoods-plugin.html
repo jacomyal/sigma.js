@@ -78,11 +78,11 @@ var s = new sigma({
     db = new sigma.plugins.neighborhoods();
 
 document.getElementById('toggle-layout').addEventListener('click', function() {
-  if ((s.forceatlas2 || {}).isRunning) {
-    s.stopForceAtlas2();
+  if ((s.supervisor || {}).running) {
+    s.killForceAtlas2();
     document.getElementById('toggle-layout').innerHTML = 'Start layout';
   } else {
-    s.startForceAtlas2();
+    s.startForceAtlas2({worker: true});
     document.getElementById('toggle-layout').innerHTML = 'Stop layout';
   }
 });
@@ -99,7 +99,7 @@ db.load('data/arctic.json', function() {
   // Out function to initialize sigma on a new neighborhood:
   function refreshGraph(centerNodeId) {
     // First, let's stop the ForceAtlas2 algorithm:
-    s.stopForceAtlas2();
+    s.killForceAtlas2();
 
     // Restart the camera:
     s.camera.goTo({
@@ -129,7 +129,7 @@ db.load('data/arctic.json', function() {
     s.refresh();
 
     // Start the ForceAtlas2 algorithm:
-    s.startForceAtlas2();
+    s.startForceAtlas2({worker: true});
     document.getElementById('toggle-layout').innerHTML = 'Stop layout';
   }
 

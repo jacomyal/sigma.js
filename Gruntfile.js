@@ -78,6 +78,7 @@ module.exports = function(grunt) {
     'renderers.customEdgeShapes',
     'renderers.customShapes',
     'renderers.edgeLabels',
+    'renderers.halo',
     'statistics.HITS'
   ];
 

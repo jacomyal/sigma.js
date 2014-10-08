@@ -1,6 +1,6 @@
 [ ![Codeship Status for Linkurious/sigma.js](https://www.codeship.io/projects/327f96c0-2c93-0132-9e32-4683d3e816f8/status)](https://www.codeship.io/projects/38962)
 
-sigma.js - v1.0.2
+sigma.js - v1.0.3
 =================
 
 Sigma is a JavaScript library dedicated to graph drawing.

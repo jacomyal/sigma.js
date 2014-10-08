@@ -44,13 +44,24 @@
         weightMax = bounds.weightMax,
         w = settings('width') || 1,
         h = settings('height') || 1,
-        rescaleSettings = settings('autoRescale');
+        rescaleSettings = settings('autoRescale'),
+        validSettings = {
+          nodePosition: 1,
+          nodeSize: 1,
+          edgeSize: 1
+        };
 
     /**
      * What elements should we rescale?
      */
     if (!(rescaleSettings instanceof Array))
       rescaleSettings = ['nodePosition', 'nodeSize', 'edgeSize'];
+
+    for (i = 0, l = rescaleSettings.length; i < l; i++)
+      if (!validSettings[rescaleSettings[i]])
+        throw new Error(
+          'The rescale setting "' + rescaleSettings[i] + '" is not recognized.'
+        );
 
     var np = ~rescaleSettings.indexOf('nodePosition'),
         ns = ~rescaleSettings.indexOf('nodeSize'),

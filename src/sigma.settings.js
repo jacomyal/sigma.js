@@ -138,6 +138,8 @@
     maxEdgeSize: 1,
     minNodeSize: 1,
     maxNodeSize: 8,
+    // {number} Defines the minimal edge's arrow display size.
+    minArrowSize: 0,
 
 
 
