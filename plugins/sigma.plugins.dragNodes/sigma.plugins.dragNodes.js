@@ -70,6 +70,7 @@
 
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
+    renderer.bind('click', click);
 
     _s.bind('kill', function() {
       _self.unbindAll();
@@ -97,6 +98,17 @@
         left: element.getBoundingClientRect().left + getCssProperty('padding-left'),
         top: element.getBoundingClientRect().top + getCssProperty('padding-top')
       };
+    };
+
+    function click(event) {
+      // event triggered at the end of the click
+      _isMouseDown = false;
+      _body.removeEventListener('mousemove', nodeMouseMove);
+      _body.removeEventListener('mouseup', nodeMouseUp);
+
+      if (!_hoverStack.length) {
+        _node = null;
+      }
     };
 
     function nodeMouseOver(event) {
@@ -133,7 +145,7 @@
     function nodeMouseDown(event) {
       _isMouseDown = true;
       var size = _s.graph.nodes().length;
-      if (size > 0) {
+      if (_node && size > 0) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
@@ -165,7 +177,6 @@
       _mouse.addEventListener('mousedown', nodeMouseDown);
       _body.removeEventListener('mousemove', nodeMouseMove);
       _body.removeEventListener('mouseup', nodeMouseUp);
-
 
       // Allow to refresh edgequadtree:
       var k,
