@@ -259,6 +259,10 @@
     // Create object if undefined
     if (!_instance[s.id]) {
       _instance[s.id] = new DragNodes(s, renderer);
+
+      s.bind('kill', function() {
+        sigma.plugins.killDragNodes(s);
+      });
     }
     return _instance[s.id];
   };
