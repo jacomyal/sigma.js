@@ -148,8 +148,8 @@
 
     function executeNodeMouseMove() {
       var offset = calculateOffset(_renderer.container),
-          x = event.pageX - offset.left,
-          y = event.pageY - offset.top,
+          x = event.clientX - offset.left,
+          y = event.clientY - offset.top,
           cos = Math.cos(_camera.angle),
           sin = Math.sin(_camera.angle),
           nodes = _s.graph.nodes(),

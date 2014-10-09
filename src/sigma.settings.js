@@ -27,6 +27,10 @@
      * *******************
      */
     // {string}
+    defaultNodeType: 'def',
+    // {string}
+    defaultEdgeType: 'def',
+    // {string}
     defaultLabelColor: '#000',
     // {string}
     defaultEdgeColor: '#000',
@@ -152,6 +156,8 @@
     touchEnabled: true,
     // {boolean}
     mouseEnabled: true,
+    // {boolean}
+    mouseWheelEnabled: true,
     // {boolean}
     doubleClickEnabled: true,
     // {boolean} Defines whether the custom events such as "clickNode" can be
