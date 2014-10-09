@@ -9,6 +9,7 @@
 <script src="../src/classes/sigma.classes.graph.js"></script>
 <script src="../src/classes/sigma.classes.camera.js"></script>
 <script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
 <script src="../src/captors/sigma.captors.mouse.js"></script>
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
@@ -26,6 +27,11 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
@@ -101,7 +107,7 @@ for (i = 0; i < E; i++)
     target: 'n' + (Math.random() * N | 0)
   });
 
-// Instanciate sigma:
+// Instantiate sigma:
 s = new sigma({
   graph: g,
   container: 'graph-container',

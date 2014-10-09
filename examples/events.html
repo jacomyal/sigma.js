@@ -9,6 +9,7 @@
 <script src="../src/classes/sigma.classes.graph.js"></script>
 <script src="../src/classes/sigma.classes.camera.js"></script>
 <script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
 <script src="../src/captors/sigma.captors.mouse.js"></script>
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
@@ -26,6 +27,11 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
@@ -52,8 +58,8 @@
  */
 var i,
     s,
-    N = 100,
-    E = 500,
+    N = 20,
+    E = 200,
     g = {
       nodes: [],
       edges: []
@@ -75,25 +81,40 @@ for (i = 0; i < E; i++)
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
-    color: '#ccc'
+    type: 'curve',
+    color: '#ccc',
+    hover_color: '#000'
   });
 
 s = new sigma({
   graph: g,
-  container: 'graph-container',
+  renderer: {
+    container: document.getElementById('graph-container'),
+    type: 'canvas'
+  },
   settings: {
-    doubleClickEnabled: false
+    doubleClickEnabled: false,
+    minEdgeSize: 0.5,
+    maxEdgeSize: 4,
+    enableEdgeHovering: true,
+    edgeHoverColor: 'edge',
+    defaultEdgeHoverColor: '#000',
+    edgeHoverSizeRatio: 1,
+    edgeHoverExtremities: true,
   }
 });
 
 // Bind the events:
-s.bind('overNode outNode clickNode doubleClickNode', function(e) {
-  console.log(e.type, e.data.node.label);
+s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
+  console.log(e.type, e.data.node.label, e.data.captor);
+});
+s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
+  console.log(e.type, e.data.edge, e.data.captor);
 });
 s.bind('clickStage', function(e) {
-  console.log(e.type);
+  console.log(e.type, e.data.captor);
 });
-s.bind('doubleClickStage', function(e) {
-  console.log(e.type);
+s.bind('doubleClickStage rightClickStage', function(e) {
+  console.log(e.type, e.data.captor);
 });
 </script>

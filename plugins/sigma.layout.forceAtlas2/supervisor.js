@@ -11,12 +11,13 @@
    * Author: Guillaume Plique (Yomguithereal)
    * Version: 0.1
    */
+  var _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  var webWorkers = 'Worker' in window;
+  var webWorkers = 'Worker' in _root;
 
   /**
    * Supervisor Object
@@ -24,10 +25,13 @@
    */
   function Supervisor(sigInst, options) {
     var _this = this,
-        workerFn = sigInst.getForceAtlas2Worker();
+        workerFn = sigInst.getForceAtlas2Worker &&
+          sigInst.getForceAtlas2Worker();
 
-    // Window URL Polyfill
-    window.URL = window.URL || window.webkitURL;
+    options = options || {};
+
+    // _root URL Polyfill
+    _root.URL = _root.URL || _root.webkitURL;
 
     // Properties
     this.sigInst = sigInst;
@@ -35,15 +39,23 @@
     this.ppn = 10;
     this.ppe = 3;
     this.config = {};
+    this.shouldUseWorker =
+      options.worker === false ? false : true && webWorkers;
+    this.workerUrl = options.workerUrl;
 
     // State
     this.started = false;
     this.running = false;
 
     // Web worker or classic DOM events?
-    if (webWorkers) {
-      var blob = this.makeBlob(workerFn);
-      this.worker = new Worker(URL.createObjectURL(blob));
+    if (this.shouldUseWorker) {
+      if (!this.workerUrl) {
+        var blob = this.makeBlob(workerFn);
+        this.worker = new Worker(URL.createObjectURL(blob));
+      }
+      else {
+        this.worker = new Worker(this.workerUrl);
+      }
 
       // Post Message Polyfill
       this.worker.postMessage =
@@ -51,13 +63,12 @@
     }
     else {
 
-      // TODO: do we crush?
       eval(workerFn);
     }
 
     // Worker message receiver
-    var msgName = (this.worker) ? 'message' : 'newCoords';
-    (this.worker || document).addEventListener(msgName, function(e) {
+    this.msgName = (this.worker) ? 'message' : 'newCoords';
+    this.listener = function(e) {
 
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
@@ -74,10 +85,17 @@
         // Rendering graph
         _this.sigInst.refresh();
       }
-    });
+    };
+
+    (this.worker || document).addEventListener(this.msgName, this.listener);
 
     // Filling byteArrays
     this.graphToByteArrays();
+
+    // Binding on kill to properly terminate layout when parent is killed
+    sigInst.bind('kill', function() {
+      sigInst.killForceAtlas2();
+    });
   }
 
   Supervisor.prototype.makeBlob = function(workerFn) {
@@ -87,9 +105,9 @@
       blob = new Blob([workerFn], {type: 'application/javascript'});
     }
     catch (e) {
-      window.BlobBuilder = window.BlobBuilder ||
-                           window.WebKitBlobBuilder ||
-                           window.MozBlobBuilder;
+      _root.BlobBuilder = _root.BlobBuilder ||
+                          _root.WebKitBlobBuilder ||
+                          _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -170,10 +188,10 @@
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(content, buffers);
     else
-      window.postMessage(content, '*');
+      _root.postMessage(content, '*');
   };
 
   Supervisor.prototype.start = function() {
@@ -181,6 +199,14 @@
       return;
 
     this.running = true;
+
+    // Do not refresh edgequadtree during layout:
+    var k,
+        c;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = false;
+    }
 
     if (!this.started) {
 
@@ -197,12 +223,45 @@
     if (!this.running)
       return;
 
+    // Allow to refresh edgequadtree:
+    var k,
+        c,
+        bounds;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = true;
+
+      // Find graph boundaries:
+      bounds = sigma.utils.getBoundaries(
+        this.graph,
+        c.readPrefix
+      );
+
+      // Refresh edgequadtree:
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+        c.edgequadtree.index(this.sigInst.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
+    }
+
     this.running = false;
   };
 
   // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
-    this.worker.terminate();
+    if (this.worker) {
+      this.worker.terminate();
+    }
+    else {
+      _root.postMessage({action: 'kill'}, '*');
+      document.removeEventListener(this.msgName, this.listener);
+    }
   };
 
   Supervisor.prototype.configure = function(config) {
@@ -215,70 +274,68 @@
 
     var data = {action: 'config', config: this.config};
 
-    if (webWorkers)
+    if (this.shouldUseWorker)
       this.worker.postMessage(data);
     else
-      window.postMessage(data, '*');
+      _root.postMessage(data, '*');
   };
 
   /**
    * Interface
    * ----------
    */
-  var supervisor = null;
-
   sigma.prototype.startForceAtlas2 = function(config) {
 
     // Create supervisor if undefined
-    if (!supervisor)
-      supervisor = new Supervisor(this);
+    if (!this.supervisor)
+      this.supervisor = new Supervisor(this, config);
 
     // Configuration provided?
     if (config)
-      supervisor.configure(config);
+      this.supervisor.configure(config);
 
     // Start algorithm
-    supervisor.start();
+    this.supervisor.start();
 
     return this;
   };
 
   sigma.prototype.stopForceAtlas2 = function() {
-    if (!supervisor)
+    if (!this.supervisor)
       return this;
 
     // Pause algorithm
-    supervisor.stop();
+    this.supervisor.stop();
 
     return this;
   };
 
   sigma.prototype.killForceAtlas2 = function() {
-    if (!supervisor)
+    if (!this.supervisor)
       return this;
 
     // Stop Algorithm
-    supervisor.stop();
+    this.supervisor.stop();
 
     // Kill Worker
-    supervisor.killWorker();
+    this.supervisor.killWorker();
 
     // Kill supervisor
-    supervisor = null;
+    this.supervisor = null;
 
     return this;
   };
 
   sigma.prototype.configForceAtlas2 = function(config) {
-    if (!supervisor)
-      supervisor = new Supervisor(this);
+    if (!this.supervisor)
+      this.supervisor = new Supervisor(this, config);
 
-    supervisor.configure(config);
+    this.supervisor.configure(config);
 
     return this;
   };
 
   sigma.prototype.isForceAtlas2Running = function(config) {
-    return supervisor && supervisor.running;
+    return this.supervisor && this.supervisor.running;
   };
 }).call(this);

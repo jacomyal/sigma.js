@@ -46,6 +46,11 @@ test('Basic manipulation', function() {
             id: 'e3',
             source: 'n2',
             target: 'n3'
+          },
+          {
+            id: 'e4',
+            source: 'n2',
+            target: 'n2'
           }
         ]
       };
@@ -66,6 +71,7 @@ test('Basic manipulation', function() {
   myGraph.addEdge(graph.edges[1]);
   myGraph.addEdge(graph.edges[2]);
   myGraph.addEdge(graph.edges[3]);
+  myGraph.addEdge(graph.edges[4]);
 
   // NODES:
   // ******
@@ -129,18 +135,12 @@ test('Basic manipulation', function() {
     '"nodes" with a strings array as arguments returns the array of specified nodes.'
   );
 
-  deepEqual(
-    myGraph.adjacentNodes('n0'),
-    [graph.nodes[1]],
-    '"adjacentNodes" returns the adjacent nodes of a specified node'
-  );
-
   throws(
     function() {
-      myGraph.nodes(['n0', 'n1', 123]);
+      myGraph.nodes(['n0', 'n1', {}]);
     },
     /nodes: Wrong arguments/,
-    '"nodes" with an array containing a non-string value throws an error.'
+    '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(
@@ -244,18 +244,12 @@ test('Basic manipulation', function() {
     '"edges" with a strings array as arguments returns the array of specified edge.'
   );
 
-  deepEqual(
-    myGraph.adjacentEdges('n0'),
-    [graph.edges[0]],
-    '"adjacentEdges" returns the adjacent edges of a specified node'
-  );
-
   throws(
     function() {
-      myGraph.edges(['e0', 123]);
+      myGraph.edges(['e0', {}]);
     },
     /edges: Wrong arguments/,
-    '"edges" with an array containing a non-string value throws an error.'
+    '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(
@@ -279,7 +273,7 @@ test('Basic manipulation', function() {
   );
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e1', 'e2', 'e3'],
+    ['e1', 'e2', 'e3', 'e4'],
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
@@ -294,8 +288,15 @@ test('Basic manipulation', function() {
   myGraph.dropEdge('e1');
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e2', 'e3'],
+    ['e2', 'e3', 'e4'],
     '"dropEdge" actually drops the edge.'
+  );
+
+  myGraph.dropEdge('e4');
+  deepEqual(
+    myGraph.edges().map(function(e) { return e.id }),
+    ['e2', 'e3'],
+    '"dropEdge" with a self loops works. (#286)'
   );
 
   throws(
@@ -327,6 +328,7 @@ test('Basic manipulation', function() {
 
 test('Methods and attached functions', function() {
   var counter,
+      colorPalette = { Person: '#C3CBE1', Place: '#9BDEBD' },
       myGraph;
 
   counter = 0;
@@ -334,16 +336,43 @@ test('Methods and attached functions', function() {
     counter++;
   });
 
+  sigma.classes.graph.attachBefore('addNode', 'applyNodeColorPalette', function(n) {
+    n.color = colorPalette[n.category];
+  });
+
+  strictEqual(
+    false,
+    sigma.classes.graph.hasMethod('getNodeLabel'),
+    'sigma.classes.hasMethod returns false if the method does not exist.'
+  );
+
   sigma.classes.graph.addMethod('getNodeLabel', function(nId) {
     return (this.nodesIndex[nId] || {}).label;
   });
 
+  strictEqual(
+    true,
+    sigma.classes.graph.hasMethod('getNodeLabel'),
+    'sigma.classes.hasMethod returns true if the method has been added with addMethod.'
+  );
+
+  strictEqual(
+    true,
+    sigma.classes.graph.hasMethod('hasMethod'),
+    'sigma.classes.hasMethod returns true if the method is implemented in the core.'
+  );
+
   myGraph = new sigma.classes.graph();
-  myGraph.addNode({ id: 'n0', label: 'My node' });
+  myGraph.addNode({ id: 'n0', label: 'My node', category: 'Person' });
   strictEqual(
     1,
     counter,
     'Attached functions are effectively executed when the anchor method is called.'
+  );
+  strictEqual(
+    myGraph.nodes('n0').color,
+    '#C3CBE1',
+    'Attached "before" functions are effectively executed before when the anchor method is called.'
   );
   strictEqual(
     myGraph.getNodeLabel('n0'),
@@ -365,6 +394,22 @@ test('Methods and attached functions', function() {
     },
     /The method "undefinedMethod" does not exist./,
     'Attaching a function to an unexisting method when throws an error.'
+  );
+
+  throws(
+    function() {
+      sigma.classes.graph.attachBefore('addNode', 'applyNodeColorPalette', function() {});
+    },
+    /A function "applyNodeColorPalette" is already attached to the method "addNode"/,
+    'Attaching a "before" function to a method when there is already a "before" function attached to this method under the same key throws an error.'
+  );
+
+  throws(
+    function() {
+      sigma.classes.graph.attachBefore('undefinedMethod', 'applyNodeColorPalette', function() {});
+    },
+    /The method "undefinedMethod" does not exist./,
+    'Attaching a "before" function to an unexisting method when throws an error.'
   );
 
   throws(

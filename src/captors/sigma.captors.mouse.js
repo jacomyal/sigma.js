@@ -44,6 +44,8 @@
 
         _isMouseDown,
         _isMoving,
+        _hasDragged,
+        _downStartTime,
         _movingTimeoutId;
 
     sigma.classes.dispatcher.extend(this);
@@ -95,11 +97,18 @@
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('mousemove', {
           x: sigma.utils.getX(e) - e.target.width / 2,
-          y: sigma.utils.getY(e) - e.target.height / 2
+          y: sigma.utils.getY(e) - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
       if (_settings('mouseEnabled') && _isMouseDown) {
         _isMoving = true;
+        _hasDragged = true;
 
         if (_movingTimeoutId)
           clearTimeout(_movingTimeoutId);
@@ -183,7 +192,13 @@
 
         _self.dispatchEvent('mouseup', {
           x: x - e.target.width / 2,
-          y: y - e.target.height / 2
+          y: y - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
         // Update _isMoving flag:
@@ -199,8 +214,6 @@
      */
     function _downHandler(e) {
       if (_settings('mouseEnabled')) {
-        _isMouseDown = true;
-
         _startCameraX = _camera.x;
         _startCameraY = _camera.y;
 
@@ -210,10 +223,43 @@
         _startMouseX = sigma.utils.getX(e);
         _startMouseY = sigma.utils.getY(e);
 
-        _self.dispatchEvent('mousedown', {
-          x: _startMouseX - e.target.width / 2,
-          y: _startMouseY - e.target.height / 2
-        });
+        _hasDragged = false;
+        _downStartTime = (new Date()).getTime();
+
+        switch (e.which) {
+          case 2:
+            // Middle mouse button pressed
+            // Do nothing.
+            break;
+          case 3:
+            // Right mouse button pressed
+            _self.dispatchEvent('rightclick', {
+              x: _startMouseX - e.target.width / 2,
+              y: _startMouseY - e.target.height / 2,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              ctrlKey: e.ctrlKey,
+              metaKey: e.metaKey,
+              altKey: e.altKey,
+              shiftKey: e.shiftKey
+            });
+            break;
+          // case 1:
+          default:
+            // Left mouse button pressed
+            _isMouseDown = true;
+
+            _self.dispatchEvent('mousedown', {
+              x: _startMouseX - e.target.width / 2,
+              y: _startMouseY - e.target.height / 2,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              ctrlKey: e.ctrlKey,
+              metaKey: e.metaKey,
+              altKey: e.altKey,
+              shiftKey: e.shiftKey
+            });
+        }
       }
     }
 
@@ -238,7 +284,16 @@
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('click', {
           x: sigma.utils.getX(e) - e.target.width / 2,
-          y: sigma.utils.getY(e) - e.target.height / 2
+          y: sigma.utils.getY(e) - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey,
+          isDragging:
+            (((new Date()).getTime() - _downStartTime) > 100) &&
+            _hasDragged
         });
 
       if (e.preventDefault)
@@ -266,7 +321,13 @@
 
         _self.dispatchEvent('doubleclick', {
           x: _startMouseX - e.target.width / 2,
-          y: _startMouseY - e.target.height / 2
+          y: _startMouseY - e.target.height / 2,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
         });
 
         if (_settings('doubleClickEnabled')) {
@@ -304,7 +365,7 @@
           ratio,
           animation;
 
-      if (_settings('mouseEnabled')) {
+      if (_settings('mouseEnabled') && _settings('mouseWheelEnabled')) {
         ratio = sigma.utils.getDelta(e) > 0 ?
           1 / _settings('zoomingRatio') :
           _settings('zoomingRatio');

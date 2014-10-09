@@ -1,5 +1,65 @@
 module('sigma.plugins.filter');
 
+test('Custom graph methods', function() {
+  var myGraph = new sigma.classes.graph();
+  myGraph.read({
+    nodes: [
+      {
+        id: 'n0',
+        label: 'Node 0',
+        myNodeAttr: 123
+      },
+      {
+        id: 'n1',
+        label: 'Node 1'
+      },
+      {
+        id: 'n2',
+        label: 'Node 2'
+      },
+      {
+        id: 'n3',
+        label: 'Node 3'
+      }
+    ],
+    edges: [
+      {
+        id: 'e0',
+        source: 'n0',
+        target: 'n1',
+        myEdgeAttr: 123
+      },
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2'
+      },
+      {
+        id: 'e2',
+        source: 'n1',
+        target: 'n3'
+      },
+      {
+        id: 'e3',
+        source: 'n2',
+        target: 'n3'
+      }
+    ]
+  });
+
+  deepEqual(
+    myGraph.adjacentNodes('n0'),
+    [ myGraph.nodes('n1') ],
+    '"adjacentNodes" returns the adjacent nodes of a specified node'
+  );
+
+  deepEqual(
+    myGraph.adjacentEdges('n0'),
+    [ myGraph.edges('e0') ],
+    '"adjacentEdges" returns the adjacent edges of a specified node'
+  );
+});
+
 test('API', function() {
   var a,
       k,
@@ -177,7 +237,7 @@ test('API', function() {
 
   // Clear the filters chain
   filter.clear();
-  
+
   deepEqual(
     filter.export(),
     [],
@@ -249,15 +309,15 @@ test('API', function() {
   filter.import(chain).apply();
 
   deepEqual(
-    filter.export().map(function(o) { 
+    filter.export().map(function(o) {
       return {
-        key: o.key, 
-        predicate: o.predicate.toString(), 
-        processor: o.processor 
+        key: o.key,
+        predicate: o.predicate.toString(),
+        processor: o.processor
       };
     }),
     [{
-      key: 'my-filter', 
+      key: 'my-filter',
       predicate: degreePredicate.toString(),
       processor: 'filter.processors.nodes'
     }],
@@ -269,18 +329,18 @@ test('API', function() {
   var dumpedChain = filter.import(filter.export()).export();
 
   deepEqual(
-    chain.map(function(o) { 
+    chain.map(function(o) {
       return {
-        key: o.key, 
-        predicate: o.predicate.toString(), 
-        processor: o.processor 
+        key: o.key,
+        predicate: o.predicate.toString(),
+        processor: o.processor
       };
     }),
-    dumpedChain.map(function(o) { 
+    dumpedChain.map(function(o) {
       return {
-        key: o.key, 
-        predicate: o.predicate.toString(), 
-        processor: o.processor 
+        key: o.key,
+        predicate: o.predicate.toString(),
+        processor: o.processor
       };
     }),
     'The exported filters chain is imported'
@@ -303,11 +363,11 @@ test('API', function() {
   degreePredicate = null;
 
   deepEqual(
-    filter.export().map(function(o) { 
+    filter.export().map(function(o) {
       return {
-        key: o.key, 
-        predicate: o.predicate.toString().replace(/\s+/g, ' '), 
-        processor: o.processor 
+        key: o.key,
+        predicate: o.predicate.toString().replace(/\s+/g, ' '),
+        processor: o.processor
       };
     }),
     [

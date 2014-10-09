@@ -1,9 +1,6 @@
 ;(function(undefined) {
   'use strict';
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
-
   /**
    * Sigma ForceAtlas2.5 Webworker
    * ==============================
@@ -12,6 +9,9 @@
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
    * Version: 0.1
    */
+
+  var _root = this,
+      inWebWorker = !('document' in _root);
 
   /**
    * Worker Function Wrapper
@@ -65,6 +65,16 @@
         for (k in arguments[i])
           res[k] = arguments[i][k];
       return res;
+    }
+
+    function __emptyObject(obj) {
+      var k;
+
+      for (k in obj)
+        if (!('hasOwnProperty' in obj) || obj.hasOwnProperty(k))
+          delete obj[k];
+
+      return obj;
     }
 
     /**
@@ -625,7 +635,7 @@
     }
 
     // On supervisor message
-    self.addEventListener('message', function(e) {
+    var listener = function(e) {
       switch (e.data.action) {
         case 'start':
           init(
@@ -649,9 +659,19 @@
           configure(e.data.config);
           break;
 
+        case 'kill':
+
+          // Deleting context for garbage collection
+          __emptyObject(W);
+          self.removeEventListener('message', listener);
+          break;
+
         default:
       }
-    });
+    };
+
+    // Adding event listener
+    self.addEventListener('message', listener);
   };
 
 
@@ -706,8 +726,23 @@
     return fnString;
   }
 
-  sigma.prototype.getForceAtlas2Worker = function() {
+  // Exporting
+  function getWorkerFn() {
     var fnString = crush ? crush(Worker.toString()) : Worker.toString();
     return ';(' + fnString + ').call(this);';
-  };
+  }
+
+  if (inWebWorker) {
+
+    // We are in a webworker, so we launch the Worker function
+    eval(getWorkerFn());
+  }
+  else {
+
+    // We are requesting the worker from sigma, we retrieve it therefore
+    if (typeof sigma === 'undefined')
+      throw 'sigma is not declared';
+
+    sigma.prototype.getForceAtlas2Worker = getWorkerFn;
+  }
 }).call(this);

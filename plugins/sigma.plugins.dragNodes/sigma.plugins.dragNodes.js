@@ -42,7 +42,8 @@
         _camera = renderer.camera,
         _node = null,
         _prefix = '',
-        _isOverNode = false,
+        _hoverStack = [],
+        _isMouseDown = false,
         _isMouseOverCanvas = false;
 
     // It removes the initial substring ('read_') if it's a WegGL renderer.
@@ -52,29 +53,60 @@
       _prefix = renderer.options.prefix;
     }
 
+    // Calculates the global offset of the given element more accurately than
+    // element.offsetTop and element.offsetLeft.
+    var calculateOffset = function(element) {
+      var style = window.getComputedStyle(element);
+      var getCssProperty = function(prop) {
+        return parseInt(style.getPropertyValue(prop).replace('px', '')) || 0;
+      };
+      return {
+        left: element.getBoundingClientRect().left + getCssProperty('padding-left'),
+        top: element.getBoundingClientRect().top + getCssProperty('padding-top')
+      };
+    };
+
     var nodeMouseOver = function(event) {
-      if (!_isOverNode) {
-        _node = event.data.node;
+      // Add node to array of current nodes over
+      _hoverStack.push(event.data.node);
+
+      if(_hoverStack.length && ! _isMouseDown) {
+        // Set the current node to be the last one in the array
+        _node = _hoverStack[_hoverStack.length - 1];
         _mouse.addEventListener('mousedown', nodeMouseDown);
-        _isOverNode = true;
       }
     };
 
     var treatOutNode = function(event) {
-      if (_isOverNode) {
+      // Remove the node from the array
+      var indexCheck = _hoverStack.map(function(e) { return e; }).indexOf(event.data.node);
+      _hoverStack.splice(indexCheck, 1);
+
+      if(_hoverStack.length && ! _isMouseDown) {
+        // On out, set the current node to be the next stated in array
+        _node = _hoverStack[_hoverStack.length - 1];
+      } else {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
-        _isOverNode = false;
       }
     };
 
     var nodeMouseDown = function(event) {
+      _isMouseDown = true;
       var size = s.graph.nodes().length;
       if (size > 1) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
 
-        renderer.unbind('outNode', treatOutNode);
+        // Do not refresh edgequadtree during drag:
+        var k,
+            c;
+        for (k in s.cameras) {
+          c = s.cameras[k];
+          if (c.edgequadtree !== undefined) {
+            c.edgequadtree._enabled = false;
+          }
+        }
 
         // Deactivate drag graph.
         renderer.settings({mouseEnabled: false, enableHovering: false});
@@ -83,12 +115,20 @@
     };
 
     var nodeMouseUp = function(event) {
+      _isMouseDown = false;
       _mouse.addEventListener('mousedown', nodeMouseDown);
       _body.removeEventListener('mousemove', nodeMouseMove);
       _body.removeEventListener('mouseup', nodeMouseUp);
 
-      treatOutNode();
-      renderer.bind('outNode', treatOutNode);
+      // Allow to refresh edgequadtree:
+      var k,
+          c;
+      for (k in s.cameras) {
+        c = s.cameras[k];
+        if (c.edgequadtree !== undefined) {
+          c.edgequadtree._enabled = true;
+        }
+      }
 
       // Activate drag graph.
       renderer.settings({mouseEnabled: true, enableHovering: true});
@@ -96,36 +136,46 @@
     };
 
     var nodeMouseMove = function(event) {
-      var x = event.pageX - _container.offsetLeft,
-          y = event.pageY - _container.offsetTop,
-          cos = Math.cos(_camera.angle),
-          sin = Math.sin(_camera.angle),
-          nodes = s.graph.nodes(),
-          ref = [];
-
-      // Getting and derotating the reference coordinates.
-      for (var i = 0; i < 2; i++) {
-        var n = nodes[i];
-        var aux = {
-          x: n.x * cos + n.y * sin,
-          y: n.y * cos - n.x * sin,
-          renX: n[_prefix + 'x'],
-          renY: n[_prefix + 'y'],
-        };
-        ref.push(aux);
+      if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        clearTimeout(timeOut);
+        var timeOut = setTimeout(executeNodeMouseMove, 0);
+      } else {
+        executeNodeMouseMove();
       }
 
-      // Applying linear interpolation.
-      x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-        (ref[1].x - ref[0].x) + ref[0].x;
-      y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-        (ref[1].y - ref[0].y) + ref[0].y;
+      function executeNodeMouseMove() {
+        var offset = calculateOffset(_container),
+            x = event.clientX - offset.left,
+            y = event.clientY - offset.top,
+            cos = Math.cos(_camera.angle),
+            sin = Math.sin(_camera.angle),
+            nodes = s.graph.nodes(),
+            ref = [];
 
-      // Rotating the coordinates.
-      _node.x = x * cos - y * sin;
-      _node.y = y * cos + x * sin;
+        // Getting and derotating the reference coordinates.
+        for (var i = 0; i < 2; i++) {
+          var n = nodes[i];
+          var aux = {
+            x: n.x * cos + n.y * sin,
+            y: n.y * cos - n.x * sin,
+            renX: n[_prefix + 'x'],
+            renY: n[_prefix + 'y'],
+          };
+          ref.push(aux);
+        }
 
-      s.refresh();
+        // Applying linear interpolation.
+        x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
+          (ref[1].x - ref[0].x) + ref[0].x;
+        y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
+          (ref[1].y - ref[0].y) + ref[0].y;
+
+        // Rotating the coordinates.
+        _node.x = x * cos - y * sin;
+        _node.y = y * cos + x * sin;
+
+        s.refresh();
+      }
     };
 
     renderer.bind('overNode', nodeMouseOver);

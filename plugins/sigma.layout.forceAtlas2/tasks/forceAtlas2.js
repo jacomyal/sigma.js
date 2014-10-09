@@ -58,8 +58,8 @@ function crush(fnString) {
 // Cleaning function
 function clean(string) {
   return string.replace(
-    /function crush\(fnString\) \{[\s\S]*sigma\.prototype\.getForceAtlas2Worker/,
-    'var crush = null; sigma.prototype.getForceAtlas2Worker'
+    /function crush\(fnString\)/,
+    'var crush = null; function no_crush(fnString)'
   );
 }
 

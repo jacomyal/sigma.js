@@ -18,13 +18,13 @@
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
-        thickness = edge[prefix + 'size'] || 1,
+        size = edge[prefix + 'size'] || 1,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
-        aSize = thickness * 2.5,
+        aSize = Math.max(size * 2.5, settings('minArrowSize')),
         d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
         aX = sX + (tX - sX) * (d - aSize - tSize) / d,
         aY = sY + (tY - sY) * (d - aSize - tSize) / d,
@@ -45,7 +45,7 @@
       }
 
     context.strokeStyle = color;
-    context.lineWidth = thickness;
+    context.lineWidth = size;
     context.beginPath();
     context.moveTo(sX, sY);
     context.lineTo(
@@ -62,14 +62,5 @@
     context.lineTo(aX + vX, aY + vY);
     context.closePath();
     context.fill();
-
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );
   };
 })();

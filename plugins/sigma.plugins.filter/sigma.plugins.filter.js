@@ -6,7 +6,50 @@
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
-  
+
+  // Add custom graph methods:
+  /**
+   * This methods returns an array of nodes that are adjacent to a node.
+   *
+   * @param  {string} id The node id.
+   * @return {array}     The array of adjacent nodes.
+   */
+  if (!sigma.classes.graph.hasMethod('adjacentNodes'))
+    sigma.classes.graph.addMethod('adjacentNodes', function(id) {
+      if (typeof id !== 'string')
+        throw 'adjacentNodes: the node id must be a string.';
+
+      var target,
+          nodes = [];
+      for(target in this.allNeighborsIndex[id]) {
+        nodes.push(this.nodesIndex[target]);
+      }
+      return nodes;
+    });
+
+  /**
+   * This methods returns an array of edges that are adjacent to a node.
+   *
+   * @param  {string} id The node id.
+   * @return {array}     The array of adjacent edges.
+   */
+  if (!sigma.classes.graph.hasMethod('adjacentEdges'))
+    sigma.classes.graph.addMethod('adjacentEdges', function(id) {
+      if (typeof id !== 'string')
+        throw 'adjacentEdges: the node id must be a string.';
+
+      var a = this.allNeighborsIndex[id],
+          eid,
+          target,
+          edges = [];
+      for(target in a) {
+        for(eid in a[target]) {
+          edges.push(a[target][eid]);
+        }
+      }
+      return edges;
+    });
+
   /**
    * Sigma Filter
    * =============================
@@ -40,7 +83,7 @@
     // hide node, or keep former value
     while(ln--)
       n[ln].hidden = !fn.call(_g, n[ln]) || n[ln].hidden;
-    
+
     while(le--)
       if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
         e[le].hidden = true;
@@ -71,14 +114,14 @@
         neighbors = _g.adjacentNodes(id),
         nn = neighbors.length,
         no = {};
-    
+
     while(nn--)
       no[neighbors[nn].id] = true;
 
     while(ln--)
       if (n[ln].id !== id && !(n[ln].id in no))
         n[ln].hidden = true;
-    
+
     while(le--)
       if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
         e[le].hidden = true;
@@ -98,10 +141,10 @@
 
     if (key != undefined && !key.length)
       throw 'The filter key must be a non-empty string.';
-    
+
     if (typeof fn !== 'function')
       throw 'The predicate of key "'+ key +'" must be a function.';
-    
+
     if ('undo' === key)
       throw '"undo" is a reserved key.';
 
@@ -155,7 +198,7 @@
    * function hides the nodes that fail a truth test (predicate). The method
    * adds the anonymous function to the chain of filters. The filter is not
    * executed until the apply() method is called.
-   * 
+   *
    * > var filter = new sigma.plugins.filter(s);
    * > filter.nodesBy(function(n) {
    * >   return this.degree(n.id) > 0;
@@ -168,7 +211,7 @@
   Filter.prototype.nodesBy = function(fn, key) {
     // Wrap the predicate to be applied on the graph and add it to the chain.
     register(Processors.nodes, fn, key);
-    
+
     return this;
   };
 
@@ -287,7 +330,7 @@
       if (Object.prototype.toString.call(v) === '[object Array]')
         for (var i = 0, len = v.length; i < len; i++)
           q[v[i]] = true;
-      
+
       else // 1 filter key
         q[v] = true;
 
@@ -333,7 +376,7 @@
         eval(" copy[i] = " +  o[i].toString());
         //copy[i] = o[i].bind(_g);
       }
-        
+
       else
         copy[i] = o[i];
     }
@@ -413,7 +456,7 @@
 
       if (typeof copy[i].predicate !== 'function')
         throw 'The predicate of key "'+ copy[i].key +'" must be a function.';
-      
+
       if (typeof copy[i].processor !== 'string')
         throw 'The processor of key "'+ copy[i].key +'" must be a string.';
 
