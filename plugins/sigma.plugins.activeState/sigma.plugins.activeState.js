@@ -156,6 +156,7 @@
     _activeNodesIndex = null;
     _activeEdgesIndex = null;
     _g = null;
+    _instance = null;
   };
 
   /**
@@ -305,8 +306,7 @@
     // Deactivate a set of nodes:
     else if (Object.prototype.toString.call(v) === '[object Array]') {
       var i,
-          l,
-          a = [];
+          l;
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
@@ -358,8 +358,7 @@
     // Deactivate a set of edges:
     else if (Object.prototype.toString.call(v) === '[object Array]') {
       var i,
-          l,
-          a = [];
+          l;
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
