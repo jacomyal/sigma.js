@@ -79,8 +79,15 @@
         // Applying layout
         _this.applyLayoutChanges();
 
-        // Send data back to worker and loop
-        _this.sendByteArrayToWorker();
+        // If the number of iterations is over the maximum defined
+        if (typeof _this.config.maxIterations == "number" &&
+                e.data.iterations >= _this.config.maxIterations) {
+          // Finish
+          _this.running = false;
+        } else {
+          // Send data back to worker and loop
+          _this.sendByteArrayToWorker();
+        }
 
         // Rendering graph
         _this.sigInst.refresh();
@@ -183,7 +190,7 @@
     var buffers = [this.nodesByteArray.buffer];
 
     if (action === 'start') {
-      content.config = this.config || {};
+      content.config = config || {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
     }
@@ -194,11 +201,12 @@
       _root.postMessage(content, '*');
   };
 
-  Supervisor.prototype.start = function() {
+  Supervisor.prototype.start = function(config) {
     if (this.running)
       return;
 
     this.running = true;
+    this.config = config;
 
     // Do not refresh edgequadtree during layout:
     var k,
@@ -211,7 +219,7 @@
     if (!this.started) {
 
       // Sending init message to worker
-      this.sendByteArrayToWorker('start');
+      this.sendByteArrayToWorker('start', config);
       this.started = true;
     }
     else {
