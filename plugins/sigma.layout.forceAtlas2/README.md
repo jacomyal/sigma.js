@@ -64,6 +64,8 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
+* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (O(n²) to O(nlog(n)))? This is useful for large graph but harmful for small ones.
+* **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
 * **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
@@ -74,6 +76,4 @@ sigmaInstance.isForceAtlas2Running();
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
 
 ## Notes
-1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
-
-2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
+1. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
