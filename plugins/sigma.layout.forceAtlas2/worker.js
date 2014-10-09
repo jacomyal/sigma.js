@@ -208,22 +208,19 @@
       // 1.bis) Barnes-Hut computation
       //------------------------------
 
-      // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
         var minX = Infinity,
             maxX = -Infinity,
             minY = Infinity,
             maxY = -Infinity,
-            nodes,
-            q0, q1, q2, q3;
+            q, q0, q1, q2, q3;
 
         // Setting up
         barnesHutMatrix = [];
+        // barnesHutMatrix.length = W.nodesLength * 3;
 
-        // Initial nodes holder
-        nodes = [];
+        // Computing min and max values
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          nodes.push(n);
           minX = Math.min(minX, NodeMatrix[np(n, 'x')]);
           maxX = Math.max(maxX, NodeMatrix[np(n, 'x')]);
           minY = Math.min(minY, NodeMatrix[np(n, 'y')]);
@@ -445,7 +442,6 @@
       // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
 
       if (W.settings.barnesHutOptimize) {
-        console.log(barnesHutMatrix.length);
         coefficient = W.settings.scalingRatio;
 
         // Applying repulsion through regions
