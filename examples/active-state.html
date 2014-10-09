@@ -121,7 +121,7 @@ s = new sigma({
 });
 
 // Instanciate the ActiveState plugin:
-var activeState = sigma.plugins.activeState(s.graph);
+var activeState = sigma.plugins.activeState(s);
 
 var activeNodesCallback = _.debounce(function(event) {
   console.log('active nodes:', activeState.nodes());
@@ -138,7 +138,7 @@ activeState.addEdges('e0');
 
 activeState.dropNodes('n0');
 activeState.addNodes(['n0', 'n1']);
-s.refresh();
+s.refresh({skipIndexation: true});
 
 console.log(activeState.nodes().length + ' active nodes');
 console.log(activeState.edges().length + ' active edges');

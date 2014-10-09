@@ -3,6 +3,7 @@ module('sigma.plugins.activeState');
 test('Standard manipulation', function() {
   var a,
       k,
+      s = new sigma(),
       opts = {},
       settings = new sigma.classes.configurable(opts),
       graph = {
@@ -63,26 +64,10 @@ test('Standard manipulation', function() {
       };
 
   // Initialize the graph:
-  var myGraph = new sigma.classes.graph(settings);
-
-  opts.immutable = opts.clone = true;
-  myGraph.addNode(graph.nodes[0]);
-  opts.clone = false;
-  myGraph.addNode(graph.nodes[1]);
-  myGraph.addNode(graph.nodes[2]);
-  myGraph.addNode(graph.nodes[3]);
-  myGraph.addNode(graph.nodes[4]);
-
-  opts.immutable = opts.clone = true;
-  myGraph.addEdge(graph.edges[0]);
-  opts.clone = false;
-  myGraph.addEdge(graph.edges[1]);
-  myGraph.addEdge(graph.edges[2]);
-  myGraph.addEdge(graph.edges[3]);
-  myGraph.addEdge(graph.edges[4]);
+  s.graph.read(graph);
 
   // Instanciate the ActiveState plugin:
-  var activeState = sigma.plugins.activeState(myGraph);
+  var activeState = sigma.plugins.activeState(s);
 
 
   // GRAPH MANIPULATIONS:
@@ -96,13 +81,13 @@ test('Standard manipulation', function() {
     1,
     '"graph.addEdge" adds actives edges to activeEdgesIndex');
 
-  myGraph.dropNode('n4');
+  s.graph.dropNode('n4');
   equal(
     activeState.nodes().length, 
     1,
     '"graph.dropNode" drops actives nodes from activeNodesIndex');
 
-  myGraph.dropEdge('e4');
+  s.graph.dropEdge('e4');
   equal(
     activeState.edges().length, 
     1,
@@ -116,7 +101,7 @@ test('Standard manipulation', function() {
   activeState.addNodes();
   equal(
     activeState.nodes().length,
-    myGraph.nodes().length, 
+    s.graph.nodes().length, 
     '"addNodes" adds all nodes to activeNodesIndex');
 
   activeState.dropNodes();
@@ -128,7 +113,7 @@ test('Standard manipulation', function() {
   // one node:
   activeState.addNodes('n0');
   equal(
-    myGraph.nodes('n0').active, 
+    s.graph.nodes('n0').active, 
     true, 
     '"addNodes" sets the node attribute "active" to true');
   equal(
@@ -138,7 +123,7 @@ test('Standard manipulation', function() {
   
   activeState.dropNodes('n0');
   equal(
-    myGraph.nodes('n0').active, 
+    s.graph.nodes('n0').active, 
     false, 
     '"dropNodes" sets the node attribute "active" to false');
   equal(
@@ -149,7 +134,7 @@ test('Standard manipulation', function() {
   // a set of nodes:
   activeState.addNodes(['n0', 'n1']);
   equal(
-    myGraph.nodes('n0').active && myGraph.nodes('n1').active, 
+    s.graph.nodes('n0').active && s.graph.nodes('n1').active, 
     true, 
     '"addNodes" sets the attribute "active" of the nodes to true');
   equal(
@@ -159,7 +144,7 @@ test('Standard manipulation', function() {
   
   activeState.dropNodes(['n0', 'n1']);
   equal(
-    myGraph.nodes('n0').active || myGraph.nodes('n1').active, 
+    s.graph.nodes('n0').active || s.graph.nodes('n1').active, 
     false, 
     '"dropNodes" sets the attribute "active" of the nodes to false');
   equal(
@@ -174,7 +159,7 @@ test('Standard manipulation', function() {
   activeState.addEdges();
   equal(
     activeState.edges().length, 
-    myGraph.edges().length, 
+    s.graph.edges().length, 
     'addEdges() adds all edges to activeEdgesIndex');
 
   activeState.dropEdges();
@@ -186,7 +171,7 @@ test('Standard manipulation', function() {
   // one edge:
   activeState.addEdges('e0');
   equal(
-    myGraph.edges('e0').active, 
+    s.graph.edges('e0').active, 
     true, 
     '"addEdges" sets the edge attribute "active" to true');
   equal(
@@ -196,7 +181,7 @@ test('Standard manipulation', function() {
   
   activeState.dropEdges('e0');
   equal(
-    myGraph.edges('e0').active, 
+    s.graph.edges('e0').active, 
     false, 
     '"dropEdges" sets the edge attribute "active" to false');
   equal(
@@ -207,7 +192,7 @@ test('Standard manipulation', function() {
   // a set of edges:
   activeState.addEdges(['e0', 'e1']);
   equal(
-    myGraph.edges('e0').active && myGraph.edges('e1').active, 
+    s.graph.edges('e0').active && s.graph.edges('e1').active, 
     true, 
     '"addEdges" sets the attribute "active" of the edges to true');
   equal(
@@ -228,22 +213,22 @@ test('Standard manipulation', function() {
     '"killActiveState" clears activeEdgesIndex');
 
   // re-instiantiate the plugin:
-  activeState = sigma.plugins.activeState(myGraph);
+  activeState = sigma.plugins.activeState(s);
   equal(
     activeState.nodes().length, 
     2,
-    '"activeState" recovers activeNodesIndex after a kill');
+    '"activeState" regenerates activeNodesIndex after a kill');
   equal(
     activeState.edges().length, 
     2,
-    '"activeState" recovers activeEdgesIndex after a kill');
+    '"activeState" regenerates activeEdgesIndex after a kill');
 
   // Advanced manipulation
 
   activeState.invertNodes();
   deepEqual(
-    activeState.nodes(),
-    [graph.nodes[2], graph.nodes[3]], 
+    activeState.nodes().map(function(n) { return n.id; }),
+    ['n2', 'n3'], 
     '"invertNodes" drops the currenct nodes and adds the other nodes');
 
   activeState
@@ -251,8 +236,8 @@ test('Standard manipulation', function() {
     .addNeighbors();
 
   deepEqual(
-    activeState.nodes(),
-    [graph.nodes[2], graph.nodes[3], graph.nodes[1]], 
+    activeState.nodes().map(function(n) { return n.id; }),
+    ['n2', 'n3', 'n1'], 
     '"addNeighbors" adds all node neighbors');
 
   equal(
@@ -274,14 +259,14 @@ test('Standard manipulation', function() {
     .invertEdges();
 
   deepEqual(
-    activeState.edges(),
-    [graph.edges[1], graph.edges[2], graph.edges[3]], 
+    activeState.edges().map(function(e) { return e.id; }),
+    ['e1', 'e2', 'e3'], 
     '"invertEdges" drops the currenct edges and adds the other edges');
 
 
   // CLEAR GRAPH:
   // *********************
-  myGraph.clear();
+  s.graph.clear();
 
   equal(
     activeState.nodes().length,
