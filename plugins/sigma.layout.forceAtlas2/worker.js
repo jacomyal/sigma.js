@@ -7,7 +7,7 @@
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
-   * Version: 0.1
+   * Version: 1.0.3
    */
 
   var _root = this,
@@ -46,7 +46,8 @@
         gravity: 1,
         slowDown: 1,
         barnesHutOptimize: false,
-        barnesHutTheta: 0.5
+        barnesHutTheta: 0.5,
+        startingIterations: 1
       }
     };
 
@@ -168,7 +169,7 @@
 
     // MATH: get distances stuff and power 2 issues
     function pass() {
-      var a, i, j, l, r, n, n1, n2, q, q2, e, w, g, k, m;
+      var a, i, j, l, r, n, n1, n2, e, w, g, k, m;
 
       var barnesHutMatrix,
           outboundAttCompensation,
@@ -946,8 +947,11 @@
             e.data.config
           );
 
-          // First iteration
-          run();
+          // First iteration(s)
+          for (var i = 0; i < W.settings.startingIterations; i++)
+            pass();
+
+          sendNewCoords();
           break;
 
         case 'loop':
