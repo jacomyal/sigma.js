@@ -47,7 +47,7 @@
         gravity: 1,
         slowDown: 1,
         barnesHutOptimize: false,
-        barnesHutTheta: 1.2
+        barnesHutTheta: 0.5
       }
     };
 
@@ -442,7 +442,6 @@
         
       }
 
-
       // 2) Repulsion
       //--------------
       // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
@@ -468,7 +467,7 @@
                 (Math.pow(W.nodeMatrix[np(n, 'y')] - r[8], 2))
               );
               if (2 * r[3] / distance < W.settings.barnesHutTheta){
-
+                
                 // We treat the region as a single body, and we repulse
 
                 xDist = W.nodeMatrix[np(n, 'x')] - r[7];
@@ -523,8 +522,13 @@
               // If there is a node r[0] and it is not n, then repulse
 
               if(r[0] >= 0 && r[0] !== n){
+                
+                // console.log('repulse '+n+' with '+r[0])
+                
                 xDist = W.nodeMatrix[np(n, 'x')] - W.nodeMatrix[np(r[0], 'x')];
                 yDist = W.nodeMatrix[np(n, 'y')] - W.nodeMatrix[np(r[0], 'y')];
+
+                distance = Math.sqrt(xDist * xDist + yDist * yDist)
 
                 if (W.settings.adjustSize) {
 
@@ -575,9 +579,8 @@
       else {
 
         // Square iteration
-        // TODO: don't apply forces when n1 === n2
         for (n1 = 0; n1 < W.nodesLength; n1 += W.ppn) {
-          for (n2 = 0; n2 < W.nodesLength; n2 += W.ppn) {
+          for (n2 = 0; n2 < n1; n2 += W.ppn) {
 
             // Common to both methods
             xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
@@ -893,7 +896,7 @@
           }
         }
       }
-
+      
       // Counting one more iteration
       W.iterations++;
     }
