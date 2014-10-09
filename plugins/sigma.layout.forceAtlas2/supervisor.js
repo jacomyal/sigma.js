@@ -367,6 +367,7 @@
     supervisor = null;
 
     eventEmitter = {};
+    sigma.classes.dispatcher.extend(eventEmitter);
   };
 
   sigma.layouts.configForceAtlas2 = function(sigInst, config) {
