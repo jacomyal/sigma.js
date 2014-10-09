@@ -71,6 +71,10 @@
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
 
+    _s.bind('kill', function() {
+      _self.unbindAll();
+    });
+
     /**
      * Unbind all event listeners.
      */
@@ -259,11 +263,12 @@
     // Create object if undefined
     if (!_instance[s.id]) {
       _instance[s.id] = new DragNodes(s, renderer);
-
-      s.bind('kill', function() {
-        sigma.plugins.killDragNodes(s);
-      });
     }
+
+    s.bind('kill', function() {
+      delete _instance[s.id];
+    });
+
     return _instance[s.id];
   };
 
