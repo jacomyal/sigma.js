@@ -66,6 +66,7 @@ sigmaInstance.isForceAtlas2Running();
 * **gravity** *number* `1`
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
+* **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
 
 *Supervisor configuration*
 

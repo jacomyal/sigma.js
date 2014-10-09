@@ -47,7 +47,8 @@
         slowDown: 1,
         barnesHutOptimize: false,
         barnesHutTheta: 0.5,
-        startingIterations: 1
+        startingIterations: 1,
+        iterationsPerRender: 1
       }
     };
 
@@ -931,9 +932,10 @@
       };
     }
 
-    // One algorithm pass
-    function run() {
-      pass();
+    // Algorithm run
+    function run(n) {
+      for (var i = 0; i < n; i++)
+        pass();
       sendNewCoords();
     }
 
@@ -948,15 +950,12 @@
           );
 
           // First iteration(s)
-          for (var i = 0; i < W.settings.startingIterations; i++)
-            pass();
-
-          sendNewCoords();
+          run(W.settings.startingIterations);
           break;
 
         case 'loop':
           NodeMatrix = new Float32Array(e.data.nodes);
-          run();
+          run(W.settings.iterationsPerRender);
           break;
 
         case 'config':
