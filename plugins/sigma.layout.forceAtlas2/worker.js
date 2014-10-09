@@ -31,7 +31,6 @@
       // Properties
       ppn: 10,
       ppe: 3,
-      ppq: 2,
       maxForce: 10,
       iterations: 0,
       converged: false,
@@ -50,6 +49,9 @@
         barnesHutTheta: 0.5
       }
     };
+
+    var NodeMatrix,
+        EdgeMatrix;
 
     /**
      * Helpers
@@ -145,21 +147,18 @@
       var i, l;
 
       // Matrices
-      W.nodeMatrix = nodes;
-      W.edgeMatrix = edges;
+      NodeMatrix = nodes;
+      EdgeMatrix = edges;
 
       // Length
-      W.nodesLength = W.nodeMatrix.length;
-      W.edgesLength = W.edgeMatrix.length;
+      W.nodesLength = NodeMatrix.length;
+      W.edgesLength = EdgeMatrix.length;
 
       // Merging configuration
       configure(config);
     }
 
     function configure(o) {
-
-      // OVERRIDE: we disable barnesHut by default until coded
-      // o.barnesHutOptimize = false;
       W.settings = extend(o, W.settings);
     }
 
@@ -180,29 +179,24 @@
           mass,
           distance,
           size,
-          factor,
-          nodes,
-          lvl,
-          // maxl, full barnes hut
-          child,
-          q0,q1,q2,q3;
+          factor;
 
       // 1) Initializing layout data
       //-----------------------------
 
       // Resetting positions & computing max values
       for (n = 0; n < W.nodesLength; n += W.ppn) {
-        W.nodeMatrix[np(n, 'old_dx')] = W.nodeMatrix[np(n, 'dx')];
-        W.nodeMatrix[np(n, 'old_dy')] = W.nodeMatrix[np(n, 'dy')];
-        W.nodeMatrix[np(n, 'dx')] = 0;
-        W.nodeMatrix[np(n, 'dy')] = 0;
+        NodeMatrix[np(n, 'old_dx')] = NodeMatrix[np(n, 'dx')];
+        NodeMatrix[np(n, 'old_dy')] = NodeMatrix[np(n, 'dy')];
+        NodeMatrix[np(n, 'dx')] = 0;
+        NodeMatrix[np(n, 'dy')] = 0;
       }
 
       // If outbound attraction distribution, compensate
       if (W.settings.outboundAttractionDistribution) {
         outboundAttCompensation = 0;
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          outboundAttCompensation += W.nodeMatrix[np(n, 'mass')];
+          outboundAttCompensation += NodeMatrix[np(n, 'mass')];
         }
 
         outboundAttCompensation /= W.nodesLength;
@@ -214,10 +208,12 @@
 
       // TODO: arrange shortcuts in iteration when too few nodes.
       if (W.settings.barnesHutOptimize) {
-        var minX = Number.MAX_VALUE,
-            maxX = -Number.MAX_VALUE,
-            minY = Number.MAX_VALUE,
-            maxY = -Number.MAX_VALUE;
+        var minX = Infinity,
+            maxX = -Infinity,
+            minY = Infinity,
+            maxY = -Infinity,
+            nodes,
+            q0, q1, q2, q3;
 
         // Setting up
         barnesHutMatrix = [];
@@ -226,10 +222,10 @@
         nodes = [];
         for (n = 0; n < W.nodesLength; n += W.ppn) {
           nodes.push(n);
-          minX = Math.min(minX, W.nodeMatrix[np(n, 'x')]);
-          maxX = Math.max(maxX, W.nodeMatrix[np(n, 'x')]);
-          minY = Math.min(minY, W.nodeMatrix[np(n, 'y')]);
-          maxY = Math.max(maxY, W.nodeMatrix[np(n, 'y')]);
+          minX = Math.min(minX, NodeMatrix[np(n, 'x')]);
+          maxX = Math.max(maxX, NodeMatrix[np(n, 'x')]);
+          minY = Math.min(minY, NodeMatrix[np(n, 'y')]);
+          maxY = Math.max(maxY, NodeMatrix[np(n, 'y')]);
         }
 
         // Build the Barnes Hut Tree
@@ -263,8 +259,8 @@
               // (see next case)
 
               // Find the quadrant of n
-              if(W.nodeMatrix[np(n, 'x')]<r[1]){
-                if(W.nodeMatrix[np(n, 'y')]<r[2]){
+              if(NodeMatrix[np(n, 'x')]<r[1]){
+                if(NodeMatrix[np(n, 'y')]<r[2]){
                   // Top Left quarter
                   q = barnesHutMatrix[r[5]]
                 } else {
@@ -272,7 +268,7 @@
                   q = barnesHutMatrix[r[5]+1]
                 }
               } else {
-                if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                if(NodeMatrix[np(n, 'y')]<r[2]){
                   // Top Right quarter
                   q = barnesHutMatrix[r[5]+2]
                 } else {
@@ -282,9 +278,9 @@
               }
 
               // Update center of mass and mass (we only do it for non-leave regions)
-              r[7] = (r[7] * r[6] + W.nodeMatrix[np(n, 'x')] * W.nodeMatrix[np(n, 'mass')]) / (r[6] + W.nodeMatrix[np(n, 'mass')]);
-              r[8] = (r[8] * r[6] + W.nodeMatrix[np(n, 'y')] * W.nodeMatrix[np(n, 'mass')]) / (r[6] + W.nodeMatrix[np(n, 'mass')]);
-              r[6] += W.nodeMatrix[np(n, 'mass')];
+              r[7] = (r[7] * r[6] + NodeMatrix[np(n, 'x')] * NodeMatrix[np(n, 'mass')]) / (r[6] + NodeMatrix[np(n, 'mass')]);
+              r[8] = (r[8] * r[6] + NodeMatrix[np(n, 'y')] * NodeMatrix[np(n, 'mass')]) / (r[6] + NodeMatrix[np(n, 'mass')]);
+              r[6] += NodeMatrix[np(n, 'mass')];
 
               // Iterate on the right quadrant
               r = q;
@@ -377,8 +373,8 @@
                 // and the one we want to add (n)
 
                 // Find the quadrant of r[0] (old node)
-                if(W.nodeMatrix[np(r[0], 'x')]<r[1]){
-                  if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
+                if(NodeMatrix[np(r[0], 'x')]<r[1]){
+                  if(NodeMatrix[np(r[0], 'y')]<r[2]){
                     // Top Left quarter
                     q = barnesHutMatrix[r[5]]
                   } else {
@@ -386,7 +382,7 @@
                     q = barnesHutMatrix[r[5]+1]
                   }
                 } else {
-                  if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
+                  if(NodeMatrix[np(r[0], 'y')]<r[2]){
                     // Top Right quarter
                     q = barnesHutMatrix[r[5]+2]
                   } else {
@@ -396,15 +392,15 @@
                 }
 
                 // We remove r[0] from the region r, add its mass to r and record it in q
-                r[6] = W.nodeMatrix[np(r[0], 'mass')];  // Mass
-                r[7] = W.nodeMatrix[np(r[0], 'x')];  // Mass center x
-                r[8] = W.nodeMatrix[np(r[0], 'y')];  // Mass center y
+                r[6] = NodeMatrix[np(r[0], 'mass')];  // Mass
+                r[7] = NodeMatrix[np(r[0], 'x')];  // Mass center x
+                r[8] = NodeMatrix[np(r[0], 'y')];  // Mass center y
                 q[0] = r[0];
                 r[0] = -1;
 
                 // Find the quadrant of n
-                if(W.nodeMatrix[np(n, 'x')]<r[1]){
-                  if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                if(NodeMatrix[np(n, 'x')]<r[1]){
+                  if(NodeMatrix[np(n, 'y')]<r[2]){
                     // Top Left quarter
                     q2 = barnesHutMatrix[r[5]]
                   } else {
@@ -412,7 +408,7 @@
                     q2 = barnesHutMatrix[r[5]+1]
                   }
                 } else {
-                  if(W.nodeMatrix[np(n, 'y')]<r[2]){
+                  if(NodeMatrix[np(n, 'y')]<r[2]){
                     // Top Right quarter
                     q2 = barnesHutMatrix[r[5]+2]
                   } else {
@@ -422,13 +418,13 @@
                 }
 
                 if(q == q2){
-                  
+
                   // If both nodes are in the same quadrant,
                   // we have to try it again on this quadrant
                   r = q;
                   continue;
                 }
-                
+
                 // If both quadrants are different, we record n
                 // in its quadrant
                 q2[0] = n
@@ -437,9 +433,9 @@
 
             }
           }
- 
+
         }
-        
+
       }
 
       // 2) Repulsion
@@ -447,6 +443,7 @@
       // NOTES: adjustSize = antiCollision & scalingRatio = coefficient
 
       if (W.settings.barnesHutOptimize) {
+        console.log(barnesHutMatrix.length);
         coefficient = W.settings.scalingRatio;
 
         // Applying repulsion through regions
@@ -463,43 +460,43 @@
 
               // We run the Barnes Hut test to see if we are at the right distance
               distance = Math.sqrt(
-                (Math.pow(W.nodeMatrix[np(n, 'x')] - r[7], 2)) +
-                (Math.pow(W.nodeMatrix[np(n, 'y')] - r[8], 2))
+                (Math.pow(NodeMatrix[np(n, 'x')] - r[7], 2)) +
+                (Math.pow(NodeMatrix[np(n, 'y')] - r[8], 2))
               );
               if (2 * r[3] / distance < W.settings.barnesHutTheta){
-                
+
                 // We treat the region as a single body, and we repulse
 
-                xDist = W.nodeMatrix[np(n, 'x')] - r[7];
-                yDist = W.nodeMatrix[np(n, 'y')] - r[8];
+                xDist = NodeMatrix[np(n, 'x')] - r[7];
+                yDist = NodeMatrix[np(n, 'y')] - r[8];
 
                 if (W.settings.adjustSize) {
 
                   //-- Linear Anti-collision Repulsion
                   if (distance > 0) {
-                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    factor = coefficient * NodeMatrix[np(n, 'mass')] *
                       r[6] / distance / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                   else if (distance < 0) {
-                    factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    factor = -coefficient * NodeMatrix[np(n, 'mass')] *
                       r[6] / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                 }
                 else {
 
                   //-- Linear Repulsion
                   if (distance > 0) {
-                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
+                    factor = coefficient * NodeMatrix[np(n, 'mass')] *
                       r[6] / distance / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                 }
 
@@ -522,11 +519,11 @@
               // If there is a node r[0] and it is not n, then repulse
 
               if(r[0] >= 0 && r[0] !== n){
-                
+
                 // console.log('repulse '+n+' with '+r[0])
-                
-                xDist = W.nodeMatrix[np(n, 'x')] - W.nodeMatrix[np(r[0], 'x')];
-                yDist = W.nodeMatrix[np(n, 'y')] - W.nodeMatrix[np(r[0], 'y')];
+
+                xDist = NodeMatrix[np(n, 'x')] - NodeMatrix[np(r[0], 'x')];
+                yDist = NodeMatrix[np(n, 'y')] - NodeMatrix[np(r[0], 'y')];
 
                 distance = Math.sqrt(xDist * xDist + yDist * yDist)
 
@@ -534,29 +531,29 @@
 
                   //-- Linear Anti-collision Repulsion
                   if (distance > 0) {
-                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                      W.nodeMatrix[np(r[0], 'mass')] / distance / distance;
+                    factor = coefficient * NodeMatrix[np(n, 'mass')] *
+                      NodeMatrix[np(r[0], 'mass')] / distance / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                   else if (distance < 0) {
-                    factor = -coefficient * W.nodeMatrix[np(n, 'mass')] *
-                      W.nodeMatrix[np(r[0], 'mass')] / distance;
+                    factor = -coefficient * NodeMatrix[np(n, 'mass')] *
+                      NodeMatrix[np(r[0], 'mass')] / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                 }
                 else {
 
                   //-- Linear Repulsion
                   if (distance > 0) {
-                    factor = coefficient * W.nodeMatrix[np(n, 'mass')] *
-                      W.nodeMatrix[np(r[0], 'mass')] / distance / distance;
+                    factor = coefficient * NodeMatrix[np(n, 'mass')] *
+                      NodeMatrix[np(r[0], 'mass')] / distance / distance;
 
-                    W.nodeMatrix[np(n, 'dx')] += xDist * factor;
-                    W.nodeMatrix[np(n, 'dy')] += yDist * factor;
+                    NodeMatrix[np(n, 'dx')] += xDist * factor;
+                    NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                 }
 
@@ -571,52 +568,53 @@
             }
 
 
-            
+
 
           }
         }
       }
       else {
+        coefficient = W.settings.scalingRatio;
 
         // Square iteration
         for (n1 = 0; n1 < W.nodesLength; n1 += W.ppn) {
           for (n2 = 0; n2 < n1; n2 += W.ppn) {
 
             // Common to both methods
-            xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
-            yDist = W.nodeMatrix[np(n1, 'y')] - W.nodeMatrix[np(n2, 'y')];
+            xDist = NodeMatrix[np(n1, 'x')] - NodeMatrix[np(n2, 'x')];
+            yDist = NodeMatrix[np(n1, 'y')] - NodeMatrix[np(n2, 'y')];
 
             if (W.settings.adjustSize) {
 
               //-- Anticollision Linear Repulsion
               distance = Math.sqrt(xDist * xDist + yDist * yDist) -
-                W.nodeMatrix[np(n1, 'size')] -
-                W.nodeMatrix[np(n2, 'size')];
+                NodeMatrix[np(n1, 'size')] -
+                NodeMatrix[np(n2, 'size')];
 
               if (distance > 0) {
-                factor = W.settings.scalingRatio *
-                  W.nodeMatrix[np(n1, 'mass')] *
-                  W.nodeMatrix[np(n2, 'mass')] /
+                factor = coefficient *
+                  NodeMatrix[np(n1, 'mass')] *
+                  NodeMatrix[np(n2, 'mass')] /
                   distance / distance;
 
                 // Updating nodes' dx and dy
-                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+                NodeMatrix[np(n1, 'dx')] += xDist * factor;
+                NodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                W.nodeMatrix[np(n2, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n2, 'dy')] += yDist * factor;
+                NodeMatrix[np(n2, 'dx')] += xDist * factor;
+                NodeMatrix[np(n2, 'dy')] += yDist * factor;
               }
               else if (distance < 0) {
-                factor = 100 * W.settings.scalingRatio *
-                  W.nodeMatrix[np(n1, 'mass')] *
-                  W.nodeMatrix[np(n2, 'mass')];
+                factor = 100 * coefficient *
+                  NodeMatrix[np(n1, 'mass')] *
+                  NodeMatrix[np(n2, 'mass')];
 
                 // Updating nodes' dx and dy
-                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+                NodeMatrix[np(n1, 'dx')] += xDist * factor;
+                NodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
-                W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
+                NodeMatrix[np(n2, 'dx')] -= xDist * factor;
+                NodeMatrix[np(n2, 'dy')] -= yDist * factor;
               }
             }
             else {
@@ -625,17 +623,17 @@
               distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
               if (distance > 0) {
-                factor = W.settings.scalingRatio *
-                  W.nodeMatrix[np(n1, 'mass')] *
-                  W.nodeMatrix[np(n2, 'mass')] /
+                factor = coefficient *
+                  NodeMatrix[np(n1, 'mass')] *
+                  NodeMatrix[np(n2, 'mass')] /
                   distance / distance;
 
                 // Updating nodes' dx and dy
-                W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-                W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+                NodeMatrix[np(n1, 'dx')] += xDist * factor;
+                NodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
-                W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
+                NodeMatrix[np(n2, 'dx')] -= xDist * factor;
+                NodeMatrix[np(n2, 'dy')] -= yDist * factor;
               }
             }
           }
@@ -651,8 +649,8 @@
         factor = 0;
 
         // Common to both methods
-        xDist = W.nodeMatrix[np(n, 'x')];
-        yDist = W.nodeMatrix[np(n, 'y')];
+        xDist = NodeMatrix[np(n, 'x')];
+        yDist = NodeMatrix[np(n, 'y')];
         distance = Math.sqrt(
           Math.pow(xDist, 2) + Math.pow(yDist, 2)
         );
@@ -661,18 +659,18 @@
 
           //-- Strong gravity
           if (distance > 0)
-            factor = coefficient * W.nodeMatrix[np(n, 'mass')] * g;
+            factor = coefficient * NodeMatrix[np(n, 'mass')] * g;
         }
         else {
 
           //-- Linear Anti-collision Repulsion n
           if (distance > 0)
-            factor = coefficient * W.nodeMatrix[np(n, 'mass')] * g / distance;
+            factor = coefficient * NodeMatrix[np(n, 'mass')] * g / distance;
         }
 
         // Updating node's dx and dy
-        W.nodeMatrix[np(n, 'dx')] -= xDist * factor;
-        W.nodeMatrix[np(n, 'dy')] -= yDist * factor;
+        NodeMatrix[np(n, 'dx')] -= xDist * factor;
+        NodeMatrix[np(n, 'dy')] -= yDist * factor;
       }
 
 
@@ -687,9 +685,9 @@
       // TODO: simplify distance
       // TODO: coefficient is always used as -c --> optimize?
       for (e = 0; e < W.edgesLength; e += W.ppe) {
-        n1 = W.edgeMatrix[ep(e, 'source')];
-        n2 = W.edgeMatrix[ep(e, 'target')];
-        w = W.edgeMatrix[ep(e, 'weight')];
+        n1 = EdgeMatrix[ep(e, 'source')];
+        n2 = EdgeMatrix[ep(e, 'target')];
+        w = EdgeMatrix[ep(e, 'weight')];
 
         // Edge weight influence
         if (W.settings.edgeWeightInfluence === 0)
@@ -700,16 +698,16 @@
           ewc = Math.pow(w, W.settings.edgeWeightInfluence);
 
         // Common measures
-        xDist = W.nodeMatrix[np(n1, 'x')] - W.nodeMatrix[np(n2, 'x')];
-        yDist = W.nodeMatrix[np(n1, 'y')] - W.nodeMatrix[np(n2, 'y')];
+        xDist = NodeMatrix[np(n1, 'x')] - NodeMatrix[np(n2, 'x')];
+        yDist = NodeMatrix[np(n1, 'y')] - NodeMatrix[np(n2, 'y')];
 
         // Applying attraction to nodes
         if (W.settings.adjustSizes) {
 
           distance = Math.sqrt(
             (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
-            W.nodeMatrix[np(n1, 'size')] -
-            W.nodeMatrix[np(n2, 'size')]
+            NodeMatrix[np(n1, 'size')] -
+            NodeMatrix[np(n2, 'size')]
           );
 
           if (W.settings.linLogMode) {
@@ -719,7 +717,7 @@
               if (distance > 0) {
                 factor = -coefficient * ewc * Math.log(1 + distance) /
                 distance /
-                W.nodeMatrix[np(n1, 'mass')];
+                NodeMatrix[np(n1, 'mass')];
               }
             }
             else {
@@ -735,7 +733,7 @@
 
               //-- Linear Degree Distributed Anti-collision Attraction
               if (distance > 0) {
-                factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
+                factor = -coefficient * ewc / NodeMatrix[np(n1, 'mass')];
               }
             }
             else {
@@ -760,7 +758,7 @@
               if (distance > 0) {
                 factor = -coefficient * ewc * Math.log(1 + distance) /
                   distance /
-                  W.nodeMatrix[np(n1, 'mass')];
+                  NodeMatrix[np(n1, 'mass')];
               }
             }
             else {
@@ -776,7 +774,7 @@
               //-- Linear Attraction Mass Distributed
               // NOTE: Distance is set to 1 to override next condition
               distance = 1;
-              factor = -coefficient * ewc / W.nodeMatrix[np(n1, 'mass')];
+              factor = -coefficient * ewc / NodeMatrix[np(n1, 'mass')];
             }
             else {
 
@@ -793,11 +791,11 @@
         if (distance > 0) {
 
           // Updating nodes' dx and dy
-          W.nodeMatrix[np(n1, 'dx')] += xDist * factor;
-          W.nodeMatrix[np(n1, 'dy')] += yDist * factor;
+          NodeMatrix[np(n1, 'dx')] += xDist * factor;
+          NodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-          W.nodeMatrix[np(n2, 'dx')] -= xDist * factor;
-          W.nodeMatrix[np(n2, 'dy')] -= yDist * factor;
+          NodeMatrix[np(n2, 'dx')] -= xDist * factor;
+          NodeMatrix[np(n2, 'dy')] -= yDist * factor;
         }
       }
 
@@ -813,43 +811,43 @@
       if (W.settings.adjustSizes) {
 
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          if (!W.nodeMatrix[np(n, 'fixed')]) {
+          if (!NodeMatrix[np(n, 'fixed')]) {
             force = Math.sqrt(
-              Math.pow(W.nodeMatrix[np(n, 'dx')], 2) +
-              Math.pow(W.nodeMatrix[np(n, 'dy')], 2)
+              Math.pow(NodeMatrix[np(n, 'dx')], 2) +
+              Math.pow(NodeMatrix[np(n, 'dy')], 2)
             );
 
             if (force > W.maxForce) {
-              W.nodeMatrix[np(n, 'dx')] =
-                W.nodeMatrix[np(n, 'dx')] * W.maxForce / force;
-              W.nodeMatrix[np(n, 'dy')] =
-                W.nodeMatrix[np(n, 'dy')] * W.maxForce / force;
+              NodeMatrix[np(n, 'dx')] =
+                NodeMatrix[np(n, 'dx')] * W.maxForce / force;
+              NodeMatrix[np(n, 'dy')] =
+                NodeMatrix[np(n, 'dy')] * W.maxForce / force;
             }
 
-            swinging = W.nodeMatrix[np(n, 'mass')] *
+            swinging = NodeMatrix[np(n, 'mass')] *
               Math.sqrt(
-                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) *
-                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) +
-                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')]) *
-                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')])
+                (NodeMatrix[np(n, 'old_dx')] - NodeMatrix[np(n, 'dx')]) *
+                (NodeMatrix[np(n, 'old_dx')] - NodeMatrix[np(n, 'dx')]) +
+                (NodeMatrix[np(n, 'old_dy')] - NodeMatrix[np(n, 'dy')]) *
+                (NodeMatrix[np(n, 'old_dy')] - NodeMatrix[np(n, 'dy')])
               );
 
             traction = Math.sqrt(
-              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) *
-              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) +
-              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')]) *
-              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')])
+              (NodeMatrix[np(n, 'old_dx')] + NodeMatrix[np(n, 'dx')]) *
+              (NodeMatrix[np(n, 'old_dx')] + NodeMatrix[np(n, 'dx')]) +
+              (NodeMatrix[np(n, 'old_dy')] + NodeMatrix[np(n, 'dy')]) *
+              (NodeMatrix[np(n, 'old_dy')] + NodeMatrix[np(n, 'dy')])
             ) / 2;
 
             nodespeed =
               0.1 * Math.log(1 + traction) / (1 + Math.sqrt(swinging));
 
             // Updating node's positon
-            W.nodeMatrix[np(n, 'x')] =
-              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
+            NodeMatrix[np(n, 'x')] =
+              NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
               (nodespeed / W.settings.slowDown);
-            W.nodeMatrix[np(n, 'y')] =
-              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
+            NodeMatrix[np(n, 'y')] =
+              NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
           }
         }
@@ -857,46 +855,46 @@
       else {
 
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          if (!W.nodeMatrix[np(n, 'fixed')]) {
+          if (!NodeMatrix[np(n, 'fixed')]) {
 
-            swinging = W.nodeMatrix[np(n, 'mass')] *
+            swinging = NodeMatrix[np(n, 'mass')] *
               Math.sqrt(
-                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) *
-                (W.nodeMatrix[np(n, 'old_dx')] - W.nodeMatrix[np(n, 'dx')]) +
-                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')]) *
-                (W.nodeMatrix[np(n, 'old_dy')] - W.nodeMatrix[np(n, 'dy')])
+                (NodeMatrix[np(n, 'old_dx')] - NodeMatrix[np(n, 'dx')]) *
+                (NodeMatrix[np(n, 'old_dx')] - NodeMatrix[np(n, 'dx')]) +
+                (NodeMatrix[np(n, 'old_dy')] - NodeMatrix[np(n, 'dy')]) *
+                (NodeMatrix[np(n, 'old_dy')] - NodeMatrix[np(n, 'dy')])
               );
 
             traction = Math.sqrt(
-              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) *
-              (W.nodeMatrix[np(n, 'old_dx')] + W.nodeMatrix[np(n, 'dx')]) +
-              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')]) *
-              (W.nodeMatrix[np(n, 'old_dy')] + W.nodeMatrix[np(n, 'dy')])
+              (NodeMatrix[np(n, 'old_dx')] + NodeMatrix[np(n, 'dx')]) *
+              (NodeMatrix[np(n, 'old_dx')] + NodeMatrix[np(n, 'dx')]) +
+              (NodeMatrix[np(n, 'old_dy')] + NodeMatrix[np(n, 'dy')]) *
+              (NodeMatrix[np(n, 'old_dy')] + NodeMatrix[np(n, 'dy')])
             ) / 2;
 
-            nodespeed = W.nodeMatrix[np(n, 'convergence')] *
+            nodespeed = NodeMatrix[np(n, 'convergence')] *
               Math.log(1 + traction) / (1 + Math.sqrt(swinging));
 
             // Updating node convergence
-            W.nodeMatrix[np(n, 'convergence')] =
+            NodeMatrix[np(n, 'convergence')] =
               Math.min(1, Math.sqrt(
                 nodespeed *
-                (Math.pow(W.nodeMatrix[np(n, 'dx')], 2) +
-                 Math.pow(W.nodeMatrix[np(n, 'dy')], 2)) /
+                (Math.pow(NodeMatrix[np(n, 'dx')], 2) +
+                 Math.pow(NodeMatrix[np(n, 'dy')], 2)) /
                 (1 + Math.sqrt(swinging))
               ));
 
             // Updating node's positon
-            W.nodeMatrix[np(n, 'x')] =
-              W.nodeMatrix[np(n, 'x')] + W.nodeMatrix[np(n, 'dx')] *
+            NodeMatrix[np(n, 'x')] =
+              NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
               (nodespeed / W.settings.slowDown);
-            W.nodeMatrix[np(n, 'y')] =
-              W.nodeMatrix[np(n, 'y')] + W.nodeMatrix[np(n, 'dy')] *
+            NodeMatrix[np(n, 'y')] =
+              NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
           }
         }
       }
-      
+
       // Counting one more iteration
       W.iterations++;
     }
@@ -914,7 +912,7 @@
       sendNewCoords = function() {
         var e = new Event('newCoords');
         e.data = {
-          nodes: W.nodeMatrix.buffer
+          nodes: NodeMatrix.buffer
         };
         requestAnimationFrame(function() {
           document.dispatchEvent(e);
@@ -926,8 +924,8 @@
       // From a WebWorker
       sendNewCoords = function() {
         self.postMessage(
-          {nodes: W.nodeMatrix.buffer},
-          [W.nodeMatrix.buffer]
+          {nodes: NodeMatrix.buffer},
+          [NodeMatrix.buffer]
         );
       };
     }
@@ -953,7 +951,7 @@
           break;
 
         case 'loop':
-          W.nodeMatrix = new Float32Array(e.data.nodes);
+          NodeMatrix = new Float32Array(e.data.nodes);
           run();
           break;
 
