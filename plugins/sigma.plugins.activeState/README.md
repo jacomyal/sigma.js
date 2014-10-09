@@ -14,7 +14,7 @@ See the following [example code](../../examples/active-state.html) and [unit tes
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var activeState = sigma.plugins.activeState(sigInst.graph);
+var activeState = sigma.plugins.activeState(sigInst);
 ````
 
 Kill the plugin instance as follows:

@@ -119,17 +119,17 @@
   /**
    * ActiveState Object
    * ------------------
-   * @param  {sigma.classes.graph} g     The related graph instance.
+   * @param  {sigma} s                   The sigma instance.
    * @return {sigma.plugins.activeState} The instance itself.
    */
-  function ActiveState(g) {
+  function ActiveState(s) {
     _instance = this;
-    _g = g;
+    _g = s.graph;
 
     if (_activeNodesIndex === null) {
       // It happens after a kill. Index nodes:
       _activeNodesIndex = Object.create(null);
-      g.nodes().forEach(function(o) {
+      _g.nodes().forEach(function(o) {
         if (o.active)
           _activeNodesIndex[o.id] = o;
       });
@@ -137,13 +137,25 @@
     if (_activeEdgesIndex === null) {
       // It happens after a kill. Index edges:
       _activeEdgesIndex = Object.create(null);
-      g.edges().forEach(function(o) {
+      _g.edges().forEach(function(o) {
         if (o.active)
           _activeEdgesIndex[o.id] = o;
       });
     }
 
     sigma.classes.dispatcher.extend(this);
+
+    // Binding on kill to properly clear the references
+    s.bind('kill', function() {
+      _instance.kill();
+    });
+  };
+
+  ActiveState.prototype.kill = function() {
+    this.unbind();
+    _activeNodesIndex = null;
+    _activeEdgesIndex = null;
+    _g = null;
   };
 
   /**
@@ -531,12 +543,12 @@
    */
 
   /**
-   * @param {sigma.classes.graph} g The related graph instance.
+   * @param {sigma} s The sigma instance.
    */
-  sigma.plugins.activeState = function(g) {
+  sigma.plugins.activeState = function(s) {
     // Create object if undefined
     if (!_instance) {
-      _instance = new ActiveState(g);
+      _instance = new ActiveState(s);
     }
     return _instance;
   };
@@ -546,10 +558,8 @@
    */
   sigma.plugins.killActiveState = function() {
     if (_instance instanceof ActiveState) {
+      _instance.kill();
       _instance = null;
-      _activeNodesIndex = null;
-      _activeEdgesIndex = null;
-      _g = null;
     }
   };
 
