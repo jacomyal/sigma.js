@@ -284,7 +284,7 @@
 
     // Binding on kill to properly terminate layout when parent is killed
     _this.sigInst.bind('kill', function() {
-      _this.sigInst.killForceAtlas2();
+      sigma.layouts.killForceAtlas2();
     });
   };
 
