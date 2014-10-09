@@ -84,8 +84,8 @@ for (i = 0; i < N; i++) {
   g.nodes.push({
     id: 'n' + i,
     label: 'Node' + i,
-    x: Math.cos(2 * i * Math.PI / N),
-    y: Math.sin(2 * i * Math.PI / N),
+    x: 500 * Math.cos(2 * i * Math.PI / N),
+    y: 500 * Math.sin(2 * i * Math.PI / N),
     size: Math.random(),
     color: o.color
   });
@@ -118,5 +118,5 @@ s = new sigma({
 });
 
 // Start the ForceAtlas2 algorithm:
-s.startForceAtlas2({worker: true, barnesHutOptimize: true, slowDown: 10});
+s.startForceAtlas2({worker: true, barnesHutOptimize: true, slowDown: 5});
 </script>

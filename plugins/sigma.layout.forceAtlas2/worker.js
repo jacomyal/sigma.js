@@ -47,8 +47,7 @@
         gravity: 1,
         slowDown: 1,
         barnesHutOptimize: false,
-        barnesHutTheta: 1.2,
-        barnesHutDepthLimit: 3
+        barnesHutTheta: 1.2
       }
     };
 
@@ -250,14 +249,13 @@
         for (n = 0; n < W.nodesLength; n += W.ppn) {
           r = barnesHutMatrix[0];   // Current region
                                     // We start with root region
-          // console.log(n + ' >root region')
+
           while(true){
-            // console.log('MATRIX ' + barnesHutMatrix.map(function(d){return d[0]}).join(' '))
 
             // Are there sub-regions ?
 
             if(r[5] >= 0){ // We look at first child index
-              // console.log('...sub');
+
               // There are sub-regions
 
               // We just iterate to find a "leave" of the tree
@@ -268,21 +266,17 @@
               if(W.nodeMatrix[np(n, 'x')]<r[1]){
                 if(W.nodeMatrix[np(n, 'y')]<r[2]){
                   // Top Left quarter
-                  // console.log(n + ' TL quarter >' + r[5] + ' r=' + r.join(' '))
                   q = barnesHutMatrix[r[5]]
                 } else {
                   // Bottom Left quarter
-                  // console.log(n + ' BL quarter >' + (r[5]+1) + ' r=' + r.join(' '))
                   q = barnesHutMatrix[r[5]+1]
                 }
               } else {
                 if(W.nodeMatrix[np(n, 'y')]<r[2]){
                   // Top Right quarter
-                  // console.log(n + ' TR quarter >' + (r[5]+2) + ' r=' + r.join(' '))
                   q = barnesHutMatrix[r[5]+2]
                 } else {
                   // Bottom Right quarter
-                  // console.log(n + ' BR quarter >' + (r[5]+3) + ' r=' + r.join(' '))
                   q = barnesHutMatrix[r[5]+3]
                 }
               }
@@ -297,7 +291,7 @@
               continue;
 
             } else {
-              // console.log('...no sub');
+
               // There are no sub-regions: we are in a "leave"
 
               // Is there a node in this leave?
@@ -307,11 +301,9 @@
                 // we record node n and go on
                 r[0] = n;
 
-                // console.log(n + ' No node: we record');
                 break;
 
               } else {
-                // console.log(n + ' Node in same region...');
 
                 // There is a node in this region
 
@@ -328,7 +320,6 @@
                 // NB: we use screen coordinates
                 // from Top Left to Bottom Right
 
-                // console.log('Create items ' + r[5] + ' to ' + (r[5]+3))
                 // Top Left sub-region
                 barnesHutMatrix[r[5]] = [
                   -1,             // Node
@@ -348,7 +339,7 @@
                   r[1] - w,       // x center
                   r[2] + w,       // y center
                   w,              // Size (half-width of the square)
-                  r[5] + 2,        // Next sibling index
+                  r[5] + 2,       // Next sibling index
                   -1,             // First child index
                   0,              // Mass
                   0,              // Mass center x
@@ -361,7 +352,7 @@
                   r[1] + w,       // x center
                   r[2] - w,       // y center
                   w,              // Size (half-width of the square)
-                  r[5] + 3,        // Next sibling index
+                  r[5] + 3,       // Next sibling index
                   -1,             // First child index
                   0,              // Mass
                   0,              // Mass center x
@@ -389,21 +380,17 @@
                 if(W.nodeMatrix[np(r[0], 'x')]<r[1]){
                   if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
                     // Top Left quarter
-                    // console.log('old node in TL ' + (r[5]))
                     q = barnesHutMatrix[r[5]]
                   } else {
                     // Bottom Left quarter
-                    // console.log('old node in BL ' + (r[5]+1))
                     q = barnesHutMatrix[r[5]+1]
                   }
                 } else {
                   if(W.nodeMatrix[np(r[0], 'y')]<r[2]){
                     // Top Right quarter
-                    // console.log('old node in TR ' + (r[5]+2))
                     q = barnesHutMatrix[r[5]+2]
                   } else {
                     // Bottom Right quarter
-                    // console.log('old node in BR ' + (r[5]+3))
                     q = barnesHutMatrix[r[5]+3]
                   }
                 }
@@ -419,21 +406,17 @@
                 if(W.nodeMatrix[np(n, 'x')]<r[1]){
                   if(W.nodeMatrix[np(n, 'y')]<r[2]){
                     // Top Left quarter
-                    // console.log(n + ' TL quarter >' + (r[5]))
                     q2 = barnesHutMatrix[r[5]]
                   } else {
                     // Bottom Left quarter
-                    // console.log(n + ' BL quarter >' + (r[5]+1))
                     q2 = barnesHutMatrix[r[5]+1]
                   }
                 } else {
                   if(W.nodeMatrix[np(n, 'y')]<r[2]){
                     // Top Right quarter
-                    // console.log(n + ' TR quarter >' + (r[5]+2))
                     q2 = barnesHutMatrix[r[5]+2]
                   } else {
                     // Bottom Right quarter
-                    // console.log(n + ' BR quarter >' + (r[5]+3))
                     q2 = barnesHutMatrix[r[5]+3]
                   }
                 }
@@ -442,14 +425,12 @@
                   
                   // If both nodes are in the same quadrant,
                   // we have to try it again on this quadrant
-                  // console.log('Both nodes in same quadrant')
                   r = q;
                   continue;
                 }
                 
                 // If both quadrants are different, we record n
                 // in its quadrant
-                // console.log('Different quadrants We record  >Break')
                 q2[0] = n
                 break;
               }
