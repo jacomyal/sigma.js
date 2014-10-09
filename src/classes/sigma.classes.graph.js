@@ -374,8 +374,8 @@
     if (Object(node) !== node || arguments.length !== 1)
       throw 'addNode: Wrong arguments.';
 
-    if (typeof node.id !== 'string')
-      throw 'The node must have a string id.';
+    if (typeof node.id !== 'string' && typeof node.id !== 'number')
+      throw 'The node must have a string or number id.';
 
     if (this.nodesIndex[node.id])
       throw 'The node "' + node.id + '" already exists.';
@@ -437,13 +437,15 @@
     if (Object(edge) !== edge || arguments.length !== 1)
       throw 'addEdge: Wrong arguments.';
 
-    if (typeof edge.id !== 'string')
-      throw 'The edge must have a string id.';
+    if (typeof edge.id !== 'string' && typeof edge.id !== 'number')
+      throw 'The edge must have a string or number id.';
 
-    if (typeof edge.source !== 'string' || !this.nodesIndex[edge.source])
+    if ((typeof edge.source !== 'string' && typeof edge.source !== 'number') ||
+        !this.nodesIndex[edge.source])
       throw 'The edge source must have an existing node id.';
 
-    if (typeof edge.target !== 'string' || !this.nodesIndex[edge.target])
+    if ((typeof edge.target !== 'string' && typeof edge.target !== 'number') ||
+        !this.nodesIndex[edge.target])
       throw 'The edge target must have an existing node id.';
 
     if (this.edgesIndex[edge.id])
@@ -504,11 +506,13 @@
     this.allNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
       validEdge;
 
-    if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
-      this.allNeighborsIndex[validEdge.target][validEdge.source] =
-        Object.create(null);
-    this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
-      validEdge;
+    if (validEdge.target !== validEdge.source) {
+      if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
+        this.allNeighborsIndex[validEdge.target][validEdge.source] =
+          Object.create(null);
+      this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+        validEdge;
+    }
 
     // Keep counts up to date:
     this.inNeighborsCount[validEdge.target]++;
@@ -529,7 +533,8 @@
    */
   graph.addMethod('dropNode', function(id) {
     // Check that the arguments are valid:
-    if (typeof id !== 'string' || arguments.length !== 1)
+    if ((typeof id !== 'string' && typeof id !== 'number') ||
+        arguments.length !== 1)
       throw 'dropNode: Wrong arguments.';
 
     if (!this.nodesIndex[id])
@@ -577,7 +582,8 @@
    */
   graph.addMethod('dropEdge', function(id) {
     // Check that the arguments are valid:
-    if (typeof id !== 'string' || arguments.length !== 1)
+    if ((typeof id !== 'string' && typeof id !== 'number') ||
+        arguments.length !== 1)
       throw 'dropEdge: Wrong arguments.';
 
     if (!this.edgesIndex[id])
@@ -606,9 +612,11 @@
     if (!Object.keys(this.allNeighborsIndex[edge.source][edge.target]).length)
       delete this.allNeighborsIndex[edge.source][edge.target];
 
-    delete this.allNeighborsIndex[edge.target][edge.source][edge.id];
-    if (!Object.keys(this.allNeighborsIndex[edge.target][edge.source]).length)
-      delete this.allNeighborsIndex[edge.target][edge.source];
+    if (edge.target !== edge.source) {
+      delete this.allNeighborsIndex[edge.target][edge.source][edge.id];
+      if (!Object.keys(this.allNeighborsIndex[edge.target][edge.source]).length)
+        delete this.allNeighborsIndex[edge.target][edge.source];
+    }
 
     this.inNeighborsCount[edge.target]--;
     this.outNeighborsCount[edge.source]--;
@@ -728,7 +736,8 @@
       return this.nodesArray.slice(0);
 
     // Return the related node:
-    if (arguments.length === 1 && typeof v === 'string')
+    if (arguments.length === 1 &&
+        (typeof v === 'string' || typeof v === 'number'))
       return this.nodesIndex[v];
 
     // Return an array of the related node:
@@ -741,7 +750,7 @@
           a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string')
+        if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(this.nodesIndex[v[i]]);
         else
           throw 'nodes: Wrong arguments.';
@@ -770,7 +779,7 @@
     }[which || ''] || this.allNeighborsCount;
 
     // Return the related node:
-    if (typeof v === 'string')
+    if (typeof v === 'string' || typeof v === 'number')
       return which[v];
 
     // Return an array of the related node:
@@ -780,7 +789,7 @@
           a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string')
+        if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(which[v[i]]);
         else
           throw 'degree: Wrong arguments.';
@@ -808,7 +817,8 @@
       return this.edgesArray.slice(0);
 
     // Return the related edge:
-    if (arguments.length === 1 && typeof v === 'string')
+    if (arguments.length === 1 &&
+        (typeof v === 'string' || typeof v === 'number'))
       return this.edgesIndex[v];
 
     // Return an array of the related edge:
@@ -821,7 +831,7 @@
           a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string')
+        if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(this.edgesIndex[v[i]]);
         else
           throw 'edges: Wrong arguments.';
@@ -831,8 +841,6 @@
 
     throw 'edges: Wrong arguments.';
   });
-
-
 
 
   /**

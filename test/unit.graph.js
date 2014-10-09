@@ -46,6 +46,11 @@ test('Basic manipulation', function() {
             id: 'e3',
             source: 'n2',
             target: 'n3'
+          },
+          {
+            id: 'e4',
+            source: 'n2',
+            target: 'n2'
           }
         ]
       };
@@ -66,6 +71,7 @@ test('Basic manipulation', function() {
   myGraph.addEdge(graph.edges[1]);
   myGraph.addEdge(graph.edges[2]);
   myGraph.addEdge(graph.edges[3]);
+  myGraph.addEdge(graph.edges[4]);
 
   // NODES:
   // ******
@@ -131,10 +137,10 @@ test('Basic manipulation', function() {
 
   throws(
     function() {
-      myGraph.nodes(['n0', 'n1', 123]);
+      myGraph.nodes(['n0', 'n1', {}]);
     },
     /nodes: Wrong arguments/,
-    '"nodes" with an array containing a non-string value throws an error.'
+    '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(
@@ -240,10 +246,10 @@ test('Basic manipulation', function() {
 
   throws(
     function() {
-      myGraph.edges(['e0', 123]);
+      myGraph.edges(['e0', {}]);
     },
     /edges: Wrong arguments/,
-    '"edges" with an array containing a non-string value throws an error.'
+    '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
   throws(
@@ -267,7 +273,7 @@ test('Basic manipulation', function() {
   );
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e1', 'e2', 'e3'],
+    ['e1', 'e2', 'e3', 'e4'],
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
@@ -282,8 +288,15 @@ test('Basic manipulation', function() {
   myGraph.dropEdge('e1');
   deepEqual(
     myGraph.edges().map(function(e) { return e.id }),
-    ['e2', 'e3'],
+    ['e2', 'e3', 'e4'],
     '"dropEdge" actually drops the edge.'
+  );
+
+  myGraph.dropEdge('e4');
+  deepEqual(
+    myGraph.edges().map(function(e) { return e.id }),
+    ['e2', 'e3'],
+    '"dropEdge" with a self loops works. (#286)'
   );
 
   throws(

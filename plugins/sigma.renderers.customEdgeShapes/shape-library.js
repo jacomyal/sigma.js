@@ -86,18 +86,18 @@
    * ----------
    */
   var genericDrawShape = function(shapeFunc) {
-    return function(edge, source, target, color, prefix, context) {
+    return function(edge, source, target, color, size, prefix, context) {
       context.fillStyle = color;
       context.beginPath();
-      shapeFunc(edge, source, target, color, prefix, context);
+      shapeFunc(edge, source, target, color, size, prefix, context);
       context.closePath();
       context.fill();
     };
   };
 
-  var drawLine = function(edge, source, target, color, prefix, context) {
+  var drawLine = function(edge, source, target, color, size, prefix, context) {
     context.strokeStyle = color;
-    context.lineWidth = edge[prefix + 'size'] || 1;
+    context.lineWidth = size;
     context.beginPath();
     context.moveTo(
       source[prefix + 'x'],
@@ -116,20 +116,20 @@
    * solid, dotted, dashed, tapered, parallel
    * ----------
    */
-  var drawSolidLine = function(edge, source, target, color, prefix, context) {
-    drawLine(edge, source, target, color, prefix, context);
+  var drawSolidLine = function(edge, source, target, color, size, prefix, context) {
+    drawLine(edge, source, target, color, size, prefix, context);
   };
   register("solid", genericDrawShape(drawSolidLine));
 
-  var drawDottedLine = function(edge, source, target, color, prefix, context) {
+  var drawDottedLine = function(edge, source, target, color, size, prefix, context) {
     context.setLineDash([2]);
-    drawLine(edge, source, target, color, prefix, context)
+    drawLine(edge, source, target, color, size, prefix, context)
   };
   register("dotted", genericDrawShape(drawDottedLine));
 
-  var drawDashedLine = function(edge, source, target, color, prefix, context) {
+  var drawDashedLine = function(edge, source, target, color, size, prefix, context) {
     context.setLineDash([8,3]);
-    drawLine(edge, source, target, color, prefix, context)
+    drawLine(edge, source, target, color, size, prefix, context)
   };
   register("dashed", genericDrawShape(drawDashedLine));
 
@@ -139,7 +139,7 @@
    * Performance Evaluation of Tapered, Curved, and Animated Directed-Edge
    * Representations in Node-Link Graphs. Research Report, Sep 2010.
    */
-  var drawTapered = function(edge, source, target, color, prefix, context) {
+  var drawTapered = function(edge, source, target, color, size, prefix, context) {
     // The goal is to draw a triangle where the target node is a point of 
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
@@ -173,8 +173,8 @@
   /**
    * Draw two parallel lines.
    */
-  var drawParallelLines = function(edge, source, target, color, prefix, context) {
-    var size = edge['renderer1:size'],
+  var drawParallelLines = function(edge, source, target, color, size, prefix, context) {
+    var s = edge['renderer1:size'],
         dist = distance(
           source['renderer1:x'], 
           source['renderer1:y'], 
@@ -186,7 +186,7 @@
     var c = circleIntersection(
       source['renderer1:x'], 
       source['renderer1:y'], 
-      size,
+      s,
       target['renderer1:x'], 
       target['renderer1:y'], 
       dist);
@@ -195,7 +195,7 @@
     var d = circleIntersection(
       target['renderer1:x'], 
       target['renderer1:y'], 
-      size,
+      s,
       source['renderer1:x'], 
       source['renderer1:y'], 
       dist);
