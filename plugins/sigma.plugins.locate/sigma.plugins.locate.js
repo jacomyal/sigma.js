@@ -87,6 +87,10 @@
     _o = extend(options, settings);
 
     _o.zoomDef = _o.zoomDef || _s.settings('zoomMax');
+
+    _s.bind('kill', function() {
+      sigma.plugins.killLocate();
+    });
   };
 
 
