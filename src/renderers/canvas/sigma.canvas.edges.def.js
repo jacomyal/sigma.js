@@ -15,6 +15,7 @@
   sigma.canvas.edges.def = function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1,
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor');
@@ -33,7 +34,7 @@
       }
 
     context.strokeStyle = color;
-    context.lineWidth = edge[prefix + 'size'] || 1;
+    context.lineWidth = size;
     context.beginPath();
     context.moveTo(
       source[prefix + 'x'],
@@ -44,14 +45,5 @@
       target[prefix + 'y']
     );
     context.stroke();
-
-    if (settings('drawEdgeLabels'))
-      sigma.canvas.labels.edges.def(
-        edge,
-        source,
-        target,
-        context,
-        settings
-    );
   };
 })();

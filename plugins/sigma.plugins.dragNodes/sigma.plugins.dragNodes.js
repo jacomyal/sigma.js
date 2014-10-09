@@ -91,6 +91,7 @@
 
       // Deactivate drag graph.
       _renderer.settings({mouseEnabled: false, enableHovering: false});
+      _s.refresh();
 
       _self.dispatchEvent('startdrag', {
         node: _node,
@@ -119,6 +120,7 @@
 
     // Activate drag graph.
     _renderer.settings({mouseEnabled: true, enableHovering: true});
+    _s.refresh();
 
     if (_drag) {
       _self.dispatchEvent('drop', {
@@ -126,9 +128,6 @@
         captor: event,
         renderer: _renderer
       });
-
-      // Refresh quadtrees:
-      _s.refresh();
     }
     _self.dispatchEvent('dragend', {
       node: _node,
@@ -148,8 +147,8 @@
 
     function executeNodeMouseMove() {
       var offset = calculateOffset(_renderer.container),
-          x = event.pageX - offset.left,
-          y = event.pageY - offset.top,
+          x = event.clientX - offset.left,
+          y = event.clientY - offset.top,
           cos = Math.cos(_camera.angle),
           sin = Math.sin(_camera.angle),
           nodes = _s.graph.nodes(),

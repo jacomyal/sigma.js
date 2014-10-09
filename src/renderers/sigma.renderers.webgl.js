@@ -150,7 +150,9 @@
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.edges[a[i].type]) ? a[i].type : 'def';
+      k = (a[i].type && sigma.webgl.edges[a[i].type]) ?
+        a[i].type :
+        this.settings(options, 'defaultEdgeType');
 
       if (!this.edgeFloatArrays[k])
         this.edgeFloatArrays[k] = {
@@ -161,7 +163,9 @@
     }
 
     for (a = graph.nodes(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.nodes[a[i].type]) ? k : 'def';
+      k = (a[i].type && sigma.webgl.nodes[a[i].type]) ?
+        k :
+        this.settings(options, 'defaultNodeType');
 
       if (!this.nodeFloatArrays[k])
         this.nodeFloatArrays[k] = {
@@ -324,7 +328,10 @@
                   width: this.width,
                   height: this.height,
                   ratio: this.camera.ratio,
-                  scalingRatio: this.settings('webglOversamplingRatio'),
+                  scalingRatio: this.settings(
+                    options,
+                    'webglOversamplingRatio'
+                  ),
                   start: start,
                   count: end - start
                 }
@@ -384,7 +391,7 @@
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
-                scalingRatio: this.settings('webglOversamplingRatio')
+                scalingRatio: this.settings(options, 'webglOversamplingRatio')
               }
             );
           }
@@ -417,7 +424,7 @@
               width: this.width,
               height: this.height,
               ratio: this.camera.ratio,
-              scalingRatio: this.settings('webglOversamplingRatio')
+              scalingRatio: this.settings(options, 'webglOversamplingRatio')
             }
           );
         }
@@ -450,8 +457,10 @@
       for (i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
           (
-            sigma.canvas.labels[a[i].type] ||
-            sigma.canvas.labels.def
+            sigma.canvas.labels[
+              a[i].type ||
+              this.settings(options, 'defaultNodeType')
+            ]
           )(a[i], this.contexts.labels, o);
     }
 
@@ -475,7 +484,8 @@
    */
   sigma.renderers.webgl.prototype.initDOM = function(tag, id, webgl) {
     var gl,
-        dom = document.createElement(tag);
+        dom = document.createElement(tag),
+        self = this;
 
     dom.style.position = 'absolute';
     dom.setAttribute('class', 'sigma-' + id);
@@ -483,10 +493,22 @@
     this.domElements[id] = dom;
     this.container.appendChild(dom);
 
-    if (tag.toLowerCase() === 'canvas')
+    if (tag.toLowerCase() === 'canvas') {
       this.contexts[id] = dom.getContext(webgl ? 'experimental-webgl' : '2d', {
         preserveDrawingBuffer: true
       });
+
+      // Adding webgl context loss listeners
+      if (webgl) {
+        dom.addEventListener('webglcontextlost', function(e) {
+          e.preventDefault();
+        }, false);
+
+        dom.addEventListener('webglcontextrestored', function(e) {
+          self.render();
+        }, false);
+      }
+    }
   };
 
   /**
