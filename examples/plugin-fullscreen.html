@@ -138,11 +138,11 @@ s = new sigma({
   container: 'graph-container'
 });
 
-// Initialize the FullScreen plugin with button:
-sigma.plugins.fullScreen(s, {
+// Initialize the FullScreen plugin with a button:
+s.renderers[0].fullScreen({
   id : 'graph-btn'
 });
 
-// Initialize the FullScreen plugin without button:
-// sigma.plugins.fullScreen(s);
+// Leave the fullscreen mode:
+// s.renderers[0].fullScreen();
 </script>
