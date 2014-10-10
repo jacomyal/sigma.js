@@ -99,13 +99,6 @@
       );
     }
 
-    // Bind resize:
-    window.addEventListener(
-      'resize',
-      this.boundResize = this.resize.bind(this),
-      false
-    );
-
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.camera.prefix);
     sigma.misc.drawHovers.call(this, this.camera.prefix);
@@ -261,12 +254,15 @@
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes');
 
+    // Call the resize function:
+    this.resize(false);
+
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
       if (this.camera.isAnimated || this.camera.isMoving)
         drawEdges = false;
 
-    // Clear and resize canvases:
+    // Clear canvases:
     this.clear();
 
     // Translate matrix to [width/2, height/2]:
@@ -595,9 +591,6 @@
   sigma.renderers.webgl.prototype.kill = function() {
     var k,
         captor;
-
-    // Unbind resize:
-    window.removeEventListener('resize', this.boundResize);
 
     // Kill captors:
     while ((captor = this.captors.pop()))

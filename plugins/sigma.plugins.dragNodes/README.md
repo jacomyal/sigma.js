@@ -13,7 +13,7 @@ To use, include all .js files under this folder. Then initialize it as follows:
 var dragListener = new sigma.plugins.dragNodes(sigInst, renderer);
 ````
 
-Kills the plugin as follows:
+Kill the plugin as follows:
 
 ````javascript
 sigma.plugins.killDragNodes();
