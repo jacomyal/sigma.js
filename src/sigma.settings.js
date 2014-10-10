@@ -41,6 +41,8 @@
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
     edgeColor: 'source',
+    // {number} Defines the minimal edge's arrow display size.
+    minArrowSize: 0,
     // {string}
     font: 'arial',
     // {string} Example: 'bold'
@@ -138,8 +140,6 @@
     maxEdgeSize: 1,
     minNodeSize: 1,
     maxNodeSize: 8,
-    // {number} Defines the minimal edge's arrow display size.
-    minArrowSize: 0,
 
 
 
