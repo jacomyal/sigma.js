@@ -38,157 +38,69 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <div id="container">
   <style>
-    #webgl {
-      top: 0;
-      bottom: 50%;
-      left: 0;
-      right: 50%;
-      color: #fff;
-      background: #000;
-      position: absolute;
+    body {
+      margin: 0;
     }
-
-    #canvas2 {
-      top: 50%;
-      bottom: 0;
-      left: 0;
-      right: 50%;
-      color: #000;
-      background: #eee;
+    #graph-container {
+      top: 30%;
+      bottom: 30%;
+      left: 50px;
+      right: 50px;
       position: absolute;
-    }
-
-    #canvas1 {
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      right: 0;
-      color: #000;
       background: #fff;
-      position: absolute;
     }
-
-    .label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1;
-      font-family: sans-serif;
+    #container {
+      position: relative;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 300%;
+      background: #ccc;
     }
   </style>
-  <div id="webgl">
-    <div class="label">WebGL renderer + Camera 1</div>
-  </div>
-  <div id="canvas1">
-    <div class="label">Canvas renderer + Camera 2</div>
-  </div>
-  <div id="canvas2">
-    <div class="label">Canvas renderer + Camera 1</div>
-  </div>
+  <div>Scroll down to see the graph</div>
+  <div id="graph-container"></div>
 </div>
-<script id="example-content">
+<script>
 /**
- * This example spawns three different renderers, two of them sharing
- * their camera. Also, a ForceAtlas2 runs on the graph.
- *
- * It is basically a mashup between some other examples, to show how
- * sigma behaves when instantiated in a weird and heavy configuration.
+ * This example copies basic.html, but with the sigma container somewhere in a
+ * page such that the user has to scroll to manipulate it. This example is here
+ * to facilitate testing sigma integration in real-life web pages.
  */
-
 var i,
     s,
-    o,
     N = 100,
     E = 500,
-    C = 5,
-    d = 0.5,
-    cs = [],
     g = {
       nodes: [],
       edges: []
     };
 
-for (i = 0; i < C; i++)
-  cs.push({
-    id: i,
-    nodes: [],
-    color: '#' + (
-      Math.floor(Math.random() * 16777215).toString(16) + '000000'
-    ).substr(0, 6)
-  });
-
-for (i = 0; i < N; i++) {
-  o = cs[(Math.random() * C) | 0];
+// Generate a random graph:
+for (i = 0; i < N; i++)
   g.nodes.push({
     id: 'n' + i,
-    label: 'Node' + i,
-    x: Math.cos(2 * i * Math.PI / N),
-    y: Math.sin(2 * i * Math.PI / N),
-    size: 0.5 + 4.5 * Math.random(),
-    color: o.color
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: '#666'
   });
-  o.nodes.push('n' + i);
-}
 
-for (i = 0; i < E; i++) {
-  if (Math.random() < 1 - d)
-    g.edges.push({
-      id: 'e' + i,
-      size: 0.5,
-      source: 'n' + ((Math.random() * N) | 0),
-      target: 'n' + ((Math.random() * N) | 0)
-    });
-  else {
-    o = cs[(Math.random() * C) | 0]
-    g.edges.push({
-      id: 'e' + i,
-      size: 0.5,
-      source: o.nodes[(Math.random() * o.nodes.length) | 0],
-      target: o.nodes[(Math.random() * o.nodes.length) | 0]
-    });
-  }
-}
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
 
+// Instantiate sigma:
 s = new sigma({
   graph: g,
-  settings: {
-    skipErrors: true
-  }
+  container: 'graph-container'
 });
-
-// Initialize cameras:
-s.addCamera('cam1'),
-s.addCamera('cam2');
-
-// Initialize the three renderers:
-s.addRenderer({
-  container: document.getElementById('webgl'),
-  type: 'webgl',
-  camera: 'cam1',
-  settings: {
-    defaultLabelColor: '#fff'
-  }
-});
-
-s.addRenderer({
-  container: document.getElementById('canvas2'),
-  type: 'canvas',
-  camera: 'cam1',
-  settings: {
-    drawEdges: false
-  }
-});
-
-s.addRenderer({
-  container: document.getElementById('canvas1'),
-  type: 'canvas',
-  camera: 'cam2'
-});
-
-// Start the layout algorithm:
-s.startForceAtlas2();
 </script>
