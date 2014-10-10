@@ -38,33 +38,69 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.parsers.gexf/gexf-parser.js"></script>
-<script src="../plugins/sigma.parsers.gexf/sigma.parsers.gexf.js"></script>
 <div id="container">
   <style>
+    body {
+      margin: 0;
+    }
     #graph-container {
+      top: 30%;
+      bottom: 30%;
+      left: 50px;
+      right: 50px;
+      position: absolute;
+      background: #fff;
+    }
+    #container {
+      position: relative;
       top: 0;
-      bottom: 0;
       left: 0;
       right: 0;
-      position: absolute;
+      height: 300%;
+      background: #ccc;
     }
   </style>
+  <div>Scroll down to see the graph</div>
   <div id="graph-container"></div>
 </div>
 <script>
 /**
- * Here is just a basic example on how to properly display a graph
- * exported from Gephi in the GEXF format.
- *
- * The plugin sigma.parsers.gexf can load and parse the GEXF graph file,
- * and instantiate sigma when the graph is received.
- *
- * The object given as the second parameter is the base of the instance
- * configuration object. The plugin will just add the "graph" key to it
- * before the instanciation.
+ * This example copies basic.html, but with the sigma container somewhere in a
+ * page such that the user has to scroll to manipulate it. This example is here
+ * to facilitate testing sigma integration in real-life web pages.
  */
-sigma.parsers.gexf('data/arctic.gexf', {
+var i,
+    s,
+    N = 100,
+    E = 500,
+    g = {
+      nodes: [],
+      edges: []
+    };
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: '#666'
+  });
+
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
   container: 'graph-container'
 });
 </script>

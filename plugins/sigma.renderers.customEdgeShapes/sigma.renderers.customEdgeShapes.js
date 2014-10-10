@@ -21,6 +21,7 @@
   var register = function(name,drawShape) {
     sigma.canvas.edges[name] = function(edge, source, target, context, settings) {
       var prefix = settings('prefix') || '',
+          size = edge[prefix + 'size'] || 1,
           color = edge.active ? 
             edge.active_color || settings('defaultEdgeActiveColor') : 
             edge.color,
@@ -44,17 +45,24 @@
 
       context.save();
 
-      if (edge.active) {
-        context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
+      if (edge.hover) {
+        if (settings('edgeHoverColor') === 'edge') {
+          color = edge.hover_color || color;
+        } else {
+          color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+        }
+        size *= settings('edgeHoverSizeRatio');
+      }
+      else if (edge.active) {
+        color = settings('edgeActiveColor') === 'edge' ?
           (color || defaultEdgeColor) :
           settings('defaultEdgeActiveColor');
       }
-      else {
-        context.strokeStyle = color;
-      }
+
+      context.strokeStyle = color;
 
       if(drawShape) {
-        drawShape(edge, source, target, color, prefix, context);
+        drawShape(edge, source, target, color, size, prefix, context);
       }
 
       context.restore();
