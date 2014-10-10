@@ -32,7 +32,7 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.plugins.designer/colorbrewer/colorbrewer.js"></script>
+<script src="../plugins/sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js"></script>
 <script src="../plugins/sigma.plugins.designer/sigma.plugins.designer.js"></script>
 <div id="container">
   <style>
@@ -110,15 +110,9 @@ var myPalette = {
     'C': '#fdc086'
   },
   colorbrewer: {
-    sequentialGreen: {
-      7: ["#edf8fb","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"]
-    }
+    sequentialGreen: sigma.plugins.colorbrewer.BuGn
   }
 };
-
-// For a professional palette, see http://colorbrewer2.org/
-// See http://bl.ocks.org/mbostock/5577023 for a comprehensive guide
-// of the colorbrewer palette available in sigma.plugins.artist.
 
 var myStyles = {
   nodes: {
