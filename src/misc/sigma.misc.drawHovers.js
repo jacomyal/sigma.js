@@ -59,6 +59,8 @@
           target,
           hoveredNode,
           hoveredEdge,
+          defaultNodeType = self.settings('defaultNodeType'),
+          defaultEdgeType = self.settings('defaultEdgeType'),
           nodeRenderers = sigma.canvas.hovers,
           edgeRenderers = sigma.canvas.edgehovers,
           extremitiesRenderers = sigma.canvas.extremities,
@@ -73,7 +75,11 @@
         Object.keys(hoveredNodes).length
       ) {
         hoveredNode = hoveredNodes[Object.keys(hoveredNodes)[0]];
-        (nodeRenderers[hoveredNode.type] || nodeRenderers.def)(
+        (
+          nodeRenderers[hoveredNode.type] ||
+          nodeRenderers[defaultNodeType] ||
+          nodeRenderers.def
+        )(
           hoveredNode,
           self.contexts.hover,
           embedSettings
@@ -86,7 +92,11 @@
         !embedSettings('singleHover')
       )
         for (k in hoveredNodes)
-          (nodeRenderers[hoveredNodes[k].type] || nodeRenderers.def)(
+          (
+            nodeRenderers[hoveredNodes[k].type] ||
+            nodeRenderers[defaultNodeType] ||
+            nodeRenderers.def
+          )(
             hoveredNodes[k],
             self.contexts.hover,
             embedSettings
@@ -105,6 +115,7 @@
         if (! hoveredEdge.hidden) {
           (
             edgeRenderers[hoveredEdge.type] ||
+            edgeRenderers[defaultEdgeType] ||
             edgeRenderers.def
           ) (
             hoveredEdge,
@@ -161,6 +172,7 @@
           if (!hoveredEdge.hidden) {
             (
               edgeRenderers[hoveredEdge.type] ||
+              edgeRenderers[defaultEdgeType] ||
               edgeRenderers.def
             ) (
               hoveredEdge,
