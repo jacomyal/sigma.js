@@ -279,7 +279,7 @@
     }
 
     s.bind('kill', function() {
-      delete _instance[s.id];
+      sigma.plugins.killDragNodes(s);
     });
 
     return _instance[s.id];
