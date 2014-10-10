@@ -154,6 +154,10 @@
       _dragListener.bind('drag', dragHandler);
       _dragListener.bind('drop', dropHandler);
     }
+
+    _s.bind('kill', function() {
+      sigma.plugins.killSelect();
+    });
   };
 
   /**
