@@ -95,13 +95,6 @@
       );
     }
 
-    // Bind resize:
-    window.addEventListener(
-      'resize',
-      this.boundResize = this.resize.bind(this),
-      false
-    );
-
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.options.prefix);
     sigma.misc.drawHovers.call(this, this.options.prefix);
@@ -146,6 +139,9 @@
         embedSettings = this.settings.embedObjects(options, {
           prefix: this.options.prefix
         });
+
+    // Call the resize function:
+    this.resize(false);
 
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
@@ -421,9 +417,6 @@
   sigma.renderers.canvas.prototype.kill = function() {
     var k,
         captor;
-
-    // Unbind resize:
-    window.removeEventListener('resize', this.boundResize);
 
     // Kill captors:
     while ((captor = this.captors.pop()))
