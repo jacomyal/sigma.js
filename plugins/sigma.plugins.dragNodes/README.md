@@ -12,6 +12,7 @@ To use, include all .js files under this folder. Then initialize it as follows:
 ````javascript
 var dragListener = new sigma.plugins.dragNodes(sigInst, renderer);
 ````
+
 Kill the plugin as follows:
 
 ````javascript
