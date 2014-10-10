@@ -38,8 +38,14 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.renderers.customEdgeShapes/shape-library.js"></script>
-<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.renderers.customEdgeShapes.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.dashed.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.dotted.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.parallel.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edges.tapered.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.dashed.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.dotted.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.parallel.js"></script>
+<script src="../plugins/sigma.renderers.customEdgeShapes/sigma.canvas.edgehovers.tapered.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -53,12 +59,6 @@
   <div id="graph-container"></div>
 </div>
 <script>
-/**
- * IMPORTANT: This only works with the canvas renderer. TBD in the future
- * will also support the WebGL renderer.
- */
-sigma.utils.pkg('sigma.canvas.nodes');
-
 // generate a random graph
 var i,
     s,
@@ -99,9 +99,16 @@ for (i = 0; i < E; i++) {
     id: 'e' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
-    // note the EdgeShapeLibrary.enumerate() returns the names of all
-    // supported renderers
-    type: EdgeShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*4)],
+    type: [
+      'line', 
+      'curve', 
+      'arrow', 
+      'curvedArrow', 
+      'dashed', 
+      'dotted', 
+      'parallel', 
+      'tapered'
+    ][Math.round(Math.random()*8)],
     size: Math.random()
   });
 }
@@ -120,8 +127,8 @@ s = new sigma({
     maxNodeSize: 10,
     minEdgeSize: 0.1,
     maxEdgeSize: 2,
+    enableEdgeHovering: true,
+    edgeHoverSizeRatio: 2
   }
 });
-CustomEdgeShapes.init(s);
-s.refresh();
 </script>
