@@ -204,7 +204,9 @@
         captor: event,
         renderer: _renderer
       });
+      
       _drag = false;
+      _node = null;
     };
 
     function nodeMouseMove(event) {
