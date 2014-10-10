@@ -108,8 +108,8 @@
    * @param {number} x       The X coordinate of the mouse.
    * @param {number} y       The Y coordinate of the mouse.
    */
-  function createtooltip(s, o, options, x, y) {
-    removetooltip();
+  function createTooltip(s, o, options, x, y) {
+    removeTooltip();
 
     // Create the DOM element:
     _tooltip = document.createElement('div');
@@ -228,7 +228,7 @@
   /**
    * This function removes the tooltip element from the DOM.
    */
-  function removetooltip() {
+  function removeTooltip() {
     if (_tooltip && _tooltip.parentNode) {
       // Remove from the DOM:
       _tooltip.parentNode.removeChild(_tooltip);
@@ -240,10 +240,10 @@
    * This function clears a potential timeout function related to the tooltip
    * and removes the tooltip.
    */
-  function canceltooltip() {
+  function cancelTooltip() {
     clearTimeout(_timeoutHandle);
     _timeoutHandle = false;
-    removetooltip();
+    removeTooltip();
   };
 
   /**
@@ -310,13 +310,17 @@
 
     sigma.classes.dispatcher.extend(this);
 
+    s.bind('kill', function() {
+      sigma.plugins.killTooltips();
+    });
+
     function contextmenuListener(event) {
       event.preventDefault();
     };
 
     // INTERFACE:
     this.close = function() {
-      canceltooltip();
+      cancelTooltip();
       return this;
     };
 
@@ -376,7 +380,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createtooltip(
+          createTooltip(
             s,
             null,
             so,
@@ -389,14 +393,14 @@
 
       s.bind(so.hide, function(event) {
         var p = _tooltip;
-        canceltooltip();
+        cancelTooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
-          canceltooltip();
+          cancelTooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
@@ -432,7 +436,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createtooltip(
+          createTooltip(
             s,
             n,
             no,
@@ -445,14 +449,14 @@
 
       s.bind(no.hide, function(event) {
         var p = _tooltip;
-        canceltooltip();
+        cancelTooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
-          canceltooltip();
+          cancelTooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
@@ -488,7 +492,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createtooltip(
+          createTooltip(
             s,
             e,
             eo,
@@ -501,14 +505,14 @@
 
       s.bind(eo.hide, function(event) {
         var p = _tooltip;
-        canceltooltip();
+        cancelTooltip();
         if (p)
           _instance.dispatchEvent('hidden');
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
-          canceltooltip();
+          cancelTooltip();
           _doubleClick = true;
           _instance.dispatchEvent('hidden');
           setTimeout(function() {
