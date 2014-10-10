@@ -119,6 +119,14 @@
     s.animations = s.animations || Object.create({});
     sigma.plugins.kill(s);
 
+    // Do not refresh edgequadtree during drag:
+    var k,
+        c;
+    for (k in s.cameras) {
+      c = s.cameras[k];
+      c.edgequadtree._enabled = false;
+    }
+
     function step() {
       var p = (sigma.utils.dateNow() - start) / duration;
 
@@ -128,6 +136,14 @@
             if (k in animate)
               node[k] = node[animate[k]];
         });
+
+        // Allow to refresh edgequadtree:
+        var k,
+            c;
+        for (k in s.cameras) {
+          c = s.cameras[k];
+          c.edgequadtree._enabled = true;
+        }
 
         s.refresh();
         if (typeof o.onComplete === 'function')
@@ -161,5 +177,13 @@
   sigma.plugins.kill = function(s) {
     for (var k in (s.animations || {}))
       cancelAnimationFrame(s.animations[k]);
+
+    // Allow to refresh edgequadtree:
+    var k,
+        c;
+    for (k in s.cameras) {
+      c = s.cameras[k];
+      c.edgequadtree._enabled = true;
+    }
   };
 }).call(window);

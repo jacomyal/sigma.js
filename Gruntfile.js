@@ -17,6 +17,7 @@ module.exports = function(grunt) {
     'src/classes/sigma.classes.graph.js',
     'src/classes/sigma.classes.camera.js',
     'src/classes/sigma.classes.quad.js',
+    'src/classes/sigma.classes.edgequad.js',
 
     // Captors:
     'src/captors/sigma.captors.mouse.js',
@@ -40,6 +41,11 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.edges.curve.js',
     'src/renderers/canvas/sigma.canvas.edges.arrow.js',
     'src/renderers/canvas/sigma.canvas.edges.curvedArrow.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.def.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.curve.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.arrow.js',
+    'src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js',
+    'src/renderers/canvas/sigma.canvas.extremities.def.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',
@@ -78,7 +84,7 @@ module.exports = function(grunt) {
         gruntfile: dir + 'Gruntfile.js'
       };
     else
-      pluginFiles.push(dir + '*.js');
+      pluginFiles.push(dir + '**/*.js');
   });
 
   // Project configuration:
@@ -125,7 +131,7 @@ module.exports = function(grunt) {
       },
       plugins: {
         files: pluginFiles.reduce(function(res, path) {
-          var dest = 'build/' + path.replace(/\/\*\.js$/, '.min.js');
+          var dest = 'build/' + path.replace(/\/\*\*\/\*\.js$/, '.min.js');
           res[dest] = path;
           return res;
         }, {})
