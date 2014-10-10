@@ -71,6 +71,7 @@ module.exports = function(grunt) {
     'plugins.dragNodes',
     'plugins.edgeSiblings',
     'plugins.filter',
+    'plugins.fullScreen',
     'plugins.locate',
     'plugins.neighborhoods',
     'plugins.tooltips',
