@@ -137,6 +137,7 @@
         i,
         l,
         k,
+        type,
         renderer,
         graph = this.graph,
         options = sigma.utils.extend(options, this.options);
@@ -150,9 +151,8 @@
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.edges[a[i].type]) ?
-        a[i].type :
-        this.settings(options, 'defaultEdgeType');
+      type = a[i].type || this.settings(options, 'defaultEdgeType');
+      k = (type && sigma.webgl.edges[type]) ? type : 'def';
 
       if (!this.edgeFloatArrays[k])
         this.edgeFloatArrays[k] = {
@@ -163,9 +163,8 @@
     }
 
     for (a = graph.nodes(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.nodes[a[i].type]) ?
-        k :
-        this.settings(options, 'defaultNodeType');
+      type = a[i].type || this.settings(options, 'defaultNodeType');
+      k = (type && sigma.webgl.nodes[type]) ? type : 'def';
 
       if (!this.nodeFloatArrays[k])
         this.nodeFloatArrays[k] = {
@@ -460,7 +459,7 @@
             sigma.canvas.labels[
               a[i].type ||
               this.settings(options, 'defaultNodeType')
-            ]
+            ] || sigma.canvas.labels.def
           )(a[i], this.contexts.labels, o);
     }
 

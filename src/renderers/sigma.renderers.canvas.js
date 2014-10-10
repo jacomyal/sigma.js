@@ -214,7 +214,9 @@
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
-            (renderers[o.type || this.settings(options, 'defaultEdgeType')])(
+            (renderers[
+              o.type || this.settings(options, 'defaultEdgeType')
+            ] || renderers.def)(
               o,
               graph.nodes(o.source),
               graph.nodes(o.target),
@@ -229,7 +231,9 @@
             for (i = start; i < end; i++) {
               o = edges[i];
               if (!o.hidden)
-                (renderers[o.type] || renderers.def)(
+                (renderers[
+                  o.type || this.settings(options, 'defaultEdgeType')
+                ] || renderers.def)(
                   o,
                   graph.nodes(o.source),
                   graph.nodes(o.target),
@@ -261,7 +265,9 @@
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
-          (renderers[o.type || this.settings(options, 'defaultEdgeType')])(
+          (renderers[
+            o.type || this.settings(options, 'defaultEdgeType')
+          ] || renderers.def)(
             o,
             graph.nodes(o.source),
             graph.nodes(o.target),
@@ -276,7 +282,9 @@
           renderers = sigma.canvas.edges.labels;
           for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++)
             if (!a[i].hidden)
-              (renderers[a[i].type] || renderers.def)(
+              (renderers[
+                a[i].type || this.settings(options, 'defaultEdgeType')
+              ] || renderers.def)(
                 a[i],
                 graph.nodes(a[i].source),
                 graph.nodes(a[i].target),
@@ -293,7 +301,9 @@
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[a[i].type || this.settings(options, 'defaultNodeType')])(
+          (renderers[
+            a[i].type || this.settings(options, 'defaultNodeType')
+          ] || renderers.def)(
             a[i],
             this.contexts.nodes,
             embedSettings
@@ -306,7 +316,9 @@
       renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[a[i].type || this.settings(options, 'defaultNodeType')])(
+          (renderers[
+            a[i].type || this.settings(options, 'defaultNodeType')
+          ] || renderers.def)(
             a[i],
             this.contexts.labels,
             embedSettings
