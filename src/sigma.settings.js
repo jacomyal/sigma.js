@@ -103,13 +103,10 @@
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
-    drawLabels: true,
-    // {booleans} The different drawing modes:
-    //           false: Layered not displayed.
-    //           true: Layered displayed.
-    drawEdgeLabels: false,
     drawEdges: true,
     drawNodes: true,
+    drawLabels: true,
+    drawEdgeLabels: false,
     // {boolean} Indicates if the edges must be drawn in several frames or in
     //           one frame, as the nodes and labels are drawn.
     batchEdgesDrawing: false,
