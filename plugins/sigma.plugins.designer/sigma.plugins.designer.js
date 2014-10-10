@@ -408,6 +408,10 @@
     _visionOnEdges = new Vision(function(s) {
       return s.graph.edges();
     }, _mappings.edges);
+
+    _s.bind('kill', function() {
+      sigma.plugins.killDesigner();
+    });
   };
 
   /**
