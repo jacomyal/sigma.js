@@ -167,7 +167,7 @@
    * To activate a specific node, call it with the id of the node. To activate
    * multiple nodes, call it with an array of ids.
    *
-   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @param  {(number|string|array)} v   Eventually one id, an array of ids.
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.addNodes = function(v) {
@@ -182,7 +182,7 @@
     }
 
     // Activate one node:
-    else if (typeof v === 'string') {
+    else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         n = _g.nodes(v);
         n.active = true;
@@ -200,7 +200,7 @@
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string') {
+          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             n = _g.nodes(v[i]);
             n.active = true;
             _activeNodesIndex[v[i]] = n;
@@ -224,7 +224,7 @@
    * To activate a specific edge, call it with the id of the edge. To activate
    * multiple edges, call it with an array of ids.
    *
-   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @param  {(number|string|array)} v   Eventually one id, an array of ids.
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.addEdges = function(v) {
@@ -239,7 +239,7 @@
     }
 
     // Activate one edge:
-    else if (typeof v === 'string') {
+    else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         e = _g.edges(v);
         e.active = true;
@@ -257,7 +257,7 @@
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string') {
+          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             e = _g.edges(v[i]);
             e.active = true;
             _activeEdgesIndex[v[i]] = e;
@@ -281,7 +281,7 @@
    * To deactivate a specific node, call it with the id of the node. To
    * deactivate multiple nodes, call it with an array of ids.
    *
-   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @param  {(number|string|array)} v   Eventually one id, an array of ids.
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.dropNodes = function(v) {
@@ -294,7 +294,7 @@
     }
 
     // Deactivate one node:
-    else if (typeof v === 'string') {
+    else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         _g.nodes(v).active = false;
         delete _activeNodesIndex[v];
@@ -310,7 +310,7 @@
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string') {
+          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             _g.nodes(v[i]).active = false;
             delete _activeNodesIndex[v[i]];
           }
@@ -333,7 +333,7 @@
    * To deactivate a specific edge, call it with the id of the edge. To
    * deactivate multiple edges, call it with an array of ids.
    *
-   * @param  {(string|array)} v          Eventually one id, an array of ids.
+   * @param  {(number|string|array)} v   Eventually one id, an array of ids.
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.dropEdges = function(v) {
@@ -346,7 +346,7 @@
     }
 
     // Deactivate one edge:
-    else if (typeof v === 'string') {
+    else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         _g.edges(v).active = false;
         delete _activeEdgesIndex[v];
@@ -362,7 +362,7 @@
 
       if (arguments.length === 1) {
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string') {
+          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             _g.edges(v[i]).active = false;
             delete _activeEdgesIndex[v[i]];
           }
