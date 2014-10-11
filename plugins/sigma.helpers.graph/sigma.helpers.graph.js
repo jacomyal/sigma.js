@@ -49,7 +49,7 @@
       for (k in _fixedNodesIndex)
         if (!('hasOwnProperty' in _fixedNodesIndex) || _fixedNodesIndex.hasOwnProperty(k))
           delete _fixedNodesIndex[k];
-      
+
       _fixedNodesIndex = Object.create(null);
     }
   );
@@ -106,7 +106,7 @@
    */
   if (!sigma.classes.graph.hasMethod('dropNodes'))
     sigma.classes.graph.addMethod('dropNodes', function(v) {
-      if (arguments.length === 1 && typeof v === 'string')
+      if (arguments.length === 1 && (typeof v === 'string' || typeof v === 'number'))
         this.dropNode(v);
 
       else if (
@@ -115,14 +115,14 @@
       ) {
         var i, l;
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string')
+          if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropNode(v[i]);
           else
             throw 'dropNodes: Wrong arguments.';
       }
       else
         throw 'dropNodes: Wrong arguments.';
-      
+
       return this;
     });
 
@@ -134,36 +134,36 @@
    */
   if (!sigma.classes.graph.hasMethod('dropEdges'))
     sigma.classes.graph.addMethod('dropEdges', function(v) {
-      if (arguments.length === 1 && typeof v === 'string')
+      if (arguments.length === 1 && (typeof v === 'string' || typeof v === 'number'))
         this.dropEdge(v);
-      
+
       else if (
         arguments.length === 1 &&
         Object.prototype.toString.call(v) === '[object Array]'
       ) {
         var i, l;
         for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string')
+          if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropEdge(v[i]);
           else
             throw 'dropEdges: Wrong arguments.';
       }
       else
         throw 'dropEdges: Wrong arguments.';
-      
+
       return this;
     });
 
   /**
    * This methods returns an array of nodes that are adjacent to a node.
    *
-   * @param  {string} id The node id.
+   * @param  {number|string} id The node id.
    * @return {array}     The array of adjacent nodes.
    */
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentNodes: the node id must be a string.';
+      if (typeof id !== 'string' && typeof id !== 'number')
+        throw 'adjacentNodes: the node id must be a string or a number.';
 
       var target,
           nodes = [];
@@ -176,13 +176,13 @@
   /**
    * This methods returns an array of edges that are adjacent to a node.
    *
-   * @param  {string} id The node id.
+   * @param  {number|string} id The node id.
    * @return {array}     The array of adjacent edges.
    */
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentEdges: the node id must be a string.';
+      if (typeof id !== 'string' && typeof id !== 'number')
+        throw 'adjacentEdges: the node id must be a string or a number.';
 
       var a = this.allNeighborsIndex[id],
           eid,
