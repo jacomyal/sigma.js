@@ -74,6 +74,17 @@
     return res;
   };
 
+  function getRescalePosition() {
+    var autoRescale = _s.settings('autoRescale');
+    if (autoRescale) {
+      if (Object.prototype.toString.call(autoRescale) === '[object Array]') {
+        return (autoRescale.indexOf('nodePosition') !== -1);
+      }
+      return true;
+    }
+    return false;
+  };
+
 
   /**
    * Locate Object
@@ -152,9 +163,11 @@
     hRatio = height / cHeight;
     wRatio = width / cWidth;
 
+    var rescalePosition = getRescalePosition();
+
     // Create the ratio dealing with min / max
-    // if autoRescale is active:
-    if (_s.settings('autoRescale'))
+    // if auto rescale the positions:
+    if (rescalePosition)
       ratio = Math.max(
         _s.settings('zoomMin'),
         Math.min(
@@ -172,10 +185,10 @@
 
     if (x === undefined || y === undefined)
       throw 'Coordinates error.'
-    
+
     return {
-      x: x, 
-      y: y, 
+      x: x,
+      y: y,
       ratio: ratio
     };
   };
@@ -213,10 +226,11 @@
     var t,
         n,
         animationOpts = extend(options, _o.animation.node),
-        ratio = _s.camera.ratio;
+        ratio = _s.camera.ratio,
+        rescalePosition = getRescalePosition();
 
     // One node:
-    if (typeof v === 'string') {
+    if (typeof v === 'string' || typeof v === 'number') {
       n = _s.graph.nodes(v);
       if (n === undefined)
         throw 'locate.nodes: Wrong arguments.';
@@ -224,7 +238,7 @@
       t = {
         x: n[_s.camera.readPrefix + 'x'],
         y: n[_s.camera.readPrefix + 'y'],
-        ratio: _s.settings('autoRescale') ?
+        ratio: rescalePosition ?
           _s.settings('zoomMin') : _o.zoomDef
       }
     }
@@ -252,14 +266,14 @@
         n = _s.graph.nodes(id);
         if (n === undefined)
           throw 'locate.nodes: Wrong arguments.';
-        
+
         return n[_s.camera.readPrefix + 'y'];
       }));
       maxY = Math.max.apply(Math, v.map(function(id) {
         n = _s.graph.nodes(id);
         if (n === undefined)
           throw 'locate.nodes: Wrong arguments.';
-        
+
         return n[_s.camera.readPrefix + 'y'];
       }));
 
@@ -268,7 +282,7 @@
     else
       throw 'locate.nodes: Wrong arguments.';
 
-    if (_o.focusOut && _s.settings('autoRescale')) {
+    if (_o.focusOut && rescalePosition) {
       sigma.misc.animation.camera(
         s.camera,
         {
@@ -332,10 +346,11 @@
     var t,
         e,
         animationOpts = extend(options, _o.animation.edge),
-        ratio = _s.camera.ratio;
+        ratio = _s.camera.ratio,
+        rescalePosition = getRescalePosition();
 
     // One edge:
-    if (typeof v === 'string') {
+    if (typeof v === 'string' || typeof v === 'number') {
       e = _s.graph.edges(v);
       if (e === undefined)
         throw 'locate.edges: Wrong arguments.';
@@ -447,19 +462,19 @@
     else
       throw 'locate.edges: Wrong arguments.';
 
-    if (_o.focusOut && _s.settings('autoRescale')) {
+    if (_o.focusOut && rescalePosition) {
       sigma.misc.animation.camera(
-        s.camera, 
+        s.camera,
         {
-          x: (_s.camera.x + t.x) * 0.5, 
-          y: (_s.camera.y + t.y) * 0.5, 
+          x: (_s.camera.x + t.x) * 0.5,
+          y: (_s.camera.y + t.y) * 0.5,
           ratio: _o.zoomDef
         },
         {
           duration: animationOpts.duration,
           onComplete: function() {
             sigma.misc.animation.camera(
-              _s.camera, 
+              _s.camera,
               t,
               animationOpts
             );
@@ -468,7 +483,7 @@
       );
     } else {
       sigma.misc.animation.camera(
-        _s.camera, 
+        _s.camera,
         t,
         animationOpts
       );
@@ -512,10 +527,10 @@
     }
     else {
       sigma.misc.animation.camera(
-        _s.camera, 
+        _s.camera,
         {
-          x: 0, 
-          y: 0, 
+          x: 0,
+          y: 0,
           ratio: ratio
         },
         animationOpts
