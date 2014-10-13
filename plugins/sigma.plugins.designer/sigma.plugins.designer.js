@@ -590,18 +590,18 @@
     if (!visualVar) {
       // undo all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        v.undoStyle(visuVar, m[visuVar].by);
+        if (s.indexOf(visuVar) !== -1) {
+          v.undoStyle(visuVar, m[visuVar].by);
+        }
       });
-
       // empty active styles:
       s.length = 0;
     }
     else if (m[visualVar]) {
-      // undo the style of the specified visual variable:
-      v.undoStyle(visualVar, m[visualVar].by);
-
-      // drop from active styles:
       if (s.indexOf(visualVar) !== -1) {
+        // undo the style of the specified visual variable:
+        v.undoStyle(visualVar, m[visualVar].by);
+        // drop from active styles:
         s.splice(s.indexOf(visualVar), 1);
       }
     }
