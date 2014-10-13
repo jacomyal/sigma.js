@@ -17,7 +17,7 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.1
+   * @version 0.2
    */
 
    var _s = null,
@@ -25,7 +25,8 @@
        _palette = null,
        _visionOnNodes = null,
        _visionOnEdges = null,
-       _visualVars = ['color', 'size', 'label'];
+       _visualVars = ['color', 'size', 'label'],
+       _activeStyles = {nodes: [], edges: []};
 
   /**
    * Convert Javascript string in dot notation into an object reference.
@@ -79,13 +80,13 @@
         bin,
         i,
         res = {};
-    
+
     // sort values by inverse order:
     numlist = values.map(function (val) {
       return parseFloat(val);
     })
-    .sort(function(a, b) { 
-      return a - b; 
+    .sort(function(a, b) {
+      return a - b;
     });
 
     min = numlist[0];
@@ -119,10 +120,10 @@
 
     // rules to map visual variables to data properties:
     this.mappings = mappings || {};
-    
+
     // index of deprecated visions on data properties:
     this.deprecated = {};
-    
+
     return this;
   };
 
@@ -144,7 +145,7 @@
         byFn,
         schemeFn,
         isSequential = true;
-    
+
     byFn = function(item, key) { return strToObjectRef(item, key); };
     schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
 
@@ -173,7 +174,7 @@
     // Find the max number of occurrence of values:
     var maxOcc = 0;
     for (val in this.idx[key]) {
-      maxOcc = 
+      maxOcc =
         (maxOcc < this.idx[key][val].items.length) ?
         this.idx[key][val].items.length :
         maxOcc;
@@ -210,7 +211,7 @@
           scheme = self.mappings.color.scheme;
 
           if (typeof scheme !== 'string')
-            throw '"' + visualVar + '.scheme" must be a string';
+            throw '"color.scheme" must be a string';
 
           if (isSequential) {
             bins = self.mappings.color.bins;
@@ -224,7 +225,7 @@
           };
 
           if (typeof format !== 'function')
-            throw '"' + visualVar + '.format" must be a function';
+            throw '"label.format" must be a function';
           break;
 
         case 'size':
@@ -232,15 +233,15 @@
           max = self.mappings.size.max || 1;
 
           if (typeof min !== 'number')
-            throw '"' + visualVar + '.min" must be a number';
+            throw '"size.min" must be a number';
           if (typeof max !== 'number')
-            throw '"' + visualVar + '.max" must be a number';
+            throw '"size.max" must be a number';
           if (min <= 0)
-            throw '"' + visualVar + '.min" must be a positive number';
+            throw '"size.min" must be a positive number';
           if (max <= 0)
-            throw '"' + visualVar + '.max" must be a positive number';
+            throw '"size.max" must be a positive number';
           if (max < min)
-            throw '"' + visualVar + '.max" must be greater or equal than "' + visualVar + '.min"';
+            throw '"size.max" must be greater or equal than "size.min"';
           if (!isSequential)
             throw 'The values of property "' + key + '" must be numbers only';
 
@@ -265,7 +266,7 @@
               self.idx[key][val].styles.color = function() {
                 if (schemeFn(_palette, scheme) === undefined)
                   throw 'The color scheme must be qualitative, i.e. a dict of value => color';
-                
+
                 return schemeFn(_palette, scheme)[val];
               };
             }
@@ -339,7 +340,7 @@
         if (item !== undefined &&
             o.styles !== undefined &&
             o.styles[visualVar]) {
-          
+
           o.orig_styles[visualVar] = o.orig_styles[visualVar] || item[visualVar];
           var newVal = o.styles[visualVar](item);
           if (newVal !== undefined)
@@ -376,7 +377,7 @@
       var o = self.idx[key][val];
       o.items.forEach(function (item) {
         if (item !== undefined) {
-          
+
           if (o.orig_styles === undefined)
             delete item[visualVar];
           else
@@ -449,7 +450,7 @@
    * This method is used to get the styles bound to each node of the graph for
    * a specified property.
    *
-   * @param  {string} key The property accessor. Use a dot notation like 
+   * @param  {string} key The property accessor. Use a dot notation like
    *                      'data.myProperty'.
    * @return {object}     The styles.
    */
@@ -461,7 +462,7 @@
    * This method is used to get the styles bound to each edge of the graph for
    * a specified property.
    *
-   * @param  {string} key The property accessor. Use a dot notation like 
+   * @param  {string} key The property accessor. Use a dot notation like
    *                      'data.myProperty'.
    * @return {object}      The styles.
    */
@@ -492,31 +493,47 @@
       throw '"Designer.make": Missing target';
 
     var m,
-        v;
+        v,
+        s;
 
     switch (target) {
       case 'nodes':
         m = _mappings.nodes;
         v = _visionOnNodes;
+        s = _activeStyles.nodes;
         break;
       case 'edges':
         m = _mappings.edges;
         v = _visionOnEdges;
+        s = _activeStyles.edges;
         break;
       default:
         throw '"Designer.make": Unknown target ' + target;
     }
 
     if (!visualVar) {
+      // empty active styles:
+      s.length = 0;
       // apply all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        if (m[visuVar])
+        if (m[visuVar]) {
           v.applyStyle(visuVar, m[visuVar].by);
+
+          // add to active styles:
+          if (s.indexOf(visuVar) === -1) {
+            s.push(visuVar);
+          }
+        }
       });
     }
     else if (m[visualVar]) {
       // apply the style of the specified visual variable:
       v.applyStyle(visualVar, m[visualVar].by);
+
+      // add to active styles:
+      if (s.indexOf(visualVar) === -1) {
+        s.push(visualVar);
+      }
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
@@ -552,16 +569,19 @@
       throw '"Designer.omit": Missing target';
 
     var m,
-        v;
+        v,
+        s;
 
     switch (target) {
       case 'nodes':
         m = _mappings.nodes;
         v = _visionOnNodes;
+        s = _activeStyles.nodes;
         break;
       case 'edges':
         m = _mappings.edges;
         v = _visionOnEdges;
+        s = _activeStyles.edges;
         break;
       default:
         throw '"Designer.omit": Unknown target ' + target;
@@ -570,12 +590,20 @@
     if (!visualVar) {
       // undo all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        v.undoStyle(visuVar, m[visuVar].by);
+        if (s.indexOf(visuVar) !== -1) {
+          v.undoStyle(visuVar, m[visuVar].by);
+        }
       });
+      // empty active styles:
+      s.length = 0;
     }
     else if (m[visualVar]) {
-      // undo the style of the specified visual variable:
-      v.undoStyle(visualVar, m[visualVar].by);
+      if (s.indexOf(visualVar) !== -1) {
+        // undo the style of the specified visual variable:
+        v.undoStyle(visualVar, m[visualVar].by);
+        // drop from active styles:
+        s.splice(s.indexOf(visualVar), 1);
+      }
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
@@ -593,6 +621,23 @@
     this.omit('nodes');
     this.omit('edges');
     return this;
+  };
+
+  /**
+   * This method is used to get the styles currently applied to nodes or edges.
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @return {array}             The applied styles.
+   */
+  Designer.prototype.appliedStyles = function(target) {
+    if (!target)
+      throw '"Designer.appliedStyles": Missing target';
+
+    if (target !== 'nodes' && target !== 'edges')
+      throw '"Designer.appliedStyles": Unknown target ' + target;
+
+    return _activeStyles[target];
   };
 
   /**
@@ -622,7 +667,7 @@
   Designer.prototype.disown = function() {
     this.omitAll();
     _mappings = sigma.utils.extend({}, settings);
-    
+
     _visionOnNodes = new Vision(function(s) {
       return s.graph.nodes();
     }, _mappings.nodes);
