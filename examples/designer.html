@@ -104,7 +104,7 @@ s = new sigma({
 
 // Create a custom color palette:
 var myPalette = {
-  aQualitativeScheme: { 
+  aQualitativeScheme: {
     'A': '#7fc97f',
     'B': '#beaed4',
     'C': '#fdc086'
@@ -158,17 +158,21 @@ var designer = sigma.plugins.designer(s, {
 // Play:
 designer
   .makeAll()
-  //.deprecate()
-  //.make('nodes')
-  //.make('nodes', 'color')
-  //.make('nodes', 'size')
-  //.omit('nodes', 'color')
-  //.omit('nodes', 'size')
-  //.omit('edges', 'color')
-  //.make('nodes')
-  //.omitAll()
-  //.disown()
+  // .deprecate()
+  // .make('nodes')
+  // .make('nodes', 'color')
+  // .make('nodes', 'size')
+  // .omit('nodes', 'color')
+  // .omit('nodes', 'size')
+  // .omit('edges', 'color')
+  // .make('nodes')
+  // .disown()
+  // .omitAll()
 ;
+
+// The visual variables currently applied
+console.log('nodes', designer.appliedStyles('nodes'));
+console.log('edges', designer.appliedStyles('edges'));
 
 // Dump palette and styles:
 //console.log(designer.getSpecs());

@@ -17,7 +17,7 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.1
+   * @version 0.2
    */
 
    var _s = null,
@@ -25,7 +25,8 @@
        _palette = null,
        _visionOnNodes = null,
        _visionOnEdges = null,
-       _visualVars = ['color', 'size', 'label'];
+       _visualVars = ['color', 'size', 'label'],
+       _activeStyles = {nodes: [], edges: []};
 
   /**
    * Convert Javascript string in dot notation into an object reference.
@@ -492,31 +493,47 @@
       throw '"Designer.make": Missing target';
 
     var m,
-        v;
+        v,
+        s;
 
     switch (target) {
       case 'nodes':
         m = _mappings.nodes;
         v = _visionOnNodes;
+        s = _activeStyles.nodes;
         break;
       case 'edges':
         m = _mappings.edges;
         v = _visionOnEdges;
+        s = _activeStyles.edges;
         break;
       default:
         throw '"Designer.make": Unknown target ' + target;
     }
 
     if (!visualVar) {
+      // empty active styles:
+      s.length = 0;
       // apply all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        if (m[visuVar])
+        if (m[visuVar]) {
           v.applyStyle(visuVar, m[visuVar].by);
+
+          // add to active styles:
+          if (s.indexOf(visuVar) === -1) {
+            s.push(visuVar);
+          }
+        }
       });
     }
     else if (m[visualVar]) {
       // apply the style of the specified visual variable:
       v.applyStyle(visualVar, m[visualVar].by);
+
+      // add to active styles:
+      if (s.indexOf(visualVar) === -1) {
+        s.push(visualVar);
+      }
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
@@ -552,16 +569,19 @@
       throw '"Designer.omit": Missing target';
 
     var m,
-        v;
+        v,
+        s;
 
     switch (target) {
       case 'nodes':
         m = _mappings.nodes;
         v = _visionOnNodes;
+        s = _activeStyles.nodes;
         break;
       case 'edges':
         m = _mappings.edges;
         v = _visionOnEdges;
+        s = _activeStyles.edges;
         break;
       default:
         throw '"Designer.omit": Unknown target ' + target;
@@ -572,10 +592,18 @@
       Object.keys(m).forEach(function (visuVar) {
         v.undoStyle(visuVar, m[visuVar].by);
       });
+
+      // empty active styles:
+      s.length = 0;
     }
     else if (m[visualVar]) {
       // undo the style of the specified visual variable:
       v.undoStyle(visualVar, m[visualVar].by);
+
+      // drop from active styles:
+      if (s.indexOf(visualVar) !== -1) {
+        s.splice(s.indexOf(visualVar), 1);
+      }
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
@@ -593,6 +621,23 @@
     this.omit('nodes');
     this.omit('edges');
     return this;
+  };
+
+  /**
+   * This method is used to get the styles currently applied to nodes or edges.
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @return {array}             The applied styles.
+   */
+  Designer.prototype.appliedStyles = function(target) {
+    if (!target)
+      throw '"Designer.appliedStyles": Missing target';
+
+    if (target !== 'nodes' && target !== 'edges')
+      throw '"Designer.appliedStyles": Unknown target ' + target;
+
+    return _activeStyles[target];
   };
 
   /**

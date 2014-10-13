@@ -93,7 +93,9 @@ var designer = sigma.plugins.designer(sigInst, {
 
 The [ColorBrewer palette](colorbrewer/colorbrewer.js) is provided to get started quickly with good color schemes.
 
-## Get bound styles
+## API
+
+### Get bound styles
 The styles are bound to each node or edge of the graph, for the specified properties, before being applied at will. You may get them anytime with the `.nodes()` and `.edges()` method. For instance, get the styles of the nodes which have the property used to color them:
 
 ```js
@@ -117,7 +119,7 @@ Same example with edges:
 var boundStyles = designer.edges(myStyles.edges.color.by);
 ```
 
-## Apply styles
+### Apply styles
 Apply all styles:
 
 ```js
@@ -148,7 +150,7 @@ Apply a specified edges style like the size:
 designer.make('edges', 'size');
 ```
 
-## Restore original styles
+### Restore original styles
 Undo all styles:
 
 ```js
@@ -179,7 +181,23 @@ Undo a specified nodes style like the size:
 designer.omit('nodes', 'size');
 ```
 
-## Deprecate the designer's vision
+### Get the styles currently applied
+
+Styles applied on nodes:
+
+```js
+var arr = designer.appliedStyles('nodes');
+// ['color', 'size']
+```
+
+Styles applied on edges:
+
+```js
+var arr = designer.appliedStyles('edges');
+// ['color', 'size']
+```
+
+### Deprecate the designer's vision
 The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called:
 
 ```js
@@ -188,7 +206,7 @@ designer.make('nodes', 'color'); // refresh node colors
 designer.makeAll(); // refresh all styles but node colors
 ```
 
-## Clear all styles
+### Clear all styles
 All styles are cleared and the designer forgets the palette and styles:
 
 ```js
@@ -196,7 +214,7 @@ designer.disown();
 designer.makeAll(); // does nothing
 ```
 
-## Import styles and palette
+### Import styles and palette
 Set a new palette and new styles:
 
 ```js
@@ -206,7 +224,7 @@ designer.extendSpecs({
 });
 ```
 
-## Remove a style from the specs
+### Remove a style from the specs
 For instance, removes the node size:
 
 ```js
@@ -214,7 +232,7 @@ designer.specs().styles.nodes.size = null;
 designer.deprecate();
 ```
 
-## Export styles and palette
+### Export styles and palette
 Dump the palette and styles, to save and restore them later:
 
 ```js
@@ -235,3 +253,10 @@ var newDesigner = sigma.plugins.designer(sigInst, {
 });
 newDesigner.makeAll(); // yeah!
 ```
+
+## Changelog
+
+**0.2**
+ * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.
+**0.1**
+ * Initial release.
