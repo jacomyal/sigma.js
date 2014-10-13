@@ -258,5 +258,7 @@ newDesigner.makeAll(); // yeah!
 
 **0.2**
  * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.
+ * Fix A specified style can be undone only once.
+
 **0.1**
  * Initial release.
