@@ -341,7 +341,10 @@
             o.styles !== undefined &&
             o.styles[visualVar]) {
 
-          o.orig_styles[visualVar] = o.orig_styles[visualVar] || item[visualVar];
+          if (!(visualVar in o.orig_styles)) {
+            o.orig_styles[visualVar] = item[visualVar];
+          }
+
           var newVal = o.styles[visualVar](item);
           if (newVal !== undefined)
             item[visualVar] = o.styles[visualVar](item);
