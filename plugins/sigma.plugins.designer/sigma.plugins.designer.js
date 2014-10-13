@@ -79,13 +79,13 @@
         bin,
         i,
         res = {};
-    
+
     // sort values by inverse order:
     numlist = values.map(function (val) {
       return parseFloat(val);
     })
-    .sort(function(a, b) { 
-      return a - b; 
+    .sort(function(a, b) {
+      return a - b;
     });
 
     min = numlist[0];
@@ -119,10 +119,10 @@
 
     // rules to map visual variables to data properties:
     this.mappings = mappings || {};
-    
+
     // index of deprecated visions on data properties:
     this.deprecated = {};
-    
+
     return this;
   };
 
@@ -144,7 +144,7 @@
         byFn,
         schemeFn,
         isSequential = true;
-    
+
     byFn = function(item, key) { return strToObjectRef(item, key); };
     schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
 
@@ -173,7 +173,7 @@
     // Find the max number of occurrence of values:
     var maxOcc = 0;
     for (val in this.idx[key]) {
-      maxOcc = 
+      maxOcc =
         (maxOcc < this.idx[key][val].items.length) ?
         this.idx[key][val].items.length :
         maxOcc;
@@ -210,7 +210,7 @@
           scheme = self.mappings.color.scheme;
 
           if (typeof scheme !== 'string')
-            throw '"' + visualVar + '.scheme" must be a string';
+            throw '"color.scheme" must be a string';
 
           if (isSequential) {
             bins = self.mappings.color.bins;
@@ -224,7 +224,7 @@
           };
 
           if (typeof format !== 'function')
-            throw '"' + visualVar + '.format" must be a function';
+            throw '"label.format" must be a function';
           break;
 
         case 'size':
@@ -232,15 +232,15 @@
           max = self.mappings.size.max || 1;
 
           if (typeof min !== 'number')
-            throw '"' + visualVar + '.min" must be a number';
+            throw '"size.min" must be a number';
           if (typeof max !== 'number')
-            throw '"' + visualVar + '.max" must be a number';
+            throw '"size.max" must be a number';
           if (min <= 0)
-            throw '"' + visualVar + '.min" must be a positive number';
+            throw '"size.min" must be a positive number';
           if (max <= 0)
-            throw '"' + visualVar + '.max" must be a positive number';
+            throw '"size.max" must be a positive number';
           if (max < min)
-            throw '"' + visualVar + '.max" must be greater or equal than "' + visualVar + '.min"';
+            throw '"size.max" must be greater or equal than "size.min"';
           if (!isSequential)
             throw 'The values of property "' + key + '" must be numbers only';
 
@@ -265,7 +265,7 @@
               self.idx[key][val].styles.color = function() {
                 if (schemeFn(_palette, scheme) === undefined)
                   throw 'The color scheme must be qualitative, i.e. a dict of value => color';
-                
+
                 return schemeFn(_palette, scheme)[val];
               };
             }
@@ -339,7 +339,7 @@
         if (item !== undefined &&
             o.styles !== undefined &&
             o.styles[visualVar]) {
-          
+
           o.orig_styles[visualVar] = o.orig_styles[visualVar] || item[visualVar];
           var newVal = o.styles[visualVar](item);
           if (newVal !== undefined)
@@ -376,7 +376,7 @@
       var o = self.idx[key][val];
       o.items.forEach(function (item) {
         if (item !== undefined) {
-          
+
           if (o.orig_styles === undefined)
             delete item[visualVar];
           else
@@ -449,7 +449,7 @@
    * This method is used to get the styles bound to each node of the graph for
    * a specified property.
    *
-   * @param  {string} key The property accessor. Use a dot notation like 
+   * @param  {string} key The property accessor. Use a dot notation like
    *                      'data.myProperty'.
    * @return {object}     The styles.
    */
@@ -461,7 +461,7 @@
    * This method is used to get the styles bound to each edge of the graph for
    * a specified property.
    *
-   * @param  {string} key The property accessor. Use a dot notation like 
+   * @param  {string} key The property accessor. Use a dot notation like
    *                      'data.myProperty'.
    * @return {object}      The styles.
    */
@@ -622,7 +622,7 @@
   Designer.prototype.disown = function() {
     this.omitAll();
     _mappings = sigma.utils.extend({}, settings);
-    
+
     _visionOnNodes = new Vision(function(s) {
       return s.graph.nodes();
     }, _mappings.nodes);
