@@ -61,9 +61,7 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      // min/max used if sigma settings {autoRescale: false}
-      min: 1,
-      max: 10
+      bins: 7
     },
     color: {
       by: 'data.quality',
@@ -78,9 +76,7 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      // min/max used if sigma settings {autoRescale: false}
-      min: 0.5,
-      max: 4
+      bins: 7
     },
   }
 };
@@ -258,7 +254,8 @@ newDesigner.makeAll(); // yeah!
 
 **0.2**
  * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.
- * Fix A specified style can be undone only once.
+ * Remove `min` and `max` settings to size, and add the `bins` setting to size.
+ * Fix a specified style can be undone only once.
 
 **0.1**
  * Initial release.

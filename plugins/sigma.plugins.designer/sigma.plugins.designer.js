@@ -187,8 +187,6 @@
     });
 
     var format,
-        min,
-        max,
         colorHist,
         sizeHist,
         scheme,
@@ -229,23 +227,13 @@
           break;
 
         case 'size':
-          min = self.mappings.size.min || 1;
-          max = self.mappings.size.max || 1;
-
-          if (typeof min !== 'number')
-            throw '"size.min" must be a number';
-          if (typeof max !== 'number')
-            throw '"size.max" must be a number';
-          if (min <= 0)
-            throw '"size.min" must be a positive number';
-          if (max <= 0)
-            throw '"size.max" must be a positive number';
-          if (max < min)
-            throw '"size.max" must be greater or equal than "size.min"';
           if (!isSequential)
             throw 'The values of property "' + key + '" must be numbers only';
 
-          sizeHist = histogram(Object.keys(self.idx[key]), 7);
+          sizeHist = histogram(
+            Object.keys(self.idx[key]),
+            (self.mappings.size.bins || 7)
+          );
           break;
       }
     });
@@ -280,8 +268,7 @@
 
           case 'size':
             self.idx[key][val].styles.size = function() {
-              var bin = sizeHist[val];  // [0..6]
-              return min + (bin / 6) * Math.abs(max - min);
+              return 1 + sizeHist[val];
             };
             break;
         }
