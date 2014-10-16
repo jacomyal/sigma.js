@@ -61,7 +61,9 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      bins: 7
+      bins: 7,
+      min: 2,
+      max: 20
     },
     color: {
       by: 'data.quality',
@@ -76,7 +78,9 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      bins: 7
+      bins: 7,
+      min: 1,
+      max: 5
     },
   }
 };
@@ -193,6 +197,23 @@ var arr = designer.appliedStyles('edges');
 // ['color', 'size']
 ```
 
+### Get the histograms computed so far 
+Histograms are objects of pairs (value -> bin). They are computed for sizes and colors on sequential data.
+
+Histograms computed so far on the nodes properties:
+
+```js
+var obj = designer.histograms('nodes');
+// { propertyA: { valueX: 0, valueY: 1, valueZ: 3 }}
+```
+
+Histograms computed so far on the edges properties:
+
+```js
+var obj = designer.histograms('nodes');
+// { propertyA: { valueX: 0, valueY: 1, valueZ: 3 }}
+```
+
 ### Deprecate the designer's vision
 The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called:
 
@@ -235,7 +256,7 @@ Dump the palette and styles, to save and restore them later:
 var specs = designer.specs();
 
 designer.disown();
-designer.setSpecs({
+designer.extendSpecs({
   styles: specs.styles,
   palette: specs.palette
 });
@@ -254,7 +275,8 @@ newDesigner.makeAll(); // yeah!
 
 **0.2**
  * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.
- * Remove `min` and `max` settings to size, and add the `bins` setting to size.
+ * Add the `bins` setting to size.
+ * Bind the `min` size and `max` size settings to sigma settings.
  * Fix a specified style can be undone only once.
 
 **0.1**

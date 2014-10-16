@@ -106,20 +106,37 @@
    * This constructor instanciates a new vision on a specified dataset (nodes
    * or edges).
    *
-   * @param  {function} dataset   The dataset accessor, e.g.
-   *                              `function(s) { return s.graph.nodes(); }`.
-   * @param  {object}   mappings  The mappings object.
+   * @param  {function} dataset   The dataset. Available options: 'nodes',
+   *                              'edges'.
    * @return {Vision}             The vision instance.
    */
-  function Vision(dataset, mappings) {
+  function Vision(dataset) {
+    this.key = dataset;
+
+    // rules to map visual variables to data properties:
+    this.mappings = {};
+
     // nodes or edges:
-    this.dataset = dataset;
+    if (dataset === 'nodes') {
+      this.dataset = function(s) {
+        return s.graph.nodes();
+      }
+      this.mappings = _mappings.nodes;
+    }
+    else if (dataset === 'edges') {
+      this.dataset = function(s) {
+        return s.graph.edges();
+      }
+      this.mappings = _mappings.edges;
+    }
+    else
+      throw 'Vision: Unknown dataset ' + dataset;
 
     // index of data properties:
     this.idx = Object.create(null);
 
-    // rules to map visual variables to data properties:
-    this.mappings = mappings || {};
+    // histograms of data properties for visual variables:
+    this.histograms = {};
 
     // index of deprecated visions on data properties:
     this.deprecated = {};
@@ -137,9 +154,9 @@
     var self = this;
 
     if (key === undefined)
-      throw 'Missing property accessor';
+      throw 'Vision.update: Missing property accessor';
     if (typeof key !== 'string')
-      throw 'The property accessor "'+ key +'" must be a string.';
+      throw 'Vision.update: The property accessor "'+ key +'" must be a string.';
 
     var val,
         byFn,
@@ -209,11 +226,12 @@
           scheme = self.mappings.color.scheme;
 
           if (typeof scheme !== 'string')
-            throw '"color.scheme" must be a string';
+            throw 'Vision.update: "color.scheme" must be a string';
 
           if (isSequential) {
-            bins = self.mappings.color.bins;
-            colorHist = histogram(Object.keys(self.idx[key]), bins);
+            bins = self.mappings.color.bins || 7;
+            self.histograms.color = self.histograms.color || {};
+            self.histograms.color[key] = histogram(Object.keys(self.idx[key]), bins);
           }
           break;
 
@@ -223,14 +241,15 @@
           };
 
           if (typeof format !== 'function')
-            throw '"label.format" must be a function';
+            throw 'Vision.update: "label.format" must be a function';
           break;
 
         case 'size':
           if (!isSequential)
-            throw 'The values of property "' + key + '" must be numbers only';
+            throw 'Vision.update: The values of property "' + key + '" must be numbers only';
 
-          sizeHist = histogram(
+          self.histograms.size = self.histograms.size || {};
+          self.histograms.size[key] = histogram(
             Object.keys(self.idx[key]),
             (self.mappings.size.bins || 7)
           );
@@ -246,14 +265,15 @@
           case 'color':
             if (isSequential) {
               self.idx[key][val].styles.color = function() {
-                var bin = colorHist[val];
+                var bin = self.histograms.color[key][val];
                 return schemeFn(_palette, scheme)[bins][bin];
               };
             }
             else {
               self.idx[key][val].styles.color = function() {
                 if (schemeFn(_palette, scheme) === undefined)
-                  throw 'The color scheme must be qualitative, i.e. a dict of value => color';
+                  throw 'Vision.update: The color scheme must be qualitative' +
+                    ', i.e. a dict of value => color';
 
                 return schemeFn(_palette, scheme)[val];
               };
@@ -268,7 +288,7 @@
 
           case 'size':
             self.idx[key][val].styles.size = function() {
-              return 1 + sizeHist[val];
+              return 1 + self.histograms.size[key][val];
             };
             break;
         }
@@ -285,9 +305,9 @@
    */
   Vision.prototype.get = function (key) {
     if (key === undefined)
-      throw 'Missing property accessor';
+      throw 'Vision.get: Missing property accessor';
     if (typeof key !== 'string')
-      throw 'The property accessor "'+ key +'" must be a string.';
+      throw 'Vision.get: The property accessor "'+ key +'" must be a string.';
 
     // lazy updating:
     if (this.deprecated[key])
@@ -312,12 +332,12 @@
    */
   Vision.prototype.applyStyle = function(visualVar, key) {
     if (key === undefined)
-      throw 'Missing property accessor';
+      throw 'Vision.applyStyle: Missing property accessor';
     if (typeof key !== 'string')
-      throw 'The property accessor "'+ key +'" must be a string.';
+      throw 'Vision.applyStyle: The property accessor "'+ key +'" must be a string.';
 
     if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Unknown style "' + visualVar + '"';
+      throw 'Vision.applyStyle: Unknown style "' + visualVar + '"';
 
     var idxp = this.get(key);
 
@@ -338,6 +358,53 @@
         }
       });
     });
+
+    if (visualVar === 'size') {
+      if (this.key === 'nodes') {
+        if (_mappings.nodes.size.min > _mappings.nodes.size.max) {
+          throw 'Vision.applyStyle: styles.nodes.size.min must not be ' +
+          'greater than styles.nodes.size.max';
+        }
+
+        _mappings.nodes.size.orig = _mappings.nodes.size.orig || Object.create(null);
+
+        if (_mappings.nodes.size.min) {
+          if (!_mappings.nodes.size.orig.min) {
+            _mappings.nodes.size.orig.min = _s.settings('minNodeSize');
+          }
+          _s.settings('minNodeSize', _mappings.nodes.size.min);
+        }
+
+        if (_mappings.nodes.size.max) {
+          if (!_mappings.nodes.size.orig.max) {
+            _mappings.nodes.size.orig.max = _s.settings('maxNodeSize');
+          }
+          _s.settings('maxNodeSize', _mappings.nodes.size.max);
+        }
+      }
+      else if (this.key === 'edges') {
+        if (_mappings.edges.size.min > _mappings.edges.size.max) {
+          throw 'Vision.applyStyle: styles.edges.size.min must not be '+
+          'greater than styles.edges.size.max';
+        }
+
+        _mappings.edges.size.orig = _mappings.edges.size.orig || Object.create(null);
+
+        if (_mappings.edges.size.min) {
+          if (!_mappings.edges.size.orig.min) {
+            _mappings.edges.size.orig.min = _s.settings('minEdgeSize');
+          }
+          _s.settings('minEdgeSize', _mappings.edges.size.min);
+        }
+
+        if (_mappings.edges.size.max) {
+          if (!_mappings.edges.size.orig.max) {
+            _mappings.edges.size.orig.max = _s.settings('maxEdgeSize');
+          }
+          _s.settings('maxEdgeSize', _mappings.edges.size.max);
+        }
+      }
+    }
   };
 
   /**
@@ -353,12 +420,12 @@
     var self = this;
 
     if (key === undefined)
-      throw 'Missing property accessor';
+      throw 'Vision.undoStyle: Missing property accessor';
     if (typeof key !== 'string')
-      throw 'The property accessor "'+ key +'" must be a string.';
+      throw 'Vision.undoStyle: The property accessor "'+ key +'" must be a string.';
 
     if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Unknown style';
+      throw 'Vision.undoStyle: Unknown style';
 
     if (this.idx[key] === undefined)
       return;
@@ -376,6 +443,35 @@
       });
       delete o.orig_styles[visualVar];
     });
+
+    if (visualVar === 'size') {
+      if (this.key === 'nodes' && _mappings.nodes.size.orig) {
+        if (_mappings.nodes.size.orig.min) {
+          _s.settings('minNodeSize', _mappings.nodes.size.orig.min);
+          delete _mappings.nodes.size.orig.min;
+        }
+        if (_mappings.nodes.size.orig.max) {
+          _s.settings('maxNodeSize', _mappings.nodes.size.orig.max);
+          delete _mappings.nodes.size.orig.max;
+        }
+        if (!Object.keys(_mappings.nodes.size.orig).length) {
+          delete _mappings.nodes.size.orig;
+        }
+      }
+      else if (this.key === 'edges' && _mappings.edges.size.orig) {
+        if (_mappings.edges.size.orig.min) {
+          _s.settings('minEdgeSize', _mappings.edges.size.orig.min);
+          delete _mappings.edges.size.orig.min;
+        }
+        if (_mappings.edges.size.orig.max) {
+          _s.settings('maxEdgeSize', _mappings.edges.size.orig.max);
+          delete _mappings.edges.size.orig.min;
+        }
+        if (!Object.keys(_mappings.edges.size.orig).length) {
+          delete _mappings.edges.size.orig;
+        }
+      }
+    }
   };
 
 
@@ -392,13 +488,8 @@
     _mappings = sigma.utils.extend((specs || {}).styles || {}, settings);
     _palette = (specs || {}).palette || {};
 
-    _visionOnNodes = new Vision(function(s) {
-      return s.graph.nodes();
-    }, _mappings.nodes);
-
-    _visionOnEdges = new Vision(function(s) {
-      return s.graph.edges();
-    }, _mappings.edges);
+    _visionOnNodes = new Vision('nodes');
+    _visionOnEdges = new Vision('edges');
 
     _s.bind('kill', function() {
       sigma.plugins.killDesigner();
@@ -631,6 +722,35 @@
   };
 
   /**
+   * This method is used to get the histograms computed so far on the
+   * properties of nodes or edges. A histogram is an object of pairs
+   * (value -> bin).
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @return {array}             The histograms.
+   */
+  Designer.prototype.histograms = function(target) {
+    if (!target)
+      throw '"Designer.histogram": Missing target';
+
+    var v;
+
+    switch (target) {
+      case 'nodes':
+        v = _visionOnNodes;
+        break;
+      case 'edges':
+        v = _visionOnEdges;
+        break;
+      default:
+        throw '"Designer.histogram": Unknown target ' + target;
+    }
+
+    return v.histograms;
+  };
+
+  /**
    * This method is used when the styles are deprecated, for instance when the
    * graph has changed. Each property style will be remakeed the next time it
    * is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`.
@@ -657,14 +777,8 @@
   Designer.prototype.disown = function() {
     this.omitAll();
     _mappings = sigma.utils.extend({}, settings);
-
-    _visionOnNodes = new Vision(function(s) {
-      return s.graph.nodes();
-    }, _mappings.nodes);
-
-    _visionOnEdges = new Vision(function(s) {
-      return s.graph.edges();
-    }, _mappings.edges);
+    _visionOnNodes = new Vision('nodes');
+    _visionOnEdges = new Vision('edges');
 
     //see https://github.com/jacomyal/sigma.js/issues/397
     _s.refresh({skipIndexation: true});
