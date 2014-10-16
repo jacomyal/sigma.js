@@ -67,7 +67,7 @@ var i,
 // Generate a random graph:
 for (i = 0; i < N; i++)
   g.nodes.push({
-    id: 'n' + i,
+    id: i,
     label: 'Node ' + i,
     x: Math.random()*100,
     y: Math.random()*100,
@@ -81,9 +81,9 @@ for (i = 0; i < N; i++)
 
 for (i = 0; i < E; i++)
   g.edges.push({
-    id: 'e' + i,
-    source: 'n' + (Math.random() * N | 0),
-    target: 'n' + (Math.random() * N | 0),
+    id: i,
+    source: (Math.random() * N | 0),
+    target: (Math.random() * N | 0),
     size: Math.random(),
     color: '#ccc',
     data: {
@@ -98,7 +98,7 @@ s = new sigma({
   container: 'graph-container',
   settings: {
     minNodeSize: 1,
-    maxNodeSize: 50
+    maxNodeSize: 5
   }
 });
 
@@ -123,11 +123,13 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      bins: 7
+      bins: 7,
+      min: 2,
+      max: 20
     },
     color: {
       by: 'data.quality',
-      scheme: 'aQualitativeScheme'
+      scheme: 'aQualitativeScheme',
     },
   },
   edges: {
@@ -138,7 +140,9 @@ var myStyles = {
     },
     size: {
       by: 'data.quantity',
-      bins: 7
+      bins: 7,
+      min: 1,
+      max: 5
     },
   }
 };
@@ -172,7 +176,7 @@ console.log('nodes', designer.appliedStyles('nodes'));
 console.log('edges', designer.appliedStyles('edges'));
 
 // Dump palette and styles:
-//console.log(designer.getSpecs());
+//console.log(designer.specs());
 
 /*console.log('styles bound to each node for the property "' + myStyles.nodes.color.by + '"',
   designer.nodes(myStyles.nodes.color.by)
