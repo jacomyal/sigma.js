@@ -141,6 +141,9 @@
     // index of deprecated visions on data properties:
     this.deprecated = {};
 
+    // some original sigma settings:
+    this.sigmaSettings = {};
+
     return this;
   };
 
@@ -366,18 +369,16 @@
           'greater than styles.nodes.size.max';
         }
 
-        _mappings.nodes.size.orig = _mappings.nodes.size.orig || Object.create(null);
-
         if (_mappings.nodes.size.min) {
-          if (!_mappings.nodes.size.orig.min) {
-            _mappings.nodes.size.orig.min = _s.settings('minNodeSize');
+          if (!this.sigmaSettings.minNodeSize) {
+            this.sigmaSettings.minNodeSize = _s.settings('minNodeSize');
           }
           _s.settings('minNodeSize', _mappings.nodes.size.min);
         }
 
         if (_mappings.nodes.size.max) {
-          if (!_mappings.nodes.size.orig.max) {
-            _mappings.nodes.size.orig.max = _s.settings('maxNodeSize');
+          if (!this.sigmaSettings.maxNodeSize) {
+            this.sigmaSettings.maxNodeSize = _s.settings('maxNodeSize');
           }
           _s.settings('maxNodeSize', _mappings.nodes.size.max);
         }
@@ -388,18 +389,16 @@
           'greater than styles.edges.size.max';
         }
 
-        _mappings.edges.size.orig = _mappings.edges.size.orig || Object.create(null);
-
         if (_mappings.edges.size.min) {
-          if (!_mappings.edges.size.orig.min) {
-            _mappings.edges.size.orig.min = _s.settings('minEdgeSize');
+          if (!this.sigmaSettings.minEdgeSize) {
+            this.sigmaSettings.minEdgeSize = _s.settings('minEdgeSize');
           }
           _s.settings('minEdgeSize', _mappings.edges.size.min);
         }
 
         if (_mappings.edges.size.max) {
-          if (!_mappings.edges.size.orig.max) {
-            _mappings.edges.size.orig.max = _s.settings('maxEdgeSize');
+          if (!this.sigmaSettings.maxEdgeSize) {
+            this.sigmaSettings.maxEdgeSize = _s.settings('maxEdgeSize');
           }
           _s.settings('maxEdgeSize', _mappings.edges.size.max);
         }
@@ -445,30 +444,20 @@
     });
 
     if (visualVar === 'size') {
-      if (this.key === 'nodes' && _mappings.nodes.size.orig) {
-        if (_mappings.nodes.size.orig.min) {
-          _s.settings('minNodeSize', _mappings.nodes.size.orig.min);
-          delete _mappings.nodes.size.orig.min;
+      if (this.key === 'nodes') {
+        if (this.sigmaSettings.minNodeSize) {
+          _s.settings('minNodeSize', this.sigmaSettings.minNodeSize);
         }
-        if (_mappings.nodes.size.orig.max) {
-          _s.settings('maxNodeSize', _mappings.nodes.size.orig.max);
-          delete _mappings.nodes.size.orig.max;
-        }
-        if (!Object.keys(_mappings.nodes.size.orig).length) {
-          delete _mappings.nodes.size.orig;
+        if (this.sigmaSettings.maxNodeSize) {
+          _s.settings('maxNodeSize', this.sigmaSettings.maxNodeSize);
         }
       }
-      else if (this.key === 'edges' && _mappings.edges.size.orig) {
-        if (_mappings.edges.size.orig.min) {
-          _s.settings('minEdgeSize', _mappings.edges.size.orig.min);
-          delete _mappings.edges.size.orig.min;
+      else if (this.key === 'edges') {
+        if (this.sigmaSettings.minEdgeSize) {
+          _s.settings('minEdgeSize', this.sigmaSettings.minEdgeSize);
         }
-        if (_mappings.edges.size.orig.max) {
-          _s.settings('maxEdgeSize', _mappings.edges.size.orig.max);
-          delete _mappings.edges.size.orig.min;
-        }
-        if (!Object.keys(_mappings.edges.size.orig).length) {
-          delete _mappings.edges.size.orig;
+        if (this.sigmaSettings.maxEdgeSize) {
+          _s.settings('maxEdgeSize', this.sigmaSettings.maxEdgeSize);
         }
       }
     }
@@ -597,7 +586,7 @@
       s.length = 0;
       // apply all styles if no visual variable is specified:
       Object.keys(m).forEach(function (visuVar) {
-        if (m[visuVar]) {
+        if (m[visuVar] && m[visuVar].by) {
           v.applyStyle(visuVar, m[visuVar].by);
 
           // add to active styles:
@@ -607,7 +596,7 @@
         }
       });
     }
-    else if (m[visualVar]) {
+    else if (m[visualVar] && m[visualVar].by) {
       // apply the style of the specified visual variable:
       v.applyStyle(visualVar, m[visualVar].by);
 
