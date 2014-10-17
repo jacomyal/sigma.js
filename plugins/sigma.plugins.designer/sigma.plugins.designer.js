@@ -71,9 +71,9 @@
    *
    * @param  {array}  values The values.
    * @param  {number} nbins  The number of bins.
-   * @return {object}        The histogram.
+   * @return {object}        The basic histogram.
    */
-  function histogram(values, nbins) {
+  function baseHistogram(values, nbins) {
     var numlist,
         min,
         max,
@@ -101,6 +101,55 @@
     return res;
   };
 
+  /**
+   * This function will generate a consolidated histogram of values grouped by
+   * bins. The result is an array of objects ordered by bins. Each object
+   * contains the list of `values` in the `bin`, the `min` and `max` values,
+   * and the `ratio` of values in the bin compared to the largest bin.
+   *
+   * @param  {object} h         The nodes or edges histograms.
+   * @param  {string} p         The property accessor.
+   * @return {array}            The consolidated histogram.
+   */
+  function histogram(h, p) {
+    var d = [],
+        bins,
+        maxOcc = 0;
+
+    if (h && h[p]) {
+      Object.keys(h[p]).forEach(function(value) {
+        var bin = h[p][value];
+        d[bin] = d[bin] || [];
+        d[bin].push(+value);
+      });
+
+      bins = d.length;
+
+      for (var bin = 0; bin < bins; bin++) {
+        if (d[bin]) {
+          maxOcc = (maxOcc > d[bin].length) ? maxOcc : d[bin].length;
+        }
+      }
+
+      for (var bin = 0; bin < bins; bin++) {
+        if (d[bin] === undefined) {
+          d[bin] = [];
+        }
+        d[bin] = {
+          bin: bin,
+          values: d[bin],
+          ratio: d[bin].length / maxOcc
+        };
+        // d[bin][visualVar] = designer.specs().palette.sequential[bins][bin];
+
+        if (d[bin].values.length) {
+          d[bin].min = Math.min.apply(null, d[bin].values);
+          d[bin].max = Math.max.apply(null, d[bin].values);
+        }
+      }
+    }
+    return d;
+  };
 
   /**
    * This constructor instanciates a new vision on a specified dataset (nodes
@@ -114,7 +163,7 @@
     this.key = dataset;
 
     // rules to map visual variables to data properties:
-    this.mappings = {};
+    this.mappings = Object.create(null);
 
     // nodes or edges:
     if (dataset === 'nodes') {
@@ -136,13 +185,16 @@
     this.idx = Object.create(null);
 
     // histograms of data properties for visual variables:
-    this.histograms = {};
+    this.histograms = Object.create(null);
 
     // index of deprecated visions on data properties:
-    this.deprecated = {};
+    this.deprecated = Object.create(null);
 
     // some original sigma settings:
-    this.sigmaSettings = {};
+    this.sigmaSettings = Object.create(null);
+
+    // properties are sequential or qualitative data
+    this.dataTypes = Object.create(null)
 
     return this;
   };
@@ -178,8 +230,8 @@
           self.idx[key][val] = {
             key: val,
             items: [],
-            styles: {},
-            orig_styles: {}
+            styles: Object.create(null),
+            orig_styles: Object.create(null)
           };
         }
         self.idx[key][val].items.push(item);
@@ -189,6 +241,7 @@
       }
     });
 
+    this.dataTypes[key] = { sequential: isSequential };
     this.deprecated[key] = false;
 
     // Find the max number of occurrence of values:
@@ -229,12 +282,12 @@
           scheme = self.mappings.color.scheme;
 
           if (typeof scheme !== 'string')
-            throw 'Vision.update: "color.scheme" must be a string';
+            throw 'Vision.update: color.scheme "' + scheme + '" must be a string';
 
           if (isSequential) {
             bins = self.mappings.color.bins || 7;
             self.histograms.color = self.histograms.color || {};
-            self.histograms.color[key] = histogram(Object.keys(self.idx[key]), bins);
+            self.histograms.color[key] = baseHistogram(Object.keys(self.idx[key]), bins);
           }
           break;
 
@@ -244,7 +297,7 @@
           };
 
           if (typeof format !== 'function')
-            throw 'Vision.update: "label.format" must be a function';
+            throw 'Vision.update: label.format "' + format + '" must be a function';
           break;
 
         case 'size':
@@ -252,7 +305,7 @@
             throw 'Vision.update: The values of property "' + key + '" must be numbers only';
 
           self.histograms.size = self.histograms.size || {};
-          self.histograms.size[key] = histogram(
+          self.histograms.size[key] = baseHistogram(
             Object.keys(self.idx[key]),
             (self.mappings.size.bins || 7)
           );
@@ -352,7 +405,11 @@
             o.styles[visualVar]) {
 
           if (!(visualVar in o.orig_styles)) {
-            o.orig_styles[visualVar] = item[visualVar];
+            // non-writable property
+            Object.defineProperty(o.orig_styles, visualVar, {
+             enumerable: true,
+             value: item[visualVar]
+            });
           }
 
           var newVal = o.styles[visualVar](item);
@@ -365,8 +422,8 @@
     if (visualVar === 'size') {
       if (this.key === 'nodes') {
         if (_mappings.nodes.size.min > _mappings.nodes.size.max) {
-          throw 'Vision.applyStyle: styles.nodes.size.min must not be ' +
-          'greater than styles.nodes.size.max';
+          throw 'Vision.applyStyle: nodes.size.min must not be ' +
+          'greater than nodes.size.max';
         }
 
         if (_mappings.nodes.size.min) {
@@ -385,8 +442,8 @@
       }
       else if (this.key === 'edges') {
         if (_mappings.edges.size.min > _mappings.edges.size.max) {
-          throw 'Vision.applyStyle: styles.edges.size.min must not be '+
-          'greater than styles.edges.size.max';
+          throw 'Vision.applyStyle: edges.size.min must not be '+
+          'greater than edges.size.max';
         }
 
         if (_mappings.edges.size.min) {
@@ -440,7 +497,6 @@
             item[visualVar] = o.orig_styles[visualVar];
         }
       });
-      delete o.orig_styles[visualVar];
     });
 
     if (visualVar === 'size') {
@@ -694,52 +750,6 @@
   };
 
   /**
-   * This method is used to get the styles currently applied to nodes or edges.
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @return {array}             The applied styles.
-   */
-  Designer.prototype.appliedStyles = function(target) {
-    if (!target)
-      throw '"Designer.appliedStyles": Missing target';
-
-    if (target !== 'nodes' && target !== 'edges')
-      throw '"Designer.appliedStyles": Unknown target ' + target;
-
-    return _activeStyles[target];
-  };
-
-  /**
-   * This method is used to get the histograms computed so far on the
-   * properties of nodes or edges. A histogram is an object of pairs
-   * (value -> bin).
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @return {array}             The histograms.
-   */
-  Designer.prototype.histograms = function(target) {
-    if (!target)
-      throw '"Designer.histogram": Missing target';
-
-    var v;
-
-    switch (target) {
-      case 'nodes':
-        v = _visionOnNodes;
-        break;
-      case 'edges':
-        v = _visionOnEdges;
-        break;
-      default:
-        throw '"Designer.histogram": Unknown target ' + target;
-    }
-
-    return v.histograms;
-  };
-
-  /**
    * This method is used when the styles are deprecated, for instance when the
    * graph has changed. Each property style will be remakeed the next time it
    * is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`.
@@ -775,6 +785,135 @@
     return this;
   };
 
+  Designer.prototype.utils = {};
+
+  /**
+   * This method is used to get the data type of a specified property on nodes
+   * or edges. It is true if data is sequential, false otherwise (qualitative).
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @param  {string} property   The property accessor.
+   * @return {boolean}           The data type.
+   */
+  Designer.prototype.utils.isSequential = function(target, property) {
+    if (!target)
+      throw '"Designer.utils.isSequential": Missing target';
+
+    var v;
+    switch (target) {
+      case 'nodes':
+        v = _visionOnNodes;
+        break;
+      case 'edges':
+        v = _visionOnEdges;
+        break;
+      default:
+        throw '"Designer.utils.isSequential": Unknown target ' + target;
+    }
+
+    if (property === undefined)
+      throw 'Designer.utils.isSequential: Missing property accessor';
+    if (typeof property !== 'string')
+      throw 'Designer.utils.isSequential: The property accessor "'+ property +'" must be a string.';
+
+    if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
+      var val,
+          found = false,
+          isSequential = true;
+      v.dataset(_s).forEach(function (item) {
+        val = strToObjectRef(item, property);
+        if (val !== undefined) {
+          found = true;
+          isSequential = (typeof val === 'number') ? isSequential : false;
+          // TODO: throw error if is number AND (is NaN or is Infinity)
+        }
+      });
+
+      if (found)
+        v.dataTypes[property] = { sequential: isSequential };
+    }
+
+    return (v.dataTypes[property] || {}).sequential;
+  };
+
+  /**
+   * This method is used to get the styles currently applied to nodes or edges.
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @return {array}             The applied styles.
+   */
+  Designer.prototype.utils.appliedStyles = function(target) {
+    if (!target)
+      throw '"Designer.utils.appliedStyles": Missing target';
+
+    if (target !== 'nodes' && target !== 'edges')
+      throw '"Designer.utils.appliedStyles": Unknown target ' + target;
+
+    return _activeStyles[target];
+  };
+
+  /**
+   * This method is used to get the histogram of values, grouped by bins, on
+   * a specified property of nodes or edges computed for a visual variable.
+   * The property must have been used on a style before calling this method.
+   *
+   * The result is an array of objects ordered by bins. Each object contains
+   * the list of `values` in the `bin`, the `min` and `max` values, and the
+   * `ratio` of values in the bin compared to the largest bin.
+   * If the visual variable is the `color`, it also contains the `color` of the
+   * bin.
+   *
+   * @param  {string} target     The data target. Available values:
+   *                             "nodes", "edges".
+   * @param  {string} visualVar  The visual variable. Available values:
+   *                             "color", "size", "label".
+   * @param  {string} property   The property accessor.
+   * @return {array}             The histogram.
+   */
+  Designer.prototype.utils.histogram = function(target, visualVar, property) {
+    if (!target)
+      throw '"Designer.utils.histogram": Missing target';
+
+    var v;
+    switch (target) {
+      case 'nodes':
+        v = _visionOnNodes;
+        break;
+      case 'edges':
+        v = _visionOnEdges;
+        break;
+      default:
+        throw '"Designer.utils.histogram": Unknown target ' + target;
+    }
+
+    if (_visualVars.indexOf(visualVar) == -1)
+      throw 'Designer.utils.histogram: Unknown style';
+
+    if (property === undefined)
+      throw 'Designer.utils.histogram: Missing property accessor';
+    if (typeof property !== 'string')
+      throw 'Designer.utils.histogram: The property accessor "'+ property +'" must be a string.';
+
+    var isSequential = this.isSequential(target, property);
+    if (isSequential === undefined)
+      throw 'Designer.utils.histogram: Missing property "'+ property;
+    if (!isSequential)
+      throw 'Designer.utils.histogram: the property "'+ property +'" must be sequential.';
+
+    var h = histogram(v.histograms[visualVar], property);
+
+    if (visualVar === 'color') {
+      var bins = h.length;
+      for (var bin = 0; bin < bins; bin++) {
+        h[bin][visualVar] = strToObjectRef(_palette, _mappings[target].color.scheme)[bins][bin];
+      }
+    }
+
+    return h;
+  };
+
 
   /**
    * Interface
@@ -786,14 +925,15 @@
 
   /**
    * @param  {sigma}   s       The related sigma instance.
-   * @param  {object}  styles  The styles of the designer.
-   * @param  {?object} palette The color palette.
-   * @return {Designer}          The instance.
+   * @param  {?object} options The object contains `palette` and `styles`.
+   *                           Styles are mappings between visual variables and
+   *                           data properties on nodes and edges.
+   * @return {Designer}        The instance.
    */
-  sigma.plugins.designer = function(s, styles, palette) {
+  sigma.plugins.designer = function(s, options) {
     // Create instance if undefined
     if (!_instance) {
-      _instance = new Designer(s, styles, palette);
+      _instance = new Designer(s, options);
     }
     return _instance;
   };
