@@ -181,39 +181,6 @@ Undo a specified nodes style like the size:
 designer.omit('nodes', 'size');
 ```
 
-### Get the styles currently applied
-
-Styles applied on nodes:
-
-```js
-var arr = designer.appliedStyles('nodes');
-// ['color', 'size']
-```
-
-Styles applied on edges:
-
-```js
-var arr = designer.appliedStyles('edges');
-// ['color', 'size']
-```
-
-### Get the histograms computed so far 
-Histograms are objects of pairs (value -> bin). They are computed for sizes and colors on sequential data.
-
-Histograms computed so far on the nodes properties:
-
-```js
-var obj = designer.histograms('nodes');
-// { propertyA: { valueX: 0, valueY: 1, valueZ: 3 }}
-```
-
-Histograms computed so far on the edges properties:
-
-```js
-var obj = designer.histograms('nodes');
-// { propertyA: { valueX: 0, valueY: 1, valueZ: 3 }}
-```
-
 ### Deprecate the designer's vision
 The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called:
 
@@ -271,6 +238,57 @@ var newDesigner = sigma.plugins.designer(sigInst, {
 newDesigner.makeAll(); // yeah!
 ```
 
+## Utils
+
+### Data type of a property on nodes or edges
+
+```js
+designer.utils.isSequential('nodes', 'data.quantity');
+// true
+
+designer.utils.isSequential('nodes', 'data.quality');
+// false
+```
+
+### Styles currently applied
+
+Styles applied on nodes:
+
+```js
+var arr = designer.utils.appliedStyles('nodes');
+// ['color', 'size']
+```
+
+Styles applied on edges:
+
+```js
+var arr = designer.utils.appliedStyles('edges');
+// ['color', 'size']
+```
+
+### Histograms
+
+Histograms are values, grouped by bins, on a specified property of nodes or edges computed for a visual variable (sizes and colors only).
+
+The result is an array of objects ordered by bins. Each object contains the list of `values` in the `bin`, the `min` and `max` values, and the `ratio` of values in the `bin` compared to the largest `bin`. If the visual variable is the `color`, it also contains the `color` of the `bin`.
+
+Example on the histogram of edge colors by the property 'data.quantity':
+
+```js
+designer.utils.histogram('edges', 'color', 'data.quantity');
+// [
+//   {
+//     bin: 0,
+//     min: 1,
+//     max: 5,
+//     values: [0.1, 0.42, ...],
+//     ratio: 0.7,
+//     color: '#ff0000'
+//   },
+//   ...
+// ]
+```
+
 ## Changelog
 
 **0.2**
@@ -278,6 +296,7 @@ newDesigner.makeAll(); // yeah!
  * Add the `bins` setting to size.
  * Bind the `min` size and `max` size settings to sigma settings.
  * Fix a specified style can be undone only once.
+ * Add function `.utils.histogram()`.
 
 **0.1**
  * Initial release.
