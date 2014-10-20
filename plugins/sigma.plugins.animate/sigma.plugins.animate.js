@@ -117,15 +117,7 @@
         }, {});
 
     s.animations = s.animations || Object.create({});
-    sigma.plugins.kill(s);
-
-    // Do not refresh edgequadtree during drag:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      c.edgequadtree._enabled = false;
-    }
+    sigma.plugins.killAnimate(s);
 
     function step() {
       var p = (sigma.utils.dateNow() - start) / duration;
@@ -137,15 +129,7 @@
               node[k] = node[animate[k]];
         });
 
-        // Allow to refresh edgequadtree:
-        var k,
-            c;
-        for (k in s.cameras) {
-          c = s.cameras[k];
-          c.edgequadtree._enabled = true;
-        }
-
-        s.refresh();
+        s.refresh({skipIndexation: true});
         if (typeof o.onComplete === 'function')
           o.onComplete();
       } else {
@@ -166,7 +150,7 @@
             }
         });
 
-        s.refresh();
+        s.refresh({skipIndexation: true});
         s.animations[id] = requestAnimationFrame(step);
       }
     }
@@ -174,16 +158,8 @@
     step();
   };
 
-  sigma.plugins.kill = function(s) {
+  sigma.plugins.killAnimate = function(s) {
     for (var k in (s.animations || {}))
       cancelAnimationFrame(s.animations[k]);
-
-    // Allow to refresh edgequadtree:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      c.edgequadtree._enabled = true;
-    }
   };
 }).call(window);
