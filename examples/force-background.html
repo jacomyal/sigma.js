@@ -47,9 +47,18 @@
       right: 0;
       position: absolute;
     }
+    #notice {
+      bottom: 1em;
+      right: 1em;
+      position: absolute;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
-  <div id="graph-container"></div>
+  <div id="graph-container"><div id="notice" class="hidden">layout in progress...</div></div>
 </div>
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
@@ -65,8 +74,8 @@
 var i,
     s,
     o,
-    N = 100,
-    E = 500,
+    N = 1000,
+    E = 5000,
     C = 5,
     d = 0.5,
     cs = [],
@@ -119,19 +128,31 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    drawEdges: false
+    drawEdges: false,
+    animationsTime: 2500
+  }
+});
+
+// Configure the ForceAtlas2 algorithm:
+var fa = sigma.layouts.configForceAtlas2(s, {
+  worker: true,
+  autoStop: true,
+  background: true,
+  easing: 'cubicInOut'
+});
+
+// Bind the events:
+fa.bind('start interpolate stop', function(e) {
+  console.log(e.type);
+  var el = document.getElementById('notice');
+  if (e.type === 'start') {
+    el.className = '';
+  }
+  else if (e.type === 'interpolate') {
+    el.className = 'hidden';
   }
 });
 
 // Start the ForceAtlas2 algorithm:
-var fa = sigma.layouts.startForceAtlas2(s, {
-  worker: true,
-  autoStop: true,
-  background: true
-});
-
-// Bind the events:
-fa.bind('start stop', function(e) {
-  console.log(e.type);
-});
+sigma.layouts.startForceAtlas2();
 </script>

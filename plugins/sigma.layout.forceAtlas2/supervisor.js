@@ -51,6 +51,7 @@
       options.worker === false ? false : true && webWorkers;
     this.workerUrl = options.workerUrl;
     this.runOnBackground = (options.background) ? true : false;
+    this.easing = options.easing;
 
     // State
     this.started = false;
@@ -122,15 +123,21 @@
   };
 
   // TODO: make a better send function
-  Supervisor.prototype.applyLayoutChanges = function() {
+  Supervisor.prototype.applyLayoutChanges = function(prefixed) {
     var nodes = this.graph.nodes(),
         j = 0,
         realIndex;
 
     // Moving nodes
     for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
-      nodes[j].x = this.nodesByteArray[i];
-      nodes[j].y = this.nodesByteArray[i + 1];
+      if (prefixed) {
+        nodes[j].fa2_x = this.nodesByteArray[i];
+        nodes[j].fa2_y = this.nodesByteArray[i + 1];
+
+      } else {
+        nodes[j].x = this.nodesByteArray[i];
+        nodes[j].y = this.nodesByteArray[i + 1];
+      }
       j++;
     }
   };
@@ -215,7 +222,7 @@
       if (_this.running) {
 
         // Applying layout
-        _this.applyLayoutChanges();
+        _this.applyLayoutChanges(_this.runOnBackground);
 
         // Send data back to worker and loop
         _this.sendByteArrayToWorker();
@@ -231,10 +238,30 @@
       }
 
       if (!_this.running) {
-        _this.applyLayoutChanges();
-        _this.sigInst.refresh();
         _this.killWorker();
-        eventEmitter.dispatchEvent('stop');
+        if (_this.runOnBackground && _this.easing) {
+          _this.applyLayoutChanges(true);
+          eventEmitter.dispatchEvent('interpolate');
+          sigma.plugins.animate(
+            _this.sigInst,
+            {
+              x: 'fa2_x',
+              y: 'fa2_y'
+            },
+            {
+              easing: _this.easing,
+              onComplete: function() {
+                _this.sigInst.refresh();
+                eventEmitter.dispatchEvent('stop');
+              }
+            }
+          );
+        }
+        else {
+          _this.applyLayoutChanges(false);
+          _this.sigInst.refresh();
+          eventEmitter.dispatchEvent('stop');
+        }
       }
     };
 

@@ -32,6 +32,7 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <div id="container">
@@ -97,6 +98,7 @@ s = new sigma({
     defaultEdgeHoverColor: '#000',
     edgeHoverSizeRatio: 1,
     edgeHoverExtremities: true,
+    animationsTime: 1500
   }
 });
 
@@ -117,7 +119,9 @@ s.bind('doubleClickStage rightClickStage', function(e) {
 // Configure the ForceAtlas2 algorithm:
 var fa = sigma.layouts.configForceAtlas2(s, {
   worker: true,
-  autoStop: true
+  autoStop: true,
+  background: true,
+  easing: 'cubicInOut'
 });
 
 // Bind the events:
