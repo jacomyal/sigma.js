@@ -77,10 +77,8 @@ sigmaInstance.isForceAtlas2Running();
 * **easing** *string* : if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
 
 ## Notes
+
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
 
-<<<<<<< HEAD
 2. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you have to trigger it explicitely.
-=======
-2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
->>>>>>> origin/master
+
