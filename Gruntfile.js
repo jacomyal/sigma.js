@@ -88,7 +88,7 @@ module.exports = function(grunt) {
       subGrunts = {};
 
   plugins.forEach(function(p) {
-    var dir = 'plugins/sigma.' + p + '/';
+    var dir = './plugins/sigma.' + p + '/';
 
     if (fs.existsSync(dir + 'Gruntfile.js'))
       subGrunts[p] = {
