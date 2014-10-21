@@ -38,9 +38,6 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -50,76 +47,90 @@
       right: 0;
       position: absolute;
     }
+    #notice {
+      bottom: 1em;
+      right: 1em;
+      position: absolute;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
-  <div id="graph-container"></div>
+  <div id="graph-container"><div id="notice" class="hidden">layout in progress...</div></div>
 </div>
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
 /**
- * This example is a copy of "basic.html", but with event bindings after.
- * Open your browser's console to see the "click", "overNode" and
- * "outNode" events logged.
+ * Just a simple example to show how to use the sigma.layout.forceAtlas2
+ * plugin:
+ *
+ * A random graph is generated, such that its nodes are separated in some
+ * distinct clusters. Each cluster has its own color, and the density of
+ * links is stronger inside the clusters. So, we expect the algorithm to
+ * regroup the nodes of each cluster.
  */
 var i,
     s,
-    N = 20,
-    E = 200,
+    o,
+    N = 1000,
+    E = 5000,
+    C = 5,
+    d = 0.5,
+    cs = [],
     g = {
       nodes: [],
       edges: []
     };
 
-for (i = 0; i < N; i++)
-  g.nodes.push({
-    id: 'n' + i,
-    label: 'Node ' + i,
-    x: Math.random(),
-    y: Math.random(),
-    size: Math.random(),
-    color: '#666'
+// Generate the graph:
+for (i = 0; i < C; i++)
+  cs.push({
+    id: i,
+    nodes: [],
+    color: '#' + (
+      Math.floor(Math.random() * 16777215).toString(16) + '000000'
+    ).substr(0, 6)
   });
 
-for (i = 0; i < E; i++)
-  g.edges.push({
-    id: 'e' + i,
-    source: 'n' + (Math.random() * N | 0),
-    target: 'n' + (Math.random() * N | 0),
+for (i = 0; i < N; i++) {
+  o = cs[(Math.random() * C) | 0];
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node' + i,
+    x: Math.cos(2 * i * Math.PI / N),
+    y: Math.sin(2 * i * Math.PI / N),
     size: Math.random(),
-    type: 'curve',
-    color: '#ccc',
-    hover_color: '#000'
+    color: o.color
   });
+  o.nodes.push('n' + i);
+}
+
+for (i = 0; i < E; i++) {
+  if (Math.random() < 1 - d)
+    g.edges.push({
+      id: 'e' + i,
+      source: 'n' + ((Math.random() * N) | 0),
+      target: 'n' + ((Math.random() * N) | 0)
+    });
+  else {
+    o = cs[(Math.random() * C) | 0]
+    g.edges.push({
+      id: 'e' + i,
+      source: o.nodes[(Math.random() * o.nodes.length) | 0],
+      target: o.nodes[(Math.random() * o.nodes.length) | 0]
+    });
+  }
+}
 
 s = new sigma({
   graph: g,
-  renderer: {
-    container: document.getElementById('graph-container'),
-    type: 'canvas'
-  },
+  container: 'graph-container',
   settings: {
-    doubleClickEnabled: false,
-    minEdgeSize: 0.5,
-    maxEdgeSize: 4,
-    enableEdgeHovering: true,
-    edgeHoverColor: 'edge',
-    defaultEdgeHoverColor: '#000',
-    edgeHoverSizeRatio: 1,
-    edgeHoverExtremities: true,
-    animationsTime: 1500
+    drawEdges: false,
+    animationsTime: 2500
   }
-});
-
-// Bind the events:
-s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
-  console.log(e.type, e.data.node.label, e.data.captor);
-});
-s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
-  console.log(e.type, e.data.edge, e.data.captor);
-});
-s.bind('clickStage', function(e) {
-  console.log(e.type, e.data.captor);
-});
-s.bind('doubleClickStage rightClickStage', function(e) {
-  console.log(e.type, e.data.captor);
 });
 
 // Configure the ForceAtlas2 algorithm:
@@ -131,8 +142,15 @@ var fa = sigma.layouts.configForceAtlas2(s, {
 });
 
 // Bind the events:
-fa.bind('start stop', function(e) {
+fa.bind('start interpolate stop', function(e) {
   console.log(e.type);
+  var el = document.getElementById('notice');
+  if (e.type === 'start') {
+    el.className = '';
+  }
+  else if (e.type === 'interpolate') {
+    el.className = 'hidden';
+  }
 });
 
 // Start the ForceAtlas2 algorithm:

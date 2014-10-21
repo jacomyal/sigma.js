@@ -50,6 +50,8 @@
     this.shouldUseWorker =
       options.worker === false ? false : true && webWorkers;
     this.workerUrl = options.workerUrl;
+    this.runOnBackground = (options.background) ? true : false;
+    this.easing = options.easing;
 
     // State
     this.started = false;
@@ -121,15 +123,21 @@
   };
 
   // TODO: make a better send function
-  Supervisor.prototype.applyLayoutChanges = function() {
+  Supervisor.prototype.applyLayoutChanges = function(prefixed) {
     var nodes = this.graph.nodes(),
         j = 0,
         realIndex;
 
     // Moving nodes
     for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
-      nodes[j].x = this.nodesByteArray[i];
-      nodes[j].y = this.nodesByteArray[i + 1];
+      if (prefixed) {
+        nodes[j].fa2_x = this.nodesByteArray[i];
+        nodes[j].fa2_y = this.nodesByteArray[i + 1];
+
+      } else {
+        nodes[j].x = this.nodesByteArray[i];
+        nodes[j].y = this.nodesByteArray[i + 1];
+      }
       j++;
     }
   };
@@ -154,55 +162,11 @@
       _root.postMessage(content, '*');
   };
 
-  Supervisor.prototype.disableEdgequadtree = function() {
-    // Do not refresh edgequadtree during layout:
-    var k,
-        c;
-    for (k in this.sigInst.cameras) {
-      c = this.sigInst.cameras[k];
-      if (c.edgequadtree !== undefined)
-        c.edgequadtree._enabled = false;
-    }
-  };
-
-  Supervisor.prototype.enableEdgequadtree = function() {
-    // Allow to refresh edgequadtree:
-    var k,
-        c,
-        bounds;
-    for (k in this.sigInst.cameras) {
-      c = this.sigInst.cameras[k];
-      if (c.edgequadtree === undefined)
-        return;
-      
-      c.edgequadtree._enabled = true;
-
-      // Find graph boundaries:
-      bounds = sigma.utils.getBoundaries(
-        this.graph,
-        c.readPrefix
-      );
-
-      // Refresh edgequadtree:
-      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
-        c.edgequadtree.index(this.sigInst.graph, {
-          prefix: c.readPrefix,
-          bounds: {
-            x: bounds.minX,
-            y: bounds.minY,
-            width: bounds.maxX - bounds.minX,
-            height: bounds.maxY - bounds.minY
-          }
-        });
-    }
-  }
-
   Supervisor.prototype.start = function() {
     if (this.running)
       return;
 
     this.running = true;
-    this.disableEdgequadtree();
 
     if (!this.started) {
       // Sending init message to worker
@@ -219,7 +183,6 @@
     if (!this.running)
       return;
 
-    this.enableEdgequadtree();
     this.running = false;
     eventEmitter.dispatchEvent('stop');
   };
@@ -237,7 +200,7 @@
       else {
         this.worker = new Worker(this.workerUrl);
       }
-      
+
       // Post Message Polyfill
       this.worker.postMessage =
         this.worker.webkitPostMessage || this.worker.postMessage;
@@ -259,21 +222,46 @@
       if (_this.running) {
 
         // Applying layout
-        _this.applyLayoutChanges();
+        _this.applyLayoutChanges(_this.runOnBackground);
 
         // Send data back to worker and loop
         _this.sendByteArrayToWorker();
 
         // Rendering graph
-        _this.sigInst.refresh();
+        if (!_this.runOnBackground)
+          _this.sigInst.refresh({skipIndexation: true});
       }
 
       // Stop ForceAtlas2 if it has converged
-      if (e.data.converged && _this.running) {
+      if (e.data.converged) {
         _this.running = false;
-        _this.enableEdgequadtree();
+      }
+
+      if (!_this.running) {
         _this.killWorker();
-        eventEmitter.dispatchEvent('stop');
+        if (_this.runOnBackground && _this.easing) {
+          _this.applyLayoutChanges(true);
+          eventEmitter.dispatchEvent('interpolate');
+          sigma.plugins.animate(
+            _this.sigInst,
+            {
+              x: 'fa2_x',
+              y: 'fa2_y'
+            },
+            {
+              easing: _this.easing,
+              onComplete: function() {
+                _this.sigInst.refresh();
+                eventEmitter.dispatchEvent('stop');
+              }
+            }
+          );
+        }
+        else {
+          _this.applyLayoutChanges(false);
+          _this.sigInst.refresh();
+          eventEmitter.dispatchEvent('stop');
+        }
       }
     };
 
@@ -325,7 +313,7 @@
 
     // Create supervisor if undefined
     if (!supervisor) {
-      supervisor = new Supervisor(sigInst);
+      supervisor = new Supervisor(sigInst, config);
     }
     else if (!supervisor.running) {
       supervisor.killWorker();
@@ -372,7 +360,7 @@
 
   sigma.layouts.configForceAtlas2 = function(sigInst, config) {
     if (!supervisor) {
-      supervisor = new Supervisor(sigInst);
+      supervisor = new Supervisor(sigInst, config);
     }
     else if (!supervisor.running) {
       supervisor.killWorker();

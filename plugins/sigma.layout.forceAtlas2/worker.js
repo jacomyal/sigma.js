@@ -634,7 +634,7 @@
       // the greater the number of iterations needed to converge.
       if (W.settings.autoStop) {
         W.converged = (
-          W.iterations > W.maxIterations || 
+          W.iterations > W.maxIterations ||
           alldistance / W.nodesLength < W.avgDistanceThreshold
         );
       }

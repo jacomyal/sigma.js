@@ -73,6 +73,8 @@ sigmaInstance.isForceAtlas2Running();
 
 * **worker** *boolean* `true`: should the layout use a web worker?
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
+* **background** *boolean* `false`: run the layout on background, apply the new nodes position on stop.
+* **easing** *string* : if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
 
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
