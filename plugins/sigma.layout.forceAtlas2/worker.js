@@ -31,6 +31,7 @@
       // Properties
       ppn: 10,
       ppe: 3,
+      ppr: 9,
       maxForce: 10,
       iterations: 0,
       converged: false,
@@ -53,7 +54,8 @@
     };
 
     var NodeMatrix,
-        EdgeMatrix;
+        EdgeMatrix,
+        RegionMatrix;
 
     /**
      * Helpers
@@ -102,6 +104,18 @@
       weight: 2
     };
 
+    var regionProperties = {
+      node: 0,
+      centerX: 1,
+      centerY: 2,
+      size: 3,
+      nextSibling: 4,
+      firstChild: 5,
+      mass: 6,
+      massCenterX: 7,
+      massCenterY: 8
+    };
+
     function np(i, p) {
 
       // DEBUG: safeguards
@@ -130,6 +144,21 @@
       else
         throw 'ForceAtlas2.Worker - ' +
               'Inexistant edge property given (' + p + ').';
+    }
+
+    function rp(i, p) {
+
+      // DEBUG: safeguards
+      if ((i % W.ppr) !== 0)
+        throw 'rp: non correct (' + i + ').';
+      if (i !== parseInt(i))
+        throw 'rp: non int.';
+
+      if (p in regionProperties)
+        return i + regionProperties[p];
+      else
+        throw 'ForceAtlas2.Worker - ' +
+              'Inexistant region property given (' + p + ').';
     }
 
     // DEBUG
@@ -172,8 +201,7 @@
     function pass() {
       var a, i, j, l, r, n, n1, n2, e, w, g, k, m;
 
-      var barnesHutMatrix,
-          outboundAttCompensation,
+      var outboundAttCompensation,
           coefficient,
           xDist,
           yDist,
@@ -209,6 +237,8 @@
       //------------------------------
 
       if (W.settings.barnesHutOptimize) {
+
+        // TODO: is Infinity possible in a FloatArray?
         var minX = Infinity,
             maxX = -Infinity,
             minY = Infinity,
@@ -216,8 +246,8 @@
             q, q0, q1, q2, q3;
 
         // Setting up
-        barnesHutMatrix = [];
-        // barnesHutMatrix.length = W.nodesLength * 3;
+        // TODO: ensure the theoritecal length so we can build a proper matrix
+        RegionMatrix = new Float32Array(W.nodesLength / W.ppn * 4 * W.ppr);
 
         // Computing min and max values
         for (n = 0; n < W.nodesLength; n += W.ppn) {
@@ -227,29 +257,29 @@
           maxY = Math.max(maxY, NodeMatrix[np(n, 'y')]);
         }
 
-        // Build the Barnes Hut Tree
-        barnesHutMatrix.push([  // Root region
-          -1,                               // Node
-          (minX + maxX) / 2,                // x center
-          (minY + maxY) / 2,                // y center
-          Math.max(maxX-minX, maxY-minY),   // Size (half-width of the square)
-          -1,                               // Next sibling index
-          -1,                               // First child index
-          0,                                // Mass
-          0,                                // Mass center x
-          0                                 // Mass center y
-        ]);
+        // Build the Barnes Hut root region
+        RegionMatrix[rp(0, 'node')] = -1;
+        RegionMatrix[rp(0, 'centerX')] = (minX + maxX) / 2;
+        RegionMatrix[rp(0, 'centerY')] = (minY + maxY) / 2;
+        RegionMatrix[rp(0, 'size')] = Math.max(maxX - minX, maxY - minY);
+        RegionMatrix[rp(0, 'nextSibling')] = -1;
+        RegionMatrix[rp(0, 'firstChild')] = -1;
+        RegionMatrix[rp(0, 'mass')] = 0;
+        RegionMatrix[rp(0, 'massCenterX')] = 0;
+        RegionMatrix[rp(0, 'massCenterY')] = 0;
 
         // Add each node in the tree
+        l = 1;
         for (n = 0; n < W.nodesLength; n += W.ppn) {
-          r = barnesHutMatrix[0];   // Current region
-                                    // We start with root region
 
-          while(true){
+          // Current region, starting with root
+          r = 0;
 
-            // Are there sub-regions ?
+          while (true) {
+            // Are there sub-regions?
 
-            if(r[5] >= 0){ // We look at first child index
+            // We look at first child index
+            if (RegionMatrix[rp(r, 'firstChild')] >= 0) {
 
               // There are sub-regions
 
@@ -258,47 +288,62 @@
               // (see next case)
 
               // Find the quadrant of n
-              if(NodeMatrix[np(n, 'x')]<r[1]){
-                if(NodeMatrix[np(n, 'y')]<r[2]){
+              if (NodeMatrix[np(n, 'x')] < RegionMatrix[rp(r, 'centerX')]) {
+
+                if (NodeMatrix[np(n, 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                   // Top Left quarter
-                  q = barnesHutMatrix[r[5]]
-                } else {
-                  // Bottom Left quarter
-                  q = barnesHutMatrix[r[5]+1]
+                  q = RegionMatrix[rp(r, 'firstChild')];
                 }
-              } else {
-                if(NodeMatrix[np(n, 'y')]<r[2]){
+                else {
+
+                  // Bottom Left quarter
+                  q = RegionMatrix[rp(r, 'firstChild')] + W.ppr;
+                }
+              }
+              else {
+                if (NodeMatrix[np(n, 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                   // Top Right quarter
-                  q = barnesHutMatrix[r[5]+2]
-                } else {
+                  q = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 2;
+                }
+                else {
+
                   // Bottom Right quarter
-                  q = barnesHutMatrix[r[5]+3]
+                  q = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 3;
                 }
               }
 
               // Update center of mass and mass (we only do it for non-leave regions)
-              r[7] = (r[7] * r[6] + NodeMatrix[np(n, 'x')] * NodeMatrix[np(n, 'mass')]) / (r[6] + NodeMatrix[np(n, 'mass')]);
-              r[8] = (r[8] * r[6] + NodeMatrix[np(n, 'y')] * NodeMatrix[np(n, 'mass')]) / (r[6] + NodeMatrix[np(n, 'mass')]);
-              r[6] += NodeMatrix[np(n, 'mass')];
+              RegionMatrix[rp(r, 'massCenterX')] =
+                (RegionMatrix[rp(r, 'massCenterX')] * RegionMatrix[rp(r, 'mass')] +
+                 NodeMatrix[np(n, 'x')] * NodeMatrix[np(n, 'mass')]) /
+                (RegionMatrix[rp(r, 'mass')] + NodeMatrix[np(n, 'mass')]);
+
+              RegionMatrix[rp(r, 'massCenterY')] =
+                (RegionMatrix[rp(r, 'massCenterY')] * RegionMatrix[rp(r, 'mass')] +
+                 NodeMatrix[np(n, 'y')] * NodeMatrix[np(n, 'mass')]) /
+                (RegionMatrix[rp(r, 'mass')] + NodeMatrix[np(n, 'mass')]);
+
+              RegionMatrix[rp(r, 'mass')] += NodeMatrix[np(n, 'mass')];
 
               // Iterate on the right quadrant
               r = q;
               continue;
-
-            } else {
+            }
+            else {
 
               // There are no sub-regions: we are in a "leave"
 
               // Is there a node in this leave?
-              if(r[0] < 0){
+              if (RegionMatrix[rp(r, 'node')] < 0) {
 
                 // There is no node in region:
                 // we record node n and go on
-                r[0] = n;
-
+                RegionMatrix[rp(r, 'node')] = n;
                 break;
-
-              } else {
+              }
+              else {
 
                 // There is a node in this region
 
@@ -308,115 +353,128 @@
                 // we will iterate.
 
                 // Create sub-regions
+                RegionMatrix[rp(r, 'firstChild')] = l * W.ppr;
+                w = RegionMatrix[rp(r, 'size')] / 2;  // new size (half)
 
-                r[5] = barnesHutMatrix.length;  // first child index
-                w = r[3]/2  // new size (half)
-
-                // NB: we use screen coordinates
+                // NOTE: we use screen coordinates
                 // from Top Left to Bottom Right
 
                 // Top Left sub-region
-                barnesHutMatrix[r[5]] = [
-                  -1,             // Node
-                  r[1] - w,       // x center
-                  r[2] - w,       // y center
-                  w,              // Size (half-width of the square)
-                  r[5] + 1,        // Next sibling index
-                  -1,             // First child index
-                  0,              // Mass
-                  0,              // Mass center x
-                  0               // Mass center y
-                ]
+                g = RegionMatrix[rp(r, 'firstChild')];
+
+                nan(RegionMatrix[rp(r, 'firstChild')]);
+                RegionMatrix[rp(g, 'node')] = -1;
+                RegionMatrix[rp(g, 'centerX')] = RegionMatrix[rp(r, 'centerX')] - w;
+                RegionMatrix[rp(g, 'centerY')] = RegionMatrix[rp(r, 'centerY')] - w;
+                RegionMatrix[rp(g, 'size')] = w;
+                RegionMatrix[rp(g, 'nextSibling')] = g + W.ppr;
+                RegionMatrix[rp(g, 'firstChild')] = -1;
+                RegionMatrix[rp(g, 'mass')] = 0;
+                RegionMatrix[rp(g, 'massCenterX')] = 0;
+                RegionMatrix[rp(g, 'massCenterY')] = 0;
 
                 // Bottom Left sub-region
-                barnesHutMatrix[r[5]+1] = [
-                  -1,             // Node
-                  r[1] - w,       // x center
-                  r[2] + w,       // y center
-                  w,              // Size (half-width of the square)
-                  r[5] + 2,       // Next sibling index
-                  -1,             // First child index
-                  0,              // Mass
-                  0,              // Mass center x
-                  0               // Mass center y
-                ]
+                g += W.ppr;
+                RegionMatrix[rp(g, 'node')] = -1;
+                RegionMatrix[rp(g, 'centerX')] = RegionMatrix[rp(r, 'centerX')] - w;
+                RegionMatrix[rp(g, 'centerY')] = RegionMatrix[rp(r, 'centerY')] + w;
+                RegionMatrix[rp(g, 'size')] = w;
+                RegionMatrix[rp(g, 'nextSibling')] = g + W.ppr;
+                RegionMatrix[rp(g, 'firstChild')] = -1;
+                RegionMatrix[rp(g, 'mass')] = 0;
+                RegionMatrix[rp(g, 'massCenterX')] = 0;
+                RegionMatrix[rp(g, 'massCenterY')] = 0;
 
                 // Top Right sub-region
-                barnesHutMatrix[r[5]+2] = [
-                  -1,             // Node
-                  r[1] + w,       // x center
-                  r[2] - w,       // y center
-                  w,              // Size (half-width of the square)
-                  r[5] + 3,       // Next sibling index
-                  -1,             // First child index
-                  0,              // Mass
-                  0,              // Mass center x
-                  0               // Mass center y
-                ]
+                g += W.ppr;
+                RegionMatrix[rp(g, 'node')] = -1;
+                RegionMatrix[rp(g, 'centerX')] = RegionMatrix[rp(r, 'centerX')] + w;
+                RegionMatrix[rp(g, 'centerY')] = RegionMatrix[rp(r, 'centerY')] - w;
+                RegionMatrix[rp(g, 'size')] = w;
+                RegionMatrix[rp(g, 'nextSibling')] = g + W.ppr;
+                RegionMatrix[rp(g, 'firstChild')] = -1;
+                RegionMatrix[rp(g, 'mass')] = 0;
+                RegionMatrix[rp(g, 'massCenterX')] = 0;
+                RegionMatrix[rp(g, 'massCenterY')] = 0;
 
                 // Bottom Right sub-region
-                barnesHutMatrix[r[5]+3] = [
-                  -1,             // Node
-                  r[1] + w,       // x center
-                  r[2] + w,       // y center
-                  w,              // Size (half-width of the square)
-                  r[4],           // Next sibling index -> Jump to parent's next sibling
-                  -1,             // First child index
-                  0,              // Mass
-                  0,              // Mass center x
-                  0               // Mass center y
-                ]
+                g += W.ppr;
+                RegionMatrix[rp(g, 'node')] = -1;
+                RegionMatrix[rp(g, 'centerX')] = RegionMatrix[rp(r, 'centerX')] + w;
+                RegionMatrix[rp(g, 'centerY')] = RegionMatrix[rp(r, 'centerY')] + w;
+                RegionMatrix[rp(g, 'size')] = w;
+                RegionMatrix[rp(g, 'nextSibling')] = RegionMatrix[rp(r, 'nextSibling')];
+                RegionMatrix[rp(g, 'firstChild')] = -1;
+                RegionMatrix[rp(g, 'mass')] = 0;
+                RegionMatrix[rp(g, 'massCenterX')] = 0;
+                RegionMatrix[rp(g, 'massCenterY')] = 0;
+
+                l += 4;
 
                 // Now the goal is to find two different sub-regions
                 // for the two nodes: the one previously recorded (r[0])
                 // and the one we want to add (n)
 
-                // Find the quadrant of r[0] (old node)
-                if(NodeMatrix[np(r[0], 'x')]<r[1]){
-                  if(NodeMatrix[np(r[0], 'y')]<r[2]){
+                // Find the quadrant of the old node
+                if (NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'x')] < RegionMatrix[rp(r, 'centerX')]) {
+                  if (NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                     // Top Left quarter
-                    q = barnesHutMatrix[r[5]]
-                  } else {
-                    // Bottom Left quarter
-                    q = barnesHutMatrix[r[5]+1]
+                    q = RegionMatrix[rp(r, 'firstChild')];
                   }
-                } else {
-                  if(NodeMatrix[np(r[0], 'y')]<r[2]){
+                  else {
+
+                    // Bottom Left quarter
+                    q = RegionMatrix[rp(r, 'firstChild')] + W.ppr;
+                  }
+                }
+                else {
+                  if (NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                     // Top Right quarter
-                    q = barnesHutMatrix[r[5]+2]
-                  } else {
+                    q = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 2;
+                  }
+                  else {
+
                     // Bottom Right quarter
-                    q = barnesHutMatrix[r[5]+3]
+                    q = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 3;
                   }
                 }
 
                 // We remove r[0] from the region r, add its mass to r and record it in q
-                r[6] = NodeMatrix[np(r[0], 'mass')];  // Mass
-                r[7] = NodeMatrix[np(r[0], 'x')];  // Mass center x
-                r[8] = NodeMatrix[np(r[0], 'y')];  // Mass center y
-                q[0] = r[0];
-                r[0] = -1;
+                RegionMatrix[rp(r, 'mass')] = NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'mass')];
+                RegionMatrix[rp(r, 'massCenterX')] = NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'x')];
+                RegionMatrix[rp(r, 'massCenterY')] = NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'y')];
+
+                RegionMatrix[rp(q, 'node')] = RegionMatrix[rp(r, 'node')];
+                RegionMatrix[rp(r, 'node')] = -1;
 
                 // Find the quadrant of n
-                if(NodeMatrix[np(n, 'x')]<r[1]){
-                  if(NodeMatrix[np(n, 'y')]<r[2]){
+                if (NodeMatrix[np(n, 'x')] < RegionMatrix[rp(r, 'centerX')]) {
+                  if (NodeMatrix[np(n, 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                     // Top Left quarter
-                    q2 = barnesHutMatrix[r[5]]
-                  } else {
-                    // Bottom Left quarter
-                    q2 = barnesHutMatrix[r[5]+1]
+                    q2 = RegionMatrix[rp(r, 'firstChild')];
                   }
-                } else {
-                  if(NodeMatrix[np(n, 'y')]<r[2]){
+                  else {
+                    // Bottom Left quarter
+                    q2 = RegionMatrix[rp(r, 'firstChild')] + W.ppr;
+                  }
+                }
+                else {
+                  if(NodeMatrix[np(n, 'y')] < RegionMatrix[rp(r, 'centerY')]) {
+
                     // Top Right quarter
-                    q2 = barnesHutMatrix[r[5]+2]
-                  } else {
+                    q2 = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 2;
+                  }
+                  else {
+
                     // Bottom Right quarter
-                    q2 = barnesHutMatrix[r[5]+3]
+                    q2 = RegionMatrix[rp(r, 'firstChild')] + W.ppr * 3;
                   }
                 }
 
-                if(q == q2){
+                if (q === q2) {
 
                   // If both nodes are in the same quadrant,
                   // we have to try it again on this quadrant
@@ -426,16 +484,14 @@
 
                 // If both quadrants are different, we record n
                 // in its quadrant
-                q2[0] = n
+                RegionMatrix[rp(q2, 'node')] = n;
                 break;
               }
-
             }
           }
-
         }
-
       }
+
 
       // 2) Repulsion
       //--------------
@@ -449,38 +505,39 @@
 
           // Computing leaf quad nodes iteration
 
-          r = barnesHutMatrix[0]; // Starting with root region
+          r = 0; // Starting with root region
           while (true) {
 
-            if(r[5] >= 0){
+            if (RegionMatrix[rp(r, 'firstChild')] >= 0) {
 
               // The region has sub-regions
 
               // We run the Barnes Hut test to see if we are at the right distance
               distance = Math.sqrt(
-                (Math.pow(NodeMatrix[np(n, 'x')] - r[7], 2)) +
-                (Math.pow(NodeMatrix[np(n, 'y')] - r[8], 2))
+                (Math.pow(NodeMatrix[np(n, 'x')] - RegionMatrix[rp(r, 'massCenterX')], 2)) +
+                (Math.pow(NodeMatrix[np(n, 'y')] - RegionMatrix[rp(r, 'massCenterY')], 2))
               );
-              if (2 * r[3] / distance < W.settings.barnesHutTheta){
+
+              if (2 * RegionMatrix[rp(r, 'size')] / distance < W.settings.barnesHutTheta) {
 
                 // We treat the region as a single body, and we repulse
 
-                xDist = NodeMatrix[np(n, 'x')] - r[7];
-                yDist = NodeMatrix[np(n, 'y')] - r[8];
+                xDist = NodeMatrix[np(n, 'x')] - RegionMatrix[rp(r, 'massCenterX')];
+                yDist = NodeMatrix[np(n, 'y')] - RegionMatrix[rp(r, 'massCenterY')];
 
                 if (W.settings.adjustSize) {
 
                   //-- Linear Anti-collision Repulsion
                   if (distance > 0) {
                     factor = coefficient * NodeMatrix[np(n, 'mass')] *
-                      r[6] / distance / distance;
+                      RegionMatrix[rp(r, 'mass')] / distance / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                   else if (distance < 0) {
                     factor = -coefficient * NodeMatrix[np(n, 'mass')] *
-                      r[6] / distance;
+                      RegionMatrix[rp(r, 'mass')] / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
@@ -491,7 +548,7 @@
                   //-- Linear Repulsion
                   if (distance > 0) {
                     factor = coefficient * NodeMatrix[np(n, 'mass')] *
-                      r[6] / distance / distance;
+                      RegionMatrix[rp(r, 'mass')] / distance / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
@@ -499,45 +556,44 @@
                 }
 
                 // When this is done, we iterate. We have to look at the next sibling.
-                if(r[4] < 0)
+                if (RegionMatrix[rp(r, 'nextSibling')] < 0)
                   break;  // No next sibling: we have finished the tree
-                r = barnesHutMatrix[r[4]]
+                r = RegionMatrix[rp(r, 'nextSibling')];
                 continue;
 
-              } else {
+              }
+              else {
 
                 // The region is too close and we have to look at sub-regions
-                r = barnesHutMatrix[r[5]]
+                r = RegionMatrix[rp(r, 'firstChild')];
                 continue;
               }
 
-            } else {
+            }
+            else {
 
               // The region has no sub-region
               // If there is a node r[0] and it is not n, then repulse
 
-              if(r[0] >= 0 && r[0] !== n){
+              if (RegionMatrix[rp(r, 'node')] >= 0 && RegionMatrix[rp(r, 'node')] !== n) {
+                xDist = NodeMatrix[np(n, 'x')] - NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'x')];
+                yDist = NodeMatrix[np(n, 'y')] - NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'y')];
 
-                // console.log('repulse '+n+' with '+r[0])
-
-                xDist = NodeMatrix[np(n, 'x')] - NodeMatrix[np(r[0], 'x')];
-                yDist = NodeMatrix[np(n, 'y')] - NodeMatrix[np(r[0], 'y')];
-
-                distance = Math.sqrt(xDist * xDist + yDist * yDist)
+                distance = Math.sqrt(xDist * xDist + yDist * yDist);
 
                 if (W.settings.adjustSize) {
 
                   //-- Linear Anti-collision Repulsion
                   if (distance > 0) {
                     factor = coefficient * NodeMatrix[np(n, 'mass')] *
-                      NodeMatrix[np(r[0], 'mass')] / distance / distance;
+                      NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'mass')] / distance / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
                   }
                   else if (distance < 0) {
                     factor = -coefficient * NodeMatrix[np(n, 'mass')] *
-                      NodeMatrix[np(r[0], 'mass')] / distance;
+                      NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'mass')] / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
@@ -548,7 +604,7 @@
                   //-- Linear Repulsion
                   if (distance > 0) {
                     factor = coefficient * NodeMatrix[np(n, 'mass')] *
-                      NodeMatrix[np(r[0], 'mass')] / distance / distance;
+                      NodeMatrix[np(RegionMatrix[rp(r, 'node')], 'mass')] / distance / distance;
 
                     NodeMatrix[np(n, 'dx')] += xDist * factor;
                     NodeMatrix[np(n, 'dy')] += yDist * factor;
@@ -558,16 +614,11 @@
               }
 
               // When this is done, we iterate. We have to look at the next sibling.
-              if(r[4] < 0)
+              if (RegionMatrix[rp(r, 'nextSibling')] < 0)
                 break;  // No next sibling: we have finished the tree
-              r = barnesHutMatrix[r[4]]
+              r = RegionMatrix[rp(r, 'nextSibling')];
               continue;
-
             }
-
-
-
-
           }
         }
       }
@@ -964,6 +1015,9 @@
 
           // Deleting context for garbage collection
           __emptyObject(W);
+          NodeMatrix = null;
+          EdgeMatrix = null;
+          RegionMatrix = null;
           self.removeEventListener('message', listener);
           break;
 
@@ -1007,7 +1061,29 @@
       'weight'
     ];
 
-    // Replacing matrix accessors by incremented indexes
+    var rp = [
+      'node',
+      'centerX',
+      'centerY',
+      'size',
+      'nextSibling',
+      'firstChild',
+      'mass',
+      'massCenterX',
+      'massCenterY'
+    ];
+
+    // rp
+    // NOTE: Must go first
+    for (i = 0, l = rp.length; i < l; i++) {
+      pattern = new RegExp('rp\\(([^,]*), \'' + rp[i] + '\'\\)', 'g');
+      fnString = fnString.replace(
+        pattern,
+        (i === 0) ? '$1' : '$1 + ' + i
+      );
+    }
+
+    // np
     for (i = 0, l = np.length; i < l; i++) {
       pattern = new RegExp('np\\(([^,]*), \'' + np[i] + '\'\\)', 'g');
       fnString = fnString.replace(
@@ -1016,6 +1092,7 @@
       );
     }
 
+    // ep
     for (i = 0, l = ep.length; i < l; i++) {
       pattern = new RegExp('ep\\(([^,]*), \'' + ep[i] + '\'\\)', 'g');
       fnString = fnString.replace(
