@@ -7,7 +7,7 @@ Plugin by [Guillaume Plique](https://github.com/Yomguithereal).
 
 ---
 
-This plugin implements [ForceAtlas2](http://www.medialab.sciences-po.fr/publications/Jacomy_Heymann_Venturini-Force_Atlas2.pdf), a force-directed layout algorithm.
+This plugin implements [ForceAtlas2](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0098679), a force-directed layout algorithm.
 
 For optimization purposes, the algorithm's computations are delegated to a web worker.
 
@@ -64,7 +64,7 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
-* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²) to O(nlog(n))`)? This is useful for large graph but harmful to small ones.
+* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²)` to `O(nlog(n))`)? This is useful for large graph but harmful to small ones.
 * **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
