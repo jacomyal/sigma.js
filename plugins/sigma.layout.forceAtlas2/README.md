@@ -64,7 +64,7 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
-* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (O(n²) to O(nlog(n)))? This is useful for large graph but harmful for small ones.
+* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²) to O(nlog(n))`)? This is useful for large graph but harmful to small ones.
 * **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
