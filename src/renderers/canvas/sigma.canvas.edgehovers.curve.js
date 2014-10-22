@@ -1,10 +1,10 @@
 ;(function() {
   'use strict';
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg('sigma.canvas.edgehovers');
 
   /**
-   * This edge renderer will display edges as curves.
+   * This hover renderer will display the edge with a different color or size.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -12,10 +12,11 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.curve = function(edge, source, target, context, settings) {
+  sigma.canvas.edgehovers.curve =
+    function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
+        size = settings('edgeHoverSizeRatio') * (edge[prefix + 'size'] || 1),
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
@@ -42,6 +43,12 @@
           color = defaultEdgeColor;
           break;
       }
+
+    if (settings('edgeHoverColor') === 'edge') {
+      color = edge.hover_color || color;
+    } else {
+      color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+    }
 
     context.strokeStyle = color;
     context.lineWidth = size;

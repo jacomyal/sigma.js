@@ -236,6 +236,11 @@
     // Add a quadtree to the camera:
     camera.quadtree = new sigma.classes.quad();
 
+    // Add an edgequadtree to the camera:
+    if (sigma.classes.edgequad !== undefined) {
+      camera.edgequadtree = new sigma.classes.edgequad();
+    }
+
     camera.bind('coordinatesUpdated', function(e) {
       self.renderCamera(camera, camera.isAnimated);
     });
@@ -362,18 +367,32 @@
           'rightClickStage',
           'clickNode',
           'clickNodes',
+          'clickEdge',
+          'clickEdges',
           'doubleClickNode',
           'doubleClickNodes',
+          'doubleClickEdge',
+          'doubleClickEdges',
           'rightClickNode',
           'rightClickNodes',
+          'rightClickEdge',
+          'rightClickEdges',
           'overNode',
           'overNodes',
+          'overEdge',
+          'overEdges',
           'outNode',
           'outNodes',
+          'outEdge',
+          'outEdges',
           'downNode',
           'downNodes',
+          'downEdge',
+          'downEdges',
           'upNode',
-          'upNodes'
+          'upNodes',
+          'upEdge',
+          'upEdges'
         ],
         this._handler
       );
@@ -420,9 +439,20 @@
    *
    * It is useful for quadtrees or WebGL processing, for instance.
    *
-   * @return {sigma} Returns the instance itself.
+   * @param  {?object}  options Eventually some options to give to the refresh
+   *                            method.
+   * @return {sigma}            Returns the instance itself.
+   *
+   * Recognized parameters:
+   * **********************
+   * Here is the exhaustive list of every accepted parameters in the "options"
+   * object:
+   *
+   *   {?boolean} skipIndexation A flag specifying wether or not the refresh
+   *                             function should reindex the graph in the
+   *                             quadtrees or not (default: false).
    */
-  sigma.prototype.refresh = function() {
+  sigma.prototype.refresh = function(options) {
     var i,
         l,
         k,
@@ -430,6 +460,8 @@
         c,
         bounds,
         prefix = 0;
+
+    options = options || {};
 
     // Call each middleware:
     a = this.middlewares || [];
@@ -465,22 +497,41 @@
           c.readPrefix
         );
 
-      // Find graph boundaries:
-      bounds = sigma.utils.getBoundaries(
-        this.graph,
-        c.readPrefix
-      );
+      if (!options.skipIndexation) {
+        // Find graph boundaries:
+        bounds = sigma.utils.getBoundaries(
+          this.graph,
+          c.readPrefix
+        );
 
-      // Refresh quadtree:
-      c.quadtree.index(this.graph.nodes(), {
-        prefix: c.readPrefix,
-        bounds: {
-          x: bounds.minX,
-          y: bounds.minY,
-          width: bounds.maxX - bounds.minX,
-          height: bounds.maxY - bounds.minY
+        // Refresh quadtree:
+        c.quadtree.index(this.graph.nodes(), {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
+
+        // Refresh edgequadtree:
+        if (
+          c.edgequadtree !== undefined &&
+          c.settings('drawEdges') &&
+          c.settings('enableEdgeHovering')
+        ) {
+          c.edgequadtree.index(this.graph, {
+            prefix: c.readPrefix,
+            bounds: {
+              x: bounds.minX,
+              y: bounds.minY,
+              width: bounds.maxX - bounds.minX,
+              height: bounds.maxY - bounds.minY
+            }
+          });
         }
-      });
+      }
     }
 
     // Call each renderer:

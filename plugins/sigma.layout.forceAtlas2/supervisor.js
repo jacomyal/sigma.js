@@ -200,6 +200,14 @@
 
     this.running = true;
 
+    // Do not refresh edgequadtree during layout:
+    var k,
+        c;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = false;
+    }
+
     if (!this.started) {
 
       // Sending init message to worker
@@ -214,6 +222,33 @@
   Supervisor.prototype.stop = function() {
     if (!this.running)
       return;
+
+    // Allow to refresh edgequadtree:
+    var k,
+        c,
+        bounds;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = true;
+
+      // Find graph boundaries:
+      bounds = sigma.utils.getBoundaries(
+        this.graph,
+        c.readPrefix
+      );
+
+      // Refresh edgequadtree:
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+        c.edgequadtree.index(this.sigInst.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
+    }
 
     this.running = false;
   };

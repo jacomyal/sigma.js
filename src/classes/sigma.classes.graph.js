@@ -506,11 +506,13 @@
     this.allNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
       validEdge;
 
-    if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
-      this.allNeighborsIndex[validEdge.target][validEdge.source] =
-        Object.create(null);
-    this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
-      validEdge;
+    if (validEdge.target !== validEdge.source) {
+      if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
+        this.allNeighborsIndex[validEdge.target][validEdge.source] =
+          Object.create(null);
+      this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
+        validEdge;
+    }
 
     // Keep counts up to date:
     this.inNeighborsCount[validEdge.target]++;
@@ -610,9 +612,11 @@
     if (!Object.keys(this.allNeighborsIndex[edge.source][edge.target]).length)
       delete this.allNeighborsIndex[edge.source][edge.target];
 
-    delete this.allNeighborsIndex[edge.target][edge.source][edge.id];
-    if (!Object.keys(this.allNeighborsIndex[edge.target][edge.source]).length)
-      delete this.allNeighborsIndex[edge.target][edge.source];
+    if (edge.target !== edge.source) {
+      delete this.allNeighborsIndex[edge.target][edge.source][edge.id];
+      if (!Object.keys(this.allNeighborsIndex[edge.target][edge.source]).length)
+        delete this.allNeighborsIndex[edge.target][edge.source];
+    }
 
     this.inNeighborsCount[edge.target]--;
     this.outNeighborsCount[edge.source]--;
@@ -837,8 +841,6 @@
 
     throw 'edges: Wrong arguments.';
   });
-
-
 
 
   /**

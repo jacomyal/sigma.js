@@ -95,13 +95,6 @@
       );
     }
 
-    // Bind resize:
-    window.addEventListener(
-      'resize',
-      this.boundResize = this.resize.bind(this),
-      false
-    );
-
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.options.prefix);
     sigma.misc.drawHovers.call(this, this.options.prefix);
@@ -142,9 +135,13 @@
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes'),
         drawLabels = this.settings(options, 'drawLabels'),
+        drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
         embedSettings = this.settings.embedObjects(options, {
           prefix: this.options.prefix
         });
+
+    // Call the resize function:
+    this.resize(false);
 
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
@@ -213,13 +210,33 @@
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
-            (renderers[o.type] || renderers.def)(
+            (renderers[
+              o.type || this.settings(options, 'defaultEdgeType')
+            ] || renderers.def)(
               o,
               graph.nodes(o.source),
               graph.nodes(o.target),
               this.contexts.edges,
               embedSettings
             );
+          }
+
+          // Draw edge labels:
+          if (drawEdgeLabels) {
+            renderers = sigma.canvas.edges.labels;
+            for (i = start; i < end; i++) {
+              o = edges[i];
+              if (!o.hidden)
+                (renderers[
+                  o.type || this.settings(options, 'defaultEdgeType')
+                ] || renderers.def)(
+                  o,
+                  graph.nodes(o.source),
+                  graph.nodes(o.target),
+                  this.contexts.labels,
+                  embedSettings
+                );
+            }
           }
 
           // Restore original globalCompositeOperation:
@@ -244,13 +261,32 @@
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
-          (renderers[o.type] || renderers.def)(
+          (renderers[
+            o.type || this.settings(options, 'defaultEdgeType')
+          ] || renderers.def)(
             o,
             graph.nodes(o.source),
             graph.nodes(o.target),
             this.contexts.edges,
             embedSettings
           );
+        }
+
+        // Draw edge labels:
+        // - No batching
+        if (drawEdgeLabels) {
+          renderers = sigma.canvas.edges.labels;
+          for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++)
+            if (!a[i].hidden)
+              (renderers[
+                a[i].type || this.settings(options, 'defaultEdgeType')
+              ] || renderers.def)(
+                a[i],
+                graph.nodes(a[i].source),
+                graph.nodes(a[i].target),
+                this.contexts.labels,
+                embedSettings
+              );
         }
       }
     }
@@ -261,7 +297,9 @@
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[a[i].type] || renderers.def)(
+          (renderers[
+            a[i].type || this.settings(options, 'defaultNodeType')
+          ] || renderers.def)(
             a[i],
             this.contexts.nodes,
             embedSettings
@@ -274,7 +312,9 @@
       renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[a[i].type] || renderers.def)(
+          (renderers[
+            a[i].type || this.settings(options, 'defaultNodeType')
+          ] || renderers.def)(
             a[i],
             this.contexts.labels,
             embedSettings
@@ -377,9 +417,6 @@
   sigma.renderers.canvas.prototype.kill = function() {
     var k,
         captor;
-
-    // Unbind resize:
-    window.removeEventListener('resize', this.boundResize);
 
     // Kill captors:
     while ((captor = this.captors.pop()))
