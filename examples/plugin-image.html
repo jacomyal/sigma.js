@@ -75,7 +75,7 @@
     <label>Width :</label>
     <input type="range" id="size" value="400" min="0" max="1000" step="100"><br>
     <label>Color :</label>
-    <input type="color" id="color" value="#FFFFFF" /><br>
+    <input type="text" id="color" value="#FFFFFF" /><br>
     <label>Keep Zoom :</label>
     <input type="checkbox" id="zoom"><br>
     <button id="snap">snapshot</button>
@@ -126,7 +126,7 @@ s = new sigma({
   renderers: [
       {
         container: document.getElementById('graph-container'),
-        type: 'webgl' // sigma.renderers.canvas works as well
+        type: 'canvas' // sigma.renderers.canvas works as well
       }
     ]
 });
@@ -141,15 +141,15 @@ $("#snap").on('click', function() {
   var color = $("#color").val();
 
   if(!size || size < 1) {
-    myRenderer.generateImage({background: color});
+    myRenderer.generateImage({download:true, background: color});
     return;
   }
 
   if ($('#zoom').is(":checked"))
   {
-    myRenderer.generateImage({size: size, zoom: true, background: color})
+    myRenderer.generateImage({download:true, size: size, zoom: true, background: color})
   } else {
-    myRenderer.generateImage({size: size, background: color});
+    myRenderer.generateImage({download:true, size: size, background: color});
   }
 });
 

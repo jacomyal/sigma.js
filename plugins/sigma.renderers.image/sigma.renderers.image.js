@@ -1,4 +1,5 @@
 ;(function(undefined) {
+  'use strict';
 
   /**
    * Sigma Renderer Image Utility
@@ -13,7 +14,7 @@
    */
 
   if (typeof sigma === 'undefined')
-    throw 'sigma.renderers.snapexport: sigma not in scope.';
+    throw 'sigma.renderers.image: sigma not in scope.';
 
   // Constants
   var mainCanvas = null,
@@ -41,11 +42,11 @@
       false, false, false, false, 0, null);
 
     anchor.dispatchEvent(event);
-    delete anchor;
+    anchor.remove();
   }
 
-  function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
-      var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+  function calculateAspectRatioFit(srcWidth, srcHeight, maxSize) {
+      var ratio = Math.min(maxSize / srcWidth, maxSize / srcHeight);
       return { width: srcWidth*ratio, height: srcHeight*ratio };
    }
 
@@ -56,10 +57,11 @@
         webgl = this instanceof sigma.renderers.webgl,
         doneContexts = [];
 
+    console.log(webgl)
     // Creating a false canvas where we'll merge main canvas
       mainCanvas = document.createElement('canvas');
       mainCanvasContext = mainCanvas.getContext('2d');
-      sized = false;
+      var sized = false;
 
     // Iterating through context
     CONTEXTS.forEach(function(name) {
@@ -91,7 +93,7 @@
     });
 
     // Cleaning
-    delete doneContexts;
+    var doneContexts = [];
   }
 
   // Generate image function
@@ -101,14 +103,13 @@
     if(!params.size)
       params.size = window.innerWidth;
 
-    // Enforcing
     if (params.format && !(params.format in TYPES))
-      throw Error('sigma.renderers.snaphot: unsupported format "' +
+      throw Error('sigma.renderers.image: unsupported format "' +
                   params.format + '".');
 
     var self = this,
         webgl = this instanceof sigma.renderers.webgl,
-        doneContextsSize = [];
+        doneContexts = [];
 
     // Creating a false canvas
       var merged = document.createElement('canvas'),
@@ -126,15 +127,29 @@
       var canvas = self.domElements[name] || self.domElements['scene'],
         context = self.contexts[name];
 
-      if (~doneContextsSize.indexOf(context))
+      if (~doneContexts.indexOf(context))
         return;
 
       if (!sized) {
         // Keep ratio
-        var ratio = calculateAspectRatioFit(canvas.width, canvas.height, params.size, params.size)
+        if(!params.zoom) {
+          var width = mainCanvas.width,
+            height = mainCanvas.height;
+        } else {
+          var width = canvas.width,
+            height = canvas.height;
+        }
+
+        var ratio = calculateAspectRatioFit(width, height, params.size)
 
         merged.width= ratio.width;
         merged.height = ratio.height;
+
+        if (!context instanceof WebGLRenderingContext) {
+          merged.width *= 2;
+          merged.height *=2;
+        }
+
         sized = true;
 
         // background color
@@ -145,32 +160,27 @@
         }
       }
 
-
-      if (!context instanceof WebGLRenderingContext) {
-        merged.width *= 2;
-        merged.height *= 2;
-      }
-
       if(params.zoom)
         mergedContext.drawImage(canvas, 0, 0, merged.width, merged.height);
       else
         mergedContext.drawImage(mainCanvas, 0, 0, merged.width, merged.height);
 
-      doneContextsSize.push(context);
+      doneContexts.push(context);
     });
 
     var dataUrl = merged.toDataURL(TYPES[params.format || 'png']);
 
-    download(
-      dataUrl,
-      params.format || 'png',
-      params.filename
-    );
+    if(params.download)
+      download(
+        dataUrl,
+        params.format || 'png',
+        params.filename
+      );
 
     // Cleaning
-    delete mergedContext;
-    delete merged;
-    delete doneContexts;
+    mergedContext = null;
+    merged  = null;
+    doneContexts = [];
 
     return dataUrl;
   }

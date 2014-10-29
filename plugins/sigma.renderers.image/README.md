@@ -1,4 +1,4 @@
-sigma.plugins.fullScreen
+sigma.plugins.image
 =====================
 
 Plugin developed by [Martin de la Taille](https://github.com/martindelataille) for [Linkurious](https://github.com/Linkurious) and published under the [MIT](LICENSE) license.
@@ -34,8 +34,8 @@ myRenderer.snapshot({
 
 *Parameters*
 
-* **size** [`600`]: size of the image.
-* **zoom** [`true`]: boolean to retrieve zoom or take entire graph rendered .
+* **size** [`window.innerWidth`]: size of the image.
+* **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
 * **background** : whether you want to specify a background color for the snapshot. Transparent if none specified.
 * **labels** [`true`] : do we want the labels on screen to be displayed on the snapshot?
