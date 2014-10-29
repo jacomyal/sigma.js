@@ -36,7 +36,6 @@
     anchor.setAttribute('href', dataUrl);
     anchor.setAttribute('download', filename || 'graph.' + extension);
 
-    // Click event
     var event = document.createEvent('MouseEvent');
     event.initMouseEvent('click', true, false, window, 0, 0, 0 ,0, 0,
       false, false, false, false, 0, null);
@@ -57,7 +56,6 @@
         webgl = this instanceof sigma.renderers.webgl,
         doneContexts = [];
 
-    console.log(webgl)
     // Creating a false canvas where we'll merge main canvas
       mainCanvas = document.createElement('canvas');
       mainCanvasContext = mainCanvas.getContext('2d');
@@ -111,10 +109,9 @@
         webgl = this instanceof sigma.renderers.webgl,
         doneContexts = [];
 
-    // Creating a false canvas
-      var merged = document.createElement('canvas'),
-          mergedContext= merged.getContext('2d'),
-          sized = false;
+    var merged = document.createElement('canvas'),
+        mergedContext= merged.getContext('2d'),
+        sized = false;
 
     // Iterating through context
     CONTEXTS.forEach(function(name) {

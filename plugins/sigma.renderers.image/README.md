@@ -24,7 +24,7 @@ myRenderer.generateImage();
 *Complex usage*
 
 ```js
-myRenderer.snapshot({
+myRenderer.generateImage({
   size: 400,
   format: 'jpg',
   background: 'white',
@@ -37,7 +37,7 @@ myRenderer.snapshot({
 * **size** [`window.innerWidth`]: size of the image.
 * **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
-* **background** : whether you want to specify a background color for the snapshot. Transparent if none specified.
-* **labels** [`true`] : do we want the labels on screen to be displayed on the snapshot?
+* **background** : whether you want to specify a background color for the image. Transparent if none specified.
+* **labels** [`true`] : labels on screen to be displayed on the image
 * **download** [`false`] : whether you want the graph image to be downloaded by the browser.
 * **filename** [`graph.png`] : full filename for the file to download.
