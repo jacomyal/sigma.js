@@ -1,0 +1,165 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.image/sigma.renderers.image.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<div id="container">
+  <style>
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+    .container {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      line-height: 40px;
+      border: 1px solid #ccc;
+      padding: 0 20px;
+      background: white;
+    }
+    output {
+      position: absolute;
+      top: 20px;
+      left: 120px;
+    }
+    button {
+      margin: 0 auto;
+      width: 90px;
+    }
+
+  </style>
+  <div id="graph-container"></div>
+
+  <div class="container">
+    <label>Width :</label>
+    <input type="range" id="size" value="400" min="0" max="1000" step="100"><br>
+    <label>Color :</label>
+    <input type="color" id="color" value="#FFFFFF" /><br>
+    <label>Keep Zoom :</label>
+    <input type="checkbox" id="zoom"><br>
+    <button id="snap">snapshot</button>
+  </div>
+
+</div>
+<script>
+/**
+ * This is a basic example on how to instantiate sigma. A random graph is
+ * generated and stored in the "graph" variable, and then sigma is instantiated
+ * directly with the graph.
+ *
+ * The simple instance of sigma is enough to make it render the graph on the on
+ * the screen, since the graph is given directly to the constructor.
+ */
+var i,
+    s,
+    N = 100,
+    E = 500,
+    g = {
+      nodes: [],
+      edges: []
+    };
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: '#666'
+  });
+
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
+  renderers: [
+      {
+        container: document.getElementById('graph-container'),
+        type: 'webgl' // sigma.renderers.canvas works as well
+      }
+    ]
+});
+
+var myRenderer = s.renderers[0];
+
+// Init the rendered graph
+myRenderer.image();
+
+$("#snap").on('click', function() {
+  var size = parseInt($("#size").val());
+  var color = $("#color").val();
+
+  if(!size || size < 1) {
+    myRenderer.generateImage({background: color});
+    return;
+  }
+
+  if ($('#zoom').is(":checked"))
+  {
+    myRenderer.generateImage({size: size, zoom: true, background: color})
+  } else {
+    myRenderer.generateImage({size: size, background: color});
+  }
+});
+
+
+  $(function(){
+    $("#size").after('<output></output>');
+    $('output').text($("#size").val());
+    $("#size").on('change', function() {
+      var valof = $(this).val();
+      $('output').text(valof);
+    });
+  });
+</script>
