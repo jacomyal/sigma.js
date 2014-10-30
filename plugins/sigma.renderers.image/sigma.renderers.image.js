@@ -1,37 +1,37 @@
 ;(function(undefined) {
   'use strict';
 
+  if (typeof sigma === 'undefined')
+    throw 'sigma is not declared';
+
+  // Initialize package:
+  sigma.utils.pkg('sigma.canvas.nodes');
+
   /**
-   * Sigma Renderer Image Utility
-   * ================================
+   * Sigma Image Utility
+   * =============================
    *
-   * The aim of this plugin is to enable users to retrieve a static image
-   * of the graph being rendered.
-   *
-   * Author: Martin de la Taille (martindelataille)
-   * Thanks to: Guillaume Plique (Yomguithereal)
-   * Version: 0.0.1
+   * @author: Martin de la Taille (martindelataille)
+   * @thanks: Guillaume Plique (Yomguithereal)
+   * @version: 0.1
    */
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma.renderers.image: sigma not in scope.';
+  var _contexts,
+      _types,
+      _canvas,
+      _canvasContext;
 
-  // Constants
-  var mainCanvas = null,
-    mainCanvasContext = null;
+  _contexts = ['scene', 'edges', 'nodes', 'labels'];
+  _types = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    gif: 'image/gif',
+    tiff: 'image/tiff'
+  };
 
-  var CONTEXTS = ['scene', 'edges', 'nodes', 'labels'],
-      TYPES = {
-        png: 'image/png',
-        jpg: 'image/jpeg',
-        gif: 'image/gif',
-        tiff: 'image/tiff'
-      };
-
-  // Utilities
+  // UTILITIES FUNCTIONS:
+  // ******************
   function download(dataUrl, extension, filename) {
-
-    // Anchor
     var anchor = document.createElement('a');
     anchor.setAttribute('href', dataUrl);
     anchor.setAttribute('download', filename || 'graph.' + extension);
@@ -45,53 +45,60 @@
   }
 
   function calculateAspectRatioFit(srcWidth, srcHeight, maxSize) {
-      var ratio = Math.min(maxSize / srcWidth, maxSize / srcHeight);
-      return { width: srcWidth*ratio, height: srcHeight*ratio };
-   }
+    var ratio = Math.min(maxSize / srcWidth, maxSize / srcHeight);
+    return { width: srcWidth*ratio, height: srcHeight*ratio };
+  }
 
-  // Main function
+
+  /**
+  * This function clone graph and generate a new canvas to download image
+  *
+  * Recognized parameters:
+  * **********************
+  * Here is the exhaustive list of every accepted parameters in the settings
+  * object:
+  *
+   * @param {sigma}  s       The related sigma instance.
+   * @param {object} o       The node or the edge.
+   * @param {object} options The options related to the object.
+  */
+
   function image() {
 
     var self = this,
         webgl = this instanceof sigma.renderers.webgl,
+        sized = false,
         doneContexts = [];
 
-    // Creating a false canvas where we'll merge main canvas
-      mainCanvas = document.createElement('canvas');
-      mainCanvasContext = mainCanvas.getContext('2d');
-      var sized = false;
+    _canvas = document.createElement('canvas');
+    _canvasContext = _canvas.getContext('2d');
 
-    // Iterating through context
-    CONTEXTS.forEach(function(name) {
+    _contexts.forEach(function(name) {
       if (!self.contexts[name])
         return;
 
-      var canvas = self.domElements[name] || self.domElements['scene'],
+      var canvas = self.domElements[name] || self.domElements.scene,
         context = self.contexts[name];
+
+        if(!sized) {
+          _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
+          _canvas.height = webgl && context instanceof WebGLRenderingContext ? canvas.height / 2 : canvas.height;
+          sized = true;
+        }
 
       if (~doneContexts.indexOf(context))
         return;
 
-      if (!sized) {
-        mainCanvas.width = webgl && context instanceof WebGLRenderingContext ?
-         canvas.width / 2 :
-         canvas.width;
-        mainCanvas.height = webgl && context instanceof WebGLRenderingContext ?
-          canvas.height / 2 :
-          canvas.height;
-        sized = true;
-      }
-
       if (context instanceof WebGLRenderingContext)
-        mainCanvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
+        _canvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
       else
-        mainCanvasContext.drawImage(canvas, 0, 0);
+        _canvasContext.drawImage(canvas, 0, 0);
 
       doneContexts.push(context);
     });
 
     // Cleaning
-    var doneContexts = [];
+    doneContexts = [];
   }
 
   // Generate image function
@@ -101,48 +108,48 @@
     if(!params.size)
       params.size = window.innerWidth;
 
-    if (params.format && !(params.format in TYPES))
-      throw Error('sigma.renderers.image: unsupported format "' +
-                  params.format + '".');
+    if (params.format && !(params.format in _types))
+      throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
 
     var self = this,
         webgl = this instanceof sigma.renderers.webgl,
+        sized = false,
         doneContexts = [];
 
     var merged = document.createElement('canvas'),
-        mergedContext= merged.getContext('2d'),
-        sized = false;
+        mergedContext= merged.getContext('2d');
 
-    // Iterating through context
-    CONTEXTS.forEach(function(name) {
+    _contexts.forEach(function(name) {
       if (!self.contexts[name])
         return;
 
       if (params.labels === false && name === 'labels')
         return;
 
-      var canvas = self.domElements[name] || self.domElements['scene'],
+      var canvas = self.domElements[name] || self.domElements.scene,
         context = self.contexts[name];
 
       if (~doneContexts.indexOf(context))
         return;
 
       if (!sized) {
-        // Keep ratio
+
+        var width, height;
+
         if(!params.zoom) {
-          var width = mainCanvas.width,
-            height = mainCanvas.height;
+          width = _canvas.width;
+          height = _canvas.height;
         } else {
-          var width = canvas.width,
-            height = canvas.height;
+          width = canvas.width;
+          height = canvas.height;
         }
 
-        var ratio = calculateAspectRatioFit(width, height, params.size)
+        var ratio = calculateAspectRatioFit(width, height, params.size);
 
         merged.width= ratio.width;
         merged.height = ratio.height;
 
-        if (!context instanceof WebGLRenderingContext) {
+        if (!webgl && !context instanceof WebGLRenderingContext) {
           merged.width *= 2;
           merged.height *=2;
         }
@@ -160,12 +167,12 @@
       if(params.zoom)
         mergedContext.drawImage(canvas, 0, 0, merged.width, merged.height);
       else
-        mergedContext.drawImage(mainCanvas, 0, 0, merged.width, merged.height);
+        mergedContext.drawImage(_canvas, 0, 0, merged.width, merged.height);
 
       doneContexts.push(context);
     });
 
-    var dataUrl = merged.toDataURL(TYPES[params.format || 'png']);
+    var dataUrl = merged.toDataURL(_types[params.format || 'png']);
 
     if(params.download)
       download(
