@@ -131,25 +131,20 @@ s = new sigma({
     ]
 });
 
-var myRenderer = s.renderers[0];
-
-// Init the rendered graph
-myRenderer.image();
-
 $("#snap").on('click', function() {
   var size = parseInt($("#size").val());
   var color = $("#color").val();
 
   if(!size || size < 1) {
-    myRenderer.generateImage({download:true, background: color});
+    s.renderers[0].image({download:true, background: color});
     return;
   }
 
   if ($('#zoom').is(":checked"))
   {
-    myRenderer.generateImage({download:true, size: size, zoom: true, background: color})
+    s.renderers[0].image({download:true, size: size, zoom: true, background: color})
   } else {
-    myRenderer.generateImage({download:true, size: size, background: color});
+    s.renderers[0].image(s.renderers[0], {download:true, size: size, background: color});
   }
 });
 

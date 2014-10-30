@@ -49,6 +49,20 @@
     return { width: srcWidth*ratio, height: srcHeight*ratio };
   }
 
+  /**
+   * Helpers
+   */
+  function extend() {
+    var i,
+        k,
+        res = {},
+        l = arguments.length;
+
+    for (i = l - 1; i >= 0; i--)
+      for (k in arguments[i])
+        res[k] = arguments[i][k];
+    return res;
+  };
 
   /**
   * This function clone graph and generate a new canvas to download image
@@ -63,10 +77,9 @@
    * @param {object} options The options related to the object.
   */
 
-  function image() {
-
-    var self = this,
-        webgl = this instanceof sigma.renderers.webgl,
+  function cloneCanvas(s) {
+    var self = s,
+        webgl = s instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -86,13 +99,13 @@
           sized = true;
         }
 
+        if (context instanceof WebGLRenderingContext)
+          _canvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
+        else
+          _canvasContext.drawImage(canvas, 0, 0);
+
       if (~doneContexts.indexOf(context))
         return;
-
-      if (context instanceof WebGLRenderingContext)
-        _canvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
-      else
-        _canvasContext.drawImage(canvas, 0, 0);
 
       doneContexts.push(context);
     });
@@ -101,8 +114,20 @@
     doneContexts = [];
   }
 
-  // Generate image function
- function generateImage (params) {
+  // image function
+ function image (s, params) {
+    var y = new sigma();
+
+    y = extend(s, y);
+
+    console.log(s.camera.ratio, y.camera.ratio)
+    y.camera.ratio = 1;
+    console.log(s.camera.ratio, y.camera.ratio)
+
+    if(!_canvas) {
+      cloneCanvas(y);
+    }
+
     params = params || {};
 
     if(!params.size)
@@ -111,8 +136,8 @@
     if (params.format && !(params.format in _types))
       throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
 
-    var self = this,
-        webgl = this instanceof sigma.renderers.webgl,
+    var self = s,
+        webgl = s instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -189,11 +214,8 @@
     return dataUrl;
   }
 
-  // Extending canvas and webl renderers
+  // Extending canvas and webgl renderers
   sigma.renderers.canvas.prototype.image = image;
-  sigma.renderers.canvas.prototype.generateImage = generateImage;
-
   sigma.renderers.webgl.prototype.image = image;
-  sigma.renderers.webgl.prototype.generateImage = generateImage;
 
 }).call(this);
