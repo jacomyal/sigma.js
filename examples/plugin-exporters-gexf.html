@@ -71,13 +71,11 @@ for (i = 0; i < N; i++)
     size: Math.random(),
     color: '#FF0000',
     data: {
-      properties: {
-        aString: 'abc ' + i,
-        aBoolean: true,
-        anInteger: i,
-        aFloat: Math.random(),
-        anArray: [1, 2, 3]
-      }
+      aString: 'abc ' + i,
+      aBoolean: true,
+      anInteger: i,
+      aFloat: Math.random(),
+      anArray: [1, 2, 3]
     }
   });
 
@@ -111,7 +109,8 @@ s = new sigma({
 s.graph.toGEXF({
   download: true,
   filename: 'myGraph.gexf',
-  attributes: 'data.properties',
+  nodeAttributes: 'data',
+  edgeAttributes: 'data.properties',
   renderer: s.renderers[0],
   creator: 'Sigma.js',
   description: 'This is an awesome graph!'

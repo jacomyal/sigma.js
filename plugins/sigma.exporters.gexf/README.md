@@ -27,7 +27,8 @@ s.graph.toGEXF({download: true});
 s.graph.toGEXF({
   download: true,
   filename: 'myGraph.gexf',
-  attributes: 'data',
+  nodeAttributes: 'data',
+  edgeAttributes: 'data.properties',
   renderer: s.renderers[0],
   creator: 'Sigma.js',
   description: 'This is an awesome graph!'
@@ -43,8 +44,11 @@ s.graph.toGEXF({
  * **filename**
    * The full filename for the file to download.
    * type: *string*
- * **attributes**
-   * The accessor to the attributes dictionnary in nodes and edges (e.g. "attributes" or "data.properties"). If provided, write the attributes of nodes and edges in the GEXF.
+ * **nodeAttributes**
+   * The accessor to the dictionnary of node attributes dictionnary (e.g. "attributes" or "data.properties"). If provided, write the attributes in the GEXF.
+   * type: *string*
+ * **edgeAttributes**
+   * The accessor to the dictionnary of edge attributes (e.g. "attributes" or "data.properties"). If provided, write the attributes in the GEXF.
    * type: *string*
  * **renderer**
    * The Sigma renderer. If provided, write the visualization attributes (position, size, color) of nodes and edges in the GEXF.
