@@ -362,7 +362,6 @@
                 // Top Left sub-region
                 g = RegionMatrix[rp(r, 'firstChild')];
 
-                nan(RegionMatrix[rp(r, 'firstChild')]);
                 RegionMatrix[rp(g, 'node')] = -1;
                 RegionMatrix[rp(g, 'centerX')] = RegionMatrix[rp(r, 'centerX')] - w;
                 RegionMatrix[rp(g, 'centerY')] = RegionMatrix[rp(r, 'centerY')] - w;
