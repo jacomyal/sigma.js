@@ -71,11 +71,13 @@ for (i = 0; i < N; i++)
     size: Math.random(),
     color: '#FF0000',
     data: {
-      aString: 'abc ' + i,
-      aBoolean: true,
-      anInteger: i,
-      aFloat: Math.random(),
-      anArray: [1, 2, 3]
+      properties: {
+        aString: 'abc ' + i,
+        aBoolean: true,
+        anInteger: i,
+        aFloat: Math.random(),
+        anArray: [1, 2, 3]
+      }
     }
   });
 
@@ -87,11 +89,13 @@ for (i = 0; i < E; i++)
     size: Math.random(),
     color: 'rgba(120, 120, 120, 0.5)',
     data: {
-      aString: 'abc ' + i,
-      aBoolean: false,
-      anInteger: i,
-      aFloat: Math.random(),
-      anArray: [1, 2, 3]
+      properties: {
+        aString: 'abc ' + i,
+        aBoolean: false,
+        anInteger: i,
+        aFloat: Math.random(),
+        anArray: [1, 2, 3]
+      }
     }
   });
 
@@ -107,7 +111,7 @@ s = new sigma({
 s.graph.toGEXF({
   download: true,
   filename: 'myGraph.gexf',
-  attributes: 'data',
+  attributes: 'data.properties',
   renderer: s.renderers[0],
   creator: 'Sigma.js',
   description: 'This is an awesome graph!'
