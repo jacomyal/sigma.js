@@ -246,8 +246,8 @@
             q, q0, q1, q2, q3;
 
         // Setting up
-        // TODO: ensure the theoritecal length so we can build a proper matrix
-        RegionMatrix = new Float32Array(W.nodesLength / W.ppn * 4 * W.ppr);
+        // RegionMatrix = new Float32Array(W.nodesLength / W.ppn * 4 * W.ppr);
+        RegionMatrix = [];
 
         // Computing min and max values
         for (n = 0; n < W.nodesLength; n += W.ppn) {
