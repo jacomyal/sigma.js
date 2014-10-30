@@ -6,7 +6,7 @@
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
-  
+
   /**
    * Sigma Select
    * =============================
@@ -20,34 +20,6 @@
       _drag = false,
       _dragListener = null;
 
-
-  /**
-   * This fuction refreshes sigma without refreshing the edge quadtree.
-   *
-   * @param {sigma} The sigma instance.
-   */
-  function refresh(s) {
-    // Do not refresh edgequadtree:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      if (c.edgequadtree !== undefined)
-        c.edgequadtree._enabled = false;
-    }
-
-    // Do refresh:
-    s.refresh();
-
-    // Allow to refresh edgequadtree:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      if (c.edgequadtree !== undefined)
-        c.edgequadtree._enabled = true;
-    }
-  };
 
   /**
    * This fuction handles the node click event. The clicked nodes are activated.
@@ -77,7 +49,7 @@
       })
     );
 
-    refresh(_s);
+    _s.refresh({skipIndexation: true});
   };
 
   /**
@@ -107,8 +79,8 @@
         return e.id;
       })
     );
-    
-    refresh(_s);
+
+    _s.refresh({skipIndexation: true});
   };
 
   /**
