@@ -358,7 +358,7 @@
 
           if (o.size) {
             sizeElem = doc.createElement('viz:size');
-            sizeElem.setAttribute('value', o[prefix + 'size']);
+            sizeElem.setAttribute('value', o.size);
             edgeElem.appendChild(sizeElem);
           }
         }
