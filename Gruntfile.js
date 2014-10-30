@@ -68,6 +68,7 @@ module.exports = function(grunt) {
     'plugins.dragNodes',
     'plugins.filter',
     'plugins.neighborhoods',
+    'plugins.poweredBy',
     'renderers.customShapes',
     'renderers.edgeLabels',
     'statistics.HITS'
