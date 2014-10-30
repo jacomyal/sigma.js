@@ -217,7 +217,7 @@
           nodeElem.setAttribute('label', o.label);
 
         // NODE ATTRIBUTES
-        attrs = strToObjectRef(o, params.attributes);
+        attrs = strToObjectRef(o, params.nodeAttributes);
         if (attrs) {
           attrsElem = doc.createElement('attvalues');
 
@@ -311,7 +311,7 @@
           edgeElem.setAttribute('label', o.label);
 
         // EDGE ATTRIBUTES
-        attrs = strToObjectRef(o, params.attributes);
+        attrs = strToObjectRef(o, params.edgeAttributes);
         if (attrs) {
           attrsElem = doc.createElement('attvalues');
 
