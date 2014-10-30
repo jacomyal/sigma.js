@@ -44,7 +44,7 @@ s.graph.toGEXF({
    * The full filename for the file to download.
    * type: *string*
  * **attributes**
-   * The key to the attributes dictionnary in nodes and edges. If provided, write the attributes of nodes and edges in the GEXF.
+   * The accessor to the attributes dictionnary in nodes and edges (e.g. "attributes" or "data.properties"). If provided, write the attributes of nodes and edges in the GEXF.
    * type: *string*
  * **renderer**
    * The Sigma renderer. If provided, write the visualization attributes (position, size, color) of nodes and edges in the GEXF.

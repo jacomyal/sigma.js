@@ -33,6 +33,19 @@
   }
 
   /**
+   * Convert Javascript string in dot notation into an object reference.
+   *
+   * @param  {object} obj The object.
+   * @param  {string} str The string to convert, e.g. 'a.b.etc'.
+   * @return {?}          The object reference.
+   */
+  function strToObjectRef(obj, str) {
+    // http://stackoverflow.com/a/6393943
+    if (str === null) return null;
+    return str.split('.').reduce(function(obj, i) { return obj[i] }, obj);
+  }
+
+  /**
    * Transform a color encoded in hexadecimal (shorthand or full form) into an
    * RGB array.
    * See http://stackoverflow.com/a/5623838
@@ -140,6 +153,7 @@
       }
 
       var o,
+          attrs,
           nodeAttrIndex = {},
           nodeAttrCpt = 0,
           edgeAttrIndex = {},
@@ -203,10 +217,11 @@
           nodeElem.setAttribute('label', o.label);
 
         // NODE ATTRIBUTES
-        if (params.attributes && o[params.attributes]) {
+        attrs = strToObjectRef(o, params.attributes);
+        if (attrs) {
           attrsElem = doc.createElement('attvalues');
 
-          Object.keys(o[params.attributes]).forEach(function (k) {
+          Object.keys(attrs).forEach(function (k) {
             if (!(k in nodeAttrIndex)) {
               nodeAttrIndex[k] = {
                 id: nodeAttrCpt,
@@ -215,7 +230,7 @@
               nodeAttrCpt++;
             }
 
-            var v = o[params.attributes][k];
+            var v = attrs[k];
             nodeAttrIndex[k].type = typeOf(v, nodeAttrIndex[k].type);
 
             attrElem = doc.createElement('attvalue');
@@ -296,10 +311,11 @@
           edgeElem.setAttribute('label', o.label);
 
         // EDGE ATTRIBUTES
-        if (params.attributes && o[params.attributes]) {
+        attrs = strToObjectRef(o, params.attributes);
+        if (attrs) {
           attrsElem = doc.createElement('attvalues');
 
-          Object.keys(o[params.attributes]).forEach(function (k) {
+          Object.keys(attrs).forEach(function (k) {
             if (!(k in edgeAttrIndex)) {
               edgeAttrIndex[k] = {
                 id: edgeAttrCpt,
@@ -308,7 +324,7 @@
               edgeAttrCpt++;
             }
 
-            var v = o[params.attributes][k];
+            var v = attrs[k];
             edgeAttrIndex[k].type = typeOf(v, edgeAttrIndex[k].type);
 
             attrElem = doc.createElement('attvalue');
@@ -342,7 +358,7 @@
 
           if (o.size) {
             sizeElem = doc.createElement('viz:size');
-            sizeElem.setAttribute('value', o[prefix + 'size']);
+            sizeElem.setAttribute('value', o.size);
             edgeElem.appendChild(sizeElem);
           }
         }
