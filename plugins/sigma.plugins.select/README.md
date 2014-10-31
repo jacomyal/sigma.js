@@ -31,7 +31,17 @@ Beta
 ## Dependencies
 
 - `sigma.plugins.activeState`
+- `sigma.plugins.keyboard` (optional)
+- `sigma.helpers.graph` (required if `sigma.plugins.keyboard` is used)
 
 ## Compatibility
 
 The plugin is compatible with `sigma.plugins.dragNodes`: dragged nodes won't be selected.
+
+The plugin is compatible with `sigma.plugins.keyboard`: if the plugin is loaded, it provides the following keyboard shortcuts:
+- <kbd>spacebar</kbd> + <kbd>a</kbd>: select all nodes
+- <kbd>spacebar</kbd> + <kbd>u</kbd>: deselect all nodes or edges
+- <kbd>spacebar</kbd> + <kbd>Del</kbd>: drop selected nodes or edges
+- <kbd>spacebar</kbd> + <kbd>e</kbd>: select neighbors of selected nodes
+- <kbd>spacebar</kbd> + <kbd>i</kbd>: select isolated nodes (i.e. of degree 0)
+- <kbd>spacebar</kbd> + <kbd>l</kbd>: select leaf nodes (i.e. nodes with 1 adjacent node)

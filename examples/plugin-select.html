@@ -37,6 +37,8 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.helpers.graph/sigma.helpers.graph.js"></script>
+<script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
 <script src="../plugins/sigma.plugins.activeState/settings.js"></script>
 <script src="../plugins/sigma.plugins.activeState/sigma.plugins.activeState.js"></script>
 <script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.nodes.def.js"></script>
@@ -54,6 +56,37 @@
 <script src="../plugins/sigma.plugins.select/sigma.plugins.select.js"></script>
 <div id="container">
   <style>
+    .key {
+      display: inline-block;
+      min-width: 10px;
+      height: 18px;
+      padding: 0 4px;
+      font-size: 11px;
+      line-height: 18px;
+      color: #555;
+      text-align: center;
+      background-color: #EEE;
+      background-repeat: repeat-x;
+      background-image: linear-gradient(#F5F5F5,#EEE);
+      -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f5f5f5, endColorstr=#eeeeee, GradientType=0)";
+      border: 1px solid #CCC;
+      border-radius: 3px;
+      box-shadow: inset 0 1px 0 #FFF,0 1px 0 #CCC;
+    }
+
+    .container {
+      display: none;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      line-height: 30px;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      background: white;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+    }
+
     #graph-container {
       top: 0;
       bottom: 0;
@@ -63,6 +96,14 @@
     }
   </style>
   <div id="graph-container"></div>
+  <div class="container">
+    <div><span class="key">spacebar</span> + <span class="key">a</span> Select/deselect all nodes</div>
+    <div><span class="key">spacebar</span> + <span class="key">u</span> Deselect all nodes or edges</div>
+    <div><span class="key">spacebar</span> + <span class="key">Del</span> Drop selected nodes or edges</div>
+    <div><span class="key">spacebar</span> + <span class="key">e</span> Select neighbors of selected nodes</div>
+    <div><span class="key">spacebar</span> + <span class="key">i</span> Select isolated nodes (i.e. of degree 0)</div>
+    <div><span class="key">spacebar</span> + <span class="key">l</span> Select leaf nodes (i.e. nodes with 1 adjacent node)</div>
+  </div>
 </div>
 <script>
 /**
@@ -120,4 +161,8 @@ var activeState = sigma.plugins.activeState(s);
 
 // Initialize the Select plugin:
 sigma.plugins.select(s, activeState);
+
+if (sigma.plugins.keyboard) {
+  document.getElementsByClassName('container')[0].style.display = 'block';
+}
 </script>
