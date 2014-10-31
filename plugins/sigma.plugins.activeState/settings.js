@@ -15,11 +15,16 @@
      * ACTIVE STATE SETTINGS:
      * **********************
      */
+    // {string}
+    defaultLabelActiveColor: '#000',
     // {string} The active node's label font. If not specified, will heritate
     //          the "font" value.
     activeFont: '',
     // {string} Example: 'bold'
     activeFontStyle: '',
+    // {string} Indicates how to choose the labels color of active nodes.
+    //          Available values: "node", "default"
+    labelActiveColor: 'default',
     // {string} Indicates how to choose the active nodes color.
     //          Available values: "node", "default"
     nodeActiveColor: 'node',

@@ -70,8 +70,8 @@ module.exports = function(grunt) {
     'plugins.filter',
     'plugins.neighborhoods',
     'plugins.select',
-    'statistics.HITS',
-    'renderers.customShapes'
+    'renderers.customShapes',
+    'statistics.HITS'
   ];
 
   var pluginFiles = [],

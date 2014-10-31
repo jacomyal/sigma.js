@@ -14,7 +14,7 @@ See the following [example code](../../examples/active-state.html) and [unit tes
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var activeState = sigma.plugins.activeState(sigInst.graph);
+var activeState = sigma.plugins.activeState(sigInst);
 ````
 
 Kill the plugin instance as follows:
@@ -34,25 +34,62 @@ sigma.plugins.killActiveState();
 **addNodes()** : *sigma.plugins.activeState*
 **addNodes( *string* )** : *sigma.plugins.activeState*
 **addNodes( *array* )** : *sigma.plugins.activeState*
- * This method set one or several nodes as 'active', depending on how it is called. To activate the array of nodes, call it without argument. To activate a specific node, call it with the id of the node. To activate multiple nodes, call it with an array of ids.
+ * This method will set one or several nodes as `active`, depending on how it is called. To activate all nodes, call it without argument. To activate a specific node, call it with the id of the node. To activate multiple nodes, call it with an array of ids.
  * The method returns the plugin instance.
 
 **addEdges()** : *sigma.plugins.activeState*
 **addEdges( *string* )** : *sigma.plugins.activeState*
 **addEdges( *array* )** : *sigma.plugins.activeState*
- * This method set one or several edges as 'active', depending on how it is called. To activate the array of edges, call it without argument. To activate a specific edge, call it with the id of the edge. To activate multiple edges, call it with an array of ids.
+ * This method will set one or several edges as `active`, depending on how it is called. To activate all edges, call it without argument. To activate a specific edge, call it with the id of the edge. To activate multiple edges, call it with an array of ids.
  * The method returns the plugin instance.
 
 **dropNodes()** : *sigma.plugins.activeState*
 **dropNodes( *string* )** : *sigma.plugins.activeState*
 **dropNodes( *array* )** : *sigma.plugins.activeState*
- * This method set one or several nodes as 'inactive', depending on how it is called. To deactivate the array of nodes, call it without argument. To deactivate a specific node, call it with the id of the node. To deactivate multiple nodes, call it with an array of ids.
+ * This method will set one or several nodes as `inactive`, depending on how it is called. To deactivate all nodes, call it without argument. To deactivate a specific node, call it with the id of the node. To deactivate multiple nodes, call it with an array of ids.
  * The method returns the plugin instance.
 
 **dropEdges()** : *sigma.plugins.activeState*
 **dropEdges( *string* )** : *sigma.plugins.activeState*
 **dropEdges( *array* )** : *sigma.plugins.activeState*
- * This method set one or several edges as 'inactive', depending on how it is called. To deactivate the array of edges, call it without argument. To deactivate a specific edge, call it with the id of the edge. To deactivate multiple edges, call it with an array of ids.
+ * This method will set one or several edges as `inactive`, depending on how it is called. To deactivate all edges, call it without argument. To deactivate a specific edge, call it with the id of the edge. To deactivate multiple edges, call it with an array of ids.
+ * The method returns the plugin instance.
+
+**addNeighbors()** : *sigma.plugins.activeState*
+ * The method will set the neighbors of all active nodes as `active`.
+ * The method returns the plugin instance.
+
+**setNodesBy( *function* )** : *sigma.plugins.activeState*
+ * The method will set the nodes that pass a specified truth test (i.e. predicate) as `active`, or as `inactive` otherwise. The method must be called with the predicate, which is a function that takes a node as argument and returns a boolean. The context of the predicate is ``sigma.graph``.
+ * The method returns the plugin instance.
+
+Example:
+
+````javascript
+// graph = {
+//   nodes: [{id:'n0'}, {id:'n1'}, {id:'n2'}], 
+//   edges: [
+//     {id:'e0', source:'n0', target:'n1'}]
+// }
+// Activate isolated nodes:
+activeState.setNodesBy(function(n) {
+  return this.degree(n.id) === 0;
+});
+// n0.active == false
+// n1.active == false
+// n2.active == true
+````
+
+**setEdgesBy( *function* )** : *sigma.plugins.activeState*
+ * The method will set the edges that pass a specified truth test (i.e. predicate) as `active`, or as `inactive` otherwise. The method must be called with the predicate, which is a function that takes a node as argument and returns a boolean. The context of the predicate is ``sigma.graph``.
+ * The method returns the plugin instance.
+
+**invertNodes()** : *sigma.plugins.activeState*
+ * The method will set the active nodes as `inactive` and the other nodes as `active`.
+ * The method returns the plugin instance.
+
+**invertEdges()** : *sigma.plugins.activeState*
+ * The method will set the active edges as `inactive` and the other edges as `active`.
  * The method returns the plugin instance.
 
 Don't forget to call `sigInst.refresh()` after calling these methods to update the visualization.
@@ -77,6 +114,10 @@ activeState.bind('activeNodes', activeNodesCallback);
 
 We extend Sigma.js settings in a transparent way to render active nodes and edges, see [settings.js](settings.js):
 
+ * **defaultLabelActiveColor**
+   * type: *string*
+   * default value: `#000`
+
  * **activeFont**
    * The active node's label font. If not specified, will heritate the `font` value.
    * type: *string*
@@ -86,6 +127,12 @@ We extend Sigma.js settings in a transparent way to render active nodes and edge
    * Example: `bold`
    * type: *string*
    * default value: ``
+
+ * **labelActiveColor**
+   * Indicates how to choose the labels color of active nodes.
+   * type: *string*
+   * default value: `default`
+   * available values: `node`, `default`
 
  * **nodeActiveColor**
    * Indicates how to choose the active nodes color.
