@@ -74,6 +74,7 @@ module.exports = function(grunt) {
     'plugins.edgeSiblings',
     'plugins.filter',
     'plugins.fullScreen',
+    'plugins.keyboard',
     'plugins.locate',
     'plugins.neighborhoods',
     'plugins.poweredBy',
