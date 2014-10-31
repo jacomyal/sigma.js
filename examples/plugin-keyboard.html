@@ -40,6 +40,41 @@
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
 <style>
+  kbd {
+    background-color: #e7e7e7;
+    background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+    background-image: linear-gradient(#fefefe, #e7e7e7);
+    background-repeat: repeat-x;
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #000;
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+  }
+
+  .key.arrow {
+     font-size: 15px;
+     font-weight: bold
+  }
+
+  .container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    background: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+  }
+  .left {
+    display: inline-block;
+    width: 100px
+  }
+
   #graph-container {
     top: 0;
     bottom: 0;
@@ -49,8 +84,14 @@
   }
 </style>
 <body>
-  <div id="container">
-    <div id="graph-container"></div>
+  <div id="graph-container"></div>
+  <div class="container">
+    <div><span class="left"><kbd>&larr;</kbd></span> Move camera left</div>
+    <div><span class="left"><kbd>&uarr;</kbd></span> Move camera up</div>
+    <div><span class="left"><kbd>&rarr;</kbd></span> Move camera right</div>
+    <div><span class="left"><kbd>&darr;</kbd></span> Move camera down</div>
+    <div><span class="left"><kbd>spacebar</kbd> + <kbd>&uarr;</kbd></span> Zoom in</div>
+    <div><span class="left"><kbd>spacebar</kbd> + <kbd>&darr;</kbd></span> Zoom out</div>
   </div>
 </body>
 <script>
@@ -102,10 +143,10 @@ var kbd = sigma.plugins.keyboard(s, {
 });
 
 kbd.bind('32', function() {
-  console.log('"Space" key pressed');
+  console.log('"Spacebar" key pressed');
 });
 
 kbd.bind('17+65 32+65', function() {
-  console.log('"Ctrl + A"  or "Space + A" pressed');
+  console.log('"Ctrl + A"  or "Spacebar + A" pressed');
 });
 </script>

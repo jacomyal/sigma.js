@@ -17,12 +17,10 @@ See the following [example code](../../examples/plugin-keyboard.html) for full u
 To use, include all .js files under this folder. Then call the exporter method as follows:
 
 ````javascript
+// Init
 var kbd = sigma.plugins.keyboard(s);
-````
 
-### Advanced usage
-
-````javascript
+// Init with options
 var kbd = sigma.plugins.keyboard(s, {
   displacement: 200,
   duration: 300,
@@ -45,6 +43,16 @@ var kbd = sigma.plugins.keyboard(s, {
    * type: *number*
    * default value: `1.7`
 
+### Keyboard shortcuts
+
+The plugin provides the following keyboard shortcuts:
+- <kbd>←</kbd>: move camera left
+- <kbd>↑</kbd>: move camera up
+- <kbd>→</kbd>: move camera right
+- <kbd>↓</kbd>: move camera down
+- <kbd>spacebar</kbd> + <kbd>↑</kbd>: zoom in
+- <kbd>spacebar</kbd> + <kbd>↓</kbd>: zoom out
+
 ### Event binding
 
 Bind functions any combinaison of keys pressed using their key code as follows:
@@ -52,17 +60,17 @@ Bind functions any combinaison of keys pressed using their key code as follows:
 ````javascript
 // Bind a function to a single key pressed
 kbd.bind('32', function() {
-  console.log('"Space" key pressed');
+  console.log('"Spacebar" key pressed');
 });
 
 // Bind a function to a combinaison of keys pressed
 kbd.bind('32+65', function() {
-  console.log('"Space + A" pressed');
+  console.log('"Spacebar + A" pressed');
 });
 
 // Bind a function to multiple combinaisons of keys pressed
 kbd.bind('17+65 32+65', function() {
-  console.log('"Ctrl + A"  or "Space + A" pressed');
+  console.log('"Ctrl + A"  or "Spacebar + A" pressed');
 });
 ````
 
