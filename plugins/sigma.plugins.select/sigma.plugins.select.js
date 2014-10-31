@@ -12,11 +12,14 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.1
+   * @version 0.2
    */
 
   var _s = null,
       _a = null,
+      _kbd = null,
+      _body = null,
+      _spacebar = false,
       _drag = false,
       _dragListener = null;
 
@@ -81,15 +84,15 @@
 
     _a.dropEdges();
 
-    if (!event.data.captor.ctrlKey && !event.data.captor.metaKey) {
+    if (_spacebar) {
+      var existingTargets = difference(targets, newTargets);
+      _a.dropNodes(existingTargets);
+    }
+    else {
       _a.dropNodes();
       if (actives.length > 1) {
         _a.addNodes(targets);
       }
-    }
-    else {
-      var existingTargets = difference(targets, newTargets);
-      _a.dropNodes(existingTargets);
     }
 
     _a.addNodes(newTargets);
@@ -121,15 +124,15 @@
 
     _a.dropNodes();
 
-    if (!event.data.captor.ctrlKey && !event.data.captor.metaKey) {
+    if (_spacebar) {
+      var existingTargets = difference(targets, newTargets);
+      _a.dropEdges(existingTargets);
+    }
+    else {
       _a.dropEdges();
       if (actives.length > 1) {
         _a.addEdges(targets);
       }
-    }
-    else {
-      var existingTargets = difference(targets, newTargets);
-      _a.dropEdges(existingTargets);
     }
 
     _a.addEdges(newTargets);
@@ -153,6 +156,64 @@
     }, 300);
   };
 
+  function keyDown(event) {
+    _spacebar = event.which === 32;
+  }
+
+  function keyUp(event) {
+    _spacebar = false;
+  }
+
+  // Select all nodes or deselect them if all nodes are active
+  function spaceA() {
+    _a.dropEdges();
+
+    if (_a.nodes().length === _s.graph.nodes().length) {
+      _a.dropNodes();
+    }
+    else {
+      _a.addNodes();
+    }
+    _s.refresh({skipIndexation: true});
+  }
+
+  // Deselect all nodes and edges
+  function spaceU() {
+    _a.dropEdges();
+    _a.dropNodes();
+    _s.refresh({skipIndexation: true});
+  }
+
+  // Drop selected nodes and edges
+  function spaceDel() {
+    _s.graph.dropNodes(_a.nodes().map(function(n) { return n.id; }));
+    _s.graph.dropEdges(_a.edges().map(function(e) { return e.id; }));
+    _s.refresh();
+  }
+
+  // Select neighbors of selected nodes
+  function spaceE() {
+    _a.addNeighbors();
+    _s.refresh({skipIndexation: true});
+  }
+
+  // Select isolated nodes (i.e. of degree 0)
+  function spaceI() {
+    _a.dropEdges();
+    _a.setNodesBy(function(n) {
+      return _s.graph.degree(n.id) === 0;
+    });
+    _s.refresh({skipIndexation: true});
+  }
+
+  // Select leaf nodes (i.e. nodes with 1 adjacent node)
+  function spaceL() {
+    _a.dropEdges();
+    _a.setNodesBy(function(n) {
+      return _s.graph.adjacentNodes(n.id).length === 1;
+    });
+    _s.refresh({skipIndexation: true});
+  }
 
   /**
    * Interface
@@ -170,15 +231,29 @@
   sigma.plugins.select = function(s, a) {
     _s = s;
     _a = a;
+    _body = _body || document.getElementsByTagName('body')[0];
 
     _s.bind('clickNodes', clickNodesHandler);
     _s.bind('clickEdges', clickEdgesHandler);
 
-    if (sigma.plugins.dragNodes !== undefined) {
+    _body.addEventListener('keydown', keyDown, false);
+    _body.addEventListener('keyup', keyUp, false);
+
+    if (sigma.plugins.dragNodes) {
       // Handle drag events:
       _dragListener = sigma.plugins.dragNodes(_s, _s.renderers[0]);
       _dragListener.bind('drag', dragHandler);
       _dragListener.bind('drop', dropHandler);
+    }
+
+    if (sigma.plugins.keyboard) {
+      _kbd = sigma.plugins.keyboard(s);
+      _kbd.bind('32+65 18+32+65', spaceA);
+      _kbd.bind('32+85 18+32+85', spaceU);
+      _kbd.bind('32+46 18+32+46', spaceDel);
+      _kbd.bind('32+69 18+32+69', spaceE);
+      _kbd.bind('32+73 18+32+73', spaceI);
+      _kbd.bind('32+76 18+32+76', spaceL);
     }
 
     _s.bind('kill', function() {
@@ -190,14 +265,19 @@
    *  This function kills the select instance.
    */
   sigma.plugins.killSelect = function() {
-    if (_s !== null) {
+    if (_s) {
       _s.unbind('clickNodes', clickNodesHandler);
       _s.unbind('clickEdges', clickEdgesHandler);
     }
-    if (_dragListener !== null) {
+    if (_dragListener) {
       _dragListener.unbind('drag', dragHandler);
       _dragListener.unbind('drop', dropHandler);
     }
+    if (_body) {
+      _body.removeEventListener('keydown', keyDown, false);
+      _body.removeEventListener('keyup', keyUp, false);
+    }
+
     _s = null;
     _a = null;
     _drag = false;
