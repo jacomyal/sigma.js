@@ -118,7 +118,7 @@ s = new sigma({
 });
 
 // Instanciate the ActiveState plugin:
-var activeState = sigma.plugins.activeState(s.graph);
+var activeState = sigma.plugins.activeState(s);
 
 // Initialize the Select plugin:
 sigma.plugins.select(s, activeState);
