@@ -105,9 +105,7 @@ s = new sigma({
   renderer: {
     container: document.getElementById('graph-container'),
     type: 'canvas'
-  }
-  //container: 'graph-container'
-  ,
+  },
   settings: {
     borderSize: 2,
     outerBorderSize: 1,
@@ -119,7 +117,7 @@ s = new sigma({
 });
 
 // Instanciate the ActiveState plugin:
-var activeState = sigma.plugins.activeState(s.graph);
+var activeState = sigma.plugins.activeState(s);
 
 // Initialize the Select plugin:
 sigma.plugins.select(s, activeState);

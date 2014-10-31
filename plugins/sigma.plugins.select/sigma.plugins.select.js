@@ -6,7 +6,7 @@
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
-  
+
   /**
    * Sigma Select
    * =============================
@@ -20,37 +20,46 @@
       _drag = false,
       _dragListener = null;
 
-
   /**
-   * This fuction refreshes sigma without refreshing the edge quadtree.
+   * Utility function to make the difference between two arrays.
+   * See https://github.com/lodash/lodash/blob/master/lodash.js#L1627
    *
-   * @param {sigma} The sigma instance.
+   * @param  {array} array  The array to inspect.
+   * @param  {array} values The values to exclude.
+   * @return {array}        Returns the new array of filtered values.
    */
-  function refresh(s) {
-    // Do not refresh edgequadtree:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      if (c.edgequadtree !== undefined)
-        c.edgequadtree._enabled = false;
+  function difference(array, values) {
+    var length = array ? array.length : 0;
+    if (!length) {
+      return [];
     }
+    var index = -1,
+        result = [],
+        valuesLength = values.length;
 
-    // Do refresh:
-    s.refresh();
+    outer:
+    while (++index < length) {
+      var value = array[index];
 
-    // Allow to refresh edgequadtree:
-    var k,
-        c;
-    for (k in s.cameras) {
-      c = s.cameras[k];
-      if (c.edgequadtree !== undefined)
-        c.edgequadtree._enabled = true;
+      if (value === value) {
+        var valuesIndex = valuesLength;
+        while (valuesIndex--) {
+          if (values[valuesIndex] === value) {
+            continue outer;
+          }
+        }
+        result.push(value);
+      }
+      else if (values.indexOf(value) < 0) {
+        result.push(value);
+      }
     }
-  };
+    return result;
+  }
 
   /**
    * This fuction handles the node click event. The clicked nodes are activated.
+   * The clicked active nodes are deactivated.
    * If the Ctrl or Meta key is hold, it adds the nodes to the list of active
    * nodes instead of clearing the list. It clears the list of active edges. It
    * prevent nodes to be selected while dragging.
@@ -62,26 +71,35 @@
     if (_drag)
       return;
 
-    // Deactivate all edges:
+    var targets = event.data.node.map(function(n) {
+      return n.id;
+    });
+    var actives = _a.nodes().map(function(n) {
+      return n.id;
+    });
+    var newTargets = difference(targets, actives);
+
     _a.dropEdges();
 
     if (!event.data.captor.ctrlKey && !event.data.captor.metaKey) {
-      // Deactivate all nodes:
       _a.dropNodes();
+      if (actives.length > 1) {
+        _a.addNodes(targets);
+      }
+    }
+    else {
+      var existingTargets = difference(targets, newTargets);
+      _a.dropNodes(existingTargets);
     }
 
-    // Activate the target nodes:
-    _a.addNodes(
-      event.data.node.map(function(n) {
-        return n.id;
-      })
-    );
+    _a.addNodes(newTargets);
 
-    refresh(_s);
+    _s.refresh({skipIndexation: true});
   };
 
   /**
    * This fuction handles the edge click event. The clicked edges are activated.
+   * The clicked active edges are deactivated.
    * If the Ctrl or Meta key is hold, it adds the edges to the list of active
    * edges instead of clearing the list. It clears the list of active nodes. It
    * prevent edges to be selected while dragging.
@@ -93,22 +111,30 @@
     if (_drag)
       return;
 
-    // Deactivate all nodes:
+    var targets = event.data.edge.map(function(e) {
+      return e.id;
+    });
+    var actives = _a.edges().map(function(e) {
+      return e.id;
+    });
+    var newTargets = difference(targets, actives);
+
     _a.dropNodes();
 
     if (!event.data.captor.ctrlKey && !event.data.captor.metaKey) {
-      // Deactivate all edges:
       _a.dropEdges();
+      if (actives.length > 1) {
+        _a.addEdges(targets);
+      }
+    }
+    else {
+      var existingTargets = difference(targets, newTargets);
+      _a.dropEdges(existingTargets);
     }
 
-    // Activate the target edges:
-    _a.addEdges(
-      event.data.edge.map(function(e) {
-        return e.id;
-      })
-    );
-    
-    refresh(_s);
+    _a.addEdges(newTargets);
+
+    _s.refresh({skipIndexation: true});
   };
 
   /**
