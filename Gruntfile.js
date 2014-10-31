@@ -69,9 +69,11 @@ module.exports = function(grunt) {
     'plugins.animate',
     'plugins.dragNodes',
     'plugins.filter',
+    'plugins.keyboard',
     'plugins.neighborhoods',
     'plugins.select',
     'renderers.customShapes',
+    'renderers.edgeLabels',
     'statistics.HITS'
   ];
 

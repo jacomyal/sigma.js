@@ -38,31 +38,34 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
-<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
-<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
-<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
-<div id="container">
-  <style>
-    #graph-container {
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      position: absolute;
-    }
-  </style>
-  <div id="graph-container"></div>
-</div>
+<script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
+<style>
+  #graph-container {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+  }
+</style>
+<body>
+  <div id="container">
+    <div id="graph-container"></div>
+  </div>
+</body>
 <script>
 /**
- * This example shows the available edge label renderers for the canvas
- * renderer.
+ * This is a basic example on how to instantiate sigma. A random graph is
+ * generated and stored in the "graph" variable, and then sigma is instantiated
+ * directly with the graph.
+ *
+ * The simple instance of sigma is enough to make it render the graph on the on
+ * the screen, since the graph is given directly to the constructor.
  */
 var i,
     s,
-    N = 10,
-    E = 50,
+    N = 100,
+    E = 500,
     g = {
       nodes: [],
       edges: []
@@ -82,23 +85,27 @@ for (i = 0; i < N; i++)
 for (i = 0; i < E; i++)
   g.edges.push({
     id: 'e' + i,
-    label: 'Edge ' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
-    color: '#ccc',
-    type: ['line', 'curve', 'arrow', 'curvedArrow'][Math.random() * 4 | 0]
+    color: '#ccc'
   });
 
 // Instantiate sigma:
 s = new sigma({
   graph: g,
-  renderer: {
-    container: document.getElementById('graph-container'),
-    type: 'canvas'
-  },
-  settings: {
-    edgeLabelSize: 'proportional'
-  }
+  container: 'graph-container'
+});
+
+var kbd = sigma.plugins.keyboard(s, {
+  zoomingRatio: 1.3
+});
+
+kbd.bind('32', function() {
+  console.log('"Space" key pressed');
+});
+
+kbd.bind('17+65 32+65', function() {
+  console.log('"Ctrl + A"  or "Space + A" pressed');
 });
 </script>
