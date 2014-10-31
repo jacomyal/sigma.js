@@ -40,6 +40,45 @@
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
 <style>
+  .key {
+    display: inline-block;
+    min-width: 10px;
+    height: 18px;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 18px;
+    color: #555;
+    text-align: center;
+    background-color: #EEE;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(#F5F5F5,#EEE);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f5f5f5, endColorstr=#eeeeee, GradientType=0)";
+    border: 1px solid #CCC;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 #FFF,0 1px 0 #CCC;
+  }
+
+  .key.arrow {
+     font-size: 15px;
+     font-weight: bold
+  }
+
+  .container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    background: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+  }
+  .left {
+    display: inline-block;
+    width: 100px
+  }
+
   #graph-container {
     top: 0;
     bottom: 0;
@@ -49,8 +88,14 @@
   }
 </style>
 <body>
-  <div id="container">
-    <div id="graph-container"></div>
+  <div id="graph-container"></div>
+  <div class="container">
+    <div><span class="left"><span class="key arrow">&larr;</span></span> Move camera left</div>
+    <div><span class="left"><span class="key arrow">&uarr;</span></span> Move camera up</div>
+    <div><span class="left"><span class="key arrow">&rarr;</span></span> Move camera right</div>
+    <div><span class="left"><span class="key arrow">&darr;</span></span> Move camera down</div>
+    <div><span class="left"><span class="key">spacebar</span> + <span class="key arrow">&uarr;</span></span> Zoom in</div>
+    <div><span class="left"><span class="key">spacebar</span> + <span class="key arrow">&darr;</span></span> Zoom out</div>
   </div>
 </body>
 <script>
@@ -102,10 +147,10 @@ var kbd = sigma.plugins.keyboard(s, {
 });
 
 kbd.bind('32', function() {
-  console.log('"Space" key pressed');
+  console.log('"Spacebar" key pressed');
 });
 
 kbd.bind('17+65 32+65', function() {
-  console.log('"Ctrl + A"  or "Space + A" pressed');
+  console.log('"Ctrl + A"  or "Spacebar + A" pressed');
 });
 </script>
