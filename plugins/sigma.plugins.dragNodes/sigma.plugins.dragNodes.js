@@ -199,6 +199,13 @@
           renderer: _renderer
         });
       }
+      else {
+        _self.dispatchEvent('click', {
+          node: _node,
+          captor: event,
+          renderer: _renderer
+        });
+      }
       _self.dispatchEvent('dragend', {
         node: _node,
         captor: event,
