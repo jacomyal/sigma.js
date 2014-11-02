@@ -38,10 +38,15 @@
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.renderers.image/sigma.renderers.image.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="../plugins/sigma.plugins.image/sigma.plugins.image.js"></script>
 <div id="container">
   <style>
+ <style>
+    body {
+      color: #333;
+      font-size: 14px;
+      font-family: Lato, sans-serif;
+    }
     #graph-container {
       top: 0;
       bottom: 0;
@@ -49,112 +54,155 @@
       right: 0;
       position: absolute;
     }
-    .container {
+    #control-pane {
+      top: 10px;
+      /*bottom: 10px;*/
+      right: 10px;
+      z-index: 1;
       position: absolute;
-      bottom: 0;
-      right: 0;
-      line-height: 40px;
-      border: 1px solid #ccc;
-      padding: 0 20px;
-      background: white;
+      width: 230px;
+      background-color: rgb(249, 247, 237);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
-    output {
-      position: absolute;
-      top: 20px;
-      left: 120px;
+    #control-pane > div {
+      margin: 10px;
+      overflow-x: auto;
     }
-    button {
-      margin: 0 auto;
-      width: 90px;
+    .line {
+      clear: both;
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 12px 0 0 0;
+      border-bottom: 1px solid #aac789;
+      background: transparent;
+    }
+    h2, h3, h4 {
+      padding: 0;
+      font-variant: small-caps;
+    }
+    .green {
+      color: #437356;
+    }
+    h2.underline {
+      color: #437356;
+      background: #f4f0e4;
+      margin: 0;
+      border-radius: 2px;
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+    .hidden {
+      display: none;
+      visibility: hidden;
     }
 
+    input[type=range] {
+      width: 160px;
+    }
+
+
+    #image-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
   </style>
   <div id="graph-container"></div>
 
-  <div class="container">
-    <label>Width :</label>
-    <input type="range" id="size" value="400" min="0" max="1000" step="100"><br>
-    <label>Color :</label>
-    <input type="text" id="color" value="#FFFFFF" /><br>
-    <label>Keep Zoom :</label>
-    <input type="checkbox" id="zoom"><br>
-    <button id="snap">snapshot</button>
+  <div id="control-pane">
+    <h2 class="underline">Image</h2>
+    <div>
+      <h3>Width <span id="width-value">0</span></h3>
+       <input id="width" type="range" min="0" max="1000" step="100" value="0"> <br>
+    </div>
+    <div>
+      <h3>Color</h3>
+      <input type="text" id="color" value="#FFFFFF" /><br>
+    </div>
+    <span class="line"></span>
+    <div>
+      <button id="snap-btn">Snap</button>
+      <button id="snapZoom-btn">Keep Zoom</button>
+    </div>
+    <div id="dump" class="hidden"></div>
   </div>
 
 </div>
 <script>
 /**
- * This is a basic example on how to instantiate sigma. A random graph is
- * generated and stored in the "graph" variable, and then sigma is instantiated
- * directly with the graph.
- *
- * The simple instance of sigma is enough to make it render the graph on the on
- * the screen, since the graph is given directly to the constructor.
+ * This is an example on how to use sigma filters plugin on a real-world graph.
+ */
+
+
+/**
+ * DOM utility functions
+ */
+var _ = {
+  $: function (id) {
+    return document.getElementById(id);
+  }
+};
+
+function changeWidthValue() {
+    var valof = _.$("width").value;
+    _.$('width-value').innerHTML = valof;
+}
+
+/**
+ * Sigma instance
  */
 var i,
     s,
-    N = 100,
-    E = 500,
-    g = {
-      nodes: [],
-      edges: []
-    };
+    N = 60,
+    E = 180;
+
+s = new sigma();
 
 // Generate a random graph:
 for (i = 0; i < N; i++)
-  g.nodes.push({
+  s.graph.addNode({
     id: 'n' + i,
     label: 'Node ' + i,
     x: Math.random(),
     y: Math.random(),
-    size: Math.random(),
-    color: '#666'
+    color: '#666',
+    size: 1 + Math.random()
   });
 
 for (i = 0; i < E; i++)
-  g.edges.push({
+  s.graph.addEdge({
     id: 'e' + i,
     source: 'n' + (Math.random() * N | 0),
     target: 'n' + (Math.random() * N | 0),
-    size: Math.random(),
-    color: '#ccc'
+    color: '#ccc',
+    size: 1 + Math.random()
   });
 
-// Instantiate sigma:
-s = new sigma({
-  graph: g,
-  renderers: [
-      {
-        container: document.getElementById('graph-container'),
-        type: 'canvas' // sigma.renderers.canvas works as well
-      }
-    ]
+s.addRenderer({
+  container: document.getElementById('graph-container'),
+  type: 'webgl' // canvas works as well
 });
 
-$("#snap").on('click', function() {
-  var size = parseInt($("#size").val());
-  var color = $("#color").val();
+s.refresh();
 
-  if(!size || size < 1) {
-    s.renderers[0].image({download:true, background: color});
-    return;
-  }
+/**
+ * Events listener
+ */
 
-  if ($('#zoom').is(":checked"))
-  {
-    s.renderers[0].image({download:true, size: size, zoom: true, background: color})
-  } else {
-    s.renderers[0].image(s.renderers[0], {download:true, size: size, background: color});
-  }
+function generateImage(mouse, zoom) {
+  var size = parseInt(_.$("width").value);
+  var color = _.$("color").value;
+
+  sigma.plugins.image(s, {download:true, size: size, background: color, zoom:zoom});
+}
+
+_.$('width').addEventListener("change", changeWidthValue); // for IE10+
+_.$('snap-btn').addEventListener("click", generateImage);
+_.$('snapZoom-btn').addEventListener("click", function(event) {
+  generateImage(event, true)
 });
 
-
-  $(function(){
-    $("#size").after('<output></output>');
-    $('output').text($("#size").val());
-    $("#size").on('change', function() {
-      var valof = $(this).val();
-      $('output').text(valof);
-    });
-  });
 </script>

@@ -5,7 +5,7 @@
     throw 'sigma is not declared';
 
   // Initialize package:
-  sigma.utils.pkg('sigma.canvas.nodes');
+  sigma.utils.pkg('sigma.plugins');
 
   /**
    * Sigma Image Utility
@@ -50,21 +50,6 @@
   }
 
   /**
-   * Helpers
-   */
-  function extend() {
-    var i,
-        k,
-        res = {},
-        l = arguments.length;
-
-    for (i = l - 1; i >= 0; i--)
-      for (k in arguments[i])
-        res[k] = arguments[i][k];
-    return res;
-  };
-
-  /**
   * This function clone graph and generate a new canvas to download image
   *
   * Recognized parameters:
@@ -73,18 +58,28 @@
   * object:
   *
    * @param {sigma}  s       The related sigma instance.
-   * @param {object} o       The node or the edge.
-   * @param {object} options The options related to the object.
   */
 
   function cloneCanvas(s) {
-    var self = s,
-        webgl = s instanceof sigma.renderers.webgl,
+
+    var el =  document.createElement("div")
+    el.id="image-container";
+    document.body.appendChild(el);
+
+    var y = s.addRenderer({
+      container: document.getElementById('image-container'),
+      type: 'canvas'
+    });
+
+    var self = y,
+        webgl = self instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
     _canvas = document.createElement('canvas');
     _canvasContext = _canvas.getContext('2d');
+
+    s.refresh();
 
     _contexts.forEach(function(name) {
       if (!self.contexts[name])
@@ -92,6 +87,7 @@
 
       var canvas = self.domElements[name] || self.domElements.scene,
         context = self.contexts[name];
+
 
         if(!sized) {
           _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
@@ -112,32 +108,34 @@
 
     // Cleaning
     doneContexts = [];
+    document.getElementById("image-container").remove();
   }
 
-  // image function
- function image (s, params) {
-    var y = new sigma();
 
-    y = extend(s, y);
-
-    console.log(s.camera.ratio, y.camera.ratio)
-    y.camera.ratio = 1;
-    console.log(s.camera.ratio, y.camera.ratio)
-
-    if(!_canvas) {
-      cloneCanvas(y);
-    }
+  /**
+  * This function generate a new canvas to download image
+  *
+  * Recognized parameters:
+  * **********************
+  * Here is the exhaustive list of every accepted parameters in the settings
+  * object:
+  *
+   * @param {params}  Options
+  */
+ function Image(s, params) {
+    if(!_canvas && !params.zoom)
+      cloneCanvas(s);
 
     params = params || {};
 
-    if(!params.size)
+    if(!params.size || params.size < 1)
       params.size = window.innerWidth;
 
     if (params.format && !(params.format in _types))
       throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
 
-    var self = s,
-        webgl = s instanceof sigma.renderers.webgl,
+    var self = s.renderers[0],
+        webgl = self instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -214,8 +212,34 @@
     return dataUrl;
   }
 
-  // Extending canvas and webgl renderers
-  sigma.renderers.canvas.prototype.image = image;
-  sigma.renderers.webgl.prototype.image = image;
+  /**
+   * Interface
+   * ------------------
+   */
+  var _instance = null;
+
+  /**
+   * @param {sigma}  s       The related sigma instance.
+   * @param {object} options An object with options.
+   */
+  sigma.plugins.image = function(s, options) {
+    sigma.plugins.killImage();
+    // Create object if undefined
+    if (!_instance) {
+      _instance = new Image(s, options);
+    }
+    return _instance;
+  };
+
+  /**
+   *  This function kills the tooltips instance.
+   */
+  sigma.plugins.killImage = function() {
+    if (_instance instanceof Image) {
+      _instance = null;
+      _canvas = null;
+      _canvasContext = null;
+    }
+  };
 
 }).call(this);
