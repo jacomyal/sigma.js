@@ -232,7 +232,7 @@
   };
 
   /**
-   *  This function kills the tooltips instance.
+   *  This function kills the image instance.
    */
   sigma.plugins.killImage = function() {
     if (_instance instanceof Image) {
