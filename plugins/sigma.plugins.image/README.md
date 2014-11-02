@@ -14,25 +14,24 @@ To use, include all .js files under this folder.
 *Basic usage*
 
 ```js
-// Instantiate image instance
-myRenderer.image();
-
 // Download the rendered graph as an image
-myRenderer.generateImage();
+sigma.plugins.image(s, {download:true});
 ```
 
 *Complex usage*
 
 ```js
-myRenderer.generateImage({
-  size: 400,
-  format: 'jpg',
-  background: 'white',
-  labels: false
+sigma.plugins.image(s, {
+	download:true,
+	size: 400,
+	background: 'white',
+	zoom: true
 });
 ```
 
 *Parameters*
+
+* **s** [`sigma.instance`]: sigma instance.
 
 * **size** [`window.innerWidth`]: size of the image.
 * **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
