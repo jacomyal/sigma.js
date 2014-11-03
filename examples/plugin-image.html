@@ -196,7 +196,7 @@ function generateImage(mouse, zoom) {
   var size = parseInt(_.$("width").value);
   var color = _.$("color").value;
 
-  sigma.plugins.image(s, {download:true, size: size, background: color, zoom:zoom});
+  sigma.plugins.image(s, s.renderers[0], {download:true, size: size, background: color, zoom:zoom});
 }
 
 _.$('width').addEventListener("change", changeWidthValue); // for IE10+

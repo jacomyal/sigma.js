@@ -15,13 +15,13 @@ To use, include all .js files under this folder.
 
 ```js
 // Download the rendered graph as an image
-sigma.plugins.image(s, {download:true});
+sigma.plugins.image(s, s.renderers[0], {download:true});
 ```
 
 *Complex usage*
 
 ```js
-sigma.plugins.image(s, {
+sigma.plugins.image(s, s.renderers[0], {
 	download:true,
 	size: 400,
 	background: 'white',
@@ -32,7 +32,7 @@ sigma.plugins.image(s, {
 *Parameters*
 
 * **s** [`sigma.instance`]: sigma instance.
-
+* **renderer** [`sigma.renderer`]: related renderer instance.
 * **size** [`window.innerWidth`]: size of the image.
 * **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.

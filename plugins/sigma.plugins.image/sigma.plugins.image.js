@@ -50,18 +50,44 @@
   }
 
   /**
-  * This function clone graph and generate a new canvas to download image
+  * This function generate a new canvas to download image
   *
   * Recognized parameters:
   * **********************
   * Here is the exhaustive list of every accepted parameters in the settings
   * object:
-  *
-   * @param {sigma}  s       The related sigma instance.
+  * @param {s}  sigma instance
+  * @param {params}  Options
   */
+ function Image(s, renderer, params) {
+    params = params || {};
 
-  function cloneCanvas(s) {
+    if (params.format && !(params.format in _types))
+      throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
 
+    if(!params.zoom)
+      this.clone(s, params);
+
+    var merged = this.draw(renderer, params);
+
+    var dataUrl = merged.toDataURL(_types[params.format || 'png']);
+
+    if(params.download)
+      download(
+        dataUrl,
+        params.format || 'png',
+        params.filename
+      );
+
+    return dataUrl;
+  }
+
+  /**
+  * @param {s}  sigma instance
+  * @param {renderer}  related renderer instance
+  * @param {params}  Options
+  */
+  Image.prototype.clone = function(s, params) {
     var el =  document.createElement("div")
     el.id="image-container";
     document.body.appendChild(el);
@@ -71,8 +97,8 @@
       type: 'canvas'
     });
 
-    var self = y,
-        webgl = self instanceof sigma.renderers.webgl,
+    var renderer = y,
+        webgl = renderer instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -82,12 +108,14 @@
     s.refresh();
 
     _contexts.forEach(function(name) {
-      if (!self.contexts[name])
+      if (!renderer.contexts[name])
         return;
 
-      var canvas = self.domElements[name] || self.domElements.scene,
-        context = self.contexts[name];
+      if (params.labels === false && name === 'labels')
+        return;
 
+      var canvas = renderer.domElements[name] || renderer.domElements.scene,
+        context = renderer.contexts[name];
 
         if(!sized) {
           _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
@@ -111,31 +139,15 @@
     document.getElementById("image-container").remove();
   }
 
-
   /**
-  * This function generate a new canvas to download image
-  *
-  * Recognized parameters:
-  * **********************
-  * Here is the exhaustive list of every accepted parameters in the settings
-  * object:
-  *
-   * @param {params}  Options
+  * @param {renderer}  related renderer instance
+  * @param {params}  Options
   */
- function Image(s, params) {
-    if(!_canvas && !params.zoom)
-      cloneCanvas(s);
-
-    params = params || {};
-
+  Image.prototype.draw = function(renderer, params, clone) {
     if(!params.size || params.size < 1)
       params.size = window.innerWidth;
 
-    if (params.format && !(params.format in _types))
-      throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
-
-    var self = s.renderers[0],
-        webgl = self instanceof sigma.renderers.webgl,
+    var webgl = renderer instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -143,14 +155,14 @@
         mergedContext= merged.getContext('2d');
 
     _contexts.forEach(function(name) {
-      if (!self.contexts[name])
+      if (!renderer.contexts[name])
         return;
 
       if (params.labels === false && name === 'labels')
         return;
 
-      var canvas = self.domElements[name] || self.domElements.scene,
-        context = self.contexts[name];
+      var canvas = renderer.domElements[name] || renderer.domElements.scene,
+        context = renderer.contexts[name];
 
       if (~doneContexts.indexOf(context))
         return;
@@ -195,21 +207,7 @@
       doneContexts.push(context);
     });
 
-    var dataUrl = merged.toDataURL(_types[params.format || 'png']);
-
-    if(params.download)
-      download(
-        dataUrl,
-        params.format || 'png',
-        params.filename
-      );
-
-    // Cleaning
-    mergedContext = null;
-    merged  = null;
-    doneContexts = [];
-
-    return dataUrl;
+    return merged;
   }
 
   /**
