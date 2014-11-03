@@ -31,8 +31,8 @@ sigma.plugins.image(s, s.renderers[0], {
 
 *Parameters*
 
-* **s** [`sigma.instance`]: sigma instance.
-* **renderer** [`sigma.renderer`]: related renderer instance.
+* **s**: sigma instance.
+* **renderer**: related renderer instance.
 * **size** [`window.innerWidth`]: size of the image.
 * **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
