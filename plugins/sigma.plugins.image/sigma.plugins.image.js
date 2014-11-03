@@ -59,7 +59,7 @@
   * @param {s}  sigma instance
   * @param {params}  Options
   */
- function Image(s, renderer, params) {
+ function Image(s, r, params) {
     params = params || {};
 
     if (params.format && !(params.format in _types))
@@ -68,7 +68,7 @@
     if(!params.zoom)
       this.clone(s, params);
 
-    var merged = this.draw(renderer, params);
+    var merged = this.draw(r, params);
 
     var dataUrl = merged.toDataURL(_types[params.format || 'png']);
 
@@ -84,7 +84,6 @@
 
   /**
   * @param {s}  sigma instance
-  * @param {renderer}  related renderer instance
   * @param {params}  Options
   */
   Image.prototype.clone = function(s, params) {
@@ -117,16 +116,16 @@
       var canvas = renderer.domElements[name] || renderer.domElements.scene,
         context = renderer.contexts[name];
 
-        if(!sized) {
-          _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
-          _canvas.height = webgl && context instanceof WebGLRenderingContext ? canvas.height / 2 : canvas.height;
-          sized = true;
-        }
+      if(!sized) {
+        _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
+        _canvas.height = webgl && context instanceof WebGLRenderingContext ? canvas.height / 2 : canvas.height;
+        sized = true;
+      }
 
-        if (context instanceof WebGLRenderingContext)
-          _canvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
-        else
-          _canvasContext.drawImage(canvas, 0, 0);
+      if (context instanceof WebGLRenderingContext)
+        _canvasContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);
+      else
+        _canvasContext.drawImage(canvas, 0, 0);
 
       if (~doneContexts.indexOf(context))
         return;
@@ -136,6 +135,7 @@
 
     // Cleaning
     doneContexts = [];
+    s.killRenderer(y);
     document.getElementById("image-container").remove();
   }
 
@@ -143,11 +143,12 @@
   * @param {renderer}  related renderer instance
   * @param {params}  Options
   */
-  Image.prototype.draw = function(renderer, params, clone) {
+  Image.prototype.draw = function(r, params) {
+
     if(!params.size || params.size < 1)
       params.size = window.innerWidth;
 
-    var webgl = renderer instanceof sigma.renderers.webgl,
+    var webgl = r instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -155,14 +156,14 @@
         mergedContext= merged.getContext('2d');
 
     _contexts.forEach(function(name) {
-      if (!renderer.contexts[name])
+      if (!r.contexts[name])
         return;
 
       if (params.labels === false && name === 'labels')
         return;
 
-      var canvas = renderer.domElements[name] || renderer.domElements.scene,
-        context = renderer.contexts[name];
+      var canvas = r.domElements[name] || r.domElements.scene,
+        context = r.contexts[name];
 
       if (~doneContexts.indexOf(context))
         return;
@@ -207,6 +208,9 @@
       doneContexts.push(context);
     });
 
+    // Cleaning
+    doneContexts = [];
+
     return merged;
   }
 
@@ -218,13 +222,14 @@
 
   /**
    * @param {sigma}  s       The related sigma instance.
+   * @param {renderer}  r    The related renderer instance.
    * @param {object} options An object with options.
    */
-  sigma.plugins.image = function(s, options) {
+  sigma.plugins.image = function(s, r, options) {
     sigma.plugins.killImage();
     // Create object if undefined
     if (!_instance) {
-      _instance = new Image(s, options);
+      _instance = new Image(s, r, options);
     }
     return _instance;
   };

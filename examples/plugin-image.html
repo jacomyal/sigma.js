@@ -181,7 +181,7 @@ for (i = 0; i < E; i++)
     size: 1 + Math.random()
   });
 
-s.addRenderer({
+var myRenderer = s.addRenderer({
   container: document.getElementById('graph-container'),
   type: 'webgl' // canvas works as well
 });
@@ -196,7 +196,7 @@ function generateImage(mouse, zoom) {
   var size = parseInt(_.$("width").value);
   var color = _.$("color").value;
 
-  sigma.plugins.image(s, s.renderers[0], {download:true, size: size, background: color, zoom:zoom});
+  sigma.plugins.image(s, myRenderer, {download:true, size: size, background: color, zoom:zoom, labels:false});
 }
 
 _.$('width').addEventListener("change", changeWidthValue); // for IE10+
