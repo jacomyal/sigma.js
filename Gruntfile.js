@@ -72,6 +72,7 @@ module.exports = function(grunt) {
     'plugins.designer',
     'plugins.dragNodes',
     'plugins.edgeSiblings',
+    'plugins.image',
     'plugins.filter',
     'plugins.fullScreen',
     'plugins.keyboard',
