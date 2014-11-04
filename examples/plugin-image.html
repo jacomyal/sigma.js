@@ -159,7 +159,9 @@ var i,
     N = 60,
     E = 180;
 
-s = new sigma();
+s = new sigma({
+  container: 'graph-container'
+});
 
 // Generate a random graph:
 for (i = 0; i < N; i++)
@@ -181,11 +183,6 @@ for (i = 0; i < E; i++)
     size: 1 + Math.random()
   });
 
-var myRenderer = s.addRenderer({
-  container: document.getElementById('graph-container'),
-  type: 'webgl' // canvas works as well
-});
-
 s.refresh();
 
 /**
@@ -196,7 +193,7 @@ function generateImage(mouse, zoom) {
   var size = parseInt(_.$("width").value);
   var color = _.$("color").value;
 
-  sigma.plugins.image(s, myRenderer, {download:true, size: size, background: color, zoom:zoom, labels:false});
+  sigma.plugins.image(s, s.renderers[0], {download:true, size: size, background: color, zoom:zoom, labels:false});
 }
 
 _.$('width').addEventListener("change", changeWidthValue); // for IE10+
