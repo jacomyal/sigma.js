@@ -99,13 +99,6 @@
       );
     }
 
-    // Bind resize:
-    window.addEventListener(
-      'resize',
-      this.boundResize = this.resize.bind(this),
-      false
-    );
-
     // Deal with sigma events:
     sigma.misc.bindEvents.call(this, this.camera.prefix);
     sigma.misc.drawHovers.call(this, this.camera.prefix);
@@ -137,6 +130,7 @@
         i,
         l,
         k,
+        type,
         renderer,
         graph = this.graph,
         options = sigma.utils.extend(options, this.options);
@@ -150,7 +144,8 @@
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.edges[a[i].type]) ? a[i].type : 'def';
+      type = a[i].type || this.settings(options, 'defaultEdgeType');
+      k = (type && sigma.webgl.edges[type]) ? type : 'def';
 
       if (!this.edgeFloatArrays[k])
         this.edgeFloatArrays[k] = {
@@ -161,7 +156,8 @@
     }
 
     for (a = graph.nodes(), i = 0, l = a.length; i < l; i++) {
-      k = (a[i].type && sigma.webgl.nodes[a[i].type]) ? k : 'def';
+      type = a[i].type || this.settings(options, 'defaultNodeType');
+      k = (type && sigma.webgl.nodes[type]) ? type : 'def';
 
       if (!this.nodeFloatArrays[k])
         this.nodeFloatArrays[k] = {
@@ -258,12 +254,15 @@
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes');
 
+    // Call the resize function:
+    this.resize(false);
+
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
       if (this.camera.isAnimated || this.camera.isMoving)
         drawEdges = false;
 
-    // Clear and resize canvases:
+    // Clear canvases:
     this.clear();
 
     // Translate matrix to [width/2, height/2]:
@@ -324,7 +323,10 @@
                   width: this.width,
                   height: this.height,
                   ratio: this.camera.ratio,
-                  scalingRatio: this.settings('webglOversamplingRatio'),
+                  scalingRatio: this.settings(
+                    options,
+                    'webglOversamplingRatio'
+                  ),
                   start: start,
                   count: end - start
                 }
@@ -384,7 +386,7 @@
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
-                scalingRatio: this.settings('webglOversamplingRatio')
+                scalingRatio: this.settings(options, 'webglOversamplingRatio')
               }
             );
           }
@@ -417,7 +419,7 @@
               width: this.width,
               height: this.height,
               ratio: this.camera.ratio,
-              scalingRatio: this.settings('webglOversamplingRatio')
+              scalingRatio: this.settings(options, 'webglOversamplingRatio')
             }
           );
         }
@@ -450,8 +452,10 @@
       for (i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
           (
-            sigma.canvas.labels[a[i].type] ||
-            sigma.canvas.labels.def
+            sigma.canvas.labels[
+              a[i].type ||
+              this.settings(options, 'defaultNodeType')
+            ] || sigma.canvas.labels.def
           )(a[i], this.contexts.labels, o);
     }
 
@@ -587,9 +591,6 @@
   sigma.renderers.webgl.prototype.kill = function() {
     var k,
         captor;
-
-    // Unbind resize:
-    window.removeEventListener('resize', this.boundResize);
 
     // Kill captors:
     while ((captor = this.captors.pop()))

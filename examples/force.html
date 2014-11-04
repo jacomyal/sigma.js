@@ -9,6 +9,7 @@
 <script src="../src/classes/sigma.classes.graph.js"></script>
 <script src="../src/classes/sigma.classes.camera.js"></script>
 <script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
 <script src="../src/captors/sigma.captors.mouse.js"></script>
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
@@ -27,6 +28,11 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
 <script src="../src/renderers/svg/sigma.svg.utils.js"></script>
 <script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
 <script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
@@ -92,8 +98,8 @@ for (i = 0; i < N; i++) {
   g.nodes.push({
     id: 'n' + i,
     label: 'Node' + i,
-    x: Math.cos(2 * i * Math.PI / N),
-    y: Math.sin(2 * i * Math.PI / N),
+    x: 100 * Math.cos(2 * i * Math.PI / N),
+    y: 100 * Math.sin(2 * i * Math.PI / N),
     size: Math.random(),
     color: o.color
   });
@@ -126,5 +132,5 @@ s = new sigma({
 });
 
 // Start the ForceAtlas2 algorithm:
-s.startForceAtlas2();
+s.startForceAtlas2({worker: true, barnesHutOptimize: false});
 </script>

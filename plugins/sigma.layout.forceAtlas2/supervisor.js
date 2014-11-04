@@ -63,13 +63,12 @@
     }
     else {
 
-      // TODO: do we crush?
       eval(workerFn);
     }
 
     // Worker message receiver
-    var msgName = (this.worker) ? 'message' : 'newCoords';
-    (this.worker || document).addEventListener(msgName, function(e) {
+    this.msgName = (this.worker) ? 'message' : 'newCoords';
+    this.listener = function(e) {
 
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
@@ -86,10 +85,17 @@
         // Rendering graph
         _this.sigInst.refresh();
       }
-    });
+    };
+
+    (this.worker || document).addEventListener(this.msgName, this.listener);
 
     // Filling byteArrays
     this.graphToByteArrays();
+
+    // Binding on kill to properly terminate layout when parent is killed
+    sigInst.bind('kill', function() {
+      sigInst.killForceAtlas2();
+    });
   }
 
   Supervisor.prototype.makeBlob = function(workerFn) {
@@ -100,8 +106,8 @@
     }
     catch (e) {
       _root.BlobBuilder = _root.BlobBuilder ||
-                           _root.WebKitBlobBuilder ||
-                           _root.MozBlobBuilder;
+                          _root.WebKitBlobBuilder ||
+                          _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -194,6 +200,14 @@
 
     this.running = true;
 
+    // Do not refresh edgequadtree during layout:
+    var k,
+        c;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = false;
+    }
+
     if (!this.started) {
 
       // Sending init message to worker
@@ -209,12 +223,45 @@
     if (!this.running)
       return;
 
+    // Allow to refresh edgequadtree:
+    var k,
+        c,
+        bounds;
+    for (k in this.sigInst.cameras) {
+      c = this.sigInst.cameras[k];
+      c.edgequadtree._enabled = true;
+
+      // Find graph boundaries:
+      bounds = sigma.utils.getBoundaries(
+        this.graph,
+        c.readPrefix
+      );
+
+      // Refresh edgequadtree:
+      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+        c.edgequadtree.index(this.sigInst.graph, {
+          prefix: c.readPrefix,
+          bounds: {
+            x: bounds.minX,
+            y: bounds.minY,
+            width: bounds.maxX - bounds.minX,
+            height: bounds.maxY - bounds.minY
+          }
+        });
+    }
+
     this.running = false;
   };
 
   // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
-    this.worker && this.worker.terminate();
+    if (this.worker) {
+      this.worker.terminate();
+    }
+    else {
+      _root.postMessage({action: 'kill'}, '*');
+      document.removeEventListener(this.msgName, this.listener);
+    }
   };
 
   Supervisor.prototype.configure = function(config) {

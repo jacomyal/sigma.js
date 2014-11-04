@@ -84,9 +84,180 @@
       return selected;
     }
 
+
+    function getEdges(e) {
+      if (!self.settings('enableEdgeHovering')) {
+        // No event if the setting is off:
+        return [];
+      }
+
+      var isCanvas = (
+        sigma.renderers.canvas && self instanceof sigma.renderers.canvas);
+
+      if (!isCanvas) {
+        // A quick hardcoded rule to prevent people from using this feature
+        // with the WebGL renderer (which is not good enough at the moment):
+        throw new Error(
+          'The edge events feature is not compatible with the WebGL renderer'
+        );
+      }
+
+      if (e) {
+        mX = 'x' in e.data ? e.data.x : mX;
+        mY = 'y' in e.data ? e.data.y : mY;
+      }
+
+      var i,
+          j,
+          l,
+          a,
+          edge,
+          s,
+          maxEpsilon = self.settings('edgeHoverPrecision'),
+          source,
+          target,
+          cp,
+          nodeIndex = {},
+          inserted,
+          selected = [],
+          modifiedX = mX + self.width / 2,
+          modifiedY = mY + self.height / 2,
+          point = self.camera.cameraPosition(
+            mX,
+            mY
+          ),
+          edges = [];
+
+      if (isCanvas) {
+        var nodesOnScreen = self.camera.quadtree.area(
+          self.camera.getRectangle(self.width, self.height)
+        );
+        for (a = nodesOnScreen, i = 0, l = a.length; i < l; i++)
+          nodeIndex[a[i].id] = a[i];
+      }
+
+      if (self.camera.edgequadtree !== undefined) {
+        edges = self.camera.edgequadtree.point(
+          point.x,
+          point.y
+        );
+      }
+
+      function insertEdge(selected, edge) {
+        inserted = false;
+
+        for (j = 0; j < selected.length; j++)
+          if (edge.size > selected[j].size) {
+            selected.splice(j, 0, edge);
+            inserted = true;
+            break;
+          }
+
+        if (!inserted)
+          selected.push(edge);
+      }
+
+      if (edges.length)
+        for (i = 0, l = edges.length; i < l; i++) {
+          edge = edges[i];
+          source = self.graph.nodes(edge.source);
+          target = self.graph.nodes(edge.target);
+          // (HACK) we can't get edge[prefix + 'size'] on WebGL renderer:
+          s = edge[prefix + 'size'] ||
+              edge['read_' + prefix + 'size'];
+
+          // First, let's identify which edges are drawn. To do this, we keep
+          // every edges that have at least one extremity displayed according to
+          // the quadtree and the "hidden" attribute. We also do not keep hidden
+          // edges.
+          // Then, let's check if the mouse is on the edge (we suppose that it
+          // is a line segment).
+
+          if (
+            !edge.hidden &&
+            !source.hidden && !target.hidden &&
+            (!isCanvas ||
+              (nodeIndex[edge.source] || nodeIndex[edge.target])) &&
+            sigma.utils.getDistance(
+              source[prefix + 'x'],
+              source[prefix + 'y'],
+              modifiedX,
+              modifiedY) > source[prefix + 'size'] &&
+            sigma.utils.getDistance(
+              target[prefix + 'x'],
+              target[prefix + 'y'],
+              modifiedX,
+              modifiedY) > target[prefix + 'size']
+          ) {
+            if (edge.type == 'curve' || edge.type == 'curvedArrow') {
+              if (source.id === target.id) {
+                cp = sigma.utils.getSelfLoopControlPoints(
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  source[prefix + 'size']
+                );
+                if (
+                  sigma.utils.isPointOnBezierCurve(
+                  modifiedX,
+                  modifiedY,
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y'],
+                  cp.x1,
+                  cp.y1,
+                  cp.x2,
+                  cp.y2,
+                  Math.max(s, maxEpsilon)
+                )) {
+                  insertEdge(selected, edge);
+                }
+              }
+              else {
+                cp = sigma.utils.getQuadraticControlPoint(
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y']);
+                if (
+                  sigma.utils.isPointOnQuadraticCurve(
+                  modifiedX,
+                  modifiedY,
+                  source[prefix + 'x'],
+                  source[prefix + 'y'],
+                  target[prefix + 'x'],
+                  target[prefix + 'y'],
+                  cp.x,
+                  cp.y,
+                  Math.max(s, maxEpsilon)
+                )) {
+                  insertEdge(selected, edge);
+                }
+              }
+            } else if (
+                sigma.utils.isPointOnSegment(
+                modifiedX,
+                modifiedY,
+                source[prefix + 'x'],
+                source[prefix + 'y'],
+                target[prefix + 'x'],
+                target[prefix + 'y'],
+                Math.max(s, maxEpsilon)
+              )) {
+              insertEdge(selected, edge);
+            }
+          }
+        }
+
+      return selected;
+    }
+
+
     function bindCaptor(captor) {
       var nodes,
-          over = {};
+          edges,
+          overNodes = {},
+          overEdges = {};
 
       function onClick(e) {
         if (!self.settings('eventsEnabled'))
@@ -95,6 +266,7 @@
         self.dispatchEvent('click', e.data);
 
         nodes = getNodes(e);
+        edges = getEdges(e);
 
         if (nodes.length) {
           self.dispatchEvent('clickNode', {
@@ -103,6 +275,15 @@
           });
           self.dispatchEvent('clickNodes', {
             node: nodes,
+            captor: e.data
+          });
+        } else if (edges.length) {
+          self.dispatchEvent('clickEdge', {
+            edge: edges[0],
+            captor: e.data
+          });
+          self.dispatchEvent('clickEdges', {
+            edge: edges,
             captor: e.data
           });
         } else
@@ -116,6 +297,7 @@
         self.dispatchEvent('doubleClick', e.data);
 
         nodes = getNodes(e);
+        edges = getEdges(e);
 
         if (nodes.length) {
           self.dispatchEvent('doubleClickNode', {
@@ -124,6 +306,15 @@
           });
           self.dispatchEvent('doubleClickNodes', {
             node: nodes,
+            captor: e.data
+          });
+        } else if (edges.length) {
+          self.dispatchEvent('doubleClickEdge', {
+            edge: edges[0],
+            captor: e.data
+          });
+          self.dispatchEvent('doubleClickEdges', {
+            edge: edges,
             captor: e.data
           });
         } else
@@ -145,6 +336,15 @@
             node: nodes,
             captor: e.data
           });
+        } else if (edges.length) {
+          self.dispatchEvent('rightClickEdge', {
+            edge: edges[0],
+            captor: e.data
+          });
+          self.dispatchEvent('rightClickEdges', {
+            edge: edges,
+            captor: e.data
+          });
         } else
           self.dispatchEvent('rightClickStage', {captor: e.data});
       }
@@ -156,21 +356,36 @@
         var k,
             i,
             l,
-            out = [];
+            le,
+            outNodes = [],
+            outEdges = [];
 
-        for (k in over)
-          out.push(over[k]);
+        for (k in overNodes)
+          outNodes.push(overNodes[k]);
 
-        over = {};
+        overNodes = {};
         // Dispatch both single and multi events:
-        for (i = 0, l = out.length; i < l; i++)
+        for (i = 0, l = outNodes.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: out[i],
+            node: outNodes[i],
             captor: e.data
           });
-        if (out.length)
+        if (outNodes.length)
           self.dispatchEvent('outNodes', {
-            nodes: out,
+            nodes: outNodes,
+            captor: e.data
+          });
+
+        overEdges = {};
+        // Dispatch both single and multi events:
+        for (i = 0, l = outEdges.length; i < le; i++)
+          self.dispatchEvent('outEdge', {
+            edge: outEdges[i],
+            captor: e.data
+          });
+        if (outNodes.length)
+          self.dispatchEvent('outEdges', {
+            edges: outEdges,
             captor: e.data
           });
       }
@@ -180,51 +395,96 @@
           return;
 
         nodes = getNodes(e);
+        edges = getEdges(e);
 
         var i,
             k,
-            n,
-            newOut = [],
-            newOvers = [],
-            currentOvers = {},
-            l = nodes.length;
+            node,
+            edge,
+            newOutNodes = [],
+            newOverNodes = [],
+            currentOverNodes = {},
+            l = nodes.length,
+            newOutEdges = [],
+            newOverEdges = [],
+            currentOverEdges = {},
+            le = edges.length;
 
         // Check newly overred nodes:
         for (i = 0; i < l; i++) {
-          n = nodes[i];
-          currentOvers[n.id] = n;
-          if (!over[n.id]) {
-            newOvers.push(n);
-            over[n.id] = n;
+          node = nodes[i];
+          currentOverNodes[node.id] = node;
+          if (!overNodes[node.id]) {
+            newOverNodes.push(node);
+            overNodes[node.id] = node;
           }
         }
 
         // Check no more overred nodes:
-        for (k in over)
-          if (!currentOvers[k]) {
-            newOut.push(over[k]);
-            delete over[k];
+        for (k in overNodes)
+          if (!currentOverNodes[k]) {
+            newOutNodes.push(overNodes[k]);
+            delete overNodes[k];
           }
 
         // Dispatch both single and multi events:
-        for (i = 0, l = newOvers.length; i < l; i++)
+        for (i = 0, l = newOverNodes.length; i < l; i++)
           self.dispatchEvent('overNode', {
-            node: newOvers[i],
+            node: newOverNodes[i],
             captor: e.data
           });
-        for (i = 0, l = newOut.length; i < l; i++)
+        for (i = 0, l = newOutNodes.length; i < l; i++)
           self.dispatchEvent('outNode', {
-            node: newOut[i],
+            node: newOutNodes[i],
             captor: e.data
           });
-        if (newOvers.length)
+        if (newOverNodes.length)
           self.dispatchEvent('overNodes', {
-            nodes: newOvers,
+            nodes: newOverNodes,
             captor: e.data
           });
-        if (newOut.length)
+        if (newOutNodes.length)
           self.dispatchEvent('outNodes', {
-            nodes: newOut,
+            nodes: newOutNodes,
+            captor: e.data
+          });
+
+        // Check newly overred edges:
+        for (i = 0; i < le; i++) {
+          edge = edges[i];
+          currentOverEdges[edge.id] = edge;
+          if (!overEdges[edge.id]) {
+            newOverEdges.push(edge);
+            overEdges[edge.id] = edge;
+          }
+        }
+
+        // Check no more overred edges:
+        for (k in overEdges)
+          if (!currentOverEdges[k]) {
+            newOutEdges.push(overEdges[k]);
+            delete overEdges[k];
+          }
+
+        // Dispatch both single and multi events:
+        for (i = 0, le = newOverEdges.length; i < le; i++)
+          self.dispatchEvent('overEdge', {
+            edge: newOverEdges[i],
+            captor: e.data
+          });
+        for (i = 0, le = newOutEdges.length; i < le; i++)
+          self.dispatchEvent('outEdge', {
+            edge: newOutEdges[i],
+            captor: e.data
+          });
+        if (newOverEdges.length)
+          self.dispatchEvent('overEdges', {
+            edges: newOverEdges,
+            captor: e.data
+          });
+        if (newOutEdges.length)
+          self.dispatchEvent('outEdges', {
+            edges: newOutEdges,
             captor: e.data
           });
       }

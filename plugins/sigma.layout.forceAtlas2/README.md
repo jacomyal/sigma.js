@@ -7,7 +7,7 @@ Plugin by [Guillaume Plique](https://github.com/Yomguithereal).
 
 ---
 
-This plugin implements [ForceAtlas2](http://www.medialab.sciences-po.fr/publications/Jacomy_Heymann_Venturini-Force_Atlas2.pdf), a force-directed layout algorithm.
+This plugin implements [ForceAtlas2](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0098679), a force-directed layout algorithm.
 
 For optimization purposes, the algorithm's computations are delegated to a web worker.
 
@@ -64,7 +64,11 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
+* **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²)` to `O(nlog(n))`)? This is useful for large graph but harmful to small ones.
+* **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
+* **startingIterations** *integer* `1`: number of iterations to be run before the first render.
+* **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
 
 *Supervisor configuration*
 
@@ -72,6 +76,4 @@ sigmaInstance.isForceAtlas2Running();
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
 
 ## Notes
-1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
-
-2. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.
+1. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.

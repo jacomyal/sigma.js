@@ -29,6 +29,10 @@
     // {string}
     classPrefix: 'sigma',
     // {string}
+    defaultNodeType: 'def',
+    // {string}
+    defaultEdgeType: 'def',
+    // {string}
     defaultLabelColor: '#000',
     // {string}
     defaultEdgeColor: '#000',
@@ -39,6 +43,8 @@
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
     edgeColor: 'source',
+    // {number} Defines the minimal edge's arrow display size.
+    minArrowSize: 0,
     // {string}
     font: 'arial',
     // {string} Example: 'bold'
@@ -86,12 +92,23 @@
     labelHoverColor: 'default',
     // {string}
     defaultLabelHoverColor: '#000',
+    // {string} Indicates how to choose the edges hover color. Available values:
+    //          "edge", "default"
+    edgeHoverColor: 'edge',
+    // {number} The size multiplicator of hovered edges.
+    edgeHoverSizeRatio: 1,
+    // {string}
+    defaultEdgeHoverColor: '#000',
+    // {boolean} Indicates if the edge extremities must be hovered when the
+    //           edge is hovered.
+    edgeHoverExtremities: false,
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
-    drawLabels: true,
     drawEdges: true,
     drawNodes: true,
+    drawLabels: true,
+    drawEdgeLabels: false,
     // {boolean} Indicates if the edges must be drawn in several frames or in
     //           one frame, as the nodes and labels are drawn.
     batchEdgesDrawing: false,
@@ -138,6 +155,8 @@
     touchEnabled: true,
     // {boolean}
     mouseEnabled: true,
+    // {boolean}
+    mouseWheelEnabled: true,
     // {boolean}
     doubleClickEnabled: true,
     // {boolean} Defines whether the custom events such as "clickNode" can be
@@ -191,6 +210,10 @@
     enableCamera: true,
     // {boolean} If set to false, the nodes cannot be hovered.
     enableHovering: true,
+    // {boolean} If set to true, the edges can be hovered.
+    enableEdgeHovering: false,
+    // {number} The size of the area around the edges to activate hovering.
+    edgeHoverPrecision: 5,
     // {boolean} If set to true, the rescale middleware will ignore node sizes
     //           to determine the graphs boundings.
     rescaleIgnoreSize: false,

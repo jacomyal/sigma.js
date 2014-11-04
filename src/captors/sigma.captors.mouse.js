@@ -44,6 +44,8 @@
 
         _isMouseDown,
         _isMoving,
+        _hasDragged,
+        _downStartTime,
         _movingTimeoutId;
 
     sigma.classes.dispatcher.extend(this);
@@ -106,6 +108,7 @@
 
       if (_settings('mouseEnabled') && _isMouseDown) {
         _isMoving = true;
+        _hasDragged = true;
 
         if (_movingTimeoutId)
           clearTimeout(_movingTimeoutId);
@@ -220,6 +223,9 @@
         _startMouseX = sigma.utils.getX(e);
         _startMouseY = sigma.utils.getY(e);
 
+        _hasDragged = false;
+        _downStartTime = (new Date()).getTime();
+
         switch (e.which) {
           case 2:
             // Middle mouse button pressed
@@ -284,7 +290,10 @@
           ctrlKey: e.ctrlKey,
           metaKey: e.metaKey,
           altKey: e.altKey,
-          shiftKey: e.shiftKey
+          shiftKey: e.shiftKey,
+          isDragging:
+            (((new Date()).getTime() - _downStartTime) > 100) &&
+            _hasDragged
         });
 
       if (e.preventDefault)
@@ -356,7 +365,7 @@
           ratio,
           animation;
 
-      if (_settings('mouseEnabled')) {
+      if (_settings('mouseEnabled') && _settings('mouseWheelEnabled')) {
         ratio = sigma.utils.getDelta(e) > 0 ?
           1 / _settings('zoomingRatio') :
           _settings('zoomingRatio');

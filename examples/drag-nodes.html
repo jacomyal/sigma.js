@@ -9,6 +9,7 @@
 <script src="../src/classes/sigma.classes.graph.js"></script>
 <script src="../src/classes/sigma.classes.camera.js"></script>
 <script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
 <script src="../src/captors/sigma.captors.mouse.js"></script>
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
@@ -27,6 +28,11 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
 <script src="../src/renderers/svg/sigma.svg.utils.js"></script>
 <script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
 <script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
@@ -50,8 +56,19 @@
       right: 0;
       position: absolute;
     }
+
+    #sidebar {
+      bottom: 0;
+      right: 0;
+      width: 200px;
+      height: 150px;
+      position: absolute;
+      background-color: #999;
+      padding: 10px;
+    }
   </style>
   <div id="graph-container"></div>
+  <div id="sidebar">This area is not a drop target.</div>
 </div>
 <script>
 /**
@@ -93,5 +110,18 @@ s = new sigma({
 });
 
 // Initialize the dragNodes plugin:
-sigma.plugins.dragNodes(s, s.renderers[0]);
+var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+
+dragListener.bind('startdrag', function(event) {
+  console.log(event);
+});
+dragListener.bind('drag', function(event) {
+  console.log(event);
+});
+dragListener.bind('drop', function(event) {
+  console.log(event);
+});
+dragListener.bind('dragend', function(event) {
+  console.log(event);
+});
 </script>
