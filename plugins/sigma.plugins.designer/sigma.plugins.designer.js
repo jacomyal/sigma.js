@@ -81,6 +81,9 @@
         i,
         res = {};
 
+    if (!values.length)
+      return res;
+
     // sort values by inverse order:
     numlist = values.map(function (val) {
       return parseFloat(val);
@@ -194,7 +197,10 @@
     this.sigmaSettings = Object.create(null);
 
     // properties are sequential or qualitative data
-    this.dataTypes = Object.create(null)
+    this.dataTypes = Object.create(null);
+
+    // original values of visual variables
+    this.originalVisualVariable = Object.create(null);
 
     return this;
   };
@@ -230,8 +236,7 @@
           self.idx[key][val] = {
             key: val,
             items: [],
-            styles: Object.create(null),
-            orig_styles: Object.create(null)
+            styles: Object.create(null)
           };
         }
         self.idx[key][val].items.push(item);
@@ -395,7 +400,8 @@
     if (_visualVars.indexOf(visualVar) == -1)
       throw 'Vision.applyStyle: Unknown style "' + visualVar + '"';
 
-    var idxp = this.get(key);
+    var self = this,
+        idxp = this.get(key);
 
     Object.keys(idxp).forEach(function (val) {
       var o = idxp[val];
@@ -404,9 +410,12 @@
             o.styles !== undefined &&
             typeof o.styles[visualVar] === 'function') {
 
-          if (!(visualVar in o.orig_styles)) {
+          if (!self.originalVisualVariable[item.id]) {
+            self.originalVisualVariable[item.id] = {};
+          }
+          if (!(visualVar in self.originalVisualVariable[item.id])) {
             // non-writable property
-            Object.defineProperty(o.orig_styles, visualVar, {
+            Object.defineProperty(self.originalVisualVariable[item.id], visualVar, {
              enumerable: true,
              value: item[visualVar]
             });
@@ -477,8 +486,6 @@
    * @param {string} key       The property accessor.
    */
   Vision.prototype.undoStyle = function(visualVar, key) {
-    var self = this;
-
     if (key === undefined)
       throw 'Vision.undoStyle: Missing property accessor';
     if (typeof key !== 'string')
@@ -490,15 +497,19 @@
     if (this.idx[key] === undefined)
       return;
 
+    var self = this;
+
     Object.keys(this.idx[key]).forEach(function (val) {
       var o = self.idx[key][val];
       o.items.forEach(function (item) {
         if (item !== undefined && item[visualVar] !== undefined) {
 
-          if (o.orig_styles === undefined || o.orig_styles[visualVar] === undefined)
+          if (self.originalVisualVariable[item.id] === undefined ||
+            self.originalVisualVariable[item.id][visualVar] === undefined) {
             delete item[visualVar];
+        }
           else
-            item[visualVar] = o.orig_styles[visualVar];
+            item[visualVar] = self.originalVisualVariable[item.id][visualVar];
         }
       });
     });
@@ -924,7 +935,7 @@
     }
 
     if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Designer.utils.histogram: Unknown style';
+      throw 'Designer.utils.histogram: Unknown visual variable.';
 
     if (property === undefined)
       throw 'Designer.utils.histogram: Missing property accessor';
