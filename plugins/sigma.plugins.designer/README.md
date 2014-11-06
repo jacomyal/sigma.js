@@ -182,10 +182,26 @@ designer.omit('nodes', 'size');
 ```
 
 ### Deprecate the designer's vision
-The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called:
+The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called.
 
 ```js
 designer.deprecate();
+designer.make('nodes', 'color'); // refresh node colors
+designer.makeAll(); // refresh all styles but node colors
+```
+
+Deprecate all node styles as follows:
+
+```js
+designer.deprecate('nodes');
+designer.make('nodes'); // refresh node styles
+designer.makeAll(); // refresh all styles but node colors
+```
+
+Deprecate a specified style as follows:
+
+```js
+designer.deprecate('nodes', 'color');
 designer.make('nodes', 'color'); // refresh node colors
 designer.makeAll(); // refresh all styles but node colors
 ```
