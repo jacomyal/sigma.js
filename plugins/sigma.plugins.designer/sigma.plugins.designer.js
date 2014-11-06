@@ -402,7 +402,7 @@
       o.items.forEach(function (item) {
         if (item !== undefined &&
             o.styles !== undefined &&
-            o.styles[visualVar]) {
+            typeof o.styles[visualVar] === 'function') {
 
           if (!(visualVar in o.orig_styles)) {
             // non-writable property
@@ -415,6 +415,10 @@
           var newVal = o.styles[visualVar](item);
           if (newVal !== undefined)
             item[visualVar] = o.styles[visualVar](item);
+        }
+        else {
+          if (typeof o.styles[visualVar] === 'function')
+            throw 'Vision.applyStyle: ' + o.styles + '.' + visualVar + 'must be a function.';
         }
       });
     });
@@ -489,9 +493,9 @@
     Object.keys(this.idx[key]).forEach(function (val) {
       var o = self.idx[key][val];
       o.items.forEach(function (item) {
-        if (item !== undefined) {
+        if (item !== undefined && item[visualVar] !== undefined) {
 
-          if (o.orig_styles === undefined)
+          if (o.orig_styles === undefined || o.orig_styles[visualVar] === undefined)
             delete item[visualVar];
           else
             item[visualVar] = o.orig_styles[visualVar];
@@ -751,19 +755,50 @@
 
   /**
    * This method is used when the styles are deprecated, for instance when the
-   * graph has changed. Each property style will be remakeed the next time it
-   * is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`.
+   * graph has changed. The specified property style will be remade the next
+   * time it is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`
+   * or all property styles if called without argument.
    *
-   * @return {Designer}  The instance.
+   * @param  {?string} target  The data target. Available values:
+   *                           "nodes", "edges".
+   * @param  {?string} key     The property accessor. Use a dot notation like
+   *                           'data.myProperty'.
+   * @return {Designer}        The instance.
    */
-  Designer.prototype.deprecate = function() {
-    Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
-      _visionOnNodes.deprecated[prop] = true;
-    });
+  Designer.prototype.deprecate = function(target, key) {
+    if (target) {
+      if (target !== 'nodes' && target !== 'edges')
+        throw '"Designer.deprecate": Unknown target ' + target;
 
-    Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
-      _visionOnEdges.deprecated[prop] = true;
-    });
+      if (key) {
+        if (target === 'nodes')
+          _visionOnNodes.deprecated[key] = true;
+        else if (target === 'edges')
+          _visionOnEdges.deprecated[key] = true;
+        else
+          throw '"Designer.deprecate": Unknown target ' + target;
+      }
+      else {
+        if (target === 'nodes')
+          Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
+            _visionOnNodes.deprecated[prop] = true;
+          });
+        else if (target === 'edges')
+          Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
+            _visionOnEdges.deprecated[prop] = true;
+          });
+      }
+    }
+    else {
+      Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
+        _visionOnNodes.deprecated[prop] = true;
+      });
+
+      Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
+        _visionOnEdges.deprecated[prop] = true;
+      });
+    }
+
     return this;
   };
 
