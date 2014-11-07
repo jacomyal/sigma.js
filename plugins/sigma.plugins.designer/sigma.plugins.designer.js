@@ -991,7 +991,9 @@
    */
   sigma.plugins.killDesigner = function() {
     if (_instance instanceof Designer) {
-      _instance.disown();
+      _mappings = sigma.utils.extend({}, settings);
+      _visionOnNodes = new Vision('nodes');
+      _visionOnEdges = new Vision('edges');
     }
     _s = null;
     _instance = null;
