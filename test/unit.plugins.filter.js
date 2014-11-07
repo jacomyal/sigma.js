@@ -382,7 +382,6 @@ test('API', function() {
     'The internal chain is a deep copy of the imported chain'
   );
 
-
   throws(
     function() {
       filter.nodesBy(function() {}, 5);
@@ -424,5 +423,31 @@ test('API', function() {
     /The filter \"a\" already exists./,
     'Registering two filters with the same key throws an error.'
   );
+
+  // check plugin lifecycle
+  filter.kill();
+  s.kill();
+  s = new sigma();
+  filter = new sigma.plugins.filter(s);
+  s.graph.read(graph);
+  filter.nodesBy(function (n) {
+    return this.degree(n.id) > 0;
+  }, 'degree');
+  filter.apply();
+
+  deepEqual(
+    hiddenNodes(),
+    [ s.graph.nodes('n4') ],
+    '"apply" applies a nodesBy filter after a kill of the plugin and sigma, and a new instanciation of them.'
+  );
+
+  sigma.plugins.killFilter(s);
+  deepEqual(
+    filter.export(),
+    [],
+    'The filters chain is empty after `killFilter` is called.'
+  );
+  filter.apply(); // does nothing
+  filter.undo(); // does nothing
 
 });

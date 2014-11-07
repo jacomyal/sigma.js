@@ -7,6 +7,9 @@
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
 
+
+  var _instance = {};
+
   // Add custom graph methods:
   /**
    * This methods returns an array of nodes that are adjacent to a node.
@@ -171,12 +174,6 @@
       _g = s.graph,
       _chain = [], // chain of wrapped filters
       _keysIndex = Object.create(null);
-    
-    // Binding on kill to clear the references
-    _s.bind('kill', function() {
-      console.log('kill');
-      _self.kill();
-    });
 
     /**
      * This function adds a filter to the chain of filters.
@@ -324,7 +321,7 @@
         _chain.shift();
       }
 
-      _s.refresh();
+      if (_s) _s.refresh();
 
       return this;
     };
@@ -380,6 +377,8 @@
       unregister(q);
 
       function processor() {
+        if (!_g) return;
+
         var n = _g.nodes(),
             ln = n.length,
             e = _g.edges(),
@@ -417,6 +416,7 @@
 
     this.kill = function() {
       this.clear();
+      delete _instance[_s.id];
       _g = null;
       _s = null;
       return this;
@@ -504,7 +504,6 @@
    *
    * > var filter = sigma.plugins.filter(s);
    */
-  var _instance = {};
 
   /**
    * @param  {sigma} s The related sigma instance.
@@ -513,19 +512,25 @@
     // Create filter if undefined
     if (!_instance[s.id]) {
       _instance[s.id] = new Filter(s);
+
+      // Binding on kill to clear the references
+      s.bind('kill', function() {
+        sigma.plugins.killFilter(s);
+      });
     }
     return _instance[s.id];
   };
 
   /**
    *  This function kills the filter instance.
+   *
+   * @param  {sigma} s The related sigma instance.
    */
-  sigma.plugins.killFilter = function() {
-    if (_instance instanceof Filter) {
-      _instance.undo().apply();
-      _instance.clear();
+  sigma.plugins.killFilter = function(s) {
+    if (_instance[s.id] instanceof Filter) {
+      _instance[s.id].kill();
     }
-    _instance = {};
+    delete _instance[s.id];
   };
 
 }).call(this);
