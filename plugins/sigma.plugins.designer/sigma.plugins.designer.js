@@ -171,12 +171,14 @@
     // nodes or edges:
     if (dataset === 'nodes') {
       this.dataset = function(s) {
+        if (!s) return [];
         return s.graph.nodes();
       }
       this.mappings = _mappings.nodes;
     }
     else if (dataset === 'edges') {
       this.dataset = function(s) {
+        if (!s) return [];
         return s.graph.edges();
       }
       this.mappings = _mappings.edges;
@@ -678,7 +680,7 @@
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
-    _s.refresh({skipIndexation: true});
+    if (_s) _s.refresh({skipIndexation: true});
 
     return this;
   };
@@ -748,7 +750,7 @@
     }
 
     //see https://github.com/jacomyal/sigma.js/issues/397
-    _s.refresh({skipIndexation: true});
+    if (_s) _s.refresh({skipIndexation: true});
 
     return this;
   };
@@ -826,7 +828,7 @@
     _visionOnEdges = new Vision('edges');
 
     //see https://github.com/jacomyal/sigma.js/issues/397
-    _s.refresh({skipIndexation: true});
+    if (_s) _s.refresh({skipIndexation: true});
 
     return this;
   };
@@ -991,8 +993,8 @@
     if (_instance instanceof Designer) {
       _instance.disown();
     }
-    _instance = null;
     _s = null;
+    _instance = null;
   };
 
 }).call(this);
