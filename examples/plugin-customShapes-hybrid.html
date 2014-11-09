@@ -91,7 +91,7 @@ for (i = 0; i < N; i++) {
     label: 'Node ' + i,
     // note the ShapeLibrary.enumerate() returns the names of all
     // supported renderers
-    type: 'equilateral',//ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
+    type: ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
     x: Math.random(),
     y: Math.random(),
     size: Math.random(),
