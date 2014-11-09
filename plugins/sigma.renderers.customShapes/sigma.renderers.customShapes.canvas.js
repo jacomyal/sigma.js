@@ -6,20 +6,15 @@
 
   if (typeof ShapeLibrary === 'undefined')
     throw 'ShapeLibrary is not declared';
-  
+
 
   // Initialize package:
   sigma.utils.pkg('sigma.canvas.nodes');
 
-  var sigInst = undefined;
   var imgCache = {};
 
-  var initPlugin = function(inst) {
-    sigInst = inst;
-  }
-
   var drawImage = function (node,x,y,size,context) {
-    if(sigInst && node.image && node.image.url) {
+    if(node.image && node.image.url) {
       var url = node.image.url;
       var ih = node.image.h || 1; // 1 is arbitrary, anyway only the ratio counts
       var iw = node.image.w || 1;
@@ -32,10 +27,7 @@
         image = document.createElement('IMG');
         image.src = url;
         image.onload = function(){
-          // TODO see how we redraw on load
-          // need to provide the siginst as a parameter to the library
-          console.log("redraw on image load");
-          sigInst.refresh();
+          window.dispatchEvent(new Event('resize'));
         };
         imgCache[url] = image;
       }
@@ -82,7 +74,7 @@
       if(drawBorder) {
         drawBorder(node,x,y,size,borderColor,context);
       }
-      
+
       drawImage(node,x,y,size,context);
 
       context.restore();
@@ -100,11 +92,11 @@
   this.CustomShapes = {
 
     // Functions
-    init: initPlugin,
+
     // add pre-cache images
 
     // Version
-    version: '0.1'
+    version: '0.2'
   };
 
 
