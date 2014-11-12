@@ -214,6 +214,7 @@
    * @param  {string}  key The property accessor.
    */
   Vision.prototype.update = function(key) {
+    // console.log('Vision.update', key);
     var self = this;
 
     if (key === undefined)
@@ -224,31 +225,53 @@
     var val,
         byFn,
         schemeFn,
-        isSequential = true;
+        isSequential = true,
+        isArray = true;
 
     byFn = function(item, key) { return strToObjectRef(item, key); };
     schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
+
+    function insertItem(val, item) {
+      if (self.idx[key][val] === undefined) {
+        self.idx[key][val] = {
+          key: val,
+          items: [],
+          styles: Object.create(null)
+        };
+      }
+      self.idx[key][val].items.push(item);
+
+      if (isSequential) {
+        isSequential = (typeof val === 'number') ? isSequential : false;
+        // TODO: throw error if is number AND (is NaN or is Infinity)
+      }
+    };
 
     // Index the collection:
     this.idx[key] = {};
     this.dataset(_s).forEach(function (item) {
       val = byFn(item, key);
       if (val !== undefined) {
-        if (self.idx[key][val] === undefined) {
-          self.idx[key][val] = {
-            key: val,
-            items: [],
-            styles: Object.create(null)
-          };
+        if (isArray) {
+          isArray = (Object.prototype.toString.call(val) === '[object Array]') ? isArray : false;
         }
-        self.idx[key][val].items.push(item);
-        // check if data is sequential:
-        isSequential = (typeof val === 'number') ? isSequential : false;
-        // TODO: throw error if is number AND (is NaN or is Infinity)
+        if (isArray) {
+          if (val.length === 1) {
+            insertItem(val[0], item);
+          }
+          else {
+            val.forEach(function (v) {
+              insertItem(v, item);
+            });
+          }
+        }
+        else {
+          insertItem(val, item);
+        }
       }
     });
 
-    this.dataTypes[key] = { sequential: isSequential };
+    this.dataTypes[key] = { sequential: isSequential, array: isArray };
     this.deprecated[key] = false;
 
     // Find the max number of occurrence of values:
