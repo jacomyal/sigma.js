@@ -69,6 +69,7 @@ module.exports = function(grunt) {
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
   var plugins = [
+    'exporters.svg',
     'layout.forceAtlas2',
     'parsers.gexf',
     'parsers.json',
@@ -79,6 +80,7 @@ module.exports = function(grunt) {
     'renderers.customEdgeShapes',
     'renderers.customShapes',
     'renderers.edgeLabels',
+    'renderers.snapshot',
     'statistics.HITS'
   ];
 
