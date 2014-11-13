@@ -135,7 +135,8 @@
       f = false;
     }
 
-    style.appendChild(document.createTextNode(styleText));
+    if (params.classes)
+      style.appendChild(document.createTextNode(styleText));
   }
 
 
@@ -194,7 +195,7 @@
     svg.removeChild(hoverGroup);
 
     // Optims?
-    params.classes = params.classes || DEFAULTS.classes;
+    params.classes = (params.classes !== false);
     if (!params.data || params.classes)
       optimize(svg, prefix, params);
 
