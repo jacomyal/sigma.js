@@ -129,7 +129,8 @@
         drawNodes = this.settings(options, 'drawNodes'),
         drawLabels = this.settings(options, 'drawLabels'),
         embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
+          prefix: this.options.prefix,
+          forceLabels: this.options.forceLabels
         });
 
     // Check the 'hideEdgesOnMove' setting:

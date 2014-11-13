@@ -58,7 +58,7 @@
         settings('labelSizeRatio') * size;
 
       // Case when we don't want to display the label
-      if (size < settings('labelThreshold'))
+      if (!settings('forceLabels') && size < settings('labelThreshold'))
         return;
 
       if (typeof node.label !== 'string')
