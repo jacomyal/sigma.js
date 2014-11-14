@@ -15,16 +15,16 @@ To use, include all .js files under this folder. Then call the exporter method a
 
 ````javascript
 // Retreive the GEXF string
-var gexfString = s.graph.toGEXF();
+var gexfString = s.toGEXF();
 
 // Download the GEXF file
-s.graph.toGEXF({download: true});
+s.toGEXF({download: true});
 ````
 
 ### Advanced usage
 
 ````javascript
-s.graph.toGEXF({
+s.toGEXF({
   download: true,
   filename: 'myGraph.gexf',
   nodeAttributes: 'data',
