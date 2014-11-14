@@ -132,9 +132,7 @@
    * @param  {object} params The options.
    * @return {string}        The GEXF string.
    */
-  sigma.classes.graph.addMethod(
-    'toGEXF',
-    function(params) {
+  sigma.prototype.toGEXF = function(params) {
       params = params || {};
 
       var doc = document.implementation.createDocument('', '', null),
@@ -142,8 +140,8 @@
           sXML = '',
           webgl = true,
           prefix,
-          nodes = this.nodes(),
-          edges = this.edges();
+          nodes = this.graph.nodes(),
+          edges = this.graph.edges();
 
       if (params.renderer) {
         webgl = params.renderer instanceof sigma.renderers.webgl;
@@ -420,6 +418,5 @@
       doc = null;
 
       return sXML;
-    }
-  );
+  };
 }).call(this);
