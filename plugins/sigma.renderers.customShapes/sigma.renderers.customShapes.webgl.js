@@ -89,10 +89,10 @@
           scale     = 0.5;
           numPoints = 5;
           if (typeof node.star !== "undefined") {
-            if (typeof node.triangle.numPoints === "number") {
-              numPoints = node.trianglr.numPoints;
+            if (typeof node.star.numPoints === "number") {
+              numPoints = node.star.numPoints;
             }
-            if (typeof node.triangle.rotate === "number") {
+            if (typeof node.star.rotate === "number") {
               shapeRotation = node.star.rotate;
             }
             // innerRatio: node.star.innerRatio || 1.0 // ratio of inner radius in star, compared to node.size
