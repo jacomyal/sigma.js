@@ -29,8 +29,8 @@ myRenderer.snapshot({
 
 *Parameters*
 
-* **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
-* **background** : whether you want to specify a background color for the snapshot. Transparent if none specified.
-* **labels** [`true`] : do we want the labels on screen to be displayed on the snapshot?
-* **download** [`false`] : whether you want the graph image to be downloaded by the browser.
-* **filename** [`graph.png`] : full filename for the file to download.
+* **format** *?string* [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
+* **background** *?string*: whether you want to specify a background color for the snapshot. Transparent if none specified.
+* **labels** *?boolean* [`true`] : do we want the labels on screen to be displayed on the snapshot?
+* **download** *?boolean* [`false`] : whether you want the graph image to be downloaded by the browser.
+* **filename** *?string* [`graph.png`] : full filename for the file to download.

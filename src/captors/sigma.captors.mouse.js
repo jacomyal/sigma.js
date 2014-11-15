@@ -96,8 +96,8 @@
       // Dispatch event:
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('mousemove', {
-          x: sigma.utils.getX(e) - e.target.width / 2,
-          y: sigma.utils.getY(e) - e.target.height / 2,
+          x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
+          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
           clientX: e.clientX,
           clientY: e.clientY,
           ctrlKey: e.ctrlKey,
@@ -191,8 +191,8 @@
           });
 
         _self.dispatchEvent('mouseup', {
-          x: x - e.target.width / 2,
-          y: y - e.target.height / 2,
+          x: x - sigma.utils.getWidth(e) / 2,
+          y: y - sigma.utils.getHeight(e) / 2,
           clientX: e.clientX,
           clientY: e.clientY,
           ctrlKey: e.ctrlKey,
@@ -234,8 +234,8 @@
           case 3:
             // Right mouse button pressed
             _self.dispatchEvent('rightclick', {
-              x: _startMouseX - e.target.width / 2,
-              y: _startMouseY - e.target.height / 2,
+              x: _startMouseX - sigma.utils.getWidth(e) / 2,
+              y: _startMouseY - sigma.utils.getHeight(e) / 2,
               clientX: e.clientX,
               clientY: e.clientY,
               ctrlKey: e.ctrlKey,
@@ -250,8 +250,8 @@
             _isMouseDown = true;
 
             _self.dispatchEvent('mousedown', {
-              x: _startMouseX - e.target.width / 2,
-              y: _startMouseY - e.target.height / 2,
+              x: _startMouseX - sigma.utils.getWidth(e) / 2,
+              y: _startMouseY - sigma.utils.getHeight(e) / 2,
               clientX: e.clientX,
               clientY: e.clientY,
               ctrlKey: e.ctrlKey,
@@ -283,8 +283,8 @@
     function _clickHandler(e) {
       if (_settings('mouseEnabled'))
         _self.dispatchEvent('click', {
-          x: sigma.utils.getX(e) - e.target.width / 2,
-          y: sigma.utils.getY(e) - e.target.height / 2,
+          x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
+          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
           clientX: e.clientX,
           clientY: e.clientY,
           ctrlKey: e.ctrlKey,
@@ -320,8 +320,8 @@
         ratio = 1 / _settings('doubleClickZoomingRatio');
 
         _self.dispatchEvent('doubleclick', {
-          x: _startMouseX - e.target.width / 2,
-          y: _startMouseY - e.target.height / 2,
+          x: _startMouseX - sigma.utils.getWidth(e) / 2,
+          y: _startMouseY - sigma.utils.getHeight(e) / 2,
           clientX: e.clientX,
           clientY: e.clientY,
           ctrlKey: e.ctrlKey,
@@ -332,8 +332,8 @@
 
         if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
-            sigma.utils.getX(e) - e.target.width / 2,
-            sigma.utils.getY(e) - e.target.height / 2,
+            sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
+            sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
             true
           );
 
@@ -371,8 +371,8 @@
           _settings('zoomingRatio');
 
         pos = _camera.cameraPosition(
-          sigma.utils.getX(e) - e.target.width / 2,
-          sigma.utils.getY(e) - e.target.height / 2,
+          sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
+          sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
           true
         );
 

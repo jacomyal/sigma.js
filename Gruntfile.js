@@ -26,6 +26,7 @@ module.exports = function(grunt) {
     // Renderers:
     'src/renderers/sigma.renderers.canvas.js',
     'src/renderers/sigma.renderers.webgl.js',
+    'src/renderers/sigma.renderers.svg.js',
     'src/renderers/sigma.renderers.def.js',
 
     // Sub functions per engine:
@@ -46,6 +47,12 @@ module.exports = function(grunt) {
     'src/renderers/canvas/sigma.canvas.edgehovers.arrow.js',
     'src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js',
     'src/renderers/canvas/sigma.canvas.extremities.def.js',
+    'src/renderers/svg/sigma.svg.utils.js',
+    'src/renderers/svg/sigma.svg.nodes.def.js',
+    'src/renderers/svg/sigma.svg.edges.def.js',
+    'src/renderers/svg/sigma.svg.edges.curve.js',
+    'src/renderers/svg/sigma.svg.labels.def.js',
+    'src/renderers/svg/sigma.svg.hovers.def.js',
 
     // Middlewares:
     'src/middlewares/sigma.middlewares.rescale.js',
@@ -54,6 +61,7 @@ module.exports = function(grunt) {
     // Miscellaneous:
     'src/misc/sigma.misc.animation.js',
     'src/misc/sigma.misc.bindEvents.js',
+    'src/misc/sigma.misc.bindDOMEvents.js',
     'src/misc/sigma.misc.drawHovers.js'
   ];
 
@@ -61,6 +69,7 @@ module.exports = function(grunt) {
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
   var plugins = [
+    'exporters.svg',
     'layout.forceAtlas2',
     'parsers.gexf',
     'parsers.json',
@@ -71,6 +80,7 @@ module.exports = function(grunt) {
     'renderers.customEdgeShapes',
     'renderers.customShapes',
     'renderers.edgeLabels',
+    'renderers.snapshot',
     'statistics.HITS'
   ];
 
