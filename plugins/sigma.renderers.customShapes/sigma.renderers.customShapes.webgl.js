@@ -191,39 +191,38 @@
 
       };
 
-      if (typeof node.text !== "undefined") {
+      if (typeof node.icon !== "undefined") {
 
         var font = "Arial";
-        if (typeof node.text.font === "string") {
-          font = node.text.font;
+        if (typeof node.icon.font === "string") {
+          font = node.icon.font;
         }
 
         var content = "";
-        if (typeof node.text.content === "string") {
-          content = node.text.content;
+        if (typeof node.icon.content === "string") {
+          content = node.icon.content;
         }
 
         // adjust icon size
         var fontSizeRatio = 0.70;
-        if (typeof node.text.scale === "number") {
-          fontSizeRatio = node.text.scale;
+        if (typeof node.icon.scale === "number") {
+          fontSizeRatio = node.icon.scale;
         }
 
-        // adjust icon background and foreground color
-        var fgColor = node.text.color || trueColor; // '#f00';
-        var bgColor = node.text.backgroundColor || trueColor;
+        // adjust icon background (border) and foreground (main) color
+        var fgColor = node.icon.color || trueColor; // '#f00';
+        var bgColor = node.color || trueColor;
 
         // adjust icon position
         var px = 0.5, py = 0.5;
-        if (typeof node.text.x === "number") {
-          px = node.text.x;
+        if (typeof node.icon.x === "number") {
+          px = node.icon.x;
         }
-        if (typeof node.text.y === "number") {
-          py = node.text.y;
+        if (typeof node.icon.y === "number") {
+          py = node.icon.y;
         }
 
         imageIndex = self.getText(font, bgColor, fgColor, fontSizeRatio, px, py, content);
-
 
       };
 
@@ -648,7 +647,7 @@
               maxSprites: settings("spriteSheetMaxSprites") || 256
       };
 
-      console.log(config);
+      //console.log(config);
 
       var spriteWidth = config.maxWidth / Math.sqrt(config.maxSprites);
       var spriteHeight = config.maxHeight / Math.sqrt(config.maxSprites);
@@ -679,10 +678,10 @@
 
       var self = this;
 
-      var fontSize = Math.floor(fontSizeRatio * self.spriteSheet.spriteHeight);
+      var fontSize = fontSizeRatio * self.spriteSheet.spriteHeight;
 
-      var pwx = Math.floor(px * self.spriteSheet.spriteWidth);
-      var phy = Math.floor(py * self.spriteSheet.spriteHeight);
+      var pwx = px * self.spriteSheet.spriteWidth;
+      var phy = py * self.spriteSheet.spriteHeight;
 
       var uid = font
          + ':' + bgColor
@@ -721,7 +720,7 @@
 
       ctx.beginPath();
       ctx.fillStyle = fgColor;
-      ctx.font = '' + fontSize + 'px ' + font;
+      ctx.font = '' + (fontSize) + 'px ' + font;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, x + pwx, y + phy);

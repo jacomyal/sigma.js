@@ -52,7 +52,34 @@
           r*yratio*2*Math.cos(-3.142/4));
       context.restore(); // exit clipping mode
     }
-  }
+  };
+
+
+    var drawIcon = function (node,x,y,size,bgColor,ctx) {
+
+        var font = node.icon.font || 'Arial',
+            fgColor = node.icon.color || '#F00',
+            fontSizeRatio = 1.0,
+            text = node.icon.content || '?';
+
+        var height = size;
+        var width = size;
+
+        var fontSize = Math.round(fontSizeRatio * height);
+
+        var pwx = 0.5 * width;
+        var phy = 0.5 * height;
+
+        //ctx.beginPath();
+        ctx.fillStyle = fgColor;
+
+        // the good thing with canvas is that we don't need to wait for the font
+        // to load before using it to draw icons
+        ctx.font = '' + fontSize + 'px ' + font;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y);
+  };
 
 
   var register = function(name,drawShape,drawBorder) {
@@ -65,6 +92,7 @@
           x = node[prefix + 'x'],
           y = node[prefix + 'y'];
 
+
       context.save();
 
       if(drawShape) {
@@ -76,6 +104,10 @@
       }
 
       drawImage(node,x,y,size,context);
+
+      if (typeof node.icon !== "undefined") {
+        drawIcon(node,x,y,size,color,context);
+      }
 
       context.restore();
     };

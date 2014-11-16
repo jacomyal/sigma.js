@@ -120,15 +120,14 @@ var createGraph = function(){
       x: Math.random(),
       y: Math.random(),
       size: 2 + 5 * Math.random(),
-      color: 'rgba(255,255,255,0.4)',
+      color: colors[Math.floor(Math.random() * colors.length)],//'rgba(255,255,255,0.4)',
       type: 'star',
-      text: {
+      icon: {
         font: 'FontAwesome',
         scale: 0.65, // size ratio of (icon / node)
         x: 0.5, // adjust icon position over x
         y: 0.5, // adjust icon position over y
-        //color: colors[Math.floor(Math.random() * colors.length)],
-        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+        color: '#fff',
         content: icons[Math.floor(Math.random() * icons.length)]
       }
     };
