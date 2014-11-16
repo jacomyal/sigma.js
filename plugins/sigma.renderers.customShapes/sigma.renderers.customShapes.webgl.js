@@ -678,7 +678,7 @@
 
       var self = this;
 
-      var fontSize = fontSizeRatio * self.spriteSheet.spriteHeight;
+      var fontSize = Math.round(fontSizeRatio * self.spriteSheet.spriteHeight);
 
       var pwx = px * self.spriteSheet.spriteWidth;
       var phy = py * self.spriteSheet.spriteHeight;

@@ -167,15 +167,12 @@ shapes:
 ```javascript
 {
   type: 'circle',
-  color: 'rgba(255, 255, 255, 0.5)', // used for node hover
-  text: {
+  color: '#A5CFD1', // background color (pastel blue)
+  icon: {
     font: 'Arial', // or 'FontAwesome' etc..
     content: '☺', // or custom fontawesome code eg. "\uF129"
     scale: 0.7, // 70% of node size
-    color: '#000000', // text color (black)
-    bgColor: '#A5CFD1', // background color (pastel blue)
-    x: 0.5, // adjust X position: 0.5 is the horizontal middle
-    y: 0.5  // adjust Y position: 0.5 is the vertical middle
+    color: '#000000' // foreground color (black)
 }
 ```
 

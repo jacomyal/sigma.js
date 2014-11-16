@@ -55,26 +55,22 @@
   };
 
 
-    var drawIcon = function (node,x,y,size,bgColor,ctx) {
+    var drawIcon = function (node,x,y,size,ctx) {
 
         var font = node.icon.font || 'Arial',
             fgColor = node.icon.color || '#F00',
-            fontSizeRatio = 1.0,
-            text = node.icon.content || '?';
+            fontSizeRatio = node.icon.scale || 1.0,
+            text = node.icon.content || '?',
+            px = node.icon.x || 0.5,
+            py = node.icon.y || 0.5,
+            height = size,
+            width = size;
 
-        var height = size;
-        var width = size;
-
-        var fontSize = Math.round(fontSizeRatio * height);
-
-        var pwx = 0.5 * width;
-        var phy = 0.5 * height;
+        var fontSize = Math.round(fontSizeRatio * (height * 0.5));
 
         //ctx.beginPath();
         ctx.fillStyle = fgColor;
 
-        // the good thing with canvas is that we don't need to wait for the font
-        // to load before using it to draw icons
         ctx.font = '' + fontSize + 'px ' + font;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -106,7 +102,7 @@
       drawImage(node,x,y,size,context);
 
       if (typeof node.icon !== "undefined") {
-        drawIcon(node,x,y,size,color,context);
+        drawIcon(node,x,y,size,context);
       }
 
       context.restore();
