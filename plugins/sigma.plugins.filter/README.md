@@ -165,7 +165,7 @@ filter.undo();
 Warning: you can't declare two filters with the same key, or it will throw an exception.
 
 ## Export the chain
-The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `filter.processors.nodes`, `filter.processors.edges`, `filter.processors.neighbors`. The predicate value is a copy of the predicate function. Dump the `chain` using the `export` method as follows:
+The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `export` method as follows:
 
 ````javascript
 var chain = filter.export();
@@ -186,7 +186,7 @@ var chain = [
   {
     key: 'my-filter',
     predicate: function(n) { return this.degree(n.id) > 0; },
-    processor: 'filter.processors.nodes'
+    processor: 'nodes'
   }
 ];
 filter
