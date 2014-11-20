@@ -78,8 +78,6 @@
     var copy = chain.slice(0);
     for (var i = 0, len = copy.length; i < len; i++) {
       copy[i] = deepCopy(copy[i]);
-      if (typeof copy[i].processor === "function")
-        copy[i].processor = 'filter.processors.' + copy[i].processor.name;
     };
     return copy;
   }
@@ -106,7 +104,9 @@
     * @param  {sigma.classes.graph} g The graph instance.
     * @param  {function} fn The predicate.
     */
-  Processors.nodes = function nodes(g, fn) {
+  Processors.nodes = function(g, fn) {
+    if (!g) return;
+
     var n = g.nodes(),
         ln = n.length,
         e = g.edges(),
@@ -126,7 +126,9 @@
     * @param  {sigma.classes.graph} g The graph instance.
     * @param  {function} fn The predicate.
     */
-  Processors.edges = function edges(g, fn) {
+  Processors.edges = function(g, fn) {
+    if (!g) return;
+
     var e = g.edges(),
         le = e.length;
 
@@ -140,7 +142,9 @@
     * @param  {sigma.classes.graph} g The graph instance.
     * @param  {string} id The center node.
     */
-  Processors.neighbors = function neighbors(g, id) {
+  Processors.neighbors = function(g, id) {
+    if (!g) return;
+
     var n = g.nodes(),
         ln = n.length,
         e = g.edges(),
@@ -161,6 +165,25 @@
         e[le].hidden = true;
   };
 
+   /**
+    *
+    * @param  {sigma.classes.graph} g The graph instance.
+    */
+  Processors.undo = function(g) {
+    if (!g) return;
+
+    var n = g.nodes(),
+        ln = n.length,
+        e = g.edges(),
+        le = e.length;
+
+    while(ln--)
+      n[ln].hidden = false;
+
+    while(le--)
+      e[le].hidden = false;
+  };
+
 
 
   /**
@@ -178,19 +201,19 @@
     /**
      * This function adds a filter to the chain of filters.
      *
-     * @param  {function} fn  The filter (i.e. predicate processor).
-     * @param  {function} p   The predicate.
-     * @param  {?string}  key The key to identify the filter.
+     * @param  {string}   processor The processor name.
+     * @param  {function} p         The predicate.
+     * @param  {?string}  key       The key to identify the filter.
      */
-    function register(fn, p, key) {
+    function register(processor, p, key) {
       if (key != undefined && typeof key !== 'string')
         throw 'The filter key "'+ key.toString() +'" must be a string.';
 
       if (key != undefined && !key.length)
         throw 'The filter key must be a non-empty string.';
 
-      if (typeof fn !== 'function')
-        throw 'The predicate of key "'+ key +'" must be a function.';
+      if (typeof processor !== 'string')
+        throw 'The predicate of key "'+ key +'" must be a string.';
 
       if ('undo' === key)
         throw '"undo" is a reserved key.';
@@ -203,7 +226,7 @@
 
       _chain.push({
         'key': key,
-        'processor': fn,
+        'processor': processor,
         'predicate': p
       });
     };
@@ -243,7 +266,7 @@
      */
     this.nodesBy = function(fn, key) {
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register(Processors.nodes, fn, key);
+      register('nodes', fn, key);
 
       return this;
     };
@@ -269,7 +292,7 @@
      */
     this.edgesBy = function(fn, key) {
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register(Processors.edges, fn, key);
+      register('edges', fn, key);
 
       return this;
     };
@@ -294,7 +317,7 @@
         throw 'The node id must be a non-empty string.';
 
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register(Processors.neighbors, id, key);
+      register('neighbors', id, key);
 
       return this;
     };
@@ -314,7 +337,22 @@
      */
     this.apply = function() {
       for (var i = 0, len = _chain.length; i < len; ++i) {
-        _chain[i].processor(_g, _chain[i].predicate);
+        switch(_chain[i].processor) {
+          case 'nodes':
+            Processors.nodes(_g, _chain[i].predicate);
+            break;
+          case 'edges':
+            Processors.edges(_g, _chain[i].predicate);
+            break;
+          case 'neighbors':
+            Processors.neighbors(_g, _chain[i].predicate);
+            break;
+          case 'undo':
+            Processors.undo(_g, _chain[i].predicate);
+            break;
+          default:
+            throw 'Unknown processor ' + _chain[i].processor;
+        }
       };
 
       if (_chain[0] && 'undo' === _chain[0].key) {
@@ -376,24 +414,9 @@
 
       unregister(q);
 
-      function processor() {
-        if (!_g) return;
-
-        var n = _g.nodes(),
-            ln = n.length,
-            e = _g.edges(),
-            le = e.length;
-
-        while(ln--)
-          n[ln].hidden = false;
-
-        while(le--)
-          e[le].hidden = false;
-      };
-
       _chain.unshift({
         'key': 'undo',
-        'processor': processor
+        'processor': 'undo'
       });
 
       return this;
@@ -443,7 +466,7 @@
      * >   {
      * >     key: 'my-filter',
      * >     predicate: function(n) {...},
-     * >     processor: 'filter.processors.nodes'
+     * >     processor: 'nodes'
      * >   }, ...
      * > ];
      * > filter.import(chain);
@@ -472,21 +495,6 @@
 
         if (typeof copy[i].processor !== 'string')
           throw 'The processor of key "'+ copy[i].key +'" must be a string.';
-
-        // Replace the processor name by the corresponding function:
-        switch(copy[i].processor) {
-          case 'filter.processors.nodes':
-            copy[i].processor = Processors.nodes;
-            break;
-          case 'filter.processors.edges':
-            copy[i].processor = Processors.edges;
-            break;
-          case 'filter.processors.neighbors':
-            copy[i].processor = Processors.neighbors;
-            break;
-          default:
-            throw 'Unknown processor ' + copy[i].processor;
-        }
       };
 
       _chain = copy;

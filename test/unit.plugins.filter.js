@@ -302,7 +302,7 @@ test('API', function() {
     {
       key: 'my-filter',
       predicate: degreePredicate,
-      processor: 'filter.processors.nodes'
+      processor: 'nodes'
     }
   ];
 
@@ -319,7 +319,7 @@ test('API', function() {
     [{
       key: 'my-filter',
       predicate: degreePredicate.toString(),
-      processor: 'filter.processors.nodes'
+      processor: 'nodes'
     }],
     'The filters chain is imported'
   );
@@ -376,7 +376,7 @@ test('API', function() {
         predicate: function degreePredicate(n) {
           return this.degree(n.id) > 0;
         }.toString().replace(/\s+/g, ' '),
-        processor: 'filter.processors.nodes'
+        processor: 'nodes'
       }
     ],
     'The internal chain is a deep copy of the imported chain'
