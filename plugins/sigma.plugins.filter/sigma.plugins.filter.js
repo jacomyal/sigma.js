@@ -102,9 +102,10 @@
    /**
     *
     * @param  {sigma.classes.graph} g The graph instance.
-    * @param  {function} fn The predicate.
+    * @param  {function} fn           The predicate.
+    * @param  {?object}  params       The options.
     */
-  Processors.nodes = function(g, fn) {
+  Processors.nodes = function(g, fn, params) {
     if (!g) return;
 
     var n = g.nodes(),
@@ -114,7 +115,7 @@
 
     // hide node, or keep former value
     while(ln--)
-      n[ln].hidden = !fn.call(g, n[ln]) || n[ln].hidden;
+      n[ln].hidden = !fn.call(g, n[ln], params) || n[ln].hidden;
 
     while(le--)
       if (g.nodes(e[le].source).hidden || g.nodes(e[le].target).hidden)
@@ -124,9 +125,10 @@
    /**
     *
     * @param  {sigma.classes.graph} g The graph instance.
-    * @param  {function} fn The predicate.
+    * @param  {function} fn           The predicate.
+    * @param  {?object}  params       The options.
     */
-  Processors.edges = function(g, fn) {
+  Processors.edges = function(g, fn, params) {
     if (!g) return;
 
     var e = g.edges(),
@@ -134,13 +136,13 @@
 
     // hide edge, or keep former value
     while(le--)
-      e[le].hidden = !fn.call(g, e[le]) || e[le].hidden;
+      e[le].hidden = !fn.call(g, e[le], params) || e[le].hidden;
   };
 
    /**
     *
     * @param  {sigma.classes.graph} g The graph instance.
-    * @param  {string} id The center node.
+    * @param  {string} id             The center node.
     */
   Processors.neighbors = function(g, id) {
     if (!g) return;
@@ -203,13 +205,21 @@
      *
      * @param  {string}   processor The processor name.
      * @param  {function} p         The predicate.
+     * @param  {?object}  params    The predicate options.
      * @param  {?string}  key       The key to identify the filter.
      */
-    function register(processor, p, key) {
-      if (key != undefined && typeof key !== 'string')
-        throw 'The filter key "'+ key.toString() +'" must be a string.';
+    function register(processor, p, params, key) {
+      if (arguments[3] === undefined) {
+        if (typeof arguments[2] !== 'object') {
+          key = params;
+          params = null;
+        }
+      }
 
-      if (key != undefined && !key.length)
+      if (key !== undefined && typeof key !== 'number' && typeof key !== 'string')
+        throw 'The filter key "'+ key.toString() +'" must be a number or a string.';
+
+      if (key !== undefined && typeof key === 'string' && !key.length)
         throw 'The filter key must be a non-empty string.';
 
       if (typeof processor !== 'string')
@@ -227,7 +237,8 @@
       _chain.push({
         'key': key,
         'processor': processor,
-        'predicate': p
+        'predicate': p,
+        'options': params || {}
       });
     };
 
@@ -260,13 +271,14 @@
      * >   return this.degree(n.id) > 0;
      * > }, 'degreeNotNull');
      *
-     * @param  {function}             fn  The filter predicate.
-     * @param  {?string}              key The key to identify the filter.
-     * @return {sigma.plugins.filter}     Returns the instance.
+     * @param  {function}             fn      The filter predicate.
+     * @param  {?object}              params  The filter options.
+     * @param  {?string}              key     The key to identify the filter.
+     * @return {sigma.plugins.filter}         Returns the instance.
      */
-    this.nodesBy = function(fn, key) {
+    this.nodesBy = function(fn, params, key) {
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register('nodes', fn, key);
+      register('nodes', fn, params, key);
 
       return this;
     };
@@ -282,17 +294,22 @@
      * executed until the apply() method is called.
      *
      * > var filter = new sigma.plugins.filter(s);
-     * > filter.edgesBy(function(e) {
-     * >   return e.size > 1;
-     * > }, 'edgeSize');
+     * > filter.edgesBy(
+     * >   function(e, options) {
+     * >     return e.size > options.val;
+     * >   },
+     * >   { val:1 },
+     * >   'edgeSize'
+     * > );
      *
      * @param  {function}             fn  The filter predicate.
+     * @param  {?object}              params  The filter options.
      * @param  {?string}              key The key to identify the filter.
      * @return {sigma.plugins.filter}     Returns the instance.
      */
-    this.edgesBy = function(fn, key) {
+    this.edgesBy = function(fn, params, key) {
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register('edges', fn, key);
+      register('edges', fn, params, key);
 
       return this;
     };
@@ -307,17 +324,18 @@
      * > filter.neighborsOf('n0');
      *
      * @param  {string}               id  The node id.
+     * @param  {?object}              params  The filter options.
      * @param  {?string}              key The key to identify the filter.
      * @return {sigma.plugins.filter}     Returns the instance.
      */
-    this.neighborsOf = function(id, key) {
+    this.neighborsOf = function(id, params, key) {
       if (typeof id !== 'string')
         throw 'The node id "'+ id.toString() +'" must be a string.';
       if (!id.length)
         throw 'The node id must be a non-empty string.';
 
       // Wrap the predicate to be applied on the graph and add it to the chain.
-      register('neighbors', id, key);
+      register('neighbors', id, params, key);
 
       return this;
     };
@@ -328,9 +346,13 @@
      *
      * > var filter = new sigma.plugins.filter(s);
      * > filter
-     * >   .nodesBy(function(n) {
-     * >     return this.degree(n.id) > 0;
-     * >   }, 'degreeNotNull')
+     * >   .nodesBy(
+     * >     function(n, options) {
+     * >       return this.degree(n.id) > options.val;
+     * >     },
+     * >     { val:0 },
+     * >    'degreeGreaterThan'
+     * >   )
      * >   .apply();
      *
      * @return {sigma.plugins.filter}      Returns the instance.
@@ -339,10 +361,10 @@
       for (var i = 0, len = _chain.length; i < len; ++i) {
         switch(_chain[i].processor) {
           case 'nodes':
-            Processors.nodes(_g, _chain[i].predicate);
+            Processors.nodes(_g, _chain[i].predicate, _chain[i].options);
             break;
           case 'edges':
-            Processors.edges(_g, _chain[i].predicate);
+            Processors.edges(_g, _chain[i].predicate, _chain[i].options);
             break;
           case 'neighbors':
             Processors.neighbors(_g, _chain[i].predicate);

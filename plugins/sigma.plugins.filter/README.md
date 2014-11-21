@@ -69,7 +69,7 @@ For each edge of the graph, the `edgesBy` processor sets the attribute `hidden` 
 // Only edges of size above one should be visible:
 filter.edgesBy(function(e) {
   return e.size > 1;
-}, 'edge-size-above-one');
+}, 'edge-size-greater-than-one');
 ````
 
 For each neighbor node of a specified node, the `neighborsOf` processor sets the attribute `hidden` to true if it is not directly connected to the node. It also sets the `hidden` attribute of edges to true if one of the edge's extremities is hidden. For instance:
@@ -80,6 +80,21 @@ filter.neighborsOf('n0');
 ````
 
 Processors instanciated with a predicate are called filters. **Filters are not applied until the `apply` method is called.**
+
+## Predicate with parameters
+
+You can pass an object of options as follows:
+
+````javascript
+// Only edges with size greater than the specified size should be visible:
+filter.edgesBy(
+  function(e, options) {
+    return e.size > options.value;
+  }, 
+  { value: 3 }, 
+  'edge-size-greater-than'
+);
+````
 
 ## Filters chain
 Combining filters is easy! Declare one filter after another, then call the `apply` method to execute them on the graph in that order. For instance:
