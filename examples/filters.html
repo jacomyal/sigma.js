@@ -225,7 +225,7 @@ function updatePane (graph, filter) {
 
   // export button
   _.$('export-btn').addEventListener("click", function(e) {
-    var chain = filter.export();
+    var chain = filter.serialize();
     console.log(chain);
     _.$('dump').textContent = JSON.stringify(chain);
     _.show('#dump');

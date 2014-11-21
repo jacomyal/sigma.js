@@ -229,7 +229,7 @@ test('API', function() {
     .apply();
 
   deepEqual(
-    filter.export().map(function(o) { return o.key }),
+    filter.serialize().map(function(o) { return o.key }),
     ['degree', 'attr'],
     'The filters chain is exported'
   );
@@ -239,7 +239,7 @@ test('API', function() {
   filter.clear();
 
   deepEqual(
-    filter.export(),
+    filter.serialize(),
     [],
     'The filters chain is cleared'
   );
@@ -286,10 +286,10 @@ test('API', function() {
 
 
   // Import an empty chain
-  filter.import([]);
+  filter.load([]);
 
   strictEqual(
-    filter.export().length,
+    filter.serialize().length,
     0,
     'The empty chain is imported'
   );
@@ -305,10 +305,10 @@ test('API', function() {
     }
   ];
 
-  filter.import(chain).apply();
+  filter.load(chain).apply();
 
   deepEqual(
-    filter.export().map(function(o) {
+    filter.serialize().map(function(o) {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
@@ -326,8 +326,8 @@ test('API', function() {
   );
 
 
-  // export > import > export
-  var dumpedChain = filter.import(filter.export()).export();
+  // serialize > import > serialize
+  var dumpedChain = filter.load(filter.serialize()).serialize();
 
   deepEqual(
     chain.map(function(o) {
@@ -361,12 +361,12 @@ test('API', function() {
 
 
   // check chain duplication
-  filter.import(chain);
+  filter.load(chain);
   chain.length = 0;
   degreePredicate = null;
 
   deepEqual(
-    filter.export().map(function(o) {
+    filter.serialize().map(function(o) {
       return {
         key: o.key,
         predicate: o.predicate.toString().replace(/\s+/g, ' '),
@@ -464,7 +464,7 @@ test('API', function() {
 
   sigma.plugins.killFilter(s);
   deepEqual(
-    filter.export(),
+    filter.serialize(),
     [],
     'The filters chain is empty after `killFilter` is called.'
   );

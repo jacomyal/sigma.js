@@ -471,11 +471,11 @@
      * This method clones the filter chain and return the copy.
      *
      * > var filter = new sigma.plugins.filter(s);
-     * > var chain = filter.export();
+     * > var chain = filter.serialize();
      *
      * @return {object}   The cloned chain of filters.
      */
-    this.export = function() {
+    this.serialize = function() {
       var c = cloneChain(_chain);
       return c;
     };
@@ -491,12 +491,12 @@
      * >     processor: 'nodes'
      * >   }, ...
      * > ];
-     * > filter.import(chain);
+     * > filter.load(chain);
      *
      * @param {array} chain The chain of filters.
      * @return {sigma.plugins.filter} Returns the instance.
      */
-    this.import = function(chain) {
+    this.load = function(chain) {
       if (chain === undefined)
         throw 'Wrong arguments.';
 
