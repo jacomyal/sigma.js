@@ -105,7 +105,7 @@
   <div id="graph-container"></div>
   <div id="control-pane">
     <h2 class="underline">filters</h2>
-    
+
     <div>
       <h3>min degree <span id="min-degree-val">0</span></h3>
       0 <input id="min-degree" type="range" min="0" max="0" value="0"> <span id="max-degree-value">0</span><br>
@@ -194,7 +194,7 @@ function updatePane (graph, filter) {
   // get max degree
   var maxDegree = 0,
       categories = {};
-  
+
   // read nodes
   graph.nodes().forEach(function(n) {
     maxDegree = Math.max(maxDegree, graph.degree(n.id));
@@ -204,7 +204,7 @@ function updatePane (graph, filter) {
   // min degree
   _.$('min-degree').max = maxDegree;
   _.$('max-degree-value').textContent = maxDegree;
-  
+
   // node category
   var nodecategoryElt = _.$('node-category');
   Object.keys(categories).forEach(function(c) {
@@ -254,9 +254,15 @@ sigma.parsers.gexf('data/moroccan-ediaspora.gexf', {
 
     filter
       .undo('min-degree')
-      .nodesBy(function(n) {
-        return this.degree(n.id) >= v;
-      }, 'min-degree')
+      .nodesBy(
+        function(n, options) {
+          return this.degree(n.id) >= options.minDegreeVal;
+        },
+        {
+          minDegreeVal: +v
+        },
+        'min-degree'
+      )
       .apply();
   }
 
@@ -264,9 +270,15 @@ sigma.parsers.gexf('data/moroccan-ediaspora.gexf', {
     var c = e.target[e.target.selectedIndex].value;
     filter
       .undo('node-category')
-      .nodesBy(function(n) {
-        return !c.length || n.attributes.acategory === c;
-      }, 'node-category')
+      .nodesBy(
+        function(n, options) {
+          return !c.length || n.attributes[options.property] === c;
+        },
+        {
+          property: 'acategory'
+        },
+        'node-category'
+      )
       .apply();
   }
 

@@ -145,8 +145,8 @@ test('API', function() {
   };
 
   // Show non-isolated nodes only
-  function degreePredicate(n) {
-    return this.degree(n.id) > 0;
+  function degreePredicate(n, options) {
+    return this.degree(n.id) > options.value;
   };
 
   // Show edges without the myEdgeAttr attribute or with myEdgeAttr > 1
@@ -155,7 +155,7 @@ test('API', function() {
   };
 
   // Register the filter
-  filter.nodesBy(degreePredicate, 'degree');
+  filter.nodesBy(degreePredicate, { value: 0 }, 'degree');
 
   deepEqual(
     hiddenNodes(),
@@ -208,7 +208,7 @@ test('API', function() {
 
   // Register two filters and apply them
   filter
-    .nodesBy(degreePredicate)
+    .nodesBy(degreePredicate, { value: 0 })
     .edgesBy(myEdgeAttrPredicate)
     .apply();
 
@@ -224,7 +224,7 @@ test('API', function() {
 
   // Register two filters and apply them
   filter
-    .nodesBy(degreePredicate, 'degree')
+    .nodesBy(degreePredicate, { value: 0 }, 'degree')
     .edgesBy(myEdgeAttrPredicate, 'attr')
     .apply();
 
@@ -250,11 +250,9 @@ test('API', function() {
 
   // nodesBy X > undo > nodesBy Y > apply
   filter
-    .nodesBy(degreePredicate, 'degree0')
+    .nodesBy(degreePredicate, { value: 0 }, 'degree0')
     .undo()
-    .nodesBy(function(n) {
-      return this.degree(n.id) > 1;
-    }, 'degree1')
+    .nodesBy(degreePredicate, { value: 1 }, 'degree1')
     .apply();
 
   deepEqual(
@@ -276,7 +274,7 @@ test('API', function() {
 
   // Call "undo" with multiple arguments
   filter
-    .nodesBy(degreePredicate, 'degree0')
+    .nodesBy(degreePredicate, { value: 0 }, 'degree0')
     .undo('degree0', 'degree1')
     .apply();
 
@@ -302,7 +300,8 @@ test('API', function() {
     {
       key: 'my-filter',
       predicate: degreePredicate,
-      processor: 'nodes'
+      processor: 'nodes',
+      options: { value: 0 }
     }
   ];
 
@@ -313,13 +312,15 @@ test('API', function() {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
-        processor: o.processor
+        processor: o.processor,
+        options: o.options
       };
     }),
     [{
       key: 'my-filter',
       predicate: degreePredicate.toString(),
-      processor: 'nodes'
+      processor: 'nodes',
+      options: { value: 0 }
     }],
     'The filters chain is imported'
   );
@@ -333,14 +334,16 @@ test('API', function() {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
-        processor: o.processor
+        processor: o.processor,
+        options: o.options
       };
     }),
     dumpedChain.map(function(o) {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
-        processor: o.processor
+        processor: o.processor,
+        options: o.options
       };
     }),
     'The exported filters chain is imported'
@@ -367,16 +370,18 @@ test('API', function() {
       return {
         key: o.key,
         predicate: o.predicate.toString().replace(/\s+/g, ' '),
-        processor: o.processor
+        processor: o.processor,
+        options: o.options
       };
     }),
     [
       {
         key: 'my-filter',
-        predicate: function degreePredicate(n) {
-          return this.degree(n.id) > 0;
+        predicate: function degreePredicate(n, options) {
+          return this.degree(n.id) > options.value;
         }.toString().replace(/\s+/g, ' '),
-        processor: 'nodes'
+        processor: 'nodes',
+        options: { value: 0 }
       }
     ],
     'The internal chain is a deep copy of the imported chain'
@@ -384,10 +389,18 @@ test('API', function() {
 
   throws(
     function() {
-      filter.nodesBy(function() {}, 5);
+      filter.nodesBy(function() {}, true);
     },
-    /The filter key \"5\" must be a string./,
+    /The filter key \"true\" must be a number or a string./,
     '"nodesBy" with a wrong key type throws an error.'
+  );
+
+  throws(
+    function() {
+      filter.nodesBy(function() {}, {}, true);
+    },
+    /The filter key \"true\" must be a number or a string./,
+    '"nodesBy" with options and a wrong key type throws an error.'
   );
 
   throws(
@@ -396,6 +409,14 @@ test('API', function() {
     },
     /The filter key must be a non-empty string./,
     '"edgesBy" with a wrong key type throws an error.'
+  );
+
+  throws(
+    function() {
+      filter.edgesBy(function() {}, {}, '');
+    },
+    /The filter key must be a non-empty string./,
+    '"edgesBy" with options and a wrong key type throws an error.'
   );
 
   throws(
