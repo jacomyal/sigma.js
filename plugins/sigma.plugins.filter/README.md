@@ -21,10 +21,10 @@ To use, include all .js files under this folder. Then initialize it as follows:
 var filter = sigma.plugins.filter(sigInst);
 ````
 
-Kill the plugin instance as follows:
+The plugin will be killed when the Sigma `kill` event is sent. You can manually kill the plugin instance as follows:
 
 ````javascript
-sigma.plugins.killFilter();
+sigma.plugins.killFilter(sigInst);
 ````
 
 ## Predicates
@@ -81,9 +81,9 @@ filter.neighborsOf('n0');
 
 Processors instanciated with a predicate are called filters. **Filters are not applied until the `apply` method is called.**
 
-## Predicate with parameters
+## Predicates with parameters
 
-You can pass an object of options as follows:
+You can pass an object of options to the `nodes` and `edges` predicates as follows:
 
 ````javascript
 // Only edges with size greater than the specified size should be visible:
@@ -188,7 +188,8 @@ var chain = filter.export();
 //  {
 //     key: '...', 
 //     processor: '...', 
-//     predicate: function() {...}
+//     predicate: function() {...},
+//     options: {...}
 //   }, ...
 // ]
 ````
@@ -200,8 +201,9 @@ You can load a filters chain using the `import` method:
 var chain = [
   {
     key: 'my-filter',
-    predicate: function(n) { return this.degree(n.id) > 0; },
-    processor: 'nodes'
+    predicate: function(n, opt) { return this.degree(n.id) > opt.val; },
+    processor: 'nodes',
+    options: { val: 0 }
   }
 ];
 filter
