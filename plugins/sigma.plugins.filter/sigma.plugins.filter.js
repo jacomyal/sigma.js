@@ -275,6 +275,16 @@
     };
 
     /**
+     * This method will return true if the filter key exists, false otherwise.
+     *
+     * @param  {string}  key The filter key.
+     * @return {boolean}
+     */
+    this.has = function(key) {
+      return _keysIndex[key];
+    }
+
+    /**
      * This method is used to filter the nodes. The method must be called with
      * the predicate, which is a function that takes a node as argument and
      * returns a boolean. It may take an identifier as argument to undo the

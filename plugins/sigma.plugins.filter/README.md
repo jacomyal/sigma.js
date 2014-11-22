@@ -202,7 +202,7 @@ filter.undo();
 // don't forget to call `apply()` anytime!
 ````
 
-Warning: you can't declare two filters with the same key, or it will throw an exception.
+Warning: you can't declare two filters with the same key, or it will throw an exception. Use `.has(key)` to know if the key is already used.
 
 ## Export the chain of filters
 The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, predicate, processor, ?options)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `serialize` method as follows:
