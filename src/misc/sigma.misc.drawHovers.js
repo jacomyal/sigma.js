@@ -17,19 +17,20 @@
    */
   sigma.misc.drawHovers = function(prefix) {
     var self = this,
-        hoveredNodes = {},
+        _hoveredNodes = [],
         hoveredEdges = {};
 
     this.bind('overNode', function(event) {
       var node = event.data.node;
       if (!node.hidden) {
-        hoveredNodes[node.id] = node;
+        _hoveredNodes.push(event.data.node);
         draw();
       }
     });
 
     this.bind('outNode', function(event) {
-      delete hoveredNodes[event.data.node.id];
+      var indexCheck = _hoveredNodes.map(function(e) { return e; }).indexOf(event.data.node);
+      _hoveredNodes.splice(indexCheck, 1);
       draw();
     });
 
@@ -72,9 +73,9 @@
       if (
         embedSettings('enableHovering') &&
         embedSettings('singleHover') &&
-        Object.keys(hoveredNodes).length
+        _hoveredNodes.length
       ) {
-        hoveredNode = hoveredNodes[Object.keys(hoveredNodes)[0]];
+        hoveredNode = _hoveredNodes[_hoveredNodes.length - 1];
         (
           nodeRenderers[hoveredNode.type] ||
           nodeRenderers[defaultNodeType] ||
@@ -91,13 +92,13 @@
         embedSettings('enableHovering') &&
         !embedSettings('singleHover')
       )
-        for (k in hoveredNodes)
+        for (k in _hoveredNodes)
           (
-            nodeRenderers[hoveredNodes[k].type] ||
+            nodeRenderers[_hoveredNodes[_hoveredNodes.length - 1].type] ||
             nodeRenderers[defaultNodeType] ||
             nodeRenderers.def
           )(
-            hoveredNodes[k],
+            _hoveredNodes[_hoveredNodes.length - 1],
             self.contexts.hover,
             embedSettings
           );
