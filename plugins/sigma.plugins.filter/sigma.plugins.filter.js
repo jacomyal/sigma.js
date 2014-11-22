@@ -80,7 +80,19 @@
       copy[i] = deepCopy(copy[i]);
     };
     return copy;
-  }
+  };
+
+  /**
+   * Convert Javascript string in dot notation into an object reference.
+   *
+   * @param  {object} obj The object.
+   * @param  {string} str The string to convert, e.g. 'a.b.etc'.
+   * @return {?}          The object reference.
+   */
+  function strToObjectRef(obj, str) {
+    // http://stackoverflow.com/a/6393943
+    return str.split('.').reduce(function(obj, i) { return obj[i] }, obj);
+  };
 
 
   /**
@@ -115,7 +127,10 @@
 
     // hide node, or keep former value
     while(ln--)
-      n[ln].hidden = !fn.call(g, n[ln], params) || n[ln].hidden;
+      n[ln].hidden = !fn.call({
+        graph: g,
+        get: strToObjectRef
+      }, n[ln], params) || n[ln].hidden;
 
     while(le--)
       if (g.nodes(e[le].source).hidden || g.nodes(e[le].target).hidden)
@@ -136,7 +151,10 @@
 
     // hide edge, or keep former value
     while(le--)
-      e[le].hidden = !fn.call(g, e[le], params) || e[le].hidden;
+      e[le].hidden = !fn.call({
+        graph: g,
+        get: strToObjectRef
+      }, e[le], params) || e[le].hidden;
   };
 
    /**

@@ -46,6 +46,17 @@ function(e) {
 }
 ````
 
+The scope of predicates contains the `graph` object. All Sigma `graph` methods are thus available, such as `.degree(nodeid)` by calling `this.graph.degree(nodeid)` inside the predicate. For instance:
+
+````javascript
+// Only nodes of positive degree should be visible:
+function(n) {
+  return this.graph.degree(n.id) > 0;
+}
+````
+
+The scope of predicates also contains a `get` function to dynamically access nodes and edges attributes if their location is defined in dot notation, see the Predicates with parameters below.
+
 Predicates are applied by predicate processors.
 
 ## Predicate processors
@@ -59,7 +70,7 @@ For each node of the graph, the `nodesBy` processor sets the attribute `hidden` 
 ````javascript
 // Only connected nodes (i.e. nodes of positive degree) should be visible:
 filter.nodesBy(function(n) {
-  return this.degree(n.id) > 0;
+  return this.graph.degree(n.id) > 0;
 }, 'non-isolates');
 ````
 
@@ -83,16 +94,30 @@ Processors instanciated with a predicate are called filters. **Filters are not a
 
 ## Predicates with parameters
 
-You can pass an object of options to the `nodes` and `edges` predicates as follows:
+You can pass an object of parameters to the `nodes` and `edges` predicates as follows:
 
 ````javascript
 // Only edges with size greater than the specified size should be visible:
 filter.edgesBy(
-  function(e, options) {
-    return e.size > options.value;
-  }, 
-  { value: 3 }, 
+  function(e, params) {
+    return e.size > params.threshold;
+  },
+  { threshold: 3 },
   'edge-size-greater-than'
+);
+````
+
+You may access nodes and edges properties dynamically using the special `get` method available in the scope of the predicate. For instance:
+
+````javascript
+filter.nodesBy(
+  function(n, params) {
+    return this.get(n, params.property) > params.threshold;
+  },
+  {
+    property: 'path.to.my.property',
+    threshold: 3
+  }
 );
 ````
 
@@ -109,7 +134,7 @@ Combining filters is easy! Declare one filter after another, then call the `appl
 // }
 filter
     .nodesBy(function(n) {
-      return this.degree(n.id) > 0;
+      return this.graph.degree(n.id) > 0;
     })
     .edgesBy(function(e) {
       return e.size >= 1;
@@ -180,15 +205,15 @@ filter.undo();
 Warning: you can't declare two filters with the same key, or it will throw an exception.
 
 ## Export the chain of filters
-The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `serialize` method as follows:
+The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, predicate, processor, ?options)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `serialize` method as follows:
 
 ````javascript
 var chain = filter.serialize();
 // chain == [
 //  {
 //     key: '...', 
-//     processor: '...', 
 //     predicate: function() {...},
+//     processor: '...', 
 //     options: {...}
 //   }, ...
 // ]
@@ -201,7 +226,7 @@ You can load a filters chain using the `load` method:
 var chain = [
   {
     key: 'my-filter',
-    predicate: function(n, opt) { return this.degree(n.id) > opt.val; },
+    predicate: function(n, opt) { return this.graph.degree(n.id) > opt.val; },
     processor: 'nodes',
     options: { val: 0 }
   }
