@@ -229,9 +229,9 @@ test('API', function() {
     .apply();
 
   deepEqual(
-    filter.export().map(function(o) { return o.key }),
+    filter.serialize().map(function(o) { return o.key }),
     ['degree', 'attr'],
-    'The filters chain is exported'
+    'The filters chain is serialized'
   );
 
 
@@ -239,7 +239,7 @@ test('API', function() {
   filter.clear();
 
   deepEqual(
-    filter.export(),
+    filter.serialize(),
     [],
     'The filters chain is cleared'
   );
@@ -286,12 +286,12 @@ test('API', function() {
 
 
   // Import an empty chain
-  filter.import([]);
+  filter.load([]);
 
   strictEqual(
-    filter.export().length,
+    filter.serialize().length,
     0,
-    'The empty chain is imported'
+    'The empty chain is loaded'
   );
 
 
@@ -305,35 +305,34 @@ test('API', function() {
     }
   ];
 
-  filter.import(chain).apply();
+  filter.load(chain).apply();
 
   deepEqual(
-    filter.export().map(function(o) {
+    filter.serialize().map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
+        predicate: o.predicate,
         processor: o.processor,
         options: o.options
       };
     }),
     [{
       key: 'my-filter',
-      predicate: degreePredicate.toString(),
+      predicate: degreePredicate.toString().replace(/\s+/g, ' '),
       processor: 'nodes',
       options: { value: 0 }
     }],
-    'The filters chain is imported'
+    'The chain of filters is loaded'
   );
 
 
-  // export > import > export
-  var dumpedChain = filter.import(filter.export()).export();
+  // serialize > import > serialize
+  var dumpedChain = filter.load(filter.serialize()).serialize();
 
   deepEqual(
     chain.map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
         processor: o.processor,
         options: o.options
       };
@@ -341,35 +340,34 @@ test('API', function() {
     dumpedChain.map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
         processor: o.processor,
         options: o.options
       };
     }),
-    'The exported filters chain is imported'
+    'The serialized chain of filters is loaded'
   );
 
 
   // check chain duplication
-  filter.clear();
+  filter.apply().clear();
 
   strictEqual(
     dumpedChain.length,
     1,
-    'The exported chain is a deep copy of the internal chain'
+    'The serialized chain is a deep copy of the internal chain'
   );
 
 
   // check chain duplication
-  filter.import(chain);
+  filter.load(chain);
   chain.length = 0;
   degreePredicate = null;
 
   deepEqual(
-    filter.export().map(function(o) {
+    filter.serialize().map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString().replace(/\s+/g, ' '),
+        predicate: o.predicate,
         processor: o.processor,
         options: o.options
       };
@@ -384,7 +382,7 @@ test('API', function() {
         options: { value: 0 }
       }
     ],
-    'The internal chain is a deep copy of the imported chain'
+    'The internal chain is a deep copy of the loaded chain'
   );
 
   throws(
@@ -464,7 +462,7 @@ test('API', function() {
 
   sigma.plugins.killFilter(s);
   deepEqual(
-    filter.export(),
+    filter.serialize(),
     [],
     'The filters chain is empty after `killFilter` is called.'
   );

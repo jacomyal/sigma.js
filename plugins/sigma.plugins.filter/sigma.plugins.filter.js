@@ -468,20 +468,24 @@
     }
 
     /**
-     * This method clones the filter chain and return the copy.
+     * This method will serialize the chain of filters.
      *
      * > var filter = new sigma.plugins.filter(s);
-     * > var chain = filter.export();
+     * > var chain = filter.serialize();
      *
-     * @return {object}   The cloned chain of filters.
+     * @return {object}   The serialized filters.
      */
-    this.export = function() {
-      var c = cloneChain(_chain);
-      return c;
+    this.serialize = function() {
+      var copy = cloneChain(_chain);
+      for (var i = 0, len = copy.length; i < len; i++) {
+        copy[i].predicate = copy[i].predicate.toString().replace(/\s+/g, ' ');
+      };
+      return copy;
     };
 
     /**
-     * This method sets the chain of filters with the specified chain.
+     * This method sets the chain of filters with the specified serialized chain.
+     * Warning: predicate strings are executed using `eval()`.
      *
      * > var filter = new sigma.plugins.filter(s);
      * > var chain = [
@@ -491,12 +495,12 @@
      * >     processor: 'nodes'
      * >   }, ...
      * > ];
-     * > filter.import(chain);
+     * > filter.load(chain);
      *
      * @param {array} chain The chain of filters.
      * @return {sigma.plugins.filter} Returns the instance.
      */
-    this.import = function(chain) {
+    this.load = function(chain) {
       if (chain === undefined)
         throw 'Wrong arguments.';
 
@@ -506,11 +510,16 @@
       var copy = cloneChain(chain);
 
       for (var i = 0, len = copy.length; i < len; i++) {
-        if (copy[i].predicate === undefined || copy[i].processor === undefined)
-          throw 'Wrong arguments.';
+        if (copy[i].predicate === undefined)
+          throw 'Missing predicate.';
+        if (copy[i].processor === undefined)
+          throw 'Missing processor.';
 
         if (copy[i].key != undefined && typeof copy[i].key !== 'string')
           throw 'The filter key "'+ copy[i].key.toString() +'" must be a string.';
+
+        if (typeof copy[i].predicate === 'string')
+          eval(" copy[i].predicate = " +  copy[i].predicate);
 
         if (typeof copy[i].predicate !== 'function')
           throw 'The predicate of key "'+ copy[i].key +'" must be a function.';

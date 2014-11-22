@@ -179,11 +179,11 @@ filter.undo();
 
 Warning: you can't declare two filters with the same key, or it will throw an exception.
 
-## Export the chain
-The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `export` method as follows:
+## Export the chain of filters
+The exported chain is an array of objects. Each object represents a filter by a triplet *(?key, processor, predicate)*. The processor value is the internal name of the processor: `nodes`, `edges`, `neighbors`, and `undo`. The predicate value is a copy of the predicate function. Dump the `chain` using the `serialize` method as follows:
 
 ````javascript
-var chain = filter.export();
+var chain = filter.serialize();
 // chain == [
 //  {
 //     key: '...', 
@@ -195,7 +195,7 @@ var chain = filter.export();
 ````
 
 ## Import a chain
-You can load a filters chain using the `import` method:
+You can load a filters chain using the `load` method:
 
 ````javascript
 var chain = [
@@ -207,6 +207,6 @@ var chain = [
   }
 ];
 filter
-  .import(chain)
+  .load(chain)
   .apply();
 ````
