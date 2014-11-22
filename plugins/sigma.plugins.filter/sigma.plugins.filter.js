@@ -535,6 +535,7 @@
       if (Object.prototype.toString.call(chain) !== '[object Array]')
         throw 'The chain" must be an array.';
 
+      this.clear();
       var copy = cloneChain(chain);
 
       for (var i = 0, len = copy.length; i < len; i++) {
@@ -554,6 +555,9 @@
 
         if (typeof copy[i].processor !== 'string')
           throw 'The processor of key "'+ copy[i].key +'" must be a string.';
+
+        if (copy[i].key)
+          _keysIndex[copy[i].key] = true;
       };
 
       _chain = copy;
