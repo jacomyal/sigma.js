@@ -182,6 +182,8 @@
     context.fillStyle = nHaloColor;
 
     nodes.forEach(function(node) {
+      if (node.hidden) return;
+
       context.beginPath();
 
       context.arc(
