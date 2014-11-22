@@ -176,8 +176,10 @@
     // Activate all nodes:
     if (!arguments.length) {
       _g.nodes().forEach(function(o) {
-        o.active = true;
-        _activeNodesIndex[o.id] = o;
+        if (!o.hidden) {
+          o.active = true;
+          _activeNodesIndex[o.id] = o;
+        }
       });
     }
 
@@ -185,8 +187,10 @@
     else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         n = _g.nodes(v);
-        n.active = true;
-        _activeNodesIndex[v] = n;
+        if (!n.hidden) {
+          n.active = true;
+          _activeNodesIndex[v] = n;
+        }
       }
       else
         throw 'activateState.addNodes: Wrong arguments.';
@@ -202,8 +206,10 @@
         for (i = 0, l = v.length; i < l; i++)
           if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             n = _g.nodes(v[i]);
-            n.active = true;
-            _activeNodesIndex[v[i]] = n;
+            if (!n.hidden) {
+              n.active = true;
+              _activeNodesIndex[v[i]] = n;
+            }
           }
           else
             throw 'activateState.addNodes: Wrong arguments.';
@@ -217,12 +223,12 @@
   };
 
   /**
-   * This method will set one or several edges as 'active', depending on how it
-   * is called.
+   * This method will set one or several visible edges as 'active', depending
+   * on how it is called.
    *
-   * To activate all edges, call it without argument.
-   * To activate a specific edge, call it with the id of the edge. To activate
-   * multiple edges, call it with an array of ids.
+   * To activate all visible edges, call it without argument.
+   * To activate a specific visible edge, call it with the id of the edge.
+   * To activate multiple visible edges, call it with an array of ids.
    *
    * @param  {(number|string|array)} v   Eventually one id, an array of ids.
    * @return {sigma.plugins.activeState} Returns the instance itself.
@@ -233,8 +239,10 @@
     // Activate all edges:
     if (!arguments.length) {
       _g.edges().forEach(function(o) {
-        o.active = true;
-        _activeEdgesIndex[o.id] = o;
+        if (!o.hidden) {
+          o.active = true;
+          _activeEdgesIndex[o.id] = o;
+        }
       });
     }
 
@@ -242,8 +250,10 @@
     else if (typeof v === 'string' || typeof v === 'number') {
       if (arguments.length === 1) {
         e = _g.edges(v);
-        e.active = true;
-        _activeEdgesIndex[v] = e;
+        if (!e.hidden) {
+          e.active = true;
+          _activeEdgesIndex[v] = e;
+        }
       }
       else
         throw 'activateState.addEdges: Wrong arguments.';
@@ -259,8 +269,10 @@
         for (i = 0, l = v.length; i < l; i++)
           if (typeof v[i] === 'string' || typeof v[i] === 'number') {
             e = _g.edges(v[i]);
-            e.active = true;
-            _activeEdgesIndex[v[i]] = e;
+            if (!e.hidden) {
+              e.active = true;
+              _activeEdgesIndex[v[i]] = e;
+            }
           }
           else
             throw 'activateState.addEdges: Wrong arguments.';
@@ -378,7 +390,7 @@
   };
 
   /**
-   * This method will set the neighbors of all active nodes as 'active'.
+   * This method will set the visible neighbors of all active nodes as 'active'.
    *
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
@@ -394,7 +406,8 @@
     if (a.length) {
       for (id in _activeNodesIndex) {
         _g.adjacentNodes(id).forEach(function (adj) {
-          a.push(adj.id);
+          if (!adj.hidden)
+            a.push(adj.id);
         });
       };
 
@@ -428,7 +441,8 @@
 
     _g.nodes().forEach(function (o) {
       if (fn.call(_g, o)) {
-        a.push(o.id);
+        if (!o.hidden)
+          a.push(o.id);
       }
     });
 
@@ -455,7 +469,8 @@
 
     _g.edges().forEach(function (o) {
       if (fn.call(_g, o)) {
-        a.push(o.id);
+        if (!o.hidden)
+          a.push(o.id);
       }
     });
 
@@ -475,7 +490,7 @@
    */
   ActiveState.prototype.invertNodes = function() {
     var a = _g.nodes().filter(function (o) {
-      return !o.active;
+      return !o.hidden && !o.active;
     }).map(function (o) {
       return o.id;
     });
@@ -496,7 +511,7 @@
    */
   ActiveState.prototype.invertEdges = function() {
     var a = _g.edges().filter(function (o) {
-      return !o.active;
+      return !o.hidden && !o.active;
     }).map(function (o) {
       return o.id;
     });
