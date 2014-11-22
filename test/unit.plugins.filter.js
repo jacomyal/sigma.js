@@ -70,26 +70,31 @@ test('API', function() {
           {
             id: 'n0',
             label: 'Node 0',
-            myNodeAttr: 0
+            myNodeAttr: 0,
+            my: {node: {attr: 5}}
           },
           {
             id: 'n1',
             label: 'Node 1',
-            myNodeAttr: 1
+            myNodeAttr: 1,
+            my: {node: {attr: 3}}
           },
           {
             id: 'n2',
             label: 'Node 2',
-            myNodeAttr: 2
+            myNodeAttr: 2,
+            my: {node: {attr: -10}}
           },
           {
             id: 'n3',
             label: 'Node 3',
-            myNodeAttr: -1
+            myNodeAttr: -1,
+            my: {node: {}}
           },
           {
             id: 'n4',
-            label: 'Node 4'
+            label: 'Node 4',
+            my: {node: {attr: 1}}
           }
         ],
         edges: [
@@ -144,15 +149,19 @@ test('API', function() {
     });
   };
 
-  // Show non-isolated nodes only
-  function degreePredicate(n, options) {
-    return this.degree(n.id) > options.value;
+  // Show only with degree greater than a specified value
+  function degreePredicate(n, params) {
+    return this.graph.degree(n.id) > params.value;
   };
 
   // Show edges without the myEdgeAttr attribute or with myEdgeAttr > 1
   function myEdgeAttrPredicate(e) {
     return e.myEdgeAttr === undefined || e.myEdgeAttr > 1;
   };
+
+  function dynamicAccessorPredicate(n, params) {
+    return this.get(n, params.property) < params.threshold;
+  }
 
   // Register the filter
   filter.nodesBy(degreePredicate, { value: 0 }, 'degree');
@@ -186,8 +195,23 @@ test('API', function() {
 
   deepEqual(
     hiddenNodes(),
-    [s.graph.nodes('n2') , s.graph.nodes('n3') , s.graph.nodes('n4') ],
+    [s.graph.nodes('n2'), s.graph.nodes('n3'), s.graph.nodes('n4') ],
     '"neighborsOf" hides all nodes which are not linked to the specified node'
+  );
+
+  // Register and apply a filter with dynamic access to nodes properties
+  filter
+    .undo()
+    .nodesBy(dynamicAccessorPredicate, {
+      property: 'my.node.attr',
+      threshold: 3
+    })
+    .apply();
+
+  deepEqual(
+    hiddenNodes(),
+    [s.graph.nodes('n0'), s.graph.nodes('n1'), s.graph.nodes('n3') ],
+    '"apply" applies a nodesBy filter with a dynamic accessor'
   );
 
 
@@ -375,8 +399,8 @@ test('API', function() {
     [
       {
         key: 'my-filter',
-        predicate: function degreePredicate(n, options) {
-          return this.degree(n.id) > options.value;
+        predicate: function degreePredicate(n, params) {
+          return this.graph.degree(n.id) > params.value;
         }.toString().replace(/\s+/g, ' '),
         processor: 'nodes',
         options: { value: 0 }
@@ -450,7 +474,7 @@ test('API', function() {
   filter = new sigma.plugins.filter(s);
   s.graph.read(graph);
   filter.nodesBy(function (n) {
-    return this.degree(n.id) > 0;
+    return this.graph.degree(n.id) > 0;
   }, 'degree');
   filter.apply();
 

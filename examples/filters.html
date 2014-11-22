@@ -256,7 +256,7 @@ sigma.parsers.gexf('data/moroccan-ediaspora.gexf', {
       .undo('min-degree')
       .nodesBy(
         function(n, options) {
-          return this.degree(n.id) >= options.minDegreeVal;
+          return this.graph.degree(n.id) >= options.minDegreeVal;
         },
         {
           minDegreeVal: +v
