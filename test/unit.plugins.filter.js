@@ -231,7 +231,7 @@ test('API', function() {
   deepEqual(
     filter.serialize().map(function(o) { return o.key }),
     ['degree', 'attr'],
-    'The filters chain is exported'
+    'The filters chain is serialized'
   );
 
 
@@ -291,7 +291,7 @@ test('API', function() {
   strictEqual(
     filter.serialize().length,
     0,
-    'The empty chain is imported'
+    'The empty chain is loaded'
   );
 
 
@@ -311,18 +311,18 @@ test('API', function() {
     filter.serialize().map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
+        predicate: o.predicate,
         processor: o.processor,
         options: o.options
       };
     }),
     [{
       key: 'my-filter',
-      predicate: degreePredicate.toString(),
+      predicate: degreePredicate.toString().replace(/\s+/g, ' '),
       processor: 'nodes',
       options: { value: 0 }
     }],
-    'The filters chain is imported'
+    'The chain of filters is loaded'
   );
 
 
@@ -333,7 +333,6 @@ test('API', function() {
     chain.map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
         processor: o.processor,
         options: o.options
       };
@@ -341,22 +340,21 @@ test('API', function() {
     dumpedChain.map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString(),
         processor: o.processor,
         options: o.options
       };
     }),
-    'The exported filters chain is imported'
+    'The serialized chain of filters is loaded'
   );
 
 
   // check chain duplication
-  filter.clear();
+  filter.apply().clear();
 
   strictEqual(
     dumpedChain.length,
     1,
-    'The exported chain is a deep copy of the internal chain'
+    'The serialized chain is a deep copy of the internal chain'
   );
 
 
@@ -369,7 +367,7 @@ test('API', function() {
     filter.serialize().map(function(o) {
       return {
         key: o.key,
-        predicate: o.predicate.toString().replace(/\s+/g, ' '),
+        predicate: o.predicate,
         processor: o.processor,
         options: o.options
       };
@@ -384,7 +382,7 @@ test('API', function() {
         options: { value: 0 }
       }
     ],
-    'The internal chain is a deep copy of the imported chain'
+    'The internal chain is a deep copy of the loaded chain'
   );
 
   throws(
