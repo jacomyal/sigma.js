@@ -19,7 +19,12 @@
        _renderer = undefined,
        _body,
        _activated = false,
-       _settings = {},
+       _settings = {
+        'fillStyle': 'rgb(200, 200, 200)',
+        'strokeStyle': 'black',
+        'lineWidth': 5,
+        'fillWhileDrawing': false
+       },
        _drawingCanvas = undefined,
        _drawingContext = undefined,
        _drewPoints = [],
@@ -51,8 +56,9 @@
       _drewPoints = [];
       _selectedNodes = [];
       _drawingContext.beginPath();
-      _drawingContext.strokeStyle = 'black';
-      _drawingContext.fillStyle = 'blue';
+      _drawingContext.lineWidth = _settings.lineWidth;
+      _drawingContext.strokeStyle = _settings.strokeStyle;
+      _drawingContext.fillStyle = _settings.fillStyle;
 
       _drewPoints.push({
         x: event.clientX - drawingRectangle.left,
@@ -75,7 +81,9 @@
       _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
 
       _drawingContext.stroke();
-      _drawingContext.fill();
+      if (_settings.fillWhileDrawing) {
+        _drawingContext.fill();
+      }
 
       event.stopPropagation();
     }
@@ -92,7 +100,7 @@
 
       console.log(_drewPoints);
 
-      // Redraw the path invisibly : without filling or stroking
+      // Redraw the path invisibly to check for isPointInPath : without filling or stroking
       _drawingContext.save();
       _drawingContext.beginPath();
       _drawingContext.moveTo(_drewPoints[0].x, _drewPoints[0].y);
