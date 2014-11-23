@@ -309,6 +309,11 @@
       lasso = new Lasso(sigmaInstance, renderer, settings);
     }
 
+    sigmaInstance.bind('kill', function () {
+      lasso.unactivate();
+      lasso = null;
+    });
+
     return lasso;
   };
 
