@@ -59,14 +59,20 @@
 
         var font = node.icon.font || 'Arial',
             fgColor = node.icon.color || '#F00',
-            fontSizeRatio = node.icon.scale || 1.0,
             text = node.icon.content || '?',
             px = node.icon.x || 0.5,
             py = node.icon.y || 0.5,
             height = size,
             width = size;
 
-        var fontSize = Math.round(fontSizeRatio * (height * 0.5));
+
+        var fontSizeRatio = 0.70;
+        if (typeof node.icon.scale === "number") {
+          fontSizeRatio = Math.abs(Math.max(0.01, node.icon.scale));
+        }
+
+
+        var fontSize = Math.round(fontSizeRatio * height);
 
         //ctx.beginPath();
         ctx.fillStyle = fgColor;

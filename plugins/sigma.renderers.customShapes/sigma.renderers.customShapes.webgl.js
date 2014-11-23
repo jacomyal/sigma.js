@@ -206,7 +206,7 @@
         // adjust icon size
         var fontSizeRatio = 0.70;
         if (typeof node.icon.scale === "number") {
-          fontSizeRatio = node.icon.scale;
+          fontSizeRatio = Math.abs(Math.max(0.01, node.icon.scale)) * 0.5;
         }
 
         // adjust icon background (border) and foreground (main) color
