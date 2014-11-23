@@ -144,9 +144,16 @@
     ]
   });
 
-  var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
-    activationKeyCode: 76,
-    activationWithAltKey: true
+  sigmaInstance.refresh();
+
+
+  var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0]);
+
+  document.addEventListener('keyup', function (event) {
+    if (event.keyCode === 76 && event.altKey) {
+      lasso.toggleActivation();
+    }
   });
+
 })();
 </script>

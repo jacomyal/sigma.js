@@ -19,11 +19,12 @@
        _renderer = undefined,
        _body,
        _activated = false,
-       _path = [],
-       _settings = {
-         "activationKeyCode": 76,
-         "activationWithAltKey": true
-       };
+       _settings = {},
+       _drawingCanvas = undefined,
+       _drawingContext = undefined,
+       _drewPoints = [],
+       _selectedNodes = [],
+       isDrawing = false;
 
   /**
    * Overwrites object1's values with object2's and adds object2's if non existent in object1
@@ -42,29 +43,39 @@
       return object3;
   }
 
-  function onKeyUp (event) {
-    console.log(event);
-
-    if (!_settings.activationWithAltKey || (_settings.activationWithAltKey && event.altKey) && event.keyCode === _settings.activationKeyCode) {
-      if (_activated) {
-        lasso.unactivate();
-      } else {
-        lasso.activate();
-      }
-    }
-  }
-
   function onMouseDown (event) {
+    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+
     if (_activated) {
-      console.log(event);
+      isDrawing = true;
+      _drewPoints = [];
+      _selectedNodes = [];
+      _drawingContext.beginPath();
+      _drawingContext.strokeStyle = 'black';
+      _drawingContext.fillStyle = 'blue';
+
+      _drewPoints.push({
+        x: event.clientX - drawingRectangle.left,
+        y: event.clientY - drawingRectangle.top
+      });
+      _drawingContext.moveTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
 
       event.stopPropagation();
     }
   }
 
   function onMouseMove (event) {
-    if (_activated) {
-      console.log(event);
+    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+
+    if (_activated && isDrawing) {
+      _drewPoints.push({
+        x: event.clientX - drawingRectangle.left,
+        y: event.clientY - drawingRectangle.top
+      });
+      _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
+
+      _drawingContext.stroke();
+      _drawingContext.fill();
 
       event.stopPropagation();
     }
@@ -72,7 +83,38 @@
 
   function onMouseUp (event) {
     if (_activated) {
-      console.log(event);
+      isDrawing = false;
+
+      // Select the nodes inside the path
+      var nodes = _sigmaInstance.graph.nodes(),
+        nodesLength = nodes.length,
+        i = 0;
+
+      console.log(_drewPoints);
+
+      // Redraw the path invisibly : without filling or stroking
+      _drawingContext.save();
+      _drawingContext.beginPath();
+      _drawingContext.moveTo(_drewPoints[0].x, _drewPoints[0].y);
+      for (i = 1; i < _drewPoints.length; i++) {
+        _drawingContext.moveTo(_drewPoints[i].x, _drewPoints[i].y);
+      }
+
+      while (nodesLength--) {
+        var node = nodes[nodesLength],
+            x = node.x,
+            y = node.y;
+        console.log(x, y);
+
+        if (_drawingContext.isPointInPath(x, y)) {
+          _selectedNodes.push(node);
+        }
+      }
+
+      console.log('selected', _selectedNodes);
+
+      // Clear the drawing canvas
+      _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
 
       event.stopPropagation();
     }
@@ -102,12 +144,7 @@
     _settings = mergeOptions(_settings, settings || {});
     _body = document.body;
 
-    console.log(_body);
-
-    // Bind keyboard events to listen for activation key
-    _body.addEventListener('keyup', onKeyUp);
-
-    console.log('created with', _settings);
+    console.log('created with', _body, _settings);
   };
 
   /**
@@ -119,6 +156,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.clear = function () {
+    this.unactivate();
     lasso = null;
 
     return this;
@@ -133,19 +171,23 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.activate = function () {
-    _activated = true;
+    if (!_activated) {
+      _activated = true;
 
-    // Add a new background layout canvas to draw the path on
-    if (!_renderer.domElements['lasso-background']) {
-      _renderer.initDOM('canvas', 'lasso-background');
-      _renderer.domElements['lasso-background'].width = _renderer.container.offsetWidth;
-      _renderer.domElements['lasso-background'].height = _renderer.container.offsetHeight;
-      _renderer.container.insertBefore(_renderer.domElements['lasso-background'], _renderer.container.firstChild);
+      // Add a new background layout canvas to draw the path on
+      if (!_renderer.domElements['lasso-background']) {
+        _renderer.initDOM('canvas', 'lasso-background');
+        _renderer.domElements['lasso-background'].width = _renderer.container.offsetWidth;
+        _renderer.domElements['lasso-background'].height = _renderer.container.offsetHeight;
+        _renderer.container.appendChild(_renderer.domElements['lasso-background']);
+        _drawingCanvas = _renderer.domElements['lasso-background'];
+        _drawingContext = _drawingCanvas.getContext('2d');
+      }
+
+      this.bindAll();
+
+      console.log('activated');
     }
-
-    this.bindAll();
-
-    console.log('activated');
 
     return this;
   };
@@ -159,16 +201,37 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.unactivate = function () {
-    _activated = false;
+    if (_activated) {
+      _activated = false;
 
-    if (_renderer.domElements['lasso-background']) {
-      console.log(_renderer, _renderer.container);
-      _renderer.container.removeChild(_renderer.domElements['lasso-background']);
+      if (_renderer.domElements['lasso-background']) {
+        _renderer.container.removeChild(_renderer.domElements['lasso-background']);
+        delete _renderer.domElements['lasso-background'];
+        _drawingCanvas = null;
+        _drawingContext = null;
+      }
+
+      this.unbindAll();
+
+      console.log('unactivated');
     }
+    return this;
+  };
 
-    this.unbindAll();
-
-    console.log('unactivated');
+  /**
+   * This method is used to activate or unactivate the lasso mode.
+   *
+   * > var lasso = new sigma.plugins.lasso(sigmaInstance);
+   * > lasso.toggleActivation();
+   *
+   * @return {sigma.plugins.lasso} Returns the instance.
+   */
+  Lasso.prototype.toggleActivation = function () {
+    if (_activated) {
+      this.unactivate();
+    } else {
+      this.activate();
+    }
 
     return this;
   };
@@ -205,6 +268,17 @@
     return this;
   };
 
+  /**
+   * This method is used to retrieve the previously selected nodes
+   *
+   * > var lasso = new sigma.plugins.lasso(sigmaInstance);
+   * > lasso.getSelectedNodes();
+   *
+   * @return {array} Returns an array of nodes.
+   */
+  Lasso.prototype.getSelectedNodes = function () {
+    return _selectedNodes;
+  };
 
   /**
    * Interface
