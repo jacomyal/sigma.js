@@ -74,6 +74,7 @@
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
 
     if (_activated && isDrawing) {
+      _drawingCanvas.style.cursor = 'move';
       _drewPoints.push({
         x: event.clientX - drawingRectangle.left,
         y: event.clientY - drawingRectangle.top
@@ -96,23 +97,14 @@
       // Select the nodes inside the path
       var nodes = _sigmaInstance.graph.nodes(),
         nodesLength = nodes.length,
-        i = 0;
+        i = 0,
+        prefix = _renderer.options.prefix || '';
 
-      console.log(_drewPoints);
-
-      // Redraw the path invisibly to check for isPointInPath : without filling or stroking
-      _drawingContext.save();
-      _drawingContext.beginPath();
-      _drawingContext.moveTo(_drewPoints[0].x, _drewPoints[0].y);
-      for (i = 1; i < _drewPoints.length; i++) {
-        _drawingContext.moveTo(_drewPoints[i].x, _drewPoints[i].y);
-      }
-
+      // Loop on all nodes and check if they are in the path
       while (nodesLength--) {
         var node = nodes[nodesLength],
-            x = node.x,
-            y = node.y;
-        console.log(x, y);
+            x = node[prefix + 'x'],
+            y = node[prefix + 'y'];
 
         if (_drawingContext.isPointInPath(x, y)) {
           _selectedNodes.push(node);
