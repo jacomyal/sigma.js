@@ -23,7 +23,9 @@
         'fillStyle': 'rgb(200, 200, 200)',
         'strokeStyle': 'black',
         'lineWidth': 5,
-        'fillWhileDrawing': false
+        'fillWhileDrawing': false,
+        'displayFeedback': true,
+        'displayFeedbackColor': 'rgb(42, 187, 155)'
        },
        _drawingCanvas = undefined,
        _drawingContext = undefined,
@@ -59,6 +61,23 @@
       _drawingContext.lineWidth = _settings.lineWidth;
       _drawingContext.strokeStyle = _settings.strokeStyle;
       _drawingContext.fillStyle = _settings.fillStyle;
+
+      // Reset initial color of each node if needed
+      if (_settings.displayFeedback) {
+        var nodes = _sigmaInstance.graph.nodes(),
+            nodesLength = nodes.length;
+
+        while (nodesLength--) {
+          var node = nodes[nodesLength];
+          if ('initialColor' in node && node.initialColor !== undefined) {
+            node.color = node.initialColor;
+            delete node.initialColor;
+          }
+        }
+      }
+
+
+      _sigmaInstance.refresh();
 
       _drewPoints.push({
         x: event.clientX - drawingRectangle.left,
@@ -108,7 +127,16 @@
 
         if (_drawingContext.isPointInPath(x, y)) {
           _selectedNodes.push(node);
+
+          if (_settings.displayFeedback) {
+            node.initialColor = node.color || _renderer.settings('defaultNodeColor');
+            node.color = _settings.displayFeedbackColor;
+          }
         }
+      }
+
+      if (_settings.displayFeedback) {
+        _sigmaInstance.refresh();
       }
 
       console.log('selected', _selectedNodes);
@@ -209,6 +237,20 @@
         delete _renderer.domElements['lasso-background'];
         _drawingCanvas = null;
         _drawingContext = null;
+      }
+
+      // Reset initial color of each node if needed
+      if (_settings.displayFeedback) {
+        var nodes = _sigmaInstance.graph.nodes(),
+            nodesLength = nodes.length;
+
+        while (nodesLength--) {
+          var node = nodes[nodesLength];
+          if ('initialColor' in node && node.initialColor !== undefined) {
+            node.color = node.initialColor;
+            delete node.initialColor;
+          }
+        }
       }
 
       this.unbindAll();
