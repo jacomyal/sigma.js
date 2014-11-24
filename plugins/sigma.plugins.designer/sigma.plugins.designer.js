@@ -531,7 +531,12 @@
 
           if (self.originalVisualVariable[item.id] === undefined ||
             self.originalVisualVariable[item.id][visualVar] === undefined) {
-            delete item[visualVar];
+
+            // Avoid Sigma bug on edge with no size
+            if (self.key === 'edges' && visualVar === 'size')
+              item.size = 1;
+            else
+              delete item[visualVar];
         }
           else
             item[visualVar] = self.originalVisualVariable[item.id][visualVar];
