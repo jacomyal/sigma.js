@@ -86,7 +86,7 @@
 
         case 'star':
           isConvex  = 1;
-          scale     = 0.5;
+          scale     = 0.7;
           numPoints = 5;
           if (typeof node.star !== "undefined") {
             if (typeof node.star.numPoints === "number") {
@@ -167,10 +167,10 @@
         case 'cross':
           isConvex = 0; // desn't matter much
           numPoints = 9; // special code
-          scale = 0.08;
+          scale = 0.10;
           if (typeof node.cross !== "undefined") {
             if (typeof node.cross.lineWeight === "number") {
-              scale = Math.max(0.08, Math.min(0.50, (node.cross.lineWeight) * 0.1));
+              scale = Math.max(0.10, Math.min(0.50, (node.cross.lineWeight) * 0.1));
             }
             if (typeof node.rotate === "number") {
               shapeRotation = node.cross.rotate;

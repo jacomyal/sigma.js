@@ -104,83 +104,85 @@ var i,
        '#F8C821'
     ];
 
-
-var createGraph = function(){
-  // Generate a random graph, going through the different shapes
-  for (i = 0; i < N; i++) {
-    var node = {
-      id: 'n' + i,
-      label: ''+i,
-      x: Math.random(),
-      y: Math.random(),
-      size: 2 + 5 * Math.random(),
-      color: colors[Math.floor(Math.random() * colors.length)],
-      type:  ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
-      icon: {
-        font: 'FontAwesome',
-        scale: 1.0, // size ratio of (icon / node)
-        color: '#fff',
-        content: icons[Math.floor(Math.random() * icons.length)]
-      }
-    };
-
-    switch(node.type) {
-      case "equilateral":
-        node.equilateral = {
-          rotate: Math.random()*45, // random rotate up to 45 deg
-          numPoints: Math.round(5 + Math.random()*3)
+    // Generate a random graph, going through the different shapes
+    for (i = 0; i < N; i++) {
+      var node = {
+        id: 'n' + i,
+        label: ''+i,
+        x: Math.random(),
+        y: Math.random(),
+        size: 20 + 50 * Math.random(),
+        color: colors[Math.floor(Math.random() * colors.length)],
+        type: 'equilateral',// ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
+        icon: {
+          font: 'FontAwesome',
+          scale: 1.0, // size ratio of (icon / node)
+          color: '#fff',
+          content: icons[Math.floor(Math.random() * icons.length)]
         }
-        break;
-      case "star":
-        node.star = {
+      };
+
+      switch(node.type) {
+        case "equilateral":
+          node.equilateral = {
+            rotate: ((Math.random()*45) * Math.PI) / 180, // random rotate up to 45° then -> radians
+            numPoints: Math.round(5 + Math.random()*3)
+          }
+          break;
+          /*
+          case "star":
+          node.star = {
           innerRatio: 0.4 + Math.random()*0.2,
           numPoints: Math.round(4 + Math.random()*3)
         }
         if(node.image) {
-          // note clip/scale are ratio values. So we fit them to the inner ratio of the star shape
-          node.image.clip = node.star.innerRatio *0.95;
-          node.image.scale = node.star.innerRatio *1.2;
-        }
-        break;
+        // note clip/scale are ratio values. So we fit them to the inner ratio of the star shape
+        node.image.clip = node.star.innerRatio *0.95;
+        node.image.scale = node.star.innerRatio *1.2;
+      }
+      break;
       case "square":
       case "diamond":
-        if(node.image) {
-          // note clip/scale are ratio values. So we fit them to the borders of the square shape
-          node.image.clip = 0.7;
-        }
-        break;
-      case "circle":
-        break;
-      case "cross":
-        node.cross = {
-          lineWeight: 0.1 + Math.round(Math.random() * 5)
-        }
-        break;
+      if(node.image) {
+      // note clip/scale are ratio values. So we fit them to the borders of the square shape
+      node.image.clip = 0.7;
     }
-    g.nodes.push(node);
+    break;
+    case "circle":
+    break;
+    case "cross":
+    node.cross = {
+    lineWeight: 0.1 + Math.round(Math.random() * 5)
   }
+  break;
+  */
+}
+g.nodes.push(node);
+}
 
 
-  for (i = 0; i < E; i++)
-    g.edges.push({
-      id: 'e' + i,
-      source: 'n' + (Math.random() * N | 0),
-      target: 'n' + (Math.random() * N | 0),
-      size: Math.random()
-    });
+for (i = 0; i < E; i++)
+g.edges.push({
+  id: 'e' + i,
+  source: 'n' + (Math.random() * N | 0),
+  target: 'n' + (Math.random() * N | 0),
+  size: Math.random()
+});
 
 
-  var settings = {
-      defaultLabelColor: '#fff',
-      defaultEdgeColor: '#333',
-      edgeColor: 'default',
-      labelThreshold: 40,
-      shortLabels: true,
-      zoomMax: 10,
-      spriteSheetResolution: 2048, // resolution of the sprite sheet square
-      spriteSheetMaxSprites: 64,    // number max of sprites
-  };
+var settings = {
+  defaultLabelColor: '#fff',
+  defaultEdgeColor: '#333',
+  edgeColor: 'default',
+  labelThreshold: 40,
+  shortLabels: true,
+  zoomMax: 10,
+  spriteSheetResolution: 2048, // resolution of the sprite sheet square
+  spriteSheetMaxSprites: 64,    // number max of sprites
+};
 
+
+setTimeout(function(){
   var sigmaCanvas = new sigma({
     graph: g,
     renderer: {
@@ -189,7 +191,6 @@ var createGraph = function(){
     },
     settings: settings
   });
-  sigmaCanvas.refresh();
 
   var sigmaWebgl = new sigma({
     graph: g,
@@ -199,16 +200,15 @@ var createGraph = function(){
     },
     settings: settings
   });
-
   sigmaWebgl.refresh();
-};
 
-// give some time to Font Awesome to load
-// alternatively, you could take care of it yourself, by using this library:
-// https://github.com/bramstein/fontloader
-// or this one:
-// https://github.com/smnh/FontLoader
-setTimeout(createGraph, 3500);
+  sigmaCanvas.refresh();
+}, 3000);
+
+// there is a timeout to give some time to Font Awesome to load to webgl mode
+// normally you would use a shim to the font loader api:
+// https://github.com/bramstein/fontloader OR https://github.com/smnh/FontLoader
+// but for the demo this is a simple timeout
 
   </script>
   </body>

@@ -1,6 +1,8 @@
 ;(function(undefined) {
   'use strict';
 
+  var sizeRatio  = 0.7; // webgl cannot draw at scale 1.0 so we need to equalize here too
+  var borderThickness = 1/5;
   var shapes = [];
   var register = function(name,drawShape,drawBorder) {
     shapes.push({
@@ -25,7 +27,7 @@
     return function(node,x,y,size,color,context) {
       context.fillStyle = color;
       context.beginPath();
-      shapeFunc(node,x,y,size,context);
+      shapeFunc(node,x,y,size*sizeRatio,context);
       context.closePath();
       context.fill();
     };
@@ -34,9 +36,9 @@
   var genericDrawBorder = function(shapeFunc) {
     return function(node,x,y,size,color,context) {
       context.strokeStyle = color;
-      context.lineWidth = size / 5;
+      context.lineWidth = size * sizeRatio * borderThickness;
       context.beginPath();
-      shapeFunc(node,x,y,size,context);
+      shapeFunc(node,x,y,size*sizeRatio,context);
       context.closePath();
       context.stroke();
     };
@@ -88,8 +90,13 @@
 
   var drawEquilateral = function(node,x,y,size,context) {
     var pcount = (node.equilateral && node.equilateral.numPoints) || 5;
-    var rotate = ((node.equilateral && node.equilateral.rotate) || 0)*Math.PI/180;
+    var rotate = ((node.equilateral && node.equilateral.rotate) || 0); // now we expect radians: Math.PI/180;
     var radius = size;
+
+    // TODO FIXME there is an angle difference between the webgl algorithm and
+    //  the canvas algorithm
+    rotate += Math.PI/pcount; // angleOffset
+
     context.moveTo(x+radius*Math.sin(rotate), y-radius*Math.cos(rotate)); // first point on outer radius, angle 'rotate'
     for(var i=1; i<pcount; i++) {
       context.lineTo(x+Math.sin(rotate+2*Math.PI*i/pcount)*radius, y-Math.cos(rotate+2*Math.PI*i/pcount)*radius);
@@ -156,7 +163,7 @@
     // add: addShape,
 
     // Version
-    version: '0.1'
+    version: '0.2'
   };
 
 }).call(this);
