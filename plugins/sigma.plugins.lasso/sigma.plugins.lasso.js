@@ -14,7 +14,8 @@
    * @author Florent Schildknecht <florent.schildknecht@gmail.com> (Florent Schildknecht)
    * @version 0.0.1
    */
-   var _sigmaInstance = undefined,
+   var _self = undefined,
+       _sigmaInstance = undefined,
        _graph = undefined,
        _renderer = undefined,
        _body,
@@ -26,105 +27,6 @@
        _selectedNodes = [],
        isDrawing = false;
 
-  function onMouseDown (event) {
-    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
-
-    if (_activated) {
-      isDrawing = true;
-      _drewPoints = [];
-      _selectedNodes = [];
-
-      _drawingContext.beginPath();
-
-      // Reset initial color of each node if needed
-      if (_settings('displayFeedback')) {
-        var nodes = _sigmaInstance.graph.nodes(),
-            nodesLength = nodes.length;
-
-        while (nodesLength--) {
-          var node = nodes[nodesLength];
-          if ('initialColor' in node && node.initialColor !== undefined) {
-            node.color = node.initialColor;
-            delete node.initialColor;
-          }
-        }
-      }
-
-      _sigmaInstance.refresh();
-
-      _drewPoints.push({
-        x: event.clientX - drawingRectangle.left,
-        y: event.clientY - drawingRectangle.top
-      });
-      _drawingContext.moveTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
-
-      event.stopPropagation();
-    }
-  }
-
-  function onMouseMove (event) {
-    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
-
-
-    if (_activated && isDrawing) {
-      _drawingContext.lineWidth = _settings('lineWidth');
-      _drawingContext.strokeStyle = _settings('strokeStyle');
-      _drawingContext.fillStyle = _settings('fillStyle');
-      _drawingCanvas.style.cursor = 'move';
-      _drewPoints.push({
-        x: event.clientX - drawingRectangle.left,
-        y: event.clientY - drawingRectangle.top
-      });
-      _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
-
-      _drawingContext.stroke();
-      if (_settings('fillWhileDrawing')) {
-        _drawingContext.fill();
-      }
-
-      event.stopPropagation();
-    }
-  }
-
-  function onMouseUp (event) {
-    if (_activated) {
-      isDrawing = false;
-
-      // Select the nodes inside the path
-      var nodes = _sigmaInstance.graph.nodes(),
-        nodesLength = nodes.length,
-        i = 0,
-        prefix = _renderer.options.prefix || '';
-
-      // Loop on all nodes and check if they are in the path
-      while (nodesLength--) {
-        var node = nodes[nodesLength],
-            x = node[prefix + 'x'],
-            y = node[prefix + 'y'];
-
-        if (_drawingContext.isPointInPath(x, y)) {
-          _selectedNodes.push(node);
-
-          if (_settings('displayFeedback')) {
-            node.initialColor = node.color || _renderer.settings('defaultNodeColor');
-            node.color = _settings('displayFeedbackColor');
-          }
-        }
-      }
-
-      if (_settings('displayFeedback')) {
-        _sigmaInstance.refresh();
-      }
-
-      console.log('selected', _selectedNodes);
-
-      // Clear the drawing canvas
-      _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
-
-      event.stopPropagation();
-    }
-  }
-
   /**
    * Lasso Object
    * ------------------
@@ -133,6 +35,9 @@
    * @param  {sigma.classes.configurable} settings    A settings class
    */
   function Lasso (sigmaInstance, renderer, settings) {
+    // Lasso is also an event dispatcher
+    sigma.classes.dispatcher.extend(this);
+
     // A quick hardcoded rule to prevent people from using this plugin with the
     // WebGL renderer (which is impossible at the moment):
     if (
@@ -143,6 +48,7 @@
         'The sigma.plugins.lasso is not compatible with the WebGL renderer'
       );
 
+    _self = this;
     _sigmaInstance = sigmaInstance;
     _graph = sigmaInstance.graph;
     _renderer = renderer;
@@ -220,6 +126,8 @@
     if (_activated) {
       _activated = false;
 
+      this.unbindAll();
+
       if (_renderer.domElements['lasso-background']) {
         _renderer.container.removeChild(_renderer.domElements['lasso-background']);
         delete _renderer.domElements['lasso-background'];
@@ -242,10 +150,9 @@
         }
       }
 
-      this.unbindAll();
-
       console.log('unactivated');
     }
+
     return this;
   };
 
@@ -276,7 +183,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.bindAll = function () {
-    _body.addEventListener('mousedown', onMouseDown);
+    _drawingCanvas.addEventListener('mousedown', onMouseDown);
     _body.addEventListener('mousemove', onMouseMove);
     _body.addEventListener('mouseup', onMouseUp);
 
@@ -292,7 +199,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.unbindAll = function () {
-    _body.removeEventListener('mousedown', onMouseDown);
+    _drawingCanvas.removeEventListener('mousedown', onMouseDown);
     _body.removeEventListener('mousemove', onMouseMove);
     _body.removeEventListener('mouseup', onMouseUp);
 
@@ -310,6 +217,108 @@
   Lasso.prototype.getSelectedNodes = function () {
     return _selectedNodes;
   };
+
+  function onMouseDown (event) {
+    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+
+    if (_activated) {
+      isDrawing = true;
+      _drewPoints = [];
+      _selectedNodes = [];
+
+      _drawingContext.beginPath();
+
+      // Reset initial color of each node if needed
+      if (_settings('displayFeedback')) {
+        var nodes = _sigmaInstance.graph.nodes(),
+            nodesLength = nodes.length;
+
+        while (nodesLength--) {
+          var node = nodes[nodesLength];
+          if ('initialColor' in node && node.initialColor !== undefined) {
+            node.color = node.initialColor;
+            delete node.initialColor;
+          }
+        }
+      }
+
+      _sigmaInstance.refresh();
+
+      _drewPoints.push({
+        x: event.clientX - drawingRectangle.left,
+        y: event.clientY - drawingRectangle.top
+      });
+      _drawingContext.moveTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
+
+      event.stopPropagation();
+    }
+  }
+
+  function onMouseMove (event) {
+    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+
+
+    if (_activated && isDrawing) {
+      _drawingContext.lineWidth = _settings('lineWidth');
+      _drawingContext.strokeStyle = _settings('strokeStyle');
+      _drawingContext.fillStyle = _settings('fillStyle');
+      _drawingCanvas.style.cursor = 'move';
+
+      _drewPoints.push({
+        x: event.clientX - drawingRectangle.left,
+        y: event.clientY - drawingRectangle.top
+      });
+
+      _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
+      _drawingContext.stroke();
+
+      if (_settings('fillWhileDrawing')) {
+        _drawingContext.fill();
+      }
+
+      event.stopPropagation();
+    }
+  }
+
+  function onMouseUp (event) {
+    if (_activated && isDrawing) {
+      isDrawing = false;
+
+      // Select the nodes inside the path
+      var nodes = _sigmaInstance.graph.nodes(),
+        nodesLength = nodes.length,
+        i = 0,
+        prefix = _renderer.options.prefix || '';
+
+      // Loop on all nodes and check if they are in the path
+      while (nodesLength--) {
+        var node = nodes[nodesLength],
+            x = node[prefix + 'x'],
+            y = node[prefix + 'y'];
+
+        if (_drawingContext.isPointInPath(x, y)) {
+          _selectedNodes.push(node);
+
+          if (_settings('displayFeedback')) {
+            node.initialColor = node.color || _renderer.settings('defaultNodeColor');
+            node.color = _settings('displayFeedbackColor');
+          }
+        }
+      }
+
+      if (_settings('displayFeedback')) {
+        _sigmaInstance.refresh();
+      }
+
+      // Dispatch event with selected nodes
+      _self.dispatchEvent('sigma:lasso:selectedNodes', _selectedNodes);
+
+      // Clear the drawing canvas
+      _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
+
+      event.stopPropagation();
+    }
+  }
 
   /**
    * Interface
@@ -332,6 +341,7 @@
       lasso = new Lasso(sigmaInstance, renderer, settings);
     }
 
+    // Listen for sigmaInstance kill event, and remove the lasso isntance
     sigmaInstance.bind('kill', function () {
       lasso.unactivate();
       lasso = null;
