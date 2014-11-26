@@ -87,6 +87,7 @@
       touchEnabled: true,
       nodesPowRatio: 1,
       edgesPowRatio: 1,
+      sideMargin: 2,
       defaultEdgeColor: '#333',
       defaultNodeColor: '#333',
       edgeColor: 'default'
@@ -101,7 +102,7 @@
         id: (++nId) + '',
         size: nodeRadius,
         x: 0,
-        y: -80,
+        y: 0,
         dX: 0,
         dY: 0,
         type: 'goo'
@@ -110,7 +111,7 @@
         id: (++nId) + '',
         size: nodeRadius,
         x: 10,
-        y: -100,
+        y: -10,
         dX: 0,
         dY: 0,
         type: 'goo'
@@ -119,7 +120,43 @@
         id: (++nId) + '',
         size: nodeRadius,
         x: 20,
-        y: -80,
+        y: -8,
+        dX: 0,
+        dY: 0,
+        type: 'goo'
+      },
+      {
+        id: (++nId) + '',
+        size: nodeRadius,
+        x: -5,
+        y: -15,
+        dX: 0,
+        dY: 0,
+        type: 'goo'
+      },
+      {
+        id: (++nId) + '',
+        size: nodeRadius,
+        x: -25,
+        y: 4,
+        dX: 0,
+        dY: 0,
+        type: 'goo'
+      },
+      {
+        id: (++nId) + '',
+        size: nodeRadius,
+        x: 18,
+        y: 2,
+        dX: 0,
+        dY: 0,
+        type: 'goo'
+      },
+      {
+        id: (++nId) + '',
+        size: nodeRadius,
+        x: -4,
+        y: -6,
         dX: 0,
         dY: 0,
         type: 'goo'
@@ -140,6 +177,26 @@
         id: (++eId) + '',
         source: '2',
         target: '3'
+      },
+      {
+        id: (++eId) + '',
+        source: '4',
+        target: '2'
+      },
+      {
+        id: (++eId) + '',
+        source: '5',
+        target: '6'
+      },
+      {
+        id: (++eId) + '',
+        source: '7',
+        target: '1'
+      },
+      {
+        id: (++eId) + '',
+        source: '6',
+        target: '7'
       }
     ]
   });
@@ -147,7 +204,9 @@
   sigmaInstance.refresh();
 
 
-  var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0]);
+  var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
+    'lineWidth': 10
+  });
 
   document.addEventListener('keyup', function (event) {
     if (event.keyCode === 76 && event.altKey) {

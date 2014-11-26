@@ -19,36 +19,12 @@
        _renderer = undefined,
        _body,
        _activated = false,
-       _settings = {
-        'fillStyle': 'rgb(200, 200, 200)',
-        'strokeStyle': 'black',
-        'lineWidth': 5,
-        'fillWhileDrawing': false,
-        'displayFeedback': true,
-        'displayFeedbackColor': 'rgb(42, 187, 155)'
-       },
+       _settings = null,
        _drawingCanvas = undefined,
        _drawingContext = undefined,
        _drewPoints = [],
        _selectedNodes = [],
        isDrawing = false;
-
-  /**
-   * Overwrites object1's values with object2's and adds object2's if non existent in object1
-   * @param object1
-   * @param object2
-   * @returns object3 a new object based on object1 and object2
-   */
-  function mergeOptions (object1, object2) {
-      var object3 = {}, attrname;
-      for (attrname in object1) {
-        object3[attrname] = object1[attrname];
-      }
-      for (attrname in object2) {
-        object3[attrname] = object2[attrname];
-      }
-      return object3;
-  }
 
   function onMouseDown (event) {
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
@@ -57,13 +33,11 @@
       isDrawing = true;
       _drewPoints = [];
       _selectedNodes = [];
+
       _drawingContext.beginPath();
-      _drawingContext.lineWidth = _settings.lineWidth;
-      _drawingContext.strokeStyle = _settings.strokeStyle;
-      _drawingContext.fillStyle = _settings.fillStyle;
 
       // Reset initial color of each node if needed
-      if (_settings.displayFeedback) {
+      if (_settings('displayFeedback')) {
         var nodes = _sigmaInstance.graph.nodes(),
             nodesLength = nodes.length;
 
@@ -101,7 +75,7 @@
       _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
 
       _drawingContext.stroke();
-      if (_settings.fillWhileDrawing) {
+      if (_settings('fillWhileDrawing')) {
         _drawingContext.fill();
       }
 
@@ -128,14 +102,14 @@
         if (_drawingContext.isPointInPath(x, y)) {
           _selectedNodes.push(node);
 
-          if (_settings.displayFeedback) {
+          if (_settings('displayFeedback')) {
             node.initialColor = node.color || _renderer.settings('defaultNodeColor');
-            node.color = _settings.displayFeedbackColor;
+            node.color = _settings('displayFeedbackColor');
           }
         }
       }
 
-      if (_settings.displayFeedback) {
+      if (_settings('displayFeedback')) {
         _sigmaInstance.refresh();
       }
 
@@ -151,9 +125,9 @@
   /**
    * Lasso Object
    * ------------------
-   * @param  {sigma}    sigmaInstance The related sigma instance.
-   * @param  {renderer} renderer      The sigma instance renderer.
-   * @param  {object}   settings      A list of settings.
+   * @param  {sigma}                                  sigmaInstance The related sigma instance.
+   * @param  {renderer} renderer                      The sigma instance renderer.
+   * @param  {sigma.classes.configurable} settings    A settings class
    */
   function Lasso (sigmaInstance, renderer, settings) {
     // A quick hardcoded rule to prevent people from using this plugin with the
@@ -169,10 +143,20 @@
     _sigmaInstance = sigmaInstance;
     _graph = sigmaInstance.graph;
     _renderer = renderer;
-    _settings = mergeOptions(_settings, settings || {});
+
+    // Extends default settings
+    _settings = new sigma.classes.configurable({
+      'fillStyle': 'rgb(200, 200, 200)',
+      'strokeStyle': 'black',
+      'lineWidth': 5,
+      'fillWhileDrawing': false,
+      'displayFeedback': true,
+      'displayFeedbackColor': 'rgb(42, 187, 155)'
+     }, settings || {});
+
     _body = document.body;
 
-    console.log('created with', _body, _settings);
+    console.log('created');
   };
 
   /**
@@ -205,11 +189,16 @@
       // Add a new background layout canvas to draw the path on
       if (!_renderer.domElements['lasso-background']) {
         _renderer.initDOM('canvas', 'lasso-background');
-        _renderer.domElements['lasso-background'].width = _renderer.container.offsetWidth;
-        _renderer.domElements['lasso-background'].height = _renderer.container.offsetHeight;
-        _renderer.container.appendChild(_renderer.domElements['lasso-background']);
         _drawingCanvas = _renderer.domElements['lasso-background'];
+
+        _drawingCanvas.width = _renderer.container.offsetWidth;
+        _drawingCanvas.height = _renderer.container.offsetHeight;
+        _renderer.container.appendChild(_drawingCanvas);
         _drawingContext = _drawingCanvas.getContext('2d');
+
+        _drawingContext.lineWidth = _settings('lineWidth');
+        _drawingContext.strokeStyle = _settings('strokeStyle');
+        _drawingContext.fillStyle = _settings('fillStyle');
       }
 
       this.bindAll();
@@ -240,12 +229,13 @@
       }
 
       // Reset initial color of each node if needed
-      if (_settings.displayFeedback) {
+      if (_settings('displayFeedback')) {
         var nodes = _sigmaInstance.graph.nodes(),
             nodesLength = nodes.length;
 
         while (nodesLength--) {
           var node = nodes[nodesLength];
+
           if ('initialColor' in node && node.initialColor !== undefined) {
             node.color = node.initialColor;
             delete node.initialColor;
@@ -331,9 +321,9 @@
   var lasso = null;
 
   /**
-   * @param  {sigma}    sigmaInstance The related sigma instance.
-   * @param  {renderer} renderer      The sigma instance renderer.
-   * @param  {object}   settings      A list of settings.
+   * @param  {sigma}                                  sigmaInstance The related sigma instance.
+   * @param  {renderer} renderer                      The sigma instance renderer.
+   * @param  {sigma.classes.configurable} settings    A settings class
    *
    * @return {sigma.plugins.lasso} Returns the instance
    */
