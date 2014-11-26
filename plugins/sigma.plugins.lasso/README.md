@@ -34,13 +34,6 @@ lasso.bind('sigma:lasso:selectedNodes', function (event) {
 
 *Lasso settings*
 
-'fillStyle': 'rgb(200, 200, 200)',
-'strokeStyle': 'black',
-'lineWidth': 5,
-'fillWhileDrawing': false,
-'displayFeedback': true,
-'displayFeedbackColor': 'rgb(42, 187, 155)'
-
 * **fillStyle**: *string* `rgb(200, 200, 200)`: The fill-color of the lasso-tool, only works when <fillWhileDrawing> is set up to `true`
 * **strokeStyle** *string* `black`: The stroke-color of the lasso-tool
 * **lineWidth** *integer* `5`: The stroke-width of the lasso-tool
