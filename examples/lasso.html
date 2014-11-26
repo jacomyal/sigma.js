@@ -203,9 +203,13 @@
 
   sigmaInstance.refresh();
 
-
   var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
-    'lineWidth': 10
+    'fillStyle': 'transparent',
+    'strokeStyle': 'black',
+    'lineWidth': 5,
+    'fillWhileDrawing': false,
+    'displayFeedback': true,
+    'displayFeedbackColor': 'rgb(42, 187, 155)'
   });
 
   document.addEventListener('keyup', function (event) {

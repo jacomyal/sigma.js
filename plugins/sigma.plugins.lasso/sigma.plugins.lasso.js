@@ -50,7 +50,6 @@
         }
       }
 
-
       _sigmaInstance.refresh();
 
       _drewPoints.push({
@@ -66,7 +65,11 @@
   function onMouseMove (event) {
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
 
+
     if (_activated && isDrawing) {
+      _drawingContext.lineWidth = _settings('lineWidth');
+      _drawingContext.strokeStyle = _settings('strokeStyle');
+      _drawingContext.fillStyle = _settings('fillStyle');
       _drawingCanvas.style.cursor = 'move';
       _drewPoints.push({
         x: event.clientX - drawingRectangle.left,
@@ -195,10 +198,6 @@
         _drawingCanvas.height = _renderer.container.offsetHeight;
         _renderer.container.appendChild(_drawingCanvas);
         _drawingContext = _drawingCanvas.getContext('2d');
-
-        _drawingContext.lineWidth = _settings('lineWidth');
-        _drawingContext.strokeStyle = _settings('strokeStyle');
-        _drawingContext.fillStyle = _settings('fillStyle');
       }
 
       this.bindAll();
