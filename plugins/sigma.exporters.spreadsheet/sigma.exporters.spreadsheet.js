@@ -109,9 +109,17 @@
       else
         doThrow('Wrong argument "what": ' + params.what);
 
-      // Find all attributes keys to provide fixed row length
+      // Find all attributes keys to provide fixed row length to deal with
+      // missing attributes
       index['id'] = cpt++;
       attributesArr.push(escape('id', params.textSeparator));
+
+      if (params.what === 'edges') {
+        index['source'] = cpt++;
+        attributesArr.push(escape('source', params.textSeparator));
+        index['target'] = cpt++;
+        attributesArr.push(escape('target', params.textSeparator));
+      }
 
       for (var i = 0 ; i < data.length ; i++) {
         o = data[i];
@@ -130,10 +138,15 @@
       // Get attribute values
       for (var i = 0 ; i < data.length ; i++) {
         o = data[i];
-        var arr = []; //TODO set array length more cleanly
+        var arr = [];
         arr.length = cpt;
 
         arr[0] = escape(o.id, params.textSeparator);
+
+        if (params.what === 'edges') {
+          arr[1] = escape(o.source, params.textSeparator);
+          arr[2] = escape(o.target, params.textSeparator);
+        }
 
         attributes = strToObjectRef(o, params.attributes) || {};
         Object.keys(attributes).forEach(function (k) {
@@ -148,7 +161,7 @@
 
       if (params.download) {
         download(
-          'data:text/csv;charset=UTF-8,' +  //TODO check it, how to open on Excel?
+          'data:text/csv;charset=UTF-8,' +
             encodeURIComponent(serialized),
           'csv',
           params.filename

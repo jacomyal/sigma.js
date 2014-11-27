@@ -62,7 +62,7 @@ var i,
     };
 
 // Generate a random graph:
-for (i = 0; i < N; i++)
+for (i = 0; i < N/2; i++)
   g.nodes.push({
     id: 'n' + i,
     label: 'Node ' + i,
@@ -79,6 +79,24 @@ for (i = 0; i < N; i++)
       anArray: [1, 2, 3],
       aNull: null,
       anUndef: undefined,
+      anObject: {},
+      aFunction: function (argument) {}
+    }
+  });
+
+for (i = N/2; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: '#FF0000',
+    data: {
+      aString: 'abc ' + i,
+      aBoolean: true,
+      anInteger: i,
+      aNull: null,
       anObject: {},
       aFunction: function (argument) {}
     }
@@ -115,6 +133,7 @@ s = new sigma({
   }
 });
 
+// Get a subset of nodes:
 var nodes = s.toSpreadsheet({
   what: 'nodes',
   which: ['n0', 'n1'],

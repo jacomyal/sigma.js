@@ -28,9 +28,10 @@ s.toSpreadsheet({what: 'edges', download: true});
 ````javascript
 s.toSpreadsheet({
   what: 'nodes',
+  which: ['n0', 'n1'],
+  attributes: 'data',
   download: true,
   filename: 'myNodes.csv',
-  attributes: 'data',
   separator: ',',
   textSeparator: '"'
 });
