@@ -71,6 +71,7 @@ module.exports = function(grunt) {
   var plugins = [
     'helpers.graph',
     'exporters.gexf',
+    'exporters.spreadsheet',
     'exporters.svg',
     'layout.forceAtlas2',
     'parsers.gexf',
