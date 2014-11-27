@@ -14,7 +14,7 @@
    */
   sigma.canvas.edgehovers.tapered =
     function(edge, source, target, context, settings) {
-    // The goal is to draw a triangle where the target node is a point of 
+    // The goal is to draw a triangle where the target node is a point of
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
     var color = edge.active ?

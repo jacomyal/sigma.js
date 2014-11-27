@@ -163,6 +163,30 @@
         return this.cameras[0];
       }
     });
+    Object.defineProperty(this, 'events', {
+      value: [
+        'click',
+        'rightClick',
+        'clickStage',
+        'doubleClickStage',
+        'rightClickStage',
+        'clickNode',
+        'clickNodes',
+        'doubleClickNode',
+        'doubleClickNodes',
+        'rightClickNode',
+        'rightClickNodes',
+        'overNode',
+        'overNodes',
+        'outNode',
+        'outNodes',
+        'downNode',
+        'downNodes',
+        'upNode',
+        'upNodes'
+      ],
+      configurable: true
+    });
 
     // Add a custom handler, to redispatch events from renderers:
     this._handler = (function(e) {

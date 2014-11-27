@@ -10,7 +10,7 @@
   /**
    * This helper will bind any no-DOM renderer (for instance canvas or WebGL)
    * to its captors, to properly dispatch the good events to the sigma instance
-   * to manage clicking, overring etc...
+   * to manage clicking, hovering etc...
    *
    * It has to be called in the scope of the related renderer.
    */

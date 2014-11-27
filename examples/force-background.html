@@ -136,6 +136,7 @@ s = new sigma({
 // Configure the ForceAtlas2 algorithm:
 var fa = sigma.layouts.configForceAtlas2(s, {
   worker: true,
+  barnesHutOptimize: false,
   autoStop: true,
   background: true,
   easing: 'cubicInOut'

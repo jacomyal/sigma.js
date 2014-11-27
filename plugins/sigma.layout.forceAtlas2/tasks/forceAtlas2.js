@@ -35,7 +35,27 @@ function crush(fnString) {
     'weight'
   ];
 
+  var rp = [
+    'node',
+    'centerX',
+    'centerY',
+    'size',
+    'nextSibling',
+    'firstChild',
+    'mass',
+    'massCenterX',
+    'massCenterY'
+  ];
+
   // Replacing matrix accessors by incremented indexes
+  for (i = 0, l = rp.length; i < l; i++) {
+    pattern = new RegExp('rp\\(([^,]*), \'' + rp[i] + '\'\\)', 'g');
+    fnString = fnString.replace(
+      pattern,
+      (i === 0) ? '$1' : '$1 + ' + i
+    );
+  }
+
   for (i = 0, l = np.length; i < l; i++) {
     pattern = new RegExp('np\\(([^,]*), \'' + np[i] + '\'\\)', 'g');
     fnString = fnString.replace(

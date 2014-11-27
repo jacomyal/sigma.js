@@ -46,6 +46,10 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.plugins.neighborhoods/sigma.plugins.neighborhoods.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="lib/jquery-2.1.1.min.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -54,88 +58,109 @@
       left: 0;
       right: 0;
       position: absolute;
+      background-color: #455660;
+    }
+    .sigma-edge {
+      stroke: #14191C;
+    }
+    .sigma-node {
+      fill: green;
+      stroke: #14191C;
+      stroke-width: 2px;
+    }
+    .sigma-node:hover {
+      fill: blue;
+    }
+    .muted {
+      fill-opacity: 0.1;
+      stroke-opacity: 0.1;
     }
   </style>
   <div id="graph-container"></div>
 </div>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 <script>
 /**
- * Just a simple example to show how to use the sigma.layout.forceAtlas2
- * plugin:
- *
- * A random graph is generated, such that its nodes are separated in some
- * distinct clusters. Each cluster has its own color, and the density of
- * links is stronger inside the clusters. So, we expect the algorithm to
- * regroup the nodes of each cluster.
+ * This is a basic example of how one could spawn a freestyle svg renderer
+ * to achieve his/her goal through css and jQuery to display fancy graphs
+ * but somewhat less performant.
  */
 var i,
     s,
-    o,
-    N = 1000,
-    E = 5000,
-    C = 5,
-    d = 0.5,
-    cs = [],
+    N = 100,
+    E = 500,
     g = {
       nodes: [],
       edges: []
     };
 
-// Generate the graph:
-for (i = 0; i < C; i++)
-  cs.push({
-    id: i,
-    nodes: [],
-    color: '#' + (
-      Math.floor(Math.random() * 16777215).toString(16) + '000000'
-    ).substr(0, 6)
-  });
-
-for (i = 0; i < N; i++) {
-  o = cs[(Math.random() * C) | 0];
+// Generate a random graph:
+for (i = 0; i < N; i++)
   g.nodes.push({
     id: 'n' + i,
-    label: 'Node' + i,
-    x: 100 * Math.cos(2 * i * Math.PI / N),
-    y: 100 * Math.sin(2 * i * Math.PI / N),
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
     size: Math.random(),
-    color: o.color
+    color: '#666'
   });
-  o.nodes.push('n' + i);
-}
 
-for (i = 0; i < E; i++) {
-  if (Math.random() < 1 - d)
-    g.edges.push({
-      id: 'e' + i,
-      source: 'n' + ((Math.random() * N) | 0),
-      target: 'n' + ((Math.random() * N) | 0)
-    });
-  else {
-    o = cs[(Math.random() * C) | 0]
-    g.edges.push({
-      id: 'e' + i,
-      source: o.nodes[(Math.random() * o.nodes.length) | 0],
-      target: o.nodes[(Math.random() * o.nodes.length) | 0]
-    });
-  }
-}
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
 
+// Instantiate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container',
   settings: {
-    drawEdges: false
+    enableHovering: false
   }
 });
 
-// Start the ForceAtlas2 algorithm:
-var fa = sigma.layouts.startForceAtlas2(s, {worker: true, barnesHutOptimize: false});
+s.addRenderer({
+  id: 'main',
+  type: 'svg',
+  container: document.getElementById('graph-container'),
+  freeStyle: true
+});
 
-// Bind the events:
-fa.bind('start stop', function(e) {
-  console.log(e.type);
+s.refresh();
+
+// Binding silly interactions
+function mute(node) {
+  if (!~node.getAttribute('class').search(/muted/))
+    node.setAttributeNS(null, 'class', node.getAttribute('class') + ' muted');
+}
+
+function unmute(node) {
+  node.setAttributeNS(null, 'class', node.getAttribute('class').replace(/(\s|^)muted(\s|$)/g, '$2'));
+}
+
+$('.sigma-node').click(function() {
+
+  // Muting
+  $('.sigma-node, .sigma-edge').each(function() {
+    mute(this);
+  });
+
+  // Unmuting neighbors
+  var neighbors = s.graph.neighborhood($(this).attr('data-node-id'));
+  neighbors.nodes.forEach(function(node) {
+    unmute($('[data-node-id="' + node.id + '"]')[0]);
+  });
+
+  neighbors.edges.forEach(function(edge) {
+    unmute($('[data-edge-id="' + edge.id + '"]')[0]);
+  });
+});
+
+s.bind('clickStage', function() {
+  $('.sigma-node, .sigma-edge').each(function() {
+    unmute(this);
+  });
 });
 </script>
