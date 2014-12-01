@@ -1,7 +1,7 @@
 sigma.plugins.lasso
 ==================
 
-Plugin developed by [Florent Schildknecht](Flo-Schield-Bobby) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Florent Schildknecht](https://github.com/Flo-Schield-Bobby) for [Linkurious](https://github.com/Linkurious).
 
 ---
 ## General
