@@ -207,9 +207,7 @@ var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
   'fillStyle': 'rgba(41, 41, 41, 0.2)',
   'strokeStyle': 'black',
   'lineWidth': 2,
-  'fillWhileDrawing': true,
-  'displayFeedback': true,
-  'displayFeedbackColor': 'rgb(42, 187, 155)'
+  'fillWhileDrawing': true
 });
 
 // Listen for selectedNodes event
@@ -221,11 +219,13 @@ lasso.bind('selectedNodes', function (event) {
 
   // For instance, reset all node size as their initial size
   sigmaInstance.graph.nodes().forEach(function (node) {
+    node.color = 'black';
     node.size = nodeRadius;
   });
 
   // Then increase the size of selected nodes...
   nodes.forEach(function (node) {
+    node.color = 'rgb(42, 187, 155)';
     node.size *= 3;
   });
 
