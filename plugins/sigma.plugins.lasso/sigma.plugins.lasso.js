@@ -104,7 +104,7 @@
         this.drawingContext = this.drawingCanvas.getContext('2d');
       }
 
-      this.bindAll();
+      _bindAll.apply(this);
 
       console.log('activated', this);
     }
@@ -125,13 +125,14 @@
       this.isActivated = false;
       this.isDrawing = false;
 
-      this.unbindAll();
+      _unbindAll.apply(this);
 
       if (this.renderer.domElements['lasso-background']) {
         this.renderer.container.removeChild(this.renderer.domElements['lasso-background']);
         delete this.renderer.domElements['lasso-background'];
         this.drawingCanvas = undefined;
         this.drawingContext = undefined;
+        this.drewPoints = [];
       }
 
       console.log('deactivated', this);
@@ -148,7 +149,7 @@
    *
    * @return {sigma.plugins.lasso} Returns the instance.
    */
-  Lasso.prototype.bindAll = function () {
+  var _bindAll = function () {
     // Mouse events
     this.drawingCanvas.addEventListener('mousedown', onDrawingStart.bind(this));
     _body.addEventListener('mousemove', onDrawing.bind(this));
@@ -159,8 +160,6 @@
     _body.addEventListener('touchcancel', onDrawingEnd.bind(this));
     _body.addEventListener('touchleave', onDrawingEnd.bind(this));
     _body.addEventListener('touchend', onDrawingEnd.bind(this));
-
-    return this;
   };
 
   /**
@@ -171,7 +170,7 @@
    *
    * @return {sigma.plugins.lasso} Returns the instance.
    */
-  Lasso.prototype.unbindAll = function () {
+  var _unbindAll = function () {
     // Mouse events
     this.drawingCanvas.removeEventListener('mousedown', onDrawingStart.bind(this));
     _body.removeEventListener('mousemove', onDrawing.bind(this));
@@ -182,8 +181,6 @@
     _body.removeEventListener('touchcancel', onDrawingEnd.bind(this));
     _body.removeEventListener('touchleave', onDrawingEnd.bind(this));
     _body.removeEventListener('touchend', onDrawingEnd.bind(this));
-
-    return this;
   };
 
   /**
