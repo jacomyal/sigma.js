@@ -92,7 +92,6 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.activate = function () {
-    console.log(this);
     if (this.sigmaInstance && !this.isActivated) {
       this.isActivated = true;
 
@@ -124,7 +123,6 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.deactivate = function () {
-    console.log(this);
     if (this.sigmaInstance && this.isActivated) {
       this.isActivated = false;
 
