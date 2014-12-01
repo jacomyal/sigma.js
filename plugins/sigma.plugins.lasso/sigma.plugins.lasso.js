@@ -57,7 +57,7 @@
     _settings = new sigma.classes.configurable({
       'fillStyle': 'rgb(200, 200, 200)',
       'strokeStyle': 'black',
-      'lineWidth': 5,
+      'lineWidth': 2,
       'fillWhileDrawing': false,
       'displayFeedback': true,
       'displayFeedbackColor': 'rgb(42, 187, 155)'
