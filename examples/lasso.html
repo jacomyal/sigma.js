@@ -63,190 +63,187 @@
   <div id="graph-container"></div>
 </div>
 <script>
-(function() {
-  'use strict';
+'use strict';
 
-  var sigmaInstance,
-      camera,
-      nId = 0,
-      eId = 0,
-      nodeRadius = 50;
+var sigmaInstance,
+    camera,
+    nId = 0,
+    eId = 0,
+    nodeRadius = 50;
 
-  /**
-   * INITIALIZATION SCRIPT:
-   * **********************
-   */
-  sigmaInstance = new sigma({
-    renderer: {
-      container: document.getElementById('graph-container'),
-      type: 'canvas'
+/**
+ * INITIALIZATION SCRIPT:
+ * **********************
+ */
+sigmaInstance = new sigma({
+  renderer: {
+    container: document.getElementById('graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    autoRescale: true,
+    mouseEnabled: true,
+    touchEnabled: true,
+    nodesPowRatio: 1,
+    edgesPowRatio: 1,
+    sideMargin: 2,
+    defaultEdgeColor: '#333',
+    defaultNodeColor: '#333',
+    edgeColor: 'default'
+  }
+});
+camera = sigmaInstance.camera;
+
+// Initialize graph:
+sigmaInstance.graph.read({
+  nodes: [
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: 0,
+      y: 0,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
     },
-    settings: {
-      autoRescale: true,
-      mouseEnabled: true,
-      touchEnabled: true,
-      nodesPowRatio: 1,
-      edgesPowRatio: 1,
-      sideMargin: 2,
-      defaultEdgeColor: '#333',
-      defaultNodeColor: '#333',
-      edgeColor: 'default'
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: 10,
+      y: -10,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
+    },
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: 20,
+      y: -8,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
+    },
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: -5,
+      y: -15,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
+    },
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: -25,
+      y: 4,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
+    },
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: 18,
+      y: 2,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
+    },
+    {
+      id: (++nId) + '',
+      size: nodeRadius,
+      x: -4,
+      y: -6,
+      dX: 0,
+      dY: 0,
+      type: 'goo'
     }
-  });
-  camera = sigmaInstance.camera;
+  ],
+  edges: [
+    {
+      id: (++eId) + '',
+      source: '1',
+      target: '2'
+    },
+    {
+      id: (++eId) + '',
+      source: '1',
+      target: '3'
+    },
+    {
+      id: (++eId) + '',
+      source: '2',
+      target: '3'
+    },
+    {
+      id: (++eId) + '',
+      source: '4',
+      target: '2'
+    },
+    {
+      id: (++eId) + '',
+      source: '5',
+      target: '6'
+    },
+    {
+      id: (++eId) + '',
+      source: '7',
+      target: '1'
+    },
+    {
+      id: (++eId) + '',
+      source: '6',
+      target: '7'
+    }
+  ]
+});
 
-  // Initialize graph:
-  sigmaInstance.graph.read({
-    nodes: [
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: 0,
-        y: 0,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: 10,
-        y: -10,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: 20,
-        y: -8,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: -5,
-        y: -15,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: -25,
-        y: 4,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: 18,
-        y: 2,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      },
-      {
-        id: (++nId) + '',
-        size: nodeRadius,
-        x: -4,
-        y: -6,
-        dX: 0,
-        dY: 0,
-        type: 'goo'
-      }
-    ],
-    edges: [
-      {
-        id: (++eId) + '',
-        source: '1',
-        target: '2'
-      },
-      {
-        id: (++eId) + '',
-        source: '1',
-        target: '3'
-      },
-      {
-        id: (++eId) + '',
-        source: '2',
-        target: '3'
-      },
-      {
-        id: (++eId) + '',
-        source: '4',
-        target: '2'
-      },
-      {
-        id: (++eId) + '',
-        source: '5',
-        target: '6'
-      },
-      {
-        id: (++eId) + '',
-        source: '7',
-        target: '1'
-      },
-      {
-        id: (++eId) + '',
-        source: '6',
-        target: '7'
-      }
-    ]
+sigmaInstance.refresh();
+
+// Init the lasso with sigmaInstance, renderer and settings
+var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
+  'fillStyle': 'rgba(41, 41, 41, 0.2)',
+  'strokeStyle': 'black',
+  'lineWidth': 2,
+  'fillWhileDrawing': true,
+  'displayFeedback': true,
+  'displayFeedbackColor': 'rgb(42, 187, 155)'
+});
+
+// Listen for selectedNodes event
+lasso.bind('sigma:lasso:selectedNodes', function (event) {
+  // Do something with the selected nodes
+  var nodes = event.data;
+
+  console.log('nodes', nodes);
+
+  // For instance, reset all node size as their initial size
+  sigmaInstance.graph.nodes().forEach(function (node) {
+    node.size = nodeRadius;
+  });
+
+  // Then increase the size of selected nodes...
+  nodes.forEach(function (node) {
+    node.size *= 3;
   });
 
   sigmaInstance.refresh();
+});
 
-  // Init the lasso with sigmaInstance, renderer and settings
-  var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
-    'fillStyle': 'rgba(41, 41, 41, 0.2)',
-    'strokeStyle': 'black',
-    'lineWidth': 2,
-    'fillWhileDrawing': true,
-    'displayFeedback': true,
-    'displayFeedbackColor': 'rgb(42, 187, 155)'
-  });
+// Toggle lasso activation on Alt + l
+var isLassoActivated = false;
 
-  // Listen for selectedNodes event
-  lasso.bind('sigma:lasso:selectedNodes', function (event) {
-    // Do something with the selected nodes
-    var nodes = event.data;
-
-    console.log('nodes', nodes);
-
-    // For instance, reset all node size as their initial size
-    sigmaInstance.graph.nodes().forEach(function (node) {
-      node.size = nodeRadius;
-    });
-
-    // Then increase the size of selected nodes...
-    nodes.forEach(function (node) {
-      node.size *= 3;
-    });
-
-    sigmaInstance.refresh();
-  });
-
-  // Toggle lasso activation on Alt + l
-  var isLassoActivated = false;
-
-  document.addEventListener('keyup', function (event) {
-    if (event.keyCode === 76 && event.altKey) {
-      if (isLassoActivated) {
-        isLassoActivated = false;
-        lasso.deactivate();
-      } else {
-        isLassoActivated = true;
-        lasso.activate();
-      }
+document.addEventListener('keyup', function (event) {
+  if (event.keyCode === 76 && event.altKey) {
+    if (isLassoActivated) {
+      isLassoActivated = false;
+      lasso.deactivate();
+    } else {
+      isLassoActivated = true;
+      lasso.activate();
     }
-  });
-
-})();
+  }
+});
 </script>
