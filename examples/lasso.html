@@ -240,7 +240,7 @@
     if (event.keyCode === 76 && event.altKey) {
       if (isLassoActivated) {
         isLassoActivated = false;
-        lasso.unactivate();
+        lasso.deactivate();
       } else {
         isLassoActivated = true;
         lasso.activate();

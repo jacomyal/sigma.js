@@ -77,7 +77,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.clear = function () {
-    this.unactivate();
+    this.deactivate();
     lasso = null;
 
     return this;
@@ -115,14 +115,14 @@
   };
 
   /**
-   * This method is used to unactivate the lasso mode.
+   * This method is used to deactivate the lasso mode.
    *
    * > var lasso = new sigma.plugins.lasso(sigmaInstance);
-   * > lasso.unactivate();
+   * > lasso.deactivate();
    *
    * @return {sigma.plugins.lasso} Returns the instance.
    */
-  Lasso.prototype.unactivate = function () {
+  Lasso.prototype.deactivate = function () {
     if (_activated) {
       _activated = false;
 
@@ -150,7 +150,7 @@
         }
       }
 
-      console.log('unactivated');
+      console.log('deactivated');
     }
 
     return this;
@@ -350,7 +350,7 @@
 
     // Listen for sigmaInstance kill event, and remove the lasso isntance
     sigmaInstance.bind('kill', function () {
-      lasso.unactivate();
+      lasso.deactivate();
       lasso = null;
     });
 
