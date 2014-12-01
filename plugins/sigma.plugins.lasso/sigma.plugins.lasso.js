@@ -14,8 +14,7 @@
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
 
-   var _self = undefined,
-       _body = undefined,
+   var _body = undefined,
        _instances = {};
 
   /**
@@ -48,7 +47,6 @@
     this.isActivated = false;
     this.isDrawing = false;
 
-    _self = this;
     _body = document.body;
 
     // Extends default settings
