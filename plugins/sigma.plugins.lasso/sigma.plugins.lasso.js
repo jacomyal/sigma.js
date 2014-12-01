@@ -226,8 +226,6 @@
       _drewPoints = [];
       _selectedNodes = [];
 
-      _drawingContext.beginPath();
-
       // Reset initial color of each node if needed
       if (_settings('displayFeedback')) {
         var nodes = _sigmaInstance.graph.nodes(),
@@ -248,7 +246,6 @@
         x: event.clientX - drawingRectangle.left,
         y: event.clientY - drawingRectangle.top
       });
-      _drawingContext.moveTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
 
       event.stopPropagation();
     }
@@ -257,19 +254,47 @@
   function onMouseMove (event) {
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
 
-
     if (_activated && isDrawing) {
-      _drawingContext.lineWidth = _settings('lineWidth');
-      _drawingContext.strokeStyle = _settings('strokeStyle');
-      _drawingContext.fillStyle = _settings('fillStyle');
-      _drawingCanvas.style.cursor = 'move';
-
       _drewPoints.push({
         x: event.clientX - drawingRectangle.left,
         y: event.clientY - drawingRectangle.top
       });
 
-      _drawingContext.lineTo(event.clientX - drawingRectangle.left, event.clientY - drawingRectangle.top);
+      // Drawing styles
+      _drawingContext.lineWidth = _settings('lineWidth');
+      _drawingContext.strokeStyle = _settings('strokeStyle');
+      _drawingContext.fillStyle = _settings('fillStyle');
+      _drawingContext.lineJoin = 'round';
+      _drawingContext.lineCap = 'round';
+      _drawingCanvas.style.cursor = 'move';
+
+      // Clear the canvas
+      _drawingContext.clearRect(0, 0, _drawingContext.canvas.width, _drawingContext.canvas.height);
+
+      // Redraw the complete path for a smoother effect
+      // Even smoother with quadratic curves
+      var sourcePoint = _drewPoints[0],
+          destinationPoint = _drewPoints[1],
+          pointsLength = _drewPoints.length,
+          getMiddlePointCoordinates = function (firstPoint, secondPoint) {
+            return {
+              x: firstPoint.x + (secondPoint.x - firstPoint.x) / 2,
+              y: firstPoint.y + (secondPoint.y - firstPoint.y) / 2
+            };
+          };
+
+      _drawingContext.beginPath();
+      _drawingContext.moveTo(sourcePoint.x, sourcePoint.y);
+
+      for (var i = 1; i < pointsLength; i++) {
+        var middlePoint = getMiddlePointCoordinates(sourcePoint, destinationPoint);
+        // _drawingContext.lineTo(_drewPoints[i].x, _drewPoints[i].y);
+        _drawingContext.quadraticCurveTo(sourcePoint.x, sourcePoint.y, middlePoint.x, middlePoint.y);
+        sourcePoint = _drewPoints[i];
+        destinationPoint = _drewPoints[i+1];
+      }
+
+      // _drawingContext.lineTo(sourcePoint.x, sourcePoint.y);
       _drawingContext.stroke();
 
       if (_settings('fillWhileDrawing')) {
@@ -314,7 +339,7 @@
       _self.dispatchEvent('sigma:lasso:selectedNodes', _selectedNodes);
 
       // Clear the drawing canvas
-      _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
+      // _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
 
       event.stopPropagation();
     }
