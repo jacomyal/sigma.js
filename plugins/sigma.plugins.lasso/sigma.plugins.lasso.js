@@ -1,3 +1,10 @@
+/**
+ * Sigma Lasso
+ * =============================
+ *
+ * @author Florent Schildknecht <florent.schildknecht@gmail.com> (Florent Schildknecht)
+ * @version 0.0.2
+ */
 ;(function (undefined) {
   'use strict';
 
@@ -7,25 +14,9 @@
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
 
-  /**
-   * Sigma Lasso
-   * =============================
-   *
-   * @author Florent Schildknecht <florent.schildknecht@gmail.com> (Florent Schildknecht)
-   * @version 0.0.1
-   */
    var _self = undefined,
-       _sigmaInstance = undefined,
-       _graph = undefined,
-       _renderer = undefined,
-       _body,
-       _activated = false,
-       _settings = null,
-       _drawingCanvas = undefined,
-       _drawingContext = undefined,
-       _drewPoints = [],
-       _selectedNodes = [],
-       isDrawing = false;
+       _body = undefined,
+       _instances = {};
 
   /**
    * Lasso Object
@@ -48,20 +39,25 @@
         'The sigma.plugins.lasso is not compatible with the WebGL renderer'
       );
 
+    this.sigmaInstance = sigmaInstance;
+    this.renderer = renderer;
+    this.drawingCanvas = undefined;
+    this.drawingContext = undefined;
+    this.drewPoints = [];
+    this.selectedNodes = [];
+    this.isActivated = false;
+    this.isDrawing = false;
+
     _self = this;
-    _sigmaInstance = sigmaInstance;
-    _graph = sigmaInstance.graph;
-    _renderer = renderer;
+    _body = document.body;
 
     // Extends default settings
-    _settings = new sigma.classes.configurable({
+    this.settings = new sigma.classes.configurable({
       'fillStyle': 'rgba(200, 200, 200, 0.25)',
       'strokeStyle': 'black',
       'lineWidth': 2,
       'fillWhileDrawing': false
      }, settings || {});
-
-    _body = document.body;
 
     console.log('created');
   };
@@ -76,16 +72,16 @@
    */
   Lasso.prototype.clear = function () {
     this.deactivate();
-    _sigmaInstance = null;
-    _graph = null;
-    _renderer = null;
-    _drawingCanvas = null;
-    _drawingContext = null;
-    _drewPoints = null;
-    lasso = null;
+
+    this.sigmaInstance = undefined;
+    this.renderer = undefined;
 
     return this;
   };
+
+  // Lasso.prototype.getSigmaInstance = function () {
+  //   return this.sigmaInstance;
+  // }
 
   /**
    * This method is used to activate the lasso mode.
@@ -96,23 +92,24 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.activate = function () {
-    if (_sigmaInstance && !_activated) {
-      _activated = true;
+    console.log(this);
+    if (this.sigmaInstance && !this.isActivated) {
+      this.isActivated = true;
 
       // Add a new background layout canvas to draw the path on
-      if (!_renderer.domElements['lasso-background']) {
-        _renderer.initDOM('canvas', 'lasso-background');
-        _drawingCanvas = _renderer.domElements['lasso-background'];
+      if (!this.renderer.domElements['lasso-background']) {
+        this.renderer.initDOM('canvas', 'lasso-background');
+        this.drawingCanvas = this.renderer.domElements['lasso-background'];
 
-        _drawingCanvas.width = _renderer.container.offsetWidth;
-        _drawingCanvas.height = _renderer.container.offsetHeight;
-        _renderer.container.appendChild(_drawingCanvas);
-        _drawingContext = _drawingCanvas.getContext('2d');
+        this.drawingCanvas.width = this.renderer.container.offsetWidth;
+        this.drawingCanvas.height = this.renderer.container.offsetHeight;
+        this.renderer.container.appendChild(this.drawingCanvas);
+        this.drawingContext = this.drawingCanvas.getContext('2d');
       }
 
       this.bindAll();
 
-      console.log('activated');
+      console.log('activated', this);
     }
 
     return this;
@@ -127,19 +124,20 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.deactivate = function () {
-    if (_sigmaInstance && _activated) {
-      _activated = false;
+    console.log(this);
+    if (this.sigmaInstance && this.isActivated) {
+      this.isActivated = false;
 
       this.unbindAll();
 
-      if (_renderer.domElements['lasso-background']) {
-        _renderer.container.removeChild(_renderer.domElements['lasso-background']);
-        delete _renderer.domElements['lasso-background'];
-        _drawingCanvas = null;
-        _drawingContext = null;
+      if (this.renderer.domElements['lasso-background']) {
+        this.renderer.container.removeChild(this.renderer.domElements['lasso-background']);
+        delete this.renderer.domElements['lasso-background'];
+        this.drawingCanvas = undefined;
+        this.drawingContext = undefined;
       }
 
-      console.log('deactivated');
+      console.log('deactivated', this);
     }
 
     return this;
@@ -155,15 +153,15 @@
    */
   Lasso.prototype.bindAll = function () {
     // Mouse events
-    _drawingCanvas.addEventListener('mousedown', onDrawingStart);
-    _body.addEventListener('mousemove', onDrawing);
-    _body.addEventListener('mouseup', onDrawingEnd);
+    this.drawingCanvas.addEventListener('mousedown', onDrawingStart.bind(this));
+    _body.addEventListener('mousemove', onDrawing.bind(this));
+    _body.addEventListener('mouseup', onDrawingEnd.bind(this));
     // Touch events
-    _drawingCanvas.addEventListener('touchstart', onDrawingStart);
-    _body.addEventListener('touchmove', onDrawing);
-    _body.addEventListener('touchcancel', onDrawingEnd);
-    _body.addEventListener('touchleave', onDrawingEnd);
-    _body.addEventListener('touchend', onDrawingEnd);
+    this.drawingCanvas.addEventListener('touchstart', onDrawingStart.bind(this));
+    _body.addEventListener('touchmove', onDrawing.bind(this));
+    _body.addEventListener('touchcancel', onDrawingEnd.bind(this));
+    _body.addEventListener('touchleave', onDrawingEnd.bind(this));
+    _body.addEventListener('touchend', onDrawingEnd.bind(this));
 
     return this;
   };
@@ -178,15 +176,15 @@
    */
   Lasso.prototype.unbindAll = function () {
     // Mouse events
-    _drawingCanvas.removeEventListener('mousedown', onDrawingStart);
-    _body.removeEventListener('mousemove', onDrawing);
-    _body.removeEventListener('mouseup', onDrawingEnd);
+    this.drawingCanvas.removeEventListener('mousedown', onDrawingStart.bind(this));
+    _body.removeEventListener('mousemove', onDrawing.bind(this));
+    _body.removeEventListener('mouseup', onDrawingEnd.bind(this));
     // Touch events
-    _drawingCanvas.removeEventListener('touchstart', onDrawingStart);
-    _drawingCanvas.removeEventListener('touchmove', onDrawing);
-    _body.removeEventListener('touchcancel', onDrawingEnd);
-    _body.removeEventListener('touchleave', onDrawingEnd);
-    _body.removeEventListener('touchend', onDrawingEnd);
+    this.drawingCanvas.removeEventListener('touchstart', onDrawingStart.bind(this));
+    this.drawingCanvas.removeEventListener('touchmove', onDrawing.bind(this));
+    _body.removeEventListener('touchcancel', onDrawingEnd.bind(this));
+    _body.removeEventListener('touchleave', onDrawingEnd.bind(this));
+    _body.removeEventListener('touchend', onDrawingEnd.bind(this));
 
     return this;
   };
@@ -200,20 +198,20 @@
    * @return {array} Returns an array of nodes.
    */
   Lasso.prototype.getSelectedNodes = function () {
-    return _selectedNodes;
+    return this.selectedNodes;
   };
 
   function onDrawingStart (event) {
-    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+    var drawingRectangle = this.drawingCanvas.getBoundingClientRect();
 
-    if (_activated) {
-      isDrawing = true;
-      _drewPoints = [];
-      _selectedNodes = [];
+    if (this.isActivated) {
+      this.isDrawing = true;
+      this.drewPoints = [];
+      this.selectedNodes = [];
 
-      _sigmaInstance.refresh();
+      this.sigmaInstance.refresh();
 
-      _drewPoints.push({
+      this.drewPoints.push({
         x: event.clientX - drawingRectangle.left,
         y: event.clientY - drawingRectangle.top
       });
@@ -223,9 +221,9 @@
   }
 
   function onDrawing (event) {
-    var drawingRectangle = _drawingCanvas.getBoundingClientRect();
+    var drawingRectangle = this.drawingCanvas.getBoundingClientRect();
 
-    if (_activated && isDrawing) {
+    if (this.isActivated && this.isDrawing) {
       var x = 0, y = 0;
       switch (event.type) {
         case 'touchmove':
@@ -237,27 +235,27 @@
           y = event.clientY;
           break;
       }
-      _drewPoints.push({
+      this.drewPoints.push({
         x: x - drawingRectangle.left,
         y: y - drawingRectangle.top
       });
 
       // Drawing styles
-      _drawingContext.lineWidth = _settings('lineWidth');
-      _drawingContext.strokeStyle = _settings('strokeStyle');
-      _drawingContext.fillStyle = _settings('fillStyle');
-      _drawingContext.lineJoin = 'round';
-      _drawingContext.lineCap = 'round';
-      _drawingCanvas.style.cursor = 'move';
+      this.drawingContext.lineWidth = this.settings('lineWidth');
+      this.drawingContext.strokeStyle = this.settings('strokeStyle');
+      this.drawingContext.fillStyle = this.settings('fillStyle');
+      this.drawingContext.lineJoin = 'round';
+      this.drawingContext.lineCap = 'round';
+      this.drawingCanvas.style.cursor = 'move';
 
       // Clear the canvas
-      _drawingContext.clearRect(0, 0, _drawingContext.canvas.width, _drawingContext.canvas.height);
+      this.drawingContext.clearRect(0, 0, this.drawingContext.canvas.width, this.drawingContext.canvas.height);
 
       // Redraw the complete path for a smoother effect
       // Even smoother with quadratic curves
-      var sourcePoint = _drewPoints[0],
-          destinationPoint = _drewPoints[1],
-          pointsLength = _drewPoints.length,
+      var sourcePoint = this.drewPoints[0],
+          destinationPoint = this.drewPoints[1],
+          pointsLength = this.drewPoints.length,
           getMiddlePointCoordinates = function (firstPoint, secondPoint) {
             return {
               x: firstPoint.x + (secondPoint.x - firstPoint.x) / 2,
@@ -265,22 +263,22 @@
             };
           };
 
-      _drawingContext.beginPath();
-      _drawingContext.moveTo(sourcePoint.x, sourcePoint.y);
+      this.drawingContext.beginPath();
+      this.drawingContext.moveTo(sourcePoint.x, sourcePoint.y);
 
       for (var i = 1; i < pointsLength; i++) {
         var middlePoint = getMiddlePointCoordinates(sourcePoint, destinationPoint);
-        // _drawingContext.lineTo(_drewPoints[i].x, _drewPoints[i].y);
-        _drawingContext.quadraticCurveTo(sourcePoint.x, sourcePoint.y, middlePoint.x, middlePoint.y);
-        sourcePoint = _drewPoints[i];
-        destinationPoint = _drewPoints[i+1];
+        // this.drawingContext.lineTo(this.drewPoints[i].x, this.drewPoints[i].y);
+        this.drawingContext.quadraticCurveTo(sourcePoint.x, sourcePoint.y, middlePoint.x, middlePoint.y);
+        sourcePoint = this.drewPoints[i];
+        destinationPoint = this.drewPoints[i+1];
       }
 
-      _drawingContext.lineTo(sourcePoint.x, sourcePoint.y);
-      _drawingContext.stroke();
+      this.drawingContext.lineTo(sourcePoint.x, sourcePoint.y);
+      this.drawingContext.stroke();
 
-      if (_settings('fillWhileDrawing')) {
-        _drawingContext.fill();
+      if (this.settings('fillWhileDrawing')) {
+        this.drawingContext.fill();
       }
 
       event.stopPropagation();
@@ -288,14 +286,14 @@
   }
 
   function onDrawingEnd (event) {
-    if (_activated && isDrawing) {
-      isDrawing = false;
+    if (this.isActivated && this.isDrawing) {
+      this.isDrawing = false;
 
       // Select the nodes inside the path
-      var nodes = _sigmaInstance.graph.nodes(),
+      var nodes = this.sigmaInstance.graph.nodes(),
         nodesLength = nodes.length,
         i = 0,
-        prefix = _renderer.options.prefix || '';
+        prefix = this.renderer.options.prefix || '';
 
       // Loop on all nodes and check if they are in the path
       while (nodesLength--) {
@@ -303,28 +301,20 @@
             x = node[prefix + 'x'],
             y = node[prefix + 'y'];
 
-        if (_drawingContext.isPointInPath(x, y)) {
-          _selectedNodes.push(node);
+        if (this.drawingContext.isPointInPath(x, y)) {
+          this.selectedNodes.push(node);
         }
       }
 
       // Dispatch event with selected nodes
-      _self.dispatchEvent('selectedNodes', _selectedNodes);
+      this.dispatchEvent('selectedNodes', this.selectedNodes);
 
       // Clear the drawing canvas
-      // _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
+      // this.drawingContext.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
 
       event.stopPropagation();
     }
   }
-
-  /**
-   * Interface
-   * ------------------
-   *
-   * > var lasso = new sigma.plugins.lasso(sigmaInstance);
-   */
-  var lasso = null;
 
   /**
    * @param  {sigma}                                  sigmaInstance The related sigma instance.
@@ -335,16 +325,19 @@
    */
   sigma.plugins.lasso = function (sigmaInstance, renderer, settings) {
     // Create lasso if undefined
-    if (!lasso) {
-      lasso = new Lasso(sigmaInstance, renderer, settings);
+    if (!_instances[sigmaInstance.id]) {
+      _instances[sigmaInstance.id] = new Lasso(sigmaInstance, renderer, settings);
     }
 
     // Listen for sigmaInstance kill event, and remove the lasso isntance
     sigmaInstance.bind('kill', function () {
-      lasso.clear();
+      if (_instances[sigmaInstance.id] instanceof Lasso) {
+        _instances[sigmaInstance.id].clear();
+        delete _instances[sigmaInstance.id];
+      }
     });
 
-    return lasso;
+    return _instances[sigmaInstance.id];
   };
 
 }).call(this);

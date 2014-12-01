@@ -51,33 +51,189 @@
 <!-- END LASSO IMPORTS -->
 <div id="container">
   <style>
-    #graph-container {
+    .graph-container {
       background: #eee;
-      height: 600px;
+      width: 46%;
+      height: 100%;
       max-width: 800px;
-      margin: auto;
+      margin: auto 2%;
       position: relative;
       overflow: hidden;
     }
+    .graph-container:before,
+    .graph-container:after, {
+      display: table;
+      clear: both;
+    }
+    #first-graph-container {
+      float: left;
+      background: #fed;
+    }
+    #second-graph-container {
+      float: right;
+      background: #def;
+    }
   </style>
-  <div id="graph-container"></div>
+  <div id="first-graph-container" class="graph-container"></div>
+  <div id="second-graph-container" class="graph-container"></div>
 </div>
 <script>
-'use strict';
+  'use strict';
 
-var sigmaInstance,
-    camera,
-    nId = 0,
-    eId = 0,
-    nodeRadius = 50;
+  var firstSigmaInstance,
+      secondSigmaInstance,
+      firstLasso,
+      secondLasso,
+      nId = 0,
+      eId = 0,
+      nodeRadius = 50,
+      data = {
+        nodes: [
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 0,
+            y: 0,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 10,
+            y: -10,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 20,
+            y: -8,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -5,
+            y: -15,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -25,
+            y: 4,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 18,
+            y: 2,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -4,
+            y: -6,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          }
+        ],
+        edges: [
+          {
+            id: (++eId) + '',
+            source: '1',
+            target: '2'
+          },
+          {
+            id: (++eId) + '',
+            source: '1',
+            target: '3'
+          },
+          {
+            id: (++eId) + '',
+            source: '2',
+            target: '3'
+          },
+          {
+            id: (++eId) + '',
+            source: '4',
+            target: '2'
+          },
+          {
+            id: (++eId) + '',
+            source: '5',
+            target: '6'
+          },
+          {
+            id: (++eId) + '',
+            source: '7',
+            target: '1'
+          },
+          {
+            id: (++eId) + '',
+            source: '6',
+            target: '7'
+          }
+        ]
+      },
+      initializeGraph = function (sigmaInstance) {
+        sigmaInstance.graph.read(data);
+        sigmaInstance.refresh();
+
+        var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
+          'fillStyle': 'rgba(41, 41, 41, 0.2)',
+          'strokeStyle': 'black',
+          'lineWidth': 2,
+          'fillWhileDrawing': true
+        });
+
+        // Listen for selectedNodes event
+        lasso.bind('selectedNodes', function (event) {
+          // Do something with the selected nodes
+          var nodes = event.data;
+
+          console.log('nodes', nodes);
+
+          // For instance, reset all node size as their initial size
+          sigmaInstance.graph.nodes().forEach(function (node) {
+            node.color = 'black';
+            node.size = nodeRadius;
+          });
+
+          // Then increase the size of selected nodes...
+          nodes.forEach(function (node) {
+            node.color = 'rgb(42, 187, 155)';
+            node.size *= 3;
+          });
+
+          sigmaInstance.refresh();
+        });
+
+        return lasso;
+      };
 
 /**
  * INITIALIZATION SCRIPT:
  * **********************
  */
-sigmaInstance = new sigma({
+firstSigmaInstance = new sigma({
   renderer: {
-    container: document.getElementById('graph-container'),
+    container: document.getElementById('first-graph-container'),
     type: 'canvas'
   },
   settings: {
@@ -92,158 +248,58 @@ sigmaInstance = new sigma({
     edgeColor: 'default'
   }
 });
-camera = sigmaInstance.camera;
+firstLasso = initializeGraph(firstSigmaInstance);
 
-// Initialize graph:
-sigmaInstance.graph.read({
-  nodes: [
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: 0,
-      y: 0,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: 10,
-      y: -10,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: 20,
-      y: -8,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: -5,
-      y: -15,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: -25,
-      y: 4,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: 18,
-      y: 2,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    },
-    {
-      id: (++nId) + '',
-      size: nodeRadius,
-      x: -4,
-      y: -6,
-      dX: 0,
-      dY: 0,
-      type: 'goo'
-    }
-  ],
-  edges: [
-    {
-      id: (++eId) + '',
-      source: '1',
-      target: '2'
-    },
-    {
-      id: (++eId) + '',
-      source: '1',
-      target: '3'
-    },
-    {
-      id: (++eId) + '',
-      source: '2',
-      target: '3'
-    },
-    {
-      id: (++eId) + '',
-      source: '4',
-      target: '2'
-    },
-    {
-      id: (++eId) + '',
-      source: '5',
-      target: '6'
-    },
-    {
-      id: (++eId) + '',
-      source: '7',
-      target: '1'
-    },
-    {
-      id: (++eId) + '',
-      source: '6',
-      target: '7'
-    }
-  ]
+secondSigmaInstance = new sigma({
+  renderer: {
+    container: document.getElementById('second-graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    autoRescale: true,
+    mouseEnabled: true,
+    touchEnabled: true,
+    nodesPowRatio: 1,
+    edgesPowRatio: 1,
+    sideMargin: 2,
+    defaultEdgeColor: '#444',
+    defaultNodeColor: '#444',
+    edgeColor: 'default'
+  }
 });
+secondLasso = initializeGraph(secondSigmaInstance);
 
-sigmaInstance.refresh();
 
-// Init the lasso with sigmaInstance, renderer and settings
-var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
-  'fillStyle': 'rgba(41, 41, 41, 0.2)',
-  'strokeStyle': 'black',
-  'lineWidth': 2,
-  'fillWhileDrawing': true
-});
+console.log(firstLasso, secondLasso);
 
-// Listen for selectedNodes event
-lasso.bind('selectedNodes', function (event) {
-  // Do something with the selected nodes
-  var nodes = event.data;
-
-  console.log('nodes', nodes);
-
-  // For instance, reset all node size as their initial size
-  sigmaInstance.graph.nodes().forEach(function (node) {
-    node.color = 'black';
-    node.size = nodeRadius;
-  });
-
-  // Then increase the size of selected nodes...
-  nodes.forEach(function (node) {
-    node.color = 'rgb(42, 187, 155)';
-    node.size *= 3;
-  });
-
-  sigmaInstance.refresh();
-});
-
-// Toggle lasso activation on Alt + l
-var isLassoActivated = false;
+// Toggle lasso activation on Alt + l or Alt + f
+var isFirstLassoActivated = false;
+var isSecondLassoActivated = false;
 
 document.addEventListener('keyup', function (event) {
-  if (event.keyCode === 76 && event.altKey) {
-    if (isLassoActivated) {
-      isLassoActivated = false;
-      lasso.deactivate();
-    } else {
-      isLassoActivated = true;
-      lasso.activate();
-    }
+  switch (event.keyCode) {
+    case 76:
+      if (event.altKey) {
+        if (isFirstLassoActivated) {
+          isFirstLassoActivated = false;
+          firstLasso.deactivate();
+        } else {
+          isFirstLassoActivated = true;
+          firstLasso.activate();
+        }
+      }
+      break;
+    case 70:
+      if (event.altKey) {
+        if (isSecondLassoActivated) {
+          isSecondLassoActivated = false;
+          secondLasso.deactivate();
+        } else {
+          isSecondLassoActivated = true;
+          secondLasso.activate();
+        }
+      }
+      break;
   }
 });
 </script>
