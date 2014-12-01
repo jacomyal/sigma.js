@@ -73,9 +73,19 @@
       float: right;
       background: #def;
     }
+    .controls {
+      padding: 5px 0;
+      text-align: center;
+      background: rgba(41, 41, 41, 0.6);
+      color: white;
+    }
   </style>
-  <div id="first-graph-container" class="graph-container"></div>
-  <div id="second-graph-container" class="graph-container"></div>
+  <div id="first-graph-container" class="graph-container">
+    <header class="controls">Activate / Unactivate Lasso with Alt + L</header>
+  </div>
+  <div id="second-graph-container" class="graph-container">
+    <header class="controls">Activate / Unactivate Lasso with Alt + M</header>
+  </div>
 </div>
 <script>
   'use strict';
@@ -269,9 +279,6 @@ secondSigmaInstance = new sigma({
 });
 secondLasso = initializeGraph(secondSigmaInstance);
 
-
-console.log(firstLasso, secondLasso);
-
 // Toggle lasso activation on Alt + l or Alt + f
 var isFirstLassoActivated = false;
 var isSecondLassoActivated = false;
@@ -289,7 +296,7 @@ document.addEventListener('keyup', function (event) {
         }
       }
       break;
-    case 70:
+    case 77:
       if (event.altKey) {
         if (isSecondLassoActivated) {
           isSecondLassoActivated = false;
