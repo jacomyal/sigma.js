@@ -76,6 +76,12 @@
    */
   Lasso.prototype.clear = function () {
     this.deactivate();
+    _sigmaInstance = null;
+    _graph = null;
+    _renderer = null;
+    _drawingCanvas = null;
+    _drawingContext = null;
+    _drewPoints = null;
     lasso = null;
 
     return this;
@@ -90,7 +96,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.activate = function () {
-    if (!_activated) {
+    if (_sigmaInstance && !_activated) {
       _activated = true;
 
       // Add a new background layout canvas to draw the path on
@@ -121,7 +127,7 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.deactivate = function () {
-    if (_activated) {
+    if (_sigmaInstance && _activated) {
       _activated = false;
 
       this.unbindAll();
@@ -335,8 +341,7 @@
 
     // Listen for sigmaInstance kill event, and remove the lasso isntance
     sigmaInstance.bind('kill', function () {
-      lasso.deactivate();
-      lasso = null;
+      lasso.clear();
     });
 
     return lasso;
