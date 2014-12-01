@@ -55,7 +55,7 @@
 
     // Extends default settings
     _settings = new sigma.classes.configurable({
-      'fillStyle': 'rgb(200, 200, 200)',
+      'fillStyle': 'rgba(200, 200, 200, 0.25)',
       'strokeStyle': 'black',
       'lineWidth': 2,
       'fillWhileDrawing': false,
