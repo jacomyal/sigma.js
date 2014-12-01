@@ -206,10 +206,10 @@
         sigmaInstance.refresh();
 
         var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
-          'fillStyle': 'rgba(41, 41, 41, 0.2)',
           'strokeStyle': 'black',
           'lineWidth': 2,
-          'fillWhileDrawing': true
+          'fillWhileDrawing': true,
+          'fillStyle': 'rgba(41, 41, 41, 0.2)'
         });
 
         // Listen for selectedNodes event

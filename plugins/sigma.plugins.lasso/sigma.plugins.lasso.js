@@ -51,10 +51,10 @@
 
     // Extends default settings
     this.settings = new sigma.classes.configurable({
-      'fillStyle': 'rgba(200, 200, 200, 0.25)',
       'strokeStyle': 'black',
       'lineWidth': 2,
-      'fillWhileDrawing': false
+      'fillWhileDrawing': false,
+      'fillStyle': 'rgba(200, 200, 200, 0.25)'
      }, settings || {});
 
     console.log('created');
