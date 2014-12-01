@@ -165,9 +165,16 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.bindAll = function () {
-    _drawingCanvas.addEventListener('mousedown', onMouseDown);
-    _body.addEventListener('mousemove', onMouseMove);
-    _body.addEventListener('mouseup', onMouseUp);
+    // Mouse events
+    _drawingCanvas.addEventListener('mousedown', onDrawingStart);
+    _body.addEventListener('mousemove', onDrawing);
+    _body.addEventListener('mouseup', onDrawingEnd);
+    // Touch events
+    _drawingCanvas.addEventListener('touchstart', onDrawingStart);
+    _body.addEventListener('touchmove', onDrawing);
+    _body.addEventListener('touchcancel', onDrawingEnd);
+    _body.addEventListener('touchleave', onDrawingEnd);
+    _body.addEventListener('touchend', onDrawingEnd);
 
     return this;
   };
@@ -181,9 +188,16 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.unbindAll = function () {
-    _drawingCanvas.removeEventListener('mousedown', onMouseDown);
-    _body.removeEventListener('mousemove', onMouseMove);
-    _body.removeEventListener('mouseup', onMouseUp);
+    // Mouse events
+    _drawingCanvas.removeEventListener('mousedown', onDrawingStart);
+    _body.removeEventListener('mousemove', onDrawing);
+    _body.removeEventListener('mouseup', onDrawingEnd);
+    // Touch events
+    _drawingCanvas.removeEventListener('touchstart', onDrawingStart);
+    _drawingCanvas.removeEventListener('touchmove', onDrawing);
+    _body.removeEventListener('touchcancel', onDrawingEnd);
+    _body.removeEventListener('touchleave', onDrawingEnd);
+    _body.removeEventListener('touchend', onDrawingEnd);
 
     return this;
   };
@@ -200,7 +214,7 @@
     return _selectedNodes;
   };
 
-  function onMouseDown (event) {
+  function onDrawingStart (event) {
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
 
     if (_activated) {
@@ -233,13 +247,24 @@
     }
   }
 
-  function onMouseMove (event) {
+  function onDrawing (event) {
     var drawingRectangle = _drawingCanvas.getBoundingClientRect();
 
     if (_activated && isDrawing) {
+      var x = 0, y = 0;
+      switch (event.type) {
+        case 'touchmove':
+          x = event.touches[0].clientX;
+          y = event.touches[0].clientY;
+          break;
+        default:
+          x = event.clientX;
+          y = event.clientY;
+          break;
+      }
       _drewPoints.push({
-        x: event.clientX - drawingRectangle.left,
-        y: event.clientY - drawingRectangle.top
+        x: x - drawingRectangle.left,
+        y: y - drawingRectangle.top
       });
 
       // Drawing styles
@@ -276,7 +301,7 @@
         destinationPoint = _drewPoints[i+1];
       }
 
-      // _drawingContext.lineTo(sourcePoint.x, sourcePoint.y);
+      _drawingContext.lineTo(sourcePoint.x, sourcePoint.y);
       _drawingContext.stroke();
 
       if (_settings('fillWhileDrawing')) {
@@ -287,7 +312,7 @@
     }
   }
 
-  function onMouseUp (event) {
+  function onDrawingEnd (event) {
     if (_activated && isDrawing) {
       isDrawing = false;
 
