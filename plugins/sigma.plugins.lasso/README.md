@@ -10,6 +10,7 @@ This plugin allows you to select several nodes with a lasso-tool:
 - Draw the lasso path
 - All the nodes with a center inside the path will then be available as an array, dispatched by an event.
 - It currently works with a canvas renderer [not compatible with WebGL renderer]
+- Touch events are supported (it works on a mobile browser)
 
 See the following [example code](../../examples/lasso.html) for full usage.
 
@@ -20,7 +21,7 @@ var lasso = new sigma.plugins.lasso(sigmaInstance, renderer, settings);
 
 lasso.activate();
 
-lasso.bind('sigma:lasso:selectedNodes', function (event) {
+lasso.bind('selectedNodes', function (event) {
   var nodes = event.data;
 
   // Do whatever you want with those nodes
@@ -34,12 +35,10 @@ lasso.bind('sigma:lasso:selectedNodes', function (event) {
 
 *Lasso settings*
 
-* **fillStyle**: *string* `rgb(200, 200, 200)`: The fill-color of the lasso-tool, only works when <fillWhileDrawing> is set up to `true`
 * **strokeStyle** *string* `black`: The stroke-color of the lasso-tool
 * **lineWidth** *integer* `5`: The stroke-width of the lasso-tool
 * **fillWhileDrawing** *boolean* `false`: Should the lasso-tool fill itself while drawing with the <fillStyle> color ?
-* **displayFeedback** *boolean* `true`: Should the selected nodes be displayed in a different color <displayFeedbackColor> after the selection ?
-* **displayFeedbackColor** *string* `rgb(42, 187, 155)`: The selected nodes color, only works when <displayFeedback> is set up to `true`
+* **fillStyle**: *string* `rgba(200, 200, 200, 0.25)`: The fill-color of the lasso-tool, only works when <fillWhileDrawing> is set up to `true`
 
 ## Notes
 1. The lasso mode has to be both activated and unactivated manually
