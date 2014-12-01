@@ -157,24 +157,6 @@
   };
 
   /**
-   * This method is used to activate or unactivate the lasso mode.
-   *
-   * > var lasso = new sigma.plugins.lasso(sigmaInstance);
-   * > lasso.toggleActivation();
-   *
-   * @return {sigma.plugins.lasso} Returns the instance.
-   */
-  Lasso.prototype.toggleActivation = function () {
-    if (_activated) {
-      this.unactivate();
-    } else {
-      this.activate();
-    }
-
-    return this;
-  };
-
-  /**
    * This method is used to bind all events of the lasso mode.
    *
    * > var lasso = new sigma.plugins.lasso(sigmaInstance);

@@ -234,9 +234,17 @@
   });
 
   // Toggle lasso activation on Alt + l
+  var isLassoActivated = false;
+
   document.addEventListener('keyup', function (event) {
     if (event.keyCode === 76 && event.altKey) {
-      lasso.toggleActivation();
+      if (isLassoActivated) {
+        isLassoActivated = false;
+        lasso.unactivate();
+      } else {
+        isLassoActivated = true;
+        lasso.activate();
+      }
     }
   });
 
