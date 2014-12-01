@@ -1,7 +1,7 @@
 sigma.plugins.lasso
 ==================
 
-Plugin developed by [Florent Schildknecht](https://github.com/Flo-Schield-Bobby) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [Florent Schildknecht](https://github.com/Flo-Schield-Bobby) for [Linkurious](https://github.com/Linkurious) and published under the [MIT](LICENSE) license.
 
 ---
 ## General
@@ -27,7 +27,7 @@ lasso.bind('selectedNodes', function (event) {
   // Do whatever you want with those nodes
 
   // Eventually unactivate the lasso-tool mode
-  lasso.unactivate();
+  lasso.deactivate();
 });
 ````
 
