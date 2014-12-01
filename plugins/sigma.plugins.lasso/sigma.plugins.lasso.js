@@ -123,6 +123,7 @@
   Lasso.prototype.deactivate = function () {
     if (this.sigmaInstance && this.isActivated) {
       this.isActivated = false;
+      this.isDrawing = false;
 
       this.unbindAll();
 
@@ -217,10 +218,10 @@
   }
 
   function onDrawing (event) {
-    var drawingRectangle = this.drawingCanvas.getBoundingClientRect();
-
     if (this.isActivated && this.isDrawing) {
-      var x = 0, y = 0;
+      var x = 0,
+          y = 0,
+          drawingRectangle = this.drawingCanvas.getBoundingClientRect();
       switch (event.type) {
         case 'touchmove':
           x = event.touches[0].clientX;
@@ -306,7 +307,7 @@
       this.dispatchEvent('selectedNodes', this.selectedNodes);
 
       // Clear the drawing canvas
-      // this.drawingContext.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+      this.drawingContext.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
 
       event.stopPropagation();
     }
