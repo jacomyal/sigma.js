@@ -213,7 +213,7 @@ var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
 });
 
 // Listen for selectedNodes event
-lasso.bind('sigma:lasso:selectedNodes', function (event) {
+lasso.bind('selectedNodes', function (event) {
   // Do something with the selected nodes
   var nodes = event.data;
 

@@ -343,7 +343,7 @@
       }
 
       // Dispatch event with selected nodes
-      _self.dispatchEvent('sigma:lasso:selectedNodes', _selectedNodes);
+      _self.dispatchEvent('selectedNodes', _selectedNodes);
 
       // Clear the drawing canvas
       // _drawingContext.clearRect(0, 0, _drawingCanvas.width, _drawingCanvas.height);
