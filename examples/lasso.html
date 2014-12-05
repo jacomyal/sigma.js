@@ -1,0 +1,312 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<!-- START LASSO IMPORTS -->
+<script src="../plugins/sigma.plugins.lasso/sigma.plugins.lasso.js"></script>
+<!-- END LASSO IMPORTS -->
+<div id="container">
+  <style>
+    .graph-container {
+      background: #eee;
+      width: 46%;
+      height: 100%;
+      max-width: 800px;
+      margin: auto 2%;
+      position: relative;
+      overflow: hidden;
+    }
+    .graph-container:before,
+    .graph-container:after, {
+      display: table;
+      clear: both;
+    }
+    #first-graph-container {
+      float: left;
+      background: #fed;
+    }
+    #second-graph-container {
+      float: right;
+      background: #def;
+    }
+    .controls {
+      padding: 5px 0;
+      text-align: center;
+      background: rgba(41, 41, 41, 0.6);
+      color: white;
+    }
+  </style>
+  <div id="first-graph-container" class="graph-container">
+    <header class="controls">Activate / Deactivate Lasso with Alt + L</header>
+  </div>
+  <div id="second-graph-container" class="graph-container">
+    <header class="controls">Activate / Deactivate Lasso with Alt + M</header>
+  </div>
+</div>
+<script>
+  'use strict';
+
+  var firstSigmaInstance,
+      secondSigmaInstance,
+      firstLasso,
+      secondLasso,
+      nId = 0,
+      eId = 0,
+      nodeRadius = 50,
+      data = {
+        nodes: [
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 0,
+            y: 0,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 10,
+            y: -10,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 20,
+            y: -8,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -5,
+            y: -15,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -25,
+            y: 4,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: 18,
+            y: 2,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          },
+          {
+            id: (++nId) + '',
+            size: nodeRadius,
+            x: -4,
+            y: -6,
+            dX: 0,
+            dY: 0,
+            type: 'goo'
+          }
+        ],
+        edges: [
+          {
+            id: (++eId) + '',
+            source: '1',
+            target: '2'
+          },
+          {
+            id: (++eId) + '',
+            source: '1',
+            target: '3'
+          },
+          {
+            id: (++eId) + '',
+            source: '2',
+            target: '3'
+          },
+          {
+            id: (++eId) + '',
+            source: '4',
+            target: '2'
+          },
+          {
+            id: (++eId) + '',
+            source: '5',
+            target: '6'
+          },
+          {
+            id: (++eId) + '',
+            source: '7',
+            target: '1'
+          },
+          {
+            id: (++eId) + '',
+            source: '6',
+            target: '7'
+          }
+        ]
+      },
+      initializeGraph = function (sigmaInstance) {
+        sigmaInstance.graph.read(data);
+        sigmaInstance.refresh();
+
+        var lasso = new sigma.plugins.lasso(sigmaInstance, sigmaInstance.renderers[0], {
+          'strokeStyle': 'black',
+          'lineWidth': 2,
+          'fillWhileDrawing': true,
+          'fillStyle': 'rgba(41, 41, 41, 0.2)'
+        });
+
+        // Listen for selectedNodes event
+        lasso.bind('selectedNodes', function (event) {
+          // Do something with the selected nodes
+          var nodes = event.data;
+
+          console.log('nodes', nodes);
+
+          // For instance, reset all node size as their initial size
+          sigmaInstance.graph.nodes().forEach(function (node) {
+            node.color = 'black';
+            node.size = nodeRadius;
+          });
+
+          // Then increase the size of selected nodes...
+          nodes.forEach(function (node) {
+            node.color = 'rgb(42, 187, 155)';
+            node.size *= 3;
+          });
+
+          sigmaInstance.refresh();
+        });
+
+        return lasso;
+      };
+
+/**
+ * INITIALIZATION SCRIPT:
+ * **********************
+ */
+firstSigmaInstance = new sigma({
+  renderer: {
+    container: document.getElementById('first-graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    autoRescale: true,
+    mouseEnabled: true,
+    touchEnabled: true,
+    nodesPowRatio: 1,
+    edgesPowRatio: 1,
+    sideMargin: 2,
+    defaultEdgeColor: '#333',
+    defaultNodeColor: '#333',
+    edgeColor: 'default'
+  }
+});
+firstLasso = initializeGraph(firstSigmaInstance);
+
+secondSigmaInstance = new sigma({
+  renderer: {
+    container: document.getElementById('second-graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    autoRescale: true,
+    mouseEnabled: true,
+    touchEnabled: true,
+    nodesPowRatio: 1,
+    edgesPowRatio: 1,
+    sideMargin: 2,
+    defaultEdgeColor: '#444',
+    defaultNodeColor: '#444',
+    edgeColor: 'default'
+  }
+});
+secondLasso = initializeGraph(secondSigmaInstance);
+
+// Toggle lasso activation on Alt + l or Alt + f
+var isFirstLassoActivated = false;
+var isSecondLassoActivated = false;
+
+document.addEventListener('keyup', function (event) {
+  switch (event.keyCode) {
+    case 76:
+      if (event.altKey) {
+        if (isFirstLassoActivated) {
+          isFirstLassoActivated = false;
+          firstLasso.deactivate();
+        } else {
+          isFirstLassoActivated = true;
+          firstLasso.activate();
+        }
+      }
+      break;
+    case 77:
+      if (event.altKey) {
+        if (isSecondLassoActivated) {
+          isSecondLassoActivated = false;
+          secondLasso.deactivate();
+        } else {
+          isSecondLassoActivated = true;
+          secondLasso.activate();
+        }
+      }
+      break;
+  }
+});
+</script>
