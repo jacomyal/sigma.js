@@ -156,7 +156,7 @@
       _instance[s.id] = new Keyboard(s, options);
 
       s.bind('kill', function() {
-        delete _instance[s.id];
+        sigma.plugins.killKeyboard(s);
       });
     }
 
@@ -168,6 +168,7 @@
    */
   sigma.plugins.killKeyboard = function(s) {
     if (_instance[s.id] instanceof Keyboard) {
+      _instance[s.id].unbind();
       _body.removeEventListener('keydown', _instance[s.id].keyDown, false);
       _body.removeEventListener('keyup', _instance[s.id].keyUp, false);
       delete _instance[s.id];
