@@ -35,6 +35,9 @@
 
     sigma.classes.dispatcher.extend(this);
 
+    // Initialize pointer-events polyfill for cross-browser support
+    PointerEventsPolyfill.initialize({});
+
     // Initialize main attributes:
     this.graph = graph;
     this.camera = camera;
