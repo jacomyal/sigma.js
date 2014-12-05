@@ -382,9 +382,9 @@
       // Deleting element
       if (containsChildNode(self.domElements.groups.hovers, self.domElements.hovers[node.id])) {
         self.domElements.groups.hovers.removeChild(
-          self.domElements.hovers[hoveredNode.id]
+          self.domElements.hovers[node.id]
         );
-        delete self.domElements.hovers[hoveredNode.id];
+        delete self.domElements.hovers[node.id];
       }
 
       hoveredNode = null;
@@ -445,7 +445,7 @@
         prefix: prefix
       });
 
-      if (!hoveredNode) {
+      if (!hoveredNode || !embedSettings('enableHovering')) {
         return;
       }
 
