@@ -1,0 +1,39 @@
+{
+  "name": "sigma.js",
+  "version": "1.0.3",
+  "authors": [
+    "Atelier Iceberg <alexis.jacomy@gmail.com>"
+  ],
+  "description": "A JavaScript library dedicated to graph drawing.",
+  "main": [
+    "build/sigma.min.js",
+    "build/plugins/sigma.exporters.svg.min.js",
+    "build/plugins/sigma.layout.forceAtlas2.min.js",
+    "build/plugins/sigma.parsers.gexf.min.js",
+    "build/plugins/sigma.parsers.json.min.js",
+    "build/plugins/sigma.plugins.animate.min.js",
+    "build/plugins/sigma.plugins.dragNodes.min.js",
+    "build/plugins/sigma.plugins.filter.min.js",
+    "build/plugins/sigma.plugins.neighborhoods.min.js",
+    "build/plugins/sigma.plugins.relativeSize.min.js",
+    "build/plugins/sigma.renderers.customEdgeShapes.min.js",
+    "build/plugins/sigma.renderers.customShapes.min.js",
+    "build/plugins/sigma.renderers.edgeLabels.min.js",
+    "build/plugins/sigma.renderers.snapshot.min.js",
+    "build/plugins/sigma.statistics.HITS.min.js"
+  ],
+  "keywords": [
+    "sigma",
+    "graph"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/jacomyal/sigma.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    ".components",
+    "test",
+    "tests"
+  ]
+}
