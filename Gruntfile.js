@@ -86,6 +86,7 @@ module.exports = function(grunt) {
     'plugins.filter',
     'plugins.fullScreen',
     'plugins.keyboard',
+    'plugins.lasso',
     'plugins.locate',
     'plugins.neighborhoods',
     'plugins.poweredBy',
