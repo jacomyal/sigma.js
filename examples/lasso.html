@@ -209,7 +209,8 @@
           'strokeStyle': 'black',
           'lineWidth': 2,
           'fillWhileDrawing': true,
-          'fillStyle': 'rgba(41, 41, 41, 0.2)'
+          'fillStyle': 'rgba(41, 41, 41, 0.2)',
+          'cursor': 'crosshair'
         });
 
         // Listen for selectedNodes event
@@ -280,29 +281,22 @@ secondSigmaInstance = new sigma({
 secondLasso = initializeGraph(secondSigmaInstance);
 
 // Toggle lasso activation on Alt + l or Alt + f
-var isFirstLassoActivated = false;
-var isSecondLassoActivated = false;
-
 document.addEventListener('keyup', function (event) {
   switch (event.keyCode) {
     case 76:
       if (event.altKey) {
-        if (isFirstLassoActivated) {
-          isFirstLassoActivated = false;
+        if (firstLasso.isActive) {
           firstLasso.deactivate();
         } else {
-          isFirstLassoActivated = true;
           firstLasso.activate();
         }
       }
       break;
     case 77:
       if (event.altKey) {
-        if (isSecondLassoActivated) {
-          isSecondLassoActivated = false;
+        if (secondLasso.isActive) {
           secondLasso.deactivate();
         } else {
-          isSecondLassoActivated = true;
           secondLasso.activate();
         }
       }

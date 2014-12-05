@@ -44,7 +44,7 @@
     this.drawingContext = undefined;
     this.drewPoints = [];
     this.selectedNodes = [];
-    this.isActivated = false;
+    this.isActive = false;
     this.isDrawing = false;
 
     _body = document.body;
@@ -54,7 +54,8 @@
       'strokeStyle': 'black',
       'lineWidth': 2,
       'fillWhileDrawing': false,
-      'fillStyle': 'rgba(200, 200, 200, 0.25)'
+      'fillStyle': 'rgba(200, 200, 200, 0.25)',
+      'cursor': 'crosshair'
      }, settings || {});
 
     console.log('created');
@@ -90,18 +91,19 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.activate = function () {
-    if (this.sigmaInstance && !this.isActivated) {
-      this.isActivated = true;
+    if (this.sigmaInstance && !this.isActive) {
+      this.isActive = true;
 
       // Add a new background layout canvas to draw the path on
-      if (!this.renderer.domElements['lasso-background']) {
-        this.renderer.initDOM('canvas', 'lasso-background');
-        this.drawingCanvas = this.renderer.domElements['lasso-background'];
+      if (!this.renderer.domElements['lasso']) {
+        this.renderer.initDOM('canvas', 'lasso');
+        this.drawingCanvas = this.renderer.domElements['lasso'];
 
         this.drawingCanvas.width = this.renderer.container.offsetWidth;
         this.drawingCanvas.height = this.renderer.container.offsetHeight;
         this.renderer.container.appendChild(this.drawingCanvas);
         this.drawingContext = this.drawingCanvas.getContext('2d');
+        this.drawingCanvas.style.cursor = this.settings('cursor');
       }
 
       _bindAll.apply(this);
@@ -121,15 +123,16 @@
    * @return {sigma.plugins.lasso} Returns the instance.
    */
   Lasso.prototype.deactivate = function () {
-    if (this.sigmaInstance && this.isActivated) {
-      this.isActivated = false;
+    if (this.sigmaInstance && this.isActive) {
+      this.isActive = false;
       this.isDrawing = false;
 
       _unbindAll.apply(this);
 
-      if (this.renderer.domElements['lasso-background']) {
-        this.renderer.container.removeChild(this.renderer.domElements['lasso-background']);
-        delete this.renderer.domElements['lasso-background'];
+      if (this.renderer.domElements['lasso']) {
+        this.renderer.container.removeChild(this.renderer.domElements['lasso']);
+        delete this.renderer.domElements['lasso'];
+        this.drawingCanvas.style.cursor = '';
         this.drawingCanvas = undefined;
         this.drawingContext = undefined;
         this.drewPoints = [];
@@ -198,7 +201,7 @@
   function onDrawingStart (event) {
     var drawingRectangle = this.drawingCanvas.getBoundingClientRect();
 
-    if (this.isActivated) {
+    if (this.isActive) {
       this.isDrawing = true;
       this.drewPoints = [];
       this.selectedNodes = [];
@@ -210,12 +213,14 @@
         y: event.clientY - drawingRectangle.top
       });
 
+      this.drawingCanvas.style.cursor = this.settings('cursor');
+
       event.stopPropagation();
     }
   }
 
   function onDrawing (event) {
-    if (this.isActivated && this.isDrawing) {
+    if (this.isActive && this.isDrawing) {
       var x = 0,
           y = 0,
           drawingRectangle = this.drawingCanvas.getBoundingClientRect();
@@ -240,7 +245,6 @@
       this.drawingContext.fillStyle = this.settings('fillStyle');
       this.drawingContext.lineJoin = 'round';
       this.drawingContext.lineCap = 'round';
-      this.drawingCanvas.style.cursor = 'move';
 
       // Clear the canvas
       this.drawingContext.clearRect(0, 0, this.drawingContext.canvas.width, this.drawingContext.canvas.height);
@@ -280,7 +284,7 @@
   }
 
   function onDrawingEnd (event) {
-    if (this.isActivated && this.isDrawing) {
+    if (this.isActive && this.isDrawing) {
       this.isDrawing = false;
 
       // Select the nodes inside the path
@@ -305,6 +309,8 @@
 
       // Clear the drawing canvas
       this.drawingContext.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+
+      this.drawingCanvas.style.cursor = this.settings('cursor');
 
       event.stopPropagation();
     }

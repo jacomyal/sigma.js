@@ -29,6 +29,8 @@ lasso.bind('selectedNodes', function (event) {
   // Eventually unactivate the lasso-tool mode
   lasso.deactivate();
 });
+
+lasso.isActive; // true
 ````
 
 ## Settings
@@ -39,6 +41,8 @@ lasso.bind('selectedNodes', function (event) {
 * **lineWidth** *integer* `5`: The stroke-width of the lasso-tool
 * **fillWhileDrawing** *boolean* `false`: Should the lasso-tool fill itself while drawing with the <fillStyle> color ?
 * **fillStyle**: *string* `rgba(200, 200, 200, 0.25)`: The fill-color of the lasso-tool, only works when <fillWhileDrawing> is set up to `true`
+* **cursor**: *string* `crosshair`: The mouse cursor.
+
 
 ## Notes
 1. The lasso mode has to be both activated and unactivated manually
