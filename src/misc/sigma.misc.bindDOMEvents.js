@@ -115,7 +115,7 @@
 
     // On out
     function onOut(e) {
-      var target = e.fromElement || e.relatedTarget;
+      var target = e.fromElement || e.originalTarget;
 
       if (!self.settings('eventsEnabled'))
         return;
