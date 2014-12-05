@@ -74,4 +74,4 @@ kbd.bind('17+65 32+65', function() {
 });
 ````
 
-Don't forget to `.unbind()` the functions when necessary to avoid memory leaks.
+Functions are unbound when the plugin is killed. You can manually `.unbind()` them.
