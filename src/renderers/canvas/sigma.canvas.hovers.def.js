@@ -87,8 +87,20 @@
     }
 
     // Node:
-    var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
-    nodeRenderer(node, context, settings);
+    context.fillStyle = settings('nodeHoverColor') === 'node' ?
+      (node.color || settings('defaultNodeColor')) :
+      settings('defaultNodeHoverColor');
+    context.beginPath();
+    context.arc(
+      node[prefix + 'x'],
+      node[prefix + 'y'],
+      node[prefix + 'size'],
+      0,
+      Math.PI * 2,
+      true
+    );
+    context.closePath();
+    context.fill();
 
     // Display the label:
     if (typeof node.label === 'string') {
