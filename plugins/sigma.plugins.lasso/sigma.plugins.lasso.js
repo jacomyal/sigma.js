@@ -57,8 +57,6 @@
       'fillStyle': 'rgba(200, 200, 200, 0.25)',
       'cursor': 'crosshair'
      }, settings || {});
-
-    console.log('created');
   };
 
   /**
@@ -107,8 +105,6 @@
       }
 
       _bindAll.apply(this);
-
-      console.log('activated', this);
     }
 
     return this;
@@ -137,8 +133,6 @@
         this.drawingContext = undefined;
         this.drewPoints = [];
       }
-
-      console.log('deactivated', this);
     }
 
     return this;
@@ -288,7 +282,7 @@
       this.isDrawing = false;
 
       // Select the nodes inside the path
-      var nodes = this.sigmaInstance.graph.nodes(),
+      var nodes = this.renderer.nodesOnScreen,
         nodesLength = nodes.length,
         i = 0,
         prefix = this.renderer.options.prefix || '';
