@@ -106,8 +106,9 @@
           o.easing :
           sigma.utils.easings.quadraticInOut,
         start = sigma.utils.dateNow(),
+        nodes = options.nodes || s.graph.nodes(),
         // Store initial positions:
-        startPositions = s.graph.nodes().reduce(function(res, node) {
+        startPositions = nodes.reduce(function(res, node) {
           var k;
           res[node.id] = {};
           for (k in animate)
@@ -123,7 +124,7 @@
       var p = (sigma.utils.dateNow() - start) / duration;
 
       if (p >= 1) {
-        s.graph.nodes().forEach(function(node) {
+        nodes.forEach(function(node) {
           for (var k in animate)
             if (k in animate)
               node[k] = node[animate[k]];
@@ -134,7 +135,7 @@
           o.onComplete();
       } else {
         p = easing(p);
-        s.graph.nodes().forEach(function(node) {
+        nodes.forEach(function(node) {
           for (var k in animate)
             if (k in animate) {
               if (k.match(/color$/))
