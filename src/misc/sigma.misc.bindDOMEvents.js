@@ -120,7 +120,7 @@
       var target = e.toElement || e.target;
       // firefox fires mouseover events when user clicks the node
       // and the event has null as its source target
-      var srcTarget = e.fromElement || e.relatedTarget
+      var srcTarget = e.fromElement || e.relatedTarget;
       if (!self.settings('eventsEnabled') || !target || !srcTarget)
         return;
 
