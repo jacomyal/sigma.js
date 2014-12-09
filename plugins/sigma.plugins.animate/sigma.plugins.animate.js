@@ -78,6 +78,9 @@
    * Here is the exhaustive list of every accepted parameters in the settings
    * object:
    *
+   *   {?array}             nodes      An array of node objects or node ids. If
+   *                                   not specified, all nodes of the graph
+   *                                   will be animated.
    *   {?(function|string)} easing     Either the name of an easing in the
    *                                   sigma.utils.easings package or a
    *                                   function. If not specified, the
@@ -106,16 +109,27 @@
           o.easing :
           sigma.utils.easings.quadraticInOut,
         start = sigma.utils.dateNow(),
-        nodes = options.nodes || s.graph.nodes(),
-        // Store initial positions:
-        startPositions = nodes.reduce(function(res, node) {
-          var k;
-          res[node.id] = {};
-          for (k in animate)
-            if (k in node)
-              res[node.id][k] = node[k];
-          return res;
-        }, {});
+        nodes,
+        startPositions;
+
+    if (o.nodes && o.nodes.length) {
+      if (typeof o.nodes[0] === 'object')
+        nodes = o.nodes;
+      else
+        nodes = s.graph.nodes(o.nodes); // argument is an array of IDs
+    }
+    else
+      nodes = s.graph.nodes();
+
+    // Store initial positions:
+    startPositions = nodes.reduce(function(res, node) {
+      var k;
+      res[node.id] = {};
+      for (k in animate)
+        if (k in node)
+          res[node.id][k] = node[k];
+      return res;
+    }, {});
 
     s.animations = s.animations || Object.create({});
     sigma.plugins.killAnimate(s);
