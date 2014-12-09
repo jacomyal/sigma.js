@@ -17,13 +17,23 @@
   sigma.canvas.labels.def = function(node, context, settings) {
     var fontSize,
         prefix = settings('prefix') || '',
-        size = node[prefix + 'size'];
+        size = node[prefix + 'size'],
+        labelWidth = 0,
+        labelPlacementX,
+        labelPlacementY,
+        alignment;
 
     if (size < settings('labelThreshold'))
       return;
 
     if (typeof node.label !== 'string')
       return;
+
+    if (settings('labelAlignment') === undefined) {
+      alignment = settings('defaultLabelAlignment');
+    } else {
+      alignment = settings('labelAlignment');
+    }
 
     fontSize = (settings('labelSize') === 'fixed') ?
       settings('defaultLabelSize') :
@@ -35,10 +45,45 @@
       (node.color || settings('defaultNodeColor')) :
       settings('defaultLabelColor');
 
+    labelWidth = context.measureText(node.label).width;
+    labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+    labelPlacementY = Math.round(node[prefix + 'y'] + fontSize / 3);
+
+    switch (alignment) {
+      case 'inside':
+        if (labelWidth >= (size + fontSize / 3) * 2) {
+          labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+          break;
+        }
+      /* falls through*/
+      case 'center':
+        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
+        break;
+      case 'left':
+        labelPlacementX =
+            Math.round(node[prefix + 'x'] - size - labelWidth - 3);
+        break;
+      case 'right':
+        labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+        break;
+      case 'top':
+        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
+        labelPlacementY = labelPlacementY - size - fontSize;
+        break;
+      case 'bottom':
+        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
+        labelPlacementY = labelPlacementY + size + fontSize;
+        break;
+      default:
+        // Default is aligned 'right'
+        labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+        break;
+    }
+
     context.fillText(
       node.label,
-      Math.round(node[prefix + 'x'] + size + 3),
-      Math.round(node[prefix + 'y'] + fontSize / 3)
+      labelPlacementX,
+      labelPlacementY
     );
   };
 }).call(this);
