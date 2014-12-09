@@ -55,8 +55,11 @@
 
         // Text
         text.innerHTML = node.label;
-        text.textContent =  node.label;
-        text.setAttributeNS(null, 'class', settings('classPrefix') + '-hover-label');
+        text.textContent = node.label;
+        text.setAttributeNS(
+            null,
+            'class',
+            settings('classPrefix') + '-hover-label');
         text.setAttributeNS(null, 'font-size', fontSize);
         text.setAttributeNS(null, 'font-family', settings('font'));
         text.setAttributeNS(null, 'fill', fontColor);
@@ -77,14 +80,20 @@
         e = Math.round(fontSize / 2 + 2);
 
         // Circle
-        circle.setAttributeNS(null, 'class', settings('classPrefix') + '-hover-area')
+        circle.setAttributeNS(
+            null,
+            'class',
+            settings('classPrefix') + '-hover-area');
         circle.setAttributeNS(null, 'fill', '#fff');
         circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
         circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
         circle.setAttributeNS(null, 'r', e);
 
         // Rectangle
-        rectangle.setAttributeNS(null, 'class', settings('classPrefix') + '-hover-area')
+        rectangle.setAttributeNS(
+            null,
+            'class',
+            settings('classPrefix') + '-hover-area');
         rectangle.setAttributeNS(null, 'fill', '#fff');
         rectangle.setAttributeNS(null, 'x', node[prefix + 'x'] + e / 4);
         rectangle.setAttributeNS(null, 'y', node[prefix + 'y'] - e);
