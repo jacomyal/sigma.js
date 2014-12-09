@@ -71,7 +71,7 @@
       text.setAttributeNS(null, 'y',
         Math.round(node[prefix + 'y'] + fontSize / 3));
       text.innerHTML = node.label;
-      text.textContent =  node.label;
+      text.textContent = node.label;
 
       // Showing
       text.style.display = '';
