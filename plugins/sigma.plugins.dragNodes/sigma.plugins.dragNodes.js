@@ -190,7 +190,6 @@
 
       // Activate drag graph.
       _renderer.settings({mouseEnabled: true, enableHovering: true});
-      _s.refresh();
 
       if (_drag) {
         _self.dispatchEvent('drop', {
