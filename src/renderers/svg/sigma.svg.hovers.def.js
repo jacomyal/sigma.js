@@ -87,7 +87,7 @@
             text.setAttributeNS(null, 'x', x - labelWidth / 2);
             text.setAttributeNS(null, 'y', y - size - 2 * fontSize / 3);
             rectangle.setAttributeNS(null, 'x', x - w / 2);
-            rectangle.setAttributeNS(null, 'y', y - e);
+            rectangle.setAttributeNS(null, 'y', y - e - h);
             break;
           case 'bottom':
             text.setAttributeNS(null, 'x', x - labelWidth / 2);
@@ -128,22 +128,23 @@
           null,
           'class',
           settings('classPrefix') + '-hover-area');
-        circle.setAttributeNS(null, 'fill', '#f00');
+        circle.setAttributeNS(null, 'fill', '#fff');
         circle.setAttributeNS(null, 'cx', x);
         circle.setAttributeNS(null, 'cy', y);
         circle.setAttributeNS(null, 'r', e);
 
         // Rectangle
+        rectangle.setAttributeNS(
+          null,
+          'class',
+          settings('classPrefix') + '-hover-area');
+
         if (alignment !== 'center' &&
             (alignment !== 'inside' || labelWidth > e * 2)) {
-          rectangle.setAttributeNS(
-            null,
-            'class',
-            settings('classPrefix') + '-hover-area');
-          rectangle.setAttributeNS(null, 'fill', '#f00');
+          rectangle.setAttributeNS(null, 'fill', '#fff');
           rectangle.setAttributeNS(null, 'width', w);
           rectangle.setAttributeNS(null, 'height', h);
-        } 
+        }
       }
 
       // Appending childs
