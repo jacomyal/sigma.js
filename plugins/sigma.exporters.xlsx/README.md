@@ -20,6 +20,18 @@ s.toXLSX();
 
 ### Advanced usage
 
+Download the XSLX file with nodes and edges attributes:
+
+````javascript
+s.toXLSX({
+  nodesAttributes: 'data',
+  edgesAttributes: 'data.properties',
+  filename: 'myGraph.xlsx'
+});
+````
+
+Download the XSLX file with 2 specified nodes and their attributes:
+
 ````javascript
 s.toXLSX({
   what: 'nodes',

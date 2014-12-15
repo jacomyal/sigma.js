@@ -228,7 +228,7 @@
 
       download(
         URL.createObjectURL(blob),
-        'xslx',
+        'xlsx',
         params.filename
       );
   };
