@@ -10,6 +10,9 @@
   },
   "license": "MIT",
   "main": "build/sigma.require.js",
+  "dependencies": {
+    "xlsx": "^0.7.12"
+  },
   "devDependencies": {
     "grunt-cli": "^0.1.13",
     "grunt": "~0.4.5",
