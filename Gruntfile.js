@@ -73,6 +73,7 @@ module.exports = function(grunt) {
     'exporters.gexf',
     'exporters.spreadsheet',
     'exporters.svg',
+    'exporters.xlsx',
     'layout.forceAtlas2',
     'parsers.gexf',
     'parsers.json',
