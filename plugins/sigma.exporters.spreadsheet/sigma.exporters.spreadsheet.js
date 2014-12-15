@@ -40,9 +40,10 @@
       return separator + separator;
 
     if (typeof x === 'function')
-      x = x.toString().replace(/\s+/g, ' ');
+      x = x.toString();
 
     x = (typeof x === 'string') ? x : JSON.stringify(x);
+    x = x.replace(/\s+/g, ' ');
 
     if (separator && separator.length) {
       return separator +
