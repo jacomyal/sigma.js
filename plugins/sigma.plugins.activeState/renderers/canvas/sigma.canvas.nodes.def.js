@@ -64,27 +64,50 @@
       }
     }
 
-    // if (node.active) {
-    //   context.fillStyle = settings('nodeActiveColor') === 'node' ?
-    //     (color || defaultNodeColor) :
-    //     settings('defaultNodeActiveColor');
-    // }
-    // else {
-    //   context.fillStyle = color;
-    // }
-    context.fillStyle = color;
+    if ((!node.active ||
+      (node.active && settings('nodeActiveColor') === 'node')) &&
+      node.colors &&
+      node.colors.length) {
 
-    context.beginPath();
-    context.arc(
-      node[prefix + 'x'],
-      node[prefix + 'y'],
-      size,
-      0,
-      Math.PI * 2,
-      true
-    );
+      // see http://jsfiddle.net/hvYkM/1/
+      var x = node[prefix + 'x'],
+          y = node[prefix + 'y'],
+          i,
+          l = node.colors.length,
+          j = 1 / l,
+          lastend = 0;
 
-    context.closePath();
-    context.fill();
+      for (i = 0; i < l; i++) {
+        context.fillStyle = node.colors[i];
+        context.beginPath();
+        context.moveTo(x, y);
+        context.arc(
+          x,
+          y,
+          size,
+          lastend,
+          lastend + (Math.PI * 2 * j),
+          false
+        );
+        context.lineTo(x, y);
+        context.closePath();
+        context.fill();
+        lastend += Math.PI * 2 * j;
+      }
+    }
+    else {
+      context.fillStyle = color;
+      context.beginPath();
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        size,
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.fill();
+    }
   };
 })();
