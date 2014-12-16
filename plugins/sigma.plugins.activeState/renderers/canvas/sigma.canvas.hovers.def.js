@@ -22,15 +22,13 @@
         e,
         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
         prefix = settings('prefix') || '',
-        size = node[prefix + 'size'],
+        size = node[prefix + 'size'] || 1,
         defaultNodeColor = settings('defaultNodeColor'),
         borderSize = settings('borderSize'),
         fontSize = (settings('labelSize') === 'fixed') ?
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size,
-        color = (node.active) ?
-          node.active_color || settings('defaultNodeActiveColor') :
-          node.color || defaultNodeColor;
+        color = node.color || defaultNodeColor;
 
     // Label background:
     context.font = (fontStyle ? fontStyle + ' ' : '') +

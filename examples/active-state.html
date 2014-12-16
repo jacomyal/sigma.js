@@ -92,7 +92,7 @@ for (i = 0; i < N; i++)
     y: Math.random(),
     size: Math.random(),
     color: '#666',
-    //active_color: '#000', //'rgb(236, 81, 72)'
+    // active_color: '#000', //'rgb(236, 81, 72)'
     active: [false, true][Math.random() * 1.05 | 0]
   });
 
@@ -111,13 +111,14 @@ for (i = 0; i < E; i++)
 // Instanciate sigma:
 s = new sigma({
   graph: g,
-  /*renderer: {
-    container: document.getElementById('graph-container'),
-    type: 'canvas'
-  }*/
+  // renderer: {
+  //   container: document.getElementById('graph-container'),
+  //   type: 'canvas'
+  // }
   container: 'graph-container'
   ,
   settings: {
+    nodeActiveColor: 'default',
     borderSize: 2,
     outerBorderSize: 1,
     defaultNodeBorderColor: '#fff',

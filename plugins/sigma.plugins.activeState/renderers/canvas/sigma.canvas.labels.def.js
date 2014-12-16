@@ -17,7 +17,7 @@
   sigma.canvas.labels.def = function(node, context, settings) {
     var fontSize,
         prefix = settings('prefix') || '',
-        size = node[prefix + 'size'],
+        size = node[prefix + 'size'] || 1,
         fontStyle = node.active ?
           settings('activeFontStyle') : settings('fontStyle');
 
