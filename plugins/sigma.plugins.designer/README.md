@@ -315,6 +315,9 @@ designer.utils.histogram('edges', 'color', 'data.quantity');
 
 ## Changelog
 
+**0.3**
+* The array `node.colors` is created when node attributes with an array of values are mapped to colors. In this case, `node.color` is unchanged.
+
 **0.2**
  * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.
  * Add the `bins` setting to size.
