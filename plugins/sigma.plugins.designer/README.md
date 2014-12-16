@@ -138,6 +138,13 @@ Apply a specified nodes style like the color:
 designer.make('nodes', 'color');
 ```
 
+Apply node sstyles progressively:
+
+```js
+designer.make('nodes', 'color'); // apply node colors
+designer.makeAll(); // apply all styles but node colors
+```
+
 Apply all edges styles:
 
 ```js
@@ -184,27 +191,28 @@ designer.omit('nodes', 'size');
 ### Deprecate the designer's vision
 The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called.
 
+Deprecate all styles:
+
 ```js
 designer.deprecate();
-designer.make('nodes', 'color'); // refresh node colors
 designer.makeAll(); // refresh all styles but node colors
 ```
 
-Deprecate all node styles as follows:
+Deprecate all nodes styles as follows:
 
 ```js
 designer.deprecate('nodes');
 designer.make('nodes'); // refresh node styles
-designer.makeAll(); // refresh all styles but node colors
 ```
 
-Deprecate a specified style as follows:
+Deprecate a specified nodes property as follows:
 
 ```js
-designer.deprecate('nodes', 'color');
-designer.make('nodes', 'color'); // refresh node colors
-designer.makeAll(); // refresh all styles but node colors
+designer.deprecate('nodes', 'data.quantity');
+designer.make('nodes'); // refresh node styles bound to 'data.quantity'
 ```
+
+Deprecation works the same way for edges.
 
 ### Clear all styles
 All styles are cleared and the designer forgets the palette and styles:
@@ -306,6 +314,9 @@ designer.utils.histogram('edges', 'color', 'data.quantity');
 ```
 
 ## Changelog
+
+**0.3**
+* The array `node.colors` is created when node attributes with an array of values are mapped to colors. In this case, `node.color` is unchanged.
 
 **0.2**
  * Add `.appliedStyles()` to list the styles currently applied to nodes or edges.

@@ -17,7 +17,7 @@
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.2
+   * @version 0.3
    */
 
    var _s = null,
@@ -428,6 +428,19 @@
     var self = this,
         idxp = this.get(key);
 
+    if (visualVar === 'color' && self.dataTypes[key].array) {
+      this.dataset(_s).forEach(function (item) {
+        delete item.colors;
+      });
+
+      Object.keys(idxp).forEach(function (val) {
+        var o = idxp[val];
+        o.items.forEach(function (item) {
+          item.colors = [];
+        });
+      });
+    }
+
     Object.keys(idxp).forEach(function (val) {
       var o = idxp[val];
       o.items.forEach(function (item) {
@@ -447,8 +460,13 @@
           }
 
           var newVal = o.styles[visualVar](item);
-          if (newVal !== undefined)
-            item[visualVar] = o.styles[visualVar](item);
+
+          if (visualVar === 'color' && self.dataTypes[key].array) {
+            if (newVal !== undefined)
+              item.colors.push(newVal);
+          }
+          else if (newVal !== undefined)
+            item[visualVar] = newVal;
         }
         else {
           if (typeof o.styles[visualVar] === 'function')
@@ -522,10 +540,20 @@
     if (this.idx[key] === undefined)
       return;
 
-    var self = this;
+    var self = this,
+        idxp = this.get(key);
 
-    Object.keys(this.idx[key]).forEach(function (val) {
-      var o = self.idx[key][val];
+    if (visualVar === 'color' && self.dataTypes[key].array) {
+      Object.keys(idxp).forEach(function (val) {
+        var o = idxp[val];
+        o.items.forEach(function (item) {
+          delete item.colors;
+        });
+      });
+    }
+
+    Object.keys(idxp).forEach(function (val) {
+      var o = idxp[val];
       o.items.forEach(function (item) {
         if (item !== undefined && item[visualVar] !== undefined) {
 
