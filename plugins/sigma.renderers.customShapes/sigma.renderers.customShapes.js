@@ -92,7 +92,6 @@
         node.image.url);
       group.appendChild(def);
       group.appendChild(image);
-      return group;
     }
   }
 
@@ -137,7 +136,8 @@
           node.color || settings('defaultNodeColor'));
 
         group.appendChild(circle);
-        return drawSVGImage(node, group, settings);
+        drawSVGImage(node, group, settings);
+        return group;
       },
       update: function(node, group, settings) {
         var classPrefix = settings('classPrefix'),
@@ -155,36 +155,36 @@
           xratio = (iw<ih) ? (iw/ih) : 1,
           yratio = (ih<iw) ? (ih/iw) : 1;
 
-        for(var i = 0, children = group.children; i < children.length; i ++) {
-          var className = children[i].getAttribute('class');
+        for(var i = 0, childNodes = group.childNodes; i < childNodes.length; i ++) {
+          var className = childNodes[i].getAttribute('class');
 
           switch (className) {
             case classPrefix + '-node':
-              children[i].setAttributeNS(null, 'cx', x);
-              children[i].setAttributeNS(null, 'cy', y);
-              children[i].setAttributeNS(null, 'r', size);
+              childNodes[i].setAttributeNS(null, 'cx', x);
+              childNodes[i].setAttributeNS(null, 'cy', y);
+              childNodes[i].setAttributeNS(null, 'r', size);
 
               // // Updating only if not freestyle
               if (!settings('freeStyle')) {
-                children[i].setAttributeNS(
+                childNodes[i].setAttributeNS(
                   null,
                   'fill',
                   node.color || settings('defaultNodeColor'));
               }
               break;
             case classPrefix + '-node-image':
-              children[i].setAttributeNS(null, 'x',
+              childNodes[i].setAttributeNS(null, 'x',
                 x+Math.sin(-3.142/4)*r*xratio);
-              children[i].setAttributeNS(null, 'y',
+              childNodes[i].setAttributeNS(null, 'y',
                 y-Math.cos(-3.142/4)*r*yratio);
-              children[i].setAttributeNS(null, 'width',
+              childNodes[i].setAttributeNS(null, 'width',
                 r*xratio*2*Math.sin(-3.142/4)*(-1));
-              children[i].setAttributeNS(null, 'height',
+              childNodes[i].setAttributeNS(null, 'height',
                 r*yratio*2*Math.cos(-3.142/4));
               break;
             default:
               // no class name, must be the clip-path
-              var clipPath = children[i].firstChild;
+              var clipPath = childNodes[i].firstChild;
               if (clipPath != null) {
                 var clipPathId = classPrefix + '-clip-path-' + node.id;
                 if (clipPath.getAttribute('id') === clipPathId) {
