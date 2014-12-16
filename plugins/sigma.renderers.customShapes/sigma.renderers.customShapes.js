@@ -62,6 +62,39 @@
     }
   }
 
+  var drawSVGImage = function (node, group, settings) {
+    if(sigInst && node.image && node.image.url) {
+      var clipCircle = document.createElementNS(settings('xmlns'), 'circle'),
+        clipPath = document.createElementNS(settings('xmlns'), 'clipPath'),
+        clipPathId = settings('classPrefix') + '-clip-path-' + node.id,
+        def = document.createElementNS(settings('xmlns'), 'defs'),
+        image = document.createElementNS(settings('xmlns'), 'image'),
+        url = node.image.url;
+
+      clipPath.setAttributeNS(null, 'id', clipPathId);
+      clipPath.appendChild(clipCircle);
+      def.appendChild(clipPath);
+
+      // angular's base tag will change the relative fragment id, so
+      // #<clipPathId> doesn't work
+      // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+      // They don't need the current URL in the clip path reference.
+      var absolutePath = /MSIE [5-9]/.test(navigator.userAgent) ?
+        "" : document.location.href;
+      // To fix cases where an anchor tag was used
+      absolutePath = absolutePath.split("#")[0];
+      image.setAttributeNS(null, 'class',
+        settings('classPrefix') + '-node-image');
+      image.setAttributeNS(null, 'clip-path',
+        'url(' + absolutePath + '#' + clipPathId + ')');
+      image.setAttributeNS(null, 'pointer-events', 'none');
+      image.setAttributeNS('http://www.w3.org/1999/xlink', 'href',
+        node.image.url);
+      group.appendChild(def);
+      group.appendChild(image);
+      return group;
+    }
+  }
 
   var register = function(name,drawShape,drawBorder) {
     sigma.canvas.nodes[name] = function(node, context, settings) {
@@ -87,6 +120,88 @@
 
       context.restore();
     };
+
+    sigma.svg.nodes[name] = {
+      create: function(node, settings) {
+        var group = document.createElementNS(settings('xmlns'), 'g'),
+        circle = document.createElementNS(settings('xmlns'), 'circle');
+
+        group.setAttributeNS(null, 'class',
+          settings('classPrefix') + '-node-group');
+        group.setAttributeNS(null, 'data-node-id', node.id);
+        // Defining the node's circle
+        circle.setAttributeNS(null, 'data-node-id', node.id);
+        circle.setAttributeNS(null, 'class',
+          settings('classPrefix') + '-node');
+        circle.setAttributeNS(null, 'fill',
+          node.color || settings('defaultNodeColor'));
+
+        group.appendChild(circle);
+        return drawSVGImage(node, group, settings);
+      },
+      update: function(node, group, settings) {
+        var classPrefix = settings('classPrefix'),
+          clip = node.image.clip || 1,
+          // 1 is arbitrary, anyway only the ratio counts
+          ih = node.image.h || 1,
+          iw = node.image.w || 1,
+          prefix = settings('prefix') || '',
+          scale = node.image.scale || 1,
+          size = node[prefix + 'size'],
+          x = node[prefix + 'x'],
+          y = node[prefix + 'y'];
+
+          var r = scale * size,
+          xratio = (iw<ih) ? (iw/ih) : 1,
+          yratio = (ih<iw) ? (ih/iw) : 1;
+
+        for(var i = 0, children = group.children; i < children.length; i ++) {
+          var className = children[i].getAttribute('class');
+
+          switch (className) {
+            case classPrefix + '-node':
+              children[i].setAttributeNS(null, 'cx', x);
+              children[i].setAttributeNS(null, 'cy', y);
+              children[i].setAttributeNS(null, 'r', size);
+
+              // // Updating only if not freestyle
+              if (!settings('freeStyle')) {
+                children[i].setAttributeNS(
+                  null,
+                  'fill',
+                  node.color || settings('defaultNodeColor'));
+              }
+              break;
+            case classPrefix + '-node-image':
+              children[i].setAttributeNS(null, 'x',
+                x+Math.sin(-3.142/4)*r*xratio);
+              children[i].setAttributeNS(null, 'y',
+                y-Math.cos(-3.142/4)*r*yratio);
+              children[i].setAttributeNS(null, 'width',
+                r*xratio*2*Math.sin(-3.142/4)*(-1));
+              children[i].setAttributeNS(null, 'height',
+                r*yratio*2*Math.cos(-3.142/4));
+              break;
+            default:
+              // no class name, must be the clip-path
+              var clipPath = children[i].firstChild;
+              if (clipPath != null) {
+                var clipPathId = classPrefix + '-clip-path-' + node.id;
+                if (clipPath.getAttribute('id') === clipPathId) {
+                  clipPath.firstChild.setAttributeNS(null, 'cx', x);
+                  clipPath.firstChild.setAttributeNS(null, 'cy', y);
+                  clipPath.firstChild.setAttributeNS(null, 'r',
+                    clip * size);
+                }
+              }
+              break;
+          }
+        }
+
+        // showing
+        group.style.display = '';
+      }
+    }
   }
 
   ShapeLibrary.enumerate().forEach(function(shape) {
