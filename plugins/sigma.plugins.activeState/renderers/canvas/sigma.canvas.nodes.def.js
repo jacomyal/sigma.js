@@ -12,14 +12,23 @@
    */
   sigma.canvas.nodes.def = function(node, context, settings) {
     var prefix = settings('prefix') || '',
+        size = node[prefix + 'size'] || 1,
         defaultNodeColor = settings('defaultNodeColor'),
         borderSize = settings('borderSize'),
         outerBorderSize = settings('outerBorderSize'),
-        color = node.active ?
-          node.active_color || settings('defaultNodeActiveColor') :
-          node.color || defaultNodeColor;
+        color = node.color || defaultNodeColor;
 
-    // Node border:
+    // Color:
+    if (node.active) {
+      if (settings('nodeActiveColor') === 'node') {
+        color = node.active_color || color;
+      }
+      else {
+        color = settings('defaultNodeActiveColor') || color;
+      }
+    }
+
+    // Border:
     if (node.active) {
       if (outerBorderSize > 0) {
         context.beginPath();
@@ -29,7 +38,7 @@
         context.arc(
           node[prefix + 'x'],
           node[prefix + 'y'],
-          node[prefix + 'size'] + borderSize + outerBorderSize,
+          size + borderSize + outerBorderSize,
           0,
           Math.PI * 2,
           true
@@ -45,7 +54,7 @@
         context.arc(
           node[prefix + 'x'],
           node[prefix + 'y'],
-          node[prefix + 'size'] + borderSize,
+          size + borderSize,
           0,
           Math.PI * 2,
           true
@@ -55,20 +64,21 @@
       }
     }
 
-    if (node.active) {
-      context.fillStyle = settings('nodeActiveColor') === 'node' ?
-        (color || defaultNodeColor) :
-        settings('defaultNodeActiveColor');
-    }
-    else {
-      context.fillStyle = color;
-    }
-    
+    // if (node.active) {
+    //   context.fillStyle = settings('nodeActiveColor') === 'node' ?
+    //     (color || defaultNodeColor) :
+    //     settings('defaultNodeActiveColor');
+    // }
+    // else {
+    //   context.fillStyle = color;
+    // }
+    context.fillStyle = color;
+
     context.beginPath();
     context.arc(
       node[prefix + 'x'],
       node[prefix + 'y'],
-      node[prefix + 'size'],
+      size,
       0,
       Math.PI * 2,
       true

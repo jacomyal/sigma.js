@@ -18,28 +18,35 @@
     POINTS: 3,
     ATTRIBUTES: 5,
     addNode: function(node, data, i, prefix, settings) {
-      var color = node.active ?
-            node.active_color || settings('defaultNodeActiveColor') :
-            node.color || settings('defaultNodeColor');
+      var color = node.color || settings('defaultNodeColor');
+
+      if (node.active) {
+        if (settings('nodeActiveColor') === 'node') {
+          color = node.active_color || color;
+        }
+        else {
+          color = settings('defaultNodeActiveColor') || color;
+        }
+      }
       color = sigma.utils.floatColor(
         color || settings('defaultNodeColor')
       );
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'];
+      data[i++] = node[prefix + 'size'] || 1;
       data[i++] = color;
       data[i++] = 0;
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'];
+      data[i++] = node[prefix + 'size'] || 1;
       data[i++] = color;
       data[i++] = 2 * Math.PI / 3;
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'];
+      data[i++] = node[prefix + 'size'] || 1;
       data[i++] = color;
       data[i++] = 4 * Math.PI / 3;
     },
