@@ -31,14 +31,13 @@
   "ignore": [
     "**/.*",
     ".components",
-    "bower_components",
     "CHANGELOG.md",
     "CONTRIBUTING.draft.md",
     "examples",
     "Gruntfile.js",
     "node_modules",
     "package.json",
-    "plugins",
+    "plugins/",
     "src",
     "test"
   ]
