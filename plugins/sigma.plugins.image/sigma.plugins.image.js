@@ -87,17 +87,20 @@
   * @param {params}  Options
   */
   Image.prototype.clone = function(s, params) {
-    var el =  document.createElement("div")
-    el.id="image-container";
-    document.body.appendChild(el);
+    params.tmpContainer = params.tmpContainer || 'image-container';
 
-    var y = s.addRenderer({
-      container: document.getElementById('image-container'),
+    if (!document.getElementById(params.tmpContainer)) {
+      var el =  document.createElement("div");
+      el.id = params.tmpContainer;
+      document.body.appendChild(el);
+    }
+
+    var renderer = s.addRenderer({
+      container: document.getElementById(params.tmpContainer),
       type: 'canvas'
     });
 
-    var renderer = y,
-        webgl = renderer instanceof sigma.renderers.webgl,
+    var webgl = renderer instanceof sigma.renderers.webgl,
         sized = false,
         doneContexts = [];
 
@@ -135,8 +138,8 @@
 
     // Cleaning
     doneContexts = [];
-    s.killRenderer(y);
-    document.getElementById("image-container").remove();
+    s.killRenderer(renderer);
+    document.getElementById(params.tmpContainer).remove();
   }
 
   /**
