@@ -103,10 +103,12 @@
       if (params.classes) {
 
         if (!(color in nodeColorIndex)) {
-          styleText += '.' + (f ? prefix + '-node' : 'color-' + (count++)) +
-                       '{fill: ' + color + '}';
-          nodeColorIndex[color] = true;
+          nodeColorIndex[color] = (f ? prefix + '-node' : 'c-' + (count++));
+          styleText += '.' + nodeColorIndex[color] + '{fill: ' + color + '}';
         }
+
+        if (nodeColorIndex[color] !== prefix + '-node')
+          nodes[i].setAttribute('class', nodes[i].getAttribute('class') + ' ' + nodeColorIndex[color]);
         nodes[i].removeAttribute('fill');
       }
 
@@ -125,10 +127,12 @@
       if (params.classes) {
 
         if (!(color in edgeColorIndex)) {
-          styleText += '.' + (f ? prefix + '-edge' : 'color-' + (count++)) +
-                       '{stroke: ' + color + '}';
-          edgeColorIndex[color] = true;
+          edgeColorIndex[color] = (f ? prefix + '-edge' : 'c-' + (count++));
+          styleText += '.' + edgeColorIndex[color] + '{stroke: ' + color + '}';
         }
+
+        if (edgeColorIndex[color] !== prefix + '-edge')
+          edges[i].setAttribute('class', edges[i].getAttribute('class') + ' ' + edgeColorIndex[color]);
         edges[i].removeAttribute('stroke');
       }
 
