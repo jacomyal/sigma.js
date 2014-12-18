@@ -35,6 +35,7 @@ sigma.plugins.image(s, s.renderers[0], {
 * **renderer**: related renderer instance.
 * **size** [`window.innerWidth`]: size of the image.
 * **zoom** [`false`]: boolean to retrieve zoom or take entire graph rendered .
+* **tmpContainer** [`image-container`]: the ID of the temporary div contained used if `zoom: false`.
 * **format** [`png`]: file format of the image. Supported: `png`, `jpg`, `gif`, `tiff`.
 * **background** : whether you want to specify a background color for the image. Transparent if none specified.
 * **labels** [`true`] : labels on screen to be displayed on the image
