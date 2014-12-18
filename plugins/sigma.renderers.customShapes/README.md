@@ -5,18 +5,15 @@ Plugin developed by:
 - [Ron Peleg](https://github.com/rpeleg1970) (original idea and version)
 - [Julian Bilcke](https://github.com/jbilcke) (WebGL implementation)
 
+License: this plugin follows the same licensing terms as sigma.js library.
+
 ---
 ## General
 
 This plugin let you display custom shapes, icons and images in graphs.
 
 The most basic features are available in both Canvas and WebGL mode, as shown
-in this demo:
-
-
-
-TODO put the hybrid demo
-
+in [this demo](https://github.com/jbilcke/sigma.js-plugin-customShapes/blob/plugins/customShapes-webgl/examples/plugin-customShapes-hybrid.html).
 
 The WebGL and Canvas renderers work differently, so it is possible that some
 features have not been ported yet from one engine to the other. So please open
@@ -28,24 +25,29 @@ how to fix it).
 
 ### Quickstart
 
-Build the Sigma.js project by typing:
+First make sure you are able to build the sigma.js project (see the [README](https://github.com/jacomyal/sigma.js/blob/master/README.md) for more information), and understand how Sigma.js works (eg. what is a Sigma.js instance).
 
-    $ npm install
+Then you can build the customShapes plugin by going to the `plugins/sigma.renderers.customShapes` directory and typing:
+
+    $ grunt build
 
 This should generate a `sigma.renderers.customShapes.min.js` file in `build/plugins`
 
 
-Then include this file in your project, like this:
+Then you can copy this file and use it in your web project:
 
 ```html
 <script src="path/to/plugin/sigma.renderers.customShapes.min.js"></script>
 ```
 
-Then you can start defining shapes, using the `type` attribute:
+*Note: The next steps assume you already imported and initialized an instance of Sigma.js.*
+
+The customShapes plugins works at the "add node" step of creating a graph.
+
+You can assigning shapes to nodes by using the `type` attribute:
 
 ```javascript
 mySigma.graph.addNode({
-  color: '#abcdef',
   type: 'star'
 });
 ```

@@ -28,5 +28,6 @@ module.exports = function(grunt) {
   grunt.loadTasks(__dirname + '/tasks');
 
   // By default, we will minify
-  grunt.registerTask('default', ['customShapes:prod']);
+  grunt.registerTask('build', ['customShapes:prod']);
+  grunt.registerTask('default', ['build']);
 };
