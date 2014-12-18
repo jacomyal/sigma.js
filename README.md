@@ -3,7 +3,7 @@
 sigma.js - v1.0.3
 =================
 
-Sigma is a JavaScript library dedicated to graph drawing.
+Sigma is a JavaScript library dedicated to graph drawing, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal).
 
 ### Resources
 

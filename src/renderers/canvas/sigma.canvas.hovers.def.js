@@ -91,7 +91,7 @@
     nodeRenderer(node, context, settings);
 
     // Display the label:
-    if (typeof node.label === 'string') {
+    if (node.label && typeof node.label === 'string') {
       context.fillStyle = (settings('labelHoverColor') === 'node') ?
         (node.color || settings('defaultNodeColor')) :
         settings('defaultLabelHoverColor');

@@ -93,6 +93,7 @@ module.exports = function(grunt) {
     'plugins.poweredBy',
     'plugins.select',
     'plugins.tooltips',
+    'plugins.relativeSize',
     'renderers.customEdgeShapes',
     'renderers.customShapes',
     'renderers.edgeLabels',
