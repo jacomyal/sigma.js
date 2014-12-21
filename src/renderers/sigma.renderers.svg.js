@@ -208,6 +208,9 @@
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
 
+        if (a[i].hidden)
+          continue;
+
         // Node
         (renderers[a[i].type] || renderers.def).update(
           a[i],
