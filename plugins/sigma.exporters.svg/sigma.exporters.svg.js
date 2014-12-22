@@ -1,4 +1,5 @@
 ;(function(undefined) {
+  'use strict';
 
   /**
    * Sigma SVG Exporter
@@ -30,7 +31,7 @@
       [data],
       {type: 'image/svg+xml;charset=utf-8'}
     );
-  };
+  }
 
   function download(string, filename) {
 
@@ -38,9 +39,10 @@
     var blob = createBlob(string);
 
     // Anchor
-    var anchor = document.createElement('a');
-    anchor.setAttribute('href', URL.createObjectURL(blob));
-    anchor.setAttribute('download', filename);
+    var o = {};
+    o.anchor = document.createElement('a');
+    o.anchor.setAttribute('href', URL.createObjectURL(blob));
+    o.anchor.setAttribute('download', filename);
 
     // Click event
     var event = document.createEvent('MouseEvent');
@@ -49,8 +51,8 @@
 
     URL.revokeObjectURL(blob);
 
-    anchor.dispatchEvent(event);
-    delete anchor;
+    o.anchor.dispatchEvent(event);
+    delete o.anchor;
   }
 
 
