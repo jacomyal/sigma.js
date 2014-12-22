@@ -11,6 +11,10 @@
   * Extended sigma settings.
   */
   var settings = {
+    fillColor: 'transparent',
+    textColor: 'black',
+    strokeColor: 'white',
+    lineWidth: 2
   };
 
   // Export the previously designed settings:

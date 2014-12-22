@@ -33,14 +33,19 @@
         },
         drawGlyph = function (settings) {
           if (settings.node && settings.node[prefix + 'x'] && settings.node[prefix + 'y']) {
-            var x = settings.node[prefix + 'x'],
-                y = settings.node[prefix + 'y'],
-                nodeRadius = settings.node[prefix + 'size'],
-                glyphRadius = settings.size || settings.node[prefix + 'size'] / 4,
+            var node = settings.node,
+                x = node[prefix + 'x'],
+                y = node[prefix + 'y'],
+                nodeRadius = node[prefix + 'size'],
+                glyphRadius = settings.size || node[prefix + 'size'] / 4,
                 fillColor = settings.fillColor || 'transparent',
+                textColor = settings.textColor || 'black',
                 strokeColor = settings.strokeColor || 'transparent',
                 lineWidth = settings.lineWidth || 0,
-                content = settings.content.toString() || '';
+                content = settings.content.toString() || '',
+                fontStyle = settings.fontStyle || 'normal',
+                fontName = settings.fontName || 'Arial',
+                fontSize = settings.fontSize || '6px';
 
             switch (settings.position) {
               case 'top-right':
@@ -61,20 +66,24 @@
                 break;
             }
 
-            switch (settings.shape) {
-              case 'circle':
-                this.drawingContext.fillStyle = fillColor;
-                this.drawingContext.strokeStyle = strokeColor;
-                this.drawingContext.lineWidth = lineWidth;
-                this.drawingContext.textAlign = 'center';
-                this.drawingContext.beginPath();
-                this.drawingContext.arc(x, y, glyphRadius, 2 * Math.PI, false);
-                this.drawingContext.fillText(content, x, y);
-                this.drawingContext.closePath();
-                this.drawingContext.stroke();
-                this.drawingContext.fill();
-                break;
-            }
+            this.drawingContext.font = fontStyle + ' ' + fontSize + ' ' + fontName;
+            var textWidth = this.drawingContext.measureText(content).width;
+
+            this.drawingContext.fillStyle = fillColor;
+            this.drawingContext.strokeStyle = strokeColor;
+            this.drawingContext.lineWidth = lineWidth;
+            this.drawingContext.beginPath();
+            this.drawingContext.arc(x, y, glyphRadius, 2 * Math.PI, false);
+            this.drawingContext.closePath();
+            this.drawingContext.stroke();
+            this.drawingContext.fill();
+
+            this.drawingContext.save();
+            this.drawingContext.fillStyle = textColor;
+            this.drawingContext.font = '8px';
+            this.drawingContext.textAlign = 'center';
+            this.drawingContext.fillText(content, x, y + 2);
+            this.drawingContext.restore();
           }
         };
 
@@ -93,8 +102,10 @@
             fillColor: 'yellow',
             strokeColor: 'yellow',
             lineWidth: 1,
-            shape: glyph.shape,
-            content: glyph.content
+            content: glyph.content,
+            fontStyle: 'normal',
+            fontSize: '8px',
+            fontName: 'Helvetica'
           }]);
         }
       }
@@ -113,11 +124,13 @@
               node: node,
               position: glyph.position,
               size: node[prefix + 'size'] / 2,
-              fillColor: 'black',
+              fillColor: 'blue',
               strokeColor: 'red',
-              lineWidth: 0,
-              shape: glyph.shape,
-              content: glyph.content
+              lineWidth: 1,
+              content: glyph.content,
+              fontStyle: 'normal',
+              fontSize: '8px',
+              fontName: 'Helvetica'
             }]);
           }
         }
