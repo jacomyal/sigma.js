@@ -11,10 +11,14 @@
   * Extended sigma settings.
   */
   var settings = {
-    fillColor: 'transparent',
-    textColor: 'black',
-    strokeColor: 'white',
-    lineWidth: 2
+    defaultGlyphsRadius: 10,
+    defaultGlyphsFillColor: 'white',
+    defaultGlyphsTextColor: 'black',
+    defaultGlyphsStrokeColor: 'black',
+    defaultGlyphsLineWidth: 2,
+    defaultGlyphsFontStyle: 'normal',
+    defaultGlyphsFontSize: '6px',
+    defaultGlyphsFontName: 'Arial'
   };
 
   // Export the previously designed settings:

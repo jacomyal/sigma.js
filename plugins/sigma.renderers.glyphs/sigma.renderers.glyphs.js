@@ -37,15 +37,15 @@
                 x = node[prefix + 'x'],
                 y = node[prefix + 'y'],
                 nodeRadius = node[prefix + 'size'],
-                glyphRadius = settings.size || node[prefix + 'size'] / 4,
-                fillColor = settings.fillColor || 'transparent',
-                textColor = settings.textColor || 'black',
-                strokeColor = settings.strokeColor || 'transparent',
-                lineWidth = settings.lineWidth || 0,
-                content = settings.content.toString() || '',
-                fontStyle = settings.fontStyle || 'normal',
-                fontName = settings.fontName || 'Arial',
-                fontSize = settings.fontSize || '6px';
+                glyphRadius = settings.size || sigma.settings.defaultGlyphsRadius || node[prefix + 'size'] / 4,
+                fillColor = settings.fillColor || sigma.settings.defaultGlyphsFillColor,
+                textColor = settings.textColor || sigma.settings.defaultGlyphsTextColor,
+                strokeColor = settings.strokeColor || sigma.settings.defaultGlyphsStrokeColor,
+                lineWidth = settings.lineWidth || sigma.settings.defaultGlyphsLineWidth,
+                fontStyle = settings.fontStyle || sigma.settings.defaultGlyphsFontStyle,
+                fontName = settings.fontName || sigma.settings.defaultGlyphsFontName,
+                fontSize = settings.fontSize || sigma.settings.defaultGlyphsFontSize,
+                content = settings.content.toString() || '';
 
             switch (settings.position) {
               case 'top-right':
@@ -79,8 +79,8 @@
             this.drawingContext.fill();
 
             this.drawingContext.save();
+            this.drawingContext.font = fontStyle + ' ' + fontSize + ' ' + fontName;
             this.drawingContext.fillStyle = textColor;
-            this.drawingContext.font = '8px';
             this.drawingContext.textAlign = 'center';
             this.drawingContext.fillText(content, x, y + 2);
             this.drawingContext.restore();
@@ -99,13 +99,7 @@
             node: this.graph.nodes(glyph.nodeId),
             position: glyph.position,
             size: node[prefix + 'size'] / 2,
-            fillColor: 'yellow',
-            strokeColor: 'yellow',
-            lineWidth: 1,
-            content: glyph.content,
-            fontStyle: 'normal',
-            fontSize: '8px',
-            fontName: 'Helvetica'
+            content: glyph.content
           }]);
         }
       }
@@ -124,13 +118,7 @@
               node: node,
               position: glyph.position,
               size: node[prefix + 'size'] / 2,
-              fillColor: 'blue',
-              strokeColor: 'red',
-              lineWidth: 1,
-              content: glyph.content,
-              fontStyle: 'normal',
-              fontSize: '8px',
-              fontName: 'Helvetica'
+              content: glyph.content
             }]);
           }
         }
