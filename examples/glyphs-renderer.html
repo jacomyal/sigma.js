@@ -74,17 +74,23 @@
      * The simple instance of sigma is enough to make it render the graph on the on
      * the screen, since the graph is given directly to the constructor.
      */
-     var i,
-     s,
-     N = 100,
-     E = 500,
-     g = {
-      nodes: [],
-      edges: []
-    };
+    var i,
+      s,
+      N = 100,
+      E = 500,
+      g = {
+        nodes: [],
+        edges: []
+      },
+      positions = [
+        'top-right',
+        'top-left',
+        'bottom-left',
+        'bottom-right'
+      ];
 
     // Generate a random graph:
-    for (i = 0; i < N; i++)
+    for (i = 0; i < N; i++) {
       g.nodes.push({
         id: 'n' + i,
         label: 'Node ' + i,
@@ -94,13 +100,14 @@
         color: '#666',
         attributes: {
           glyphs: [{
-            position: 'top-left',
+            position: positions[Math.floor(Math.random() * 4)],
             content: i
           }]
         }
       });
+    }
 
-    for (i = 0; i < E; i++)
+    for (i = 0; i < E; i++) {
       g.edges.push({
         id: 'e' + i,
         source: 'n' + (Math.random() * N | 0),
@@ -108,8 +115,9 @@
         size: Math.random(),
         color: '#ccc'
       });
+    }
 
-    // sigma.renderers.def = sigma.renderers.canvas;
+    sigma.renderers.def = sigma.renderers.canvas;
 
     // Instantiate sigma:
     sigmaInstance = new sigma({
