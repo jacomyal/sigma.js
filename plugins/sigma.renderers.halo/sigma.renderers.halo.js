@@ -1,4 +1,5 @@
 ;(function(undefined) {
+  'use strict';
 
   /**
    * Sigma Renderer Halo Utility
