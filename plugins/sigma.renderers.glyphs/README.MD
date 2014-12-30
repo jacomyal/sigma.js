@@ -1,37 +1,46 @@
-sigma.plugins.halo
+sigma.renderers.glyphs
 =====================
 
-Plugin developed by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious) and published under the [MIT](LICENSE) license.
+Plugin developed by [Florent Schildknecht](https://github.com/Flo-Schield-Bobby) for [Linkurious](https://github.com/Linkurious) and published under the [MIT](LICENSE) license.
 
-Contact: seb@linkurio.us
+Contact: florent.schildknecht@gmail.com
 
 ---
 
-This plugin provides a method to render a halo behind nodes and edges.
+This plugin provides a method to render glyphs at four possible positions on top of nodes.
 
-See the following [example code](../../examples/plugin-halo.html) for full usage.
+See the following [example code](../../examples/glyphs-renderer.html) for full usage.
 
-To use, include all .js files under this folder. Then call the renderer method as follows:
+To use, include all .js files under this folder.
+Then set up glyphs settings as node keys:
 
 ````javascript
-// Render the halo behind all nodes:
-myRenderer.halo({ nodes: s.graph.nodes() });
+var node = {
+  id: 'node-id',
+  glyphs: [{
+   'position': 'top-left', // ['top-left', 'top-right', 'bottom-right', 'bottom-left']
+    'content': 'A'
+  }, {
+   'position': 'top-right', // ['top-left', 'top-right', 'bottom-right', 'bottom-left']
+    'content': 'B'
+  }]
+}
 ````
 
+Then call the renderer method as follows:
+
 ````javascript
-// Render the halo behind all edges:
-myRenderer.halo({ edges: s.graph.edges() });
+// Render the glyphs of each nodes:
+myRenderer.glyphs();
 ````
 
 ## Automatic rendering
 
-Regenerate the halo at each rendering as follows:
+Regenerate the glyphs at each rendering as follows:
 
 ````javascript
-myRenderer.bind('render', function(e) {
-  myRenderer.halo({
-    nodes: s.graph.nodes()
-  });
+myRenderer.bind('render', function (e) {
+  myRenderer.glyphs();
 });
 ````
 
@@ -44,74 +53,66 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    nodeHaloColor: '#ecf0f1',
-    edgeHaloColor: '#ecf0f1',
-    nodeHaloSize: 50,
-    edgeHaloSize: 10
+    glyphRadius: 12,
+    glyphFillColor: 'white',
+    glyphTextColor: 'black',
+    glyphStrokeColor: 'black',
+    glyphLineWidth: 4,
+    glyphFontStyle: 'normal',
+    glyphFontSize: 6,
+    glyphFontName: 'Helvetica'
   }
 });
 ````
 
-Override these settings anytime `halo` is called:
+Override these settings anytime `glyphs` is called:
 
 ````javascript
 // Render a grey halo of size 100 behind all nodes:
-myRenderer.halo({
-  nodeHaloColor: '#333',
-  nodeHaloSize: 100,
-  nodes: s.graph.nodes()
+myRenderer.glyphs({
+  glyphRadius: 12,
+  glyphFillColor: 'white',
+  glyphTextColor: 'black',
+  glyphStrokeColor: 'black',
+  glyphLineWidth: 4,
+  glyphFontStyle: 'normal',
+  glyphFontSize: 6,
+  glyphFontName: 'Helvetica'
 });
 ````
 
 
 #### Options
 
- * **nodeHaloColor**
-   * The node halo color.
-   * type: *string*
-   * default value: `#fff`
- * **nodeHaloSize**
-   * The node halo size.
-   * type: *number*
-   * default value: `50`
- * **edgeHaloColor**
-   * The edge halo color.
-   * type: *string*
-   * default value: `#fff`
- * **edgeHaloSize**
-   * The edge halo size.
+ * **glyphRadius**
+   * The glyph radius in pixels.
    * type: *number*
    * default value: `10`
-
-## Advanced usage
-
-Render the halo behind a subset of nodes as follows:
-
-````javascript
-myRenderer.halo({
-  nodes: s.graph.nodes().filter(function(node) { return node.size > 0.5; })
-});
-````
-
-Render the halo behind hovered nodes and their adjacent nodes as follows:
-
-````javascript
-s.bind('overNodes', function(e) {
-  var adjacentNodes = [];
-
-  // Get adjacent nodes:
-  e.data.nodes.forEach(function(node) {
-    s.graph.adjacentNodes(node.id).forEach(function(n) {
-      adjacentNodes.push(n);
-    })
-  });
-
-  // Add hovered nodes to the array and remove duplicates:
-  adjacentNodes = arrayUnique(adjacentNodes.concat(e.data.nodes));
-
-  // Render halo:
-  myRenderer.halo({
-    nodes: adjacentNodes
-  });
-});
-````
+ * **glyphFillColor**
+   * The glyph background-color.
+   * type: *string*
+   * default value: `white`
+ * **glyphTextColor**
+   * The glyph text-color.
+   * type: *string*
+   * default value: `black`
+ * **glyphStrokeColor**
+   * The glyph border-color.
+   * type: *string*
+   * default value: `black`
+ * **glyphLineWidth**
+   * The glyph border-width in pixels.
+   * type: *number*
+   * default value: `2`
+ * **glyphFontStyle**
+   * The glyph text font-style.
+   * type: *string*
+   * default value: `normal`
+ * **glyphFontSize**
+   * The glyph text font-size in pixels.
+   * type: *number*
+   * default value: `2`
+ * **glyphFontName**
+   * The glyph text font-family in pixels. Should be included if needed with @font-face or equivalent.
+   * type: *string*
+   * default value: `Arial`
