@@ -109,10 +109,10 @@
       while (nodesLength--) {
         var node = nodes[nodesLength];
 
-        if (node.attributes && node.attributes.glyphs) {
-          var glyphsLength = node.attributes.glyphs.length;
+        if (node.glyphs) {
+          var glyphsLength = node.glyphs.length;
           while (glyphsLength--) {
-            var glyph = node.attributes.glyphs[glyphsLength];
+            var glyph = node.glyphs[glyphsLength];
 
             drawGlyph.apply(this, [{
               node: node,
