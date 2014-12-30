@@ -66,9 +66,7 @@
                 break;
             }
 
-            this.drawingContext.font = fontStyle + ' ' + fontSize + ' ' + fontName;
-            var textWidth = this.drawingContext.measureText(content).width;
-
+            // Glyph rendering
             this.drawingContext.fillStyle = fillColor;
             this.drawingContext.strokeStyle = strokeColor;
             this.drawingContext.lineWidth = lineWidth;
@@ -78,12 +76,17 @@
             this.drawingContext.stroke();
             this.drawingContext.fill();
 
-            this.drawingContext.save();
+            // Glyph content rendering
             this.drawingContext.font = fontStyle + ' ' + fontSize + ' ' + fontName;
-            this.drawingContext.fillStyle = textColor;
-            this.drawingContext.textAlign = 'center';
-            this.drawingContext.fillText(content, x, y + 2);
-            this.drawingContext.restore();
+            var textWidth = this.drawingContext.measureText(content).width;
+
+            console.log(textWidth, sigma.settings.labelThreshold);
+
+            if (textWidth >= sigma.settings.labelThreshold) {
+              this.drawingContext.fillStyle = textColor;
+              this.drawingContext.textAlign = 'center';
+              this.drawingContext.fillText(content, x, y + 2);
+            }
           }
         };
 

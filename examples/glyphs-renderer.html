@@ -75,7 +75,7 @@
      * the screen, since the graph is given directly to the constructor.
      */
     var i,
-      s,
+      sigmaInstance,
       N = 100,
       E = 500,
       g = {
@@ -119,15 +119,22 @@
 
     // Instantiate sigma:
     sigmaInstance = new sigma({
-      graph: g,
-      container: 'graph-container',
+      renderer: {
+        type: 'canvas',
+        container: document.getElementById('graph-container')
+      },
       settings: {
+        labelThreshold: 3,
         nodeHaloColor: '#ecf0f1',
         edgeHaloColor: '#ecf0f1',
         nodeHaloSize: 50,
         edgeHaloSize: 10
       }
     });
+
+    sigmaInstance.graph.read(g);
+    sigmaInstance.refresh();
+
 
     function renderGlyphs() {
       sigmaInstance.renderers[0].glyphs();
