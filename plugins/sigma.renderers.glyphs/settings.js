@@ -17,7 +17,7 @@
     glyphStrokeColor: 'black',
     glyphLineWidth: 2,
     glyphFontStyle: 'normal',
-    glyphFontSize: '6px',
+    glyphFontSize: 6,
     glyphFontName: 'Arial'
   };
 

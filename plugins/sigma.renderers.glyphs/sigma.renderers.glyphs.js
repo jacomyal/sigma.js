@@ -37,15 +37,17 @@
                 x = node[prefix + 'x'],
                 y = node[prefix + 'y'],
                 nodeRadius = node[prefix + 'size'],
-                glyphRadius = settings.size || sigma.settings.glyphRadius || node[prefix + 'size'] / 4,
-                fillColor = settings.fillColor || sigma.settings.glyphFillColor,
-                textColor = settings.textColor || sigma.settings.glyphTextColor,
-                strokeColor = settings.strokeColor || sigma.settings.glyphStrokeColor,
-                lineWidth = settings.lineWidth || sigma.settings.glyphLineWidth,
-                fontStyle = settings.fontStyle || sigma.settings.glyphFontStyle,
-                fontName = settings.fontName || sigma.settings.glyphFontName,
-                fontSize = settings.fontSize || sigma.settings.glyphFontSize,
+                glyphRadius = settings.size || this.settings('glyphRadius') || node[prefix + 'size'] / 4,
+                fillColor = settings.fillColor || this.settings('glyphFillColor'),
+                textColor = settings.textColor || this.settings('glyphTextColor'),
+                strokeColor = settings.strokeColor || this.settings('glyphStrokeColor'),
+                lineWidth = settings.lineWidth || this.settings('glyphLineWidth'),
+                fontStyle = settings.fontStyle || this.settings('glyphFontStyle'),
+                fontName = settings.fontName || this.settings('glyphFontName'),
+                fontSize = this.settings('labelSizeRatio') * (settings.fontSize || this.settings('glyphFontSize')),
                 content = settings.content.toString() || '';
+
+            fontSize *= this.settings('zoomingRatio');
 
             switch (settings.position) {
               case 'top-right':
@@ -77,12 +79,10 @@
             this.drawingContext.fill();
 
             // Glyph content rendering
-            this.drawingContext.font = fontStyle + ' ' + fontSize + ' ' + fontName;
+            this.drawingContext.font = fontStyle + ' ' + fontSize + 'px ' + fontName;
             var textWidth = this.drawingContext.measureText(content).width;
 
-            console.log(textWidth, sigma.settings.labelThreshold);
-
-            if (textWidth >= sigma.settings.labelThreshold) {
+            if ((textWidth <= nodeRadius) && (textWidth >= this.settings('labelThreshold'))) {
               this.drawingContext.fillStyle = textColor;
               this.drawingContext.textAlign = 'center';
               this.drawingContext.fillText(content, x, y + 2);
@@ -101,7 +101,7 @@
           drawGlyph.apply(this, [{
             node: this.graph.nodes(glyph.nodeId),
             position: glyph.position,
-            size: node[prefix + 'size'] / 2,
+            size: glyph.size || node[prefix + 'size'] / 2,
             content: glyph.content
           }]);
         }
@@ -120,7 +120,7 @@
             drawGlyph.apply(this, [{
               node: node,
               position: glyph.position,
-              size: node[prefix + 'size'] / 2,
+              size: glyph.size || node[prefix + 'size'] / 2,
               content: glyph.content
             }]);
           }
