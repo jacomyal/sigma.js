@@ -37,14 +37,14 @@
                 x = node[prefix + 'x'],
                 y = node[prefix + 'y'],
                 nodeRadius = node[prefix + 'size'],
-                glyphRadius = settings.size || sigma.settings.defaultGlyphsRadius || node[prefix + 'size'] / 4,
-                fillColor = settings.fillColor || sigma.settings.defaultGlyphsFillColor,
-                textColor = settings.textColor || sigma.settings.defaultGlyphsTextColor,
-                strokeColor = settings.strokeColor || sigma.settings.defaultGlyphsStrokeColor,
-                lineWidth = settings.lineWidth || sigma.settings.defaultGlyphsLineWidth,
-                fontStyle = settings.fontStyle || sigma.settings.defaultGlyphsFontStyle,
-                fontName = settings.fontName || sigma.settings.defaultGlyphsFontName,
-                fontSize = settings.fontSize || sigma.settings.defaultGlyphsFontSize,
+                glyphRadius = settings.size || sigma.settings.glyphRadius || node[prefix + 'size'] / 4,
+                fillColor = settings.fillColor || sigma.settings.glyphFillColor,
+                textColor = settings.textColor || sigma.settings.glyphTextColor,
+                strokeColor = settings.strokeColor || sigma.settings.glyphStrokeColor,
+                lineWidth = settings.lineWidth || sigma.settings.glyphLineWidth,
+                fontStyle = settings.fontStyle || sigma.settings.glyphFontStyle,
+                fontName = settings.fontName || sigma.settings.glyphFontName,
+                fontSize = settings.fontSize || sigma.settings.glyphFontSize,
                 content = settings.content.toString() || '';
 
             switch (settings.position) {
