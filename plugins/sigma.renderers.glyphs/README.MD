@@ -60,7 +60,8 @@ s = new sigma({
     glyphLineWidth: 4,
     glyphFontStyle: 'normal',
     glyphFontSize: 6,
-    glyphFontName: 'Helvetica'
+    glyphFontName: 'Helvetica',
+    glyphHidden: false
   }
 });
 ````
@@ -77,7 +78,8 @@ myRenderer.glyphs({
   glyphLineWidth: 4,
   glyphFontStyle: 'normal',
   glyphFontSize: 6,
-  glyphFontName: 'Helvetica'
+  glyphFontName: 'Helvetica',
+  glyphHidden: false
 });
 ````
 
@@ -116,3 +118,7 @@ myRenderer.glyphs({
    * The glyph text font-family in pixels. Should be included if needed with @font-face or equivalent.
    * type: *string*
    * default value: `Arial`
+ * **glyphHidden**
+   * A flag to display glyphs or not.
+   * type: *boolean*
+   * default value: `false`

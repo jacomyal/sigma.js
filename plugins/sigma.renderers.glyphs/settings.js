@@ -18,7 +18,8 @@
     glyphLineWidth: 2,
     glyphFontStyle: 'normal',
     glyphFontSize: 6,
-    glyphFontName: 'Arial'
+    glyphFontName: 'Arial',
+    glyphHidden: false
   };
 
   // Export the previously designed settings:

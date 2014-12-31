@@ -45,47 +45,50 @@
                 fontStyle = settings.fontStyle || this.settings('glyphFontStyle'),
                 fontName = settings.fontName || this.settings('glyphFontName'),
                 fontSize = this.settings('labelSizeRatio') * (settings.fontSize || this.settings('glyphFontSize')),
+                hidden = settings.hidden || this.settings('glyphHidden') || false,
                 content = settings.content.toString() || '';
 
-            fontSize *= this.settings('zoomingRatio');
+            if (hidden !== true) {
+              fontSize *= this.settings('zoomingRatio');
 
-            switch (settings.position) {
-              case 'top-right':
-                x += nodeRadius * Math.cos(degreesToRadians(45));
-                y += nodeRadius * Math.sin(degreesToRadians(45));
-                break;
-              case 'top-left':
-                x += nodeRadius * Math.cos(degreesToRadians(135));
-                y += nodeRadius * Math.sin(degreesToRadians(135));
-                break;
-              case 'bottom-left':
-                x += nodeRadius * Math.cos(degreesToRadians(225));
-                y += nodeRadius * Math.sin(degreesToRadians(225));
-                break;
-              case 'bottom-right':
-                x += nodeRadius * Math.cos(degreesToRadians(315));
-                y += nodeRadius * Math.sin(degreesToRadians(315));
-                break;
-            }
+              switch (settings.position) {
+                case 'top-right':
+                  x += nodeRadius * Math.cos(degreesToRadians(45));
+                  y += nodeRadius * Math.sin(degreesToRadians(45));
+                  break;
+                case 'top-left':
+                  x += nodeRadius * Math.cos(degreesToRadians(135));
+                  y += nodeRadius * Math.sin(degreesToRadians(135));
+                  break;
+                case 'bottom-left':
+                  x += nodeRadius * Math.cos(degreesToRadians(225));
+                  y += nodeRadius * Math.sin(degreesToRadians(225));
+                  break;
+                case 'bottom-right':
+                  x += nodeRadius * Math.cos(degreesToRadians(315));
+                  y += nodeRadius * Math.sin(degreesToRadians(315));
+                  break;
+              }
 
-            // Glyph rendering
-            this.drawingContext.fillStyle = fillColor;
-            this.drawingContext.strokeStyle = strokeColor;
-            this.drawingContext.lineWidth = lineWidth;
-            this.drawingContext.beginPath();
-            this.drawingContext.arc(x, y, glyphRadius, 2 * Math.PI, false);
-            this.drawingContext.closePath();
-            this.drawingContext.stroke();
-            this.drawingContext.fill();
+              // Glyph rendering
+              this.drawingContext.fillStyle = fillColor;
+              this.drawingContext.strokeStyle = strokeColor;
+              this.drawingContext.lineWidth = lineWidth;
+              this.drawingContext.beginPath();
+              this.drawingContext.arc(x, y, glyphRadius, 2 * Math.PI, false);
+              this.drawingContext.closePath();
+              this.drawingContext.stroke();
+              this.drawingContext.fill();
 
-            // Glyph content rendering
-            this.drawingContext.font = fontStyle + ' ' + fontSize + 'px ' + fontName;
-            var textWidth = this.drawingContext.measureText(content).width;
+              // Glyph content rendering
+              this.drawingContext.font = fontStyle + ' ' + fontSize + 'px ' + fontName;
+              var textWidth = this.drawingContext.measureText(content).width;
 
-            if ((textWidth <= nodeRadius) && (textWidth >= this.settings('labelThreshold'))) {
-              this.drawingContext.fillStyle = textColor;
-              this.drawingContext.textAlign = 'center';
-              this.drawingContext.fillText(content, x, y + 2);
+              if ((textWidth <= nodeRadius) && (textWidth >= this.settings('labelThreshold'))) {
+                this.drawingContext.fillStyle = textColor;
+                this.drawingContext.textAlign = 'center';
+                this.drawingContext.fillText(content, x, y + 2);
+              }
             }
           }
         };
@@ -102,7 +105,15 @@
             node: this.graph.nodes(glyph.nodeId),
             position: glyph.position,
             size: glyph.size || node[prefix + 'size'] / 2,
-            content: glyph.content
+            content: glyph.content,
+            fillColor: glyph.fillColor,
+            textColor: glyph.textColor,
+            strokeColor: glyph.strokeColor,
+            lineWidth: glyph.lineWidth,
+            fontStyle: glyph.fontStyle,
+            fontName: glyph.fontName,
+            fontSize: glyph.fontSize,
+            hidden: glyph.hidden
           }]);
         }
       }
@@ -121,7 +132,15 @@
               node: node,
               position: glyph.position,
               size: glyph.size || node[prefix + 'size'] / 2,
-              content: glyph.content
+              content: glyph.content,
+              fillColor: glyph.fillColor,
+              textColor: glyph.textColor,
+              strokeColor: glyph.strokeColor,
+              lineWidth: glyph.lineWidth,
+              fontStyle: glyph.fontStyle,
+              fontName: glyph.fontName,
+              fontSize: glyph.fontSize,
+              hidden: glyph.hidden
             }]);
           }
         }

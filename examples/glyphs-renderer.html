@@ -100,7 +100,8 @@
         color: '#666',
         glyphs: [{
           position: positions[Math.floor(Math.random() * 4)],
-          content: i
+          content: i,
+          hidden: (Math.random() > 0.3 ? false : true)
         }]
       });
     }
@@ -130,9 +131,10 @@
         glyphTextColor: 'black',
         glyphStrokeColor: 'black',
         glyphLineWidth: 4,
-        glyphFontStyle: 'italic',
+        glyphFontStyle: 'normal',
         glyphFontSize: 6,
-        glyphFontName: 'Helvetica'
+        glyphFontName: 'Helvetica',
+        glyphHidden: false
       }
     });
 
