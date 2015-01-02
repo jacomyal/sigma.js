@@ -235,10 +235,6 @@
       this.dragListener.bind('drop', this.dropHandler);
     }
 
-    s.bind('kill', function() {
-      sigma.plugins.killSelect();
-    });
-
     this.bindKeyboard = function(keyboard) {
       kbd = keyboard;
       kbd.bind('32+65 18+32+65', spaceA);
@@ -290,6 +286,8 @@
 
   /**
    *  This function kills the select instance.
+   *
+   * @param  {sigma} s The related sigma instance.
    */
   sigma.plugins.killSelect = function(s) {
     if (_instance[s.id] instanceof Select) {
@@ -299,7 +297,7 @@
       _instance[s.id].unbindKeyboard();
 
       if (_instance[s.id].dragListener) {
-        _instance[s.id].unbind('drag', _instance[s.id].dragHandler);
+        _instance[s.id].dragListener.unbind('drag', _instance[s.id].dragHandler);
         _instance[s.id].dragListener.unbind('drop', _instance[s.id].dropHandler);
         _instance[s.id].drag = false;
         _instance[s.id].dragListener = null;
