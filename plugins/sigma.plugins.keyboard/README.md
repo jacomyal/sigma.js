@@ -42,6 +42,10 @@ var kbd = sigma.plugins.keyboard(s, {
    * Override the `zoomingRatio` setting of Sigma
    * type: *number*
    * default value: `1.7`
+ * **tabindex**
+   * Tab index of the graph container provided if no `tabindex` attribute is found
+   * type: *number*
+   * default value: `-1`
 
 ### Keyboard shortcuts
 
