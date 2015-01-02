@@ -16,7 +16,7 @@ var dragListener = new sigma.plugins.dragNodes(sigInst, renderer);
 Kill the plugin as follows:
 
 ````javascript
-sigma.plugins.killDragNodes();
+sigma.plugins.killDragNodes(sigInst);
 ````
 
 ## Events
