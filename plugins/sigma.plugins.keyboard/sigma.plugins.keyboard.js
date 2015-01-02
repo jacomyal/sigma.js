@@ -30,11 +30,13 @@
     // {number} Override the `mouseZoomDuration` setting of Sigma
     duration: 200,
     // {number} Override the `zoomingRatio` setting of Sigma
-    zoomingRatio: 1.7
+    zoomingRatio: 1.7,
+    // {number} Tab index of the graph container provided if no `tabindex`
+    // attribute is found
+    tabIndex: -1
   };
 
   var _instance = {},
-      _body,
       _keys = [],
       _currentEvents;
 
@@ -42,16 +44,18 @@
    * Keyboard Object
    * ------------------
    *
-   * @param  {sigma}   s     The related sigma instance.
-   * @param  {object} params The options related to the object.
+   * @param  {sigma}   s       The related sigma instance.
+   * @param  {object} renderer The renderer to attach keyboard events.
+   * @param  {object} params   The options related to the object.
    */
-  function Keyboard(s, params) {
+  function Keyboard(s, renderer, params) {
     params = sigma.utils.extend(params, settings);
     params.zoomingRatio = params.zoomingRatio || s.settings('zoomingRatio');
     params.duration = params.duration || s.settings('mouseZoomDuration');
 
+    this.domElt = renderer.container;
+
     var self = this;
-    _body = _body || document.getElementsByTagName('body')[0];
 
     sigma.classes.dispatcher.extend(this);
 
@@ -110,7 +114,8 @@
     };
 
     this.keyDown = function(event) {
-      if (!_keys[event.which]) {
+      if (event.which !== 9 && event.which !== 18 && event.which !== 20 && !_keys[event.which]) {
+        // Do nothing on Tabbing, Alt and Capslock because keyUp won't be triggered
         _keys[event.which] = true;
         _currentEvents = Object.keys(_keys).join('+');
         self.dispatchEvent(_currentEvents);
@@ -122,8 +127,25 @@
       _currentEvents = null;
     }
 
-    _body.addEventListener('keydown', this.keyDown, false);
-    _body.addEventListener('keyup', this.keyUp, false);
+    this.focus = function(event) {
+      self.domElt.focus();
+      return true;
+    }
+
+    this.blur = function(event) {
+      self.domElt.blur();
+      return true;
+    }
+
+    // needed to provide focus to the graph container
+    // see http://www.dbp-consulting.com/tutorials/canvas/CanvasKeyEvents.html
+    this.domElt.tabIndex = params.tabIndex;
+    this.domElt.focus();
+
+    this.domElt.addEventListener('mouseover', this.focus, false);
+    this.domElt.addEventListener('mouseout', this.blur, false);
+    this.domElt.addEventListener('keydown', this.keyDown, false);
+    this.domElt.addEventListener('keyup', this.keyUp, false);
 
     this.bind('37 18+37', moveLeft); // (ALT +) LEFT ARROW
     this.bind('38 18+38', moveTop); // (ALT +) TOP ARROW
@@ -144,16 +166,17 @@
    * This function initializes the Keyboard for a specified Sigma instance.
    *
    * Usage:
-   *   var kbd = sigma.plugins.keyboard(s);
+   *   var kbd = sigma.plugins.keyboard(s, s.renderers[0]);
    *   kbd.bind('32', function() { console.log('"Space" key pressed'); });
    *
-   * @param  {sigma} s The related sigma instance.
-   * @param  {object} options The options related to the object.
+   * @param  {sigma}  s        The related sigma instance.
+   * @param  {object} renderer The renderer to attach keyboard events.
+   * @param  {object} options  The options related to the object.
    */
-  sigma.plugins.keyboard = function(s, options) {
+  sigma.plugins.keyboard = function(s, renderer, options) {
     // Create object if undefined
     if (!_instance[s.id]) {
-      _instance[s.id] = new Keyboard(s, options);
+      _instance[s.id] = new Keyboard(s, renderer, options);
 
       s.bind('kill', function() {
         sigma.plugins.killKeyboard(s);
@@ -169,8 +192,10 @@
   sigma.plugins.killKeyboard = function(s) {
     if (_instance[s.id] instanceof Keyboard) {
       _instance[s.id].unbind();
-      _body.removeEventListener('keydown', _instance[s.id].keyDown, false);
-      _body.removeEventListener('keyup', _instance[s.id].keyUp, false);
+      _instance[s.id].domElt.removeEventListener('mouseover', _instance[s.id].focus, false);
+      _instance[s.id].domElt.removeEventListener('mouseout', _instance[s.id].blur, false);
+      _instance[s.id].domElt.removeEventListener('keydown', _instance[s.id].keyDown, false);
+      _instance[s.id].domElt.removeEventListener('keyup', _instance[s.id].keyUp, false);
       delete _instance[s.id];
     }
   };

@@ -82,6 +82,11 @@
     right: 0;
     position: absolute;
   }
+
+  /*Uncomment to remove browser outline on focus*/
+  /*#graph-container:focus {
+    outline: none;
+  }*/
 </style>
 <body>
   <div id="graph-container"></div>
@@ -138,7 +143,7 @@ s = new sigma({
   container: 'graph-container'
 });
 
-var kbd = sigma.plugins.keyboard(s, {
+var kbd = sigma.plugins.keyboard(s, s.renderers[0], {
   zoomingRatio: 1.3
 });
 

@@ -42,6 +42,10 @@ var kbd = sigma.plugins.keyboard(s, {
    * Override the `zoomingRatio` setting of Sigma
    * type: *number*
    * default value: `1.7`
+ * **tabindex**
+   * Tab index of the graph container provided if no `tabindex` attribute is found
+   * type: *number*
+   * default value: `-1`
 
 ### Keyboard shortcuts
 
@@ -74,4 +78,4 @@ kbd.bind('17+65 32+65', function() {
 });
 ````
 
-Functions are unbound when the plugin is killed. You can manually `.unbind()` them.
+Don't forget to `.unbind()` the functions when necessary to avoid memory leaks.
