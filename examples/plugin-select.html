@@ -155,9 +155,11 @@ s = new sigma({
 
 // Instanciate the ActiveState plugin:
 var activeState = sigma.plugins.activeState(s);
+var keyboard = sigma.plugins.keyboard(s, s.renderers[0]);
 
 // Initialize the Select plugin:
-sigma.plugins.select(s, activeState);
+var select = sigma.plugins.select(s, activeState);
+select.bindKeyboard(keyboard);
 
 if (sigma.plugins.keyboard) {
   document.getElementsByClassName('container')[0].style.display = 'block';
