@@ -61,14 +61,15 @@
       h = Math.round(fontSize + 4);
       e = Math.round(fontSize / 2 + 2);
 
-      // "short" labels do not overlap with a node's canvas
-      if (settings('shortLabels') === true) {
+      // short label mode, to prevent overlapping with non-circular node shapes
+      if (settings('shortLabelsOnHover') === true) {
   	    x = Math.round(node[prefix + 'x'] + size + 3);
   	    w = Math.round(
   	      context.measureText(node.label).width + fontSize / 2 + 7
   	    );
   	    labelX = Math.round(node[prefix + 'x'] + size + 13);
   	  }
+
 
       context.moveTo(x, y + e);
       context.arcTo(x, y, x + e, y, e);

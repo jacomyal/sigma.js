@@ -52,6 +52,86 @@ mySigma.graph.addNode({
 });
 ```
 
+### Global configuration
+
+The customShapes plugin extends the built-in Sigma.js configuration system with some new global settings.
+Here are the labels and their default values:
+
+var settings = {
+
+  // a boolean to indicate if you want to switch to a custom label display mode
+  shortLabelsOnHover: true, // true or false
+
+  // helps the browser authorize the cross domain policy (see paragraph below)
+  imgCrossOrigin: 'anonymous',
+
+  // resolution of the sprite sheet square.
+  spriteSheetResolution: 2048,
+
+  // number max of sprites
+  spriteSheetMaxSprites: 128
+
+};
+
+
+You have to add these custom settings keys and values to the existing settings
+object when initializing sigma.js (please refer to the Sigma.js doc and examples for more details):
+
+```javascript
+var sigma = new sigma({
+  graph: myGraph,
+  settings: {
+    zoomMax: 3,
+    ... add your custom settings here ...
+  }
+});
+
+#### shortLabelsOnHover
+
+A Boolean to indicate if you want to enable the a custom label display mode when hovering nodes.
+Default to true when the customShapes plugin is active.
+
+#### imgCrossOrigin
+
+Controls the security policy of the image loading, from the browser's side.
+
+Please read this page for more information:
+https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+
+Default to 'anonymous'.
+
+#### spriteSheetResolution / spriteSheetMaxSprites
+
+These two settings are only used by the custom shape WebGL renderer.
+
+In this rendering mode, a large texture is created in memory, and is used to store the sprites.
+
+This large texture must have a fixed size, and for now cannot be resized dynamically.
+
+The final resolution of each sprites thus depends on the resolution of this large texture,
+but also on the number of sprites you want to draw:
+
+The more sprite you need to draw, the less pixels are available, so they will have a smaller resolution,
+so you can either increase the resolution of the sprite sheet texture, or reduce
+the number of images
+
+##### spriteSheetResolution
+
+This is the resolution of a side of the sprite sheet texture (which is a square).
+Must be power of two, as this is directly linked to the size of the final WebGL texture.
+Don't use a value too large. Values like 2048 or 4096 should be ok.
+
+##### spriteSheetMaxSprites
+
+Number max of sprites.
+
+Defines how many sprites can fit inside the sprite sheet texture.
+If you have less than 128 images then you can enter the number of max different
+images you will even encounter, so that each sprite can use as much pixels as possible (this gives increased resolution).
+
+
+
+
 ### List of shapes
 
 #### type: 'star'
