@@ -57,6 +57,7 @@ mySigma.graph.addNode({
 The customShapes plugin extends the built-in Sigma.js configuration system with some new global settings.
 Here are the labels and their default values:
 
+```javascript
 var settings = {
 
   // a boolean to indicate if you want to switch to a custom label display mode
@@ -72,7 +73,7 @@ var settings = {
   spriteSheetMaxSprites: 128
 
 };
-
+```
 
 You have to add these custom settings keys and values to the existing settings
 object when initializing sigma.js (please refer to the Sigma.js doc and examples for more details):
@@ -85,6 +86,7 @@ var sigma = new sigma({
     ... add your custom settings here ...
   }
 });
+```
 
 #### shortLabelsOnHover
 
