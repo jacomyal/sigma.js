@@ -54,14 +54,13 @@ mySigma.graph.addNode({
 
 ### Global configuration
 
-The customShapes plugin extends the built-in Sigma.js configuration system with some new global settings.
-Here are the labels and their default values:
+The customShapes plugin extends the built-in Sigma.js configuration system with some new global settings:
 
 ```javascript
 var settings = {
 
   // a boolean to indicate if you want to switch to a custom label display mode
-  shortLabelsOnHover: false, // true (recommended)
+  shortLabelsOnHover: false,
 
   // helps the browser authorize the cross domain policy (see paragraph below)
   imgCrossOrigin: 'anonymous',
@@ -88,16 +87,20 @@ var sigma = new sigma({
 });
 ```
 
-#### shortLabelsOnHover
+#### shortLabelsOnHover : Boolean = false
 
 A Boolean to indicate if you want to enable the a custom label display mode when hovering nodes.
+
+Setting this to true is more than recommended, unless you do not plan to use the
+custom shapes (but only images or icons, for instance).
+
 Default to false, to not interfer with normal Sigma.js behavior.
 
 Possible improvement: in the future, the plugin might force the default value to true when
 initialized, so that apps not using the plugin would not be affected.
 
 
-#### imgCrossOrigin
+#### imgCrossOrigin : String = 'anonymous'
 
 Controls the security policy of the image loading, from the browser's side.
 
@@ -106,7 +109,8 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
 
 Default to 'anonymous'.
 
-#### spriteSheetResolution / spriteSheetMaxSprites
+#### spriteSheetResolution: Number = 2048
+#### spriteSheetMaxSprites: Number = 128
 
 These two settings are only used by the custom shape WebGL renderer.
 
