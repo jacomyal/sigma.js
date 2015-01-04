@@ -11,9 +11,11 @@
   // Initialize package:
   sigma.utils.pkg('sigma.canvas.nodes');
 
+  // incrementally scaled, not automatically resized for now
+  // (ie. possible memory leak if there are many graph load / unload)
   var imgCache = {};
 
-  var drawImage = function (node,x,y,size,context) {
+  var drawImage = function (node,x,y,size,context, imgCrossOrigin) {
     if(node.image && node.image.url) {
       var url = node.image.url;
       var ih = node.image.h || 1; // 1 is arbitrary, anyway only the ratio counts
@@ -25,6 +27,7 @@
       var image = imgCache[url];
       if(!image) {
         image = document.createElement('IMG');
+        image.setAttribute('crossOrigin', imgCrossOrigin);
         image.src = url;
         image.onload = function(){
           window.dispatchEvent(new Event('resize'));
@@ -90,6 +93,7 @@
           prefix = settings('prefix') || '',
           size = node[prefix + 'size'],
           color = node.color || settings('defaultNodeColor'),
+          imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous',
           borderColor = node.borderColor || color,
           x = node[prefix + 'x'],
           y = node[prefix + 'y'];
@@ -98,25 +102,25 @@
       context.save();
 
       if(drawShape) {
-        drawShape(node,x,y,size,color,context);
+        drawShape(node, x, y, size, color, context);
       }
 
       if(drawBorder) {
-        drawBorder(node,x,y,size,borderColor,context);
+        drawBorder(node, x, y, size, borderColor, context);
       }
 
-      drawImage(node,x,y,size,context);
+      drawImage(node, x, y, size, context, imgCrossOrigin);
 
       if (typeof node.icon !== "undefined") {
-        drawIcon(node,x,y,size,context);
+        drawIcon(node, x, y, size, context);
       }
 
       context.restore();
     };
-  }
+  };
 
   ShapeLibrary.enumerate().forEach(function(shape) {
-    register(shape.name,shape.drawShape,shape.drawBorder);
+    register(shape.name, shape.drawShape, shape.drawBorder);
   });
 
   /**

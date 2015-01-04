@@ -22,6 +22,7 @@
       var self = this;
 
       var trueColor = node.color || settings('defaultNodeColor');
+      var imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous';
 
       var color = sigma.utils.floatColor(trueColor);
 
@@ -96,7 +97,7 @@
               shapeRotation = node.star.rotate;
             }
             // innerRatio: node.star.innerRatio || 1.0 // ratio of inner radius in star, compared to node.size
-          };
+          }
           break;
 
         case 'seastar':
@@ -184,12 +185,12 @@
 
         var url = node.image.url || "";
         if (url.length > 0) {
-          imageIndex = self.getImage(url);
+          imageIndex = self.getImage(url, imgCrossOrigin);
           imageScaleW = node.image.w || 1.0;
           imageScaleH = node.image.h || 1.0;
         }
 
-      };
+      }
 
       if (typeof node.icon !== "undefined") {
 
@@ -222,9 +223,9 @@
           py = node.icon.y;
         }
 
-        imageIndex = self.getText(font, bgColor, fgColor, fontSizeRatio, px, py, content);
+        imageIndex = self.getText(settings, font, bgColor, fgColor, fontSizeRatio, px, py, content);
 
-      };
+      }
 
 
 
@@ -640,11 +641,10 @@
     createSpriteSheet: function (settings) {
       var self = this;
 
-
       var config = {
-              maxWidth: settings("spriteSheetResolution")   || 2048,
-              maxHeight: settings("spriteSheetResolution")  || 2048,
-              maxSprites: settings("spriteSheetMaxSprites") || 256
+              maxWidth: settings('spriteSheetResolution')   || 2048,
+              maxHeight: settings('spriteSheetResolution')  || 2048,
+              maxSprites: settings('spriteSheetMaxSprites') || 256
       };
 
       //console.log(config);
@@ -683,15 +683,13 @@
       var pwx = px * self.spriteSheet.spriteWidth;
       var phy = py * self.spriteSheet.spriteHeight;
 
-      var uid = font
-         + ':' + bgColor
-         + ':' + fgColor
-         + ':' + fontSize
-         + ':' + text
-         + ':' + pwx
-         + ':' + phy;
-
-      //console.log("uid: " + uid);
+      var uid = font +
+         ':' + bgColor +
+         ':' + fgColor +
+         ':' + fontSize +
+         ':' + text +
+         ':' + pwx +
+         ':' + phy;
 
       if (uid in self.spriteSheet.urlToIndex) {
         return self.spriteSheet.urlToIndex[uid];
@@ -710,9 +708,6 @@
 
       var ctx = self.spriteSheet.canvas.getContext('2d');
 
-
-      /// TODO background color!
-
       ctx.beginPath();
       ctx.rect(x, y, self.spriteSheet.spriteWidth,  self.spriteSheet.spriteHeight);
       ctx.fillStyle = bgColor;
@@ -730,8 +725,11 @@
       return index;
     },
 
-    // we manage a global cache for the sprites
-    getImage: function (url) {
+    // load an image from the internet, scale it and put in in the spreadsheet
+    // there is an unmanaged cache, which will incrementally grow in size
+    // in the future we should fix this memory leak somehow, eg. limited size
+    // of the cache (parametrable)
+    getImage: function (url, imgCrossOrigin) {
 
       var self = this;
 
@@ -759,6 +757,9 @@
       self.spriteSheet.urlToIndex[url] = index;
 
       var img = new Image();
+
+      image.setAttribute('crossOrigin', imgCrossOrigin);
+
       img.onload = function () {
 
         var x = (index * self.spriteSheet.spriteWidth) % self.spriteSheet.maxWidth;
@@ -766,7 +767,12 @@
 
 
         ctx.drawImage(
-        img, 0, 0, img.width, img.height, x, y, self.spriteSheet.spriteWidth, self.spriteSheet.spriteHeight);
+          img,
+          0, 0,
+          img.width, img.height,
+          x, y,
+          self.spriteSheet.spriteWidth, self.spriteSheet.spriteHeight
+        );
 
         self.updateNeeded = true;
 
