@@ -290,7 +290,7 @@ Dealing with images hosted on other servers is not a trivial task and must be do
 Modern browsers impose restrictions regarding what kind of (image) data can be trusted or not,
 before "eating it" eg. load it in graphic card memory, or reading the buffer.
 
- WebGL applications may utilize images and videos that come from other domains,
+ WebGL applications may use images and videos that come from other domains,
  with the cooperation of the server hosting the media, using Cross-Origin Resource Sharing [CORS].
  In order to use such media, the application needs to explicitly request permission to do so,
  and the server needs to explicitly grant permission.
