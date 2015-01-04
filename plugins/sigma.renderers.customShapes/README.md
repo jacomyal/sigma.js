@@ -61,7 +61,7 @@ Here are the labels and their default values:
 var settings = {
 
   // a boolean to indicate if you want to switch to a custom label display mode
-  shortLabelsOnHover: true, // true or false
+  shortLabelsOnHover: false, // true (recommended)
 
   // helps the browser authorize the cross domain policy (see paragraph below)
   imgCrossOrigin: 'anonymous',
@@ -91,7 +91,11 @@ var sigma = new sigma({
 #### shortLabelsOnHover
 
 A Boolean to indicate if you want to enable the a custom label display mode when hovering nodes.
-Default to true when the customShapes plugin is active.
+Default to false, to not interfer with normal Sigma.js behavior.
+
+Possible improvement: in the future, the plugin might force the default value to true when
+initialized, so that apps not using the plugin would not be affected.
+
 
 #### imgCrossOrigin
 
@@ -274,19 +278,28 @@ renderer example](../../examples/custom-node-renderer.html)
 Current limitations:
 
 * Fonts need to be loaded by the browser before graph is initialized
-* Images must be on the same host / or CORS must be correctly configured
+* Images must be on the same host / or CORS must be correctly configured (see doc)
 * Some parameters are not supported for all shapes (eg. borders)
 * The Pac-man shape had a low priority and is not supported yet
 
 
-#### Additional information about images & webgl
+#### Additional information about image loading (and WebGL)
 
-WebGL necessarily imposes stronger restrictions on the use of cross-domain media
- than other APIs (such as the 2D canvas). WebGL applications may utilize images
- and videos that come from other domains, with the cooperation of the server
- hosting the media, using Cross-Origin Resource Sharing [CORS]. In order to use
- such media, the application needs to explicitly request permission to do so,
+Dealing with images hosted on other servers is not a trivial task and must be done carefully.
+
+Modern browsers impose restrictions regarding what kind of (image) data can be trusted or not,
+before "eating it" eg. load it in graphic card memory, or reading the buffer.
+
+ WebGL applications may utilize images and videos that come from other domains,
+ with the cooperation of the server hosting the media, using Cross-Origin Resource Sharing [CORS].
+ In order to use such media, the application needs to explicitly request permission to do so,
  and the server needs to explicitly grant permission.
 
-Please read the official documentation for more information:
+ If an image comes from an untrusted source, it might be labeled as such
+ (or "tainted") and its use (reading pixels values from JS etc..) forbidden.
+
+Please read this page for more information:
+https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+
+Some information about how WebGL deals with texture:
 http://www.khronos.org/registry/webgl/specs/latest/1.0/#4.1
