@@ -758,7 +758,7 @@
 
       var img = new Image();
 
-      image.setAttribute('crossOrigin', imgCrossOrigin);
+      img.setAttribute('crossOrigin', imgCrossOrigin);
 
       img.onload = function () {
 
