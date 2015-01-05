@@ -12,20 +12,16 @@ License: this plugin follows the same licensing terms as sigma.js library.
 
 This plugin let you display custom shapes, icons and images in graphs.
 
-The most basic features are available in both Canvas and WebGL mode, as shown
-in [this demo](https://github.com/jbilcke/sigma.js-plugin-customShapes/blob/plugins/customShapes-webgl/examples/plugin-customShapes-hybrid.html).
+The most basic features are available in both Canvas and WebGL mode, as shown in [this demo](../../examples/plugin-customShapes-hybrid.html).
 
-The WebGL and Canvas renderers work differently, so it is possible that some
-features have not been ported yet from one engine to the other. So please open
-a ticket of you believe something important is missing (or a PR if you can know
-how to fix it).
+The WebGL and Canvas renderers work differently, so it is possible that some features have not been ported yet from one engine to the other. So please open a ticket of you believe something important is missing (or a PR if you can know how to fix it).
 
 
 ## Usage
 
 ### Quickstart
 
-First make sure you are able to build the sigma.js project (see the [README](https://github.com/jacomyal/sigma.js/blob/master/README.md) for more information), and understand how Sigma.js works (eg. what is a Sigma.js instance).
+First make sure you are able to build the sigma.js project (see the [README](../../README.md) for more information), and understand how Sigma.js works (eg. what is a Sigma.js instance).
 
 Then you can build the customShapes plugin by going to the `plugins/sigma.renderers.customShapes` directory and typing:
 
@@ -74,8 +70,7 @@ var settings = {
 };
 ```
 
-You have to add these custom settings keys and values to the existing settings
-object when initializing sigma.js (please refer to the Sigma.js doc and examples for more details):
+You have to add these custom settings keys and values to the existing settings object when initializing sigma.js (please refer to the Sigma.js doc and examples for more details):
 
 ```javascript
 var sigma = new sigma({
@@ -91,13 +86,11 @@ var sigma = new sigma({
 
 A Boolean to indicate if you want to enable the a custom label display mode when hovering nodes.
 
-Setting this to true is more than recommended, unless you do not plan to use the
-custom shapes (but only images or icons, for instance).
+Setting this to true is more than recommended, unless you do not plan to use the custom shapes (but only images or icons, for instance).
 
 Default to false, to not interfer with normal Sigma.js behavior.
 
-Possible improvement: in the future, the plugin might force the default value to true when
-initialized, so that apps not using the plugin would not be affected.
+Possible improvement: in the future, the plugin might force the default value to true when initialized, so that apps not using the plugin would not be affected.
 
 
 #### imgCrossOrigin : String = 'anonymous'
@@ -118,12 +111,9 @@ In this rendering mode, a large texture is created in memory, and is used to sto
 
 This large texture must have a fixed size, and for now cannot be resized dynamically.
 
-The final resolution of each sprites thus depends on the resolution of this large texture,
-but also on the number of sprites you want to draw:
+The final resolution of each sprites thus depends on the resolution of this large texture, but also on the number of sprites you want to draw:
 
-The more sprite you need to draw, the less pixels are available, so they will have a smaller resolution,
-so you can either increase the resolution of the sprite sheet texture, or reduce
-the number of images
+The more sprite you need to draw, the less pixels are available, so they will have a smaller resolution, so you can either increase the resolution of the sprite sheet texture, or reduce the number of images
 
 ##### spriteSheetResolution
 
@@ -136,8 +126,7 @@ Don't use a value too large. Values like 2048 or 4096 should be ok.
 Number max of sprites.
 
 Defines how many sprites can fit inside the sprite sheet texture.
-If you have less than 128 images then you can enter the number of max different
-images you will even encounter, so that each sprite can use as much pixels as possible (this gives increased resolution).
+If you have less than 128 images then you can enter the number of max different images you will even encounter, so that each sprite can use as much pixels as possible (this gives increased resolution).
 
 
 
@@ -246,11 +235,7 @@ Notes:
 
 Custom webfonts are supported!
 
-You just need to make sure you custom font is
-actually loaded before actually using it in a graph, using the W3C CSS Font
-Loading API (to support non-evergreen browsers you can use a shim like
-https://github.com/zachleat/fontfaceonload or
-https://github.com/bramstein/fontloader)
+You just need to make sure you custom font is actually loaded before actually using it in a graph, using the W3C CSS Font Loading API (to support non-evergreen browsers you can use a shim like https://github.com/zachleat/fontfaceonload or https://github.com/bramstein/fontloader)
 
 The syntax to use a webfont is very simple, and can even be combined with
 shapes:
@@ -274,8 +259,7 @@ shapes:
 ### Canvas
 
 In canvas mode it is easy to define your own node renderers. The default
-renderer implemented by sigma.js is named `def` - see also [generic custom node
-renderer example](../../examples/custom-node-renderer.html)
+renderer implemented by sigma.js is named `def` - see also [generic custom node renderer example](../../examples/custom-node-renderer.html)
 
 ### WebGL
 
@@ -291,16 +275,13 @@ Current limitations:
 
 Dealing with images hosted on other servers is not a trivial task and must be done carefully.
 
-Modern browsers impose restrictions regarding what kind of (image) data can be trusted or not,
-before "eating it" eg. load it in graphic card memory, or reading the buffer.
+Modern browsers impose restrictions regarding what kind of (image) data can be trusted or not, before "eating it" eg. load it in graphic card memory, or reading the buffer.
 
  WebGL applications may use images and videos that come from other domains,
  with the cooperation of the server hosting the media, using Cross-Origin Resource Sharing [CORS].
- In order to use such media, the application needs to explicitly request permission to do so,
- and the server needs to explicitly grant permission.
+ In order to use such media, the application needs to explicitly request permission to do so,  and the server needs to explicitly grant permission.
 
- If an image comes from an untrusted source, it might be labeled as such
- (or "tainted") and its use (reading pixels values from JS etc..) forbidden.
+ If an image comes from an untrusted source, it might be labeled as such (or "tainted") and its use (reading pixels values from JS etc..) forbidden.
 
 Please read this page for more information:
 https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
