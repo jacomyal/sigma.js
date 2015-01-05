@@ -9,12 +9,10 @@
 <script src="../src/classes/sigma.classes.graph.js"></script>
 <script src="../src/classes/sigma.classes.camera.js"></script>
 <script src="../src/classes/sigma.classes.quad.js"></script>
-<script src="../src/classes/sigma.classes.edgequad.js"></script>
 <script src="../src/captors/sigma.captors.mouse.js"></script>
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
 <script src="../src/renderers/sigma.renderers.webgl.js"></script>
-<script src="../src/renderers/sigma.renderers.svg.js"></script>
 <script src="../src/renderers/sigma.renderers.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
@@ -28,45 +26,35 @@
 <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
-<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
-<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
-<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
-<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.renderers.customShapes/shape-library.js"></script>
 <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.canvas.js"></script>
 <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.webgl.js"></script>
-<div id="container">
+
   <style>
-    #graph-container {
+    #graph-canvas-left{
       top: 0;
       bottom: 0;
       left: 0;
+      right: 50%;
+      position: absolute;
+    }
+    #graph-webgl-right{
+      top: 0;
+      bottom: 0;
+      left: 50%;
       right: 0;
       position: absolute;
     }
   </style>
-  <div id="graph-container"></div>
-</div>
+  <div id="graph-canvas-left"></div>
+  <div id="graph-webgl-right"></div>
 <script>
-/**
- * IMPORTANT: This only works with the canvas renderer. TBD in the future
- * will also support the WebGL renderer.
- */
-sigma.utils.pkg('sigma.canvas.nodes');
 
 // generate a random graph
 var i,
@@ -144,7 +132,7 @@ for (i = 0; i < N; i++) {
       break;
     case "cross":
       node.cross = {
-        lineWeight: Math.round(Math.random() * 5)
+        lineWeight: 0.1 + Math.round(Math.random() * 5)
       }
       break;
   }
@@ -160,20 +148,37 @@ for (i = 0; i < E; i++)
     size: Math.random()
   });
 
-s = new sigma({
+
+var settings = {
+    defaultLabelColor: '#000',
+    defaultEdgeColor: '#333',
+    edgeColor: 'default',
+    labelThreshold: 40,
+    zoomMin: 0.001,
+    zoomMax: 3,
+
+    shortLabelsOnHover: true,    // enable the short label display mode
+    spriteSheetResolution: 2048, // resolution of the sprite sheet square
+    spriteSheetMaxSprites: 8     // number max of sprites
+};
+
+var sigmaCanvas = new sigma({
   graph: g,
   renderer: {
-    // IMPORTANT:
-    // This works only with the canvas renderer, so the
-    // renderer type set as "canvas" is necessary here.
-    container: document.getElementById('graph-container'),
+    container: document.getElementById('graph-canvas-left'),
     type: 'canvas'
   },
-  settings: {
-    minNodeSize: 8,
-    maxNodeSize: 16,
-    shortLabelsOnHover: true  // enable the short label display mode
-  }
+  settings: settings
 });
-s.refresh();
+sigmaCanvas.refresh();
+
+var sigmaWebgl = new sigma({
+  graph: g,
+  renderer: {
+    container: document.getElementById('graph-webgl-right'),
+    type: 'webgl'
+  },
+  settings: settings
+});
+sigmaWebgl.refresh();
 </script>

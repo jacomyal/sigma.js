@@ -6,20 +6,17 @@
 
   if (typeof ShapeLibrary === 'undefined')
     throw 'ShapeLibrary is not declared';
-  
+
 
   // Initialize package:
   sigma.utils.pkg('sigma.canvas.nodes');
 
-  var sigInst = undefined;
+  // incrementally scaled, not automatically resized for now
+  // (ie. possible memory leak if there are many graph load / unload)
   var imgCache = {};
 
-  var initPlugin = function(inst) {
-    sigInst = inst;
-  }
-
-  var drawImage = function (node,x,y,size,context) {
-    if(sigInst && node.image && node.image.url) {
+  var drawImage = function (node,x,y,size,context, imgCrossOrigin) {
+    if(node.image && node.image.url) {
       var url = node.image.url;
       var ih = node.image.h || 1; // 1 is arbitrary, anyway only the ratio counts
       var iw = node.image.w || 1;
@@ -30,12 +27,10 @@
       var image = imgCache[url];
       if(!image) {
         image = document.createElement('IMG');
+        image.setAttribute('crossOrigin', imgCrossOrigin);
         image.src = url;
         image.onload = function(){
-          // TODO see how we redraw on load
-          // need to provide the siginst as a parameter to the library
-          console.log("redraw on image load");
-          sigInst.refresh();
+          window.dispatchEvent(new Event('resize'));
         };
         imgCache[url] = image;
       }
@@ -60,7 +55,36 @@
           r*yratio*2*Math.cos(-3.142/4));
       context.restore(); // exit clipping mode
     }
-  }
+  };
+
+
+    var drawIcon = function (node,x,y,size,ctx) {
+
+        var font = node.icon.font || 'Arial',
+            fgColor = node.icon.color || '#F00',
+            text = node.icon.content || '?',
+            px = node.icon.x || 0.5,
+            py = node.icon.y || 0.5,
+            height = size,
+            width = size;
+
+
+        var fontSizeRatio = 0.70;
+        if (typeof node.icon.scale === "number") {
+          fontSizeRatio = Math.abs(Math.max(0.01, node.icon.scale));
+        }
+
+
+        var fontSize = Math.round(fontSizeRatio * height);
+
+        //ctx.beginPath();
+        ctx.fillStyle = fgColor;
+
+        ctx.font = '' + fontSize + 'px ' + font;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y);
+  };
 
 
   var register = function(name,drawShape,drawBorder) {
@@ -69,28 +93,34 @@
           prefix = settings('prefix') || '',
           size = node[prefix + 'size'],
           color = node.color || settings('defaultNodeColor'),
+          imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous',
           borderColor = node.borderColor || color,
           x = node[prefix + 'x'],
           y = node[prefix + 'y'];
 
+
       context.save();
 
       if(drawShape) {
-        drawShape(node,x,y,size,color,context);
+        drawShape(node, x, y, size, color, context);
       }
 
       if(drawBorder) {
-        drawBorder(node,x,y,size,borderColor,context);
+        drawBorder(node, x, y, size, borderColor, context);
       }
-      
-      drawImage(node,x,y,size,context);
+
+      drawImage(node, x, y, size, context, imgCrossOrigin);
+
+      if (typeof node.icon !== "undefined") {
+        drawIcon(node, x, y, size, context);
+      }
 
       context.restore();
     };
-  }
+  };
 
   ShapeLibrary.enumerate().forEach(function(shape) {
-    register(shape.name,shape.drawShape,shape.drawBorder);
+    register(shape.name, shape.drawShape, shape.drawBorder);
   });
 
   /**
@@ -100,11 +130,11 @@
   this.CustomShapes = {
 
     // Functions
-    init: initPlugin,
+
     // add pre-cache images
 
     // Version
-    version: '0.1'
+    version: '0.2'
   };
 
 

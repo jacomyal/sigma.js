@@ -20,12 +20,15 @@
         w,
         h,
         e,
+        labelX,
+        labelY,
         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'],
         fontSize = (settings('labelSize') === 'fixed') ?
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size;
+
 
     // Label background:
     context.font = (fontStyle ? fontStyle + ' ' : '') +
@@ -43,6 +46,12 @@
       context.shadowColor = settings('labelHoverShadowColor');
     }
 
+
+    // Label coordinates
+    labelX = Math.round(node[prefix + 'x'] + size + 3);
+    labelY = Math.round(node[prefix + 'y'] + fontSize / 3);
+
+
     if (node.label && typeof node.label === 'string') {
       x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
@@ -51,6 +60,16 @@
       );
       h = Math.round(fontSize + 4);
       e = Math.round(fontSize / 2 + 2);
+
+      // short label mode, to prevent overlapping with non-circular node shapes
+      if (settings('shortLabelsOnHover') === true) {
+  	    x = Math.round(node[prefix + 'x'] + size + 3);
+  	    w = Math.round(
+  	      context.measureText(node.label).width + fontSize / 2 + 7
+  	    );
+  	    labelX = Math.round(node[prefix + 'x'] + size + 13);
+  	  }
+
 
       context.moveTo(x, y + e);
       context.arcTo(x, y, x + e, y, e);
@@ -98,8 +117,8 @@
 
       context.fillText(
         node.label,
-        Math.round(node[prefix + 'x'] + size + 3),
-        Math.round(node[prefix + 'y'] + fontSize / 3)
+        labelX,
+        labelY
       );
     }
   };
