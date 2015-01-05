@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="fonts/font-awesome.css">
+  <style>
+    #graph-canvas-left {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 50%;
+      position: absolute;
+    }
+    #graph-webgl-right {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: 0;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <!-- we force the loading of the font awesome -->
+  <i class="fa fa-camera-retro fa-1x" style="color: rgba(0,0,0,0);"></i>
+
+  <div id="graph-canvas-left"></div>
+  <div id="graph-webgl-right"></div>
+
+  <!-- START SIGMA IMPORTS -->
+  <script src="../src/sigma.core.js"></script>
+  <script src="../src/conrad.js"></script>
+  <script src="../src/utils/sigma.utils.js"></script>
+  <script src="../src/utils/sigma.polyfills.js"></script>
+  <script src="../src/sigma.settings.js"></script>
+  <script src="../src/classes/sigma.classes.dispatcher.js"></script>
+  <script src="../src/classes/sigma.classes.configurable.js"></script>
+  <script src="../src/classes/sigma.classes.graph.js"></script>
+  <script src="../src/classes/sigma.classes.camera.js"></script>
+  <script src="../src/classes/sigma.classes.quad.js"></script>
+  <script src="../src/captors/sigma.captors.mouse.js"></script>
+  <script src="../src/captors/sigma.captors.touch.js"></script>
+  <script src="../src/renderers/sigma.renderers.canvas.js"></script>
+  <script src="../src/renderers/sigma.renderers.webgl.js"></script>
+  <script src="../src/renderers/sigma.renderers.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+  <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+  <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+  <script src="../src/misc/sigma.misc.animation.js"></script>
+  <script src="../src/misc/sigma.misc.bindEvents.js"></script>
+  <script src="../src/misc/sigma.misc.drawHovers.js"></script>
+  <!-- END SIGMA IMPORTS -->
+  <script src="../plugins/sigma.renderers.customShapes/shape-library.js"></script>
+  <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.canvas.js"></script>
+  <script src="../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.webgl.js"></script>
+  <script>
+    // generate a random graph
+    var i,
+      s,
+      img,
+      N = 100,
+      E = 500,
+      g = {
+        nodes: [],
+        edges: []
+      },
+      urls = [
+        'img/img1.png',
+        'img/img2.png',
+        'img/img3.png',
+        'img/img4.png'
+      ],
+      icons = [
+        "\uF11b",
+        "\uF11c",
+        "\uF11d",
+        "\uF128",
+        "\uF129",
+        "\uF130",
+        "\uF131",
+        "\uF132"
+
+      ],
+      colors = [
+        '#965E04',
+        '#C89435',
+        '#F7A456',
+        '#AFCF8A',
+        '#7B39DE',
+        '#B095C0',
+        '#D24556',
+        '#93C2FA',
+        '#9DB09E',
+        '#F8C821'
+      ];
+
+    // Generate a random graph, going through the different shapes
+    for (i = 0; i < N; i++) {
+      var node = {
+        id: 'n' + i,
+        label: '' + i,
+        x: Math.random(),
+        y: Math.random(),
+        size: 50,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        type: 'equilateral', // ShapeLibrary.enumerate().map(function(s){return s.name;})[Math.round(Math.random()*5)],
+        icon: {
+          font: 'FontAwesome',
+          scale: 1.0, // size ratio of (icon / node)
+          color: '#fff',
+          content: icons[Math.floor(Math.random() * icons.length)]
+        }
+      };
+
+      switch (node.type) {
+        case "equilateral":
+          node.equilateral = {
+            rotate: ((Math.random() * 45) * Math.PI) / 180, // random rotate up to 45° then -> radians
+            numPoints: Math.round(5 + Math.random() * 3)
+          }
+          break;
+
+        case "star":
+          node.star = {
+            innerRatio: 0.4 + Math.random() * 0.2,
+            numPoints: Math.round(4 + Math.random() * 3)
+          };
+
+          if (node.image) {
+            // note clip/scale are ratio values. So we fit them to the inner ratio of the star shape
+            node.image.clip = node.star.innerRatio * 0.95;
+            node.image.scale = node.star.innerRatio * 1.2;
+          }
+          break;
+        case "square":
+        case "diamond":
+          if (node.image) {
+            // note clip/scale are ratio values. So we fit them to the borders of the square shape
+            node.image.clip = 0.7;
+          }
+          break;
+        case "circle":
+          break;
+        case "cross":
+          node.cross = {
+            lineWeight: 0.1 + Math.round(Math.random() * 5)
+          }
+          break;
+
+      }
+      g.nodes.push(node);
+    }
+
+
+    for (i = 0; i < E; i++)
+      g.edges.push({
+        id: 'e' + i,
+        source: 'n' + (Math.random() * N | 0),
+        target: 'n' + (Math.random() * N | 0),
+        size: Math.random()
+      });
+
+
+    var settings = {
+      defaultLabelColor: '#000',
+      defaultEdgeColor: '#333',
+      edgeColor: 'default',
+      labelThreshold: 20,
+      zoomMin: 0.001,
+      zoomMax: 3,
+
+      shortLabelsOnHover: true,    // enable the short label display mode
+      spriteSheetResolution: 2048, // resolution of the sprite sheet square
+      spriteSheetMaxSprites: 128   // number max of sprites
+    };
+
+
+    setTimeout(function() {
+      var sigmaCanvas = new sigma({
+        graph: g,
+        renderer: {
+          container: document.getElementById('graph-canvas-left'),
+          type: 'canvas'
+        },
+        settings: settings
+      });
+
+      var sigmaWebgl = new sigma({
+        graph: g,
+        renderer: {
+          container: document.getElementById('graph-webgl-right'),
+          type: 'webgl'
+        },
+        settings: settings
+      });
+      sigmaWebgl.refresh();
+
+      sigmaCanvas.refresh();
+    }, 3000);
+
+    // there is a timeout to give some time to Font Awesome to load to webgl mode
+    // normally you would use a shim to the font loader api:
+    // https://github.com/bramstein/fontloader OR https://github.com/smnh/FontLoader
+    // but for the demo this is a simple timeout
+  </script>
+</body>
+
+</html>
