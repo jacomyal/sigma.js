@@ -98,6 +98,7 @@ module.exports = function(grunt) {
     'renderers.customShapes',
     'renderers.edgeLabels',
     'renderers.halo',
+    'renderers.linkurious',
     'renderers.snapshot',
     'statistics.HITS'
   ];
