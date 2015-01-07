@@ -50,7 +50,19 @@
     // {number} The size of the outer border of hovered and active nodes.
     outerBorderSize: 0,
     // {string} The default hovered and active node outer border's color.
-    defaultNodeOuterBorderColor: '#000'
+    defaultNodeOuterBorderColor: '#000',
+
+    /**
+     * NODE ICONS AND IMAGES SETTINGS:
+     * *******************************
+     */
+    // {number} The minimum size a node must have to see its icon displayed.
+    iconThreshold: 8,
+    // {number} The minimum size a node must have to see its image displayed.
+    imageThreshold: 8,
+    // {string} Controls the security policy of the image loading, from the
+    // browser's side.
+    imgCrossOrigin: 'anonymous'
   };
 
   // Export the previously designed settings:

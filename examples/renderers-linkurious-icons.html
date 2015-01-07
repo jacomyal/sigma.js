@@ -67,27 +67,15 @@
 <script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.curvedArrow.js"></script>
 <div id="container">
   <style>
-    #graph-canvas-left{
+    #graph-container {
       top: 0;
       bottom: 0;
       left: 0;
-      right: 50%;
-      position: absolute;
-    }
-    #graph-webgl-right{
-      top: 0;
-      bottom: 0;
-      left: 50%;
       right: 0;
       position: absolute;
     }
-    h1 {
-      position: absolute;
-      margin: 0.5em;
-    }
   </style>
-  <div id="graph-canvas-left"><h1>Canvas</h1></div>
-  <div id="graph-webgl-right"><h1>WebGL</h1></div>
+  <div id="graph-container"></div>
 </div>
 
 <!-- we force the loading of the font awesome -->
@@ -146,9 +134,15 @@ for (i = 0; i < N; i++)
     x: Math.random(),
     y: Math.random(),
     size: Math.random(),
-    color: '#666',
+    color: colors[Math.floor(Math.random() * colors.length)],
     type: ['circle', 'cross', 'square', 'diamond', 'star', 'equilateral'][Math.random() * 6 | 0],
-    active: [false, true][Math.random() * 1.15 | 0]
+    active: [false, true][Math.random() * 1.15 | 0],
+    icon: {
+      font: 'FontAwesome',
+      scale: 1.0, // size ratio of (icon / node)
+      color: '#fff',
+      content: icons[Math.floor(Math.random() * icons.length)]
+    }
   });
 
 for (i = 0; i < E; i++)
@@ -158,41 +152,24 @@ for (i = 0; i < E; i++)
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
     color: '#ccc',
-    type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0],
+    // type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0],
     active: [false, true][Math.random() * 1.05 | 0]
   });
 
-var settings = {
-  nodeActiveColor: 'default',
-  borderSize: 2,
-  outerBorderSize: 3,
-  defaultNodeBorderColor: '#fff',
-  nodeBorderColor: 'default',
-  defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
+// Force canvas
+sigma.renderers.def = sigma.renderers.canvas
 
-  zoomMin: 0.001,
-  zoomMax: 3,
-
-  shortLabelsOnHover: true,    // enable the short label display mode
-  spriteSheetResolution: 2048, // resolution of the sprite sheet square
-  spriteSheetMaxSprites: 8     // number max of sprites
-};
-
-var sigmaCanvas = new sigma({
+// Instantiate sigma:
+s = new sigma({
   graph: g,
-  renderer: {
-    container: document.getElementById('graph-canvas-left'),
-    type: 'canvas'
-  },
-  settings: settings
-});
-
-var sigmaWebgl = new sigma({
-  graph: g,
-  renderer: {
-    container: document.getElementById('graph-webgl-right'),
-    type: 'webgl'
-  },
-  settings: settings
+  container: 'graph-container',
+  settings: {
+    nodeActiveColor: 'default',
+    borderSize: 2,
+    outerBorderSize: 3,
+    defaultNodeBorderColor: '#fff',
+    nodeBorderColor: 'default',
+    defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
+  }
 });
 </script>

@@ -7,6 +7,29 @@
   // (ie. possible memory leak if there are many graph load / unload)
   var imgCache = {};
 
+  var drawEquilateral = function(node, x, y, size, context) {
+    var pcount = (node.equilateral && node.equilateral.numPoints) || 5;
+    var rotate = ((node.equilateral && node.equilateral.rotate) || 0); // we expect radians: Math.PI/180;
+    var radius = size;
+
+    // TODO FIXME there is an angle difference between the webgl algorithm and
+    // the canvas algorithm
+    rotate += Math.PI / pcount; // angleOffset
+
+     // first point on outer radius, angle 'rotate'
+    context.moveTo(
+      x + radius * Math.sin(rotate),
+      y - radius * Math.cos(rotate)
+    );
+
+    for(var i = 1; i < pcount; i++) {
+      context.lineTo(
+        x + Math.sin(rotate + 2 * Math.PI * i / pcount) * radius,
+        y - Math.cos(rotate + 2 * Math.PI * i / pcount) * radius
+      );
+    }
+  }
+
   var drawImage = function (node, x, y, size, context, imgCrossOrigin, threshold) {
     if(!node.image || !node.image.url || size < threshold) return;
 
@@ -33,10 +56,10 @@
     var yratio = (ih < iw) ? (ih / iw) : 1;
     var r = size * scale;
 
-    // Draw the clipping disc:
+    // Draw the clipping equilateral:
     context.save(); // enter clipping mode
     context.beginPath();
-    context.arc(x, y, size * clip, 0, Math. PI * 2, true);
+    drawEquilateral(node, x, y, size, context);
     context.closePath();
     context.clip();
 
@@ -82,13 +105,13 @@
   };
 
   /**
-   * The default node renderer. It renders the node as a simple disc.
+   * The node renderer renders the node as a equilateral.
    *
    * @param  {object}                   node     The node object.
    * @param  {CanvasRenderingContext2D} context  The canvas context.
    * @param  {configurable}             settings The settings function.
    */
-  sigma.canvas.nodes.def = function(node, context, settings) {
+  sigma.canvas.nodes.equilateral = function(node, context, settings) {
     var prefix = settings('prefix') || '',
         size = node[prefix + 'size'] || 1,
         x = node[prefix + 'x'],
@@ -116,7 +139,7 @@
         context.fillStyle = settings('nodeOuterBorderColor') === 'node' ?
           (color || defaultNodeColor) :
           settings('defaultNodeOuterBorderColor');
-        context.arc(x, y, size + borderSize + outerBorderSize, 0, Math.PI * 2, true);
+        drawEquilateral(node, x, y, size + borderSize + outerBorderSize, context);
         context.closePath();
         context.fill();
       }
@@ -125,41 +148,49 @@
         context.fillStyle = settings('nodeBorderColor') === 'node' ?
           (color || defaultNodeColor) :
           settings('defaultNodeBorderColor');
-        context.arc(x, y, size + borderSize, 0, Math.PI * 2, true);
+        drawEquilateral(node, x, y, size + borderSize, context);
         context.closePath();
         context.fill();
       }
     }
 
-    if ((!node.active ||
-      (node.active && settings('nodeActiveColor') === 'node')) &&
-      node.colors &&
-      node.colors.length) {
+      // TODO equilateral color pie
+    // if ((!node.active ||
+    //   (node.active && settings('nodeActiveColor') === 'node')) &&
+    //   node.colors &&
+    //   node.colors.length) {
 
-      // see http://jsfiddle.net/hvYkM/1/
-      var i,
-          l = node.colors.length,
-          j = 1 / l,
-          lastend = 0;
+    //   // see http://jsfiddle.net/hvYkM/1/
+    //   var i,
+    //       l = node.colors.length,
+    //       j = 1 / l,
+    //       lastend = 0;
 
-      for (i = 0; i < l; i++) {
-        context.fillStyle = node.colors[i];
-        context.beginPath();
-        context.moveTo(x, y);
-        context.arc(x, y, size, lastend, lastend + (Math.PI * 2 * j), false);
-        context.lineTo(x, y);
-        context.closePath();
-        context.fill();
-        lastend += Math.PI * 2 * j;
-      }
-    }
-    else {
+    //   for (i = 0; i < l; i++) {
+    //     context.fillStyle = node.colors[i];
+    //     context.beginPath();
+    //     context.moveTo(x, y);
+    //     context.arc(
+    //       x,
+    //       y,
+    //       size,
+    //       lastend,
+    //       lastend + (Math.PI * 2 * j),
+    //       false
+    //     );
+    //     context.lineTo(x, y);
+    //     context.closePath();
+    //     context.fill();
+    //     lastend += Math.PI * 2 * j;
+    //   }
+    // }
+    // else {
       context.fillStyle = color;
       context.beginPath();
-      context.arc(x, y, size, 0, Math.PI * 2, true);
+      drawEquilateral(node, x, y, size, context);
       context.closePath();
       context.fill();
-    }
+    // }
 
     // Image:
     if (node.image) {
