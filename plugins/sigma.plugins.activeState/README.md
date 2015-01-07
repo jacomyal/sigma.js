@@ -9,7 +9,7 @@ Contact: seb@linkurio.us
 ## General
 This plugin provides a new state called `active` to nodes and edges. Graphical elements in user interfaces have usually multiple states like `hidden`, `hover`, `focus`, and `active`. They are keys to enable great user interaction. For instance, one might create a plugin that drag all active nodes, which are eventually considered as "selected" elements. Sigma.js provides the `hidden` and `hover` states only.
 
-See the following [example code](../../examples/active-state.html) and [unit tests](../../test/unit.plugins.activeState.js) for full usage.
+See the following [unit tests](../../test/unit.plugins.activeState.js) for full usage.
 
 To use, include all .js files under this folder. Then initialize it as follows:
 
@@ -110,94 +110,6 @@ var activeNodesCallback = _.debounce(function(event) {
 activeState.bind('activeNodes', activeNodesCallback);
 ````
 
-## Settings
+## Compatibility
 
-We extend Sigma.js settings in a transparent way to render active nodes and edges, see [settings.js](settings.js):
-
- * **defaultLabelActiveColor**
-   * type: *string*
-   * default value: `#000`
-
- * **activeFont**
-   * The active node's label font. If not specified, will heritate the `font` value.
-   * type: *string*
-   * default value: ``
-
- * **activeFontStyle**
-   * Example: `bold`
-   * type: *string*
-   * default value: ``
-
- * **labelActiveColor**
-   * Indicates how to choose the labels color of active nodes.
-   * type: *string*
-   * default value: `default`
-   * available values: `node`, `default`
-
- * **nodeActiveColor**
-   * Indicates how to choose the active nodes color.
-   * type: *string*
-   * default value: `node`
-   * available values: `node`, `default`
-
- * **defaultNodeActiveColor**
-   * type: *string*
-   * default value: `rgb(236, 81, 72)`
-
- * **edgeActiveColor**
-   * Indicates how to choose the active nodes color.
-   * type: *string*
-   * default value: `edge`
-   * available values: `edge`, `default`
-
- * **defaultEdgeActiveColor**
-   * type: *string*
-   * default value: `rgb(236, 81, 72)`
-
- * **nodeBorderColor**
-   * Indicates how to choose the nodes border color.
-   * type: *string*
-   * default value: `node`
-   * available values: `node`, `default`
-
- * **nodeOuterBorderColor**
-   * Indicates how to choose the nodes outer border color.
-   * type: *string*
-   * default value: `node`
-   * available values: `node`, `default`
-
- * **outerBorderSize**
-   * The size of the outer border of hovered and active nodes.
-   * type: *number*
-   * default value: `0`
-
- * **defaultNodeOuterBorderColor**
-   * The default hovered and active node outer border's color.
-   * type: *string*
-   * default value: `#000`
-
-The default values provided by the plugin may be overridden when instantiating Sigma, e.g.:
-
-````javascript
-var sigInst = new sigma({
-  graph: g,
-  container: 'graph-container',
-  settings: {
-    activeFontStyle: 'bold'
-  }
-});
-````
-
-## Renderers
-
-This plugin overrides default renderers to change their colors on active state. Nodes and edges may have the following attributes:
-- `active`: *boolean*
-- `active_color`: *string*
-
-Notice in the settings that we improve the support of node borders (i.e. stroke). Borders are used in both hover and active node renderers.
-
-Finally, the node renderers take the borders sizes into account in the distance between node circles and labels.
-
-#### Limitations
-
-WebGL node renderers ignore borders.
+The plugin is compatible with [sigma.renderers.linkurious](../sigma.renderers.linkurious) which provides renderers to display the active state of nodes and edges.
