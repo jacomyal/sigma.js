@@ -50,7 +50,7 @@
       x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
       w = Math.round(
-        context.measureText(node.label).width + fontSize / 2 + size + 7
+        context.measureText(node.label).width + fontSize / 2 + size + 10
       );
       h = Math.round(fontSize + 4);
       e = Math.round(fontSize / 2 + 2);
