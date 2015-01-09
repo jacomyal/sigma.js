@@ -230,9 +230,9 @@
 
     if (sigma.plugins.dragNodes) {
       // Handle drag events:
-      this.dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
-      this.dragListener.bind('drag', this.dragHandler);
-      this.dragListener.bind('drop', this.dropHandler);
+      // this.dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+      // this.dragListener.bind('drag', this.dragHandler);
+      // this.dragListener.bind('drop', this.dropHandler);
     }
 
     this.bindKeyboard = function(keyboard) {
