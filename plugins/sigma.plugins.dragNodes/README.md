@@ -1,7 +1,7 @@
 sigma.plugins.dragNodes
 =====================
 
-Plugin developed by [José M. Camacho](https://github.com/josemazo), events by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious).
+Plugin developed by [José M. Camacho](https://github.com/josemazo), events by [Sébastien Heymann](https://github.com/sheymann) for [Linkurious](https://github.com/Linkurious), multiple selection by events by [Martin de la Taille](https://github.com/martindelataille) for [Linkurious](https://github.com/Linkurious).
 
 ---
 
@@ -10,7 +10,7 @@ This plugin provides a method to drag & drop nodes. At the moment, this plugin i
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var dragListener = new sigma.plugins.dragNodes(sigInst, renderer);
+var dragListener = new sigma.plugins.dragNodes(sigInst, renderer, array);
 ````
 
 Kill the plugin as follows:
