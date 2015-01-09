@@ -114,11 +114,13 @@
           {
             position: positions[Math.floor(Math.random() * 4)],
             content: icons[Math.floor(Math.random() * icons.length)],
+            fillColor: (Math.random() > 0.5 ? '#fb4c2f' : '#35ac19'),
             hidden: (Math.random() > 0.5 ? false : true)
           },
           {
             position: positions[Math.floor(Math.random() * 4)],
             content: icons[Math.floor(Math.random() * icons.length)],
+            fillColor: (Math.random() > 0.5 ? '#fb4c2f' : '#35ac19'),
             hidden: (Math.random() > 0.5 ? false : true)
           }
         ]
@@ -152,7 +154,7 @@
         glyphFont: 'FontAwesome',
         glyphFontStyle: 'normal',
         glyphTextThreshold: 6,
-        glyphThreshold: 4
+        glyphThreshold: 3
       }
     });
 
