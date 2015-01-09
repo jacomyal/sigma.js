@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <title>Sigma.js Glyph renderer example</title>
   <style>
     html,body {
@@ -20,6 +21,9 @@
   </style>
 </head>
 <body>
+  <!-- we force the loading of the font awesome -->
+  <i class="fa fa-camera-retro fa-1x" style="color: rgba(0,0,0,0);"></i>
+
   <div id="graph-container"></div>
   <!-- START SIGMA IMPORTS -->
   <script src="../src/sigma.core.js"></script>
@@ -86,44 +90,38 @@
         'bottom-left',
         'bottom-right'
       ],
-      colors = [
-        '#965E04',
-        '#C89435',
-        '#F7A456',
-        '#AFCF8A',
-        '#7B39DE',
-        '#B095C0',
-        '#D24556',
-        '#93C2FA',
-        '#9DB09E',
-        '#F8C821'
+      icons = [
+        "\uF11b",
+        "\uF11c",
+        "\uF11d",
+        "\uF128",
+        "\uF129",
+        "\uF130",
+        "\uF131",
+        "\uF132"
       ];
 
     // Generate a random graph:
     for (i = 0; i < N; i++) {
-      var c = colors[Math.floor(Math.random() * colors.length)];
       g.nodes.push({
         id: 'n' + i,
         label: 'Node ' + i,
         x: Math.random(),
         y: Math.random(),
         size: Math.random(),
-        color: c,
-        glyphs: [{
-          position: positions[Math.floor(Math.random() * 4)],
-          // Style 1:
-          fillColor: '#fff',
-          strokeColor: c,
-          strokeIfText: false,
-
-          // Style 2:
-          // textColor: '#fff',
-          // fillColor: c,
-          // strokeColor: '#fff',
-          // strokeIfText: true,
-
-          content: i
-        }]
+        color: '#666',
+        glyphs: [
+          {
+            position: positions[Math.floor(Math.random() * 4)],
+            content: icons[Math.floor(Math.random() * icons.length)],
+            hidden: (Math.random() > 0.5 ? false : true)
+          },
+          {
+            position: positions[Math.floor(Math.random() * 4)],
+            content: icons[Math.floor(Math.random() * icons.length)],
+            hidden: (Math.random() > 0.5 ? false : true)
+          }
+        ]
       });
     }
 
@@ -147,10 +145,14 @@
         zoomMin: 0.001,
         zoomMax: 10,
 
-        glyphLineWidth: 4,
-        glyphStrokeIfText: true,
-        glyphTextThreshold: 7,
-        glyphThreshold: 2
+        glyphScale: 0.7,
+        glyphFillColor: '#666',
+        glyphTextColor: 'white',
+        glyphStrokeColor: 'transparent',
+        glyphFont: 'FontAwesome',
+        glyphFontStyle: 'normal',
+        glyphTextThreshold: 6,
+        glyphThreshold: 4
       }
     });
 

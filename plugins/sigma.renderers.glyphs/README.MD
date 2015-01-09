@@ -7,7 +7,7 @@ Contact: florent.schildknecht@gmail.com
 
 ---
 
-This plugin provides a method to render glyphs at four possible positions on top of nodes.
+This plugin provides a method to render glyphs at four possible positions above the nodes on screen: `top-right`, `top-left`, `bottom-left`, `bottom-right`. This plugin is compatible with **Canvas** node renderers only.
 
 See the following [example code](../../examples/glyphs-renderer.html) for full usage.
 
@@ -53,15 +53,17 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    glyphRadius: 12,
+    glyphScale: 0.6,
     glyphFillColor: 'white',
     glyphTextColor: 'black',
     glyphStrokeColor: 'black',
     glyphLineWidth: 4,
     glyphFontStyle: 'normal',
-    glyphFontSize: 6,
+    glyphFontScale: 1,
     glyphFont: 'Helvetica',
     glyphTextThreshold: 6,
+    glyphStrokeIfText: true,
+    glyphThreshold: 1,
     drawGlyphs: true
   }
 });
@@ -71,26 +73,27 @@ Override these settings anytime `glyphs` is called:
 
 ````javascript
 myRenderer.glyphs({
-  radius: 12,
+  scale: 0.6,
   fillColor: 'white',
   textColor: 'black',
   strokeColor: 'black',
   lineWidth: 4,
   fontStyle: 'normal',
-  fontSize: 6,
+  fontScale: 1,
   font: 'Helvetica',
   textThreshold: 10,
+  strokeIfText: true,
+  threshold: 5,
   draw: true
 });
 ````
 
+## Settings
 
-#### Options
-
- * **glyphRadius**
-   * The glyph radius in pixels.
+ * **glyphScale**
+   * The glyph size proportional to the node size.
    * type: *number*
-   * default value: `10`
+   * default value: `0.5`
  * **glyphFillColor**
    * The glyph background-color.
    * type: *string*
@@ -107,23 +110,61 @@ myRenderer.glyphs({
    * The glyph border-width in pixels.
    * type: *number*
    * default value: `2`
+ * **glyphFont**
+   * The glyph text font-family. Should be included if needed with @font-face or equivalent.
+   * type: *string*
+   * default value: `Arial`
  * **glyphFontStyle**
    * The glyph text font-style.
    * type: *string*
    * default value: `normal`
- * **glyphFontSize**
-   * The glyph text font-size in pixels.
+ * **glyphFontScale**
+   * The font size proportional to the glyph size.
    * type: *number*
-   * default value: `2`
- * **glyphFont**
-   * The glyph text font-family in pixels. Should be included if needed with @font-face or equivalent.
-   * type: *string*
-   * default value: `Arial`
- * **glyphThreshold**
+   * default value: `1`
+ * **glyphTextThreshold**
    * The minimum size a node must have to see its glyph text displayed.
    * type: *number*
    * default value: `6`
+ * **glyphStrokeIfText**
+   * A flag to display glyph strokes only if its text is displayed.
+   * type: *boolean*
+   * default value: `false`
+ * **glyphThreshold**
+   * The minimum size a node must have to see its glyph displayed.
+   * type: *number*
+   * default value: `1`
  * **drawGlyphs**
    * A flag to display glyphs or not.
    * type: *boolean*
-   * default value: `false`
+   * default value: `true`
+
+## Font-icons
+
+Custom webfonts are supported in glyphs!
+
+See the following [example code](../../examples/glyphs-renderer-icons.html).
+
+You just need to make sure your custom font is actually loaded before actually using it in a graph, using the W3C CSS Font Loading API. You can use a shim like [zachleat/fontfaceonload](https://github.com/zachleat/fontfaceonload) or [bramstein/fontloader](https://github.com/bramstein/fontloader) to support non-evergreen browsers.
+
+The syntax to use a webfont in glyph objects is simple:
+
+```javascript
+{
+  glyphs: [{
+    font: 'FontAwesome',
+    content: '☺', // or custom fontawesome code eg. "\uF129"
+  }]
+}
+```
+
+Notice that you may set the font for all glyphs:
+
+```javascript
+new sigma({
+  settings: {
+    glyphFont: 'FontAwesome'
+  }
+  ...
+});
+```

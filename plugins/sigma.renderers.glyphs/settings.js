@@ -11,8 +11,8 @@
   * Extended sigma settings.
   */
   var settings = {
-    // {number} The glyph radius in pixels.
-    glyphRadius: 10,
+    // {number} The glyph size ratio compared to the node size.
+    glyphScale: 0.5,
     // {string} The glyph background-color.
     glyphFillColor: 'white',
     // {string} The glyph text-color.
@@ -21,15 +21,19 @@
     glyphStrokeColor: 'black',
     // {number} The glyph border-width in pixels.
     glyphLineWidth: 2,
+    // {string} The glyph text font-family. Should be included if needed with
+    // @font-face or equivalent.
+    glyphFont: 'Arial',
     // {string} The glyph text font-style.
     glyphFontStyle: 'normal',
-    // {number} The glyph text font-size in pixels.
-    glyphFontSize: 6,
-    // {string} The glyph text font-family in pixels. Should be included if
-    // needed with @font-face or equivalent.
-    glyphFont: 'Arial',
+    // {number} The font size ratio compared to the glyph size.
+    glyphFontScale: 1,
     // {number} The minimum size a node must have to see its glyph text displayed.
-    glyphTextThreshold: 6,
+    glyphTextThreshold: 7,
+    // {boolean} A flag to display glyph strokes only if its text is displayed.
+    glyphStrokeIfText: false,
+    // {number} The minimum size a node must have to see its glyph displayed.
+    glyphThreshold: 1,
     // {boolean} A flag to display glyphs or not.
     drawGlyphs: true
   };

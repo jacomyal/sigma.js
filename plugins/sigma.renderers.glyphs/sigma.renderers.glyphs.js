@@ -26,16 +26,16 @@
 
     var defFont = params.font || this.settings('glyphFont'),
         defFontStyle = params.fontStyle || this.settings('glyphFontStyle'),
-        defFontSize = this.settings('labelSizeRatio') *
-          (params.fontSize || this.settings('glyphFontSize')) *
-          this.settings('zoomingRatio'),
+        defFontScale = params.fontScale || this.settings('glyphFontScale'),
         defStrokeColor = params.strokeColor || this.settings('glyphStrokeColor'),
         defLineWidth = params.lineWidth || this.settings('glyphLineWidth'),
         defFillColor = params.fillColor || this.settings('glyphFillColor'),
-        defRadius = params.radius || this.settings('glyphRadius'),
+        defScale = params.scale || this.settings('glyphScale'),
         defTextColor = params.textColor || this.settings('glyphTextColor'),
         defTextThreshold = params.textThreshold || this.settings('glyphTextThreshold'),
-        defDraw = params.draw || this.settings('drawGlyphs');
+        defStrokeIfText = ('strokeIfText' in params) ? params.strokeIfText : this.settings('glyphStrokeIfText'),
+        defThreshold = params.threshold || this.settings('glyphThreshold'),
+        defDraw = ('draw' in params) ? params.draw : this.settings('drawGlyphs');
 
     if (!this.domElements['glyphs']) {
       this.initDOM('canvas', 'glyphs');
@@ -48,10 +48,9 @@
     }
     this.drawingContext = this.domElements['glyphs'].getContext('2d');
     this.drawingContext.textAlign = 'center';
+    this.drawingContext.textBaseline = 'middle';
     this.drawingContext.lineWidth = defLineWidth;
-    this.drawingContext.font = defFontStyle + ' ' + defFontSize + 'px ' + defFont;
     this.drawingContext.strokeStyle = defStrokeColor;
-
 
     var self = this,
         nodes = this.nodesOnScreen || [],
@@ -65,8 +64,9 @@
         cos315 = Math.cos(degreesToRadians(315)),
         sin315 = Math.sin(degreesToRadians(315));
 
-    function draw (o, textThreshold, context) {
-      if (o.draw && o.x && o.y) {
+    function draw (o, context) {
+        // console.log(o.draw);
+      if (o.draw && o.x && o.y && o.radius > o.threshold) {
         var x = o.x,
             y = o.y;
 
@@ -97,17 +97,20 @@
         context.beginPath();
         context.arc(x, y, o.radius, 2 * Math.PI, false);
         context.closePath();
-        if (context.lineWidth) context.stroke();
+        if (!o.strokeIfText || o.radius > o.textThreshold) {
+          context.stroke();
+        }
         context.fill();
 
         // Glyph content rendering
-        if (o.radius > textThreshold) {
-          var font =  o.fontStyle + ' ' + o.fontSize + 'px ' + o.font;
+        if (o.radius > o.textThreshold) {
+          var fontSize = Math.round(o.fontScale * o.radius);
+          var font =  o.fontStyle + ' ' + fontSize + 'px ' + o.font;
           if (font !== context.font) {
             context.font = font;
           }
           context.fillStyle = o.textColor;
-          context.fillText(o.content, x, y + o.radius * 0.5);
+          context.fillText(o.content, x, y);
         }
       }
     };
@@ -121,18 +124,20 @@
               y: node[prefix + 'y'],
               nodeSize: node[prefix + 'size'] || 0,
               position: glyph.position,
-              radius: glyph.size || node[prefix + 'size'] / 2 || defRadius,
+              radius: glyph.size || node[prefix + 'size'] * defScale,
               content: (glyph.content || '').toString() || '',
               lineWidth: glyph.lineWidth || defLineWidth,
               fillColor: glyph.fillColor || defFillColor,
               textColor: glyph.textColor || defTextColor,
               strokeColor: glyph.strokeColor || defStrokeColor,
+              strokeIfText: ('strokeIfText' in glyph) ? glyph.strokeIfText : defStrokeIfText,
               fontStyle: glyph.fontStyle || defFontStyle,
               font: glyph.font || defFont,
-              fontSize: glyph.fontSize || defFontSize,
-              draw: !glyph.hidden || defDraw
+              fontScale: glyph.fontScale || defFontScale,
+              threshold: glyph.threshold || defThreshold,
+              textThreshold: glyph.textThreshold || defTextThreshold,
+              draw: (defDraw) ? !glyph.hidden : false
             },
-            glyph.threshold || defTextThreshold,
             self.drawingContext
           );
         });
