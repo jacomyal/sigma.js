@@ -33,7 +33,7 @@
    * @param  {sigma}    s        The related sigma instance.
    * @param  {renderer} renderer The related renderer instance.
    */
-  function DragNodes(s, renderer) {
+  function DragNodes(s, renderer, a) {
     sigma.classes.dispatcher.extend(this);
 
     // A quick hardcoded rule to prevent people from using this plugin with the
@@ -49,6 +49,7 @@
     // Init variables:
     var _self = this,
       _s = s,
+      _a = a,
       _body = document.body,
       _renderer = renderer,
       _mouse = renderer.container.lastChild,
@@ -204,7 +205,7 @@
         captor: event,
         renderer: _renderer
       });
-      
+
       _drag = false;
       _node = null;
     };
@@ -236,6 +237,25 @@
             renY: n[_prefix + 'y'],
           };
           ref.push(aux);
+        }
+
+        if(_a) {
+          var activeNodes = _a.nodes();
+          for(var i = 0; i < activeNodes.length; i++) {
+            if(!activeNodes[i].alphaX) {
+              var alphaX = Math.abs(_node.x - activeNodes[i].x);
+              var alphaY = Math.abs(_node.y - activeNodes[i].y);
+
+              activeNodes[i].alphaX = alphaX;
+              activeNodes[i].alphaY = alphaY;
+            }
+
+            var x2 = _node.x*activeNodes[i].alphaX + (1-activeNodes[i].alphaX)*activeNodes[i].x;
+            var y2 = _node.y*activeNodes[i].alphaY + (1-activeNodes[i].alphaY)*activeNodes[i].y;
+
+            activeNodes[i].x = x2 * cos - y2 * sin;
+            activeNodes[i].y = y2 * cos + x2 * sin;
+          }
         }
 
         // Applying linear interpolation.
@@ -272,10 +292,13 @@
    * @param  {sigma} s The related sigma instance.
    * @param  {renderer} renderer The related renderer instance.
    */
-  sigma.plugins.dragNodes = function(s, renderer) {
+  sigma.plugins.dragNodes = function(s, renderer, a) {
+    var a = a ? a : null;
+
     // Create object if undefined
     if (!_instance[s.id]) {
-      _instance[s.id] = new DragNodes(s, renderer);
+      // Handle drag events:
+      _instance[s.id] = new DragNodes(s, renderer, a);
     }
 
     s.bind('kill', function() {
