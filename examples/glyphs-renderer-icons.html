@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <title>Sigma.js Glyph renderer example</title>
+  <style>
+    html,body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- we force the loading of the font awesome -->
+  <i class="fa fa-camera-retro fa-1x" style="color: rgba(0,0,0,0);"></i>
+
+  <div id="graph-container"></div>
+  <!-- START SIGMA IMPORTS -->
+  <script src="../src/sigma.core.js"></script>
+  <script src="../src/conrad.js"></script>
+  <script src="../src/utils/sigma.utils.js"></script>
+  <script src="../src/utils/sigma.polyfills.js"></script>
+  <script src="../src/sigma.settings.js"></script>
+  <script src="../src/classes/sigma.classes.dispatcher.js"></script>
+  <script src="../src/classes/sigma.classes.configurable.js"></script>
+  <script src="../src/classes/sigma.classes.graph.js"></script>
+  <script src="../src/classes/sigma.classes.camera.js"></script>
+  <script src="../src/classes/sigma.classes.quad.js"></script>
+  <script src="../src/classes/sigma.classes.edgequad.js"></script>
+  <script src="../src/captors/sigma.captors.mouse.js"></script>
+  <script src="../src/captors/sigma.captors.touch.js"></script>
+  <script src="../src/renderers/sigma.renderers.canvas.js"></script>
+  <script src="../src/renderers/sigma.renderers.webgl.js"></script>
+  <script src="../src/renderers/sigma.renderers.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+  <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+  <script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+  <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+  <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+  <script src="../src/misc/sigma.misc.animation.js"></script>
+  <script src="../src/misc/sigma.misc.bindEvents.js"></script>
+  <script src="../src/misc/sigma.misc.drawHovers.js"></script>
+  <!-- END SIGMA IMPORTS -->
+  <script src="../plugins/sigma.renderers.glyphs/settings.js"></script>
+  <script src="../plugins/sigma.renderers.glyphs/sigma.renderers.glyphs.js"></script>
+  <script>
+    /**
+     * This is a basic example on how to instantiate sigma. A random graph is
+     * generated and stored in the "graph" variable, and then sigma is instantiated
+     * directly with the graph.
+     *
+     * The simple instance of sigma is enough to make it render the graph on the on
+     * the screen, since the graph is given directly to the constructor.
+     */
+    var i,
+      sigmaInstance,
+      N = 100,
+      E = 500,
+      g = {
+        nodes: [],
+        edges: []
+      },
+      positions = [
+        'top-right',
+        'top-left',
+        'bottom-left',
+        'bottom-right'
+      ],
+      icons = [
+        "\uF11b",
+        "\uF11c",
+        "\uF11d",
+        "\uF128",
+        "\uF129",
+        "\uF130",
+        "\uF131",
+        "\uF132"
+      ];
+
+    // Generate a random graph:
+    for (i = 0; i < N; i++) {
+      g.nodes.push({
+        id: 'n' + i,
+        label: 'Node ' + i,
+        x: Math.random(),
+        y: Math.random(),
+        size: Math.random(),
+        color: '#666',
+        glyphs: [
+          {
+            position: positions[Math.floor(Math.random() * 4)],
+            content: icons[Math.floor(Math.random() * icons.length)],
+            fillColor: (Math.random() > 0.5 ? '#fb4c2f' : '#35ac19'),
+            hidden: (Math.random() > 0.5 ? false : true)
+          },
+          {
+            position: positions[Math.floor(Math.random() * 4)],
+            content: icons[Math.floor(Math.random() * icons.length)],
+            fillColor: (Math.random() > 0.5 ? '#fb4c2f' : '#35ac19'),
+            hidden: (Math.random() > 0.5 ? false : true)
+          }
+        ]
+      });
+    }
+
+    for (i = 0; i < E; i++) {
+      g.edges.push({
+        id: 'e' + i,
+        source: 'n' + (Math.random() * N | 0),
+        target: 'n' + (Math.random() * N | 0),
+        size: Math.random(),
+        color: '#ccc'
+      });
+    }
+
+    sigma.renderers.def = sigma.renderers.canvas;
+
+    // Instantiate sigma:
+    sigmaInstance = new sigma({
+      graph: g,
+      container: 'graph-container',
+      settings: {
+        zoomMin: 0.001,
+        zoomMax: 10,
+
+        glyphScale: 0.7,
+        glyphFillColor: '#666',
+        glyphTextColor: 'white',
+        glyphStrokeColor: 'transparent',
+        glyphFont: 'FontAwesome',
+        glyphFontStyle: 'normal',
+        glyphTextThreshold: 6,
+        glyphThreshold: 3
+      }
+    });
+
+    var myRenderer = sigmaInstance.renderers[0];
+
+    myRenderer.glyphs();
+
+    myRenderer.bind('render', function(e) {
+      myRenderer.glyphs();
+    });
+  </script>
+</body>
+</html>

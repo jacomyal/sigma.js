@@ -97,6 +97,7 @@ module.exports = function(grunt) {
     'renderers.customEdgeShapes',
     'renderers.customShapes',
     'renderers.edgeLabels',
+    'renderers.glyphs',
     'renderers.halo',
     'renderers.linkurious',
     'renderers.snapshot',
