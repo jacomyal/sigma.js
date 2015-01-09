@@ -72,20 +72,20 @@
 
         switch (o.position) {
           case 'top-right':
-            x += o.nodeSize * cos45;
-            y += o.nodeSize * sin45;
+            x += o.nodeSize * cos315;
+            y += o.nodeSize * sin315;
             break;
           case 'top-left':
-            x += o.nodeSize * cos135;
-            y += o.nodeSize * sin135;
-            break;
-          case 'bottom-left':
             x += o.nodeSize * cos225;
             y += o.nodeSize * sin225;
             break;
+          case 'bottom-left':
+            x += o.nodeSize * cos135;
+            y += o.nodeSize * sin135;
+            break;
           case 'bottom-right':
-            x += o.nodeSize * cos315;
-            y += o.nodeSize * sin315;
+            x += o.nodeSize * cos45;
+            y += o.nodeSize * sin45;
             break;
         }
 
