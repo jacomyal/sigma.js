@@ -67,6 +67,7 @@
 	context.closePath();
 	context.fill();
     }
+    //drawing animated part
     context.lineWidth = overlay;
     context.beginPath();
     context.moveTo(sX, sY);
