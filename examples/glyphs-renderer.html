@@ -65,7 +65,6 @@
   <script src="../plugins/sigma.renderers.glyphs/settings.js"></script>
   <script src="../plugins/sigma.renderers.glyphs/sigma.renderers.glyphs.js"></script>
   <script>
-    sigma.renderers.def = sigma.renderers.canvas;
     /**
      * This is a basic example on how to instantiate sigma. A random graph is
      * generated and stored in the "graph" variable, and then sigma is instantiated
@@ -120,36 +119,26 @@
 
     // Instantiate sigma:
     sigmaInstance = new sigma({
-      renderer: {
-        type: 'canvas',
-        container: document.getElementById('graph-container')
-      },
+      graph: g,
+      container: 'graph-container',
       settings: {
-        labelThreshold: 7,
         glyphRadius: 12,
         glyphFillColor: 'white',
         glyphTextColor: 'black',
-        glyphStrokeColor: 'black',
+        glyphStrokeColor: '#666',
         glyphLineWidth: 4,
         glyphFontStyle: 'normal',
         glyphFontSize: 6,
-        glyphFontName: 'Helvetica',
-        glyphHidden: false
+        glyphFont: 'Helvetica',
+        glyphTextThreshold: 6,
+        drawGlyphs: true
       }
     });
 
-    sigmaInstance.graph.read(g);
-    sigmaInstance.refresh();
-
-
-    function renderGlyphs() {
-      sigmaInstance.renderers[0].glyphs();
-    }
-
-    renderGlyphs();
+    sigmaInstance.renderers[0].glyphs();
 
     sigmaInstance.renderers[0].bind('render', function(e) {
-      renderGlyphs();
+      sigmaInstance.renderers[0].glyphs();
     });
   </script>
 </body>

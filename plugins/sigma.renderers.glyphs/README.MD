@@ -60,8 +60,9 @@ s = new sigma({
     glyphLineWidth: 4,
     glyphFontStyle: 'normal',
     glyphFontSize: 6,
-    glyphFontName: 'Helvetica',
-    glyphHidden: false
+    glyphFont: 'Helvetica',
+    glyphTextThreshold: 6,
+    drawGlyphs: true
   }
 });
 ````
@@ -69,17 +70,17 @@ s = new sigma({
 Override these settings anytime `glyphs` is called:
 
 ````javascript
-// Render a grey halo of size 100 behind all nodes:
 myRenderer.glyphs({
-  glyphRadius: 12,
-  glyphFillColor: 'white',
-  glyphTextColor: 'black',
-  glyphStrokeColor: 'black',
-  glyphLineWidth: 4,
-  glyphFontStyle: 'normal',
-  glyphFontSize: 6,
-  glyphFontName: 'Helvetica',
-  glyphHidden: false
+  radius: 12,
+  fillColor: 'white',
+  textColor: 'black',
+  strokeColor: 'black',
+  lineWidth: 4,
+  fontStyle: 'normal',
+  fontSize: 6,
+  font: 'Helvetica',
+  textThreshold: 10,
+  draw: true
 });
 ````
 
@@ -114,11 +115,15 @@ myRenderer.glyphs({
    * The glyph text font-size in pixels.
    * type: *number*
    * default value: `2`
- * **glyphFontName**
+ * **glyphFont**
    * The glyph text font-family in pixels. Should be included if needed with @font-face or equivalent.
    * type: *string*
    * default value: `Arial`
- * **glyphHidden**
+ * **glyphThreshold**
+   * The minimum size a node must have to see its glyph text displayed.
+   * type: *number*
+   * default value: `6`
+ * **drawGlyphs**
    * A flag to display glyphs or not.
    * type: *boolean*
    * default value: `false`
