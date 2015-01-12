@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="fonts/font-awesome.css">
 <!-- START SIGMA IMPORTS -->
 <script src="../src/sigma.core.js"></script>
 <script src="../src/conrad.js"></script>
@@ -89,9 +88,6 @@
   <div id="graph-canvas-left"><h1>Canvas</h1></div>
   <div id="graph-webgl-right"><h1>WebGL</h1></div>
 </div>
-
-<!-- we force the loading of the font awesome -->
-<i class="fa fa-camera-retro fa-1x" style="color: rgba(0,0,0,0);"></i>
 <script>
 /**
  * This is a basic example on how to instantiate sigma. A random graph is
@@ -108,35 +104,7 @@ var i,
     g = {
       nodes: [],
       edges: []
-    },
-    urls = [
-      'img/img1.png',
-      'img/img2.png',
-      'img/img3.png',
-      'img/img4.png'
-    ],
-    icons = [
-      "\uF11b",
-      "\uF11c",
-      "\uF11d",
-      "\uF128",
-      "\uF129",
-      "\uF130",
-      "\uF131",
-      "\uF132"
-    ],
-    colors = [
-      '#965E04',
-      '#C89435',
-      '#F7A456',
-      '#AFCF8A',
-      '#7B39DE',
-      '#B095C0',
-      '#D24556',
-      '#93C2FA',
-      '#9DB09E',
-      '#F8C821'
-    ];
+    };
 
 // Generate a random graph:
 for (i = 0; i < N; i++)

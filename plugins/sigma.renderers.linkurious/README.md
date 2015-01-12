@@ -133,7 +133,7 @@ Notes:
 - The shape type will then be applied to crop the image.
 - The `w` and `h` are not supported in WebGL mode.
 
-## Font-icons (Canvas only)
+## Font-icons
 
 Custom webfonts are supported!
 
@@ -273,7 +273,6 @@ The plugin is **NOT** compatible with [sigma.plugins.customShapes](../sigma.plug
 ### Limitations
 
 - WebGL node renderers ignore borders.
-- Icons are not supported by the WebGL renderers.
 
 #### Additional information about image loading
 

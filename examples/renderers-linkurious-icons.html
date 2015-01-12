@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="fonts/font-awesome.css">
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <!-- START SIGMA IMPORTS -->
 <script src="../src/sigma.core.js"></script>
 <script src="../src/conrad.js"></script>
@@ -67,15 +67,27 @@
 <script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.curvedArrow.js"></script>
 <div id="container">
   <style>
-    #graph-container {
+    #graph-canvas-left{
       top: 0;
       bottom: 0;
       left: 0;
+      right: 50%;
+      position: absolute;
+    }
+    #graph-webgl-right{
+      top: 0;
+      bottom: 0;
+      left: 50%;
       right: 0;
       position: absolute;
     }
+    h1 {
+      position: absolute;
+      margin: 0.5em;
+    }
   </style>
-  <div id="graph-container"></div>
+  <div id="graph-canvas-left"><h1>Canvas</h1></div>
+  <div id="graph-webgl-right"><h1>WebGL</h1></div>
 </div>
 
 <!-- we force the loading of the font awesome -->
@@ -152,24 +164,40 @@ for (i = 0; i < E; i++)
     target: 'n' + (Math.random() * N | 0),
     size: Math.random(),
     color: '#ccc',
-    // type: ['curve', 'arrow', 'curvedArrow'][Math.random() * 3 | 0],
     active: [false, true][Math.random() * 1.05 | 0]
   });
 
-// Force canvas
-sigma.renderers.def = sigma.renderers.canvas
+var settings = {
+  nodeActiveColor: 'default',
+  borderSize: 2,
+  outerBorderSize: 3,
+  defaultNodeBorderColor: '#fff',
+  nodeBorderColor: 'default',
+  defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
 
-// Instantiate sigma:
-s = new sigma({
-  graph: g,
-  container: 'graph-container',
-  settings: {
-    nodeActiveColor: 'default',
-    borderSize: 2,
-    outerBorderSize: 3,
-    defaultNodeBorderColor: '#fff',
-    nodeBorderColor: 'default',
-    defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
-  }
-});
+  zoomMin: 0.001,
+  zoomMax: 3,
+
+  spriteSheetMaxSprites: 128   // number max of sprites
+};
+
+setTimeout(function() {
+  var sigmaCanvas = new sigma({
+    graph: g,
+    renderer: {
+      container: document.getElementById('graph-canvas-left'),
+      type: 'canvas'
+    },
+    settings: settings
+  });
+
+  var sigmaWebgl = new sigma({
+    graph: g,
+    renderer: {
+      container: document.getElementById('graph-webgl-right'),
+      type: 'webgl'
+    },
+    settings: settings
+  });
+}, 300);
 </script>
