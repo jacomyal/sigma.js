@@ -79,7 +79,7 @@ See our [performance guide]() to learn more.
 
 ### External Dependencies
 
-Linkurious.js comes with no external dependencies, making it compatible with any Javascript framework and libraries. We integrate it with [Angular.js](https://angularjs.org/) in a Linkurious product.
+Linkurious.js comes with no external dependency, making it compatible with any Javascript framework and library. We integrate it with [Angular.js](https://angularjs.org/) in a Linkurious product.
 
 A few plugins may require external dependencies. Please check their README files.
 
