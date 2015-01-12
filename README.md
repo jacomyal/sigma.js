@@ -87,7 +87,7 @@ A few plugins may require external dependencies. Please check their README files
 
 You can contribute by submitting [issues tickets](http://github.com/Linkurious/sigma.js/issues) and proposing [pull requests](http://github.com/Linkurious/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request by running the command `grunt`.
 
-See our [workflow](https://github.com/Linkurious/sigma.js/wiki/Workflow) to understand where to push your code.
+See [How to fix bugs](https://github.com/Linkurious/sigma.js/wiki/How-to-fix-bugs) and to [How to develop plugins](https://github.com/Linkurious/sigma.js/wiki/How-to-develop-plugins).
 
 The whole source code is validated by the [Google Closure Linter](https://developers.google.com/closure/utilities/) and [JSHint](http://www.jshint.com/), and the comments are written in [JSDoc](http://en.wikipedia.org/wiki/JSDoc) (tags description is available [here](https://developers.google.com/closure/compiler/docs/js-for-compiler)).
 
