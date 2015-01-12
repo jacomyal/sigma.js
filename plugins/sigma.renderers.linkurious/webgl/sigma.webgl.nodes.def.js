@@ -1,4 +1,5 @@
-;(function () {
+;
+(function() {
   'use strict';
 
   sigma.utils.pkg('sigma.webgl.nodes');
@@ -17,7 +18,8 @@
     POINTS: 3,
     ATTRIBUTES: 12,
 
-    addNode: function (node, data, i, prefix, settings) {
+    addNode: function(node, data, i, prefix, settings) {
+
       var self = this;
 
       var trueColor = node.color || settings('defaultNodeColor');
@@ -43,26 +45,27 @@
 
       var scale = 0.7;
 
-      var numPoints = 99; // leave default
+      var numPoints = 999; // leave default
       var imageScaleW = 1.0; // leave default
       var imageScaleH = 1.0;
 
       var isConvex = 1;
       var shapeRotation = 0;
 
-      switch (node.type) {
+      switch (node.type || 'circle') {
 
         case 'circle':
         case 'disc':
-          isConvex  = 1;
+        case 'disk':
+          isConvex = 1;
           numPoints = 999;
-          scale     = 1.0;
+          scale = 1.0;
           break;
 
         case 'square':
-          isConvex   = 0;
+          isConvex = 0;
           numPoints = 4;
-          scale     = 0.7;
+          scale = 0.7;
           if (typeof node.square !== "undefined") {
             if (typeof node.square.rotate === "number") {
               shapeRotation = node.square.rotate;
@@ -71,9 +74,9 @@
           break;
 
         case 'diamond':
-          isConvex  = 0;
+          isConvex = 0;
           numPoints = 4;
-          scale     = 0.7;
+          scale = 0.7;
           shapeRotation = 45 * Math.PI / 180; // 45°
           if (typeof node.diamond !== "undefined") {
             if (typeof node.diamond.rotate === "number") {
@@ -83,9 +86,9 @@
           break;
 
         case 'triangle':
-          isConvex  = 0;
+          isConvex = 0;
           numPoints = 3;
-          scale     = 0.5;
+          scale = 0.5;
           shapeRotation = Math.PI;
           if (typeof node.triangle !== "undefined") {
             if (typeof node.triangle.rotate === "number") {
@@ -95,8 +98,8 @@
           break;
 
         case 'star':
-          isConvex  = 1;
-          scale     = 0.7;
+          isConvex = 1;
+          scale = 0.7;
           numPoints = 5;
           if (typeof node.star !== "undefined") {
             if (typeof node.star.numPoints === "number") {
@@ -110,19 +113,19 @@
           break;
 
         case 'seastar':
-            isConvex  = 2;
-            scale     = 0.5;
-            numPoints = 5;
-            if (typeof node.seastar !== "undefined") {
-              if (typeof node.seastar.numPoints === 'number') {
-                numPoints = node.seastar.numPoints;
-              }
-              if (typeof node.seastar.rotate === 'number') {
-                shapeRotation = node.seastar.rotate;
-              }
-              // innerRatio: node.star.innerRatio || 1.0 // ratio of inner radius in star, compared to node.size
+          isConvex = 2;
+          scale = 0.5;
+          numPoints = 5;
+          if (typeof node.seastar !== "undefined") {
+            if (typeof node.seastar.numPoints === 'number') {
+              numPoints = node.seastar.numPoints;
             }
-            break;
+            if (typeof node.seastar.rotate === 'number') {
+              shapeRotation = node.seastar.rotate;
+            }
+            // innerRatio: node.star.innerRatio || 1.0 // ratio of inner radius in star, compared to node.size
+          }
+          break;
 
 
 
@@ -224,7 +227,8 @@
         var bgColor = node.color || trueColor;
 
         // adjust icon position
-        var px = 0.5, py = 0.5;
+        var px = 0.5,
+          py = 0.5;
         if (typeof node.icon.x === "number") {
           px = node.icon.x;
         }
@@ -232,7 +236,7 @@
           py = node.icon.y;
         }
 
-        imageIndex = self.getText(settings, font, bgColor, fgColor, fontSizeRatio, px, py, content);
+        imageIndex = self.getText(font, bgColor, fgColor, fontSizeRatio, px, py, content);
 
       }
 
@@ -240,7 +244,7 @@
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'] || 1;
+      data[i++] = node[prefix + 'size'];
       data[i++] = color;
       data[i++] = 0;
       data[i++] = isConvex;
@@ -255,7 +259,7 @@
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'] || 1;
+      data[i++] = node[prefix + 'size'];
       data[i++] = color;
       data[i++] = 2 * Math.PI / 3;
       data[i++] = isConvex;
@@ -269,7 +273,7 @@
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'] || 1;
+      data[i++] = node[prefix + 'size'];
       data[i++] = color;
       data[i++] = 4 * Math.PI / 3;
       data[i++] = isConvex;
@@ -284,7 +288,7 @@
 
     },
 
-    render: function (gl, program, data, params) {
+    render: function(gl, program, data, params) {
       var buffer, self = this,
         args = arguments;
 
@@ -315,7 +319,7 @@
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
       gl.uniform2f(resolutionLocation, params.width, params.height);
       gl.uniform1f(
-      ratioLocation, 1 / Math.pow(params.ratio, params.settings('nodesPowRatio')));
+        ratioLocation, 1 / Math.pow(params.ratio, params.settings('nodesPowRatio')));
       gl.uniform1f(scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
 
@@ -331,19 +335,19 @@
       gl.enableVertexAttribArray(imageLocation);
 
       gl.vertexAttribPointer(
-      positionLocation, 2, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+        positionLocation, 2, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
       gl.vertexAttribPointer(
-      sizeLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+        sizeLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
       gl.vertexAttribPointer(
-      colorLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
+        colorLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
       gl.vertexAttribPointer(
-      angleLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+        angleLocation, 1, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
 
       gl.vertexAttribPointer(
-      shapeLocation, 4, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+        shapeLocation, 4, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
 
       gl.vertexAttribPointer(
-      imageLocation, 3, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 36);
+        imageLocation, 3, gl.FLOAT, false, this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 36);
 
 
 
@@ -384,7 +388,7 @@
         //  gl.bindTexture(gl.TEXTURE_2D, null);
         //console.log("empty texture created");
         // this is a temporary hack, to force refresh
-        setTimeout(function () {
+        setTimeout(function() {
           self.render.apply(self, args);
         }, 1000);
       }
@@ -404,7 +408,7 @@
           gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
           gl.texImage2D(
-          gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.spriteSheet.canvas);
+            gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self.spriteSheet.canvas);
           //console.log("texture updated");
         }
 
@@ -421,11 +425,11 @@
 
     },
 
-    initProgram: function (gl) {
+    initProgram: function(gl) {
       var vertexShader, fragmentShader, program;
 
       vertexShader = sigma.utils.loadShader(
-      gl, [
+        gl, [
           'attribute vec2 a_position;',
           'attribute float a_size;',
           'attribute float a_color;',
@@ -449,57 +453,57 @@
           'varying vec3 image;',
 
           'void main() {',
-            // Multiply the point size twice:
-            'radius = a_size * u_ratio;',
+          // Multiply the point size twice:
+          'radius = a_size * u_ratio;',
 
-            // Scale from [[-1 1] [-1 1]] to the container:
-            'vec2 position = (u_matrix * vec3(a_position, 1)).xy;',
+          // Scale from [[-1 1] [-1 1]] to the container:
+          'vec2 position = (u_matrix * vec3(a_position, 1)).xy;',
 
-            'center = position * u_scale;',
-            'center = vec2(center.x, u_scale * u_resolution.y - center.y);',
+          'center = position * u_scale;',
+          'center = vec2(center.x, u_scale * u_resolution.y - center.y);',
 
-            'position = position +',
-              '2.0 * radius * vec2(cos(a_angle), sin(a_angle));',
-            'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
+          'position = position +',
+          '2.0 * radius * vec2(cos(a_angle), sin(a_angle));',
+          'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
-            'radius = radius * u_scale;',
+          'radius = radius * u_scale;',
 
-            // s: isconvex, t: angles, p: scale, q: rotation
-            'shape = a_shape;',
-            'image = a_image;',
+          // s: isconvex, t: angles, p: scale, q: rotation
+          'shape = a_shape;',
+          'image = a_image;',
 
-            // compute the index in the texture
-            'highp vec2 sp = ',
-              'vec2(mod((a_image.s * u_sprite_dim.x), u_texture_dim.x),',
-              'floor((a_image.s * u_sprite_dim.x) / u_texture_dim.y) * u_sprite_dim.y);',
+          // compute the index in the texture
+          'highp vec2 sp = ',
+          'vec2(mod((a_image.s * u_sprite_dim.x), u_texture_dim.x),',
+          'floor((a_image.s * u_sprite_dim.x) / u_texture_dim.y) * u_sprite_dim.y);',
 
-            // move pointer to center of sprite
-            'sp = vec2(sp.x + (u_sprite_dim.x * 0.5),',
-                     ' sp.y + (u_sprite_dim.y * 0.5));',
+          // move pointer to center of sprite
+          'sp = vec2(sp.x + (u_sprite_dim.x * 0.5),',
+          ' sp.y + (u_sprite_dim.y * 0.5));',
 
-            // we have the coordinates in pixel, we need to normalize [0.0, 1.0]
-            'v_sprite = vec4(',
-              'sp.x / u_texture_dim.x,',
-              'sp.y / u_texture_dim.y,',
-              'u_sprite_dim.x / u_texture_dim.x,',
+          // we have the coordinates in pixel, we need to normalize [0.0, 1.0]
+          'v_sprite = vec4(',
+          'sp.x / u_texture_dim.x,',
+          'sp.y / u_texture_dim.y,',
+          'u_sprite_dim.x / u_texture_dim.x,',
 
-              // https://www.khronos.org/webgl/public-mailing-list/archives/1212/msg00050.html
-              '- u_sprite_dim.y / u_texture_dim.y', // the minus here is to flip the texture
-            ');',
+          // https://www.khronos.org/webgl/public-mailing-list/archives/1212/msg00050.html
+          '- u_sprite_dim.y / u_texture_dim.y', // the minus here is to flip the texture
+          ');',
 
-            'gl_Position = vec4(position, 0, 1);',
+          'gl_Position = vec4(position, 0, 1);',
 
-            // Extract the color:
-            'float c = a_color;',
-            'color.b = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.g = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0;',
+          // Extract the color:
+          'float c = a_color;',
+          'color.b = mod(c, 256.0); c = floor(c / 256.0);',
+          'color.g = mod(c, 256.0); c = floor(c / 256.0);',
+          'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
+          'color.a = 1.0;',
           '}'
-      ].join('\n'), gl.VERTEX_SHADER);
+        ].join('\n'), gl.VERTEX_SHADER);
 
       fragmentShader = sigma.utils.loadShader(
-      gl, [
+        gl, [
 
           '#ifdef GL_ES',
           'precision mediump float;',
@@ -520,140 +524,140 @@
           'void main(void) {',
 
 
-            // s: isconvex, t: angles, p: scale, q: rotation
+          // s: isconvex, t: angles, p: scale, q: rotation
 
-            'int angles = int(shape.t);', // nb angles
-            'int convex = int(shape.s);', // 0 for concave, 1 for convex
+          'int angles = int(shape.t);', // nb angles
+          'int convex = int(shape.s);', // 0 for concave, 1 for convex
 
-            'vec2 m = gl_FragCoord.xy - center;',
+          'vec2 m = gl_FragCoord.xy - center;',
 
-            'vec2 p = m.xy/radius;',
-
-
-            'float theta = atan(p.y,p.x);',
-
-            // transparent
-            'vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);',
+          'vec2 p = m.xy/radius;',
 
 
-            // if we want to rotate the background:
-            //'float bgAngle = 0.8;',
-            //'mat2 bgRot = mat2(cos(bgAngle),sin(bgAngle),-sin(bgAngle),cos(bgAngle));',
-            //'vec2 sp = p * bgRot;',
+          'float theta = atan(p.y,p.x);',
+
+          // transparent
+          'vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);',
 
 
-            // now we need to normalize pixels
-
-            'vec4 color1 = (image.s >= 0.0) ?',
-             ' texture2D(u_sampler, ',
-                'vec2(',
-                   '(v_sprite.s + v_sprite.p * p.x * 0.5 * image.t),',
-                   '(v_sprite.t + v_sprite.q * p.y * 0.5 * image.p)',
-                  '))',
-             ' : color',
-            ';',
+          // if we want to rotate the background:
+          //'float bgAngle = 0.8;',
+          //'mat2 bgRot = mat2(cos(bgAngle),sin(bgAngle),-sin(bgAngle),cos(bgAngle));',
+          //'vec2 sp = p * bgRot;',
 
 
-            // rotate the shape (shape.q is the rotation angle)
-            'mat2 shapeRot = mat2(cos(shape.q),sin(shape.q),-sin(shape.q),cos(shape.q));',
-            'p = p * shapeRot;',
+          // now we need to normalize pixels
+
+          'vec4 color1 = (image.s >= 0.0) ?',
+          ' texture2D(u_sampler, ',
+          'vec2(',
+          '(v_sprite.s + v_sprite.p * p.x * 0.5 * image.t),',
+          '(v_sprite.t + v_sprite.q * p.y * 0.5 * image.p)',
+          '))',
+          ' : color',
+          ';',
 
 
-            // render a disc
-            'if (angles > 9) {',
-              'gl_FragColor = ',
-                 // check if we are in the circle
-                 '((radius - sqrt(m.x * m.x + m.y * m.y)) > 0.0)',
-                   '? color1 : color0;',
-
-            // render a cross
-            '} else if (angles > 8){',
-              'gl_FragColor = (',
-                    '(abs(p.x) > 0.0 && abs(p.x) < (1.0 - sin(shape.p)) && abs(p.y) < shape.p)',
-                 '|| (abs(p.y) > 0.0 && abs(p.y) < (1.0 - sin(shape.p)) && abs(p.x) < shape.p)',
-                 ') ? color1 : color0;',
-
-            // render a polygon
-            // note: this method does not permit changing a star's inner radius
-            '} else {',
-
-              // render a rounded star
+          // rotate the shape (shape.q is the rotation angle)
+          'mat2 shapeRot = mat2(cos(shape.q),sin(shape.q),-sin(shape.q),cos(shape.q));',
+          'p = p * shapeRot;',
 
 
-               /*
-              'if (false){', //convex > 0) {',
-                 // here shape.s is the number of angles and already in float
-                 // so we use it directly rather than 'angles'
-                  'float pk = 0.2;',
-                  'float k = 0.5;',
-                  'float radstart = 0.4;',
-                  'float n = 5.0;',
-                  'float powr = 1.0;',
+          // render a disc
+          'if (angles > 9) {',
+          'gl_FragColor = ',
+          // check if we are in the circle
+          '((radius - sqrt(m.x * m.x + m.y * m.y)) > 0.0)',
+          '? color1 : color0;',
 
-                  'if (dot(p,p) < ',
-                    '(1.0/pk',
-                      '* 1.0 / (',
-                       '1.0 - k ',
-                        '* pow(',
-                             '2.0*n ',
-                            '* abs(',
-                               'mod(',
-                                '(theta + radstart) / PI_2, 1.0/n) ',
-                                ' - 1.0/(2.0 * n)',
-                               ')',
-                              ', powr',
-                            ')',
-                        ')',
-                      ')',
-                    ') {',
-                  //'if (dot(p,p) < (  1.0 / exp(acos(sin(theta*shape.t)*0.5)))  )',
-                  '  gl_FragColor = color1;',
-                  'else ',
-                     'discard;',
-              '} else {',
-              */
+          // render a cross
+          '} else if (angles > 8){',
+          'gl_FragColor = (',
+          '(abs(p.x) > 0.0 && abs(p.x) < (1.0 - sin(shape.p)) && abs(p.y) < shape.p)',
+          '|| (abs(p.y) > 0.0 && abs(p.y) < (1.0 - sin(shape.p)) && abs(p.x) < shape.p)',
+          ') ? color1 : color0;',
+
+          // render a polygon
+          // note: this method does not permit changing a star's inner radius
+          '} else {',
+
+          // render a rounded star
 
 
-              // divide scale by two for convex shapes, so that spikes are not cropped
-              'float scale = (convex > 0) ? shape.p * 0.5 : shape.p;',
+          /*
+          'if (false){', //convex > 0) {',
+          // here shape.s is the number of angles and already in float
+          // so we use it directly rather than 'angles'
+          'float pk = 0.2;',
+          'float k = 0.5;',
+          'float radstart = 0.4;',
+          'float n = 5.0;',
+          'float powr = 1.0;',
 
-              // compute the angle for each side
-              'float angle = PI_2 / shape.t;',
-              'mat2 t = mat2(cos(angle),sin(angle),-sin(angle),cos(angle));',
+          'if (dot(p,p) < ',
+          '(1.0/pk',
+          '* 1.0 / (',
+          '1.0 - k ',
+          '* pow(',
+          '2.0*n ',
+          '* abs(',
+          'mod(',
+          '(theta + radstart) / PI_2, 1.0/n) ',
+          ' - 1.0/(2.0 * n)',
+          ')',
+          ', powr',
+          ')',
+          ')',
+          ')',
+          ') {',
+          //'if (dot(p,p) < (  1.0 / exp(acos(sin(theta*shape.t)*0.5)))  )',
+          '  gl_FragColor = color1;',
+          'else ',
+          'discard;',
+          '} else {',
+          */
 
-              'int q = 0;',
-              'for (int i=0;i<MAX_ANGLES;i++) {',
-                'if (i >= angles) break;',
 
-                 'if (p.y < scale) q++;',
+          // divide scale by two for convex shapes, so that spikes are not cropped
+          'float scale = (convex > 0) ? shape.p * 0.5 : shape.p;',
 
-                 'p *= t;',
-              '}',
+          // compute the angle for each side
+          'float angle = PI_2 / shape.t;',
+          'mat2 t = mat2(cos(angle),sin(angle),-sin(angle),cos(angle));',
 
-              'gl_FragColor =',
-                '((convex > 0)',  // select the kind of polygon
-                   '? (q > angles - (angles - 1) / 2)', // convex
-                   ': (q > angles - 1))',               // concave
-                '? color1 : color0;',  // inside: color, outside: transparent
-              //  '}',
-            '}',
+          'int q = 0;',
+          'for (int i=0;i<MAX_ANGLES;i++) {',
+          'if (i >= angles) break;',
+
+          'if (p.y < scale) q++;',
+
+          'p *= t;',
+          '}',
+
+          'gl_FragColor =',
+          '((convex > 0)', // select the kind of polygon
+          '? (q > angles - (angles - 1) / 2)', // convex
+          ': (q > angles - 1))', // concave
+          '? color1 : color0;', // inside: color, outside: transparent
+          //  '}',
+          '}',
 
 
           '}'
-      ].join('\n'), gl.FRAGMENT_SHADER);
+        ].join('\n'), gl.FRAGMENT_SHADER);
 
       program = sigma.utils.loadProgram(gl, [vertexShader, fragmentShader]);
 
       return program;
     },
 
-    createSpriteSheet: function (settings) {
+    createSpriteSheet: function(settings) {
       var self = this;
 
       var config = {
-              maxWidth: settings('spriteSheetResolution')   || 2048,
-              maxHeight: settings('spriteSheetResolution')  || 2048,
-              maxSprites: settings('spriteSheetMaxSprites') || 256
+        maxWidth: settings('spriteSheetResolution') || 2048,
+        maxHeight: settings('spriteSheetResolution') || 2048,
+        maxSprites: settings('spriteSheetMaxSprites') || 256
       };
 
       //console.log(config);
@@ -683,7 +687,7 @@
 
     },
 
-    getText: function (font, bgColor, fgColor, fontSizeRatio, px, py, text) {
+    getText: function(font, bgColor, fgColor, fontSizeRatio, px, py, text) {
 
       var self = this;
 
@@ -693,12 +697,12 @@
       var phy = py * self.spriteSheet.spriteHeight;
 
       var uid = font +
-         ':' + bgColor +
-         ':' + fgColor +
-         ':' + fontSize +
-         ':' + text +
-         ':' + pwx +
-         ':' + phy;
+        ':' + bgColor +
+        ':' + fgColor +
+        ':' + fontSize +
+        ':' + text +
+        ':' + pwx +
+        ':' + phy;
 
       if (uid in self.spriteSheet.urlToIndex) {
         return self.spriteSheet.urlToIndex[uid];
@@ -712,13 +716,13 @@
 
       var x = (index * self.spriteSheet.spriteWidth) % self.spriteSheet.maxWidth;
       var y = Math.floor(
-          (index * self.spriteSheet.spriteWidth) / self.spriteSheet.maxWidth
-        ) * self.spriteSheet.spriteHeight;
+        (index * self.spriteSheet.spriteWidth) / self.spriteSheet.maxWidth
+      ) * self.spriteSheet.spriteHeight;
 
       var ctx = self.spriteSheet.canvas.getContext('2d');
 
       ctx.beginPath();
-      ctx.rect(x, y, self.spriteSheet.spriteWidth,  self.spriteSheet.spriteHeight);
+      ctx.rect(x, y, self.spriteSheet.spriteWidth, self.spriteSheet.spriteHeight);
       ctx.fillStyle = bgColor;
       ctx.fill();
 
@@ -738,7 +742,7 @@
     // there is an unmanaged cache, which will incrementally grow in size
     // in the future we should fix this memory leak somehow, eg. limited size
     // of the cache (parametrable)
-    getImage: function (url, imgCrossOrigin) {
+    getImage: function(url, imgCrossOrigin) {
 
       var self = this;
 
@@ -769,7 +773,7 @@
 
       img.setAttribute('crossOrigin', imgCrossOrigin);
 
-      img.onload = function () {
+      img.onload = function() {
 
         var x = (index * self.spriteSheet.spriteWidth) % self.spriteSheet.maxWidth;
         var y = Math.floor((index * self.spriteSheet.spriteWidth) / self.spriteSheet.maxWidth) * self.spriteSheet.spriteHeight;
