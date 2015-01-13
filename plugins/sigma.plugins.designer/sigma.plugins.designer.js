@@ -1009,9 +1009,16 @@
     var h = histogram(v.histograms[visualVar], property);
 
     if (visualVar === 'color') {
-      var bins = h.length;
+      var bins = h.length,
+        o = null;
       for (var bin = 0; bin < bins; bin++) {
-        h[bin][visualVar] = strToObjectRef(_palette, _mappings[target].color.scheme)[bins][bin];
+        o = strToObjectRef(_palette, _mappings[target].color.scheme);
+        if (!o)
+          throw 'Designer.utils.histogram: color scheme "' + _mappings[target].color.scheme + '" not in '+ target +' palette.';
+        if (!o[bins])
+          throw 'Designer.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + _mappings[target].color.scheme + '".';
+
+        h[bin][visualVar] = o[bins][bin];
       }
     }
 
