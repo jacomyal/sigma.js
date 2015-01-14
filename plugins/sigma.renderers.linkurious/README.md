@@ -25,6 +25,21 @@ See the following [example code](../../examples/renderers-linkurious.html) and [
 
 To use, include all .js files under this folder. The renderers will be used automatically.
 
+## Pie charts
+
+![Pie charts](https://github.com/Linkurious/sigma.js/wiki/media/node-pie-charts.png)
+
+Set `node.colors` as an array of hexadecimal values. For instance:
+
+```js
+{
+    id: 'n0',
+    colors: ["#ECD078","#D95B43","#C02942","#542437","#53777A"]
+}
+```
+
+See the [example file](https://github.com/Linkurious/sigma.js/blob/linkurious-version/examples/renderers-linkurious-pie-charts.html) to display pie charts on nodes.
+
 ## Shapes
 
 You can assigning shapes to nodes by using the `type` attribute:
