@@ -5,7 +5,9 @@ Plugin developed by [Alexis Jacomy](https://github.com/jacomyal).
 
 ---
 
-This plugin provides a method to animate a sigma instance by interpolating some node properties. Check the `sigma.plugins.animate` function doc or the `examples/animate.html` code sample to know more.
+This plugin provides a method to animate a sigma instance by interpolating some node properties. Check the `sigma.plugins.animate` function doc or the [`examples/animate.html`](../../examples/animate.html) code sample to know more.
+
+![Animate](https://github.com/Linkurious/sigma.js/wiki/media/animate.gif)
 
 Interpolate coordinates as follows:
 
