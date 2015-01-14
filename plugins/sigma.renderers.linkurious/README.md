@@ -38,7 +38,7 @@ Set `node.colors` as an array of hexadecimal values. For instance:
 }
 ```
 
-See the [example file](https://github.com/Linkurious/sigma.js/blob/linkurious-version/examples/renderers-linkurious-pie-charts.html) to display pie charts on nodes.
+See the [example file](../../examples/renderers-linkurious-pie-charts.html) to display pie charts on nodes.
 
 ## Shapes
 
