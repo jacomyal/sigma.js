@@ -7,7 +7,15 @@ Contact: seb@linkurio.us
 
 ---
 
-This plugin provides a method to display a tooltip when a sigma event is fired either on stage, node, or edge. The tooltip is an HTML DOM element. Only one tooltip is displayed on screen. Check the `sigma.plugins.tooltips` function doc or the [example code](../../examples/plugin-tooltips.html) to know more.
+This plugin provides a method to display a tooltip when a sigma event is fired either on stage, node, or edge. The tooltip is an HTML DOM element. Only one tooltip is displayed on screen. 
+
+#### Example 1: display on node hover event
+![Tooltips](https://github.com/Linkurious/sigma.js/wiki/media/tooltips.gif)
+
+#### Example 2: display on right-click event
+![Tooltips LK](https://github.com/Linkurious/sigma.js/wiki/media/tooltips-lk.gif)
+
+Check the `sigma.plugins.tooltips` function doc or the [example code](../../examples/plugin-tooltips.html) to know more.
 
 To use, include all .js files under this folder. Then initialize it as follows, where the first parameter is the Sigma instance, and the second parameter is the options object:
 
