@@ -11,6 +11,14 @@ This plugin provides a method to render glyphs at four possible positions above 
 
 See the following [example code](../../examples/glyphs-renderer.html) for full usage.
 
+#### Example 1
+![Glyphs1](https://github.com/Linkurious/sigma.js/wiki/media/glyphs1.png)
+
+#### Example 2
+![Glyphs2](https://github.com/Linkurious/sigma.js/wiki/media/glyphs2.png)
+
+## How to use it
+
 To use, include all .js files under this folder.
 Then set up glyphs settings as node keys:
 
@@ -140,6 +148,8 @@ myRenderer.glyphs({
    * default value: `true`
 
 ## Font-icons
+
+![Glyphs Icons](https://github.com/Linkurious/sigma.js/wiki/media/glyph-icons.png)
 
 Custom webfonts are supported in glyphs!
 
