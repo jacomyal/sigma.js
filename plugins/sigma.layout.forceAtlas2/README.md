@@ -13,6 +13,16 @@ This plugin implements [ForceAtlas2](http://www.medialab.sciences-po.fr/publicat
 
 For optimization purposes, the algorithm's computations are delegated to a web worker.
 
+#### Toy example
+
+![forceatlas1](https://github.com/Linkurious/sigma.js/wiki/media/forceatlas1.gif)
+
+#### Real-world example
+
+Dataset of 1700 nodes and 6700 edges:
+
+![layout-arctic](https://github.com/Linkurious/sigma.js/wiki/media/layout-arctic.gif)
+
 ## Methods
 
 **sigma.startForceAtlas2**
