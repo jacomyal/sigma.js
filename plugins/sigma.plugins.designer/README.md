@@ -22,6 +22,9 @@ This plugin comes with fancy developer features:
 - Undo any style.
 - Chain all methods for concise (coding) style.
 
+See the live example using the API below:
+![Designer](https://github.com/Linkurious/sigma.js/wiki/media/designer-live.gif)
+
 See the following [example code](../../examples/designer.html) and [unit tests](../../test/unit.plugins.designer.js) for full usage.
 
 To use, include all .js files under this folder. Then initialize it as follows:
