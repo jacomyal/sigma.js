@@ -58,7 +58,7 @@ Also, you can customize the build by adding or removing files from the `coreJsFi
 
 ### Why linkurious.js?
 
-At [Linkurious SAS](http://linkurio.us) we are big fans of Sigma.js. We use it extensively in our applications because it is an efficient graph *viewer*, but application developers like us need more high level and integration-ready features to create smart graph applications. We have thus developed more than 20 plugins, and we provide [our configuration]() to embed it into applications.
+At [Linkurious SAS](http://linkurio.us) we are big fans of Sigma.js. We use it extensively in our applications because it is an efficient graph *viewer*, but application developers like us need more high level and integration-ready features to create smart graph applications. We have thus developed more than 20 plugins and improved the core of Sigma for enhanced interaction features.
 
 Stating the above, we define our mission as follows:
 
