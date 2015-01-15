@@ -11,6 +11,7 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 
 ---
 
+[
 ![glyphs-icons](https://github.com/Linkurious/sigma.js/wiki/media/glyphs-icons-230.gif)
 ![edge-shapes](https://github.com/Linkurious/sigma.js/wiki/media/edge-shapes-230.gif)
 ![filters](https://github.com/Linkurious/sigma.js/wiki/media/filters-230.gif)
@@ -26,6 +27,7 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 ![pie-charts](https://github.com/Linkurious/sigma.js/wiki/media/pie-charts-230.gif)
 ![self-loop](https://github.com/Linkurious/sigma.js/wiki/media/self-loop-230.gif)
 ![tooltips](https://github.com/Linkurious/sigma.js/wiki/media/tooltips-230.gif)
+](https://github.com/Linkurious/sigma.js/wiki)
 
 ---
 
