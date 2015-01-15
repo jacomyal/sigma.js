@@ -54,13 +54,13 @@ To build the code:
  - Use `npm install` to install sigma development dependencies.
  - Use `npm run build` to minify the code with [Uglify](https://github.com/mishoo/UglifyJS). The minified files `sigma.min.js` and sigma plugins will then be accessible in the `build/` folder.
 
-Also, you can customize the build by adding or removing files from the `coreJsFiles` array in `Gruntfile.js` before applying the grunt task.
+You can also customize the build by adding or removing files from the `coreJsFiles` array in `Gruntfile.js` before applying the grunt task.
 
 ### Why linkurious.js?
 
-At [Linkurious SAS](http://linkurio.us) we are big fans of Sigma.js. We use it extensively in our applications because it is an efficient graph *viewer*, but application developers like us need more high level and integration-ready features to create smart graph applications. We have thus developed more than 20 plugins and improved the core of Sigma for enhanced interaction features.
+At [Linkurious SAS](http://linkurio.us) we are big fans of Sigma.js. We use it extensively in our applications because it is an efficient graph *viewer*, but application developers like us need more high level and integration-ready features to create smart graph applications. We have thus developed more than 20 plugins and improved the core of Sigma with enhanced interaction features.
 
-Stating the above, we define our mission as follows:
+We define our mission as follows:
 
 1. To work on **core fixes** and core improvements in collaboration with the Sigma.js team.
 2. To develop **integration-ready features** such as filters, tooltips, or Excel exporter.
@@ -89,9 +89,9 @@ Touch events on tablet and mobile are currently supported as *beta* features.
 
 Performance depends on the graph size, the graphic renderers, the computer and browser on which the web application runs.
 
-* **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. We recommend to display up to 5 000 nodes and 8 000 edges with this technology.
-* **WebGL** needs a graph card and is thus not suitable to all clients, but it unlock the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. We recommend to display up to 20 000 nodes and 30 000 edges with this technology.
-* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. We recommend to display up to 500 nodes and 1 000 edges with this technology. Notice that an [SVG export plugin](https://github.com/Linkurious/sigma.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
+* **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. Use it to display up to 5 000 nodes and 8 000 edges with this technology.
+* **WebGL** needs a graph card and is thus not suitable to all clients, but it unlocks the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. Use it to display up to 20 000 nodes and 30 000 edges with this technology.
+* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. Use it to display up to 500 nodes and 1 000 edges with this technology. Notice that an [SVG export plugin](https://github.com/Linkurious/sigma.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
 
 Different kinds of renderers can be mixed, and automatic fallback from WebGL to Canvas makes adoption wider and smoother. With linkurious.js your application is not bound to a specific rendering technology anymore!
 
