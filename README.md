@@ -11,6 +11,24 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 
 ---
 
+![glyphs-icons](https://github.com/Linkurious/sigma.js/wiki/media/glyphs-icons-230.gif)
+![edge-shapes](https://github.com/Linkurious/sigma.js/wiki/media/edge-shapes-230.gif)
+![filters](https://github.com/Linkurious/sigma.js/wiki/media/filters-230.gif)
+![forceatlas](https://github.com/Linkurious/sigma.js/wiki/media/forceatlas-230.gif)
+![glyphs](https://github.com/Linkurious/sigma.js/wiki/media/glyphs-230.gif)
+![halo](https://github.com/Linkurious/sigma.js/wiki/media/halo-230.gif)
+![hover-edge](https://github.com/Linkurious/sigma.js/wiki/media/hover-edge-230.gif)
+![designer](https://github.com/Linkurious/sigma.js/wiki/media/designer-230.gif)
+![lasso](https://github.com/Linkurious/sigma.js/wiki/media/lasso-230.gif)
+![layout-arctic](https://github.com/Linkurious/sigma.js/wiki/media/layout-arctic-230.gif)
+![level-of-details-edges-labels](https://github.com/Linkurious/sigma.js/wiki/media/level-of-details-edges-labels-230.gif)
+![node-icons](https://github.com/Linkurious/sigma.js/wiki/media/node-icons-230.gif)
+![pie-charts](https://github.com/Linkurious/sigma.js/wiki/media/pie-charts-230.gif)
+![self-loop](https://github.com/Linkurious/sigma.js/wiki/media/self-loop-230.gif)
+![tooltips](https://github.com/Linkurious/sigma.js/wiki/media/tooltips-230.gif)
+
+---
+
 ### Introduction
 
 Linkurious.js is developed in pure Javascript. It uses Sigma.js for its graph data structure and visualization engine, which provides both **Canvas**, **WebGL** and **SVG** renderers for nodes and edges. Sigma.js is highly flexible thanks to its modular architecture, and is extensible by plugins. The Linkurious.js toolkit is made of **more than 30 Sigma.js plugins**, combined to work together and tested for integration into modern Web applications.
