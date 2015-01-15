@@ -95,7 +95,7 @@ Performance depends on the graph size, the graphic renderers, the computer and b
 
 Different kinds of renderers can be mixed, and automatic fallback from WebGL to Canvas makes adoption wider and smoother. With linkurious.js your application is not bound to a specific rendering technology anymore!
 
-See our [performance guide]() to learn more.
+See our [performance guide](https://github.com/Linkurious/sigma.js/wiki/Performance) to learn more.
 
 ### External Dependencies
 
