@@ -79,7 +79,7 @@ You should consider Linkurious.js as your primary toolkit for building graph-bas
 
 All modern web browsers are supported, including:
 * Internet Explorer 10+
-* Chrome 23+
+* Chrome 23+ and Chromium
 * Firefox 15+
 * Safari 6+
 
@@ -87,7 +87,7 @@ Touch events on tablet and mobile are currently supported as *beta* features.
 
 ### Performance
 
-Performance depends on the graphic renderers.
+Performance depends on the graph size, the graphic renderers, the computer and browser on which the web application runs.
 
 * **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. We recommend to display up to 5 000 nodes and 8 000 edges with this technology.
 * **WebGL** needs a graph card and is thus not suitable to all clients, but it unlock the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. We recommend to display up to 20 000 nodes and 30 000 edges with this technology.
