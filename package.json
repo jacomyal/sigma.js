@@ -1,12 +1,12 @@
 {
-  "name": "sigma",
+  "name": "linkurious",
   "version": "1.0.5",
   "description": "A Javascript toolkit to speed up the development of graph visualization and interaction applications.",
-  "homepage": "https://github.com/Linkurious/sigma.js",
-  "bugs": "http://github.com/Linkurious/sigma.js/issues",
+  "homepage": "https://github.com/Linkurious/linkurious.js",
+  "bugs": "http://github.com/Linkurious/linkurious.js/issues",
   "repository": {
     "type": "git",
-    "url": "http://github.com/Linkurious/sigma.js.git"
+    "url": "http://github.com/Linkurious/linkurious.js.git"
   },
   "license": "MIT",
   "main": "build/sigma.require.js",
