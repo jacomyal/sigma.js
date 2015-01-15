@@ -13,6 +13,16 @@ This plugin implements [ForceAtlas2](http://www.plosone.org/article/info%3Adoi%2
 
 For optimization purposes, the algorithm's computations are delegated to a web worker.
 
+#### Toy example
+
+![forceatlas1](https://github.com/Linkurious/sigma.js/wiki/media/forceatlas1.gif)
+
+#### Real-world example
+
+Dataset of 1700 nodes and 6700 edges:
+
+![layout-arctic](https://github.com/Linkurious/sigma.js/wiki/media/layout-arctic.gif)
+
 ## Methods
 
 **sigma.startForceAtlas2**
@@ -81,4 +91,6 @@ sigmaInstance.isForceAtlas2Running();
 * **easing** *string* : if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
 
 ## Notes
-1. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you have to trigger it explicitely.
+1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
+
+2. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you have to trigger it explicitely.
