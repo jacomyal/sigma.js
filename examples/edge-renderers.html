@@ -46,6 +46,7 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.helpers.graph/sigma.helpers.graph.js"></script>
 <script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
 <script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
 <script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
@@ -87,17 +88,6 @@ for (i = 0; i < N; i++)
     color: '#666'
   });
 
-for (i = 0; i < E; i++)
-  g.edges.push({
-    id: 'e' + i,
-    label: 'Edge ' + i,
-    source: 'n' + (Math.random() * N | 0),
-    target: 'n' + (Math.random() * N | 0),
-    size: Math.random(),
-    color: '#ccc',
-    type: ['line', 'curve', 'arrow', 'curvedArrow'][Math.random() * 4 | 0]
-  });
-
 // Instantiate sigma:
 s = new sigma({
   graph: g,
@@ -106,7 +96,28 @@ s = new sigma({
     type: 'canvas'
   },
   settings: {
-    edgeLabelSize: 'proportional'
+    edgeLabelSize: 'proportional',
+    edgeLabelThreshold: 3,
+    minEdgeSize: 4
   }
 });
+
+for (i = 0; i < E; i++) {
+  var source = 'n' + (Math.random() * N | 0),
+      target = 'n' + (Math.random() * N | 0);
+
+  if (!s.graph.adjacentNodes || s.graph.adjacentNodes(source).map(function(n) { return n.id; }).indexOf(target) === -1) {
+    s.graph.addEdge({
+      id: 'e' + i,
+      label: 'Edge ' + i,
+      source: source,
+      target: target,
+      size: Math.random(),
+      color: '#ccc',
+      type: ['line', 'curve', 'arrow', 'curvedArrow'][Math.random() * 4 | 0]
+    });
+  }
+}
+s.refresh();
+
 </script>
