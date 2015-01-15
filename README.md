@@ -1,4 +1,4 @@
-[ ![Codeship Status for Linkurious/sigma.js](https://www.codeship.io/projects/327f96c0-2c93-0132-9e32-4683d3e816f8/status)](https://www.codeship.io/projects/38962)
+[ ![Codeship Status for Linkurious/linkurious.js](https://www.codeship.io/projects/b0710040-7f11-0132-f563-62fa786c5210/status)](https://www.codeship.io/projects/57170)
 
 linkurious.js
 =================
