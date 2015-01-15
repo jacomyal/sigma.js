@@ -12,22 +12,22 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 ---
 
 [
-![glyphs-icons](https://github.com/Linkurious/sigma.js/wiki/media/glyphs-icons-230.gif)
-![edge-shapes](https://github.com/Linkurious/sigma.js/wiki/media/edge-shapes-230.gif)
-![filters](https://github.com/Linkurious/sigma.js/wiki/media/filters-230.gif)
-![forceatlas](https://github.com/Linkurious/sigma.js/wiki/media/forceatlas-230.gif)
-![glyphs](https://github.com/Linkurious/sigma.js/wiki/media/glyphs-230.gif)
-![halo](https://github.com/Linkurious/sigma.js/wiki/media/halo-230.gif)
-![hover-edge](https://github.com/Linkurious/sigma.js/wiki/media/hover-edge-230.gif)
-![designer](https://github.com/Linkurious/sigma.js/wiki/media/designer-230.gif)
-![lasso](https://github.com/Linkurious/sigma.js/wiki/media/lasso-230.gif)
-![layout-arctic](https://github.com/Linkurious/sigma.js/wiki/media/layout-arctic-230.gif)
-![level-of-details-edges-labels](https://github.com/Linkurious/sigma.js/wiki/media/level-of-details-edges-labels-230.gif)
-![node-icons](https://github.com/Linkurious/sigma.js/wiki/media/node-icons-230.gif)
-![pie-charts](https://github.com/Linkurious/sigma.js/wiki/media/pie-charts-230.gif)
-![self-loop](https://github.com/Linkurious/sigma.js/wiki/media/self-loop-230.gif)
-![tooltips](https://github.com/Linkurious/sigma.js/wiki/media/tooltips-230.gif)
-](https://github.com/Linkurious/sigma.js/wiki)
+![glyphs-icons](https://github.com/Linkurious/linkurious.js/wiki/media/glyphs-icons-230.gif)
+![edge-shapes](https://github.com/Linkurious/linkurious.js/wiki/media/edge-shapes-230.gif)
+![filters](https://github.com/Linkurious/linkurious.js/wiki/media/filters-230.gif)
+![forceatlas](https://github.com/Linkurious/linkurious.js/wiki/media/forceatlas-230.gif)
+![glyphs](https://github.com/Linkurious/linkurious.js/wiki/media/glyphs-230.gif)
+![halo](https://github.com/Linkurious/linkurious.js/wiki/media/halo-230.gif)
+![hover-edge](https://github.com/Linkurious/linkurious.js/wiki/media/hover-edge-230.gif)
+![designer](https://github.com/Linkurious/linkurious.js/wiki/media/designer-230.gif)
+![lasso](https://github.com/Linkurious/linkurious.js/wiki/media/lasso-230.gif)
+![layout-arctic](https://github.com/Linkurious/linkurious.js/wiki/media/layout-arctic-230.gif)
+![level-of-details-edges-labels](https://linkurious.com/Linkurious/sigma.js/wiki/media/level-of-details-edges-labels-230.gif)
+![node-icons](https://github.com/Linkurious/linkurious.js/wiki/media/node-icons-230.gif)
+![pie-charts](https://github.com/Linkurious/linkurious.js/wiki/media/pie-charts-230.gif)
+![self-loop](https://github.com/Linkurious/linkurious.js/wiki/media/self-loop-230.gif)
+![tooltips](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips-230.gif)
+](https://github.com/Linkurious/linkurious.js/wiki)
 
 ---
 
@@ -37,7 +37,7 @@ Linkurious.js is developed in pure Javascript. It uses Sigma.js for its graph da
 
 ### Resources
 
-The [wiki](https://github.com/Linkurious/sigma.js/wiki) provides documentation on APIs, and you can start learning how to code with Linkurious.js with the `examples` and `test` directories.
+The [wiki](https://github.com/Linkurious/linkurious.js/wiki) provides documentation on APIs, and you can start learning how to code with Linkurious.js with the `examples` and `test` directories.
 
 ### Getting started
 
@@ -91,11 +91,11 @@ Performance depends on the graph size, the graphic renderers, the computer and b
 
 * **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. Use it to display up to 5 000 nodes and 8 000 edges with this technology.
 * **WebGL** needs a graph card and is thus not suitable to all clients, but it unlocks the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. Use it to display up to 20 000 nodes and 30 000 edges with this technology.
-* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. Use it to display up to 500 nodes and 1 000 edges with this technology. Notice that an [SVG export plugin](https://github.com/Linkurious/sigma.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
+* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. Use it to display up to 500 nodes and 1 000 edges with this technology. Notice that an [SVG export plugin](https://github.com/Linkurious/linkurious.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
 
 Different kinds of renderers can be mixed, and automatic fallback from WebGL to Canvas makes adoption wider and smoother. With linkurious.js your application is not bound to a specific rendering technology anymore!
 
-See our [performance guide](https://github.com/Linkurious/sigma.js/wiki/Performance) to learn more.
+See our [performance guide](https://github.com/Linkurious/linkurious.js/wiki/Performance) to learn more.
 
 ### External Dependencies
 
@@ -105,9 +105,9 @@ A few plugins may require external dependencies. Please check their README files
 
 ### Contributing
 
-You can contribute by submitting [issues tickets](http://github.com/Linkurious/sigma.js/issues) and proposing [pull requests](http://github.com/Linkurious/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request by running the command `grunt`.
+You can contribute by submitting [issues tickets](http://github.com/Linkurious/linkurious.js/issues) and proposing [pull requests](http://github.com/Linkurious/linkurious.js/pulls). Make sure that tests and linting pass before submitting any pull request by running the command `grunt`.
 
-See [How to fix bugs](https://github.com/Linkurious/sigma.js/wiki/How-to-fix-bugs) and to [How to develop plugins](https://github.com/Linkurious/sigma.js/wiki/How-to-develop-plugins).
+See [How to fix bugs](https://github.com/Linkurious/linkurious.js/wiki/How-to-fix-bugs) and to [How to develop plugins](https://github.com/Linkurious/linkurious.js/wiki/How-to-develop-plugins).
 
 The whole source code is validated by the [Google Closure Linter](https://developers.google.com/closure/utilities/) and [JSHint](http://www.jshint.com/), and the comments are written in [JSDoc](http://en.wikipedia.org/wiki/JSDoc) (tags description is available [here](https://developers.google.com/closure/compiler/docs/js-for-compiler)).
 
