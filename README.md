@@ -3,7 +3,7 @@
 linkurious.js
 =================
 
-The Linkurious.js toolkit speeds up the development of modern Web applications that leverage the power of graph visualization and interaction.
+The Linkurious.js toolkit speeds up the development of modern Web applications that leverage the power of **graph visualization and interaction**.
 
 Graphs are also called networks: they are made of nodes linked by edges. Graphs are a powerful way to represent any relationships in data like social networks (i.e. who likes who), infrastructure (i.e. how devices are connected), flows (i.e. where does the money go), and much more.
 
