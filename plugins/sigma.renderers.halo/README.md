@@ -9,7 +9,7 @@ Contact: seb@linkurio.us
 
 This plugin provides a method to render a halo behind nodes and edges.
 
-![Halo](https://github.com/Linkurious/sigma.js/wiki/media/halo.gif)
+![Halo](https://github.com/Linkurious/linkurious.js/wiki/media/halo.gif)
 
 See the following [example code](../../examples/plugin-halo.html) for full usage.
 
