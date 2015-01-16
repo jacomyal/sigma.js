@@ -3,7 +3,7 @@
 linkurious.js
 =================
 
-The Linkurious.js toolkit speeds up the development of modern Web applications that leverage the power of **graph visualization and interaction**.
+The linkurious.js toolkit speeds up the development of modern Web applications that leverage the power of **graph visualization and interaction**.
 
 Graphs are also called networks: they are made of nodes linked by edges. Graphs are a powerful way to represent any relationships in data like social networks (i.e. who likes who), infrastructure (i.e. how devices are connected), flows (i.e. where does the money go), and much more.
 
@@ -33,7 +33,7 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 
 ### Introduction
 
-Linkurious.js is developed in pure Javascript. It uses Sigma.js for its graph data structure and visualization engine, which provides both **Canvas**, **WebGL** and **SVG** renderers for nodes and edges. Sigma.js is highly flexible thanks to its modular architecture, and is extensible by plugins. The Linkurious.js toolkit is made of **more than 30 Sigma.js plugins**, combined to work together and tested for integration into modern Web applications.
+Linkurious.js is developed in pure Javascript. It uses Sigma.js for its graph data structure and visualization engine, which provides both **Canvas**, **WebGL** and **SVG** renderers for nodes and edges. Sigma.js is highly flexible thanks to its modular architecture, and is extensible by plugins. The linkurious.js toolkit is made of **more than 30 Sigma.js plugins**, combined to work together and tested for integration into modern Web applications.
 
 ### Resources
 
@@ -68,7 +68,7 @@ We define our mission as follows:
 
 ### Benefits
 
-You should consider Linkurious.js as your primary toolkit for building graph-based applications on the Web if you need:
+You should consider linkurious.js as your primary toolkit for building graph-based applications on the Web if you need:
 * to ship your solution quickly;
 * to focus on the core value of your application;
 * to display large graphs (i.e. larger than 2000 nodes and 5000 edges);
@@ -89,9 +89,9 @@ Touch events on tablet and mobile are currently supported as *beta* features.
 
 Performance depends on the graph size, the graphic renderers, the computer and browser on which the web application runs.
 
-* **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. Use it to display up to 5 000 nodes and 8 000 edges with this technology.
-* **WebGL** needs a graph card and is thus not suitable to all clients, but it unlocks the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. Use it to display up to 20 000 nodes and 30 000 edges with this technology.
-* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. Use it to display up to 500 nodes and 1 000 edges with this technology. Notice that an [SVG export plugin](https://github.com/Linkurious/linkurious.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
+* **Canvas** is supported in all modern browsers. It is a great tradeoff between flexibility and performance. Use it to display up to 5 000 nodes and 8 000 edges.
+* **WebGL** needs a graph card and is thus not suitable to all clients, but it unlocks the graph size boundaries. It is great to display large graph withs a layout previously computed (e.g. from [Gephi](http://gephi.github.io/)) because the graphic card memory is loaded only once. Use it to display up to 20 000 nodes and 30 000 edges.
+* **SVG** is partially supported and is still under active development. It is great for interactivity and animations but performances drop quickly with the number of displayed items. Use it to display up to 500 nodes and 1 000 edges. Notice that an [SVG export plugin](https://github.com/Linkurious/linkurious.js/tree/linkurious-version/plugins/sigma.exporters.svg) is available to generate files for Inkscape or Adobe Illustrator.
 
 Different kinds of renderers can be mixed, and automatic fallback from WebGL to Canvas makes adoption wider and smoother. With linkurious.js your application is not bound to a specific rendering technology anymore!
 
@@ -114,16 +114,16 @@ The whole source code is validated by the [Google Closure Linter](https://develo
 
 ### License
 
-The Linkurious.js toolkit is dual-licensed, **available under both commercial and open-source licenses**. The open-source license is the GNU General Public License v.3 ("GPL"). In addition to GPL, the Linkurious.js toolkit is available under commercial license terms from [Linkurious SAS](http://linkurio.us).
+The linkurious.js toolkit is dual-licensed, **available under both commercial and open-source licenses**. The open-source license is the GNU General Public License v.3 ("GPL"). In addition to GPL, the Linkurious.js toolkit is available under commercial license terms from [Linkurious SAS](http://linkurio.us).
 
-GPL has been chosen as the open-source license for Linkurious.js, because it provides the following four degrees of freedom:
+GPL has been chosen as the open-source license for linkurious.js, because it provides the following four degrees of freedom:
 
 1. The freedom to run the program for any purpose.
 2. The freedom to study how the program works and adapt it to specific needs.
 3. The freedom to redistribute copies so you can help your neighbor.
 4. The freedom to improve the program and release your improvements to the public, so that the whole community benefits.
 
-These four degrees of freedom are very important for the success of Linkurious.js, and it is important that all users of Linkurious.js under GPL adhere to these and fully meet all the requirements set by the GPL. It is recommended that a thorough legal analysis is conducted when choosing to use the GPL or other open-source licenses. In many cases, the GPL is well suited, but it is important that the freedoms of the GPL are not restricted from the user of an application or device using a GPL library such as Linkurious.js, which may be difficult to achieve in some use cases.
+These four degrees of freedom are very important for the success of linkurious.js, and it is important that all users of linkurious.js under GPL adhere to these and fully meet all the requirements set by the GPL. It is recommended that a thorough legal analysis is conducted when choosing to use the GPL or other open-source licenses. In many cases, the GPL is well suited, but it is important that the freedoms of the GPL are not restricted from the user of an application or device using a GPL library such as linkurious.js, which may be difficult to achieve in some use cases.
 
 **The commercial terms are therefore more suited for integration into commercial applications or closed-source applications.** In this case, simply get in touch with us at contact@linkurio.us.
 
