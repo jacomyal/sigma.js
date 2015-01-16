@@ -20,7 +20,7 @@ The plugin implements the following shapes:
 
 To assign a shape renderer to an edge, simply set `edge.type='shape-name'` e.g. `edge.type='dotted'`. The default renderer implemented by sigma.js is named `def` (alias `line`) - see also [generic custom edge renderer example](../../examples/custom-edge-renderer.html).
 
-![dashed](https://github.com/Linkurious/sigma.js/wiki/media/dashed1.png)
-![dotted](https://github.com/Linkurious/sigma.js/wiki/media/dotted1.png)
-![parallel](https://github.com/Linkurious/sigma.js/wiki/media/parallel1.png)
-![tapered](https://github.com/Linkurious/sigma.js/wiki/media/tapered1.png)
+![dashed](https://github.com/Linkurious/linkurious.js/wiki/media/dashed1.png)
+![dotted](https://github.com/Linkurious/linkurious.js/wiki/media/dotted1.png)
+![parallel](https://github.com/Linkurious/linkurious.js/wiki/media/parallel1.png)
+![tapered](https://github.com/Linkurious/linkurious.js/wiki/media/tapered1.png)
