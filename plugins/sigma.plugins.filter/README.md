@@ -13,7 +13,7 @@ This plugin filters nodes and edges in a fancy manner:
 - Undo any filter while preserving the execution order. 
 - Chain all methods for concise style.
 
-![Filters](https://github.com/Linkurious/sigma.js/wiki/media/filters.gif)
+![Filters](https://github.com/Linkurious/linkurious.js/wiki/media/filters.gif)
 
 See the following [example code](../../examples/filters.html) and [unit tests](../../test/unit.plugins.filter.js) for full usage.
 
