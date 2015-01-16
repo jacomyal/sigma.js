@@ -27,8 +27,8 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    poweredByHTML: 'Powered by Sigma.js',
-    poweredByURL: 'http://sigmajs.org',
+    poweredByHTML: 'Powered by Linkurious.js',
+    poweredByURL: 'https://github.com/Linkurious/linkurious.js',
     poweredByPingURL: ''
   }
 });
@@ -47,11 +47,11 @@ myRenderer.poweredBy({
  * **poweredByHTML**
    * The text or HTML content to be displayed.
    * type: *string*
-   * default value: `Powered by Sigma.js`
+   * default value: `Powered by Linkurious.js`
  * **poweredByURL**
    * The URL clicked by the user.
    * type: *string*
-   * default value: `http://sigmajs.org`
+   * default value: `https://github.com/Linkurious/linkurious.js`
  * **poweredByPingURL**
    * Another URL accessed, may be used to "ping" a server.
    * type: *string*

@@ -12,9 +12,9 @@
   */
   var settings = {
     // {string}
-    poweredByHTML: 'Powered by Sigma.js',
+    poweredByHTML: 'Powered by Linkurious.js',
     // {number}
-    poweredByURL: 'http://sigmajs.org',
+    poweredByURL: 'https://github.com/Linkurious/linkurious.js',
     // {string}
     poweredByPingURL: ''
   };
