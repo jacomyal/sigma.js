@@ -7,7 +7,7 @@ Contact: seb@linkurio.us
 
 ---
 ## General
-This plugin registers custom edge shape renderers. See the following [example code](../../examples/plugin-customEdgeShapes.html) for full usage.
+This plugin registers custom edge shape renderers on **Canvas** only. See the following [example code](../../examples/plugin-customEdgeShapes.html) for full usage.
 
 To use, include all .js files under this folder.
 
