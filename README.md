@@ -9,7 +9,7 @@ Sigma is a JavaScript library dedicated to graph drawing, mainly developed by [@
 
 [The website](http://sigmajs.org) provides a global overview of the project, and the documentation is available in the [Github Wiki](https://github.com/jacomyal/sigma.js/wiki).
 
-Also, the `plugins` and `examples` directories contain some various use-cases, that might help you understanding how to use sigma.
+Also, the `plugins` and `examples` directories contain some various use-cases that might help you understanding how to use sigma.
 
 ### How to use it
 
