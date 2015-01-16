@@ -10,7 +10,7 @@ Contact: seb@linkurio.us
 This plugin provides a method to display a tooltip when a sigma event is fired either on stage, node, or edge. The tooltip is an HTML DOM element. Only one tooltip is displayed on screen. 
 
 #### Example 1: display on node hover event
-![Tooltips](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips.gif)
+![Tooltips](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips.png)
 
 #### Example 2: display on right-click event
 ![Tooltips LK](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips-lk.gif)
