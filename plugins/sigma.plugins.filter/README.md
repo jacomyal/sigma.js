@@ -13,6 +13,8 @@ This plugin filters nodes and edges in a fancy manner:
 - Undo any filter while preserving the execution order. 
 - Chain all methods for concise style.
 
+![Filters](https://github.com/Linkurious/linkurious.js/wiki/media/filters.gif)
+
 See the following [example code](../../examples/filters.html) and [unit tests](../../test/unit.plugins.filter.js) for full usage.
 
 To use, include all .js files under this folder. Then initialize it as follows:
