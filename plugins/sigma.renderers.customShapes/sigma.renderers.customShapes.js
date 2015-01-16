@@ -6,10 +6,11 @@
 
   if (typeof ShapeLibrary === 'undefined')
     throw 'ShapeLibrary is not declared';
-  
+
 
   // Initialize package:
   sigma.utils.pkg('sigma.canvas.nodes');
+  sigma.utils.pkg('sigma.svg.nodes');
 
   var sigInst = undefined;
   var imgCache = {};
@@ -114,7 +115,7 @@
       if(drawBorder) {
         drawBorder(node,x,y,size,borderColor,context);
       }
-      
+
       drawImage(node,x,y,size,context);
 
       context.restore();
