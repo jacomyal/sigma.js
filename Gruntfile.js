@@ -193,7 +193,7 @@ module.exports = function(grunt) {
     },
     zip: {
       release: {
-        dest: 'build/release-v<%= pkg.version %>.zip',
+        dest: 'build/<%= pkg.name %>-v<%= pkg.version %>.zip',
         src: [
           'README.md',
           'build/sigma.min.js',
