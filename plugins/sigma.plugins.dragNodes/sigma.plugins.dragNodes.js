@@ -60,6 +60,10 @@
       _isMouseDown = false,
       _isMouseOverCanvas = false,
       _drag = false;
+    
+    if (renderer instanceof sigma.renderers.svg) {
+        _mouse = renderer.container.firstChild;
+    }
 
     // It removes the initial substring ('read_') if it's a WegGL renderer.
     if (renderer instanceof sigma.renderers.webgl) {
