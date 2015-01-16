@@ -12,9 +12,9 @@ This plugin allows you to select several nodes with a lasso-tool:
 - It currently works with a canvas renderer [not compatible with WebGL renderer]
 - Touch events are supported (it works on a mobile browser)
 
-![Lasso](https://github.com/Linkurious/sigma.js/wiki/media/lasso.gif)
+![Lasso](https://github.com/Linkurious/linkurious.js/wiki/media/lasso.gif)
 
-![Lasso LK](https://github.com/Linkurious/sigma.js/wiki/media/lasso-lk.gif)
+![Lasso LK](https://github.com/Linkurious/linkurious.js/wiki/media/lasso-lk.gif)
 
 See the following [example code](../../examples/lasso.html) for full usage.
 
