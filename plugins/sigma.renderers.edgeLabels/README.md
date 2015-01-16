@@ -7,7 +7,7 @@ Contact: seb@linkurio.us
 
 ---
 ## General
-This plugin displays edge labels.
+This plugin displays edge labels on **Canvas** only.
 
 See the following [example](../../examples/edge-renderers.html) for full usage.
 
