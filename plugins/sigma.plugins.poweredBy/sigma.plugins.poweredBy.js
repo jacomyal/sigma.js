@@ -39,8 +39,8 @@
       }
 
       this.domElements['poweredby'].innerHTML = content.join('');
-      this.domElements['poweredby'].style.bottom = 0;
-      this.domElements['poweredby'].style.right = 0;
+      this.domElements['poweredby'].style.bottom = '2px';
+      this.domElements['poweredby'].style.right = '1px';
       this.domElements['poweredby'].style.background = 'rgba(255, 255, 255, 0.8)';
 
       this.container.appendChild(this.domElements['poweredby']);
