@@ -1,81 +1,48 @@
-## sigma.js - changelog:
+## linkurious.js - changelog:
 
-#### 1.0.3 - release (August 22, 2014)
+#### 1.0.5 - draft (January 16, 2015)
 
-  - Fixed [#186](https://github.com/jacomyal/sigma.js/issues/186): NPM sigma package
-  - New helper `sigma.utils.zoomTo` (thanks to [@josemazo](https://github.com/josemazo))
-  - Fixed [#241](https://github.com/jacomyal/sigma.js/issues/241): Improved canvas renderer
-  - Fixed [#244](https://github.com/jacomyal/sigma.js/issues/244): (min|max)(Node|Edge)Size as strings or numbers
-  - Cross available in the customShapes plugin (thanks to [@csweaver](https://github.com/csweaver))
-  - [Relative size](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.plugins.relativeSize) plugin (thanks to [@tsdaemon](https://github.com/tsdaemon))
-  - Fixed y positions from sigma.parsers.gexf (thanks to [@totetmatt](https://github.com/totetmatt))
-  - Fixed lag problem for the dragNodes plugin on Firefox (thanks to [@apitts](https://github.com/apitts))
-  - Added the `singleHover` settings (thanks to [@patrickmarabeas](https://github.com/patrickmarabeas))
-  - Improved dragNodes behaviours with several hovered nodes (thanks to [@patrickmarabeas](https://github.com/patrickmarabeas))
-  - Added self-loops rendering for curved edges (thanks to [@ssidorchick](https://github.com/ssidorchick))
-  - Updated gexfParser.js version
-  - [HITS statistics computation](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.statistics.HITS) plugin (thanks to [@mef](https://github.com/mef))
-  - Fixed [#299](https://github.com/jacomyal/sigma.js/issues/299): Fixed `npm build`
-  - Fixed [#332](https://github.com/jacomyal/sigma.js/issues/332): Fixed grunt tasks for building plugins
-  - Fixed [#347](https://github.com/jacomyal/sigma.js/issues/347): Added polymorphism for the autoRescale setting
-  - Fixed build for Force-Atlas 2 plugin (thanks to [@luca](https://github.com/luca))
-  - Fixed some typos (thanks to [@Tal-Daniel](https://github.com/Tal-Daniel))
-  - [Custom edge shapes](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.customEdgeShapes) plugin (thanks to [@sheymann](https://github.com/sheymann))
-  - [Filter API](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.plugins.filter) plugin (thanks to [@sheymann](https://github.com/sheymann))
-  - Right-click support (thanks to [@sheymann](https://github.com/sheymann))
-  - Event data now always dispatched by sigma.core (thanks to [@sheymann](https://github.com/sheymann))
-  - Added the `attachBefore` method to `sigma.classes.graph` (thanks to [@sheymann](https://github.com/sheymann))
-  - Fixed buggy behaviour with the dragNodes plugin when container is offset (thanks to [@Pie21](https://github.com/Pie21))
-  - Updated NPM dev dependencies
-  - Fixed a leak in `sigma.classes.graph` (details at [#340](https://github.com/jacomyal/sigma.js/issues/340))
-  - **WebGL based Force-Atlas 2**
+  - New plugin `sigma.exporters.xlsx`
+  - New plugin `sigma.plugins.lasso` (thanks to [@Flo-Schield-Bobby](https://github.com/Flo-Schield-Bobby))
+  - New plugin `sigma.renderers.glyphs` (thanks to [@Flo-Schield-Bobby](https://github.com/Flo-Schield-Bobby))
+  - Revamp plugin `sigma.renderers.customShapes` (thanks to [@jbilcke](https://github.com/jbilcke))
+  - New plugin `sigma.renderers.linkurious` (thanks to [@jbilcke](https://github.com/jbilcke))
+  - Add an option to animate a given set of nodes in `sigma.plugins.animate`
 
-#### 1.0.2 - release (April 2, 2014)
+#### 1.0.4 - draft (November 27, 2014)
 
-  - Added Canvas curved edge renderer
-  - Fully refactored examples
-  - Fixed [#211](https://github.com/jacomyal/sigma.js/issues/211): Added default camera getter
-  - Fixes on ForceAtlas2 API (thanks to [@adkatrit](https://github.com/adkatrit))
-  - Added Canvas curved arrows edge renderer (thanks to [@ssidorchick](https://github.com/ssidorchick))
-  - Fixed [#220](https://github.com/jacomyal/sigma.js/issues/220): WebGL edges batch rendering fixed
-  - Fixed [#175](https://github.com/jacomyal/sigma.js/issues/175): Disable setAutoSettings in ForceAtlas2
-  - Fixed some minor typos (thanks to [@anirvan](https://github.com/anirvan))
-  - Added the `sigma.plugins.dragNodes` plugin for the Canvas renderer (thanks to [@josemazo](https://github.com/josemazo))
-  - Fixed `gjslint.py does not exist` error (thanks to [@jeroencoumans](https://github.com/jeroencoumans))
-  - Made it easier to build for newbies by not requiring global `grunt-cli` (thanks to [@eins78](https://github.com/eins78))
-  - Some minor changes on docs and GEXF parser (thanks to [@Yomguithereal](https://github.com/Yomguithereal))
-  - Added current version number as `sigma.version`
-  - Fixed [#236](https://github.com/jacomyal/sigma.js/issues/236): Implemented `kill` renderers method
+  - New plugin `sigma.exporters.gexf`
+  - New plugin `sigma.exporters.spreadsheet`
+  - New plugin `sigma.exporters.svg` (thanks to [@Yomguithereal](https://github.com/Yomguithereal))
+  - New plugin `sigma.plugins.image`, fork of `sigma.renderers.snapshot` (thanks to [@martindelataille](https://github.com/martindelataille))
+  - New plugin `sigma.plugins.keyboard`
+  - New plugin `sigma.plugins.poweredBy`
 
-#### 1.0.1 - release (February 26, 2014)
 
-  - Custom node shapes and images plug-in (thanks to [@rpeleg1970](https://github.com/rpeleg1970))
-  - Fixed [#189](https://github.com/jacomyal/sigma.js/issues/189): Added doubleClick events
-  - Fixed [#183](https://github.com/jacomyal/sigma.js/issues/183): Avoid using `for in` to iterate over arrays (thanks to [@cdevienne](https://github.com/cdevienne))
-  - Added `http-server` dependency (thanks to [@oncletom](https://github.com/oncletom))
-  - Minor fix in LICENSE.txt (thanks to [@gdi2290](https://github.com/gdi2290))
-  - Added `"hidden"` nodes and edges support
-  - Fixed typo in `sigma.instances` method (thanks to [@juanpastas](https://github.com/juanpastas))
-  - Fixed ForceAtlas2 stopForceAtlas2 method
-  - Improved captors
-  - Plus some minor and various fixes...
+#### 1.0.3 - draft (October 17, 2014)
 
-#### 1.0.0 - release (January 30, 2014)
+  - Merge sigma.js 1.0.3
+  - New plugin `sigma.plugins.colorbrewer`
+  - New plugin `sigma.plugins.designer`
+  - New plugin `sigma.plugins.fullScreen` (thanks to [@martindelataille](https://github.com/martindelataille))
+  - New plugin `sigma.renderers.halo`
+  - Add background execution and easing transition to `sigma.layout.forceAtlas2`
+  - Improve `sigma.plugins.dragNodes`
 
- - Finalization:
-   * Closed issues related to the initial version that were not relevant in this new version
-   * Fixed some bugs in the new version related to both versions
-   * Added more plugins and code samples, to solve some actual use-cases
-   * Fixed a lot of bugs for the release
+#### 1.0.2 - draft (August 22, 2014)
 
-#### 1.0.0 - draft (November 27, 2013)
-
- - Full new version of sigma from scratch, including old features:
-   * ForceAtlas2 plugin
-   * GEXF parser
-   * Canvas renderer
- - ...and some new features:
-   * WebGL renderer
-   * Touch support
- - Also added some unit tests (main classes, core API, ...).
- - Architecture fully rewritten
+  - Merge sigma.js 1.0.2
+  - Add method `graph.attachBefore` to the core
+  - Add spatial indexing of edges using a quad tree to the core
+  - Add events on edges to the core
+  - Add edge hovering to the core
+  - New plugin `sigma.helpers.graph`
+  - New plugin `sigma.plugin.activeState`
+  - New plugin `sigma.plugin.edgeSiblings`
+  - New plugin `sigma.plugin.filter`
+  - New plugin `sigma.plugin.locate`
+  - New plugin `sigma.plugin.select`
+  - New plugin `sigma.plugin.tooltips`
+  - New plugin `sigma.renderers.customEdgeShapes`
+  - New plugin `sigma.renderers.edgeLabels`
+  - Add auto-stop condition to `sigma.layout.forceAtlas2`
