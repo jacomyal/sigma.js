@@ -60,7 +60,7 @@
       _isMouseDown = false,
       _isMouseOverCanvas = false,
       _drag = false;
-    
+
     if (renderer instanceof sigma.renderers.svg) {
         _mouse = renderer.container.firstChild;
     }
@@ -228,7 +228,11 @@
             cos = Math.cos(_camera.angle),
             sin = Math.sin(_camera.angle),
             nodes = _s.graph.nodes(),
-            ref = [];
+            ref = [],
+            renXDiff,
+            renYDiff,
+            xDiff,
+            yDiff;
 
         // Getting and derotating the reference coordinates.
         for (var i = 0; i < 2; i++) {
@@ -242,23 +246,33 @@
           ref.push(aux);
         }
 
+        renXDiff = ref[1].renX - ref[0].renX;
+        xDiff = ref[1].x - ref[0].x;
+
         // Applying linear interpolation.
-        if ((ref[1].renX - ref[0].renX) === 0) {
-          // (ref[1].x -ref[0].x) / (ref[1].renX - ref[0].renX))
-          // should be close to 1
+        if (renXDiff === 0 && xDiff === 0) {
+          // if both are equal to 0, use 1 as the division result
           x = x - ref[0].renX + ref[0].x;
         } else {
-          x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-            (ref[1].x - ref[0].x) + ref[0].x;
+          // use a really small number
+          if (renXDiff === 0) {
+            renXDiff = 0.0000000000000001;
+          }
+
+          x = (x - ref[0].renX) / renXDiff * xDiff + ref[0].x;
         }
 
-        if ((ref[1].renY - ref[0].renY) === 0) {
-          // (ref[1].y - ref[0].y) / (ref[1].renY - ref[0].renY))
-          // should be close to 1
+        renYDiff = ref[1].renY - ref[0].renY;
+        yDiff = ref[1].y - ref[0].y;
+
+        if (renYDiff === 0 && yDiff === 0) {
           y = y - ref[0].renY + ref[0].y;
         } else {
-          y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-            (ref[1].y - ref[0].y) + ref[0].y;
+          if (renYDiff === 0) {
+            renYDiff = 0.0000000000000001;
+          }
+
+          y = (y - ref[0].renY) / renYDiff * yDiff + ref[0].y;
         }
 
         // Rotating the coordinates.
