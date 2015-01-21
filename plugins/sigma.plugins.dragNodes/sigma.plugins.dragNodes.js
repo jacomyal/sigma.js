@@ -149,7 +149,11 @@
     function nodeMouseDown(event) {
       _isMouseDown = true;
       var size = _s.graph.nodes().length;
-      if (_node && size > 0) {
+
+      // when there is only node in the graph, the plugin cannot apply
+      // linear interpolation. So treat it as if a user is dragging
+      // the graph
+      if (_node && size > 1) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
