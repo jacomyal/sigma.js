@@ -20,7 +20,7 @@ Check the `sigma.plugins.tooltips` function doc or the [example code](../../exam
 To use, include all .js files under this folder. Then initialize it as follows, where the first parameter is the Sigma instance, and the second parameter is the options object:
 
 ````javascript
-sigma.plugins.tooltips(s, {
+sigma.plugins.tooltips(sigmaInstance, {
   node: {
     template: 'Hello node!'
   },
@@ -36,7 +36,7 @@ sigma.plugins.tooltips(s, {
 Kills the tooltips as follows:
 
 ````javascript
-sigma.plugins.killTooltips();
+sigma.plugins.killTooltips(sigmaInstance);
 ````
 
 ## Configuration
@@ -45,14 +45,14 @@ A configuration object must be passed to the plugin at the initialization:
 
 ````javascript
 var config = {...};
-sigma.plugins.tooltips(s, config);
+sigma.plugins.tooltips(sigmaInstance, config);
 ````
 
 The plugin provides three configuration keys called `stage`, `node`, `edge`. Bound to the relevant Sigma events, the content and style of the tooltip varies if you trigger it for a node, an edge, or the stage.
 
 For instance, the following configuration enables a tooltip on node click:
 ````javascript
-sigma.plugins.tooltips(s, {
+sigma.plugins.tooltips(sigmaInstance, {
   node: {
     show: 'clickNode',
     template: 'Hello node!'
@@ -112,6 +112,10 @@ This plugins provides the following events:
 * `hidden`: fired when the tooltip is hidden
 
 ## Changelog
+
+### v0.4
+
+  * Handle multiple sigma instances
 
 ### v0.3
 

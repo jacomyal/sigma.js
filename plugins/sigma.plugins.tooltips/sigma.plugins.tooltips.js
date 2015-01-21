@@ -55,196 +55,6 @@
     doubleClickDelay: 800
   };
 
-  var _tooltip,
-      _timeoutHandle,
-      _doubleClick = false;
-
-
-  /**
-   * Helpers
-   */
-  function extend() {
-    var i,
-        k,
-        res = {},
-        l = arguments.length;
-
-    for (i = l - 1; i >= 0; i--)
-      for (k in arguments[i])
-        res[k] = arguments[i][k];
-    return res;
-  };
-
-  /**
-   * This function removes the existing tooltip and creates a new tooltip for a
-   * specified node or edge.
-   *
-   * Recognized parameters:
-   * **********************
-   * Here is the exhaustive list of every accepted parameters in the settings
-   * object:
-   *
-   *   {?string}   template   The HTML template. It is directly inserted inside
-   *                          a div element unless a renderer is specified.
-   *   {?function} renderer   This function may process the template or be used
-   *                          independently. It should return an HTML string.
-   *                          It is executed at runtime. Its context is
-   *                          sigma.graph.
-   *   {?string}   cssClass   The CSS class attached to the top div element.
-   *                          Default value: "sigma-tooltip".
-   *   {?string}   position   The position of the tooltip regarding the mouse.
-   *                          If it is not specified, the tooltip top-left
-   *                          corner is positionned at the mouse position.
-   *                          Available values: "top", "bottom", "left",
-   *                          "right".
-   *   {?boolean}  autoadjust [EXPERIMENTAL] If true, tries to adjust the
-   *                          tooltip position to be fully included in the body
-   *                          area. Doesn't work on Firefox 30. Better work on
-   *                          elements with fixed width and height.
-   *
-   * @param {sigma}  s       The related sigma instance.
-   * @param {object} o       The node or the edge.
-   * @param {object} options The options related to the object.
-   * @param {number} x       The X coordinate of the mouse.
-   * @param {number} y       The Y coordinate of the mouse.
-   */
-  function createTooltip(s, o, options, x, y) {
-    removeTooltip();
-
-    // Create the DOM element:
-    _tooltip = document.createElement('div');
-    if (options.renderer) {
-      // Copy the object:
-      var clone = Object.create(null),
-          renderer, 
-          k;
-      for (k in o)
-        clone[k] = o[k];
-
-      renderer = options.renderer.call(s.graph, clone, options.template);
-
-      if (typeof renderer === 'string')
-         _tooltip.innerHTML = renderer;
-      else
-          // renderer is a dom element:
-         _tooltip.appendChild(renderer);
-    } else {
-      _tooltip.innerHTML = options.template;
-    }
-
-    // Style it:
-    _tooltip.className = options.cssClass;
-    _tooltip.style.position = 'absolute';
-
-    // Default position is mouse position:
-    _tooltip.style.left = x + 'px';
-    _tooltip.style.top = y + 'px';
-
-    // Execute after rendering:
-    setTimeout(function() {
-      if (!_tooltip)
-        return;
-
-      // Insert the element in the DOM:
-      s.renderers[0].container.appendChild(_tooltip);
-
-      // Find offset:
-      var bodyRect = document.body.getBoundingClientRect(),
-          tooltipRect = _tooltip.getBoundingClientRect(),
-          offsetTop =  tooltipRect.top - bodyRect.top,
-          offsetBottom = bodyRect.bottom - tooltipRect.bottom,
-          offsetLeft =  tooltipRect.left - bodyRect.left,
-          offsetRight = bodyRect.right - tooltipRect.right;
-      
-      if (options.position === 'top') {
-        // New position vertically aligned and on top of the mouse:
-        _tooltip.className = options.cssClass + ' top';
-        _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
-        _tooltip.style.top = y - tooltipRect.height + 'px';
-      }
-      else if (options.position === 'bottom') {
-        // New position vertically aligned and on bottom of the mouse:
-        _tooltip.className = options.cssClass + ' bottom';
-        _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
-        _tooltip.style.top = y + 'px';
-      }
-      else if (options.position === 'left') {
-        // New position vertically aligned and on bottom of the mouse:
-        _tooltip.className = options.cssClass+ ' left';
-        _tooltip.style.left = x - tooltipRect.width + 'px';
-        _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
-      }
-      else if (options.position === 'right') {
-        // New position vertically aligned and on bottom of the mouse:
-        _tooltip.className = options.cssClass + ' right';
-        _tooltip.style.left = x + 'px';
-        _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
-      }
-
-      // Adjust position to keep the tooltip inside body:
-      // FIXME: doesn't work on Firefox
-      if (options.autoadjust) {
-
-        // Update offset
-        tooltipRect = _tooltip.getBoundingClientRect();
-        offsetTop = tooltipRect.top - bodyRect.top;
-        offsetBottom = bodyRect.bottom - tooltipRect.bottom;
-        offsetLeft = tooltipRect.left - bodyRect.left;
-        offsetRight = bodyRect.right - tooltipRect.right;
-
-        if (offsetBottom < 0) {
-          _tooltip.className = options.cssClass;
-          if (options.position === 'top' || options.position === 'bottom') {
-            _tooltip.className = options.cssClass + ' top';
-          }
-          _tooltip.style.top = y - tooltipRect.height + 'px';
-        }
-        else if (offsetTop < 0) {
-          _tooltip.className = options.cssClass;
-          if (options.position === 'top' || options.position === 'bottom') {
-            _tooltip.className = options.cssClass + ' bottom';
-          }
-          _tooltip.style.top = y + 'px';
-        }
-        if (offsetRight < 0) {
-          //! incorrect tooltipRect.width on non fixed width element.
-          _tooltip.className = options.cssClass;
-          if (options.position === 'left' || options.position === 'right') {
-            _tooltip.className = options.cssClass + ' left';
-          }
-          _tooltip.style.left = x - tooltipRect.width + 'px';
-        }
-        else if (offsetLeft < 0) {
-          _tooltip.className = options.cssClass;
-          if (options.position === 'left' || options.position === 'right') {
-            _tooltip.className = options.cssClass + ' right';
-          }
-          _tooltip.style.left = x + 'px';
-        }
-      }
-    }, 0);
-  };
-
-  /**
-   * This function removes the tooltip element from the DOM.
-   */
-  function removeTooltip() {
-    if (_tooltip && _tooltip.parentNode) {
-      // Remove from the DOM:
-      _tooltip.parentNode.removeChild(_tooltip);
-      _tooltip = null;
-    }
-  };
-
-  /**
-   * This function clears a potential timeout function related to the tooltip
-   * and removes the tooltip.
-   */
-  function cancelTooltip() {
-    clearTimeout(_timeoutHandle);
-    _timeoutHandle = false;
-    removeTooltip();
-  };
 
   /**
    * This function will display a tooltip when a sigma event is fired. It will
@@ -304,9 +114,13 @@
    * @param {object} options An object with options.
    */
   function Tooltips(s, options) {
-    var so = extend(options.stage, settings.stage);
-    var no = extend(options.node, settings.node);
-    var eo = extend(options.edge, settings.edge);
+    var self = this,
+        so = sigma.utils.extend(options.stage, settings.stage),
+        no = sigma.utils.extend(options.node, settings.node),
+        eo = sigma.utils.extend(options.edge, settings.edge),
+        _tooltip,
+        _timeoutHandle,
+        _doubleClick = false;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -318,11 +132,166 @@
       event.preventDefault();
     };
 
+    /**
+     * This function removes the existing tooltip and creates a new tooltip for a
+     * specified node or edge.
+     *
+     * @param {sigma}  s       The related sigma instance.
+     * @param {object} o       The node or the edge.
+     * @param {object} options The options related to the object.
+     * @param {number} x       The X coordinate of the mouse.
+     * @param {number} y       The Y coordinate of the mouse.
+     */
+    this.create = function(s, o, options, x, y) {
+      self.remove();
+
+      // Create the DOM element:
+      _tooltip = document.createElement('div');
+      if (options.renderer) {
+        // Copy the object:
+        var clone = Object.create(null),
+            renderer,
+            k;
+        for (k in o)
+          clone[k] = o[k];
+
+        renderer = options.renderer.call(s.graph, clone, options.template);
+
+        if (typeof renderer === 'string')
+           _tooltip.innerHTML = renderer;
+        else
+            // renderer is a dom element:
+           _tooltip.appendChild(renderer);
+      } else {
+        _tooltip.innerHTML = options.template;
+      }
+
+      // Style it:
+      _tooltip.className = options.cssClass;
+      _tooltip.style.position = 'absolute';
+
+      // Default position is mouse position:
+      _tooltip.style.left = x + 'px';
+      _tooltip.style.top = y + 'px';
+
+      // Execute after rendering:
+      setTimeout(function() {
+        if (!_tooltip)
+          return;
+
+        // Insert the element in the DOM:
+        s.renderers[0].container.appendChild(_tooltip);
+
+        // Find offset:
+        var bodyRect = document.body.getBoundingClientRect(),
+            tooltipRect = _tooltip.getBoundingClientRect(),
+            offsetTop =  tooltipRect.top - bodyRect.top,
+            offsetBottom = bodyRect.bottom - tooltipRect.bottom,
+            offsetLeft =  tooltipRect.left - bodyRect.left,
+            offsetRight = bodyRect.right - tooltipRect.right;
+
+        if (options.position === 'top') {
+          // New position vertically aligned and on top of the mouse:
+          _tooltip.className = options.cssClass + ' top';
+          _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
+          _tooltip.style.top = y - tooltipRect.height + 'px';
+        }
+        else if (options.position === 'bottom') {
+          // New position vertically aligned and on bottom of the mouse:
+          _tooltip.className = options.cssClass + ' bottom';
+          _tooltip.style.left = x - (tooltipRect.width / 2) + 'px';
+          _tooltip.style.top = y + 'px';
+        }
+        else if (options.position === 'left') {
+          // New position vertically aligned and on bottom of the mouse:
+          _tooltip.className = options.cssClass+ ' left';
+          _tooltip.style.left = x - tooltipRect.width + 'px';
+          _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
+        }
+        else if (options.position === 'right') {
+          // New position vertically aligned and on bottom of the mouse:
+          _tooltip.className = options.cssClass + ' right';
+          _tooltip.style.left = x + 'px';
+          _tooltip.style.top = y - (tooltipRect.height / 2) + 'px';
+        }
+
+        // Adjust position to keep the tooltip inside body:
+        // FIXME: doesn't work on Firefox
+        if (options.autoadjust) {
+
+          // Update offset
+          tooltipRect = _tooltip.getBoundingClientRect();
+          offsetTop = tooltipRect.top - bodyRect.top;
+          offsetBottom = bodyRect.bottom - tooltipRect.bottom;
+          offsetLeft = tooltipRect.left - bodyRect.left;
+          offsetRight = bodyRect.right - tooltipRect.right;
+
+          if (offsetBottom < 0) {
+            _tooltip.className = options.cssClass;
+            if (options.position === 'top' || options.position === 'bottom') {
+              _tooltip.className = options.cssClass + ' top';
+            }
+            _tooltip.style.top = y - tooltipRect.height + 'px';
+          }
+          else if (offsetTop < 0) {
+            _tooltip.className = options.cssClass;
+            if (options.position === 'top' || options.position === 'bottom') {
+              _tooltip.className = options.cssClass + ' bottom';
+            }
+            _tooltip.style.top = y + 'px';
+          }
+          if (offsetRight < 0) {
+            //! incorrect tooltipRect.width on non fixed width element.
+            _tooltip.className = options.cssClass;
+            if (options.position === 'left' || options.position === 'right') {
+              _tooltip.className = options.cssClass + ' left';
+            }
+            _tooltip.style.left = x - tooltipRect.width + 'px';
+          }
+          else if (offsetLeft < 0) {
+            _tooltip.className = options.cssClass;
+            if (options.position === 'left' || options.position === 'right') {
+              _tooltip.className = options.cssClass + ' right';
+            }
+            _tooltip.style.left = x + 'px';
+          }
+        }
+      }, 0);
+    };
+
+    /**
+     * This function removes the tooltip element from the DOM.
+     */
+    this.remove = function() {
+      if (_tooltip && _tooltip.parentNode) {
+        // Remove from the DOM:
+        _tooltip.parentNode.removeChild(_tooltip);
+        _tooltip = null;
+      }
+    };
+
+    /**
+     * This function clears a potential timeout function related to the tooltip
+     * and removes the tooltip.
+     */
+    this.cancel = function() {
+      clearTimeout(_timeoutHandle);
+      _timeoutHandle = false;
+      self.remove();
+    };
+
     // INTERFACE:
     this.close = function() {
-      cancelTooltip();
+      self.cancel();
       return this;
     };
+
+    this.kill = function() {
+      this.unbindEvents();
+      _tooltip = null;
+      _timeoutHandle = null;
+      _doubleClick = false;
+    }
 
     this.unbindEvents = function() {
       if (options.stage) {
@@ -380,29 +349,29 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createTooltip(
+          self.create(
             s,
             null,
             so,
             clientX,
             clientY);
 
-          _instance.dispatchEvent('shown');
-        }, so.delay);     
+          self.dispatchEvent('shown');
+        }, so.delay);
       });
 
       s.bind(so.hide, function(event) {
         var p = _tooltip;
-        cancelTooltip();
+        self.cancel();
         if (p)
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
-          cancelTooltip();
+          self.cancel();
           _doubleClick = true;
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -412,7 +381,7 @@
 
     // NODE tooltip:
     if (options.node) {
-      if (options.node.renderer !== undefined && 
+      if (options.node.renderer !== undefined &&
           typeof options.node.renderer !== 'function')
         throw 'The render of the node tooltip must be a function.';
 
@@ -436,29 +405,29 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createTooltip(
+          self.create(
             s,
             n,
             no,
             clientX,
             clientY);
 
-          _instance.dispatchEvent('shown');
-        }, no.delay);     
+          self.dispatchEvent('shown');
+        }, no.delay);
       });
 
       s.bind(no.hide, function(event) {
         var p = _tooltip;
-        cancelTooltip();
+        self.cancel();
         if (p)
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
-          cancelTooltip();
+          self.cancel();
           _doubleClick = true;
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -492,29 +461,29 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          createTooltip(
+          self.create(
             s,
             e,
             eo,
             clientX,
             clientY);
 
-          _instance.dispatchEvent('shown');
-        }, eo.delay);     
+          self.dispatchEvent('shown');
+        }, eo.delay);
       });
 
       s.bind(eo.hide, function(event) {
         var p = _tooltip;
-        cancelTooltip();
+        self.cancel();
         if (p)
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
-          cancelTooltip();
+          self.cancel();
           _doubleClick = true;
-          _instance.dispatchEvent('hidden');
+          self.dispatchEvent('hidden');
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -536,7 +505,7 @@
    * Interface
    * ------------------
    */
-  var _instance = null;
+  var _instance = {};
 
   /**
    * @param {sigma}  s       The related sigma instance.
@@ -544,23 +513,20 @@
    */
   sigma.plugins.tooltips = function(s, options) {
     // Create object if undefined
-    if (!_instance) {
-      _instance = new Tooltips(s, options);
+    if (!_instance[s.id]) {
+      _instance[s.id] = new Tooltips(s, options);
     }
-    return _instance;
+    return _instance[s.id];
   };
 
   /**
    *  This function kills the tooltips instance.
    */
-  sigma.plugins.killTooltips = function() {
-    if (_instance instanceof Tooltips) {
-      _instance.unbindEvents();
-      _instance = null;
-      _tooltip = null;
-      _timeoutHandle = null;
-      _doubleClick = false;
+  sigma.plugins.killTooltips = function(s) {
+    if (_instance[s.id] instanceof Tooltips) {
+      _instance[s.id].kill();
     }
+    delete _instance[s.id];
   };
 
 }).call(window);
