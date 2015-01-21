@@ -243,10 +243,23 @@
         }
 
         // Applying linear interpolation.
-        x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-          (ref[1].x - ref[0].x) + ref[0].x;
-        y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-          (ref[1].y - ref[0].y) + ref[0].y;
+        if ((ref[1].renX - ref[0].renX) === 0) {
+          // (ref[1].x -ref[0].x) / (ref[1].renX - ref[0].renX))
+          // should be close to 1
+          x = x - ref[0].renX + ref[0].x;
+        } else {
+          x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
+            (ref[1].x - ref[0].x) + ref[0].x;
+        }
+
+        if ((ref[1].renY - ref[0].renY) === 0) {
+          // (ref[1].y - ref[0].y) / (ref[1].renY - ref[0].renY))
+          // should be close to 1
+          y = y - ref[0].renY + ref[0].y;
+        } else {
+          y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
+            (ref[1].y - ref[0].y) + ref[0].y;
+        }
 
         // Rotating the coordinates.
         _node.x = x * cos - y * sin;
