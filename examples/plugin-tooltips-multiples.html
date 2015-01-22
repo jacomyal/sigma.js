@@ -151,7 +151,8 @@
 </div>
 <script>
 /**
- * This is an example on how to use node tooltips based on a random graph.
+ * This is an example on how to use node tooltips based on a random graph
+ * and with multiple sigma instances.
  */
 var i,
     s,
@@ -218,7 +219,7 @@ sigmaWebgl.refresh();
   }
 });*/
 
-var settings = {
+var config = {
   node: {
     show: 'overNode',
     hide: 'outNode',
@@ -252,7 +253,7 @@ var settings = {
 };
 
 // Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
-var tooltipsCanvas = sigma.plugins.tooltips(sigmaCanvas, sigmaCanvas.renderers[0], settings);
+var tooltipsCanvas = sigma.plugins.tooltips(sigmaCanvas, sigmaCanvas.renderers[0], config);
 
 tooltipsCanvas.bind('shown', function(event) {
   console.log('tooltip shown', event);
@@ -263,7 +264,7 @@ tooltipsCanvas.bind('hidden', function(event) {
 });
 
 
-var tooltipsWebgl = sigma.plugins.tooltips(sigmaWebgl, sigmaWebgl.renderers[0], settings);
+var tooltipsWebgl = sigma.plugins.tooltips(sigmaWebgl, sigmaWebgl.renderers[0], config);
 
 tooltipsWebgl.bind('shown', function(event) {
   console.log('tooltip shown', event);

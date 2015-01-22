@@ -17,7 +17,7 @@ This plugin provides a method to display a tooltip manually or when a sigma even
 
 Check the `sigma.plugins.tooltips` function doc or the example code [here](../../examples/plugin-tooltips.html) and [there](../../examples/plugin-tooltips-multiples.html) to know more.
 
-To use, include all .js files under this folder. Then initialize it as follows, where the first parameter is the Sigma instance, and the second parameter is the options object:
+To use, include all .js files under this folder. Then initialize it as follows, where the first parameter is the Sigma instance, the second is the renderer on which to display the tooltip, and the third parameter is the options object:
 
 ````javascript
 var tooltipInstance = sigma.plugins.tooltips(
@@ -37,7 +37,7 @@ var tooltipInstance = sigma.plugins.tooltips(
 );
 ````
 
-Kills the tooltips as follows:
+Kill the tooltips as follows:
 
 ````javascript
 sigma.plugins.killTooltips(sigmaInstance);
@@ -49,7 +49,7 @@ Manually open a tooltip on a node:
 var n = sigmaInstance.graph.nodes('n0');
 var prefix = sigmaInstance.renderers[0].camera.prefix;
 
-tooltipInstance.(
+tooltipInstance.open(
   n, 
   settings.node, 
   n[prefix + 'x'], 
