@@ -14,7 +14,6 @@
 <script src="../src/captors/sigma.captors.touch.js"></script>
 <script src="../src/renderers/sigma.renderers.canvas.js"></script>
 <script src="../src/renderers/sigma.renderers.webgl.js"></script>
-<script src="../src/renderers/sigma.renderers.svg.js"></script>
 <script src="../src/renderers/sigma.renderers.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
@@ -33,29 +32,33 @@
 <script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
-<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
-<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
-<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
 <script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
 <script src="../src/middlewares/sigma.middlewares.copy.js"></script>
 <script src="../src/misc/sigma.misc.animation.js"></script>
 <script src="../src/misc/sigma.misc.bindEvents.js"></script>
-<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
 <div id="container">
   <style>
-    #graph-container {
+    #graph-canvas-left{
       top: 0;
       bottom: 0;
       left: 0;
+      right: 50%;
+      position: absolute;
+    }
+    #graph-webgl-right{
+      top: 0;
+      bottom: 0;
+      left: 50%;
       right: 0;
       position: absolute;
+    }
+    h1 {
+      position: absolute;
+      margin: 0.5em;
     }
 
     .sigma-tooltip {
@@ -143,11 +146,13 @@
     }
 
   </style>
-  <div id="graph-container"></div>
+  <div id="graph-canvas-left"><h1>Canvas</h1></div>
+  <div id="graph-webgl-right"><h1>WebGL</h1></div>
 </div>
 <script>
 /**
- * This is an example on how to use node tooltips based on a random graph.
+ * This is an example on how to use node tooltips based on a random graph
+ * and with multiple sigma instances.
  */
 var i,
     s,
@@ -185,10 +190,27 @@ for (i = 0; i < E; i++)
   });
 
 // Instanciate sigma:
-s = new sigma({
+// s = new sigma({
+//   graph: g,
+//   container: 'graph-container'
+// });
+var sigmaCanvas = new sigma({
   graph: g,
-  container: 'graph-container'
+  renderer: {
+    container: document.getElementById('graph-canvas-left'),
+    type: 'canvas'
+  }
 });
+sigmaCanvas.refresh();
+
+var sigmaWebgl = new sigma({
+  graph: g,
+  renderer: {
+    container: document.getElementById('graph-webgl-right'),
+    type: 'webgl'
+  }
+});
+sigmaWebgl.refresh();
 
 // Minimal example of the tooltip plugin instanciation:
 /*sigma.plugins.tooltip(s, {
@@ -231,21 +253,24 @@ var config = {
 };
 
 // Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
-var tooltips = sigma.plugins.tooltips(s, s.renderers[0], config);
+var tooltipsCanvas = sigma.plugins.tooltips(sigmaCanvas, sigmaCanvas.renderers[0], config);
 
-
-// Manually open a tooltip on a node:
-var n = s.graph.nodes('n10');
-var prefix = s.renderers[0].camera.prefix;
-tooltips.open(n, config.node, n[prefix + 'x'], n[prefix + 'y']);
-
-
-tooltips.bind('shown', function(event) {
+tooltipsCanvas.bind('shown', function(event) {
   console.log('tooltip shown', event);
 });
 
-tooltips.bind('hidden', function(event) {
+tooltipsCanvas.bind('hidden', function(event) {
   console.log('tooltip hidden', event);
 });
 
+
+var tooltipsWebgl = sigma.plugins.tooltips(sigmaWebgl, sigmaWebgl.renderers[0], config);
+
+tooltipsWebgl.bind('shown', function(event) {
+  console.log('tooltip shown', event);
+});
+
+tooltipsWebgl.bind('hidden', function(event) {
+  console.log('tooltip hidden', event);
+});
 </script>
