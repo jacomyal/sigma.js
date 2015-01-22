@@ -20,7 +20,7 @@ var locate = sigma.plugins.locate(sigInst);
 Kill the plugin instance as follows:
 
 ````javascript
-sigma.plugins.killLocate();
+sigma.plugins.killLocate(sigInst);
 ````
 
 ## Configuration
