@@ -7,7 +7,7 @@ Contact: seb@linkurio.us
 
 ---
 
-This plugin provides a method to display a tooltip when a sigma event is fired either on stage, node, or edge. The tooltip is an HTML DOM element. Only one tooltip is displayed on screen. 
+This plugin provides a method to display a tooltip manually or when a sigma event is fired either on stage, node, or edge. The tooltip is an HTML DOM element. Only one tooltip is displayed on screen. 
 
 #### Example 1: display on node hover event
 ![Tooltips](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips.png)
@@ -15,22 +15,26 @@ This plugin provides a method to display a tooltip when a sigma event is fired e
 #### Example 2: display on right-click event
 ![Tooltips LK](https://github.com/Linkurious/linkurious.js/wiki/media/tooltips-lk.gif)
 
-Check the `sigma.plugins.tooltips` function doc or the [example code](../../examples/plugin-tooltips.html) to know more.
+Check the `sigma.plugins.tooltips` function doc or the example code [here](../../examples/plugin-tooltips.html) and [there](../../examples/plugin-tooltips-multiples.html) to know more.
 
 To use, include all .js files under this folder. Then initialize it as follows, where the first parameter is the Sigma instance, and the second parameter is the options object:
 
 ````javascript
-sigma.plugins.tooltips(sigmaInstance, {
-  node: {
-    template: 'Hello node!'
-  },
-  edge: {
-    template: 'Hello edge!'
-  },
-  stage: {
-    template: 'Hello stage!'
+var tooltipInstance = sigma.plugins.tooltips(
+  sigmaInstance,
+  sigmaInstance.renderers[0],
+  {
+    node: {
+      template: 'Hello node!'
+    },
+    edge: {
+      template: 'Hello edge!'
+    },
+    stage: {
+      template: 'Hello stage!'
+    }
   }
-});
+);
 ````
 
 Kills the tooltips as follows:
@@ -39,20 +43,40 @@ Kills the tooltips as follows:
 sigma.plugins.killTooltips(sigmaInstance);
 ````
 
+Manually open a tooltip on a node:
+
+````javascript
+var n = sigmaInstance.graph.nodes('n0');
+var prefix = sigmaInstance.renderers[0].camera.prefix;
+
+tooltipInstance.(
+  n, 
+  settings.node, 
+  n[prefix + 'x'], 
+  n[prefix + 'y']
+);
+````
+
+Manually close a tooltip:
+
+````javascript
+tooltipInstance.close();
+````
+
 ## Configuration
 
 A configuration object must be passed to the plugin at the initialization:
 
 ````javascript
 var config = {...};
-sigma.plugins.tooltips(sigmaInstance, config);
+sigma.plugins.tooltips(sigmaInstance, sigmaInstance.renderers[0], config);
 ````
 
 The plugin provides three configuration keys called `stage`, `node`, `edge`. Bound to the relevant Sigma events, the content and style of the tooltip varies if you trigger it for a node, an edge, or the stage.
 
 For instance, the following configuration enables a tooltip on node click:
 ````javascript
-sigma.plugins.tooltips(sigmaInstance, {
+sigma.plugins.tooltips(sigmaInstance, sigmaInstance.renderers[0], {
   node: {
     show: 'clickNode',
     template: 'Hello node!'
@@ -116,6 +140,8 @@ This plugins provides the following events:
 ### v0.4
 
   * Handle multiple sigma instances
+  * The renderer is passed as argument
+  * Make public methods `.open()`, `.close()`, `.kill()`
 
 ### v0.3
 

@@ -217,7 +217,14 @@ var settings = {
 };
 
 // Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
-var tooltips = sigma.plugins.tooltips(s, settings);
+var tooltips = sigma.plugins.tooltips(s, s.renderers[0], settings);
+
+
+// Manually open a tooltip on a node:
+var n = s.graph.nodes('n10');
+var prefix = s.renderers[0].camera.prefix;
+tooltips.open(n, settings.node, n[prefix + 'x'], n[prefix + 'y']);
+
 
 tooltips.bind('shown', function(event) {
   console.log('tooltip shown', event);

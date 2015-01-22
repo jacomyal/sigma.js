@@ -110,10 +110,11 @@
    * >   }
    * > });
    *
-   * @param {sigma}  s       The related sigma instance.
-   * @param {object} options An object with options.
+   * @param {sigma}    s        The related sigma instance.
+   * @param {renderer} renderer The related sigma renderer.
+   * @param {object}   options  An object with options.
    */
-  function Tooltips(s, options) {
+  function Tooltips(s, renderer, options) {
     var self = this,
         so = sigma.utils.extend(options.stage, settings.stage),
         no = sigma.utils.extend(options.node, settings.node),
@@ -136,39 +137,43 @@
      * This function removes the existing tooltip and creates a new tooltip for a
      * specified node or edge.
      *
-     * @param {sigma}  s       The related sigma instance.
      * @param {object} o       The node or the edge.
      * @param {object} options The options related to the object.
      * @param {number} x       The X coordinate of the mouse.
      * @param {number} y       The Y coordinate of the mouse.
      */
-    this.create = function(s, o, options, x, y) {
-      self.remove();
+    this.open = function(o, options, x, y) {
+      remove();
 
       // Create the DOM element:
       _tooltip = document.createElement('div');
       if (options.renderer) {
         // Copy the object:
         var clone = Object.create(null),
-            renderer,
+            tooltipRenderer,
             k;
         for (k in o)
           clone[k] = o[k];
 
-        renderer = options.renderer.call(s.graph, clone, options.template);
+        tooltipRenderer = options.renderer.call(s.graph, clone, options.template);
 
-        if (typeof renderer === 'string')
-           _tooltip.innerHTML = renderer;
+        if (typeof tooltipRenderer === 'string')
+           _tooltip.innerHTML = tooltipRenderer;
         else
-            // renderer is a dom element:
-           _tooltip.appendChild(renderer);
+            // tooltipRenderer is a dom element:
+           _tooltip.appendChild(tooltipRenderer);
       } else {
         _tooltip.innerHTML = options.template;
       }
 
       // Style it:
       _tooltip.className = options.cssClass;
-      _tooltip.style.position = 'absolute';
+      _tooltip.style.position = 'relative';
+
+      // container position:
+      var containerRect = renderer.container.getBoundingClientRect();
+      x = ~~(x - containerRect.left);
+      y = ~~(y - containerRect.top);
 
       // Default position is mouse position:
       _tooltip.style.left = x + 'px';
@@ -180,7 +185,7 @@
           return;
 
         // Insert the element in the DOM:
-        s.renderers[0].container.appendChild(_tooltip);
+        renderer.container.appendChild(_tooltip);
 
         // Find offset:
         var bodyRect = document.body.getBoundingClientRect(),
@@ -262,7 +267,7 @@
     /**
      * This function removes the tooltip element from the DOM.
      */
-    this.remove = function() {
+    function remove() {
       if (_tooltip && _tooltip.parentNode) {
         // Remove from the DOM:
         _tooltip.parentNode.removeChild(_tooltip);
@@ -274,15 +279,15 @@
      * This function clears a potential timeout function related to the tooltip
      * and removes the tooltip.
      */
-    this.cancel = function() {
+    function cancel() {
       clearTimeout(_timeoutHandle);
       _timeoutHandle = false;
-      self.remove();
+      remove();
     };
 
     // INTERFACE:
     this.close = function() {
-      self.cancel();
+      cancel();
       return this;
     };
 
@@ -317,7 +322,7 @@
       }
       if (no.show === 'rightClickNode' ||
           eo.show === 'rightClickEdge') {
-        s.renderers[0].container.removeEventListener(
+        renderer.container.removeEventListener(
           'contextmenu',
           contextmenuListener
         );
@@ -349,8 +354,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          self.create(
-            s,
+          self.open(
             null,
             so,
             clientX,
@@ -362,14 +366,14 @@
 
       s.bind(so.hide, function(event) {
         var p = _tooltip;
-        self.cancel();
+        cancel();
         if (p)
           self.dispatchEvent('hidden');
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
-          self.cancel();
+          cancel();
           _doubleClick = true;
           self.dispatchEvent('hidden');
           setTimeout(function() {
@@ -405,8 +409,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          self.create(
-            s,
+          self.open(
             n,
             no,
             clientX,
@@ -418,14 +421,14 @@
 
       s.bind(no.hide, function(event) {
         var p = _tooltip;
-        self.cancel();
+        cancel();
         if (p)
           self.dispatchEvent('hidden');
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
-          self.cancel();
+          cancel();
           _doubleClick = true;
           self.dispatchEvent('hidden');
           setTimeout(function() {
@@ -461,8 +464,7 @@
 
         clearTimeout(_timeoutHandle);
         _timeoutHandle = setTimeout(function() {
-          self.create(
-            s,
+          self.open(
             e,
             eo,
             clientX,
@@ -474,14 +476,14 @@
 
       s.bind(eo.hide, function(event) {
         var p = _tooltip;
-        self.cancel();
+        cancel();
         if (p)
           self.dispatchEvent('hidden');
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
-          self.cancel();
+          cancel();
           _doubleClick = true;
           self.dispatchEvent('hidden');
           setTimeout(function() {
@@ -494,7 +496,7 @@
     // Prevent the browser context menu to appear
     // if the right click event is already handled:
     if (no.show === 'rightClickNode' || eo.show === 'rightClickEdge') {
-      s.renderers[0].container.addEventListener(
+      renderer.container.addEventListener(
         'contextmenu',
         contextmenuListener
       );
@@ -508,13 +510,14 @@
   var _instance = {};
 
   /**
-   * @param {sigma}  s       The related sigma instance.
-   * @param {object} options An object with options.
+   * @param {sigma}    s        The related sigma instance.
+   * @param {renderer} renderer The related sigma renderer.
+   * @param {object}   options  An object with options.
    */
-  sigma.plugins.tooltips = function(s, options) {
+  sigma.plugins.tooltips = function(s, renderer, options) {
     // Create object if undefined
     if (!_instance[s.id]) {
-      _instance[s.id] = new Tooltips(s, options);
+      _instance[s.id] = new Tooltips(s, renderer, options);
     }
     return _instance[s.id];
   };
