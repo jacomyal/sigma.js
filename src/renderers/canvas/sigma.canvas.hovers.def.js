@@ -37,7 +37,7 @@
       (node.color || settings('defaultNodeColor')) :
       settings('defaultHoverLabelBGColor');
 
-    if (node.label && settings('labelHoverShadow')) {
+    if (settings('labelHoverShadow')) {
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 0;
       context.shadowBlur = 8;
@@ -50,81 +50,7 @@
       alignment = settings('labelAlignment');
     }
 
-    if (node.label && typeof node.label === 'string') {
-      x = Math.round(node[prefix + 'x']);
-      y = Math.round(node[prefix + 'y']);
-      w = Math.round(
-        context.measureText(node.label).width + size + 1.5 + fontSize / 3
-      );
-      h = Math.round(fontSize + 4);
-      e = size + fontSize / 3;
-
-      // draw a circle for the node first
-      context.moveTo(x, y - e);
-      context.arcTo(x + e, y - e, x + e, y, e);
-      context.arcTo(x + e, y + e, x, y + e, e);
-      context.arcTo(x - e, y + e, x - e, y, e);
-      context.arcTo(x - e, y - e, x, y - e, e);
-
-      // then a rectangle for the label
-      switch (alignment) {
-        case 'center':
-          break;
-        case 'left':
-          y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
-          context.moveTo(x, y);
-          context.lineTo(x, y + h);
-          context.lineTo(x - w, y + h);
-          context.lineTo(x - w, y);
-          context.lineTo(x, y);
-          break;
-        case 'top':
-          y = Math.round(node[prefix + 'y'] - e);
-
-          context.moveTo(x, y);
-          context.lineTo(x + w / 2 , y);
-          context.lineTo(x + w / 2, y - h);
-          context.lineTo(x - w / 2, y - h);
-          context.lineTo(x - w / 2, y);
-          context.lineTo(x, y);
-          break;
-        case 'bottom':
-          y = Math.round(node[prefix + 'y'] + e);
-
-          context.moveTo(x, y);
-          context.lineTo(x + w / 2 , y);
-          context.lineTo(x + w / 2, y + h);
-          context.lineTo(x - w / 2, y + h);
-          context.lineTo(x - w / 2, y);
-          context.lineTo(x, y);
-          break;
-        case 'inside':
-          if (context.measureText(node.label).width <= e * 2) {
-            // don't draw anything
-            break;
-          }
-          // use default setting, falling through
-        /* falls through*/
-        case 'right':
-        /* falls through*/
-        default:
-          y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
-
-          context.moveTo(x, y);
-          context.lineTo(x + w, y);
-          context.lineTo(x + w, y + h);
-          context.lineTo(x, y + h);
-          context.lineTo(x, y);
-          break;
-      }
-
-      context.closePath();
-      context.fill();
-
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 0;
-      context.shadowBlur = 0;
-    }
+    drawHoverBorder(alignment, context, fontSize, node);
 
     // Node border:
     if (settings('borderSize') > 0) {
@@ -148,8 +74,14 @@
     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
     nodeRenderer(node, context, settings);
 
-    // Display the label:
-    if (typeof node.label === 'string') {
+    displayLabel(alignment, context, fontSize, node);
+
+    function displayLabel(alignment, context, fontSize, node) {
+      if (node.label === null || node.label === undefined ||
+          typeof node.label !== 'string') {
+        return;
+      }
+
       context.fillStyle = (settings('labelHoverColor') === 'node') ?
         (node.color || settings('defaultNodeColor')) :
         settings('defaultLabelHoverColor');
@@ -189,6 +121,84 @@
         Math.round(node[prefix + 'x'] + xOffset),
         Math.round(node[prefix + 'y'] + yOffset)
       );
+    }
+
+    function drawHoverBorder(alignment, context, fontSize, node) {
+      x = Math.round(node[prefix + 'x']);
+      y = Math.round(node[prefix + 'y']);
+      w = Math.round(
+        context.measureText(node.label).width + size + 1.5 + fontSize / 3
+      );
+      h = Math.round(fontSize + 4);
+      e = size + fontSize / 3;
+
+      // draw a circle for the node first
+      context.moveTo(x, y - e);
+      context.arcTo(x + e, y - e, x + e, y, e);
+      context.arcTo(x + e, y + e, x, y + e, e);
+      context.arcTo(x - e, y + e, x - e, y, e);
+      context.arcTo(x - e, y - e, x, y - e, e);
+
+      if (node.label && typeof node.label === 'string') {
+        // then a rectangle for the label
+        switch (alignment) {
+          case 'center':
+            break;
+          case 'left':
+            y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
+            context.moveTo(x, y);
+            context.lineTo(x, y + h);
+            context.lineTo(x - w, y + h);
+            context.lineTo(x - w, y);
+            context.lineTo(x, y);
+            break;
+          case 'top':
+            y = Math.round(node[prefix + 'y'] - e);
+
+            context.moveTo(x, y);
+            context.lineTo(x + w / 2 , y);
+            context.lineTo(x + w / 2, y - h);
+            context.lineTo(x - w / 2, y - h);
+            context.lineTo(x - w / 2, y);
+            context.lineTo(x, y);
+            break;
+          case 'bottom':
+            y = Math.round(node[prefix + 'y'] + e);
+
+            context.moveTo(x, y);
+            context.lineTo(x + w / 2 , y);
+            context.lineTo(x + w / 2, y + h);
+            context.lineTo(x - w / 2, y + h);
+            context.lineTo(x - w / 2, y);
+            context.lineTo(x, y);
+            break;
+          case 'inside':
+            if (context.measureText(node.label).width <= e * 2) {
+              // don't draw anything
+              break;
+            }
+            // use default setting, falling through
+          /* falls through*/
+          case 'right':
+          /* falls through*/
+          default:
+            y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
+
+            context.moveTo(x, y);
+            context.lineTo(x + w, y);
+            context.lineTo(x + w, y + h);
+            context.lineTo(x, y + h);
+            context.lineTo(x, y);
+            break;
+        }
+      }
+
+      context.closePath();
+      context.fill();
+
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
     }
   };
 }).call(this);
