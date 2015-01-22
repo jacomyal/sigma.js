@@ -223,16 +223,16 @@
 
       function executeNodeMouseMove() {
         var offset = calculateOffset(_renderer.container),
-            x = event.clientX - offset.left,
-            y = event.clientY - offset.top,
-            cos = Math.cos(_camera.angle),
-            sin = Math.sin(_camera.angle),
-            nodes = _s.graph.nodes(),
-            ref = [],
-            renXDiff,
-            renYDiff,
-            xDiff,
-            yDiff;
+          x = event.clientX - offset.left,
+          y = event.clientY - offset.top,
+          cos = Math.cos(_camera.angle),
+          sin = Math.sin(_camera.angle),
+          nodes = _s.graph.nodes(),
+          ref = [],
+          renXDiff,
+          renYDiff,
+          xDiff,
+          yDiff;
 
         // Getting and derotating the reference coordinates.
         for (var i = 0; i < 2; i++) {
@@ -256,7 +256,7 @@
         } else {
           // use a really small number
           if (renXDiff === 0) {
-            renXDiff = 0.0000000000000001;
+            renXDiff = Number.MIN_VALUE;
           }
 
           x = (x - ref[0].renX) / renXDiff * xDiff + ref[0].x;
@@ -269,7 +269,7 @@
           y = y - ref[0].renY + ref[0].y;
         } else {
           if (renYDiff === 0) {
-            renYDiff = 0.0000000000000001;
+            renYDiff = Number.MIN_VALUE;
           }
 
           y = (y - ref[0].renY) / renYDiff * yDiff + ref[0].y;
