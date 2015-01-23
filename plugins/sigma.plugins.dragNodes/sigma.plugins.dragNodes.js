@@ -245,8 +245,9 @@
         y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
           (ref[1].y - ref[0].y) + ref[0].y;
 
-          var forceX = (x + _node.x)
-          var forceY = (y + _node.y)
+        // Calcul force of dragging
+        var forceX = (x + _node.x)
+        var forceY = (y + _node.y)
 
         // Drag multiple nodes, Keep distance
         var x2, y2;
@@ -254,6 +255,7 @@
           var activeNodes = _a.nodes();
           for(var i = 0; i < activeNodes.length; i++) {
 
+            // Calcul first position of activeNodes
             if(!activeNodes[i].alphaX) {
               var alphaX = activeNodes[i].x - x;
               var alphaY = activeNodes[i].y - y;
@@ -266,8 +268,10 @@
 
               activeNodes[i].x = x2
               activeNodes[i].y = y2
+
             } else {
 
+              // Moove activeNodes to keep same distance between dragged nodes and active nodes
               x2 = _node.x + forceX*activeNodes[i].alphaX;
               y2 = _node.y + forceY*activeNodes[i].alphaY;
 
@@ -277,7 +281,7 @@
           }
         }
 
-        // // Rotating the coordinates.
+        // Rotating the coordinates.
         _node.x = x * cos - y * sin;
         _node.y = y * cos + x * sin;
 
