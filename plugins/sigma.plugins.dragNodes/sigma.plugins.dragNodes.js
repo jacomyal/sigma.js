@@ -239,32 +239,45 @@
           ref.push(aux);
         }
 
-        if(_a) {
-          var activeNodes = _a.nodes();
-          for(var i = 0; i < activeNodes.length; i++) {
-            if(!activeNodes[i].alphaX) {
-              var alphaX = Math.abs(_node.x - activeNodes[i].x);
-              var alphaY = Math.abs(_node.y - activeNodes[i].y);
-
-              activeNodes[i].alphaX = alphaX;
-              activeNodes[i].alphaY = alphaY;
-            }
-
-            var x2 = _node.x*activeNodes[i].alphaX + (1-activeNodes[i].alphaX)*activeNodes[i].x;
-            var y2 = _node.y*activeNodes[i].alphaY + (1-activeNodes[i].alphaY)*activeNodes[i].y;
-
-            activeNodes[i].x = x2 * cos - y2 * sin;
-            activeNodes[i].y = y2 * cos + x2 * sin;
-          }
-        }
-
         // Applying linear interpolation.
         x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
           (ref[1].x - ref[0].x) + ref[0].x;
         y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
           (ref[1].y - ref[0].y) + ref[0].y;
 
-        // Rotating the coordinates.
+          var forceX = (x + _node.x)
+          var forceY = (y + _node.y)
+
+        // Drag multiple nodes, Keep distance
+        var x2, y2;
+        if(_a) {
+          var activeNodes = _a.nodes();
+          for(var i = 0; i < activeNodes.length; i++) {
+
+            if(!activeNodes[i].alphaX) {
+              var alphaX = activeNodes[i].x - x;
+              var alphaY = activeNodes[i].y - y;
+
+              activeNodes[i].alphaX = alphaX;
+              activeNodes[i].alphaY = alphaY;
+
+              x2 = forceX*activeNodes[i].alphaX;
+              y2 = forceY*activeNodes[i].alphaY;
+
+              activeNodes[i].x = x2
+              activeNodes[i].y = y2
+            } else {
+
+              x2 = _node.x + forceX*activeNodes[i].alphaX;
+              y2 = _node.y + forceY*activeNodes[i].alphaY;
+
+              activeNodes[i].x = x2;
+              activeNodes[i].y = y2;
+            }
+          }
+        }
+
+        // // Rotating the coordinates.
         _node.x = x * cos - y * sin;
         _node.y = y * cos + x * sin;
 
