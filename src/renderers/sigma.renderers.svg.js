@@ -313,9 +313,8 @@
     this.container.appendChild(canvas);
     this.measurementCanvas = canvas.getContext('2d');
 
-    var fontSize = (this.settings('labelSize') === 'fixed') ?
-      this.settings('defaultLabelSize') :
-      this.settings('labelSizeRatio') * size;
+    // "proportional" labelSize is not yet supported
+    var fontSize = this.settings('defaultLabelSize');
     this.measurementCanvas.font = (this.settings('fontStyle') ?
       this.settings('fontStyle') + ' ' :
       '') + fontSize + 'px ' + this.settings('font');
