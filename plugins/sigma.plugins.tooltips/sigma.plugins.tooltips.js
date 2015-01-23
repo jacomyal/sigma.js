@@ -126,7 +126,7 @@
     sigma.classes.dispatcher.extend(this);
 
     s.bind('kill', function() {
-      sigma.plugins.killTooltips();
+      sigma.plugins.killTooltips(s);
     });
 
     function contextmenuListener(event) {
