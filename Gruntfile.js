@@ -66,7 +66,7 @@ module.exports = function(grunt) {
     'parsers.json',
     'plugins.animate',
     'plugins.colorbrewer',
-    'plugins.designer',
+    'plugins.design',
     'plugins.dragNodes',
     'plugins.filter',
     'plugins.neighborhoods',

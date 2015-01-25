@@ -1,10 +1,10 @@
-module('sigma.plugins.designer');
+module('sigma.plugins.design');
 
 test('API', function(assert) {
   var a,
       k,
       s = new sigma(),
-      designer;
+      design;
 
   var graph = {
     nodes: [
@@ -119,28 +119,28 @@ test('API', function(assert) {
     }
   };
 
-  // Initialize the designer:
-  designer = sigma.plugins.designer(s, {
+  // Initialize the design:
+  design = sigma.plugins.design(s, {
     styles: myStyles,
     palette: myPalette
   });
 
   s.graph.read(graph);
 
-  designer.apply('nodes');
-  designer.apply('edges');
+  design.apply('nodes');
+  design.apply('edges');
 
-  designer.apply();
+  design.apply();
 
-  designer.deprecate();
+  design.deprecate();
 
 
   // check apply node color
 
-  designer.apply('nodes', 'color');
+  design.apply('nodes', 'color');
 
   ok(
-    designer.styles.nodes.color.active,
+    design.styles.nodes.color.active,
     'nodes color is active after "apply(\'nodes\', \'color\')"'
   );
 
@@ -177,10 +177,10 @@ test('API', function(assert) {
 
   // check apply node size
 
-  designer.apply('nodes', 'size');
+  design.apply('nodes', 'size');
 
   ok(
-    designer.styles.nodes.size.active,
+    design.styles.nodes.size.active,
     'nodes size is active after "apply(\'nodes\', \'size\')"'
   );
 
@@ -212,7 +212,7 @@ test('API', function(assert) {
   // check undo node color
   // see https://github.com/jacomyal/sigma.js/issues/500
 
-  // designer.undo('nodes', 'color');
+  // design.undo('nodes', 'color');
 
   // strictEqual(
   //   s.graph.nodes('n0').color,
@@ -229,10 +229,10 @@ test('API', function(assert) {
 
   // check undo node size
 
-  designer.undo('nodes', 'size');
+  design.undo('nodes', 'size');
 
   ok(
-    !designer.styles.nodes.size.active,
+    !design.styles.nodes.size.active,
     'nodes size is not active after "undo(\'nodes\', \'size\')"'
   );
 
@@ -249,38 +249,38 @@ test('API', function(assert) {
   );
 
 
-  designer.apply('edges', 'color');
+  design.apply('edges', 'color');
 
   ok(
-    designer.styles.edges.color.active,
+    design.styles.edges.color.active,
     'edges color is active after "apply(\'edges\', \'color\')"'
   );
 
-  designer.apply('edges', 'size');
+  design.apply('edges', 'size');
 
   ok(
-    designer.styles.edges.size.active,
+    design.styles.edges.size.active,
     'edges size is active after "apply(\'edges\', \'size\')"'
   );
 
-  designer.undo('edges', 'color');
+  design.undo('edges', 'color');
 
   ok(
-    !designer.styles.edges.color.active,
+    !design.styles.edges.color.active,
     'edges color is not active after "undo(\'edges\', \'color\')"'
   );
 
-  designer.undo('edges', 'size');
+  design.undo('edges', 'size');
 
   ok(
-    !designer.styles.edges.size.active,
+    !design.styles.edges.size.active,
     'edges size is not active after "undo(\'edges\', \'size\')"'
   );
 
-  designer.apply();
+  design.apply();
 
   ok(
-    designer.styles.nodes.color.active,
+    design.styles.nodes.color.active,
     'nodes color is active after "apply()"'
   );
 
@@ -288,33 +288,33 @@ test('API', function(assert) {
   // check histogram function
 
   equal(
-    designer.utils.histogram('edges', 'color', 'quantity').length,
+    design.utils.histogram('edges', 'color', 'quantity').length,
     7,
-    '"designer.utils.histogram" returns an array of specified length'
+    '"design.utils.histogram" returns an array of specified length'
   );
 
 
   throws(
     function() {
-      designer.utils.histogram('edges', 'color', 'meh');
+      design.utils.histogram('edges', 'color', 'meh');
     },
-    /Designer.utils.histogram: Missing property \"meh\"/,
+    /design.utils.histogram: Missing property \"meh\"/,
     '"utils.histogram" throws an error on a non-existing property.'
   );
 
   throws(
     function() {
-      designer.utils.histogram('edges', 'meh', 'quantity');
+      design.utils.histogram('edges', 'meh', 'quantity');
     },
-    /Designer.utils.histogram: Unknown visual variable./,
+    /design.utils.histogram: Unknown visual variable./,
     '"utils.histogram" throws an error on an unknown visual variable.'
   );
 
   throws(
     function() {
-      designer.utils.histogram('meh', 'color', 'quantity');
+      design.utils.histogram('meh', 'color', 'quantity');
     },
-    /Designer.utils.histogram: Unknown target \"meh\"/,
+    /design.utils.histogram: Unknown target \"meh\"/,
     '"utils.histogram" throws an error on an unknown target.'
   );
 
@@ -322,34 +322,34 @@ test('API', function(assert) {
   // check isSequential function
 
   ok(
-    designer.utils.isSequential('nodes', 'data.quantity'),
+    design.utils.isSequential('nodes', 'data.quantity'),
     '"utils.isSequential" returns true on a quantitative property'
   );
 
   ok(
-    !designer.utils.isSequential('nodes', 'data.quality'),
+    !design.utils.isSequential('nodes', 'data.quality'),
     '"utils.isSequential" returns false on a qualitative property'
   );
 
   strictEqual(
-    designer.utils.isSequential('nodes', 'data.missing'),
+    design.utils.isSequential('nodes', 'data.missing'),
     undefined,
     '"utils.isSequential" returns undefined on a property which does not exist'
   );
 
-  designer.undo();
+  design.undo();
 
-  designer.clear();
+  design.clear();
 
 
   // check plugin lifecycle
-  designer.kill();
+  design.kill();
   s.kill();
   s = new sigma();
-  designer = sigma.plugins.designer(s);
+  design = sigma.plugins.design(s);
   s.graph.read(graph);
 
-  designer
+  design
     .nodesBy('label', myStyles.nodes.label)
     .nodesBy('size', myStyles.nodes.size)
     .setPalette(myPalette)
@@ -358,14 +358,14 @@ test('API', function(assert) {
     .edgesBy('color', myStyles.edges.color)
     .apply();
 
-  sigma.plugins.killDesigner(s);
+  sigma.plugins.killDesign(s);
   deepEqual(
-    designer.styles,
+    design.styles,
     undefined,
-    'The styles object is undefined after `killDesigner` is called.'
+    'The styles object is undefined after `killDesign` is called.'
   );
 
-  designer.apply();  // does nothing
-  designer.undo();  // does nothing
+  design.apply();  // does nothing
+  design.undo();  // does nothing
 
 });

@@ -8,7 +8,7 @@
   sigma.utils.pkg('sigma.plugins');
 
   /**
-   * Sigma Designer
+   * Sigma design
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
@@ -149,7 +149,7 @@
           values: d[bin],
           ratio: d[bin].length / maxOcc
         };
-        // d[bin][visualVar] = designer.palette.sequential[bins][bin];
+        // d[bin][visualVar] = design.palette.sequential[bins][bin];
 
         if (d[bin].values.length) {
           d[bin].min = Math.min.apply(null, d[bin].values);
@@ -622,14 +622,14 @@
 
 
   /**
-   * Designer Object
+   * design Object
    * ------------------
    * @param  {sigma}   s       The related sigma instance.
    * @param  {?object} options The object contains `palette` and `styles`.
    *                           Styles are mappings between visual variables and
    *                           data properties on nodes and edges.
    */
-  function Designer(s, options) {
+  function design(s, options) {
     this.palette = (options || {}).palette || {};
     this.styles = sigma.utils.extend((options || {}).styles || {}, {
       nodes: {},
@@ -641,7 +641,7 @@
         _visionOnEdges = new Vision(s, 'edges', this.styles, this.palette);
 
     s.bind('kill', function() {
-      sigma.plugins.killDesigner(s);
+      sigma.plugins.killDesign(s);
     });
 
 
@@ -651,7 +651,7 @@
      * existing styles.
      *
      * @param  {object}  styles The styles object.
-     * @return {Designer}       The instance.
+     * @return {design}       The instance.
      */
     this.setStyles = function(styles) {
       this.styles = sigma.utils.extend(styles || {}, {
@@ -673,7 +673,7 @@
      *
      * @param  {string}  visualVar The visual variable.
      * @param  {object}  params    The style parameter.
-     * @return {Designer}          The instance.
+     * @return {design}          The instance.
      */
     this.nodesBy = function(visualVar, params) {
       this.styles = sigma.utils.extend(this.styles || {}, {
@@ -698,7 +698,7 @@
      *
      * @param  {string}  visualVar The visual variable.
      * @param  {object}  params    The style parameter.
-     * @return {Designer}          The instance.
+     * @return {design}          The instance.
      */
     this.edgesBy = function(visualVar, params) {
       this.styles = sigma.utils.extend(this.styles || {}, {
@@ -721,7 +721,7 @@
      * This method will set a new palette. It will deprecate existing styles.
      *
      * @param  {object}  palette The palette object.
-     * @return {Designer}        The instance.
+     * @return {design}        The instance.
      */
     this.setPalette = function(palette) {
       this.palette = palette;
@@ -799,7 +799,7 @@
      *                              "nodes", "edges".
      * @param  {?string} visualVar  The visual variable. Available values:
      *                              "color", "size", "label".
-     * @return {Designer}            The instance.
+     * @return {design}            The instance.
      */
     this.apply = function(target, visualVar) {
       if (!this.styles) return;
@@ -818,7 +818,7 @@
           __apply(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw '"Designer.apply": Unknown target ' + target;
+          throw '"design.apply": Unknown target ' + target;
       }
 
       return this;
@@ -853,7 +853,7 @@
      *                               "nodes", "edges".
      * @param  {?string} visualVar  The visual variable. Available values:
      *                             "color", "size", "label".
-     * @return {Designer}  The instance.
+     * @return {design}  The instance.
      */
     this.undo = function(target, visualVar) {
       if (!this.styles) return;
@@ -872,7 +872,7 @@
           __undo(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw '"Designer.undo": Unknown target ' + target;
+          throw '"design.undo": Unknown target ' + target;
       }
 
       return this;
@@ -888,12 +888,12 @@
      *                           "nodes", "edges".
      * @param  {?string} key     The property accessor. Use a dot notation like
      *                           'data.myProperty'.
-     * @return {Designer}        The instance.
+     * @return {design}        The instance.
      */
     this.deprecate = function(target, key) {
       if (target) {
         if (target !== 'nodes' && target !== 'edges')
-          throw '"Designer.deprecate": Unknown target ' + target;
+          throw '"design.deprecate": Unknown target ' + target;
 
         if (key) {
           if (target === 'nodes') {
@@ -903,7 +903,7 @@
             _visionOnEdges.deprecated[key] = true;
           }
           else
-            throw '"Designer.deprecate": Unknown target ' + target;
+            throw '"design.deprecate": Unknown target ' + target;
         }
         else {
           if (target === 'nodes') {
@@ -935,7 +935,7 @@
      * This method is used to clear all styles. It will refresh the display. Use
      * `.undo()` instead to undo styles without losing the configuration.
      *
-     * @return {Designer}  The instance.
+     * @return {design}  The instance.
      */
     this.clear = function() {
       this.undo();
@@ -980,7 +980,7 @@
      */
     this.utils.isSequential = function(target, property) {
       if (!target)
-        throw '"Designer.utils.isSequential": Missing target';
+        throw '"design.utils.isSequential": Missing target';
 
       var v;
       switch (target) {
@@ -991,14 +991,14 @@
           v = _visionOnEdges;
           break;
         default:
-          throw '"Designer.utils.isSequential": Unknown target ' + target;
+          throw '"design.utils.isSequential": Unknown target ' + target;
       }
 
       if (property === undefined)
-        throw 'Designer.utils.isSequential: Missing property accessor';
+        throw 'design.utils.isSequential: Missing property accessor';
 
       if (typeof property !== 'string')
-        throw 'Designer.utils.isSequential: The property accessor "'+ property +'" must be a string.';
+        throw 'design.utils.isSequential: The property accessor "'+ property +'" must be a string.';
 
       if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
         var val,
@@ -1042,7 +1042,7 @@
      */
     this.utils.histogram = function(target, visualVar, property) {
       if (!target)
-        throw 'Designer.utils.histogram: Missing target';
+        throw 'design.utils.histogram: Missing target';
 
       var v;
       switch (target) {
@@ -1053,25 +1053,25 @@
           v = _visionOnEdges;
           break;
         default:
-          throw 'Designer.utils.histogram: Unknown target "' + target + '"';
+          throw 'design.utils.histogram: Unknown target "' + target + '"';
       }
 
       if (v.visualVars.indexOf(visualVar) == -1)
-        throw 'Designer.utils.histogram: Unknown visual variable.';
+        throw 'design.utils.histogram: Unknown visual variable.';
 
       if (property === undefined)
-        throw 'Designer.utils.histogram: Missing property accessor';
+        throw 'design.utils.histogram: Missing property accessor';
 
       if (typeof property !== 'string')
-        throw 'Designer.utils.histogram: The property accessor "'+ property +'" must be a string.';
+        throw 'design.utils.histogram: The property accessor "'+ property +'" must be a string.';
 
       var isSequential = this.isSequential(target, property);
 
       if (isSequential === undefined)
-        throw 'Designer.utils.histogram: Missing property "'+ property + '"';
+        throw 'design.utils.histogram: Missing property "'+ property + '"';
 
       if (!isSequential)
-        throw 'Designer.utils.histogram: the property "'+ property +'" must be sequential.';
+        throw 'design.utils.histogram: the property "'+ property +'" must be sequential.';
 
       var h = histogram(v.histograms[visualVar], property);
 
@@ -1081,9 +1081,9 @@
         for (var bin = 0; bin < bins; bin++) {
           o = strToObjectRef(self.palette, self.styles[target].color.scheme);
           if (!o)
-            throw 'Designer.utils.histogram: color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.';
+            throw 'design.utils.histogram: color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.';
           if (!o[bins])
-            throw 'Designer.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".';
+            throw 'design.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".';
 
           h[bin][visualVar] = o[bins][bin];
         }
@@ -1098,7 +1098,7 @@
    * Interface
    * ------------------
    *
-   * > var designer = sigma.plugins.designer(s, options);
+   * > var design = sigma.plugins.design(s, options);
    */
   var _instance = {};
 
@@ -1107,21 +1107,21 @@
    * @param  {?object} options The object contains `palette` and `styles`.
    *                           Styles are mappings between visual variables and
    *                           data properties on nodes and edges.
-   * @return {Designer}        The instance.
+   * @return {design}        The instance.
    */
-  sigma.plugins.designer = function(s, options) {
+  sigma.plugins.design = function(s, options) {
     // Create instance if undefined
     if (!_instance[s.id]) {
-      _instance[s.id] = new Designer(s, options);
+      _instance[s.id] = new design(s, options);
     }
     return _instance[s.id];
   };
 
   /**
-   *  This function kills the designer instance.
+   *  This function kills the design instance.
    */
-  sigma.plugins.killDesigner = function(s) {
-    if (_instance[s.id] instanceof Designer) {
+  sigma.plugins.killDesign = function(s) {
+    if (_instance[s.id] instanceof design) {
       _instance[s.id].kill();
     }
     delete _instance[s.id];

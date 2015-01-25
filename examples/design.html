@@ -33,7 +33,7 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js"></script>
-<script src="../plugins/sigma.plugins.designer/sigma.plugins.designer.js"></script>
+<script src="../plugins/sigma.plugins.design/sigma.plugins.design.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -146,14 +146,14 @@ var myStyles = {
   }
 };
 
-// Instanciate the designer:
-var designer = sigma.plugins.designer(s, {
+// Instanciate the design:
+var design = sigma.plugins.design(s, {
   styles: myStyles,
   palette: myPalette
 });
 
 // Play:
-designer
+design
   .apply()
   // .deprecate()
   // .apply('nodes')
@@ -167,9 +167,9 @@ designer
 ;
 
 // set styles using nodesBy and edgesBy:
-// var designer = sigma.plugins.designer(s);
+// var design = sigma.plugins.design(s);
 
-// designer
+// design
 //   .nodesBy('label', myStyles.nodes.label)
 //   .nodesBy('size', myStyles.nodes.size)
 //   .setPalette(myPalette)
@@ -179,7 +179,7 @@ designer
 //   .apply();
 
 // override previous style:
-// designer
+// design
 //   .nodesBy('color', myStyles.nodes.color)
 //   .nodesBy('color', {
 //     by: 'data.quantity',
@@ -188,34 +188,34 @@ designer
 //   .apply();
 
 // undo a style then remove it:
-// designer.undo('nodes', 'size');
-// delete designer.styles.nodes.size;
+// design.undo('nodes', 'size');
+// delete design.styles.nodes.size;
 
 // The visual variables currently applied to the nodes
 var activeNodeStyles = {};
-Object.keys(designer.styles.nodes).forEach(function (visualVariable) {
-  if (designer.styles.nodes[visualVariable].active) {
-    activeNodeStyles[visualVariable] = designer.styles.nodes[visualVariable];
+Object.keys(design.styles.nodes).forEach(function (visualVariable) {
+  if (design.styles.nodes[visualVariable].active) {
+    activeNodeStyles[visualVariable] = design.styles.nodes[visualVariable];
   }
 });
 console.log('active node styles', activeNodeStyles);
 
 // The visual variables currently applied to the edges
 var activeEdgeStyles = {};
-Object.keys(designer.styles.edges).forEach(function (visualVariable) {
-  if (designer.styles.edges[visualVariable].active) {
-    activeEdgeStyles[visualVariable] = designer.styles.edges[visualVariable];
+Object.keys(design.styles.edges).forEach(function (visualVariable) {
+  if (design.styles.edges[visualVariable].active) {
+    activeEdgeStyles[visualVariable] = design.styles.edges[visualVariable];
   }
 });
 console.log('active edge styles', activeEdgeStyles);
 
 // Dump palette and styles:
-//console.log(designer.styles, designer.palette);
+//console.log(design.styles, design.palette);
 
 /*console.log('styles bound to each node for the property "' + myStyles.nodes.color.by + '"',
-  designer.nodes(myStyles.nodes.color.by)
+  design.nodes(myStyles.nodes.color.by)
 );*/
 
 // Bye bye black bird:
-//sigma.plugins.killDesigner(s);
+//sigma.plugins.killDesign(s);
 </script>
