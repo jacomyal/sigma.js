@@ -70,19 +70,19 @@ Available visual variables in styles are `color`, `label`, `size` for both nodes
 
 * **label**
   * It will replace the existing label by the content of a data property.
-  * by (*string*): the accessor to the data property.
-  * format (*function*): the label formatter, may be used to truncate the label.
+  * **by** (*string*): the accessor to the data property.
+  * **format** (*function*): the label formatter, may be used to truncate the label.
 * **size**
   * It will set the `size` of nodes and edges in function of a data property.
-  * by (*string*): the accessor to the data property.
-  * bins (*number*, default: `7`): the number of buckets to group the property values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 sizes at once.
-  * min (*number*): will override `minNodeSize` or  `minEdgeSize`.
-  * max (*number*): will override `maxNodeSize` or  `maxEdgeSize`.
+  * **by** (*string*): the accessor to the data property.
+  * **bins** (*number*, default: `7`): the number of buckets to group the property values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 sizes at once.
+  * **min** (*number*): will override `minNodeSize` or  `minEdgeSize`.
+  * **max** (*number*): will override `maxNodeSize` or  `maxEdgeSize`.
 * **color**
   * It will set the `color` of nodes and edges in function of a data property.
-  * by (*string*): the accessor to the data property.
-  * scheme (*string*): the accessor to the color scheme in the palette, using a dot notation.
-  * bins (*number*, default: `7`): optional, the number of buckets to group the quantiative values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 colors at once.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the color scheme in the palette, using a dot notation.
+  * **bins** (*number*, default: `7`): optional, the number of buckets to group the quantiative values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 colors at once.
 
 This is an example of styles for nodes and edges:
 
@@ -198,7 +198,7 @@ designer.apply('edges', 'size');
 ```
 
 ### Restore original styles
-The original label, color and size of nodes and edges are stored to be restored using the `.undo()` and `undo()` methods.
+The original label, color and size of nodes and edges are stored to be restored using the `.undo()` method.
 
 Undo all styles as follows:
 
@@ -212,7 +212,7 @@ Undo all nodes styles:
 designer.undo('nodes');
 ```
 
-Undo a specified nodes style like the color:
+Undo a specified nodes style such as the color:
 
 ```js
 designer.undo('nodes', 'color');
@@ -225,7 +225,7 @@ Undo all edges styles:
 designer.undo('edges');
 ```
 
-Undo a specified nodes style like the size:
+Undo a specified nodes style such as the size:
 
 ```js
 designer.undo('nodes', 'size');
@@ -233,7 +233,7 @@ designer.undo('nodes', 'size');
 ```
 
 ### Deprecate the designer's vision
-After calling `.deprecate()`, the designer will reindex the graph the next time `.apply()`, `.apply()`, `.nodes()`, or `.edges()` is called.
+After calling `.deprecate()`, the designer will reindex the graph the next time `.apply()`, `.nodes()`, or `.edges()` is called.
 
 Deprecate all styles:
 
@@ -259,7 +259,9 @@ designer.apply('nodes'); // refresh node styles bound to 'data.quantity'
 Deprecation works the same way for edges.
 
 ### Clear all styles
-All styles are cleared and the designer forgets the palette and styles:
+* Clear all references,
+* the original color, size and label of nodes and edges are restored,
+* the designer forgets the palette and styles.
 
 ```js
 designer.clear();
@@ -267,20 +269,20 @@ designer.apply(); // does nothing
 ```
 
 ### Update palette and styles
-Set a new palette and deprecate existing styles:
+Set a new palette and deprecate all existing styles:
 
 ```js
 designer.setPalette(myPalette);
 ```
 
-Set new styles and deprecate existing styles:
+Set new styles and deprecate all existing styles:
 
 ```js
 designer.setStyles(myStyles);
 ```
 
 ### Remove a single style
-For instance, removes the node size:
+Example:
 
 ```js
 designer.undo('nodes', 'size');
@@ -318,6 +320,9 @@ designer.utils.isSequential('nodes', 'data.quantity');
 
 designer.utils.isSequential('nodes', 'data.quality');
 // false
+
+designer.utils.isSequential('nodes', 'data.missing');
+// undefined
 ```
 
 ### Styles currently applied
@@ -346,11 +351,33 @@ Object.keys(designer.styles.edges).forEach(function (visualVariable) {
 
 ### Histograms
 
-Histograms are values, grouped by bins, on a specified property of nodes or edges computed for a visual variable (sizes and colors only).
+Histograms are values of a specified property of nodes or edges grouped by bins and computed for a visual variable such as sizes and colors.
 
-The result is an array of objects ordered by bins. Each object contains the list of `values` in the `bin`, the `min` and `max` values, and the `ratio` of values in the `bin` compared to the largest `bin`. If the visual variable is the `color`, it also contains the `color` of the `bin`.
+The result is an array of bin objects ordered by `bin` ID. Each bin object contain the following information:
 
-Example on the histogram of edge colors by the property 'data.quantity':
+* **bin**
+  * The bin ID, generally between 0 and 7. Bins group property values (see above).
+  * type: *number*
+* **min**
+  * The minimum property value. It is equal to `Math.min(values)`.
+  * type: *number*
+* **max**
+  * The maximum property value. It is equal to `Math.max(values)`.
+  * type: *number*
+* **values**
+  * The property values grouped in the current bin.
+  * type: *array*
+* **ratio**
+  * The number of values in the current bin divided by the maximum number of values in the largest bin.
+  * type: *number*
+* **color** (optional)
+  * The color of nodes or edges in hexadecimal, rgb or rgba.
+  * type: *string*
+* **size** (optional)
+  * The size of nodes or edges.
+  * type: *number*
+
+Example on the histogram of edge colored by the property 'data.quantity':
 
 ```js
 designer.utils.histogram('edges', 'color', 'data.quantity');
@@ -358,12 +385,19 @@ designer.utils.histogram('edges', 'color', 'data.quantity');
 //   {
 //     bin: 0,
 //     min: 1,
-//     max: 5,
-//     values: [0.1, 0.42, ...],
-//     ratio: 0.7,
-//     color: '#ff0000'
+//     max: 6,
+//     values: [1, 2, 3, 4, 6],
+//     ratio: 1,
+//     color: '#333'
 //   },
-//   ...
+//   {
+//     bin: 1,
+//     min: 6.1,
+//     max: 10,
+//     values: [6.1, 6.34, 10],
+//     ratio: 0.6, // = 3/5
+//     color: '#666'
+//   }
 // ]
 ```
 

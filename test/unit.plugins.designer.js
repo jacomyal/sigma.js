@@ -332,7 +332,7 @@ test('API', function(assert) {
   );
 
   strictEqual(
-    designer.utils.isSequential('nodes', 'data.notset'),
+    designer.utils.isSequential('nodes', 'data.missing'),
     undefined,
     '"utils.isSequential" returns undefined on a property which does not exist'
   );
