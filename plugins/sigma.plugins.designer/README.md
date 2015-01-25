@@ -9,12 +9,12 @@ Contact: seb@linkurio.us
 ## General
 This plugin provides an designer for you to craft the graph like a boss. The designer will use a set of **styles** and a **color palette**. A style is a mapping between a **node or edge property** and a **visual variable** (color, size, label, etc.), with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`.
 
-The designer is **lazy**: she will not look for changes on the graph. Deprecate the designer yourself so that she will make the graph correctly the next time you will ask it.
+The designer is **lazy**: it will not look for changes on the graph. Deprecate the designer yourself so that it will apply the styles the next time you will ask it.
 
-The designer is **open minded**: the color palette may contain sequential, diverging and qualitative data schemes, and the styles can be bound to any node or edge attribute.
+The designer is **open minded**: the color palette may contain sequential, diverging and qualitative data schemes, and the styles can be bound to any node or edge property.
 
 This plugin comes with fancy developer features:
-- Define the styles to apply on nodes and edges.
+- Configure the styles to apply on nodes and edges.
 - Use accessors to find the properties of nodes and edges.
 - Use accessors to find the right color schemes in the palette.
 - Register multiple styles before applying them anytime at once.
@@ -30,17 +30,26 @@ See the following [example code](../../examples/designer.html) and [unit tests](
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var designer = sigma.plugins.designer(sigInst, specs);
+var designer = sigma.plugins.designer(sigInst, {
+  styles: myStyles,  // see below
+  palette: myPalette // see below
+});
 ````
 
 Kill the plugin instance as follows:
 
 ````javascript
-sigma.plugins.killDesigner();
+sigma.plugins.killDesigner(sigInst);
 ````
 
 ## Configuration
-This is an example of palette and styles:
+The configuration is made of a color palette and a set of styles, i.e. mapping between visual variables and data properties on nodes and edges.
+
+Palettes may contain color schemes for both quantitative and qualitative properties. Schemes for qualitative properties are dictionaries where keys are the property values, and values are associated colors. Schemes for quantitative properties are dictionaries where keys are the number of property values, and the values are arrays of sequential colors.
+
+Schemes may be nested in objects and be referenced in dot notation by the styles.
+
+This is an example of a color palette with 2 schemes:
 
 ```js
 var myPalette = {
@@ -55,7 +64,29 @@ var myPalette = {
     }
   }
 };
+```
 
+Available visual variables in styles are `color`, `label`, `size` for both nodes and edges. Styles map visual variables to data properties as follows:
+
+* **label**
+  * It will replace the existing label by the content of a data property.
+  * by (*string*): the accessor to the data property.
+  * format (*function*): the label formatter, may be used to truncate the label.
+* **size**
+  * It will set the `size` of nodes and edges in function of a data property.
+  * by (*string*): the accessor to the data property.
+  * bins (*number*, default: `7`): the number of buckets to group the property values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 sizes at once.
+  * min (*number*): will override `minNodeSize` or  `minEdgeSize`.
+  * max (*number*): will override `maxNodeSize` or  `maxEdgeSize`.
+* **color**
+  * It will set the `color` of nodes and edges in function of a data property.
+  * by (*string*): the accessor to the data property.
+  * scheme (*string*): the accessor to the color scheme in the palette, using a dot notation.
+  * bins (*number*, default: `7`): optional, the number of buckets to group the quantiative values. We recommend to set this parameter between 3 and 7 ; the human eyes can hardly distinguish more than 7 colors at once.
+
+This is an example of styles for nodes and edges:
+
+```js
 var myStyles = {
   nodes: {
     label: {
@@ -87,24 +118,19 @@ var myStyles = {
     },
   }
 };
-
-var designer = sigma.plugins.designer(sigInst, {
-  styles: myStyles,
-  palette: myPalette
-});
 ```
 
-The [ColorBrewer palette](colorbrewer/colorbrewer.js) is provided to get started quickly with good color schemes.
+The [ColorBrewer palette](../sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js) is provided to get started quickly with good color schemes.
 
 ## API
 
 ### Get bound styles
-The styles are bound to each node or edge of the graph, for the specified properties, before being applied at will. You may get them anytime with the `.nodes()` and `.edges()` method. For instance, get the styles of the nodes which have the property used to color them:
+The styles are bound to each node or edge of the graph, for the specified properties, to be applied on demand. Get the bound styles using the `.nodes()` and `.edges()` method. For instance, get the styles of the nodes which have the property used to color them:
 
 ```js
 var boundStyles = designer.nodes(myStyles.nodes.color.by);
 /* {
-  propA: {
+  aValue: {
     items: *array*
     ratio: *number*
     orig_styles: *object*
@@ -116,103 +142,118 @@ var boundStyles = designer.nodes(myStyles.nodes.color.by);
 } */
 ```
 
+Get the nodes colored by a specified property value:
+
+```js
+var nodes = designer.nodes('data.quality')['excellent'].items;
+```
+
 Same example with edges:
 
 ```js
 var boundStyles = designer.edges(myStyles.edges.color.by);
+var edges = boundStyles['aValue'].items;
 ```
 
 ### Apply styles
-Apply all styles:
+The first time a style is applied, the designer indexes the nodes or edges property and updates either their `label`, `color` or `size` attribute.
+
+Apply all styles as follows:
 
 ```js
-designer.makeAll();
+designer.apply();
 ```
 
 Apply all nodes styles:
 
 ```js
-designer.make('nodes');
+designer.apply('nodes');
 ```
 
 Apply a specified nodes style like the color:
 
 ```js
-designer.make('nodes', 'color');
+designer.apply('nodes', 'color');
+// designer.styles.nodes.color.active === true
 ```
 
-Apply node sstyles progressively:
+Apply nodes styles progressively:
 
 ```js
-designer.make('nodes', 'color'); // apply node colors
-designer.makeAll(); // apply all styles but node colors
+designer.apply('nodes', 'color'); // apply node colors
+designer.apply(); // apply all styles but node colors
 ```
 
 Apply all edges styles:
 
 ```js
-designer.make('edges');
+designer.apply('edges');
 ```
 
 Apply a specified edges style like the size:
 
 ```js
-designer.make('edges', 'size');
+designer.apply('edges', 'size');
+// designer.styles.edges.size.active === true
 ```
 
 ### Restore original styles
-Undo all styles:
+The original label, color and size of nodes and edges are stored to be restored using the `.undo()` and `undo()` methods.
+
+Undo all styles as follows:
 
 ```js
-designer.omitAll();
+designer.undo();
 ```
 
 Undo all nodes styles:
 
 ```js
-designer.omit('nodes');
+designer.undo('nodes');
 ```
 
 Undo a specified nodes style like the color:
 
 ```js
-designer.omit('nodes', 'color');
+designer.undo('nodes', 'color');
+// designer.styles.nodes.color.active === false
 ```
 
 Undo all edges styles:
 
 ```js
-designer.omit('edges');
+designer.undo('edges');
 ```
 
 Undo a specified nodes style like the size:
 
 ```js
-designer.omit('nodes', 'size');
+designer.undo('nodes', 'size');
+// designer.styles.nodes.size.active === false
 ```
 
 ### Deprecate the designer's vision
-The designer will check the graph anew the next time `.make()`, `.makeAll()`, `.nodes()`, or `.edges()` are called.
+After calling `.deprecate()`, the designer will reindex the graph the next time `.apply()`, `.apply()`, `.nodes()`, or `.edges()` is called.
 
 Deprecate all styles:
 
 ```js
 designer.deprecate();
-designer.makeAll(); // refresh all styles but node colors
+designer.apply(); // refresh all styles
 ```
 
 Deprecate all nodes styles as follows:
 
 ```js
 designer.deprecate('nodes');
-designer.make('nodes'); // refresh node styles
+designer.apply('nodes'); // refresh node styles
 ```
 
 Deprecate a specified nodes property as follows:
 
 ```js
 designer.deprecate('nodes', 'data.quantity');
-designer.make('nodes'); // refresh node styles bound to 'data.quantity'
+designer.apply('nodes'); // refresh node styles bound to 'data.quantity'
 ```
 
 Deprecation works the same way for edges.
@@ -221,48 +262,50 @@ Deprecation works the same way for edges.
 All styles are cleared and the designer forgets the palette and styles:
 
 ```js
-designer.disown();
-designer.makeAll(); // does nothing
+designer.clear();
+designer.apply(); // does nothing
 ```
 
-### Import styles and palette
-Set a new palette and new styles:
+### Update palette and styles
+Set a new palette and deprecate existing styles:
 
 ```js
-designer.extendSpecs({
-  styles: myStyles,
-  palette: myPalette
-});
+designer.setPalette(myPalette);
 ```
 
-### Remove a style from the specs
+Set new styles and deprecate existing styles:
+
+```js
+designer.setStyles(myStyles);
+```
+
+### Remove a single style
 For instance, removes the node size:
 
 ```js
-designer.specs().styles.nodes.size = null;
-designer.deprecate();
+designer.undo('nodes', 'size');
+delete designer.styles.nodes.size;
 ```
 
 ### Export styles and palette
-Dump the palette and styles, to save and restore them later:
+You may save the palette and styles to restore them later as follows:
 
 ```js
-var specs = designer.specs();
+var oldStyles = designer.styles;
+var oldPalette = designer.palette;
 
-designer.disown();
-designer.extendSpecs({
-  styles: specs.styles,
-  palette: specs.palette
-});
-designer.makeAll(); // it works, bitches!
+designer.clear();
+designer.setPalette(oldPalette);
+designer.setStyles(oldStyles);
+designer.apply(); // it works, bitches!
 
 // or:
-sigma.plugins.killDesigner();
+sigma.plugins.killDesigner(sigInst);
 var newDesigner = sigma.plugins.designer(sigInst, {
-  styles: specs.styles,
-  palette: specs.palette
+  styles: oldStyles,
+  palette: oldPalette
 });
-newDesigner.makeAll(); // yeah!
+newDesigner.apply(); // yeah!
 ```
 
 ## Utils
@@ -282,15 +325,23 @@ designer.utils.isSequential('nodes', 'data.quality');
 Styles applied on nodes:
 
 ```js
-var arr = designer.utils.appliedStyles('nodes');
-// ['color', 'size']
+var activeNodeStyles = {};
+Object.keys(designer.styles.nodes).forEach(function (visualVariable) {
+  if (designer.styles.nodes[visualVariable].active) {
+    activeNodeStyles[visualVariable] = designer.styles.nodes[visualVariable];
+  }
+});
 ```
 
 Styles applied on edges:
 
 ```js
-var arr = designer.utils.appliedStyles('edges');
-// ['color', 'size']
+var activeEdgeStyles = {};
+Object.keys(designer.styles.edges).forEach(function (visualVariable) {
+  if (designer.styles.edges[visualVariable].active) {
+    activeEdgeStyles[visualVariable] = designer.styles.edges[visualVariable];
+  }
+});
 ```
 
 ### Histograms
@@ -317,6 +368,18 @@ designer.utils.histogram('edges', 'color', 'data.quantity');
 ```
 
 ## Changelog
+
+**0.4**
+* Handle multiple Sigma instances
+* Rename method `.make()` -> `.apply()`
+* Rename method `.makeAll()` -> `.apply()` without argument
+* Rename method `.omit()` -> `.undo()`
+* Rename method `.omitAll()` -> `.undo()` without argument
+* Rename method `.disown()` -> `.clear()`
+* Remove methods `.specs()` and `.extendSpecs()`
+* Add methods `setStyles()` and `setPalette()`
+* Add public properties `styles` and `palette`
+* Add basic unit tests
 
 **0.3**
 * The array `node.colors` is created when node attributes with an array of values are mapped to colors. In this case, `node.color` is unchanged.

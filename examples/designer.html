@@ -52,7 +52,7 @@
  * generated and stored in the "graph" variable, and then sigma is instantiated
  * directly with the graph.
  *
- * The simple instance of sigma is enough to make it render the graph on the on
+ * The simple instance of sigma is enough to apply it render the graph on the on
  * the screen, since the graph is given directly to the constructor.
  */
 var i,
@@ -101,7 +101,6 @@ s = new sigma({
     maxNodeSize: 5
   }
 });
-
 
 // Create a custom color palette:
 var myPalette = {
@@ -153,35 +152,49 @@ var designer = sigma.plugins.designer(s, {
   palette: myPalette
 });
 
-// Remove a style from the specs:
-// designer.specs().styles.nodes.size = null;
-
 // Play:
 designer
-  .makeAll()
+  .apply()
   // .deprecate()
-  // .make('nodes')
-  // .make('nodes', 'color')
-  // .make('nodes', 'size')
-  // .omit('nodes', 'color')
-  // .omit('nodes', 'size')
-  // .omit('edges', 'color')
-  // .make('nodes')
-  // .omitAll()
-  // .disown()
+  // .apply('nodes')
+  // .apply('nodes', 'color')
+  // .apply('nodes', 'size')
+  // .undo('nodes', 'color')
+  // .undo('nodes', 'size')
+  // .undo('edges', 'color')
+  // .apply('nodes')
+  // .undo()
 ;
 
-// The visual variables currently applied
-console.log('nodes', designer.utils.appliedStyles('nodes'));
-console.log('edges', designer.utils.appliedStyles('edges'));
+// undo a style then remove it:
+// designer.undo('nodes', 'size');
+// delete designer.styles.nodes.size;
+
+// The visual variables currently applied to the nodes
+var activeNodeStyles = {};
+Object.keys(designer.styles.nodes).forEach(function (visualVariable) {
+  if (designer.styles.nodes[visualVariable].active) {
+    activeNodeStyles[visualVariable] = designer.styles.nodes[visualVariable];
+  }
+});
+console.log('active node styles', activeNodeStyles);
+
+// The visual variables currently applied to the edges
+var activeEdgeStyles = {};
+Object.keys(designer.styles.edges).forEach(function (visualVariable) {
+  if (designer.styles.edges[visualVariable].active) {
+    activeEdgeStyles[visualVariable] = designer.styles.edges[visualVariable];
+  }
+});
+console.log('active edge styles', activeEdgeStyles);
 
 // Dump palette and styles:
-//console.log(designer.specs());
+//console.log(designer.styles, designer.palette);
 
 /*console.log('styles bound to each node for the property "' + myStyles.nodes.color.by + '"',
   designer.nodes(myStyles.nodes.color.by)
 );*/
 
 // Bye bye black bird:
-//sigma.plugins.killDesigner();
+//sigma.plugins.killDesigner(s);
 </script>

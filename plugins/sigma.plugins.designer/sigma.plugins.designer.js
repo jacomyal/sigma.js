@@ -7,26 +7,14 @@
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
 
-  var settings = {
-    nodes: {},
-    edges: {}
-  };
-
   /**
    * Sigma Designer
    * =============================
    *
    * @author Sébastien Heymann <seb@linkurio.us> (Linkurious)
-   * @version 0.3
+   * @version 0.4
    */
 
-   var _s = null,
-       _mappings = null,
-       _palette = null,
-       _visionOnNodes = null,
-       _visionOnEdges = null,
-       _visualVars = ['color', 'size', 'label'],
-       _activeStyles = {nodes: [], edges: []};
 
   /**
    * Convert Javascript string in dot notation into an object reference.
@@ -38,6 +26,24 @@
   function strToObjectRef(obj, str) {
     // http://stackoverflow.com/a/6393943
     return str.split('.').reduce(function(obj, i) { return obj[i] }, obj);
+  }
+
+  /**
+   * This custom tool function removes every pair key/value from an hash. The
+   * goal is to avoid creating a new object while some other references are
+   * still hanging in some scopes...
+   *
+   * @param  {object} obj The object to empty.
+   * @return {object}     The empty object.
+   */
+  function emptyObject(obj) {
+    var k;
+
+    for (k in obj)
+      if (!('hasOwnProperty' in obj) || obj.hasOwnProperty(k))
+        delete obj[k];
+
+    return obj;
   }
 
   /**
@@ -143,7 +149,7 @@
           values: d[bin],
           ratio: d[bin].length / maxOcc
         };
-        // d[bin][visualVar] = designer.specs().palette.sequential[bins][bin];
+        // d[bin][visualVar] = designer.palette.sequential[bins][bin];
 
         if (d[bin].values.length) {
           d[bin].min = Math.min.apply(null, d[bin].values);
@@ -158,33 +164,24 @@
    * This constructor instanciates a new vision on a specified dataset (nodes
    * or edges).
    *
-   * @param  {function} dataset   The dataset. Available options: 'nodes',
-   *                              'edges'.
-   * @return {Vision}             The vision instance.
+   * @param  {sigma} s              The sigma instance.
+   * @param  {function} datasetName The dataset. Available options: 'nodes',
+   *                                'edges'.
+   * @param  {object} mappings      The style mappings object.
+   * @param  {object} palette       The palette object.
+   * @return {Vision}               The vision instance.
    */
-  function Vision(dataset) {
-    this.key = dataset;
+  function Vision(s, datasetName, mappings, palette) {
+    var that = this;
 
-    // rules to map visual variables to data properties:
-    this.mappings = Object.create(null);
+    // defined below:
+    this.visualVars = null;
 
-    // nodes or edges:
-    if (dataset === 'nodes') {
-      this.dataset = function(s) {
-        if (!s) return [];
-        return s.graph.nodes();
-      }
-      this.mappings = _mappings.nodes;
-    }
-    else if (dataset === 'edges') {
-      this.dataset = function(s) {
-        if (!s) return [];
-        return s.graph.edges();
-      }
-      this.mappings = _mappings.edges;
-    }
-    else
-      throw 'Vision: Unknown dataset ' + dataset;
+    // mappings may be overriden:
+    this.mappings = null;
+
+    // palette may be overriden:
+    this.palette = palette;
 
     // index of data properties:
     this.idx = Object.create(null);
@@ -204,825 +201,847 @@
     // original values of visual variables
     this.originalVisualVariable = Object.create(null);
 
-    return this;
-  };
+    // nodes or edges:
+    if (datasetName === 'nodes') {
+      this.visualVars = ['color', 'size', 'label'];
+      this.mappings = mappings.nodes;
 
-  /**
-   * This method will index the collection with the specified property, and
-   * will compute all styles related to the specified property for each item.
-   *
-   * @param  {string}  key The property accessor.
-   */
-  Vision.prototype.update = function(key) {
-    // console.log('Vision.update', key);
-    var self = this;
-
-    if (key === undefined)
-      throw 'Vision.update: Missing property accessor';
-    if (typeof key !== 'string')
-      throw 'Vision.update: The property accessor "'+ key +'" must be a string.';
-
-    var val,
-        byFn,
-        schemeFn,
-        isSequential = true,
-        isArray = true;
-
-    byFn = function(item, key) { return strToObjectRef(item, key); };
-    schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
-
-    function insertItem(val, item) {
-      if (self.idx[key][val] === undefined) {
-        self.idx[key][val] = {
-          key: val,
-          items: [],
-          styles: Object.create(null)
-        };
+      this.dataset = function() {
+        return s.graph.nodes();
       }
-      self.idx[key][val].items.push(item);
-
-      if (isSequential) {
-        isSequential = (typeof val === 'number') ? isSequential : false;
-        // TODO: throw error if is number AND (is NaN or is Infinity)
-      }
-    };
-
-    // Index the collection:
-    this.idx[key] = {};
-    this.dataset(_s).forEach(function (item) {
-      val = byFn(item, key);
-      if (val !== undefined) {
-        if (isArray) {
-          isArray = (Object.prototype.toString.call(val) === '[object Array]') ? isArray : false;
-        }
-        if (isArray) {
-          if (val.length === 1) {
-            insertItem(val[0], item);
-          }
-          else {
-            val.forEach(function (v) {
-              insertItem(v, item);
-            });
-          }
-        }
-        else {
-          insertItem(val, item);
-        }
-      }
-    });
-
-    this.dataTypes[key] = { sequential: isSequential, array: isArray };
-    this.deprecated[key] = false;
-
-    // Find the max number of occurrence of values:
-    var maxOcc = 0;
-    for (val in this.idx[key]) {
-      maxOcc =
-        (maxOcc < this.idx[key][val].items.length) ?
-        this.idx[key][val].items.length :
-        maxOcc;
     }
+    else if (datasetName === 'edges') {
+      this.visualVars = ['color', 'size', 'label'];
+      this.mappings = mappings.edges;
 
-    // number of occurrence / max number of occurrences of the value:
-    Object.keys(this.idx[key]).forEach(function (val) {
-      self.idx[key][val].ratio =
-        parseFloat(self.idx[key][val].items.length / maxOcc);
-    });
-
-    var format,
-        colorHist,
-        sizeHist,
-        scheme,
-        bins,
-        visualVars;
-
-    // Visual variables mapped to the specified property:
-    visualVars = Object.keys(this.mappings).filter(function (visualVar) {
-      return (
-        (self.mappings[visualVar]) &&
-        (self.mappings[visualVar].by !== undefined) &&
-        (self.mappings[visualVar].by.toString() == key)
-      );
-    });
-
-    // Validate the mappings and compute histograms if needed:
-    visualVars.forEach(function (visualVar) {
-      switch (visualVar) {
-        case 'color':
-          scheme = self.mappings.color.scheme;
-
-          if (typeof scheme !== 'string')
-            throw 'Vision.update: color.scheme "' + scheme + '" must be a string';
-
-          if (isSequential) {
-            bins = self.mappings.color.bins || 7;
-            self.histograms.color = self.histograms.color || {};
-            self.histograms.color[key] = baseHistogram(Object.keys(self.idx[key]), bins);
-          }
-          break;
-
-        case 'label':
-          format = self.mappings.label.format || function(item) {
-            return item.label;
-          };
-
-          if (typeof format !== 'function')
-            throw 'Vision.update: label.format "' + format + '" must be a function';
-          break;
-
-        case 'size':
-          if (!isSequential)
-            throw 'Vision.update: The values of property "' + key + '" must be numbers only';
-
-          self.histograms.size = self.histograms.size || {};
-          self.histograms.size[key] = baseHistogram(
-            Object.keys(self.idx[key]),
-            (self.mappings.size.bins || 7)
-          );
-          break;
+      this.dataset = function() {
+        return s.graph.edges();
       }
-    });
+    }
+    else
+      throw 'Vision: Unknown dataset ' + datasetName;
 
-    // Compute all styles related to the property for each item:
-    Object.keys(this.idx[key]).forEach(function (val) {
-      visualVars.forEach(function (visualVar) {
-        switch (visualVar) {
 
-          case 'color':
-            if (isSequential) {
-              self.idx[key][val].styles.color = function() {
-                var bin = self.histograms.color[key][val];
-                return schemeFn(_palette, scheme)[bins][bin];
-              };
+    /**
+     * This method will index the collection with the specified property, and
+     * will compute all styles related to the specified property for each item.
+     *
+     * @param  {string}  key The property accessor.
+     */
+    this.update = function(key) {
+      // console.log('Vision.update', key);
+      var self = this;
+
+      if (key === undefined)
+        throw 'Vision.update: Missing property accessor';
+
+      if (typeof key !== 'string')
+        throw 'Vision.update: The property accessor "'+ key +'" must be a string.';
+
+      var val,
+          byFn,
+          schemeFn,
+          isSequential = undefined,
+          isArray = true;
+
+      byFn = function(item, key) { return strToObjectRef(item, key); };
+      schemeFn = function(palette, key) { return strToObjectRef(palette, key); }
+
+      function insertItem(val, item) {
+        if (self.idx[key][val] === undefined) {
+          self.idx[key][val] = {
+            key: val,
+            items: [],
+            styles: Object.create(null)
+          };
+        }
+        self.idx[key][val].items.push(item);
+
+        if (isSequential || isSequential === undefined) {
+          isSequential = (typeof val === 'number');
+          // TODO: throw error if is number AND (is NaN or is Infinity)
+        }
+      };
+
+      // Index the collection:
+      this.idx[key] = {};
+      this.dataset().forEach(function (item) {
+        val = byFn(item, key);
+        if (val !== undefined) {
+          if (isArray) {
+            isArray = (Object.prototype.toString.call(val) === '[object Array]') ? isArray : false;
+          }
+          if (isArray) {
+            if (val.length === 1) {
+              insertItem(val[0], item);
             }
             else {
-              self.idx[key][val].styles.color = function() {
-                if (schemeFn(_palette, scheme) === undefined)
-                  throw 'Vision.update: The color scheme must be qualitative' +
-                    ', i.e. a dict of value => color';
+              val.forEach(function (v) {
+                insertItem(v, item);
+              });
+            }
+          }
+          else {
+            insertItem(val, item);
+          }
+        }
+      });
 
-                return schemeFn(_palette, scheme)[val];
-              };
+      this.dataTypes[key] = { sequential: isSequential, array: isArray };
+      this.deprecated[key] = false;
+
+      // Find the max number of occurrence of values:
+      var maxOcc = 0;
+      for (val in this.idx[key]) {
+        maxOcc =
+          (maxOcc < this.idx[key][val].items.length) ?
+          this.idx[key][val].items.length :
+          maxOcc;
+      }
+
+      // number of occurrence / max number of occurrences of the value:
+      Object.keys(this.idx[key]).forEach(function (val) {
+        self.idx[key][val].ratio =
+          parseFloat(self.idx[key][val].items.length / maxOcc);
+      });
+
+      var format,
+          colorHist,
+          sizeHist,
+          scheme,
+          bins,
+          visualVars;
+
+      // Visual variables mapped to the specified property:
+      visualVars = Object.keys(that.mappings).filter(function (visualVar) {
+        return (
+          (that.mappings[visualVar]) &&
+          (that.mappings[visualVar].by !== undefined) &&
+          (that.mappings[visualVar].by.toString() == key)
+        );
+      });
+
+      // Validate the mappings and compute histograms if needed:
+      visualVars.forEach(function (visualVar) {
+        switch (visualVar) {
+          case 'color':
+            scheme = that.mappings.color.scheme;
+
+            if (typeof scheme !== 'string')
+              throw 'Vision.update: color.scheme "' + scheme + '" must be a string';
+
+            if (isSequential) {
+              bins = that.mappings.color.bins || 7;
+              self.histograms.color = self.histograms.color || {};
+              self.histograms.color[key] = baseHistogram(Object.keys(self.idx[key]), bins);
             }
             break;
 
           case 'label':
-            self.idx[key][val].styles.label = function(item) {
-              return format(byFn(item, key));
+            format = that.mappings.label.format || function(item) {
+              return item.label;
             };
+
+            if (typeof format !== 'function')
+              throw 'Vision.update: label.format "' + format + '" must be a function';
             break;
 
           case 'size':
-            self.idx[key][val].styles.size = function() {
-              return 1 + self.histograms.size[key][val];
-            };
+            if (!isSequential)
+              throw 'Vision.update: The values of property "' + key + '" must be numbers only';
+
+            self.histograms.size = self.histograms.size || {};
+            self.histograms.size[key] = baseHistogram(
+              Object.keys(self.idx[key]),
+              (that.mappings.size.bins || 7)
+            );
             break;
         }
       });
-    });
-  };
 
-  /**
-   * This method will return the vision on a specified property. It will update
-   * the vision on the property if it is deprecated or missing.
-   *
-   * @param  {string} key  The property accessor.
-   * @return {object}      The vision on the property.
-   */
-  Vision.prototype.get = function (key) {
-    if (key === undefined)
-      throw 'Vision.get: Missing property accessor';
-    if (typeof key !== 'string')
-      throw 'Vision.get: The property accessor "'+ key +'" must be a string.';
+      // Compute all styles related to the property for each item:
+      Object.keys(this.idx[key]).forEach(function (val) {
+        visualVars.forEach(function (visualVar) {
+          switch (visualVar) {
 
-    // lazy updating:
-    if (this.deprecated[key])
-      this.update(key);
+            case 'color':
+              if (isSequential) {
+                self.idx[key][val].styles.color = function() {
+                  var bin = self.histograms.color[key][val];
+                  return schemeFn(that.palette, scheme)[bins][bin];
+                };
+              }
+              else {
+                self.idx[key][val].styles.color = function() {
+                  if (schemeFn(that.palette, scheme) === undefined)
+                    throw 'Vision.update: The color scheme must be qualitative' +
+                      ', i.e. a dict of value => color';
 
-    // lazy indexing:
-    if (this.idx[key] === undefined)
-      this.update(key);
+                  return schemeFn(that.palette, scheme)[val];
+                };
+              }
+              break;
 
-    return this.idx[key];
-  };
+            case 'label':
+              self.idx[key][val].styles.label = function(item) {
+                return format(byFn(item, key));
+              };
+              break;
 
-  /**
-   * This method will apply a mapping between a visual variable and a property.
-   * It will update the vision on the property if it is deprecated or missing.
-   * It will stores the original value of the visual variable for each item.
-   * If the new value is `undefined`, it will keep the original value.
-   * Available visual variables are stored in `_visualVars`.
-   *
-   * @param {string} visualVar The name of the visual variable.
-   * @param {string} key       The property accessor.
-   */
-  Vision.prototype.applyStyle = function(visualVar, key) {
-    if (key === undefined)
-      throw 'Vision.applyStyle: Missing property accessor';
-    if (typeof key !== 'string')
-      throw 'Vision.applyStyle: The property accessor "'+ key +'" must be a string.';
-
-    if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Vision.applyStyle: Unknown style "' + visualVar + '"';
-
-    var self = this,
-        idxp = this.get(key);
-
-    if (visualVar === 'color' && self.dataTypes[key].array) {
-      this.dataset(_s).forEach(function (item) {
-        delete item.colors;
-      });
-
-      Object.keys(idxp).forEach(function (val) {
-        var o = idxp[val];
-        o.items.forEach(function (item) {
-          item.colors = [];
+            case 'size':
+              self.idx[key][val].styles.size = function() {
+                return 1 + self.histograms.size[key][val];
+              };
+              break;
+          }
         });
       });
-    }
+    };
 
-    Object.keys(idxp).forEach(function (val) {
-      var o = idxp[val];
-      o.items.forEach(function (item) {
-        if (item !== undefined &&
-            o.styles !== undefined &&
-            typeof o.styles[visualVar] === 'function') {
+    /**
+     * This method will return the vision on a specified property. It will update
+     * the vision on the property if it is deprecated or missing.
+     *
+     * @param  {string} key  The property accessor.
+     * @return {object}      The vision on the property.
+     */
+    this.get = function (key) {
+      if (key === undefined)
+        throw 'Vision.get: Missing property accessor';
 
-          if (!self.originalVisualVariable[item.id]) {
-            self.originalVisualVariable[item.id] = {};
-          }
-          if (!(visualVar in self.originalVisualVariable[item.id])) {
-            // non-writable property
-            Object.defineProperty(self.originalVisualVariable[item.id], visualVar, {
-             enumerable: true,
-             value: item[visualVar]
-            });
-          }
+      if (typeof key !== 'string')
+        throw 'Vision.get: The property accessor "'+ key +'" must be a string.';
 
-          var newVal = o.styles[visualVar](item);
+      // lazy updating:
+      if (this.deprecated[key])
+        this.update(key);
 
-          if (visualVar === 'color' && self.dataTypes[key].array) {
-            if (newVal !== undefined)
-              item.colors.push(newVal);
-          }
-          else if (newVal !== undefined)
-            item[visualVar] = newVal;
-        }
-        else {
-          if (typeof o.styles[visualVar] === 'function')
-            throw 'Vision.applyStyle: ' + o.styles + '.' + visualVar + 'must be a function.';
-        }
-      });
-    });
+      // lazy indexing:
+      if (this.idx[key] === undefined)
+        this.update(key);
 
-    if (visualVar === 'size') {
-      if (this.key === 'nodes') {
-        if (_mappings.nodes.size.min > _mappings.nodes.size.max) {
-          throw 'Vision.applyStyle: nodes.size.min must not be ' +
-          'greater than nodes.size.max';
-        }
+      return this.idx[key];
+    };
 
-        if (_mappings.nodes.size.min) {
-          if (!this.sigmaSettings.minNodeSize) {
-            this.sigmaSettings.minNodeSize = _s.settings('minNodeSize');
-          }
-          _s.settings('minNodeSize', _mappings.nodes.size.min);
-        }
+    /**
+     * This method will apply a mapping between a visual variable and a property.
+     * It will update the vision on the property if it is deprecated or missing.
+     * It will stores the original value of the visual variable for each item.
+     * If the new value is `undefined`, it will keep the original value.
+     * Available visual variables are stored in `visualVars`.
+     *
+     * @param {string} visualVar The name of the visual variable.
+     * @param {string} key       The property accessor.
+     */
+    this.applyStyle = function(visualVar, key) {
+      if (key === undefined)
+        throw 'Vision.applyStyle: Missing property accessor';
 
-        if (_mappings.nodes.size.max) {
-          if (!this.sigmaSettings.maxNodeSize) {
-            this.sigmaSettings.maxNodeSize = _s.settings('maxNodeSize');
-          }
-          _s.settings('maxNodeSize', _mappings.nodes.size.max);
-        }
-      }
-      else if (this.key === 'edges') {
-        if (_mappings.edges.size.min > _mappings.edges.size.max) {
-          throw 'Vision.applyStyle: edges.size.min must not be '+
-          'greater than edges.size.max';
-        }
+      if (typeof key !== 'string')
+        throw 'Vision.applyStyle: The property accessor "'+ key +'" must be a string.';
 
-        if (_mappings.edges.size.min) {
-          if (!this.sigmaSettings.minEdgeSize) {
-            this.sigmaSettings.minEdgeSize = _s.settings('minEdgeSize');
-          }
-          _s.settings('minEdgeSize', _mappings.edges.size.min);
-        }
+      if (this.visualVars.indexOf(visualVar) == -1)
+        throw 'Vision.applyStyle: Unknown style "' + visualVar + '"';
 
-        if (_mappings.edges.size.max) {
-          if (!this.sigmaSettings.maxEdgeSize) {
-            this.sigmaSettings.maxEdgeSize = _s.settings('maxEdgeSize');
-          }
-          _s.settings('maxEdgeSize', _mappings.edges.size.max);
-        }
-      }
-    }
-  };
+      var self = this,
+          idxp = this.get(key);
 
-  /**
-   * This method will undo a mapping between a visual variable and a property.
-   * It restores the original value of the visual variable for each item. It
-   * will do nothing if the vision on the property is missing.
-   * Available visual variables are stored in `_visualVars`.
-   *
-   * @param {string} visualVar The name of the visual variable.
-   * @param {string} key       The property accessor.
-   */
-  Vision.prototype.undoStyle = function(visualVar, key) {
-    if (key === undefined)
-      throw 'Vision.undoStyle: Missing property accessor';
-    if (typeof key !== 'string')
-      throw 'Vision.undoStyle: The property accessor "'+ key +'" must be a string.';
-
-    if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Vision.undoStyle: Unknown style';
-
-    if (this.idx[key] === undefined)
-      return;
-
-    var self = this,
-        idxp = this.get(key);
-
-    if (visualVar === 'color' && self.dataTypes[key].array) {
-      Object.keys(idxp).forEach(function (val) {
-        var o = idxp[val];
-        o.items.forEach(function (item) {
+      if (visualVar === 'color' && self.dataTypes[key].array) {
+        this.dataset().forEach(function (item) {
           delete item.colors;
         });
+
+        Object.keys(idxp).forEach(function (val) {
+          var o = idxp[val];
+          o.items.forEach(function (item) {
+            item.colors = [];
+          });
+        });
+      }
+
+      Object.keys(idxp).forEach(function (val) {
+        var o = idxp[val];
+        o.items.forEach(function (item) {
+          if (item !== undefined &&
+              o.styles !== undefined &&
+              typeof o.styles[visualVar] === 'function') {
+
+            if (!self.originalVisualVariable[item.id]) {
+              self.originalVisualVariable[item.id] = {};
+            }
+            if (!(visualVar in self.originalVisualVariable[item.id])) {
+              // non-writable property
+              Object.defineProperty(self.originalVisualVariable[item.id], visualVar, {
+               enumerable: true,
+               value: item[visualVar]
+              });
+            }
+
+            var newVal = o.styles[visualVar](item);
+
+            if (visualVar === 'color' && self.dataTypes[key].array) {
+              if (newVal !== undefined)
+                item.colors.push(newVal);
+            }
+            else if (newVal !== undefined)
+              item[visualVar] = newVal;
+          }
+          else {
+            if (typeof o.styles[visualVar] === 'function')
+              throw 'Vision.applyStyle: ' + o.styles + '.' + visualVar + 'must be a function.';
+          }
+        });
       });
-    }
 
-    Object.keys(idxp).forEach(function (val) {
-      var o = idxp[val];
-      o.items.forEach(function (item) {
-        if (item !== undefined && item[visualVar] !== undefined) {
+      if (visualVar === 'size') {
+        if (datasetName === 'nodes') {
+          if (this.mappings.size.min > this.mappings.size.max) {
+            throw 'Vision.applyStyle: nodes.size.min must not be ' +
+            'greater than nodes.size.max';
+          }
 
-          if (self.originalVisualVariable[item.id] === undefined ||
-            self.originalVisualVariable[item.id][visualVar] === undefined) {
+          if (this.mappings.size.min) {
+            if (!this.sigmaSettings.minNodeSize) {
+              this.sigmaSettings.minNodeSize = s.settings('minNodeSize');
+            }
+            s.settings('minNodeSize', this.mappings.size.min);
+          }
 
-            // Avoid Sigma bug on edge with no size
-            if (self.key === 'edges' && visualVar === 'size')
-              item.size = 1;
+          if (this.mappings.size.max) {
+            if (!this.sigmaSettings.maxNodeSize) {
+              this.sigmaSettings.maxNodeSize = s.settings('maxNodeSize');
+            }
+            s.settings('maxNodeSize', this.mappings.size.max);
+          }
+        }
+        else if (datasetName === 'edges') {
+          if (this.mappings.size.min > this.mappings.size.max) {
+            throw 'Vision.applyStyle: edges.size.min must not be '+
+            'greater than edges.size.max';
+          }
+
+          if (this.mappings.size.min) {
+            if (!this.sigmaSettings.minEdgeSize) {
+              this.sigmaSettings.minEdgeSize = s.settings('minEdgeSize');
+            }
+            s.settings('minEdgeSize', this.mappings.size.min);
+          }
+
+          if (this.mappings.size.max) {
+            if (!this.sigmaSettings.maxEdgeSize) {
+              this.sigmaSettings.maxEdgeSize = s.settings('maxEdgeSize');
+            }
+            s.settings('maxEdgeSize', this.mappings.size.max);
+          }
+        }
+      }
+    };
+
+    /**
+     * This method will undo a mapping between a visual variable and a property.
+     * It restores the original value of the visual variable for each item. It
+     * will do nothing if the vision on the property is missing.
+     * Available visual variables are stored in `visualVars`.
+     *
+     * @param {string} visualVar The name of the visual variable.
+     * @param {string} key       The property accessor.
+     */
+    this.undoStyle = function(visualVar, key) {
+      if (key === undefined)
+        throw 'Vision.undoStyle: Missing property accessor';
+
+      if (typeof key !== 'string')
+        throw 'Vision.undoStyle: The property accessor "'+ key +'" must be a string.';
+
+      if (this.visualVars.indexOf(visualVar) == -1)
+        throw 'Vision.undoStyle: Unknown style';
+
+      if (this.idx[key] === undefined) return;
+
+      var self = this,
+          idxp = this.get(key);
+
+      if (visualVar === 'color' && self.dataTypes[key].array) {
+        Object.keys(idxp).forEach(function (val) {
+          var o = idxp[val];
+          o.items.forEach(function (item) {
+            delete item.colors;
+          });
+        });
+      }
+
+      Object.keys(idxp).forEach(function (val) {
+        var o = idxp[val];
+        o.items.forEach(function (item) {
+          if (item !== undefined && item[visualVar] !== undefined) {
+
+            if (self.originalVisualVariable[item.id] === undefined ||
+              self.originalVisualVariable[item.id][visualVar] === undefined) {
+
+              // Avoid Sigma bug on edge with no size
+              if (self.key === 'edges' && visualVar === 'size')
+                item.size = 1;
+              else
+                delete item[visualVar];
+          }
             else
-              delete item[visualVar];
-        }
-          else
-            item[visualVar] = self.originalVisualVariable[item.id][visualVar];
-        }
+              item[visualVar] = self.originalVisualVariable[item.id][visualVar];
+          }
+        });
       });
-    });
 
-    if (visualVar === 'size') {
-      if (this.key === 'nodes') {
-        if (this.sigmaSettings.minNodeSize) {
-          _s.settings('minNodeSize', this.sigmaSettings.minNodeSize);
+      if (visualVar === 'size') {
+        if (datasetName === 'nodes') {
+          if (this.sigmaSettings.minNodeSize) {
+            s.settings('minNodeSize', this.sigmaSettings.minNodeSize);
+          }
+          if (this.sigmaSettings.maxNodeSize) {
+            s.settings('maxNodeSize', this.sigmaSettings.maxNodeSize);
+          }
         }
-        if (this.sigmaSettings.maxNodeSize) {
-          _s.settings('maxNodeSize', this.sigmaSettings.maxNodeSize);
+        else if (datasetName === 'edges') {
+          if (this.sigmaSettings.minEdgeSize) {
+            s.settings('minEdgeSize', this.sigmaSettings.minEdgeSize);
+          }
+          if (this.sigmaSettings.maxEdgeSize) {
+            s.settings('maxEdgeSize', this.sigmaSettings.maxEdgeSize);
+          }
         }
       }
-      else if (this.key === 'edges') {
-        if (this.sigmaSettings.minEdgeSize) {
-          _s.settings('minEdgeSize', this.sigmaSettings.minEdgeSize);
-        }
-        if (this.sigmaSettings.maxEdgeSize) {
-          _s.settings('maxEdgeSize', this.sigmaSettings.maxEdgeSize);
-        }
-      }
-    }
+    };
+
+    /**
+     * This method empties the arrays and indexes.
+     */
+    this.clear = function() {
+      this.visualVars.length = 0;
+      emptyObject(this.idx);
+      emptyObject(this.histograms);
+      emptyObject(this.deprecated);
+      emptyObject(this.sigmaSettings);
+      emptyObject(this.dataTypes);
+      emptyObject(this.originalVisualVariable);
+    };
+
+    return this;
   };
 
 
   /**
    * Designer Object
    * ------------------
-   * @param  {sigma}   s      The related sigma instance.
-   * @param  {?object} specs  The specs object contains `palette` and `styles`.
-   *                          Styles are mappings between visual variables and
-   *                          data properties on nodes and edges.
+   * @param  {sigma}   s       The related sigma instance.
+   * @param  {?object} options The object contains `palette` and `styles`.
+   *                           Styles are mappings between visual variables and
+   *                           data properties on nodes and edges.
    */
-  function Designer(s, specs) {
-    _s = s;
-    _mappings = sigma.utils.extend((specs || {}).styles || {}, settings);
-    _palette = (specs || {}).palette || {};
-
-    _visionOnNodes = new Vision('nodes');
-    _visionOnEdges = new Vision('edges');
-
-    _s.bind('kill', function() {
-      sigma.plugins.killDesigner();
+  function Designer(s, options) {
+    this.palette = (options || {}).palette || {};
+    this.styles = sigma.utils.extend((options || {}).styles || {}, {
+      nodes: {},
+      edges: {}
     });
-  };
 
-  /**
-   * This method will configure the palette and styles. Styles are mappings
-   * between visual variables and data properties on nodes and edges. It will
-   * deprecate existing styles.
-   *
-   * @param  {?object}  specs The specs object contains `palette` and `styles`.
-   * @return {Designer}       The instance.
-   */
-  Designer.prototype.extendSpecs = function(specs) {
-    _mappings = sigma.utils.extend((specs || {}).styles || _mappings, settings);
-    _palette = (specs || {}).palette || _palette;
+    var self = this,
+        _visionOnNodes = new Vision(s, 'nodes', this.styles, this.palette),
+        _visionOnEdges = new Vision(s, 'edges', this.styles, this.palette);
 
-    _visionOnNodes.mappings = _mappings.nodes;
-    _visionOnEdges.mappings = _mappings.edges;
+    s.bind('kill', function() {
+      sigma.plugins.killDesigner(s);
+    });
 
-    this.deprecate();
-    return this;
-  };
 
-  /**
-   * This method will export the styles and palette of the designer.
-   *
-   * @return {Designer}  The instance.
-   */
-  Designer.prototype.specs = function() {
-    return {
-      styles: _mappings,
-      palette: _palette
+    /**
+     * This method will set new styles. Styles are mappings between visual
+     * variables and data properties on nodes and edges. It will deprecate
+     * existing styles.
+     *
+     * @param  {object}  styles The styles object.
+     * @return {Designer}       The instance.
+     */
+    this.setStyles = function(styles) {
+      this.styles = sigma.utils.extend(styles || {}, {
+        nodes: {},
+        edges: {}
+      });
+
+      _visionOnNodes.mappings = this.styles.nodes;
+      _visionOnEdges.mappings = this.styles.edges;
+
+      this.deprecate();
+      return this;
     };
-  };
 
-  /**
-   * This method is used to get the styles bound to each node of the graph for
-   * a specified property.
-   *
-   * @param  {string} key The property accessor. Use a dot notation like
-   *                      'data.myProperty'.
-   * @return {object}     The styles.
-   */
-  Designer.prototype.nodes = function(key) {
-    return _visionOnNodes.get(key);
-  };
+    /**
+     * This method will set a new palette. It will deprecate existing styles.
+     *
+     * @param  {object}  palette The palette object.
+     * @return {Designer}        The instance.
+     */
+    this.setPalette = function(palette) {
+      this.palette = palette;
 
-  /**
-   * This method is used to get the styles bound to each edge of the graph for
-   * a specified property.
-   *
-   * @param  {string} key The property accessor. Use a dot notation like
-   *                      'data.myProperty'.
-   * @return {object}      The styles.
-   */
-  Designer.prototype.edges = function(key) {
-    return _visionOnEdges.get(key);
-  };
+      _visionOnNodes.palette = this.palette;
+      _visionOnEdges.palette = this.palette;
 
-  Designer.prototype.inspect = function() {
-    return {
-      nodes: deepCopy(_visionOnNodes),
-      edges: deepCopy(_visionOnEdges)
+      this.deprecate();
+      return this;
     };
-  };
 
-  /**
-   * This method is used to apply all target styles or a specified target
-   * style, depending on how it is called.
-   * It will refresh the display.
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @param  {string} visualVar  The visual variable. Available values:
-   *                             "color", "size", "label".
-   * @return {Designer}            The instance.
-   */
-  Designer.prototype.make = function(target, visualVar) {
-    if (!target)
-      throw '"Designer.make": Missing target';
+    /**
+     * This method is used to get the styles bound to each node of the graph for
+     * a specified property.
+     *
+     * @param  {string} key The property accessor. Use a dot notation like
+     *                      'data.myProperty'.
+     * @return {object}     The styles.
+     */
+    this.nodes = function(key) {
+      return _visionOnNodes.get(key);
+    };
 
-    var m,
-        v,
-        s;
+    /**
+     * This method is used to get the styles bound to each edge of the graph for
+     * a specified property.
+     *
+     * @param  {string} key The property accessor. Use a dot notation like
+     *                      'data.myProperty'.
+     * @return {object}     The styles.
+     */
+    this.edges = function(key) {
+      return _visionOnEdges.get(key);
+    };
 
-    switch (target) {
-      case 'nodes':
-        m = _mappings.nodes;
-        v = _visionOnNodes;
-        s = _activeStyles.nodes;
-        break;
-      case 'edges':
-        m = _mappings.edges;
-        v = _visionOnEdges;
-        s = _activeStyles.edges;
-        break;
-      default:
-        throw '"Designer.make": Unknown target ' + target;
-    }
+    /**
+     * This method will export a deep copy of the internal `Vision` objects,
+     * which store the indexes, bound styles and histograms.
+     *
+     * @return {object}  The object of keys `nodes` and `edges`.
+     */
+    this.inspect = function() {
+      return {
+        nodes: deepCopy(_visionOnNodes),
+        edges: deepCopy(_visionOnEdges)
+      };
+    };
 
-    if (!visualVar) {
-      // empty active styles:
-      s.length = 0;
-      // apply all styles if no visual variable is specified:
-      Object.keys(m).forEach(function (visuVar) {
-        if (m[visuVar] && m[visuVar].by) {
-          v.applyStyle(visuVar, m[visuVar].by);
-
-          // add to active styles:
-          if (s.indexOf(visuVar) === -1) {
-            s.push(visuVar);
+    function __apply(mappings, vision, visualVar) {
+      if (!visualVar) {
+        // apply all styles if no visual variable is specified:
+        Object.keys(mappings).forEach(function (visuVar) {
+          mappings[visuVar].active = false;
+          if (mappings[visuVar] && mappings[visuVar].by) {
+            vision.applyStyle(visuVar, mappings[visuVar].by);
+            mappings[visuVar].active = true;
           }
-        }
-      });
-    }
-    else if (m[visualVar] && m[visualVar].by) {
-      // apply the style of the specified visual variable:
-      v.applyStyle(visualVar, m[visualVar].by);
-
-      // add to active styles:
-      if (s.indexOf(visualVar) === -1) {
-        s.push(visualVar);
+        });
       }
-    }
+      else if (mappings[visualVar] && mappings[visualVar].by) {
+        // apply the style of the specified visual variable:
+        vision.applyStyle(visualVar, mappings[visualVar].by);
+        mappings[visualVar].active = true;
+      }
 
-    //see https://github.com/jacomyal/sigma.js/issues/397
-    if (_s) _s.refresh({skipIndexation: true});
+      if (s) s.refresh({skipIndexation: true});
+    };
 
-    return this;
-  };
+    /**
+     * This method is used to apply all target styles or a specified target
+     * style, depending on how it is called. Apply all styles if it is called
+     * without argument. It will refresh the display.
+     *
+     * @param  {?string} target     The data target. Available values:
+     *                              "nodes", "edges".
+     * @param  {?string} visualVar  The visual variable. Available values:
+     *                              "color", "size", "label".
+     * @return {Designer}            The instance.
+     */
+    this.apply = function(target, visualVar) {
+      if (!this.styles) return;
 
-  /**
-   * This method will apply all styles on nodes and edges.
-   *
-   * @return {Designer}  The instance.
-   */
-  Designer.prototype.makeAll = function() {
-    this.make('nodes');
-    this.make('edges');
-    return this;
-  };
+      if (!target) {
+        __apply(this.styles.nodes, _visionOnNodes, visualVar);
+        __apply(this.styles.edges, _visionOnEdges, visualVar);
+        return this;
+      }
 
-  /**
-   * This method is used to undo all target styles or a specified target style,
-   * depending on how it is called.
-   * It will refresh the display.
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @param  {string} visualVar  The visual variable. Available values:
-   *                             "color", "size", "label".
-   * @return {Designer}  The instance.
-   */
-  Designer.prototype.omit = function(target, visualVar) {
-    if (!target)
-      throw '"Designer.omit": Missing target';
+      switch (target) {
+        case 'nodes':
+          __apply(this.styles.nodes, _visionOnNodes, visualVar);
+          break;
+        case 'edges':
+          __apply(this.styles.edges, _visionOnEdges, visualVar);
+          break;
+        default:
+          throw '"Designer.apply": Unknown target ' + target;
+      }
 
-    var m,
-        v,
-        s;
+      return this;
+    };
 
-    switch (target) {
-      case 'nodes':
-        m = _mappings.nodes;
-        v = _visionOnNodes;
-        s = _activeStyles.nodes;
-        break;
-      case 'edges':
-        m = _mappings.edges;
-        v = _visionOnEdges;
-        s = _activeStyles.edges;
-        break;
-      default:
-        throw '"Designer.omit": Unknown target ' + target;
-    }
-
-    if (!visualVar) {
-      // undo all styles if no visual variable is specified:
-      Object.keys(m).forEach(function (visuVar) {
-        if (s.indexOf(visuVar) !== -1) {
-          v.undoStyle(visuVar, m[visuVar].by);
-        }
-      });
-      // empty active styles:
-      s.length = 0;
-    }
-    else if (m[visualVar]) {
-      if (s.indexOf(visualVar) !== -1) {
+    function __undo(mappings, vision, visualVar) {
+      if (!visualVar) {
+        // undo all styles if no visual variable is specified:
+        Object.keys(mappings).forEach(function (visuVar) {
+          if (mappings[visuVar].active) {
+            vision.undoStyle(visuVar, mappings[visuVar].by);
+            mappings[visuVar].active = false;
+          }
+        });
+      }
+      else if (mappings[visualVar] && mappings[visualVar].active) {
         // undo the style of the specified visual variable:
-        v.undoStyle(visualVar, m[visualVar].by);
-        // drop from active styles:
-        s.splice(s.indexOf(visualVar), 1);
+        vision.undoStyle(visualVar, mappings[visualVar].by);
+        mappings[visualVar].active = false;
       }
-    }
 
-    //see https://github.com/jacomyal/sigma.js/issues/397
-    if (_s) _s.refresh({skipIndexation: true});
+      if (s) s.refresh({skipIndexation: true});
+    };
 
-    return this;
-  };
+    /**
+     * This method is used to undo all target styles or a specified target style,
+     * depending on how it is called. Undo all styles if it is called
+     * without argument. It will do nothing if the visual variable
+     * is not in the existing styles. It will finally refresh the display.
+     *
+     * @param  {?string} target     The data target. Available values:
+     *                               "nodes", "edges".
+     * @param  {?string} visualVar  The visual variable. Available values:
+     *                             "color", "size", "label".
+     * @return {Designer}  The instance.
+     */
+    this.undo = function(target, visualVar) {
+      if (!this.styles) return;
 
-  /**
-   * This method will undo all styles on nodes and edges.
-   *
-   * @return {Designer}  The instance.
-   */
-  Designer.prototype.omitAll = function() {
-    this.omit('nodes');
-    this.omit('edges');
-    return this;
-  };
+      if (!target) {
+        __undo(this.styles.nodes, _visionOnNodes, visualVar);
+        __undo(this.styles.edges, _visionOnEdges, visualVar);
+        return this;
+      }
 
-  /**
-   * This method is used when the styles are deprecated, for instance when the
-   * graph has changed. The specified property style will be remade the next
-   * time it is called using `.make()`, `.makeAll()`, `.nodes()`, or `.edges()`
-   * or all property styles if called without argument.
-   *
-   * @param  {?string} target  The data target. Available values:
-   *                           "nodes", "edges".
-   * @param  {?string} key     The property accessor. Use a dot notation like
-   *                           'data.myProperty'.
-   * @return {Designer}        The instance.
-   */
-  Designer.prototype.deprecate = function(target, key) {
-    if (target) {
-      if (target !== 'nodes' && target !== 'edges')
-        throw '"Designer.deprecate": Unknown target ' + target;
+      switch (target) {
+        case 'nodes':
+          __undo(this.styles.nodes, _visionOnNodes, visualVar);
+          break;
+        case 'edges':
+          __undo(this.styles.edges, _visionOnEdges, visualVar);
+          break;
+        default:
+          throw '"Designer.undo": Unknown target ' + target;
+      }
 
-      if (key) {
-        if (target === 'nodes')
-          _visionOnNodes.deprecated[key] = true;
-        else if (target === 'edges')
-          _visionOnEdges.deprecated[key] = true;
-        else
+      return this;
+    };
+
+    /**
+     * This method is used when the styles are deprecated, for instance when the
+     * graph has changed. The specified property style will be remade the next
+     * time it is called using `.apply()`, `.applyAll()`, `.nodes()`, or `.edges()`
+     * or all property styles if called without argument.
+     *
+     * @param  {?string} target  The data target. Available values:
+     *                           "nodes", "edges".
+     * @param  {?string} key     The property accessor. Use a dot notation like
+     *                           'data.myProperty'.
+     * @return {Designer}        The instance.
+     */
+    this.deprecate = function(target, key) {
+      if (target) {
+        if (target !== 'nodes' && target !== 'edges')
           throw '"Designer.deprecate": Unknown target ' + target;
+
+        if (key) {
+          if (target === 'nodes')
+            _visionOnNodes.deprecated[key] = true;
+          else if (target === 'edges')
+            _visionOnEdges.deprecated[key] = true;
+          else
+            throw '"Designer.deprecate": Unknown target ' + target;
+        }
+        else {
+          if (target === 'nodes')
+            Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
+              _visionOnNodes.deprecated[prop] = true;
+            });
+          else if (target === 'edges')
+            Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
+              _visionOnEdges.deprecated[prop] = true;
+            });
+        }
       }
       else {
-        if (target === 'nodes')
-          Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
-            _visionOnNodes.deprecated[prop] = true;
-          });
-        else if (target === 'edges')
-          Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
-            _visionOnEdges.deprecated[prop] = true;
-          });
+        Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
+          _visionOnNodes.deprecated[prop] = true;
+        });
+
+        Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
+          _visionOnEdges.deprecated[prop] = true;
+        });
       }
-    }
-    else {
-      Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
-        _visionOnNodes.deprecated[prop] = true;
-      });
 
-      Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
-        _visionOnEdges.deprecated[prop] = true;
-      });
-    }
+      return this;
+    };
 
-    return this;
-  };
+    /**
+     * This method is used to clear all styles. It will refresh the display. Use
+     * `.undo()` instead to undo styles without losing the configuration.
+     *
+     * @return {Designer}  The instance.
+     */
+    this.clear = function() {
+      this.undo();
+      this.styles = {
+        nodes: {},
+        edges: {}
+      };
+      this.palette = {};
 
-  /**
-   * This method is used to clear all styles. It will refresh the display. Use
-   * `.omitAll()` instead to undo styles without losing the configuration.
-   *
-   * @return {Designer}  The instance.
-   */
-  Designer.prototype.disown = function() {
-    this.omitAll();
-    _mappings = sigma.utils.extend({}, settings);
-    _visionOnNodes = new Vision('nodes');
-    _visionOnEdges = new Vision('edges');
+      _visionOnNodes.clear();
+      _visionOnEdges.clear();
 
-    //see https://github.com/jacomyal/sigma.js/issues/397
-    if (_s) _s.refresh({skipIndexation: true});
+      _visionOnNodes = new Vision(s, 'nodes', this.styles, this.palette);
+      _visionOnEdges = new Vision(s, 'edges', this.styles, this.palette);
 
-    return this;
-  };
+      if (s) s.refresh({skipIndexation: true});
 
-  Designer.prototype.utils = {};
+      return this;
+    };
 
-  /**
-   * This method is used to get the data type of a specified property on nodes
-   * or edges. It is true if data is sequential, false otherwise (qualitative).
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @param  {string} property   The property accessor.
-   * @return {boolean}           The data type.
-   */
-  Designer.prototype.utils.isSequential = function(target, property) {
-    if (!target)
-      throw '"Designer.utils.isSequential": Missing target';
+    /**
+     * This method destroys the current instance.
+     */
+    this.kill = function() {
+      delete this.styles;
+      delete this.palette;
+      _visionOnNodes.clear();
+      _visionOnEdges.clear();
+    };
 
-    var v;
-    switch (target) {
-      case 'nodes':
-        v = _visionOnNodes;
-        break;
-      case 'edges':
-        v = _visionOnEdges;
-        break;
-      default:
-        throw '"Designer.utils.isSequential": Unknown target ' + target;
-    }
+    this.utils = {};
 
-    if (property === undefined)
-      throw 'Designer.utils.isSequential: Missing property accessor';
-    if (typeof property !== 'string')
-      throw 'Designer.utils.isSequential: The property accessor "'+ property +'" must be a string.';
+    /**
+     * This method is used to get the data type of a specified property on nodes
+     * or edges. It is true if data is sequential, false otherwise (qualitative),
+     * or undefined if the property doesn't exist.
+     *
+     * @param  {string} target     The data target. Available values:
+     *                             "nodes", "edges".
+     * @param  {string} property   The property accessor.
+     * @return {boolean}           The data type.
+     */
+    this.utils.isSequential = function(target, property) {
+      if (!target)
+        throw '"Designer.utils.isSequential": Missing target';
 
-    if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
-      var val,
-          found = false,
-          isSequential = true;
-      v.dataset(_s).forEach(function (item) {
-        val = strToObjectRef(item, property);
-        if (val !== undefined) {
-          found = true;
-          isSequential = (typeof val === 'number') ? isSequential : false;
-          // TODO: throw error if is number AND (is NaN or is Infinity)
+      var v;
+      switch (target) {
+        case 'nodes':
+          v = _visionOnNodes;
+          break;
+        case 'edges':
+          v = _visionOnEdges;
+          break;
+        default:
+          throw '"Designer.utils.isSequential": Unknown target ' + target;
+      }
+
+      if (property === undefined)
+        throw 'Designer.utils.isSequential: Missing property accessor';
+
+      if (typeof property !== 'string')
+        throw 'Designer.utils.isSequential: The property accessor "'+ property +'" must be a string.';
+
+      if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
+        var val,
+            found = false,
+            isSequential = true;
+
+        v.dataset().forEach(function (item) {
+          val = strToObjectRef(item, property);
+          if (val !== undefined) {
+            found = true;
+            isSequential = (typeof val === 'number') ? isSequential : false;
+            // TODO: throw error if is number AND (is NaN or is Infinity)
+          }
+        });
+
+        if (found) {
+          v.dataTypes[property] = { sequential: isSequential };
         }
-      });
-
-      if (found)
-        v.dataTypes[property] = { sequential: isSequential };
-    }
-
-    return (v.dataTypes[property] || {}).sequential;
-  };
-
-  /**
-   * This method is used to get the styles currently applied to nodes or edges.
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @return {array}             The applied styles.
-   */
-  Designer.prototype.utils.appliedStyles = function(target) {
-    if (!target)
-      throw '"Designer.utils.appliedStyles": Missing target';
-
-    if (target !== 'nodes' && target !== 'edges')
-      throw '"Designer.utils.appliedStyles": Unknown target ' + target;
-
-    return _activeStyles[target];
-  };
-
-  /**
-   * This method is used to get the histogram of values, grouped by bins, on
-   * a specified property of nodes or edges computed for a visual variable.
-   * The property must have been used on a style before calling this method.
-   *
-   * The result is an array of objects ordered by bins. Each object contains
-   * the list of `values` in the `bin`, the `min` and `max` values, and the
-   * `ratio` of values in the bin compared to the largest bin.
-   * If the visual variable is the `color`, it also contains the `color` of the
-   * bin.
-   *
-   * @param  {string} target     The data target. Available values:
-   *                             "nodes", "edges".
-   * @param  {string} visualVar  The visual variable. Available values:
-   *                             "color", "size", "label".
-   * @param  {string} property   The property accessor.
-   * @return {array}             The histogram.
-   */
-  Designer.prototype.utils.histogram = function(target, visualVar, property) {
-    if (!target)
-      throw '"Designer.utils.histogram": Missing target';
-
-    var v;
-    switch (target) {
-      case 'nodes':
-        v = _visionOnNodes;
-        break;
-      case 'edges':
-        v = _visionOnEdges;
-        break;
-      default:
-        throw '"Designer.utils.histogram": Unknown target ' + target;
-    }
-
-    if (_visualVars.indexOf(visualVar) == -1)
-      throw 'Designer.utils.histogram: Unknown visual variable.';
-
-    if (property === undefined)
-      throw 'Designer.utils.histogram: Missing property accessor';
-    if (typeof property !== 'string')
-      throw 'Designer.utils.histogram: The property accessor "'+ property +'" must be a string.';
-
-    var isSequential = this.isSequential(target, property);
-    if (isSequential === undefined)
-      throw 'Designer.utils.histogram: Missing property "'+ property;
-    if (!isSequential)
-      throw 'Designer.utils.histogram: the property "'+ property +'" must be sequential.';
-
-    var h = histogram(v.histograms[visualVar], property);
-
-    if (visualVar === 'color') {
-      var bins = h.length,
-        o = null;
-      for (var bin = 0; bin < bins; bin++) {
-        o = strToObjectRef(_palette, _mappings[target].color.scheme);
-        if (!o)
-          throw 'Designer.utils.histogram: color scheme "' + _mappings[target].color.scheme + '" not in '+ target +' palette.';
-        if (!o[bins])
-          throw 'Designer.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + _mappings[target].color.scheme + '".';
-
-        h[bin][visualVar] = o[bins][bin];
       }
-    }
 
-    return h;
+      return (v.dataTypes[property] || {}).sequential;
+    };
+
+    /**
+     * This method is used to get the histogram of values, grouped by bins, on
+     * a specified property of nodes or edges computed for a visual variable.
+     * The property must have been used on a style before calling this method.
+     *
+     * The result is an array of objects ordered by bins. Each object contains
+     * the list of `values` in the `bin`, the `min` and `max` values, and the
+     * `ratio` of values in the bin compared to the largest bin.
+     * If the visual variable is the `color`, it also contains the `color` of the
+     * bin.
+     *
+     * @param  {string} target     The data target. Available values:
+     *                             "nodes", "edges".
+     * @param  {string} visualVar  The visual variable. Available values:
+     *                             "color", "size", "label".
+     * @param  {string} property   The property accessor.
+     * @return {array}             The histogram.
+     */
+    this.utils.histogram = function(target, visualVar, property) {
+      if (!target)
+        throw 'Designer.utils.histogram: Missing target';
+
+      var v;
+      switch (target) {
+        case 'nodes':
+          v = _visionOnNodes;
+          break;
+        case 'edges':
+          v = _visionOnEdges;
+          break;
+        default:
+          throw 'Designer.utils.histogram: Unknown target "' + target + '"';
+      }
+
+      if (v.visualVars.indexOf(visualVar) == -1)
+        throw 'Designer.utils.histogram: Unknown visual variable.';
+
+      if (property === undefined)
+        throw 'Designer.utils.histogram: Missing property accessor';
+
+      if (typeof property !== 'string')
+        throw 'Designer.utils.histogram: The property accessor "'+ property +'" must be a string.';
+
+      var isSequential = this.isSequential(target, property);
+
+      if (isSequential === undefined)
+        throw 'Designer.utils.histogram: Missing property "'+ property + '"';
+
+      if (!isSequential)
+        throw 'Designer.utils.histogram: the property "'+ property +'" must be sequential.';
+
+      var h = histogram(v.histograms[visualVar], property);
+
+      if (visualVar === 'color') {
+        var bins = h.length,
+          o = null;
+        for (var bin = 0; bin < bins; bin++) {
+          o = strToObjectRef(self.palette, self.styles[target].color.scheme);
+          if (!o)
+            throw 'Designer.utils.histogram: color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.';
+          if (!o[bins])
+            throw 'Designer.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".';
+
+          h[bin][visualVar] = o[bins][bin];
+        }
+      }
+
+      return h;
+    };
   };
 
 
@@ -1032,7 +1051,7 @@
    *
    * > var designer = sigma.plugins.designer(s, options);
    */
-  var _instance = null;
+  var _instance = {};
 
   /**
    * @param  {sigma}   s       The related sigma instance.
@@ -1043,23 +1062,20 @@
    */
   sigma.plugins.designer = function(s, options) {
     // Create instance if undefined
-    if (!_instance) {
-      _instance = new Designer(s, options);
+    if (!_instance[s.id]) {
+      _instance[s.id] = new Designer(s, options);
     }
-    return _instance;
+    return _instance[s.id];
   };
 
   /**
    *  This function kills the designer instance.
    */
-  sigma.plugins.killDesigner = function() {
-    if (_instance instanceof Designer) {
-      _mappings = sigma.utils.extend({}, settings);
-      _visionOnNodes = new Vision('nodes');
-      _visionOnEdges = new Vision('edges');
+  sigma.plugins.killDesigner = function(s) {
+    if (_instance[s.id] instanceof Designer) {
+      _instance[s.id].kill();
     }
-    _s = null;
-    _instance = null;
+    delete _instance[s.id];
   };
 
 }).call(this);
