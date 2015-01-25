@@ -269,16 +269,59 @@ designer.apply(); // does nothing
 ```
 
 ### Update palette and styles
+You may initialize the designer with no styles, then set palette and styles later:
+
+```js
+var designer = sigma.plugins.designer(s);
+```
+
 Set a new palette and deprecate all existing styles:
 
 ```js
 designer.setPalette(myPalette);
 ```
 
-Set new styles and deprecate all existing styles:
+Set new styles, deprecate all existing styles, and apply:
 
 ```js
-designer.setStyles(myStyles);
+designer.setStyles(myStyles).apply();
+```
+
+Set a single node style:
+
+```js
+designer
+  .nodesBy('color', {
+    by: 'data.quantity',
+    scheme: 'colorbrewer.sequentialGreen',
+  })
+  .apply();
+```
+
+Set a single edge style:
+
+```js
+designer
+  .edgesBy('size', {
+    by: 'data.quantity',
+    bins: 7,
+    min: 1,
+    max: 5
+  })
+  .apply();
+```
+
+Set multiple styles in a concise way:
+
+```js
+designer
+  .setPalette(myPalette)
+  .nodesBy('label', myStyles.nodes.label)
+  .nodesBy('size', myStyles.nodes.size)
+  .nodesBy('color', myStyles.nodes.color)
+  .edgesBy('size', myStyles.edges.size)
+  .edgesBy('color', myStyles.edges.color)
+  .apply();
 ```
 
 ### Remove a single style
@@ -411,7 +454,8 @@ designer.utils.histogram('edges', 'color', 'data.quantity');
 * Rename method `.omitAll()` -> `.undo()` without argument
 * Rename method `.disown()` -> `.clear()`
 * Remove methods `.specs()` and `.extendSpecs()`
-* Add methods `setStyles()` and `setPalette()`
+* Add methods `.setStyles()` and `.setPalette()`
+* Add methods `.nodesBy()` and `.edgesBy()`
 * Add public properties `styles` and `palette`
 * Add basic unit tests
 

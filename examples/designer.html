@@ -166,6 +166,27 @@ designer
   // .undo()
 ;
 
+// set styles using nodesBy and edgesBy:
+// var designer = sigma.plugins.designer(s);
+
+// designer
+//   .nodesBy('label', myStyles.nodes.label)
+//   .nodesBy('size', myStyles.nodes.size)
+//   .setPalette(myPalette)
+//   .nodesBy('color', myStyles.nodes.color)
+//   .edgesBy('size', myStyles.edges.size)
+//   .edgesBy('color', myStyles.edges.color)
+//   .apply();
+
+// override previous style:
+// designer
+//   .nodesBy('color', myStyles.nodes.color)
+//   .nodesBy('color', {
+//     by: 'data.quantity',
+//     scheme: 'colorbrewer.sequentialGreen',
+//   })
+//   .apply();
+
 // undo a style then remove it:
 // designer.undo('nodes', 'size');
 // delete designer.styles.nodes.size;

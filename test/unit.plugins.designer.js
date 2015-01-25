@@ -120,7 +120,7 @@ test('API', function(assert) {
   };
 
   // Initialize the designer:
-  designer = new sigma.plugins.designer(s, {
+  designer = sigma.plugins.designer(s, {
     styles: myStyles,
     palette: myPalette
   });
@@ -346,9 +346,17 @@ test('API', function(assert) {
   designer.kill();
   s.kill();
   s = new sigma();
-  designer = new sigma.plugins.designer(s);
+  designer = sigma.plugins.designer(s);
   s.graph.read(graph);
-  designer.apply();
+
+  designer
+    .nodesBy('label', myStyles.nodes.label)
+    .nodesBy('size', myStyles.nodes.size)
+    .setPalette(myPalette)
+    .nodesBy('color', myStyles.nodes.color)
+    .edgesBy('size', myStyles.edges.size)
+    .edgesBy('color', myStyles.edges.color)
+    .apply();
 
   sigma.plugins.killDesigner(s);
   deepEqual(

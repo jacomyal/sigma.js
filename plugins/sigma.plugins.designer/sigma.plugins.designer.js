@@ -205,18 +205,12 @@
     if (datasetName === 'nodes') {
       this.visualVars = ['color', 'size', 'label'];
       this.mappings = mappings.nodes;
-
-      this.dataset = function() {
-        return s.graph.nodes();
-      }
+      this.dataset = function() { return s.graph.nodes(); }
     }
     else if (datasetName === 'edges') {
       this.visualVars = ['color', 'size', 'label'];
       this.mappings = mappings.edges;
-
-      this.dataset = function() {
-        return s.graph.edges();
-      }
+      this.dataset = function() { return s.graph.edges(); }
     }
     else
       throw 'Vision: Unknown dataset ' + datasetName;
@@ -413,12 +407,10 @@
         throw 'Vision.get: The property accessor "'+ key +'" must be a string.';
 
       // lazy updating:
-      if (this.deprecated[key])
-        this.update(key);
+      if (this.deprecated[key]) this.update(key);
 
       // lazy indexing:
-      if (this.idx[key] === undefined)
-        this.update(key);
+      if (this.idx[key] === undefined) this.update(key);
 
       return this.idx[key];
     };
@@ -480,11 +472,13 @@
             var newVal = o.styles[visualVar](item);
 
             if (visualVar === 'color' && self.dataTypes[key].array) {
-              if (newVal !== undefined)
+              if (newVal !== undefined) {
                 item.colors.push(newVal);
+              }
             }
-            else if (newVal !== undefined)
+            else if (newVal !== undefined) {
               item[visualVar] = newVal;
+            }
           }
           else {
             if (typeof o.styles[visualVar] === 'function')
@@ -673,6 +667,57 @@
     };
 
     /**
+     * This method will set a specified node style. Styles are mappings between
+     * visual variables and data properties on nodes and edges. It will
+     * deprecate existing node styles bound to the specified data property.
+     *
+     * @param  {string}  visualVar The visual variable.
+     * @param  {object}  params    The style parameter.
+     * @return {Designer}          The instance.
+     */
+    this.nodesBy = function(visualVar, params) {
+      this.styles = sigma.utils.extend(this.styles || {}, {
+        nodes: {},
+        edges: {}
+      });
+
+      this.styles.nodes[visualVar] = params;
+      _visionOnNodes.mappings = this.styles.nodes;
+
+      if (params.by) {
+        this.deprecate('nodes', params.by);
+      }
+
+      return this;
+    };
+
+    /**
+     * This method will set a specified edge style. Styles are mappings between
+     * visual variables and data properties on nodes and edges. It will
+     * deprecate existing edge styles bound to the specified data property.
+     *
+     * @param  {string}  visualVar The visual variable.
+     * @param  {object}  params    The style parameter.
+     * @return {Designer}          The instance.
+     */
+    this.edgesBy = function(visualVar, params) {
+      this.styles = sigma.utils.extend(this.styles || {}, {
+        nodes: {},
+        edges: {}
+      });
+
+      this.styles.edges[visualVar] = params;
+      _visionOnEdges.mappings = this.styles.edges;
+
+      if (params.by) {
+        this.deprecate('edges', params.by);
+      }
+
+      return this;
+    };
+
+
+    /**
      * This method will set a new palette. It will deprecate existing styles.
      *
      * @param  {object}  palette The palette object.
@@ -836,7 +881,7 @@
     /**
      * This method is used when the styles are deprecated, for instance when the
      * graph has changed. The specified property style will be remade the next
-     * time it is called using `.apply()`, `.applyAll()`, `.nodes()`, or `.edges()`
+     * time it is called using `.apply()`, `.nodes()`, or `.edges()`
      * or all property styles if called without argument.
      *
      * @param  {?string} target  The data target. Available values:
@@ -851,22 +896,26 @@
           throw '"Designer.deprecate": Unknown target ' + target;
 
         if (key) {
-          if (target === 'nodes')
+          if (target === 'nodes') {
             _visionOnNodes.deprecated[key] = true;
-          else if (target === 'edges')
+          }
+          else if (target === 'edges') {
             _visionOnEdges.deprecated[key] = true;
+          }
           else
             throw '"Designer.deprecate": Unknown target ' + target;
         }
         else {
-          if (target === 'nodes')
+          if (target === 'nodes') {
             Object.keys(_visionOnNodes.deprecated).forEach(function(prop) {
               _visionOnNodes.deprecated[prop] = true;
             });
-          else if (target === 'edges')
+          }
+          else if (target === 'edges') {
             Object.keys(_visionOnEdges.deprecated).forEach(function(prop) {
               _visionOnEdges.deprecated[prop] = true;
             });
+          }
         }
       }
       else {
