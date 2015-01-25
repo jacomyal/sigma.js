@@ -10,7 +10,7 @@ Contact: seb@linkurio.us
 This plugin provides an API to design the graph visualization like a boss. The graph design is made of a **color palette** and a set of **styles**. A style is a mapping between a **node or edge property** and a **visual variable**, with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`.
 
 This plugin provides **lazy** methods:
-- styles are computed once to be applied and undone multiple times like a breeze.
+- styles are computed once to be applied and reset multiple times like a breeze.
 - the plugin will not look for changes on the graph. Deprecate the design manually to refresh the styles.
 
 The color palette may contain sequential, diverging and qualitative data schemes, and the styles can be computed regarding any node or edge property.
@@ -21,8 +21,8 @@ This plugin comes with fancy developer features:
 - Use accessors to find the right color schemes in the palette.
 - Register multiple styles before applying them anytime at once.
 - Index the nodes and edges properties on demand only, for performance reasons.
-- Undo any style.
-- Chain all methods for concise (coding) style.
+- Reset any style.
+- Chain all methods for concise coding style.
 
 See the live example using the API below:
 ![design](https://github.com/Linkurious/linkurious.js/wiki/media/design-live.gif)
@@ -212,6 +212,7 @@ Apply nodes styles progressively:
 ```js
 design.apply('nodes', 'color');
 design.apply('nodes', 'size');
+
 design.apply(); // apply all styles and skip node colors and size
 ```
 
@@ -260,7 +261,7 @@ var edges = computedStyles['aValue'].items;
 ```
 
 ### Currently applied styles
-Computed styles may not necessarily being applied. For instance, calling `.undo()` will deactivate all styles, however the computed styles still exist and may be applied when calling `.apply()`.
+Computed styles may not necessarily being applied. For instance, calling `.reset()` will deactivate all styles, however the computed styles still exist and may be applied when calling `.apply()`.
 
 You may get all the styles applied to the nodes as follows:
 
@@ -284,38 +285,38 @@ Object.keys(design.styles.edges).forEach(function (visualVariable) {
 });
 ```
 
-### Restore original styles
-The original label, color and size of nodes and edges are stored by the plugin. They may be restored using the `.undo()` method.
+### Reset to original styles
+The original label, color and size of nodes and edges are stored by the plugin. They may be restored using the `.reset()` method.
 
-Undo all styles as follows:
+Reset all styles as follows:
 
 ```js
-design.undo();
+design.reset();
 ```
 
-Undo all nodes styles:
+Reset all nodes styles:
 
 ```js
-design.undo('nodes');
+design.reset('nodes');
 ```
 
-Undo a specified nodes style such as the color:
+Reset a specified nodes style such as the color:
 
 ```js
-design.undo('nodes', 'color');
+design.reset('nodes', 'color');
 // design.styles.nodes.color.active === false
 ```
 
-Undo all edges styles:
+Reset all edges styles:
 
 ```js
-design.undo('edges');
+design.reset('edges');
 ```
 
-Undo a specified nodes style such as the size:
+Reset a specified nodes style such as the size:
 
 ```js
-design.undo('nodes', 'size');
+design.reset('nodes', 'size');
 // design.styles.nodes.size.active === false
 ```
 
@@ -349,7 +350,7 @@ Deprecation works the same for edges.
 Example:
 
 ```js
-design.undo('nodes', 'size');
+design.reset('nodes', 'size');
 delete design.styles.nodes.size;
 ```
 
@@ -458,8 +459,8 @@ design.utils.histogram('edges', 'color', 'data.quantity');
 * Handle multiple Sigma instances
 * Rename method `.make()` -> `.apply()`
 * Rename method `.makeAll()` -> `.apply()` without argument
-* Rename method `.omit()` -> `.undo()`
-* Rename method `.omitAll()` -> `.undo()` without argument
+* Rename method `.omit()` -> `.reset()`
+* Rename method `.omitAll()` -> `.reset()` without argument
 * Rename method `.disown()` -> `.clear()`
 * Remove methods `.specs()` and `.extendSpecs()`
 * Add methods `.setStyles()` and `.setPalette()`

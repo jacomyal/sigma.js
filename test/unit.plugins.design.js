@@ -209,43 +209,43 @@ test('API', function(assert) {
   );
 
 
-  // check undo node color
+  // check reset node color
   // see https://github.com/jacomyal/sigma.js/issues/500
 
-  // design.undo('nodes', 'color');
+  // design.reset('nodes', 'color');
 
   // strictEqual(
   //   s.graph.nodes('n0').color,
   //   '#333',
-  //   '"undo(\'nodes\', \'color\')" reset node color'
+  //   '"reset(\'nodes\', \'color\')" reset node color'
   // );
 
   // strictEqual(
   //   s.graph.nodes('n1').color,
   //   undefined,
-  //   '"undo(\'nodes\', \'color\')" reset node color'
+  //   '"reset(\'nodes\', \'color\')" reset node color'
   // );
 
 
-  // check undo node size
+  // check reset node size
 
-  design.undo('nodes', 'size');
+  design.reset('nodes', 'size');
 
   ok(
     !design.styles.nodes.size.active,
-    'nodes size is not active after "undo(\'nodes\', \'size\')"'
+    'nodes size is not active after "reset(\'nodes\', \'size\')"'
   );
 
   strictEqual(
     s.graph.nodes('n0').size,
     1,
-    '"undo(\'nodes\', \'size\')" reset node size'
+    '"reset(\'nodes\', \'size\')" reset node size'
   );
 
   strictEqual(
     s.graph.nodes('n1').size,
     undefined,
-    '"undo(\'nodes\', \'size\')" reset node size'
+    '"reset(\'nodes\', \'size\')" reset node size'
   );
 
 
@@ -263,18 +263,18 @@ test('API', function(assert) {
     'edges size is active after "apply(\'edges\', \'size\')"'
   );
 
-  design.undo('edges', 'color');
+  design.reset('edges', 'color');
 
   ok(
     !design.styles.edges.color.active,
-    'edges color is not active after "undo(\'edges\', \'color\')"'
+    'edges color is not active after "reset(\'edges\', \'color\')"'
   );
 
-  design.undo('edges', 'size');
+  design.reset('edges', 'size');
 
   ok(
     !design.styles.edges.size.active,
-    'edges size is not active after "undo(\'edges\', \'size\')"'
+    'edges size is not active after "reset(\'edges\', \'size\')"'
   );
 
   design.apply();
@@ -337,7 +337,7 @@ test('API', function(assert) {
     '"utils.isSequential" returns undefined on a property which does not exist'
   );
 
-  design.undo();
+  design.reset();
 
   design.clear();
 
@@ -366,6 +366,6 @@ test('API', function(assert) {
   );
 
   design.apply();  // does nothing
-  design.undo();  // does nothing
+  design.reset();  // does nothing
 
 });

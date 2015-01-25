@@ -159,11 +159,11 @@ design
   // .apply('nodes')
   // .apply('nodes', 'color')
   // .apply('nodes', 'size')
-  // .undo('nodes', 'color')
-  // .undo('nodes', 'size')
-  // .undo('edges', 'color')
+  // .reset('nodes', 'color')
+  // .reset('nodes', 'size')
+  // .reset('edges', 'color')
   // .apply('nodes')
-  // .undo()
+  // .reset()
 ;
 
 // set styles using nodesBy and edgesBy:
@@ -187,8 +187,8 @@ design
 //   })
 //   .apply();
 
-// undo a style then remove it:
-// design.undo('nodes', 'size');
+// reset a style then remove it:
+// design.reset('nodes', 'size');
 // delete design.styles.nodes.size;
 
 // The visual variables currently applied to the nodes
