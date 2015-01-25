@@ -532,7 +532,7 @@
     };
 
     /**
-     * This method will undo a mapping between a visual variable and a property.
+     * This method will reset a mapping between a visual variable and a property.
      * It restores the original value of the visual variable for each item. It
      * will do nothing if the vision on the property is missing.
      * Available visual variables are stored in `visualVars`.
@@ -540,15 +540,15 @@
      * @param {string} visualVar The name of the visual variable.
      * @param {string} key       The property accessor.
      */
-    this.undoStyle = function(visualVar, key) {
+    this.resetStyle = function(visualVar, key) {
       if (key === undefined)
-        throw 'Vision.undoStyle: Missing property accessor';
+        throw 'Vision.resetStyle: Missing property accessor';
 
       if (typeof key !== 'string')
-        throw 'Vision.undoStyle: The property accessor "'+ key +'" must be a string.';
+        throw 'Vision.resetStyle: The property accessor "'+ key +'" must be a string.';
 
       if (this.visualVars.indexOf(visualVar) == -1)
-        throw 'Vision.undoStyle: Unknown style';
+        throw 'Vision.resetStyle: Unknown style';
 
       if (this.idx[key] === undefined) return;
 
@@ -824,19 +824,19 @@
       return this;
     };
 
-    function __undo(mappings, vision, visualVar) {
+    function __reset(mappings, vision, visualVar) {
       if (!visualVar) {
-        // undo all styles if no visual variable is specified:
+        // reset all styles if no visual variable is specified:
         Object.keys(mappings).forEach(function (visuVar) {
           if (mappings[visuVar].active) {
-            vision.undoStyle(visuVar, mappings[visuVar].by);
+            vision.resetStyle(visuVar, mappings[visuVar].by);
             mappings[visuVar].active = false;
           }
         });
       }
       else if (mappings[visualVar] && mappings[visualVar].active) {
-        // undo the style of the specified visual variable:
-        vision.undoStyle(visualVar, mappings[visualVar].by);
+        // reset the style of the specified visual variable:
+        vision.resetStyle(visualVar, mappings[visualVar].by);
         mappings[visualVar].active = false;
       }
 
@@ -844,8 +844,8 @@
     };
 
     /**
-     * This method is used to undo all target styles or a specified target style,
-     * depending on how it is called. Undo all styles if it is called
+     * This method is used to reset all target styles or a specified target style,
+     * depending on how it is called. reset all styles if it is called
      * without argument. It will do nothing if the visual variable
      * is not in the existing styles. It will finally refresh the display.
      *
@@ -855,24 +855,24 @@
      *                             "color", "size", "label".
      * @return {design}  The instance.
      */
-    this.undo = function(target, visualVar) {
+    this.reset = function(target, visualVar) {
       if (!this.styles) return;
 
       if (!target) {
-        __undo(this.styles.nodes, _visionOnNodes, visualVar);
-        __undo(this.styles.edges, _visionOnEdges, visualVar);
+        __reset(this.styles.nodes, _visionOnNodes, visualVar);
+        __reset(this.styles.edges, _visionOnEdges, visualVar);
         return this;
       }
 
       switch (target) {
         case 'nodes':
-          __undo(this.styles.nodes, _visionOnNodes, visualVar);
+          __reset(this.styles.nodes, _visionOnNodes, visualVar);
           break;
         case 'edges':
-          __undo(this.styles.edges, _visionOnEdges, visualVar);
+          __reset(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw '"design.undo": Unknown target ' + target;
+          throw '"design.reset": Unknown target ' + target;
       }
 
       return this;
@@ -933,12 +933,12 @@
 
     /**
      * This method is used to clear all styles. It will refresh the display. Use
-     * `.undo()` instead to undo styles without losing the configuration.
+     * `.reset()` instead to reset styles without losing the configuration.
      *
      * @return {design}  The instance.
      */
     this.clear = function() {
-      this.undo();
+      this.reset();
       this.styles = {
         nodes: {},
         edges: {}
