@@ -80,7 +80,6 @@ module.exports = function(grunt) {
     'plugins.activeState',
     'plugins.animate',
     'plugins.colorbrewer',
-    'plugins.designer',
     'plugins.dragNodes',
     'plugins.edgeSiblings',
     'plugins.image',
