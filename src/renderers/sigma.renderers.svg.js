@@ -222,6 +222,7 @@
         (subrenderers[a[i].type] || subrenderers.def).update(
           a[i],
           this.domElements.labels[a[i].id],
+          this.measurementCanvas,
           embedSettings
         );
       }
