@@ -18,9 +18,9 @@
     var fontSize,
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'],
-        labelWidth = 0,
-        labelPlacementX,
-        labelPlacementY,
+        labelWidth,
+        labelOffsetX,
+        labelOffsetY,
         alignment;
 
     if (size < settings('labelThreshold'))
@@ -46,44 +46,37 @@
       settings('defaultLabelColor');
 
     labelWidth = context.measureText(node.label).width;
-    labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
-    labelPlacementY = Math.round(node[prefix + 'y'] + fontSize / 3);
+    labelOffsetX = - labelWidth / 2;
+    labelOffsetY = fontSize / 3;
 
     switch (alignment) {
+      case 'bottom':
+        labelOffsetY = + size + 4 * fontSize / 3;
+        break;
+      case 'center':
+        break;
+      case 'left':
+        labelOffsetX = - size - 3 - labelWidth;
+        break;
+      case 'top':
+        labelOffsetY = - size - 2 * fontSize / 3;
+        break;
       case 'inside':
-        if (labelWidth >= (size + fontSize / 3) * 2) {
-          labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+        if (labelWidth <= (size + fontSize / 3) * 2) {
           break;
         }
       /* falls through*/
-      case 'center':
-        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
-        break;
-      case 'left':
-        labelPlacementX =
-            Math.round(node[prefix + 'x'] - size - labelWidth - 3);
-        break;
       case 'right':
-        labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
-        break;
-      case 'top':
-        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
-        labelPlacementY = labelPlacementY - size - fontSize;
-        break;
-      case 'bottom':
-        labelPlacementX = Math.round(node[prefix + 'x'] - labelWidth / 2);
-        labelPlacementY = labelPlacementY + size + fontSize;
-        break;
+      /* falls through*/
       default:
-        // Default is aligned 'right'
-        labelPlacementX = Math.round(node[prefix + 'x'] + size + 3);
+        labelOffsetX = size + 3;
         break;
     }
 
     context.fillText(
       node.label,
-      labelPlacementX,
-      labelPlacementY
+      Math.round(node[prefix + 'x'] + labelOffsetX),
+      Math.round(node[prefix + 'y'] + labelOffsetY)
     );
   };
 }).call(this);

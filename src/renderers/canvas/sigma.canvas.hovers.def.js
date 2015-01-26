@@ -15,12 +15,7 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.canvas.hovers.def = function(node, context, settings) {
-    var x,
-        y,
-        w,
-        h,
-        e,
-        alignment,
+    var alignment,
         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'],
@@ -74,11 +69,11 @@
     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
     nodeRenderer(node, context, settings);
 
-    displayLabel(alignment, context, fontSize, node);
+    drawLabel(alignment, context, fontSize, node);
 
-    function displayLabel(alignment, context, fontSize, node) {
+    function drawLabel(alignment, context, fontSize, node) {
       if (node.label === null || node.label === undefined ||
-          typeof node.label !== 'string') {
+          node.label === '' || typeof node.label !== 'string') {
         return;
       }
 
@@ -86,58 +81,51 @@
         (node.color || settings('defaultNodeColor')) :
         settings('defaultLabelHoverColor');
       var labelWidth = context.measureText(node.label).width,
-        xOffset = 0,
-        yOffset = fontSize / 3;
+          labelOffsetX = - labelWidth / 2,
+          labelOffsetY = fontSize / 3;
 
       switch (alignment) {
         case 'bottom':
-          xOffset = - labelWidth / 2;
-          yOffset = + size + 4 * fontSize / 3;
+          labelOffsetY = + size + 4 * fontSize / 3;
           break;
         case 'center':
-          xOffset = - labelWidth / 2;
           break;
         case 'left':
-          xOffset = - size - 3 - labelWidth;
+          labelOffsetX = - size - 3 - labelWidth;
           break;
         case 'top':
-          xOffset = - labelWidth / 2;
-          yOffset = - size - 2 * fontSize / 3;
+          labelOffsetY = - size - 2 * fontSize / 3;
           break;
         case 'inside':
           if (labelWidth <= (size + fontSize / 3) * 2) {
-            xOffset = - labelWidth / 2;
             break;
           }
         /* falls through*/
         case 'right':
         /* falls through*/
         default:
-          xOffset = size + 3;
+          labelOffsetX = size + 3;
           break;
       }
+
       context.fillText(
         node.label,
-        Math.round(node[prefix + 'x'] + xOffset),
-        Math.round(node[prefix + 'y'] + yOffset)
+        Math.round(node[prefix + 'x'] + labelOffsetX),
+        Math.round(node[prefix + 'y'] + labelOffsetY)
       );
     }
 
     function drawHoverBorder(alignment, context, fontSize, node) {
-      x = Math.round(node[prefix + 'x']);
-      y = Math.round(node[prefix + 'y']);
-      w = Math.round(
-        context.measureText(node.label).width + size + 1.5 + fontSize / 3
-      );
-      h = Math.round(fontSize + 4);
-      e = size + fontSize / 3;
+      var x = Math.round(node[prefix + 'x']),
+          y = Math.round(node[prefix + 'y']),
+          w = Math.round(
+            context.measureText(node.label).width + size + 1.5 + fontSize / 3
+          ),
+          h = fontSize + 4,
+          e = Math.round(size + fontSize / 3);
 
       // draw a circle for the node first
-      context.moveTo(x, y - e);
-      context.arcTo(x + e, y - e, x + e, y, e);
-      context.arcTo(x + e, y + e, x, y + e, e);
-      context.arcTo(x - e, y + e, x - e, y, e);
-      context.arcTo(x - e, y - e, x, y - e, e);
+      context.arc(x, y, e, 0, 2 * Math.PI);
 
       if (node.label && typeof node.label === 'string') {
         // then a rectangle for the label
@@ -146,31 +134,13 @@
             break;
           case 'left':
             y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
-            context.moveTo(x, y);
-            context.lineTo(x, y + h);
-            context.lineTo(x - w, y + h);
-            context.lineTo(x - w, y);
-            context.lineTo(x, y);
+            context.rect(x - w, y, w, h);
             break;
           case 'top':
-            y = Math.round(node[prefix + 'y'] - e);
-
-            context.moveTo(x, y);
-            context.lineTo(x + w / 2 , y);
-            context.lineTo(x + w / 2, y - h);
-            context.lineTo(x - w / 2, y - h);
-            context.lineTo(x - w / 2, y);
-            context.lineTo(x, y);
+            context.rect(x - w / 2, y - e - h, w, h);
             break;
           case 'bottom':
-            y = Math.round(node[prefix + 'y'] + e);
-
-            context.moveTo(x, y);
-            context.lineTo(x + w / 2 , y);
-            context.lineTo(x + w / 2, y + h);
-            context.lineTo(x - w / 2, y + h);
-            context.lineTo(x - w / 2, y);
-            context.lineTo(x, y);
+            context.rect(x - w / 2, y + e, w, h);
             break;
           case 'inside':
             if (context.measureText(node.label).width <= e * 2) {
@@ -183,12 +153,7 @@
           /* falls through*/
           default:
             y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
-
-            context.moveTo(x, y);
-            context.lineTo(x + w, y);
-            context.lineTo(x + w, y + h);
-            context.lineTo(x, y + h);
-            context.lineTo(x, y);
+            context.rect(x, y, w, h);
             break;
         }
       }
