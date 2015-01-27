@@ -31,7 +31,10 @@
           size = node[prefix + 'size'],
           fontSize = (settings('labelSize') === 'fixed') ?
             settings('defaultLabelSize') :
-            settings('labelSizeRatio') * size;
+            settings('labelSizeRatio') * size,
+          e = size + fontSize / 3,
+          x = node[prefix + 'x'],
+          y = node[prefix + 'y'];
 
        // set context font and font size
       measurementCanvas.font = (fontStyle ? fontStyle + ' ' : '') +
@@ -56,13 +59,13 @@
       circle.setAttributeNS(null, 'stroke', '#000');
       circle.setAttributeNS(null, 'stroke-opacity', '0.3');
       circle.setAttributeNS(null, 'stroke-width', 2);
-      circle.setAttributeNS(null, 'cx', Math.round(node[prefix + 'x']));
-      circle.setAttributeNS(null, 'cy', Math.round(node[prefix + 'y']));
-      circle.setAttributeNS(null, 'r', Math.round(size + fontSize / 3));
+      circle.setAttributeNS(null, 'cx', Math.round(x));
+      circle.setAttributeNS(null, 'cy', Math.round(y));
+      circle.setAttributeNS(null, 'r', Math.round(e));
 
       group.appendChild(circle);
 
-      if (node.label && typeof node.label === 'string') {
+      if (typeof node.label === 'string' && node.label !== '') {
         drawHoverBorderAndLabel(
           fontSize,
           group,
@@ -84,21 +87,17 @@
         node,
         nodeCircle) {
         var alignment,
-            e = size + fontSize / 3,
             fontColor = (settings('labelHoverColor') === 'node') ?
                           (node.color || settings('defaultNodeColor')) :
                           settings('defaultLabelHoverColor'),
             h = fontSize + 4,
             labelOffsetX = - labelWidth / 2,
             labelOffsetY = fontSize / 3,
-            prefix = settings('prefix') || '',
             rectangle = document.createElementNS(settings('xmlns'), 'rect'),
             rectOffsetX,
             rectOffsetY,
             text = document.createElementNS(settings('xmlns'), 'text'),
-            w = labelWidth + size + 1.5 + fontSize / 3,
-            x = node[prefix + 'x'],
-            y = node[prefix + 'y'];
+            w = labelWidth + size + 1.5 + fontSize / 3;
 
         if (settings('labelAlignment') === undefined) {
           alignment = settings('defaultLabelAlignment');
@@ -144,7 +143,6 @@
         // Text
         text.setAttributeNS(null, 'x', Math.round(x + labelOffsetX));
         text.setAttributeNS(null, 'y', Math.round(y + labelOffsetY));
-        text.innerHTML = node.label;
         text.textContent = node.label;
         text.setAttributeNS(
           null,
