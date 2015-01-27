@@ -157,6 +157,7 @@ module.exports = function(grunt) {
           'build/sigma.min.js': coreJsFiles
         },
         options: {
+          sourceMap: true,
           banner: '/* sigma.js - <%= pkg.description %> - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n'
         }
       },
@@ -165,7 +166,10 @@ module.exports = function(grunt) {
           var dest = 'build/' + path.replace(/\/\*\*\/\*\.js$/, '.min.js');
           res[dest] = path;
           return res;
-        }, {})
+        }, {}),
+        options: {
+          sourceMap: true
+        }
       }
     },
     concat: {
