@@ -304,7 +304,8 @@
           sizeHist,
           scheme,
           bins,
-          visualVars;
+          visualVars,
+          nset = 0;
 
       // Visual variables mapped to the specified property:
       visualVars = Object.keys(that.mappings).filter(function (visualVar) {
@@ -329,6 +330,7 @@
               self.histograms.color = self.histograms.color || {};
               self.histograms.color[key] = baseHistogram(Object.keys(self.idx[key]), bins);
             }
+
             break;
 
           case 'label':
@@ -368,8 +370,13 @@
               else {
                 self.idx[key][val].styles.color = function() {
                   if (schemeFn(that.palette, scheme) === undefined)
-                    throw 'Vision.update: The color scheme must be qualitative' +
-                      ', i.e. a dict of value => color';
+                    throw 'Vision.update: Wrong or undefined color scheme';
+
+                  if (that.mappings.color.set > 0) {
+                    var setItem = schemeFn(that.palette, scheme)[that.mappings.color.set][nset];
+                    nset = (nset + 1) % that.mappings.color.set;
+                    return setItem;
+                  }
 
                   return schemeFn(that.palette, scheme)[val];
                 };
