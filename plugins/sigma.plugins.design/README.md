@@ -93,7 +93,7 @@ Available visual variables in styles are `color`, `label`, `size` for both nodes
   * It will set the `color` of nodes and edges in function of a data property.
   * **by** (*string*): the accessor to the data property.
   * **scheme** (*string*): the accessor to the color scheme in the palette, using a dot notation.
-  * **bins** (*number*, default: `7`): The number of buckets to group the quantiative values. It is required for a scheme on sequential data. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
+  * **bins** (*number*, default: `7`): The number of buckets to group the quantitative values. It is required for a scheme on sequential data. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
   * **set** (*number*): The number of items in a set of colors. It is required for a scheme on qualitative data where the scheme contains arrays indexed by array length.
 
 This is an example of styles for nodes and edges:
