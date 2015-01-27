@@ -70,6 +70,9 @@ var myPalette = {
       8: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"],
       9: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b"]
     }
+  },
+  aSetScheme: {
+    7: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628"]
   }
 };
 ```
@@ -90,7 +93,8 @@ Available visual variables in styles are `color`, `label`, `size` for both nodes
   * It will set the `color` of nodes and edges in function of a data property.
   * **by** (*string*): the accessor to the data property.
   * **scheme** (*string*): the accessor to the color scheme in the palette, using a dot notation.
-  * **bins** (*number*, default: `7`): optional, the number of buckets to group the quantiative values. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
+  * **bins** (*number*, default: `7`): The number of buckets to group the quantiative values. It is required for a scheme on sequential data. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
+  * **set** (*number*): The number of items in a set of colors. It is required for a scheme on qualitative data where the scheme contains arrays indexed by array length.
 
 This is an example of styles for nodes and edges:
 
@@ -125,6 +129,22 @@ var myStyles = {
       max: 5
     },
   }
+};
+```
+
+The plugin is able to assign colors randomly from an array of colors for qualitative data as follows (see the scheme definition above):
+
+```js
+var myStyles = {
+  nodes: {
+    color: {
+      by: 'data.quality',
+      scheme: 'aSetScheme',
+      set: 7
+    },
+    ...
+  },
+  ...
 };
 ```
 
@@ -402,7 +422,7 @@ design.utils.isSequential('nodes', 'data.missing');
 
 ### Histograms
 
-Histograms are values of a specified property of nodes or edges grouped by bins and computed for a visual variable such as sizes and colors.
+Histograms are values of a specified property of nodes or edges grouped by bins and computed for a visual variable such as sizes and colors. They are computed in a lazy manner and stored by the plugin.
 
 The result is an array of bin objects ordered by `bin` ID. Each bin object contain the following information:
 
@@ -453,6 +473,9 @@ design.utils.histogram('edges', 'color', 'data.quantity');
 ```
 
 ## Changelog
+
+**0.5**
+* Automatic color assignment of qualitative data when the scheme is a set of colors instead of a dictionnary.
 
 **0.4**
 * Rename plugin `designer` -> `design`
