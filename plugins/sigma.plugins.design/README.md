@@ -7,7 +7,7 @@ Contact: seb@linkurio.us
 
 ---
 ## General
-This plugin provides an API to design the graph visualization like a boss. The graph design is made of a **color palette** and a set of **styles**. A style is a mapping between a **node or edge property** and a **visual variable**, with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`.
+This plugin provides an API to design the graph visualization like a boss. The graph design is made of a **color palette** and a set of **styles**. A style is a mapping between a **node or edge property** and a **visual variable**, with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`, and `type` (i.e. shapes) for both nodes and edges, as well as `icon` and `image` for nodes.
 
 This plugin provides **lazy** methods:
 - styles are computed once to be applied and reset multiple times like a breeze.
@@ -47,11 +47,11 @@ sigma.plugins.killDesign(sigInst);
 ## Configuration
 The configuration is made of a color palette and a set of styles, i.e. mapping between visual variables and data properties on nodes and edges.
 
-Palettes may contain color schemes for both quantitative and qualitative properties. Schemes for qualitative properties are dictionaries where keys are the property values, and values are associated colors. Schemes for quantitative properties are dictionaries where keys are the number of property values, and the values are arrays of sequential colors.
+Palettes may contain color schemes for both quantitative and qualitative properties, as well as schemes for types (i.e. shapes), icons and images. Schemes for qualitative properties are dictionaries where keys are the property values, and values are associated colors. Schemes for quantitative properties are dictionaries where keys are the number of property values, and the values are arrays of sequential colors.
 
 Schemes may be nested in objects and be referenced in dot notation by the styles.
 
-This is an example of a color palette with 2 schemes:
+This is a complete example of palette:
 
 ```js
 var myPalette = {
@@ -71,13 +71,67 @@ var myPalette = {
       9: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b"]
     }
   },
+  ggplot2: {
+    sequentialBlue: {
+      7: ['#132b43','#1d3f5d','#27547a','#326896','#3d7fb5','#4897d4','#54aef3']
+    },
+  },
   aSetScheme: {
     7: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628"]
+  },
+  // see sigma.renderers.linkurious
+  nodeTypeScheme: {
+    'A': 'square',
+    'B': 'diamond',
+    'C': 'star'
+  },
+  // see sigma.renderers.customEdgeShapes
+  edgeTypeScheme: {
+    'A': 'tapered'
+  },
+  // see sigma.renderers.linkurious
+  imageScheme: {
+    'A': {
+      url: 'img/img1.png',
+      scale: 1.3,
+      clip: 0.85
+    },
+    'B': {
+      url: 'img/img2.png',
+      scale: 1.3,
+      clip: 0.85
+    },
+    'C': {
+      url: 'img/img3.png',
+      scale: 1.3,
+      clip: 0.85
+    }
+  },
+  // see sigma.renderers.linkurious
+  iconScheme: {
+    'A': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11b"
+    },
+    'B': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11c"
+    },
+    'C': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11d"
+    }
   }
 };
 ```
 
-Available visual variables in styles are `color`, `label`, `size` for both nodes and edges. Styles map visual variables to data properties as follows:
+Available visual variables are `color`, `label`, `size`, and `type` (i.e. shapes) for both nodes and edges, as well as `icon` and `image` for nodes. Styles map visual variables to data properties as follows:
 
 * **label**
   * It will replace the existing label by the content of a data property.
@@ -95,6 +149,18 @@ Available visual variables in styles are `color`, `label`, `size` for both nodes
   * **scheme** (*string*): the accessor to the color scheme in the palette, using a dot notation.
   * **bins** (*number*, default: `7`): The number of buckets to group the quantitative values. It is required for a scheme on sequential data. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
   * **set** (*number*): The number of items in a set of colors. It is required for a scheme on qualitative data where the scheme contains arrays indexed by array length.
+* **type**
+  * It will set the `type` (i.e. shape) of nodes and edges in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the type scheme in the palette, using a dot notation.
+* **icon**
+  * It will set the nodes `icon` in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the icon scheme in the palette, using a dot notation.
+* **image**
+  * It will set the nodes `image` in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the image scheme in the palette, using a dot notation.
 
 This is an example of styles for nodes and edges:
 
@@ -115,6 +181,10 @@ var myStyles = {
       by: 'data.quality',
       scheme: 'aQualitativeScheme'
     },
+    icon: {
+      by: 'data.quality',
+      scheme: 'iconScheme'
+    }
   },
   edges: {
     color: {
@@ -148,7 +218,7 @@ var myStyles = {
 };
 ```
 
-The [ColorBrewer palette](../sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js) is provided to get started quickly with good color schemes.
+The [ColorBrewer palette](../sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js) provides good color schemes to start with .
 
 ## API
 
@@ -476,6 +546,7 @@ design.utils.histogram('edges', 'color', 'data.quantity');
 
 **0.5**
 * Automatic color assignment of qualitative data when the scheme is a set of colors instead of a dictionnary.
+* Add node and edge types, node icons and images; fully compatible with `sigma.renderers.linkurious`
 
 **0.4**
 * Rename plugin `designer` -> `design`

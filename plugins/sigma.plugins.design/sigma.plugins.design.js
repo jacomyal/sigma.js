@@ -203,12 +203,12 @@
 
     // nodes or edges:
     if (datasetName === 'nodes') {
-      this.visualVars = ['color', 'size', 'label'];
+      this.visualVars = ['color', 'size', 'label', 'type', 'icon', 'image'];
       this.mappings = mappings.nodes;
       this.dataset = function() { return s.graph.nodes(); }
     }
     else if (datasetName === 'edges') {
-      this.visualVars = ['color', 'size', 'label'];
+      this.visualVars = ['color', 'size', 'label', 'type'];
       this.mappings = mappings.edges;
       this.dataset = function() { return s.graph.edges(); }
     }
@@ -302,7 +302,10 @@
       var format,
           colorHist,
           sizeHist,
-          scheme,
+          colorScheme,
+          typeScheme,
+          iconScheme,
+          imageScheme,
           bins,
           visualVars,
           nset = 0;
@@ -320,10 +323,10 @@
       visualVars.forEach(function (visualVar) {
         switch (visualVar) {
           case 'color':
-            scheme = that.mappings.color.scheme;
+            colorScheme = that.mappings.color.scheme;
 
-            if (typeof scheme !== 'string')
-              throw 'Vision.update: color.scheme "' + scheme + '" must be a string';
+            if (typeof colorScheme !== 'string')
+              throw 'Vision.update: color.scheme "' + colorScheme + '" must be a string';
 
             if (isSequential) {
               bins = that.mappings.color.bins || 7;
@@ -352,6 +355,30 @@
               (that.mappings.size.bins || 7)
             );
             break;
+
+          case 'type':
+            typeScheme = that.mappings.type.scheme;
+
+            if (typeof typeScheme !== 'string')
+              throw 'Vision.update: type.scheme "' + typeScheme + '" must be a string';
+
+            break;
+
+          case 'icon':
+            iconScheme = that.mappings.icon.scheme;
+
+            if (typeof iconScheme !== 'string')
+              throw 'Vision.update: icon.scheme "' + iconScheme + '" must be a string';
+
+            break;
+
+          case 'image':
+            imageScheme = that.mappings.image.scheme;
+
+            if (typeof imageScheme !== 'string')
+              throw 'Vision.update: type.scheme "' + imageScheme + '" must be a string';
+
+            break;
         }
       });
 
@@ -364,21 +391,21 @@
               if (isSequential) {
                 self.idx[key][val].styles.color = function() {
                   var bin = self.histograms.color[key][val];
-                  return schemeFn(that.palette, scheme)[bins][bin];
+                  return schemeFn(that.palette, colorScheme)[bins][bin];
                 };
               }
               else {
                 self.idx[key][val].styles.color = function() {
-                  if (schemeFn(that.palette, scheme) === undefined)
+                  if (schemeFn(that.palette, colorScheme) === undefined)
                     throw 'Vision.update: Wrong or undefined color scheme';
 
                   if (that.mappings.color.set > 0) {
-                    var setItem = schemeFn(that.palette, scheme)[that.mappings.color.set][nset];
+                    var setItem = schemeFn(that.palette, colorScheme)[that.mappings.color.set][nset];
                     nset = (nset + 1) % that.mappings.color.set;
                     return setItem;
                   }
 
-                  return schemeFn(that.palette, scheme)[val];
+                  return schemeFn(that.palette, colorScheme)[val];
                 };
               }
               break;
@@ -392,6 +419,33 @@
             case 'size':
               self.idx[key][val].styles.size = function() {
                 return 1 + self.histograms.size[key][val];
+              };
+              break;
+
+            case 'type':
+              self.idx[key][val].styles.type = function() {
+                if (schemeFn(that.palette, typeScheme) === undefined)
+                  throw 'Vision.update: Wrong or undefined type scheme';
+
+                return schemeFn(that.palette, typeScheme)[val];
+              };
+              break;
+
+            case 'icon':
+              self.idx[key][val].styles.icon = function() {
+                if (schemeFn(that.palette, iconScheme) === undefined)
+                  throw 'Vision.update: Wrong or undefined icon scheme';
+
+                return schemeFn(that.palette, iconScheme)[val];
+              };
+              break;
+
+            case 'image':
+              self.idx[key][val].styles.image = function() {
+                if (schemeFn(that.palette, imageScheme) === undefined)
+                  throw 'Vision.update: Wrong or undefined image scheme';
+
+                return schemeFn(that.palette, imageScheme)[val];
               };
               break;
           }
