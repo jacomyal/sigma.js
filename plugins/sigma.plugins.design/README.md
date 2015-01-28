@@ -71,8 +71,62 @@ var myPalette = {
       9: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b"]
     }
   },
+  ggplot2: {
+    sequentialBlue: {
+      7: ['#132b43','#1d3f5d','#27547a','#326896','#3d7fb5','#4897d4','#54aef3']
+    },
+  },
   aSetScheme: {
     7: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628"]
+  },
+  // see sigma.renderers.linkurious
+  nodeTypeScheme: {
+    'A': 'square',
+    'B': 'diamond',
+    'C': 'star'
+  },
+  // see sigma.renderers.customEdgeShapes
+  edgeTypeScheme: {
+    'A': 'tapered'
+  },
+  // see sigma.renderers.linkurious
+  imageScheme: {
+    'A': {
+      url: 'img/img1.png',
+      scale: 1.3,
+      clip: 0.85
+    },
+    'B': {
+      url: 'img/img2.png',
+      scale: 1.3,
+      clip: 0.85
+    },
+    'C': {
+      url: 'img/img3.png',
+      scale: 1.3,
+      clip: 0.85
+    }
+  },
+  // see sigma.renderers.linkurious
+  iconScheme: {
+    'A': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11b"
+    },
+    'B': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11c"
+    },
+    'C': {
+      font: 'FontAwesome',
+      scale: 1.0,
+      color: '#fff',
+      content: "\uF11d"
+    }
   }
 };
 ```
@@ -95,6 +149,18 @@ Available visual variables in styles are `color`, `label`, `size` for both nodes
   * **scheme** (*string*): the accessor to the color scheme in the palette, using a dot notation.
   * **bins** (*number*, default: `7`): The number of buckets to group the quantitative values. It is required for a scheme on sequential data. We recommend to set this parameter between 3 and 9 ; the human eyes can hardly distinguish more than 9 colors at once.
   * **set** (*number*): The number of items in a set of colors. It is required for a scheme on qualitative data where the scheme contains arrays indexed by array length.
+* **type**
+  * It will set the `type` (i.e. shape) of nodes and edges in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the type scheme in the palette, using a dot notation.
+* **icon**
+  * It will set the nodes `icon` in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the icon scheme in the palette, using a dot notation.
+* **image**
+  * It will set the nodes `image` in function of a data property.
+  * **by** (*string*): the accessor to the data property.
+  * **scheme** (*string*): the accessor to the image scheme in the palette, using a dot notation.
 
 This is an example of styles for nodes and edges:
 
@@ -115,6 +181,10 @@ var myStyles = {
       by: 'data.quality',
       scheme: 'aQualitativeScheme'
     },
+    icon: {
+      by: 'data.quality',
+      scheme: 'iconScheme'
+    }
   },
   edges: {
     color: {
@@ -476,6 +546,7 @@ design.utils.histogram('edges', 'color', 'data.quantity');
 
 **0.5**
 * Automatic color assignment of qualitative data when the scheme is a set of colors instead of a dictionnary.
+* Add node and edge types, node icons and images; fully compatible with `sigma.renderers.linkurious`
 
 **0.4**
 * Rename plugin `designer` -> `design`
