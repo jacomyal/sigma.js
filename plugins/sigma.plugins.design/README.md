@@ -7,7 +7,7 @@ Contact: seb@linkurio.us
 
 ---
 ## General
-This plugin provides an API to design the graph visualization like a boss. The graph design is made of a **color palette** and a set of **styles**. A style is a mapping between a **node or edge property** and a **visual variable**, with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`.
+This plugin provides an API to design the graph visualization like a boss. The graph design is made of a **color palette** and a set of **styles**. A style is a mapping between a **node or edge property** and a **visual variable**, with optional parameters depending on the visual variable. Available visual variables are `color`, `label`, `size`, and `type` (i.e. shapes) for both nodes and edges, as well as `icon` and `image` for nodes.
 
 This plugin provides **lazy** methods:
 - styles are computed once to be applied and reset multiple times like a breeze.
@@ -47,11 +47,11 @@ sigma.plugins.killDesign(sigInst);
 ## Configuration
 The configuration is made of a color palette and a set of styles, i.e. mapping between visual variables and data properties on nodes and edges.
 
-Palettes may contain color schemes for both quantitative and qualitative properties. Schemes for qualitative properties are dictionaries where keys are the property values, and values are associated colors. Schemes for quantitative properties are dictionaries where keys are the number of property values, and the values are arrays of sequential colors.
+Palettes may contain color schemes for both quantitative and qualitative properties, as well as schemes for types (i.e. shapes), icons and images. Schemes for qualitative properties are dictionaries where keys are the property values, and values are associated colors. Schemes for quantitative properties are dictionaries where keys are the number of property values, and the values are arrays of sequential colors.
 
 Schemes may be nested in objects and be referenced in dot notation by the styles.
 
-This is an example of a color palette with 2 schemes:
+This is a complete example of palette:
 
 ```js
 var myPalette = {
@@ -131,7 +131,7 @@ var myPalette = {
 };
 ```
 
-Available visual variables in styles are `color`, `label`, `size` for both nodes and edges. Styles map visual variables to data properties as follows:
+Available visual variables are `color`, `label`, `size`, and `type` (i.e. shapes) for both nodes and edges, as well as `icon` and `image` for nodes. Styles map visual variables to data properties as follows:
 
 * **label**
   * It will replace the existing label by the content of a data property.
@@ -218,7 +218,7 @@ var myStyles = {
 };
 ```
 
-The [ColorBrewer palette](../sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js) is provided to get started quickly with good color schemes.
+The [ColorBrewer palette](../sigma.plugins.colorbrewer/sigma.plugins.colorbrewer.js) provides good color schemes to start with .
 
 ## API
 
