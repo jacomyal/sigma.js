@@ -10,6 +10,8 @@ Main repository for this plugin is here: <https://github.com/A----/sigma-pathfin
 
 This plugin computes paths in a graph using a naive implementation of the [A*](http://en.wikipedia.org/wiki/A*_search_algorithm) algorithm.
 
+![Astar](https://github.com/Linkurious/sigma.js/wiki/media/astar.gif)
+
 See the following [example code](../../examples/plugin-pathfinding-astar.html)  for full usage.
 
 To use, include all .js files under this folder.
