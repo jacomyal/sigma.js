@@ -77,6 +77,7 @@ module.exports = function(grunt) {
     'layout.forceAtlas2',
     'parsers.gexf',
     'parsers.json',
+    'pathfinding.astar',
     'plugins.activeState',
     'plugins.animate',
     'plugins.colorbrewer',
