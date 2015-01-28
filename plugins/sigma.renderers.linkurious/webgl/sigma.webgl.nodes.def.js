@@ -387,10 +387,6 @@
         //gl.uniform1i(gl.getUniformLocation(program, "u_sampler"), 0);
         //  gl.bindTexture(gl.TEXTURE_2D, null);
         //console.log("empty texture created");
-        // this is a temporary hack, to force refresh
-        setTimeout(function() {
-          self.render.apply(self, args);
-        }, 1000);
       }
 
 
