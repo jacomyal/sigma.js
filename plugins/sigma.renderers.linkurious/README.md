@@ -27,7 +27,7 @@ To use, include all .js files under this folder. The renderers will be used auto
 
 ## Pie charts
 
-![Pie charts](https://github.com/Linkurious/sigma.js/wiki/media/node-pie-charts.png)
+![Pie charts](https://github.com/Linkurious/linkurious.js/wiki/media/node-pie-charts.png)
 
 Set `node.colors` as an array of hexadecimal values. For instance:
 
@@ -38,7 +38,7 @@ Set `node.colors` as an array of hexadecimal values. For instance:
 }
 ```
 
-See the [example file](https://github.com/Linkurious/sigma.js/blob/linkurious-version/examples/renderers-linkurious-pie-charts.html) to display pie charts on nodes.
+See the [example file](../../examples/renderers-linkurious-pie-charts.html) to display pie charts on nodes.
 
 ## Shapes
 
@@ -54,7 +54,7 @@ mySigma.graph.addNode({
 
 #### type: 'circle'
 
-![Circle](https://github.com/Linkurious/sigma.js/wiki/media/node-circle.png)
+![Circle](https://github.com/Linkurious/linkurious.js/wiki/media/node-circle.png)
 
 Draw a disc shaped node (you can also use 'disc', which is an alias).
 
@@ -66,7 +66,7 @@ Draw a disc shaped node (you can also use 'disc', which is an alias).
 
 #### type: 'cross'
 
-![cross](https://github.com/Linkurious/sigma.js/wiki/media/node-cross.png)
+![cross](https://github.com/Linkurious/linkurious.js/wiki/media/node-cross.png)
 
 Draw a `+` shaped cross.
 
@@ -82,7 +82,7 @@ Draw a `+` shaped cross.
 
 #### type: 'diamond'
 
-![diamond](https://github.com/Linkurious/sigma.js/wiki/media/node-diamond.png)
+![diamond](https://github.com/Linkurious/linkurious.js/wiki/media/node-diamond.png)
 
 Draw a diamond. This is basically a square with a 45° rotation.
 
@@ -107,7 +107,7 @@ Draw an equilateral triangle.
 
 #### type: 'square'
 
-![square](https://github.com/Linkurious/sigma.js/wiki/media/node-square.png)
+![square](https://github.com/Linkurious/linkurious.js/wiki/media/node-square.png)
 
 Draw a square. You can rotate it if needed.
 
@@ -122,7 +122,7 @@ Draw a square. You can rotate it if needed.
 
 #### type: 'star'
 
-![star](https://github.com/Linkurious/sigma.js/wiki/media/node-star.png)
+![star](https://github.com/Linkurious/linkurious.js/wiki/media/node-star.png)
 
 Draw a star. Example:
 
@@ -141,8 +141,8 @@ Note: defining an inner star radius is not yet supported in WebGL mode.
 
 ## Images
 
-![image1](https://github.com/Linkurious/sigma.js/wiki/media/node-image1.png)
-![image2](https://github.com/Linkurious/sigma.js/wiki/media/node-image2.png)
+![image1](https://github.com/Linkurious/linkurious.js/wiki/media/node-image1.png)
+![image2](https://github.com/Linkurious/linkurious.js/wiki/media/node-image2.png)
 
 You can add an image to any node, simply by adding `node.image` property, with the following content:
 ````javascript
@@ -163,10 +163,10 @@ Notes:
 
 ## Font-icons
 
-![icon1](https://github.com/Linkurious/sigma.js/wiki/media/node-icon1.png)
-![icon2](https://github.com/Linkurious/sigma.js/wiki/media/node-icon2.png)
-![icon3](https://github.com/Linkurious/sigma.js/wiki/media/node-icon3.png)
-![icon4](https://github.com/Linkurious/sigma.js/wiki/media/node-icon4.png)
+![icon1](https://github.com/Linkurious/linkurious.js/wiki/media/node-icon1.png)
+![icon2](https://github.com/Linkurious/linkurious.js/wiki/media/node-icon2.png)
+![icon3](https://github.com/Linkurious/linkurious.js/wiki/media/node-icon3.png)
+![icon4](https://github.com/Linkurious/linkurious.js/wiki/media/node-icon4.png)
 
 Custom webfonts are supported!
 

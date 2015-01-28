@@ -181,7 +181,7 @@ var settings = {
   spriteSheetMaxSprites: 128   // number max of sprites
 };
 
-setTimeout(function() {
+function init() {
   var sigmaCanvas = new sigma({
     graph: g,
     renderer: {
@@ -199,5 +199,24 @@ setTimeout(function() {
     },
     settings: settings
   });
-}, 300);
+};
+
+// In case the WebGL renderer is used, we must wait for FontAwesome to be loaded.
+// http://www.w3.org/TR/css-font-loading/
+if (document.fonts) {
+  // document.fonts.ready() method is going to be replaced with
+  // document.fonts.ready attribute in the future.
+  var fontsReady = document.fonts.ready;
+  if (typeof(fontsReady) == "function") {
+    fontsReady = document.fonts.ready();
+  }
+  fontsReady.then(init);
+}
+else {
+  // wait or use a polyfill such as:
+  // https://github.com/zachleat/fontfaceonload
+  // https://github.com/smnh/FontLoader
+  setTimeout(init, 2000);
+}
+
 </script>
