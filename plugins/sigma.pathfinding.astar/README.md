@@ -1,32 +1,43 @@
 sigma.pathfinding.astar.js — v1.0.0
 ===================================
 
-> Main repository for this plugin is here: https://github.com/A----/sigma-pathfinding-astar
-> Please report issues, make PR, there.
-> This project is released under Public Domain license (see LICENSE for more information).
+Plugin developed by [A----](https://github.com/A----) and published under the licence [Public Domain](LICENSE).
 
+Main repository for this plugin is here: <https://github.com/A----/sigma-pathfinding-astar>. Please report issues, make PR, there.
 
-*sigma.pathfinding.astar.js* is a plugin for [sigma.js](http://sigmajs.org) that computes path in a graph
-using a naive implementation of the [A*](http://en.wikipedia.org/wiki/A*_search_algorithm) algorithm.
+---
+## General
+
+This plugin computes paths in a graph using a naive implementation of the [A*](http://en.wikipedia.org/wiki/A*_search_algorithm) algorithm.
+
+See the following [example code](../../examples/plugin-pathfinding-astar.html)  for full usage.
+
+To use, include all .js files under this folder.
 
 ## Usage
 
-Either download a tarball, `git clone` the repository or `npm install` it. Then it's pretty straight-forward.
+This plugin adds the static method `.astar(srcId, destId, ?options)` to `sigma.classes.graph` with the following signature:
 
-It adds a method to your `sigma.graph` called `astar(srcId, destId[, options])`.
-- `srcId`, identifier of the start node;
-- `destId`, identification of the destination node;
-- `options` (optional), an object containing one or more of those properties:
-   - `undirected` (default: `false`), if set to `true`, consider the graph as non-oriented (will explore all edges, including the inbound ones);
-   - `pathLengthFunction` (default is the geometrical distance), a `function(node1, node2, previousLength)` that should return the new path length between the start node and `node2`, knowing that the path length between the start node and `node1` is contained in `previousLength`.
-   - `heuristicLengthFunction` (default: `undefined`), a `function(node1, node2)` guesses the path length between `node1` and `node2` (`node2` actually is the destination node). If left undefined, takes the `pathLengthFunction` option (third parameter will be left undefined).
+**astar( *string|number*, *string|number*, ?*object* )** : *array*
+   - **srcId**: *string|number*, identifier of the source node.
+   - **destId**: *string|number*, identifier of the target node.
+   - **options**: ?*object*, an object of optional settings.
 
-Return value is either:
-- `undefined`: no path could be found between the source node and the destination node;
-- `[srcNode, …, destNode ]`: an array of nodes, including source and destination node.
+The method returns `[srcNode, …, destNode ]` an ordered array of nodes if a path is found, including the source node and the target node, or `undefined` otherwise.
 
-Check `example/index.html` for a live example.
+### Options
 
-## Build
+* **undirected**: *boolean* (default: `false`)
+   - If set to `true`, consider the graph as non-oriented (will explore all edges, including the inbound ones).
+* **pathLengthFunction**: *function* (default: the geometrical distance)
+   - The `function(node1, node2, previousLength)` returns the new path length between the start node and `node2`, knowing that the path length between the start node and `node1` is contained in `previousLength`.
+* **heuristicLengthFunction**: *function* (default: `pathLengthFunction`)
+   - The `function(node1, node2)` guesses the path length between `node1` and `node2` (`node2` actually is the target node). If left undefined, takes the `pathLengthFunction` option (third parameter will be left undefined).
 
-Use `grunt` or `grunt watch`.
+### Example
+
+````javascript
+var path = sigInst.graph.astar('n0', 'n5', {
+  undirected: true
+});
+````
