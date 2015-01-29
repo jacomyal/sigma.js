@@ -114,7 +114,10 @@
 
     // save the initial scale and use it if autoScale is set to false or
     // nodePosition is not specified in the setting
-    if (!this.graph.initScale) {
+    if (np) {
+      this.graph.initScale = null;
+    } else {
+      if (!this.graph.initScale)
       this.graph.initScale = scale;
     }
 
