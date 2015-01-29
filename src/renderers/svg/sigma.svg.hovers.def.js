@@ -51,7 +51,7 @@
       group.setAttributeNS(null, 'class', settings('classPrefix') + '-hover');
       group.setAttributeNS(null, 'data-node-id', node.id);
 
-      if (typeof node.label === 'string' && node.lable !== '') {
+      if (typeof node.label === 'string' && node.label !== '') {
         // Text
         text.textContent =  node.label;
         text.setAttributeNS(null, 'class', settings('classPrefix') + '-hover-label');
