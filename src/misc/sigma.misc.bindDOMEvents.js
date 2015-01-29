@@ -89,11 +89,39 @@
       e.stopPropagation();
     }
 
-    // On over
-    function onOver(e) {
+    // On down
+    function onDown(e) {
       var target = e.toElement || e.target;
 
       if (!self.settings('eventsEnabled') || !target)
+        return;
+
+      var el = new Element(target);
+
+      if (el.isNode()) {
+        self.dispatchEvent('downNode', {
+          node: graph.nodes(el.attr('data-node-id'))
+        });
+      }
+      else if (el.isEdge()) {
+        var edge = graph.edges(el.attr('data-edge-id'));
+        self.dispatchEvent('downEdge', {
+          edge: edge,
+          source: graph.nodes(edge.source),
+          target: graph.nodes(edge.target)
+        });
+      }
+
+      e.preventDefault();
+    }
+
+    // On over
+    function onOver(e) {
+      var target = e.toElement || e.target;
+      // firefox fires mouseover events when user clicks the node
+      // and the event has null as its source target
+      var srcTarget = e.fromElement || e.relatedTarget;
+      if (!self.settings('eventsEnabled') || !target || !srcTarget)
         return;
 
       var el = new Element(target);
@@ -137,6 +165,32 @@
       }
     }
 
+    // On up
+    function onUp(e) {
+      var target = e.toElement || e.target;
+
+      if (!self.settings('eventsEnabled') || !target)
+        return;
+
+      var el = new Element(target);
+
+      if (el.isNode()) {
+        self.dispatchEvent('upNode', {
+          node: graph.nodes(el.attr('data-node-id'))
+        });
+      }
+      else if (el.isEdge()) {
+        var edge = graph.edges(el.attr('data-edge-id'));
+        self.dispatchEvent('upEdge', {
+          edge: edge,
+          source: graph.nodes(edge.source),
+          target: graph.nodes(edge.target)
+        });
+      }
+
+      e.preventDefault();
+    }
+
     // Registering Events:
 
     // Click
@@ -147,10 +201,17 @@
     container.addEventListener('touchstart', click, false);
     sigma.utils.doubleClick(container, 'touchstart', doubleClick);
 
+    // Mousedown
+    container.addEventListener('mousedown', onDown, true);
+
     // Mouseover
     container.addEventListener('mouseover', onOver, true);
 
     // Mouseout
     container.addEventListener('mouseout', onOut, true);
+
+    // Mouseup
+    container.addEventListener('mouseup', onUp, true);
+
   };
 }).call(this);

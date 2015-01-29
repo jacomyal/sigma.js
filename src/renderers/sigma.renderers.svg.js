@@ -348,12 +348,18 @@
 
     function overNode(e) {
       var node = e.data.node,
-          embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        embedSettings = self.settings.embedObjects({
+          prefix: prefix
+        });
 
       if (!embedSettings('enableHovering'))
         return;
+
+      if (containsChildNode(
+          self.domElements.groups.hovers,
+          self.domElements.hovers[node.id])) {
+        return;
+      }
 
       var hover = (renderers[node.type] || renderers.def).create(
         node,
@@ -371,19 +377,24 @@
 
     function outNode(e) {
       var node = e.data.node,
-          embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        embedSettings = self.settings.embedObjects({
+          prefix: prefix
+        });
 
       if (!embedSettings('enableHovering'))
         return;
 
       // Deleting element
-      self.domElements.groups.hovers.removeChild(
-        self.domElements.hovers[node.id]
-      );
+      if (containsChildNode(
+          self.domElements.groups.hovers,
+          self.domElements.hovers[node.id])) {
+        self.domElements.groups.hovers.removeChild(
+          self.domElements.hovers[node.id]
+        );
+        delete self.domElements.hovers[node.id];
+      }
+
       hoveredNode = null;
-      delete self.domElements.hovers[node.id];
 
       // Reinstate
       self.domElements.groups.nodes.appendChild(
@@ -391,20 +402,75 @@
       );
     }
 
+    function containsChildNode(parentNode, childNode) {
+      if (parentNode === null || parent === undefined ||
+          parentNode.childElementCount === 0 ||
+          childNode === null || childNode === undefined) {
+        return false;
+      }
+
+      if (parentNode.contains !== null && parentNode.contains !== undefined) {
+        return parentNode.contains(childNode);
+      }
+
+      for (var i = 0, childNodes = parentNode.childNodes;
+           i < childNodes.length;
+           i++) {
+        if (childNodes[i] === childNode) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function showHoverElements(e) {
+      setHoverElementsVisibility(e, true);
+    }
+
+    function hideHoverElements(e) {
+      setHoverElementsVisibility(e, false);
+    }
+
+    function setHoverElementsVisibility(e, visible) {
+      var node = e.data.node;
+      if (node === null || node === undefined ||
+          self.domElements.hovers[node.id] === null ||
+          self.domElements.hovers[node.id] === undefined ||
+          self.domElements.hovers[node.id].parentNode.childElementCount === 0) {
+        return;
+      }
+
+      var childNodes = self.domElements.hovers[node.id].childNodes;
+      var visibility = visible ? 'visible' : 'hidden';
+      for (var i = 0; i < childNodes.length; i++) {
+        var childClass = childNodes[i].getAttribute('class');
+        if (childClass.indexOf(self.settings('classPrefix') + '-node') < 0) {
+          childNodes[i].style.visibility = visibility;
+        }
+      }
+      self.domElements.hovers[node.id].disabled = !visible;
+    }
+
     // OPTIMIZE: perform a real update rather than a deletion
     function update() {
-      if (!hoveredNode)
-        return;
-
       var embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        prefix: prefix
+      });
+
+      if (!hoveredNode || !embedSettings('enableHovering')) {
+        return;
+      }
 
       // Deleting element before update
-      self.domElements.groups.hovers.removeChild(
-        self.domElements.hovers[hoveredNode.id]
-      );
-      delete self.domElements.hovers[hoveredNode.id];
+      if (containsChildNode(
+          self.domElements.groups.hovers,
+          self.domElements.hovers[hoveredNode.id])) {
+        self.domElements.groups.hovers.removeChild(
+          self.domElements.hovers[hoveredNode.id]
+        );
+        delete self.domElements.hovers[hoveredNode.id];
+      }
 
       var hover = (renderers[hoveredNode.type] || renderers.def).create(
         hoveredNode,
@@ -420,8 +486,10 @@
     }
 
     // Binding events
+    this.bind('downNode', hideHoverElements);
     this.bind('overNode', overNode);
     this.bind('outNode', outNode);
+    this.bind('upNode', showHoverElements);
 
     // Update on render
     this.bind('render', update);
