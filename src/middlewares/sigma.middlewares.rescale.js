@@ -112,6 +112,12 @@
         h / Math.max(maxY - minY, 1)
       );
 
+    // save the initial scale and use it if autoScale set to false or 
+    // nodePosition is not speicied in the setting
+    if (!this.graph.initScale) {
+      this.graph.initScale = scale;
+    }
+
     // Size homothetic parameters:
     if (!settings('maxNodeSize') && !settings('minNodeSize')) {
       a = 1;
@@ -143,10 +149,10 @@
     for (i = 0, l = n.length; i < l; i++) {
       n[i][writePrefix + 'size'] =
         n[i][readPrefix + 'size'] * (ns ? a : 1) + (ns ? b : 0);
-      n[i][writePrefix + 'x'] =
-        (n[i][readPrefix + 'x'] - (maxX + minX) / 2) * (np ? scale : 1);
-      n[i][writePrefix + 'y'] =
-        (n[i][readPrefix + 'y'] - (maxY + minY) / 2) * (np ? scale : 1);
+      n[i][writePrefix + 'x'] = (n[i][readPrefix + 'x'] - (maxX + minX) / 2) *
+        (np ? scale : this.graph.initScale);
+      n[i][writePrefix + 'y'] = (n[i][readPrefix + 'y'] - (maxY + minY) / 2) *
+        (np ? scale : this.graph.initScale);
     }
   };
 
