@@ -1,6 +1,7 @@
 sigma.pathfinding.astar.js — v1.0.0
 ===================================
 
+> Plugin author: [@A----](https://github.com/A----)
 > Main repository for this plugin is here: https://github.com/A----/sigma-pathfinding-astar
 > Please report issues, make PR, there.
 > This project is released under Public Domain license (see LICENSE for more information).
@@ -24,9 +25,3 @@ It adds a method to your `sigma.graph` called `astar(srcId, destId[, options])`.
 Return value is either:
 - `undefined`: no path could be found between the source node and the destination node;
 - `[srcNode, …, destNode ]`: an array of nodes, including source and destination node.
-
-Check `example/index.html` for a live example.
-
-## Build
-
-Use `grunt` or `grunt watch`.
