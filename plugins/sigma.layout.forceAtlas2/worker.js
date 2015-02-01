@@ -738,12 +738,7 @@
         w = EdgeMatrix[ep(e, 'weight')];
 
         // Edge weight influence
-        if (W.settings.edgeWeightInfluence === 0)
-          ewc = 1
-        else if (W.settings.edgeWeightInfluence === 1)
-          ewc = w;
-        else
-          ewc = Math.pow(w, W.settings.edgeWeightInfluence);
+        ewc = Math.pow(w, W.settings.edgeWeightInfluence);
 
         // Common measures
         xDist = NodeMatrix[np(n1, 'x')] - NodeMatrix[np(n2, 'x')];
