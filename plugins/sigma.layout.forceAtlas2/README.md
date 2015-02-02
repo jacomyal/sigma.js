@@ -69,6 +69,7 @@ sigmaInstance.isForceAtlas2Running();
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
 * **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
+* **runInBackground** *boolean* `false`: do not render positions, save them as attributes "fa2:x" and "fa2:y" on each node.
 
 *Supervisor configuration*
 

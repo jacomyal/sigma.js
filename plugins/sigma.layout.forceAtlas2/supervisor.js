@@ -83,7 +83,8 @@
         _this.sendByteArrayToWorker();
 
         // Rendering graph
-        _this.sigInst.refresh();
+        if (!this.config.runInBackground)
+          _this.sigInst.refresh();
       }
     };
 
@@ -164,12 +165,13 @@
   Supervisor.prototype.applyLayoutChanges = function() {
     var nodes = this.graph.nodes(),
         j = 0,
-        realIndex;
+        realIndex,
+        prefix = this.config.runInBackground ? "fa2:" : "";
 
     // Moving nodes
     for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
-      nodes[j].x = this.nodesByteArray[i];
-      nodes[j].y = this.nodesByteArray[i + 1];
+      nodes[j][prefix + 'x'] = this.nodesByteArray[i];
+      nodes[j][prefix + 'y'] = this.nodesByteArray[i + 1];
       j++;
     }
   };
