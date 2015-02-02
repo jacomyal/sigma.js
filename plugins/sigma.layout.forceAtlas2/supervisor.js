@@ -336,6 +336,6 @@
   };
 
   sigma.prototype.isForceAtlas2Running = function(config) {
-    return this.supervisor && this.supervisor.running;
+    return !!this.supervisor && this.supervisor.running;
   };
 }).call(this);
