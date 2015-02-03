@@ -29,6 +29,24 @@ Pauses the layout.
 sigmaInstance.forceAtlas2.stop();
 ```
 
+**sigma.forceAtlas2.cooldown**
+
+Gently stops the layout in 30 iterations by default or in a number provided to the function.
+
+```js
+// 30 iterations of cooldown
+sigmaInstance.forceAtlas2.cooldown();
+
+// 20 iterations of cooldown
+sigmaInstance.forceAtlas2.cooldown(20);
+
+// Passing a callback
+sigmaInstance.forceAtlas2.cooldown(20, callback);
+
+// Passing only a callback to keep the default 30
+sigmaInstance.forceAtlas2.cooldown(callback);
+```
+
 **sigma.forceAtlas2.config**
 
 Changes the layout's configuration.
@@ -51,6 +69,14 @@ Returns whether ForceAtlas2 is running.
 
 ```js
 sigmaInstance.forceAtlas2.running();
+```
+
+**sigma.forceAtlas2.cooling**
+
+Returns whether ForceAtlas2 is in a cooling state.
+
+```js
+sigmaInstance.forceAtlas2.cooling();
 ```
 
 ## Configuration

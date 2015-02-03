@@ -929,10 +929,10 @@
             // Updating node's positon
             NodeMatrix[np(n, 'x')] =
               NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
-              (nodespeed / W.settings.slowDown);
+              (nodespeed / W.settings.slowDown / W.cooldown);
             NodeMatrix[np(n, 'y')] =
               NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
-              (nodespeed / W.settings.slowDown);
+              (nodespeed / W.settings.slowDown / W.cooldown);
           }
         }
       }
@@ -1006,6 +1006,13 @@
 
         case 'loop':
           NodeMatrix = new Float32Array(e.data.nodes);
+          W.cooldown = 1;
+          run(W.settings.iterationsPerRender);
+          break;
+
+        case 'cooldown':
+          NodeMatrix = new Float32Array(e.data.nodes);
+          W.cooldown *= Math.exp(Math.log(100) / e.data.params.nbIterations);
           run(W.settings.iterationsPerRender);
           break;
 

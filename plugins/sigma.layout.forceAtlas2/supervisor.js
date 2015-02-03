@@ -47,6 +47,11 @@
     this.started = false;
     this.running = false;
 
+    // Cooling
+    this.cooling = false;
+    this.cpi = -1;
+    this.cei = null;
+
     // Web worker or classic DOM events?
     if (this.shouldUseWorker) {
       if (!this.workerUrl) {
@@ -79,8 +84,34 @@
         // Applying layout
         self.applyLayoutChanges();
 
-        // Send data back to worker and loop
-        self.sendByteArrayToWorker();
+        // Counting iterations
+        if (self.cooling) {
+
+          // One more
+          self.cpi++;
+
+          // Ought to stop?
+          if (self.cpi === self.cei) {
+
+            // Tearing
+            self.cooling = false;
+            self.cpi = -1;
+            self.cei = null;
+
+            self.afterCooldown();
+            delete self.afterCooldown;
+            self.stop();
+            return;
+          }
+
+          // Send data back to worker and loop
+          self.sendByteArrayToWorker('cooldown', {nbIterations: self.cei});
+        }
+        else {
+
+          // Send data back to worker and loop
+          self.sendByteArrayToWorker('loop');
+        }
 
         // Rendering graph
         self.sigInst.refresh();
@@ -160,7 +191,6 @@
     }
   };
 
-  // TODO: make a better send function
   Supervisor.prototype.applyLayoutChanges = function() {
     var nodes = this.graph.nodes(),
         j = 0,
@@ -174,11 +204,14 @@
     }
   };
 
-  Supervisor.prototype.sendByteArrayToWorker = function(action) {
+  Supervisor.prototype.sendByteArrayToWorker = function(action, params) {
     var content = {
       action: action || 'loop',
       nodes: this.nodesByteArray.buffer
     };
+
+    if (params)
+      content.params = params;
 
     var buffers = [this.nodesByteArray.buffer];
 
@@ -253,9 +286,17 @@
     this.running = false;
   };
 
-  // FORMULA: Math.exp(Math.log(100)/nIter)
-  Supervisor.prototype.cooldown = function(nbIterations) {
+  Supervisor.prototype.cooldown = function(nbIterations, callback) {
+    if (typeof nbIterations === 'function') {
+      callback = nbIterations;
+      nbIterations = null;
+    }
 
+    this.cei = nbIterations || 30;
+    this.cooling = true;
+    this.afterCooldown = typeof callback === 'function' ?
+      callback :
+      Function.prototype;
   };
 
   Supervisor.prototype.killWorker = function() {
@@ -319,6 +360,16 @@
     return this;
   };
 
+  ForceAtlas2Interface.prototype.cooldown = function(nbIterations, callback) {
+    var self = this;
+
+    if (!this.supervisor)
+      return this;
+
+    this.supervisor.cooldown(nbIterations, callback);
+    return this;
+  };
+
   ForceAtlas2Interface.prototype.kill = function() {
     if (!this.supervisor)
       return this;
@@ -344,8 +395,12 @@
     return this;
   };
 
-  ForceAtlas2Interface.prototype.running = function(config) {
+  ForceAtlas2Interface.prototype.running = function() {
     return !!this.supervisor && this.supervisor.running;
+  };
+
+  ForceAtlas2Interface.prototype.cooling = function() {
+    return !!this.supervisor && this.supervisor.cooling;
   };
 
   /**
