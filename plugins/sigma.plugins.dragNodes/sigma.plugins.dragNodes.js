@@ -189,6 +189,16 @@
         }
       }
 
+      if(_a) {
+        var activeNodes = _a.nodes();
+        for(var i = 0; i < activeNodes.length; i++) {
+          delete activeNodes[i].forceX;
+          delete activeNodes[i].forceY;
+          delete activeNodes[i].alphaX;
+          delete activeNodes[i].alphaY;
+        }
+      }
+
       // Activate drag graph.
       _renderer.settings({mouseEnabled: true, enableHovering: true});
       _s.refresh();
@@ -225,6 +235,8 @@
             cos = Math.cos(_camera.angle),
             sin = Math.sin(_camera.angle),
             nodes = _s.graph.nodes(),
+            forceX,
+            forceY,
             ref = [];
 
         // Getting and derotating the reference coordinates.
@@ -245,10 +257,6 @@
         y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
           (ref[1].y - ref[0].y) + ref[0].y;
 
-        // Calcul force of dragging
-        var forceX = (x + _node.x)
-        var forceY = (y + _node.y)
-
         // Drag multiple nodes, Keep distance
         var x2, y2;
         if(_a) {
@@ -260,20 +268,25 @@
               var alphaX = activeNodes[i].x - x;
               var alphaY = activeNodes[i].y - y;
 
+              var forceX = (x + _node.x)
+              var forceY = (y + _node.y)
+
               activeNodes[i].alphaX = alphaX;
               activeNodes[i].alphaY = alphaY;
 
-              x2 = forceX*activeNodes[i].alphaX;
-              y2 = forceY*activeNodes[i].alphaY;
+              activeNodes[i].forceX = forceX;
+              activeNodes[i].forceY = forceY;
 
-              activeNodes[i].x = x2
-              activeNodes[i].y = y2
+              x2 = _node.x + activeNodes[i].forceX*activeNodes[i].alphaX;
+              y2 = _node.y + activeNodes[i].forceY*activeNodes[i].alphaY;
+
+              activeNodes[i].x = x2 * cos - y2 * sin;
+              activeNodes[i].y = y2 * cos + x2 * sin;
 
             } else {
-
               // Moove activeNodes to keep same distance between dragged nodes and active nodes
-              x2 = _node.x + forceX*activeNodes[i].alphaX;
-              y2 = _node.y + forceY*activeNodes[i].alphaY;
+              x2 = _node.x + activeNodes[i].forceX*activeNodes[i].alphaX;
+              y2 = _node.y + activeNodes[i].forceY*activeNodes[i].alphaY;
 
               activeNodes[i].x = x2;
               activeNodes[i].y = y2;
