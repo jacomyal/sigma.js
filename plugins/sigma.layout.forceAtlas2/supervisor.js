@@ -283,11 +283,16 @@
    * Interface
    * ----------
    */
-  sigma.prototype.startForceAtlas2 = function(config) {
+  function ForceAtlas2Interface(sigInst) {
+    this.supervisor = null;
+    this.sigInst = sigInst;
+  }
+
+  ForceAtlas2Interface.prototype.start = function(config) {
 
     // Create supervisor if undefined
     if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config);
+      this.supervisor = new Supervisor(this.sigInst, config);
 
     // Configuration provided?
     if (config)
@@ -299,7 +304,7 @@
     return this;
   };
 
-  sigma.prototype.stopForceAtlas2 = function() {
+  ForceAtlas2Interface.prototype.stop = function() {
     if (!this.supervisor)
       return this;
 
@@ -309,7 +314,7 @@
     return this;
   };
 
-  sigma.prototype.killForceAtlas2 = function() {
+  ForceAtlas2Interface.prototype.kill = function() {
     if (!this.supervisor)
       return this;
 
@@ -325,7 +330,7 @@
     return this;
   };
 
-  sigma.prototype.configForceAtlas2 = function(config) {
+  ForceAtlas2Interface.prototype.config = function(config) {
     if (!this.supervisor)
       this.supervisor = new Supervisor(this, config);
 
@@ -334,7 +339,17 @@
     return this;
   };
 
-  sigma.prototype.isForceAtlas2Running = function(config) {
+  ForceAtlas2Interface.prototype.running = function(config) {
     return !!this.supervisor && this.supervisor.running;
   };
+
+  /**
+   * Registering constructor extension
+   * ----------------------------------
+   */
+  sigma.register(function() {
+
+    // Main object
+    this.forceAtlas2 = new ForceAtlas2Interface(this);
+  });
 }).call(this);
