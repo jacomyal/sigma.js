@@ -20,7 +20,6 @@
 
     // DOMElement abstraction
     function Element(domElement) {
-
       // Helpers
       this.attr = function(attrName) {
         return domElement.getAttributeNS(null, attrName);
@@ -89,106 +88,47 @@
       e.stopPropagation();
     }
 
-    // On down
-    function onDown(e) {
-      var target = e.toElement || e.target;
-
+    function handleEvent(type, target) {
       if (!self.settings('eventsEnabled') || !target)
         return;
 
       var el = new Element(target);
 
       if (el.isNode()) {
-        self.dispatchEvent('downNode', {
+        self.dispatchEvent(type + 'Node', {
           node: graph.nodes(el.attr('data-node-id'))
         });
       }
       else if (el.isEdge()) {
         var edge = graph.edges(el.attr('data-edge-id'));
-        self.dispatchEvent('downEdge', {
+        self.dispatchEvent(type + 'Edge', {
           edge: edge,
           source: graph.nodes(edge.source),
           target: graph.nodes(edge.target)
         });
       }
+    }
 
-      e.preventDefault();
+    function onDown(e) {
+      handleEvent('down', e.target);
     }
 
     // On over
     function onOver(e) {
-      var target = e.toElement || e.target;
       // firefox fires mouseover events when user clicks the node
       // and the event has null as its source target
-      var srcTarget = e.fromElement || e.relatedTarget;
-      if (!self.settings('eventsEnabled') || !target || !srcTarget)
+      if (!e.fromElement && !e.relatedTarget) {
         return;
-
-      var el = new Element(target);
-
-      if (el.isNode()) {
-        self.dispatchEvent('overNode', {
-          node: graph.nodes(el.attr('data-node-id'))
-        });
       }
-      else if (el.isEdge()) {
-        var edge = graph.edges(el.attr('data-edge-id'));
-        self.dispatchEvent('overEdge', {
-          edge: edge,
-          source: graph.nodes(edge.source),
-          target: graph.nodes(edge.target)
-        });
-      }
+      handleEvent('over', e.toElement || e.target);
     }
 
-    // On out
     function onOut(e) {
-      var target = e.fromElement || e.relatedTarget;
-
-      if (!self.settings('eventsEnabled'))
-        return;
-
-      var el = new Element(target);
-
-      if (el.isNode()) {
-        self.dispatchEvent('outNode', {
-          node: graph.nodes(el.attr('data-node-id'))
-        });
-      }
-      else if (el.isEdge()) {
-        var edge = graph.edges(el.attr('data-edge-id'));
-        self.dispatchEvent('outEdge', {
-          edge: edge,
-          source: graph.nodes(edge.source),
-          target: graph.nodes(edge.target)
-        });
-      }
+      handleEvent('out', e.fromElement || e.relatedTarget);
     }
 
-    // On up
     function onUp(e) {
-      var target = e.toElement || e.target;
-
-      if (!self.settings('eventsEnabled') || !target)
-        return;
-
-      var el = new Element(target);
-
-      if (el.isNode()) {
-        self.dispatchEvent('upNode', {
-          node: graph.nodes(el.attr('data-node-id'))
-        });
-      }
-      else if (el.isEdge()) {
-        var edge = graph.edges(el.attr('data-edge-id'));
-        self.dispatchEvent('upEdge', {
-          edge: edge,
-          source: graph.nodes(edge.source),
-          target: graph.nodes(edge.target)
-        });
-      }
-
-      e.preventDefault();
+      handleEvent('up', e.target);
     }
 
     // Registering Events:
@@ -212,6 +152,5 @@
 
     // Mouseup
     container.addEventListener('mouseup', onUp, true);
-
   };
 }).call(this);

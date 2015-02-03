@@ -356,7 +356,7 @@
       if (!embedSettings('enableHovering'))
         return;
 
-      if (containsChildNode(
+      if (sigma.svg.utils.containsChild(
           self.domElements.groups.hovers,
           self.domElements.hovers[node.id])) {
         return;
@@ -384,9 +384,9 @@
 
     function outNode(e) {
       var node = e.data.node,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+          embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
 
       lastKnownPos.x = node[prefix + 'x'];
       lastKnownPos.y = node[prefix + 'y'];
@@ -395,7 +395,7 @@
         return;
 
       // Deleting element
-      if (containsChildNode(
+      if (sigma.svg.utils.containsChild(
           self.domElements.groups.hovers,
           self.domElements.hovers[node.id])) {
         self.domElements.groups.hovers.removeChild(
@@ -412,24 +412,6 @@
       );
     }
 
-    function containsChildNode(parentNode, childNode) {
-      if (!parentNode || !childNode) {
-        return false;
-      }
-
-      // Node.contains is not supported on IE and this is checking for
-      // direct relationship
-      for (var i = 0, childNodes = parentNode.childNodes;
-           i < childNodes.length;
-           i++) {
-        if (childNodes[i] === childNode) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
     function showHoverElements(e) {
       setHoverElementsVisibility(e, true);
     }
@@ -443,9 +425,7 @@
       lastKnownPos.x = node[prefix + 'x'];
       lastKnownPos.y = node[prefix + 'y'];
 
-      if (node === null || node === undefined ||
-          self.domElements.hovers[node.id] === null ||
-          self.domElements.hovers[node.id] === undefined) {
+      if (!node || !self.domElements.hovers[node.id]) {
         return;
       }
 
@@ -468,7 +448,7 @@
         return;
       }
 
-      if (!containsChildNode(
+      if (!sigma.svg.utils.containsChild(
           self.domElements.groups.hovers,
           self.domElements.hovers[hoveredNode.id])) {
         var hover = (renderers[hoveredNode.type] || renderers.def).create(

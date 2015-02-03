@@ -26,6 +26,29 @@
     hide: function(element) {
       element.style.display = 'none';
       return this;
+    },
+    /**
+     * SVG node check for child node.
+     *
+     * @param  {Node}                     parentNode  The parent node.
+     * @param  {Node}                     childNode   The child node.
+     */
+    containsChild: function(parentNode, childNode) {
+      if (!parentNode || !childNode) {
+        return false;
+      }
+
+      // Node.contains is not supported on IE and this is checking for
+      // direct relationship
+      for (var i = 0, childNodes = parentNode.childNodes;
+           i < childNodes.length;
+           i++) {
+        if (childNodes[i] === childNode) {
+          return true;
+        }
+      }
+
+      return false;
     }
   };
 })();
