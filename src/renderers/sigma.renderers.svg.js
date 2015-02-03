@@ -339,15 +339,19 @@
    */
   // TODO: add option about whether to display hovers or not
   sigma.renderers.svg.prototype.bindHovers = function(prefix) {
-    var renderers = sigma.svg.hovers,
-        self = this,
-        hoveredNode;
+    var hoveredNode,
+        lastKnownPos = {},
+        renderers = sigma.svg.hovers,
+        self = this;
 
     function overNode(e) {
       var node = e.data.node,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+          embedSettings = self.settings.embedObjects({
+            prefix: prefix
+          });
+
+      lastKnownPos.x = node[prefix + 'x'];
+      lastKnownPos.y = node[prefix + 'y'];
 
       if (!embedSettings('enableHovering'))
         return;
@@ -361,6 +365,12 @@
       var hover = (renderers[node.type] || renderers.def).create(
         node,
         self.domElements.nodes[node.id],
+        embedSettings
+      );
+
+      (renderers[node.type] || renderers.def).update(
+        node,
+        hover,
         self.measurementCanvas,
         embedSettings
       );
@@ -377,6 +387,9 @@
         embedSettings = self.settings.embedObjects({
           prefix: prefix
         });
+
+      lastKnownPos.x = node[prefix + 'x'];
+      lastKnownPos.y = node[prefix + 'y'];
 
       if (!embedSettings('enableHovering'))
         return;
@@ -400,16 +413,12 @@
     }
 
     function containsChildNode(parentNode, childNode) {
-      if (parentNode === null || parent === undefined ||
-          parentNode.childElementCount === 0 ||
-          childNode === null || childNode === undefined) {
+      if (!parentNode || !childNode) {
         return false;
       }
 
-      if (parentNode.contains !== null && parentNode.contains !== undefined) {
-        return parentNode.contains(childNode);
-      }
-
+      // Node.contains is not supported on IE and this is checking for
+      // direct relationship
       for (var i = 0, childNodes = parentNode.childNodes;
            i < childNodes.length;
            i++) {
@@ -431,25 +440,25 @@
 
     function setHoverElementsVisibility(e, visible) {
       var node = e.data.node;
+      lastKnownPos.x = node[prefix + 'x'];
+      lastKnownPos.y = node[prefix + 'y'];
+
       if (node === null || node === undefined ||
           self.domElements.hovers[node.id] === null ||
-          self.domElements.hovers[node.id] === undefined ||
-          self.domElements.hovers[node.id].parentNode.childElementCount === 0) {
+          self.domElements.hovers[node.id] === undefined) {
         return;
       }
 
       var childNodes = self.domElements.hovers[node.id].childNodes;
-      var visibility = visible ? 'visible' : 'hidden';
+      var display = visible ? '' : 'none';
       for (var i = 0; i < childNodes.length; i++) {
         var childClass = childNodes[i].getAttribute('class');
         if (childClass.indexOf(self.settings('classPrefix') + '-node') < 0) {
-          childNodes[i].style.visibility = visibility;
+          childNodes[i].setAttributeNS(null, 'display', display);
         }
       }
-      self.domElements.hovers[node.id].disabled = !visible;
     }
 
-    // OPTIMIZE: perform a real update rather than a deletion
     function update() {
       var embedSettings = self.settings.embedObjects({
         prefix: prefix
@@ -459,27 +468,28 @@
         return;
       }
 
-      // Deleting element before update
-      if (containsChildNode(
+      if (!containsChildNode(
           self.domElements.groups.hovers,
           self.domElements.hovers[hoveredNode.id])) {
-        self.domElements.groups.hovers.removeChild(
-          self.domElements.hovers[hoveredNode.id]
+        var hover = (renderers[hoveredNode.type] || renderers.def).create(
+          hoveredNode,
+          self.domElements.nodes[hoveredNode.id],
+          embedSettings
         );
-        delete self.domElements.hovers[hoveredNode.id];
+
+        self.domElements.hovers[hoveredNode.id] = hover;
+
+        // Inserting the hover in the dom
+        self.domElements.groups.hovers.appendChild(hover);
       }
 
-      var hover = (renderers[hoveredNode.type] || renderers.def).create(
+      (renderers[hoveredNode.type] || renderers.def).update(
         hoveredNode,
-        self.domElements.nodes[hoveredNode.id],
+        self.domElements.hovers[hoveredNode.id],
         self.measurementCanvas,
-        embedSettings
+        embedSettings,
+        lastKnownPos
       );
-
-      self.domElements.hovers[hoveredNode.id] = hover;
-
-      // Inserting the hover in the dom
-      self.domElements.groups.hovers.appendChild(hover);
     }
 
     // Binding events
