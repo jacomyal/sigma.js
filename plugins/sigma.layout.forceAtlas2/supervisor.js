@@ -24,7 +24,7 @@
    * ------------------
    */
   function Supervisor(sigInst, options) {
-    var _this = this,
+    var self = this,
         workerFn = sigInst.getForceAtlas2Worker &&
           sigInst.getForceAtlas2Worker();
 
@@ -71,19 +71,19 @@
     this.listener = function(e) {
 
       // Retrieving data
-      _this.nodesByteArray = new Float32Array(e.data.nodes);
+      self.nodesByteArray = new Float32Array(e.data.nodes);
 
       // If ForceAtlas2 is running, we act accordingly
-      if (_this.running) {
+      if (self.running) {
 
         // Applying layout
-        _this.applyLayoutChanges();
+        self.applyLayoutChanges();
 
         // Send data back to worker and loop
-        _this.sendByteArrayToWorker();
+        self.sendByteArrayToWorker();
 
         // Rendering graph
-        _this.sigInst.refresh();
+        self.sigInst.refresh();
       }
     };
 
@@ -253,6 +253,11 @@
     this.running = false;
   };
 
+  // FORMULA: Math.exp(Math.log(100)/nIter)
+  Supervisor.prototype.cooldown = function(nbIterations) {
+
+  };
+
   Supervisor.prototype.killWorker = function() {
     if (this.worker) {
       this.worker.terminate();
@@ -266,7 +271,7 @@
   Supervisor.prototype.configure = function(config) {
 
     // Setting configuration
-    this.config = config;
+    this.config = sigma.utils.extend(config, this.config);
 
     if (!this.started)
       return;

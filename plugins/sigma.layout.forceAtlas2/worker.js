@@ -35,6 +35,7 @@
       maxForce: 10,
       iterations: 0,
       converged: false,
+      cooldown: 1,
 
       // Possible to change through config
       settings: {
@@ -886,10 +887,10 @@
             // Updating node's positon
             NodeMatrix[np(n, 'x')] =
               NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
-              (nodespeed / W.settings.slowDown);
+              (nodespeed / W.settings.slowDown / W.cooldown);
             NodeMatrix[np(n, 'y')] =
               NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
-              (nodespeed / W.settings.slowDown);
+              (nodespeed / W.settings.slowDown / W.cooldown);
           }
         }
       }
