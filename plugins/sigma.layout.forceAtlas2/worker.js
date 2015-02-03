@@ -951,7 +951,18 @@
 
       // From same document as sigma
       sendNewCoords = function() {
-        var e = new Event('newCoords');
+        var e;
+
+        if (document.createEvent) {
+          e = document.createEvent('Event');
+          e.initEvent('newCoords', true, false);
+        }
+        else {
+          e = document.createEventObject();
+          e.eventType = 'newCoords';
+        }
+
+        e.eventName = 'newCoords';
         e.data = {
           nodes: NodeMatrix.buffer
         };
