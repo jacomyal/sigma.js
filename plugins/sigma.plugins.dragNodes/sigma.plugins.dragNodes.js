@@ -204,7 +204,7 @@
         captor: event,
         renderer: _renderer
       });
-      
+
       _drag = false;
       _node = null;
     };
@@ -229,13 +229,15 @@
         // Getting and derotating the reference coordinates.
         for (var i = 0; i < 2; i++) {
           var n = nodes[i];
-          var aux = {
-            x: n.x * cos + n.y * sin,
-            y: n.y * cos - n.x * sin,
-            renX: n[_prefix + 'x'],
-            renY: n[_prefix + 'y'],
-          };
-          ref.push(aux);
+          if (n) {
+            var aux = {
+              x: n.x * cos + n.y * sin,
+              y: n.y * cos - n.x * sin,
+              renX: n[_prefix + 'x'],
+              renY: n[_prefix + 'y'],
+            };
+            ref.push(aux);
+          }
         }
 
         // Applying linear interpolation.
