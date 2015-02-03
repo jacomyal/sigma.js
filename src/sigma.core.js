@@ -1,7 +1,8 @@
 ;(function(undefined) {
   'use strict';
 
-  var __instances = {};
+  var __instances = {},
+      __constuctorExtensions = [];
 
   /**
    * This is the sigma instances constructor. One instance of sigma represent
@@ -228,6 +229,11 @@
       if (_self.settings)
         _self.refresh();
     });
+
+    // Applying constructor's extensions
+    __constuctorExtensions.forEach(function(extension) {
+      extension.apply(this);
+    }, this);
   };
 
 
@@ -702,6 +708,23 @@
   };
 
 
+
+  /**
+   * Register a function that will be called on a new sigma's instance when
+   * the constructor is invoked.
+   *
+   * @param  {function} fn The function to register.
+   * @return {object}      Returns the sigma object.
+   */
+  sigma.register = function(fn) {
+
+    // Safeguard
+    if (typeof fn !== 'function')
+      throw Error('Trying to register a non-function.');
+
+    __constuctorExtensions.push(fn);
+    return sigma;
+  };
 
 
   /**
