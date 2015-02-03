@@ -172,7 +172,6 @@
      * Algorithm initialization
      */
 
-    // TODO: autosettings
     function init(nodes, edges, config) {
       config = config || {};
       var i, l;
@@ -238,7 +237,6 @@
 
       if (W.settings.barnesHutOptimize) {
 
-        // TODO: is Infinity possible in a FloatArray?
         var minX = Infinity,
             maxX = -Infinity,
             minY = Infinity,

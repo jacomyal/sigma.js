@@ -6,7 +6,7 @@
 
   /**
    * Sigma ForceAtlas2.5 Supervisor
-   * =============================
+   * ===============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Version: 0.1
@@ -253,7 +253,6 @@
     this.running = false;
   };
 
-  // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
     if (this.worker) {
       this.worker.terminate();
