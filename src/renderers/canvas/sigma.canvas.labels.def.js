@@ -21,19 +21,13 @@
         labelWidth,
         labelOffsetX,
         labelOffsetY,
-        alignment;
+        alignment = settings('labelAlignment');
 
     if (size < settings('labelThreshold'))
       return;
 
     if (typeof node.label !== 'string')
       return;
-
-    if (settings('labelAlignment') === undefined) {
-      alignment = settings('defaultLabelAlignment');
-    } else {
-      alignment = settings('labelAlignment');
-    }
 
     fontSize = (settings('labelSize') === 'fixed') ?
       settings('defaultLabelSize') :

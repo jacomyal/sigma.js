@@ -15,7 +15,7 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.canvas.hovers.def = function(node, context, settings) {
-    var alignment,
+    var alignment = settings('labelAlignment'),
         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'],
@@ -37,12 +37,6 @@
       context.shadowOffsetY = 0;
       context.shadowBlur = 8;
       context.shadowColor = settings('labelHoverShadowColor');
-    }
-
-    if (settings('labelAlignment') === undefined) {
-      alignment = settings('defaultLabelAlignment');
-    } else {
-      alignment = settings('labelAlignment');
     }
 
     drawHoverBorder(alignment, context, fontSize, node);
