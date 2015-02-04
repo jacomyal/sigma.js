@@ -19,7 +19,13 @@
         prefix = settings('prefix') || '',
         size = node[prefix + 'size'] || 1,
         fontStyle = node.active ?
-          settings('activeFontStyle') : settings('fontStyle');
+          settings('activeFontStyle') : settings('fontStyle'),
+        borderSize = node.active ?
+          settings('borderSize') + settings('outerBorderSize') : 0,
+        labelWidth,
+        labelOffsetX,
+        labelOffsetY,
+        alignment = settings('labelAlignment');
 
     if (size < settings('labelThreshold'))
       return;
@@ -48,15 +54,38 @@
         node.color || settings('defaultNodeColor') :
         settings('defaultLabelColor');
 
+    labelWidth = context.measureText(node.label).width;
+    labelOffsetX = - labelWidth / 2;
+    labelOffsetY = fontSize / 3;
+
+    switch (alignment) {
+      case 'bottom':
+        labelOffsetY = + size + 4 * fontSize / 3;
+        break;
+      case 'center':
+        break;
+      case 'left':
+        labelOffsetX = - size - borderSize - 3 - labelWidth;
+        break;
+      case 'top':
+        labelOffsetY = - size - 2 * fontSize / 3;
+        break;
+      case 'inside':
+        if (labelWidth <= (size + fontSize / 3) * 2) {
+          break;
+        }
+      /* falls through*/
+      case 'right':
+      /* falls through*/
+      default:
+        labelOffsetX = size + borderSize + 3;
+        break;
+    }
+
     context.fillText(
       node.label,
-      Math.round(node[prefix + 'x'] +
-        size +
-        (node.active ?
-          settings('borderSize') + settings('outerBorderSize') :
-          0) +
-        3),
-      Math.round(node[prefix + 'y'] + fontSize / 3)
+      Math.round(node[prefix + 'x'] + labelOffsetX),
+      Math.round(node[prefix + 'y'] + labelOffsetY)
     );
   };
 }).call(this);
