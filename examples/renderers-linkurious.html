@@ -80,13 +80,20 @@
       right: 0;
       position: absolute;
     }
-    h1 {
+    .label {
       position: absolute;
-      margin: 0.5em;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+      font-family: sans-serif;
     }
   </style>
-  <div id="graph-canvas-left"><h1>Canvas</h1></div>
-  <div id="graph-webgl-right"><h1>WebGL</h1></div>
+  <div id="graph-canvas-left">
+    <div class="label">Canvas</div>
+  </div>
+  <div id="graph-webgl-right">
+    <div class="label">WebGL</div>
+  </div>
 </div>
 <script>
 /**
@@ -146,21 +153,27 @@ var settings = {
   spriteSheetMaxSprites: 8     // number max of sprites
 };
 
-var sigmaCanvas = new sigma({
+s = new sigma({
   graph: g,
-  renderer: {
-    container: document.getElementById('graph-canvas-left'),
-    type: 'canvas'
-  },
   settings: settings
 });
 
-var sigmaWebgl = new sigma({
-  graph: g,
-  renderer: {
-    container: document.getElementById('graph-webgl-right'),
-    type: 'webgl'
-  },
-  settings: settings
+// Initialize camera:
+s.addCamera('cam1'),
+
+// Initialize the two renderers:
+s.addRenderer({
+  container: document.getElementById('graph-webgl-right'),
+  type: 'webgl',
+  camera: 'cam1'
 });
+
+s.addRenderer({
+  container: document.getElementById('graph-canvas-left'),
+  type: 'canvas',
+  camera: 'cam1'
+});
+
+s.refresh();
+
 </script>
