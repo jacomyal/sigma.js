@@ -107,8 +107,6 @@
 
       context.fillText(
         node.label,
-        // labelX,
-        // labelY
         Math.round(node[prefix + 'x'] + labelOffsetX),
         Math.round(node[prefix + 'y'] + labelOffsetY)
       );
