@@ -40,6 +40,9 @@
     defaultNodeColor: '#000',
     // {string}
     defaultLabelSize: 14,
+    // {string} Label position relative to its node. Available values:
+    //          "right", "left", "top", "bottom", "center", "inside"
+    labelAlignment: 'right',
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
     edgeColor: 'source',

@@ -17,7 +17,11 @@
   sigma.canvas.labels.def = function(node, context, settings) {
     var fontSize,
         prefix = settings('prefix') || '',
-        size = node[prefix + 'size'];
+        size = node[prefix + 'size'],
+        labelWidth,
+        labelOffsetX,
+        labelOffsetY,
+        alignment = settings('labelAlignment');
 
     if (size < settings('labelThreshold'))
       return;
@@ -35,10 +39,38 @@
       (node.color || settings('defaultNodeColor')) :
       settings('defaultLabelColor');
 
+    labelWidth = context.measureText(node.label).width;
+    labelOffsetX = - labelWidth / 2;
+    labelOffsetY = fontSize / 3;
+
+    switch (alignment) {
+      case 'bottom':
+        labelOffsetY = + size + 4 * fontSize / 3;
+        break;
+      case 'center':
+        break;
+      case 'left':
+        labelOffsetX = - size - 3 - labelWidth;
+        break;
+      case 'top':
+        labelOffsetY = - size - 2 * fontSize / 3;
+        break;
+      case 'inside':
+        if (labelWidth <= (size + fontSize / 3) * 2) {
+          break;
+        }
+      /* falls through*/
+      case 'right':
+      /* falls through*/
+      default:
+        labelOffsetX = size + 3;
+        break;
+    }
+
     context.fillText(
       node.label,
-      Math.round(node[prefix + 'x'] + size + 3),
-      Math.round(node[prefix + 'y'] + fontSize / 3)
+      Math.round(node[prefix + 'x'] + labelOffsetX),
+      Math.round(node[prefix + 'y'] + labelOffsetY)
     );
   };
 }).call(this);
