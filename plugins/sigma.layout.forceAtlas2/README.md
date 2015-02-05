@@ -90,8 +90,16 @@ sigmaInstance.isForceAtlas2Running();
 * **background** *boolean* `false`: run the layout on background, apply the new nodes position on stop.
 * **easing** *string* : if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
 
-## Notes
+#### Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
+
+## Events
+
+The plugin dispatches the following events:
+
+- `start`: on layout start.
+- `interpolate`: at the beginning of the layout animation if an *easing* function is specified and the layout is ran on background.
+- `stop`: on layout stop, will be dispatched after `interpolate`.
 
 ## Usage
 
