@@ -15,13 +15,13 @@ For optimization purposes, the algorithm's computations are delegated to a web w
 
 #### Toy example
 
-![forceatlas1](https://github.com/Linkurious/sigma.js/wiki/media/forceatlas1.gif)
+![forceatlas1](https://github.com/Linkurious/linkurious.js/wiki/media/forceatlas1.gif)
 
 #### Real-world example
 
 Dataset of 1700 nodes and 6700 edges:
 
-![layout-arctic](https://github.com/Linkurious/sigma.js/wiki/media/layout-arctic.gif)
+![layout-arctic](https://github.com/Linkurious/linkurious.js/wiki/media/layout-arctic.gif)
 
 ## Methods
 
@@ -93,4 +93,14 @@ sigmaInstance.isForceAtlas2Running();
 ## Notes
 1. *Barnes-Hut* optimizations are disabled for the time being. We need time to develop a low-level version of the optimization in order to scale efficiently.
 
-2. The layout won't stop by itself unless *autoStop* is true, so if you want it to stop, you have to trigger it explicitely.
+## Usage
+
+### Infinite layout
+
+By default, the layout won't stop by itself, so if you want it to stop, you have to trigger it explicitely. Use it for a full control on the layout process.
+
+### Automatic layout
+
+Set the *autoStop* option to `true` to let the layout stop automatically when it reaches a "reasonnably good readability" as fast as possible.
+
+The nodes positions are updated on screen at each iteration of the algorithm. You may set *background* to `true` to apply the nodes positions when the layout is complete. It will speed up the layout process and avoid the "seasick" feeling. Once the layout is complete, you may animate the transition between nodes positions with an *easing* function (see [sigma.utils.easing](../../src/utils/sigma.utils.js)).
