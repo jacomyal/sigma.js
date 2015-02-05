@@ -9,7 +9,7 @@ Auto-stop condition by [Sébastien Heymann](https://github.com/sheymann).
 
 ---
 
-This plugin implements [ForceAtlas2](http://www.medialab.sciences-po.fr/publications/Jacomy_Heymann_Venturini-Force_Atlas2.pdf), a force-directed layout algorithm.
+This plugin implements [ForceAtlas2](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0098679), a force-directed layout algorithm.
 
 For optimization purposes, the algorithm's computations are delegated to a web worker.
 
@@ -76,7 +76,11 @@ sigmaInstance.isForceAtlas2Running();
 * **scalingRatio** *number* `1`
 * **strongGravityMode** *boolean* `false`
 * **gravity** *number* `1`
+* **barnesHutOptimize** *boolean* `false`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²)` to `O(nlog(n))`)? This is useful for large graph but harmful to small ones.
+* **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
+* **startingIterations** *integer* `1`: number of iterations to be run before the first render.
+* **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
 * **autoStop** *boolean* `false`
 
 *Supervisor configuration*
@@ -100,4 +104,3 @@ By default, the layout won't stop by itself, so if you want it to stop, you have
 Set the *autoStop* option to `true` to let the layout stop automatically when it reaches a "reasonnably good readability" as fast as possible.
 
 The nodes positions are updated on screen at each iteration of the algorithm. You may set *background* to `true` to apply the nodes positions when the layout is complete. It will speed up the layout process and avoid the "seasick" feeling. Once the layout is complete, you may animate the transition between nodes positions with an *easing* function (see [sigma.utils.easing](../../src/utils/sigma.utils.js)).
-
