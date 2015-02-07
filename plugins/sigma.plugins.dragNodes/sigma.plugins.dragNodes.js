@@ -163,7 +163,7 @@
 
         // Deactivate drag graph.
         _renderer.settings({mouseEnabled: false, enableHovering: false});
-        _s.refresh();
+        _s.refresh({skipIndexation: true});
 
         _self.dispatchEvent('startdrag', {
           node: _node,
@@ -201,7 +201,7 @@
 
       // Activate drag graph.
       _renderer.settings({mouseEnabled: true, enableHovering: true});
-      _s.refresh();
+      _s.refresh({skipIndexation: true});
 
       if (_drag) {
         _self.dispatchEvent('drop', {
@@ -265,32 +265,18 @@
 
             // Calcul first position of activeNodes
             if(!activeNodes[i].alphaX) {
-              var alphaX = activeNodes[i].x - x;
-              var alphaY = activeNodes[i].y - y;
+              activeNodes[i].alphaX = activeNodes[i].x - x;
+              activeNodes[i].alphaY = activeNodes[i].y - y;
 
-              var forceX = (x + _node.x)
-              var forceY = (y + _node.y)
-
-              activeNodes[i].alphaX = alphaX;
-              activeNodes[i].alphaY = alphaY;
-
-              activeNodes[i].forceX = forceX;
-              activeNodes[i].forceY = forceY;
-
-              x2 = _node.x + activeNodes[i].forceX*activeNodes[i].alphaX;
-              y2 = _node.y + activeNodes[i].forceY*activeNodes[i].alphaY;
-
-              activeNodes[i].x = x2 * cos - y2 * sin;
-              activeNodes[i].y = y2 * cos + x2 * sin;
-
-            } else {
+              activeNodes[i].forceX = (x + _node.x);
+              activeNodes[i].forceY = (y + _node.y);
+            }
               // Moove activeNodes to keep same distance between dragged nodes and active nodes
               x2 = _node.x + activeNodes[i].forceX*activeNodes[i].alphaX;
               y2 = _node.y + activeNodes[i].forceY*activeNodes[i].alphaY;
 
-              activeNodes[i].x = x2;
-              activeNodes[i].y = y2;
-            }
+              activeNodes[i].x = x2 * cos - y2 * sin;
+              activeNodes[i].y = y2 * cos + x2*sin;
           }
         }
 

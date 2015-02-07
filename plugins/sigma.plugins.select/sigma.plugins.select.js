@@ -107,10 +107,13 @@
         a.dropNodes(existingTargets);
       }
       else {
-        a.dropNodes();
-        if (actives.length > 1) {
-          a.addNodes(targets);
+        if(!sigma.plugins.dragNodes) {
+          a.dropNodes();
         }
+
+          if (actives.length > 1) {
+            a.addNodes(targets);
+          }
       }
 
       a.addNodes(newTargets);
@@ -227,13 +230,6 @@
 
     _body.addEventListener('keydown', keyDown, false);
     _body.addEventListener('keyup', keyUp, false);
-
-    if (sigma.plugins.dragNodes) {
-      // Handle drag events:
-      // this.dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
-      // this.dragListener.bind('drag', this.dragHandler);
-      // this.dragListener.bind('drop', this.dropHandler);
-    }
 
     this.bindKeyboard = function(keyboard) {
       kbd = keyboard;
