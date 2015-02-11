@@ -30,7 +30,7 @@ Dataset of 1700 nodes and 6700 edges:
 Starts or resumes the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
-sigmaInstance.startForceAtlas2(sigInst, config);
+sigmaInstance.layouts.startForceAtlas2(sigInst, config);
 ```
 
 **sigma.stopForceAtlas2**
@@ -38,7 +38,7 @@ sigmaInstance.startForceAtlas2(sigInst, config);
 Stops the layout.
 
 ```js
-sigmaInstance.stopForceAtlas2();
+sigmaInstance.layouts.stopForceAtlas2();
 ```
 
 **sigma.configForceAtlas2**
@@ -46,7 +46,7 @@ sigmaInstance.stopForceAtlas2();
 Changes the layout's configuration.
 
 ```js
-sigmaInstance.configForceAtlas2(sigInst, config);
+sigmaInstance.layouts.configForceAtlas2(sigInst, config);
 ```
 
 **sigma.killForceAtlas2**
@@ -54,7 +54,7 @@ sigmaInstance.configForceAtlas2(sigInst, config);
 Stops the layout and terminates the associated worker. You can still restart it later, but a new worker will have to be initialized.
 
 ```js
-sigmaInstance.killForceAtlas2();
+sigmaInstance.layouts.killForceAtlas2();
 ```
 
 **sigma.isForceAtlas2Running**
@@ -62,7 +62,7 @@ sigmaInstance.killForceAtlas2();
 Returns whether ForceAtlas2 is running.
 
 ```js
-sigmaInstance.isForceAtlas2Running();
+sigmaInstance.layouts.isForceAtlas2Running();
 ```
 
 ## Configuration
@@ -100,6 +100,15 @@ The plugin dispatches the following events:
 - `start`: on layout start.
 - `interpolate`: at the beginning of the layout animation if an *easing* function is specified and the layout is ran on background.
 - `stop`: on layout stop, will be dispatched after `interpolate`.
+
+```js
+// Start the ForceAtlas2 algorithm:
+var fa = sigma.layouts.startForceAtlas2(s);
+// Bind all events:
+fa.bind('start stop interpolate', function(event) {
+  console.log(event.type);
+});
+```
 
 ## Usage
 
