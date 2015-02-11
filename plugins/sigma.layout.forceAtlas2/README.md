@@ -25,44 +25,44 @@ Dataset of 1700 nodes and 6700 edges:
 
 ## Methods
 
-**sigma.startForceAtlas2**
+**startForceAtlas2**
 
 Starts or resumes the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
-sigmaInstance.layouts.startForceAtlas2(sigInst, config);
+var fa = sigma.layouts.startForceAtlas2(sigInst, config);
 ```
 
-**sigma.stopForceAtlas2**
+**stopForceAtlas2**
 
 Stops the layout.
 
 ```js
-sigmaInstance.layouts.stopForceAtlas2();
+sigma.layouts.stopForceAtlas2();
 ```
 
-**sigma.configForceAtlas2**
+**configForceAtlas2**
 
 Changes the layout's configuration.
 
 ```js
-sigmaInstance.layouts.configForceAtlas2(sigInst, config);
+sigma.layouts.configForceAtlas2(sigInst, config);
 ```
 
-**sigma.killForceAtlas2**
+**killForceAtlas2**
 
 Stops the layout and terminates the associated worker. You can still restart it later, but a new worker will have to be initialized.
 
 ```js
-sigmaInstance.layouts.killForceAtlas2();
+sigma.layouts.killForceAtlas2();
 ```
 
-**sigma.isForceAtlas2Running**
+**isForceAtlas2Running**
 
 Returns whether ForceAtlas2 is running.
 
 ```js
-sigmaInstance.layouts.isForceAtlas2Running();
+sigma.layouts.isForceAtlas2Running();
 ```
 
 ## Configuration
