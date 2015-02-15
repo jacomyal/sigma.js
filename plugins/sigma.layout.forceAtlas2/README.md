@@ -81,6 +81,8 @@ sigma.layouts.isForceAtlas2Running();
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
 * **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
+* **maxIterations** *number* `1000`: set a limit if `autoStop: true`.
+* **avgDistanceThreshold** *number* `0.01`: this is the normal stopping condition of `autoStop: true`. When the average displacements of nodes is below this threshold, the layout stops.
 * **autoStop** *boolean* `false`
 
 *Supervisor configuration*
@@ -100,6 +102,8 @@ The plugin dispatches the following events:
 - `start`: on layout start.
 - `interpolate`: at the beginning of the layout animation if an *easing* function is specified and the layout is ran on background.
 - `stop`: on layout stop, will be dispatched after `interpolate`.
+
+Example:
 
 ```js
 // Start the ForceAtlas2 algorithm:

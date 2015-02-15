@@ -41,8 +41,6 @@
       ppr: 9,
       maxForce: 10,
       iterations: 0,
-      maxIterations: 1000,
-      avgDistanceThreshold: 0.01,
       converged: false,
 
       // Possible to change through config
@@ -59,6 +57,8 @@
         barnesHutTheta: 0.5,
         startingIterations: 1,
         iterationsPerRender: 1,
+        maxIterations: 1000,
+        avgDistanceThreshold: 0.01,
         autoStop: false
       }
     };
@@ -984,8 +984,8 @@
       // the greater the number of iterations needed to converge.
       if (W.settings.autoStop) {
         W.converged = (
-          W.iterations > W.maxIterations ||
-          alldistance / W.nodesLength < W.avgDistanceThreshold
+          W.iterations > W.settings.maxIterations ||
+          alldistance / W.nodesLength < W.settings.avgDistanceThreshold
         );
       }
     }
