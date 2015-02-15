@@ -17,6 +17,7 @@
 
   var _instance = {},
       _body = null,
+      _isDragging = null,
       _spacebar = false;
 
   /**
@@ -79,6 +80,13 @@
 
     _body = _body || document.getElementsByTagName('body')[0];
 
+    s.renderers[0].bind('overNode', function() {
+      _body.addEventListener('mousemove', nodeMouseMove);
+    });
+    s.renderers[0].bind('outNode', function() {
+      _body.removeEventListener('mousemove', nodeMouseMove);
+    });
+
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
      * The clicked active nodes are deactivated.
@@ -89,6 +97,8 @@
      * @param {event} The event.
      */
     this.clickNodesHandler = function(event) {
+      console.log('click nodes')
+
       // Prevent nodes to be selected while dragging:
       if (drag) return;
 
@@ -107,13 +117,16 @@
         a.dropNodes(existingTargets);
       }
       else {
-        if(!sigma.plugins.dragNodes) {
+        // Don't drop nodes on dragging
+        if(!_isDragging) {
           a.dropNodes();
         }
 
-          if (actives.length > 1) {
-            a.addNodes(targets);
-          }
+        if (actives.length > 1) {
+          a.addNodes(targets);
+        }
+
+        _isDragging = null;
       }
 
       a.addNodes(newTargets);
@@ -185,6 +198,10 @@
         a.addNodes();
       }
       s.refresh({skipIndexation: true});
+    }
+
+    function nodeMouseMove() {
+      _isDragging = true;
     }
 
     // Deselect all nodes and edges
