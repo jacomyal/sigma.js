@@ -55,6 +55,7 @@
       _mouse = renderer.container.lastChild,
       _camera = renderer.camera,
       _node = null,
+      _draggingNode = null,
       _prefix = '',
       _hoverStack = [],
       _hoverIndex = {},
@@ -189,16 +190,6 @@
         }
       }
 
-      if(_a) {
-        var activeNodes = _a.nodes();
-        for(var i = 0; i < activeNodes.length; i++) {
-          delete activeNodes[i].forceX;
-          delete activeNodes[i].forceY;
-          delete activeNodes[i].alphaX;
-          delete activeNodes[i].alphaY;
-        }
-      }
-
       // Activate drag graph.
       _renderer.settings({mouseEnabled: true, enableHovering: true});
       _s.refresh({skipIndexation: true});
@@ -263,6 +254,14 @@
           var activeNodes = _a.nodes();
           for(var i = 0; i < activeNodes.length; i++) {
 
+            // Delete old reference
+            if(_draggingNode != _node) {
+              delete activeNodes[i].forceX;
+              delete activeNodes[i].forceY;
+              delete activeNodes[i].alphaX;
+              delete activeNodes[i].alphaY;
+            }
+
             // Calcul first position of activeNodes
             if(!activeNodes[i].alphaX) {
               activeNodes[i].alphaX = activeNodes[i].x - x;
@@ -270,13 +269,17 @@
 
               activeNodes[i].forceX = (x + _node.x);
               activeNodes[i].forceY = (y + _node.y);
-            }
-              // Moove activeNodes to keep same distance between dragged nodes and active nodes
-              x2 = _node.x + activeNodes[i].forceX*activeNodes[i].alphaX;
-              y2 = _node.y + activeNodes[i].forceY*activeNodes[i].alphaY;
 
-              activeNodes[i].x = x2 * cos - y2 * sin;
-              activeNodes[i].y = y2 * cos + x2*sin;
+              x2 = activeNodes[i].alphaX;
+              y2 = activeNodes[i].alphaY;
+            } else {
+              // Moove activeNodes to keep same distance between dragged nodes and active nodes
+              x2 = _node.x + activeNodes[i].alphaX;
+              y2 = _node.y + activeNodes[i].alphaY;
+            }
+
+              activeNodes[i].x = x2;
+              activeNodes[i].y = y2;
           }
         }
 
@@ -292,6 +295,8 @@
           captor: event,
           renderer: _renderer
         });
+
+        _draggingNode = _node;
       }
     };
   };
