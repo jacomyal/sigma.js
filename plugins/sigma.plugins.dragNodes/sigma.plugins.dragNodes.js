@@ -226,8 +226,6 @@
             cos = Math.cos(_camera.angle),
             sin = Math.sin(_camera.angle),
             nodes = _s.graph.nodes(),
-            forceX,
-            forceY,
             ref = [];
 
         // Getting and derotating the reference coordinates.
@@ -256,30 +254,29 @@
 
             // Delete old reference
             if(_draggingNode != _node) {
-              delete activeNodes[i].forceX;
-              delete activeNodes[i].forceY;
               delete activeNodes[i].alphaX;
               delete activeNodes[i].alphaY;
             }
 
             // Calcul first position of activeNodes
             if(!activeNodes[i].alphaX) {
+
               activeNodes[i].alphaX = activeNodes[i].x - x;
               activeNodes[i].alphaY = activeNodes[i].y - y;
 
-              activeNodes[i].forceX = (x + _node.x);
-              activeNodes[i].forceY = (y + _node.y);
-
               x2 = activeNodes[i].alphaX;
               y2 = activeNodes[i].alphaY;
+
             } else {
+
               // Moove activeNodes to keep same distance between dragged nodes and active nodes
               x2 = _node.x + activeNodes[i].alphaX;
               y2 = _node.y + activeNodes[i].alphaY;
+
             }
 
-              activeNodes[i].x = x2;
-              activeNodes[i].y = y2;
+            activeNodes[i].x = x2;
+            activeNodes[i].y = y2;
           }
         }
 

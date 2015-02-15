@@ -97,8 +97,6 @@
      * @param {event} The event.
      */
     this.clickNodesHandler = function(event) {
-      console.log('click nodes')
-
       // Prevent nodes to be selected while dragging:
       if (drag) return;
 
