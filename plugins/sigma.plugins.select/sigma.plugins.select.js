@@ -17,6 +17,7 @@
 
   var _instance = {},
       _body = null,
+      _nodeReference = null,
       _isDragging = null,
       _spacebar = false;
 
@@ -80,12 +81,9 @@
 
     _body = _body || document.getElementsByTagName('body')[0];
 
-    s.renderers[0].bind('overNode', function() {
-      _body.addEventListener('mousemove', nodeMouseMove);
-    });
-    s.renderers[0].bind('outNode', function() {
-      _body.removeEventListener('mousemove', nodeMouseMove);
-    });
+    if(sigma.plugins.dragNodes) {
+      s.renderers[0].container.lastChild.addEventListener('mousedown', nodeMouseDown);
+    }
 
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
@@ -118,13 +116,22 @@
         // Don't drop nodes on dragging
         if(!_isDragging) {
           a.dropNodes();
+          _nodeReference = null;
         }
 
         if (actives.length > 1) {
           a.addNodes(targets);
         }
 
-        _isDragging = null;
+        if(a.nodes().length > 0 && sigma.plugins.dragNodes) {
+          if(_nodeReference == a.nodes()[0].x) {
+            a.dropNodes();
+            _nodeReference = null;
+          } else {
+            _nodeReference = a.nodes()[0].x;
+          }
+        }
+
       }
 
       a.addNodes(newTargets);
@@ -200,6 +207,13 @@
 
     function nodeMouseMove() {
       _isDragging = true;
+      if(a.nodes().length > 0 && !_nodeReference) {
+        _nodeReference = a.nodes()[0].x;
+      }
+    }
+
+    function nodeMouseDown() {
+      s.renderers[0].container.lastChild.addEventListener('mousemove', nodeMouseMove);
     }
 
     // Deselect all nodes and edges
