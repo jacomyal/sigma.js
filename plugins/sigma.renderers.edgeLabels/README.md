@@ -35,6 +35,12 @@ This plugin extends Sigma.js settings in a transparent way to render edge labels
    * default value: `fixed`
    * available values: `fixed`, `proportional`
 
+ * **edgeLabelAlignment**
+   * Indicates how to position the label relative to its edge.
+   * type: *string*
+   * default value: `auto`
+   * available values: `auto`, `horizontal`
+
  * **edgeLabelSizePowRatio**
    * The opposite power ratio between the font size of the label and the edge size.
    * type: *number*
