@@ -38,7 +38,7 @@
         dX = target[prefix + 'x'] - source[prefix + 'x'],
         dY = target[prefix + 'y'] - source[prefix + 'y'],
         sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
-        angle = Math.atan2(dY * sign, dX * sign);
+        angle = 'horizontal' === settings('edgeLabelAlignment') ? 0 : Math.atan2(dY * sign, dX * sign);
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
