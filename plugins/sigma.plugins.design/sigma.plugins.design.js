@@ -73,7 +73,7 @@
   /**
    * This method will put the values in different bins using a linear scale,
    * for a specified number of bins (i.e. histogram). It will return a
-   * dictionnary of bins indexed by the specified values.
+   * dictionary of bins indexed by the specified values.
    *
    * @param  {array}  values The values.
    * @param  {number} nbins  The number of bins.
@@ -84,7 +84,6 @@
         min,
         max,
         bin,
-        i,
         res = {};
 
     if (!values.length)
@@ -101,11 +100,19 @@
     min = numlist[0];
     max = numlist[numlist.length - 1];
 
-    numlist.forEach(function(num) {
-      bin = Math.floor(nbins * Math.abs(num - min) / Math.abs(max - min));
-      bin -= (bin == nbins) ? 1 : 0;
-      res[num] = bin;
-    });
+
+    if (max - min !== 0) {
+      numlist.forEach(function (num) {
+        bin = Math.floor(nbins * Math.abs(num - min) / Math.abs(max - min));
+        bin -= (bin == nbins) ? 1 : 0;
+        res[num] = bin;
+      });
+    } else {
+      // if the max is the same as the minimum, we put all the numbers in the same bin.
+      numlist.forEach(function(num){
+        res[num] = 0;
+      });
+    }
 
     return res;
   };
@@ -132,7 +139,7 @@
         d[bin].push(+value);
       });
 
-      bins = d.length;
+      bins = (d.length !== 1 ) ? d.length : 7;
 
       for (var bin = 0; bin < bins; bin++) {
         if (d[bin]) {
