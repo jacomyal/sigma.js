@@ -10,13 +10,16 @@ This plugin provides a method to drag & drop nodes. At the moment, this plugin i
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var dragListener = new sigma.plugins.dragNodes(sigInst, renderer, array);
+var activeState = sigma.plugins.activeState(sigmaInstance);
+var renderer = sigmaInstance.renderers[0]; // or another renderer
+
+var dragListener = new sigma.plugins.dragNodes(sigmaInstance, renderer, activeState);
 ````
 
 Kill the plugin as follows:
 
 ````javascript
-sigma.plugins.killDragNodes(sigInst);
+sigma.plugins.killDragNodes(sigmaInstance);
 ````
 
 ## Events

@@ -121,12 +121,8 @@ for (i = 0; i < E; i++)
     size: Math.random(),
     color: '#ccc'
   });
-sigma.renderers.def = sigma.renderers.canvas
-// Instantiate sigma:
-// s = new sigma({
-//   graph: g,
-//   container: 'graph-container'
-// });
+
+sigma.renderers.def = sigma.renderers.canvas;
 
 s = new sigma({
   graph: g,
@@ -136,7 +132,7 @@ s = new sigma({
   },
   settings: {
     borderSize: 2,
-    outerBorderSize: 1,
+    outerBorderSize: 3,
     defaultNodeBorderColor: '#fff',
     defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
     enableEdgeHovering: true,
