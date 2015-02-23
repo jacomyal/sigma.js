@@ -47,6 +47,25 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+
+<script src="../plugins/sigma.helpers.graph/sigma.helpers.graph.js"></script>
+<script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
+<script src="../plugins/sigma.plugins.activeState/settings.js"></script>
+<script src="../plugins/sigma.plugins.activeState/sigma.plugins.activeState.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../plugins/sigma.plugins.activeState/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../plugins/sigma.plugins.select/sigma.plugins.select.js"></script>
+
 <div id="container">
   <style>
     #graph-container {
@@ -102,15 +121,35 @@ for (i = 0; i < E; i++)
     size: Math.random(),
     color: '#ccc'
   });
-sigma.renderers.def = sigma.renderers.canvas
-// Instantiate sigma:
+
+sigma.renderers.def = sigma.renderers.canvas;
+
 s = new sigma({
   graph: g,
-  container: 'graph-container'
+  renderer: {
+    container: document.getElementById('graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    borderSize: 2,
+    outerBorderSize: 3,
+    defaultNodeBorderColor: '#fff',
+    defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
+    enableEdgeHovering: true,
+    edgeHoverHighlightNodes: 'circle',
+  }
 });
 
+// Instanciate the ActiveState plugin:
+var activeState = sigma.plugins.activeState(s);
+var keyboard = sigma.plugins.keyboard(s, s.renderers[0]);
+
+// Initialize the Select plugin:
+var select = sigma.plugins.select(s, activeState);
+select.bindKeyboard(keyboard);
+
 // Initialize the dragNodes plugin:
-var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+var dragListener = sigma.plugins.dragNodes(s, s.renderers[0], activeState);
 
 dragListener.bind('startdrag', function(event) {
   console.log(event);
