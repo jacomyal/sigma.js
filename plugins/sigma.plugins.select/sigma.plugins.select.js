@@ -17,6 +17,8 @@
 
   var _instance = {},
       _body = null,
+      _nodeReference = null,
+      _isDragging = null,
       _spacebar = false;
 
   /**
@@ -58,10 +60,14 @@
 
   function keyDown(event) {
     _spacebar = event.which === 32;
+    _body.removeEventListener('keydown', keyDown, false);
+    _body.addEventListener('keyup', keyUp, false);
   }
 
   function keyUp(event) {
     _spacebar = false;
+    _body.addEventListener('keydown', keyDown, false);
+    _body.removeEventListener('keyup', keyUp, false);
   }
 
 
@@ -79,10 +85,14 @@
 
     _body = _body || document.getElementsByTagName('body')[0];
 
+    if(sigma.plugins.dragNodes) {
+      s.renderers[0].container.lastChild.addEventListener('mousedown', nodeMouseDown);
+    }
+
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
      * The clicked active nodes are deactivated.
-     * If the Ctrl or Meta key is hold, it adds the nodes to the list of active
+     * If the Spacebar key is hold, it adds the nodes to the list of active
      * nodes instead of clearing the list. It clears the list of active edges. It
      * prevent nodes to be selected while dragging.
      *
@@ -107,10 +117,25 @@
         a.dropNodes(existingTargets);
       }
       else {
-        a.dropNodes();
+        // Don't drop nodes on dragging
+        if(!_isDragging) {
+          a.dropNodes();
+          _nodeReference = null;
+        }
+
         if (actives.length > 1) {
           a.addNodes(targets);
         }
+
+        if(a.nodes().length > 0 && sigma.plugins.dragNodes) {
+          if(_nodeReference == a.nodes()[0].x) {
+            a.dropNodes();
+            _nodeReference = null;
+          } else {
+            _nodeReference = a.nodes()[0].x;
+          }
+        }
+
       }
 
       a.addNodes(newTargets);
@@ -120,7 +145,7 @@
     /**
      * This fuction handles the edge click event. The clicked edges are activated.
      * The clicked active edges are deactivated.
-     * If the Ctrl or Meta key is hold, it adds the edges to the list of active
+     * If the Spacebar key is hold, it adds the edges to the list of active
      * edges instead of clearing the list. It clears the list of active nodes. It
      * prevent edges to be selected while dragging.
      *
@@ -184,6 +209,17 @@
       s.refresh({skipIndexation: true});
     }
 
+    function nodeMouseMove() {
+      _isDragging = true;
+      if(a.nodes().length > 0 && !_nodeReference) {
+        _nodeReference = a.nodes()[0].x;
+      }
+    }
+
+    function nodeMouseDown() {
+      s.renderers[0].container.lastChild.addEventListener('mousemove', nodeMouseMove);
+    }
+
     // Deselect all nodes and edges
     function spaceU() {
       a.dropEdges();
@@ -226,14 +262,6 @@
     s.bind('clickEdges', this.clickEdgesHandler);
 
     _body.addEventListener('keydown', keyDown, false);
-    _body.addEventListener('keyup', keyUp, false);
-
-    if (sigma.plugins.dragNodes) {
-      // Handle drag events:
-      this.dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
-      this.dragListener.bind('drag', this.dragHandler);
-      this.dragListener.bind('drop', this.dropHandler);
-    }
 
     this.bindKeyboard = function(keyboard) {
       kbd = keyboard;
