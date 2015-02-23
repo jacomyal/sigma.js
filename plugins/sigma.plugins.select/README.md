@@ -14,21 +14,21 @@ See the following [example code](../../examples/plugin-select.html) for full usa
 To use, include all .js files under this folder. Then initialize it as follows:
 
 ````javascript
-var activeState = sigma.plugins.activeState(sigInst);
-var select = sigma.plugins.select(sigInst, activeState);
+var activeState = sigma.plugins.activeState(sigmaInstance);
+var select = sigma.plugins.select(sigmaInstance, activeState);
 ````
 
 Optionnaly bind keyboard events as follows:
 
 ````javascript
-var kbd = sigma.plugins.keyboard(sigInst, sigInst.renderers[0]);
+var kbd = sigma.plugins.keyboard(sigmaInstance, sigmaInstance.renderers[0]);
 select.bindKeyboard(kbd);
 ````
 
 The plugin will be killed when Sigma is killed. Kill the plugin instance manually as follows:
 
 ````javascript
-sigma.plugins.killSelect();
+sigma.plugins.killSelect(sigmaInstance);
 ````
 
 ## Status
@@ -44,7 +44,7 @@ Beta
 
 ## Compatibility
 
-The plugin is compatible with `sigma.plugins.dragNodes`: dragged nodes won't be selected.
+The plugin is compatible with `sigma.plugins.dragNodes`.
 
 The plugin is compatible with `sigma.plugins.keyboard`: if an instance is bound to the plugin, it provides the following keyboard shortcuts:
 - <kbd>spacebar</kbd> + <kbd>a</kbd>: select all nodes
