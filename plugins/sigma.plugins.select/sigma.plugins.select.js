@@ -60,10 +60,14 @@
 
   function keyDown(event) {
     _spacebar = event.which === 32;
+    _body.removeEventListener('keydown', keyDown, false);
+    _body.addEventListener('keyup', keyUp, false);
   }
 
   function keyUp(event) {
     _spacebar = false;
+    _body.addEventListener('keydown', keyDown, false);
+    _body.removeEventListener('keyup', keyUp, false);
   }
 
 
@@ -88,7 +92,7 @@
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
      * The clicked active nodes are deactivated.
-     * If the Ctrl or Meta key is hold, it adds the nodes to the list of active
+     * If the Spacebar key is hold, it adds the nodes to the list of active
      * nodes instead of clearing the list. It clears the list of active edges. It
      * prevent nodes to be selected while dragging.
      *
@@ -141,7 +145,7 @@
     /**
      * This fuction handles the edge click event. The clicked edges are activated.
      * The clicked active edges are deactivated.
-     * If the Ctrl or Meta key is hold, it adds the edges to the list of active
+     * If the Spacebar key is hold, it adds the edges to the list of active
      * edges instead of clearing the list. It clears the list of active nodes. It
      * prevent edges to be selected while dragging.
      *
@@ -258,7 +262,6 @@
     s.bind('clickEdges', this.clickEdgesHandler);
 
     _body.addEventListener('keydown', keyDown, false);
-    _body.addEventListener('keyup', keyUp, false);
 
     this.bindKeyboard = function(keyboard) {
       kbd = keyboard;
