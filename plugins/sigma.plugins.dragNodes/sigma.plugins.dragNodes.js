@@ -57,19 +57,12 @@
       _camera = renderer.camera,
       _node = null,
       _draggingNode = null,
-      _prefix = '',
+      _prefix = renderer.options.prefix,
       _hoverStack = [],
       _hoverIndex = {},
       _isMouseDown = false,
       _isMouseOverCanvas = false,
       _drag = false;
-
-    // It removes the initial substring ('read_') if it's a WegGL renderer.
-    if (renderer instanceof sigma.renderers.webgl) {
-      _prefix = renderer.options.prefix.substr(5);
-    } else {
-      _prefix = renderer.options.prefix;
-    }
 
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
@@ -112,6 +105,23 @@
       if (!_hoverStack.length) {
         _node = null;
       }
+      else {
+        // Drag node right after click instead of needing mouse out + mouse over:
+        setTimeout(function() {
+          if(_a) {
+            var activeNodes = _a.nodes();
+            if (activeNodes.length) {
+              // Add node to array of current nodes over
+              _hoverStack.push(activeNodes[0]);
+              _hoverIndex[activeNodes[0].id] = true;
+
+              // Set the current node to be the last one in the array
+              _node = _hoverStack[_hoverStack.length - 1];
+              _mouse.addEventListener('mousedown', nodeMouseDown);
+            }
+          }
+        }, 0);
+      }
     };
 
     function nodeMouseOver(event) {
@@ -124,7 +134,7 @@
       _hoverStack.push(event.data.node);
       _hoverIndex[event.data.node.id] = true;
 
-      if(_hoverStack.length && ! _isMouseDown) {
+      if(!_isMouseDown) {
         // Set the current node to be the last one in the array
         _node = _hoverStack[_hoverStack.length - 1];
         _mouse.addEventListener('mousedown', nodeMouseDown);
@@ -147,8 +157,7 @@
 
     function nodeMouseDown(event) {
       _isMouseDown = true;
-      var size = _s.graph.nodes().length;
-      if (_node && size > 0) {
+      if (_node && _s.graph.nodes().length > 0) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
