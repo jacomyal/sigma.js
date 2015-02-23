@@ -5,7 +5,13 @@ Plugin developed by [José M. Camacho](https://github.com/josemazo), events by [
 
 ---
 
-This plugin provides a method to drag & drop nodes. At the moment, this plugin is not compatible with the WebGL renderer. Check the sigma.plugins.dragNodes function doc or the [example code](../../examples/drag-nodes.html) to know more.
+This plugin provides a method to drag & drop nodes. At the moment, this plugin is not compatible with the WebGL renderer.
+
+Combined with a lasso selection like in the following example, it provides an intuitive experience to the users:
+
+![Drag](https://github.com/Linkurious/linkurious.js/wiki/media/drag-multiple-nodes.gif)
+
+Check the sigma.plugins.dragNodes function doc or the [example code](../../examples/drag-nodes.html) to know more.
 
 To use, include all .js files under this folder. Then initialize it as follows:
 
