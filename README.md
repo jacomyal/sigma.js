@@ -20,7 +20,7 @@ Linkurious.js provides a collection of **HTML5** features based on [Sigma.js](ht
 ![halo](https://github.com/Linkurious/linkurious.js/wiki/media/halo-230.gif)
 ![hover-edge](https://github.com/Linkurious/linkurious.js/wiki/media/hover-edge-230.gif)
 ![designer](https://github.com/Linkurious/linkurious.js/wiki/media/designer-230.gif)
-![lasso](https://github.com/Linkurious/linkurious.js/wiki/media/lasso-230.gif)
+![drag](https://github.com/Linkurious/linkurious.js/wiki/media/drag-multiple-nodes-230.gif)
 ![layout-arctic](https://github.com/Linkurious/linkurious.js/wiki/media/layout-arctic-230.gif)
 ![level-of-details-edges-labels](https://github.com/Linkurious/linkurious.js/wiki/media/level-of-details-edges-labels-230.gif)
 ![node-icons](https://github.com/Linkurious/linkurious.js/wiki/media/node-icons-230.gif)
