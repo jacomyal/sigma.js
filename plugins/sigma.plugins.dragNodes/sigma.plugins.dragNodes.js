@@ -32,6 +32,7 @@
    * **********************
    * @param  {sigma}    s        The related sigma instance.
    * @param  {renderer} renderer The related renderer instance.
+   * @param  {sigma.plugins.activeState} a The activeState plugin instance.
    */
   function DragNodes(s, renderer, a) {
     sigma.classes.dispatcher.extend(this);
@@ -152,19 +153,8 @@
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
 
-        // Do not refresh edgequadtree during drag:
-        var k,
-            c;
-        for (k in _s.cameras) {
-          c = _s.cameras[k];
-          if (c.edgequadtree !== undefined) {
-            c.edgequadtree._enabled = false;
-          }
-        }
-
         // Deactivate drag graph.
         _renderer.settings({mouseEnabled: false, enableHovering: false});
-        _s.refresh({skipIndexation: true});
 
         _self.dispatchEvent('startdrag', {
           node: _node,
@@ -180,19 +170,8 @@
       _body.removeEventListener('mousemove', nodeMouseMove);
       _body.removeEventListener('mouseup', nodeMouseUp);
 
-      // Allow to refresh edgequadtree:
-      var k,
-          c;
-      for (k in _s.cameras) {
-        c = _s.cameras[k];
-        if (c.edgequadtree !== undefined) {
-          c.edgequadtree._enabled = true;
-        }
-      }
-
       // Activate drag graph.
       _renderer.settings({mouseEnabled: true, enableHovering: true});
-      _s.refresh({skipIndexation: true});
 
       if (_drag) {
         _self.dispatchEvent('drop', {
@@ -200,6 +179,16 @@
           captor: event,
           renderer: _renderer
         });
+
+        if(_a) {
+          var activeNodes = _a.nodes();
+          for(var i = 0; i < activeNodes.length; i++) {
+            delete activeNodes[i].alphaX;
+            delete activeNodes[i].alphaY;
+          }
+        }
+
+        _s.refresh();
       }
       _self.dispatchEvent('dragend', {
         node: _node,
@@ -259,21 +248,15 @@
             }
 
             // Calcul first position of activeNodes
-            if(!activeNodes[i].alphaX) {
+            if(!activeNodes[i].alphaX || !activeNodes[i].alphaY) {
 
               activeNodes[i].alphaX = activeNodes[i].x - x;
               activeNodes[i].alphaY = activeNodes[i].y - y;
-
-              x2 = activeNodes[i].alphaX;
-              y2 = activeNodes[i].alphaY;
-
-            } else {
-
-              // Moove activeNodes to keep same distance between dragged nodes and active nodes
-              x2 = _node.x + activeNodes[i].alphaX;
-              y2 = _node.y + activeNodes[i].alphaY;
-
             }
+
+            // Move activeNodes to keep same distance between dragged nodes and active nodes
+            x2 = _node.x + activeNodes[i].alphaX;
+            y2 = _node.y + activeNodes[i].alphaY;
 
             activeNodes[i].x = x2;
             activeNodes[i].y = y2;
@@ -284,7 +267,7 @@
         _node.x = x * cos - y * sin;
         _node.y = y * cos + x * sin;
 
-        _s.refresh();
+        _s.refresh({skipIndexation: true});
 
         _drag = true;
         _self.dispatchEvent('drag', {
@@ -302,17 +285,16 @@
    * Interface
    * ------------------
    *
-   * > var dragNodesListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+   * > var dragNodesListener = sigma.plugins.dragNodes(s, s.renderers[0], a);
    */
   var _instance = {};
 
   /**
    * @param  {sigma} s The related sigma instance.
    * @param  {renderer} renderer The related renderer instance.
+   * @param  {sigma.plugins.activeState} a The activeState plugin instance.
    */
   sigma.plugins.dragNodes = function(s, renderer, a) {
-    var a = a ? a : null;
-
     // Create object if undefined
     if (!_instance[s.id]) {
       // Handle drag events:
