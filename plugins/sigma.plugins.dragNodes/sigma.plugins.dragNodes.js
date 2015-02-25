@@ -226,6 +226,8 @@
             nodes = _s.graph.nodes(),
             ref = [];
 
+        if (nodes.length < 2) return;
+
         // Getting and derotating the reference coordinates.
         for (var i = 0; i < 2; i++) {
           var n = nodes[i];
