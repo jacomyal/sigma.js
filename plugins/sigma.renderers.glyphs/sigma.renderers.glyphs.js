@@ -20,6 +20,13 @@
     return degrees * Math.PI / 180;
   }
 
+  function resolve (param, thisArg) {
+    if (typeof param === 'function') {
+      return param.call(thisArg);
+    }
+    return param;
+  }
+
   // Main method: create glyphs canvas and append it to the scene
   function glyphs (params) {
     params = params || {};
@@ -127,9 +134,9 @@
               radius: glyph.size || node[prefix + 'size'] * defScale,
               content: (glyph.content || '').toString() || '',
               lineWidth: glyph.lineWidth || defLineWidth,
-              fillColor: glyph.fillColor || defFillColor,
-              textColor: glyph.textColor || defTextColor,
-              strokeColor: glyph.strokeColor || defStrokeColor,
+              fillColor: resolve(glyph.fillColor, node) || defFillColor,
+              textColor: resolve(glyph.textColor, node) || defTextColor,
+              strokeColor: resolve(glyph.strokeColor, node) || defStrokeColor,
               strokeIfText: ('strokeIfText' in glyph) ? glyph.strokeIfText : defStrokeIfText,
               fontStyle: glyph.fontStyle || defFontStyle,
               font: glyph.font || defFont,
