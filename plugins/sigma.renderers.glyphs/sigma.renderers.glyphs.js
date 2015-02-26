@@ -143,7 +143,7 @@
               fontScale: glyph.fontScale || defFontScale,
               threshold: glyph.threshold || defThreshold,
               textThreshold: glyph.textThreshold || defTextThreshold,
-              draw: (defDraw) ? !glyph.hidden : false
+              draw: ('draw' in glyph) ? glyph.draw : ((defDraw) ? !node.hidden : false)
             },
             self.drawingContext
           );
