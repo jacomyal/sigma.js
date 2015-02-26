@@ -103,16 +103,16 @@ myRenderer.glyphs({
    * type: *number*
    * default value: `0.5`
  * **glyphFillColor**
-   * The glyph background-color.
-   * type: *string*
+   * The glyph background-color. When it is a function, `this` inside the function si bound to the node object.
+   * type: *string* | *function*
    * default value: `white`
  * **glyphTextColor**
-   * The glyph text-color.
-   * type: *string*
+   * The glyph text-color. When it is a function, `this` inside the function si bound to the node object.
+   * type: *string* | *function*
    * default value: `black`
  * **glyphStrokeColor**
-   * The glyph border-color.
-   * type: *string*
+   * The glyph border-color. When it is a function, `this` inside the function si bound to the node object.
+   * type: *string* | *function*
    * default value: `black`
  * **glyphLineWidth**
    * The glyph border-width in pixels.

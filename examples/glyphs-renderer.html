@@ -121,7 +121,7 @@
           position: positions[Math.floor(Math.random() * 4)],
           // Style 1:
           fillColor: '#fff',
-          strokeColor: c,
+          strokeColor: function() { return this.color; },
           strokeIfText: false,
 
           // Style 2:
