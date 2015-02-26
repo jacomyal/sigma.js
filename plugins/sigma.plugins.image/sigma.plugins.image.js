@@ -46,7 +46,58 @@
 
   function calculateAspectRatioFit(srcWidth, srcHeight, maxSize) {
     var ratio = Math.min(maxSize / srcWidth, maxSize / srcHeight);
-    return { width: srcWidth*ratio, height: srcHeight*ratio };
+    return { width: srcWidth * ratio, height: srcHeight * ratio };
+  }
+
+  function calculateBoundingBox(s, r, params) {
+    var minX, maxX, minY, maxY;
+    window.sigInst = s;
+
+    minX = Math.min.apply(Math, s.graph.nodes().map(function(n) {
+      return n[r.camera.readPrefix + 'x'];
+    }));
+    maxX = Math.max.apply(Math, s.graph.nodes().map(function(n) {
+      return n[r.camera.readPrefix + 'x'];
+    }));
+    minY = Math.min.apply(Math, s.graph.nodes().map(function(n) {
+      return n[r.camera.readPrefix + 'y'];
+    }));
+    maxY = Math.max.apply(Math, s.graph.nodes().map(function(n) {
+      return n[r.camera.readPrefix + 'y'];
+    }));
+
+    return {
+      minX: minX / params.zoomRatio,
+      maxX: maxX / params.zoomRatio,
+      minY: minY / params.zoomRatio,
+      maxY: maxY / params.zoomRatio,
+    }
+  }
+
+  function calculateRatio(s, r, params) {
+    var boundingBox,
+        margin = params.margin || 0,
+        ratio = {
+          width:  r.width,
+          height: r.height,
+        };
+
+    if (!params.clips && !params.size) {
+      boundingBox = calculateBoundingBox(s, r, params);
+
+      ratio = {
+        width:  boundingBox.maxX - boundingBox.minX,
+        height: boundingBox.maxY - boundingBox.minY
+      };
+    }
+    else if (params.size && params.size >= 1) {
+      ratio = calculateAspectRatioFit(r.width, r.height, params.size);
+    }
+
+    ratio.width += margin;
+    ratio.height += margin;
+
+    return ratio;
   }
 
   /**
@@ -65,10 +116,12 @@
     if (params.format && !(params.format in _types))
       throw Error('sigma.renderers.image: unsupported format "' + params.format + '".');
 
-    if(!params.zoom)
-      this.clone(s, params);
+    var ratio = calculateRatio(s, r, params);
 
-    var merged = this.draw(r, params);
+    if(!params.clip)
+      this.clone(s, params, ratio);
+
+    var merged = this.draw(r, params, ratio);
 
     var dataUrl = merged.toDataURL(_types[params.format || 'png']);
 
@@ -86,19 +139,28 @@
   * @param {s}  sigma instance
   * @param {params}  Options
   */
-  Image.prototype.clone = function(s, params) {
+  Image.prototype.clone = function(s, params, ratio) {
     params.tmpContainer = params.tmpContainer || 'image-container';
 
-    if (!document.getElementById(params.tmpContainer)) {
-      var el =  document.createElement("div");
+    var el = document.getElementById(params.tmpContainer);
+    if (!el) {
+      el =  document.createElement("div");
       el.id = params.tmpContainer;
       document.body.appendChild(el);
     }
+    el.setAttribute("style",
+        'width:' + ratio.width + 'px;' +
+        'height:' + Math.round(ratio.height) + 'px;');
 
     var renderer = s.addRenderer({
       container: document.getElementById(params.tmpContainer),
-      type: 'canvas'
+      type: 'canvas',
+      settings: {
+        batchEdgesDrawing: true,
+        drawLabels: !!params.labels
+      }
     });
+    renderer.camera.ratio = (params.zoomRatio > 0) ? params.zoomRatio : 1;
 
     var webgl = renderer instanceof sigma.renderers.webgl,
         sized = false,
@@ -120,8 +182,14 @@
         context = renderer.contexts[name];
 
       if(!sized) {
-        _canvas.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
-        _canvas.height = webgl && context instanceof WebGLRenderingContext ? canvas.height / 2 : canvas.height;
+        _canvas.width = ratio.width;
+        _canvas.height = ratio.height;
+
+        if (webgl && context instanceof WebGLRenderingContext) {
+          _canvas.width  *= 0.5;
+          _canvas.height *= 0.5;
+        }
+
         sized = true;
       }
 
@@ -139,14 +207,14 @@
     // Cleaning
     doneContexts = [];
     s.killRenderer(renderer);
-    document.getElementById(params.tmpContainer).remove();
+    el.remove();
   }
 
   /**
   * @param {renderer}  related renderer instance
   * @param {params}  Options
   */
-  Image.prototype.draw = function(r, params) {
+  Image.prototype.draw = function(r, params, ratio) {
 
     if(!params.size || params.size < 1)
       params.size = window.innerWidth;
@@ -175,17 +243,16 @@
 
         var width, height;
 
-        if(!params.zoom) {
+        if(!params.clip) {
           width = _canvas.width;
           height = _canvas.height;
         } else {
           width = canvas.width;
           height = canvas.height;
+          ratio = calculateAspectRatioFit(width, height, params.size);
         }
 
-        var ratio = calculateAspectRatioFit(width, height, params.size);
-
-        merged.width= ratio.width;
+        merged.width = ratio.width;
         merged.height = ratio.height;
 
         if (!webgl && !context instanceof WebGLRenderingContext) {
@@ -203,7 +270,7 @@
         }
       }
 
-      if(params.zoom)
+      if(params.clip)
         mergedContext.drawImage(canvas, 0, 0, merged.width, merged.height);
       else
         mergedContext.drawImage(_canvas, 0, 0, merged.width, merged.height);
