@@ -116,7 +116,7 @@
     <h2 class="underline">Image</h2>
     <div>
       <h3>Width <span id="width-value">0</span></h3>
-       <input id="width" type="range" min="0" max="1000" step="100" value="0"> <br>
+       <input id="width" type="range" min="0" max="3000" step="100" value="0"> <br>
     </div>
     <div>
       <h3>Color</h3>
@@ -124,8 +124,8 @@
     </div>
     <span class="line"></span>
     <div>
-      <button id="snap-btn">Snap</button>
-      <button id="snapZoom-btn">Keep Zoom</button>
+      <button id="snap-btn">Snap full view</button>
+      <button id="snapClip-btn">Snap clipped view</button>
     </div>
     <div id="dump" class="hidden"></div>
   </div>
@@ -189,16 +189,24 @@ s.refresh();
  * Events listener
  */
 
-function generateImage(mouse, zoom) {
+function generateImage(mouse, clip) {
   var size = parseInt(_.$("width").value);
   var color = _.$("color").value;
 
-  sigma.plugins.image(s, s.renderers[0], {download:true, size: size, background: color, zoom:zoom, labels:false});
+  sigma.plugins.image(s, s.renderers[0], {
+    download: true,
+    size: size,
+    margin: 50,
+    background: color,
+    clip: clip,
+    zoomRatio: 1,
+    labels: false
+  });
 }
 
 _.$('width').addEventListener("change", changeWidthValue); // for IE10+
 _.$('snap-btn').addEventListener("click", generateImage);
-_.$('snapZoom-btn').addEventListener("click", function(event) {
+_.$('snapClip-btn').addEventListener("click", function(event) {
   generateImage(event, true)
 });
 
