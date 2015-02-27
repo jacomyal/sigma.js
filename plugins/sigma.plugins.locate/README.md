@@ -63,10 +63,6 @@ var locate = sigma.plugins.locate(sigInst, {
    * default value: `null`
 
 
-## Status
-
-Beta
-
 ## Public methods
 
 **nodes( *string, ?object* )** : *sigma.plugins.locate*
@@ -115,7 +111,3 @@ onComplete: function() {/* do something when it's done. */}
 ````
 
 See [`sigma.misc.animation.camera`](https://github.com/jacomyal/sigma.js/blob/master/src/misc/sigma.misc.animation.js#l47) for a list of accepted parameters in this object.
-
-## Known bugs
-
-When `autoRescale=true` the plugin may not compute the optimal zoom ratio. I'd appreciate any guidance on this issue.

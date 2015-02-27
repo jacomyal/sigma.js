@@ -70,6 +70,34 @@
     return false;
   };
 
+  function getBoundaries(nodes, prefix) {
+    var i,
+        l,
+        sizeMax = -Infinity,
+        minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
+
+    for (i = 0, l = nodes.length; i < l; i++) {
+      sizeMax = Math.max(nodes[i][prefix + 'size'], sizeMax);
+      maxX = Math.max(nodes[i][prefix + 'x'], maxX);
+      minX = Math.min(nodes[i][prefix + 'x'], minX);
+      maxY = Math.max(nodes[i][prefix + 'y'], maxY);
+      minY = Math.min(nodes[i][prefix + 'y'], minY);
+    }
+
+    sizeMax = sizeMax || 1;
+
+    return {
+      sizeMax: sizeMax,
+      minX: minX,
+      minY: minY,
+      maxX: maxX,
+      maxY: maxY
+    };
+  };
+
 
   /**
    * Locate Object
@@ -93,81 +121,67 @@
      * This function computes the target point (x, y, ratio) of the animation
      * given a bounding box.
      *
-     *
-     * @param  {number}  minX  The bounding box top.
-     * @param  {number}  maxX  The bounding box bottom.
-     * @param  {number}  minY  The bounding box left.
-     * @param  {number}  maxY  The bounding box right.
+     * @param {object} boundaries:
+     *      {number}  minX  The bounding box top.
+     *      {number}  maxX  The bounding box bottom.
+     *      {number}  minY  The bounding box left.
+     *      {number}  maxY  The bounding box right.
      * @return {object}        The target point.
      */
-    function target(minX, maxX, minY, maxY) {
-      if (minX === undefined || isNaN(minX) ||  typeof minX !== "number")
-        throw 'minX must be a number.'
-
-      if (maxX === undefined || isNaN(maxX) || typeof maxX !== "number")
-        throw 'maxX must be a number.'
-
-      if (minY === undefined || isNaN(minY) || typeof minY !== "number")
-        throw 'minY must be a number.'
-
-      if (maxY === undefined || isNaN(maxY) || typeof maxY !== "number")
-        throw 'maxY must be a number.'
-
+    function target(boundaries) {
       var x,
           y,
-          bounds,
+          ratio,
           width,
-          height,
-          rect;
+          height;
 
-      // Center of the bounding box:
-      x = (minX + maxX) * 0.5;
-      y = (minY + maxY) * 0.5;
-
-      // Coordinates of the rectangle representing the camera on screen
-      // for the bounding box:
-      rect = _s.camera.getRectangle(maxX - minX, maxY - minY);
-      width = rect.x2 - rect.x1 || 1;
-      height = rect.height || 1;
-
-      // Find graph boundaries:
-      bounds = sigma.utils.getBoundaries(
-        _s.graph,
-        _s.camera.readPrefix
-      );
+      // Center of the boundaries:
+      x = (boundaries.minX + boundaries.maxX) * 0.5;
+      y = (boundaries.minY + boundaries.maxY) * 0.5;
 
       // Zoom ratio:
-      var cHeight = bounds.maxY + bounds.sizeMax,
-          cWidth = bounds.maxX + bounds.sizeMax,
-          ratio = _s.settings('zoomMax'),
-          hRatio,
-          wRatio;
+      if (getRescalePosition(_s)) {
+        var graphBoundaries,
+            graphRect,
+            graphWidth,
+            graphHeight,
+            rect;
 
-      hRatio = height / cHeight;
-      wRatio = width / cWidth;
-
-      var rescalePosition = getRescalePosition(_s);
-
-      // Create the ratio dealing with min / max
-      // if auto rescale the positions:
-      if (rescalePosition)
-        ratio = Math.max(
-          _s.settings('zoomMin'),
-          Math.min(
-            _s.settings('zoomMax'),
-            _s.camera.ratio / Math.min(hRatio, wRatio)
-          )
+        // Coordinates of the rectangle representing the camera on screen for the selection boundaries:
+        rect = _s.camera.getRectangle(
+          boundaries.maxX - boundaries.minX,
+          boundaries.maxY - boundaries.minY
         );
+
+        width = rect.x2 - rect.x1 || 1;
+        height = rect.height || 1;
+
+        // Graph boundaries:
+        graphBoundaries = sigma.utils.getBoundaries(
+          _s.graph,
+          _s.camera.readPrefix
+        );
+
+        // Coordinates of the rectangle representing the camera on screen for the graph boundaries:
+        graphRect = _s.camera.getRectangle(
+          graphBoundaries.maxX - graphBoundaries.minX,
+          graphBoundaries.maxY - graphBoundaries.minY
+        );
+
+        graphWidth = graphRect.x2 - graphRect.x1 || 1;
+        graphHeight = graphRect.height || 1;
+
+        ratio = Math.max(width / graphWidth, height / graphHeight);
+      }
       else {
-        ratio = _o.zoomDef;
+        width = boundaries.maxX - boundaries.minX + boundaries.sizeMax * 2;
+        height = boundaries.maxY - boundaries.minY + boundaries.sizeMax * 2;
+        ratio = Math.max(width / _s.renderers[0].width, height / _s.renderers[0].height);
       }
 
-      /*console.log({
-        x:x, y:y, ratio:ratio, hRatio:hRatio, wRatio:wRatio, height:height, width:width, cHeight:cHeight, cWidth:cWidth
-      });*/
-
-      if (x === undefined || y === undefined)
-        throw 'Coordinates error.'
+      // console.log({
+      //   x:x, y:y, ratio:ratio, height:height, width:width, graphHeight:graphHeight, graphWidth:graphWidth
+      // });
 
       return {
         x: x,
@@ -230,37 +244,11 @@
       else if (
         Object.prototype.toString.call(v) === '[object Array]'
       ) {
-        var minX, maxX, minY, maxY;
+        var boundaries = getBoundaries(v.map(function(id) {
+          return _s.graph.nodes(id);
+        }), _s.camera.readPrefix);
 
-        minX = Math.min.apply(Math, v.map(function(id) {
-          n = _s.graph.nodes(id);
-          if (n === undefined)
-            throw 'locate.nodes: Wrong arguments.';
-
-          return n[_s.camera.readPrefix + 'x'];
-        }));
-        maxX = Math.max.apply(Math, v.map(function(id) {
-          n = _s.graph.nodes(id);
-          if (n === undefined)
-            throw 'locate.nodes: Wrong arguments.';
-          return n[_s.camera.readPrefix + 'x'];
-        }));
-        minY = Math.min.apply(Math, v.map(function(id) {
-          n = _s.graph.nodes(id);
-          if (n === undefined)
-            throw 'locate.nodes: Wrong arguments.';
-
-          return n[_s.camera.readPrefix + 'y'];
-        }));
-        maxY = Math.max.apply(Math, v.map(function(id) {
-          n = _s.graph.nodes(id);
-          if (n === undefined)
-            throw 'locate.nodes: Wrong arguments.';
-
-          return n[_s.camera.readPrefix + 'y'];
-        }));
-
-        t = target(minX, maxX, minY, maxY);
+        t = target(boundaries);
       }
       else
         throw 'locate.nodes: Wrong arguments.';
@@ -328,6 +316,7 @@
 
       var t,
           e,
+          boundaries,
           animationOpts = sigma.utils.extend(options, _o.animation.edge),
           ratio = _s.camera.ratio,
           rescalePosition = getRescalePosition(_s);
@@ -338,109 +327,30 @@
         if (e === undefined)
           throw 'locate.edges: Wrong arguments.';
 
-        var snode = _s.graph.nodes(e.source),
-            tnode = _s.graph.nodes(e.target),
-            minX, maxX, minY, maxY;
+        boundaries = getBoundaries([
+          _s.graph.nodes(e.source),
+          _s.graph.nodes(e.target)
+        ], _s.camera.readPrefix);
 
-        minX = Math.min(
-          snode[_s.camera.readPrefix + 'x'],
-          tnode[_s.camera.readPrefix + 'x']
-        );
-        maxX = Math.max(
-          snode[_s.camera.readPrefix + 'x'],
-          tnode[_s.camera.readPrefix + 'x']
-        );
-        minY = Math.min(
-          snode[_s.camera.readPrefix + 'y'],
-          tnode[_s.camera.readPrefix + 'y']
-        );
-        maxY = Math.max(
-          snode[_s.camera.readPrefix + 'y'],
-          tnode[_s.camera.readPrefix + 'y']
-        );
-
-        t = target(minX, maxX, minY, maxY);
+        t = target(boundaries);
       }
 
       // Array of edges:
       else if (
         Object.prototype.toString.call(v) === '[object Array]'
       ) {
-        var minX, maxX, minY, maxY;
+        var i,
+            l,
+            nodes = [];
 
-        var allx = v.map(function(id) {
-          e = _s.graph.edges(id);
-          if (e === undefined)
-            throw 'locate.edges: Wrong arguments.';
+        for (i = 0, l = v.length; i < l; i++) {
+          e = _s.graph.edges(v[i]);
+          nodes.push(_s.graph.nodes(e.source));
+          nodes.push(_s.graph.nodes(e.target));
+        }
 
-          return [
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
-          ]
-        });
-        // Flatten the array:
-        allx = [].concat.apply([], allx);
-
-        var ally = v.map(function(id) {
-          e = _s.graph.edges(id);
-          if (e === undefined)
-            throw 'locate.edges: Wrong arguments.';
-
-          return [
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
-          ]
-        });
-        // Flatten the array:
-        ally = [].concat.apply([], ally);
-
-        minX = Math.min.apply(Math, allx);
-        maxX = Math.max.apply(Math, allx);
-        minY = Math.min.apply(Math, ally);
-        maxY = Math.max.apply(Math, ally);
-
-        /*minX = Math.min.apply(Math, v.map(function(id) {
-          e = _s.graph.edges(id);
-        if (e === undefined)
-          throw 'locate.edges: Wrong arguments.';
-
-          return Math.min(
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
-          );
-        }));
-        maxX = Math.max.apply(Math, v.map(function(id) {
-          e = _s.graph.edges(id);
-        if (e === undefined)
-          throw 'locate.edges: Wrong arguments.';
-
-          return Math.min(
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'x'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'x']
-          );
-        }));
-        minY = Math.min.apply(Math, v.map(function(id) {
-          e = _s.graph.edges(id);
-        if (e === undefined)
-          throw 'locate.edges: Wrong arguments.';
-
-          return Math.min(
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
-          );
-        }));
-        maxY = Math.max.apply(Math, v.map(function(id) {
-          e = _s.graph.edges(id);
-        if (e === undefined)
-          throw 'locate.edges: Wrong arguments.';
-
-          return Math.min(
-            _s.graph.nodes(e.source)[_s.camera.readPrefix + 'y'],
-            _s.graph.nodes(e.target)[_s.camera.readPrefix + 'y']
-          );
-        }));*/
-
-        t = target(minX, maxX, minY, maxY);
+        boundaries = getBoundaries(nodes, _s.camera.readPrefix);
+        t = target(boundaries);
       }
       else
         throw 'locate.edges: Wrong arguments.';
