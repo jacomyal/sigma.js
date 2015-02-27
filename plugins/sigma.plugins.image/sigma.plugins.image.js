@@ -50,27 +50,27 @@
   }
 
   function calculateBoundingBox(s, r, params) {
-    var minX, maxX, minY, maxY;
-    window.sigInst = s;
+    var minX, maxX, minY, maxY,
+        xArr = [],
+        yArr = [],
+        x = r.camera.readPrefix + 'x',
+        y = r.camera.readPrefix + 'y';
 
-    minX = Math.min.apply(Math, s.graph.nodes().map(function(n) {
-      return n[r.camera.readPrefix + 'x'];
-    }));
-    maxX = Math.max.apply(Math, s.graph.nodes().map(function(n) {
-      return n[r.camera.readPrefix + 'x'];
-    }));
-    minY = Math.min.apply(Math, s.graph.nodes().map(function(n) {
-      return n[r.camera.readPrefix + 'y'];
-    }));
-    maxY = Math.max.apply(Math, s.graph.nodes().map(function(n) {
-      return n[r.camera.readPrefix + 'y'];
-    }));
+    s.graph.nodes().forEach(function(n) {
+      xArr.push(n[x]);
+      yArr.push(n[y]);
+    });
+
+    minX = Math.min.apply(Math, xArr) / params.zoomRatio;
+    maxX = Math.max.apply(Math, xArr) / params.zoomRatio;
+    minY = Math.min.apply(Math, yArr) / params.zoomRatio;
+    maxY = Math.max.apply(Math, yArr) / params.zoomRatio;
 
     return {
-      minX: minX / params.zoomRatio,
-      maxX: maxX / params.zoomRatio,
-      minY: minY / params.zoomRatio,
-      maxY: maxY / params.zoomRatio,
+      minX: minX,
+      maxX: maxX,
+      minY: minY,
+      maxY: maxY,
     }
   }
 
