@@ -179,9 +179,8 @@
         ratio = Math.max(width / _s.renderers[0].width, height / _s.renderers[0].height);
       }
 
-      // console.log({
-      //   x:x, y:y, ratio:ratio, height:height, width:width, graphHeight:graphHeight, graphWidth:graphWidth
-      // });
+      // Normalize ratio:
+      ratio = Math.max(_s.settings('zoomMin'), Math.min(_s.settings('zoomMax'), ratio));
 
       return {
         x: x,
