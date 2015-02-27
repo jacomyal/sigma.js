@@ -49,33 +49,24 @@
     return { width: srcWidth * ratio, height: srcHeight * ratio };
   }
 
-  function calculateBoundingBox(s, r, params) {
-    var minX, maxX, minY, maxY,
-        xArr = [],
-        yArr = [],
-        x = r.camera.readPrefix + 'x',
-        y = r.camera.readPrefix + 'y';
+  function calculateZoomedBoundaries(s, r, params) {
+    var bounds;
 
-    s.graph.nodes().forEach(function(n) {
-      xArr.push(n[x]);
-      yArr.push(n[y]);
-    });
+    bounds = sigma.utils.getBoundaries(
+      s.graph,
+      r.camera.readPrefix
+    );
 
-    minX = Math.min.apply(Math, xArr) / params.zoomRatio;
-    maxX = Math.max.apply(Math, xArr) / params.zoomRatio;
-    minY = Math.min.apply(Math, yArr) / params.zoomRatio;
-    maxY = Math.max.apply(Math, yArr) / params.zoomRatio;
+    bounds.minX /= params.zoomRatio;
+    bounds.minY /= params.zoomRatio;
+    bounds.maxX /= params.zoomRatio;
+    bounds.maxY /= params.zoomRatio;
 
-    return {
-      minX: minX,
-      maxX: maxX,
-      minY: minY,
-      maxY: maxY,
-    }
+    return bounds;
   }
 
   function calculateRatio(s, r, params) {
-    var boundingBox,
+    var boundaries,
         margin = params.margin || 0,
         ratio = {
           width:  r.width,
@@ -83,11 +74,11 @@
         };
 
     if (!params.clips && !params.size) {
-      boundingBox = calculateBoundingBox(s, r, params);
+      boundaries = calculateZoomedBoundaries(s, r, params);
 
       ratio = {
-        width:  boundingBox.maxX - boundingBox.minX,
-        height: boundingBox.maxY - boundingBox.minY
+        width:  boundaries.maxX - boundaries.minX + boundaries.sizeMax * 2,
+        height: boundaries.maxY - boundaries.minY + boundaries.sizeMax * 2
       };
     }
     else if (params.size && params.size >= 1) {
