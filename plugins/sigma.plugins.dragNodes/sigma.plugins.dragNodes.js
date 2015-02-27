@@ -108,18 +108,9 @@
       else {
         // Drag node right after click instead of needing mouse out + mouse over:
         setTimeout(function() {
-          if(_a) {
-            var activeNodes = _a.nodes();
-            if (activeNodes.length) {
-              // Add node to array of current nodes over
-              _hoverStack.push(activeNodes[0]);
-              _hoverIndex[activeNodes[0].id] = true;
-
-              // Set the current node to be the last one in the array
-              _node = _hoverStack[_hoverStack.length - 1];
-              _mouse.addEventListener('mousedown', nodeMouseDown);
-            }
-          }
+          // Set the current node to be the last one in the array
+          _node = _hoverStack[_hoverStack.length - 1];
+          _mouse.addEventListener('mousedown', nodeMouseDown);
         }, 0);
       }
     };
