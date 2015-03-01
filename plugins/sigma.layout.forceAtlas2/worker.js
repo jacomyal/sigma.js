@@ -182,7 +182,6 @@
      * Algorithm initialization
      */
 
-    // TODO: autosettings
     function init(nodes, edges, config) {
       config = config || {};
       var i, l;
@@ -250,7 +249,6 @@
 
       if (W.settings.barnesHutOptimize) {
 
-        // TODO: is Infinity possible in a FloatArray?
         var minX = Infinity,
             maxX = -Infinity,
             minY = Infinity,
@@ -750,12 +748,7 @@
         w = EdgeMatrix[ep(e, 'weight')];
 
         // Edge weight influence
-        if (W.settings.edgeWeightInfluence === 0)
-          ewc = 1
-        else if (W.settings.edgeWeightInfluence === 1)
-          ewc = w;
-        else
-          ewc = Math.pow(w, W.settings.edgeWeightInfluence);
+        ewc = Math.pow(w, W.settings.edgeWeightInfluence);
 
         // Common measures
         xDist = NodeMatrix[np(n1, 'x')] - NodeMatrix[np(n2, 'x')];
@@ -1001,7 +994,18 @@
 
       // From same document as sigma
       sendNewCoords = function() {
-        var e = new Event('newCoords');
+        var e;
+
+        if (document.createEvent) {
+          e = document.createEvent('Event');
+          e.initEvent('newCoords', true, false);
+        }
+        else {
+          e = document.createEventObject();
+          e.eventType = 'newCoords';
+        }
+
+        e.eventName = 'newCoords';
         e.data = {
           nodes: NodeMatrix.buffer,
           converged: W.converged

@@ -64,6 +64,10 @@
       _isMouseOverCanvas = false,
       _drag = false;
 
+    if (renderer instanceof sigma.renderers.svg) {
+        _mouse = renderer.container.firstChild;
+    }
+
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
     renderer.bind('click', click);

@@ -327,6 +327,9 @@
 
         self.dispatchEvent('rightClick', e.data);
 
+        nodes = getNodes(e);
+        edges = getEdges(e);
+
         if (nodes.length) {
           self.dispatchEvent('rightClickNode', {
             node: nodes[0],
@@ -378,12 +381,12 @@
 
         overEdges = {};
         // Dispatch both single and multi events:
-        for (i = 0, l = outEdges.length; i < le; i++)
+        for (i = 0, le = outEdges.length; i < le; i++)
           self.dispatchEvent('outEdge', {
             edge: outEdges[i],
             captor: e.data
           });
-        if (outNodes.length)
+        if (outEdges.length)
           self.dispatchEvent('outEdges', {
             edges: outEdges,
             captor: e.data
