@@ -9,7 +9,7 @@
 
   /**
    * Sigma ForceAtlas2.5 Supervisor
-   * =============================
+   * ===============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Autostop author: Sébastien Heymann @ Linkurious
@@ -276,7 +276,6 @@
     });
   };
 
-  // TODO: kill polyfill when worker is not true worker
   Supervisor.prototype.killWorker = function() {
     if (this.worker) {
       this.worker.terminate();
@@ -374,6 +373,6 @@
   };
 
   sigma.layouts.isForceAtlas2Running = function() {
-    return supervisor && supervisor.running;
+    return !!supervisor && supervisor.running;
   };
 }).call(this);

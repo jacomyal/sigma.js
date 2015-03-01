@@ -27,6 +27,12 @@
      * *******************
      */
     // {string}
+    classPrefix: 'sigma',
+    // {string}
+    defaultNodeType: 'def',
+    // {string}
+    defaultEdgeType: 'def',
+    // {string}
     defaultLabelColor: '#000',
     // {string}
     defaultEdgeColor: '#000',
@@ -37,6 +43,8 @@
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
     edgeColor: 'source',
+    // {number} Defines the minimal edge's arrow display size.
+    minArrowSize: 0,
     // {string}
     font: 'arial',
     // {string} Example: 'bold'
@@ -61,7 +69,7 @@
     //          the "font" value.
     hoverFont: '',
     // {boolean} If true, then only one node can be hovered at a time.
-    singleHover: false,
+    singleHover: true,
     // {string} Example: 'bold'
     hoverFontStyle: '',
     // {string} Indicates how to choose the hovered nodes shadow color.
@@ -97,9 +105,10 @@
     // {booleans} The different drawing modes:
     //           false: Layered not displayed.
     //           true: Layered displayed.
-    drawLabels: true,
     drawEdges: true,
     drawNodes: true,
+    drawLabels: true,
+    drawEdgeLabels: false,
     // {boolean} Indicates if the edges must be drawn in several frames or in
     //           one frame, as the nodes and labels are drawn.
     batchEdgesDrawing: false,
@@ -134,8 +143,6 @@
     maxEdgeSize: 1,
     minNodeSize: 1,
     maxNodeSize: 8,
-    // {number} Defines the minimal edge's arrow display size.
-    minArrowSize: 0,
 
 
 
@@ -148,6 +155,8 @@
     touchEnabled: true,
     // {boolean}
     mouseEnabled: true,
+    // {boolean}
+    mouseWheelEnabled: true,
     // {boolean}
     doubleClickEnabled: true,
     // {boolean} Defines whether the custom events such as "clickNode" can be
