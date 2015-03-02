@@ -83,7 +83,8 @@ module.exports = function(grunt) {
     'renderers.customShapes',
     'renderers.edgeLabels',
     'renderers.snapshot',
-    'statistics.HITS'
+    'statistics.HITS',
+    'statistics.louvain'
   ];
 
   var pluginFiles = [],
