@@ -1,0 +1,293 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+
+<script src="../plugins/sigma.statistics.louvain/sigma.statistics.louvain.js"></script>
+<div id="container">
+  <style>
+    body {
+      color: #333;
+      font-size: 14px;
+      font-family: Lato, sans-serif;
+    }
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+    #control-pane {
+      top: 10px;
+      /*bottom: 10px;*/
+      right: 10px;
+      position: absolute;
+      width: 230px;
+      background-color: rgb(249, 247, 237);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    #control-pane > div {
+      margin: 10px;
+      overflow-x: auto;
+    }
+    .line {
+      clear: both;
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 12px 0 0 0;
+      border-bottom: 1px solid #aac789;
+      background: transparent;
+    }
+    h2, h3, h4 {
+      padding: 0;
+      font-variant: small-caps;
+    }
+    .green {
+      color: #437356;
+    }
+    h2.underline {
+      color: #437356;
+      background: #f4f0e4;
+      margin: 0;
+      border-radius: 2px;
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+
+    input[type=range] {
+      width: 160px;
+    }
+  </style>
+  <div id="graph-container"></div>
+  <div id="control-pane">
+    <h2 class="underline"><span id="nb-partitions">0</span> communities</h2>
+    <div>
+      <h3>levels</h3>
+      <select id="levels"></select>
+    </div>
+    <span class="line"></span>
+    <div>
+      <button id="run-btn">Detect communities</button>
+      <button id="reset-btn">Reset</button>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * A random graph is generated, such that its nodes are separated in some
+ * distinct clusters. Each cluster has its own color, and the density of
+ * links is stronger inside the clusters. So, we expect the algorithm to
+ * detect the clusters of the nodes.
+ */
+var i,
+    s,
+    o,
+    N = 20,
+    E = 100,
+    C = 5,
+    d = 0.5,
+    cs = [],
+    g = {
+      nodes: [],
+      edges: []
+    },
+    colors = [
+      "#D6C1B0",
+      "#9DDD5A",
+      "#D06D34",
+      "#D28FD8",
+      "#5D8556",
+      "#71D4C6",
+      "#CDCF79",
+      "#D8A836",
+      "#5E8084",
+      "#738ECD",
+      "#D36565",
+      "#61DC7B",
+      "#9B7168",
+      "#97C4DE",
+      "#A57E42",
+      "#D5DA41",
+      "#D06B97",
+      "#917097",
+      "#689534",
+      "#90D59B"
+    ];
+
+// Generate the graph:
+for (i = 0; i < C; i++)
+  cs.push({
+    id: i,
+    nodes: []
+  });
+
+for (i = 0; i < N; i++) {
+  o = cs[(Math.random() * C) | 0];
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node' + i,
+    x: 100 * Math.cos(2 * i * Math.PI / N),
+    y: 100 * Math.sin(2 * i * Math.PI / N),
+    size: Math.random(),
+    color: '#333'
+  });
+  o.nodes.push('n' + i);
+}
+
+for (i = 0; i < E; i++) {
+  var w = Math.random();
+  if (Math.random() < 1 - d)
+    g.edges.push({
+      id: 'e' + i,
+      source: 'n' + ((Math.random() * N) | 0),
+      target: 'n' + ((Math.random() * N) | 0),
+    });
+  else {
+    o = cs[(Math.random() * C) | 0]
+    g.edges.push({
+      id: 'e' + i,
+      source: o.nodes[(Math.random() * o.nodes.length) | 0],
+      target: o.nodes[(Math.random() * o.nodes.length) | 0],
+      weight: w,
+      size: w
+    });
+  }
+}
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
+  container: 'graph-container',
+  settings: {
+    minEdgeSize: 2,
+    maxEdgeSize: 8,
+    minNodeSize: 4,
+    maxNodeSize: 20,
+    drawLabels: false
+  }
+});
+
+// Layout the graph to see node clusters:
+s.startForceAtlas2({
+  worker: true,
+  startingIterations: 10,
+  iterationsPerRender: 10
+});
+setTimeout(function (argument) {
+  s.killForceAtlas2();
+}, 1000);
+
+
+var louvainInstance;
+
+// Detect button
+document.getElementById('run-btn').addEventListener("click", function(e) {
+
+  // Detect communities using the Louvain algorithm:
+  louvainInstance = sigma.plugins.louvain(s.graph, {
+    setter: function(communityId) { this.my_community = communityId; }
+  });
+
+  var nbLevels = louvainInstance.countLevels();
+  var partitions = louvainInstance.getPartitions();
+  var nbPartitions = louvainInstance.countPartitions(partitions);
+
+  // Color nodes based on their community
+  s.graph.nodes().forEach(function(node) {
+    node.color = colors[node.my_community];
+  });
+  s.refresh({skipIndexation: true});
+
+  document.getElementById('nb-partitions').textContent = nbPartitions;
+
+  // Fill level selector
+  var levelElt = document.getElementById('levels');
+  for (var i = 0; i < nbLevels; i++) {
+    var optionElt = document.createElement("option");
+    optionElt.text = i + 1;
+    if (i === nbLevels - 1) {
+      optionElt.selected = true;
+    }
+    levelElt.add(optionElt);
+  }
+
+  levelElt.addEventListener("change", function(e) {
+    var level = +e.target[e.target.selectedIndex].value;
+    louvainInstance.setResults({level: level});
+
+    // Partition count
+    partitions = louvainInstance.getPartitions(level);
+    nbPartitions = louvainInstance.countPartitions(partitions);
+    document.getElementById('nb-partitions').textContent = nbPartitions;
+
+    // Color nodes based on their community
+    s.graph.nodes().forEach(function(node) {
+      node.color = colors[node.my_community];
+    });
+    s.refresh({skipIndexation: true});
+  });
+});
+
+document.getElementById('reset-btn').addEventListener("click", function(e) {
+  // Reset colors
+  s.graph.nodes().forEach(function(node) {
+    node.color = '#333';
+  });
+  s.refresh({skipIndexation: true});
+
+  document.getElementById('nb-partitions').textContent = 0;
+
+  document.getElementById('levels').innerHTML = '';
+
+  louvainInstance = null;
+});
+
+</script>

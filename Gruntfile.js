@@ -102,7 +102,8 @@ module.exports = function(grunt) {
     'renderers.halo',
     'renderers.linkurious',
     'renderers.snapshot',
-    'statistics.HITS'
+    'statistics.HITS',
+    'statistics.louvain'
   ];
 
   var pluginFiles = [],
