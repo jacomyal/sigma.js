@@ -46,6 +46,7 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
 <script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
 
@@ -216,14 +217,13 @@ s = new sigma({
 });
 
 // Layout the graph to see node clusters:
-s.startForceAtlas2({
+var fa = sigma.layouts.configForceAtlas2(s, {
   worker: true,
-  startingIterations: 10,
-  iterationsPerRender: 10
+  autoStop: true,
+  background: true,
+  easing: 'cubicInOut'
 });
-setTimeout(function (argument) {
-  s.killForceAtlas2();
-}, 1000);
+sigma.layouts.startForceAtlas2();
 
 
 var louvainInstance;
