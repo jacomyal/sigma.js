@@ -15,8 +15,8 @@ One of the popular community detection algorithms is presented in [2]. This algo
 
 [2] V.D. Blondel, J.-L. Guillaume, R. Lambiotte, E. Lefebvre. "Fast unfolding of communities in large networks." J. Stat. Mech., 2008: 1008.
 
-![Before](https://github.com/Linkurious/linkurious.js/wiki/media/louvain-before.png)
-![After](https://github.com/Linkurious/linkurious.js/wiki/media/louvain-after.png)
+![Before](https://github.com/Linkurious/linkurious.js/wiki/media/louvain-before-400.png)
+![After](https://github.com/Linkurious/linkurious.js/wiki/media/louvain-after-400.png)
 
 ## Usage
 
@@ -48,7 +48,9 @@ var louvainInstance = sigma.plugins.louvain(sigmaInstance.graph);
 
 // get community of node 'n0': 
 var c = sigmaInstance.graph.nodes('n0')._louvain;
+```
 
+```js
 // run with a setter argument:
 var louvainInstance = sigma.plugins.louvain(sigmaInstance.graph, {
   setter: function(communityId) { this.my_community = communityId; }
@@ -64,6 +66,15 @@ Execute the algorithm again after calling `sigma.plugins.louvain()` as follows:
 
 ```js
 louvainInstance.run();
+```
+
+You can optionally provide an intermediary community partition assignement as follows:
+
+```js
+// Object with ids of nodes as properties and community number assigned as value.
+var partitions_init = {'n1':0, 'n2':0, 'n3': 1};
+
+louvainInstance.run({ partitions: partitions_init });
 ```
 
 ### Count levels of hierarchy
@@ -83,7 +94,7 @@ You may extract partitions at a specified level of hierarchy as follows:
 ```js
 // Get partitions at the highest level:
 var partitions = louvainInstance.getPartitions();
-// equivalent to louvainInstance.getPartitions(louvainInstance.countLevels() - 1)
+// equivalent to louvainInstance.getPartitions(louvainInstance.countLevels())
 
 // Get partitions at the lowest level:
 var partitions = louvainInstance.getPartitions({level: 1});

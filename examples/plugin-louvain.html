@@ -250,9 +250,9 @@ document.getElementById('run-btn').addEventListener("click", function(e) {
 
   // Fill level selector
   var levelElt = document.getElementById('levels');
-  for (var i = 1; i < nbLevels; i++) {
+  for (var i = 0; i < nbLevels; i++) {
     var optionElt = document.createElement("option");
-    optionElt.text = i;
+    optionElt.text = i + 1;
     if (i === nbLevels - 1) {
       optionElt.selected = true;
     }

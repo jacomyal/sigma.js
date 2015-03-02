@@ -404,10 +404,10 @@
     /**
      * Count levels of hierarchy.
      *
-     * @return {number}  The level count.
+     * @return {number}  The number of levels.
      */
     core.countLevels = function() {
-      return dendogram.length;
+      return dendogram.length - 1;
     };
 
     /**
@@ -519,7 +519,7 @@
     var instance = jLouvain(graph, p.partitions).run();
 
     instance.setResults({
-      level: instance.countLevels() - 1,
+      level: instance.countLevels(),
       setter: p.setter
     });
 
