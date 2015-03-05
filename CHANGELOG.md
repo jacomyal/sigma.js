@@ -1,5 +1,30 @@
 ## linkurious.js - changelog:
 
+#### 1.0.6 - draft (March 05, 2015)
+
+  - Update Sigma to [jacomyal/sigma.js#287f49616a5674ddcf30775d37f9c564cacf8e2a](https://github.com/jacomyal/sigma.js/commit/287f49616a5674ddcf30775d37f9c564cacf8e2a)
+
+  - New plugin `sigma.pathfinding.astar` to find shortest paths (thanks to [@A----](https://github.com/A----))
+  - New plugin `sigma.statistics.louvain` for community detection (thanks to [@upphiminn](https://github.com/upphiminn))
+  - Revamp plugin `sigma.plugins.dragNodes` to support multiple nodes (thanks to [@martindelataille](https://github.com/martindelataille))
+
+Improvements:
+
+  - #69 sigma.layout.forceAtlas2: make maxIterations and avgDistanceThreshold configurable
+  - #66 sigma.plugins.design: add support of type, icon, and image
+  - #62 sigma.plugins.design: add color generation for qualitative data
+  - add label alignment settings for canvas (thanks to [@qinfchen](https://github.com/qinfchen))
+
+Bug fixes:
+
+  - #78 sigma.plugins.image: sized images with zoom false are blurred
+  - #74 sigma.plugins.locate.nodes() zooms out instead of zooming in
+  - #72 sigma.plugins.design Histograms are not generated when there is only one value for a sequential property (thanks to [@callicles](https://github.com/callicles))
+  - #60-#61 sigma.plugins.designer documentation
+  - #59 sigma.plugins.designer doesn't support multiple sigma instances
+  - #57 sigma.plugins.locate doesn't support multiple sigma instances
+  - #56 sigma.plugins.tooltips doesn't support multiple sigma instances
+
 #### 1.0.5 - draft (January 16, 2015)
 
   - New plugin `sigma.exporters.xlsx`
