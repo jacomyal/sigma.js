@@ -202,6 +202,7 @@ module.exports = function(grunt) {
         dest: 'build/<%= pkg.name %>-v<%= pkg.version %>.zip',
         src: [
           'README.md',
+          'CHANGELOG.md',
           'build/sigma.min.js',
           'build/plugins/*.min.js'
         ],
