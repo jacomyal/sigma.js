@@ -1,0 +1,236 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.halo/settings.js"></script>
+<script src="../plugins/sigma.renderers.halo/sigma.renderers.halo.js"></script>
+
+<script src="../plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+
+<script src="../plugins/sigma.helpers.graph/sigma.helpers.graph.js"></script>
+<script src="../plugins/sigma.plugins.keyboard/sigma.plugins.keyboard.js"></script>
+<script src="../plugins/sigma.plugins.activeState/sigma.plugins.activeState.js"></script>
+<script src="../plugins/sigma.plugins.select/sigma.plugins.select.js"></script>
+<script src="../plugins/sigma.plugins.lasso/sigma.plugins.lasso.js"></script>
+
+<script src="../plugins/sigma.renderers.linkurious/settings.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.cross.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.diamond.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.equilateral.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.square.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.nodes.star.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../plugins/sigma.renderers.linkurious/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<div id="container">
+  <style>
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+
+
+  kbd {
+    background-color: #e7e7e7;
+    background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+    background-image: linear-gradient(#fefefe, #e7e7e7);
+    background-repeat: repeat-x;
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #000;
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+  }
+
+  .key.arrow {
+     font-size: 15px;
+     font-weight: bold
+  }
+
+  .container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    background: white;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+  }
+  .left {
+    display: inline-block;
+    width: 100px
+  }
+  </style>
+  <div id="graph-container"></div>
+  <div class="container">
+    <div><span class="left"><kbd>spacebar</kbd> + <kbd>s</kbd></span> Enable lasso tool</div>
+  </div>
+</div>
+<script>
+/**
+ * This example shows how to use the dragNodes plugin.
+ */
+var i,
+    s,
+    N = 100,
+    E = 500,
+    g = {
+      nodes: [],
+      edges: []
+    };
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: '#666'
+  });
+
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc'
+  });
+
+sigma.renderers.def = sigma.renderers.canvas;
+
+s = new sigma({
+  graph: g,
+  renderer: {
+    container: document.getElementById('graph-container'),
+    type: 'canvas'
+  },
+  settings: {
+    enableEdgeHovering: false,
+    borderSize: 2,
+    outerBorderSize: 3,
+    defaultNodeBorderColor: '#fff',
+    defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
+    edgeHoverHighlightNodes: 'circle',
+    nodeHaloColor: 'rgba(236, 81, 72, 0.2)',
+    nodeHaloSize: 50,
+  }
+});
+
+// Instanciate the ActiveState plugin:
+var activeState = sigma.plugins.activeState(s);
+var keyboard = sigma.plugins.keyboard(s, s.renderers[0]);
+
+// Initialize the Select plugin:
+var select = sigma.plugins.select(s, activeState);
+select.bindKeyboard(keyboard);
+
+// Initialize the dragNodes plugin:
+var dragListener = sigma.plugins.dragNodes(s, s.renderers[0], activeState);
+
+// Initialize the lasso plugin:
+var lasso = new sigma.plugins.lasso(s, s.renderers[0], {
+  'strokeStyle': 'rgb(236, 81, 72)',
+  'lineWidth': 2,
+  'fillWhileDrawing': true,
+  'fillStyle': 'rgba(236, 81, 72, 0.2)',
+  'cursor': 'crosshair'
+});
+
+lasso.activate();
+
+// halo on active nodes:
+function renderHalo() {
+  s.renderers[0].halo({
+    nodes: activeState.nodes()
+  });
+}
+
+s.renderers[0].bind('render', function(e) {
+  renderHalo();
+});
+
+
+//"spacebar" + "s" keys pressed binding for the lasso tool
+keyboard.bind('32+83', function() {
+  if (lasso.isActive) {
+    lasso.deactivate();
+  } else {
+    lasso.activate();
+  }
+});
+
+
+// Listen for selectedNodes event
+lasso.bind('selectedNodes', function (event) {
+  activeState.dropEdges();
+
+  var nodes = event.data;
+
+  if (!nodes.length) activeState.dropNodes();
+
+  activeState.addNodes(nodes.map(function(n) { return n.id; }));
+
+  setTimeout(function() {
+    lasso.deactivate();
+    s.refresh({ skipIdexation: true });
+  }, 0);
+});
+</script>
