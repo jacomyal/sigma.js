@@ -697,14 +697,14 @@
   function _settings(v1, v2) {
     var o;
 
-    if (typeof a1 === 'string' && arguments.length === 1)
-      return _parameters[a1];
+    if (typeof v1 === 'string' && arguments.length === 1)
+      return _parameters[v1];
     else {
-      o = (typeof a1 === 'object' && arguments.length === 1) ?
-        a1 || {} :
+      o = (typeof v1 === 'object' && arguments.length === 1) ?
+        v1 || {} :
         {};
-      if (typeof a1 === 'string')
-        o[a1] = a2;
+      if (typeof v1 === 'string')
+        o[v1] = v2;
 
       for (var k in o)
         if (o[k] !== undefined)

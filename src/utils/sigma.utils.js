@@ -803,7 +803,7 @@
    * @param  {function(string): void} error     Callback for errors.
    * @return {WebGLProgram}                     The created program.
    */
-  sigma.utils.loadProgram = function(gl, shaders, attribs, loc, error) {
+  sigma.utils.loadProgram = function(gl, shaders, attribs, locations, error) {
     var i,
         linked,
         program = gl.createProgram();
@@ -816,7 +816,7 @@
         gl.bindAttribLocation(
           program,
           locations ? locations[i] : i,
-          opt_attribs[i]
+          attribs[i]
         );
 
     gl.linkProgram(program);
