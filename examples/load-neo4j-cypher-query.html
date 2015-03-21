@@ -47,6 +47,8 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.parsers.json/sigma.parsers.json.js"></script>
+<script src="../plugins/sigma.parsers.cypher/sigma.parsers.cypher.js"></script>
+
 <div id="container">
     <style>
         #graph-container {
@@ -65,6 +67,8 @@
      *
      * The plugin sigma.neo4j.cypher can load a cypher query, parse the JSON response,
      * and instantiate sigma when the response is received.
+     *
+     * It based & similary on the json parser (that's why its must be loaded).
      *
      * The object given as the third parameter is the base of the instance
      * configuration object. The plugin will just add the "graph" key to it
