@@ -18,7 +18,6 @@
   var _instance = {},
       _body = null,
       _nodeReference = null,
-      _isDragging = null,
       _spacebar = false;
 
   /**
@@ -79,7 +78,7 @@
    * @param  {sigma.plugins.activeState} a The activeState plugin instance.
    */
   function Select(s, a) {
-    var drag = false,
+    var isDragging = false,
         dragListener = null,
         kbd = null;
 
@@ -88,6 +87,7 @@
     if(sigma.plugins.dragNodes) {
       s.renderers[0].container.lastChild.addEventListener('mousedown', nodeMouseDown);
     }
+
 
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
@@ -100,7 +100,7 @@
      */
     this.clickNodesHandler = function(event) {
       // Prevent nodes to be selected while dragging:
-      if (drag) return;
+      if (isDragging) return;
 
       var targets = event.data.node.map(function(n) {
         return n.id;
@@ -118,7 +118,7 @@
       }
       else {
         // Don't drop nodes on dragging
-        if(!_isDragging) {
+        if(!isDragging) {
           a.dropNodes();
           _nodeReference = null;
         }
@@ -127,12 +127,12 @@
           a.addNodes(targets);
         }
 
-        if(a.nodes().length > 0 && sigma.plugins.dragNodes) {
-          if(_nodeReference == a.nodes()[0].x) {
+        if(a.nodes().length && sigma.plugins.dragNodes) {
+          if(_nodeReference === a.nodes()[0].id) {
             a.dropNodes();
             _nodeReference = null;
           } else {
-            _nodeReference = a.nodes()[0].x;
+            _nodeReference = a.nodes()[0].id;
           }
         }
 
@@ -153,7 +153,7 @@
      */
     this.clickEdgesHandler = function(event) {
       // Prevent edges to be selected while dragging:
-      if (drag) return;
+      if (isDragging) return;
 
       var targets = event.data.edge.map(function(e) {
         return e.id;
@@ -184,7 +184,7 @@
      * This function handles the 'drag' event.
      */
     this.dragHandler = function() {
-      drag = true;
+      isDragging = true;
     };
 
     /**
@@ -192,7 +192,7 @@
      */
     this.dropHandler = function() {
       setTimeout(function() {
-        drag = false;
+        isDragging = false;
       }, 300);
     };
 
@@ -210,9 +210,8 @@
     }
 
     function nodeMouseMove() {
-      _isDragging = true;
-      if(a.nodes().length > 0 && !_nodeReference) {
-        _nodeReference = a.nodes()[0].x;
+      if(a.nodes().length && _nodeReference === null) {
+        _nodeReference = a.nodes()[0].id;
       }
     }
 
@@ -261,8 +260,31 @@
     s.bind('clickNodes', this.clickNodesHandler);
     s.bind('clickEdges', this.clickEdgesHandler);
 
+    /**
+     * Bind the dragNodes plugin to handle drag events.
+     * @param  {sigma.plugins.dragNodes} d The dragNodes plugin instance.
+     */
+    this.bindDragNodes = function(d) {
+      dragListener = d;
+      dragListener.bind('drag', this.dragHandler);
+      dragListener.bind('drop', this.dropHandler);
+    }
+
+    this.unbindDragNodes = function() {
+      if (dragListener) {
+        dragListener.unbind('drag', this.dragHandler);
+        dragListener.unbind('drop', this.dropHandler);
+        isDragging = false;
+        dragListener = null;
+      }
+    };
+
     _body.addEventListener('keydown', keyDown, false);
 
+    /**
+     * Bind the dragNodes plugin to handle keybiard events.
+     * @param  {sigma.plugins.keyboard} keyboard The keyboard plugin instance.
+     */
     this.bindKeyboard = function(keyboard) {
       kbd = keyboard;
       kbd.bind('32+65 18+32+65', spaceA);
@@ -323,13 +345,8 @@
       s.unbind('clickEdges', _instance[s.id].clickEdgesHandler);
 
       _instance[s.id].unbindKeyboard();
+      _instance[s.id].unbindDragNodes();
 
-      if (_instance[s.id].dragListener) {
-        _instance[s.id].dragListener.unbind('drag', _instance[s.id].dragHandler);
-        _instance[s.id].dragListener.unbind('drop', _instance[s.id].dropHandler);
-        _instance[s.id].drag = false;
-        _instance[s.id].dragListener = null;
-      }
       delete _instance[s.id];
     }
 
