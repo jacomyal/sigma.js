@@ -122,9 +122,15 @@
       }
     };
 
+    var display;
     nodes.forEach(function(node) {
       if (node.glyphs) {
         node.glyphs.forEach(function(glyph) {
+          display = !node.hidden;
+          if (display) {
+            display = ('draw' in glyph) ? glyph.draw : defDraw;
+          }
+
           draw(
             {
               x: node[prefix + 'x'],
@@ -143,7 +149,7 @@
               fontScale: glyph.fontScale || defFontScale,
               threshold: glyph.threshold || defThreshold,
               textThreshold: glyph.textThreshold || defTextThreshold,
-              draw: ('draw' in glyph) ? glyph.draw : ((defDraw) ? !node.hidden : false)
+              draw: display
             },
             self.drawingContext
           );
