@@ -183,6 +183,7 @@ select.bindKeyboard(keyboard);
 
 // Initialize the dragNodes plugin:
 var dragListener = sigma.plugins.dragNodes(s, s.renderers[0], activeState);
+select.bindDragNodes(dragListener);
 
 // Initialize the lasso plugin:
 var lasso = new sigma.plugins.lasso(s, s.renderers[0], {
