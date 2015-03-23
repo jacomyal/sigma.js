@@ -1,7 +1,7 @@
 /**
  * This plugin provides a method to drag & drop nodes. Check the
- * sigma.plugins.dragNodes function doc or the examples/basic.html &
- * examples/api-candy.html code samples to know more.
+ * sigma.plugins.dragNodes function doc or the examples/drag-nodes.html code
+ * sample to know more.
  */
 (function() {
   'use strict';
@@ -30,9 +30,9 @@
    *
    * Recognized parameters:
    * **********************
-   * @param  {sigma}    s        The related sigma instance.
-   * @param  {renderer} renderer The related renderer instance.
-   * @param  {sigma.plugins.activeState} a The activeState plugin instance.
+   * @param  {sigma}                      s        The related sigma instance.
+   * @param  {renderer}                   renderer The related renderer instance.
+   * @param  {?sigma.plugins.activeState} a        The activeState plugin instance.
    */
   function DragNodes(s, renderer, a) {
     sigma.classes.dispatcher.extend(this);
@@ -298,9 +298,9 @@
   var _instance = {};
 
   /**
-   * @param  {sigma} s The related sigma instance.
-   * @param  {renderer} renderer The related renderer instance.
-   * @param  {sigma.plugins.activeState} a The activeState plugin instance.
+   * @param  {sigma}                      s        The related sigma instance.
+   * @param  {renderer}                   renderer The related renderer instance.
+   * @param  {?sigma.plugins.activeState} a        The activeState plugin instance.
    */
   sigma.plugins.dragNodes = function(s, renderer, a) {
     // Create object if undefined
