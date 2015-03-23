@@ -52,19 +52,19 @@
       settings: settings || _defaultSettingsFunction,
 
       /**
-       * MAIN DATA:
-       * **********
-       */
-      nodesArray: [],
-      edgesArray: [],
-
-      /**
        * GLOBAL INDEXES:
        * ***************
        * These indexes just index data by ids.
        */
       nodesIndex: Object.create(null),
       edgesIndex: Object.create(null),
+
+      /**
+       * This index maps node id into a dictionary that maps adjacent edges ids
+       * into edges.
+       * Useful for for quick node removal.
+       */
+      allAdjacentEdgesIndex: Object.create(null),
 
       /**
        * LOCAL INDEXES:
@@ -410,8 +410,9 @@
     this.outNeighborsCount[id] = 0;
     this.allNeighborsCount[id] = 0;
 
+    this.allAdjacentEdgesIndex[validNode.id] = {}
+
     // Add the node to indexes:
-    this.nodesArray.push(validNode);
     this.nodesIndex[validNode.id] = validNode;
 
     // Return the current instance:
@@ -484,8 +485,10 @@
       validEdge.target = edge.target;
     }
 
+    this.allAdjacentEdgesIndex[validEdge.source][validEdge.id] = validEdge
+    this.allAdjacentEdgesIndex[validEdge.target][validEdge.id] = validEdge
+
     // Add the edge to indexes:
-    this.edgesArray.push(validEdge);
     this.edgesIndex[validEdge.id] = validEdge;
 
     if (!this.inNeighborsIndex[validEdge.target][validEdge.source])
@@ -544,16 +547,15 @@
 
     // Remove the node from indexes:
     delete this.nodesIndex[id];
-    for (i = 0, l = this.nodesArray.length; i < l; i++)
-      if (this.nodesArray[i].id === id) {
-        this.nodesArray.splice(i, 1);
-        break;
-      }
 
     // Remove related edges:
-    for (i = this.edgesArray.length - 1; i >= 0; i--)
-      if (this.edgesArray[i].source === id || this.edgesArray[i].target === id)
-        this.dropEdge(this.edgesArray[i].id);
+    var edge_ids = []
+    for (i in this.allAdjacentEdgesIndex[id]) {
+      edge_ids.push(i)
+    }
+    for (k in edge_ids) {
+      this.dropEdge(edge_ids[k])
+    }
 
     // Remove related edge indexes:
     delete this.inNeighborsIndex[id];
@@ -594,11 +596,8 @@
     // Remove the edge from indexes:
     edge = this.edgesIndex[id];
     delete this.edgesIndex[id];
-    for (i = 0, l = this.edgesArray.length; i < l; i++)
-      if (this.edgesArray[i].id === id) {
-        this.edgesArray.splice(i, 1);
-        break;
-      }
+    delete this.allAdjacentEdgesIndex[edge.source][edge.id];
+    delete this.allAdjacentEdgesIndex[edge.target][edge.id];
 
     delete this.inNeighborsIndex[edge.target][edge.source][edge.id];
     if (!Object.keys(this.inNeighborsIndex[edge.target][edge.source]).length)
@@ -631,11 +630,8 @@
    * and methods attached to the graph.
    */
   graph.addMethod('kill', function() {
-    // Delete arrays:
-    this.nodesArray.length = 0;
-    this.edgesArray.length = 0;
-    delete this.nodesArray;
-    delete this.edgesArray;
+
+    delete this.allAdjacentEdgesIndex;
 
     // Delete indexes:
     delete this.nodesIndex;
@@ -655,8 +651,8 @@
    * @return {object} The graph instance.
    */
   graph.addMethod('clear', function() {
-    this.nodesArray.length = 0;
-    this.edgesArray.length = 0;
+
+    __emptyObject(this.allAdjacentEdgesIndex);
 
     // Due to GC issues, I prefer not to create new object. These objects are
     // only available from the methods and attached functions, but still, it is
@@ -732,8 +728,13 @@
    */
   graph.addMethod('nodes', function(v) {
     // Clone the array of nodes and return it:
-    if (!arguments.length)
-      return this.nodesArray.slice(0);
+    if (!arguments.length) {
+      var nodes = [];
+      for (var id in this.nodesIndex) {
+        nodes.push(this.nodesIndex[id]);
+      }
+      return nodes;
+    }
 
     // Return the related node:
     if (arguments.length === 1 &&
@@ -813,8 +814,13 @@
    */
   graph.addMethod('edges', function(v) {
     // Clone the array of edges and return it:
-    if (!arguments.length)
-      return this.edgesArray.slice(0);
+    if (!arguments.length) {
+      var edges = [];
+      for (var id in this.edgesIndex) {
+	  edges.push(this.edgesIndex[id]);
+      }
+      return edges;
+    }
 
     // Return the related edge:
     if (arguments.length === 1 &&
