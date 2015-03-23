@@ -151,6 +151,8 @@
     };
 
     function nodeMouseDown(event) {
+      if(event.which == 3) return; // Right mouse button pressed
+
       _isMouseDown = true;
       if (_node && _s.graph.nodes().length > 0) {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
