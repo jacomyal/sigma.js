@@ -87,9 +87,11 @@
    * @param  {object}                   node     The node object.
    * @param  {CanvasRenderingContext2D} context  The canvas context.
    * @param  {configurable}             settings The settings function.
+   * @param  {?object}                  options  Force optional parameters (e.g. color).
    */
-  sigma.canvas.nodes.def = function(node, context, settings) {
-    var prefix = settings('prefix') || '',
+  sigma.canvas.nodes.def = function(node, context, settings, options) {
+    var o = options || {},
+        prefix = settings('prefix') || '',
         size = node[prefix + 'size'] || 1,
         x = node[prefix + 'x'],
         y = node[prefix + 'y'],
@@ -97,7 +99,7 @@
         imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous',
         borderSize = settings('borderSize'),
         outerBorderSize = settings('outerBorderSize'),
-        color = node.color || defaultNodeColor;
+        color = o.color || node.color || defaultNodeColor;
 
     // Color:
     if (node.active) {

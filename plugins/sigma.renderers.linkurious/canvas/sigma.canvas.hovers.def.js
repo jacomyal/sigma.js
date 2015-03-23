@@ -29,7 +29,9 @@
         fontSize = (settings('labelSize') === 'fixed') ?
           settings('defaultLabelSize') :
           settings('labelSizeRatio') * size,
-        color = node.color || defaultNodeColor;
+        color = settings('nodeHoverColor') === 'node' ?
+          (node.color || defaultNodeColor) :
+          settings('defaultNodeHoverColor');
 
     if (alignment !== 'center') {
       prepareLabelBackground(context);
@@ -40,7 +42,7 @@
     if (borderSize > 0) {
       context.beginPath();
       context.fillStyle = settings('nodeBorderColor') === 'node' ?
-        (node.color || settings('defaultNodeColor')) :
+        (node.color || defaultNodeColor) :
         settings('defaultNodeBorderColor');
       context.arc(
         node[prefix + 'x'],
@@ -56,7 +58,7 @@
 
     // Node:
     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
-    nodeRenderer(node, context, settings);
+    nodeRenderer(node, context, settings, { color: color });
 
     if (alignment === 'center') {
       prepareLabelBackground(context);
@@ -66,7 +68,7 @@
     // Display the label:
     if (typeof node.label === 'string') {
       context.fillStyle = (settings('labelHoverColor') === 'node') ?
-        (node.color || settings('defaultNodeColor')) :
+        (node.color || defaultNodeColor) :
         settings('defaultLabelHoverColor');
 
       var labelWidth = context.measureText(node.label).width,
@@ -110,7 +112,7 @@
 
       context.beginPath();
       context.fillStyle = settings('labelHoverBGColor') === 'node' ?
-        (node.color || settings('defaultNodeColor')) :
+        (node.color || defaultNodeColor) :
         settings('defaultHoverLabelBGColor');
 
       if (node.label && settings('labelHoverShadow')) {
