@@ -19,11 +19,20 @@
       // Indexes are working now, i.e. before the ActiveState constructor is
       // called, to index active nodes and edges when a graph object is passed
       // to sigma at instantiation.
-      _activeNodesIndex = Object.create(null),
-      _activeEdgesIndex = Object.create(null),
+      _activeNodesIndex,
+      _activeEdgesIndex,
+      _activeNodesCount,
+      _activeEdgesCount,
       _g = null,
       _enableEvents = true;
 
+  function initIndexes() {
+    _activeNodesIndex = Object.create(null);
+    _activeEdgesIndex = Object.create(null);
+    _activeNodesCount = 0;
+    _activeEdgesCount = 0;
+  };
+  initIndexes();
 
   /**
    * Dispatch the 'activeNodes' event.
@@ -56,6 +65,7 @@
     function(n) {
       if (n.active) {
         _activeNodesIndex[n.id] = this.nodesIndex[n.id];
+        _activeNodesCount++;
         dispatchNodeEvent();
       }
     }
@@ -79,12 +89,10 @@
     'dropNode',
     'sigma.plugins.activeState.dropNode',
     function(id) {
-      if (this.nodesIndex[id] !== undefined) {
-        var active = this.nodesIndex[id].active;
+      if (this.nodesIndex[id] !== undefined && this.nodesIndex[id].active) {
         delete _activeNodesIndex[id];
-        if (active) {
-          dispatchNodeEvent();
-        }
+        _activeNodesCount--;
+        dispatchNodeEvent();
       }
     }
   );
@@ -95,12 +103,10 @@
     'dropEdge',
     'sigma.plugins.activeState.dropEdge',
     function(id) {
-      if (this.edgesIndex[id] !== undefined) {
-        var active = this.edgesIndex[id].active;
+      if (this.edgesIndex[id] !== undefined && this.edgesIndex[id].active) {
         delete _activeEdgesIndex[id];
-        if (active) {
-          dispatchEdgeEvent();
-        }
+        _activeEdgesCount--;
+        dispatchEdgeEvent();
       }
     }
   );
@@ -109,11 +115,7 @@
   sigma.classes.graph.attachBefore(
     'clear',
     'sigma.plugins.activeState.clear',
-    function() {
-      _activeNodesIndex = Object.create(null);
-      _activeEdgesIndex = Object.create(null);
-      dispatchEdgeEvent();
-    }
+    initIndexes
   );
 
   /**
@@ -129,17 +131,25 @@
     if (_activeNodesIndex === null) {
       // It happens after a kill. Index nodes:
       _activeNodesIndex = Object.create(null);
+      _activeNodesCount = 0;
+
       _g.nodes().forEach(function(o) {
-        if (o.active)
+        if (o.active) {
           _activeNodesIndex[o.id] = o;
+          _activeNodesCount++;
+        }
       });
     }
     if (_activeEdgesIndex === null) {
       // It happens after a kill. Index edges:
       _activeEdgesIndex = Object.create(null);
+      _activeEdgesCount = 0;
+
       _g.edges().forEach(function(o) {
-        if (o.active)
+        if (o.active) {
           _activeEdgesIndex[o.id] = o;
+          _activeEdgesCount++;
+        }
       });
     }
 
@@ -155,6 +165,8 @@
     this.unbind();
     _activeNodesIndex = null;
     _activeEdgesIndex = null;
+    _activeNodesCount = 0;
+    _activeEdgesCount = 0;
     _g = null;
     _instance = null;
   };
@@ -171,7 +183,8 @@
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.addNodes = function(v) {
-    var n;
+    var oldCount = _activeNodesCount,
+        n;
 
     // Activate all nodes:
     if (!arguments.length) {
@@ -218,7 +231,12 @@
         throw 'activateState.addNodes: Wrong arguments.';
     }
 
-    dispatchNodeEvent();
+    _activeNodesCount = Object.keys(_activeNodesIndex).length;
+
+    if (oldCount != _activeNodesCount) {
+      dispatchNodeEvent();
+    }
+
     return this;
   };
 
@@ -234,7 +252,8 @@
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.addEdges = function(v) {
-    var e;
+    var oldCount = _activeEdgesCount,
+        e;
 
     // Activate all edges:
     if (!arguments.length) {
@@ -281,7 +300,12 @@
         throw 'activateState.addEdges: Wrong arguments.';
     }
 
-    dispatchEdgeEvent();
+    _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
+
+    if (oldCount != _activeEdgesCount) {
+      dispatchEdgeEvent();
+    }
+
     return this;
   };
 
@@ -297,6 +321,8 @@
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.dropNodes = function(v) {
+    var oldCount = _activeNodesCount;
+
     // Deactivate all nodes:
     if (!arguments.length) {
       _g.nodes().forEach(function(o) {
@@ -333,7 +359,12 @@
         throw 'activateState.dropNodes: Wrong arguments.';
     }
 
-    dispatchNodeEvent();
+    _activeNodesCount = Object.keys(_activeNodesIndex).length;
+
+    if (oldCount != _activeNodesCount) {
+      dispatchNodeEvent();
+    }
+
     return this;
   };
 
@@ -349,6 +380,8 @@
    * @return {sigma.plugins.activeState} Returns the instance itself.
    */
   ActiveState.prototype.dropEdges = function(v) {
+    var oldCount = _activeEdgesCount;
+
     // Deactivate all edges:
     if (!arguments.length) {
       _g.edges().forEach(function(o) {
@@ -385,7 +418,12 @@
         throw 'activateState.dropEdges: Wrong arguments.';
     }
 
-    dispatchEdgeEvent();
+    _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
+
+    if (oldCount != _activeEdgesCount) {
+      dispatchEdgeEvent();
+    }
+
     return this;
   };
 
