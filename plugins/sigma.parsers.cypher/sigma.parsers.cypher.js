@@ -26,7 +26,7 @@
      *                                 with the related sigma instance as
      *                                 parameter.
      */
-    sigma.neo4j.cypher = function (url, cypher, sig, callback) {
+    sigma.neo4j.cypher = function (url, login, password, cypher, sig, callback) {
         var graph = { nodes: [], edges: [] },
             xhr = sigma.utils.xhr(),
             neo4jTransactionEndPoint = url + '/db/data/transaction/commit';
@@ -76,6 +76,9 @@
 
         var postData = JSON.stringify(data);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        if( login && password) {
+            xhr.setRequestHeader('Authorization', 'Basic ' + btoa(login + ':' + password));
+        }
         xhr.send(postData);
     };
 
@@ -104,8 +107,6 @@
                 sigmaNode.labels = node.labels;
                 sigmaNode.x = Math.random();
                 sigmaNode.y = Math.random();
-                sigmaNode.size = 1;
-                sigmaNode.color = '#000000';
 
                 if (sigmaNode.id in nodesMap) {
                     // do nothing
@@ -122,7 +123,6 @@
                 sigmaEdge.label = edge.type;
                 sigmaEdge.source = edge.startNode;
                 sigmaEdge.target = edge.endNode;
-                sigmaEdge.color = '#7D7C8E';
 
                 if (sigmaEdge.id in edgesMap) {
                     // do nothing
