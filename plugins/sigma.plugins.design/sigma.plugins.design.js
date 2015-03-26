@@ -541,6 +541,7 @@
 
             if (visualVar === 'color' && self.dataTypes[key].array) {
               if (newVal !== undefined) {
+                item.color = newVal;  // backward-compatibility
                 item.colors.push(newVal);
               }
             }
