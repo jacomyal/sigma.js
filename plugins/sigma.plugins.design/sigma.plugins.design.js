@@ -1053,17 +1053,17 @@
           appliedStyles = Object.keys(computedStyles[value].styles);
 
           for (var i = 0 ; i < computedStyles[value].items.length ; i++){
-            for (var j = 0 ; j < appliedStyles.length ; j++){
-              // For a given property, we want to delete all the styles references that are computed
-              // from it for a given node
-              if (computedStyles[value].items[i].id === id) {
+            // For a given property, we want to delete all the styles references that are computed
+            // from it for a given node
+            if (computedStyles[value].items[i].id === id) {
 
+              for (var j = 0; j < appliedStyles.length; j++) {
                 delete computedStyles[value].items[i][appliedStyles[j]];
-                this.deprecate(target, key);
-                // There is only one node that should correspond to this. Once we have found it, we
-                // can return.
-                return this;
               }
+              // There is only one node that should correspond to this. Once we have found it, we
+              // can return.
+              this.deprecate(target, key);
+              return this;
             }
           }
         }
