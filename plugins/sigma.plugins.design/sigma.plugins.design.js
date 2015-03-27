@@ -1042,10 +1042,10 @@
         for (var i = 0 ; i < computedStyle.items.length ; i++){
 
           item = computedStyle.items[i];
-          // For a given property, we want to delete all the styles references that are computed
-          // from it for a given node
           if (item.id === id) {
 
+            // For a given property, we want to delete all the styles references that are computed
+            // from it for a given node
             for (var j = 0; j < appliedStyles.length; j++) {
 
               if (appliedStyles[j] !== 'label' && appliedStyles[j] !== 'size') {
