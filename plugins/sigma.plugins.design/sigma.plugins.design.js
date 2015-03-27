@@ -1001,6 +1001,71 @@
     };
 
     /**
+     * Deletes styles from an element according to the specified element id, target type and
+     * property reference.
+     *
+     * @param {String}  target The data target. Available values: "nodes", "edges".
+     * @param {Number}  id     id of the Element to update
+     * @param {string?} key    property key to delete styles from.
+     */
+    this.deletePropertyStylesFrom = function(target, id, key){
+
+      if (id == null){
+        throw new Error('"design.deleteNodeStyles": id is undefined');
+      }
+      if (target !== 'nodes' && target !== 'edges') {
+        throw new Error('"design.deleteNodeStyles": Unknown target ' + target);
+      }
+      if (key == null){
+        throw new Error('"design.deleteNodeStyles": key is undefined');
+      }
+
+      var
+        computedStyles,
+        computedStyle,
+        appliedStyles,
+        item;
+
+      if (target === 'nodes'){
+        computedStyles = _visionOnNodes.get(key);
+      } else {
+        computedStyles = _visionOnEdges.get(key);
+      }
+
+      var values = Object.keys(computedStyles);
+
+      for (var k = 0 ; k < values.length ; k++){
+
+        computedStyle = computedStyles[values[k]];
+        appliedStyles = Object.keys(computedStyle.styles);
+
+        for (var i = 0 ; i < computedStyle.items.length ; i++){
+
+          item = computedStyle.items[i];
+          if (item.id === id) {
+
+            // For a given property, we want to delete all the styles references that are computed
+            // from it for a given node
+            for (var j = 0; j < appliedStyles.length; j++) {
+
+              if (appliedStyles[j] !== 'label' && appliedStyles[j] !== 'size') {
+                delete item[appliedStyles[j]];
+              } else if (appliedStyles[j] === 'size'){
+                item.size = 1;
+              }
+            }
+            // There is only one node that should correspond to this. Once we have found it, we
+            // can return.
+            this.deprecate(target, key);
+            return this;
+          }
+        }
+      }
+
+      return this;
+    };
+
+    /**
      * This method is used to clear all styles. It will refresh the display. Use
      * `.reset()` instead to reset styles without losing the configuration.
      *
