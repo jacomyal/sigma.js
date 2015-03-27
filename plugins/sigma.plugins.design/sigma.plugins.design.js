@@ -1001,15 +1001,14 @@
     };
 
     /**
-     * Deletes styles from an element according to the specified options.
-     * If the only the nodeId is specified, this will delete the 'size', 'color', 'type', 'icon' and
-     * 'image'
+     * Deletes styles from an element according to the specified element id, target type and
+     * property reference.
      *
      * @param {String}  target The data target. Available values: "nodes", "edges".
      * @param {Number}  id     id of the Element to update
      * @param {string?} key    property key to delete styles from.
      */
-    this.deleteElementStyles = function(target, id, key){
+    this.deletePropertyStylesFrom = function(target, id, key){
 
       if (id == null){
         throw new Error('"design.deleteNodeStyles": id is undefined');
