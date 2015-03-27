@@ -1,4 +1,6 @@
 [ ![Codeship Status for Linkurious/linkurious.js](https://www.codeship.io/projects/b0710040-7f11-0132-f563-62fa786c5210/status)](https://www.codeship.io/projects/57170)
+[![Issue Stats](http://issuestats.com/github/Linkurious/linkurious.js/badge/pr?style=flat)](http://issuestats.com/github/Linkurious/linkurious.js)
+[![Issue Stats](http://issuestats.com/github/Linkurious/linkurious.js/badge/issue?style=flat)](http://issuestats.com/github/Linkurious/linkurious.js)
 
 linkurious.js
 =================
