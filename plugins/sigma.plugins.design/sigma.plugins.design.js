@@ -1001,6 +1001,78 @@
     };
 
     /**
+     * Deletes styles from an element according to the specified options.
+     * If the only the nodeId is specified, this will delete the 'size', 'color', 'type', 'icon' and
+     * 'image'
+     *
+     * @param {String} target - The data target. Available values: "nodes", "edges".
+     * @param {Number|String} id - id of the Element to update
+     * @param {Object} [key] - property key to delete styles from.
+     */
+    this.deleteElementStyles = function(target, id, key){
+
+      if (id === undefined || id === null){
+        throw new Error('"design.deleteNodeStyles": nodeId is undefined');
+      }
+      if (target !== 'nodes' && target !== 'edges') {
+        throw new Error('"design.deleteNodeStyles": Unknown target ' + target);
+      }
+
+      if (!key){
+        var element;
+        if (target === 'nodes') {
+          element = s.graph.nodes(id);
+        } else {
+          element = s.graph.edges(id);
+        }
+
+        delete element.size;
+        delete element.type;
+        delete element.color;
+        delete element.icon;
+        delete element.image;
+
+        this.deprecate(target);
+
+        return this;
+      }
+
+      if (!!key){
+        var
+          computedStyles,
+          appliedStyles;
+
+        if (target === 'nodes'){
+          computedStyles = _visionOnNodes.get(key);
+        } else {
+          computedStyles = _visionOnEdges.get(key);
+        }
+
+        for (var value in computedStyles){
+
+          appliedStyles = Object.keys(computedStyles[value].styles);
+
+          for (var i = 0 ; i < computedStyles[value].items.length ; i++){
+            for (var j = 0 ; j < appliedStyles.length ; j++){
+              // For a given property, we want to delete all the styles references that are computed
+              // from it for a given node
+              if (computedStyles[value].items[i].id === id) {
+
+                delete computedStyles[value].items[i][appliedStyles[j]];
+                this.deprecate(target, key);
+                // There is only one node that should correspond to this. Once we have found it, we
+                // can return.
+                return this;
+              }
+            }
+          }
+        }
+      }
+
+      return this;
+    };
+
+    /**
      * This method is used to clear all styles. It will refresh the display. Use
      * `.reset()` instead to reset styles without losing the configuration.
      *
