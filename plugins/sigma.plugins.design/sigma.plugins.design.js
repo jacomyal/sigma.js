@@ -1005,14 +1005,14 @@
      * If the only the nodeId is specified, this will delete the 'size', 'color', 'type', 'icon' and
      * 'image'
      *
-     * @param {String} target - The data target. Available values: "nodes", "edges".
-     * @param {Number|String} id - id of the Element to update
-     * @param {Object} [key] - property key to delete styles from.
+     * @param {String}  target The data target. Available values: "nodes", "edges".
+     * @param {Number}  id     id of the Element to update
+     * @param {string?} key    property key to delete styles from.
      */
     this.deleteElementStyles = function(target, id, key){
 
-      if (id === undefined || id === null){
-        throw new Error('"design.deleteNodeStyles": nodeId is undefined');
+      if (id == null){
+        throw new Error('"design.deleteNodeStyles": id is undefined');
       }
       if (target !== 'nodes' && target !== 'edges') {
         throw new Error('"design.deleteNodeStyles": Unknown target ' + target);
@@ -1026,7 +1026,7 @@
           element = s.graph.edges(id);
         }
 
-        delete element.size;
+        element.size = 1;
         delete element.type;
         delete element.color;
         delete element.icon;
@@ -1058,7 +1058,13 @@
             if (computedStyles[value].items[i].id === id) {
 
               for (var j = 0; j < appliedStyles.length; j++) {
-                delete computedStyles[value].items[i][appliedStyles[j]];
+
+                if (appliedStyles[j] !== 'label' && appliedStyles[j] !== 'size') {
+                  delete computedStyles[value].items[i][appliedStyles[j]];
+
+                } else if (appliedStyles[j] === 'size'){
+                  computedStyles[value].items[i].size = 1;
+                }
               }
               // There is only one node that should correspond to this. Once we have found it, we
               // can return.
