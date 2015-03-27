@@ -1017,60 +1017,48 @@
       if (target !== 'nodes' && target !== 'edges') {
         throw new Error('"design.deleteNodeStyles": Unknown target ' + target);
       }
-
-      if (!key){
-        var element;
-        if (target === 'nodes') {
-          element = s.graph.nodes(id);
-        } else {
-          element = s.graph.edges(id);
-        }
-
-        element.size = 1;
-        delete element.type;
-        delete element.color;
-        delete element.icon;
-        delete element.image;
-
-        this.deprecate(target);
-
-        return this;
+      if (key == null){
+        throw new Error('"design.deleteNodeStyles": key is undefined');
       }
 
-      if (!!key){
-        var
-          computedStyles,
-          appliedStyles;
+      var
+        computedStyles,
+        computedStyle,
+        appliedStyles,
+        item;
 
-        if (target === 'nodes'){
-          computedStyles = _visionOnNodes.get(key);
-        } else {
-          computedStyles = _visionOnEdges.get(key);
-        }
+      if (target === 'nodes'){
+        computedStyles = _visionOnNodes.get(key);
+      } else {
+        computedStyles = _visionOnEdges.get(key);
+      }
 
-        for (var value in computedStyles){
+      var values = Object.keys(computedStyles);
 
-          appliedStyles = Object.keys(computedStyles[value].styles);
+      for (var k = 0 ; k < values.length ; k++){
 
-          for (var i = 0 ; i < computedStyles[value].items.length ; i++){
-            // For a given property, we want to delete all the styles references that are computed
-            // from it for a given node
-            if (computedStyles[value].items[i].id === id) {
+        computedStyle = computedStyles[values[k]];
+        appliedStyles = Object.keys(computedStyle.styles);
 
-              for (var j = 0; j < appliedStyles.length; j++) {
+        for (var i = 0 ; i < computedStyle.items.length ; i++){
 
-                if (appliedStyles[j] !== 'label' && appliedStyles[j] !== 'size') {
-                  delete computedStyles[value].items[i][appliedStyles[j]];
+          item = computedStyle.items[i];
+          // For a given property, we want to delete all the styles references that are computed
+          // from it for a given node
+          if (item.id === id) {
 
-                } else if (appliedStyles[j] === 'size'){
-                  computedStyles[value].items[i].size = 1;
-                }
+            for (var j = 0; j < appliedStyles.length; j++) {
+
+              if (appliedStyles[j] !== 'label' && appliedStyles[j] !== 'size') {
+                delete item[appliedStyles[j]];
+              } else if (appliedStyles[j] === 'size'){
+                item.size = 1;
               }
-              // There is only one node that should correspond to this. Once we have found it, we
-              // can return.
-              this.deprecate(target, key);
-              return this;
             }
+            // There is only one node that should correspond to this. Once we have found it, we
+            // can return.
+            this.deprecate(target, key);
+            return this;
           }
         }
       }
