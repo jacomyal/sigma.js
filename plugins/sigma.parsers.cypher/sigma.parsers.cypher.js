@@ -101,12 +101,16 @@
             // iteration on graph for all node
             data.graph.nodes.forEach(function (node, index, ar) {
 
-                var sigmaNode = node.properties;
-                sigmaNode.id = node.id;
-                sigmaNode.label = node.id;
-                sigmaNode.labels = node.labels;
-                sigmaNode.x = Math.random();
-                sigmaNode.y = Math.random();
+                var sigmaNode =  {
+                    id : node.id,
+                    label : node.id,
+                    x : Math.random(),
+                    y : Math.random(),
+                    size : 1,
+                    color : '#000000',
+                    neo4j_labels : node.labels,
+                    neo4j_data : node.properties
+                };
 
                 if (sigmaNode.id in nodesMap) {
                     // do nothing
@@ -117,12 +121,15 @@
 
             // iteration on graph for all node
             data.graph.relationships.forEach(function (edge, index, ar) {
-                var sigmaEdge = edge.properties;
-                sigmaEdge.id = edge.id;
-                sigmaEdge.type = edge.type;
-                sigmaEdge.label = edge.type;
-                sigmaEdge.source = edge.startNode;
-                sigmaEdge.target = edge.endNode;
+                var sigmaEdge =  {
+                    id : edge.id,
+                    label : edge.type,
+                    source : edge.startNode,
+                    target : edge.endNode,
+                    color : '#7D7C8E',
+                    neo4j_type : edge.type,
+                    neo4j_data : edge.properties
+                };
 
                 if (sigmaEdge.id in edgesMap) {
                     // do nothing
