@@ -57,18 +57,18 @@
         e = this.edges(Object.keys(edges)[0]);
         if (e.type !== 'parallel')
           throw 'The sibling container must be of type "parallel".';
-        
+
         if (e.siblings === undefined)
           throw 'The sibling container has no "siblings" key.';
-        
+
         if (Object.keys(e.siblings).length < 2)
           throw 'The sibling container must have more than one sibling.';
-        
+
         if (e.siblings[id] === undefined)
           throw 'Sibling container found but the edge sibling is missing.'
 
         return e;
-      } 
+      }
       else if (Object.keys(edges).length > 1) {
         // We have parallel edges in the graph structure, maybe because
         // graph.addEdge() has been called directly.
@@ -181,7 +181,7 @@
   function drop(c, sid) {
     delete c.siblings[sid];
     delete this.siblingEdgesIndex[sid];
-    
+
     if (Object.keys(c.siblings).length === 1) {
       // One sibling remains so we drop the container and add the sibling as a
       // new edge:
@@ -263,11 +263,11 @@
         // An edge already exists, we make it a container and add a sibling:
         var otherEdge = this.edges(edges[Object.keys(edges)[0]].id);
         add.call(
-          this, 
-          otherEdge, 
+          this,
+          otherEdge,
           edge
         );
-      } 
+      }
       else {
         // No edge exists between source and target, we add a normal edge:
         this.addEdge(edge);
