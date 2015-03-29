@@ -1,5 +1,30 @@
 ## linkurious.js - changelog:
 
+#### 1.0.7 (March 29, 2015)
+
+Core:
+
+  - Switch `clone` setting to `false` by default
+  - Switch `singleHover` setting to `true` by default
+
+Plugins:
+
+  - plugins.design: Add method to deal with deleted node/edge properties
+  - plugins.design: Preserve `color` key when `colors` exist for backward-compatibility
+  - plugins.activeState: improved event trigger system
+  - #64 renderers.linkurious: should use defaultNodeHoverColor
+  - #86 renderers.glyphs: glyphs displayed on hidden nodes
+  - #88 plugins.dragNodes: do not drag on right click
+  - #84 plugins.dragNodes: node still selected after a click on its neighbor
+
+Examples:
+
+  - Add select-and-drag-nodes.html
+
+Dev:
+
+  - Update devDependencies
+
 #### 1.0.6 - draft (March 05, 2015)
 
   - Update Sigma to [jacomyal/sigma.js#287f49616a5674ddcf30775d37f9c564cacf8e2a](https://github.com/jacomyal/sigma.js/commit/287f49616a5674ddcf30775d37f9c564cacf8e2a)
