@@ -957,7 +957,8 @@
      *                           "nodes", "edges".
      * @param  {?string} key     The property accessor. Use a dot notation like
      *                           'data.myProperty'.
-     * @return {design}        The instance.
+     *
+     * @return {design}          The instance.
      */
     this.deprecate = function(target, key) {
       if (target) {
@@ -1001,12 +1002,14 @@
     };
 
     /**
-     * Deletes styles from an element according to the specified element id, target type and
-     * property reference.
+     * Delete styles from a node or an edge according to its specified id,
+     * target type and property reference.
      *
-     * @param {String}  target The data target. Available values: "nodes", "edges".
-     * @param {Number}  id     id of the Element to update
-     * @param {string?} key    property key to delete styles from.
+     * @param {string}  target The data target. Available values: "nodes", "edges".
+     * @param {number}  id     The id of the node or edge to update
+     * @param {string}  key    The property key to delete styles from.
+     *
+     * @return {design}        The instance.
      */
     this.deletePropertyStylesFrom = function(target, id, key){
 
