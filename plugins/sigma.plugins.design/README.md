@@ -436,6 +436,14 @@ design.apply('nodes'); // refresh node styles computed for 'data.quantity'
 
 Deprecation works the same for edges.
 
+### Delete property styles from nodes or edges
+
+Deprecation will work correctly if the deprecated properties still exist at the time of deprecation. In case of removed node or edge property, we must delete styles manually as follows:
+
+```js
+design.deletePropertyStylesFrom('nodes', 'n0', 'data.quantity');
+```
+
 ### Remove a single style
 Example:
 
