@@ -52,7 +52,8 @@ test('API', function() {
     anAttr: 1
   };
 
-  var s = new sigma(),
+  // clone data to make testing easier
+  var s = new sigma({ settings: { clone:true } }),
       graph = {
         nodes: [{ id: 'n0' }, { id: 'n1' }, { id: 'n2' }, { id: 'n3' }],
         edges: [e0, e1, e3, e4]
@@ -63,7 +64,7 @@ test('API', function() {
 
 
   ok(
-    s.graph.edges().length == 3, 
+    s.graph.edges().length == 3,
     '"readWithSiblings" does not create parallel edges.'
   );
 
@@ -81,7 +82,7 @@ test('API', function() {
   s.graph.addEdgeSibling(e2);
 
   ok(
-    s.graph.edges().length == 3, 
+    s.graph.edges().length == 3,
     '"addEdgeSibling" does not create parallel edges in the graph.'
   );
 
@@ -96,22 +97,22 @@ test('API', function() {
   );
 
   ok(
-    s.graph.edges('e0').type == 'parallel', 
+    s.graph.edges('e0').type == 'parallel',
     '"addEdgeSibling" sets the type of edges with sibling as "parallel".'
   );
 
   ok(
-    s.graph.edges('e0').size == 1, 
+    s.graph.edges('e0').size == 1,
     '"addEdgeSibling" set the size of edges with sibling to 1.'
   );
-  
+
   ok(
-    s.graph.edges('e0').color === undefined, 
+    s.graph.edges('e0').color === undefined,
     '"addEdgeSibling" removes the color of edges with sibling.'
   );
-  
+
   ok(
-    s.graph.edges('e0').label === undefined, 
+    s.graph.edges('e0').label === undefined,
     '"addEdgeSibling" removes the label of edges with sibling.'
   );
 
@@ -138,7 +139,7 @@ test('API', function() {
     s.graph.edges(),
     '"edgeSiblings" with no argument returns all edges.'
   );
-  
+
   deepEqual(
     s.graph.edgeSiblings('e0').siblings,
     {
@@ -148,13 +149,13 @@ test('API', function() {
     },
     '"edgeSiblings" with a container returns the edge.'
   );
-  
+
   deepEqual(
     s.graph.edgeSiblings('e1'),
     s.graph.edges('e0'),
     '"edgeSiblings" with a sibling returns its container.'
   );
-  
+
   deepEqual(
     s.graph.edgeSiblings('e3'),
     e3,
@@ -195,27 +196,27 @@ test('API', function() {
   s.graph.dropEdgeSibling('e1');
 
   ok(
-    s.graph.edges('e0').siblings === undefined, 
+    s.graph.edges('e0').siblings === undefined,
     '"dropEdgeSibling" transforms a single sibling into an edge.'
   );
 
   ok(
-    s.graph.edges('e0').type === e0.type, 
+    s.graph.edges('e0').type === e0.type,
     '"dropEdgeSibling" restores the type of edges with no sibling anymore.'
   );
 
   ok(
-    s.graph.edges('e0').size === e0.size, 
+    s.graph.edges('e0').size === e0.size,
     '"dropEdgeSibling" restores the size of edges with no sibling anymore.'
   );
-  
+
   ok(
-    s.graph.edges('e0').color === e0.color, 
+    s.graph.edges('e0').color === e0.color,
     '"dropEdgeSibling" restores the color of edges with no sibling anymore.'
   );
 
   ok(
-    s.graph.edges('e0').anAttr === e0.anAttr, 
+    s.graph.edges('e0').anAttr === e0.anAttr,
     '"dropEdgeSibling" restores the attributes of edges with no sibling anymore.'
   );
 
@@ -226,20 +227,20 @@ test('API', function() {
   s.graph.dropEdgeSibling('e0');
 
   ok(
-    s.graph.edges('e0') === undefined, 
+    s.graph.edges('e0') === undefined,
     '"dropEdgeSibling" drops an edge.'
   );
 
   s.graph.dropEdgeSibling('e1');
 
   ok(
-    s.graph.edges().length == 2, 
+    s.graph.edges().length == 2,
     '"dropEdgeSibling" drops an edge which was formally a sibling.'
   );
 
 
   // Reset sigma:
-  s = new sigma(),
+  s = new sigma({ settings: { clone:true } }),
       graph = {
         nodes: [{ id: 'n0' }, { id: 'n1' }, { id: 'n2' }, { id: 'n3' }],
         edges: [e0, e1, e3, e4]
@@ -276,5 +277,5 @@ test('API', function() {
   s.graph.dropEdge('e1');
 
   s.graph.addEdgeSibling(e1);
-  // which edge contains the sibling? not determined
+  // // which edge contains the sibling? not determined
 });
