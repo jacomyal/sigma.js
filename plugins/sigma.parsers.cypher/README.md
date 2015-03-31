@@ -14,10 +14,10 @@ Node are create with the following structure :
  * neo4j_data -> All the properties of the neo4j node
 
 Edge are create with the following structure :
-      * id -> Neo4j edge id
-      * label -> Neo4j edge type
-      * neo4j_type -> Neo4j edge type
-      * neo4j_data -> All the properties of Neo4j node
+ * id -> Neo4j edge id
+ * label -> Neo4j edge type
+ * neo4j_type -> Neo4j edge type
+ * neo4j_data -> All the properties of Neo4j node
 
 The most basic way to use this helper is to call it with a neo4j server url and a cypher query. It will then instanciate sigma, but after having added the graph into the config object.
 
@@ -30,7 +30,7 @@ sigma.parsers.cypher(
 );
 ````
 
-For neo4j >= 2.2, you must set pass a neo4j user with its password.
+For neo4j >= 2.2, you must add a neo4j user with its password.
 ````javascript
 sigma.parsers.cypher(
   'http://localhost:7474',
