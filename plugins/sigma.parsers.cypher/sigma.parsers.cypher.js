@@ -18,6 +18,8 @@
      * that will be executed at the end of the process.
      *
      * @param  {string}       url      The URL of neo4j server.
+     * @param  {string}       login    Login of a neo4j user (set it to None if no need)
+     * @param  {string}       password Password of the specified neo4j user (set it to None if no need)
      * @param  {string}       cypher   The cypher query
      * @param  {object|sigma} sig      A sigma configuration object or a sigma
      *                                 instance.

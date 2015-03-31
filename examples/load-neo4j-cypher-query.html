@@ -68,11 +68,11 @@
      * The plugin sigma.neo4j.cypher can load a cypher query, parse the JSON response,
      * and instantiate sigma when the response is received.
      *
-     * It based & similary on the json parser (that's why its must be loaded).
+     * It based on the json parser (that's why its must be loaded).
      *
-     * The object given as the third parameter is the base of the instance
+     * The object given as the Fifth parameter is the base of the instance
      * configuration object. The plugin will just add the "graph" key to it
      * before the instanciation.
      */
-    sigma.neo4j.cypher('http://localhost:7474', 'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100', { container: 'graph-container'});
+    sigma.neo4j.cypher('http://localhost:7474', 'neo4j', 'admin', 'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100', { container: 'graph-container'});
 </script>
