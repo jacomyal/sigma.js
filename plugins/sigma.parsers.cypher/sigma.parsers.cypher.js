@@ -28,10 +28,30 @@
      *                                 with the related sigma instance as
      *                                 parameter.
      */
-    sigma.neo4j.cypher = function (url, login, password, cypher, sig, callback) {
+    sigma.neo4j.cypher = function (/*url, login, password, cypher, sig, callback*/) {
+        var url, login, password, cypher, sig, callback;
+        url = arguments[0];
+        // is there login & password ?
+        if (arguments.length >= 5 ) {
+            login = arguments[1];
+            password = arguments[2];
+            cypher = arguments[3];
+            sig = arguments[4];
+            if(arguments[5]) {
+                callback = arguments[5];
+            }
+        }
+        else {
+            cypher = arguments[1];
+            sig = arguments[2];
+            if(arguments[3]) {
+                callback = arguments[3];
+            }
+        }
+
         var graph = { nodes: [], edges: [] },
-            xhr = sigma.utils.xhr(),
-            neo4jTransactionEndPoint = url + '/db/data/transaction/commit';
+        xhr = sigma.utils.xhr(),
+        neo4jTransactionEndPoint = url + '/db/data/transaction/commit';
 
         if (!xhr)
             throw 'XMLHttpRequest not supported, cannot load the file.';
