@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -220,7 +220,7 @@
       this.dataset = function() { return s.graph.edges(); }
     }
     else
-      throw 'Vision: Unknown dataset ' + datasetName;
+      throw new Error('Invalid argument: "datasetName" is not "nodes" or "edges". Current value is "' + datasetName + '".');
 
 
     /**
@@ -234,10 +234,10 @@
       var self = this;
 
       if (key === undefined)
-        throw 'Vision.update: Missing property accessor';
+        throw new Error('Missing argument: "key".');
 
       if (typeof key !== 'string')
-        throw 'Vision.update: The property accessor "'+ key +'" must be a string.';
+        throw new Error('Invalid argument: "key" is not a string. Current value is "' + key + '".');
 
       var val,
           byFn,
@@ -270,7 +270,7 @@
         val = byFn(item, key);
         if (val !== undefined) {
           if (isArray) {
-            isArray = (Object.prototype.toString.call(val) === '[object Array]') ? isArray : false;
+            isArray = Array.isArray(val) ? isArray : false;
           }
           if (isArray) {
             if (val.length === 1) {
@@ -333,7 +333,7 @@
             colorScheme = that.mappings.color.scheme;
 
             if (typeof colorScheme !== 'string')
-              throw 'Vision.update: color.scheme "' + colorScheme + '" must be a string';
+              throw new Error('color.scheme "' + colorScheme + '" is not a string.');
 
             if (isSequential) {
               bins = that.mappings.color.bins || 7;
@@ -349,12 +349,12 @@
             };
 
             if (typeof format !== 'function')
-              throw 'Vision.update: label.format "' + format + '" must be a function';
+              throw new Error('label.format "' + format + '" is not a function.');
             break;
 
           case 'size':
             if (!isSequential)
-              throw 'Vision.update: The values of property "' + key + '" must be numbers only';
+              throw new Error('One value of the property "' + key + '" is not a number.');
 
             self.histograms.size = self.histograms.size || {};
             self.histograms.size[key] = baseHistogram(
@@ -367,7 +367,7 @@
             typeScheme = that.mappings.type.scheme;
 
             if (typeof typeScheme !== 'string')
-              throw 'Vision.update: type.scheme "' + typeScheme + '" must be a string';
+              throw new Error('type.scheme "' + typeScheme + '" is not a string.');
 
             break;
 
@@ -375,7 +375,7 @@
             iconScheme = that.mappings.icon.scheme;
 
             if (typeof iconScheme !== 'string')
-              throw 'Vision.update: icon.scheme "' + iconScheme + '" must be a string';
+              throw new Error('icon.scheme "' + iconScheme + '" is not a string.');
 
             break;
 
@@ -383,7 +383,7 @@
             imageScheme = that.mappings.image.scheme;
 
             if (typeof imageScheme !== 'string')
-              throw 'Vision.update: type.scheme "' + imageScheme + '" must be a string';
+              throw new Error('type.scheme "' + imageScheme + '" is not a string.');
 
             break;
         }
@@ -404,7 +404,7 @@
               else {
                 self.idx[key][val].styles.color = function() {
                   if (schemeFn(that.palette, colorScheme) === undefined)
-                    throw 'Vision.update: Wrong or undefined color scheme';
+                    throw new Error('Wrong or undefined color scheme.');
 
                   if (that.mappings.color.set > 0) {
                     var setItem = schemeFn(that.palette, colorScheme)[that.mappings.color.set][nset];
@@ -432,7 +432,7 @@
             case 'type':
               self.idx[key][val].styles.type = function() {
                 if (schemeFn(that.palette, typeScheme) === undefined)
-                  throw 'Vision.update: Wrong or undefined type scheme';
+                  throw new Error('Wrong or undefined type scheme.');
 
                 return schemeFn(that.palette, typeScheme)[val];
               };
@@ -441,7 +441,7 @@
             case 'icon':
               self.idx[key][val].styles.icon = function() {
                 if (schemeFn(that.palette, iconScheme) === undefined)
-                  throw 'Vision.update: Wrong or undefined icon scheme';
+                  throw new Error('Wrong or undefined icon scheme.');
 
                 return schemeFn(that.palette, iconScheme)[val];
               };
@@ -450,7 +450,7 @@
             case 'image':
               self.idx[key][val].styles.image = function() {
                 if (schemeFn(that.palette, imageScheme) === undefined)
-                  throw 'Vision.update: Wrong or undefined image scheme';
+                  throw new Error('Wrong or undefined image scheme.');
 
                 return schemeFn(that.palette, imageScheme)[val];
               };
@@ -469,10 +469,10 @@
      */
     this.get = function (key) {
       if (key === undefined)
-        throw 'Vision.get: Missing property accessor';
+        throw new TypeError('Missing argument: "key".');
 
       if (typeof key !== 'string')
-        throw 'Vision.get: The property accessor "'+ key +'" must be a string.';
+        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
 
       // lazy updating:
       if (this.deprecated[key]) this.update(key);
@@ -495,13 +495,13 @@
      */
     this.applyStyle = function(visualVar, key) {
       if (key === undefined)
-        throw 'Vision.applyStyle: Missing property accessor';
+        throw new TypeError('Missing argument: "key"');
 
       if (typeof key !== 'string')
-        throw 'Vision.applyStyle: The property accessor "'+ key +'" must be a string.';
+        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
 
       if (this.visualVars.indexOf(visualVar) == -1)
-        throw 'Vision.applyStyle: Unknown style "' + visualVar + '"';
+        throw new Error('Unknown style "' + visualVar + '"');
 
       var self = this,
           idxp = this.get(key);
@@ -551,7 +551,7 @@
           }
           else {
             if (typeof o.styles[visualVar] === 'function')
-              throw 'Vision.applyStyle: ' + o.styles + '.' + visualVar + 'must be a function.';
+              throw new TypeError(o.styles + '.' + visualVar + 'is not a function.');
           }
         });
       });
@@ -559,8 +559,8 @@
       if (visualVar === 'size') {
         if (datasetName === 'nodes') {
           if (this.mappings.size.min > this.mappings.size.max) {
-            throw 'Vision.applyStyle: nodes.size.min must not be ' +
-            'greater than nodes.size.max';
+            throw new RangeError('nodes.size.min must be ' +
+            'lower or equal than nodes.size.max');
           }
 
           if (this.mappings.size.min) {
@@ -579,8 +579,8 @@
         }
         else if (datasetName === 'edges') {
           if (this.mappings.size.min > this.mappings.size.max) {
-            throw 'Vision.applyStyle: edges.size.min must not be '+
-            'greater than edges.size.max';
+            throw new RangeError('edges.size.min must be '+
+            'lower or equal than edges.size.max');
           }
 
           if (this.mappings.size.min) {
@@ -611,13 +611,13 @@
      */
     this.resetStyle = function(visualVar, key) {
       if (key === undefined)
-        throw 'Vision.resetStyle: Missing property accessor';
+        throw new TypeError('Missing argument: "key"');
 
       if (typeof key !== 'string')
-        throw 'Vision.resetStyle: The property accessor "'+ key +'" must be a string.';
+        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
 
       if (this.visualVars.indexOf(visualVar) == -1)
-        throw 'Vision.resetStyle: Unknown style';
+        throw new Error('Unknown style "' + visualVar + '".');
 
       if (this.idx[key] === undefined) return;
 
@@ -887,7 +887,7 @@
           __apply(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw '"design.apply": Unknown target ' + target;
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
       }
 
       return this;
@@ -941,7 +941,7 @@
           __reset(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw '"design.reset": Unknown target ' + target;
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
       }
 
       return this;
@@ -963,7 +963,7 @@
     this.deprecate = function(target, key) {
       if (target) {
         if (target !== 'nodes' && target !== 'edges')
-          throw '"design.deprecate": Unknown target ' + target;
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
 
         if (key) {
           if (target === 'nodes') {
@@ -972,8 +972,6 @@
           else if (target === 'edges') {
             _visionOnEdges.deprecated[key] = true;
           }
-          else
-            throw '"design.deprecate": Unknown target ' + target;
         }
         else {
           if (target === 'nodes') {
@@ -1014,13 +1012,13 @@
     this.deletePropertyStylesFrom = function(target, id, key){
 
       if (id == null){
-        throw new Error('"design.deleteNodeStyles": id is undefined');
+        throw new TypeError('Missing argument: "id".');
       }
       if (target !== 'nodes' && target !== 'edges') {
-        throw new Error('"design.deleteNodeStyles": Unknown target ' + target);
+        throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
       }
       if (key == null){
-        throw new Error('"design.deleteNodeStyles": key is undefined');
+        throw new TypeError('Missing argument: "key".');
       }
 
       var
@@ -1117,7 +1115,7 @@
      */
     this.utils.isSequential = function(target, property) {
       if (!target)
-        throw '"design.utils.isSequential": Missing target';
+        throw new TypeError('Missing argument: "target"');
 
       var v;
       switch (target) {
@@ -1128,14 +1126,14 @@
           v = _visionOnEdges;
           break;
         default:
-          throw '"design.utils.isSequential": Unknown target ' + target;
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
       }
 
       if (property === undefined)
-        throw 'design.utils.isSequential: Missing property accessor';
+        throw new TypeError('Missing argument: "property"');
 
       if (typeof property !== 'string')
-        throw 'design.utils.isSequential: The property accessor "'+ property +'" must be a string.';
+        throw new TypeError('Invalid argument: "property" is not a string. Current value is ' + property + '".');
 
       if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
         var val,
@@ -1179,7 +1177,7 @@
      */
     this.utils.histogram = function(target, visualVar, property) {
       if (!target)
-        throw 'design.utils.histogram: Missing target';
+        throw new TypeError('Missing argument: "target"');
 
       var v;
       switch (target) {
@@ -1190,25 +1188,22 @@
           v = _visionOnEdges;
           break;
         default:
-          throw 'design.utils.histogram: Unknown target "' + target + '"';
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
       }
 
       if (v.visualVars.indexOf(visualVar) == -1)
-        throw 'design.utils.histogram: Unknown visual variable.';
+        throw new Error('Unknown visual variable "' + visualVar + '".');
 
       if (property === undefined)
-        throw 'design.utils.histogram: Missing property accessor';
+        throw new TypeError('Missing argument: "property".');
 
       if (typeof property !== 'string')
-        throw 'design.utils.histogram: The property accessor "'+ property +'" must be a string.';
+        throw new TypeError('Invalid argument: "property" is not a string. Current value is "' + property + '".');
 
       var isSequential = this.isSequential(target, property);
 
-      if (isSequential === undefined)
-        throw 'design.utils.histogram: Missing property "'+ property + '"';
-
       if (!isSequential)
-        throw 'design.utils.histogram: the property "'+ property +'" must be sequential.';
+        throw new Error('The property "'+ property +'" is not sequential.');
 
       var h = histogram(v.histograms[visualVar], property);
 
@@ -1218,9 +1213,9 @@
         for (var bin = 0; bin < bins; bin++) {
           o = strToObjectRef(self.palette, self.styles[target].color.scheme);
           if (!o)
-            throw 'design.utils.histogram: color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.';
+            throw new Error('Color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.');
           if (!o[bins])
-            throw 'design.utils.histogram: missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".';
+            throw new Error('Missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".');
 
           h[bin][visualVar] = o[bins][bin];
         }
