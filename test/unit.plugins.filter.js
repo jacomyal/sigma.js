@@ -413,7 +413,7 @@ test('API', function() {
     function() {
       filter.nodesBy(function() {}, true);
     },
-    /The filter key \"true\" must be a number or a string./,
+    new TypeError('Invalid argument: "key" is not a number or a string. Current value is "true".'),
     '"nodesBy" with a wrong key type throws an error.'
   );
 
@@ -421,7 +421,7 @@ test('API', function() {
     function() {
       filter.nodesBy(function() {}, {}, true);
     },
-    /The filter key \"true\" must be a number or a string./,
+    new TypeError('Invalid argument: "key" is not a number or a string. Current value is "true".'),
     '"nodesBy" with options and a wrong key type throws an error.'
   );
 
@@ -429,7 +429,7 @@ test('API', function() {
     function() {
       filter.edgesBy(function() {}, '');
     },
-    /The filter key must be a non-empty string./,
+    new TypeError('Invalid argument: "key" is not a non-empty string.'),
     '"edgesBy" with a wrong key type throws an error.'
   );
 
@@ -437,23 +437,15 @@ test('API', function() {
     function() {
       filter.edgesBy(function() {}, {}, '');
     },
-    /The filter key must be a non-empty string./,
+    new TypeError('Invalid argument: "key" is not a non-empty string.'),
     '"edgesBy" with options and a wrong key type throws an error.'
-  );
-
-  throws(
-    function() {
-      filter.neighborsOf(0);
-    },
-    /The node id \"0\" must be a string./,
-    '"neighborsOf" with a wrong node id type throws an error.'
   );
 
   throws(
     function() {
       filter.neighborsOf('');
     },
-    /The node id must be a non-empty string./,
+    new TypeError('Invalid argument: id is not a non-empty string.'),
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
@@ -463,7 +455,7 @@ test('API', function() {
         .nodesBy(function() {}, "a")
         .edgesBy(function() {}, "a");
     },
-    /The filter \"a\" already exists./,
+    new Error('Invalid argument: the filter of key "a" already exists.'),
     'Registering two filters with the same key throws an error.'
   );
 

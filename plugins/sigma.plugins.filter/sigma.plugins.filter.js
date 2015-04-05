@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -19,8 +19,8 @@
    */
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentNodes: the node id must be a string.';
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: id is not a string or a number.');
 
       var target,
           nodes = [];
@@ -38,8 +38,8 @@
    */
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentEdges: the node id must be a string.';
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: id is not a string or a number.');
 
       var a = this.allNeighborsIndex[id],
           eid,
@@ -235,19 +235,19 @@
       }
 
       if (key !== undefined && typeof key !== 'number' && typeof key !== 'string')
-        throw 'The filter key "'+ key.toString() +'" must be a number or a string.';
+        throw new TypeError('Invalid argument: "key" is not a number or a string. Current value is "' + key + '".');
 
       if (key !== undefined && typeof key === 'string' && !key.length)
-        throw 'The filter key must be a non-empty string.';
+        throw new TypeError('Invalid argument: "key" is not a non-empty string.');
 
       if (typeof processor !== 'string')
-        throw 'The predicate of key "'+ key +'" must be a string.';
+        throw new TypeError('Invalid argument: "processor" is not a string.');
 
       if ('undo' === key)
-        throw '"undo" is a reserved key.';
+        throw new Error('Invalid argument: "key" has value "undo", which is a reserved keyword.');
 
       if (_keysIndex[key])
-        throw 'The filter "' + key + '" already exists.';
+        throw new Error('Invalid argument: the filter of key "' + key + '" already exists.');
 
       if (key)
         _keysIndex[key] = true;
@@ -351,16 +351,16 @@
      * > var filter = new sigma.plugins.filter(s);
      * > filter.neighborsOf('n0');
      *
-     * @param  {string}               id  The node id.
+     * @param  {number|string}        id  The node id.
      * @param  {?object}              params  The filter options.
      * @param  {?string}              key The key to identify the filter.
      * @return {sigma.plugins.filter}     Returns the instance.
      */
     this.neighborsOf = function(id, params, key) {
-      if (typeof id !== 'string')
-        throw 'The node id "'+ id.toString() +'" must be a string.';
-      if (!id.length)
-        throw 'The node id must be a non-empty string.';
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: id is not a string or a number. Current value is "' + id + '".');
+      if (typeof id === 'string' && !id.length)
+        throw new TypeError('Invalid argument: id is not a non-empty string.');
 
       // Wrap the predicate to be applied on the graph and add it to the chain.
       register('neighbors', id, params, key);
@@ -401,7 +401,7 @@
             Processors.undo(_g, _chain[i].predicate);
             break;
           default:
-            throw 'Unknown processor ' + _chain[i].processor;
+            throw new Error('Unknown processor ' + _chain[i].processor);
         }
       };
 
@@ -530,31 +530,32 @@
      */
     this.load = function(chain) {
       if (chain === undefined)
-        throw 'Wrong arguments.';
+        throw new TypeError('Missing argument.');
 
-      if (Object.prototype.toString.call(chain) !== '[object Array]')
-        throw 'The chain" must be an array.';
+      if (!Array.isArray(chain))
+        throw new TypeError('Invalid argument: "chain" is not an array.');
 
       this.clear();
       var copy = cloneChain(chain);
 
       for (var i = 0, len = copy.length; i < len; i++) {
         if (copy[i].predicate === undefined)
-          throw 'Missing predicate.';
+          throw new TypeError('Missing filter key: "predicate".');
+
         if (copy[i].processor === undefined)
-          throw 'Missing processor.';
+          throw new TypeError('Missing filter key: "processor".');
 
         if (copy[i].key != undefined && typeof copy[i].key !== 'string')
-          throw 'The filter key "'+ copy[i].key.toString() +'" must be a string.';
+          throw new TypeError('Invalid filter key: "key" is not a string. Current value is "' + copy[i].key.toString() + '".');
 
         if (typeof copy[i].predicate === 'string')
           eval(" copy[i].predicate = " +  copy[i].predicate);
 
         if (typeof copy[i].predicate !== 'function')
-          throw 'The predicate of key "'+ copy[i].key +'" must be a function.';
+          throw new TypeError('Invalid filter key: "predicate" of key "'+ copy[i].key +'" is not a function.');
 
         if (typeof copy[i].processor !== 'string')
-          throw 'The processor of key "'+ copy[i].key +'" must be a string.';
+          throw new TypeError('Invalid filter key: "processor" of key "'+ copy[i].key +'" is not a string.');
 
         if (copy[i].key)
           _keysIndex[copy[i].key] = true;
