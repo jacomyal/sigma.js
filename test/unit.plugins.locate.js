@@ -66,7 +66,7 @@ asyncTest('API', function(assert) {
     [0, 0, 1],
     'The camera is initialized with default settings.'
   );
-  
+
   stop();
   locate.nodes('n0', {
     onComplete: function() {
@@ -147,7 +147,7 @@ asyncTest('API', function(assert) {
     function() {
       locate.nodes('0');
     },
-    /locate.nodes: Wrong arguments./,
+    new Error('Invalid argument: "v". No node of id "0" exists.'),
     '"nodes" with a wrong key type throws an error.'
   );
 
@@ -155,7 +155,7 @@ asyncTest('API', function(assert) {
     function() {
       locate.edges('0');
     },
-    /locate.edges: Wrong arguments./,
+    new Error('Invalid argument: "v". No edge of id "0" exists.'),
     '"edges" with a wrong key type throws an error.'
   );
 
