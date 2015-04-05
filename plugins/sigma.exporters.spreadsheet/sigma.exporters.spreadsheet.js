@@ -77,7 +77,7 @@
       params.textSeparator = params.textSeparator || '';
 
       if (params.textSeparator && params.textSeparator !== '"' && params.textSeparator !== "'")
-        throw new Error('Wrong argument "textSeparator": "' + params.textSeparator + '"');
+        throw new TypeError('Invalid argument :"textSeparator" is not single-quote or double-quote. Current value is "' + params.textSeparator + '".');
 
       var rows = [],
           index = {},
@@ -88,7 +88,7 @@
           o;
 
       if (!params.what)
-        throw new Error('Missing argument "what".');
+        throw new TypeError('Missing argument: "what".');
 
       if (params.what === 'nodes') {
         if (params.which)
@@ -103,7 +103,7 @@
           data = this.graph.edges();
       }
       else
-        throw new Error('Wrong argument "what": "' + params.what + '"');
+        throw new TypeError('Invalid argument: "what" is not "nodes" or "edges". Current value is "' + params.what + '".');
 
       // Find all attributes keys to provide fixed row length to deal with
       // missing attributes
