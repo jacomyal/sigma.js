@@ -13,12 +13,7 @@
    */
 
   if (typeof sigma === 'undefined')
-    throw 'sigma.exporters.spreadsheet: sigma is not declared';
-
-  // Utilities
-  function doThrow(str) {
-    throw 'sigma.exporters.spreadsheet: ' + str;
-  }
+    throw new Error('sigma is not declared');
 
   function download(dataUrl, extension, filename) {
     // Anchor
@@ -82,7 +77,7 @@
       params.textSeparator = params.textSeparator || '';
 
       if (params.textSeparator && params.textSeparator !== '"' && params.textSeparator !== "'")
-        doThrow('Wrong argument "textSeparator": ' + params.textSeparator);
+        throw new Error('Wrong argument "textSeparator": "' + params.textSeparator + '"');
 
       var rows = [],
           index = {},
@@ -93,7 +88,7 @@
           o;
 
       if (!params.what)
-        doThrow('Missing argument "what".');
+        throw new Error('Missing argument "what".');
 
       if (params.what === 'nodes') {
         if (params.which)
@@ -108,7 +103,7 @@
           data = this.graph.edges();
       }
       else
-        doThrow('Wrong argument "what": ' + params.what);
+        throw new Error('Wrong argument "what": "' + params.what + '"');
 
       // Find all attributes keys to provide fixed row length to deal with
       // missing attributes
