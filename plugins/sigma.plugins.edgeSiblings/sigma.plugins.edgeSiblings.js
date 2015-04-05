@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -56,16 +56,16 @@
       if (Object.keys(edges).length === 1) {
         e = this.edges(Object.keys(edges)[0]);
         if (e.type !== 'parallel')
-          throw 'The sibling container must be of type "parallel".';
+          throw new Error('The sibling container must be of type "parallel".');
 
         if (e.siblings === undefined)
-          throw 'The sibling container has no "siblings" key.';
+          throw new Error('The sibling container has no "siblings" key.');
 
         if (Object.keys(e.siblings).length < 2)
-          throw 'The sibling container must have more than one sibling.';
+          throw new Error('The sibling container must have more than one sibling.');
 
         if (e.siblings[id] === undefined)
-          throw 'Sibling container found but the edge sibling is missing.'
+          throw new Error('Sibling container found but the edge sibling is missing.');
 
         return e;
       }
@@ -83,13 +83,13 @@
               }
             }
             else
-              throw 'Edge sibling found but its container is missing.';
+              throw new Error('Edge sibling found but its container is missing.');
           }
         };
-        throw 'Edge sibling found but its container is missing.';
+        throw new Error('Edge sibling found but its container is missing.');
       }
       else // Object.keys(edges).length == 0
-        throw 'Edge sibling found but its container is missing.';
+        throw new Error('Edge sibling found but its container is missing.');
     }
     else
       return this.edgesIndex[id];
@@ -105,39 +105,39 @@
    * the same order. If some edges are siblings, their containers are returned
    * instead.
    *
-   * @param  {?(string|array)} v Eventually one id, an array of ids.
-   * @return {object|array}      The related edge or array of edges.
+   * @param  {?(number|string|array)} v Eventually one id, an array of ids.
+   * @return {object|array}             The related edge or array of edges.
    */
   function get(v) {
     // Clone the array of edges and return it:
     if (!arguments.length || v === undefined)
       return this.edgesArray.slice(0);
 
+    if (arguments.length > 1)
+      throw new Error('Too many arguments. Use an array instead.');
+
     // Return the related edge or edge container:
-    if (arguments.length === 1 && typeof v === 'string') {
+    if (typeof v === 'number' || typeof v === 'string') {
       return find.call(this, v);
     }
 
     // Return an array of the related edge or edge container:
-    if (
-      arguments.length === 1 &&
-      Object.prototype.toString.call(v) === '[object Array]'
-    ) {
+    if (Array.isArray(v)) {
       var i,
           l,
           a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string') {
+        if (typeof v[i] === 'number' || typeof v[i] === 'string') {
           a.push(find.call(this, v[i]));
         }
         else
-          throw 'Wrong arguments.';
+          throw new Error('Invalid argument: an edge id is not a string or a number. Current value is ' + v[i] + '".');
 
       return a;
     }
 
-    throw 'Wrong arguments.';
+    throw new Error('Invalid argument: it is not a string or an array.');
   };
 
   /**
@@ -240,23 +240,26 @@
   if (!sigma.classes.graph.hasMethod('addEdgeSibling'))
     sigma.classes.graph.addMethod('addEdgeSibling', function(edge) {
       // Check that the edge is an object and has an id:
-      if (Object(edge) !== edge || arguments.length !== 1)
-        throw 'addEdgeSibling: Wrong arguments.';
+      if (arguments.length == 0)
+        throw new TypeError('Missing argument.');
 
-      if (typeof edge.id !== 'string')
-        throw 'The edge must have a string id.';
+      if (Object(edge) !== edge)
+        throw new TypeError('Invalid argument: it is not an object.');
 
-      if (typeof edge.source !== 'string' || !this.nodesIndex[edge.source])
-        throw 'The edge source must have an existing node id.';
+      if (typeof edge.id !== 'number' && typeof edge.id !== 'string')
+        throw new TypeError('Invalid argument key: id is not a string or a number.');
 
-      if (typeof edge.target !== 'string' || !this.nodesIndex[edge.target])
-        throw 'The edge target must have an existing node id.';
+      if ((typeof edge.source !== 'number' && typeof edge.source !== 'string') || !this.nodesIndex[edge.source])
+        throw new Error('Invalid argument key: source is not an existing node id.');
+
+      if ((typeof edge.target !== 'number' && typeof edge.target !== 'string') || !this.nodesIndex[edge.target])
+        throw new Error('Invalid argument key: target is not an existing node id.');
 
       if (this.edgesIndex[edge.id])
-        throw 'The edge "' + edge.id + '" already exists.';
+        throw new Error('Invalid argument: an edge of id "' + edge.id + '" already exists.');
 
       if (this.siblingEdgesIndex[edge.id])
-        throw 'The edge sibling "' + edge.id + '" already exists.';
+        throw new Error('Invalid argument: an edge sibling of id "' + edge.id + '" already exists.');
 
       var edges = this.allNeighborsIndex[edge.source][edge.target];
       if (edges !== undefined && Object.keys(edges).length) {
@@ -287,14 +290,17 @@
    * If parallel edges exist, i.e. multiple edges may contain the sibling, it
    * will drop the first sibling found in a parallel edge.
    *
-   * @param  {string} id The edge id.
-   * @return {object}    The graph instance.
+   * @param  {number|string} id The edge id.
+   * @return {object}           The graph instance.
    */
   if (!sigma.classes.graph.hasMethod('dropEdgeSibling'))
     sigma.classes.graph.addMethod('dropEdgeSibling', function(id) {
       // Check that the arguments are valid:
-      if (typeof id !== 'string' || arguments.length !== 1)
-        throw 'dropEdgeSibling: Wrong arguments.';
+      if (arguments.length == 0)
+        throw new TypeError('Missing argument.');
+
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: it is not a string or a number.');
 
       if (this.siblingEdgesIndex[id]) {
         var container = find.call(this, id);
