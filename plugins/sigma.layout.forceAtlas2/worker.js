@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.layouts');
@@ -133,51 +133,51 @@
 
       // DEBUG: safeguards
       if ((i % W.ppn) !== 0)
-        throw 'np: non correct (' + i + ').';
+        throw new Error('Invalid argument in np: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'np: non int.';
+        throw new TypeError('Invalid argument in np: "i" is not an integer.');
 
       if (p in nodeProperties)
         return i + nodeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant node property given (' + p + ').';
+        throw new Error('ForceAtlas2.Worker - ' +
+              'Inexistant node property given (' + p + ').');
     }
 
     function ep(i, p) {
 
       // DEBUG: safeguards
       if ((i % W.ppe) !== 0)
-        throw 'ep: non correct (' + i + ').';
+        throw new Error('Invalid argument in ep: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'ep: non int.';
+        throw new TypeError('Invalid argument in ep: "i" is not an integer.');
 
       if (p in edgeProperties)
         return i + edgeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant edge property given (' + p + ').';
+        throw new Error('ForceAtlas2.Worker - ' +
+              'Inexistant edge property given (' + p + ').');
     }
 
     function rp(i, p) {
 
       // DEBUG: safeguards
       if ((i % W.ppr) !== 0)
-        throw 'rp: non correct (' + i + ').';
+        throw new Error('Invalid argument in rp: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'rp: non int.';
+        throw new TypeError('Invalid argument in rp: "i" is not an integer.');
 
       if (p in regionProperties)
         return i + regionProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant region property given (' + p + ').';
+        throw new Error('ForceAtlas2.Worker - ' +
+              'Inexistant region property given (' + p + ').');
     }
 
     // DEBUG
     function nan(v) {
       if (isNaN(v))
-        throw 'NaN alert!';
+        throw new TypeError('NaN alert!');
     }
 
 
@@ -1170,7 +1170,7 @@
   else {
     // We are requesting the worker from sigma, we retrieve it therefore
     if (typeof sigma === 'undefined')
-      throw 'sigma is not declared';
+      throw new Error('sigma is not declared');
 
     sigma.layouts.getForceAtlas2Worker = getWorkerFn;
   }
