@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -175,7 +175,7 @@
    * This method will set one or several nodes as 'active', depending on how it
    * is called.
    *
-   * To activate allnodes, call it without argument.
+   * To activate all nodes, call it without argument.
    * To activate a specific node, call it with the id of the node. To activate
    * multiple nodes, call it with an array of ids.
    *
@@ -196,39 +196,35 @@
       });
     }
 
+    if (arguments.length > 1) {
+      throw new TypeError('Too many arguments. Use an array instead.');
+    }
+
     // Activate one node:
     else if (typeof v === 'string' || typeof v === 'number') {
-      if (arguments.length === 1) {
-        n = _g.nodes(v);
-        if (!n.hidden) {
-          n.active = true;
-          _activeNodesIndex[v] = n;
-        }
+      n = _g.nodes(v);
+      if (!n.hidden) {
+        n.active = true;
+        _activeNodesIndex[v] = n;
       }
-      else
-        throw 'activateState.addNodes: Wrong arguments.';
     }
 
     // Activate a set of nodes:
-    else if (Object.prototype.toString.call(v) === '[object Array]') {
+    else if (Array.isArray(v)) {
       var i,
           l,
           a = [];
 
-      if (arguments.length === 1) {
-        for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
-            n = _g.nodes(v[i]);
-            if (!n.hidden) {
-              n.active = true;
-              _activeNodesIndex[v[i]] = n;
-            }
+      for (i = 0, l = v.length; i < l; i++)
+        if (typeof v[i] === 'string' || typeof v[i] === 'number') {
+          n = _g.nodes(v[i]);
+          if (!n.hidden) {
+            n.active = true;
+            _activeNodesIndex[v[i]] = n;
           }
-          else
-            throw 'activateState.addNodes: Wrong arguments.';
-      }
-      else
-        throw 'activateState.addNodes: Wrong arguments.';
+        }
+        else
+          throw new TypeError('Invalid argument: a node id is not a string or a number.');
     }
 
     _activeNodesCount = Object.keys(_activeNodesIndex).length;
@@ -265,39 +261,35 @@
       });
     }
 
+    if (arguments.length > 1) {
+      throw new TypeError('Too many arguments. Use an array instead.');
+    }
+
     // Activate one edge:
     else if (typeof v === 'string' || typeof v === 'number') {
-      if (arguments.length === 1) {
-        e = _g.edges(v);
-        if (!e.hidden) {
-          e.active = true;
-          _activeEdgesIndex[v] = e;
-        }
+      e = _g.edges(v);
+      if (!e.hidden) {
+        e.active = true;
+        _activeEdgesIndex[v] = e;
       }
-      else
-        throw 'activateState.addEdges: Wrong arguments.';
     }
 
     // Activate a set of edges:
-    else if (Object.prototype.toString.call(v) === '[object Array]') {
+    else if (Array.isArray(v)) {
       var i,
           l,
           a = [];
 
-      if (arguments.length === 1) {
-        for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
-            e = _g.edges(v[i]);
-            if (!e.hidden) {
-              e.active = true;
-              _activeEdgesIndex[v[i]] = e;
-            }
+      for (i = 0, l = v.length; i < l; i++)
+        if (typeof v[i] === 'string' || typeof v[i] === 'number') {
+          e = _g.edges(v[i]);
+          if (!e.hidden) {
+            e.active = true;
+            _activeEdgesIndex[v[i]] = e;
           }
-          else
-            throw 'activateState.addEdges: Wrong arguments.';
-      }
-      else
-        throw 'activateState.addEdges: Wrong arguments.';
+        }
+        else
+          throw new TypeError('Invalid argument: an edge id is not a string or a number.');
     }
 
     _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
@@ -331,32 +323,28 @@
       });
     }
 
+    if (arguments.length > 1) {
+      throw new TypeError('Too many arguments. Use an array instead.');
+    }
+
     // Deactivate one node:
     else if (typeof v === 'string' || typeof v === 'number') {
-      if (arguments.length === 1) {
-        _g.nodes(v).active = false;
-        delete _activeNodesIndex[v];
-      }
-      else
-        throw 'activateState.dropNodes: Wrong arguments.';
+      _g.nodes(v).active = false;
+      delete _activeNodesIndex[v];
     }
 
     // Deactivate a set of nodes:
-    else if (Object.prototype.toString.call(v) === '[object Array]') {
+    else if (Array.isArray(v)) {
       var i,
           l;
 
-      if (arguments.length === 1) {
-        for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
-            _g.nodes(v[i]).active = false;
-            delete _activeNodesIndex[v[i]];
-          }
-          else
-            throw 'activateState.dropNodes: Wrong arguments.';
-      }
-      else
-        throw 'activateState.dropNodes: Wrong arguments.';
+      for (i = 0, l = v.length; i < l; i++)
+        if (typeof v[i] === 'string' || typeof v[i] === 'number') {
+          _g.nodes(v[i]).active = false;
+          delete _activeNodesIndex[v[i]];
+        }
+        else
+          throw new TypeError('Invalid argument: a node id is not a string or a number.');
     }
 
     _activeNodesCount = Object.keys(_activeNodesIndex).length;
@@ -390,32 +378,28 @@
       });
     }
 
+    if (arguments.length > 1) {
+      throw new TypeError('Too many arguments. Use an array instead.');
+    }
+
     // Deactivate one edge:
     else if (typeof v === 'string' || typeof v === 'number') {
-      if (arguments.length === 1) {
-        _g.edges(v).active = false;
-        delete _activeEdgesIndex[v];
-      }
-      else
-        throw 'activateState.dropEdges: Wrong arguments.';
+      _g.edges(v).active = false;
+      delete _activeEdgesIndex[v];
     }
 
     // Deactivate a set of edges:
-    else if (Object.prototype.toString.call(v) === '[object Array]') {
+    else if (Array.isArray(v)) {
       var i,
           l;
 
-      if (arguments.length === 1) {
-        for (i = 0, l = v.length; i < l; i++)
-          if (typeof v[i] === 'string' || typeof v[i] === 'number') {
-            _g.edges(v[i]).active = false;
-            delete _activeEdgesIndex[v[i]];
-          }
-          else
-            throw 'activateState.dropEdges: Wrong arguments.';
-      }
-      else
-        throw 'activateState.dropEdges: Wrong arguments.';
+      for (i = 0, l = v.length; i < l; i++)
+        if (typeof v[i] === 'string' || typeof v[i] === 'number') {
+          _g.edges(v[i]).active = false;
+          delete _activeEdgesIndex[v[i]];
+        }
+        else
+          throw new TypeError('Invalid argument: an edge id is not a string or a number.');
     }
 
     _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
@@ -434,7 +418,7 @@
    */
   ActiveState.prototype.addNeighbors = function() {
     if (!('adjacentNodes' in _g))
-      throw 'Missing method graph.adjacentNodes';
+      throw new Error('Missing method graph.adjacentNodes');
 
     var a,
         id;
