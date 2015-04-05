@@ -13,15 +13,10 @@
    */
 
   if (typeof sigma === 'undefined')
-    throw 'sigma.exporters.xlsx: sigma is not declared';
+    throw new Error('sigma is not declared');
 
   if (typeof XLSX === 'undefined')
-    throw 'sigma.exporters.xlsx: XLSX is not declared';
-
-  // Utilities
-  function doThrow(str) {
-    throw 'sigma.exporters.xlsx: ' + str;
-  }
+    throw new Error('XLSX is not declared');
 
   function download(dataUrl, extension, filename) {
     // Anchor
@@ -210,7 +205,7 @@
           wsEdges = sheet(toArray(data, params));
         }
         else
-          doThrow('Wrong argument "what": ' + params.what);
+          throw new Error('Wrong argument "what": "' + params.what + '"');
       }
 
       /* add worksheets to workbook */
