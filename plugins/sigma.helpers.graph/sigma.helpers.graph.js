@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   var _fixedNodesIndex = Object.create(null);
 
@@ -118,10 +118,10 @@
           if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropNode(v[i]);
           else
-            throw 'dropNodes: Wrong arguments.';
+            throw new TypeError('Wrong arguments.');
       }
       else
-        throw 'dropNodes: Wrong arguments.';
+        throw new TypeError('Wrong arguments.');
 
       return this;
     });
@@ -146,10 +146,10 @@
           if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropEdge(v[i]);
           else
-            throw 'dropEdges: Wrong arguments.';
+            throw new TypeError('Wrong arguments.');
       }
       else
-        throw 'dropEdges: Wrong arguments.';
+        throw new TypeError('Wrong arguments.');
 
       return this;
     });
@@ -163,7 +163,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
       if (typeof id !== 'string' && typeof id !== 'number')
-        throw 'adjacentNodes: the node id must be a string or a number.';
+        throw new TypeError('The node id must be a string or a number.');
 
       var target,
           nodes = [];
@@ -182,7 +182,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
       if (typeof id !== 'string' && typeof id !== 'number')
-        throw 'adjacentEdges: the node id must be a string or a number.';
+        throw new TypeError('The node id must be a string or a number.');
 
       var a = this.allNeighborsIndex[id],
           eid,
