@@ -205,7 +205,7 @@
           wsEdges = sheet(toArray(data, params));
         }
         else
-          throw new Error('Wrong argument "what": "' + params.what + '"');
+          throw new TypeError('Invalid argument: "what" is not "nodes" or "edges". Current value is "' + params.what + '".');
       }
 
       /* add worksheets to workbook */
