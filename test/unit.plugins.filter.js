@@ -413,7 +413,7 @@ test('API', function() {
     function() {
       filter.nodesBy(function() {}, true);
     },
-    new TypeError('Invalid argument: "key" is not a number or a string. Current value is "true".'),
+    new TypeError('Invalid argument: "key" is not a number or a string, was true'),
     '"nodesBy" with a wrong key type throws an error.'
   );
 
@@ -421,7 +421,7 @@ test('API', function() {
     function() {
       filter.nodesBy(function() {}, {}, true);
     },
-    new TypeError('Invalid argument: "key" is not a number or a string. Current value is "true".'),
+    new TypeError('Invalid argument: "key" is not a number or a string, was true'),
     '"nodesBy" with options and a wrong key type throws an error.'
   );
 
@@ -429,7 +429,7 @@ test('API', function() {
     function() {
       filter.edgesBy(function() {}, '');
     },
-    new TypeError('Invalid argument: "key" is not a non-empty string.'),
+    new TypeError('Invalid argument: "key" is an empty string.'),
     '"edgesBy" with a wrong key type throws an error.'
   );
 
@@ -437,7 +437,7 @@ test('API', function() {
     function() {
       filter.edgesBy(function() {}, {}, '');
     },
-    new TypeError('Invalid argument: "key" is not a non-empty string.'),
+    new TypeError('Invalid argument: "key" is an empty string.'),
     '"edgesBy" with options and a wrong key type throws an error.'
   );
 
@@ -445,7 +445,7 @@ test('API', function() {
     function() {
       filter.neighborsOf('');
     },
-    new TypeError('Invalid argument: id is not a non-empty string.'),
+    new TypeError('Invalid argument: id is an empty string.'),
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
