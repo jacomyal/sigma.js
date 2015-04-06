@@ -16,7 +16,7 @@
 
   // Terminating if sigma were not to be found
   if (typeof sigma === 'undefined')
-    throw 'sigma.statistics.louvain: sigma not in scope.';
+    throw new Error('sigma not in scope.');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -151,7 +151,7 @@
             status.nodes_to_com[node] = i;
             var deg = get_degree_for_node(graph, node);
             if (deg < 0)
-                throw 'Bad graph type, use positive weights!';
+                throw new Error('A node has a negative weight.');
 
             status.degrees[i] = deg;
             status.gdegrees[node] = deg;
@@ -173,7 +173,7 @@
             neighbours.forEach(function (neighbour, i) {
               var weight = graph._assoc_mat[node][neighbour];
               if (weight <= 0) {
-                  throw "Bad graph type, use positive weights";
+                  throw new Error('A node has a negative weight.');
               }
 
               if (part[neighbour] == com) {
@@ -419,7 +419,7 @@
      */
     core.getPartitions = function(level) {
       if (level !== undefined && (level < 1 || level > dendogram.length - 1))
-        throw 'sigma.statistics.louvain: wrong level';
+        throw new RangeError('Invalid argument: "level" is not between 1 and ' + dendogram.length - 1 + ' included.');
 
       return partition_at_level(dendogram, level || dendogram.length - 1);
     };
