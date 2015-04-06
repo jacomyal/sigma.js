@@ -20,7 +20,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: id is not a string or a number.');
+        throw new TypeError('Invalid argument: "id" is not a string or a number, was ' + id);
 
       var target,
           nodes = [];
@@ -39,7 +39,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: id is not a string or a number.');
+        throw new TypeError('Invalid argument: "id" is not a string or a number, was ' + id);
 
       var a = this.allNeighborsIndex[id],
           eid,
@@ -235,13 +235,13 @@
       }
 
       if (key !== undefined && typeof key !== 'number' && typeof key !== 'string')
-        throw new TypeError('Invalid argument: "key" is not a number or a string. Current value is "' + key + '".');
+        throw new TypeError('Invalid argument: "key" is not a number or a string, was ' + key);
 
       if (key !== undefined && typeof key === 'string' && !key.length)
-        throw new TypeError('Invalid argument: "key" is not a non-empty string.');
+        throw new TypeError('Invalid argument: "key" is an empty string.');
 
       if (typeof processor !== 'string')
-        throw new TypeError('Invalid argument: "processor" is not a string.');
+        throw new TypeError('Invalid argument: "processor" is not a string, was ' + processor);
 
       if ('undo' === key)
         throw new Error('Invalid argument: "key" has value "undo", which is a reserved keyword.');
@@ -358,9 +358,9 @@
      */
     this.neighborsOf = function(id, params, key) {
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: id is not a string or a number. Current value is "' + id + '".');
+        throw new TypeError('Invalid argument: id is not a string or a number, was ' + id);
       if (typeof id === 'string' && !id.length)
-        throw new TypeError('Invalid argument: id is not a non-empty string.');
+        throw new TypeError('Invalid argument: id is an empty string.');
 
       // Wrap the predicate to be applied on the graph and add it to the chain.
       register('neighbors', id, params, key);
@@ -533,7 +533,7 @@
         throw new TypeError('Missing argument.');
 
       if (!Array.isArray(chain))
-        throw new TypeError('Invalid argument: "chain" is not an array.');
+        throw new TypeError('Invalid argument: "chain" is not an array, was ' + chain);
 
       this.clear();
       var copy = cloneChain(chain);
@@ -546,7 +546,7 @@
           throw new TypeError('Missing filter key: "processor".');
 
         if (copy[i].key != undefined && typeof copy[i].key !== 'string')
-          throw new TypeError('Invalid filter key: "key" is not a string. Current value is "' + copy[i].key.toString() + '".');
+          throw new TypeError('Invalid filter key: "key" is not a string, was ' + copy[i].key.toString());
 
         if (typeof copy[i].predicate === 'string')
           eval(" copy[i].predicate = " +  copy[i].predicate);
