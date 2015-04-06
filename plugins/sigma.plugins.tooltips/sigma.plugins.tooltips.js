@@ -8,7 +8,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
@@ -333,14 +333,14 @@
     if (options.stage) {
       if (options.stage.renderer !== undefined &&
           typeof options.stage.renderer !== 'function')
-        throw 'The render of the stage tooltip must be a function.';
+        throw new TypeError('"options.stage.renderer" is not a function.');
 
       if (options.stage.position !== undefined) {
         if (options.stage.position !== 'top' &&
             options.stage.position !== 'bottom' &&
             options.stage.position !== 'left' &&
             options.stage.position !== 'right') {
-          throw 'The value of options.position must be either: top, bottom, left, right.';
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
@@ -387,14 +387,14 @@
     if (options.node) {
       if (options.node.renderer !== undefined &&
           typeof options.node.renderer !== 'function')
-        throw 'The render of the node tooltip must be a function.';
+        throw new TypeError('"options.node.renderer" is not a function.');
 
       if (options.node.position !== undefined) {
         if (options.node.position !== 'top' &&
             options.node.position !== 'bottom' &&
             options.node.position !== 'left' &&
             options.node.position !== 'right') {
-          throw 'The value of options.position must be either: top, bottom, left, right.';
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
@@ -442,14 +442,14 @@
     if (options.edge) {
       if (options.edge.renderer !== undefined &&
           typeof options.edge.renderer !== 'function')
-        throw 'The render of the edge tooltip must be a function.';
+        throw new TypeError('"options.edge.renderer" is not a function.');
 
       if (options.edge.position !== undefined) {
         if (options.edge.position !== 'top' &&
             options.edge.position !== 'bottom' &&
             options.edge.position !== 'left' &&
             options.edge.position !== 'right') {
-          throw 'The value of options.position must be either: top, bottom, left, right.';
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
