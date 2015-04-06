@@ -37,7 +37,7 @@
    *                                   function.
    *
    * @param  {camera}  camera  The camera to animate.
-   * @param  {object}  target  The coordinates to reach.
+   * @param  {object}  val     The coordinates to reach.
    * @param  {?object} options Eventually an object to specify some options to
    *                           the function. The available options are
    *                           presented in the description of the function.
@@ -45,20 +45,30 @@
    *                           through the method "sigma.misc.animation.kill".
    */
   sigma.misc.animation.camera = function(camera, val, options) {
-    if (
-      !(camera instanceof sigma.classes.camera) ||
-      typeof val !== 'object' ||
-      !val
-    )
-      throw 'animation.camera: Wrong arguments.';
+    if (!(camera instanceof sigma.classes.camera))
+      throw new TypeError(
+        'Invalid argument: "camera" is not a sigma.classes.camera, was ' +
+        camera);
 
-    if (
-      typeof val.x !== 'number' &&
-      typeof val.y !== 'number' &&
-      typeof val.ratio !== 'number' &&
-      typeof val.angle !== 'number'
-    )
-      throw 'There must be at least one valid coordinate in the given val.';
+    if (typeof val !== 'object' || !val)
+      throw new TypeError('Invalid argument: "val" is not an object, was ' +
+        val);
+
+    if (typeof val.x !== 'number')
+      throw new TypeError('Invalid argument key: "val.x" is not a number, ' +
+        'was ' + val.x);
+
+    if (typeof val.y !== 'number')
+      throw new TypeError('Invalid argument key: "val.y" is not a number, ' +
+        'was ' + val.y);
+
+    if (typeof val.ratio !== 'number')
+      throw new TypeError(
+        'Invalid argument key: "val.ratio" is not a number, was ' + val.ratio);
+
+    if (typeof val.angle !== 'number')
+      throw new TypeError(
+        'Invalid argument key: "val.angle" is not a number, was ' + val.angle);
 
     var fn,
         id,
@@ -150,8 +160,11 @@
    * @return {object}     Returns the sigma.misc.animation package.
    */
   sigma.misc.animation.kill = function(id) {
-    if (arguments.length !== 1 || typeof id !== 'number')
-      throw 'animation.kill: Wrong arguments.';
+    if (arguments.length !== 1)
+      throw new Error('Wrong number of arguments.');
+
+    if (typeof id !== 'number')
+      throw new TypeError('Invalid argument: "id" is not a number, was ' + id);
 
     var o = sigma.misc.animation.running[id];
 

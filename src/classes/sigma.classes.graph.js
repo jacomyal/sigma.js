@@ -171,15 +171,20 @@
    * @return {object}              The global graph constructor.
    */
   graph.addMethod = function(methodName, fn) {
-    if (
-      typeof methodName !== 'string' ||
-      typeof fn !== 'function' ||
-      arguments.length !== 2
-    )
-      throw 'addMethod: Wrong arguments.';
+    if (arguments.length !== 2)
+      throw new Error('Wrong number of arguments.');
+
+    if (typeof methodName !== 'string')
+      throw new TypeError('Invalid argument: "methodName" is not a string, ' +
+        'was ' + methodName);
+
+    if (typeof fn !== 'function')
+      throw new TypeError('Invalid argument: "fn" is not a function, was ' +
+        fn);
 
     if (_methods[methodName] || graph[methodName])
-      throw 'The method "' + methodName + '" already exists.';
+      throw new Error('Invalid argument: the method "' + methodName +
+        '" already exists.');
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
@@ -249,14 +254,18 @@
    * @return {object}              The global graph constructor.
    */
   graph.attach = function(methodName, key, fn, before) {
-    if (
-      typeof methodName !== 'string' ||
-      typeof key !== 'string' ||
-      typeof fn !== 'function' ||
-      arguments.length < 3 ||
-      arguments.length > 4
-    )
-      throw 'attach: Wrong arguments.';
+    if (arguments.length < 3 || arguments.length > 4)
+      throw new Error('Wrong number of arguments.');
+
+    if (typeof methodName !== 'string')
+      throw new Error('Invalid argument: "methodName" is not a string, was ' +
+        methodName);
+
+    if (typeof key !== 'string')
+      throw new Error('Invalid argument: "key" is not a string, was ' + key);
+
+    if (typeof fn !== 'function')
+      throw new Error('Invalid argument: "fn" is not a function, was ' + fn);
 
     var bindings;
 
@@ -265,21 +274,23 @@
     else {
       if (before) {
         if (!_methodBeforeBindings[methodName])
-        throw 'The method "' + methodName + '" does not exist.';
+        throw new Error('Invalid argument: the method "' + methodName +
+          '" does not exist.');
 
         bindings = _methodBeforeBindings[methodName];
       }
       else {
         if (!_methodBindings[methodName])
-          throw 'The method "' + methodName + '" does not exist.';
+          throw new Error('Invalid argument: the method "' + methodName +
+            '" does not exist.');
 
         bindings = _methodBindings[methodName];
       }
     }
 
     if (bindings[key])
-      throw 'A function "' + key + '" is already attached ' +
-            'to the method "' + methodName + '".';
+      throw new Error('Invalid argument: a function "' + key + '" is already' +
+        ' attached to the method "' + methodName + '".');
 
     bindings[key] = fn;
 
@@ -329,15 +340,20 @@
    * @return {object}          The global graph constructor.
    */
   graph.addIndex = function(name, bindings) {
-    if (
-      typeof name !== 'string' ||
-      Object(bindings) !== bindings ||
-      arguments.length !== 2
-    )
-      throw 'addIndex: Wrong arguments.';
+    if (arguments.length !== 2)
+      throw new Error('Wrong number of arguments.');
+
+    if (typeof name !== 'string')
+      throw new TypeError('Invalid argument: "name" is not a string, was ' +
+        name);
+
+    if (Object(bindings) !== bindings)
+      throw new TypeError('Invalid argument: "bindings" is not an object, ' +
+        'was ' + bindings);
 
     if (_indexes[name])
-      throw 'The index "' + name + '" already exists.';
+      throw new Error(
+        'Invalid argument: the index "' + name + '" already exists.');
 
     var k;
 
@@ -346,8 +362,10 @@
 
     // Attach the bindings:
     for (k in bindings)
-      if (typeof bindings[k] !== 'function')
-        throw 'The bindings must be functions.';
+      if (typeof bindings[k] !== 'function') {
+        throw new TypeError('Invalid argument key: "bindings[' + k + ']" ' +
+         'is not a function, was ' + bindings[k]);
+      }
       else
         graph.attach(k, name, bindings[k]);
 
@@ -371,14 +389,22 @@
    */
   graph.addMethod('addNode', function(node) {
     // Check that the node is an object and has an id:
-    if (Object(node) !== node || arguments.length !== 1)
-      throw 'addNode: Wrong arguments.';
+    if (arguments.length !== 1)
+      throw new Error('Wrong number of arguments.');
+
+    // Check that the node is an object and has an id:
+    if (Object(node) !== node)
+      throw new TypeError('Invalid argument: "node" is not an object. was ' +
+        node);
 
     if (typeof node.id !== 'string' && typeof node.id !== 'number')
-      throw 'The node must have a string or number id.';
+      throw new TypeError(
+        'Invalid argument: "node.id" is not a string or a number, was ' +
+        node.id);
 
     if (this.nodesIndex[node.id])
-      throw 'The node "' + node.id + '" already exists.';
+      throw new Error(
+        'Invalid argument: the node of id "' + node.id + '" already exists.');
 
     var k,
         id = node.id,
@@ -433,23 +459,42 @@
    * @return {object}      The graph instance.
    */
   graph.addMethod('addEdge', function(edge) {
+    if (arguments.length !== 1)
+      throw new Error('Wrong number of arguments.');
+
     // Check that the edge is an object and has an id:
-    if (Object(edge) !== edge || arguments.length !== 1)
-      throw 'addEdge: Wrong arguments.';
+    if (Object(edge) !== edge)
+      throw new TypeError('Invalid argument: "edge" is not an object, ' +
+        'was ' + edge);
 
     if (typeof edge.id !== 'string' && typeof edge.id !== 'number')
-      throw 'The edge must have a string or number id.';
+      throw new TypeError(
+        'Invalid argument: "edge.id" is not a string or a number, was ' +
+        edge.id);
 
-    if ((typeof edge.source !== 'string' && typeof edge.source !== 'number') ||
-        !this.nodesIndex[edge.source])
-      throw 'The edge source must have an existing node id.';
+    if (typeof edge.source !== 'string' && typeof edge.source !== 'number')
+      throw new TypeError(
+        'Invalid argument: "edge.source" is not a string or a number, was ' +
+        edge.source);
 
-    if ((typeof edge.target !== 'string' && typeof edge.target !== 'number') ||
-        !this.nodesIndex[edge.target])
-      throw 'The edge target must have an existing node id.';
+    if (typeof edge.target !== 'string' && typeof edge.target !== 'number')
+      throw new TypeError(
+        'Invalid argument: "edge.target" is not a string or a number, was ' +
+        edge.target);
+
+    if (!this.nodesIndex[edge.source])
+      throw new Error(
+        'Invalid argument: "edge.source" is not an existing node id, was ' +
+        edge.source);
+
+    if (!this.nodesIndex[edge.target])
+      throw new Error(
+        'Invalid argument: "edge.target" is not an existing node id, was ' +
+        edge.target);
 
     if (this.edgesIndex[edge.id])
-      throw 'The edge "' + edge.id + '" already exists.';
+      throw new Error(
+        'Invalid argument: the edge of id "' + edge.id + '" already exists.');
 
     var k,
         validEdge = Object.create(null);
@@ -532,13 +577,17 @@
    * @return {object}    The graph instance.
    */
   graph.addMethod('dropNode', function(id) {
+    if (arguments.length !== 1)
+      throw new Error('Wrong number of arguments.');
+
     // Check that the arguments are valid:
-    if ((typeof id !== 'string' && typeof id !== 'number') ||
-        arguments.length !== 1)
-      throw 'dropNode: Wrong arguments.';
+    if ((typeof id !== 'string' && typeof id !== 'number'))
+      throw new TypeError(
+        'Invalid argument: "id" is not a string or a number, was ' + id);
 
     if (!this.nodesIndex[id])
-      throw 'The node "' + id + '" does not exist.';
+      throw new Error('Invalid argument: the node "' + id +
+        '" does not exist.');
 
     var i, k, l;
 
@@ -581,13 +630,17 @@
    * @return {object}    The graph instance.
    */
   graph.addMethod('dropEdge', function(id) {
+    if (arguments.length !== 1)
+      throw new Error('Wrong number of arguments.');
+
     // Check that the arguments are valid:
-    if ((typeof id !== 'string' && typeof id !== 'number') ||
-        arguments.length !== 1)
-      throw 'dropEdge: Wrong arguments.';
+    if ((typeof id !== 'string' && typeof id !== 'number'))
+      throw new TypeError(
+        'Invalid argument: "id" is not a string or a number, was ' + id);
 
     if (!this.edgesIndex[id])
-      throw 'The edge "' + id + '" does not exist.';
+      throw new Error('Invalid argument: the edge "' + id +
+        '" does not exist.');
 
     var i, l, edge;
 
@@ -735,16 +788,15 @@
     if (!arguments.length)
       return this.nodesArray.slice(0);
 
+    if (arguments.length > 1)
+      throw new Error('Too many arguments. Use an array instead.');
+
     // Return the related node:
-    if (arguments.length === 1 &&
-        (typeof v === 'string' || typeof v === 'number'))
+    if (typeof v === 'string' || typeof v === 'number')
       return this.nodesIndex[v];
 
     // Return an array of the related node:
-    if (
-      arguments.length === 1 &&
-      Object.prototype.toString.call(v) === '[object Array]'
-    ) {
+    if (Object.prototype.toString.call(v) === '[object Array]') {
       var i,
           l,
           a = [];
@@ -753,12 +805,14 @@
         if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(this.nodesIndex[v[i]]);
         else
-          throw 'nodes: Wrong arguments.';
+          throw new TypeError('Invalid argument key: "v[' + i + ']" ' +
+            'is not a string or a number, was ' + v[i]);
 
       return a;
     }
 
-    throw 'nodes: Wrong arguments.';
+    throw new TypeError('Invalid argument: "v" is not a string, a number, ' +
+      'or an array, was ' + v);
   });
 
   /**
@@ -792,12 +846,14 @@
         if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(which[v[i]]);
         else
-          throw 'degree: Wrong arguments.';
+          throw new TypeError('Invalid argument: "v[' + i + ']" ' +
+            'is not a string or a number, was ' + v[i]);
 
       return a;
     }
 
-    throw 'degree: Wrong arguments.';
+    throw new Error('Invalid argument: "v" is not a string, a number, ' +
+      'or an array, was ' + v);
   });
 
   /**
@@ -834,12 +890,14 @@
         if (typeof v[i] === 'string' || typeof v[i] === 'number')
           a.push(this.edgesIndex[v[i]]);
         else
-          throw 'edges: Wrong arguments.';
+          throw new TypeError('Invalid argument: "v[' + i + ']" ' +
+            'is not a string or a number, was ' + v[i]);
 
       return a;
     }
 
-    throw 'edges: Wrong arguments.';
+    throw new TypeError('Invalid argument: "v" is not a string, a number, ' +
+      'or an array, was ' + v);
   });
 
 

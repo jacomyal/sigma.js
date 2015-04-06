@@ -37,7 +37,7 @@ test('Basic manipulation', function() {
         x: 'abc'
       });
     },
-    /Value for "x" is not a number./,
+    new TypeError('"x" is not a number, was abc'),
     '"goTo" with a non-number value throws an error.'
   );
 
@@ -47,7 +47,7 @@ test('Basic manipulation', function() {
         x: NaN
       });
     },
-    /Value for "x" is not a number./,
+    new TypeError('"x" is not a number, was NaN'),
     '"goTo" with NaN as a value throws an error.'
   );
 });

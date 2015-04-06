@@ -70,7 +70,9 @@ test('Constructor polymorphism', function() {
 
   throws(function() {
     s = new sigma('abcd');
-  }, /Container not found./, 'Trying to instantiate sigma with a string that is not the ID of an HTMLElement will throw an error.');
+  },
+  'Container not found.',
+  'Trying to instantiate sigma with a string that is not the ID of an HTMLElement will throw an error.');
 });
 
 test('Public methods', function() {
@@ -115,11 +117,15 @@ test('Public methods', function() {
 
   throws(function() {
     s.killCamera('42');
-  }, /The camera is undefined./, 'Killing a camera that does not exist throws an error.');
+  },
+  new TypeError('Missing argument: "v".'),
+  'Killing a camera that does not exist throws an error.');
 
   throws(function() {
     s.killRenderer('42');
-  }, /The renderer is undefined./, 'Killing a renderer that does not exist throws an error.');
+  },
+  new TypeError('Missing argument: "v".'),
+  'Killing a renderer that does not exist throws an error.');
 
   s.killCamera('0');
 
@@ -134,11 +140,15 @@ test('Public methods', function() {
 
   throws(function() {
     s.addCamera('myCamera');
-  }, /The camera "myCamera" already exists./, 'Adding a camera with an already existing ID throws an error.');
+  },
+  new Error('Invalid argument: the camera of id "myCamera" already exists.'),
+  'Adding a camera with an already existing ID throws an error.');
 
   throws(function() {
     s.addRenderer({ camera: c, container: dom, id: 'myRenderer' });
-  }, /The renderer "myRenderer" already exists./, 'Adding a renderer with an already existing ID throws an error.');
+  },
+  new Error('The renderer "myRenderer" already exists.'),
+  'Adding a renderer with an already existing ID throws an error.');
 
   // And check also some crazy side cases:
   var c = s.addCamera(),
@@ -148,7 +158,9 @@ test('Public methods', function() {
 
   throws(function() {
     s.addRenderer({ camera: c, container: dom });
-  }, /The camera is not properly referenced./, 'Adding a renderer with camera that is not referenced anymore throws an error.');
+  },
+  new Error('The camera is not properly referenced.'),
+  'Adding a renderer with camera that is not referenced anymore throws an error.');
 
   // Restore previous state:
   document.body.removeChild(dom);

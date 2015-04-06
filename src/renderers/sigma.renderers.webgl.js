@@ -19,10 +19,11 @@
    */
   sigma.renderers.webgl = function(graph, camera, settings, options) {
     if (typeof options !== 'object')
-      throw 'sigma.renderers.webgl: Wrong arguments.';
+      throw new TypeError(
+        'Invalid argument: "options" is not an object, was ' + options);
 
     if (!(options.container instanceof HTMLElement))
-      throw 'Container not found.';
+      throw new Error('Container not found.');
 
     var k,
         i,

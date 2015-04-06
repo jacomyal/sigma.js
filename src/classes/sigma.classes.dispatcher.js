@@ -59,7 +59,7 @@
         });
       }
     } else
-      throw 'bind: Wrong arguments.';
+      throw new Error('Wrong arguments.');
 
     return this;
   };

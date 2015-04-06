@@ -139,7 +139,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.nodes(['n0', 'n1', {}]);
     },
-    /nodes: Wrong arguments/,
+    new TypeError('Invalid argument key: "v[2]" is not a string or a number, was [object Object]'),
     '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
@@ -147,7 +147,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.addNode(graph.nodes[0]);
     },
-    /The node "n0" already exists./,
+    new Error('Invalid argument: the node of id "n0" already exists.'),
     'Adding an already existing node throws an error.'
   );
 
@@ -248,7 +248,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.edges(['e0', {}]);
     },
-    /edges: Wrong arguments/,
+    new TypeError('Invalid argument: "v[1]" is not a string or a number, was [object Object]'),
     '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
@@ -256,7 +256,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.addEdge(graph.edges[0]);
     },
-    /The edge "e0" already exists./,
+    new Error('Invalid argument: the edge of id "e0" already exists.'),
     'Adding an already existing edge throws an error.'
   );
 
@@ -281,7 +281,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.dropNode('n0');
     },
-    /The node "n0" does not exist./,
+    new Error('Invalid argument: the node "n0" does not exist.'),
     'Droping an unexisting node throws an error.'
   );
 
@@ -303,7 +303,7 @@ test('Basic manipulation', function() {
     function() {
       myGraph.dropEdge('e1');
     },
-    /The edge "e1" does not exist./,
+    new Error('Invalid argument: the edge "e1" does not exist.'),
     'Droping an unexisting edge throws an error.'
   );
 
@@ -384,7 +384,7 @@ test('Methods and attached functions', function() {
     function() {
       sigma.classes.graph.attach('addNode', 'counterInc', function() {});
     },
-    /A function "counterInc" is already attached to the method "addNode"/,
+    new Error('Invalid argument: a function "counterInc" is already attached to the method "addNode".'),
     'Attaching a function to a method when there is already a function attached to this method under the same key throws an error.'
   );
 
@@ -392,7 +392,7 @@ test('Methods and attached functions', function() {
     function() {
       sigma.classes.graph.attach('undefinedMethod', 'counterInc', function() {});
     },
-    /The method "undefinedMethod" does not exist./,
+    new Error('Invalid argument: the method "undefinedMethod" does not exist.'),
     'Attaching a function to an unexisting method when throws an error.'
   );
 
@@ -400,7 +400,7 @@ test('Methods and attached functions', function() {
     function() {
       sigma.classes.graph.attachBefore('addNode', 'applyNodeColorPalette', function() {});
     },
-    /A function "applyNodeColorPalette" is already attached to the method "addNode"/,
+    new Error('Invalid argument: a function "applyNodeColorPalette" is already attached to the method "addNode".'),
     'Attaching a "before" function to a method when there is already a "before" function attached to this method under the same key throws an error.'
   );
 
@@ -408,7 +408,7 @@ test('Methods and attached functions', function() {
     function() {
       sigma.classes.graph.attachBefore('undefinedMethod', 'applyNodeColorPalette', function() {});
     },
-    /The method "undefinedMethod" does not exist./,
+    new Error('Invalid argument: the method "undefinedMethod" does not exist.'),
     'Attaching a "before" function to an unexisting method when throws an error.'
   );
 
@@ -416,7 +416,7 @@ test('Methods and attached functions', function() {
     function() {
       sigma.classes.graph.addMethod('getNodeLabel', function() {});
     },
-    /The method "getNodeLabel" already exists./,
+    new Error('Invalid argument: the method "getNodeLabel" already exists.'),
     'Attaching a method whose name is already referenced throws an error.'
   );
 });

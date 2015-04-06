@@ -61,7 +61,8 @@
         if (typeof c[keys[i]] === 'number' && !isNaN(c[keys[i]]))
           this[keys[i]] = c[keys[i]];
         else
-          throw 'Value for "' + keys[i] + '" is not a number.';
+          throw new TypeError('"' + keys[i] + '" is not a number, was ' +
+            c[keys[i]]);
       }
 
     this.dispatchEvent('coordinatesUpdated');

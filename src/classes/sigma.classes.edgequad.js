@@ -676,7 +676,7 @@
 
     // Enforcing presence of boundaries
     if (!params.bounds)
-      throw 'sigma.classes.edgequad.index: bounds information not given.';
+      throw new Error('Missing argument key: "params.bounds".');
 
     // Prefix
     var prefix = params.prefix || '',
