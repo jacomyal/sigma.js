@@ -56,13 +56,13 @@
       if (Object.keys(edges).length === 1) {
         e = this.edges(Object.keys(edges)[0]);
         if (e.type !== 'parallel')
-          throw new Error('The sibling container must be of type "parallel".');
+          throw new Error('The sibling container must be of type "parallel", was ' + e.type);
 
         if (e.siblings === undefined)
           throw new Error('The sibling container has no "siblings" key.');
 
         if (Object.keys(e.siblings).length < 2)
-          throw new Error('The sibling container must have more than one sibling.');
+          throw new Error('The sibling container must have more than one sibling, had ' + Object.keys(e.siblings).length);
 
         if (e.siblings[id] === undefined)
           throw new Error('Sibling container found but the edge sibling is missing.');
@@ -132,12 +132,12 @@
           a.push(find.call(this, v[i]));
         }
         else
-          throw new Error('Invalid argument: an edge id is not a string or a number. Current value is ' + v[i] + '".');
+          throw new Error('Invalid argument: an edge id is not a string or a number, was ' + v[i]);
 
       return a;
     }
 
-    throw new Error('Invalid argument: it is not a string or an array.');
+    throw new Error('Invalid argument: "v" is not a string or an array, was ' + v);
   };
 
   /**
@@ -244,16 +244,16 @@
         throw new TypeError('Missing argument.');
 
       if (Object(edge) !== edge)
-        throw new TypeError('Invalid argument: it is not an object.');
+        throw new TypeError('Invalid argument: "edge" is not an object, was ' + edge);
 
       if (typeof edge.id !== 'number' && typeof edge.id !== 'string')
-        throw new TypeError('Invalid argument key: id is not a string or a number.');
+        throw new TypeError('Invalid argument key: "edge.id" is not a string or a number, was ' + edge.id);
 
       if ((typeof edge.source !== 'number' && typeof edge.source !== 'string') || !this.nodesIndex[edge.source])
-        throw new Error('Invalid argument key: source is not an existing node id.');
+        throw new Error('Invalid argument key: "edge.source" is not an existing node id, was ' + edge.source);
 
       if ((typeof edge.target !== 'number' && typeof edge.target !== 'string') || !this.nodesIndex[edge.target])
-        throw new Error('Invalid argument key: target is not an existing node id.');
+        throw new Error('Invalid argument key: "edge.target" is not an existing node id, was ' + edge.target);
 
       if (this.edgesIndex[edge.id])
         throw new Error('Invalid argument: an edge of id "' + edge.id + '" already exists.');
@@ -300,7 +300,7 @@
         throw new TypeError('Missing argument.');
 
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: it is not a string or a number.');
+        throw new TypeError('Invalid argument: "id" is not a string or a number, was ' + id);
 
       if (this.siblingEdgesIndex[id]) {
         var container = find.call(this, id);
