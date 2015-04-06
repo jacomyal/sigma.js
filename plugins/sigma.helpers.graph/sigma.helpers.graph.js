@@ -106,23 +106,22 @@
    */
   if (!sigma.classes.graph.hasMethod('dropNodes'))
     sigma.classes.graph.addMethod('dropNodes', function(v) {
-      if (arguments.length === 1 && (typeof v === 'string' || typeof v === 'number'))
+      if (arguments.length > 1)
+        throw new Error('Too many arguments. Use an array instead.');
+
+      if (typeof v === 'string' || typeof v === 'number')
         this.dropNode(v);
 
-      else if (
-        arguments.length === 1 && Array.isArray(v)) {
+      else if (Array.isArray(v)) {
         var i, l;
         for (i = 0, l = v.length; i < l; i++)
           if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropNode(v[i]);
           else
-            throw new TypeError('Invalid argument: a node id is not a string or a number.');
-      }
-      else if (arguments.length > 1) {
-        throw new Error('Too many arguments. Use an array instead.');
+            throw new TypeError('Invalid argument: a node id is not a string or a number, was ' + v[i]);
       }
       else
-        throw new TypeError('Invalid argument: it is not a string, a number, or an array.');
+        throw new TypeError('Invalid argument: "v" is not a string, a number, or an array, was ' + v);
 
       return this;
     });
@@ -135,23 +134,22 @@
    */
   if (!sigma.classes.graph.hasMethod('dropEdges'))
     sigma.classes.graph.addMethod('dropEdges', function(v) {
-      if (arguments.length === 1 && (typeof v === 'string' || typeof v === 'number'))
+      if (arguments.length > 1)
+        throw new Error('Too many arguments. Use an array instead.');
+
+      if (typeof v === 'string' || typeof v === 'number')
         this.dropEdge(v);
 
-      else if (
-        arguments.length === 1 && Array.isArray(v)) {
+      else if (Array.isArray(v)) {
         var i, l;
         for (i = 0, l = v.length; i < l; i++)
           if (typeof v[i] === 'string' || typeof v[i] === 'number')
             this.dropEdge(v[i]);
           else
-            throw new TypeError('Invalid argument: an edge id is not a string or a number.');
-      }
-      else if (arguments.length > 1) {
-        throw new Error('Too many arguments. Use an array instead.');
+            throw new TypeError('Invalid argument: an edge id is not a string or a number, was ' + v[i]);
       }
       else
-        throw new TypeError('Invalid argument: it is not a string, a number, or an array.');
+        throw new TypeError('Invalid argument: it is not a string, a number, or an array, was ' + v);
 
       return this;
     });
@@ -165,7 +163,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
       if (typeof id !== 'string' && typeof id !== 'number')
-        throw new TypeError('The node id is not a string or a number.');
+        throw new TypeError('The node id is not a string or a number, was ' + id);
 
       var target,
           nodes = [];
@@ -184,7 +182,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
       if (typeof id !== 'string' && typeof id !== 'number')
-        throw new TypeError('The node id is not a string or a number.');
+        throw new TypeError('The node id is not a string or a number, was ' + id);
 
       var a = this.allNeighborsIndex[id],
           eid,
