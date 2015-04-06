@@ -6,7 +6,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   sigma.utils.pkg('sigma.plugins');
 
@@ -62,7 +62,7 @@
   function getRescalePosition(s) {
     var autoRescale = s.settings('autoRescale');
     if (autoRescale) {
-      if (Object.prototype.toString.call(autoRescale) === '[object Array]') {
+      if (Array.isArray(autoRescale)) {
         return (autoRescale.indexOf('nodePosition') !== -1);
       }
       return true;
@@ -214,10 +214,10 @@
      */
     this.nodes = function(v, options) {
       if (arguments.length < 1)
-        throw 'locate.nodes: Wrong arguments.';
+        throw new TypeError('Too few arguments.');
 
       if (arguments.length === 3 && typeof options !== "object")
-        throw 'locate.nodes: options must be an object.'
+        throw new TypeError('Invalid argument: "options" is not an object.');
 
       var t,
           n,
@@ -229,7 +229,7 @@
       if (typeof v === 'string' || typeof v === 'number') {
         n = _s.graph.nodes(v);
         if (n === undefined)
-          throw 'locate.nodes: Wrong arguments.';
+          throw new Error('Invalid argument: "v". No node of id "' + v + '" exists.');
 
         t = {
           x: n[_s.camera.readPrefix + 'x'],
@@ -240,9 +240,7 @@
       }
 
       // Array of nodes:
-      else if (
-        Object.prototype.toString.call(v) === '[object Array]'
-      ) {
+      else if (Array.isArray(v)) {
         var boundaries = getBoundaries(v.map(function(id) {
           return _s.graph.nodes(id);
         }), _s.camera.readPrefix);
@@ -250,7 +248,7 @@
         t = target(boundaries);
       }
       else
-        throw 'locate.nodes: Wrong arguments.';
+        throw new TypeError('Invalid argument: "v" is not a string, a number, or an array.');
 
       if (_o.focusOut && rescalePosition) {
         sigma.misc.animation.camera(
@@ -308,10 +306,10 @@
      */
     this.edges = function(v, options) {
       if (arguments.length < 1)
-        throw 'locate.edges: Wrong arguments.';
+        throw new TypeError('Too few arguments.');
 
       if (arguments.length === 3 && typeof options !== "object")
-        throw 'locate.edges: options must be an object.'
+        throw new TypeError('Invalid argument: "options" is not an object.');
 
       var t,
           e,
@@ -324,7 +322,7 @@
       if (typeof v === 'string' || typeof v === 'number') {
         e = _s.graph.edges(v);
         if (e === undefined)
-          throw 'locate.edges: Wrong arguments.';
+          throw new Error('Invalid argument: "v". No edge of id "' + v + '" exists.');
 
         boundaries = getBoundaries([
           _s.graph.nodes(e.source),
@@ -335,9 +333,7 @@
       }
 
       // Array of edges:
-      else if (
-        Object.prototype.toString.call(v) === '[object Array]'
-      ) {
+      else if (Array.isArray(v)) {
         var i,
             l,
             nodes = [];
@@ -352,7 +348,7 @@
         t = target(boundaries);
       }
       else
-        throw 'locate.edges: Wrong arguments.';
+        throw new TypeError('Invalid argument: "v" is not a string or a number, or an array.');
 
       if (_o.focusOut && rescalePosition) {
         sigma.misc.animation.camera(
