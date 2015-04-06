@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma.renderers.halo: sigma not in scope.';
+    throw new Error('sigma not in scope.');
 
   // Initialize package:
   sigma.utils.pkg('sigma.settings');

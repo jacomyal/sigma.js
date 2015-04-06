@@ -1,4 +1,5 @@
 ;(function(undefined) {
+  'use strict';
 
   /**
    * Sigma Renderer Halo Utility
@@ -12,7 +13,7 @@
 
   // Terminating if sigma were not to be found
   if (typeof sigma === 'undefined')
-    throw 'sigma.renderers.halo: sigma not in scope.';
+    throw new Error('sigma not in scope.');
 
   /**
    * This methods returns an array of nodes that are adjacent to a node.
@@ -22,8 +23,8 @@
    */
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentNodes: the node id must be a string.';
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: "id" is not a string or a number.');
 
       var target,
           nodes = [];
@@ -41,8 +42,8 @@
    */
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentEdges: the node id must be a string.';
+      if (typeof id !== 'number' && typeof id !== 'string')
+        throw new TypeError('Invalid argument: "id" is not a string or a number.');
 
       var a = this.allNeighborsIndex[id],
           eid,
