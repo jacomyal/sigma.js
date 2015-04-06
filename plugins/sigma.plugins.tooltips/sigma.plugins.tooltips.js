@@ -340,7 +340,7 @@
             options.stage.position !== 'bottom' &&
             options.stage.position !== 'left' &&
             options.stage.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
@@ -394,7 +394,7 @@
             options.node.position !== 'bottom' &&
             options.node.position !== 'left' &&
             options.node.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
@@ -449,7 +449,7 @@
             options.edge.position !== 'bottom' &&
             options.edge.position !== 'left' &&
             options.edge.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
         }
       }
 
