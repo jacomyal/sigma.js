@@ -298,7 +298,7 @@ test('API', function(assert) {
     function() {
       design.utils.histogram('edges', 'color', 'meh');
     },
-    /design.utils.histogram: Missing property \"meh\"/,
+    new Error('The property "meh" is not sequential.'),
     '"utils.histogram" throws an error on a non-existing property.'
   );
 
@@ -306,7 +306,7 @@ test('API', function(assert) {
     function() {
       design.utils.histogram('edges', 'meh', 'quantity');
     },
-    /design.utils.histogram: Unknown visual variable./,
+    new Error('Unknown visual variable "meh".'),
     '"utils.histogram" throws an error on an unknown visual variable.'
   );
 
@@ -314,7 +314,7 @@ test('API', function(assert) {
     function() {
       design.utils.histogram('meh', 'color', 'quantity');
     },
-    /design.utils.histogram: Unknown target \"meh\"/,
+    new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "meh".'),
     '"utils.histogram" throws an error on an unknown target.'
   );
 
