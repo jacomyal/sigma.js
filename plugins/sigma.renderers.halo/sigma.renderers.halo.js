@@ -24,7 +24,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentNodes'))
     sigma.classes.graph.addMethod('adjacentNodes', function(id) {
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: "id" is not a string or a number.');
+        throw new TypeError('Invalid argument: "id" is not a string or a number, was ' + id);
 
       var target,
           nodes = [];
@@ -43,7 +43,7 @@
   if (!sigma.classes.graph.hasMethod('adjacentEdges'))
     sigma.classes.graph.addMethod('adjacentEdges', function(id) {
       if (typeof id !== 'number' && typeof id !== 'string')
-        throw new TypeError('Invalid argument: "id" is not a string or a number.');
+        throw new TypeError('Invalid argument: "id" is not a string or a number, was ' + id);
 
       var a = this.allNeighborsIndex[id],
           eid,
