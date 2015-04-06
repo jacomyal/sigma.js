@@ -220,7 +220,7 @@
       this.dataset = function() { return s.graph.edges(); }
     }
     else
-      throw new Error('Invalid argument: "datasetName" is not "nodes" or "edges". Current value is "' + datasetName + '".');
+      throw new Error('Invalid argument: "datasetName" is not "nodes" or "edges", was ' + datasetName);
 
 
     /**
@@ -237,7 +237,7 @@
         throw new Error('Missing argument: "key".');
 
       if (typeof key !== 'string')
-        throw new Error('Invalid argument: "key" is not a string. Current value is "' + key + '".');
+        throw new Error('Invalid argument: "key" is not a string, was ' + key);
 
       var val,
           byFn,
@@ -472,7 +472,7 @@
         throw new TypeError('Missing argument: "key".');
 
       if (typeof key !== 'string')
-        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
+        throw new TypeError('Invalid argument: "key" is not a string, was ' + key);
 
       // lazy updating:
       if (this.deprecated[key]) this.update(key);
@@ -498,7 +498,7 @@
         throw new TypeError('Missing argument: "key"');
 
       if (typeof key !== 'string')
-        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
+        throw new TypeError('Invalid argument: "key" is not a string, was ' + key);
 
       if (this.visualVars.indexOf(visualVar) == -1)
         throw new Error('Unknown style "' + visualVar + '"');
@@ -551,7 +551,7 @@
           }
           else {
             if (typeof o.styles[visualVar] === 'function')
-              throw new TypeError(o.styles + '.' + visualVar + 'is not a function.');
+              throw new TypeError(o.styles + '.' + visualVar + 'is not a function, was ' + o.styles[visualVar]);
           }
         });
       });
@@ -614,7 +614,7 @@
         throw new TypeError('Missing argument: "key"');
 
       if (typeof key !== 'string')
-        throw new TypeError('Invalid argument: "key" is not a string. Current value is ' + key + '".');
+        throw new TypeError('Invalid argument: "key" is not a string, was ' + key);
 
       if (this.visualVars.indexOf(visualVar) == -1)
         throw new Error('Unknown style "' + visualVar + '".');
@@ -887,7 +887,7 @@
           __apply(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
       }
 
       return this;
@@ -941,7 +941,7 @@
           __reset(this.styles.edges, _visionOnEdges, visualVar);
           break;
         default:
-          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
       }
 
       return this;
@@ -963,7 +963,7 @@
     this.deprecate = function(target, key) {
       if (target) {
         if (target !== 'nodes' && target !== 'edges')
-          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
 
         if (key) {
           if (target === 'nodes') {
@@ -1015,7 +1015,7 @@
         throw new TypeError('Missing argument: "id".');
       }
       if (target !== 'nodes' && target !== 'edges') {
-        throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+        throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
       }
       if (key == null){
         throw new TypeError('Missing argument: "key".');
@@ -1126,14 +1126,14 @@
           v = _visionOnEdges;
           break;
         default:
-          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
       }
 
       if (property === undefined)
         throw new TypeError('Missing argument: "property"');
 
       if (typeof property !== 'string')
-        throw new TypeError('Invalid argument: "property" is not a string. Current value is ' + property + '".');
+        throw new TypeError('Invalid argument: "property" is not a string, was ' + property);
 
       if (!(property in v.dataTypes) || v.dataTypes[property].sequential === undefined) {
         var val,
@@ -1188,7 +1188,7 @@
           v = _visionOnEdges;
           break;
         default:
-          throw new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "' + target + '".');
+          throw new Error('Invalid argument: "target" is not "nodes" or "edges", was ' + target);
       }
 
       if (v.visualVars.indexOf(visualVar) == -1)
@@ -1198,7 +1198,7 @@
         throw new TypeError('Missing argument: "property".');
 
       if (typeof property !== 'string')
-        throw new TypeError('Invalid argument: "property" is not a string. Current value is "' + property + '".');
+        throw new TypeError('Invalid argument: "property" is not a string, was' + property);
 
       var isSequential = this.isSequential(target, property);
 
