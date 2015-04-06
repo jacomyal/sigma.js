@@ -2,7 +2,7 @@
   'use strict';
 
   if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+    throw new Error('sigma is not declared');
 
   // Initialize packages:
   sigma.utils.pkg('sigma.canvas.edges.labels');
@@ -30,7 +30,7 @@
       return;
 
     if (0 === settings('edgeLabelSizePowRatio'))
-      throw '"edgeLabelSizePowRatio" must not be 0.';
+      throw new Error('Invalid setting: "edgeLabelSizePowRatio" is equal to 0.');
 
     var fontSize,
         x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
