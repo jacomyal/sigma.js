@@ -333,14 +333,14 @@
     if (options.stage) {
       if (options.stage.renderer !== undefined &&
           typeof options.stage.renderer !== 'function')
-        throw new TypeError('"options.stage.renderer" is not a function.');
+        throw new TypeError('"options.stage.renderer" is not a function, was ' + options.stage.renderer);
 
       if (options.stage.position !== undefined) {
         if (options.stage.position !== 'top' &&
             options.stage.position !== 'bottom' &&
             options.stage.position !== 'left' &&
             options.stage.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
         }
       }
 
@@ -387,14 +387,14 @@
     if (options.node) {
       if (options.node.renderer !== undefined &&
           typeof options.node.renderer !== 'function')
-        throw new TypeError('"options.node.renderer" is not a function.');
+        throw new TypeError('"options.node.renderer" is not a function, was ' + options.node.renderer);
 
       if (options.node.position !== undefined) {
         if (options.node.position !== 'top' &&
             options.node.position !== 'bottom' &&
             options.node.position !== 'left' &&
             options.node.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
         }
       }
 
@@ -442,14 +442,14 @@
     if (options.edge) {
       if (options.edge.renderer !== undefined &&
           typeof options.edge.renderer !== 'function')
-        throw new TypeError('"options.edge.renderer" is not a function.');
+        throw new TypeError('"options.edge.renderer" is not a function, was ' + options.edge.renderer);
 
       if (options.edge.position !== undefined) {
         if (options.edge.position !== 'top' &&
             options.edge.position !== 'bottom' &&
             options.edge.position !== 'left' &&
             options.edge.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right". Current value is "' + options.position + '".');
+          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
         }
       }
 
