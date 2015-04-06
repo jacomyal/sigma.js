@@ -314,7 +314,7 @@ test('API', function(assert) {
     function() {
       design.utils.histogram('meh', 'color', 'quantity');
     },
-    new Error('Invalid argument: "target" is not "nodes" or "edges". Current value is "meh".'),
+    new Error('Invalid argument: "target" is not "nodes" or "edges", was meh'),
     '"utils.histogram" throws an error on an unknown target.'
   );
 
