@@ -217,7 +217,7 @@
         throw new TypeError('Too few arguments.');
 
       if (arguments.length === 3 && typeof options !== "object")
-        throw new TypeError('Invalid argument: "options" is not an object.');
+        throw new TypeError('Invalid argument: "options" is not an object, was ' + options);
 
       var t,
           n,
@@ -229,7 +229,7 @@
       if (typeof v === 'string' || typeof v === 'number') {
         n = _s.graph.nodes(v);
         if (n === undefined)
-          throw new Error('Invalid argument: "v". No node of id "' + v + '" exists.');
+          throw new Error('Invalid argument: the node of id "' + v + '" does not exist.');
 
         t = {
           x: n[_s.camera.readPrefix + 'x'],
@@ -248,7 +248,7 @@
         t = target(boundaries);
       }
       else
-        throw new TypeError('Invalid argument: "v" is not a string, a number, or an array.');
+        throw new TypeError('Invalid argument: "v" is not a string, a number, or an array, was ' + v);
 
       if (_o.focusOut && rescalePosition) {
         sigma.misc.animation.camera(
@@ -309,7 +309,7 @@
         throw new TypeError('Too few arguments.');
 
       if (arguments.length === 3 && typeof options !== "object")
-        throw new TypeError('Invalid argument: "options" is not an object.');
+        throw new TypeError('Invalid argument: "options" is not an object, was ' + options);
 
       var t,
           e,
@@ -322,7 +322,7 @@
       if (typeof v === 'string' || typeof v === 'number') {
         e = _s.graph.edges(v);
         if (e === undefined)
-          throw new Error('Invalid argument: "v". No edge of id "' + v + '" exists.');
+          throw new Error('Invalid argument: the edge of id "' + v + '" does not exist.');
 
         boundaries = getBoundaries([
           _s.graph.nodes(e.source),
@@ -348,7 +348,7 @@
         t = target(boundaries);
       }
       else
-        throw new TypeError('Invalid argument: "v" is not a string or a number, or an array.');
+        throw new TypeError('Invalid argument: "v" is not a string or a number, or an array, was ' + v);
 
       if (_o.focusOut && rescalePosition) {
         sigma.misc.animation.camera(

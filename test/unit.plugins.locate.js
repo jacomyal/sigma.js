@@ -147,7 +147,7 @@ asyncTest('API', function(assert) {
     function() {
       locate.nodes('0');
     },
-    new Error('Invalid argument: "v". No node of id "0" exists.'),
+    new Error('Invalid argument: the node of id "0" does not exist.'),
     '"nodes" with a wrong key type throws an error.'
   );
 
@@ -155,7 +155,7 @@ asyncTest('API', function(assert) {
     function() {
       locate.edges('0');
     },
-    new Error('Invalid argument: "v". No edge of id "0" exists.'),
+    new Error('Invalid argument: the edge of id "0" does not exist.'),
     '"edges" with a wrong key type throws an error.'
   );
 
