@@ -17,6 +17,7 @@
     var color = edge.color,
         prefix = settings('prefix') || '',
         size = settings('edgeHoverSizeRatio') * (edge[prefix + 'size'] || 1),
+        count = edge.count || 0,
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
@@ -28,8 +29,8 @@
         tY = target[prefix + 'y'];
 
     cp = (source.id === target.id) ?
-      sigma.utils.getSelfLoopControlPoints(sX, sY, sSize) :
-      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
+      sigma.utils.getSelfLoopControlPoints(sX, sY, sSize, count) :
+      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY, count);
 
     if (!color)
       switch (edgeColor) {
