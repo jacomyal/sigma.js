@@ -120,7 +120,7 @@ test('API', function() {
     function() {
       s.graph.addEdgeSibling(e0);
     },
-    'Error("Invalid argument: an edge of id "e0" already exists.")',
+    new Error('Invalid argument: an edge of id "e0" already exists.'),
     '"addEdgeSibling" with an existing edge throws an error.'
   );
 
@@ -128,7 +128,7 @@ test('API', function() {
     function() {
       s.graph.addEdgeSibling(e1);
     },
-    'Error("Invalid argument: an edge of id "e1" already exists.")',
+    new Error('Invalid argument: an edge sibling of id "e1" already exists.'),
     '"addEdgeSibling" with an existing sibling throws an error.'
   );
 
