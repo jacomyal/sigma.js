@@ -151,7 +151,7 @@
             status.nodes_to_com[node] = i;
             var deg = get_degree_for_node(graph, node);
             if (deg < 0)
-                throw new Error('A node has a negative weight.');
+                throw new Error('A node has a negative degree. Use positive weights.');
 
             status.degrees[i] = deg;
             status.gdegrees[node] = deg;
@@ -173,7 +173,7 @@
             neighbours.forEach(function (neighbour, i) {
               var weight = graph._assoc_mat[node][neighbour];
               if (weight <= 0) {
-                  throw new Error('A node has a negative weight.');
+                  throw new Error('A node has a negative degree. Use positive weights.');
               }
 
               if (part[neighbour] == com) {
