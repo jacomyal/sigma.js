@@ -224,7 +224,7 @@
           }
         }
         else
-          throw new TypeError('Invalid argument: a node id is not a string or a number.');
+          throw new TypeError('Invalid argument: a node id is not a string or a number, was ' + v[i]);
     }
 
     _activeNodesCount = Object.keys(_activeNodesIndex).length;
@@ -289,7 +289,7 @@
           }
         }
         else
-          throw new TypeError('Invalid argument: an edge id is not a string or a number.');
+          throw new TypeError('Invalid argument: an edge id is not a string or a number, was ' + v[i]);
     }
 
     _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
@@ -344,7 +344,7 @@
           delete _activeNodesIndex[v[i]];
         }
         else
-          throw new TypeError('Invalid argument: a node id is not a string or a number.');
+          throw new TypeError('Invalid argument: a node id is not a string or a number, was ' + v[i]);
     }
 
     _activeNodesCount = Object.keys(_activeNodesIndex).length;
@@ -399,7 +399,7 @@
           delete _activeEdgesIndex[v[i]];
         }
         else
-          throw new TypeError('Invalid argument: an edge id is not a string or a number.');
+          throw new TypeError('Invalid argument: an edge id is not a string or a number, was ' + v[i]);
     }
 
     _activeEdgesCount = Object.keys(_activeEdgesIndex).length;
