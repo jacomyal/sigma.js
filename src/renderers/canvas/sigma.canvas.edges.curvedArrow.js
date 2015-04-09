@@ -21,7 +21,6 @@
         defaultEdgeColor = settings('defaultEdgeColor'),
         cp = {},
         size = edge[prefix + 'size'] || 1,
-        count = edge.count || 0,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
@@ -35,8 +34,8 @@
         vY;
 
     cp = (source.id === target.id) ?
-      sigma.utils.getSelfLoopControlPoints(sX, sY, tSize, count) :
-      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY, count);
+      sigma.utils.getSelfLoopControlPoints(sX, sY, tSize) :
+      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
 
     if (source.id === target.id) {
       d = Math.sqrt(Math.pow(tX - cp.x1, 2) + Math.pow(tY - cp.y1, 2));
