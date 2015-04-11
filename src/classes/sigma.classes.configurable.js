@@ -50,25 +50,27 @@
      */
     var settings = function(a1, a2) {
       var o,
+          i,
+          l,
           k;
 
       if (arguments.length === 1 && typeof a1 === 'string') {
-        if ((a1 in data) && data[a1] !== undefined)
+        if (data[a1] !== undefined)
           return data[a1];
         for (i = 0, l = datas.length; i < l; i++)
-          if ((a1 in datas[i]) && datas[i][a1] !== undefined)
+          if (datas[i][a1] !== undefined)
             return datas[i][a1];
         return undefined;
       } else if (typeof a1 === 'object' && typeof a2 === 'string') {
-        return a2 in (a1 || {}) ? a1[a2] : settings(a2);
+        return (a1 || {})[a2] !== undefined ? a1[a2] : settings(a2);
       } else {
         o = (typeof a1 === 'object' && a2 === undefined) ? a1 : {};
 
         if (typeof a1 === 'string')
           o[a1] = a2;
 
-        for (k in o)
-          data[k] = o[k];
+        for (i = 0, k = Object.keys(o), l = k.length; i < l; i++)
+          data[k[i]] = o[k[i]];
 
         return this;
       }

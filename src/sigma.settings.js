@@ -69,7 +69,7 @@
     //          the "font" value.
     hoverFont: '',
     // {boolean} If true, then only one node can be hovered at a time.
-    singleHover: false,
+    singleHover: true,
     // {string} Example: 'bold'
     hoverFontStyle: '',
     // {string} Indicates how to choose the hovered nodes shadow color.

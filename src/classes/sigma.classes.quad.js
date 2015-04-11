@@ -252,11 +252,10 @@
       var axis = this.axis(c1, c2),
           col = true;
 
-      for (var i = 0; i < 4; i++) {
-        col *= this.axisCollision(axis[i], c1, c2);
-      }
+      for (var i = 0; i < 4; i++)
+        col = col && this.axisCollision(axis[i], c1, c2);
 
-      return !!col;
+      return col;
     }
   };
 
