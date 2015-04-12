@@ -70,9 +70,11 @@
         xhr.onreadystatechange = function () {
 
             if (xhr.readyState === 4) {
-                var neo4jResult = JSON.parse(xhr.responseText);
 
-                graph =  sigma.neo4j.cypher_parse(neo4jResult);
+                if(xhr.responseText != "") {
+                    var neo4jResult = JSON.parse(xhr.responseText);
+                    graph =  sigma.neo4j.cypher_parse(neo4jResult);
+                }
 
                 // Update the instance's graph:
                 if (sig instanceof sigma) {
