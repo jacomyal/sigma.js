@@ -17,7 +17,7 @@ Edge are create with the following structure :
  * id -> Neo4j edge id
  * label -> Neo4j edge type
  * neo4j_type -> Neo4j edge type
- * neo4j_data -> All the properties of Neo4j node
+ * neo4j_data -> All the properties of Neo4j relationship
 
 The most basic way to use this helper is to call it with a neo4j server url and a cypher query. It will then instanciate sigma, but after having added the graph into the config object.
 
