@@ -1,19 +1,19 @@
-sigma.parsers.json
-==================
+sigma.parsers.cypher
+====================
 
 Plugin developed by [Benoît Simard](https://github.com/sim51).
 
 ---
 
-This plugin provides a single function, `sigma.parsers.cypher()`, that will run a cypher query on a neo4j instance, parse th response, eventually instanciate sigma and fill the graph with the `graph.read()` method.
+This plugin provides a single function, `sigma.parsers.cypher()`, that will run a cypher query on a neo4j instance, parse the response, eventually instanciate sigma and fill the graph with the `graph.read()` method.
 
-Node are create with the following structure :
+Node are created with the following structure :
  * id -> Neo4j node id
  * label -> Neo4j node id
  * neo4j_labels -> Labels of Neo4j node
  * neo4j_data -> All the properties of the neo4j node
 
-Edge are create with the following structure :
+Edge are created with the following structure :
  * id -> Neo4j edge id
  * label -> Neo4j edge type
  * neo4j_type -> Neo4j edge type
@@ -36,7 +36,7 @@ sigma.parsers.cypher(
   'http://localhost:7474',
   'neo4j',
   'admin'
-  ''MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100',
+  'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100',
   { container: 'myContainer' }
 );
 ````
