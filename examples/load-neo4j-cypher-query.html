@@ -61,7 +61,8 @@
     </style>
     <div id="graph-container"></div>
 </div>
-<script>
+
+<script type="application/javascript">
     /**
      * Here is just a basic example on how to properly display a neo4j cypher query.
      *
@@ -69,10 +70,30 @@
      * and instantiate sigma when the response is received.
      *
      * It based on the json parser (that's why its must be loaded).
-     *
-     * The object given as the Fifth parameter is the base of the instance
-     * configuration object. The plugin will just add the "graph" key to it
-     * before the instanciation.
      */
-    sigma.neo4j.cypher('http://localhost:7474', 'neo4j', 'admin', 'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100', { container: 'graph-container'});
+    sigma.neo4j.cypher(
+            { url: 'http://localhost:7474', user: 'neo4j', password: 'admin' },
+            'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100',
+            { container: 'graph-container' } ,
+            function(s) {
+                console.log('Number of nodes :'+ s.graph.nodes().length);
+                console.log('Number of edges :'+ s.graph.edges().length);
+            }
+    );
+
+    // Calling neo4j to get all its relationship type
+    sigma.neo4j.getTypes(
+            { url: 'http://localhost:7474', user:'neo4j', password:'admin' },
+            function(types) {
+                console.log("Relationship types" + types);
+            }
+    );
+
+    // Calling neo4j to get all its node label
+    sigma.neo4j.getLabels(
+            { url: 'http://localhost:7474', user:'neo4j', password:'admin' },
+            function(labels) {
+                console.log("Node labels" + labels);
+            }
+    );
 </script>
