@@ -13,117 +13,66 @@
 
 
     /**
-     * This function execute a cypher and creates a new sigma instance or
-     * updates the graph of a given instance. It is possible to give a callback
-     * that will be executed at the end of the process.
+     * This function is an helper for the neo4j communication.
      *
-     * @param  {string}       url      The URL of neo4j server.
-     * @param  {string}       login    Login of a neo4j user (set it to None if no need)
-     * @param  {string}       password Password of the specified neo4j user (set it to None if no need)
-     * @param  {string}       cypher   The cypher query
-     * @param  {object|sigma} sig      A sigma configuration object or a sigma
-     *                                 instance.
-     * @param  {?function}    callback Eventually a callback to execute after
-     *                                 having parsed the file. It will be called
-     *                                 with the related sigma instance as
-     *                                 parameter.
+     * @param   {string|object}     neo4j       The URL of neo4j server or a neo4j server object.
+     * @param   {string}            endpoint    Endpoint of the neo4j server
+     * @param   {string}            method      The calling method for the endpoint : 'GET' or 'POST'
+     * @param   {object|string}     data        Data that will be send to the server
+     * @param   {function}          callback    The callback function
      */
-    sigma.neo4j.cypher = function (/*url, login, password, cypher, sig, callback*/) {
-        var url, login, password, cypher, sig, callback;
-        url = arguments[0];
-        // is there login & password ?
-        if (arguments.length >= 5 ) {
-            login = arguments[1];
-            password = arguments[2];
-            cypher = arguments[3];
-            sig = arguments[4];
-            if(arguments[5]) {
-                callback = arguments[5];
-            }
-        }
-        else {
-            cypher = arguments[1];
-            sig = arguments[2];
-            if(arguments[3]) {
-                callback = arguments[3];
-            }
-        }
+    sigma.neo4j.send = function(neo4j, endpoint, method, data, callback) {
+        var xhr = sigma.utils.xhr(),
+            url, user, password;
 
-        var graph = { nodes: [], edges: [] },
-        xhr = sigma.utils.xhr(),
-        neo4jTransactionEndPoint = url + '/db/data/transaction/commit';
+        // if neo4j arg is not an object
+        url = neo4j;
+        if(typeof neo4j === 'object') {
+            url = neo4j.url;
+            user = neo4j.user;
+            password = neo4j.password;
+        }
 
         if (!xhr)
             throw 'XMLHttpRequest not supported, cannot load the file.';
 
-        var data = {
-            "statements": [
-                {
-                    "statement": cypher,
-                    "resultDataContents": ["graph"],
-                    "includeStats": false
-                }
-            ]
-        };
+        // Construct the endpoint url
+        url += endpoint;
 
-        xhr.open('POST', neo4jTransactionEndPoint, true);
+        xhr.open(method, url, true);
+        if( user && password) {
+            xhr.setRequestHeader('Authorization', 'Basic ' + btoa(user + ':' + password));
+        }
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         xhr.onreadystatechange = function () {
-
             if (xhr.readyState === 4) {
-
-                if(xhr.responseText != "") {
-                    var neo4jResult = JSON.parse(xhr.responseText);
-                    graph =  sigma.neo4j.cypher_parse(neo4jResult);
-                }
-
-                // Update the instance's graph:
-                if (sig instanceof sigma) {
-                    sig.graph.clear();
-                    sig.graph.read(graph);
-
-                    // ...or instantiate sigma if needed:
-                } else if (typeof sig === 'object') {
-                    sig.graph = graph;
-                    sig = new sigma(sig);
-
-                    // ...or it's finally the callback:
-                } else if (typeof sig === 'function') {
-                    callback = sig;
-                    sig = null;
-                }
-
                 // Call the callback if specified:
-                if (callback)
-                    callback(sig || graph);
+                callback(JSON.parse(xhr.responseText));
             }
         };
-
-        var postData = JSON.stringify(data);
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        if( login && password) {
-            xhr.setRequestHeader('Authorization', 'Basic ' + btoa(login + ':' + password));
-        }
-        xhr.send(postData);
+        xhr.send(data);
     };
 
     /**
-     * This function parse a neo4j cypher query result.
+     * This function parse a neo4j cypher query result, and transform it into
+     * a sigma graph object.
      *
-     * @param  {object}       neo4jResult The URL of neo4j server.
+     * @param  {object}     result      The server response of a cypher query.
      *
      * @return A graph object
      */
-    sigma.neo4j.cypher_parse = function(neo4jResult) {
+    sigma.neo4j.cypher_parse = function(result) {
         var graph = { nodes: [], edges: [] },
             nodesMap = {},
             edgesMap = {},
             key;
 
         // Iteration on all result data
-        neo4jResult.results[0].data.forEach(function (data, index, ar) {
+        result.results[0].data.forEach(function (data) {
 
             // iteration on graph for all node
-            data.graph.nodes.forEach(function (node, index, ar) {
+            data.graph.nodes.forEach(function (node) {
 
                 var sigmaNode =  {
                     id : node.id,
@@ -144,7 +93,7 @@
             });
 
             // iteration on graph for all node
-            data.graph.relationships.forEach(function (edge, index, ar) {
+            data.graph.relationships.forEach(function (edge) {
                 var sigmaEdge =  {
                     id : edge.id,
                     label : edge.type,
@@ -176,60 +125,93 @@
         return graph;
     };
 
+
+    /**
+     * This function execute a cypher and create a new sigma instance or
+     * updates the graph of a given instance. It is possible to give a callback
+     * that will be executed at the end of the process.
+     *
+     * @param  {object|string}      neo4j       The URL of neo4j server or a neo4j server object.
+     * @param  {string}             cypher      The cypher query
+     * @param  {?object|?sigma}     sig         A sigma configuration object or a sigma instance.
+     * @param  {?function}          callback    Eventually a callback to execute after
+     *                                          having parsed the file. It will be called
+     *                                          with the related sigma instance as
+     *                                          parameter.
+     */
+    sigma.neo4j.cypher = function (neo4j, cypher, sig, callback) {
+        var endpoint = '/db/data/transaction/commit',
+            data, cypherCallback;
+
+        // Data that will be send to the server
+        data = JSON.stringify({
+            "statements": [
+                {
+                    "statement": cypher,
+                    "resultDataContents": ["graph"],
+                    "includeStats": false
+                }
+            ]
+        });
+
+        // Callback method after server response
+        cypherCallback = function (callback) {
+
+            return function (response) {
+
+                var graph = { nodes: [], edges: [] };
+
+                graph = sigma.neo4j.cypher_parse(response);
+
+                // Update the instance's graph:
+                if (sig instanceof sigma) {
+                    sig.graph.clear();
+                    sig.graph.read(graph);
+
+                    // ...or instantiate sigma if needed:
+                } else if (typeof sig === 'object') {
+                    sig = new sigma(sig);
+                    sig.graph.read(graph);
+                    sig.refresh();
+
+                    // ...or it's finally the callback:
+                } else if (typeof sig === 'function') {
+                    callback = sig;
+                    sig = null;
+                }
+
+                // Call the callback if specified:
+                if (callback)
+                    callback(sig || graph);
+            };
+        };
+
+        // Let's call neo4j
+        sigma.neo4j.send(neo4j, endpoint, 'POST', data, cypherCallback(callback));
+    };
+
     /**
      * This function call neo4j to get all labels of the graph.
      *
-     * @param  {string}       server      The URL of neo4j server.
+     * @param  {string}       neo4j      The URL of neo4j server or an object with the url, user & password.
+     * @param  {function}     callback   The callback function
      *
      * @return An array of label
      */
-    sigma.neo4j.getLabels = function(server, callback) {
-        var xhr = sigma.utils.xhr(),
-            url;
-
-        if (!xhr)
-            throw 'XMLHttpRequest not supported, cannot load the file.';
-        url = server + '/db/data/labels';
-
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                // Call the callback if specified:
-                if (callback)
-                    callback(JSON.parse(xhr.responseText).sort());
-            }
-        };
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.send();
+    sigma.neo4j.getLabels = function(neo4j, callback) {
+        sigma.neo4j.send(neo4j, '/db/data/labels', 'GET', null, callback);
     };
 
     /**
      * This function parse a neo4j cypher query result.
      *
-     * @param  {string}       server      The URL of neo4j server.
+     * @param  {string}       neo4j      The URL of neo4j server or an object with the url, user & password.
+     * @param  {function}     callback   The callback function
      *
      * @return An array of relationship type
      */
-    sigma.neo4j.getTypes = function(server, callback) {
-        var xhr = sigma.utils.xhr(),
-            url;
-
-        if (!xhr)
-            throw 'XMLHttpRequest not supported, cannot load the file.';
-        url = server + '/db/data/relationship/types';
-
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                // Call the callback if specified:
-                if (callback)
-                    callback(JSON.parse(xhr.responseText).sort());
-            }
-        };
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.send();
+    sigma.neo4j.getTypes = function(neo4j, callback) {
+        sigma.neo4j.send(neo4j, '/db/data/relationship/types', 'GET', null, callback);
     };
 
 }).call(this);
