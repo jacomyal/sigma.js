@@ -7,13 +7,13 @@ Plugin developed by [Benoît Simard](https://github.com/sim51).
 
 This plugin provides a simple function, `sigma.parsers.cypher()`, that will run a cypher query on a neo4j instance, parse the response, eventually instantiate sigma and fill the graph with the `graph.read()` method.
 
-Node are created with the following structure :
+Nodes are created with the following structure :
  * id -> Neo4j node id
  * label -> Neo4j node id
  * neo4j_labels -> Labels of Neo4j node
  * neo4j_data -> All the properties of the neo4j node
 
-Edge are created with the following structure :
+Edges are created with the following structure :
  * id -> Neo4j edge id
  * label -> Neo4j edge type
  * neo4j_type -> Neo4j edge type
@@ -30,12 +30,10 @@ sigma.parsers.cypher(
 );
 ````
 
-For neo4j >= 2.2, you must passed a neo4j user with its password. So instead of the neo4j url, you have to passed a neo4j server object like this :  
+For neo4j >= 2.2, you must pass a neo4j user with its password. So instead of the neo4j url, you have to pass a neo4j server object like this :  
 ````javascript
 sigma.parsers.cypher(
   { url: 'http://localhost:7474', user:'neo4j', password:'admin' },
-  'neo4j',
-  'admin'
   'MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 100',
   { container: 'myContainer' }
 );
@@ -57,4 +55,4 @@ sigma.parsers.cypher(
 There is two additional functions provided by the plugin :
 
  * ```sigma.neo4j.getTypes({ url: 'http://localhost:7474', user:'neo4j', password:'admin' }, callback)``` : Return all relationship type of the database
- * ```sigma.neo4j.getTLabels({ url: 'http://localhost:7474', user:'neo4j', password:'admin' }, callback)``` : Return all node label of the database 
+ * ```sigma.neo4j.getLabels({ url: 'http://localhost:7474', user:'neo4j', password:'admin' }, callback)``` : Return all node label of the database 
