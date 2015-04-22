@@ -67,6 +67,10 @@
 
         // Weight over viz.thickness?
         obj.size = obj.weight;
+
+        // Changing type to be direction so it won't mess with sigma's naming
+        obj.direction = obj.type;
+        delete obj.type;
       }
 
       // Update the instance's graph:
