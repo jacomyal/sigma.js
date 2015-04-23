@@ -27,7 +27,7 @@
         c,
         d,
         scale,
-        margin,
+        margins,
         n = this.graph.nodes(),
         e = this.graph.edges(),
         settings = this.settings.embedObjects(options || {}),
@@ -89,17 +89,35 @@
      * biggest node to the X and Y values, we have to first get an
      * approximation of the scaling ratio.
      **/
-    margin =
-      (
-        settings('rescaleIgnoreSize') ?
-          0 :
+    var marginsBase = (
+          settings('rescaleIgnoreSize') ?
+                0 :
           (settings('maxNodeSize') || sizeMax) / scale
-      ) +
-      (settings('sideMargin') || 0);
-    maxX += margin;
-    minX -= margin;
-    maxY += margin;
-    minY -= margin;
+    );
+
+    var sideMargin = settings('sideMargin')
+    var margin = sideMargin || 0;
+    if (typeof margin == 'number') {
+      margins = [ margin, margin, margin, margin ];
+    } else if (sideMargin instanceof Array) {
+      if (sideMargin.length == 4) {
+        margins = [ sideMargin[0] + marginsBase, sideMargin[1] + marginsBase, sideMargin[2] + marginsBase, sideMargin[3] + marginsBase ];
+      } else if (sideMargin.length == 3) {
+        margins = [ sideMargin[0] + marginsBase, sideMargin[1] + marginsBase, sideMargin[2] + marginsBase, sideMargin[1] + marginsBase ];
+      } else if (sideMargin.length == 2) {
+        margins = [ sideMargin[0] + marginsBase, sideMargin[1] + marginsBase, sideMargin[0] + marginsBase, sideMargin[1] + marginsBase ];
+      } else if (sideMargin.length == 1) {
+        margins = [ sideMargin[0] + marginsBase, sideMargin[0] + marginsBase, sideMargin[0] + marginsBase, sideMargin[0] + marginsBase ];
+      } else {
+        throw new Error("Invalid 'sideMargin' setting: " + sideMargin);
+      }
+    } else {
+      throw new Error("Invalid 'sideMargin' setting: " + sideMargin);
+    }
+    minY -= margins[0];
+    maxX += margins[1];
+    maxY += margins[2];
+    minX -= margins[3];
 
     // Fix the scaling with the new extrema:
     scale = settings('scalingMode') === 'outside' ?
