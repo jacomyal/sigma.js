@@ -348,7 +348,7 @@
   };
 
   /**
-   * This method resizes each DOM elements in the container and stores the new
+   * This method resizes each DOM element in the container and stores the new
    * dimensions. Then, it renders the graph.
    *
    * @param  {?number}                width  The new width of the container.
