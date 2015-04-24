@@ -500,7 +500,6 @@
       captor.bind('mouseout', onOut);
       captor.bind('doubleclick', onDoubleClick);
       captor.bind('rightclick', onRightClick);
-      self.bind('render', onMove);
     }
 
     for (i = 0, l = this.captors.length; i < l; i++)

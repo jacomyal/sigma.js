@@ -143,6 +143,7 @@
         _node = _hoverStack[_hoverStack.length - 1];
       } else {
         _mouse.removeEventListener('mousedown', nodeMouseDown);
+        _node = null;
       }
     };
 
@@ -214,7 +215,6 @@
       });
       
       _drag = false;
-      _node = null;
     };
 
     function nodeMouseMove(event) {
