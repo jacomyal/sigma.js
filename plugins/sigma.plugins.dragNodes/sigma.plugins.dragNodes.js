@@ -54,6 +54,7 @@
       _mouse = renderer.container.lastChild,
       _camera = renderer.camera,
       _node = null,
+      _dragNodeOffset = null,
       _prefix = '',
       _hoverStack = [],
       _hoverIndex = {},
@@ -146,6 +147,42 @@
       }
     };
 
+    function computeMousePosition(event) {
+      var offset = calculateOffset(_renderer.container),
+            x = event.clientX - offset.left,
+            y = event.clientY - offset.top,
+            cos = Math.cos(_camera.angle),
+            sin = Math.sin(_camera.angle),
+            nodes = _s.graph.nodes(),
+            ref = [];
+
+      // Getting and derotating the reference coordinates.
+      for (var i = 0; i < 2; i++) {
+        var n = nodes[i];
+        var aux = {
+          x: n.x * cos + n.y * sin,
+          y: n.y * cos - n.x * sin,
+          renX: n[_prefix + 'x'],
+          renY: n[_prefix + 'y'],
+        };
+        ref.push(aux);
+      }
+
+      var prevX = x, prevY = y;
+
+      // Applying linear interpolation.
+      x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
+      (ref[1].x - ref[0].x) + ref[0].x;
+      y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
+      (ref[1].y - ref[0].y) + ref[0].y;
+
+      // Rotating the coordinates.
+      var rotX = x * cos - y * sin;
+      var rotY = y * cos + x * sin;
+
+      return { x: rotX, y: rotY };
+    };
+
     function nodeMouseDown(event) {
       _isMouseDown = true;
       var size = _s.graph.nodes().length;
@@ -157,6 +194,9 @@
         _mouse.removeEventListener('mousedown', nodeMouseDown);
         _body.addEventListener('mousemove', nodeMouseMove);
         _body.addEventListener('mouseup', nodeMouseUp);
+
+        var mousePos = computeMousePosition(event);
+        _dragNodeOffset = { x: _node.x - mousePos.x, y: _node.y - mousePos.y }
 
         // Do not refresh edgequadtree during drag:
         var k,
@@ -226,35 +266,10 @@
       }
 
       function executeNodeMouseMove() {
-        var offset = calculateOffset(_renderer.container),
-            x = event.clientX - offset.left,
-            y = event.clientY - offset.top,
-            cos = Math.cos(_camera.angle),
-            sin = Math.sin(_camera.angle),
-            nodes = _s.graph.nodes(),
-            ref = [];
+        var mousePos = computeMousePosition(event);
 
-        // Getting and derotating the reference coordinates.
-        for (var i = 0; i < 2; i++) {
-          var n = nodes[i];
-          var aux = {
-            x: n.x * cos + n.y * sin,
-            y: n.y * cos - n.x * sin,
-            renX: n[_prefix + 'x'],
-            renY: n[_prefix + 'y'],
-          };
-          ref.push(aux);
-        }
-
-        // Applying linear interpolation.
-        x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-          (ref[1].x - ref[0].x) + ref[0].x;
-        y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-          (ref[1].y - ref[0].y) + ref[0].y;
-
-        // Rotating the coordinates.
-        _node.x = x * cos - y * sin;
-        _node.y = y * cos + x * sin;
+        _node.x = mousePos.x + _dragNodeOffset.x;
+        _node.y = mousePos.y + _dragNodeOffset.y;
 
         _s.refresh();
 
