@@ -58,7 +58,6 @@
       _hoverStack = [],
       _hoverIndex = {},
       _isMouseDown = false,
-      _isMouseOverCanvas = false,
       _drag = false;
     
     if (renderer instanceof sigma.renderers.svg) {
