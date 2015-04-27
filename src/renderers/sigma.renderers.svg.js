@@ -431,6 +431,8 @@
    * This method resizes each DOM elements in the container and stores the new
    * dimensions. Then, it renders the graph.
    *
+   * If either param is undefined, uses the full container size.
+   *
    * @param  {?number}                width  The new width of the container.
    * @param  {?number}                height The new height of the container.
    * @return {sigma.renderers.svg}           Returns the instance itself.
