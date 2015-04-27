@@ -15,7 +15,7 @@ The Fruchterman-Reingold Algorithm is a force-directed layout algorithm. The ide
 
 In this algorithm, the sum of the force vectors determines which direction a node should move. The step width, which is a constant determines how far a node moves in a single step. When the energy of the system is minimized, the nodes stop moving and the system reaches it's equilibrium state. The drawback of this is that if we define a constant step width, there is no guarantee that the system will reach equilibrium at all. T.M.J. Fruchterman and E.M. Reingold introduced a "global temperature" that controls the step width of node movements and the algorithm's termination. The step width is proportional to the temperature, so if the temperature is hot, the nodes move faster (i.e, a larger distance in each single step). This temperature is the same for all nodes, and cools down at each iteration. Once the nodes stop moving, the system terminates.
 
-The time complexity of the algorithm is O(*N*² + *E*), with *N* being the number of nodes and *E* the number of edges in the graph. The algorithm should thus only be used on small graphs of *N* < 500 nodes.
+The time complexity of the algorithm is O(*N*² + *E*), where *N* is the number of nodes and *E* the number of edges in the graph. The algorithm should thus only be used on small graphs of *N* < 500 nodes.
 
 ## Methods
 
@@ -55,7 +55,7 @@ sigma.layouts.fruchtermanReingold.progress();
 
 *Algorithm configuration*
 
-* **autoArea**: *boolean* `true`: if `true`, **area** will be N².
+* **autoArea**: *boolean* `true`: if `true`, **area** will be computed as *N*².
 * **area**: *number* `1`
 * **gravity** *number* `1`
 * **speed**: *number* `0.1`
