@@ -71,6 +71,7 @@ module.exports = function(grunt) {
   var plugins = [
     'exporters.svg',
     'layout.forceAtlas2',
+    'layout.fruchtermanReingold',
     'parsers.gexf',
     'parsers.json',
     'pathfinding.astar',
