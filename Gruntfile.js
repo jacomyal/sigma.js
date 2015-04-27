@@ -75,6 +75,7 @@ module.exports = function(grunt) {
     'exporters.svg',
     'exporters.xlsx',
     'layout.forceAtlas2',
+    'parsers.cypher',
     'parsers.gexf',
     'parsers.json',
     'pathfinding.astar',
