@@ -54,8 +54,8 @@
       color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
 
-    size *= settings('edgeHoverSizeRatio');
-    overlay *= settings('edgeHoverSizeRatio');
+    size = (edge.hover) ? settings('edgeHoverSizeRatio') * size : size;
+    overlay = (edge.hover) ? settings('edgeHoverSizeRatio') * overlay : overlay;
 
     function drawQuadratic() {
 	for (var i = 0;i<percent; i++) {

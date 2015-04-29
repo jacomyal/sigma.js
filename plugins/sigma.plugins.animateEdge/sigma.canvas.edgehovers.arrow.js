@@ -29,8 +29,8 @@
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'];
 
-    size = (edge.hover) ?
-      settings('edgeHoverSizeRatio') * size : size;
+    size = (edge.hover) ? settings('edgeHoverSizeRatio') * size : size;
+    overlay = (edge.hover) ? settings('edgeHoverSizeRatio') * overlay : overlay;
     var aSize = size * 2.5,
         d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
         aX = sX + (tX - sX) * (d - aSize - tSize) / d,
@@ -57,7 +57,6 @@
       color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
 
-    size *= settings('edgeHoverSizeRatio');
     overlay *= settings('edgeHoverSizeRatio');
 
     var dx = (aX - sX) / 100;

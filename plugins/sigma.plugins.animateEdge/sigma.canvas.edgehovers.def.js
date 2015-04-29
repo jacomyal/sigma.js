@@ -42,8 +42,8 @@
       color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
     }
 
-    size *= settings('edgeHoverSizeRatio');
-    overlay *= settings('edgeHoverSizeRatio');
+    size = (edge.hover) ? settings('edgeHoverSizeRatio') * size : size;
+    overlay = (edge.hover) ? settings('edgeHoverSizeRatio') * overlay : overlay;
 
     var dx = (target[prefix + 'x'] - source[prefix + 'x']) / 100;
     var dy = (target[prefix + 'y'] - source[prefix + 'y']) / 100;
