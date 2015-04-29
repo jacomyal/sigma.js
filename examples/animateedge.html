@@ -181,6 +181,7 @@ var interval_id = setInterval(function() {
 }, 2000);
 */
 
+/*
 //continues animation with 2 seconds interval time
 //Note that sigma instance's {animationsTime} setting or plugins {duration} option must be greater (and not equal)
 //than the interval time.
@@ -208,4 +209,34 @@ var interval_id = setInterval(function() {
     }
   );
 }, 1100);
+*/
+
+// continues animation without the use of setInterval
+function animate(t) {
+  sigma.plugins.animateedge(
+    s,
+    {
+      percent: t
+    },
+    {
+	edges: ['e0','e2', 'pe1'],
+	//easing: 'cubicInOut',
+	//duration: 1500,
+	hold: true,	
+	onStep: function() {
+		//console.log('step...' + c++);
+	},
+	onComplete: function() {
+	//	clearInterval(interval_id);
+		(t == 50) ? t= 20 : t= 50;
+		animate(a);
+	//	c = 0;
+	//	console.log('Animation complete.');
+	}
+    }
+  );
+}
+
+animate(50);
+
 </script>
