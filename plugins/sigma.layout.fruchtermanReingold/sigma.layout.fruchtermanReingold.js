@@ -59,6 +59,9 @@
       this.running = false;
     };
 
+    /**
+     * Single layout iteration.
+     */
     this.atomicGo = function () {
       if (!this.running || this.iterCount < 1) return false;
 
@@ -267,7 +270,42 @@
    * ----------
    */
 
+  /**
+   * Configure the layout algorithm.
+
+   * Recognized options:
+   * **********************
+   * Here is the exhaustive list of every accepted parameters in the settings
+   * object:
+   *
+   *   {?boolean}           autoArea   If `true`, area will be computed as N².
+   *   {?number}            area       The area of the graph.
+   *   {?number}            gravity    This force attracts all nodes to the
+   *                                   center to avoid dispersion of
+   *                                   disconnected components.
+   *   {?number}            speed      A greater value increases the
+   *                                   convergence speed at the cost of precision loss.
+   *   {?number}            iterations The number of iterations to perform
+   *                                   before the layout completes.
+   *   {?(function|string)} easing     Either the name of an easing in the
+   *                                   sigma.utils.easings package or a
+   *                                   function. If not specified, the
+   *                                   quadraticInOut easing from this package
+   *                                   will be used instead.
+   *   {?number}            duration   The duration of the animation. If not
+   *                                   specified, the "animationsTime" setting
+   *                                   value of the sigma instance will be used
+   *                                   instead.
+   *
+   *
+   * @param  {sigma}   sigInst The related sigma instance.
+   * @param  {object} config  The optional configuration object.
+   *
+   * @return {sigma.classes.dispatcher} Returns an event emitter.
+   */
   sigma.layouts.fruchtermanReingold.configure = function(sigInst, config) {
+    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+    if (!config) throw new Error('Missing argument: "config"');
 
     // Create instance if undefined
     if (!_instance[sigInst.id]) {
@@ -288,7 +326,42 @@
     return _eventEmitter[sigInst.id];
   };
 
+  /**
+   * Start the layout algorithm. It will use the existing configuration if no
+   * new configuration is passed.
+
+   * Recognized options:
+   * **********************
+   * Here is the exhaustive list of every accepted parameters in the settings
+   * object:
+   *
+   *   {?boolean}           autoArea   If `true`, area will be computed as N².
+   *   {?number}            area       The area of the graph.
+   *   {?number}            gravity    This force attracts all nodes to the
+   *                                   center to avoid dispersion of
+   *                                   disconnected components.
+   *   {?number}            speed      A greater value increases the
+   *                                   convergence speed at the cost of precision loss.
+   *   {?number}            iterations The number of iterations to perform
+   *                                   before the layout completes.
+   *   {?(function|string)} easing     Either the name of an easing in the
+   *                                   sigma.utils.easings package or a
+   *                                   function. If not specified, the
+   *                                   quadraticInOut easing from this package
+   *                                   will be used instead.
+   *   {?number}            duration   The duration of the animation. If not
+   *                                   specified, the "animationsTime" setting
+   *                                   value of the sigma instance will be used
+   *                                   instead.
+   *
+   *
+   * @param  {sigma}   sigInst The related sigma instance.
+   * @param  {?object} config  The optional configuration object.
+   *
+   * @return {sigma.classes.dispatcher} Returns an event emitter.
+   */
   sigma.layouts.fruchtermanReingold.start = function(sigInst, config) {
+    if (!sigInst) throw new Error('Missing argument: "sigInst"');
 
     if (config) {
       this.configure(sigInst, config);
@@ -299,11 +372,30 @@
     return _eventEmitter[sigInst.id];
   };
 
+  /**
+   * Returns true if the layout has started and is not completed.
+   *
+   * @param  {sigma}   sigInst The related sigma instance.
+   *
+   * @return {boolean}
+   */
   sigma.layouts.fruchtermanReingold.isRunning = function(sigInst) {
+    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+
     return !!_instance[sigInst.id] && _instance[sigInst.id].running;
   };
 
+  /**
+   * Returns the number of iterations done divided by the total number of
+   * iterations to perform.
+   *
+   * @param  {sigma}   sigInst The related sigma instance.
+   *
+   * @return {number} A value between 0 and 1.
+   */
   sigma.layouts.fruchtermanReingold.progress = function(sigInst) {
+    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+
     return (_instance[sigInst.id].config.iterations - _instance[sigInst.id].iterCount) /
       _instance[sigInst.id].config.iterations;
   };
