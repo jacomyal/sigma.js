@@ -40,7 +40,7 @@ var listener = sigma.layouts.fruchtermanReingold.start(sigInst, config);
 Returns whether the layout is running.
 
 ```js
-sigma.layouts.fruchtermanReingold.isRunning();
+sigma.layouts.fruchtermanReingold.isRunning(sigInst);
 ```
 
 **progress**
@@ -48,7 +48,7 @@ sigma.layouts.fruchtermanReingold.isRunning();
 Returns the percentage of iterations done, from 0 (0%) to 1 (100%).
 
 ```js
-sigma.layouts.fruchtermanReingold.progress();
+sigma.layouts.fruchtermanReingold.progress(sigInst);
 ```
 
 ## Configuration
@@ -59,7 +59,7 @@ sigma.layouts.fruchtermanReingold.progress();
 * **area**: *number* `1`
 * **gravity** *number* `1`
 * **speed**: *number* `0.1`
-* **maxIterations** *number* `1000`: set a number of iterations to perform before the layout completes.
+* **iterations** *number* `1000`: the number of iterations to perform before the layout completes.
 
 *Easing configuration*
 
@@ -78,11 +78,11 @@ Example:
 
 ```js
 // Start the algorithm:
-var listener = sigma.layouts.fruchtermanReingold.configure(s, config);
+var listener = sigma.layouts.fruchtermanReingold.configure(sigInst, config);
 // Bind all events:
 listener.bind('start stop interpolate', function(event) {
   console.log(event.type);
 });
 
-sigma.layouts.fruchtermanReingold.start();
+sigma.layouts.fruchtermanReingold.start(sigInst);
 ```
