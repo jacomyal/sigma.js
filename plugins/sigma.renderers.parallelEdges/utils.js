@@ -28,6 +28,25 @@
   };
 
   /**
+   * Return the control point coordinates for parallel edges.
+   *
+   * @param  {number} x1  The X coordinate of the start point.
+   * @param  {number} y1  The Y coordinate of the start point.
+   * @param  {number} x2  The X coordinate of the end point.
+   * @param  {number} y2  The Y coordinate of the end point.
+   * @param  {number} a   Modifier for the amplitude of the curve.
+   * @return {x,y}        The control point coordinates.
+   */
+  sigma.utils.getParallelControlPoint = function(x1, y1, x2, y2, a) {
+    a = a || 0;
+    var b = (a % 2) ? 1 : -1;
+    return {
+      x: (x1 + x2) / 2 + b * (y2 - y1) / ((400 + a) / (15 + a)),
+      y: (y1 + y2) / 2 + b * (x1 - x2) / ((400 + a) / (15 + a))
+    };
+  };
+
+  /**
    * Return the coordinates of the two control points for a self loop (i.e.
    * where the start point is also the end point) computed as a cubic bezier
    * curve.
