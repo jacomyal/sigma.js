@@ -15,6 +15,7 @@ This plugin overrides default renderers to provide more powerful renderers.Nodes
 - `type`: *string*
 - `icon`: *object*
 - `image`: *object*
+- `level`: *number*
 
 Edges take the following attributes:
 - `type`: *string*
@@ -185,6 +186,24 @@ The syntax to use a webfont is simple:
 }
 ```
 
+## Levels
+
+Levels simulate layers of nodes using shadows to create depth. Shadows with different offset and blur are used to simulate depth. Inspired by [Google Material Design](https://www.google.com/design/spec/what-is-material/environment.html#environment-3d-world), 5 levels are available:
+
+![nodelevels](https://github.com/Linkurious/linkurious.js/wiki/media/node-levels.png)
+
+Levels can be assigned on each node:
+
+```javascript
+mySigma.graph.addNode({
+  level: 3
+});
+```
+
+They may be used to reinforce a highligh effect on hover or selected nodes. Set a value from 1 to 5 for the `nodeHoverLevel` setting to use levels on hover nodes. Set a value from 1 to 5  for the `nodeActiveLevel` setting to use levels on active nodes. The default value of these settings is `0`. It means no effect.
+
+Levels are supported in Canvas only.
+
 ## Settings
 
  * **defaultLabelActiveColor**
@@ -278,6 +297,18 @@ The syntax to use a webfont is simple:
    * Defines how many sprites can fit inside the sprite sheet texture. If you have less than 128 images then you can enter the number of max different images you will even encounter, so that each sprite can use as much pixels as possible (this gives increased resolution).
    * type: *number*
    * default value: `128`
+
+ * **nodeActiveLevel** (Canvas only)
+   * Defines the (Material Design) shadow level of active nodes.
+   * type: *number*
+   * default value: `0`
+   * available values: `0` (no shadow), `1` (low), `2`, `3`, `4`, `5` (high)
+
+ * **nodeHoverLevel**
+   * Defines the (Material Design) shadow level of hovered nodes.
+   * type: *number*
+   * default value: `0`
+   * available values: `0` (no shadow), `1` (low), `2`, `3`, `4`, `5` (high)
 
 You may override the default values when instantiating Sigma, e.g.:
 

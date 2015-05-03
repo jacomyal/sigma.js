@@ -115,7 +115,41 @@
         imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous',
         borderSize = settings('borderSize'),
         outerBorderSize = settings('outerBorderSize'),
-        color = o.color || node.color || defaultNodeColor;
+        color = o.color || node.color || defaultNodeColor,
+        level = node.active ? settings('nodeActiveLevel') : node.level;
+
+    // Level:
+    if (level) {
+      context.shadowOffsetX = 0;
+      // inspired by Material Design shadows, level from 1 to 5:
+      switch(level) {
+        case 1:
+          context.shadowOffsetY = 1.5;
+          context.shadowBlur = 4;
+          context.shadowColor = 'rgba(0,0,0,0.36)';
+          break;
+        case 2:
+          context.shadowOffsetY = 3;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.39)';
+          break;
+        case 3:
+          context.shadowOffsetY = 6;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.42)';
+          break;
+        case 4:
+          context.shadowOffsetY = 10;
+          context.shadowBlur = 20;
+          context.shadowColor = 'rgba(0,0,0,0.47)';
+          break;
+        case 5:
+          context.shadowOffsetY = 15;
+          context.shadowBlur = 24;
+          context.shadowColor = 'rgba(0,0,0,0.52)';
+          break;
+      }
+    }
 
     // Color:
     if (node.active) {
@@ -149,43 +183,18 @@
       }
     }
 
-      // TODO cross color pie
-    // if ((!node.active ||
-    //   (node.active && settings('nodeActiveColor') === 'node')) &&
-    //   node.colors &&
-    //   node.colors.length) {
+    context.fillStyle = color;
+    context.beginPath();
+    drawCross(node, x, y, size, context);
+    context.closePath();
+    context.fill();
 
-    //   // see http://jsfiddle.net/hvYkM/1/
-    //   var i,
-    //       l = node.colors.length,
-    //       j = 1 / l,
-    //       lastend = 0;
-
-    //   for (i = 0; i < l; i++) {
-    //     context.fillStyle = node.colors[i];
-    //     context.beginPath();
-    //     context.moveTo(x, y);
-    //     context.arc(
-    //       x,
-    //       y,
-    //       size,
-    //       lastend,
-    //       lastend + (Math.PI * 2 * j),
-    //       false
-    //     );
-    //     context.lineTo(x, y);
-    //     context.closePath();
-    //     context.fill();
-    //     lastend += Math.PI * 2 * j;
-    //   }
-    // }
-    // else {
-      context.fillStyle = color;
-      context.beginPath();
-      drawCross(node, x, y, size, context);
-      context.closePath();
-      context.fill();
-    // }
+    // reset shadow
+    if (level) {
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
+      context.shadowColor = '#000000'
+    }
 
     // Image:
     if (node.image) {

@@ -99,20 +99,52 @@
         imgCrossOrigin = settings('imgCrossOrigin') || 'anonymous',
         borderSize = settings('borderSize'),
         outerBorderSize = settings('outerBorderSize'),
-        color = o.color || node.color || defaultNodeColor;
+        color = o.color || node.color || defaultNodeColor,
+        level = node.active ? settings('nodeActiveLevel') : node.level;
 
-    // Color:
+    // Level:
+    if (level) {
+      context.shadowOffsetX = 0;
+      // inspired by Material Design shadows, level from 1 to 5:
+      switch(level) {
+        case 1:
+          context.shadowOffsetY = 1.5;
+          context.shadowBlur = 4;
+          context.shadowColor = 'rgba(0,0,0,0.36)';
+          break;
+        case 2:
+          context.shadowOffsetY = 3;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.39)';
+          break;
+        case 3:
+          context.shadowOffsetY = 6;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.42)';
+          break;
+        case 4:
+          context.shadowOffsetY = 10;
+          context.shadowBlur = 20;
+          context.shadowColor = 'rgba(0,0,0,0.47)';
+          break;
+        case 5:
+          context.shadowOffsetY = 15;
+          context.shadowBlur = 24;
+          context.shadowColor = 'rgba(0,0,0,0.52)';
+          break;
+      }
+    }
+
     if (node.active) {
+      // Color:
       if (settings('nodeActiveColor') === 'node') {
         color = node.active_color || color;
       }
       else {
         color = settings('defaultNodeActiveColor') || color;
       }
-    }
 
-    // Border:
-    if (node.active) {
+      // Outer Border:
       if (outerBorderSize > 0) {
         context.beginPath();
         context.fillStyle = settings('nodeOuterBorderColor') === 'node' ?
@@ -122,6 +154,7 @@
         context.closePath();
         context.fill();
       }
+      // Border:
       if (borderSize > 0) {
         context.beginPath();
         context.fillStyle = settings('nodeBorderColor') === 'node' ?
@@ -161,6 +194,13 @@
       context.arc(x, y, size, 0, Math.PI * 2, true);
       context.closePath();
       context.fill();
+    }
+
+    // reset shadow
+    if (level) {
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
+      context.shadowColor = '#000000'
     }
 
     // Image:
