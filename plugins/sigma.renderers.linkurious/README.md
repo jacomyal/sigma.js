@@ -188,10 +188,9 @@ The syntax to use a webfont is simple:
 
 ## Levels
 
-Levels simulate layers of nodes using shadows to create depth. Inspired by [Google Material Design](https://www.google.com/design/spec/what-is-material/environment.html#environment-3d-world), 5 levels are available:
+Levels simulate layers of nodes using shadows to create depth. Shadows with different offset and blur are used to simulate depth. Inspired by [Google Material Design](https://www.google.com/design/spec/what-is-material/environment.html#environment-3d-world), 5 levels are available:
 
 ![nodelevels](https://github.com/Linkurious/linkurious.js/wiki/media/node-levels.png)
-Shadows with different offset and blur are used to simulate depth.
 
 Levels can be assigned on each node:
 
