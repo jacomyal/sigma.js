@@ -31,11 +31,46 @@
           settings('labelSizeRatio') * size,
         color = settings('nodeHoverColor') === 'node' ?
           (node.color || defaultNodeColor) :
-          settings('defaultNodeHoverColor');
+          settings('defaultNodeHoverColor'),
+        level = settings('nodeHoverLevel');
 
     if (alignment !== 'center') {
       prepareLabelBackground(context);
       drawHoverBorder(alignment, context, fontSize, node);
+    }
+
+
+    // Level:
+    if (level) {
+      context.shadowOffsetX = 0;
+      // inspired by Material Design shadows, level from 1 to 5:
+      switch(level) {
+        case 1:
+          context.shadowOffsetY = 1.5;
+          context.shadowBlur = 4;
+          context.shadowColor = 'rgba(0,0,0,0.36)';
+          break;
+        case 2:
+          context.shadowOffsetY = 3;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.39)';
+          break;
+        case 3:
+          context.shadowOffsetY = 6;
+          context.shadowBlur = 12;
+          context.shadowColor = 'rgba(0,0,0,0.42)';
+          break;
+        case 4:
+          context.shadowOffsetY = 10;
+          context.shadowBlur = 20;
+          context.shadowColor = 'rgba(0,0,0,0.47)';
+          break;
+        case 5:
+          context.shadowOffsetY = 15;
+          context.shadowBlur = 24;
+          context.shadowColor = 'rgba(0,0,0,0.52)';
+          break;
+      }
     }
 
     // Node border:
@@ -59,6 +94,12 @@
     // Node:
     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
     nodeRenderer(node, context, settings, { color: color });
+
+    // reset shadow
+    if (level) {
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
+    }
 
     if (alignment === 'center') {
       prepareLabelBackground(context);
@@ -184,7 +225,6 @@
       context.closePath();
       context.fill();
 
-      context.shadowOffsetX = 0;
       context.shadowOffsetY = 0;
       context.shadowBlur = 0;
     }

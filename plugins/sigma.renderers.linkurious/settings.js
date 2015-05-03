@@ -53,6 +53,17 @@
     defaultNodeOuterBorderColor: '#000',
 
     /**
+     * NODE LEVEL SETTINGS:
+     * **********************
+     */
+    // {number} The (Material Design) shadow level of active nodes.
+    //          Available values: 0 (no shadow), 1 (low), 2, 3, 4, 5 (high)
+    nodeActiveLevel: 0,
+    // {number} The (Material Design) shadow level of hovered nodes.
+    //          Available values: 0 (no shadow), 1 (low), 2, 3, 4, 5 (high)
+    nodeHoverLevel: 0,
+
+    /**
      * NODE ICONS AND IMAGES SETTINGS:
      * *******************************
      */
