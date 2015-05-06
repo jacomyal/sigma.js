@@ -92,7 +92,7 @@
     context.lineWidth = size;
 
     context.fillStyle = color;
-    if (!partial) {
+    if (!partial || (percent==100)) {
 	context.beginPath();
 	context.moveTo(aX + vX, aY + vY);
 	context.lineTo(aX + vY * 0.6, aY - vX * 0.6);

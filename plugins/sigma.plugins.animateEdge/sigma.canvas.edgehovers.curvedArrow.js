@@ -135,7 +135,4 @@
       pt = drawQuadratic();
     }
     context.stroke();
-
-//----------------TODO---------------------
-//--------Draw the arrow head--------------
   };})();
