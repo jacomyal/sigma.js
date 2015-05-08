@@ -8,13 +8,14 @@ Plugin developed by [Florent Schildknecht](https://github.com/Flo-Schield-Bobby)
 This plugin allows you to select several nodes with a lasso-tool:
 - Enable the lasso mode
 - Draw the lasso path
-- All the nodes with a center inside the path will then be available as an array, dispatched by an event.
+- All the nodes with a center inside the path will then be available as an array, dispatched by an event
+- Hidden nodes will not be selected
 - It currently works with a canvas renderer [not compatible with WebGL renderer]
 - Touch events are supported (it works on a mobile browser)
 
-![Lasso](https://github.com/Linkurious/sigma.js/wiki/media/lasso.gif)
+![Lasso](https://github.com/Linkurious/linkurious.js/wiki/media/lasso.gif)
 
-![Lasso LK](https://github.com/Linkurious/sigma.js/wiki/media/lasso-lk.gif)
+![Lasso LK](https://github.com/Linkurious/linkurious.js/wiki/media/lasso-lk.gif)
 
 See the following [example code](../../examples/lasso.html) for full usage.
 
