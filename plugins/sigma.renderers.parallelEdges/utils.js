@@ -40,9 +40,10 @@
   sigma.utils.getParallelControlPoint = function(x1, y1, x2, y2, a) {
     a = a || 0;
     var b = (a % 2) ? 1 : -1;
+    var c = (a % 2) ? a : a - 1;
     return {
-      x: (x1 + x2) / 2 + b * (y2 - y1) / ((400 + a) / (15 + a)),
-      y: (y1 + y2) / 2 + b * (x1 - x2) / ((400 + a) / (15 + a))
+      x: (x1 + x2) / 2 + b * (y2 - y1) / (250 / (5 + c)),
+      y: (y1 + y2) / 2  + b * (x1 - x2) / (250 / (5 + c))
     };
   };
 
