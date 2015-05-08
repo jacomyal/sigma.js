@@ -293,7 +293,7 @@
             x = node[prefix + 'x'],
             y = node[prefix + 'y'];
 
-        if (this.drawingContext.isPointInPath(x, y)) {
+        if (this.drawingContext.isPointInPath(x, y) && !node.hidden) {
           this.selectedNodes.push(node);
         }
       }
