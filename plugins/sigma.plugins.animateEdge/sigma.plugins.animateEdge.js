@@ -56,26 +56,35 @@
           o.easing :
           sigma.utils.easings.quadraticOut,
         start = sigma.utils.dateNow(),
+	edges, startPositions;
+
+    s.animations = s.animations || Object.create({});
+    sigma.plugins.kill(s);
+
+    if (o.edges && o.edges.length) {
+      if (typeof o.edges[0] === 'object')
+        edges = o.edges;
+      else
+        edges = s.graph.edges(o.edges); // argument is an array of IDs
+    }
+    else
+	edges = [];
+
         // Store initial positions:
-        startPositions = s.graph.edges().reduce(function(res, edge) {
+        startPositions = edges.reduce(function(res, edge) {
           var k;
           res[edge.id] = {};
-	  if (o.edges.indexOf(edge.id) >= 0)
            for (k in animate)
             if (k in edge)
               res[edge.id][k] = edge[k];
           return res;
         }, {});
 
-    s.animations = s.animations || Object.create({});
-    sigma.plugins.kill(s);
-
     function step() {
       var p = (sigma.utils.dateNow() - start) / duration;
 
       if (p >= 1) {
-        s.graph.edges().forEach(function(edge) {
-	if (o.edges.indexOf(edge.id) >= 0)
+        edges.forEach(function(edge) {
           for (var k in animate)
             if (k in animate) 
               edge[k] = ((hold) ? animate[k] : startPositions[edge.id][k]);
@@ -86,13 +95,11 @@
       } else {
         p = easing(p);
  
-	s.graph.edges().forEach(function(edge) {
-	if (o.edges.indexOf(edge.id) >= 0) {
+	edges.forEach(function(edge) {
           for (var k in animate)
             if (k in animate) {
                 edge[k] = animate[k] * p + startPositions[edge.id][k] * (1 - p);
             }
-	  }
         });
 
         s.refresh();
