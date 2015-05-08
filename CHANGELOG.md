@@ -1,5 +1,28 @@
 ## sigma.js - changelog:
 
+#### 1.1.0 - release (May 10, 2015)
+
+ - Added the SVG renderer.
+ - Added the `minArrowSize` setting (thanks to [@ssidorchick](https://github.com/ssidorchick)).
+ - Added an edge quadtree and support for edge events (thanks to [@sheymann](https://github.com/sheymann)).
+ - Fixed [#362](https://github.com/jacomyal/sigma.js/issues/362): Nodes and edges can now have a number id.
+ - Added the [renderers.snapshot](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.snapshot) plugin.
+ - Fixed [#403](https://github.com/jacomyal/sigma.js/issues/403): renderer string container polymorphism.
+ - Added an event dispatched when instance is killed.
+ - Added low-level Barnes-Hut optimization to the [layout.forceAltas2](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.layout.forceAtlas2) plugin (thanks to [@jacomyma](https://github.com/jacomyma)).
+ - Added the `mouseWheelEnabled` setting.
+ - Added an option to skip quadtree indexation when refreshing an instance.
+ - Added `defaultEdgeType` and `defaultNodeType` settings.
+ - Added a `isDragging` flag in click event.
+ - Added some features to the [layout.forceAltas2](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.layout.forceAtlas2) plugin.
+ - Fixed resizing related issues.
+ - Added the [SVG exporter](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.exporters.svg) plugin.
+ - Fixed some SVG-related bugs (thanks to [@qinfchen](https://github.com/qinfchen)).
+ - Added the [A*](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.pathfinding.astar) plugin (thanks to [@A----](https://github.com/A----)).
+ - Changed the `singleHover` setting to default to `true`.
+ - Added the [cypher](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.parsers.cypher) plugin (thanks to [@sim51](https://github.com/sim51)).
+ - Added the [parallel edges](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.parallelEdges) plugin (thanks to [@3ch01c](https://github.com/3ch01c))
+
 #### 1.0.3 - release (August 22, 2014)
 
   - Fixed [#186](https://github.com/jacomyal/sigma.js/issues/186): NPM sigma package
