@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edgehovers.def =
+  sigma.canvas.edgehovers.parallel =
     function(edge, source, target, context, settings) {
       var color = edge.color,
         prefix = settings('prefix') || '',
