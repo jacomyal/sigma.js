@@ -4,7 +4,7 @@
   sigma.utils.pkg('sigma.canvas.edges');
 
   /**
-   * The default edge renderer. It renders the edge as a simple line.
+   * Parallel edge renderer
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
