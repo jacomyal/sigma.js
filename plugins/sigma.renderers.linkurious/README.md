@@ -21,6 +21,7 @@ Edges take the following attributes:
 - `type`: *string*
 - `active`: *boolean* (see Compatibility below)
 - `active_color`: *string* (see Compatibility below)
+- `level`: *number*
 
 See the following [example code](../../examples/renderers-linkurious.html) and [settings](settings.js) for full usage.
 
@@ -188,11 +189,11 @@ The syntax to use a webfont is simple:
 
 ## Levels
 
-Levels simulate layers of nodes using shadows to create depth. Shadows with different offset and blur are used to simulate depth. Inspired by [Google Material Design](https://www.google.com/design/spec/what-is-material/environment.html#environment-3d-world), 5 levels are available:
+Levels simulate layers of nodes and edges using shadows to create depth. Shadows with different offset and blur are used to simulate depth. Inspired by [Google Material Design](https://www.google.com/design/spec/what-is-material/environment.html#environment-3d-world), 5 levels are available:
 
 ![nodelevels](https://github.com/Linkurious/linkurious.js/wiki/media/node-levels.png)
 
-Levels can be assigned on each node:
+Levels can be assigned on each node or edge:
 
 ```javascript
 mySigma.graph.addNode({
@@ -200,7 +201,7 @@ mySigma.graph.addNode({
 });
 ```
 
-They may be used to reinforce a highligh effect on hover or selected nodes. Set a value from 1 to 5 for the `nodeHoverLevel` setting to use levels on hover nodes. Set a value from 1 to 5  for the `nodeActiveLevel` setting to use levels on active nodes. The default value of these settings is `0`. It means no effect.
+They may be used to reinforce a highligh effect on hover or selected nodes and edges. Set a value from 1 to 5 for the `nodeHoverLevel` setting to use levels on hover nodes. Set a value from 1 to 5  for the `nodeActiveLevel` setting to use levels on active nodes. Set `edgeHoverLevel` and `edgeActiveLevel` for the edges. The default value of these settings is `0`. It means no effect.
 
 Levels are supported in Canvas only.
 
@@ -306,6 +307,18 @@ Levels are supported in Canvas only.
 
  * **nodeHoverLevel**
    * Defines the (Material Design) shadow level of hovered nodes.
+   * type: *number*
+   * default value: `0`
+   * available values: `0` (no shadow), `1` (low), `2`, `3`, `4`, `5` (high)
+
+ * **edgeActiveLevel** (Canvas only)
+   * Defines the (Material Design) shadow level of active edges.
+   * type: *number*
+   * default value: `0`
+   * available values: `0` (no shadow), `1` (low), `2`, `3`, `4`, `5` (high)
+
+ * **edgeHoverLevel**
+   * Defines the (Material Design) shadow level of hovered edges.
    * type: *number*
    * default value: `0`
    * available values: `0` (no shadow), `1` (low), `2`, `3`, `4`, `5` (high)
