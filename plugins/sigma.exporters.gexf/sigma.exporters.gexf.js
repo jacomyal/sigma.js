@@ -105,9 +105,9 @@
    * @return {string}      The updated variable type.
    */
   function typeOf(x, type) {
-    if (type === 'float' && typeof x === 'number') {
-      if (isInteger(x)) {
-        type = 'integer';
+    if (type === 'integer' && typeof x === 'number') {
+      if (!isInteger(x)) {
+        type = 'float';
       }
     }
     else if (typeof x !== 'number') {
@@ -223,7 +223,7 @@
             if (!(k in nodeAttrIndex)) {
               nodeAttrIndex[k] = {
                 id: nodeAttrCpt,
-                type: 'float'
+                type: 'integer'
               };
               nodeAttrCpt++;
             }
@@ -317,7 +317,7 @@
             if (!(k in edgeAttrIndex)) {
               edgeAttrIndex[k] = {
                 id: edgeAttrCpt,
-                type: 'float'
+                type: 'integer'
               };
               edgeAttrCpt++;
             }
