@@ -1208,12 +1208,16 @@
       var h = histogram(v.histograms[visualVar], property);
 
       if (visualVar === 'color') {
+        if (!self.styles[target].color) {
+          throw new Error('Missing key "color" in '+ target +' palette.');
+        }
         var bins = h.length,
-          o = null;
-        for (var bin = 0; bin < bins; bin++) {
           o = strToObjectRef(self.palette, self.styles[target].color.scheme);
-          if (!o)
-            throw new Error('Color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.');
+
+        if (!o)
+          throw new Error('Color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.');
+
+        for (var bin = 0; bin < bins; bin++) {
           if (!o[bins])
             throw new Error('Missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".');
 
