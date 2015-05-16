@@ -144,6 +144,12 @@
     minNodeSize: 1,
     maxNodeSize: 8,
 
+    // {number} Global transparency values for WebGL nodes and edges.
+    //          nodesAlpha and edgesAlpha should be floating point values
+    //          between 0.0 and 1.0. They default to 1.0 (fully opaque).
+    //          Currently only works for WebGL rendering.
+    nodesAlpha: 1.0,
+    edgesAlpha: 1.0,
 
 
 

@@ -58,6 +58,8 @@
             gl.getUniformLocation(program, 'u_matrix'),
           ratioLocation =
             gl.getUniformLocation(program, 'u_ratio'),
+          alphaLocation =
+            gl.getUniformLocation(program, 'u_alpha'),
           scaleLocation =
             gl.getUniformLocation(program, 'u_scale');
 
@@ -72,6 +74,7 @@
       );
       gl.uniform1f(scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
+      gl.uniform1f(alphaLocation, params.settings('nodesAlpha'));
 
       gl.enableVertexAttribArray(positionLocation);
       gl.enableVertexAttribArray(sizeLocation);
@@ -134,6 +137,7 @@
           'uniform float u_ratio;',
           'uniform float u_scale;',
           'uniform mat3 u_matrix;',
+          'uniform float u_alpha;',
 
           'varying vec4 color;',
           'varying vec2 center;',
@@ -162,7 +166,7 @@
             'color.b = mod(c, 256.0); c = floor(c / 256.0);',
             'color.g = mod(c, 256.0); c = floor(c / 256.0);',
             'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0;',
+            'color.a = u_alpha;',
           '}'
         ].join('\n'),
         gl.VERTEX_SHADER

@@ -111,6 +111,8 @@
             gl.getUniformLocation(program, 'u_matrixHalfPiMinus'),
           ratioLocation =
             gl.getUniformLocation(program, 'u_ratio'),
+          alphaLocation =
+            gl.getUniformLocation(program, 'u_alpha'),
           scaleLocation =
             gl.getUniformLocation(program, 'u_scale');
 
@@ -123,6 +125,7 @@
         ratioLocation,
         params.ratio / Math.pow(params.ratio, params.settings('edgesPowRatio'))
       );
+      gl.uniform1f(alphaLocation, params.settings('edgesAlpha'));
       gl.uniform1f(scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
       gl.uniformMatrix2fv(
@@ -200,6 +203,7 @@
 
           'uniform vec2 u_resolution;',
           'uniform float u_ratio;',
+          'uniform float u_alpha;',
           'uniform float u_scale;',
           'uniform mat3 u_matrix;',
           'uniform mat2 u_matrixHalfPi;',
@@ -230,7 +234,7 @@
             'color.b = mod(c, 256.0); c = floor(c / 256.0);',
             'color.g = mod(c, 256.0); c = floor(c / 256.0);',
             'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0;',
+            'color.a = u_alpha;',
           '}'
         ].join('\n'),
         gl.VERTEX_SHADER
