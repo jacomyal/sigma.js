@@ -1,5 +1,17 @@
 ## linkurious.js - changelog:
 
+#### 1.0.8 (May 18, 2015)
+
+Plugins:
+
+  - Add sigma.layouts.fruchtermanReingold
+  - Add sigma.parsers.cypher (license GNU GPL3 from @sim51)
+  - Add levels to Linkurious renderers (canvas)
+  - use throw new Error('msg') instead of throw 'msg'
+  - plugins.lasso: Ensure that lasso does not select hidden nodes (thanks @apitts)
+  - exporters.gexf: Change initial type to integer in GEXF exporter (thanks @apitts)
+  - plugins.design: Minor fix in histogram on a missing "color" key
+
 #### 1.0.7 (March 29, 2015)
 
 Core:
