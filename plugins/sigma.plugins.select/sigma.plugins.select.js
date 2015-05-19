@@ -78,7 +78,7 @@
    * @param  {sigma.plugins.activeState} a The activeState plugin instance.
    */
   function Select(s, a) {
-    var isDragging = false,
+    var dragCount = 0,
         dragListener = null,
         kbd = null;
 
@@ -100,7 +100,7 @@
      */
     this.clickNodesHandler = function(event) {
       // Prevent nodes to be selected while dragging:
-      if (isDragging) return;
+      if (dragCount > 1) return;
 
       var targets = event.data.node.map(function(n) {
         return n.id;
@@ -117,12 +117,6 @@
         a.dropNodes(existingTargets);
       }
       else {
-        // Don't drop nodes on dragging
-        if(!isDragging) {
-          a.dropNodes();
-          _nodeReference = null;
-        }
-
         if (actives.length > 1) {
           a.addNodes(targets);
         }
@@ -153,7 +147,7 @@
      */
     this.clickEdgesHandler = function(event) {
       // Prevent edges to be selected while dragging:
-      if (isDragging) return;
+      if (dragCount) return;
 
       var targets = event.data.edge.map(function(e) {
         return e.id;
@@ -184,7 +178,7 @@
      * This function handles the 'drag' event.
      */
     this.dragHandler = function() {
-      isDragging = true;
+      dragCount++;
     };
 
     /**
@@ -192,8 +186,8 @@
      */
     this.dropHandler = function() {
       setTimeout(function() {
-        isDragging = false;
-      }, 300);
+        dragCount = 0;
+      }, 1);
     };
 
     // Select all nodes or deselect them if all nodes are active
@@ -262,21 +256,25 @@
 
     /**
      * Bind the dragNodes plugin to handle drag events.
-     * @param  {sigma.plugins.dragNodes} d The dragNodes plugin instance.
+     * @param  {sigma.plugins.dragNodes} dragNodes The dragNodes plugin instance.
      */
-    this.bindDragNodes = function(d) {
-      dragListener = d;
+    this.bindDragNodes = function(dragNodes) {
+      if (!dragNodes) throw new Error('Missing argument: "dragNodes"');
+
+      dragListener = dragNodes;
       dragListener.bind('drag', this.dragHandler);
       dragListener.bind('drop', this.dropHandler);
+      return this;
     }
 
     this.unbindDragNodes = function() {
       if (dragListener) {
         dragListener.unbind('drag', this.dragHandler);
         dragListener.unbind('drop', this.dropHandler);
-        isDragging = false;
+        dragCount = 0;
         dragListener = null;
       }
+      return this;
     };
 
     _body.addEventListener('keydown', keyDown, false);
@@ -286,6 +284,8 @@
      * @param  {sigma.plugins.keyboard} keyboard The keyboard plugin instance.
      */
     this.bindKeyboard = function(keyboard) {
+      if (!keyboard) throw new Error('Missing argument: "keyboard"');
+
       kbd = keyboard;
       kbd.bind('32+65 18+32+65', spaceA);
       kbd.bind('32+85 18+32+85', spaceU);
@@ -293,6 +293,7 @@
       kbd.bind('32+69 18+32+69', spaceE);
       kbd.bind('32+73 18+32+73', spaceI);
       kbd.bind('32+76 18+32+76', spaceL);
+      return this;
     }
 
     this.unbindKeyboard = function() {
@@ -305,6 +306,7 @@
         kbd.unbind('32+76 18+32+76', spaceL);
         kbd = null;
       }
+      return this;
     }
   }
 
