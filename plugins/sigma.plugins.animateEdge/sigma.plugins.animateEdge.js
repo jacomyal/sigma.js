@@ -59,7 +59,7 @@
 	edges, startPositions;
 
     s.animations = s.animations || Object.create({});
-    sigma.plugins.kill(s);
+    sigma.plugins.killAnimateEdge(s);
 
     if (o.edges && o.edges.length) {
       if (typeof o.edges[0] === 'object')
@@ -112,7 +112,7 @@
     step();
   };
 
-  sigma.plugins.kill = function(s) {
+  sigma.plugins.killAnimateEdge = function(s) {
     for (var k in (s.animations || {}))
       cancelAnimationFrame(s.animations[k]);
   };
