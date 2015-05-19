@@ -163,7 +163,6 @@
         _renderer.settings({mouseEnabled: false, enableHovering: false});
 
         _self.dispatchEvent('startdrag', {
-          node: _node,
           captor: event,
           renderer: _renderer
         });
@@ -181,7 +180,6 @@
 
       if (_drag) {
         _self.dispatchEvent('drop', {
-          node: _node,
           captor: event,
           renderer: _renderer
         });
@@ -197,7 +195,6 @@
         _s.refresh();
       }
       _self.dispatchEvent('dragend', {
-        node: _node,
         captor: event,
         renderer: _renderer
       });
@@ -248,28 +245,38 @@
         // Drag multiple nodes, Keep distance
         var x2, y2;
         if(_a) {
-          var activeNodes = _a.nodes();
-          for(var i = 0; i < activeNodes.length; i++) {
+          var activeNodes = _a.nodes(),
+            isHoveredNodeActive;
 
-            // Delete old reference
-            if(_draggingNode != _node) {
-              delete activeNodes[i].alphaX;
-              delete activeNodes[i].alphaY;
+          // If hovered node is active, drag active nodes nodes
+          isHoveredNodeActive = (-1 < activeNodes.map(function(node) {
+            return node.id;
+          }).indexOf(_node.id));
+
+          if (isHoveredNodeActive) {
+            for(var i = 0; i < activeNodes.length; i++) {
+
+              // Delete old reference
+              if(_draggingNode != _node) {
+                delete activeNodes[i].alphaX;
+                delete activeNodes[i].alphaY;
+              }
+
+              // Calcul first position of activeNodes
+              if(!activeNodes[i].alphaX || !activeNodes[i].alphaY) {
+
+                activeNodes[i].alphaX = activeNodes[i].x - x;
+                activeNodes[i].alphaY = activeNodes[i].y - y;
+              }
+
+              // Move activeNodes to keep same distance between dragged nodes
+              // and active nodes
+              x2 = _node.x + activeNodes[i].alphaX;
+              y2 = _node.y + activeNodes[i].alphaY;
+
+              activeNodes[i].x = x2;
+              activeNodes[i].y = y2;
             }
-
-            // Calcul first position of activeNodes
-            if(!activeNodes[i].alphaX || !activeNodes[i].alphaY) {
-
-              activeNodes[i].alphaX = activeNodes[i].x - x;
-              activeNodes[i].alphaY = activeNodes[i].y - y;
-            }
-
-            // Move activeNodes to keep same distance between dragged nodes and active nodes
-            x2 = _node.x + activeNodes[i].alphaX;
-            y2 = _node.y + activeNodes[i].alphaY;
-
-            activeNodes[i].x = x2;
-            activeNodes[i].y = y2;
           }
         }
 
@@ -281,7 +288,6 @@
 
         _drag = true;
         _self.dispatchEvent('drag', {
-          node: _node,
           captor: event,
           renderer: _renderer
         });

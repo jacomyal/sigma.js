@@ -135,21 +135,25 @@ s = new sigma({
     outerBorderSize: 3,
     defaultNodeBorderColor: '#fff',
     defaultNodeOuterBorderColor: 'rgb(236, 81, 72)',
-    enableEdgeHovering: true,
+    enableEdgeHovering: false,
     edgeHoverHighlightNodes: 'circle',
   }
 });
 
 // Instanciate the ActiveState plugin:
 var activeState = sigma.plugins.activeState(s);
-var keyboard = sigma.plugins.keyboard(s, s.renderers[0]);
-
-// Initialize the Select plugin:
-var select = sigma.plugins.select(s, activeState);
-select.bindKeyboard(keyboard);
 
 // Initialize the dragNodes plugin:
 var dragListener = sigma.plugins.dragNodes(s, s.renderers[0], activeState);
+
+// Initialize the Select plugin:
+var select = sigma.plugins.select(s, activeState);
+
+// Initialize the Keyboard plugin:
+var keyboard = sigma.plugins.keyboard(s, s.renderers[0]);
+
+// Bind the Keyboard and DragNodes plugins to the Select plugin:
+select.bindKeyboard(keyboard).bindDragNodes(dragListener);
 
 dragListener.bind('startdrag', function(event) {
   console.log(event);
