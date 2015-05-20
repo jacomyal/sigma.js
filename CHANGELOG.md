@@ -1,10 +1,20 @@
 ## linkurious.js - changelog:
 
+#### 1.0.9 (May 20, 2015)
+
+Plugins:
+
+  - Fix #109 sigma.plugins.locate: handle multiple sigma instances
+  - #108 sigma.plugins.locate: add an optional padding
+  - Fix #107 sigma.plugins.select: A node is deactivated on double-click
+  - Fix #106 sigma.plugins.dragNodes: Dragging an unselected node while another node is selected drags both
+  - Fix #105 sigma.plugins.select: A node is deactivated on drag
+
 #### 1.0.8 (May 18, 2015)
 
 Plugins:
 
-  - Add sigma.layouts.fruchtermanReingold
+  - #94 Add sigma.layouts.fruchtermanReingold
   - Add sigma.parsers.cypher (license GNU GPL3 from @sim51)
   - Add levels to Linkurious renderers (canvas)
   - use throw new Error('msg') instead of throw 'msg'
