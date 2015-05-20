@@ -171,8 +171,16 @@ sigma.parsers.gexf('data/standard_graph_communities.gexf', {
   };
   var locate = sigma.plugins.locate(s, conf);
 
-  if (!s.settings('autoRescale'))
+  locate.setPadding({
+    // top:250,
+    // bottom: 250,
+    right:250,
+    // left:250
+  });
+
+  if (!s.settings('autoRescale')) {
     sigma.utils.zoomTo(s.camera, 0, 0, conf.zoomDef);
+  }
 
   var categories = {};
 

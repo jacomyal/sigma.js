@@ -42,6 +42,13 @@ var locate = sigma.plugins.locate(sigInst, {
       duration: 300
     }
   },
+  // PADDING:
+  padding: {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  },
   // GLOBAL SETTINGS:
   // **********
   focusOut: true,
@@ -51,6 +58,10 @@ var locate = sigma.plugins.locate(sigInst, {
 
  * **animation**
    * The different animation options when calling `nodes()`, `edges()`, and `center()`. See [`sigma.misc.animation.camera`](https://github.com/jacomyal/sigma.js/blob/master/src/misc/sigma.misc.animation.js#l47) for a list of accepted parameters.
+   * type: *object*
+   * default value: see above
+ * **padding**
+   * The space (in screen pixels) between the renderer border and the renderer content. The parameters are `top`, `right`, `bottom`, `left`.
    * type: *object*
    * default value: see above
  * **focusOut**
@@ -97,6 +108,16 @@ locate.edges(['e0', 'e1']);
 
 ````javascript
 locate.center(1);
+````
+
+**setPadding( *object* )** : *sigma.plugins.locate*
+ * This method set the padding, i.e. the space (in screen pixels) between the renderer border and the renderer content. The parameters are `top`, `right`, `bottom`, `left`.
+ * The method returns the instance itself.
+
+````javascript
+locate.setPadding({
+  right:250
+});
 ````
 
 #### Optional argument
