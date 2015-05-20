@@ -47,6 +47,13 @@
         duration: 300
       }
     },
+    // PADDING:
+    padding: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
     // GLOBAL SETTINGS:
     // **********
     // If true adds a halfway point while animating the camera.
@@ -55,9 +62,7 @@
     zoomDef: null
   };
 
-  var _instance = {},
-      _s = null,
-      _o = null;
+  var _instance = {}
 
   function getRescalePosition(s) {
     var autoRescale = s.settings('autoRescale');
@@ -102,18 +107,18 @@
   /**
    * Locate Object
    * ------------------
-   * @param  {sigma}   s       The related sigma instance.
+   * @param  {sigma}   s      The related sigma instance.
    * @param  {object} options The options related to the object.
    */
   function Locate(s, options) {
-    var self = this,
-        _s = s,
-        _o = sigma.utils.extend(options, settings);
+    var self = this;
 
-    _o.zoomDef = _o.zoomDef || _s.settings('zoomMax');
+    this.s = s;
+    this.settings = sigma.utils.extend(options, settings);
+    this.settings.zoomDef = this.settings.zoomDef || this.s.settings('zoomMax');
 
-    _s.bind('kill', function() {
-      sigma.plugins.killLocate(_s);
+    this.s.bind('kill', function() {
+      sigma.plugins.killLocate(self.s);
     });
 
 
@@ -133,14 +138,16 @@
           y,
           ratio,
           width,
-          height;
+          height,
+          rendererWidth,
+          rendererHeight;
 
       // Center of the boundaries:
       x = (boundaries.minX + boundaries.maxX) * 0.5;
       y = (boundaries.minY + boundaries.maxY) * 0.5;
 
       // Zoom ratio:
-      if (getRescalePosition(_s)) {
+      if (getRescalePosition(self.s)) {
         var graphBoundaries,
             graphRect,
             graphWidth,
@@ -148,7 +155,7 @@
             rect;
 
         // Coordinates of the rectangle representing the camera on screen for the selection boundaries:
-        rect = _s.camera.getRectangle(
+        rect = self.s.camera.getRectangle(
           boundaries.maxX - boundaries.minX,
           boundaries.maxY - boundaries.minY
         );
@@ -158,12 +165,12 @@
 
         // Graph boundaries:
         graphBoundaries = sigma.utils.getBoundaries(
-          _s.graph,
-          _s.camera.readPrefix
+          self.s.graph,
+          self.s.camera.readPrefix
         );
 
         // Coordinates of the rectangle representing the camera on screen for the graph boundaries:
-        graphRect = _s.camera.getRectangle(
+        graphRect = self.s.camera.getRectangle(
           graphBoundaries.maxX - graphBoundaries.minX,
           graphBoundaries.maxY - graphBoundaries.minY
         );
@@ -171,16 +178,25 @@
         graphWidth = graphRect.x2 - graphRect.x1 || 1;
         graphHeight = graphRect.height || 1;
 
-        ratio = Math.max(width / graphWidth, height / graphHeight);
+        rendererWidth = graphWidth - self.settings.padding.left - self.settings.padding.right;
+        rendererHeight = graphHeight - self.settings.padding.top - self.settings.padding.bottom;
+
+        ratio = Math.max(width / rendererWidth, height / rendererHeight);
       }
       else {
         width = boundaries.maxX - boundaries.minX + boundaries.sizeMax * 2;
         height = boundaries.maxY - boundaries.minY + boundaries.sizeMax * 2;
-        ratio = Math.max(width / _s.renderers[0].width, height / _s.renderers[0].height);
+        rendererWidth = self.s.renderers[0].width - self.settings.padding.left - self.settings.padding.right;
+        rendererHeight = self.s.renderers[0].height - self.settings.padding.top - self.settings.padding.bottom;
+        ratio = Math.max(width / rendererWidth, height / rendererHeight);
       }
 
       // Normalize ratio:
-      ratio = Math.max(_s.settings('zoomMin'), Math.min(_s.settings('zoomMax'), ratio));
+      ratio = Math.max(self.s.settings('zoomMin'), Math.min(self.s.settings('zoomMax'), ratio));
+
+      // Update center:
+      x += (self.settings.padding.right - self.settings.padding.left) * ratio * 0.5;
+      y += (self.settings.padding.bottom - self.settings.padding.top) * ratio * 0.5;
 
       return {
         x: x,
@@ -221,48 +237,48 @@
 
       var t,
           n,
-          animationOpts = sigma.utils.extend(options, _o.animation.node),
-          ratio = _s.camera.ratio,
-          rescalePosition = getRescalePosition(_s);
+          animationOpts = sigma.utils.extend(options, self.settings.animation.node),
+          ratio = self.s.camera.ratio,
+          rescalePosition = getRescalePosition(self.s);
 
       // One node:
       if (typeof v === 'string' || typeof v === 'number') {
-        n = _s.graph.nodes(v);
+        n = self.s.graph.nodes(v);
         if (n === undefined)
           throw new Error('Invalid argument: the node of id "' + v + '" does not exist.');
 
         t = {
-          x: n[_s.camera.readPrefix + 'x'],
-          y: n[_s.camera.readPrefix + 'y'],
+          x: n[self.s.camera.readPrefix + 'x'],
+          y: n[self.s.camera.readPrefix + 'y'],
           ratio: rescalePosition ?
-            _s.settings('zoomMin') : _o.zoomDef
+            self.s.settings('zoomMin') : self.settings.zoomDef
         }
       }
 
       // Array of nodes:
       else if (Array.isArray(v)) {
         var boundaries = getBoundaries(v.map(function(id) {
-          return _s.graph.nodes(id);
-        }), _s.camera.readPrefix);
+          return self.s.graph.nodes(id);
+        }), self.s.camera.readPrefix);
 
         t = target(boundaries);
       }
       else
         throw new TypeError('Invalid argument: "v" is not a string, a number, or an array, was ' + v);
 
-      if (_o.focusOut && rescalePosition) {
+      if (self.settings.focusOut && rescalePosition) {
         sigma.misc.animation.camera(
           s.camera,
           {
-            x: (_s.camera.x + t.x) * 0.5,
-            y: (_s.camera.y + t.y) * 0.5,
-            ratio: _o.zoomDef
+            x: (self.s.camera.x + t.x) * 0.5,
+            y: (self.s.camera.y + t.y) * 0.5,
+            ratio: self.settings.zoomDef
           },
           {
             duration: animationOpts.duration,
             onComplete: function() {
               sigma.misc.animation.camera(
-                _s.camera,
+                self.s.camera,
                 t,
                 animationOpts
               );
@@ -270,14 +286,15 @@
           }
         );
       } else {
+        // console.log(t);
         sigma.misc.animation.camera(
-          _s.camera,
+          self.s.camera,
           t,
           animationOpts
         );
       }
 
-      return this;
+      return self;
     };
 
 
@@ -314,20 +331,20 @@
       var t,
           e,
           boundaries,
-          animationOpts = sigma.utils.extend(options, _o.animation.edge),
-          ratio = _s.camera.ratio,
-          rescalePosition = getRescalePosition(_s);
+          animationOpts = sigma.utils.extend(options, self.settings.animation.edge),
+          ratio = self.s.camera.ratio,
+          rescalePosition = getRescalePosition(self.s);
 
       // One edge:
       if (typeof v === 'string' || typeof v === 'number') {
-        e = _s.graph.edges(v);
+        e = self.s.graph.edges(v);
         if (e === undefined)
           throw new Error('Invalid argument: the edge of id "' + v + '" does not exist.');
 
         boundaries = getBoundaries([
-          _s.graph.nodes(e.source),
-          _s.graph.nodes(e.target)
-        ], _s.camera.readPrefix);
+          self.s.graph.nodes(e.source),
+          self.s.graph.nodes(e.target)
+        ], self.s.camera.readPrefix);
 
         t = target(boundaries);
       }
@@ -339,30 +356,30 @@
             nodes = [];
 
         for (i = 0, l = v.length; i < l; i++) {
-          e = _s.graph.edges(v[i]);
-          nodes.push(_s.graph.nodes(e.source));
-          nodes.push(_s.graph.nodes(e.target));
+          e = self.s.graph.edges(v[i]);
+          nodes.push(self.s.graph.nodes(e.source));
+          nodes.push(self.s.graph.nodes(e.target));
         }
 
-        boundaries = getBoundaries(nodes, _s.camera.readPrefix);
+        boundaries = getBoundaries(nodes, self.s.camera.readPrefix);
         t = target(boundaries);
       }
       else
         throw new TypeError('Invalid argument: "v" is not a string or a number, or an array, was ' + v);
 
-      if (_o.focusOut && rescalePosition) {
+      if (self.settings.focusOut && rescalePosition) {
         sigma.misc.animation.camera(
           s.camera,
           {
-            x: (_s.camera.x + t.x) * 0.5,
-            y: (_s.camera.y + t.y) * 0.5,
-            ratio: _o.zoomDef
+            x: (self.s.camera.x + t.x) * 0.5,
+            y: (self.s.camera.y + t.y) * 0.5,
+            ratio: self.settings.zoomDef
           },
           {
             duration: animationOpts.duration,
             onComplete: function() {
               sigma.misc.animation.camera(
-                _s.camera,
+                self.s.camera,
                 t,
                 animationOpts
               );
@@ -371,13 +388,13 @@
         );
       } else {
         sigma.misc.animation.camera(
-          _s.camera,
+          self.s.camera,
           t,
           animationOpts
         );
       }
 
-      return this;
+      return self;
     };
 
 
@@ -407,15 +424,15 @@
      * @return {sigma.plugins.locate} Returns the instance itself.
      */
     this.center = function(ratio, options) {
-      var animationOpts = sigma.utils.extend(options, _o.animation.center);
-      if (_s.graph.nodes().length) {
-        self.nodes(_s.graph.nodes().map(function(n) {
+      var animationOpts = sigma.utils.extend(options, self.settings.animation.center);
+      if (self.s.graph.nodes().length) {
+        self.nodes(self.s.graph.nodes().map(function(n) {
           return n.id;
         }), animationOpts);
       }
       else {
         sigma.misc.animation.camera(
-          _s.camera,
+          self.s.camera,
           {
             x: 0,
             y: 0,
@@ -425,12 +442,25 @@
         );
       }
 
-      return this;
+      return self;
     };
 
+    /**
+     * Set the padding, i.e. the space (in screen pixels) between the renderer
+     * border and the renderer content.
+     * The parameters are `top`, `right`, `bottom`, `left`.
+     *
+     * @param  {object} options  A dictionary with padding options.
+     * @return {sigma.plugins.locate} Returns the instance itself.
+     */
+    this.setPadding = function(options) {
+      self.settings.padding = sigma.utils.extend(options, self.settings.padding);
+      return self;
+    }
+
     this.kill = function() {
-      _o = null;
-      _s = null;
+      self.settings = null;
+      self.s = null;
     }
 
   };
