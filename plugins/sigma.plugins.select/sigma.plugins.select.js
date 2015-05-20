@@ -18,7 +18,8 @@
   var _instance = {},
       _body = null,
       _nodeReference = null,
-      _spacebar = false;
+      _spacebar = false,
+      _doubleClickingNodes = false;
 
   /**
    * Utility function to make the difference between two arrays.
@@ -91,7 +92,8 @@
 
     /**
      * This fuction handles the node click event. The clicked nodes are activated.
-     * The clicked active nodes are deactivated.
+     * All active nodes are deactivated if one of the active nodes is clicked.
+     * The double-clicked nodes are activated.
      * If the Spacebar key is hold, it adds the nodes to the list of active
      * nodes instead of clearing the list. It clears the list of active edges. It
      * prevent nodes to be selected while dragging.
@@ -123,17 +125,39 @@
 
         if(a.nodes().length && sigma.plugins.dragNodes) {
           if(_nodeReference === a.nodes()[0].id) {
-            a.dropNodes();
-            _nodeReference = null;
+            if(newTargets.length) {
+              a.dropNodes();
+              _nodeReference = null;
+            }
+            else {
+              setTimeout(function() {
+                if (!_doubleClickingNodes) {
+                  a.dropNodes();
+                  _nodeReference = null;
+                  s.refresh({skipIndexation: true});
+                }
+              }, s.settings('doubleClickTimeout'));
+            }
           } else {
             _nodeReference = a.nodes()[0].id;
           }
         }
-
       }
 
       a.addNodes(newTargets);
       s.refresh({skipIndexation: true});
+    };
+
+    /**
+     * Handle the flag 'doubleClickingNodes'.
+     * Warning: sigma fires 'doubleClickNodes' before 'clickNodes'.
+     */
+    this.doubleClickNodesHandler = function(event) {
+      _doubleClickingNodes = true;
+
+      setTimeout(function() {
+        _doubleClickingNodes = false;
+      }, 100 + s.settings('doubleClickTimeout'));
     };
 
     /**
@@ -252,6 +276,7 @@
     }
 
     s.bind('clickNodes', this.clickNodesHandler);
+    s.bind('doubleClickNodes', this.doubleClickNodesHandler);
     s.bind('clickEdges', this.clickEdgesHandler);
 
     /**
@@ -344,6 +369,7 @@
   sigma.plugins.killSelect = function(s) {
     if (_instance[s.id] instanceof Select) {
       s.unbind('clickNodes', _instance[s.id].clickNodesHandler);
+      s.unbind('doubleClickNodes', _instance[s.id].doubleClickNodesHandler);
       s.unbind('clickEdges', _instance[s.id].clickEdgesHandler);
 
       _instance[s.id].unbindKeyboard();
