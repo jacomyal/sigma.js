@@ -163,6 +163,7 @@
         _renderer.settings({mouseEnabled: false, enableHovering: false});
 
         _self.dispatchEvent('startdrag', {
+          node: _node,
           captor: event,
           renderer: _renderer
         });
@@ -180,6 +181,7 @@
 
       if (_drag) {
         _self.dispatchEvent('drop', {
+          node: _node,
           captor: event,
           renderer: _renderer
         });
@@ -195,6 +197,7 @@
         _s.refresh();
       }
       _self.dispatchEvent('dragend', {
+        node: _node,
         captor: event,
         renderer: _renderer
       });
@@ -288,6 +291,7 @@
 
         _drag = true;
         _self.dispatchEvent('drag', {
+          node: _node,
           captor: event,
           renderer: _renderer
         });
