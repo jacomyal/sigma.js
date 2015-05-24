@@ -38,9 +38,9 @@ But:
 
 If you submit modifications to sigma, please ensure that:
 
- 1 the unit tests still pass
- 2 your code respect JSHint and ClosureLint rules
- 3 you cleaned your code from commented lines, logs, alerts or other debugging related code.
+ 1. the unit tests still pass
+ 2. your code respect JSHint and ClosureLint rules
+ 3. you cleaned your code from commented lines, logs, alerts or other debugging related code.
 
 You can check these rules by running `grunt` in sigma's directory from your command line.
 
