@@ -17,13 +17,24 @@
     throw 'sigma.exporters.gexf: sigma is not declared';
 
   // Utilities
-  function download(dataUrl, extension, filename) {
+  function download(fileEntry, extension, filename) {
     // Anchor
     var anchor = document.createElement('a');
-    anchor.setAttribute('href', dataUrl);
+
+
+    var textFile = null,
+    makeTextFile = function (text) {
+      var data = new Blob([text], {type: 'text/plain'});
+      if (textFile !== null) {
+        window.URL.revokeObjectURL(textFile);
+      }
+      textFile = window.URL.createObjectURL(data);
+      return textFile;
+    };
+
+    anchor.setAttribute('href', makeTextFile(fileEntry));
     anchor.setAttribute('download', filename || 'graph.' + extension);
 
-    // Click event
     var event = document.createEvent('MouseEvent');
     event.initMouseEvent('click', true, false, window, 0, 0, 0 ,0, 0,
       false, false, false, false, 0, null);
@@ -387,13 +398,8 @@
       sXML = oSerializer.serializeToString(doc);
 
       if (params.download) {
-        download(
-          'data:text/xml;charset=UTF-8,' +
-            encodeURIComponent('<?xml version="1.0" encoding="UTF-8"?>') +
-            encodeURIComponent(sXML),
-          'gexf',
-          params.filename
-        );
+
+        download(sXML, 'gexf', params.filename);
       }
 
       // Cleaning
