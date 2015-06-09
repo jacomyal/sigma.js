@@ -11,8 +11,10 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.canvas.nodes.def = function(node, context, settings) {
-    var prefix = settings('prefix') || '';
+    var prefix = settings('prefix') || '',
+        opac   = node.opacity || 1;
 
+    context.globalAlpha = opac;
     context.fillStyle = node.color || settings('defaultNodeColor');
     context.beginPath();
     context.arc(
@@ -26,5 +28,6 @@
 
     context.closePath();
     context.fill();
+    context.globalAlpha = 1;
   };
 })();
