@@ -36,9 +36,7 @@
     tabIndex: -1
   };
 
-  var _instance = {},
-      _keys = [],
-      _currentEvents;
+  var _instance = {};
 
   /**
    * Keyboard Object
@@ -54,6 +52,8 @@
     params.duration = params.duration || s.settings('mouseZoomDuration');
 
     this.domElt = renderer.container;
+    this.keys = {};
+    this.currentEvents = null;
 
     var self = this;
 
@@ -114,17 +114,17 @@
     };
 
     this.keyDown = function(event) {
-      if (event.which !== 9 && event.which !== 18 && event.which !== 20 && !_keys[event.which]) {
+      if (event.which !== 9 && event.which !== 18 && event.which !== 20 && !self.keys[event.which]) {
         // Do nothing on Tabbing, Alt and Capslock because keyUp won't be triggered
-        _keys[event.which] = true;
-        _currentEvents = Object.keys(_keys).join('+');
-        self.dispatchEvent(_currentEvents);
+        self.keys[event.which] = true;
+        self.currentEvents = Object.keys(self.keys).join('+');
+        self.dispatchEvent(self.currentEvents);
       }
     }
 
     this.keyUp = function(event) {
-      delete _keys[event.which];
-      _currentEvents = null;
+      delete self.keys[event.which];
+      self.currentEvents = null;
     }
 
     this.focus = function(event) {
@@ -134,6 +134,8 @@
 
     this.blur = function(event) {
       self.domElt.blur();
+      self.keys = {};
+      self.currentEvents = null;
       return true;
     }
 
@@ -196,6 +198,9 @@
       _instance[s.id].domElt.removeEventListener('mouseout', _instance[s.id].blur, false);
       _instance[s.id].domElt.removeEventListener('keydown', _instance[s.id].keyDown, false);
       _instance[s.id].domElt.removeEventListener('keyup', _instance[s.id].keyUp, false);
+      _instance[s.id].domElt = null;
+      _instance[s.id].keys = {};
+      _instance[s.id].currentEvents = null;
       delete _instance[s.id];
     }
   };
