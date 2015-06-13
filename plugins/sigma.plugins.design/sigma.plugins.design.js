@@ -1217,11 +1217,13 @@
         if (!o)
           throw new Error('Color scheme "' + self.styles[target].color.scheme + '" not in '+ target +' palette.');
 
-        for (var bin = 0; bin < bins; bin++) {
-          if (!o[bins])
-            throw new Error('Missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".');
+        if (isSequential) {
+          for (var bin = 0; bin < bins; bin++) {
+            if (!o[bins])
+              throw new Error('Missing key "'+ bins +'" in '+ target +' palette " of color scheme ' + self.styles[target].color.scheme + '".');
 
-          h[bin][visualVar] = o[bins][bin];
+            h[bin][visualVar] = o[bins][bin];
+          }
         }
       }
 
