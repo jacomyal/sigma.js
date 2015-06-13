@@ -69,7 +69,7 @@ sigma.layouts.isForceAtlas2Running();
 
 *Algorithm configuration*
 
-* **linLogMode**: *boolean* `false`
+* **linLogMode**: *boolean* `false`: alternative energy model with linear repulsion force and logarithmic attraction force.
 * **outboundAttractionDistribution** *boolean* `false`
 * **adjustSizes** *boolean* `false`
 * **edgeWeightInfluence** *number* `0`
@@ -90,7 +90,9 @@ sigma.layouts.isForceAtlas2Running();
 * **worker** *boolean* `true`: should the layout use a web worker?
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
 * **background** *boolean* `false`: run the layout on background, apply the new nodes position on stop.
-* **easing** *string* : if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
+* **easing** *string*: if specified, ease the transition between nodes positions if background is `true`. The duration is specified by the Sigma settings `animationsTime`.
+* **randomize** *string*: randomize the initial `x` and `y` coordinates of the nodes. Available values: `globally` will generate random node positions (useful to generate completely new positions) ; `locally` will randomize positions around the existing positions (useful to overcome local minima).
+* **randomizeFactor** *number* `1`: multiplicator of the `Math.random()` function if the `randomize` setting is used.
 
 ## Events
 

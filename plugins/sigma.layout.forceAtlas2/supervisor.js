@@ -53,6 +53,18 @@
     this.runOnBackground = (options.background) ? true : false;
     this.easing = options.easing;
 
+    this.randomize;
+    switch (options.randomize) {
+      case 'globally':
+        this.randomize = function(x) { return Math.random() * (options.randomizeFactor || 1) };
+      break;
+      case 'locally':
+        this.randomize = function(x) { return x + (Math.random() * (options.randomizeFactor || 1)) };
+      break;
+      default:
+        this.randomize = function(x) { return x };
+    }
+
     // State
     this.started = false;
     this.running = false;
@@ -100,8 +112,8 @@
       nIndex[nodes[i].id] = j;
 
       // Populating byte array
-      this.nodesByteArray[j] = nodes[i].x;
-      this.nodesByteArray[j + 1] = nodes[i].y;
+      this.nodesByteArray[j] = this.randomize(nodes[i].x);
+      this.nodesByteArray[j + 1] = this.randomize(nodes[i].y);
       this.nodesByteArray[j + 2] = 0;
       this.nodesByteArray[j + 3] = 0;
       this.nodesByteArray[j + 4] = 0;
