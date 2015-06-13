@@ -994,38 +994,42 @@
 
       // From same document as sigma
       sendNewCoords = function() {
-        var e;
+        if (!W.autoStop || W.converged) {
+          var e;
 
-        if (document.createEvent) {
-          e = document.createEvent('Event');
-          e.initEvent('newCoords', true, false);
-        }
-        else {
-          e = document.createEventObject();
-          e.eventType = 'newCoords';
-        }
+          if (document.createEvent) {
+            e = document.createEvent('Event');
+            e.initEvent('newCoords', true, false);
+          }
+          else {
+            e = document.createEventObject();
+            e.eventType = 'newCoords';
+          }
 
-        e.eventName = 'newCoords';
-        e.data = {
-          nodes: NodeMatrix.buffer,
-          converged: W.converged
-        };
-        requestAnimationFrame(function() {
-          document.dispatchEvent(e);
-        });
+          e.eventName = 'newCoords';
+          e.data = {
+            nodes: NodeMatrix.buffer,
+            converged: W.converged
+          };
+          requestAnimationFrame(function() {
+            document.dispatchEvent(e);
+          });
+        }
       };
     }
     else {
 
       // From a WebWorker
       sendNewCoords = function() {
-        self.postMessage(
-          {
-            nodes: NodeMatrix.buffer,
-            converged: W.converged
-          },
-          [NodeMatrix.buffer]
-        );
+        if (!W.autoStop || W.converged) {
+          self.postMessage(
+            {
+              nodes: NodeMatrix.buffer,
+              converged: W.converged
+            },
+            [NodeMatrix.buffer]
+          );
+        }
       };
     }
 
