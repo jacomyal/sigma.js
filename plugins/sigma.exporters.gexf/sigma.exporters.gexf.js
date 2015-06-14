@@ -21,18 +21,28 @@
     // Anchor
     var anchor = document.createElement('a');
 
+    if(window.BlobBuilder){
+      // use Blob if available
+      var textFile = null,
+      makeTextFile = function (text) {
+        var data = new Blob([text], {type: 'text/plain'});
+        if (textFile !== null) {
+          window.URL.revokeObjectURL(textFile);
+        }
+        textFile = window.URL.createObjectURL(data);
+        return textFile;
+      };
 
-    var textFile = null,
-    makeTextFile = function (text) {
-      var data = new Blob([text], {type: 'text/plain'});
-      if (textFile !== null) {
-        window.URL.revokeObjectURL(textFile);
-      }
-      textFile = window.URL.createObjectURL(data);
-      return textFile;
-    };
+      anchor.setAttribute('href', makeTextFile(fileEntry));
+    }
+    else {
+      // else use dataURI
+      var dataUrl = 'data:text/xml;charset=UTF-8,' +
+            encodeURIComponent('<?xml version="1.0" encoding="UTF-8"?>') +
+            encodeURIComponent(fileEntry);
+      anchor.setAttribute('href', dataUrl);
+    }
 
-    anchor.setAttribute('href', makeTextFile(fileEntry));
     anchor.setAttribute('download', filename || 'graph.' + extension);
 
     var event = document.createEvent('MouseEvent');
