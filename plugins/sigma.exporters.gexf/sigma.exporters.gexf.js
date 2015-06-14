@@ -21,7 +21,7 @@
     // Anchor
     var anchor = document.createElement('a');
 
-    if(window.BlobBuilder){
+    if(window.Blob){
       // use Blob if available
       var textFile = null,
       makeTextFile = function (text) {
