@@ -40,7 +40,7 @@
         sign = (sX < tX) ? 1 : -1,
         cp = {},
         c,
-        angle,
+        angle = 0,
         t = 0.5;  //length of the curve
 
     if (source.id === target.id) {
@@ -48,11 +48,9 @@
       c = sigma.utils.getPointOnBezierCurve(
         t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
       );
-      angle = 'horizontal' === settings('edgeLabelAlignment') ? 0 : Math.atan2(1, 1); // 45°
     } else {
       cp = sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
       c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
-      angle = 'horizontal' === settings('edgeLabelAlignment') ? 0 : Math.atan2(dY * sign, dX * sign);
     }
 
     // The font size is sublineraly proportional to the edge size, in order to
@@ -98,6 +96,29 @@
 
     context.textAlign = 'center';
     context.textBaseline = 'alphabetic';
+
+    // force horizontal alignment if not enough space to draw the text,
+    // otherwise draw text along the edge curve:
+    if ('auto' === settings('edgeLabelAlignment')) {
+      if (source.id === target.id) {
+        angle = Math.atan2(1, 1); // 45°
+      } else {
+        var
+          labelWidth = context.measureText(edge.label).width,
+          edgeLength = sigma.utils.getDistance(
+            source[prefix + 'x'],
+            source[prefix + 'y'],
+            target[prefix + 'x'],
+            target[prefix + 'y']);
+
+          // reduce node sizes + constant
+          edgeLength = edgeLength - source[prefix + 'size'] - target[prefix + 'size'] - 10;
+
+        if (labelWidth < edgeLength) {
+          angle = Math.atan2(dY * sign, dX * sign);
+        }
+      }
+    }
 
     context.translate(c.x, c.y);
     context.rotate(angle);
