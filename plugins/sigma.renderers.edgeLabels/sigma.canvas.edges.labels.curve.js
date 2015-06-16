@@ -26,8 +26,11 @@
     var prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1;
 
-    if (size < settings('edgeLabelThreshold'))
+    if (size < settings('edgeLabelThreshold') && !edge.hover)
       return;
+
+    if (0 === settings('edgeLabelSizePowRatio'))
+      throw new Error('Invalid setting: "edgeLabelSizePowRatio" is equal to 0.');
 
     var fontSize,
         sSize = source[prefix + 'size'],
@@ -41,16 +44,21 @@
         cp = {},
         c,
         angle = 0,
-        t = 0.5;  //length of the curve
+        t = 0.5,  //length of the curve
+        fontStyle = edge.hover ?
+          (settings('hoverFontStyle') || settings('fontStyle')) :
+          settings('fontStyle');
 
     if (source.id === target.id) {
       cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize);
       c = sigma.utils.getPointOnBezierCurve(
         t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
       );
+      angle = Math.atan2(1, 1); // 45°
     } else {
       cp = sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
       c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
+      angle = Math.atan2(dY * sign, dX * sign);
     }
 
     // The font size is sublineraly proportional to the edge size, in order to
@@ -68,30 +76,19 @@
 
     context.save();
 
-
     if (edge.active) {
       context.font = [
-        settings('activeFontStyle'),
+        settings('activeFontStyle') || settings('fontStyle'),
         fontSize + 'px',
         settings('activeFont') || settings('font')
       ].join(' ');
-
-      context.fillStyle =
-        settings('edgeActiveColor') === 'edge' ?
-        (edge.active_color || settings('defaultEdgeActiveColor')) :
-        settings('defaultEdgeLabelActiveColor');
     }
     else {
       context.font = [
-        settings('fontStyle'),
+        fontStyle,
         fontSize + 'px',
         settings('font')
       ].join(' ');
-
-      context.fillStyle =
-        (settings('edgeLabelColor') === 'edge') ?
-        (edge.color || settings('defaultEdgeColor')) :
-        settings('defaultEdgeLabelColor');
     }
 
     context.textAlign = 'center';
@@ -120,6 +117,40 @@
       }
     }
 
+    if (edge.hover) {
+      // Label background:
+      context.fillStyle = settings('edgeLabelHoverBGColor') === 'edge' ?
+        (edge.color || settings('defaultEdgeColor')) :
+        settings('defaultEdgeHoverLabelBGColor');
+
+      if (settings('edgeLabelHoverShadow')) {
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 8;
+        context.shadowColor = settings('edgeLabelHoverShadowColor');
+      }
+
+      drawBackground(angle, context, fontSize, size, edge.label, c.x, c.y);
+
+      if (settings('edgeLabelHoverShadow')) {
+        context.shadowBlur = 0;
+        context.shadowColor = '#000';
+      }
+    }
+
+    if (edge.active) {
+      context.fillStyle =
+        settings('edgeActiveColor') === 'edge' ?
+        (edge.active_color || settings('defaultEdgeActiveColor')) :
+        settings('defaultEdgeLabelActiveColor');
+    }
+    else {
+      context.fillStyle =
+        (settings('edgeLabelColor') === 'edge') ?
+        (edge.color || settings('defaultEdgeColor')) :
+        settings('defaultEdgeLabelColor');
+    }
+
     context.translate(c.x, c.y);
     context.rotate(angle);
     context.fillText(
@@ -129,5 +160,24 @@
     );
 
     context.restore();
+
+    function drawBackground(angle, context, fontSize, size, label, x, y) {
+      var w = Math.round(
+            context.measureText(label).width + size + 1.5 + fontSize / 3
+          ),
+          h = fontSize + 4;
+
+      context.save();
+      context.beginPath();
+
+      // draw a rectangle for the label
+      context.translate(x, y);
+      context.rotate(angle);
+      context.rect(-w / 2, -h -size/2, w, h);
+
+      context.closePath();
+      context.fill();
+      context.restore();
+    }
   };
 }).call(this);
