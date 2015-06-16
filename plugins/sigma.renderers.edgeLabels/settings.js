@@ -30,6 +30,16 @@
     edgeLabelSizePowRatio: 1,
     // {number} The minimum size an edge must have to see its label displayed.
     edgeLabelThreshold: 1,
+    // {string}
+    defaultEdgeHoverLabelBGColor: '#fff',
+    // {string} Indicates how to choose the hovered edge labels color.
+    //          Available values: "edge", "default"
+    edgeLabelHoverBGColor: 'default',
+    // {string} Indicates how to choose the hovered edges shadow color.
+    //          Available values: "edge", "default"
+    edgeLabelHoverShadow: 'default',
+    // {string}
+    edgeLabelHoverShadowColor: '#000'
   };
 
   // Export the previously designed settings:

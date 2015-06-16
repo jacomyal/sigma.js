@@ -26,8 +26,11 @@
     var prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1;
 
-    if (size < settings('edgeLabelThreshold'))
+    if (size < settings('edgeLabelThreshold') && !edge.hover)
       return;
+
+    if (0 === settings('edgeLabelSizePowRatio'))
+      throw new Error('Invalid setting: "edgeLabelSizePowRatio" is equal to 0.');
 
     var fontSize,
         sSize = source[prefix + 'size'],
@@ -40,8 +43,11 @@
         sign = (sX < tX) ? 1 : -1,
         cp = {},
         c,
-        angle,
-        t = 0.5;  //length of the curve
+        angle = 0,
+        t = 0.5,  //length of the curve
+        fontStyle = edge.hover ?
+          (settings('hoverFontStyle') || settings('fontStyle')) :
+          settings('fontStyle');
 
     if (source.id === target.id) {
       cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize);
@@ -70,34 +76,80 @@
 
     context.save();
 
-    
     if (edge.active) {
       context.font = [
-        settings('activeFontStyle'),
+        settings('activeFontStyle') || settings('fontStyle'),
         fontSize + 'px',
         settings('activeFont') || settings('font')
       ].join(' ');
+    }
+    else {
+      context.font = [
+        fontStyle,
+        fontSize + 'px',
+        settings('font')
+      ].join(' ');
+    }
 
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
+
+    // force horizontal alignment if not enough space to draw the text,
+    // otherwise draw text along the edge curve:
+    if ('auto' === settings('edgeLabelAlignment')) {
+      if (source.id === target.id) {
+        angle = Math.atan2(1, 1); // 45°
+      } else {
+        var
+          labelWidth = context.measureText(edge.label).width,
+          edgeLength = sigma.utils.getDistance(
+            source[prefix + 'x'],
+            source[prefix + 'y'],
+            target[prefix + 'x'],
+            target[prefix + 'y']);
+
+          // reduce node sizes + constant
+          edgeLength = edgeLength - source[prefix + 'size'] - target[prefix + 'size'] - 10;
+
+        if (labelWidth < edgeLength) {
+          angle = Math.atan2(dY * sign, dX * sign);
+        }
+      }
+    }
+
+    if (edge.hover) {
+      // Label background:
+      context.fillStyle = settings('edgeLabelHoverBGColor') === 'edge' ?
+        (edge.color || settings('defaultEdgeColor')) :
+        settings('defaultEdgeHoverLabelBGColor');
+
+      if (settings('edgeLabelHoverShadow')) {
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 8;
+        context.shadowColor = settings('edgeLabelHoverShadowColor');
+      }
+
+      drawBackground(angle, context, fontSize, size, edge.label, c.x, c.y);
+
+      if (settings('edgeLabelHoverShadow')) {
+        context.shadowBlur = 0;
+        context.shadowColor = '#000';
+      }
+    }
+
+    if (edge.active) {
       context.fillStyle =
         settings('edgeActiveColor') === 'edge' ?
         (edge.active_color || settings('defaultEdgeActiveColor')) :
         settings('defaultEdgeLabelActiveColor');
     }
     else {
-      context.font = [
-        settings('fontStyle'),
-        fontSize + 'px',
-        settings('font')
-      ].join(' ');
-
       context.fillStyle =
         (settings('edgeLabelColor') === 'edge') ?
         (edge.color || settings('defaultEdgeColor')) :
         settings('defaultEdgeLabelColor');
     }
-
-    context.textAlign = 'center';
-    context.textBaseline = 'alphabetic';
 
     context.translate(c.x, c.y);
     context.rotate(angle);
@@ -108,5 +160,24 @@
     );
 
     context.restore();
+
+    function drawBackground(angle, context, fontSize, size, label, x, y) {
+      var w = Math.round(
+            context.measureText(label).width + size + 1.5 + fontSize / 3
+          ),
+          h = fontSize + 4;
+
+      context.save();
+      context.beginPath();
+
+      // draw a rectangle for the label
+      context.translate(x, y);
+      context.rotate(angle);
+      context.rect(-w / 2, -h -size/2, w, h);
+
+      context.closePath();
+      context.fill();
+      context.restore();
+    }
   };
 }).call(this);

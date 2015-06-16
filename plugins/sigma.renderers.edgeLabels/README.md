@@ -15,7 +15,7 @@ To use it, include all .js files under this folder.
 
 ## Settings
 
-This plugin extends Sigma.js settings in a transparent way to render edge labels, see [settings.js](settings.js):
+This plugin extends Sigma.js settings to render edge labels, see [settings.js](settings.js):
 
  * **defaultEdgeLabelColor**
    * type: *string*
@@ -50,7 +50,27 @@ Math.pow(size, - 1 / edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
    * type: *number*
    * default value: `1`
 
-The plugin also forces `drawEdgeLabels` to `true`.
+ * **defaultEdgeHoverLabelBGColor**
+   * type: *string*
+   * default value: `#fff`
+
+ * **edgeLabelHoverBGColor**
+   * Indicates how to choose the hovered edge labels color.
+   * type: *string*
+   * default value: `default`
+   * available values: `edge`, `default`
+
+ * **edgeLabelHoverShadow**
+   * Indicates how to choose the hovered edges shadow color.
+   * type: *string*
+   * default value: `default`
+   * available values: `edge`, `default`
+
+ * **edgeLabelHoverShadowColor**
+   * type: *string*
+   * default value: `#000`
+
+When included, the plugin forces `drawEdgeLabels` to `true`.
 
 The default values provided by the plugin may be overridden when instantiating Sigma, e.g.:
 
@@ -73,4 +93,5 @@ This plugin provides the following edge label renderers:
 
 ## Compatibility
 
+This plugin is compatible with `sigma.renderers.linkurious` (required for hovering effects).
 This plugin is compatible with `sigma.plugins.activeState`.
