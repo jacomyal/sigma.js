@@ -35,6 +35,12 @@ This plugin extends Sigma.js settings to render edge labels, see [settings.js](s
    * default value: `fixed`
    * available values: `fixed`, `proportional`
 
+ * **edgeLabelAlignment**
+   * Indicates how to position the label relative to its edge.
+   * type: *string*
+   * default value: `auto`
+   * available values: `auto`, `horizontal`
+
  * **edgeLabelSizePowRatio**
    * The opposite power ratio between the font size of the label and the edge size.
    * type: *number*
@@ -93,5 +99,5 @@ This plugin provides the following edge label renderers:
 
 ## Compatibility
 
-This plugin is compatible with `sigma.renderers.linkurious` (required for hovering effects).
+This plugin is compatible with `sigma.renderers.linkurious` (required for hovering effects) and with  `sigma.renderers.customEdgeShapes`.
 This plugin is compatible with `sigma.plugins.activeState`.

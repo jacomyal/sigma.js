@@ -30,7 +30,7 @@
       return;
 
     if (0 === settings('edgeLabelSizePowRatio'))
-      throw '"edgeLabelSizePowRatio" must not be 0.';
+      throw new Error('Invalid setting: "edgeLabelSizePowRatio" is equal to 0.');
 
     var fontSize,
         angle = 0,
@@ -41,8 +41,7 @@
         y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
         dX = target[prefix + 'x'] - source[prefix + 'x'],
         dY = target[prefix + 'y'] - source[prefix + 'y'],
-        sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
-        angle = Math.atan2(dY * sign, dX * sign);
+        sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1;
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
