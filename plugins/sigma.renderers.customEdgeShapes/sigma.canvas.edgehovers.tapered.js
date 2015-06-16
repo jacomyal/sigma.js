@@ -5,6 +5,7 @@
 
   /**
    * This hover renderer will display the edge with a different color or size.
+   * It will also display the label with a background.
    *
    * @param  {object}                   edge         The edge object.
    * @param  {object}                   source node  The edge source node.
@@ -111,5 +112,12 @@
     }
 
     context.restore();
+
+    // draw label with a background
+    if (sigma.canvas.edges.labels.def) {
+      edge.hover = true;
+      sigma.canvas.edges.labels.def(edge, source, target, context, settings);
+      edge.hover = false;
+    }
   };
 })();
