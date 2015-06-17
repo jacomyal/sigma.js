@@ -8,11 +8,11 @@
   sigma.utils.pkg('sigma.layouts');
 
   /**
-   * Sigma ForceAtlas2.5 Supervisor
+   * Sigma ForceLink Supervisor
    * ===============================
    *
    * Author: Guillaume Plique (Yomguithereal)
-   * Autostop author: Sébastien Heymann @ Linkurious
+   * Extensions author: Sébastien Heymann @ Linkurious
    * Version: 0.1
    */
   var _root = this;
@@ -201,7 +201,7 @@
 
   Supervisor.prototype.initWorker = function() {
     var _this = this,
-        workerFn = sigma.layouts.getForceAtlas2Worker();
+        workerFn = sigma.layouts.getForceLinkWorker();
 
     // Web worker or classic DOM events?
     if (this.shouldUseWorker) {
@@ -230,7 +230,7 @@
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
 
-      // If ForceAtlas2 is running, we act accordingly
+      // If ForceLink is running, we act accordingly
       if (_this.running) {
 
         // Applying layout
@@ -244,7 +244,7 @@
           _this.sigInst.refresh({skipIndexation: true});
       }
 
-      // Stop ForceAtlas2 if it has converged
+      // Stop ForceLink if it has converged
       if (e.data.converged) {
         _this.running = false;
       }
@@ -284,7 +284,7 @@
 
     // Binding on kill to properly terminate layout when parent is killed
     _this.sigInst.bind('kill', function() {
-      sigma.layouts.killForceAtlas2();
+      sigma.layouts.killForceLink();
     });
   };
 
@@ -320,7 +320,7 @@
    */
   var supervisor = null;
 
-  sigma.layouts.startForceAtlas2 = function(sigInst, config) {
+  sigma.layouts.startForceLink = function(sigInst, config) {
 
     // Create supervisor if undefined
     if (!supervisor) {
@@ -342,7 +342,7 @@
     return eventEmitter;
   };
 
-  sigma.layouts.stopForceAtlas2 = function() {
+  sigma.layouts.stopForceLink = function() {
     if (!supervisor)
       return;
 
@@ -352,7 +352,7 @@
     return supervisor;
   };
 
-  sigma.layouts.killForceAtlas2 = function() {
+  sigma.layouts.killForceLink = function() {
     if (!supervisor)
       return;
 
@@ -369,7 +369,7 @@
     sigma.classes.dispatcher.extend(eventEmitter);
   };
 
-  sigma.layouts.configForceAtlas2 = function(sigInst, config) {
+  sigma.layouts.configForceLink = function(sigInst, config) {
     if (!supervisor) {
       supervisor = new Supervisor(sigInst, config);
     }
@@ -384,7 +384,7 @@
     return eventEmitter;
   };
 
-  sigma.layouts.isForceAtlas2Running = function() {
+  sigma.layouts.isForceLinkRunning = function() {
     return !!supervisor && supervisor.running;
   };
 }).call(this);

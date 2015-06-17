@@ -11,10 +11,10 @@ module.exports = function(grunt) {
 
   // Project configuration:
   grunt.initConfig({
-    forceAtlas2: {
+    forceLink: {
       prod: {
         files: {
-          'build/plugins/sigma.layout.forceAtlas2.min.js': files
+          'build/plugins/sigma.layout.forceLink.min.js': files
         }
       }
     }
@@ -24,5 +24,5 @@ module.exports = function(grunt) {
   grunt.loadTasks(__dirname + '/tasks');
 
   // By default, we will crush and then minify
-  grunt.registerTask('default', ['forceAtlas2:prod']);
+  grunt.registerTask('default', ['forceLink:prod']);
 };

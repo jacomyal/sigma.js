@@ -8,13 +8,13 @@
   sigma.utils.pkg('sigma.layouts');
 
   /**
-   * Sigma ForceAtlas2.5 Webworker
+   * Sigma ForceLink Webworker
    * ==============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
-   * Autostop author: Sébastien Heymann @ Linkurious
-   * Version: 1.0.3
+   * Extensions author: Sébastien Heymann @ Linkurious
+   * Version: 1.0.0
    */
 
   var _root = this,
@@ -381,7 +381,7 @@
       if (p in nodeProperties)
         return i + nodeProperties[p];
       else
-        throw new Error('ForceAtlas2.Worker - ' +
+        throw new Error('ForceLink.Worker - ' +
               'Inexistant node property given (' + p + ').');
     }
 
@@ -396,7 +396,7 @@
       if (p in edgeProperties)
         return i + edgeProperties[p];
       else
-        throw new Error('ForceAtlas2.Worker - ' +
+        throw new Error('ForceLink.Worker - ' +
               'Inexistant edge property given (' + p + ').');
     }
 
@@ -411,7 +411,7 @@
       if (p in regionProperties)
         return i + regionProperties[p];
       else
-        throw new Error('ForceAtlas2.Worker - ' +
+        throw new Error('ForceLink.Worker - ' +
               'Inexistant region property given (' + p + ').');
     }
 
@@ -1316,7 +1316,7 @@
 
             // avoid horizontal vector because node labels overlap:
             if (2 * angleMin > Math.PI)
-              throw new Error('ForceAtlas2.Worker - Invalid parameter: angleMin must be smaller than 2 PI.');
+              throw new Error('ForceLink.Worker - Invalid parameter: angleMin must be smaller than 2 PI.');
 
             if (angleMin > 0) {
               // TODO layout parameter
@@ -1561,6 +1561,6 @@
     if (typeof sigma === 'undefined')
       throw new Error('sigma is not declared');
 
-    sigma.layouts.getForceAtlas2Worker = getWorkerFn;
+    sigma.layouts.getForceLinkWorker = getWorkerFn;
   }
 }).call(this);

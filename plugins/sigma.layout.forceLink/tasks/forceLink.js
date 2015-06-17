@@ -1,7 +1,7 @@
 /*
- * grunt-forceAtlas2
+ * grunt-forceLink
  *
- * This task crush and minify Force Atlas 2 code.
+ * This task crush and minify ForceLink code.
  */
 var uglify = require('uglify-js');
 
@@ -120,8 +120,8 @@ module.exports = function(grunt) {
 
   // Registering the task
   grunt.registerMultiTask(
-    'forceAtlas2',
-    'A grunt task to crush and minify ForceAtlas2.',
+    'ForceLink',
+    'A grunt task to crush and minify ForceLink.',
     multitask
   );
 };
