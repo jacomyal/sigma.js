@@ -120,7 +120,7 @@ module.exports = function(grunt) {
 
   // Registering the task
   grunt.registerMultiTask(
-    'ForceLink',
+    'forceLink',
     'A grunt task to crush and minify ForceLink.',
     multitask
   );
