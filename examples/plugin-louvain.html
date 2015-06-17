@@ -217,14 +217,13 @@ s = new sigma({
 });
 
 // Layout the graph to see node clusters:
-var fa = sigma.layouts.configForceAtlas2(s, {
+var fa = s.configForceAtlas2({
   worker: true,
   autoStop: true,
   background: true,
   easing: 'cubicInOut'
 });
-sigma.layouts.startForceAtlas2();
-
+s.startForceAtlas2();
 
 var louvainInstance;
 
@@ -247,6 +246,9 @@ document.getElementById('run-btn').addEventListener("click", function(e) {
   s.refresh({skipIndexation: true});
 
   document.getElementById('nb-partitions').textContent = nbPartitions;
+
+  // Clear level selector first
+  document.getElementById('levels').innerHTML = '';
 
   // Fill level selector
   var levelElt = document.getElementById('levels');
