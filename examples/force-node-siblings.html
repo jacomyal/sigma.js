@@ -46,11 +46,6 @@
 <script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="../plugins/sigma.parsers.gexf/gexf-parser.js"></script>
-<script src="../plugins/sigma.parsers.gexf/sigma.parsers.gexf.js"></script>
-<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
-<script src="../plugins/sigma.layout.forceLink/worker.js"></script>
-<script src="../plugins/sigma.layout.forceLink/supervisor.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -60,65 +55,90 @@
       right: 0;
       position: absolute;
     }
-
-    #layout-notification {
-      display: block;
+    #notice {
+      bottom: 1em;
+      right: 1em;
       position: absolute;
-      top: 1em;
-      left: 1em;
-      visibility: hidden;
-      font-weight: bold;
+    }
+    .hidden {
+      display: none;
     }
   </style>
-  <div id="graph-container"><span id="layout-notification">Layout in progress...</span></div>
+  <div id="graph-container"><div id="notice" class="hidden">layout in progress...</div></div>
 </div>
+<script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<script src="../plugins/sigma.layout.forceLink/worker.js"></script>
+<script src="../plugins/sigma.layout.forceLink/supervisor.js"></script>
 <script>
-sigma.parsers.gexf('data/standard_graph_communities.gexf', {
+/**
+ * Just a simple example to show how to use the sigma.layout.forceLink
+ * plugin:
+ *
+ * A random graph is generated, such that its nodes are separated in some
+ * distinct clusters. Each cluster has its own color, and the density of
+ * links is stronger inside the clusters. So, we expect the algorithm to
+ * regroup the nodes of each cluster.
+ */
+var i,
+    s,
+    o,
+    N = 1000,
+    E = 5000,
+    C = 5,
+    d = 0.5,
+    cs = [],
+    g;
+
+g = {
+      nodes: [
+        {id: 'source', label: 'source', x: Math.random(), y: Math.random(), size: 1},
+        {id: 'target', label: 'target', x: Math.random(), y: Math.random(), size: 1},
+        {id: 'n1', label: 'n1', x: Math.random(), y: Math.random(), size: 1},
+        {id: 'n2', label: 'n2', x: Math.random(), y: Math.random(), size: 1},
+        {id: 'n3', label: 'n3', x: Math.random(), y: Math.random(), size: 1}
+      ],
+      edges: [
+        {id: 'e0', source: 'n1', target: 'source'},
+        {id: 'e1', source: 'n1', target: 'target'},
+        {id: 'e3', source: 'n2', target: 'source'},
+        {id: 'e4', source: 'n2', target: 'target'},
+        {id: 'e5', source: 'n3', target: 'source'},
+        {id: 'e6', source: 'n3', target: 'target'}
+      ]
+};
+
+s = new sigma({
+  graph: g,
   container: 'graph-container',
   settings: {
-    edgeColor: 'default',
-    defaultEdgeColor: '#ccc',
-    animationsTime: 2000,
-    drawLabels: false,
-    minNodeSize: 10,
-    maxEdgeSize: 10,
-    maxEdgeSize: 5,
-    sideMargin: 1
+    animationsTime: 1500
   }
-}, function(s) {
-  s.graph.nodes().forEach(function (n) {
-    if (!s.graph.degree(n.id)) {
-      s.graph.dropNode(n.id);
-    }
-    else {
-      n.x = Math.random();
-      n.y = Math.random();
-    }
-  });
-  s.refresh();
-
-  // Configure the ForceLink algorithm:
-  var fa = sigma.layouts.configForceLink(s, {
-    worker: true,
-    autoStop: true,
-    background: true,
-    scaleRatio: 10,
-    gravity: 3,
-    easing: 'cubicInOut'
-  });
-
-  // Bind the events:
-  fa.bind('start stop', function(e) {
-    console.log(e.type);
-    document.getElementById('layout-notification').style.visibility = '';
-    if (e.type == 'start') {
-      document.getElementById('layout-notification').style.visibility = 'visible';
-    }
-  });
-
-  // Start the ForceLink algorithm:
-  sigma.layouts.startForceLink();
 });
 
+// Configure the ForceLink algorithm:
+var fa = sigma.layouts.configForceLink(s, {
+  worker: true,
+  barnesHutOptimize: false,
+  autoStop: true,
+  background: true,
+  easing: 'cubicInOut',
+  alignNodeSiblings: true,
+  nodeSiblingsScale: 1,
+  nodeSiblingsAngleMin: 0.3
+});
 
+// Bind the events:
+fa.bind('start interpolate stop', function(e) {
+  console.log(e.type);
+  var el = document.getElementById('notice');
+  if (e.type === 'start') {
+    el.className = '';
+  }
+  else if (e.type === 'interpolate') {
+    el.className = 'hidden';
+  }
+});
+
+// Start the ForceLink algorithm:
+sigma.layouts.startForceLink();
 </script>

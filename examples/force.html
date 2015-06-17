@@ -132,10 +132,5 @@ s = new sigma({
 });
 
 // Start the ForceAtlas2 algorithm:
-var fa = sigma.layouts.startForceAtlas2(s, {worker: true});
-
-// Bind the events:
-fa.bind('start stop', function(e) {
-  console.log(e.type);
-});
+var fa = s.startForceAtlas2({worker: true});
 </script>

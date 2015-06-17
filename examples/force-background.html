@@ -67,11 +67,11 @@
   <div id="graph-container"><div id="notice" class="hidden">layout in progress...</div></div>
 </div>
 <script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="../plugins/sigma.layout.forceLink/worker.js"></script>
+<script src="../plugins/sigma.layout.forceLink/supervisor.js"></script>
 <script>
 /**
- * Just a simple example to show how to use the sigma.layout.forceAtlas2
+ * Just a simple example to show how to use the sigma.layout.forceLink
  * plugin:
  *
  * A random graph is generated, such that its nodes are separated in some
@@ -141,8 +141,8 @@ s = new sigma({
   }
 });
 
-// Configure the ForceAtlas2 algorithm:
-var fa = sigma.layouts.configForceAtlas2(s, {
+// Configure the ForceLink algorithm:
+var fa = sigma.layouts.configForceLink(s, {
   worker: true,
   barnesHutOptimize: false,
   autoStop: true,
@@ -162,6 +162,6 @@ fa.bind('start interpolate stop', function(e) {
   }
 });
 
-// Start the ForceAtlas2 algorithm:
-sigma.layouts.startForceAtlas2();
+// Start the ForceLink algorithm:
+sigma.layouts.startForceLink();
 </script>

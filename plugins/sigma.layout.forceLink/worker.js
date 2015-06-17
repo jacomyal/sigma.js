@@ -1,13 +1,20 @@
 ;(function(undefined) {
   'use strict';
 
+  if (typeof sigma === 'undefined')
+    throw new Error('sigma is not declared');
+
+  // Initialize package:
+  sigma.utils.pkg('sigma.layouts');
+
   /**
-   * Sigma ForceAtlas2.5 Webworker
+   * Sigma ForceLink Webworker
    * ==============================
    *
    * Author: Guillaume Plique (Yomguithereal)
    * Algorithm author: Mathieu Jacomy @ Sciences Po Medialab & WebAtlas
-   * Version: 1.0.3
+   * Extensions author: Sébastien Heymann @ Linkurious
+   * Version: 1.0.0
    */
 
   var _root = this,
@@ -38,6 +45,7 @@
 
       // Possible to change through config
       settings: {
+        // force atlas 2:
         linLogMode: false,
         outboundAttractionDistribution: false,
         adjustSizes: false,
@@ -49,7 +57,15 @@
         barnesHutOptimize: false,
         barnesHutTheta: 0.5,
         startingIterations: 1,
-        iterationsPerRender: 1
+        iterationsPerRender: 1,
+        // stopping condition:
+        maxIterations: 1000,
+        avgDistanceThreshold: 0.01,
+        autoStop: false,
+        // node siblings:
+        alignNodeSiblings: false,
+        nodeSiblingsScale: 1,
+        nodeSiblingsAngleMin: 0
       }
     };
 
@@ -81,6 +97,244 @@
 
       return obj;
     }
+
+    /**
+     * Return the euclidian distance between two points of a plane
+     * with an orthonormal basis.
+     *
+     * @param  {number} x1  The X coordinate of the first point.
+     * @param  {number} y1  The Y coordinate of the first point.
+     * @param  {number} x2  The X coordinate of the second point.
+     * @param  {number} y2  The Y coordinate of the second point.
+     * @return {number}     The euclidian distance.
+     */
+    function getDistance(x0, y0, x1, y1) {
+      return Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
+    };
+
+    /**
+     * Return the coordinates of the intersection points of two circles.
+     *
+     * @param  {number} x0  The X coordinate of center location of the first
+     *                      circle.
+     * @param  {number} y0  The Y coordinate of center location of the first
+     *                      circle.
+     * @param  {number} r0  The radius of the first circle.
+     * @param  {number} x1  The X coordinate of center location of the second
+     *                      circle.
+     * @param  {number} y1  The Y coordinate of center location of the second
+     *                      circle.
+     * @param  {number} r1  The radius of the second circle.
+     * @return {xi,yi}      The coordinates of the intersection points.
+     */
+    function getCircleIntersection(x0, y0, r0, x1, y1, r1) {
+      // http://stackoverflow.com/a/12219802
+      var a, dx, dy, d, h, rx, ry, x2, y2;
+
+      // dx and dy are the vertical and horizontal distances between the circle
+      // centers:
+      dx = x1 - x0;
+      dy = y1 - y0;
+
+      // Determine the straight-line distance between the centers:
+      d = Math.sqrt((dy * dy) + (dx * dx));
+
+      // Check for solvability:
+      if (d > (r0 + r1)) {
+          // No solution. circles do not intersect.
+          return false;
+      }
+      if (d < Math.abs(r0 - r1)) {
+          // No solution. one circle is contained in the other.
+          console.log('B', d, r0, r1, Math.abs(r0 - r1));
+          return false;
+      }
+
+      //'point 2' is the point where the line through the circle intersection
+      // points crosses the line between the circle centers.
+
+      // Determine the distance from point 0 to point 2:
+      a = ((r0 * r0) - (r1 * r1) + (d * d)) / (2.0 * d);
+
+      // Determine the coordinates of point 2:
+      x2 = x0 + (dx * a / d);
+      y2 = y0 + (dy * a / d);
+
+      // Determine the distance from point 2 to either of the intersection
+      // points:
+      h = Math.sqrt((r0 * r0) - (a * a));
+
+      // Determine the offsets of the intersection points from point 2:
+      rx = -dy * (h / d);
+      ry = dx * (h / d);
+
+      // Determine the absolute intersection points:
+      var xi = x2 + rx;
+      var xi_prime = x2 - rx;
+      var yi = y2 + ry;
+      var yi_prime = y2 - ry;
+
+      return {xi: xi, xi_prime: xi_prime, yi: yi, yi_prime: yi_prime};
+    };
+
+    /**
+     * Find the closest point on a line.
+     *
+     * @param  {number} x  The X coordinate of the point to check.
+     * @param  {number} y  The Y coordinate of the point to check.
+     * @param  {number} x1 The X coordinate of the line start point.
+     * @param  {number} y1 The Y coordinate of the line start point.
+     * @param  {number} x2 The X coordinate of the line end point.
+     * @param  {number} y2 The Y coordinate of the line end point.
+     * @return {x,y}       The coordinates of the closest point.
+     */
+    /*function getClosestPointToLine(x, y, x1, y1, x2, y2) {
+      // http://stackoverflow.com/a/328122
+      var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
+        d = getDistance(x1, y1, x2, y2),
+        nCrossProduct = crossProduct / d; // normalized cross product
+
+      // http://stackoverflow.com/a/3120357
+      // Add the distance to A, moving towards B
+      return {
+        x: x1 + (x2 - x1) * nCrossProduct,
+        y: y1 + (y2 - y1) * nCrossProduct
+      }
+    };*/
+
+    // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+    function getLinesIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2) {
+      // if the lines intersect, the result contains the x and y of the intersection
+      // (treating the lines as infinite) and booleans for whether line segment 1 or
+      // line segment 2 contain the point
+      var
+        denominator,
+        a,
+        b,
+        numerator1,
+        numerator2,
+        result = {
+          x: null,
+          y: null,
+          onLine1: false,
+          onLine2: false
+      };
+
+      denominator =
+        ((line2y2 - line2y1) * (line1x2 - line1x1)) -
+        ((line2x2 - line2x1) * (line1y2 - line1y1));
+
+      if (denominator == 0) {
+          return result;
+      }
+
+      a = line1y1 - line2y1;
+      b = line1x1 - line2x1;
+
+      numerator1 = ((line2x2 - line2x1) * a) - ((line2y2 - line2y1) * b);
+      numerator2 = ((line1x2 - line1x1) * a) - ((line1y2 - line1y1) * b);
+
+      a = numerator1 / denominator;
+      b = numerator2 / denominator;
+
+      // if we cast these lines infinitely in both directions, they intersect here:
+      result.x = line1x1 + (a * (line1x2 - line1x1));
+      result.y = line1y1 + (a * (line1y2 - line1y1));
+      /*
+      // it is worth noting that this should be the same as:
+        x = line2x1 + (b * (line2x2 - line2x1));
+        y = line2x1 + (b * (line2y2 - line2y1));
+      */
+      // if line1 is a segment and line2 is infinite, they intersect if:
+      if (a > 0 && a < 1) {
+          result.onLine1 = true;
+      }
+      // if line2 is a segment and line1 is infinite, they intersect if:
+      if (b > 0 && b < 1) {
+          result.onLine2 = true;
+      }
+      // if line1 and line2 are segments, they intersect if both of the above are true
+      return result;
+    };
+
+    /**
+     * Scale a value from the range [baseMin, baseMax] to the range
+     * [limitMin, limitMax].
+     *
+     * @param  {number} value    The value to rescale.
+     * @param  {number} baseMin  The min value of the range of origin.
+     * @param  {number} baseMax  The max value of the range of origin.
+     * @param  {number} limitMin The min value of the range of destination.
+     * @param  {number} limitMax The max value of the range of destination.
+     * @return {number}          The scaled value.
+     */
+    function scaleRange(value, baseMin, baseMax, limitMin, limitMax) {
+      return ((limitMax - limitMin) * (value - baseMin) / (baseMax - baseMin)) + limitMin;
+    };
+
+    /**
+     * Get the angle of the vector (in radian).
+     *
+     * @param  {object} v  The 2d vector with x,y coordinates.
+     * @return {number}    The angle of the vector  (in radian).
+     */
+    function getVectorAngle(v) {
+      return Math.acos( v.x / Math.sqrt(v.x * v.x + v.y * v.y) );
+    };
+
+    /**
+     * Get the normal vector of the line segment, i.e. the vector
+     * orthogonal to the line.
+     * http://stackoverflow.com/a/1243614/
+     *
+     * @param  {number} aX The x coorinates of the start point.
+     * @param  {number} aY The y coorinates of the start point.
+     * @param  {number} bX The x coorinates of the end point.
+     * @param  {number} bY The y coorinates of the end point.
+     * @return {object}    The 2d vector with (xi,yi), (xi_prime,yi_prime) coordinates.
+     */
+    function getNormalVector(aX, aY, bX, bY) {
+      return {
+        xi:       -(bY - aY),
+        yi:         bX - aX,
+        xi_prime:   bY - aY,
+        yi_prime: -(bX - aX)
+      };
+    };
+
+    /**
+     * Get the normalized vector.
+     *
+     * @param  {object} v      The 2d vector with (xi,yi), (xi_prime,yi_prime) coordinates.
+     * @param  {number} length The vector length.
+     * @return {object}        The normalized vector
+     */
+    function getNormalizedVector(v, length) {
+      return {
+        x: (v.xi_prime - v.xi) / length,
+        y: (v.yi_prime - v.yi) / length,
+      };
+    };
+
+    /**
+     * Get the a point the line segment [A,B] at a specified distance percentage
+     * from the start point.
+     *
+     * @param  {number} aX The x coorinates of the start point.
+     * @param  {number} aY The y coorinates of the start point.
+     * @param  {number} bX The x coorinates of the end point.
+     * @param  {number} bY The y coorinates of the end point.
+     * @param  {number} t  The distance percentage from the start point.
+     * @return {object}    The (x,y) coordinates of the point.
+     */
+    function getPointOnLineSegment(aX, aY, bX, bY, t) {
+      return {
+        x: aX + (bX - aX) * t,
+        y: aY + (bY - aY) * t
+      };
+    }
+
+
 
     /**
      * Matrices properties accessors
@@ -120,51 +374,51 @@
 
       // DEBUG: safeguards
       if ((i % W.ppn) !== 0)
-        throw 'np: non correct (' + i + ').';
+        throw new Error('Invalid argument in np: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'np: non int.';
+        throw new TypeError('Invalid argument in np: "i" is not an integer.');
 
       if (p in nodeProperties)
         return i + nodeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant node property given (' + p + ').';
+        throw new Error('ForceLink.Worker - ' +
+              'Inexistant node property given (' + p + ').');
     }
 
     function ep(i, p) {
 
       // DEBUG: safeguards
       if ((i % W.ppe) !== 0)
-        throw 'ep: non correct (' + i + ').';
+        throw new Error('Invalid argument in ep: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'ep: non int.';
+        throw new TypeError('Invalid argument in ep: "i" is not an integer.');
 
       if (p in edgeProperties)
         return i + edgeProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant edge property given (' + p + ').';
+        throw new Error('ForceLink.Worker - ' +
+              'Inexistant edge property given (' + p + ').');
     }
 
     function rp(i, p) {
 
       // DEBUG: safeguards
       if ((i % W.ppr) !== 0)
-        throw 'rp: non correct (' + i + ').';
+        throw new Error('Invalid argument in rp: "i" is not correct (' + i + ').');
       if (i !== parseInt(i))
-        throw 'rp: non int.';
+        throw new TypeError('Invalid argument in rp: "i" is not an integer.');
 
       if (p in regionProperties)
         return i + regionProperties[p];
       else
-        throw 'ForceAtlas2.Worker - ' +
-              'Inexistant region property given (' + p + ').';
+        throw new Error('ForceLink.Worker - ' +
+              'Inexistant region property given (' + p + ').');
     }
 
     // DEBUG
     function nan(v) {
       if (isNaN(v))
-        throw 'NaN alert!';
+        throw new TypeError('NaN alert!');
     }
 
 
@@ -204,6 +458,8 @@
           coefficient,
           xDist,
           yDist,
+          oldxDist,
+          oldyDist,
           ewc,
           mass,
           distance,
@@ -846,7 +1102,8 @@
       var force,
           swinging,
           traction,
-          nodespeed;
+          nodespeed,
+          alldistance = 0;
 
       // MATH: sqrt and square distances
       if (W.settings.adjustSizes) {
@@ -883,6 +1140,9 @@
             nodespeed =
               0.1 * Math.log(1 + traction) / (1 + Math.sqrt(swinging));
 
+            oldxDist = NodeMatrix[np(n, 'x')];
+            oldyDist = NodeMatrix[np(n, 'y')];
+
             // Updating node's positon
             NodeMatrix[np(n, 'x')] =
               NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
@@ -890,6 +1150,13 @@
             NodeMatrix[np(n, 'y')] =
               NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
+
+            xDist = NodeMatrix[np(n, 'x')];
+            yDist = NodeMatrix[np(n, 'y')];
+            distance = Math.sqrt(
+              Math.pow(xDist - oldxDist, 2) + Math.pow(yDist - oldyDist, 2)
+            );
+            alldistance += distance;
           }
         }
       }
@@ -925,6 +1192,9 @@
                 (1 + Math.sqrt(swinging))
               ));
 
+            oldxDist = NodeMatrix[np(n, 'x')];
+            oldyDist = NodeMatrix[np(n, 'y')];
+
             // Updating node's positon
             NodeMatrix[np(n, 'x')] =
               NodeMatrix[np(n, 'x')] + NodeMatrix[np(n, 'dx')] *
@@ -932,12 +1202,173 @@
             NodeMatrix[np(n, 'y')] =
               NodeMatrix[np(n, 'y')] + NodeMatrix[np(n, 'dy')] *
               (nodespeed / W.settings.slowDown);
+
+            xDist = NodeMatrix[np(n, 'x')];
+            yDist = NodeMatrix[np(n, 'y')];
+            distance = Math.sqrt(
+              Math.pow(xDist - oldxDist, 2) + Math.pow(yDist - oldyDist, 2)
+            );
+            alldistance += distance;
           }
         }
       }
 
       // Counting one more iteration
       W.iterations++;
+
+      // Auto stop.
+      // The greater the ratio nb nodes / nb edges,
+      // the greater the number of iterations needed to converge.
+      if (W.settings.autoStop) {
+        W.converged = (
+          W.iterations > W.settings.maxIterations ||
+          alldistance / W.nodesLength < W.settings.avgDistanceThreshold
+        );
+
+        // align nodes that are linked to the same two nodes only:
+        if (W.converged && W.settings.alignNodeSiblings) {
+          // console.time("alignment");
+
+          var
+            neighbors = {}, // index of neighbors
+            parallelNodes = {}, // set of parallel nodes indexed by same <source;target>
+            setKey, // tmp
+            keysN;  // tmp
+
+          // build index of neighbors:
+          for (e = 0; e < W.edgesLength; e += W.ppe) {
+            n1 = EdgeMatrix[ep(e, 'source')];
+            n2 = EdgeMatrix[ep(e, 'target')];
+
+            if (n1 === n2) continue;
+
+            neighbors[n1] = neighbors[n1] || {};
+            neighbors[n2] = neighbors[n2] || {};
+            neighbors[n1][n2] = true;
+            neighbors[n2][n1] = true;
+          }
+
+          // group triplets by same <source, target> (resp. target, source):
+          Object.keys(neighbors).forEach(function(n) {
+            n = ~~n;  // string to int
+            keysN = Object.keys(neighbors[n]);
+            if (keysN.length == 2) {
+              setKey = keysN[0] + ';' + keysN[1];
+              if (setKey in parallelNodes) {
+                parallelNodes[setKey].push(n);
+              }
+              else {
+                setKey = keysN[1] + ';' + keysN[0];
+                if (!parallelNodes[setKey]) {
+                  parallelNodes[setKey] = [ ~~keysN[1], ~~keysN[0] ];
+                }
+                parallelNodes[setKey].push(n);
+              }
+            }
+          });
+
+          var
+            setNodes,
+            setSource,
+            setTarget,
+            degSource,
+            degTarget,
+            sX,
+            sY,
+            tX,
+            tY,
+            t,
+            distSourceTarget,
+            intersectionPoint,
+            normalVector,
+            nNormaleVector,
+            angle,
+            angleMin = W.settings.nodeSiblingsAngleMin;
+
+          Object.keys(parallelNodes).forEach(function(key) {
+            setSource = parallelNodes[key].shift();
+            setTarget = parallelNodes[key].shift();
+            setNodes = parallelNodes[key];
+
+            sX = NodeMatrix[np(setSource, 'x')];
+            sY = NodeMatrix[np(setSource, 'y')];
+            tX = NodeMatrix[np(setTarget, 'x')];
+            tY = NodeMatrix[np(setTarget, 'y')];
+
+            if (setNodes.length == 1) return;
+
+            // the extremity of lowest degree attracts the nodes
+            // up to 1/4 of the distance:
+            degSource = Object.keys(neighbors[setSource]).length;
+            degTarget = Object.keys(neighbors[setTarget]).length;
+            t = scaleRange(degSource / (degSource + degTarget), 0, 1, 1/4, 3/4);
+            intersectionPoint = getPointOnLineSegment(sX, sY, tX, tY, t);
+
+            // vector normal to the segment [source, target]:
+            normalVector = getNormalVector(sX, sY, tX, tY);
+
+            distSourceTarget = getDistance(sX, sY, tX, tY);
+
+            // normalized normal vector:
+            nNormaleVector = getNormalizedVector(normalVector, distSourceTarget);
+
+            angle = getVectorAngle(nNormaleVector);
+
+            // avoid horizontal vector because node labels overlap:
+            if (2 * angleMin > Math.PI)
+              throw new Error('ForceLink.Worker - Invalid parameter: angleMin must be smaller than 2 PI.');
+
+            if (angleMin > 0) {
+              // TODO layout parameter
+              if (angle < angleMin ||
+                (angle > Math.PI - angleMin) && angle <= Math.PI) {
+
+                // New vector of angle PI - angleMin
+                nNormaleVector = {
+                  x: Math.cos(Math.PI - angleMin) * 2,
+                  y: Math.sin(Math.PI - angleMin) * 2,
+                };
+              }
+              else if ((angle > 2 * Math.PI - angleMin) ||
+                angle >= Math.PI && (angle < Math.PI + angleMin)) {
+
+                // New vector of angle angleMin
+                nNormaleVector = {
+                  x: Math.cos(angleMin) * 2,
+                  y: Math.sin(angleMin) * 2,
+                };
+              }
+            }
+
+            // evenly distribute nodes along the perpendicular line to
+            // [source, target] at the computed intersection point:
+            var
+              start = 0,
+              sign = 1,
+              steps = 1;
+
+            if (setNodes.length % 2 == 1) {
+              steps = 0;
+              start = 1;
+            }
+
+            for(var i = 0; i < setNodes.length; i++) {
+              NodeMatrix[np(setNodes[i], 'x')] =
+                intersectionPoint.x + (sign * nNormaleVector.x * steps) *
+                ((start || i >= 2) ? W.settings.nodeSiblingsScale : W.settings.nodeSiblingsScale * 2/3);
+
+              NodeMatrix[np(setNodes[i], 'y')] =
+                intersectionPoint.y + (sign * nNormaleVector.y * steps) *
+                ((start || i >= 2) ? W.settings.nodeSiblingsScale : W.settings.nodeSiblingsScale * 2/3);
+
+              sign = -sign;
+              steps += (i + start) % 2;
+            }
+          });
+
+          // console.timeEnd("alignment");
+        }
+      }
     }
 
     /**
@@ -951,34 +1382,42 @@
 
       // From same document as sigma
       sendNewCoords = function() {
-        var e;
+        if (!W.autoStop || W.converged) {
+          var e;
 
-        if (document.createEvent) {
-          e = document.createEvent('Event');
-          e.initEvent('newCoords', true, false);
-        }
-        else {
-          e = document.createEventObject();
-          e.eventType = 'newCoords';
-        }
+          if (document.createEvent) {
+            e = document.createEvent('Event');
+            e.initEvent('newCoords', true, false);
+          }
+          else {
+            e = document.createEventObject();
+            e.eventType = 'newCoords';
+          }
 
-        e.eventName = 'newCoords';
-        e.data = {
-          nodes: NodeMatrix.buffer
-        };
-        requestAnimationFrame(function() {
-          document.dispatchEvent(e);
-        });
+          e.eventName = 'newCoords';
+          e.data = {
+            nodes: NodeMatrix.buffer,
+            converged: W.converged
+          };
+          requestAnimationFrame(function() {
+            document.dispatchEvent(e);
+          });
+        }
       };
     }
     else {
 
       // From a WebWorker
       sendNewCoords = function() {
-        self.postMessage(
-          {nodes: NodeMatrix.buffer},
-          [NodeMatrix.buffer]
-        );
+        if (!W.autoStop || W.converged) {
+          self.postMessage(
+            {
+              nodes: NodeMatrix.buffer,
+              converged: W.converged
+            },
+            [NodeMatrix.buffer]
+          );
+        }
       };
     }
 
@@ -1114,16 +1553,14 @@
   }
 
   if (inWebWorker) {
-
     // We are in a webworker, so we launch the Worker function
     eval(getWorkerFn());
   }
   else {
-
     // We are requesting the worker from sigma, we retrieve it therefore
     if (typeof sigma === 'undefined')
-      throw 'sigma is not declared';
+      throw new Error('sigma is not declared');
 
-    sigma.prototype.getForceAtlas2Worker = getWorkerFn;
+    sigma.layouts.getForceLinkWorker = getWorkerFn;
   }
 }).call(this);
