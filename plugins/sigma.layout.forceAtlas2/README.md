@@ -79,11 +79,17 @@ sigma.layouts.isForceAtlas2Running();
 * **barnesHutOptimize** *boolean* `false`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²)` to `O(nlog(n))`)? This is useful for large graph but harmful to small ones.
 * **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
+
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
 * **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
+
 * **maxIterations** *number* `1000`: set a limit if `autoStop: true`.
 * **avgDistanceThreshold** *number* `0.01`: this is the normal stopping condition of `autoStop: true`. When the average displacements of nodes is below this threshold, the layout stops.
 * **autoStop** *boolean* `false`
+
+* **alignNodeSiblings** *boolean* `false`: align nodes that are linked to the same two nodes only. It enhances readability. This operation is performed once the main layout is finished.
+* **nodeSiblingsScale** *number* `1`: Distance multiplicator between the aligned nodes.
+* **nodeSiblingsAngleMin** *number* `0`: force a minimal angle between aligned nodes (from 0 to PI / 2). Node labels may indeed overlap on horizontally aligned nodes.
 
 *Supervisor configuration*
 
