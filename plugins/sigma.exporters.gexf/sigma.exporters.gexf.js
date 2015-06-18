@@ -18,22 +18,14 @@
 
   // Utilities
   function download(fileEntry, extension, filename) {
-    // Anchor
-    var anchor = document.createElement('a');
+    var
+      anchor = document.createElement('a'),
+      objectUrl = null;
 
     if(window.Blob){
       // use Blob if available
-      var textFile = null,
-      makeTextFile = function (text) {
-        var data = new Blob([text], {type: 'text/plain'});
-        if (textFile !== null) {
-          window.URL.revokeObjectURL(textFile);
-        }
-        textFile = window.URL.createObjectURL(data);
-        return textFile;
-      };
-
-      anchor.setAttribute('href', makeTextFile(fileEntry));
+      objectUrl = window.URL.createObjectURL(new Blob([fileEntry], {type: 'text/xml'}));
+      anchor.setAttribute('href', objectUrl);
     }
     else {
       // else use dataURI
@@ -45,12 +37,17 @@
 
     anchor.setAttribute('download', filename || 'graph.' + extension);
 
+    // Click event:
     var event = document.createEvent('MouseEvent');
     event.initMouseEvent('click', true, false, window, 0, 0, 0 ,0, 0,
       false, false, false, false, 0, null);
 
     anchor.dispatchEvent(event);
     anchor.remove();
+
+    if (objectUrl) {
+      window.URL.revokeObjectURL(objectUrl);
+    }
   }
 
   /**
