@@ -47,8 +47,8 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script src="../plugins/sigma.layout.forceLink/worker.js"></script>
+<script src="../plugins/sigma.layout.forceLink/supervisor.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -130,8 +130,8 @@ s.bind('doubleClickStage rightClickStage', function(e) {
   console.log(e.type, e.data.captor);
 });
 
-// Configure the ForceAtlas2 algorithm:
-var fa = sigma.layouts.configForceAtlas2(s, {
+// Configure the ForceLink algorithm:
+var fa = sigma.layouts.configForceLink(s, {
   worker: true,
   autoStop: true,
   background: true,
@@ -143,6 +143,6 @@ fa.bind('start stop', function(e) {
   console.log(e.type);
 });
 
-// Start the ForceAtlas2 algorithm:
-sigma.layouts.startForceAtlas2();
+// Start the ForceLink algorithm:
+sigma.layouts.startForceLink();
 </script>
