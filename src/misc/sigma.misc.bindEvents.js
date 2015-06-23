@@ -62,8 +62,8 @@
             modifiedY > y - s &&
             modifiedY < y + s &&
             Math.sqrt(
-              Math.pow(modifiedX - x, 2) +
-              Math.pow(modifiedY - y, 2)
+              (modifiedX - x) * (modifiedX - x) +
+              (modifiedY - y) * (modifiedY - y)
             ) < s
           ) {
             // Insert the node:

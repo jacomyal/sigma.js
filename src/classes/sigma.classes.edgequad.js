@@ -211,8 +211,8 @@
     lowerLeftCoor: function(r) {
       var width = (
         Math.sqrt(
-          Math.pow(r.x2 - r.x1, 2) +
-          Math.pow(r.y2 - r.y1, 2)
+          (r.x2 - r.x1) * (r.x2 - r.x1) +
+          (r.y2 - r.y1) * (r.y2 - r.y1)
         )
       );
 
@@ -318,7 +318,7 @@
     projection: function(c, a) {
       var l = (
         (c.x * a.x + c.y * a.y) /
-        (Math.pow(a.x, 2) + Math.pow(a.y, 2))
+        (a.x * a.x + a.y * a.y)
       );
 
       return {

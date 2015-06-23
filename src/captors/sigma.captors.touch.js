@@ -156,8 +156,8 @@
               _startTouchX1 - _startTouchX0
             );
             _startTouchDistance = Math.sqrt(
-              Math.pow(_startTouchY1 - _startTouchY0, 2) +
-              Math.pow(_startTouchX1 - _startTouchX0, 2)
+              (_startTouchY1 - _startTouchY0) * (_startTouchY1 - _startTouchY0) +
+              (_startTouchX1 - _startTouchX0) * (_startTouchX1 - _startTouchX0)
             );
 
             e.preventDefault();
@@ -318,7 +318,7 @@
 
             dAngle = Math.atan2(y1 - y0, x1 - x0) - _startTouchAngle;
             dRatio = Math.sqrt(
-              Math.pow(y1 - y0, 2) + Math.pow(x1 - x0, 2)
+              (y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0)
             ) / _startTouchDistance;
 
             // Translation:
