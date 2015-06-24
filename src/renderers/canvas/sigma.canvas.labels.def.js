@@ -35,7 +35,14 @@
       (node.color || settings('defaultNodeColor')) :
       settings('defaultLabelColor');
 
+    context.strokeStyle = '#000';
+
     context.fillText(
+      node.label,
+      Math.round(node[prefix + 'x'] + size + 3),
+      Math.round(node[prefix + 'y'] + fontSize / 3)
+    );
+    context.strokeText(
       node.label,
       Math.round(node[prefix + 'x'] + size + 3),
       Math.round(node[prefix + 'y'] + fontSize / 3)
