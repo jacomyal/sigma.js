@@ -183,15 +183,18 @@
 
           'void main(void) {',
             'vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);',
+            'vec4 black = vec4(0.0, 0.0, 0.0, 1.0);',
 
             'vec2 m = gl_FragCoord.xy - center;',
             'float diff = radius - sqrt(m.x * m.x + m.y * m.y);',
 
             // Here is how we draw a disc instead of a square:
-            'if (diff > 0.0)',
+            'if (diff > 0.25)',
               'gl_FragColor = color;',
-            'else',
+            'else if (diff < -0.25)',
               'gl_FragColor = color0;',
+            'else',
+              'gl_FragColor = black;',
           '}'
         ].join('\n'),
         gl.FRAGMENT_SHADER
