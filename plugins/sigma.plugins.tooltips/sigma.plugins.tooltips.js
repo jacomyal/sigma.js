@@ -288,6 +288,7 @@
     // INTERFACE:
     this.close = function() {
       cancel();
+      this.dispatchEvent('hidden');
       return this;
     };
 
@@ -360,7 +361,7 @@
             clientX,
             clientY);
 
-          self.dispatchEvent('shown');
+          self.dispatchEvent('shown', event.data);
         }, so.delay);
       });
 
@@ -368,14 +369,14 @@
         var p = _tooltip;
         cancel();
         if (p)
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
       });
 
       if (so.show !== 'doubleClickStage') {
         s.bind('doubleClickStage', function(event) {
           cancel();
           _doubleClick = true;
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -415,7 +416,7 @@
             clientX,
             clientY);
 
-          self.dispatchEvent('shown');
+          self.dispatchEvent('shown', event.data);
         }, no.delay);
       });
 
@@ -423,14 +424,14 @@
         var p = _tooltip;
         cancel();
         if (p)
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
       });
 
       if (no.show !== 'doubleClickNode') {
         s.bind('doubleClickNode', function(event) {
           cancel();
           _doubleClick = true;
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
@@ -470,7 +471,7 @@
             clientX,
             clientY);
 
-          self.dispatchEvent('shown');
+          self.dispatchEvent('shown', event.data);
         }, eo.delay);
       });
 
@@ -478,14 +479,14 @@
         var p = _tooltip;
         cancel();
         if (p)
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
       });
 
       if (eo.show !== 'doubleClickEdge') {
         s.bind('doubleClickEdge', function(event) {
           cancel();
           _doubleClick = true;
-          self.dispatchEvent('hidden');
+          self.dispatchEvent('hidden', event.data);
           setTimeout(function() {
             _doubleClick = false;
           }, settings.doubleClickDelay);
