@@ -223,6 +223,16 @@
 
 
 
+    /**
+     * SPATIAL INDEXING SETTINGS:
+     * ****************
+     */
+    // {number} Max height of the node quad tree.
+    nodeQuadtreeMaxLevel: 4,
+    // {number} Max height of the edge quad tree.
+    edgeQuadtreeMaxLevel: 4,
+
+
 
     /**
      * CAMERA SETTINGS:

@@ -531,6 +531,7 @@
         // Refresh quadtree:
         c.quadtree.index(this.graph.nodes(), {
           prefix: c.readPrefix,
+          maxLevel: c.settings('nodeQuadtreeMaxLevel'),
           bounds: {
             x: bounds.minX,
             y: bounds.minY,
@@ -547,6 +548,7 @@
         ) {
           c.edgequadtree.index(this.graph, {
             prefix: c.readPrefix,
+            maxLevel: c.settings('edgeQuadtreeMaxLevel'),
             bounds: {
               x: bounds.minX,
               y: bounds.minY,
