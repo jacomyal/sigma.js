@@ -166,18 +166,21 @@
         _tooltip.innerHTML = options.template;
       }
 
-      // Style it:
-      _tooltip.className = options.cssClass;
-      _tooltip.style.position = 'relative';
-
       // container position:
       var containerRect = renderer.container.getBoundingClientRect();
       x = ~~(x - containerRect.left);
       y = ~~(y - containerRect.top);
 
-      // Default position is mouse position:
-      _tooltip.style.left = x + 'px';
-      _tooltip.style.top = y + 'px';
+      // Style it:
+      _tooltip.className = options.cssClass;
+
+      if (options.position !== 'css') {
+        _tooltip.style.position = 'relative';
+
+        // Default position is mouse position:
+        _tooltip.style.left = x + 'px';
+        _tooltip.style.top = y + 'px';
+      }
 
       // Execute after rendering:
       setTimeout(function() {
@@ -340,8 +343,9 @@
         if (options.stage.position !== 'top' &&
             options.stage.position !== 'bottom' &&
             options.stage.position !== 'left' &&
-            options.stage.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
+            options.stage.position !== 'right' &&
+            options.stage.position !== 'css') {
+          throw new Error('"options.position" is not "top", "bottom", "left", "right", or "css", was ' + options.position);
         }
       }
 
@@ -394,8 +398,9 @@
         if (options.node.position !== 'top' &&
             options.node.position !== 'bottom' &&
             options.node.position !== 'left' &&
-            options.node.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
+            options.node.position !== 'right' &&
+            options.node.position !== 'css') {
+          throw new Error('"options.position" is not "top", "bottom", "left", "right", or "css", was ' + options.position);
         }
       }
 
@@ -449,8 +454,9 @@
         if (options.edge.position !== 'top' &&
             options.edge.position !== 'bottom' &&
             options.edge.position !== 'left' &&
-            options.edge.position !== 'right') {
-          throw new Error('"options.position" is not "top", "bottom", "left", or "right", was ' + options.position);
+            options.edge.position !== 'right' &&
+            options.edge.position !== 'css') {
+          throw new Error('"options.position" is not "top", "bottom", "left", "right", or "css", was ' + options.position);
         }
       }
 

@@ -107,10 +107,9 @@ The `node`, `edge` or `stage` keys are mandatory to enable the related tooltips.
    * type: *string*
    * default value: `sigma-tooltip`
  * **position**
-   * Relative position of the tooltip regarding to the mouse position. If it is not specified, the tooltip top-left corner is positionned at the mouse position.
+   * Relative position of the tooltip regarding to the mouse position. If it is not specified, the tooltip top-left corner is positionned at the mouse position. If set as `css`, the tooltip position is not set and must be set by external CSS.
    * type: *string*
-   * default value: `""`
-   * available values: `top` | `bottom` | `left` | `right`
+   * available values: `top` | `bottom` | `left` | `right` | `css`
  * **delay**
    * The delay in miliseconds before displaying the tooltip after the `show` event is triggered.
    * type: *number*
