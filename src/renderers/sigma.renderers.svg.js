@@ -33,6 +33,8 @@
         fn,
         self = this;
 
+    this.dispatchEvent('beforeRender');
+
     sigma.classes.dispatcher.extend(this);
 
     // Initialize main attributes:

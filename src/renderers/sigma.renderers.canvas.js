@@ -114,6 +114,8 @@
   sigma.renderers.canvas.prototype.render = function(options) {
     options = options || {};
 
+    this.dispatchEvent('beforeRender');
+
     var a,
         i,
         k,

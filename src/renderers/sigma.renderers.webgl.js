@@ -31,6 +31,8 @@
         fn,
         _self = this;
 
+    this.dispatchEvent('beforeRender');
+
     sigma.classes.dispatcher.extend(this);
 
     // Conrad related attributes:
