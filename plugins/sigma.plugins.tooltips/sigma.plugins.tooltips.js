@@ -151,18 +151,26 @@
         // Copy the object:
         var clone = Object.create(null),
             tooltipRenderer,
+            type,
             k;
         for (k in o)
           clone[k] = o[k];
 
         tooltipRenderer = options.renderer.call(s.graph, clone, options.template);
 
-        if (typeof tooltipRenderer === 'string')
+        type = typeof tooltipRenderer;
+
+        if (type === 'undefined') return;
+
+        if (type === 'string') {
            _tooltip.innerHTML = tooltipRenderer;
-        else
-            // tooltipRenderer is a dom element:
-           _tooltip.appendChild(tooltipRenderer);
-      } else {
+        }
+        else {
+          // tooltipRenderer is a dom element:
+          _tooltip.appendChild(tooltipRenderer);
+        }
+      }
+      else {
         _tooltip.innerHTML = options.template;
       }
 
