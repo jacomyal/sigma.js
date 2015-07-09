@@ -31,8 +31,6 @@
         fn,
         _self = this;
 
-    this.dispatchEvent('beforeRender');
-
     sigma.classes.dispatcher.extend(this);
 
     // Conrad related attributes:
@@ -255,6 +253,8 @@
         drawLabels = this.settings(options, 'drawLabels'),
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes');
+
+    this.dispatchEvent('beforeRender');
 
     // Call the resize function:
     this.resize(false);

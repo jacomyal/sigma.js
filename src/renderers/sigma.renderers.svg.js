@@ -33,8 +33,6 @@
         fn,
         self = this;
 
-    this.dispatchEvent('beforeRender');
-
     sigma.classes.dispatcher.extend(this);
 
     // Initialize main attributes:
@@ -110,6 +108,8 @@
    */
   sigma.renderers.svg.prototype.render = function(options) {
     options = options || {};
+
+    this.dispatchEvent('beforeRender');
 
     var a,
         i,
