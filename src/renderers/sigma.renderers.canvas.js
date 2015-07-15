@@ -103,7 +103,81 @@
   };
 
 
+  /**
+   * Render elements with the given renderers
+   * 
+   * @param  {array}                 renderers  Renderers to use
+   * @param  {string}                type       "edges" or "nodes"
+   * @param  {array}                 elements   Elements to render
+   * @param  {Context2D}             ctx        Ctontext to draz on
+   * @param  {integer}               start      Starting index of the elements to render
+   * @param  {integer}               end        Last index of the elements to render
+   * @param  {object}                options    An object of options.
+   */
+  sigma.renderers.canvas.prototype.renderRenderers = function(renderers, type, elements, ctx, start, end, options) {
+    var a,
+        i,
+        renderer,
+        specialized_renderer,
+        def,
+        render,
+        elementType = type == 'edges' ? 'defaultEdgeType' : 'defaultNodeType',
+        embedSettings = this.settings.embedObjects(options, {
+          prefix: this.options.prefix
+        });
 
+    for(renderer in renderers){
+      if(renderers[renderer].pre){
+        renderers[renderer].pre(ctx, embedSettings);
+      }
+    }
+    for (a = elements, i = start; i < end; i++){
+      if (!a[i].hidden){
+        specialized_renderer = renderers[
+          a[i].type || this.settings(options, type)
+        ]
+        def = (specialized_renderer || renderers.def);
+        render = (def.render || def);
+        if(type == 'edges'){
+          render(
+            a[i],
+            this.graph.nodes(a[i].source),
+            this.graph.nodes(a[i].target),
+            ctx,
+            embedSettings
+          );
+        }else{
+          render(
+            a[i],
+            ctx,
+            embedSettings
+          );
+        }
+      }
+    }
+    for(renderer in renderers){
+      if(renderers[renderer].post){
+        renderers[renderer].post(ctx, embedSettings);
+      }
+    }
+  };
+
+
+  /**
+   * Render a batch of edges
+   * 
+   * @param    {integer}               start   Starting index of the edges to render
+   * @param    {integer}               end     An object of options.
+   * @param    {object}                options An object of options.
+   */
+  sigma.renderers.canvas.prototype.renderEdges = function(start, end, options) {
+    this.renderRenderers(sigma.canvas.edges, 'edges', this.edgesOnScreen,
+        this.contexts.edges, start, end, options);
+    if (this.settings(options, 'drawEdgeLabels')) {
+      this.renderRenderers(sigma.canvas.edges.labels, 'edges', this.edgesOnScreen,
+           this.contexts.labels, start, end, options);
+    }
+  };
 
   /**
    * This method renders the graph on the canvases.
@@ -113,6 +187,8 @@
    */
   sigma.renderers.canvas.prototype.render = function(options) {
     options = options || {};
+
+    this.dispatchEvent('beforeRender');
 
     var a,
         i,
@@ -124,8 +200,6 @@
         job,
         start,
         edges,
-        renderers,
-        rendererType,
         batchSize,
         tempGCO,
         index = {},
@@ -135,7 +209,6 @@
         drawEdges = this.settings(options, 'drawEdges'),
         drawNodes = this.settings(options, 'drawNodes'),
         drawLabels = this.settings(options, 'drawLabels'),
-        drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
         embedSettings = this.settings.embedObjects(options, {
           prefix: this.options.prefix
         });
@@ -207,37 +280,7 @@
           tempGCO = this.contexts.edges.globalCompositeOperation;
           this.contexts.edges.globalCompositeOperation = 'destination-over';
 
-          renderers = sigma.canvas.edges;
-          for (i = start; i < end; i++) {
-            o = edges[i];
-            (renderers[
-              o.type || this.settings(options, 'defaultEdgeType')
-            ] || renderers.def)(
-              o,
-              graph.nodes(o.source),
-              graph.nodes(o.target),
-              this.contexts.edges,
-              embedSettings
-            );
-          }
-
-          // Draw edge labels:
-          if (drawEdgeLabels) {
-            renderers = sigma.canvas.edges.labels;
-            for (i = start; i < end; i++) {
-              o = edges[i];
-              if (!o.hidden)
-                (renderers[
-                  o.type || this.settings(options, 'defaultEdgeType')
-                ] || renderers.def)(
-                  o,
-                  graph.nodes(o.source),
-                  graph.nodes(o.target),
-                  this.contexts.labels,
-                  embedSettings
-                );
-            }
-          }
+          this.renderEdges(start,end, options);
 
           // Restore original globalCompositeOperation:
           this.contexts.edges.globalCompositeOperation = tempGCO;
@@ -258,67 +301,22 @@
 
       // If not, they are drawn in one frame:
       } else {
-        renderers = sigma.canvas.edges;
-        for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
-          o = a[i];
-          (renderers[
-            o.type || this.settings(options, 'defaultEdgeType')
-          ] || renderers.def)(
-            o,
-            graph.nodes(o.source),
-            graph.nodes(o.target),
-            this.contexts.edges,
-            embedSettings
-          );
-        }
-
-        // Draw edge labels:
-        // - No batching
-        if (drawEdgeLabels) {
-          renderers = sigma.canvas.edges.labels;
-          for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++)
-            if (!a[i].hidden)
-              (renderers[
-                a[i].type || this.settings(options, 'defaultEdgeType')
-              ] || renderers.def)(
-                a[i],
-                graph.nodes(a[i].source),
-                graph.nodes(a[i].target),
-                this.contexts.labels,
-                embedSettings
-              );
-        }
+        this.renderEdges(0, this.edgesOnScreen.length, options);
       }
     }
 
     // Draw nodes:
     // - No batching
     if (drawNodes) {
-      renderers = sigma.canvas.nodes;
-      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        if (!a[i].hidden)
-          (renderers[
-            a[i].type || this.settings(options, 'defaultNodeType')
-          ] || renderers.def)(
-            a[i],
-            this.contexts.nodes,
-            embedSettings
-          );
+      this.renderRenderers(sigma.canvas.nodes, 'nodes', this.nodesOnScreen,
+        this.contexts.nodes, 0,  this.nodesOnScreen.length, options);
     }
 
     // Draw labels:
     // - No batching
     if (drawLabels) {
-      renderers = sigma.canvas.labels;
-      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        if (!a[i].hidden)
-          (renderers[
-            a[i].type || this.settings(options, 'defaultNodeType')
-          ] || renderers.def)(
-            a[i],
-            this.contexts.labels,
-            embedSettings
-          );
+      this.renderRenderers(sigma.canvas.labels, 'nodes', this.nodesOnScreen,
+        this.contexts.labels, 0,  this.nodesOnScreen.length, options);
     }
 
     this.dispatchEvent('render');
