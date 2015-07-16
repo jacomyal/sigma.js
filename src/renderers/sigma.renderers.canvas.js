@@ -105,16 +105,19 @@
 
   /**
    * Render elements with the given renderers
-   * 
-   * @param  {array}                 renderers  Renderers to use
-   * @param  {string}                type       "edges" or "nodes"
-   * @param  {array}                 elements   Elements to render
-   * @param  {Context2D}             ctx        Ctontext to draz on
-   * @param  {integer}               start      Starting index of the elements to render
-   * @param  {integer}               end        Last index of the elements to render
-   * @param  {object}                options    An object of options.
+   *
+   * @param  {array}        renderers  Renderers to use
+   * @param  {string}       type       "edges" or "nodes"
+   * @param  {array}        elements   Elements to render
+   * @param  {Context2D}    ctx        Ctontext to draz on
+   * @param  {integer}      start      Starting index of
+   *                                   the elements to render
+   * @param  {integer}      end        Last index of
+   *                                   the elements to render
+   * @param  {object}       options    An object of options.
    */
-  sigma.renderers.canvas.prototype.renderRenderers = function(renderers, type, elements, ctx, start, end, options) {
+  sigma.renderers.canvas.prototype.renderRenderers = function(renderers, type,
+    elements, ctx, start, end, options) {
     var a,
         i,
         renderer,
@@ -126,19 +129,19 @@
           prefix: this.options.prefix
         });
 
-    for(renderer in renderers){
-      if(renderers[renderer].pre){
+    for (renderer in renderers) {
+      if (renderers[renderer].pre) {
         renderers[renderer].pre(ctx, embedSettings);
       }
     }
-    for (a = elements, i = start; i < end; i++){
-      if (!a[i].hidden){
+    for (a = elements, i = start; i < end; i++) {
+      if (!a[i].hidden) {
         specialized_renderer = renderers[
           a[i].type || this.settings(options, type)
-        ]
+        ];
         def = (specialized_renderer || renderers.def);
         render = (def.render || def);
-        if(type == 'edges'){
+        if (type == 'edges') {
           render(
             a[i],
             this.graph.nodes(a[i].source),
@@ -146,7 +149,7 @@
             ctx,
             embedSettings
           );
-        }else{
+        }else {
           render(
             a[i],
             ctx,
@@ -155,8 +158,8 @@
         }
       }
     }
-    for(renderer in renderers){
-      if(renderers[renderer].post){
+    for (renderer in renderers) {
+      if (renderers[renderer].post) {
         renderers[renderer].post(ctx, embedSettings);
       }
     }
@@ -165,8 +168,9 @@
 
   /**
    * Render a batch of edges
-   * 
-   * @param    {integer}               start   Starting index of the edges to render
+   *
+   * @param    {integer}               start   Starting index of the edges
+   *                                           to render
    * @param    {integer}               end     An object of options.
    * @param    {object}                options An object of options.
    */
@@ -174,8 +178,8 @@
     this.renderRenderers(sigma.canvas.edges, 'edges', this.edgesOnScreen,
         this.contexts.edges, start, end, options);
     if (this.settings(options, 'drawEdgeLabels')) {
-      this.renderRenderers(sigma.canvas.edges.labels, 'edges', this.edgesOnScreen,
-           this.contexts.labels, start, end, options);
+      this.renderRenderers(sigma.canvas.edges.labels, 'edges',
+        this.edgesOnScreen, this.contexts.labels, start, end, options);
     }
   };
 
@@ -278,7 +282,7 @@
           tempGCO = this.contexts.edges.globalCompositeOperation;
           this.contexts.edges.globalCompositeOperation = 'destination-over';
 
-          this.renderEdges(start,end, options);
+          this.renderEdges(start, end, options);
 
           // Restore original globalCompositeOperation:
           this.contexts.edges.globalCompositeOperation = tempGCO;
@@ -307,14 +311,14 @@
     // - No batching
     if (drawNodes) {
       this.renderRenderers(sigma.canvas.nodes, 'nodes', this.nodesOnScreen,
-        this.contexts.nodes, 0,  this.nodesOnScreen.length, options);
+        this.contexts.nodes, 0, this.nodesOnScreen.length, options);
     }
 
     // Draw labels:
     // - No batching
     if (drawLabels) {
       this.renderRenderers(sigma.canvas.labels, 'nodes', this.nodesOnScreen,
-        this.contexts.labels, 0,  this.nodesOnScreen.length, options);
+        this.contexts.labels, 0, this.nodesOnScreen.length, options);
     }
 
     this.dispatchEvent('render');
