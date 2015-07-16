@@ -104,19 +104,19 @@
 
 
   /**
-   * Render elements with the given renderers
+   * Render edges or nodes with the given renderers
    *
    * @param  {array}        renderers  Renderers to use
    * @param  {string}       type       "edges" or "nodes"
    * @param  {array}        elements   Elements to render
-   * @param  {Context2D}    ctx        Ctontext to draz on
+   * @param  {Context2D}    ctx        Context to draw on
    * @param  {integer}      start      Starting index of
    *                                   the elements to render
    * @param  {integer}      end        Last index of
    *                                   the elements to render
    * @param  {object}       options    An object of options.
    */
-  sigma.renderers.canvas.prototype.renderRenderers = function(renderers, type,
+  sigma.renderers.canvas.prototype.applyRenderers = function(renderers, type,
     elements, ctx, start, end, options) {
     var a,
         i,
@@ -175,10 +175,10 @@
    * @param    {object}                options An object of options.
    */
   sigma.renderers.canvas.prototype.renderEdges = function(start, end, options) {
-    this.renderRenderers(sigma.canvas.edges, 'edges', this.edgesOnScreen,
+    this.applyRenderers(sigma.canvas.edges, 'edges', this.edgesOnScreen,
         this.contexts.edges, start, end, options);
     if (this.settings(options, 'drawEdgeLabels')) {
-      this.renderRenderers(sigma.canvas.edges.labels, 'edges',
+      this.applyRenderers(sigma.canvas.edges.labels, 'edges',
         this.edgesOnScreen, this.contexts.labels, start, end, options);
     }
   };
@@ -310,14 +310,14 @@
     // Draw nodes:
     // - No batching
     if (drawNodes) {
-      this.renderRenderers(sigma.canvas.nodes, 'nodes', this.nodesOnScreen,
+      this.applyRenderers(sigma.canvas.nodes, 'nodes', this.nodesOnScreen,
         this.contexts.nodes, 0, this.nodesOnScreen.length, options);
     }
 
     // Draw labels:
     // - No batching
     if (drawLabels) {
-      this.renderRenderers(sigma.canvas.labels, 'nodes', this.nodesOnScreen,
+      this.applyRenderers(sigma.canvas.labels, 'nodes', this.nodesOnScreen,
         this.contexts.labels, 0, this.nodesOnScreen.length, options);
     }
 
