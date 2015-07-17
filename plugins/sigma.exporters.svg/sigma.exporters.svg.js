@@ -34,25 +34,35 @@
   }
 
   function download(string, filename) {
+    if (typeof safari !== 'undefined') {
+      var msg = "File download does not work in Safari. Please use a modern web browser such as Firefox, Chrome, or Internet Explorer 11.";
+      alert(msg);
+      throw new Error(msg);
+    }
 
-    // Creating blob href
-    var blob = createBlob(string);
+    // Blob
+    var blob = createBlob(string),
+        objectUrl = window.URL.createObjectURL(blob);
 
-    // Anchor
-    var o = {};
-    o.anchor = document.createElement('a');
-    o.anchor.setAttribute('href', URL.createObjectURL(blob));
-    o.anchor.setAttribute('download', filename);
+    if (navigator.msSaveBlob) { // IE11+ : (has Blob, but not a[download])
+      navigator.msSaveBlob(blob, filename);
+    } else if (navigator.msSaveOrOpenBlob) { // IE10+ : (has Blob, but not a[download])
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      // A-download
+      var anchor = document.createElement('a');
+      anchor.setAttribute('href', objectUrl);
+      anchor.setAttribute('download', filename);
 
-    // Click event
-    var event = document.createEvent('MouseEvent');
-    event.initMouseEvent('click', true, false, window, 0, 0, 0 ,0, 0,
-      false, false, false, false, 0, null);
+      // Firefox requires the link to be added to the DOM before it can be clicked.
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+    }
 
-    URL.revokeObjectURL(blob);
-
-    o.anchor.dispatchEvent(event);
-    delete o.anchor;
+    setTimeout(function() { // Firefox needs a timeout
+      window.URL.revokeObjectURL(objectUrl);
+    }, 0);
   }
 
 
