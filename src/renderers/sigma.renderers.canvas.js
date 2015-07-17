@@ -118,41 +118,42 @@
    *      }
    */
   sigma.renderers.canvas.applyRenderers = function(params) {
-    var a,
-        i,
+    var i,
         renderer,
         specialized_renderer,
         def,
         render,
+        els = params.elements,
         elementType = (params.elements || params.type == 'edges' ?
               'defaultEdgeType' : 'defaultNodeType');
 
     params.start = params.start || 0;
     params.end = params.end || params.elements.length;
+    params.end = Math.min(params.elements.length, params.end);
 
     for (renderer in params.renderers) {
       if (params.renderers[renderer].pre) {
         params.renderers[renderer].pre(params.ctx, params.settings);
       }
     }
-    for (a = params.elements, i = params.start; i < params.end; i++) {
-      if (!a[i].hidden) {
+    for (i = params.start; i < params.end; i++) {
+      if (!els[i].hidden) {
         specialized_renderer = params.renderers[
-          a[i].type || params.settings(params.options, elementType)
+          els[i].type || params.settings(params.options, elementType)
         ];
         def = (specialized_renderer || params.renderers.def);
         render = (def.render || def);
         if (params.type == 'edges') {
           render(
-            a[i],
-            params.graph.nodes(a[i].source),
-            params.graph.nodes(a[i].target),
+            els[i],
+            params.graph.nodes(els[i].source),
+            params.graph.nodes(els[i].target),
             params.ctx,
             params.settings
           );
         }else {
           render(
-            a[i],
+            els[i],
             params.ctx,
             params.settings
           );
@@ -175,28 +176,23 @@
    * @param    {integer}               end     An object of options.
    * @param    {object}                options An object of options.
    */
-  sigma.renderers.canvas.prototype.renderEdges = function(start, end, settings) {
-    sigma.renderers.canvas.applyRenderers({
+  sigma.renderers.canvas.prototype.renderEdges =
+          function(start, end, settings) {
+    var renderParams = {
       renderers: sigma.canvas.edges,
       type: 'edges',
       elements: this.edgesOnScreen,
       ctx: this.contexts.edges,
       start: start,
       end: end,
-      graph:this.graph,
+      graph: this.graph,
       settings: settings
-    });
+    };
+    sigma.renderers.canvas.applyRenderers(renderParams);
     if (settings('drawEdgeLabels')) {
-      sigma.renderers.canvas.applyRenderers({
-        renderers: sigma.canvas.edges.labels,
-        type: 'edges',
-        ctx: this.contexts.labels,
-        elements: this.edgesOnScreen,
-        start: start,
-        end: end,
-        graph:this.graph,
-        settings: settings
-      });
+      renderParams.renderers = sigma.canvas.edges.labels;
+      renderParams.ctx = this.contexts.labels;
+      sigma.renderers.canvas.applyRenderers(renderParams);
     }
   };
 
@@ -285,7 +281,7 @@
       }
 
       // If the "batchEdgesDrawing" settings is true, edges are batched:
-      if (this.settings(options, 'batchEdgesDrawing')) {
+      if (embedSettings('batchEdgesDrawing')) {
         id = 'edges_' + this.conradId;
         batchSize = embedSettings('canvasEdgesBatchSize');
 
