@@ -106,21 +106,22 @@
    * Static method to render edges or nodes with the given renderers
    *
    * @param  {object}       params     The parameters passed in an object
-   *      {
-   *        renderers:           Renderers to be used
-   *        type:                "edges" or "nodes"
-   *        ctx:                 Canvas Context to draw on
-   *        settings:            Settings object to use
-   *        elements:            Elements to render
-   *        graph:               Graph object (necessary for edge rendering)
-   *        start:    (optional) Starting index of the elements to render
-   *        end:      (optional) Last index of the elements to render
-   *      }
+   * {
+   *   renderers: {object}              Renderers indexed by types
+   *   type:      {string}              "edges" or "nodes"
+   *   ctx:       {Context2D}           Canvas Context to draw on
+   *   settings:  {object}              Settings object to use
+   *   elements:  {array}               Elements to render
+   *   graph?:    {sigma.classes.graph} Graph object
+   *                                    (only necessary for edge rendering)
+   *   start?:    {integer}             Starting index of the elements to render
+   *   end?:      {integer}             Last index of the elements to render
+   * }
    */
   sigma.renderers.canvas.applyRenderers = function(params) {
     var i,
         renderer,
-        specialized_renderer,
+        specializedRenderer,
         def,
         render,
         els = params.elements,
@@ -138,10 +139,10 @@
     }
     for (i = params.start; i < params.end; i++) {
       if (!els[i].hidden) {
-        specialized_renderer = params.renderers[
+        specializedRenderer = params.renderers[
           els[i].type || params.settings(params.options, elementType)
         ];
-        def = (specialized_renderer || params.renderers.def);
+        def = (specializedRenderer || params.renderers.def);
         render = (def.render || def);
         if (params.type == 'edges') {
           render(
@@ -171,10 +172,9 @@
   /**
    * Render a batch of edges
    *
-   * @param    {integer}               start   Starting index of the edges
-   *                                           to render
-   * @param    {integer}               end     An object of options.
-   * @param    {object}                options An object of options.
+   * @param    {integer}      start    Starting index of the elements to render
+   * @param    {integer}      end      Last index of the elements to render
+   * @param    {object}       settings Settings to use
    */
   sigma.renderers.canvas.prototype.renderEdges =
           function(start, end, settings) {
