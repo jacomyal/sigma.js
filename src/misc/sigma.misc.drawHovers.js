@@ -87,7 +87,7 @@
         sigma.renderers.canvas.applyRenderers(renderParams);
 
         if (embedSettings('edgeHoverExtremities')) {
-          renderParams.renderers = sigma.canvas.edgehovers;
+          renderParams.renderers = sigma.canvas.extremities;
           sigma.renderers.canvas.applyRenderers(renderParams);
         } else { //draw nodes over edges
           renderParams.ctx = self.contexts.nodes;
