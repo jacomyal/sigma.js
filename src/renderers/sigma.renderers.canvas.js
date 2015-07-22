@@ -132,6 +132,8 @@
     params.end = params.end || params.elements.length;
     params.end = Math.min(params.elements.length, params.end);
 
+    params.ctx.save();
+
     for (renderer in params.renderers) {
       if (params.renderers[renderer].pre) {
         params.renderers[renderer].pre(params.ctx, params.settings);
@@ -166,6 +168,8 @@
         params.renderers[renderer].post(params.ctx, params.settings);
       }
     }
+
+    params.ctx.restore();
   };
 
 
