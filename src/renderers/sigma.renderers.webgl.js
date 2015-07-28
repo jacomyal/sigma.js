@@ -449,14 +449,13 @@
         }, key);
       };
 
-      for (i = 0, l = a.length; i < l; i++)
-        if (!a[i].hidden)
-          (
-            sigma.canvas.labels[
-              a[i].type ||
-              this.settings(options, 'defaultNodeType')
-            ] || sigma.canvas.labels.def
-          )(a[i], this.contexts.labels, o);
+      sigma.renderers.canvas.applyRenderers({
+        renderers: sigma.canvas.labels,
+        type: 'nodes',
+        ctx: this.contexts.labels,
+        elements: a,
+        settings: o
+      });
     }
 
     this.dispatchEvent('render');
