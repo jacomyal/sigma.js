@@ -517,7 +517,8 @@
   sigma.renderers.webgl.prototype.resize = function(w, h) {
     var k,
         oldWidth = this.width,
-        oldHeight = this.height;
+        oldHeight = this.height,
+        pixelRatio = sigma.utils.getPixelRatio();
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -538,8 +539,11 @@
         if (this.domElements[k].tagName.toLowerCase() === 'canvas') {
           // If simple 2D canvas:
           if (this.contexts[k] && this.contexts[k].scale) {
-            this.domElements[k].setAttribute('width', w + 'px');
-            this.domElements[k].setAttribute('height', h + 'px');
+            this.domElements[k].setAttribute('width', (w * pixelRatio) + 'px');
+            this.domElements[k].setAttribute('height', (h * pixelRatio) + 'px');
+
+            if (pixelRatio !== 1)
+              this.contexts[k].scale(pixelRatio, pixelRatio);
           } else {
             this.domElements[k].setAttribute(
               'width',
@@ -573,12 +577,7 @@
    * @return {sigma.renderers.webgl} Returns the instance itself.
    */
   sigma.renderers.webgl.prototype.clear = function() {
-    var k;
-
-    for (k in this.domElements)
-      if (this.domElements[k].tagName === 'CANVAS')
-        this.domElements[k].width = this.domElements[k].width;
-
+    this.contexts.labels.clearRect(0, 0, this.width, this.height);
     this.contexts.nodes.clear(this.contexts.nodes.COLOR_BUFFER_BIT);
     this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
 

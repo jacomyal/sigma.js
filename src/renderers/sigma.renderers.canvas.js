@@ -359,13 +359,7 @@
     var k,
         oldWidth = this.width,
         oldHeight = this.height,
-        pixelRatio = 1;
-        // TODO:
-        // *****
-        // This pixelRatio is the solution to display with the good definition
-        // on canvases on Retina displays (ie oversampling). Unfortunately, it
-        // has a huge performance cost...
-        //  > pixelRatio = window.devicePixelRatio || 1;
+        pixelRatio = sigma.utils.getPixelRatio();
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -402,11 +396,9 @@
    * @return {sigma.renderers.canvas} Returns the instance itself.
    */
   sigma.renderers.canvas.prototype.clear = function() {
-    var k;
-
-    for (k in this.domElements)
-      if (this.domElements[k].tagName === 'CANVAS')
-        this.domElements[k].width = this.domElements[k].width;
+    for (var k in this.contexts) {
+      this.contexts[k].clearRect(0, 0, this.width, this.height);
+    }
 
     return this;
   };

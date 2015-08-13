@@ -73,9 +73,6 @@
       };
     }
 
-
-
-
     /**
      * This method unbinds every handlers that makes the captor work.
      */
@@ -87,9 +84,6 @@
       _target.addEventListener('touchleave', _handleLeave);
       _target.addEventListener('touchmove', _handleMove);
     };
-
-
-
 
     // TOUCH EVENTS:
     // *************
@@ -156,8 +150,10 @@
               _startTouchX1 - _startTouchX0
             );
             _startTouchDistance = Math.sqrt(
-              Math.pow(_startTouchY1 - _startTouchY0, 2) +
-              Math.pow(_startTouchX1 - _startTouchX0, 2)
+              (_startTouchY1 - _startTouchY0) *
+                (_startTouchY1 - _startTouchY0) +
+              (_startTouchX1 - _startTouchX0) *
+                (_startTouchX1 - _startTouchX0)
             );
 
             e.preventDefault();
@@ -281,16 +277,8 @@
                 y: newStageY
               });
 
-              _self.dispatchEvent('mousemove', {
-                x: pos0.x - sigma.utils.getWidth(e) / 2,
-                y: pos0.y - sigma.utils.getHeight(e) / 2,
-                clientX: e.clientX,
-                clientY: e.clientY,
-                ctrlKey: e.ctrlKey,
-                metaKey: e.metaKey,
-                altKey: e.altKey,
-                shiftKey: e.shiftKey
-              });
+              _self.dispatchEvent('mousemove',
+                sigma.utils.mouseCoords(e, pos0.x, pos0.y));
 
               _self.dispatchEvent('drag');
             }
@@ -305,20 +293,20 @@
 
             start = _camera.cameraPosition(
               (_startTouchX0 + _startTouchX1) / 2 -
-                sigma.utils.getWidth(e) / 2,
+                sigma.utils.getCenter(e).x,
               (_startTouchY0 + _startTouchY1) / 2 -
-                sigma.utils.getHeight(e) / 2,
+                sigma.utils.getCenter(e).y,
               true
             );
             end = _camera.cameraPosition(
-              (x0 + x1) / 2 - sigma.utils.getWidth(e) / 2,
-              (y0 + y1) / 2 - sigma.utils.getHeight(e) / 2,
+              (x0 + x1) / 2 - sigma.utils.getCenter(e).x,
+              (y0 + y1) / 2 - sigma.utils.getCenter(e).y,
               true
             );
 
             dAngle = Math.atan2(y1 - y0, x1 - x0) - _startTouchAngle;
             dRatio = Math.sqrt(
-              Math.pow(y1 - y0, 2) + Math.pow(x1 - x0, 2)
+              (y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0)
             ) / _startTouchDistance;
 
             // Translation:
@@ -389,21 +377,13 @@
         ratio = 1 / _settings('doubleClickZoomingRatio');
 
         pos = position(e.touches[0]);
-        _self.dispatchEvent('doubleclick', {
-          x: pos.x - sigma.utils.getWidth(e) / 2,
-          y: pos.y - sigma.utils.getHeight(e) / 2,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey
-        });
+        _self.dispatchEvent('doubleclick',
+          sigma.utils.mouseCoords(e, pos.x, pos.y));
 
         if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
-            pos.x - sigma.utils.getWidth(e) / 2,
-            pos.y - sigma.utils.getHeight(e) / 2,
+            pos.x - sigma.utils.getCenter(e).x,
+            pos.y - sigma.utils.getCenter(e).y,
             true
           );
 
