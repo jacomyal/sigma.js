@@ -632,7 +632,7 @@
    * @return {object}   The center of the event's target.
    */
   sigma.utils.getCenter = function(e) {
-    var ratio = e.target.getAttribute('class') == 'sigma-svg' ? 1 :
+    var ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 :
         sigma.utils.getPixelRatio();
     return {
       x: sigma.utils.getWidth(e) / (2 * ratio),
