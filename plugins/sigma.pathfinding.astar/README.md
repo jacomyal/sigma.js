@@ -1,4 +1,4 @@
-sigma.pathfinding.astar.js — v1.0.0
+sigma.pathfinding.astar.js — v1.0.1
 ===================================
 
 > Plugin author: [@A----](https://github.com/A----)

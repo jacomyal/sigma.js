@@ -109,7 +109,7 @@
         for(i = 0; i < neighbors.length; i++) {
           neighbor = this.nodes(neighbors[i]);
           pathLength = pathLengthFunction(inspectedItem.node, neighbor, inspectedItem.pathLength);
-          heuristicLength = heuristicLengthFunction(neighbor, destNode);
+          heuristicLength = heuristicLengthFunction(neighbor, destNode, pathLength);
           addToLists(neighbor, inspectedItem.node, pathLength, heuristicLength);
         }
       }
