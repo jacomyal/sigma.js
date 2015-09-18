@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jacomyal/sigma.js.png)](https://travis-ci.org/jacomyal/sigma.js)
+[![Build Status](https://travis-ci.org/jacomyal/sigma.js.svg)](https://travis-ci.org/jacomyal/sigma.js)
 
 sigma.js - v1.0.3
 =================
