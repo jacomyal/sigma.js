@@ -112,16 +112,8 @@ for (i = 0; i < E; i++)
 s = new sigma({
   graph: g,
   settings: {
-    edgeColor: 'default',
-    defaultEdgeColor: '#f00',
-
-    edgeHoverColor: 'default',
-    defaultEdgeHoverColor: '#777',
-          minEdgeSize: 4,
-        maxEdgeSize: 4,
-      singleHover:true,
-        enableEdgeHovering: true,
-
+    singleHover:true,
+    enableEdgeHovering: true
   },
   renderer: {
     container: document.getElementById('graph-container'),
