@@ -194,7 +194,8 @@
                 cp = sigma.utils.getSelfLoopControlPoints(
                   source[prefix + 'x'],
                   source[prefix + 'y'],
-                  source[prefix + 'size']
+                  source[prefix + 'size'],
+                  edge.count
                 );
                 if (
                   sigma.utils.isPointOnBezierCurve(
@@ -218,7 +219,9 @@
                   source[prefix + 'x'],
                   source[prefix + 'y'],
                   target[prefix + 'x'],
-                  target[prefix + 'y']);
+                  target[prefix + 'y'],
+                  edge.count
+                );
                 if (
                   sigma.utils.isPointOnQuadraticCurve(
                   modifiedX,
