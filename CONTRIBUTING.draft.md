@@ -6,7 +6,7 @@ As an open-source project that is maintained by people who cannot work on it on 
 
 First, here are some basic rules:
 
- - Make sure your bug or question has not been adressed in another ticket yet.
+ - Make sure your bug or question has not been addressed in another ticket yet.
  - If your ticket is related to a bug you've met, please add a simple use-case to help the maintainers reproduce the bug.
 
 ##### A word about labels
