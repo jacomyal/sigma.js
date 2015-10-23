@@ -247,10 +247,28 @@
         }
 
         // Applying linear interpolation.
-        x = ((x - ref[0].renX) / (ref[1].renX - ref[0].renX)) *
-          (ref[1].x - ref[0].x) + ref[0].x;
-        y = ((y - ref[0].renY) / (ref[1].renY - ref[0].renY)) *
-          (ref[1].y - ref[0].y) + ref[0].y;
+        // if the nodes are on top of each other, we use the camera ratio to interpolate
+        if (ref[0].x === ref[1].x && ref[0].y === ref[1].y) {
+          var xRatio = (ref[0].renX === 0) ? 1 : ref[0].renX;
+          var yRatio = (ref[0].renY === 0) ? 1 : ref[0].renY;
+          x = (ref[0].x / xRatio) * (x - ref[0].renX) + ref[0].x;
+          y = (ref[0].y / yRatio) * (y - ref[0].renY) + ref[0].y;
+        } else {
+          var xRatio = (ref[1].renX - ref[0].renX) / (ref[1].x - ref[0].x);
+          var yRatio = (ref[1].renY - ref[0].renY) / (ref[1].y - ref[0].y);
+
+          // if the coordinates are the same, we use the other ratio to interpolate
+          if (ref[1].x === ref[0].x) {
+            xRatio = yRatio;
+          }
+
+          if (ref[1].y === ref[0].y) {
+            yRatio = xRatio;
+          }
+
+          x = (x - ref[0].renX) / xRatio + ref[0].x;
+          y = (y - ref[0].renY) / yRatio + ref[0].y;
+        }
 
         // Rotating the coordinates.
         _node.x = x * cos - y * sin;
