@@ -32,10 +32,16 @@
       if(!image) {
         image = document.createElement('IMG');
         image.src = url;
+        image.status = 'loading';
+        image.onerror = function() {
+          console.log("error loading", url);
+          image.status = 'error';
+        };
         image.onload = function(){
           // TODO see how we redraw on load
           // need to provide the siginst as a parameter to the library
-          console.log("redraw on image load");
+          console.log("redraw on image load", url);
+          image.status = 'ok';
           sigInst.refresh();
         };
         imgCache[url] = image;
@@ -53,12 +59,14 @@
       context.closePath();
       context.clip();
 
-      // Draw the actual image
-      context.drawImage(image,
-          x+Math.sin(-3.142/4)*r*xratio,
-          y-Math.cos(-3.142/4)*r*yratio,
-          r*xratio*2*Math.sin(-3.142/4)*(-1),
-          r*yratio*2*Math.cos(-3.142/4));
+      if(image.status === 'ok') {
+        // Draw the actual image
+        context.drawImage(image,
+            x+Math.sin(-3.142/4)*r*xratio,
+            y-Math.cos(-3.142/4)*r*yratio,
+            r*xratio*2*Math.sin(-3.142/4)*(-1),
+            r*yratio*2*Math.cos(-3.142/4));
+      }
       context.restore(); // exit clipping mode
     }
   }
