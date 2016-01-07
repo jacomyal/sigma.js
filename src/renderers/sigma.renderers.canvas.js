@@ -1,4 +1,5 @@
-;(function(undefined) {
+;
+(function(undefined) {
   'use strict';
 
   if (typeof sigma === 'undefined')
@@ -28,11 +29,11 @@
       throw 'Container not found.';
 
     var k,
-        i,
-        l,
-        a,
-        fn,
-        self = this;
+      i,
+      l,
+      a,
+      fn,
+      self = this;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -50,8 +51,8 @@
         typeof options.settings === 'object' &&
         options.settings
       ) ?
-        settings.embedObjects(options.settings) :
-        settings;
+      settings.embedObjects(options.settings) :
+      settings;
 
     // Node indexes:
     this.nodesOnScreen = [];
@@ -64,9 +65,7 @@
     this.options.prefix = 'renderer' + this.conradId + ':';
 
     // Initialize the DOM elements:
-    if (
-      !this.settings('batchEdgesDrawing')
-    ) {
+    if (!this.settings('batchEdgesDrawing')) {
       this.initDOM('canvas', 'scene');
       this.contexts.edges = this.contexts.scene;
       this.contexts.nodes = this.contexts.scene;
@@ -115,44 +114,43 @@
     options = options || {};
 
     var a,
-        i,
-        k,
-        l,
-        o,
-        id,
-        end,
-        job,
-        start,
-        edges,
-        renderers,
-        rendererType,
-        batchSize,
-        tempGCO,
-        index = {},
-        graph = this.graph,
-        nodes = this.graph.nodes,
-        prefix = this.options.prefix || '',
-        drawEdges = this.settings(options, 'drawEdges'),
-        drawNodes = this.settings(options, 'drawNodes'),
-        drawLabels = this.settings(options, 'drawLabels'),
-        drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
-        });
+      i,
+      k,
+      l,
+      o,
+      id,
+      end,
+      job,
+      start,
+      edges,
+      renderers,
+      rendererType,
+      batchSize,
+      tempGCO,
+      index = {},
+      graph = this.graph,
+      nodes = this.graph.nodes,
+      prefix = this.options.prefix || '',
+      drawEdges = this.settings(options, 'drawEdges'),
+      drawNodes = this.settings(options, 'drawNodes'),
+      drawLabels = this.settings(options, 'drawLabels'),
+      drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
+      embedSettings = this.settings.embedObjects(options, {
+        prefix: this.options.prefix
+      });
 
     // Call the resize function:
-    this.resize(false);
+    this.resize(this.settings('canvasWidth'), this.settings('canvasHeight'));
 
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, 'hideEdgesOnMove'))
       if (this.camera.isAnimated || this.camera.isMoving)
         drawEdges = false;
 
-    // Apply the camera's view:
+      // Apply the camera's view:
     this.camera.applyView(
       undefined,
-      this.options.prefix,
-      {
+      this.options.prefix, {
         width: this.width,
         height: this.height
       }
@@ -166,7 +164,7 @@
       if (conrad.hasJob(k))
         conrad.killJob(k);
 
-    // Find which nodes are on screen:
+      // Find which nodes are on screen:
     this.edgesOnScreen = [];
     this.nodesOnScreen = this.camera.quadtree.area(
       this.camera.getRectangle(this.width, this.height)
@@ -174,6 +172,13 @@
 
     for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
       index[a[i].id] = a[i];
+
+    //TODO : Get coordinate from hidden field and draw background image.
+    var bg = this.settings(options, 'backgroundImg');
+    if (bg != undefined) {
+      this.contexts.scene.scale(this.camera.ratio, this.camera.ratio)
+      this.contexts.scene.drawImage(bg, 0, 0, this.settings('canvasWidth'), this.settings('canvasHeight'));
+    }
 
     // Draw edges:
     // - If settings('batchEdgesDrawing') is true, the edges are displayed per
@@ -256,7 +261,7 @@
         this.jobs[id] = job;
         conrad.addJob(id, job.bind(this));
 
-      // If not, they are drawn in one frame:
+        // If not, they are drawn in one frame:
       } else {
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
@@ -357,15 +362,15 @@
    */
   sigma.renderers.canvas.prototype.resize = function(w, h) {
     var k,
-        oldWidth = this.width,
-        oldHeight = this.height,
-        pixelRatio = 1;
-        // TODO:
-        // *****
-        // This pixelRatio is the solution to display with the good definition
-        // on canvases on Retina displays (ie oversampling). Unfortunately, it
-        // has a huge performance cost...
-        //  > pixelRatio = window.devicePixelRatio || 1;
+      oldWidth = this.width,
+      oldHeight = this.height,
+      pixelRatio = 1;
+    // TODO:
+    // *****
+    // This pixelRatio is the solution to display with the good definition
+    // on canvases on Retina displays (ie oversampling). Unfortunately, it
+    // has a huge performance cost...
+    //  > pixelRatio = window.devicePixelRatio || 1;
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -416,7 +421,7 @@
    */
   sigma.renderers.canvas.prototype.kill = function() {
     var k,
-        captor;
+      captor;
 
     // Kill captors:
     while ((captor = this.captors.pop()))

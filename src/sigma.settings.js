@@ -1,4 +1,5 @@
-;(function(undefined) {
+;
+(function(undefined) {
   'use strict';
 
   if (typeof sigma === 'undefined')
@@ -243,7 +244,12 @@
      * ********************
      */
     // {number} The default animation time.
-    animationsTime: 200
+    animationsTime: 200,
+    // {number} The default canvas size.
+    canvasWidth: 200,
+    canvasHeight: 200,
+    // {image} background image.
+    backgroundImg: undefined,
   };
 
   // Export the previously designed settings:
