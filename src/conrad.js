@@ -581,7 +581,7 @@
   /**
    * Kills one or more jobs, indicated by their ids. It is only possible to
    * kill running jobs or waiting jobs. If you try to kill a job that does not
-   * exists or that is already killed, a warning will be thrown.
+   * exist or that is already killed, a warning will be thrown.
    *
    * @param  {Array|String} v1 A string job id or an array of job ids.
    * @return {Object}       Returns conrad.
@@ -726,7 +726,7 @@
   }
 
   /**
-   * Unreference every jobs that are stored in the _doneJobs object. It will
+   * Unreference every job that is stored in the _doneJobs object. It will
    * not be possible anymore to get stats about these jobs, but it will release
    * the memory.
    *
