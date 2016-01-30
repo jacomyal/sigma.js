@@ -1,4 +1,4 @@
-sigma.parsers.cypher
+sigma.neo4j.cypher
 ====================
 
 Plugin developed by [Benoît Simard](https://github.com/sim51).
