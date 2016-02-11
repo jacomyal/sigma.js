@@ -119,11 +119,21 @@
    * returns an integer equal to "r * 255 * 255 + g * 255 + b", to gain some
    * memory in the data given to WebGL shaders.
    *
+   * Note that the function actually caches its results for better performance.
+   *
    * @param  {string} val The hexa or rgba color.
    * @return {number}     The number value.
    */
+  var floatColorCache = {};
+
   sigma.utils.floatColor = function(val) {
-    var r = 0,
+
+    // Is the color already computed?
+    if (floatColorCache[val])
+      return floatColorCache[val];
+
+    var original = val,
+        r = 0,
         g = 0,
         b = 0;
 
@@ -149,11 +159,16 @@
       b = +val[3];
     }
 
-    return (
+    var color = (
       r * 256 * 256 +
       g * 256 +
       b
     );
+
+    // Caching the color
+    floatColorCache[original] = color;
+
+    return color;
   };
 
     /**
