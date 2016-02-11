@@ -21,7 +21,8 @@
 - Added the [A*](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.pathfinding.astar) plugin (thanks to [@A----](https://github.com/A----)).
 - Changed the `singleHover` setting to default to `true`.
 - Added the [cypher](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.parsers.cypher) plugin (thanks to [@sim51](https://github.com/sim51)).
-- Added the [parallel edges](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.parallelEdges) plugin (thanks to [@3ch01c](https://github.com/3ch01c))
+- Added the [parallel edges](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.parallelEdges) plugin (thanks to [@3ch01c](https://github.com/3ch01c)).
+- Added HDPI screens support (thanks to [@mdamien](https://github.com/mdamien)).
 - Various optimizations.
 
 #### 1.0.3 - release (August 22, 2014)
