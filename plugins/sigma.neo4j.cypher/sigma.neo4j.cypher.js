@@ -4,12 +4,11 @@
     if (typeof sigma === 'undefined')
         throw 'sigma is not declared';
 
-    // Declare cypher package
+    // Declare neo4j package
     sigma.utils.pkg("sigma.neo4j");
 
     // Initialize package:
     sigma.utils.pkg('sigma.utils');
-    sigma.utils.pkg('sigma.parsers');
 
 
     /**
