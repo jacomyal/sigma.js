@@ -12,7 +12,7 @@
    * rendering later.
    */
   sigma.webgl.edges.shader = {
-    POINTS: 2,
+    POINTS: 4,
     ATTRIBUTES: 6,
     addEdge: function(edge, source, target, data, i, prefix, settings) {
       var thickness = (edge[prefix + 'size'] || 1),
@@ -55,7 +55,15 @@
       data[i++] = y1;
       data[i++] = normals[0];
       data[i++] = normals[1];
-      data[i++] = 5;
+      data[i++] = thickness;
+      data[i++] = color;
+
+      // First point flipped
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = normals[1];
+      data[i++] = normals[0];
+      data[i++] = thickness;
       data[i++] = color;
 
       // Second point
@@ -63,7 +71,15 @@
       data[i++] = y2;
       data[i++] = normals[0];
       data[i++] = normals[1];
-      data[i++] = 5;
+      data[i++] = thickness;
+      data[i++] = color;
+
+      // Second point flipped
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = normals[1];
+      data[i++] = normals[0];
+      data[i++] = thickness;
       data[i++] = color;
     },
     render: function(gl, program, data, params) {
@@ -125,7 +141,7 @@
       );
 
       gl.drawArrays(
-        gl.POINTS,
+        gl.TRIANGLES,
         params.start || 0,
         params.count || (data.length / this.ATTRIBUTES)
       );
@@ -151,13 +167,12 @@
           'void main() {',
 
             // Push the point along its normal by half thickness
-            'vec2 pointPosition = a_position.xy + vec2(a_normal * a_thickness / 2.0);',
-            'vec2 position = (u_matrix * vec3(pointPosition, 1)).xy;',
+            'vec2 position = (u_matrix * vec3(a_position, 1)).xy;',
+            'position = position.xy + vec2(a_normal * a_thickness / 2.0);',
             'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
             // Applying
             'gl_Position = vec4(position, 0, 1);',
-            'gl_PointSize = 10.0;',
 
             // Extract the color:
             'float c = a_color;',
