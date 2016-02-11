@@ -20,8 +20,7 @@
           y1 = source[prefix + 'y'],
           x2 = target[prefix + 'x'],
           y2 = target[prefix + 'y'],
-          color = edge.color,
-          normal;
+          color = edge.color;
 
       if (!color)
         switch (settings('edgeColor')) {
@@ -39,25 +38,31 @@
       // Normalize color:
       color = sigma.utils.floatColor(color);
 
-      // Computing normal vector:
-      normal = [
-        y1 - y2,
-        x2 - x1
+      // Computing normals:
+      var dx = x2 - x1,
+          dy = y2 - y1,
+          len = dx * dx + dy * dy;
+
+      len = 1 / Math.sqrt(len);
+
+      var normals = [
+        dx * len,
+        dy * len
       ];
 
       // First point
       data[i++] = x1;
       data[i++] = y1;
-      data[i++] = normal[0];
-      data[i++] = normal[1];
+      data[i++] = normals[0];
+      data[i++] = normals[1];
       data[i++] = 5;
       data[i++] = color;
 
       // Second point
       data[i++] = x2;
       data[i++] = y2;
-      data[i++] = normal[0];
-      data[i++] = normal[1];
+      data[i++] = normals[0];
+      data[i++] = normals[1];
       data[i++] = 5;
       data[i++] = color;
     },
@@ -146,17 +151,12 @@
           'void main() {',
 
             // Push the point along its normal by half thickness
-            'vec2 p = a_position.xy + vec2(a_normal * a_thickness / 2.0);',
-            // 'vec4 t = mat4(0.0) * vec4(p, 0.0, 1.0)',
-            // 'gl_Position = mat4(u_matrix) * vec4(p, 0.0, 1.0);',
+            'vec2 pointPosition = a_position.xy + vec2(a_normal * a_thickness / 2.0);',
+            'vec2 position = (u_matrix * vec3(pointPosition, 1)).xy;',
+            'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
-            'gl_Position = vec4(',
-              '((u_matrix * vec3(a_position, 1)).xy /',
-                'u_resolution * 2.0 - 1.0) * vec2(1, -1),',
-              '0,',
-              '1',
-            ');',
-
+            // Applying
+            'gl_Position = vec4(position, 0, 1);',
             'gl_PointSize = 10.0;',
 
             // Extract the color:
