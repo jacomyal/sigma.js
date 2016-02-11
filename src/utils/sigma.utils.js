@@ -123,36 +123,36 @@
    * @return {number}     The number value.
    */
   sigma.utils.floatColor = function(val) {
-    var result = [0, 0, 0];
+    var r = 0,
+        g = 0,
+        b = 0;
 
-    if (val.match(/^#/)) {
-      val = (val || '').replace(/^#/, '');
-      result = (val.length === 3) ?
-        [
-          parseInt(val.charAt(0) + val.charAt(0), 16),
-          parseInt(val.charAt(1) + val.charAt(1), 16),
-          parseInt(val.charAt(2) + val.charAt(2), 16)
-        ] :
-        [
-          parseInt(val.charAt(0) + val.charAt(1), 16),
-          parseInt(val.charAt(2) + val.charAt(3), 16),
-          parseInt(val.charAt(4) + val.charAt(5), 16)
-        ];
+    if (val[0] === '#') {
+      val = val.slice(1);
+
+      if (val.length === 3) {
+        r = parseInt(val.charAt(0) + val.charAt(0), 16);
+        g = parseInt(val.charAt(1) + val.charAt(1), 16);
+        b = parseInt(val.charAt(2) + val.charAt(2), 16);
+      }
+      else {
+        r = parseInt(val.charAt(0) + val.charAt(1), 16);
+        g = parseInt(val.charAt(2) + val.charAt(3), 16);
+        b = parseInt(val.charAt(4) + val.charAt(5), 16);
+      }
     } else if (val.match(/^ *rgba? *\(/)) {
       val = val.match(
         /^ *rgba? *\( *([0-9]*) *, *([0-9]*) *, *([0-9]*) *(,.*)?\) *$/
       );
-      result = [
-        +val[1],
-        +val[2],
-        +val[3]
-      ];
+      r = +val[1];
+      g = +val[2];
+      b = +val[3];
     }
 
     return (
-      result[0] * 256 * 256 +
-      result[1] * 256 +
-      result[2]
+      r * 256 * 256 +
+      g * 256 +
+      b
     );
   };
 
