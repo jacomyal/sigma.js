@@ -96,6 +96,8 @@
             gl.getAttribLocation(program, 'a_color'),
           resolutionLocation =
             gl.getUniformLocation(program, 'u_resolution'),
+          ratioLocation =
+            gl.getUniformLocation(program, 'u_ratio'),
           matrixLocation =
             gl.getUniformLocation(program, 'u_matrix');
 
@@ -104,6 +106,11 @@
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
 
       gl.uniform2f(resolutionLocation, params.width, params.height);
+      gl.uniform1f(
+        ratioLocation,
+        params.ratio / Math.pow(params.ratio, params.settings('edgesPowRatio'))
+      );
+
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
 
       gl.enableVertexAttribArray(positionLocation);
@@ -160,6 +167,7 @@
           'attribute float a_color;',
 
           'uniform vec2 u_resolution;',
+          'uniform float u_ratio;',
           'uniform mat3 u_matrix;',
 
           'varying vec4 v_color;',
@@ -168,7 +176,7 @@
 
             // Push the point along its normal by half thickness
             'vec2 position = (u_matrix * vec3(a_position, 1)).xy;',
-            'position = position.xy + vec2(a_normal * a_thickness / 2.0);',
+            'position = position.xy + vec2(a_normal * a_thickness / 2.0 * u_ratio);',
             'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
             // Applying
