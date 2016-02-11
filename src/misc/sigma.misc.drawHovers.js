@@ -51,14 +51,13 @@
     });
 
     function draw() {
-      // Clear self.contexts.hover:
-      self.contexts.hover.canvas.width = self.contexts.hover.canvas.width;
 
       var k,
           source,
           target,
           hoveredNode,
           hoveredEdge,
+          c = self.contexts.hover.canvas,
           defaultNodeType = self.settings('defaultNodeType'),
           defaultEdgeType = self.settings('defaultEdgeType'),
           nodeRenderers = sigma.canvas.hovers,
@@ -67,6 +66,9 @@
           embedSettings = self.settings.embedObjects({
             prefix: prefix
           });
+
+      // Clear self.contexts.hover:
+      self.contexts.hover.clearRect(0, 0, c.width, c.height);
 
       // Node render: single hover
       if (

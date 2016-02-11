@@ -94,58 +94,51 @@
           pos;
 
       // Dispatch event:
-      if (_settings('mouseEnabled'))
-        _self.dispatchEvent('mousemove', {
-          x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey
-        });
+      if (_settings('mouseEnabled')) {
+        _self.dispatchEvent('mousemove',
+          sigma.utils.mouseCoords(e));
 
-      if (_settings('mouseEnabled') && _isMouseDown) {
-        _isMoving = true;
-        _hasDragged = true;
+        if (_isMouseDown) {
+          _isMoving = true;
+          _hasDragged = true;
 
-        if (_movingTimeoutId)
-          clearTimeout(_movingTimeoutId);
+          if (_movingTimeoutId)
+            clearTimeout(_movingTimeoutId);
 
-        _movingTimeoutId = setTimeout(function() {
-          _isMoving = false;
-        }, _settings('dragTimeout'));
+          _movingTimeoutId = setTimeout(function() {
+            _isMoving = false;
+          }, _settings('dragTimeout'));
 
-        sigma.misc.animation.killAll(_camera);
+          sigma.misc.animation.killAll(_camera);
 
-        _camera.isMoving = true;
-        pos = _camera.cameraPosition(
-          sigma.utils.getX(e) - _startMouseX,
-          sigma.utils.getY(e) - _startMouseY,
-          true
-        );
+          _camera.isMoving = true;
+          pos = _camera.cameraPosition(
+            sigma.utils.getX(e) - _startMouseX,
+            sigma.utils.getY(e) - _startMouseY,
+            true
+          );
 
-        x = _startCameraX - pos.x;
-        y = _startCameraY - pos.y;
+          x = _startCameraX - pos.x;
+          y = _startCameraY - pos.y;
 
-        if (x !== _camera.x || y !== _camera.y) {
-          _lastCameraX = _camera.x;
-          _lastCameraY = _camera.y;
+          if (x !== _camera.x || y !== _camera.y) {
+            _lastCameraX = _camera.x;
+            _lastCameraY = _camera.y;
 
-          _camera.goTo({
-            x: x,
-            y: y
-          });
+            _camera.goTo({
+              x: x,
+              y: y
+            });
+          }
+
+          if (e.preventDefault)
+            e.preventDefault();
+          else
+            e.returnValue = false;
+
+          e.stopPropagation();
+          return false;
         }
-
-        if (e.preventDefault)
-          e.preventDefault();
-        else
-          e.returnValue = false;
-
-        e.stopPropagation();
-        return false;
       }
     }
 
@@ -190,16 +183,8 @@
             y: _camera.y
           });
 
-        _self.dispatchEvent('mouseup', {
-          x: x - sigma.utils.getWidth(e) / 2,
-          y: y - sigma.utils.getHeight(e) / 2,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey
-        });
+        _self.dispatchEvent('mouseup',
+          sigma.utils.mouseCoords(e));
 
         // Update _isMoving flag:
         _isMoving = false;
@@ -233,32 +218,16 @@
             break;
           case 3:
             // Right mouse button pressed
-            _self.dispatchEvent('rightclick', {
-              x: _startMouseX - sigma.utils.getWidth(e) / 2,
-              y: _startMouseY - sigma.utils.getHeight(e) / 2,
-              clientX: e.clientX,
-              clientY: e.clientY,
-              ctrlKey: e.ctrlKey,
-              metaKey: e.metaKey,
-              altKey: e.altKey,
-              shiftKey: e.shiftKey
-            });
+            _self.dispatchEvent('rightclick',
+              sigma.utils.mouseCoords(e, _startMouseX, _startMouseY));
             break;
           // case 1:
           default:
             // Left mouse button pressed
             _isMouseDown = true;
 
-            _self.dispatchEvent('mousedown', {
-              x: _startMouseX - sigma.utils.getWidth(e) / 2,
-              y: _startMouseY - sigma.utils.getHeight(e) / 2,
-              clientX: e.clientX,
-              clientY: e.clientY,
-              ctrlKey: e.ctrlKey,
-              metaKey: e.metaKey,
-              altKey: e.altKey,
-              shiftKey: e.shiftKey
-            });
+            _self.dispatchEvent('mousedown',
+              sigma.utils.mouseCoords(e, _startMouseX, _startMouseY));
         }
       }
     }
@@ -281,20 +250,12 @@
      * @param {event} e A mouse event.
      */
     function _clickHandler(e) {
-      if (_settings('mouseEnabled'))
-        _self.dispatchEvent('click', {
-          x: sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-          y: sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey,
-          isDragging:
-            (((new Date()).getTime() - _downStartTime) > 100) &&
-            _hasDragged
-        });
+      if (_settings('mouseEnabled')) {
+        var event = sigma.utils.mouseCoords(e);
+        event.isDragging =
+          (((new Date()).getTime() - _downStartTime) > 100) && _hasDragged;
+        _self.dispatchEvent('click', event);
+      }
 
       if (e.preventDefault)
         e.preventDefault();
@@ -319,21 +280,13 @@
       if (_settings('mouseEnabled')) {
         ratio = 1 / _settings('doubleClickZoomingRatio');
 
-        _self.dispatchEvent('doubleclick', {
-          x: _startMouseX - sigma.utils.getWidth(e) / 2,
-          y: _startMouseY - sigma.utils.getHeight(e) / 2,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey
-        });
+        _self.dispatchEvent('doubleclick',
+            sigma.utils.mouseCoords(e, _startMouseX, _startMouseY));
 
         if (_settings('doubleClickEnabled')) {
           pos = _camera.cameraPosition(
-            sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-            sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
+            sigma.utils.getX(e) - sigma.utils.getCenter(e).x,
+            sigma.utils.getY(e) - sigma.utils.getCenter(e).y,
             true
           );
 
@@ -371,8 +324,8 @@
           _settings('zoomingRatio');
 
         pos = _camera.cameraPosition(
-          sigma.utils.getX(e) - sigma.utils.getWidth(e) / 2,
-          sigma.utils.getY(e) - sigma.utils.getHeight(e) / 2,
+          sigma.utils.getX(e) - sigma.utils.getCenter(e).x,
+          sigma.utils.getY(e) - sigma.utils.getCenter(e).y,
           true
         );
 
