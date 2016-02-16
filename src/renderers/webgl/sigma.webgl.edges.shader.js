@@ -14,8 +14,7 @@
   sigma.webgl.edges.shader = {
     POINTS: 4,
     ATTRIBUTES: 6,
-    INDICES_POINTS: 6,
-    addEdge: function(edge, source, target, data, i, prefix, settings, indicesData, j) {
+    addEdge: function(edge, source, target, data, i, prefix, settings) {
       var thickness = (edge[prefix + 'size'] || 1),
           x1 = source[prefix + 'x'],
           y1 = source[prefix + 'y'],
@@ -57,16 +56,6 @@
         ];
       }
 
-      thickness = 20;
-
-      // Indices
-      indicesData[j++] = i + 0;
-      indicesData[j++] = i + 1;
-      indicesData[j++] = i + 2;
-      indicesData[j++] = i + 2;
-      indicesData[j++] = i + 1;
-      indicesData[j++] = i + 3;
-
       // First point
       data[i++] = x1;
       data[i++] = y1;
@@ -98,6 +87,25 @@
       data[i++] = -normals[1];
       data[i++] = thickness;
       data[i++] = color;
+    },
+    computeIndices: function(data) {
+      var indices = new Uint16Array(data.length * 6),
+          c = 0,
+          i = 0,
+          j,
+          l;
+
+      for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
+        indices[c++] = i + 0;
+        indices[c++] = i + 1;
+        indices[c++] = i + 2;
+        indices[c++] = i + 2;
+        indices[c++] = i + 1;
+        indices[c++] = i + 3;
+        i += 3;
+      }
+
+      return indices;
     },
     render: function(gl, program, data, params) {
 
@@ -204,7 +212,7 @@
             'vec2 yeah = a_normal;',
             'float dummy = u_ratio * a_thickness;',
 
-            'vec2 delta = vec2(a_normal * a_thickness);',
+            'vec2 delta = vec2(a_normal * a_thickness / 2.0);',
             'vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;',
             'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 

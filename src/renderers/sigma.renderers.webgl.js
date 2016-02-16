@@ -177,9 +177,6 @@
     for (k in this.edgeFloatArrays) {
       renderer = sigma.webgl.edges[k];
 
-      if (renderer.INDICES_POINTS)
-        this.edgeIndicesArrays[k] = new Uint16Array(this.edgeFloatArrays[k].edges.length * renderer.INDICES_POINTS);
-
       for (a = this.edgeFloatArrays[k].edges, i = 0, l = a.length; i < l; i++) {
         if (!this.edgeFloatArrays[k].array)
           this.edgeFloatArrays[k].array = new Float32Array(
@@ -200,11 +197,14 @@
             this.edgeFloatArrays[k].array,
             i * renderer.POINTS * renderer.ATTRIBUTES,
             options.prefix,
-            this.settings,
-            this.edgeIndicesArrays[k],
-            i * renderer.INDICES_POINTS
+            this.settings
           );
       }
+
+      if (typeof renderer.computeIndices === 'function')
+        this.edgeIndicesArrays[k] = renderer.computeIndices(
+          this.edgeFloatArrays[k].array
+        );
     }
 
     // Push nodes:
