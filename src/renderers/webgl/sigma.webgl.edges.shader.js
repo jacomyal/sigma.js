@@ -14,7 +14,8 @@
   sigma.webgl.edges.shader = {
     POINTS: 4,
     ATTRIBUTES: 6,
-    addEdge: function(edge, source, target, data, i, prefix, settings) {
+    INDICES_POINTS: 6,
+    addEdge: function(edge, source, target, data, i, prefix, settings, indicesData, j) {
       var thickness = (edge[prefix + 'size'] || 1),
           x1 = source[prefix + 'x'],
           y1 = source[prefix + 'y'],
@@ -56,7 +57,15 @@
         ];
       }
 
-      thickness = 2;
+      thickness = 20;
+
+      // Indices
+      indicesData[j++] = i + 0;
+      indicesData[j++] = i + 1;
+      indicesData[j++] = i + 2;
+      indicesData[j++] = i + 2;
+      indicesData[j++] = i + 1;
+      indicesData[j++] = i + 3;
 
       // First point
       data[i++] = x1;
@@ -91,7 +100,6 @@
       data[i++] = color;
     },
     render: function(gl, program, data, params) {
-      var buffer;
 
       // Define attributes:
       var positionLocation =
@@ -109,10 +117,12 @@
           matrixLocation =
             gl.getUniformLocation(program, 'u_matrix');
 
-      buffer = gl.createBuffer();
+      // Creating buffer:
+      var buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
 
+      // Binding uniforms:
       gl.uniform2f(resolutionLocation, params.width, params.height);
       gl.uniform1f(
         ratioLocation,
@@ -121,6 +131,7 @@
 
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
 
+      // Binding attributes:
       gl.enableVertexAttribArray(positionLocation);
       gl.enableVertexAttribArray(normalLocation);
       gl.enableVertexAttribArray(thicknessLocation);
@@ -155,10 +166,17 @@
         20
       );
 
-      gl.drawArrays(
-        gl.POINTS,
-        params.start || 0,
-        params.count || (data.length / this.ATTRIBUTES)
+      // Creating indices buffer:
+      var indicesBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, params.indicesData, gl.STATIC_DRAW);
+
+      // Drawing:
+      gl.drawElements(
+        gl.TRIANGLES,
+        params.indicesData.length,
+        gl.UNSIGNED_SHORT,
+        params.start || 0
       );
     },
     initProgram: function(gl) {
