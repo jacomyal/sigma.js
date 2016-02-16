@@ -51,10 +51,12 @@
         len = 1 / Math.sqrt(len);
 
         var normals = [
-          dx * len,
-          dy * len
+          -dy * len,
+          dx * len
         ];
       }
+
+      thickness = 2;
 
       // First point
       data[i++] = x1;
@@ -67,8 +69,8 @@
       // First point flipped
       data[i++] = x1;
       data[i++] = y1;
-      data[i++] = 1 - normals[1];
-      data[i++] = normals[0];
+      data[i++] = -normals[0];
+      data[i++] = -normals[1];
       data[i++] = thickness;
       data[i++] = color;
 
@@ -83,8 +85,8 @@
       // Second point flipped
       data[i++] = x2;
       data[i++] = y2;
-      data[i++] = normals[1];
-      data[i++] = 1 - normals[0];
+      data[i++] = -normals[0];
+      data[i++] = -normals[1];
       data[i++] = thickness;
       data[i++] = color;
     },
@@ -180,7 +182,6 @@
 
           'void main() {',
 
-            // Position
             // Scale from [[-1 1] [-1 1]] to the container:
             'vec2 yeah = a_normal;',
             'float dummy = u_ratio * a_thickness;',
@@ -189,14 +190,9 @@
             'vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;',
             'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
-
-    //            vec4 delta = vec4(a_normal * u_linewidth, 0, 0);
-    // vec4 pos = u_mv_matrix * vec4(a_pos, 0, 1);
-    // gl_Position = u_p_matrix * (pos + delta);
-
             // Applying
             'gl_Position = vec4(position, 0, 1);',
-            'gl_PointSize = 5.0;',
+            'gl_PointSize = 10.0;',
 
             // Extract the color:
             'float c = a_color;',
