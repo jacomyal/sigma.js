@@ -38,13 +38,13 @@
 
     // A quick hardcoded rule to prevent people from using this plugin with the
     // WebGL renderer (which is impossible at the moment):
-    if (
-      sigma.renderers.webgl &&
-      renderer instanceof sigma.renderers.webgl
-    )
-      throw new Error(
-        'The sigma.plugins.dragNodes is not compatible with the WebGL renderer'
-      );
+    // if (
+    //   sigma.renderers.webgl &&
+    //   renderer instanceof sigma.renderers.webgl
+    // )
+    //   throw new Error(
+    //     'The sigma.plugins.dragNodes is not compatible with the WebGL renderer'
+    //   );
 
     // Init variables:
     var _self = this,
@@ -60,7 +60,7 @@
       _isMouseDown = false,
       _isMouseOverCanvas = false,
       _drag = false;
-    
+
     if (renderer instanceof sigma.renderers.svg) {
         _mouse = renderer.container.firstChild;
     }
@@ -212,7 +212,7 @@
         captor: event,
         renderer: _renderer
       });
-      
+
       _drag = false;
       _node = null;
     };
