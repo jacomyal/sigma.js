@@ -20,6 +20,7 @@
 <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.shader.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
@@ -82,7 +83,7 @@ var i,
       nodes: [],
       edges: []
     };
-
+sigma.webgl.edges.def = sigma.webgl.edges.shader;
 // Generate the graph:
 for (i = 0; i < C; i++)
   cs.push({
@@ -127,7 +128,7 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    drawEdges: false
+    drawEdges: true
   }
 });
 

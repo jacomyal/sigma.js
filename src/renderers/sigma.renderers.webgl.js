@@ -70,6 +70,9 @@
     Object.defineProperty(this, 'edgeFloatArrays', {
       value: {}
     });
+    Object.defineProperty(this, 'edgeIndicesArrays', {
+      value: {}
+    });
 
     // Initialize the DOM elements:
     if (this.settings(options, 'batchEdgesDrawing')) {
@@ -142,6 +145,9 @@
     for (k in this.edgeFloatArrays)
       delete this.edgeFloatArrays[k];
 
+    for (k in this.edgeIndicesArrays)
+      delete this.edgeIndicesArrays[k];
+
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
       type = a[i].type || this.settings(options, 'defaultEdgeType');
@@ -177,6 +183,7 @@
             a.length * renderer.POINTS * renderer.ATTRIBUTES
           );
 
+
         // Just check that the edge and both its extremities are visible:
         if (
           !a[i].hidden &&
@@ -193,6 +200,11 @@
             this.settings
           );
       }
+
+      if (typeof renderer.computeIndices === 'function')
+        this.edgeIndicesArrays[k] = renderer.computeIndices(
+          this.edgeFloatArrays[k].array
+        );
     }
 
     // Push nodes:
@@ -287,6 +299,7 @@
               arr,
               end,
               start,
+              indices,
               renderer,
               batchSize,
               currentProgram;
@@ -300,6 +313,7 @@
           i = 0;
           renderer = sigma.webgl.edges[a[i]];
           arr = this.edgeFloatArrays[a[i]].array;
+          indices = this.edgeIndicesArrays[a[i]];
           start = 0;
           end = Math.min(
             start + batchSize * renderer.POINTS,
@@ -328,7 +342,8 @@
                     'webglOversamplingRatio'
                   ),
                   start: start,
-                  count: end - start
+                  count: end - start,
+                  indicesData: indices
                 }
               );
             }
@@ -386,7 +401,8 @@
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
-                scalingRatio: this.settings(options, 'webglOversamplingRatio')
+                scalingRatio: this.settings(options, 'webglOversamplingRatio'),
+                indicesData: this.edgeIndicesArrays[k]
               }
             );
           }
