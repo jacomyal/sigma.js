@@ -101,8 +101,8 @@
         sin = Math.sin(this.angle),
         nodeRatio = Math.pow(this.ratio, this.settings('nodesPowRatio')),
         edgeRatio = Math.pow(this.ratio, this.settings('edgesPowRatio')),
-        xDivider = this.ratio + (options.width || 0) / 2,
-        yDivider = this.ratio + (options.height || 0) / 2;
+        xOffset = (options.width || 0) / 2,
+        yOffset = (options.height || 0) / 2;
 
     for (i = 0, l = nodes.length; i < l; i++) {
       node = nodes[i];
@@ -110,12 +110,12 @@
         (
           ((node[read + 'x'] || 0) - this.x) * cos +
           ((node[read + 'y'] || 0) - this.y) * sin
-        ) / xDivider;
+        ) / this.ratio + xOffset;
       node[write + 'y'] =
         (
           ((node[read + 'y'] || 0) - this.y) * cos -
           ((node[read + 'x'] || 0) - this.x) * sin
-        ) / yDivider;
+        ) / this.ratio + yOffset;
       node[write + 'size'] =
         (node[read + 'size'] || 0) /
         nodeRatio;
