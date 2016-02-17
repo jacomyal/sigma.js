@@ -97,25 +97,23 @@
     var i,
         l,
         node,
-        cos = Math.cos(this.angle),
-        sin = Math.sin(this.angle),
+        relCos = Math.cos(this.angle) / this.ratio,
+        relSin = Math.sin(this.angle) / this.ratio,
         nodeRatio = Math.pow(this.ratio, this.settings('nodesPowRatio')),
         edgeRatio = Math.pow(this.ratio, this.settings('edgesPowRatio')),
-        xOffset = (options.width || 0) / 2,
-        yOffset = (options.height || 0) / 2;
+        xOffset = (options.width || 0) / 2 - this.x * relCos - this.y * relSin,
+        yOffset = (options.height || 0) / 2 - this.y * relCos + this.x * relSin;
 
     for (i = 0, l = nodes.length; i < l; i++) {
       node = nodes[i];
       node[write + 'x'] =
-        (
-          ((node[read + 'x'] || 0) - this.x) * cos +
-          ((node[read + 'y'] || 0) - this.y) * sin
-        ) / this.ratio + xOffset;
+        (node[read + 'x'] || 0) * relCos +
+        (node[read + 'y'] || 0) * relSin +
+        xOffset;
       node[write + 'y'] =
-        (
-          ((node[read + 'y'] || 0) - this.y) * cos -
-          ((node[read + 'x'] || 0) - this.x) * sin
-        ) / this.ratio + yOffset;
+        (node[read + 'y'] || 0) * relCos -
+        (node[read + 'x'] || 0) * relSin +
+        yOffset;
       node[write + 'size'] =
         (node[read + 'size'] || 0) /
         nodeRatio;
