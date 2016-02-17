@@ -651,7 +651,7 @@
         sigma.utils.getPixelRatio();
     return {
       x: sigma.utils.getWidth(e) / (2 * ratio),
-      y: sigma.utils.getHeight(e) / (2 * ratio),
+      y: sigma.utils.getHeight(e) / (2 * ratio)
     };
   };
 
