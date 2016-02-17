@@ -178,13 +178,14 @@
     // Push edges:
     for (k in this.edgeFloatArrays) {
       renderer = sigma.webgl.edges[k];
+      a = this.edgeFloatArrays[k].edges;
 
-      for (a = this.edgeFloatArrays[k].edges, i = 0, l = a.length; i < l; i++) {
-        if (!this.edgeFloatArrays[k].array)
-          this.edgeFloatArrays[k].array = new Float32Array(
-            a.length * renderer.POINTS * renderer.ATTRIBUTES
-          );
+      // Creating the necessary arrays
+      this.edgeFloatArrays[k].array = new Float32Array(
+        a.length * renderer.POINTS * renderer.ATTRIBUTES
+      );
 
+      for (i = 0, l = a.length; i < l; i++) {
 
         // Just check that the edge and both its extremities are visible:
         if (
@@ -212,8 +213,14 @@
     // Push nodes:
     for (k in this.nodeFloatArrays) {
       renderer = sigma.webgl.nodes[k];
+      a = this.nodeFloatArrays[k].nodes;
 
-      for (a = this.nodeFloatArrays[k].nodes, i = 0, l = a.length; i < l; i++) {
+      // Creating the necessary arrays
+      this.nodeFloatArrays[k].array = new Float32Array(
+        a.length * renderer.POINTS * renderer.ATTRIBUTES
+      );
+
+      for (i = 0, l = a.length; i < l; i++) {
         if (!this.nodeFloatArrays[k].array)
           this.nodeFloatArrays[k].array = new Float32Array(
             a.length * renderer.POINTS * renderer.ATTRIBUTES
