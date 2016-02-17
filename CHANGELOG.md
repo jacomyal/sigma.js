@@ -24,6 +24,7 @@
 - Added the [parallel edges](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.parallelEdges) plugin (thanks to [@3ch01c](https://github.com/3ch01c)).
 - Added HDPI screens support (thanks to [@mdamien](https://github.com/mdamien)).
 - Fixed a ForceAtlas2 bug related to the `ajustSizes` setting (thanks to [@rangeonnicolas](https://github.com/rangeonnicolas)).
+- Improved `sigma.webgl.nodes.fast` implementaton.
 - Various optimizations.
 
 #### 1.0.3 - release (August 22, 2014)
