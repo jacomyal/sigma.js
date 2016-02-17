@@ -136,7 +136,9 @@
         type,
         renderer,
         graph = this.graph,
-        options = sigma.utils.extend(options, this.options);
+        options = sigma.utils.extend(options, this.options),
+        defaultEdgeType = this.settings(options, 'defaultEdgeType'),
+        defaultNodeType = this.settings(options, 'defaultNodeType');
 
     // Empty float arrays:
     for (k in this.nodeFloatArrays)
@@ -150,7 +152,7 @@
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
-      type = a[i].type || this.settings(options, 'defaultEdgeType');
+      type = a[i].type || defaultEdgeType;
       k = (type && sigma.webgl.edges[type]) ? type : 'def';
 
       if (!this.edgeFloatArrays[k])
@@ -162,7 +164,7 @@
     }
 
     for (a = graph.nodes(), i = 0, l = a.length; i < l; i++) {
-      type = a[i].type || this.settings(options, 'defaultNodeType');
+      type = a[i].type || defaultNodeType;
       k = (type && sigma.webgl.nodes[type]) ? type : 'def';
 
       if (!this.nodeFloatArrays[k])
