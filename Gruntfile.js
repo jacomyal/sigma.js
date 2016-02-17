@@ -71,7 +71,7 @@ module.exports = function(grunt) {
   var plugins = [
     'exporters.svg',
     'layout.forceAtlas2',
-    'parsers.cypher',
+    'neo4j.cypher',
     'parsers.gexf',
     'parsers.json',
     'pathfinding.astar',
