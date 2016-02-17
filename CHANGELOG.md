@@ -1,6 +1,6 @@
 ## sigma.js - changelog:
 
-#### 1.1.0 - release (May 10, 2015)
+#### 1.1.0 - release (Feb 17, 2016)
 
 - Added the SVG renderer.
 - Added the `minArrowSize` setting (thanks to [@ssidorchick](https://github.com/ssidorchick)).

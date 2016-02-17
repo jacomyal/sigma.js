@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/jacomyal/sigma.js.svg)](https://travis-ci.org/jacomyal/sigma.js)
 
-sigma.js - v1.0.3
+sigma.js - v1.1.0
 =================
 
 Sigma is a JavaScript library dedicated to graph drawing, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal).
