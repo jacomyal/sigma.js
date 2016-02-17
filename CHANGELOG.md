@@ -25,6 +25,7 @@
 - Added HDPI screens support (thanks to [@mdamien](https://github.com/mdamien)).
 - Fixed a ForceAtlas2 bug related to the `ajustSizes` setting (thanks to [@rangeonnicolas](https://github.com/rangeonnicolas)).
 - Improved `sigma.webgl.nodes.fast` implementaton.
+- Added some alternatives to `sigma.webgl.edges.def`.
 - Various optimizations.
 
 #### 1.0.3 - release (August 22, 2014)
