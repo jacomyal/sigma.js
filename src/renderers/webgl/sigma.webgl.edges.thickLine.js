@@ -4,18 +4,23 @@
   sigma.utils.pkg('sigma.webgl.edges');
 
   /**
-   * This edge renderer will display edges as polylines using a vertex shader.
-   * This should be faster than rendering lines as triangles and supports
-   * thickness better than gl.LINES.
+   * This will render edges as thick lines using four points translated
+   * orthogonally from the source & target's centers by half thickness.
    *
-   * This should also pave the way towards easy and efficient curved edges
-   * rendering later.
+   * Rendering two triangles by using only four points is made possible through
+   * the use of indices.
+   *
+   * This method should be faster than the 6 points / 2 triangles approach and
+   * should handle thickness better than with gl.LINES.
+   *
+   * This version of the shader balances geometry computation evenly between
+   * the CPU & GPU (normals are computed on the CPU side).
    */
-  sigma.webgl.edges.lightShader = {
+  sigma.webgl.edges.thickLine = {
     POINTS: 4,
-    ATTRIBUTES: 3,
+    ATTRIBUTES: 6,
     addEdge: function(edge, source, target, data, i, prefix, settings) {
-      var thickness = (edge[prefix + 'size'] || 1) / 2,
+      var thickness = (edge[prefix + 'size'] || 1),
           x1 = source[prefix + 'x'],
           y1 = source[prefix + 'y'],
           x2 = target[prefix + 'x'],
@@ -51,29 +56,41 @@
         len = 1 / Math.sqrt(len);
 
         var normals = [
-          -dy * len * thickness,
-          dx * len * thickness
+          -dy * len,
+          dx * len
         ];
       }
 
       // First point
-      data[i++] = x1 + normals[0];
-      data[i++] = y1 + normals[1];
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = normals[0];
+      data[i++] = normals[1];
+      data[i++] = thickness;
       data[i++] = color;
 
       // First point flipped
-      data[i++] = x1 - normals[0];
-      data[i++] = y1 - normals[1];
+      data[i++] = x1;
+      data[i++] = y1;
+      data[i++] = -normals[0];
+      data[i++] = -normals[1];
+      data[i++] = thickness;
       data[i++] = color;
 
       // Second point
-      data[i++] = x2 + normals[0];
-      data[i++] = y2 + normals[1];
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = normals[0];
+      data[i++] = normals[1];
+      data[i++] = thickness;
       data[i++] = color;
 
       // Second point flipped
-      data[i++] = x2 - normals[0];
-      data[i++] = y2 - normals[1];
+      data[i++] = x2;
+      data[i++] = y2;
+      data[i++] = -normals[0];
+      data[i++] = -normals[1];
+      data[i++] = thickness;
       data[i++] = color;
     },
     computeIndices: function(data) {
@@ -100,6 +117,10 @@
       // Define attributes:
       var positionLocation =
             gl.getAttribLocation(program, 'a_position'),
+          normalLocation =
+            gl.getAttribLocation(program, 'a_normal'),
+          thicknessLocation =
+            gl.getAttribLocation(program, 'a_thickness'),
           colorLocation =
             gl.getAttribLocation(program, 'a_color'),
           resolutionLocation =
@@ -125,6 +146,8 @@
 
       // Binding attributes:
       gl.enableVertexAttribArray(positionLocation);
+      gl.enableVertexAttribArray(normalLocation);
+      gl.enableVertexAttribArray(thicknessLocation);
       gl.enableVertexAttribArray(colorLocation);
 
       gl.vertexAttribPointer(positionLocation,
@@ -134,12 +157,26 @@
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
         0
       );
+      gl.vertexAttribPointer(normalLocation,
+        2,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        8
+      );
+      gl.vertexAttribPointer(thicknessLocation,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+        16
+      );
       gl.vertexAttribPointer(colorLocation,
         1,
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-        8
+        20
       );
 
       // Creating indices buffer:
@@ -159,11 +196,13 @@
       var vertexShader,
           fragmentShader,
           program;
-console.log('light')
+
       vertexShader = sigma.utils.loadShader(
         gl,
         [
           'attribute vec2 a_position;',
+          'attribute vec2 a_normal;',
+          'attribute float a_thickness;',
           'attribute float a_color;',
 
           'uniform vec2 u_resolution;',
@@ -175,7 +214,8 @@ console.log('light')
           'void main() {',
 
             // Scale from [[-1 1] [-1 1]] to the container:
-            'vec2 position = (u_matrix * vec3(a_position, 1)).xy;',
+            'vec2 delta = vec2(a_normal * a_thickness / 2.0);',
+            'vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;',
             'position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);',
 
             // Applying
