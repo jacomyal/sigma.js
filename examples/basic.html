@@ -21,7 +21,6 @@
 <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
-<script src="../src/renderers/webgl/sigma.webgl.edges.shader.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
@@ -70,13 +69,13 @@
  */
 var i,
     s,
-    N = 1000,
-    E = 5000,
+    N = 100,
+    E = 500,
     g = {
       nodes: [],
       edges: []
     };
-sigma.webgl.edges.def = sigma.webgl.edges.shader;
+
 // Generate a random graph:
 for (i = 0; i < N; i++)
   g.nodes.push({

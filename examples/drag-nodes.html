@@ -19,7 +19,6 @@
 <script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
-<script src="../src/renderers/webgl/sigma.webgl.edges.shader.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
 <script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
 <script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
@@ -78,13 +77,13 @@
  */
 var i,
     s,
-    N = 1000,
-    E = 5000,
+    N = 100,
+    E = 500,
     g = {
       nodes: [],
       edges: []
     };
-sigma.webgl.edges.def = sigma.webgl.edges.shader;
+
 // Generate a random graph:
 for (i = 0; i < N; i++)
   g.nodes.push({
@@ -114,16 +113,16 @@ s = new sigma({
 // Initialize the dragNodes plugin:
 var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
 
-// dragListener.bind('startdrag', function(event) {
-//   console.log(event);
-// });
-// dragListener.bind('drag', function(event) {
-//   console.log(event);
-// });
-// dragListener.bind('drop', function(event) {
-//   console.log(event);
-// });
-// dragListener.bind('dragend', function(event) {
-//   console.log(event);
-// });
-// </script>
+dragListener.bind('startdrag', function(event) {
+  console.log(event);
+});
+dragListener.bind('drag', function(event) {
+  console.log(event);
+});
+dragListener.bind('drop', function(event) {
+  console.log(event);
+});
+dragListener.bind('dragend', function(event) {
+  console.log(event);
+});
+</script>
