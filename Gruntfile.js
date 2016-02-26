@@ -71,6 +71,7 @@ module.exports = function(grunt) {
   var plugins = [
     'exporters.svg',
     'layout.forceAtlas2',
+    'layout.noverlap',
     'neo4j.cypher',
     'parsers.gexf',
     'parsers.json',
