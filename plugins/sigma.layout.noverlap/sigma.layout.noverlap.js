@@ -227,7 +227,7 @@
 
       var nodes = this.sigInst.graph.nodes();
 
-      var prefix = this.sigInst.renderers[0].options.prefix;
+      var prefix = this.sigInst.renderers[self.config.rendererIndex].options.prefix;
 
       this.running = true;
 
