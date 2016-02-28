@@ -323,13 +323,14 @@
    *   {?number}            duration            The duration of the animation. If not specified, the "animationsTime" setting value of the sigma instance will be used instead.
    *
    *
-   * @param  {sigma}   sigInst The related sigma instance.
    * @param  {object} config  The optional configuration object.
    *
    * @return {sigma.classes.dispatcher} Returns an event emitter.
    */
-  sigma.layout.noverlap.configure = function(sigInst, config) {
-    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+  sigma.prototype.configNoverlap = function(config) {
+
+    var sigInst = this;
+
     if (!config) throw new Error('Missing argument: "config"');
 
     // Create instance if undefined
@@ -374,17 +375,17 @@
    *
    *
    *
-   * @param  {sigma}   sigInst The related sigma instance.
    * @param  {object} config  The optional configuration object.
    *
    * @return {sigma.classes.dispatcher} Returns an event emitter.
    */
 
-  sigma.layout.noverlap.start = function(sigInst, config) {
-    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+  sigma.prototype.startNoverlap = function(config) {
+
+    var sigInst = this;
 
     if (config) {
-      this.configure(sigInst, config);
+      this.configNoverlap(sigInst, config);
     }
 
     _instance[sigInst.id].start();
@@ -395,12 +396,11 @@
   /**
    * Returns true if the layout has started and is not completed.
    *
-   * @param  {sigma}   sigInst The related sigma instance.
-   *
    * @return {boolean}
    */
-  sigma.layout.noverlap.isRunning = function(sigInst) {
-    if (!sigInst) throw new Error('Missing argument: "sigInst"');
+  sigma.prototype.isNoverlapRunning = function() {
+
+    var sigInst = this;
 
     return !!_instance[sigInst.id] && _instance[sigInst.id].running;
   };
