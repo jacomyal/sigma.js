@@ -14,7 +14,7 @@ This plugin runs an algorithm which distributes nodes in the network, ensuring t
 Changes the layout's configuration.
 
 ```js
-var listener = sigma.layout.noverlap.configure(sigInst, config);
+var listener = s.configNoverlap(config);
 ```
 
 **start**
@@ -22,7 +22,7 @@ var listener = sigma.layout.noverlap.configure(sigInst, config);
 Starts the layout. It is possible to pass a configuration if this is the first time you start the layout.
 
 ```js
-var listener = sigma.layout.noverlap.start(sigInst, config);
+s.startNoverlap();
 ```
 
 **isRunning**
@@ -30,7 +30,7 @@ var listener = sigma.layout.noverlap.start(sigInst, config);
 Returns whether the layout is running.
 
 ```js
-sigma.layout.noverlap.isRunning(sigInst);
+s.isNoverlapRunning();
 ```
 
 ## Configuration
@@ -63,18 +63,25 @@ The plugin dispatches the following events:
 Example:
 
 ```js
+
+s = new sigma({
+  graph: g,
+  container: 'graph-container'
+});
+
 var config = {
   nodeMargin: 3.0,
   scaleNodes: 1.3
 };
 
-// Start the algorithm:
-var listener = sigma.layout.noverlap.configure(sigInst, config);
+// Configure the algorithm
+var listener = s.configNoverlap(config);
 
 // Bind all events:
 listener.bind('start stop interpolate', function(event) {
   console.log(event.type);
 });
 
-sigma.layout.noverlap.start(sigInst);
+// Start the algorithm:
+s.startNoverlap();
 ```
