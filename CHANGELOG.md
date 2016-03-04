@@ -1,5 +1,9 @@
 ## sigma.js - changelog:
 
+#### 1.2.0 - (provisional)
+
+- Added the [layout.noverlap](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.layout.noverlap) plugin (thanks to [@apitts](https://github.com/apitts)).
+
 #### 1.1.0 - release (Feb 17, 2016)
 
 - Added the SVG renderer.
