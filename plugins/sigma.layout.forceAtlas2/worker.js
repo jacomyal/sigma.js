@@ -647,8 +647,8 @@
                 NodeMatrix[np(n1, 'dx')] += xDist * factor;
                 NodeMatrix[np(n1, 'dy')] += yDist * factor;
 
-                NodeMatrix[np(n2, 'dx')] += xDist * factor;
-                NodeMatrix[np(n2, 'dy')] += yDist * factor;
+                NodeMatrix[np(n2, 'dx')] -= xDist * factor;
+                NodeMatrix[np(n2, 'dy')] -= yDist * factor;
               }
               else if (distance < 0) {
                 factor = 100 * coefficient *
