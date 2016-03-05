@@ -857,13 +857,6 @@
               Math.pow(NodeMatrix[np(n, 'dy')], 2)
             );
 
-            if (force > W.maxForce) {
-              NodeMatrix[np(n, 'dx')] =
-                NodeMatrix[np(n, 'dx')] * W.maxForce / force;
-              NodeMatrix[np(n, 'dy')] =
-                NodeMatrix[np(n, 'dy')] * W.maxForce / force;
-            }
-
             swinging = NodeMatrix[np(n, 'mass')] *
               Math.sqrt(
                 (NodeMatrix[np(n, 'old_dx')] - NodeMatrix[np(n, 'dx')]) *
@@ -881,6 +874,10 @@
 
             nodespeed =
               0.1 * Math.log(1 + traction) / (1 + Math.sqrt(swinging));
+
+            if(nodespeed > (W.maxForce * W.settings.slowDown / force) ) {
+              nodespeed = W.maxForce * W.settings.slowDown / force;
+            }
 
             // Updating node's positon
             NodeMatrix[np(n, 'x')] =
