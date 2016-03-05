@@ -139,8 +139,8 @@
       nIndex[nodes[i].id] = j;
 
       // Populating byte array
-      this.nodesByteArray[j] = this.randomize(nodes[i][prefix + 'x']);
-      this.nodesByteArray[j + 1] = this.randomize(nodes[i][prefix + 'y']);
+      this.nodesByteArray[j] = nodes[i][prefix + 'x'];
+      this.nodesByteArray[j + 1] = nodes[i][prefix + 'y'];
       this.nodesByteArray[j + 2] = 0;
       this.nodesByteArray[j + 3] = 0;
       this.nodesByteArray[j + 4] = 0;
