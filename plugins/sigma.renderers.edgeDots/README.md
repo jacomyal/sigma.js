@@ -21,11 +21,11 @@ This plugin extends Sigma.js canvas edges:
    * type: *string*
    * default value: undefined
  * **targetDotColor**
-   * The value to use as color for the target dot. If left undefined there will be no dot at the source.
+   * The value to use as color for the target dot. If left undefined there will be no dot at the target.
    * type: *string*
    * default value: undefined
  * **dotOffset**
-   * The value which define the distance between the dots and the nodes relative to the node size.
+   * The value which define the distance between the dots and the nodes, relative to the node size.
    * type: *number*
    * default value: 3
  * **dotSize**
