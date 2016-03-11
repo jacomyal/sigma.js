@@ -83,6 +83,7 @@ module.exports = function(grunt) {
     'plugins.relativeSize',
     'renderers.customEdgeShapes',
     'renderers.customShapes',
+    'renderers.edgeDots',
     'renderers.edgeLabels',
     'renderers.parallelEdges',
     'renderers.snapshot',
