@@ -123,7 +123,6 @@
         nbytes = nodes.length * this.ppn,
         ebytes = edges.length * this.ppe,
         nIndex = {},
-        prefix = this.sigInst.renderers[0].options.prefix,
         i,
         j,
         l;
@@ -139,15 +138,15 @@
       nIndex[nodes[i].id] = j;
 
       // Populating byte array
-      this.nodesByteArray[j] = nodes[i][prefix + 'x'];
-      this.nodesByteArray[j + 1] = nodes[i][prefix + 'y'];
+      this.nodesByteArray[j] = nodes[i].x;
+      this.nodesByteArray[j + 1] = nodes[i].y;
       this.nodesByteArray[j + 2] = 0;
       this.nodesByteArray[j + 3] = 0;
       this.nodesByteArray[j + 4] = 0;
       this.nodesByteArray[j + 5] = 0;
       this.nodesByteArray[j + 6] = 1 + this.graph.degree(nodes[i].id);
       this.nodesByteArray[j + 7] = 1;
-      this.nodesByteArray[j + 8] = nodes[i][prefix + 'size'];
+      this.nodesByteArray[j + 8] = nodes[i].size;
       this.nodesByteArray[j + 9] = nodes[i].fixed || 0;
       j += this.ppn;
     }
