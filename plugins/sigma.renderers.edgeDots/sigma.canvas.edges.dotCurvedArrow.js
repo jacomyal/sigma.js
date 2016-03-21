@@ -12,7 +12,7 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.curvedArrow =
+  sigma.canvas.edges.dotCurvedArrow =
     function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
