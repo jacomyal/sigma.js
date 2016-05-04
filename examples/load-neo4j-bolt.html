@@ -1,0 +1,109 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="https://cdn.rawgit.com/neo4j/neo4j-javascript-driver/1.1/lib/browser/neo4j-web.min.js"></script>
+<script src="../plugins/sigma.neo4j.bolt/sigma.neo4j.bolt.js"></script>
+
+<div id="container">
+    <style>
+        #graph-container {
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            position: absolute;
+        }
+    </style>
+    <div id="graph-container"></div>
+</div>
+
+<script type="application/javascript">
+    /**
+     * Here is just a basic example on how to properly display a neo4j cypher query.
+     *
+     * The plugin sigma.neo4j.cypher can load a cypher query, parse the JSON response,
+     * and instantiate sigma when the response is received.
+     *
+     */
+    sigma.neo4j.connect({ auth : { principal : 'neo4j', password : 'andrea' } }, { container: 'graph-container' });
+    
+    // Calling neo4j to get all its node label
+    var labels = sigma.neo4j.getLabels()
+        /*
+        .then(function(labels) {
+            console.log("Node labels %o", labels);
+        });
+        */
+    
+    // Calling neo4j to get all its relationship type
+    var types = sigma.neo4j.getTypes()
+        /*
+        .then(function(types) {
+            console.log("Relationship types %o", types);
+        });
+        */
+    
+    /*
+    sigma.neo4j.query('MATCH (n{name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
+        .then(function (s) {
+            console.log('query executed', arguments);
+        });
+    */
+    
+    var queryStream = sigma.neo4j.queryStream('MATCH (n{ name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
+        .then(function (s) {
+            console.log('query executed', s);
+        });
+    
+    Promise.all([labels, types, queryStream]).then(function (values) {
+        console.log("Node labels %o", values[0]);
+        console.log("Relationship types %o", values[1]);
+        console.log('query executed', values[2]);
+    });
+    
+</script>
