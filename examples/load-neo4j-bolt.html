@@ -63,38 +63,17 @@
 </div>
 
 <script type="application/javascript">
-    /**
-     * Here is just a basic example on how to properly display a neo4j cypher query.
-     *
-     * The plugin sigma.neo4j.cypher can load a cypher query, parse the JSON response,
-     * and instantiate sigma when the response is received.
-     *
-     */
+    //Here is just a basic example on how to use the plugin.
+    
     sigma.neo4j.connect({ auth : { principal : 'neo4j', password : 'andrea' } }, { container: 'graph-container' });
     
-    // Calling neo4j to get all its node label
+    // Query neo4j to get all its node label
     var labels = sigma.neo4j.getLabels()
-        /*
-        .then(function(labels) {
-            console.log("Node labels %o", labels);
-        });
-        */
     
-    // Calling neo4j to get all its relationship type
+    // Query neo4j to get all its relationship type
     var types = sigma.neo4j.getTypes()
-        /*
-        .then(function(types) {
-            console.log("Relationship types %o", types);
-        });
-        */
     
-    /*
-    sigma.neo4j.query('MATCH (n{name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
-        .then(function (s) {
-            console.log('query executed', arguments);
-        });
-    */
-    
+    // Execute a simple query
     var queryStream = sigma.neo4j.queryStream('MATCH (n{ name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
         .then(function (s) {
             console.log('query executed', s);
