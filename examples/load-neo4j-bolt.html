@@ -68,16 +68,13 @@
     sigma.neo4j.connect({ auth : { principal : 'neo4j', password : 'andrea' } }, { container: 'graph-container' });
     
     // Query neo4j to get all its node label
-    var labels = sigma.neo4j.getLabels()
+    var labels = sigma.neo4j.getLabels();
     
     // Query neo4j to get all its relationship type
-    var types = sigma.neo4j.getTypes()
+    var types = sigma.neo4j.getTypes();
     
     // Execute a simple query
-    var queryStream = sigma.neo4j.queryStream('MATCH (n{ name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
-        .then(function (s) {
-            console.log('query executed', s);
-        });
+    var queryStream = sigma.neo4j.queryStream('MATCH (n{ name : {name} })-[r]->(m) RETURN n, r, m LIMIT 10', { name : 'Kevin Bacon' });
     
     Promise.all([labels, types, queryStream]).then(function (values) {
         console.log("Node labels %o", values[0]);

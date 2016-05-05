@@ -37,7 +37,7 @@ var types = sigma.neo4j.getTypes();
 // Query neo4j with a statement, the method <b>sigma.neo4j.queryStream(statement, params)</b> invokes
 // the bolt stream js api where the results will be added to the graph as they arrive (it returns a Promise object)
 var queryStream = sigma.neo4j
-	.queryStream('MATCH (n{ name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10');
+	.queryStream('MATCH (n{ name : {name} })-[r]->(m) RETURN n, r, m LIMIT 10', { name : 'Kevin Bacon' });
 	
 // You can use Promise api in order to manange the responses:
 Promise.all([labels, types, queryStream]).then(function (values) {
@@ -69,7 +69,7 @@ sigma.neo4j.getTypes()
 
 // Query neo4j with a statement, the method <b>sigma.neo4j.query(statement, params)</b> invokes
 // the bolt Promise js api where the results will be displayed when all they are fetched from neo4j (it returns a Promise object)
-sigma.neo4j.query('MATCH (n{name : "Kevin Bacon" })-[r]->(m) RETURN n, r, m LIMIT 10')
+sigma.neo4j.query('MATCH (n{ name : {name} })-[r]->(m) RETURN n, r, m LIMIT 10', { name : 'Kevin Bacon' })
     .then(function (sigma) {
         console.log('query executed', sigma);
     });
