@@ -3,3 +3,4 @@ build/*
 *.tgz
 *.log
 *.swp
+.DS_Store
