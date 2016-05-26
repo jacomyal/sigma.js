@@ -10,14 +10,14 @@ This plugin provides connect to neo4j >= 3 via new bolt protocol using bolt java
 Nodes are created with the following structure :
  * id -> Neo4j node id
  * label -> Neo4j node id
- * neo4j_labels -> Labels of Neo4j node
- * neo4j_data -> All the properties of the neo4j node
+ * neo4jLabels -> Labels of Neo4j node
+ * neo4jData -> All the properties of the neo4j node
 
 Edges are created with the following structure :
  * id -> Neo4j edge id
  * label -> Neo4j edge type
- * neo4j_type -> Neo4j edge type
- * neo4j_data -> All the properties of Neo4j relationship
+ * neo4jType -> Neo4j edge type
+ * neo4jData -> All the properties of Neo4j relationship
 
 Examples:
 ````javascript

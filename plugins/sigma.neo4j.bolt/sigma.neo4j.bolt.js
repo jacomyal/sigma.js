@@ -10,29 +10,11 @@
     }
     
     var driver = null,
-    	sig = null,
+        sig = null,
         version = null;
     
     // Declare neo4j package
     sigma.utils.pkg("sigma.neo4j");
-    
-    /**
-     * This function checks if a node is already prensent in the graph
-     *
-     * @return {boolean} True if node is present
-     */
-    sigma.classes.graph.addMethod('isNodePresent', function(nodeId) {
-        return this.nodesIndex[nodeId] != null ? true : false;
-    });
-    
-    /**
-     * This function checks if a edge is already prensent in the graph
-     *
-     * @return {boolean} True if edge is present
-     */
-    sigma.classes.graph.addMethod('isEdgePresent', function(edgeId) {
-        return this.edgesIndex[edgeId] != null ? true : false;
-    });
     
     /*
      * Convert the Record object of neo4j bolt web driver in order to get
@@ -81,8 +63,7 @@
                 if (('start' in primitive
                         || 'end' in primitive
                         || 'type' in primitive)
-                        && !sig.graph.isEdgePresent(primitive.identity)) {
-                    //graph.relationships.push(primitive);
+                        && !sig.graph.edges(primitive.identity)) {
                     edgesMap[primitive.identity] = {
                         id : primitive.identity,
                         label : primitive.type,
@@ -92,7 +73,7 @@
                         neo4j_type : primitive.type,
                         neo4j_data : primitive.properties
                     };
-                } else if (!sig.graph.isNodePresent(primitive.identity)) {
+                } else if (!sig.graph.nodes(primitive.identity)) {
                     nodesMap[primitive.identity] =  {
                         id : primitive.identity,
                         label : primitive.identity,
