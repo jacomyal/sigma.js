@@ -193,7 +193,6 @@
      * @return {array} An array of labels
      */
     sigma.neo4j.getLabels = function() {
-        //sigma.neo4j.send(neo4j, '/db/data/labels', 'GET', null, callback);
         return new Promise(function (resolve, reject) {
             var session = driver.session();
             session.run('match (n) with distinct labels(n) as labels unwind labels as label return label')
@@ -212,7 +211,6 @@
      * @return {array} An array of relationships type
      */
     sigma.neo4j.getTypes = function() {
-        //sigma.neo4j.send(neo4j, '/db/data/relationship/types', 'GET', null, callback);
         return new Promise(function (resolve, reject) {
             var session = driver.session();
             session.run('match (n)-[r]-() return distinct type(r)')
