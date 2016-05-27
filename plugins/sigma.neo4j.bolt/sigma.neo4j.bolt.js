@@ -152,7 +152,7 @@
                     resolve(onResolve(response));
                     session.close();
                 })
-    			.catch(reject);
+                .catch(reject);
     	});
     };
     
