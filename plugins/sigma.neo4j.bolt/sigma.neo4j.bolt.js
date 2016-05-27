@@ -70,8 +70,8 @@
                         source : primitive.start,
                         target : primitive.end,
                         color : '#7D7C8E',
-                        neo4j_type : primitive.type,
-                        neo4j_data : primitive.properties
+                        neo4jType : primitive.type,
+                        neo4jData : primitive.properties
                     };
                 } else if (!sig.graph.nodes(primitive.identity)) {
                     nodesMap[primitive.identity] =  {
@@ -81,8 +81,8 @@
                         y : Math.random(),
                         size : 1,
                         color : '#000000',
-                        neo4j_labels : primitive.labels,
-                        neo4j_data : primitive.properties
+                        neo4jLabels : primitive.labels,
+                        neo4jData : primitive.properties
                     };
                 }
             });
