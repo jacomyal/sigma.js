@@ -16,7 +16,7 @@ Also, the `plugins` and `examples` directories contain various use-cases that mi
 To use it, clone the repository:
 
 ```
-git clone git@github.com:jacomyal/sigma.js.git
+git clone https://github.com/jacomyal/sigma.js/
 ```
 
 To build the code:
