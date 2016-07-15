@@ -1,0 +1,270 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../../src/sigma.core.js"></script>
+<script src="../../src/conrad.js"></script>
+<script src="../../src/utils/sigma.utils.js"></script>
+<script src="../../src/utils/sigma.polyfills.js"></script>
+<script src="../../src/sigma.settings.js"></script>
+<script src="../../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../../src/classes/sigma.classes.configurable.js"></script>
+<script src="../../src/classes/sigma.classes.graph.js"></script>
+<script src="../../src/classes/sigma.classes.camera.js"></script>
+<script src="../../src/classes/sigma.classes.quad.js"></script>
+<script src="../../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../../src/captors/sigma.captors.mouse.js"></script>
+<script src="../../src/captors/sigma.captors.touch.js"></script>
+<script src="../../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../../src/renderers/sigma.renderers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../../src/misc/sigma.misc.animation.js"></script>
+<script src="../../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- needed for no overlap layout -->
+<script src="../../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<script src="../../plugins/sigma.layout.noverlap/sigma.layout.noverlap.js"></script>
+<!-- end of no overlap specific requirements -->
+<!-- need for force layout -->
+<script src="../../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<!-- end of force layout specific requirements -->
+<!-- custom shape/image for nodes -->
+<script src="../../plugins/sigma.renderers.customShapes/shape-library.js"></script>
+<script src="../../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
+<!-- end of custom shape/image specific requirements -->
+<script src="../../plugins/sigma.plugins.filter/sigma.plugins.filter.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
+<!-- Import jQuery and d3 -->
+<script   src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+
+<!-- Custom style and scripts -->
+<link rel="stylesheet" type="text/css" href="./network-graph.css"></link>
+<script type="text/javascript" src="./graph-components.js"></script>
+<div id="container">
+  <div class="dropdown">
+    <button onclick="filterNodesByColor()" class="dropbtn">Color</button>
+    <div id="color-dropdown" class="dropdown-content">
+      <a class="color" href="#">1</a>
+      <a class="color" href="#">2</a>
+      <a class="color" href="#">yellow</a>
+      <a class="color" href="#">green</a>
+      <a class="color" href="#">blue</a>
+      <a class="color" href="#">purple</a>
+      <a class="color" href="#">black</a>
+      <a class="color" href="#">grey</a>
+      <a class="color" href="#">steelblue</a>
+      <a class="color" href="#">fuchsia</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button onclick="filterNodesByDegree()" class="dropbtn">Degree</button>
+    <div id="degree-dropdown" class="dropdown-content">
+      <a class="degree" href="#">0</a>
+      <a class="degree" href="#">1</a>
+      <a class="degree" href="#">2</a>
+      <a class="degree" href="#">3</a>
+      <a class="degree" href="#">4</a>
+      <a class="degree" href="#">5</a>
+      <a class="degree" href="#">6</a>
+      <a class="degree" href="#">7</a>
+      <a class="degree" href="#">8</a>
+      <a class="degree" href="#">9</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button onclick="resetGraph()" class="dropbtn">Reset</button>
+  </div>
+  <div id="graph-container"></div>
+</div>
+<script type="text/javascript">
+	function filterNodesByColor() {
+	    document.getElementById("color-dropdown").classList.toggle("show");
+	}
+	function filterNodesByDegree() {
+		document.getElementById("degree-dropdown").classList.toggle("show");
+	}
+	window.onclick = function(event) {
+	  if (!event.target.matches('.dropbtn')) {
+	    var dropdowns = $(".dropdown-content");
+	    var i;
+	    for (i = 0; i < dropdowns.length; i++) {
+	      var openDropdown = dropdowns[i];
+	      if (openDropdown.classList.contains('show')) {
+	        openDropdown.classList.remove('show');
+	      }
+	    }
+	  }
+	}
+</script>
+<script type="text/javascript">
+/*
+Setting up variables for random graph generation.
+These will normally not be here and will be provided by the developer
+as either properties on the nodes/edges or read from the API/s
+*/
+	var i,
+	    N = 500,
+	    E = 500,
+	    data = {
+	    	nodes: [],
+	    	edges: []
+	    },
+	    colors = {
+	    	'1': 'red',
+	    	'2': 'orange',
+	    	'3': 'yellow',
+	    	'4': 'green',
+	    	'5': 'blue',
+	    	'6': 'purple',
+	    	'7': 'black',
+	    	'8': 'grey',
+	    	'9': 'steelblue',
+	    	'10': 'fuchsia'
+	    },
+	    nodeTypes = [
+	    	"user",
+	    	"endDevice",
+	    	"service",
+	    	"router",
+	    	"switch",
+	    	"location"
+	    ];
+/*
+This portion generates the a random graph to build for testing purporses
+Eventually when hooked up it can be populated by the developer with API calls.
+*/
+	for (i = 0; i < N; i++){
+		data.nodes.push({
+			label: String(Math.floor(Math.random() * (11 - 1) + 1)),
+			title: 'Node ' + i,
+			id: `n${i}`,
+			// type: String(Math.floor(Math.random() * (11 - 1) + 1)),
+			type: Math.floow(Math.random() * (7-1)+1),
+			x: Math.random(),
+			y: Math.random(),
+			color: colors[String(Math.floor(Math.random() * (11 - 1) + 1))],
+			size: Math.random(),
+			clicked: false
+		});
+	};
+	for (i = 0; i < E; i++){
+		data.edges.push({
+			source: `n${(Math.random()*N|0)}`,
+			target: `n${(Math.random()*N|0)}`,
+			id: `e${i}`,
+			label: Math.floor(Math.random() * (11 - 1) + 1),
+			type: 'curve'
+		});
+	};
+/*
+This the code the developer would write to generate a graph using the SDK
+GraphFactory takes 4 inputs:
+	nodes: Array of node objects
+	edges: Array of edge objects
+	customSettings: user defined settings for sigma graph instance
+	providerFunctions: node type specific properties and event binding functions
+*/
+
+// set some basic custom settings. If none are provided the defaults will take over.
+	var customSettings = {
+		drawLabels: false,
+		drawEdges: true,
+		nodesPowerRatio: 10
+	}
+/*
+This is a sample provider function.
+the number represents the node type since it's randomly generated graph.
+Each events object will map to the sigma canvas events and bind the provided
+function to the corresponding sigma event. Currently the SDK only maps single node
+and edge specific events. There is no binding support for groups of nodes/edges or
+canvas stage. Have to find a clean way to do that in the GraphFactory.
+*/
+	var providerFunctions = {
+		"1": {
+			"properties": {},
+			"events": {
+				'clickNode': function(e){
+					console.log('e from 1 clickNode', e)
+				}
+			}
+		},
+		"2": {
+			"properties": {},
+			"events": {
+				'clickNode': function(e){
+					console.log('e from 2 clickNode', e)
+				}
+			}
+		}
+	}
+/*
+This next line generates the sigma graph instance wrapped with visitor pattern on each node/edge
+and all the proper node/edge bindings set by the developer settings.
+*/
+	var s = new GraphFactory(data.nodes, data.edges, customSettings, providerFunctions);
+
+/*
+The graph is already generated and on the page with the given html above. The following code
+now configures two different layouts, beyond the default random, that can be used.
+These eventually can be setting passed to the GraphFactory.
+*/
+	var noOverlap = s.configNoverlap({
+		nodeMargin: 0.5,
+		scaleNodes: 1.05,
+		gridSize: 75,
+		easing: 'quadraticInOut', 
+		duration: 100
+	});
+
+	s.startForceAtlas2({worker: true, barnesHutOptimize: false});
+	setTimeout(function(){
+		s.stopForceAtlas2()
+		s.startNoverlap();
+	}, 5000)
+/*
+Filters are supported to show/hide nodes/edges meeting user defined characteristics.
+Filtering by neighbors of is also suppoerted. The filters are implemented after the sigma
+instance in instantiated and the wrapped in functions and jQuery to give them functionality
+on the UI. 
+
+In this case, clicking to filter by node color or the degree of a node.
+There is also a reset button that removes all applied filters.
+*/
+	var filter = new sigma.plugins.filter(s);
+	function resetGraph() {
+		filter.undo().apply();
+	}
+	$('a.color').click(function(e){
+		filter
+		.undo()
+		.nodesBy(function(n){
+			return n.type === e.target.innerHTML;
+		}, 'color-filter')
+		.apply();
+	});
+	$('a.degree').click(function(e){
+		filter
+		.nodesBy(function(n){
+			return this.degree(n.id) === parseInt(e.target.innerHTML);
+		}, "degree-filter")
+		.apply();
+	})
+</script>
