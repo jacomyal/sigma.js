@@ -1,77 +1,24 @@
-<!-- START SIGMA IMPORTS -->
-<script src="../../src/sigma.core.js"></script>
-<script src="../../src/conrad.js"></script>
-<script src="../../src/utils/sigma.utils.js"></script>
-<script src="../../src/utils/sigma.polyfills.js"></script>
-<script src="../../src/sigma.settings.js"></script>
-<script src="../../src/classes/sigma.classes.dispatcher.js"></script>
-<script src="../../src/classes/sigma.classes.configurable.js"></script>
-<script src="../../src/classes/sigma.classes.graph.js"></script>
-<script src="../../src/classes/sigma.classes.camera.js"></script>
-<script src="../../src/classes/sigma.classes.quad.js"></script>
-<script src="../../src/classes/sigma.classes.edgequad.js"></script>
-<script src="../../src/captors/sigma.captors.mouse.js"></script>
-<script src="../../src/captors/sigma.captors.touch.js"></script>
-<script src="../../src/renderers/sigma.renderers.canvas.js"></script>
-<script src="../../src/renderers/sigma.renderers.webgl.js"></script>
-<script src="../../src/renderers/sigma.renderers.svg.js"></script>
-<script src="../../src/renderers/sigma.renderers.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
-<script src="../../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
-<script src="../../src/middlewares/sigma.middlewares.rescale.js"></script>
-<script src="../../src/middlewares/sigma.middlewares.copy.js"></script>
-<script src="../../src/misc/sigma.misc.animation.js"></script>
-<script src="../../src/misc/sigma.misc.bindEvents.js"></script>
-<script src="../../src/misc/sigma.misc.bindDOMEvents.js"></script>
-<script src="../../src/misc/sigma.misc.drawHovers.js"></script>
-<!-- needed for no overlap layout -->
-<script src="../../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
-<script src="../../plugins/sigma.layout.noverlap/sigma.layout.noverlap.js"></script>
-<!-- end of no overlap specific requirements -->
-<!-- need for force layout -->
+<script src="../../build/sigma.min.js"></script>
 <script src="../../plugins/sigma.layout.forceAtlas2/worker.js"></script>
 <script src="../../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
-<!-- end of force layout specific requirements -->
-<!-- custom shape/image for nodes -->
-<script src="../../plugins/sigma.renderers.customShapes/shape-library.js"></script>
-<script src="../../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
-<!-- end of custom shape/image specific requirements -->
-<script src="../../plugins/sigma.plugins.filter/sigma.plugins.filter.js"></script>
-<script src="../../plugins/sigma.renderers.edgeLabels/settings.js"></script>
-<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
-<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
-<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
-<!-- Import jQuery and d3 -->
 <script   src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="https://d3js.org/d3.v3.min.js"></script>
-
-<!-- Custom style and scripts -->
-<link rel="stylesheet" type="text/css" href="./network-graph.css"></link>
 <script type="text/javascript" src="./graph-components.js"></script>
+
+<link rel="stylesheet" type="text/css" href="./network-graph.css"></link>
+
+
 <div id="container">
+  <div id="graph-container"></div>
   <div class="dropdown">
-    <button onclick="filterNodesByColor()" class="dropbtn">Color</button>
+    <button onclick="filterNodesByColor()" class="dropbtn">Type</button>
     <div id="color-dropdown" class="dropdown-content">
-      <a class="color" href="#">1</a>
-      <a class="color" href="#">2</a>
-      <a class="color" href="#">yellow</a>
-      <a class="color" href="#">green</a>
-      <a class="color" href="#">blue</a>
-      <a class="color" href="#">purple</a>
-      <a class="color" href="#">black</a>
-      <a class="color" href="#">grey</a>
-      <a class="color" href="#">steelblue</a>
-      <a class="color" href="#">fuchsia</a>
+      <a class="color" href="#">user</a>
+      <a class="color" href="#">endDevice</a>
+      <a class="color" href="#">service</a>
+      <a class="color" href="#">router</a>
+      <a class="color" href="#">switch</a>
+      <a class="color" href="#">location</a>
     </div>
   </div>
   <div class="dropdown">
@@ -92,7 +39,9 @@
   <div class="dropdown">
     <button onclick="resetGraph()" class="dropbtn">Reset</button>
   </div>
-  <div id="graph-container"></div>
+  <div class="dropdown">
+    <button onclick="addNode()" class="dropbtn">Add Node</button>
+  </div>
 </div>
 <script type="text/javascript">
 	function filterNodesByColor() {
@@ -115,14 +64,94 @@
 	}
 </script>
 <script type="text/javascript">
+sigma.canvas.nodes.image = (function() {
+  var _cache = {},
+      _loading = {},
+      _callbacks = {};
+  // Return the renderer itself:
+  var renderer = function(node, context, settings) {
+    var args = arguments,
+        prefix = settings('prefix') || '',
+        size = node[prefix + 'size'],
+        color = node.color || settings('defaultNodeColor'),
+        url = node.url;
+    if (_cache[url]) {
+      context.save();
+      // Draw the clipping disc:
+      context.beginPath();
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'],
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.clip();
+      // Draw the image
+      context.drawImage(
+        _cache[url],
+        node[prefix + 'x'] - size,
+        node[prefix + 'y'] - size,
+        2 * size,
+        2 * size
+      );
+      // Quit the "clipping mode":
+      context.restore();
+      // Draw the border:
+      context.beginPath();
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'],
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.lineWidth = size / 5;
+      context.strokeStyle = node.color || settings('defaultNodeColor');
+      context.stroke();
+    } else {
+      sigma.canvas.nodes.image.cache(url);
+      sigma.canvas.nodes.def.apply(
+        sigma.canvas.nodes,
+        args
+      );
+    }
+  };
+  // Let's add a public method to cache images, to make it possible to
+  // preload images before the initial rendering:
+  renderer.cache = function(url, callback) {
+    if (callback)
+      _callbacks[url] = callback;
+    if (_loading[url])
+      return;
+    var img = new Image();
+    img.onload = function() {
+      _loading[url] = false;
+      _cache[url] = img;
+      if (_callbacks[url]) {
+        _callbacks[url].call(this, img);
+        delete _callbacks[url];
+      }
+    };
+    _loading[url] = true;
+    img.src = url;
+  };
+  return renderer;
+})();
+
 /*
 Setting up variables for random graph generation.
 These will normally not be here and will be provided by the developer
 as either properties on the nodes/edges or read from the API/s
 */
+// sigma.utils.pkg('sigma.canvas.nodes');
+
 	var i,
-	    N = 500,
-	    E = 500,
+	    N = 100,
+	    E = 50,
 	    data = {
 	    	nodes: [],
 	    	edges: []
@@ -139,6 +168,12 @@ as either properties on the nodes/edges or read from the API/s
 	    	'9': 'steelblue',
 	    	'10': 'fuchsia'
 	    },
+	    urls = [
+	      '../img/img1.png',
+	      '../img/img2.png',
+	      '../img/img3.png',
+	      '../img/img4.png'
+	    ],
 	    nodeTypes = [
 	    	"user",
 	    	"endDevice",
@@ -147,22 +182,19 @@ as either properties on the nodes/edges or read from the API/s
 	    	"switch",
 	    	"location"
 	    ];
-/*
-This portion generates the a random graph to build for testing purporses
-Eventually when hooked up it can be populated by the developer with API calls.
-*/
+	    var j = 0;
 	for (i = 0; i < N; i++){
 		data.nodes.push({
 			label: String(Math.floor(Math.random() * (11 - 1) + 1)),
 			title: 'Node ' + i,
 			id: `n${i}`,
-			// type: String(Math.floor(Math.random() * (11 - 1) + 1)),
-			type: Math.floow(Math.random() * (7-1)+1),
+			nodeType: nodeTypes[Math.floor(Math.random() * (6))],
+			type: 'image',
 			x: Math.random(),
 			y: Math.random(),
 			color: colors[String(Math.floor(Math.random() * (11 - 1) + 1))],
-			size: Math.random(),
-			clicked: false
+			size: Math.random()*10,
+			url: urls[Math.floor(Math.random() * urls.length)]
 		});
 	};
 	for (i = 0; i < E; i++){
@@ -171,62 +203,41 @@ Eventually when hooked up it can be populated by the developer with API calls.
 			target: `n${(Math.random()*N|0)}`,
 			id: `e${i}`,
 			label: Math.floor(Math.random() * (11 - 1) + 1),
-			type: 'curve'
+			type: 'line'
 		});
 	};
-/*
-This the code the developer would write to generate a graph using the SDK
-GraphFactory takes 4 inputs:
-	nodes: Array of node objects
-	edges: Array of edge objects
-	customSettings: user defined settings for sigma graph instance
-	providerFunctions: node type specific properties and event binding functions
-*/
 
-// set some basic custom settings. If none are provided the defaults will take over.
 	var customSettings = {
 		drawLabels: false,
-		drawEdges: true,
-		nodesPowerRatio: 10
+		drawEdges: false,
+		nodesPowerRatio: 10,
+		hideEdgesOnMove: true,
+		minNodeSize: 15,
+		doubleClickEnabled: false
 	}
-/*
-This is a sample provider function.
-the number represents the node type since it's randomly generated graph.
-Each events object will map to the sigma canvas events and bind the provided
-function to the corresponding sigma event. Currently the SDK only maps single node
-and edge specific events. There is no binding support for groups of nodes/edges or
-canvas stage. Have to find a clean way to do that in the GraphFactory.
-*/
+
 	var providerFunctions = {
-		"1": {
+		"user": {
 			"properties": {},
 			"events": {
 				'clickNode': function(e){
-					console.log('e from 1 clickNode', e)
+					console.log('e from user clickNode', e)
 				}
 			}
 		},
-		"2": {
+		"endDevice": {
 			"properties": {},
 			"events": {
 				'clickNode': function(e){
-					console.log('e from 2 clickNode', e)
+					console.log('e from endDevice clickNode', e)
 				}
 			}
 		}
 	}
-/*
-This next line generates the sigma graph instance wrapped with visitor pattern on each node/edge
-and all the proper node/edge bindings set by the developer settings.
-*/
+
 	var s = new GraphFactory(data.nodes, data.edges, customSettings, providerFunctions);
 
-/*
-The graph is already generated and on the page with the given html above. The following code
-now configures two different layouts, beyond the default random, that can be used.
-These eventually can be setting passed to the GraphFactory.
-*/
-	var noOverlap = s.configNoverlap({
+	var noOverlap = s.graph.configNoverlap({
 		nodeMargin: 0.5,
 		scaleNodes: 1.05,
 		gridSize: 75,
@@ -234,21 +245,32 @@ These eventually can be setting passed to the GraphFactory.
 		duration: 100
 	});
 
-	s.startForceAtlas2({worker: true, barnesHutOptimize: false});
-	setTimeout(function(){
-		s.stopForceAtlas2()
-		s.startNoverlap();
-	}, 5000)
-/*
-Filters are supported to show/hide nodes/edges meeting user defined characteristics.
-Filtering by neighbors of is also suppoerted. The filters are implemented after the sigma
-instance in instantiated and the wrapped in functions and jQuery to give them functionality
-on the UI. 
+	noOverlap.bind('start stop interpolate', function(e) {
+	  console.log(e.type);
+	  if(e.type === 'start') {
+	    console.time('noverlap');
+	  }
+	  if(e.type === 'interpolate') {
+	    console.timeEnd('noverlap');
+	  }
+	  if(e.type === 'stop'){
+	  	s.graph.settings({
+	  		drawEdges: true
+	  	});
+	  	s.graph.refresh();
+	  }
+	});
 
-In this case, clicking to filter by node color or the degree of a node.
-There is also a reset button that removes all applied filters.
-*/
-	var filter = new sigma.plugins.filter(s);
+	s.graph.startForceAtlas2({
+		worker: true,
+		barnesHutOptimize: false
+	});
+	setTimeout(function(){
+		s.graph.stopForceAtlas2()
+		s.graph.startNoverlap();
+	}, 5000)
+
+	var filter = s.filter;
 	function resetGraph() {
 		filter.undo().apply();
 	}
@@ -256,12 +278,13 @@ There is also a reset button that removes all applied filters.
 		filter
 		.undo()
 		.nodesBy(function(n){
-			return n.type === e.target.innerHTML;
+			return n.nodeType === e.target.innerHTML;
 		}, 'color-filter')
 		.apply();
 	});
 	$('a.degree').click(function(e){
 		filter
+		.undo()
 		.nodesBy(function(n){
 			return this.degree(n.id) === parseInt(e.target.innerHTML);
 		}, "degree-filter")

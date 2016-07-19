@@ -52,9 +52,9 @@ var GraphFactory = function(nodes, edges, sigmaSettings, providerFunctions){
     newNode.accept = function(visitor){
       visitor.visit(this);
     };
-    if(providerFunctions[newNode.type]){
-      Object.keys(providerFunctions[newNode.type].events).forEach(function(item){
-        newNode[item] = providerFunctions[newNode.type].events[item]
+    if(providerFunctions[newNode.nodeType]){
+      Object.keys(providerFunctions[newNode.nodeType].events).forEach(function(item){
+        newNode[item] = providerFunctions[newNode.nodeType].events[item]
       })
     }
   });
@@ -75,17 +75,20 @@ var GraphFactory = function(nodes, edges, sigmaSettings, providerFunctions){
   var s = new sigma($.extend(false, {}, defaultSettings, sigmaSettings));
 
   s.bind('overNode outNode clickNode doubleClickNode rightClickNode', function(e) {
-    if(e.data.node[e.type]){
+    // console.log(e.data.node[e.type]);
+    if(!!e.data.node[e.type]){
       e.data.node[e.type](e);
     }
   });
   s.bind('overEdge outEdge clickEdge doubleClickEdge rightClickEdge', function(e) {
-    if(e.data.edge[e.type]){
+    if(!!e.data.edge[e.type]){
       e.data.edge[e.type](e);
     }
   });
-  
-  return s;
+  return {
+    graph: s,
+    filter: new sigma.plugins.filter(s)
+  };
 }
 
 
