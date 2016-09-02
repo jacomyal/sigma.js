@@ -378,7 +378,10 @@
             nodes: outNodes,
             captor: e.data
           });
-
+        
+        for (k in overEdges)
+          outEdges.push(overEdges[k]);
+          
         overEdges = {};
         // Dispatch both single and multi events:
         for (i = 0, le = outEdges.length; i < le; i++)
