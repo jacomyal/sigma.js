@@ -6,6 +6,7 @@
  * a renderer & camera to display the bound graph on screen.
  */
 import Camera from './camera';
+import Renderer from './renderer';
 import {internalNodeReducer} from './reducers';
 import {assign, isGraph} from './utils';
 
@@ -39,16 +40,20 @@ function initializeIndex(map, elements) {
  * @param {Graph} graph - A graphology Graph instance.
  */
 export default class Sigma {
-  constructor(graph) {
+  constructor(graph, renderer) {
 
     // Checking the arguments
     if (!isGraph(graph))
       throw new Error('Sigma.constructor: given graph is not an instance of a graphology implementation.');
 
+    if (!(renderer instanceof Renderer))
+      throw new Error('Sigma.constructor: given renderer is not an instance of a sigma Renderer.');
+
     // Properties
     this.graph = graph;
     this.map = this.graph.map;
     this.camera = new Camera();
+    this.renderer = renderer;
 
     this.state = {};
     this.nodesIndex = initializeIndex(this.map, graph.nodes());
@@ -97,8 +102,8 @@ export default class Sigma {
 
     // 1-- We need to compute reducers
     for (let i = 0, l = nodes.length; i < l; i++) {
-      const node = nodes[i];
-      let data = {};
+      const node = nodes[i],
+            data = {};
 
       // Applying every reducers
       for (let j = 0, m = this.nodeReducers.length; j < m; j++) {
@@ -113,5 +118,8 @@ export default class Sigma {
       else
         this.nodesIndex[node].computed = data;
     }
+
+    // TEMP: rendering
+    this.renderer.render();
   }
 }

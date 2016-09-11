@@ -10,5 +10,3 @@ if (util.inspect.defaultOptions)
   util.inspect.defaultOptions.depth = null;
 
 require('./sigma.js');
-
-

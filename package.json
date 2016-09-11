@@ -6,6 +6,7 @@
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "main": "dist/sigma.js",
   "scripts": {
+    "lint": "eslint src test",
     "test": "mocha --compilers js:babel-core/register ./test/endpoint.js"
   },
   "repository": {
@@ -24,8 +25,10 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@yomguithereal/eslint-config": "^3.0.0",
     "babel-core": "^6.14.0",
     "babel-preset-es2015": "^6.14.0",
+    "eslint": "^3.5.0",
     "graphology": "0.0.4",
     "mocha": "^3.0.2"
   },
@@ -33,6 +36,11 @@
     "graph"
   ],
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "@yomguithereal/eslint-config/es6"
   }
 }
