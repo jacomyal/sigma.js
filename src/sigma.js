@@ -12,6 +12,7 @@ import {assign, isGraph} from './utils';
 
 // TODO: possibility to pass a camera
 // TODO: distinguish with events, full refresh vs. draw
+// TODO: do we need to store computed data? I'm not sure
 
 /**
  * Helper functions not registered as methods not to overload the prototype
