@@ -1,5 +1,5 @@
-node_modules/*
-build/*
+node_modules
+build
 *.tgz
 *.log
 *.swp

@@ -1,6 +1,6 @@
 {
   "name": "sigma",
-  "version": "1.1.0",
+  "version": "2.0.0-beta1",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
@@ -8,27 +8,22 @@
     "type": "git",
     "url": "http://github.com/jacomyal/sigma.js.git"
   },
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    },
+    {
+      "name": "Guillaume Plique",
+      "url": "http://github.com/Yomguithereal"
+    }
+  ],
   "license": "MIT",
   "main": "build/sigma.require.js",
   "devDependencies": {
-    "grunt-cli": "^0.1.13",
-    "grunt": "~0.4.5",
-    "grunt-contrib-qunit": "~0.5.2",
-    "grunt-contrib-uglify": "~0.5.1",
-    "grunt-closure-linter": "~0.1.4",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-concat": "~0.5.0",
-    "load-grunt-tasks": "~0.6.0",
-    "grunt-sed": "~0.1.1",
-    "grunt-zip": "~0.15.0",
-    "http-server": "~0.9.0",
-    "grunt-grunt": "^0.2.2",
-    "uglify-js": "^2.4.15"
+    "mocha": "^3.0.2"
   },
-  "scripts": {
-    "start": "http-server -p 8000",
-    "test": "grunt travis",
-    "build": "grunt build",
-    "prepublish": "grunt npmPrePublish"
-  }
+  "keywords": [
+    "graph"
+  ]
 }
