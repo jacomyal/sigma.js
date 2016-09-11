@@ -7,17 +7,6 @@
 import assert from 'assert';
 import Graph from 'graphology';
 import Sigma from '../src/sigma';
-import CanvasRenderer from '../src/renderers/canvas';
-
-const graph = new Graph();
-graph.addNodesFrom(['John', 'Mary', 'Martha']);
-
-const renderer = new CanvasRenderer();
-
-const sigma = new Sigma(graph, renderer);
-sigma.refresh();
-
-console.log(sigma);
 
 describe('Sigma', function() {
 

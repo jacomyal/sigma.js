@@ -18,21 +18,6 @@ import {assign, isGraph} from './utils';
  * Helper functions not registered as methods not to overload the prototype
  * and preventing sneaky users to abuse them.
  */
-function initializeIndex(map, elements) {
-  const index = map ? new Map() : {};
-
-  for (let i = 0, l = elements.length; i < l; i++) {
-    const element = elements[i],
-          object = {computed: {}, state: {}};
-
-    if (map)
-      index.set(element, object);
-    else
-      index[element] = object;
-  }
-
-  return index;
-}
 
 /**
  * Sigma class
@@ -58,11 +43,15 @@ export default class Sigma {
     this.renderer = renderer;
 
     this.state = {};
-    this.nodesIndex = initializeIndex(this.map, graph.nodes());
-    this.edgesIndex = initializeIndex(this.map, graph.edges());
+    this.nodeStates = null;
+    this.edgeStates = null;
 
     this.nodeReducers = [internalNodeReducer];
     this.edgeReducers = [];
+
+    // TODO: this is temporary
+    this.renderer.initialize(graph);
+    this.refresh();
   }
 
   /**---------------------------------------------------------------------------
@@ -102,7 +91,7 @@ export default class Sigma {
     const nodes = this.graph.nodes(),
           egdes = this.graph.edges();
 
-    // 1-- We need to compute reducers
+    // 1-- We need to compute node reducers
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i],
             data = {};
@@ -114,11 +103,8 @@ export default class Sigma {
         assign(data, reducer(this, this.graph, node));
       }
 
-      // Storing computed data
-      if (this.map)
-        this.nodesIndex.get(node).computed = data;
-      else
-        this.nodesIndex[node].computed = data;
+      // Updating node display information as stored by renderer
+      this.renderer.updateNodeDisplayInformation(node, data);
     }
 
     // TEMP: rendering

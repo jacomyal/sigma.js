@@ -12,7 +12,7 @@
  * @param {object}                   data    - Node's display data.
  */
 export default function Node(context, data) {
-  context.fillStyle = node.color;
+  context.fillStyle = data.color;
   context.beginPath();
   context.arc(
     data.x,

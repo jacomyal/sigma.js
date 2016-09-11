@@ -15,7 +15,9 @@
  */
 export function internalNodeReducer(controller, graph, node) {
   return {
-    x: 1,
-    y: 1
+    x: 50,
+    y: 50,
+    size: 15,
+    color: 'red'
   };
 }

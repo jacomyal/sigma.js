@@ -1,4 +1,5 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin'),
+      path = require('path');
 
 const EXAMPLES = [
   {
@@ -18,6 +19,7 @@ module.exports = EXAMPLES.map(example => {
     output: {
       filename: `${example.file}.bundle.js`
     },
+    devtool: 'eval-source-map',
     module: {
       loaders: [
         {
@@ -30,7 +32,8 @@ module.exports = EXAMPLES.map(example => {
     plugins: [
       new HtmlWebpackPlugin({
         title: `Sigma.js - ${example.title}`,
-        filename: `${example.file}.html`
+        filename: `${example.file}.html`,
+        template: path.join(__dirname, 'templates', 'default.ejs')
       })
     ]
   };
