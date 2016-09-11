@@ -38,7 +38,8 @@ function initializeIndex(map, elements) {
  * Sigma class
  *
  * @constructor
- * @param {Graph} graph - A graphology Graph instance.
+ * @param {Graph}    graph    - A graphology Graph instance.
+ * @param {Renderer} renderer - A Renderer instance.
  */
 export default class Sigma {
   constructor(graph, renderer) {
