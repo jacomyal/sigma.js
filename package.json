@@ -4,6 +4,7 @@
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "main": "dist/sigma.js",
   "repository": {
     "type": "git",
     "url": "http://github.com/jacomyal/sigma.js.git"
@@ -19,8 +20,8 @@
     }
   ],
   "license": "MIT",
-  "main": "build/sigma.require.js",
   "devDependencies": {
+    "graphology": "0.0.4",
     "mocha": "^3.0.2"
   },
   "keywords": [
