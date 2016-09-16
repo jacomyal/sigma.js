@@ -745,11 +745,9 @@
         // Applying attraction to nodes
         if (W.settings.adjustSizes) {
 
-          distance = Math.sqrt(
-            (Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
+          distance = Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) -
             NodeMatrix[np(n1, 'size')] -
-            NodeMatrix[np(n2, 'size')]
-            );
+            NodeMatrix[np(n2, 'size')];
 
           if (W.settings.linLogMode) {
             if (W.settings.outboundAttractionDistribution) {
