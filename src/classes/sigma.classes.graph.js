@@ -410,7 +410,7 @@
     this.outNeighborsCount[id] = 0;
     this.allNeighborsCount[id] = 0;
 
-    this.allAdjacentEdgesIndex[validNode.id] = {}
+    this.allAdjacentEdgesIndex[validNode.id] = {};
 
     // Add the node to indexes:
     this.nodesIndex[validNode.id] = validNode;
@@ -485,8 +485,8 @@
       validEdge.target = edge.target;
     }
 
-    this.allAdjacentEdgesIndex[validEdge.source][validEdge.id] = validEdge
-    this.allAdjacentEdgesIndex[validEdge.target][validEdge.id] = validEdge
+    this.allAdjacentEdgesIndex[validEdge.source][validEdge.id] = validEdge;
+    this.allAdjacentEdgesIndex[validEdge.target][validEdge.id] = validEdge;
 
     // Add the edge to indexes:
     this.edgesIndex[validEdge.id] = validEdge;
@@ -549,12 +549,12 @@
     delete this.nodesIndex[id];
 
     // Remove related edges:
-    var edge_ids = []
+    var edge_ids = [];
     for (i in this.allAdjacentEdgesIndex[id]) {
-      edge_ids.push(i)
+      edge_ids.push(i);
     }
     for (k in edge_ids) {
-      this.dropEdge(edge_ids[k])
+      this.dropEdge(edge_ids[k]);
     }
 
     // Remove related edge indexes:
@@ -817,7 +817,7 @@
     if (!arguments.length) {
       var edges = [];
       for (var id in this.edgesIndex) {
-	  edges.push(this.edgesIndex[id]);
+        edges.push(this.edgesIndex[id]);
       }
       return edges;
     }
