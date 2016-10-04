@@ -60,7 +60,7 @@
       edgesIndex: Object.create(null),
 
       /**
-       * This index maps node ids into a dictionary that maps adjacent edges ids
+       * This index maps node ids into dictionaries that map adjacent edges ids
        * into edges.
        * Useful for quick node removal.
        */
