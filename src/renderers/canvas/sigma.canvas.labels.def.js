@@ -32,7 +32,7 @@
     context.font = (settings('fontStyle') ? settings('fontStyle') + ' ' : '') +
       fontSize + 'px ' + settings('font');
     context.fillStyle = (settings('labelColor') === 'node') ?
-      (node.color || settings('defaultNodeColor')) :
+      (node.labelColor || node.color || settings('defaultNodeColor')) :
       settings('defaultLabelColor');
 
     context.fillText(
