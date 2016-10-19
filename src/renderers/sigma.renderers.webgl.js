@@ -451,23 +451,23 @@
       }
     }
 
+    a = this.camera.quadtree.area(
+      this.camera.getRectangle(this.width, this.height)
+    );
+
+    // Apply camera view to these nodes:
+    this.camera.applyView(
+      undefined,
+      undefined,
+      {
+        nodes: a,
+        edges: [],
+        width: this.width,
+        height: this.height
+      }
+    );
+
     if (drawLabels) {
-      a = this.camera.quadtree.area(
-        this.camera.getRectangle(this.width, this.height)
-      );
-
-      // Apply camera view to these nodes:
-      this.camera.applyView(
-        undefined,
-        undefined,
-        {
-          nodes: a,
-          edges: [],
-          width: this.width,
-          height: this.height
-        }
-      );
-
       o = function(key) {
         return self.settings({
           prefix: self.camera.prefix
