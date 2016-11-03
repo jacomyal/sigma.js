@@ -316,10 +316,11 @@
     function _wheelHandler(e) {
       var pos,
           ratio,
-          animation;
+          animation,
+          wheelDelta = sigma.utils.getDelta(e);
 
-      if (_settings('mouseEnabled') && _settings('mouseWheelEnabled')) {
-        ratio = sigma.utils.getDelta(e) > 0 ?
+      if (_settings('mouseEnabled') && _settings('mouseWheelEnabled') && wheelDelta !== 0) {
+        ratio = wheelDelta > 0 ?
           1 / _settings('zoomingRatio') :
           _settings('zoomingRatio');
 
