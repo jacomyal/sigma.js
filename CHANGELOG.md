@@ -1,9 +1,11 @@
 ## sigma.js - changelog:
 
-#### 1.2.0 - (provisional)
+#### 1.2.0 - release (Nov 3, 2016)
 
 - Added the [layout.noverlap](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.layout.noverlap) plugin (thanks to [@apitts](https://github.com/apitts)).
 - Added the [renderers.edgeDot](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.renderers.edgeDots) plugin (thanks to [@jotunacorn](https://github.com/jotunacorn)).
+- Fixed `sigma.require.js` so that Webpack & node.js can require the library.
+- Fixed camera zoom weird behavior on retina displays (thanks to [@robindemourat](https://github.com/robindemourat)).
 
 #### 1.1.0 - release (Feb 17, 2016)
 
