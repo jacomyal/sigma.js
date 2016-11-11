@@ -44,11 +44,9 @@ export default class CanvasRenderer extends Renderer {
    * @return {CanvasRenderer}       - Returns itself for chaining.
    */
   initialize(graph) {
-    const map = graph.map;
 
-    this.map = map;
-    this.nodesIndex = map ? new Map() : {};
-    this.edgesIndex = map ? new Map() : {};
+    this.nodesIndex = Object.create(null);
+    this.edgesIndex = Object.create(null);
 
     return this;
   }
@@ -63,10 +61,7 @@ export default class CanvasRenderer extends Renderer {
   updateNodeDisplayInformation(node, data) {
 
     // TODO: for now, this is only saving raw
-    if (this.map)
-      this.nodesIndex.set(node, data);
-    else
-      this.nodesIndex[node] = data;
+    this.nodesIndex[node] = data;
 
     return this;
   }
@@ -79,7 +74,6 @@ export default class CanvasRenderer extends Renderer {
   render() {
 
     // Rendering nodes
-    // TODO: handle maps
     for (const k in this.nodesIndex) {
       const displayInformation = this.nodesIndex[k];
 

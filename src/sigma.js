@@ -5,10 +5,12 @@
  * Core class holding state for the bound graph and using a combination of
  * a renderer & camera to display the bound graph on screen.
  */
+import isGraph from 'graphology-utils/is-graph';
+
 import Camera from './camera';
 import Renderer from './renderer';
 import {internalNodeReducer} from './reducers';
-import {assign, isGraph} from './utils';
+import {assign} from './utils';
 
 // TODO: possibility to pass a camera
 // TODO: distinguish with events, full refresh vs. draw
@@ -38,7 +40,6 @@ export default class Sigma {
 
     // Properties
     this.graph = graph;
-    this.map = this.graph.map;
     this.camera = new Camera();
     this.renderer = renderer;
 

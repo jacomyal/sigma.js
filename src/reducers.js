@@ -15,9 +15,9 @@
  */
 export function internalNodeReducer(controller, graph, node) {
   return {
-    x: 50,
-    y: 50,
-    size: 15,
-    color: 'red'
+    x: graph.getNodeAttribute(node, 'x') || 1,
+    y: graph.getNodeAttribute(node, 'y') || 1,
+    size: graph.getNodeAttribute(node, 'size') || 1,
+    color: graph.getNodeAttribute(node, 'color') || 'black'
   };
 }
