@@ -68,7 +68,7 @@ module.exports = function(grunt) {
   var npmJsFiles = coreJsFiles.slice(0);
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
-  var plugins_require = "src/sigma.plugins.require.js";
+  var plugins_require = "plugins/sigma.plugins.require.js";
 
   var plugins = [
     'exporters.svg',
