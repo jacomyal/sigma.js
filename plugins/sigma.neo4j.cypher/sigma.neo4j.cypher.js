@@ -213,6 +213,6 @@
         sigma.neo4j.send(neo4j, '/db/data/relationship/types', 'GET', null, callback);
     };
 
-}).call(this);
+}).call(window);
 
     
