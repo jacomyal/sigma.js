@@ -239,6 +239,4 @@
         }
     }
 
-}).call(this);
-
-    
+}).call(window);
