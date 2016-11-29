@@ -12,6 +12,8 @@ if (typeof window === 'undefined')
   window = {
     addEventListener: function() {}
   };
+else if(this !== window)
+  this.WebGLRenderingContext = window.WebGLRenderingContext;
 
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports)
