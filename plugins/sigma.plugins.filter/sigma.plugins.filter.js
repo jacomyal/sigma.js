@@ -494,10 +494,9 @@
    * @param  {sigma} s The related sigma instance.
    */
   sigma.plugins.filter = function(s) {
-    // Create filter if undefined
-    if (!filter) {
-      filter = new Filter(s);
-    }
+    // Create new filter to update the graph params. Be aware, filter is a singleton,
+    // therefore filter instance can work on one sigma instance at a time.
+    filter = new Filter(s);
     return filter;
   };
 
