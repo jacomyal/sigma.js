@@ -76,6 +76,7 @@ module.exports = function(grunt) {
     'parsers.gexf',
     'parsers.json',
     'pathfinding.astar',
+    'plugins.shortestpath',
     'plugins.animate',
     'plugins.dragNodes',
     'plugins.filter',
