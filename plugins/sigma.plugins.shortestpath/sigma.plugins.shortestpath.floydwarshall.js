@@ -33,7 +33,7 @@
                 // Default settings
                 {
                     // Graph is directed, affects which edges are taken into account
-                    undirected: false,
+                    undirected: true,
                     // Function to compute the distance between two connected node
                     pathLengthFunction: defaultPathLengthFunction
                 },
@@ -41,13 +41,15 @@
 
             var pathLengthFunction = currentSettings("pathLengthFunction");
 
+            // nodeIndexMap maps the nodes to its index in the nodesArray
             var nodeIndexMap = {};
+
             var adjList = new Array(this.nodesArray.length);
+            // creates an adjacent list in adjList
             var createAdjList = function() {
                 self.nodesArray.forEach(function(node, idx) {
                     nodeIndexMap[node.id] = idx;
                 });
-                console.log(adjList.length);
                 var i;
                 for(i=0; i<self.nodesArray.length; i++) {
                     adjList[i] = new Array();
@@ -56,11 +58,53 @@
                     var src = nodeIndexMap[edge.source];
                     var dest = nodeIndexMap[edge.target];
                     adjList[src].push(dest);
-                    if(currentSettings.undirected)
+                    if(currentSettings("undirected")) {
                         adjList[dest].push(src);
+                    }
                 });
             };
             createAdjList();
+
+            var floydWarshall = function() {
+                var INF =1000000000;
+                var nodeSize = self.nodesArray.length;
+                var dist = new Array(nodeSize);
+                for(var i=0;i<nodeSize;i++)
+                    dist[i]=new Array(nodeSize);
+                for(var i=0;i<nodeSize;i++) {
+                    for(var j=0;j<nodeSize;j++) {
+                        dist[i][j]=INF;
+                    }
+                }
+
+                for(var i=0;i<nodeSize;i++) {
+                    for(var j=0;j<adjList[i].length;j++) {
+                        var node1 = self.nodesArray[i];
+                        var node2 = self.nodesArray[adjList[i][j]];
+                        dist[i][adjList[i][j]]=defaultPathLengthFunction(node1,node2,0);
+                    }
+                }
+                for(var i=0;i<nodeSize;i++) {
+                    for(var j=0;j<nodeSize;j++) {
+                        console.log(dist[i][j]);
+                    }
+                }
+                console.log("ENDDDD");
+
+                for(var k=0;k<nodeSize;k++) {
+                    for(var i=0;i<nodeSize;i++) {
+                        for(var j=0;j<nodeSize;j++) {
+                            dist[i][j]=Math.min(dist[i][j], dist[i][k]+dist[k][j]);
+                        }
+                    }
+                }
+                for(var i=0;i<nodeSize;i++) {
+                    for(var j=0;j<nodeSize;j++) {
+                        console.log(dist[i][j]);
+                    }
+                }
+            }
+            floydWarshall();
         }
     );
 }).call(window);
