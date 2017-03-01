@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic sigma.js example</title>
+    <p style="text-align: center">Check the console for shortest path lengths</p>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script src="../build/sigma.min.js"></script>
+<script src="../build/plugins/sigma.plugins.shortestpath.min.js"></script>
+<script>
+    // Let's first initialize sigma:
+    var s = new sigma('container');
+
+    // Then, let's add some data to display:
+    s.graph.addNode({
+        // Main attributes:
+        id: 'n0',
+        label: 'Node 0',
+        // Display attributes:
+        x: 0,
+        y: 0,
+        size: 1,
+        color: '#f00'
+    }).addNode({
+        // Main attributes:
+        id: 'n1',
+        label: 'Node 1',
+        // Display attributes:
+        x: 0,
+        y: 1,
+        size: 1,
+        color: '#00e'
+    }).addNode({
+        // Main attributes:
+        id: 'n2',
+        label: 'Node 2',
+        // Display attributes:
+        x: 1,
+        y: 1,
+        size: 1,
+        color: '#0e0'
+    }).addNode({
+        // Main attributes:
+        id: 'n3',
+        label: 'Node 3',
+        // Display attributes:
+        x: 1,
+        y: 0,
+        size: 1,
+        color: '#6ef'
+    }).addNode({
+        // Main attributes:
+        id: 'n4',
+        label: 'Node 4',
+        // Display attributes:
+        x: 0.5,
+        y: 0.5,
+        size: 1,
+        color: '#919'
+    }).addEdge({
+        id: 'e0',
+        // Reference extremities:
+        source: 'n0',
+        target: 'n1'
+    }).addEdge({
+        id: 'e1',
+        // Reference extremities:
+        source: 'n1',
+        target: 'n2'
+    }).addEdge({
+        id: 'e2',
+        // Reference extremities:
+        source: 'n2',
+        target: 'n3'
+    }).addEdge({
+        id: 'e3',
+        // Reference extremities:
+        source: 'n3',
+        target: 'n0'
+    }).addEdge({
+        id: 'e4',
+        // Reference extremities:
+        source: 'n4',
+        target: 'n0'
+    }).addEdge({
+        id: 'e5',
+        // Reference extremities:
+        source: 'n4',
+        target: 'n1'
+    });
+
+    // Finally, let's ask our sigma instance to refresh:
+    s.refresh();
+    distMatrix = s.graph.floydwarshall();
+    for(var i=0;i<distMatrix.length;i++) {
+        for(var j=0;j<distMatrix.length;j++) {
+            console.log(i+","+j+" : "+distMatrix[i][j]);
+        }
+    }
+</script>
+</body>
+</html>
