@@ -86,6 +86,7 @@ module.exports = function(grunt) {
     'renderers.edgeDots',
     'renderers.edgeLabels',
     'renderers.parallelEdges',
+    'renderers.mirrorEdges',
     'renderers.snapshot',
     'statistics.HITS'
   ];
