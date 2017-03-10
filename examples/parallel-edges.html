@@ -47,10 +47,13 @@
 <script src="../src/misc/sigma.misc.drawHovers.js"></script>
 <!-- END SIGMA IMPORTS -->
 <script src="../plugins/sigma.renderers.parallelEdges/utils.js"></script>
+<script src="../plugins/sigma.renderers.parallelEdges/bindEvents.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edges.curve.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edges.curvedArrow.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edgehovers.curve.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edges.parallel.js"></script>
+<script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edgehovers.parallel.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -70,8 +73,8 @@
  */
 var i,
     s,
-    N = 2,
-    E = 10,
+    N = 4,
+    E = 5,
     g = {
       nodes: [],
       edges: []
@@ -94,9 +97,23 @@ for (i = 0; i < E; i++)
     label: 'Edge ' + i,
     source: 'n0',
     target: 'n1',
-    size: Math.random(),
+    size: 1,
     color: '#ccc',
     type: 'curvedArrow',
+    hover_color: "black",
+    count: i
+  });
+
+for (i = 0; i < 40; i++)
+  g.edges.push({
+    id: 'pe' + i,
+    label: 'pEdge ' + i,
+    source: 'n2',
+    target: 'n3',
+    size: 1,
+    color: '#ccc',
+    type: 'parallel',
+    hover_color: "black",
     count: i
   });
 
