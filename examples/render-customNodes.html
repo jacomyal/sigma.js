@@ -1,0 +1,178 @@
+<link href="fonts/font-awesome.css" rel="stylesheet">
+
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.renderers.customNodes/sigma.canvas.nodes.def.js"></script>
+
+<div id="container">
+  <style>
+    #graph-canvas{
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+    h1 {
+      position: absolute;
+      margin: 0.5em;
+    }
+  </style>
+  <div id="graph-canvas"><h1>Canvas</h1></div>
+</div>
+
+<!-- we force the loading of the font awesome -->
+<i class="fa fa-camera-retro fa-1x" style="color: rgba(0,0,0,0);"></i>
+<script>
+/**
+ * This is a basic example on how to instantiate sigma. A random graph is
+ * generated and stored in the "graph" variable, and then sigma is instantiated
+ * directly with the graph.
+ *
+ * The simple instance of sigma is enough to make it render the graph on the on
+ * the screen, since the graph is given directly to the constructor.
+ */
+var i,
+    s,
+    N = 100,
+    E = 500,
+    g = {
+      nodes: [],
+      edges: []
+    },
+    icons = [
+      "\uF11b",
+      "\uF11c",
+      "\uF11d",
+      "\uF128",
+      "\uF129",
+      "\uF130",
+      "\uF131",
+      "\uF132"
+    ],
+    colors = [
+      '#965E04',
+      '#C89435',
+      '#F7A456',
+      '#AFCF8A',
+      '#7B39DE',
+      '#B095C0',
+      '#D24556',
+      '#93C2FA',
+      '#9DB09E',
+      '#F8C821'
+    ];
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random(),
+    color: colors[Math.floor(Math.random() * colors.length)],
+    type: 'circle',
+    active: [false, true][Math.random() * 1.15 | 0],
+    icon: {
+      font: 'FontAwesome',
+      scale: 1.0, // size ratio of (icon / node)
+      color: '#fff',
+      content: icons[Math.floor(Math.random() * icons.length)]
+    }
+  });
+
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random() * N | 0),
+    target: 'n' + (Math.random() * N | 0),
+    size: Math.random(),
+    color: '#ccc',
+    active: [false, true][Math.random() * 1.05 | 0]
+  });
+
+var settings = {
+  borderSize: 2,
+  defaultNodeBorderColor: '#fff',
+  nodeBorderColor: 'default',
+
+  zoomMin: 0.001,
+  zoomMax: 3
+};
+
+function init() {
+  var sigmaCanvas = new sigma({
+    graph: g,
+    renderer: {
+      container: document.getElementById('graph-canvas'),
+      type: 'canvas'
+    },
+    settings: settings
+  });
+};
+
+// In case the WebGL renderer is used, we must wait for FontAwesome to be loaded.
+// http://www.w3.org/TR/css-font-loading/
+if (document.fonts) {
+  // document.fonts.ready() method is going to be replaced with
+  // document.fonts.ready attribute in the future.
+  var fontsReady = document.fonts.ready;
+  if (typeof(fontsReady) == "function") {
+    fontsReady = document.fonts.ready();
+  }
+  fontsReady.then(init);
+}
+else {
+  // wait or use a polyfill such as:
+  // https://github.com/zachleat/fontfaceonload
+  // https://github.com/smnh/FontLoader
+  setTimeout(init, 2000);
+}
+</script>
