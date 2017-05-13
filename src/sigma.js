@@ -6,20 +6,9 @@
  * a renderer & camera to display the bound graph on screen.
  */
 import isGraph from 'graphology-utils/is-graph';
-
 import Camera from './camera';
 import Renderer from './renderer';
-import {internalNodeReducer} from './reducers';
 import {assign} from './utils';
-
-// TODO: possibility to pass a camera
-// TODO: distinguish with events, full refresh vs. draw
-// TODO: do we need to store computed data? I'm not sure
-
-/**
- * Helper functions not registered as methods not to overload the prototype
- * and preventing sneaky users to abuse them.
- */
 
 /**
  * Sigma class
@@ -46,13 +35,6 @@ export default class Sigma {
     this.state = {};
     this.nodeStates = null;
     this.edgeStates = null;
-
-    this.nodeReducers = [internalNodeReducer];
-    this.edgeReducers = [];
-
-    // TODO: this is temporary
-    this.renderer.initialize(graph);
-    this.refresh();
   }
 
   /**---------------------------------------------------------------------------
