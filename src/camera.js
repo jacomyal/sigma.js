@@ -19,4 +19,18 @@ export default class Camera {
     this.angle = 0;
     this.ratio = 0;
   }
+
+  /**
+   * Method used to retrieve the camera's current state.
+   *
+   * @return {object}
+   */
+  getState() {
+    return {
+      x: this.x,
+      y: this.y,
+      angle: this.angle,
+      ratio: this.ratio
+    };
+  }
 }

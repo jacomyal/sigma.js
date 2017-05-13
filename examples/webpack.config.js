@@ -25,7 +25,12 @@ module.exports = EXAMPLES.map(example => {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loader: 'babel'
+          loader: 'babel-loader'
+        },
+        {
+          test: /\.(?:vert|frag)$/,
+          exclude: /node_modules/,
+          loader: 'raw-loader'
         }
       ]
     },

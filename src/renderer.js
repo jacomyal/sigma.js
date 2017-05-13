@@ -12,4 +12,12 @@
  */
 export default class Renderer {
 
+  /**
+   * Conventional method used to bind the renderer to a sigma's instance.
+   *
+   * @param {Sigma} sigma - Target sigma instance.
+   */
+  bind(sigma) {
+    this.sigma = sigma;
+  }
 }

@@ -9,4 +9,5 @@ const util = require('util');
 if (util.inspect.defaultOptions)
   util.inspect.defaultOptions.depth = null;
 
+require('./camera.js');
 require('./sigma.js');

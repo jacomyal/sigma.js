@@ -1,17 +1,18 @@
 /**
- * Sigma.js Rendering Helpers
+ * Sigma.js Rendering Utils
  * ===========================
  *
- * Helpers used by every renderer.
+ * Helpers used by most renderers.
  */
 
 /**
- * Function creating to create DOM elements easily.
+ * Function used to create DOM elements easily.
  */
 export function createDOMElement(tag, attributes) {
-  attributes = attributes || {};
-
   const element = document.createElement(tag);
+
+  if (!attributes)
+    return element;
 
   for (const k in attributes) {
     if (k === 'style') {
