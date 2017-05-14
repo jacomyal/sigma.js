@@ -5,6 +5,7 @@
  * File implementing sigma's WebGL Renderer.
  */
 import Renderer from '../../renderer';
+import NodeProgram from './programs/node';
 
 import {
   createElement,
@@ -39,7 +40,9 @@ export default class WebGLRenderer extends Renderer {
     this.nodesData = null;
     this.edgesData = null;
 
-    this.nodePrograms = {};
+    this.nodePrograms = {
+      node: new NodeProgram()
+    };
     this.edgePrograms = {};
 
     // Starting dimensions
@@ -52,6 +55,10 @@ export default class WebGLRenderer extends Renderer {
 
     // Initial resize
     this.resize();
+
+    // Loading programs
+    for (const k in this.nodePrograms)
+      this.nodePrograms[k].load(this.contexts.nodes);
   }
 
   /**---------------------------------------------------------------------------

@@ -25,11 +25,10 @@ function loadShader(type, gl, source) {
 
   // Throwing if something went awry
   if (!successfullyCompiled) {
-    // TODO: do custom error with data
-    // const infoLog = gl.getShaderInfoLog(shader);
+    const infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error('sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader.');
+    throw new Error(`sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}`);
   }
 
   return shader;

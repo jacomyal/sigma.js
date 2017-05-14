@@ -22,7 +22,7 @@ void main() {
   center = position * u_scale;
   center = vec2(center.x, u_scale * u_resolution.y - center.y);
 
-  position = position +,
+  position = position +
     2.0 * radius * vec2(cos(a_angle), sin(a_angle));
   position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);
 
