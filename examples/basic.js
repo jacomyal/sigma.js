@@ -1,11 +1,14 @@
-import Graph from 'graphology';
+import {UndirectedGraph} from 'graphology';
+import erdosRenyi from 'graphology-generators/random/erdos-renyi';
+import randomLayout from 'graphology-layout/random';
 import Sigma from '../src/sigma';
-import CanvasRenderer from '../src/renderers/canvas';
+import WebGLRenderer from '../src/renderers/webgl';
 
-const graph = new Graph();
-graph.addNode('John', {x: 50, y: 50, color: 'blue', size: 10});
-graph.addNode('Martha', {x: 100, y: 100, color: 'red', size: 10});
+const container = document.getElementById('container');
 
-const renderer = new CanvasRenderer(document.getElementById('container'));
+const graph = erdosRenyi(UndirectedGraph, {n: 20, probability: 0.7});
+randomLayout.assign(graph);
 
-const sigma = new Sigma(graph, renderer);
+const renderer = new WebGLRenderer(container);
+
+new Sigma(graph, renderer);

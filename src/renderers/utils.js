@@ -8,7 +8,7 @@
 /**
  * Function used to create DOM elements easily.
  */
-export function createDOMElement(tag, attributes) {
+export function createElement(tag, attributes) {
   const element = document.createElement(tag);
 
   if (!attributes)
