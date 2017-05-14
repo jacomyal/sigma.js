@@ -31,10 +31,17 @@ export default class Sigma {
     this.graph = graph;
     this.camera = new Camera();
     this.renderer = renderer;
+    this.renderer.bind(this);
 
     this.state = {};
     this.nodeStates = null;
     this.edgeStates = null;
+
+    // First time refresh
+    this.refresh();
+
+    // TODO: should store normalized display information as a flat array with
+    // standard indices to save up some RAM & computation
   }
 
   /**---------------------------------------------------------------------------
@@ -71,26 +78,6 @@ export default class Sigma {
    * @return {Sigma} - Returns itself for chaining.
    */
   refresh() {
-    const nodes = this.graph.nodes(),
-          egdes = this.graph.edges();
-
-    // 1-- We need to compute node reducers
-    for (let i = 0, l = nodes.length; i < l; i++) {
-      const node = nodes[i],
-            data = {};
-
-      // Applying every reducers
-      for (let j = 0, m = this.nodeReducers.length; j < m; j++) {
-        const reducer = this.nodeReducers[j];
-
-        assign(data, reducer(this, this.graph, node));
-      }
-
-      // Updating node display information as stored by renderer
-      this.renderer.updateNodeDisplayInformation(node, data);
-    }
-
-    // TEMP: rendering
     this.renderer.render();
   }
 }
