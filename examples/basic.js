@@ -12,3 +12,5 @@ randomLayout.assign(graph);
 const renderer = new WebGLRenderer(container);
 
 new Sigma(graph, renderer);
+
+window.renderer = renderer;

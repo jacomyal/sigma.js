@@ -5,16 +5,17 @@
  * File implementing sigma's WebGL Renderer.
  */
 import Renderer from '../../renderer';
-import {createElement} from '../utils';
+
 import {
-  loadVertexShader,
-  loadFragmentShader,
-  loadProgram
-} from './shaders/utils';
+  createElement,
+  getPixelRatio
+} from '../utils';
 
 /**
  * Constants.
  */
+const WEBGL_OVERSAMPLING_RATIO = 2;
+const PIXEL_RATIO = getPixelRatio();
 
 /**
  * Main class.
@@ -41,9 +42,16 @@ export default class WebGLRenderer extends Renderer {
     this.nodePrograms = {};
     this.edgePrograms = {};
 
+    // Starting dimensions
+    this.width = 0;
+    this.height = 0;
+
     // Initializing contexts
     this._initContext('nodes');
     this._initContext('edges');
+
+    // Initial resize
+    this.resize();
   }
 
   /**---------------------------------------------------------------------------
@@ -84,6 +92,70 @@ export default class WebGLRenderer extends Renderer {
    * Public API.
    **---------------------------------------------------------------------------
    */
+
+  /**
+   * Function used to resize the renderer.
+   *
+   * @param  {number} width  - Target width.
+   * @param  {number} height - Target height.
+   * @return {WebGLRenderer}
+   */
+  resize(width, height) {
+    const previousWidth = this.width,
+          previousHeight = this.height;
+
+    if (arguments.length > 1) {
+      this.width = width;
+      this.height = height;
+    }
+    else {
+      this.width = this.container.offsetWidth;
+      this.height = this.container.offsetHeight;
+    }
+
+    // If nothing has changed, we can stop right here
+    if (previousWidth === this.width && previousHeight === this.height)
+      return this;
+
+    // Sizing dom elements
+    for (const id in this.elements) {
+      const element = this.elements[id];
+
+      element.style.width = this.width + 'px';
+      element.style.height = this.height + 'px';
+    }
+
+    // Sizing contexts
+    for (const id in this.contexts) {
+      const context = this.contexts[id];
+
+      // Canvas contexts
+      if (context.scale) {
+        this.elements[id].setAttribute('width', this.width * PIXEL_RATIO);
+        this.elements[id].setAttribute('height', this.height * PIXEL_RATIO);
+
+        if (PIXEL_RATIO !== 1)
+          context.scale(PIXEL_RATIO, PIXEL_RATIO);
+      }
+
+      // WebGL contexts
+      else {
+        this.elements[id].setAttribute('width', this.width * WEBGL_OVERSAMPLING_RATIO);
+        this.elements[id].setAttribute('height', this.height * WEBGL_OVERSAMPLING_RATIO);
+      }
+
+      if (context.viewport) {
+        context.viewport(
+          0,
+          0,
+          this.width * WEBGL_OVERSAMPLING_RATIO,
+          this.height * WEBGL_OVERSAMPLING_RATIO
+        );
+      }
+    }
+
+    return this;
+  }
 
   /**
    * Function used to render.
