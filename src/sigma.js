@@ -36,6 +36,9 @@ export default class Sigma {
     this.nodeStates = null;
     this.edgeStates = null;
 
+    // State
+    this.dirty = false;
+
     // First time refresh
     this.refresh();
 

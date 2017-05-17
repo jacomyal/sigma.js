@@ -19,4 +19,22 @@ describe('Camera', function() {
       ratio: 1
     });
   });
+
+  it('should be possibile to set the camera\'s state.', function() {
+    const camera = new Camera();
+
+    camera.setState({
+      x: 10,
+      y: -45,
+      angle: 0,
+      ratio: 3
+    });
+
+    assert.deepEqual(camera.getState(), {
+      x: 10,
+      y: -45,
+      angle: 0,
+      ratio: 3
+    });
+  });
 });
