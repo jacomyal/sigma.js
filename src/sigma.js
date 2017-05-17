@@ -8,7 +8,6 @@
 import isGraph from 'graphology-utils/is-graph';
 import Camera from './camera';
 import Renderer from './renderer';
-import {assign} from './utils';
 
 /**
  * Sigma class

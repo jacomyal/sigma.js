@@ -1,3 +1,4 @@
+/* eslint no-new: 0 */
 /**
  * Sigma.js Core Unit Tests
  * =========================
@@ -15,18 +16,18 @@ describe('Sigma', function() {
     it('should throw if the given graph is invalid.', function() {
 
       assert.throws(function() {
-        const sigma = new Sigma();
+        new Sigma();
       }, /graphology/);
 
       assert.throws(function() {
-        const sigma = new Sigma(null);
+        new Sigma(null);
       }, /graphology/);
     });
 
     it('should throw if the given renderer is invalid.', function() {
 
       assert.throws(function() {
-        const sigma = new Sigma(new Graph(), null);
+        new Sigma(new Graph(), null);
       }, /renderer/);
     });
   });
