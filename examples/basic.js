@@ -26,4 +26,6 @@ const renderer = new WebGLRenderer(container);
 
 const sigma = new Sigma(graph, renderer);
 
+window.graph = graph;
 window.renderer = renderer;
+window.camera = sigma.getCamera();

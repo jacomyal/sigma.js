@@ -32,18 +32,57 @@ export default class Sigma {
     this.renderer = renderer;
     this.renderer.bind(this);
 
+    // Userland state
     this.state = {};
     this.nodeStates = null;
     this.edgeStates = null;
 
-    // State
-    this.dirty = false;
+    // Internal state
+    this.nextFrame = null;
+
+    // Binding handlers
+    this._bindCameraHandlers();
 
     // First time refresh
     this.refresh();
 
     // TODO: should store normalized display information as a flat array with
     // standard indices to save up some RAM & computation
+  }
+
+  /**---------------------------------------------------------------------------
+   * Internals
+   **---------------------------------------------------------------------------
+   */
+
+  /**
+   * Function binding camera handlers.
+   *
+   * @return {Sigma}
+   */
+  _bindCameraHandlers() {
+    this.camera.on('updated', () => {
+      this._scheduleRefresh();
+    });
+  }
+
+  /**
+   * Function used to schedule an update.
+   *
+   * @return {Sigma}
+   */
+  _scheduleRefresh() {
+    if (this.nextFrame)
+      return this;
+
+    this.nextFrame = requestAnimationFrame(() => {
+
+      // Resetting state
+      this.nextFrame = null;
+
+      // Refreshing
+      this.refresh();
+    });
   }
 
   /**---------------------------------------------------------------------------
@@ -80,6 +119,14 @@ export default class Sigma {
    * @return {Sigma} - Returns itself for chaining.
    */
   refresh() {
+
+    // If a frame is scheduled, we cancel it
+    if (this.nextFrame) {
+      cancelAnimationFrame(this.nextFrame);
+      this.nextFrame = null;
+    }
+
+    // Calling renderer
     this.renderer.render();
   }
 }

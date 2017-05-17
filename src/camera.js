@@ -4,14 +4,16 @@
  *
  * Class designed to store camera information & used to update it.
  */
+import {EventEmitter} from 'events';
 
 /**
  * Camera class
  *
  * @constructor
  */
-export default class Camera {
+export default class Camera extends EventEmitter {
   constructor() {
+    super();
 
     // State
     this.x = 0;
@@ -55,6 +57,9 @@ export default class Camera {
 
     if ('ratio' in state)
       this.ratio = state.ratio;
+
+    // Emitting
+    this.emit('updated', this.getState());
 
     return this;
   }
