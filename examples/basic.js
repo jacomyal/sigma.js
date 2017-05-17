@@ -15,10 +15,10 @@ graph.nodes().forEach(node => {
   const attr = graph.getNodeAttributes(node);
 
   graph.mergeNodeAttributes(node, {
-    size: Math.random() * 2,
+    size: Math.random() * 8,
     color: chroma.random().hex(),
-    x: attr.x * 500,
-    y: attr.y * 500
+    x: attr.x * 150,
+    y: attr.y * 150
   });
 });
 

@@ -13,7 +13,7 @@ import {mat3} from 'gl-matrix';
 const FLOAT_COLOR_CACHE = {};
 
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
-const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/
+const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
 
 export function floatColor(val) {
 

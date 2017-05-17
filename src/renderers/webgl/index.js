@@ -4,6 +4,8 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
+import {mat3} from 'gl-matrix';
+
 import Renderer from '../../renderer';
 import NodeProgram from './programs/node';
 
@@ -81,7 +83,7 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   _initContext(id, webgl = true) {
-    var element = createElement('canvas', {
+    const element = createElement('canvas', {
       class: `sigma-${id}`,
       style: {
         position: 'absolute'
@@ -95,7 +97,7 @@ export default class WebGLRenderer extends Renderer {
       preserveDrawingBuffer: true
     };
 
-    const context = element.getContext(webgl ? 'webgl' : '2d');
+    const context = element.getContext(webgl ? 'webgl' : '2d', contextOptions);
 
     this.contexts[id] = context;
 
@@ -131,7 +133,7 @@ export default class WebGLRenderer extends Renderer {
 
     const nodes = graph.nodes();
 
-    for (let i = 0, l = nodes.length; i < l; i++) {
+    for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
 
       // TODO: this is temporary!
@@ -185,8 +187,8 @@ export default class WebGLRenderer extends Renderer {
 
       // Canvas contexts
       if (context.scale) {
-        this.elements[id].setAttribute('width', this.width * PIXEL_RATIO);
-        this.elements[id].setAttribute('height', this.height * PIXEL_RATIO);
+        this.elements[id].setAttribute('width', (this.width * PIXEL_RATIO) + 'px');
+        this.elements[id].setAttribute('height', (this.height * PIXEL_RATIO) + 'px');
 
         if (PIXEL_RATIO !== 1)
           context.scale(PIXEL_RATIO, PIXEL_RATIO);
@@ -194,8 +196,8 @@ export default class WebGLRenderer extends Renderer {
 
       // WebGL contexts
       else {
-        this.elements[id].setAttribute('width', this.width * WEBGL_OVERSAMPLING_RATIO);
-        this.elements[id].setAttribute('height', this.height * WEBGL_OVERSAMPLING_RATIO);
+        this.elements[id].setAttribute('width', (this.width * WEBGL_OVERSAMPLING_RATIO) + 'px');
+        this.elements[id].setAttribute('height', (this.height * WEBGL_OVERSAMPLING_RATIO) + 'px');
       }
 
       if (context.viewport) {
@@ -244,6 +246,14 @@ export default class WebGLRenderer extends Renderer {
     const cameraState = this.camera.getState(),
           cameraMatrix = matrixFromCamera(cameraState);
 
+    const translation = mat3.fromTranslation(mat3.create(), [
+      this.width / 2,
+      this.height / 2,
+      0
+    ]);
+
+    mat3.multiply(cameraMatrix, cameraMatrix, translation);
+
     let program,
         gl;
 
@@ -256,9 +266,7 @@ export default class WebGLRenderer extends Renderer {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
-    // TODO: should probably use another name for this abstraction
-    gl.useProgram(program.program);
-
+    // TODO: should probably use another name for the `program` abstraction
     program.render(
       gl,
       this.nodeArray,
