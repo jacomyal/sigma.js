@@ -4,6 +4,7 @@
  *
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
+import {mat3} from 'gl-matrix';
 
 /**
  * Memoized function returning a float-encoded color from various string
@@ -20,7 +21,9 @@ export function floatColor(val) {
   if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined')
     return FLOAT_COLOR_CACHE[val];
 
-  let r = g = b = 0;
+  let r = 0,
+      g = 0,
+      b = 0;
 
   // Handling hexadecimal notation
   if (val[0] === '#') {
@@ -54,4 +57,23 @@ export function floatColor(val) {
   FLOAT_COLOR_CACHE[val] = color;
 
   return color;
+}
+
+/**
+ * Function returning a matrix from the current state of the camera.
+ */
+export function matrixFromCamera(state) {
+  const {
+    angle,
+    ratio,
+    x,
+    y
+  } = state;
+
+  const matrix = mat3.fromScaling(mat3.create(), [1 / ratio, 1 / ratio]);
+
+  mat3.rotate(matrix, matrix, angle);
+  mat3.translate(matrix, matrix, [-x, -y, 0]);
+
+  return matrix;
 }

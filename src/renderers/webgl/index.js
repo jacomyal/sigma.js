@@ -12,6 +12,10 @@ import {
   getPixelRatio
 } from '../utils';
 
+import {
+  matrixFromCamera
+} from './utils';
+
 /**
  * Constants.
  */
@@ -33,15 +37,18 @@ export default class WebGLRenderer extends Renderer {
       throw new Error('sigma/renderers/webgl: container should be an html element.');
 
     // Properties
+    this.sigma = null;
+    this.graph = null;
+    this.camera = null;
     this.container = container;
     this.elements = {};
     this.contexts = {};
 
-    this.nodesData = null;
-    this.edgesData = null;
+    this.nodeArray = null;
+    this.edgeArray = null;
 
     this.nodePrograms = {
-      node: new NodeProgram()
+      def: new NodeProgram()
     };
     this.edgePrograms = {};
 
@@ -99,6 +106,46 @@ export default class WebGLRenderer extends Renderer {
    * Public API.
    **---------------------------------------------------------------------------
    */
+
+  /**
+   * Function used to bind the renderer to a sigma instance.
+   *
+   * @param  {Sigma} sigma - Target sigma instance.
+   * @return {WebGLRenderer}
+   */
+  bind(sigma) {
+
+    // Binding instance
+    this.sigma = sigma;
+    this.camera = sigma.getCamera();
+    this.graph = sigma.getGraph();
+
+    const graph = this.graph;
+
+    // Initializing our byte arrays
+    const nodeProgram = this.nodePrograms.def;
+
+    this.nodeArray = new Float32Array(
+      NodeProgram.POINTS * NodeProgram.ATTRIBUTES * graph.order
+    );
+
+    const nodes = graph.nodes();
+
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      const node = nodes[i];
+
+      // TODO: this is temporary!
+      const data = graph.getNodeAttributes(node);
+
+      nodeProgram.process(
+        this.nodeArray,
+        data,
+        i * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
+      );
+    }
+
+    return this;
+  }
 
   /**
    * Function used to resize the renderer.
@@ -165,9 +212,66 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
+   * Function used to clear the canvases.
+   *
+   * @return {WebGLRenderer}
+   */
+  clear() {
+    for (const id in this.contexts) {
+      const context = this.contexts[id];
+
+      context.clear(context.COLOR_BUFFER_BIT);
+      context.clear(context.COLOR_BUFFER_BIT);
+    }
+
+    return this;
+  }
+
+  /**
    * Function used to render.
+   *
+   * @return {WebGLRenderer}
    */
   render() {
+
+    // First we need to resize
+    this.resize();
+
+    // Clearing the canvases
+    this.clear();
+
+    // Then we need to extract a matrix from the camera
+    const cameraState = this.camera.getState(),
+          cameraMatrix = matrixFromCamera(cameraState);
+
+    let program,
+        gl;
+
+    // Drawing nodes
+    gl = this.contexts.nodes;
+    program = this.nodePrograms.def;
+
+    // Blending
+    // TODO: check the purpose of this
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    // TODO: should probably use another name for this abstraction
+    gl.useProgram(program.program);
+
+    program.render(
+      gl,
+      this.nodeArray,
+      {
+        matrix: cameraMatrix,
+        width: this.width,
+        height: this.height,
+        ratio: cameraState.ratio,
+        nodesPowRatio: 0.5,
+        scalingRatio: WEBGL_OVERSAMPLING_RATIO
+      }
+    );
+
     return this;
   }
 }
