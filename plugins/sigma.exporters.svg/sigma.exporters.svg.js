@@ -90,6 +90,7 @@
     // Creating style tag if needed
     if (params.classes) {
       style = document.createElementNS(XMLNS, 'style');
+      style.setAttribute('type', 'text/css')
       svg.insertBefore(style, svg.firstChild);
     }
 
