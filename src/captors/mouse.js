@@ -14,7 +14,9 @@ import Captor from '../captor';
 
 import {
   getX,
-  getY
+  getY,
+  getCenter,
+  getWheelDelta
 } from './utils';
 
 /**
@@ -22,7 +24,9 @@ import {
  */
 const DRAG_TIMEOUT = 200,
       MOUSE_INERTIA_DURATION = 200,
-      MOUSE_INERTIA_RATIO = 3;
+      MOUSE_INERTIA_RATIO = 3,
+      MOUSE_ZOOM_DURATION = 200,
+      ZOOMING_RATIO = 1.7;
 
 /**
  * Mouse captor class.
@@ -54,11 +58,14 @@ export default class MouseCaptor extends Captor {
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);
     this.handleMove = this.handleMove.bind(this);
+    this.handleWheel = this.handleWheel.bind(this);
 
     // Binding events
     container.addEventListener('click', this.handleClick, false);
     container.addEventListener('mousedown', this.handleDown, false);
     container.addEventListener('mousemove', this.handleMove, false);
+    container.addEventListener('DOMMouseScroll', this.handleWheel, false);
+    container.addEventListener('mousewheel', this.handleWheel, false);
 
     document.addEventListener('mouseup', this.handleUp, false);
   }
@@ -170,5 +177,28 @@ export default class MouseCaptor extends Captor {
     e.stopPropagation();
 
     return false;
+  }
+
+  handleWheel(e) {
+    if (!this.enabled)
+      return;
+
+    const delta = getWheelDelta(e);
+
+    if (!delta)
+      return;
+
+    const ratio = delta > 0 ?
+      1 / ZOOMING_RATIO :
+      ZOOMING_RATIO;
+
+    const center = getCenter(e);
+
+    const position = this.camera.getPosition(
+      getX(e) - center.x,
+      getY(e) - center.y
+    );
+
+    // TODO: zoomTo helper
   }
 }

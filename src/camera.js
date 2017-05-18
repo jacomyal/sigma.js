@@ -165,40 +165,6 @@ export default class Camera extends EventEmitter {
 
     this.nextFrame = requestAnimationFrame(fn);
   }
-
-  /**
-   * Shortcut method used to pan the camera.
-   *
-   * @param  {number}   x          - Delta x.
-   * @param  {number}   y          - Delta y.
-   * @param  {object}   options    - Options:
-   * @param  {number}     duration - Duration of the animation.
-   * @param  {function} callback   - Callback
-   * @return {function}            - Return a function to cancel the animation.
-   */
-  pan(x, y, options, callback) {
-    const targetX = this.x - x,
-          targetY = this.y - y;
-
-    return this.animate({x: targetX, y: targetY}, options, callback);
-  }
-
-  /**
-   * Shortcut method used to zoom the camera.
-   *
-   * @param  {number}   factor     - Factor.
-   * @param  {object}   options    - Options:
-   * @param  {number}     duration - Duration of the animation.
-   * @param  {function} callback   - Callback
-   * @return {function}            - Return a function to cancel the animation.
-   */
-  zoom(factor, options, callback) {
-    factor = factor || 1.5;
-
-    const targetRatio = this.ratio / factor;
-
-    return this.animate({ratio: targetRatio}, options, callback);
-  }
 }
 
-// TODO: unzoom, reset, rotate
+// TODO: pan, zoom, unzoom, reset, rotate, zoomTo

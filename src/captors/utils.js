@@ -136,7 +136,7 @@ export function getMouseCoords(e, x, y) {
  * @param  {event}  e - A mouse or touch event.
  * @return {number}     The wheel delta of the mouse.
  */
-export function getDelta(e) {
+export function getWheelDelta(e) {
   if (typeof e.wheelDelta !== undefined)
     return e.wheelDelta;
 
