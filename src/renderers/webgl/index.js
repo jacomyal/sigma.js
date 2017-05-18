@@ -8,6 +8,7 @@ import {mat3} from 'gl-matrix';
 
 import Renderer from '../../renderer';
 import NodeProgram from './programs/node';
+import EdgeProgram from './programs/edge';
 
 import {
   createElement,
@@ -47,20 +48,24 @@ export default class WebGLRenderer extends Renderer {
     this.contexts = {};
 
     this.nodeArray = null;
+    this.nodeIndicesArray = null;
     this.edgeArray = null;
+    this.edgeIndicesArray = null;
 
     this.nodePrograms = {
       def: new NodeProgram()
     };
-    this.edgePrograms = {};
+    this.edgePrograms = {
+      def: new EdgeProgram()
+    };
 
     // Starting dimensions
     this.width = 0;
     this.height = 0;
 
     // Initializing contexts
-    this._initContext('nodes');
     this._initContext('edges');
+    this._initContext('nodes');
 
     // Initial resize
     this.resize();
@@ -68,6 +73,9 @@ export default class WebGLRenderer extends Renderer {
     // Loading programs
     for (const k in this.nodePrograms)
       this.nodePrograms[k].load(this.contexts.nodes);
+
+    for (const k in this.edgePrograms)
+      this.edgePrograms[k].load(this.contexts.edges);
   }
 
   /**---------------------------------------------------------------------------
@@ -144,6 +152,35 @@ export default class WebGLRenderer extends Renderer {
         data,
         i * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
       );
+    }
+
+    const edgeProgram = this.edgePrograms.def;
+
+    this.edgeArray = new Float32Array(
+      EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES * graph.size
+    );
+
+    const edges = graph.edges();
+
+    for (let i = 0, l = edges.length; i < l; i++) {
+      const edge = edges[i];
+
+      // TODO: this is temporary
+      const data = graph.getEdgeAttributes(edge),
+            extremities = graph.extremities(edge),
+            sourceData = graph.getNodeAttributes(extremities[0]),
+            targetData = graph.getNodeAttributes(extremities[1]);
+
+      edgeProgram.process(
+        this.edgeArray,
+        sourceData,
+        targetData,
+        data,
+        i * EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES
+      );
+
+      if (typeof edgeProgram.computeIndices === 'function')
+        this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
     }
 
     return this;
@@ -277,6 +314,24 @@ export default class WebGLRenderer extends Renderer {
         ratio: cameraState.ratio,
         nodesPowRatio: 0.5,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO
+      }
+    );
+
+    // Drawing edges
+    gl = this.contexts.edges;
+    program = this.edgePrograms.def;
+
+    program.render(
+      gl,
+      this.edgeArray,
+      {
+        matrix: cameraMatrix,
+        width: this.width,
+        height: this.height,
+        ratio: cameraState.ratio,
+        edgesPowRatio: 0.5,
+        scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+        indices: this.edgeIndicesArray
       }
     );
 

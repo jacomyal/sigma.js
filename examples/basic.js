@@ -8,18 +8,20 @@ import WebGLRenderer from '../src/renderers/webgl';
 
 const container = document.getElementById('container');
 
-const graph = erdosRenyi(UndirectedGraph, {n: 20, probability: 0.7});
-randomLayout.assign(graph);
+const graph = erdosRenyi(UndirectedGraph, {n: 100, probability: 0.2});
+randomLayout.assign(graph, {scale: 400, center: 0});
 
 graph.nodes().forEach(node => {
   const attr = graph.getNodeAttributes(node);
 
   graph.mergeNodeAttributes(node, {
-    size: Math.random() * 8,
-    color: chroma.random().hex(),
-    x: attr.x * 150,
-    y: attr.y * 150
+    size: Math.max(4, Math.random() * 10),
+    color: chroma.random().hex()
   });
+});
+
+graph.edges().forEach(edge => {
+  graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
 const renderer = new WebGLRenderer(container);
