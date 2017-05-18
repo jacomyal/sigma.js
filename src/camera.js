@@ -13,6 +13,7 @@ import {assign} from './utils';
  * Defaults.
  */
 const ANIMATE_DEFAULTS = {
+  easing: 'quadraticInOut',
   duration: 150
 };
 
@@ -59,6 +60,24 @@ export default class Camera extends EventEmitter {
   }
 
   /**
+   * Method returning the coordinates of a point from the frame of the
+   * graph to the frame of the camera.
+   *
+   * @param  {number} x The X coordinate of the point in the frame of the graph.
+   * @param  {number} y The Y coordinate of the point in the frame of the graph.
+   * @return {object}   The point coordinates in the frame of the camera.
+   */
+  getPosition(x, y) {
+    const cos = Math.cos(this.angle),
+          sin = Math.sin(this.angle);
+
+    return {
+      x: (x * cos - y * sin) * this.ratio,
+      y: (y * cos + x * sin) * this.ratio
+    };
+  }
+
+  /**
    * Method used to set the camera's state.
    *
    * @param  {object} state - New state.
@@ -96,11 +115,15 @@ export default class Camera extends EventEmitter {
    * @param  {function} callback   - Callback
    * @return {function}            - Return a function to cancel the animation.
    */
-  animate(state, options, callback) {
+  animate(state, options /*, callback */) {
 
     // TODO: validation
 
     options = assign({}, ANIMATE_DEFAULTS, options);
+
+    const easing = typeof options.easing === 'function' ?
+      options.easing :
+      easings[options.easing];
 
     // Canceling previous animation if needed
     if (this.nextFrame)
@@ -122,7 +145,7 @@ export default class Camera extends EventEmitter {
         return;
       }
 
-      const coefficient = easings.quadraticInOut(t);
+      const coefficient = easing(t);
 
       const newState = {};
 
@@ -178,4 +201,4 @@ export default class Camera extends EventEmitter {
   }
 }
 
-// TODO: unzoom, reset
+// TODO: unzoom, reset, rotate

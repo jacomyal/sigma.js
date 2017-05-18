@@ -10,6 +10,8 @@ import Renderer from '../../renderer';
 import NodeProgram from './programs/node';
 import EdgeProgram from './programs/edge';
 
+import MouseCaptor from '../../captors/mouse';
+
 import {
   createElement,
   getPixelRatio
@@ -43,6 +45,7 @@ export default class WebGLRenderer extends Renderer {
     this.sigma = null;
     this.graph = null;
     this.camera = null;
+    this.captors = {};
     this.container = container;
     this.elements = {};
     this.contexts = {};
@@ -66,6 +69,7 @@ export default class WebGLRenderer extends Renderer {
     // Initializing contexts
     this._initContext('edges');
     this._initContext('nodes');
+    this._initContext('mouse');
 
     // Initial resize
     this.resize();
@@ -79,7 +83,7 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**---------------------------------------------------------------------------
-   * Internal functions.
+   * Internal methods.
    **---------------------------------------------------------------------------
    */
 
@@ -131,6 +135,11 @@ export default class WebGLRenderer extends Renderer {
     this.graph = sigma.getGraph();
 
     const graph = this.graph;
+
+    // Initializing captors
+    this.captors = {
+      mouse: new MouseCaptor(this.elements.mouse, this.camera)
+    };
 
     // Initializing our byte arrays
     const nodeProgram = this.nodePrograms.def;
