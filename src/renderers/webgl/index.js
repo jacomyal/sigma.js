@@ -10,6 +10,8 @@ import Renderer from '../../renderer';
 import NodeProgram from './programs/node';
 import EdgeProgram from './programs/edge';
 
+import LabelComponent from '../canvas/components/label';
+
 import MouseCaptor from '../../captors/mouse';
 
 import {
@@ -27,7 +29,8 @@ import {
 const WEBGL_OVERSAMPLING_RATIO = 2;
 const PIXEL_RATIO = getPixelRatio();
 
-// TODO: test the color pixel map for hover
+// TODO: test the color pixel map for hover, or a raycaster
+// TODO: check bufferSubData
 
 /**
  * Main class.
@@ -71,6 +74,7 @@ export default class WebGLRenderer extends Renderer {
     // Initializing contexts
     this._initContext('edges');
     this._initContext('nodes');
+    this._initContext('labels', false);
     this._initContext('mouse', false);
 
     // Initial resize
@@ -273,6 +277,9 @@ export default class WebGLRenderer extends Renderer {
     context = this.contexts.edges;
     context.clear(context.COLOR_BUFFER_BIT);
 
+    context = this.contexts.labels;
+    context.clearRect(0, 0, this.width, this.height);
+
     return this;
   }
 
@@ -344,6 +351,75 @@ export default class WebGLRenderer extends Renderer {
       }
     );
 
+    // Drawing labels
+    // TODO: POW RATIO is currently default 0.5 and harcoded
+    const nodes = this.graph.nodes(),
+          context = this.contexts.labels;
+
+    const relCos = Math.cos(cameraState.angle) / cameraState.ratio,
+          relSin = Math.sin(cameraState.angle) / cameraState.ratio,
+          xOffset = (this.width / 2) - cameraState.x * relCos - cameraState.y * relSin,
+          yOffset = (this.height / 2) - cameraState.y * relCos + cameraState.x * relSin,
+          sizeRatio = Math.pow(cameraState.ratio, 0.5);
+
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      const data = this.graph.getNodeAttributes(nodes[i]);
+
+      const x = data.x * relCos + data.y * relSin + xOffset,
+            y = data.y * relCos + data.x * relSin + yOffset,
+            size = data.size / sizeRatio;
+
+      LabelComponent(context, {
+        label: data.label,
+        size,
+        x,
+        y
+      });
+    }
+
     return this;
   }
 }
+
+  //  */
+  // sigma.classes.camera.prototype.applyView = function(read, write, options) {
+  //   options = options || {};
+  //   write = write !== undefined ? write : this.prefix;
+  //   read = read !== undefined ? read : this.readPrefix;
+
+  //   var nodes = options.nodes || this.graph.nodes(),
+  //       edges = options.edges || this.graph.edges();
+
+  //   var i,
+  //       l,
+  //       node,
+  //       relCos = Math.cos(this.angle) / this.ratio,
+  //       relSin = Math.sin(this.angle) / this.ratio,
+  //       nodeRatio = Math.pow(this.ratio, this.settings('nodesPowRatio')),
+  //       edgeRatio = Math.pow(this.ratio, this.settings('edgesPowRatio')),
+  //       xOffset = (options.width || 0) / 2 - this.x * relCos - this.y * relSin,
+  //       yOffset = (options.height || 0) / 2 - this.y * relCos + this.x * relSin;
+
+  //   for (i = 0, l = nodes.length; i < l; i++) {
+  //     node = nodes[i];
+  //     node[write + 'x'] =
+  //       (node[read + 'x'] || 0) * relCos +
+  //       (node[read + 'y'] || 0) * relSin +
+  //       xOffset;
+  //     node[write + 'y'] =
+  //       (node[read + 'y'] || 0) * relCos -
+  //       (node[read + 'x'] || 0) * relSin +
+  //       yOffset;
+  //     node[write + 'size'] =
+  //       (node[read + 'size'] || 0) /
+  //       nodeRatio;
+  //   }
+
+  //   for (i = 0, l = edges.length; i < l; i++) {
+  //     edges[i][write + 'size'] =
+  //       (edges[i][read + 'size'] || 0) /
+  //       edgeRatio;
+  //   }
+
+  //   return this;
+  // };
