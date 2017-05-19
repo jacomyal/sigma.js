@@ -9,6 +9,10 @@ const EXAMPLES = [
   {
     file: 'gexf',
     title: 'Gexf'
+  },
+  {
+    file: 'markov',
+    title: 'Markov'
   }
 ];
 
