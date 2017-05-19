@@ -40,7 +40,7 @@ export function floatColor(val) {
   }
 
   // Handling rgb notation
-  else if (RGBA_TEST_REGEX.text(val)) {
+  else if (RGBA_TEST_REGEX.test(val)) {
     const match = val.match(RGBA_EXTRACT_REGEX);
 
     r = +match[1];

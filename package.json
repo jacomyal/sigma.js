@@ -35,6 +35,7 @@
     "faker": "^4.1.0",
     "graphology": "^0.10.0",
     "graphology-generators": "^0.4.3",
+    "graphology-gexf": "^0.3.1",
     "graphology-layout": "0.0.1",
     "html-webpack-plugin": "^2.22.0",
     "mocha": "^3.0.2",

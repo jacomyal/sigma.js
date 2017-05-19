@@ -7,8 +7,8 @@ const EXAMPLES = [
     title: 'Basic'
   },
   {
-    file: 'advanced',
-    title: 'Advanced'
+    file: 'gexf',
+    title: 'Gexf'
   }
 ];
 
@@ -28,7 +28,7 @@ module.exports = EXAMPLES.map(example => {
           loader: 'babel-loader'
         },
         {
-          test: /\.(?:vert|frag)$/,
+          test: /\.(?:vert|frag|gexf)$/,
           exclude: /node_modules/,
           loader: 'raw-loader'
         }

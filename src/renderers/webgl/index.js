@@ -31,6 +31,8 @@ const PIXEL_RATIO = getPixelRatio();
 
 // TODO: test the color pixel map for hover, or a raycaster
 // TODO: check bufferSubData
+// TODO: possibility to bypass need for quadtree when every node fits in
+// TODO: rescale layout
 
 /**
  * Main class.
@@ -368,6 +370,10 @@ export default class WebGLRenderer extends Renderer {
       const x = data.x * relCos + data.y * relSin + xOffset,
             y = data.y * relCos + data.x * relSin + yOffset,
             size = data.size / sizeRatio;
+
+      // TODO: this is the label threshold hardcoded
+      if (size < 8)
+        continue;
 
       LabelComponent(context, {
         label: data.label,
