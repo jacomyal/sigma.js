@@ -51,7 +51,7 @@ export function getY(e) {
  * @return {number}     The width of the event's target.
  */
 export function getWidth(e) {
-  const w = (!e.target.ownerSVGElement) ?
+  const w = !e.target.ownerSVGElement ?
     e.target.width :
     e.target.ownerSVGElement.width;
 
@@ -71,7 +71,7 @@ export function getWidth(e) {
  * @return {number}     The height of the event's target.
  */
 export function getHeight(e) {
-  const w = (!e.target.ownerSVGElement) ?
+  const w = !e.target.ownerSVGElement ?
     e.target.height :
     e.target.ownerSVGElement.height;
 

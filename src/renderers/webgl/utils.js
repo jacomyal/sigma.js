@@ -62,6 +62,9 @@ export function floatColor(val) {
 /**
  * Function returning a matrix from the current state of the camera.
  */
+
+// TODO: it's possible to optimize this drastically!
+// TODO: fix angle!
 export function matrixFromCamera(state) {
   const {
     angle,
@@ -70,10 +73,13 @@ export function matrixFromCamera(state) {
     y
   } = state;
 
-  const matrix = mat3.fromScaling(mat3.create(), [1 / ratio, 1 / ratio]);
+  const matrix = mat3.create(),
+        scale = mat3.fromScaling(mat3.create(), [1 / ratio, 1 / ratio]),
+        rotation = mat3.fromRotation(mat3.create(), -angle),
+        translation = mat3.fromTranslation(mat3.create(), [-x, -y]);
 
-  mat3.rotate(matrix, matrix, angle);
-  mat3.translate(matrix, matrix, [-x, -y, 0]);
+  mat3.multiply(matrix, scale, rotation);
+  mat3.multiply(matrix, matrix, translation);
 
   return matrix;
 }

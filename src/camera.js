@@ -17,6 +17,8 @@ const ANIMATE_DEFAULTS = {
   duration: 150
 };
 
+// TODO: animate options = number polymorphism?
+
 /**
  * Camera class
  *

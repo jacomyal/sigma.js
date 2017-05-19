@@ -27,6 +27,8 @@ import {
 const WEBGL_OVERSAMPLING_RATIO = 2;
 const PIXEL_RATIO = getPixelRatio();
 
+// TODO: test the color pixel map for hover
+
 /**
  * Main class.
  *
@@ -69,7 +71,7 @@ export default class WebGLRenderer extends Renderer {
     // Initializing contexts
     this._initContext('edges');
     this._initContext('nodes');
-    this._initContext('mouse');
+    this._initContext('mouse', false);
 
     // Initial resize
     this.resize();
@@ -265,12 +267,11 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   clear() {
-    for (const id in this.contexts) {
-      const context = this.contexts[id];
+    let context = this.contexts.nodes;
+    context.clear(context.COLOR_BUFFER_BIT);
 
-      context.clear(context.COLOR_BUFFER_BIT);
-      context.clear(context.COLOR_BUFFER_BIT);
-    }
+    context = this.contexts.edges;
+    context.clear(context.COLOR_BUFFER_BIT);
 
     return this;
   }
@@ -294,11 +295,10 @@ export default class WebGLRenderer extends Renderer {
 
     const translation = mat3.fromTranslation(mat3.create(), [
       this.width / 2,
-      this.height / 2,
-      0
+      this.height / 2
     ]);
 
-    mat3.multiply(cameraMatrix, cameraMatrix, translation);
+    mat3.multiply(cameraMatrix, translation, cameraMatrix);
 
     let program,
         gl;

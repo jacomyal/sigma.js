@@ -26,7 +26,10 @@ const DRAG_TIMEOUT = 200,
       MOUSE_INERTIA_DURATION = 200,
       MOUSE_INERTIA_RATIO = 3,
       MOUSE_ZOOM_DURATION = 200,
-      ZOOMING_RATIO = 1.7;
+      ZOOMING_RATIO = 1.7,
+      DOUBLE_CLICK_TIMEOUT = 300,
+      DOUBLE_CLICK_ZOOMING_RATIO = 2.2,
+      DOUBLE_CLICK_ZOOMING_DURATION = 200;
 
 /**
  * Mouse captor class.
@@ -52,6 +55,8 @@ export default class MouseCaptor extends Captor {
     this.movingTimeout = null;
     this.startCameraState = null;
     this.lastCameraState = null;
+    this.clicks = 0;
+    this.doubleClickTimeout = null;
 
     // Binding methods
     this.handleClick = this.handleClick.bind(this);
@@ -59,6 +64,7 @@ export default class MouseCaptor extends Captor {
     this.handleUp = this.handleUp.bind(this);
     this.handleMove = this.handleMove.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
+    this.handleOut = this.handleOut.bind(this);
 
     // Binding events
     container.addEventListener('click', this.handleClick, false);
@@ -66,12 +72,64 @@ export default class MouseCaptor extends Captor {
     container.addEventListener('mousemove', this.handleMove, false);
     container.addEventListener('DOMMouseScroll', this.handleWheel, false);
     container.addEventListener('mousewheel', this.handleWheel, false);
+    container.addEventListener('mouseout', this.handleOut, false);
 
     document.addEventListener('mouseup', this.handleUp, false);
   }
 
-  handleClick() {
+  handleClick(e) {
+    if (!this.enabled)
+      return;
 
+    this.clicks++;
+
+    if (this.clicks === 2) {
+      this.clicks = 0;
+
+      clearTimeout(this.doubleClickTimeout);
+      this.doubleClickTimeout = null;
+
+      return this.handleDoubleClick(e);
+    }
+
+    setTimeout(() => {
+      this.clicks = 0;
+      this.doubleClickTimeout = null;
+    }, DOUBLE_CLICK_TIMEOUT);
+  }
+
+  handleDoubleClick(e) {
+    if (!this.enabled)
+      return;
+
+    const ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
+
+    const center = getCenter(e);
+
+    const cameraState = this.camera.getState();
+
+    const position = this.camera.getPosition(
+      getX(e) - center.x,
+      getY(e) - center.y
+    );
+
+    this.camera.animate({
+      x: position.x * (1 - ratio) + cameraState.x,
+      y: position.y * (1 - ratio) + cameraState.y,
+      ratio: ratio * cameraState.ratio
+    }, {
+      easing: 'quadraticInOut',
+      duration: DOUBLE_CLICK_ZOOMING_DURATION
+    });
+
+    if (e.preventDefault)
+      e.preventDefault();
+    else
+      e.returnValue = false;
+
+    e.stopPropagation();
+
+    return false;
   }
 
   handleDown(e) {
@@ -103,8 +161,10 @@ export default class MouseCaptor extends Captor {
 
     this.isMouseDown = false;
 
-    if (this.movingTimeout)
+    if (this.movingTimeout) {
+      this.movingTimeout = null;
       clearTimeout(this.movingTimeout);
+    }
 
     const x = getX(e),
           y = getY(e);
@@ -145,6 +205,7 @@ export default class MouseCaptor extends Captor {
         clearTimeout(this.movingTimeout);
 
       this.movingTimeout = setTimeout(() => {
+        this.movingTimeout = null;
         this.isMoving = false;
       }, DRAG_TIMEOUT);
 
@@ -194,11 +255,33 @@ export default class MouseCaptor extends Captor {
 
     const center = getCenter(e);
 
+    const cameraState = this.camera.getState();
+
     const position = this.camera.getPosition(
       getX(e) - center.x,
       getY(e) - center.y
     );
 
-    // TODO: zoomTo helper
+    this.camera.animate({
+      x: position.x * (1 - ratio) + cameraState.x,
+      y: position.y * (1 - ratio) + cameraState.y,
+      ratio: ratio * cameraState.ratio
+    }, {
+      easing: 'quadraticOut',
+      duration: MOUSE_ZOOM_DURATION
+    });
+
+    if (e.preventDefault)
+      e.preventDefault();
+    else
+      e.returnValue = false;
+
+    e.stopPropagation();
+
+    return false;
+  }
+
+  handleOut() {
+    // TODO: dispatch event
   }
 }
