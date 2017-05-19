@@ -16,7 +16,8 @@ import {
   getX,
   getY,
   getCenter,
-  getWheelDelta
+  getWheelDelta,
+  getMouseCoords
 } from './utils';
 
 /**
@@ -96,6 +97,8 @@ export default class MouseCaptor extends Captor {
       this.clicks = 0;
       this.doubleClickTimeout = null;
     }, DOUBLE_CLICK_TIMEOUT);
+
+    this.emit('click', getMouseCoords(e));
   }
 
   handleDoubleClick(e) {

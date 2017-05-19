@@ -20,7 +20,8 @@ import {
 } from '../utils';
 
 import {
-  matrixFromCamera
+  matrixFromCamera,
+  extractPixelColor
 } from './utils';
 
 /**
@@ -148,6 +149,16 @@ export default class WebGLRenderer extends Renderer {
     this.captors = {
       mouse: new MouseCaptor(this.elements.mouse, this.camera)
     };
+
+    // this.captors.mouse.on('click', e => {
+    //   const gl = this.contexts.nodes;
+
+    //   const color = extractPixelColor(
+    //     gl,
+    //     e.clientX * WEBGL_OVERSAMPLING_RATIO,
+    //     gl.drawingBufferHeight - e.clientY * WEBGL_OVERSAMPLING_RATIO
+    //   );
+    // });
 
     // Initializing our byte arrays
     const nodeProgram = this.nodePrograms.def;
