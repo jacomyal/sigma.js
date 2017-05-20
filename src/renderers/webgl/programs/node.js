@@ -62,6 +62,7 @@ export default class NodeProgram extends Program {
 
     const buffer = gl.createBuffer();
 
+    // TODO: might be possible not to buffer data each time if only the camera changes
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 

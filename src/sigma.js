@@ -48,6 +48,8 @@ export default class Sigma {
 
     // TODO: should store normalized display information as a flat array with
     // standard indices to save up some RAM & computation
+
+    // TODO: should we use an iterator?
   }
 
   /**---------------------------------------------------------------------------
