@@ -16,6 +16,9 @@
     var color = edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
+        overlay = edge['overlay'] || size+2,
+        percent = edge['percent'] || 0,
+	partial = !!edge['partial'],
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor');
@@ -33,17 +36,34 @@
           break;
       }
 
+    var dx = (target[prefix + 'x'] - source[prefix + 'x']) / 100;
+    var dy = (target[prefix + 'y'] - source[prefix + 'y']) / 100;
+
     context.strokeStyle = color;
-    context.lineWidth = size;
+    if (!partial) {
+	context.lineWidth = size;
+	context.beginPath();
+	context.moveTo(
+	  source[prefix + 'x'],
+	  source[prefix + 'y']
+	);
+	context.lineTo(
+	  target[prefix + 'x'],
+	  target[prefix + 'y']
+	);
+	context.stroke();
+    }
+    context.lineWidth = overlay;
     context.beginPath();
     context.moveTo(
       source[prefix + 'x'],
       source[prefix + 'y']
     );
     context.lineTo(
-      target[prefix + 'x'],
-      target[prefix + 'y']
+      source[prefix + 'x'] + (dx * percent),
+      source[prefix + 'y'] + (dy * percent)
     );
     context.stroke();
   };
+
 })();

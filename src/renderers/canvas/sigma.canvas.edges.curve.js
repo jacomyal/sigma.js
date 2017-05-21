@@ -16,6 +16,9 @@
     var color = edge.color,
         prefix = settings('prefix') || '',
         size = edge[prefix + 'size'] || 1,
+        overlay = edge['overlay'] || size+2,
+	percent = edge['percent'] || 0,
+	partial = !!edge['partial'],
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
@@ -43,15 +46,49 @@
           break;
       }
 
+    function drawQuadratic() {
+	for (var i = 0;i<percent; i++) {
+		var p = sigma.utils.getPointOnQuadraticCurve(i/100, sX, sY, tX, tY, cp.x, cp.y);
+		context.lineTo(p.x, p.y);
+	}
+    }
+
+    function drawBezier() {
+	for (var i = 0; i<percent; i++) {
+		var p = sigma.utils.getPointOnBezierCurve(i/100, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2);
+		context.lineTo(p.x, p.y);
+	}
+    }
+
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
     context.moveTo(sX, sY);
     if (source.id === target.id) {
-      context.bezierCurveTo(cp.x1, cp.y1, cp.x2, cp.y2, tX, tY);
+      if (!partial) {
+	context.bezierCurveTo(cp.x1, cp.y1, cp.x2, cp.y2, tX, tY);
+	context.stroke();
+      }
+      context.lineWidth = overlay;
+      context.beginPath();
+      context.moveTo(sX, sY);
+      drawBezier();
     } else {
-      context.quadraticCurveTo(cp.x, cp.y, tX, tY);
+      if (!partial) {
+	context.quadraticCurveTo(cp.x, cp.y, tX, tY);
+	context.stroke();
+      }
+      context.lineWidth = overlay;
+      context.beginPath();
+      context.moveTo(sX, sY);
+      drawQuadratic();
     }
     context.stroke();
+//    if (source.id === target.id) {
+//      context.bezierCurveTo(cp.x1, cp.y1, cp.x2, cp.y2, tX, tY);
+//    } else {
+//      context.quadraticCurveTo(cp.x, cp.y, tX, tY);
+//    }
+//    context.stroke();
   };
 })();

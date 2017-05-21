@@ -16,17 +16,20 @@
     function(edge, source, target, context, settings) {
     var color = edge.color,
         prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1,
+        overlay = edge['overlay'] || size+2,
+        percent = edge['percent'] || 0,
+	partial = !!edge['partial'],
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
         cp = {},
-        size = edge[prefix + 'size'] || 1,
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
-        aSize = Math.max(size * 2.5, settings('minArrowSize')),
+        aSize = Math.max(size * 4.5, settings('minArrowSize')),
         d,
         aX,
         aY,
@@ -64,7 +67,7 @@
           color = defaultEdgeColor;
           break;
       }
-
+/*
     context.strokeStyle = color;
     context.lineWidth = size;
     context.beginPath();
@@ -84,5 +87,84 @@
     context.lineTo(aX + vX, aY + vY);
     context.closePath();
     context.fill();
+*/
+
+    function drawQuadratic() {
+	var p;
+	for (var i = 0;i<percent; i++) {
+		p = sigma.utils.getPointOnQuadraticCurve(i/100, sX, sY, tX, tY, cp.x, cp.y);
+		context.lineTo(p.x, p.y);
+	}
+	return p;
+    }
+
+    function drawBezier() {
+	var p;
+	for (var i = 0; i<percent; i++) {
+		p = sigma.utils.getPointOnBezierCurve(i/100, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2);
+		context.lineTo(p.x, p.y);
+	}
+	return p;
+    }
+
+    var pt;
+
+    context.strokeStyle = color;
+    context.lineWidth = size;
+
+    context.fillStyle = color;
+    if (!partial) {
+	context.beginPath();
+	context.moveTo(aX + vX, aY + vY);
+	context.lineTo(aX + vY * 0.6, aY - vX * 0.6);
+	context.lineTo(aX - vY * 0.6, aY + vX * 0.6);
+	context.lineTo(aX + vX, aY + vY);
+	context.closePath();
+	context.fill();
+    }
+
+    context.beginPath();
+    context.moveTo(sX, sY);
+    if (source.id === target.id) {
+      if (!partial) {
+	context.bezierCurveTo(cp.x1, cp.y1, cp.x2, cp.y2, tX, tY);
+	context.stroke();
+      }
+      context.lineWidth = overlay;
+      context.beginPath();
+      context.moveTo(sX, sY);
+      pt = drawBezier();
+//      d = Math.sqrt(Math.pow(pt.x - cp.x1, 2) + Math.pow(pt.y - cp.y1, 2));
+//      aX = cp.x1 + (pt.x - cp.x1) * (d - aSize - tSize) / d;
+//      aY = cp.y1 + (pt.y - cp.y1) * (d - aSize - tSize) / d;
+//      vX = (pt.x - cp.x1) * aSize / d;
+//      vY = (pt.y - cp.y1) * aSize / d;
+    } else {
+      if (!partial) {
+	context.quadraticCurveTo(cp.x, cp.y, tX, tY);
+	context.stroke();
+      }
+      context.lineWidth = overlay;
+      context.beginPath();
+      context.moveTo(sX, sY);
+      pt = drawQuadratic();
+//      d = Math.sqrt(Math.pow(pt.x - cp.x, 2) + Math.pow(pt.y - cp.y, 2));
+//      aX = cp.x + (pt.x - cp.x) * (d - aSize - tSize) / d;
+//      aY = cp.y + (pt.y - cp.y) * (d - aSize - tSize) / d;
+//      vX = (pt.x - cp.x) * aSize / d;
+//      vY = (pt.y - cp.y) * aSize / d;
+    }
+    context.stroke();
+
+//----------------TODO---------------------
+//--------Draw the arrow head--------------
+//    context.fillStyle = color;
+//    context.beginPath();
+//    context.moveTo(pt.x, pt.y);
+//    context.lineTo(pt.x - vY * 0.6, pt.y + vX * 0.6);
+//    context.lineTo(pt.x + vY * 0.6, pt.y - vX * 0.6);
+//    context.lineTo(pt.x + vX, pt.y + vY);
+//    context.closePath();
+//    context.fill();
   };
 })();

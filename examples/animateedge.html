@@ -1,0 +1,207 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<script src="../plugins/sigma.plugins.animateedge/sigma.plugins.animateedge.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<!-- END SIGMA IMPORTS -->
+<div id="container">
+  <style>
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+  </style>
+  <div id="graph-container"></div>
+</div>
+<script>
+var i,
+    s,
+    c = 0,
+    N = 5,
+    E = 8,
+    g = {
+      nodes: [],
+      edges: []
+    };
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(1, 100),
+    y: Math.random(1, 100),
+    size: 1,
+    color: 'black'
+  });
+
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + (Math.random(1, E) * N | 0),
+    target: 'n' + (Math.random(1, E) * N | 0),
+    percent: 20,
+    size: 1,
+    //overlay: 5,
+    //partial: true,
+    //color: 'blue',
+    type: 'curvedArrow'
+  });
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
+  renderer: {
+    container: 'graph-container',
+    type: 'canvas'
+  },
+  settings: {
+    animationsTime: 1000
+  }
+});
+
+//-----------------------jQuery method---------------------------------------
+/*
+function animate(from, to) {
+	f = {x: from};
+	t = {x: to};	
+	$(f).animate(t, {duration: 5000, 
+		step: function() { 
+			s.graph.edges()[0].percent = this.x;
+			s.refresh(); 
+		}
+	});
+}
+
+$(document).ready(function(){
+	animate(0, 100);
+});
+*/
+
+//-------------------------Plugin method--------------------------------------
+
+//run once
+/*
+sigma.plugins.animateedge(
+  s,
+  {
+    percent: 50
+  },
+  {
+	edges: ['e0','e2'],
+	//easing: 'cubicInOut',
+	//duration: 300,
+	hold: true,
+	onStep: function() {
+		console.log('step...' + c++);
+	},
+	onComplete: function() {
+		c = 0;
+		console.log('Animation complete.');
+	}
+  }
+);
+*/
+//run every 2 seconds
+//Note that sigma instance's {animationsTime} setting or plugins {duration} option must be greater (and not equal)
+//than the interval time.
+/*
+var interval_id = setInterval(function() {
+  sigma.plugins.animateedge(
+    s,
+    {
+      percent: 50
+    },
+    {
+	edges: ['e0','e2'],
+	//easing: 'cubicInOut',
+	//duration: 1500,
+	//hold: false,	
+	onStep: function() {
+		console.log('step...' + c++);
+	},
+	onComplete: function() {
+	//	clearInterval(interval_id);
+		c = 0;
+		console.log('Animation complete.');
+	}
+    }
+  );
+}, 2000);
+*/
+
+//continues animation with 2 seconds interval time
+//Note that sigma instance's {animationsTime} setting or plugins {duration} option must be greater (and not equal)
+//than the interval time.
+var t = 50;
+var interval_id = setInterval(function() {
+  sigma.plugins.animateedge(
+    s,
+    {
+      percent: t
+    },
+    {
+	edges: ['e0','e2'],
+	//easing: 'cubicInOut',
+	//duration: 1500,
+	hold: true,	
+	onStep: function() {
+		//console.log('step...' + c++);
+	},
+	onComplete: function() {
+	//	clearInterval(interval_id);
+		(t == 50) ? t= 20 : t= 50;
+		c = 0;
+		//console.log('Animation complete.');
+	}
+    }
+  );
+}, 1100);
+</script>
