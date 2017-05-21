@@ -77,6 +77,7 @@ module.exports = function(grunt) {
     'parsers.json',
     'pathfinding.astar',
     'plugins.animate',
+    'plugins.animateEdge',
     'plugins.dragNodes',
     'plugins.filter',
     'plugins.neighborhoods',
