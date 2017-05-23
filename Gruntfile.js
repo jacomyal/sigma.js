@@ -7,6 +7,7 @@ module.exports = function(grunt) {
 
     // Utils:
     'src/conrad.js',
+    'src/utils/pointer_events_polyfill.js',
     'src/utils/sigma.utils.js',
     'src/utils/sigma.polyfills.js',
 

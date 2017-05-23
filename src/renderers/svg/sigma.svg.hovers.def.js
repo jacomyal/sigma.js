@@ -67,6 +67,7 @@
           Math.round(node[prefix + 'x'] + size + 3));
         text.setAttributeNS(null, 'y',
           Math.round(node[prefix + 'y'] + fontSize / 3));
+        text.setAttributeNS(null, 'pointer-events', 'none');
 
         // Measures
         // OPTIMIZE: Find a better way than a measurement canvas
@@ -88,6 +89,7 @@
         circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
         circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
         circle.setAttributeNS(null, 'r', e);
+        circle.setAttributeNS(null, 'pointer-events', 'none');
 
         // Rectangle
         rectangle.setAttributeNS(
@@ -99,6 +101,7 @@
         rectangle.setAttributeNS(null, 'y', node[prefix + 'y'] - e);
         rectangle.setAttributeNS(null, 'width', w);
         rectangle.setAttributeNS(null, 'height', h);
+        rectangle.setAttributeNS(null, 'pointer-events', 'none');
       }
 
       // Appending childs

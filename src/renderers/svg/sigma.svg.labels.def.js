@@ -36,6 +36,7 @@
       text.setAttributeNS(null, 'font-size', fontSize);
       text.setAttributeNS(null, 'font-family', settings('font'));
       text.setAttributeNS(null, 'fill', fontColor);
+      text.setAttributeNS(null, 'pointer-events', 'none');
 
       text.innerHTML = node.label;
       text.textContent = node.label;
