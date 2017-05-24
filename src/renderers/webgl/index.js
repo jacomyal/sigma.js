@@ -30,10 +30,21 @@ import {
 const WEBGL_OVERSAMPLING_RATIO = 2;
 const PIXEL_RATIO = getPixelRatio();
 
+// TODO: autorescale should be a factory function with dimensions and boundaries => conversion (can use the camera)
+
 // TODO: test the color pixel map for hover, or a raycaster
 // TODO: check bufferSubData
 // TODO: possibility to bypass need for quadtree when every node fits in
 // TODO: rescale layout
+
+// TODO: give all the bricks to create your own renderer easily
+// TODO: expose the captors etc.
+// TODO: drop the ugly _ in method names
+// TODO: show minimalist renderers (canvas for instance), so that anyone may do it
+// TODO: delegate render to renderer avoid refresh on sigma
+// TODO: create a minimalistic renderer using canvas or d3
+
+// TODO: might be possible to use a canvas camera for the canvas renderer
 
 /**
  * Main class.
@@ -75,10 +86,10 @@ export default class WebGLRenderer extends Renderer {
     this.height = 0;
 
     // Initializing contexts
-    this._initContext('edges');
-    this._initContext('nodes');
-    this._initContext('labels', false);
-    this._initContext('mouse', false);
+    this.createContext('edges');
+    this.createContext('nodes');
+    this.createContext('labels', false);
+    this.createContext('mouse', false);
 
     // Initial resize
     this.resize();
@@ -97,13 +108,14 @@ export default class WebGLRenderer extends Renderer {
    */
 
   /**
-   * Internal function used to initialize a context.
+   * Internal function used to create a canvas context and add the relevant
+   * DOM elements.
    *
    * @param  {string}  id    - Context's id.
    * @param  {boolean} webgl - Whether the context is a webgl or canvas one.
    * @return {WebGLRenderer}
    */
-  _initContext(id, webgl = true) {
+  createContext(id, webgl = true) {
     const element = createElement('canvas', {
       class: `sigma-${id}`,
       style: {

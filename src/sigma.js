@@ -9,6 +9,9 @@ import isGraph from 'graphology-utils/is-graph';
 import Camera from './camera';
 import Renderer from './renderer';
 
+// TODO: sigma should only hold the graph and compose state to give to renderer,
+// does it need to orchestrate?
+
 /**
  * Sigma class
  *
@@ -41,15 +44,10 @@ export default class Sigma {
     this.nextFrame = null;
 
     // Binding handlers
-    this._bindCameraHandlers();
+    this.bindCameraHandlers();
 
     // First time refresh
     this.refresh();
-
-    // TODO: should store normalized display information as a flat array with
-    // standard indices to save up some RAM & computation
-
-    // TODO: should we use an iterator?
   }
 
   /**---------------------------------------------------------------------------
@@ -62,9 +60,9 @@ export default class Sigma {
    *
    * @return {Sigma}
    */
-  _bindCameraHandlers() {
+  bindCameraHandlers() {
     this.camera.on('updated', () => {
-      this._scheduleRefresh();
+      this.scheduleRefresh();
     });
   }
 
@@ -73,7 +71,7 @@ export default class Sigma {
    *
    * @return {Sigma}
    */
-  _scheduleRefresh() {
+  scheduleRefresh() {
     if (this.nextFrame)
       return this;
 

@@ -18,6 +18,10 @@ const ANIMATE_DEFAULTS = {
 };
 
 // TODO: animate options = number polymorphism?
+// TODO: pan, zoom, unzoom, reset, rotate, zoomTo
+// TODO: add width / height to camera and add #.resize
+// TODO: bind camera to renderer rather than sigma
+// TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
 
 /**
  * Camera class
@@ -103,6 +107,7 @@ export default class Camera extends EventEmitter {
       this.ratio = state.ratio;
 
     // Emitting
+    // TODO: don't emit if nothing changed?
     this.emit('updated', this.getState());
 
     return this;
@@ -168,5 +173,3 @@ export default class Camera extends EventEmitter {
     this.nextFrame = requestAnimationFrame(fn);
   }
 }
-
-// TODO: pan, zoom, unzoom, reset, rotate, zoomTo

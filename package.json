@@ -34,7 +34,7 @@
     "eslint": "^3.5.0",
     "faker": "^4.1.0",
     "graphology": "^0.10.0",
-    "graphology-generators": "^0.4.3",
+    "graphology-generators": "^0.5.0",
     "graphology-gexf": "^0.3.1",
     "graphology-layout": "0.0.1",
     "graphology-layout-forceatlas2": "0.0.1",
