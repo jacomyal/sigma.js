@@ -222,6 +222,7 @@
         (subrenderers[a[i].type] || subrenderers.def).update(
           a[i],
           this.domElements.labels[a[i].id],
+          this.measurementCanvas,
           embedSettings
         );
       }
@@ -314,6 +315,12 @@
     // Appending measurement canvas
     this.container.appendChild(canvas);
     this.measurementCanvas = canvas.getContext('2d');
+
+    // "proportional" labelSize is not yet supported
+    var fontSize = this.settings('defaultLabelSize');
+    this.measurementCanvas.font = (this.settings('fontStyle') ?
+      this.settings('fontStyle') + ' ' :
+      '') + fontSize + 'px ' + this.settings('font');
   };
 
   /**
