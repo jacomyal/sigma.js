@@ -61,7 +61,7 @@
      *
      * @return A graph object
      */
-    sigma.neo4j.cypher_parse = function(result) {
+    sigma.neo4j.cypher_parse = function(result, producers) {
         var graph = { nodes: [], edges: [] },
             nodesMap = {},
             edgesMap = {},
@@ -73,16 +73,7 @@
             // iteration on graph for all node
             data.graph.nodes.forEach(function (node) {
 
-                var sigmaNode =  {
-                    id : node.id,
-                    label : node.id,
-                    x : Math.random(),
-                    y : Math.random(),
-                    size : 1,
-                    color : '#000000',
-                    neo4j_labels : node.labels,
-                    neo4j_data : node.properties
-                };
+                var sigmaNode = producers.node(node);
 
                 if (sigmaNode.id in nodesMap) {
                     // do nothing
@@ -91,17 +82,10 @@
                 }
             });
 
-            // iteration on graph for all node
+            // iteration on graph for all edges
             data.graph.relationships.forEach(function (edge) {
-                var sigmaEdge =  {
-                    id : edge.id,
-                    label : edge.type,
-                    source : edge.startNode,
-                    target : edge.endNode,
-                    color : '#7D7C8E',
-                    neo4j_type : edge.type,
-                    neo4j_data : edge.properties
-                };
+
+                var sigmaEdge = producers.edge(edge);
 
                 if (sigmaEdge.id in edgesMap) {
                     // do nothing
@@ -137,10 +121,18 @@
      *                                          having parsed the file. It will be called
      *                                          with the related sigma instance as
      *                                          parameter.
+     * @param  {?object}            producers   Factory object with node and/or edge producers functions
+     *                                          By default sigma.neo4j produces black nodes and gray edges.
+     *                                          producers.node(node) takes neo4j node as input,
+     *                                          should output sigma node properties
+     *                                          producers.edge(edge) takes neo4j node as input,
+     *                                          should output sigma edge properties
      */
-    sigma.neo4j.cypher = function (neo4j, cypher, sig, callback) {
+    sigma.neo4j.cypher = function (neo4j, cypher, sig, callback, producers) {
         var endpoint = '/db/data/transaction/commit',
             data, cypherCallback;
+
+        if(!producers) producers = sigma.neo4j.defaultProducers;
 
         // Data that will be send to the server
         data = JSON.stringify({
@@ -160,7 +152,7 @@
 
                 var graph = { nodes: [], edges: [] };
 
-                graph = sigma.neo4j.cypher_parse(response);
+                graph = sigma.neo4j.cypher_parse(response, producers);
 
                 // Update the instance's graph:
                 if (sig instanceof sigma) {
@@ -213,6 +205,38 @@
         sigma.neo4j.send(neo4j, '/db/data/relationship/types', 'GET', null, callback);
     };
 
-}).call(this);
+    /**
+     * This object consist of sigma node and endge producers based on neo4j data node.
+     *
+     * @param  {object}       node   node(neo4j_node): sigma_node, where  neo4j_node = {id, label, properties}
+     * @param  {object}       edge   edge(neo4j_edge): sigma_edge, where  neo4j_edge = {id, type, startNode, endNode, properties}
+     *
+     * @return Sigma data object for node or edge
+     */
+    sigma.neo4j.defaultProducers = {
+        node: function(node) {
+            return {
+                id : node.id,
+                label : node.id,
+                x : Math.random(),
+                y : Math.random(),
+                size : 1,
+                color : '#666666',
+                neo4j_labels : node.labels,
+                neo4j_data : node.properties
+            }
+        },
+        edge: function(edge) {
+            return {
+                id : edge.id,
+                label : edge.type,
+                source : edge.startNode,
+                target : edge.endNode,
+                color : '#7D7C8E',
+                neo4j_type : edge.type,
+                neo4j_data : edge.properties
+            }
+        }
+    }
 
-    
+}).call(window);

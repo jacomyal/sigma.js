@@ -68,6 +68,8 @@ module.exports = function(grunt) {
   var npmJsFiles = coreJsFiles.slice(0);
   npmJsFiles.splice(2, 0, 'src/sigma.export.js');
 
+  var plugins_require = "plugins/sigma.plugins.require.js";
+
   var plugins = [
     'exporters.svg',
     'layout.forceAtlas2',
@@ -165,6 +167,13 @@ module.exports = function(grunt) {
       require: {
         src: npmJsFiles,
         dest: 'build/sigma.require.js'
+      },
+      plugins_require: {
+        files: pluginFiles.reduce(function(res, path) {
+          var dest = 'build/' + path.replace(/\/\*\*\/\*\.js$/, '.require.js');
+          res[dest] = [plugins_require, path];
+          return res;
+        }, {})
       }
     },
     sed: {
@@ -198,7 +207,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify']);
   grunt.registerTask('release', ['closureLint', 'jshint', 'qunit', 'sed', 'grunt', 'uglify', 'zip']);
   grunt.registerTask('npmPrePublish', ['uglify:plugins', 'grunt', 'concat:require']);
-  grunt.registerTask('build', ['uglify', 'grunt', 'concat:require']);
+  grunt.registerTask('build', ['uglify', 'grunt', 'concat:require', 'concat:plugins_require']);
   grunt.registerTask('test', ['qunit']);
 
   // For travis-ci.org, only launch tests:

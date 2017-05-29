@@ -1126,4 +1126,4 @@
 
     sigma.prototype.getForceAtlas2Worker = getWorkerFn;
   }
-}).call(this);
+}).call(window);
