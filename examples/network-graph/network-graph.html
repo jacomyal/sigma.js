@@ -1,0 +1,293 @@
+<script src="../../build/sigma.min.js"></script>
+<script src="../../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<script   src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="./graph-components.js"></script>
+
+<link rel="stylesheet" type="text/css" href="./network-graph.css"></link>
+
+
+<div id="container">
+  <div id="graph-container"></div>
+  <div class="dropdown">
+    <button onclick="filterNodesByColor()" class="dropbtn">Type</button>
+    <div id="color-dropdown" class="dropdown-content">
+      <a class="color" href="#">user</a>
+      <a class="color" href="#">endDevice</a>
+      <a class="color" href="#">service</a>
+      <a class="color" href="#">router</a>
+      <a class="color" href="#">switch</a>
+      <a class="color" href="#">location</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button onclick="filterNodesByDegree()" class="dropbtn">Degree</button>
+    <div id="degree-dropdown" class="dropdown-content">
+      <a class="degree" href="#">0</a>
+      <a class="degree" href="#">1</a>
+      <a class="degree" href="#">2</a>
+      <a class="degree" href="#">3</a>
+      <a class="degree" href="#">4</a>
+      <a class="degree" href="#">5</a>
+      <a class="degree" href="#">6</a>
+      <a class="degree" href="#">7</a>
+      <a class="degree" href="#">8</a>
+      <a class="degree" href="#">9</a>
+    </div>
+  </div>
+  <div class="dropdown">
+    <button onclick="resetGraph()" class="dropbtn">Reset</button>
+  </div>
+  <div class="dropdown">
+    <button onclick="addNode()" class="dropbtn">Add Node</button>
+  </div>
+</div>
+<script type="text/javascript">
+	function filterNodesByColor() {
+	    document.getElementById("color-dropdown").classList.toggle("show");
+	}
+	function filterNodesByDegree() {
+		document.getElementById("degree-dropdown").classList.toggle("show");
+	}
+	window.onclick = function(event) {
+	  if (!event.target.matches('.dropbtn')) {
+	    var dropdowns = $(".dropdown-content");
+	    var i;
+	    for (i = 0; i < dropdowns.length; i++) {
+	      var openDropdown = dropdowns[i];
+	      if (openDropdown.classList.contains('show')) {
+	        openDropdown.classList.remove('show');
+	      }
+	    }
+	  }
+	}
+</script>
+<script type="text/javascript">
+sigma.canvas.nodes.image = (function() {
+  var _cache = {},
+      _loading = {},
+      _callbacks = {};
+  // Return the renderer itself:
+  var renderer = function(node, context, settings) {
+    var args = arguments,
+        prefix = settings('prefix') || '',
+        size = node[prefix + 'size'],
+        color = node.color || settings('defaultNodeColor'),
+        url = node.url;
+    if (_cache[url]) {
+      context.save();
+      // Draw the clipping disc:
+      context.beginPath();
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'],
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.closePath();
+      context.clip();
+      // Draw the image
+      context.drawImage(
+        _cache[url],
+        node[prefix + 'x'] - size,
+        node[prefix + 'y'] - size,
+        2 * size,
+        2 * size
+      );
+      // Quit the "clipping mode":
+      context.restore();
+      // Draw the border:
+      context.beginPath();
+      context.arc(
+        node[prefix + 'x'],
+        node[prefix + 'y'],
+        node[prefix + 'size'],
+        0,
+        Math.PI * 2,
+        true
+      );
+      context.lineWidth = size / 5;
+      context.strokeStyle = node.color || settings('defaultNodeColor');
+      context.stroke();
+    } else {
+      sigma.canvas.nodes.image.cache(url);
+      sigma.canvas.nodes.def.apply(
+        sigma.canvas.nodes,
+        args
+      );
+    }
+  };
+  // Let's add a public method to cache images, to make it possible to
+  // preload images before the initial rendering:
+  renderer.cache = function(url, callback) {
+    if (callback)
+      _callbacks[url] = callback;
+    if (_loading[url])
+      return;
+    var img = new Image();
+    img.onload = function() {
+      _loading[url] = false;
+      _cache[url] = img;
+      if (_callbacks[url]) {
+        _callbacks[url].call(this, img);
+        delete _callbacks[url];
+      }
+    };
+    _loading[url] = true;
+    img.src = url;
+  };
+  return renderer;
+})();
+
+/*
+Setting up variables for random graph generation.
+These will normally not be here and will be provided by the developer
+as either properties on the nodes/edges or read from the API/s
+*/
+// sigma.utils.pkg('sigma.canvas.nodes');
+
+	var i,
+	    N = 100,
+	    E = 50,
+	    data = {
+	    	nodes: [],
+	    	edges: []
+	    },
+	    colors = {
+	    	'1': 'red',
+	    	'2': 'orange',
+	    	'3': 'yellow',
+	    	'4': 'green',
+	    	'5': 'blue',
+	    	'6': 'purple',
+	    	'7': 'black',
+	    	'8': 'grey',
+	    	'9': 'steelblue',
+	    	'10': 'fuchsia'
+	    },
+	    urls = [
+	      '../img/img1.png',
+	      '../img/img2.png',
+	      '../img/img3.png',
+	      '../img/img4.png'
+	    ],
+	    nodeTypes = [
+	    	"user",
+	    	"endDevice",
+	    	"service",
+	    	"router",
+	    	"switch",
+	    	"location"
+	    ];
+	    var j = 0;
+	for (i = 0; i < N; i++){
+		data.nodes.push({
+			label: String(Math.floor(Math.random() * (11 - 1) + 1)),
+			title: 'Node ' + i,
+			id: `n${i}`,
+			nodeType: nodeTypes[Math.floor(Math.random() * (6))],
+			type: 'image',
+			x: Math.random(),
+			y: Math.random(),
+			color: colors[String(Math.floor(Math.random() * (11 - 1) + 1))],
+			size: Math.random()*10,
+			url: urls[Math.floor(Math.random() * urls.length)]
+		});
+	};
+	for (i = 0; i < E; i++){
+		data.edges.push({
+			source: `n${(Math.random()*N|0)}`,
+			target: `n${(Math.random()*N|0)}`,
+			id: `e${i}`,
+			label: Math.floor(Math.random() * (11 - 1) + 1),
+			type: 'line'
+		});
+	};
+
+	var customSettings = {
+		drawLabels: false,
+		drawEdges: false,
+		nodesPowerRatio: 10,
+		hideEdgesOnMove: true,
+		minNodeSize: 15,
+		doubleClickEnabled: false
+	}
+
+	var providerFunctions = {
+		"user": {
+			"properties": {},
+			"events": {
+				'clickNode': function(e){
+					console.log('e from user clickNode', e)
+				}
+			}
+		},
+		"endDevice": {
+			"properties": {},
+			"events": {
+				'clickNode': function(e){
+					console.log('e from endDevice clickNode', e)
+				}
+			}
+		}
+	}
+
+	var s = new GraphFactory(data.nodes, data.edges, customSettings, providerFunctions);
+
+	var noOverlap = s.graph.configNoverlap({
+		nodeMargin: 0.5,
+		scaleNodes: 1.05,
+		gridSize: 75,
+		easing: 'quadraticInOut', 
+		duration: 100
+	});
+
+	noOverlap.bind('start stop interpolate', function(e) {
+	  console.log(e.type);
+	  if(e.type === 'start') {
+	    console.time('noverlap');
+	  }
+	  if(e.type === 'interpolate') {
+	    console.timeEnd('noverlap');
+	  }
+	  if(e.type === 'stop'){
+	  	s.graph.settings({
+	  		drawEdges: true
+	  	});
+	  	s.graph.refresh();
+	  }
+	});
+
+	s.graph.startForceAtlas2({
+		worker: true,
+		barnesHutOptimize: false
+	});
+	setTimeout(function(){
+		s.graph.stopForceAtlas2()
+		s.graph.startNoverlap();
+	}, 5000)
+
+	var filter = s.filter;
+	function resetGraph() {
+		filter.undo().apply();
+	}
+	$('a.color').click(function(e){
+		filter
+		.undo()
+		.nodesBy(function(n){
+			return n.nodeType === e.target.innerHTML;
+		}, 'color-filter')
+		.apply();
+	});
+	$('a.degree').click(function(e){
+		filter
+		.undo()
+		.nodesBy(function(n){
+			return this.degree(n.id) === parseInt(e.target.innerHTML);
+		}, "degree-filter")
+		.apply();
+	})
+</script>

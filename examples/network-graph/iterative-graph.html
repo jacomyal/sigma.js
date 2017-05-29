@@ -1,0 +1,181 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../../src/sigma.core.js"></script>
+<script src="../../src/conrad.js"></script>
+<script src="../../src/utils/sigma.utils.js"></script>
+<script src="../../src/utils/sigma.polyfills.js"></script>
+<script src="../../src/sigma.settings.js"></script>
+<script src="../../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../../src/classes/sigma.classes.configurable.js"></script>
+<script src="../../src/classes/sigma.classes.graph.js"></script>
+<script src="../../src/classes/sigma.classes.camera.js"></script>
+<script src="../../src/classes/sigma.classes.quad.js"></script>
+<script src="../../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../../src/captors/sigma.captors.mouse.js"></script>
+<script src="../../src/captors/sigma.captors.touch.js"></script>
+<script src="../../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../../src/renderers/sigma.renderers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../../src/misc/sigma.misc.animation.js"></script>
+<script src="../../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- needed for no overlap layout -->
+<script src="../../plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+<script src="../../plugins/sigma.layout.noverlap/sigma.layout.noverlap.js"></script>
+<!-- end of no overlap specific requirements -->
+<!-- need for force layout -->
+<script src="../../plugins/sigma.layout.forceAtlas2/worker.js"></script>
+<script src="../../plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+<!-- end of force layout specific requirements -->
+<!-- custom shape/image for nodes -->
+<script src="../../plugins/sigma.renderers.customShapes/shape-library.js"></script>
+<script src="../../plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
+<!-- end of custom shape/image specific requirements -->
+<script src="../../plugins/sigma.plugins.filter/sigma.plugins.filter.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
+<!-- Import jQuery and d3 -->
+<script   src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+
+<!-- Custom style and scripts -->
+<link rel="stylesheet" type="text/css" href="./network-graph.css"></link>
+<script type="text/javascript" src="./graph-components.js"></script>
+<div id="container">
+  <div id="graph-container"></div>
+<div class="dropdown">
+  <button onclick="startForce()" class="dropbtn">Start Force</button>
+</div>
+<div class="dropdown">
+  <button onclick="stopForce()" class="dropbtn">Stop Force</button>
+</div>
+<div class="dropdown">
+  <button onclick="fixOverlap()" class="dropbtn">Fix Overlap</button>
+</div>
+</div>
+<script type="text/javascript">
+
+var i = 0;
+var data = {
+    	nodes: [{
+    		label: "user",
+    		nodeType: 'user',
+    		title: "jimmywi",
+    		id: i++,
+    		x: Math.random(),
+    		y: Math.random(),
+    		size: Math.random(),
+    		clicked: false,
+    		depth: 0
+
+    	}],
+    	edges: []
+    };
+
+
+var customSettings = {
+	nodesPowerRatio: 10,
+	hideEdgesOnMove: true,
+	minNodeSize: 8,
+	maxNodeSize: 20,
+	doubleClickEnabled: true
+}
+
+var providerFunctions = {
+	"user": {
+		"properties": {},
+		"events": {
+			'clickNode': function(e){
+				addNodes(e.data.node);
+			}
+		}
+	}
+}
+
+var s = new GraphFactory(data.nodes, data.edges, customSettings, providerFunctions);
+
+var addNodes = function(n){
+	if(n.clicked === false){
+		for(let j=0; j<11; j++){
+			s.graph.graph.addNode({
+				label: "user",
+				nodeType: 'user',
+				title: "jimmywi",
+				id: `n${i}`,
+				x: n.x + 5 * Math.cos(2 * Math.PI * j / 11),
+				y: n.y + 5 * Math.sin(2 * Math.PI * j / 11),
+				size: Math.random(),
+				clicked: false,
+				depth: n.depth + 1
+			});
+			s.graph.graph.addEdge({
+				target: `n${i}`,
+				source: n.id,
+				id: `e${i++}`,
+				label: Math.floor(Math.random() * (11 - 1) + 1),
+				type: 'line'
+			})
+			n.clicked = true;
+		}
+		s.graph.refresh();
+	}
+}
+
+var startForce = function(){
+	console.log('starting force layout')
+	s.graph.startForceAtlas2();
+};
+var stopForce = function(){
+	console.log('stopping force layout')
+	s.graph.stopForceAtlas2()
+}
+var fixOverlap = function(){
+	let noOverlap = s.graph.configNoverlap({
+		nodeMargin: 0.5,
+		scaleNodes: 1.05,
+		gridSize: 75,
+		easing: 'quadraticInOut', 
+		duration: 100
+	});
+	s.graph.startNoverlap();
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
