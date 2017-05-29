@@ -62,7 +62,7 @@
      * @return A graph object
      */
     sigma.neo4j.cypher_parse = function(result) {
-        var graph = { nodes: [], edges: [] },
+        var graph = { nodes: [], edges: [], rows: [] },
             nodesMap = {},
             edgesMap = {},
             key;
@@ -110,6 +110,10 @@
                 }
             });
 
+            data.row.forEach(function(row){
+              graph.rows.push(row) ;
+            });
+
         });
 
         // construct sigma nodes
@@ -147,7 +151,7 @@
             "statements": [
                 {
                     "statement": cypher,
-                    "resultDataContents": ["graph"],
+                    "resultDataContents": ["graph","row"],
                     "includeStats": false
                 }
             ]
@@ -214,5 +218,3 @@
     };
 
 }).call(this);
-
-    
