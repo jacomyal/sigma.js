@@ -57,13 +57,13 @@ sigmaInstance.isForceAtlas2Running();
 
 *Algorithm configuration*
 
-* **linLogMode**: *boolean* `false`
+* **linLogMode** *boolean* `false`: switch ForceAtlas' model from lin-lin to lin-log (tribute to Andreas Noack). Makes clusters more tight.
 * **outboundAttractionDistribution** *boolean* `false`
 * **adjustSizes** *boolean* `false`
-* **edgeWeightInfluence** *number* `0`
-* **scalingRatio** *number* `1`
+* **edgeWeightInfluence** *number* `0`: how much influence you give to the edges weight. 0 is "no influence" and 1 is "normal".
+* **scalingRatio** *number* `1`: how much repulsion you want. More makes a more sparse graph.
 * **strongGravityMode** *boolean* `false`
-* **gravity** *number* `1`
+* **gravity** *number* `1`: attracts nodes to the center. Prevents islands from drifting away.
 * **barnesHutOptimize** *boolean* `true`: should we use the algorithm's Barnes-Hut to improve repulsion's scalability (`O(n²)` to `O(nlog(n))`)? This is useful for large graph but harmful to small ones.
 * **barnesHutTheta** *number* `0.5`
 * **slowDown** *number* `1`
