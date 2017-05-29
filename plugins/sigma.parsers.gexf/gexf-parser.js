@@ -548,4 +548,4 @@
 
   if (typeof exports !== 'undefined' && this.exports !== exports)
     module.exports = this.gexf;
-}).call(this);
+}).call(window);

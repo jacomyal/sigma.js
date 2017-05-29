@@ -233,4 +233,4 @@
 
 
 
-}).call(this);
+}).call(window);
