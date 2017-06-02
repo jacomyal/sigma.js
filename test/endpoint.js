@@ -10,4 +10,5 @@ if (util.inspect.defaultOptions)
   util.inspect.defaultOptions.depth = null;
 
 require('./camera.js');
+require('./quadtree.js');
 require('./sigma.js');

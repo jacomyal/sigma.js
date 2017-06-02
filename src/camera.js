@@ -56,9 +56,7 @@ export default class Camera extends EventEmitter {
       x: this.x,
       y: this.y,
       angle: this.angle,
-      ratio: this.ratio,
-      width: this.width,
-      height: this.height,
+      ratio: this.ratio
     };
   }
 
@@ -96,7 +94,6 @@ export default class Camera extends EventEmitter {
           sin = Math.sin(this.angle);
 
     // TODO: this should take a real point not one from offset by the center
-
     return {
       x: (x * cos - y * sin) * this.ratio,
       y: (y * cos + x * sin) * this.ratio
