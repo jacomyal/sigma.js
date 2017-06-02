@@ -31,4 +31,4 @@ const sigma = new Sigma(graph, renderer);
 
 window.graph = graph;
 window.renderer = renderer;
-window.camera = sigma.getCamera();
+window.camera = renderer.camera;

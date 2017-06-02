@@ -29,7 +29,9 @@ const ANIMATE_DEFAULTS = {
  * @constructor
  */
 export default class Camera extends EventEmitter {
-  constructor() {
+  constructor(dimensions) {
+    dimensions = dimensions || {};
+
     super();
 
     // Properties
@@ -37,6 +39,8 @@ export default class Camera extends EventEmitter {
     this.y = 0;
     this.angle = 0;
     this.ratio = 1;
+    this.width = dimensions.width || 0;
+    this.height = dimensions.height || 0;
 
     // State
     this.nextFrame = null;
@@ -52,7 +56,21 @@ export default class Camera extends EventEmitter {
       x: this.x,
       y: this.y,
       angle: this.angle,
-      ratio: this.ratio
+      ratio: this.ratio,
+      width: this.width,
+      height: this.height,
+    };
+  }
+
+  /**
+   * Method used to retrieve the camera's dimensions.
+   *
+   * @return {object}
+   */
+  getDimensions() {
+    return {
+      width: this.width,
+      height: this.height
     };
   }
 
@@ -66,20 +84,42 @@ export default class Camera extends EventEmitter {
   }
 
   /**
-   * Method returning the coordinates of a point from the frame of the
-   * graph to the frame of the camera.
+   * Method returning the coordinates of a point from the display frame to the
+   * graph one.
    *
-   * @param  {number} x The X coordinate of the point in the frame of the graph.
-   * @param  {number} y The Y coordinate of the point in the frame of the graph.
-   * @return {object}   The point coordinates in the frame of the camera.
+   * @param  {number} x The X coordinate.
+   * @param  {number} y The Y coordinate.
+   * @return {object}   The point coordinates in the frame of the graph.
    */
-  getPosition(x, y) {
+  displayToGraph(x, y) {
     const cos = Math.cos(this.angle),
           sin = Math.sin(this.angle);
+
+    // TODO: this should take a real point not one from offset by the center
 
     return {
       x: (x * cos - y * sin) * this.ratio,
       y: (y * cos + x * sin) * this.ratio
+    };
+  }
+
+  /**
+   * Method returning the coordinates of a point from the graph frame to the
+   * display one.
+   *
+   * @param  {number} x The X coordinate.
+   * @param  {number} y The Y coordinate.
+   * @return {object}   The point coordinates in the frame of the display.
+   */
+  graphToDisplay(x, y) {
+    const relCos = Math.cos(this.angle) / this.ratio,
+          relSin = Math.sin(this.angle) / this.ratio,
+          xOffset = (this.width / 2) - this.x * relCos - this.y * relSin,
+          yOffset = (this.height / 2) - this.y * relCos + this.x * relSin;
+
+    return {
+      x: x * relCos + y * relSin + xOffset,
+      y: y * relCos + x * relSin + yOffset
     };
   }
 
@@ -109,6 +149,25 @@ export default class Camera extends EventEmitter {
     // Emitting
     // TODO: don't emit if nothing changed?
     this.emit('updated', this.getState());
+
+    return this;
+  }
+
+  /**
+   * Method used to resize the camera's dimensions.
+   *
+   * @param  {object} dimensions - New dimensions.
+   * @return {Camera}
+   */
+  resize(dimensions) {
+
+    if ('width' in dimensions)
+      this.width = dimensions.width;
+
+    if ('height' in dimensions)
+      this.height = dimensions.height;
+
+    this.emit('resized', this.getDimensions());
 
     return this;
   }

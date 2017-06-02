@@ -4,12 +4,6 @@
  *
  * Sigma's captor dealing with the user's mouse.
  */
-/**
- * Sigma.js Captor Class
- * ======================
- *
- * Abstract class representing a captor like the user's mouse or touch controls.
- */
 import Captor from '../captor';
 
 import {
@@ -111,7 +105,7 @@ export default class MouseCaptor extends Captor {
 
     const cameraState = this.camera.getState();
 
-    const position = this.camera.getPosition(
+    const position = this.camera.displayToGraph(
       getX(e) - center.x,
       getY(e) - center.y
     );
@@ -212,7 +206,7 @@ export default class MouseCaptor extends Captor {
         this.isMoving = false;
       }, DRAG_TIMEOUT);
 
-      const position = this.camera.getPosition(
+      const position = this.camera.displayToGraph(
         getX(e) - this.startMouseX,
         getY(e) - this.startMouseY
       );
@@ -260,7 +254,7 @@ export default class MouseCaptor extends Captor {
 
     const cameraState = this.camera.getState();
 
-    const position = this.camera.getPosition(
+    const position = this.camera.displayToGraph(
       getX(e) - center.x,
       getY(e) - center.y
     );

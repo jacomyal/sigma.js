@@ -7,6 +7,7 @@
 import {mat3} from 'gl-matrix';
 
 import Renderer from '../../renderer';
+import Camera from '../../camera';
 import NodeProgram from './programs/node';
 import EdgeProgram from './programs/edge';
 
@@ -20,8 +21,7 @@ import {
 } from '../utils';
 
 import {
-  matrixFromCamera,
-  extractPixelColor
+  matrixFromCamera
 } from './utils';
 
 /**
@@ -137,6 +137,17 @@ export default class WebGLRenderer extends Renderer {
     return this;
   }
 
+  /**
+   * Function binding camera handlers.
+   *
+   * @return {Sigma}
+   */
+  bindCameraHandlers() {
+    this.camera.on('updated', () => {
+      this.sigma.scheduleRefresh();
+    });
+  }
+
   /**---------------------------------------------------------------------------
    * Public API.
    **---------------------------------------------------------------------------
@@ -152,7 +163,10 @@ export default class WebGLRenderer extends Renderer {
 
     // Binding instance
     this.sigma = sigma;
-    this.camera = sigma.getCamera();
+    this.camera = new Camera({
+      width: this.width,
+      height: this.height
+    });
     this.graph = sigma.getGraph();
 
     const graph = this.graph;
@@ -161,6 +175,9 @@ export default class WebGLRenderer extends Renderer {
     this.captors = {
       mouse: new MouseCaptor(this.elements.mouse, this.camera)
     };
+
+    // Binding camera events
+    this.bindCameraHandlers();
 
     // this.captors.mouse.on('click', e => {
     //   const gl = this.contexts.nodes;
@@ -381,18 +398,14 @@ export default class WebGLRenderer extends Renderer {
     const nodes = this.graph.nodes(),
           context = this.contexts.labels;
 
-    const relCos = Math.cos(cameraState.angle) / cameraState.ratio,
-          relSin = Math.sin(cameraState.angle) / cameraState.ratio,
-          xOffset = (this.width / 2) - cameraState.x * relCos - cameraState.y * relSin,
-          yOffset = (this.height / 2) - cameraState.y * relCos + cameraState.x * relSin,
-          sizeRatio = Math.pow(cameraState.ratio, 0.5);
+    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const data = this.graph.getNodeAttributes(nodes[i]);
 
-      const x = data.x * relCos + data.y * relSin + xOffset,
-            y = data.y * relCos + data.x * relSin + yOffset,
-            size = data.size / sizeRatio;
+      const {x, y} = this.camera.graphToDisplay(data.x, data.y);
+
+      const size = data.size / sizeRatio;
 
       // TODO: this is the label threshold hardcoded
       if (size < 8)

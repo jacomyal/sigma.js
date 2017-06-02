@@ -6,7 +6,6 @@
  * a renderer & camera to display the bound graph on screen.
  */
 import isGraph from 'graphology-utils/is-graph';
-import Camera from './camera';
 import Renderer from './renderer';
 
 // TODO: sigma should only hold the graph and compose state to give to renderer,
@@ -31,7 +30,6 @@ export default class Sigma {
 
     // Properties
     this.graph = graph;
-    this.camera = new Camera();
     this.renderer = renderer;
     this.renderer.bind(this);
 
@@ -43,9 +41,6 @@ export default class Sigma {
     // Internal state
     this.nextFrame = null;
 
-    // Binding handlers
-    this.bindCameraHandlers();
-
     // First time refresh
     this.refresh();
   }
@@ -54,36 +49,6 @@ export default class Sigma {
    * Internals
    **---------------------------------------------------------------------------
    */
-
-  /**
-   * Function binding camera handlers.
-   *
-   * @return {Sigma}
-   */
-  bindCameraHandlers() {
-    this.camera.on('updated', () => {
-      this.scheduleRefresh();
-    });
-  }
-
-  /**
-   * Function used to schedule an update.
-   *
-   * @return {Sigma}
-   */
-  scheduleRefresh() {
-    if (this.nextFrame)
-      return this;
-
-    this.nextFrame = requestAnimationFrame(() => {
-
-      // Resetting state
-      this.nextFrame = null;
-
-      // Refreshing
-      this.refresh();
-    });
-  }
 
   /**---------------------------------------------------------------------------
    * Getters
@@ -112,6 +77,25 @@ export default class Sigma {
    * Drawing
    **---------------------------------------------------------------------------
    */
+
+  /**
+   * Function used to schedule an update.
+   *
+   * @return {Sigma}
+   */
+  scheduleRefresh() {
+    if (this.nextFrame)
+      return this;
+
+    this.nextFrame = requestAnimationFrame(() => {
+
+      // Resetting state
+      this.nextFrame = null;
+
+      // Refreshing
+      this.refresh();
+    });
+  }
 
   /**
    * Method used to refresh display of the graph.
