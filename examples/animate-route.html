@@ -1,0 +1,147 @@
+<!-- START SIGMA IMPORTS -->
+<script src="../src/sigma.core.js"></script>
+<script src="../src/conrad.js"></script>
+<script src="../src/utils/sigma.utils.js"></script>
+<script src="../src/utils/sigma.polyfills.js"></script>
+<script src="../src/sigma.settings.js"></script>
+<script src="../src/classes/sigma.classes.dispatcher.js"></script>
+<script src="../src/classes/sigma.classes.configurable.js"></script>
+<script src="../src/classes/sigma.classes.graph.js"></script>
+<script src="../src/classes/sigma.classes.camera.js"></script>
+<script src="../src/classes/sigma.classes.quad.js"></script>
+<script src="../src/classes/sigma.classes.edgequad.js"></script>
+<script src="../src/captors/sigma.captors.mouse.js"></script>
+<script src="../src/captors/sigma.captors.touch.js"></script>
+<script src="../src/renderers/sigma.renderers.canvas.js"></script>
+<script src="../src/renderers/sigma.renderers.webgl.js"></script>
+<script src="../src/renderers/sigma.renderers.svg.js"></script>
+<script src="../src/renderers/sigma.renderers.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="../src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="../src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="../src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="../src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="../src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="../src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="../src/misc/sigma.misc.animation.js"></script>
+<script src="../src/misc/sigma.misc.bindEvents.js"></script>
+<script src="../src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="../src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="../plugins/sigma.plugins.animateEdge/sigma.plugins.animateEdge.js"></script>
+<script src="../plugins/sigma.plugins.animateEdge/sigma.canvas.edges.arrow.js"></script>
+<script src="../plugins/sigma.plugins.animateEdge/sigma.canvas.edges.curve.js"></script>
+<script src="../plugins/sigma.plugins.animateEdge/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="../plugins/sigma.plugins.animateEdge/sigma.canvas.edges.def.js"></script>
+<div id="container">
+  <style>
+    #graph-container {
+      top: 30px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+  </style>
+  <div id="graph-container"></div>
+</div>
+<input type='button' onclick='draw();' value='draw'>
+<script>
+var i,
+    s,
+    c = 0,
+    N = 5,
+    E = N - 1,
+    g = {
+      nodes: [],
+      edges: []
+    };
+
+// Generate a random graph:
+for (i = 0; i < N; i++)
+  g.nodes.push({
+    id: 'n' + i,
+    label: 'Node ' + i,
+    x: Math.random(1, 100),
+    y: Math.random(1, 100),
+    size: 1,
+    color: 'black'
+  });
+
+// overlay : thickness of overlay part
+// partial : if it should draw the whole edge underneath the overlay animated part
+for (i = 0; i < E; i++)
+  g.edges.push({
+    id: 'e' + i,
+    source: 'n' + i,
+    target: 'n' + (i + 1),
+    percent: 0,
+    size: 1,
+    overlay: 1,
+    partial: true,
+    //color: 'blue',
+    type: 'curvedArrow'
+  });
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
+  renderer: {
+    container: 'graph-container',
+    type: 'canvas'
+  },
+  settings: {
+    //animationsTime: 1000
+  }
+});
+
+i = 0;
+function animate() {
+  sigma.plugins.animateedge(
+    s,
+    {
+      percent: 100
+    },
+    {
+	edges: [g.edges[i].id],
+	//easing: 'cubicInOut',
+	duration: 2000,
+	hold: true,	
+	onStep: function() {
+	},
+	onComplete: function() {
+		s.refresh();
+		if (i < E - 1) { i++; animate(); }
+	}
+    }
+  );
+}
+
+function draw() {
+  if (i == E) {
+	i = 0;
+	s.graph.edges().forEach(function(edge, index, array) { edge.percent = 0; });
+	s.refresh();
+  }
+  animate();
+}
+
+</script>
