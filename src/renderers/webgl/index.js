@@ -101,6 +101,20 @@ export default class WebGLRenderer extends Renderer {
     // Initial resize
     this.resize();
 
+    // Initializing the camera
+    this.camera = new Camera({
+      width: this.width,
+      height: this.height
+    });
+
+    // Binding camera events
+    this.bindCameraHandlers();
+
+    // Initializing captors
+    this.captors = {
+      mouse: new MouseCaptor(this.elements.mouse, this.camera)
+    };
+
     // Loading programs
     for (const k in this.nodePrograms)
       this.nodePrograms[k].load(this.contexts.nodes);
@@ -170,32 +184,11 @@ export default class WebGLRenderer extends Renderer {
 
     // Binding instance
     this.sigma = sigma;
-    this.camera = new Camera({
-      width: this.width,
-      height: this.height
-    });
     this.graph = sigma.getGraph();
 
     const graph = this.graph;
 
-    // Initializing captors
-    this.captors = {
-      mouse: new MouseCaptor(this.elements.mouse, this.camera)
-    };
-
-    // Binding camera events
-    this.bindCameraHandlers();
-
-    // this.captors.mouse.on('click', e => {
-    //   const gl = this.contexts.nodes;
-
-    //   const color = extractPixelColor(
-    //     gl,
-    //     e.clientX * WEBGL_OVERSAMPLING_RATIO,
-    //     gl.drawingBufferHeight - e.clientY * WEBGL_OVERSAMPLING_RATIO
-    //   );
-    // });
-
+    // TODO: this should go into a different #.process method
     // Initializing our byte arrays
     const nodeProgram = this.nodePrograms.def;
 
