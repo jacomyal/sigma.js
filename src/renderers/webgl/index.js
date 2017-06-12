@@ -39,12 +39,19 @@ const PIXEL_RATIO = getPixelRatio();
 
 // TODO: give all the bricks to create your own renderer easily
 // TODO: expose the captors etc.
-// TODO: drop the ugly _ in method names
 // TODO: show minimalist renderers (canvas for instance), so that anyone may do it
 // TODO: delegate render to renderer avoid refresh on sigma
 // TODO: create a minimalistic renderer using canvas or d3
 
 // TODO: might be possible to use a canvas camera for the canvas renderer
+// TODO: camera should be created in the constructor rather than in #.bind
+// TODO: should sigma be the one to refresh?
+// TODO: renderer can be a class or a mere function if needed
+
+// TODO: should not buffer data each time it seems
+// TODO: should react to the graph updates obviously :)
+
+// TODO: we should check the pixel opacity before attempting to use the quad
 
 /**
  * Main class.
@@ -405,6 +412,7 @@ export default class WebGLRenderer extends Renderer {
 
       const {x, y} = this.camera.graphToDisplay(data.x, data.y);
 
+      // TODO: we can cache the labels we need to render until the camera's ratio changes
       const size = data.size / sizeRatio;
 
       // TODO: this is the label threshold hardcoded
