@@ -1,3 +1,4 @@
+/* eslint no-nested-ternary: 0 */
 /**
  * Sigma.js Quad Tree Class
  * =========================
@@ -276,6 +277,7 @@ export default class QuadTree {
       if (this.containers[block])
         nodes.push.apply(nodes, this.containers[block]);
 
+      // TODO: should probably use a do...while to avoid useless last op
       const quad = pointIsInQuad(
         x,
         y,

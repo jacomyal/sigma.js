@@ -4,7 +4,7 @@
  *
  * Function used by the canvas renderer to display a single node's label.
  */
-export default function LabelComponent(context, data) {
+export default function drawLabel(context, data) {
   context.fillStyle = '#000';
   context.font = '14px arial';
 

@@ -11,7 +11,8 @@ import Camera from '../../camera';
 import NodeProgram from './programs/node';
 import EdgeProgram from './programs/edge';
 
-import LabelComponent from '../canvas/components/label';
+import drawLabel from '../canvas/components/label';
+import drawHover from '../canvas/components/hover';
 
 import MouseCaptor from '../../captors/mouse';
 
@@ -36,6 +37,7 @@ const PIXEL_RATIO = getPixelRatio();
 // TODO: check bufferSubData
 // TODO: possibility to bypass need for quadtree when every node fits in
 // TODO: rescale layout
+// TODO: draw hover should be an activable method
 
 // TODO: give all the bricks to create your own renderer easily
 // TODO: expose the captors etc.
@@ -50,6 +52,8 @@ const PIXEL_RATIO = getPixelRatio();
 
 // TODO: should not buffer data each time it seems
 // TODO: should react to the graph updates obviously :)
+
+// TODO: should try the method without if and oversampling found for the nodes
 
 // TODO: we should check the pixel opacity before attempting to use the quad
 
@@ -412,7 +416,7 @@ export default class WebGLRenderer extends Renderer {
       if (size < 8)
         continue;
 
-      LabelComponent(context, {
+      drawLabel(context, {
         label: data.label,
         size,
         x,
