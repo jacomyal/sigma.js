@@ -10,6 +10,8 @@ import drawLabel from './label';
 
 export default function drawHover(context, data) {
 
+  context.font = '14px arial';
+
   // Then we draw the label background
   context.beginPath();
   context.fillStyle = '#fff';

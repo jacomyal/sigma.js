@@ -94,10 +94,14 @@ export default class WebGLRenderer extends Renderer {
     this.width = 0;
     this.height = 0;
 
+    // State
+    this.highlightedNodes = new Set();
+
     // Initializing contexts
     this.createContext('edges');
     this.createContext('nodes');
     this.createContext('labels', false);
+    this.createContext('hovers', false);
     this.createContext('mouse', false);
 
     // Initial resize
@@ -161,7 +165,7 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
-   * Function binding camera handlers.
+   * Method binding camera handlers.
    *
    * @return {WebGLRenderer}
    */
@@ -174,7 +178,7 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
-   * Function used to process the whole graph's data.
+   * Method used to process the whole graph's data.
    *
    * @return {WebGLRenderer}
    */
@@ -239,7 +243,7 @@ export default class WebGLRenderer extends Renderer {
    */
 
   /**
-   * Function used to bind the renderer to a sigma instance.
+   * Method used to bind the renderer to a sigma instance.
    *
    * @param  {Sigma} sigma - Target sigma instance.
    * @return {WebGLRenderer}
@@ -256,7 +260,7 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
-   * Function used to resize the renderer.
+   * Method used to resize the renderer.
    *
    * @param  {number} width  - Target width.
    * @param  {number} height - Target height.
@@ -320,7 +324,7 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
-   * Function used to clear the canvases.
+   * Method used to clear the canvases.
    *
    * @return {WebGLRenderer}
    */
@@ -334,11 +338,14 @@ export default class WebGLRenderer extends Renderer {
     context = this.contexts.labels;
     context.clearRect(0, 0, this.width, this.height);
 
+    context = this.contexts.hovers;
+    context.clearRect(0, 0, this.width, this.height);
+
     return this;
   }
 
   /**
-   * Function used to render.
+   * Method used to render.
    *
    * @return {WebGLRenderer}
    */
@@ -431,6 +438,81 @@ export default class WebGLRenderer extends Renderer {
         y
       });
     }
+
+    // Rendering highlighted nodes
+    this.renderHighlightedNodes();
+
+    return this;
+  }
+
+  /**
+   * Method used to render the highlighted nodes.
+   *
+   * @return {WebGLRenderer}
+   */
+  renderHighlightedNodes() {
+
+    const camera = this.camera;
+
+    const sizeRatio = Math.pow(camera.getState().ratio, 0.5);
+
+    const context = this.contexts.hovers;
+
+    // Clearing
+    context.clearRect(0, 0, this.width, this.height);
+
+    // Rendering
+    this.highlightedNodes.forEach(node => {
+      const data = this.sigma.getNodeData(node);
+
+      const {x, y} = camera.graphToDisplay(data.x, data.y);
+
+      const size = data.size / sizeRatio;
+
+      drawHover(context, {
+        label: data.label,
+        color: data.color,
+        size,
+        x,
+        y
+      });
+    });
+  }
+
+  /**
+   * Method used to highlight a node.
+   *
+   * @param  {string} key - The node's key.
+   * @return {WebGLRenderer}
+   */
+  highlightNode(key) {
+
+    // TODO: check the existence of the node
+    // TODO: coerce?
+    this.highlightedNodes.add(key);
+
+    // Rendering
+    // TODO: schedule
+    this.renderHighlightedNodes();
+
+    return this;
+  }
+
+  /**
+   * Method used to unhighlight a node.
+   *
+   * @param  {string} key - The node's key.
+   * @return {WebGLRenderer}
+   */
+  unhighlightNode(key) {
+
+    // TODO: check the existence of the node
+    // TODO: coerce?
+    this.highlightedNodes.delete(key);
+
+    // Rendering
+    // TODO: schedule
+    this.renderHighlightedNodes();
 
     return this;
   }
