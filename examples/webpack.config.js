@@ -27,7 +27,7 @@ module.exports = EXAMPLES.map(example => {
     output: {
       filename: `${example.file}.bundle.js`
     },
-    devtool: 'eval-source-map',
+    devtool: false,
     module: {
       rules: [
         {
@@ -39,6 +39,11 @@ module.exports = EXAMPLES.map(example => {
           test: /\.(?:vert|frag|gexf)$/,
           exclude: /node_modules/,
           loader: 'raw-loader'
+        },
+        {
+          test: /\.worker\.js$/,
+          exclude: /node_modules/,
+          loader: 'worker-loader'
         }
       ]
     },

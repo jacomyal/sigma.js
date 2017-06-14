@@ -63,6 +63,7 @@
   "dependencies": {
     "events": "^1.1.1",
     "gl-matrix": "^2.3.2",
-    "graphology-utils": "^1.1.1"
+    "graphology-utils": "^1.1.1",
+    "worker-loader": "^0.8.0"
   }
 }
