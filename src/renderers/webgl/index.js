@@ -73,8 +73,6 @@ export default class WebGLRenderer extends Renderer {
 
     // Properties
     this.sigma = null;
-    this.graph = null;
-    this.camera = null;
     this.captors = {};
     this.container = container;
     this.elements = {};
@@ -165,35 +163,25 @@ export default class WebGLRenderer extends Renderer {
   /**
    * Function binding camera handlers.
    *
-   * @return {Sigma}
+   * @return {WebGLRenderer}
    */
   bindCameraHandlers() {
     this.camera.on('updated', () => {
       this.sigma.scheduleRefresh();
     });
+
+    return this;
   }
 
-  /**---------------------------------------------------------------------------
-   * Public API.
-   **---------------------------------------------------------------------------
-   */
-
   /**
-   * Function used to bind the renderer to a sigma instance.
+   * Function used to process the whole graph's data.
    *
-   * @param  {Sigma} sigma - Target sigma instance.
    * @return {WebGLRenderer}
    */
-  bind(sigma) {
+  process() {
 
-    // Binding instance
-    this.sigma = sigma;
-    this.graph = sigma.getGraph();
+    const graph = this.sigma.getGraph();
 
-    const graph = this.graph;
-
-    // TODO: this should go into a different #.process method
-    // Initializing our byte arrays
     const nodeProgram = this.nodePrograms.def;
 
     this.nodeArray = new Float32Array(
@@ -205,8 +193,7 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
 
-      // TODO: this is temporary!
-      const data = graph.getNodeAttributes(node);
+      const data = this.sigma.getNodeData(node);
 
       nodeProgram.process(
         this.nodeArray,
@@ -226,11 +213,10 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      // TODO: this is temporary
-      const data = graph.getEdgeAttributes(edge),
+      const data = this.sigma.getEdgeData(edge),
             extremities = graph.extremities(edge),
-            sourceData = graph.getNodeAttributes(extremities[0]),
-            targetData = graph.getNodeAttributes(extremities[1]);
+            sourceData = this.sigma.getNodeData(extremities[0]),
+            targetData = this.sigma.getNodeData(extremities[1]);
 
       edgeProgram.process(
         this.edgeArray,
@@ -243,6 +229,28 @@ export default class WebGLRenderer extends Renderer {
       if (typeof edgeProgram.computeIndices === 'function')
         this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
     }
+
+    return this;
+  }
+
+  /**---------------------------------------------------------------------------
+   * Public API.
+   **---------------------------------------------------------------------------
+   */
+
+  /**
+   * Function used to bind the renderer to a sigma instance.
+   *
+   * @param  {Sigma} sigma - Target sigma instance.
+   * @return {WebGLRenderer}
+   */
+  bind(sigma) {
+
+    // Binding instance
+    this.sigma = sigma;
+
+    // Processing initial data
+    this.process();
 
     return this;
   }
@@ -399,13 +407,13 @@ export default class WebGLRenderer extends Renderer {
 
     // Drawing labels
     // TODO: POW RATIO is currently default 0.5 and harcoded
-    const nodes = this.graph.nodes(),
+    const nodes = this.sigma.getGraph().nodes(),
           context = this.contexts.labels;
 
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
-      const data = this.graph.getNodeAttributes(nodes[i]);
+      const data = this.sigma.getNodeData(nodes[i]);
 
       const {x, y} = this.camera.graphToDisplay(data.x, data.y);
 

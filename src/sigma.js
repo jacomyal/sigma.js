@@ -65,12 +65,27 @@ export default class Sigma {
   }
 
   /**
-   * Method returning the instance's camera.
+   * Method returning the composed data of the target node.
    *
-   * @return {Camera} - The instance's graph.
+   * @return {string} key - The node's key.
+   * @return {object}     - The node's attributes.
    */
-  getCamera() {
-    return this.camera;
+  getNodeData(key) {
+
+    // TODO: this will change to compose state later
+    return this.graph.getNodeAttributes(key);
+  }
+
+  /**
+   * Method returning the composed data of the target edge.
+   *
+   * @return {string} key - The edge's key.
+   * @return {object}     - The edge's attributes.
+   */
+  getEdgeData(key) {
+
+    // TODO: this will change to compose state later
+    return this.graph.getEdgeAttributes(key);
   }
 
   /**---------------------------------------------------------------------------
