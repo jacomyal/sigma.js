@@ -13,6 +13,10 @@ const EXAMPLES = [
   {
     file: 'markov',
     title: 'Markov'
+  },
+  {
+    file: 'naive-layout',
+    title: 'Naive Layout'
   }
 ];
 

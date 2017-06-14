@@ -50,6 +50,8 @@ const PIXEL_RATIO = getPixelRatio();
 // TODO: should sigma be the one to refresh?
 // TODO: renderer can be a class or a mere function if needed
 
+// TODO: method returning the camera & captor
+
 // TODO: should not buffer data each time it seems
 // TODO: should react to the graph updates obviously :)
 
@@ -81,8 +83,10 @@ export default class WebGLRenderer extends Renderer {
 
     this.nodeArray = null;
     this.nodeIndicesArray = null;
+    this.nodeOrder = {};
     this.edgeArray = null;
     this.edgeIndicesArray = null;
+    this.edgeOrder = {};
 
     this.nodePrograms = {
       def: new NodeProgram()
@@ -97,6 +101,9 @@ export default class WebGLRenderer extends Renderer {
 
     // State
     this.highlightedNodes = new Set();
+    this.renderFrame = null;
+    this.needToProcess = false;
+    this.needToSoftProcess = false;
 
     // Initializing contexts
     this.createContext('edges');
@@ -176,7 +183,7 @@ export default class WebGLRenderer extends Renderer {
   bindCameraHandlers() {
 
     this.listeners.camera = () => {
-      this.sigma.scheduleRefresh();
+      this.scheduleRender();
     };
 
     this.camera.on('updated', this.listeners.camera);
@@ -190,7 +197,53 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   bindEventHandlers() {
+    return this;
+  }
 
+  /**
+   * Method binding graph handlers
+   *
+   * @return {WebGLRenderer}
+   */
+  bindGraphHandlers() {
+
+    const graph = this.sigma.getGraph();
+
+    this.listeners.graphUpdate = () => {
+      this.needToProcess = true;
+      this.scheduleRender();
+    };
+
+    this.listeners.softGraphUpdate = () => {
+      this.needToSoftProcess = true;
+      this.scheduleRender();
+    };
+
+    this.listeners.nodeUpdate = e => {
+      this.processNode(e.key);
+
+      // TODO: this is dumb in layout cases
+      const edges = graph.edges(e.key);
+
+      for (let i = 0, l = edges.length; i < l; i++)
+        this.processEdge(edges[i]);
+
+      this.scheduleRender();
+    };
+
+    this.listeners.edgeUpdate = e => {
+      this.processEdge(e.key);
+      this.scheduleRender();
+    };
+
+    // TODO: bind this on composed events
+    graph.on('nodeAdded', this.listeners.graphUpdate);
+    graph.on('nodeAttributesUpdated', this.listeners.softGraphUpdate);
+    graph.on('edgeAdded', this.listeners.graphUpdate);
+    graph.on('edgeAttributesUpdated', this.listeners.softGraphUpdate);
+    graph.on('cleared', this.listeners.graphUpdate);
+
+    return this;
   }
 
   /**
@@ -198,20 +251,26 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  process() {
+  process(keepArrays = false) {
 
     const graph = this.sigma.getGraph();
 
     const nodeProgram = this.nodePrograms.def;
 
-    this.nodeArray = new Float32Array(
-      NodeProgram.POINTS * NodeProgram.ATTRIBUTES * graph.order
-    );
+    if (!keepArrays) {
+      this.nodeArray = new Float32Array(
+        NodeProgram.POINTS * NodeProgram.ATTRIBUTES * graph.order
+      );
+
+      this.nodeOrder = {};
+    }
 
     const nodes = graph.nodes();
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
+
+      this.nodeOrder[node] = i;
 
       const data = this.sigma.getNodeData(node);
 
@@ -224,14 +283,20 @@ export default class WebGLRenderer extends Renderer {
 
     const edgeProgram = this.edgePrograms.def;
 
-    this.edgeArray = new Float32Array(
-      EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES * graph.size
-    );
+    if (!keepArrays) {
+      this.edgeArray = new Float32Array(
+        EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES * graph.size
+      );
+
+      this.edgeOrder = {};
+    }
 
     const edges = graph.edges();
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
+
+      this.edgeOrder[edge] = i;
 
       const data = this.sigma.getEdgeData(edge),
             extremities = graph.extremities(edge),
@@ -246,9 +311,56 @@ export default class WebGLRenderer extends Renderer {
         i * EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES
       );
 
-      if (typeof edgeProgram.computeIndices === 'function')
+      if (!keepArrays && typeof edgeProgram.computeIndices === 'function')
         this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
     }
+
+    return this;
+  }
+
+  /**
+   * Method used to process a single node.
+   *
+   * @return {WebGLRenderer}
+   */
+  processNode(key) {
+
+    const nodeProgram = this.nodePrograms.def;
+
+    const data = this.sigma.getNodeData(key);
+
+    nodeProgram.process(
+      this.nodeArray,
+      data,
+      this.nodeOrder[key] * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
+    );
+
+    return this;
+  }
+
+  /**
+   * Method used to process a single edge.
+   *
+   * @return {WebGLRenderer}
+   */
+  processEdge(key) {
+
+    const graph = this.sigma.getGraph();
+
+    const edgeProgram = this.edgePrograms.def;
+
+    const data = this.sigma.getEdgeData(key),
+          extremities = graph.extremities(key),
+          sourceData = this.sigma.getNodeData(extremities[0]),
+          targetData = this.sigma.getNodeData(extremities[1]);
+
+    edgeProgram.process(
+      this.edgeArray,
+      sourceData,
+      targetData,
+      data,
+      this.edgeOrder[key] * EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES
+    );
 
     return this;
   }
@@ -268,6 +380,8 @@ export default class WebGLRenderer extends Renderer {
 
     // Binding instance
     this.sigma = sigma;
+
+    this.bindGraphHandlers();
 
     // Processing initial data
     this.process();
@@ -366,6 +480,14 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   render() {
+
+    // If a render was scheduled, we cancel it
+    if (this.renderFrame) {
+      cancelAnimationFrame(this.renderFrame);
+      this.renderFrame = null;
+      this.needToProcess = false;
+      this.needToSoftProcess = false;
+    }
 
     // First we need to resize
     this.resize();
@@ -492,6 +614,31 @@ export default class WebGLRenderer extends Renderer {
         x,
         y
       });
+    });
+  }
+
+  /**
+   * Method used to schedule a render.
+   *
+   * @return {WebGLRenderer}
+   */
+  scheduleRender() {
+    if (this.renderFrame)
+      return this;
+
+    this.renderFrame = requestAnimationFrame(() => {
+
+      // Do we need to process data?
+      if (this.needToProcess || this.needToSoftProcess)
+        this.process(this.needToSoftProcess);
+
+      // Resetting state
+      this.renderFrame = null;
+      this.needToProcess = false;
+      this.needToSoftProcess = false;
+
+      // Rendering
+      this.render();
     });
   }
 

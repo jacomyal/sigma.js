@@ -11,6 +11,9 @@ import Renderer from './renderer';
 // TODO: sigma should only hold the graph and compose state to give to renderer,
 // does it need to orchestrate?
 
+// TODO: should be able to take n renderers
+// TODO: what to do with refresh methods?
+
 /**
  * Sigma class
  *
