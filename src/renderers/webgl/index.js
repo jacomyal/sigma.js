@@ -77,6 +77,7 @@ export default class WebGLRenderer extends Renderer {
     this.container = container;
     this.elements = {};
     this.contexts = {};
+    this.listeners = {};
 
     this.nodeArray = null;
     this.nodeIndicesArray = null;
@@ -120,6 +121,9 @@ export default class WebGLRenderer extends Renderer {
     this.captors = {
       mouse: new MouseCaptor(this.elements.mouse, this.camera)
     };
+
+    // Binding event handlers
+    this.bindEventHandlers();
 
     // Loading programs
     for (const k in this.nodePrograms)
@@ -170,11 +174,23 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   bindCameraHandlers() {
-    this.camera.on('updated', () => {
+
+    this.listeners.camera = () => {
       this.sigma.scheduleRefresh();
-    });
+    };
+
+    this.camera.on('updated', this.listeners.camera);
 
     return this;
+  }
+
+  /**
+   * Method binding event handlers.
+   *
+   * @return {WebGLRenderer}
+   */
+  bindEventHandlers() {
+
   }
 
   /**
