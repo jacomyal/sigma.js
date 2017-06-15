@@ -220,6 +220,8 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // TODO: bind this on composed state events
+    // TODO: it could be possible to update only specific node etc. by holding
+    // a fixed-size pool of updated items
     graph.on('nodeAdded', this.listeners.graphUpdate);
     graph.on('nodeDropped', this.listeners.graphUpdate);
     graph.on('nodeAttributesUpdated', this.listeners.softGraphUpdate);
@@ -634,7 +636,7 @@ export default class WebGLRenderer extends Renderer {
    * @param  {string} key - The node's key.
    * @return {WebGLRenderer}
    */
-  highlightNode(key) {
+  highlightNode(key) {
 
     // TODO: check the existence of the node
     // TODO: coerce?
@@ -653,7 +655,7 @@ export default class WebGLRenderer extends Renderer {
    * @param  {string} key - The node's key.
    * @return {WebGLRenderer}
    */
-  unhighlightNode(key) {
+  unhighlightNode(key) {
 
     // TODO: check the existence of the node
     // TODO: coerce?

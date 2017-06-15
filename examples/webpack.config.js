@@ -43,19 +43,19 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'basic.html',
       title: 'Sigma.js - Basic Example',
-      template: template,
+      template,
       chunks: ['commons', 'basic']
     }),
     new HtmlWebpackPlugin({
       filename: 'gexf.html',
       title: 'Sigma.js - GEXF Example',
-      template: template,
+      template,
       chunks: ['commons', 'gexf']
     }),
     new HtmlWebpackPlugin({
       filename: 'naive-layout.html',
       title: 'Sigma.js - Naive Layout Example',
-      template: template,
+      template,
       chunks: ['commons', 'naiveLayout']
     })
   ]

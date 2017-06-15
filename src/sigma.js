@@ -43,11 +43,8 @@ export default class Sigma {
     this.nodeStates = null;
     this.edgeStates = null;
 
-    // Internal state
-    this.nextFrame = null;
-
-    // First time refresh
-    this.refresh();
+    // First time render
+    this.renderer.render();
   }
 
   /**---------------------------------------------------------------------------
@@ -93,44 +90,59 @@ export default class Sigma {
     return this.graph.getEdgeAttributes(key);
   }
 
-  /**---------------------------------------------------------------------------
-   * Drawing
-   **---------------------------------------------------------------------------
-   */
-
   /**
-   * Function used to schedule an update.
+   * Method returning the extent of the bound graph.
    *
-   * @return {Sigma}
+   * @return {object} - The graph's extent.
    */
-  scheduleRefresh() {
-    if (this.nextFrame)
-      return this;
+  getGraphExtent() {
+    const graph = this.graph;
 
-    this.nextFrame = requestAnimationFrame(() => {
+    const nodes = graph.nodes(),
+          edges = graph.edges();
 
-      // Resetting state
-      this.nextFrame = null;
+    let maxX = -Infinity,
+        maxY = -Infinity,
+        minX = Infinity,
+        minY = Infinity,
+        maxNodeSize = -Infinity,
+        maxEdgeSize = -Infinity;
 
-      // Refreshing
-      this.refresh();
-    });
-  }
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      const node = nodes[i];
 
-  /**
-   * Method used to refresh display of the graph.
-   *
-   * @return {Sigma} - Returns itself for chaining.
-   */
-  refresh() {
+      const data = this.getNodeData(node);
 
-    // If a frame is scheduled, we cancel it
-    if (this.nextFrame) {
-      cancelAnimationFrame(this.nextFrame);
-      this.nextFrame = null;
+      if (data.x > maxX)
+        maxX = data.x;
+      if (data.y > maxY)
+        maxY = data.y;
+
+      if (data.x < minX)
+        minX = data.x;
+      if (data.y < minY)
+        minY = data.y;
+
+      if (data.size > maxNodeSize)
+        maxNodeSize = data.size;
     }
 
-    // Calling renderer
-    this.renderer.render();
+    for (let i = 0, l = edges.length; i < l; i++) {
+      const edge = edges[i];
+
+      const data = this.getEdgeData(edge);
+
+      if (data.size > maxEdgeSize)
+        maxEdgeSize = data.size;
+    }
+
+    return {
+      maxX,
+      maxY,
+      minX,
+      minY,
+      maxNodeSize,
+      maxEdgeSize
+    };
   }
 }
