@@ -1,58 +1,62 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin'),
+const webpack = require('webpack'),
+      HtmlWebpackPlugin = require('html-webpack-plugin'),
       path = require('path');
 
-const EXAMPLES = [
-  {
-    file: 'basic',
-    title: 'Basic'
-  },
-  {
-    file: 'gexf',
-    title: 'Gexf'
-  },
-  {
-    file: 'markov',
-    title: 'Markov'
-  },
-  {
-    file: 'naive-layout',
-    title: 'Naive Layout'
-  }
-];
+const template = path.join(__dirname, 'templates', 'default.ejs');
 
-module.exports = EXAMPLES.map(example => {
-  return {
-    context: __dirname,
-    entry: `./${example.file}.js`,
-    output: {
-      filename: `${example.file}.bundle.js`
-    },
-    devtool: false,
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader'
-        },
-        {
-          test: /\.(?:vert|frag|gexf)$/,
-          exclude: /node_modules/,
-          loader: 'raw-loader'
-        },
-        {
-          test: /\.worker\.js$/,
-          exclude: /node_modules/,
-          loader: 'worker-loader'
-        }
-      ]
-    },
-    plugins: [
-      new HtmlWebpackPlugin({
-        title: `Sigma.js - ${example.title}`,
-        filename: `${example.file}.html`,
-        template: path.join(__dirname, 'templates', 'default.ejs')
-      })
+module.exports = {
+  context: __dirname,
+  entry: {
+    basic: './basic.js',
+    gexf: './gexf.js',
+    naiveLayout: './naive-layout.js'
+  },
+  output: {
+    filename: '[name].bundle.js'
+  },
+  devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      },
+      {
+        test: /\.(?:vert|frag|gexf)$/,
+        exclude: /node_modules/,
+        loader: 'raw-loader'
+      },
+      {
+        test: /\.worker\.js$/,
+        exclude: /node_modules/,
+        loader: 'worker-loader'
+      }
     ]
-  };
-});
+  },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons',
+      filename: 'commons.bundle.js',
+      minChunks: 2
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'basic.html',
+      title: 'Sigma.js - Basic Example',
+      template: template,
+      chunks: ['commons', 'basic']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'gexf.html',
+      title: 'Sigma.js - GEXF Example',
+      template: template,
+      chunks: ['commons', 'gexf']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'naive-layout.html',
+      title: 'Sigma.js - Naive Layout Example',
+      template: template,
+      chunks: ['commons', 'naiveLayout']
+    })
+  ]
+};

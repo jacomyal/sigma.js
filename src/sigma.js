@@ -14,6 +14,8 @@ import Renderer from './renderer';
 // TODO: should be able to take n renderers
 // TODO: what to do with refresh methods?
 
+// TODO: create a thumbnail renderer
+
 /**
  * Sigma class
  *
