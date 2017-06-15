@@ -205,7 +205,7 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
 
     // If we don't have at least a collision, there is an issue
     if (collisions === 0)
-      throw new Error('sigma/quadtree.insertNode: no collision.');
+      throw new Error(`sigma/quadtree.insertNode: no collision (level: ${level}, key: ${key}, x: ${x}, y: ${y}, size: ${size}).`);
 
     // If we have more that one collision, we stop here and store the node
     // in the relevant container
@@ -237,13 +237,34 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
  * @param {Graph} graph - A graph instance.
  */
 export default class QuadTree {
-  constructor(nodes, boundaries) {
+  constructor(boundaries) {
 
     // Allocating the underlying byte array
     const L = Math.pow(4, MAX_LEVEL);
 
     this.data = new Float32Array(BLOCKS * ((4 * L - 1) / 3));
     this.containers = {};
+
+    if (boundaries)
+      this.resize(boundaries);
+  }
+
+  add(key, x, y, size) {
+    insertNode(
+      MAX_LEVEL,
+      this.data,
+      this.containers,
+      key,
+      x,
+      y,
+      size
+    );
+
+    return this;
+  }
+
+  resize(boundaries) {
+    this.clear();
 
     // Building the quadrants
     this.data[X_OFFSET] = boundaries.x;
@@ -252,18 +273,12 @@ export default class QuadTree {
     this.data[HEIGHT_OFFSET] = boundaries.height;
 
     buildQuadrants(MAX_LEVEL, this.data);
+  }
 
-    // Inserting the nodes
-    for (let i = 0, l = nodes.length; i < l; i++)
-      insertNode(
-        MAX_LEVEL,
-        this.data,
-        this.containers,
-        nodes[i].key,
-        nodes[i].x,
-        nodes[i].y,
-        nodes[i].size
-      );
+  clear() {
+    this.containers = {};
+
+    return this;
   }
 
   point(x, y) {

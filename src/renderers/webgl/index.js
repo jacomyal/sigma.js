@@ -16,6 +16,8 @@ import drawHover from '../canvas/components/hover';
 
 import MouseCaptor from '../../captors/mouse';
 
+import QuadTree from '../../quadtree';
+
 import {
   assign
 } from '../../utils';
@@ -85,6 +87,8 @@ export default class WebGLRenderer extends Renderer {
     this.elements = {};
     this.contexts = {};
     this.listeners = {};
+
+    this.quadtree = new QuadTree();
 
     this.nodeArray = null;
     this.nodeIndicesArray = null;
@@ -250,11 +254,30 @@ export default class WebGLRenderer extends Renderer {
 
     const graph = this.sigma.getGraph();
 
+    const extent = this.sigma.getGraphExtent();
+
     // Rescaling function
     this.nodeRescalingFunction = createNodeRescalingFunction(
       {width: this.width, height: this.height},
       this.sigma.getGraphExtent()
     );
+
+    const minRescaled = this.nodeRescalingFunction({
+      x: extent.minX,
+      y: extent.minY
+    });
+
+    const maxRescaled = this.nodeRescalingFunction({
+      x: extent.maxX,
+      y: extent.maxY
+    });
+
+    this.quadtree.resize({
+      x: minRescaled.x,
+      y: minRescaled.y,
+      width: maxRescaled.x - minRescaled.x,
+      height: maxRescaled.y - minRescaled.y
+    });
 
     this.nodeRescaleCache = {};
 
@@ -279,7 +302,10 @@ export default class WebGLRenderer extends Renderer {
 
       const rescaledData = this.nodeRescalingFunction(data);
 
+      // TODO: Optimize this to be save a loop and one object
       const displayData = assign({}, data, rescaledData);
+
+      this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
 
       this.nodeDataCache[node] = displayData;
 
