@@ -20,16 +20,17 @@ const PALETTE = [
 
 const container = document.getElementById('container');
 
-// console.profile('Creation');
+console.time('Creation');
 const graph = clusters(UndirectedGraph, {
   order: 5000,
-  size: 10000,
+  size: 25000,
   clusters: 5
 });
-// console.profileEnd('Creation');
+console.timeEnd('Creation');
 
 randomLayout.assign(graph, {scale: 400, center: 0});
 
+console.time('Node Attributes');
 graph.nodes().forEach(node => {
   const attr = graph.getNodeAttributes(node);
 
@@ -39,14 +40,19 @@ graph.nodes().forEach(node => {
     color: PALETTE[attr.cluster]
   });
 });
+console.timeEnd('Node Attributes');
 
+console.time('Edge Attributes');
 graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
+console.timeEnd('Edge Attributes');
 
 const renderer = new WebGLRenderer(container);
 
+console.profile('Sigma');
 const sigma = new Sigma(graph, renderer);
+console.profileEnd('Sigma');
 
 const worker = new Worker();
 
