@@ -219,27 +219,12 @@ export default class WebGLRenderer extends Renderer {
       this.scheduleRender();
     };
 
-    this.listeners.nodeUpdate = e => {
-      this.processNode(e.key);
-
-      // TODO: this is dumb in layout cases
-      const edges = graph.edges(e.key);
-
-      for (let i = 0, l = edges.length; i < l; i++)
-        this.processEdge(edges[i]);
-
-      this.scheduleRender();
-    };
-
-    this.listeners.edgeUpdate = e => {
-      this.processEdge(e.key);
-      this.scheduleRender();
-    };
-
-    // TODO: bind this on composed events
+    // TODO: bind this on composed state events
     graph.on('nodeAdded', this.listeners.graphUpdate);
+    graph.on('nodeDropped', this.listeners.graphUpdate);
     graph.on('nodeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.on('edgeAdded', this.listeners.graphUpdate);
+    graph.on('nodeDropped', this.listeners.graphUpdate);
     graph.on('edgeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.on('cleared', this.listeners.graphUpdate);
 

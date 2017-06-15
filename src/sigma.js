@@ -12,7 +12,7 @@ import Renderer from './renderer';
 // does it need to orchestrate?
 
 // TODO: should be able to take n renderers
-// TODO: what to do with refresh methods?
+// TODO: what to do with refresh methods? We should probably drop them
 
 // TODO: create a thumbnail renderer
 
