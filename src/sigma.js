@@ -123,8 +123,10 @@ export default class Sigma {
       if (data.y < minY)
         minY = data.y;
 
-      if (data.size > maxNodeSize)
-        maxNodeSize = data.size;
+      const size = data.size || 1;
+
+      if (size > maxNodeSize)
+        maxNodeSize = size;
     }
 
     for (let i = 0, l = edges.length; i < l; i++) {
@@ -132,8 +134,10 @@ export default class Sigma {
 
       const data = this.getEdgeData(edge);
 
-      if (data.size > maxEdgeSize)
-        maxEdgeSize = data.size;
+      const size = data.size || 1;
+
+      if (size > maxEdgeSize)
+        maxEdgeSize = size;
     }
 
     return {

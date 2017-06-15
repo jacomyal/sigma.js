@@ -17,8 +17,13 @@ import drawHover from '../canvas/components/hover';
 import MouseCaptor from '../../captors/mouse';
 
 import {
+  assign
+} from '../../utils';
+
+import {
   createElement,
-  getPixelRatio
+  getPixelRatio,
+  createNodeRescalingFunction
 } from '../utils';
 
 import {
@@ -84,6 +89,7 @@ export default class WebGLRenderer extends Renderer {
     this.nodeArray = null;
     this.nodeIndicesArray = null;
     this.nodeOrder = {};
+    this.nodeDataCache = {};
     this.edgeArray = null;
     this.edgeIndicesArray = null;
     this.edgeOrder = {};
@@ -94,6 +100,8 @@ export default class WebGLRenderer extends Renderer {
     this.edgePrograms = {
       def: new EdgeProgram()
     };
+
+    this.nodeRescalingFunction = null;
 
     // Starting dimensions
     this.width = 0;
@@ -242,6 +250,14 @@ export default class WebGLRenderer extends Renderer {
 
     const graph = this.sigma.getGraph();
 
+    // Rescaling function
+    this.nodeRescalingFunction = createNodeRescalingFunction(
+      {width: this.width, height: this.height},
+      this.sigma.getGraphExtent()
+    );
+
+    this.nodeRescaleCache = {};
+
     const nodeProgram = this.nodePrograms.def;
 
     if (!keepArrays) {
@@ -261,9 +277,15 @@ export default class WebGLRenderer extends Renderer {
 
       const data = this.sigma.getNodeData(node);
 
+      const rescaledData = this.nodeRescalingFunction(data);
+
+      const displayData = assign({}, data, rescaledData);
+
+      this.nodeDataCache[node] = displayData;
+
       nodeProgram.process(
         this.nodeArray,
-        data,
+        displayData,
         i * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
       );
     }
@@ -287,8 +309,8 @@ export default class WebGLRenderer extends Renderer {
 
       const data = this.sigma.getEdgeData(edge),
             extremities = graph.extremities(edge),
-            sourceData = this.sigma.getNodeData(extremities[0]),
-            targetData = this.sigma.getNodeData(extremities[1]);
+            sourceData = this.nodeDataCache[extremities[0]],
+            targetData = this.nodeDataCache[extremities[1]];
 
       edgeProgram.process(
         this.edgeArray,
@@ -546,7 +568,7 @@ export default class WebGLRenderer extends Renderer {
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
-      const data = this.sigma.getNodeData(nodes[i]);
+      const data = this.nodeDataCache[nodes[i]];
 
       const {x, y} = this.camera.graphToDisplay(data.x, data.y);
 

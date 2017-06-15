@@ -49,3 +49,60 @@ export function getPixelRatio() {
 
   return 1;
 }
+
+/**
+ * Default rescale options.
+ */
+const DEFAULT_NODE_RESCALE_OPTIONS = {
+  mode: 'inside',
+  margin: 0,
+  minSize: 1,
+  maxSize: 8
+};
+
+const DEFAULT_EDGE_RESCALE_OPTIONS = {
+  minSize: 0.5,
+  maxSize: 1
+};
+
+/**
+ * Factory returning a function rescaling the given node's position and/or size.
+ *
+ * @param  {object}   options - Options.
+ * @param  {object}   extent  - Extent of the graph.
+ * @return {function}
+ */
+export function createNodeRescalingFunction(options, extent) {
+  options = options || {};
+
+  const mode = options.mode || DEFAULT_NODE_RESCALE_OPTIONS.mode,
+        height = options.height || 1,
+        width = options.width || 1;
+
+  const {
+    maxX,
+    maxY,
+    minX,
+    minY
+  } = extent;
+
+  const hx = (maxX + minX) / 2,
+        hy = (maxY + minY) / 2;
+
+  const scale = mode === 'outside' ?
+    Math.max(
+      width / Math.max(maxX - minX, 1),
+      height / Math.max(maxY - minY, 1),
+    ) :
+    Math.min(
+      width / Math.max(maxX - minX, 1),
+      height / Math.max(maxY - minY, 1)
+    );
+
+  return data => {
+    return {
+      x: (data.x - hx) * scale,
+      y: (data.y - hy) * scale
+    };
+  };
+}
