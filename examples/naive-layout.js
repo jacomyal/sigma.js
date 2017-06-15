@@ -50,9 +50,7 @@ console.timeEnd('Edge Attributes');
 
 const renderer = new WebGLRenderer(container);
 
-console.profile('Sigma');
 const sigma = new Sigma(graph, renderer);
-console.profileEnd('Sigma');
 
 const worker = new Worker();
 
