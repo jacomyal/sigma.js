@@ -1,10 +1,10 @@
 {
   "name": "sigma",
-  "version": "2.0.0-beta1",
+  "version": "2.0.0-alpha1",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
-  "main": "dist/sigma.js",
+  "main": "index.js",
   "scripts": {
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --port 8000 --progress",
     "lint": "eslint examples src test",
@@ -42,7 +42,8 @@
     "mocha": "^3.0.2",
     "raw-loader": "^0.5.1",
     "webpack": "^2.5.1",
-    "webpack-dev-server": "^2.4.5"
+    "webpack-dev-server": "^2.4.5",
+    "worker-loader": "^0.8.0"
   },
   "keywords": [
     "graph",
@@ -63,7 +64,6 @@
   "dependencies": {
     "events": "^1.1.1",
     "gl-matrix": "^2.3.2",
-    "graphology-utils": "^1.1.1",
-    "worker-loader": "^0.8.0"
+    "graphology-utils": "^1.1.1"
   }
 }

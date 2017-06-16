@@ -76,6 +76,7 @@ export default class WebGLRenderer extends Renderer {
       def: new EdgeProgram()
     };
 
+    // TODO: if we drop size scaling => this should become "rescalingFunction"
     this.nodeRescalingFunction = null;
 
     // Starting dimensions
