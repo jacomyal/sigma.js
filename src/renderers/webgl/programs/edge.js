@@ -28,6 +28,12 @@ export default class EdgeProgram extends Program {
   }
 
   process(array, sourceData, targetData, data, i) {
+
+    if (sourceData.hidden || targetData.hidden || data.hidden) {
+      for (let l = i + EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES; i < l; i++)
+        array[i] = 0;
+    }
+
     const thickness = data.size || 1,
           x1 = sourceData.x,
           y1 = sourceData.y,

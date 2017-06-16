@@ -203,6 +203,7 @@ export default class WebGLRenderer extends Renderer {
    */
   bindEventHandlers() {
 
+    // Function checking if the mouse is on the given node
     const mouseIsOnNode = (mouseX, mouseY, nodeX, nodeY, size) => {
       return (
         mouseX > nodeX - size &&
@@ -214,22 +215,28 @@ export default class WebGLRenderer extends Renderer {
       );
     };
 
+    // Function returning the nodes in the mouse's quad
+    const getQuadNodes = (mouseX, mouseY) => {
+
+      const mouseGraphPosition = this.camera.displayToGraph(
+        mouseX,
+        mouseY
+      );
+
+      return this.quadtree.point(
+        mouseGraphPosition.x,
+        mouseGraphPosition.y
+      );
+    };
+
+    // Handling mouse move
     this.listeners.handleMove = e => {
 
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
-      // Retrieving nodes at position
-      const mouseGraphPosition = this.camera.displayToGraph(
-        e.clientX,
-        e.clientY
-      );
-
-      const quadNodes = this.quadtree.point(
-        mouseGraphPosition.x,
-        mouseGraphPosition.y
-      );
+      const quadNodes = getQuadNodes(e.clientX, e.clientY);
 
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
@@ -246,6 +253,7 @@ export default class WebGLRenderer extends Renderer {
         if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
           this.hoveredNode = node;
 
+          this.emit('overNode', {node});
           return this.scheduleHighlightedNodesRender();
         }
       }
@@ -264,12 +272,39 @@ export default class WebGLRenderer extends Renderer {
         if (!mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
           this.hoveredNode = null;
 
+          this.emit('outNode', {node: this.hoveredNode});
           return this.scheduleHighlightedNodesRender();
         }
       }
     };
 
+    // Handling click
+    this.listeners.handleClick = e => {
+      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
+
+      const quadNodes = getQuadNodes(e.clientX, e.clientY);
+
+      for (let i = 0, l = quadNodes.length; i < l; i++) {
+        const node = quadNodes[i];
+
+        const data = this.nodeDataCache[node];
+
+        const pos = this.camera.graphToDisplay(
+          data.x,
+          data.y
+        );
+
+        const size = data.size / sizeRatio;
+
+        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size))
+          return this.emit('clickNode', {node});
+        else
+          return this.emit('clickStage');
+      }
+    };
+
     this.captors.mouse.on('mousemove', this.listeners.handleMove);
+    this.captors.mouse.on('click', this.listeners.handleClick);
 
     return this;
   }

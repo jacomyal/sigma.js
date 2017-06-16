@@ -2,8 +2,6 @@ import {UndirectedGraph} from 'graphology';
 import erdosRenyi from 'graphology-generators/random/erdos-renyi';
 import randomLayout from 'graphology-layout/random';
 import chroma from 'chroma-js';
-
-// TODO: get rid of fake. This is too heavy
 import faker from 'faker';
 import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
