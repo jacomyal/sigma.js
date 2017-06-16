@@ -66,6 +66,7 @@ const DEFAULT_EDGE_RESCALE_OPTIONS = {
 };
 
 // TODO: should we let the user handle size through, for instance, d3 scales?
+// TODO: should we put the rescaling in the camera itself?
 
 /**
  * Factory returning a function rescaling the given node's position and/or size.
@@ -91,7 +92,7 @@ export function createNodeRescalingFunction(options, extent) {
   const hx = (maxX + minX) / 2,
         hy = (maxY + minY) / 2;
 
-  const scale = mode === 'outside' ?
+  let scale = mode === 'outside' ?
     Math.max(
       width / Math.max(maxX - minX, 1),
       height / Math.max(maxY - minY, 1)
@@ -101,10 +102,19 @@ export function createNodeRescalingFunction(options, extent) {
       height / Math.max(maxY - minY, 1)
     );
 
-  return data => {
+  const fn = data => {
     return {
       x: (data.x - hx) * scale,
       y: (data.y - hy) * scale
     };
   };
+
+  fn.inverse = data => {
+    return {
+       x: data.x / scale + hx,
+       y: data.y / scale + hy
+    };
+  };
+
+  return fn;
 }

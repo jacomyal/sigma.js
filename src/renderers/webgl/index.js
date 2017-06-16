@@ -278,6 +278,29 @@ export default class WebGLRenderer extends Renderer {
       }
     };
 
+    // Handling down
+    this.listeners.handleDown = e => {
+      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
+
+      const quadNodes = getQuadNodes(e.clientX, e.clientY);
+
+      for (let i = 0, l = quadNodes.length; i < l; i++) {
+        const node = quadNodes[i];
+
+        const data = this.nodeDataCache[node];
+
+        const pos = this.camera.graphToDisplay(
+          data.x,
+          data.y
+        );
+
+        const size = data.size / sizeRatio;
+
+        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size))
+          return this.emit('downNode', {node});
+      }
+    };
+
     // Handling click
     this.listeners.handleClick = e => {
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
@@ -303,7 +326,9 @@ export default class WebGLRenderer extends Renderer {
       return this.emit('clickStage');
     };
 
+    // TODO: optimize, we don't need to repeat collisions
     this.captors.mouse.on('mousemove', this.listeners.handleMove);
+    this.captors.mouse.on('mousedown', this.listeners.handleDown);
     this.captors.mouse.on('click', this.listeners.handleClick);
 
     return this;
@@ -356,7 +381,7 @@ export default class WebGLRenderer extends Renderer {
     // Rescaling function
     this.nodeRescalingFunction = createNodeRescalingFunction(
       {width: this.width, height: this.height},
-      this.sigma.getGraphExtent()
+      extent
     );
 
     const minRescaled = this.nodeRescalingFunction({

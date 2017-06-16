@@ -1,34 +1,19 @@
-import {UndirectedGraph} from 'graphology';
-import erdosRenyi from 'graphology-generators/random/erdos-renyi';
-import randomLayout from 'graphology-layout/random';
-import chroma from 'chroma-js';
-import faker from 'faker';
+import Graph from 'graphology';
+import gexf from 'graphology-gexf/browser';
 import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
 
-const container = document.getElementById('container');
+import arctic from './resources/arctic.gexf';
 
-const graph = erdosRenyi.fast(UndirectedGraph, {n: 500, probability: 0.05});
-randomLayout.assign(graph);
-
-graph.nodes().forEach(node => {
-  const attr = graph.getNodeAttributes(node);
-
-  const color = chroma.random().hex();
-
-  graph.mergeNodeAttributes(node, {
-    label: faker.name.findName(),
-    size: Math.max(4, Math.random() * 10),
-    originalColor: color,
-    color
-  });
-});
+const graph = gexf.parse(Graph, arctic);
 
 graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
 const renderer = new WebGLRenderer(container);
+
+const camera = renderer.getCamera();
 
 const sigma = new Sigma(graph, renderer);
 
@@ -38,16 +23,31 @@ const captor = renderer.getMouseCaptor();
 let draggedNode = null,
     dragging = false;
 
-renderer.on('clickNode', e => {
+renderer.on('downNode', e => {
+  dragging = true;
   draggedNode = e.node;
-  console.log(e)
+  camera.disable();
 });
 
-captor.on('mousedown', e => (dragging = true));
-captor.on('mouseup', e => (dragging = false));
+captor.on('mouseup', e => {
+  dragging = false;
+  draggedNode = null;
+  camera.enable();
+});
 
 captor.on('mousemove', e => {
 
-  if (dragging && draggedNode)
-    console.log(e);
+  if (!dragging)
+    return;
+
+  // Get new position of node
+  const pos = renderer.nodeRescalingFunction.inverse(
+    camera.displayToGraph(e.clientX, e.clientY)
+  );
+
+  graph.setNodeAttribute(draggedNode, 'x', pos.x);
+  graph.setNodeAttribute(draggedNode, 'y', pos.y);
 });
+
+window.renderer = renderer;
+window.camera = renderer.getCamera();
