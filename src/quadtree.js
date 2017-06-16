@@ -17,6 +17,8 @@
 
 // TODO: be sure we can handle cases overcoming boundaries (because of size) or use a max
 
+// TODO: decide whether to store at leaf level or at medium levels (frustum vs. hover)
+
 /**
  * Constants.
  *

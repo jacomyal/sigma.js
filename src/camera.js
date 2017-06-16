@@ -94,11 +94,28 @@ export default class Camera extends EventEmitter {
           sin = Math.sin(this.angle);
 
     // TODO: this should take a real point not one from offset by the center
+    // TODO: see jacomyma for this
     return {
       x: (x * cos - y * sin) * this.ratio,
       y: (y * cos + x * sin) * this.ratio
     };
   }
+
+  // realDisplayToGraph(x, y) {
+  //   const cos = Math.cos(this.angle),
+  //         sin = Math.sin(this.angle);
+
+  //   const xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio / Math.cos(2 * this.angle),
+  //         yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio / Math.cos(2 * this.angle);
+
+  //   const X = x - xOffset,
+  //         Y = y - yOffset;
+
+  //   return {
+  //     x: (X * cos - Y * sin) * this.ratio / Math.cos(2 * this.angle),
+  //     y: (Y * cos + X * sin) * this.ratio / Math.cos(2 * this.angle)
+  //   };
+  // }
 
   /**
    * Method returning the coordinates of a point from the graph frame to the
@@ -116,7 +133,7 @@ export default class Camera extends EventEmitter {
 
     return {
       x: x * relCos + y * relSin + xOffset,
-      y: y * relCos + x * relSin + yOffset
+      y: y * relCos - x * relSin + yOffset
     };
   }
 

@@ -209,6 +209,74 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   bindEventHandlers() {
+
+    this.listeners.handleMove = e => {
+
+      // TODO: disable when camera is animated
+      // TODO: use pixel test to avoid quadtree when possible
+
+      // 1. display to graph
+      // 2. quadtree
+      // 3. compare display data to event
+
+      // Retrieving nodes at position
+      const position = this.camera.displayToGraph(
+        e.x - this.width / 2,
+        e.y - this.height / 2
+      );
+
+      console.log(position);
+
+      return;
+
+      const quadNodes = this.quadtree.point(
+        position.x - this.width / 2,
+        position.y - this.height / 2
+      );
+
+      console.log(quadNodes.map(node => this.nodeDataCache[node].label));
+
+      for (let i = 0, l = quadNodes.length; i < l; i++) {
+        const node = quadNodes[i];
+
+        const data = this.nodeDataCache[node];
+
+        const pos = this.camera.graphToDisplay(
+          data.x,
+          data.y
+        );
+
+        // => Réajuster le ratio
+        // TODO: Math.sqrt etc.
+
+        if (e.x > pos.x - data.size &&
+            e.x < pos.x + data.size &&
+            e.y > pos.y - data.size &&
+            e.y < pos.y + data.size) {
+          this.highlightNode(node);
+
+          // We only highlight the first one
+          break;
+        }
+      }
+
+      // TODO: need to distinguish between hovered & highlighted nodes!
+
+      // Did we got out of a node?
+      this.highlightedNodes.forEach(node => {
+        const data = this.nodeDataCache[node];
+
+        if (!(e.x > data.x - data.size &&
+              e.x < data.x + data.size &&
+              e.y > data.y - data.size &&
+              e.y < data.y + data.size)) {
+          this.unhighlightNode(node);
+        }
+      });
+    };
+
+    this.captors.mouse.on('click', this.listeners.handleMove);
+
     return this;
   }
 
@@ -637,7 +705,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Rendering
     this.highlightedNodes.forEach(node => {
-      const data = this.sigma.getNodeData(node);
+      const data = this.nodeDataCache[node];
 
       const {x, y} = camera.graphToDisplay(data.x, data.y);
 

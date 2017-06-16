@@ -192,6 +192,8 @@ export default class MouseCaptor extends Captor {
     if (!this.enabled)
       return;
 
+    this.emit('mousemove', getMouseCoords(e));
+
     if (this.isMouseDown) {
 
       // TODO: dispatch events

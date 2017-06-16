@@ -65,6 +65,8 @@ const DEFAULT_EDGE_RESCALE_OPTIONS = {
   maxSize: 1
 };
 
+// TODO: should we let the user handle size through, for instance, d3 scales?
+
 /**
  * Factory returning a function rescaling the given node's position and/or size.
  *
