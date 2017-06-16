@@ -83,6 +83,24 @@ export default class Camera extends EventEmitter {
 
   /**
    * Method returning the coordinates of a point from the display frame to the
+   * graph one but ignores the offset and dimensions of the container.
+   *
+   * @param  {number} x The X coordinate.
+   * @param  {number} y The Y coordinate.
+   * @return {object}   The point coordinates in the frame of the graph.
+   */
+  abstractDisplayToGraph(x, y) {
+    const cos = Math.cos(this.angle),
+          sin = Math.sin(this.angle);
+
+    return {
+      x: (x * cos - y * sin) * this.ratio,
+      y: (y * cos + x * sin) * this.ratio
+    };
+  }
+
+  /**
+   * Method returning the coordinates of a point from the display frame to the
    * graph one.
    *
    * @param  {number} x The X coordinate.
@@ -93,29 +111,17 @@ export default class Camera extends EventEmitter {
     const cos = Math.cos(this.angle),
           sin = Math.sin(this.angle);
 
-    // TODO: this should take a real point not one from offset by the center
-    // TODO: see jacomyma for this
+    const xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio,
+          yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio;
+
+    const X = x - xOffset,
+          Y = y - yOffset;
+
     return {
-      x: (x * cos - y * sin) * this.ratio,
-      y: (y * cos + x * sin) * this.ratio
+      x: (X * cos - Y * sin) * this.ratio,
+      y: (Y * cos + X * sin) * this.ratio
     };
   }
-
-  // realDisplayToGraph(x, y) {
-  //   const cos = Math.cos(this.angle),
-  //         sin = Math.sin(this.angle);
-
-  //   const xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio / Math.cos(2 * this.angle),
-  //         yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio / Math.cos(2 * this.angle);
-
-  //   const X = x - xOffset,
-  //         Y = y - yOffset;
-
-  //   return {
-  //     x: (X * cos - Y * sin) * this.ratio / Math.cos(2 * this.angle),
-  //     y: (Y * cos + X * sin) * this.ratio / Math.cos(2 * this.angle)
-  //   };
-  // }
 
   /**
    * Method returning the coordinates of a point from the graph frame to the

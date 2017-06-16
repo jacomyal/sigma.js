@@ -118,6 +118,7 @@ export function getMouseCoords(e, x, y) {
 
   const center = getCenter(e);
 
+  // TODO: is this really needed to have this strange {x,y} with now?
   return {
     x: x - center.x,
     y: y - center.y,

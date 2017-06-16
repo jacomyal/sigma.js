@@ -105,7 +105,7 @@ export default class MouseCaptor extends Captor {
 
     const cameraState = this.camera.getState();
 
-    const position = this.camera.displayToGraph(
+    const position = this.camera.abstractDisplayToGraph(
       getX(e) - center.x,
       getY(e) - center.y
     );
@@ -208,7 +208,7 @@ export default class MouseCaptor extends Captor {
         this.isMoving = false;
       }, DRAG_TIMEOUT);
 
-      const position = this.camera.displayToGraph(
+      const position = this.camera.abstractDisplayToGraph(
         getX(e) - this.startMouseX,
         getY(e) - this.startMouseY
       );
@@ -256,7 +256,7 @@ export default class MouseCaptor extends Captor {
 
     const cameraState = this.camera.getState();
 
-    const position = this.camera.displayToGraph(
+    const position = this.camera.abstractDisplayToGraph(
       getX(e) - center.x,
       getY(e) - center.y
     );

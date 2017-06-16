@@ -86,14 +86,10 @@ export function matrixFromCamera(state) {
 /**
  * Function extracting the color at the given pixel.
  */
-export function extractPixelColor(gl, x, y) {
-  const data = new Uint8Array(4);
+export function extractPixel(gl, x, y, array) {
+  const data = array || new Uint8Array(4);
 
   gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
-  return (
-    data[0] * 256 * 256 +
-    data[1] * 256 +
-    data[2]
-  );
+  return data;
 }

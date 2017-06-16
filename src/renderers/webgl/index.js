@@ -29,7 +29,8 @@ import {
 } from '../utils';
 
 import {
-  matrixFromCamera
+  matrixFromCamera,
+  extractPixel
 } from './utils';
 
 /**
@@ -113,9 +114,12 @@ export default class WebGLRenderer extends Renderer {
 
     // State
     this.highlightedNodes = new Set();
+    this.hoveredNode = null;
     this.renderFrame = null;
+    this.renderHighlightedNodesFrame = null;
     this.needToProcess = false;
     this.needToSoftProcess = false;
+    this.pixel = new Uint8Array(4);
 
     // Initializing contexts
     this.createContext('edges');
@@ -156,6 +160,25 @@ export default class WebGLRenderer extends Renderer {
    * Internal methods.
    **---------------------------------------------------------------------------
    */
+
+  /**
+   * Method used to test a pixel of the given context.
+   *
+   * @param  {WebGLContext} gl - Context.
+   * @param  {number}       x  - Client x.
+   * @param  {number}       y  - Client y.
+   * @return {boolean}
+   */
+  testPixel(gl, x, y) {
+    extractPixel(
+      gl,
+      x * WEBGL_OVERSAMPLING_RATIO,
+      (this.height - y) * WEBGL_OVERSAMPLING_RATIO,
+      this.pixel
+    );
+
+    return this.pixel[3] !== 0;
+  }
 
   /**
    * Internal function used to create a canvas context and add the relevant
@@ -210,31 +233,33 @@ export default class WebGLRenderer extends Renderer {
    */
   bindEventHandlers() {
 
+    const mouseIsOnNode = (mouseX, mouseY, nodeX, nodeY, size) => {
+      return (
+        mouseX > nodeX - size &&
+        mouseX < nodeX + size &&
+        mouseY > nodeY - size &&
+        mouseY < nodeY + size &&
+        Math.sqrt(Math.pow(mouseX - nodeX, 2) +
+          Math.pow(mouseY - nodeY, 2)) < size
+      );
+    };
+
     this.listeners.handleMove = e => {
 
-      // TODO: disable when camera is animated
-      // TODO: use pixel test to avoid quadtree when possible
-
-      // 1. display to graph
-      // 2. quadtree
-      // 3. compare display data to event
+      // NOTE: for the canvas renderer, testing the pixel's alpha should
+      // give some boost but this slows things down for WebGL empirically.
+      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
       // Retrieving nodes at position
-      const position = this.camera.displayToGraph(
-        e.x - this.width / 2,
-        e.y - this.height / 2
+      const mouseGraphPosition = this.camera.displayToGraph(
+        e.clientX,
+        e.clientY
       );
-
-      console.log(position);
-
-      return;
 
       const quadNodes = this.quadtree.point(
-        position.x - this.width / 2,
-        position.y - this.height / 2
+        mouseGraphPosition.x,
+        mouseGraphPosition.y
       );
-
-      console.log(quadNodes.map(node => this.nodeDataCache[node].label));
 
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
@@ -246,36 +271,35 @@ export default class WebGLRenderer extends Renderer {
           data.y
         );
 
-        // => Réajuster le ratio
-        // TODO: Math.sqrt etc.
+        const size = data.size / sizeRatio;
 
-        if (e.x > pos.x - data.size &&
-            e.x < pos.x + data.size &&
-            e.y > pos.y - data.size &&
-            e.y < pos.y + data.size) {
-          this.highlightNode(node);
+        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
+          this.hoveredNode = node;
 
-          // We only highlight the first one
-          break;
+          return this.scheduleHighlightedNodesRender();
         }
       }
 
-      // TODO: need to distinguish between hovered & highlighted nodes!
+      // Checking if the hovered node is still hovered
+      if (this.hoveredNode) {
+        const data = this.nodeDataCache[this.hoveredNode];
 
-      // Did we got out of a node?
-      this.highlightedNodes.forEach(node => {
-        const data = this.nodeDataCache[node];
+        const pos = this.camera.graphToDisplay(
+          data.x,
+          data.y
+        );
 
-        if (!(e.x > data.x - data.size &&
-              e.x < data.x + data.size &&
-              e.y > data.y - data.size &&
-              e.y < data.y + data.size)) {
-          this.unhighlightNode(node);
+        const size = data.size / sizeRatio;
+
+        if (!mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
+          this.hoveredNode = null;
+
+          return this.scheduleHighlightedNodesRender();
         }
-      });
+      }
     };
 
-    this.captors.mouse.on('click', this.listeners.handleMove);
+    this.captors.mouse.on('mousemove', this.listeners.handleMove);
 
     return this;
   }
@@ -704,7 +728,7 @@ export default class WebGLRenderer extends Renderer {
     context.clearRect(0, 0, this.width, this.height);
 
     // Rendering
-    this.highlightedNodes.forEach(node => {
+    const render = node => {
       const data = this.nodeDataCache[node];
 
       const {x, y} = camera.graphToDisplay(data.x, data.y);
@@ -718,7 +742,12 @@ export default class WebGLRenderer extends Renderer {
         x,
         y
       });
-    });
+    };
+
+    if (this.hoveredNode)
+      render(this.hoveredNode);
+
+    this.highlightedNodes.forEach(render);
   }
 
   /**
@@ -747,6 +776,25 @@ export default class WebGLRenderer extends Renderer {
   }
 
   /**
+   * Method used to schedule a hover render.
+   *
+   * @return {WebGLRenderer}
+   */
+  scheduleHighlightedNodesRender() {
+    if (this.renderHighlightedNodesFrame)
+      return this;
+
+    this.renderHighlightedNodesFrame = requestAnimationFrame(() => {
+
+      // Resetting state
+      this.renderHighlightedNodesFrame = null;
+
+      // Rendering
+      this.renderHighlightedNodes();
+    });
+  }
+
+  /**
    * Method used to highlight a node.
    *
    * @param  {string} key - The node's key.
@@ -759,8 +807,7 @@ export default class WebGLRenderer extends Renderer {
     this.highlightedNodes.add(key);
 
     // Rendering
-    // TODO: schedule
-    this.renderHighlightedNodes();
+    this.scheduleHighlightedNodesRender();
 
     return this;
   }
@@ -778,8 +825,7 @@ export default class WebGLRenderer extends Renderer {
     this.highlightedNodes.delete(key);
 
     // Rendering
-    // TODO: schedule
-    this.renderHighlightedNodes();
+    this.scheduleHighlightedNodesRender();
 
     return this;
   }
