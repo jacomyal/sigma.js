@@ -8,15 +8,13 @@ import {mat3} from 'gl-matrix';
 
 import Renderer from '../../renderer';
 import Camera from '../../camera';
+import MouseCaptor from '../../captors/mouse';
+import QuadTree from '../../quadtree';
 import NodeProgram from './programs/node';
 import EdgeProgram from './programs/edge';
 
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
-
-import MouseCaptor from '../../captors/mouse';
-
-import QuadTree from '../../quadtree';
 
 import {
   assign
@@ -38,34 +36,6 @@ import {
  */
 const WEBGL_OVERSAMPLING_RATIO = 2;
 const PIXEL_RATIO = getPixelRatio();
-
-// TODO: autorescale should be a factory function with dimensions and boundaries => conversion (can use the camera)
-
-// TODO: test the color pixel map for hover, or a raycaster
-// TODO: check bufferSubData
-// TODO: possibility to bypass need for quadtree when every node fits in
-// TODO: rescale layout
-// TODO: draw hover should be an activable method
-
-// TODO: give all the bricks to create your own renderer easily
-// TODO: expose the captors etc.
-// TODO: show minimalist renderers (canvas for instance), so that anyone may do it
-// TODO: delegate render to renderer avoid refresh on sigma
-// TODO: create a minimalistic renderer using canvas or d3
-
-// TODO: might be possible to use a canvas camera for the canvas renderer
-// TODO: camera should be created in the constructor rather than in #.bind
-// TODO: should sigma be the one to refresh?
-// TODO: renderer can be a class or a mere function if needed
-
-// TODO: method returning the camera & captor
-
-// TODO: should not buffer data each time it seems
-// TODO: should react to the graph updates obviously :)
-
-// TODO: should try the method without if and oversampling found for the nodes
-
-// TODO: we should check the pixel opacity before attempting to use the quad
 
 /**
  * Main class.
