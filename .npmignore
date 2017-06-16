@@ -1,0 +1,12 @@
+node_modules
+*.tgz
+*.log
+*.swp
+.DS_Store
+package-lock.json
+.gitignore
+.npmignore
+examples
+test
+src
+webpack.config.js

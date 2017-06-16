@@ -20,4 +20,7 @@ const library = {
   WebGLRenderer
 };
 
-module.exports = library;
+for (const k in library)
+  Sigma[k] = library[k];
+
+module.exports = Sigma;

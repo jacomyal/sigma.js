@@ -25,7 +25,7 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
-        test: /\.(?:vert|frag|gexf)$/,
+        test: /\.(?:glsl|gexf)$/,
         exclude: /node_modules/,
         loader: 'raw-loader'
       },

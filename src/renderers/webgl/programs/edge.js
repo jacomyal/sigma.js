@@ -16,8 +16,8 @@
  */
 import Program from './program';
 import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/edge.vert';
-import fragmentShaderSource from '../shaders/edge.frag';
+import vertexShaderSource from '../shaders/edge.vert.glsl';
+import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
 export default class EdgeProgram extends Program {
   constructor() {
