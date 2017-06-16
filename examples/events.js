@@ -71,6 +71,10 @@ renderer.on('outNode', e => {
   });
 });
 
+renderer.on('clickNode', e => {
+  console.log(e.node, graph.getNodeAttributes(e.node));
+});
+
 window.graph = graph;
 window.renderer = renderer;
 window.camera = renderer.camera;

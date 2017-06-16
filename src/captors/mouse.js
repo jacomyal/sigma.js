@@ -149,6 +149,7 @@ export default class MouseCaptor extends Captor {
 
         // Left button pressed
         this.isMouseDown = true;
+        this.emit('mousedown', getMouseCoords(e));
     }
   }
 
@@ -184,7 +185,7 @@ export default class MouseCaptor extends Captor {
       });
     }
 
-    // TODO: dispatch events
+    this.emit('mouseup', getMouseCoords(e));
     this.isMoving = false;
   }
 

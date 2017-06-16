@@ -8,6 +8,7 @@ module.exports = {
   context: __dirname,
   entry: {
     basic: './basic.js',
+    drag: './drag.js',
     events: './events.js',
     gexf: './gexf.js',
     naiveLayout: './naive-layout.js'
@@ -46,6 +47,12 @@ module.exports = {
       title: 'Sigma.js - Basic Example',
       template,
       chunks: ['commons', 'basic']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'drag.html',
+      title: 'Sigma.js - Drag Example',
+      template,
+      chunks: ['commons', 'drag']
     }),
     new HtmlWebpackPlugin({
       filename: 'events.html',

@@ -44,6 +44,27 @@ export default class Camera extends EventEmitter {
 
     // State
     this.nextFrame = null;
+    this.enabled = true;
+  }
+
+  /**
+   * Method used to enable the camera.
+   *
+   * @return {Camera}
+   */
+  enable() {
+    this.enabled = true;
+    return this;
+  }
+
+  /**
+   * Method used to disable the camera.
+   *
+   * @return {Camera}
+   */
+  disable() {
+    this.enabled = false;
+    return this;
   }
 
   /**
@@ -151,6 +172,9 @@ export default class Camera extends EventEmitter {
    */
   setState(state) {
 
+    if (!this.enabled)
+      return this;
+
     // TODO: validations
     // TODO: update by function
 
@@ -181,6 +205,9 @@ export default class Camera extends EventEmitter {
    */
   resize(dimensions) {
 
+    if (!this.enabled)
+      return this;
+
     if ('width' in dimensions)
       this.width = dimensions.width;
 
@@ -202,6 +229,9 @@ export default class Camera extends EventEmitter {
    * @return {function}            - Return a function to cancel the animation.
    */
   animate(state, options /*, callback */) {
+
+    if (!this.enabled)
+      return this;
 
     // TODO: validation
 

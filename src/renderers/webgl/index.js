@@ -298,9 +298,9 @@ export default class WebGLRenderer extends Renderer {
 
         if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size))
           return this.emit('clickNode', {node});
-        else
-          return this.emit('clickStage');
       }
+
+      return this.emit('clickStage');
     };
 
     this.captors.mouse.on('mousemove', this.listeners.handleMove);
@@ -520,6 +520,24 @@ export default class WebGLRenderer extends Renderer {
     this.process();
 
     return this;
+  }
+
+  /**
+   * Method returning the renderer's camera.
+   *
+   * @return {Camera}
+   */
+  getCamera() {
+    return this.camera;
+  }
+
+  /**
+   * Method returning the mouse captor.
+   *
+   * @return {Camera}
+   */
+  getMouseCaptor() {
+    return this.captors.mouse;
   }
 
   /**
