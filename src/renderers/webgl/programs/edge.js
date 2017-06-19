@@ -124,7 +124,7 @@ export default class EdgeProgram extends Program {
     // Creating buffer:
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
     // Binding uniforms
     gl.uniform2f(resolutionLocation, params.width, params.height);
