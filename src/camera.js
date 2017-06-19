@@ -279,6 +279,6 @@ export default class Camera extends EventEmitter {
       this.nextFrame = requestAnimationFrame(fn);
     };
 
-    this.nextFrame = requestAnimationFrame(fn);
+    fn();
   }
 }
