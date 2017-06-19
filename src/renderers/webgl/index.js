@@ -11,7 +11,7 @@ import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
 import NodeProgram from './programs/node';
-import EdgeProgram from './programs/edge';
+import EdgeProgram from './programs/edge.fast';
 
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
