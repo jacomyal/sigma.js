@@ -9,7 +9,7 @@
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
     "dist": "npm run clean && babel src --out-dir . && webpack --config ./webpack.programs.config.js",
-    "examples": "webpack-dev-server --config ./examples/webpack.config.js --port 8000 --progress",
+    "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "lint": "eslint examples src test",
     "postpublish": "npm run clean",
     "prepublish": "npm run test && npm run dist && npm run build",

@@ -80,5 +80,8 @@ module.exports = {
       }
     ]
   },
-  plugins
+  plugins,
+  devServer: {
+    port: 8000
+  }
 };
