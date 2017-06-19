@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title>Sigma.js - Examples</title>
+  </head>
+  <body>
+    <h1>Sigma.js - Examples</h1>
+    <ul>
+      <% var pages = htmlWebpackPlugin.options.pages %>
+      <% for(var i = 0, l = pages.length; i < l; i++) {%>
+        <li>
+          <a href="./<%= pages[i].id %>.html">
+            <%= pages[i].title %>
+        </li>
+      <% } %>
+    </ul>
+  </body>
+</html>

@@ -2,17 +2,61 @@ const webpack = require('webpack'),
       HtmlWebpackPlugin = require('html-webpack-plugin'),
       path = require('path');
 
-const template = path.join(__dirname, 'templates', 'default.ejs');
+const EXAMPLES = {
+  basic: {
+    id: 'basic',
+    title: 'Basic'
+  },
+  drag: {
+    id: 'drag',
+    title: 'Drag'
+  },
+  events: {
+    id: 'events',
+    title: 'Events'
+  },
+  gexf: {
+    id: 'gexf',
+    title: 'GEXF'
+  },
+  naiveLayout: {
+    id: 'naive-layout',
+    title: 'Naive Layout'
+  }
+};
+
+const entry = {};
+
+const plugins = [
+  new webpack.optimize.CommonsChunkPlugin({
+      name: 'commons',
+      filename: 'commons.bundle.js',
+      minChunks: 2
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'index.html',
+    title: 'Sigma.js - Examples',
+    template: path.join(__dirname, 'templates', 'index.ejs'),
+    pages: Object.keys(EXAMPLES).map(key => EXAMPLES[key])
+  })
+];
+
+for (const key in EXAMPLES) {
+  const example = EXAMPLES[key];
+
+  entry[key] = `./${example.id}.js`;
+
+  plugins.push(new HtmlWebpackPlugin({
+    filename: `${example.id}.html`,
+    title: `Sigma.js - ${example.title} Example`,
+    chunks: ['commons', key],
+    template: path.join(__dirname, 'templates', 'default.ejs')
+  }));
+}
 
 module.exports = {
   context: __dirname,
-  entry: {
-    basic: './basic.js',
-    drag: './drag.js',
-    events: './events.js',
-    gexf: './gexf.js',
-    naiveLayout: './naive-layout.js'
-  },
+  entry,
   output: {
     filename: '[name].bundle.js'
   },
@@ -36,41 +80,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.bundle.js',
-      minChunks: 2
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'basic.html',
-      title: 'Sigma.js - Basic Example',
-      template,
-      chunks: ['commons', 'basic']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'drag.html',
-      title: 'Sigma.js - Drag Example',
-      template,
-      chunks: ['commons', 'drag']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'events.html',
-      title: 'Sigma.js - Events Example',
-      template,
-      chunks: ['commons', 'events']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'gexf.html',
-      title: 'Sigma.js - GEXF Example',
-      template,
-      chunks: ['commons', 'gexf']
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'naive-layout.html',
-      title: 'Sigma.js - Naive Layout Example',
-      template,
-      chunks: ['commons', 'naiveLayout']
-    })
-  ]
+  plugins
 };
