@@ -37,7 +37,8 @@ const plugins = [
     filename: 'index.html',
     title: 'Sigma.js - Examples',
     template: path.join(__dirname, 'templates', 'index.ejs'),
-    pages: Object.keys(EXAMPLES).map(key => EXAMPLES[key])
+    pages: Object.keys(EXAMPLES).map(key => EXAMPLES[key]),
+    chunks: []
   })
 ];
 
