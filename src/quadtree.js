@@ -143,11 +143,12 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
   const stack = [0, 0];
 
   while (stack.length) {
-    const level = stack.pop(),
-          block = stack.pop();
+    let level = stack.pop();
+
+    const block = stack.pop();
 
     // If we reached max level
-    if (level === maxLevel) {
+    if (level >= maxLevel) {
       containers[block] = containers[block] || [];
       containers[block].push(key);
       return;
@@ -209,26 +210,33 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
     if (collisions === 0)
       throw new Error(`sigma/quadtree.insertNode: no collision (level: ${level}, key: ${key}, x: ${x}, y: ${y}, size: ${size}).`);
 
+    // If we have 3 collisions, we have a geometry problem obviously
+    if (collisions === 3)
+      throw new Error(`sigma/quadtree.insertNode: 3 impossible collisions (level: ${level}, key: ${key}, x: ${x}, y: ${y}, size: ${size}).`);
+
     // If we have more that one collision, we stop here and store the node
-    // in the relevant container
+    // in the relevant containers
     if (collisions > 1) {
       containers[block] = containers[block] || [];
       containers[block].push(key);
       return;
     }
+    else {
+      level++;
+    }
 
-    // Else we recurse into the correct quad
+    // Else we recurse into the correct quads
     if (collidingWithTopLeft)
-      stack.push(topLeftBlock, level + 1);
+      stack.push(topLeftBlock, level);
 
     if (collidingWithTopRight)
-      stack.push(topRightBlock, level + 1);
+      stack.push(topRightBlock, level);
 
     if (collidingWithBottomLeft)
-      stack.push(bottomLeftBlock, level + 1);
+      stack.push(bottomLeftBlock, level);
 
     if (collidingWithBottomRight)
-      stack.push(bottomRightBlock, level + 1);
+      stack.push(bottomRightBlock, level);
   }
 }
 
@@ -289,12 +297,10 @@ export default class QuadTree {
     let block = 0,
         level = 0;
 
-    while (level <= MAX_LEVEL) {
-
+    do {
       if (this.containers[block])
         nodes.push.apply(nodes, this.containers[block]);
 
-      // TODO: should probably use a do...while to avoid useless last op
       const quad = pointIsInQuad(
         x,
         y,
@@ -306,7 +312,7 @@ export default class QuadTree {
 
       block = 4 * block + quad * BLOCKS;
       level++;
-    }
+    } while (level <= MAX_LEVEL);
 
     return nodes;
   }
