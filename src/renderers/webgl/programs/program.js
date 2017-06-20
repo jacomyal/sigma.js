@@ -16,6 +16,12 @@ import {
  * @constructor
  */
 export default class Program {
+  constructor(gl, vertexShaderSource, fragmentShaderSource) {
+    this.vertexShaderSource = vertexShaderSource;
+    this.fragmentShaderSource = fragmentShaderSource;
+
+    this.load(gl);
+  }
 
   /**
    * Method used to load the program into a webgl context.

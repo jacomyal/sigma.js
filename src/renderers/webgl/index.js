@@ -69,13 +69,6 @@ export default class WebGLRenderer extends Renderer {
     this.edgeIndicesArray = null;
     this.edgeOrder = {};
 
-    this.nodePrograms = {
-      def: new NodeProgram()
-    };
-    this.edgePrograms = {
-      def: new EdgeProgram()
-    };
-
     // TODO: if we drop size scaling => this should become "rescalingFunction"
     this.nodeRescalingFunction = null;
 
@@ -99,6 +92,20 @@ export default class WebGLRenderer extends Renderer {
     this.createContext('hovers', false);
     this.createContext('mouse', false);
 
+    // Blending
+    const gl = this.contexts.nodes;
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    // Loading programs
+    this.nodePrograms = {
+      def: new NodeProgram(this.contexts.nodes)
+    };
+    this.edgePrograms = {
+      def: new EdgeProgram(this.contexts.edges)
+    };
+
     // Initial resize
     this.resize();
 
@@ -118,13 +125,6 @@ export default class WebGLRenderer extends Renderer {
 
     // Binding event handlers
     this.bindEventHandlers();
-
-    // Loading programs
-    for (const k in this.nodePrograms)
-      this.nodePrograms[k].load(this.contexts.nodes);
-
-    for (const k in this.edgePrograms)
-      this.edgePrograms[k].load(this.contexts.edges);
   }
 
   /**---------------------------------------------------------------------------
@@ -689,11 +689,6 @@ export default class WebGLRenderer extends Renderer {
     // Drawing nodes
     gl = this.contexts.nodes;
     program = this.nodePrograms.def;
-
-    // Blending
-    // TODO: check the purpose of this
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
 
     // TODO: should probably use another name for the `program` abstraction
     program.render(

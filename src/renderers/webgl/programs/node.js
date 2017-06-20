@@ -17,11 +17,22 @@ const ANGLE_1 = 0,
       ANGLE_3 = 4 * Math.PI / 3;
 
 export default class NodeProgram extends Program {
-  constructor() {
-    super();
+  constructor(gl) {
+    super(gl, vertexShaderSource, fragmentShaderSource);
 
-    this.vertexShaderSource = vertexShaderSource;
-    this.fragmentShaderSource = fragmentShaderSource;
+    // Initializing buffers
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+    // Locations
+    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
+    this.sizeLocation = gl.getAttribLocation(this.program, 'a_size');
+    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
+    this.angleLocation = gl.getAttribLocation(this.program, 'a_angle');
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
+    this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
+    this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
   }
 
   process(array, data, i) {
@@ -50,37 +61,23 @@ export default class NodeProgram extends Program {
     const program = this.program;
     gl.useProgram(program);
 
-    // Attribute locations
-    const positionLocation = gl.getAttribLocation(program, 'a_position'),
-          sizeLocation = gl.getAttribLocation(program, 'a_size'),
-          colorLocation = gl.getAttribLocation(program, 'a_color'),
-          angleLocation = gl.getAttribLocation(program, 'a_angle'),
-          resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-          matrixLocation = gl.getUniformLocation(program, 'u_matrix'),
-          ratioLocation = gl.getUniformLocation(program, 'u_ratio'),
-          scaleLocation = gl.getUniformLocation(program, 'u_scale');
-
-    const buffer = gl.createBuffer();
-
-    // TODO: might be possible not to buffer data each time if only the camera changes
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
-    gl.uniform2f(resolutionLocation, params.width, params.height);
+    gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
-      ratioLocation,
+      this.ratioLocation,
       1 / Math.pow(params.ratio, params.nodesPowRatio)
     );
-    gl.uniform1f(scaleLocation, params.scalingRatio);
-    gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
+    gl.uniform1f(this.scaleLocation, params.scalingRatio);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    gl.enableVertexAttribArray(positionLocation);
-    gl.enableVertexAttribArray(sizeLocation);
-    gl.enableVertexAttribArray(colorLocation);
-    gl.enableVertexAttribArray(angleLocation);
+    gl.enableVertexAttribArray(this.positionLocation);
+    gl.enableVertexAttribArray(this.sizeLocation);
+    gl.enableVertexAttribArray(this.colorLocation);
+    gl.enableVertexAttribArray(this.angleLocation);
 
     gl.vertexAttribPointer(
-      positionLocation,
+      this.positionLocation,
       2,
       gl.FLOAT,
       false,
@@ -89,7 +86,7 @@ export default class NodeProgram extends Program {
     );
 
     gl.vertexAttribPointer(
-      sizeLocation,
+      this.sizeLocation,
       1,
       gl.FLOAT,
       false,
@@ -98,7 +95,7 @@ export default class NodeProgram extends Program {
     );
 
     gl.vertexAttribPointer(
-      colorLocation,
+      this.colorLocation,
       1,
       gl.FLOAT,
       false,
@@ -107,7 +104,7 @@ export default class NodeProgram extends Program {
     );
 
     gl.vertexAttribPointer(
-      angleLocation,
+      this.angleLocation,
       1,
       gl.FLOAT,
       false,

@@ -20,11 +20,24 @@ import vertexShaderSource from '../shaders/edge.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
 export default class EdgeProgram extends Program {
-  constructor() {
-    super();
+  constructor(gl) {
+    super(gl, vertexShaderSource, fragmentShaderSource);
 
-    this.vertexShaderSource = vertexShaderSource;
-    this.fragmentShaderSource = fragmentShaderSource;
+    // Initializing buffers
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+    this.indicesBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+
+    // Locations
+    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
+    this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
+    this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
+    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
+    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
   }
 
   process(array, sourceData, targetData, data, i) {
@@ -112,57 +125,46 @@ export default class EdgeProgram extends Program {
     const program = this.program;
     gl.useProgram(program);
 
-    // Attribute locations
-    const positionLocation = gl.getAttribLocation(program, 'a_position'),
-          normalLocation = gl.getAttribLocation(program, 'a_normal'),
-          thicknessLocation = gl.getAttribLocation(program, 'a_thickness'),
-          colorLocation = gl.getAttribLocation(program, 'a_color'),
-          resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-          ratioLocation = gl.getUniformLocation(program, 'u_ratio'),
-          matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-
-    // Creating buffer:
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    // Buffer data
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
     // Binding uniforms
-    gl.uniform2f(resolutionLocation, params.width, params.height);
+    gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
-      ratioLocation,
+      this.ratioLocation,
       params.ratio / Math.pow(params.ratio, params.edgesPowRatio)
     );
 
-    gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     // Binding attributes:
-    gl.enableVertexAttribArray(positionLocation);
-    gl.enableVertexAttribArray(normalLocation);
-    gl.enableVertexAttribArray(thicknessLocation);
-    gl.enableVertexAttribArray(colorLocation);
+    gl.enableVertexAttribArray(this.positionLocation);
+    gl.enableVertexAttribArray(this.normalLocation);
+    gl.enableVertexAttribArray(this.thicknessLocation);
+    gl.enableVertexAttribArray(this.colorLocation);
 
-    gl.vertexAttribPointer(positionLocation,
+    gl.vertexAttribPointer(this.positionLocation,
       2,
       gl.FLOAT,
       false,
       EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
-    gl.vertexAttribPointer(normalLocation,
+    gl.vertexAttribPointer(this.normalLocation,
       2,
       gl.FLOAT,
       false,
       EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
-    gl.vertexAttribPointer(thicknessLocation,
+    gl.vertexAttribPointer(this.thicknessLocation,
       1,
       gl.FLOAT,
       false,
       EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
-    gl.vertexAttribPointer(colorLocation,
+    gl.vertexAttribPointer(this.colorLocation,
       1,
       gl.FLOAT,
       false,
@@ -170,9 +172,7 @@ export default class EdgeProgram extends Program {
       20
     );
 
-    // Creating indices buffer:
-    const indicesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+    // Buffering indices data
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, params.indices, gl.STATIC_DRAW);
 
     // Drawing:
