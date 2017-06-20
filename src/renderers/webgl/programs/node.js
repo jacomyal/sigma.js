@@ -33,44 +33,8 @@ export default class NodeProgram extends Program {
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
-  }
 
-  process(array, data, i) {
-    const color = floatColor(data.color);
-
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
-    array[i++] = ANGLE_1;
-
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
-    array[i++] = ANGLE_2;
-
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
-    array[i++] = ANGLE_3;
-  }
-
-  render(gl, array, params) {
-    const program = this.program;
-    gl.useProgram(program);
-
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
-
-    gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(
-      this.ratioLocation,
-      1 / Math.pow(params.ratio, params.nodesPowRatio)
-    );
-    gl.uniform1f(this.scaleLocation, params.scalingRatio);
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
+    // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.sizeLocation);
     gl.enableVertexAttribArray(this.colorLocation);
@@ -111,6 +75,43 @@ export default class NodeProgram extends Program {
       NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
+  }
+
+  process(array, data, i) {
+    const color = floatColor(data.color);
+
+    array[i++] = data.x;
+    array[i++] = data.y;
+    array[i++] = data.size;
+    array[i++] = color;
+    array[i++] = ANGLE_1;
+
+    array[i++] = data.x;
+    array[i++] = data.y;
+    array[i++] = data.size;
+    array[i++] = color;
+    array[i++] = ANGLE_2;
+
+    array[i++] = data.x;
+    array[i++] = data.y;
+    array[i++] = data.size;
+    array[i++] = color;
+    array[i++] = ANGLE_3;
+  }
+
+  render(gl, array, params) {
+    const program = this.program;
+    gl.useProgram(program);
+
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+
+    gl.uniform2f(this.resolutionLocation, params.width, params.height);
+    gl.uniform1f(
+      this.ratioLocation,
+      1 / Math.pow(params.ratio, params.nodesPowRatio)
+    );
+    gl.uniform1f(this.scaleLocation, params.scalingRatio);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     gl.drawArrays(
       gl.TRIANGLES,
