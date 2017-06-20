@@ -79,6 +79,7 @@ export default class WebGLRenderer extends Renderer {
     // State
     this.highlightedNodes = new Set();
     this.hoveredNode = null;
+    this.wasRenderedInThisFrame = false;
     this.renderFrame = null;
     this.renderHighlightedNodesFrame = null;
     this.needToProcess = false;
@@ -800,9 +801,35 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   scheduleRender() {
+
+    // If we did not render in this frame yet
+    // if (!this.wasRenderedInThisFrame) {
+
+    //   // Do we need to process data?
+    //   if (this.needToProcess || this.needToSoftProcess)
+    //     this.process(this.needToSoftProcess);
+
+    //   // Resetting state
+    //   this.renderFrame = null;
+    //   this.needToProcess = false;
+    //   this.needToSoftProcess = false;
+
+    //   this.render();
+
+    //   this.wasRenderedInThisFrame = true;
+
+    //   requestAnimationFrame(() => {
+    //     this.wasRenderedInThisFrame = false;
+    //   });
+
+    //   return this;
+    // }
+
+    // A frame is already scheduled
     if (this.renderFrame)
       return this;
 
+    // Let's schedule a frame
     this.renderFrame = requestAnimationFrame(() => {
 
       // Do we need to process data?
