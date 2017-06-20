@@ -34,8 +34,8 @@ import {
 /**
  * Constants.
  */
-const WEBGL_OVERSAMPLING_RATIO = 2;
 const PIXEL_RATIO = getPixelRatio();
+const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 
 /**
  * Main class.
