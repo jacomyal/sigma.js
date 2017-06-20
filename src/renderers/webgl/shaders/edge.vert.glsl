@@ -18,7 +18,6 @@ void main() {
 
   // Applying
   gl_Position = vec4(position, 0, 1);
-  gl_PointSize = 10.0;
 
   // Extract the color:
   float c = a_color;
