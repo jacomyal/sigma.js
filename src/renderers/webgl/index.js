@@ -172,7 +172,8 @@ export default class WebGLRenderer extends Renderer {
     this.container.appendChild(element);
 
     const contextOptions = {
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: true,
+      antialias: false
     };
 
     const context = element.getContext(webgl ? 'webgl' : '2d', contextOptions);

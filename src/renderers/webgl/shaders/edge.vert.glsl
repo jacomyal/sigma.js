@@ -8,6 +8,8 @@ uniform float u_ratio;
 uniform mat3 u_matrix;
 
 varying vec4 v_color;
+varying vec2 v_normal;
+varying float v_thickness;
 
 void main() {
 
@@ -18,6 +20,9 @@ void main() {
 
   // Applying
   gl_Position = vec4(position, 0, 1);
+
+  v_normal = a_normal;
+  v_thickness = a_thickness;
 
   // Extract the color:
   float c = a_color;
