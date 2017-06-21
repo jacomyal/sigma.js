@@ -22,7 +22,7 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   v_normal = a_normal;
-  v_thickness = a_thickness;
+  v_thickness = (a_thickness / 2.0) * (1.0 / u_ratio);
 
   // Extract the color:
   float c = a_color;

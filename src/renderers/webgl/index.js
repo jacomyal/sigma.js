@@ -94,9 +94,14 @@ export default class WebGLRenderer extends Renderer {
     this.createContext('mouse', false);
 
     // Blending
-    const gl = this.contexts.nodes;
+    let gl = this.contexts.nodes;
 
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    gl = this.contexts.edges;
+
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
     // Loading programs
