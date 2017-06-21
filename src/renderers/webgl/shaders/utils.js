@@ -28,7 +28,7 @@ function loadShader(type, gl, source) {
     const infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error(`sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}`);
+    throw new Error(`sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`);
   }
 
   return shader;
