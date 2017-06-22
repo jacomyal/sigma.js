@@ -96,7 +96,7 @@ export default class WebGLRenderer extends Renderer {
     // Blending
     let gl = this.contexts.nodes;
 
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
     gl = this.contexts.edges;
