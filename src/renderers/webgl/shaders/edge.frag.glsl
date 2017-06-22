@@ -10,7 +10,7 @@ void main(void) {
 
   float radius = v_thickness;
 
-  float dist = length(v_normal) * radius;
+  float dist = length(v_normal) * (radius + feather);
 
   float t = smoothstep(
     radius + feather,
