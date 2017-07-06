@@ -223,6 +223,8 @@ var FLOAT_COLOR_CACHE = {}; /**
                              * Miscelleanous helper functions used by sigma's WebGL renderer.
                              */
 
+// TODO: this is heavy for what we do with it
+
 
 var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
 var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
@@ -905,7 +907,8 @@ var Camera = function (_EventEmitter) {
       var easing = typeof options.easing === 'function' ? options.easing : easings[options.easing];
 
       // Canceling previous animation if needed
-      if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
+      // if (this.nextFrame)
+      //   cancelAnimationFrame(this.nextFrame);
 
       // State
       var start = Date.now(),
@@ -937,7 +940,12 @@ var Camera = function (_EventEmitter) {
         _this2.nextFrame = requestAnimationFrame(fn);
       };
 
-      this.nextFrame = requestAnimationFrame(fn);
+      if (this.nextFrame) {
+        cancelAnimationFrame(this.nextFrame);
+        this.nextFrame = requestAnimationFrame(fn);
+      } else {
+        fn();
+      }
     }
   }]);
 
@@ -1398,11 +1406,12 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
   var stack = [0, 0];
 
   while (stack.length) {
-    var level = stack.pop(),
-        block = stack.pop();
+    var level = stack.pop();
+
+    var block = stack.pop();
 
     // If we reached max level
-    if (level === maxLevel) {
+    if (level >= maxLevel) {
       containers[block] = containers[block] || [];
       containers[block].push(key);
       return;
@@ -1426,22 +1435,27 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
     // If we don't have at least a collision, there is an issue
     if (collisions === 0) throw new Error("sigma/quadtree.insertNode: no collision (level: " + level + ", key: " + key + ", x: " + x + ", y: " + y + ", size: " + size + ").");
 
+    // If we have 3 collisions, we have a geometry problem obviously
+    if (collisions === 3) throw new Error("sigma/quadtree.insertNode: 3 impossible collisions (level: " + level + ", key: " + key + ", x: " + x + ", y: " + y + ", size: " + size + ").");
+
     // If we have more that one collision, we stop here and store the node
-    // in the relevant container
+    // in the relevant containers
     if (collisions > 1) {
       containers[block] = containers[block] || [];
       containers[block].push(key);
       return;
+    } else {
+      level++;
     }
 
-    // Else we recurse into the correct quad
-    if (collidingWithTopLeft) stack.push(topLeftBlock, level + 1);
+    // Else we recurse into the correct quads
+    if (collidingWithTopLeft) stack.push(topLeftBlock, level);
 
-    if (collidingWithTopRight) stack.push(topRightBlock, level + 1);
+    if (collidingWithTopRight) stack.push(topRightBlock, level);
 
-    if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level + 1);
+    if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level);
 
-    if (collidingWithBottomRight) stack.push(bottomRightBlock, level + 1);
+    if (collidingWithBottomRight) stack.push(bottomRightBlock, level);
   }
 }
 
@@ -1500,16 +1514,14 @@ var QuadTree = function () {
       var block = 0,
           level = 0;
 
-      while (level <= MAX_LEVEL) {
-
+      do {
         if (this.containers[block]) nodes.push.apply(nodes, this.containers[block]);
 
-        // TODO: should probably use a do...while to avoid useless last op
         var quad = pointIsInQuad(x, y, this.data[block + X_OFFSET], this.data[block + Y_OFFSET], this.data[block + WIDTH_OFFSET], this.data[block + HEIGHT_OFFSET]);
 
         block = 4 * block + quad * BLOCKS;
         level++;
-      }
+      } while (level <= MAX_LEVEL);
 
       return nodes;
     }
@@ -1691,20 +1703,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @constructor
  */
 var Program = function () {
-  function Program() {
+  function Program(gl, vertexShaderSource, fragmentShaderSource) {
     _classCallCheck(this, Program);
+
+    this.vertexShaderSource = vertexShaderSource;
+    this.fragmentShaderSource = fragmentShaderSource;
+
+    this.load(gl);
   }
+
+  /**
+   * Method used to load the program into a webgl context.
+   *
+   * @param  {WebGLContext} gl - The WebGL context.
+   * @return {WebGLProgram}
+   */
+
 
   _createClass(Program, [{
     key: 'load',
-
-
-    /**
-     * Method used to load the program into a webgl context.
-     *
-     * @param  {WebGLContext} gl - The WebGL context.
-     * @return {WebGLProgram}
-     */
     value: function load(gl) {
       this.vertexShader = (0, _utils.loadVertexShader)(gl, this.vertexShaderSource);
       this.fragmentShader = (0, _utils.loadFragmentShader)(gl, this.fragmentShaderSource);
@@ -4025,8 +4042,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * Constants.
  */
-var WEBGL_OVERSAMPLING_RATIO = 2;
 var PIXEL_RATIO = (0, _utils2.getPixelRatio)();
+var WEBGL_OVERSAMPLING_RATIO = (0, _utils2.getPixelRatio)();
 
 /**
  * Main class.
@@ -4064,13 +4081,6 @@ var WebGLRenderer = function (_Renderer) {
     _this.edgeIndicesArray = null;
     _this.edgeOrder = {};
 
-    _this.nodePrograms = {
-      def: new _node2.default()
-    };
-    _this.edgePrograms = {
-      def: new _edge2.default()
-    };
-
     // TODO: if we drop size scaling => this should become "rescalingFunction"
     _this.nodeRescalingFunction = null;
 
@@ -4081,6 +4091,7 @@ var WebGLRenderer = function (_Renderer) {
     // State
     _this.highlightedNodes = new Set();
     _this.hoveredNode = null;
+    _this.wasRenderedInThisFrame = false;
     _this.renderFrame = null;
     _this.renderHighlightedNodesFrame = null;
     _this.needToProcess = false;
@@ -4093,6 +4104,25 @@ var WebGLRenderer = function (_Renderer) {
     _this.createContext('labels', false);
     _this.createContext('hovers', false);
     _this.createContext('mouse', false);
+
+    // Blending
+    var gl = _this.contexts.nodes;
+
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    gl = _this.contexts.edges;
+
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    // Loading programs
+    _this.nodePrograms = {
+      def: new _node2.default(_this.contexts.nodes)
+    };
+    _this.edgePrograms = {
+      def: new _edge2.default(_this.contexts.edges)
+    };
 
     // Initial resize
     _this.resize();
@@ -4113,13 +4143,7 @@ var WebGLRenderer = function (_Renderer) {
 
     // Binding event handlers
     _this.bindEventHandlers();
-
-    // Loading programs
-    for (var k in _this.nodePrograms) {
-      _this.nodePrograms[k].load(_this.contexts.nodes);
-    }for (var _k in _this.edgePrograms) {
-      _this.edgePrograms[_k].load(_this.contexts.edges);
-    }return _this;
+    return _this;
   }
 
   /**---------------------------------------------------------------------------
@@ -4170,7 +4194,8 @@ var WebGLRenderer = function (_Renderer) {
       this.container.appendChild(element);
 
       var contextOptions = {
-        preserveDrawingBuffer: true
+        preserveDrawingBuffer: true,
+        antialias: false
       };
 
       var context = element.getContext(webgl ? 'webgl' : '2d', contextOptions);
@@ -4664,11 +4689,6 @@ var WebGLRenderer = function (_Renderer) {
       gl = this.contexts.nodes;
       program = this.nodePrograms.def;
 
-      // Blending
-      // TODO: check the purpose of this
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      gl.enable(gl.BLEND);
-
       // TODO: should probably use another name for the `program` abstraction
       program.render(gl, this.nodeArray, {
         matrix: cameraMatrix,
@@ -4784,8 +4804,33 @@ var WebGLRenderer = function (_Renderer) {
     value: function scheduleRender() {
       var _this6 = this;
 
+      // If we did not render in this frame yet
+      // if (!this.wasRenderedInThisFrame) {
+
+      //   // Do we need to process data?
+      //   if (this.needToProcess || this.needToSoftProcess)
+      //     this.process(this.needToSoftProcess);
+
+      //   // Resetting state
+      //   this.renderFrame = null;
+      //   this.needToProcess = false;
+      //   this.needToSoftProcess = false;
+
+      //   this.render();
+
+      //   this.wasRenderedInThisFrame = true;
+
+      //   requestAnimationFrame(() => {
+      //     this.wasRenderedInThisFrame = false;
+      //   });
+
+      //   return this;
+      // }
+
+      // A frame is already scheduled
       if (this.renderFrame) return this;
 
+      // Let's schedule a frame
       this.renderFrame = requestAnimationFrame(function () {
 
         // Do we need to process data?
@@ -5614,13 +5659,37 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var EdgeProgram = function (_Program) {
   _inherits(EdgeProgram, _Program);
 
-  function EdgeProgram() {
+  function EdgeProgram(gl) {
     _classCallCheck(this, EdgeProgram);
 
-    var _this = _possibleConstructorReturn(this, (EdgeProgram.__proto__ || Object.getPrototypeOf(EdgeProgram)).call(this));
+    // Initializing buffers
+    var _this = _possibleConstructorReturn(this, (EdgeProgram.__proto__ || Object.getPrototypeOf(EdgeProgram)).call(this, gl, _edgeVert2.default, _edgeFrag2.default));
 
-    _this.vertexShaderSource = _edgeVert2.default;
-    _this.fragmentShaderSource = _edgeFrag2.default;
+    _this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, _this.buffer);
+
+    _this.indicesBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this.indicesBuffer);
+
+    // Locations
+    _this.positionLocation = gl.getAttribLocation(_this.program, 'a_position');
+    _this.normalLocation = gl.getAttribLocation(_this.program, 'a_normal');
+    _this.thicknessLocation = gl.getAttribLocation(_this.program, 'a_thickness');
+    _this.colorLocation = gl.getAttribLocation(_this.program, 'a_color');
+    _this.resolutionLocation = gl.getUniformLocation(_this.program, 'u_resolution');
+    _this.ratioLocation = gl.getUniformLocation(_this.program, 'u_ratio');
+    _this.matrixLocation = gl.getUniformLocation(_this.program, 'u_matrix');
+
+    // Bindings
+    gl.enableVertexAttribArray(_this.positionLocation);
+    gl.enableVertexAttribArray(_this.normalLocation);
+    gl.enableVertexAttribArray(_this.thicknessLocation);
+    gl.enableVertexAttribArray(_this.colorLocation);
+
+    gl.vertexAttribPointer(_this.positionLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(_this.normalLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(_this.thicknessLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+    gl.vertexAttribPointer(_this.colorLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
     return _this;
   }
 
@@ -5714,40 +5783,16 @@ var EdgeProgram = function (_Program) {
       var program = this.program;
       gl.useProgram(program);
 
-      // Attribute locations
-      var positionLocation = gl.getAttribLocation(program, 'a_position'),
-          normalLocation = gl.getAttribLocation(program, 'a_normal'),
-          thicknessLocation = gl.getAttribLocation(program, 'a_thickness'),
-          colorLocation = gl.getAttribLocation(program, 'a_color'),
-          resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-          ratioLocation = gl.getUniformLocation(program, 'u_ratio'),
-          matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-
-      // Creating buffer:
-      var buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW);
+      // Buffer data
+      gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
       // Binding uniforms
-      gl.uniform2f(resolutionLocation, params.width, params.height);
-      gl.uniform1f(ratioLocation, params.ratio / Math.pow(params.ratio, params.edgesPowRatio));
+      gl.uniform2f(this.resolutionLocation, params.width, params.height);
+      gl.uniform1f(this.ratioLocation, params.ratio / Math.pow(params.ratio, params.edgesPowRatio));
 
-      gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
+      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-      // Binding attributes:
-      gl.enableVertexAttribArray(positionLocation);
-      gl.enableVertexAttribArray(normalLocation);
-      gl.enableVertexAttribArray(thicknessLocation);
-      gl.enableVertexAttribArray(colorLocation);
-
-      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-      gl.vertexAttribPointer(normalLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-      gl.vertexAttribPointer(thicknessLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
-      gl.vertexAttribPointer(colorLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
-
-      // Creating indices buffer:
-      var indicesBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
+      // Buffering indices data
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, params.indices, gl.STATIC_DRAW);
 
       // Drawing:
@@ -5815,13 +5860,38 @@ var ANGLE_1 = 0,
 var NodeProgram = function (_Program) {
   _inherits(NodeProgram, _Program);
 
-  function NodeProgram() {
+  function NodeProgram(gl) {
     _classCallCheck(this, NodeProgram);
 
-    var _this = _possibleConstructorReturn(this, (NodeProgram.__proto__ || Object.getPrototypeOf(NodeProgram)).call(this));
+    // Initializing buffers
+    var _this = _possibleConstructorReturn(this, (NodeProgram.__proto__ || Object.getPrototypeOf(NodeProgram)).call(this, gl, _nodeVert2.default, _nodeFrag2.default));
 
-    _this.vertexShaderSource = _nodeVert2.default;
-    _this.fragmentShaderSource = _nodeFrag2.default;
+    _this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, _this.buffer);
+
+    // Locations
+    _this.positionLocation = gl.getAttribLocation(_this.program, 'a_position');
+    _this.sizeLocation = gl.getAttribLocation(_this.program, 'a_size');
+    _this.colorLocation = gl.getAttribLocation(_this.program, 'a_color');
+    _this.angleLocation = gl.getAttribLocation(_this.program, 'a_angle');
+    _this.resolutionLocation = gl.getUniformLocation(_this.program, 'u_resolution');
+    _this.matrixLocation = gl.getUniformLocation(_this.program, 'u_matrix');
+    _this.ratioLocation = gl.getUniformLocation(_this.program, 'u_ratio');
+    _this.scaleLocation = gl.getUniformLocation(_this.program, 'u_scale');
+
+    // Bindings
+    gl.enableVertexAttribArray(_this.positionLocation);
+    gl.enableVertexAttribArray(_this.sizeLocation);
+    gl.enableVertexAttribArray(_this.colorLocation);
+    gl.enableVertexAttribArray(_this.angleLocation);
+
+    gl.vertexAttribPointer(_this.positionLocation, 2, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+
+    gl.vertexAttribPointer(_this.sizeLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+
+    gl.vertexAttribPointer(_this.colorLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
+
+    gl.vertexAttribPointer(_this.angleLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
     return _this;
   }
 
@@ -5854,39 +5924,12 @@ var NodeProgram = function (_Program) {
       var program = this.program;
       gl.useProgram(program);
 
-      // Attribute locations
-      var positionLocation = gl.getAttribLocation(program, 'a_position'),
-          sizeLocation = gl.getAttribLocation(program, 'a_size'),
-          colorLocation = gl.getAttribLocation(program, 'a_color'),
-          angleLocation = gl.getAttribLocation(program, 'a_angle'),
-          resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-          matrixLocation = gl.getUniformLocation(program, 'u_matrix'),
-          ratioLocation = gl.getUniformLocation(program, 'u_ratio'),
-          scaleLocation = gl.getUniformLocation(program, 'u_scale');
-
-      var buffer = gl.createBuffer();
-
-      // TODO: might be possible not to buffer data each time if only the camera changes
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
-      gl.uniform2f(resolutionLocation, params.width, params.height);
-      gl.uniform1f(ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
-      gl.uniform1f(scaleLocation, params.scalingRatio);
-      gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
-
-      gl.enableVertexAttribArray(positionLocation);
-      gl.enableVertexAttribArray(sizeLocation);
-      gl.enableVertexAttribArray(colorLocation);
-      gl.enableVertexAttribArray(angleLocation);
-
-      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-
-      gl.vertexAttribPointer(sizeLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-
-      gl.vertexAttribPointer(colorLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
-
-      gl.vertexAttribPointer(angleLocation, 1, gl.FLOAT, false, NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+      gl.uniform2f(this.resolutionLocation, params.width, params.height);
+      gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+      gl.uniform1f(this.scaleLocation, params.scalingRatio);
+      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
       gl.drawArrays(gl.TRIANGLES, 0, array.length / NodeProgram.ATTRIBUTES);
     }
@@ -5942,7 +5985,7 @@ function loadShader(type, gl, source) {
     var infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error('sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n' + infoLog);
+    throw new Error('sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n' + infoLog + '\n' + source);
   }
 
   return shader;
@@ -10272,19 +10315,19 @@ module.exports = function isGraph(value) {
 /* 32 */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\n\nvoid main(void) {\ngl_FragColor = v_color;\n}\n"
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nvoid main(void) {\n  float feather = 0.5;\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\n  float radius = v_thickness;\n\n  float dist = length(v_normal) * (radius + feather);\n\n  float t = smoothstep(\n    radius + feather,\n    radius - feather,\n    dist\n  );\n\n  gl_FragColor = mix(color0, v_color, t);\n}\n"
 
 /***/ }),
 /* 33 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\n\nvarying vec4 v_color;\n\nvoid main() {\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * a_thickness / 2.0);\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n  gl_PointSize = 10.0;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nvoid main() {\n\n  float feather = 0.5 * 2.0;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * (a_thickness + feather) / 2.0);\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = (a_thickness / 2.0) * (1.0 / u_ratio);\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
 
 /***/ }),
 /* 34 */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying vec2 center;\nvarying float radius;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\n  vec2 m = gl_FragCoord.xy - center;\n  float diff = radius - sqrt(m.x * m.x + m.y * m.y);\n\n  // Here is how we draw a disc instead of a square:\n  if (diff > 0.0)\n    gl_FragColor = color;\n  else\n    gl_FragColor = color0;\n}\n"
+module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying vec2 center;\nvarying float radius;\n\nvoid main(void) {\n  float border_size = 0.8;\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\n  vec2 m = gl_FragCoord.xy - center;\n  float dist = sqrt(m.x * m.x + m.y * m.y);\n  float t = smoothstep(\n    radius + border_size,\n    radius - border_size,\n    dist\n  );\n\n  // Here is how we draw a disc instead of a square:\n  gl_FragColor = mix(color0, color, t);\n}\n"
 
 /***/ }),
 /* 35 */

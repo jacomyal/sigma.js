@@ -4,6 +4,8 @@
  *
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
+
+// TODO: this is heavy for what we do with it
 import {mat3} from 'gl-matrix';
 
 /**
