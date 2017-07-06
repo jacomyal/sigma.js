@@ -3,9 +3,11 @@ var path = require('path');
 var production = !!~process.argv.indexOf('-p');
 
 module.exports = {
-  entry: './src/endpoint.js',
+  entry: {
+    sigma: './src/endpoint.js'
+  },
   output: {
-    filename: production ? 'sigma.min.js' : 'sigma.js',
+    filename: production ? '[name].min.js' : '[name].js',
     path: path.join(__dirname, 'build'),
     library: 'Sigma',
     libraryTarget: 'umd'
