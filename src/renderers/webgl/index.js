@@ -211,6 +211,14 @@ export default class WebGLRenderer extends Renderer {
    */
   bindEventHandlers() {
 
+    // Handling window resize
+    this.listeners.handleResize = () => {
+      this.needToSoftProcess = true;
+      this.scheduleRender();
+    };
+
+    window.addEventListener('resize', this.listeners.handleResize);
+
     // Function checking if the mouse is on the given node
     const mouseIsOnNode = (mouseX, mouseY, nodeX, nodeY, size) => {
       return (
@@ -384,6 +392,7 @@ export default class WebGLRenderer extends Renderer {
 
     const graph = this.sigma.getGraph();
 
+    // TODO: possible to index this somehow using two byte arrays or so
     const extent = this.sigma.getGraphExtent();
 
     // Rescaling function
@@ -596,6 +605,11 @@ export default class WebGLRenderer extends Renderer {
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height)
       return this;
+
+    // Resizing camera
+    // TODO: maybe move this elsewhere
+    if (this.camera)
+      this.camera.resize({width: this.width, height: this.height});
 
     // Sizing dom elements
     for (const id in this.elements) {
@@ -858,7 +872,7 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   scheduleHighlightedNodesRender() {
-    if (this.renderHighlightedNodesFrame)
+    if (this.renderHighlightedNodesFrame || this.renderFrame)
       return this;
 
     this.renderHighlightedNodesFrame = requestAnimationFrame(() => {
