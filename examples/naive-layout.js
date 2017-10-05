@@ -1,12 +1,8 @@
 import {UndirectedGraph} from 'graphology';
 import clusters from 'graphology-generators/random/clusters';
 import randomLayout from 'graphology-layout/random';
-import {
-  applyLayoutChanges,
-  graphToByteArrays
-} from 'graphology-layout-forceatlas2/helpers';
+import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import faker from 'faker';
-import Worker from './fa2.worker.js';
 import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
 
@@ -52,29 +48,10 @@ const renderer = new WebGLRenderer(container);
 
 const sigma = new Sigma(graph, renderer);
 
-const worker = new Worker();
-
-function layout() {
-  const matrices = graphToByteArrays(graph);
-
-  worker.postMessage({
-    nodes: matrices.nodes.buffer,
-    edges: matrices.edges.buffer
-  }, [matrices.nodes.buffer, matrices.edges.buffer]);
-
-  worker.addEventListener('message', event => {
-    const nodeM = new Float32Array(event.data.nodes);
-
-    applyLayoutChanges(graph, nodeM);
-
-    worker.postMessage({
-      nodes: nodeM.buffer
-    }, [nodeM.buffer]);
-  });
-}
-
-layout();
+const layout = new FA2Layout(graph);
+layout.start({settings: {barnesHutOptimize: true}});
 
 window.graph = graph;
 window.renderer = renderer;
 window.camera = renderer.camera;
+window.layout = layout;
