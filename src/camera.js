@@ -17,6 +17,8 @@ const ANIMATE_DEFAULTS = {
   duration: 150
 };
 
+const DEFAULT_ZOOMING_RATIO = 1.5;
+
 // TODO: animate options = number polymorphism?
 // TODO: pan, zoom, unzoom, reset, rotate, zoomTo
 // TODO: add width / height to camera and add #.resize
@@ -287,4 +289,55 @@ export default class Camera extends EventEmitter {
       fn();
     }
   }
+
+  /**
+   * Method used to zoom the camera.
+   *
+   * @param  {number|object} factorOrOptions - Factor or options.
+   * @return {function}
+   */
+  animatedZoom(factorOrOptions) {
+
+    if (!factorOrOptions) {
+      return this.animate({ratio: this.ratio / DEFAULT_ZOOMING_RATIO});
+    }
+    else {
+      if (typeof factorOrOptions === 'number')
+        return this.animate({ratio: this.ratio / factorOrOptions});
+      else
+        return this.animate(
+          {ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)},
+          factorOrOptions
+        );
+    }
+  }
+
+  /**
+   * Method used to unzoom the camera.
+   *
+   * @param  {number|object} factorOrOptions - Factor or options.
+   * @return {function}
+   */
+  animatedUnzoom(factorOrOptions) {
+
+    if (!factorOrOptions) {
+      return this.animate({ratio: this.ratio * DEFAULT_ZOOMING_RATIO});
+    }
+    else {
+      if (typeof factorOrOptions === 'number')
+        return this.animate({ratio: this.ratio * factorOrOptions});
+      else
+        return this.animate(
+          {ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)},
+          factorOrOptions
+        );
+    }
+  }
+
+  /**
+   * Method used to reset the camera.
+   *
+   * @param  {number|object} factorOrOptions - Factor or options.
+   * @return {function}
+   */
 }

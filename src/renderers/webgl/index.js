@@ -64,6 +64,8 @@ export default class WebGLRenderer extends Renderer {
     this.nodeArray = null;
     this.nodeIndicesArray = null;
     this.nodeOrder = {};
+
+    // TODO: this could be improved by key => index => floatArray
     this.nodeDataCache = {};
     this.edgeArray = null;
     this.edgeIndicesArray = null;
@@ -250,9 +252,11 @@ export default class WebGLRenderer extends Renderer {
 
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
+
+      // TODO: this should be a method from the camera (or can be passed to graph to display somehow)
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
-      const quadNodes = getQuadNodes(e.clientX, e.clientY);
+      const quadNodes = getQuadNodes(e.x, e.y);
 
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
@@ -266,7 +270,7 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
+        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           this.hoveredNode = node;
 
           this.emit('overNode', {node});
@@ -285,7 +289,7 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        if (!mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
+        if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           this.hoveredNode = null;
 
           this.emit('outNode', {node: this.hoveredNode});
@@ -298,7 +302,7 @@ export default class WebGLRenderer extends Renderer {
     this.listeners.handleDown = e => {
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
-      const quadNodes = getQuadNodes(e.clientX, e.clientY);
+      const quadNodes = getQuadNodes(e.x, e.y);
 
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
@@ -312,7 +316,7 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size))
+        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
           return this.emit('downNode', {node});
       }
     };
@@ -321,7 +325,7 @@ export default class WebGLRenderer extends Renderer {
     this.listeners.handleClick = e => {
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
-      const quadNodes = getQuadNodes(e.clientX, e.clientY);
+      const quadNodes = getQuadNodes(e.x, e.y);
 
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
@@ -335,7 +339,7 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size))
+        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
           return this.emit('clickNode', {node});
       }
 

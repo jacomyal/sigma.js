@@ -5,6 +5,8 @@ import WebGLRenderer from '../src/renderers/webgl';
 
 import arctic from './resources/arctic.gexf';
 
+const container = document.getElementById('container');
+
 const graph = gexf.parse(Graph, arctic);
 
 graph.edges().forEach(edge => {
@@ -42,7 +44,7 @@ captor.on('mousemove', e => {
 
   // Get new position of node
   const pos = renderer.nodeRescalingFunction.inverse(
-    camera.displayToGraph(e.clientX, e.clientY)
+    camera.displayToGraph(e.x, e.y)
   );
 
   graph.setNodeAttribute(draggedNode, 'x', pos.x);

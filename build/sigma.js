@@ -652,6 +652,8 @@ var ANIMATE_DEFAULTS = {
   duration: 150
 };
 
+var DEFAULT_ZOOMING_RATIO = 1.5;
+
 // TODO: animate options = number polymorphism?
 // TODO: pan, zoom, unzoom, reset, rotate, zoomTo
 // TODO: add width / height to camera and add #.resize
@@ -947,6 +949,50 @@ var Camera = function (_EventEmitter) {
         fn();
       }
     }
+
+    /**
+     * Method used to zoom the camera.
+     *
+     * @param  {number|object} factorOrOptions - Factor or options.
+     * @return {function}
+     */
+
+  }, {
+    key: 'animatedZoom',
+    value: function animatedZoom(factorOrOptions) {
+
+      if (!factorOrOptions) {
+        return this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
+      } else {
+        if (typeof factorOrOptions === 'number') return this.animate({ ratio: this.ratio / factorOrOptions });else return this.animate({ ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO) }, factorOrOptions);
+      }
+    }
+
+    /**
+     * Method used to unzoom the camera.
+     *
+     * @param  {number|object} factorOrOptions - Factor or options.
+     * @return {function}
+     */
+
+  }, {
+    key: 'animatedUnzoom',
+    value: function animatedUnzoom(factorOrOptions) {
+
+      if (!factorOrOptions) {
+        return this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
+      } else {
+        if (typeof factorOrOptions === 'number') return this.animate({ ratio: this.ratio * factorOrOptions });else return this.animate({ ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO) }, factorOrOptions);
+      }
+    }
+
+    /**
+     * Method used to reset the camera.
+     *
+     * @param  {number|object} factorOrOptions - Factor or options.
+     * @return {function}
+     */
+
   }]);
 
   return Camera;
@@ -1074,7 +1120,7 @@ var MouseCaptor = function (_Captor) {
         _this2.doubleClickTimeout = null;
       }, DOUBLE_CLICK_TIMEOUT);
 
-      this.emit('click', (0, _utils.getMouseCoords)(e));
+      this.emit('click', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
     }
   }, {
     key: 'handleDoubleClick',
@@ -1125,7 +1171,7 @@ var MouseCaptor = function (_Captor) {
 
           // Left button pressed
           this.isMouseDown = true;
-          this.emit('mousedown', (0, _utils.getMouseCoords)(e));
+          this.emit('mousedown', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
       }
     }
   }, {
@@ -1160,7 +1206,7 @@ var MouseCaptor = function (_Captor) {
         });
       }
 
-      this.emit('mouseup', (0, _utils.getMouseCoords)(e));
+      this.emit('mouseup', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
       this.isMoving = false;
     }
   }, {
@@ -1170,7 +1216,7 @@ var MouseCaptor = function (_Captor) {
 
       if (!this.enabled) return;
 
-      this.emit('mousemove', (0, _utils.getMouseCoords)(e));
+      this.emit('mousemove', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
 
       if (this.isMouseDown) {
 
@@ -4361,6 +4407,8 @@ var WebGLRenderer = function (_Renderer) {
     _this.nodeArray = null;
     _this.nodeIndicesArray = null;
     _this.nodeOrder = {};
+
+    // TODO: this could be improved by key => index => floatArray
     _this.nodeDataCache = {};
     _this.edgeArray = null;
     _this.edgeIndicesArray = null;
@@ -4521,6 +4569,14 @@ var WebGLRenderer = function (_Renderer) {
     value: function bindEventHandlers() {
       var _this3 = this;
 
+      // Handling window resize
+      this.listeners.handleResize = function () {
+        _this3.needToSoftProcess = true;
+        _this3.scheduleRender();
+      };
+
+      window.addEventListener('resize', this.listeners.handleResize);
+
       // Function checking if the mouse is on the given node
       var mouseIsOnNode = function mouseIsOnNode(mouseX, mouseY, nodeX, nodeY, size) {
         return mouseX > nodeX - size && mouseX < nodeX + size && mouseY > nodeY - size && mouseY < nodeY + size && Math.sqrt(Math.pow(mouseX - nodeX, 2) + Math.pow(mouseY - nodeY, 2)) < size;
@@ -4539,9 +4595,11 @@ var WebGLRenderer = function (_Renderer) {
 
         // NOTE: for the canvas renderer, testing the pixel's alpha should
         // give some boost but this slows things down for WebGL empirically.
+
+        // TODO: this should be a method from the camera (or can be passed to graph to display somehow)
         var sizeRatio = Math.pow(_this3.camera.getState().ratio, 0.5);
 
-        var quadNodes = getQuadNodes(e.clientX, e.clientY);
+        var quadNodes = getQuadNodes(e.x, e.y);
 
         for (var i = 0, l = quadNodes.length; i < l; i++) {
           var node = quadNodes[i];
@@ -4552,7 +4610,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var size = data.size / sizeRatio;
 
-          if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) {
+          if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
             _this3.hoveredNode = node;
 
             _this3.emit('overNode', { node: node });
@@ -4568,7 +4626,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var _size = _data.size / sizeRatio;
 
-          if (!mouseIsOnNode(e.clientX, e.clientY, _pos.x, _pos.y, _size)) {
+          if (!mouseIsOnNode(e.x, e.y, _pos.x, _pos.y, _size)) {
             _this3.hoveredNode = null;
 
             _this3.emit('outNode', { node: _this3.hoveredNode });
@@ -4581,7 +4639,7 @@ var WebGLRenderer = function (_Renderer) {
       this.listeners.handleDown = function (e) {
         var sizeRatio = Math.pow(_this3.camera.getState().ratio, 0.5);
 
-        var quadNodes = getQuadNodes(e.clientX, e.clientY);
+        var quadNodes = getQuadNodes(e.x, e.y);
 
         for (var i = 0, l = quadNodes.length; i < l; i++) {
           var node = quadNodes[i];
@@ -4592,7 +4650,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var size = data.size / sizeRatio;
 
-          if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) return _this3.emit('downNode', { node: node });
+          if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) return _this3.emit('downNode', { node: node });
         }
       };
 
@@ -4600,7 +4658,7 @@ var WebGLRenderer = function (_Renderer) {
       this.listeners.handleClick = function (e) {
         var sizeRatio = Math.pow(_this3.camera.getState().ratio, 0.5);
 
-        var quadNodes = getQuadNodes(e.clientX, e.clientY);
+        var quadNodes = getQuadNodes(e.x, e.y);
 
         for (var i = 0, l = quadNodes.length; i < l; i++) {
           var node = quadNodes[i];
@@ -4611,7 +4669,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var size = data.size / sizeRatio;
 
-          if (mouseIsOnNode(e.clientX, e.clientY, pos.x, pos.y, size)) return _this3.emit('clickNode', { node: node });
+          if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) return _this3.emit('clickNode', { node: node });
         }
 
         return _this3.emit('clickStage');
@@ -4676,6 +4734,7 @@ var WebGLRenderer = function (_Renderer) {
 
       var graph = this.sigma.getGraph();
 
+      // TODO: possible to index this somehow using two byte arrays or so
       var extent = this.sigma.getGraphExtent();
 
       // Rescaling function
@@ -4876,6 +4935,10 @@ var WebGLRenderer = function (_Renderer) {
 
       // If nothing has changed, we can stop right here
       if (previousWidth === this.width && previousHeight === this.height) return this;
+
+      // Resizing camera
+      // TODO: maybe move this elsewhere
+      if (this.camera) this.camera.resize({ width: this.width, height: this.height });
 
       // Sizing dom elements
       for (var id in this.elements) {
@@ -5142,7 +5205,7 @@ var WebGLRenderer = function (_Renderer) {
     value: function scheduleHighlightedNodesRender() {
       var _this7 = this;
 
-      if (this.renderHighlightedNodesFrame) return this;
+      if (this.renderHighlightedNodesFrame || this.renderFrame) return this;
 
       this.renderHighlightedNodesFrame = requestAnimationFrame(function () {
 
@@ -9785,12 +9848,10 @@ function getMouseCoords(e, x, y) {
     y = getY(e);
   }
 
-  var center = getCenter(e);
-
-  // TODO: is this really needed to have this strange {x,y} with now?
+  // const center = getCenter(e);
   return {
-    x: x - center.x,
-    y: y - center.y,
+    x: e.clientX - x,
+    y: e.clientY - y,
     clientX: e.clientX,
     clientY: e.clientY,
     ctrlKey: e.ctrlKey,
