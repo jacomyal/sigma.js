@@ -52,6 +52,7 @@ export default class MouseCaptor extends Captor {
     this.lastCameraState = null;
     this.clicks = 0;
     this.doubleClickTimeout = null;
+    this.wheelLock = false;
 
     // Binding methods
     this.handleClick = this.handleClick.bind(this);
@@ -242,20 +243,29 @@ export default class MouseCaptor extends Captor {
 
   handleWheel(e) {
     if (!this.enabled)
-      return;
+      return false;
 
     const delta = getWheelDelta(e);
 
     if (!delta)
-      return;
+      return false;
 
+    if (this.wheelLock)
+      return false;
+
+    this.wheelLock = true;
+    setTimeout(() => (this.wheelLock = false), 30);
+
+    // TODO: handle max zoom
     const ratio = delta > 0 ?
       1 / ZOOMING_RATIO :
       ZOOMING_RATIO;
 
-    const center = getCenter(e);
-
     const cameraState = this.camera.getState();
+
+    const newRatio = ratio * cameraState.ratio;
+
+    const center = getCenter(e);
 
     const position = this.camera.abstractDisplayToGraph(
       getX(e) - center.x,
@@ -265,9 +275,9 @@ export default class MouseCaptor extends Captor {
     this.camera.animate({
       x: position.x * (1 - ratio) + cameraState.x,
       y: position.y * (1 - ratio) + cameraState.y,
-      ratio: ratio * cameraState.ratio
+      ratio: newRatio
     }, {
-      easing: 'quadraticOut',
+      easing: this.camera.isAnimated() ? 'quadraticOut' : 'quadraticInOut',
       duration: MOUSE_ZOOM_DURATION
     });
 

@@ -244,8 +244,8 @@ export default class Camera extends EventEmitter {
       easings[options.easing];
 
     // Canceling previous animation if needed
-    // if (this.nextFrame)
-    //   cancelAnimationFrame(this.nextFrame);
+    if (this.nextFrame)
+      cancelAnimationFrame(this.nextFrame);
 
     // State
     const start = Date.now(),
