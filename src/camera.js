@@ -337,7 +337,15 @@ export default class Camera extends EventEmitter {
   /**
    * Method used to reset the camera.
    *
-   * @param  {number|object} factorOrOptions - Factor or options.
+   * @param  {object} options - Options.
    * @return {function}
    */
+  animatedReset(options) {
+    return this.animate({
+      x: 0,
+      y: 0,
+      ratio: 1,
+      angle: 0
+    }, options);
+  }
 }
