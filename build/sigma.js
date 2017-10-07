@@ -909,8 +909,7 @@ var Camera = function (_EventEmitter) {
       var easing = typeof options.easing === 'function' ? options.easing : easings[options.easing];
 
       // Canceling previous animation if needed
-      // if (this.nextFrame)
-      //   cancelAnimationFrame(this.nextFrame);
+      if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
 
       // State
       var start = Date.now(),
@@ -989,10 +988,20 @@ var Camera = function (_EventEmitter) {
     /**
      * Method used to reset the camera.
      *
-     * @param  {number|object} factorOrOptions - Factor or options.
+     * @param  {object} options - Options.
      * @return {function}
      */
 
+  }, {
+    key: 'animatedReset',
+    value: function animatedReset(options) {
+      return this.animate({
+        x: 0,
+        y: 0,
+        ratio: 1,
+        angle: 0
+      }, options);
+    }
   }]);
 
   return Camera;
@@ -1076,6 +1085,7 @@ var MouseCaptor = function (_Captor) {
     _this.lastCameraState = null;
     _this.clicks = 0;
     _this.doubleClickTimeout = null;
+    _this.wheelLock = false;
 
     // Binding methods
     _this.handleClick = _this.handleClick.bind(_this);
@@ -1120,7 +1130,7 @@ var MouseCaptor = function (_Captor) {
         _this2.doubleClickTimeout = null;
       }, DOUBLE_CLICK_TIMEOUT);
 
-      this.emit('click', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
+      this.emit('click', (0, _utils.getMouseCoords)(e));
     }
   }, {
     key: 'handleDoubleClick',
@@ -1171,7 +1181,7 @@ var MouseCaptor = function (_Captor) {
 
           // Left button pressed
           this.isMouseDown = true;
-          this.emit('mousedown', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
+          this.emit('mousedown', (0, _utils.getMouseCoords)(e));
       }
     }
   }, {
@@ -1206,7 +1216,7 @@ var MouseCaptor = function (_Captor) {
         });
       }
 
-      this.emit('mouseup', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
+      this.emit('mouseup', (0, _utils.getMouseCoords)(e));
       this.isMoving = false;
     }
   }, {
@@ -1216,7 +1226,7 @@ var MouseCaptor = function (_Captor) {
 
       if (!this.enabled) return;
 
-      this.emit('mousemove', (0, _utils.getMouseCoords)(e, this.container.offsetLeft, this.container.offsetTop));
+      this.emit('mousemove', (0, _utils.getMouseCoords)(e));
 
       if (this.isMouseDown) {
 
@@ -1258,26 +1268,38 @@ var MouseCaptor = function (_Captor) {
   }, {
     key: 'handleWheel',
     value: function handleWheel(e) {
-      if (!this.enabled) return;
+      var _this4 = this;
+
+      if (!this.enabled) return false;
 
       var delta = (0, _utils.getWheelDelta)(e);
 
-      if (!delta) return;
+      if (!delta) return false;
 
+      if (this.wheelLock) return false;
+
+      this.wheelLock = true;
+      setTimeout(function () {
+        return _this4.wheelLock = false;
+      }, 30);
+
+      // TODO: handle max zoom
       var ratio = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
 
-      var center = (0, _utils.getCenter)(e);
-
       var cameraState = this.camera.getState();
+
+      var newRatio = ratio * cameraState.ratio;
+
+      var center = (0, _utils.getCenter)(e);
 
       var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
 
       this.camera.animate({
         x: position.x * (1 - ratio) + cameraState.x,
         y: position.y * (1 - ratio) + cameraState.y,
-        ratio: ratio * cameraState.ratio
+        ratio: newRatio
       }, {
-        easing: 'quadraticOut',
+        easing: this.camera.isAnimated() ? 'quadraticOut' : 'quadraticInOut',
         duration: MOUSE_ZOOM_DURATION
       });
 
@@ -9842,16 +9864,10 @@ function getCenter(e) {
  *
  * @return {object}
  */
-function getMouseCoords(e, x, y) {
-  if (arguments.length < 2) {
-    x = getX(e);
-    y = getY(e);
-  }
-
-  // const center = getCenter(e);
+function getMouseCoords(e) {
   return {
-    x: e.clientX - x,
-    y: e.clientY - y,
+    x: getX(e),
+    y: getY(e),
     clientX: e.clientX,
     clientY: e.clientY,
     ctrlKey: e.ctrlKey,

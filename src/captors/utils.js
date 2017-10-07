@@ -110,16 +110,10 @@ export function getCenter(e) {
  *
  * @return {object}
  */
-export function getMouseCoords(e, x, y) {
-  if (arguments.length < 2) {
-    x = getX(e);
-    y = getY(e);
-  }
-
-  // const center = getCenter(e);
+export function getMouseCoords(e) {
   return {
-    x: e.clientX - x,
-    y: e.clientY - y,
+    x: getX(e),
+    y: getY(e),
     clientX: e.clientX,
     clientY: e.clientY,
     ctrlKey: e.ctrlKey,

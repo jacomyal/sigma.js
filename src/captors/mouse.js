@@ -93,7 +93,7 @@ export default class MouseCaptor extends Captor {
       this.doubleClickTimeout = null;
     }, DOUBLE_CLICK_TIMEOUT);
 
-    this.emit('click', getMouseCoords(e, this.container.offsetLeft, this.container.offsetTop));
+    this.emit('click', getMouseCoords(e));
   }
 
   handleDoubleClick(e) {
@@ -150,7 +150,7 @@ export default class MouseCaptor extends Captor {
 
         // Left button pressed
         this.isMouseDown = true;
-        this.emit('mousedown', getMouseCoords(e, this.container.offsetLeft, this.container.offsetTop));
+        this.emit('mousedown', getMouseCoords(e));
     }
   }
 
@@ -186,7 +186,7 @@ export default class MouseCaptor extends Captor {
       });
     }
 
-    this.emit('mouseup', getMouseCoords(e, this.container.offsetLeft, this.container.offsetTop));
+    this.emit('mouseup', getMouseCoords(e));
     this.isMoving = false;
   }
 
@@ -194,7 +194,7 @@ export default class MouseCaptor extends Captor {
     if (!this.enabled)
       return;
 
-    this.emit('mousemove', getMouseCoords(e, this.container.offsetLeft, this.container.offsetTop));
+    this.emit('mousemove', getMouseCoords(e));
 
     if (this.isMouseDown) {
 
