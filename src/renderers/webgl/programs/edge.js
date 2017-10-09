@@ -73,6 +73,11 @@ export default class EdgeProgram extends Program {
       EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
+
+    // Enabling the OES_element_index_uint extension
+    // TODO: fallback if not enabled!
+    // TODO: use mnemonist to use the right kind of index to save up memory
+    gl.getExtension('OES_element_index_uint');
   }
 
   process(array, sourceData, targetData, data, i) {
@@ -142,7 +147,7 @@ export default class EdgeProgram extends Program {
 
     const size = l + (l / 2);
 
-    const indices = new Uint16Array(size);
+    const indices = new Uint32Array(size);
 
     for (let i = 0, c = 0; i < size; i += 4) {
       indices[c++] = i;
@@ -179,7 +184,7 @@ export default class EdgeProgram extends Program {
     gl.drawElements(
       gl.TRIANGLES,
       params.indices.length,
-      gl.UNSIGNED_SHORT,
+      gl.UNSIGNED_INT,
       0
     );
   }
