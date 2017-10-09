@@ -13,10 +13,12 @@ varying float v_thickness;
 
 void main() {
 
-  float feather = 0.5 * 2.0;
+  float feather = 0.5;
+
+  v_thickness = a_thickness * u_ratio / 2.0 + feather;
 
   // Scale from [[-1 1] [-1 1]] to the container:
-  vec2 delta = vec2(a_normal * (a_thickness + feather) / 2.0);
+  vec2 delta = vec2(a_normal * v_thickness);
   vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;
   position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);
 
@@ -24,7 +26,7 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   v_normal = a_normal;
-  v_thickness = (a_thickness / 2.0) * (1.0 / u_ratio);
+  v_thickness = max(1.0, length(delta) * u_matrix[0][0]);
 
   // Extract the color:
   float c = a_color;

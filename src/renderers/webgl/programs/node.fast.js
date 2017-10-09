@@ -12,11 +12,8 @@ import vertexShaderSource from '../shaders/node.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/node.fast.frag.glsl';
 
 export default class NodeProgramFast extends Program {
-  constructor() {
-    super();
-
-    this.vertexShaderSource = vertexShaderSource;
-    this.fragmentShaderSource = fragmentShaderSource;
+  constructor(gl) {
+    super(gl, vertexShaderSource, fragmentShaderSource);
   }
 
   process(array, data, i) {
