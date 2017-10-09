@@ -3,7 +3,7 @@ precision mediump float;
 varying vec4 color;
 
 void main(void) {
-  float border = 0.01;
+  float border = 0.05;
   float radius = 0.5;
 
   vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
