@@ -130,10 +130,10 @@ export function getMouseCoords(e) {
  * @return {number}     The wheel delta of the mouse.
  */
 export function getWheelDelta(e) {
-  if (typeof e.wheelDelta !== undefined)
+  if (typeof e.wheelDelta !== 'undefined')
     return e.wheelDelta;
 
-  if (typeof e.detail !== undefined)
+  if (typeof e.detail !== 'undefined')
     return -e.detail;
 
   throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
