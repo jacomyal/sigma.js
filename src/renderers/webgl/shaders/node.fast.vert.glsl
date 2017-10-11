@@ -8,8 +8,7 @@ uniform float u_scale;
 uniform mat3 u_matrix;
 
 varying vec4 color;
-varying vec2 center;
-varying float radius;
+varying float ratio;
 
 void main() {
 
@@ -19,13 +18,13 @@ void main() {
     0,
     1
   );
-  center = gl_Position.xy;
 
   // Multiply the point size twice:
   //  - x SCALING_RATIO to correct the canvas scaling
   //  - x 2 to correct the formulae
   gl_PointSize = a_size * u_ratio * u_scale * 2.0;
-  radius = gl_PointSize;
+
+  ratio = 1.0 / u_ratio;
 
   // Extract the color:
   float c = a_color;

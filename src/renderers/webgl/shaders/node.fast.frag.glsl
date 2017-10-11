@@ -1,14 +1,15 @@
 precision mediump float;
 
 varying vec4 color;
+varying float ratio;
 
 void main(void) {
-  float border = 0.05;
+  float border = 0.03 * ratio;
   float radius = 0.5;
 
   vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
   vec2 m = gl_PointCoord - vec2(0.5, 0.5);
-  float dist = radius - sqrt(m.x * m.x + m.y * m.y);
+  float dist = radius - length(m);
 
   float t = 0.0;
   if (dist > border)

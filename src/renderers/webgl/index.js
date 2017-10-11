@@ -10,7 +10,7 @@ import Renderer from '../../renderer';
 import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
-import NodeProgram from './programs/node';
+import NodeProgram from './programs/node.fast';
 import EdgeProgram from './programs/edge';
 
 import drawLabel from '../canvas/components/label';
