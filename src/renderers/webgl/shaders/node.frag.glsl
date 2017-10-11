@@ -4,12 +4,12 @@ varying vec4 color;
 varying vec2 center;
 varying float radius;
 
-void main(void) {
-  float border_size = 0.8;
-  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
+const float border_size = 0.8;
 
-  vec2 m = gl_FragCoord.xy - center;
-  float dist = sqrt(m.x * m.x + m.y * m.y);
+void main(void) {
+  float dist = length(gl_FragCoord.xy - center);
+
   float t = smoothstep(
     radius + border_size,
     radius - border_size,
