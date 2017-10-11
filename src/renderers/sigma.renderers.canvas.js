@@ -311,7 +311,7 @@
     if (drawLabels) {
       renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
-        if (!a[i].hidden)
+        if (!a[i].hidden && !a[i].hideLabel)
           (renderers[
             a[i].type || this.settings(options, 'defaultNodeType')
           ] || renderers.def)(

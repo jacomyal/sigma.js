@@ -168,8 +168,10 @@
 
     // Moving nodes
     for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
-      nodes[j].x = this.nodesByteArray[i];
-      nodes[j].y = this.nodesByteArray[i + 1];
+      if(!nodes[j].isPinned){
+		  nodes[j].x = this.nodesByteArray[i];
+		  nodes[j].y = this.nodesByteArray[i + 1];
+	  }
       j++;
     }
   };
