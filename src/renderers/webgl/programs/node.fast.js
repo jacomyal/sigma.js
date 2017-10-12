@@ -70,11 +70,13 @@ export default class NodeProgramFast extends Program {
     array[i++] = color;
   }
 
+  bufferData(gl, array) {
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+  }
+
   render(gl, array, params) {
     const program = this.program;
     gl.useProgram(program);
-
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(

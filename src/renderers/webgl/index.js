@@ -459,6 +459,8 @@ export default class WebGLRenderer extends Renderer {
       );
     }
 
+    nodeProgram.bufferData(this.contexts.nodes, this.nodeArray);
+
     const edgeProgram = this.edgePrograms.def;
 
     if (!keepArrays) {
@@ -493,6 +495,12 @@ export default class WebGLRenderer extends Renderer {
     // Computing edge indices if necessary
     if (!keepArrays && typeof edgeProgram.computeIndices === 'function')
       this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
+
+    edgeProgram.bufferData(
+      this.contexts.edges,
+      this.edgeArray,
+      this.edgeIndicesArray
+    );
 
     return this;
   }

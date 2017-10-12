@@ -166,12 +166,18 @@ export default class EdgeProgram extends Program {
     return indices;
   }
 
+  bufferData(gl, array, indicesArray) {
+
+    // Vertices data
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+
+    // Indices data
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
+  }
+
   render(gl, array, params) {
     const program = this.program;
     gl.useProgram(program);
-
-    // Buffer data
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
     // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
@@ -181,9 +187,6 @@ export default class EdgeProgram extends Program {
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
-    // Buffering indices data
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, params.indices, gl.STATIC_DRAW);
 
     // Drawing:
     gl.drawElements(
