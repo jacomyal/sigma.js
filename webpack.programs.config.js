@@ -13,7 +13,8 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'renderers', 'webgl', 'shaders'),
-    filename: '[name].glsl'
+    filename: '[name].glsl',
+    libraryTarget: 'commonjs2'
   },
   module: {
     rules: [
