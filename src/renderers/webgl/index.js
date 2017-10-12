@@ -467,7 +467,7 @@ export default class WebGLRenderer extends Renderer {
         i * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
       );
     }
-
+    console.log(this.quadtree)
     nodeProgram.bufferData(this.contexts.nodes, this.nodeArray);
 
     const edgeProgram = this.edgePrograms.def;

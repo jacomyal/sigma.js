@@ -217,8 +217,34 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
     // If we have more that one collision, we stop here and store the node
     // in the relevant containers
     if (collisions > 1) {
-      containers[block] = containers[block] || [];
-      containers[block].push(key);
+
+      if (collisions < 4) {
+
+        // If we intersect two quads, we place the node in those two
+        if (collidingWithTopLeft) {
+          containers[topLeftBlock] = containers[topLeftBlock] || [];
+          containers[topLeftBlock].push(key);
+        }
+        if (collidingWithTopRight) {
+          containers[topRightBlock] = containers[topRightBlock] || [];
+          containers[topRightBlock].push(key);
+        }
+        if (collidingWithBottomLeft) {
+          containers[bottomLeftBlock] = containers[bottomLeftBlock] || [];
+          containers[bottomLeftBlock].push(key);
+        }
+        if (collidingWithBottomRight) {
+          containers[bottomRightBlock] = containers[bottomRightBlock] || [];
+          containers[bottomRightBlock].push(key);
+        }
+      }
+      else {
+
+        // Else we keep the node where it is to avoid more pointless computations
+        containers[block] = containers[block] || [];
+        containers[block].push(key);
+      }
+
       return;
     }
     else {
