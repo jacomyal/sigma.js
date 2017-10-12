@@ -73,7 +73,6 @@
   },
   "dependencies": {
     "events": "^1.1.1",
-    "gl-matrix": "^2.3.2",
     "graphology-utils": "^1.1.1"
   }
 }

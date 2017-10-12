@@ -4,8 +4,6 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
-import {mat3} from 'gl-matrix';
-
 import Renderer from '../../renderer';
 import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
@@ -54,7 +52,7 @@ export default class WebGLRenderer extends Renderer {
   constructor(container, settings) {
     super();
 
-    settings = settings || {};
+    settings = settings || {};
 
     this.settings = assign({}, DEFAULT_SETTINGS, settings);
 
@@ -718,14 +716,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Then we need to extract a matrix from the camera
     const cameraState = this.camera.getState(),
-          cameraMatrix = matrixFromCamera(cameraState);
-
-    const translation = mat3.fromTranslation(mat3.create(), [
-      this.width / 2,
-      this.height / 2
-    ]);
-
-    mat3.multiply(cameraMatrix, translation, cameraMatrix);
+          cameraMatrix = matrixFromCamera(cameraState, {width: this.width, height: this.height});
 
     let program,
         gl;
@@ -846,29 +837,6 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   scheduleRender() {
-
-    // If we did not render in this frame yet
-    // if (!this.wasRenderedInThisFrame) {
-
-    //   // Do we need to process data?
-    //   if (this.needToProcess || this.needToSoftProcess)
-    //     this.process(this.needToSoftProcess);
-
-    //   // Resetting state
-    //   this.renderFrame = null;
-    //   this.needToProcess = false;
-    //   this.needToSoftProcess = false;
-
-    //   this.render();
-
-    //   this.wasRenderedInThisFrame = true;
-
-    //   requestAnimationFrame(() => {
-    //     this.wasRenderedInThisFrame = false;
-    //   });
-
-    //   return this;
-    // }
 
     // A frame is already scheduled
     if (this.renderFrame)

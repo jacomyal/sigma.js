@@ -4,9 +4,13 @@
  *
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
-
-// TODO: this is heavy for what we do with it
-import {mat3} from 'gl-matrix';
+import {
+  identity,
+  scale,
+  rotate,
+  translate,
+  multiply
+} from './matrices';
 
 /**
  * Memoized function returning a float-encoded color from various string
@@ -66,7 +70,7 @@ export function floatColor(val) {
  */
 
 // TODO: it's possible to optimize this drastically!
-export function matrixFromCamera(state) {
+export function matrixFromCamera(state, dimensions) {
   const {
     angle,
     ratio,
@@ -74,13 +78,22 @@ export function matrixFromCamera(state) {
     y
   } = state;
 
-  const matrix = mat3.create(),
-        scale = mat3.fromScaling(mat3.create(), [1 / ratio, 1 / ratio]),
-        rotation = mat3.fromRotation(mat3.create(), -angle),
-        translation = mat3.fromTranslation(mat3.create(), [-x, -y]);
+  const {
+    width,
+    height
+  } = dimensions;
 
-  mat3.multiply(matrix, scale, rotation);
-  mat3.multiply(matrix, matrix, translation);
+  let matrix = identity();
+
+  const scaling = scale(identity(), 1 / ratio),
+        rotation = rotate(identity(), -angle),
+        translation = translate(identity(), -x, -y),
+        dimensionTranslation = translate(identity(), width / 2, height / 2);
+
+  multiply(matrix, scaling);
+  multiply(matrix, rotation);
+  multiply(matrix, translation);
+  matrix = multiply(dimensionTranslation, matrix);
 
   return matrix;
 }
