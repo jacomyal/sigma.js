@@ -108,9 +108,9 @@ export default class Camera extends EventEmitter {
    * Method returning the coordinates of a point from the display frame to the
    * graph one but ignores the offset and dimensions of the container.
    *
-   * @param  {number} x The X coordinate.
-   * @param  {number} y The Y coordinate.
-   * @return {object}   The point coordinates in the frame of the graph.
+   * @param  {number} x - The X coordinate.
+   * @param  {number} y - The Y coordinate.
+   * @return {object}     The point coordinates in the frame of the graph.
    */
   abstractDisplayToGraph(x, y) {
     const cos = Math.cos(this.angle),
@@ -126,9 +126,9 @@ export default class Camera extends EventEmitter {
    * Method returning the coordinates of a point from the display frame to the
    * graph one.
    *
-   * @param  {number} x The X coordinate.
-   * @param  {number} y The Y coordinate.
-   * @return {object}   The point coordinates in the frame of the graph.
+   * @param  {number} x - The X coordinate.
+   * @param  {number} y - The Y coordinate.
+   * @return {object}   - The point coordinates in the frame of the graph.
    */
   displayToGraph(x, y) {
     const cos = Math.cos(this.angle),
@@ -150,9 +150,9 @@ export default class Camera extends EventEmitter {
    * Method returning the coordinates of a point from the graph frame to the
    * display one.
    *
-   * @param  {number} x The X coordinate.
-   * @param  {number} y The Y coordinate.
-   * @return {object}   The point coordinates in the frame of the display.
+   * @param  {number} x - The X coordinate.
+   * @param  {number} y - The Y coordinate.
+   * @return {object}   - The point coordinates in the frame of the display.
    */
   graphToDisplay(x, y) {
     const relCos = Math.cos(this.angle) / this.ratio,
@@ -163,6 +163,31 @@ export default class Camera extends EventEmitter {
     return {
       x: x * relCos + y * relSin + xOffset,
       y: y * relCos - x * relSin + yOffset
+    };
+  }
+
+  /**
+   * Method returning the abstract rectangle containing the graph according
+   * to the camera's state.
+   *
+   * @return {object} - The view's rectangle.
+   */
+  viewRectangle() {
+    const widthVect = this.abstractDisplayToGraph(this.width, 0),
+          heightVect = this.abstractDisplayToGraph(0, this.height),
+          centerVect = this.abstractDisplayToGraph(this.width / 2, this.height / 2),
+          marginX = this.abstractDisplayToGraph(this.width / 4, 0).x,
+          marginY = this.abstractDisplayToGraph(0, this.height / 4, 0).y;
+
+    return {
+      x1: this.x - centerVect.x - marginX,
+      y1: this.y - centerVect.y - marginY,
+      x2: this.x - centerVect.x + marginX + widthVect.x,
+      y2: this.y - centerVect.y - marginY + widthVect.y,
+      height: Math.sqrt(
+        Math.pow(heightVect.x, 2) +
+        Math.pow(heightVect.y + 2 * marginY, 2)
+      )
     };
   }
 

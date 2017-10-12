@@ -454,7 +454,7 @@ export default class WebGLRenderer extends Renderer {
 
       const rescaledData = this.nodeRescalingFunction(data);
 
-      // TODO: Optimize this to be save a loop and one object
+      // TODO: Optimize this to be save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
       this.quadtree.add(node, displayData.x, displayData.y, displayData.size);

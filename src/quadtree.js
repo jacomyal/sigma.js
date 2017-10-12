@@ -15,9 +15,9 @@
 
 // TODO: jsdoc
 
-// TODO: be sure we can handle cases overcoming boundaries (because of size) or use a max
+// TODO: be sure we can handle cases overcoming boundaries (because of size) or use a maxed size
 
-// TODO: decide whether to store at leaf level or at medium levels (frustum vs. hover)
+// TODO: filtering unwanted labels beforehand through the filter function
 
 /**
  * Constants.
@@ -262,23 +262,111 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
   }
 }
 
+function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, w) {
+
+  // [block, level]
+  const stack = [0, 0];
+
+  const collectedNodes = [];
+
+  let container;
+
+  while (stack.length) {
+    const level = stack.pop(),
+          block = stack.pop();
+
+    // If we reached max level
+    // TODO: can probably do this condition downwards
+    if (level >= maxLevel)
+      continue;
+
+    // Collecting nodes
+    container = containers[block];
+
+    if (container)
+      collectedNodes.push.apply(collectedNodes, container);
+
+    const topLeftBlock = 4 * block + BLOCKS,
+          topRightBlock = 4 * block + 2 * BLOCKS,
+          bottomLeftBlock = 4 * block + 3 * BLOCKS,
+          bottomRightBlock = 4 * block + 4 * BLOCKS;
+
+    const collidingWithTopLeft = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      data[topLeftBlock + X_OFFSET],
+      data[topLeftBlock + Y_OFFSET],
+      data[topLeftBlock + WIDTH_OFFSET],
+      data[topLeftBlock + HEIGHT_OFFSET]
+    );
+
+    const collidingWithTopRight = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      data[topRightBlock + X_OFFSET],
+      data[topRightBlock + Y_OFFSET],
+      data[topRightBlock + WIDTH_OFFSET],
+      data[topRightBlock + HEIGHT_OFFSET]
+    );
+
+    const collidingWithBottomLeft = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      data[bottomLeftBlock + X_OFFSET],
+      data[bottomLeftBlock + Y_OFFSET],
+      data[bottomLeftBlock + WIDTH_OFFSET],
+      data[bottomLeftBlock + HEIGHT_OFFSET]
+    );
+
+    const collidingWithBottomRight = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      data[bottomRightBlock + X_OFFSET],
+      data[bottomRightBlock + Y_OFFSET],
+      data[bottomRightBlock + WIDTH_OFFSET],
+      data[bottomRightBlock + HEIGHT_OFFSET]
+    );
+
+    if (collidingWithTopLeft)
+      stack.push(level + 1, topLeftBlock);
+    if (collidingWithTopRight)
+      stack.push(level + 1, topRightBlock);
+    if (collidingWithBottomLeft)
+      stack.push(level + 1, bottomLeftBlock);
+    if (collidingWithBottomRight)
+      stack.push(level + 1, bottomRightBlock);
+  }
+
+  return collectedNodes;
+}
+
 /**
  * QuadTree class.
  *
  * @constructor
- * @param {Graph} graph - A graph instance.
+ * @param {object} boundaries - The graph boundaries.
  */
 export default class QuadTree {
-  constructor(boundaries) {
+  constructor(params) {
+    params = params || {};
 
     // Allocating the underlying byte array
     const L = Math.pow(4, MAX_LEVEL);
 
     this.data = new Float32Array(BLOCKS * ((4 * L - 1) / 3));
     this.containers = {};
+    this.cache = null;
+    this.lastRectangle = null;
 
-    if (boundaries)
-      this.resize(boundaries);
+    if (params.boundaries)
+      this.resize(params.boundaries);
+
+    if (typeof params.filter === 'function')
+      this.nodeFilter = params.filter;
   }
 
   add(key, x, y, size) {
@@ -337,5 +425,45 @@ export default class QuadTree {
     } while (level <= MAX_LEVEL);
 
     return nodes;
+  }
+
+  rectangle(x1, y1, x2, y2, height) {
+    const lr = this.lastRectangle;
+
+    if (
+      lr &&
+      x1 === lr.x1 &&
+      x2 === lr.x2 &&
+      y1 === lr.y1 &&
+      y2 === lr.y2 &&
+      height === lr.height
+    ) {
+      return this.cache;
+    }
+
+    this.lastRectangle = {
+      x1,
+      y1,
+      x2,
+      y2,
+      height
+    };
+
+    // Is the rectangle axis aligned?
+    if (!isAxisAligned(x1, y1, x2, y2))
+      throw new Error('sigma/quadtree.rectangle: shifted view is not yet implemented.');
+
+    const collectedNodes = getNodesInAxisAlignedRectangleArea(
+      MAX_LEVEL,
+      data,
+      containers,
+      x1,
+      y1,
+      height
+    );
+
+    this.cache = collectedNodes;
+
+    return this.cache;
   }
 }
