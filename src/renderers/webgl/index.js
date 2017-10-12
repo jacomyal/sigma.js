@@ -38,14 +38,25 @@ const PIXEL_RATIO = getPixelRatio();
 const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 
 /**
+ * Defaults.
+ */
+const DEFAULT_SETTINGS = {
+  hideEdgesOnMove: false
+};
+
+/**
  * Main class.
  *
  * @constructor
  * @param {HTMLElement} container - The graph's container.
  */
 export default class WebGLRenderer extends Renderer {
-  constructor(container) {
+  constructor(container, settings) {
     super();
+
+    settings = settings || {};
+
+    this.settings = assign({}, DEFAULT_SETTINGS, settings);
 
     // Validating
     if (!(container instanceof HTMLElement))
@@ -738,22 +749,24 @@ export default class WebGLRenderer extends Renderer {
     );
 
     // Drawing edges
-    gl = this.contexts.edges;
-    program = this.edgePrograms.def;
+    if (!this.settings.hideEdgesOnMove || !this.camera.isAnimated()) {
+      gl = this.contexts.edges;
+      program = this.edgePrograms.def;
 
-    program.render(
-      gl,
-      this.edgeArray,
-      {
-        matrix: cameraMatrix,
-        width: this.width,
-        height: this.height,
-        ratio: cameraState.ratio,
-        edgesPowRatio: 0.5,
-        scalingRatio: WEBGL_OVERSAMPLING_RATIO,
-        indices: this.edgeIndicesArray
-      }
-    );
+      program.render(
+        gl,
+        this.edgeArray,
+        {
+          matrix: cameraMatrix,
+          width: this.width,
+          height: this.height,
+          ratio: cameraState.ratio,
+          edgesPowRatio: 0.5,
+          scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+          indices: this.edgeIndicesArray
+        }
+      );
+    }
 
     // Drawing labels
     // TODO: POW RATIO is currently default 0.5 and harcoded
