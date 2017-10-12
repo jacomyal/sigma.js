@@ -759,9 +759,21 @@ export default class WebGLRenderer extends Renderer {
       );
     }
 
+    // Getting displayed nodes from quadtree
+    // TODO: if camera view includes the whole graph, don't ask the quad
+    let viewRectangle = this.camera.viewRectangle();
+
+    const visibleNodes = this.quadtree.rectangle(
+      viewRectangle.x1,
+      viewRectangle.y1,
+      viewRectangle.x2,
+      viewRectangle.y2,
+      viewRectangle.height
+    );
+
     // Drawing labels
     // TODO: POW RATIO is currently default 0.5 and harcoded
-    const nodes = this.sigma.getGraph().nodes(),
+    const nodes = visibleNodes,
           context = this.contexts.labels;
 
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);

@@ -23,7 +23,7 @@ describe('QuadTree', function() {
     }
   ];
 
-  const tree = new QuadTree({x: 0, y: 0, width: 500, height: 500});
+  const tree = new QuadTree({boundaries: {x: 0, y: 0, width: 500, height: 500}});
 
   nodes.forEach(node => (tree.add(node.key, node.x, node.y, node.size)));
 
