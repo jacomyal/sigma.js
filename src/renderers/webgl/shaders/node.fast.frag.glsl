@@ -4,7 +4,7 @@ varying vec4 color;
 varying float ratio;
 
 void main(void) {
-  float border = 0.03 * ratio;
+  float border = 0.05 * ratio;
   float radius = 0.5;
 
   vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
