@@ -66,7 +66,6 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules(?!\/gl-matrix)/,
         loader: 'babel-loader'
       },
       {
