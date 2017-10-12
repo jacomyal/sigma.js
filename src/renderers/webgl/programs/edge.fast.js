@@ -11,11 +11,39 @@ import vertexShaderSource from '../shaders/edge.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.fast.frag.glsl';
 
 export default class EdgeFastProgram extends Program {
-  constructor() {
-    super();
+  constructor(gl) {
+    super(gl, vertexShaderSource, fragmentShaderSource);
 
-    this.vertexShaderSource = vertexShaderSource;
-    this.fragmentShaderSource = fragmentShaderSource;
+    // Initializing buffers
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+    const program = this.program;
+
+    // Locations
+    this.colorLocation = gl.getAttribLocation(program, 'a_color');
+    this.positionLocation = gl.getAttribLocation(program, 'a_position');
+    this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
+
+    // Bindings
+    gl.enableVertexAttribArray(this.positionLocation);
+    gl.enableVertexAttribArray(this.colorLocation);
+
+    gl.vertexAttribPointer(this.positionLocation,
+      2,
+      gl.FLOAT,
+      false,
+      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      0
+    );
+    gl.vertexAttribPointer(this.colorLocation,
+      1,
+      gl.FLOAT,
+      false,
+      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      8
+    );
   }
 
   process(array, sourceData, targetData, data, i) {
@@ -41,40 +69,16 @@ export default class EdgeFastProgram extends Program {
     array[i++] = color;
   }
 
+  bufferData(gl, array) {
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+  }
+
   render(gl, array, params) {
     const program = this.program;
     gl.useProgram(program);
 
-    // Attribute locations
-    const colorLocation = gl.getAttribLocation(program, 'a_color'),
-          positionLocation = gl.getAttribLocation(program, 'a_position'),
-          resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-          matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
-
-    gl.uniform2f(resolutionLocation, params.width, params.height);
-    gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
-
-    gl.enableVertexAttribArray(positionLocation);
-    gl.enableVertexAttribArray(colorLocation);
-
-    gl.vertexAttribPointer(positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    gl.vertexAttribPointer(colorLocation,
-      1,
-      gl.FLOAT,
-      false,
-      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
+    gl.uniform2f(this.resolutionLocation, params.width, params.height);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     // TODO: use gl line thickness
     gl.lineWidth(3);

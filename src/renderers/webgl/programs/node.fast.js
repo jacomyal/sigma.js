@@ -22,12 +22,12 @@ export default class NodeProgramFast extends Program {
     const program = this.program;
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(program, 'a_position'),
-    this.sizeLocation = gl.getAttribLocation(program, 'a_size'),
-    this.colorLocation = gl.getAttribLocation(program, 'a_color'),
-    this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution'),
-    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix'),
-    this.ratioLocation = gl.getUniformLocation(program, 'u_ratio'),
+    this.positionLocation = gl.getAttribLocation(program, 'a_position');
+    this.sizeLocation = gl.getAttribLocation(program, 'a_size');
+    this.colorLocation = gl.getAttribLocation(program, 'a_color');
+    this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
+    this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
     this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
 
     // Bindings
