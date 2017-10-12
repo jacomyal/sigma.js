@@ -759,27 +759,36 @@ export default class WebGLRenderer extends Renderer {
       );
     }
 
-    // Getting displayed nodes from quadtree
-    // TODO: if camera view includes the whole graph, don't ask the quad
-    let viewRectangle = this.camera.viewRectangle();
+    // Finding visible nodes to display their labels
+    let visibleNodes;
 
-    const visibleNodes = this.quadtree.rectangle(
-      viewRectangle.x1,
-      viewRectangle.y1,
-      viewRectangle.x2,
-      viewRectangle.y2,
-      viewRectangle.height
-    );
+    if (cameraState.ratio >= 1) {
+
+      // Camera is unzoomed so no need to ask the quadtree for visible nodes
+      visibleNodes = this.sigma.getGraph().nodes();
+    }
+    else {
+
+      // Let's ask the quadtree
+      const viewRectangle = this.camera.viewRectangle();
+
+      visibleNodes = this.quadtree.rectangle(
+        viewRectangle.x1,
+        viewRectangle.y1,
+        viewRectangle.x2,
+        viewRectangle.y2,
+        viewRectangle.height
+      );
+    }
 
     // Drawing labels
     // TODO: POW RATIO is currently default 0.5 and harcoded
-    const nodes = visibleNodes,
-          context = this.contexts.labels;
+    const context = this.contexts.labels;
 
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
-    for (let i = 0, l = nodes.length; i < l; i++) {
-      const data = this.nodeDataCache[nodes[i]];
+    for (let i = 0, l = visibleNodes.length; i < l; i++) {
+      const data = this.nodeDataCache[visibleNodes[i]];
 
       const {x, y} = this.camera.graphToDisplay(data.x, data.y);
 
