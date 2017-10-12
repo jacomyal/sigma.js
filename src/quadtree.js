@@ -138,14 +138,10 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
         y1 = y - size,
         w = size * 2;
 
-  // [block, level]
-  // TODO: does not require a stack if sticking with mid-level containers
-  const stack = [0, 0];
+  let level = 0,
+      block = 0;
 
-  while (stack.length) {
-    let level = stack.pop();
-
-    const block = stack.pop();
+  while (true) {
 
     // If we reached max level
     if (level >= maxLevel) {
@@ -253,16 +249,16 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
 
     // Else we recurse into the correct quads
     if (collidingWithTopLeft)
-      stack.push(topLeftBlock, level);
+      block = topLeftBlock;
 
     if (collidingWithTopRight)
-      stack.push(topRightBlock, level);
+      block = topRightBlock;
 
     if (collidingWithBottomLeft)
-      stack.push(bottomLeftBlock, level);
+      block = bottomLeftBlock;
 
     if (collidingWithBottomRight)
-      stack.push(bottomRightBlock, level);
+      block = bottomRightBlock;
   }
 }
 
