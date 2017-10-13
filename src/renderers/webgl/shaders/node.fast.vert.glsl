@@ -8,7 +8,7 @@ uniform float u_scale;
 uniform mat3 u_matrix;
 
 varying vec4 color;
-varying float ratio;
+varying float border;
 
 void main() {
 
@@ -24,7 +24,7 @@ void main() {
   //  - x 2 to correct the formulae
   gl_PointSize = a_size * u_ratio * u_scale * 2.0;
 
-  ratio = 1.0 / u_ratio;
+  border = (1.0 / u_ratio) * (0.5 / a_size);
 
   // Extract the color:
   float c = a_color;

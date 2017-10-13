@@ -41,6 +41,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 const DEFAULT_SETTINGS = {
   hideEdgesOnMove: false
 };
+// TODO: hide labels on move
 
 /**
  * Main class.
