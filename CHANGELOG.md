@@ -1,5 +1,10 @@
 ## sigma.js - changelog:
 
+#### 1.2.1 - release (Oct 13, 2017)
+
+- Fixing the [A*](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.pathfinding.astar) plugin (thanks to [@RohitJV](https://github.com/RohitJV)).
+- Fixing SVG export (thanks to [@CarloLucibello](https://github.com/CarloLucibello)).
+
 #### 1.2.0 - release (Nov 3, 2016)
 
 - Added the [layout.noverlap](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.layout.noverlap) plugin (thanks to [@apitts](https://github.com/apitts)).
