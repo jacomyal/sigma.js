@@ -22,6 +22,10 @@ const EXAMPLES = {
   naiveLayout: {
     id: 'naive-layout',
     title: 'Naive Layout'
+  },
+  performance: {
+    id: 'performance',
+    title: 'Performance'
   }
 };
 
