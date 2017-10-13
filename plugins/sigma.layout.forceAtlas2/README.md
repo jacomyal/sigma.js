@@ -5,6 +5,8 @@ Algorithm by [Mathieu Jacomy](https://github.com/jacomyma).
 
 Plugin by [Guillaume Plique](https://github.com/Yomguithereal).
 
+Filter modification by [Joakim af Sandeberg](https://github.com/jotunacorn).
+
 ---
 
 This plugin implements [ForceAtlas2](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0098679), a force-directed layout algorithm.
@@ -69,11 +71,17 @@ sigmaInstance.isForceAtlas2Running();
 * **slowDown** *number* `1`
 * **startingIterations** *integer* `1`: number of iterations to be run before the first render.
 * **iterationsPerRender** *integer* `1`: number of iterations to be run before each render.
+* **edgeFilter** *[string]* `[]`: Array of Strings to filter the edges on. Only edges with the filterType set to the same String as in the edgefilter will be used during the layout. If the array is empty all edges will be used.
+* **nodeFilter** *[string]* `[]`: Array of Strings to filter the nodes on. Only nodes with the filterType set to the same String as in the nodeFilter will be used during the layout. If the array is empty all nodes will be used.
 
 *Supervisor configuration*
 
 * **worker** *boolean* `true`: should the layout use a web worker?
 * **workerUrl** *string* : path to the worker file if needed because your browser does not support blob workers.
+
+*Edge/Node configuration*
+
+* **filterType** *String* `undefined`: String to combine with the edgeFilter/nodeFIlter in the algorithm configuration.
 
 ## Notes
 1. The layout won't stop by itself, so if you want it to stop, you will have to trigger it explicitly.

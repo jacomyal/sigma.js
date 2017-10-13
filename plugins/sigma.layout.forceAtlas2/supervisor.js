@@ -26,7 +26,7 @@
   function Supervisor(sigInst, options) {
     var _this = this,
         workerFn = sigInst.getForceAtlas2Worker &&
-          sigInst.getForceAtlas2Worker();
+            sigInst.getForceAtlas2Worker();
 
     options = options || {};
 
@@ -40,9 +40,10 @@
     this.ppe = 3;
     this.config = {};
     this.shouldUseWorker =
-      options.worker === false ? false : true && webWorkers;
+        options.worker === false ? false : true && webWorkers;
     this.workerUrl = options.workerUrl;
-
+    this.edgeFilter = options.edgeFilter || [];
+    this.nodeFilter = options.nodeFilter || [];
     // State
     this.started = false;
     this.running = false;
@@ -59,7 +60,7 @@
 
       // Post Message Polyfill
       this.worker.postMessage =
-        this.worker.webkitPostMessage || this.worker.postMessage;
+          this.worker.webkitPostMessage || this.worker.postMessage;
     }
     else {
 
@@ -106,8 +107,8 @@
     }
     catch (e) {
       _root.BlobBuilder = _root.BlobBuilder ||
-                          _root.WebKitBlobBuilder ||
-                          _root.MozBlobBuilder;
+          _root.WebKitBlobBuilder ||
+          _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -117,19 +118,104 @@
     return blob;
   };
 
+  function getNodesAndEdges(graph, edgeFilter, nodeFilter){
+    var nodes = [], edges = [], i, j, k, l;
+    if (edgeFilter.length == 0 && nodeFilter.length == 0) {
+      nodes = this.graph.nodes();
+      edges = this.graph.edges();
+    }
+    else{
+      if(nodeFilter.length == 0) {
+        nodes = this.graph.nodes();
+      }
+      else{
+        var graphNodes = graph.nodes();
+        for (i = 0, l = graphNodes.length; i < l; i++) {
+          for (k = 0; k < nodeFilter.length; k++) {
+            if (graphNodes[i].filterType == nodeFilter[k]) {
+              nodes.push(graphNodes[i]);
+            }
+          }
+        }
+      }
+      var graphEdges = graph.edges();
+      var sourceNode,
+          targetNode,
+          sourceOk,
+          targetOk;
+      for (i = 0, l = graphEdges.length; i < l; i++) {
+        if(edgeFilter.length != 0) {
+          for (j = 0; j < edgeFilter.length; j++) {
+            if (graphEdges[i].filterType == edgeFilter[j]) {
+              if (nodeFilter.length != 0) {
+                sourceNode = graph.nodes(graphEdges[i].source);
+                targetNode = graph.nodes(graphEdges[i].target);
+                sourceOk = false;
+                targetOk = false;
+                for (k = 0; k < nodeFilter.length; k++) {
+                  if (sourceNode.filterType == nodeFilter[k]) {
+                    sourceOk = true;
+                  }
+                  if (targetNode.filterType == nodeFilter[k]) {
+                    targetOk = true;
+                  }
+                }
+                if (sourceOk && targetOk) {
+                  edges.push(graphEdges[i]);
+                }
+              }
+              else{
+                edges.push(graphEdges[i]);
+              }
+            }
+          }
+        }
+        else{
+          if (nodeFilter.length != 0) {
+            sourceNode = graph.nodes(graphEdges[i].source);
+            targetNode = graph.nodes(graphEdges[i].target);
+            sourceOk = false;
+            targetOk = false;
+            for (var k = 0; k < nodeFilter.length; k++) {
+              if (sourceNode.filterType == nodeFilter[k]) {
+                sourceOk = true;
+              }
+              if (targetNode.filterType == nodeFilter[k]) {
+                targetOk = true;
+              }
+            }
+            if (sourceOk && targetOk) {
+              edges.push(graphEdges[i]);
+            }
+          }
+          else{
+            edges.push(graphEdges[i]);
+          }
+        }
+      }
+    }
+    return {nodes:nodes, edges:edges};
+  }
+
   Supervisor.prototype.graphToByteArrays = function() {
-    var nodes = this.graph.nodes(),
-        edges = this.graph.edges(),
-        nbytes = nodes.length * this.ppn,
-        ebytes = edges.length * this.ppe,
+    var nodes = [],
+        edges = [],
         nIndex = {},
         i,
         j,
+        k,
         l;
 
+    var nodesAndEdges = getNodesAndEdges(this.graph, this.edgeFilter, this.nodeFilter);
+    nodes = nodesAndEdges.nodes;
+    edges = nodesAndEdges.edges;
+    console.log("Found " + nodes.length + " nodes and " + edges.length + " edges");
+    var nbytes = nodes.length * this.ppn,
+        ebytes = edges.length * this.ppe;
     // Allocating Byte arrays with correct nb of bytes
     this.nodesByteArray = new Float32Array(nbytes);
     this.edgesByteArray = new Float32Array(ebytes);
+
 
     // Iterate through nodes
     for (i = j = 0, l = nodes.length; i < l; i++) {
@@ -162,7 +248,7 @@
 
   // TODO: make a better send function
   Supervisor.prototype.applyLayoutChanges = function() {
-    var nodes = this.graph.nodes(),
+    var nodes = getNodesAndEdges(this.graph, this.edgeFilter, this.nodeFilter).nodes,
         j = 0,
         realIndex;
 
@@ -233,8 +319,8 @@
 
       // Find graph boundaries:
       bounds = sigma.utils.getBoundaries(
-        this.graph,
-        c.readPrefix
+          this.graph,
+          c.readPrefix
       );
 
       // Refresh edgequadtree:
