@@ -4,8 +4,10 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
+// Note: twice the one defined in the vertex shader
+const float feather = 1.0;
+
 void main(void) {
-  float feather = 1.3;
   vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
 
   float radius = v_thickness;
