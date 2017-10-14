@@ -6,17 +6,14 @@ varying float v_thickness;
 
 // Note: twice the one defined in the vertex shader
 const float feather = 1.0;
+const vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
-  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
-
-  float radius = v_thickness;
-
-  float dist = length(v_normal) * radius;
+  float dist = length(v_normal) * v_thickness;
 
   float t = smoothstep(
-    radius - feather,
-    radius,
+    v_thickness - feather,
+    v_thickness,
     dist
   );
 
