@@ -11,9 +11,9 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-void main() {
+const float feather = 0.5;
 
-  float feather = 0.5;
+void main() {
 
   v_thickness = a_thickness * u_ratio / 2.0 + feather;
 
