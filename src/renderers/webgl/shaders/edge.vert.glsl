@@ -27,7 +27,8 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   v_normal = a_normal + vec2(sign(a_normal.x) * feather, sign(a_normal.y) * feather);
-  v_thickness = max(1.0, length(delta) / u_scale);
+  // v_thickness = max(1.0, length(delta) / u_scale);
+  v_thickness = max(1.0, v_thickness / u_scale);
 
   // Extract the color:
   float c = a_color;
