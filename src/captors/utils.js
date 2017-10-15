@@ -131,10 +131,10 @@ export function getMouseCoords(e) {
  */
 export function getWheelDelta(e) {
   if (typeof e.wheelDelta !== 'undefined')
-    return e.wheelDelta;
+    return e.wheelDelta / 360;
 
   if (typeof e.detail !== 'undefined')
-    return -e.detail;
+    return e.detail / -9;
 
   throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
 }

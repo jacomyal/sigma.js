@@ -255,7 +255,7 @@ export default class Camera extends EventEmitter {
    * @param  {function} callback   - Callback
    * @return {function}            - Return a function to cancel the animation.
    */
-  animate(state, options /*, callback */) {
+  animate(state, options, callback) {
 
     if (!this.enabled)
       return this;
@@ -284,6 +284,9 @@ export default class Camera extends EventEmitter {
       if (t >= 1) {
         this.nextFrame = null;
         this.setState(state);
+
+        if (typeof callback === 'function')
+          callback();
 
         return;
       }

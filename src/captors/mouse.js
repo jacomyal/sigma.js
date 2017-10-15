@@ -242,6 +242,14 @@ export default class MouseCaptor extends Captor {
   }
 
   handleWheel(e) {
+
+    if (e.preventDefault)
+      e.preventDefault();
+    else
+      e.returnValue = false;
+
+    e.stopPropagation();
+
     if (!this.enabled)
       return false;
 
@@ -254,7 +262,6 @@ export default class MouseCaptor extends Captor {
       return false;
 
     this.wheelLock = true;
-    setTimeout(() => (this.wheelLock = false), 30);
 
     // TODO: handle max zoom
     const ratio = delta > 0 ?
@@ -277,16 +284,9 @@ export default class MouseCaptor extends Captor {
       y: position.y * (1 - ratio) + cameraState.y,
       ratio: newRatio
     }, {
-      easing: this.camera.isAnimated() ? 'quadraticOut' : 'quadraticInOut',
+      easing: 'linear',
       duration: MOUSE_ZOOM_DURATION
-    });
-
-    if (e.preventDefault)
-      e.preventDefault();
-    else
-      e.returnValue = false;
-
-    e.stopPropagation();
+    }, () => (this.wheelLock = false));
 
     return false;
   }
