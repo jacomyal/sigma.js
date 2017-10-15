@@ -6,6 +6,7 @@ attribute float a_color;
 uniform vec2 u_resolution;
 uniform float u_ratio;
 uniform mat3 u_matrix;
+uniform float u_scale;
 
 varying vec4 v_color;
 varying vec2 v_normal;
@@ -26,7 +27,7 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   v_normal = a_normal + vec2(sign(a_normal.x) * feather, sign(a_normal.y) * feather);
-  v_thickness = max(1.0, length(delta) * u_matrix[0][0]);
+  v_thickness = max(1.0, length(delta) / u_scale);
 
   // Extract the color:
   float c = a_color;

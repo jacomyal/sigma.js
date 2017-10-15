@@ -38,6 +38,7 @@ export default class EdgeProgram extends Program {
     this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
+    this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -187,6 +188,8 @@ export default class EdgeProgram extends Program {
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+
+    gl.uniform1f(this.scaleLocation, params.ratio);
 
     // Drawing:
     gl.drawElements(
