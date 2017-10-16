@@ -13,7 +13,7 @@ void main(void) {
 
   float t = smoothstep(
     v_thickness - feather,
-    v_thickness,
+    v_thickness + feather / 1.5,
     dist
   );
 
