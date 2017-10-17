@@ -46,7 +46,7 @@ export default class MouseCaptor extends Captor {
     this.startMouseX = null;
     this.startMouseY = null;
     this.isMouseDown = false;
-    this.isMoving = true;
+    this.isMoving = false;
     this.movingTimeout = null;
     this.startCameraState = null;
     this.lastCameraState = null;
@@ -186,8 +186,9 @@ export default class MouseCaptor extends Captor {
       });
     }
 
-    this.emit('mouseup', getMouseCoords(e));
     this.isMoving = false;
+    this.hasDragged = false;
+    this.emit('mouseup', getMouseCoords(e));
   }
 
   handleMove(e) {

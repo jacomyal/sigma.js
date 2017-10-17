@@ -39,9 +39,9 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * Defaults.
  */
 const DEFAULT_SETTINGS = {
-  hideEdgesOnMove: false
+  hideEdgesOnMove: false,
+  hideLabelsOnMove: false
 };
-// TODO: hide labels on move
 
 /**
  * Main class.
@@ -96,7 +96,6 @@ export default class WebGLRenderer extends Renderer {
     this.renderHighlightedNodesFrame = null;
     this.needToProcess = false;
     this.needToSoftProcess = false;
-    this.pixel = new Uint8Array(4);
 
     // Initializing contexts
     this.createContext('edges');
@@ -149,25 +148,6 @@ export default class WebGLRenderer extends Renderer {
    * Internal methods.
    **---------------------------------------------------------------------------
    */
-
-  /**
-   * Method used to test a pixel of the given context.
-   *
-   * @param  {WebGLContext} gl - Context.
-   * @param  {number}       x  - Client x.
-   * @param  {number}       y  - Client y.
-   * @return {boolean}
-   */
-  testPixel(gl, x, y) {
-    extractPixel(
-      gl,
-      x * WEBGL_OVERSAMPLING_RATIO,
-      (this.height - y) * WEBGL_OVERSAMPLING_RATIO,
-      this.pixel
-    );
-
-    return this.pixel[3] !== 0;
-  }
 
   /**
    * Internal function used to create a canvas context and add the relevant
@@ -709,6 +689,13 @@ export default class WebGLRenderer extends Renderer {
       this.needToSoftProcess = false;
     }
 
+    // TODO: improve this heuristic
+    const moving = (
+      this.camera.isAnimated() ||
+      this.captors.mouse.isMoving ||
+      this.captors.mouse.hasDragged
+    );
+
     // First we need to resize
     this.resize();
 
@@ -741,7 +728,7 @@ export default class WebGLRenderer extends Renderer {
     );
 
     // Drawing edges
-    if (!this.settings.hideEdgesOnMove || !this.camera.isAnimated()) {
+    if (!this.settings.hideEdgesOnMove || !moving) {
       gl = this.contexts.edges;
       program = this.edgePrograms.def;
 
@@ -759,6 +746,10 @@ export default class WebGLRenderer extends Renderer {
         }
       );
     }
+
+    // Do not display labels on move per setting
+    if (this.settings.hideLabelsOnMove && moving)
+      return this;
 
     // Finding visible nodes to display their labels
     let visibleNodes;
