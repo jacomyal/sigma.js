@@ -693,7 +693,8 @@ export default class WebGLRenderer extends Renderer {
     const moving = (
       this.camera.isAnimated() ||
       this.captors.mouse.isMoving ||
-      this.captors.mouse.hasDragged
+      this.captors.mouse.hasDragged ||
+      this.captors.mouse.wheelLock
     );
 
     // First we need to resize
