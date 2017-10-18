@@ -495,9 +495,7 @@
    */
   sigma.plugins.filter = function(s) {
     // Create filter if undefined
-    if (!filter) {
-      filter = new Filter(s);
-    }
+    filter = new Filter(s);
     return filter;
   };
 
