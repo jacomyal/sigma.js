@@ -12,13 +12,17 @@
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
 
-// TODO: a square can be represented as topleft + width
+// TODO: a square can be represented as topleft + width, saying for the quad blocks (reduce mem)
 
 // TODO: jsdoc
 
 // TODO: be sure we can handle cases overcoming boundaries (because of size) or use a maxed size
 
 // TODO: filtering unwanted labels beforehand through the filter function
+
+// NOTE: this is basically a MX-CIF Quadtree at this point
+// NOTE: need to explore R-Trees for edges
+// NOTE: need to explore 2d segment tree for edges
 
 /**
  * Constants.
