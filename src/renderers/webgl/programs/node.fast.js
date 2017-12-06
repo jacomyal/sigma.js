@@ -11,9 +11,15 @@ import {floatColor} from '../utils';
 import vertexShaderSource from '../shaders/node.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/node.fast.frag.glsl';
 
+const POINTS = 1,
+      ATTRIBUTES = 4;
+
 export default class NodeProgramFast extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
+
+    // Array data
+    this.array = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -40,7 +46,7 @@ export default class NodeProgramFast extends Program {
       2,
       gl.FLOAT,
       false,
-      NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
     gl.vertexAttribPointer(
@@ -48,7 +54,7 @@ export default class NodeProgramFast extends Program {
       1,
       gl.FLOAT,
       false,
-      NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
     gl.vertexAttribPointer(
@@ -56,25 +62,33 @@ export default class NodeProgramFast extends Program {
       1,
       gl.FLOAT,
       false,
-      NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       12
     );
   }
 
-  process(array, data, i) {
+  allocate(capacity) {
+    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  }
+
+  process(data, offset) {
     const color = floatColor(data.color);
+
+    let i = offset * POINTS * ATTRIBUTES;
+
+    const array = this.array;
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
-    array[i++] = color;
+    array[i] = color;
   }
 
-  bufferData(gl, array) {
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+  bufferData(gl) {
+    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
-  render(gl, array, params) {
+  render(gl, params) {
     const program = this.program;
     gl.useProgram(program);
 
@@ -89,10 +103,7 @@ export default class NodeProgramFast extends Program {
     gl.drawArrays(
       gl.POINTS,
       0,
-      array.length / NodeProgramFast.ATTRIBUTES
+      this.array.length / ATTRIBUTES
     );
   }
 }
-
-NodeProgramFast.POINTS = 1;
-NodeProgramFast.ATTRIBUTES = 4;

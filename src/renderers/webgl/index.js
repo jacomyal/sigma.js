@@ -25,8 +25,7 @@ import {
 } from '../utils';
 
 import {
-  matrixFromCamera,
-  extractPixel
+  matrixFromCamera
 } from './utils';
 
 /**
@@ -70,15 +69,10 @@ export default class WebGLRenderer extends Renderer {
     this.listeners = {};
 
     this.quadtree = new QuadTree();
-
-    this.nodeArray = null;
-    this.nodeIndicesArray = null;
     this.nodeOrder = {};
 
     // TODO: this could be improved by key => index => floatArray
     this.nodeDataCache = {};
-    this.edgeArray = null;
-    this.edgeIndicesArray = null;
     this.edgeOrder = {};
 
     // TODO: if we drop size scaling => this should become "rescalingFunction"
@@ -260,6 +254,7 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
+        // TODO: we should get the nearest node instead
         if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           this.hoveredNode = node;
 
@@ -417,10 +412,7 @@ export default class WebGLRenderer extends Renderer {
     const nodeProgram = this.nodePrograms.def;
 
     if (!keepArrays) {
-      this.nodeArray = new Float32Array(
-        NodeProgram.POINTS * NodeProgram.ATTRIBUTES * graph.order
-      );
-
+      nodeProgram.allocate(graph.order);
       this.nodeOrder = {};
     }
 
@@ -442,22 +434,16 @@ export default class WebGLRenderer extends Renderer {
 
       this.nodeDataCache[node] = displayData;
 
-      nodeProgram.process(
-        this.nodeArray,
-        displayData,
-        i * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
-      );
+      nodeProgram.process(displayData, i);
     }
 
-    nodeProgram.bufferData(this.contexts.nodes, this.nodeArray);
+    // TODO: do we need to keep passing gl to the program?
+    nodeProgram.bufferData(this.contexts.nodes);
 
     const edgeProgram = this.edgePrograms.def;
 
     if (!keepArrays) {
-      this.edgeArray = new Float32Array(
-        EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES * graph.size
-      );
-
+      edgeProgram.allocate(graph.size);
       this.edgeOrder = {};
     }
 
@@ -474,22 +460,19 @@ export default class WebGLRenderer extends Renderer {
             targetData = this.nodeDataCache[extremities[1]];
 
       edgeProgram.process(
-        this.edgeArray,
         sourceData,
         targetData,
         data,
-        i * EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES
+        i
       );
     }
 
     // Computing edge indices if necessary
     if (!keepArrays && typeof edgeProgram.computeIndices === 'function')
-      this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
+      this.edgeIndicesArray = edgeProgram.computeIndices();
 
     edgeProgram.bufferData(
-      this.contexts.edges,
-      this.edgeArray,
-      this.edgeIndicesArray
+      this.contexts.edges
     );
 
     return this;
@@ -507,9 +490,8 @@ export default class WebGLRenderer extends Renderer {
     const data = this.sigma.getNodeData(key);
 
     nodeProgram.process(
-      this.nodeArray,
       data,
-      this.nodeOrder[key] * NodeProgram.POINTS * NodeProgram.ATTRIBUTES
+      this.nodeOrder[key]
     );
 
     return this;
@@ -532,11 +514,10 @@ export default class WebGLRenderer extends Renderer {
           targetData = this.sigma.getNodeData(extremities[1]);
 
     edgeProgram.process(
-      this.edgeArray,
       sourceData,
       targetData,
       data,
-      this.edgeOrder[key] * EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES
+      this.edgeOrder[key]
     );
 
     return this;
@@ -717,7 +698,6 @@ export default class WebGLRenderer extends Renderer {
     // TODO: should probably use another name for the `program` abstraction
     program.render(
       gl,
-      this.nodeArray,
       {
         matrix: cameraMatrix,
         width: this.width,
@@ -735,15 +715,13 @@ export default class WebGLRenderer extends Renderer {
 
       program.render(
         gl,
-        this.edgeArray,
         {
           matrix: cameraMatrix,
           width: this.width,
           height: this.height,
           ratio: cameraState.ratio,
           edgesPowRatio: 0.5,
-          scalingRatio: WEBGL_OVERSAMPLING_RATIO,
-          indices: this.edgeIndicesArray
+          scalingRatio: WEBGL_OVERSAMPLING_RATIO
         }
       );
     }

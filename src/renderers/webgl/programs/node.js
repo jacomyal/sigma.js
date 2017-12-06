@@ -16,9 +16,15 @@ const ANGLE_1 = 0,
       ANGLE_2 = 2 * Math.PI / 3,
       ANGLE_3 = 4 * Math.PI / 3;
 
+const POINTS = 3,
+      ATTRIBUTES = 5;
+
 export default class NodeProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
+
+    // Array data
+    this.array = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -45,7 +51,7 @@ export default class NodeProgram extends Program {
       2,
       gl.FLOAT,
       false,
-      NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
 
@@ -54,7 +60,7 @@ export default class NodeProgram extends Program {
       1,
       gl.FLOAT,
       false,
-      NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
 
@@ -63,7 +69,7 @@ export default class NodeProgram extends Program {
       1,
       gl.FLOAT,
       false,
-      NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       12
     );
 
@@ -72,13 +78,23 @@ export default class NodeProgram extends Program {
       1,
       gl.FLOAT,
       false,
-      NodeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
   }
 
-  process(array, data, i) {
+  allocate(capacity) {
+    this.array = new Float32Array(
+      POINTS * ATTRIBUTES * capacity
+    );
+  }
+
+  process(data, offset) {
     const color = floatColor(data.color);
+
+    let i = offset * POINTS * ATTRIBUTES;
+
+    const array = this.array;
 
     array[i++] = data.x;
     array[i++] = data.y;
@@ -96,14 +112,16 @@ export default class NodeProgram extends Program {
     array[i++] = data.y;
     array[i++] = data.size;
     array[i++] = color;
-    array[i++] = ANGLE_3;
+    array[i] = ANGLE_3;
   }
 
-  render(gl, array, params) {
+  bufferData(gl) {
+    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+  }
+
+  render(gl, params) {
     const program = this.program;
     gl.useProgram(program);
-
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
 
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
@@ -116,10 +134,7 @@ export default class NodeProgram extends Program {
     gl.drawArrays(
       gl.TRIANGLES,
       0,
-      array.length / NodeProgram.ATTRIBUTES
+      this.array.length / ATTRIBUTES
     );
   }
 }
-
-NodeProgram.POINTS = 3;
-NodeProgram.ATTRIBUTES = 5;

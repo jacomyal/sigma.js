@@ -19,9 +19,16 @@ import {floatColor} from '../utils';
 import vertexShaderSource from '../shaders/edge.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
+const POINTS = 4,
+      ATTRIBUTES = 6;
+
 export default class EdgeProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
+
+    // Array data
+    this.array = null;
+    this.indicesArray = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -50,28 +57,28 @@ export default class EdgeProgram extends Program {
       2,
       gl.FLOAT,
       false,
-      EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
     gl.vertexAttribPointer(this.normalLocation,
       2,
       gl.FLOAT,
       false,
-      EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
     gl.vertexAttribPointer(this.thicknessLocation,
       1,
       gl.FLOAT,
       false,
-      EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
     gl.vertexAttribPointer(this.colorLocation,
       1,
       gl.FLOAT,
       false,
-      EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
 
@@ -86,10 +93,14 @@ export default class EdgeProgram extends Program {
     this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
   }
 
-  process(array, sourceData, targetData, data, i) {
+  allocate(capacity) {
+    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  }
+
+  process(sourceData, targetData, data, offset) {
 
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let l = i + EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES; i < l; i++)
+      for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
         array[i] = 0;
     }
 
@@ -114,6 +125,10 @@ export default class EdgeProgram extends Program {
       n1 = -dy * len;
       n2 = dx * len;
     }
+
+    let i = POINTS * ATTRIBUTES * offset;
+
+    const array = this.array;
 
     // First point
     array[i++] = x1;
@@ -145,11 +160,11 @@ export default class EdgeProgram extends Program {
     array[i++] = -n1;
     array[i++] = -n2;
     array[i++] = thickness;
-    array[i++] = color;
+    array[i] = color;
   }
 
-  computeIndices(array) {
-    const l = array.length / EdgeProgram.ATTRIBUTES;
+  computeIndices() {
+    const l = this.array.length / ATTRIBUTES;
 
     const size = l + (l / 2);
 
@@ -164,19 +179,19 @@ export default class EdgeProgram extends Program {
       indices[c++] = i + 3;
     }
 
-    return indices;
+    this.indicesArray = indices;
   }
 
-  bufferData(gl, array, indicesArray) {
+  bufferData(gl) {
 
     // Vertices data
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
 
     // Indices data
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
   }
 
-  render(gl, array, params) {
+  render(gl, params) {
     const program = this.program;
     gl.useProgram(program);
 
@@ -194,12 +209,9 @@ export default class EdgeProgram extends Program {
     // Drawing:
     gl.drawElements(
       gl.TRIANGLES,
-      params.indices.length,
+      this.indicesArray.length,
       this.indicesType,
       0
     );
   }
 }
-
-EdgeProgram.POINTS = 4;
-EdgeProgram.ATTRIBUTES = 6;
