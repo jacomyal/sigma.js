@@ -438,7 +438,7 @@ export default class WebGLRenderer extends Renderer {
     }
 
     // TODO: do we need to keep passing gl to the program?
-    nodeProgram.bufferData(this.contexts.nodes);
+    nodeProgram.bufferData();
 
     const edgeProgram = this.edgePrograms.def;
 
@@ -471,9 +471,7 @@ export default class WebGLRenderer extends Renderer {
     if (!keepArrays && typeof edgeProgram.computeIndices === 'function')
       this.edgeIndicesArray = edgeProgram.computeIndices();
 
-    edgeProgram.bufferData(
-      this.contexts.edges
-    );
+    edgeProgram.bufferData();
 
     return this;
   }
@@ -688,16 +686,13 @@ export default class WebGLRenderer extends Renderer {
     const cameraState = this.camera.getState(),
           cameraMatrix = matrixFromCamera(cameraState, {width: this.width, height: this.height});
 
-    let program,
-        gl;
+    let program;
 
     // Drawing nodes
-    gl = this.contexts.nodes;
     program = this.nodePrograms.def;
 
     // TODO: should probably use another name for the `program` abstraction
     program.render(
-      gl,
       {
         matrix: cameraMatrix,
         width: this.width,
@@ -710,11 +705,9 @@ export default class WebGLRenderer extends Renderer {
 
     // Drawing edges
     if (!this.settings.hideEdgesOnMove || !moving) {
-      gl = this.contexts.edges;
       program = this.edgePrograms.def;
 
       program.render(
-        gl,
         {
           matrix: cameraMatrix,
           width: this.width,

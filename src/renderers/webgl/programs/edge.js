@@ -26,6 +26,9 @@ export default class EdgeProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
+    // Binding context
+    this.gl = gl;
+
     // Array data
     this.array = null;
     this.indicesArray = null;
@@ -182,7 +185,8 @@ export default class EdgeProgram extends Program {
     this.indicesArray = indices;
   }
 
-  bufferData(gl) {
+  bufferData() {
+    const gl = this.gl;
 
     // Vertices data
     gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
@@ -191,7 +195,9 @@ export default class EdgeProgram extends Program {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
   }
 
-  render(gl, params) {
+  render(params) {
+    const gl = this.gl;
+
     const program = this.program;
     gl.useProgram(program);
 

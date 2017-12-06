@@ -23,6 +23,9 @@ export default class NodeProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
+    // Binding context
+    this.gl = gl;
+
     // Array data
     this.array = null;
 
@@ -115,12 +118,17 @@ export default class NodeProgram extends Program {
     array[i] = ANGLE_3;
   }
 
-  bufferData(gl) {
+  bufferData() {
+    const gl = this.gl;
+
     gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
-  render(gl, params) {
+  render(params) {
+    const gl = this.gl;
+
     const program = this.program;
+
     gl.useProgram(program);
 
     gl.uniform2f(this.resolutionLocation, params.width, params.height);

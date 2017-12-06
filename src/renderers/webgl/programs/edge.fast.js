@@ -10,6 +10,9 @@ import {floatColor} from '../utils';
 import vertexShaderSource from '../shaders/edge.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.fast.frag.glsl';
 
+// WARNING: this code is deprecated. It needs to be re-adapted to work
+// correctly to new APIs.
+
 export default class EdgeFastProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
