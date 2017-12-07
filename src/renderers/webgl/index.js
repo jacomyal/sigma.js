@@ -68,10 +68,11 @@ export default class WebGLRenderer extends Renderer {
     this.contexts = {};
     this.listeners = {};
 
+    // Indices
+    // TODO: this could be improved by key => index => floatArray
+    // TODO: the cache should erase keys on node delete
     this.quadtree = new QuadTree();
     this.nodeOrder = {};
-
-    // TODO: this could be improved by key => index => floatArray
     this.nodeDataCache = {};
     this.edgeOrder = {};
 
