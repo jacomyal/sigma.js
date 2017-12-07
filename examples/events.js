@@ -8,7 +8,7 @@ import WebGLRenderer from '../src/renderers/webgl';
 
 const container = document.getElementById('container');
 
-const graph = erdosRenyi.fast(UndirectedGraph, {n: 500, probability: 0.05});
+const graph = erdosRenyi.sparse(UndirectedGraph, {order: 500, probability: 0.05});
 randomLayout.assign(graph);
 
 graph.nodes().forEach(node => {

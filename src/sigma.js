@@ -113,6 +113,8 @@ export default class Sigma {
 
       const data = this.getNodeData(node);
 
+      const size = data.size || 1;
+
       if (data.x > maxX)
         maxX = data.x;
       if (data.y > maxY)
@@ -122,8 +124,6 @@ export default class Sigma {
         minX = data.x;
       if (data.y < minY)
         minY = data.y;
-
-      const size = data.size || 1;
 
       if (size > maxNodeSize)
         maxNodeSize = size;

@@ -407,8 +407,6 @@ export default class WebGLRenderer extends Renderer {
       height: maxRescaled.y - minRescaled.y
     });
 
-    this.nodeRescaleCache = {};
-
     const nodeProgram = this.nodePrograms.def;
 
     if (!keepArrays) {
