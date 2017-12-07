@@ -19,9 +19,9 @@ const EXAMPLES = {
     id: 'gexf',
     title: 'GEXF'
   },
-  naiveLayout: {
-    id: 'naive-layout',
-    title: 'Naive Layout'
+  layout: {
+    id: 'layout',
+    title: 'Force Atlas 2 Layout'
   },
   performance: {
     id: 'performance',

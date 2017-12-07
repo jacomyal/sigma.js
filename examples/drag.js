@@ -43,7 +43,7 @@ captor.on('mousemove', e => {
     return;
 
   // Get new position of node
-  const pos = renderer.nodeRescalingFunction.inverse(
+  const pos = renderer.rescalingFunction.inverse(
     camera.displayToGraph(e.x, e.y)
   );
 

@@ -21,7 +21,7 @@ import {
 import {
   createElement,
   getPixelRatio,
-  createNodeRescalingFunction
+  createRescalingFunction
 } from '../utils';
 
 import {
@@ -75,8 +75,8 @@ export default class WebGLRenderer extends Renderer {
     this.nodeDataCache = {};
     this.edgeOrder = {};
 
-    // TODO: if we drop size scaling => this should become "rescalingFunction"
-    this.nodeRescalingFunction = null;
+    // Rescaling function
+    this.rescalingFunction = null;
 
     // Starting dimensions
     this.width = 0;
@@ -385,17 +385,17 @@ export default class WebGLRenderer extends Renderer {
     const extent = this.sigma.getGraphExtent();
 
     // Rescaling function
-    this.nodeRescalingFunction = createNodeRescalingFunction(
+    this.rescalingFunction = createRescalingFunction(
       {width: this.width, height: this.height},
       extent
     );
 
-    const minRescaled = this.nodeRescalingFunction({
+    const minRescaled = this.rescalingFunction({
       x: extent.minX,
       y: extent.minY
     });
 
-    const maxRescaled = this.nodeRescalingFunction({
+    const maxRescaled = this.rescalingFunction({
       x: extent.maxX,
       y: extent.maxY
     });
@@ -425,7 +425,7 @@ export default class WebGLRenderer extends Renderer {
 
       const data = this.sigma.getNodeData(node);
 
-      const rescaledData = this.nodeRescalingFunction(data);
+      const rescaledData = this.rescalingFunction(data);
 
       // TODO: Optimize this to be save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);

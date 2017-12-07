@@ -53,32 +53,24 @@ export function getPixelRatio() {
 /**
  * Default rescale options.
  */
-const DEFAULT_NODE_RESCALE_OPTIONS = {
+const DEFAULT_RESCALE_OPTIONS = {
   mode: 'inside',
-  margin: 0,
-  minSize: 1,
-  maxSize: 8
+  margin: 0
 };
 
-const DEFAULT_EDGE_RESCALE_OPTIONS = {
-  minSize: 0.5,
-  maxSize: 1
-};
-
-// TODO: should we let the user handle size through, for instance, d3 scales?
 // TODO: should we put the rescaling in the camera itself?
 
 /**
- * Factory returning a function rescaling the given node's position and/or size.
+ * Factory returning a function rescaling the given node's position.
  *
  * @param  {object}   options - Options.
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-export function createNodeRescalingFunction(options, extent) {
+export function createRescalingFunction(options, extent) {
   options = options || {};
 
-  const mode = options.mode || DEFAULT_NODE_RESCALE_OPTIONS.mode,
+  const mode = options.mode || DEFAULT_RESCALE_OPTIONS.mode,
         height = options.height || 1,
         width = options.width || 1;
 
