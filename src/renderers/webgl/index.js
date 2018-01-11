@@ -168,7 +168,18 @@ export default class WebGLRenderer extends Renderer {
       antialias: false
     };
 
-    const context = element.getContext(webgl ? 'webgl' : '2d', contextOptions);
+    let context;
+
+    if (webgl) {
+      context = element.getContext('webgl', contextOptions);
+
+      // Edge, I am looking right at you...
+      if (!context)
+        context = element.getContext('experimental-webgl', contextOptions);
+    }
+    else {
+      context = element.getContext('2d', contextOptions)
+    }
 
     this.contexts[id] = context;
 
