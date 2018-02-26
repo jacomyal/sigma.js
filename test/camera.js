@@ -20,6 +20,20 @@ describe('Camera', function() {
     });
   });
 
+  it('should be possible to read the camera\'s previous state.', function() {
+    const camera = new Camera();
+
+    camera.setState({x: 34, y: 56, ratio: 4, angle: 10});
+    camera.setState({x: 5, y: -3, ratio: 5, angle: 0});
+
+    assert.deepEqual(camera.getPreviousState(), {
+      x: 34,
+      y: 56,
+      ratio: 4,
+      angle: 10
+    });
+  });
+
   it('should be possibile to set the camera\'s state.', function() {
     const camera = new Camera();
 

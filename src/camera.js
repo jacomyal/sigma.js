@@ -46,6 +46,7 @@ export default class Camera extends EventEmitter {
 
     // State
     this.nextFrame = null;
+    this.previousState = this.getState();
     this.enabled = true;
   }
 
@@ -80,6 +81,22 @@ export default class Camera extends EventEmitter {
       y: this.y,
       angle: this.angle,
       ratio: this.ratio
+    };
+  }
+
+  /**
+   * Method used to retrieve the camera's previous state.
+   *
+   * @return {object}
+   */
+  getPreviousState() {
+    const state = this.previousState;
+
+    return {
+      x: state.x,
+      y: state.y,
+      angle: state.angle,
+      ratio: state.ratio
     };
   }
 
@@ -204,6 +221,9 @@ export default class Camera extends EventEmitter {
 
     // TODO: validations
     // TODO: update by function
+
+    // Keeping track of last state
+    this.previousState = this.getState();
 
     if ('x' in state)
       this.x = state.x;
