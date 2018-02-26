@@ -28,6 +28,10 @@ import {
   matrixFromCamera
 } from './utils';
 
+import {
+  labelsToDisplayFromGrid
+} from '../../heuristics/labels';
+
 /**
  * Constants.
  */
@@ -85,6 +89,8 @@ export default class WebGLRenderer extends Renderer {
 
     // State
     this.highlightedNodes = new Set();
+    this.previousVisibleNodes = new Set();
+    this.displayedLabels = new Set();
     this.hoveredNode = null;
     this.wasRenderedInThisFrame = false;
     this.renderFrame = null;
@@ -755,14 +761,23 @@ export default class WebGLRenderer extends Renderer {
       );
     }
 
+    // Selecting labels to draw
+    const labelsToDisplay = labelsToDisplayFromGrid({
+      cache: this.nodeDataCache,
+      camera: this.camera,
+      displayedLabels: this.displayedLabels,
+      previousVisibleNodes: this.previousVisibleNodes,
+      visibleNodes
+    });
+
     // Drawing labels
     // TODO: POW RATIO is currently default 0.5 and harcoded
     const context = this.contexts.labels;
 
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
-    for (let i = 0, l = visibleNodes.length; i < l; i++) {
-      const data = this.nodeDataCache[visibleNodes[i]];
+    for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
+      const data = this.nodeDataCache[labelsToDisplay[i]];
 
       const {x, y} = this.camera.graphToDisplay(data.x, data.y);
 
@@ -770,8 +785,8 @@ export default class WebGLRenderer extends Renderer {
       const size = data.size / sizeRatio;
 
       // TODO: this is the label threshold hardcoded
-      if (size < 8)
-        continue;
+      // if (size < 8)
+      //   continue;
 
       drawLabel(context, {
         label: data.label,
@@ -780,6 +795,10 @@ export default class WebGLRenderer extends Renderer {
         y
       });
     }
+
+    // Caching visible nodes and displayed labels
+    this.previousVisibleNodes = new Set(visibleNodes);
+    this.displayedLabels = new Set(labelsToDisplay);
 
     // Rendering highlighted nodes
     this.renderHighlightedNodes();
