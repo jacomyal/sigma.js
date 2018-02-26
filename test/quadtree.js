@@ -27,5 +27,5 @@ describe('QuadTree', function() {
 
   nodes.forEach(node => (tree.add(node.key, node.x, node.y, node.size)));
 
-  console.log(tree.point(10, 14));
+  // console.log(tree.point(10, 14));
 });

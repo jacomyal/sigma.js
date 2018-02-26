@@ -178,7 +178,7 @@ export default class WebGLRenderer extends Renderer {
         context = element.getContext('experimental-webgl', contextOptions);
     }
     else {
-      context = element.getContext('2d', contextOptions)
+      context = element.getContext('2d', contextOptions);
     }
 
     this.contexts[id] = context;

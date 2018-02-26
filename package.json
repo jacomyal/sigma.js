@@ -13,10 +13,10 @@
     "lint": "eslint examples src test",
     "postpublish": "npm run clean",
     "prepublish": "npm run test && npm run dist && npm run build",
-    "test": "mocha --compilers js:babel-core/register ./test/endpoint.js"
+    "test": "mocha --require babel-core/register ./test/endpoint.js"
   },
   "sigma": {
-    "clean": "camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma.js utils.js captors renderers"
+    "clean": "camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma.js utils.js captors heuristics renderers"
   },
   "repository": {
     "type": "git",
@@ -37,23 +37,23 @@
     "@yomguithereal/eslint-config": "^4.0.0",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.14.0",
-    "babel-loader": "^7.0.0",
+    "babel-loader": "^7.1.3",
     "babel-preset-es2015": "^6.14.0",
-    "chroma-js": "^1.3.3",
-    "eslint": "^4.0.0",
+    "chroma-js": "^1.3.6",
+    "eslint": "^4.18.1",
     "faker": "^4.1.0",
-    "graphology": "^0.11.0",
+    "graphology": "^0.11.1",
     "graphology-generators": "^0.7.0",
     "graphology-gexf": "^0.3.1",
     "graphology-layout": "0.0.1",
     "graphology-layout-forceatlas2": "^0.1.1",
     "html-webpack-plugin": "^2.22.0",
-    "mocha": "^4.0.1",
+    "mocha": "^5.0.1",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.1",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.4.5",
-    "worker-loader": "^1.1.0"
+    "worker-loader": "^1.1.1"
   },
   "keywords": [
     "graph",
@@ -72,7 +72,7 @@
     "extends": "@yomguithereal/eslint-config/es6"
   },
   "dependencies": {
-    "events": "^1.1.1",
+    "events": "^2.0.0",
     "graphology-utils": "^1.1.1"
   }
 }

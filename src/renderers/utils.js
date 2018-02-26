@@ -84,7 +84,7 @@ export function createRescalingFunction(options, extent) {
   const hx = (maxX + minX) / 2,
         hy = (maxY + minY) / 2;
 
-  let scale = mode === 'outside' ?
+  const scale = mode === 'outside' ?
     Math.max(
       width / Math.max(maxX - minX, 1),
       height / Math.max(maxY - minY, 1)

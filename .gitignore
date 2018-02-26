@@ -3,4 +3,3 @@ node_modules
 *.log
 *.swp
 .DS_Store
-package-lock.json
