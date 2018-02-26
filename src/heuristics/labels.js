@@ -35,8 +35,6 @@ const DEFAULT_UNZOOMED_CELL = {
  * Note: It might be possible to not use last displayed labels by measurements
  * and a margin.
  *
- * Note: should clear invisible labels on pan to avoid potential memory leaks.
- *
  * @param  {object} params                 - Parameters:
  * @param  {object}   cache                - Cache storing nodes' data.
  * @param  {Camera}   camera               - The renderer's camera.
@@ -94,9 +92,7 @@ exports.labelsToDisplayFromGrid = function(params) {
   const grid = {};
 
   const worthyBuckets = new Set();
-  const worthyLabels = (zooming || (panning && !unzooming)) ?
-    Array.from(displayedLabels) :
-    [];
+  const worthyLabels = [];
 
   // Selecting worthy labels
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
@@ -115,17 +111,19 @@ exports.labelsToDisplayFromGrid = function(params) {
     const xKey = Math.floor(pos.x / cellWidth),
           yKey = Math.floor(pos.y / cellHeight);
 
-    // TODO: check keys validity
+    // NOTE: there seems to be overflowing keys but this is actually a good
+    // thing since it means we grasp margins.
     const key = `${xKey};${yKey}`;
-
-    if (worthyBuckets.has(key))
-      continue;
 
     // When zooming or panning, we aim at keeping the already displayed labels
     if ((zooming || (panning && !unzooming)) && displayedLabels.has(node)) {
       worthyBuckets.add(key);
+      worthyLabels.push(node);
       continue;
     }
+
+    if (worthyBuckets.has(key))
+      continue;
 
     // Label resolution
     if (typeof grid[key] === 'undefined') {
