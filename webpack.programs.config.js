@@ -1,16 +1,16 @@
-var path = require('path');
+var path = require('path'),
+    glob = require('glob');
+
+var shaders = glob.sync(path.join(__dirname, 'src', 'renderers', 'webgl', 'shaders', '*.glsl'));
+
+var entry = {};
+
+shaders.forEach(function(p) {
+  entry[path.basename(p, '.glsl')] = p;
+});
 
 module.exports = {
-  entry: {
-    'node.vert': './src/renderers/webgl/shaders/node.vert.glsl',
-    'node.fast.vert': './src/renderers/webgl/shaders/node.fast.vert.glsl',
-    'edge.vert': './src/renderers/webgl/shaders/edge.vert.glsl',
-    'edge.fast.vert': './src/renderers/webgl/shaders/edge.fast.vert.glsl',
-    'node.frag': './src/renderers/webgl/shaders/node.frag.glsl',
-    'node.fast.frag': './src/renderers/webgl/shaders/node.fast.frag.glsl',
-    'edge.frag': './src/renderers/webgl/shaders/edge.frag.glsl',
-    'edge.fast.frag': './src/renderers/webgl/shaders/edge.fast.frag.glsl'
-  },
+  entry: entry,
   output: {
     path: path.join(__dirname, 'renderers', 'webgl', 'shaders'),
     filename: '[name].glsl',
