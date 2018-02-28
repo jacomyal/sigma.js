@@ -104,7 +104,7 @@ export default class EdgeProgram extends Program {
 
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
-        array[i] = 0;
+        this.array[i] = 0;
     }
 
     const thickness = data.size || 1,

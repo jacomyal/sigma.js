@@ -10,24 +10,28 @@ import {floatColor} from '../utils';
 import vertexShaderSource from '../shaders/edge.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.fast.frag.glsl';
 
-// WARNING: this code is deprecated. It needs to be re-adapted to work
-// correctly to new APIs.
+const POINTS = 2,
+      ATTRIBUTES = 3;
 
 export default class EdgeFastProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
+    // Binding context
+    this.gl = gl;
+
+    // Array data
+    this.array = null;
+
     // Initializing buffers
     this.buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
-    const program = this.program;
-
     // Locations
-    this.colorLocation = gl.getAttribLocation(program, 'a_color');
-    this.positionLocation = gl.getAttribLocation(program, 'a_position');
-    this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
+    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
+    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -37,22 +41,28 @@ export default class EdgeFastProgram extends Program {
       2,
       gl.FLOAT,
       false,
-      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
     gl.vertexAttribPointer(this.colorLocation,
       1,
       gl.FLOAT,
       false,
-      EdgeFastProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
   }
 
-  process(array, sourceData, targetData, data, i) {
+  allocate(capacity) {
+    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  }
+
+  process(sourceData, targetData, data, offset) {
+
+    const array = this.array;
 
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let l = i + EdgeFastProgram.POINTS * EdgeFastProgram.ATTRIBUTES; i < l; i++)
+      for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
         array[i] = 0;
     }
 
@@ -62,35 +72,42 @@ export default class EdgeFastProgram extends Program {
           y2 = targetData.y,
           color = floatColor(data.color);
 
+    let i = POINTS * ATTRIBUTES * offset;
+
+    // First point
     array[i++] = x1;
     array[i++] = y1;
     array[i++] = color;
 
+    // Second point
     array[i++] = x2;
     array[i++] = y2;
-    array[i++] = color;
+    array[i] = color;
   }
 
-  bufferData(gl, array) {
-    gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
+  bufferData() {
+    const gl = this.gl;
+
+    // Vertices data
+    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
-  render(gl, array, params) {
+  render(params) {
+    const gl = this.gl;
+
     const program = this.program;
     gl.useProgram(program);
 
+    // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
+
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    // TODO: use gl line thickness
-    gl.lineWidth(3);
+    // Drawing:
     gl.drawArrays(
       gl.LINES,
       0,
-      array.length / EdgeFastProgram.ATTRIBUTES
+      this.array.length / ATTRIBUTES
     );
   }
 }
-
-EdgeFastProgram.POINTS = 2;
-EdgeFastProgram.ATTRIBUTES = 3;

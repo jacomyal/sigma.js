@@ -21,7 +21,6 @@ export default class EdgeTriangleProgram extends Program {
 
     // Array data
     this.array = null;
-    this.indicesArray = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -90,7 +89,7 @@ export default class EdgeTriangleProgram extends Program {
 
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
-        array[i] = 0;
+        this.array[i] = 0;
     }
 
     const thickness = data.size || 1,
