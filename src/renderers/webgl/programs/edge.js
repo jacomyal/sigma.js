@@ -1,5 +1,5 @@
 /**
- * Sigma.js WebGL Renderer Node Program
+ * Sigma.js WebGL Renderer Edge Program
  * =====================================
  *
  * Program rendering edges as thick lines using four points translated
