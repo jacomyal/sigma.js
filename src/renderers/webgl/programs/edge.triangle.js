@@ -10,7 +10,7 @@ import vertexShaderSource from '../shaders/edge.triangle.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.triangle.frag.glsl';
 
 const POINTS = 3,
-      ATTRIBUTES = 6;
+      ATTRIBUTES = 9;
 
 export default class EdgeTriangleProgram extends Program {
   constructor(gl) {
@@ -32,6 +32,7 @@ export default class EdgeTriangleProgram extends Program {
     this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
+    this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
     this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
@@ -42,6 +43,7 @@ export default class EdgeTriangleProgram extends Program {
     gl.enableVertexAttribArray(this.normalLocation);
     gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.colorLocation);
+    gl.enableVertexAttribArray(this.barycentricLocation);
 
     gl.vertexAttribPointer(this.positionLocation,
       2,
@@ -70,6 +72,13 @@ export default class EdgeTriangleProgram extends Program {
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
+    );
+    gl.vertexAttribPointer(this.barycentricLocation,
+      3,
+      gl.FLOAT,
+      false,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      24
     );
   }
 
@@ -117,6 +126,9 @@ export default class EdgeTriangleProgram extends Program {
     array[i++] = n2;
     array[i++] = thickness;
     array[i++] = color;
+    array[i++] = 1;
+    array[i++] = 0;
+    array[i++] = 0;
 
     // Second point
     array[i++] = x1;
@@ -125,6 +137,9 @@ export default class EdgeTriangleProgram extends Program {
     array[i++] = -n2;
     array[i++] = thickness;
     array[i++] = color;
+    array[i++] = 0;
+    array[i++] = 1;
+    array[i++] = 0;
 
     // Third point
     array[i++] = x2;
@@ -132,7 +147,10 @@ export default class EdgeTriangleProgram extends Program {
     array[i++] = 0;
     array[i++] = 0;
     array[i++] = 0;
-    array[i] = color;
+    array[i++] = color;
+    array[i++] = 0;
+    array[i++] = 0;
+    array[i] = 20;
   }
 
   bufferData() {

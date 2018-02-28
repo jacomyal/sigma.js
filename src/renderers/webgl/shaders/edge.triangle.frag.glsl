@@ -1,9 +1,11 @@
 precision mediump float;
 
 varying vec4 v_color;
-varying vec2 v_position;
-varying float v_size;
+varying vec3 v_barycentric;
 
 void main(void) {
-  gl_FragColor = v_color;
+  // if (any(lessThan(v_barycentric, vec3(0.01))))
+  //   discard;
+  // else
+    gl_FragColor = v_color;
 }

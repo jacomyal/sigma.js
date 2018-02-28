@@ -2,6 +2,7 @@ attribute vec2 a_position;
 attribute vec2 a_normal;
 attribute float a_thickness;
 attribute float a_color;
+attribute vec3 a_barycentric;
 
 uniform vec2 u_resolution;
 uniform float u_ratio;
@@ -9,6 +10,7 @@ uniform mat3 u_matrix;
 uniform float u_scale;
 
 varying vec4 v_color;
+varying vec3 v_barycentric;
 
 const float feather = 0.0;
 
@@ -22,6 +24,8 @@ void main() {
 
   // Applying
   gl_Position = vec4(position, 0, 1);
+
+  v_barycentric = a_barycentric;
 
   // Extract the color:
   float c = a_color;
