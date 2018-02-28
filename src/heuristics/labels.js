@@ -76,14 +76,14 @@ exports.labelsToDisplayFromGrid = function(params) {
   const baseCell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
 
   // Adapting cell dimensions
-  let cellWidthRemainder = dimensions.width % baseCell.width;
-  let cellWidth = (
+  const cellWidthRemainder = dimensions.width % baseCell.width;
+  const cellWidth = (
     baseCell.width +
     (cellWidthRemainder / Math.floor(dimensions.width / baseCell.width))
   );
 
-  let cellHeightRemainder = dimensions.height % baseCell.height;
-  let cellHeight = (
+  const cellHeightRemainder = dimensions.height % baseCell.height;
+  const cellHeight = (
     baseCell.height +
     (cellHeightRemainder / Math.floor(dimensions.height / baseCell.height))
   );
@@ -95,7 +95,7 @@ exports.labelsToDisplayFromGrid = function(params) {
   const worthyLabels = [];
 
   // Selecting worthy labels
-  for (let i = 0, l = visibleNodes.length; i < l; i++) {
+  for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
           nodeData = cache[node];
 
