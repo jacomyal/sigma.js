@@ -35,10 +35,7 @@ export default class EdgeProgram extends Program {
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-
     this.indicesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
@@ -49,6 +46,25 @@ export default class EdgeProgram extends Program {
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
+
+    this.bind();
+
+    // Enabling the OES_element_index_uint extension
+    // NOTE: on older GPUs, this means that really large graphs won't
+    // have all their edges rendered. But it seems that the
+    // `OES_element_index_uint` is quite everywhere so we'll handle
+    // the potential issue if it really arises.
+    const extension = gl.getExtension('OES_element_index_uint');
+    this.canUse32BitsIndices = !!extension;
+    this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+  }
+
+  bind() {
+    const gl = this.gl;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -84,16 +100,6 @@ export default class EdgeProgram extends Program {
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
-
-    // Enabling the OES_element_index_uint extension
-    // NOTE: on older GPUs, this means that really large graphs won't
-    // have all their edges rendered. But it seems that the
-    // `OES_element_index_uint` is quite everywhere so we'll handle
-    // the potential issue if it really arises.
-    const extension = gl.getExtension('OES_element_index_uint');
-    this.canUse32BitsIndices = !!extension;
-    this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
-    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
   }
 
   allocate(capacity) {

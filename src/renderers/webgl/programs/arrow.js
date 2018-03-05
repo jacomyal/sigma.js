@@ -9,13 +9,10 @@ import {floatColor} from '../utils';
 import vertexShaderSource from '../shaders/arrow.vert.glsl';
 import fragmentShaderSource from '../shaders/arrow.frag.glsl';
 
-// TODO: compound program
-// TODO: can be more clever and factorize computation for edge with triangle arrows
-
 const POINTS = 3,
       ATTRIBUTES = 10;
 
-export default class TriangleProgram extends Program {
+export default class ArrowProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -27,7 +24,6 @@ export default class TriangleProgram extends Program {
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
@@ -40,6 +36,14 @@ export default class TriangleProgram extends Program {
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
+
+    this.bind();
+  }
+
+  bind() {
+    const gl = this.gl;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -104,7 +108,7 @@ export default class TriangleProgram extends Program {
         this.array[i] = 0;
     }
 
-    const thickness = data.size || 10,
+    const thickness = Math.max((data.size || 1) * 10, 1),
           radius = targetData.size || 1,
           x1 = sourceData.x,
           y1 = sourceData.y,

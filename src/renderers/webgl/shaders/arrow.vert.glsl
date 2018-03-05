@@ -17,42 +17,22 @@ const float arrow_ratio = 0.5;
 
 void main() {
 
-  // vec2 offset_position = vec2(
-  //   a_position.x
-  //     + ( ( 0.0 * a_radius + a_thickness ) * a_normal.y )
-  //     + ( arrow_ratio * a_thickness * a_normal.x / 2.0 ),
-  //   a_position.y
-  //     - ( ( 0.0 * a_radius + a_thickness ) * a_normal.x )
-  //     + ( arrow_ratio * a_thickness * a_normal.y / 2.0 )
-  // );
-
-  // float thickness = a_thickness * u_ratio;
-  // float radius = a_radius * u_ratio;
-
   float da = a_barycentric.x;
   float db = a_barycentric.y;
   float dc = a_barycentric.z;
 
-  // vec2 offset_position = vec2(
-  //   a_position.x +
-  //     ((radius + thickness) * a_normal.y) +
-  //     (arrow_ratio * thickness / 2.0 * a_normal.x),
-  //   a_position.y -
-  //     ((radius + thickness) * a_normal.x) +
-  //     (arrow_ratio * thickness / 2.0 * a_normal.y)
-  // );
-
   float radius = a_radius * u_ratio;
   float thickness = a_thickness * u_ratio;
+  float width = arrow_ratio * thickness / 2.0;
 
   vec2 offset_position = vec2(
       da * (a_position.x + (radius) * a_normal.y)
-    + db * (a_position.x + (radius + thickness) * a_normal.y + (arrow_ratio * thickness / 2.0) * a_normal.x)
-    + dc * (a_position.x + (radius + thickness) * a_normal.y - (arrow_ratio * thickness / 2.0) * a_normal.x),
+    + db * (a_position.x + (radius + thickness) * a_normal.y + width * a_normal.x)
+    + dc * (a_position.x + (radius + thickness) * a_normal.y - width * a_normal.x),
 
       da * (a_position.y - (radius) * a_normal.x)
-    + db * (a_position.y - (radius + thickness) * a_normal.x + (arrow_ratio * thickness / 2.0) * a_normal.y)
-    + dc * (a_position.y - (radius + thickness) * a_normal.x - (arrow_ratio * thickness / 2.0) * a_normal.y)
+    + db * (a_position.y - (radius + thickness) * a_normal.x + width * a_normal.y)
+    + dc * (a_position.y - (radius + thickness) * a_normal.x - width * a_normal.y)
   );
 
   // Scale from [[-1 1] [-1 1]] to the container:

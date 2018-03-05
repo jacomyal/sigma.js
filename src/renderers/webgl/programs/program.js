@@ -41,3 +41,50 @@ export default class Program {
     return this.program;
   }
 }
+
+/**
+ * Helper function combining two or more programs into a single compound one.
+ * Note that this is more a quick & easy way to combine program than a really
+ * performant option. More performant programs can be written entirely.
+ *
+ * @param  {array}    programClasses - Program classes to combine.
+ * @return {function}
+ */
+export function createCompoundProgram(programClasses) {
+  return class CompoundProgram {
+    constructor(gl) {
+      this.programs = programClasses.map(ProgramClass => new ProgramClass(gl));
+    }
+
+    allocate(capacity) {
+      this.programs.forEach(program => program.allocate(capacity));
+    }
+
+    process() {
+      const args = arguments;
+
+      this.programs.forEach(program => program.process(...args));
+    }
+
+    computeIndices() {
+      this.programs.forEach(program => {
+        if (typeof program.computeIndices === 'function')
+          program.computeIndices();
+      });
+    }
+
+    bufferData() {
+      this.programs.forEach(program => program.bufferData());
+    }
+
+    render() {
+      const args = arguments;
+
+      this.programs.forEach(program => {
+        program.bind();
+        program.bufferData();
+        program.render(...args);
+      });
+    }
+  };
+}

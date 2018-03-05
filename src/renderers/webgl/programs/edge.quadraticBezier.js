@@ -83,8 +83,7 @@ export default class EdgeQuadraticBezierProgram extends Program {
         this.array[i] = 0;
     }
 
-    const thickness = data.size || 1,
-          x1 = sourceData.x,
+    const x1 = sourceData.x,
           y1 = sourceData.y,
           x2 = targetData.x,
           y2 = targetData.y,
