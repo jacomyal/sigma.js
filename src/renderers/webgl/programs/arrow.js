@@ -1,18 +1,21 @@
 /**
- * Sigma.js WebGL Renderer Triangle Edge Program
- * ==============================================
+ * Sigma.js WebGL Renderer Arrow Program
+ * ======================================
  *
- * Program rendering directed edges as a single anti-aliased triangle.
+ * Program rendering direction arrows as a simple triangle.
  */
 import Program from './program';
 import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/edge.triangle.vert.glsl';
-import fragmentShaderSource from '../shaders/edge.triangle.frag.glsl';
+import vertexShaderSource from '../shaders/arrow.vert.glsl';
+import fragmentShaderSource from '../shaders/arrow.frag.glsl';
+
+// TODO: compound program
+// TODO: can be more clever and factorize computation for edge with triangle arrows
 
 const POINTS = 3,
-      ATTRIBUTES = 9;
+      ATTRIBUTES = 10;
 
-export default class EdgeTriangleProgram extends Program {
+export default class TriangleProgram extends Program {
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -30,6 +33,7 @@ export default class EdgeTriangleProgram extends Program {
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
     this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
+    this.radiusLocation = gl.getAttribLocation(this.program, 'a_radius');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
     this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
     this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
@@ -41,6 +45,7 @@ export default class EdgeTriangleProgram extends Program {
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.normalLocation);
     gl.enableVertexAttribArray(this.thicknessLocation);
+    gl.enableVertexAttribArray(this.radiusLocation);
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.barycentricLocation);
 
@@ -65,19 +70,26 @@ export default class EdgeTriangleProgram extends Program {
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
-    gl.vertexAttribPointer(this.colorLocation,
+    gl.vertexAttribPointer(this.radiusLocation,
       1,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
+    gl.vertexAttribPointer(this.colorLocation,
+      1,
+      gl.FLOAT,
+      false,
+      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
+      24
+    );
     gl.vertexAttribPointer(this.barycentricLocation,
       3,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      24
+      28
     );
   }
 
@@ -92,7 +104,8 @@ export default class EdgeTriangleProgram extends Program {
         this.array[i] = 0;
     }
 
-    const thickness = data.size || 1,
+    const thickness = data.size || 10,
+          radius = targetData.size || 1,
           x1 = sourceData.x,
           y1 = sourceData.y,
           x2 = targetData.x,
@@ -118,25 +131,25 @@ export default class EdgeTriangleProgram extends Program {
 
     const array = this.array;
 
-    // TODO: I guess it's not necessary to pass normals to the shader here
-
     // First point
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = n1;
-    array[i++] = n2;
+    array[i++] = x2;
+    array[i++] = y2;
+    array[i++] = -n1;
+    array[i++] = -n2;
     array[i++] = thickness;
+    array[i++] = radius;
     array[i++] = color;
     array[i++] = 1;
     array[i++] = 0;
     array[i++] = 0;
 
     // Second point
-    array[i++] = x1;
-    array[i++] = y1;
+    array[i++] = x2;
+    array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
     array[i++] = thickness;
+    array[i++] = radius;
     array[i++] = color;
     array[i++] = 0;
     array[i++] = 1;
@@ -145,13 +158,14 @@ export default class EdgeTriangleProgram extends Program {
     // Third point
     array[i++] = x2;
     array[i++] = y2;
-    array[i++] = 0;
-    array[i++] = 0;
-    array[i++] = 0;
+    array[i++] = -n1;
+    array[i++] = -n2;
+    array[i++] = thickness;
+    array[i++] = radius;
     array[i++] = color;
     array[i++] = 0;
     array[i++] = 0;
-    array[i] = 20;
+    array[i] = 1;
   }
 
   bufferData() {
