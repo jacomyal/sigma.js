@@ -4,8 +4,7 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-// Note: twice the one defined in the vertex shader
-const float feather = 1.0;
+const float feather = 0.5;
 const vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
@@ -13,7 +12,7 @@ void main(void) {
 
   float t = smoothstep(
     v_thickness - feather,
-    v_thickness + feather / 1.5,
+    v_thickness,
     dist
   );
 

@@ -216,7 +216,7 @@ export default class EdgeProgram extends Program {
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    gl.uniform1f(this.scaleLocation, params.ratio);
+    gl.uniform1f(this.scaleLocation, params.scalingRatio);
 
     // Drawing:
     gl.drawElements(
