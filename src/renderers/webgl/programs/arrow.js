@@ -108,7 +108,7 @@ export default class ArrowProgram extends Program {
         this.array[i] = 0;
     }
 
-    const thickness = Math.max((data.size || 1) * 10, 1),
+    const thickness = Math.max((data.size || 1) * 2.5, 5),
           radius = targetData.size || 1,
           x1 = sourceData.x,
           y1 = sourceData.y,
@@ -189,7 +189,7 @@ export default class ArrowProgram extends Program {
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
       this.ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.edgesPowRatio)
+      1 / Math.pow(params.ratio, params.edgesPowRatio)
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);

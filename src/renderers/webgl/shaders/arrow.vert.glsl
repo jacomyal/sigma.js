@@ -13,7 +13,7 @@ uniform float u_scale;
 varying vec4 v_color;
 varying vec3 v_barycentric;
 
-const float arrow_ratio = 0.5;
+const float arrow_ratio = 0.6;
 
 void main() {
 
@@ -21,8 +21,8 @@ void main() {
   float db = a_barycentric.y;
   float dc = a_barycentric.z;
 
-  float radius = a_radius * u_ratio;
-  float thickness = a_thickness * u_ratio;
+  float radius = (a_radius - 1.0) / u_ratio;
+  float thickness = a_thickness  /u_ratio;
   float width = arrow_ratio * thickness / 2.0;
 
   vec2 offset_position = vec2(
