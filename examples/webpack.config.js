@@ -26,6 +26,10 @@ const EXAMPLES = {
   performance: {
     id: 'performance',
     title: 'Performance'
+  },
+  tiny: {
+    id: 'tiny',
+    title: 'Tiny graph'
   }
 };
 
