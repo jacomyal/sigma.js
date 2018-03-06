@@ -208,10 +208,12 @@ export default class EdgeProgram extends Program {
     gl.useProgram(program);
 
     // Binding uniforms
+    // TODO: precise the uniform names
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
       this.ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.edgesPowRatio)
+      // 1 / Math.pow(params.ratio, params.edgesPowRatio)
+      params.ratio
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);

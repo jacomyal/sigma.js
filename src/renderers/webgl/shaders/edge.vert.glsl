@@ -16,7 +16,8 @@ const float feather = 0.5;
 
 void main() {
 
-  float thickness = a_thickness * u_ratio / 2.0 / u_scale + feather;
+  float pow_ratio = 1.0 / pow(u_ratio, 0.5);
+  float thickness = (a_thickness + feather) / 2.0 / pow_ratio / u_scale;
 
   // Scale from [[-1 1] [-1 1]] to the container:
   vec2 delta = vec2(a_normal * thickness);
@@ -28,7 +29,7 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   v_normal = a_normal;
-  v_thickness = 1.0 / u_ratio;
+  v_thickness = thickness / u_ratio;
 
   // Extract the color:
   float c = a_color;
