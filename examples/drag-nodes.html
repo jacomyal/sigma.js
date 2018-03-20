@@ -106,7 +106,10 @@ for (i = 0; i < E; i++)
 // Instantiate sigma:
 s = new sigma({
   graph: g,
-  container: 'graph-container'
+  renderer: {
+    container: 'graph-container',
+    type: 'webgl'
+  }
 });
 
 // Initialize the dragNodes plugin:

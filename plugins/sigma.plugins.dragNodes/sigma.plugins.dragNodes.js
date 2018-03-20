@@ -54,7 +54,10 @@
       _mouse = renderer.container.lastChild,
       _camera = renderer.camera,
       _node = null,
-      _prefix = '',
+      _prefix = sigma.renderers.webgl &&
+        renderer instanceof sigma.renderers.webgl ?
+        renderer.camera.prefix :
+        renderer.options.prefix,
       _hoverStack = [],
       _hoverIndex = {},
       _isMouseDown = false,
@@ -66,11 +69,11 @@
     }
 
     // It removes the initial substring ('read_') if it's a WegGL renderer.
-    if (renderer instanceof sigma.renderers.webgl) {
-      _prefix = renderer.options.prefix.substr(5);
-    } else {
-      _prefix = renderer.options.prefix;
-    }
+    // if (renderer instanceof sigma.renderers.webgl) {
+    //   _prefix = renderer.options.prefix.substr(5);
+    // } else {
+    //   _prefix = renderer.options.prefix;
+    // }
 
     renderer.bind('overNode', nodeMouseOver);
     renderer.bind('outNode', treatOutNode);
