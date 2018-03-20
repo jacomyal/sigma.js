@@ -56,7 +56,7 @@
       _node = null,
       _prefix = sigma.renderers.webgl &&
         renderer instanceof sigma.renderers.webgl ?
-        renderer.camera.prefix :
+        _camera.prefix :
         renderer.options.prefix,
       _hoverStack = [],
       _hoverIndex = {},
