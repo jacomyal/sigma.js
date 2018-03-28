@@ -4,6 +4,8 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
+import nodeExtent from 'graphology-metrics/extent';
+
 import Renderer from '../../renderer';
 import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
@@ -400,7 +402,7 @@ export default class WebGLRenderer extends Renderer {
     const graph = this.sigma.getGraph();
 
     // TODO: possible to index this somehow using two byte arrays or so
-    const extent = this.sigma.getGraphExtent();
+    const extent = nodeExtent(graph, ['x', 'y', 'size']);
 
     // Rescaling function
     this.rescalingFunction = createRescalingFunction(
@@ -409,13 +411,13 @@ export default class WebGLRenderer extends Renderer {
     );
 
     const minRescaled = this.rescalingFunction({
-      x: extent.minX,
-      y: extent.minY
+      x: extent.x[0],
+      y: extent.y[0]
     });
 
     const maxRescaled = this.rescalingFunction({
-      x: extent.maxX,
-      y: extent.maxY
+      x: extent.x[1],
+      y: extent.x[1]
     });
 
     this.quadtree.resize({

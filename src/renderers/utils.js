@@ -75,10 +75,8 @@ export function createRescalingFunction(options, extent) {
         width = options.width || 1;
 
   const {
-    maxX,
-    maxY,
-    minX,
-    minY
+    x: [minX, maxX],
+    y: [minY, maxY]
   } = extent;
 
   const hx = (maxX + minX) / 2,
