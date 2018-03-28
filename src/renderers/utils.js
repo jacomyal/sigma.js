@@ -62,20 +62,23 @@ export function createNormalizationFunction(extent) {
     y: [minY, maxY]
   } = extent;
 
-  const dX = maxX - minX,
-        dY = maxY - minY;
+  const ratio = Math.max(maxX - minX, maxY - minY);
+
+  const dX = (maxX + minX) / 2,
+        dY = (maxY + minY) / 2;
 
   const fn = data => {
     return {
-      x: (data.x - minX) / dX,
-      y: (data.y - minY) / dY
+      x: 0.5 + (data.x - dX) / ratio,
+      y: 0.5 + (data.y - dY) / ratio
     };
   };
 
+  // TODO: unit test this
   fn.inverse = data => {
     return {
-       x: minX + data.x * dX,
-       y: minY + data.y * dY
+       x: dX + ratio * (data.x - 0.5),
+       y: dY + ratio * (data.y - 0.5)
     };
   };
 

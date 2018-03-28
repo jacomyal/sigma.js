@@ -12,6 +12,7 @@ export function identity() {
   );
 }
 
+// TODO: optimize
 export function scale(m, x, y) {
   m[0] = x;
   m[4] = y || x;

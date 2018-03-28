@@ -122,64 +122,42 @@ export default class Camera extends EventEmitter {
   }
 
   /**
-   * Method returning the coordinates of a point from the display frame to the
-   * graph one but ignores the offset and dimensions of the container.
-   *
-   * @param  {number} x - The X coordinate.
-   * @param  {number} y - The Y coordinate.
-   * @return {object}     The point coordinates in the frame of the graph.
-   */
-  abstractDisplayToGraph(x, y) {
-    const cos = Math.cos(this.angle),
-          sin = Math.sin(this.angle);
-
-    return {
-      x: (x * cos - y * sin) * this.ratio,
-      y: (y * cos + x * sin) * this.ratio
-    };
-  }
-
-  /**
-   * Method returning the coordinates of a point from the display frame to the
-   * graph one.
-   *
-   * @param  {number} x - The X coordinate.
-   * @param  {number} y - The Y coordinate.
-   * @return {object}   - The point coordinates in the frame of the graph.
-   */
-  displayToGraph(x, y) {
-    const cos = Math.cos(this.angle),
-          sin = Math.sin(this.angle);
-
-    const xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio,
-          yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio;
-
-    const X = x - xOffset,
-          Y = y - yOffset;
-
-    return {
-      x: (X * cos - Y * sin) * this.ratio,
-      y: (Y * cos + X * sin) * this.ratio
-    };
-  }
-
-  /**
    * Method returning the coordinates of a point from the graph frame to the
-   * display one.
+   * viewport.
    *
-   * @param  {number} x - The X coordinate.
-   * @param  {number} y - The Y coordinate.
-   * @return {object}   - The point coordinates in the frame of the display.
+   * @param  {object} dimensions - Dimensions of the viewport.
+   * @param  {number} x          - The X coordinate.
+   * @param  {number} y          - The Y coordinate.
+   * @return {object}            - The point coordinates in the viewport.
    */
-  graphToDisplay(x, y) {
-    const relCos = Math.cos(this.angle) / this.ratio,
-          relSin = Math.sin(this.angle) / this.ratio,
-          xOffset = (this.width / 2) - this.x * relCos - this.y * relSin,
-          yOffset = (this.height / 2) - this.y * relCos + this.x * relSin;
+
+  // TODO: angles
+  graphToViewport(dimensions, x, y) {
+    const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     return {
-      x: x * relCos + y * relSin + xOffset,
-      y: y * relCos - x * relSin + yOffset
+      x: (x - this.x + this.ratio / 2) * (smallestDimension / this.ratio),
+      y: (y - this.y + this.ratio / 2) * (smallestDimension / this.ratio)
+    };
+  }
+
+  /**
+   * Method returning the coordinates of a point from the viewport frame to the
+   * graph frame.
+   *
+   * @param  {object} dimensions - Dimensions of the viewport.
+   * @param  {number} x          - The X coordinate.
+   * @param  {number} y          - The Y coordinate.
+   * @return {object}            - The point coordinates in the graph frame.
+   */
+
+  // TODO: angles
+  viewportToGraph(dimensions, x, y) {
+    const smallestDimension = Math.min(dimensions.width, dimensions.height);
+
+    return {
+      x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2,
+      y: (this.ratio / smallestDimension) * y + this.y - this.ratio / 2
     };
   }
 
@@ -189,6 +167,8 @@ export default class Camera extends EventEmitter {
    *
    * @return {object} - The view's rectangle.
    */
+
+  // TODO: probably obsolete with normalized coordinates
   viewRectangle() {
     const widthVect = this.abstractDisplayToGraph(this.width, 0),
           heightVect = this.abstractDisplayToGraph(0, this.height),

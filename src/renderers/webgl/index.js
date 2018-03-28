@@ -253,6 +253,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling mouse move
     this.listeners.handleMove = e => {
+      return;
 
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
@@ -305,6 +306,8 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling down
     this.listeners.handleDown = e => {
+      return;
+
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
       const quadNodes = getQuadNodes(e.x, e.y);
@@ -328,6 +331,8 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling click
     this.listeners.handleClick = e => {
+      return;
+
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
       const quadNodes = getQuadNodes(e.x, e.y);
