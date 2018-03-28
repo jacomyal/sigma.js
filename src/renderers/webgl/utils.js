@@ -85,15 +85,18 @@ export function matrixFromCamera(state, dimensions) {
 
   let matrix = identity();
 
-  const scaling = scale(identity(), 1 / ratio),
-        rotation = rotate(identity(), -angle),
-        translation = translate(identity(), -x, -y),
-        dimensionTranslation = translate(identity(), width / 2, height / 2);
+  const smallestDimension = Math.min(width, height);
 
-  multiply(matrix, scaling);
-  multiply(matrix, rotation);
-  multiply(matrix, translation);
-  matrix = multiply(dimensionTranslation, matrix);
+  const cameraCentering = translate(identity(), -x, -y),
+        cameraScaling = scale(identity(), 1 / ratio),
+        cameraRotation = rotate(identity(), -angle),
+        viewportScaling = scale(identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
+
+  // Logical order is reversed
+  multiply(matrix, viewportScaling);
+  multiply(matrix, cameraRotation);
+  multiply(matrix, cameraScaling);
+  multiply(matrix, cameraCentering);
 
   return matrix;
 }

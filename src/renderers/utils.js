@@ -51,58 +51,31 @@ export function getPixelRatio() {
 }
 
 /**
- * Default rescale options.
- */
-const DEFAULT_RESCALE_OPTIONS = {
-  mode: 'inside',
-  margin: 0
-};
-
-// TODO: should we put the rescaling in the camera itself?
-
-/**
- * Factory returning a function rescaling the given node's position.
+ * Factory returning a function normalizing the given node's position & size.
  *
- * @param  {object}   options - Options.
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-export function createRescalingFunction(options, extent) {
-  options = options || {};
-
-  const mode = options.mode || DEFAULT_RESCALE_OPTIONS.mode,
-        height = options.height || 1,
-        width = options.width || 1;
-
+export function createNormalizationFunction(extent) {
   const {
     x: [minX, maxX],
     y: [minY, maxY]
   } = extent;
 
-  const hx = (maxX + minX) / 2,
-        hy = (maxY + minY) / 2;
-
-  const scale = mode === 'outside' ?
-    Math.max(
-      width / Math.max(maxX - minX, 1),
-      height / Math.max(maxY - minY, 1)
-    ) :
-    Math.min(
-      width / Math.max(maxX - minX, 1),
-      height / Math.max(maxY - minY, 1)
-    );
+  const dX = maxX - minX,
+        dY = maxY - minY;
 
   const fn = data => {
     return {
-      x: (data.x - hx) * scale,
-      y: (data.y - hy) * scale
+      x: (data.x - minX) / dX,
+      y: (data.y - minY) / dY
     };
   };
 
   fn.inverse = data => {
     return {
-       x: data.x / scale + hx,
-       y: data.y / scale + hy
+       x: minX + data.x * dX,
+       y: minY + data.y * dY
     };
   };
 

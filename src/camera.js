@@ -37,8 +37,8 @@ export default class Camera extends EventEmitter {
     super();
 
     // Properties
-    this.x = 0;
-    this.y = 0;
+    this.x = 0.5;
+    this.y = 0.5;
     this.angle = 0;
     this.ratio = 1;
     this.width = dimensions.width || 0;

@@ -11,7 +11,7 @@ import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
 import NodeProgram from './programs/node.fast';
-import EdgeProgram from './programs/edge';
+import EdgeProgram from './programs/edge.fast';
 
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
@@ -23,7 +23,7 @@ import {
 import {
   createElement,
   getPixelRatio,
-  createRescalingFunction
+  createNormalizationFunction
 } from '../utils';
 
 import {
@@ -82,8 +82,8 @@ export default class WebGLRenderer extends Renderer {
     this.nodeDataCache = {};
     this.edgeOrder = {};
 
-    // Rescaling function
-    this.rescalingFunction = null;
+    // Normalization function
+    this.normalizationFunction = null;
 
     // Starting dimensions
     this.width = 0;
@@ -405,17 +405,14 @@ export default class WebGLRenderer extends Renderer {
     const extent = nodeExtent(graph, ['x', 'y', 'size']);
 
     // Rescaling function
-    this.rescalingFunction = createRescalingFunction(
-      {width: this.width, height: this.height},
-      extent
-    );
+    this.normalizationFunction = createNormalizationFunction(extent);
 
-    const minRescaled = this.rescalingFunction({
+    const minRescaled = this.normalizationFunction({
       x: extent.x[0],
       y: extent.y[0]
     });
 
-    const maxRescaled = this.rescalingFunction({
+    const maxRescaled = this.normalizationFunction({
       x: extent.x[1],
       y: extent.x[1]
     });
@@ -443,12 +440,12 @@ export default class WebGLRenderer extends Renderer {
 
       const data = this.sigma.getNodeData(node);
 
-      const rescaledData = this.rescalingFunction(data);
+      const rescaledData = this.normalizationFunction(data);
 
       // TODO: Optimize this to be save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
-      this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
+      // this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
 
       this.nodeDataCache[node] = displayData;
 
@@ -720,6 +717,8 @@ export default class WebGLRenderer extends Renderer {
         scalingRatio: WEBGL_OVERSAMPLING_RATIO
       }
     );
+
+    return;
 
     // Drawing edges
     if (!this.settings.hideEdgesOnMove || !moving) {

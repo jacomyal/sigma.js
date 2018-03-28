@@ -12,9 +12,9 @@ export function identity() {
   );
 }
 
-export function scale(m, x) {
+export function scale(m, x, y) {
   m[0] = x;
-  m[4] = x;
+  m[4] = y || x;
 
   return m;
 }
