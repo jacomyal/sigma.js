@@ -7,7 +7,7 @@
 		exports["Sigma"] = factory();
 	else
 		root["Sigma"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -43,9 +43,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -73,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -87,7 +84,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _events = __webpack_require__(2);
+var _events = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -122,115 +119,6 @@ exports.default = Renderer;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.floatColor = floatColor;
-exports.matrixFromCamera = matrixFromCamera;
-exports.extractPixel = extractPixel;
-
-var _matrices = __webpack_require__(18);
-
-/**
- * Memoized function returning a float-encoded color from various string
- * formats describing colors.
- */
-var FLOAT_COLOR_CACHE = {}; /**
-                             * Sigma.js WebGL Renderer Utils
-                             * ==============================
-                             *
-                             * Miscelleanous helper functions used by sigma's WebGL renderer.
-                             */
-
-
-var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
-var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
-
-function floatColor(val) {
-
-  // If the color is already computed, we yield it
-  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
-
-  var r = 0,
-      g = 0,
-      b = 0;
-
-  // Handling hexadecimal notation
-  if (val[0] === '#') {
-    if (val.length === 4) {
-      r = parseInt(val.charAt(1) + val.charAt(1), 16);
-      g = parseInt(val.charAt(2) + val.charAt(2), 16);
-      b = parseInt(val.charAt(3) + val.charAt(3), 16);
-    } else {
-      r = parseInt(val.charAt(1) + val.charAt(2), 16);
-      g = parseInt(val.charAt(3) + val.charAt(4), 16);
-      b = parseInt(val.charAt(5) + val.charAt(6), 16);
-    }
-  }
-
-  // Handling rgb notation
-  else if (RGBA_TEST_REGEX.test(val)) {
-      var match = val.match(RGBA_EXTRACT_REGEX);
-
-      r = +match[1];
-      g = +match[2];
-      b = +match[3];
-    }
-
-  var color = r * 256 * 256 + g * 256 + b;
-
-  FLOAT_COLOR_CACHE[val] = color;
-
-  return color;
-}
-
-/**
- * Function returning a matrix from the current state of the camera.
- */
-
-// TODO: it's possible to optimize this drastically!
-function matrixFromCamera(state, dimensions) {
-  var angle = state.angle,
-      ratio = state.ratio,
-      x = state.x,
-      y = state.y;
-  var width = dimensions.width,
-      height = dimensions.height;
-
-
-  var matrix = (0, _matrices.identity)();
-
-  var scaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
-      rotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
-      translation = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
-      dimensionTranslation = (0, _matrices.translate)((0, _matrices.identity)(), width / 2, height / 2);
-
-  (0, _matrices.multiply)(matrix, scaling);
-  (0, _matrices.multiply)(matrix, rotation);
-  (0, _matrices.multiply)(matrix, translation);
-  matrix = (0, _matrices.multiply)(dimensionTranslation, matrix);
-
-  return matrix;
-}
-
-/**
- * Function extracting the color at the given pixel.
- */
-function extractPixel(gl, x, y, array) {
-  var data = array || new Uint8Array(4);
-
-  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-  return data;
-}
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -538,6 +426,115 @@ function isUndefined(arg) {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.floatColor = floatColor;
+exports.matrixFromCamera = matrixFromCamera;
+exports.extractPixel = extractPixel;
+
+var _matrices = __webpack_require__(19);
+
+/**
+ * Memoized function returning a float-encoded color from various string
+ * formats describing colors.
+ */
+var FLOAT_COLOR_CACHE = {}; /**
+                             * Sigma.js WebGL Renderer Utils
+                             * ==============================
+                             *
+                             * Miscelleanous helper functions used by sigma's WebGL renderer.
+                             */
+
+
+var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
+var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
+
+function floatColor(val) {
+
+  // If the color is already computed, we yield it
+  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
+
+  var r = 0,
+      g = 0,
+      b = 0;
+
+  // Handling hexadecimal notation
+  if (val[0] === '#') {
+    if (val.length === 4) {
+      r = parseInt(val.charAt(1) + val.charAt(1), 16);
+      g = parseInt(val.charAt(2) + val.charAt(2), 16);
+      b = parseInt(val.charAt(3) + val.charAt(3), 16);
+    } else {
+      r = parseInt(val.charAt(1) + val.charAt(2), 16);
+      g = parseInt(val.charAt(3) + val.charAt(4), 16);
+      b = parseInt(val.charAt(5) + val.charAt(6), 16);
+    }
+  }
+
+  // Handling rgb notation
+  else if (RGBA_TEST_REGEX.test(val)) {
+      var match = val.match(RGBA_EXTRACT_REGEX);
+
+      r = +match[1];
+      g = +match[2];
+      b = +match[3];
+    }
+
+  var color = r * 256 * 256 + g * 256 + b;
+
+  FLOAT_COLOR_CACHE[val] = color;
+
+  return color;
+}
+
+/**
+ * Function returning a matrix from the current state of the camera.
+ */
+
+// TODO: it's possible to optimize this drastically!
+function matrixFromCamera(state, dimensions) {
+  var angle = state.angle,
+      ratio = state.ratio,
+      x = state.x,
+      y = state.y;
+  var width = dimensions.width,
+      height = dimensions.height;
+
+
+  var matrix = (0, _matrices.identity)();
+
+  var scaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
+      rotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
+      translation = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
+      dimensionTranslation = (0, _matrices.translate)((0, _matrices.identity)(), width / 2, height / 2);
+
+  (0, _matrices.multiply)(matrix, scaling);
+  (0, _matrices.multiply)(matrix, rotation);
+  (0, _matrices.multiply)(matrix, translation);
+  matrix = (0, _matrices.multiply)(dimensionTranslation, matrix);
+
+  return matrix;
+}
+
+/**
+ * Function extracting the color at the given pixel.
+ */
+function extractPixel(gl, x, y, array) {
+  var data = array || new Uint8Array(4);
+
+  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+  return data;
+}
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -550,13 +547,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _events = __webpack_require__(2);
+var _events = __webpack_require__(1);
 
-var _easings = __webpack_require__(14);
+var _easings = __webpack_require__(13);
 
 var easings = _interopRequireWildcard(_easings);
 
-var _utils = __webpack_require__(9);
+var _utils = __webpack_require__(4);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -614,6 +611,7 @@ var Camera = function (_EventEmitter) {
 
     // State
     _this.nextFrame = null;
+    _this.previousState = _this.getState();
     _this.enabled = true;
     return _this;
   }
@@ -659,6 +657,25 @@ var Camera = function (_EventEmitter) {
         y: this.y,
         angle: this.angle,
         ratio: this.ratio
+      };
+    }
+
+    /**
+     * Method used to retrieve the camera's previous state.
+     *
+     * @return {object}
+     */
+
+  }, {
+    key: 'getPreviousState',
+    value: function getPreviousState() {
+      var state = this.previousState;
+
+      return {
+        x: state.x,
+        y: state.y,
+        angle: state.angle,
+        ratio: state.ratio
       };
     }
 
@@ -800,6 +817,9 @@ var Camera = function (_EventEmitter) {
 
       // TODO: validations
       // TODO: update by function
+
+      // Keeping track of last state
+      this.previousState = this.getState();
 
       if ('x' in state) this.x = state.x;
 
@@ -974,306 +994,38 @@ exports.default = Camera;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _captor = __webpack_require__(12);
-
-var _captor2 = _interopRequireDefault(_captor);
-
-var _utils = __webpack_require__(13);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Mouse Captor
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ======================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma's captor dealing with the user's mouse.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
+exports.assign = assign;
 /**
- * Constants.
- */
-var DRAG_TIMEOUT = 200,
-    MOUSE_INERTIA_DURATION = 200,
-    MOUSE_INERTIA_RATIO = 3,
-    MOUSE_ZOOM_DURATION = 200,
-    ZOOMING_RATIO = 1.7,
-    DOUBLE_CLICK_TIMEOUT = 300,
-    DOUBLE_CLICK_ZOOMING_RATIO = 2.2,
-    DOUBLE_CLICK_ZOOMING_DURATION = 200;
-
-/**
- * Mouse captor class.
+ * Sigma.js Utils
+ * ===============
  *
- * @constructor
+ * Various helper functions & classes used throughout the library.
  */
 
-var MouseCaptor = function (_Captor) {
-  _inherits(MouseCaptor, _Captor);
+/**
+ * Very simple Object.assign-like function.
+ *
+ * @param  {object} target       - First object.
+ * @param  {object} [...objects] - Objects to merge.
+ * @return {object}
+ */
+function assign(target) {
+  target = target || {};
 
-  function MouseCaptor(container, camera) {
-    _classCallCheck(this, MouseCaptor);
-
-    // Properties
-    var _this = _possibleConstructorReturn(this, (MouseCaptor.__proto__ || Object.getPrototypeOf(MouseCaptor)).call(this, container, camera));
-
-    _this.container = container;
-    _this.camera = camera;
-
-    // State
-    _this.enabled = true;
-    _this.hasDragged = false;
-    _this.downStartTime = null;
-    _this.startMouseX = null;
-    _this.startMouseY = null;
-    _this.isMouseDown = false;
-    _this.isMoving = true;
-    _this.movingTimeout = null;
-    _this.startCameraState = null;
-    _this.lastCameraState = null;
-    _this.clicks = 0;
-    _this.doubleClickTimeout = null;
-    _this.wheelLock = false;
-
-    // Binding methods
-    _this.handleClick = _this.handleClick.bind(_this);
-    _this.handleDown = _this.handleDown.bind(_this);
-    _this.handleUp = _this.handleUp.bind(_this);
-    _this.handleMove = _this.handleMove.bind(_this);
-    _this.handleWheel = _this.handleWheel.bind(_this);
-    _this.handleOut = _this.handleOut.bind(_this);
-
-    // Binding events
-    container.addEventListener('click', _this.handleClick, false);
-    container.addEventListener('mousedown', _this.handleDown, false);
-    container.addEventListener('mousemove', _this.handleMove, false);
-    container.addEventListener('DOMMouseScroll', _this.handleWheel, false);
-    container.addEventListener('mousewheel', _this.handleWheel, false);
-    container.addEventListener('mouseout', _this.handleOut, false);
-
-    document.addEventListener('mouseup', _this.handleUp, false);
-    return _this;
+  for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    objects[_key - 1] = arguments[_key];
   }
 
-  _createClass(MouseCaptor, [{
-    key: 'handleClick',
-    value: function handleClick(e) {
-      var _this2 = this;
+  for (var i = 0, l = objects.length; i < l; i++) {
+    if (!objects[i]) continue;
 
-      if (!this.enabled) return;
-
-      this.clicks++;
-
-      if (this.clicks === 2) {
-        this.clicks = 0;
-
-        clearTimeout(this.doubleClickTimeout);
-        this.doubleClickTimeout = null;
-
-        return this.handleDoubleClick(e);
-      }
-
-      setTimeout(function () {
-        _this2.clicks = 0;
-        _this2.doubleClickTimeout = null;
-      }, DOUBLE_CLICK_TIMEOUT);
-
-      this.emit('click', (0, _utils.getMouseCoords)(e));
+    for (var k in objects[i]) {
+      target[k] = objects[i][k];
     }
-  }, {
-    key: 'handleDoubleClick',
-    value: function handleDoubleClick(e) {
-      if (!this.enabled) return;
+  }
 
-      var ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
-
-      var center = (0, _utils.getCenter)(e);
-
-      var cameraState = this.camera.getState();
-
-      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
-
-      this.camera.animate({
-        x: position.x * (1 - ratio) + cameraState.x,
-        y: position.y * (1 - ratio) + cameraState.y,
-        ratio: ratio * cameraState.ratio
-      }, {
-        easing: 'quadraticInOut',
-        duration: DOUBLE_CLICK_ZOOMING_DURATION
-      });
-
-      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
-
-      e.stopPropagation();
-
-      return false;
-    }
-  }, {
-    key: 'handleDown',
-    value: function handleDown(e) {
-      if (!this.enabled) return;
-
-      this.startCameraState = this.camera.getState();
-      this.lastCameraState = this.startCameraState;
-
-      this.startMouseX = (0, _utils.getX)(e);
-      this.startMouseY = (0, _utils.getY)(e);
-
-      this.hasDragged = false;
-
-      this.downStartTime = Date.now();
-
-      // TODO: dispatch events
-      switch (e.which) {
-        default:
-
-          // Left button pressed
-          this.isMouseDown = true;
-          this.emit('mousedown', (0, _utils.getMouseCoords)(e));
-      }
-    }
-  }, {
-    key: 'handleUp',
-    value: function handleUp(e) {
-      if (!this.enabled || !this.isMouseDown) return;
-
-      this.isMouseDown = false;
-
-      if (this.movingTimeout) {
-        this.movingTimeout = null;
-        clearTimeout(this.movingTimeout);
-      }
-
-      var x = (0, _utils.getX)(e),
-          y = (0, _utils.getY)(e);
-
-      var cameraState = this.camera.getState();
-
-      if (this.isMoving) {
-        this.camera.animate({
-          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - this.lastCameraState.x),
-          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - this.lastCameraState.y)
-        }, {
-          duration: MOUSE_INERTIA_DURATION,
-          easing: 'quadraticOut'
-        });
-      } else if (this.startMouseX !== x || this.startMouseY !== y) {
-        this.camera.setState({
-          x: cameraState.x,
-          y: cameraState.y
-        });
-      }
-
-      this.emit('mouseup', (0, _utils.getMouseCoords)(e));
-      this.isMoving = false;
-    }
-  }, {
-    key: 'handleMove',
-    value: function handleMove(e) {
-      var _this3 = this;
-
-      if (!this.enabled) return;
-
-      this.emit('mousemove', (0, _utils.getMouseCoords)(e));
-
-      if (this.isMouseDown) {
-
-        // TODO: dispatch events
-        this.isMoving = true;
-        this.hasDragged = true;
-
-        if (this.movingTimeout) clearTimeout(this.movingTimeout);
-
-        this.movingTimeout = setTimeout(function () {
-          _this3.movingTimeout = null;
-          _this3.isMoving = false;
-        }, DRAG_TIMEOUT);
-
-        var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - this.startMouseX, (0, _utils.getY)(e) - this.startMouseY);
-
-        var x = this.startCameraState.x - position.x,
-            y = this.startCameraState.y - position.y;
-
-        var cameraState = this.camera.getState();
-
-        if (cameraState.x !== x || cameraState.y !== y) {
-
-          this.lastCameraState = cameraState;
-
-          this.camera.setState({
-            x: x,
-            y: y
-          });
-        }
-      }
-
-      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
-
-      e.stopPropagation();
-
-      return false;
-    }
-  }, {
-    key: 'handleWheel',
-    value: function handleWheel(e) {
-      var _this4 = this;
-
-      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
-
-      e.stopPropagation();
-
-      if (!this.enabled) return false;
-
-      var delta = (0, _utils.getWheelDelta)(e);
-
-      if (!delta) return false;
-
-      if (this.wheelLock) return false;
-
-      this.wheelLock = true;
-
-      // TODO: handle max zoom
-      var ratio = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
-
-      var cameraState = this.camera.getState();
-
-      var newRatio = ratio * cameraState.ratio;
-
-      var center = (0, _utils.getCenter)(e);
-
-      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
-
-      this.camera.animate({
-        x: position.x * (1 - ratio) + cameraState.x,
-        y: position.y * (1 - ratio) + cameraState.y,
-        ratio: newRatio
-      }, {
-        easing: 'linear',
-        duration: MOUSE_ZOOM_DURATION
-      }, function () {
-        return _this4.wheelLock = false;
-      });
-
-      return false;
-    }
-  }, {
-    key: 'handleOut',
-    value: function handleOut() {
-      // TODO: dispatch event
-    }
-  }]);
-
-  return MouseCaptor;
-}(_captor2.default);
-
-exports.default = MouseCaptor;
+  return target;
+}
 
 /***/ }),
 /* 5 */
@@ -1304,13 +1056,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
 
-// TODO: a square can be represented as topleft + width
+// TODO: a square can be represented as topleft + width, saying for the quad blocks (reduce mem)
 
 // TODO: jsdoc
 
 // TODO: be sure we can handle cases overcoming boundaries (because of size) or use a maxed size
 
 // TODO: filtering unwanted labels beforehand through the filter function
+
+// NOTE: this is basically a MX-CIF Quadtree at this point
+// NOTE: need to explore R-Trees for edges
+// NOTE: need to explore 2d segment tree for edges
 
 /**
  * Constants.
@@ -1674,19 +1430,307 @@ exports.default = QuadTree;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = drawLabel;
-/**
- * Sigma.js Canvas Renderer Label Component
- * =========================================
- *
- * Function used by the canvas renderer to display a single node's label.
- */
-function drawLabel(context, data) {
-  context.fillStyle = '#000';
-  context.font = '14px arial';
 
-  context.fillText(data.label, data.x + data.size + 3, data.y + 14 / 3);
-}
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _captor = __webpack_require__(14);
+
+var _captor2 = _interopRequireDefault(_captor);
+
+var _utils = __webpack_require__(15);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Mouse Captor
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ======================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma's captor dealing with the user's mouse.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+
+/**
+ * Constants.
+ */
+var DRAG_TIMEOUT = 200,
+    MOUSE_INERTIA_DURATION = 200,
+    MOUSE_INERTIA_RATIO = 3,
+    MOUSE_ZOOM_DURATION = 200,
+    ZOOMING_RATIO = 1.7,
+    DOUBLE_CLICK_TIMEOUT = 300,
+    DOUBLE_CLICK_ZOOMING_RATIO = 2.2,
+    DOUBLE_CLICK_ZOOMING_DURATION = 200;
+
+/**
+ * Mouse captor class.
+ *
+ * @constructor
+ */
+
+var MouseCaptor = function (_Captor) {
+  _inherits(MouseCaptor, _Captor);
+
+  function MouseCaptor(container, camera) {
+    _classCallCheck(this, MouseCaptor);
+
+    // Properties
+    var _this = _possibleConstructorReturn(this, (MouseCaptor.__proto__ || Object.getPrototypeOf(MouseCaptor)).call(this, container, camera));
+
+    _this.container = container;
+    _this.camera = camera;
+
+    // State
+    _this.enabled = true;
+    _this.hasDragged = false;
+    _this.downStartTime = null;
+    _this.startMouseX = null;
+    _this.startMouseY = null;
+    _this.isMouseDown = false;
+    _this.isMoving = false;
+    _this.movingTimeout = null;
+    _this.startCameraState = null;
+    _this.lastCameraState = null;
+    _this.clicks = 0;
+    _this.doubleClickTimeout = null;
+    _this.wheelLock = false;
+
+    // Binding methods
+    _this.handleClick = _this.handleClick.bind(_this);
+    _this.handleDown = _this.handleDown.bind(_this);
+    _this.handleUp = _this.handleUp.bind(_this);
+    _this.handleMove = _this.handleMove.bind(_this);
+    _this.handleWheel = _this.handleWheel.bind(_this);
+    _this.handleOut = _this.handleOut.bind(_this);
+
+    // Binding events
+    container.addEventListener('click', _this.handleClick, false);
+    container.addEventListener('mousedown', _this.handleDown, false);
+    container.addEventListener('mousemove', _this.handleMove, false);
+    container.addEventListener('DOMMouseScroll', _this.handleWheel, false);
+    container.addEventListener('mousewheel', _this.handleWheel, false);
+    container.addEventListener('mouseout', _this.handleOut, false);
+
+    document.addEventListener('mouseup', _this.handleUp, false);
+    return _this;
+  }
+
+  _createClass(MouseCaptor, [{
+    key: 'handleClick',
+    value: function handleClick(e) {
+      var _this2 = this;
+
+      if (!this.enabled) return;
+
+      this.clicks++;
+
+      if (this.clicks === 2) {
+        this.clicks = 0;
+
+        clearTimeout(this.doubleClickTimeout);
+        this.doubleClickTimeout = null;
+
+        return this.handleDoubleClick(e);
+      }
+
+      setTimeout(function () {
+        _this2.clicks = 0;
+        _this2.doubleClickTimeout = null;
+      }, DOUBLE_CLICK_TIMEOUT);
+
+      this.emit('click', (0, _utils.getMouseCoords)(e));
+    }
+  }, {
+    key: 'handleDoubleClick',
+    value: function handleDoubleClick(e) {
+      if (!this.enabled) return;
+
+      var ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
+
+      var center = (0, _utils.getCenter)(e);
+
+      var cameraState = this.camera.getState();
+
+      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
+
+      this.camera.animate({
+        x: position.x * (1 - ratio) + cameraState.x,
+        y: position.y * (1 - ratio) + cameraState.y,
+        ratio: ratio * cameraState.ratio
+      }, {
+        easing: 'quadraticInOut',
+        duration: DOUBLE_CLICK_ZOOMING_DURATION
+      });
+
+      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
+
+      e.stopPropagation();
+
+      return false;
+    }
+  }, {
+    key: 'handleDown',
+    value: function handleDown(e) {
+      if (!this.enabled) return;
+
+      this.startCameraState = this.camera.getState();
+      this.lastCameraState = this.startCameraState;
+
+      this.startMouseX = (0, _utils.getX)(e);
+      this.startMouseY = (0, _utils.getY)(e);
+
+      this.hasDragged = false;
+
+      this.downStartTime = Date.now();
+
+      // TODO: dispatch events
+      switch (e.which) {
+        default:
+
+          // Left button pressed
+          this.isMouseDown = true;
+          this.emit('mousedown', (0, _utils.getMouseCoords)(e));
+      }
+    }
+  }, {
+    key: 'handleUp',
+    value: function handleUp(e) {
+      if (!this.enabled || !this.isMouseDown) return;
+
+      this.isMouseDown = false;
+
+      if (this.movingTimeout) {
+        this.movingTimeout = null;
+        clearTimeout(this.movingTimeout);
+      }
+
+      var x = (0, _utils.getX)(e),
+          y = (0, _utils.getY)(e);
+
+      var cameraState = this.camera.getState();
+
+      if (this.isMoving) {
+        this.camera.animate({
+          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - this.lastCameraState.x),
+          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - this.lastCameraState.y)
+        }, {
+          duration: MOUSE_INERTIA_DURATION,
+          easing: 'quadraticOut'
+        });
+      } else if (this.startMouseX !== x || this.startMouseY !== y) {
+        this.camera.setState({
+          x: cameraState.x,
+          y: cameraState.y
+        });
+      }
+
+      this.isMoving = false;
+      this.hasDragged = false;
+      this.emit('mouseup', (0, _utils.getMouseCoords)(e));
+    }
+  }, {
+    key: 'handleMove',
+    value: function handleMove(e) {
+      var _this3 = this;
+
+      if (!this.enabled) return;
+
+      this.emit('mousemove', (0, _utils.getMouseCoords)(e));
+
+      if (this.isMouseDown) {
+
+        // TODO: dispatch events
+        this.isMoving = true;
+        this.hasDragged = true;
+
+        if (this.movingTimeout) clearTimeout(this.movingTimeout);
+
+        this.movingTimeout = setTimeout(function () {
+          _this3.movingTimeout = null;
+          _this3.isMoving = false;
+        }, DRAG_TIMEOUT);
+
+        var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - this.startMouseX, (0, _utils.getY)(e) - this.startMouseY);
+
+        var x = this.startCameraState.x - position.x,
+            y = this.startCameraState.y - position.y;
+
+        var cameraState = this.camera.getState();
+
+        if (cameraState.x !== x || cameraState.y !== y) {
+
+          this.lastCameraState = cameraState;
+
+          this.camera.setState({
+            x: x,
+            y: y
+          });
+        }
+      }
+
+      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
+
+      e.stopPropagation();
+
+      return false;
+    }
+  }, {
+    key: 'handleWheel',
+    value: function handleWheel(e) {
+      var _this4 = this;
+
+      if (e.preventDefault) e.preventDefault();else e.returnValue = false;
+
+      e.stopPropagation();
+
+      if (!this.enabled) return false;
+
+      var delta = (0, _utils.getWheelDelta)(e);
+
+      if (!delta) return false;
+
+      if (this.wheelLock) return false;
+
+      this.wheelLock = true;
+
+      // TODO: handle max zoom
+      var ratio = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
+
+      var cameraState = this.camera.getState();
+
+      var newRatio = ratio * cameraState.ratio;
+
+      var center = (0, _utils.getCenter)(e);
+
+      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
+
+      this.camera.animate({
+        x: position.x * (1 - ratio) + cameraState.x,
+        y: position.y * (1 - ratio) + cameraState.y,
+        ratio: newRatio
+      }, {
+        easing: 'linear',
+        duration: MOUSE_ZOOM_DURATION
+      }, function () {
+        return _this4.wheelLock = false;
+      });
+
+      return false;
+    }
+  }, {
+    key: 'handleOut',
+    value: function handleOut() {
+      // TODO: dispatch event
+    }
+  }]);
+
+  return MouseCaptor;
+}(_captor2.default);
+
+exports.default = MouseCaptor;
 
 /***/ }),
 /* 7 */
@@ -1700,7 +1744,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createElement = createElement;
 exports.getPixelRatio = getPixelRatio;
-exports.createNodeRescalingFunction = createNodeRescalingFunction;
+exports.createRescalingFunction = createRescalingFunction;
 /**
  * Sigma.js Rendering Utils
  * ===========================
@@ -1749,32 +1793,24 @@ function getPixelRatio() {
 /**
  * Default rescale options.
  */
-var DEFAULT_NODE_RESCALE_OPTIONS = {
+var DEFAULT_RESCALE_OPTIONS = {
   mode: 'inside',
-  margin: 0,
-  minSize: 1,
-  maxSize: 8
+  margin: 0
 };
 
-var DEFAULT_EDGE_RESCALE_OPTIONS = {
-  minSize: 0.5,
-  maxSize: 1
-};
-
-// TODO: should we let the user handle size through, for instance, d3 scales?
 // TODO: should we put the rescaling in the camera itself?
 
 /**
- * Factory returning a function rescaling the given node's position and/or size.
+ * Factory returning a function rescaling the given node's position.
  *
  * @param  {object}   options - Options.
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-function createNodeRescalingFunction(options, extent) {
+function createRescalingFunction(options, extent) {
   options = options || {};
 
-  var mode = options.mode || DEFAULT_NODE_RESCALE_OPTIONS.mode,
+  var mode = options.mode || DEFAULT_RESCALE_OPTIONS.mode,
       height = options.height || 1,
       width = options.width || 1;
 
@@ -1825,7 +1861,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _utils = __webpack_require__(21);
+exports.createCompoundProgram = createCompoundProgram;
+
+var _utils = __webpack_require__(18);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1867,7 +1907,73 @@ var Program = function () {
   return Program;
 }();
 
+/**
+ * Helper function combining two or more programs into a single compound one.
+ * Note that this is more a quick & easy way to combine program than a really
+ * performant option. More performant programs can be written entirely.
+ *
+ * @param  {array}    programClasses - Program classes to combine.
+ * @return {function}
+ */
+
+
 exports.default = Program;
+function createCompoundProgram(programClasses) {
+  return function () {
+    function CompoundProgram(gl) {
+      _classCallCheck(this, CompoundProgram);
+
+      this.programs = programClasses.map(function (ProgramClass) {
+        return new ProgramClass(gl);
+      });
+    }
+
+    _createClass(CompoundProgram, [{
+      key: 'allocate',
+      value: function allocate(capacity) {
+        this.programs.forEach(function (program) {
+          return program.allocate(capacity);
+        });
+      }
+    }, {
+      key: 'process',
+      value: function process() {
+        var args = arguments;
+
+        this.programs.forEach(function (program) {
+          return program.process.apply(program, _toConsumableArray(args));
+        });
+      }
+    }, {
+      key: 'computeIndices',
+      value: function computeIndices() {
+        this.programs.forEach(function (program) {
+          if (typeof program.computeIndices === 'function') program.computeIndices();
+        });
+      }
+    }, {
+      key: 'bufferData',
+      value: function bufferData() {
+        this.programs.forEach(function (program) {
+          return program.bufferData();
+        });
+      }
+    }, {
+      key: 'render',
+      value: function render() {
+        var args = arguments;
+
+        this.programs.forEach(function (program) {
+          program.bind();
+          program.bufferData();
+          program.render.apply(program, _toConsumableArray(args));
+        });
+      }
+    }]);
+
+    return CompoundProgram;
+  }();
+}
 
 /***/ }),
 /* 9 */
@@ -1879,41 +1985,520 @@ exports.default = Program;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.assign = assign;
+exports.default = drawLabel;
 /**
- * Sigma.js Utils
- * ===============
+ * Sigma.js Canvas Renderer Label Component
+ * =========================================
  *
- * Various helper functions & classes used throughout the library.
+ * Function used by the canvas renderer to display a single node's label.
  */
+function drawLabel(context, data) {
+  context.fillStyle = '#000';
+  context.font = '14px arial';
 
-/**
- * Very simple Object.assign-like function.
- *
- * @param  {object} target       - First object.
- * @param  {object} [...objects] - Objects to merge.
- * @return {object}
- */
-function assign(target) {
-  target = target || {};
-
-  for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    objects[_key - 1] = arguments[_key];
-  }
-
-  for (var i = 0, l = objects.length; i < l; i++) {
-    if (!objects[i]) continue;
-
-    for (var k in objects[i]) {
-      target[k] = objects[i][k];
-    }
-  }
-
-  return target;
+  context.fillText(data.label, data.x + data.size + 3, data.y + 14 / 3);
 }
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(11);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+var _renderer = __webpack_require__(0);
+
+var _renderer2 = _interopRequireDefault(_renderer);
+
+var _camera = __webpack_require__(3);
+
+var _camera2 = _interopRequireDefault(_camera);
+
+var _quadtree = __webpack_require__(5);
+
+var _quadtree2 = _interopRequireDefault(_quadtree);
+
+var _mouse = __webpack_require__(6);
+
+var _mouse2 = _interopRequireDefault(_mouse);
+
+var _webgl = __webpack_require__(16);
+
+var _webgl2 = _interopRequireDefault(_webgl);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Sigma.js Library Endpoint
+ * ==========================
+ *
+ * The library endpoint.
+ */
+var library = {
+  Sigma: _sigma2.default,
+  Renderer: _renderer2.default,
+  Camera: _camera2.default,
+  QuadTree: _quadtree2.default,
+  MouseCaptor: _mouse2.default,
+  WebGLRenderer: _webgl2.default
+};
+
+for (var k in library) {
+  _sigma2.default[k] = library[k];
+}module.exports = _sigma2.default;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Sigma.js Core Class
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * ====================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Core class holding state for the bound graph and using a combination of
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * a renderer & camera to display the bound graph on screen.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _isGraph = __webpack_require__(12);
+
+var _isGraph2 = _interopRequireDefault(_isGraph);
+
+var _renderer = __webpack_require__(0);
+
+var _renderer2 = _interopRequireDefault(_renderer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// TODO: sigma should only hold the graph and compose state to give to renderer,
+// does it need to orchestrate?
+
+// TODO: should be able to take n renderers
+// TODO: what to do with refresh methods? We should probably drop them
+
+// TODO: create a thumbnail renderer
+
+/**
+ * Sigma class
+ *
+ * @constructor
+ * @param {Graph}    graph    - A graphology Graph instance.
+ * @param {Renderer} renderer - A Renderer instance.
+ */
+var Sigma = function () {
+  function Sigma(graph, renderer) {
+    _classCallCheck(this, Sigma);
+
+    // Checking the arguments
+    if (!(0, _isGraph2.default)(graph)) throw new Error('Sigma.constructor: given graph is not an instance of a graphology implementation.');
+
+    if (!(renderer instanceof _renderer2.default)) throw new Error('Sigma.constructor: given renderer is not an instance of a sigma Renderer.');
+
+    // Properties
+    this.graph = graph;
+    this.renderer = renderer;
+    this.renderer.bind(this);
+
+    // Userland state
+    this.state = {};
+    this.nodeStates = null;
+    this.edgeStates = null;
+
+    // First time render
+    this.renderer.render();
+  }
+
+  /**---------------------------------------------------------------------------
+   * Internals
+   **---------------------------------------------------------------------------
+   */
+
+  /**---------------------------------------------------------------------------
+   * Getters
+   **---------------------------------------------------------------------------
+   */
+
+  /**
+   * Method returning the graph bound to the instance.
+   *
+   * @return {Graph} - The bound graph.
+   */
+
+
+  _createClass(Sigma, [{
+    key: 'getGraph',
+    value: function getGraph() {
+      return this.graph;
+    }
+
+    /**
+     * Method returning the composed data of the target node.
+     *
+     * @return {string} key - The node's key.
+     * @return {object}     - The node's attributes.
+     */
+
+  }, {
+    key: 'getNodeData',
+    value: function getNodeData(key) {
+
+      // TODO: this will change to compose state later
+      return this.graph.getNodeAttributes(key);
+    }
+
+    /**
+     * Method returning the composed data of the target edge.
+     *
+     * @return {string} key - The edge's key.
+     * @return {object}     - The edge's attributes.
+     */
+
+  }, {
+    key: 'getEdgeData',
+    value: function getEdgeData(key) {
+
+      // TODO: this will change to compose state later
+      return this.graph.getEdgeAttributes(key);
+    }
+
+    /**
+     * Method returning the extent of the bound graph.
+     *
+     * @return {object} - The graph's extent.
+     */
+
+  }, {
+    key: 'getGraphExtent',
+    value: function getGraphExtent() {
+      var graph = this.graph;
+
+      var nodes = graph.nodes(),
+          edges = graph.edges();
+
+      var maxX = -Infinity,
+          maxY = -Infinity,
+          minX = Infinity,
+          minY = Infinity,
+          maxNodeSize = -Infinity,
+          maxEdgeSize = -Infinity;
+
+      for (var i = 0, l = nodes.length; i < l; i++) {
+        var node = nodes[i];
+
+        var data = this.getNodeData(node);
+
+        var size = data.size || 1;
+
+        if (data.x > maxX) maxX = data.x;
+        if (data.y > maxY) maxY = data.y;
+
+        if (data.x < minX) minX = data.x;
+        if (data.y < minY) minY = data.y;
+
+        if (size > maxNodeSize) maxNodeSize = size;
+      }
+
+      for (var _i = 0, _l = edges.length; _i < _l; _i++) {
+        var edge = edges[_i];
+
+        var _data = this.getEdgeData(edge);
+
+        var _size = _data.size || 1;
+
+        if (_size > maxEdgeSize) maxEdgeSize = _size;
+      }
+
+      return {
+        maxX: maxX,
+        maxY: maxY,
+        minX: minX,
+        minY: minY,
+        maxNodeSize: maxNodeSize,
+        maxEdgeSize: maxEdgeSize
+      };
+    }
+  }]);
+
+  return Sigma;
+}();
+
+exports.default = Sigma;
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+/**
+ * Graphology isGraph
+ * ===================
+ *
+ * Very simple function aiming at ensuring the given variable is a
+ * graphology instance.
+ */
+
+/**
+ * Checking the value is a graphology instance.
+ *
+ * @param  {any}     value - Target value.
+ * @return {boolean}
+ */
+module.exports = function isGraph(value) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.addUndirectedEdgeWithKey === 'function' &&
+    typeof value.dropNodes === 'function' &&
+    typeof value.multi === 'boolean'
+  );
+};
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Sigma.js Easings
+ * =================
+ *
+ * Handy collection of easing functions.
+ */
+var linear = exports.linear = function linear(k) {
+  return k;
+};
+
+var quadraticIn = exports.quadraticIn = function quadraticIn(k) {
+  return k * k;
+};
+
+var quadraticOut = exports.quadraticOut = function quadraticOut(k) {
+  return k * (2 - k);
+};
+
+var quadraticInOut = exports.quadraticInOut = function quadraticInOut(k) {
+  if ((k *= 2) < 1) return 0.5 * k * k;
+  return -0.5 * (--k * (k - 2) - 1);
+};
+
+var cubicIn = exports.cubicIn = function cubicIn(k) {
+  return k * k * k;
+};
+
+var cubicOut = exports.cubicOut = function cubicOut(k) {
+  return --k * k * k + 1;
+};
+
+var cubicInOut = exports.cubicInOut = function cubicInOut(k) {
+  if ((k *= 2) < 1) return 0.5 * k * k * k;
+  return 0.5 * ((k -= 2) * k * k + 2);
+};
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _events = __webpack_require__(1);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Captor Class
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ======================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Abstract class representing a captor like the user's mouse or touch controls.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+
+var Captor = function (_EventEmitter) {
+  _inherits(Captor, _EventEmitter);
+
+  function Captor(container, camera) {
+    _classCallCheck(this, Captor);
+
+    // Properties
+    var _this = _possibleConstructorReturn(this, (Captor.__proto__ || Object.getPrototypeOf(Captor)).call(this));
+
+    _this.container = container;
+    _this.camera = camera;
+    return _this;
+  }
+
+  return Captor;
+}(_events.EventEmitter);
+
+exports.default = Captor;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getX = getX;
+exports.getY = getY;
+exports.getWidth = getWidth;
+exports.getHeight = getHeight;
+exports.getCenter = getCenter;
+exports.getMouseCoords = getMouseCoords;
+exports.getWheelDelta = getWheelDelta;
+
+var _utils = __webpack_require__(7);
+
+/**
+ * Extract the local X position from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The local X value of the mouse.
+ */
+function getX(e) {
+  if (typeof e.offsetX !== 'undefined') return e.offsetX;
+
+  if (typeof e.layerX !== 'undefined') return e.layerX;
+
+  if (typeof e.clientX !== 'undefined') return e.clientX;
+
+  throw new Error('sigma/captors/utils.getX: could not extract x from event.');
+}
+
+/**
+ * Extract the local Y position from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The local Y value of the mouse.
+ */
+/**
+ * Sigma.js Captor Utils
+ * ======================
+ *
+ * Miscellenous helper functions related to the captors.
+ */
+function getY(e) {
+  if (typeof e.offsetY !== 'undefined') return e.offsetY;
+
+  if (typeof e.layerY !== 'undefined') return e.layerY;
+
+  if (typeof e.clientY !== 'undefined') return e.clientY;
+
+  throw new Error('sigma/captors/utils.getY: could not extract y from event.');
+}
+
+/**
+ * Extract the width from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The width of the event's target.
+ */
+function getWidth(e) {
+  var w = !e.target.ownerSVGElement ? e.target.width : e.target.ownerSVGElement.width;
+
+  if (typeof w === 'number') return w;
+
+  if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
+
+  throw new Error('sigma/captors/utils.getWidth: could not extract width from event.');
+}
+
+/**
+ * Extract the height from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The height of the event's target.
+ */
+function getHeight(e) {
+  var w = !e.target.ownerSVGElement ? e.target.height : e.target.ownerSVGElement.height;
+
+  if (typeof w === 'number') return w;
+
+  if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
+
+  throw new Error('sigma/captors/utils.getHeight: could not extract height from event.');
+}
+
+/**
+ * Extract the center from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {object}     The center of the event's target.
+ */
+function getCenter(e) {
+  var ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 : (0, _utils.getPixelRatio)();
+
+  return {
+    x: getWidth(e) / (2 * ratio),
+    y: getHeight(e) / (2 * ratio)
+  };
+}
+
+/**
+ * Convert mouse coords to sigma coords.
+ *
+ * @param  {event}   e   - A mouse or touch event.
+ * @param  {number}  [x] - The x coord to convert
+ * @param  {number}  [y] - The y coord to convert
+ *
+ * @return {object}
+ */
+function getMouseCoords(e) {
+  return {
+    x: getX(e),
+    y: getY(e),
+    clientX: e.clientX,
+    clientY: e.clientY,
+    ctrlKey: e.ctrlKey,
+    metaKey: e.metaKey,
+    altKey: e.altKey,
+    shiftKey: e.shiftKey
+  };
+}
+
+/**
+ * Extract the wheel delta from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The wheel delta of the mouse.
+ */
+function getWheelDelta(e) {
+  if (typeof e.wheelDelta !== 'undefined') return e.wheelDelta / 360;
+
+  if (typeof e.detail !== 'undefined') return e.detail / -9;
+
+  throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
+}
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1933,7 +2518,7 @@ var _camera = __webpack_require__(3);
 
 var _camera2 = _interopRequireDefault(_camera);
 
-var _mouse = __webpack_require__(4);
+var _mouse = __webpack_require__(6);
 
 var _mouse2 = _interopRequireDefault(_mouse);
 
@@ -1941,27 +2526,29 @@ var _quadtree = __webpack_require__(5);
 
 var _quadtree2 = _interopRequireDefault(_quadtree);
 
-var _node = __webpack_require__(20);
+var _node = __webpack_require__(17);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _edge = __webpack_require__(19);
+var _edge = __webpack_require__(22);
 
 var _edge2 = _interopRequireDefault(_edge);
 
-var _label = __webpack_require__(6);
+var _label = __webpack_require__(9);
 
 var _label2 = _interopRequireDefault(_label);
 
-var _hover = __webpack_require__(16);
+var _hover = __webpack_require__(25);
 
 var _hover2 = _interopRequireDefault(_hover);
 
-var _utils = __webpack_require__(9);
+var _utils = __webpack_require__(4);
 
 var _utils2 = __webpack_require__(7);
 
-var _utils3 = __webpack_require__(1);
+var _utils3 = __webpack_require__(2);
+
+var _labels = __webpack_require__(27);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1987,9 +2574,9 @@ var WEBGL_OVERSAMPLING_RATIO = (0, _utils2.getPixelRatio)();
  * Defaults.
  */
 var DEFAULT_SETTINGS = {
-  hideEdgesOnMove: false
+  hideEdgesOnMove: false,
+  hideLabelsOnMove: false
 };
-// TODO: hide labels on move
 
 /**
  * Main class.
@@ -2021,20 +2608,16 @@ var WebGLRenderer = function (_Renderer) {
     _this.contexts = {};
     _this.listeners = {};
 
-    _this.quadtree = new _quadtree2.default();
-
-    _this.nodeArray = null;
-    _this.nodeIndicesArray = null;
-    _this.nodeOrder = {};
-
+    // Indices
     // TODO: this could be improved by key => index => floatArray
+    // TODO: the cache should erase keys on node delete
+    _this.quadtree = new _quadtree2.default();
+    _this.nodeOrder = {};
     _this.nodeDataCache = {};
-    _this.edgeArray = null;
-    _this.edgeIndicesArray = null;
     _this.edgeOrder = {};
 
-    // TODO: if we drop size scaling => this should become "rescalingFunction"
-    _this.nodeRescalingFunction = null;
+    // Rescaling function
+    _this.rescalingFunction = null;
 
     // Starting dimensions
     _this.width = 0;
@@ -2042,13 +2625,14 @@ var WebGLRenderer = function (_Renderer) {
 
     // State
     _this.highlightedNodes = new Set();
+    _this.previousVisibleNodes = new Set();
+    _this.displayedLabels = new Set();
     _this.hoveredNode = null;
     _this.wasRenderedInThisFrame = false;
     _this.renderFrame = null;
     _this.renderHighlightedNodesFrame = null;
     _this.needToProcess = false;
     _this.needToSoftProcess = false;
-    _this.pixel = new Uint8Array(4);
 
     // Initializing contexts
     _this.createContext('edges');
@@ -2104,33 +2688,16 @@ var WebGLRenderer = function (_Renderer) {
    */
 
   /**
-   * Method used to test a pixel of the given context.
+   * Internal function used to create a canvas context and add the relevant
+   * DOM elements.
    *
-   * @param  {WebGLContext} gl - Context.
-   * @param  {number}       x  - Client x.
-   * @param  {number}       y  - Client y.
-   * @return {boolean}
+   * @param  {string}  id    - Context's id.
+   * @param  {boolean} webgl - Whether the context is a webgl or canvas one.
+   * @return {WebGLRenderer}
    */
 
 
   _createClass(WebGLRenderer, [{
-    key: 'testPixel',
-    value: function testPixel(gl, x, y) {
-      (0, _utils3.extractPixel)(gl, x * WEBGL_OVERSAMPLING_RATIO, (this.height - y) * WEBGL_OVERSAMPLING_RATIO, this.pixel);
-
-      return this.pixel[3] !== 0;
-    }
-
-    /**
-     * Internal function used to create a canvas context and add the relevant
-     * DOM elements.
-     *
-     * @param  {string}  id    - Context's id.
-     * @param  {boolean} webgl - Whether the context is a webgl or canvas one.
-     * @return {WebGLRenderer}
-     */
-
-  }, {
     key: 'createContext',
     value: function createContext(id) {
       var webgl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -2150,7 +2717,16 @@ var WebGLRenderer = function (_Renderer) {
         antialias: false
       };
 
-      var context = element.getContext(webgl ? 'webgl' : '2d', contextOptions);
+      var context = void 0;
+
+      if (webgl) {
+        context = element.getContext('webgl', contextOptions);
+
+        // Edge, I am looking right at you...
+        if (!context) context = element.getContext('experimental-webgl', contextOptions);
+      } else {
+        context = element.getContext('2d', contextOptions);
+      }
 
       this.contexts[id] = context;
 
@@ -2229,6 +2805,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var size = data.size / sizeRatio;
 
+          // TODO: we should get the nearest node instead
           if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
             _this3.hoveredNode = node;
 
@@ -2357,14 +2934,14 @@ var WebGLRenderer = function (_Renderer) {
       var extent = this.sigma.getGraphExtent();
 
       // Rescaling function
-      this.nodeRescalingFunction = (0, _utils2.createNodeRescalingFunction)({ width: this.width, height: this.height }, extent);
+      this.rescalingFunction = (0, _utils2.createRescalingFunction)({ width: this.width, height: this.height }, extent);
 
-      var minRescaled = this.nodeRescalingFunction({
+      var minRescaled = this.rescalingFunction({
         x: extent.minX,
         y: extent.minY
       });
 
-      var maxRescaled = this.nodeRescalingFunction({
+      var maxRescaled = this.rescalingFunction({
         x: extent.maxX,
         y: extent.maxY
       });
@@ -2376,13 +2953,10 @@ var WebGLRenderer = function (_Renderer) {
         height: maxRescaled.y - minRescaled.y
       });
 
-      this.nodeRescaleCache = {};
-
       var nodeProgram = this.nodePrograms.def;
 
       if (!keepArrays) {
-        this.nodeArray = new Float32Array(_node2.default.POINTS * _node2.default.ATTRIBUTES * graph.order);
-
+        nodeProgram.allocate(graph.order);
         this.nodeOrder = {};
       }
 
@@ -2395,7 +2969,7 @@ var WebGLRenderer = function (_Renderer) {
 
         var data = this.sigma.getNodeData(node);
 
-        var rescaledData = this.nodeRescalingFunction(data);
+        var rescaledData = this.rescalingFunction(data);
 
         // TODO: Optimize this to be save a loop and one object, by using a reversed assign
         var displayData = (0, _utils.assign)({}, data, rescaledData);
@@ -2404,16 +2978,16 @@ var WebGLRenderer = function (_Renderer) {
 
         this.nodeDataCache[node] = displayData;
 
-        nodeProgram.process(this.nodeArray, displayData, i * _node2.default.POINTS * _node2.default.ATTRIBUTES);
+        nodeProgram.process(displayData, i);
       }
 
-      nodeProgram.bufferData(this.contexts.nodes, this.nodeArray);
+      // TODO: do we need to keep passing gl to the program?
+      nodeProgram.bufferData();
 
       var edgeProgram = this.edgePrograms.def;
 
       if (!keepArrays) {
-        this.edgeArray = new Float32Array(_edge2.default.POINTS * _edge2.default.ATTRIBUTES * graph.size);
-
+        edgeProgram.allocate(graph.size);
         this.edgeOrder = {};
       }
 
@@ -2429,13 +3003,13 @@ var WebGLRenderer = function (_Renderer) {
             sourceData = this.nodeDataCache[extremities[0]],
             targetData = this.nodeDataCache[extremities[1]];
 
-        edgeProgram.process(this.edgeArray, sourceData, targetData, _data2, _i * _edge2.default.POINTS * _edge2.default.ATTRIBUTES);
+        edgeProgram.process(sourceData, targetData, _data2, _i);
       }
 
       // Computing edge indices if necessary
-      if (!keepArrays && typeof edgeProgram.computeIndices === 'function') this.edgeIndicesArray = edgeProgram.computeIndices(this.edgeArray);
+      if (!keepArrays && typeof edgeProgram.computeIndices === 'function') this.edgeIndicesArray = edgeProgram.computeIndices();
 
-      edgeProgram.bufferData(this.contexts.edges, this.edgeArray, this.edgeIndicesArray);
+      edgeProgram.bufferData();
 
       return this;
     }
@@ -2454,7 +3028,7 @@ var WebGLRenderer = function (_Renderer) {
 
       var data = this.sigma.getNodeData(key);
 
-      nodeProgram.process(this.nodeArray, data, this.nodeOrder[key] * _node2.default.POINTS * _node2.default.ATTRIBUTES);
+      nodeProgram.process(data, this.nodeOrder[key]);
 
       return this;
     }
@@ -2478,7 +3052,7 @@ var WebGLRenderer = function (_Renderer) {
           sourceData = this.sigma.getNodeData(extremities[0]),
           targetData = this.sigma.getNodeData(extremities[1]);
 
-      edgeProgram.process(this.edgeArray, sourceData, targetData, data, this.edgeOrder[key] * _edge2.default.POINTS * _edge2.default.ATTRIBUTES);
+      edgeProgram.process(sourceData, targetData, data, this.edgeOrder[key]);
 
       return this;
     }
@@ -2639,6 +3213,9 @@ var WebGLRenderer = function (_Renderer) {
         this.needToSoftProcess = false;
       }
 
+      // TODO: improve this heuristic
+      var moving = this.camera.isAnimated() || this.captors.mouse.isMoving || this.captors.mouse.hasDragged || this.captors.mouse.wheelLock;
+
       // First we need to resize
       this.resize();
 
@@ -2649,15 +3226,13 @@ var WebGLRenderer = function (_Renderer) {
       var cameraState = this.camera.getState(),
           cameraMatrix = (0, _utils3.matrixFromCamera)(cameraState, { width: this.width, height: this.height });
 
-      var program = void 0,
-          gl = void 0;
+      var program = void 0;
 
       // Drawing nodes
-      gl = this.contexts.nodes;
       program = this.nodePrograms.def;
 
       // TODO: should probably use another name for the `program` abstraction
-      program.render(gl, this.nodeArray, {
+      program.render({
         matrix: cameraMatrix,
         width: this.width,
         height: this.height,
@@ -2667,20 +3242,22 @@ var WebGLRenderer = function (_Renderer) {
       });
 
       // Drawing edges
-      if (!this.settings.hideEdgesOnMove || !this.camera.isAnimated()) {
-        gl = this.contexts.edges;
+      if (!this.settings.hideEdgesOnMove || !moving) {
         program = this.edgePrograms.def;
 
-        program.render(gl, this.edgeArray, {
+        program.render({
           matrix: cameraMatrix,
           width: this.width,
           height: this.height,
           ratio: cameraState.ratio,
+          nodesPowRatio: 0.5,
           edgesPowRatio: 0.5,
-          scalingRatio: WEBGL_OVERSAMPLING_RATIO,
-          indices: this.edgeIndicesArray
+          scalingRatio: WEBGL_OVERSAMPLING_RATIO
         });
       }
+
+      // Do not display labels on move per setting
+      if (this.settings.hideLabelsOnMove && moving) return this;
 
       // Finding visible nodes to display their labels
       var visibleNodes = void 0;
@@ -2697,14 +3274,23 @@ var WebGLRenderer = function (_Renderer) {
         visibleNodes = this.quadtree.rectangle(viewRectangle.x1, viewRectangle.y1, viewRectangle.x2, viewRectangle.y2, viewRectangle.height);
       }
 
+      // Selecting labels to draw
+      var labelsToDisplay = (0, _labels.labelsToDisplayFromGrid)({
+        cache: this.nodeDataCache,
+        camera: this.camera,
+        displayedLabels: this.displayedLabels,
+        previousVisibleNodes: this.previousVisibleNodes,
+        visibleNodes: visibleNodes
+      });
+
       // Drawing labels
       // TODO: POW RATIO is currently default 0.5 and harcoded
       var context = this.contexts.labels;
 
       var sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
-      for (var i = 0, l = visibleNodes.length; i < l; i++) {
-        var data = this.nodeDataCache[visibleNodes[i]];
+      for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
+        var data = this.nodeDataCache[labelsToDisplay[i]];
 
         var _camera$graphToDispla = this.camera.graphToDisplay(data.x, data.y),
             x = _camera$graphToDispla.x,
@@ -2716,7 +3302,8 @@ var WebGLRenderer = function (_Renderer) {
         var size = data.size / sizeRatio;
 
         // TODO: this is the label threshold hardcoded
-        if (size < 8) continue;
+        // if (size < 8)
+        //   continue;
 
         (0, _label2.default)(context, {
           label: data.label,
@@ -2725,6 +3312,10 @@ var WebGLRenderer = function (_Renderer) {
           y: y
         });
       }
+
+      // Caching visible nodes and displayed labels
+      this.previousVisibleNodes = new Set(visibleNodes);
+      this.displayedLabels = new Set(labelsToDisplay);
 
       // Rendering highlighted nodes
       this.renderHighlightedNodes();
@@ -2878,7 +3469,7 @@ var WebGLRenderer = function (_Renderer) {
 exports.default = WebGLRenderer;
 
 /***/ }),
-/* 11 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2888,227 +3479,131 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Sigma.js Core Class
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * ====================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Core class holding state for the bound graph and using a combination of
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * a renderer & camera to display the bound graph on screen.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _program = __webpack_require__(8);
 
-var _isGraph = __webpack_require__(22);
+var _program2 = _interopRequireDefault(_program);
 
-var _isGraph2 = _interopRequireDefault(_isGraph);
+var _utils = __webpack_require__(2);
 
-var _renderer = __webpack_require__(0);
+var _nodeFastVert = __webpack_require__(20);
 
-var _renderer2 = _interopRequireDefault(_renderer);
+var _nodeFastVert2 = _interopRequireDefault(_nodeFastVert);
+
+var _nodeFastFrag = __webpack_require__(21);
+
+var _nodeFastFrag2 = _interopRequireDefault(_nodeFastFrag);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// TODO: sigma should only hold the graph and compose state to give to renderer,
-// does it need to orchestrate?
-
-// TODO: should be able to take n renderers
-// TODO: what to do with refresh methods? We should probably drop them
-
-// TODO: create a thumbnail renderer
-
-/**
- * Sigma class
- *
- * @constructor
- * @param {Graph}    graph    - A graphology Graph instance.
- * @param {Renderer} renderer - A Renderer instance.
- */
-var Sigma = function () {
-  function Sigma(graph, renderer) {
-    _classCallCheck(this, Sigma);
-
-    // Checking the arguments
-    if (!(0, _isGraph2.default)(graph)) throw new Error('Sigma.constructor: given graph is not an instance of a graphology implementation.');
-
-    if (!(renderer instanceof _renderer2.default)) throw new Error('Sigma.constructor: given renderer is not an instance of a sigma Renderer.');
-
-    // Properties
-    this.graph = graph;
-    this.renderer = renderer;
-    this.renderer.bind(this);
-
-    // Userland state
-    this.state = {};
-    this.nodeStates = null;
-    this.edgeStates = null;
-
-    // First time render
-    this.renderer.render();
-  }
-
-  /**---------------------------------------------------------------------------
-   * Internals
-   **---------------------------------------------------------------------------
-   */
-
-  /**---------------------------------------------------------------------------
-   * Getters
-   **---------------------------------------------------------------------------
-   */
-
-  /**
-   * Method returning the graph bound to the instance.
-   *
-   * @return {Graph} - The bound graph.
-   */
-
-
-  _createClass(Sigma, [{
-    key: 'getGraph',
-    value: function getGraph() {
-      return this.graph;
-    }
-
-    /**
-     * Method returning the composed data of the target node.
-     *
-     * @return {string} key - The node's key.
-     * @return {object}     - The node's attributes.
-     */
-
-  }, {
-    key: 'getNodeData',
-    value: function getNodeData(key) {
-
-      // TODO: this will change to compose state later
-      return this.graph.getNodeAttributes(key);
-    }
-
-    /**
-     * Method returning the composed data of the target edge.
-     *
-     * @return {string} key - The edge's key.
-     * @return {object}     - The edge's attributes.
-     */
-
-  }, {
-    key: 'getEdgeData',
-    value: function getEdgeData(key) {
-
-      // TODO: this will change to compose state later
-      return this.graph.getEdgeAttributes(key);
-    }
-
-    /**
-     * Method returning the extent of the bound graph.
-     *
-     * @return {object} - The graph's extent.
-     */
-
-  }, {
-    key: 'getGraphExtent',
-    value: function getGraphExtent() {
-      var graph = this.graph;
-
-      var nodes = graph.nodes(),
-          edges = graph.edges();
-
-      var maxX = -Infinity,
-          maxY = -Infinity,
-          minX = Infinity,
-          minY = Infinity,
-          maxNodeSize = -Infinity,
-          maxEdgeSize = -Infinity;
-
-      for (var i = 0, l = nodes.length; i < l; i++) {
-        var node = nodes[i];
-
-        var data = this.getNodeData(node);
-
-        if (data.x > maxX) maxX = data.x;
-        if (data.y > maxY) maxY = data.y;
-
-        if (data.x < minX) minX = data.x;
-        if (data.y < minY) minY = data.y;
-
-        var size = data.size || 1;
-
-        if (size > maxNodeSize) maxNodeSize = size;
-      }
-
-      for (var _i = 0, _l = edges.length; _i < _l; _i++) {
-        var edge = edges[_i];
-
-        var _data = this.getEdgeData(edge);
-
-        var _size = _data.size || 1;
-
-        if (_size > maxEdgeSize) maxEdgeSize = _size;
-      }
-
-      return {
-        maxX: maxX,
-        maxY: maxY,
-        minX: minX,
-        minY: minY,
-        maxNodeSize: maxNodeSize,
-        maxEdgeSize: maxEdgeSize
-      };
-    }
-  }]);
-
-  return Sigma;
-}();
-
-exports.default = Sigma;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _events = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Captor Class
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ======================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js WebGL Renderer Node Program
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * =====================================
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Abstract class representing a captor like the user's mouse or touch controls.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Simple program rendering nodes using GL_POINTS. This is faster than the
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * three triangle option but has some quirks and is not supported equally by
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * every GPU.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
 
-var Captor = function (_EventEmitter) {
-  _inherits(Captor, _EventEmitter);
+var POINTS = 1,
+    ATTRIBUTES = 4;
 
-  function Captor(container, camera) {
-    _classCallCheck(this, Captor);
+var NodeProgramFast = function (_Program) {
+  _inherits(NodeProgramFast, _Program);
 
-    // Properties
-    var _this = _possibleConstructorReturn(this, (Captor.__proto__ || Object.getPrototypeOf(Captor)).call(this));
+  function NodeProgramFast(gl) {
+    _classCallCheck(this, NodeProgramFast);
 
-    _this.container = container;
-    _this.camera = camera;
+    // Binding context
+    var _this = _possibleConstructorReturn(this, (NodeProgramFast.__proto__ || Object.getPrototypeOf(NodeProgramFast)).call(this, gl, _nodeFastVert2.default, _nodeFastFrag2.default));
+
+    _this.gl = gl;
+
+    // Array data
+    _this.array = null;
+
+    // Initializing buffers
+    _this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, _this.buffer);
+
+    var program = _this.program;
+
+    // Locations
+    _this.positionLocation = gl.getAttribLocation(program, 'a_position');
+    _this.sizeLocation = gl.getAttribLocation(program, 'a_size');
+    _this.colorLocation = gl.getAttribLocation(program, 'a_color');
+    _this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    _this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
+    _this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
+    _this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
+
+    // Bindings
+    gl.enableVertexAttribArray(_this.positionLocation);
+    gl.enableVertexAttribArray(_this.sizeLocation);
+    gl.enableVertexAttribArray(_this.colorLocation);
+
+    gl.vertexAttribPointer(_this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(_this.sizeLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(_this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
     return _this;
   }
 
-  return Captor;
-}(_events.EventEmitter);
+  _createClass(NodeProgramFast, [{
+    key: 'allocate',
+    value: function allocate(capacity) {
+      this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+    }
+  }, {
+    key: 'process',
+    value: function process(data, offset) {
+      var color = (0, _utils.floatColor)(data.color);
 
-exports.default = Captor;
+      var i = offset * POINTS * ATTRIBUTES;
+
+      var array = this.array;
+
+      array[i++] = data.x;
+      array[i++] = data.y;
+      array[i++] = data.size;
+      array[i] = color;
+    }
+  }, {
+    key: 'bufferData',
+    value: function bufferData() {
+      var gl = this.gl;
+
+      gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    }
+  }, {
+    key: 'render',
+    value: function render(params) {
+      var gl = this.gl;
+
+      var program = this.program;
+      gl.useProgram(program);
+
+      gl.uniform2f(this.resolutionLocation, params.width, params.height);
+      gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+      gl.uniform1f(this.scaleLocation, params.scalingRatio);
+      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+
+      gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
+    }
+  }]);
+
+  return NodeProgramFast;
+}(_program2.default);
+
+exports.default = NodeProgramFast;
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3117,139 +3612,78 @@ exports.default = Captor;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getX = getX;
-exports.getY = getY;
-exports.getWidth = getWidth;
-exports.getHeight = getHeight;
-exports.getCenter = getCenter;
-exports.getMouseCoords = getMouseCoords;
-exports.getWheelDelta = getWheelDelta;
-
-var _utils = __webpack_require__(7);
-
+exports.loadProgram = loadProgram;
 /**
- * Extract the local X position from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The local X value of the mouse.
- */
-function getX(e) {
-  if (typeof e.offsetX !== 'undefined') return e.offsetX;
-
-  if (typeof e.layerX !== 'undefined') return e.layerX;
-
-  if (typeof e.clientX !== 'undefined') return e.clientX;
-
-  throw new Error('sigma/captors/utils.getX: could not extract x from event.');
-}
-
-/**
- * Extract the local Y position from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The local Y value of the mouse.
- */
-/**
- * Sigma.js Captor Utils
+ * Sigma.js Shader Utils
  * ======================
  *
- * Miscellenous helper functions related to the captors.
+ * Code used to load sigma's shaders.
  */
-function getY(e) {
-  if (typeof e.offsetY !== 'undefined') return e.offsetY;
-
-  if (typeof e.layerY !== 'undefined') return e.layerY;
-
-  if (typeof e.clientY !== 'undefined') return e.clientY;
-
-  throw new Error('sigma/captors/utils.getY: could not extract y from event.');
-}
 
 /**
- * Extract the width from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The width of the event's target.
+ * Function used to load a shader.
  */
-function getWidth(e) {
-  var w = !e.target.ownerSVGElement ? e.target.width : e.target.ownerSVGElement.width;
+function loadShader(type, gl, source) {
+  var glType = type === 'VERTEX' ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
-  if (typeof w === 'number') return w;
+  // Creating the shader
+  var shader = gl.createShader(glType);
 
-  if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
+  // Loading source
+  gl.shaderSource(shader, source);
 
-  throw new Error('sigma/captors/utils.getWidth: could not extract width from event.');
+  // Compiling the shader
+  gl.compileShader(shader);
+
+  // Retrieving compilation status
+  var successfullyCompiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+
+  // Throwing if something went awry
+  if (!successfullyCompiled) {
+    var infoLog = gl.getShaderInfoLog(shader);
+
+    gl.deleteShader(shader);
+    throw new Error('sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n' + infoLog + '\n' + source);
+  }
+
+  return shader;
 }
 
-/**
- * Extract the height from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The height of the event's target.
- */
-function getHeight(e) {
-  var w = !e.target.ownerSVGElement ? e.target.height : e.target.ownerSVGElement.height;
+var loadVertexShader = loadShader.bind(null, 'VERTEX'),
+    loadFragmentShader = loadShader.bind(null, 'FRAGMENT');
 
-  if (typeof w === 'number') return w;
-
-  if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
-
-  throw new Error('sigma/captors/utils.getHeight: could not extract height from event.');
-}
+exports.loadVertexShader = loadVertexShader;
+exports.loadFragmentShader = loadFragmentShader;
 
 /**
- * Extract the center from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {object}     The center of the event's target.
+ * Function used to load a program.
  */
-function getCenter(e) {
-  var ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 : (0, _utils.getPixelRatio)();
 
-  return {
-    x: getWidth(e) / (2 * ratio),
-    y: getHeight(e) / (2 * ratio)
-  };
-}
+function loadProgram(gl, shaders) {
+  var program = gl.createProgram();
 
-/**
- * Convert mouse coords to sigma coords.
- *
- * @param  {event}   e   - A mouse or touch event.
- * @param  {number}  [x] - The x coord to convert
- * @param  {number}  [y] - The y coord to convert
- *
- * @return {object}
- */
-function getMouseCoords(e) {
-  return {
-    x: getX(e),
-    y: getY(e),
-    clientX: e.clientX,
-    clientY: e.clientY,
-    ctrlKey: e.ctrlKey,
-    metaKey: e.metaKey,
-    altKey: e.altKey,
-    shiftKey: e.shiftKey
-  };
-}
+  var i = void 0,
+      l = void 0;
 
-/**
- * Extract the wheel delta from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The wheel delta of the mouse.
- */
-function getWheelDelta(e) {
-  if (typeof e.wheelDelta !== 'undefined') return e.wheelDelta / 360;
+  // Attaching the shaders
+  for (i = 0, l = shaders.length; i < l; i++) {
+    gl.attachShader(program, shaders[i]);
+  }gl.linkProgram(program);
 
-  if (typeof e.detail !== 'undefined') return e.detail / -9;
+  // Checking status
+  var successfullyLinked = gl.getProgramParameter(program, gl.LINK_STATUS);
 
-  throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
+  if (!successfullyLinked) {
+
+    gl.deleteProgram(program);
+    throw new Error('sigma/renderers/weblg/shaders/utils.loadProgram: error while linking the program.');
+  }
+
+  return program;
 }
 
 /***/ }),
-/* 14 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3258,96 +3692,358 @@ function getWheelDelta(e) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.identity = identity;
+exports.scale = scale;
+exports.rotate = rotate;
+exports.translate = translate;
+exports.multiply = multiply;
 /**
- * Sigma.js Easings
- * =================
+ * Sigma.js WebGL Matrices Helpers
+ * ================================
  *
- * Handy collection of easing functions.
+ * Matrices-related helper functions used by sigma's WebGL renderer.
  */
-var linear = exports.linear = function linear(k) {
-  return k;
-};
+function identity() {
+  return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
+}
 
-var quadraticIn = exports.quadraticIn = function quadraticIn(k) {
-  return k * k;
-};
+function scale(m, x) {
+  m[0] = x;
+  m[4] = x;
 
-var quadraticOut = exports.quadraticOut = function quadraticOut(k) {
-  return k * (2 - k);
-};
+  return m;
+}
 
-var quadraticInOut = exports.quadraticInOut = function quadraticInOut(k) {
-  if ((k *= 2) < 1) return 0.5 * k * k;
-  return -0.5 * (--k * (k - 2) - 1);
-};
+function rotate(m, r) {
+  var s = Math.sin(r),
+      c = Math.cos(r);
 
-var cubicIn = exports.cubicIn = function cubicIn(k) {
-  return k * k * k;
-};
+  m[0] = c;
+  m[1] = s;
+  m[3] = -s;
+  m[4] = c;
 
-var cubicOut = exports.cubicOut = function cubicOut(k) {
-  return --k * k * k + 1;
-};
+  return m;
+}
 
-var cubicInOut = exports.cubicInOut = function cubicInOut(k) {
-  if ((k *= 2) < 1) return 0.5 * k * k * k;
-  return 0.5 * ((k -= 2) * k * k + 2);
-};
+function translate(m, x, y) {
+  m[6] = x;
+  m[7] = y;
+
+  return m;
+}
+
+function multiply(a, b) {
+  var a00 = a[0],
+      a01 = a[1],
+      a02 = a[2];
+  var a10 = a[3],
+      a11 = a[4],
+      a12 = a[5];
+  var a20 = a[6],
+      a21 = a[7],
+      a22 = a[8];
+
+  var b00 = b[0],
+      b01 = b[1],
+      b02 = b[2];
+  var b10 = b[3],
+      b11 = b[4],
+      b12 = b[5];
+  var b20 = b[6],
+      b21 = b[7],
+      b22 = b[8];
+
+  a[0] = b00 * a00 + b01 * a10 + b02 * a20;
+  a[1] = b00 * a01 + b01 * a11 + b02 * a21;
+  a[2] = b00 * a02 + b01 * a12 + b02 * a22;
+
+  a[3] = b10 * a00 + b11 * a10 + b12 * a20;
+  a[4] = b10 * a01 + b11 * a11 + b12 * a21;
+  a[5] = b10 * a02 + b11 * a12 + b12 * a22;
+
+  a[6] = b20 * a00 + b21 * a10 + b22 * a20;
+  a[7] = b20 * a01 + b21 * a11 + b22 * a21;
+  a[8] = b20 * a02 + b21 * a12 + b22 * a22;
+
+  return a;
+}
 
 /***/ }),
-/* 15 */
+/* 20 */
+/***/ (function(module, exports) {
+
+module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    ((u_matrix * vec3(a_position, 1)).xy /\n      u_resolution * 2.0 - 1.0) * vec2(1, -1),\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying float border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / border;\n\n  gl_FragColor = mix(color0, color, t);\n}\n"
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _sigma = __webpack_require__(11);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _sigma2 = _interopRequireDefault(_sigma);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _renderer = __webpack_require__(0);
+var _program = __webpack_require__(8);
 
-var _renderer2 = _interopRequireDefault(_renderer);
+var _program2 = _interopRequireDefault(_program);
 
-var _camera = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
-var _camera2 = _interopRequireDefault(_camera);
+var _edgeVert = __webpack_require__(23);
 
-var _quadtree = __webpack_require__(5);
+var _edgeVert2 = _interopRequireDefault(_edgeVert);
 
-var _quadtree2 = _interopRequireDefault(_quadtree);
+var _edgeFrag = __webpack_require__(24);
 
-var _mouse = __webpack_require__(4);
-
-var _mouse2 = _interopRequireDefault(_mouse);
-
-var _webgl = __webpack_require__(10);
-
-var _webgl2 = _interopRequireDefault(_webgl);
+var _edgeFrag2 = _interopRequireDefault(_edgeFrag);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Sigma.js Library Endpoint
- * ==========================
- *
- * The library endpoint.
- */
-var library = {
-  Sigma: _sigma2.default,
-  Renderer: _renderer2.default,
-  Camera: _camera2.default,
-  QuadTree: _quadtree2.default,
-  MouseCaptor: _mouse2.default,
-  WebGLRenderer: _webgl2.default
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-for (var k in library) {
-  _sigma2.default[k] = library[k];
-}module.exports = _sigma2.default;
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js WebGL Renderer Edge Program
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * =====================================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Program rendering edges as thick lines using four points translated
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * orthogonally from the source & target's centers by half thickness.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Rendering two triangles by using only four points is made possible through
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the use of indices.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This method should be faster than the 6 points / 2 triangles approach and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * should handle thickness better than with gl.LINES.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This version of the shader balances geometry computation evenly between
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the CPU & GPU (normals are computed on the CPU side).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+
+var POINTS = 4,
+    ATTRIBUTES = 6;
+
+var EdgeProgram = function (_Program) {
+  _inherits(EdgeProgram, _Program);
+
+  function EdgeProgram(gl) {
+    _classCallCheck(this, EdgeProgram);
+
+    // Binding context
+    var _this = _possibleConstructorReturn(this, (EdgeProgram.__proto__ || Object.getPrototypeOf(EdgeProgram)).call(this, gl, _edgeVert2.default, _edgeFrag2.default));
+
+    _this.gl = gl;
+
+    // Array data
+    _this.array = null;
+    _this.indicesArray = null;
+
+    // Initializing buffers
+    _this.buffer = gl.createBuffer();
+    _this.indicesBuffer = gl.createBuffer();
+
+    // Locations
+    _this.positionLocation = gl.getAttribLocation(_this.program, 'a_position');
+    _this.normalLocation = gl.getAttribLocation(_this.program, 'a_normal');
+    _this.thicknessLocation = gl.getAttribLocation(_this.program, 'a_thickness');
+    _this.colorLocation = gl.getAttribLocation(_this.program, 'a_color');
+    _this.resolutionLocation = gl.getUniformLocation(_this.program, 'u_resolution');
+    _this.ratioLocation = gl.getUniformLocation(_this.program, 'u_ratio');
+    _this.matrixLocation = gl.getUniformLocation(_this.program, 'u_matrix');
+    _this.scaleLocation = gl.getUniformLocation(_this.program, 'u_scale');
+
+    _this.bind();
+
+    // Enabling the OES_element_index_uint extension
+    // NOTE: on older GPUs, this means that really large graphs won't
+    // have all their edges rendered. But it seems that the
+    // `OES_element_index_uint` is quite everywhere so we'll handle
+    // the potential issue if it really arises.
+    var extension = gl.getExtension('OES_element_index_uint');
+    _this.canUse32BitsIndices = !!extension;
+    _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+    _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+    return _this;
+  }
+
+  _createClass(EdgeProgram, [{
+    key: 'bind',
+    value: function bind() {
+      var gl = this.gl;
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+
+      // Bindings
+      gl.enableVertexAttribArray(this.positionLocation);
+      gl.enableVertexAttribArray(this.normalLocation);
+      gl.enableVertexAttribArray(this.thicknessLocation);
+      gl.enableVertexAttribArray(this.colorLocation);
+
+      gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+      gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+      gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+      gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+    }
+  }, {
+    key: 'allocate',
+    value: function allocate(capacity) {
+      this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+    }
+  }, {
+    key: 'process',
+    value: function process(sourceData, targetData, data, offset) {
+
+      if (sourceData.hidden || targetData.hidden || data.hidden) {
+        for (var l = i + POINTS * ATTRIBUTES; i < l; i++) {
+          this.array[i] = 0;
+        }
+      }
+
+      var thickness = data.size || 1,
+          x1 = sourceData.x,
+          y1 = sourceData.y,
+          x2 = targetData.x,
+          y2 = targetData.y,
+          color = (0, _utils.floatColor)(data.color);
+
+      // Computing normals
+      var dx = x2 - x1,
+          dy = y2 - y1;
+
+      var len = dx * dx + dy * dy,
+          n1 = 0,
+          n2 = 0;
+
+      if (len) {
+        len = 1 / Math.sqrt(len);
+
+        n1 = -dy * len;
+        n2 = dx * len;
+      }
+
+      var i = POINTS * ATTRIBUTES * offset;
+
+      var array = this.array;
+
+      // First point
+      array[i++] = x1;
+      array[i++] = y1;
+      array[i++] = n1;
+      array[i++] = n2;
+      array[i++] = thickness;
+      array[i++] = color;
+
+      // First point flipped
+      array[i++] = x1;
+      array[i++] = y1;
+      array[i++] = -n1;
+      array[i++] = -n2;
+      array[i++] = thickness;
+      array[i++] = color;
+
+      // Second point
+      array[i++] = x2;
+      array[i++] = y2;
+      array[i++] = n1;
+      array[i++] = n2;
+      array[i++] = thickness;
+      array[i++] = color;
+
+      // Second point flipped
+      array[i++] = x2;
+      array[i++] = y2;
+      array[i++] = -n1;
+      array[i++] = -n2;
+      array[i++] = thickness;
+      array[i] = color;
+    }
+  }, {
+    key: 'computeIndices',
+    value: function computeIndices() {
+      var l = this.array.length / ATTRIBUTES;
+
+      var size = l + l / 2;
+
+      var indices = new this.IndicesArray(size);
+
+      for (var _i = 0, c = 0; _i < size; _i += 4) {
+        indices[c++] = _i;
+        indices[c++] = _i + 1;
+        indices[c++] = _i + 2;
+        indices[c++] = _i + 2;
+        indices[c++] = _i + 1;
+        indices[c++] = _i + 3;
+      }
+
+      this.indicesArray = indices;
+    }
+  }, {
+    key: 'bufferData',
+    value: function bufferData() {
+      var gl = this.gl;
+
+      // Vertices data
+      gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+
+      // Indices data
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
+    }
+  }, {
+    key: 'render',
+    value: function render(params) {
+      var gl = this.gl;
+
+      var program = this.program;
+      gl.useProgram(program);
+
+      // Binding uniforms
+      // TODO: precise the uniform names
+      gl.uniform2f(this.resolutionLocation, params.width, params.height);
+      gl.uniform1f(this.ratioLocation,
+      // 1 / Math.pow(params.ratio, params.edgesPowRatio)
+      params.ratio);
+
+      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+
+      gl.uniform1f(this.scaleLocation, params.scalingRatio);
+
+      // Drawing:
+      gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
+    }
+  }]);
+
+  return EdgeProgram;
+}(_program2.default);
+
+exports.default = EdgeProgram;
 
 /***/ }),
-/* 16 */
+/* 23 */
+/***/ (function(module, exports) {
+
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5;\n\nvoid main() {\n\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = (a_thickness + feather) / 2.0 / pow_ratio / u_scale;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * thickness);\n\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness / u_ratio;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5 / 2.0;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3358,11 +4054,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = drawHover;
 
-var _node = __webpack_require__(17);
+var _node = __webpack_require__(26);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _label = __webpack_require__(6);
+var _label = __webpack_require__(9);
 
 var _label2 = _interopRequireDefault(_label);
 
@@ -3526,7 +4222,7 @@ function drawHover(context, data) {
 // }).call(this);
 
 /***/ }),
-/* 17 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3555,561 +4251,152 @@ function drawNode(context, data) {
 }
 
 /***/ }),
-/* 18 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.identity = identity;
-exports.scale = scale;
-exports.rotate = rotate;
-exports.translate = translate;
-exports.multiply = multiply;
 /**
- * Sigma.js WebGL Matrices Helpers
- * ================================
+ * Sigma.js Labels Heuristics
+ * ===========================
  *
- * Matrices-related helper functions used by sigma's WebGL renderer.
- */
-function identity() {
-  return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
-}
-
-function scale(m, x) {
-  m[0] = x;
-  m[4] = x;
-
-  return m;
-}
-
-function rotate(m, r) {
-  var s = Math.sin(r),
-      c = Math.cos(r);
-
-  m[0] = c;
-  m[1] = s;
-  m[3] = -s;
-  m[4] = c;
-
-  return m;
-}
-
-function translate(m, x, y) {
-  m[6] = x;
-  m[7] = y;
-
-  return m;
-}
-
-function multiply(a, b) {
-  var a00 = a[0],
-      a01 = a[1],
-      a02 = a[2];
-  var a10 = a[3],
-      a11 = a[4],
-      a12 = a[5];
-  var a20 = a[6],
-      a21 = a[7],
-      a22 = a[8];
-
-  var b00 = b[0],
-      b01 = b[1],
-      b02 = b[2];
-  var b10 = b[3],
-      b11 = b[4],
-      b12 = b[5];
-  var b20 = b[6],
-      b21 = b[7],
-      b22 = b[8];
-
-  a[0] = b00 * a00 + b01 * a10 + b02 * a20;
-  a[1] = b00 * a01 + b01 * a11 + b02 * a21;
-  a[2] = b00 * a02 + b01 * a12 + b02 * a22;
-
-  a[3] = b10 * a00 + b11 * a10 + b12 * a20;
-  a[4] = b10 * a01 + b11 * a11 + b12 * a21;
-  a[5] = b10 * a02 + b11 * a12 + b12 * a22;
-
-  a[6] = b20 * a00 + b21 * a10 + b22 * a20;
-  a[7] = b20 * a01 + b21 * a11 + b22 * a21;
-  a[8] = b20 * a02 + b21 * a12 + b22 * a22;
-
-  return a;
-}
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _program = __webpack_require__(8);
-
-var _program2 = _interopRequireDefault(_program);
-
-var _utils = __webpack_require__(1);
-
-var _edgeVert = __webpack_require__(24);
-
-var _edgeVert2 = _interopRequireDefault(_edgeVert);
-
-var _edgeFrag = __webpack_require__(23);
-
-var _edgeFrag2 = _interopRequireDefault(_edgeFrag);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js WebGL Renderer Node Program
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * =====================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Program rendering edges as thick lines using four points translated
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * orthogonally from the source & target's centers by half thickness.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Rendering two triangles by using only four points is made possible through
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the use of indices.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This method should be faster than the 6 points / 2 triangles approach and
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * should handle thickness better than with gl.LINES.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This version of the shader balances geometry computation evenly between
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * the CPU & GPU (normals are computed on the CPU side).
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var EdgeProgram = function (_Program) {
-  _inherits(EdgeProgram, _Program);
-
-  function EdgeProgram(gl) {
-    _classCallCheck(this, EdgeProgram);
-
-    // Initializing buffers
-    var _this = _possibleConstructorReturn(this, (EdgeProgram.__proto__ || Object.getPrototypeOf(EdgeProgram)).call(this, gl, _edgeVert2.default, _edgeFrag2.default));
-
-    _this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, _this.buffer);
-
-    _this.indicesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _this.indicesBuffer);
-
-    // Locations
-    _this.positionLocation = gl.getAttribLocation(_this.program, 'a_position');
-    _this.normalLocation = gl.getAttribLocation(_this.program, 'a_normal');
-    _this.thicknessLocation = gl.getAttribLocation(_this.program, 'a_thickness');
-    _this.colorLocation = gl.getAttribLocation(_this.program, 'a_color');
-    _this.resolutionLocation = gl.getUniformLocation(_this.program, 'u_resolution');
-    _this.ratioLocation = gl.getUniformLocation(_this.program, 'u_ratio');
-    _this.matrixLocation = gl.getUniformLocation(_this.program, 'u_matrix');
-    _this.scaleLocation = gl.getUniformLocation(_this.program, 'u_scale');
-
-    // Bindings
-    gl.enableVertexAttribArray(_this.positionLocation);
-    gl.enableVertexAttribArray(_this.normalLocation);
-    gl.enableVertexAttribArray(_this.thicknessLocation);
-    gl.enableVertexAttribArray(_this.colorLocation);
-
-    gl.vertexAttribPointer(_this.positionLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(_this.normalLocation, 2, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(_this.thicknessLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
-    gl.vertexAttribPointer(_this.colorLocation, 1, gl.FLOAT, false, EdgeProgram.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
-
-    // Enabling the OES_element_index_uint extension
-    // NOTE: on older GPUs, this means that really large graphs won't
-    // have all their edges rendered. But it seems that the
-    // `OES_element_index_uint` is quite everywhere so we'll handle
-    // the potential issue if it really arises.
-    var extension = gl.getExtension('OES_element_index_uint');
-    _this.canUse32BitsIndices = !!extension;
-    _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
-    _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-    return _this;
-  }
-
-  _createClass(EdgeProgram, [{
-    key: 'process',
-    value: function process(array, sourceData, targetData, data, i) {
-
-      if (sourceData.hidden || targetData.hidden || data.hidden) {
-        for (var l = i + EdgeProgram.POINTS * EdgeProgram.ATTRIBUTES; i < l; i++) {
-          array[i] = 0;
-        }
-      }
-
-      var thickness = data.size || 1,
-          x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          color = (0, _utils.floatColor)(data.color);
-
-      // Computing normals
-      var dx = x2 - x1,
-          dy = y2 - y1;
-
-      var len = dx * dx + dy * dy,
-          n1 = 0,
-          n2 = 0;
-
-      if (len) {
-        len = 1 / Math.sqrt(len);
-
-        n1 = -dy * len;
-        n2 = dx * len;
-      }
-
-      // First point
-      array[i++] = x1;
-      array[i++] = y1;
-      array[i++] = n1;
-      array[i++] = n2;
-      array[i++] = thickness;
-      array[i++] = color;
-
-      // First point flipped
-      array[i++] = x1;
-      array[i++] = y1;
-      array[i++] = -n1;
-      array[i++] = -n2;
-      array[i++] = thickness;
-      array[i++] = color;
-
-      // Second point
-      array[i++] = x2;
-      array[i++] = y2;
-      array[i++] = n1;
-      array[i++] = n2;
-      array[i++] = thickness;
-      array[i++] = color;
-
-      // Second point flipped
-      array[i++] = x2;
-      array[i++] = y2;
-      array[i++] = -n1;
-      array[i++] = -n2;
-      array[i++] = thickness;
-      array[i++] = color;
-    }
-  }, {
-    key: 'computeIndices',
-    value: function computeIndices(array) {
-      var l = array.length / EdgeProgram.ATTRIBUTES;
-
-      var size = l + l / 2;
-
-      var indices = new this.IndicesArray(size);
-
-      for (var i = 0, c = 0; i < size; i += 4) {
-        indices[c++] = i;
-        indices[c++] = i + 1;
-        indices[c++] = i + 2;
-        indices[c++] = i + 2;
-        indices[c++] = i + 1;
-        indices[c++] = i + 3;
-      }
-
-      return indices;
-    }
-  }, {
-    key: 'bufferData',
-    value: function bufferData(gl, array, indicesArray) {
-
-      // Vertices data
-      gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
-
-      // Indices data
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
-    }
-  }, {
-    key: 'render',
-    value: function render(gl, array, params) {
-      var program = this.program;
-      gl.useProgram(program);
-
-      // Binding uniforms
-      gl.uniform2f(this.resolutionLocation, params.width, params.height);
-      gl.uniform1f(this.ratioLocation, params.ratio / Math.pow(params.ratio, params.edgesPowRatio));
-
-      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
-      gl.uniform1f(this.scaleLocation, params.ratio);
-
-      // Drawing:
-      gl.drawElements(gl.TRIANGLES, params.indices.length, this.indicesType, 0);
-    }
-  }]);
-
-  return EdgeProgram;
-}(_program2.default);
-
-exports.default = EdgeProgram;
-
-
-EdgeProgram.POINTS = 4;
-EdgeProgram.ATTRIBUTES = 6;
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _program = __webpack_require__(8);
-
-var _program2 = _interopRequireDefault(_program);
-
-var _utils = __webpack_require__(1);
-
-var _nodeFastVert = __webpack_require__(26);
-
-var _nodeFastVert2 = _interopRequireDefault(_nodeFastVert);
-
-var _nodeFastFrag = __webpack_require__(25);
-
-var _nodeFastFrag2 = _interopRequireDefault(_nodeFastFrag);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js WebGL Renderer Node Program
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * =====================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Simple program rendering nodes using GL_POINTS. This is faster than the
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * three triangle option but has some quirks and is not supported equally by
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * every GPU.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var NodeProgramFast = function (_Program) {
-  _inherits(NodeProgramFast, _Program);
-
-  function NodeProgramFast(gl) {
-    _classCallCheck(this, NodeProgramFast);
-
-    // Initializing buffers
-    var _this = _possibleConstructorReturn(this, (NodeProgramFast.__proto__ || Object.getPrototypeOf(NodeProgramFast)).call(this, gl, _nodeFastVert2.default, _nodeFastFrag2.default));
-
-    _this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, _this.buffer);
-
-    var program = _this.program;
-
-    // Locations
-    _this.positionLocation = gl.getAttribLocation(program, 'a_position');
-    _this.sizeLocation = gl.getAttribLocation(program, 'a_size');
-    _this.colorLocation = gl.getAttribLocation(program, 'a_color');
-    _this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-    _this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-    _this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
-    _this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
-
-    // Bindings
-    gl.enableVertexAttribArray(_this.positionLocation);
-    gl.enableVertexAttribArray(_this.sizeLocation);
-    gl.enableVertexAttribArray(_this.colorLocation);
-
-    gl.vertexAttribPointer(_this.positionLocation, 2, gl.FLOAT, false, NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(_this.sizeLocation, 1, gl.FLOAT, false, NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(_this.colorLocation, 1, gl.FLOAT, false, NodeProgramFast.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
-    return _this;
-  }
-
-  _createClass(NodeProgramFast, [{
-    key: 'process',
-    value: function process(array, data, i) {
-      var color = (0, _utils.floatColor)(data.color);
-
-      array[i++] = data.x;
-      array[i++] = data.y;
-      array[i++] = data.size;
-      array[i++] = color;
-    }
-  }, {
-    key: 'bufferData',
-    value: function bufferData(gl, array) {
-      gl.bufferData(gl.ARRAY_BUFFER, array, gl.DYNAMIC_DRAW);
-    }
-  }, {
-    key: 'render',
-    value: function render(gl, array, params) {
-      var program = this.program;
-      gl.useProgram(program);
-
-      gl.uniform2f(this.resolutionLocation, params.width, params.height);
-      gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
-      gl.uniform1f(this.scaleLocation, params.scalingRatio);
-      gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
-      gl.drawArrays(gl.POINTS, 0, array.length / NodeProgramFast.ATTRIBUTES);
-    }
-  }]);
-
-  return NodeProgramFast;
-}(_program2.default);
-
-exports.default = NodeProgramFast;
-
-
-NodeProgramFast.POINTS = 1;
-NodeProgramFast.ATTRIBUTES = 4;
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.loadProgram = loadProgram;
-/**
- * Sigma.js Shader Utils
- * ======================
- *
- * Code used to load sigma's shaders.
+ * Miscelleneous heuristics related to label display.
  */
 
 /**
- * Function used to load a shader.
- */
-function loadShader(type, gl, source) {
-  var glType = type === 'VERTEX' ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
-
-  // Creating the shader
-  var shader = gl.createShader(glType);
-
-  // Loading source
-  gl.shaderSource(shader, source);
-
-  // Compiling the shader
-  gl.compileShader(shader);
-
-  // Retrieving compilation status
-  var successfullyCompiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-
-  // Throwing if something went awry
-  if (!successfullyCompiled) {
-    var infoLog = gl.getShaderInfoLog(shader);
-
-    gl.deleteShader(shader);
-    throw new Error('sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n' + infoLog + '\n' + source);
-  }
-
-  return shader;
-}
-
-var loadVertexShader = loadShader.bind(null, 'VERTEX'),
-    loadFragmentShader = loadShader.bind(null, 'FRAGMENT');
-
-exports.loadVertexShader = loadVertexShader;
-exports.loadFragmentShader = loadFragmentShader;
-
-/**
- * Function used to load a program.
+ * Constants.
  */
 
-function loadProgram(gl, shaders) {
-  var program = gl.createProgram();
-
-  var i = void 0,
-      l = void 0;
-
-  // Attaching the shaders
-  for (i = 0, l = shaders.length; i < l; i++) {
-    gl.attachShader(program, shaders[i]);
-  }gl.linkProgram(program);
-
-  // Checking status
-  var successfullyLinked = gl.getProgramParameter(program, gl.LINK_STATUS);
-
-  if (!successfullyLinked) {
-
-    gl.deleteProgram(program);
-    throw new Error('sigma/renderers/weblg/shaders/utils.loadProgram: error while linking the program.');
-  }
-
-  return program;
-}
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-/**
- * Graphology isGraph
- * ===================
- *
- * Very simple function aiming at ensuring the given variable is a
- * graphology instance.
- */
-
-/**
- * Checking the value is a graphology instance.
- *
- * @param  {any}     value - Target value.
- * @return {boolean}
- */
-module.exports = function isGraph(value) {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    typeof value.addUndirectedEdgeWithKey === 'function' &&
-    typeof value.dropNodes === 'function' &&
-    typeof value.multi === 'boolean'
-  );
+// Dimensions of a normal cell
+var DEFAULT_CELL = {
+  width: 200,
+  height: 150
 };
 
+// Dimensions of an unzoomed cell. This one is usually smaller than the normal
+// one to account for the fact that labels will more likely collide.
+var DEFAULT_UNZOOMED_CELL = {
+  width: 400,
+  height: 300
+};
 
-/***/ }),
-/* 23 */
-/***/ (function(module, exports) {
+/**
+ * Label grid heuristic selecting labels to display according to the following
+ * parameters:
+ *   1) Only one label per grid cell.
+ *   2) Greater labels win.
+ *   3) Already displayed label should stay displayed.
+ *
+ * Note: It is possible to apply a size threshold to the labels (but should
+ * really be done at quad level for performance).
+ *
+ * Note: It might be possible to not use last displayed labels by measurements
+ * and a margin.
+ *
+ * @param  {object} params                 - Parameters:
+ * @param  {object}   cache                - Cache storing nodes' data.
+ * @param  {Camera}   camera               - The renderer's camera.
+ * @param  {Set}      displayedLabels      - Currently displayed labels.
+ * @param  {Set}      previousVisibleNodes - Nodes visible last render.
+ * @param  {Array}    visibleNodes         - Nodes visible for this render.
+ * @return {Array}                         - The selected labels.
+ */
+exports.labelsToDisplayFromGrid = function (params) {
+  var cache = params.cache,
+      camera = params.camera,
+      displayedLabels = params.displayedLabels,
+      previousVisibleNodes = params.previousVisibleNodes,
+      visibleNodes = params.visibleNodes;
 
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\n// Note: twice the one defined in the vertex shader\nconst float feather = 1.0;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
 
-/***/ }),
-/* 24 */
-/***/ (function(module, exports) {
+  var cameraState = camera.getState(),
+      previousCameraState = camera.getPreviousState(),
+      dimensions = camera.getDimensions();
 
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5;\n\nvoid main() {\n\n  v_thickness = a_thickness * u_ratio / 2.0 + feather;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * v_thickness);\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal + vec2(sign(a_normal.x) * feather, sign(a_normal.y) * feather);\n  // v_thickness = max(1.0, length(delta) / u_scale);\n  v_thickness = max(1.0, v_thickness / u_scale);\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
+  // State
+  // TODO: the panning is false because of not working y condition, though
+  // if I fix it, the whole heuristic fails. I am saddness... :(
+  var zooming = cameraState.ratio < previousCameraState.ratio,
+      panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.x,
+      unzooming = cameraState.ratio > previousCameraState.ratio,
+      unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1;
 
-/***/ }),
-/* 25 */
-/***/ (function(module, exports) {
+  // Trick to discretize unzooming
+  if (unzooming && Math.trunc(cameraState.ratio * 10) % 3 !== 0) return Array.from(displayedLabels);
 
-module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying float border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / border;\n\n  gl_FragColor = mix(color0, color, t);\n}\n"
+  // If panning while unzoomed, we shouldn't change label selection
+  if (unzoomedPanning && displayedLabels.size !== 0) return Array.from(displayedLabels);
 
-/***/ }),
-/* 26 */
-/***/ (function(module, exports) {
+  // Selecting cell
+  var baseCell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
 
-module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    ((u_matrix * vec3(a_position, 1)).xy /\n      u_resolution * 2.0 - 1.0) * vec2(1, -1),\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
+  // Adapting cell dimensions
+  var cellWidthRemainder = dimensions.width % baseCell.width;
+  var cellWidth = baseCell.width + cellWidthRemainder / Math.floor(dimensions.width / baseCell.width);
+
+  var cellHeightRemainder = dimensions.height % baseCell.height;
+  var cellHeight = baseCell.height + cellHeightRemainder / Math.floor(dimensions.height / baseCell.height);
+
+  // Building the grid
+  var grid = {};
+
+  var worthyBuckets = new Set();
+  var worthyLabels = [];
+
+  // Selecting worthy labels
+  for (var i = 0, l = visibleNodes.length; i < l; i++) {
+    var node = visibleNodes[i],
+        nodeData = cache[node];
+
+    // When panning, we should not consider nodes that were previously shown
+    if (panning && !zooming && !unzooming) {
+      if (!displayedLabels.has(node) && previousVisibleNodes.has(node)) continue;
+    }
+
+    // Finding our node's cell in the grid
+    var pos = camera.graphToDisplay(nodeData.x, nodeData.y);
+
+    var xKey = Math.floor(pos.x / cellWidth),
+        yKey = Math.floor(pos.y / cellHeight);
+
+    // NOTE: there seems to be overflowing keys but this is actually a good
+    // thing since it means we grasp margins.
+    var key = xKey + ';' + yKey;
+
+    // When zooming or panning, we aim at keeping the already displayed labels
+    if ((zooming || panning && !unzooming) && displayedLabels.has(node)) {
+      worthyBuckets.add(key);
+      worthyLabels.push(node);
+      continue;
+    }
+
+    if (worthyBuckets.has(key)) continue;
+
+    // Label resolution
+    if (typeof grid[key] === 'undefined') {
+
+      // The cell is empty
+      grid[key] = node;
+    } else {
+
+      // We must solve a conflict in this cell
+      var currentNode = grid[key],
+          currentNodeData = cache[currentNode];
+
+      // In case of size equality, we use the node's key so that the
+      // process remains deterministic
+      if (nodeData.size > currentNodeData.size || nodeData.size === currentNodeData.size && node > currentNode) {
+        grid[key] = node;
+      }
+    }
+  }
+
+  // Compiling the labels
+  for (var _key in grid) {
+    worthyLabels.push(grid[_key]);
+  }return worthyLabels;
+};
 
 /***/ })
 /******/ ]);
