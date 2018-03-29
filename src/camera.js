@@ -164,11 +164,9 @@ export default class Camera extends EventEmitter {
     const dx = smallestDimension / dimensions.width,
           dy = smallestDimension / dimensions.height;
 
-    // TODO: inverse y?
     return {
       x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2 / dx,
-      y: (this.ratio / smallestDimension) * y + this.y - this.ratio / 2 / dy
-      // y: - ((this.ratio / smallestDimension) * y - this.y - this.ratio / 2 / dy)
+      y: -((this.ratio / smallestDimension) * y - this.y - this.ratio / 2 / dy)
     };
   }
 

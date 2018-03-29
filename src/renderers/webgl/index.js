@@ -249,7 +249,7 @@ export default class WebGLRenderer extends Renderer {
       // TODO: minus 1? lol
       return this.quadtree.point(
         mouseGraphPosition.x,
-        1 - mouseGraphPosition.y
+        mouseGraphPosition.y
       );
     };
 
@@ -309,8 +309,6 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling down
     this.listeners.handleDown = e => {
-      return;
-
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
       const quadNodes = getQuadNodes(e.x, e.y);
@@ -320,7 +318,8 @@ export default class WebGLRenderer extends Renderer {
 
         const data = this.nodeDataCache[node];
 
-        const pos = this.camera.graphToDisplay(
+        const pos = this.camera.graphToViewport(
+          this,
           data.x,
           data.y
         );
@@ -334,8 +333,6 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling click
     this.listeners.handleClick = e => {
-      return;
-
       const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
       const quadNodes = getQuadNodes(e.x, e.y);
@@ -345,7 +342,8 @@ export default class WebGLRenderer extends Renderer {
 
         const data = this.nodeDataCache[node];
 
-        const pos = this.camera.graphToDisplay(
+        const pos = this.camera.graphToViewport(
+          this,
           data.x,
           data.y
         );
@@ -410,7 +408,7 @@ export default class WebGLRenderer extends Renderer {
     const graph = this.sigma.getGraph();
 
     // TODO: possible to index this somehow using two byte arrays or so
-    const extent = nodeExtent(graph, ['x', 'y', 'size']);
+    const extent = nodeExtent(graph, ['x', 'y']);
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(extent);
@@ -440,7 +438,7 @@ export default class WebGLRenderer extends Renderer {
 
       const rescaledData = this.normalizationFunction(data);
 
-      // TODO: Optimize this to be save a loop and one object, by using a reversed assign
+      // TODO: Optimize this to save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
       // TODO: this size normalization does not work
@@ -456,7 +454,6 @@ export default class WebGLRenderer extends Renderer {
       nodeProgram.process(displayData, i);
     }
 
-    // TODO: do we need to keep passing gl to the program?
     nodeProgram.bufferData();
 
     const edgeProgram = this.edgePrograms.def;

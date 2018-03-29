@@ -134,7 +134,7 @@ export default class MouseCaptor extends Captor {
 
     this.camera.animate({
       x: cameraState.x - deltaX,
-      y: cameraState.y + deltaY,
+      y: cameraState.y - deltaY,
       ratio: newRatio
     }, {
       easing: 'quadraticInOut',
@@ -259,7 +259,7 @@ export default class MouseCaptor extends Captor {
       const cameraState = this.camera.getState();
 
       const x = cameraState.x + offsetX,
-            y = cameraState.y - offsetY;
+            y = cameraState.y + offsetY;
 
       this.camera.setState({x, y});
 
@@ -336,7 +336,7 @@ export default class MouseCaptor extends Captor {
 
     this.camera.animate({
       x: cameraState.x - deltaX,
-      y: cameraState.y + deltaY,
+      y: cameraState.y - deltaY,
       ratio: newRatio
     }, {
       easing: 'linear',
