@@ -88,8 +88,7 @@ export default class MouseCaptor extends Captor {
 
       return this.handleDoubleClick(e);
     }
-    console.log(getX(e), getY(e))
-    console.log(this.camera.viewportToGraph({width: this.container.offsetWidth, height: this.container.offsetHeight}, getX(e), getY(e)));
+
     setTimeout(() => {
       this.clicks = 0;
       this.doubleClickTimeout = null;

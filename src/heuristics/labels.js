@@ -22,6 +22,8 @@ const DEFAULT_UNZOOMED_CELL = {
   height: 300
 };
 
+// TODO: use degree as secondary tie-breaker
+
 /**
  * Label grid heuristic selecting labels to display according to the following
  * parameters:

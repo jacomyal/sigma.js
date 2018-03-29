@@ -131,6 +131,7 @@ export default class Camera extends EventEmitter {
    * @return {object}            - The point coordinates in the viewport.
    */
 
+  // TODO: assign to gain one object
   // TODO: angles
   graphToViewport(dimensions, x, y) {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);

@@ -240,20 +240,21 @@ export default class WebGLRenderer extends Renderer {
     // Function returning the nodes in the mouse's quad
     const getQuadNodes = (mouseX, mouseY) => {
 
-      const mouseGraphPosition = this.camera.displayToGraph(
+      const mouseGraphPosition = this.camera.viewportToGraph(
+        this,
         mouseX,
         mouseY
       );
 
+      // TODO: minus 1? lol
       return this.quadtree.point(
         mouseGraphPosition.x,
-        mouseGraphPosition.y
+        1 - mouseGraphPosition.y
       );
     };
 
     // Handling mouse move
     this.listeners.handleMove = e => {
-      return;
 
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
@@ -268,7 +269,8 @@ export default class WebGLRenderer extends Renderer {
 
         const data = this.nodeDataCache[node];
 
-        const pos = this.camera.graphToDisplay(
+        const pos = this.camera.graphToViewport(
+          this,
           data.x,
           data.y
         );
@@ -288,7 +290,8 @@ export default class WebGLRenderer extends Renderer {
       if (this.hoveredNode) {
         const data = this.nodeDataCache[this.hoveredNode];
 
-        const pos = this.camera.graphToDisplay(
+        const pos = this.camera.graphToViewport(
+          this,
           data.x,
           data.y
         );
@@ -440,11 +443,12 @@ export default class WebGLRenderer extends Renderer {
       // TODO: Optimize this to be save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
+      // TODO: this size normalization does not work
       this.quadtree.add(
         node,
         displayData.x,
         displayData.y,
-        0.001
+        displayData.size / this.width
       );
 
       this.nodeDataCache[node] = displayData;
@@ -826,7 +830,7 @@ export default class WebGLRenderer extends Renderer {
     const render = node => {
       const data = this.nodeDataCache[node];
 
-      const {x, y} = camera.graphToDisplay(data.x, data.y);
+      const {x, y} = camera.graphToViewport(this, data.x, data.y);
 
       const size = data.size / sizeRatio;
 
