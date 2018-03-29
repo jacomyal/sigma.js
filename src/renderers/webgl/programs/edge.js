@@ -138,7 +138,6 @@ export default class EdgeProgram extends Program {
     let i = POINTS * ATTRIBUTES * offset;
 
     const array = this.array;
-    thickness /= 1000000;
 
     // First point
     array[i++] = x1;

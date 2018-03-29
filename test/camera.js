@@ -13,8 +13,8 @@ describe('Camera', function() {
     const camera = new Camera();
 
     assert.deepEqual(camera.getState(), {
-      x: 0,
-      y: 0,
+      x: 0.5,
+      y: 0.5,
       angle: 0,
       ratio: 1
     });

@@ -11,7 +11,7 @@ import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
 import NodeProgram from './programs/node.fast';
-import EdgeProgram from './programs/edge.fast';
+import EdgeProgram from './programs/edge';
 
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
@@ -723,8 +723,6 @@ export default class WebGLRenderer extends Renderer {
       }
     );
 
-    return;
-
     // Drawing edges
     if (!this.settings.hideEdgesOnMove || !moving) {
       program = this.edgePrograms.def;
@@ -741,6 +739,8 @@ export default class WebGLRenderer extends Renderer {
         }
       );
     }
+
+    return;
 
     // Do not display labels on move per setting
     if (this.settings.hideLabelsOnMove && moving)
