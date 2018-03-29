@@ -12,15 +12,18 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-const float feather = 0.5;
+const float feather = 0.8;
 
 void main() {
 
+  // Computing thickness in pixels
   float pow_ratio = 1.0 / pow(u_ratio, 0.5);
   float thickness = a_thickness / 2.0 * pow_ratio / u_scale;
+
+  // Adding a small feather for AA
   thickness += feather;
 
-  // Scale from [[-1 1] [-1 1]] to the container:
+  // Computing delta relative to viewport
   vec2 delta = (a_normal * thickness) / u_resolution;
 
   vec2 position = (u_matrix * vec3(a_position, 1)).xy;
