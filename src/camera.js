@@ -135,9 +135,14 @@ export default class Camera extends EventEmitter {
   graphToViewport(dimensions, x, y) {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
+    const dx = smallestDimension / dimensions.width,
+          dy = smallestDimension / dimensions.height;
+
+    // TODO: we keep on the upper left corner!
+    // TODO: how to normalize sizes?
     return {
-      x: (x - this.x + this.ratio / 2) * (smallestDimension / this.ratio),
-      y: (y - this.y + this.ratio / 2) * (smallestDimension / this.ratio)
+      x: (x - this.x + this.ratio / 2 / dx) * (smallestDimension / this.ratio),
+      y: (this.y - y + this.ratio / 2 / dy) * (smallestDimension / this.ratio)
     };
   }
 
@@ -155,9 +160,14 @@ export default class Camera extends EventEmitter {
   viewportToGraph(dimensions, x, y) {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
+    const dx = smallestDimension / dimensions.width,
+          dy = smallestDimension / dimensions.height;
+
+    // TODO: inverse y?
     return {
-      x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2,
-      y: (this.ratio / smallestDimension) * y + this.y - this.ratio / 2
+      x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2 / dx,
+      y: (this.ratio / smallestDimension) * y + this.y - this.ratio / 2 / dy
+      // y: - ((this.ratio / smallestDimension) * y - this.y - this.ratio / 2 / dy)
     };
   }
 

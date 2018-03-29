@@ -412,21 +412,11 @@ export default class WebGLRenderer extends Renderer {
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(extent);
 
-    const minRescaled = this.normalizationFunction({
-      x: extent.x[0],
-      y: extent.y[0]
-    });
-
-    const maxRescaled = this.normalizationFunction({
-      x: extent.x[1],
-      y: extent.x[1]
-    });
-
     this.quadtree.resize({
-      x: minRescaled.x,
-      y: minRescaled.y,
-      width: maxRescaled.x - minRescaled.x,
-      height: maxRescaled.y - minRescaled.y
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1
     });
 
     const nodeProgram = this.nodePrograms.def;
@@ -450,7 +440,12 @@ export default class WebGLRenderer extends Renderer {
       // TODO: Optimize this to be save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
-      // this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
+      this.quadtree.add(
+        node,
+        displayData.x,
+        displayData.y,
+        0.001
+      );
 
       this.nodeDataCache[node] = displayData;
 
@@ -740,8 +735,6 @@ export default class WebGLRenderer extends Renderer {
       );
     }
 
-    return;
-
     // Do not display labels on move per setting
     if (this.settings.hideLabelsOnMove && moving)
       return this;
@@ -749,7 +742,7 @@ export default class WebGLRenderer extends Renderer {
     // Finding visible nodes to display their labels
     let visibleNodes;
 
-    if (cameraState.ratio >= 1) {
+    if (true || cameraState.ratio >= 1) {
 
       // Camera is unzoomed so no need to ask the quadtree for visible nodes
       visibleNodes = this.sigma.getGraph().nodes();
@@ -757,15 +750,15 @@ export default class WebGLRenderer extends Renderer {
     else {
 
       // Let's ask the quadtree
-      const viewRectangle = this.camera.viewRectangle();
+      // const viewRectangle = this.camera.viewRectangle();
 
-      visibleNodes = this.quadtree.rectangle(
-        viewRectangle.x1,
-        viewRectangle.y1,
-        viewRectangle.x2,
-        viewRectangle.y2,
-        viewRectangle.height
-      );
+      // visibleNodes = this.quadtree.rectangle(
+      //   viewRectangle.x1,
+      //   viewRectangle.y1,
+      //   viewRectangle.x2,
+      //   viewRectangle.y2,
+      //   viewRectangle.height
+      // );
     }
 
     // Selecting labels to draw
@@ -786,7 +779,7 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
       const data = this.nodeDataCache[labelsToDisplay[i]];
 
-      const {x, y} = this.camera.graphToDisplay(data.x, data.y);
+      const {x, y} = this.camera.graphToViewport(this, data.x, data.y);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       const size = data.size / sizeRatio;

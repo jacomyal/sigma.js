@@ -106,7 +106,8 @@ exports.labelsToDisplayFromGrid = function(params) {
     }
 
     // Finding our node's cell in the grid
-    const pos = camera.graphToDisplay(nodeData.x, nodeData.y);
+    // TODO: pass dimensions to the function
+    const pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
 
     const xKey = Math.floor(pos.x / cellWidth),
           yKey = Math.floor(pos.y / cellHeight);

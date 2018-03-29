@@ -82,5 +82,7 @@ export function createNormalizationFunction(extent) {
     };
   };
 
+  fn.ratio = ratio;
+
   return fn;
 }
