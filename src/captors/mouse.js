@@ -101,21 +101,41 @@ export default class MouseCaptor extends Captor {
     if (!this.enabled)
       return;
 
-    const ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
-
     const center = getCenter(e);
 
     const cameraState = this.camera.getState();
 
-    const position = this.camera.abstractDisplayToGraph(
-      getX(e) - center.x,
-      getY(e) - center.y
-    );
+    const newRatio = cameraState.ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+
+    // TODO: factorize
+    const dimensions = {
+      width: this.container.offsetWidth,
+      height: this.container.offsetHeight
+    };
+
+    const clickX = getX(e),
+          clickY = getY(e);
+
+    // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
+    // TODO: factorize pan & zoomTo
+    const cameraWithNewRatio = new Camera();
+    cameraWithNewRatio.ratio = newRatio;
+    cameraWithNewRatio.x = cameraState.x;
+    cameraWithNewRatio.y = cameraState.y;
+
+    const clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
+          centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
+
+    const clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
+          centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
+
+    const deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
+          deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
 
     this.camera.animate({
-      x: position.x * (1 - ratio) + cameraState.x,
-      y: position.y * (1 - ratio) + cameraState.y,
-      ratio: ratio * cameraState.ratio
+      x: cameraState.x - deltaX,
+      y: cameraState.y + deltaY,
+      ratio: newRatio
     }, {
       easing: 'quadraticInOut',
       duration: DOUBLE_CLICK_ZOOMING_DURATION
