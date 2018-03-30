@@ -113,7 +113,7 @@ export default class EdgeProgram extends Program {
         this.array[i] = 0;
     }
 
-    let thickness = data.size || 1,
+    const thickness = data.size || 1,
           x1 = sourceData.x,
           y1 = sourceData.y,
           x2 = targetData.x,

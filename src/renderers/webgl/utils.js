@@ -83,7 +83,7 @@ export function matrixFromCamera(state, dimensions) {
     height
   } = dimensions;
 
-  let matrix = identity();
+  const matrix = identity();
 
   const smallestDimension = Math.min(width, height);
 
