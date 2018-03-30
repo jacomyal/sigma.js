@@ -177,23 +177,23 @@ export default class Camera extends EventEmitter {
    * @return {object} - The view's rectangle.
    */
 
-  // TODO: probably obsolete with normalized coordinates
-  viewRectangle() {
-    const widthVect = this.abstractDisplayToGraph(this.width, 0),
-          heightVect = this.abstractDisplayToGraph(0, this.height),
-          centerVect = this.abstractDisplayToGraph(this.width / 2, this.height / 2),
-          marginX = this.abstractDisplayToGraph(this.width / 4, 0).x,
-          marginY = this.abstractDisplayToGraph(0, this.height / 4, 0).y;
+  // TODO: angle
+  viewRectangle(dimensions) {
+
+    // TODO: reduce relative margin?
+    const marginX = 0 * this.width / 8,
+          marginY = 0 * this.height / 8;
+
+    const p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
+          p2 = this.viewportToGraph(dimensions, this.width + marginX, 0 - marginY),
+          h = this.viewportToGraph(dimensions, 0, this.height + marginY);
 
     return {
-      x1: this.x - centerVect.x - marginX,
-      y1: this.y - centerVect.y - marginY,
-      x2: this.x - centerVect.x + marginX + widthVect.x,
-      y2: this.y - centerVect.y - marginY + widthVect.y,
-      height: Math.sqrt(
-        Math.pow(heightVect.x, 2) +
-        Math.pow(heightVect.y + 2 * marginY, 2)
-      )
+      x1: p1.x,
+      y1: p1.y,
+      x2: p2.x,
+      y2: p2.y,
+      height: p2.y - h.y
     };
   }
 

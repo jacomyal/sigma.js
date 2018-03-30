@@ -249,7 +249,7 @@ export default class WebGLRenderer extends Renderer {
       // TODO: minus 1? lol
       return this.quadtree.point(
         mouseGraphPosition.x,
-        mouseGraphPosition.y
+        1 - mouseGraphPosition.y
       );
     };
 
@@ -445,7 +445,7 @@ export default class WebGLRenderer extends Renderer {
       this.quadtree.add(
         node,
         displayData.x,
-        displayData.y,
+        1 - displayData.y,
         displayData.size / this.width
       );
 
@@ -743,7 +743,7 @@ export default class WebGLRenderer extends Renderer {
     // Finding visible nodes to display their labels
     let visibleNodes;
 
-    if (true || cameraState.ratio >= 1) {
+    if (cameraState.ratio >= 1) {
 
       // Camera is unzoomed so no need to ask the quadtree for visible nodes
       visibleNodes = this.sigma.getGraph().nodes();
@@ -751,15 +751,15 @@ export default class WebGLRenderer extends Renderer {
     else {
 
       // Let's ask the quadtree
-      // const viewRectangle = this.camera.viewRectangle();
+      const viewRectangle = this.camera.viewRectangle(this);
 
-      // visibleNodes = this.quadtree.rectangle(
-      //   viewRectangle.x1,
-      //   viewRectangle.y1,
-      //   viewRectangle.x2,
-      //   viewRectangle.y2,
-      //   viewRectangle.height
-      // );
+      visibleNodes = this.quadtree.rectangle(
+        viewRectangle.x1,
+        1 - viewRectangle.y1,
+        viewRectangle.x2,
+        1 - viewRectangle.y2,
+        viewRectangle.height
+      );
     }
 
     // Selecting labels to draw
