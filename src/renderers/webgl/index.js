@@ -45,7 +45,12 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  */
 const DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
-  hideLabelsOnMove: false
+  hideLabelsOnMove: false,
+
+  // TEMPORARY LABEL SETTINGS
+  labelFont: 'Arial',
+  labelSize: 14,
+  labelWeight: 'normal'
 };
 
 /**
@@ -794,7 +799,7 @@ export default class WebGLRenderer extends Renderer {
         size,
         x,
         y
-      });
+      }, this.settings);
     }
 
     // Caching visible nodes and displayed labels
@@ -837,7 +842,7 @@ export default class WebGLRenderer extends Renderer {
         size,
         x,
         y
-      });
+      }, this.settings);
     };
 
     if (this.hoveredNode)
