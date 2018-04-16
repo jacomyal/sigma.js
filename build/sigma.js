@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -435,6 +435,115 @@ function isUndefined(arg) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.floatColor = floatColor;
+exports.matrixFromCamera = matrixFromCamera;
+exports.extractPixel = extractPixel;
+
+var _matrices = __webpack_require__(19);
+
+/**
+ * Memoized function returning a float-encoded color from various string
+ * formats describing colors.
+ */
+var FLOAT_COLOR_CACHE = {}; /**
+                             * Sigma.js WebGL Renderer Utils
+                             * ==============================
+                             *
+                             * Miscelleanous helper functions used by sigma's WebGL renderer.
+                             */
+
+
+var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
+var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
+
+function floatColor(val) {
+
+  // If the color is already computed, we yield it
+  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
+
+  var r = 0,
+      g = 0,
+      b = 0;
+
+  // Handling hexadecimal notation
+  if (val[0] === '#') {
+    if (val.length === 4) {
+      r = parseInt(val.charAt(1) + val.charAt(1), 16);
+      g = parseInt(val.charAt(2) + val.charAt(2), 16);
+      b = parseInt(val.charAt(3) + val.charAt(3), 16);
+    } else {
+      r = parseInt(val.charAt(1) + val.charAt(2), 16);
+      g = parseInt(val.charAt(3) + val.charAt(4), 16);
+      b = parseInt(val.charAt(5) + val.charAt(6), 16);
+    }
+  }
+
+  // Handling rgb notation
+  else if (RGBA_TEST_REGEX.test(val)) {
+      var match = val.match(RGBA_EXTRACT_REGEX);
+
+      r = +match[1];
+      g = +match[2];
+      b = +match[3];
+    }
+
+  var color = r * 256 * 256 + g * 256 + b;
+
+  FLOAT_COLOR_CACHE[val] = color;
+
+  return color;
+}
+
+/**
+ * Function returning a matrix from the current state of the camera.
+ */
+
+// TODO: it's possible to optimize this drastically!
+function matrixFromCamera(state, dimensions) {
+  var angle = state.angle,
+      ratio = state.ratio,
+      x = state.x,
+      y = state.y;
+  var width = dimensions.width,
+      height = dimensions.height;
+
+
+  var matrix = (0, _matrices.identity)();
+
+  var scaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
+      rotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
+      translation = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
+      dimensionTranslation = (0, _matrices.translate)((0, _matrices.identity)(), width / 2, height / 2);
+
+  (0, _matrices.multiply)(matrix, scaling);
+  (0, _matrices.multiply)(matrix, rotation);
+  (0, _matrices.multiply)(matrix, translation);
+  matrix = (0, _matrices.multiply)(dimensionTranslation, matrix);
+
+  return matrix;
+}
+
+/**
+ * Function extracting the color at the given pixel.
+ */
+function extractPixel(gl, x, y, array) {
+  var data = array || new Uint8Array(4);
+
+  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+  return data;
+}
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -444,7 +553,7 @@ var _easings = __webpack_require__(13);
 
 var easings = _interopRequireWildcard(_easings);
 
-var _utils = __webpack_require__(5);
+var _utils = __webpack_require__(4);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -493,8 +602,8 @@ var Camera = function (_EventEmitter) {
     // Properties
     var _this = _possibleConstructorReturn(this, (Camera.__proto__ || Object.getPrototypeOf(Camera)).call(this));
 
-    _this.x = 0.5;
-    _this.y = 0.5;
+    _this.x = 0;
+    _this.y = 0;
     _this.angle = 0;
     _this.ratio = 1;
     _this.width = dimensions.width || 0;
@@ -598,57 +707,73 @@ var Camera = function (_EventEmitter) {
     }
 
     /**
-     * Method returning the coordinates of a point from the graph frame to the
-     * viewport.
+     * Method returning the coordinates of a point from the display frame to the
+     * graph one but ignores the offset and dimensions of the container.
      *
-     * @param  {object} dimensions - Dimensions of the viewport.
-     * @param  {number} x          - The X coordinate.
-     * @param  {number} y          - The Y coordinate.
-     * @return {object}            - The point coordinates in the viewport.
+     * @param  {number} x - The X coordinate.
+     * @param  {number} y - The Y coordinate.
+     * @return {object}     The point coordinates in the frame of the graph.
      */
 
-    // TODO: assign to gain one object
-    // TODO: angles
-
   }, {
-    key: 'graphToViewport',
-    value: function graphToViewport(dimensions, x, y) {
-      var smallestDimension = Math.min(dimensions.width, dimensions.height);
+    key: 'abstractDisplayToGraph',
+    value: function abstractDisplayToGraph(x, y) {
+      var cos = Math.cos(this.angle),
+          sin = Math.sin(this.angle);
 
-      var dx = smallestDimension / dimensions.width,
-          dy = smallestDimension / dimensions.height;
-
-      // TODO: we keep on the upper left corner!
-      // TODO: how to normalize sizes?
       return {
-        x: (x - this.x + this.ratio / 2 / dx) * (smallestDimension / this.ratio),
-        y: (this.y - y + this.ratio / 2 / dy) * (smallestDimension / this.ratio)
+        x: (x * cos - y * sin) * this.ratio,
+        y: (y * cos + x * sin) * this.ratio
       };
     }
 
     /**
-     * Method returning the coordinates of a point from the viewport frame to the
-     * graph frame.
+     * Method returning the coordinates of a point from the display frame to the
+     * graph one.
      *
-     * @param  {object} dimensions - Dimensions of the viewport.
-     * @param  {number} x          - The X coordinate.
-     * @param  {number} y          - The Y coordinate.
-     * @return {object}            - The point coordinates in the graph frame.
+     * @param  {number} x - The X coordinate.
+     * @param  {number} y - The Y coordinate.
+     * @return {object}   - The point coordinates in the frame of the graph.
      */
 
-    // TODO: angles
-
   }, {
-    key: 'viewportToGraph',
-    value: function viewportToGraph(dimensions, x, y) {
-      var smallestDimension = Math.min(dimensions.width, dimensions.height);
+    key: 'displayToGraph',
+    value: function displayToGraph(x, y) {
+      var cos = Math.cos(this.angle),
+          sin = Math.sin(this.angle);
 
-      var dx = smallestDimension / dimensions.width,
-          dy = smallestDimension / dimensions.height;
+      var xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio,
+          yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio;
+
+      var X = x - xOffset,
+          Y = y - yOffset;
 
       return {
-        x: this.ratio / smallestDimension * x + this.x - this.ratio / 2 / dx,
-        y: -(this.ratio / smallestDimension * y - this.y - this.ratio / 2 / dy)
+        x: (X * cos - Y * sin) * this.ratio,
+        y: (Y * cos + X * sin) * this.ratio
+      };
+    }
+
+    /**
+     * Method returning the coordinates of a point from the graph frame to the
+     * display one.
+     *
+     * @param  {number} x - The X coordinate.
+     * @param  {number} y - The Y coordinate.
+     * @return {object}   - The point coordinates in the frame of the display.
+     */
+
+  }, {
+    key: 'graphToDisplay',
+    value: function graphToDisplay(x, y) {
+      var relCos = Math.cos(this.angle) / this.ratio,
+          relSin = Math.sin(this.angle) / this.ratio,
+          xOffset = this.width / 2 - this.x * relCos - this.y * relSin,
+          yOffset = this.height / 2 - this.y * relCos + this.x * relSin;
+
+      return {
+        x: x * relCos + y * relSin + xOffset,
+        y: y * relCos - x * relSin + yOffset
       };
     }
 
@@ -659,26 +784,21 @@ var Camera = function (_EventEmitter) {
      * @return {object} - The view's rectangle.
      */
 
-    // TODO: angle
-
   }, {
     key: 'viewRectangle',
-    value: function viewRectangle(dimensions) {
-
-      // TODO: reduce relative margin?
-      var marginX = 0 * this.width / 8,
-          marginY = 0 * this.height / 8;
-
-      var p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
-          p2 = this.viewportToGraph(dimensions, this.width + marginX, 0 - marginY),
-          h = this.viewportToGraph(dimensions, 0, this.height + marginY);
+    value: function viewRectangle() {
+      var widthVect = this.abstractDisplayToGraph(this.width, 0),
+          heightVect = this.abstractDisplayToGraph(0, this.height),
+          centerVect = this.abstractDisplayToGraph(this.width / 2, this.height / 2),
+          marginX = this.abstractDisplayToGraph(this.width / 4, 0).x,
+          marginY = this.abstractDisplayToGraph(0, this.height / 4, 0).y;
 
       return {
-        x1: p1.x,
-        y1: p1.y,
-        x2: p2.x,
-        y2: p2.y,
-        height: p2.y - h.y
+        x1: this.x - centerVect.x - marginX,
+        y1: this.y - centerVect.y - marginY,
+        x2: this.x - centerVect.x + marginX + widthVect.x,
+        y2: this.y - centerVect.y - marginY + widthVect.y,
+        height: Math.sqrt(Math.pow(heightVect.x, 2) + Math.pow(heightVect.y + 2 * marginY, 2))
       };
     }
 
@@ -865,148 +985,7 @@ var Camera = function (_EventEmitter) {
 exports.default = Camera;
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.floatColor = floatColor;
-exports.matrixFromCamera = matrixFromCamera;
-exports.extractPixel = extractPixel;
-
-var _matrices = __webpack_require__(20);
-
-/**
- * Memoized function returning a float-encoded color from various string
- * formats describing colors.
- */
-var FLOAT_COLOR_CACHE = {}; /**
-                             * Sigma.js WebGL Renderer Utils
-                             * ==============================
-                             *
-                             * Miscelleanous helper functions used by sigma's WebGL renderer.
-                             */
-
-
-var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
-var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
-
-function floatColor(val) {
-
-  // If the color is already computed, we yield it
-  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
-
-  var r = 0,
-      g = 0,
-      b = 0;
-
-  // Handling hexadecimal notation
-  if (val[0] === '#') {
-    if (val.length === 4) {
-      r = parseInt(val.charAt(1) + val.charAt(1), 16);
-      g = parseInt(val.charAt(2) + val.charAt(2), 16);
-      b = parseInt(val.charAt(3) + val.charAt(3), 16);
-    } else {
-      r = parseInt(val.charAt(1) + val.charAt(2), 16);
-      g = parseInt(val.charAt(3) + val.charAt(4), 16);
-      b = parseInt(val.charAt(5) + val.charAt(6), 16);
-    }
-  }
-
-  // Handling rgb notation
-  else if (RGBA_TEST_REGEX.test(val)) {
-      var match = val.match(RGBA_EXTRACT_REGEX);
-
-      r = +match[1];
-      g = +match[2];
-      b = +match[3];
-    }
-
-  var color = r * 256 * 256 + g * 256 + b;
-
-  FLOAT_COLOR_CACHE[val] = color;
-
-  return color;
-}
-
-/**
- * Function returning a matrix from the current state of the camera.
- */
-
-// TODO: it's possible to optimize this drastically!
-function matrixFromCamera(state, dimensions) {
-  var angle = state.angle,
-      ratio = state.ratio,
-      x = state.x,
-      y = state.y;
-  var width = dimensions.width,
-      height = dimensions.height;
-
-
-  var matrix = (0, _matrices.identity)();
-
-  var smallestDimension = Math.min(width, height);
-
-  var cameraCentering = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
-      cameraScaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
-      cameraRotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
-      viewportScaling = (0, _matrices.scale)((0, _matrices.identity)(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
-
-  // Logical order is reversed
-  (0, _matrices.multiply)(matrix, viewportScaling);
-  (0, _matrices.multiply)(matrix, cameraRotation);
-  (0, _matrices.multiply)(matrix, cameraScaling);
-  (0, _matrices.multiply)(matrix, cameraCentering);
-
-  return matrix;
-}
-
-/**
- * Function extracting the color at the given pixel.
- */
-function extractPixel(gl, x, y, array) {
-  var data = array || new Uint8Array(4);
-
-  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-  return data;
-}
-
-/***/ }),
 /* 4 */
-/***/ (function(module, exports) {
-
-/**
- * Graphology isGraph
- * ===================
- *
- * Very simple function aiming at ensuring the given variable is a
- * graphology instance.
- */
-
-/**
- * Checking the value is a graphology instance.
- *
- * @param  {any}     value - Target value.
- * @return {boolean}
- */
-module.exports = function isGraph(value) {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    typeof value.addUndirectedEdgeWithKey === 'function' &&
-    typeof value.dropNodes === 'function' &&
-    typeof value.multi === 'boolean'
-  );
-};
-
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1049,7 +1028,7 @@ function assign(target) {
 }
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1442,7 +1421,7 @@ var QuadTree = function () {
 exports.default = QuadTree;
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1453,10 +1432,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _camera = __webpack_require__(2);
-
-var _camera2 = _interopRequireDefault(_camera);
 
 var _captor = __webpack_require__(14);
 
@@ -1512,8 +1487,8 @@ var MouseCaptor = function (_Captor) {
     _this.enabled = true;
     _this.hasDragged = false;
     _this.downStartTime = null;
-    _this.lastMouseX = null;
-    _this.lastMouseY = null;
+    _this.startMouseX = null;
+    _this.startMouseY = null;
     _this.isMouseDown = false;
     _this.isMoving = false;
     _this.movingTimeout = null;
@@ -1573,41 +1548,18 @@ var MouseCaptor = function (_Captor) {
     value: function handleDoubleClick(e) {
       if (!this.enabled) return;
 
+      var ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
+
       var center = (0, _utils.getCenter)(e);
 
       var cameraState = this.camera.getState();
 
-      var newRatio = cameraState.ratio / DOUBLE_CLICK_ZOOMING_RATIO;
-
-      // TODO: factorize
-      var dimensions = {
-        width: this.container.offsetWidth,
-        height: this.container.offsetHeight
-      };
-
-      var clickX = (0, _utils.getX)(e),
-          clickY = (0, _utils.getY)(e);
-
-      // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
-      // TODO: factorize pan & zoomTo
-      var cameraWithNewRatio = new _camera2.default();
-      cameraWithNewRatio.ratio = newRatio;
-      cameraWithNewRatio.x = cameraState.x;
-      cameraWithNewRatio.y = cameraState.y;
-
-      var clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
-          centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
-
-      var clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
-          centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
-
-      var deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-          deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
 
       this.camera.animate({
-        x: cameraState.x - deltaX,
-        y: cameraState.y - deltaY,
-        ratio: newRatio
+        x: position.x * (1 - ratio) + cameraState.x,
+        y: position.y * (1 - ratio) + cameraState.y,
+        ratio: ratio * cameraState.ratio
       }, {
         easing: 'quadraticInOut',
         duration: DOUBLE_CLICK_ZOOMING_DURATION
@@ -1627,8 +1579,8 @@ var MouseCaptor = function (_Captor) {
       this.startCameraState = this.camera.getState();
       this.lastCameraState = this.startCameraState;
 
-      this.lastMouseX = (0, _utils.getX)(e);
-      this.lastMouseY = (0, _utils.getY)(e);
+      this.startMouseX = (0, _utils.getX)(e);
+      this.startMouseY = (0, _utils.getY)(e);
 
       this.hasDragged = false;
 
@@ -1658,18 +1610,17 @@ var MouseCaptor = function (_Captor) {
       var x = (0, _utils.getX)(e),
           y = (0, _utils.getY)(e);
 
-      var cameraState = this.camera.getState(),
-          previousCameraState = this.camera.getPreviousState();
+      var cameraState = this.camera.getState();
 
       if (this.isMoving) {
         this.camera.animate({
-          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
-          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y)
+          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - this.lastCameraState.x),
+          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - this.lastCameraState.y)
         }, {
           duration: MOUSE_INERTIA_DURATION,
           easing: 'quadraticOut'
         });
-      } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
+      } else if (this.startMouseX !== x || this.startMouseY !== y) {
         this.camera.setState({
           x: cameraState.x,
           y: cameraState.y
@@ -1702,30 +1653,22 @@ var MouseCaptor = function (_Captor) {
           _this3.isMoving = false;
         }, DRAG_TIMEOUT);
 
-        var dimensions = {
-          width: this.container.offsetWidth,
-          height: this.container.offsetHeight
-        };
+        var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - this.startMouseX, (0, _utils.getY)(e) - this.startMouseY);
 
-        var eX = (0, _utils.getX)(e),
-            eY = (0, _utils.getY)(e);
-
-        var lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX, this.lastMouseY);
-
-        var mouse = this.camera.viewportToGraph(dimensions, eX, eY);
-
-        var offsetX = lastMouse.x - mouse.x,
-            offsetY = lastMouse.y - mouse.y;
+        var x = this.startCameraState.x - position.x,
+            y = this.startCameraState.y - position.y;
 
         var cameraState = this.camera.getState();
 
-        var x = cameraState.x + offsetX,
-            y = cameraState.y + offsetY;
+        if (cameraState.x !== x || cameraState.y !== y) {
 
-        this.camera.setState({ x: x, y: y });
+          this.lastCameraState = cameraState;
 
-        this.lastMouseX = eX;
-        this.lastMouseY = eY;
+          this.camera.setState({
+            x: x,
+            y: y
+          });
+        }
       }
 
       if (e.preventDefault) e.preventDefault();else e.returnValue = false;
@@ -1762,33 +1705,11 @@ var MouseCaptor = function (_Captor) {
 
       var center = (0, _utils.getCenter)(e);
 
-      var dimensions = {
-        width: this.container.offsetWidth,
-        height: this.container.offsetHeight
-      };
-
-      var clickX = (0, _utils.getX)(e),
-          clickY = (0, _utils.getY)(e);
-
-      // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
-      // TODO: factorize pan & zoomTo
-      var cameraWithNewRatio = new _camera2.default();
-      cameraWithNewRatio.ratio = newRatio;
-      cameraWithNewRatio.x = cameraState.x;
-      cameraWithNewRatio.y = cameraState.y;
-
-      var clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
-          centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
-
-      var clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
-          centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
-
-      var deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-          deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
 
       this.camera.animate({
-        x: cameraState.x - deltaX,
-        y: cameraState.y - deltaY,
+        x: position.x * (1 - ratio) + cameraState.x,
+        y: position.y * (1 - ratio) + cameraState.y,
         ratio: newRatio
       }, {
         easing: 'linear',
@@ -1812,7 +1733,7 @@ var MouseCaptor = function (_Captor) {
 exports.default = MouseCaptor;
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1821,12 +1742,9 @@ exports.default = MouseCaptor;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.createElement = createElement;
 exports.getPixelRatio = getPixelRatio;
-exports.createNormalizationFunction = createNormalizationFunction;
+exports.createRescalingFunction = createRescalingFunction;
 /**
  * Sigma.js Rendering Utils
  * ===========================
@@ -1873,46 +1791,59 @@ function getPixelRatio() {
 }
 
 /**
- * Factory returning a function normalizing the given node's position & size.
+ * Default rescale options.
+ */
+var DEFAULT_RESCALE_OPTIONS = {
+  mode: 'inside',
+  margin: 0
+};
+
+// TODO: should we put the rescaling in the camera itself?
+
+/**
+ * Factory returning a function rescaling the given node's position.
  *
+ * @param  {object}   options - Options.
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-function createNormalizationFunction(extent) {
-  var _extent$x = _slicedToArray(extent.x, 2),
-      minX = _extent$x[0],
-      maxX = _extent$x[1],
-      _extent$y = _slicedToArray(extent.y, 2),
-      minY = _extent$y[0],
-      maxY = _extent$y[1];
+function createRescalingFunction(options, extent) {
+  options = options || {};
 
-  var ratio = Math.max(maxX - minX, maxY - minY);
+  var mode = options.mode || DEFAULT_RESCALE_OPTIONS.mode,
+      height = options.height || 1,
+      width = options.width || 1;
 
-  var dX = (maxX + minX) / 2,
-      dY = (maxY + minY) / 2;
+  var maxX = extent.maxX,
+      maxY = extent.maxY,
+      minX = extent.minX,
+      minY = extent.minY;
+
+
+  var hx = (maxX + minX) / 2,
+      hy = (maxY + minY) / 2;
+
+  var scale = mode === 'outside' ? Math.max(width / Math.max(maxX - minX, 1), height / Math.max(maxY - minY, 1)) : Math.min(width / Math.max(maxX - minX, 1), height / Math.max(maxY - minY, 1));
 
   var fn = function fn(data) {
     return {
-      x: 0.5 + (data.x - dX) / ratio,
-      y: 0.5 + (data.y - dY) / ratio
+      x: (data.x - hx) * scale,
+      y: (data.y - hy) * scale
     };
   };
 
-  // TODO: unit test this
   fn.inverse = function (data) {
     return {
-      x: dX + ratio * (data.x - 0.5),
-      y: dY + ratio * (data.y - 0.5)
+      x: data.x / scale + hx,
+      y: data.y / scale + hy
     };
   };
-
-  fn.ratio = ratio;
 
   return fn;
 }
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1932,7 +1863,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 exports.createCompoundProgram = createCompoundProgram;
 
-var _utils = __webpack_require__(19);
+var _utils = __webpack_require__(18);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -2045,7 +1976,7 @@ function createCompoundProgram(programClasses) {
 }
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2061,25 +1992,21 @@ exports.default = drawLabel;
  *
  * Function used by the canvas renderer to display a single node's label.
  */
-function drawLabel(context, data, settings) {
-  var size = settings.labelSize,
-      font = settings.labelFont,
-      weight = settings.labelWeight;
-
+function drawLabel(context, data) {
   context.fillStyle = '#000';
-  context.font = weight + ' ' + size + 'px ' + font;
+  context.font = '14px arial';
 
-  context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
+  context.fillText(data.label, data.x + data.size + 3, data.y + 14 / 3);
 }
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _sigma = __webpack_require__(12);
+var _sigma = __webpack_require__(11);
 
 var _sigma2 = _interopRequireDefault(_sigma);
 
@@ -2087,15 +2014,15 @@ var _renderer = __webpack_require__(0);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(2);
+var _camera = __webpack_require__(3);
 
 var _camera2 = _interopRequireDefault(_camera);
 
-var _quadtree = __webpack_require__(6);
+var _quadtree = __webpack_require__(5);
 
 var _quadtree2 = _interopRequireDefault(_quadtree);
 
-var _mouse = __webpack_require__(7);
+var _mouse = __webpack_require__(6);
 
 var _mouse2 = _interopRequireDefault(_mouse);
 
@@ -2125,7 +2052,7 @@ for (var k in library) {
 }module.exports = _sigma2.default;
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2144,7 +2071,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
 
-var _isGraph = __webpack_require__(4);
+var _isGraph = __webpack_require__(12);
 
 var _isGraph2 = _interopRequireDefault(_isGraph);
 
@@ -2246,12 +2173,98 @@ var Sigma = function () {
       // TODO: this will change to compose state later
       return this.graph.getEdgeAttributes(key);
     }
+
+    /**
+     * Method returning the extent of the bound graph.
+     *
+     * @return {object} - The graph's extent.
+     */
+
+  }, {
+    key: 'getGraphExtent',
+    value: function getGraphExtent() {
+      var graph = this.graph;
+
+      var nodes = graph.nodes(),
+          edges = graph.edges();
+
+      var maxX = -Infinity,
+          maxY = -Infinity,
+          minX = Infinity,
+          minY = Infinity,
+          maxNodeSize = -Infinity,
+          maxEdgeSize = -Infinity;
+
+      for (var i = 0, l = nodes.length; i < l; i++) {
+        var node = nodes[i];
+
+        var data = this.getNodeData(node);
+
+        var size = data.size || 1;
+
+        if (data.x > maxX) maxX = data.x;
+        if (data.y > maxY) maxY = data.y;
+
+        if (data.x < minX) minX = data.x;
+        if (data.y < minY) minY = data.y;
+
+        if (size > maxNodeSize) maxNodeSize = size;
+      }
+
+      for (var _i = 0, _l = edges.length; _i < _l; _i++) {
+        var edge = edges[_i];
+
+        var _data = this.getEdgeData(edge);
+
+        var _size = _data.size || 1;
+
+        if (_size > maxEdgeSize) maxEdgeSize = _size;
+      }
+
+      return {
+        maxX: maxX,
+        maxY: maxY,
+        minX: minX,
+        minY: minY,
+        maxNodeSize: maxNodeSize,
+        maxEdgeSize: maxEdgeSize
+      };
+    }
   }]);
 
   return Sigma;
 }();
 
 exports.default = Sigma;
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+/**
+ * Graphology isGraph
+ * ===================
+ *
+ * Very simple function aiming at ensuring the given variable is a
+ * graphology instance.
+ */
+
+/**
+ * Checking the value is a graphology instance.
+ *
+ * @param  {any}     value - Target value.
+ * @return {boolean}
+ */
+module.exports = function isGraph(value) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.addUndirectedEdgeWithKey === 'function' &&
+    typeof value.dropNodes === 'function' &&
+    typeof value.multi === 'boolean'
+  );
+};
+
 
 /***/ }),
 /* 13 */
@@ -2361,7 +2374,7 @@ exports.getCenter = getCenter;
 exports.getMouseCoords = getMouseCoords;
 exports.getWheelDelta = getWheelDelta;
 
-var _utils = __webpack_require__(8);
+var _utils = __webpack_require__(7);
 
 /**
  * Extract the local X position from a mouse or touch event.
@@ -2497,49 +2510,45 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extent = __webpack_require__(17);
-
-var _extent2 = _interopRequireDefault(_extent);
-
 var _renderer = __webpack_require__(0);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(2);
+var _camera = __webpack_require__(3);
 
 var _camera2 = _interopRequireDefault(_camera);
 
-var _mouse = __webpack_require__(7);
+var _mouse = __webpack_require__(6);
 
 var _mouse2 = _interopRequireDefault(_mouse);
 
-var _quadtree = __webpack_require__(6);
+var _quadtree = __webpack_require__(5);
 
 var _quadtree2 = _interopRequireDefault(_quadtree);
 
-var _node = __webpack_require__(18);
+var _node = __webpack_require__(17);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _edge = __webpack_require__(23);
+var _edge = __webpack_require__(22);
 
 var _edge2 = _interopRequireDefault(_edge);
 
-var _label = __webpack_require__(10);
+var _label = __webpack_require__(9);
 
 var _label2 = _interopRequireDefault(_label);
 
-var _hover = __webpack_require__(26);
+var _hover = __webpack_require__(25);
 
 var _hover2 = _interopRequireDefault(_hover);
 
-var _utils = __webpack_require__(5);
+var _utils = __webpack_require__(4);
 
-var _utils2 = __webpack_require__(8);
+var _utils2 = __webpack_require__(7);
 
-var _utils3 = __webpack_require__(3);
+var _utils3 = __webpack_require__(2);
 
-var _labels = __webpack_require__(28);
+var _labels = __webpack_require__(27);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2566,12 +2575,7 @@ var WEBGL_OVERSAMPLING_RATIO = (0, _utils2.getPixelRatio)();
  */
 var DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
-  hideLabelsOnMove: false,
-
-  // TEMPORARY LABEL SETTINGS
-  labelFont: 'Arial',
-  labelSize: 14,
-  labelWeight: 'normal'
+  hideLabelsOnMove: false
 };
 
 /**
@@ -2612,8 +2616,8 @@ var WebGLRenderer = function (_Renderer) {
     _this.nodeDataCache = {};
     _this.edgeOrder = {};
 
-    // Normalization function
-    _this.normalizationFunction = null;
+    // Rescaling function
+    _this.rescalingFunction = null;
 
     // Starting dimensions
     _this.width = 0;
@@ -2776,10 +2780,9 @@ var WebGLRenderer = function (_Renderer) {
       // Function returning the nodes in the mouse's quad
       var getQuadNodes = function getQuadNodes(mouseX, mouseY) {
 
-        var mouseGraphPosition = _this3.camera.viewportToGraph(_this3, mouseX, mouseY);
+        var mouseGraphPosition = _this3.camera.displayToGraph(mouseX, mouseY);
 
-        // TODO: minus 1? lol
-        return _this3.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
+        return _this3.quadtree.point(mouseGraphPosition.x, mouseGraphPosition.y);
       };
 
       // Handling mouse move
@@ -2798,7 +2801,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
+          var pos = _this3.camera.graphToDisplay(data.x, data.y);
 
           var size = data.size / sizeRatio;
 
@@ -2815,7 +2818,7 @@ var WebGLRenderer = function (_Renderer) {
         if (_this3.hoveredNode) {
           var _data = _this3.nodeDataCache[_this3.hoveredNode];
 
-          var _pos = _this3.camera.graphToViewport(_this3, _data.x, _data.y);
+          var _pos = _this3.camera.graphToDisplay(_data.x, _data.y);
 
           var _size = _data.size / sizeRatio;
 
@@ -2839,7 +2842,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
+          var pos = _this3.camera.graphToDisplay(data.x, data.y);
 
           var size = data.size / sizeRatio;
 
@@ -2858,7 +2861,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
+          var pos = _this3.camera.graphToDisplay(data.x, data.y);
 
           var size = data.size / sizeRatio;
 
@@ -2928,16 +2931,26 @@ var WebGLRenderer = function (_Renderer) {
       var graph = this.sigma.getGraph();
 
       // TODO: possible to index this somehow using two byte arrays or so
-      var extent = (0, _extent2.default)(graph, ['x', 'y']);
+      var extent = this.sigma.getGraphExtent();
 
       // Rescaling function
-      this.normalizationFunction = (0, _utils2.createNormalizationFunction)(extent);
+      this.rescalingFunction = (0, _utils2.createRescalingFunction)({ width: this.width, height: this.height }, extent);
+
+      var minRescaled = this.rescalingFunction({
+        x: extent.minX,
+        y: extent.minY
+      });
+
+      var maxRescaled = this.rescalingFunction({
+        x: extent.maxX,
+        y: extent.maxY
+      });
 
       this.quadtree.resize({
-        x: 0,
-        y: 0,
-        width: 1,
-        height: 1
+        x: minRescaled.x,
+        y: minRescaled.y,
+        width: maxRescaled.x - minRescaled.x,
+        height: maxRescaled.y - minRescaled.y
       });
 
       var nodeProgram = this.nodePrograms.def;
@@ -2956,19 +2969,19 @@ var WebGLRenderer = function (_Renderer) {
 
         var data = this.sigma.getNodeData(node);
 
-        var rescaledData = this.normalizationFunction(data);
+        var rescaledData = this.rescalingFunction(data);
 
-        // TODO: Optimize this to save a loop and one object, by using a reversed assign
+        // TODO: Optimize this to be save a loop and one object, by using a reversed assign
         var displayData = (0, _utils.assign)({}, data, rescaledData);
 
-        // TODO: this size normalization does not work
-        this.quadtree.add(node, displayData.x, 1 - displayData.y, displayData.size / this.width);
+        this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
 
         this.nodeDataCache[node] = displayData;
 
         nodeProgram.process(displayData, i);
       }
 
+      // TODO: do we need to keep passing gl to the program?
       nodeProgram.bufferData();
 
       var edgeProgram = this.edgePrograms.def;
@@ -3256,9 +3269,9 @@ var WebGLRenderer = function (_Renderer) {
       } else {
 
         // Let's ask the quadtree
-        var viewRectangle = this.camera.viewRectangle(this);
+        var viewRectangle = this.camera.viewRectangle();
 
-        visibleNodes = this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height);
+        visibleNodes = this.quadtree.rectangle(viewRectangle.x1, viewRectangle.y1, viewRectangle.x2, viewRectangle.y2, viewRectangle.height);
       }
 
       // Selecting labels to draw
@@ -3279,9 +3292,9 @@ var WebGLRenderer = function (_Renderer) {
       for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
         var data = this.nodeDataCache[labelsToDisplay[i]];
 
-        var _camera$graphToViewpo = this.camera.graphToViewport(this, data.x, data.y),
-            x = _camera$graphToViewpo.x,
-            y = _camera$graphToViewpo.y;
+        var _camera$graphToDispla = this.camera.graphToDisplay(data.x, data.y),
+            x = _camera$graphToDispla.x,
+            y = _camera$graphToDispla.y;
 
         // TODO: we can cache the labels we need to render until the camera's ratio changes
 
@@ -3297,7 +3310,7 @@ var WebGLRenderer = function (_Renderer) {
           size: size,
           x: x,
           y: y
-        }, this.settings);
+        });
       }
 
       // Caching visible nodes and displayed labels
@@ -3334,9 +3347,9 @@ var WebGLRenderer = function (_Renderer) {
       var render = function render(node) {
         var data = _this5.nodeDataCache[node];
 
-        var _camera$graphToViewpo2 = camera.graphToViewport(_this5, data.x, data.y),
-            x = _camera$graphToViewpo2.x,
-            y = _camera$graphToViewpo2.y;
+        var _camera$graphToDispla2 = camera.graphToDisplay(data.x, data.y),
+            x = _camera$graphToDispla2.x,
+            y = _camera$graphToDispla2.y;
 
         var size = data.size / sizeRatio;
 
@@ -3346,7 +3359,7 @@ var WebGLRenderer = function (_Renderer) {
           size: size,
           x: x,
           y: y
-        }, _this5.settings);
+        });
       };
 
       if (this.hoveredNode) render(this.hoveredNode);
@@ -3459,126 +3472,6 @@ exports.default = WebGLRenderer;
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/**
- * Graphology Extent
- * ==================
- *
- * Simple function returning the extent of selected attributes of the graph.
- */
-var isGraph = __webpack_require__(4);
-
-/**
- * Function returning the extent of the selected node attributes.
- *
- * @param  {Graph}        graph     - Target graph.
- * @param  {string|array} attribute - Single or multiple attributes.
- * @return {array|object}
- */
-function nodeExtent(graph, attribute) {
-  if (!isGraph(graph))
-    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
-
-  var attributes = [].concat(attribute);
-
-  var nodes = graph.nodes(),
-      node,
-      data,
-      value,
-      key,
-      a,
-      i,
-      l;
-
-  var results = {};
-
-  for (a = 0; a < attributes.length; a++) {
-    key = attributes[a];
-
-    results[key] = [Infinity, -Infinity];
-  }
-
-  for (i = 0, l = nodes.length; i < l; i++) {
-    node = nodes[i];
-    data = graph.getNodeAttributes(node);
-
-    for (a = 0; a < attributes.length; a++) {
-      key = attributes[a];
-      value = data[key];
-
-      if (value < results[key][0])
-        results[key][0] = value;
-
-      if (value > results[key][1])
-        results[key][1] = value;
-    }
-  }
-
-  return typeof attribute === 'string' ? results[attribute] : results;
-}
-
-/**
- * Function returning the extent of the selected edge attributes.
- *
- * @param  {Graph}        graph     - Target graph.
- * @param  {string|array} attribute - Single or multiple attributes.
- * @return {array|object}
- */
-function edgeExtent(graph, attribute) {
-  if (!isGraph(graph))
-    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
-
-  var attributes = [].concat(attribute);
-
-  var edges = graph.edges(),
-      edge,
-      data,
-      value,
-      key,
-      a,
-      i,
-      l;
-
-  var results = {};
-
-  for (a = 0; a < attributes.length; a++) {
-    key = attributes[a];
-
-    results[key] = [Infinity, -Infinity];
-  }
-
-  for (i = 0, l = edges.length; i < l; i++) {
-    edge = edges[i];
-    data = graph.getEdgeAttributes(edge);
-
-    for (a = 0; a < attributes.length; a++) {
-      key = attributes[a];
-      value = data[key];
-
-      if (value < results[key][0])
-        results[key][0] = value;
-
-      if (value > results[key][1])
-        results[key][1] = value;
-    }
-  }
-
-  return typeof attribute === 'string' ? results[attribute] : results;
-}
-
-/**
- * Exporting.
- */
-var extent = nodeExtent;
-extent.nodeExtent = nodeExtent;
-extent.edgeExtent = edgeExtent;
-
-module.exports = extent;
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -3588,17 +3481,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _program = __webpack_require__(9);
+var _program = __webpack_require__(8);
 
 var _program2 = _interopRequireDefault(_program);
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
-var _nodeFastVert = __webpack_require__(21);
+var _nodeFastVert = __webpack_require__(20);
 
 var _nodeFastVert2 = _interopRequireDefault(_nodeFastVert);
 
-var _nodeFastFrag = __webpack_require__(22);
+var _nodeFastFrag = __webpack_require__(21);
 
 var _nodeFastFrag2 = _interopRequireDefault(_nodeFastFrag);
 
@@ -3710,7 +3603,7 @@ var NodeProgramFast = function (_Program) {
 exports.default = NodeProgramFast;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3790,7 +3683,7 @@ function loadProgram(gl, shaders) {
 }
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3814,10 +3707,9 @@ function identity() {
   return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 
-// TODO: optimize
-function scale(m, x, y) {
+function scale(m, x) {
   m[0] = x;
-  m[4] = y || x;
+  m[4] = x;
 
   return m;
 }
@@ -3878,19 +3770,19 @@ function multiply(a, b) {
 }
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    (u_matrix * vec3(a_position, 1)).xy,\n    0,\n    1\n  );\n\n  // gl_Position = vec4(\n  //   ((u_matrix * vec3(a_position, 1)).xy /\n  //     u_resolution * 2.0 - 1.0) * vec2(1, -1),\n  //   0,\n  //   1\n  // );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    ((u_matrix * vec3(a_position, 1)).xy /\n      u_resolution * 2.0 - 1.0) * vec2(1, -1),\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying float border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / border;\n\n  gl_FragColor = mix(color0, color, t);\n}\n"
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3902,17 +3794,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _program = __webpack_require__(9);
+var _program = __webpack_require__(8);
 
 var _program2 = _interopRequireDefault(_program);
 
-var _utils = __webpack_require__(3);
+var _utils = __webpack_require__(2);
 
-var _edgeVert = __webpack_require__(24);
+var _edgeVert = __webpack_require__(23);
 
 var _edgeVert2 = _interopRequireDefault(_edgeVert);
 
-var _edgeFrag = __webpack_require__(25);
+var _edgeFrag = __webpack_require__(24);
 
 var _edgeFrag2 = _interopRequireDefault(_edgeFrag);
 
@@ -4139,34 +4031,34 @@ var EdgeProgram = function (_Program) {
 exports.default = EdgeProgram;
 
 /***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5;\n\nvoid main() {\n\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = (a_thickness + feather) / 2.0 / pow_ratio / u_scale;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * thickness);\n\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness / u_ratio;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
+
+/***/ }),
 /* 24 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness / 2.0 * pow_ratio / u_scale;\n\n  // Adding a small feather for AA\n  thickness += feather;\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5 / 2.0;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
 
 /***/ }),
 /* 25 */
-/***/ (function(module, exports) {
-
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
-
-/***/ }),
-/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-      value: true
+  value: true
 });
 exports.default = drawHover;
 
-var _node = __webpack_require__(27);
+var _node = __webpack_require__(26);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _label = __webpack_require__(10);
+var _label = __webpack_require__(9);
 
 var _label2 = _interopRequireDefault(_label);
 
@@ -4179,54 +4071,158 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
-function drawHover(context, data, settings) {
-      var size = settings.labelSize,
-          font = settings.labelFont,
-          weight = settings.labelWeight;
+function drawHover(context, data) {
 
-      context.font = weight + ' ' + size + 'px ' + font;
+  context.font = '14px arial';
 
-      // Then we draw the label background
-      context.beginPath();
-      context.fillStyle = '#fff';
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 0;
-      context.shadowBlur = 8;
-      context.shadowColor = '#000';
+  // Then we draw the label background
+  context.beginPath();
+  context.fillStyle = '#fff';
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.shadowBlur = 8;
+  context.shadowColor = '#000';
 
-      var textWidth = context.measureText(data.label).width;
+  var textWidth = context.measureText(data.label).width;
 
-      var x = Math.round(data.x - size / 2 - 2),
-          y = Math.round(data.y - size / 2 - 2),
-          w = Math.round(textWidth + size / 2 + data.size + 9),
-          h = Math.round(size + 4),
-          e = Math.round(size / 2 + 2);
+  var x = Math.round(data.x - 14 / 2 - 2),
+      y = Math.round(data.y - 14 / 2 - 2),
+      w = Math.round(textWidth + 14 / 2 + data.size + 9),
+      h = Math.round(14 + 4),
+      e = Math.round(14 / 2 + 2);
 
-      context.moveTo(x, y + e);
-      context.moveTo(x, y + e);
-      context.arcTo(x, y, x + e, y, e);
-      context.lineTo(x + w, y);
-      context.lineTo(x + w, y + h);
-      context.lineTo(x + e, y + h);
-      context.arcTo(x, y + h, x, y + h - e, e);
-      context.lineTo(x, y + e);
+  context.moveTo(x, y + e);
+  context.moveTo(x, y + e);
+  context.arcTo(x, y, x + e, y, e);
+  context.lineTo(x + w, y);
+  context.lineTo(x + w, y + h);
+  context.lineTo(x + e, y + h);
+  context.arcTo(x, y + h, x, y + h - e, e);
+  context.lineTo(x, y + e);
 
-      context.closePath();
-      context.fill();
+  context.closePath();
+  context.fill();
 
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 0;
-      context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.shadowBlur = 0;
 
-      // Then we need to draw the node
-      (0, _node2.default)(context, data);
+  // Then we need to draw the node
+  (0, _node2.default)(context, data);
 
-      // And finally we draw the label
-      (0, _label2.default)(context, data, settings);
+  // And finally we draw the label
+  (0, _label2.default)(context, data);
 }
 
+// ;(function(undefined) {
+//   'use strict';
+
+//   if (typeof sigma === 'undefined')
+//     throw 'sigma is not declared';
+
+//   // Initialize packages:
+//   sigma.utils.pkg('sigma.canvas.hovers');
+
+//   /**
+//    * This hover renderer will basically display the label with a background.
+//    *
+//    * @param  {object}                   node     The node object.
+//    * @param  {CanvasRenderingContext2D} context  The canvas context.
+//    * @param  {configurable}             settings The settings function.
+//    */
+//   sigma.canvas.hovers.def = function(node, context, settings) {
+//     var x,
+//         y,
+//         w,
+//         h,
+//         e,
+//         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
+//         prefix = settings('prefix') || '',
+//         size = node[prefix + 'size'],
+//         fontSize = (settings('labelSize') === 'fixed') ?
+//           settings('defaultLabelSize') :
+//           settings('labelSizeRatio') * size;
+
+//     // Label background:
+//     context.font = (fontStyle ? fontStyle + ' ' : '') +
+//       fontSize + 'px ' + (settings('hoverFont') || settings('font'));
+
+//     context.beginPath();
+//     context.fillStyle = settings('labelHoverBGColor') === 'node' ?
+//       (node.color || settings('defaultNodeColor')) :
+//       settings('defaultHoverLabelBGColor');
+
+//     if (node.label && settings('labelHoverShadow')) {
+//       context.shadowOffsetX = 0;
+//       context.shadowOffsetY = 0;
+//       context.shadowBlur = 8;
+//       context.shadowColor = settings('labelHoverShadowColor');
+//     }
+
+//     if (node.label && typeof node.label === 'string') {
+//       x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
+//       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
+//       w = Math.round(
+//         context.measureText(node.label).width + fontSize / 2 + size + 7
+//       );
+//       h = Math.round(fontSize + 4);
+//       e = Math.round(fontSize / 2 + 2);
+
+//       context.moveTo(x, y + e);
+//       context.arcTo(x, y, x + e, y, e);
+//       context.lineTo(x + w, y);
+//       context.lineTo(x + w, y + h);
+//       context.lineTo(x + e, y + h);
+//       context.arcTo(x, y + h, x, y + h - e, e);
+//       context.lineTo(x, y + e);
+
+//       context.closePath();
+//       context.fill();
+
+//       context.shadowOffsetX = 0;
+//       context.shadowOffsetY = 0;
+//       context.shadowBlur = 0;
+//     }
+
+//     // Node border:
+//     if (settings('borderSize') > 0) {
+//       context.beginPath();
+//       context.fillStyle = settings('nodeBorderColor') === 'node' ?
+//         (node.color || settings('defaultNodeColor')) :
+//         settings('defaultNodeBorderColor');
+//       context.arc(
+//         node[prefix + 'x'],
+//         node[prefix + 'y'],
+//         size + settings('borderSize'),
+//         0,
+//         Math.PI * 2,
+//         true
+//       );
+//       context.closePath();
+//       context.fill();
+//     }
+
+//     // Node:
+//     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
+//     nodeRenderer(node, context, settings);
+
+//     // Display the label:
+//     if (node.label && typeof node.label === 'string') {
+//       context.fillStyle = (settings('labelHoverColor') === 'node') ?
+//         (node.color || settings('defaultNodeColor')) :
+//         settings('defaultLabelHoverColor');
+
+//       context.fillText(
+//         node.label,
+//         Math.round(node[prefix + 'x'] + size + 3),
+//         Math.round(node[prefix + 'y'] + fontSize / 3)
+//       );
+//     }
+//   };
+// }).call(this);
+
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4255,7 +4251,7 @@ function drawNode(context, data) {
 }
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4284,8 +4280,6 @@ var DEFAULT_UNZOOMED_CELL = {
   width: 400,
   height: 300
 };
-
-// TODO: use degree as secondary tie-breaker
 
 /**
  * Label grid heuristic selecting labels to display according to the following
@@ -4361,8 +4355,7 @@ exports.labelsToDisplayFromGrid = function (params) {
     }
 
     // Finding our node's cell in the grid
-    // TODO: pass dimensions to the function
-    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+    var pos = camera.graphToDisplay(nodeData.x, nodeData.y);
 
     var xKey = Math.floor(pos.x / cellWidth),
         yKey = Math.floor(pos.y / cellHeight);
