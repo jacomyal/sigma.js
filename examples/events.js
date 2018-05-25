@@ -3,7 +3,6 @@ import erdosRenyi from 'graphology-generators/random/erdos-renyi';
 import randomLayout from 'graphology-layout/random';
 import chroma from 'chroma-js';
 import faker from 'faker';
-import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
 
 const container = document.getElementById('container');
@@ -28,9 +27,7 @@ graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
-const renderer = new WebGLRenderer(container);
-
-const sigma = new Sigma(graph, renderer);
+const renderer = new WebGLRenderer(graph, container);
 
 // Binding events
 renderer.on('overNode', e => {

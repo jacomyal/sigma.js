@@ -3,7 +3,6 @@ import clusters from 'graphology-generators/random/clusters';
 import randomLayout from 'graphology-layout/random';
 import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import faker from 'faker';
-import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
 
 const PALETTE = [
@@ -44,9 +43,7 @@ graph.edges().forEach(edge => {
 });
 console.timeEnd('Edge Attributes');
 
-const renderer = new WebGLRenderer(container);
-
-const sigma = new Sigma(graph, renderer);
+const renderer = new WebGLRenderer(graph, container);
 
 const layout = new FA2Layout(graph);
 layout.start({settings: {barnesHutOptimize: true}});

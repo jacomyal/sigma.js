@@ -5,6 +5,7 @@
  * File implementing sigma's WebGL Renderer.
  */
 import nodeExtent from 'graphology-metrics/extent';
+import isGraph from 'graphology-utils/is-graph';
 
 import Renderer from '../../renderer';
 import Camera from '../../camera';
@@ -57,10 +58,12 @@ const DEFAULT_SETTINGS = {
  * Main class.
  *
  * @constructor
- * @param {HTMLElement} container - The graph's container.
+ * @param {Graph}       graph     - Graph to render.
+ * @param {HTMLElement} container - DOM container in which to render.
+ * @param {object}      settings  - Optional settings.
  */
 export default class WebGLRenderer extends Renderer {
-  constructor(container, settings) {
+  constructor(graph, container, settings) {
     super();
 
     settings = settings || {};
@@ -68,11 +71,14 @@ export default class WebGLRenderer extends Renderer {
     this.settings = assign({}, DEFAULT_SETTINGS, settings);
 
     // Validating
+    if (!isGraph(graph))
+      throw new Error('sigma/renderers/webgl: invalid graph instance.');
+
     if (!(container instanceof HTMLElement))
       throw new Error('sigma/renderers/webgl: container should be an html element.');
 
     // Properties
-    this.sigma = null;
+    this.graph = graph;
     this.captors = {};
     this.container = container;
     this.elements = {};
@@ -150,6 +156,13 @@ export default class WebGLRenderer extends Renderer {
 
     // Binding event handlers
     this.bindEventHandlers();
+
+    // Binding graph handlers
+    this.bindGraphHandlers();
+
+    // Processing data for the first time & render
+    this.process();
+    this.render();
   }
 
   /**---------------------------------------------------------------------------
@@ -377,7 +390,7 @@ export default class WebGLRenderer extends Renderer {
    */
   bindGraphHandlers() {
 
-    const graph = this.sigma.getGraph();
+    const graph = this.graph;
 
     this.listeners.graphUpdate = () => {
       this.needToProcess = true;
@@ -410,7 +423,7 @@ export default class WebGLRenderer extends Renderer {
    */
   process(keepArrays = false) {
 
-    const graph = this.sigma.getGraph();
+    const graph = this.graph;
 
     // TODO: possible to index this somehow using two byte arrays or so
     const extent = nodeExtent(graph, ['x', 'y']);
@@ -439,7 +452,7 @@ export default class WebGLRenderer extends Renderer {
 
       this.nodeOrder[node] = i;
 
-      const data = this.sigma.getNodeData(node);
+      const data = graph.getNodeAttributes(node);
 
       const rescaledData = this.normalizationFunction(data);
 
@@ -475,7 +488,7 @@ export default class WebGLRenderer extends Renderer {
 
       this.edgeOrder[edge] = i;
 
-      const data = this.sigma.getEdgeData(edge),
+      const data = graph.getEdgeAttributes(edge),
             extremities = graph.extremities(edge),
             sourceData = this.nodeDataCache[extremities[0]],
             targetData = this.nodeDataCache[extremities[1]];
@@ -506,7 +519,7 @@ export default class WebGLRenderer extends Renderer {
 
     const nodeProgram = this.nodePrograms.def;
 
-    const data = this.sigma.getNodeData(key);
+    const data = this.graph.getNodeAttributes(key);
 
     nodeProgram.process(
       data,
@@ -523,14 +536,14 @@ export default class WebGLRenderer extends Renderer {
    */
   processEdge(key) {
 
-    const graph = this.sigma.getGraph();
+    const graph = this.graph;
 
     const edgeProgram = this.edgePrograms.def;
 
-    const data = this.sigma.getEdgeData(key),
+    const data = graph.getEdgeAttributes(key),
           extremities = graph.extremities(key),
-          sourceData = this.sigma.getNodeData(extremities[0]),
-          targetData = this.sigma.getNodeData(extremities[1]);
+          sourceData = graph.getNodeAttributes(extremities[0]),
+          targetData = graph.getNodeAttributes(extremities[1]);
 
     edgeProgram.process(
       sourceData,
@@ -546,25 +559,6 @@ export default class WebGLRenderer extends Renderer {
    * Public API.
    **---------------------------------------------------------------------------
    */
-
-  /**
-   * Method used to bind the renderer to a sigma instance.
-   *
-   * @param  {Sigma} sigma - Target sigma instance.
-   * @return {WebGLRenderer}
-   */
-  bind(sigma) {
-
-    // Binding instance
-    this.sigma = sigma;
-
-    this.bindGraphHandlers();
-
-    // Processing initial data
-    this.process();
-
-    return this;
-  }
 
   /**
    * Method returning the renderer's camera.
@@ -751,7 +745,7 @@ export default class WebGLRenderer extends Renderer {
     if (cameraState.ratio >= 1) {
 
       // Camera is unzoomed so no need to ask the quadtree for visible nodes
-      visibleNodes = this.sigma.getGraph().nodes();
+      visibleNodes = this.graph.nodes();
     }
     else {
 

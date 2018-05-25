@@ -1,6 +1,5 @@
 import Graph from 'graphology';
 import gexf from 'graphology-gexf/browser';
-import Sigma from '../src/sigma';
 import WebGLRenderer from '../src/renderers/webgl';
 
 import arctic from './resources/arctic.gexf';
@@ -13,9 +12,7 @@ graph.edges().forEach(edge => {
 
 const container = document.getElementById('container');
 
-const renderer = new WebGLRenderer(container);
-
-const sigma = new Sigma(graph, renderer);
+const renderer = new WebGLRenderer(graph, container);
 
 window.renderer = renderer;
 window.camera = renderer.getCamera();

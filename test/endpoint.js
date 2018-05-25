@@ -11,4 +11,3 @@ if (util.inspect.defaultOptions)
 
 require('./camera.js');
 require('./quadtree.js');
-require('./sigma.js');
