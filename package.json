@@ -73,6 +73,7 @@
     "extends": "@yomguithereal/eslint-config/es6"
   },
   "dependencies": {
+    "@yomguithereal/helpers": "^1.0.0",
     "events": "^2.0.0",
     "graphology-metrics": "1.6.0",
     "graphology-utils": "^1.3.0"
