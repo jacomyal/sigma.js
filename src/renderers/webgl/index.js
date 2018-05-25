@@ -920,4 +920,45 @@ export default class WebGLRenderer extends Renderer {
 
     return this;
   }
+
+  /**
+   * Method used to shut the container & release event listeners.
+   *
+   * @return {undefined}
+   */
+  kill() {
+    const graph = this.graph;
+
+    // Releasing camera handlers
+    this.camera.removeListener('updated', this.listeners.camera);
+
+    // Releasing DOM events & captors
+    window.removeEventListener('resize', this.listeners.handleResize);
+    this.captors.mouse.kill();
+
+    // Releasing graph handlers
+    graph.removeListener('nodeAdded', this.listeners.graphUpdate);
+    graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+    graph.removeListener('nodeAttributesUpdated', this.listeners.softGraphUpdate);
+    graph.removeListener('edgeAdded', this.listeners.graphUpdate);
+    graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+    graph.removeListener('edgeAttributesUpdated', this.listeners.softGraphUpdate);
+    graph.removeListener('cleared', this.listeners.graphUpdate);
+
+    // Releasing cache & state
+    this.quadtree = null;
+    this.nodeOrder = null;
+    this.nodeDataCache = null;
+    this.edgeOrder = null;
+
+    this.highlightedNodes = null;
+    this.previousVisibleNodes = null;
+    this.displayedLabels = null;
+
+    // Destroying canvases
+    const container = this.container;
+
+    while (container.firstChild)
+      container.removeChild(container.firstChild);
+  }
 }

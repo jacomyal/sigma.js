@@ -74,6 +74,17 @@ export default class MouseCaptor extends Captor {
     document.addEventListener('mouseup', this.handleUp, false);
   }
 
+  kill() {
+    container.removeEventListener('click', this.handleClick);
+    container.removeEventListener('mousedown', this.handleDown);
+    container.removeEventListener('mousemove', this.handleMove);
+    container.removeEventListener('DOMMouseScroll', this.handleWheel);
+    container.removeEventListener('mousewheel', this.handleWheel);
+    container.removeEventListener('mouseout', this.handleOut);
+
+    document.removeEventListener('mouseup', this.handleUp);
+  }
+
   handleClick(e) {
     if (!this.enabled)
       return;
