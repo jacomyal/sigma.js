@@ -305,6 +305,7 @@ export default class WebGLRenderer extends Renderer {
             Math.pow(e.y - pos.y, 2)
           );
 
+          // TODO: sort by min size also for cases where center is the same
           if (distance < minDistance) {
             minDistance = distance;
             nodeToHover = node;
