@@ -18,13 +18,6 @@ void main() {
     1
   );
 
-  // gl_Position = vec4(
-  //   ((u_matrix * vec3(a_position, 1)).xy /
-  //     u_resolution * 2.0 - 1.0) * vec2(1, -1),
-  //   0,
-  //   1
-  // );
-
   // Multiply the point size twice:
   //  - x SCALING_RATIO to correct the canvas scaling
   //  - x 2 to correct the formulae
