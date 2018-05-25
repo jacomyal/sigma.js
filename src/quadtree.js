@@ -389,6 +389,13 @@ export default class QuadTree {
 
     if (params.boundaries)
       this.resize(params.boundaries);
+    else
+      this.resize({
+        x: 0,
+        y: 0,
+        width: 1,
+        height: 1
+      });
 
     if (typeof params.filter === 'function')
       this.nodeFilter = params.filter;

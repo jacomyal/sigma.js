@@ -431,13 +431,6 @@ export default class WebGLRenderer extends Renderer {
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(extent);
 
-    this.quadtree.resize({
-      x: 0,
-      y: 0,
-      width: 1,
-      height: 1
-    });
-
     const nodeProgram = this.nodePrograms.def;
 
     if (!keepArrays) {
