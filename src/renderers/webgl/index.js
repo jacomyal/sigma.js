@@ -282,6 +282,10 @@ export default class WebGLRenderer extends Renderer {
 
       const quadNodes = getQuadNodes(e.x, e.y);
 
+      // We will hover the node whose center is closest to mouse
+      let minDistance = Infinity,
+          nodeToHover = null;
+
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
 
@@ -295,13 +299,23 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        // TODO: we should get the nearest node instead
         if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
-          this.hoveredNode = node;
+          const distance = Math.sqrt(
+            Math.pow(e.x - pos.x, 2) +
+            Math.pow(e.y - pos.y, 2)
+          );
 
-          this.emit('overNode', {node});
-          return this.scheduleHighlightedNodesRender();
+          if (distance < minDistance) {
+            minDistance = distance;
+            nodeToHover = node;
+          }
         }
+      }
+
+      if (nodeToHover) {
+        this.hoveredNode = nodeToHover;
+        this.emit('overNode', {node: nodeToHover});
+        return this.scheduleHighlightedNodesRender();
       }
 
       // Checking if the hovered node is still hovered

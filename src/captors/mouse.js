@@ -75,6 +75,8 @@ export default class MouseCaptor extends Captor {
   }
 
   kill() {
+    const container = this.container;
+
     container.removeEventListener('click', this.handleClick);
     container.removeEventListener('mousedown', this.handleDown);
     container.removeEventListener('mousemove', this.handleMove);
