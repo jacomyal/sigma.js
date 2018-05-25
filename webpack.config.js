@@ -2,28 +2,41 @@ var path = require('path');
 
 var production = !!~process.argv.indexOf('-p');
 
-module.exports = {
-  entry: {
-    sigma: './src/endpoint.js'
-  },
-  output: {
-    filename: production ? '[name].min.js' : '[name].js',
-    path: path.join(__dirname, 'build'),
-    library: 'Sigma',
-    libraryTarget: 'umd'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.glsl$/,
-        exclude: /node_modules/,
-        loader: 'raw-loader'
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader'
-      }
-    ]
-  }
+var moduleConfig = {
+  rules: [
+    {
+      test: /\.glsl$/,
+      exclude: /node_modules/,
+      loader: 'raw-loader'
+    },
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: 'babel-loader'
+    }
+  ]
 };
+
+module.exports = [
+  {
+    name: 'sigma',
+    entry: './src/endpoint.js',
+    output: {
+      filename: production ? 'sigma.min.js' : 'sigma.js',
+      path: path.join(__dirname, 'build'),
+      library: 'Sigma',
+      libraryTarget: 'umd'
+    },
+    module: moduleConfig
+  },
+  {
+    name: 'sigma-graphology',
+    entry: './src/sigma-graphology.js',
+    output: {
+      filename: production ? 'sigma-graphology.min.js' : 'sigma-graphology.js',
+      path: path.join(__dirname, 'build')
+    },
+    module: moduleConfig
+  }
+];
+

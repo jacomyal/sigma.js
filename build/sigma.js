@@ -70,55 +70,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _events = __webpack_require__(1);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Renderer Class
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ========================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Abstract classes extended by all of sigma's renderers.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-/**
- * Renderer class.
- *
- * @constructor
- */
-var Renderer = function (_EventEmitter) {
-  _inherits(Renderer, _EventEmitter);
-
-  function Renderer() {
-    _classCallCheck(this, Renderer);
-
-    return _possibleConstructorReturn(this, (Renderer.__proto__ || Object.getPrototypeOf(Renderer)).apply(this, arguments));
-  }
-
-  return Renderer;
-}(_events.EventEmitter);
-
-exports.default = Renderer;
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -426,116 +382,7 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.floatColor = floatColor;
-exports.matrixFromCamera = matrixFromCamera;
-exports.extractPixel = extractPixel;
-
-var _matrices = __webpack_require__(19);
-
-/**
- * Memoized function returning a float-encoded color from various string
- * formats describing colors.
- */
-var FLOAT_COLOR_CACHE = {}; /**
-                             * Sigma.js WebGL Renderer Utils
-                             * ==============================
-                             *
-                             * Miscelleanous helper functions used by sigma's WebGL renderer.
-                             */
-
-
-var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
-var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
-
-function floatColor(val) {
-
-  // If the color is already computed, we yield it
-  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
-
-  var r = 0,
-      g = 0,
-      b = 0;
-
-  // Handling hexadecimal notation
-  if (val[0] === '#') {
-    if (val.length === 4) {
-      r = parseInt(val.charAt(1) + val.charAt(1), 16);
-      g = parseInt(val.charAt(2) + val.charAt(2), 16);
-      b = parseInt(val.charAt(3) + val.charAt(3), 16);
-    } else {
-      r = parseInt(val.charAt(1) + val.charAt(2), 16);
-      g = parseInt(val.charAt(3) + val.charAt(4), 16);
-      b = parseInt(val.charAt(5) + val.charAt(6), 16);
-    }
-  }
-
-  // Handling rgb notation
-  else if (RGBA_TEST_REGEX.test(val)) {
-      var match = val.match(RGBA_EXTRACT_REGEX);
-
-      r = +match[1];
-      g = +match[2];
-      b = +match[3];
-    }
-
-  var color = r * 256 * 256 + g * 256 + b;
-
-  FLOAT_COLOR_CACHE[val] = color;
-
-  return color;
-}
-
-/**
- * Function returning a matrix from the current state of the camera.
- */
-
-// TODO: it's possible to optimize this drastically!
-function matrixFromCamera(state, dimensions) {
-  var angle = state.angle,
-      ratio = state.ratio,
-      x = state.x,
-      y = state.y;
-  var width = dimensions.width,
-      height = dimensions.height;
-
-
-  var matrix = (0, _matrices.identity)();
-
-  var scaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
-      rotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
-      translation = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
-      dimensionTranslation = (0, _matrices.translate)((0, _matrices.identity)(), width / 2, height / 2);
-
-  (0, _matrices.multiply)(matrix, scaling);
-  (0, _matrices.multiply)(matrix, rotation);
-  (0, _matrices.multiply)(matrix, translation);
-  matrix = (0, _matrices.multiply)(dimensionTranslation, matrix);
-
-  return matrix;
-}
-
-/**
- * Function extracting the color at the given pixel.
- */
-function extractPixel(gl, x, y, array) {
-  var data = array || new Uint8Array(4);
-
-  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-  return data;
-}
-
-/***/ }),
-/* 3 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -547,9 +394,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _events = __webpack_require__(1);
+var _events = __webpack_require__(0);
 
-var _easings = __webpack_require__(13);
+var _easings = __webpack_require__(12);
 
 var easings = _interopRequireWildcard(_easings);
 
@@ -602,8 +449,8 @@ var Camera = function (_EventEmitter) {
     // Properties
     var _this = _possibleConstructorReturn(this, (Camera.__proto__ || Object.getPrototypeOf(Camera)).call(this));
 
-    _this.x = 0;
-    _this.y = 0;
+    _this.x = 0.5;
+    _this.y = 0.5;
     _this.angle = 0;
     _this.ratio = 1;
     _this.width = dimensions.width || 0;
@@ -707,73 +554,57 @@ var Camera = function (_EventEmitter) {
     }
 
     /**
-     * Method returning the coordinates of a point from the display frame to the
-     * graph one but ignores the offset and dimensions of the container.
-     *
-     * @param  {number} x - The X coordinate.
-     * @param  {number} y - The Y coordinate.
-     * @return {object}     The point coordinates in the frame of the graph.
-     */
-
-  }, {
-    key: 'abstractDisplayToGraph',
-    value: function abstractDisplayToGraph(x, y) {
-      var cos = Math.cos(this.angle),
-          sin = Math.sin(this.angle);
-
-      return {
-        x: (x * cos - y * sin) * this.ratio,
-        y: (y * cos + x * sin) * this.ratio
-      };
-    }
-
-    /**
-     * Method returning the coordinates of a point from the display frame to the
-     * graph one.
-     *
-     * @param  {number} x - The X coordinate.
-     * @param  {number} y - The Y coordinate.
-     * @return {object}   - The point coordinates in the frame of the graph.
-     */
-
-  }, {
-    key: 'displayToGraph',
-    value: function displayToGraph(x, y) {
-      var cos = Math.cos(this.angle),
-          sin = Math.sin(this.angle);
-
-      var xOffset = this.width / 2 - (this.x * cos + this.y * sin) / this.ratio,
-          yOffset = this.height / 2 - (this.y * cos - this.x * sin) / this.ratio;
-
-      var X = x - xOffset,
-          Y = y - yOffset;
-
-      return {
-        x: (X * cos - Y * sin) * this.ratio,
-        y: (Y * cos + X * sin) * this.ratio
-      };
-    }
-
-    /**
      * Method returning the coordinates of a point from the graph frame to the
-     * display one.
+     * viewport.
      *
-     * @param  {number} x - The X coordinate.
-     * @param  {number} y - The Y coordinate.
-     * @return {object}   - The point coordinates in the frame of the display.
+     * @param  {object} dimensions - Dimensions of the viewport.
+     * @param  {number} x          - The X coordinate.
+     * @param  {number} y          - The Y coordinate.
+     * @return {object}            - The point coordinates in the viewport.
      */
 
+    // TODO: assign to gain one object
+    // TODO: angles
+
   }, {
-    key: 'graphToDisplay',
-    value: function graphToDisplay(x, y) {
-      var relCos = Math.cos(this.angle) / this.ratio,
-          relSin = Math.sin(this.angle) / this.ratio,
-          xOffset = this.width / 2 - this.x * relCos - this.y * relSin,
-          yOffset = this.height / 2 - this.y * relCos + this.x * relSin;
+    key: 'graphToViewport',
+    value: function graphToViewport(dimensions, x, y) {
+      var smallestDimension = Math.min(dimensions.width, dimensions.height);
+
+      var dx = smallestDimension / dimensions.width,
+          dy = smallestDimension / dimensions.height;
+
+      // TODO: we keep on the upper left corner!
+      // TODO: how to normalize sizes?
+      return {
+        x: (x - this.x + this.ratio / 2 / dx) * (smallestDimension / this.ratio),
+        y: (this.y - y + this.ratio / 2 / dy) * (smallestDimension / this.ratio)
+      };
+    }
+
+    /**
+     * Method returning the coordinates of a point from the viewport frame to the
+     * graph frame.
+     *
+     * @param  {object} dimensions - Dimensions of the viewport.
+     * @param  {number} x          - The X coordinate.
+     * @param  {number} y          - The Y coordinate.
+     * @return {object}            - The point coordinates in the graph frame.
+     */
+
+    // TODO: angles
+
+  }, {
+    key: 'viewportToGraph',
+    value: function viewportToGraph(dimensions, x, y) {
+      var smallestDimension = Math.min(dimensions.width, dimensions.height);
+
+      var dx = smallestDimension / dimensions.width,
+          dy = smallestDimension / dimensions.height;
 
       return {
-        x: x * relCos + y * relSin + xOffset,
-        y: y * relCos - x * relSin + yOffset
+        x: this.ratio / smallestDimension * x + this.x - this.ratio / 2 / dx,
+        y: -(this.ratio / smallestDimension * y - this.y - this.ratio / 2 / dy)
       };
     }
 
@@ -784,21 +615,26 @@ var Camera = function (_EventEmitter) {
      * @return {object} - The view's rectangle.
      */
 
+    // TODO: angle
+
   }, {
     key: 'viewRectangle',
-    value: function viewRectangle() {
-      var widthVect = this.abstractDisplayToGraph(this.width, 0),
-          heightVect = this.abstractDisplayToGraph(0, this.height),
-          centerVect = this.abstractDisplayToGraph(this.width / 2, this.height / 2),
-          marginX = this.abstractDisplayToGraph(this.width / 4, 0).x,
-          marginY = this.abstractDisplayToGraph(0, this.height / 4, 0).y;
+    value: function viewRectangle(dimensions) {
+
+      // TODO: reduce relative margin?
+      var marginX = 0 * this.width / 8,
+          marginY = 0 * this.height / 8;
+
+      var p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
+          p2 = this.viewportToGraph(dimensions, this.width + marginX, 0 - marginY),
+          h = this.viewportToGraph(dimensions, 0, this.height + marginY);
 
       return {
-        x1: this.x - centerVect.x - marginX,
-        y1: this.y - centerVect.y - marginY,
-        x2: this.x - centerVect.x + marginX + widthVect.x,
-        y2: this.y - centerVect.y - marginY + widthVect.y,
-        height: Math.sqrt(Math.pow(heightVect.x, 2) + Math.pow(heightVect.y + 2 * marginY, 2))
+        x1: p1.x,
+        y1: p1.y,
+        x2: p2.x,
+        y2: p2.y,
+        height: p2.y - h.y
       };
     }
 
@@ -985,6 +821,162 @@ var Camera = function (_EventEmitter) {
 exports.default = Camera;
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.floatColor = floatColor;
+exports.matrixFromCamera = matrixFromCamera;
+exports.extractPixel = extractPixel;
+
+var _matrices = __webpack_require__(20);
+
+/**
+ * Memoized function returning a float-encoded color from various string
+ * formats describing colors.
+ */
+var FLOAT_COLOR_CACHE = {}; /**
+                             * Sigma.js WebGL Renderer Utils
+                             * ==============================
+                             *
+                             * Miscelleanous helper functions used by sigma's WebGL renderer.
+                             */
+
+
+var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
+var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
+
+function floatColor(val) {
+
+  // If the color is already computed, we yield it
+  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
+
+  var r = 0,
+      g = 0,
+      b = 0;
+
+  // Handling hexadecimal notation
+  if (val[0] === '#') {
+    if (val.length === 4) {
+      r = parseInt(val.charAt(1) + val.charAt(1), 16);
+      g = parseInt(val.charAt(2) + val.charAt(2), 16);
+      b = parseInt(val.charAt(3) + val.charAt(3), 16);
+    } else {
+      r = parseInt(val.charAt(1) + val.charAt(2), 16);
+      g = parseInt(val.charAt(3) + val.charAt(4), 16);
+      b = parseInt(val.charAt(5) + val.charAt(6), 16);
+    }
+  }
+
+  // Handling rgb notation
+  else if (RGBA_TEST_REGEX.test(val)) {
+      var match = val.match(RGBA_EXTRACT_REGEX);
+
+      r = +match[1];
+      g = +match[2];
+      b = +match[3];
+    }
+
+  var color = r * 256 * 256 + g * 256 + b;
+
+  FLOAT_COLOR_CACHE[val] = color;
+
+  return color;
+}
+
+/**
+ * Function returning a matrix from the current state of the camera.
+ */
+
+// TODO: it's possible to optimize this drastically!
+function matrixFromCamera(state, dimensions) {
+  var angle = state.angle,
+      ratio = state.ratio,
+      x = state.x,
+      y = state.y;
+  var width = dimensions.width,
+      height = dimensions.height;
+
+
+  var matrix = (0, _matrices.identity)();
+
+  var smallestDimension = Math.min(width, height);
+
+  var cameraCentering = (0, _matrices.translate)((0, _matrices.identity)(), -x, -y),
+      cameraScaling = (0, _matrices.scale)((0, _matrices.identity)(), 1 / ratio),
+      cameraRotation = (0, _matrices.rotate)((0, _matrices.identity)(), -angle),
+      viewportScaling = (0, _matrices.scale)((0, _matrices.identity)(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
+
+  // Logical order is reversed
+  (0, _matrices.multiply)(matrix, viewportScaling);
+  (0, _matrices.multiply)(matrix, cameraRotation);
+  (0, _matrices.multiply)(matrix, cameraScaling);
+  (0, _matrices.multiply)(matrix, cameraCentering);
+
+  return matrix;
+}
+
+/**
+ * Function extracting the color at the given pixel.
+ */
+function extractPixel(gl, x, y, array) {
+  var data = array || new Uint8Array(4);
+
+  gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+  return data;
+}
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _events = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Sigma.js Renderer Class
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * ========================
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Abstract classes extended by all of sigma's renderers.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+
+/**
+ * Renderer class.
+ *
+ * @constructor
+ */
+var Renderer = function (_EventEmitter) {
+  _inherits(Renderer, _EventEmitter);
+
+  function Renderer() {
+    _classCallCheck(this, Renderer);
+
+    return _possibleConstructorReturn(this, (Renderer.__proto__ || Object.getPrototypeOf(Renderer)).apply(this, arguments));
+  }
+
+  return Renderer;
+}(_events.EventEmitter);
+
+exports.default = Renderer;
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1038,11 +1030,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint no-nested-ternary: 0 */
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* eslint no-nested-ternary: 0 */
 /* eslint no-constant-condition: 0 */
 /**
  * Sigma.js Quad Tree Class
@@ -1052,6 +1040,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
  */
+
+
+var _extend = __webpack_require__(13);
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
@@ -1285,7 +1282,7 @@ function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, 
     // Collecting nodes
     container = containers[block];
 
-    if (container) collectedNodes.push.apply(collectedNodes, container);
+    if (container) (0, _extend2.default)(collectedNodes, container);
 
     // If we reached max level
     if (level >= maxLevel) continue;
@@ -1336,7 +1333,12 @@ var QuadTree = function () {
     this.cache = null;
     this.lastRectangle = null;
 
-    if (params.boundaries) this.resize(params.boundaries);
+    if (params.boundaries) this.resize(params.boundaries);else this.resize({
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1
+    });
 
     if (typeof params.filter === 'function') this.nodeFilter = params.filter;
   }
@@ -1433,6 +1435,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _camera = __webpack_require__(1);
+
+var _camera2 = _interopRequireDefault(_camera);
+
 var _captor = __webpack_require__(14);
 
 var _captor2 = _interopRequireDefault(_captor);
@@ -1487,8 +1493,8 @@ var MouseCaptor = function (_Captor) {
     _this.enabled = true;
     _this.hasDragged = false;
     _this.downStartTime = null;
-    _this.startMouseX = null;
-    _this.startMouseY = null;
+    _this.lastMouseX = null;
+    _this.lastMouseY = null;
     _this.isMouseDown = false;
     _this.isMoving = false;
     _this.movingTimeout = null;
@@ -1519,6 +1525,20 @@ var MouseCaptor = function (_Captor) {
   }
 
   _createClass(MouseCaptor, [{
+    key: 'kill',
+    value: function kill() {
+      var container = this.container;
+
+      container.removeEventListener('click', this.handleClick);
+      container.removeEventListener('mousedown', this.handleDown);
+      container.removeEventListener('mousemove', this.handleMove);
+      container.removeEventListener('DOMMouseScroll', this.handleWheel);
+      container.removeEventListener('mousewheel', this.handleWheel);
+      container.removeEventListener('mouseout', this.handleOut);
+
+      document.removeEventListener('mouseup', this.handleUp);
+    }
+  }, {
     key: 'handleClick',
     value: function handleClick(e) {
       var _this2 = this;
@@ -1548,18 +1568,41 @@ var MouseCaptor = function (_Captor) {
     value: function handleDoubleClick(e) {
       if (!this.enabled) return;
 
-      var ratio = 1 / DOUBLE_CLICK_ZOOMING_RATIO;
-
       var center = (0, _utils.getCenter)(e);
 
       var cameraState = this.camera.getState();
 
-      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
+      var newRatio = cameraState.ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+
+      // TODO: factorize
+      var dimensions = {
+        width: this.container.offsetWidth,
+        height: this.container.offsetHeight
+      };
+
+      var clickX = (0, _utils.getX)(e),
+          clickY = (0, _utils.getY)(e);
+
+      // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
+      // TODO: factorize pan & zoomTo
+      var cameraWithNewRatio = new _camera2.default();
+      cameraWithNewRatio.ratio = newRatio;
+      cameraWithNewRatio.x = cameraState.x;
+      cameraWithNewRatio.y = cameraState.y;
+
+      var clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
+          centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
+
+      var clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
+          centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
+
+      var deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
+          deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
 
       this.camera.animate({
-        x: position.x * (1 - ratio) + cameraState.x,
-        y: position.y * (1 - ratio) + cameraState.y,
-        ratio: ratio * cameraState.ratio
+        x: cameraState.x - deltaX,
+        y: cameraState.y - deltaY,
+        ratio: newRatio
       }, {
         easing: 'quadraticInOut',
         duration: DOUBLE_CLICK_ZOOMING_DURATION
@@ -1579,8 +1622,8 @@ var MouseCaptor = function (_Captor) {
       this.startCameraState = this.camera.getState();
       this.lastCameraState = this.startCameraState;
 
-      this.startMouseX = (0, _utils.getX)(e);
-      this.startMouseY = (0, _utils.getY)(e);
+      this.lastMouseX = (0, _utils.getX)(e);
+      this.lastMouseY = (0, _utils.getY)(e);
 
       this.hasDragged = false;
 
@@ -1610,17 +1653,18 @@ var MouseCaptor = function (_Captor) {
       var x = (0, _utils.getX)(e),
           y = (0, _utils.getY)(e);
 
-      var cameraState = this.camera.getState();
+      var cameraState = this.camera.getState(),
+          previousCameraState = this.camera.getPreviousState();
 
       if (this.isMoving) {
         this.camera.animate({
-          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - this.lastCameraState.x),
-          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - this.lastCameraState.y)
+          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
+          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y)
         }, {
           duration: MOUSE_INERTIA_DURATION,
           easing: 'quadraticOut'
         });
-      } else if (this.startMouseX !== x || this.startMouseY !== y) {
+      } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
         this.camera.setState({
           x: cameraState.x,
           y: cameraState.y
@@ -1653,22 +1697,30 @@ var MouseCaptor = function (_Captor) {
           _this3.isMoving = false;
         }, DRAG_TIMEOUT);
 
-        var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - this.startMouseX, (0, _utils.getY)(e) - this.startMouseY);
+        var dimensions = {
+          width: this.container.offsetWidth,
+          height: this.container.offsetHeight
+        };
 
-        var x = this.startCameraState.x - position.x,
-            y = this.startCameraState.y - position.y;
+        var eX = (0, _utils.getX)(e),
+            eY = (0, _utils.getY)(e);
+
+        var lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX, this.lastMouseY);
+
+        var mouse = this.camera.viewportToGraph(dimensions, eX, eY);
+
+        var offsetX = lastMouse.x - mouse.x,
+            offsetY = lastMouse.y - mouse.y;
 
         var cameraState = this.camera.getState();
 
-        if (cameraState.x !== x || cameraState.y !== y) {
+        var x = cameraState.x + offsetX,
+            y = cameraState.y + offsetY;
 
-          this.lastCameraState = cameraState;
+        this.camera.setState({ x: x, y: y });
 
-          this.camera.setState({
-            x: x,
-            y: y
-          });
-        }
+        this.lastMouseX = eX;
+        this.lastMouseY = eY;
       }
 
       if (e.preventDefault) e.preventDefault();else e.returnValue = false;
@@ -1705,11 +1757,33 @@ var MouseCaptor = function (_Captor) {
 
       var center = (0, _utils.getCenter)(e);
 
-      var position = this.camera.abstractDisplayToGraph((0, _utils.getX)(e) - center.x, (0, _utils.getY)(e) - center.y);
+      var dimensions = {
+        width: this.container.offsetWidth,
+        height: this.container.offsetHeight
+      };
+
+      var clickX = (0, _utils.getX)(e),
+          clickY = (0, _utils.getY)(e);
+
+      // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
+      // TODO: factorize pan & zoomTo
+      var cameraWithNewRatio = new _camera2.default();
+      cameraWithNewRatio.ratio = newRatio;
+      cameraWithNewRatio.x = cameraState.x;
+      cameraWithNewRatio.y = cameraState.y;
+
+      var clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
+          centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
+
+      var clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
+          centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
+
+      var deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
+          deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
 
       this.camera.animate({
-        x: position.x * (1 - ratio) + cameraState.x,
-        y: position.y * (1 - ratio) + cameraState.y,
+        x: cameraState.x - deltaX,
+        y: cameraState.y - deltaY,
         ratio: newRatio
       }, {
         easing: 'linear',
@@ -1742,9 +1816,12 @@ exports.default = MouseCaptor;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 exports.createElement = createElement;
 exports.getPixelRatio = getPixelRatio;
-exports.createRescalingFunction = createRescalingFunction;
+exports.createNormalizationFunction = createNormalizationFunction;
 /**
  * Sigma.js Rendering Utils
  * ===========================
@@ -1791,59 +1868,75 @@ function getPixelRatio() {
 }
 
 /**
- * Default rescale options.
- */
-var DEFAULT_RESCALE_OPTIONS = {
-  mode: 'inside',
-  margin: 0
-};
-
-// TODO: should we put the rescaling in the camera itself?
-
-/**
- * Factory returning a function rescaling the given node's position.
+ * Factory returning a function normalizing the given node's position & size.
  *
- * @param  {object}   options - Options.
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-function createRescalingFunction(options, extent) {
-  options = options || {};
+function createNormalizationFunction(extent) {
+  var _extent$x = _slicedToArray(extent.x, 2),
+      minX = _extent$x[0],
+      maxX = _extent$x[1],
+      _extent$y = _slicedToArray(extent.y, 2),
+      minY = _extent$y[0],
+      maxY = _extent$y[1];
 
-  var mode = options.mode || DEFAULT_RESCALE_OPTIONS.mode,
-      height = options.height || 1,
-      width = options.width || 1;
+  var ratio = Math.max(maxX - minX, maxY - minY);
 
-  var maxX = extent.maxX,
-      maxY = extent.maxY,
-      minX = extent.minX,
-      minY = extent.minY;
-
-
-  var hx = (maxX + minX) / 2,
-      hy = (maxY + minY) / 2;
-
-  var scale = mode === 'outside' ? Math.max(width / Math.max(maxX - minX, 1), height / Math.max(maxY - minY, 1)) : Math.min(width / Math.max(maxX - minX, 1), height / Math.max(maxY - minY, 1));
+  var dX = (maxX + minX) / 2,
+      dY = (maxY + minY) / 2;
 
   var fn = function fn(data) {
     return {
-      x: (data.x - hx) * scale,
-      y: (data.y - hy) * scale
+      x: 0.5 + (data.x - dX) / ratio,
+      y: 0.5 + (data.y - dY) / ratio
     };
   };
 
+  // TODO: unit test this
   fn.inverse = function (data) {
     return {
-      x: data.x / scale + hx,
-      y: data.y / scale + hy
+      x: dX + ratio * (data.x - 0.5),
+      y: dY + ratio * (data.y - 0.5)
     };
   };
+
+  fn.ratio = ratio;
 
   return fn;
 }
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports) {
+
+/**
+ * Graphology isGraph
+ * ===================
+ *
+ * Very simple function aiming at ensuring the given variable is a
+ * graphology instance.
+ */
+
+/**
+ * Checking the value is a graphology instance.
+ *
+ * @param  {any}     value - Target value.
+ * @return {boolean}
+ */
+module.exports = function isGraph(value) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.addUndirectedEdgeWithKey === 'function' &&
+    typeof value.dropNodes === 'function' &&
+    typeof value.multi === 'boolean'
+  );
+};
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1863,7 +1956,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 exports.createCompoundProgram = createCompoundProgram;
 
-var _utils = __webpack_require__(18);
+var _utils = __webpack_require__(19);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -1976,7 +2069,7 @@ function createCompoundProgram(programClasses) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1992,29 +2085,34 @@ exports.default = drawLabel;
  *
  * Function used by the canvas renderer to display a single node's label.
  */
-function drawLabel(context, data) {
-  context.fillStyle = '#000';
-  context.font = '14px arial';
+function drawLabel(context, data, settings) {
+  var size = settings.labelSize,
+      font = settings.labelFont,
+      weight = settings.labelWeight;
 
-  context.fillText(data.label, data.x + data.size + 3, data.y + 14 / 3);
+  context.fillStyle = '#000';
+  context.font = weight + ' ' + size + 'px ' + font;
+
+  context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _sigma = __webpack_require__(11);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.WebGLRenderer = exports.MouseCaptor = exports.QuadTree = exports.Camera = exports.Renderer = undefined;
 
-var _sigma2 = _interopRequireDefault(_sigma);
-
-var _renderer = __webpack_require__(0);
+var _renderer = __webpack_require__(3);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(3);
+var _camera = __webpack_require__(1);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -2032,242 +2130,19 @@ var _webgl2 = _interopRequireDefault(_webgl);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Sigma.js Library Endpoint
- * ==========================
- *
- * The library endpoint.
- */
-var library = {
-  Sigma: _sigma2.default,
-  Renderer: _renderer2.default,
-  Camera: _camera2.default,
-  QuadTree: _quadtree2.default,
-  MouseCaptor: _mouse2.default,
-  WebGLRenderer: _webgl2.default
-};
-
-for (var k in library) {
-  _sigma2.default[k] = library[k];
-}module.exports = _sigma2.default;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Sigma.js Core Class
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * ====================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Core class holding state for the bound graph and using a combination of
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * a renderer & camera to display the bound graph on screen.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
-
-
-var _isGraph = __webpack_require__(12);
-
-var _isGraph2 = _interopRequireDefault(_isGraph);
-
-var _renderer = __webpack_require__(0);
-
-var _renderer2 = _interopRequireDefault(_renderer);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// TODO: sigma should only hold the graph and compose state to give to renderer,
-// does it need to orchestrate?
-
-// TODO: should be able to take n renderers
-// TODO: what to do with refresh methods? We should probably drop them
-
-// TODO: create a thumbnail renderer
-
-/**
- * Sigma class
- *
- * @constructor
- * @param {Graph}    graph    - A graphology Graph instance.
- * @param {Renderer} renderer - A Renderer instance.
- */
-var Sigma = function () {
-  function Sigma(graph, renderer) {
-    _classCallCheck(this, Sigma);
-
-    // Checking the arguments
-    if (!(0, _isGraph2.default)(graph)) throw new Error('Sigma.constructor: given graph is not an instance of a graphology implementation.');
-
-    if (!(renderer instanceof _renderer2.default)) throw new Error('Sigma.constructor: given renderer is not an instance of a sigma Renderer.');
-
-    // Properties
-    this.graph = graph;
-    this.renderer = renderer;
-    this.renderer.bind(this);
-
-    // Userland state
-    this.state = {};
-    this.nodeStates = null;
-    this.edgeStates = null;
-
-    // First time render
-    this.renderer.render();
-  }
-
-  /**---------------------------------------------------------------------------
-   * Internals
-   **---------------------------------------------------------------------------
-   */
-
-  /**---------------------------------------------------------------------------
-   * Getters
-   **---------------------------------------------------------------------------
-   */
-
-  /**
-   * Method returning the graph bound to the instance.
-   *
-   * @return {Graph} - The bound graph.
-   */
-
-
-  _createClass(Sigma, [{
-    key: 'getGraph',
-    value: function getGraph() {
-      return this.graph;
-    }
-
-    /**
-     * Method returning the composed data of the target node.
-     *
-     * @return {string} key - The node's key.
-     * @return {object}     - The node's attributes.
-     */
-
-  }, {
-    key: 'getNodeData',
-    value: function getNodeData(key) {
-
-      // TODO: this will change to compose state later
-      return this.graph.getNodeAttributes(key);
-    }
-
-    /**
-     * Method returning the composed data of the target edge.
-     *
-     * @return {string} key - The edge's key.
-     * @return {object}     - The edge's attributes.
-     */
-
-  }, {
-    key: 'getEdgeData',
-    value: function getEdgeData(key) {
-
-      // TODO: this will change to compose state later
-      return this.graph.getEdgeAttributes(key);
-    }
-
-    /**
-     * Method returning the extent of the bound graph.
-     *
-     * @return {object} - The graph's extent.
-     */
-
-  }, {
-    key: 'getGraphExtent',
-    value: function getGraphExtent() {
-      var graph = this.graph;
-
-      var nodes = graph.nodes(),
-          edges = graph.edges();
-
-      var maxX = -Infinity,
-          maxY = -Infinity,
-          minX = Infinity,
-          minY = Infinity,
-          maxNodeSize = -Infinity,
-          maxEdgeSize = -Infinity;
-
-      for (var i = 0, l = nodes.length; i < l; i++) {
-        var node = nodes[i];
-
-        var data = this.getNodeData(node);
-
-        var size = data.size || 1;
-
-        if (data.x > maxX) maxX = data.x;
-        if (data.y > maxY) maxY = data.y;
-
-        if (data.x < minX) minX = data.x;
-        if (data.y < minY) minY = data.y;
-
-        if (size > maxNodeSize) maxNodeSize = size;
-      }
-
-      for (var _i = 0, _l = edges.length; _i < _l; _i++) {
-        var edge = edges[_i];
-
-        var _data = this.getEdgeData(edge);
-
-        var _size = _data.size || 1;
-
-        if (_size > maxEdgeSize) maxEdgeSize = _size;
-      }
-
-      return {
-        maxX: maxX,
-        maxY: maxY,
-        minX: minX,
-        minY: minY,
-        maxNodeSize: maxNodeSize,
-        maxEdgeSize: maxEdgeSize
-      };
-    }
-  }]);
-
-  return Sigma;
-}();
-
-exports.default = Sigma;
+exports.Renderer = _renderer2.default;
+exports.Camera = _camera2.default;
+exports.QuadTree = _quadtree2.default;
+exports.MouseCaptor = _mouse2.default;
+exports.WebGLRenderer = _webgl2.default; /**
+                                          * Sigma.js Library Endpoint
+                                          * ==========================
+                                          *
+                                          * The library endpoint.
+                                          */
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports) {
-
-/**
- * Graphology isGraph
- * ===================
- *
- * Very simple function aiming at ensuring the given variable is a
- * graphology instance.
- */
-
-/**
- * Checking the value is a graphology instance.
- *
- * @param  {any}     value - Target value.
- * @return {boolean}
- */
-module.exports = function isGraph(value) {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    typeof value.addUndirectedEdgeWithKey === 'function' &&
-    typeof value.dropNodes === 'function' &&
-    typeof value.multi === 'boolean'
-  );
-};
-
-
-/***/ }),
-/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2313,6 +2188,52 @@ var cubicInOut = exports.cubicInOut = function cubicInOut(k) {
 };
 
 /***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+/**
+ * Extend function
+ * ================
+ *
+ * Function used to push a bunch of values into an array at once.
+ *
+ * Its strategy is to mutate target array's length then setting the new indices
+ * to be the values to add.
+ *
+ * A benchmark proved that it is faster than the following strategies:
+ *   1) `array.push.apply(array, values)`.
+ *   2) A loop of pushes.
+ *   3) `array = array.concat(values)`, obviously.
+ *
+ * Intuitively, this is correct because when adding a lot of elements, the
+ * chosen strategies does not need to handle the `arguments` object to
+ * execute #.apply's variadicity and because the array know its final length
+ * at the beginning, avoiding potential multiple reallocations of the underlying
+ * contiguous array. Some engines may be able to optimize the loop of push
+ * operations but empirically they don't seem to do so.
+ */
+
+/**
+ * Extends the target array with the given values.
+ *
+ * @param  {array} array  - Target array.
+ * @param  {array} values - Values to add.
+ */
+module.exports = function extend(array, values) {
+  var l1 = array.length,
+      l2 = values.length;
+
+  if (l2 === 0)
+    return;
+
+  array.length += values.length;
+
+  for (var i = 0; i < l2; i++)
+    array[l1 + i] = values[i];
+};
+
+
+/***/ }),
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2323,7 +2244,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _events = __webpack_require__(1);
+var _events = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2510,11 +2431,19 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _renderer = __webpack_require__(0);
+var _extent = __webpack_require__(17);
+
+var _extent2 = _interopRequireDefault(_extent);
+
+var _isGraph = __webpack_require__(8);
+
+var _isGraph2 = _interopRequireDefault(_isGraph);
+
+var _renderer = __webpack_require__(3);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(3);
+var _camera = __webpack_require__(1);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -2526,19 +2455,19 @@ var _quadtree = __webpack_require__(5);
 
 var _quadtree2 = _interopRequireDefault(_quadtree);
 
-var _node = __webpack_require__(17);
+var _node = __webpack_require__(18);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _edge = __webpack_require__(22);
+var _edge = __webpack_require__(23);
 
 var _edge2 = _interopRequireDefault(_edge);
 
-var _label = __webpack_require__(9);
+var _label = __webpack_require__(10);
 
 var _label2 = _interopRequireDefault(_label);
 
-var _hover = __webpack_require__(25);
+var _hover = __webpack_require__(26);
 
 var _hover2 = _interopRequireDefault(_hover);
 
@@ -2548,7 +2477,7 @@ var _utils2 = __webpack_require__(7);
 
 var _utils3 = __webpack_require__(2);
 
-var _labels = __webpack_require__(27);
+var _labels = __webpack_require__(28);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2575,20 +2504,27 @@ var WEBGL_OVERSAMPLING_RATIO = (0, _utils2.getPixelRatio)();
  */
 var DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
-  hideLabelsOnMove: false
+  hideLabelsOnMove: false,
+
+  // TEMPORARY LABEL SETTINGS
+  labelFont: 'Arial',
+  labelSize: 14,
+  labelWeight: 'normal'
 };
 
 /**
  * Main class.
  *
  * @constructor
- * @param {HTMLElement} container - The graph's container.
+ * @param {Graph}       graph     - Graph to render.
+ * @param {HTMLElement} container - DOM container in which to render.
+ * @param {object}      settings  - Optional settings.
  */
 
 var WebGLRenderer = function (_Renderer) {
   _inherits(WebGLRenderer, _Renderer);
 
-  function WebGLRenderer(container, settings) {
+  function WebGLRenderer(graph, container, settings) {
     _classCallCheck(this, WebGLRenderer);
 
     var _this = _possibleConstructorReturn(this, (WebGLRenderer.__proto__ || Object.getPrototypeOf(WebGLRenderer)).call(this));
@@ -2598,10 +2534,12 @@ var WebGLRenderer = function (_Renderer) {
     _this.settings = (0, _utils.assign)({}, DEFAULT_SETTINGS, settings);
 
     // Validating
+    if (!(0, _isGraph2.default)(graph)) throw new Error('sigma/renderers/webgl: invalid graph instance.');
+
     if (!(container instanceof HTMLElement)) throw new Error('sigma/renderers/webgl: container should be an html element.');
 
     // Properties
-    _this.sigma = null;
+    _this.graph = graph;
     _this.captors = {};
     _this.container = container;
     _this.elements = {};
@@ -2616,8 +2554,8 @@ var WebGLRenderer = function (_Renderer) {
     _this.nodeDataCache = {};
     _this.edgeOrder = {};
 
-    // Rescaling function
-    _this.rescalingFunction = null;
+    // Normalization function
+    _this.normalizationFunction = null;
 
     // Starting dimensions
     _this.width = 0;
@@ -2679,6 +2617,13 @@ var WebGLRenderer = function (_Renderer) {
 
     // Binding event handlers
     _this.bindEventHandlers();
+
+    // Binding graph handlers
+    _this.bindGraphHandlers();
+
+    // Processing data for the first time & render
+    _this.process();
+    _this.render();
     return _this;
   }
 
@@ -2780,9 +2725,10 @@ var WebGLRenderer = function (_Renderer) {
       // Function returning the nodes in the mouse's quad
       var getQuadNodes = function getQuadNodes(mouseX, mouseY) {
 
-        var mouseGraphPosition = _this3.camera.displayToGraph(mouseX, mouseY);
+        var mouseGraphPosition = _this3.camera.viewportToGraph(_this3, mouseX, mouseY);
 
-        return _this3.quadtree.point(mouseGraphPosition.x, mouseGraphPosition.y);
+        // TODO: minus 1? lol
+        return _this3.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
       };
 
       // Handling mouse move
@@ -2796,29 +2742,41 @@ var WebGLRenderer = function (_Renderer) {
 
         var quadNodes = getQuadNodes(e.x, e.y);
 
+        // We will hover the node whose center is closest to mouse
+        var minDistance = Infinity,
+            nodeToHover = null;
+
         for (var i = 0, l = quadNodes.length; i < l; i++) {
           var node = quadNodes[i];
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToDisplay(data.x, data.y);
+          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
 
           var size = data.size / sizeRatio;
 
-          // TODO: we should get the nearest node instead
           if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
-            _this3.hoveredNode = node;
+            var distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
 
-            _this3.emit('overNode', { node: node });
-            return _this3.scheduleHighlightedNodesRender();
+            // TODO: sort by min size also for cases where center is the same
+            if (distance < minDistance) {
+              minDistance = distance;
+              nodeToHover = node;
+            }
           }
+        }
+
+        if (nodeToHover) {
+          _this3.hoveredNode = nodeToHover;
+          _this3.emit('overNode', { node: nodeToHover });
+          return _this3.scheduleHighlightedNodesRender();
         }
 
         // Checking if the hovered node is still hovered
         if (_this3.hoveredNode) {
           var _data = _this3.nodeDataCache[_this3.hoveredNode];
 
-          var _pos = _this3.camera.graphToDisplay(_data.x, _data.y);
+          var _pos = _this3.camera.graphToViewport(_this3, _data.x, _data.y);
 
           var _size = _data.size / sizeRatio;
 
@@ -2842,7 +2800,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToDisplay(data.x, data.y);
+          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
 
           var size = data.size / sizeRatio;
 
@@ -2861,7 +2819,7 @@ var WebGLRenderer = function (_Renderer) {
 
           var data = _this3.nodeDataCache[node];
 
-          var pos = _this3.camera.graphToDisplay(data.x, data.y);
+          var pos = _this3.camera.graphToViewport(_this3, data.x, data.y);
 
           var size = data.size / sizeRatio;
 
@@ -2890,7 +2848,7 @@ var WebGLRenderer = function (_Renderer) {
     value: function bindGraphHandlers() {
       var _this4 = this;
 
-      var graph = this.sigma.getGraph();
+      var graph = this.graph;
 
       this.listeners.graphUpdate = function () {
         _this4.needToProcess = true;
@@ -2928,30 +2886,13 @@ var WebGLRenderer = function (_Renderer) {
       var keepArrays = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
 
-      var graph = this.sigma.getGraph();
+      var graph = this.graph;
 
       // TODO: possible to index this somehow using two byte arrays or so
-      var extent = this.sigma.getGraphExtent();
+      var extent = (0, _extent2.default)(graph, ['x', 'y']);
 
       // Rescaling function
-      this.rescalingFunction = (0, _utils2.createRescalingFunction)({ width: this.width, height: this.height }, extent);
-
-      var minRescaled = this.rescalingFunction({
-        x: extent.minX,
-        y: extent.minY
-      });
-
-      var maxRescaled = this.rescalingFunction({
-        x: extent.maxX,
-        y: extent.maxY
-      });
-
-      this.quadtree.resize({
-        x: minRescaled.x,
-        y: minRescaled.y,
-        width: maxRescaled.x - minRescaled.x,
-        height: maxRescaled.y - minRescaled.y
-      });
+      this.normalizationFunction = (0, _utils2.createNormalizationFunction)(extent);
 
       var nodeProgram = this.nodePrograms.def;
 
@@ -2967,21 +2908,21 @@ var WebGLRenderer = function (_Renderer) {
 
         this.nodeOrder[node] = i;
 
-        var data = this.sigma.getNodeData(node);
+        var data = graph.getNodeAttributes(node);
 
-        var rescaledData = this.rescalingFunction(data);
+        var rescaledData = this.normalizationFunction(data);
 
-        // TODO: Optimize this to be save a loop and one object, by using a reversed assign
+        // TODO: Optimize this to save a loop and one object, by using a reversed assign
         var displayData = (0, _utils.assign)({}, data, rescaledData);
 
-        this.quadtree.add(node, displayData.x, displayData.y, displayData.size);
+        // TODO: this size normalization does not work
+        this.quadtree.add(node, displayData.x, 1 - displayData.y, displayData.size / this.width);
 
         this.nodeDataCache[node] = displayData;
 
         nodeProgram.process(displayData, i);
       }
 
-      // TODO: do we need to keep passing gl to the program?
       nodeProgram.bufferData();
 
       var edgeProgram = this.edgePrograms.def;
@@ -2998,7 +2939,7 @@ var WebGLRenderer = function (_Renderer) {
 
         this.edgeOrder[edge] = _i;
 
-        var _data2 = this.sigma.getEdgeData(edge),
+        var _data2 = graph.getEdgeAttributes(edge),
             extremities = graph.extremities(edge),
             sourceData = this.nodeDataCache[extremities[0]],
             targetData = this.nodeDataCache[extremities[1]];
@@ -3026,7 +2967,7 @@ var WebGLRenderer = function (_Renderer) {
 
       var nodeProgram = this.nodePrograms.def;
 
-      var data = this.sigma.getNodeData(key);
+      var data = this.graph.getNodeAttributes(key);
 
       nodeProgram.process(data, this.nodeOrder[key]);
 
@@ -3043,14 +2984,14 @@ var WebGLRenderer = function (_Renderer) {
     key: 'processEdge',
     value: function processEdge(key) {
 
-      var graph = this.sigma.getGraph();
+      var graph = this.graph;
 
       var edgeProgram = this.edgePrograms.def;
 
-      var data = this.sigma.getEdgeData(key),
+      var data = graph.getEdgeAttributes(key),
           extremities = graph.extremities(key),
-          sourceData = this.sigma.getNodeData(extremities[0]),
-          targetData = this.sigma.getNodeData(extremities[1]);
+          sourceData = graph.getNodeAttributes(extremities[0]),
+          targetData = graph.getNodeAttributes(extremities[1]);
 
       edgeProgram.process(sourceData, targetData, data, this.edgeOrder[key]);
 
@@ -3061,28 +3002,6 @@ var WebGLRenderer = function (_Renderer) {
      * Public API.
      **---------------------------------------------------------------------------
      */
-
-    /**
-     * Method used to bind the renderer to a sigma instance.
-     *
-     * @param  {Sigma} sigma - Target sigma instance.
-     * @return {WebGLRenderer}
-     */
-
-  }, {
-    key: 'bind',
-    value: function bind(sigma) {
-
-      // Binding instance
-      this.sigma = sigma;
-
-      this.bindGraphHandlers();
-
-      // Processing initial data
-      this.process();
-
-      return this;
-    }
 
     /**
      * Method returning the renderer's camera.
@@ -3265,13 +3184,13 @@ var WebGLRenderer = function (_Renderer) {
       if (cameraState.ratio >= 1) {
 
         // Camera is unzoomed so no need to ask the quadtree for visible nodes
-        visibleNodes = this.sigma.getGraph().nodes();
+        visibleNodes = this.graph.nodes();
       } else {
 
         // Let's ask the quadtree
-        var viewRectangle = this.camera.viewRectangle();
+        var viewRectangle = this.camera.viewRectangle(this);
 
-        visibleNodes = this.quadtree.rectangle(viewRectangle.x1, viewRectangle.y1, viewRectangle.x2, viewRectangle.y2, viewRectangle.height);
+        visibleNodes = this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height);
       }
 
       // Selecting labels to draw
@@ -3292,9 +3211,9 @@ var WebGLRenderer = function (_Renderer) {
       for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
         var data = this.nodeDataCache[labelsToDisplay[i]];
 
-        var _camera$graphToDispla = this.camera.graphToDisplay(data.x, data.y),
-            x = _camera$graphToDispla.x,
-            y = _camera$graphToDispla.y;
+        var _camera$graphToViewpo = this.camera.graphToViewport(this, data.x, data.y),
+            x = _camera$graphToViewpo.x,
+            y = _camera$graphToViewpo.y;
 
         // TODO: we can cache the labels we need to render until the camera's ratio changes
 
@@ -3310,7 +3229,7 @@ var WebGLRenderer = function (_Renderer) {
           size: size,
           x: x,
           y: y
-        });
+        }, this.settings);
       }
 
       // Caching visible nodes and displayed labels
@@ -3347,9 +3266,9 @@ var WebGLRenderer = function (_Renderer) {
       var render = function render(node) {
         var data = _this5.nodeDataCache[node];
 
-        var _camera$graphToDispla2 = camera.graphToDisplay(data.x, data.y),
-            x = _camera$graphToDispla2.x,
-            y = _camera$graphToDispla2.y;
+        var _camera$graphToViewpo2 = camera.graphToViewport(_this5, data.x, data.y),
+            x = _camera$graphToViewpo2.x,
+            y = _camera$graphToViewpo2.y;
 
         var size = data.size / sizeRatio;
 
@@ -3359,7 +3278,7 @@ var WebGLRenderer = function (_Renderer) {
           size: size,
           x: x,
           y: y
-        });
+        }, _this5.settings);
       };
 
       if (this.hoveredNode) render(this.hoveredNode);
@@ -3461,6 +3380,51 @@ var WebGLRenderer = function (_Renderer) {
 
       return this;
     }
+
+    /**
+     * Method used to shut the container & release event listeners.
+     *
+     * @return {undefined}
+     */
+
+  }, {
+    key: 'kill',
+    value: function kill() {
+      var graph = this.graph;
+
+      // Releasing camera handlers
+      this.camera.removeListener('updated', this.listeners.camera);
+
+      // Releasing DOM events & captors
+      window.removeEventListener('resize', this.listeners.handleResize);
+      this.captors.mouse.kill();
+
+      // Releasing graph handlers
+      graph.removeListener('nodeAdded', this.listeners.graphUpdate);
+      graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+      graph.removeListener('nodeAttributesUpdated', this.listeners.softGraphUpdate);
+      graph.removeListener('edgeAdded', this.listeners.graphUpdate);
+      graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+      graph.removeListener('edgeAttributesUpdated', this.listeners.softGraphUpdate);
+      graph.removeListener('cleared', this.listeners.graphUpdate);
+
+      // Releasing cache & state
+      this.quadtree = null;
+      this.nodeOrder = null;
+      this.nodeDataCache = null;
+      this.edgeOrder = null;
+
+      this.highlightedNodes = null;
+      this.previousVisibleNodes = null;
+      this.displayedLabels = null;
+
+      // Destroying canvases
+      var container = this.container;
+
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+    }
   }]);
 
   return WebGLRenderer;
@@ -3472,6 +3436,126 @@ exports.default = WebGLRenderer;
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/**
+ * Graphology Extent
+ * ==================
+ *
+ * Simple function returning the extent of selected attributes of the graph.
+ */
+var isGraph = __webpack_require__(8);
+
+/**
+ * Function returning the extent of the selected node attributes.
+ *
+ * @param  {Graph}        graph     - Target graph.
+ * @param  {string|array} attribute - Single or multiple attributes.
+ * @return {array|object}
+ */
+function nodeExtent(graph, attribute) {
+  if (!isGraph(graph))
+    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
+
+  var attributes = [].concat(attribute);
+
+  var nodes = graph.nodes(),
+      node,
+      data,
+      value,
+      key,
+      a,
+      i,
+      l;
+
+  var results = {};
+
+  for (a = 0; a < attributes.length; a++) {
+    key = attributes[a];
+
+    results[key] = [Infinity, -Infinity];
+  }
+
+  for (i = 0, l = nodes.length; i < l; i++) {
+    node = nodes[i];
+    data = graph.getNodeAttributes(node);
+
+    for (a = 0; a < attributes.length; a++) {
+      key = attributes[a];
+      value = data[key];
+
+      if (value < results[key][0])
+        results[key][0] = value;
+
+      if (value > results[key][1])
+        results[key][1] = value;
+    }
+  }
+
+  return typeof attribute === 'string' ? results[attribute] : results;
+}
+
+/**
+ * Function returning the extent of the selected edge attributes.
+ *
+ * @param  {Graph}        graph     - Target graph.
+ * @param  {string|array} attribute - Single or multiple attributes.
+ * @return {array|object}
+ */
+function edgeExtent(graph, attribute) {
+  if (!isGraph(graph))
+    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
+
+  var attributes = [].concat(attribute);
+
+  var edges = graph.edges(),
+      edge,
+      data,
+      value,
+      key,
+      a,
+      i,
+      l;
+
+  var results = {};
+
+  for (a = 0; a < attributes.length; a++) {
+    key = attributes[a];
+
+    results[key] = [Infinity, -Infinity];
+  }
+
+  for (i = 0, l = edges.length; i < l; i++) {
+    edge = edges[i];
+    data = graph.getEdgeAttributes(edge);
+
+    for (a = 0; a < attributes.length; a++) {
+      key = attributes[a];
+      value = data[key];
+
+      if (value < results[key][0])
+        results[key][0] = value;
+
+      if (value > results[key][1])
+        results[key][1] = value;
+    }
+  }
+
+  return typeof attribute === 'string' ? results[attribute] : results;
+}
+
+/**
+ * Exporting.
+ */
+var extent = nodeExtent;
+extent.nodeExtent = nodeExtent;
+extent.edgeExtent = edgeExtent;
+
+module.exports = extent;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
@@ -3481,17 +3565,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _program = __webpack_require__(8);
+var _program = __webpack_require__(9);
 
 var _program2 = _interopRequireDefault(_program);
 
 var _utils = __webpack_require__(2);
 
-var _nodeFastVert = __webpack_require__(20);
+var _nodeFastVert = __webpack_require__(21);
 
 var _nodeFastVert2 = _interopRequireDefault(_nodeFastVert);
 
-var _nodeFastFrag = __webpack_require__(21);
+var _nodeFastFrag = __webpack_require__(22);
 
 var _nodeFastFrag2 = _interopRequireDefault(_nodeFastFrag);
 
@@ -3603,7 +3687,7 @@ var NodeProgramFast = function (_Program) {
 exports.default = NodeProgramFast;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3683,7 +3767,7 @@ function loadProgram(gl, shaders) {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3707,9 +3791,10 @@ function identity() {
   return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 
-function scale(m, x) {
+// TODO: optimize
+function scale(m, x, y) {
   m[0] = x;
-  m[4] = x;
+  m[4] = arguments.length > 2 ? y : x;
 
   return m;
 }
@@ -3770,19 +3855,19 @@ function multiply(a, b) {
 }
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    ((u_matrix * vec3(a_position, 1)).xy /\n      u_resolution * 2.0 - 1.0) * vec2(1, -1),\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute float a_size;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 color;\nvarying float border;\n\nvoid main() {\n\n  gl_Position = vec4(\n    (u_matrix * vec3(a_position, 1)).xy,\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  float c = a_color;\n  color.b = mod(c, 256.0); c = floor(c / 256.0);\n  color.g = mod(c, 256.0); c = floor(c / 256.0);\n  color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;\n  color.a = 1.0;\n}\n"
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = "precision mediump float;\n\nvarying vec4 color;\nvarying float border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / border;\n\n  gl_FragColor = mix(color0, color, t);\n}\n"
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3794,17 +3879,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _program = __webpack_require__(8);
+var _program = __webpack_require__(9);
 
 var _program2 = _interopRequireDefault(_program);
 
 var _utils = __webpack_require__(2);
 
-var _edgeVert = __webpack_require__(23);
+var _edgeVert = __webpack_require__(24);
 
 var _edgeVert2 = _interopRequireDefault(_edgeVert);
 
-var _edgeFrag = __webpack_require__(24);
+var _edgeFrag = __webpack_require__(25);
 
 var _edgeFrag2 = _interopRequireDefault(_edgeFrag);
 
@@ -4031,34 +4116,34 @@ var EdgeProgram = function (_Program) {
 exports.default = EdgeProgram;
 
 /***/ }),
-/* 23 */
-/***/ (function(module, exports) {
-
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5;\n\nvoid main() {\n\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = (a_thickness + feather) / 2.0 / pow_ratio / u_scale;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 delta = vec2(a_normal * thickness);\n\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness / u_ratio;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
-
-/***/ }),
 /* 24 */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.5 / 2.0;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness / 2.0 * pow_ratio / u_scale;\n\n  // Adding a small feather for AA\n  thickness += feather;\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  float c = a_color;\n  v_color.b = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.g = mod(c, 256.0); c = floor(c / 256.0);\n  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;\n  v_color.a = 1.0;\n}\n"
 
 /***/ }),
 /* 25 */
+/***/ (function(module, exports) {
+
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
+
+/***/ }),
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+      value: true
 });
 exports.default = drawHover;
 
-var _node = __webpack_require__(26);
+var _node = __webpack_require__(27);
 
 var _node2 = _interopRequireDefault(_node);
 
-var _label = __webpack_require__(9);
+var _label = __webpack_require__(10);
 
 var _label2 = _interopRequireDefault(_label);
 
@@ -4071,158 +4156,54 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
-function drawHover(context, data) {
+function drawHover(context, data, settings) {
+      var size = settings.labelSize,
+          font = settings.labelFont,
+          weight = settings.labelWeight;
 
-  context.font = '14px arial';
+      context.font = weight + ' ' + size + 'px ' + font;
 
-  // Then we draw the label background
-  context.beginPath();
-  context.fillStyle = '#fff';
-  context.shadowOffsetX = 0;
-  context.shadowOffsetY = 0;
-  context.shadowBlur = 8;
-  context.shadowColor = '#000';
+      // Then we draw the label background
+      context.beginPath();
+      context.fillStyle = '#fff';
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 8;
+      context.shadowColor = '#000';
 
-  var textWidth = context.measureText(data.label).width;
+      var textWidth = context.measureText(data.label).width;
 
-  var x = Math.round(data.x - 14 / 2 - 2),
-      y = Math.round(data.y - 14 / 2 - 2),
-      w = Math.round(textWidth + 14 / 2 + data.size + 9),
-      h = Math.round(14 + 4),
-      e = Math.round(14 / 2 + 2);
+      var x = Math.round(data.x - size / 2 - 2),
+          y = Math.round(data.y - size / 2 - 2),
+          w = Math.round(textWidth + size / 2 + data.size + 9),
+          h = Math.round(size + 4),
+          e = Math.round(size / 2 + 2);
 
-  context.moveTo(x, y + e);
-  context.moveTo(x, y + e);
-  context.arcTo(x, y, x + e, y, e);
-  context.lineTo(x + w, y);
-  context.lineTo(x + w, y + h);
-  context.lineTo(x + e, y + h);
-  context.arcTo(x, y + h, x, y + h - e, e);
-  context.lineTo(x, y + e);
+      context.moveTo(x, y + e);
+      context.moveTo(x, y + e);
+      context.arcTo(x, y, x + e, y, e);
+      context.lineTo(x + w, y);
+      context.lineTo(x + w, y + h);
+      context.lineTo(x + e, y + h);
+      context.arcTo(x, y + h, x, y + h - e, e);
+      context.lineTo(x, y + e);
 
-  context.closePath();
-  context.fill();
+      context.closePath();
+      context.fill();
 
-  context.shadowOffsetX = 0;
-  context.shadowOffsetY = 0;
-  context.shadowBlur = 0;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
 
-  // Then we need to draw the node
-  (0, _node2.default)(context, data);
+      // Then we need to draw the node
+      (0, _node2.default)(context, data);
 
-  // And finally we draw the label
-  (0, _label2.default)(context, data);
+      // And finally we draw the label
+      (0, _label2.default)(context, data, settings);
 }
 
-// ;(function(undefined) {
-//   'use strict';
-
-//   if (typeof sigma === 'undefined')
-//     throw 'sigma is not declared';
-
-//   // Initialize packages:
-//   sigma.utils.pkg('sigma.canvas.hovers');
-
-//   /**
-//    * This hover renderer will basically display the label with a background.
-//    *
-//    * @param  {object}                   node     The node object.
-//    * @param  {CanvasRenderingContext2D} context  The canvas context.
-//    * @param  {configurable}             settings The settings function.
-//    */
-//   sigma.canvas.hovers.def = function(node, context, settings) {
-//     var x,
-//         y,
-//         w,
-//         h,
-//         e,
-//         fontStyle = settings('hoverFontStyle') || settings('fontStyle'),
-//         prefix = settings('prefix') || '',
-//         size = node[prefix + 'size'],
-//         fontSize = (settings('labelSize') === 'fixed') ?
-//           settings('defaultLabelSize') :
-//           settings('labelSizeRatio') * size;
-
-//     // Label background:
-//     context.font = (fontStyle ? fontStyle + ' ' : '') +
-//       fontSize + 'px ' + (settings('hoverFont') || settings('font'));
-
-//     context.beginPath();
-//     context.fillStyle = settings('labelHoverBGColor') === 'node' ?
-//       (node.color || settings('defaultNodeColor')) :
-//       settings('defaultHoverLabelBGColor');
-
-//     if (node.label && settings('labelHoverShadow')) {
-//       context.shadowOffsetX = 0;
-//       context.shadowOffsetY = 0;
-//       context.shadowBlur = 8;
-//       context.shadowColor = settings('labelHoverShadowColor');
-//     }
-
-//     if (node.label && typeof node.label === 'string') {
-//       x = Math.round(node[prefix + 'x'] - fontSize / 2 - 2);
-//       y = Math.round(node[prefix + 'y'] - fontSize / 2 - 2);
-//       w = Math.round(
-//         context.measureText(node.label).width + fontSize / 2 + size + 7
-//       );
-//       h = Math.round(fontSize + 4);
-//       e = Math.round(fontSize / 2 + 2);
-
-//       context.moveTo(x, y + e);
-//       context.arcTo(x, y, x + e, y, e);
-//       context.lineTo(x + w, y);
-//       context.lineTo(x + w, y + h);
-//       context.lineTo(x + e, y + h);
-//       context.arcTo(x, y + h, x, y + h - e, e);
-//       context.lineTo(x, y + e);
-
-//       context.closePath();
-//       context.fill();
-
-//       context.shadowOffsetX = 0;
-//       context.shadowOffsetY = 0;
-//       context.shadowBlur = 0;
-//     }
-
-//     // Node border:
-//     if (settings('borderSize') > 0) {
-//       context.beginPath();
-//       context.fillStyle = settings('nodeBorderColor') === 'node' ?
-//         (node.color || settings('defaultNodeColor')) :
-//         settings('defaultNodeBorderColor');
-//       context.arc(
-//         node[prefix + 'x'],
-//         node[prefix + 'y'],
-//         size + settings('borderSize'),
-//         0,
-//         Math.PI * 2,
-//         true
-//       );
-//       context.closePath();
-//       context.fill();
-//     }
-
-//     // Node:
-//     var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
-//     nodeRenderer(node, context, settings);
-
-//     // Display the label:
-//     if (node.label && typeof node.label === 'string') {
-//       context.fillStyle = (settings('labelHoverColor') === 'node') ?
-//         (node.color || settings('defaultNodeColor')) :
-//         settings('defaultLabelHoverColor');
-
-//       context.fillText(
-//         node.label,
-//         Math.round(node[prefix + 'x'] + size + 3),
-//         Math.round(node[prefix + 'y'] + fontSize / 3)
-//       );
-//     }
-//   };
-// }).call(this);
-
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4251,7 +4232,7 @@ function drawNode(context, data) {
 }
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4280,6 +4261,8 @@ var DEFAULT_UNZOOMED_CELL = {
   width: 400,
   height: 300
 };
+
+// TODO: use degree as secondary tie-breaker
 
 /**
  * Label grid heuristic selecting labels to display according to the following
@@ -4355,7 +4338,8 @@ exports.labelsToDisplayFromGrid = function (params) {
     }
 
     // Finding our node's cell in the grid
-    var pos = camera.graphToDisplay(nodeData.x, nodeData.y);
+    // TODO: pass dimensions to the function
+    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
 
     var xKey = Math.floor(pos.x / cellWidth),
         yKey = Math.floor(pos.y / cellHeight);

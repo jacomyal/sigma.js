@@ -48,6 +48,7 @@
     "graphology-gexf": "^0.4.0",
     "graphology-layout": "0.0.1",
     "graphology-layout-forceatlas2": "^0.1.1",
+    "graphology-library": "^0.1.1",
     "html-webpack-plugin": "^2.22.0",
     "mocha": "^5.0.5",
     "raw-loader": "^0.5.1",
