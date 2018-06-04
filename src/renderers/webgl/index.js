@@ -445,6 +445,9 @@ export default class WebGLRenderer extends Renderer {
 
     const graph = this.graph;
 
+    // Clearing the quad
+    this.quadtree.clear();
+
     // TODO: possible to index this somehow using two byte arrays or so
     const extent = nodeExtent(graph, ['x', 'y']);
 
