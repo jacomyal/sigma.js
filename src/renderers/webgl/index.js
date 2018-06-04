@@ -197,7 +197,12 @@ export default class WebGLRenderer extends Renderer {
     let context;
 
     if (webgl) {
-      context = element.getContext('webgl', contextOptions);
+      // First we try webgl2 for an easy performance boost
+      context = element.getContext('webgl2', contextOptions);
+
+      // Else we fall back to webgl
+      if (!context)
+        context = element.getContext('webgl', contextOptions);
 
       // Edge, I am looking right at you...
       if (!context)
