@@ -24,7 +24,9 @@ graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new WebGLRenderer(graph, container, {
+  renderLabels: false
+});
 
 window.graph = graph;
 window.renderer = renderer;

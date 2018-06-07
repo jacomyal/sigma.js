@@ -51,6 +51,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 const DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
+  renderLabels: true,
   zIndex: false,
 
   // TEMPORARY LABEL SETTINGS
@@ -197,7 +198,7 @@ export default class WebGLRenderer extends Renderer {
     this.container.appendChild(element);
 
     const contextOptions = {
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false,
       antialias: false
     };
 
@@ -699,17 +700,20 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   clear() {
-    let context = this.contexts.nodes;
-    context.clear(context.COLOR_BUFFER_BIT);
 
-    context = this.contexts.edges;
-    context.clear(context.COLOR_BUFFER_BIT);
+    // NOTE: don't need to clear with preserveDrawingBuffer to false
 
-    context = this.contexts.labels;
+    // let context = this.contexts.nodes;
+    // context.clear(context.COLOR_BUFFER_BIT);
+
+    // context = this.contexts.edges;
+    // context.clear(context.COLOR_BUFFER_BIT);
+
+    const context = this.contexts.labels;
     context.clearRect(0, 0, this.width, this.height);
 
-    context = this.contexts.hovers;
-    context.clearRect(0, 0, this.width, this.height);
+    // context = this.contexts.hovers;
+    // context.clearRect(0, 0, this.width, this.height);
 
     return this;
   }
@@ -806,6 +810,9 @@ export default class WebGLRenderer extends Renderer {
         viewRectangle.height
       );
     }
+
+    if (!this.settings.renderLabels)
+      return this;
 
     // Selecting labels to draw
     const labelsToDisplay = labelsToDisplayFromGrid({
