@@ -35,6 +35,10 @@ import {
   labelsToDisplayFromGrid
 } from '../../heuristics/labels';
 
+import {
+  zIndexOrdering
+} from '../../heuristics/z-index';
+
 /**
  * Constants.
  */
@@ -471,9 +475,15 @@ export default class WebGLRenderer extends Renderer {
       this.nodeOrder = {};
     }
 
-    const nodes = graph.nodes();
+    let nodes = graph.nodes();
 
-    // TODO: Handling node z-index
+    // Handling node z-index
+    if (this.settings.zIndex)
+      nodes = zIndexOrdering(
+        this.edgeExtent.z,
+        node => graph.getNodeAttribute(node, 'z'),
+        nodes
+      );
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -509,9 +519,15 @@ export default class WebGLRenderer extends Renderer {
       this.edgeOrder = {};
     }
 
-    const edges = graph.edges();
+    let edges = graph.edges();
 
-    // TODO: Handling edge z-index
+    // Handling edge z-index
+    if (this.settings.zIndex)
+      edges = zIndexOrdering(
+        this.edgeExtent.z,
+        edge => graph.getEdgeAttribute(edge, 'z'),
+        edges
+      );
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];

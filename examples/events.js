@@ -25,6 +25,7 @@ graph.nodes().forEach(node => {
 
 graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
+  graph.setEdgeAttribute(edge, 'z', 0);
 });
 
 const renderer = new WebGLRenderer(graph, container, {
@@ -42,9 +43,11 @@ renderer.on('overNode', e => {
   graph.nodes().forEach(node => {
     if (neighbors.has(node)) {
       graph.setNodeAttribute(node, 'color', '#f00');
+      graph.setNodeAttribute(node, 'z', 1);
     }
     else {
       graph.setNodeAttribute(node, 'color', '#ccc');
+      graph.setNodeAttribute(node, 'z', 0);
     }
   });
 
@@ -52,9 +55,11 @@ renderer.on('overNode', e => {
     if (edges.has(edge)) {
       graph.setEdgeAttribute(edge, 'hidden', false);
       graph.setEdgeAttribute(edge, 'color', '#f00');
+      graph.setEdgeAttribute(edge, 'z', 1);
     }
     else {
       graph.setEdgeAttribute(edge, 'hidden', true);
+      graph.setEdgeAttribute(edge, 'z', 0);
     }
   });
 });
@@ -63,10 +68,12 @@ renderer.on('outNode', e => {
   graph.edges().forEach(edge => {
     graph.setEdgeAttribute(edge, 'hidden', false);
     graph.setEdgeAttribute(edge, 'color', '#ccc');
+    graph.setEdgeAttribute(edge, 'z', 0);
   });
 
   graph.nodes().forEach(node => {
     graph.setNodeAttribute(node, 'color', graph.getNodeAttribute(node, 'originalColor'));
+    graph.setNodeAttribute(node, 'z', 0);
   });
 });
 
