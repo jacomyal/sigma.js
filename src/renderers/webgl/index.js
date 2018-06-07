@@ -4,7 +4,7 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
-import nodeExtent from 'graphology-metrics/extent';
+import {nodeExtent, edgeExtent} from 'graphology-metrics/extent';
 import isGraph from 'graphology-utils/is-graph';
 
 import Renderer from '../../renderer';
@@ -47,6 +47,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 const DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
+  zIndex: false,
 
   // TEMPORARY LABEL SETTINGS
   labelFont: 'Arial',
@@ -85,13 +86,15 @@ export default class WebGLRenderer extends Renderer {
     this.contexts = {};
     this.listeners = {};
 
-    // Indices
+    // Indices & cache
     // TODO: this could be improved by key => index => floatArray
     // TODO: the cache should erase keys on node delete
     this.quadtree = new QuadTree();
     this.nodeOrder = {};
     this.nodeDataCache = {};
     this.edgeOrder = {};
+    this.nodeExtent = null;
+    this.edgeExtent = null;
 
     // Normalization function
     this.normalizationFunction = null;
@@ -448,11 +451,18 @@ export default class WebGLRenderer extends Renderer {
     // Clearing the quad
     this.quadtree.clear();
 
-    // TODO: possible to index this somehow using two byte arrays or so
-    const extent = nodeExtent(graph, ['x', 'y']);
+    // Computing extents
+    const nodeExtentProperties = ['x', 'y'];
+
+    if (this.settings.zIndex) {
+      nodeExtentProperties.push('z');
+      this.edgeExtent = edgeExtent(graph, ['z']);
+    }
+
+    this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
 
     // Rescaling function
-    this.normalizationFunction = createNormalizationFunction(extent);
+    this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
 
     const nodeProgram = this.nodePrograms.def;
 
@@ -462,6 +472,8 @@ export default class WebGLRenderer extends Renderer {
     }
 
     const nodes = graph.nodes();
+
+    // TODO: Handling node z-index
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -498,6 +510,8 @@ export default class WebGLRenderer extends Renderer {
     }
 
     const edges = graph.edges();
+
+    // TODO: Handling edge z-index
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];

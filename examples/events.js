@@ -27,7 +27,9 @@ graph.edges().forEach(edge => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new WebGLRenderer(graph, container, {
+  zIndex: true
+});
 
 // Binding events
 renderer.on('overNode', e => {
