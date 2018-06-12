@@ -46,7 +46,7 @@ renderer.on('overNode', e => {
       graph.setNodeAttribute(node, 'z', 1);
     }
     else {
-      graph.setNodeAttribute(node, 'color', '#ccc');
+      graph.setNodeAttribute(node, 'color', '#bbb');
       graph.setNodeAttribute(node, 'z', 0);
     }
   });
@@ -58,7 +58,7 @@ renderer.on('overNode', e => {
       graph.setEdgeAttribute(edge, 'z', 1);
     }
     else {
-      graph.setEdgeAttribute(edge, 'hidden', true);
+      graph.setEdgeAttribute(edge, 'color', '#eee');
       graph.setEdgeAttribute(edge, 'z', 0);
     }
   });
