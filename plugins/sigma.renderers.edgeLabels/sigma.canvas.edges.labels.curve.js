@@ -35,6 +35,7 @@
         sY = source[prefix + 'y'],
         tX = target[prefix + 'x'],
         tY = target[prefix + 'y'],
+        count = edge.count || 0,
         dX = tX - sX,
         dY = tY - sY,
         sign = (sX < tX) ? 1 : -1,
@@ -44,13 +45,13 @@
         t = 0.5;  //length of the curve
 
     if (source.id === target.id) {
-      cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize);
+      cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize, count);
       c = sigma.utils.getPointOnBezierCurve(
         t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2
       );
       angle = Math.atan2(1, 1); // 45°
     } else {
-      cp = sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
+      cp = sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY, count);
       c = sigma.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
       angle = Math.atan2(dY * sign, dX * sign);
     }
