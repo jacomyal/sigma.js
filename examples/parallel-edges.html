@@ -76,6 +76,7 @@ var i,
     s,
     N = 2,
     E = 10,
+    L = 3,
     g = {
       nodes: [],
       edges: []
@@ -98,6 +99,18 @@ for (i = 0; i < E; i++)
     label: 'Edge ' + i,
     source: 'n0',
     target: 'n1',
+    size: 1,
+    color: '#ccc',
+    type: 'curvedArrow',
+    count: i
+  });
+
+for (i = 0; i < L; i++)
+  g.edges.push({
+    id: 'e_loop' + i,
+    label: 'Edge_loop ' + i,
+    source: 'n0',
+    target: 'n0',
     size: 1,
     color: '#ccc',
     type: 'curvedArrow',
