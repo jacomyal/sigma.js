@@ -51,6 +51,10 @@
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edges.curvedArrow.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edgehovers.curve.js"></script>
 <script src="../plugins/sigma.renderers.parallelEdges/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="../plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
 <div id="container">
   <style>
     #graph-container {
@@ -72,6 +76,7 @@ var i,
     s,
     N = 2,
     E = 10,
+    L = 3,
     g = {
       nodes: [],
       edges: []
@@ -94,7 +99,19 @@ for (i = 0; i < E; i++)
     label: 'Edge ' + i,
     source: 'n0',
     target: 'n1',
-    size: Math.random(),
+    size: 1,
+    color: '#ccc',
+    type: 'curvedArrow',
+    count: i
+  });
+
+for (i = 0; i < L; i++)
+  g.edges.push({
+    id: 'e_loop' + i,
+    label: 'Edge_loop ' + i,
+    source: 'n0',
+    target: 'n0',
+    size: 1,
     color: '#ccc',
     type: 'curvedArrow',
     count: i
