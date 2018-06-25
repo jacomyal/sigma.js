@@ -19006,8 +19006,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _extent = __webpack_require__(61);
 
-var _extent2 = _interopRequireDefault(_extent);
-
 var _isGraph = __webpack_require__(0);
 
 var _isGraph2 = _interopRequireDefault(_isGraph);
@@ -19052,6 +19050,8 @@ var _utils3 = __webpack_require__(35);
 
 var _labels = __webpack_require__(247);
 
+var _zIndex = __webpack_require__(248);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19078,6 +19078,8 @@ var WEBGL_OVERSAMPLING_RATIO = (0, _utils2.getPixelRatio)();
 var DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
+  renderLabels: true,
+  zIndex: false,
 
   // TEMPORARY LABEL SETTINGS
   labelFont: 'Arial',
@@ -19119,13 +19121,15 @@ var WebGLRenderer = function (_Renderer) {
     _this.contexts = {};
     _this.listeners = {};
 
-    // Indices
+    // Indices & cache
     // TODO: this could be improved by key => index => floatArray
     // TODO: the cache should erase keys on node delete
     _this.quadtree = new _quadtree2.default();
     _this.nodeOrder = {};
     _this.nodeDataCache = {};
     _this.edgeOrder = {};
+    _this.nodeExtent = null;
+    _this.edgeExtent = null;
 
     // Normalization function
     _this.normalizationFunction = null;
@@ -19231,14 +19235,18 @@ var WebGLRenderer = function (_Renderer) {
       this.container.appendChild(element);
 
       var contextOptions = {
-        preserveDrawingBuffer: true,
+        preserveDrawingBuffer: false,
         antialias: false
       };
 
       var context = void 0;
 
       if (webgl) {
-        context = element.getContext('webgl', contextOptions);
+        // First we try webgl2 for an easy performance boost
+        context = element.getContext('webgl2', contextOptions);
+
+        // Else we fall back to webgl
+        if (!context) context = element.getContext('webgl', contextOptions);
 
         // Edge, I am looking right at you...
         if (!context) context = element.getContext('experimental-webgl', contextOptions);
@@ -19461,11 +19469,21 @@ var WebGLRenderer = function (_Renderer) {
 
       var graph = this.graph;
 
-      // TODO: possible to index this somehow using two byte arrays or so
-      var extent = (0, _extent2.default)(graph, ['x', 'y']);
+      // Clearing the quad
+      this.quadtree.clear();
+
+      // Computing extents
+      var nodeExtentProperties = ['x', 'y'];
+
+      if (this.settings.zIndex) {
+        nodeExtentProperties.push('z');
+        this.edgeExtent = (0, _extent.edgeExtent)(graph, ['z']);
+      }
+
+      this.nodeExtent = (0, _extent.nodeExtent)(graph, nodeExtentProperties);
 
       // Rescaling function
-      this.normalizationFunction = (0, _utils2.createNormalizationFunction)(extent);
+      this.normalizationFunction = (0, _utils2.createNormalizationFunction)(this.nodeExtent);
 
       var nodeProgram = this.nodePrograms.def;
 
@@ -19475,6 +19493,11 @@ var WebGLRenderer = function (_Renderer) {
       }
 
       var nodes = graph.nodes();
+
+      // Handling node z-index
+      if (this.settings.zIndex) nodes = (0, _zIndex.zIndexOrdering)(this.edgeExtent.z, function (node) {
+        return graph.getNodeAttribute(node, 'z');
+      }, nodes);
 
       for (var i = 0, l = nodes.length; i < l; i++) {
         var node = nodes[i];
@@ -19506,6 +19529,11 @@ var WebGLRenderer = function (_Renderer) {
       }
 
       var edges = graph.edges();
+
+      // Handling edge z-index
+      if (this.settings.zIndex) edges = (0, _zIndex.zIndexOrdering)(this.edgeExtent.z, function (edge) {
+        return graph.getEdgeAttribute(edge, 'z');
+      }, edges);
 
       for (var _i = 0, _l = edges.length; _i < _l; _i++) {
         var edge = edges[_i];
@@ -19672,17 +19700,20 @@ var WebGLRenderer = function (_Renderer) {
   }, {
     key: 'clear',
     value: function clear() {
-      var context = this.contexts.nodes;
-      context.clear(context.COLOR_BUFFER_BIT);
 
-      context = this.contexts.edges;
-      context.clear(context.COLOR_BUFFER_BIT);
+      // NOTE: don't need to clear with preserveDrawingBuffer to false
 
-      context = this.contexts.labels;
+      // let context = this.contexts.nodes;
+      // context.clear(context.COLOR_BUFFER_BIT);
+
+      // context = this.contexts.edges;
+      // context.clear(context.COLOR_BUFFER_BIT);
+
+      var context = this.contexts.labels;
       context.clearRect(0, 0, this.width, this.height);
 
-      context = this.contexts.hovers;
-      context.clearRect(0, 0, this.width, this.height);
+      // context = this.contexts.hovers;
+      // context.clearRect(0, 0, this.width, this.height);
 
       return this;
     }
@@ -19765,6 +19796,8 @@ var WebGLRenderer = function (_Renderer) {
 
         visibleNodes = this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height);
       }
+
+      if (!this.settings.renderLabels) return this;
 
       // Selecting labels to draw
       var labelsToDisplay = (0, _labels.labelsToDisplayFromGrid)({
@@ -20833,6 +20866,57 @@ exports.labelsToDisplayFromGrid = function (params) {
   for (var _key in grid) {
     worthyLabels.push(grid[_key]);
   }return worthyLabels;
+};
+
+/***/ }),
+/* 248 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+/**
+ * Sigma.js zIndex Heuristics
+ * ===========================
+ *
+ * Miscelleneous heuristics related to z-index ordering of nodes & edges.
+ */
+
+/**
+ * Function ordering the given elements in reverse z-order so they drawn
+ * the correct way.
+ *
+ * @param  {number}   extent   - [min, max] z values.
+ * @param  {function} getter   - Z attribute getter function.
+ * @param  {array}    elements - The array to sort.
+ * @return {array} - The sorted array.
+ */
+exports.zIndexOrdering = function (extent, getter, elements) {
+  var n = elements.length;
+
+  var _extent = _slicedToArray(extent, 2),
+      min = _extent[0],
+      max = _extent[1];
+
+  var k = max - min;
+
+  // No ordering needs to be done
+  if (k === 0 || k === -Infinity) return elements;
+
+  // If k is > n, we'll use a standard sort
+  if (true) return elements.sort(function (a, b) {
+    var zA = getter(a),
+        zB = getter(b);
+
+    if (zA < zB) return -1;
+    if (zA > zB) return 1;
+
+    return 0;
+  });
+
+  // TODO: counting sort optimization
 };
 
 /***/ })
