@@ -4,4 +4,3 @@ build/*
 *.log
 *.swp
 .DS_Store
-.idea/*
