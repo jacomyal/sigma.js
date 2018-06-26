@@ -54,7 +54,14 @@ export default class EdgeProgram extends Program {
     // have all their edges rendered. But it seems that the
     // `OES_element_index_uint` is quite everywhere so we'll handle
     // the potential issue if it really arises.
-    const extension = gl.getExtension('OES_element_index_uint');
+    // NOTE: when using webgl2, the extension is enabled by default
+    const webgl2 = (
+      typeof WebGL2RenderingContext !== 'undefined' &&
+      gl instanceof WebGL2RenderingContext
+    );
+
+    const extension = webgl2 || gl.getExtension('OES_element_index_uint');
+
     this.canUse32BitsIndices = !!extension;
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
     this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
