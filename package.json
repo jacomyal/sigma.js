@@ -16,7 +16,7 @@
     "test": "mocha --require babel-core/register ./test/endpoint.js"
   },
   "sigma": {
-    "clean": "camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers"
+    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers"
   },
   "repository": {
     "type": "git",

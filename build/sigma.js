@@ -2669,8 +2669,9 @@ var WebGLRenderer = function (_Renderer) {
       var context = void 0;
 
       if (webgl) {
+
         // First we try webgl2 for an easy performance boost
-        context = element.getContext('webgl2', contextOptions);
+        context = element.getContext('webgl', contextOptions);
 
         // Else we fall back to webgl
         if (!context) context = element.getContext('webgl', contextOptions);
@@ -3989,7 +3990,11 @@ var EdgeProgram = function (_Program) {
     // have all their edges rendered. But it seems that the
     // `OES_element_index_uint` is quite everywhere so we'll handle
     // the potential issue if it really arises.
-    var extension = gl.getExtension('OES_element_index_uint');
+    // NOTE: when using webgl2, the extension is enabled by default
+    var webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
+    var extension = webgl2 || gl.getExtension('OES_element_index_uint');
+
     _this.canUse32BitsIndices = !!extension;
     _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
     _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
