@@ -40,6 +40,7 @@
     "babel-loader": "^7.1.4",
     "babel-preset-es2015": "^6.14.0",
     "chroma-js": "^1.3.6",
+    "d3-scale": "^2.1.0",
     "eslint": "^4.19.1",
     "faker": "^4.1.0",
     "glob": "^7.1.2",
@@ -53,6 +54,7 @@
     "mocha": "^5.0.5",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.1",
+    "simple-statistics": "^6.1.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.2",
     "worker-loader": "^1.1.1"
