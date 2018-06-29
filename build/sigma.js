@@ -2977,7 +2977,7 @@ var WebGLRenderer = function (_Renderer) {
       }
 
       // Computing edge indices if necessary
-      if (!keepArrays && typeof edgeProgram.computeIndices === 'function') this.edgeIndicesArray = edgeProgram.computeIndices();
+      if (!keepArrays && typeof edgeProgram.computeIndices === 'function') edgeProgram.computeIndices();
 
       edgeProgram.bufferData();
 
@@ -3686,6 +3686,15 @@ var NodeProgramFast = function (_Program) {
 
       var array = this.array;
 
+      if (data.hidden) {
+        array[i++] = 0;
+        array[i++] = 0;
+        array[i++] = 0;
+        array[i++] = 0;
+
+        return;
+      }
+
       array[i++] = data.x;
       array[i++] = data.y;
       array[i++] = data.size;
@@ -3952,7 +3961,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var POINTS = 4,
-    ATTRIBUTES = 6;
+    ATTRIBUTES = 6,
+    STRIDE = POINTS * ATTRIBUTES;
 
 var EdgeProgram = function (_Program) {
   _inherits(EdgeProgram, _Program);
@@ -4030,9 +4040,9 @@ var EdgeProgram = function (_Program) {
     value: function process(sourceData, targetData, data, offset) {
 
       if (sourceData.hidden || targetData.hidden || data.hidden) {
-        for (var l = i + POINTS * ATTRIBUTES; i < l; i++) {
-          this.array[i] = 0;
-        }
+        for (var _i = offset * STRIDE, l = _i + STRIDE; _i < l; _i++) {
+          this.array[_i] = 0;
+        }return;
       }
 
       var thickness = data.size || 1,
@@ -4102,13 +4112,13 @@ var EdgeProgram = function (_Program) {
 
       var indices = new this.IndicesArray(size);
 
-      for (var _i = 0, c = 0; _i < size; _i += 4) {
-        indices[c++] = _i;
-        indices[c++] = _i + 1;
-        indices[c++] = _i + 2;
-        indices[c++] = _i + 2;
-        indices[c++] = _i + 1;
-        indices[c++] = _i + 3;
+      for (var i = 0, c = 0; i < size; i += 4) {
+        indices[c++] = i;
+        indices[c++] = i + 1;
+        indices[c++] = i + 2;
+        indices[c++] = i + 2;
+        indices[c++] = i + 1;
+        indices[c++] = i + 3;
       }
 
       this.indicesArray = indices;
