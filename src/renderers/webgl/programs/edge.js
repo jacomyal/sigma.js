@@ -20,7 +20,8 @@ import vertexShaderSource from '../shaders/edge.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
 const POINTS = 4,
-      ATTRIBUTES = 6;
+      ATTRIBUTES = 6,
+      STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeProgram extends Program {
   constructor(gl) {
@@ -116,8 +117,10 @@ export default class EdgeProgram extends Program {
   process(sourceData, targetData, data, offset) {
 
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
+      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
         this.array[i] = 0;
+
+      return;
     }
 
     const thickness = data.size || 1,

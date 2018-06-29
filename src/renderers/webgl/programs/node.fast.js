@@ -81,6 +81,15 @@ export default class NodeProgramFast extends Program {
 
     const array = this.array;
 
+    if (data.hidden) {
+      array[i++] = 0;
+      array[i++] = 0;
+      array[i++] = 0;
+      array[i++] = 0;
+
+      return;
+    }
+
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
