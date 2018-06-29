@@ -551,7 +551,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Computing edge indices if necessary
     if (!keepArrays && typeof edgeProgram.computeIndices === 'function')
-      this.edgeIndicesArray = edgeProgram.computeIndices();
+      edgeProgram.computeIndices();
 
     edgeProgram.bufferData();
 
