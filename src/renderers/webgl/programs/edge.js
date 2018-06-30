@@ -189,7 +189,7 @@ export default class EdgeProgram extends Program {
 
     const indices = new this.IndicesArray(size);
 
-    for (let i = 0, c = 0; i < size; i += 4) {
+    for (let i = 0, c = 0; i < l; i += 4) {
       indices[c++] = i;
       indices[c++] = i + 1;
       indices[c++] = i + 2;
