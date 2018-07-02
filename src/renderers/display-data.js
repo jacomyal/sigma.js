@@ -54,6 +54,9 @@ export class EdgeDisplayData {
     if ('size' in data)
       this.size = data.size;
 
+    if ('color' in data)
+      this.color = data.color;
+
     if ('hidden' in data)
       this.hidden = data.hidden;
   }
