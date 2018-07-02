@@ -11,6 +11,7 @@ import Renderer from '../../renderer';
 import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
+import {NodeDisplayData, EdgeDisplayData} from '../display-data';
 import NodeProgram from './programs/node.fast';
 import EdgeProgram from './programs/edge';
 
@@ -99,13 +100,14 @@ export default class WebGLRenderer extends Renderer {
 
     // Indices & cache
     // TODO: this could be improved by key => index => floatArray
-    // TODO: the cache should erase keys on node delete
+    // TODO: the cache should erase keys on node delete & add new
     this.quadtree = new QuadTree();
-    this.nodeOrder = {};
     this.nodeDataCache = {};
-    this.edgeOrder = {};
+    this.edgeDataCache = {};
     this.nodeExtent = null;
     this.edgeExtent = null;
+
+    this.initializeCache();
 
     // Normalization function
     this.normalizationFunction = null;
@@ -230,6 +232,25 @@ export default class WebGLRenderer extends Renderer {
     this.contexts[id] = context;
 
     return this;
+  }
+
+  /**
+   * Method used to initialize display data cache.
+   *
+   * @return {WebGLRenderer}
+   */
+  initializeCache() {
+    const graph = this.graph;
+
+    const nodes = graph.nodes();
+
+    for (let i = 0, l = nodes.length; i < l; i++)
+      this.nodeDataCache[nodes[i]] = new NodeDisplayData(i);
+
+    const edges = graph.edges();
+
+    for (let i = 0, l = edges.length; i < l; i++)
+      this.edgeDataCache[edges[i]] = new EdgeDisplayData(i);
   }
 
   /**
@@ -478,10 +499,8 @@ export default class WebGLRenderer extends Renderer {
 
     const nodeProgram = this.nodePrograms.def;
 
-    if (!keepArrays) {
+    if (!keepArrays)
       nodeProgram.allocate(graph.order);
-      this.nodeOrder = {};
-    }
 
     let nodes = graph.nodes();
 
@@ -495,16 +514,12 @@ export default class WebGLRenderer extends Renderer {
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
-
-      this.nodeOrder[node] = i;
+      const displayData = this.nodeDataCache[node];
 
       const data = graph.getNodeAttributes(node);
 
-      const rescaledData = this.normalizationFunction(data);
-
-      // TODO: optimize by keeping a reference to display object at all time and mutate it
-      // TODO: optimize this to save a loop and one object, by using a reversed assign
-      const displayData = assign({}, data, rescaledData);
+      displayData.assign(data);
+      this.normalizationFunction.applyTo(displayData);
 
       this.quadtree.add(
         node,
@@ -513,9 +528,9 @@ export default class WebGLRenderer extends Renderer {
         displayData.size / this.width
       );
 
-      this.nodeDataCache[node] = displayData;
-
       nodeProgram.process(displayData, i);
+
+      displayData.index = i;
     }
 
     nodeProgram.bufferData();
@@ -540,19 +555,23 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      this.edgeOrder[edge] = i;
-
       const data = graph.getEdgeAttributes(edge),
-            extremities = graph.extremities(edge),
+            displayData = this.edgeDataCache[edge];
+
+      displayData.assign(data);
+
+      const extremities = graph.extremities(edge),
             sourceData = this.nodeDataCache[extremities[0]],
             targetData = this.nodeDataCache[extremities[1]];
 
       edgeProgram.process(
         sourceData,
         targetData,
-        data,
+        displayData,
         i
       );
+
+      displayData.index = i;
     }
 
     // Computing edge indices if necessary
@@ -577,7 +596,7 @@ export default class WebGLRenderer extends Renderer {
 
     nodeProgram.process(
       data,
-      this.nodeOrder[key]
+      this.nodeDataCache[key].index
     );
 
     return this;
@@ -603,7 +622,7 @@ export default class WebGLRenderer extends Renderer {
       sourceData,
       targetData,
       data,
-      this.edgeOrder[key]
+      this.edgeDataCache[key].index
     );
 
     return this;
@@ -1010,9 +1029,8 @@ export default class WebGLRenderer extends Renderer {
 
     // Releasing cache & state
     this.quadtree = null;
-    this.nodeOrder = null;
     this.nodeDataCache = null;
-    this.edgeOrder = null;
+    this.edgeDataCache = null;
 
     this.highlightedNodes = null;
     this.previousVisibleNodes = null;

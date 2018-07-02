@@ -74,7 +74,12 @@ export function createNormalizationFunction(extent) {
     };
   };
 
-  // TODO: unit test this
+  // TODO: possibility to apply this in batch over array of indices
+  fn.applyTo = data => {
+    data.x = 0.5 + (data.x - dX) / ratio;
+    data.y = 0.5 + (data.y - dY) / ratio;
+  };
+
   fn.inverse = data => {
     return {
        x: dX + ratio * (data.x - 0.5),
