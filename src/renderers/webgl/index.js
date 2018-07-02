@@ -62,6 +62,8 @@ const DEFAULT_SETTINGS = {
   labelFont: 'Arial',
   labelSize: 14,
   labelWeight: 'normal',
+  nodeReducer: null,
+  edgeReducer: null,
 
   // Features
   zIndex: false
@@ -479,7 +481,8 @@ export default class WebGLRenderer extends Renderer {
    */
   process(keepArrays = false) {
 
-    const graph = this.graph;
+    const graph = this.graph,
+          settings = this.settings;
 
     // Clearing the quad
     this.quadtree.clear();
@@ -505,6 +508,7 @@ export default class WebGLRenderer extends Renderer {
     let nodes = graph.nodes();
 
     // Handling node z-index
+    // TODO: z-index needs us to compute display data before hand
     if (this.settings.zIndex)
       nodes = zIndexOrdering(
         this.edgeExtent.z,
@@ -514,10 +518,15 @@ export default class WebGLRenderer extends Renderer {
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
+
+      let data = graph.getNodeAttributes(node);
+
       const displayData = this.nodeDataCache[node];
 
-      const data = graph.getNodeAttributes(node);
+      if (settings.nodeReducer)
+        data = settings.nodeReducer(node, data);
 
+      // TODO: should assign default also somewhere here if there is a reducer
       displayData.assign(data);
       this.normalizationFunction.applyTo(displayData);
 
@@ -537,10 +546,8 @@ export default class WebGLRenderer extends Renderer {
 
     const edgeProgram = this.edgePrograms.def;
 
-    if (!keepArrays) {
+    if (!keepArrays)
       edgeProgram.allocate(graph.size);
-      this.edgeOrder = {};
-    }
 
     let edges = graph.edges();
 
@@ -555,8 +562,12 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      const data = graph.getEdgeAttributes(edge),
-            displayData = this.edgeDataCache[edge];
+      let data = graph.getEdgeAttributes(edge);
+
+      const displayData = this.edgeDataCache[edge];
+
+      if (settings.edgeReducer)
+        data = settings.edgeReducer(edge, data);
 
       displayData.assign(data);
 
@@ -777,7 +788,6 @@ export default class WebGLRenderer extends Renderer {
     // Drawing nodes
     program = this.nodePrograms.def;
 
-    // TODO: should probably use another name for the `program` abstraction
     program.render(
       {
         matrix: cameraMatrix,
@@ -965,6 +975,18 @@ export default class WebGLRenderer extends Renderer {
       // Rendering
       this.renderHighlightedNodes();
     });
+  }
+
+  /**
+   * Method used to manually refresh.
+   *
+   * @return {WebGLRenderer}
+   */
+  refresh() {
+    this.needToSoftProcess = true;
+    this.scheduleRender();
+
+    return this;
   }
 
   /**

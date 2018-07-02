@@ -11,76 +11,62 @@ const graph = erdosRenyi.sparse(UndirectedGraph, {order: 500, probability: 0.05}
 randomLayout.assign(graph);
 
 graph.nodes().forEach(node => {
-  const attr = graph.getNodeAttributes(node);
-
-  const color = chroma.random().hex();
 
   graph.mergeNodeAttributes(node, {
     label: faker.name.findName(),
     size: Math.max(4, Math.random() * 10),
-    originalColor: color,
-    color
+    color: chroma.random().hex(),
+    zIndex: 0
   });
 });
 
-graph.edges().forEach(edge => {
-  graph.setEdgeAttribute(edge, 'color', '#ccc');
-  graph.setEdgeAttribute(edge, 'z', 0);
-});
+graph.edges().forEach(edge => graph.mergeEdgeAttributes(edge, {
+  color: '#ccc',
+  zIndex: 0
+}));
+
+let highlighedNodes = new Set();
+let highlighedEdges = new Set();
+
+const nodeReducer = (node, data) => {
+  if (highlighedNodes.has(node))
+    return {...data, color: '#f00', zIndex: 1};
+
+  return data;
+};
+
+const edgeReducer = (edge, data) => {
+  if (highlighedEdges.has(edge))
+    return {...data, color: '#f00', zIndex: 1};
+
+  return data;
+};
 
 const renderer = new WebGLRenderer(graph, container, {
+  nodeReducer,
+  edgeReducer,
   zIndex: true
 });
 
-// Binding events
-renderer.on('overNode', e => {
-  const edges = new Set(graph.edges(e.node));
+renderer.on('overNode', ({node}) => {
+  if (highlighedNodes.has(node))
+    return;
 
-  const neighbors = new Set(
-    [e.node].concat([...edges].map(edge => graph.opposite(e.node, edge)))
-  );
+  highlighedNodes = new Set(graph.neighbors(node));
+  highlighedNodes.add(node);
 
-  graph.nodes().forEach(node => {
-    if (neighbors.has(node)) {
-      graph.setNodeAttribute(node, 'color', '#f00');
-      graph.setNodeAttribute(node, 'z', 1);
-    }
-    else {
-      graph.setNodeAttribute(node, 'color', '#bbb');
-      graph.setNodeAttribute(node, 'z', 0);
-    }
-  });
+  highlighedEdges = new Set(graph.edges(node));
 
-  graph.edges().forEach(edge => {
-    if (edges.has(edge)) {
-      graph.setEdgeAttribute(edge, 'hidden', false);
-      graph.setEdgeAttribute(edge, 'color', '#f00');
-      graph.setEdgeAttribute(edge, 'z', 1);
-    }
-    else {
-      graph.setEdgeAttribute(edge, 'color', '#eee');
-      graph.setEdgeAttribute(edge, 'z', 0);
-    }
-  });
+  renderer.refresh();
 });
 
-renderer.on('outNode', e => {
-  graph.edges().forEach(edge => {
-    graph.setEdgeAttribute(edge, 'hidden', false);
-    graph.setEdgeAttribute(edge, 'color', '#ccc');
-    graph.setEdgeAttribute(edge, 'z', 0);
-  });
+renderer.on('outNode', () => {
+  highlighedNodes.clear();
+  highlighedEdges.clear();
 
-  graph.nodes().forEach(node => {
-    graph.setNodeAttribute(node, 'color', graph.getNodeAttribute(node, 'originalColor'));
-    graph.setNodeAttribute(node, 'z', 0);
-  });
-});
-
-renderer.on('clickNode', e => {
-  console.log(e.node, graph.getNodeAttributes(e.node));
+  renderer.refresh();
 });
 
 window.graph = graph;
 window.renderer = renderer;
-window.camera = renderer.camera;
+window.camera = renderer.getCamera();

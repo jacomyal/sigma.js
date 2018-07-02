@@ -15,29 +15,28 @@
  * @return {array} - The sorted array.
  */
 exports.zIndexOrdering = function(extent, getter, elements) {
-  const n = elements.length;
+  // const n = elements.length;
 
-  const [min, max] = extent;
+  // const [min, max] = extent;
 
-  const k = max - min;
+  // const k = max - min;
 
   // No ordering needs to be done
-  if (k === 0 || k === -Infinity)
-    return elements;
+  // if (k === 0 || k === -Infinity)
+  //   return elements;
 
   // If k is > n, we'll use a standard sort
-  if (true || k > n)
-    return elements.sort(function(a, b) {
-      const zA = getter(a),
-            zB = getter(b);
+  return elements.sort(function(a, b) {
+    const zA = getter(a) || 0,
+          zB = getter(b) || 0;
 
-      if (zA < zB)
-        return -1;
-      if (zA > zB)
-        return 1;
+    if (zA < zB)
+      return -1;
+    if (zA > zB)
+      return 1;
 
-      return 0;
-    });
+    return 0;
+  });
 
   // TODO: counting sort optimization
 };
