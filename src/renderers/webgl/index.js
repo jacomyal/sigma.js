@@ -502,10 +502,10 @@ export default class WebGLRenderer extends Renderer {
 
       const rescaledData = this.normalizationFunction(data);
 
-      // TODO: Optimize this to save a loop and one object, by using a reversed assign
+      // TODO: optimize by keeping a reference to display object at all time and mutate it
+      // TODO: optimize this to save a loop and one object, by using a reversed assign
       const displayData = assign({}, data, rescaledData);
 
-      // TODO: this size normalization does not work
       this.quadtree.add(
         node,
         displayData.x,
