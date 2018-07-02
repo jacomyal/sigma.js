@@ -11,12 +11,12 @@
  * afterwards.
  */
 export class NodeDisplayData {
-  constructor(index) {
+  constructor(index, settings) {
     this.index = index;
     this.x = 0;
     this.y = 0;
     this.size = 2;
-    this.color = '#333';
+    this.color = settings.defaultNodeColor;
     this.hidden = false;
     this.label = '';
   }
@@ -43,10 +43,10 @@ export class NodeDisplayData {
 }
 
 export class EdgeDisplayData {
-  constructor(index) {
+  constructor(index, settings) {
     this.index = index;
     this.size = 1;
-    this.color = '#ccc';
+    this.color = settings.defaultEdgeColor;
     this.hidden = false;
   }
 

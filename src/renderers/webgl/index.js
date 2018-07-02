@@ -57,7 +57,7 @@ const DEFAULT_SETTINGS = {
   renderLabels: true,
 
   // Component rendering
-  defaultNodeColor: '#333',
+  defaultNodeColor: '#999',
   defaultEdgeColor: '#ccc',
   labelFont: 'Arial',
   labelSize: 14,
@@ -245,12 +245,12 @@ export default class WebGLRenderer extends Renderer {
     const nodes = graph.nodes();
 
     for (let i = 0, l = nodes.length; i < l; i++)
-      this.nodeDataCache[nodes[i]] = new NodeDisplayData(i);
+      this.nodeDataCache[nodes[i]] = new NodeDisplayData(i, this.settings);
 
     const edges = graph.edges();
 
     for (let i = 0, l = edges.length; i < l; i++)
-      this.edgeDataCache[edges[i]] = new EdgeDisplayData(i);
+      this.edgeDataCache[edges[i]] = new EdgeDisplayData(i, this.settings);
   }
 
   /**

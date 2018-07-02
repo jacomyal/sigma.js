@@ -20,10 +20,6 @@ graph.nodes().forEach(node => {
   });
 });
 
-graph.edges().forEach(edge => {
-  graph.setEdgeAttribute(edge, 'color', '#ccc');
-});
-
 const renderer = new WebGLRenderer(graph, container);
 
 window.graph = graph;
