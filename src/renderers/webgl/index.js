@@ -49,15 +49,21 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * Defaults.
  */
 const DEFAULT_SETTINGS = {
+
+  // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
   renderLabels: true,
-  zIndex: false,
 
-  // TEMPORARY LABEL SETTINGS
+  // Component rendering
+  defaultNodeColor: '#333',
+  defaultEdgeColor: '#ccc',
   labelFont: 'Arial',
   labelSize: 14,
-  labelWeight: 'normal'
+  labelWeight: 'normal',
+
+  // Features
+  zIndex: false
 };
 
 /**
