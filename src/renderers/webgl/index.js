@@ -656,11 +656,6 @@ export default class WebGLRenderer extends Renderer {
     if (previousWidth === this.width && previousHeight === this.height)
       return this;
 
-    // Resizing camera
-    // TODO: maybe move this elsewhere
-    if (this.camera)
-      this.camera.resize({width: this.width, height: this.height});
-
     // Sizing dom elements
     for (const id in this.elements) {
       const element = this.elements[id];
@@ -827,7 +822,8 @@ export default class WebGLRenderer extends Renderer {
       camera: this.camera,
       displayedLabels: this.displayedLabels,
       previousVisibleNodes: this.previousVisibleNodes,
-      visibleNodes
+      visibleNodes,
+      dimensions: this
     });
 
     // Drawing labels

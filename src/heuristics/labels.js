@@ -51,13 +51,12 @@ exports.labelsToDisplayFromGrid = function(params) {
     camera,
     displayedLabels,
     previousVisibleNodes,
-    visibleNodes
+    visibleNodes,
+    dimensions
   } = params;
 
   const cameraState = camera.getState(),
-        previousCameraState = camera.getPreviousState(),
-        dimensions = camera.getDimensions();
-
+        previousCameraState = camera.getPreviousState();
   // State
   // TODO: the panning is false because of not working y condition, though
   // if I fix it, the whole heuristic fails. I am saddness... :(

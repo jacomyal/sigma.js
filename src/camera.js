@@ -31,9 +31,7 @@ const DEFAULT_ZOOMING_RATIO = 1.5;
  * @constructor
  */
 export default class Camera extends EventEmitter {
-  constructor(dimensions) {
-    dimensions = dimensions || {};
-
+  constructor() {
     super();
 
     // Properties
@@ -41,8 +39,6 @@ export default class Camera extends EventEmitter {
     this.y = 0.5;
     this.angle = 0;
     this.ratio = 1;
-    this.width = dimensions.width || 0;
-    this.height = dimensions.height || 0;
 
     // State
     this.nextFrame = null;
@@ -97,18 +93,6 @@ export default class Camera extends EventEmitter {
       y: state.y,
       angle: state.angle,
       ratio: state.ratio
-    };
-  }
-
-  /**
-   * Method used to retrieve the camera's dimensions.
-   *
-   * @return {object}
-   */
-  getDimensions() {
-    return {
-      width: this.width,
-      height: this.height
     };
   }
 
@@ -181,12 +165,12 @@ export default class Camera extends EventEmitter {
   viewRectangle(dimensions) {
 
     // TODO: reduce relative margin?
-    const marginX = 0 * this.width / 8,
-          marginY = 0 * this.height / 8;
+    const marginX = 0 * dimensions.width / 8,
+          marginY = 0 * dimensions.height / 8;
 
     const p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
-          p2 = this.viewportToGraph(dimensions, this.width + marginX, 0 - marginY),
-          h = this.viewportToGraph(dimensions, 0, this.height + marginY);
+          p2 = this.viewportToGraph(dimensions, dimensions.width + marginX, 0 - marginY),
+          h = this.viewportToGraph(dimensions, 0, dimensions.height + marginY);
 
     return {
       x1: p1.x,
@@ -229,28 +213,6 @@ export default class Camera extends EventEmitter {
     // Emitting
     // TODO: don't emit if nothing changed?
     this.emit('updated', this.getState());
-
-    return this;
-  }
-
-  /**
-   * Method used to resize the camera's dimensions.
-   *
-   * @param  {object} dimensions - New dimensions.
-   * @return {Camera}
-   */
-  resize(dimensions) {
-
-    if (!this.enabled)
-      return this;
-
-    if ('width' in dimensions)
-      this.width = dimensions.width;
-
-    if ('height' in dimensions)
-      this.height = dimensions.height;
-
-    this.emit('resized', this.getDimensions());
 
     return this;
   }
