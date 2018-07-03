@@ -82,12 +82,14 @@ export default class ArrowProgram extends Program {
       20
     );
     gl.vertexAttribPointer(this.colorLocation,
-      1,
-      gl.FLOAT,
-      false,
+      4,
+      gl.UNSIGNED_BYTE,
+      true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       24
     );
+
+    // TODO: maybe we can optimize here by packing this in a bit mask
     gl.vertexAttribPointer(this.barycentricLocation,
       3,
       gl.FLOAT,

@@ -2,7 +2,7 @@ attribute vec2 a_position;
 attribute vec2 a_normal;
 attribute float a_thickness;
 attribute float a_radius;
-attribute float a_color;
+attribute vec4 a_color;
 attribute vec3 a_barycentric;
 
 uniform vec2 u_resolution;
@@ -11,9 +11,10 @@ uniform mat3 u_matrix;
 uniform float u_scale;
 
 varying vec4 v_color;
-varying vec3 v_barycentric;
+// varying vec3 v_barycentric;
 
 const float arrow_ratio = 0.6;
+const float bias = 255.0 / 254.0;
 
 void main() {
 
@@ -22,7 +23,7 @@ void main() {
   float dc = a_barycentric.z;
 
   float radius = (a_radius - 1.0) / u_ratio;
-  float thickness = a_thickness  /u_ratio;
+  float thickness = a_thickness / u_ratio;
   float width = arrow_ratio * thickness / 2.0;
 
   vec2 offset_position = vec2(
@@ -37,17 +38,13 @@ void main() {
 
   // Scale from [[-1 1] [-1 1]] to the container:
   vec2 position = (u_matrix * vec3(offset_position, 1)).xy;
-  position = (position / u_resolution * 2.0 - 1.0) * vec2(1, -1);
 
   // Applying
   gl_Position = vec4(position, 0, 1);
 
-  v_barycentric = a_barycentric;
+  // v_barycentric = a_barycentric;
 
   // Extract the color:
-  float c = a_color;
-  v_color.b = mod(c, 256.0); c = floor(c / 256.0);
-  v_color.g = mod(c, 256.0); c = floor(c / 256.0);
-  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;
-  v_color.a = 1.0;
+  v_color = a_color;
+  v_color.a *= bias;
 }

@@ -38,5 +38,5 @@ void main() {
 
   // Extract the color:
   v_color = a_color;
-  v_color.a = a_color.a * bias;
+  v_color.a *= bias;
 }
