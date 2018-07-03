@@ -17,9 +17,12 @@ import {
  * formats describing colors.
  */
 const FLOAT_COLOR_CACHE = {};
+const INT8 = new Int8Array(4);
+const INT32 = new Int32Array(INT8.buffer, 0, 1);
+const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
 
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
-const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)\s*(,.*)?\)\s*$/;
+const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
 
 export function floatColor(val) {
 
@@ -29,7 +32,8 @@ export function floatColor(val) {
 
   let r = 0,
       g = 0,
-      b = 0;
+      b = 0,
+      a = 1;
 
   // Handling hexadecimal notation
   if (val[0] === '#') {
@@ -52,13 +56,18 @@ export function floatColor(val) {
     r = +match[1];
     g = +match[2];
     b = +match[3];
+
+    if (match[4])
+      a = +match[4];
   }
 
-  const color = (
-    r * 256 * 256 +
-    g * 256 +
-    b
-  );
+  a = (a * 255) | 0;
+
+  const bits = (a << 24 | b << 16 | g << 8 | r) & 0xfeffffff;
+
+  INT32[0] = bits;
+
+  const color = FLOAT32[0];
 
   FLOAT_COLOR_CACHE[val] = color;
 

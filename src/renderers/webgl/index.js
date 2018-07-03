@@ -139,7 +139,7 @@ export default class WebGLRenderer extends Renderer {
     // Blending
     let gl = this.contexts.nodes;
 
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
     gl = this.contexts.edges;
@@ -509,6 +509,8 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling node z-index
     // TODO: z-index needs us to compute display data before hand
+    // TODO: remains to be seen if reducers are a good or bad thing and if we
+    // should store display data in flat byte arrays indices
     if (this.settings.zIndex)
       nodes = zIndexOrdering(
         this.edgeExtent.z,

@@ -1,7 +1,7 @@
 attribute vec2 a_position;
 attribute vec2 a_normal;
 attribute float a_thickness;
-attribute float a_color;
+attribute vec4 a_color;
 
 uniform vec2 u_resolution;
 uniform float u_ratio;
@@ -13,6 +13,7 @@ varying vec2 v_normal;
 varying float v_thickness;
 
 const float feather = 0.8;
+const float bias = 255.0 / 254.0;
 
 void main() {
 
@@ -36,9 +37,6 @@ void main() {
   v_thickness = thickness;
 
   // Extract the color:
-  float c = a_color;
-  v_color.b = mod(c, 256.0); c = floor(c / 256.0);
-  v_color.g = mod(c, 256.0); c = floor(c / 256.0);
-  v_color.r = mod(c, 256.0); c = floor(c / 256.0); v_color /= 255.0;
-  v_color.a = 1.0;
+  v_color = a_color;
+  v_color.a = a_color.a * bias;
 }

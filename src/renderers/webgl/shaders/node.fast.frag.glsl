@@ -1,7 +1,7 @@
 precision mediump float;
 
-varying vec4 color;
-varying float border;
+varying vec4 v_color;
+varying float v_border;
 
 const float radius = 0.5;
 
@@ -11,10 +11,11 @@ void main(void) {
   float dist = radius - length(m);
 
   float t = 0.0;
-  if (dist > border)
+  if (dist > v_border)
     t = 1.0;
   else if (dist > 0.0)
-    t = dist / border;
+    t = dist / v_border;
 
-  gl_FragColor = mix(color0, color, t);
+  // gl_FragColor = mix(color0, v_color, t);
+  gl_FragColor = mix(color0, v_color, t);
 }

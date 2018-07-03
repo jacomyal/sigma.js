@@ -102,9 +102,9 @@ export default class EdgeProgram extends Program {
       16
     );
     gl.vertexAttribPointer(this.colorLocation,
-      1,
-      gl.FLOAT,
-      false,
+      4,
+      gl.UNSIGNED_BYTE,
+      true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
