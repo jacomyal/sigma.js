@@ -684,6 +684,12 @@ export default class WebGLRenderer extends Renderer {
       this.height = this.container.offsetHeight;
     }
 
+    if (this.width === 0)
+      throw new Error('sigma/renderers/webgl: container as no width.');
+
+    if (this.height === 0)
+      throw new Error('sigma/renderers/webgl: container as no height.');
+
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height)
       return this;
