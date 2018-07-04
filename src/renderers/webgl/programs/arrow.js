@@ -191,12 +191,12 @@ export default class ArrowProgram extends Program {
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
       this.ratioLocation,
-      1 / Math.pow(params.ratio, params.edgesPowRatio)
+      params.ratio
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    gl.uniform1f(this.scaleLocation, params.ratio);
+    gl.uniform1f(this.scaleLocation, params.scalingRatio);
 
     // Drawing:
     gl.drawArrays(

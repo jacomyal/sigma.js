@@ -22,22 +22,26 @@ void main() {
   float db = a_barycentric.y;
   float dc = a_barycentric.z;
 
-  float radius = (a_radius - 1.0) / u_ratio;
-  float thickness = a_thickness / u_ratio;
+  float pow_ratio = 1.0 / pow(u_ratio, 0.5) * 2.0;
+  float radius = (a_radius - 1.0) * pow_ratio;
+  float thickness = a_thickness * pow_ratio;
   float width = arrow_ratio * thickness / 2.0;
 
-  vec2 offset_position = vec2(
-      da * (a_position.x + (radius) * a_normal.y)
-    + db * (a_position.x + (radius + thickness) * a_normal.y + width * a_normal.x)
-    + dc * (a_position.x + (radius + thickness) * a_normal.y - width * a_normal.x),
+  vec2 delta = vec2(
+      da * ((radius) * a_normal.y)
+    + db * ((radius + thickness) * a_normal.y + width * a_normal.x)
+    + dc * ((radius + thickness) * a_normal.y - width * a_normal.x),
 
-      da * (a_position.y - (radius) * a_normal.x)
-    + db * (a_position.y - (radius + thickness) * a_normal.x + width * a_normal.y)
-    + dc * (a_position.y - (radius + thickness) * a_normal.x - width * a_normal.y)
+      da * (-(radius) * a_normal.x)
+    + db * (-(radius + thickness) * a_normal.x + width * a_normal.y)
+    + dc * (-(radius + thickness) * a_normal.x - width * a_normal.y)
   );
 
+  delta /= u_resolution;
+
   // Scale from [[-1 1] [-1 1]] to the container:
-  vec2 position = (u_matrix * vec3(offset_position, 1)).xy;
+  vec2 position = (u_matrix * vec3(a_position, 1)).xy;
+  position += delta;
 
   // Applying
   gl_Position = vec4(position, 0, 1);
