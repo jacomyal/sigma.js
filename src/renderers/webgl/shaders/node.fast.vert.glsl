@@ -2,7 +2,6 @@ attribute vec2 a_position;
 attribute float a_size;
 attribute vec4 a_color;
 
-uniform vec2 u_resolution;
 uniform float u_ratio;
 uniform float u_scale;
 uniform mat3 u_matrix;

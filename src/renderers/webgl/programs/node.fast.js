@@ -34,7 +34,6 @@ export default class NodeProgramFast extends Program {
     this.positionLocation = gl.getAttribLocation(program, 'a_position');
     this.sizeLocation = gl.getAttribLocation(program, 'a_size');
     this.colorLocation = gl.getAttribLocation(program, 'a_color');
-    this.resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
     this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
     this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
     this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
@@ -108,7 +107,6 @@ export default class NodeProgramFast extends Program {
     const program = this.program;
     gl.useProgram(program);
 
-    gl.uniform2f(this.resolutionLocation, params.width, params.height);
     gl.uniform1f(
       this.ratioLocation,
       1 / Math.pow(params.ratio, params.nodesPowRatio)
