@@ -6,10 +6,6 @@ import arctic from './resources/arctic.gexf';
 
 const graph = gexf.parse(Graph, arctic);
 
-graph.edges().forEach(edge => {
-  graph.setEdgeAttribute(edge, 'color', '#ccc');
-});
-
 const container = document.getElementById('container');
 
 const renderer = new WebGLRenderer(graph, container);
