@@ -49,6 +49,8 @@
           }
           obj.size = obj.viz.size;
           obj.color = obj.viz.color;
+          if (obj.viz.shape)
+            obj.type = obj.viz.shape
         }
       }
 

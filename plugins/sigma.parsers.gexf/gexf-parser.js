@@ -150,11 +150,8 @@
       label: properties.label
     };
 
-    if (properties.viz) {
+    if (properties.viz)
       node.viz = properties.viz;
-      if (properties.viz.shape)
-        node.type = properties.viz.shape
-    }
 
     if (properties.attributes)
       node.attributes = properties.attributes;
