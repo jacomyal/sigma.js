@@ -50,6 +50,8 @@ export default class Program {
  * @param  {array}    programClasses - Program classes to combine.
  * @return {function}
  */
+
+// TODO: maybe those should handle their own canvases
 export function createCompoundProgram(programClasses) {
   return class CompoundProgram {
     constructor(gl) {

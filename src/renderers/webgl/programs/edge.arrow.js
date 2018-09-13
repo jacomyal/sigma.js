@@ -6,10 +6,10 @@
  */
 import {createCompoundProgram} from './program';
 import ArrowProgram from './arrow';
-import EdgeProgram from './edge';
+import EdgeClampedProgram from './edge.clamped';
 
 const program = createCompoundProgram([
-  EdgeProgram,
+  EdgeClampedProgram,
   ArrowProgram
 ]);
 
