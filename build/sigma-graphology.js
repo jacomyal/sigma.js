@@ -5323,6 +5323,8 @@ var Program = function () {
  * @return {function}
  */
 
+// TODO: maybe those should handle their own canvases
+
 
 exports.default = Program;
 function createCompoundProgram(programClasses) {
