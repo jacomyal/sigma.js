@@ -4,7 +4,7 @@
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
-  "main": "sigma.js",
+  "main": "endpoint.js",
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
