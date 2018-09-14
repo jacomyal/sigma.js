@@ -860,7 +860,8 @@ export default class WebGLRenderer extends Renderer {
       displayedLabels: this.displayedLabels,
       previousVisibleNodes: this.previousVisibleNodes,
       visibleNodes,
-      dimensions: this
+      dimensions: this,
+      graph: this.graph
     });
 
     // Drawing labels
