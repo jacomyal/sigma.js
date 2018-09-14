@@ -35,21 +35,13 @@ function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
   );
 }
 
-// TODO: basic sweeping anti-collision at the end
+// TODO: cache camera position of selected nodes to avoid costly computations
+// in anti-collision step
 // TODO: minSize to be displayed
+// TOOD: document a little bit more so future people can understand this mess
 
 /**
- * Label grid heuristic selecting labels to display according to the following
- * parameters:
- *   1) Only one label per grid cell.
- *   2) Greater labels win.
- *   3) Already displayed label should stay displayed.
- *
- * Note: It is possible to apply a size threshold to the labels (but should
- * really be done at quad level for performance).
- *
- * Note: It might be possible to not use last displayed labels by measurements
- * and a margin.
+ * Label grid heuristic selecting labels to display.
  *
  * @param  {object} params                 - Parameters:
  * @param  {object}   cache                - Cache storing nodes' data.
