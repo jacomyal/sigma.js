@@ -23,6 +23,18 @@ const DEFAULT_UNZOOMED_CELL = {
   height: 300
 };
 
+/**
+ * Helpers.
+ */
+function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return (
+    x1 < x2 + w2 &&
+    x1 + w1 > x2 &&
+    y1 < y2 + h2 &&
+    y1 + h1 > y2
+  );
+}
+
 // TODO: basic sweeping anti-collision at the end
 // TODO: minSize to be displayed
 
@@ -214,19 +226,62 @@ exports.labelsToDisplayFromGrid = function(params) {
   }
 
   // Compiling the labels
-  let biggestNodeShown = false;
+  let biggestNodeShown = worthyLabels.some(node => node === biggestNode);
 
   for (const key in grid) {
 
-    if (key === biggestNode)
+    const node = grid[key];
+
+    if (node === biggestNode)
       biggestNodeShown = true;
 
-    worthyLabels.push(grid[key]);
+    worthyLabels.push(node);
   }
 
   // Always keeping biggest node shown on screen
   if (!biggestNodeShown && biggestNode)
     worthyLabels.push(biggestNode);
 
-  return worthyLabels;
+  // Basic anti-collision
+  const collisions = new Set();
+
+  for (let i = 0, l = worthyLabels.length; i < l; i++) {
+    const n1 = worthyLabels[i],
+          d1 = cache[n1],
+          p1 = camera.graphToViewport(dimensions, d1.x, d1.y);
+
+    if (collisions.has(n1))
+      continue;
+
+    for (let j = i + 1; j < l; j++) {
+      const n2 = worthyLabels[j],
+            d2 = cache[n2],
+            p2 = camera.graphToViewport(dimensions, d2.x, d2.y);
+
+      const c = collision(
+        p1.x,
+        p1.y,
+        d1.label.length * 8,
+        14,
+
+        p2.x,
+        p2.y,
+        d2.label.length * 8,
+        14
+      );
+
+      if (c) {
+
+        // NOTE: add degree as tie-breaker here if required in the future
+        if (d1.size < d2.size)
+          collisions.add(n1);
+        else
+          collisions.add(n2);
+      }
+    }
+  }
+
+  // console.log(collisions)
+
+  return worthyLabels.filter(l => !collisions.has(l));
 };
