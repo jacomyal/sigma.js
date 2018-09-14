@@ -12,8 +12,8 @@ import Camera from '../camera';
 
 // Dimensions of a normal cell
 const DEFAULT_CELL = {
-  width: 200,
-  height: 150
+  width: 250,
+  height: 175
 };
 
 // Dimensions of an unzoomed cell. This one is usually larger than the normal
@@ -23,8 +23,8 @@ const DEFAULT_UNZOOMED_CELL = {
   height: 300
 };
 
-// TODO: slight margin
 // TODO: basic sweeping anti-collision at the end
+// TODO: minSize to be displayed
 
 /**
  * Label grid heuristic selecting labels to display according to the following
@@ -85,19 +85,31 @@ exports.labelsToDisplayFromGrid = function(params) {
   if ((unzoomedPanning || still) && displayedLabels.size !== 0)
     return Array.from(displayedLabels);
 
+  // When unzoomed & zooming
+  if (zooming && cameraState.ratio >= 1)
+    return Array.from(displayedLabels);
+
   // Adapting cell dimensions
-  const baseCell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
+  const cell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
 
-  const cwr = dimensions.width % baseCell.width;
-  const cellWidth = baseCell.width + cwr / Math.floor(dimensions.width / baseCell.width);
+  const cwr = dimensions.width % cell.width;
+  const cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
 
-  const chr = dimensions.height % baseCell.height;
-  const cellHeight = baseCell.height + chr / Math.floor(dimensions.height / baseCell.height);
+  const chr = dimensions.height % cell.height;
+  const cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
+
+  const adjustedWidth = dimensions.width + cellWidth,
+        adjustedHeight = dimensions.height + cellHeight,
+        adjustedX = -cellWidth,
+        adjustedY = -cellHeight;
 
   // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
 
   const worthyLabels = [];
   const grid = {};
+
+  let maxSize = -Infinity,
+      biggestNode = null;
 
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
@@ -107,12 +119,18 @@ exports.labelsToDisplayFromGrid = function(params) {
     const pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
 
     // Node is not actually visible on screen
-    // NOTE: will maybe need to define a margin here
+    // NOTE: can optimize margin on the right side (only if we know where the labels go)
     if (
-      (pos.x < 0 || pos.x > dimensions.width) ||
-      (pos.y < 0 || pos.y > dimensions.height)
+      (pos.x < adjustedX || pos.x > adjustedWidth) ||
+      (pos.y < adjustedY || pos.y > adjustedHeight)
     )
       continue;
+
+    // Keeping track of the maximum node size for certain cases
+    if (nodeData.size > maxSize) {
+      maxSize = nodeData.size;
+      biggestNode = node;
+    }
 
     // If panning when zoomed, we consider only displayed labels and newly
     // visible nodes
@@ -121,11 +139,11 @@ exports.labelsToDisplayFromGrid = function(params) {
 
       // Was node visible earlier?
       if (
-        (ppos.x >= 0 && ppos.x <= dimensions.width) &&
-        (ppos.y >= 0 && ppos.y <= dimensions.height)
+        (ppos.x >= adjustedX && ppos.x <= adjustedWidth) &&
+        (ppos.y >= adjustedY && ppos.y <= adjustedHeight)
       ) {
 
-        // Was its label displayed?
+        // Was the label displayed?
         if (!displayedLabels.has(node))
           continue;
       }
@@ -152,8 +170,9 @@ exports.labelsToDisplayFromGrid = function(params) {
         const n1 = displayedLabels.has(node),
               n2 = displayedLabels.has(currentNode);
 
-        if (!n1 && n2)
+        if (!n1 && n2) {
           continue;
+        }
 
         if (n1 && !n2) {
           grid[key] = node;
@@ -195,8 +214,19 @@ exports.labelsToDisplayFromGrid = function(params) {
   }
 
   // Compiling the labels
-  for (const key in grid)
+  let biggestNodeShown = false;
+
+  for (const key in grid) {
+
+    if (key === biggestNode)
+      biggestNodeShown = true;
+
     worthyLabels.push(grid[key]);
+  }
+
+  // Always keeping biggest node shown on screen
+  if (!biggestNodeShown && biggestNode)
+    worthyLabels.push(biggestNode);
 
   return worthyLabels;
 };
