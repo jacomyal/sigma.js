@@ -23,7 +23,6 @@ const DEFAULT_UNZOOMED_CELL = {
   height: 300
 };
 
-// TODO: drop previousvisiblenodes
 // TODO: slight margin
 // TODO: basic sweeping anti-collision at the end
 
@@ -44,8 +43,8 @@ const DEFAULT_UNZOOMED_CELL = {
  * @param  {object}   cache                - Cache storing nodes' data.
  * @param  {Camera}   camera               - The renderer's camera.
  * @param  {Set}      displayedLabels      - Currently displayed labels.
- * @param  {Set}      previousVisibleNodes - Nodes visible last render.
  * @param  {Array}    visibleNodes         - Nodes visible for this render.
+ * @param  {Graph}    graph                - The rendered graph.
  * @return {Array}                         - The selected labels.
  */
 exports.labelsToDisplayFromGrid = function(params) {
@@ -53,7 +52,6 @@ exports.labelsToDisplayFromGrid = function(params) {
     cache,
     camera,
     displayedLabels,
-    previousVisibleNodes,
     visibleNodes,
     dimensions,
     graph

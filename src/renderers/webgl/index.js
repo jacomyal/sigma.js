@@ -120,7 +120,6 @@ export default class WebGLRenderer extends Renderer {
 
     // State
     this.highlightedNodes = new Set();
-    this.previousVisibleNodes = new Set();
     this.displayedLabels = new Set();
     this.hoveredNode = null;
     this.wasRenderedInThisFrame = false;
@@ -858,7 +857,6 @@ export default class WebGLRenderer extends Renderer {
       cache: this.nodeDataCache,
       camera: this.camera,
       displayedLabels: this.displayedLabels,
-      previousVisibleNodes: this.previousVisibleNodes,
       visibleNodes,
       dimensions: this,
       graph: this.graph
@@ -891,7 +889,6 @@ export default class WebGLRenderer extends Renderer {
     }
 
     // Caching visible nodes and displayed labels
-    this.previousVisibleNodes = new Set(visibleNodes);
     this.displayedLabels = new Set(labelsToDisplay);
 
     // Rendering highlighted nodes
