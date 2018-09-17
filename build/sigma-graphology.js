@@ -1696,8 +1696,8 @@ var Camera = function (_EventEmitter) {
     key: 'animatedReset',
     value: function animatedReset(options) {
       return this.animate({
-        x: 0,
-        y: 0,
+        x: 0.5,
+        y: 0.5,
         ratio: 1,
         angle: 0
       }, options);
@@ -19680,9 +19680,9 @@ var WebGLRenderer = function (_Renderer) {
         this.height = this.container.offsetHeight;
       }
 
-      if (this.width === 0) throw new Error('sigma/renderers/webgl: container as no width.');
+      if (this.width === 0) throw new Error('sigma/renderers/webgl: container has no width.');
 
-      if (this.height === 0) throw new Error('sigma/renderers/webgl: container as no height.');
+      if (this.height === 0) throw new Error('sigma/renderers/webgl: container has no height.');
 
       // If nothing has changed, we can stop right here
       if (previousWidth === this.width && previousHeight === this.height) return this;
