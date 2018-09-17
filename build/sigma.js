@@ -75,314 +75,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -394,7 +86,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _events = __webpack_require__(0);
+var _events = __webpack_require__(1);
 
 var _easings = __webpack_require__(12);
 
@@ -780,6 +472,314 @@ var Camera = function (_EventEmitter) {
 exports.default = Camera;
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+
+/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -792,6 +792,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.floatColor = floatColor;
 exports.matrixFromCamera = matrixFromCamera;
 exports.extractPixel = extractPixel;
+exports.canUse32BitsIndices = canUse32BitsIndices;
 
 var _matrices = __webpack_require__(21);
 
@@ -903,6 +904,15 @@ function extractPixel(gl, x, y, array) {
   return data;
 }
 
+/**
+ * Function used to know whether given webgl context can use 32 bits indices.
+ */
+function canUse32BitsIndices(gl) {
+  var webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
+  return webgl2 || !!gl.getExtension('OES_element_index_uint');
+}
+
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -914,7 +924,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _events = __webpack_require__(0);
+var _events = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1035,6 +1045,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // NOTE: this is basically a MX-CIF Quadtree at this point
 // NOTE: need to explore R-Trees for edges
 // NOTE: need to explore 2d segment tree for edges
+
+// NOTE: probably can do faster using spatial hashing
 
 /**
  * Constants.
@@ -1406,7 +1418,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _camera = __webpack_require__(1);
+var _camera = __webpack_require__(0);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -2090,7 +2102,7 @@ var _renderer = __webpack_require__(3);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(1);
+var _camera = __webpack_require__(0);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -2222,7 +2234,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _events = __webpack_require__(0);
+var _events = __webpack_require__(1);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2419,7 +2431,7 @@ var _renderer = __webpack_require__(3);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(1);
+var _camera = __webpack_require__(0);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -2556,7 +2568,6 @@ var WebGLRenderer = function (_Renderer) {
 
     // State
     _this.highlightedNodes = new Set();
-    _this.previousVisibleNodes = new Set();
     _this.displayedLabels = new Set();
     _this.hoveredNode = null;
     _this.wasRenderedInThisFrame = false;
@@ -2660,7 +2671,7 @@ var WebGLRenderer = function (_Renderer) {
       if (webgl) {
 
         // First we try webgl2 for an easy performance boost
-        context = element.getContext('webgl', contextOptions);
+        context = element.getContext('webgl2', contextOptions);
 
         // Else we fall back to webgl
         if (!context) context = element.getContext('webgl', contextOptions);
@@ -3247,9 +3258,9 @@ var WebGLRenderer = function (_Renderer) {
         cache: this.nodeDataCache,
         camera: this.camera,
         displayedLabels: this.displayedLabels,
-        previousVisibleNodes: this.previousVisibleNodes,
         visibleNodes: visibleNodes,
-        dimensions: this
+        dimensions: this,
+        graph: this.graph
       });
 
       // Drawing labels
@@ -3283,7 +3294,6 @@ var WebGLRenderer = function (_Renderer) {
       }
 
       // Caching visible nodes and displayed labels
-      this.previousVisibleNodes = new Set(visibleNodes);
       this.displayedLabels = new Set(labelsToDisplay);
 
       // Rendering highlighted nodes
@@ -4113,11 +4123,7 @@ var EdgeProgram = function (_Program) {
     // `OES_element_index_uint` is quite everywhere so we'll handle
     // the potential issue if it really arises.
     // NOTE: when using webgl2, the extension is enabled by default
-    var webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-
-    var extension = webgl2 || gl.getExtension('OES_element_index_uint');
-
-    _this.canUse32BitsIndices = !!extension;
+    _this.canUse32BitsIndices = (0, _utils.canUse32BitsIndices)(gl);
     _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
     _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
     return _this;
@@ -4279,13 +4285,13 @@ exports.default = EdgeProgram;
 /* 25 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness / 2.0 * pow_ratio / u_scale;\n\n  // Adding a small feather for AA\n  thickness += feather;\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float min_thickness = 1.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness * pow_ratio / u_scale;\n\n  // Min thickness for AA\n  thickness = max(min_thickness, thickness);\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"
 
 /***/ }),
 /* 26 */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 2.6;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
 
 /***/ }),
 /* 27 */
@@ -4398,12 +4404,11 @@ function drawNode(context, data) {
 "use strict";
 
 
-/**
- * Sigma.js Labels Heuristics
- * ===========================
- *
- * Miscelleneous heuristics related to label display.
- */
+var _camera = __webpack_require__(0);
+
+var _camera2 = _interopRequireDefault(_camera);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Constants.
@@ -4411,115 +4416,145 @@ function drawNode(context, data) {
 
 // Dimensions of a normal cell
 var DEFAULT_CELL = {
-  width: 200,
-  height: 150
+  width: 250,
+  height: 175
 };
 
-// Dimensions of an unzoomed cell. This one is usually smaller than the normal
+// Dimensions of an unzoomed cell. This one is usually larger than the normal
 // one to account for the fact that labels will more likely collide.
+/**
+ * Sigma.js Labels Heuristics
+ * ===========================
+ *
+ * Miscelleneous heuristics related to label display.
+ */
 var DEFAULT_UNZOOMED_CELL = {
   width: 400,
   height: 300
 };
 
-// TODO: use degree as secondary tie-breaker
+/**
+ * Helpers.
+ */
+function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+
+// TODO: cache camera position of selected nodes to avoid costly computations
+// in anti-collision step
+// TODO: minSize to be displayed
+// TOOD: document a little bit more so future people can understand this mess
 
 /**
- * Label grid heuristic selecting labels to display according to the following
- * parameters:
- *   1) Only one label per grid cell.
- *   2) Greater labels win.
- *   3) Already displayed label should stay displayed.
- *
- * Note: It is possible to apply a size threshold to the labels (but should
- * really be done at quad level for performance).
- *
- * Note: It might be possible to not use last displayed labels by measurements
- * and a margin.
+ * Label grid heuristic selecting labels to display.
  *
  * @param  {object} params                 - Parameters:
  * @param  {object}   cache                - Cache storing nodes' data.
  * @param  {Camera}   camera               - The renderer's camera.
  * @param  {Set}      displayedLabels      - Currently displayed labels.
- * @param  {Set}      previousVisibleNodes - Nodes visible last render.
  * @param  {Array}    visibleNodes         - Nodes visible for this render.
+ * @param  {Graph}    graph                - The rendered graph.
  * @return {Array}                         - The selected labels.
  */
 exports.labelsToDisplayFromGrid = function (params) {
   var cache = params.cache,
       camera = params.camera,
       displayedLabels = params.displayedLabels,
-      previousVisibleNodes = params.previousVisibleNodes,
       visibleNodes = params.visibleNodes,
-      dimensions = params.dimensions;
+      dimensions = params.dimensions,
+      graph = params.graph;
 
 
   var cameraState = camera.getState(),
       previousCameraState = camera.getPreviousState();
+
+  var previousCamera = new _camera2.default();
+  previousCamera.setState(previousCameraState);
+
+  // Camera hasn't moved?
+  var still = cameraState.x === previousCameraState.x && cameraState.y === previousCameraState.y && cameraState.ratio === previousCameraState.ratio;
+
   // State
-  // TODO: the panning is false because of not working y condition, though
-  // if I fix it, the whole heuristic fails. I am saddness... :(
   var zooming = cameraState.ratio < previousCameraState.ratio,
-      panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.x,
+      panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
       unzooming = cameraState.ratio > previousCameraState.ratio,
-      unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1;
+      unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1,
+      zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
 
   // Trick to discretize unzooming
-  if (unzooming && Math.trunc(cameraState.ratio * 10) % 3 !== 0) return Array.from(displayedLabels);
+  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) return Array.from(displayedLabels);
 
   // If panning while unzoomed, we shouldn't change label selection
-  if (unzoomedPanning && displayedLabels.size !== 0) return Array.from(displayedLabels);
+  if ((unzoomedPanning || still) && displayedLabels.size !== 0) return Array.from(displayedLabels);
 
-  // Selecting cell
-  var baseCell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
+  // When unzoomed & zooming
+  if (zooming && cameraState.ratio >= 1) return Array.from(displayedLabels);
 
   // Adapting cell dimensions
-  var cellWidthRemainder = dimensions.width % baseCell.width;
-  var cellWidth = baseCell.width + cellWidthRemainder / Math.floor(dimensions.width / baseCell.width);
+  var cell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
 
-  var cellHeightRemainder = dimensions.height % baseCell.height;
-  var cellHeight = baseCell.height + cellHeightRemainder / Math.floor(dimensions.height / baseCell.height);
+  var cwr = dimensions.width % cell.width;
+  var cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
 
-  // Building the grid
+  var chr = dimensions.height % cell.height;
+  var cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
+
+  var adjustedWidth = dimensions.width + cellWidth,
+      adjustedHeight = dimensions.height + cellHeight,
+      adjustedX = -cellWidth,
+      adjustedY = -cellHeight;
+
+  var panningWidth = dimensions.width + cellWidth / 2,
+      panningHeight = dimensions.height + cellHeight / 2,
+      panningX = -(cellWidth / 2),
+      panningY = -(cellHeight / 2);
+
+  // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
+
+  var worthyLabels = [];
   var grid = {};
 
-  var worthyBuckets = new Set();
-  var worthyLabels = [];
+  var maxSize = -Infinity,
+      biggestNode = null;
 
-  // Selecting worthy labels
   for (var i = 0, l = visibleNodes.length; i < l; i++) {
     var node = visibleNodes[i],
         nodeData = cache[node];
 
-    // When panning, we should not consider nodes that were previously shown
-    if (panning && !zooming && !unzooming) {
-      if (!displayedLabels.has(node) && previousVisibleNodes.has(node)) continue;
+    // Finding our node's cell in the grid
+    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+
+    // Node is not actually visible on screen
+    // NOTE: can optimize margin on the right side (only if we know where the labels go)
+    if (pos.x < adjustedX || pos.x > adjustedWidth || pos.y < adjustedY || pos.y > adjustedHeight) continue;
+
+    // Keeping track of the maximum node size for certain cases
+    if (nodeData.size > maxSize) {
+      maxSize = nodeData.size;
+      biggestNode = node;
     }
 
-    // Finding our node's cell in the grid
-    // TODO: pass dimensions to the function
-    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+    // If panning when zoomed, we consider only displayed labels and newly
+    // visible nodes
+    if (zoomedPanning) {
+      var ppos = previousCamera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+
+      // Was node visible earlier?
+      if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
+
+        // Was the label displayed?
+        if (!displayedLabels.has(node)) continue;
+      }
+    }
 
     var xKey = Math.floor(pos.x / cellWidth),
         yKey = Math.floor(pos.y / cellHeight);
 
-    // NOTE: there seems to be overflowing keys but this is actually a good
-    // thing since it means we grasp margins.
-    var key = xKey + ';' + yKey;
+    var key = xKey + '\xA7' + yKey;
 
-    // When zooming or panning, we aim at keeping the already displayed labels
-    if ((zooming || panning && !unzooming) && displayedLabels.has(node)) {
-      worthyBuckets.add(key);
-      worthyLabels.push(node);
-      continue;
-    }
-
-    if (worthyBuckets.has(key)) continue;
-
-    // Label resolution
     if (typeof grid[key] === 'undefined') {
 
-      // The cell is empty
+      // This cell is not yet occupied
       grid[key] = node;
     } else {
 
@@ -4527,18 +4562,96 @@ exports.labelsToDisplayFromGrid = function (params) {
       var currentNode = grid[key],
           currentNodeData = cache[currentNode];
 
-      // In case of size equality, we use the node's key so that the
-      // process remains deterministic
-      if (nodeData.size > currentNodeData.size || nodeData.size === currentNodeData.size && node > currentNode) {
-        grid[key] = node;
+      // We prefer already displayed labels
+      if (displayedLabels.size > 0) {
+        var n1 = displayedLabels.has(node),
+            n2 = displayedLabels.has(currentNode);
+
+        if (!n1 && n2) {
+          continue;
+        }
+
+        if (n1 && !n2) {
+          grid[key] = node;
+          continue;
+        }
+
+        if ((zoomedPanning || zooming) && n1 && n2) {
+          worthyLabels.push(node);
+          continue;
+        }
       }
+
+      // In case of size & degree equality, we use the node's key so that the
+      // process remains deterministic
+      var won = false;
+
+      if (nodeData.size > currentNodeData.size) {
+        won = true;
+      } else if (nodeData.size === currentNodeData.size) {
+
+        var nodeDegree = graph.degree(node),
+            currentNodeDegree = graph.degree(currentNode);
+
+        if (nodeDegree > currentNodeDegree) {
+          won = true;
+        } else if (nodeDegree === currentNodeDegree) {
+
+          if (node > currentNode) won = true;
+        }
+      }
+
+      if (won) grid[key] = node;
     }
   }
 
   // Compiling the labels
+  var biggestNodeShown = worthyLabels.some(function (node) {
+    return node === biggestNode;
+  });
+
   for (var _key in grid) {
-    worthyLabels.push(grid[_key]);
-  }return worthyLabels;
+
+    var _node = grid[_key];
+
+    if (_node === biggestNode) biggestNodeShown = true;
+
+    worthyLabels.push(_node);
+  }
+
+  // Always keeping biggest node shown on screen
+  if (!biggestNodeShown && biggestNode) worthyLabels.push(biggestNode);
+
+  // Basic anti-collision
+  var collisions = new Set();
+
+  for (var _i = 0, _l = worthyLabels.length; _i < _l; _i++) {
+    var _n = worthyLabels[_i],
+        d1 = cache[_n],
+        p1 = camera.graphToViewport(dimensions, d1.x, d1.y);
+
+    if (collisions.has(_n)) continue;
+
+    for (var j = _i + 1; j < _l; j++) {
+      var _n2 = worthyLabels[j],
+          d2 = cache[_n2],
+          p2 = camera.graphToViewport(dimensions, d2.x, d2.y);
+
+      var c = collision(p1.x, p1.y, d1.label.length * 8, 14, p2.x, p2.y, d2.label.length * 8, 14);
+
+      if (c) {
+
+        // NOTE: add degree as tie-breaker here if required in the future
+        if (d1.size < d2.size) collisions.add(_n);else collisions.add(_n2);
+      }
+    }
+  }
+
+  // console.log(collisions)
+
+  return worthyLabels.filter(function (l) {
+    return !collisions.has(l);
+  });
 };
 
 /***/ }),

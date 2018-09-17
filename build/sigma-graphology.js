@@ -278,7 +278,7 @@ module.exports = eq;
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(24),
+var Symbol = __webpack_require__(25),
     getRawTag = __webpack_require__(95),
     objectToString = __webpack_require__(96);
 
@@ -1240,7 +1240,7 @@ module.exports = isArray;
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isFunction = __webpack_require__(23),
+var isFunction = __webpack_require__(24),
     isLength = __webpack_require__(45);
 
 /**
@@ -1280,7 +1280,7 @@ module.exports = isArrayLike;
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = __webpack_require__(47),
-    baseRest = __webpack_require__(29),
+    baseRest = __webpack_require__(30),
     customDefaultsMerge = __webpack_require__(148),
     mergeWith = __webpack_require__(165);
 
@@ -1313,568 +1313,6 @@ module.exports = defaultsDeep;
 
 /***/ }),
 /* 20 */
-/***/ (function(module, exports) {
-
-/* eslint no-constant-condition: 0 */
-/**
- * Obliterator Take Function
- * ==========================
- *
- * Function taking n or every value of the given iterator and returns them
- * into an array.
- */
-
-/**
- * Take.
- *
- * @param  {Iterator} iterator - Target iterator.
- * @param  {number}   [n]      - Optional number of items to take.
- * @return {array}
- */
-module.exports = function take(iterator, n) {
-  var l = arguments.length > 1 ? n : Infinity,
-      array = l !== Infinity ? new Array(l) : [],
-      step,
-      i = 0;
-
-  while (true) {
-
-    if (i === l)
-      return array;
-
-    step = iterator.next();
-
-    if (step.done) {
-
-      if (i !== n)
-        return array.slice(0, i);
-
-      return array;
-    }
-
-    array[i++] = step.value;
-  }
-};
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.MixedNodeData = MixedNodeData;
-exports.DirectedNodeData = DirectedNodeData;
-exports.UndirectedNodeData = UndirectedNodeData;
-exports.DirectedEdgeData = DirectedEdgeData;
-exports.UndirectedEdgeData = UndirectedEdgeData;
-/**
- * Graphology Internal Data Classes
- * =================================
- *
- * Internal classes hopefully reduced to structs by engines & storing
- * necessary information for nodes & edges.
- *
- * Note that those classes don't rely on the `class` keyword to avoid some
- * cruft introduced by most of ES2015 transpilers.
- */
-
-/**
- * MixedNodeData class.
- *
- * @constructor
- * @param {object} attributes - Node's attributes.
- */
-function MixedNodeData(attributes) {
-
-  // Attributes
-  this.attributes = attributes;
-
-  // Degrees
-  this.inDegree = 0;
-  this.outDegree = 0;
-  this.undirectedDegree = 0;
-  this.directedSelfLoops = 0;
-  this.undirectedSelfLoops = 0;
-
-  // Indices
-  this.in = {};
-  this.out = {};
-  this.undirected = {};
-}
-
-/**
- * DirectedNodeData class.
- *
- * @constructor
- * @param {object} attributes - Node's attributes.
- */
-function DirectedNodeData(attributes) {
-
-  // Attributes
-  this.attributes = attributes || {};
-
-  // Degrees
-  this.inDegree = 0;
-  this.outDegree = 0;
-  this.directedSelfLoops = 0;
-
-  // Indices
-  this.in = {};
-  this.out = {};
-}
-
-DirectedNodeData.prototype.upgradeToMixed = function () {
-
-  // Degrees
-  this.undirectedDegree = 0;
-  this.undirectedSelfLoops = 0;
-
-  // Indices
-  this.undirected = {};
-};
-
-/**
- * UndirectedNodeData class.
- *
- * @constructor
- * @param {object} attributes - Node's attributes.
- */
-function UndirectedNodeData(attributes) {
-
-  // Attributes
-  this.attributes = attributes || {};
-
-  // Degrees
-  this.undirectedDegree = 0;
-  this.undirectedSelfLoops = 0;
-
-  // Indices
-  this.undirected = {};
-}
-
-UndirectedNodeData.prototype.upgradeToMixed = function () {
-
-  // Degrees
-  this.inDegree = 0;
-  this.outDegree = 0;
-  this.directedSelfLoops = 0;
-
-  // Indices
-  this.in = {};
-  this.out = {};
-};
-
-/**
- * DirectedEdgeData class.
- *
- * @constructor
- * @param {boolean} generatedKey - Was its key generated?
- * @param {string}  source       - Source of the edge.
- * @param {string}  target       - Target of the edge.
- * @param {object}  attributes   - Edge's attributes.
- */
-function DirectedEdgeData(generatedKey, source, target, attributes) {
-
-  // Attributes
-  this.attributes = attributes;
-
-  // Extremities
-  this.source = source;
-  this.target = target;
-
-  // Was its key generated?
-  this.generatedKey = generatedKey;
-}
-
-/**
- * UndirectedEdgeData class.
- *
- * @constructor
- * @param {boolean} generatedKey - Was its key generated?
- * @param {string}  source       - Source of the edge.
- * @param {string}  target       - Target of the edge.
- * @param {object}  attributes   - Edge's attributes.
- */
-function UndirectedEdgeData(generatedKey, source, target, attributes) {
-
-  // Attributes
-  this.attributes = attributes;
-
-  // Extremities
-  this.source = source;
-  this.target = target;
-
-  // Was its key generated?
-  this.generatedKey = generatedKey;
-}
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getNative = __webpack_require__(4),
-    root = __webpack_require__(2);
-
-/* Built-in method references that are verified to be native. */
-var Map = getNative(root, 'Map');
-
-module.exports = Map;
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseGetTag = __webpack_require__(7),
-    isObject = __webpack_require__(3);
-
-/** `Object#toString` result references. */
-var asyncTag = '[object AsyncFunction]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    proxyTag = '[object Proxy]';
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a function, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  if (!isObject(value)) {
-    return false;
-  }
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in Safari 9 which returns 'object' for typed arrays and other constructors.
-  var tag = baseGetTag(value);
-  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-}
-
-module.exports = isFunction;
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var root = __webpack_require__(2);
-
-/** Built-in value references. */
-var Symbol = root.Symbol;
-
-module.exports = Symbol;
-
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(2),
-    stubFalse = __webpack_require__(130);
-
-/** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
-
-/** Detect free variable `module`. */
-var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
-
-/** Detect the popular CommonJS extension `module.exports`. */
-var moduleExports = freeModule && freeModule.exports === freeExports;
-
-/** Built-in value references. */
-var Buffer = moduleExports ? root.Buffer : undefined;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
-
-/**
- * Checks if `value` is a buffer.
- *
- * @static
- * @memberOf _
- * @since 4.3.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
- * @example
- *
- * _.isBuffer(new Buffer(2));
- * // => true
- *
- * _.isBuffer(new Uint8Array(2));
- * // => false
- */
-var isBuffer = nativeIsBuffer || stubFalse;
-
-module.exports = isBuffer;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)(module)))
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseIsTypedArray = __webpack_require__(131),
-    baseUnary = __webpack_require__(132),
-    nodeUtil = __webpack_require__(133);
-
-/* Node.js helper references. */
-var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
-
-/**
- * Checks if `value` is classified as a typed array.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
- * @example
- *
- * _.isTypedArray(new Uint8Array);
- * // => true
- *
- * _.isTypedArray([]);
- * // => false
- */
-var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-
-module.exports = isTypedArray;
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports) {
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Checks if `value` is likely a prototype object.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
- */
-function isPrototype(value) {
-  var Ctor = value && value.constructor,
-      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
-
-  return value === proto;
-}
-
-module.exports = isPrototype;
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var identity = __webpack_require__(48),
-    overRest = __webpack_require__(143),
-    setToString = __webpack_require__(144);
-
-/**
- * The base implementation of `_.rest` which doesn't validate or coerce arguments.
- *
- * @private
- * @param {Function} func The function to apply a rest parameter to.
- * @param {number} [start=func.length-1] The start position of the rest parameter.
- * @returns {Function} Returns the new function.
- */
-function baseRest(func, start) {
-  return setToString(overRest(func, start, identity), func + '');
-}
-
-module.exports = baseRest;
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var defineProperty = __webpack_require__(49);
-
-/**
- * The base implementation of `assignValue` and `assignMergeValue` without
- * value checks.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {string} key The key of the property to assign.
- * @param {*} value The value to assign.
- */
-function baseAssignValue(object, key, value) {
-  if (key == '__proto__' && defineProperty) {
-    defineProperty(object, key, {
-      'configurable': true,
-      'enumerable': true,
-      'value': value,
-      'writable': true
-    });
-  } else {
-    object[key] = value;
-  }
-}
-
-module.exports = baseAssignValue;
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var arrayLikeKeys = __webpack_require__(42),
-    baseKeysIn = __webpack_require__(163),
-    isArrayLike = __webpack_require__(18);
-
-/**
- * Creates an array of the own and inherited enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keysIn(new Foo);
- * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
- */
-function keysIn(object) {
-  return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
-}
-
-module.exports = keysIn;
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var eq = __webpack_require__(6),
-    isArrayLike = __webpack_require__(18),
-    isIndex = __webpack_require__(44),
-    isObject = __webpack_require__(3);
-
-/**
- * Checks if the given arguments are from an iteratee call.
- *
- * @private
- * @param {*} value The potential iteratee value argument.
- * @param {*} index The potential iteratee index or key argument.
- * @param {*} object The potential iteratee object argument.
- * @returns {boolean} Returns `true` if the arguments are from an iteratee call,
- *  else `false`.
- */
-function isIterateeCall(value, index, object) {
-  if (!isObject(object)) {
-    return false;
-  }
-  var type = typeof index;
-  if (type == 'number'
-        ? (isArrayLike(object) && isIndex(index, object.length))
-        : (type == 'string' && index in object)
-      ) {
-    return eq(object[index], value);
-  }
-  return false;
-}
-
-module.exports = isIterateeCall;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-/**
- * Graphology mergePath
- * =====================
- *
- * Function merging the given path to the graph.
- */
-
-/**
- * Merging the given path to the graph.
- *
- * @param  {Graph} graph - Target graph.
- * @param  {array} nodes - Nodes representing the path to merge.
- */
-module.exports = function mergePath(graph, nodes) {
-  if (nodes.length === 0)
-    return;
-
-  var previousNode, node, i, l;
-
-  graph.mergeNode(nodes[0]);
-
-  for (i = 1, l = nodes.length; i < l; i++) {
-    previousNode = nodes[i - 1];
-    node = nodes[i];
-
-    graph.mergeEdge(previousNode, node);
-  }
-};
-
-
-/***/ }),
-/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2272,6 +1710,568 @@ var Camera = function (_EventEmitter) {
 exports.default = Camera;
 
 /***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+/* eslint no-constant-condition: 0 */
+/**
+ * Obliterator Take Function
+ * ==========================
+ *
+ * Function taking n or every value of the given iterator and returns them
+ * into an array.
+ */
+
+/**
+ * Take.
+ *
+ * @param  {Iterator} iterator - Target iterator.
+ * @param  {number}   [n]      - Optional number of items to take.
+ * @return {array}
+ */
+module.exports = function take(iterator, n) {
+  var l = arguments.length > 1 ? n : Infinity,
+      array = l !== Infinity ? new Array(l) : [],
+      step,
+      i = 0;
+
+  while (true) {
+
+    if (i === l)
+      return array;
+
+    step = iterator.next();
+
+    if (step.done) {
+
+      if (i !== n)
+        return array.slice(0, i);
+
+      return array;
+    }
+
+    array[i++] = step.value;
+  }
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MixedNodeData = MixedNodeData;
+exports.DirectedNodeData = DirectedNodeData;
+exports.UndirectedNodeData = UndirectedNodeData;
+exports.DirectedEdgeData = DirectedEdgeData;
+exports.UndirectedEdgeData = UndirectedEdgeData;
+/**
+ * Graphology Internal Data Classes
+ * =================================
+ *
+ * Internal classes hopefully reduced to structs by engines & storing
+ * necessary information for nodes & edges.
+ *
+ * Note that those classes don't rely on the `class` keyword to avoid some
+ * cruft introduced by most of ES2015 transpilers.
+ */
+
+/**
+ * MixedNodeData class.
+ *
+ * @constructor
+ * @param {object} attributes - Node's attributes.
+ */
+function MixedNodeData(attributes) {
+
+  // Attributes
+  this.attributes = attributes;
+
+  // Degrees
+  this.inDegree = 0;
+  this.outDegree = 0;
+  this.undirectedDegree = 0;
+  this.directedSelfLoops = 0;
+  this.undirectedSelfLoops = 0;
+
+  // Indices
+  this.in = {};
+  this.out = {};
+  this.undirected = {};
+}
+
+/**
+ * DirectedNodeData class.
+ *
+ * @constructor
+ * @param {object} attributes - Node's attributes.
+ */
+function DirectedNodeData(attributes) {
+
+  // Attributes
+  this.attributes = attributes || {};
+
+  // Degrees
+  this.inDegree = 0;
+  this.outDegree = 0;
+  this.directedSelfLoops = 0;
+
+  // Indices
+  this.in = {};
+  this.out = {};
+}
+
+DirectedNodeData.prototype.upgradeToMixed = function () {
+
+  // Degrees
+  this.undirectedDegree = 0;
+  this.undirectedSelfLoops = 0;
+
+  // Indices
+  this.undirected = {};
+};
+
+/**
+ * UndirectedNodeData class.
+ *
+ * @constructor
+ * @param {object} attributes - Node's attributes.
+ */
+function UndirectedNodeData(attributes) {
+
+  // Attributes
+  this.attributes = attributes || {};
+
+  // Degrees
+  this.undirectedDegree = 0;
+  this.undirectedSelfLoops = 0;
+
+  // Indices
+  this.undirected = {};
+}
+
+UndirectedNodeData.prototype.upgradeToMixed = function () {
+
+  // Degrees
+  this.inDegree = 0;
+  this.outDegree = 0;
+  this.directedSelfLoops = 0;
+
+  // Indices
+  this.in = {};
+  this.out = {};
+};
+
+/**
+ * DirectedEdgeData class.
+ *
+ * @constructor
+ * @param {boolean} generatedKey - Was its key generated?
+ * @param {string}  source       - Source of the edge.
+ * @param {string}  target       - Target of the edge.
+ * @param {object}  attributes   - Edge's attributes.
+ */
+function DirectedEdgeData(generatedKey, source, target, attributes) {
+
+  // Attributes
+  this.attributes = attributes;
+
+  // Extremities
+  this.source = source;
+  this.target = target;
+
+  // Was its key generated?
+  this.generatedKey = generatedKey;
+}
+
+/**
+ * UndirectedEdgeData class.
+ *
+ * @constructor
+ * @param {boolean} generatedKey - Was its key generated?
+ * @param {string}  source       - Source of the edge.
+ * @param {string}  target       - Target of the edge.
+ * @param {object}  attributes   - Edge's attributes.
+ */
+function UndirectedEdgeData(generatedKey, source, target, attributes) {
+
+  // Attributes
+  this.attributes = attributes;
+
+  // Extremities
+  this.source = source;
+  this.target = target;
+
+  // Was its key generated?
+  this.generatedKey = generatedKey;
+}
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getNative = __webpack_require__(4),
+    root = __webpack_require__(2);
+
+/* Built-in method references that are verified to be native. */
+var Map = getNative(root, 'Map');
+
+module.exports = Map;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseGetTag = __webpack_require__(7),
+    isObject = __webpack_require__(3);
+
+/** `Object#toString` result references. */
+var asyncTag = '[object AsyncFunction]',
+    funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    proxyTag = '[object Proxy]';
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  if (!isObject(value)) {
+    return false;
+  }
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 9 which returns 'object' for typed arrays and other constructors.
+  var tag = baseGetTag(value);
+  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
+}
+
+module.exports = isFunction;
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var root = __webpack_require__(2);
+
+/** Built-in value references. */
+var Symbol = root.Symbol;
+
+module.exports = Symbol;
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(2),
+    stubFalse = __webpack_require__(130);
+
+/** Detect free variable `exports`. */
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+/** Detect free variable `module`. */
+var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
+
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports = freeModule && freeModule.exports === freeExports;
+
+/** Built-in value references. */
+var Buffer = moduleExports ? root.Buffer : undefined;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
+
+/**
+ * Checks if `value` is a buffer.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.3.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
+ * @example
+ *
+ * _.isBuffer(new Buffer(2));
+ * // => true
+ *
+ * _.isBuffer(new Uint8Array(2));
+ * // => false
+ */
+var isBuffer = nativeIsBuffer || stubFalse;
+
+module.exports = isBuffer;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)(module)))
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseIsTypedArray = __webpack_require__(131),
+    baseUnary = __webpack_require__(132),
+    nodeUtil = __webpack_require__(133);
+
+/* Node.js helper references. */
+var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+
+/**
+ * Checks if `value` is classified as a typed array.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+ * @example
+ *
+ * _.isTypedArray(new Uint8Array);
+ * // => true
+ *
+ * _.isTypedArray([]);
+ * // => false
+ */
+var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+
+module.exports = isTypedArray;
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports) {
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Checks if `value` is likely a prototype object.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+ */
+function isPrototype(value) {
+  var Ctor = value && value.constructor,
+      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
+
+  return value === proto;
+}
+
+module.exports = isPrototype;
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var identity = __webpack_require__(48),
+    overRest = __webpack_require__(143),
+    setToString = __webpack_require__(144);
+
+/**
+ * The base implementation of `_.rest` which doesn't validate or coerce arguments.
+ *
+ * @private
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @returns {Function} Returns the new function.
+ */
+function baseRest(func, start) {
+  return setToString(overRest(func, start, identity), func + '');
+}
+
+module.exports = baseRest;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var defineProperty = __webpack_require__(49);
+
+/**
+ * The base implementation of `assignValue` and `assignMergeValue` without
+ * value checks.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
+ */
+function baseAssignValue(object, key, value) {
+  if (key == '__proto__' && defineProperty) {
+    defineProperty(object, key, {
+      'configurable': true,
+      'enumerable': true,
+      'value': value,
+      'writable': true
+    });
+  } else {
+    object[key] = value;
+  }
+}
+
+module.exports = baseAssignValue;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var arrayLikeKeys = __webpack_require__(42),
+    baseKeysIn = __webpack_require__(163),
+    isArrayLike = __webpack_require__(18);
+
+/**
+ * Creates an array of the own and inherited enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keysIn(new Foo);
+ * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
+ */
+function keysIn(object) {
+  return isArrayLike(object) ? arrayLikeKeys(object, true) : baseKeysIn(object);
+}
+
+module.exports = keysIn;
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var eq = __webpack_require__(6),
+    isArrayLike = __webpack_require__(18),
+    isIndex = __webpack_require__(44),
+    isObject = __webpack_require__(3);
+
+/**
+ * Checks if the given arguments are from an iteratee call.
+ *
+ * @private
+ * @param {*} value The potential iteratee value argument.
+ * @param {*} index The potential iteratee index or key argument.
+ * @param {*} object The potential iteratee object argument.
+ * @returns {boolean} Returns `true` if the arguments are from an iteratee call,
+ *  else `false`.
+ */
+function isIterateeCall(value, index, object) {
+  if (!isObject(object)) {
+    return false;
+  }
+  var type = typeof index;
+  if (type == 'number'
+        ? (isArrayLike(object) && isIndex(index, object.length))
+        : (type == 'string' && index in object)
+      ) {
+    return eq(object[index], value);
+  }
+  return false;
+}
+
+module.exports = isIterateeCall;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+/**
+ * Graphology mergePath
+ * =====================
+ *
+ * Function merging the given path to the graph.
+ */
+
+/**
+ * Merging the given path to the graph.
+ *
+ * @param  {Graph} graph - Target graph.
+ * @param  {array} nodes - Nodes representing the path to merge.
+ */
+module.exports = function mergePath(graph, nodes) {
+  if (nodes.length === 0)
+    return;
+
+  var previousNode, node, i, l;
+
+  graph.mergeNode(nodes[0]);
+
+  for (i = 1, l = nodes.length; i < l; i++) {
+    previousNode = nodes[i - 1];
+    node = nodes[i];
+
+    graph.mergeEdge(previousNode, node);
+  }
+};
+
+
+/***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2284,6 +2284,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.floatColor = floatColor;
 exports.matrixFromCamera = matrixFromCamera;
 exports.extractPixel = extractPixel;
+exports.canUse32BitsIndices = canUse32BitsIndices;
 
 var _matrices = __webpack_require__(240);
 
@@ -2393,6 +2394,15 @@ function extractPixel(gl, x, y, array) {
   gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
   return data;
+}
+
+/**
+ * Function used to know whether given webgl context can use 32 bits indices.
+ */
+function canUse32BitsIndices(gl) {
+  var webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+
+  return webgl2 || !!gl.getExtension('OES_element_index_uint');
 }
 
 /***/ }),
@@ -2617,9 +2627,9 @@ module.exports = Uint8Array;
 var baseTimes = __webpack_require__(128),
     isArguments = __webpack_require__(43),
     isArray = __webpack_require__(17),
-    isBuffer = __webpack_require__(25),
+    isBuffer = __webpack_require__(26),
     isIndex = __webpack_require__(44),
-    isTypedArray = __webpack_require__(27);
+    isTypedArray = __webpack_require__(28);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -2880,7 +2890,7 @@ var Stack = __webpack_require__(36),
     baseFor = __webpack_require__(149),
     baseMergeDeep = __webpack_require__(151),
     isObject = __webpack_require__(3),
-    keysIn = __webpack_require__(31),
+    keysIn = __webpack_require__(32),
     safeGet = __webpack_require__(53);
 
 /**
@@ -2923,7 +2933,7 @@ module.exports = baseMerge;
 /* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseAssignValue = __webpack_require__(30),
+var baseAssignValue = __webpack_require__(31),
     eq = __webpack_require__(6);
 
 /**
@@ -2970,9 +2980,11 @@ module.exports = getPrototype;
  * @returns {*} Returns the property value.
  */
 function safeGet(object, key) {
-  return key == '__proto__'
-    ? undefined
-    : object[key];
+  if (key == '__proto__') {
+    return;
+  }
+
+  return object[key];
 }
 
 module.exports = safeGet;
@@ -4084,10 +4096,10 @@ module.exports = {
 /* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseRest = __webpack_require__(29),
+var baseRest = __webpack_require__(30),
     eq = __webpack_require__(6),
-    isIterateeCall = __webpack_require__(32),
-    keysIn = __webpack_require__(31);
+    isIterateeCall = __webpack_require__(33),
+    keysIn = __webpack_require__(32);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -4402,6 +4414,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // NOTE: this is basically a MX-CIF Quadtree at this point
 // NOTE: need to explore R-Trees for edges
 // NOTE: need to explore 2d segment tree for edges
+
+// NOTE: probably can do faster using spatial hashing
 
 /**
  * Constants.
@@ -4773,7 +4787,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _camera = __webpack_require__(34);
+var _camera = __webpack_require__(20);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -5431,7 +5445,7 @@ var _renderer = __webpack_require__(62);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(34);
+var _camera = __webpack_require__(20);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -5609,13 +5623,13 @@ var _iterator = __webpack_require__(12);
 
 var _iterator2 = _interopRequireDefault(_iterator);
 
-var _take = __webpack_require__(20);
+var _take = __webpack_require__(21);
 
 var _take2 = _interopRequireDefault(_take);
 
 var _errors = __webpack_require__(8);
 
-var _data = __webpack_require__(21);
+var _data = __webpack_require__(22);
 
 var _indices = __webpack_require__(72);
 
@@ -8593,13 +8607,13 @@ var _iterator = __webpack_require__(12);
 
 var _iterator2 = _interopRequireDefault(_iterator);
 
-var _take = __webpack_require__(20);
+var _take = __webpack_require__(21);
 
 var _take2 = _interopRequireDefault(_take);
 
 var _errors = __webpack_require__(8);
 
-var _data = __webpack_require__(21);
+var _data = __webpack_require__(22);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8950,7 +8964,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.attachNeighborIterationMethods = attachNeighborIterationMethods;
 
-var _take = __webpack_require__(20);
+var _take = __webpack_require__(21);
 
 var _take2 = _interopRequireDefault(_take);
 
@@ -9163,7 +9177,7 @@ exports.serializeEdge = serializeEdge;
 exports.validateSerializedNode = validateSerializedNode;
 exports.validateSerializedEdge = validateSerializedEdge;
 
-var _data = __webpack_require__(21);
+var _data = __webpack_require__(22);
 
 var _utils = __webpack_require__(10);
 
@@ -9448,8 +9462,8 @@ var Stack = __webpack_require__(36),
     equalObjects = __webpack_require__(120),
     getTag = __webpack_require__(136),
     isArray = __webpack_require__(17),
-    isBuffer = __webpack_require__(25),
-    isTypedArray = __webpack_require__(27);
+    isBuffer = __webpack_require__(26),
+    isTypedArray = __webpack_require__(28);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1;
@@ -9756,7 +9770,7 @@ module.exports = stackHas;
 /***/ (function(module, exports, __webpack_require__) {
 
 var ListCache = __webpack_require__(13),
-    Map = __webpack_require__(22),
+    Map = __webpack_require__(23),
     MapCache = __webpack_require__(39);
 
 /** Used as the size to enable large array optimizations. */
@@ -9795,7 +9809,7 @@ module.exports = stackSet;
 /* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isFunction = __webpack_require__(23),
+var isFunction = __webpack_require__(24),
     isMasked = __webpack_require__(97),
     isObject = __webpack_require__(3),
     toSource = __webpack_require__(38);
@@ -9875,7 +9889,7 @@ module.exports = g;
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(24);
+var Symbol = __webpack_require__(25);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -10014,7 +10028,7 @@ module.exports = getValue;
 
 var Hash = __webpack_require__(101),
     ListCache = __webpack_require__(13),
-    Map = __webpack_require__(22);
+    Map = __webpack_require__(23);
 
 /**
  * Removes all key-value entries from the map.
@@ -10458,7 +10472,7 @@ module.exports = cacheHas;
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(24),
+var Symbol = __webpack_require__(25),
     Uint8Array = __webpack_require__(41),
     eq = __webpack_require__(6),
     equalArrays = __webpack_require__(40),
@@ -11123,13 +11137,13 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)(module)))
 
 /***/ }),
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isPrototype = __webpack_require__(28),
+var isPrototype = __webpack_require__(29),
     nativeKeys = __webpack_require__(135);
 
 /** Used for built-in method references. */
@@ -11178,7 +11192,7 @@ module.exports = nativeKeys;
 /***/ (function(module, exports, __webpack_require__) {
 
 var DataView = __webpack_require__(137),
-    Map = __webpack_require__(22),
+    Map = __webpack_require__(23),
     Promise = __webpack_require__(138),
     Set = __webpack_require__(139),
     WeakMap = __webpack_require__(140),
@@ -11871,11 +11885,11 @@ var assignMergeValue = __webpack_require__(51),
     isArguments = __webpack_require__(43),
     isArray = __webpack_require__(17),
     isArrayLikeObject = __webpack_require__(158),
-    isBuffer = __webpack_require__(25),
-    isFunction = __webpack_require__(23),
+    isBuffer = __webpack_require__(26),
+    isFunction = __webpack_require__(24),
     isObject = __webpack_require__(3),
     isPlainObject = __webpack_require__(159),
-    isTypedArray = __webpack_require__(27),
+    isTypedArray = __webpack_require__(28),
     safeGet = __webpack_require__(53),
     toPlainObject = __webpack_require__(160);
 
@@ -11939,7 +11953,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
       if (isArguments(objValue)) {
         newValue = toPlainObject(objValue);
       }
-      else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
+      else if (!isObject(objValue) || isFunction(objValue)) {
         newValue = initCloneObject(srcValue);
       }
     }
@@ -11999,7 +12013,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)(module)))
 
 /***/ }),
 /* 153 */
@@ -12077,7 +12091,7 @@ module.exports = copyArray;
 
 var baseCreate = __webpack_require__(157),
     getPrototype = __webpack_require__(52),
-    isPrototype = __webpack_require__(28);
+    isPrototype = __webpack_require__(29);
 
 /**
  * Initializes an object clone.
@@ -12243,7 +12257,7 @@ module.exports = isPlainObject;
 /***/ (function(module, exports, __webpack_require__) {
 
 var copyObject = __webpack_require__(161),
-    keysIn = __webpack_require__(31);
+    keysIn = __webpack_require__(32);
 
 /**
  * Converts `value` to a plain object flattening inherited enumerable string
@@ -12281,7 +12295,7 @@ module.exports = toPlainObject;
 /***/ (function(module, exports, __webpack_require__) {
 
 var assignValue = __webpack_require__(162),
-    baseAssignValue = __webpack_require__(30);
+    baseAssignValue = __webpack_require__(31);
 
 /**
  * Copies properties of `source` to `object`.
@@ -12326,7 +12340,7 @@ module.exports = copyObject;
 /* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseAssignValue = __webpack_require__(30),
+var baseAssignValue = __webpack_require__(31),
     eq = __webpack_require__(6);
 
 /** Used for built-in method references. */
@@ -12361,7 +12375,7 @@ module.exports = assignValue;
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(3),
-    isPrototype = __webpack_require__(28),
+    isPrototype = __webpack_require__(29),
     nativeKeysIn = __webpack_require__(164);
 
 /** Used for built-in method references. */
@@ -12470,8 +12484,8 @@ module.exports = mergeWith;
 /* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseRest = __webpack_require__(29),
-    isIterateeCall = __webpack_require__(32);
+var baseRest = __webpack_require__(30),
+    isIterateeCall = __webpack_require__(33);
 
 /**
  * Creates a function like `_.assign`.
@@ -12758,7 +12772,7 @@ module.exports = function complete(GraphClass, order) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseRange = __webpack_require__(174),
-    isIterateeCall = __webpack_require__(32),
+    isIterateeCall = __webpack_require__(33),
     toFinite = __webpack_require__(175);
 
 /**
@@ -13021,7 +13035,7 @@ module.exports = function empty(GraphClass, order) {
  * Function generating ladder graphs.
  */
 var isGraphConstructor = __webpack_require__(1),
-    mergePath = __webpack_require__(33),
+    mergePath = __webpack_require__(34),
     range = __webpack_require__(9);
 
 /**
@@ -13058,7 +13072,7 @@ module.exports = function ladder(GraphClass, length) {
  * Function generating path graphs.
  */
 var isGraphConstructor = __webpack_require__(1),
-    mergePath = __webpack_require__(33),
+    mergePath = __webpack_require__(34),
     range = __webpack_require__(9);
 
 /**
@@ -16773,7 +16787,7 @@ exports.isGraph = __webpack_require__(0);
 exports.isGraphConstructor = __webpack_require__(1);
 exports.mergeClique = __webpack_require__(222);
 exports.mergeCycle = __webpack_require__(223);
-exports.mergePath = __webpack_require__(33);
+exports.mergePath = __webpack_require__(34);
 exports.mergeStar = __webpack_require__(56);
 
 
@@ -18992,7 +19006,7 @@ var _renderer = __webpack_require__(62);
 
 var _renderer2 = _interopRequireDefault(_renderer);
 
-var _camera = __webpack_require__(34);
+var _camera = __webpack_require__(20);
 
 var _camera2 = _interopRequireDefault(_camera);
 
@@ -19129,7 +19143,6 @@ var WebGLRenderer = function (_Renderer) {
 
     // State
     _this.highlightedNodes = new Set();
-    _this.previousVisibleNodes = new Set();
     _this.displayedLabels = new Set();
     _this.hoveredNode = null;
     _this.wasRenderedInThisFrame = false;
@@ -19233,7 +19246,7 @@ var WebGLRenderer = function (_Renderer) {
       if (webgl) {
 
         // First we try webgl2 for an easy performance boost
-        context = element.getContext('webgl', contextOptions);
+        context = element.getContext('webgl2', contextOptions);
 
         // Else we fall back to webgl
         if (!context) context = element.getContext('webgl', contextOptions);
@@ -19820,9 +19833,9 @@ var WebGLRenderer = function (_Renderer) {
         cache: this.nodeDataCache,
         camera: this.camera,
         displayedLabels: this.displayedLabels,
-        previousVisibleNodes: this.previousVisibleNodes,
         visibleNodes: visibleNodes,
-        dimensions: this
+        dimensions: this,
+        graph: this.graph
       });
 
       // Drawing labels
@@ -19856,7 +19869,6 @@ var WebGLRenderer = function (_Renderer) {
       }
 
       // Caching visible nodes and displayed labels
-      this.previousVisibleNodes = new Set(visibleNodes);
       this.displayedLabels = new Set(labelsToDisplay);
 
       // Rendering highlighted nodes
@@ -20566,11 +20578,7 @@ var EdgeProgram = function (_Program) {
     // `OES_element_index_uint` is quite everywhere so we'll handle
     // the potential issue if it really arises.
     // NOTE: when using webgl2, the extension is enabled by default
-    var webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
-
-    var extension = webgl2 || gl.getExtension('OES_element_index_uint');
-
-    _this.canUse32BitsIndices = !!extension;
+    _this.canUse32BitsIndices = (0, _utils.canUse32BitsIndices)(gl);
     _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
     _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
     return _this;
@@ -20732,13 +20740,13 @@ exports.default = EdgeProgram;
 /* 244 */
 /***/ (function(module, exports) {
 
-module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness / 2.0 * pow_ratio / u_scale;\n\n  // Adding a small feather for AA\n  thickness += feather;\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"
+module.exports = "attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float min_thickness = 1.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness * pow_ratio / u_scale;\n\n  // Min thickness for AA\n  thickness = max(min_thickness, thickness);\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"
 
 /***/ }),
 /* 245 */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.8;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
+module.exports = "precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 2.6;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"
 
 /***/ }),
 /* 246 */
@@ -20851,12 +20859,11 @@ function drawNode(context, data) {
 "use strict";
 
 
-/**
- * Sigma.js Labels Heuristics
- * ===========================
- *
- * Miscelleneous heuristics related to label display.
- */
+var _camera = __webpack_require__(20);
+
+var _camera2 = _interopRequireDefault(_camera);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Constants.
@@ -20864,115 +20871,145 @@ function drawNode(context, data) {
 
 // Dimensions of a normal cell
 var DEFAULT_CELL = {
-  width: 200,
-  height: 150
+  width: 250,
+  height: 175
 };
 
-// Dimensions of an unzoomed cell. This one is usually smaller than the normal
+// Dimensions of an unzoomed cell. This one is usually larger than the normal
 // one to account for the fact that labels will more likely collide.
+/**
+ * Sigma.js Labels Heuristics
+ * ===========================
+ *
+ * Miscelleneous heuristics related to label display.
+ */
 var DEFAULT_UNZOOMED_CELL = {
   width: 400,
   height: 300
 };
 
-// TODO: use degree as secondary tie-breaker
+/**
+ * Helpers.
+ */
+function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+
+// TODO: cache camera position of selected nodes to avoid costly computations
+// in anti-collision step
+// TODO: minSize to be displayed
+// TOOD: document a little bit more so future people can understand this mess
 
 /**
- * Label grid heuristic selecting labels to display according to the following
- * parameters:
- *   1) Only one label per grid cell.
- *   2) Greater labels win.
- *   3) Already displayed label should stay displayed.
- *
- * Note: It is possible to apply a size threshold to the labels (but should
- * really be done at quad level for performance).
- *
- * Note: It might be possible to not use last displayed labels by measurements
- * and a margin.
+ * Label grid heuristic selecting labels to display.
  *
  * @param  {object} params                 - Parameters:
  * @param  {object}   cache                - Cache storing nodes' data.
  * @param  {Camera}   camera               - The renderer's camera.
  * @param  {Set}      displayedLabels      - Currently displayed labels.
- * @param  {Set}      previousVisibleNodes - Nodes visible last render.
  * @param  {Array}    visibleNodes         - Nodes visible for this render.
+ * @param  {Graph}    graph                - The rendered graph.
  * @return {Array}                         - The selected labels.
  */
 exports.labelsToDisplayFromGrid = function (params) {
   var cache = params.cache,
       camera = params.camera,
       displayedLabels = params.displayedLabels,
-      previousVisibleNodes = params.previousVisibleNodes,
       visibleNodes = params.visibleNodes,
-      dimensions = params.dimensions;
+      dimensions = params.dimensions,
+      graph = params.graph;
 
 
   var cameraState = camera.getState(),
       previousCameraState = camera.getPreviousState();
+
+  var previousCamera = new _camera2.default();
+  previousCamera.setState(previousCameraState);
+
+  // Camera hasn't moved?
+  var still = cameraState.x === previousCameraState.x && cameraState.y === previousCameraState.y && cameraState.ratio === previousCameraState.ratio;
+
   // State
-  // TODO: the panning is false because of not working y condition, though
-  // if I fix it, the whole heuristic fails. I am saddness... :(
   var zooming = cameraState.ratio < previousCameraState.ratio,
-      panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.x,
+      panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
       unzooming = cameraState.ratio > previousCameraState.ratio,
-      unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1;
+      unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1,
+      zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
 
   // Trick to discretize unzooming
-  if (unzooming && Math.trunc(cameraState.ratio * 10) % 3 !== 0) return Array.from(displayedLabels);
+  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) return Array.from(displayedLabels);
 
   // If panning while unzoomed, we shouldn't change label selection
-  if (unzoomedPanning && displayedLabels.size !== 0) return Array.from(displayedLabels);
+  if ((unzoomedPanning || still) && displayedLabels.size !== 0) return Array.from(displayedLabels);
 
-  // Selecting cell
-  var baseCell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
+  // When unzoomed & zooming
+  if (zooming && cameraState.ratio >= 1) return Array.from(displayedLabels);
 
   // Adapting cell dimensions
-  var cellWidthRemainder = dimensions.width % baseCell.width;
-  var cellWidth = baseCell.width + cellWidthRemainder / Math.floor(dimensions.width / baseCell.width);
+  var cell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
 
-  var cellHeightRemainder = dimensions.height % baseCell.height;
-  var cellHeight = baseCell.height + cellHeightRemainder / Math.floor(dimensions.height / baseCell.height);
+  var cwr = dimensions.width % cell.width;
+  var cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
 
-  // Building the grid
+  var chr = dimensions.height % cell.height;
+  var cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
+
+  var adjustedWidth = dimensions.width + cellWidth,
+      adjustedHeight = dimensions.height + cellHeight,
+      adjustedX = -cellWidth,
+      adjustedY = -cellHeight;
+
+  var panningWidth = dimensions.width + cellWidth / 2,
+      panningHeight = dimensions.height + cellHeight / 2,
+      panningX = -(cellWidth / 2),
+      panningY = -(cellHeight / 2);
+
+  // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
+
+  var worthyLabels = [];
   var grid = {};
 
-  var worthyBuckets = new Set();
-  var worthyLabels = [];
+  var maxSize = -Infinity,
+      biggestNode = null;
 
-  // Selecting worthy labels
   for (var i = 0, l = visibleNodes.length; i < l; i++) {
     var node = visibleNodes[i],
         nodeData = cache[node];
 
-    // When panning, we should not consider nodes that were previously shown
-    if (panning && !zooming && !unzooming) {
-      if (!displayedLabels.has(node) && previousVisibleNodes.has(node)) continue;
+    // Finding our node's cell in the grid
+    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+
+    // Node is not actually visible on screen
+    // NOTE: can optimize margin on the right side (only if we know where the labels go)
+    if (pos.x < adjustedX || pos.x > adjustedWidth || pos.y < adjustedY || pos.y > adjustedHeight) continue;
+
+    // Keeping track of the maximum node size for certain cases
+    if (nodeData.size > maxSize) {
+      maxSize = nodeData.size;
+      biggestNode = node;
     }
 
-    // Finding our node's cell in the grid
-    // TODO: pass dimensions to the function
-    var pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+    // If panning when zoomed, we consider only displayed labels and newly
+    // visible nodes
+    if (zoomedPanning) {
+      var ppos = previousCamera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+
+      // Was node visible earlier?
+      if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
+
+        // Was the label displayed?
+        if (!displayedLabels.has(node)) continue;
+      }
+    }
 
     var xKey = Math.floor(pos.x / cellWidth),
         yKey = Math.floor(pos.y / cellHeight);
 
-    // NOTE: there seems to be overflowing keys but this is actually a good
-    // thing since it means we grasp margins.
-    var key = xKey + ';' + yKey;
+    var key = xKey + '\xA7' + yKey;
 
-    // When zooming or panning, we aim at keeping the already displayed labels
-    if ((zooming || panning && !unzooming) && displayedLabels.has(node)) {
-      worthyBuckets.add(key);
-      worthyLabels.push(node);
-      continue;
-    }
-
-    if (worthyBuckets.has(key)) continue;
-
-    // Label resolution
     if (typeof grid[key] === 'undefined') {
 
-      // The cell is empty
+      // This cell is not yet occupied
       grid[key] = node;
     } else {
 
@@ -20980,18 +21017,96 @@ exports.labelsToDisplayFromGrid = function (params) {
       var currentNode = grid[key],
           currentNodeData = cache[currentNode];
 
-      // In case of size equality, we use the node's key so that the
-      // process remains deterministic
-      if (nodeData.size > currentNodeData.size || nodeData.size === currentNodeData.size && node > currentNode) {
-        grid[key] = node;
+      // We prefer already displayed labels
+      if (displayedLabels.size > 0) {
+        var n1 = displayedLabels.has(node),
+            n2 = displayedLabels.has(currentNode);
+
+        if (!n1 && n2) {
+          continue;
+        }
+
+        if (n1 && !n2) {
+          grid[key] = node;
+          continue;
+        }
+
+        if ((zoomedPanning || zooming) && n1 && n2) {
+          worthyLabels.push(node);
+          continue;
+        }
       }
+
+      // In case of size & degree equality, we use the node's key so that the
+      // process remains deterministic
+      var won = false;
+
+      if (nodeData.size > currentNodeData.size) {
+        won = true;
+      } else if (nodeData.size === currentNodeData.size) {
+
+        var nodeDegree = graph.degree(node),
+            currentNodeDegree = graph.degree(currentNode);
+
+        if (nodeDegree > currentNodeDegree) {
+          won = true;
+        } else if (nodeDegree === currentNodeDegree) {
+
+          if (node > currentNode) won = true;
+        }
+      }
+
+      if (won) grid[key] = node;
     }
   }
 
   // Compiling the labels
+  var biggestNodeShown = worthyLabels.some(function (node) {
+    return node === biggestNode;
+  });
+
   for (var _key in grid) {
-    worthyLabels.push(grid[_key]);
-  }return worthyLabels;
+
+    var _node = grid[_key];
+
+    if (_node === biggestNode) biggestNodeShown = true;
+
+    worthyLabels.push(_node);
+  }
+
+  // Always keeping biggest node shown on screen
+  if (!biggestNodeShown && biggestNode) worthyLabels.push(biggestNode);
+
+  // Basic anti-collision
+  var collisions = new Set();
+
+  for (var _i = 0, _l = worthyLabels.length; _i < _l; _i++) {
+    var _n = worthyLabels[_i],
+        d1 = cache[_n],
+        p1 = camera.graphToViewport(dimensions, d1.x, d1.y);
+
+    if (collisions.has(_n)) continue;
+
+    for (var j = _i + 1; j < _l; j++) {
+      var _n2 = worthyLabels[j],
+          d2 = cache[_n2],
+          p2 = camera.graphToViewport(dimensions, d2.x, d2.y);
+
+      var c = collision(p1.x, p1.y, d1.label.length * 8, 14, p2.x, p2.y, d2.label.length * 8, 14);
+
+      if (c) {
+
+        // NOTE: add degree as tie-breaker here if required in the future
+        if (d1.size < d2.size) collisions.add(_n);else collisions.add(_n2);
+      }
+    }
+  }
+
+  // console.log(collisions)
+
+  return worthyLabels.filter(function (l) {
+    return !collisions.has(l);
+  });
 };
 
 /***/ }),
