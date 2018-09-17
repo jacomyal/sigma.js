@@ -341,8 +341,8 @@ export default class Camera extends EventEmitter {
    */
   animatedReset(options) {
     return this.animate({
-      x: 0,
-      y: 0,
+      x: 0.5,
+      y: 0.5,
       ratio: 1,
       angle: 0
     }, options);
