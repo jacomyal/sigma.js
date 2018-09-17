@@ -15,7 +15,7 @@
  * the CPU & GPU (normals are computed on the CPU side).
  */
 import Program from './program';
-import {floatColor} from '../utils';
+import {floatColor, canUse32BitsIndices} from '../utils';
 import vertexShaderSource from '../shaders/edge.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
@@ -56,14 +56,7 @@ export default class EdgeProgram extends Program {
     // `OES_element_index_uint` is quite everywhere so we'll handle
     // the potential issue if it really arises.
     // NOTE: when using webgl2, the extension is enabled by default
-    const webgl2 = (
-      typeof WebGL2RenderingContext !== 'undefined' &&
-      gl instanceof WebGL2RenderingContext
-    );
-
-    const extension = webgl2 || gl.getExtension('OES_element_index_uint');
-
-    this.canUse32BitsIndices = !!extension;
+    this.canUse32BitsIndices = canUse32BitsIndices(gl);
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
     this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
   }

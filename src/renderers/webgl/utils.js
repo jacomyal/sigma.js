@@ -120,3 +120,15 @@ export function extractPixel(gl, x, y, array) {
 
   return data;
 }
+
+/**
+ * Function used to know whether given webgl context can use 32 bits indices.
+ */
+export function canUse32BitsIndices(gl) {
+  const webgl2 = (
+    typeof WebGL2RenderingContext !== 'undefined' &&
+    gl instanceof WebGL2RenderingContext
+  );
+
+  return webgl2 || !!gl.getExtension('OES_element_index_uint');
+}
