@@ -25,6 +25,8 @@ import extend from '@yomguithereal/helpers/extend';
 // NOTE: need to explore R-Trees for edges
 // NOTE: need to explore 2d segment tree for edges
 
+// NOTE: probably can do faster using spatial hashing
+
 /**
  * Constants.
  *
