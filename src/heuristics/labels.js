@@ -107,6 +107,11 @@ exports.labelsToDisplayFromGrid = function(params) {
         adjustedX = -cellWidth,
         adjustedY = -cellHeight;
 
+  const panningWidth = dimensions.width + cellWidth / 2,
+        panningHeight = dimensions.height + cellHeight / 2,
+        panningX = -(cellWidth / 2),
+        panningY = -(cellHeight / 2);
+
   // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
 
   const worthyLabels = [];
@@ -143,8 +148,8 @@ exports.labelsToDisplayFromGrid = function(params) {
 
       // Was node visible earlier?
       if (
-        (ppos.x >= adjustedX && ppos.x <= adjustedWidth) &&
-        (ppos.y >= adjustedY && ppos.y <= adjustedHeight)
+        (ppos.x >= panningX && ppos.x <= panningWidth) &&
+        (ppos.y >= panningY && ppos.y <= panningHeight)
       ) {
 
         // Was the label displayed?
