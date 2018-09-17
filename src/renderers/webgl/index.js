@@ -216,7 +216,7 @@ export default class WebGLRenderer extends Renderer {
     if (webgl) {
 
       // First we try webgl2 for an easy performance boost
-      context = element.getContext('webgl', contextOptions);
+      context = element.getContext('webgl2', contextOptions);
 
       // Else we fall back to webgl
       if (!context)
