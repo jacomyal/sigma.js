@@ -33,6 +33,12 @@
     }
   ],
   "license": "MIT",
+  "dependencies": {
+    "@yomguithereal/helpers": "^1.0.0",
+    "events": "^2.1.0",
+    "graphology-metrics": "1.6.0",
+    "graphology-utils": "^1.3.0"
+  },
   "devDependencies": {
     "@yomguithereal/eslint-config": "^4.0.0",
     "babel-cli": "^6.24.1",
@@ -42,13 +48,13 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-es2015": "^6.14.0",
     "chroma-js": "^1.3.6",
-    "d3-scale": "^2.1.0",
+    "d3-scale": "^2.1.2",
     "eslint": "^4.19.1",
     "faker": "^4.1.0",
-    "glob": "^7.1.2",
+    "glob": "^7.1.3",
     "graphology": "^0.11.4",
     "graphology-generators": "^0.9.0",
-    "graphology-gexf": "^0.4.0",
+    "graphology-gexf": "^0.5.0",
     "graphology-layout": "0.1.0",
     "graphology-layout-forceatlas2": "^0.1.1",
     "graphology-library": "^0.1.1",
@@ -79,11 +85,5 @@
   },
   "eslintConfig": {
     "extends": "@yomguithereal/eslint-config/es7"
-  },
-  "dependencies": {
-    "@yomguithereal/helpers": "^1.0.0",
-    "events": "^2.0.0",
-    "graphology-metrics": "1.6.0",
-    "graphology-utils": "^1.3.0"
   }
 }
