@@ -90,12 +90,7 @@ communities.forEach((h, i) => {
   randomLayout.assign(h);
   forceAtlas2.assign(h, {
     iterations: 100,
-    settings: {
-      strongGravityMode: true,
-      gravity: 0.05,
-      scalingRatio: 10,
-      slowDown: 1 + Math.log(h.order)
-    }
+    settings: forceAtlas2.inferSettings(h)
   });
 
   const container = containers[i];
