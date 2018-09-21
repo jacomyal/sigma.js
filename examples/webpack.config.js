@@ -7,6 +7,10 @@ const EXAMPLES = {
     id: 'basic',
     title: 'Basic'
   },
+  components: {
+    id: 'components',
+    title: 'Connected Components'
+  },
   drag: {
     id: 'drag',
     title: 'Drag'

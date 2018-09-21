@@ -57,6 +57,7 @@ const DEFAULT_SETTINGS = {
   renderLabels: true,
 
   // Component rendering
+  // TODO: nest into components:
   defaultNodeColor: '#999',
   defaultEdgeColor: '#ccc',
   labelFont: 'Arial',
