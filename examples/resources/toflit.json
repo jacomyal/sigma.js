@@ -1,0 +1,7567 @@
+﻿[
+  {
+    "source": "Chaussettes",
+    "target": "Fil",
+    "flows": 11
+  },
+  {
+    "source": "Toile",
+    "target": "Cholet",
+    "flows": 23
+  },
+  {
+    "source": "Dospin",
+    "target": "Pierre",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Riz",
+    "flows": 44
+  },
+  {
+    "source": "Aiguilles",
+    "target": "Tabac",
+    "flows": 1
+  },
+  {
+    "source": "Tambours",
+    "target": "Forme",
+    "flows": 1
+  },
+  {
+    "source": "Pelleterie",
+    "target": "Commune",
+    "flows": 80
+  },
+  {
+    "source": "Commune",
+    "target": "Crue",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Voile",
+    "flows": 60
+  },
+  {
+    "source": "Fusils",
+    "target": "Boucaniers",
+    "flows": 5
+  },
+  {
+    "source": "Mousserons",
+    "target": "Truffes",
+    "flows": 2
+  },
+  {
+    "source": "Barres",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Habits",
+    "target": "Uniformes",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Barbezieux",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Chasselas",
+    "flows": 4
+  },
+  {
+    "source": "Eau",
+    "target": "Vie",
+    "flows": 646
+  },
+  {
+    "source": "Raz",
+    "target": "Saint",
+    "flows": 3
+  },
+  {
+    "source": "Saint",
+    "target": "Maur",
+    "flows": 3
+  },
+  {
+    "source": "Poterie",
+    "target": "Grès",
+    "flows": 15
+  },
+  {
+    "source": "Brai",
+    "target": "Gras",
+    "flows": 41
+  },
+  {
+    "source": "Gras",
+    "target": "Sec",
+    "flows": 1
+  },
+  {
+    "source": "Bonneterie",
+    "target": "Soie",
+    "flows": 2
+  },
+  {
+    "source": "Cadis",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Dentelle",
+    "target": "Fil",
+    "flows": 38
+  },
+  {
+    "source": "Fil",
+    "target": "Blanc",
+    "flows": 16
+  },
+  {
+    "source": "Blanc",
+    "target": "Lille",
+    "flows": 1
+  },
+  {
+    "source": "Tavelle",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Commode",
+    "target": "Ornée",
+    "flows": 1
+  },
+  {
+    "source": "Flanelle",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Laine",
+    "flows": 26
+  },
+  {
+    "source": "Casimir",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Fonte",
+    "flows": 3
+  },
+  {
+    "source": "Tartre",
+    "target": "Glan",
+    "flows": 1
+  },
+  {
+    "source": "Habits",
+    "target": "Drap",
+    "flows": 2
+  },
+  {
+    "source": "Drap",
+    "target": "Galonnés",
+    "flows": 1
+  },
+  {
+    "source": "Galonnés",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Argent",
+    "target": "Or",
+    "flows": 73
+  },
+  {
+    "source": "Marchandises",
+    "target": "L",
+    "flows": 7
+  },
+  {
+    "source": "L",
+    "target": "Estimation",
+    "flows": 7
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Demi",
+    "flows": 38
+  },
+  {
+    "source": "Demi",
+    "target": "Castor",
+    "flows": 38
+  },
+  {
+    "source": "Vin",
+    "target": "Xérès",
+    "flows": 1
+  },
+  {
+    "source": "Poêles",
+    "target": "Frire",
+    "flows": 31
+  },
+  {
+    "source": "Frire",
+    "target": "Fer",
+    "flows": 3
+  },
+  {
+    "source": "Jarretières",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Ligne",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Charente",
+    "flows": 17
+  },
+  {
+    "source": "Fruits",
+    "target": "Verts",
+    "flows": 3
+  },
+  {
+    "source": "Vin",
+    "target": "Ré",
+    "flows": 109
+  },
+  {
+    "source": "Beurre",
+    "target": "Salé",
+    "flows": 14
+  },
+  {
+    "source": "Masses",
+    "target": "Fer",
+    "flows": 2
+  },
+  {
+    "source": "Balais",
+    "target": "Brandes",
+    "flows": 1
+  },
+  {
+    "source": "Perles",
+    "target": "Fausses",
+    "flows": 2
+  },
+  {
+    "source": "Mors",
+    "target": "Bride",
+    "flows": 4
+  },
+  {
+    "source": "Chandelle",
+    "target": "Suif",
+    "flows": 8
+  },
+  {
+    "source": "Soufflets",
+    "target": "Forge",
+    "flows": 3
+  },
+  {
+    "source": "Dentelle",
+    "target": "Caen",
+    "flows": 1
+  },
+  {
+    "source": "Flacons",
+    "target": "Vides",
+    "flows": 1
+  },
+  {
+    "source": "Sucre",
+    "target": "Ferré",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Chypre",
+    "flows": 1
+  },
+  {
+    "source": "Pelleterie",
+    "target": "Canada",
+    "flows": 99
+  },
+  {
+    "source": "Poudre",
+    "target": "Grenaille",
+    "flows": 1
+  },
+  {
+    "source": "Verres",
+    "target": "Moulein",
+    "flows": 1
+  },
+  {
+    "source": "Fruits",
+    "target": "Confits",
+    "flows": 20
+  },
+  {
+    "source": "Confits",
+    "target": "L",
+    "flows": 18
+  },
+  {
+    "source": "L",
+    "target": "Eau",
+    "flows": 18
+  },
+  {
+    "source": "Meules",
+    "target": "Coutelier",
+    "flows": 7
+  },
+  {
+    "source": "Toile",
+    "target": "Basin",
+    "flows": 5
+  },
+  {
+    "source": "Basin",
+    "target": "Coton",
+    "flows": 3
+  },
+  {
+    "source": "Coton",
+    "target": "Fil",
+    "flows": 49
+  },
+  {
+    "source": "Hardes",
+    "target": "Nègre",
+    "flows": 1
+  },
+  {
+    "source": "Stockfisch",
+    "target": "Salé",
+    "flows": 2
+  },
+  {
+    "source": "Couvertures",
+    "target": "Rouen",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Non",
+    "flows": 1
+  },
+  {
+    "source": "Non",
+    "target": "Brodés",
+    "flows": 1
+  },
+  {
+    "source": "Brodés",
+    "target": "Castor",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Cuir",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Écrire",
+    "flows": 45
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Cuivre",
+    "flows": 62
+  },
+  {
+    "source": "Esprit",
+    "target": "Vitriol",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Vieux",
+    "flows": 1
+  },
+  {
+    "source": "Hardes",
+    "target": "Vieilles",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Brodés",
+    "flows": 1
+  },
+  {
+    "source": "Marchandises",
+    "target": "Plus",
+    "flows": 2
+  },
+  {
+    "source": "Plus",
+    "target": "Fort",
+    "flows": 2
+  },
+  {
+    "source": "Fort",
+    "target": "Article",
+    "flows": 2
+  },
+  {
+    "source": "Article",
+    "target": "N",
+    "flows": 2
+  },
+  {
+    "source": "N",
+    "target": "Excède",
+    "flows": 2
+  },
+  {
+    "source": "Excède",
+    "target": "Pas",
+    "flows": 2
+  },
+  {
+    "source": "Pas",
+    "target": "Livres",
+    "flows": 2
+  },
+  {
+    "source": "Platines",
+    "target": "Cuivre",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Neutres",
+    "flows": 1
+  },
+  {
+    "source": "Galon",
+    "target": "Or",
+    "flows": 19
+  },
+  {
+    "source": "Or",
+    "target": "Fin",
+    "flows": 7
+  },
+  {
+    "source": "Drap",
+    "target": "Calimouk",
+    "flows": 1
+  },
+  {
+    "source": "Poudre",
+    "target": "Poudrer",
+    "flows": 50
+  },
+  {
+    "source": "Suif",
+    "target": "Fondu",
+    "flows": 7
+  },
+  {
+    "source": "Chaudière",
+    "target": "Cuivre",
+    "flows": 4
+  },
+  {
+    "source": "Cuivre",
+    "target": "Sucre",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Rouge",
+    "flows": 2
+  },
+  {
+    "source": "Fil",
+    "target": "Argent",
+    "flows": 16
+  },
+  {
+    "source": "Filets",
+    "target": "Pêcher",
+    "flows": 17
+  },
+  {
+    "source": "Cacao",
+    "target": "Broyé",
+    "flows": 2
+  },
+  {
+    "source": "Azur",
+    "target": "Fin",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Dorure",
+    "flows": 2
+  },
+  {
+    "source": "Dorure",
+    "target": "Fausse",
+    "flows": 2
+  },
+  {
+    "source": "Boutons",
+    "target": "Or",
+    "flows": 17
+  },
+  {
+    "source": "Boutons",
+    "target": "Argent",
+    "flows": 2
+  },
+  {
+    "source": "Sel",
+    "target": "Sables",
+    "flows": 1
+  },
+  {
+    "source": "Sables",
+    "target": "Olonne",
+    "flows": 1
+  },
+  {
+    "source": "Gras",
+    "target": "Tours",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Laine",
+    "flows": 31
+  },
+  {
+    "source": "Laine",
+    "target": "Fin",
+    "flows": 8
+  },
+  {
+    "source": "Huile",
+    "target": "Graine",
+    "flows": 6
+  },
+  {
+    "source": "Eau",
+    "target": "Fleurs",
+    "flows": 2
+  },
+  {
+    "source": "Fleurs",
+    "target": "Oranger",
+    "flows": 2
+  },
+  {
+    "source": "Fil",
+    "target": "Lin",
+    "flows": 6
+  },
+  {
+    "source": "Vin",
+    "target": "Ordinaire",
+    "flows": 15
+  },
+  {
+    "source": "Coffres",
+    "target": "Chirurgie",
+    "flows": 2
+  },
+  {
+    "source": "Nappes",
+    "target": "Serviettes",
+    "flows": 4
+  },
+  {
+    "source": "Serviettes",
+    "target": "Lin",
+    "flows": 2
+  },
+  {
+    "source": "Chaises",
+    "target": "Paille",
+    "flows": 5
+  },
+  {
+    "source": "Carreaux",
+    "target": "Paver",
+    "flows": 2
+  },
+  {
+    "source": "Paver",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Gros",
+    "target": "Tours",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Peint",
+    "flows": 2
+  },
+  {
+    "source": "Platines",
+    "target": "Fer",
+    "flows": 3
+  },
+  {
+    "source": "Indienne",
+    "target": "Coton",
+    "flows": 3
+  },
+  {
+    "source": "Peaux",
+    "target": "Apprêtées",
+    "flows": 67
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Agneau",
+    "flows": 10
+  },
+  {
+    "source": "Sirop",
+    "target": "Orgeat",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Écrue",
+    "flows": 2
+  },
+  {
+    "source": "Bouteilles",
+    "target": "Vides",
+    "flows": 2
+  },
+  {
+    "source": "Peaux",
+    "target": "Raffinerie",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Lin",
+    "flows": 2
+  },
+  {
+    "source": "Guêtres",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Balles",
+    "target": "Plomb",
+    "flows": 2
+  },
+  {
+    "source": "Bois",
+    "target": "Caliatour",
+    "flows": 2
+  },
+  {
+    "source": "Étoffe",
+    "target": "Fil",
+    "flows": 6
+  },
+  {
+    "source": "Fil",
+    "target": "Soie",
+    "flows": 5
+  },
+  {
+    "source": "Poix",
+    "target": "Blanche",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Pliantes",
+    "flows": 2
+  },
+  {
+    "source": "Dentelle",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Méteil",
+    "flows": 6
+  },
+  {
+    "source": "Housses",
+    "target": "Faux",
+    "flows": 1
+  },
+  {
+    "source": "Faux",
+    "target": "Fourreaux",
+    "flows": 2
+  },
+  {
+    "source": "Fourreaux",
+    "target": "Garnis",
+    "flows": 2
+  },
+  {
+    "source": "Garnis",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Bouteilles",
+    "target": "Verres",
+    "flows": 1
+  },
+  {
+    "source": "Objets",
+    "target": "Divers",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Charronnage",
+    "flows": 1
+  },
+  {
+    "source": "Grappins",
+    "target": "Fer",
+    "flows": 4
+  },
+  {
+    "source": "Peaux",
+    "target": "Orignal",
+    "flows": 55
+  },
+  {
+    "source": "Bas",
+    "target": "Toile",
+    "flows": 2
+  },
+  {
+    "source": "Ruban",
+    "target": "Argent",
+    "flows": 7
+  },
+  {
+    "source": "Argent",
+    "target": "Soie",
+    "flows": 5
+  },
+  {
+    "source": "Jupes",
+    "target": "Molleton",
+    "flows": 1
+  },
+  {
+    "source": "Laine",
+    "target": "Barbarie",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Loup",
+    "flows": 232
+  },
+  {
+    "source": "Loup",
+    "target": "Cervier",
+    "flows": 99
+  },
+  {
+    "source": "Flacons",
+    "target": "Verre",
+    "flows": 9
+  },
+  {
+    "source": "Peaux",
+    "target": "Martre",
+    "flows": 201
+  },
+  {
+    "source": "Martre",
+    "target": "Passées",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Faire",
+    "flows": 1
+  },
+  {
+    "source": "Faire",
+    "target": "Linge",
+    "flows": 1
+  },
+  {
+    "source": "Fonte",
+    "target": "Pistolet",
+    "flows": 3
+  },
+  {
+    "source": "Cuirs",
+    "target": "Dorés",
+    "flows": 1
+  },
+  {
+    "source": "Noix",
+    "target": "Marrons",
+    "flows": 2
+  },
+  {
+    "source": "Bois",
+    "target": "Pernambouc",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Coton",
+    "flows": 66
+  },
+  {
+    "source": "Coton",
+    "target": "Duvet",
+    "flows": 1
+  },
+  {
+    "source": "Poivre",
+    "target": "Noir",
+    "flows": 1
+  },
+  {
+    "source": "Pierres",
+    "target": "Faux",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Combourg",
+    "flows": 2
+  },
+  {
+    "source": "Poutres",
+    "target": "Sapin",
+    "flows": 1
+  },
+  {
+    "source": "Rogues",
+    "target": "Stockfisch",
+    "flows": 1
+  },
+  {
+    "source": "Planches",
+    "target": "Bois",
+    "flows": 2
+  },
+  {
+    "source": "Éventails",
+    "target": "Fins",
+    "flows": 1
+  },
+  {
+    "source": "Meules",
+    "target": "Moulins",
+    "flows": 2
+  },
+  {
+    "source": "Tableaux",
+    "target": "Cadres",
+    "flows": 1
+  },
+  {
+    "source": "Cadres",
+    "target": "Dorés",
+    "flows": 9
+  },
+  {
+    "source": "Planches",
+    "target": "Noyer",
+    "flows": 2
+  },
+  {
+    "source": "Barils",
+    "target": "Vides",
+    "flows": 3
+  },
+  {
+    "source": "Étoffe",
+    "target": "Peu",
+    "flows": 1
+  },
+  {
+    "source": "Peu",
+    "target": "Soie",
+    "flows": 2
+  },
+  {
+    "source": "Vie",
+    "target": "Simple",
+    "flows": 36
+  },
+  {
+    "source": "Peaux",
+    "target": "Chevreuil",
+    "flows": 66
+  },
+  {
+    "source": "Toile",
+    "target": "Brodée",
+    "flows": 2
+  },
+  {
+    "source": "Brodée",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Cloches",
+    "target": "Métal",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Au",
+    "flows": 1
+  },
+  {
+    "source": "Au",
+    "target": "Lait",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Figuré",
+    "flows": 1
+  },
+  {
+    "source": "Taffetas",
+    "target": "Bleu",
+    "flows": 2
+  },
+  {
+    "source": "Laine",
+    "target": "Autriche",
+    "flows": 2
+  },
+  {
+    "source": "Poids",
+    "target": "Plomb",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Crin",
+    "flows": 5
+  },
+  {
+    "source": "Cochon",
+    "target": "Salé",
+    "flows": 2
+  },
+  {
+    "source": "Bonneterie",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Madère",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Ville",
+    "flows": 12
+  },
+  {
+    "source": "Dentelle",
+    "target": "Commune",
+    "flows": 3
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Peints",
+    "flows": 2
+  },
+  {
+    "source": "Guinée",
+    "target": "Tachée",
+    "flows": 1
+  },
+  {
+    "source": "Bassines",
+    "target": "Cuivre",
+    "flows": 2
+  },
+  {
+    "source": "Solives",
+    "target": "Sapin",
+    "flows": 1
+  },
+  {
+    "source": "Châtaignes",
+    "target": "Sèche",
+    "flows": 1
+  },
+  {
+    "source": "Cuivre",
+    "target": "Rouge",
+    "flows": 10
+  },
+  {
+    "source": "Tabac",
+    "target": "Râpé",
+    "flows": 2
+  },
+  {
+    "source": "Sucre",
+    "target": "Têtes",
+    "flows": 46
+  },
+  {
+    "source": "Têtes",
+    "target": "Forme",
+    "flows": 29
+  },
+  {
+    "source": "Cercles",
+    "target": "Pipes",
+    "flows": 1
+  },
+  {
+    "source": "Canapé",
+    "target": "Cuir",
+    "flows": 1
+  },
+  {
+    "source": "Cuir",
+    "target": "Russie",
+    "flows": 3
+  },
+  {
+    "source": "Pots",
+    "target": "Grès",
+    "flows": 1
+  },
+  {
+    "source": "Serge",
+    "target": "Écarlatine",
+    "flows": 1
+  },
+  {
+    "source": "Cacao",
+    "target": "Graine",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Cirée",
+    "flows": 2
+  },
+  {
+    "source": "Couperon",
+    "target": "Verte",
+    "flows": 1
+  },
+  {
+    "source": "Grilles",
+    "target": "Fer",
+    "flows": 4
+  },
+  {
+    "source": "Instruments",
+    "target": "Musique",
+    "flows": 1
+  },
+  {
+    "source": "Crin",
+    "target": "Frisé",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Jonc",
+    "flows": 1
+  },
+  {
+    "source": "Parasols",
+    "target": "Soie",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Coupis",
+    "flows": 1
+  },
+  {
+    "source": "Plomb",
+    "target": "Grenaille",
+    "flows": 53
+  },
+  {
+    "source": "Sirop",
+    "target": "Brut",
+    "flows": 1
+  },
+  {
+    "source": "Étamine",
+    "target": "Mi",
+    "flows": 1
+  },
+  {
+    "source": "Mi",
+    "target": "Soie",
+    "flows": 9
+  },
+  {
+    "source": "Vie",
+    "target": "Marennes",
+    "flows": 3
+  },
+  {
+    "source": "Pièces",
+    "target": "Eau",
+    "flows": 2
+  },
+  {
+    "source": "Gomme",
+    "target": "Arabique",
+    "flows": 3
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Point",
+    "flows": 1
+  },
+  {
+    "source": "Point",
+    "target": "Hongrie",
+    "flows": 1
+  },
+  {
+    "source": "Couvertures",
+    "target": "Laine",
+    "flows": 47
+  },
+  {
+    "source": "Laine",
+    "target": "Commune",
+    "flows": 15
+  },
+  {
+    "source": "Argent",
+    "target": "Sur",
+    "flows": 1
+  },
+  {
+    "source": "Sur",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Robes",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Peinte",
+    "flows": 18
+  },
+  {
+    "source": "Ruban",
+    "target": "Soie",
+    "flows": 21
+  },
+  {
+    "source": "Bonneterie",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Sel",
+    "target": "Epsom",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Soie",
+    "flows": 9
+  },
+  {
+    "source": "Bougie",
+    "target": "Cire",
+    "flows": 16
+  },
+  {
+    "source": "Cire",
+    "target": "Blanche",
+    "flows": 32
+  },
+  {
+    "source": "Habits",
+    "target": "Homme",
+    "flows": 3
+  },
+  {
+    "source": "Homme",
+    "target": "Femme",
+    "flows": 2
+  },
+  {
+    "source": "Galon",
+    "target": "Argent",
+    "flows": 50
+  },
+  {
+    "source": "Or",
+    "target": "Faux",
+    "flows": 13
+  },
+  {
+    "source": "Meules",
+    "target": "Moulin",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Coton",
+    "flows": 26
+  },
+  {
+    "source": "Coton",
+    "target": "Soie",
+    "flows": 9
+  },
+  {
+    "source": "Horloge",
+    "target": "Tables",
+    "flows": 2
+  },
+  {
+    "source": "Étoffe",
+    "target": "Soie",
+    "flows": 75
+  },
+  {
+    "source": "Soie",
+    "target": "Laine",
+    "flows": 13
+  },
+  {
+    "source": "Raisin",
+    "target": "Sec",
+    "flows": 37
+  },
+  {
+    "source": "Pots",
+    "target": "Terre",
+    "flows": 2
+  },
+  {
+    "source": "Planches",
+    "target": "Cuivre",
+    "flows": 5
+  },
+  {
+    "source": "Drogues",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Carreaux",
+    "target": "Verre",
+    "flows": 14
+  },
+  {
+    "source": "Verre",
+    "target": "Vitre",
+    "flows": 12
+  },
+  {
+    "source": "Bois",
+    "target": "Gaïac",
+    "flows": 3
+  },
+  {
+    "source": "Galon",
+    "target": "Soie",
+    "flows": 3
+  },
+  {
+    "source": "Pou",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Soliveaux",
+    "target": "Bois",
+    "flows": 3
+  },
+  {
+    "source": "Moulins",
+    "target": "Maïs",
+    "flows": 3
+  },
+  {
+    "source": "Baffetas",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Douelles",
+    "target": "Quart",
+    "flows": 4
+  },
+  {
+    "source": "Bordage",
+    "target": "Sapin",
+    "flows": 3
+  },
+  {
+    "source": "Fil",
+    "target": "Morlaix",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Grès",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Bretagne",
+    "flows": 61
+  },
+  {
+    "source": "Bretagne",
+    "target": "Crée",
+    "flows": 4
+  },
+  {
+    "source": "Lampareille",
+    "target": "Lille",
+    "flows": 1
+  },
+  {
+    "source": "Garas",
+    "target": "Bleu",
+    "flows": 3
+  },
+  {
+    "source": "Étoffe",
+    "target": "Fleuret",
+    "flows": 2
+  },
+  {
+    "source": "Vin",
+    "target": "Constance",
+    "flows": 1
+  },
+  {
+    "source": "Cornes",
+    "target": "Lanternes",
+    "flows": 1
+  },
+  {
+    "source": "Boutons",
+    "target": "Fil",
+    "flows": 31
+  },
+  {
+    "source": "Toile",
+    "target": "Grise",
+    "flows": 1
+  },
+  {
+    "source": "Grise",
+    "target": "Non",
+    "flows": 1
+  },
+  {
+    "source": "Non",
+    "target": "Battue",
+    "flows": 1
+  },
+  {
+    "source": "Blanc",
+    "target": "Coudre",
+    "flows": 2
+  },
+  {
+    "source": "Fusils",
+    "target": "Traite",
+    "flows": 9
+  },
+  {
+    "source": "Étoffe",
+    "target": "Au",
+    "flows": 11
+  },
+  {
+    "source": "Au",
+    "target": "Quart",
+    "flows": 12
+  },
+  {
+    "source": "Plomb",
+    "target": "Divers",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Coutellerie",
+    "flows": 4
+  },
+  {
+    "source": "Camelot",
+    "target": "Lille",
+    "flows": 5
+  },
+  {
+    "source": "Portemanteaux",
+    "target": "Peau",
+    "flows": 1
+  },
+  {
+    "source": "Peau",
+    "target": "Russie",
+    "flows": 1
+  },
+  {
+    "source": "Monnaies",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Morue",
+    "target": "Séchée",
+    "flows": 33
+  },
+  {
+    "source": "Montres",
+    "target": "Pendule",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Charente",
+    "flows": 4
+  },
+  {
+    "source": "Frange",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Malaga",
+    "flows": 4
+  },
+  {
+    "source": "Fil",
+    "target": "Sennes",
+    "flows": 4
+  },
+  {
+    "source": "Vin",
+    "target": "Gaillac",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Lit",
+    "flows": 16
+  },
+  {
+    "source": "Étoffe",
+    "target": "Argent",
+    "flows": 17
+  },
+  {
+    "source": "Fil",
+    "target": "Rennes",
+    "flows": 46
+  },
+  {
+    "source": "Cuirs",
+    "target": "Tannés",
+    "flows": 19
+  },
+  {
+    "source": "Chair",
+    "target": "Salée",
+    "flows": 13
+  },
+  {
+    "source": "Drap",
+    "target": "Fin",
+    "flows": 7
+  },
+  {
+    "source": "Fin",
+    "target": "Languedoc",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Cheval",
+    "flows": 2
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Plomb",
+    "flows": 2
+  },
+  {
+    "source": "Mine",
+    "target": "Plomb",
+    "flows": 12
+  },
+  {
+    "source": "Papier",
+    "target": "Blanc",
+    "flows": 116
+  },
+  {
+    "source": "Cuirs",
+    "target": "Bœuf",
+    "flows": 33
+  },
+  {
+    "source": "Bœuf",
+    "target": "Poil",
+    "flows": 17
+  },
+  {
+    "source": "Fil",
+    "target": "Auville",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Brin",
+    "flows": 7
+  },
+  {
+    "source": "Bœuf",
+    "target": "Irlande",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Roulantes",
+    "flows": 10
+  },
+  {
+    "source": "Vin",
+    "target": "Andelys",
+    "flows": 7
+  },
+  {
+    "source": "Vin",
+    "target": "Rouge",
+    "flows": 10
+  },
+  {
+    "source": "Meubles",
+    "target": "Taillandier",
+    "flows": 2
+  },
+  {
+    "source": "Bas",
+    "target": "Brin",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Veau",
+    "flows": 6
+  },
+  {
+    "source": "Veau",
+    "target": "Passées",
+    "flows": 3
+  },
+  {
+    "source": "Galon",
+    "target": "Sistème",
+    "flows": 1
+  },
+  {
+    "source": "Drogues",
+    "target": "Peintures",
+    "flows": 12
+  },
+  {
+    "source": "Peintures",
+    "target": "Teinture",
+    "flows": 9
+  },
+  {
+    "source": "Vin",
+    "target": "Frontignan",
+    "flows": 16
+  },
+  {
+    "source": "Linge",
+    "target": "Lin",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Fin",
+    "flows": 1
+  },
+  {
+    "source": "Paniers",
+    "target": "Osier",
+    "flows": 2
+  },
+  {
+    "source": "Grelots",
+    "target": "Cuivre",
+    "flows": 11
+  },
+  {
+    "source": "Cuillères",
+    "target": "Fer",
+    "flows": 3
+  },
+  {
+    "source": "Graine",
+    "target": "Jardin",
+    "flows": 20
+  },
+  {
+    "source": "Gomme",
+    "target": "Gutte",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Palme",
+    "flows": 1
+  },
+  {
+    "source": "Couvertures",
+    "target": "Plocq",
+    "flows": 4
+  },
+  {
+    "source": "Bretagne",
+    "target": "Brin",
+    "flows": 5
+  },
+  {
+    "source": "Vin",
+    "target": "Bordeaux",
+    "flows": 115
+  },
+  {
+    "source": "Bordage",
+    "target": "Chêne",
+    "flows": 6
+  },
+  {
+    "source": "Cabine",
+    "target": "Noyer",
+    "flows": 2
+  },
+  {
+    "source": "Arçons",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Ouate",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Harnais",
+    "target": "Chaise",
+    "flows": 16
+  },
+  {
+    "source": "Drap",
+    "target": "Linge",
+    "flows": 1
+  },
+  {
+    "source": "Linge",
+    "target": "Commun",
+    "flows": 1
+  },
+  {
+    "source": "Roues",
+    "target": "Chaise",
+    "flows": 3
+  },
+  {
+    "source": "Poêles",
+    "target": "Airain",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Plat",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Étain",
+    "flows": 41
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Haute",
+    "flows": 2
+  },
+  {
+    "source": "Haute",
+    "target": "Lice",
+    "flows": 2
+  },
+  {
+    "source": "Bœuf",
+    "target": "Fumé",
+    "flows": 2
+  },
+  {
+    "source": "Lard",
+    "target": "Salé",
+    "flows": 11
+  },
+  {
+    "source": "Coton",
+    "target": "Blanche",
+    "flows": 2
+  },
+  {
+    "source": "Glaces",
+    "target": "Miroirs",
+    "flows": 3
+  },
+  {
+    "source": "Tannés",
+    "target": "Vache",
+    "flows": 10
+  },
+  {
+    "source": "Drap",
+    "target": "Lin",
+    "flows": 6
+  },
+  {
+    "source": "Lin",
+    "target": "Vieux",
+    "flows": 1
+  },
+  {
+    "source": "Langues",
+    "target": "Porc",
+    "flows": 2
+  },
+  {
+    "source": "Porc",
+    "target": "Salées",
+    "flows": 2
+  },
+  {
+    "source": "Tapsel",
+    "target": "Large",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Nègre",
+    "flows": 5
+  },
+  {
+    "source": "Gaze",
+    "target": "Soie",
+    "flows": 8
+  },
+  {
+    "source": "Baleine",
+    "target": "Fanon",
+    "flows": 2
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Soie",
+    "flows": 3
+  },
+  {
+    "source": "Paille",
+    "target": "Fauteuils",
+    "flows": 4
+  },
+  {
+    "source": "Cuirs",
+    "target": "Poil",
+    "flows": 8
+  },
+  {
+    "source": "Poil",
+    "target": "Vache",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Coutil",
+    "flows": 9
+  },
+  {
+    "source": "Gants",
+    "target": "Fil",
+    "flows": 3
+  },
+  {
+    "source": "Fil",
+    "target": "Fer",
+    "flows": 6
+  },
+  {
+    "source": "Toile",
+    "target": "Bleue",
+    "flows": 2
+  },
+  {
+    "source": "Pelleterie",
+    "target": "Crue",
+    "flows": 2
+  },
+  {
+    "source": "Fer",
+    "target": "Ordinaire",
+    "flows": 1
+  },
+  {
+    "source": "Artichauts",
+    "target": "Marinés",
+    "flows": 2
+  },
+  {
+    "source": "Dorés",
+    "target": "Tableaux",
+    "flows": 1
+  },
+  {
+    "source": "Vestes",
+    "target": "Brodées",
+    "flows": 3
+  },
+  {
+    "source": "Réseau",
+    "target": "Argent",
+    "flows": 2
+  },
+  {
+    "source": "Cinabre",
+    "target": "Roche",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Toile",
+    "flows": 9
+  },
+  {
+    "source": "Toile",
+    "target": "Lin",
+    "flows": 78
+  },
+  {
+    "source": "Langues",
+    "target": "Bœuf",
+    "flows": 9
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Unis",
+    "flows": 2
+  },
+  {
+    "source": "Unis",
+    "target": "Demi",
+    "flows": 2
+  },
+  {
+    "source": "Demi",
+    "target": "Forme",
+    "flows": 2
+  },
+  {
+    "source": "Soierie",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Essence",
+    "target": "Pommade",
+    "flows": 1
+  },
+  {
+    "source": "Cartes",
+    "target": "Jouer",
+    "flows": 58
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Pur",
+    "flows": 1
+  },
+  {
+    "source": "Pur",
+    "target": "Coutil",
+    "flows": 1
+  },
+  {
+    "source": "Coutil",
+    "target": "Hollande",
+    "flows": 1
+  },
+  {
+    "source": "Indienne",
+    "target": "Française",
+    "flows": 2
+  },
+  {
+    "source": "Langues",
+    "target": "Morue",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Laine",
+    "flows": 45
+  },
+  {
+    "source": "Fauteuils",
+    "target": "Chaises",
+    "flows": 2
+  },
+  {
+    "source": "Chaises",
+    "target": "Rotin",
+    "flows": 5
+  },
+  {
+    "source": "Dentelle",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Commune",
+    "target": "Canada",
+    "flows": 9
+  },
+  {
+    "source": "Penne",
+    "target": "Aguipon",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Chevreau",
+    "flows": 15
+  },
+  {
+    "source": "Chevreau",
+    "target": "Poil",
+    "flows": 6
+  },
+  {
+    "source": "Porcelaine",
+    "target": "Indes",
+    "flows": 4
+  },
+  {
+    "source": "Or",
+    "target": "Soie",
+    "flows": 13
+  },
+  {
+    "source": "Coton",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Matelas",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Poids",
+    "target": "Fer",
+    "flows": 17
+  },
+  {
+    "source": "Manches",
+    "target": "Brodées",
+    "flows": 2
+  },
+  {
+    "source": "Sel",
+    "target": "Oléron",
+    "flows": 43
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Bois",
+    "flows": 3
+  },
+  {
+    "source": "Pots",
+    "target": "Raffinerie",
+    "flows": 2
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Fleuret",
+    "flows": 1
+  },
+  {
+    "source": "Quart",
+    "target": "Farine",
+    "flows": 1
+  },
+  {
+    "source": "Pots",
+    "target": "Forme",
+    "flows": 2
+  },
+  {
+    "source": "Forme",
+    "target": "Sucre",
+    "flows": 15
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Rouen",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Saint",
+    "flows": 5
+  },
+  {
+    "source": "Saint",
+    "target": "Georges",
+    "flows": 3
+  },
+  {
+    "source": "Harnais",
+    "target": "Selles",
+    "flows": 5
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Toile",
+    "flows": 12
+  },
+  {
+    "source": "Toile",
+    "target": "Blanche",
+    "flows": 23
+  },
+  {
+    "source": "Boulets",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Canons",
+    "flows": 15
+  },
+  {
+    "source": "Poivre",
+    "target": "Grains",
+    "flows": 1
+  },
+  {
+    "source": "Chanvre",
+    "target": "Masses",
+    "flows": 4
+  },
+  {
+    "source": "Cruches",
+    "target": "Grès",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Navarre",
+    "flows": 2
+  },
+  {
+    "source": "Crics",
+    "target": "Fer",
+    "flows": 2
+  },
+  {
+    "source": "Serge",
+    "target": "Laine",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Canevas",
+    "flows": 4
+  },
+  {
+    "source": "Toile",
+    "target": "Emballage",
+    "flows": 11
+  },
+  {
+    "source": "Feuillards",
+    "target": "Fer",
+    "flows": 12
+  },
+  {
+    "source": "Marmites",
+    "target": "Fer",
+    "flows": 35
+  },
+  {
+    "source": "Cuivre",
+    "target": "Lessive",
+    "flows": 1
+  },
+  {
+    "source": "Charbon",
+    "target": "Bois",
+    "flows": 4
+  },
+  {
+    "source": "Couvertures",
+    "target": "Filoselle",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Brûler",
+    "flows": 1
+  },
+  {
+    "source": "Graine",
+    "target": "Moutarde",
+    "flows": 21
+  },
+  {
+    "source": "Fer",
+    "target": "Plaques",
+    "flows": 8
+  },
+  {
+    "source": "Peaux",
+    "target": "Castor",
+    "flows": 7
+  },
+  {
+    "source": "Castor",
+    "target": "Sec",
+    "flows": 2
+  },
+  {
+    "source": "Huile",
+    "target": "Vitriol",
+    "flows": 1
+  },
+  {
+    "source": "Graine",
+    "target": "Avignon",
+    "flows": 2
+  },
+  {
+    "source": "Réseau",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Habits",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Indienne",
+    "flows": 2
+  },
+  {
+    "source": "Grains",
+    "target": "Blé",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Plomb",
+    "flows": 3
+  },
+  {
+    "source": "Confitures",
+    "target": "Sèches",
+    "flows": 2
+  },
+  {
+    "source": "Socs",
+    "target": "Fer",
+    "flows": 2
+  },
+  {
+    "source": "Vin",
+    "target": "Orange",
+    "flows": 1
+  },
+  {
+    "source": "Boulets",
+    "target": "Canons",
+    "flows": 7
+  },
+  {
+    "source": "Homme",
+    "target": "Complets",
+    "flows": 1
+  },
+  {
+    "source": "Fourneaux",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Aubusson",
+    "flows": 3
+  },
+  {
+    "source": "Coton",
+    "target": "Vieux",
+    "flows": 1
+  },
+  {
+    "source": "Tripe",
+    "target": "Velours",
+    "flows": 3
+  },
+  {
+    "source": "Portrait",
+    "target": "Cour",
+    "flows": 1
+  },
+  {
+    "source": "Lit",
+    "target": "Neuf",
+    "flows": 1
+  },
+  {
+    "source": "Biscuit",
+    "target": "Mer",
+    "flows": 10
+  },
+  {
+    "source": "Chaudière",
+    "target": "Fonte",
+    "flows": 1
+  },
+  {
+    "source": "Plomb",
+    "target": "Rouleau",
+    "flows": 3
+  },
+  {
+    "source": "Barques",
+    "target": "Démontées",
+    "flows": 1
+  },
+  {
+    "source": "Poêles",
+    "target": "Chauffer",
+    "flows": 3
+  },
+  {
+    "source": "Cercles",
+    "target": "Quart",
+    "flows": 1
+  },
+  {
+    "source": "Aiguilles",
+    "target": "Emballage",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Bordés",
+    "flows": 22
+  },
+  {
+    "source": "Bordés",
+    "target": "Argent",
+    "flows": 4
+  },
+  {
+    "source": "Or",
+    "target": "Castor",
+    "flows": 4
+  },
+  {
+    "source": "Coiffes",
+    "target": "Tambou",
+    "flows": 1
+  },
+  {
+    "source": "Poulies",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Orfèvrerie",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Coton",
+    "flows": 12
+  },
+  {
+    "source": "Drap",
+    "target": "Elbeuf",
+    "flows": 5
+  },
+  {
+    "source": "Toile",
+    "target": "Royalle",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Saint",
+    "flows": 57
+  },
+  {
+    "source": "Saint",
+    "target": "Ange",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Loup",
+    "flows": 1
+  },
+  {
+    "source": "Loup",
+    "target": "Marin",
+    "flows": 9
+  },
+  {
+    "source": "Ruban",
+    "target": "Fil",
+    "flows": 13
+  },
+  {
+    "source": "Lampareille",
+    "target": "Poil",
+    "flows": 10
+  },
+  {
+    "source": "Guingan",
+    "target": "Madras",
+    "flows": 6
+  },
+  {
+    "source": "Pierres",
+    "target": "Bâtir",
+    "flows": 9
+  },
+  {
+    "source": "Colliers",
+    "target": "Perles",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Socreton",
+    "flows": 2
+  },
+  {
+    "source": "Couvertures",
+    "target": "Bazal",
+    "flows": 1
+  },
+  {
+    "source": "Manches",
+    "target": "Gaffes",
+    "flows": 2
+  },
+  {
+    "source": "Ratine",
+    "target": "Beauvais",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Portugal",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Laine",
+    "flows": 54
+  },
+  {
+    "source": "Laine",
+    "target": "Poil",
+    "flows": 6
+  },
+  {
+    "source": "Farine",
+    "target": "Froment",
+    "flows": 2
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Laiton",
+    "flows": 1
+  },
+  {
+    "source": "Linge",
+    "target": "Table",
+    "flows": 53
+  },
+  {
+    "source": "Table",
+    "target": "Serviettes",
+    "flows": 3
+  },
+  {
+    "source": "Boîtes",
+    "target": "Peintes",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Flotte",
+    "flows": 2
+  },
+  {
+    "source": "Drap",
+    "target": "Silésie",
+    "flows": 1
+  },
+  {
+    "source": "Poterie",
+    "target": "Raffinerie",
+    "flows": 1
+  },
+  {
+    "source": "Calotte",
+    "target": "Papier",
+    "flows": 1
+  },
+  {
+    "source": "Graine",
+    "target": "Chou",
+    "flows": 1
+  },
+  {
+    "source": "Fléaux",
+    "target": "Poids",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Filoselle",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Indes",
+    "flows": 4
+  },
+  {
+    "source": "Gaine",
+    "target": "Couteau",
+    "flows": 1
+  },
+  {
+    "source": "Racines",
+    "target": "Jalap",
+    "flows": 1
+  },
+  {
+    "source": "Sucre",
+    "target": "Brut",
+    "flows": 151
+  },
+  {
+    "source": "Brut",
+    "target": "Forme",
+    "flows": 1
+  },
+  {
+    "source": "Selles",
+    "target": "Communes",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Étoupes",
+    "flows": 19
+  },
+  {
+    "source": "Étoupes",
+    "target": "Lin",
+    "flows": 1
+  },
+  {
+    "source": "Plaques",
+    "target": "Cuivre",
+    "flows": 2
+  },
+  {
+    "source": "Vin",
+    "target": "Aiguillon",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Homme",
+    "flows": 1
+  },
+  {
+    "source": "Bretagne",
+    "target": "Olonne",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Photas",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Gueuse",
+    "flows": 3
+  },
+  {
+    "source": "Beau",
+    "target": "Vert",
+    "flows": 1
+  },
+  {
+    "source": "Vert",
+    "target": "Broyé",
+    "flows": 1
+  },
+  {
+    "source": "Tables",
+    "target": "Marbre",
+    "flows": 3
+  },
+  {
+    "source": "Fil",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Rouen",
+    "flows": 3
+  },
+  {
+    "source": "Poix",
+    "target": "Résines",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Rouen",
+    "flows": 12
+  },
+  {
+    "source": "Poudre",
+    "target": "Canons",
+    "flows": 7
+  },
+  {
+    "source": "Cuivre",
+    "target": "Rouleau",
+    "flows": 1
+  },
+  {
+    "source": "Haches",
+    "target": "Fer",
+    "flows": 6
+  },
+  {
+    "source": "Fer",
+    "target": "Acier",
+    "flows": 21
+  },
+  {
+    "source": "Bois",
+    "target": "Brûler",
+    "flows": 7
+  },
+  {
+    "source": "Brûler",
+    "target": "Fagots",
+    "flows": 1
+  },
+  {
+    "source": "Toilettes",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Verni",
+    "flows": 1
+  },
+  {
+    "source": "Ains",
+    "target": "Pêcher",
+    "flows": 6
+  },
+  {
+    "source": "Chaudron",
+    "target": "Cuivre",
+    "flows": 28
+  },
+  {
+    "source": "Cuivre",
+    "target": "Jaune",
+    "flows": 1
+  },
+  {
+    "source": "Pois",
+    "target": "Secs",
+    "flows": 2
+  },
+  {
+    "source": "Canons",
+    "target": "Mitraille",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Carreaux",
+    "flows": 4
+  },
+  {
+    "source": "Carreaux",
+    "target": "Grosse",
+    "flows": 1
+  },
+  {
+    "source": "Grosse",
+    "target": "Lille",
+    "flows": 1
+  },
+  {
+    "source": "Eau",
+    "target": "Senteur",
+    "flows": 11
+  },
+  {
+    "source": "Senteur",
+    "target": "Reine",
+    "flows": 8
+  },
+  {
+    "source": "Reine",
+    "target": "Hongrie",
+    "flows": 8
+  },
+  {
+    "source": "Vin",
+    "target": "Prague",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Allemagne",
+    "flows": 1
+  },
+  {
+    "source": "Roues",
+    "target": "Cabrouets",
+    "flows": 11
+  },
+  {
+    "source": "Chaudron",
+    "target": "Potin",
+    "flows": 1
+  },
+  {
+    "source": "Eau",
+    "target": "Mélisse",
+    "flows": 1
+  },
+  {
+    "source": "Poudre",
+    "target": "Tirer",
+    "flows": 30
+  },
+  {
+    "source": "Verroterie",
+    "target": "Rassades",
+    "flows": 4
+  },
+  {
+    "source": "Peaux",
+    "target": "Mouton",
+    "flows": 69
+  },
+  {
+    "source": "Mouton",
+    "target": "Passées",
+    "flows": 53
+  },
+  {
+    "source": "Souliers",
+    "target": "Cuir",
+    "flows": 3
+  },
+  {
+    "source": "Ocre",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Crue",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Harnois",
+    "flows": 1
+  },
+  {
+    "source": "Morue",
+    "target": "Verte",
+    "flows": 7
+  },
+  {
+    "source": "Étoffe",
+    "target": "Mêlée",
+    "flows": 1
+  },
+  {
+    "source": "Mêlée",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Chaudière",
+    "target": "Fer",
+    "flows": 16
+  },
+  {
+    "source": "Sucre",
+    "target": "Blanc",
+    "flows": 132
+  },
+  {
+    "source": "Bouteilles",
+    "target": "Verre",
+    "flows": 37
+  },
+  {
+    "source": "Verre",
+    "target": "Clissées",
+    "flows": 2
+  },
+  {
+    "source": "Plumes",
+    "target": "Écrire",
+    "flows": 6
+  },
+  {
+    "source": "Terre",
+    "target": "Vérone",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Blanc",
+    "flows": 9
+  },
+  {
+    "source": "Toile",
+    "target": "Manche",
+    "flows": 1
+  },
+  {
+    "source": "Rouge",
+    "target": "Pierre",
+    "flows": 1
+  },
+  {
+    "source": "Harnais",
+    "target": "Chaises",
+    "flows": 1
+  },
+  {
+    "source": "Poix",
+    "target": "Noire",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Tôle",
+    "flows": 37
+  },
+  {
+    "source": "Planches",
+    "target": "Sapin",
+    "flows": 56
+  },
+  {
+    "source": "Toile",
+    "target": "Saintonge",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Agneau",
+    "flows": 22
+  },
+  {
+    "source": "Bas",
+    "target": "Laine",
+    "flows": 43
+  },
+  {
+    "source": "Marchandises",
+    "target": "Blanches",
+    "flows": 5
+  },
+  {
+    "source": "Bas",
+    "target": "Chamois",
+    "flows": 1
+  },
+  {
+    "source": "Cheval",
+    "target": "Poil",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Liqueurs",
+    "flows": 22
+  },
+  {
+    "source": "Fauteuils",
+    "target": "Passerame",
+    "flows": 1
+  },
+  {
+    "source": "Passerame",
+    "target": "Avec",
+    "flows": 1
+  },
+  {
+    "source": "Avec",
+    "target": "Leurs",
+    "flows": 2
+  },
+  {
+    "source": "Leurs",
+    "target": "Harnais",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Grains",
+    "flows": 1
+  },
+  {
+    "source": "Yeux",
+    "target": "Écrevisses",
+    "flows": 1
+  },
+  {
+    "source": "Bœuf",
+    "target": "Verts",
+    "flows": 2
+  },
+  {
+    "source": "Jupons",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Blanc",
+    "flows": 46
+  },
+  {
+    "source": "Gomme",
+    "target": "Laque",
+    "flows": 2
+  },
+  {
+    "source": "Marchandises",
+    "target": "Valeur",
+    "flows": 30
+  },
+  {
+    "source": "Toile",
+    "target": "Morlaix",
+    "flows": 25
+  },
+  {
+    "source": "Liqueurs",
+    "target": "Boire",
+    "flows": 34
+  },
+  {
+    "source": "Grains",
+    "target": "Orge",
+    "flows": 19
+  },
+  {
+    "source": "Toile",
+    "target": "Caladaris",
+    "flows": 2
+  },
+  {
+    "source": "Mouton",
+    "target": "Tannées",
+    "flows": 2
+  },
+  {
+    "source": "Roues",
+    "target": "Charrette",
+    "flows": 5
+  },
+  {
+    "source": "Toile",
+    "target": "Olonne",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Bourbonne",
+    "flows": 1
+  },
+  {
+    "source": "Pierres",
+    "target": "Aiguiser",
+    "flows": 1
+  },
+  {
+    "source": "Poinçon",
+    "target": "Neuf",
+    "flows": 1
+  },
+  {
+    "source": "Neuf",
+    "target": "Vide",
+    "flows": 1
+  },
+  {
+    "source": "Couvertures",
+    "target": "Bourre",
+    "flows": 3
+  },
+  {
+    "source": "Bouteilles",
+    "target": "Clissées",
+    "flows": 2
+  },
+  {
+    "source": "Vie",
+    "target": "Ré",
+    "flows": 79
+  },
+  {
+    "source": "Matériaux",
+    "target": "Bois",
+    "flows": 7
+  },
+  {
+    "source": "Drap",
+    "target": "Uni",
+    "flows": 1
+  },
+  {
+    "source": "Raisiné",
+    "target": "Pot",
+    "flows": 1
+  },
+  {
+    "source": "Perruques",
+    "target": "Peau",
+    "flows": 1
+  },
+  {
+    "source": "Peau",
+    "target": "Mouton",
+    "flows": 1
+  },
+  {
+    "source": "Verres",
+    "target": "Communs",
+    "flows": 6
+  },
+  {
+    "source": "Grains",
+    "target": "Seigle",
+    "flows": 8
+  },
+  {
+    "source": "Douelles",
+    "target": "Barrique",
+    "flows": 1
+  },
+  {
+    "source": "Graine",
+    "target": "Étain",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Feutre",
+    "flows": 13
+  },
+  {
+    "source": "Feutre",
+    "target": "Unis",
+    "flows": 1
+  },
+  {
+    "source": "Faux",
+    "target": "Faucher",
+    "flows": 6
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Castor",
+    "flows": 47
+  },
+  {
+    "source": "Castor",
+    "target": "Unis",
+    "flows": 1
+  },
+  {
+    "source": "Ornements",
+    "target": "Église",
+    "flows": 3
+  },
+  {
+    "source": "Brosses",
+    "target": "Cirer",
+    "flows": 1
+  },
+  {
+    "source": "Meules",
+    "target": "Aiguiser",
+    "flows": 7
+  },
+  {
+    "source": "Crin",
+    "target": "Pêcher",
+    "flows": 1
+  },
+  {
+    "source": "Parchemins",
+    "target": "Feuilles",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Absinthe",
+    "flows": 1
+  },
+  {
+    "source": "Raz",
+    "target": "Maroc",
+    "flows": 4
+  },
+  {
+    "source": "Étain",
+    "target": "Bloc",
+    "flows": 4
+  },
+  {
+    "source": "Armes",
+    "target": "Feu",
+    "flows": 47
+  },
+  {
+    "source": "Armes",
+    "target": "Blanches",
+    "flows": 7
+  },
+  {
+    "source": "Housses",
+    "target": "Selles",
+    "flows": 1
+  },
+  {
+    "source": "Bas",
+    "target": "Fleuret",
+    "flows": 3
+  },
+  {
+    "source": "Bottes",
+    "target": "Fortes",
+    "flows": 3
+  },
+  {
+    "source": "Bois",
+    "target": "Construction",
+    "flows": 7
+  },
+  {
+    "source": "Construction",
+    "target": "Sapin",
+    "flows": 2
+  },
+  {
+    "source": "Armoires",
+    "target": "Noyer",
+    "flows": 1
+  },
+  {
+    "source": "Tabac",
+    "target": "Brésil",
+    "flows": 1
+  },
+  {
+    "source": "Eau",
+    "target": "Charente",
+    "flows": 2
+  },
+  {
+    "source": "Plumes",
+    "target": "Apprêtées",
+    "flows": 1
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Autruche",
+    "flows": 1
+  },
+  {
+    "source": "Basanes",
+    "target": "Tannées",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Custas",
+    "flows": 1
+  },
+  {
+    "source": "Crin",
+    "target": "Cheval",
+    "flows": 5
+  },
+  {
+    "source": "Charrues",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Ours",
+    "flows": 218
+  },
+  {
+    "source": "Ours",
+    "target": "Ourson",
+    "flows": 2
+  },
+  {
+    "source": "Brai",
+    "target": "Goudron",
+    "flows": 11
+  },
+  {
+    "source": "Martre",
+    "target": "Canada",
+    "flows": 1
+  },
+  {
+    "source": "Pieds",
+    "target": "Têtes",
+    "flows": 1
+  },
+  {
+    "source": "Mignotte",
+    "target": "Étoffe",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Petite",
+    "flows": 1
+  },
+  {
+    "source": "Azur",
+    "target": "Commun",
+    "flows": 4
+  },
+  {
+    "source": "Gaze",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Argent",
+    "target": "Faux",
+    "flows": 3
+  },
+  {
+    "source": "Faux",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Cru",
+    "flows": 3
+  },
+  {
+    "source": "Soie",
+    "target": "Charrues",
+    "flows": 1
+  },
+  {
+    "source": "Camelot",
+    "target": "Écarlate",
+    "flows": 3
+  },
+  {
+    "source": "Fil",
+    "target": "Or",
+    "flows": 14
+  },
+  {
+    "source": "Or",
+    "target": "Trait",
+    "flows": 2
+  },
+  {
+    "source": "Vin",
+    "target": "L",
+    "flows": 2
+  },
+  {
+    "source": "L",
+    "target": "Île",
+    "flows": 1
+  },
+  {
+    "source": "Île",
+    "target": "Ré",
+    "flows": 1
+  },
+  {
+    "source": "Cruches",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Chitte",
+    "target": "Amedabad",
+    "flows": 1
+  },
+  {
+    "source": "Dentelle",
+    "target": "Lille",
+    "flows": 2
+  },
+  {
+    "source": "Cercles",
+    "target": "Tonneaux",
+    "flows": 7
+  },
+  {
+    "source": "Dame",
+    "target": "Jeannes",
+    "flows": 38
+  },
+  {
+    "source": "Jeannes",
+    "target": "Clissées",
+    "flows": 7
+  },
+  {
+    "source": "Épée",
+    "target": "Argent",
+    "flows": 2
+  },
+  {
+    "source": "Drap",
+    "target": "Poitou",
+    "flows": 1
+  },
+  {
+    "source": "Chevreuil",
+    "target": "Poil",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Ménage",
+    "flows": 5
+  },
+  {
+    "source": "Feuillards",
+    "target": "Bois",
+    "flows": 11
+  },
+  {
+    "source": "Planches",
+    "target": "Chêne",
+    "flows": 1
+  },
+  {
+    "source": "Lie",
+    "target": "Vin",
+    "flows": 1
+  },
+  {
+    "source": "Quincaillerie",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Dentelle",
+    "target": "Puy",
+    "flows": 13
+  },
+  {
+    "source": "Cordage",
+    "target": "Caret",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Cotonnade",
+    "flows": 3
+  },
+  {
+    "source": "Jambon",
+    "target": "Salé",
+    "flows": 1
+  },
+  {
+    "source": "Tapis",
+    "target": "Auvergne",
+    "flows": 4
+  },
+  {
+    "source": "Harnais",
+    "target": "Chevaux",
+    "flows": 6
+  },
+  {
+    "source": "Saint",
+    "target": "Jean",
+    "flows": 58
+  },
+  {
+    "source": "Jean",
+    "target": "Angély",
+    "flows": 2
+  },
+  {
+    "source": "Barres",
+    "target": "Anspect",
+    "flows": 1
+  },
+  {
+    "source": "Anspect",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Glates",
+    "flows": 1
+  },
+  {
+    "source": "Colonne",
+    "target": "Noyer",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Kircochaye",
+    "flows": 1
+  },
+  {
+    "source": "Sucre",
+    "target": "Brun",
+    "flows": 3
+  },
+  {
+    "source": "Rognons",
+    "target": "Castor",
+    "flows": 62
+  },
+  {
+    "source": "Étoffe",
+    "target": "Or",
+    "flows": 4
+  },
+  {
+    "source": "Graine",
+    "target": "Lin",
+    "flows": 97
+  },
+  {
+    "source": "Bois",
+    "target": "Brésil",
+    "flows": 3
+  },
+  {
+    "source": "Tabac",
+    "target": "Commun",
+    "flows": 2
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Border",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Matelas",
+    "flows": 2
+  },
+  {
+    "source": "Indienne",
+    "target": "Étrangère",
+    "flows": 1
+  },
+  {
+    "source": "Tabatières",
+    "target": "Écaille",
+    "flows": 2
+  },
+  {
+    "source": "Écaille",
+    "target": "Incrustées",
+    "flows": 2
+  },
+  {
+    "source": "Incrustées",
+    "target": "Argent",
+    "flows": 2
+  },
+  {
+    "source": "Peaux",
+    "target": "Chèvre",
+    "flows": 3
+  },
+  {
+    "source": "Chèvre",
+    "target": "Passées",
+    "flows": 2
+  },
+  {
+    "source": "Colle",
+    "target": "Poisson",
+    "flows": 2
+  },
+  {
+    "source": "Langues",
+    "target": "Salées",
+    "flows": 10
+  },
+  {
+    "source": "Nappes",
+    "target": "Unies",
+    "flows": 1
+  },
+  {
+    "source": "Serviettes",
+    "target": "Ouvrées",
+    "flows": 1
+  },
+  {
+    "source": "Agneau",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Tresse",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Cuirs",
+    "target": "Grains",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Vache",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Chèvre",
+    "flows": 4
+  },
+  {
+    "source": "Lames",
+    "target": "Épée",
+    "flows": 4
+  },
+  {
+    "source": "Meules",
+    "target": "Taillandier",
+    "flows": 11
+  },
+  {
+    "source": "Encre",
+    "target": "Écrire",
+    "flows": 2
+  },
+  {
+    "source": "Chauffe",
+    "target": "Pieds",
+    "flows": 1
+  },
+  {
+    "source": "Rocaille",
+    "target": "Verre",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Oléron",
+    "flows": 3
+  },
+  {
+    "source": "Huile",
+    "target": "Rabette",
+    "flows": 1
+  },
+  {
+    "source": "Prunelle",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Forme",
+    "target": "Cordonnier",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Noix",
+    "flows": 16
+  },
+  {
+    "source": "Marchandises",
+    "target": "Blanche",
+    "flows": 2
+  },
+  {
+    "source": "Blanche",
+    "target": "Compagnie",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Fougères",
+    "flows": 6
+  },
+  {
+    "source": "Toile",
+    "target": "Chanvre",
+    "flows": 78
+  },
+  {
+    "source": "Chanvre",
+    "target": "Ouvrée",
+    "flows": 2
+  },
+  {
+    "source": "Tabac",
+    "target": "Ferme",
+    "flows": 2
+  },
+  {
+    "source": "Plumes",
+    "target": "Lin",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Lin",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Brodés",
+    "flows": 1
+  },
+  {
+    "source": "Jus",
+    "target": "Réglisse",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Noyer",
+    "flows": 6
+  },
+  {
+    "source": "Drogues",
+    "target": "Misme",
+    "flows": 1
+  },
+  {
+    "source": "Perches",
+    "target": "Sapin",
+    "flows": 1
+  },
+  {
+    "source": "Coton",
+    "target": "Laine",
+    "flows": 14
+  },
+  {
+    "source": "Poil",
+    "target": "Chèvre",
+    "flows": 4
+  },
+  {
+    "source": "Fleuret",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Commun",
+    "flows": 2
+  },
+  {
+    "source": "Fruits",
+    "target": "Secs",
+    "flows": 30
+  },
+  {
+    "source": "Café",
+    "target": "Moka",
+    "flows": 18
+  },
+  {
+    "source": "Nappes",
+    "target": "Ouvrées",
+    "flows": 1
+  },
+  {
+    "source": "Gants",
+    "target": "Peau",
+    "flows": 9
+  },
+  {
+    "source": "Coton",
+    "target": "Rayée",
+    "flows": 1
+  },
+  {
+    "source": "Pierres",
+    "target": "Taille",
+    "flows": 4
+  },
+  {
+    "source": "Flèches",
+    "target": "Métal",
+    "flows": 1
+  },
+  {
+    "source": "Affûts",
+    "target": "Fûts",
+    "flows": 1
+  },
+  {
+    "source": "Fûts",
+    "target": "Canons",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Cerf",
+    "flows": 81
+  },
+  {
+    "source": "Cerf",
+    "target": "Chevreuil",
+    "flows": 11
+  },
+  {
+    "source": "Camelot",
+    "target": "Peu",
+    "flows": 1
+  },
+  {
+    "source": "Bottes",
+    "target": "Cuir",
+    "flows": 2
+  },
+  {
+    "source": "Siamoise",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Serge",
+    "target": "Saint",
+    "flows": 3
+  },
+  {
+    "source": "Saint",
+    "target": "Maixent",
+    "flows": 3
+  },
+  {
+    "source": "Fil",
+    "target": "Laiton",
+    "flows": 9
+  },
+  {
+    "source": "Gros",
+    "target": "Naples",
+    "flows": 1
+  },
+  {
+    "source": "Pelleterie",
+    "target": "Parchemins",
+    "flows": 1
+  },
+  {
+    "source": "Mouton",
+    "target": "Prêtées",
+    "flows": 1
+  },
+  {
+    "source": "Laque",
+    "target": "Plate",
+    "flows": 2
+  },
+  {
+    "source": "Drap",
+    "target": "Carcassonne",
+    "flows": 13
+  },
+  {
+    "source": "Croc",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Morue",
+    "flows": 1
+  },
+  {
+    "source": "Enclumes",
+    "target": "Fer",
+    "flows": 5
+  },
+  {
+    "source": "Café",
+    "target": "Martinique",
+    "flows": 3
+  },
+  {
+    "source": "Baleine",
+    "target": "Coupée",
+    "flows": 8
+  },
+  {
+    "source": "Étain",
+    "target": "Saumon",
+    "flows": 1
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Mouton",
+    "flows": 42
+  },
+  {
+    "source": "Souliers",
+    "target": "Brodés",
+    "flows": 6
+  },
+  {
+    "source": "Brodés",
+    "target": "Femme",
+    "flows": 2
+  },
+  {
+    "source": "Passées",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Hollande",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Blanches",
+    "flows": 1
+  },
+  {
+    "source": "Blanches",
+    "target": "Ouvrées",
+    "flows": 1
+  },
+  {
+    "source": "Bâtiments",
+    "target": "Naufragés",
+    "flows": 1
+  },
+  {
+    "source": "Chevrons",
+    "target": "Sapin",
+    "flows": 1
+  },
+  {
+    "source": "Souline",
+    "target": "Étoffe",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Indes",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Glastes",
+    "flows": 2
+  },
+  {
+    "source": "Tabac",
+    "target": "Poudre",
+    "flows": 7
+  },
+  {
+    "source": "Bottes",
+    "target": "Molles",
+    "flows": 1
+  },
+  {
+    "source": "Couteaux",
+    "target": "Gazat",
+    "flows": 1
+  },
+  {
+    "source": "Galon",
+    "target": "Fil",
+    "flows": 7
+  },
+  {
+    "source": "Peaux",
+    "target": "Blanches",
+    "flows": 4
+  },
+  {
+    "source": "Blanches",
+    "target": "Apprêtées",
+    "flows": 1
+  },
+  {
+    "source": "Serviettes",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Cap",
+    "flows": 1
+  },
+  {
+    "source": "Cap",
+    "target": "Breton",
+    "flows": 1
+  },
+  {
+    "source": "Dorure",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Écorces",
+    "flows": 1
+  },
+  {
+    "source": "Écorces",
+    "target": "Chêne",
+    "flows": 1
+  },
+  {
+    "source": "Chêne",
+    "target": "Frêne",
+    "flows": 1
+  },
+  {
+    "source": "Truffes",
+    "target": "Culs",
+    "flows": 1
+  },
+  {
+    "source": "Culs",
+    "target": "Artichauts",
+    "flows": 1
+  },
+  {
+    "source": "Romals",
+    "target": "Rouges",
+    "flows": 1
+  },
+  {
+    "source": "Bougie",
+    "target": "Blanche",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Vimoutiers",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Haule",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Folle",
+    "flows": 5
+  },
+  {
+    "source": "Café",
+    "target": "Indes",
+    "flows": 140
+  },
+  {
+    "source": "Cloches",
+    "target": "Fonte",
+    "flows": 6
+  },
+  {
+    "source": "Drap",
+    "target": "Louvres",
+    "flows": 1
+  },
+  {
+    "source": "Brûler",
+    "target": "Autres",
+    "flows": 1
+  },
+  {
+    "source": "Graine",
+    "target": "Genièvre",
+    "flows": 54
+  },
+  {
+    "source": "Peaux",
+    "target": "Crues",
+    "flows": 1
+  },
+  {
+    "source": "Crues",
+    "target": "Chevreau",
+    "flows": 1
+  },
+  {
+    "source": "Socreton",
+    "target": "Bleue",
+    "flows": 1
+  },
+  {
+    "source": "Harengs",
+    "target": "Blancs",
+    "flows": 7
+  },
+  {
+    "source": "Futailles",
+    "target": "Petites",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Garnies",
+    "flows": 21
+  },
+  {
+    "source": "Garnies",
+    "target": "Femme",
+    "flows": 1
+  },
+  {
+    "source": "Or",
+    "target": "Poil",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Doublage",
+    "flows": 3
+  },
+  {
+    "source": "Chanvre",
+    "target": "Cru",
+    "flows": 16
+  },
+  {
+    "source": "Salemporis",
+    "target": "Blanc",
+    "flows": 7
+  },
+  {
+    "source": "Bas",
+    "target": "Saint",
+    "flows": 6
+  },
+  {
+    "source": "Saint",
+    "target": "Mexant",
+    "flows": 6
+  },
+  {
+    "source": "Oléron",
+    "target": "Ré",
+    "flows": 1
+  },
+  {
+    "source": "Esprit",
+    "target": "Nitre",
+    "flows": 1
+  },
+  {
+    "source": "Cannes",
+    "target": "Pommes",
+    "flows": 3
+  },
+  {
+    "source": "Pommes",
+    "target": "Or",
+    "flows": 3
+  },
+  {
+    "source": "Cire",
+    "target": "Jaune",
+    "flows": 19
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Cholet",
+    "flows": 17
+  },
+  {
+    "source": "Chaises",
+    "target": "Poste",
+    "flows": 1
+  },
+  {
+    "source": "Bas",
+    "target": "Filoselle",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Masse",
+    "flows": 1
+  },
+  {
+    "source": "Fromage",
+    "target": "Hollande",
+    "flows": 6
+  },
+  {
+    "source": "Lignes",
+    "target": "Pêcher",
+    "flows": 27
+  },
+  {
+    "source": "Sucre",
+    "target": "Pain",
+    "flows": 57
+  },
+  {
+    "source": "Aiguilles",
+    "target": "Coudre",
+    "flows": 3
+  },
+  {
+    "source": "Bretagne",
+    "target": "Diverse",
+    "flows": 2
+  },
+  {
+    "source": "Bonnets",
+    "target": "Coton",
+    "flows": 11
+  },
+  {
+    "source": "Habits",
+    "target": "Taffetas",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Daim",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Salemporis",
+    "flows": 1
+  },
+  {
+    "source": "Salemporis",
+    "target": "Bleue",
+    "flows": 1
+  },
+  {
+    "source": "Bâtons",
+    "target": "Sapin",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Fleuret",
+    "flows": 2
+  },
+  {
+    "source": "Fleuret",
+    "target": "Rouen",
+    "flows": 2
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Vigogne",
+    "flows": 5
+  },
+  {
+    "source": "Artichauts",
+    "target": "Secs",
+    "flows": 2
+  },
+  {
+    "source": "Vin",
+    "target": "Mus",
+    "flows": 1
+  },
+  {
+    "source": "Drogues",
+    "target": "Apothicaire",
+    "flows": 16
+  },
+  {
+    "source": "Planches",
+    "target": "Prusse",
+    "flows": 6
+  },
+  {
+    "source": "Peaux",
+    "target": "Bœuf",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Commodité",
+    "flows": 2
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Romals",
+    "flows": 2
+  },
+  {
+    "source": "Boutons",
+    "target": "Soie",
+    "flows": 5
+  },
+  {
+    "source": "Drap",
+    "target": "Angleterre",
+    "flows": 3
+  },
+  {
+    "source": "Tabatières",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Carreaux",
+    "target": "Faïence",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Écarlate",
+    "flows": 11
+  },
+  {
+    "source": "Barres",
+    "target": "Fer",
+    "flows": 101
+  },
+  {
+    "source": "Gobelets",
+    "target": "Verre",
+    "flows": 1
+  },
+  {
+    "source": "Rossière",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Langues",
+    "target": "Cochon",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Sevigneau",
+    "flows": 1
+  },
+  {
+    "source": "Serge",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Baume",
+    "target": "Copahu",
+    "flows": 1
+  },
+  {
+    "source": "Dentelle",
+    "target": "Soie",
+    "flows": 7
+  },
+  {
+    "source": "Vaisselle",
+    "target": "Argent",
+    "flows": 19
+  },
+  {
+    "source": "Habits",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Baffetas",
+    "target": "Bleu",
+    "flows": 5
+  },
+  {
+    "source": "Toile",
+    "target": "Blancard",
+    "flows": 5
+  },
+  {
+    "source": "Eau",
+    "target": "Hongrie",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Poisson",
+    "flows": 26
+  },
+  {
+    "source": "Madras",
+    "target": "Mouchoirs",
+    "flows": 4
+  },
+  {
+    "source": "Vin",
+    "target": "Quercy",
+    "flows": 2
+  },
+  {
+    "source": "Laine",
+    "target": "Lavée",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Violet",
+    "flows": 1
+  },
+  {
+    "source": "Lignes",
+    "target": "Acier",
+    "flows": 1
+  },
+  {
+    "source": "Vie",
+    "target": "Cognac",
+    "flows": 11
+  },
+  {
+    "source": "Toile",
+    "target": "Royale",
+    "flows": 6
+  },
+  {
+    "source": "Litharge",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Étamine",
+    "target": "Laine",
+    "flows": 22
+  },
+  {
+    "source": "Cercles",
+    "target": "Fer",
+    "flows": 5
+  },
+  {
+    "source": "Huile",
+    "target": "Olive",
+    "flows": 76
+  },
+  {
+    "source": "Merrains",
+    "target": "Sapin",
+    "flows": 3
+  },
+  {
+    "source": "Dentelle",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Écharpe",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Safran",
+    "target": "Gâtinais",
+    "flows": 8
+  },
+  {
+    "source": "Brocard",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Sirop",
+    "target": "Capillaire",
+    "flows": 1
+  },
+  {
+    "source": "Crapaudines",
+    "target": "Fonte",
+    "flows": 1
+  },
+  {
+    "source": "Gants",
+    "target": "Cuir",
+    "flows": 1
+  },
+  {
+    "source": "Lampes",
+    "target": "Fer",
+    "flows": 5
+  },
+  {
+    "source": "Toile",
+    "target": "Beauvais",
+    "flows": 4
+  },
+  {
+    "source": "Bois",
+    "target": "Jaune",
+    "flows": 1
+  },
+  {
+    "source": "Vie",
+    "target": "Charente",
+    "flows": 89
+  },
+  {
+    "source": "Amandes",
+    "target": "Cassées",
+    "flows": 8
+  },
+  {
+    "source": "Toile",
+    "target": "Pontivy",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Bretonnes",
+    "flows": 2
+  },
+  {
+    "source": "Blanc",
+    "target": "Écrire",
+    "flows": 1
+  },
+  {
+    "source": "Tableaux",
+    "target": "Famille",
+    "flows": 1
+  },
+  {
+    "source": "Tavelle",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Raz",
+    "target": "Castor",
+    "flows": 5
+  },
+  {
+    "source": "Garnies",
+    "target": "Batiste",
+    "flows": 1
+  },
+  {
+    "source": "Birampots",
+    "target": "Bleu",
+    "flows": 1
+  },
+  {
+    "source": "Couchette",
+    "target": "Garnie",
+    "flows": 1
+  },
+  {
+    "source": "Barriques",
+    "target": "Neuves",
+    "flows": 4
+  },
+  {
+    "source": "Agneau",
+    "target": "Passées",
+    "flows": 12
+  },
+  {
+    "source": "Toile",
+    "target": "Flandre",
+    "flows": 3
+  },
+  {
+    "source": "Chanvre",
+    "target": "Peigné",
+    "flows": 4
+  },
+  {
+    "source": "Coutil",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Esprit",
+    "target": "Soufre",
+    "flows": 1
+  },
+  {
+    "source": "Cordes",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Serge",
+    "target": "Doubler",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Rouen",
+    "flows": 1
+  },
+  {
+    "source": "Guinée",
+    "target": "Bleue",
+    "flows": 21
+  },
+  {
+    "source": "Basin",
+    "target": "Indes",
+    "flows": 11
+  },
+  {
+    "source": "Scies",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Lit",
+    "target": "Vieux",
+    "flows": 4
+  },
+  {
+    "source": "Toile",
+    "target": "Lille",
+    "flows": 2
+  },
+  {
+    "source": "Lille",
+    "target": "Serviettes",
+    "flows": 2
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Veau",
+    "flows": 5
+  },
+  {
+    "source": "Miroirs",
+    "target": "Cadres",
+    "flows": 6
+  },
+  {
+    "source": "Lattes",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Acajou",
+    "flows": 4
+  },
+  {
+    "source": "Boutons",
+    "target": "Crin",
+    "flows": 5
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Argent",
+    "flows": 5
+  },
+  {
+    "source": "Vin",
+    "target": "Espagne",
+    "flows": 15
+  },
+  {
+    "source": "Bois",
+    "target": "Campêche",
+    "flows": 8
+  },
+  {
+    "source": "Souliers",
+    "target": "Femme",
+    "flows": 2
+  },
+  {
+    "source": "Épicerie",
+    "target": "Douce",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Siamoise",
+    "flows": 6
+  },
+  {
+    "source": "Raz",
+    "target": "Marron",
+    "flows": 1
+  },
+  {
+    "source": "Azur",
+    "target": "Gros",
+    "flows": 1
+  },
+  {
+    "source": "Canons",
+    "target": "Fonte",
+    "flows": 2
+  },
+  {
+    "source": "Bas",
+    "target": "Coton",
+    "flows": 27
+  },
+  {
+    "source": "Vin",
+    "target": "Pays",
+    "flows": 9
+  },
+  {
+    "source": "Tables",
+    "target": "Noyer",
+    "flows": 1
+  },
+  {
+    "source": "Bas",
+    "target": "Soie",
+    "flows": 73
+  },
+  {
+    "source": "Housses",
+    "target": "Chevaux",
+    "flows": 5
+  },
+  {
+    "source": "Chevaux",
+    "target": "Faux",
+    "flows": 2
+  },
+  {
+    "source": "Garnis",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Tapis",
+    "target": "Laine",
+    "flows": 3
+  },
+  {
+    "source": "Douelles",
+    "target": "Tonneau",
+    "flows": 2
+  },
+  {
+    "source": "Couteaux",
+    "target": "Tables",
+    "flows": 1
+  },
+  {
+    "source": "Crêpe",
+    "target": "Noir",
+    "flows": 1
+  },
+  {
+    "source": "Boutons",
+    "target": "Poil",
+    "flows": 11
+  },
+  {
+    "source": "Cuirs",
+    "target": "Secs",
+    "flows": 2
+  },
+  {
+    "source": "Secs",
+    "target": "Poil",
+    "flows": 2
+  },
+  {
+    "source": "Merrains",
+    "target": "Tonnellerie",
+    "flows": 3
+  },
+  {
+    "source": "Pliantes",
+    "target": "Cuir",
+    "flows": 1
+  },
+  {
+    "source": "Drogues",
+    "target": "Sur",
+    "flows": 1
+  },
+  {
+    "source": "Sur",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Communes",
+    "flows": 1
+  },
+  {
+    "source": "Clous",
+    "target": "Dorés",
+    "flows": 3
+  },
+  {
+    "source": "Vin",
+    "target": "Cahors",
+    "flows": 1
+  },
+  {
+    "source": "Sardines",
+    "target": "Salées",
+    "flows": 8
+  },
+  {
+    "source": "Pots",
+    "target": "Faïence",
+    "flows": 2
+  },
+  {
+    "source": "Tuyaux",
+    "target": "Plomb",
+    "flows": 1
+  },
+  {
+    "source": "Planches",
+    "target": "Pin",
+    "flows": 2
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Pondichéry",
+    "flows": 15
+  },
+  {
+    "source": "Soie",
+    "target": "Coudre",
+    "flows": 8
+  },
+  {
+    "source": "Haches",
+    "target": "Armes",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Teindre",
+    "flows": 2
+  },
+  {
+    "source": "Feuilles",
+    "target": "Tabac",
+    "flows": 3
+  },
+  {
+    "source": "Outils",
+    "target": "Acier",
+    "flows": 1
+  },
+  {
+    "source": "Pain",
+    "target": "Cacheter",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Couleur",
+    "flows": 1
+  },
+  {
+    "source": "Colle",
+    "target": "Forte",
+    "flows": 6
+  },
+  {
+    "source": "Anis",
+    "target": "Vert",
+    "flows": 1
+  },
+  {
+    "source": "Cuirs",
+    "target": "Vache",
+    "flows": 1
+  },
+  {
+    "source": "Flotte",
+    "target": "Indes",
+    "flows": 1
+  },
+  {
+    "source": "Mercerie",
+    "target": "Commune",
+    "flows": 3
+  },
+  {
+    "source": "Galon",
+    "target": "Laine",
+    "flows": 5
+  },
+  {
+    "source": "Toile",
+    "target": "Chasse",
+    "flows": 1
+  },
+  {
+    "source": "Guinée",
+    "target": "Blanche",
+    "flows": 8
+  },
+  {
+    "source": "Blanche",
+    "target": "Bleue",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Challe",
+    "flows": 4
+  },
+  {
+    "source": "Faïence",
+    "target": "Commune",
+    "flows": 3
+  },
+  {
+    "source": "Saumon",
+    "target": "Salé",
+    "flows": 19
+  },
+  {
+    "source": "Lin",
+    "target": "Peigné",
+    "flows": 2
+  },
+  {
+    "source": "Linge",
+    "target": "Vieux",
+    "flows": 4
+  },
+  {
+    "source": "Plomb",
+    "target": "Plaque",
+    "flows": 5
+  },
+  {
+    "source": "Vin",
+    "target": "Marennes",
+    "flows": 10
+  },
+  {
+    "source": "Merrains",
+    "target": "Chêne",
+    "flows": 3
+  },
+  {
+    "source": "Vin",
+    "target": "Cognac",
+    "flows": 194
+  },
+  {
+    "source": "Vin",
+    "target": "Ambrion",
+    "flows": 1
+  },
+  {
+    "source": "Eau",
+    "target": "Forte",
+    "flows": 1
+  },
+  {
+    "source": "Coton",
+    "target": "Indes",
+    "flows": 9
+  },
+  {
+    "source": "Grains",
+    "target": "Froment",
+    "flows": 29
+  },
+  {
+    "source": "Ails",
+    "target": "Fauches",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Espagne",
+    "flows": 6
+  },
+  {
+    "source": "Gilets",
+    "target": "Molleton",
+    "flows": 2
+  },
+  {
+    "source": "Écharpe",
+    "target": "Gaze",
+    "flows": 1
+  },
+  {
+    "source": "Cuirs",
+    "target": "Cheval",
+    "flows": 1
+  },
+  {
+    "source": "Cheval",
+    "target": "Tannés",
+    "flows": 1
+  },
+  {
+    "source": "Habits",
+    "target": "Soldat",
+    "flows": 1
+  },
+  {
+    "source": "Bas",
+    "target": "Fil",
+    "flows": 67
+  },
+  {
+    "source": "Portemanteaux",
+    "target": "Cuir",
+    "flows": 2
+  },
+  {
+    "source": "Clous",
+    "target": "Fer",
+    "flows": 70
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Bengale",
+    "flows": 21
+  },
+  {
+    "source": "Drap",
+    "target": "Petit",
+    "flows": 22
+  },
+  {
+    "source": "Huile",
+    "target": "Lin",
+    "flows": 22
+  },
+  {
+    "source": "Agneau",
+    "target": "Mouton",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Térébenthine",
+    "flows": 2
+  },
+  {
+    "source": "Souliers",
+    "target": "Communs",
+    "flows": 1
+  },
+  {
+    "source": "Bretagne",
+    "target": "Halle",
+    "flows": 2
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Masulipatan",
+    "flows": 8
+  },
+  {
+    "source": "Or",
+    "target": "Vrai",
+    "flows": 1
+  },
+  {
+    "source": "Bâtons",
+    "target": "Lave",
+    "flows": 2
+  },
+  {
+    "source": "Lave",
+    "target": "Place",
+    "flows": 2
+  },
+  {
+    "source": "Papier",
+    "target": "Plan",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Laval",
+    "flows": 1
+  },
+  {
+    "source": "Soie",
+    "target": "Brodés",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Laval",
+    "flows": 21
+  },
+  {
+    "source": "Dents",
+    "target": "Éléphant",
+    "flows": 1
+  },
+  {
+    "source": "Souliers",
+    "target": "Homme",
+    "flows": 5
+  },
+  {
+    "source": "Tabac",
+    "target": "Carotte",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Fil",
+    "flows": 5
+  },
+  {
+    "source": "Citrons",
+    "target": "Limons",
+    "flows": 2
+  },
+  {
+    "source": "Huîtres",
+    "target": "Daube",
+    "flows": 1
+  },
+  {
+    "source": "Daube",
+    "target": "Marinée",
+    "flows": 1
+  },
+  {
+    "source": "Moulins",
+    "target": "Café",
+    "flows": 8
+  },
+  {
+    "source": "Café",
+    "target": "Doux",
+    "flows": 1
+  },
+  {
+    "source": "Flanelle",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Limes",
+    "target": "Fer",
+    "flows": 5
+  },
+  {
+    "source": "Brun",
+    "target": "Rouge",
+    "flows": 2
+  },
+  {
+    "source": "Tabac",
+    "target": "Filé",
+    "flows": 3
+  },
+  {
+    "source": "Laine",
+    "target": "Peignée",
+    "flows": 1
+  },
+  {
+    "source": "Taffetas",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Bougie",
+    "target": "Tables",
+    "flows": 4
+  },
+  {
+    "source": "Parasols",
+    "target": "Peau",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Hongrie",
+    "flows": 1
+  },
+  {
+    "source": "Cannettes",
+    "target": "Grès",
+    "flows": 13
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Chevreau",
+    "flows": 4
+  },
+  {
+    "source": "Table",
+    "target": "Ouvré",
+    "flows": 14
+  },
+  {
+    "source": "Pots",
+    "target": "Sucre",
+    "flows": 2
+  },
+  {
+    "source": "Sucre",
+    "target": "Terre",
+    "flows": 13
+  },
+  {
+    "source": "Faux",
+    "target": "Faucilles",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Voile",
+    "flows": 45
+  },
+  {
+    "source": "Fil",
+    "target": "Gros",
+    "flows": 1
+  },
+  {
+    "source": "Carreaux",
+    "target": "Pierre",
+    "flows": 1
+  },
+  {
+    "source": "Pierres",
+    "target": "Fusils",
+    "flows": 94
+  },
+  {
+    "source": "Cornichons",
+    "target": "Confits",
+    "flows": 1
+  },
+  {
+    "source": "Têtes",
+    "target": "Brodées",
+    "flows": 1
+  },
+  {
+    "source": "Brodées",
+    "target": "Basin",
+    "flows": 1
+  },
+  {
+    "source": "Balais",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Caves",
+    "target": "Garnies",
+    "flows": 4
+  },
+  {
+    "source": "Roquelance",
+    "target": "Écarlate",
+    "flows": 1
+  },
+  {
+    "source": "Mouton",
+    "target": "Laine",
+    "flows": 3
+  },
+  {
+    "source": "Canevettes",
+    "target": "Grès",
+    "flows": 1
+  },
+  {
+    "source": "Sirop",
+    "target": "Terré",
+    "flows": 1
+  },
+  {
+    "source": "Chaises",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Moulins",
+    "target": "Poivre",
+    "flows": 3
+  },
+  {
+    "source": "Drogues",
+    "target": "Composées",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Glaster",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Bretagne",
+    "flows": 3
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Chèvre",
+    "flows": 3
+  },
+  {
+    "source": "Cire",
+    "target": "Cacheter",
+    "flows": 1
+  },
+  {
+    "source": "Ancres",
+    "target": "Vides",
+    "flows": 1
+  },
+  {
+    "source": "Orge",
+    "target": "Mondé",
+    "flows": 1
+  },
+  {
+    "source": "Vestes",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Brodées",
+    "flows": 1
+  },
+  {
+    "source": "Harengs",
+    "target": "Saurs",
+    "flows": 6
+  },
+  {
+    "source": "Chanvre",
+    "target": "Rousse",
+    "flows": 6
+  },
+  {
+    "source": "Sel",
+    "target": "Ré",
+    "flows": 111
+  },
+  {
+    "source": "Pois",
+    "target": "Verts",
+    "flows": 2
+  },
+  {
+    "source": "Fer",
+    "target": "Metumes",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Grandville",
+    "flows": 1
+  },
+  {
+    "source": "Café",
+    "target": "Bourbon",
+    "flows": 4
+  },
+  {
+    "source": "Toile",
+    "target": "Languenan",
+    "flows": 1
+  },
+  {
+    "source": "Batterie",
+    "target": "Cuivre",
+    "flows": 2
+  },
+  {
+    "source": "Étuve",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Nattes",
+    "target": "Jonc",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Parchemins",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Indes",
+    "flows": 17
+  },
+  {
+    "source": "Bordeaux",
+    "target": "Ville",
+    "flows": 3
+  },
+  {
+    "source": "Lin",
+    "target": "Cambrai",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Commerce",
+    "flows": 2
+  },
+  {
+    "source": "Commerce",
+    "target": "Étranger",
+    "flows": 1
+  },
+  {
+    "source": "Étranger",
+    "target": "Indes",
+    "flows": 1
+  },
+  {
+    "source": "Marmites",
+    "target": "Feu",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Lille",
+    "flows": 1
+  },
+  {
+    "source": "Inde",
+    "target": "Plate",
+    "flows": 2
+  },
+  {
+    "source": "Sirop",
+    "target": "Fin",
+    "flows": 2
+  },
+  {
+    "source": "Toile",
+    "target": "Halle",
+    "flows": 19
+  },
+  {
+    "source": "Futailles",
+    "target": "Vieilles",
+    "flows": 2
+  },
+  {
+    "source": "Verre",
+    "target": "Gros",
+    "flows": 1
+  },
+  {
+    "source": "Chevreau",
+    "target": "Passées",
+    "flows": 1
+  },
+  {
+    "source": "Bœuf",
+    "target": "Daube",
+    "flows": 4
+  },
+  {
+    "source": "Graine",
+    "target": "Muscade",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Divers",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Emballage",
+    "flows": 1
+  },
+  {
+    "source": "Étamine",
+    "target": "Auvergne",
+    "flows": 10
+  },
+  {
+    "source": "Sucre",
+    "target": "Terré",
+    "flows": 176
+  },
+  {
+    "source": "Galon",
+    "target": "Peau",
+    "flows": 1
+  },
+  {
+    "source": "Étaux",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Suif",
+    "target": "Rames",
+    "flows": 1
+  },
+  {
+    "source": "Dégras",
+    "target": "Huile",
+    "flows": 1
+  },
+  {
+    "source": "Mercerie",
+    "target": "Fine",
+    "flows": 8
+  },
+  {
+    "source": "Dorure",
+    "target": "Fine",
+    "flows": 12
+  },
+  {
+    "source": "Peaux",
+    "target": "Maroquins",
+    "flows": 4
+  },
+  {
+    "source": "Sirop",
+    "target": "Mélasse",
+    "flows": 76
+  },
+  {
+    "source": "Grains",
+    "target": "Maïs",
+    "flows": 7
+  },
+  {
+    "source": "Talons",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Mouches",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Vie",
+    "target": "Double",
+    "flows": 10
+  },
+  {
+    "source": "Fil",
+    "target": "Coudre",
+    "flows": 24
+  },
+  {
+    "source": "Lin",
+    "target": "Préparé",
+    "flows": 2
+  },
+  {
+    "source": "Peaux",
+    "target": "Tannées",
+    "flows": 11
+  },
+  {
+    "source": "Tannées",
+    "target": "Veau",
+    "flows": 11
+  },
+  {
+    "source": "Orange",
+    "target": "Aigre",
+    "flows": 1
+  },
+  {
+    "source": "Quart",
+    "target": "Soie",
+    "flows": 10
+  },
+  {
+    "source": "Portemanteaux",
+    "target": "Russie",
+    "flows": 1
+  },
+  {
+    "source": "Savon",
+    "target": "Noir",
+    "flows": 1
+  },
+  {
+    "source": "Table",
+    "target": "Plomb",
+    "flows": 2
+  },
+  {
+    "source": "Verres",
+    "target": "Vitre",
+    "flows": 42
+  },
+  {
+    "source": "Amandes",
+    "target": "Coque",
+    "flows": 30
+  },
+  {
+    "source": "Chanvre",
+    "target": "Étoupes",
+    "flows": 4
+  },
+  {
+    "source": "Fromage",
+    "target": "Gruyère",
+    "flows": 2
+  },
+  {
+    "source": "Plomb",
+    "target": "Saumon",
+    "flows": 33
+  },
+  {
+    "source": "Poterie",
+    "target": "Terre",
+    "flows": 32
+  },
+  {
+    "source": "Couteaux",
+    "target": "Indigo",
+    "flows": 3
+  },
+  {
+    "source": "Chaudron",
+    "target": "Fer",
+    "flows": 2
+  },
+  {
+    "source": "Graisse",
+    "target": "Poisson",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Ayant",
+    "flows": 2
+  },
+  {
+    "source": "Ayant",
+    "target": "Servi",
+    "flows": 3
+  },
+  {
+    "source": "Toile",
+    "target": "Corot",
+    "flows": 26
+  },
+  {
+    "source": "Chanvre",
+    "target": "Rames",
+    "flows": 3
+  },
+  {
+    "source": "Coiffures",
+    "target": "Gaze",
+    "flows": 3
+  },
+  {
+    "source": "Marbre",
+    "target": "Avec",
+    "flows": 1
+  },
+  {
+    "source": "Leurs",
+    "target": "Pieds",
+    "flows": 1
+  },
+  {
+    "source": "Sirop",
+    "target": "Sucre",
+    "flows": 43
+  },
+  {
+    "source": "Peaux",
+    "target": "Apprêtée",
+    "flows": 3
+  },
+  {
+    "source": "Apprêtée",
+    "target": "Orignal",
+    "flows": 3
+  },
+  {
+    "source": "Laine",
+    "target": "Tapisserie",
+    "flows": 6
+  },
+  {
+    "source": "Tapis",
+    "target": "Table",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Dentelle",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Saintonge",
+    "flows": 52
+  },
+  {
+    "source": "Cuirs",
+    "target": "Corroyés",
+    "flows": 3
+  },
+  {
+    "source": "Corroyés",
+    "target": "Vache",
+    "flows": 3
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Jonc",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Simarouba",
+    "flows": 3
+  },
+  {
+    "source": "Serinettes",
+    "target": "Ouvrées",
+    "flows": 1
+  },
+  {
+    "source": "Fusils",
+    "target": "Neufs",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Vieux",
+    "flows": 4
+  },
+  {
+    "source": "Poudre",
+    "target": "Fusil",
+    "flows": 2
+  },
+  {
+    "source": "Bourre",
+    "target": "Bœuf",
+    "flows": 1
+  },
+  {
+    "source": "Grenat",
+    "target": "Faux",
+    "flows": 2
+  },
+  {
+    "source": "Farine",
+    "target": "Gruau",
+    "flows": 1
+  },
+  {
+    "source": "Sellerie",
+    "target": "Commune",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Caverge",
+    "flows": 1
+  },
+  {
+    "source": "Chevaux",
+    "target": "Enrichie",
+    "flows": 1
+  },
+  {
+    "source": "L",
+    "target": "Agenais",
+    "flows": 1
+  },
+  {
+    "source": "Couteaux",
+    "target": "Communs",
+    "flows": 22
+  },
+  {
+    "source": "Cordons",
+    "target": "Montres",
+    "flows": 1
+  },
+  {
+    "source": "Barques",
+    "target": "Bottes",
+    "flows": 1
+  },
+  {
+    "source": "Étoffe",
+    "target": "Iles",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Crée",
+    "flows": 4
+  },
+  {
+    "source": "Crée",
+    "target": "Large",
+    "flows": 3
+  },
+  {
+    "source": "Colliers",
+    "target": "Grenat",
+    "flows": 1
+  },
+  {
+    "source": "Couperose",
+    "target": "Verte",
+    "flows": 2
+  },
+  {
+    "source": "Mortiers",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Blaye",
+    "flows": 2
+  },
+  {
+    "source": "Gingembre",
+    "target": "Sec",
+    "flows": 1
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Auvergne",
+    "flows": 4
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Chêne",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Poil",
+    "flows": 8
+  },
+  {
+    "source": "Poil",
+    "target": "Estain",
+    "flows": 1
+  },
+  {
+    "source": "Livres",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Alicante",
+    "flows": 8
+  },
+  {
+    "source": "Toile",
+    "target": "Quintin",
+    "flows": 2
+  },
+  {
+    "source": "Culottes",
+    "target": "Peau",
+    "flows": 1
+  },
+  {
+    "source": "Coton",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Verges",
+    "target": "Moulins",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Rochefort",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Rets",
+    "flows": 10
+  },
+  {
+    "source": "Castor",
+    "target": "Vernis",
+    "flows": 4
+  },
+  {
+    "source": "Bois",
+    "target": "Brésillet",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Osier",
+    "flows": 1
+  },
+  {
+    "source": "Habits",
+    "target": "Peau",
+    "flows": 2
+  },
+  {
+    "source": "Soie",
+    "target": "France",
+    "flows": 1
+  },
+  {
+    "source": "Table",
+    "target": "Commun",
+    "flows": 1
+  },
+  {
+    "source": "Quincaillerie",
+    "target": "Cuivre",
+    "flows": 9
+  },
+  {
+    "source": "Terre",
+    "target": "Faïence",
+    "flows": 1
+  },
+  {
+    "source": "Confection",
+    "target": "Hyacinthe",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Fine",
+    "target": "Flandre",
+    "flows": 1
+  },
+  {
+    "source": "Thé",
+    "target": "Bou",
+    "flows": 1
+  },
+  {
+    "source": "Cuivre",
+    "target": "Pompe",
+    "flows": 1
+  },
+  {
+    "source": "Rogues",
+    "target": "Morue",
+    "flows": 5
+  },
+  {
+    "source": "Verre",
+    "target": "Vides",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Communs",
+    "flows": 16
+  },
+  {
+    "source": "Siamoise",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Grossier",
+    "flows": 1
+  },
+  {
+    "source": "Haches",
+    "target": "Houes",
+    "flows": 5
+  },
+  {
+    "source": "Houes",
+    "target": "Serpes",
+    "flows": 5
+  },
+  {
+    "source": "Artichauts",
+    "target": "Confits",
+    "flows": 11
+  },
+  {
+    "source": "Linge",
+    "target": "Tapisserie",
+    "flows": 1
+  },
+  {
+    "source": "Grilles",
+    "target": "Tambours",
+    "flows": 1
+  },
+  {
+    "source": "Tambours",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Veau",
+    "target": "Poil",
+    "flows": 3
+  },
+  {
+    "source": "Couperose",
+    "target": "Blanche",
+    "flows": 1
+  },
+  {
+    "source": "Cinabre",
+    "target": "Broyé",
+    "flows": 1
+  },
+  {
+    "source": "Sel",
+    "target": "Marennes",
+    "flows": 21
+  },
+  {
+    "source": "Canons",
+    "target": "Feu",
+    "flows": 1
+  },
+  {
+    "source": "Feu",
+    "target": "Livres",
+    "flows": 1
+  },
+  {
+    "source": "Manne",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Chaudière",
+    "target": "Potin",
+    "flows": 1
+  },
+  {
+    "source": "Garance",
+    "target": "Commune",
+    "flows": 1
+  },
+  {
+    "source": "Miroirs",
+    "target": "Bordures",
+    "flows": 1
+  },
+  {
+    "source": "Bordures",
+    "target": "Dorées",
+    "flows": 1
+  },
+  {
+    "source": "Langues",
+    "target": "Fumées",
+    "flows": 2
+  },
+  {
+    "source": "Robes",
+    "target": "Chambre",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Rayée",
+    "flows": 1
+  },
+  {
+    "source": "Bas",
+    "target": "Ségovie",
+    "flows": 1
+  },
+  {
+    "source": "Cire",
+    "target": "Espagne",
+    "flows": 5
+  },
+  {
+    "source": "Peintures",
+    "target": "Communes",
+    "flows": 2
+  },
+  {
+    "source": "Serge",
+    "target": "Poitou",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Grandes",
+    "flows": 1
+  },
+  {
+    "source": "Grandes",
+    "target": "Borderies",
+    "flows": 1
+  },
+  {
+    "source": "Eau",
+    "target": "Rochefort",
+    "flows": 1
+  },
+  {
+    "source": "Brodés",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Poil",
+    "target": "Soie",
+    "flows": 2
+  },
+  {
+    "source": "Ferrements",
+    "target": "Sucre",
+    "flows": 1
+  },
+  {
+    "source": "Quincaillerie",
+    "target": "Fer",
+    "flows": 28
+  },
+  {
+    "source": "Antimoine",
+    "target": "Cru",
+    "flows": 2
+  },
+  {
+    "source": "Grai",
+    "target": "Gras",
+    "flows": 1
+  },
+  {
+    "source": "Chapeaux",
+    "target": "Nègre",
+    "flows": 33
+  },
+  {
+    "source": "Lin",
+    "target": "Garnies",
+    "flows": 3
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Imprimés",
+    "flows": 1
+  },
+  {
+    "source": "Vie",
+    "target": "Rochefort",
+    "flows": 20
+  },
+  {
+    "source": "Peaux",
+    "target": "Russie",
+    "flows": 7
+  },
+  {
+    "source": "Barbe",
+    "target": "Baleine",
+    "flows": 1
+  },
+  {
+    "source": "Velours",
+    "target": "Gênes",
+    "flows": 1
+  },
+  {
+    "source": "Selles",
+    "target": "Velours",
+    "flows": 14
+  },
+  {
+    "source": "Vie",
+    "target": "Oléron",
+    "flows": 3
+  },
+  {
+    "source": "Mitrailles",
+    "target": "Cuivre",
+    "flows": 2
+  },
+  {
+    "source": "Porcs",
+    "target": "Salés",
+    "flows": 2
+  },
+  {
+    "source": "Encre",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Commune",
+    "flows": 1
+  },
+  {
+    "source": "Commune",
+    "target": "Lille",
+    "flows": 1
+  },
+  {
+    "source": "Mouton",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Bonneterie",
+    "target": "Laine",
+    "flows": 17
+  },
+  {
+    "source": "Tabernacle",
+    "target": "Doré",
+    "flows": 1
+  },
+  {
+    "source": "Paver",
+    "target": "Pierre",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Sucre",
+    "flows": 2
+  },
+  {
+    "source": "Bassin",
+    "target": "Cuivre",
+    "flows": 9
+  },
+  {
+    "source": "Brodées",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Figue",
+    "target": "Raisin",
+    "flows": 1
+  },
+  {
+    "source": "Blanc",
+    "target": "Baleine",
+    "flows": 1
+  },
+  {
+    "source": "Bœuf",
+    "target": "Salé",
+    "flows": 133
+  },
+  {
+    "source": "Morceaux",
+    "target": "Sapin",
+    "flows": 2
+  },
+  {
+    "source": "Oléron",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Poêles",
+    "target": "Fer",
+    "flows": 3
+  },
+  {
+    "source": "Fer",
+    "target": "Feu",
+    "flows": 2
+  },
+  {
+    "source": "Coiffures",
+    "target": "Dentelles",
+    "flows": 1
+  },
+  {
+    "source": "Pommes",
+    "target": "Terre",
+    "flows": 2
+  },
+  {
+    "source": "Grains",
+    "target": "Millet",
+    "flows": 3
+  },
+  {
+    "source": "Housses",
+    "target": "Galonnées",
+    "flows": 2
+  },
+  {
+    "source": "Plomb",
+    "target": "Laminé",
+    "flows": 2
+  },
+  {
+    "source": "Manchettes",
+    "target": "Brodée",
+    "flows": 12
+  },
+  {
+    "source": "Fil",
+    "target": "Chanvre",
+    "flows": 3
+  },
+  {
+    "source": "Castor",
+    "target": "Gras",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Bluteaux",
+    "flows": 1
+  },
+  {
+    "source": "Meubles",
+    "target": "Coutelier",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Coulé",
+    "flows": 10
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Fonte",
+    "flows": 20
+  },
+  {
+    "source": "Liège",
+    "target": "Planches",
+    "flows": 4
+  },
+  {
+    "source": "Sel",
+    "target": "Olonne",
+    "flows": 2
+  },
+  {
+    "source": "Liège",
+    "target": "Bouchons",
+    "flows": 26
+  },
+  {
+    "source": "Orange",
+    "target": "Fraîche",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Bleu",
+    "flows": 8
+  },
+  {
+    "source": "Vin",
+    "target": "Languedoc",
+    "flows": 2
+  },
+  {
+    "source": "Cercles",
+    "target": "Feuillards",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Menuiserie",
+    "flows": 1
+  },
+  {
+    "source": "Cuisses",
+    "target": "Oie",
+    "flows": 23
+  },
+  {
+    "source": "Forme",
+    "target": "Soulier",
+    "flows": 3
+  },
+  {
+    "source": "Noir",
+    "target": "Noircir",
+    "flows": 2
+  },
+  {
+    "source": "Verrerie",
+    "target": "Bouteilles",
+    "flows": 3
+  },
+  {
+    "source": "Laine",
+    "target": "Coudre",
+    "flows": 1
+  },
+  {
+    "source": "Percale",
+    "target": "Bleue",
+    "flows": 1
+  },
+  {
+    "source": "Commerce",
+    "target": "France",
+    "flows": 1
+  },
+  {
+    "source": "France",
+    "target": "Indes",
+    "flows": 1
+  },
+  {
+    "source": "Gants",
+    "target": "Communs",
+    "flows": 6
+  },
+  {
+    "source": "Vin",
+    "target": "Champagne",
+    "flows": 32
+  },
+  {
+    "source": "Laine",
+    "target": "Fine",
+    "flows": 1
+  },
+  {
+    "source": "Poivre",
+    "target": "Giroflé",
+    "flows": 1
+  },
+  {
+    "source": "Poêles",
+    "target": "Feu",
+    "flows": 3
+  },
+  {
+    "source": "Soie",
+    "target": "Au",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Agen",
+    "flows": 1
+  },
+  {
+    "source": "Plumes",
+    "target": "Lit",
+    "flows": 2
+  },
+  {
+    "source": "Roulantes",
+    "target": "Avec",
+    "flows": 2
+  },
+  {
+    "source": "Avec",
+    "target": "Harnais",
+    "flows": 1
+  },
+  {
+    "source": "Poudre",
+    "target": "Feu",
+    "flows": 20
+  },
+  {
+    "source": "Livres",
+    "target": "Registres",
+    "flows": 1
+  },
+  {
+    "source": "Œufs",
+    "target": "Composition",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Canaries",
+    "flows": 2
+  },
+  {
+    "source": "Charbon",
+    "target": "Terre",
+    "flows": 38
+  },
+  {
+    "source": "Ocre",
+    "target": "Jaune",
+    "flows": 1
+  },
+  {
+    "source": "Salemporis",
+    "target": "Bleu",
+    "flows": 9
+  },
+  {
+    "source": "Plaques",
+    "target": "Cheminées",
+    "flows": 1
+  },
+  {
+    "source": "Cheminées",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Guacy",
+    "flows": 1
+  },
+  {
+    "source": "Ruban",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Sapin",
+    "flows": 1
+  },
+  {
+    "source": "Tapisserie",
+    "target": "Fausse",
+    "flows": 1
+  },
+  {
+    "source": "Fausse",
+    "target": "Toile",
+    "flows": 1
+  },
+  {
+    "source": "Velours",
+    "target": "Chine",
+    "flows": 1
+  },
+  {
+    "source": "Barils",
+    "target": "Neufs",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Flandre",
+    "flows": 1
+  },
+  {
+    "source": "Flandre",
+    "target": "Fin",
+    "flows": 1
+  },
+  {
+    "source": "Cuivre",
+    "target": "Brun",
+    "flows": 1
+  },
+  {
+    "source": "Amandes",
+    "target": "Douces",
+    "flows": 3
+  },
+  {
+    "source": "Fromage",
+    "target": "Commun",
+    "flows": 4
+  },
+  {
+    "source": "Blanche",
+    "target": "Ouvrée",
+    "flows": 6
+  },
+  {
+    "source": "Jouets",
+    "target": "Enfant",
+    "flows": 1
+  },
+  {
+    "source": "Capillaire",
+    "target": "Herbes",
+    "flows": 1
+  },
+  {
+    "source": "Fauteuils",
+    "target": "Tapisserie",
+    "flows": 1
+  },
+  {
+    "source": "Papier",
+    "target": "Lettre",
+    "flows": 1
+  },
+  {
+    "source": "Poudre",
+    "target": "Fers",
+    "flows": 1
+  },
+  {
+    "source": "Fèves",
+    "target": "Blanches",
+    "flows": 1
+  },
+  {
+    "source": "Bayette",
+    "target": "Bleue",
+    "flows": 1
+  },
+  {
+    "source": "Bleue",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Agrément",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Lodève",
+    "flows": 1
+  },
+  {
+    "source": "Huile",
+    "target": "Baleine",
+    "flows": 1
+  },
+  {
+    "source": "Vie",
+    "target": "Hendaye",
+    "flows": 1
+  },
+  {
+    "source": "Cordage",
+    "target": "Emballage",
+    "flows": 2
+  },
+  {
+    "source": "Noyer",
+    "target": "Pouce",
+    "flows": 1
+  },
+  {
+    "source": "Feuilles",
+    "target": "Cuivre",
+    "flows": 1
+  },
+  {
+    "source": "Clous",
+    "target": "Cuivre",
+    "flows": 1
+  },
+  {
+    "source": "Pantoufles",
+    "target": "Brodées",
+    "flows": 1
+  },
+  {
+    "source": "Bordés",
+    "target": "Or",
+    "flows": 2
+  },
+  {
+    "source": "Tabatières",
+    "target": "Garnies",
+    "flows": 1
+  },
+  {
+    "source": "Garnies",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Morue",
+    "target": "Pavé",
+    "flows": 1
+  },
+  {
+    "source": "Cordage",
+    "target": "Chanvre",
+    "flows": 11
+  },
+  {
+    "source": "Couteaux",
+    "target": "Traite",
+    "flows": 1
+  },
+  {
+    "source": "Confits",
+    "target": "Vinaigre",
+    "flows": 2
+  },
+  {
+    "source": "Pois",
+    "target": "Bourgogne",
+    "flows": 1
+  },
+  {
+    "source": "Sardines",
+    "target": "Apprêtées",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Laval",
+    "flows": 1
+  },
+  {
+    "source": "Étamine",
+    "target": "Amiens",
+    "flows": 1
+  },
+  {
+    "source": "Blanc",
+    "target": "Espagne",
+    "flows": 13
+  },
+  {
+    "source": "Tapis",
+    "target": "Coton",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Chamois",
+    "flows": 1
+  },
+  {
+    "source": "Noir",
+    "target": "Fumée",
+    "flows": 4
+  },
+  {
+    "source": "Aigrettes",
+    "target": "Fil",
+    "flows": 1
+  },
+  {
+    "source": "Terre",
+    "target": "Verte",
+    "flows": 1
+  },
+  {
+    "source": "Fléaux",
+    "target": "Fer",
+    "flows": 10
+  },
+  {
+    "source": "Ancres",
+    "target": "Fer",
+    "flows": 18
+  },
+  {
+    "source": "Peinte",
+    "target": "Française",
+    "flows": 1
+  },
+  {
+    "source": "Fleurs",
+    "target": "Souffre",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Pouldavid",
+    "flows": 1
+  },
+  {
+    "source": "Mouton",
+    "target": "Chamois",
+    "flows": 1
+  },
+  {
+    "source": "Marche",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Blanche",
+    "flows": 1
+  },
+  {
+    "source": "Cuivre",
+    "target": "Brut",
+    "flows": 6
+  },
+  {
+    "source": "Brut",
+    "target": "Rouge",
+    "flows": 1
+  },
+  {
+    "source": "Verres",
+    "target": "Cassés",
+    "flows": 1
+  },
+  {
+    "source": "Couvertures",
+    "target": "Nègre",
+    "flows": 2
+  },
+  {
+    "source": "Ceinturons",
+    "target": "Brodés",
+    "flows": 1
+  },
+  {
+    "source": "Brodés",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Indes",
+    "target": "Dits",
+    "flows": 1
+  },
+  {
+    "source": "Dits",
+    "target": "Romals",
+    "flows": 1
+  },
+  {
+    "source": "Garas",
+    "target": "Blanc",
+    "flows": 3
+  },
+  {
+    "source": "Drap",
+    "target": "Commun",
+    "flows": 7
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Marbre",
+    "flows": 2
+  },
+  {
+    "source": "Pipes",
+    "target": "Fumer",
+    "flows": 64
+  },
+  {
+    "source": "Mignonette",
+    "target": "Étoffe",
+    "flows": 4
+  },
+  {
+    "source": "Fumer",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Terre",
+    "flows": 6
+  },
+  {
+    "source": "Terre",
+    "target": "Cuite",
+    "flows": 6
+  },
+  {
+    "source": "Busquière",
+    "target": "Or",
+    "flows": 2
+  },
+  {
+    "source": "Busquière",
+    "target": "Argent",
+    "flows": 1
+  },
+  {
+    "source": "Caves",
+    "target": "Flacons",
+    "flows": 2
+  },
+  {
+    "source": "Gobelets",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Pelleterie",
+    "target": "Apprêtée",
+    "flows": 3
+  },
+  {
+    "source": "Garnies",
+    "target": "Homme",
+    "flows": 1
+  },
+  {
+    "source": "Couteaux",
+    "target": "Flamands",
+    "flows": 10
+  },
+  {
+    "source": "Carreaux",
+    "target": "Marbre",
+    "flows": 2
+  },
+  {
+    "source": "Huile",
+    "target": "Amande",
+    "flows": 1
+  },
+  {
+    "source": "Amande",
+    "target": "Douce",
+    "flows": 1
+  },
+  {
+    "source": "Café",
+    "target": "Avarié",
+    "flows": 1
+  },
+  {
+    "source": "Coton",
+    "target": "Juve",
+    "flows": 1
+  },
+  {
+    "source": "Chanvre",
+    "target": "Carreaux",
+    "flows": 2
+  },
+  {
+    "source": "Bois",
+    "target": "Santal",
+    "flows": 2
+  },
+  {
+    "source": "Santal",
+    "target": "Blanc",
+    "flows": 1
+  },
+  {
+    "source": "Peaux",
+    "target": "Corroyées",
+    "flows": 15
+  },
+  {
+    "source": "Corroyées",
+    "target": "Veau",
+    "flows": 15
+  },
+  {
+    "source": "Essieux",
+    "target": "Fer",
+    "flows": 4
+  },
+  {
+    "source": "Drogues",
+    "target": "Diverses",
+    "flows": 2
+  },
+  {
+    "source": "Diverses",
+    "target": "Médicinales",
+    "flows": 2
+  },
+  {
+    "source": "Sapin",
+    "target": "Pieds",
+    "flows": 1
+  },
+  {
+    "source": "Sel",
+    "target": "Nitre",
+    "flows": 1
+  },
+  {
+    "source": "Pattes",
+    "target": "Ancre",
+    "flows": 1
+  },
+  {
+    "source": "Vaisselle",
+    "target": "Étain",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Tapsel",
+    "flows": 1
+  },
+  {
+    "source": "Morilles",
+    "target": "Mousserons",
+    "flows": 1
+  },
+  {
+    "source": "Gants",
+    "target": "Soie",
+    "flows": 4
+  },
+  {
+    "source": "Outils",
+    "target": "Pêche",
+    "flows": 2
+  },
+  {
+    "source": "Verges",
+    "target": "Fer",
+    "flows": 7
+  },
+  {
+    "source": "Vestes",
+    "target": "Bordures",
+    "flows": 1
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Indienne",
+    "flows": 1
+  },
+  {
+    "source": "Carreaux",
+    "target": "Terre",
+    "flows": 7
+  },
+  {
+    "source": "Vin",
+    "target": "Rochelle",
+    "flows": 22
+  },
+  {
+    "source": "Guingan",
+    "target": "Pondichéry",
+    "flows": 6
+  },
+  {
+    "source": "Huile",
+    "target": "Anis",
+    "flows": 1
+  },
+  {
+    "source": "Vieux",
+    "target": "Oint",
+    "flows": 5
+  },
+  {
+    "source": "Vin",
+    "target": "Étranger",
+    "flows": 1
+  },
+  {
+    "source": "Bassin",
+    "target": "Étain",
+    "flows": 1
+  },
+  {
+    "source": "Housses",
+    "target": "Drap",
+    "flows": 1
+  },
+  {
+    "source": "Dents",
+    "target": "Morphil",
+    "flows": 1
+  },
+  {
+    "source": "Bleu",
+    "target": "Hollande",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Cholette",
+    "flows": 1
+  },
+  {
+    "source": "Gobelets",
+    "target": "Cristal",
+    "flows": 1
+  },
+  {
+    "source": "Grains",
+    "target": "Divers",
+    "flows": 3
+  },
+  {
+    "source": "Verres",
+    "target": "Boire",
+    "flows": 41
+  },
+  {
+    "source": "Merrains",
+    "target": "Pipes",
+    "flows": 2
+  },
+  {
+    "source": "Apprêtées",
+    "target": "Cheval",
+    "flows": 2
+  },
+  {
+    "source": "Mèches",
+    "target": "Canons",
+    "flows": 3
+  },
+  {
+    "source": "Drap",
+    "target": "Glouster",
+    "flows": 1
+  },
+  {
+    "source": "Sel",
+    "target": "Teint",
+    "flows": 1
+  },
+  {
+    "source": "Vestes",
+    "target": "Drap",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Brodées",
+    "flows": 1
+  },
+  {
+    "source": "Brodées",
+    "target": "Or",
+    "flows": 1
+  },
+  {
+    "source": "Broutes",
+    "target": "Chaderdoral",
+    "flows": 1
+  },
+  {
+    "source": "Ancres",
+    "target": "Gravelées",
+    "flows": 1
+  },
+  {
+    "source": "Coffres",
+    "target": "Forts",
+    "flows": 1
+  },
+  {
+    "source": "Forts",
+    "target": "Fer",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Corail",
+    "flows": 18
+  },
+  {
+    "source": "Étoffe",
+    "target": "Mi",
+    "flows": 8
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Osier",
+    "flows": 2
+  },
+  {
+    "source": "Camelot",
+    "target": "Laine",
+    "flows": 32
+  },
+  {
+    "source": "Vin",
+    "target": "Divers",
+    "flows": 4
+  },
+  {
+    "source": "Lin",
+    "target": "Rousse",
+    "flows": 3
+  },
+  {
+    "source": "Vin",
+    "target": "Muscat",
+    "flows": 9
+  },
+  {
+    "source": "Carreaux",
+    "target": "Lin",
+    "flows": 1
+  },
+  {
+    "source": "Fil",
+    "target": "Forme",
+    "flows": 1
+  },
+  {
+    "source": "Peau",
+    "target": "Complets",
+    "flows": 1
+  },
+  {
+    "source": "Jeannes",
+    "target": "Verre",
+    "flows": 7
+  },
+  {
+    "source": "Camelot",
+    "target": "Soie",
+    "flows": 7
+  },
+  {
+    "source": "Citrons",
+    "target": "Confits",
+    "flows": 4
+  },
+  {
+    "source": "Fer",
+    "target": "Dhipsium",
+    "flows": 1
+  },
+  {
+    "source": "Tapis",
+    "target": "Guinée",
+    "flows": 1
+  },
+  {
+    "source": "Barriques",
+    "target": "Vides",
+    "flows": 5
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Modes",
+    "flows": 1
+  },
+  {
+    "source": "Terre",
+    "target": "Limousin",
+    "flows": 1
+  },
+  {
+    "source": "Fourreaux",
+    "target": "Épée",
+    "flows": 1
+  },
+  {
+    "source": "Ouvrages",
+    "target": "Fer",
+    "flows": 50
+  },
+  {
+    "source": "Sabots",
+    "target": "Selles",
+    "flows": 2
+  },
+  {
+    "source": "Selles",
+    "target": "Bois",
+    "flows": 2
+  },
+  {
+    "source": "Coutellerie",
+    "target": "Argenterie",
+    "flows": 1
+  },
+  {
+    "source": "Cabinet",
+    "target": "Noyer",
+    "flows": 1
+  },
+  {
+    "source": "Indes",
+    "target": "Indes",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Sanas",
+    "flows": 1
+  },
+  {
+    "source": "Sanas",
+    "target": "Lustrée",
+    "flows": 1
+  },
+  {
+    "source": "Cuirs",
+    "target": "Russie",
+    "flows": 19
+  },
+  {
+    "source": "Assiette",
+    "target": "Plats",
+    "flows": 1
+  },
+  {
+    "source": "Plats",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Poudre",
+    "target": "Ailhaud",
+    "flows": 1
+  },
+  {
+    "source": "Outils",
+    "target": "Charpentier",
+    "flows": 1
+  },
+  {
+    "source": "Chemises",
+    "target": "Fumer",
+    "flows": 1
+  },
+  {
+    "source": "Avec",
+    "target": "Leur",
+    "flows": 1
+  },
+  {
+    "source": "Leur",
+    "target": "Train",
+    "flows": 1
+  },
+  {
+    "source": "Droguet",
+    "target": "Laine",
+    "flows": 2
+  },
+  {
+    "source": "Cuivre",
+    "target": "Vieux",
+    "flows": 2
+  },
+  {
+    "source": "Camelot",
+    "target": "Burail",
+    "flows": 1
+  },
+  {
+    "source": "Bourses",
+    "target": "Cheveux",
+    "flows": 4
+  },
+  {
+    "source": "Planches",
+    "target": "Plomb",
+    "flows": 1
+  },
+  {
+    "source": "Bonnets",
+    "target": "Laine",
+    "flows": 7
+  },
+  {
+    "source": "Bœuf",
+    "target": "Tannés",
+    "flows": 14
+  },
+  {
+    "source": "Toile",
+    "target": "Clisson",
+    "flows": 1
+  },
+  {
+    "source": "Lin",
+    "target": "Blanche",
+    "flows": 6
+  },
+  {
+    "source": "Cannettes",
+    "target": "Terre",
+    "flows": 1
+  },
+  {
+    "source": "Chanvre",
+    "target": "Voile",
+    "flows": 2
+  },
+  {
+    "source": "Manches",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Bois",
+    "target": "Gaffes",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Doux",
+    "flows": 5
+  },
+  {
+    "source": "Épicerie",
+    "target": "Fine",
+    "flows": 6
+  },
+  {
+    "source": "Ceinturons",
+    "target": "Soie",
+    "flows": 1
+  },
+  {
+    "source": "Alun",
+    "target": "Gâté",
+    "flows": 1
+  },
+  {
+    "source": "Fer",
+    "target": "Noir",
+    "flows": 4
+  },
+  {
+    "source": "Toile",
+    "target": "Rousse",
+    "flows": 4
+  },
+  {
+    "source": "Écaille",
+    "target": "Tortue",
+    "flows": 4
+  },
+  {
+    "source": "Cercles",
+    "target": "Bois",
+    "flows": 39
+  },
+  {
+    "source": "Soufflets",
+    "target": "Feu",
+    "flows": 1
+  },
+  {
+    "source": "Brai",
+    "target": "Sec",
+    "flows": 43
+  },
+  {
+    "source": "Quincaillerie",
+    "target": "Acier",
+    "flows": 17
+  },
+  {
+    "source": "Castor",
+    "target": "Fins",
+    "flows": 1
+  },
+  {
+    "source": "Cuirs",
+    "target": "Forts",
+    "flows": 3
+  },
+  {
+    "source": "Forts",
+    "target": "Tannés",
+    "flows": 3
+  },
+  {
+    "source": "Fer",
+    "target": "Traite",
+    "flows": 1
+  },
+  {
+    "source": "Bordés",
+    "target": "Castor",
+    "flows": 4
+  },
+  {
+    "source": "Douelles",
+    "target": "Pipes",
+    "flows": 9
+  },
+  {
+    "source": "Poisson",
+    "target": "Salé",
+    "flows": 5
+  },
+  {
+    "source": "Mouchoirs",
+    "target": "Fil",
+    "flows": 10
+  },
+  {
+    "source": "Perches",
+    "target": "Bois",
+    "flows": 1
+  },
+  {
+    "source": "Futailles",
+    "target": "Vides",
+    "flows": 7
+  },
+  {
+    "source": "Roues",
+    "target": "Brouette",
+    "flows": 2
+  },
+  {
+    "source": "Raz",
+    "target": "Laine",
+    "flows": 1
+  },
+  {
+    "source": "Boules",
+    "target": "Terres",
+    "flows": 1
+  },
+  {
+    "source": "Drap",
+    "target": "Languedoc",
+    "flows": 9
+  },
+  {
+    "source": "Gingembre",
+    "target": "Confit",
+    "flows": 1
+  },
+  {
+    "source": "Merrains",
+    "target": "Barriques",
+    "flows": 2
+  },
+  {
+    "source": "Fanal",
+    "target": "Vaisseaux",
+    "flows": 1
+  },
+  {
+    "source": "Sabres",
+    "target": "Traite",
+    "flows": 1
+  },
+  {
+    "source": "Sucre",
+    "target": "Raffiné",
+    "flows": 3
+  },
+  {
+    "source": "Vaisselle",
+    "target": "Faïence",
+    "flows": 11
+  },
+  {
+    "source": "Sapin",
+    "target": "Commun",
+    "flows": 2
+  },
+  {
+    "source": "Tapis",
+    "target": "Aubusson",
+    "flows": 1
+  },
+  {
+    "source": "Écarlatine",
+    "target": "Beauvais",
+    "flows": 1
+  },
+  {
+    "source": "Toile",
+    "target": "Linge",
+    "flows": 3
+  },
+  {
+    "source": "Linge",
+    "target": "Tables",
+    "flows": 3
+  },
+  {
+    "source": "Lit",
+    "target": "Ayant",
+    "flows": 1
+  },
+  {
+    "source": "Crée",
+    "target": "Margé",
+    "flows": 1
+  },
+  {
+    "source": "Vin",
+    "target": "Bourgogne",
+    "flows": 4
+  }
+]
