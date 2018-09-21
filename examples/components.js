@@ -7,11 +7,6 @@ import WebGLRenderer from '../src/renderers/webgl';
 
 import data from './resources/toflit.json';
 
-// TODO: function returning sub-graph
-// TODO: function returning optimal FA2 settings
-// TODO: forEach iterator on graph
-// TODO: outbound iterators
-
 const scale = (d) => Math.max(2, Math.log2(d) * 1.7);
 
 document.body.innerHTML += `
