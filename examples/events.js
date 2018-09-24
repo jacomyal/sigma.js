@@ -48,6 +48,10 @@ const renderer = new WebGLRenderer(graph, container, {
   zIndex: true
 });
 
+renderer.on('clickNode', ({node}) => {
+  console.log(graph.getNodeAttribute(node, 'label'));
+});
+
 renderer.on('overNode', ({node}) => {
   if (highlighedNodes.has(node))
     return;
