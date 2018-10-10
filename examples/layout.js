@@ -45,8 +45,8 @@ console.timeEnd('Edge Attributes');
 
 const renderer = new WebGLRenderer(graph, container);
 
-const layout = new FA2Layout(graph);
-layout.start({settings: {barnesHutOptimize: true}});
+const layout = new FA2Layout(graph, {settings: {barnesHutOptimize: true}});
+layout.start();
 
 window.graph = graph;
 window.renderer = renderer;
