@@ -1065,6 +1065,17 @@ export default class WebGLRenderer extends Renderer {
     this.previousVisibleNodes = null;
     this.displayedLabels = null;
 
+    // Clearing frames
+    if (this.renderFrame) {
+      cancelAnimationFrame(this.renderFrame);
+      this.renderFrame = null;
+    }
+
+    if (this.renderHighlightedNodesFrame) {
+      cancelAnimationFrame(this.renderHighlightedNodesFrame);
+      this.renderHighlightedNodesFrame = null;
+    }
+
     // Destroying canvases
     const container = this.container;
 
