@@ -37,7 +37,8 @@
     "@yomguithereal/helpers": "^1.0.0",
     "events": "^3.0.0",
     "graphology-metrics": "1.6.0",
-    "graphology-utils": "^1.4.0"
+    "graphology-utils": "^1.4.0",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
