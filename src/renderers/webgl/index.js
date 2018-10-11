@@ -19,6 +19,10 @@ import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
 
 import {
+  assign
+} from '../../utils';
+
+import {
   createElement,
   getPixelRatio,
   createNormalizationFunction
@@ -53,12 +57,13 @@ const DEFAULT_SETTINGS = {
   renderLabels: true,
 
   // Component rendering
-  // TODO: nest into components:
   defaultNodeColor: '#999',
   defaultEdgeColor: '#ccc',
   labelFont: 'Arial',
   labelSize: 14,
   labelWeight: 'normal',
+
+  // Reducers
   nodeReducer: null,
   edgeReducer: null,
 
