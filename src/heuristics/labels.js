@@ -51,7 +51,7 @@ function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
  * @param  {Graph}    graph                - The rendered graph.
  * @return {Array}                         - The selected labels.
  */
-exports.labelsToDisplayFromGrid = function(params) {
+export function labelsToDisplayFromGrid(params) {
   const {
     cache,
     camera,

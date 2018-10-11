@@ -14,7 +14,7 @@
  * @param  {array}    elements - The array to sort.
  * @return {array} - The sorted array.
  */
-exports.zIndexOrdering = function(extent, getter, elements) {
+export function zIndexOrdering(extent, getter, elements) {
   // const n = elements.length;
 
   // const [min, max] = extent;

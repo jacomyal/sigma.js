@@ -10,6 +10,7 @@ shaders.forEach(function(p) {
 });
 
 module.exports = {
+  mode: 'production',
   entry: entry,
   output: {
     path: path.join(__dirname, 'renderers', 'webgl', 'shaders'),

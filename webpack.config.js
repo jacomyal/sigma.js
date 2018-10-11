@@ -20,6 +20,7 @@ var moduleConfig = {
 module.exports = [
   {
     name: 'sigma',
+    mode: 'production',
     entry: './src/endpoint.js',
     output: {
       filename: production ? 'sigma.min.js' : 'sigma.js',
@@ -31,6 +32,7 @@ module.exports = [
   },
   {
     name: 'sigma-graphology',
+    mode: 'production',
     entry: './src/sigma-graphology.js',
     output: {
       filename: production ? 'sigma-graphology.min.js' : 'sigma-graphology.js',

@@ -44,11 +44,6 @@ const EXAMPLES = {
 const entry = {};
 
 const plugins = [
-  new webpack.optimize.CommonsChunkPlugin({
-      name: 'commons',
-      filename: 'commons.bundle.js',
-      minChunks: 2
-  }),
   new HtmlWebpackPlugin({
     filename: 'index.html',
     title: 'Sigma.js - Examples',
@@ -72,6 +67,7 @@ for (const key in EXAMPLES) {
 }
 
 module.exports = {
+  mode: 'development',
   context: __dirname,
   entry,
   output: {
@@ -89,15 +85,16 @@ module.exports = {
         test: /\.(?:glsl|gexf)$/,
         exclude: /node_modules/,
         loader: 'raw-loader'
-      },
-      {
-        test: /\.worker\.js$/,
-        exclude: /node_modules/,
-        loader: 'worker-loader'
       }
     ]
   },
   plugins,
+  optimization: {
+    splitChunks: {
+      minChunks: 2,
+      name: 'commons'
+    }
+  },
   devServer: {
     port: 8000
   }
