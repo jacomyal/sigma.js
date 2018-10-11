@@ -4,7 +4,6 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
-import defaultsDeep from 'lodash/defaultsDeep';
 import {nodeExtent, edgeExtent} from 'graphology-metrics/extent';
 import isGraph from 'graphology-utils/is-graph';
 
@@ -79,7 +78,9 @@ export default class WebGLRenderer extends Renderer {
   constructor(graph, container, settings) {
     super();
 
-    this.settings = defaultsDeep(settings, DEFAULT_SETTINGS);
+    settings = settings || {};
+
+    this.settings = assign({}, DEFAULT_SETTINGS, settings);
 
     // Validating
     if (!isGraph(graph))
