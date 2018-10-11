@@ -20,10 +20,6 @@ import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
 
 import {
-  assign
-} from '../../utils';
-
-import {
   createElement,
   getPixelRatio,
   createNormalizationFunction

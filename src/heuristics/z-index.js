@@ -39,4 +39,4 @@ export function zIndexOrdering(extent, getter, elements) {
   });
 
   // TODO: counting sort optimization
-};
+}

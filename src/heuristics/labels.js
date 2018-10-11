@@ -281,4 +281,4 @@ export function labelsToDisplayFromGrid(params) {
   // console.log(collisions)
 
   return worthyLabels.filter(l => !collisions.has(l));
-};
+}
