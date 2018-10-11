@@ -376,9 +376,10 @@ export default class WebGLRenderer extends Renderer {
         const size = data.size / sizeRatio;
 
         if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
+          const node = this.hoveredNode;
           this.hoveredNode = null;
 
-          this.emit('outNode', {node: this.hoveredNode});
+          this.emit('outNode', {node});
           return this.scheduleHighlightedNodesRender();
         }
       }

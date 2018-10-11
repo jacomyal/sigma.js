@@ -64,7 +64,9 @@ renderer.on('overNode', ({node}) => {
   renderer.refresh();
 });
 
-renderer.on('outNode', () => {
+renderer.on('outNode', ({node}) => {
+  console.log(node);
+
   highlighedNodes.clear();
   highlighedEdges.clear();
 
