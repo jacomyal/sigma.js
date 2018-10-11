@@ -357,9 +357,9 @@ export default class WebGLRenderer extends Renderer {
         }
       }
 
-      if (nodeToHover) {
+      if (nodeToHover && this.hoveredNode !== nodeToHover) {
         this.hoveredNode = nodeToHover;
-        this.emit('overNode', {node: nodeToHover});
+        this.emit('enterNode', {node: nodeToHover});
         return this.scheduleHighlightedNodesRender();
       }
 
@@ -379,33 +379,9 @@ export default class WebGLRenderer extends Renderer {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
-          this.emit('outNode', {node});
+          this.emit('leaveNode', {node});
           return this.scheduleHighlightedNodesRender();
         }
-      }
-    };
-
-    // Handling down
-    this.listeners.handleDown = e => {
-      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
-
-      const quadNodes = getQuadNodes(e.x, e.y);
-
-      for (let i = 0, l = quadNodes.length; i < l; i++) {
-        const node = quadNodes[i];
-
-        const data = this.nodeDataCache[node];
-
-        const pos = this.camera.graphToViewport(
-          this,
-          data.x,
-          data.y
-        );
-
-        const size = data.size / sizeRatio;
-
-        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
-          return this.emit('downNode', {node});
       }
     };
 
@@ -435,9 +411,7 @@ export default class WebGLRenderer extends Renderer {
       return this.emit('clickStage');
     };
 
-    // TODO: optimize, we don't need to repeat collisions
     this.captors.mouse.on('mousemove', this.listeners.handleMove);
-    this.captors.mouse.on('mousedown', this.listeners.handleDown);
     this.captors.mouse.on('click', this.listeners.handleClick);
 
     return this;

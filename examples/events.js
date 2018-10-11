@@ -49,13 +49,15 @@ const renderer = new WebGLRenderer(graph, container, {
 });
 
 renderer.on('clickNode', ({node}) => {
-  console.log(graph.getNodeAttribute(node, 'label'));
+  console.log('Clicking:', node);
 });
 
-renderer.on('overNode', ({node}) => {
-  if (highlighedNodes.has(node))
-    return;
+renderer.on('clickStage', () => {
+  console.log('Clicking the stage.');
+});
 
+renderer.on('enterNode', ({node}) => {
+  console.log('Entering: ', node);
   highlighedNodes = new Set(graph.neighbors(node));
   highlighedNodes.add(node);
 
@@ -64,8 +66,8 @@ renderer.on('overNode', ({node}) => {
   renderer.refresh();
 });
 
-renderer.on('outNode', ({node}) => {
-  console.log(node);
+renderer.on('leaveNode', ({node}) => {
+  console.log('Leaving:', node);
 
   highlighedNodes.clear();
   highlighedEdges.clear();
