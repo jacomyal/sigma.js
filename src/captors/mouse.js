@@ -107,7 +107,9 @@ export default class MouseCaptor extends Captor {
       this.doubleClickTimeout = null;
     }, DOUBLE_CLICK_TIMEOUT);
 
-    this.emit('click', getMouseCoords(e));
+    // NOTE: this is here to prevent click events on drag
+    if (!this.hasDragged)
+      this.emit('click', getMouseCoords(e));
   }
 
   handleDoubleClick(e) {
@@ -222,7 +224,7 @@ export default class MouseCaptor extends Captor {
     }
 
     this.isMoving = false;
-    this.hasDragged = false;
+    setImmediate(() => (this.hasDragged = false));
     this.emit('mouseup', getMouseCoords(e));
   }
 

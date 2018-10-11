@@ -749,7 +749,7 @@ export default class WebGLRenderer extends Renderer {
       this.needToSoftProcess = false;
     }
 
-    // TODO: improve this heuristic
+    // TODO: improve this heuristic or move to the captor itself?
     const moving = (
       this.camera.isAnimated() ||
       this.captors.mouse.isMoving ||
