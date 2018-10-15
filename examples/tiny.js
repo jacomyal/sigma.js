@@ -23,7 +23,7 @@ graph.addNode('Truman', {
 
 graph.addEdge('Jessica', 'Truman', {
   color: '#CCC',
-  size: 50
+  size: 1
 });
 
 const renderer = new WebGLRenderer(graph, container);

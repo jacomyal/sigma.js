@@ -13,7 +13,7 @@ uniform float u_scale;
 varying vec4 v_color;
 // varying vec3 v_barycentric;
 
-const float arrow_ratio = 0.6;
+const float arrow_ratio = 0.66;
 const float bias = 255.0 / 254.0;
 
 void main() {
@@ -24,7 +24,7 @@ void main() {
 
   float pow_ratio = 1.0 / pow(u_ratio, 0.5) * 2.0;
   float radius = (a_radius - 1.0) * pow_ratio;
-  float thickness = a_thickness * pow_ratio;
+  float thickness = a_thickness * pow_ratio / u_scale;
   float width = arrow_ratio * thickness / 2.0;
 
   vec2 delta = vec2(
