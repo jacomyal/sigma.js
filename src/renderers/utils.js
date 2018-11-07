@@ -62,14 +62,17 @@ export function createNormalizationFunction(extent) {
     y: [minY, maxY]
   } = extent;
 
-  const ratio = Math.max(maxX - minX, maxY - minY);
+  let fn;
 
-  // TODO: test 0 nodes, 1 node, several perfectly aligned nodes
+  let ratio = Math.max(maxX - minX, maxY - minY);
+
+  if (ratio === 0)
+    ratio = 1;
 
   const dX = (maxX + minX) / 2,
         dY = (maxY + minY) / 2;
 
-  const fn = data => {
+  fn = data => {
     return {
       x: 0.5 + (data.x - dX) / ratio,
       y: 0.5 + (data.y - dY) / ratio
