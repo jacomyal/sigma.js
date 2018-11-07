@@ -749,6 +749,10 @@ export default class WebGLRenderer extends Renderer {
       this.needToSoftProcess = false;
     }
 
+    // If we have no nodes we can stop right there
+    if (!this.graph.order)
+      return this;
+
     // TODO: improve this heuristic or move to the captor itself?
     const moving = (
       this.camera.isAnimated() ||
