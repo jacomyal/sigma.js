@@ -28,7 +28,7 @@ function loadShader(type, gl, source) {
     const infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error(`sigma/renderers/weblg/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`);
+    throw new Error(`sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`);
   }
 
   return shader;
@@ -59,7 +59,7 @@ export function loadProgram(gl, shaders) {
   if (!successfullyLinked) {
 
     gl.deleteProgram(program);
-    throw new Error('sigma/renderers/weblg/shaders/utils.loadProgram: error while linking the program.');
+    throw new Error('sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.');
   }
 
   return program;
