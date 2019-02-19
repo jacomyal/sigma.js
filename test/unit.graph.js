@@ -266,17 +266,13 @@ QUnit.test("Basic manipulation", assert => {
 
   myGraph.dropEdge("e4");
   assert.deepEqual(
-    myGraph.edges().map(function(e) {
-      return e.id;
-    }),
+    myGraph.edges().map(e => e.id),
     ["e2", "e3"],
     '"dropEdge" with a self loops works. (#286)'
   );
 
   assert.throws(
-    function() {
-      myGraph.dropEdge("e1");
-    },
+    () => myGraph.dropEdge("e1"),
     /The edge "e1" does not exist./,
     "Droping an unexisting edge throws an error."
   );
@@ -315,9 +311,8 @@ QUnit.test("Methods and attached functions", assert => {
   counter = 0;
   sigma.classes.graph.attach("addNode", "counterInc", () => counter++);
 
-  sigma.classes.graph.attachBefore("addNode", "applyNodeColorPalette", function(
-    n
-  ) {
+  sigma.classes.graph.attachBefore("addNode", "applyNodeColorPalette", n => {
+    // eslint-disable-next-line no-param-reassign
     n.color = colorPalette[n.category];
   });
 
@@ -327,7 +322,7 @@ QUnit.test("Methods and attached functions", assert => {
     "sigma.classes.hasMethod returns false if the method does not exist."
   );
 
-  sigma.classes.graph.addMethod("getNodeLabel", function(nId) {
+  sigma.classes.graph.addMethod("getNodeLabel", function getNodeLabel(nId) {
     return (this.nodesIndex[nId] || {}).label;
   });
 
