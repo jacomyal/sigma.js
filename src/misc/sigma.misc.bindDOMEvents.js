@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -14,8 +12,9 @@
    * It has to be called in the scope of the related renderer.
    */
   sigma.misc.bindDOMEvents = function(container) {
-    var self = this,
-      graph = this.graph;
+    const self = this;
+
+    const graph = this.graph;
 
     // DOMElement abstraction
     function Element(domElement) {
@@ -31,15 +30,15 @@
 
       // Methods
       this.isNode = function() {
-        return !!~this.class.indexOf(self.settings("classPrefix") + "-node");
+        return !!~this.class.indexOf(`${self.settings("classPrefix")}-node`);
       };
 
       this.isEdge = function() {
-        return !!~this.class.indexOf(self.settings("classPrefix") + "-edge");
+        return !!~this.class.indexOf(`${self.settings("classPrefix")}-edge`);
       };
 
       this.isHover = function() {
-        return !!~this.class.indexOf(self.settings("classPrefix") + "-hover");
+        return !!~this.class.indexOf(`${self.settings("classPrefix")}-hover`);
       };
     }
 
@@ -51,7 +50,7 @@
       self.dispatchEvent("click", e);
 
       // Are we on a node?
-      var element = new Element(e.target);
+      const element = new Element(e.target);
 
       if (element.isNode())
         self.dispatchEvent("clickNode", {
@@ -71,7 +70,7 @@
       self.dispatchEvent("doubleClick", e);
 
       // Are we on a node?
-      var element = new Element(e.target);
+      const element = new Element(e.target);
 
       if (element.isNode())
         self.dispatchEvent("doubleClickNode", {
@@ -85,20 +84,20 @@
 
     // On over
     function onOver(e) {
-      var target = e.toElement || e.target;
+      const target = e.toElement || e.target;
 
       if (!self.settings("eventsEnabled") || !target) return;
 
-      var el = new Element(target);
+      const el = new Element(target);
 
       if (el.isNode()) {
         self.dispatchEvent("overNode", {
           node: graph.nodes(el.attr("data-node-id"))
         });
       } else if (el.isEdge()) {
-        var edge = graph.edges(el.attr("data-edge-id"));
+        const edge = graph.edges(el.attr("data-edge-id"));
         self.dispatchEvent("overEdge", {
-          edge: edge,
+          edge,
           source: graph.nodes(edge.source),
           target: graph.nodes(edge.target)
         });
@@ -107,20 +106,20 @@
 
     // On out
     function onOut(e) {
-      var target = e.fromElement || e.originalTarget;
+      const target = e.fromElement || e.originalTarget;
 
       if (!self.settings("eventsEnabled")) return;
 
-      var el = new Element(target);
+      const el = new Element(target);
 
       if (el.isNode()) {
         self.dispatchEvent("outNode", {
           node: graph.nodes(el.attr("data-node-id"))
         });
       } else if (el.isEdge()) {
-        var edge = graph.edges(el.attr("data-edge-id"));
+        const edge = graph.edges(el.attr("data-edge-id"));
         self.dispatchEvent("outEdge", {
-          edge: edge,
+          edge,
           source: graph.nodes(edge.source),
           target: graph.nodes(edge.target)
         });

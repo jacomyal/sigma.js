@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -13,19 +11,21 @@
    * @param {?string} writePrefix The write prefix.
    */
   sigma.middlewares.copy = function(readPrefix, writePrefix) {
-    var i, l, a;
+    let i;
+    let l;
+    let a;
 
-    if (writePrefix + "" === readPrefix + "") return;
+    if (`${writePrefix}` === `${readPrefix}`) return;
 
     a = this.graph.nodes();
     for (i = 0, l = a.length; i < l; i++) {
-      a[i][writePrefix + "x"] = a[i][readPrefix + "x"];
-      a[i][writePrefix + "y"] = a[i][readPrefix + "y"];
-      a[i][writePrefix + "size"] = a[i][readPrefix + "size"];
+      a[i][`${writePrefix}x`] = a[i][`${readPrefix}x`];
+      a[i][`${writePrefix}y`] = a[i][`${readPrefix}y`];
+      a[i][`${writePrefix}size`] = a[i][`${readPrefix}size`];
     }
 
     a = this.graph.edges();
     for (i = 0, l = a.length; i < l; i++)
-      a[i][writePrefix + "size"] = a[i][readPrefix + "size"];
+      a[i][`${writePrefix}size`] = a[i][`${readPrefix}size`];
   };
 }.call(this));

@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   sigma.utils.pkg("sigma.classes");
@@ -24,10 +22,10 @@
       value: id
     });
     Object.defineProperty(this, "readPrefix", {
-      value: "read_cam" + id + ":"
+      value: `read_cam${id}:`
     });
     Object.defineProperty(this, "prefix", {
-      value: "cam" + id + ":"
+      value: `cam${id}:`
     });
 
     this.x = 0;
@@ -50,16 +48,19 @@
   sigma.classes.camera.prototype.goTo = function(coordinates) {
     if (!this.settings("enableCamera")) return this;
 
-    var i,
-      l,
-      c = coordinates || {},
-      keys = ["x", "y", "ratio", "angle"];
+    let i;
+
+    let l;
+
+    const c = coordinates || {};
+
+    const keys = ["x", "y", "ratio", "angle"];
 
     for (i = 0, l = keys.length; i < l; i++)
       if (c[keys[i]] !== undefined) {
         if (typeof c[keys[i]] === "number" && !isNaN(c[keys[i]]))
           this[keys[i]] = c[keys[i]];
-        else throw 'Value for "' + keys[i] + '" is not a number.';
+        else throw `Value for "${keys[i]}" is not a number.`;
       }
 
     this.dispatchEvent("coordinatesUpdated");
@@ -89,34 +90,45 @@
     write = write !== undefined ? write : this.prefix;
     read = read !== undefined ? read : this.readPrefix;
 
-    var nodes = options.nodes || this.graph.nodes(),
-      edges = options.edges || this.graph.edges();
+    const nodes = options.nodes || this.graph.nodes();
 
-    var i,
-      l,
-      node,
-      relCos = Math.cos(this.angle) / this.ratio,
-      relSin = Math.sin(this.angle) / this.ratio,
-      nodeRatio = Math.pow(this.ratio, this.settings("nodesPowRatio")),
-      edgeRatio = Math.pow(this.ratio, this.settings("edgesPowRatio")),
-      xOffset = (options.width || 0) / 2 - this.x * relCos - this.y * relSin,
-      yOffset = (options.height || 0) / 2 - this.y * relCos + this.x * relSin;
+    const edges = options.edges || this.graph.edges();
+
+    let i;
+
+    let l;
+
+    let node;
+
+    const relCos = Math.cos(this.angle) / this.ratio;
+
+    const relSin = Math.sin(this.angle) / this.ratio;
+
+    const nodeRatio = Math.pow(this.ratio, this.settings("nodesPowRatio"));
+
+    const edgeRatio = Math.pow(this.ratio, this.settings("edgesPowRatio"));
+
+    const xOffset =
+      (options.width || 0) / 2 - this.x * relCos - this.y * relSin;
+
+    const yOffset =
+      (options.height || 0) / 2 - this.y * relCos + this.x * relSin;
 
     for (i = 0, l = nodes.length; i < l; i++) {
       node = nodes[i];
-      node[write + "x"] =
-        (node[read + "x"] || 0) * relCos +
-        (node[read + "y"] || 0) * relSin +
+      node[`${write}x`] =
+        (node[`${read}x`] || 0) * relCos +
+        (node[`${read}y`] || 0) * relSin +
         xOffset;
-      node[write + "y"] =
-        (node[read + "y"] || 0) * relCos -
-        (node[read + "x"] || 0) * relSin +
+      node[`${write}y`] =
+        (node[`${read}y`] || 0) * relCos -
+        (node[`${read}x`] || 0) * relSin +
         yOffset;
-      node[write + "size"] = (node[read + "size"] || 0) / nodeRatio;
+      node[`${write}size`] = (node[`${read}size`] || 0) / nodeRatio;
     }
 
     for (i = 0, l = edges.length; i < l; i++) {
-      edges[i][write + "size"] = (edges[i][read + "size"] || 0) / edgeRatio;
+      edges[i][`${write}size`] = (edges[i][`${read}size`] || 0) / edgeRatio;
     }
 
     return this;
@@ -133,10 +145,13 @@
    * @return {object}   The point coordinates in the frame of the graph.
    */
   sigma.classes.camera.prototype.graphPosition = function(x, y, vector) {
-    var X = 0,
-      Y = 0,
-      cos = Math.cos(this.angle),
-      sin = Math.sin(this.angle);
+    let X = 0;
+
+    let Y = 0;
+
+    const cos = Math.cos(this.angle);
+
+    const sin = Math.sin(this.angle);
 
     // Revert the origin differential vector:
     if (!vector) {
@@ -161,10 +176,13 @@
    * @return {object}   The point coordinates in the frame of the camera.
    */
   sigma.classes.camera.prototype.cameraPosition = function(x, y, vector) {
-    var X = 0,
-      Y = 0,
-      cos = Math.cos(this.angle),
-      sin = Math.sin(this.angle);
+    let X = 0;
+
+    let Y = 0;
+
+    const cos = Math.cos(this.angle);
+
+    const sin = Math.sin(this.angle);
 
     // Revert the origin differential vector:
     if (!vector) {
@@ -186,13 +204,16 @@
    * @return {array} The transformation matrix.
    */
   sigma.classes.camera.prototype.getMatrix = function() {
-    var scale = sigma.utils.matrices.scale(1 / this.ratio),
-      rotation = sigma.utils.matrices.rotation(this.angle),
-      translation = sigma.utils.matrices.translation(-this.x, -this.y),
-      matrix = sigma.utils.matrices.multiply(
-        translation,
-        sigma.utils.matrices.multiply(rotation, scale)
-      );
+    const scale = sigma.utils.matrices.scale(1 / this.ratio);
+
+    const rotation = sigma.utils.matrices.rotation(this.angle);
+
+    const translation = sigma.utils.matrices.translation(-this.x, -this.y);
+
+    const matrix = sigma.utils.matrices.multiply(
+      translation,
+      sigma.utils.matrices.multiply(rotation, scale)
+    );
 
     return matrix;
   };
@@ -211,11 +232,15 @@
    *                         two opposite points.
    */
   sigma.classes.camera.prototype.getRectangle = function(width, height) {
-    var widthVect = this.cameraPosition(width, 0, true),
-      heightVect = this.cameraPosition(0, height, true),
-      centerVect = this.cameraPosition(width / 2, height / 2, true),
-      marginX = this.cameraPosition(width / 4, 0, true).x,
-      marginY = this.cameraPosition(0, height / 4, true).y;
+    const widthVect = this.cameraPosition(width, 0, true);
+
+    const heightVect = this.cameraPosition(0, height, true);
+
+    const centerVect = this.cameraPosition(width / 2, height / 2, true);
+
+    const marginX = this.cameraPosition(width / 4, 0, true).x;
+
+    const marginY = this.cameraPosition(0, height / 4, true).y;
 
     return {
       x1: this.x - centerVect.x - marginX,

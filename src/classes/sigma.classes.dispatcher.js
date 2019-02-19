@@ -1,12 +1,10 @@
 (function() {
-  "use strict";
-
   /**
    * Dispatcher constructor.
    *
    * @return {dispatcher} The new dispatcher instance.
    */
-  var dispatcher = function() {
+  const dispatcher = function() {
     Object.defineProperty(this, "_handlers", {
       value: {}
     });
@@ -22,7 +20,10 @@
    * @return {dispatcher}               Returns the instance itself.
    */
   dispatcher.prototype.bind = function(events, handler) {
-    var i, l, event, eArray;
+    let i;
+    let l;
+    let event;
+    let eArray;
 
     if (arguments.length === 1 && typeof arguments[0] === "object")
       for (events in arguments[0]) this.bind(events, arguments[0][events]);
@@ -40,7 +41,7 @@
         // Using an object instead of directly the handler will make possible
         // later to add flags
         this._handlers[event].push({
-          handler: handler
+          handler
         });
       }
     } else throw "bind: Wrong arguments.";
@@ -60,14 +61,21 @@
    * @return {dispatcher}                Returns the instance itself.
    */
   dispatcher.prototype.unbind = function(events, handler) {
-    var i,
-      n,
-      j,
-      m,
-      k,
-      a,
-      event,
-      eArray = typeof events === "string" ? events.split(" ") : events;
+    let i;
+
+    let n;
+
+    let j;
+
+    let m;
+
+    let k;
+
+    let a;
+
+    let event;
+
+    const eArray = typeof events === "string" ? events.split(" ") : events;
 
     if (!arguments.length) {
       for (k in this._handlers) delete this._handlers[k];
@@ -105,15 +113,23 @@
    * @return {dispatcher}        Returns the instance itself.
    */
   dispatcher.prototype.dispatchEvent = function(events, data) {
-    var i,
-      n,
-      j,
-      m,
-      a,
-      event,
-      eventName,
-      self = this,
-      eArray = typeof events === "string" ? events.split(" ") : events;
+    let i;
+
+    let n;
+
+    let j;
+
+    let m;
+
+    let a;
+
+    let event;
+
+    let eventName;
+
+    const self = this;
+
+    const eArray = typeof events === "string" ? events.split(" ") : events;
 
     data = data === undefined ? {} : data;
 
@@ -159,7 +175,7 @@
    * @param {object} target The target.
    */
   dispatcher.extend = function(target, args) {
-    var k;
+    let k;
 
     for (k in dispatcher.prototype)
       if (dispatcher.prototype.hasOwnProperty(k))

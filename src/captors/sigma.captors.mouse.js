@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -17,31 +15,51 @@
    * @return {sigma.captor}          The fresh new captor instance.
    */
   sigma.captors.mouse = function(target, camera, settings) {
-    var _self = this,
-      _target = target,
-      _camera = camera,
-      _settings = settings,
-      // CAMERA MANAGEMENT:
-      // ******************
-      // The camera position when the user starts dragging:
-      _startCameraX,
-      _startCameraY,
-      _startCameraAngle,
-      // The latest stage position:
-      _lastCameraX,
-      _lastCameraY,
-      _lastCameraAngle,
-      _lastCameraRatio,
-      // MOUSE MANAGEMENT:
-      // *****************
-      // The mouse position when the user starts dragging:
-      _startMouseX,
-      _startMouseY,
-      _isMouseDown,
-      _isMoving,
-      _hasDragged,
-      _downStartTime,
-      _movingTimeoutId;
+    const _self = this;
+
+    const _target = target;
+
+    const _camera = camera;
+
+    const _settings = settings;
+
+    // CAMERA MANAGEMENT:
+    // ******************
+    // The camera position when the user starts dragging:
+
+    let _startCameraX;
+
+    let _startCameraY;
+
+    let _startCameraAngle;
+
+    // The latest stage position:
+
+    let _lastCameraX;
+
+    let _lastCameraY;
+
+    let _lastCameraAngle;
+
+    let _lastCameraRatio;
+
+    // MOUSE MANAGEMENT:
+    // *****************
+    // The mouse position when the user starts dragging:
+
+    let _startMouseX;
+
+    let _startMouseY;
+
+    let _isMouseDown;
+
+    let _isMoving;
+
+    let _hasDragged;
+
+    let _downStartTime;
+
+    let _movingTimeoutId;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -78,7 +96,9 @@
      * @param {event} e A mouse event.
      */
     function _moveHandler(e) {
-      var x, y, pos;
+      let x;
+      let y;
+      let pos;
 
       // Dispatch event:
       if (_settings("mouseEnabled")) {
@@ -111,8 +131,8 @@
             _lastCameraY = _camera.y;
 
             _camera.goTo({
-              x: x,
-              y: y
+              x,
+              y
             });
           }
 
@@ -138,8 +158,9 @@
 
         _camera.isMoving = false;
 
-        var x = sigma.utils.getX(e),
-          y = sigma.utils.getY(e);
+        const x = sigma.utils.getX(e);
+
+        const y = sigma.utils.getY(e);
 
         if (_isMoving) {
           sigma.misc.animation.killAll(_camera);
@@ -234,7 +255,7 @@
      */
     function _clickHandler(e) {
       if (_settings("mouseEnabled")) {
-        var event = sigma.utils.mouseCoords(e);
+        const event = sigma.utils.mouseCoords(e);
         event.isDragging =
           new Date().getTime() - _downStartTime > 100 && _hasDragged;
         _self.dispatchEvent("click", event);
@@ -254,7 +275,9 @@
      * @param {event} e A mouse event.
      */
     function _doubleClickHandler(e) {
-      var pos, ratio, animation;
+      let pos;
+      let ratio;
+      let animation;
 
       if (_settings("mouseEnabled")) {
         ratio = 1 / _settings("doubleClickZoomingRatio");
@@ -293,10 +316,13 @@
      * @param {event} e A mouse event.
      */
     function _wheelHandler(e) {
-      var pos,
-        ratio,
-        animation,
-        wheelDelta = sigma.utils.getDelta(e);
+      let pos;
+
+      let ratio;
+
+      let animation;
+
+      const wheelDelta = sigma.utils.getDelta(e);
 
       if (
         _settings("mouseEnabled") &&

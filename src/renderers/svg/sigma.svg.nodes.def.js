@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.svg.nodes");
 
   /**
@@ -13,13 +11,14 @@
      * @param  {object}                   node     The node object.
      * @param  {configurable}             settings The settings function.
      */
-    create: function(node, settings) {
-      var prefix = settings("prefix") || "",
-        circle = document.createElementNS(settings("xmlns"), "circle");
+    create(node, settings) {
+      const prefix = settings("prefix") || "";
+
+      const circle = document.createElementNS(settings("xmlns"), "circle");
 
       // Defining the node's circle
       circle.setAttributeNS(null, "data-node-id", node.id);
-      circle.setAttributeNS(null, "class", settings("classPrefix") + "-node");
+      circle.setAttributeNS(null, "class", `${settings("classPrefix")}-node`);
       circle.setAttributeNS(
         null,
         "fill",
@@ -37,14 +36,14 @@
      * @param  {DOMElement}               circle   The node DOM element.
      * @param  {configurable}             settings The settings function.
      */
-    update: function(node, circle, settings) {
-      var prefix = settings("prefix") || "";
+    update(node, circle, settings) {
+      const prefix = settings("prefix") || "";
 
       // Applying changes
       // TODO: optimize - check if necessary
-      circle.setAttributeNS(null, "cx", node[prefix + "x"]);
-      circle.setAttributeNS(null, "cy", node[prefix + "y"]);
-      circle.setAttributeNS(null, "r", node[prefix + "size"]);
+      circle.setAttributeNS(null, "cx", node[`${prefix}x`]);
+      circle.setAttributeNS(null, "cy", node[`${prefix}y`]);
+      circle.setAttributeNS(null, "r", node[`${prefix}size`]);
 
       // Updating only if not freestyle
       if (!settings("freeStyle"))

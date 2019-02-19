@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -14,25 +12,30 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.canvas.hovers.def = function(node, context, settings) {
-    var x,
-      y,
-      w,
-      h,
-      e,
-      fontStyle = settings("hoverFontStyle") || settings("fontStyle"),
-      prefix = settings("prefix") || "",
-      size = node[prefix + "size"],
-      fontSize =
-        settings("labelSize") === "fixed"
-          ? settings("defaultLabelSize")
-          : settings("labelSizeRatio") * size;
+    let x;
+
+    let y;
+
+    let w;
+
+    let h;
+
+    let e;
+
+    const fontStyle = settings("hoverFontStyle") || settings("fontStyle");
+
+    const prefix = settings("prefix") || "";
+
+    const size = node[`${prefix}size`];
+
+    const fontSize =
+      settings("labelSize") === "fixed"
+        ? settings("defaultLabelSize")
+        : settings("labelSizeRatio") * size;
 
     // Label background:
-    context.font =
-      (fontStyle ? fontStyle + " " : "") +
-      fontSize +
-      "px " +
-      (settings("hoverFont") || settings("font"));
+    context.font = `${(fontStyle ? `${fontStyle} ` : "") +
+      fontSize}px ${settings("hoverFont") || settings("font")}`;
 
     context.beginPath();
     context.fillStyle =
@@ -48,8 +51,8 @@
     }
 
     if (node.label && typeof node.label === "string") {
-      x = Math.round(node[prefix + "x"] - fontSize / 2 - 2);
-      y = Math.round(node[prefix + "y"] - fontSize / 2 - 2);
+      x = Math.round(node[`${prefix}x`] - fontSize / 2 - 2);
+      y = Math.round(node[`${prefix}y`] - fontSize / 2 - 2);
       w = Math.round(
         context.measureText(node.label).width + fontSize / 2 + size + 7
       );
@@ -80,8 +83,8 @@
           ? node.color || settings("defaultNodeColor")
           : settings("defaultNodeBorderColor");
       context.arc(
-        node[prefix + "x"],
-        node[prefix + "y"],
+        node[`${prefix}x`],
+        node[`${prefix}y`],
         size + settings("borderSize"),
         0,
         Math.PI * 2,
@@ -92,7 +95,8 @@
     }
 
     // Node:
-    var nodeRenderer = sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
+    const nodeRenderer =
+      sigma.canvas.nodes[node.type] || sigma.canvas.nodes.def;
     nodeRenderer(node, context, settings);
 
     // Display the label:
@@ -104,8 +108,8 @@
 
       context.fillText(
         node.label,
-        Math.round(node[prefix + "x"] + size + 3),
-        Math.round(node[prefix + "y"] + fontSize / 3)
+        Math.round(node[`${prefix}x`] + size + 3),
+        Math.round(node[`${prefix}y`] + fontSize / 3)
       );
     }
   };

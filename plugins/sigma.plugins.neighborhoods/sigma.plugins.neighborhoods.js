@@ -21,8 +21,6 @@
  *  > });
  */
 (function() {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   /**
@@ -36,19 +34,28 @@
    *                           the format required by the "read" graph method.
    */
   sigma.classes.graph.addMethod("neighborhood", function(centerId) {
-    var k1,
-      k2,
-      k3,
-      node,
-      center,
-      // Those two local indexes are here just to avoid duplicates:
-      localNodesIndex = {},
-      localEdgesIndex = {},
-      // And here is the resulted graph, empty at the moment:
-      graph = {
-        nodes: [],
-        edges: []
-      };
+    let k1;
+
+    let k2;
+
+    let k3;
+
+    let node;
+
+    let center;
+
+    // Those two local indexes are here just to avoid duplicates:
+
+    const localNodesIndex = {};
+
+    const localEdgesIndex = {};
+
+    // And here is the resulted graph, empty at the moment:
+
+    const graph = {
+      nodes: [],
+      edges: []
+    };
 
     // Check that the exists:
     if (!this.nodes(centerId)) return graph;
@@ -98,9 +105,11 @@
    * sigma.plugins.neighborhoods constructor.
    */
   sigma.plugins.neighborhoods = function() {
-    var ready = false,
-      readyCallbacks = [],
-      graph = new sigma.classes.graph();
+    const ready = false;
+
+    const readyCallbacks = [];
+
+    const graph = new sigma.classes.graph();
 
     /**
      * This method just returns the neighborhood of a node.
@@ -121,10 +130,11 @@
      */
     this.load = function(path, callback) {
       // Quick XHR polyfill:
-      var xhr = (function() {
+      const xhr = (function() {
         if (window.XMLHttpRequest) return new XMLHttpRequest();
 
-        var names, i;
+        let names;
+        let i;
 
         if (window.ActiveXObject) {
           names = [

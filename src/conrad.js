@@ -28,8 +28,6 @@
  * in the Software.
  */
 (function(global) {
-  "use strict";
-
   // Check that conrad.js has not been loaded yet:
   if (global.conrad) throw new Error("conrad already exists");
 
@@ -43,14 +41,14 @@
    *
    * @type {Number}
    */
-  var _lastFrameTime;
+  let _lastFrameTime;
 
   /**
    * A flag indicating whether conrad is running or not.
    *
    * @type {Boolean}
    */
-  var _isRunning = false;
+  let _isRunning = false;
 
   /**
    * The hash of registered jobs. Each job must at least have a unique ID
@@ -59,28 +57,28 @@
    *
    * @type {Object}
    */
-  var _jobs = {};
+  let _jobs = {};
 
   /**
    * The hash of currently running jobs.
    *
    * @type {Object}
    */
-  var _runningJobs = {};
+  let _runningJobs = {};
 
   /**
    * The array of currently running jobs, sorted by priority.
    *
    * @type {Array}
    */
-  var _sortedByPriorityJobs = [];
+  let _sortedByPriorityJobs = [];
 
   /**
    * The array of currently waiting jobs.
    *
    * @type {Object}
    */
-  var _waitingJobs = {};
+  let _waitingJobs = {};
 
   /**
    * The array of finished jobs. They are stored in an array, since two jobs
@@ -88,7 +86,7 @@
    *
    * @type {Array}
    */
-  var _doneJobs = [];
+  let _doneJobs = [];
 
   /**
    * A dirty flag to keep conrad from starting: Indeed, when addJob() is called
@@ -97,7 +95,7 @@
    *
    * @type {Boolean}
    */
-  var _noStart = false;
+  let _noStart = false;
 
   /**
    * An hash containing some global settings about how conrad.js should
@@ -105,7 +103,7 @@
    *
    * @type {Object}
    */
-  var _parameters = {
+  const _parameters = {
     frameDuration: 20,
     history: true
   };
@@ -116,7 +114,7 @@
    *
    * @type {Object}
    */
-  var _handlers = Object.create(null);
+  let _handlers = Object.create(null);
 
   /**
    * PRIVATE FUNCTIONS:
@@ -133,10 +131,13 @@
    * @return {Object}                      Returns conrad.
    */
   function _bind(events, handler) {
-    var i, i_end, event, eArray;
+    let i;
+    let i_end;
+    let event;
+    let eArray;
 
     if (!arguments.length) return;
-    else if (arguments.length === 1 && Object(arguments[0]) === arguments[0])
+    if (arguments.length === 1 && Object(arguments[0]) === arguments[0])
       for (events in arguments[0]) _bind(events, arguments[0][events]);
     else if (arguments.length > 1) {
       eArray = Array.isArray(events) ? events : events.split(/ /);
@@ -149,7 +150,7 @@
         // Using an object instead of directly the handler will make possible
         // later to add flags
         _handlers[event].push({
-          handler: handler
+          handler
         });
       }
     }
@@ -167,13 +168,19 @@
    * @return {Object}            Returns conrad.
    */
   function _unbind(events, handler) {
-    var i,
-      i_end,
-      j,
-      j_end,
-      a,
-      event,
-      eArray = Array.isArray(events) ? events : events.split(/ /);
+    let i;
+
+    let i_end;
+
+    let j;
+
+    let j_end;
+
+    let a;
+
+    let event;
+
+    const eArray = Array.isArray(events) ? events : events.split(/ /);
 
     if (!arguments.length) _handlers = Object.create(null);
     else if (handler) {
@@ -205,13 +212,19 @@
    * @return {Object}         Returns conrad.
    */
   function _dispatch(events, data) {
-    var i,
-      j,
-      i_end,
-      j_end,
-      event,
-      eventName,
-      eArray = Array.isArray(events) ? events : events.split(/ /);
+    let i;
+
+    let j;
+
+    let i_end;
+
+    let j_end;
+
+    let event;
+
+    let eventName;
+
+    const eArray = Array.isArray(events) ? events : events.split(/ /);
 
     data = data === undefined ? {} : data;
 
@@ -239,13 +252,19 @@
    * @return {?Object} Returns the job object if it has to be killed, null else.
    */
   function _executeFirstJob() {
-    var i,
-      l,
-      test,
-      kill,
-      pushed = false,
-      time = __dateNow(),
-      job = _sortedByPriorityJobs.shift();
+    let i;
+
+    let l;
+
+    let test;
+
+    let kill;
+
+    let pushed = false;
+
+    let time = __dateNow();
+
+    const job = _sortedByPriorityJobs.shift();
 
     // Execute the job and look at the result:
     test = job.job();
@@ -283,7 +302,7 @@
    * @param  {Object} job The job to activate.
    */
   function _activateJob(job) {
-    var l = _sortedByPriorityJobs.length;
+    const l = _sortedByPriorityJobs.length;
 
     // Add the job to the running jobs:
     _runningJobs[job.id] = job;
@@ -312,7 +331,12 @@
    *  . It stops itself when there are no more jobs to execute.
    */
   function _loop() {
-    var k, o, l, job, time, deadJob;
+    let k;
+    let o;
+    let l;
+    let job;
+    let time;
+    let deadJob;
 
     // Deal with the newly added jobs (the _jobs object):
     for (k in _jobs) {
@@ -442,7 +466,9 @@
    *                         specified "after" job is ended.
    */
   function _addJob(v1, v2) {
-    var i, l, o;
+    let i;
+    let l;
+    let o;
 
     // Array of jobs:
     if (Array.isArray(v1)) {
@@ -494,9 +520,7 @@
       // One job (string, *):
     } else if (typeof v1 === "string") {
       if (_hasJob(v1))
-        throw new Error(
-          '[conrad.addJob] Job with id "' + v1 + '" already exists.'
-        );
+        throw new Error(`[conrad.addJob] Job with id "${v1}" already exists.`);
 
       // One job (string, function):
       if (typeof v2 === "function") {
@@ -557,12 +581,17 @@
    * @return {Object}       Returns conrad.
    */
   function _killJob(v1) {
-    var i,
-      l,
-      k,
-      a,
-      job,
-      found = false;
+    let i;
+
+    let l;
+
+    let k;
+
+    let a;
+
+    let job;
+
+    let found = false;
 
     // Array of job ids:
     if (Array.isArray(v1))
@@ -597,8 +626,7 @@
           break;
         }
 
-      if (!found)
-        throw new Error('[conrad.killJob] Job "' + v1 + '" not found.');
+      if (!found) throw new Error(`[conrad.killJob] Job "${v1}" not found.`);
 
       // If none of those cases, throw an error:
     } else throw new Error("[conrad.killJob] Wrong arguments.");
@@ -612,8 +640,9 @@
    * @return {Object} Returns conrad.
    */
   function _killAll() {
-    var k,
-      jobs = __extend(_jobs, _runningJobs, _waitingJobs);
+    let k;
+
+    const jobs = __extend(_jobs, _runningJobs, _waitingJobs);
 
     // Take every jobs and push them into the _doneJobs object:
     if (_parameters.history)
@@ -644,7 +673,7 @@
    * @return {?Object} Returns the job object if it exists.
    */
   function _hasJob(id) {
-    var job = _jobs[id] || _runningJobs[id] || _waitingJobs[id];
+    const job = _jobs[id] || _runningJobs[id] || _waitingJobs[id];
     return job ? __extend(job) : null;
   }
 
@@ -660,20 +689,19 @@
    *                    given, and conrad else.
    */
   function _settings(v1, v2) {
-    var o;
+    let o;
 
     if (typeof a1 === "string" && arguments.length === 1)
       return _parameters[a1];
-    else {
-      o = typeof a1 === "object" && arguments.length === 1 ? a1 || {} : {};
-      if (typeof a1 === "string") o[a1] = a2;
 
-      for (var k in o)
-        if (o[k] !== undefined) _parameters[k] = o[k];
-        else delete _parameters[k];
+    o = typeof a1 === "object" && arguments.length === 1 ? a1 || {} : {};
+    if (typeof a1 === "string") o[a1] = a2;
 
-      return this;
-    }
+    for (const k in o)
+      if (o[k] !== undefined) _parameters[k] = o[k];
+      else delete _parameters[k];
+
+    return this;
   }
 
   /**
@@ -722,7 +750,13 @@
    *  > conrad.getStats('running', /test/)
    */
   function _getStats(v1, v2) {
-    var a, k, i, l, stats, pattern, isPatternString;
+    let a;
+    let k;
+    let i;
+    let l;
+    let stats;
+    let pattern;
+    let isPatternString;
 
     if (!arguments.length) {
       stats = [];
@@ -823,10 +857,13 @@
    * @return {Object}  The merged object.
    */
   function __extend() {
-    var i,
-      k,
-      res = {},
-      l = arguments.length;
+    let i;
+
+    let k;
+
+    const res = {};
+
+    const l = arguments.length;
 
     for (i = l - 1; i >= 0; i--)
       for (k in arguments[i]) res[k] = arguments[i][k];
@@ -844,7 +881,10 @@
    * @return {Object} The clone.
    */
   function __clone(item) {
-    var result, i, k, l;
+    let result;
+    let i;
+    let k;
+    let l;
 
     if (!item) return item;
 
@@ -866,8 +906,9 @@
    * @return {Array}  The array of values.
    */
   function __objectValues(o) {
-    var k,
-      a = [];
+    let k;
+
+    const a = [];
 
     for (k in o) a.push(o[k]);
 
@@ -895,7 +936,7 @@
    * EXPORT PUBLIC API:
    * ******************
    */
-  var conrad = {
+  const conrad = {
     hasJob: _hasJob,
     addJob: _addJob,
     killJob: _killJob,

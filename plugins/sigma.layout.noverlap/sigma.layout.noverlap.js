@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
@@ -16,7 +14,7 @@
    * Version: 0.1
    */
 
-  var settings = {
+  const settings = {
     speed: 3,
     scaleNodes: 1.2,
     nodeMargin: 5.0,
@@ -26,20 +24,20 @@
     maxIterations: 500
   };
 
-  var _instance = {};
+  const _instance = {};
 
   /**
    * Event emitter Object
    * ------------------
    */
-  var _eventEmitter = {};
+  const _eventEmitter = {};
 
   /**
    * Noverlap Object
    * ------------------
    */
   function Noverlap() {
-    var self = this;
+    const self = this;
 
     this.init = function(sigInst, options) {
       options = options || {};
@@ -69,34 +67,61 @@
     this.atomicGo = function() {
       if (!this.running || this.iterCount < 1) return false;
 
-      var nodes = this.nodes || this.sigInst.graph.nodes(),
-        nodesCount = nodes.length,
-        i,
-        n,
-        n1,
-        n2,
-        xmin = Infinity,
-        xmax = -Infinity,
-        ymin = Infinity,
-        ymax = -Infinity,
-        xwidth,
-        yheight,
-        xcenter,
-        ycenter,
-        grid,
-        row,
-        col,
-        minXBox,
-        maxXBox,
-        minYBox,
-        maxYBox,
-        adjacentNodes,
-        subRow,
-        subCol,
-        nxmin,
-        nxmax,
-        nymin,
-        nymax;
+      const nodes = this.nodes || this.sigInst.graph.nodes();
+
+      const nodesCount = nodes.length;
+
+      let i;
+
+      let n;
+
+      let n1;
+
+      let n2;
+
+      let xmin = Infinity;
+
+      let xmax = -Infinity;
+
+      let ymin = Infinity;
+
+      let ymax = -Infinity;
+
+      let xwidth;
+
+      let yheight;
+
+      let xcenter;
+
+      let ycenter;
+
+      let grid;
+
+      let row;
+
+      let col;
+
+      let minXBox;
+
+      let maxXBox;
+
+      let minYBox;
+
+      let maxYBox;
+
+      let adjacentNodes;
+
+      let subRow;
+
+      let subCol;
+
+      let nxmin;
+
+      let nxmax;
+
+      let nymin;
+
+      let nymax;
 
       this.iterCount--;
       this.running = false;
@@ -106,7 +131,7 @@
         n.dn.dx = 0;
         n.dn.dy = 0;
 
-        //Find the min and max for both x and y across all nodes
+        // Find the min and max for both x and y across all nodes
         xmin = Math.min(
           xmin,
           n.dn_x - (n.dn_size * self.config.scaleNodes + self.config.nodeMargin)
@@ -134,7 +159,7 @@
       ymin = ycenter - (self.config.permittedExpansion * yheight) / 2;
       ymax = ycenter + (self.config.permittedExpansion * yheight) / 2;
 
-      grid = {}; //An object of objects where grid[row][col] is an array of node ids representing nodes that fall in that grid. Nodes can fall in more than one grid
+      grid = {}; // An object of objects where grid[row][col] is an array of node ids representing nodes that fall in that grid. Nodes can fall in more than one grid
 
       for (row = 0; row < self.config.gridSize; row++) {
         grid[row] = {};
@@ -143,7 +168,7 @@
         }
       }
 
-      //Place nodes in grid
+      // Place nodes in grid
       for (i = 0; i < nodesCount; i++) {
         n = nodes[i];
 
@@ -179,7 +204,7 @@
         }
       }
 
-      adjacentNodes = {}; //An object that stores the node ids of adjacent nodes (either in same grid box or adjacent grid box) for all nodes
+      adjacentNodes = {}; // An object that stores the node ids of adjacent nodes (either in same grid box or adjacent grid box) for all nodes
 
       for (row = 0; row < self.config.gridSize; row++) {
         for (col = 0; col < self.config.gridSize; col++) {
@@ -211,15 +236,15 @@
         }
       }
 
-      //If two nodes overlap then repulse them
+      // If two nodes overlap then repulse them
       for (i = 0; i < nodesCount; i++) {
         n1 = nodes[i];
         adjacentNodes[n1.id].forEach(function(nodeId) {
-          var n2 = self.sigInst.graph.nodes(nodeId);
-          var xDist = n2.dn_x - n1.dn_x;
-          var yDist = n2.dn_y - n1.dn_y;
-          var dist = Math.sqrt(xDist * xDist + yDist * yDist);
-          var collision =
+          const n2 = self.sigInst.graph.nodes(nodeId);
+          const xDist = n2.dn_x - n1.dn_x;
+          const yDist = n2.dn_y - n1.dn_y;
+          const dist = Math.sqrt(xDist * xDist + yDist * yDist);
+          const collision =
             dist <
             n1.dn_size * self.config.scaleNodes +
               self.config.nodeMargin +
@@ -240,8 +265,8 @@
       for (i = 0; i < nodesCount; i++) {
         n = nodes[i];
         if (!n.fixed) {
-          n.dn_x = n.dn_x + n.dn.dx * 0.1 * self.config.speed;
-          n.dn_y = n.dn_y + n.dn.dy * 0.1 * self.config.speed;
+          n.dn_x += n.dn.dx * 0.1 * self.config.speed;
+          n.dn_y += n.dn.dy * 0.1 * self.config.speed;
         }
       }
 
@@ -265,18 +290,18 @@
     this.start = function() {
       if (this.running) return;
 
-      var nodes = this.sigInst.graph.nodes();
+      const nodes = this.sigInst.graph.nodes();
 
-      var prefix = this.sigInst.renderers[self.config.rendererIndex].options
+      const prefix = this.sigInst.renderers[self.config.rendererIndex].options
         .prefix;
 
       this.running = true;
 
       // Init nodes
-      for (var i = 0; i < nodes.length; i++) {
-        nodes[i].dn_x = nodes[i][prefix + "x"];
-        nodes[i].dn_y = nodes[i][prefix + "y"];
-        nodes[i].dn_size = nodes[i][prefix + "size"];
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].dn_x = nodes[i][`${prefix}x`];
+        nodes[i].dn_y = nodes[i][`${prefix}y`];
+        nodes[i].dn_size = nodes[i][`${prefix}size`];
         nodes[i].dn = {
           dx: 0,
           dy: 0
@@ -287,7 +312,7 @@
     };
 
     this.stop = function() {
-      var nodes = this.sigInst.graph.nodes();
+      const nodes = this.sigInst.graph.nodes();
 
       this.running = false;
 
@@ -301,9 +326,9 @@
           },
           {
             easing: self.easing,
-            onComplete: function() {
+            onComplete() {
               self.sigInst.refresh();
-              for (var i = 0; i < nodes.length; i++) {
+              for (let i = 0; i < nodes.length; i++) {
                 nodes[i].dn = null;
                 nodes[i].dn_x = null;
                 nodes[i].dn_y = null;
@@ -368,7 +393,7 @@
    * @return {sigma.classes.dispatcher} Returns an event emitter.
    */
   sigma.prototype.configNoverlap = function(config) {
-    var sigInst = this;
+    const sigInst = this;
 
     if (!config) throw new Error('Missing argument: "config"');
 
@@ -420,7 +445,7 @@
    */
 
   sigma.prototype.startNoverlap = function(config) {
-    var sigInst = this;
+    const sigInst = this;
 
     if (config) {
       this.configNoverlap(sigInst, config);
@@ -437,7 +462,7 @@
    * @return {boolean}
    */
   sigma.prototype.isNoverlapRunning = function() {
-    var sigInst = this;
+    const sigInst = this;
 
     return !!_instance[sigInst.id] && _instance[sigInst.id].running;
   };

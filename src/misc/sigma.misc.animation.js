@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -11,10 +9,10 @@
    *
    * @return {string} Returns the new ID.
    */
-  var _getID = (function() {
-    var id = 0;
+  const _getID = (function() {
+    let id = 0;
     return function() {
-      return "" + ++id;
+      return `${++id}`;
     };
   })();
 
@@ -59,14 +57,21 @@
     )
       throw "There must be at least one valid coordinate in the given val.";
 
-    var fn,
-      id,
-      anim,
-      easing,
-      duration,
-      initialVal,
-      o = options || {},
-      start = sigma.utils.dateNow();
+    let fn;
+
+    let id;
+
+    let anim;
+
+    let easing;
+
+    let duration;
+
+    let initialVal;
+
+    const o = options || {};
+
+    const start = sigma.utils.dateNow();
 
     // Store initial values:
     initialVal = {
@@ -83,8 +88,9 @@
         : o.easing;
 
     fn = function() {
-      var coef,
-        t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
+      let coef;
+
+      const t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
 
       // If the animation is over:
       if (t >= 1) {
@@ -138,7 +144,7 @@
       target: camera,
       type: "camera",
       options: o,
-      fn: fn
+      fn
     };
     sigma.misc.animation.running[id] = anim;
 
@@ -155,7 +161,7 @@
     if (arguments.length !== 1 || typeof id !== "number")
       throw "animation.kill: Wrong arguments.";
 
-    var o = sigma.misc.animation.running[id];
+    const o = sigma.misc.animation.running[id];
 
     if (o) {
       cancelAnimationFrame(id);
@@ -182,12 +188,17 @@
    *                                   that way.
    */
   sigma.misc.animation.killAll = function(filter) {
-    var o,
-      id,
-      count = 0,
-      type = typeof filter === "string" ? filter : null,
-      target = typeof filter === "object" ? filter : null,
-      running = sigma.misc.animation.running;
+    let o;
+
+    let id;
+
+    let count = 0;
+
+    const type = typeof filter === "string" ? filter : null;
+
+    const target = typeof filter === "object" ? filter : null;
+
+    const running = sigma.misc.animation.running;
 
     for (id in running)
       if (
@@ -222,10 +233,13 @@
    *                                matches.
    */
   sigma.misc.animation.has = function(filter) {
-    var id,
-      type = typeof filter === "string" ? filter : null,
-      target = typeof filter === "object" ? filter : null,
-      running = sigma.misc.animation.running;
+    let id;
+
+    const type = typeof filter === "string" ? filter : null;
+
+    const target = typeof filter === "object" ? filter : null;
+
+    const running = sigma.misc.animation.running;
 
     for (id in running)
       if (

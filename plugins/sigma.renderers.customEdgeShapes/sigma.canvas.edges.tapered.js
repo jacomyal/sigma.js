@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -25,20 +23,31 @@
     // The goal is to draw a triangle where the target node is a point of
     // the triangle, and the two other points are the intersection of the
     // source circle and the circle (target, distance(source, target)).
-    var color = edge.active
-        ? edge.active_color || settings("defaultEdgeActiveColor")
-        : edge.color,
-      prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1,
-      edgeColor = settings("edgeColor"),
-      prefix = settings("prefix") || "",
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor"),
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"],
-      dist = sigma.utils.getDistance(sX, sY, tX, tY);
+    let color = edge.active
+      ? edge.active_color || settings("defaultEdgeActiveColor")
+      : edge.color;
+
+    var prefix = settings("prefix") || "";
+
+    const size = edge[`${prefix}size`] || 1;
+
+    const edgeColor = settings("edgeColor");
+
+    var prefix = settings("prefix") || "";
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
+
+    const dist = sigma.utils.getDistance(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {
@@ -54,7 +63,7 @@
       }
 
     // Intersection points:
-    var c = sigma.utils.getCircleIntersection(sX, sY, size, tX, tY, dist);
+    const c = sigma.utils.getCircleIntersection(sX, sY, size, tX, tY, dist);
 
     context.save();
 

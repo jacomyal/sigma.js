@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   /**
    * Sigma Quadtree Module for edges
    * ===============================
@@ -17,7 +15,7 @@
    * A useful batch of geometric operations used by the quadtree.
    */
 
-  var _geom = {
+  const _geom = {
     /**
      * Transforms a graph node with x, y and size into an
      * axis-aligned square.
@@ -25,7 +23,7 @@
      * @param  {object} A graph node with at least a point (x, y) and a size.
      * @return {object} A square: two points (x1, y1), (x2, y2) and height.
      */
-    pointToSquare: function(n) {
+    pointToSquare(n) {
       return {
         x1: n.x - n.size,
         y1: n.y - n.size,
@@ -43,7 +41,7 @@
      *                  (x1, y1), (x2, y2) and a size.
      * @return {object} A square: two points (x1, y1), (x2, y2) and height.
      */
-    lineToSquare: function(e) {
+    lineToSquare(e) {
       if (e.y1 < e.y2) {
         // (e.x1, e.y1) on top
         if (e.x1 < e.x2) {
@@ -96,8 +94,8 @@
      * @param  {object} cp A control point (x,y).
      * @return {object}    A square: two points (x1, y1), (x2, y2) and height.
      */
-    quadraticCurveToSquare: function(e, cp) {
-      var pt = sigma.utils.getPointOnQuadraticCurve(
+    quadraticCurveToSquare(e, cp) {
+      const pt = sigma.utils.getPointOnQuadraticCurve(
         0.5,
         e.x1,
         e.y1,
@@ -109,10 +107,13 @@
 
       // Bounding box of the two points and the point at the middle of the
       // curve:
-      var minX = Math.min(e.x1, e.x2, pt.x),
-        maxX = Math.max(e.x1, e.x2, pt.x),
-        minY = Math.min(e.y1, e.y2, pt.y),
-        maxY = Math.max(e.y1, e.y2, pt.y);
+      const minX = Math.min(e.x1, e.x2, pt.x);
+
+      const maxX = Math.max(e.x1, e.x2, pt.x);
+
+      const minY = Math.min(e.y1, e.y2, pt.y);
+
+      const maxY = Math.max(e.y1, e.y2, pt.y);
 
       return {
         x1: minX - e.size,
@@ -129,16 +130,19 @@
      * @param  {object} n A graph node with a point (x, y) and a size.
      * @return {object}   A square: two points (x1, y1), (x2, y2) and height.
      */
-    selfLoopToSquare: function(n) {
+    selfLoopToSquare(n) {
       // Fitting to the curve is too costly, we compute a larger bounding box
       // using the control points:
-      var cp = sigma.utils.getSelfLoopControlPoints(n.x, n.y, n.size);
+      const cp = sigma.utils.getSelfLoopControlPoints(n.x, n.y, n.size);
 
       // Bounding box of the point and the two control points:
-      var minX = Math.min(n.x, cp.x1, cp.x2),
-        maxX = Math.max(n.x, cp.x1, cp.x2),
-        minY = Math.min(n.y, cp.y1, cp.y2),
-        maxY = Math.max(n.y, cp.y1, cp.y2);
+      const minX = Math.min(n.x, cp.x1, cp.x2);
+
+      const maxX = Math.max(n.x, cp.x1, cp.x2);
+
+      const minY = Math.min(n.y, cp.y1, cp.y2);
+
+      const maxY = Math.max(n.y, cp.y1, cp.y2);
 
       return {
         x1: minX - n.size,
@@ -156,7 +160,7 @@
      *                   (x1, y1) and (x2, y2).
      * @return {boolean} True if the rectangle is axis-aligned.
      */
-    isAxisAligned: function(r) {
+    isAxisAligned(r) {
       return r.x1 === r.x2 || r.y1 === r.y2;
     },
 
@@ -169,7 +173,7 @@
      *                  (x1, y1), (x2, y2) and height.
      * @return {object} A rectangle: two points (x1, y1), (x2, y2) and height.
      */
-    axisAlignedTopPoints: function(r) {
+    axisAlignedTopPoints(r) {
       // Basic
       if (r.y1 === r.y2 && r.x1 < r.x2) return r;
 
@@ -209,8 +213,8 @@
      * @param  {object} A rectangle defined by two points (x1, y1) and (x2, y2).
      * @return {object} Coordinates of the corner (x, y).
      */
-    lowerLeftCoor: function(r) {
-      var width = Math.sqrt(
+    lowerLeftCoor(r) {
+      const width = Math.sqrt(
         Math.pow(r.x2 - r.x1, 2) + Math.pow(r.y2 - r.y1, 2)
       );
 
@@ -228,7 +232,7 @@
      * @param  {object} A corner's coordinates (x, y).
      * @return {object} Coordinates of the corner (x, y).
      */
-    lowerRightCoor: function(r, llc) {
+    lowerRightCoor(r, llc) {
       return {
         x: llc.x - r.x1 + r.x2,
         y: llc.y - r.y1 + r.y2
@@ -241,9 +245,10 @@
      * @param  {object} A rectangle defined by two points (x1, y1) and (x2, y2).
      * @return {array}  An array of the four corners' coordinates (x, y).
      */
-    rectangleCorners: function(r) {
-      var llc = this.lowerLeftCoor(r),
-        lrc = this.lowerRightCoor(r, llc);
+    rectangleCorners(r) {
+      const llc = this.lowerLeftCoor(r);
+
+      const lrc = this.lowerRightCoor(r, llc);
 
       return [
         { x: r.x1, y: r.y1 },
@@ -260,7 +265,7 @@
      * @return {array}  An array containing the four new squares, themselves
      *                  defined by an array of their four corners (x, y).
      */
-    splitSquare: function(b) {
+    splitSquare(b) {
       return [
         [
           { x: b.x, y: b.y },
@@ -297,7 +302,7 @@
      * @param  {array} An array of rectangle B's four corners (x, y).
      * @return {array} An array of four axis defined by their coordinates (x,y).
      */
-    axis: function(c1, c2) {
+    axis(c1, c2) {
       return [
         { x: c1[1].x - c1[0].x, y: c1[1].y - c1[0].y },
         { x: c1[1].x - c1[3].x, y: c1[1].y - c1[3].y },
@@ -313,8 +318,8 @@
      * @param  {object} Coordinates of an axis (x, y).
      * @return {object} The projection defined by coordinates (x, y).
      */
-    projection: function(c, a) {
-      var l = (c.x * a.x + c.y * a.y) / (Math.pow(a.x, 2) + Math.pow(a.y, 2));
+    projection(c, a) {
+      const l = (c.x * a.x + c.y * a.y) / (Math.pow(a.x, 2) + Math.pow(a.y, 2));
 
       return {
         x: l * a.x,
@@ -330,22 +335,27 @@
      * @param  {array}    Rectangle B's corners.
      * @return {boolean}  True if the rectangles collide on the axis.
      */
-    axisCollision: function(a, c1, c2) {
-      var sc1 = [],
-        sc2 = [];
+    axisCollision(a, c1, c2) {
+      const sc1 = [];
 
-      for (var ci = 0; ci < 4; ci++) {
-        var p1 = this.projection(c1[ci], a),
-          p2 = this.projection(c2[ci], a);
+      const sc2 = [];
+
+      for (let ci = 0; ci < 4; ci++) {
+        const p1 = this.projection(c1[ci], a);
+
+        const p2 = this.projection(c2[ci], a);
 
         sc1.push(p1.x * a.x + p1.y * a.y);
         sc2.push(p2.x * a.x + p2.y * a.y);
       }
 
-      var maxc1 = Math.max.apply(Math, sc1),
-        maxc2 = Math.max.apply(Math, sc2),
-        minc1 = Math.min.apply(Math, sc1),
-        minc2 = Math.min.apply(Math, sc2);
+      const maxc1 = Math.max(...sc1);
+
+      const maxc2 = Math.max(...sc2);
+
+      const minc1 = Math.min(...sc1);
+
+      const minc2 = Math.min(...sc2);
 
       return minc2 <= maxc1 && maxc2 >= minc1;
     },
@@ -358,11 +368,12 @@
      * @param  {array}    Rectangle B's corners.
      * @return {boolean}  True if the rectangles collide.
      */
-    collision: function(c1, c2) {
-      var axis = this.axis(c1, c2),
-        col = true;
+    collision(c1, c2) {
+      const axis = this.axis(c1, c2);
 
-      for (var i = 0; i < 4; i++)
+      let col = true;
+
+      for (let i = 0; i < 4; i++)
         col = col && this.axisCollision(axis[i], c1, c2);
 
       return col;
@@ -394,18 +405,20 @@
    * @return {integer}            The index of the node containing the point.
    */
   function _quadIndex(point, quadBounds) {
-    var xmp = quadBounds.x + quadBounds.width / 2,
-      ymp = quadBounds.y + quadBounds.height / 2,
-      top = point.y < ymp,
-      left = point.x < xmp;
+    const xmp = quadBounds.x + quadBounds.width / 2;
+
+    const ymp = quadBounds.y + quadBounds.height / 2;
+
+    const top = point.y < ymp;
+
+    const left = point.x < xmp;
 
     if (top) {
       if (left) return 0;
-      else return 1;
-    } else {
-      if (left) return 2;
-      else return 3;
+      return 1;
     }
+    if (left) return 2;
+    return 3;
   }
 
   /**
@@ -418,10 +431,10 @@
    *                               four integers.
    */
   function _quadIndexes(rectangle, quadCorners) {
-    var indexes = [];
+    const indexes = [];
 
     // Iterating through quads
-    for (var i = 0; i < 4; i++)
+    for (let i = 0; i < 4; i++)
       if (
         rectangle.x2 >= quadCorners[i][0].x &&
         rectangle.x1 <= quadCorners[i][1].x &&
@@ -443,10 +456,10 @@
    *                               four integers.
    */
   function _quadCollision(corners, quadCorners) {
-    var indexes = [];
+    const indexes = [];
 
     // Iterating through quads
-    for (var i = 0; i < 4; i++)
+    for (let i = 0; i < 4; i++)
       if (_geom.collision(corners, quadCorners[i])) indexes.push(i);
 
     return indexes;
@@ -461,13 +474,19 @@
    * @return {object}         A new quad representing the node created.
    */
   function _quadSubdivide(index, quad) {
-    var next = quad.level + 1,
-      subw = Math.round(quad.bounds.width / 2),
-      subh = Math.round(quad.bounds.height / 2),
-      qx = Math.round(quad.bounds.x),
-      qy = Math.round(quad.bounds.y),
-      x,
-      y;
+    const next = quad.level + 1;
+
+    const subw = Math.round(quad.bounds.width / 2);
+
+    const subh = Math.round(quad.bounds.height / 2);
+
+    const qx = Math.round(quad.bounds.x);
+
+    const qy = Math.round(quad.bounds.y);
+
+    let x;
+
+    let y;
 
     switch (index) {
       case 0:
@@ -489,7 +508,7 @@
     }
 
     return _quadTree(
-      { x: x, y: y, width: subw, height: subh },
+      { x, y, width: subw, height: subh },
       next,
       quad.maxElements,
       quad.maxLevel
@@ -510,10 +529,10 @@
   function _quadInsert(el, sizedPoint, quad) {
     if (quad.level < quad.maxLevel) {
       // Searching appropriate quads
-      var indexes = _quadIndexes(sizedPoint, quad.corners);
+      const indexes = _quadIndexes(sizedPoint, quad.corners);
 
       // Iterating
-      for (var i = 0, l = indexes.length; i < l; i++) {
+      for (let i = 0, l = indexes.length; i < l; i++) {
         // Subdividing if necessary
         if (quad.nodes[indexes[i]] === undefined)
           quad.nodes[indexes[i]] = _quadSubdivide(indexes[i], quad);
@@ -538,17 +557,15 @@
    */
   function _quadRetrievePoint(point, quad) {
     if (quad.level < quad.maxLevel) {
-      var index = _quadIndex(point, quad.bounds);
+      const index = _quadIndex(point, quad.bounds);
 
       // If node does not exist we return an empty list
       if (quad.nodes[index] !== undefined) {
         return _quadRetrievePoint(point, quad.nodes[index]);
-      } else {
-        return [];
       }
-    } else {
-      return quad.elements;
+      return [];
     }
+    return quad.elements;
   }
 
   /**
@@ -571,9 +588,9 @@
     els = els || {};
 
     if (quad.level < quad.maxLevel) {
-      var indexes = collisionFunc(rectData, quad.corners);
+      const indexes = collisionFunc(rectData, quad.corners);
 
-      for (var i = 0, l = indexes.length; i < l; i++)
+      for (let i = 0, l = indexes.length; i < l; i++)
         if (quad.nodes[indexes[i]] !== undefined)
           _quadRetrieveArea(
             rectData,
@@ -582,7 +599,7 @@
             els
           );
     } else
-      for (var j = 0, m = quad.elements.length; j < m; j++)
+      for (let j = 0, m = quad.elements.length; j < m; j++)
         if (els[quad.elements[j].id] === undefined)
           els[quad.elements[j].id] = quad.elements[j];
 
@@ -602,7 +619,7 @@
   function _quadTree(bounds, level, maxElements, maxLevel) {
     return {
       level: level || 0,
-      bounds: bounds,
+      bounds,
       corners: _geom.splitSquare(bounds),
       maxElements: maxElements || 40,
       maxLevel: maxLevel || 8,
@@ -626,7 +643,7 @@
    * property {object} _cache    Cache for the area method.
    * property {boolean} _enabled Can index and retreive elements.
    */
-  var edgequad = function() {
+  const edgequad = function() {
     this._geom = _geom;
     this._tree = null;
     this._cache = {
@@ -660,12 +677,17 @@
       throw "sigma.classes.edgequad.index: bounds information not given.";
 
     // Prefix
-    var prefix = params.prefix || "",
-      cp,
-      source,
-      target,
-      n,
-      e;
+    const prefix = params.prefix || "";
+
+    let cp;
+
+    let source;
+
+    let target;
+
+    let n;
+
+    let e;
 
     // Building the tree
     this._tree = _quadTree(
@@ -675,27 +697,27 @@
       params.maxLevel
     );
 
-    var edges = graph.edges();
+    const edges = graph.edges();
 
     // Inserting graph edges into the tree
-    for (var i = 0, l = edges.length; i < l; i++) {
+    for (let i = 0, l = edges.length; i < l; i++) {
       source = graph.nodes(edges[i].source);
       target = graph.nodes(edges[i].target);
       e = {
-        x1: source[prefix + "x"],
-        y1: source[prefix + "y"],
-        x2: target[prefix + "x"],
-        y2: target[prefix + "y"],
-        size: edges[i][prefix + "size"] || 0
+        x1: source[`${prefix}x`],
+        y1: source[`${prefix}y`],
+        x2: target[`${prefix}x`],
+        y2: target[`${prefix}y`],
+        size: edges[i][`${prefix}size`] || 0
       };
 
       // Inserting edge
       if (edges[i].type === "curve" || edges[i].type === "curvedArrow") {
         if (source.id === target.id) {
           n = {
-            x: source[prefix + "x"],
-            y: source[prefix + "y"],
-            size: source[prefix + "size"] || 0
+            x: source[`${prefix}x`],
+            y: source[`${prefix}y`],
+            size: source[`${prefix}size`] || 0
           };
           _quadInsert(edges[i], _geom.selfLoopToSquare(n), this._tree);
         } else {
@@ -732,9 +754,7 @@
   edgequad.prototype.point = function(x, y) {
     if (!this._enabled) return [];
 
-    return this._tree
-      ? _quadRetrievePoint({ x: x, y: y }, this._tree) || []
-      : [];
+    return this._tree ? _quadRetrievePoint({ x, y }, this._tree) || [] : [];
   };
 
   /**
@@ -749,9 +769,11 @@
   edgequad.prototype.area = function(rect) {
     if (!this._enabled) return [];
 
-    var serialized = JSON.stringify(rect),
-      collisionFunc,
-      rectData;
+    const serialized = JSON.stringify(rect);
+
+    let collisionFunc;
+
+    let rectData;
 
     // Returning cache?
     if (this._cache.query === serialized) return this._cache.result;
@@ -766,13 +788,13 @@
     }
 
     // Retrieving edges
-    var edges = this._tree
+    const edges = this._tree
       ? _quadRetrieveArea(rectData, this._tree, collisionFunc)
       : [];
 
     // Object to array
-    var edgesArray = [];
-    for (var i in edges) edgesArray.push(edges[i]);
+    const edgesArray = [];
+    for (const i in edges) edgesArray.push(edges[i]);
 
     // Caching
     this._cache.query = serialized;

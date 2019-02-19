@@ -4,21 +4,20 @@
  * examples/animate.html code sample to know more.
  */
 (function() {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   sigma.utils.pkg("sigma.plugins");
 
-  var _id = 0,
-    _cache = {};
+  let _id = 0;
+
+  const _cache = {};
 
   // TOOLING FUNCTIONS:
   // ******************
   function parseColor(val) {
     if (_cache[val]) return _cache[val];
 
-    var result = [0, 0, 0];
+    let result = [0, 0, 0];
 
     if (val.match(/^#/)) {
       val = (val || "").replace(/^#/, "");
@@ -54,13 +53,13 @@
     c1 = parseColor(c1);
     c2 = parseColor(c2);
 
-    var c = {
+    const c = {
       r: c1.r * (1 - p) + c2.r * p,
       g: c1.g * (1 - p) + c2.g * p,
       b: c1.b * (1 - p) + c2.b * p
     };
 
-    return "rgb(" + [c.r | 0, c.g | 0, c.b | 0].join(",") + ")";
+    return `rgb(${[c.r | 0, c.g | 0, c.b | 0].join(",")})`;
   }
 
   /**
@@ -95,18 +94,24 @@
    * @param  {?object} options Eventually an object with options.
    */
   sigma.plugins.animate = function(s, animate, options) {
-    var o = options || {},
-      id = ++_id,
-      duration = o.duration || s.settings("animationsTime"),
-      easing =
-        typeof o.easing === "string"
-          ? sigma.utils.easings[o.easing]
-          : typeof o.easing === "function"
-          ? o.easing
-          : sigma.utils.easings.quadraticInOut,
-      start = sigma.utils.dateNow(),
-      nodes,
-      startPositions;
+    const o = options || {};
+
+    const id = ++_id;
+
+    const duration = o.duration || s.settings("animationsTime");
+
+    const easing =
+      typeof o.easing === "string"
+        ? sigma.utils.easings[o.easing]
+        : typeof o.easing === "function"
+        ? o.easing
+        : sigma.utils.easings.quadraticInOut;
+
+    const start = sigma.utils.dateNow();
+
+    let nodes;
+
+    let startPositions;
 
     if (o.nodes && o.nodes.length) {
       if (typeof o.nodes[0] === "object") nodes = o.nodes;
@@ -115,7 +120,7 @@
 
     // Store initial positions:
     startPositions = nodes.reduce(function(res, node) {
-      var k;
+      let k;
       res[node.id] = {};
       for (k in animate) if (k in node) res[node.id][k] = node[k];
       return res;
@@ -125,22 +130,24 @@
     sigma.plugins.kill(s);
 
     // Do not refresh edgequadtree during drag:
-    var k, c;
+    let k;
+    let c;
     for (k in s.cameras) {
       c = s.cameras[k];
       c.edgequadtree._enabled = false;
     }
 
     function step() {
-      var p = (sigma.utils.dateNow() - start) / duration;
+      let p = (sigma.utils.dateNow() - start) / duration;
 
       if (p >= 1) {
         nodes.forEach(function(node) {
-          for (var k in animate) if (k in animate) node[k] = node[animate[k]];
+          for (const k in animate) if (k in animate) node[k] = node[animate[k]];
         });
 
         // Allow to refresh edgequadtree:
-        var k, c;
+        let k;
+        let c;
         for (k in s.cameras) {
           c = s.cameras[k];
           c.edgequadtree._enabled = true;
@@ -151,7 +158,7 @@
       } else {
         p = easing(p);
         nodes.forEach(function(node) {
-          for (var k in animate)
+          for (const k in animate)
             if (k in animate) {
               if (k.match(/color$/))
                 node[k] = interpolateColors(
@@ -177,7 +184,8 @@
     for (var k in s.animations || {}) cancelAnimationFrame(s.animations[k]);
 
     // Allow to refresh edgequadtree:
-    var k, c;
+    var k;
+    let c;
     for (k in s.cameras) {
       c = s.cameras[k];
       c.edgequadtree._enabled = true;

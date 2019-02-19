@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -14,12 +12,17 @@
    * It has to be called in the scope of the related renderer.
    */
   sigma.misc.bindEvents = function(prefix) {
-    var i,
-      l,
-      mX,
-      mY,
-      captor,
-      self = this;
+    let i;
+
+    let l;
+
+    let mX;
+
+    let mY;
+
+    let captor;
+
+    const self = this;
 
     function getNodes(e) {
       if (e) {
@@ -27,26 +30,38 @@
         mY = "y" in e.data ? e.data.y : mY;
       }
 
-      var i,
-        j,
-        l,
-        n,
-        x,
-        y,
-        s,
-        inserted,
-        selected = [],
-        modifiedX = mX + self.width / 2,
-        modifiedY = mY + self.height / 2,
-        point = self.camera.cameraPosition(mX, mY),
-        nodes = self.camera.quadtree.point(point.x, point.y);
+      let i;
+
+      let j;
+
+      let l;
+
+      let n;
+
+      let x;
+
+      let y;
+
+      let s;
+
+      let inserted;
+
+      const selected = [];
+
+      const modifiedX = mX + self.width / 2;
+
+      const modifiedY = mY + self.height / 2;
+
+      const point = self.camera.cameraPosition(mX, mY);
+
+      const nodes = self.camera.quadtree.point(point.x, point.y);
 
       if (nodes.length)
         for (i = 0, l = nodes.length; i < l; i++) {
           n = nodes[i];
-          x = n[prefix + "x"];
-          y = n[prefix + "y"];
-          s = n[prefix + "size"];
+          x = n[`${prefix}x`];
+          y = n[`${prefix}y`];
+          s = n[`${prefix}size`];
 
           if (
             !n.hidden &&
@@ -80,7 +95,7 @@
         return [];
       }
 
-      var isCanvas =
+      const isCanvas =
         sigma.renderers.canvas && self instanceof sigma.renderers.canvas;
 
       if (!isCanvas) {
@@ -96,26 +111,42 @@
         mY = "y" in e.data ? e.data.y : mY;
       }
 
-      var i,
-        j,
-        l,
-        a,
-        edge,
-        s,
-        maxEpsilon = self.settings("edgeHoverPrecision"),
-        source,
-        target,
-        cp,
-        nodeIndex = {},
-        inserted,
-        selected = [],
-        modifiedX = mX + self.width / 2,
-        modifiedY = mY + self.height / 2,
-        point = self.camera.cameraPosition(mX, mY),
-        edges = [];
+      let i;
+
+      let j;
+
+      let l;
+
+      let a;
+
+      let edge;
+
+      let s;
+
+      const maxEpsilon = self.settings("edgeHoverPrecision");
+
+      let source;
+
+      let target;
+
+      let cp;
+
+      const nodeIndex = {};
+
+      let inserted;
+
+      const selected = [];
+
+      const modifiedX = mX + self.width / 2;
+
+      const modifiedY = mY + self.height / 2;
+
+      const point = self.camera.cameraPosition(mX, mY);
+
+      let edges = [];
 
       if (isCanvas) {
-        var nodesOnScreen = self.camera.quadtree.area(
+        const nodesOnScreen = self.camera.quadtree.area(
           self.camera.getRectangle(self.width, self.height)
         );
         for (a = nodesOnScreen, i = 0, l = a.length; i < l; i++)
@@ -145,7 +176,7 @@
           source = self.graph.nodes(edge.source);
           target = self.graph.nodes(edge.target);
           // (HACK) we can't get edge[prefix + 'size'] on WebGL renderer:
-          s = edge[prefix + "size"] || edge["read_" + prefix + "size"];
+          s = edge[`${prefix}size`] || edge[`read_${prefix}size`];
 
           // First, let's identify which edges are drawn. To do this, we keep
           // every edges that have at least one extremity displayed according to
@@ -160,33 +191,33 @@
             !target.hidden &&
             (!isCanvas || (nodeIndex[edge.source] || nodeIndex[edge.target])) &&
             sigma.utils.getDistance(
-              source[prefix + "x"],
-              source[prefix + "y"],
+              source[`${prefix}x`],
+              source[`${prefix}y`],
               modifiedX,
               modifiedY
-            ) > source[prefix + "size"] &&
+            ) > source[`${prefix}size`] &&
             sigma.utils.getDistance(
-              target[prefix + "x"],
-              target[prefix + "y"],
+              target[`${prefix}x`],
+              target[`${prefix}y`],
               modifiedX,
               modifiedY
-            ) > target[prefix + "size"]
+            ) > target[`${prefix}size`]
           ) {
             if (edge.type == "curve" || edge.type == "curvedArrow") {
               if (source.id === target.id) {
                 cp = sigma.utils.getSelfLoopControlPoints(
-                  source[prefix + "x"],
-                  source[prefix + "y"],
-                  source[prefix + "size"]
+                  source[`${prefix}x`],
+                  source[`${prefix}y`],
+                  source[`${prefix}size`]
                 );
                 if (
                   sigma.utils.isPointOnBezierCurve(
                     modifiedX,
                     modifiedY,
-                    source[prefix + "x"],
-                    source[prefix + "y"],
-                    target[prefix + "x"],
-                    target[prefix + "y"],
+                    source[`${prefix}x`],
+                    source[`${prefix}y`],
+                    target[`${prefix}x`],
+                    target[`${prefix}y`],
                     cp.x1,
                     cp.y1,
                     cp.x2,
@@ -198,19 +229,19 @@
                 }
               } else {
                 cp = sigma.utils.getQuadraticControlPoint(
-                  source[prefix + "x"],
-                  source[prefix + "y"],
-                  target[prefix + "x"],
-                  target[prefix + "y"]
+                  source[`${prefix}x`],
+                  source[`${prefix}y`],
+                  target[`${prefix}x`],
+                  target[`${prefix}y`]
                 );
                 if (
                   sigma.utils.isPointOnQuadraticCurve(
                     modifiedX,
                     modifiedY,
-                    source[prefix + "x"],
-                    source[prefix + "y"],
-                    target[prefix + "x"],
-                    target[prefix + "y"],
+                    source[`${prefix}x`],
+                    source[`${prefix}y`],
+                    target[`${prefix}x`],
+                    target[`${prefix}y`],
                     cp.x,
                     cp.y,
                     Math.max(s, maxEpsilon)
@@ -223,10 +254,10 @@
               sigma.utils.isPointOnSegment(
                 modifiedX,
                 modifiedY,
-                source[prefix + "x"],
-                source[prefix + "y"],
-                target[prefix + "x"],
-                target[prefix + "y"],
+                source[`${prefix}x`],
+                source[`${prefix}y`],
+                target[`${prefix}x`],
+                target[`${prefix}y`],
                 Math.max(s, maxEpsilon)
               )
             ) {
@@ -239,10 +270,13 @@
     }
 
     function bindCaptor(captor) {
-      var nodes,
-        edges,
-        overNodes = {},
-        overEdges = {};
+      let nodes;
+
+      let edges;
+
+      let overNodes = {};
+
+      let overEdges = {};
 
       function onClick(e) {
         if (!self.settings("eventsEnabled")) return;
@@ -334,12 +368,17 @@
       function onOut(e) {
         if (!self.settings("eventsEnabled")) return;
 
-        var k,
-          i,
-          l,
-          le,
-          outNodes = [],
-          outEdges = [];
+        let k;
+
+        let i;
+
+        let l;
+
+        let le;
+
+        const outNodes = [];
+
+        const outEdges = [];
 
         for (k in overNodes) outNodes.push(overNodes[k]);
 
@@ -376,18 +415,29 @@
         nodes = getNodes(e);
         edges = getEdges(e);
 
-        var i,
-          k,
-          node,
-          edge,
-          newOutNodes = [],
-          newOverNodes = [],
-          currentOverNodes = {},
-          l = nodes.length,
-          newOutEdges = [],
-          newOverEdges = [],
-          currentOverEdges = {},
-          le = edges.length;
+        let i;
+
+        let k;
+
+        let node;
+
+        let edge;
+
+        const newOutNodes = [];
+
+        const newOverNodes = [];
+
+        const currentOverNodes = {};
+
+        let l = nodes.length;
+
+        const newOutEdges = [];
+
+        const newOverEdges = [];
+
+        const currentOverEdges = {};
+
+        let le = edges.length;
 
         // Check newly overred nodes:
         for (i = 0; i < l; i++) {

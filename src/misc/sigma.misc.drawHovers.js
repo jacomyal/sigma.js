@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -15,12 +13,14 @@
    * It has to be called in the scope of the related renderer.
    */
   sigma.misc.drawHovers = function(prefix) {
-    var self = this,
-      hoveredNodes = {},
-      hoveredEdges = {};
+    const self = this;
+
+    const hoveredNodes = {};
+
+    const hoveredEdges = {};
 
     this.bind("overNode", function(event) {
-      var node = event.data.node;
+      const node = event.data.node;
       if (!node.hidden) {
         hoveredNodes[node.id] = node;
         draw();
@@ -33,7 +33,7 @@
     });
 
     this.bind("overEdge", function(event) {
-      var edge = event.data.edge;
+      const edge = event.data.edge;
       if (!edge.hidden) {
         hoveredEdges[edge.id] = edge;
         draw();
@@ -50,20 +50,31 @@
     });
 
     function draw() {
-      var k,
-        source,
-        target,
-        hoveredNode,
-        hoveredEdge,
-        c = self.contexts.hover.canvas,
-        defaultNodeType = self.settings("defaultNodeType"),
-        defaultEdgeType = self.settings("defaultEdgeType"),
-        nodeRenderers = sigma.canvas.hovers,
-        edgeRenderers = sigma.canvas.edgehovers,
-        extremitiesRenderers = sigma.canvas.extremities,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+      let k;
+
+      let source;
+
+      let target;
+
+      let hoveredNode;
+
+      let hoveredEdge;
+
+      const c = self.contexts.hover.canvas;
+
+      const defaultNodeType = self.settings("defaultNodeType");
+
+      const defaultEdgeType = self.settings("defaultEdgeType");
+
+      const nodeRenderers = sigma.canvas.hovers;
+
+      const edgeRenderers = sigma.canvas.edgehovers;
+
+      const extremitiesRenderers = sigma.canvas.extremities;
+
+      const embedSettings = self.settings.embedObjects({
+        prefix
+      });
 
       // Clear self.contexts.hover:
       self.contexts.hover.clearRect(0, 0, c.width, c.height);

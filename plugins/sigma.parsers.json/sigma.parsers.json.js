@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize package:
@@ -15,7 +13,8 @@
   sigma.utils.xhr = function() {
     if (window.XMLHttpRequest) return new XMLHttpRequest();
 
-    var names, i;
+    let names;
+    let i;
 
     if (window.ActiveXObject) {
       names = [
@@ -48,8 +47,9 @@
    *                                 parameter.
    */
   sigma.parsers.json = function(url, sig, callback) {
-    var graph,
-      xhr = sigma.utils.xhr();
+    let graph;
+
+    const xhr = sigma.utils.xhr();
 
     if (!xhr) throw "XMLHttpRequest not supported, cannot load the file.";
 

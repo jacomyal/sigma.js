@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.webgl.edges");
 
   /**
@@ -12,13 +10,18 @@
   sigma.webgl.edges.fast = {
     POINTS: 2,
     ATTRIBUTES: 3,
-    addEdge: function(edge, source, target, data, i, prefix, settings) {
-      var w = (edge[prefix + "size"] || 1) / 2,
-        x1 = source[prefix + "x"],
-        y1 = source[prefix + "y"],
-        x2 = target[prefix + "x"],
-        y2 = target[prefix + "y"],
-        color = edge.color;
+    addEdge(edge, source, target, data, i, prefix, settings) {
+      const w = (edge[`${prefix}size`] || 1) / 2;
+
+      const x1 = source[`${prefix}x`];
+
+      const y1 = source[`${prefix}y`];
+
+      const x2 = target[`${prefix}x`];
+
+      const y2 = target[`${prefix}y`];
+
+      let color = edge.color;
 
       if (!color)
         switch (settings("edgeColor")) {
@@ -44,14 +47,17 @@
       data[i++] = y2;
       data[i++] = color;
     },
-    render: function(gl, program, data, params) {
-      var buffer;
+    render(gl, program, data, params) {
+      let buffer;
 
       // Define attributes:
-      var colorLocation = gl.getAttribLocation(program, "a_color"),
-        positionLocation = gl.getAttribLocation(program, "a_position"),
-        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
-        matrixLocation = gl.getUniformLocation(program, "u_matrix");
+      const colorLocation = gl.getAttribLocation(program, "a_color");
+
+      const positionLocation = gl.getAttribLocation(program, "a_position");
+
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+      const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -87,8 +93,10 @@
         params.count || data.length / this.ATTRIBUTES
       );
     },
-    initProgram: function(gl) {
-      var vertexShader, fragmentShader, program;
+    initProgram(gl) {
+      let vertexShader;
+      let fragmentShader;
+      let program;
 
       vertexShader = sigma.utils.loadShader(
         gl,
