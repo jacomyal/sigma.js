@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.misc.animation.running');
+  sigma.utils.pkg("sigma.misc.animation.running");
 
   /**
    * Generates a unique ID for the animation.
@@ -15,7 +14,7 @@
   var _getID = (function() {
     var id = 0;
     return function() {
-      return '' + (++id);
+      return "" + ++id;
     };
   })();
 
@@ -47,27 +46,27 @@
   sigma.misc.animation.camera = function(camera, val, options) {
     if (
       !(camera instanceof sigma.classes.camera) ||
-      typeof val !== 'object' ||
+      typeof val !== "object" ||
       !val
     )
-      throw 'animation.camera: Wrong arguments.';
+      throw "animation.camera: Wrong arguments.";
 
     if (
-      typeof val.x !== 'number' &&
-      typeof val.y !== 'number' &&
-      typeof val.ratio !== 'number' &&
-      typeof val.angle !== 'number'
+      typeof val.x !== "number" &&
+      typeof val.y !== "number" &&
+      typeof val.ratio !== "number" &&
+      typeof val.angle !== "number"
     )
-      throw 'There must be at least one valid coordinate in the given val.';
+      throw "There must be at least one valid coordinate in the given val.";
 
     var fn,
-        id,
-        anim,
-        easing,
-        duration,
-        initialVal,
-        o = options || {},
-        start = sigma.utils.dateNow();
+      id,
+      anim,
+      easing,
+      duration,
+      initialVal,
+      o = options || {},
+      start = sigma.utils.dateNow();
 
     // Store initial values:
     initialVal = {
@@ -78,13 +77,14 @@
     };
 
     duration = o.duration;
-    easing = typeof o.easing !== 'function' ?
-      sigma.utils.easings[o.easing || 'quadraticInOut'] :
-      o.easing;
+    easing =
+      typeof o.easing !== "function"
+        ? sigma.utils.easings[o.easing || "quadraticInOut"]
+        : o.easing;
 
     fn = function() {
       var coef,
-          t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
+        t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
 
       // If the animation is over:
       if (t >= 1) {
@@ -100,31 +100,33 @@
         delete sigma.misc.animation.running[id];
 
         // Check callbacks:
-        if (typeof o.onComplete === 'function')
-          o.onComplete();
+        if (typeof o.onComplete === "function") o.onComplete();
 
-      // Else, let's keep going:
+        // Else, let's keep going:
       } else {
         coef = easing(t);
         camera.isAnimated = true;
         camera.goTo({
-          x: val.x !== undefined ?
-            initialVal.x + (val.x - initialVal.x) * coef :
-            initialVal.x,
-          y: val.y !== undefined ?
-            initialVal.y + (val.y - initialVal.y) * coef :
-            initialVal.y,
-          ratio: val.ratio !== undefined ?
-            initialVal.ratio + (val.ratio - initialVal.ratio) * coef :
-            initialVal.ratio,
-          angle: val.angle !== undefined ?
-            initialVal.angle + (val.angle - initialVal.angle) * coef :
-            initialVal.angle
+          x:
+            val.x !== undefined
+              ? initialVal.x + (val.x - initialVal.x) * coef
+              : initialVal.x,
+          y:
+            val.y !== undefined
+              ? initialVal.y + (val.y - initialVal.y) * coef
+              : initialVal.y,
+          ratio:
+            val.ratio !== undefined
+              ? initialVal.ratio + (val.ratio - initialVal.ratio) * coef
+              : initialVal.ratio,
+          angle:
+            val.angle !== undefined
+              ? initialVal.angle + (val.angle - initialVal.angle) * coef
+              : initialVal.angle
         });
 
         // Check callbacks:
-        if (typeof o.onNewFrame === 'function')
-          o.onNewFrame();
+        if (typeof o.onNewFrame === "function") o.onNewFrame();
 
         anim.frameId = requestAnimationFrame(fn);
       }
@@ -134,7 +136,7 @@
     anim = {
       frameId: requestAnimationFrame(fn),
       target: camera,
-      type: 'camera',
+      type: "camera",
       options: o,
       fn: fn
     };
@@ -150,8 +152,8 @@
    * @return {object}     Returns the sigma.misc.animation package.
    */
   sigma.misc.animation.kill = function(id) {
-    if (arguments.length !== 1 || typeof id !== 'number')
-      throw 'animation.kill: Wrong arguments.';
+    if (arguments.length !== 1 || typeof id !== "number")
+      throw "animation.kill: Wrong arguments.";
 
     var o = sigma.misc.animation.running[id];
 
@@ -159,11 +161,10 @@
       cancelAnimationFrame(id);
       delete sigma.misc.animation.running[o.frameId];
 
-      if (o.type === 'camera')
-        o.target.isAnimated = false;
+      if (o.type === "camera") o.target.isAnimated = false;
 
       // Check callbacks:
-      if (typeof (o.options || {}).onComplete === 'function')
+      if (typeof (o.options || {}).onComplete === "function")
         o.options.onComplete();
     }
 
@@ -182,11 +183,11 @@
    */
   sigma.misc.animation.killAll = function(filter) {
     var o,
-        id,
-        count = 0,
-        type = typeof filter === 'string' ? filter : null,
-        target = typeof filter === 'object' ? filter : null,
-        running = sigma.misc.animation.running;
+      id,
+      count = 0,
+      type = typeof filter === "string" ? filter : null,
+      target = typeof filter === "object" ? filter : null,
+      running = sigma.misc.animation.running;
 
     for (id in running)
       if (
@@ -197,14 +198,13 @@
         cancelAnimationFrame(o.frameId);
         delete sigma.misc.animation.running[id];
 
-        if (o.type === 'camera')
-          o.target.isAnimated = false;
+        if (o.type === "camera") o.target.isAnimated = false;
 
         // Increment counter:
         count++;
 
         // Check callbacks:
-        if (typeof (o.options || {}).onComplete === 'function')
+        if (typeof (o.options || {}).onComplete === "function")
           o.options.onComplete();
       }
 
@@ -223,9 +223,9 @@
    */
   sigma.misc.animation.has = function(filter) {
     var id,
-        type = typeof filter === 'string' ? filter : null,
-        target = typeof filter === 'object' ? filter : null,
-        running = sigma.misc.animation.running;
+      type = typeof filter === "string" ? filter : null,
+      target = typeof filter === "object" ? filter : null,
+      running = sigma.misc.animation.running;
 
     for (id in running)
       if (
@@ -236,4 +236,4 @@
 
     return false;
   };
-}).call(this);
+}.call(this));

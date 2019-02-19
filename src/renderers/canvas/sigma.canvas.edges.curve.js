@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg("sigma.canvas.edges");
 
   /**
    * This edge renderer will display edges as curves.
@@ -14,28 +14,29 @@
    */
   sigma.canvas.edges.curve = function(edge, source, target, context, settings) {
     var color = edge.color,
-        prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
-        edgeColor = settings('edgeColor'),
-        defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor'),
-        cp = {},
-        sSize = source[prefix + 'size'],
-        sX = source[prefix + 'x'],
-        sY = source[prefix + 'y'],
-        tX = target[prefix + 'x'],
-        tY = target[prefix + 'y'];
+      prefix = settings("prefix") || "",
+      size = edge[prefix + "size"] || 1,
+      edgeColor = settings("edgeColor"),
+      defaultNodeColor = settings("defaultNodeColor"),
+      defaultEdgeColor = settings("defaultEdgeColor"),
+      cp = {},
+      sSize = source[prefix + "size"],
+      sX = source[prefix + "x"],
+      sY = source[prefix + "y"],
+      tX = target[prefix + "x"],
+      tY = target[prefix + "y"];
 
-    cp = (source.id === target.id) ?
-      sigma.utils.getSelfLoopControlPoints(sX, sY, sSize) :
-      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
+    cp =
+      source.id === target.id
+        ? sigma.utils.getSelfLoopControlPoints(sX, sY, sSize)
+        : sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {
-        case 'source':
+        case "source":
           color = source.color || defaultNodeColor;
           break;
-        case 'target':
+        case "target":
           color = target.color || defaultNodeColor;
           break;
         default:

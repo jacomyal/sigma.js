@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.canvas.nodes');
+  sigma.utils.pkg("sigma.canvas.nodes");
 
   /**
    * The default node renderer. It renders the node as a simple disc.
@@ -11,14 +11,14 @@
    * @param  {configurable}             settings The settings function.
    */
   sigma.canvas.nodes.def = function(node, context, settings) {
-    var prefix = settings('prefix') || '';
+    var prefix = settings("prefix") || "";
 
-    context.fillStyle = node.color || settings('defaultNodeColor');
+    context.fillStyle = node.color || settings("defaultNodeColor");
     context.beginPath();
     context.arc(
-      node[prefix + 'x'],
-      node[prefix + 'y'],
-      node[prefix + 'size'],
+      node[prefix + "x"],
+      node[prefix + "y"],
+      node[prefix + "size"],
       0,
       Math.PI * 2,
       true

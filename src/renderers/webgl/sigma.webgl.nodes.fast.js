@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.webgl.nodes');
+  sigma.utils.pkg("sigma.webgl.nodes");
 
   /**
    * This node renderer will display nodes in the fastest way: Nodes are basic
@@ -24,31 +24,24 @@
     POINTS: 1,
     ATTRIBUTES: 4,
     addNode: function(node, data, i, prefix, settings) {
-      data[i++] = node[prefix + 'x'];
-      data[i++] = node[prefix + 'y'];
-      data[i++] = node[prefix + 'size'];
+      data[i++] = node[prefix + "x"];
+      data[i++] = node[prefix + "y"];
+      data[i++] = node[prefix + "size"];
       data[i++] = sigma.utils.floatColor(
-        node.color || settings('defaultNodeColor')
+        node.color || settings("defaultNodeColor")
       );
     },
     render: function(gl, program, data, params) {
       var buffer;
 
       // Define attributes:
-      var positionLocation =
-            gl.getAttribLocation(program, 'a_position'),
-          sizeLocation =
-            gl.getAttribLocation(program, 'a_size'),
-          colorLocation =
-            gl.getAttribLocation(program, 'a_color'),
-          resolutionLocation =
-            gl.getUniformLocation(program, 'u_resolution'),
-          matrixLocation =
-            gl.getUniformLocation(program, 'u_matrix'),
-          ratioLocation =
-            gl.getUniformLocation(program, 'u_ratio'),
-          scaleLocation =
-            gl.getUniformLocation(program, 'u_scale');
+      var positionLocation = gl.getAttribLocation(program, "a_position"),
+        sizeLocation = gl.getAttribLocation(program, "a_size"),
+        colorLocation = gl.getAttribLocation(program, "a_color"),
+        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
+        matrixLocation = gl.getUniformLocation(program, "u_matrix"),
+        ratioLocation = gl.getUniformLocation(program, "u_ratio"),
+        scaleLocation = gl.getUniformLocation(program, "u_scale");
 
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -57,7 +50,7 @@
       gl.uniform2f(resolutionLocation, params.width, params.height);
       gl.uniform1f(
         ratioLocation,
-        1 / Math.pow(params.ratio, params.settings('nodesPowRatio'))
+        1 / Math.pow(params.ratio, params.settings("nodesPowRatio"))
       );
       gl.uniform1f(scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
@@ -94,77 +87,75 @@
       gl.drawArrays(
         gl.POINTS,
         params.start || 0,
-        params.count || (data.length / this.ATTRIBUTES)
+        params.count || data.length / this.ATTRIBUTES
       );
     },
     initProgram: function(gl) {
-      var vertexShader,
-          fragmentShader,
-          program;
+      var vertexShader, fragmentShader, program;
 
       vertexShader = sigma.utils.loadShader(
         gl,
         [
-          'attribute vec2 a_position;',
-          'attribute float a_size;',
-          'attribute float a_color;',
+          "attribute vec2 a_position;",
+          "attribute float a_size;",
+          "attribute float a_color;",
 
-          'uniform vec2 u_resolution;',
-          'uniform float u_ratio;',
-          'uniform float u_scale;',
-          'uniform mat3 u_matrix;',
+          "uniform vec2 u_resolution;",
+          "uniform float u_ratio;",
+          "uniform float u_scale;",
+          "uniform mat3 u_matrix;",
 
-          'varying vec4 color;',
+          "varying vec4 color;",
 
-          'void main() {',
-            // Scale from [[-1 1] [-1 1]] to the container:
-            'gl_Position = vec4(',
-              '((u_matrix * vec3(a_position, 1)).xy /',
-                'u_resolution * 2.0 - 1.0) * vec2(1, -1),',
-              '0,',
-              '1',
-            ');',
+          "void main() {",
+          // Scale from [[-1 1] [-1 1]] to the container:
+          "gl_Position = vec4(",
+          "((u_matrix * vec3(a_position, 1)).xy /",
+          "u_resolution * 2.0 - 1.0) * vec2(1, -1),",
+          "0,",
+          "1",
+          ");",
 
-            // Multiply the point size twice:
-            //  - x SCALING_RATIO to correct the canvas scaling
-            //  - x 2 to correct the formulae
-            'gl_PointSize = a_size * u_ratio * u_scale * 2.0;',
+          // Multiply the point size twice:
+          //  - x SCALING_RATIO to correct the canvas scaling
+          //  - x 2 to correct the formulae
+          "gl_PointSize = a_size * u_ratio * u_scale * 2.0;",
 
-            // Extract the color:
-            'float c = a_color;',
-            'color.b = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.g = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0;',
-          '}'
-        ].join('\n'),
+          // Extract the color:
+          "float c = a_color;",
+          "color.b = mod(c, 256.0); c = floor(c / 256.0);",
+          "color.g = mod(c, 256.0); c = floor(c / 256.0);",
+          "color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;",
+          "color.a = 1.0;",
+          "}"
+        ].join("\n"),
         gl.VERTEX_SHADER
       );
 
       fragmentShader = sigma.utils.loadShader(
         gl,
         [
-          'precision mediump float;',
+          "precision mediump float;",
 
-          'varying vec4 color;',
+          "varying vec4 color;",
 
-          'void main(void) {',
-            'float border = 0.01;',
-            'float radius = 0.5;',
+          "void main(void) {",
+          "float border = 0.01;",
+          "float radius = 0.5;",
 
-            'vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);',
-            'vec2 m = gl_PointCoord - vec2(0.5, 0.5);',
-            'float dist = radius - sqrt(m.x * m.x + m.y * m.y);',
+          "vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);",
+          "vec2 m = gl_PointCoord - vec2(0.5, 0.5);",
+          "float dist = radius - sqrt(m.x * m.x + m.y * m.y);",
 
-            'float t = 0.0;',
-            'if (dist > border)',
-              't = 1.0;',
-            'else if (dist > 0.0)',
-              't = dist / border;',
+          "float t = 0.0;",
+          "if (dist > border)",
+          "t = 1.0;",
+          "else if (dist > 0.0)",
+          "t = dist / border;",
 
-            'gl_FragColor = mix(color0, color, t);',
-          '}'
-        ].join('\n'),
+          "gl_FragColor = mix(color0, color, t);",
+          "}"
+        ].join("\n"),
         gl.FRAGMENT_SHADER
       );
 

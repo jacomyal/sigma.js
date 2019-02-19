@@ -1,14 +1,12 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
-  if (typeof conrad === 'undefined')
-    throw 'conrad is not declared';
+  if (typeof conrad === "undefined") throw "conrad is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.renderers');
+  sigma.utils.pkg("sigma.renderers");
 
   /**
    * This function is the constructor of the canvas sigma's renderer.
@@ -21,23 +19,23 @@
    * @return {sigma.renderers.canvas}          The renderer instance.
    */
   sigma.renderers.canvas = function(graph, camera, settings, options) {
-    if (typeof options !== 'object')
-      throw 'sigma.renderers.canvas: Wrong arguments.';
+    if (typeof options !== "object")
+      throw "sigma.renderers.canvas: Wrong arguments.";
 
     if (!(options.container instanceof HTMLElement))
-      throw 'Container not found.';
+      throw "Container not found.";
 
     var k,
-        i,
-        l,
-        a,
-        fn,
-        self = this;
+      i,
+      l,
+      a,
+      fn,
+      self = this;
 
     sigma.classes.dispatcher.extend(this);
 
     // Initialize main attributes:
-    Object.defineProperty(this, 'conradId', {
+    Object.defineProperty(this, "conradId", {
       value: sigma.utils.id()
     });
     this.graph = graph;
@@ -46,12 +44,10 @@
     this.domElements = {};
     this.options = options;
     this.container = this.options.container;
-    this.settings = (
-        typeof options.settings === 'object' &&
-        options.settings
-      ) ?
-        settings.embedObjects(options.settings) :
-        settings;
+    this.settings =
+      typeof options.settings === "object" && options.settings
+        ? settings.embedObjects(options.settings)
+        : settings;
 
     // Node indexes:
     this.nodesOnScreen = [];
@@ -61,37 +57,31 @@
     this.jobs = {};
 
     // Find the prefix:
-    this.options.prefix = 'renderer' + this.conradId + ':';
+    this.options.prefix = "renderer" + this.conradId + ":";
 
     // Initialize the DOM elements:
-    if (
-      !this.settings('batchEdgesDrawing')
-    ) {
-      this.initDOM('canvas', 'scene');
+    if (!this.settings("batchEdgesDrawing")) {
+      this.initDOM("canvas", "scene");
       this.contexts.edges = this.contexts.scene;
       this.contexts.nodes = this.contexts.scene;
       this.contexts.labels = this.contexts.scene;
     } else {
-      this.initDOM('canvas', 'edges');
-      this.initDOM('canvas', 'scene');
+      this.initDOM("canvas", "edges");
+      this.initDOM("canvas", "scene");
       this.contexts.nodes = this.contexts.scene;
       this.contexts.labels = this.contexts.scene;
     }
 
-    this.initDOM('canvas', 'mouse');
+    this.initDOM("canvas", "mouse");
     this.contexts.hover = this.contexts.mouse;
 
     // Initialize captors:
     this.captors = [];
     a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
     for (i = 0, l = a.length; i < l; i++) {
-      fn = typeof a[i] === 'function' ? a[i] : sigma.captors[a[i]];
+      fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
       this.captors.push(
-        new fn(
-          this.domElements.mouse,
-          this.camera,
-          this.settings
-        )
+        new fn(this.domElements.mouse, this.camera, this.settings)
       );
     }
 
@@ -101,9 +91,6 @@
 
     this.resize(false);
   };
-
-
-
 
   /**
    * This method renders the graph on the canvases.
@@ -115,56 +102,49 @@
     options = options || {};
 
     var a,
-        i,
-        k,
-        l,
-        o,
-        id,
-        end,
-        job,
-        start,
-        edges,
-        renderers,
-        rendererType,
-        batchSize,
-        tempGCO,
-        index = {},
-        graph = this.graph,
-        nodes = this.graph.nodes,
-        prefix = this.options.prefix || '',
-        drawEdges = this.settings(options, 'drawEdges'),
-        drawNodes = this.settings(options, 'drawNodes'),
-        drawLabels = this.settings(options, 'drawLabels'),
-        drawEdgeLabels = this.settings(options, 'drawEdgeLabels'),
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix
-        });
+      i,
+      k,
+      l,
+      o,
+      id,
+      end,
+      job,
+      start,
+      edges,
+      renderers,
+      rendererType,
+      batchSize,
+      tempGCO,
+      index = {},
+      graph = this.graph,
+      nodes = this.graph.nodes,
+      prefix = this.options.prefix || "",
+      drawEdges = this.settings(options, "drawEdges"),
+      drawNodes = this.settings(options, "drawNodes"),
+      drawLabels = this.settings(options, "drawLabels"),
+      drawEdgeLabels = this.settings(options, "drawEdgeLabels"),
+      embedSettings = this.settings.embedObjects(options, {
+        prefix: this.options.prefix
+      });
 
     // Call the resize function:
     this.resize(false);
 
     // Check the 'hideEdgesOnMove' setting:
-    if (this.settings(options, 'hideEdgesOnMove'))
-      if (this.camera.isAnimated || this.camera.isMoving)
-        drawEdges = false;
+    if (this.settings(options, "hideEdgesOnMove"))
+      if (this.camera.isAnimated || this.camera.isMoving) drawEdges = false;
 
     // Apply the camera's view:
-    this.camera.applyView(
-      undefined,
-      this.options.prefix,
-      {
-        width: this.width,
-        height: this.height
-      }
-    );
+    this.camera.applyView(undefined, this.options.prefix, {
+      width: this.width,
+      height: this.height
+    });
 
     // Clear canvases:
     this.clear();
 
     // Kill running jobs:
-    for (k in this.jobs)
-      if (conrad.hasJob(k))
-        conrad.killJob(k);
+    for (k in this.jobs) if (conrad.hasJob(k)) conrad.killJob(k);
 
     // Find which nodes are on screen:
     this.edgesOnScreen = [];
@@ -193,9 +173,9 @@
       }
 
       // If the "batchEdgesDrawing" settings is true, edges are batched:
-      if (this.settings(options, 'batchEdgesDrawing')) {
-        id = 'edges_' + this.conradId;
-        batchSize = embedSettings('canvasEdgesBatchSize');
+      if (this.settings(options, "batchEdgesDrawing")) {
+        id = "edges_" + this.conradId;
+        batchSize = embedSettings("canvasEdgesBatchSize");
 
         edges = this.edgesOnScreen;
         l = edges.length;
@@ -205,14 +185,13 @@
 
         job = function() {
           tempGCO = this.contexts.edges.globalCompositeOperation;
-          this.contexts.edges.globalCompositeOperation = 'destination-over';
+          this.contexts.edges.globalCompositeOperation = "destination-over";
 
           renderers = sigma.canvas.edges;
           for (i = start; i < end; i++) {
             o = edges[i];
-            (renderers[
-              o.type || this.settings(options, 'defaultEdgeType')
-            ] || renderers.def)(
+            (renderers[o.type || this.settings(options, "defaultEdgeType")] ||
+              renderers.def)(
               o,
               graph.nodes(o.source),
               graph.nodes(o.target),
@@ -228,7 +207,7 @@
               o = edges[i];
               if (!o.hidden)
                 (renderers[
-                  o.type || this.settings(options, 'defaultEdgeType')
+                  o.type || this.settings(options, "defaultEdgeType")
                 ] || renderers.def)(
                   o,
                   graph.nodes(o.source),
@@ -256,14 +235,13 @@
         this.jobs[id] = job;
         conrad.addJob(id, job.bind(this));
 
-      // If not, they are drawn in one frame:
+        // If not, they are drawn in one frame:
       } else {
         renderers = sigma.canvas.edges;
         for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
           o = a[i];
-          (renderers[
-            o.type || this.settings(options, 'defaultEdgeType')
-          ] || renderers.def)(
+          (renderers[o.type || this.settings(options, "defaultEdgeType")] ||
+            renderers.def)(
             o,
             graph.nodes(o.source),
             graph.nodes(o.target),
@@ -279,7 +257,7 @@
           for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++)
             if (!a[i].hidden)
               (renderers[
-                a[i].type || this.settings(options, 'defaultEdgeType')
+                a[i].type || this.settings(options, "defaultEdgeType")
               ] || renderers.def)(
                 a[i],
                 graph.nodes(a[i].source),
@@ -297,13 +275,8 @@
       renderers = sigma.canvas.nodes;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[
-            a[i].type || this.settings(options, 'defaultNodeType')
-          ] || renderers.def)(
-            a[i],
-            this.contexts.nodes,
-            embedSettings
-          );
+          (renderers[a[i].type || this.settings(options, "defaultNodeType")] ||
+            renderers.def)(a[i], this.contexts.nodes, embedSettings);
     }
 
     // Draw labels:
@@ -312,16 +285,11 @@
       renderers = sigma.canvas.labels;
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++)
         if (!a[i].hidden)
-          (renderers[
-            a[i].type || this.settings(options, 'defaultNodeType')
-          ] || renderers.def)(
-            a[i],
-            this.contexts.labels,
-            embedSettings
-          );
+          (renderers[a[i].type || this.settings(options, "defaultNodeType")] ||
+            renderers.def)(a[i], this.contexts.labels, embedSettings);
     }
 
-    this.dispatchEvent('render');
+    this.dispatchEvent("render");
 
     return this;
   };
@@ -337,14 +305,14 @@
   sigma.renderers.canvas.prototype.initDOM = function(tag, id) {
     var dom = document.createElement(tag);
 
-    dom.style.position = 'absolute';
-    dom.setAttribute('class', 'sigma-' + id);
+    dom.style.position = "absolute";
+    dom.setAttribute("class", "sigma-" + id);
 
     this.domElements[id] = dom;
     this.container.appendChild(dom);
 
-    if (tag.toLowerCase() === 'canvas')
-      this.contexts[id] = dom.getContext('2d');
+    if (tag.toLowerCase() === "canvas")
+      this.contexts[id] = dom.getContext("2d");
   };
 
   /**
@@ -357,9 +325,9 @@
    */
   sigma.renderers.canvas.prototype.resize = function(w, h) {
     var k,
-        oldWidth = this.width,
-        oldHeight = this.height,
-        pixelRatio = sigma.utils.getPixelRatio();
+      oldWidth = this.width,
+      oldHeight = this.height,
+      pixelRatio = sigma.utils.getPixelRatio();
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -374,15 +342,14 @@
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
       for (k in this.domElements) {
-        this.domElements[k].style.width = w + 'px';
-        this.domElements[k].style.height = h + 'px';
+        this.domElements[k].style.width = w + "px";
+        this.domElements[k].style.height = h + "px";
 
-        if (this.domElements[k].tagName.toLowerCase() === 'canvas') {
-          this.domElements[k].setAttribute('width', (w * pixelRatio) + 'px');
-          this.domElements[k].setAttribute('height', (h * pixelRatio) + 'px');
+        if (this.domElements[k].tagName.toLowerCase() === "canvas") {
+          this.domElements[k].setAttribute("width", w * pixelRatio + "px");
+          this.domElements[k].setAttribute("height", h * pixelRatio + "px");
 
-          if (pixelRatio !== 1)
-            this.contexts[k].scale(pixelRatio, pixelRatio);
+          if (pixelRatio !== 1) this.contexts[k].scale(pixelRatio, pixelRatio);
         }
       }
     }
@@ -407,12 +374,10 @@
    * This method kills contexts and other attributes.
    */
   sigma.renderers.canvas.prototype.kill = function() {
-    var k,
-        captor;
+    var k, captor;
 
     // Kill captors:
-    while ((captor = this.captors.pop()))
-      captor.kill();
+    while ((captor = this.captors.pop())) captor.kill();
     delete this.captors;
 
     // Kill contexts:
@@ -425,9 +390,6 @@
     delete this.contexts;
   };
 
-
-
-
   /**
    * The labels, nodes and edges renderers are stored in the three following
    * objects. When an element is drawn, its type will be checked and if a
@@ -436,7 +398,7 @@
    *
    * They are stored in different files, in the "./canvas" folder.
    */
-  sigma.utils.pkg('sigma.canvas.nodes');
-  sigma.utils.pkg('sigma.canvas.edges');
-  sigma.utils.pkg('sigma.canvas.labels');
-}).call(this);
+  sigma.utils.pkg("sigma.canvas.nodes");
+  sigma.utils.pkg("sigma.canvas.edges");
+  sigma.utils.pkg("sigma.canvas.labels");
+}.call(this));

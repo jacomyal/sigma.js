@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.canvas.edgehovers');
+  sigma.utils.pkg("sigma.canvas.edgehovers");
 
   /**
    * This hover renderer will display the edge with a different color or size.
@@ -12,31 +12,37 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edgehovers.curve =
-    function(edge, source, target, context, settings) {
+  sigma.canvas.edgehovers.curve = function(
+    edge,
+    source,
+    target,
+    context,
+    settings
+  ) {
     var color = edge.color,
-        prefix = settings('prefix') || '',
-        size = settings('edgeHoverSizeRatio') * (edge[prefix + 'size'] || 1),
-        edgeColor = settings('edgeColor'),
-        defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor'),
-        cp = {},
-        sSize = source[prefix + 'size'],
-        sX = source[prefix + 'x'],
-        sY = source[prefix + 'y'],
-        tX = target[prefix + 'x'],
-        tY = target[prefix + 'y'];
+      prefix = settings("prefix") || "",
+      size = settings("edgeHoverSizeRatio") * (edge[prefix + "size"] || 1),
+      edgeColor = settings("edgeColor"),
+      defaultNodeColor = settings("defaultNodeColor"),
+      defaultEdgeColor = settings("defaultEdgeColor"),
+      cp = {},
+      sSize = source[prefix + "size"],
+      sX = source[prefix + "x"],
+      sY = source[prefix + "y"],
+      tX = target[prefix + "x"],
+      tY = target[prefix + "y"];
 
-    cp = (source.id === target.id) ?
-      sigma.utils.getSelfLoopControlPoints(sX, sY, sSize) :
-      sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
+    cp =
+      source.id === target.id
+        ? sigma.utils.getSelfLoopControlPoints(sX, sY, sSize)
+        : sigma.utils.getQuadraticControlPoint(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {
-        case 'source':
+        case "source":
           color = source.color || defaultNodeColor;
           break;
-        case 'target':
+        case "target":
           color = target.color || defaultNodeColor;
           break;
         default:
@@ -44,10 +50,10 @@
           break;
       }
 
-    if (settings('edgeHoverColor') === 'edge') {
+    if (settings("edgeHoverColor") === "edge") {
       color = edge.hover_color || color;
     } else {
-      color = edge.hover_color || settings('defaultEdgeHoverColor') || color;
+      color = edge.hover_color || settings("defaultEdgeHoverColor") || color;
     }
 
     context.strokeStyle = color;

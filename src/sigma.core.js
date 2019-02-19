@@ -1,5 +1,5 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
   var __instances = {};
 
@@ -63,19 +63,14 @@
   var sigma = function(conf) {
     // Local variables:
     // ****************
-    var i,
-        l,
-        a,
-        c,
-        o,
-        id;
+    var i, l, a, c, o, id;
 
     sigma.classes.dispatcher.extend(this);
 
     // Private attributes:
     // *******************
     var _self = this,
-        _conf = conf || {};
+      _conf = conf || {};
 
     // Little shortcut:
     // ****************
@@ -88,14 +83,11 @@
     //    considered as the container itself (a DOM element).
     //  - If the argument passed to sigma() is a string, it will be considered
     //    as the ID of the DOM container.
-    if (
-      typeof _conf === 'string' ||
-      _conf instanceof HTMLElement
-    )
+    if (typeof _conf === "string" || _conf instanceof HTMLElement)
       _conf = {
         renderers: [_conf]
       };
-    else if (Object.prototype.toString.call(_conf) === '[object Array]')
+    else if (Object.prototype.toString.call(_conf) === "[object Array]")
       _conf = {
         renderers: _conf
       };
@@ -104,9 +96,9 @@
     o = _conf.renderers || _conf.renderer || _conf.container;
     if (!_conf.renderers || _conf.renderers.length === 0)
       if (
-        typeof o === 'string' ||
+        typeof o === "string" ||
         o instanceof HTMLElement ||
-        (typeof o === 'object' && 'container' in o)
+        (typeof o === "object" && "container" in o)
       )
         _conf.renderers = [o];
 
@@ -114,15 +106,14 @@
     if (_conf.id) {
       if (__instances[_conf.id])
         throw 'sigma: Instance "' + _conf.id + '" already exists.';
-      Object.defineProperty(this, 'id', {
+      Object.defineProperty(this, "id", {
         value: _conf.id
       });
     } else {
       id = 0;
-      while (__instances[id])
-        id++;
-      Object.defineProperty(this, 'id', {
-        value: '' + id
+      while (__instances[id]) id++;
+      Object.defineProperty(this, "id", {
+        value: "" + id
       });
     }
     __instances[this.id] = this;
@@ -134,88 +125,84 @@
     );
 
     // Initialize locked attributes:
-    Object.defineProperty(this, 'graph', {
+    Object.defineProperty(this, "graph", {
       value: new sigma.classes.graph(this.settings),
       configurable: true
     });
-    Object.defineProperty(this, 'middlewares', {
+    Object.defineProperty(this, "middlewares", {
       value: [],
       configurable: true
     });
-    Object.defineProperty(this, 'cameras', {
+    Object.defineProperty(this, "cameras", {
       value: {},
       configurable: true
     });
-    Object.defineProperty(this, 'renderers', {
+    Object.defineProperty(this, "renderers", {
       value: {},
       configurable: true
     });
-    Object.defineProperty(this, 'renderersPerCamera', {
+    Object.defineProperty(this, "renderersPerCamera", {
       value: {},
       configurable: true
     });
-    Object.defineProperty(this, 'cameraFrames', {
+    Object.defineProperty(this, "cameraFrames", {
       value: {},
       configurable: true
     });
-    Object.defineProperty(this, 'camera', {
+    Object.defineProperty(this, "camera", {
       get: function() {
         return this.cameras[0];
       }
     });
-    Object.defineProperty(this, 'events', {
+    Object.defineProperty(this, "events", {
       value: [
-        'click',
-        'rightClick',
-        'clickStage',
-        'doubleClickStage',
-        'rightClickStage',
-        'clickNode',
-        'clickNodes',
-        'doubleClickNode',
-        'doubleClickNodes',
-        'rightClickNode',
-        'rightClickNodes',
-        'overNode',
-        'overNodes',
-        'outNode',
-        'outNodes',
-        'downNode',
-        'downNodes',
-        'upNode',
-        'upNodes'
+        "click",
+        "rightClick",
+        "clickStage",
+        "doubleClickStage",
+        "rightClickStage",
+        "clickNode",
+        "clickNodes",
+        "doubleClickNode",
+        "doubleClickNodes",
+        "rightClickNode",
+        "rightClickNodes",
+        "overNode",
+        "overNodes",
+        "outNode",
+        "outNodes",
+        "downNode",
+        "downNodes",
+        "upNode",
+        "upNodes"
       ],
       configurable: true
     });
 
     // Add a custom handler, to redispatch events from renderers:
-    this._handler = (function(e) {
+    this._handler = function(e) {
       var k,
-          data = {};
+        data = {};
 
-      for (k in e.data)
-        data[k] = e.data[k];
+      for (k in e.data) data[k] = e.data[k];
 
       data.renderer = e.target;
       this.dispatchEvent(e.type, data);
-    }).bind(this);
+    }.bind(this);
 
     // Initialize renderers:
     a = _conf.renderers || [];
-    for (i = 0, l = a.length; i < l; i++)
-      this.addRenderer(a[i]);
+    for (i = 0, l = a.length; i < l; i++) this.addRenderer(a[i]);
 
     // Initialize middlewares:
     a = _conf.middlewares || [];
     for (i = 0, l = a.length; i < l; i++)
       this.middlewares.push(
-        typeof a[i] === 'string' ?
-          sigma.middlewares[a[i]] :
-          a[i]
+        typeof a[i] === "string" ? sigma.middlewares[a[i]] : a[i]
       );
 
     // Check if there is already a graph to fill in:
-    if (typeof _conf.graph === 'object' && _conf.graph) {
+    if (typeof _conf.graph === "object" && _conf.graph) {
       this.graph.read(_conf.graph);
 
       // If a graph is given to the to the instance, the "refresh" method is
@@ -224,14 +211,10 @@
     }
 
     // Deal with resize:
-    window.addEventListener('resize', function() {
-      if (_self.settings)
-        _self.refresh();
+    window.addEventListener("resize", function() {
+      if (_self.settings) _self.refresh();
     });
   };
-
-
-
 
   /**
    * This methods will instantiate and reference a new camera. If no id is
@@ -242,13 +225,12 @@
    */
   sigma.prototype.addCamera = function(id) {
     var self = this,
-        camera;
+      camera;
 
     if (!arguments.length) {
       id = 0;
-      while (this.cameras['' + id])
-        id++;
-      id = '' + id;
+      while (this.cameras["" + id]) id++;
+      id = "" + id;
     }
 
     if (this.cameras[id])
@@ -265,7 +247,7 @@
       camera.edgequadtree = new sigma.classes.edgequad();
     }
 
-    camera.bind('coordinatesUpdated', function(e) {
+    camera.bind("coordinatesUpdated", function(e) {
       self.renderCamera(camera, camera.isAnimated);
     });
 
@@ -281,24 +263,21 @@
    * @return {sigma}           Returns the instance.
    */
   sigma.prototype.killCamera = function(v) {
-    v = typeof v === 'string' ? this.cameras[v] : v;
+    v = typeof v === "string" ? this.cameras[v] : v;
 
-    if (!v)
-      throw 'sigma.killCamera: The camera is undefined.';
+    if (!v) throw "sigma.killCamera: The camera is undefined.";
 
     var i,
-        l,
-        a = this.renderersPerCamera[v.id];
+      l,
+      a = this.renderersPerCamera[v.id];
 
-    for (l = a.length, i = l - 1; i >= 0; i--)
-      this.killRenderer(a[i]);
+    for (l = a.length, i = l - 1; i >= 0; i--) this.killRenderer(a[i]);
 
     delete this.renderersPerCamera[v.id];
     delete this.cameraFrames[v.id];
     delete this.cameras[v.id];
 
-    if (v.kill)
-      v.kill();
+    if (v.kill) v.kill();
 
     return this;
   };
@@ -326,13 +305,13 @@
    */
   sigma.prototype.addRenderer = function(options) {
     var id,
-        fn,
-        camera,
-        renderer,
-        o = options || {};
+      fn,
+      camera,
+      renderer,
+      o = options || {};
 
     // Polymorphism:
-    if (typeof o === 'string')
+    if (typeof o === "string")
       o = {
         container: document.getElementById(o)
       };
@@ -342,41 +321,38 @@
       };
 
     // If the container still is a string, we get it by id
-    if (typeof o.container === 'string')
+    if (typeof o.container === "string")
       o.container = document.getElementById(o.container);
 
     // Reference the new renderer:
-    if (!('id' in o)) {
+    if (!("id" in o)) {
       id = 0;
-      while (this.renderers['' + id])
-        id++;
-      id = '' + id;
-    } else
-      id = o.id;
+      while (this.renderers["" + id]) id++;
+      id = "" + id;
+    } else id = o.id;
 
     if (this.renderers[id])
       throw 'sigma.addRenderer: The renderer "' + id + '" already exists.';
 
     // Find the good constructor:
-    fn = typeof o.type === 'function' ? o.type : sigma.renderers[o.type];
+    fn = typeof o.type === "function" ? o.type : sigma.renderers[o.type];
     fn = fn || sigma.renderers.def;
 
     // Find the good camera:
-    camera = 'camera' in o ?
-      (
-        o.camera instanceof sigma.classes.camera ?
-          o.camera :
-          this.cameras[o.camera] || this.addCamera(o.camera)
-      ) :
-      this.addCamera();
+    camera =
+      "camera" in o
+        ? o.camera instanceof sigma.classes.camera
+          ? o.camera
+          : this.cameras[o.camera] || this.addCamera(o.camera)
+        : this.addCamera();
 
     if (this.cameras[camera.id] !== camera)
-      throw 'sigma.addRenderer: The camera is not properly referenced.';
+      throw "sigma.addRenderer: The camera is not properly referenced.";
 
     // Instantiate:
     renderer = new fn(this.graph, camera, this.settings, o);
     this.renderers[id] = renderer;
-    Object.defineProperty(renderer, 'id', {
+    Object.defineProperty(renderer, "id", {
       value: id
     });
 
@@ -384,39 +360,39 @@
     if (renderer.bind)
       renderer.bind(
         [
-          'click',
-          'rightClick',
-          'clickStage',
-          'doubleClickStage',
-          'rightClickStage',
-          'clickNode',
-          'clickNodes',
-          'clickEdge',
-          'clickEdges',
-          'doubleClickNode',
-          'doubleClickNodes',
-          'doubleClickEdge',
-          'doubleClickEdges',
-          'rightClickNode',
-          'rightClickNodes',
-          'rightClickEdge',
-          'rightClickEdges',
-          'overNode',
-          'overNodes',
-          'overEdge',
-          'overEdges',
-          'outNode',
-          'outNodes',
-          'outEdge',
-          'outEdges',
-          'downNode',
-          'downNodes',
-          'downEdge',
-          'downEdges',
-          'upNode',
-          'upNodes',
-          'upEdge',
-          'upEdges'
+          "click",
+          "rightClick",
+          "clickStage",
+          "doubleClickStage",
+          "rightClickStage",
+          "clickNode",
+          "clickNodes",
+          "clickEdge",
+          "clickEdges",
+          "doubleClickNode",
+          "doubleClickNodes",
+          "doubleClickEdge",
+          "doubleClickEdges",
+          "rightClickNode",
+          "rightClickNodes",
+          "rightClickEdge",
+          "rightClickEdges",
+          "overNode",
+          "overNodes",
+          "overEdge",
+          "overEdges",
+          "outNode",
+          "outNodes",
+          "outEdge",
+          "outEdges",
+          "downNode",
+          "downNodes",
+          "downEdge",
+          "downEdges",
+          "upNode",
+          "upNodes",
+          "upEdge",
+          "upEdges"
         ],
         this._handler
       );
@@ -434,27 +410,21 @@
    * @return {sigma}             Returns the instance.
    */
   sigma.prototype.killRenderer = function(v) {
-    v = typeof v === 'string' ? this.renderers[v] : v;
+    v = typeof v === "string" ? this.renderers[v] : v;
 
-    if (!v)
-      throw 'sigma.killRenderer: The renderer is undefined.';
+    if (!v) throw "sigma.killRenderer: The renderer is undefined.";
 
     var a = this.renderersPerCamera[v.camera.id],
-        i = a.indexOf(v);
+      i = a.indexOf(v);
 
-    if (i >= 0)
-      a.splice(i, 1);
+    if (i >= 0) a.splice(i, 1);
 
-    if (v.kill)
-      v.kill();
+    if (v.kill) v.kill();
 
     delete this.renderers[v.id];
 
     return this;
   };
-
-
-
 
   /**
    * This method calls the "render" method of each renderer, with the same
@@ -478,12 +448,12 @@
    */
   sigma.prototype.refresh = function(options) {
     var i,
-        l,
-        k,
-        a,
-        c,
-        bounds,
-        prefix = 0;
+      l,
+      k,
+      a,
+      c,
+      bounds,
+      prefix = 0;
 
     options = options || {};
 
@@ -492,8 +462,8 @@
     for (i = 0, l = a.length; i < l; i++)
       a[i].call(
         this,
-        (i === 0) ? '' : 'tmp' + prefix + ':',
-        (i === l - 1) ? 'ready:' : ('tmp' + (++prefix) + ':')
+        i === 0 ? "" : "tmp" + prefix + ":",
+        i === l - 1 ? "ready:" : "tmp" + ++prefix + ":"
       );
 
     // Then, for each camera, call the "rescale" middleware, unless the
@@ -501,13 +471,13 @@
     for (k in this.cameras) {
       c = this.cameras[k];
       if (
-        c.settings('autoRescale') &&
+        c.settings("autoRescale") &&
         this.renderersPerCamera[c.id] &&
         this.renderersPerCamera[c.id].length
       )
         sigma.middlewares.rescale.call(
           this,
-          a.length ? 'ready:' : '',
+          a.length ? "ready:" : "",
           c.readPrefix,
           {
             width: this.renderersPerCamera[c.id][0].width,
@@ -517,16 +487,13 @@
       else
         sigma.middlewares.copy.call(
           this,
-          a.length ? 'ready:' : '',
+          a.length ? "ready:" : "",
           c.readPrefix
         );
 
       if (!options.skipIndexation) {
         // Find graph boundaries:
-        bounds = sigma.utils.getBoundaries(
-          this.graph,
-          c.readPrefix
-        );
+        bounds = sigma.utils.getBoundaries(this.graph, c.readPrefix);
 
         // Refresh quadtree:
         c.quadtree.index(this.graph.nodes(), {
@@ -542,8 +509,8 @@
         // Refresh edgequadtree:
         if (
           c.edgequadtree !== undefined &&
-          c.settings('drawEdges') &&
-          c.settings('enableEdgeHovering')
+          c.settings("drawEdges") &&
+          c.settings("enableEdgeHovering")
         ) {
           c.edgequadtree.index(this.graph, {
             prefix: c.readPrefix,
@@ -562,7 +529,7 @@
     a = Object.keys(this.renderers);
     for (i = 0, l = a.length; i < l; i++)
       if (this.renderers[a[i]].process) {
-        if (this.settings('skipErrors'))
+        if (this.settings("skipErrors"))
           try {
             this.renderers[a[i]].process();
           } catch (e) {
@@ -570,8 +537,7 @@
               'Warning: The renderer "' + a[i] + '" crashed on ".process()"'
             );
           }
-        else
-          this.renderers[a[i]].process();
+        else this.renderers[a[i]].process();
       }
 
     this.render();
@@ -586,24 +552,23 @@
    */
   sigma.prototype.render = function() {
     var i,
-        l,
-        a,
-        prefix = 0;
+      l,
+      a,
+      prefix = 0;
 
     // Call each renderer:
     a = Object.keys(this.renderers);
     for (i = 0, l = a.length; i < l; i++)
-      if (this.settings('skipErrors'))
+      if (this.settings("skipErrors"))
         try {
           this.renderers[a[i]].render();
         } catch (e) {
-          if (this.settings('verbose'))
+          if (this.settings("verbose"))
             console.log(
               'Warning: The renderer "' + a[i] + '" crashed on ".render()"'
             );
         }
-      else
-        this.renderers[a[i]].render();
+      else this.renderers[a[i]].render();
 
     return this;
   };
@@ -621,41 +586,39 @@
    */
   sigma.prototype.renderCamera = function(camera, force) {
     var i,
-        l,
-        a,
-        self = this;
+      l,
+      a,
+      self = this;
 
     if (force) {
       a = this.renderersPerCamera[camera.id];
       for (i = 0, l = a.length; i < l; i++)
-        if (this.settings('skipErrors'))
+        if (this.settings("skipErrors"))
           try {
             a[i].render();
           } catch (e) {
-            if (this.settings('verbose'))
+            if (this.settings("verbose"))
               console.log(
                 'Warning: The renderer "' + a[i].id + '" crashed on ".render()"'
               );
           }
-        else
-          a[i].render();
+        else a[i].render();
     } else {
       if (!this.cameraFrames[camera.id]) {
         a = this.renderersPerCamera[camera.id];
         for (i = 0, l = a.length; i < l; i++)
-          if (this.settings('skipErrors'))
+          if (this.settings("skipErrors"))
             try {
               a[i].render();
             } catch (e) {
-              if (this.settings('verbose'))
+              if (this.settings("verbose"))
                 console.log(
                   'Warning: The renderer "' +
                     a[i].id +
                     '" crashed on ".render()"'
                 );
             }
-          else
-            a[i].render();
+          else a[i].render();
 
         this.cameraFrames[camera.id] = requestAnimationFrame(function() {
           delete self.cameraFrames[camera.id];
@@ -674,7 +637,7 @@
     var k;
 
     // Dispatching event
-    this.dispatchEvent('kill');
+    this.dispatchEvent("kill");
 
     // Kill graph:
     this.graph.kill();
@@ -683,26 +646,19 @@
     delete this.middlewares;
 
     // Kill each renderer:
-    for (k in this.renderers)
-      this.killRenderer(this.renderers[k]);
+    for (k in this.renderers) this.killRenderer(this.renderers[k]);
 
     // Kill each camera:
-    for (k in this.cameras)
-      this.killCamera(this.cameras[k]);
+    for (k in this.cameras) this.killCamera(this.cameras[k]);
 
     delete this.renderers;
     delete this.cameras;
 
     // Kill everything else:
-    for (k in this)
-      if (this.hasOwnProperty(k))
-        delete this[k];
+    for (k in this) if (this.hasOwnProperty(k)) delete this[k];
 
     delete __instances[this.id];
   };
-
-
-
 
   /**
    * Returns a clone of the instances object or a specific running instance.
@@ -712,28 +668,22 @@
    *                      object.
    */
   sigma.instances = function(id) {
-    return arguments.length ?
-      __instances[id] :
-      sigma.utils.extend({}, __instances);
+    return arguments.length
+      ? __instances[id]
+      : sigma.utils.extend({}, __instances);
   };
-
-
 
   /**
    * The current version of sigma:
    */
-  sigma.version = '1.2.1';
-
-
-
+  sigma.version = "1.2.1";
 
   /**
    * EXPORT:
    * *******
    */
-  if (typeof this.sigma !== 'undefined')
-    throw 'An object called sigma is already in the global scope.';
+  if (typeof this.sigma !== "undefined")
+    throw "An object called sigma is already in the global scope.";
 
   this.sigma = sigma;
-
-}).call(this);
+}.call(this));

@@ -28,12 +28,10 @@
  * in the Software.
  */
 (function(global) {
-  'use strict';
+  "use strict";
 
   // Check that conrad.js has not been loaded yet:
-  if (global.conrad)
-    throw new Error('conrad already exists');
-
+  if (global.conrad) throw new Error("conrad already exists");
 
   /**
    * PRIVATE VARIABLES:
@@ -120,7 +118,6 @@
    */
   var _handlers = Object.create(null);
 
-
   /**
    * PRIVATE FUNCTIONS:
    * ******************
@@ -136,30 +133,18 @@
    * @return {Object}                      Returns conrad.
    */
   function _bind(events, handler) {
-    var i,
-        i_end,
-        event,
-        eArray;
+    var i, i_end, event, eArray;
 
-    if (!arguments.length)
-      return;
-    else if (
-      arguments.length === 1 &&
-      Object(arguments[0]) === arguments[0]
-    )
-      for (events in arguments[0])
-        _bind(events, arguments[0][events]);
+    if (!arguments.length) return;
+    else if (arguments.length === 1 && Object(arguments[0]) === arguments[0])
+      for (events in arguments[0]) _bind(events, arguments[0][events]);
     else if (arguments.length > 1) {
-      eArray =
-        Array.isArray(events) ?
-          events :
-          events.split(/ /);
+      eArray = Array.isArray(events) ? events : events.split(/ /);
 
       for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
 
-        if (!_handlers[event])
-          _handlers[event] = [];
+        if (!_handlers[event]) _handlers[event] = [];
 
         // Using an object instead of directly the handler will make possible
         // later to add flags
@@ -183,17 +168,14 @@
    */
   function _unbind(events, handler) {
     var i,
-        i_end,
-        j,
-        j_end,
-        a,
-        event,
-        eArray = Array.isArray(events) ?
-                   events :
-                   events.split(/ /);
+      i_end,
+      j,
+      j_end,
+      a,
+      event,
+      eArray = Array.isArray(events) ? events : events.split(/ /);
 
-    if (!arguments.length)
-      _handlers = Object.create(null);
+    if (!arguments.length) _handlers = Object.create(null);
     else if (handler) {
       for (i = 0, i_end = eArray.length; i !== i_end; i += 1) {
         event = eArray[i];
@@ -224,14 +206,12 @@
    */
   function _dispatch(events, data) {
     var i,
-        j,
-        i_end,
-        j_end,
-        event,
-        eventName,
-        eArray = Array.isArray(events) ?
-                   events :
-                   events.split(/ /);
+      j,
+      i_end,
+      j_end,
+      event,
+      eventName,
+      eArray = Array.isArray(events) ? events : events.split(/ /);
 
     data = data === undefined ? {} : data;
 
@@ -260,12 +240,12 @@
    */
   function _executeFirstJob() {
     var i,
-        l,
-        test,
-        kill,
-        pushed = false,
-        time = __dateNow(),
-        job = _sortedByPriorityJobs.shift();
+      l,
+      test,
+      kill,
+      pushed = false,
+      time = __dateNow(),
+      job = _sortedByPriorityJobs.shift();
 
     // Execute the job and look at the result:
     test = job.job();
@@ -279,7 +259,7 @@
     job.averageTime = job.time / job.done;
 
     // Check if the job has to be killed:
-    kill = job.count ? (job.count <= job.done) : !test;
+    kill = job.count ? job.count <= job.done : !test;
 
     // Reset priorities:
     if (!kill) {
@@ -290,8 +270,7 @@
           break;
         }
 
-      if (!pushed)
-        _sortedByPriorityJobs.push(job);
+      if (!pushed) _sortedByPriorityJobs.push(job);
     }
 
     return kill ? job : null;
@@ -308,7 +287,7 @@
 
     // Add the job to the running jobs:
     _runningJobs[job.id] = job;
-    job.status = 'running';
+    job.status = "running";
 
     // Add the job to the priorities:
     if (l) {
@@ -318,7 +297,7 @@
 
     // Initialize the job and dispatch:
     job.startTime = __dateNow();
-    _dispatch('jobStarted', __clone(job));
+    _dispatch("jobStarted", __clone(job));
 
     _sortedByPriorityJobs.push(job);
   }
@@ -333,21 +312,14 @@
    *  . It stops itself when there are no more jobs to execute.
    */
   function _loop() {
-    var k,
-        o,
-        l,
-        job,
-        time,
-        deadJob;
+    var k, o, l, job, time, deadJob;
 
     // Deal with the newly added jobs (the _jobs object):
     for (k in _jobs) {
       job = _jobs[k];
 
-      if (job.after)
-        _waitingJobs[k] = job;
-      else
-        _activateJob(job);
+      if (job.after) _waitingJobs[k] = job;
+      else _activateJob(job);
 
       delete _jobs[k];
     }
@@ -380,10 +352,9 @@
       // Update the _lastFrameTime:
       _lastFrameTime = __dateNow();
 
-      _dispatch('enterFrame');
+      _dispatch("enterFrame");
       setTimeout(_loop, 0);
-    } else
-      _dispatch('stop');
+    } else _dispatch("stop");
   }
 
   /**
@@ -471,9 +442,7 @@
    *                         specified "after" job is ended.
    */
   function _addJob(v1, v2) {
-    var i,
-        l,
-        o;
+    var i, l, o;
 
     // Array of jobs:
     if (Array.isArray(v1)) {
@@ -488,65 +457,68 @@
         // Update the _lastFrameTime:
         _lastFrameTime = __dateNow();
 
-        _dispatch('start');
+        _dispatch("start");
         _loop();
       }
-    } else if (typeof v1 === 'object') {
+    } else if (typeof v1 === "object") {
       // One job (object):
-      if (typeof v1.id === 'string')
-        _addJob(v1.id, v1);
-
+      if (typeof v1.id === "string") _addJob(v1.id, v1);
       // Hash of jobs:
       else {
         // Keep conrad to start until the last job is added:
         _noStart = true;
 
         for (i in v1)
-          if (typeof v1[i] === 'function')
-            _addJob(i, __extend({
-              job: v1[i]
-            }, v2));
-          else
-            _addJob(i, __extend(v1[i], v2));
+          if (typeof v1[i] === "function")
+            _addJob(
+              i,
+              __extend(
+                {
+                  job: v1[i]
+                },
+                v2
+              )
+            );
+          else _addJob(i, __extend(v1[i], v2));
 
         _noStart = false;
         if (!_isRunning) {
           // Update the _lastFrameTime:
           _lastFrameTime = __dateNow();
 
-          _dispatch('start');
+          _dispatch("start");
           _loop();
         }
       }
 
-    // One job (string, *):
-    } else if (typeof v1 === 'string') {
+      // One job (string, *):
+    } else if (typeof v1 === "string") {
       if (_hasJob(v1))
         throw new Error(
           '[conrad.addJob] Job with id "' + v1 + '" already exists.'
         );
 
       // One job (string, function):
-      if (typeof v2 === 'function') {
+      if (typeof v2 === "function") {
         o = {
           id: v1,
           done: 0,
           time: 0,
-          status: 'waiting',
+          status: "waiting",
           currentTime: 0,
           averageTime: 0,
           weightTime: 0,
           job: v2
         };
 
-      // One job (string, object):
-      } else if (typeof v2 === 'object') {
+        // One job (string, object):
+      } else if (typeof v2 === "object") {
         o = __extend(
           {
             id: v1,
             done: 0,
             time: 0,
-            status: 'waiting',
+            status: "waiting",
             currentTime: 0,
             averageTime: 0,
             weightTime: 0
@@ -554,26 +526,24 @@
           v2
         );
 
-      // If none of those cases, throw an error:
-      } else
-        throw new Error('[conrad.addJob] Wrong arguments.');
+        // If none of those cases, throw an error:
+      } else throw new Error("[conrad.addJob] Wrong arguments.");
 
       // Effectively add the job:
       _jobs[v1] = o;
-      _dispatch('jobAdded', __clone(o));
+      _dispatch("jobAdded", __clone(o));
 
       // Check if the loop has to be started:
       if (!_isRunning && !_noStart) {
         // Update the _lastFrameTime:
         _lastFrameTime = __dateNow();
 
-        _dispatch('start');
+        _dispatch("start");
         _loop();
       }
 
-    // If none of those cases, throw an error:
-    } else
-      throw new Error('[conrad.addJob] Wrong arguments.');
+      // If none of those cases, throw an error:
+    } else throw new Error("[conrad.addJob] Wrong arguments.");
 
     return this;
   }
@@ -588,19 +558,17 @@
    */
   function _killJob(v1) {
     var i,
-        l,
-        k,
-        a,
-        job,
-        found = false;
+      l,
+      k,
+      a,
+      job,
+      found = false;
 
     // Array of job ids:
     if (Array.isArray(v1))
-      for (i = 0, l = v1.length; i < l; i++)
-        _killJob(v1[i]);
-
+      for (i = 0, l = v1.length; i < l; i++) _killJob(v1[i]);
     // One job's id:
-    else if (typeof v1 === 'string') {
+    else if (typeof v1 === "string") {
       a = [_runningJobs, _waitingJobs, _jobs];
 
       // Remove the job from the hashes:
@@ -609,15 +577,14 @@
           job = a[i][v1];
 
           if (_parameters.history) {
-            job.status = 'done';
+            job.status = "done";
             _doneJobs.push(job);
           }
 
-          _dispatch('jobEnded', __clone(job));
+          _dispatch("jobEnded", __clone(job));
           delete a[i][v1];
 
-          if (typeof job.end === 'function')
-            job.end();
+          if (typeof job.end === "function") job.end();
 
           found = true;
         }
@@ -633,9 +600,8 @@
       if (!found)
         throw new Error('[conrad.killJob] Job "' + v1 + '" not found.');
 
-    // If none of those cases, throw an error:
-    } else
-      throw new Error('[conrad.killJob] Wrong arguments.');
+      // If none of those cases, throw an error:
+    } else throw new Error("[conrad.killJob] Wrong arguments.");
 
     return this;
   }
@@ -647,16 +613,15 @@
    */
   function _killAll() {
     var k,
-        jobs = __extend(_jobs, _runningJobs, _waitingJobs);
+      jobs = __extend(_jobs, _runningJobs, _waitingJobs);
 
     // Take every jobs and push them into the _doneJobs object:
     if (_parameters.history)
       for (k in jobs) {
-        jobs[k].status = 'done';
+        jobs[k].status = "done";
         _doneJobs.push(jobs[k]);
 
-        if (typeof jobs[k].end === 'function')
-          jobs[k].end();
+        if (typeof jobs[k].end === "function") jobs[k].end();
       }
 
     // Reinitialize the different jobs lists:
@@ -697,20 +662,15 @@
   function _settings(v1, v2) {
     var o;
 
-    if (typeof a1 === 'string' && arguments.length === 1)
+    if (typeof a1 === "string" && arguments.length === 1)
       return _parameters[a1];
     else {
-      o = (typeof a1 === 'object' && arguments.length === 1) ?
-        a1 || {} :
-        {};
-      if (typeof a1 === 'string')
-        o[a1] = a2;
+      o = typeof a1 === "object" && arguments.length === 1 ? a1 || {} : {};
+      if (typeof a1 === "string") o[a1] = a2;
 
       for (var k in o)
-        if (o[k] !== undefined)
-          _parameters[k] = o[k];
-        else
-          delete _parameters[k];
+        if (o[k] !== undefined) _parameters[k] = o[k];
+        else delete _parameters[k];
 
       return this;
     }
@@ -762,72 +722,58 @@
    *  > conrad.getStats('running', /test/)
    */
   function _getStats(v1, v2) {
-    var a,
-        k,
-        i,
-        l,
-        stats,
-        pattern,
-        isPatternString;
+    var a, k, i, l, stats, pattern, isPatternString;
 
     if (!arguments.length) {
       stats = [];
 
-      for (k in _jobs)
-        stats.push(_jobs[k]);
+      for (k in _jobs) stats.push(_jobs[k]);
 
-      for (k in _waitingJobs)
-        stats.push(_waitingJobs[k]);
+      for (k in _waitingJobs) stats.push(_waitingJobs[k]);
 
-      for (k in _runningJobs)
-        stats.push(_runningJobs[k]);
+      for (k in _runningJobs) stats.push(_runningJobs[k]);
 
       stats = stats.concat(_doneJobs);
     }
 
-    if (typeof v1 === 'string')
+    if (typeof v1 === "string")
       switch (v1) {
-        case 'waiting':
+        case "waiting":
           stats = __objectValues(_waitingJobs);
           break;
-        case 'running':
+        case "running":
           stats = __objectValues(_runningJobs);
           break;
-        case 'done':
+        case "done":
           stats = _doneJobs;
           break;
         default:
           pattern = v1;
       }
 
-    if (v1 instanceof RegExp)
-      pattern = v1;
+    if (v1 instanceof RegExp) pattern = v1;
 
-    if (!pattern && (typeof v2 === 'string' || v2 instanceof RegExp))
+    if (!pattern && (typeof v2 === "string" || v2 instanceof RegExp))
       pattern = v2;
 
     // Filter jobs if a pattern is given:
     if (pattern) {
-      isPatternString = typeof pattern === 'string';
+      isPatternString = typeof pattern === "string";
 
       if (stats instanceof Array) {
         a = stats;
-      } else if (typeof stats === 'object') {
+      } else if (typeof stats === "object") {
         a = [];
 
-        for (k in stats)
-          a = a.concat(stats[k]);
+        for (k in stats) a = a.concat(stats[k]);
       } else {
         a = [];
 
-        for (k in _jobs)
-          a.push(_jobs[k]);
+        for (k in _jobs) a.push(_jobs[k]);
 
-        for (k in _waitingJobs)
-          a.push(_waitingJobs[k]);
+        for (k in _waitingJobs) a.push(_waitingJobs[k]);
 
-        for (k in _runningJobs)
-          a.push(_runningJobs[k]);
+        for (k in _runningJobs) a.push(_runningJobs[k]);
 
         a = a.concat(_doneJobs);
       }
@@ -840,7 +786,6 @@
 
     return __clone(stats);
   }
-
 
   /**
    * TOOLS FUNCTIONS:
@@ -879,13 +824,12 @@
    */
   function __extend() {
     var i,
-        k,
-        res = {},
-        l = arguments.length;
+      k,
+      res = {},
+      l = arguments.length;
 
     for (i = l - 1; i >= 0; i--)
-      for (k in arguments[i])
-        res[k] = arguments[i][k];
+      for (k in arguments[i]) res[k] = arguments[i][k];
 
     return res;
   }
@@ -902,19 +846,15 @@
   function __clone(item) {
     var result, i, k, l;
 
-    if (!item)
-      return item;
+    if (!item) return item;
 
     if (Array.isArray(item)) {
       result = [];
-      for (i = 0, l = item.length; i < l; i++)
-        result.push(__clone(item[i]));
-    } else if (typeof item === 'object') {
+      for (i = 0, l = item.length; i < l; i++) result.push(__clone(item[i]));
+    } else if (typeof item === "object") {
       result = {};
-      for (i in item)
-        result[i] = __clone(item[i]);
-    } else
-      result = item;
+      for (i in item) result[i] = __clone(item[i]);
+    } else result = item;
 
     return result;
   }
@@ -927,10 +867,9 @@
    */
   function __objectValues(o) {
     var k,
-        a = [];
+      a = [];
 
-    for (k in o)
-      a.push(o[k]);
+    for (k in o) a.push(o[k]);
 
     return a;
   }
@@ -949,9 +888,8 @@
    */
   if (!Array.isArray)
     Array.isArray = function(v) {
-      return Object.prototype.toString.call(v) === '[object Array]';
+      return Object.prototype.toString.call(v) === "[object Array]";
     };
-
 
   /**
    * EXPORT PUBLIC API:
@@ -972,11 +910,11 @@
     unbind: _unbind,
 
     // Version:
-    version: '0.1.0'
+    version: "0.1.0"
   };
 
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
+  if (typeof exports !== "undefined") {
+    if (typeof module !== "undefined" && module.exports)
       exports = module.exports = conrad;
     exports.conrad = conrad;
   }

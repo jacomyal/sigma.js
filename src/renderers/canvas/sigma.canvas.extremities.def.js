@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.canvas.extremities');
+  sigma.utils.pkg("sigma.canvas.extremities");
 
   /**
    * The default renderer for hovered edge extremities. It renders the edge
@@ -17,22 +16,25 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.extremities.def =
-    function(edge, source, target, context, settings) {
+  sigma.canvas.extremities.def = function(
+    edge,
+    source,
+    target,
+    context,
+    settings
+  ) {
     // Source Node:
-    (
-      sigma.canvas.hovers[source.type] ||
-      sigma.canvas.hovers.def
-    ) (
-      source, context, settings
+    (sigma.canvas.hovers[source.type] || sigma.canvas.hovers.def)(
+      source,
+      context,
+      settings
     );
 
     // Target Node:
-    (
-      sigma.canvas.hovers[target.type] ||
-      sigma.canvas.hovers.def
-    ) (
-      target, context, settings
+    (sigma.canvas.hovers[target.type] || sigma.canvas.hovers.def)(
+      target,
+      context,
+      settings
     );
   };
-}).call(this);
+}.call(this));

@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.captors');
+  sigma.utils.pkg("sigma.captors");
 
   /**
    * The user inputs default captor. It deals with mouse events, keyboards
@@ -19,50 +18,44 @@
    */
   sigma.captors.touch = function(target, camera, settings) {
     var _self = this,
-        _target = target,
-        _camera = camera,
-        _settings = settings,
-
-        // CAMERA MANAGEMENT:
-        // ******************
-        // The camera position when the user starts dragging:
-        _startCameraX,
-        _startCameraY,
-        _startCameraAngle,
-        _startCameraRatio,
-
-        // The latest stage position:
-        _lastCameraX,
-        _lastCameraY,
-        _lastCameraAngle,
-        _lastCameraRatio,
-
-        // TOUCH MANAGEMENT:
-        // *****************
-        // Touches that are down:
-        _downTouches = [],
-
-        _startTouchX0,
-        _startTouchY0,
-        _startTouchX1,
-        _startTouchY1,
-        _startTouchAngle,
-        _startTouchDistance,
-
-        _touchMode,
-
-        _isMoving,
-        _doubleTap,
-        _movingTimeoutId;
+      _target = target,
+      _camera = camera,
+      _settings = settings,
+      // CAMERA MANAGEMENT:
+      // ******************
+      // The camera position when the user starts dragging:
+      _startCameraX,
+      _startCameraY,
+      _startCameraAngle,
+      _startCameraRatio,
+      // The latest stage position:
+      _lastCameraX,
+      _lastCameraY,
+      _lastCameraAngle,
+      _lastCameraRatio,
+      // TOUCH MANAGEMENT:
+      // *****************
+      // Touches that are down:
+      _downTouches = [],
+      _startTouchX0,
+      _startTouchY0,
+      _startTouchX1,
+      _startTouchY1,
+      _startTouchAngle,
+      _startTouchDistance,
+      _touchMode,
+      _isMoving,
+      _doubleTap,
+      _movingTimeoutId;
 
     sigma.classes.dispatcher.extend(this);
 
-    sigma.utils.doubleClick(_target, 'touchstart', _doubleTapHandler);
-    _target.addEventListener('touchstart', _handleStart, false);
-    _target.addEventListener('touchend', _handleLeave, false);
-    _target.addEventListener('touchcancel', _handleLeave, false);
-    _target.addEventListener('touchleave', _handleLeave, false);
-    _target.addEventListener('touchmove', _handleMove, false);
+    sigma.utils.doubleClick(_target, "touchstart", _doubleTapHandler);
+    _target.addEventListener("touchstart", _handleStart, false);
+    _target.addEventListener("touchend", _handleLeave, false);
+    _target.addEventListener("touchcancel", _handleLeave, false);
+    _target.addEventListener("touchleave", _handleLeave, false);
+    _target.addEventListener("touchmove", _handleMove, false);
 
     function position(e) {
       var offset = sigma.utils.getOffset(_target);
@@ -77,12 +70,12 @@
      * This method unbinds every handlers that makes the captor work.
      */
     this.kill = function() {
-      sigma.utils.unbindDoubleClick(_target, 'touchstart');
-      _target.addEventListener('touchstart', _handleStart);
-      _target.addEventListener('touchend', _handleLeave);
-      _target.addEventListener('touchcancel', _handleLeave);
-      _target.addEventListener('touchleave', _handleLeave);
-      _target.addEventListener('touchmove', _handleMove);
+      sigma.utils.unbindDoubleClick(_target, "touchstart");
+      _target.addEventListener("touchstart", _handleStart);
+      _target.addEventListener("touchend", _handleLeave);
+      _target.addEventListener("touchcancel", _handleLeave);
+      _target.addEventListener("touchleave", _handleLeave);
+      _target.addEventListener("touchmove", _handleMove);
     };
 
     // TOUCH EVENTS:
@@ -94,13 +87,8 @@
      * @param {event} e A touch event.
      */
     function _handleStart(e) {
-      if (_settings('touchEnabled')) {
-        var x0,
-            x1,
-            y0,
-            y1,
-            pos0,
-            pos1;
+      if (_settings("touchEnabled")) {
+        var x0, x1, y0, y1, pos0, pos1;
 
         _downTouches = e.touches;
 
@@ -152,8 +140,8 @@
             _startTouchDistance = Math.sqrt(
               (_startTouchY1 - _startTouchY0) *
                 (_startTouchY1 - _startTouchY0) +
-              (_startTouchX1 - _startTouchX0) *
-                (_startTouchX1 - _startTouchX0)
+                (_startTouchX1 - _startTouchX0) *
+                  (_startTouchX1 - _startTouchX0)
             );
 
             e.preventDefault();
@@ -170,9 +158,9 @@
      * @param {event} e A touch event.
      */
     function _handleLeave(e) {
-      if (_settings('touchEnabled')) {
+      if (_settings("touchEnabled")) {
         _downTouches = e.touches;
-        var inertiaRatio = _settings('touchInertiaRatio');
+        var inertiaRatio = _settings("touchInertiaRatio");
 
         if (_movingTimeoutId) {
           _isMoving = false;
@@ -187,24 +175,22 @@
               e.preventDefault();
               break;
             }
-            /* falls through */
+          /* falls through */
           case 1:
             _camera.isMoving = false;
-            _self.dispatchEvent('stopDrag');
+            _self.dispatchEvent("stopDrag");
 
             if (_isMoving) {
               _doubleTap = false;
               sigma.misc.animation.camera(
                 _camera,
                 {
-                  x: _camera.x +
-                    inertiaRatio * (_camera.x - _lastCameraX),
-                  y: _camera.y +
-                    inertiaRatio * (_camera.y - _lastCameraY)
+                  x: _camera.x + inertiaRatio * (_camera.x - _lastCameraX),
+                  y: _camera.y + inertiaRatio * (_camera.y - _lastCameraY)
                 },
                 {
-                  easing: 'quadraticOut',
-                  duration: _settings('touchInertiaDuration')
+                  easing: "quadraticOut",
+                  duration: _settings("touchInertiaDuration")
                 }
               );
             }
@@ -224,34 +210,33 @@
      * @param {event} e A touch event.
      */
     function _handleMove(e) {
-      if (!_doubleTap && _settings('touchEnabled')) {
+      if (!_doubleTap && _settings("touchEnabled")) {
         var x0,
-            x1,
-            y0,
-            y1,
-            cos,
-            sin,
-            end,
-            pos0,
-            pos1,
-            diff,
-            start,
-            dAngle,
-            dRatio,
-            newStageX,
-            newStageY,
-            newStageRatio,
-            newStageAngle;
+          x1,
+          y0,
+          y1,
+          cos,
+          sin,
+          end,
+          pos0,
+          pos1,
+          diff,
+          start,
+          dAngle,
+          dRatio,
+          newStageX,
+          newStageY,
+          newStageRatio,
+          newStageAngle;
 
         _downTouches = e.touches;
         _isMoving = true;
 
-        if (_movingTimeoutId)
-          clearTimeout(_movingTimeoutId);
+        if (_movingTimeoutId) clearTimeout(_movingTimeoutId);
 
         _movingTimeoutId = setTimeout(function() {
           _isMoving = false;
-        }, _settings('dragTimeout'));
+        }, _settings("dragTimeout"));
 
         switch (_touchMode) {
           case 1:
@@ -277,10 +262,12 @@
                 y: newStageY
               });
 
-              _self.dispatchEvent('mousemove',
-                sigma.utils.mouseCoords(e, pos0.x, pos0.y));
+              _self.dispatchEvent(
+                "mousemove",
+                sigma.utils.mouseCoords(e, pos0.x, pos0.y)
+              );
 
-              _self.dispatchEvent('drag');
+              _self.dispatchEvent("drag");
             }
             break;
           case 2:
@@ -292,10 +279,8 @@
             y1 = pos1.y;
 
             start = _camera.cameraPosition(
-              (_startTouchX0 + _startTouchX1) / 2 -
-                sigma.utils.getCenter(e).x,
-              (_startTouchY0 + _startTouchY1) / 2 -
-                sigma.utils.getCenter(e).y,
+              (_startTouchX0 + _startTouchX1) / 2 - sigma.utils.getCenter(e).x,
+              (_startTouchY0 + _startTouchY1) / 2 - sigma.utils.getCenter(e).y,
               true
             );
             end = _camera.cameraPosition(
@@ -305,9 +290,9 @@
             );
 
             dAngle = Math.atan2(y1 - y0, x1 - x0) - _startTouchAngle;
-            dRatio = Math.sqrt(
-              (y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0)
-            ) / _startTouchDistance;
+            dRatio =
+              Math.sqrt((y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0)) /
+              _startTouchDistance;
 
             // Translation:
             x0 = start.x;
@@ -349,7 +334,7 @@
                 ratio: newStageRatio
               });
 
-              _self.dispatchEvent('drag');
+              _self.dispatchEvent("drag");
             }
 
             break;
@@ -367,20 +352,20 @@
      * @param {event} e A touch event.
      */
     function _doubleTapHandler(e) {
-      var pos,
-          ratio,
-          animation;
+      var pos, ratio, animation;
 
-      if (e.touches && e.touches.length === 1 && _settings('touchEnabled')) {
+      if (e.touches && e.touches.length === 1 && _settings("touchEnabled")) {
         _doubleTap = true;
 
-        ratio = 1 / _settings('doubleClickZoomingRatio');
+        ratio = 1 / _settings("doubleClickZoomingRatio");
 
         pos = position(e.touches[0]);
-        _self.dispatchEvent('doubleclick',
-          sigma.utils.mouseCoords(e, pos.x, pos.y));
+        _self.dispatchEvent(
+          "doubleclick",
+          sigma.utils.mouseCoords(e, pos.x, pos.y)
+        );
 
-        if (_settings('doubleClickEnabled')) {
+        if (_settings("doubleClickEnabled")) {
           pos = _camera.cameraPosition(
             pos.x - sigma.utils.getCenter(e).x,
             pos.y - sigma.utils.getCenter(e).y,
@@ -388,7 +373,7 @@
           );
 
           animation = {
-            duration: _settings('doubleClickZoomDuration'),
+            duration: _settings("doubleClickZoomDuration"),
             onComplete: function() {
               _doubleTap = false;
             }
@@ -397,14 +382,12 @@
           sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
-        if (e.preventDefault)
-          e.preventDefault();
-        else
-          e.returnValue = false;
+        if (e.preventDefault) e.preventDefault();
+        else e.returnValue = false;
 
         e.stopPropagation();
         return false;
       }
     }
   };
-}).call(this);
+}.call(this));

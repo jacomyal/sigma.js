@@ -1,5 +1,5 @@
-;(function(global) {
-  'use strict';
+(function(global) {
+  "use strict";
 
   /**
    * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -9,27 +9,23 @@
    * MIT license
    */
   var x,
-      lastTime = 0,
-      vendors = ['ms', 'moz', 'webkit', 'o'];
+    lastTime = 0,
+    vendors = ["ms", "moz", "webkit", "o"];
 
   for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
-    global.requestAnimationFrame =
-      global[vendors[x] + 'RequestAnimationFrame'];
+    global.requestAnimationFrame = global[vendors[x] + "RequestAnimationFrame"];
     global.cancelAnimationFrame =
-      global[vendors[x] + 'CancelAnimationFrame'] ||
-      global[vendors[x] + 'CancelRequestAnimationFrame'];
+      global[vendors[x] + "CancelAnimationFrame"] ||
+      global[vendors[x] + "CancelRequestAnimationFrame"];
   }
 
   if (!global.requestAnimationFrame)
     global.requestAnimationFrame = function(callback, element) {
       var currTime = new Date().getTime(),
-          timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-          id = global.setTimeout(
-            function() {
-              callback(currTime + timeToCall);
-            },
-            timeToCall
-          );
+        timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+        id = global.setTimeout(function() {
+          callback(currTime + timeToCall);
+        }, timeToCall);
 
       lastTime = currTime + timeToCall;
       return id;
@@ -47,24 +43,22 @@
    */
   if (!Function.prototype.bind)
     Function.prototype.bind = function(oThis) {
-      if (typeof this !== 'function')
+      if (typeof this !== "function")
         // Closest thing possible to the ECMAScript 5 internal IsCallable
         // function:
         throw new TypeError(
-          'Function.prototype.bind - what is trying to be bound is not callable'
+          "Function.prototype.bind - what is trying to be bound is not callable"
         );
 
       var aArgs = Array.prototype.slice.call(arguments, 1),
-          fToBind = this,
-          fNOP,
-          fBound;
+        fToBind = this,
+        fNOP,
+        fBound;
 
       fNOP = function() {};
       fBound = function() {
         return fToBind.apply(
-          this instanceof fNOP && oThis ?
-            this :
-            oThis,
+          this instanceof fNOP && oThis ? this : oThis,
           aArgs.concat(Array.prototype.slice.call(arguments))
         );
       };
