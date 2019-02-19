@@ -3,9 +3,7 @@ module.exports = function(grunt) {
   grunt.file.setBase("../../");
 
   // Registering needed files
-  const files = ["supervisor.js", "worker.js"].map(function(p) {
-    return `${__dirname}/${p}`;
-  });
+  const files = ["supervisor.js", "worker.js"].map(p => `${__dirname}/${p}`);
 
   // Project configuration:
   grunt.initConfig({

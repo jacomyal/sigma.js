@@ -3,13 +3,6 @@
  *
  * This task crush and minify Force Atlas 2 code.
  */
-const uglify = require("uglify-js");
-
-// Shorteners
-function minify(string) {
-  return uglify.minify(string, { fromString: true }).code;
-}
-
 // Crushing function
 function crush(fnString) {
   let pattern;
@@ -97,7 +90,7 @@ module.exports = function(grunt) {
         .join("\n");
 
       // Crushing, cleaning and minifying
-      src = minify(clean(crush(src)));
+      src = clean(crush(src));
 
       // Write the destination file.
       grunt.file.write(f.dest, src);

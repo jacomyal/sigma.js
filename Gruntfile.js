@@ -108,49 +108,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     grunt: subGrunts,
-    closureLint: {
-      app: {
-        closureLinterPath: "/usr/local/bin",
-        command: "gjslint",
-        src: coreJsFiles,
-        options: {
-          stdout: true,
-          strict: true,
-          opt: "--disable 6,13"
-        }
-      }
-    },
-    jshint: {
-      all: coreJsFiles,
-      options: {
-        "-W055": true,
-        "-W040": true,
-        "-W064": true
-      }
-    },
     qunit: {
       all: {
         options: {
           urls: ["./test/unit.html"]
         }
-      }
-    },
-    uglify: {
-      prod: {
-        files: {
-          "build/sigma.min.js": coreJsFiles
-        },
-        options: {
-          banner:
-            "/* sigma.js - <%= pkg.description %> - Version: <%= pkg.version %> - Author: Alexis Jacomy, Sciences-Po Médialab - License: MIT */\n"
-        }
-      },
-      plugins: {
-        files: pluginFiles.reduce(function(res, path) {
-          const dest = `build/${path.replace(/\/\*\*\/\*\.js$/, ".min.js")}`;
-          res[dest] = path;
-          return res;
-        }, {})
       }
     },
     concat: {
@@ -196,29 +158,10 @@ module.exports = function(grunt) {
   require("load-grunt-tasks")(grunt);
 
   // By default, will check lint, hint, test and minify:
-  grunt.registerTask("default", [
-    "closureLint",
-    "jshint",
-    "qunit",
-    "sed",
-    "grunt",
-    "uglify"
-  ]);
-  grunt.registerTask("release", [
-    "closureLint",
-    "jshint",
-    "qunit",
-    "sed",
-    "grunt",
-    "uglify",
-    "zip"
-  ]);
-  grunt.registerTask("npmPrePublish", [
-    "uglify:plugins",
-    "grunt",
-    "concat:require"
-  ]);
-  grunt.registerTask("build", ["uglify", "grunt", "concat:require"]);
+  grunt.registerTask("default", ["qunit", "sed", "grunt"]);
+  grunt.registerTask("release", ["qunit", "sed", "grunt", "zip"]);
+  grunt.registerTask("npmPrePublish", ["grunt", "concat:require"]);
+  grunt.registerTask("build", ["grunt", "concat:require"]);
   grunt.registerTask("test", ["qunit"]);
 
   // For travis-ci.org, only launch tests:
