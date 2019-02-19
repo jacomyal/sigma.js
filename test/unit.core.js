@@ -1,5 +1,5 @@
-module("sigma.core.js");
-test("Constructor polymorphism", function() {
+QUnit.module("sigma.core.js");
+QUnit.test("Constructor polymorphism", function(assert) {
   let s;
 
   const tmp = sigma.renderers.def;
@@ -17,14 +17,14 @@ test("Constructor polymorphism", function() {
   };
 
   s = new sigma();
-  equal(
+  assert.equal(
     Object.keys(s.renderers).length,
     0,
     '"new sigma()" instantiate sigma without any renderer.'
   );
 
   s = new sigma("abc");
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -33,7 +33,7 @@ test("Constructor polymorphism", function() {
   );
 
   s = new sigma(["abc"]);
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -42,7 +42,7 @@ test("Constructor polymorphism", function() {
   );
 
   s = new sigma(document.getElementById("abc"));
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -53,7 +53,7 @@ test("Constructor polymorphism", function() {
   s = new sigma({
     container: "abc"
   });
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -64,7 +64,7 @@ test("Constructor polymorphism", function() {
   s = new sigma({
     container: document.getElementById("abc")
   });
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -73,7 +73,7 @@ test("Constructor polymorphism", function() {
   );
 
   s = new sigma(["abc", "abc"]);
-  deepEqual(
+  assert.deepEqual(
     [s.renderers[0].options, s.renderers[1].options],
     [{ container: dom }, { container: dom }],
     '"new sigma(["abc", "abc"])" instantiate the default renderer in the div #abc twice.'
@@ -86,7 +86,7 @@ test("Constructor polymorphism", function() {
       }
     ]
   });
-  deepEqual(
+  assert.deepEqual(
     s.renderers[0].options,
     {
       container: dom
@@ -98,7 +98,7 @@ test("Constructor polymorphism", function() {
   sigma.renderers.def = tmp;
   document.body.removeChild(dom);
 
-  throws(
+  assert.throws(
     function() {
       s = new sigma("abcd");
     },
@@ -107,7 +107,7 @@ test("Constructor polymorphism", function() {
   );
 });
 
-test("Public methods", function() {
+QUnit.test("Public methods", function(assert) {
   const s = new sigma();
 
   const dom = document.createElement("DIV");
@@ -116,7 +116,7 @@ test("Public methods", function() {
   dom.id = "abc";
   document.body.appendChild(dom);
 
-  deepEqual(
+  assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [[], []],
     "A sigma instance created without configuration has no camera nor renderer."
@@ -132,27 +132,27 @@ test("Public methods", function() {
   const r2 = s.addRenderer({ container: dom, camera: c2, id: "1" });
 
   const r3 = s.addRenderer({ container: dom, camera: c2, id: "2" });
-  deepEqual(
+  assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [["0", "1", "2"], ["0", "1"]],
     "The cameras/renderers indexes are updated when adding cameras/renderers."
   );
 
   s.killRenderer("2");
-  deepEqual(
+  assert.deepEqual(
     Object.keys(s.renderers),
     ["0", "1"],
     "The renderers indexes are updated when killing renderers."
   );
 
   s.killCamera("1");
-  deepEqual(
+  assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [["0"], ["0"]],
     "The cameras/renderers indexes are updated when killing cameras."
   );
 
-  throws(
+  assert.throws(
     function() {
       s.killCamera("42");
     },
@@ -160,7 +160,7 @@ test("Public methods", function() {
     "Killing a camera that does not exist throws an error."
   );
 
-  throws(
+  assert.throws(
     function() {
       s.killRenderer("42");
     },
@@ -174,13 +174,13 @@ test("Public methods", function() {
   var c = s.addCamera("myCamera");
 
   const r = s.addRenderer({ camera: c, container: dom, id: "myRenderer" });
-  deepEqual(
+  assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [["myRenderer"], ["myCamera"]],
     "The cameras/renderers adders work well with custom IDs."
   );
 
-  throws(
+  assert.throws(
     function() {
       s.addCamera("myCamera");
     },
@@ -188,7 +188,7 @@ test("Public methods", function() {
     "Adding a camera with an already existing ID throws an error."
   );
 
-  throws(
+  assert.throws(
     function() {
       s.addRenderer({ camera: c, container: dom, id: "myRenderer" });
     },
@@ -203,7 +203,7 @@ test("Public methods", function() {
 
   s.killCamera(id);
 
-  throws(
+  assert.throws(
     function() {
       s.addRenderer({ camera: c, container: dom });
     },

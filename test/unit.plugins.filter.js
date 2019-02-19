@@ -1,6 +1,6 @@
-module("sigma.plugins.filter");
+QUnit.module("sigma.plugins.filter");
 
-test("Custom graph methods", function() {
+QUnit.test("Custom graph methods", function(assert) {
   const myGraph = new sigma.classes.graph();
   myGraph.read({
     nodes: [
@@ -47,20 +47,20 @@ test("Custom graph methods", function() {
     ]
   });
 
-  deepEqual(
+  assert.deepEqual(
     myGraph.adjacentNodes("n0"),
     [myGraph.nodes("n1")],
     '"adjacentNodes" returns the adjacent nodes of a specified node'
   );
 
-  deepEqual(
+  assert.deepEqual(
     myGraph.adjacentEdges("n0"),
     [myGraph.edges("e0")],
     '"adjacentEdges" returns the adjacent edges of a specified node'
   );
 });
 
-test("API", function() {
+QUnit.test("API", function(assert) {
   let a;
 
   let k;
@@ -161,7 +161,7 @@ test("API", function() {
   // Register the filter
   filter.nodesBy(degreePredicate, "degree");
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes(),
     [],
     'A "nodesBy" filter is not applied automatically'
@@ -170,7 +170,7 @@ test("API", function() {
   // Apply the filter
   filter.apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes(),
     [s.graph.nodes("n4")],
     '"apply" applies a nodesBy filter'
@@ -179,12 +179,12 @@ test("API", function() {
   // Undo this filter
   filter.undo("degree").apply();
 
-  deepEqual(hiddenNodes(), [], '"undo(a)" undoes the specified filter');
+  assert.deepEqual(hiddenNodes(), [], '"undo(a)" undoes the specified filter');
 
   // Register another filter
   filter.neighborsOf("n0").apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes(),
     [s.graph.nodes("n2"), s.graph.nodes("n3"), s.graph.nodes("n4")],
     '"neighborsOf" hides all nodes which are not linked to the specified node'
@@ -196,7 +196,7 @@ test("API", function() {
   // Register an edge filter
   filter.edgesBy(myEdgeAttrPredicate).apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenEdges(),
     [s.graph.edges("e0"), s.graph.edges("e1"), s.graph.edges("e3")],
     '"apply" applies an edgesBy filter'
@@ -211,7 +211,7 @@ test("API", function() {
   // Undo all filters
   filter.undo().apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes().concat(hiddenEdges()),
     [],
     "All filters are undone at once"
@@ -223,7 +223,7 @@ test("API", function() {
     .edgesBy(myEdgeAttrPredicate, "attr")
     .apply();
 
-  deepEqual(
+  assert.deepEqual(
     filter.export().map(function(o) {
       return o.key;
     }),
@@ -234,7 +234,7 @@ test("API", function() {
   // Clear the filters chain
   filter.clear();
 
-  deepEqual(filter.export(), [], "The filters chain is cleared");
+  assert.deepEqual(filter.export(), [], "The filters chain is cleared");
 
   // Undo all filters
   filter.undo().apply();
@@ -248,7 +248,7 @@ test("API", function() {
     }, "degree1")
     .apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes(),
     [s.graph.nodes("n4")],
     '"undo" undoes the filters before it in the chain, and not the filters after it'
@@ -257,7 +257,7 @@ test("API", function() {
   // Call "apply" multiple times
   filter.apply().apply();
 
-  deepEqual(
+  assert.deepEqual(
     hiddenNodes(),
     [s.graph.nodes("n4")],
     '"apply" is called multiple times'
@@ -269,12 +269,16 @@ test("API", function() {
     .undo("degree0", "degree1")
     .apply();
 
-  deepEqual(hiddenNodes(), [], '"undo" is called with multiple arguments');
+  assert.deepEqual(
+    hiddenNodes(),
+    [],
+    '"undo" is called with multiple arguments'
+  );
 
   // Import an empty chain
   filter.import([]);
 
-  strictEqual(filter.export().length, 0, "The empty chain is imported");
+  assert.strictEqual(filter.export().length, 0, "The empty chain is imported");
 
   // Import a chain of filters
   const chain = [
@@ -287,7 +291,7 @@ test("API", function() {
 
   filter.import(chain).apply();
 
-  deepEqual(
+  assert.deepEqual(
     filter.export().map(function(o) {
       return {
         key: o.key,
@@ -308,7 +312,7 @@ test("API", function() {
   // export > import > export
   const dumpedChain = filter.import(filter.export()).export();
 
-  deepEqual(
+  assert.deepEqual(
     chain.map(function(o) {
       return {
         key: o.key,
@@ -329,7 +333,7 @@ test("API", function() {
   // check chain duplication
   filter.clear();
 
-  strictEqual(
+  assert.strictEqual(
     dumpedChain.length,
     1,
     "The exported chain is a deep copy of the internal chain"
@@ -340,7 +344,7 @@ test("API", function() {
   chain.length = 0;
   degreePredicate = null;
 
-  deepEqual(
+  assert.deepEqual(
     filter.export().map(function(o) {
       return {
         key: o.key,
@@ -362,7 +366,7 @@ test("API", function() {
     "The internal chain is a deep copy of the imported chain"
   );
 
-  throws(
+  assert.throws(
     function() {
       filter.nodesBy(function() {}, 5);
     },
@@ -370,7 +374,7 @@ test("API", function() {
     '"nodesBy" with a wrong key type throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       filter.edgesBy(function() {}, "");
     },
@@ -378,7 +382,7 @@ test("API", function() {
     '"edgesBy" with a wrong key type throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       filter.neighborsOf(0);
     },
@@ -386,7 +390,7 @@ test("API", function() {
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       filter.neighborsOf("");
     },
@@ -394,7 +398,7 @@ test("API", function() {
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       filter.nodesBy(function() {}, "a").edgesBy(function() {}, "a");
     },

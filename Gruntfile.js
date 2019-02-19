@@ -1,4 +1,5 @@
 const fs = require("fs");
+const loadGruntTasks = require("load-grunt-tasks");
 
 module.exports = function(grunt) {
   const coreJsFiles = [
@@ -155,7 +156,7 @@ module.exports = function(grunt) {
     }
   });
 
-  require("load-grunt-tasks")(grunt);
+  loadGruntTasks(grunt);
 
   // By default, will check lint, hint, test and minify:
   grunt.registerTask("default", ["qunit", "sed", "grunt"]);

@@ -1,6 +1,6 @@
-module("sigma.classes.camera");
+QUnit.module("sigma.classes.camera");
 
-test("Basic manipulation", function() {
+QUnit.test("Basic manipulation", function(assert) {
   const graph = new sigma.classes.graph();
 
   const camera = new sigma.classes.camera(
@@ -9,7 +9,7 @@ test("Basic manipulation", function() {
     sigma.classes.configurable(sigma.settings)
   );
 
-  deepEqual(
+  assert.deepEqual(
     [camera.x, camera.y, camera.ratio, camera.angle],
     [0, 0, 1, 0],
     "Initial values for [x, y, angle, ratio] are [0, 0, 1, 0]."
@@ -21,7 +21,7 @@ test("Basic manipulation", function() {
     ratio: 3,
     angle: 4
   });
-  deepEqual(
+  assert.deepEqual(
     [camera.x, camera.y, camera.ratio, camera.angle],
     [1, 2, 3, 4],
     '"goTo" with every parameters effectively updates them all.'
@@ -30,13 +30,13 @@ test("Basic manipulation", function() {
   camera.goTo({
     x: 5
   });
-  deepEqual(
+  assert.deepEqual(
     [camera.x, camera.y, camera.ratio, camera.angle],
     [5, 2, 3, 4],
     '"goTo" with only some parameters effectively updates only them.'
   );
 
-  throws(
+  assert.throws(
     function() {
       camera.goTo({
         x: "abc"
@@ -46,7 +46,7 @@ test("Basic manipulation", function() {
     '"goTo" with a non-number value throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       camera.goTo({
         x: NaN
@@ -57,7 +57,7 @@ test("Basic manipulation", function() {
   );
 });
 
-test("Apply to a graph", function() {
+QUnit.test("Apply to a graph", function(assert) {
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -99,7 +99,7 @@ test("Apply to a graph", function() {
   });
 
   camera.applyView("", "display:");
-  deepEqual(
+  assert.deepEqual(
     graph.nodes().map(function(n) {
       return {
         x: n["display:x"],
@@ -124,7 +124,7 @@ test("Apply to a graph", function() {
     angle: Math.PI / 2
   });
   camera.applyView("", "display:");
-  deepEqual(
+  assert.deepEqual(
     graph.nodes().map(function(n) {
       return {
         x: approx(n["display:x"]),
@@ -153,7 +153,7 @@ test("Apply to a graph", function() {
   );
 });
 
-test("Position", function() {
+QUnit.test("Position", function(assert) {
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -173,7 +173,7 @@ test("Position", function() {
     angle: Math.PI / 2
   });
   pos = camera.graphPosition(1, 2);
-  deepEqual(
+  assert.deepEqual(
     { x: approx(pos.x), y: approx(pos.y) },
     { x: 0.5, y: 0.5 },
     "graphPosition works (test 1)."
@@ -186,7 +186,7 @@ test("Position", function() {
     angle: -Math.PI / 2
   });
   pos = camera.graphPosition(1, 2);
-  deepEqual(
+  assert.deepEqual(
     { x: approx(pos.x), y: approx(pos.y) },
     { x: 0, y: 2 },
     "graphPosition works (test 2)."
@@ -199,7 +199,7 @@ test("Position", function() {
     angle: Math.PI / 2
   });
   pos = camera.cameraPosition(0.5, 0.5);
-  deepEqual(
+  assert.deepEqual(
     { x: approx(pos.x), y: approx(pos.y) },
     { x: 1, y: 2 },
     "cameraPosition works (test 1)."
@@ -212,7 +212,7 @@ test("Position", function() {
     angle: -Math.PI / 2
   });
   pos = camera.cameraPosition(0, 2);
-  deepEqual(
+  assert.deepEqual(
     { x: approx(pos.x), y: approx(pos.y) },
     { x: 1, y: 2 },
     "cameraPosition works (test 2)."

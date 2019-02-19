@@ -1,5 +1,5 @@
-module("sigma.utils");
-test("Float color", function() {
+QUnit.module("sigma.utils");
+QUnit.test("Float color", function(assert) {
   const floatColor = sigma.utils.floatColor;
 
   const inputs = [
@@ -14,6 +14,6 @@ test("Float color", function() {
   const outputs = [16776960, 13750737, 13750737, 15398442, 15398442, 15398442];
 
   inputs.forEach(function(input, i) {
-    strictEqual(floatColor(input), outputs[i]);
+    assert.strictEqual(floatColor(input), outputs[i]);
   });
 });

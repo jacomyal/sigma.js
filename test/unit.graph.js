@@ -1,6 +1,6 @@
-module("sigma.classes.graph");
+QUnit.module("sigma.classes.graph");
 
-test("Basic manipulation", function() {
+QUnit.test("Basic manipulation", function(assert) {
   let a;
 
   let k;
@@ -79,26 +79,26 @@ test("Basic manipulation", function() {
 
   // NODES:
   // ******
-  deepEqual(
+  assert.deepEqual(
     graph.nodes[0],
     myGraph.nodes(graph.nodes[0].id),
     '"addNode" works and the node properties have been preserved.'
   );
 
-  notStrictEqual(
+  assert.notStrictEqual(
     graph.nodes[0],
     myGraph.nodes(graph.nodes[0].id),
     'With {clone: true}, "addNode" creates a new object.'
   );
 
-  equal(
+  assert.equal(
     graph.nodes[1],
     myGraph.nodes(graph.nodes[1].id),
     'With {clone: false}, "addNode" keeps the same object.'
   );
 
   myGraph.nodes(graph.nodes[0].id).id = "new_n0";
-  strictEqual(
+  assert.strictEqual(
     graph.nodes[0].id,
     myGraph.nodes(graph.nodes[0].id).id,
     "With {immutable: true}, node ids in the graph are not writable."
@@ -106,7 +106,7 @@ test("Basic manipulation", function() {
 
   const node = myGraph.nodes(graph.nodes[1].id);
   node.id = "new_n0";
-  strictEqual(
+  assert.strictEqual(
     "new_n0",
     node.id,
     "With {immutable: false}, node ids in the graph are writable."
@@ -114,32 +114,32 @@ test("Basic manipulation", function() {
   node.id = "n1";
 
   myGraph.nodes(graph.nodes[0].id).label = "New node 0";
-  strictEqual(
+  assert.strictEqual(
     "New node 0",
     myGraph.nodes(graph.nodes[0].id).label,
     "Other node attributes are writable."
   );
   myGraph.nodes(graph.nodes[0].id).label = "Node 0";
 
-  notStrictEqual(
+  assert.notStrictEqual(
     myGraph.nodes(),
     myGraph.nodes(),
     '"nodes" without arguments returns a copy of the nodes array.'
   );
 
-  strictEqual(
+  assert.strictEqual(
     myGraph.nodes("unexisting_id"),
     undefined,
     '"nodes" with an unreferenced id returns undefined and does not throw an error.'
   );
 
-  deepEqual(
+  assert.deepEqual(
     myGraph.nodes(["n0", "n1", "n0"]),
     [graph.nodes[0], graph.nodes[1], graph.nodes[0]],
     '"nodes" with a strings array as arguments returns the array of specified nodes.'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.nodes(["n0", "n1", {}]);
     },
@@ -147,7 +147,7 @@ test("Basic manipulation", function() {
     '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.addNode(graph.nodes[0]);
     },
@@ -156,7 +156,7 @@ test("Basic manipulation", function() {
   );
 
   myGraph.addNode({ id: "prototype" }).addNode({ id: "constructor" });
-  ok(
+  assert.ok(
     myGraph.nodes("prototype") && myGraph.nodes("constructor"),
     '"constructor" and "prototype" are valid node IDs.'
   );
@@ -164,19 +164,19 @@ test("Basic manipulation", function() {
 
   // EDGES:
   // ******
-  deepEqual(
+  assert.deepEqual(
     graph.edges[0],
     myGraph.edges(graph.edges[0].id),
     '"addEdge" works and the edge properties have been preserved.'
   );
 
-  notStrictEqual(
+  assert.notStrictEqual(
     graph.edges[0],
     myGraph.edges(graph.edges[0].id),
     'With {clone: true}, "addEdge" creates a new object.'
   );
 
-  equal(
+  assert.equal(
     graph.edges[1],
     myGraph.edges(graph.edges[1].id),
     'With {clone: false}, "addEdge" keeps the same object.'
@@ -185,7 +185,7 @@ test("Basic manipulation", function() {
   myGraph.edges(graph.edges[0].id).id = "new_e0";
   myGraph.edges(graph.edges[0].id).source = "undefined_node";
   myGraph.edges(graph.edges[0].id).target = "undefined_node";
-  deepEqual(
+  assert.deepEqual(
     [graph.edges[0].id, graph.edges[0].source, graph.edges[0].target],
     [
       myGraph.edges(graph.edges[0].id).id,
@@ -199,7 +199,7 @@ test("Basic manipulation", function() {
   edge.id = "new_e0";
   edge.source = "undefined_node";
   edge.target = "undefined_node";
-  deepEqual(
+  assert.deepEqual(
     ["new_e0", "undefined_node", "undefined_node"],
     [edge.id, edge.source, edge.target],
     "With {immutable: false}, edge sources, targets and ids in the graph are writable."
@@ -209,32 +209,32 @@ test("Basic manipulation", function() {
   edge.target = "n2";
 
   myGraph.edges(graph.edges[0].id).myEdgeAttr = 456;
-  strictEqual(
+  assert.strictEqual(
     456,
     myGraph.edges(graph.edges[0].id).myEdgeAttr,
     "Other edge attributes are writable."
   );
   myGraph.edges(graph.edges[0].id).myEdgeAttr = 123;
 
-  notStrictEqual(
+  assert.notStrictEqual(
     myGraph.edges(),
     myGraph.edges(),
     '"edges" without arguments returns a copy of the edge array.'
   );
 
-  strictEqual(
+  assert.strictEqual(
     myGraph.edges("unexisting_id"),
     undefined,
     '"edges" with an unreferenced id returns undefined and does not throw an error.'
   );
 
-  deepEqual(
+  assert.deepEqual(
     myGraph.edges(["e0", "e0"]),
     [graph.edges[0], graph.edges[0]],
     '"edges" with a strings array as arguments returns the array of specified edge.'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.edges(["e0", {}]);
     },
@@ -242,7 +242,7 @@ test("Basic manipulation", function() {
     '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.addEdge(graph.edges[0]);
     },
@@ -253,14 +253,14 @@ test("Basic manipulation", function() {
   // DROPING AND CLEARING:
   // *********************
   myGraph.dropNode("n0");
-  deepEqual(
+  assert.deepEqual(
     myGraph.nodes().map(function(n) {
       return n.id;
     }),
     ["n1", "n2", "n3"],
     '"dropNode" actually drops the node.'
   );
-  deepEqual(
+  assert.deepEqual(
     myGraph.edges().map(function(e) {
       return e.id;
     }),
@@ -268,7 +268,7 @@ test("Basic manipulation", function() {
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.dropNode("n0");
     },
@@ -277,7 +277,7 @@ test("Basic manipulation", function() {
   );
 
   myGraph.dropEdge("e1");
-  deepEqual(
+  assert.deepEqual(
     myGraph.edges().map(function(e) {
       return e.id;
     }),
@@ -286,7 +286,7 @@ test("Basic manipulation", function() {
   );
 
   myGraph.dropEdge("e4");
-  deepEqual(
+  assert.deepEqual(
     myGraph.edges().map(function(e) {
       return e.id;
     }),
@@ -294,7 +294,7 @@ test("Basic manipulation", function() {
     '"dropEdge" with a self loops works. (#286)'
   );
 
-  throws(
+  assert.throws(
     function() {
       myGraph.dropEdge("e1");
     },
@@ -308,7 +308,7 @@ test("Basic manipulation", function() {
   myGraph.addEdge(graph.edges[1]);
 
   myGraph.clear();
-  deepEqual(
+  assert.deepEqual(
     [myGraph.nodes(), myGraph.edges()],
     [[], []],
     '"clear" empties the nodes and edges arrays.'
@@ -317,11 +317,19 @@ test("Basic manipulation", function() {
   myGraph = new sigma.classes.graph();
   myGraph.read(graph);
 
-  deepEqual(myGraph.nodes(), graph.nodes, '"read" adds properly the nodes.');
-  deepEqual(myGraph.edges(), graph.edges, '"read" adds properly the edges.');
+  assert.deepEqual(
+    myGraph.nodes(),
+    graph.nodes,
+    '"read" adds properly the nodes.'
+  );
+  assert.deepEqual(
+    myGraph.edges(),
+    graph.edges,
+    '"read" adds properly the edges.'
+  );
 });
 
-test("Methods and attached functions", function() {
+QUnit.test("Methods and attached functions", function(assert) {
   let counter;
 
   const colorPalette = { Person: "#C3CBE1", Place: "#9BDEBD" };
@@ -339,7 +347,7 @@ test("Methods and attached functions", function() {
     n.color = colorPalette[n.category];
   });
 
-  strictEqual(
+  assert.strictEqual(
     false,
     sigma.classes.graph.hasMethod("getNodeLabel"),
     "sigma.classes.hasMethod returns false if the method does not exist."
@@ -349,13 +357,13 @@ test("Methods and attached functions", function() {
     return (this.nodesIndex[nId] || {}).label;
   });
 
-  strictEqual(
+  assert.strictEqual(
     true,
     sigma.classes.graph.hasMethod("getNodeLabel"),
     "sigma.classes.hasMethod returns true if the method has been added with addMethod."
   );
 
-  strictEqual(
+  assert.strictEqual(
     true,
     sigma.classes.graph.hasMethod("hasMethod"),
     "sigma.classes.hasMethod returns true if the method is implemented in the core."
@@ -363,23 +371,23 @@ test("Methods and attached functions", function() {
 
   myGraph = new sigma.classes.graph();
   myGraph.addNode({ id: "n0", label: "My node", category: "Person" });
-  strictEqual(
+  assert.strictEqual(
     1,
     counter,
     "Attached functions are effectively executed when the anchor method is called."
   );
-  strictEqual(
+  assert.strictEqual(
     myGraph.nodes("n0").color,
     "#C3CBE1",
     'Attached "before" functions are effectively executed before when the anchor method is called.'
   );
-  strictEqual(
+  assert.strictEqual(
     myGraph.getNodeLabel("n0"),
     "My node",
     'Custom methods work, can have arguments, and have access to the data in their scope (through "this").'
   );
 
-  throws(
+  assert.throws(
     function() {
       sigma.classes.graph.attach("addNode", "counterInc", function() {});
     },
@@ -387,7 +395,7 @@ test("Methods and attached functions", function() {
     "Attaching a function to a method when there is already a function attached to this method under the same key throws an error."
   );
 
-  throws(
+  assert.throws(
     function() {
       sigma.classes.graph.attach(
         "undefinedMethod",
@@ -399,7 +407,7 @@ test("Methods and attached functions", function() {
     "Attaching a function to an unexisting method when throws an error."
   );
 
-  throws(
+  assert.throws(
     function() {
       sigma.classes.graph.attachBefore(
         "addNode",
@@ -411,7 +419,7 @@ test("Methods and attached functions", function() {
     'Attaching a "before" function to a method when there is already a "before" function attached to this method under the same key throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       sigma.classes.graph.attachBefore(
         "undefinedMethod",
@@ -423,7 +431,7 @@ test("Methods and attached functions", function() {
     'Attaching a "before" function to an unexisting method when throws an error.'
   );
 
-  throws(
+  assert.throws(
     function() {
       sigma.classes.graph.addMethod("getNodeLabel", function() {});
     },
@@ -432,7 +440,7 @@ test("Methods and attached functions", function() {
   );
 });
 
-test("Builtin indexes", function() {
+QUnit.test("Builtin indexes", function(assert) {
   const graph = {
     nodes: [
       {
@@ -480,7 +488,7 @@ test("Builtin indexes", function() {
 
   const index = g.retrieveIndexes();
 
-  deepEqual(
+  assert.deepEqual(
     index.inIndex,
     {
       n0: {},
@@ -507,7 +515,7 @@ test("Builtin indexes", function() {
     "Incoming index up to date"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.inCount,
     {
       n0: 0,
@@ -517,7 +525,7 @@ test("Builtin indexes", function() {
     "Incoming count up to date"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outIndex,
     {
       n0: {
@@ -544,7 +552,7 @@ test("Builtin indexes", function() {
     "Outcoming index up to date"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outCount,
     {
       n0: 1,
@@ -554,7 +562,7 @@ test("Builtin indexes", function() {
     "Outcoming count up to date"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allIndex,
     {
       n0: {
@@ -597,7 +605,7 @@ test("Builtin indexes", function() {
     "Full index up to date"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allCount,
     {
       n0: 1,
@@ -609,7 +617,7 @@ test("Builtin indexes", function() {
 
   g.dropNode("n2");
 
-  deepEqual(
+  assert.deepEqual(
     index.inIndex,
     {
       n0: {},
@@ -627,7 +635,7 @@ test("Builtin indexes", function() {
     "Incoming index up to date after having dropped a node"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.inCount,
     {
       n0: 0,
@@ -636,7 +644,7 @@ test("Builtin indexes", function() {
     "Incoming count up to date after having dropped a node"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outIndex,
     {
       n0: {
@@ -654,7 +662,7 @@ test("Builtin indexes", function() {
     "Outcoming index up to date after having dropped a node"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outCount,
     {
       n0: 1,
@@ -663,7 +671,7 @@ test("Builtin indexes", function() {
     "Outcoming count up to date after having dropped a node"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allIndex,
     {
       n0: {
@@ -690,7 +698,7 @@ test("Builtin indexes", function() {
     "Full index up to date after having dropped a node"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allCount,
     {
       n0: 1,
@@ -701,7 +709,7 @@ test("Builtin indexes", function() {
 
   g.dropEdge("e0");
 
-  deepEqual(
+  assert.deepEqual(
     index.inIndex,
     {
       n0: {},
@@ -710,7 +718,7 @@ test("Builtin indexes", function() {
     "Incoming index up to date after having dropped an edge"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.inCount,
     {
       n0: 0,
@@ -719,7 +727,7 @@ test("Builtin indexes", function() {
     "Incoming count up to date after having dropped an edge"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outIndex,
     {
       n0: {},
@@ -728,7 +736,7 @@ test("Builtin indexes", function() {
     "Outcoming index up to date after having dropped an edge"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.outCount,
     {
       n0: 0,
@@ -737,7 +745,7 @@ test("Builtin indexes", function() {
     "Outcoming count up to date after having dropped an edge"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allIndex,
     {
       n0: {},
@@ -746,7 +754,7 @@ test("Builtin indexes", function() {
     "Full index up to date after having dropped an edge"
   );
 
-  deepEqual(
+  assert.deepEqual(
     index.allCount,
     {
       n0: 0,
@@ -756,7 +764,7 @@ test("Builtin indexes", function() {
   );
 });
 
-test("Custom indexes", function() {
+QUnit.test("Custom indexes", function(assert) {
   let myGraph;
 
   sigma.classes.graph.addIndex("nodesCount", {
@@ -783,7 +791,7 @@ test("Custom indexes", function() {
     .addNode({ id: "n0" })
     .addNode({ id: "n1" })
     .dropNode("n0");
-  strictEqual(
+  assert.strictEqual(
     1,
     myGraph.getNodesCount(),
     "Indexes work, and the scope is effectively shared with custom methods."

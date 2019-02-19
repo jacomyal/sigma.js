@@ -25,9 +25,12 @@
     let event;
     let eArray;
 
-    if (arguments.length === 1 && typeof arguments[0] === "object")
-      for (events in arguments[0]) this.bind(events, arguments[0][events]);
-    else if (arguments.length === 2 && typeof arguments[1] === "function") {
+    if (arguments.length === 1 && typeof arguments[0] === "object") {
+      let argObject = arguments[0];
+      for (events in argObject) {
+        this.bind(events, argObject[events]);
+      }
+    } else if (arguments.length === 2 && typeof arguments[1] === "function") {
       eArray = typeof events === "string" ? events.split(" ") : events;
 
       for (i = 0, l = eArray.length; i !== l; i += 1) {

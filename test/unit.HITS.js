@@ -1,11 +1,11 @@
-module("sigma.statistics.HITS");
+QUnit.module("sigma.statistics.HITS");
 
 // These tests are based on testing plan
 // https://docs.google.com/file/d/0BznZHkruvUX6WkFBSmdEMWFReU0/edit
 // read plugin documentation for more info
 // read also for more context: https://github.com/jacomyal/sigma.js/issues/309#issuecomment-47554156
 
-test("Stats computation", function() {
+QUnit.test("Stats computation", function(assert) {
   let a;
 
   let k;
@@ -171,85 +171,85 @@ test("Stats computation", function() {
 
   stats = myGraph.HITS(true);
 
-  ok(stats.n1.authority == 1, "test 1.1");
-  ok(stats.n1.hub == 1, "test 1.2");
+  assert.ok(stats.n1.authority == 1, "test 1.1");
+  assert.ok(stats.n1.hub == 1, "test 1.2");
 
   myGraph.clear();
   myGraph.read(graph2);
 
   stats = myGraph.HITS(true);
 
-  equal(stats.n1.authority, 0.5, "test 2");
+  assert.equal(stats.n1.authority, 0.5, "test 2");
 
   myGraph.clear();
   myGraph.read(graph3);
 
   stats = myGraph.HITS(true);
 
-  ok(stats.n2.hub == 0.2, "test 3.1");
-  ok(stats.n3.authority == 0.2, "test 3.2");
+  assert.ok(stats.n2.hub == 0.2, "test 3.1");
+  assert.ok(stats.n3.authority == 0.2, "test 3.2");
 
   myGraph.clear();
   myGraph.read(graph4);
 
   stats = myGraph.HITS(true);
 
-  equal(stats.n1.hub, 0.19999999999999998, "test 4.1");
-  equal(stats.n5.authority, 0.19999999999999998, "test 4.2");
+  assert.equal(stats.n1.hub, 0.19999999999999998, "test 4.1");
+  assert.equal(stats.n5.authority, 0.19999999999999998, "test 4.2");
 
   myGraph.clear();
   myGraph.read(graph5);
 
   stats = myGraph.HITS(true);
 
-  ok(stats.n1.hub > stats.n3.hub, "test 5.1");
+  assert.ok(stats.n1.hub > stats.n3.hub, "test 5.1");
 
-  ok(stats.n1.authority > stats.n4.authority, "test 5.2");
+  assert.ok(stats.n1.authority > stats.n4.authority, "test 5.2");
 
   myGraph.clear();
   myGraph.read(graph6);
 
   var stats = myGraph.HITS(true);
 
-  ok(stats.n2.hub > stats.n1.hub, "test 6");
+  assert.ok(stats.n2.hub > stats.n1.hub, "test 6");
 
   myGraph.clear();
   myGraph.read(graph7);
 
   stats = myGraph.HITS();
 
-  equal(stats.n1.hub, 0.3333333333333333, "test 7.1");
-  equal(stats.n4.hub, 0, "test 7.2");
-  equal(stats.n2.authority, 0, "test 7.3");
-  equal(stats.n5.authority, 0.5, "test 7.4");
+  assert.equal(stats.n1.hub, 0.3333333333333333, "test 7.1");
+  assert.equal(stats.n4.hub, 0, "test 7.2");
+  assert.equal(stats.n2.authority, 0, "test 7.3");
+  assert.equal(stats.n5.authority, 0.5, "test 7.4");
 
   myGraph.clear();
   myGraph.read(graph8);
 
   stats = myGraph.HITS();
 
-  equal(stats.n1.hub, 1, "test 8.1");
-  equal(stats.n1.authority, 0, "test 8.2");
-  equal(stats.n3.hub, 0, "test 8.3");
-  equal(stats.n3.authority, 0.2, "test 8.4");
+  assert.equal(stats.n1.hub, 1, "test 8.1");
+  assert.equal(stats.n1.authority, 0, "test 8.2");
+  assert.equal(stats.n3.hub, 0, "test 8.3");
+  assert.equal(stats.n3.authority, 0.2, "test 8.4");
 
   myGraph.clear();
   myGraph.read(graph9);
 
   stats = myGraph.HITS();
 
-  equal(stats.n3.hub, stats.n5.hub, "test 9.1");
-  ok(stats.n3.hub > stats.n2.hub, "test 9.2");
-  ok(stats.n1.authority > stats.n6.authority, "test 9.3");
-  equal(stats.n6.hub, 0, "test 9.4");
-  equal(stats.n3.authority, 0, "test 9.5");
+  assert.equal(stats.n3.hub, stats.n5.hub, "test 9.1");
+  assert.ok(stats.n3.hub > stats.n2.hub, "test 9.2");
+  assert.ok(stats.n1.authority > stats.n6.authority, "test 9.3");
+  assert.equal(stats.n6.hub, 0, "test 9.4");
+  assert.equal(stats.n3.authority, 0, "test 9.5");
 
   myGraph.clear();
   myGraph.read(graph10);
 
   stats = myGraph.HITS();
 
-  equal(stats.n1.hub, stats.n3.hub, "test 10.1");
-  ok(stats.n1.hub > stats.n5.hub, "test 10.2");
-  ok(stats.n5.authority > stats.n6.authority, "test 10.3");
+  assert.equal(stats.n1.hub, stats.n3.hub, "test 10.1");
+  assert.ok(stats.n1.hub > stats.n5.hub, "test 10.2");
+  assert.ok(stats.n5.authority > stats.n6.authority, "test 10.3");
 });

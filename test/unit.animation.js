@@ -1,6 +1,7 @@
-module("sigma.misc.animation");
+QUnit.module("sigma.misc.animation");
 
-asyncTest("Camera animation", function() {
+QUnit.test("Camera animation", function(assert) {
+  const done = assert.async();
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -62,8 +63,7 @@ asyncTest("Camera animation", function() {
         camera.applyView("", "display:");
 
         if (!hasTestedFrame) {
-          start();
-          deepEqual(
+          assert.deepEqual(
             graph.nodes().map(function(n) {
               return {
                 x: approx(n["display:x"]),
@@ -96,8 +96,7 @@ asyncTest("Camera animation", function() {
       },
       onComplete() {
         camera.applyView("", "display:");
-        start();
-        deepEqual(
+        assert.deepEqual(
           graph.nodes().map(function(n) {
             return {
               x: approx(n["display:x"]),
@@ -124,6 +123,7 @@ asyncTest("Camera animation", function() {
           ],
           "Animation's end gives the good values and custom easings work well."
         );
+        done();
       }
     }
   );
