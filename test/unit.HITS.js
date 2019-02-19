@@ -6,15 +6,8 @@ QUnit.module("sigma.statistics.HITS");
 // read also for more context: https://github.com/jacomyal/sigma.js/issues/309#issuecomment-47554156
 
 QUnit.test("Stats computation", assert => {
-  let a;
-
-  let k;
-
   const opts = {};
-
   const settings = new sigma.classes.configurable(opts);
-
-  var stats;
 
   const graph1 = {
     nodes: [{ id: "n1" }],
@@ -169,10 +162,10 @@ QUnit.test("Stats computation", assert => {
 
   myGraph.read(graph1);
 
-  stats = myGraph.HITS(true);
+  let stats = myGraph.HITS(true);
 
-  assert.ok(stats.n1.authority == 1, "test 1.1");
-  assert.ok(stats.n1.hub == 1, "test 1.2");
+  assert.ok(stats.n1.authority === 1, "test 1.1");
+  assert.ok(stats.n1.hub === 1, "test 1.2");
 
   myGraph.clear();
   myGraph.read(graph2);
@@ -186,8 +179,8 @@ QUnit.test("Stats computation", assert => {
 
   stats = myGraph.HITS(true);
 
-  assert.ok(stats.n2.hub == 0.2, "test 3.1");
-  assert.ok(stats.n3.authority == 0.2, "test 3.2");
+  assert.ok(stats.n2.hub === 0.2, "test 3.1");
+  assert.ok(stats.n3.authority === 0.2, "test 3.2");
 
   myGraph.clear();
   myGraph.read(graph4);
@@ -209,7 +202,7 @@ QUnit.test("Stats computation", assert => {
   myGraph.clear();
   myGraph.read(graph6);
 
-  var stats = myGraph.HITS(true);
+  stats = myGraph.HITS(true);
 
   assert.ok(stats.n2.hub > stats.n1.hub, "test 6");
 

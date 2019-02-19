@@ -1,3 +1,4 @@
+/* eslint-disable no-func-assign, no-shadow */
 QUnit.module("sigma.plugins.filter");
 
 QUnit.test("Custom graph methods", assert => {
@@ -61,14 +62,7 @@ QUnit.test("Custom graph methods", assert => {
 });
 
 QUnit.test("API", assert => {
-  let a;
-
-  let k;
-
   const s = new sigma();
-
-  let filter;
-
   const graph = {
     nodes: [
       {
@@ -130,22 +124,18 @@ QUnit.test("API", assert => {
   };
 
   // Initialize the filter:
-  filter = new sigma.plugins.filter(s);
+  const filter = new sigma.plugins.filter(s);
 
   s.graph.read(graph);
 
   // helper function
   function hiddenNodes() {
-    return s.graph.nodes().filter(function(n) {
-      return n.hidden;
-    });
+    return s.graph.nodes().filter(n => n.hidden);
   }
 
   // helper function
   function hiddenEdges() {
-    return s.graph.edges().filter(function(e) {
-      return e.hidden;
-    });
+    return s.graph.edges().filter(e => e.hidden);
   }
 
   // Show non-isolated nodes only
@@ -224,9 +214,7 @@ QUnit.test("API", assert => {
     .apply();
 
   assert.deepEqual(
-    filter.export().map(function(o) {
-      return o.key;
-    }),
+    filter.export().map(o => o.key),
     ["degree", "attr"],
     "The filters chain is exported"
   );
@@ -243,7 +231,7 @@ QUnit.test("API", assert => {
   filter
     .nodesBy(degreePredicate, "degree0")
     .undo()
-    .nodesBy(function(n) {
+    .nodesBy(function degree(n) {
       return this.degree(n.id) > 1;
     }, "degree1")
     .apply();
@@ -292,13 +280,11 @@ QUnit.test("API", assert => {
   filter.import(chain).apply();
 
   assert.deepEqual(
-    filter.export().map(function(o) {
-      return {
-        key: o.key,
-        predicate: o.predicate.toString(),
-        processor: o.processor
-      };
-    }),
+    filter.export().map(({ key, predicate, processor }) => ({
+      key,
+      predicate: predicate.toString(),
+      processor
+    })),
     [
       {
         key: "my-filter",
@@ -313,14 +299,14 @@ QUnit.test("API", assert => {
   const dumpedChain = filter.import(filter.export()).export();
 
   assert.deepEqual(
-    chain.map(function(o) {
+    chain.map(o => {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
         processor: o.processor
       };
     }),
-    dumpedChain.map(function(o) {
+    dumpedChain.map(o => {
       return {
         key: o.key,
         predicate: o.predicate.toString(),
@@ -345,7 +331,7 @@ QUnit.test("API", assert => {
   degreePredicate = null;
 
   assert.deepEqual(
-    filter.export().map(function(o) {
+    filter.export().map(o => {
       return {
         key: o.key,
         predicate: o.predicate.toString().replace(/\s+/g, " "),
@@ -366,43 +352,35 @@ QUnit.test("API", assert => {
     "The internal chain is a deep copy of the imported chain"
   );
 
+  function noop() {}
+
   assert.throws(
-    function() {
-      filter.nodesBy(function() {}, 5);
-    },
-    /The filter key \"5\" must be a string./,
+    () => filter.nodesBy(noop, 5),
+    /The filter key "5" must be a string./,
     '"nodesBy" with a wrong key type throws an error.'
   );
 
   assert.throws(
-    function() {
-      filter.edgesBy(function() {}, "");
-    },
+    () => filter.edgesBy(noop, ""),
     /The filter key must be a non-empty string./,
     '"edgesBy" with a wrong key type throws an error.'
   );
 
   assert.throws(
-    function() {
-      filter.neighborsOf(0);
-    },
-    /The node id \"0\" must be a string./,
+    () => filter.neighborsOf(0),
+    /The node id "0" must be a string./,
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
   assert.throws(
-    function() {
-      filter.neighborsOf("");
-    },
+    () => filter.neighborsOf(""),
     /The node id must be a non-empty string./,
     '"neighborsOf" with a wrong node id type throws an error.'
   );
 
   assert.throws(
-    function() {
-      filter.nodesBy(function() {}, "a").edgesBy(function() {}, "a");
-    },
-    /The filter \"a\" already exists./,
+    () => filter.nodesBy(noop, "a").edgesBy(noop, "a"),
+    /The filter "a" already exists./,
     "Registering two filters with the same key throws an error."
   );
 });
