@@ -26,7 +26,7 @@
     let eArray;
 
     if (arguments.length === 1 && typeof arguments[0] === "object") {
-      let argObject = arguments[0];
+      const argObject = arguments[0];
       for (events in argObject) {
         this.bind(events, argObject[events]);
       }

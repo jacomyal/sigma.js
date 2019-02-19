@@ -65,6 +65,10 @@
     },
     "globals": {
       "sigma": "writable"
+    },
+    "rules": {
+      "new-cap": "off",
+      "no-underscore-dangle": "off"
     }
   },
   "dependencies": {

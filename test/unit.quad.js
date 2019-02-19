@@ -5,26 +5,6 @@ QUnit.module("sigma.classes.quad");
 QUnit.test("QuadTree", assert => {
   // Helpers
   //---------
-  function getRandom(min, max) {
-    return min + Math.floor(Math.random() * (max - min + 1));
-  }
-
-  function generateRandomGraph(nb) {
-    const nodes = [];
-
-    for (let i = 0; i < nb; i++) {
-      nodes.push({
-        x: getRandom(4, 95),
-        y: getRandom(4, 95),
-        size: getRandom(1, 2),
-        data: `Node#${i}`,
-        id: i
-      });
-    }
-
-    return nodes;
-  }
-
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -32,7 +12,6 @@ QUnit.test("QuadTree", assert => {
   // Instanciation
   //---------------
   const quad = new sigma.classes.quad();
-
   const geom = quad._geom;
 
   // Geometry
@@ -109,7 +88,7 @@ QUnit.test("QuadTree", assert => {
     "Point to Square"
   );
 
-  rectangles.map(function(r, i) {
+  rectangles.forEach((r, i) => {
     assert.deepEqual(
       geom.rectangleCorners(r),
       solutions[i],
@@ -153,26 +132,4 @@ QUnit.test("QuadTree", assert => {
     ],
     "Split Square"
   );
-
-  // Quad Tree
-  //-----------
-  // var nodes = generateRandomGraph(1000);
-
-  // var tree = quad.index(
-  //   nodes,
-  //   {
-  //     bounds: {
-  //       x: 0,
-  //       y: 0,
-  //       width: 100,
-  //       height: 100
-  //     },
-  //     maxLevel: 4
-  //   }
-  // );
-
-  // console.log(tree);
-  // console.log(quad.point(34, 53));
-  // console.log(quad.area({x1: 25, y1: 25, x2: 30, y2: 25, height: 10}));
-  // console.log(quad.area({x1: 0, y1: 0, x2: 100, y2: 0, height: 100}).length);
 });
