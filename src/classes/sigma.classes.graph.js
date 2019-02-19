@@ -1,18 +1,18 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
   var _methods = Object.create(null),
-      _indexes = Object.create(null),
-      _initBindings = Object.create(null),
-      _methodBindings = Object.create(null),
-      _methodBeforeBindings = Object.create(null),
-      _defaultSettings = {
-        immutable: true,
-        clone: true
-      },
-      _defaultSettingsFunction = function(key) {
-        return _defaultSettings[key];
-      };
+    _indexes = Object.create(null),
+    _initBindings = Object.create(null),
+    _methodBindings = Object.create(null),
+    _methodBeforeBindings = Object.create(null),
+    _defaultSettings = {
+      immutable: true,
+      clone: true
+    },
+    _defaultSettingsFunction = function(key) {
+      return _defaultSettings[key];
+    };
 
   /**
    * The graph constructor. It initializes the data and the indexes, and binds
@@ -33,9 +33,7 @@
    * @return {graph}                  The new graph instance.
    */
   var graph = function(settings) {
-    var k,
-        fn,
-        data;
+    var k, fn, data;
 
     /**
      * DATA:
@@ -82,8 +80,7 @@
     };
 
     // Execute bindings:
-    for (k in _initBindings)
-      _initBindings[k].call(data);
+    for (k in _initBindings) _initBindings[k].call(data);
 
     // Add methods to both the scope and the data objects:
     for (k in _methods) {
@@ -92,9 +89,6 @@
       data[k] = fn;
     }
   };
-
-
-
 
   /**
    * A custom tool to bind methods such that function that are bound to it will
@@ -107,8 +101,7 @@
    */
   function __bindGraphMethod(methodName, scope, fn) {
     var result = function() {
-      var k,
-          res;
+      var k, res;
 
       // Execute "before" bound functions:
       for (k in _methodBeforeBindings[methodName])
@@ -140,14 +133,10 @@
     var k;
 
     for (k in obj)
-      if (!('hasOwnProperty' in obj) || obj.hasOwnProperty(k))
-        delete obj[k];
+      if (!("hasOwnProperty" in obj) || obj.hasOwnProperty(k)) delete obj[k];
 
     return obj;
   }
-
-
-
 
   /**
    * This global method adds a method that will be bound to the futurly created
@@ -172,11 +161,11 @@
    */
   graph.addMethod = function(methodName, fn) {
     if (
-      typeof methodName !== 'string' ||
-      typeof fn !== 'function' ||
+      typeof methodName !== "string" ||
+      typeof fn !== "function" ||
       arguments.length !== 2
     )
-      throw 'addMethod: Wrong arguments.';
+      throw "addMethod: Wrong arguments.";
 
     if (_methods[methodName] || graph[methodName])
       throw 'The method "' + methodName + '" already exists.';
@@ -250,26 +239,24 @@
    */
   graph.attach = function(methodName, key, fn, before) {
     if (
-      typeof methodName !== 'string' ||
-      typeof key !== 'string' ||
-      typeof fn !== 'function' ||
+      typeof methodName !== "string" ||
+      typeof key !== "string" ||
+      typeof fn !== "function" ||
       arguments.length < 3 ||
       arguments.length > 4
     )
-      throw 'attach: Wrong arguments.';
+      throw "attach: Wrong arguments.";
 
     var bindings;
 
-    if (methodName === 'constructor')
-      bindings = _initBindings;
+    if (methodName === "constructor") bindings = _initBindings;
     else {
       if (before) {
         if (!_methodBeforeBindings[methodName])
-        throw 'The method "' + methodName + '" does not exist.';
+          throw 'The method "' + methodName + '" does not exist.';
 
         bindings = _methodBeforeBindings[methodName];
-      }
-      else {
+      } else {
         if (!_methodBindings[methodName])
           throw 'The method "' + methodName + '" does not exist.';
 
@@ -278,8 +265,12 @@
     }
 
     if (bindings[key])
-      throw 'A function "' + key + '" is already attached ' +
-            'to the method "' + methodName + '".';
+      throw 'A function "' +
+        key +
+        '" is already attached ' +
+        'to the method "' +
+        methodName +
+        '".';
 
     bindings[key] = fn;
 
@@ -330,14 +321,13 @@
    */
   graph.addIndex = function(name, bindings) {
     if (
-      typeof name !== 'string' ||
+      typeof name !== "string" ||
       Object(bindings) !== bindings ||
       arguments.length !== 2
     )
-      throw 'addIndex: Wrong arguments.';
+      throw "addIndex: Wrong arguments.";
 
-    if (_indexes[name])
-      throw 'The index "' + name + '" already exists.';
+    if (_indexes[name]) throw 'The index "' + name + '" already exists.';
 
     var k;
 
@@ -346,16 +336,12 @@
 
     // Attach the bindings:
     for (k in bindings)
-      if (typeof bindings[k] !== 'function')
-        throw 'The bindings must be functions.';
-      else
-        graph.attach(k, name, bindings[k]);
+      if (typeof bindings[k] !== "function")
+        throw "The bindings must be functions.";
+      else graph.attach(k, name, bindings[k]);
 
     return this;
   };
-
-
-
 
   /**
    * This method adds a node to the graph. The node must be an object, with a
@@ -369,37 +355,33 @@
    * @param  {object} node The node to add.
    * @return {object}      The graph instance.
    */
-  graph.addMethod('addNode', function(node) {
+  graph.addMethod("addNode", function(node) {
     // Check that the node is an object and has an id:
     if (Object(node) !== node || arguments.length !== 1)
-      throw 'addNode: Wrong arguments.';
+      throw "addNode: Wrong arguments.";
 
-    if (typeof node.id !== 'string' && typeof node.id !== 'number')
-      throw 'The node must have a string or number id.';
+    if (typeof node.id !== "string" && typeof node.id !== "number")
+      throw "The node must have a string or number id.";
 
     if (this.nodesIndex[node.id])
       throw 'The node "' + node.id + '" already exists.';
 
     var k,
-        id = node.id,
-        validNode = Object.create(null);
+      id = node.id,
+      validNode = Object.create(null);
 
     // Check the "clone" option:
-    if (this.settings('clone')) {
-      for (k in node)
-        if (k !== 'id')
-          validNode[k] = node[k];
-    } else
-      validNode = node;
+    if (this.settings("clone")) {
+      for (k in node) if (k !== "id") validNode[k] = node[k];
+    } else validNode = node;
 
     // Check the "immutable" option:
-    if (this.settings('immutable'))
-      Object.defineProperty(validNode, 'id', {
+    if (this.settings("immutable"))
+      Object.defineProperty(validNode, "id", {
         value: id,
         enumerable: true
       });
-    else
-      validNode.id = id;
+    else validNode.id = id;
 
     // Add empty containers for edges indexes:
     this.inNeighborsIndex[id] = Object.create(null);
@@ -432,49 +414,52 @@
    * @param  {object} edge The edge to add.
    * @return {object}      The graph instance.
    */
-  graph.addMethod('addEdge', function(edge) {
+  graph.addMethod("addEdge", function(edge) {
     // Check that the edge is an object and has an id:
     if (Object(edge) !== edge || arguments.length !== 1)
-      throw 'addEdge: Wrong arguments.';
+      throw "addEdge: Wrong arguments.";
 
-    if (typeof edge.id !== 'string' && typeof edge.id !== 'number')
-      throw 'The edge must have a string or number id.';
+    if (typeof edge.id !== "string" && typeof edge.id !== "number")
+      throw "The edge must have a string or number id.";
 
-    if ((typeof edge.source !== 'string' && typeof edge.source !== 'number') ||
-        !this.nodesIndex[edge.source])
-      throw 'The edge source must have an existing node id.';
+    if (
+      (typeof edge.source !== "string" && typeof edge.source !== "number") ||
+      !this.nodesIndex[edge.source]
+    )
+      throw "The edge source must have an existing node id.";
 
-    if ((typeof edge.target !== 'string' && typeof edge.target !== 'number') ||
-        !this.nodesIndex[edge.target])
-      throw 'The edge target must have an existing node id.';
+    if (
+      (typeof edge.target !== "string" && typeof edge.target !== "number") ||
+      !this.nodesIndex[edge.target]
+    )
+      throw "The edge target must have an existing node id.";
 
     if (this.edgesIndex[edge.id])
       throw 'The edge "' + edge.id + '" already exists.';
 
     var k,
-        validEdge = Object.create(null);
+      validEdge = Object.create(null);
 
     // Check the "clone" option:
-    if (this.settings('clone')) {
+    if (this.settings("clone")) {
       for (k in edge)
-        if (k !== 'id' && k !== 'source' && k !== 'target')
+        if (k !== "id" && k !== "source" && k !== "target")
           validEdge[k] = edge[k];
-    } else
-      validEdge = edge;
+    } else validEdge = edge;
 
     // Check the "immutable" option:
-    if (this.settings('immutable')) {
-      Object.defineProperty(validEdge, 'id', {
+    if (this.settings("immutable")) {
+      Object.defineProperty(validEdge, "id", {
         value: edge.id,
         enumerable: true
       });
 
-      Object.defineProperty(validEdge, 'source', {
+      Object.defineProperty(validEdge, "source", {
         value: edge.source,
         enumerable: true
       });
 
-      Object.defineProperty(validEdge, 'target', {
+      Object.defineProperty(validEdge, "target", {
         value: edge.target,
         enumerable: true
       });
@@ -489,29 +474,37 @@
     this.edgesIndex[validEdge.id] = validEdge;
 
     if (!this.inNeighborsIndex[validEdge.target][validEdge.source])
-      this.inNeighborsIndex[validEdge.target][validEdge.source] =
-        Object.create(null);
-    this.inNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
-      validEdge;
+      this.inNeighborsIndex[validEdge.target][validEdge.source] = Object.create(
+        null
+      );
+    this.inNeighborsIndex[validEdge.target][validEdge.source][
+      validEdge.id
+    ] = validEdge;
 
     if (!this.outNeighborsIndex[validEdge.source][validEdge.target])
-      this.outNeighborsIndex[validEdge.source][validEdge.target] =
-        Object.create(null);
-    this.outNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
-      validEdge;
+      this.outNeighborsIndex[validEdge.source][
+        validEdge.target
+      ] = Object.create(null);
+    this.outNeighborsIndex[validEdge.source][validEdge.target][
+      validEdge.id
+    ] = validEdge;
 
     if (!this.allNeighborsIndex[validEdge.source][validEdge.target])
-      this.allNeighborsIndex[validEdge.source][validEdge.target] =
-        Object.create(null);
-    this.allNeighborsIndex[validEdge.source][validEdge.target][validEdge.id] =
-      validEdge;
+      this.allNeighborsIndex[validEdge.source][
+        validEdge.target
+      ] = Object.create(null);
+    this.allNeighborsIndex[validEdge.source][validEdge.target][
+      validEdge.id
+    ] = validEdge;
 
     if (validEdge.target !== validEdge.source) {
       if (!this.allNeighborsIndex[validEdge.target][validEdge.source])
-        this.allNeighborsIndex[validEdge.target][validEdge.source] =
-          Object.create(null);
-      this.allNeighborsIndex[validEdge.target][validEdge.source][validEdge.id] =
-        validEdge;
+        this.allNeighborsIndex[validEdge.target][
+          validEdge.source
+        ] = Object.create(null);
+      this.allNeighborsIndex[validEdge.target][validEdge.source][
+        validEdge.id
+      ] = validEdge;
     }
 
     // Keep counts up to date:
@@ -531,14 +524,15 @@
    * @param  {string} id The node id.
    * @return {object}    The graph instance.
    */
-  graph.addMethod('dropNode', function(id) {
+  graph.addMethod("dropNode", function(id) {
     // Check that the arguments are valid:
-    if ((typeof id !== 'string' && typeof id !== 'number') ||
-        arguments.length !== 1)
-      throw 'dropNode: Wrong arguments.';
+    if (
+      (typeof id !== "string" && typeof id !== "number") ||
+      arguments.length !== 1
+    )
+      throw "dropNode: Wrong arguments.";
 
-    if (!this.nodesIndex[id])
-      throw 'The node "' + id + '" does not exist.';
+    if (!this.nodesIndex[id]) throw 'The node "' + id + '" does not exist.';
 
     var i, k, l;
 
@@ -580,14 +574,15 @@
    * @param  {string} id The edge id.
    * @return {object}    The graph instance.
    */
-  graph.addMethod('dropEdge', function(id) {
+  graph.addMethod("dropEdge", function(id) {
     // Check that the arguments are valid:
-    if ((typeof id !== 'string' && typeof id !== 'number') ||
-        arguments.length !== 1)
-      throw 'dropEdge: Wrong arguments.';
+    if (
+      (typeof id !== "string" && typeof id !== "number") ||
+      arguments.length !== 1
+    )
+      throw "dropEdge: Wrong arguments.";
 
-    if (!this.edgesIndex[id])
-      throw 'The edge "' + id + '" does not exist.';
+    if (!this.edgesIndex[id]) throw 'The edge "' + id + '" does not exist.';
 
     var i, l, edge;
 
@@ -630,7 +625,7 @@
    * This method destroys the current instance. It basically empties each index
    * and methods attached to the graph.
    */
-  graph.addMethod('kill', function() {
+  graph.addMethod("kill", function() {
     // Delete arrays:
     this.nodesArray.length = 0;
     this.edgesArray.length = 0;
@@ -654,7 +649,7 @@
    *
    * @return {object} The graph instance.
    */
-  graph.addMethod('clear', function() {
+  graph.addMethod("clear", function() {
     this.nodesArray.length = 0;
     this.edgesArray.length = 0;
 
@@ -703,18 +698,14 @@
    * @param  {object} g The graph object.
    * @return {object}   The graph instance.
    */
-  graph.addMethod('read', function(g) {
-    var i,
-        a,
-        l;
+  graph.addMethod("read", function(g) {
+    var i, a, l;
 
     a = g.nodes || [];
-    for (i = 0, l = a.length; i < l; i++)
-      this.addNode(a[i]);
+    for (i = 0, l = a.length; i < l; i++) this.addNode(a[i]);
 
     a = g.edges || [];
-    for (i = 0, l = a.length; i < l; i++)
-      this.addEdge(a[i]);
+    for (i = 0, l = a.length; i < l; i++) this.addEdge(a[i]);
 
     return this;
   });
@@ -730,35 +721,35 @@
    * @param  {?(string|array)} v Eventually one id, an array of ids.
    * @return {object|array}      The related node or array of nodes.
    */
-  graph.addMethod('nodes', function(v) {
+  graph.addMethod("nodes", function(v) {
     // Clone the array of nodes and return it:
-    if (!arguments.length)
-      return this.nodesArray.slice(0);
+    if (!arguments.length) return this.nodesArray.slice(0);
 
     // Return the related node:
-    if (arguments.length === 1 &&
-        (typeof v === 'string' || typeof v === 'number'))
+    if (
+      arguments.length === 1 &&
+      (typeof v === "string" || typeof v === "number")
+    )
       return this.nodesIndex[v];
 
     // Return an array of the related node:
     if (
       arguments.length === 1 &&
-      Object.prototype.toString.call(v) === '[object Array]'
+      Object.prototype.toString.call(v) === "[object Array]"
     ) {
       var i,
-          l,
-          a = [];
+        l,
+        a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string' || typeof v[i] === 'number')
+        if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(this.nodesIndex[v[i]]);
-        else
-          throw 'nodes: Wrong arguments.';
+        else throw "nodes: Wrong arguments.";
 
       return a;
     }
 
-    throw 'nodes: Wrong arguments.';
+    throw "nodes: Wrong arguments.";
   });
 
   /**
@@ -771,33 +762,32 @@
    *                              'out', and by default the normal degree.
    * @return {number|array}       The related degree or array of degrees.
    */
-  graph.addMethod('degree', function(v, which) {
+  graph.addMethod("degree", function(v, which) {
     // Check which degree is required:
-    which = {
-      'in': this.inNeighborsCount,
-      'out': this.outNeighborsCount
-    }[which || ''] || this.allNeighborsCount;
+    which =
+      {
+        in: this.inNeighborsCount,
+        out: this.outNeighborsCount
+      }[which || ""] || this.allNeighborsCount;
 
     // Return the related node:
-    if (typeof v === 'string' || typeof v === 'number')
-      return which[v];
+    if (typeof v === "string" || typeof v === "number") return which[v];
 
     // Return an array of the related node:
-    if (Object.prototype.toString.call(v) === '[object Array]') {
+    if (Object.prototype.toString.call(v) === "[object Array]") {
       var i,
-          l,
-          a = [];
+        l,
+        a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string' || typeof v[i] === 'number')
+        if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(which[v[i]]);
-        else
-          throw 'degree: Wrong arguments.';
+        else throw "degree: Wrong arguments.";
 
       return a;
     }
 
-    throw 'degree: Wrong arguments.';
+    throw "degree: Wrong arguments.";
   });
 
   /**
@@ -811,49 +801,47 @@
    * @param  {?(string|array)} v Eventually one id, an array of ids.
    * @return {object|array}      The related edge or array of edges.
    */
-  graph.addMethod('edges', function(v) {
+  graph.addMethod("edges", function(v) {
     // Clone the array of edges and return it:
-    if (!arguments.length)
-      return this.edgesArray.slice(0);
+    if (!arguments.length) return this.edgesArray.slice(0);
 
     // Return the related edge:
-    if (arguments.length === 1 &&
-        (typeof v === 'string' || typeof v === 'number'))
+    if (
+      arguments.length === 1 &&
+      (typeof v === "string" || typeof v === "number")
+    )
       return this.edgesIndex[v];
 
     // Return an array of the related edge:
     if (
       arguments.length === 1 &&
-      Object.prototype.toString.call(v) === '[object Array]'
+      Object.prototype.toString.call(v) === "[object Array]"
     ) {
       var i,
-          l,
-          a = [];
+        l,
+        a = [];
 
       for (i = 0, l = v.length; i < l; i++)
-        if (typeof v[i] === 'string' || typeof v[i] === 'number')
+        if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(this.edgesIndex[v[i]]);
-        else
-          throw 'edges: Wrong arguments.';
+        else throw "edges: Wrong arguments.";
 
       return a;
     }
 
-    throw 'edges: Wrong arguments.';
+    throw "edges: Wrong arguments.";
   });
-
 
   /**
    * EXPORT:
    * *******
    */
-  if (typeof sigma !== 'undefined') {
+  if (typeof sigma !== "undefined") {
     sigma.classes = sigma.classes || Object.create(null);
     sigma.classes.graph = graph;
-  } else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
+  } else if (typeof exports !== "undefined") {
+    if (typeof module !== "undefined" && module.exports)
       exports = module.exports = graph;
     exports.graph = graph;
-  } else
-    this.graph = graph;
-}).call(this);
+  } else this.graph = graph;
+}.call(this));

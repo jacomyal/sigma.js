@@ -1,14 +1,12 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
-  if (typeof conrad === 'undefined')
-    throw 'conrad is not declared';
+  if (typeof conrad === "undefined") throw "conrad is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.renderers');
+  sigma.utils.pkg("sigma.renderers");
 
   /**
    * This function is the constructor of the svg sigma's renderer.
@@ -21,17 +19,17 @@
    * @return {sigma.renderers.svg}             The renderer instance.
    */
   sigma.renderers.svg = function(graph, camera, settings, options) {
-    if (typeof options !== 'object')
-      throw 'sigma.renderers.svg: Wrong arguments.';
+    if (typeof options !== "object")
+      throw "sigma.renderers.svg: Wrong arguments.";
 
     if (!(options.container instanceof HTMLElement))
-      throw 'Container not found.';
+      throw "Container not found.";
 
     var i,
-        l,
-        a,
-        fn,
-        self = this;
+      l,
+      a,
+      fn,
+      self = this;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -49,45 +47,39 @@
     this.measurementCanvas = null;
     this.options = options;
     this.container = this.options.container;
-    this.settings = (
-        typeof options.settings === 'object' &&
-        options.settings
-      ) ?
-        settings.embedObjects(options.settings) :
-        settings;
+    this.settings =
+      typeof options.settings === "object" && options.settings
+        ? settings.embedObjects(options.settings)
+        : settings;
 
     // Is the renderer meant to be freestyle?
-    this.settings('freeStyle', !!this.options.freeStyle);
+    this.settings("freeStyle", !!this.options.freeStyle);
 
     // SVG xmlns
-    this.settings('xmlns', 'http://www.w3.org/2000/svg');
+    this.settings("xmlns", "http://www.w3.org/2000/svg");
 
     // Indexes:
     this.nodesOnScreen = [];
     this.edgesOnScreen = [];
 
     // Find the prefix:
-    this.options.prefix = 'renderer' + sigma.utils.id() + ':';
+    this.options.prefix = "renderer" + sigma.utils.id() + ":";
 
     // Initialize the DOM elements
-    this.initDOM('svg');
+    this.initDOM("svg");
 
     // Initialize captors:
     this.captors = [];
     a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
     for (i = 0, l = a.length; i < l; i++) {
-      fn = typeof a[i] === 'function' ? a[i] : sigma.captors[a[i]];
+      fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
       this.captors.push(
-        new fn(
-          this.domElements.graph,
-          this.camera,
-          this.settings
-        )
+        new fn(this.domElements.graph, this.camera, this.settings)
       );
     }
 
     // Bind resize:
-    window.addEventListener('resize', function() {
+    window.addEventListener("resize", function() {
       self.resize();
     });
 
@@ -110,43 +102,38 @@
     options = options || {};
 
     var a,
-        i,
-        k,
-        e,
-        l,
-        o,
-        source,
-        target,
-        start,
-        edges,
-        renderers,
-        subrenderers,
-        index = {},
-        graph = this.graph,
-        nodes = this.graph.nodes,
-        prefix = this.options.prefix || '',
-        drawEdges = this.settings(options, 'drawEdges'),
-        drawNodes = this.settings(options, 'drawNodes'),
-        drawLabels = this.settings(options, 'drawLabels'),
-        embedSettings = this.settings.embedObjects(options, {
-          prefix: this.options.prefix,
-          forceLabels: this.options.forceLabels
-        });
+      i,
+      k,
+      e,
+      l,
+      o,
+      source,
+      target,
+      start,
+      edges,
+      renderers,
+      subrenderers,
+      index = {},
+      graph = this.graph,
+      nodes = this.graph.nodes,
+      prefix = this.options.prefix || "",
+      drawEdges = this.settings(options, "drawEdges"),
+      drawNodes = this.settings(options, "drawNodes"),
+      drawLabels = this.settings(options, "drawLabels"),
+      embedSettings = this.settings.embedObjects(options, {
+        prefix: this.options.prefix,
+        forceLabels: this.options.forceLabels
+      });
 
     // Check the 'hideEdgesOnMove' setting:
-    if (this.settings(options, 'hideEdgesOnMove'))
-      if (this.camera.isAnimated || this.camera.isMoving)
-        drawEdges = false;
+    if (this.settings(options, "hideEdgesOnMove"))
+      if (this.camera.isAnimated || this.camera.isMoving) drawEdges = false;
 
     // Apply the camera's view:
-    this.camera.applyView(
-      undefined,
-      this.options.prefix,
-      {
-        width: this.width,
-        height: this.height
-      }
-    );
+    this.camera.applyView(undefined, this.options.prefix, {
+      width: this.width,
+      height: this.height
+    });
 
     // Hiding everything
     // TODO: find a more sensible way to perform this operation
@@ -183,7 +170,6 @@
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
         if (!a[i].hidden && !this.domElements.nodes[a[i].id]) {
-
           // Node
           e = (renderers[a[i].type] || renderers.def).create(
             a[i],
@@ -207,9 +193,7 @@
     //-- Second we update the nodes
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
-
-        if (a[i].hidden)
-          continue;
+        if (a[i].hidden) continue;
 
         // Node
         (renderers[a[i].type] || renderers.def).update(
@@ -247,7 +231,7 @@
           this.domElements.edges[a[i].id] = e;
           this.domElements.groups.edges.appendChild(e);
         }
-       }
+      }
 
     //-- Second we update the edges
     if (drawEdges)
@@ -262,9 +246,9 @@
           target,
           embedSettings
         );
-       }
+      }
 
-    this.dispatchEvent('render');
+    this.dispatchEvent("render");
 
     return this;
   };
@@ -278,42 +262,43 @@
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
   sigma.renderers.svg.prototype.initDOM = function(tag) {
-    var dom = document.createElementNS(this.settings('xmlns'), tag),
-        c = this.settings('classPrefix'),
-        g,
-        l,
-        i;
+    var dom = document.createElementNS(this.settings("xmlns"), tag),
+      c = this.settings("classPrefix"),
+      g,
+      l,
+      i;
 
-    dom.style.position = 'absolute';
-    dom.setAttribute('class', c + '-svg');
+    dom.style.position = "absolute";
+    dom.setAttribute("class", c + "-svg");
 
     // Setting SVG namespace
-    dom.setAttribute('xmlns', this.settings('xmlns'));
-    dom.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    dom.setAttribute('version', '1.1');
+    dom.setAttribute("xmlns", this.settings("xmlns"));
+    dom.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    dom.setAttribute("version", "1.1");
 
     // Creating the measurement canvas
-    var canvas = document.createElement('canvas');
-    canvas.setAttribute('class', c + '-measurement-canvas');
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute("class", c + "-measurement-canvas");
 
     // Appending elements
     this.domElements.graph = this.container.appendChild(dom);
 
     // Creating groups
-    var groups = ['edges', 'nodes', 'labels', 'hovers'];
+    var groups = ["edges", "nodes", "labels", "hovers"];
     for (i = 0, l = groups.length; i < l; i++) {
-      g = document.createElementNS(this.settings('xmlns'), 'g');
+      g = document.createElementNS(this.settings("xmlns"), "g");
 
-      g.setAttributeNS(null, 'id', c + '-group-' + groups[i]);
-      g.setAttributeNS(null, 'class', c + '-group');
+      g.setAttributeNS(null, "id", c + "-group-" + groups[i]);
+      g.setAttributeNS(null, "class", c + "-group");
 
-      this.domElements.groups[groups[i]] =
-        this.domElements.graph.appendChild(g);
+      this.domElements.groups[groups[i]] = this.domElements.graph.appendChild(
+        g
+      );
     }
 
     // Appending measurement canvas
     this.container.appendChild(canvas);
-    this.measurementCanvas = canvas.getContext('2d');
+    this.measurementCanvas = canvas.getContext("2d");
   };
 
   /**
@@ -324,8 +309,7 @@
    * @return {sigma.renderers.svg}              Returns the instance itself.
    */
   sigma.renderers.svg.prototype.hideDOMElements = function(elements) {
-    var o,
-        i;
+    var o, i;
 
     for (i in elements) {
       o = elements[i];
@@ -343,17 +327,16 @@
   // TODO: add option about whether to display hovers or not
   sigma.renderers.svg.prototype.bindHovers = function(prefix) {
     var renderers = sigma.svg.hovers,
-        self = this,
-        hoveredNode;
+      self = this,
+      hoveredNode;
 
     function overNode(e) {
       var node = e.data.node,
-          embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        embedSettings = self.settings.embedObjects({
+          prefix: prefix
+        });
 
-      if (!embedSettings('enableHovering'))
-        return;
+      if (!embedSettings("enableHovering")) return;
 
       var hover = (renderers[node.type] || renderers.def).create(
         node,
@@ -371,12 +354,11 @@
 
     function outNode(e) {
       var node = e.data.node,
-          embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        embedSettings = self.settings.embedObjects({
+          prefix: prefix
+        });
 
-      if (!embedSettings('enableHovering'))
-        return;
+      if (!embedSettings("enableHovering")) return;
 
       // Deleting element
       self.domElements.groups.hovers.removeChild(
@@ -393,12 +375,11 @@
 
     // OPTIMIZE: perform a real update rather than a deletion
     function update() {
-      if (!hoveredNode)
-        return;
+      if (!hoveredNode) return;
 
       var embedSettings = self.settings.embedObjects({
-            prefix: prefix
-          });
+        prefix: prefix
+      });
 
       // Deleting element before update
       self.domElements.groups.hovers.removeChild(
@@ -420,11 +401,11 @@
     }
 
     // Binding events
-    this.bind('overNode', overNode);
-    this.bind('outNode', outNode);
+    this.bind("overNode", overNode);
+    this.bind("outNode", outNode);
 
     // Update on render
-    this.bind('render', update);
+    this.bind("render", update);
   };
 
   /**
@@ -437,8 +418,8 @@
    */
   sigma.renderers.svg.prototype.resize = function(w, h) {
     var oldWidth = this.width,
-        oldHeight = this.height,
-        pixelRatio = 1;
+      oldHeight = this.height,
+      pixelRatio = 1;
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -452,18 +433,17 @@
     }
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
-      this.domElements.graph.style.width = w + 'px';
-      this.domElements.graph.style.height = h + 'px';
+      this.domElements.graph.style.width = w + "px";
+      this.domElements.graph.style.height = h + "px";
 
-      if (this.domElements.graph.tagName.toLowerCase() === 'svg') {
-        this.domElements.graph.setAttribute('width', (w * pixelRatio));
-        this.domElements.graph.setAttribute('height', (h * pixelRatio));
+      if (this.domElements.graph.tagName.toLowerCase() === "svg") {
+        this.domElements.graph.setAttribute("width", w * pixelRatio);
+        this.domElements.graph.setAttribute("height", h * pixelRatio);
       }
     }
 
     return this;
   };
-
 
   /**
    * The labels, nodes and edges renderers are stored in the three following
@@ -473,7 +453,7 @@
    *
    * They are stored in different files, in the "./svg" folder.
    */
-  sigma.utils.pkg('sigma.svg.nodes');
-  sigma.utils.pkg('sigma.svg.edges');
-  sigma.utils.pkg('sigma.svg.labels');
-}).call(this);
+  sigma.utils.pkg("sigma.svg.nodes");
+  sigma.utils.pkg("sigma.svg.edges");
+  sigma.utils.pkg("sigma.svg.labels");
+}.call(this));

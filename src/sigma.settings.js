@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Packages initialization:
-  sigma.utils.pkg('sigma.settings');
+  sigma.utils.pkg("sigma.settings");
 
   var settings = {
     /**
@@ -21,40 +20,39 @@
     // {boolean} Indicates if sigma can log its errors and warnings.
     verbose: false,
 
-
     /**
      * RENDERERS SETTINGS:
      * *******************
      */
     // {string}
-    classPrefix: 'sigma',
+    classPrefix: "sigma",
     // {string}
-    defaultNodeType: 'def',
+    defaultNodeType: "def",
     // {string}
-    defaultEdgeType: 'def',
+    defaultEdgeType: "def",
     // {string}
-    defaultLabelColor: '#000',
+    defaultLabelColor: "#000",
     // {string}
-    defaultEdgeColor: '#000',
+    defaultEdgeColor: "#000",
     // {string}
-    defaultNodeColor: '#000',
+    defaultNodeColor: "#000",
     // {string}
     defaultLabelSize: 14,
     // {string} Indicates how to choose the edges color. Available values:
     //          "source", "target", "default"
-    edgeColor: 'source',
+    edgeColor: "source",
     // {number} Defines the minimal edge's arrow display size.
     minArrowSize: 0,
     // {string}
-    font: 'arial',
+    font: "arial",
     // {string} Example: 'bold'
-    fontStyle: '',
+    fontStyle: "",
     // {string} Indicates how to choose the labels color. Available values:
     //          "node", "default"
-    labelColor: 'default',
+    labelColor: "default",
     // {string} Indicates how to choose the labels size. Available values:
     //          "fixed", "proportional"
-    labelSize: 'fixed',
+    labelSize: "fixed",
     // {string} The ratio between the font size of the label and the node size.
     labelSizeRatio: 1,
     // {number} The minimum size a node must have to see its label displayed.
@@ -64,41 +62,41 @@
     // {number} The size of the border of hovered nodes.
     borderSize: 0,
     // {number} The default hovered node border's color.
-    defaultNodeBorderColor: '#000',
+    defaultNodeBorderColor: "#000",
     // {number} The hovered node's label font. If not specified, will heritate
     //          the "font" value.
-    hoverFont: '',
+    hoverFont: "",
     // {boolean} If true, then only one node can be hovered at a time.
     singleHover: true,
     // {string} Example: 'bold'
-    hoverFontStyle: '',
+    hoverFontStyle: "",
     // {string} Indicates how to choose the hovered nodes shadow color.
     //          Available values: "node", "default"
-    labelHoverShadow: 'default',
+    labelHoverShadow: "default",
     // {string}
-    labelHoverShadowColor: '#000',
+    labelHoverShadowColor: "#000",
     // {string} Indicates how to choose the hovered nodes color.
     //          Available values: "node", "default"
-    nodeHoverColor: 'node',
+    nodeHoverColor: "node",
     // {string}
-    defaultNodeHoverColor: '#000',
+    defaultNodeHoverColor: "#000",
     // {string} Indicates how to choose the hovered nodes background color.
     //          Available values: "node", "default"
-    labelHoverBGColor: 'default',
+    labelHoverBGColor: "default",
     // {string}
-    defaultHoverLabelBGColor: '#fff',
+    defaultHoverLabelBGColor: "#fff",
     // {string} Indicates how to choose the hovered labels color.
     //          Available values: "node", "default"
-    labelHoverColor: 'default',
+    labelHoverColor: "default",
     // {string}
-    defaultLabelHoverColor: '#000',
+    defaultLabelHoverColor: "#000",
     // {string} Indicates how to choose the edges hover color. Available values:
     //          "edge", "default"
-    edgeHoverColor: 'edge',
+    edgeHoverColor: "edge",
     // {number} The size multiplicator of hovered edges.
     edgeHoverSizeRatio: 1,
     // {string}
-    defaultEdgeHoverColor: '#000',
+    defaultEdgeHoverColor: "#000",
     // {boolean} Indicates if the edge extremities must be hovered when the
     //           edge is hovered.
     edgeHoverExtremities: false,
@@ -120,16 +118,13 @@
     canvasEdgesBatchSize: 500,
     webglEdgesBatchSize: 1000,
 
-
-
-
     /**
      * RESCALE SETTINGS:
      * *****************
      */
     // {string} Indicates of to scale the graph relatively to its container.
     //          Available values: "inside", "outside"
-    scalingMode: 'inside',
+    scalingMode: "inside",
     // {number} The margin to keep around the graph.
     sideMargin: 0,
     // {number} Determine the size of the smallest and the biggest node / edges
@@ -143,9 +138,6 @@
     maxEdgeSize: 1,
     minNodeSize: 1,
     maxNodeSize: 8,
-
-
-
 
     /**
      * CAPTORS SETTINGS:
@@ -191,9 +183,6 @@
     // {number} The maximum time of dragging to trigger intertia.
     dragTimeout: 200,
 
-
-
-
     /**
      * GLOBAL SETTINGS:
      * ****************
@@ -221,9 +210,6 @@
     //           rendering.
     skipErrors: false,
 
-
-
-
     /**
      * CAMERA SETTINGS:
      * ****************
@@ -235,9 +221,6 @@
     nodesPowRatio: 0.5,
     edgesPowRatio: 0.5,
 
-
-
-
     /**
      * ANIMATIONS SETTINGS:
      * ********************
@@ -248,4 +231,4 @@
 
   // Export the previously designed settings:
   sigma.settings = sigma.utils.extend(sigma.settings || {}, settings);
-}).call(this);
+}.call(this));

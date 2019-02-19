@@ -1,8 +1,7 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   var _root = this;
 
@@ -44,13 +43,12 @@
    */
   sigma.utils.extend = function() {
     var i,
-        k,
-        res = {},
-        l = arguments.length;
+      k,
+      res = {},
+      l = arguments.length;
 
     for (i = l - 1; i >= 0; i--)
-      for (k in arguments[i])
-        res[k] = arguments[i][k];
+      for (k in arguments[i]) res[k] = arguments[i][k];
 
     return res;
   };
@@ -82,10 +80,8 @@
    * @return {object}         The related package.
    */
   sigma.utils.pkg = function(pkgName) {
-    return (pkgName || '').split('.').reduce(function(context, objName) {
-      return (objName in context) ?
-        context[objName] :
-        (context[objName] = {});
+    return (pkgName || "").split(".").reduce(function(context, objName) {
+      return objName in context ? context[objName] : (context[objName] = {});
     }, _root);
   };
 
@@ -127,25 +123,22 @@
   var floatColorCache = {};
 
   sigma.utils.floatColor = function(val) {
-
     // Is the color already computed?
-    if (floatColorCache[val])
-      return floatColorCache[val];
+    if (floatColorCache[val]) return floatColorCache[val];
 
     var original = val,
-        r = 0,
-        g = 0,
-        b = 0;
+      r = 0,
+      g = 0,
+      b = 0;
 
-    if (val[0] === '#') {
+    if (val[0] === "#") {
       val = val.slice(1);
 
       if (val.length === 3) {
         r = parseInt(val.charAt(0) + val.charAt(0), 16);
         g = parseInt(val.charAt(1) + val.charAt(1), 16);
         b = parseInt(val.charAt(2) + val.charAt(2), 16);
-      }
-      else {
+      } else {
         r = parseInt(val.charAt(0) + val.charAt(1), 16);
         g = parseInt(val.charAt(2) + val.charAt(3), 16);
         b = parseInt(val.charAt(4) + val.charAt(5), 16);
@@ -159,11 +152,7 @@
       b = +val[3];
     }
 
-    var color = (
-      r * 256 * 256 +
-      g * 256 +
-      b
-    );
+    var color = r * 256 * 256 + g * 256 + b;
 
     // Caching the color
     floatColorCache[original] = color;
@@ -171,7 +160,7 @@
     return color;
   };
 
-    /**
+  /**
    * Perform a zoom into a camera, with or without animation, to the
    * coordinates indicated using a specified ratio.
    *
@@ -194,18 +183,15 @@
    */
   sigma.utils.zoomTo = function(camera, x, y, ratio, animation) {
     var settings = camera.settings,
-        count,
-        newRatio,
-        animationSettings,
-        coordinates;
+      count,
+      newRatio,
+      animationSettings,
+      coordinates;
 
     // Create the newRatio dealing with min / max:
     newRatio = Math.max(
-      settings('zoomMin'),
-      Math.min(
-        settings('zoomMax'),
-        camera.ratio * ratio
-      )
+      settings("zoomMin"),
+      Math.min(settings("zoomMax"), camera.ratio * ratio)
     );
 
     // Check that the new ratio is different from the initial one:
@@ -221,18 +207,14 @@
       if (animation && animation.duration) {
         // Complete the animation setings:
         count = sigma.misc.animation.killAll(camera);
-        animation = sigma.utils.extend(
-          animation,
-          {
-            easing: count ? 'quadraticOut' : 'quadraticInOut'
-          }
-        );
+        animation = sigma.utils.extend(animation, {
+          easing: count ? "quadraticOut" : "quadraticInOut"
+        });
 
         sigma.misc.animation.camera(camera, coordinates, animation);
       } else {
         camera.goTo(coordinates);
-        if (animation && animation.onComplete)
-          animation.onComplete();
+        if (animation && animation.onComplete) animation.onComplete();
       }
     }
   };
@@ -254,19 +236,19 @@
   };
 
   /**
-    * Compute the coordinates of the point positioned
-    * at length t in the quadratic bezier curve.
-    *
-    * @param  {number} t  In [0,1] the step percentage to reach
-    *                     the point in the curve from the context point.
-    * @param  {number} x1 The X coordinate of the context point.
-    * @param  {number} y1 The Y coordinate of the context point.
-    * @param  {number} x2 The X coordinate of the ending point.
-    * @param  {number} y2 The Y coordinate of the ending point.
-    * @param  {number} xi The X coordinate of the control point.
-    * @param  {number} yi The Y coordinate of the control point.
-    * @return {object}    {x,y}.
-  */
+   * Compute the coordinates of the point positioned
+   * at length t in the quadratic bezier curve.
+   *
+   * @param  {number} t  In [0,1] the step percentage to reach
+   *                     the point in the curve from the context point.
+   * @param  {number} x1 The X coordinate of the context point.
+   * @param  {number} y1 The Y coordinate of the context point.
+   * @param  {number} x2 The X coordinate of the ending point.
+   * @param  {number} y2 The Y coordinate of the ending point.
+   * @param  {number} xi The X coordinate of the control point.
+   * @param  {number} yi The Y coordinate of the control point.
+   * @return {object}    {x,y}.
+   */
   sigma.utils.getPointOnQuadraticCurve = function(t, x1, y1, x2, y2, xi, yi) {
     // http://stackoverflow.com/a/5634528
     return {
@@ -276,33 +258,42 @@
   };
 
   /**
-    * Compute the coordinates of the point positioned
-    * at length t in the cubic bezier curve.
-    *
-    * @param  {number} t  In [0,1] the step percentage to reach
-    *                     the point in the curve from the context point.
-    * @param  {number} x1 The X coordinate of the context point.
-    * @param  {number} y1 The Y coordinate of the context point.
-    * @param  {number} x2 The X coordinate of the end point.
-    * @param  {number} y2 The Y coordinate of the end point.
-    * @param  {number} cx The X coordinate of the first control point.
-    * @param  {number} cy The Y coordinate of the first control point.
-    * @param  {number} dx The X coordinate of the second control point.
-    * @param  {number} dy The Y coordinate of the second control point.
-    * @return {object}    {x,y} The point at t.
-  */
-  sigma.utils.getPointOnBezierCurve =
-    function(t, x1, y1, x2, y2, cx, cy, dx, dy) {
+   * Compute the coordinates of the point positioned
+   * at length t in the cubic bezier curve.
+   *
+   * @param  {number} t  In [0,1] the step percentage to reach
+   *                     the point in the curve from the context point.
+   * @param  {number} x1 The X coordinate of the context point.
+   * @param  {number} y1 The Y coordinate of the context point.
+   * @param  {number} x2 The X coordinate of the end point.
+   * @param  {number} y2 The Y coordinate of the end point.
+   * @param  {number} cx The X coordinate of the first control point.
+   * @param  {number} cy The Y coordinate of the first control point.
+   * @param  {number} dx The X coordinate of the second control point.
+   * @param  {number} dy The Y coordinate of the second control point.
+   * @return {object}    {x,y} The point at t.
+   */
+  sigma.utils.getPointOnBezierCurve = function(
+    t,
+    x1,
+    y1,
+    x2,
+    y2,
+    cx,
+    cy,
+    dx,
+    dy
+  ) {
     // http://stackoverflow.com/a/15397596
     // Blending functions:
     var B0_t = Math.pow(1 - t, 3),
-        B1_t = 3 * t * Math.pow(1 - t, 2),
-        B2_t = 3 * Math.pow(t, 2) * (1 - t),
-        B3_t = Math.pow(t, 3);
+      B1_t = 3 * t * Math.pow(1 - t, 2),
+      B2_t = 3 * Math.pow(t, 2) * (1 - t),
+      B3_t = Math.pow(t, 3);
 
     return {
-      x: (B0_t * x1) + (B1_t * cx) + (B2_t * dx) + (B3_t * x2),
-      y: (B0_t * y1) + (B1_t * cy) + (B2_t * dy) + (B3_t * y2)
+      x: B0_t * x1 + B1_t * cx + B2_t * dx + B3_t * x2,
+      y: B0_t * y1 + B1_t * cy + B2_t * dy + B3_t * y2
     };
   };
 
@@ -316,7 +307,7 @@
    * @param  {number} size The node size.
    * @return {x1,y1,x2,y2} The coordinates of the two control points.
    */
-  sigma.utils.getSelfLoopControlPoints = function(x , y, size) {
+  sigma.utils.getSelfLoopControlPoints = function(x, y, size) {
     return {
       x1: x - size * 7,
       y1: y,
@@ -364,31 +355,31 @@
     dy = y1 - y0;
 
     // Determine the straight-line distance between the centers:
-    d = Math.sqrt((dy * dy) + (dx * dx));
+    d = Math.sqrt(dy * dy + dx * dx);
 
     // Check for solvability:
-    if (d > (r0 + r1)) {
-        // No solution. circles do not intersect.
-        return false;
+    if (d > r0 + r1) {
+      // No solution. circles do not intersect.
+      return false;
     }
     if (d < Math.abs(r0 - r1)) {
-        // No solution. one circle is contained in the other.
-        return false;
+      // No solution. one circle is contained in the other.
+      return false;
     }
 
     //'point 2' is the point where the line through the circle intersection
     // points crosses the line between the circle centers.
 
     // Determine the distance from point 0 to point 2:
-    a = ((r0 * r0) - (r1 * r1) + (d * d)) / (2.0 * d);
+    a = (r0 * r0 - r1 * r1 + d * d) / (2.0 * d);
 
     // Determine the coordinates of point 2:
-    x2 = x0 + (dx * a / d);
-    y2 = y0 + (dy * a / d);
+    x2 = x0 + (dx * a) / d;
+    y2 = y0 + (dy * a) / d;
 
     // Determine the distance from point 2 to either of the intersection
     // points:
-    h = Math.sqrt((r0 * r0) - (a * a));
+    h = Math.sqrt(r0 * r0 - a * a);
 
     // Determine the offsets of the intersection points from point 2:
     rx = -dy * (h / d);
@@ -400,50 +391,63 @@
     var yi = y2 + ry;
     var yi_prime = y2 - ry;
 
-    return {xi: xi, xi_prime: xi_prime, yi: yi, yi_prime: yi_prime};
+    return { xi: xi, xi_prime: xi_prime, yi: yi, yi_prime: yi_prime };
   };
 
   /**
-    * Check if a point is on a line segment.
-    *
-    * @param  {number} x       The X coordinate of the point to check.
-    * @param  {number} y       The Y coordinate of the point to check.
-    * @param  {number} x1      The X coordinate of the line start point.
-    * @param  {number} y1      The Y coordinate of the line start point.
-    * @param  {number} x2      The X coordinate of the line end point.
-    * @param  {number} y2      The Y coordinate of the line end point.
-    * @param  {number} epsilon The precision (consider the line thickness).
-    * @return {boolean}        True if point is "close to" the line
-    *                          segment, false otherwise.
-  */
+   * Check if a point is on a line segment.
+   *
+   * @param  {number} x       The X coordinate of the point to check.
+   * @param  {number} y       The Y coordinate of the point to check.
+   * @param  {number} x1      The X coordinate of the line start point.
+   * @param  {number} y1      The Y coordinate of the line start point.
+   * @param  {number} x2      The X coordinate of the line end point.
+   * @param  {number} y2      The Y coordinate of the line end point.
+   * @param  {number} epsilon The precision (consider the line thickness).
+   * @return {boolean}        True if point is "close to" the line
+   *                          segment, false otherwise.
+   */
   sigma.utils.isPointOnSegment = function(x, y, x1, y1, x2, y2, epsilon) {
     // http://stackoverflow.com/a/328122
     var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
-        d = sigma.utils.getDistance(x1, y1, x2, y2),
-        nCrossProduct = crossProduct / d; // normalized cross product
+      d = sigma.utils.getDistance(x1, y1, x2, y2),
+      nCrossProduct = crossProduct / d; // normalized cross product
 
-    return (nCrossProduct < epsilon &&
-     Math.min(x1, x2) <= x && x <= Math.max(x1, x2) &&
-     Math.min(y1, y2) <= y && y <= Math.max(y1, y2));
+    return (
+      nCrossProduct < epsilon &&
+      Math.min(x1, x2) <= x &&
+      x <= Math.max(x1, x2) &&
+      Math.min(y1, y2) <= y &&
+      y <= Math.max(y1, y2)
+    );
   };
 
   /**
-    * Check if a point is on a quadratic bezier curve segment with a thickness.
-    *
-    * @param  {number} x       The X coordinate of the point to check.
-    * @param  {number} y       The Y coordinate of the point to check.
-    * @param  {number} x1      The X coordinate of the curve start point.
-    * @param  {number} y1      The Y coordinate of the curve start point.
-    * @param  {number} x2      The X coordinate of the curve end point.
-    * @param  {number} y2      The Y coordinate of the curve end point.
-    * @param  {number} cpx     The X coordinate of the curve control point.
-    * @param  {number} cpy     The Y coordinate of the curve control point.
-    * @param  {number} epsilon The precision (consider the line thickness).
-    * @return {boolean}        True if (x,y) is on the curve segment,
-    *                          false otherwise.
-  */
-  sigma.utils.isPointOnQuadraticCurve =
-    function(x, y, x1, y1, x2, y2, cpx, cpy, epsilon) {
+   * Check if a point is on a quadratic bezier curve segment with a thickness.
+   *
+   * @param  {number} x       The X coordinate of the point to check.
+   * @param  {number} y       The Y coordinate of the point to check.
+   * @param  {number} x1      The X coordinate of the curve start point.
+   * @param  {number} y1      The Y coordinate of the curve start point.
+   * @param  {number} x2      The X coordinate of the curve end point.
+   * @param  {number} y2      The Y coordinate of the curve end point.
+   * @param  {number} cpx     The X coordinate of the curve control point.
+   * @param  {number} cpy     The Y coordinate of the curve control point.
+   * @param  {number} epsilon The precision (consider the line thickness).
+   * @return {boolean}        True if (x,y) is on the curve segment,
+   *                          false otherwise.
+   */
+  sigma.utils.isPointOnQuadraticCurve = function(
+    x,
+    y,
+    x1,
+    y1,
+    x2,
+    y2,
+    cpx,
+    cpy,
+    epsilon
+  ) {
     // Fails if the point is too far from the extremities of the segment,
     // preventing for more costly computation:
     var dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
@@ -452,23 +456,26 @@
     }
 
     var dP1 = sigma.utils.getDistance(x, y, x1, y1),
-        dP2 = sigma.utils.getDistance(x, y, x2, y2),
-        t = 0.5,
-        r = (dP1 < dP2) ? -0.01 : 0.01,
-        rThreshold = 0.001,
-        i = 100,
-        pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
-        dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
-        old_dt;
+      dP2 = sigma.utils.getDistance(x, y, x2, y2),
+      t = 0.5,
+      r = dP1 < dP2 ? -0.01 : 0.01,
+      rThreshold = 0.001,
+      i = 100,
+      pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
+      dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
+      old_dt;
 
     // This algorithm minimizes the distance from the point to the curve. It
     // find the optimal t value where t=0 is the start point and t=1 is the end
     // point of the curve, starting from t=0.5.
     // It terminates because it runs a maximum of i interations.
-    while (i-- > 0 &&
-      t >= 0 && t <= 1 &&
-      (dt > epsilon) &&
-      (r > rThreshold || r < -rThreshold)) {
+    while (
+      i-- > 0 &&
+      t >= 0 &&
+      t <= 1 &&
+      dt > epsilon &&
+      (r > rThreshold || r < -rThreshold)
+    ) {
       old_dt = dt;
       pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
       dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
@@ -478,14 +485,12 @@
         // halfstep in the opposite direction
         r = -r / 2;
         t += r;
-      }
-      else if (t + r < 0 || t + r > 1) {
+      } else if (t + r < 0 || t + r > 1) {
         // oops, we've gone too far:
         // revert with a halfstep
         r = r / 2;
         dt = old_dt;
-      }
-      else {
+      } else {
         // progress:
         t += r;
       }
@@ -494,26 +499,36 @@
     return dt < epsilon;
   };
 
-
   /**
-    * Check if a point is on a cubic bezier curve segment with a thickness.
-    *
-    * @param  {number} x       The X coordinate of the point to check.
-    * @param  {number} y       The Y coordinate of the point to check.
-    * @param  {number} x1      The X coordinate of the curve start point.
-    * @param  {number} y1      The Y coordinate of the curve start point.
-    * @param  {number} x2      The X coordinate of the curve end point.
-    * @param  {number} y2      The Y coordinate of the curve end point.
-    * @param  {number} cpx1    The X coordinate of the 1st curve control point.
-    * @param  {number} cpy1    The Y coordinate of the 1st curve control point.
-    * @param  {number} cpx2    The X coordinate of the 2nd curve control point.
-    * @param  {number} cpy2    The Y coordinate of the 2nd curve control point.
-    * @param  {number} epsilon The precision (consider the line thickness).
-    * @return {boolean}        True if (x,y) is on the curve segment,
-    *                          false otherwise.
-  */
-  sigma.utils.isPointOnBezierCurve =
-    function(x, y, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2, epsilon) {
+   * Check if a point is on a cubic bezier curve segment with a thickness.
+   *
+   * @param  {number} x       The X coordinate of the point to check.
+   * @param  {number} y       The Y coordinate of the point to check.
+   * @param  {number} x1      The X coordinate of the curve start point.
+   * @param  {number} y1      The Y coordinate of the curve start point.
+   * @param  {number} x2      The X coordinate of the curve end point.
+   * @param  {number} y2      The Y coordinate of the curve end point.
+   * @param  {number} cpx1    The X coordinate of the 1st curve control point.
+   * @param  {number} cpy1    The Y coordinate of the 1st curve control point.
+   * @param  {number} cpx2    The X coordinate of the 2nd curve control point.
+   * @param  {number} cpy2    The Y coordinate of the 2nd curve control point.
+   * @param  {number} epsilon The precision (consider the line thickness).
+   * @return {boolean}        True if (x,y) is on the curve segment,
+   *                          false otherwise.
+   */
+  sigma.utils.isPointOnBezierCurve = function(
+    x,
+    y,
+    x1,
+    y1,
+    x2,
+    y2,
+    cpx1,
+    cpy1,
+    cpx2,
+    cpy2,
+    epsilon
+  ) {
     // Fails if the point is too far from the extremities of the segment,
     // preventing for more costly computation:
     var dP1CP1 = sigma.utils.getDistance(x1, y1, cpx1, cpy1);
@@ -522,27 +537,48 @@
     }
 
     var dP1 = sigma.utils.getDistance(x, y, x1, y1),
-        dP2 = sigma.utils.getDistance(x, y, x2, y2),
-        t = 0.5,
-        r = (dP1 < dP2) ? -0.01 : 0.01,
-        rThreshold = 0.001,
-        i = 100,
-        pt = sigma.utils.getPointOnBezierCurve(
-          t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2),
-        dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
-        old_dt;
+      dP2 = sigma.utils.getDistance(x, y, x2, y2),
+      t = 0.5,
+      r = dP1 < dP2 ? -0.01 : 0.01,
+      rThreshold = 0.001,
+      i = 100,
+      pt = sigma.utils.getPointOnBezierCurve(
+        t,
+        x1,
+        y1,
+        x2,
+        y2,
+        cpx1,
+        cpy1,
+        cpx2,
+        cpy2
+      ),
+      dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
+      old_dt;
 
     // This algorithm minimizes the distance from the point to the curve. It
     // find the optimal t value where t=0 is the start point and t=1 is the end
     // point of the curve, starting from t=0.5.
     // It terminates because it runs a maximum of i interations.
-    while (i-- > 0 &&
-      t >= 0 && t <= 1 &&
-      (dt > epsilon) &&
-      (r > rThreshold || r < -rThreshold)) {
+    while (
+      i-- > 0 &&
+      t >= 0 &&
+      t <= 1 &&
+      dt > epsilon &&
+      (r > rThreshold || r < -rThreshold)
+    ) {
       old_dt = dt;
       pt = sigma.utils.getPointOnBezierCurve(
-        t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2);
+        t,
+        x1,
+        y1,
+        x2,
+        y2,
+        cpx1,
+        cpy1,
+        cpx2,
+        cpy2
+      );
       dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
 
       if (dt > old_dt) {
@@ -550,14 +586,12 @@
         // halfstep in the opposite direction
         r = -r / 2;
         t += r;
-      }
-      else if (t + r < 0 || t + r > 1) {
+      } else if (t + r < 0 || t + r > 1) {
         // oops, we've gone too far:
         // revert with a halfstep
         r = r / 2;
         dt = old_dt;
-      }
-      else {
+      } else {
         // progress:
         t += r;
       }
@@ -565,7 +599,6 @@
 
     return dt < epsilon;
   };
-
 
   /**
    * ************
@@ -612,13 +645,14 @@
    */
   sigma.utils.getPixelRatio = function() {
     var ratio = 1;
-    if (window.screen.deviceXDPI !== undefined &&
-         window.screen.logicalXDPI !== undefined &&
-         window.screen.deviceXDPI > window.screen.logicalXDPI) {
-        ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
-    }
-    else if (window.devicePixelRatio !== undefined) {
-        ratio = window.devicePixelRatio;
+    if (
+      window.screen.deviceXDPI !== undefined &&
+      window.screen.logicalXDPI !== undefined &&
+      window.screen.deviceXDPI > window.screen.logicalXDPI
+    ) {
+      ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
+    } else if (window.devicePixelRatio !== undefined) {
+      ratio = window.devicePixelRatio;
     }
     return ratio;
   };
@@ -630,12 +664,12 @@
    * @return {number}   The width of the event's target.
    */
   sigma.utils.getWidth = function(e) {
-    var w = (!e.target.ownerSVGElement) ?
-              e.target.width :
-              e.target.ownerSVGElement.width;
+    var w = !e.target.ownerSVGElement
+      ? e.target.width
+      : e.target.ownerSVGElement.width;
 
     return (
-      (typeof w === 'number' && w) ||
+      (typeof w === "number" && w) ||
       (w !== undefined && w.baseVal !== undefined && w.baseVal.value)
     );
   };
@@ -647,8 +681,10 @@
    * @return {object}   The center of the event's target.
    */
   sigma.utils.getCenter = function(e) {
-    var ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 :
-        sigma.utils.getPixelRatio();
+    var ratio =
+      e.target.namespaceURI.indexOf("svg") !== -1
+        ? 1
+        : sigma.utils.getPixelRatio();
     return {
       x: sigma.utils.getWidth(e) / (2 * ratio),
       y: sigma.utils.getHeight(e) / (2 * ratio)
@@ -668,14 +704,14 @@
     x = x || sigma.utils.getX(e);
     y = y || sigma.utils.getY(e);
     return {
-        x: x - sigma.utils.getCenter(e).x,
-        y: y - sigma.utils.getCenter(e).y,
-        clientX: e.clientX,
-        clientY: e.clientY,
-        ctrlKey: e.ctrlKey,
-        metaKey: e.metaKey,
-        altKey: e.altKey,
-        shiftKey: e.shiftKey
+      x: x - sigma.utils.getCenter(e).x,
+      y: y - sigma.utils.getCenter(e).y,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      ctrlKey: e.ctrlKey,
+      metaKey: e.metaKey,
+      altKey: e.altKey,
+      shiftKey: e.shiftKey
     };
   };
 
@@ -686,12 +722,12 @@
    * @return {number}   The height of the event's target.
    */
   sigma.utils.getHeight = function(e) {
-    var h = (!e.target.ownerSVGElement) ?
-              e.target.height :
-              e.target.ownerSVGElement.height;
+    var h = !e.target.ownerSVGElement
+      ? e.target.height
+      : e.target.ownerSVGElement.height;
 
     return (
-      (typeof h === 'number' && h) ||
+      (typeof h === "number" && h) ||
       (h !== undefined && h.baseVal !== undefined && h.baseVal.value)
     );
   };
@@ -717,7 +753,7 @@
    */
   sigma.utils.getOffset = function(dom) {
     var left = 0,
-        top = 0;
+      top = 0;
 
     while (dom) {
       top = top + parseInt(dom.offsetTop);
@@ -740,8 +776,8 @@
    */
   sigma.utils.doubleClick = function(target, type, callback) {
     var clicks = 0,
-        self = this,
-        handlers;
+      self = this,
+      handlers;
 
     target._doubleClickHandler = target._doubleClickHandler || {};
     target._doubleClickHandler[type] = target._doubleClickHandler[type] || [];
@@ -771,7 +807,7 @@
    */
   sigma.utils.unbindDoubleClick = function(target, type) {
     var handler,
-        handlers = (target._doubleClickHandler || {})[type] || [];
+      handlers = (target._doubleClickHandler || {})[type] || [];
 
     while ((handler = handlers.pop())) {
       target.removeEventListener(type, handler);
@@ -779,9 +815,6 @@
 
     delete (target._doubleClickHandler || {})[type];
   };
-
-
-
 
   /**
    * Here are just some of the most basic easing functions, used for the
@@ -803,9 +836,8 @@
     return k * (2 - k);
   };
   sigma.utils.easings.quadraticInOut = function(k) {
-    if ((k *= 2) < 1)
-      return 0.5 * k * k;
-    return - 0.5 * (--k * (k - 2) - 1);
+    if ((k *= 2) < 1) return 0.5 * k * k;
+    return -0.5 * (--k * (k - 2) - 1);
   };
   sigma.utils.easings.cubicIn = function(k) {
     return k * k * k;
@@ -814,13 +846,9 @@
     return --k * k * k + 1;
   };
   sigma.utils.easings.cubicInOut = function(k) {
-    if ((k *= 2) < 1)
-      return 0.5 * k * k * k;
+    if ((k *= 2) < 1) return 0.5 * k * k * k;
     return 0.5 * ((k -= 2) * k * k + 2);
   };
-
-
-
 
   /**
    * ************
@@ -838,7 +866,7 @@
    */
   sigma.utils.loadShader = function(gl, shaderSource, shaderType, error) {
     var compiled,
-        shader = gl.createShader(shaderType);
+      shader = gl.createShader(shaderType);
 
     // Load the shader source
     gl.shaderSource(shader, shaderSource);
@@ -853,8 +881,10 @@
     if (!compiled) {
       if (error) {
         error(
-          'Error compiling shader "' + shader + '":' +
-          gl.getShaderInfoLog(shader)
+          'Error compiling shader "' +
+            shader +
+            '":' +
+            gl.getShaderInfoLog(shader)
         );
       }
 
@@ -877,11 +907,10 @@
    */
   sigma.utils.loadProgram = function(gl, shaders, attribs, loc, error) {
     var i,
-        linked,
-        program = gl.createProgram();
+      linked,
+      program = gl.createProgram();
 
-    for (i = 0; i < shaders.length; ++i)
-      gl.attachShader(program, shaders[i]);
+    for (i = 0; i < shaders.length; ++i) gl.attachShader(program, shaders[i]);
 
     if (attribs)
       for (i = 0; i < attribs.length; ++i)
@@ -897,7 +926,7 @@
     linked = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!linked) {
       if (error)
-        error('Error in program linking: ' + gl.getProgramInfoLog(program));
+        error("Error in program linking: " + gl.getProgramInfoLog(program));
 
       gl.deleteProgram(program);
       return null;
@@ -906,9 +935,6 @@
     return program;
   };
 
-
-
-
   /**
    * *********
    * MATRICES:
@@ -916,7 +942,7 @@
    * The following utils are just here to help generating the transformation
    * matrices for the WebGL renderers.
    */
-  sigma.utils.pkg('sigma.utils.matrices');
+  sigma.utils.pkg("sigma.utils.matrices");
 
   /**
    * The returns a 3x3 translation matrix.
@@ -926,11 +952,7 @@
    * @return {array}     Returns the matrix.
    */
   sigma.utils.matrices.translation = function(dx, dy) {
-    return [
-      1, 0, 0,
-      0, 1, 0,
-      dx, dy, 1
-    ];
+    return [1, 0, 0, 0, 1, 0, dx, dy, 1];
   };
 
   /**
@@ -942,16 +964,9 @@
    */
   sigma.utils.matrices.rotation = function(angle, m2) {
     var cos = Math.cos(angle),
-        sin = Math.sin(angle);
+      sin = Math.sin(angle);
 
-    return m2 ? [
-      cos, -sin,
-      sin, cos
-    ] : [
-      cos, -sin, 0,
-      sin, cos, 0,
-      0, 0, 1
-    ];
+    return m2 ? [cos, -sin, sin, cos] : [cos, -sin, 0, sin, cos, 0, 0, 0, 1];
   };
 
   /**
@@ -962,14 +977,7 @@
    * @return {array}         Returns the matrix.
    */
   sigma.utils.matrices.scale = function(ratio, m2) {
-    return m2 ? [
-      ratio, 0,
-      0, ratio
-    ] : [
-      ratio, 0, 0,
-      0, ratio, 0,
-      0, 0, 1
-    ];
+    return m2 ? [ratio, 0, 0, ratio] : [ratio, 0, 0, 0, ratio, 0, 0, 0, 1];
   };
 
   /**
@@ -983,40 +991,42 @@
    */
   sigma.utils.matrices.multiply = function(a, b, m2) {
     var l = m2 ? 2 : 3,
-        a00 = a[0 * l + 0],
-        a01 = a[0 * l + 1],
-        a02 = a[0 * l + 2],
-        a10 = a[1 * l + 0],
-        a11 = a[1 * l + 1],
-        a12 = a[1 * l + 2],
-        a20 = a[2 * l + 0],
-        a21 = a[2 * l + 1],
-        a22 = a[2 * l + 2],
-        b00 = b[0 * l + 0],
-        b01 = b[0 * l + 1],
-        b02 = b[0 * l + 2],
-        b10 = b[1 * l + 0],
-        b11 = b[1 * l + 1],
-        b12 = b[1 * l + 2],
-        b20 = b[2 * l + 0],
-        b21 = b[2 * l + 1],
-        b22 = b[2 * l + 2];
+      a00 = a[0 * l + 0],
+      a01 = a[0 * l + 1],
+      a02 = a[0 * l + 2],
+      a10 = a[1 * l + 0],
+      a11 = a[1 * l + 1],
+      a12 = a[1 * l + 2],
+      a20 = a[2 * l + 0],
+      a21 = a[2 * l + 1],
+      a22 = a[2 * l + 2],
+      b00 = b[0 * l + 0],
+      b01 = b[0 * l + 1],
+      b02 = b[0 * l + 2],
+      b10 = b[1 * l + 0],
+      b11 = b[1 * l + 1],
+      b12 = b[1 * l + 2],
+      b20 = b[2 * l + 0],
+      b21 = b[2 * l + 1],
+      b22 = b[2 * l + 2];
 
-    return m2 ? [
-      a00 * b00 + a01 * b10,
-      a00 * b01 + a01 * b11,
-      a10 * b00 + a11 * b10,
-      a10 * b01 + a11 * b11
-    ] : [
-      a00 * b00 + a01 * b10 + a02 * b20,
-      a00 * b01 + a01 * b11 + a02 * b21,
-      a00 * b02 + a01 * b12 + a02 * b22,
-      a10 * b00 + a11 * b10 + a12 * b20,
-      a10 * b01 + a11 * b11 + a12 * b21,
-      a10 * b02 + a11 * b12 + a12 * b22,
-      a20 * b00 + a21 * b10 + a22 * b20,
-      a20 * b01 + a21 * b11 + a22 * b21,
-      a20 * b02 + a21 * b12 + a22 * b22
-    ];
+    return m2
+      ? [
+          a00 * b00 + a01 * b10,
+          a00 * b01 + a01 * b11,
+          a10 * b00 + a11 * b10,
+          a10 * b01 + a11 * b11
+        ]
+      : [
+          a00 * b00 + a01 * b10 + a02 * b20,
+          a00 * b01 + a01 * b11 + a02 * b21,
+          a00 * b02 + a01 * b12 + a02 * b22,
+          a10 * b00 + a11 * b10 + a12 * b20,
+          a10 * b01 + a11 * b11 + a12 * b21,
+          a10 * b02 + a11 * b12 + a12 * b22,
+          a20 * b00 + a21 * b10 + a22 * b20,
+          a20 * b01 + a21 * b11 + a22 * b21,
+          a20 * b02 + a21 * b12 + a22 * b22
+        ];
   };
-}).call(this);
+}.call(this));

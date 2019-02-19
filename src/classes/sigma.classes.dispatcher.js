@@ -1,5 +1,5 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
   /**
    * Dispatcher constructor.
@@ -7,13 +7,10 @@
    * @return {dispatcher} The new dispatcher instance.
    */
   var dispatcher = function() {
-    Object.defineProperty(this, '_handlers', {
+    Object.defineProperty(this, "_handlers", {
       value: {}
     });
   };
-
-
-
 
   /**
    * Will execute the handler everytime that the indicated event (or the
@@ -25,32 +22,20 @@
    * @return {dispatcher}               Returns the instance itself.
    */
   dispatcher.prototype.bind = function(events, handler) {
-    var i,
-        l,
-        event,
-        eArray;
+    var i, l, event, eArray;
 
-    if (
-      arguments.length === 1 &&
-      typeof arguments[0] === 'object'
-    )
-      for (events in arguments[0])
-        this.bind(events, arguments[0][events]);
-    else if (
-      arguments.length === 2 &&
-      typeof arguments[1] === 'function'
-    ) {
-      eArray = typeof events === 'string' ? events.split(' ') : events;
+    if (arguments.length === 1 && typeof arguments[0] === "object")
+      for (events in arguments[0]) this.bind(events, arguments[0][events]);
+    else if (arguments.length === 2 && typeof arguments[1] === "function") {
+      eArray = typeof events === "string" ? events.split(" ") : events;
 
       for (i = 0, l = eArray.length; i !== l; i += 1) {
         event = eArray[i];
 
         // Check that event is not '':
-        if (!event)
-          continue;
+        if (!event) continue;
 
-        if (!this._handlers[event])
-          this._handlers[event] = [];
+        if (!this._handlers[event]) this._handlers[event] = [];
 
         // Using an object instead of directly the handler will make possible
         // later to add flags
@@ -58,8 +43,7 @@
           handler: handler
         });
       }
-    } else
-      throw 'bind: Wrong arguments.';
+    } else throw "bind: Wrong arguments.";
 
     return this;
   };
@@ -77,17 +61,16 @@
    */
   dispatcher.prototype.unbind = function(events, handler) {
     var i,
-        n,
-        j,
-        m,
-        k,
-        a,
-        event,
-        eArray = typeof events === 'string' ? events.split(' ') : events;
+      n,
+      j,
+      m,
+      k,
+      a,
+      event,
+      eArray = typeof events === "string" ? events.split(" ") : events;
 
     if (!arguments.length) {
-      for (k in this._handlers)
-        delete this._handlers[k];
+      for (k in this._handlers) delete this._handlers[k];
       return this;
     }
 
@@ -123,14 +106,14 @@
    */
   dispatcher.prototype.dispatchEvent = function(events, data) {
     var i,
-        n,
-        j,
-        m,
-        a,
-        event,
-        eventName,
-        self = this,
-        eArray = typeof events === 'string' ? events.split(' ') : events;
+      n,
+      j,
+      m,
+      a,
+      event,
+      eventName,
+      self = this,
+      eArray = typeof events === "string" ? events.split(" ") : events;
 
     data = data === undefined ? {} : data;
 
@@ -185,20 +168,16 @@
     dispatcher.apply(target, args);
   };
 
-
-
-
   /**
    * EXPORT:
    * *******
    */
-  if (typeof this.sigma !== 'undefined') {
+  if (typeof this.sigma !== "undefined") {
     this.sigma.classes = this.sigma.classes || {};
     this.sigma.classes.dispatcher = dispatcher;
-  } else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
+  } else if (typeof exports !== "undefined") {
+    if (typeof module !== "undefined" && module.exports)
       exports = module.exports = dispatcher;
     exports.dispatcher = dispatcher;
-  } else
-    this.dispatcher = dispatcher;
-}).call(this);
+  } else this.dispatcher = dispatcher;
+}.call(this));

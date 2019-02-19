@@ -1,13 +1,12 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.svg.nodes');
+  sigma.utils.pkg("sigma.svg.nodes");
 
   /**
    * The default node renderer. It renders the node as a simple disc.
    */
   sigma.svg.nodes.def = {
-
     /**
      * SVG Element creation.
      *
@@ -15,14 +14,17 @@
      * @param  {configurable}             settings The settings function.
      */
     create: function(node, settings) {
-      var prefix = settings('prefix') || '',
-          circle = document.createElementNS(settings('xmlns'), 'circle');
+      var prefix = settings("prefix") || "",
+        circle = document.createElementNS(settings("xmlns"), "circle");
 
       // Defining the node's circle
-      circle.setAttributeNS(null, 'data-node-id', node.id);
-      circle.setAttributeNS(null, 'class', settings('classPrefix') + '-node');
+      circle.setAttributeNS(null, "data-node-id", node.id);
+      circle.setAttributeNS(null, "class", settings("classPrefix") + "-node");
       circle.setAttributeNS(
-        null, 'fill', node.color || settings('defaultNodeColor'));
+        null,
+        "fill",
+        node.color || settings("defaultNodeColor")
+      );
 
       // Returning the DOM Element
       return circle;
@@ -36,21 +38,24 @@
      * @param  {configurable}             settings The settings function.
      */
     update: function(node, circle, settings) {
-      var prefix = settings('prefix') || '';
+      var prefix = settings("prefix") || "";
 
       // Applying changes
       // TODO: optimize - check if necessary
-      circle.setAttributeNS(null, 'cx', node[prefix + 'x']);
-      circle.setAttributeNS(null, 'cy', node[prefix + 'y']);
-      circle.setAttributeNS(null, 'r', node[prefix + 'size']);
+      circle.setAttributeNS(null, "cx", node[prefix + "x"]);
+      circle.setAttributeNS(null, "cy", node[prefix + "y"]);
+      circle.setAttributeNS(null, "r", node[prefix + "size"]);
 
       // Updating only if not freestyle
-      if (!settings('freeStyle'))
+      if (!settings("freeStyle"))
         circle.setAttributeNS(
-          null, 'fill', node.color || settings('defaultNodeColor'));
+          null,
+          "fill",
+          node.color || settings("defaultNodeColor")
+        );
 
       // Showing
-      circle.style.display = '';
+      circle.style.display = "";
 
       return this;
     }

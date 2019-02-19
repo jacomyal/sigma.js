@@ -1,5 +1,5 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
   /**
    * Sigma Quadtree Module
@@ -9,8 +9,6 @@
    * Version: 0.2
    */
 
-
-
   /**
    * Quad Geometric Operations
    * -------------------------
@@ -19,7 +17,6 @@
    */
 
   var _geom = {
-
     /**
      * Transforms a graph node with x, y and size into an
      * axis-aligned square.
@@ -58,31 +55,35 @@
      * @return {object} A rectangle: two points (x1, y1), (x2, y2) and height.
      */
     axisAlignedTopPoints: function(r) {
-
       // Basic
-      if (r.y1 === r.y2 && r.x1 < r.x2)
-        return r;
+      if (r.y1 === r.y2 && r.x1 < r.x2) return r;
 
       // Rotated to right
       if (r.x1 === r.x2 && r.y2 > r.y1)
         return {
-          x1: r.x1 - r.height, y1: r.y1,
-          x2: r.x1, y2: r.y1,
+          x1: r.x1 - r.height,
+          y1: r.y1,
+          x2: r.x1,
+          y2: r.y1,
           height: r.height
         };
 
       // Rotated to left
       if (r.x1 === r.x2 && r.y2 < r.y1)
         return {
-          x1: r.x1, y1: r.y2,
-          x2: r.x2 + r.height, y2: r.y2,
+          x1: r.x1,
+          y1: r.y2,
+          x2: r.x2 + r.height,
+          y2: r.y2,
           height: r.height
         };
 
       // Bottom's up
       return {
-        x1: r.x2, y1: r.y1 - r.height,
-        x2: r.x1, y2: r.y1 - r.height,
+        x1: r.x2,
+        y1: r.y1 - r.height,
+        x2: r.x1,
+        y2: r.y1 - r.height,
         height: r.height
       };
     },
@@ -94,16 +95,13 @@
      * @return {object} Coordinates of the corner (x, y).
      */
     lowerLeftCoor: function(r) {
-      var width = (
-        Math.sqrt(
-          Math.pow(r.x2 - r.x1, 2) +
-          Math.pow(r.y2 - r.y1, 2)
-        )
+      var width = Math.sqrt(
+        Math.pow(r.x2 - r.x1, 2) + Math.pow(r.y2 - r.y1, 2)
       );
 
       return {
-        x: r.x1 - (r.y2 - r.y1) * r.height / width,
-        y: r.y1 + (r.x2 - r.x1) * r.height / width
+        x: r.x1 - ((r.y2 - r.y1) * r.height) / width,
+        y: r.y1 + ((r.x2 - r.x1) * r.height) / width
       };
     },
 
@@ -130,13 +128,13 @@
      */
     rectangleCorners: function(r) {
       var llc = this.lowerLeftCoor(r),
-          lrc = this.lowerRightCoor(r, llc);
+        lrc = this.lowerRightCoor(r, llc);
 
       return [
-        {x: r.x1, y: r.y1},
-        {x: r.x2, y: r.y2},
-        {x: llc.x, y: llc.y},
-        {x: lrc.x, y: lrc.y}
+        { x: r.x1, y: r.y1 },
+        { x: r.x2, y: r.y2 },
+        { x: llc.x, y: llc.y },
+        { x: lrc.x, y: lrc.y }
       ];
     },
 
@@ -150,28 +148,28 @@
     splitSquare: function(b) {
       return [
         [
-          {x: b.x, y: b.y},
-          {x: b.x + b.width / 2, y: b.y},
-          {x: b.x, y: b.y + b.height / 2},
-          {x: b.x + b.width / 2, y: b.y + b.height / 2}
+          { x: b.x, y: b.y },
+          { x: b.x + b.width / 2, y: b.y },
+          { x: b.x, y: b.y + b.height / 2 },
+          { x: b.x + b.width / 2, y: b.y + b.height / 2 }
         ],
         [
-          {x: b.x + b.width / 2, y: b.y},
-          {x: b.x + b.width, y: b.y},
-          {x: b.x + b.width / 2, y: b.y + b.height / 2},
-          {x: b.x + b.width, y: b.y + b.height / 2}
+          { x: b.x + b.width / 2, y: b.y },
+          { x: b.x + b.width, y: b.y },
+          { x: b.x + b.width / 2, y: b.y + b.height / 2 },
+          { x: b.x + b.width, y: b.y + b.height / 2 }
         ],
         [
-          {x: b.x, y: b.y + b.height / 2},
-          {x: b.x + b.width / 2, y: b.y + b.height / 2},
-          {x: b.x, y: b.y + b.height},
-          {x: b.x + b.width / 2, y: b.y + b.height}
+          { x: b.x, y: b.y + b.height / 2 },
+          { x: b.x + b.width / 2, y: b.y + b.height / 2 },
+          { x: b.x, y: b.y + b.height },
+          { x: b.x + b.width / 2, y: b.y + b.height }
         ],
         [
-          {x: b.x + b.width / 2, y: b.y + b.height / 2},
-          {x: b.x + b.width, y: b.y + b.height / 2},
-          {x: b.x + b.width / 2, y: b.y + b.height},
-          {x: b.x + b.width, y: b.y + b.height}
+          { x: b.x + b.width / 2, y: b.y + b.height / 2 },
+          { x: b.x + b.width, y: b.y + b.height / 2 },
+          { x: b.x + b.width / 2, y: b.y + b.height },
+          { x: b.x + b.width, y: b.y + b.height }
         ]
       ];
     },
@@ -186,10 +184,10 @@
      */
     axis: function(c1, c2) {
       return [
-        {x: c1[1].x - c1[0].x, y: c1[1].y - c1[0].y},
-        {x: c1[1].x - c1[3].x, y: c1[1].y - c1[3].y},
-        {x: c2[0].x - c2[2].x, y: c2[0].y - c2[2].y},
-        {x: c2[0].x - c2[1].x, y: c2[0].y - c2[1].y}
+        { x: c1[1].x - c1[0].x, y: c1[1].y - c1[0].y },
+        { x: c1[1].x - c1[3].x, y: c1[1].y - c1[3].y },
+        { x: c2[0].x - c2[2].x, y: c2[0].y - c2[2].y },
+        { x: c2[0].x - c2[1].x, y: c2[0].y - c2[1].y }
       ];
     },
 
@@ -201,10 +199,7 @@
      * @return {object} The projection defined by coordinates (x, y).
      */
     projection: function(c, a) {
-      var l = (
-        (c.x * a.x + c.y * a.y) /
-        (Math.pow(a.x, 2) + Math.pow(a.y, 2))
-      );
+      var l = (c.x * a.x + c.y * a.y) / (Math.pow(a.x, 2) + Math.pow(a.y, 2));
 
       return {
         x: l * a.x,
@@ -222,22 +217,22 @@
      */
     axisCollision: function(a, c1, c2) {
       var sc1 = [],
-          sc2 = [];
+        sc2 = [];
 
       for (var ci = 0; ci < 4; ci++) {
         var p1 = this.projection(c1[ci], a),
-            p2 = this.projection(c2[ci], a);
+          p2 = this.projection(c2[ci], a);
 
         sc1.push(p1.x * a.x + p1.y * a.y);
         sc2.push(p2.x * a.x + p2.y * a.y);
       }
 
       var maxc1 = Math.max.apply(Math, sc1),
-          maxc2 = Math.max.apply(Math, sc2),
-          minc1 = Math.min.apply(Math, sc1),
-          minc2 = Math.min.apply(Math, sc2);
+        maxc2 = Math.max.apply(Math, sc2),
+        minc1 = Math.min.apply(Math, sc1),
+        minc2 = Math.min.apply(Math, sc2);
 
-      return (minc2 <= maxc1 && maxc2 >= minc1);
+      return minc2 <= maxc1 && maxc2 >= minc1;
     },
 
     /**
@@ -250,7 +245,7 @@
      */
     collision: function(c1, c2) {
       var axis = this.axis(c1, c2),
-          col = true;
+        col = true;
 
       for (var i = 0; i < 4; i++)
         col = col && this.axisCollision(axis[i], c1, c2);
@@ -258,7 +253,6 @@
       return col;
     }
   };
-
 
   /**
    * Quad Functions
@@ -286,21 +280,16 @@
    */
   function _quadIndex(point, quadBounds) {
     var xmp = quadBounds.x + quadBounds.width / 2,
-        ymp = quadBounds.y + quadBounds.height / 2,
-        top = (point.y < ymp),
-        left = (point.x < xmp);
+      ymp = quadBounds.y + quadBounds.height / 2,
+      top = point.y < ymp,
+      left = point.x < xmp;
 
     if (top) {
-      if (left)
-        return 0;
-      else
-        return 1;
-    }
-    else {
-      if (left)
-        return 2;
-      else
-        return 3;
+      if (left) return 0;
+      else return 1;
+    } else {
+      if (left) return 2;
+      else return 3;
     }
   }
 
@@ -318,10 +307,12 @@
 
     // Iterating through quads
     for (var i = 0; i < 4; i++)
-      if ((rectangle.x2 >= quadCorners[i][0].x) &&
-          (rectangle.x1 <= quadCorners[i][1].x) &&
-          (rectangle.y1 + rectangle.height >= quadCorners[i][0].y) &&
-          (rectangle.y1 <= quadCorners[i][2].y))
+      if (
+        rectangle.x2 >= quadCorners[i][0].x &&
+        rectangle.x1 <= quadCorners[i][1].x &&
+        rectangle.y1 + rectangle.height >= quadCorners[i][0].y &&
+        rectangle.y1 <= quadCorners[i][2].y
+      )
         indexes.push(i);
 
     return indexes;
@@ -341,8 +332,7 @@
 
     // Iterating through quads
     for (var i = 0; i < 4; i++)
-      if (_geom.collision(corners, quadCorners[i]))
-        indexes.push(i);
+      if (_geom.collision(corners, quadCorners[i])) indexes.push(i);
 
     return indexes;
   }
@@ -357,12 +347,12 @@
    */
   function _quadSubdivide(index, quad) {
     var next = quad.level + 1,
-        subw = Math.round(quad.bounds.width / 2),
-        subh = Math.round(quad.bounds.height / 2),
-        qx = Math.round(quad.bounds.x),
-        qy = Math.round(quad.bounds.y),
-        x,
-        y;
+      subw = Math.round(quad.bounds.width / 2),
+      subh = Math.round(quad.bounds.height / 2),
+      qx = Math.round(quad.bounds.x),
+      qy = Math.round(quad.bounds.y),
+      x,
+      y;
 
     switch (index) {
       case 0:
@@ -384,7 +374,7 @@
     }
 
     return _quadTree(
-      {x: x, y: y, width: subw, height: subh},
+      { x: x, y: y, width: subw, height: subh },
       next,
       quad.maxElements,
       quad.maxLevel
@@ -404,13 +394,11 @@
    */
   function _quadInsert(el, sizedPoint, quad) {
     if (quad.level < quad.maxLevel) {
-
       // Searching appropriate quads
       var indexes = _quadIndexes(sizedPoint, quad.corners);
 
       // Iterating
       for (var i = 0, l = indexes.length; i < l; i++) {
-
         // Subdividing if necessary
         if (quad.nodes[indexes[i]] === undefined)
           quad.nodes[indexes[i]] = _quadSubdivide(indexes[i], quad);
@@ -418,9 +406,7 @@
         // Recursion
         _quadInsert(el, sizedPoint, quad.nodes[indexes[i]]);
       }
-    }
-    else {
-
+    } else {
       // Pushing the element in a leaf node
       quad.elements.push(el);
     }
@@ -442,12 +428,10 @@
       // If node does not exist we return an empty list
       if (quad.nodes[index] !== undefined) {
         return _quadRetrievePoint(point, quad.nodes[index]);
-      }
-      else {
+      } else {
         return [];
       }
-    }
-    else {
+    } else {
       return quad.elements;
     }
   }
@@ -512,7 +496,6 @@
     };
   }
 
-
   /**
    * Sigma Quad Constructor
    * ----------------------
@@ -553,13 +536,12 @@
    * maxLevel:    {integer?} the max recursion level of the tree.
    */
   quad.prototype.index = function(nodes, params) {
-
     // Enforcing presence of boundaries
     if (!params.bounds)
-      throw 'sigma.classes.quad.index: bounds information not given.';
+      throw "sigma.classes.quad.index: bounds information not given.";
 
     // Prefix
-    var prefix = params.prefix || '';
+    var prefix = params.prefix || "";
 
     // Building the tree
     this._tree = _quadTree(
@@ -571,14 +553,13 @@
 
     // Inserting graph nodes into the tree
     for (var i = 0, l = nodes.length; i < l; i++) {
-
       // Inserting node
       _quadInsert(
         nodes[i],
         _geom.pointToSquare({
-          x: nodes[i][prefix + 'x'],
-          y: nodes[i][prefix + 'y'],
-          size: nodes[i][prefix + 'size']
+          x: nodes[i][prefix + "x"],
+          y: nodes[i][prefix + "y"],
+          size: nodes[i][prefix + "size"]
         }),
         this._tree
       );
@@ -603,9 +584,9 @@
    * @return {array}  An array of nodes retrieved.
    */
   quad.prototype.point = function(x, y) {
-    return this._tree ?
-      _quadRetrievePoint({x: x, y: y}, this._tree) || [] :
-      [];
+    return this._tree
+      ? _quadRetrievePoint({ x: x, y: y }, this._tree) || []
+      : [];
   };
 
   /**
@@ -619,36 +600,29 @@
    */
   quad.prototype.area = function(rect) {
     var serialized = JSON.stringify(rect),
-        collisionFunc,
-        rectData;
+      collisionFunc,
+      rectData;
 
     // Returning cache?
-    if (this._cache.query === serialized)
-      return this._cache.result;
+    if (this._cache.query === serialized) return this._cache.result;
 
     // Axis aligned ?
     if (_geom.isAxisAligned(rect)) {
       collisionFunc = _quadIndexes;
       rectData = _geom.axisAlignedTopPoints(rect);
-    }
-    else {
+    } else {
       collisionFunc = _quadCollision;
       rectData = _geom.rectangleCorners(rect);
     }
 
     // Retrieving nodes
-    var nodes = this._tree ?
-      _quadRetrieveArea(
-        rectData,
-        this._tree,
-        collisionFunc
-      ) :
-      [];
+    var nodes = this._tree
+      ? _quadRetrieveArea(rectData, this._tree, collisionFunc)
+      : [];
 
     // Object to array
     var nodesArray = [];
-    for (var i in nodes)
-      nodesArray.push(nodes[i]);
+    for (var i in nodes) nodesArray.push(nodes[i]);
 
     // Caching
     this._cache.query = serialized;
@@ -657,18 +631,16 @@
     return nodesArray;
   };
 
-
   /**
    * EXPORT:
    * *******
    */
-  if (typeof this.sigma !== 'undefined') {
+  if (typeof this.sigma !== "undefined") {
     this.sigma.classes = this.sigma.classes || {};
     this.sigma.classes.quad = quad;
-  } else if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports)
+  } else if (typeof exports !== "undefined") {
+    if (typeof module !== "undefined" && module.exports)
       exports = module.exports = quad;
     exports.quad = quad;
-  } else
-    this.quad = quad;
-}).call(this);
+  } else this.quad = quad;
+}.call(this));
