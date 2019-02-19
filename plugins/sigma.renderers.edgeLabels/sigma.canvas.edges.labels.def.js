@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
-  sigma.utils.pkg('sigma.canvas.edges.labels');
+  sigma.utils.pkg("sigma.canvas.edges.labels");
 
   /**
    * This label renderer will just display the label on the line of the edge.
@@ -18,27 +17,30 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.labels.def =
-    function(edge, source, target, context, settings) {
-    if (typeof edge.label !== 'string' || source == target)
-      return;
+  sigma.canvas.edges.labels.def = function(
+    edge,
+    source,
+    target,
+    context,
+    settings
+  ) {
+    if (typeof edge.label !== "string" || source == target) return;
 
-    var prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1;
+    var prefix = settings("prefix") || "",
+      size = edge[prefix + "size"] || 1;
 
-    if (size < settings('edgeLabelThreshold'))
-      return;
+    if (size < settings("edgeLabelThreshold")) return;
 
-    if (0 === settings('edgeLabelSizePowRatio'))
+    if (0 === settings("edgeLabelSizePowRatio"))
       throw '"edgeLabelSizePowRatio" must not be 0.';
 
     var fontSize,
-        x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
-        y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
-        dX = target[prefix + 'x'] - source[prefix + 'x'],
-        dY = target[prefix + 'y'] - source[prefix + 'y'],
-        sign = (source[prefix + 'x'] < target[prefix + 'x']) ? 1 : -1,
-        angle = Math.atan2(dY * sign, dX * sign);
+      x = (source[prefix + "x"] + target[prefix + "x"]) / 2,
+      y = (source[prefix + "y"] + target[prefix + "y"]) / 2,
+      dX = target[prefix + "x"] - source[prefix + "x"],
+      dY = target[prefix + "y"] - source[prefix + "y"],
+      sign = source[prefix + "x"] < target[prefix + "x"] ? 1 : -1,
+      angle = Math.atan2(dY * sign, dX * sign);
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
@@ -47,50 +49,46 @@
     // The final form is:
     // f'(x) = b * x * x^(-1 / a), thus f'(1) = b. Application:
     // fontSize = defaultEdgeLabelSize if edgeLabelSizePowRatio = 1
-    fontSize = (settings('edgeLabelSize') === 'fixed') ?
-      settings('defaultEdgeLabelSize') :
-      settings('defaultEdgeLabelSize') *
-      size *
-      Math.pow(size, -1 / settings('edgeLabelSizePowRatio'));
+    fontSize =
+      settings("edgeLabelSize") === "fixed"
+        ? settings("defaultEdgeLabelSize")
+        : settings("defaultEdgeLabelSize") *
+          size *
+          Math.pow(size, -1 / settings("edgeLabelSizePowRatio"));
 
     context.save();
 
     if (edge.active) {
       context.font = [
-        settings('activeFontStyle'),
-        fontSize + 'px',
-        settings('activeFont') || settings('font')
-      ].join(' ');
+        settings("activeFontStyle"),
+        fontSize + "px",
+        settings("activeFont") || settings("font")
+      ].join(" ");
 
       context.fillStyle =
-        settings('edgeActiveColor') === 'edge' ?
-        (edge.active_color || settings('defaultEdgeActiveColor')) :
-        settings('defaultEdgeLabelActiveColor');
-    }
-    else {
+        settings("edgeActiveColor") === "edge"
+          ? edge.active_color || settings("defaultEdgeActiveColor")
+          : settings("defaultEdgeLabelActiveColor");
+    } else {
       context.font = [
-        settings('fontStyle'),
-        fontSize + 'px',
-        settings('font')
-      ].join(' ');
+        settings("fontStyle"),
+        fontSize + "px",
+        settings("font")
+      ].join(" ");
 
       context.fillStyle =
-        (settings('edgeLabelColor') === 'edge') ?
-        (edge.color || settings('defaultEdgeColor')) :
-        settings('defaultEdgeLabelColor');
+        settings("edgeLabelColor") === "edge"
+          ? edge.color || settings("defaultEdgeColor")
+          : settings("defaultEdgeLabelColor");
     }
 
-    context.textAlign = 'center';
-    context.textBaseline = 'alphabetic';
+    context.textAlign = "center";
+    context.textBaseline = "alphabetic";
 
     context.translate(x, y);
     context.rotate(angle);
-    context.fillText(
-      edge.label,
-      0,
-      (-size / 2) - 3
-    );
+    context.fillText(edge.label, 0, -size / 2 - 3);
 
     context.restore();
   };
-}).call(this);
+}.call(this));

@@ -1,16 +1,15 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize package:
-  sigma.utils.pkg('sigma.parsers');
+  sigma.utils.pkg("sigma.parsers");
 
   // Just a basic ID generator:
   var _id = 0;
   function edgeId() {
-    return 'e' + (_id++);
+    return "e" + _id++;
   }
 
   /**
@@ -30,10 +29,7 @@
    *                                      instance as parameter.
    */
   sigma.parsers.gexf = function(target, sig, callback) {
-    var i,
-        l,
-        arr,
-        obj;
+    var i, l, arr, obj;
 
     function parse(graph) {
       // Adapt the graph:
@@ -42,15 +38,14 @@
         obj = arr[i];
 
         obj.id = obj.id;
-        if (obj.viz && typeof obj.viz === 'object') {
-          if (obj.viz.position && typeof obj.viz.position === 'object') {
+        if (obj.viz && typeof obj.viz === "object") {
+          if (obj.viz.position && typeof obj.viz.position === "object") {
             obj.x = obj.viz.position.x;
             obj.y = -obj.viz.position.y; // Needed otherwise it's up side down
           }
           obj.size = obj.viz.size;
           obj.color = obj.viz.color;
-          if (obj.viz.shape)
-            obj.type = obj.viz.shape
+          if (obj.viz.shape) obj.type = obj.viz.shape;
         }
       }
 
@@ -58,11 +53,11 @@
       for (i = 0, l = arr.length; i < l; i++) {
         obj = arr[i];
 
-        obj.id = typeof obj.id === 'string' ? obj.id : edgeId();
-        obj.source = '' + obj.source;
-        obj.target = '' + obj.target;
+        obj.id = typeof obj.id === "string" ? obj.id : edgeId();
+        obj.source = "" + obj.source;
+        obj.target = "" + obj.target;
 
-        if (obj.viz && typeof obj.viz === 'object') {
+        if (obj.viz && typeof obj.viz === "object") {
           obj.color = obj.viz.color;
           obj.size = obj.viz.thickness;
         }
@@ -80,20 +75,18 @@
         sig.graph.clear();
 
         arr = graph.nodes;
-        for (i = 0, l = arr.length; i < l; i++)
-          sig.graph.addNode(arr[i]);
+        for (i = 0, l = arr.length; i < l; i++) sig.graph.addNode(arr[i]);
 
         arr = graph.edges;
-        for (i = 0, l = arr.length; i < l; i++)
-          sig.graph.addEdge(arr[i]);
+        for (i = 0, l = arr.length; i < l; i++) sig.graph.addEdge(arr[i]);
 
-      // ...or instantiate sigma if needed:
-      } else if (typeof sig === 'object') {
+        // ...or instantiate sigma if needed:
+      } else if (typeof sig === "object") {
         sig.graph = graph;
         sig = new sigma(sig);
 
-      // ...or it's finally the callback:
-      } else if (typeof sig === 'function') {
+        // ...or it's finally the callback:
+      } else if (typeof sig === "function") {
         callback = sig;
         sig = null;
       }
@@ -102,13 +95,10 @@
       if (callback) {
         callback(sig || graph);
         return;
-      } else
-        return graph;
+      } else return graph;
     }
 
-    if (typeof target === 'string')
-      gexf.fetch(target, parse);
-    else if (typeof target === 'object')
-      return parse(gexf.parse(target));
+    if (typeof target === "string") gexf.fetch(target, parse);
+    else if (typeof target === "object") return parse(gexf.parse(target));
   };
-}).call(this);
+}.call(this));

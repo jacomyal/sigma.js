@@ -1,8 +1,7 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   var _root = this;
 
@@ -38,7 +37,7 @@
    * @param  {number} a    Modifier to the loop size.
    * @return {x1,y1,x2,y2} The coordinates of the two control points.
    */
-  sigma.utils.getSelfLoopControlPoints = function(x , y, size, a) {
+  sigma.utils.getSelfLoopControlPoints = function(x, y, size, a) {
     a = a || 0;
     return {
       x1: x - (size + a) * 7,
@@ -47,4 +46,4 @@
       y2: y + (size + a) * 7
     };
   };
-}).call(this);
+}.call(this));

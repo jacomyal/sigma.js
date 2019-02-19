@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg("sigma.canvas.edges");
 
   /**
    * This method renders the edge as a dotted line.
@@ -12,22 +12,28 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.dotted = function(edge, source, target, context, settings) {
-    var color = edge.active ?
-          edge.active_color || settings('defaultEdgeActiveColor') :
-          edge.color,
-        prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
-        edgeColor = settings('edgeColor'),
-        defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor');
+  sigma.canvas.edges.dotted = function(
+    edge,
+    source,
+    target,
+    context,
+    settings
+  ) {
+    var color = edge.active
+        ? edge.active_color || settings("defaultEdgeActiveColor")
+        : edge.color,
+      prefix = settings("prefix") || "",
+      size = edge[prefix + "size"] || 1,
+      edgeColor = settings("edgeColor"),
+      defaultNodeColor = settings("defaultNodeColor"),
+      defaultEdgeColor = settings("defaultEdgeColor");
 
     if (!color)
       switch (edgeColor) {
-        case 'source':
+        case "source":
           color = source.color || defaultNodeColor;
           break;
-        case 'target':
+        case "target":
           color = target.color || defaultNodeColor;
           break;
         default:
@@ -38,25 +44,19 @@
     context.save();
 
     if (edge.active) {
-      context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
-        (color || defaultEdgeColor) :
-        settings('defaultEdgeActiveColor');
-    }
-    else {
+      context.strokeStyle =
+        settings("edgeActiveColor") === "edge"
+          ? color || defaultEdgeColor
+          : settings("defaultEdgeActiveColor");
+    } else {
       context.strokeStyle = color;
     }
 
     context.setLineDash([2]);
     context.lineWidth = size;
     context.beginPath();
-    context.moveTo(
-      source[prefix + 'x'],
-      source[prefix + 'y']
-    );
-    context.lineTo(
-      target[prefix + 'x'],
-      target[prefix + 'y']
-    );
+    context.moveTo(source[prefix + "x"], source[prefix + "y"]);
+    context.lineTo(target[prefix + "x"], target[prefix + "y"]);
     context.stroke();
 
     context.restore();
