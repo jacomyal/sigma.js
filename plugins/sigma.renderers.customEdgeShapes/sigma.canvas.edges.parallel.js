@@ -1,7 +1,7 @@
-;(function() {
-  'use strict';
+(function() {
+  "use strict";
 
-  sigma.utils.pkg('sigma.canvas.edges');
+  sigma.utils.pkg("sigma.canvas.edges");
 
   /**
    * This method renders the edge as two parallel lines.
@@ -12,29 +12,35 @@
    * @param  {CanvasRenderingContext2D} context      The canvas context.
    * @param  {configurable}             settings     The settings function.
    */
-  sigma.canvas.edges.parallel = function(edge, source, target, context, settings) {
-    var color = edge.active ?
-          edge.active_color || settings('defaultEdgeActiveColor') :
-          edge.color,
-        prefix = settings('prefix') || '',
-        size = edge[prefix + 'size'] || 1,
-        edgeColor = settings('edgeColor'),
-        defaultNodeColor = settings('defaultNodeColor'),
-        defaultEdgeColor = settings('defaultEdgeColor'),
-        sX = source[prefix + 'x'],
-        sY = source[prefix + 'y'],
-        tX = target[prefix + 'x'],
-        tY = target[prefix + 'y'],
-        c,
-        d,
-        dist = sigma.utils.getDistance(sX, sY, tX, tY);
+  sigma.canvas.edges.parallel = function(
+    edge,
+    source,
+    target,
+    context,
+    settings
+  ) {
+    var color = edge.active
+        ? edge.active_color || settings("defaultEdgeActiveColor")
+        : edge.color,
+      prefix = settings("prefix") || "",
+      size = edge[prefix + "size"] || 1,
+      edgeColor = settings("edgeColor"),
+      defaultNodeColor = settings("defaultNodeColor"),
+      defaultEdgeColor = settings("defaultEdgeColor"),
+      sX = source[prefix + "x"],
+      sY = source[prefix + "y"],
+      tX = target[prefix + "x"],
+      tY = target[prefix + "y"],
+      c,
+      d,
+      dist = sigma.utils.getDistance(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {
-        case 'source':
+        case "source":
           color = source.color || defaultNodeColor;
           break;
-        case 'target':
+        case "target":
           color = target.color || defaultNodeColor;
           break;
         default:
@@ -51,11 +57,11 @@
     context.save();
 
     if (edge.active) {
-      context.strokeStyle = settings('edgeActiveColor') === 'edge' ?
-        (color || defaultEdgeColor) :
-        settings('defaultEdgeActiveColor');
-    }
-    else {
+      context.strokeStyle =
+        settings("edgeActiveColor") === "edge"
+          ? color || defaultEdgeColor
+          : settings("defaultEdgeActiveColor");
+    } else {
       context.strokeStyle = color;
     }
 

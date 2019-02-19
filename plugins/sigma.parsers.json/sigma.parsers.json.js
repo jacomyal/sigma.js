@@ -1,12 +1,11 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize package:
-  sigma.utils.pkg('sigma.parsers');
-  sigma.utils.pkg('sigma.utils');
+  sigma.utils.pkg("sigma.parsers");
+  sigma.utils.pkg("sigma.utils");
 
   /**
    * Just an XmlHttpRequest polyfill for different IE versions.
@@ -14,18 +13,16 @@
    * @return {*} The XHR like object.
    */
   sigma.utils.xhr = function() {
-    if (window.XMLHttpRequest)
-      return new XMLHttpRequest();
+    if (window.XMLHttpRequest) return new XMLHttpRequest();
 
-    var names,
-        i;
+    var names, i;
 
     if (window.ActiveXObject) {
       names = [
-        'Msxml2.XMLHTTP.6.0',
-        'Msxml2.XMLHTTP.3.0',
-        'Msxml2.XMLHTTP',
-        'Microsoft.XMLHTTP'
+        "Msxml2.XMLHTTP.6.0",
+        "Msxml2.XMLHTTP.3.0",
+        "Msxml2.XMLHTTP",
+        "Microsoft.XMLHTTP"
       ];
 
       for (i in names)
@@ -52,12 +49,11 @@
    */
   sigma.parsers.json = function(url, sig, callback) {
     var graph,
-        xhr = sigma.utils.xhr();
+      xhr = sigma.utils.xhr();
 
-    if (!xhr)
-      throw 'XMLHttpRequest not supported, cannot load the file.';
+    if (!xhr) throw "XMLHttpRequest not supported, cannot load the file.";
 
-    xhr.open('GET', url, true);
+    xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
         graph = JSON.parse(xhr.responseText);
@@ -67,22 +63,21 @@
           sig.graph.clear();
           sig.graph.read(graph);
 
-        // ...or instantiate sigma if needed:
-        } else if (typeof sig === 'object') {
+          // ...or instantiate sigma if needed:
+        } else if (typeof sig === "object") {
           sig.graph = graph;
           sig = new sigma(sig);
 
-        // ...or it's finally the callback:
-        } else if (typeof sig === 'function') {
+          // ...or it's finally the callback:
+        } else if (typeof sig === "function") {
           callback = sig;
           sig = null;
         }
 
         // Call the callback if specified:
-        if (callback)
-          callback(sig || graph);
+        if (callback) callback(sig || graph);
       }
     };
     xhr.send();
   };
-}).call(this);
+}.call(this));

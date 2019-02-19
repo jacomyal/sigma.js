@@ -1,11 +1,10 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize package:
-  sigma.utils.pkg('sigma.plugins');
+  sigma.utils.pkg("sigma.plugins");
 
   // Add custom graph methods:
   /**
@@ -14,14 +13,14 @@
    * @param  {string} id The node id.
    * @return {array}     The array of adjacent nodes.
    */
-  if (!sigma.classes.graph.hasMethod('adjacentNodes'))
-    sigma.classes.graph.addMethod('adjacentNodes', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentNodes: the node id must be a string.';
+  if (!sigma.classes.graph.hasMethod("adjacentNodes"))
+    sigma.classes.graph.addMethod("adjacentNodes", function(id) {
+      if (typeof id !== "string")
+        throw "adjacentNodes: the node id must be a string.";
 
       var target,
-          nodes = [];
-      for(target in this.allNeighborsIndex[id]) {
+        nodes = [];
+      for (target in this.allNeighborsIndex[id]) {
         nodes.push(this.nodesIndex[target]);
       }
       return nodes;
@@ -33,17 +32,17 @@
    * @param  {string} id The node id.
    * @return {array}     The array of adjacent edges.
    */
-  if (!sigma.classes.graph.hasMethod('adjacentEdges'))
-    sigma.classes.graph.addMethod('adjacentEdges', function(id) {
-      if (typeof id !== 'string')
-        throw 'adjacentEdges: the node id must be a string.';
+  if (!sigma.classes.graph.hasMethod("adjacentEdges"))
+    sigma.classes.graph.addMethod("adjacentEdges", function(id) {
+      if (typeof id !== "string")
+        throw "adjacentEdges: the node id must be a string.";
 
       var a = this.allNeighborsIndex[id],
-          eid,
-          target,
-          edges = [];
-      for(target in a) {
-        for(eid in a[target]) {
+        eid,
+        target,
+        edges = [];
+      for (target in a) {
+        for (eid in a[target]) {
           edges.push(a[target][eid]);
         }
       }
@@ -58,75 +57,68 @@
    * @version 0.1
    */
 
-   var _g = undefined,
-       _s = undefined,
-       _chain = [], // chain of wrapped filters
-       _keysIndex = Object.create(null),
-       Processors = {};   // available predicate processors
-
+  var _g = undefined,
+    _s = undefined,
+    _chain = [], // chain of wrapped filters
+    _keysIndex = Object.create(null),
+    Processors = {}; // available predicate processors
 
   /**
    * Library of processors
    * ------------------
    */
 
-   /**
-    *
-    * @param  {function} fn The predicate.
-    */
+  /**
+   *
+   * @param  {function} fn The predicate.
+   */
   Processors.nodes = function nodes(fn) {
     var n = _g.nodes(),
-        ln = n.length,
-        e = _g.edges(),
-        le = e.length;
+      ln = n.length,
+      e = _g.edges(),
+      le = e.length;
 
     // hide node, or keep former value
-    while(ln--)
-      n[ln].hidden = !fn.call(_g, n[ln]) || n[ln].hidden;
+    while (ln--) n[ln].hidden = !fn.call(_g, n[ln]) || n[ln].hidden;
 
-    while(le--)
+    while (le--)
       if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
         e[le].hidden = true;
   };
 
-   /**
-    *
-    * @param  {function} fn The predicate.
-    */
+  /**
+   *
+   * @param  {function} fn The predicate.
+   */
   Processors.edges = function edges(fn) {
     var e = _g.edges(),
-        le = e.length;
+      le = e.length;
 
     // hide edge, or keep former value
-    while(le--)
-      e[le].hidden = !fn.call(_g, e[le]) || e[le].hidden;
+    while (le--) e[le].hidden = !fn.call(_g, e[le]) || e[le].hidden;
   };
 
-   /**
-    *
-    * @param  {string} id The center node.
-    */
+  /**
+   *
+   * @param  {string} id The center node.
+   */
   Processors.neighbors = function neighbors(id) {
     var n = _g.nodes(),
-        ln = n.length,
-        e = _g.edges(),
-        le = e.length,
-        neighbors = _g.adjacentNodes(id),
-        nn = neighbors.length,
-        no = {};
+      ln = n.length,
+      e = _g.edges(),
+      le = e.length,
+      neighbors = _g.adjacentNodes(id),
+      nn = neighbors.length,
+      no = {};
 
-    while(nn--)
-      no[neighbors[nn].id] = true;
+    while (nn--) no[neighbors[nn].id] = true;
 
-    while(ln--)
-      if (n[ln].id !== id && !(n[ln].id in no))
-        n[ln].hidden = true;
+    while (ln--) if (n[ln].id !== id && !(n[ln].id in no)) n[ln].hidden = true;
 
-    while(le--)
+    while (le--)
       if (_g.nodes(e[le].source).hidden || _g.nodes(e[le].target).hidden)
         e[le].hidden = true;
   };
-
 
   /**
    * This function adds a filter to the chain of filters.
@@ -136,47 +128,40 @@
    * @param  {?string}  key The key to identify the filter.
    */
   function register(fn, p, key) {
-    if (key != undefined && typeof key !== 'string')
-      throw 'The filter key "'+ key.toString() +'" must be a string.';
+    if (key != undefined && typeof key !== "string")
+      throw 'The filter key "' + key.toString() + '" must be a string.';
 
     if (key != undefined && !key.length)
-      throw 'The filter key must be a non-empty string.';
+      throw "The filter key must be a non-empty string.";
 
-    if (typeof fn !== 'function')
-      throw 'The predicate of key "'+ key +'" must be a function.';
+    if (typeof fn !== "function")
+      throw 'The predicate of key "' + key + '" must be a function.';
 
-    if ('undo' === key)
-      throw '"undo" is a reserved key.';
+    if ("undo" === key) throw '"undo" is a reserved key.';
 
-    if (_keysIndex[key])
-      throw 'The filter "' + key + '" already exists.';
+    if (_keysIndex[key]) throw 'The filter "' + key + '" already exists.';
 
-    if (key)
-      _keysIndex[key] = true;
+    if (key) _keysIndex[key] = true;
 
     _chain.push({
-      'key': key,
-      'processor': fn,
-      'predicate': p
+      key: key,
+      processor: fn,
+      predicate: p
     });
-  };
+  }
 
   /**
    * This function removes a set of filters from the chain.
    *
    * @param {object} o The filter keys.
    */
-  function unregister (o) {
+  function unregister(o) {
     _chain = _chain.filter(function(a) {
       return !(a.key in o);
     });
 
-    for(var key in o)
-      delete _keysIndex[key];
-  };
-
-
-
+    for (var key in o) delete _keysIndex[key];
+  }
 
   /**
    * Filter Object
@@ -186,8 +171,7 @@
   function Filter(s) {
     _s = s;
     _g = s.graph;
-  };
-
+  }
 
   /**
    * This method is used to filter the nodes. The method must be called with
@@ -255,10 +239,9 @@
    * @return {sigma.plugins.filter}     Returns the instance.
    */
   Filter.prototype.neighborsOf = function(id, key) {
-    if (typeof id !== 'string')
-      throw 'The node id "'+ id.toString() +'" must be a string.';
-    if (!id.length)
-      throw 'The node id must be a non-empty string.';
+    if (typeof id !== "string")
+      throw 'The node id "' + id.toString() + '" must be a string.';
+    if (!id.length) throw "The node id must be a non-empty string.";
 
     // Wrap the predicate to be applied on the graph and add it to the chain.
     register(Processors.neighbors, id, key);
@@ -282,9 +265,9 @@
   Filter.prototype.apply = function() {
     for (var i = 0, len = _chain.length; i < len; ++i) {
       _chain[i].processor(_chain[i].predicate);
-    };
+    }
 
-    if (_chain[0] && 'undo' === _chain[0].key) {
+    if (_chain[0] && "undo" === _chain[0].key) {
       _chain.shift();
     }
 
@@ -323,42 +306,34 @@
    */
   Filter.prototype.undo = function(v) {
     var q = Object.create(null),
-        la = arguments.length;
+      la = arguments.length;
 
     // find removable filters
     if (la === 1) {
-      if (Object.prototype.toString.call(v) === '[object Array]')
-        for (var i = 0, len = v.length; i < len; i++)
-          q[v[i]] = true;
-
-      else // 1 filter key
-        q[v] = true;
-
+      if (Object.prototype.toString.call(v) === "[object Array]")
+        for (var i = 0, len = v.length; i < len; i++) q[v[i]] = true;
+      // 1 filter key
+      else q[v] = true;
     } else if (la > 1) {
-      for (var i = 0; i < la; i++)
-        q[arguments[i]] = true;
-    }
-    else
-      this.clear();
+      for (var i = 0; i < la; i++) q[arguments[i]] = true;
+    } else this.clear();
 
     unregister(q);
 
     function processor() {
       var n = _g.nodes(),
-          ln = n.length,
-          e = _g.edges(),
-          le = e.length;
+        ln = n.length,
+        e = _g.edges(),
+        le = e.length;
 
-      while(ln--)
-        n[ln].hidden = false;
+      while (ln--) n[ln].hidden = false;
 
-      while(le--)
-        e[le].hidden = false;
-    };
+      while (le--) e[le].hidden = false;
+    }
 
     _chain.unshift({
-      'key': 'undo',
-      'processor': processor
+      key: "undo",
+      processor: processor
     });
 
     return this;
@@ -370,18 +345,14 @@
     for (var i in o) {
       if (typeof o[i] === "object" && o[i] !== null) {
         copy[i] = deepCopy(o[i]);
-      }
-      else if (typeof o[i] === "function" && o[i] !== null) {
+      } else if (typeof o[i] === "function" && o[i] !== null) {
         // clone function:
-        eval(" copy[i] = " +  o[i].toString());
+        eval(" copy[i] = " + o[i].toString());
         //copy[i] = o[i].bind(_g);
-      }
-
-      else
-        copy[i] = o[i];
+      } else copy[i] = o[i];
     }
     return copy;
-  };
+  }
 
   function cloneChain(chain) {
     // Clone the array of filters:
@@ -389,8 +360,8 @@
     for (var i = 0, len = copy.length; i < len; i++) {
       copy[i] = deepCopy(copy[i]);
       if (typeof copy[i].processor === "function")
-        copy[i].processor = 'filter.processors.' + copy[i].processor.name;
-    };
+        copy[i].processor = "filter.processors." + copy[i].processor.name;
+    }
     return copy;
   }
 
@@ -439,48 +410,48 @@
    * @return {sigma.plugins.filter} Returns the instance.
    */
   Filter.prototype.import = function(chain) {
-    if (chain === undefined)
-      throw 'Wrong arguments.';
+    if (chain === undefined) throw "Wrong arguments.";
 
-    if (Object.prototype.toString.call(chain) !== '[object Array]')
+    if (Object.prototype.toString.call(chain) !== "[object Array]")
       throw 'The chain" must be an array.';
 
     var copy = cloneChain(chain);
 
     for (var i = 0, len = copy.length; i < len; i++) {
       if (copy[i].predicate === undefined || copy[i].processor === undefined)
-        throw 'Wrong arguments.';
+        throw "Wrong arguments.";
 
-      if (copy[i].key != undefined && typeof copy[i].key !== 'string')
-        throw 'The filter key "'+ copy[i].key.toString() +'" must be a string.';
+      if (copy[i].key != undefined && typeof copy[i].key !== "string")
+        throw 'The filter key "' +
+          copy[i].key.toString() +
+          '" must be a string.';
 
-      if (typeof copy[i].predicate !== 'function')
-        throw 'The predicate of key "'+ copy[i].key +'" must be a function.';
+      if (typeof copy[i].predicate !== "function")
+        throw 'The predicate of key "' + copy[i].key + '" must be a function.';
 
-      if (typeof copy[i].processor !== 'string')
-        throw 'The processor of key "'+ copy[i].key +'" must be a string.';
+      if (typeof copy[i].processor !== "string")
+        throw 'The processor of key "' + copy[i].key + '" must be a string.';
 
       // Replace the processor name by the corresponding function:
-      switch(copy[i].processor) {
-        case 'filter.processors.nodes':
+      switch (copy[i].processor) {
+        case "filter.processors.nodes":
           copy[i].processor = Processors.nodes;
           break;
-        case 'filter.processors.edges':
+        case "filter.processors.edges":
           copy[i].processor = Processors.edges;
           break;
-        case 'filter.processors.neighbors':
+        case "filter.processors.neighbors":
           copy[i].processor = Processors.neighbors;
           break;
         default:
-          throw 'Unknown processor ' + copy[i].processor;
+          throw "Unknown processor " + copy[i].processor;
       }
-    };
+    }
 
     _chain = copy;
 
     return this;
   };
-
 
   /**
    * Interface
@@ -500,5 +471,4 @@
     }
     return filter;
   };
-
-}).call(this);
+}.call(this));

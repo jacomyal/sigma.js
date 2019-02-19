@@ -15,6 +15,7 @@
     "test": "grunt travis",
     "build": "grunt build",
     "lint": "echo TODO: Lint",
+    "prettify_all": "prettier {src,test,plugins}/**/*.js --write",
     "prepublish": "grunt npmPrePublish"
   },
   "devDependencies": {
@@ -42,9 +43,22 @@
     }
   },
   "lint-staged": {
-    "**/*.{ts,tsx}": [
+    "**/*.{js,ts}": [
       "prettier --write",
       "git add"
     ]
+  },
+  "eslintIgnore": [
+    "examples/lib/**/*.js"
+  ],
+  "eslintConfig": {
+    "extends": [
+      "airbnb",
+      "prettier"
+    ],
+    "env": {
+      "browser": true,
+      "qunit": true
+    }
   }
 }

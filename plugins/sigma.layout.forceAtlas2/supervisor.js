@@ -1,8 +1,7 @@
-;(function(undefined) {
-  'use strict';
+(function(undefined) {
+  "use strict";
 
-  if (typeof sigma === 'undefined')
-    throw 'sigma is not declared';
+  if (typeof sigma === "undefined") throw "sigma is not declared";
 
   /**
    * Sigma ForceAtlas2.5 Supervisor
@@ -17,7 +16,7 @@
    * Feature detection
    * ------------------
    */
-  var webWorkers = 'Worker' in _root;
+  var webWorkers = "Worker" in _root;
 
   /**
    * Supervisor Object
@@ -25,8 +24,7 @@
    */
   function Supervisor(sigInst, options) {
     var _this = this,
-        workerFn = sigInst.getForceAtlas2Worker &&
-          sigInst.getForceAtlas2Worker();
+      workerFn = sigInst.getForceAtlas2Worker && sigInst.getForceAtlas2Worker();
 
     options = options || {};
 
@@ -52,30 +50,25 @@
       if (!this.workerUrl) {
         var blob = this.makeBlob(workerFn);
         this.worker = new Worker(URL.createObjectURL(blob));
-      }
-      else {
+      } else {
         this.worker = new Worker(this.workerUrl);
       }
 
       // Post Message Polyfill
       this.worker.postMessage =
         this.worker.webkitPostMessage || this.worker.postMessage;
-    }
-    else {
-
+    } else {
       eval(workerFn);
     }
 
     // Worker message receiver
-    this.msgName = (this.worker) ? 'message' : 'newCoords';
+    this.msgName = this.worker ? "message" : "newCoords";
     this.listener = function(e) {
-
       // Retrieving data
       _this.nodesByteArray = new Float32Array(e.data.nodes);
 
       // If ForceAtlas2 is running, we act accordingly
       if (_this.running) {
-
         // Applying layout
         _this.applyLayoutChanges();
 
@@ -93,7 +86,7 @@
     this.graphToByteArrays();
 
     // Binding on kill to properly terminate layout when parent is killed
-    sigInst.bind('kill', function() {
+    sigInst.bind("kill", function() {
       sigInst.killForceAtlas2();
     });
   }
@@ -102,12 +95,10 @@
     var blob;
 
     try {
-      blob = new Blob([workerFn], {type: 'application/javascript'});
-    }
-    catch (e) {
-      _root.BlobBuilder = _root.BlobBuilder ||
-                          _root.WebKitBlobBuilder ||
-                          _root.MozBlobBuilder;
+      blob = new Blob([workerFn], { type: "application/javascript" });
+    } catch (e) {
+      _root.BlobBuilder =
+        _root.BlobBuilder || _root.WebKitBlobBuilder || _root.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -119,13 +110,13 @@
 
   Supervisor.prototype.graphToByteArrays = function() {
     var nodes = this.graph.nodes(),
-        edges = this.graph.edges(),
-        nbytes = nodes.length * this.ppn,
-        ebytes = edges.length * this.ppe,
-        nIndex = {},
-        i,
-        j,
-        l;
+      edges = this.graph.edges(),
+      nbytes = nodes.length * this.ppn,
+      ebytes = edges.length * this.ppe,
+      nIndex = {},
+      i,
+      j,
+      l;
 
     // Allocating Byte arrays with correct nb of bytes
     this.nodesByteArray = new Float32Array(nbytes);
@@ -133,7 +124,6 @@
 
     // Iterate through nodes
     for (i = j = 0, l = nodes.length; i < l; i++) {
-
       // Populating index
       nIndex[nodes[i].id] = j;
 
@@ -163,8 +153,8 @@
   // TODO: make a better send function
   Supervisor.prototype.applyLayoutChanges = function() {
     var nodes = this.graph.nodes(),
-        j = 0,
-        realIndex;
+      j = 0,
+      realIndex;
 
     // Moving nodes
     for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
@@ -176,69 +166,57 @@
 
   Supervisor.prototype.sendByteArrayToWorker = function(action) {
     var content = {
-      action: action || 'loop',
+      action: action || "loop",
       nodes: this.nodesByteArray.buffer
     };
 
     var buffers = [this.nodesByteArray.buffer];
 
-    if (action === 'start') {
+    if (action === "start") {
       content.config = this.config || {};
       content.edges = this.edgesByteArray.buffer;
       buffers.push(this.edgesByteArray.buffer);
     }
 
-    if (this.shouldUseWorker)
-      this.worker.postMessage(content, buffers);
-    else
-      _root.postMessage(content, '*');
+    if (this.shouldUseWorker) this.worker.postMessage(content, buffers);
+    else _root.postMessage(content, "*");
   };
 
   Supervisor.prototype.start = function() {
-    if (this.running)
-      return;
+    if (this.running) return;
 
     this.running = true;
 
     // Do not refresh edgequadtree during layout:
-    var k,
-        c;
+    var k, c;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
       c.edgequadtree._enabled = false;
     }
 
     if (!this.started) {
-
       // Sending init message to worker
-      this.sendByteArrayToWorker('start');
+      this.sendByteArrayToWorker("start");
       this.started = true;
-    }
-    else {
+    } else {
       this.sendByteArrayToWorker();
     }
   };
 
   Supervisor.prototype.stop = function() {
-    if (!this.running)
-      return;
+    if (!this.running) return;
 
     // Allow to refresh edgequadtree:
-    var k,
-        c,
-        bounds;
+    var k, c, bounds;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
       c.edgequadtree._enabled = true;
 
       // Find graph boundaries:
-      bounds = sigma.utils.getBoundaries(
-        this.graph,
-        c.readPrefix
-      );
+      bounds = sigma.utils.getBoundaries(this.graph, c.readPrefix);
 
       // Refresh edgequadtree:
-      if (c.settings('drawEdges') && c.settings('enableEdgeHovering'))
+      if (c.settings("drawEdges") && c.settings("enableEdgeHovering"))
         c.edgequadtree.index(this.sigInst.graph, {
           prefix: c.readPrefix,
           bounds: {
@@ -256,27 +234,22 @@
   Supervisor.prototype.killWorker = function() {
     if (this.worker) {
       this.worker.terminate();
-    }
-    else {
-      _root.postMessage({action: 'kill'}, '*');
+    } else {
+      _root.postMessage({ action: "kill" }, "*");
       document.removeEventListener(this.msgName, this.listener);
     }
   };
 
   Supervisor.prototype.configure = function(config) {
-
     // Setting configuration
     this.config = config;
 
-    if (!this.started)
-      return;
+    if (!this.started) return;
 
-    var data = {action: 'config', config: this.config};
+    var data = { action: "config", config: this.config };
 
-    if (this.shouldUseWorker)
-      this.worker.postMessage(data);
-    else
-      _root.postMessage(data, '*');
+    if (this.shouldUseWorker) this.worker.postMessage(data);
+    else _root.postMessage(data, "*");
   };
 
   /**
@@ -284,14 +257,11 @@
    * ----------
    */
   sigma.prototype.startForceAtlas2 = function(config) {
-
     // Create supervisor if undefined
-    if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config);
+    if (!this.supervisor) this.supervisor = new Supervisor(this, config);
 
     // Configuration provided?
-    if (config)
-      this.supervisor.configure(config);
+    if (config) this.supervisor.configure(config);
 
     // Start algorithm
     this.supervisor.start();
@@ -300,8 +270,7 @@
   };
 
   sigma.prototype.stopForceAtlas2 = function() {
-    if (!this.supervisor)
-      return this;
+    if (!this.supervisor) return this;
 
     // Pause algorithm
     this.supervisor.stop();
@@ -310,8 +279,7 @@
   };
 
   sigma.prototype.killForceAtlas2 = function() {
-    if (!this.supervisor)
-      return this;
+    if (!this.supervisor) return this;
 
     // Stop Algorithm
     this.supervisor.stop();
@@ -326,8 +294,7 @@
   };
 
   sigma.prototype.configForceAtlas2 = function(config) {
-    if (!this.supervisor)
-      this.supervisor = new Supervisor(this, config);
+    if (!this.supervisor) this.supervisor = new Supervisor(this, config);
 
     this.supervisor.configure(config);
 
@@ -337,4 +304,4 @@
   sigma.prototype.isForceAtlas2Running = function(config) {
     return !!this.supervisor && this.supervisor.running;
   };
-}).call(this);
+}.call(this));
