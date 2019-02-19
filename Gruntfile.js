@@ -1,7 +1,7 @@
 const fs = require("fs");
 const loadGruntTasks = require("load-grunt-tasks");
 
-module.exports = function(grunt) {
+module.exports = grunt => {
   const coreJsFiles = [
     // Core:
     "src/sigma.core.js",
@@ -95,7 +95,7 @@ module.exports = function(grunt) {
 
   const subGrunts = {};
 
-  plugins.forEach(function(p) {
+  plugins.forEach(p => {
     const dir = `plugins/sigma.${p}/`;
 
     if (fs.existsSync(`${dir}Gruntfile.js`))
@@ -137,9 +137,7 @@ module.exports = function(grunt) {
         replacement: ["<!-- START SIGMA IMPORTS -->"]
           .concat(
             coreJsFiles
-              .map(function(path) {
-                return `<script src="../${path}"></script>`;
-              })
+              .map(path => `<script src="../${path}"></script>`)
               .concat("<!-- END SIGMA IMPORTS -->")
           )
           .join("\n")

@@ -21,12 +21,16 @@ QUnit.test("Basic manipulation", assert => {
     "Overriding works. (multi keys)"
   );
 
-  settings({ mySetting: "abc" }, "mySetting"),
+  assert.deepEqual(
+    settings({ mySetting: "abc" }, "mySetting"),
     "abc",
-    "Filtering works. (when key is present)";
-  settings({ hisSetting: "abc" }, "mySetting"),
+    "Filtering works. (when key is present)"
+  );
+  assert.deepEqual(
+    settings({ hisSetting: "abc" }, "mySetting"),
     456,
-    "Filtering works. (when key is present)";
+    "Filtering works. (when key is present)"
+  );
 
   settings = new sigma.classes.configurable({ mySetting: 42 });
   assert.deepEqual(

@@ -64,61 +64,56 @@ QUnit.test("Camera animation", assert => {
 
         if (!hasTestedFrame) {
           assert.deepEqual(
-            graph.nodes().map(function(n) {
-              return {
-                x: approx(n["display:x"]),
-                y: approx(n["display:y"]),
-                size: approx(n["display:size"])
-              };
-            }),
+            graph.nodes().map(n => ({
+              x: approx(n["display:x"]),
+              y: approx(n["display:y"]),
+              size: approx(n["display:size"])
+            })),
             [
               {
-                size: approx(Math.pow(2 / 3, camera.settings("nodesPowRatio"))),
+                size: approx((2 / 3) ** camera.settings("nodesPowRatio")),
                 x: approx(Math.SQRT1_2),
                 y: approx(Math.SQRT1_2)
               },
               {
-                size: approx(Math.pow(2 / 3, camera.settings("nodesPowRatio"))),
+                size: approx((2 / 3) ** camera.settings("nodesPowRatio")),
                 x: approx(Math.SQRT1_2),
                 y: -approx(Math.SQRT1_2) / 3
               },
               {
-                size: approx(Math.pow(2 / 3, camera.settings("nodesPowRatio"))),
+                size: approx((2 / 3) ** camera.settings("nodesPowRatio")),
                 x: -approx(Math.SQRT1_2) / 3,
                 y: -approx(Math.SQRT1_2) / 3
               }
             ],
             "Animation's middle gives the good values."
           );
-          stop();
           hasTestedFrame = true;
         }
       },
       onComplete() {
         camera.applyView("", "display:");
         assert.deepEqual(
-          graph.nodes().map(function(n) {
-            return {
-              x: approx(n["display:x"]),
-              y: approx(n["display:y"]),
-              size: approx(n["display:size"])
-            };
-          }),
+          graph.nodes().map(n => ({
+            x: approx(n["display:x"]),
+            y: approx(n["display:y"]),
+            size: approx(n["display:size"])
+          })),
           [
             {
               x: 0.5,
               y: 0.5,
-              size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+              size: approx(0.5 ** camera.settings("nodesPowRatio"))
             },
             {
               x: 0,
               y: 0,
-              size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+              size: approx(0.5 ** camera.settings("nodesPowRatio"))
             },
             {
               x: -0.5,
               y: 0.5,
-              size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+              size: approx(0.5 ** camera.settings("nodesPowRatio"))
             }
           ],
           "Animation's end gives the good values and custom easings work well."

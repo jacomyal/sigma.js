@@ -52,7 +52,8 @@
     ]
   },
   "eslintIgnore": [
-    "examples/lib/**/*.js"
+    "examples/lib/**/*.js",
+    "build/**/*.js"
   ],
   "eslintConfig": {
     "extends": [
@@ -68,7 +69,9 @@
     },
     "rules": {
       "new-cap": "off",
-      "no-underscore-dangle": "off"
+      "no-underscore-dangle": "off",
+      "no-plusplus": "off",
+      "no-multi-assign": "off"
     }
   },
   "dependencies": {

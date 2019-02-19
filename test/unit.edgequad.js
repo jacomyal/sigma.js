@@ -5,36 +5,6 @@ QUnit.module("sigma.classes.edgequad");
 QUnit.test("EdgeQuadTree", assert => {
   // Helpers
   //---------
-  function getRandom(min, max) {
-    return min + Math.floor(Math.random() * (max - min + 1));
-  }
-
-  function generateRandomGraph(N, E) {
-    const nodes = [];
-
-    const edges = [];
-
-    for (var i = 0; i < N; i++) {
-      nodes.push({
-        x: getRandom(4, 95),
-        y: getRandom(4, 95),
-        size: getRandom(1, 2),
-        data: `Node#${i}`,
-        id: i
-      });
-    }
-
-    for (var i = 0; i < E; i++)
-      edges.push({
-        id: `e${i}`,
-        source: `n${(Math.random() * N) | 0}`,
-        target: `n${(Math.random() * N) | 0}`,
-        size: getRandom(1, 2)
-      });
-
-    return edges;
-  }
-
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -119,7 +89,7 @@ QUnit.test("EdgeQuadTree", assert => {
     "Point to Square"
   );
 
-  rectangles.map(function(r, i) {
+  rectangles.forEach((r, i) => {
     assert.deepEqual(
       geom.rectangleCorners(r),
       solutions[i],
@@ -163,26 +133,4 @@ QUnit.test("EdgeQuadTree", assert => {
     ],
     "Split Square"
   );
-
-  // Quad Tree
-  //-----------
-  // var edges = generateRandomGraph(1000, 5000);
-
-  // var tree = edgequad.index(
-  //   edges,
-  //   {
-  //     bounds: {
-  //       x: 0,
-  //       y: 0,
-  //       width: 100,
-  //       height: 100
-  //     },
-  //     maxLevel: 8
-  //   }
-  // );
-
-  // console.log(tree);
-  // console.log(edgequad.point(34, 53));
-  // console.log(edgequad.area({x1: 25, y1: 25, x2: 30, y2: 25, height: 10}));
-  // console.log(edgequad.area({x1: 0, y1: 0, x2: 100, y2: 0, height: 100}).length);
 });
