@@ -3,8 +3,8 @@ module.exports = function(grunt) {
   grunt.file.setBase("../../");
 
   // Registering needed files
-  var files = ["supervisor.js", "worker.js"].map(function(p) {
-    return __dirname + "/" + p;
+  const files = ["supervisor.js", "worker.js"].map(function(p) {
+    return `${__dirname}/${p}`;
   });
 
   // Project configuration:
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
   });
 
   // Loading tasks
-  grunt.loadTasks(__dirname + "/tasks");
+  grunt.loadTasks(`${__dirname}/tasks`);
 
   // By default, we will crush and then minify
   grunt.registerTask("default", ["forceAtlas2:prod"]);

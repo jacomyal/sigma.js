@@ -1,9 +1,7 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
-  var _root = this;
+  const _root = this;
 
   // Initialize packages:
   sigma.utils = sigma.utils || {};
@@ -42,10 +40,13 @@
    * @return {object}  The merged object.
    */
   sigma.utils.extend = function() {
-    var i,
-      k,
-      res = {},
-      l = arguments.length;
+    let i;
+
+    let k;
+
+    const res = {};
+
+    const l = arguments.length;
 
     for (i = l - 1; i >= 0; i--)
       for (k in arguments[i]) res[k] = arguments[i][k];
@@ -103,7 +104,7 @@
    * @return {object}         The related package.
    */
   sigma.utils.id = (function() {
-    var i = 0;
+    let i = 0;
     return function() {
       return ++i;
     };
@@ -120,16 +121,19 @@
    * @param  {string} val The hexa or rgba color.
    * @return {number}     The number value.
    */
-  var floatColorCache = {};
+  const floatColorCache = {};
 
   sigma.utils.floatColor = function(val) {
     // Is the color already computed?
     if (floatColorCache[val]) return floatColorCache[val];
 
-    var original = val,
-      r = 0,
-      g = 0,
-      b = 0;
+    const original = val;
+
+    let r = 0;
+
+    let g = 0;
+
+    let b = 0;
 
     if (val[0] === "#") {
       val = val.slice(1);
@@ -152,7 +156,7 @@
       b = +val[3];
     }
 
-    var color = r * 256 * 256 + g * 256 + b;
+    const color = r * 256 * 256 + g * 256 + b;
 
     // Caching the color
     floatColorCache[original] = color;
@@ -182,11 +186,15 @@
    * @param {?animation} A dictionary with options for a possible animation.
    */
   sigma.utils.zoomTo = function(camera, x, y, ratio, animation) {
-    var settings = camera.settings,
-      count,
-      newRatio,
-      animationSettings,
-      coordinates;
+    const settings = camera.settings;
+
+    let count;
+
+    let newRatio;
+
+    let animationSettings;
+
+    let coordinates;
 
     // Create the newRatio dealing with min / max:
     newRatio = Math.max(
@@ -286,10 +294,13 @@
   ) {
     // http://stackoverflow.com/a/15397596
     // Blending functions:
-    var B0_t = Math.pow(1 - t, 3),
-      B1_t = 3 * t * Math.pow(1 - t, 2),
-      B2_t = 3 * Math.pow(t, 2) * (1 - t),
-      B3_t = Math.pow(t, 3);
+    const B0_t = Math.pow(1 - t, 3);
+
+    const B1_t = 3 * t * Math.pow(1 - t, 2);
+
+    const B2_t = 3 * Math.pow(t, 2) * (1 - t);
+
+    const B3_t = Math.pow(t, 3);
 
     return {
       x: B0_t * x1 + B1_t * cx + B2_t * dx + B3_t * x2,
@@ -347,7 +358,15 @@
    */
   sigma.utils.getCircleIntersection = function(x0, y0, r0, x1, y1, r1) {
     // http://stackoverflow.com/a/12219802
-    var a, dx, dy, d, h, rx, ry, x2, y2;
+    let a;
+    let dx;
+    let dy;
+    let d;
+    let h;
+    let rx;
+    let ry;
+    let x2;
+    let y2;
 
     // dx and dy are the vertical and horizontal distances between the circle
     // centers:
@@ -367,7 +386,7 @@
       return false;
     }
 
-    //'point 2' is the point where the line through the circle intersection
+    // 'point 2' is the point where the line through the circle intersection
     // points crosses the line between the circle centers.
 
     // Determine the distance from point 0 to point 2:
@@ -386,12 +405,12 @@
     ry = dx * (h / d);
 
     // Determine the absolute intersection points:
-    var xi = x2 + rx;
-    var xi_prime = x2 - rx;
-    var yi = y2 + ry;
-    var yi_prime = y2 - ry;
+    const xi = x2 + rx;
+    const xi_prime = x2 - rx;
+    const yi = y2 + ry;
+    const yi_prime = y2 - ry;
 
-    return { xi: xi, xi_prime: xi_prime, yi: yi, yi_prime: yi_prime };
+    return { xi, xi_prime, yi, yi_prime };
   };
 
   /**
@@ -409,9 +428,11 @@
    */
   sigma.utils.isPointOnSegment = function(x, y, x1, y1, x2, y2, epsilon) {
     // http://stackoverflow.com/a/328122
-    var crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)),
-      d = sigma.utils.getDistance(x1, y1, x2, y2),
-      nCrossProduct = crossProduct / d; // normalized cross product
+    const crossProduct = Math.abs((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1));
+
+    const d = sigma.utils.getDistance(x1, y1, x2, y2);
+
+    const nCrossProduct = crossProduct / d; // normalized cross product
 
     return (
       nCrossProduct < epsilon &&
@@ -450,20 +471,28 @@
   ) {
     // Fails if the point is too far from the extremities of the segment,
     // preventing for more costly computation:
-    var dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
+    const dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
     if (Math.abs(x - x1) > dP1P2 || Math.abs(y - y1) > dP1P2) {
       return false;
     }
 
-    var dP1 = sigma.utils.getDistance(x, y, x1, y1),
-      dP2 = sigma.utils.getDistance(x, y, x2, y2),
-      t = 0.5,
-      r = dP1 < dP2 ? -0.01 : 0.01,
-      rThreshold = 0.001,
-      i = 100,
-      pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy),
-      dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
-      old_dt;
+    const dP1 = sigma.utils.getDistance(x, y, x1, y1);
+
+    const dP2 = sigma.utils.getDistance(x, y, x2, y2);
+
+    let t = 0.5;
+
+    let r = dP1 < dP2 ? -0.01 : 0.01;
+
+    const rThreshold = 0.001;
+
+    let i = 100;
+
+    let pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
+
+    let dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+    let old_dt;
 
     // This algorithm minimizes the distance from the point to the curve. It
     // find the optimal t value where t=0 is the start point and t=1 is the end
@@ -488,7 +517,7 @@
       } else if (t + r < 0 || t + r > 1) {
         // oops, we've gone too far:
         // revert with a halfstep
-        r = r / 2;
+        r /= 2;
         dt = old_dt;
       } else {
         // progress:
@@ -531,30 +560,38 @@
   ) {
     // Fails if the point is too far from the extremities of the segment,
     // preventing for more costly computation:
-    var dP1CP1 = sigma.utils.getDistance(x1, y1, cpx1, cpy1);
+    const dP1CP1 = sigma.utils.getDistance(x1, y1, cpx1, cpy1);
     if (Math.abs(x - x1) > dP1CP1 || Math.abs(y - y1) > dP1CP1) {
       return false;
     }
 
-    var dP1 = sigma.utils.getDistance(x, y, x1, y1),
-      dP2 = sigma.utils.getDistance(x, y, x2, y2),
-      t = 0.5,
-      r = dP1 < dP2 ? -0.01 : 0.01,
-      rThreshold = 0.001,
-      i = 100,
-      pt = sigma.utils.getPointOnBezierCurve(
-        t,
-        x1,
-        y1,
-        x2,
-        y2,
-        cpx1,
-        cpy1,
-        cpx2,
-        cpy2
-      ),
-      dt = sigma.utils.getDistance(x, y, pt.x, pt.y),
-      old_dt;
+    const dP1 = sigma.utils.getDistance(x, y, x1, y1);
+
+    const dP2 = sigma.utils.getDistance(x, y, x2, y2);
+
+    let t = 0.5;
+
+    let r = dP1 < dP2 ? -0.01 : 0.01;
+
+    const rThreshold = 0.001;
+
+    let i = 100;
+
+    let pt = sigma.utils.getPointOnBezierCurve(
+      t,
+      x1,
+      y1,
+      x2,
+      y2,
+      cpx1,
+      cpy1,
+      cpx2,
+      cpy2
+    );
+
+    let dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+
+    let old_dt;
 
     // This algorithm minimizes the distance from the point to the curve. It
     // find the optimal t value where t=0 is the start point and t=1 is the end
@@ -589,7 +626,7 @@
       } else if (t + r < 0 || t + r > 1) {
         // oops, we've gone too far:
         // revert with a halfstep
-        r = r / 2;
+        r /= 2;
         dt = old_dt;
       } else {
         // progress:
@@ -644,7 +681,7 @@
    * @return {number}        Pixel ratio of the screen
    */
   sigma.utils.getPixelRatio = function() {
-    var ratio = 1;
+    let ratio = 1;
     if (
       window.screen.deviceXDPI !== undefined &&
       window.screen.logicalXDPI !== undefined &&
@@ -664,7 +701,7 @@
    * @return {number}   The width of the event's target.
    */
   sigma.utils.getWidth = function(e) {
-    var w = !e.target.ownerSVGElement
+    const w = !e.target.ownerSVGElement
       ? e.target.width
       : e.target.ownerSVGElement.width;
 
@@ -681,7 +718,7 @@
    * @return {object}   The center of the event's target.
    */
   sigma.utils.getCenter = function(e) {
-    var ratio =
+    const ratio =
       e.target.namespaceURI.indexOf("svg") !== -1
         ? 1
         : sigma.utils.getPixelRatio();
@@ -722,7 +759,7 @@
    * @return {number}   The height of the event's target.
    */
   sigma.utils.getHeight = function(e) {
-    var h = !e.target.ownerSVGElement
+    const h = !e.target.ownerSVGElement
       ? e.target.height
       : e.target.ownerSVGElement.height;
 
@@ -752,18 +789,19 @@
    * @return {object}         The offset of the DOM element (top, left).
    */
   sigma.utils.getOffset = function(dom) {
-    var left = 0,
-      top = 0;
+    let left = 0;
+
+    let top = 0;
 
     while (dom) {
-      top = top + parseInt(dom.offsetTop);
-      left = left + parseInt(dom.offsetLeft);
+      top += parseInt(dom.offsetTop);
+      left += parseInt(dom.offsetLeft);
       dom = dom.offsetParent;
     }
 
     return {
-      top: top,
-      left: left
+      top,
+      left
     };
   };
 
@@ -775,9 +813,11 @@
    * @param  {function}    callback The callback to execute.
    */
   sigma.utils.doubleClick = function(target, type, callback) {
-    var clicks = 0,
-      self = this,
-      handlers;
+    let clicks = 0;
+
+    const self = this;
+
+    let handlers;
 
     target._doubleClickHandler = target._doubleClickHandler || {};
     target._doubleClickHandler[type] = target._doubleClickHandler[type] || [];
@@ -789,7 +829,8 @@
       if (clicks === 2) {
         clicks = 0;
         return callback(e);
-      } else if (clicks === 1) {
+      }
+      if (clicks === 1) {
         setTimeout(function() {
           clicks = 0;
         }, sigma.settings.doubleClickTimeout);
@@ -806,8 +847,9 @@
    * @param  {string}      type     The event type.
    */
   sigma.utils.unbindDoubleClick = function(target, type) {
-    var handler,
-      handlers = (target._doubleClickHandler || {})[type] || [];
+    let handler;
+
+    const handlers = (target._doubleClickHandler || {})[type] || [];
 
     while ((handler = handlers.pop())) {
       target.removeEventListener(type, handler);
@@ -865,8 +907,9 @@
    * @return {WebGLShader}                         The created shader.
    */
   sigma.utils.loadShader = function(gl, shaderSource, shaderType, error) {
-    var compiled,
-      shader = gl.createShader(shaderType);
+    let compiled;
+
+    const shader = gl.createShader(shaderType);
 
     // Load the shader source
     gl.shaderSource(shader, shaderSource);
@@ -881,10 +924,7 @@
     if (!compiled) {
       if (error) {
         error(
-          'Error compiling shader "' +
-            shader +
-            '":' +
-            gl.getShaderInfoLog(shader)
+          `Error compiling shader "${shader}":${gl.getShaderInfoLog(shader)}`
         );
       }
 
@@ -906,9 +946,11 @@
    * @return {WebGLProgram}                     The created program.
    */
   sigma.utils.loadProgram = function(gl, shaders, attribs, loc, error) {
-    var i,
-      linked,
-      program = gl.createProgram();
+    let i;
+
+    let linked;
+
+    const program = gl.createProgram();
 
     for (i = 0; i < shaders.length; ++i) gl.attachShader(program, shaders[i]);
 
@@ -926,7 +968,7 @@
     linked = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!linked) {
       if (error)
-        error("Error in program linking: " + gl.getProgramInfoLog(program));
+        error(`Error in program linking: ${gl.getProgramInfoLog(program)}`);
 
       gl.deleteProgram(program);
       return null;
@@ -963,8 +1005,9 @@
    * @return {array}         Returns the matrix.
    */
   sigma.utils.matrices.rotation = function(angle, m2) {
-    var cos = Math.cos(angle),
-      sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+
+    const sin = Math.sin(angle);
 
     return m2 ? [cos, -sin, sin, cos] : [cos, -sin, 0, sin, cos, 0, 0, 0, 1];
   };
@@ -990,25 +1033,43 @@
    * @return {array}      Returns the matrix.
    */
   sigma.utils.matrices.multiply = function(a, b, m2) {
-    var l = m2 ? 2 : 3,
-      a00 = a[0 * l + 0],
-      a01 = a[0 * l + 1],
-      a02 = a[0 * l + 2],
-      a10 = a[1 * l + 0],
-      a11 = a[1 * l + 1],
-      a12 = a[1 * l + 2],
-      a20 = a[2 * l + 0],
-      a21 = a[2 * l + 1],
-      a22 = a[2 * l + 2],
-      b00 = b[0 * l + 0],
-      b01 = b[0 * l + 1],
-      b02 = b[0 * l + 2],
-      b10 = b[1 * l + 0],
-      b11 = b[1 * l + 1],
-      b12 = b[1 * l + 2],
-      b20 = b[2 * l + 0],
-      b21 = b[2 * l + 1],
-      b22 = b[2 * l + 2];
+    const l = m2 ? 2 : 3;
+
+    const a00 = a[0 * l + 0];
+
+    const a01 = a[0 * l + 1];
+
+    const a02 = a[0 * l + 2];
+
+    const a10 = a[1 * l + 0];
+
+    const a11 = a[1 * l + 1];
+
+    const a12 = a[1 * l + 2];
+
+    const a20 = a[2 * l + 0];
+
+    const a21 = a[2 * l + 1];
+
+    const a22 = a[2 * l + 2];
+
+    const b00 = b[0 * l + 0];
+
+    const b01 = b[0 * l + 1];
+
+    const b02 = b[0 * l + 2];
+
+    const b10 = b[1 * l + 0];
+
+    const b11 = b[1 * l + 1];
+
+    const b12 = b[1 * l + 2];
+
+    const b20 = b[2 * l + 0];
+
+    const b21 = b[2 * l + 1];
+
+    const b22 = b[2 * l + 2];
 
     return m2
       ? [

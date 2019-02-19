@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.webgl.nodes");
 
   /**
@@ -17,41 +15,48 @@
   sigma.webgl.nodes.def = {
     POINTS: 3,
     ATTRIBUTES: 5,
-    addNode: function(node, data, i, prefix, settings) {
-      var color = sigma.utils.floatColor(
+    addNode(node, data, i, prefix, settings) {
+      const color = sigma.utils.floatColor(
         node.color || settings("defaultNodeColor")
       );
 
-      data[i++] = node[prefix + "x"];
-      data[i++] = node[prefix + "y"];
-      data[i++] = node[prefix + "size"];
+      data[i++] = node[`${prefix}x`];
+      data[i++] = node[`${prefix}y`];
+      data[i++] = node[`${prefix}size`];
       data[i++] = color;
       data[i++] = 0;
 
-      data[i++] = node[prefix + "x"];
-      data[i++] = node[prefix + "y"];
-      data[i++] = node[prefix + "size"];
+      data[i++] = node[`${prefix}x`];
+      data[i++] = node[`${prefix}y`];
+      data[i++] = node[`${prefix}size`];
       data[i++] = color;
       data[i++] = (2 * Math.PI) / 3;
 
-      data[i++] = node[prefix + "x"];
-      data[i++] = node[prefix + "y"];
-      data[i++] = node[prefix + "size"];
+      data[i++] = node[`${prefix}x`];
+      data[i++] = node[`${prefix}y`];
+      data[i++] = node[`${prefix}size`];
       data[i++] = color;
       data[i++] = (4 * Math.PI) / 3;
     },
-    render: function(gl, program, data, params) {
-      var buffer;
+    render(gl, program, data, params) {
+      let buffer;
 
       // Define attributes:
-      var positionLocation = gl.getAttribLocation(program, "a_position"),
-        sizeLocation = gl.getAttribLocation(program, "a_size"),
-        colorLocation = gl.getAttribLocation(program, "a_color"),
-        angleLocation = gl.getAttribLocation(program, "a_angle"),
-        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
-        matrixLocation = gl.getUniformLocation(program, "u_matrix"),
-        ratioLocation = gl.getUniformLocation(program, "u_ratio"),
-        scaleLocation = gl.getUniformLocation(program, "u_scale");
+      const positionLocation = gl.getAttribLocation(program, "a_position");
+
+      const sizeLocation = gl.getAttribLocation(program, "a_size");
+
+      const colorLocation = gl.getAttribLocation(program, "a_color");
+
+      const angleLocation = gl.getAttribLocation(program, "a_angle");
+
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+      const matrixLocation = gl.getUniformLocation(program, "u_matrix");
+
+      const ratioLocation = gl.getUniformLocation(program, "u_ratio");
+
+      const scaleLocation = gl.getUniformLocation(program, "u_scale");
 
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -109,8 +114,10 @@
         params.count || data.length / this.ATTRIBUTES
       );
     },
-    initProgram: function(gl) {
-      var vertexShader, fragmentShader, program;
+    initProgram(gl) {
+      let vertexShader;
+      let fragmentShader;
+      let program;
 
       vertexShader = sigma.utils.loadShader(
         gl,

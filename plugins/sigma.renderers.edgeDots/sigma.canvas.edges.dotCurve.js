@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -19,18 +17,29 @@
     context,
     settings
   ) {
-    var color = edge.color,
-      prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1,
-      edgeColor = settings("edgeColor"),
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor"),
-      cp = {},
-      sSize = source[prefix + "size"],
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"];
+    let color = edge.color;
+
+    const prefix = settings("prefix") || "";
+
+    const size = edge[`${prefix}size`] || 1;
+
+    const edgeColor = settings("edgeColor");
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
+
+    let cp = {};
+
+    const sSize = source[`${prefix}size`];
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
 
     cp =
       source.id === target.id
@@ -61,10 +70,10 @@
     }
     context.stroke();
     if (edge.sourceDotColor != undefined || edge.targetDotColor != undefined) {
-      var dotOffset = edge.dotOffset || 3;
-      var dotSize = edge.dotSize || 1;
+      let dotOffset = edge.dotOffset || 3;
+      let dotSize = edge.dotSize || 1;
       dotSize = size * dotSize;
-      dotOffset = dotOffset * sSize;
+      dotOffset *= sSize;
       if (edge.sourceDotColor != undefined) {
         createDot(
           context,
@@ -97,13 +106,13 @@
   function createDot(context, sX, sY, cp, tX, tY, offset, size, color) {
     context.beginPath();
     context.fillStyle = color;
-    var dot = getPointOnBezier(sX, sY, cp.x, cp.y, tX, tY, offset);
+    const dot = getPointOnBezier(sX, sY, cp.x, cp.y, tX, tY, offset);
     context.arc(dot.x, dot.y, size * 3, 0, 2 * Math.PI, false);
     context.fill();
   }
 
   function getQBezierValue(t, p1, p2, p3) {
-    var iT = 1 - t;
+    const iT = 1 - t;
     return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
   }
 
@@ -126,13 +135,13 @@
   }
   /* Function to get a point on a bezier curve a certain distance away from
      its source. Needed since the position on a beziercurve is given to the
-     formula as a percentage (t).*/
+     formula as a percentage (t). */
   function getPointOnBezier(startX, startY, cpX, cpY, endX, endY, distance) {
-    var bestT = 0;
-    var bestAccuracy = 1000;
-    var stepSize = 0.001;
-    for (var t = 0; t < 1; t += stepSize) {
-      var currentPoint = getQuadraticCurvePoint(
+    let bestT = 0;
+    let bestAccuracy = 1000;
+    const stepSize = 0.001;
+    for (let t = 0; t < 1; t += stepSize) {
+      const currentPoint = getQuadraticCurvePoint(
         startX,
         startY,
         cpX,
@@ -141,7 +150,7 @@
         endY,
         t
       );
-      var currentDistance = getDistanceBetweenPoints(
+      const currentDistance = getDistanceBetweenPoints(
         startX,
         startY,
         currentPoint.x,

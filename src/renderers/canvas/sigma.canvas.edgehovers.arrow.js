@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edgehovers");
 
   /**
@@ -19,25 +17,40 @@
     context,
     settings
   ) {
-    var color = edge.color,
-      prefix = settings("prefix") || "",
-      edgeColor = settings("edgeColor"),
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor"),
-      size = edge[prefix + "size"] || 1,
-      tSize = target[prefix + "size"],
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"];
+    let color = edge.color;
+
+    const prefix = settings("prefix") || "";
+
+    const edgeColor = settings("edgeColor");
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
+
+    let size = edge[`${prefix}size`] || 1;
+
+    const tSize = target[`${prefix}size`];
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
 
     size = edge.hover ? settings("edgeHoverSizeRatio") * size : size;
-    var aSize = size * 2.5,
-      d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2)),
-      aX = sX + ((tX - sX) * (d - aSize - tSize)) / d,
-      aY = sY + ((tY - sY) * (d - aSize - tSize)) / d,
-      vX = ((tX - sX) * aSize) / d,
-      vY = ((tY - sY) * aSize) / d;
+    const aSize = size * 2.5;
+
+    const d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2));
+
+    const aX = sX + ((tX - sX) * (d - aSize - tSize)) / d;
+
+    const aY = sY + ((tY - sY) * (d - aSize - tSize)) / d;
+
+    const vX = ((tX - sX) * aSize) / d;
+
+    const vY = ((tY - sY) * aSize) / d;
 
     if (!color)
       switch (edgeColor) {

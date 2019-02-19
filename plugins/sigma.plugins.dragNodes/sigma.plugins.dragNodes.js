@@ -4,8 +4,6 @@
  * examples/api-candy.html code samples to know more.
  */
 (function() {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   sigma.utils.pkg("sigma.plugins");
@@ -45,19 +43,31 @@
     //   );
 
     // Init variables:
-    var _self = this,
-      _s = s,
-      _body = document.body,
-      _renderer = renderer,
-      _mouse = renderer.container.lastChild,
-      _camera = renderer.camera,
-      _node = null,
-      _prefix = "",
-      _hoverStack = [],
-      _hoverIndex = {},
-      _isMouseDown = false,
-      _isMouseOverCanvas = false,
-      _drag = false;
+    const _self = this;
+
+    const _s = s;
+
+    const _body = document.body;
+
+    const _renderer = renderer;
+
+    let _mouse = renderer.container.lastChild;
+
+    const _camera = renderer.camera;
+
+    let _node = null;
+
+    let _prefix = "";
+
+    const _hoverStack = [];
+
+    const _hoverIndex = {};
+
+    let _isMouseDown = false;
+
+    const _isMouseOverCanvas = false;
+
+    let _drag = false;
 
     if (renderer instanceof sigma.renderers.svg) {
       _mouse = renderer.container.firstChild;
@@ -92,8 +102,8 @@
     // Calculates the global offset of the given element more accurately than
     // element.offsetTop and element.offsetLeft.
     function calculateOffset(element) {
-      var style = window.getComputedStyle(element);
-      var getCssProperty = function(prop) {
+      const style = window.getComputedStyle(element);
+      const getCssProperty = function(prop) {
         return parseInt(style.getPropertyValue(prop).replace("px", "")) || 0;
       };
       return {
@@ -133,7 +143,7 @@
 
     function treatOutNode(event) {
       // Remove the node from the array
-      var indexCheck = _hoverStack
+      const indexCheck = _hoverStack
         .map(function(e) {
           return e;
         })
@@ -151,7 +161,7 @@
 
     function nodeMouseDown(event) {
       _isMouseDown = true;
-      var size = _s.graph.nodes().length;
+      const size = _s.graph.nodes().length;
 
       // when there is only node in the graph, the plugin cannot apply
       // linear interpolation. So treat it as if a user is dragging
@@ -162,7 +172,8 @@
         _body.addEventListener("mouseup", nodeMouseUp);
 
         // Do not refresh edgequadtree during drag:
-        var k, c;
+        let k;
+        let c;
         for (k in _s.cameras) {
           c = _s.cameras[k];
           if (c.edgequadtree !== undefined) {
@@ -189,7 +200,8 @@
       _body.removeEventListener("mouseup", nodeMouseUp);
 
       // Allow to refresh edgequadtree:
-      var k, c;
+      let k;
+      let c;
       for (k in _s.cameras) {
         c = _s.cameras[k];
         if (c.edgequadtree !== undefined) {
@@ -227,22 +239,28 @@
       }
 
       function executeNodeMouseMove() {
-        var offset = calculateOffset(_renderer.container),
-          x = event.clientX - offset.left,
-          y = event.clientY - offset.top,
-          cos = Math.cos(_camera.angle),
-          sin = Math.sin(_camera.angle),
-          nodes = _s.graph.nodes(),
-          ref = [];
+        const offset = calculateOffset(_renderer.container);
+
+        let x = event.clientX - offset.left;
+
+        let y = event.clientY - offset.top;
+
+        const cos = Math.cos(_camera.angle);
+
+        const sin = Math.sin(_camera.angle);
+
+        const nodes = _s.graph.nodes();
+
+        const ref = [];
 
         // Getting and derotating the reference coordinates.
-        for (var i = 0; i < 2; i++) {
-          var n = nodes[i];
-          var aux = {
+        for (let i = 0; i < 2; i++) {
+          const n = nodes[i];
+          const aux = {
             x: n.x * cos + n.y * sin,
             y: n.y * cos - n.x * sin,
-            renX: n[_prefix + "x"],
-            renY: n[_prefix + "y"]
+            renX: n[`${_prefix}x`],
+            renY: n[`${_prefix}y`]
           };
           ref.push(aux);
         }
@@ -293,7 +311,7 @@
    *
    * > var dragNodesListener = sigma.plugins.dragNodes(s, s.renderers[0]);
    */
-  var _instance = {};
+  const _instance = {};
 
   /**
    * @param  {sigma} s The related sigma instance.

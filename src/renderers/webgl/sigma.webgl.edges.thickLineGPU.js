@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.webgl.edges");
 
   /**
@@ -20,13 +18,18 @@
   sigma.webgl.edges.thickLineGPU = {
     POINTS: 4,
     ATTRIBUTES: 7,
-    addEdge: function(edge, source, target, data, i, prefix, settings) {
-      var thickness = edge[prefix + "size"] || 1,
-        x1 = source[prefix + "x"],
-        y1 = source[prefix + "y"],
-        x2 = target[prefix + "x"],
-        y2 = target[prefix + "y"],
-        color = edge.color;
+    addEdge(edge, source, target, data, i, prefix, settings) {
+      const thickness = edge[`${prefix}size`] || 1;
+
+      const x1 = source[`${prefix}x`];
+
+      const y1 = source[`${prefix}y`];
+
+      const x2 = target[`${prefix}x`];
+
+      const y2 = target[`${prefix}y`];
+
+      let color = edge.color;
 
       if (!color)
         switch (settings("edgeColor")) {
@@ -80,12 +83,16 @@
       data[i++] = thickness;
       data[i++] = color;
     },
-    computeIndices: function(data) {
-      var indices = new Uint16Array(data.length * 6),
-        c = 0,
-        i = 0,
-        j,
-        l;
+    computeIndices(data) {
+      const indices = new Uint16Array(data.length * 6);
+
+      let c = 0;
+
+      let i = 0;
+
+      let j;
+
+      let l;
 
       for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
         indices[c++] = i + 0;
@@ -99,19 +106,26 @@
 
       return indices;
     },
-    render: function(gl, program, data, params) {
+    render(gl, program, data, params) {
       // Define attributes:
-      var position1Location = gl.getAttribLocation(program, "a_position1"),
-        position2Location = gl.getAttribLocation(program, "a_position2"),
-        directionLocation = gl.getAttribLocation(program, "a_direction"),
-        thicknessLocation = gl.getAttribLocation(program, "a_thickness"),
-        colorLocation = gl.getAttribLocation(program, "a_color"),
-        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
-        ratioLocation = gl.getUniformLocation(program, "u_ratio"),
-        matrixLocation = gl.getUniformLocation(program, "u_matrix");
+      const position1Location = gl.getAttribLocation(program, "a_position1");
+
+      const position2Location = gl.getAttribLocation(program, "a_position2");
+
+      const directionLocation = gl.getAttribLocation(program, "a_direction");
+
+      const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
+
+      const colorLocation = gl.getAttribLocation(program, "a_color");
+
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+      const ratioLocation = gl.getUniformLocation(program, "u_ratio");
+
+      const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
       // Creating buffer:
-      var buffer = gl.createBuffer();
+      const buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
 
@@ -173,7 +187,7 @@
       );
 
       // Creating indices buffer:
-      var indicesBuffer = gl.createBuffer();
+      const indicesBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
       gl.bufferData(
         gl.ELEMENT_ARRAY_BUFFER,
@@ -189,8 +203,10 @@
         params.start || 0
       );
     },
-    initProgram: function(gl) {
-      var vertexShader, fragmentShader, program;
+    initProgram(gl) {
+      let vertexShader;
+      let fragmentShader;
+      let program;
 
       vertexShader = sigma.utils.loadShader(
         gl,

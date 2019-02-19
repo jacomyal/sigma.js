@@ -1,18 +1,22 @@
 (function(undefined) {
-  "use strict";
+  const _methods = Object.create(null);
 
-  var _methods = Object.create(null),
-    _indexes = Object.create(null),
-    _initBindings = Object.create(null),
-    _methodBindings = Object.create(null),
-    _methodBeforeBindings = Object.create(null),
-    _defaultSettings = {
-      immutable: true,
-      clone: true
-    },
-    _defaultSettingsFunction = function(key) {
-      return _defaultSettings[key];
-    };
+  const _indexes = Object.create(null);
+
+  const _initBindings = Object.create(null);
+
+  const _methodBindings = Object.create(null);
+
+  const _methodBeforeBindings = Object.create(null);
+
+  const _defaultSettings = {
+    immutable: true,
+    clone: true
+  };
+
+  const _defaultSettingsFunction = function(key) {
+    return _defaultSettings[key];
+  };
 
   /**
    * The graph constructor. It initializes the data and the indexes, and binds
@@ -32,8 +36,10 @@
    * @param  {?configurable} settings Eventually a settings function.
    * @return {graph}                  The new graph instance.
    */
-  var graph = function(settings) {
-    var k, fn, data;
+  const graph = function(settings) {
+    let k;
+    let fn;
+    let data;
 
     /**
      * DATA:
@@ -100,8 +106,9 @@
    * @return {function}            The new method.
    */
   function __bindGraphMethod(methodName, scope, fn) {
-    var result = function() {
-      var k, res;
+    const result = function() {
+      let k;
+      let res;
 
       // Execute "before" bound functions:
       for (k in _methodBeforeBindings[methodName])
@@ -130,7 +137,7 @@
    * @return {object}     The empty object.
    */
   function __emptyObject(obj) {
-    var k;
+    let k;
 
     for (k in obj)
       if (!("hasOwnProperty" in obj) || obj.hasOwnProperty(k)) delete obj[k];
@@ -168,7 +175,7 @@
       throw "addMethod: Wrong arguments.";
 
     if (_methods[methodName] || graph[methodName])
-      throw 'The method "' + methodName + '" already exists.';
+      throw `The method "${methodName}" already exists.`;
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
@@ -247,30 +254,24 @@
     )
       throw "attach: Wrong arguments.";
 
-    var bindings;
+    let bindings;
 
     if (methodName === "constructor") bindings = _initBindings;
-    else {
-      if (before) {
-        if (!_methodBeforeBindings[methodName])
-          throw 'The method "' + methodName + '" does not exist.';
+    else if (before) {
+      if (!_methodBeforeBindings[methodName])
+        throw `The method "${methodName}" does not exist.`;
 
-        bindings = _methodBeforeBindings[methodName];
-      } else {
-        if (!_methodBindings[methodName])
-          throw 'The method "' + methodName + '" does not exist.';
+      bindings = _methodBeforeBindings[methodName];
+    } else {
+      if (!_methodBindings[methodName])
+        throw `The method "${methodName}" does not exist.`;
 
-        bindings = _methodBindings[methodName];
-      }
+      bindings = _methodBindings[methodName];
     }
 
     if (bindings[key])
-      throw 'A function "' +
-        key +
-        '" is already attached ' +
-        'to the method "' +
-        methodName +
-        '".';
+      throw `A function "${key}" is already attached ` +
+        `to the method "${methodName}".`;
 
     bindings[key] = fn;
 
@@ -327,9 +328,9 @@
     )
       throw "addIndex: Wrong arguments.";
 
-    if (_indexes[name]) throw 'The index "' + name + '" already exists.';
+    if (_indexes[name]) throw `The index "${name}" already exists.`;
 
-    var k;
+    let k;
 
     // Store the bindings:
     _indexes[name] = bindings;
@@ -363,12 +364,13 @@
     if (typeof node.id !== "string" && typeof node.id !== "number")
       throw "The node must have a string or number id.";
 
-    if (this.nodesIndex[node.id])
-      throw 'The node "' + node.id + '" already exists.';
+    if (this.nodesIndex[node.id]) throw `The node "${node.id}" already exists.`;
 
-    var k,
-      id = node.id,
-      validNode = Object.create(null);
+    let k;
+
+    const id = node.id;
+
+    let validNode = Object.create(null);
 
     // Check the "clone" option:
     if (this.settings("clone")) {
@@ -434,11 +436,11 @@
     )
       throw "The edge target must have an existing node id.";
 
-    if (this.edgesIndex[edge.id])
-      throw 'The edge "' + edge.id + '" already exists.';
+    if (this.edgesIndex[edge.id]) throw `The edge "${edge.id}" already exists.`;
 
-    var k,
-      validEdge = Object.create(null);
+    let k;
+
+    let validEdge = Object.create(null);
 
     // Check the "clone" option:
     if (this.settings("clone")) {
@@ -532,9 +534,11 @@
     )
       throw "dropNode: Wrong arguments.";
 
-    if (!this.nodesIndex[id]) throw 'The node "' + id + '" does not exist.';
+    if (!this.nodesIndex[id]) throw `The node "${id}" does not exist.`;
 
-    var i, k, l;
+    let i;
+    let k;
+    let l;
 
     // Remove the node from indexes:
     delete this.nodesIndex[id];
@@ -582,9 +586,11 @@
     )
       throw "dropEdge: Wrong arguments.";
 
-    if (!this.edgesIndex[id]) throw 'The edge "' + id + '" does not exist.';
+    if (!this.edgesIndex[id]) throw `The edge "${id}" does not exist.`;
 
-    var i, l, edge;
+    let i;
+    let l;
+    let edge;
 
     // Remove the edge from indexes:
     edge = this.edgesIndex[id];
@@ -699,7 +705,9 @@
    * @return {object}   The graph instance.
    */
   graph.addMethod("read", function(g) {
-    var i, a, l;
+    let i;
+    let a;
+    let l;
 
     a = g.nodes || [];
     for (i = 0, l = a.length; i < l; i++) this.addNode(a[i]);
@@ -737,9 +745,11 @@
       arguments.length === 1 &&
       Object.prototype.toString.call(v) === "[object Array]"
     ) {
-      var i,
-        l,
-        a = [];
+      let i;
+
+      let l;
+
+      const a = [];
 
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")
@@ -775,9 +785,11 @@
 
     // Return an array of the related node:
     if (Object.prototype.toString.call(v) === "[object Array]") {
-      var i,
-        l,
-        a = [];
+      let i;
+
+      let l;
+
+      const a = [];
 
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")
@@ -817,9 +829,11 @@
       arguments.length === 1 &&
       Object.prototype.toString.call(v) === "[object Array]"
     ) {
-      var i,
-        l,
-        a = [];
+      let i;
+
+      let l;
+
+      const a = [];
 
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")

@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.webgl.edges");
 
   /**
@@ -15,13 +13,18 @@
   sigma.webgl.edges.def = {
     POINTS: 6,
     ATTRIBUTES: 7,
-    addEdge: function(edge, source, target, data, i, prefix, settings) {
-      var w = (edge[prefix + "size"] || 1) / 2,
-        x1 = source[prefix + "x"],
-        y1 = source[prefix + "y"],
-        x2 = target[prefix + "x"],
-        y2 = target[prefix + "y"],
-        color = edge.color;
+    addEdge(edge, source, target, data, i, prefix, settings) {
+      const w = (edge[`${prefix}size`] || 1) / 2;
+
+      const x1 = source[`${prefix}x`];
+
+      const y1 = source[`${prefix}y`];
+
+      const x2 = target[`${prefix}x`];
+
+      const y2 = target[`${prefix}y`];
+
+      let color = edge.color;
 
       if (!color)
         switch (settings("edgeColor")) {
@@ -87,24 +90,37 @@
       data[i++] = 0.0;
       data[i++] = color;
     },
-    render: function(gl, program, data, params) {
-      var buffer;
+    render(gl, program, data, params) {
+      let buffer;
 
       // Define attributes:
-      var colorLocation = gl.getAttribLocation(program, "a_color"),
-        positionLocation1 = gl.getAttribLocation(program, "a_position1"),
-        positionLocation2 = gl.getAttribLocation(program, "a_position2"),
-        thicknessLocation = gl.getAttribLocation(program, "a_thickness"),
-        minusLocation = gl.getAttribLocation(program, "a_minus"),
-        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
-        matrixLocation = gl.getUniformLocation(program, "u_matrix"),
-        matrixHalfPiLocation = gl.getUniformLocation(program, "u_matrixHalfPi"),
-        matrixHalfPiMinusLocation = gl.getUniformLocation(
-          program,
-          "u_matrixHalfPiMinus"
-        ),
-        ratioLocation = gl.getUniformLocation(program, "u_ratio"),
-        scaleLocation = gl.getUniformLocation(program, "u_scale");
+      const colorLocation = gl.getAttribLocation(program, "a_color");
+
+      const positionLocation1 = gl.getAttribLocation(program, "a_position1");
+
+      const positionLocation2 = gl.getAttribLocation(program, "a_position2");
+
+      const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
+
+      const minusLocation = gl.getAttribLocation(program, "a_minus");
+
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+      const matrixLocation = gl.getUniformLocation(program, "u_matrix");
+
+      const matrixHalfPiLocation = gl.getUniformLocation(
+        program,
+        "u_matrixHalfPi"
+      );
+
+      const matrixHalfPiMinusLocation = gl.getUniformLocation(
+        program,
+        "u_matrixHalfPiMinus"
+      );
+
+      const ratioLocation = gl.getUniformLocation(program, "u_ratio");
+
+      const scaleLocation = gl.getUniformLocation(program, "u_scale");
 
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -181,8 +197,10 @@
         params.count || data.length / this.ATTRIBUTES
       );
     },
-    initProgram: function(gl) {
-      var vertexShader, fragmentShader, program;
+    initProgram(gl) {
+      let vertexShader;
+      let fragmentShader;
+      let program;
 
       vertexShader = sigma.utils.loadShader(
         gl,

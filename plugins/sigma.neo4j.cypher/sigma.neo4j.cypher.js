@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Declare neo4j package
@@ -19,10 +17,13 @@
    * @param   {function}          callback    The callback function
    */
   sigma.neo4j.send = function(neo4j, endpoint, method, data, callback) {
-    var xhr = sigma.utils.xhr(),
-      url,
-      user,
-      password;
+    const xhr = sigma.utils.xhr();
+
+    let url;
+
+    let user;
+
+    let password;
 
     // if neo4j arg is not an object
     url = neo4j;
@@ -41,7 +42,7 @@
     if (user && password) {
       xhr.setRequestHeader(
         "Authorization",
-        "Basic " + btoa(user + ":" + password)
+        `Basic ${btoa(`${user}:${password}`)}`
       );
     }
     xhr.setRequestHeader("Accept", "application/json");
@@ -64,16 +65,19 @@
    * @return A graph object
    */
   sigma.neo4j.cypher_parse = function(result) {
-    var graph = { nodes: [], edges: [] },
-      nodesMap = {},
-      edgesMap = {},
-      key;
+    const graph = { nodes: [], edges: [] };
+
+    const nodesMap = {};
+
+    const edgesMap = {};
+
+    let key;
 
     // Iteration on all result data
     result.results[0].data.forEach(function(data) {
       // iteration on graph for all node
       data.graph.nodes.forEach(function(node) {
-        var sigmaNode = {
+        const sigmaNode = {
           id: node.id,
           label: node.id,
           x: Math.random(),
@@ -93,7 +97,7 @@
 
       // iteration on graph for all node
       data.graph.relationships.forEach(function(edge) {
-        var sigmaEdge = {
+        const sigmaEdge = {
           id: edge.id,
           label: edge.type,
           source: edge.startNode,
@@ -137,9 +141,11 @@
    *                                          parameter.
    */
   sigma.neo4j.cypher = function(neo4j, cypher, sig, callback) {
-    var endpoint = "/db/data/transaction/commit",
-      data,
-      cypherCallback;
+    const endpoint = "/db/data/transaction/commit";
+
+    let data;
+
+    let cypherCallback;
 
     // Data that will be send to the server
     data = JSON.stringify({
@@ -155,7 +161,7 @@
     // Callback method after server response
     cypherCallback = function(callback) {
       return function(response) {
-        var graph = { nodes: [], edges: [] };
+        let graph = { nodes: [], edges: [] };
 
         graph = sigma.neo4j.cypher_parse(response);
 

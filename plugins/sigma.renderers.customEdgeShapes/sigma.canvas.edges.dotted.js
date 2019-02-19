@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -19,14 +17,19 @@
     context,
     settings
   ) {
-    var color = edge.active
-        ? edge.active_color || settings("defaultEdgeActiveColor")
-        : edge.color,
-      prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1,
-      edgeColor = settings("edgeColor"),
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor");
+    let color = edge.active
+      ? edge.active_color || settings("defaultEdgeActiveColor")
+      : edge.color;
+
+    const prefix = settings("prefix") || "";
+
+    const size = edge[`${prefix}size`] || 1;
+
+    const edgeColor = settings("edgeColor");
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
 
     if (!color)
       switch (edgeColor) {
@@ -55,8 +58,8 @@
     context.setLineDash([2]);
     context.lineWidth = size;
     context.beginPath();
-    context.moveTo(source[prefix + "x"], source[prefix + "y"]);
-    context.lineTo(target[prefix + "x"], target[prefix + "y"]);
+    context.moveTo(source[`${prefix}x`], source[`${prefix}y`]);
+    context.lineTo(target[`${prefix}x`], target[`${prefix}y`]);
     context.stroke();
 
     context.restore();

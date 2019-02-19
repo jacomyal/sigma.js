@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -26,21 +24,28 @@
   ) {
     if (typeof edge.label !== "string" || source == target) return;
 
-    var prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1;
+    const prefix = settings("prefix") || "";
+
+    const size = edge[`${prefix}size`] || 1;
 
     if (size < settings("edgeLabelThreshold")) return;
 
-    if (0 === settings("edgeLabelSizePowRatio"))
+    if (settings("edgeLabelSizePowRatio") === 0)
       throw '"edgeLabelSizePowRatio" must not be 0.';
 
-    var fontSize,
-      x = (source[prefix + "x"] + target[prefix + "x"]) / 2,
-      y = (source[prefix + "y"] + target[prefix + "y"]) / 2,
-      dX = target[prefix + "x"] - source[prefix + "x"],
-      dY = target[prefix + "y"] - source[prefix + "y"],
-      sign = source[prefix + "x"] < target[prefix + "x"] ? 1 : -1,
-      angle = Math.atan2(dY * sign, dX * sign);
+    let fontSize;
+
+    const x = (source[`${prefix}x`] + target[`${prefix}x`]) / 2;
+
+    const y = (source[`${prefix}y`] + target[`${prefix}y`]) / 2;
+
+    const dX = target[`${prefix}x`] - source[`${prefix}x`];
+
+    const dY = target[`${prefix}y`] - source[`${prefix}y`];
+
+    const sign = source[`${prefix}x`] < target[`${prefix}x`] ? 1 : -1;
+
+    const angle = Math.atan2(dY * sign, dX * sign);
 
     // The font size is sublineraly proportional to the edge size, in order to
     // avoid very large labels on screen.
@@ -61,7 +66,7 @@
     if (edge.active) {
       context.font = [
         settings("activeFontStyle"),
-        fontSize + "px",
+        `${fontSize}px`,
         settings("activeFont") || settings("font")
       ].join(" ");
 
@@ -72,7 +77,7 @@
     } else {
       context.font = [
         settings("fontStyle"),
-        fontSize + "px",
+        `${fontSize}px`,
         settings("font")
       ].join(" ");
 

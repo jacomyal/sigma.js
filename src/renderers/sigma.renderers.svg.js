@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   if (typeof conrad === "undefined") throw "conrad is not declared";
@@ -25,11 +23,15 @@
     if (!(options.container instanceof HTMLElement))
       throw "Container not found.";
 
-    var i,
-      l,
-      a,
-      fn,
-      self = this;
+    let i;
+
+    let l;
+
+    let a;
+
+    let fn;
+
+    const self = this;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -63,7 +65,7 @@
     this.edgesOnScreen = [];
 
     // Find the prefix:
-    this.options.prefix = "renderer" + sigma.utils.id() + ":";
+    this.options.prefix = `renderer${sigma.utils.id()}:`;
 
     // Initialize the DOM elements
     this.initDOM("svg");
@@ -101,29 +103,48 @@
   sigma.renderers.svg.prototype.render = function(options) {
     options = options || {};
 
-    var a,
-      i,
-      k,
-      e,
-      l,
-      o,
-      source,
-      target,
-      start,
-      edges,
-      renderers,
-      subrenderers,
-      index = {},
-      graph = this.graph,
-      nodes = this.graph.nodes,
-      prefix = this.options.prefix || "",
-      drawEdges = this.settings(options, "drawEdges"),
-      drawNodes = this.settings(options, "drawNodes"),
-      drawLabels = this.settings(options, "drawLabels"),
-      embedSettings = this.settings.embedObjects(options, {
-        prefix: this.options.prefix,
-        forceLabels: this.options.forceLabels
-      });
+    let a;
+
+    let i;
+
+    let k;
+
+    let e;
+
+    let l;
+
+    let o;
+
+    let source;
+
+    let target;
+
+    let start;
+
+    let edges;
+
+    let renderers;
+
+    let subrenderers;
+
+    const index = {};
+
+    const graph = this.graph;
+
+    const nodes = this.graph.nodes;
+
+    const prefix = this.options.prefix || "";
+
+    let drawEdges = this.settings(options, "drawEdges");
+
+    const drawNodes = this.settings(options, "drawNodes");
+
+    const drawLabels = this.settings(options, "drawLabels");
+
+    const embedSettings = this.settings.embedObjects(options, {
+      prefix: this.options.prefix,
+      forceLabels: this.options.forceLabels
+    });
 
     // Check the 'hideEdgesOnMove' setting:
     if (this.settings(options, "hideEdgesOnMove"))
@@ -166,7 +187,7 @@
     renderers = sigma.svg.nodes;
     subrenderers = sigma.svg.labels;
 
-    //-- First we create the nodes which are not already created
+    // -- First we create the nodes which are not already created
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
         if (!a[i].hidden && !this.domElements.nodes[a[i].id]) {
@@ -190,7 +211,7 @@
         }
       }
 
-    //-- Second we update the nodes
+    // -- Second we update the nodes
     if (drawNodes)
       for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
         if (a[i].hidden) continue;
@@ -214,7 +235,7 @@
     //---------------
     renderers = sigma.svg.edges;
 
-    //-- First we create the edges which are not already created
+    // -- First we create the edges which are not already created
     if (drawEdges)
       for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
         if (!this.domElements.edges[a[i].id]) {
@@ -233,7 +254,7 @@
         }
       }
 
-    //-- Second we update the edges
+    // -- Second we update the edges
     if (drawEdges)
       for (a = this.edgesOnScreen, i = 0, l = a.length; i < l; i++) {
         source = nodes(a[i].source);
@@ -262,14 +283,18 @@
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
   sigma.renderers.svg.prototype.initDOM = function(tag) {
-    var dom = document.createElementNS(this.settings("xmlns"), tag),
-      c = this.settings("classPrefix"),
-      g,
-      l,
-      i;
+    const dom = document.createElementNS(this.settings("xmlns"), tag);
+
+    const c = this.settings("classPrefix");
+
+    let g;
+
+    let l;
+
+    let i;
 
     dom.style.position = "absolute";
-    dom.setAttribute("class", c + "-svg");
+    dom.setAttribute("class", `${c}-svg`);
 
     // Setting SVG namespace
     dom.setAttribute("xmlns", this.settings("xmlns"));
@@ -277,19 +302,19 @@
     dom.setAttribute("version", "1.1");
 
     // Creating the measurement canvas
-    var canvas = document.createElement("canvas");
-    canvas.setAttribute("class", c + "-measurement-canvas");
+    const canvas = document.createElement("canvas");
+    canvas.setAttribute("class", `${c}-measurement-canvas`);
 
     // Appending elements
     this.domElements.graph = this.container.appendChild(dom);
 
     // Creating groups
-    var groups = ["edges", "nodes", "labels", "hovers"];
+    const groups = ["edges", "nodes", "labels", "hovers"];
     for (i = 0, l = groups.length; i < l; i++) {
       g = document.createElementNS(this.settings("xmlns"), "g");
 
-      g.setAttributeNS(null, "id", c + "-group-" + groups[i]);
-      g.setAttributeNS(null, "class", c + "-group");
+      g.setAttributeNS(null, "id", `${c}-group-${groups[i]}`);
+      g.setAttributeNS(null, "class", `${c}-group`);
 
       this.domElements.groups[groups[i]] = this.domElements.graph.appendChild(
         g
@@ -309,7 +334,8 @@
    * @return {sigma.renderers.svg}              Returns the instance itself.
    */
   sigma.renderers.svg.prototype.hideDOMElements = function(elements) {
-    var o, i;
+    let o;
+    let i;
 
     for (i in elements) {
       o = elements[i];
@@ -326,19 +352,22 @@
    */
   // TODO: add option about whether to display hovers or not
   sigma.renderers.svg.prototype.bindHovers = function(prefix) {
-    var renderers = sigma.svg.hovers,
-      self = this,
-      hoveredNode;
+    const renderers = sigma.svg.hovers;
+
+    const self = this;
+
+    let hoveredNode;
 
     function overNode(e) {
-      var node = e.data.node,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+      const node = e.data.node;
+
+      const embedSettings = self.settings.embedObjects({
+        prefix
+      });
 
       if (!embedSettings("enableHovering")) return;
 
-      var hover = (renderers[node.type] || renderers.def).create(
+      const hover = (renderers[node.type] || renderers.def).create(
         node,
         self.domElements.nodes[node.id],
         self.measurementCanvas,
@@ -353,10 +382,11 @@
     }
 
     function outNode(e) {
-      var node = e.data.node,
-        embedSettings = self.settings.embedObjects({
-          prefix: prefix
-        });
+      const node = e.data.node;
+
+      const embedSettings = self.settings.embedObjects({
+        prefix
+      });
 
       if (!embedSettings("enableHovering")) return;
 
@@ -377,8 +407,8 @@
     function update() {
       if (!hoveredNode) return;
 
-      var embedSettings = self.settings.embedObjects({
-        prefix: prefix
+      const embedSettings = self.settings.embedObjects({
+        prefix
       });
 
       // Deleting element before update
@@ -387,7 +417,7 @@
       );
       delete self.domElements.hovers[hoveredNode.id];
 
-      var hover = (renderers[hoveredNode.type] || renderers.def).create(
+      const hover = (renderers[hoveredNode.type] || renderers.def).create(
         hoveredNode,
         self.domElements.nodes[hoveredNode.id],
         self.measurementCanvas,
@@ -417,9 +447,11 @@
    * @return {sigma.renderers.svg}           Returns the instance itself.
    */
   sigma.renderers.svg.prototype.resize = function(w, h) {
-    var oldWidth = this.width,
-      oldHeight = this.height,
-      pixelRatio = 1;
+    const oldWidth = this.width;
+
+    const oldHeight = this.height;
+
+    const pixelRatio = 1;
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -433,8 +465,8 @@
     }
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
-      this.domElements.graph.style.width = w + "px";
-      this.domElements.graph.style.height = h + "px";
+      this.domElements.graph.style.width = `${w}px`;
+      this.domElements.graph.style.height = `${h}px`;
 
       if (this.domElements.graph.tagName.toLowerCase() === "svg") {
         this.domElements.graph.setAttribute("width", w * pixelRatio);

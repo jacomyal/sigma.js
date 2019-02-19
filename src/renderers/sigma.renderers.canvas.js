@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   if (typeof conrad === "undefined") throw "conrad is not declared";
@@ -25,12 +23,17 @@
     if (!(options.container instanceof HTMLElement))
       throw "Container not found.";
 
-    var k,
-      i,
-      l,
-      a,
-      fn,
-      self = this;
+    let k;
+
+    let i;
+
+    let l;
+
+    let a;
+
+    let fn;
+
+    const self = this;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -57,7 +60,7 @@
     this.jobs = {};
 
     // Find the prefix:
-    this.options.prefix = "renderer" + this.conradId + ":";
+    this.options.prefix = `renderer${this.conradId}:`;
 
     // Initialize the DOM elements:
     if (!this.settings("batchEdgesDrawing")) {
@@ -101,31 +104,53 @@
   sigma.renderers.canvas.prototype.render = function(options) {
     options = options || {};
 
-    var a,
-      i,
-      k,
-      l,
-      o,
-      id,
-      end,
-      job,
-      start,
-      edges,
-      renderers,
-      rendererType,
-      batchSize,
-      tempGCO,
-      index = {},
-      graph = this.graph,
-      nodes = this.graph.nodes,
-      prefix = this.options.prefix || "",
-      drawEdges = this.settings(options, "drawEdges"),
-      drawNodes = this.settings(options, "drawNodes"),
-      drawLabels = this.settings(options, "drawLabels"),
-      drawEdgeLabels = this.settings(options, "drawEdgeLabels"),
-      embedSettings = this.settings.embedObjects(options, {
-        prefix: this.options.prefix
-      });
+    let a;
+
+    let i;
+
+    let k;
+
+    let l;
+
+    let o;
+
+    let id;
+
+    let end;
+
+    let job;
+
+    let start;
+
+    let edges;
+
+    let renderers;
+
+    let rendererType;
+
+    let batchSize;
+
+    let tempGCO;
+
+    const index = {};
+
+    const graph = this.graph;
+
+    const nodes = this.graph.nodes;
+
+    const prefix = this.options.prefix || "";
+
+    let drawEdges = this.settings(options, "drawEdges");
+
+    const drawNodes = this.settings(options, "drawNodes");
+
+    const drawLabels = this.settings(options, "drawLabels");
+
+    const drawEdgeLabels = this.settings(options, "drawEdgeLabels");
+
+    const embedSettings = this.settings.embedObjects(options, {
+      prefix: this.options.prefix
+    });
 
     // Call the resize function:
     this.resize(false);
@@ -174,7 +199,7 @@
 
       // If the "batchEdgesDrawing" settings is true, edges are batched:
       if (this.settings(options, "batchEdgesDrawing")) {
-        id = "edges_" + this.conradId;
+        id = `edges_${this.conradId}`;
         batchSize = embedSettings("canvasEdgesBatchSize");
 
         edges = this.edgesOnScreen;
@@ -303,10 +328,10 @@
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
   sigma.renderers.canvas.prototype.initDOM = function(tag, id) {
-    var dom = document.createElement(tag);
+    const dom = document.createElement(tag);
 
     dom.style.position = "absolute";
-    dom.setAttribute("class", "sigma-" + id);
+    dom.setAttribute("class", `sigma-${id}`);
 
     this.domElements[id] = dom;
     this.container.appendChild(dom);
@@ -324,10 +349,13 @@
    * @return {sigma.renderers.canvas}        Returns the instance itself.
    */
   sigma.renderers.canvas.prototype.resize = function(w, h) {
-    var k,
-      oldWidth = this.width,
-      oldHeight = this.height,
-      pixelRatio = sigma.utils.getPixelRatio();
+    let k;
+
+    const oldWidth = this.width;
+
+    const oldHeight = this.height;
+
+    const pixelRatio = sigma.utils.getPixelRatio();
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -342,12 +370,12 @@
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
       for (k in this.domElements) {
-        this.domElements[k].style.width = w + "px";
-        this.domElements[k].style.height = h + "px";
+        this.domElements[k].style.width = `${w}px`;
+        this.domElements[k].style.height = `${h}px`;
 
         if (this.domElements[k].tagName.toLowerCase() === "canvas") {
-          this.domElements[k].setAttribute("width", w * pixelRatio + "px");
-          this.domElements[k].setAttribute("height", h * pixelRatio + "px");
+          this.domElements[k].setAttribute("width", `${w * pixelRatio}px`);
+          this.domElements[k].setAttribute("height", `${h * pixelRatio}px`);
 
           if (pixelRatio !== 1) this.contexts[k].scale(pixelRatio, pixelRatio);
         }
@@ -363,7 +391,7 @@
    * @return {sigma.renderers.canvas} Returns the instance itself.
    */
   sigma.renderers.canvas.prototype.clear = function() {
-    for (var k in this.contexts) {
+    for (const k in this.contexts) {
       this.contexts[k].clearRect(0, 0, this.width, this.height);
     }
 
@@ -374,7 +402,8 @@
    * This method kills contexts and other attributes.
    */
   sigma.renderers.canvas.prototype.kill = function() {
-    var k, captor;
+    let k;
+    let captor;
 
     // Kill captors:
     while ((captor = this.captors.pop())) captor.kill();

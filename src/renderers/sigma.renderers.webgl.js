@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -23,12 +21,17 @@
     if (!(options.container instanceof HTMLElement))
       throw "Container not found.";
 
-    var k,
-      i,
-      l,
-      a,
-      fn,
-      _self = this;
+    let k;
+
+    let i;
+
+    let l;
+
+    let a;
+
+    let fn;
+
+    const _self = this;
 
     sigma.classes.dispatcher.extend(this);
 
@@ -119,16 +122,25 @@
    * @return {sigma.renderers.webgl} Returns the instance itself.
    */
   sigma.renderers.webgl.prototype.process = function() {
-    var a,
-      i,
-      l,
-      k,
-      type,
-      renderer,
-      graph = this.graph,
-      options = sigma.utils.extend(options, this.options),
-      defaultEdgeType = this.settings(options, "defaultEdgeType"),
-      defaultNodeType = this.settings(options, "defaultNodeType");
+    let a;
+
+    let i;
+
+    let l;
+
+    let k;
+
+    let type;
+
+    let renderer;
+
+    const graph = this.graph;
+
+    var options = sigma.utils.extend(options, this.options);
+
+    const defaultEdgeType = this.settings(options, "defaultEdgeType");
+
+    const defaultNodeType = this.settings(options, "defaultNodeType");
 
     // Empty float arrays:
     for (k in this.nodeFloatArrays) delete this.nodeFloatArrays[k];
@@ -239,22 +251,37 @@
    * @return {sigma.renderers.webgl}        Returns the instance itself.
    */
   sigma.renderers.webgl.prototype.render = function(params) {
-    var a,
-      i,
-      l,
-      k,
-      o,
-      program,
-      renderer,
-      self = this,
-      graph = this.graph,
-      nodesGl = this.contexts.nodes,
-      edgesGl = this.contexts.edges,
-      matrix = this.camera.getMatrix(),
-      options = sigma.utils.extend(params, this.options),
-      drawLabels = this.settings(options, "drawLabels"),
-      drawEdges = this.settings(options, "drawEdges"),
-      drawNodes = this.settings(options, "drawNodes");
+    let a;
+
+    let i;
+
+    let l;
+
+    let k;
+
+    let o;
+
+    let program;
+
+    let renderer;
+
+    const self = this;
+
+    const graph = this.graph;
+
+    const nodesGl = this.contexts.nodes;
+
+    const edgesGl = this.contexts.edges;
+
+    let matrix = this.camera.getMatrix();
+
+    const options = sigma.utils.extend(params, this.options);
+
+    const drawLabels = this.settings(options, "drawLabels");
+
+    let drawEdges = this.settings(options, "drawEdges");
+
+    const drawNodes = this.settings(options, "drawNodes");
 
     // Call the resize function:
     this.resize(false);
@@ -278,20 +305,31 @@
     if (drawEdges) {
       if (this.settings(options, "batchEdgesDrawing"))
         (function() {
-          var a,
-            k,
-            i,
-            id,
-            job,
-            arr,
-            end,
-            start,
-            indices,
-            renderer,
-            batchSize,
-            currentProgram;
+          let a;
 
-          id = "edges_" + this.conradId;
+          let k;
+
+          let i;
+
+          let id;
+
+          let job;
+
+          let arr;
+
+          let end;
+
+          let start;
+
+          let indices;
+
+          let renderer;
+
+          let batchSize;
+
+          let currentProgram;
+
+          id = `edges_${this.conradId}`;
           batchSize = this.settings(options, "webglEdgesBatchSize");
           a = Object.keys(this.edgeFloatArrays);
 
@@ -315,12 +353,12 @@
               edgesGl.useProgram(this.edgePrograms[a[i]]);
               renderer.render(edgesGl, this.edgePrograms[a[i]], arr, {
                 settings: this.settings,
-                matrix: matrix,
+                matrix,
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
                 scalingRatio: this.settings(options, "webglOversamplingRatio"),
-                start: start,
+                start,
                 count: end - start,
                 indicesData: indices
               });
@@ -372,7 +410,7 @@
               this.edgeFloatArrays[k].array,
               {
                 settings: this.settings,
-                matrix: matrix,
+                matrix,
                 width: this.width,
                 height: this.height,
                 ratio: this.camera.ratio,
@@ -406,7 +444,7 @@
             this.nodeFloatArrays[k].array,
             {
               settings: this.settings,
-              matrix: matrix,
+              matrix,
               width: this.width,
               height: this.height,
               ratio: this.camera.ratio,
@@ -462,12 +500,14 @@
    * @param  {?boolean} webgl Will init the WebGL context if true.
    */
   sigma.renderers.webgl.prototype.initDOM = function(tag, id, webgl) {
-    var gl,
-      dom = document.createElement(tag),
-      self = this;
+    let gl;
+
+    const dom = document.createElement(tag);
+
+    const self = this;
 
     dom.style.position = "absolute";
-    dom.setAttribute("class", "sigma-" + id);
+    dom.setAttribute("class", `sigma-${id}`);
 
     this.domElements[id] = dom;
     this.container.appendChild(dom);
@@ -507,10 +547,13 @@
    * @return {sigma.renderers.webgl}        Returns the instance itself.
    */
   sigma.renderers.webgl.prototype.resize = function(w, h) {
-    var k,
-      oldWidth = this.width,
-      oldHeight = this.height,
-      pixelRatio = sigma.utils.getPixelRatio();
+    let k;
+
+    const oldWidth = this.width;
+
+    const oldHeight = this.height;
+
+    const pixelRatio = sigma.utils.getPixelRatio();
 
     if (w !== undefined && h !== undefined) {
       this.width = w;
@@ -525,25 +568,25 @@
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
       for (k in this.domElements) {
-        this.domElements[k].style.width = w + "px";
-        this.domElements[k].style.height = h + "px";
+        this.domElements[k].style.width = `${w}px`;
+        this.domElements[k].style.height = `${h}px`;
 
         if (this.domElements[k].tagName.toLowerCase() === "canvas") {
           // If simple 2D canvas:
           if (this.contexts[k] && this.contexts[k].scale) {
-            this.domElements[k].setAttribute("width", w * pixelRatio + "px");
-            this.domElements[k].setAttribute("height", h * pixelRatio + "px");
+            this.domElements[k].setAttribute("width", `${w * pixelRatio}px`);
+            this.domElements[k].setAttribute("height", `${h * pixelRatio}px`);
 
             if (pixelRatio !== 1)
               this.contexts[k].scale(pixelRatio, pixelRatio);
           } else {
             this.domElements[k].setAttribute(
               "width",
-              w * this.settings("webglOversamplingRatio") + "px"
+              `${w * this.settings("webglOversamplingRatio")}px`
             );
             this.domElements[k].setAttribute(
               "height",
-              h * this.settings("webglOversamplingRatio") + "px"
+              `${h * this.settings("webglOversamplingRatio")}px`
             );
           }
         }
@@ -580,7 +623,8 @@
    * This method kills contexts and other attributes.
    */
   sigma.renderers.webgl.prototype.kill = function() {
-    var k, captor;
+    let k;
+    let captor;
 
     // Kill captors:
     while ((captor = this.captors.pop())) captor.kill();

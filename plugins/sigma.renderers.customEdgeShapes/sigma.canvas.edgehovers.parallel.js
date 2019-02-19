@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edgehovers");
 
   /**
@@ -19,21 +17,33 @@
     context,
     settings
   ) {
-    var color = edge.active
-        ? edge.active_color || settings("defaultEdgeActiveColor")
-        : edge.color,
-      prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1,
-      edgeColor = settings("edgeColor"),
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor"),
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"],
-      c,
-      d,
-      dist = sigma.utils.getDistance(sX, sY, tX, tY);
+    let color = edge.active
+      ? edge.active_color || settings("defaultEdgeActiveColor")
+      : edge.color;
+
+    const prefix = settings("prefix") || "";
+
+    let size = edge[`${prefix}size`] || 1;
+
+    const edgeColor = settings("edgeColor");
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
+
+    let c;
+
+    let d;
+
+    const dist = sigma.utils.getDistance(sX, sY, tX, tY);
 
     if (!color)
       switch (edgeColor) {

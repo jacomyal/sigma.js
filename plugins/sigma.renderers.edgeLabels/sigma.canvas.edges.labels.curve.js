@@ -1,6 +1,4 @@
 (function(undefined) {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   // Initialize packages:
@@ -26,25 +24,39 @@
   ) {
     if (typeof edge.label !== "string") return;
 
-    var prefix = settings("prefix") || "",
-      size = edge[prefix + "size"] || 1;
+    const prefix = settings("prefix") || "";
+
+    const size = edge[`${prefix}size`] || 1;
 
     if (size < settings("edgeLabelThreshold")) return;
 
-    var fontSize,
-      sSize = source[prefix + "size"],
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"],
-      count = edge.count || 0,
-      dX = tX - sX,
-      dY = tY - sY,
-      sign = sX < tX ? 1 : -1,
-      cp = {},
-      c,
-      angle,
-      t = 0.5; //length of the curve
+    let fontSize;
+
+    const sSize = source[`${prefix}size`];
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
+
+    const count = edge.count || 0;
+
+    const dX = tX - sX;
+
+    const dY = tY - sY;
+
+    const sign = sX < tX ? 1 : -1;
+
+    let cp = {};
+
+    let c;
+
+    let angle;
+
+    const t = 0.5; // length of the curve
 
     if (source.id === target.id) {
       cp = sigma.utils.getSelfLoopControlPoints(sX, sY, sSize, count);
@@ -85,7 +97,7 @@
     if (edge.active) {
       context.font = [
         settings("activeFontStyle"),
-        fontSize + "px",
+        `${fontSize}px`,
         settings("activeFont") || settings("font")
       ].join(" ");
 
@@ -96,7 +108,7 @@
     } else {
       context.font = [
         settings("fontStyle"),
-        fontSize + "px",
+        `${fontSize}px`,
         settings("font")
       ].join(" ");
 

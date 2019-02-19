@@ -30,8 +30,6 @@
  */
 
 (function() {
-  "use strict";
-
   if (typeof sigma === "undefined") throw "sigma is not declared";
 
   /**
@@ -43,13 +41,19 @@
    */
 
   sigma.classes.graph.addMethod("HITS", function(isUndirected) {
-    var res = {},
-      epsilon = 0.0001,
-      hubList = [],
-      authList = [],
-      nodes = this.nodes(),
-      nodesCount = nodes.length,
-      tempRes = {};
+    let res = {};
+
+    const epsilon = 0.0001;
+
+    const hubList = [];
+
+    const authList = [];
+
+    const nodes = this.nodes();
+
+    const nodesCount = nodes.length;
+
+    let tempRes = {};
 
     if (!isUndirected) isUndirected = false;
 
@@ -66,12 +70,13 @@
       res[nodes[i].id] = { authority: 1, hub: 1 };
     }
 
-    var done;
+    let done;
 
     while (true) {
       done = true;
-      var authSum = 0,
-        hubSum = 0;
+      let authSum = 0;
+
+      let hubSum = 0;
 
       for (var i in authList) {
         tempRes[authList[i].id] = { authority: 1, hub: 0 };

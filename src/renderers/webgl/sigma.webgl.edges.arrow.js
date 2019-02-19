@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.webgl.edges");
 
   /**
@@ -15,14 +13,20 @@
   sigma.webgl.edges.arrow = {
     POINTS: 9,
     ATTRIBUTES: 11,
-    addEdge: function(edge, source, target, data, i, prefix, settings) {
-      var w = (edge[prefix + "size"] || 1) / 2,
-        x1 = source[prefix + "x"],
-        y1 = source[prefix + "y"],
-        x2 = target[prefix + "x"],
-        y2 = target[prefix + "y"],
-        targetSize = target[prefix + "size"],
-        color = edge.color;
+    addEdge(edge, source, target, data, i, prefix, settings) {
+      const w = (edge[`${prefix}size`] || 1) / 2;
+
+      const x1 = source[`${prefix}x`];
+
+      const y1 = source[`${prefix}y`];
+
+      const x2 = target[`${prefix}x`];
+
+      const y2 = target[`${prefix}y`];
+
+      const targetSize = target[`${prefix}size`];
+
+      let color = edge.color;
 
       if (!color)
         switch (settings("edgeColor")) {
@@ -149,30 +153,52 @@
       data[i++] = 1.0;
       data[i++] = color;
     },
-    render: function(gl, program, data, params) {
-      var buffer;
+    render(gl, program, data, params) {
+      let buffer;
 
       // Define attributes:
-      var positionLocation1 = gl.getAttribLocation(program, "a_pos1"),
-        positionLocation2 = gl.getAttribLocation(program, "a_pos2"),
-        thicknessLocation = gl.getAttribLocation(program, "a_thickness"),
-        targetSizeLocation = gl.getAttribLocation(program, "a_tSize"),
-        delayLocation = gl.getAttribLocation(program, "a_delay"),
-        minusLocation = gl.getAttribLocation(program, "a_minus"),
-        headLocation = gl.getAttribLocation(program, "a_head"),
-        headPositionLocation = gl.getAttribLocation(program, "a_headPosition"),
-        colorLocation = gl.getAttribLocation(program, "a_color"),
-        resolutionLocation = gl.getUniformLocation(program, "u_resolution"),
-        matrixLocation = gl.getUniformLocation(program, "u_matrix"),
-        matrixHalfPiLocation = gl.getUniformLocation(program, "u_matrixHalfPi"),
-        matrixHalfPiMinusLocation = gl.getUniformLocation(
-          program,
-          "u_matrixHalfPiMinus"
-        ),
-        ratioLocation = gl.getUniformLocation(program, "u_ratio"),
-        nodeRatioLocation = gl.getUniformLocation(program, "u_nodeRatio"),
-        arrowHeadLocation = gl.getUniformLocation(program, "u_arrowHead"),
-        scaleLocation = gl.getUniformLocation(program, "u_scale");
+      const positionLocation1 = gl.getAttribLocation(program, "a_pos1");
+
+      const positionLocation2 = gl.getAttribLocation(program, "a_pos2");
+
+      const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
+
+      const targetSizeLocation = gl.getAttribLocation(program, "a_tSize");
+
+      const delayLocation = gl.getAttribLocation(program, "a_delay");
+
+      const minusLocation = gl.getAttribLocation(program, "a_minus");
+
+      const headLocation = gl.getAttribLocation(program, "a_head");
+
+      const headPositionLocation = gl.getAttribLocation(
+        program,
+        "a_headPosition"
+      );
+
+      const colorLocation = gl.getAttribLocation(program, "a_color");
+
+      const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+      const matrixLocation = gl.getUniformLocation(program, "u_matrix");
+
+      const matrixHalfPiLocation = gl.getUniformLocation(
+        program,
+        "u_matrixHalfPi"
+      );
+
+      const matrixHalfPiMinusLocation = gl.getUniformLocation(
+        program,
+        "u_matrixHalfPiMinus"
+      );
+
+      const ratioLocation = gl.getUniformLocation(program, "u_ratio");
+
+      const nodeRatioLocation = gl.getUniformLocation(program, "u_nodeRatio");
+
+      const arrowHeadLocation = gl.getUniformLocation(program, "u_arrowHead");
+
+      const scaleLocation = gl.getUniformLocation(program, "u_scale");
 
       buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -290,8 +316,10 @@
         params.count || data.length / this.ATTRIBUTES
       );
     },
-    initProgram: function(gl) {
-      var vertexShader, fragmentShader, program;
+    initProgram(gl) {
+      let vertexShader;
+      let fragmentShader;
+      let program;
 
       vertexShader = sigma.utils.loadShader(
         gl,

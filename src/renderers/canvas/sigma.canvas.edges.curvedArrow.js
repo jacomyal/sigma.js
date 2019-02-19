@@ -1,6 +1,4 @@
 (function() {
-  "use strict";
-
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -19,24 +17,41 @@
     context,
     settings
   ) {
-    var color = edge.color,
-      prefix = settings("prefix") || "",
-      edgeColor = settings("edgeColor"),
-      defaultNodeColor = settings("defaultNodeColor"),
-      defaultEdgeColor = settings("defaultEdgeColor"),
-      cp = {},
-      size = edge[prefix + "size"] || 1,
-      tSize = target[prefix + "size"],
-      sX = source[prefix + "x"],
-      sY = source[prefix + "y"],
-      tX = target[prefix + "x"],
-      tY = target[prefix + "y"],
-      aSize = Math.max(size * 2.5, settings("minArrowSize")),
-      d,
-      aX,
-      aY,
-      vX,
-      vY;
+    let color = edge.color;
+
+    const prefix = settings("prefix") || "";
+
+    const edgeColor = settings("edgeColor");
+
+    const defaultNodeColor = settings("defaultNodeColor");
+
+    const defaultEdgeColor = settings("defaultEdgeColor");
+
+    let cp = {};
+
+    const size = edge[`${prefix}size`] || 1;
+
+    const tSize = target[`${prefix}size`];
+
+    const sX = source[`${prefix}x`];
+
+    const sY = source[`${prefix}y`];
+
+    const tX = target[`${prefix}x`];
+
+    const tY = target[`${prefix}y`];
+
+    const aSize = Math.max(size * 2.5, settings("minArrowSize"));
+
+    let d;
+
+    let aX;
+
+    let aY;
+
+    let vX;
+
+    let vY;
 
     cp =
       source.id === target.id
