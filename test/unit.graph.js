@@ -356,54 +356,44 @@ QUnit.test("Methods and attached functions", assert => {
     'Custom methods work, can have arguments, and have access to the data in their scope (through "this").'
   );
 
+  function noop() {}
+
   assert.throws(
-    function() {
-      sigma.classes.graph.attach("addNode", "counterInc", function() {});
-    },
+    () => sigma.classes.graph.attach("addNode", "counterInc", noop),
     /A function "counterInc" is already attached to the method "addNode"/,
     "Attaching a function to a method when there is already a function attached to this method under the same key throws an error."
   );
 
   assert.throws(
-    function() {
-      sigma.classes.graph.attach(
-        "undefinedMethod",
-        "counterInc",
-        function() {}
-      );
-    },
+    () => sigma.classes.graph.attach("undefinedMethod", "counterInc", noop),
     /The method "undefinedMethod" does not exist./,
     "Attaching a function to an unexisting method when throws an error."
   );
 
   assert.throws(
-    function() {
+    () =>
       sigma.classes.graph.attachBefore(
         "addNode",
         "applyNodeColorPalette",
-        function() {}
-      );
-    },
+        noop
+      ),
     /A function "applyNodeColorPalette" is already attached to the method "addNode"/,
     'Attaching a "before" function to a method when there is already a "before" function attached to this method under the same key throws an error.'
   );
 
   assert.throws(
-    function() {
+    () =>
       sigma.classes.graph.attachBefore(
         "undefinedMethod",
         "applyNodeColorPalette",
-        function() {}
-      );
-    },
+        noop
+      ),
     /The method "undefinedMethod" does not exist./,
     'Attaching a "before" function to an unexisting method when throws an error.'
   );
 
   assert.throws(
-    function() {
-      sigma.classes.graph.addMethod("getNodeLabel", function() {});
-    },
+    () => sigma.classes.graph.addMethod("getNodeLabel", noop),
     /The method "getNodeLabel" already exists./,
     "Attaching a method whose name is already referenced throws an error."
   );
@@ -441,7 +431,7 @@ QUnit.test("Builtin indexes", assert => {
     ]
   };
 
-  sigma.classes.graph.addMethod("retrieveIndexes", function() {
+  sigma.classes.graph.addMethod("retrieveIndexes", function getIndexes() {
     return {
       inIndex: this.inNeighborsIndex,
       outIndex: this.outNeighborsIndex,
@@ -734,8 +724,6 @@ QUnit.test("Builtin indexes", assert => {
 });
 
 QUnit.test("Custom indexes", assert => {
-  let myGraph;
-
   sigma.classes.graph.addIndex("nodesCount", {
     constructor() {
       this.nodesCount = 0;
@@ -751,11 +739,11 @@ QUnit.test("Custom indexes", assert => {
     }
   });
 
-  sigma.classes.graph.addMethod("getNodesCount", function() {
+  sigma.classes.graph.addMethod("getNodesCount", function getNodeCount() {
     return this.nodesCount;
   });
 
-  myGraph = new sigma.classes.graph();
+  const myGraph = new sigma.classes.graph();
   myGraph
     .addNode({ id: "n0" })
     .addNode({ id: "n1" })
