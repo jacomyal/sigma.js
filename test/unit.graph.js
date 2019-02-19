@@ -1,14 +1,8 @@
 QUnit.module("sigma.classes.graph");
 
 QUnit.test("Basic manipulation", assert => {
-  let a;
-
-  let k;
-
   const opts = {};
-
   const settings = new sigma.classes.configurable(opts);
-
   const graph = {
     nodes: [
       {
@@ -140,17 +134,13 @@ QUnit.test("Basic manipulation", assert => {
   );
 
   assert.throws(
-    function() {
-      myGraph.nodes(["n0", "n1", {}]);
-    },
+    () => myGraph.nodes(["n0", "n1", {}]),
     /nodes: Wrong arguments/,
     '"nodes" with an array containing a non-string or non-number value throws an error.'
   );
 
   assert.throws(
-    function() {
-      myGraph.addNode(graph.nodes[0]);
-    },
+    () => myGraph.addNode(graph.nodes[0]),
     /The node "n0" already exists./,
     "Adding an already existing node throws an error."
   );
@@ -235,17 +225,14 @@ QUnit.test("Basic manipulation", assert => {
   );
 
   assert.throws(
-    function() {
-      myGraph.edges(["e0", {}]);
-    },
+    () => myGraph.edges(["e0", {}]),
+
     /edges: Wrong arguments/,
     '"edges" with an array containing a non-string or non-number value throws an error.'
   );
 
   assert.throws(
-    function() {
-      myGraph.addEdge(graph.edges[0]);
-    },
+    () => myGraph.addEdge(graph.edges[0]),
     /The edge "e0" already exists./,
     "Adding an already existing edge throws an error."
   );
@@ -254,33 +241,25 @@ QUnit.test("Basic manipulation", assert => {
   // *********************
   myGraph.dropNode("n0");
   assert.deepEqual(
-    myGraph.nodes().map(function(n) {
-      return n.id;
-    }),
+    myGraph.nodes().map(n => n.id),
     ["n1", "n2", "n3"],
     '"dropNode" actually drops the node.'
   );
   assert.deepEqual(
-    myGraph.edges().map(function(e) {
-      return e.id;
-    }),
+    myGraph.edges().map(e => e.id),
     ["e1", "e2", "e3", "e4"],
     '"dropNode" also kills the edges linked to the related nodes..'
   );
 
   assert.throws(
-    function() {
-      myGraph.dropNode("n0");
-    },
+    () => myGraph.dropNode("n0"),
     /The node "n0" does not exist./,
     "Droping an unexisting node throws an error."
   );
 
   myGraph.dropEdge("e1");
   assert.deepEqual(
-    myGraph.edges().map(function(e) {
-      return e.id;
-    }),
+    myGraph.edges().map(e => e.id),
     ["e2", "e3", "e4"],
     '"dropEdge" actually drops the edge.'
   );
@@ -331,15 +310,10 @@ QUnit.test("Basic manipulation", assert => {
 
 QUnit.test("Methods and attached functions", assert => {
   let counter;
-
   const colorPalette = { Person: "#C3CBE1", Place: "#9BDEBD" };
 
-  let myGraph;
-
   counter = 0;
-  sigma.classes.graph.attach("addNode", "counterInc", function() {
-    counter++;
-  });
+  sigma.classes.graph.attach("addNode", "counterInc", () => counter++);
 
   sigma.classes.graph.attachBefore("addNode", "applyNodeColorPalette", function(
     n
@@ -369,7 +343,7 @@ QUnit.test("Methods and attached functions", assert => {
     "sigma.classes.hasMethod returns true if the method is implemented in the core."
   );
 
-  myGraph = new sigma.classes.graph();
+  const myGraph = new sigma.classes.graph();
   myGraph.addNode({ id: "n0", label: "My node", category: "Person" });
   assert.strictEqual(
     1,
