@@ -37,21 +37,13 @@ QUnit.test("Basic manipulation", assert => {
   );
 
   assert.throws(
-    function() {
-      camera.goTo({
-        x: "abc"
-      });
-    },
+    () => camera.goTo({ x: "abc" }),
     /Value for "x" is not a number./,
     '"goTo" with a non-number value throws an error.'
   );
 
   assert.throws(
-    function() {
-      camera.goTo({
-        x: NaN
-      });
-    },
+    () => camera.goTo({ x: NaN }),
     /Value for "x" is not a number./,
     '"goTo" with NaN as a value throws an error.'
   );
@@ -100,14 +92,14 @@ QUnit.test("Apply to a graph", assert => {
 
   camera.applyView("", "display:");
   assert.deepEqual(
-    graph.nodes().map(function(n) {
+    graph.nodes().map(n => {
       return {
         x: n["display:x"],
         y: n["display:y"],
         size: n["display:size"]
       };
     }),
-    graph.nodes().map(function(n) {
+    graph.nodes().map(n => {
       return {
         x: n.x,
         y: n.y,
@@ -125,7 +117,7 @@ QUnit.test("Apply to a graph", assert => {
   });
   camera.applyView("", "display:");
   assert.deepEqual(
-    graph.nodes().map(function(n) {
+    graph.nodes().map(n => {
       return {
         x: approx(n["display:x"]),
         y: approx(n["display:y"]),
@@ -136,17 +128,17 @@ QUnit.test("Apply to a graph", assert => {
       {
         x: 0.5,
         y: 0.5,
-        size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+        size: approx(0.5 ** camera.settings("nodesPowRatio"))
       },
       {
         x: 0,
         y: 0,
-        size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+        size: approx(0.5 ** camera.settings("nodesPowRatio"))
       },
       {
         x: -0.5,
         y: 0.5,
-        size: approx(Math.pow(0.5, camera.settings("nodesPowRatio")))
+        size: approx(0.5 ** camera.settings("nodesPowRatio"))
       }
     ],
     "Applying the camera's view to the graph works after having moved the camera."
