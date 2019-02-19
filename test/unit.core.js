@@ -12,7 +12,7 @@ QUnit.test("Constructor polymorphism", assert => {
 
   // Custom renderer:
   // We just need the options here.
-  sigma.renderers.def = function(_1, _2, _3, options) {
+  sigma.renderers.def = function defRenderer(_1, _2, _3, options) {
     this.options = options;
   };
 
@@ -99,7 +99,7 @@ QUnit.test("Constructor polymorphism", assert => {
   document.body.removeChild(dom);
 
   assert.throws(
-    function() {
+    () => {
       s = new sigma("abcd");
     },
     /Container not found./,
@@ -124,14 +124,11 @@ QUnit.test("Public methods", assert => {
 
   // Adding and killing cameras and renderers:
   const c1 = s.addCamera("0");
-
   const c2 = s.addCamera("1");
+  s.addRenderer({ container: dom, camera: c1, id: "0" });
+  s.addRenderer({ container: dom, camera: c2, id: "1" });
+  s.addRenderer({ container: dom, camera: c2, id: "2" });
 
-  const r1 = s.addRenderer({ container: dom, camera: c1, id: "0" });
-
-  const r2 = s.addRenderer({ container: dom, camera: c2, id: "1" });
-
-  const r3 = s.addRenderer({ container: dom, camera: c2, id: "2" });
   assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [["0", "1", "2"], ["0", "1"]],
@@ -153,17 +150,13 @@ QUnit.test("Public methods", assert => {
   );
 
   assert.throws(
-    function() {
-      s.killCamera("42");
-    },
+    () => s.killCamera("42"),
     /The camera is undefined./,
     "Killing a camera that does not exist throws an error."
   );
 
   assert.throws(
-    function() {
-      s.killRenderer("42");
-    },
+    () => s.killRenderer("42"),
     /The renderer is undefined./,
     "Killing a renderer that does not exist throws an error."
   );
@@ -171,9 +164,9 @@ QUnit.test("Public methods", assert => {
   s.killCamera("0");
 
   // Checking a bit more deeply adding methods:
-  var c = s.addCamera("myCamera");
+  let c = s.addCamera("myCamera");
 
-  const r = s.addRenderer({ camera: c, container: dom, id: "myRenderer" });
+  s.addRenderer({ camera: c, container: dom, id: "myRenderer" });
   assert.deepEqual(
     [Object.keys(s.renderers), Object.keys(s.cameras)],
     [["myRenderer"], ["myCamera"]],
@@ -181,32 +174,26 @@ QUnit.test("Public methods", assert => {
   );
 
   assert.throws(
-    function() {
-      s.addCamera("myCamera");
-    },
+    () => s.addCamera("myCamera"),
     /The camera "myCamera" already exists./,
     "Adding a camera with an already existing ID throws an error."
   );
 
   assert.throws(
-    function() {
-      s.addRenderer({ camera: c, container: dom, id: "myRenderer" });
-    },
+    () => s.addRenderer({ camera: c, container: dom, id: "myRenderer" }),
     /The renderer "myRenderer" already exists./,
     "Adding a renderer with an already existing ID throws an error."
   );
 
   // And check also some crazy side cases:
-  var c = s.addCamera();
+  c = s.addCamera();
 
-  const id = c.id;
+  const { id } = c;
 
   s.killCamera(id);
 
   assert.throws(
-    function() {
-      s.addRenderer({ camera: c, container: dom });
-    },
+    () => s.addRenderer({ camera: c, container: dom }),
     /The camera is not properly referenced./,
     "Adding a renderer with camera that is not referenced anymore throws an error."
   );
