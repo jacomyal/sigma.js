@@ -6,9 +6,7 @@ QUnit.test("Basics", assert => {
 
   const instance = new sigma.classes.dispatcher();
 
-  const listener = function() {
-    dispatched++;
-  };
+  const listener = () => dispatched++;
 
   instance.dispatchEvent("myEvent");
   assert.strictEqual(
@@ -38,11 +36,9 @@ QUnit.test("API", assert => {
   // 1. "unbind" polymorphism
   let dispatched = 0;
 
-  var instance = new sigma.classes.dispatcher();
+  let instance = new sigma.classes.dispatcher();
 
-  const listener = function() {
-    dispatched++;
-  };
+  const listener = () => dispatched++;
 
   instance.bind("myEvent", listener);
   instance.unbind("myEvent", listener);
@@ -80,18 +76,12 @@ QUnit.test("API", assert => {
 
   // 2. "bind" polymorphism
   let dispatched1 = 0;
-
   let dispatched2 = 0;
 
-  var instance = new sigma.classes.dispatcher();
+  instance = new sigma.classes.dispatcher();
 
-  const listener1 = function() {
-    dispatched1++;
-  };
-
-  const listener2 = function() {
-    dispatched2++;
-  };
+  const listener1 = () => dispatched1++;
+  const listener2 = () => dispatched2++;
 
   instance.bind("myEvent1", listener1);
   instance.dispatchEvent("myEvent1");
