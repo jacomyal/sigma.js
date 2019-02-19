@@ -2,7 +2,7 @@ QUnit.module("sigma.classes.quad");
 
 // Test Beginning
 //= ===============
-QUnit.test("QuadTree", function(assert) {
+QUnit.test("QuadTree", assert => {
   // Helpers
   //---------
   function getRandom(min, max) {

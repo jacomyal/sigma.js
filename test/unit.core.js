@@ -1,5 +1,5 @@
 QUnit.module("sigma.core.js");
-QUnit.test("Constructor polymorphism", function(assert) {
+QUnit.test("Constructor polymorphism", assert => {
   let s;
 
   const tmp = sigma.renderers.def;
@@ -107,7 +107,7 @@ QUnit.test("Constructor polymorphism", function(assert) {
   );
 });
 
-QUnit.test("Public methods", function(assert) {
+QUnit.test("Public methods", assert => {
   const s = new sigma();
 
   const dom = document.createElement("DIV");

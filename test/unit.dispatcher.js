@@ -1,6 +1,6 @@
 QUnit.module("sigma.classes.dispatcher");
 
-QUnit.test("Basics", function(assert) {
+QUnit.test("Basics", assert => {
   // 1. Basics
   let dispatched = 0;
 
@@ -34,7 +34,7 @@ QUnit.test("Basics", function(assert) {
   );
 });
 
-QUnit.test("API", function(assert) {
+QUnit.test("API", assert => {
   // 1. "unbind" polymorphism
   let dispatched = 0;
 

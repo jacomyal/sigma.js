@@ -5,7 +5,7 @@ QUnit.module("sigma.statistics.HITS");
 // read plugin documentation for more info
 // read also for more context: https://github.com/jacomyal/sigma.js/issues/309#issuecomment-47554156
 
-QUnit.test("Stats computation", function(assert) {
+QUnit.test("Stats computation", assert => {
   let a;
 
   let k;

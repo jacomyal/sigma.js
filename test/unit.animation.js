@@ -1,6 +1,6 @@
 QUnit.module("sigma.misc.animation");
 
-QUnit.test("Camera animation", function(assert) {
+QUnit.test("Camera animation", assert => {
   const done = assert.async();
   function approx(v) {
     return Math.round(v * 10000) / 10000;

@@ -1,6 +1,6 @@
 QUnit.module("sigma.plugins.filter");
 
-QUnit.test("Custom graph methods", function(assert) {
+QUnit.test("Custom graph methods", assert => {
   const myGraph = new sigma.classes.graph();
   myGraph.read({
     nodes: [
@@ -60,7 +60,7 @@ QUnit.test("Custom graph methods", function(assert) {
   );
 });
 
-QUnit.test("API", function(assert) {
+QUnit.test("API", assert => {
   let a;
 
   let k;

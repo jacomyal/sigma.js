@@ -1,6 +1,6 @@
 QUnit.module("sigma.classes.graph");
 
-QUnit.test("Basic manipulation", function(assert) {
+QUnit.test("Basic manipulation", assert => {
   let a;
 
   let k;
@@ -329,7 +329,7 @@ QUnit.test("Basic manipulation", function(assert) {
   );
 });
 
-QUnit.test("Methods and attached functions", function(assert) {
+QUnit.test("Methods and attached functions", assert => {
   let counter;
 
   const colorPalette = { Person: "#C3CBE1", Place: "#9BDEBD" };
@@ -440,7 +440,7 @@ QUnit.test("Methods and attached functions", function(assert) {
   );
 });
 
-QUnit.test("Builtin indexes", function(assert) {
+QUnit.test("Builtin indexes", assert => {
   const graph = {
     nodes: [
       {
@@ -764,7 +764,7 @@ QUnit.test("Builtin indexes", function(assert) {
   );
 });
 
-QUnit.test("Custom indexes", function(assert) {
+QUnit.test("Custom indexes", assert => {
   let myGraph;
 
   sigma.classes.graph.addIndex("nodesCount", {

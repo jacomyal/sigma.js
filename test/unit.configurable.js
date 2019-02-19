@@ -1,6 +1,6 @@
 QUnit.module("sigma.classes.configurable");
 
-QUnit.test("Basic manipulation", function(assert) {
+QUnit.test("Basic manipulation", assert => {
   let settings = new sigma.classes.configurable();
   settings("mySetting", 42);
   assert.deepEqual(
@@ -36,7 +36,7 @@ QUnit.test("Basic manipulation", function(assert) {
   );
 });
 
-QUnit.test("Embed objects", function(assert) {
+QUnit.test("Embed objects", assert => {
   const data = { key1: "data", key2: "data" };
 
   const object = { key1: "object" };
@@ -62,7 +62,7 @@ QUnit.test("Embed objects", function(assert) {
   );
 });
 
-QUnit.test("Deeply embed objects", function(assert) {
+QUnit.test("Deeply embed objects", assert => {
   const data = { key1: "data", key2: "data", key3: "data" };
 
   const object1 = { key1: "object1", key2: "object1" };

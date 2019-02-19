@@ -2,7 +2,7 @@ QUnit.module("sigma.classes.edgequad");
 
 // Test Beginning
 //= ===============
-QUnit.test("EdgeQuadTree", function(assert) {
+QUnit.test("EdgeQuadTree", assert => {
   // Helpers
   //---------
   function getRandom(min, max) {

@@ -1,6 +1,6 @@
 QUnit.module("sigma.classes.camera");
 
-QUnit.test("Basic manipulation", function(assert) {
+QUnit.test("Basic manipulation", assert => {
   const graph = new sigma.classes.graph();
 
   const camera = new sigma.classes.camera(
@@ -57,7 +57,7 @@ QUnit.test("Basic manipulation", function(assert) {
   );
 });
 
-QUnit.test("Apply to a graph", function(assert) {
+QUnit.test("Apply to a graph", assert => {
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
@@ -153,7 +153,7 @@ QUnit.test("Apply to a graph", function(assert) {
   );
 });
 
-QUnit.test("Position", function(assert) {
+QUnit.test("Position", assert => {
   function approx(v) {
     return Math.round(v * 10000) / 10000;
   }
