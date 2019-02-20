@@ -19,33 +19,27 @@ export default function Dispatcher() {
  * @return {dispatcher}               Returns the instance itself.
  */
 Dispatcher.prototype.bind = function bind(events, handler) {
-  let i;
-  let l;
-  let event;
+  /* eslint-disable prefer-rest-params */
   let eArray;
 
   if (arguments.length === 1 && typeof arguments[0] === "object") {
     const argObject = arguments[0];
-    for (events in argObject) {
-      this.bind(events, argObject[events]);
-    }
+    Object.keys(argObject).forEach(evts => {
+      this.bind(evts, argObject[events]);
+    });
   } else if (arguments.length === 2 && typeof arguments[1] === "function") {
     eArray = typeof events === "string" ? events.split(" ") : events;
+    eArray
+      .filter(e => !!e)
+      .forEach(event => {
+        if (!this._handlers[event]) this._handlers[event] = [];
 
-    for (i = 0, l = eArray.length; i !== l; i += 1) {
-      event = eArray[i];
-
-      // Check that event is not '':
-      if (!event) continue;
-
-      if (!this._handlers[event]) this._handlers[event] = [];
-
-      // Using an object instead of directly the handler will make possible
-      // later to add flags
-      this._handlers[event].push({
-        handler
+        // Using an object instead of directly the handler will make possible
+        // later to add flags
+        this._handlers[event].push({
+          handler
+        });
       });
-    }
   } else throw new Error("bind: Wrong arguments.");
 
   return this;

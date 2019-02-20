@@ -470,17 +470,11 @@ function _quadCollision(corners, quadCorners) {
  */
 function _quadSubdivide(index, quad) {
   const next = quad.level + 1;
-
   const subw = Math.round(quad.bounds.width / 2);
-
   const subh = Math.round(quad.bounds.height / 2);
-
   const qx = Math.round(quad.bounds.x);
-
   const qy = Math.round(quad.bounds.y);
-
   let x;
-
   let y;
 
   switch (index) {
@@ -500,6 +494,8 @@ function _quadSubdivide(index, quad) {
       x = qx + subw;
       y = qy + subh;
       break;
+    default:
+      throw new Error(`invalid quad index ${index}`);
   }
 
   return _quadTree(
@@ -774,7 +770,6 @@ EdgeQuad.prototype.area = function area(rect) {
     : [];
 
   // Object to array
-  const edgesArray = [];
   for (const i in edges) {
     edgesArray.push(edges[i]);
   }
