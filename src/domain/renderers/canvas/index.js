@@ -21,13 +21,6 @@ export default sigma => {
     if (!(options.container instanceof HTMLElement))
       throw new Error("Container not found.");
 
-    let k;
-    let i;
-    let l;
-    let a;
-    let fn;
-    const self = this;
-
     Dispatcher.extend(this);
 
     // Initialize main attributes:
@@ -73,9 +66,12 @@ export default sigma => {
 
     // Initialize captors:
     this.captors = [];
-    a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
-    for (i = 0, l = a.length; i < l; i++) {
-      fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
+    const a = this.options.captors || [
+      sigma.captors.mouse,
+      sigma.captors.touch
+    ];
+    for (let i = 0; i < a.length; i++) {
+      const fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
       this.captors.push(
         new fn(this.domElements.mouse, this.camera, this.settings)
       );
@@ -96,51 +92,25 @@ export default sigma => {
    */
   CanvasRenderer.prototype.render = function render(options) {
     options = options || {};
-
     let a;
-
     let i;
-
-    let k;
-
     let l;
-
     let o;
-
     let id;
-
     let end;
-
-    let job;
-
     let start;
-
     let edges;
-
     let renderers;
-
     let rendererType;
-
     let batchSize;
-
     let tempGCO;
-
     const index = {};
-
-    const graph = this.graph;
-
-    const nodes = this.graph.nodes;
-
-    const prefix = this.options.prefix || "";
-
+    const { graph } = this;
+    const { nodes } = graph;
     let drawEdges = this.settings(options, "drawEdges");
-
     const drawNodes = this.settings(options, "drawNodes");
-
     const drawLabels = this.settings(options, "drawLabels");
-
     const drawEdgeLabels = this.settings(options, "drawEdgeLabels");
-
     const embedSettings = this.settings.embedObjects(options, {
       prefix: this.options.prefix
     });
@@ -162,7 +132,9 @@ export default sigma => {
     this.clear();
 
     // Kill running jobs:
-    for (k in this.jobs) if (conrad.hasJob(k)) conrad.killJob(k);
+    Object.keys(this.jobs).forEach(k => {
+      if (conrad.hasJob(k)) conrad.killJob(k);
+    });
 
     // Find which nodes are on screen:
     this.edgesOnScreen = [];
@@ -201,7 +173,7 @@ export default sigma => {
         start = 0;
         end = Math.min(edges.length, start + batchSize);
 
-        job = function job() {
+        const job = () => {
           tempGCO = this.contexts.edges.globalCompositeOperation;
           this.contexts.edges.globalCompositeOperation = "destination-over";
 
@@ -251,7 +223,7 @@ export default sigma => {
         };
 
         this.jobs[id] = job;
-        conrad.addJob(id, job.bind(this));
+        conrad.addJob(id, job);
 
         // If not, they are drawn in one frame:
       } else {

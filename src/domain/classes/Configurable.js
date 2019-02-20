@@ -7,14 +7,9 @@
  *
  * @return {configurable} The "settings" function.
  */
-export default function Configurable() {
-  let i;
-
-  let l;
-
+export default function Configurable(...args) {
   const data = {};
-
-  const datas = Array.prototype.slice.call(arguments, 0);
+  const datas = Array.prototype.slice.call(args, 0);
 
   /**
    * The method to use to set or get any property of this instance.
@@ -48,30 +43,31 @@ export default function Configurable() {
    *  > settings({mySetting: 'abc'}, 'mySetting');  // Logs: 'abc'
    *  > settings({hisSetting: 'abc'}, 'mySetting'); // Logs: 456
    */
-  var settings = function(a1, a2) {
-    let o;
-    let i;
-    let l;
-    let k;
-
+  function settings(a1, a2) {
     if (arguments.length === 1 && typeof a1 === "string") {
-      if (data[a1] !== undefined) return data[a1];
-      for (i = 0, l = datas.length; i < l; i++)
-        if (datas[i][a1] !== undefined) return datas[i][a1];
+      if (data[a1] !== undefined) {
+        return data[a1];
+      }
+      for (let i = 0; i < datas.length; i++) {
+        if (datas[i][a1] !== undefined) {
+          return datas[i][a1];
+        }
+      }
       return undefined;
     }
     if (typeof a1 === "object" && typeof a2 === "string") {
       return (a1 || {})[a2] !== undefined ? a1[a2] : settings(a2);
     }
-    o = typeof a1 === "object" && a2 === undefined ? a1 : {};
+    const o = typeof a1 === "object" && a2 === undefined ? a1 : {};
+    if (typeof a1 === "string") {
+      o[a1] = a2;
+    }
 
-    if (typeof a1 === "string") o[a1] = a2;
-
-    for (i = 0, k = Object.keys(o), l = k.length; i < l; i++)
-      data[k[i]] = o[k[i]];
-
-    return this;
-  };
+    Object.keys(o).forEach(key => {
+      data[key] = o[key];
+    });
+    return undefined;
+  }
 
   /**
    * This method returns a new configurable function, with new objects
@@ -80,16 +76,15 @@ export default function Configurable() {
    * @return {function} Returns the function. Check its documentation to know
    *                    more about how it works.
    */
-  settings.embedObjects = function() {
-    const args = datas
+  settings.embedObjects = function embedObjects(...eoArgs) {
+    const callArgs = datas
       .concat(data)
-      .concat(Array.prototype.splice.call(arguments, 0));
+      .concat(Array.prototype.splice.call(eoArgs, 0));
 
-    return Configurable.apply({}, args);
+    return Configurable.apply({}, callArgs);
   };
 
   // Initialize
-  for (i = 0, l = arguments.length; i < l; i++) settings(arguments[i]);
-
+  args.forEach(a => settings(a));
   return settings;
 }

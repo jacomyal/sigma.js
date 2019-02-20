@@ -17,17 +17,11 @@ export default {
   ATTRIBUTES: 11,
   addEdge(edge, source, target, data, i, prefix, settings) {
     const w = (edge[`${prefix}size`] || 1) / 2;
-
     const x1 = source[`${prefix}x`];
-
     const y1 = source[`${prefix}y`];
-
     const x2 = target[`${prefix}x`];
-
     const y2 = target[`${prefix}y`];
-
     const targetSize = target[`${prefix}size`];
-
     let { color } = edge;
 
     if (!color)
@@ -155,56 +149,37 @@ export default {
     data[i++] = color;
   },
   render(gl, program, data, params) {
-    let buffer;
-
     // Define attributes:
     const positionLocation1 = gl.getAttribLocation(program, "a_pos1");
-
     const positionLocation2 = gl.getAttribLocation(program, "a_pos2");
-
     const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
-
     const targetSizeLocation = gl.getAttribLocation(program, "a_tSize");
-
     const delayLocation = gl.getAttribLocation(program, "a_delay");
-
     const minusLocation = gl.getAttribLocation(program, "a_minus");
-
     const headLocation = gl.getAttribLocation(program, "a_head");
-
     const headPositionLocation = gl.getAttribLocation(
       program,
       "a_headPosition"
     );
-
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
-
     const matrixHalfPiLocation = gl.getUniformLocation(
       program,
       "u_matrixHalfPi"
     );
-
     const matrixHalfPiMinusLocation = gl.getUniformLocation(
       program,
       "u_matrixHalfPiMinus"
     );
-
     const ratioLocation = gl.getUniformLocation(program, "u_ratio");
-
     const nodeRatioLocation = gl.getUniformLocation(program, "u_nodeRatio");
-
     const arrowHeadLocation = gl.getUniformLocation(program, "u_arrowHead");
-
     const scaleLocation = gl.getUniformLocation(program, "u_scale");
 
-    buffer = gl.createBuffer();
+    const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,

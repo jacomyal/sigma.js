@@ -9,15 +9,10 @@
  */
 export default function edgeHoversDef(edge, source, target, context, settings) {
   let { color } = edge;
-
   const prefix = settings("prefix") || "";
-
   let size = edge[`${prefix}size`] || 1;
-
   const edgeColor = settings("edgeColor");
-
   const defaultNodeColor = settings("defaultNodeColor");
-
   const defaultEdgeColor = settings("defaultEdgeColor");
 
   if (!color)

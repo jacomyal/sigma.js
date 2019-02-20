@@ -21,16 +21,11 @@ export default {
   ATTRIBUTES: 7,
   addEdge(edge, source, target, data, i, prefix, settings) {
     const thickness = edge[`${prefix}size`] || 1;
-
     const x1 = source[`${prefix}x`];
-
     const y1 = source[`${prefix}y`];
-
     const x2 = target[`${prefix}x`];
-
     const y2 = target[`${prefix}y`];
-
-    let color = edge.color;
+    let { color } = edge;
 
     if (!color)
       switch (settings("edgeColor")) {
@@ -238,9 +233,7 @@ export default {
         "}"
       ].join("\n"),
       gl.VERTEX_SHADER,
-      function(error) {
-        console.log(error);
-      }
+      error => console.log(error)
     );
 
     const fragmentShader = loadShader(
@@ -258,7 +251,6 @@ export default {
     );
 
     const program = loadProgram(gl, [vertexShader, fragmentShader]);
-
     return program;
   }
 };

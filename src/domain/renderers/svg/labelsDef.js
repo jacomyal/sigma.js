@@ -55,9 +55,10 @@ export default {
         : settings("labelSizeRatio") * size;
 
     // Case when we don't want to display the label
-    if (!settings("forceLabels") && size < settings("labelThreshold")) return;
+    if (!settings("forceLabels") && size < settings("labelThreshold"))
+      return this;
 
-    if (typeof node.label !== "string") return;
+    if (typeof node.label !== "string") return this;
 
     // Updating
     text.setAttributeNS(null, "x", Math.round(node[`${prefix}x`] + size + 3));

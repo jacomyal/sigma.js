@@ -46,25 +46,19 @@ export default function Camera(id, graph, settings, options) {
  * @param  {object} coordinates The new coordinates object.
  * @return {camera}             Returns the camera.
  */
-Camera.prototype.goTo = function(coordinates) {
+Camera.prototype.goTo = function goto(coordinates) {
   if (!this.settings("enableCamera")) return this;
 
-  let i;
-
-  let l;
-
   const c = coordinates || {};
-
   const keys = ["x", "y", "ratio", "angle"];
-
-  for (i = 0, l = keys.length; i < l; i++)
-    if (c[keys[i]] !== undefined) {
-      if (typeof c[keys[i]] === "number" && !isNaN(c[keys[i]]))
-        this[keys[i]] = c[keys[i]];
-      else throw new Error(`Value for "${keys[i]}" is not a number.`);
+  keys.forEach(key => {
+    if (c[key] !== undefined) {
+      if (typeof c[key] === "number" && !Number.isNaN(c[key]))
+        this[key] = c[key];
+      else throw new Error(`Value for "${key}" is not a number.`);
     }
-
-  this.dispatchEvent("coordinatesUpdated");
+  });
+  keys.forEach(() => this.dispatchEvent("coordinatesUpdated"));
   return this;
 };
 

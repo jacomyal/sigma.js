@@ -14,18 +14,11 @@ export default {
    */
   create(node, nodeCircle, measurementCanvas, settings) {
     // Defining visual properties
-    let x;
-    let y;
     let w;
     let h;
     let e;
-    let d;
-    const fontStyle = settings("hoverFontStyle") || settings("fontStyle");
-
     const prefix = settings("prefix") || "";
-
     const size = node[`${prefix}size`];
-
     const fontSize =
       settings("labelSize") === "fixed"
         ? settings("defaultLabelSize")
@@ -38,11 +31,8 @@ export default {
 
     // Creating elements
     const group = document.createElementNS(settings("xmlns"), "g");
-
     const rectangle = document.createElementNS(settings("xmlns"), "rect");
-
     const circle = document.createElementNS(settings("xmlns"), "circle");
-
     const text = document.createElementNS(settings("xmlns"), "text");
 
     // Defining properties

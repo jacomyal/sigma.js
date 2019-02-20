@@ -49,14 +49,12 @@ export default {
 
     let len = dx * dx + dy * dy;
 
-    var normals;
-
+    let normals;
     if (!len) {
       normals = [0, 0];
     } else {
       len = 1 / Math.sqrt(len);
-
-      var normals = [-dy * len, dx * len];
+      normals = [-dy * len, dx * len];
     }
 
     // First point
@@ -93,13 +91,9 @@ export default {
   },
   computeIndices(data) {
     const indices = new Uint16Array(data.length * 6);
-
     let c = 0;
-
     let i = 0;
-
     let j;
-
     let l;
 
     for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
@@ -117,17 +111,11 @@ export default {
   render(gl, program, data, params) {
     // Define attributes:
     const positionLocation = gl.getAttribLocation(program, "a_position");
-
     const normalLocation = gl.getAttribLocation(program, "a_normal");
-
     const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
-
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const ratioLocation = gl.getUniformLocation(program, "u_ratio");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
     // Creating buffer:
@@ -197,11 +185,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position;",
@@ -237,7 +221,7 @@ export default {
       gl.VERTEX_SHADER
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -251,8 +235,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
-
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
     return program;
   }
 };

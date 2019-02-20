@@ -6,17 +6,13 @@
  * @param  {configurable}             settings The settings function.
  */
 export default function labelsDef(node, context, settings) {
-  let fontSize;
-
   const prefix = settings("prefix") || "";
-
   const size = node[`${prefix}size`];
 
   if (size < settings("labelThreshold")) return;
-
   if (!node.label || typeof node.label !== "string") return;
 
-  fontSize =
+  const fontSize =
     settings("labelSize") === "fixed"
       ? settings("defaultLabelSize")
       : settings("labelSizeRatio") * size;

@@ -18,15 +18,13 @@ export default function edgesCurve(edge, source, target, context, settings) {
   const edgeColor = settings("edgeColor");
   const defaultNodeColor = settings("defaultNodeColor");
   const defaultEdgeColor = settings("defaultEdgeColor");
-  let cp = {};
-
   const sSize = source[`${prefix}size`];
   const sX = source[`${prefix}x`];
   const sY = source[`${prefix}y`];
   const tX = target[`${prefix}x`];
   const tY = target[`${prefix}y`];
 
-  cp =
+  const cp =
     source.id === target.id
       ? getSelfLoopControlPoints(sX, sY, sSize)
       : getQuadraticControlPoint(sX, sY, tX, tY);

@@ -12,7 +12,6 @@ export default {
   POINTS: 2,
   ATTRIBUTES: 3,
   addEdge(edge, source, target, data, i, prefix, settings) {
-    const w = (edge[`${prefix}size`] || 1) / 2;
     const x1 = source[`${prefix}x`];
     const y1 = source[`${prefix}y`];
     const x2 = target[`${prefix}x`];
@@ -44,24 +43,17 @@ export default {
     data[i++] = color;
   },
   render(gl, program, data, params) {
-    let buffer;
-
     // Define attributes:
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const positionLocation = gl.getAttribLocation(program, "a_position");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
-    buffer = gl.createBuffer();
+    const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
-
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
-
     gl.enableVertexAttribArray(positionLocation);
     gl.enableVertexAttribArray(colorLocation);
 
@@ -90,11 +82,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position;",
@@ -125,7 +113,7 @@ export default {
       gl.VERTEX_SHADER
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -139,8 +127,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
-
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
     return program;
   }
 };

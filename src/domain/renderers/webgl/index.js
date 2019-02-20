@@ -131,7 +131,7 @@ export default sigma => {
 
     let renderer;
 
-    const graph = this.graph;
+    const { graph } = this;
 
     var options = extend(options, this.options);
 
@@ -264,7 +264,7 @@ export default sigma => {
 
     const self = this;
 
-    const graph = this.graph;
+    const { graph } = this;
 
     const nodesGl = this.contexts.nodes;
 
@@ -300,27 +300,16 @@ export default sigma => {
       if (this.settings(options, "batchEdgesDrawing"))
         (function() {
           let a;
-
           let k;
-
           let i;
-
           let id;
-
           let job;
-
           let arr;
-
           let end;
-
           let start;
-
           let indices;
-
           let renderer;
-
           let batchSize;
-
           let currentProgram;
 
           id = `edges_${this.conradId}`;

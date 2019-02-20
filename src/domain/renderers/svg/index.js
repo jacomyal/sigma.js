@@ -377,8 +377,7 @@ export default sigma => {
     }
 
     function outNode(e) {
-      const node = e.data.node;
-
+      const { node } = e.data;
       const embedSettings = self.settings.embedObjects({
         prefix
       });

@@ -9,8 +9,6 @@ export default {
    * @param  {configurable}             settings The settings function.
    */
   create(node, settings) {
-    const prefix = settings("prefix") || "";
-
     const circle = document.createElementNS(settings("xmlns"), "circle");
 
     // Defining the node's circle

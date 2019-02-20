@@ -183,11 +183,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position1;",
@@ -234,7 +230,7 @@ export default {
       gl.VERTEX_SHADER
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -248,8 +244,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
-
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
     return program;
   }
 };

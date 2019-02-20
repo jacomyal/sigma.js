@@ -12,7 +12,6 @@ export default {
    */
   create(edge, source, target, settings) {
     let { color } = edge;
-    const prefix = settings("prefix") || "";
     const edgeColor = settings("edgeColor");
     const defaultNodeColor = settings("defaultNodeColor");
     const defaultEdgeColor = settings("defaultEdgeColor");
