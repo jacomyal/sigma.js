@@ -24,12 +24,6 @@ export default sigma => {
     if (!(options.container instanceof HTMLElement))
       throw new Error("Container not found.");
 
-    let k;
-    let i;
-    let l;
-    let a;
-    let fn;
-    const _self = this;
     Dispatcher.extend(this);
 
     // Conrad related attributes:
@@ -87,11 +81,17 @@ export default sigma => {
 
     // Initialize captors:
     this.captors = [];
-    a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
-    for (i = 0, l = a.length; i < l; i++) {
-      fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
+    const captors = this.options.captors || [
+      sigma.captors.mouse,
+      sigma.captors.touch
+    ];
+    for (let i = 0; i < captors.length; i++) {
+      const Captor =
+        typeof captors[i] === "function"
+          ? captors[i]
+          : sigma.captors[captors[i]];
       this.captors.push(
-        new fn(this.domElements.mouse, this.camera, this.settings)
+        new Captor(this.domElements.mouse, this.camera, this.settings)
       );
     }
 
@@ -122,7 +122,6 @@ export default sigma => {
     let a;
     let i;
     let l;
-    let k;
     let type;
     let renderer;
     const { graph } = this;
@@ -131,14 +130,20 @@ export default sigma => {
     const defaultNodeType = this.settings(options, "defaultNodeType");
 
     // Empty float arrays:
-    for (k in this.nodeFloatArrays) delete this.nodeFloatArrays[k];
-    for (k in this.edgeFloatArrays) delete this.edgeFloatArrays[k];
-    for (k in this.edgeIndicesArrays) delete this.edgeIndicesArrays[k];
+    Object.keys(this.nodeFloatArrays).forEach(
+      k => delete this.nodeFloatArrays[k]
+    );
+    Object.keys(this.edgeFloatArrays).forEach(
+      k => delete this.edgeFloatArrays[k]
+    );
+    Object.keys(this.edgeFloatArrays).forEach(
+      k => delete this.edgeFloatArrays[k]
+    );
 
     // Sort edges and nodes per types:
     for (a = graph.edges(), i = 0, l = a.length; i < l; i++) {
       type = a[i].type || defaultEdgeType;
-      k = type && sigma.webgl.edges[type] ? type : "def";
+      const k = type && sigma.webgl.edges[type] ? type : "def";
 
       if (!this.edgeFloatArrays[k])
         this.edgeFloatArrays[k] = {
@@ -150,7 +155,7 @@ export default sigma => {
 
     for (a = graph.nodes(), i = 0, l = a.length; i < l; i++) {
       type = a[i].type || defaultNodeType;
-      k = type && sigma.webgl.nodes[type] ? type : "def";
+      const k = type && sigma.webgl.nodes[type] ? type : "def";
 
       if (!this.nodeFloatArrays[k])
         this.nodeFloatArrays[k] = {
@@ -161,7 +166,7 @@ export default sigma => {
     }
 
     // Push edges:
-    for (k in this.edgeFloatArrays) {
+    Object.keys(this.edgeFloatArrays).forEach(k => {
       renderer = sigma.webgl.edges[k];
       a = this.edgeFloatArrays[k].edges;
 
@@ -192,10 +197,10 @@ export default sigma => {
         this.edgeIndicesArrays[k] = renderer.computeIndices(
           this.edgeFloatArrays[k].array
         );
-    }
+    });
 
     // Push nodes:
-    for (k in this.nodeFloatArrays) {
+    Object.keys(this.nodeFloatArrays).forEach(k => {
       renderer = sigma.webgl.nodes[k];
       a = this.nodeFloatArrays[k].nodes;
 
@@ -220,7 +225,7 @@ export default sigma => {
             this.settings
           );
       }
-    }
+    });
 
     return this;
   };
@@ -237,15 +242,7 @@ export default sigma => {
    * @return {WebGLRenderer}        Returns the instance itself.
    */
   WebGLRenderer.prototype.render = function render(params) {
-    let a;
-    let i;
-    let l;
-    let k;
-    let o;
-    let program;
-    let renderer;
     const self = this;
-    const { graph } = this;
     const nodesGl = this.contexts.nodes;
     const edgesGl = this.contexts.edges;
     let matrix = this.camera.getMatrix();
@@ -268,40 +265,33 @@ export default sigma => {
     matrix = multiply(matrix, translation(this.width / 2, this.height / 2));
 
     // Kill running jobs:
-    for (k in this.jobs) if (conrad.hasJob(k)) conrad.killJob(k);
+    Object.keys(this.jobs).forEach(k => {
+      if (conrad.hasJob(k)) conrad.killJob(k);
+    });
 
     if (drawEdges) {
       if (this.settings(options, "batchEdgesDrawing"))
-        (function() {
-          let a;
-          let k;
-          let i;
-          let id;
-          let job;
+        (function batch() {
           let arr;
           let end;
           let start;
-          let indices;
-          let renderer;
-          let batchSize;
-          let currentProgram;
 
-          id = `edges_${this.conradId}`;
-          batchSize = this.settings(options, "webglEdgesBatchSize");
-          a = Object.keys(this.edgeFloatArrays);
+          const edgeBatchId = `edges_${this.conradId}`;
+          const batchSize = this.settings(options, "webglEdgesBatchSize");
+          const a = Object.keys(this.edgeFloatArrays);
 
           if (!a.length) return;
-          i = 0;
-          renderer = sigma.webgl.edges[a[i]];
+          let i = 0;
+          const renderer = sigma.webgl.edges[a[i]];
           arr = this.edgeFloatArrays[a[i]].array;
-          indices = this.edgeIndicesArrays[a[i]];
+          const indices = this.edgeIndicesArrays[a[i]];
           start = 0;
           end = Math.min(
             start + batchSize * renderer.POINTS,
             arr.length / renderer.ATTRIBUTES
           );
 
-          job = function() {
+          const job = () => {
             // Check program:
             if (!this.edgePrograms[a[i]])
               this.edgePrograms[a[i]] = renderer.initProgram(edgesGl);
@@ -323,36 +313,36 @@ export default sigma => {
 
             // Catch job's end:
             if (end >= arr.length / renderer.ATTRIBUTES && i === a.length - 1) {
-              delete this.jobs[id];
+              delete this.jobs[edgeBatchId];
               return false;
             }
 
             if (end >= arr.length / renderer.ATTRIBUTES) {
               i++;
               arr = this.edgeFloatArrays[a[i]].array;
-              renderer = sigma.webgl.edges[a[i]];
+              const r = sigma.webgl.edges[a[i]];
               start = 0;
               end = Math.min(
-                start + batchSize * renderer.POINTS,
-                arr.length / renderer.ATTRIBUTES
+                start + batchSize * r.POINTS,
+                arr.length / r.ATTRIBUTES
               );
             } else {
               start = end;
               end = Math.min(
-                start + batchSize * renderer.POINTS,
-                arr.length / renderer.ATTRIBUTES
+                start + batchSize * r.POINTS,
+                arr.length / r.ATTRIBUTES
               );
             }
 
             return true;
           };
 
-          this.jobs[id] = job;
-          conrad.addJob(id, job.bind(this));
+          this.jobs[edgeBatchId] = job;
+          conrad.addJob(edgeBatchId, job);
         }.call(this));
       else {
-        for (k in this.edgeFloatArrays) {
-          renderer = sigma.webgl.edges[k];
+        Object.keys(this.edgeFloatArrays).forEach(k => {
+          const renderer = sigma.webgl.edges[k];
 
           // Check program:
           if (!this.edgePrograms[k])
@@ -376,7 +366,7 @@ export default sigma => {
               }
             );
           }
-        }
+        });
       }
     }
 
@@ -385,8 +375,8 @@ export default sigma => {
       nodesGl.blendFunc(nodesGl.SRC_ALPHA, nodesGl.ONE_MINUS_SRC_ALPHA);
       nodesGl.enable(nodesGl.BLEND);
 
-      for (k in this.nodeFloatArrays) {
-        renderer = sigma.webgl.nodes[k];
+      Object.keys(this.nodeFloatArrays).forEach(k => {
+        const renderer = sigma.webgl.nodes[k];
 
         // Check program:
         if (!this.nodePrograms[k])
@@ -409,10 +399,10 @@ export default sigma => {
             }
           );
         }
-      }
+      });
     }
 
-    a = this.camera.quadtree.area(
+    const a = this.camera.quadtree.area(
       this.camera.getRectangle(this.width, this.height)
     );
 
@@ -425,7 +415,7 @@ export default sigma => {
     });
 
     if (drawLabels) {
-      o = function(key) {
+      const o = key => {
         return self.settings(
           {
             prefix: self.camera.prefix
@@ -434,7 +424,7 @@ export default sigma => {
         );
       };
 
-      for (i = 0, l = a.length; i < l; i++)
+      for (let i = 0; i < a.length; i++)
         if (!a[i].hidden)
           (sigma.canvas.labels[
             a[i].type || this.settings(options, "defaultNodeType")
@@ -457,10 +447,7 @@ export default sigma => {
    * @param  {?boolean} webgl Will init the WebGL context if true.
    */
   WebGLRenderer.prototype.initDOM = function initDOM(tag, id, webgl) {
-    let gl;
-
     const dom = document.createElement(tag);
-
     const self = this;
 
     dom.style.position = "absolute";
@@ -478,17 +465,13 @@ export default sigma => {
       if (webgl) {
         dom.addEventListener(
           "webglcontextlost",
-          function(e) {
-            e.preventDefault();
-          },
+          e => e.preventDefault(),
           false
         );
 
         dom.addEventListener(
           "webglcontextrestored",
-          function(e) {
-            self.render();
-          },
+          () => self.render(),
           false
         );
       }
@@ -504,7 +487,6 @@ export default sigma => {
    * @return {WebGLRenderer}        Returns the instance itself.
    */
   WebGLRenderer.prototype.resize = function resize(w, h) {
-    let k;
     const oldWidth = this.width;
     const oldHeight = this.height;
     const pixelRatio = getPixelRatio();
@@ -521,7 +503,7 @@ export default sigma => {
     }
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
-      for (k in this.domElements) {
+      Object.keys(this.domElements).forEach(k => {
         this.domElements[k].style.width = `${w}px`;
         this.domElements[k].style.height = `${h}px`;
 
@@ -544,11 +526,11 @@ export default sigma => {
             );
           }
         }
-      }
+      });
     }
 
     // Scale:
-    for (k in this.contexts)
+    Object.keys(this.contexts).forEach(k => {
       if (this.contexts[k] && this.contexts[k].viewport)
         this.contexts[k].viewport(
           0,
@@ -556,6 +538,7 @@ export default sigma => {
           this.width * this.settings("webglOversamplingRatio"),
           this.height * this.settings("webglOversamplingRatio")
         );
+    });
 
     return this;
   };
@@ -565,7 +548,7 @@ export default sigma => {
    *
    * @return {WebGLRenderer} Returns the instance itself.
    */
-  WebGLRenderer.prototype.clear = function() {
+  WebGLRenderer.prototype.clear = function clear() {
     this.contexts.labels.clearRect(0, 0, this.width, this.height);
     this.contexts.nodes.clear(this.contexts.nodes.COLOR_BUFFER_BIT);
     this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
@@ -576,20 +559,20 @@ export default sigma => {
   /**
    * This method kills contexts and other attributes.
    */
-  WebGLRenderer.prototype.kill = function() {
-    let k;
+  WebGLRenderer.prototype.kill = function kill() {
     let captor;
 
     // Kill captors:
+    // eslint-disable-next-line no-cond-assign
     while ((captor = this.captors.pop())) captor.kill();
     delete this.captors;
 
     // Kill contexts:
-    for (k in this.domElements) {
+    Object.keys(this.domElements).forEach(k => {
       this.domElements[k].parentNode.removeChild(this.domElements[k]);
       delete this.domElements[k];
       delete this.contexts[k];
-    }
+    });
     delete this.domElements;
     delete this.contexts;
   };
