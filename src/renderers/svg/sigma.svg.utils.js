@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.svg.utils");
 
   /**
@@ -25,4 +25,4 @@
       return this;
     }
   };
-})();
+}

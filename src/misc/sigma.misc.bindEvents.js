@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -532,4 +532,4 @@
     for (i = 0, l = this.captors.length; i < l; i++)
       bindCaptor(this.captors[i]);
   };
-}.call(this));
+}

@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.webgl.edges");
 
   /**
@@ -264,4 +264,4 @@
       return program;
     }
   };
-})();
+}

@@ -1,4 +1,4 @@
-(function(global) {
+export default function configure(sigma, global) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -21,4 +21,4 @@
 
   // Copy the good renderer:
   sigma.renderers.def = webgl ? sigma.renderers.webgl : sigma.renderers.canvas;
-})(this);
+}

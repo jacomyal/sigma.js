@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   /**
    * This utils aims to facilitate the manipulation of each instance setting.
    * Using a function instead of an object brings two main advantages: First,
@@ -95,16 +95,6 @@
     return settings;
   };
 
-  /**
-   * EXPORT:
-   * *******
-   */
-  if (typeof this.sigma !== "undefined") {
-    this.sigma.classes = this.sigma.classes || {};
-    this.sigma.classes.configurable = configurable;
-  } else if (typeof exports !== "undefined") {
-    if (typeof module !== "undefined" && module.exports)
-      exports = module.exports = configurable;
-    exports.configurable = configurable;
-  } else this.configurable = configurable;
-}.call(this));
+  sigma.classes = sigma.classes || {};
+  sigma.classes.configurable = configurable;
+}

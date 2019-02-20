@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   const _methods = Object.create(null);
 
   const _indexes = Object.create(null);
@@ -856,12 +856,6 @@
    * EXPORT:
    * *******
    */
-  if (typeof sigma !== "undefined") {
-    sigma.classes = sigma.classes || Object.create(null);
-    sigma.classes.graph = graph;
-  } else if (typeof exports !== "undefined") {
-    if (typeof module !== "undefined" && module.exports)
-      exports = module.exports = graph;
-    exports.graph = graph;
-  } else this.graph = graph;
-}.call(this));
+  sigma.classes = sigma.classes || Object.create(null);
+  sigma.classes.graph = graph;
+}

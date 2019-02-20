@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -714,4 +714,4 @@
    * node, the renderer and a settings function.
    */
   sigma.utils.pkg("sigma.canvas.labels");
-}.call(this));
+}

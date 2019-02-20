@@ -17,7 +17,9 @@
     "lint": "echo TODO: Lint",
     "eslint": "eslint .",
     "prettify_all": "prettier {src,test,plugins}/**/*.js --write",
-    "prepublish": "grunt npmPrePublish"
+    "prepublish": "grunt npmPrePublish",
+    "ru_build": "rollup -c",
+    "ru_dev": "rollup -c -w"
   },
   "devDependencies": {
     "eslint": "5.3.0",
@@ -37,6 +39,9 @@
     "lint-staged": "^8.1.4",
     "load-grunt-tasks": "~0.6.0",
     "prettier": "^1.16.4",
+    "rollup": "^1.2.2",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
     "uglify-js": "^2.4.15"
   },
   "husky": {
@@ -75,6 +80,7 @@
     }
   },
   "dependencies": {
+    "conrad": "^0.1.0",
     "eslint-config-prettier": "^4.0.0",
     "qunit": "^2.9.1"
   }
