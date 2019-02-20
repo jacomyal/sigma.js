@@ -13,12 +13,11 @@
   "scripts": {
     "start": "http-server -p 8000",
     "test": "grunt travis",
-    "build": "grunt build",
+    "build": "rollup -c",
     "lint": "eslint .",
     "prettify_all": "prettier {src,test,plugins}/**/*.js --write",
     "prepublish": "grunt npmPrePublish",
-    "ru_build": "rollup -c",
-    "ru_dev": "rollup -c -w"
+    "rollup_dev": "rollup -c -w"
   },
   "devDependencies": {
     "eslint": "5.3.0",

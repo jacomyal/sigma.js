@@ -43,9 +43,9 @@ import translation from "./domain/utils/matrices/translation";
 import rotation from "./domain/utils/matrices/rotation";
 import scale from "./domain/utils/matrices/scale";
 import multiply from "./domain/utils/matrices/multiply";
-import EdgeQuad from "./domain/classes/EdgeQuad/index";
+import EdgeQuad from "./domain/classes/EdgeQuad";
 import Graph from "./domain/classes/Graph";
-import Quad from "./domain/classes/Quad/index";
+import Quad from "./domain/classes/Quad";
 import edgeHoversArrowCanvas from "./domain/renderers/canvas/edgeHoversArrow";
 import edgeHoversCurveCanvas from "./domain/renderers/canvas/edgeHoversCurve";
 import edgeHoversCurvedArrowCanvas from "./domain/renderers/canvas/edgeHoversCurvedArrow";
@@ -78,6 +78,20 @@ import webglThickLineGPU from "./domain/renderers/webgl/thickLineGPU";
 import copy from "./domain/middleware/copy";
 import rescale from "./domain/middleware/rescale";
 import getBoundaries from "./domain/utils/geometry/getBoundaries";
+import lowerRightCoor from "./domain/utils/geometry/lowerRightCoor";
+import pointToSquare from "./domain/utils/geometry/pointToSquare";
+import isAxisAligned from "./domain/utils/geometry/isAxisAligned";
+import lowerLeftCoor from "./domain/utils/geometry/lowerLeftCoor";
+import rectangleCorners from "./domain/utils/geometry/rectangleCorners";
+import axisAlignedTopPoints from "./domain/utils/geometry/axisAlignedTopPoints";
+import splitSquare from "./domain/utils/geometry/splitSquare";
+import axis from "./domain/utils/geometry/axis";
+import projection from "./domain/utils/geometry/projection";
+import axisCollision from "./domain/utils/geometry/axisCollision";
+import collision from "./domain/utils/geometry/collision";
+import lineToSquare from "./domain/utils/geometry/lineToSquare";
+import quadraticCurveToSquare from "./domain/utils/geometry/quadraticCurveToSquare";
+import selfLoopToSquare from "./domain/utils/geometry/selfLoopToSquare";
 
 export default sigma => {
   /**
@@ -114,6 +128,20 @@ export default sigma => {
   );
   sigma.register("sigma.utils.isPointOnBezierCurve", isPointOnBezierCurve);
   sigma.register("sigma.utils.getBoundaries", getBoundaries);
+  sigma.register("sigma.utils.pointToSquare", pointToSquare);
+  sigma.register("sigma.utils.isAxisAligned", isAxisAligned);
+  sigma.register("sigma.utils.axisAlignedTopPoints", axisAlignedTopPoints);
+  sigma.register("sigma.utils.lowerLeftCoor", lowerLeftCoor);
+  sigma.register("sigma.utils.lowerRightCoor", lowerRightCoor);
+  sigma.register("sigma.utils.rectangleCorners", rectangleCorners);
+  sigma.register("sigma.utils.splitSquare", splitSquare);
+  sigma.register("sigma.utils.axis", axis);
+  sigma.register("sigma.utils.projection", projection);
+  sigma.register("sigma.utils.axisCollision", axisCollision);
+  sigma.register("sigma.utils.collision", collision);
+  sigma.register("sigma.utils.lineToSquare", lineToSquare);
+  sigma.register("sigma.utils.quadraticCurveToSquare", quadraticCurveToSquare);
+  sigma.register("sigma.utils.selfLoopToSquare", selfLoopToSquare);
 
   /**
    * Event Utilities

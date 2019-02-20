@@ -1,11 +1,9 @@
-import {
-  splitSquare,
-  collision,
-  pointToSquare,
-  isAxisAligned,
-  axisAlignedTopPoints,
-  rectangleCorners
-} from "./geometryUtil";
+import splitSquare from "../utils/geometry/splitSquare";
+import collision from "../utils/geometry/collision";
+import pointToSquare from "../utils/geometry/pointToSquare";
+import isAxisAligned from "../utils/geometry/isAxisAligned";
+import axisAlignedTopPoints from "../utils/geometry/axisAlignedTopPoints";
+import rectangleCorners from "../utils/geometry/rectangleCorners";
 
 /**
  * Creates the quadtree object itself.

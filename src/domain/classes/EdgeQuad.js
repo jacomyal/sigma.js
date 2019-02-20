@@ -1,14 +1,12 @@
-import getQuadraticControlPoint from "../../utils/geometry/getQuadraticControlPoint";
-import {
-  splitSquare,
-  collision,
-  selfLoopToSquare,
-  quadraticCurveToSquare,
-  lineToSquare,
-  isAxisAligned,
-  axisAlignedTopPoints,
-  rectangleCorners
-} from "./geometryUtils";
+import getQuadraticControlPoint from "../utils/geometry/getQuadraticControlPoint";
+import splitSquare from "../utils/geometry/splitSquare";
+import collision from "../utils/geometry/collision";
+import selfLoopToSquare from "../utils/geometry/selfLoopToSquare";
+import quadraticCurveToSquare from "../utils/geometry/quadraticCurveToSquare";
+import lineToSquare from "../utils/geometry/lineToSquare";
+import isAxisAligned from "../utils/geometry/isAxisAligned";
+import axisAlignedTopPoints from "../utils/geometry/axisAlignedTopPoints";
+import rectangleCorners from "../utils/geometry/rectangleCorners";
 
 /**
  * Sigma Quadtree Module for edges
