@@ -230,8 +230,6 @@ function Sigma(conf) {
 Sigma.prototype.addCamera = function addCamera(id) {
   const self = this;
 
-  let camera;
-
   if (!arguments.length) {
     id = 0;
     while (this.cameras[`${id}`]) id++;
@@ -241,7 +239,7 @@ Sigma.prototype.addCamera = function addCamera(id) {
   if (this.cameras[id])
     throw new Error(`sigma.addCamera: The camera "${id}" already exists.`);
 
-  camera = new Sigma.classes.camera(id, this.graph, this.settings);
+  const camera = new Sigma.classes.camera(id, this.graph, this.settings);
   this.cameras[id] = camera;
 
   // Add a quadtree to the camera:
@@ -252,12 +250,11 @@ Sigma.prototype.addCamera = function addCamera(id) {
     camera.edgequadtree = new Sigma.classes.edgequad();
   }
 
-  camera.bind("coordinatesUpdated", function(e) {
+  camera.bind("coordinatesUpdated", function onCoordinatesUpdated(e) {
     self.renderCamera(camera, camera.isAnimated);
   });
 
   this.renderersPerCamera[id] = [];
-
   return camera;
 };
 

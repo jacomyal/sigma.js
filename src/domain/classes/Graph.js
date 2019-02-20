@@ -1,7 +1,11 @@
 const _methods = Object.create(null);
+
 const _indexes = Object.create(null);
+
 const _initBindings = Object.create(null);
+
 const _methodBindings = Object.create(null);
+
 const _methodBeforeBindings = Object.create(null);
 
 const _defaultSettings = {
@@ -9,9 +13,9 @@ const _defaultSettings = {
   clone: true
 };
 
-function _defaultSettingsFunction(key) {
+const _defaultSettingsFunction = function(key) {
   return _defaultSettings[key];
-}
+};
 
 /**
  * The graph constructor. It initializes the data and the indexes, and binds
@@ -29,9 +33,13 @@ function _defaultSettingsFunction(key) {
  *                       immutable.
  *
  * @param  {?configurable} settings Eventually a settings function.
- * @return {Graph}                  The new graph instance.
+ * @return {graph}                  The new graph instance.
  */
-export default function Graph(settings) {
+const graph = function graph(settings) {
+  let k;
+  let fn;
+  let data;
+
   /**
    * DATA:
    * *****
@@ -39,7 +47,7 @@ export default function Graph(settings) {
    * object. This object will be served as context for all these methods,
    * and it is possible to add other type of data in it.
    */
-  const data = {
+  data = {
     /**
      * SETTINGS FUNCTION:
      * ******************
@@ -77,15 +85,15 @@ export default function Graph(settings) {
   };
 
   // Execute bindings:
-  for (let k in _initBindings) _initBindings[k].call(data);
+  for (k in _initBindings) _initBindings[k].call(data);
 
   // Add methods to both the scope and the data objects:
-  for (let k in _methods) {
-    let fn = __bindGraphMethod(k, data, _methods[k]);
+  for (k in _methods) {
+    fn = __bindGraphMethod(k, data, _methods[k]);
     this[k] = fn;
     data[k] = fn;
   }
-}
+};
 
 /**
  * A custom tool to bind methods such that function that are bound to it will
@@ -97,7 +105,7 @@ export default function Graph(settings) {
  * @return {function}            The new method.
  */
 function __bindGraphMethod(methodName, scope, fn) {
-  const result = () => {
+  const result = function() {
     let k;
     let res;
 
@@ -157,7 +165,7 @@ function __emptyObject(obj) {
  * @param  {function} fn         The method itself.
  * @return {object}              The global graph constructor.
  */
-Graph.addMethod = function addMethod(methodName, fn) {
+graph.addMethod = function(methodName, fn) {
   if (
     typeof methodName !== "string" ||
     typeof fn !== "function" ||
@@ -165,7 +173,7 @@ Graph.addMethod = function addMethod(methodName, fn) {
   )
     throw new Error("addMethod: Wrong arguments.");
 
-  if (_methods[methodName] || Graph[methodName])
+  if (_methods[methodName] || graph[methodName])
     throw new Error(`The method "${methodName}" already exists.`);
 
   _methods[methodName] = fn;
@@ -188,8 +196,8 @@ Graph.addMethod = function addMethod(methodName, fn) {
  * @param  {string}  methodName The name of the method.
  * @return {boolean}            The result.
  */
-Graph.hasMethod = function hasMethod(methodName) {
-  return !!(_methods[methodName] || Graph[methodName]);
+graph.hasMethod = function(methodName) {
+  return !!(_methods[methodName] || graph[methodName]);
 };
 
 /**
@@ -235,7 +243,7 @@ Graph.hasMethod = function hasMethod(methodName) {
  * @param  {boolean}  before     If true the function is called right before.
  * @return {object}              The global graph constructor.
  */
-Graph.attach = function attach(methodName, key, fn, before) {
+graph.attach = function(methodName, key, fn, before) {
   if (
     typeof methodName !== "string" ||
     typeof key !== "string" ||
@@ -274,7 +282,7 @@ Graph.attach = function attach(methodName, key, fn, before) {
 /**
  * Alias of attach(methodName, key, fn, true).
  */
-Graph.attachBefore = function attachBefore(methodName, key, fn) {
+graph.attachBefore = function(methodName, key, fn) {
   return this.attach(methodName, key, fn, true);
 };
 
@@ -287,7 +295,7 @@ Graph.attachBefore = function attachBefore(methodName, key, fn) {
  * in the current graph. It also adds a method to provide a getter on that
  * new index:
  *
- *  > Grapg.addIndex('nodesCount', {
+ *  > sigma.classes.graph.addIndex('nodesCount', {
  *  >   constructor: function() {
  *  >     this.nodesCount = 0;
  *  >   },
@@ -299,11 +307,11 @@ Graph.attachBefore = function attachBefore(methodName, key, fn) {
  *  >   }
  *  > });
  *  >
- *  > Grapg.addMethod('getNodesCount', function() {
+ *  > sigma.classes.graph.addMethod('getNodesCount', function() {
  *  >   return this.nodesCount;
  *  > });
  *  >
- *  > var myGraph = new Grapg();
+ *  > var myGraph = new sigma.classes.graph();
  *  > console.log(myGraph.getNodesCount()); // outputs 0
  *  >
  *  > myGraph.addNode({ id: '1' }).addNode({ id: '2' });
@@ -313,7 +321,7 @@ Graph.attachBefore = function attachBefore(methodName, key, fn) {
  * @param  {object} bindings The object containing the functions to bind.
  * @return {object}          The global graph constructor.
  */
-Graph.addIndex = function addIndex(name, bindings) {
+graph.addIndex = function(name, bindings) {
   if (
     typeof name !== "string" ||
     Object(bindings) !== bindings ||
@@ -332,7 +340,7 @@ Graph.addIndex = function addIndex(name, bindings) {
   for (k in bindings)
     if (typeof bindings[k] !== "function")
       throw new Error("The bindings must be functions.");
-    else Graph.attach(k, name, bindings[k]);
+    else graph.attach(k, name, bindings[k]);
 
   return this;
 };
@@ -349,7 +357,7 @@ Graph.addIndex = function addIndex(name, bindings) {
  * @param  {object} node The node to add.
  * @return {object}      The graph instance.
  */
-Graph.addMethod("addNode", function addMethod(node) {
+graph.addMethod("addNode", function(node) {
   // Check that the node is an object and has an id:
   if (Object(node) !== node || arguments.length !== 1)
     throw new Error("addNode: Wrong arguments.");
@@ -410,7 +418,7 @@ Graph.addMethod("addNode", function addMethod(node) {
  * @param  {object} edge The edge to add.
  * @return {object}      The graph instance.
  */
-Graph.addMethod("addEdge", function addEdge(edge) {
+graph.addMethod("addEdge", function(edge) {
   // Check that the edge is an object and has an id:
   if (Object(edge) !== edge || arguments.length !== 1)
     throw new Error("addEdge: Wrong arguments.");
@@ -521,7 +529,7 @@ Graph.addMethod("addEdge", function addEdge(edge) {
  * @param  {string} id The node id.
  * @return {object}    The graph instance.
  */
-Graph.addMethod("dropNode", function dropNode(id) {
+graph.addMethod("dropNode", function(id) {
   // Check that the arguments are valid:
   if (
     (typeof id !== "string" && typeof id !== "number") ||
@@ -573,7 +581,7 @@ Graph.addMethod("dropNode", function dropNode(id) {
  * @param  {string} id The edge id.
  * @return {object}    The graph instance.
  */
-Graph.addMethod("dropEdge", function dropEdge(id) {
+graph.addMethod("dropEdge", function(id) {
   // Check that the arguments are valid:
   if (
     (typeof id !== "string" && typeof id !== "number") ||
@@ -626,7 +634,7 @@ Graph.addMethod("dropEdge", function dropEdge(id) {
  * This method destroys the current instance. It basically empties each index
  * and methods attached to the graph.
  */
-Graph.addMethod("kill", function kill() {
+graph.addMethod("kill", function() {
   // Delete arrays:
   this.nodesArray.length = 0;
   this.edgesArray.length = 0;
@@ -650,7 +658,7 @@ Graph.addMethod("kill", function kill() {
  *
  * @return {object} The graph instance.
  */
-Graph.addMethod("clear", function clear() {
+graph.addMethod("clear", function() {
   this.nodesArray.length = 0;
   this.edgesArray.length = 0;
 
@@ -699,7 +707,7 @@ Graph.addMethod("clear", function clear() {
  * @param  {object} g The graph object.
  * @return {object}   The graph instance.
  */
-Graph.addMethod("read", function read(g) {
+graph.addMethod("read", function(g) {
   let i;
   let a;
   let l;
@@ -724,7 +732,7 @@ Graph.addMethod("read", function read(g) {
  * @param  {?(string|array)} v Eventually one id, an array of ids.
  * @return {object|array}      The related node or array of nodes.
  */
-Graph.addMethod("nodes", function nodes(v) {
+graph.addMethod("nodes", function(v) {
   // Clone the array of nodes and return it:
   if (!arguments.length) return this.nodesArray.slice(0);
 
@@ -741,8 +749,11 @@ Graph.addMethod("nodes", function nodes(v) {
     Object.prototype.toString.call(v) === "[object Array]"
   ) {
     let i;
+
     let l;
+
     const a = [];
+
     for (i = 0, l = v.length; i < l; i++)
       if (typeof v[i] === "string" || typeof v[i] === "number")
         a.push(this.nodesIndex[v[i]]);
@@ -764,7 +775,7 @@ Graph.addMethod("nodes", function nodes(v) {
  *                              'out', and by default the normal degree.
  * @return {number|array}       The related degree or array of degrees.
  */
-Graph.addMethod("degree", function degree(v, which) {
+graph.addMethod("degree", function(v, which) {
   // Check which degree is required:
   which =
     {
@@ -805,7 +816,7 @@ Graph.addMethod("degree", function degree(v, which) {
  * @param  {?(string|array)} v Eventually one id, an array of ids.
  * @return {object|array}      The related edge or array of edges.
  */
-Graph.addMethod("edges", function edges(v) {
+graph.addMethod("edges", function(v) {
   // Clone the array of edges and return it:
   if (!arguments.length) return this.edgesArray.slice(0);
 
@@ -837,3 +848,4 @@ Graph.addMethod("edges", function edges(v) {
 
   throw new Error("edges: Wrong arguments.");
 });
+export default graph;

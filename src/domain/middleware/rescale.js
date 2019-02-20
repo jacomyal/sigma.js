@@ -26,7 +26,8 @@ export default function rescale(readPrefix, writePrefix, options) {
   const bounds =
     settings("bounds") || getBoundaries(this.graph, readPrefix, true);
 
-  const { minX, minY, maxX, maxY, sizeMax, weightMax } = bounds;
+  let { minX, minY, maxX, maxY } = bounds;
+  const { sizeMax, weightMax } = bounds;
   const w = settings("width") || 1;
   const h = settings("height") || 1;
 
