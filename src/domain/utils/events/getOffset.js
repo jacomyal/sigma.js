@@ -6,7 +6,6 @@
  */
 export default function getOffset(dom) {
   let left = 0;
-
   let top = 0;
 
   while (dom) {

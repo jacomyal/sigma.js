@@ -1,3 +1,4 @@
+/* eslint-disable no-cond-assign, no-return-assign */
 export function linearNone(k) {
   return k;
 }

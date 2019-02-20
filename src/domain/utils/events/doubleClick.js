@@ -8,24 +8,17 @@
 export default sigma =>
   function doubleClick(target, type, callback) {
     let clicks = 0;
-
-    const self = this;
-
-    let handlers;
-
     target._doubleClickHandler = target._doubleClickHandler || {};
     target._doubleClickHandler[type] = target._doubleClickHandler[type] || [];
-    handlers = target._doubleClickHandler[type];
+    const handlers = target._doubleClickHandler[type];
 
-    handlers.push(function(e) {
+    handlers.push(e => {
       clicks++;
-
       if (clicks === 2) {
         clicks = 0;
-        return callback(e);
-      }
-      if (clicks === 1) {
-        setTimeout(function() {
+        callback(e);
+      } else if (clicks === 1) {
+        setTimeout(() => {
           clicks = 0;
         }, sigma.settings.doubleClickTimeout);
       }

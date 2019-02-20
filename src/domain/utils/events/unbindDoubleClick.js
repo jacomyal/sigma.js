@@ -5,12 +5,11 @@
  * @param  {string}      type     The event type.
  */
 export default function unbindDoubleClick(target, type) {
-  let handler;
-
   const handlers = (target._doubleClickHandler || {})[type] || [];
-
-  while ((handler = handlers.pop())) {
+  let handler = handlers.pop();
+  while (handler) {
     target.removeEventListener(type, handler);
+    handler = handlers.pop();
   }
 
   delete (target._doubleClickHandler || {})[type];

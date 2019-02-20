@@ -1,8 +1,6 @@
 export default function getBoundaries(graph, prefix, doEdges) {
-  let i;
-  let l;
-  const e = graph.edges();
-  const n = graph.nodes();
+  const edges = graph.edges();
+  const nodes = graph.nodes();
   let weightMax = -Infinity;
   let sizeMax = -Infinity;
   let minX = Infinity;
@@ -10,17 +8,19 @@ export default function getBoundaries(graph, prefix, doEdges) {
   let maxX = -Infinity;
   let maxY = -Infinity;
 
-  if (doEdges)
-    for (i = 0, l = e.length; i < l; i++)
-      weightMax = Math.max(e[i][`${prefix}size`], weightMax);
-
-  for (i = 0, l = n.length; i < l; i++) {
-    sizeMax = Math.max(n[i][`${prefix}size`], sizeMax);
-    maxX = Math.max(n[i][`${prefix}x`], maxX);
-    minX = Math.min(n[i][`${prefix}x`], minX);
-    maxY = Math.max(n[i][`${prefix}y`], maxY);
-    minY = Math.min(n[i][`${prefix}y`], minY);
+  if (doEdges) {
+    edges.forEach(edge => {
+      weightMax = Math.max(edge[`${prefix}size`], weightMax);
+    });
   }
+
+  nodes.forEach(node => {
+    sizeMax = Math.max(node[`${prefix}size`], sizeMax);
+    maxX = Math.max(node[`${prefix}x`], maxX);
+    minX = Math.min(node[`${prefix}x`], minX);
+    maxY = Math.max(node[`${prefix}y`], maxY);
+    minY = Math.min(node[`${prefix}y`], minY);
+  });
 
   weightMax = weightMax || 1;
   sizeMax = sizeMax || 1;
