@@ -105,19 +105,12 @@ export default {
   render(gl, program, data, params) {
     // Define attributes:
     const position1Location = gl.getAttribLocation(program, "a_position1");
-
     const position2Location = gl.getAttribLocation(program, "a_position2");
-
     const directionLocation = gl.getAttribLocation(program, "a_direction");
-
     const thicknessLocation = gl.getAttribLocation(program, "a_thickness");
-
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const ratioLocation = gl.getUniformLocation(program, "u_ratio");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
     // Creating buffer:
