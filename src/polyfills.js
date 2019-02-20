@@ -1,3 +1,5 @@
+/* eslint-disable no-extend-native, prefer-rest-params */
+
 /**
  * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
  * http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
@@ -19,15 +21,12 @@ for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
 }
 
 if (!global.requestAnimationFrame)
-  global.requestAnimationFrame = function requestAnimationFrame(
-    callback,
-    element
-  ) {
+  global.requestAnimationFrame = function requestAnimationFrame(callback) {
     const currTime = new Date().getTime();
 
     const timeToCall = Math.max(0, 16 - (currTime - lastTime));
 
-    const id = global.setTimeout(function() {
+    const id = global.setTimeout(function cb() {
       callback(currTime + timeToCall);
     }, timeToCall);
 
@@ -55,20 +54,15 @@ if (!Function.prototype.bind)
       );
 
     const aArgs = Array.prototype.slice.call(arguments, 1);
-
     const fToBind = this;
 
-    let fNOP;
-
-    let fBound;
-
-    fNOP = function() {};
-    fBound = function() {
+    function fNOP() {}
+    function fBound() {
       return fToBind.apply(
         this instanceof fNOP && oThis ? this : oThis,
         aArgs.concat(Array.prototype.slice.call(arguments))
       );
-    };
+    }
 
     fNOP.prototype = this.prototype;
     fBound.prototype = new fNOP();

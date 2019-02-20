@@ -1,3 +1,4 @@
+/* eslint-disable no-global-assign */
 // Hardcoded export for the node.js version:
 const { sigma } = this;
 

@@ -76,7 +76,8 @@
       "no-underscore-dangle": "off",
       "no-plusplus": "off",
       "no-multi-assign": "off",
-      "no-param-reassign": "off"
+      "no-param-reassign": "off",
+      "no-console": "off"
     }
   },
   "dependencies": {

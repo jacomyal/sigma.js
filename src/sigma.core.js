@@ -329,6 +329,7 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
     id = 0;
     while (this.renderers[`${id}`]) id++;
     id = `${id}`;
+    // eslint-disable-next-line prefer-destructuring
   } else id = o.id;
 
   if (this.renderers[id])
