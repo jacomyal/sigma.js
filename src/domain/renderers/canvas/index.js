@@ -96,12 +96,10 @@ export default sigma => {
     let i;
     let l;
     let o;
-    let id;
     let end;
     let start;
     let edges;
     let renderers;
-    let rendererType;
     let batchSize;
     let tempGCO;
     const index = {};
@@ -164,7 +162,7 @@ export default sigma => {
 
       // If the "batchEdgesDrawing" settings is true, edges are batched:
       if (this.settings(options, "batchEdgesDrawing")) {
-        id = `edges_${this.conradId}`;
+        let id = `edges_${this.conradId}`;
         batchSize = embedSettings("canvasEdgesBatchSize");
 
         edges = this.edgesOnScreen;
@@ -332,7 +330,7 @@ export default sigma => {
     }
 
     if (oldWidth !== this.width || oldHeight !== this.height) {
-      for (k in this.domElements) {
+      Object.keys(this.domElements).forEach(k => {
         this.domElements[k].style.width = `${w}px`;
         this.domElements[k].style.height = `${h}px`;
 
@@ -342,7 +340,7 @@ export default sigma => {
 
           if (pixelRatio !== 1) this.contexts[k].scale(pixelRatio, pixelRatio);
         }
-      }
+      });
     }
 
     return this;
@@ -354,9 +352,9 @@ export default sigma => {
    * @return {Canvas} Returns the instance itself.
    */
   CanvasRenderer.prototype.clear = function clear() {
-    for (const k in this.contexts) {
+    Object.keys(this.contexts).forEach(k => {
       this.contexts[k].clearRect(0, 0, this.width, this.height);
-    }
+    });
 
     return this;
   };
@@ -365,19 +363,19 @@ export default sigma => {
    * This method kills contexts and other attributes.
    */
   CanvasRenderer.prototype.kill = function kill() {
-    let k;
     let captor;
 
     // Kill captors:
+    // eslint-disable-next-line no-cond-assign
     while ((captor = this.captors.pop())) captor.kill();
     delete this.captors;
 
     // Kill contexts:
-    for (k in this.domElements) {
+    Object.keys(this.domElements).forEach(k => {
       this.domElements[k].parentNode.removeChild(this.domElements[k]);
       delete this.domElements[k];
       delete this.contexts[k];
-    }
+    });
     delete this.domElements;
     delete this.contexts;
   };

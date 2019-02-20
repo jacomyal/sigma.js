@@ -45,7 +45,7 @@ import scale from "./domain/utils/matrices/scale";
 import multiply from "./domain/utils/matrices/multiply";
 import EdgeQuad from "./domain/classes/EdgeQuad/index";
 import Graph from "./domain/classes/Graph";
-import Quad from "./domain/classes/Quad";
+import Quad from "./domain/classes/Quad/index";
 import edgeHoversArrowCanvas from "./domain/renderers/canvas/edgeHoversArrow";
 import edgeHoversCurveCanvas from "./domain/renderers/canvas/edgeHoversCurve";
 import edgeHoversCurvedArrowCanvas from "./domain/renderers/canvas/edgeHoversCurvedArrow";

@@ -12,7 +12,6 @@ QUnit.test("EdgeQuadTree", assert => {
   // Instanciation
   //---------------
   const quad = new sigma.classes.edgequad();
-
   const geom = quad._geom;
 
   // Geometry

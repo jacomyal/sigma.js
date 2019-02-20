@@ -19,7 +19,6 @@ export default function rescale(readPrefix, writePrefix, options) {
   let c;
   let d;
   let scale;
-  let margin;
   const n = this.graph.nodes();
   const e = this.graph.edges();
   const settings = this.settings.embedObjects(options || {});
@@ -72,7 +71,7 @@ export default function rescale(readPrefix, writePrefix, options) {
    * biggest node to the X and Y values, we have to first get an
    * approximation of the scaling ratio.
    * */
-  margin =
+  const margin =
     (settings("rescaleIgnoreSize")
       ? 0
       : (settings("maxNodeSize") || sizeMax) / scale) +

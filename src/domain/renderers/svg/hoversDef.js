@@ -60,8 +60,6 @@ export default {
 
       // Measures
       // OPTIMIZE: Find a better way than a measurement canvas
-      x = Math.round(node[`${prefix}x`] - fontSize / 2 - 2);
-      y = Math.round(node[`${prefix}y`] - fontSize / 2 - 2);
       w = Math.round(
         measurementCanvas.measureText(node.label).width +
           fontSize / 2 +

@@ -265,7 +265,6 @@ function _quadRetrieveArea(rectData, quad, collisionFunc, els) {
  * The edgequad core that will become the sigma interface with the quadtree.
  *
  * property {object} _tree     Property holding the quadtree object.
- * property {object} _geom     Exposition of the _geom namespace for testing.
  * property {object} _cache    Cache for the area method.
  * property {boolean} _enabled Can index and retreive elements.
  */
@@ -402,7 +401,7 @@ EdgeQuad.prototype.area = function area(rect) {
     : [];
 
   // Object to array
-  const edgesArray = edges.map(e => e);
+  const edgesArray = Object.keys(edges).map(e => edges[e]);
 
   // Caching
   this._cache.query = serialized;
