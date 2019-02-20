@@ -162,7 +162,7 @@ export default sigma => {
 
       // If the "batchEdgesDrawing" settings is true, edges are batched:
       if (this.settings(options, "batchEdgesDrawing")) {
-        let id = `edges_${this.conradId}`;
+        const edgeJobId = `edges_${this.conradId}`;
         batchSize = embedSettings("canvasEdgesBatchSize");
 
         edges = this.edgesOnScreen;
@@ -211,7 +211,7 @@ export default sigma => {
 
           // Catch job's end:
           if (end === edges.length) {
-            delete this.jobs[id];
+            delete this.jobs[edgeJobId];
             return false;
           }
 
@@ -220,8 +220,8 @@ export default sigma => {
           return true;
         };
 
-        this.jobs[id] = job;
-        conrad.addJob(id, job);
+        this.jobs[edgeJobId] = job;
+        conrad.addJob(edgeJobId, job);
 
         // If not, they are drawn in one frame:
       } else {
@@ -290,17 +290,17 @@ export default sigma => {
    * @param  {string} tag The label tag.
    * @param  {string} id  The id of the element (to store it in "domElements").
    */
-  CanvasRenderer.prototype.initDOM = function initDOM(tag, id) {
+  CanvasRenderer.prototype.initDOM = function initDOM(tag, elementId) {
     const dom = document.createElement(tag);
 
     dom.style.position = "absolute";
-    dom.setAttribute("class", `sigma-${id}`);
+    dom.setAttribute("class", `sigma-${elementId}`);
 
-    this.domElements[id] = dom;
+    this.domElements[elementId] = dom;
     this.container.appendChild(dom);
 
     if (tag.toLowerCase() === "canvas")
-      this.contexts[id] = dom.getContext("2d");
+      this.contexts[elementId] = dom.getContext("2d");
   };
 
   /**
@@ -312,8 +312,6 @@ export default sigma => {
    * @return {Canvas}        Returns the instance itself.
    */
   CanvasRenderer.prototype.resize = function resize(w, h) {
-    let k;
-
     const oldWidth = this.width;
     const oldHeight = this.height;
     const pixelRatio = getPixelRatio();

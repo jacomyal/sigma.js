@@ -329,8 +329,8 @@ export default sigma => {
             } else {
               start = end;
               end = Math.min(
-                start + batchSize * r.POINTS,
-                arr.length / r.ATTRIBUTES
+                start + batchSize * renderer.POINTS,
+                arr.length / renderer.ATTRIBUTES
               );
             }
 
@@ -446,20 +446,23 @@ export default sigma => {
    *                          "domElements").
    * @param  {?boolean} webgl Will init the WebGL context if true.
    */
-  WebGLRenderer.prototype.initDOM = function initDOM(tag, id, webgl) {
+  WebGLRenderer.prototype.initDOM = function initDOM(tag, elementId, webgl) {
     const dom = document.createElement(tag);
     const self = this;
 
     dom.style.position = "absolute";
-    dom.setAttribute("class", `sigma-${id}`);
+    dom.setAttribute("class", `sigma-${elementId}`);
 
-    this.domElements[id] = dom;
+    this.domElements[elementId] = dom;
     this.container.appendChild(dom);
 
     if (tag.toLowerCase() === "canvas") {
-      this.contexts[id] = dom.getContext(webgl ? "experimental-webgl" : "2d", {
-        preserveDrawingBuffer: true
-      });
+      this.contexts[elementId] = dom.getContext(
+        webgl ? "experimental-webgl" : "2d",
+        {
+          preserveDrawingBuffer: true
+        }
+      );
 
       // Adding webgl context loss listeners
       if (webgl) {

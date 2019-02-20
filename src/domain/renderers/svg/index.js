@@ -19,10 +19,6 @@ export default sigma => {
     if (!(options.container instanceof HTMLElement))
       throw new Error("Container not found.");
 
-    let i;
-    let l;
-    let a;
-    let fn;
     const self = this;
     Dispatcher.extend(this);
 
@@ -63,13 +59,17 @@ export default sigma => {
 
     // Initialize captors:
     this.captors = [];
-    a = this.options.captors || [sigma.captors.mouse, sigma.captors.touch];
-    for (i = 0, l = a.length; i < l; i++) {
-      fn = typeof a[i] === "function" ? a[i] : sigma.captors[a[i]];
+    const captors = this.options.captors || [
+      sigma.captors.mouse,
+      sigma.captors.touch
+    ];
+    captors.forEach(captor => {
+      const Captor =
+        typeof captor === "function" ? captor : sigma.captors[captor];
       this.captors.push(
-        new fn(this.domElements.graph, this.camera, this.settings)
+        new Captor(this.domElements.graph, this.camera, this.settings)
       );
-    }
+    });
 
     // Bind resize:
     window.addEventListener("resize", function handleResize() {
@@ -93,45 +93,18 @@ export default sigma => {
    */
   SvgRenderer.prototype.render = function render(options) {
     options = options || {};
-
     let a;
-
     let i;
-
-    let k;
-
     let e;
-
     let l;
-
     let o;
-
     let source;
-
     let target;
-
-    let start;
-
-    let edges;
-
-    let renderers;
-
-    let subrenderers;
-
     const index = {};
-
-    const graph = this.graph;
-
-    const nodes = this.graph.nodes;
-
-    const prefix = this.options.prefix || "";
-
+    const { graph } = this;
+    const { nodes } = graph;
     let drawEdges = this.settings(options, "drawEdges");
-
     const drawNodes = this.settings(options, "drawNodes");
-
-    const drawLabels = this.settings(options, "drawLabels");
-
     const embedSettings = this.settings.embedObjects(options, {
       prefix: this.options.prefix,
       forceLabels: this.options.forceLabels
@@ -175,8 +148,8 @@ export default sigma => {
 
     // Display nodes
     //---------------
-    renderers = sigma.svg.nodes;
-    subrenderers = sigma.svg.labels;
+    let renderers = sigma.svg.nodes;
+    const subrenderers = sigma.svg.labels;
 
     // -- First we create the nodes which are not already created
     if (drawNodes)
@@ -204,23 +177,23 @@ export default sigma => {
 
     // -- Second we update the nodes
     if (drawNodes)
-      for (a = this.nodesOnScreen, i = 0, l = a.length; i < l; i++) {
-        if (a[i].hidden) continue;
+      this.nodesOnScreen
+        .filter(n => !n.hidden)
+        .forEach(node => {
+          // Node
+          (renderers[a[i].type] || renderers.def).update(
+            a[i],
+            this.domElements.nodes[node.id],
+            embedSettings
+          );
 
-        // Node
-        (renderers[a[i].type] || renderers.def).update(
-          a[i],
-          this.domElements.nodes[a[i].id],
-          embedSettings
-        );
-
-        // Label
-        (subrenderers[a[i].type] || subrenderers.def).update(
-          a[i],
-          this.domElements.labels[a[i].id],
-          embedSettings
-        );
-      }
+          // Label
+          (subrenderers[a[i].type] || subrenderers.def).update(
+            a[i],
+            this.domElements.labels[node.id],
+            embedSettings
+          );
+        });
 
     // Display edges
     //---------------
@@ -325,14 +298,10 @@ export default sigma => {
    * @return {SvgRenderer}              Returns the instance itself.
    */
   SvgRenderer.prototype.hideDOMElements = function hideDOMElements(elements) {
-    let o;
-    let i;
-
-    for (i in elements) {
-      o = elements[i];
+    Object.keys(elements).forEach(i => {
+      const o = elements[i];
       sigma.svg.utils.hide(o);
-    }
-
+    });
     return this;
   };
 
@@ -344,17 +313,12 @@ export default sigma => {
   // TODO: add option about whether to display hovers or not
   SvgRenderer.prototype.bindHovers = function bindHovers(prefix) {
     const renderers = sigma.svg.hovers;
-
     const self = this;
-
     let hoveredNode;
 
     function overNode(e) {
-      const node = e.data.node;
-
-      const embedSettings = self.settings.embedObjects({
-        prefix
-      });
+      const { node } = e.data;
+      const embedSettings = self.settings.embedObjects({ prefix });
 
       if (!embedSettings("enableHovering")) return;
 
