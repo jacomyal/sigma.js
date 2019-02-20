@@ -224,4 +224,7 @@ export default function configure(sigma) {
     // {number} The default animation time.
     animationsTime: 200
   };
+
+  // Export the previously designed settings:
+  sigma.settings = sigma.utils.extend(sigma.settings || {}, settings);
 }
