@@ -28,19 +28,14 @@
  * @param  {object+} Any number of objects.
  * @return {object}  The merged object.
  */
-export default function extend() {
-  let i;
-
-  let k;
-
+export default function extend(...args) {
   const res = {};
 
-  const l = arguments.length;
-
-  for (i = l - 1; i >= 0; i--)
-    for (k in arguments[i]) {
-      res[k] = arguments[i][k];
-    }
-
+  for (let i = args.length - 1; i >= 0; i--) {
+    const arg = args[i];
+    Object.keys(arg).forEach(key => {
+      res[key] = arg[key];
+    });
+  }
   return res;
 }

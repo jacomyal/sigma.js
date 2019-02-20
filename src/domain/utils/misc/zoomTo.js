@@ -25,16 +25,8 @@ export default function zoomTo(sigma) {
   return (camera, x, y, ratio, animation) => {
     const { settings } = camera;
 
-    let count;
-
-    let newRatio;
-
-    let animationSettings;
-
-    let coordinates;
-
     // Create the newRatio dealing with min / max:
-    newRatio = Math.max(
+    const newRatio = Math.max(
       settings("zoomMin"),
       Math.min(settings("zoomMax"), camera.ratio * ratio)
     );
@@ -43,7 +35,7 @@ export default function zoomTo(sigma) {
     if (newRatio !== camera.ratio) {
       // Create the coordinates variable:
       ratio = newRatio / camera.ratio;
-      coordinates = {
+      const coordinates = {
         x: x * (1 - ratio) + camera.x,
         y: y * (1 - ratio) + camera.y,
         ratio: newRatio
@@ -51,7 +43,7 @@ export default function zoomTo(sigma) {
 
       if (animation && animation.duration) {
         // Complete the animation setings:
-        count = sigma.misc.animation.killAll(camera);
+        const count = sigma.misc.animation.killAll(camera);
         animation = extend(animation, {
           easing: count ? "quadraticOut" : "quadraticInOut"
         });

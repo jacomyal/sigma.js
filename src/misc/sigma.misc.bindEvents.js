@@ -113,17 +113,17 @@ export default function configure(sigma) {
         edges = self.camera.edgequadtree.point(point.x, point.y);
       }
 
-      function insertEdge(selected, edge) {
+      function insertEdge(ieSelected, ieEdge) {
         inserted = false;
 
-        for (j = 0; j < selected.length; j++)
-          if (edge.size > selected[j].size) {
-            selected.splice(j, 0, edge);
+        for (j = 0; j < ieSelected.length; j++)
+          if (ieEdge.size > ieSelected[j].size) {
+            ieSelected.splice(j, 0, ieEdge);
             inserted = true;
             break;
           }
 
-        if (!inserted) selected.push(edge);
+        if (!inserted) ieSelected.push(ieEdge);
       }
 
       if (edges.length)
