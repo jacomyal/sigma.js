@@ -1,8 +1,4 @@
-export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  sigma.utils.pkg("sigma.classes");
-
+export default function createCamera(sigma) {
   /**
    * The camera constructor. It just initializes its attributes and methods.
    *
@@ -12,7 +8,7 @@ export default function configure(sigma) {
    * @param  {?object}      options  Eventually some overriding options.
    * @return {camera}                Returns the fresh new camera instance.
    */
-  sigma.classes.camera = function(id, graph, settings, options) {
+  function Camera(id, graph, settings, options) {
     sigma.classes.dispatcher.extend(this);
 
     Object.defineProperty(this, "graph", {
@@ -37,7 +33,7 @@ export default function configure(sigma) {
       typeof options === "object" && options
         ? settings.embedObject(options)
         : settings;
-  };
+  }
 
   /**
    * Updates the camera position.
@@ -45,7 +41,7 @@ export default function configure(sigma) {
    * @param  {object} coordinates The new coordinates object.
    * @return {camera}             Returns the camera.
    */
-  sigma.classes.camera.prototype.goTo = function(coordinates) {
+  Camera.prototype.goTo = function(coordinates) {
     if (!this.settings("enableCamera")) return this;
 
     let i;
@@ -85,7 +81,7 @@ export default function configure(sigma) {
    *                           - A height.
    * @return {camera}        Returns the camera.
    */
-  sigma.classes.camera.prototype.applyView = function(read, write, options) {
+  Camera.prototype.applyView = function(read, write, options) {
     options = options || {};
     write = write !== undefined ? write : this.prefix;
     read = read !== undefined ? read : this.readPrefix;
@@ -144,7 +140,7 @@ export default function configure(sigma) {
    *                    camera.
    * @return {object}   The point coordinates in the frame of the graph.
    */
-  sigma.classes.camera.prototype.graphPosition = function(x, y, vector) {
+  Camera.prototype.graphPosition = function(x, y, vector) {
     let X = 0;
 
     let Y = 0;
@@ -175,7 +171,7 @@ export default function configure(sigma) {
    *                    graph.
    * @return {object}   The point coordinates in the frame of the camera.
    */
-  sigma.classes.camera.prototype.cameraPosition = function(x, y, vector) {
+  Camera.prototype.cameraPosition = function(x, y, vector) {
     let X = 0;
 
     let Y = 0;
@@ -203,7 +199,7 @@ export default function configure(sigma) {
    *
    * @return {array} The transformation matrix.
    */
-  sigma.classes.camera.prototype.getMatrix = function() {
+  Camera.prototype.getMatrix = function() {
     const scale = sigma.utils.matrices.scale(1 / this.ratio);
 
     const rotation = sigma.utils.matrices.rotation(this.angle);
@@ -231,7 +227,7 @@ export default function configure(sigma) {
    * @return {object}        The rectangle as x1, y1, x2 and y2, representing
    *                         two opposite points.
    */
-  sigma.classes.camera.prototype.getRectangle = function(width, height) {
+  Camera.prototype.getRectangle = function(width, height) {
     const widthVect = this.cameraPosition(width, 0, true);
 
     const heightVect = this.cameraPosition(0, height, true);
@@ -252,4 +248,6 @@ export default function configure(sigma) {
       )
     };
   };
+
+  return Camera;
 }

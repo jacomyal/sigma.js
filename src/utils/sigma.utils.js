@@ -90,9 +90,9 @@ export default function configure(sigma) {
     };
     const levels = (pkgName || "").split(".");
     if (levels[0] === "sigma") {
-      getPackage(levels.slice(1), sigma);
+      return getPackage(levels.slice(1), sigma);
     } else {
-      getPackage(levels, sigma.packages);
+      return getPackage(levels, sigma.packages);
     }
   };
 

@@ -1,16 +1,15 @@
-import conrad from "conrad";
+import register from "./register";
 import sigma from "./sigma.core";
 import utils from "./utils/sigma.utils";
 import "./utils/sigma.polyfills";
 import settings from "./sigma.settings";
-import dispatcher from "./classes/sigma.classes.dispatcher";
-import configurable from "./classes/sigma.classes.configurable";
-import graph from "./classes/sigma.classes.graph";
-import camera from "./classes/sigma.classes.camera";
-import quad from "./classes/sigma.classes.quad";
-import edgequad from "./classes/sigma.classes.edgequad";
-import captorMouse from "./captors/sigma.captors.mouse";
-import captorTouch from "./captors/sigma.captors.touch";
+import dispatcher from "./modules/sigma.classes.dispatcher";
+import configurable from "./modules/sigma.classes.configurable";
+import graph from "./modules/sigma.classes.graph";
+import camera from "./modules/sigma.classes.camera";
+import quad from "./modules/sigma.classes.quad";
+import edgequad from "./modules/sigma.classes.edgequad";
+import captors from "./modules/sigma.captors";
 import rendererCanvas from "./renderers/sigma.renderers.canvas";
 import rendererWebgl from "./renderers/sigma.renderers.webgl";
 import rendererSvg from "./renderers/sigma.renderers.svg";
@@ -47,7 +46,7 @@ import bindEvents from "./misc/sigma.misc.bindEvents";
 import bindDOMEvents from "./misc/sigma.misc.bindDOMEvents";
 import drawHovers from "./misc/sigma.misc.drawHovers";
 
-sigma.conrad = conrad;
+register(sigma);
 utils(sigma);
 settings(sigma);
 
@@ -60,8 +59,7 @@ quad(sigma);
 edgequad(sigma);
 
 // Captors
-captorMouse(sigma);
-captorTouch(sigma);
+captors(sigma);
 
 // Renderers
 rendererCanvas(sigma);

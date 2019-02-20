@@ -1,9 +1,4 @@
-export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  // Initialize packages:
-  sigma.utils.pkg("sigma.captors");
-
+export default function mouseCaptor(sigma) {
   /**
    * The user inputs default captor. It deals with mouse events, keyboards
    * events and touch events.
@@ -14,7 +9,7 @@ export default function configure(sigma) {
    * @param  {configurable} settings The settings function.
    * @return {sigma.captor}          The fresh new captor instance.
    */
-  sigma.captors.mouse = function(target, camera, settings) {
+  return function MouseCaptor(target, camera, settings) {
     const _self = this;
 
     const _target = target;

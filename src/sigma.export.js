@@ -1,6 +1,5 @@
 // Hardcoded export for the node.js version:
-const { sigma, conrad } = this;
-sigma.conrad = conrad;
+const { sigma } = this;
 
 // Dirty polyfills to permit sigma usage in node
 if (typeof HTMLElement === "undefined") HTMLElement = function noop() {};
