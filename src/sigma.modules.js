@@ -43,7 +43,7 @@ import translation from "./domain/utils/matrices/translation";
 import rotation from "./domain/utils/matrices/rotation";
 import scale from "./domain/utils/matrices/scale";
 import multiply from "./domain/utils/matrices/multiply";
-import EdgeQuad from "./domain/classes/EdgeQuad";
+import EdgeQuad from "./domain/classes/EdgeQuad/index";
 import Graph from "./domain/classes/Graph";
 import Quad from "./domain/classes/Quad";
 import edgeHoversArrowCanvas from "./domain/renderers/canvas/edgeHoversArrow";
