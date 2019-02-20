@@ -19,69 +19,37 @@ export default function touchCaptor(sigma) {
    */
   return function TouchCaptor(target, camera, settings) {
     const _self = this;
-
     const _target = target;
-
     const _camera = camera;
-
     const _settings = settings;
 
     // CAMERA MANAGEMENT:
     // ******************
     // The camera position when the user starts dragging:
-
     let _startCameraX;
-
     let _startCameraY;
-
     let _startCameraAngle;
-
     let _startCameraRatio;
 
     // The latest stage position:
-
     let _lastCameraX;
-
     let _lastCameraY;
-
-    let _lastCameraAngle;
-
-    let _lastCameraRatio;
 
     // TOUCH MANAGEMENT:
     // *****************
     // Touches that are down:
-
     let _downTouches = [];
-
     let _startTouchX0;
-
     let _startTouchY0;
-
     let _startTouchX1;
-
     let _startTouchY1;
-
     let _startTouchAngle;
-
     let _startTouchDistance;
-
     let _touchMode;
-
     let _isMoving;
-
     let _doubleTap;
-
     let _movingTimeoutId;
-
     Dispatcher.extend(this);
-
-    doubleClick(_target, "touchstart", _doubleTapHandler);
-    _target.addEventListener("touchstart", _handleStart, false);
-    _target.addEventListener("touchend", _handleLeave, false);
-    _target.addEventListener("touchcancel", _handleLeave, false);
-    _target.addEventListener("touchleave", _handleLeave, false);
-    _target.addEventListener("touchmove", _handleMove, false);
 
     function position(e) {
       const offset = getOffset(_target);
@@ -92,18 +60,6 @@ export default function touchCaptor(sigma) {
       };
     }
 
-    /**
-     * This method unbinds every handlers that makes the captor work.
-     */
-    this.kill = function kill() {
-      unbindDoubleClick(_target, "touchstart");
-      _target.addEventListener("touchstart", _handleStart);
-      _target.addEventListener("touchend", _handleLeave);
-      _target.addEventListener("touchcancel", _handleLeave);
-      _target.addEventListener("touchleave", _handleLeave);
-      _target.addEventListener("touchmove", _handleMove);
-    };
-
     // TOUCH EVENTS:
     // *************
     /**
@@ -112,7 +68,7 @@ export default function touchCaptor(sigma) {
      *
      * @param {event} e A touch event.
      */
-    function _handleStart(e) {
+    function handleStart(e) {
       if (_settings("touchEnabled")) {
         let x0;
         let x1;
@@ -177,8 +133,11 @@ export default function touchCaptor(sigma) {
 
             e.preventDefault();
             return false;
+          default:
+            console.log(`Unhandled downtouches ${_downTouches.length}`);
         }
       }
+      return undefined;
     }
 
     /**
@@ -188,7 +147,7 @@ export default function touchCaptor(sigma) {
      *
      * @param {event} e A touch event.
      */
-    function _handleLeave(e) {
+    function handleLeave(e) {
       if (_settings("touchEnabled")) {
         _downTouches = e.touches;
         const inertiaRatio = _settings("touchInertiaRatio");
@@ -201,7 +160,7 @@ export default function touchCaptor(sigma) {
         switch (_touchMode) {
           case 2:
             if (e.touches.length === 1) {
-              _handleStart(e);
+              handleStart(e);
 
               e.preventDefault();
               break;
@@ -229,6 +188,8 @@ export default function touchCaptor(sigma) {
             _isMoving = false;
             _touchMode = 0;
             break;
+          default:
+            console.log(`Unhandled touchMode ${_touchMode}`);
         }
       }
     }
@@ -240,48 +201,31 @@ export default function touchCaptor(sigma) {
      *
      * @param {event} e A touch event.
      */
-    function _handleMove(e) {
+    function handleMove(e) {
       if (!_doubleTap && _settings("touchEnabled")) {
         let x0;
-
         let x1;
-
         let y0;
-
         let y1;
-
         let cos;
-
         let sin;
-
         let end;
-
         let pos0;
-
         let pos1;
-
         let diff;
-
         let start;
-
         let dAngle;
-
         let dRatio;
-
         let newStageX;
-
         let newStageY;
-
         let newStageRatio;
-
         let newStageAngle;
-
         _downTouches = e.touches;
         _isMoving = true;
 
         if (_movingTimeoutId) clearTimeout(_movingTimeoutId);
 
-        _movingTimeoutId = setTimeout(function() {
+        _movingTimeoutId = setTimeout(function moveTimeout() {
           _isMoving = false;
         }, _settings("dragTimeout"));
 
@@ -368,8 +312,6 @@ export default function touchCaptor(sigma) {
             ) {
               _lastCameraX = _camera.x;
               _lastCameraY = _camera.y;
-              _lastCameraAngle = _camera.angle;
-              _lastCameraRatio = _camera.ratio;
 
               _camera.goTo({
                 x: newStageX,
@@ -382,11 +324,14 @@ export default function touchCaptor(sigma) {
             }
 
             break;
+          default:
+            console.log(`Unhandled touchMode ${_touchMode}`);
         }
 
         e.preventDefault();
         return false;
       }
+      return undefined;
     }
 
     /**
@@ -395,7 +340,7 @@ export default function touchCaptor(sigma) {
      *
      * @param {event} e A touch event.
      */
-    function _doubleTapHandler(e) {
+    function doubleTapHandler(e) {
       let pos;
       let ratio;
       let animation;
@@ -431,6 +376,26 @@ export default function touchCaptor(sigma) {
         e.stopPropagation();
         return false;
       }
+      return undefined;
     }
+
+    doubleClick(_target, "touchstart", doubleTapHandler);
+    _target.addEventListener("touchstart", handleStart, false);
+    _target.addEventListener("touchend", handleLeave, false);
+    _target.addEventListener("touchcancel", handleLeave, false);
+    _target.addEventListener("touchleave", handleLeave, false);
+    _target.addEventListener("touchmove", handleMove, false);
+
+    /**
+     * This method unbinds every handlers that makes the captor work.
+     */
+    this.kill = function kill() {
+      unbindDoubleClick(_target, "touchstart");
+      _target.addEventListener("touchstart", handleStart);
+      _target.addEventListener("touchend", handleLeave);
+      _target.addEventListener("touchcancel", handleLeave);
+      _target.addEventListener("touchleave", handleLeave);
+      _target.addEventListener("touchmove", handleMove);
+    };
   };
 }
