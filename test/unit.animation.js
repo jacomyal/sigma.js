@@ -56,9 +56,7 @@ QUnit.test("Camera animation", assert => {
     },
     {
       duration: 50,
-      easing(k) {
-        return k === 1 ? k : 0.5;
-      },
+      easing: k => (k === 1 ? k : 0.5),
       onNewFrame() {
         camera.applyView("", "display:");
 

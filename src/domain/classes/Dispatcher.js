@@ -20,16 +20,14 @@ export default function Dispatcher() {
  */
 Dispatcher.prototype.bind = function bind(events, handler) {
   /* eslint-disable prefer-rest-params */
-  let eArray;
-
   if (arguments.length === 1 && typeof arguments[0] === "object") {
-    const argObject = arguments[0];
+    const argObject = events;
     Object.keys(argObject).forEach(evts => {
-      this.bind(evts, argObject[events]);
+      this.bind(evts, argObject[evts]);
     });
-  } else if (arguments.length === 2 && typeof arguments[1] === "function") {
-    eArray = typeof events === "string" ? events.split(" ") : events;
-    eArray
+  } else if (arguments.length === 2 && typeof handler === "function") {
+    const eventArray = typeof events === "string" ? events.split(" ") : events;
+    eventArray
       .filter(e => !!e)
       .forEach(event => {
         if (!this._handlers[event]) this._handlers[event] = [];
@@ -40,7 +38,10 @@ Dispatcher.prototype.bind = function bind(events, handler) {
           handler
         });
       });
-  } else throw new Error("bind: Wrong arguments.");
+  } else
+    throw new Error(
+      `bind: Wrong arguments. eventstype=${typeof events} handlertype=${typeof handler}`
+    );
 
   return this;
 };
