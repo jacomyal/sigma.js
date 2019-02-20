@@ -1,3 +1,5 @@
+import Dispatcher from "./domain/classes/Dispatcher";
+
 const __instances = {};
 
 /**
@@ -65,12 +67,11 @@ function Sigma(conf) {
   let a;
   let id;
 
-  Sigma.classes.dispatcher.extend(this);
+  Dispatcher.extend(this);
 
   // Private attributes:
   // *******************
   const _self = this;
-
   let _conf = conf || {};
 
   // Little shortcut:
@@ -181,16 +182,14 @@ function Sigma(conf) {
   });
 
   // Add a custom handler, to redispatch events from renderers:
-  this._handler = function(e) {
-    let k;
-
+  this._handler = e => {
     const data = {};
-
-    for (k in e.data) data[k] = e.data[k];
-
+    Object.keys(e.data).forEach(key => {
+      data[key] = e.data[key];
+    });
     data.renderer = e.target;
     this.dispatchEvent(e.type, data);
-  }.bind(this);
+  };
 
   // Initialize renderers:
   a = _conf.renderers || [];
@@ -213,7 +212,7 @@ function Sigma(conf) {
   }
 
   // Deal with resize:
-  window.addEventListener("resize", function() {
+  window.addEventListener("resize", () => {
     if (_self.settings) _self.refresh();
   });
 }
@@ -340,12 +339,16 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
   fn = fn || Sigma.renderers.def;
 
   // Find the good camera:
-  const camera =
-    "camera" in o
-      ? o.camera instanceof Sigma.classes.camera
-        ? o.camera
-        : this.cameras[o.camera] || this.addCamera(o.camera)
-      : this.addCamera();
+  const findGoodCamera = () => {
+    if ("camera" in o) {
+      if (o.camera instanceof Sigma.classes.camera) {
+        return o.camera;
+      }
+      return this.cameras[o.camera] || this.addCamera(o.camera);
+    }
+    return this.addCamera();
+  };
+  const camera = findGoodCamera();
 
   if (this.cameras[camera.id] !== camera)
     throw new Error(
@@ -414,19 +417,12 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
  */
 Sigma.prototype.killRenderer = function killRenderer(v) {
   v = typeof v === "string" ? this.renderers[v] : v;
-
   if (!v) throw new Error("sigma.killRenderer: The renderer is undefined.");
-
   const a = this.renderersPerCamera[v.camera.id];
-
   const i = a.indexOf(v);
-
   if (i >= 0) a.splice(i, 1);
-
   if (v.kill) v.kill();
-
   delete this.renderers[v.id];
-
   return this;
 };
 
@@ -451,52 +447,53 @@ Sigma.prototype.killRenderer = function killRenderer(v) {
  *                             quadtrees or not (default: false).
  */
 Sigma.prototype.refresh = function refresh(options) {
-  let i;
-  let l;
-  let k;
-  let a;
-  let c;
+  const middlewares = this.middlewares || [];
   let bounds;
   let prefix = 0;
   options = options || {};
 
   // Call each middleware:
-  a = this.middlewares || [];
-  for (i = 0, l = a.length; i < l; i++)
-    a[i].call(
+
+  middlewares.forEach((mw, i) => {
+    mw.call(
       this,
       i === 0 ? "" : `tmp${prefix}:`,
-      i === l - 1 ? "ready:" : `tmp${++prefix}:`
+      i === middlewares.length - 1 ? "ready:" : `tmp${++prefix}:`
     );
+  });
 
   // Then, for each camera, call the "rescale" middleware, unless the
   // settings specify not to:
-  for (k in this.cameras) {
-    c = this.cameras[k];
+  Object.keys(this.cameras).forEach(camId => {
+    const cam = this.cameras[camId];
     if (
-      c.settings("autoRescale") &&
-      this.renderersPerCamera[c.id] &&
-      this.renderersPerCamera[c.id].length
+      cam.settings("autoRescale") &&
+      this.renderersPerCamera[cam.id] &&
+      this.renderersPerCamera[cam.id].length
     )
       Sigma.middlewares.rescale.call(
         this,
-        a.length ? "ready:" : "",
-        c.readPrefix,
+        middlewares.length ? "ready:" : "",
+        cam.readPrefix,
         {
-          width: this.renderersPerCamera[c.id][0].width,
-          height: this.renderersPerCamera[c.id][0].height
+          width: this.renderersPerCamera[cam.id][0].width,
+          height: this.renderersPerCamera[cam.id][0].height
         }
       );
     else
-      Sigma.middlewares.copy.call(this, a.length ? "ready:" : "", c.readPrefix);
+      Sigma.middlewares.copy.call(
+        this,
+        middlewares.length ? "ready:" : "",
+        cam.readPrefix
+      );
 
     if (!options.skipIndexation) {
       // Find graph boundaries:
-      bounds = Sigma.utils.getBoundaries(this.graph, c.readPrefix);
+      bounds = Sigma.utils.getBoundaries(this.graph, cam.readPrefix);
 
       // Refresh quadtree:
-      c.quadtree.index(this.graph.nodes(), {
-        prefix: c.readPrefix,
+      cam.quadtree.index(this.graph.nodes(), {
+        prefix: cam.readPrefix,
         bounds: {
           x: bounds.minX,
           y: bounds.minY,
@@ -507,12 +504,12 @@ Sigma.prototype.refresh = function refresh(options) {
 
       // Refresh edgequadtree:
       if (
-        c.edgequadtree !== undefined &&
-        c.settings("drawEdges") &&
-        c.settings("enableEdgeHovering")
+        cam.edgequadtree !== undefined &&
+        cam.settings("drawEdges") &&
+        cam.settings("enableEdgeHovering")
       ) {
-        c.edgequadtree.index(this.graph, {
-          prefix: c.readPrefix,
+        cam.edgequadtree.index(this.graph, {
+          prefix: cam.readPrefix,
           bounds: {
             x: bounds.minX,
             y: bounds.minY,
@@ -522,26 +519,28 @@ Sigma.prototype.refresh = function refresh(options) {
         });
       }
     }
-  }
+  });
 
-  // Call each renderer:
-  a = Object.keys(this.renderers);
-  for (i = 0, l = a.length; i < l; i++)
-    if (this.renderers[a[i]].process) {
-      if (this.settings("skipErrors"))
-        try {
-          this.renderers[a[i]].process();
-        } catch (e) {
-          console.log(
-            `Warning: The renderer "${a[i]}" crashed on ".process()"`
-          );
-        }
-      else this.renderers[a[i]].process();
-    }
-
+  this._forEachRenderer("process");
   this.render();
-
   return this;
+};
+
+Sigma.prototype._forEachRenderer = function _forEachRenderer(name) {
+  Object.keys(this.renderers).forEach(key => {
+    const renderer = this.renderers[key];
+    if (renderer[name]) {
+      if (this.settings("skipErrors")) {
+        try {
+          renderer[name]();
+        } catch (e) {
+          console.log(`Warning: The renderer "${key}" crashed on ".${name}()"`);
+        }
+      } else {
+        renderer[name]();
+      }
+    }
+  });
 };
 
 /**
@@ -550,26 +549,7 @@ Sigma.prototype.refresh = function refresh(options) {
  * @return {Sigma} Returns the instance itself.
  */
 Sigma.prototype.render = function render() {
-  let i;
-
-  let l;
-
-  let a;
-
-  const prefix = 0;
-
-  // Call each renderer:
-  a = Object.keys(this.renderers);
-  for (i = 0, l = a.length; i < l; i++)
-    if (this.settings("skipErrors"))
-      try {
-        this.renderers[a[i]].render();
-      } catch (e) {
-        if (this.settings("verbose"))
-          console.log(`Warning: The renderer "${a[i]}" crashed on ".render()"`);
-      }
-    else this.renderers[a[i]].render();
-
+  this._forEachRenderer("render");
   return this;
 };
 
@@ -633,8 +613,6 @@ Sigma.prototype.renderCamera = function renderCamera(camera, force) {
  * reference from the instance.
  */
 Sigma.prototype.kill = function kill() {
-  let k;
-
   // Dispatching event
   this.dispatchEvent("kill");
 
@@ -645,16 +623,18 @@ Sigma.prototype.kill = function kill() {
   delete this.middlewares;
 
   // Kill each renderer:
-  for (k in this.renderers) this.killRenderer(this.renderers[k]);
+  Object.keys(this.renderers).forEach(key =>
+    this.killRenderer(this.renderers[key])
+  );
 
   // Kill each camera:
-  for (k in this.cameras) this.killCamera(this.cameras[k]);
+  Object.keys(this.cameras).forEach(key => this.killCamera(this.cameras[key]));
 
   delete this.renderers;
   delete this.cameras;
 
   // Kill everything else:
-  for (k in this) if (this.hasOwnProperty(k)) delete this[k];
+  Object.keys(this).forEach(key => delete this[key]);
 
   delete __instances[this.id];
 };
