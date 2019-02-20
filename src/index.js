@@ -1,5 +1,5 @@
 import "./polyfills";
-import Sigma from "./sigma.core";
+import sigma from "./sigma.core";
 import register from "./register";
 import settings from "./sigma.settings";
 import registerSigmaModules from "./sigma.modules";
@@ -7,15 +7,17 @@ import animation from "./misc/sigma.misc.animation";
 import bindEvents from "./misc/sigma.misc.bindEvents";
 import bindDOMEvents from "./misc/sigma.misc.bindDOMEvents";
 import drawHovers from "./misc/sigma.misc.drawHovers";
+import rendererDef from "./sigma.renderers.def";
 
-register(Sigma);
-settings(Sigma);
-registerSigmaModules(Sigma);
+register(sigma);
+settings(sigma);
+registerSigmaModules(sigma);
+rendererDef(sigma, window);
 
 // Miscellaneous
-animation(Sigma);
-bindEvents(Sigma);
-bindDOMEvents(Sigma);
-drawHovers(Sigma);
+animation(sigma);
+bindEvents(sigma);
+bindDOMEvents(sigma);
+drawHovers(sigma);
 
-export default Sigma;
+export default sigma;
