@@ -12,6 +12,37 @@ const _defaultSettingsFunction = function _defaultSettingsFunction(key) {
 };
 
 /**
+ * A custom tool to bind methods such that function that are bound to it will
+ * be executed anytime the method is called.
+ *
+ * @param  {string}   methodName The name of the method to bind.
+ * @param  {object}   scope      The scope where the method must be executed.
+ * @param  {function} fn         The method itself.
+ * @return {function}            The new method.
+ */
+function bindGraphMethod(methodName, scope, fn) {
+  return (...boundArgs) => {
+    // Execute "before" bound functions:
+    const beforeBindings = _methodBeforeBindings[methodName];
+    Object.keys(beforeBindings).forEach(k => {
+      beforeBindings[k].apply(scope, boundArgs);
+    });
+
+    // Apply the method:
+    const res = fn.apply(scope, boundArgs);
+
+    // Execute bound functions:
+    const methodBindings = _methodBindings[methodName];
+    Object.keys(methodBindings).forEach(k => {
+      methodBindings[k].apply(scope, boundArgs);
+    });
+
+    // Return res:
+    return res;
+  };
+}
+
+/**
  * The graph constructor. It initializes the data and the indexes, and binds
  * the custom indexes and methods to its own scope.
  *
@@ -29,10 +60,7 @@ const _defaultSettingsFunction = function _defaultSettingsFunction(key) {
  * @param  {?configurable} settings Eventually a settings function.
  * @return {graph}                  The new graph instance.
  */
-const graph = function graph(settings) {
-  let k;
-  let fn;
-
+function graph(settings) {
   /**
    * DATA:
    * *****
@@ -78,46 +106,14 @@ const graph = function graph(settings) {
   };
 
   // Execute bindings:
-  for (k in _initBindings) _initBindings[k].call(data);
+  Object.keys(_initBindings).forEach(k => _initBindings[k].call(data));
 
   // Add methods to both the scope and the data objects:
-  for (k in _methods) {
-    fn = bindGraphMethod(k, data, _methods[k]);
-    this[k] = fn;
-    data[k] = fn;
-  }
-};
-
-/**
- * A custom tool to bind methods such that function that are bound to it will
- * be executed anytime the method is called.
- *
- * @param  {string}   methodName The name of the method to bind.
- * @param  {object}   scope      The scope where the method must be executed.
- * @param  {function} fn         The method itself.
- * @return {function}            The new method.
- */
-function bindGraphMethod(methodName, scope, fn) {
-  const result = function boundMethod() {
-    let k;
-    let res;
-
-    // Execute "before" bound functions:
-    for (k in _methodBeforeBindings[methodName])
-      _methodBeforeBindings[methodName][k].apply(scope, arguments);
-
-    // Apply the method:
-    res = fn.apply(scope, arguments);
-
-    // Execute bound functions:
-    for (k in _methodBindings[methodName])
-      _methodBindings[methodName][k].apply(scope, arguments);
-
-    // Return res:
-    return res;
-  };
-
-  return result;
+  Object.keys(_methods).forEach(methodName => {
+    const method = bindGraphMethod(methodName, data, _methods[methodName]);
+    this[methodName] = method;
+    data[methodName] = method;
+  });
 }
 
 /**
@@ -129,12 +125,12 @@ function bindGraphMethod(methodName, scope, fn) {
  * @return {object}     The empty object.
  */
 function __emptyObject(obj) {
-  let k;
-
-  for (k in obj)
-    if (!("hasOwnProperty" in obj) || obj.hasOwnProperty(k)) delete obj[k];
-
-  return obj;
+  Object.keys(obj).forEach(k => {
+    // eslint-disable-next-line no-prototype-builtins
+    if (!("hasOwnProperty" in obj) || obj.hasOwnProperty(k)) {
+      delete obj[k];
+    }
+  });
 }
 
 /**
@@ -189,7 +185,7 @@ graph.addMethod = function addMethod(methodName, fn) {
  * @param  {string}  methodName The name of the method.
  * @return {boolean}            The result.
  */
-graph.hasMethod = function(methodName) {
+graph.hasMethod = function hasMethod(methodName) {
   return !!(_methods[methodName] || graph[methodName]);
 };
 
@@ -324,16 +320,16 @@ graph.addIndex = function addIndex(name, bindings) {
 
   if (_indexes[name]) throw new Error(`The index "${name}" already exists.`);
 
-  let k;
-
   // Store the bindings:
   _indexes[name] = bindings;
 
   // Attach the bindings:
-  for (k in bindings)
-    if (typeof bindings[k] !== "function")
+  Object.keys(bindings).forEach(k => {
+    if (typeof bindings[k] !== "function") {
       throw new Error("The bindings must be functions.");
-    else graph.attach(k, name, bindings[k]);
+    }
+    graph.attach(k, name, bindings[k]);
+  });
 
   return this;
 };
@@ -361,15 +357,16 @@ graph.addMethod("addNode", function addNode(node) {
   if (this.nodesIndex[node.id])
     throw new Error(`The node "${node.id}" already exists.`);
 
-  let k;
-
-  const id = node.id;
-
+  const { id } = node;
   let validNode = Object.create(null);
 
   // Check the "clone" option:
   if (this.settings("clone")) {
-    for (k in node) if (k !== "id") validNode[k] = node[k];
+    Object.keys(node).forEach(k => {
+      if (k !== "id") {
+        validNode[k] = node[k];
+      }
+    });
   } else validNode = node;
 
   // Check the "immutable" option:
@@ -434,15 +431,14 @@ graph.addMethod("addEdge", function addEdge(edge) {
   if (this.edgesIndex[edge.id])
     throw new Error(`The edge "${edge.id}" already exists.`);
 
-  let k;
-
   let validEdge = Object.create(null);
 
   // Check the "clone" option:
   if (this.settings("clone")) {
-    for (k in edge)
+    Object.keys(edge).forEach(k => {
       if (k !== "id" && k !== "source" && k !== "target")
         validEdge[k] = edge[k];
+    });
   } else validEdge = edge;
 
   // Check the "immutable" option:
@@ -532,20 +528,18 @@ graph.addMethod("dropNode", function dropNode(id) {
 
   if (!this.nodesIndex[id]) throw new Error(`The node "${id}" does not exist.`);
 
-  let i;
-  let k;
-  let l;
+  const l = this.nodesArray.length;
 
   // Remove the node from indexes:
   delete this.nodesIndex[id];
-  for (i = 0, l = this.nodesArray.length; i < l; i++)
+  for (let i = 0; i < l; i++)
     if (this.nodesArray[i].id === id) {
       this.nodesArray.splice(i, 1);
       break;
     }
 
   // Remove related edges:
-  for (i = this.edgesArray.length - 1; i >= 0; i--)
+  for (let i = this.edgesArray.length - 1; i >= 0; i--)
     if (this.edgesArray[i].source === id || this.edgesArray[i].target === id)
       this.dropEdge(this.edgesArray[i].id);
 
@@ -558,11 +552,11 @@ graph.addMethod("dropNode", function dropNode(id) {
   delete this.outNeighborsCount[id];
   delete this.allNeighborsCount[id];
 
-  for (k in this.nodesIndex) {
+  Object.keys(this.nodesIndex).forEach(k => {
     delete this.inNeighborsIndex[k][id];
     delete this.outNeighborsIndex[k][id];
     delete this.allNeighborsIndex[k][id];
-  }
+  });
 
   return this;
 });
@@ -584,14 +578,10 @@ graph.addMethod("dropEdge", function dropEdge(id) {
 
   if (!this.edgesIndex[id]) throw new Error(`The edge "${id}" does not exist.`);
 
-  let i;
-  let l;
-  let edge;
-
   // Remove the edge from indexes:
-  edge = this.edgesIndex[id];
+  const edge = this.edgesIndex[id];
   delete this.edgesIndex[id];
-  for (i = 0, l = this.edgesArray.length; i < l; i++)
+  for (let i = 0; i < this.edgesArray.length; i++)
     if (this.edgesArray[i].id === id) {
       this.edgesArray.splice(i, 1);
       break;
