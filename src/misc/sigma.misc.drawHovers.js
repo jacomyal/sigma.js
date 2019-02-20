@@ -9,67 +9,21 @@ export default function configure(sigma) {
    */
   sigma.register("sigma.misc.drawHovers", function drawHovers(prefix) {
     const self = this;
-
     const hoveredNodes = {};
-
     const hoveredEdges = {};
 
-    this.bind("overNode", function(event) {
-      const node = event.data.node;
-      if (!node.hidden) {
-        hoveredNodes[node.id] = node;
-        draw();
-      }
-    });
-
-    this.bind("outNode", function(event) {
-      delete hoveredNodes[event.data.node.id];
-      draw();
-    });
-
-    this.bind("overEdge", function(event) {
-      const edge = event.data.edge;
-      if (!edge.hidden) {
-        hoveredEdges[edge.id] = edge;
-        draw();
-      }
-    });
-
-    this.bind("outEdge", function(event) {
-      delete hoveredEdges[event.data.edge.id];
-      draw();
-    });
-
-    this.bind("render", function(event) {
-      draw();
-    });
-
     function draw() {
-      let k;
-
       let source;
-
       let target;
-
       let hoveredNode;
-
       let hoveredEdge;
-
       const c = self.contexts.hover.canvas;
-
       const defaultNodeType = self.settings("defaultNodeType");
-
       const defaultEdgeType = self.settings("defaultEdgeType");
-
       const nodeRenderers = sigma.canvas.hovers;
-
       const edgeRenderers = sigma.canvas.edgehovers;
-
       const extremitiesRenderers = sigma.canvas.extremities;
-
-      const embedSettings = self.settings.embedObjects({
-        prefix
-      });
+      const embedSettings = self.settings.embedObjects({ prefix });
 
       // Clear self.contexts.hover:
       self.contexts.hover.clearRect(0, 0, c.width, c.height);
@@ -88,7 +42,7 @@ export default function configure(sigma) {
 
       // Node render: multiple hover
       if (embedSettings("enableHovering") && !embedSettings("singleHover"))
-        for (k in hoveredNodes)
+        Object.keys(hoveredNodes).forEach(k => {
           (nodeRenderers[hoveredNodes[k].type] ||
             nodeRenderers[defaultNodeType] ||
             nodeRenderers.def)(
@@ -96,6 +50,7 @@ export default function configure(sigma) {
             self.contexts.hover,
             embedSettings
           );
+        });
 
       // Edge render: single hover
       if (
@@ -148,7 +103,7 @@ export default function configure(sigma) {
         embedSettings("enableEdgeHovering") &&
         !embedSettings("singleHover")
       ) {
-        for (k in hoveredEdges) {
+        Object.keys(hoveredEdges).forEach(k => {
           hoveredEdge = hoveredEdges[k];
           source = self.graph.nodes(hoveredEdge.source);
           target = self.graph.nodes(hoveredEdge.target);
@@ -187,8 +142,36 @@ export default function configure(sigma) {
               );
             }
           }
-        }
+        });
       }
     }
+
+    this.bind("overNode", event => {
+      const { node } = event.data;
+      if (!node.hidden) {
+        hoveredNodes[node.id] = node;
+        draw();
+      }
+    });
+
+    this.bind("outNode", event => {
+      delete hoveredNodes[event.data.node.id];
+      draw();
+    });
+
+    this.bind("overEdge", event => {
+      const { edge } = event.data;
+      if (!edge.hidden) {
+        hoveredEdges[edge.id] = edge;
+        draw();
+      }
+    });
+
+    this.bind("outEdge", event => {
+      delete hoveredEdges[event.data.edge.id];
+      draw();
+    });
+
+    this.bind("render", () => draw());
   });
 }

@@ -14,9 +14,7 @@ export default function configure(sigma) {
     // DOMElement abstraction
     function Element(domElement) {
       // Helpers
-      this.attr = function(attrName) {
-        return domElement.getAttributeNS(null, attrName);
-      };
+      this.attr = attrName => domElement.getAttributeNS(null, attrName);
 
       // Properties
       this.tag = domElement.tagName;
@@ -24,15 +22,15 @@ export default function configure(sigma) {
       this.id = this.attr("id");
 
       // Methods
-      this.isNode = function() {
+      this.isNode = function isNode() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-node`);
       };
 
-      this.isEdge = function() {
+      this.isEdge = function isEdge() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-edge`);
       };
 
-      this.isHover = function() {
+      this.isHover = function isHover() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-hover`);
       };
     }

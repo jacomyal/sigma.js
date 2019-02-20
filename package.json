@@ -77,7 +77,8 @@
       "no-plusplus": "off",
       "no-multi-assign": "off",
       "no-param-reassign": "off",
-      "no-console": "off"
+      "no-console": "off",
+      "no-bitwise": "off"
     }
   },
   "dependencies": {

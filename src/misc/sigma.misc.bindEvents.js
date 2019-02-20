@@ -159,7 +159,7 @@ export default function configure(sigma) {
               modifiedY
             ) > target[`${prefix}size`]
           ) {
-            if (edge.type == "curve" || edge.type == "curvedArrow") {
+            if (edge.type === "curve" || edge.type === "curvedArrow") {
               if (source.id === target.id) {
                 cp = sigma.utils.getSelfLoopControlPoints(
                   source[`${prefix}x`],

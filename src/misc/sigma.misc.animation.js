@@ -41,7 +41,7 @@ export default function configure(sigma) {
    * @return {number}          The animation id, to make it easy to kill
    *                           through the method "sigma.misc.animation.kill".
    */
-  sigma.misc.animation.camera = function camera(camera, val, options) {
+  sigma.misc.animation.camera = function animationCamera(camera, val, options) {
     if (
       !(camera instanceof sigma.classes.camera) ||
       typeof val !== "object" ||
@@ -59,30 +59,25 @@ export default function configure(sigma) {
         "There must be at least one valid coordinate in the given val."
       );
 
-    let fn;
     let id;
     let anim;
-    let easing;
-    let duration;
-    let initialVal;
     const o = options || {};
     const start = sigma.utils.dateNow();
 
     // Store initial values:
-    initialVal = {
+    const initialVal = {
       x: camera.x,
       y: camera.y,
       ratio: camera.ratio,
       angle: camera.angle
     };
 
-    duration = o.duration;
-    easing =
+    const easing =
       typeof o.easing !== "function"
         ? sigma.utils.easings[o.easing || "quadraticInOut"]
         : o.easing;
 
-    fn = function tick() {
+    function tick() {
       let coef;
 
       const t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
@@ -129,17 +124,17 @@ export default function configure(sigma) {
         // Check callbacks:
         if (typeof o.onNewFrame === "function") o.onNewFrame();
 
-        anim.frameId = requestAnimationFrame(fn);
+        anim.frameId = requestAnimationFrame(tick);
       }
-    };
+    }
 
     id = _getID();
     anim = {
-      frameId: requestAnimationFrame(fn),
+      frameId: requestAnimationFrame(tick),
       target: camera,
       type: "camera",
       options: o,
-      fn
+      fn: tick
     };
     sigma.misc.animation.running[id] = anim;
 
@@ -184,18 +179,12 @@ export default function configure(sigma) {
    */
   sigma.misc.animation.killAll = function killAll(filter) {
     let o;
-
-    let id;
-
     let count = 0;
-
     const type = typeof filter === "string" ? filter : null;
-
     const target = typeof filter === "object" ? filter : null;
+    const { running } = sigma.misc.animation;
 
-    const running = sigma.misc.animation.running;
-
-    for (id in running)
+    Object.keys(running).forEach(id => {
       if (
         (!type || running[id].type === type) &&
         (!target || running[id].target === target)
@@ -213,6 +202,7 @@ export default function configure(sigma) {
         if (typeof (o.options || {}).onComplete === "function")
           o.options.onComplete();
       }
+    });
 
     return count;
   };
@@ -228,21 +218,15 @@ export default function configure(sigma) {
    *                                matches.
    */
   sigma.misc.animation.has = function has(filter) {
-    let id;
-
     const type = typeof filter === "string" ? filter : null;
-
     const target = typeof filter === "object" ? filter : null;
+    const { running } = sigma.misc.animation;
 
-    const running = sigma.misc.animation.running;
-
-    for (id in running)
-      if (
+    return Object.keys(running).some(id => {
+      return (
         (!type || running[id].type === type) &&
         (!target || running[id].target === target)
-      )
-        return true;
-
-    return false;
+      );
+    });
   };
 }

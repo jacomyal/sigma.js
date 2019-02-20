@@ -8,7 +8,7 @@
  * @param  {function(string): void} error     Callback for errors.
  * @return {WebGLProgram}                     The created program.
  */
-export default function loadProgram(gl, shaders, attribs, loc, error) {
+export default function loadProgram(gl, shaders, attribs, locations, error) {
   let i;
   const program = gl.createProgram();
 
@@ -16,11 +16,7 @@ export default function loadProgram(gl, shaders, attribs, loc, error) {
 
   if (attribs)
     for (i = 0; i < attribs.length; ++i)
-      gl.bindAttribLocation(
-        program,
-        locations ? locations[i] : i,
-        opt_attribs[i]
-      );
+      gl.bindAttribLocation(program, locations ? locations[i] : i, attribs[i]);
 
   gl.linkProgram(program);
 
