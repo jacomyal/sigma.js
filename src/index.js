@@ -1,6 +1,6 @@
-import register from "./register";
+import "./polyfills";
 import sigma from "./sigma.core";
-import "./utils/sigma.polyfills";
+import register from "./register";
 import settings from "./sigma.settings";
 import graph from "./modules/sigma.classes.graph";
 import quad from "./modules/sigma.classes.quad";
@@ -43,9 +43,8 @@ import bindDOMEvents from "./misc/sigma.misc.bindDOMEvents";
 import drawHovers from "./misc/sigma.misc.drawHovers";
 
 register(sigma);
-registerSigmaModules(sigma);
-
 settings(sigma);
+registerSigmaModules(sigma);
 
 // Main Classes
 graph(sigma);

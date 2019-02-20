@@ -19,7 +19,10 @@ for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
 }
 
 if (!global.requestAnimationFrame)
-  global.requestAnimationFrame = function(callback, element) {
+  global.requestAnimationFrame = function requestAnimationFrame(
+    callback,
+    element
+  ) {
     const currTime = new Date().getTime();
 
     const timeToCall = Math.max(0, 16 - (currTime - lastTime));
@@ -33,7 +36,7 @@ if (!global.requestAnimationFrame)
   };
 
 if (!global.cancelAnimationFrame)
-  global.cancelAnimationFrame = function(id) {
+  global.cancelAnimationFrame = function cancelAnimationFrame(id) {
     clearTimeout(id);
   };
 
@@ -43,7 +46,7 @@ if (!global.cancelAnimationFrame)
  * Public domain
  */
 if (!Function.prototype.bind)
-  Function.prototype.bind = function(oThis) {
+  Function.prototype.bind = function bind(oThis) {
     if (typeof this !== "function")
       // Closest thing possible to the ECMAScript 5 internal IsCallable
       // function:
