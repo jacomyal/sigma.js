@@ -18,7 +18,7 @@ export default function Dispatcher() {
  * @param  {function(Object)} handler The handler to bind.
  * @return {dispatcher}               Returns the instance itself.
  */
-Dispatcher.prototype.bind = function(events, handler) {
+Dispatcher.prototype.bind = function bind(events, handler) {
   let i;
   let l;
   let event;
@@ -62,43 +62,31 @@ Dispatcher.prototype.bind = function(events, handler) {
  *                                     events will be removed.
  * @return {dispatcher}                Returns the instance itself.
  */
-Dispatcher.prototype.unbind = function(events, handler) {
+Dispatcher.prototype.unbind = function unbind(events, handler) {
   let i;
-
   let n;
-
-  let j;
-
-  let m;
-
-  let k;
-
-  let a;
-
-  let event;
-
   const eArray = typeof events === "string" ? events.split(" ") : events;
 
   if (!arguments.length) {
-    for (k in this._handlers) delete this._handlers[k];
+    Object.keys(this._handlers).forEach(key => delete this._handlers[key]);
     return this;
   }
 
   if (handler) {
-    for (i = 0, n = eArray.length; i !== n; i += 1) {
-      event = eArray[i];
+    eArray.forEach(event => {
       if (this._handlers[event]) {
-        a = [];
-        for (j = 0, m = this._handlers[event].length; j !== m; j += 1)
-          if (this._handlers[event][j].handler !== handler)
-            a.push(this._handlers[event][j]);
-
-        this._handlers[event] = a;
+        const savedHandlers = [];
+        this._handlers[event].forEach(h => {
+          if (h.handler !== handler) {
+            savedHandlers.push(h);
+          }
+        });
+        this._handlers[event] = savedHandlers;
       }
 
       if (this._handlers[event] && this._handlers[event].length === 0)
         delete this._handlers[event];
-    }
+    });
   } else
     for (i = 0, n = eArray.length; i !== n; i += 1)
       delete this._handlers[eArray[i]];
@@ -114,43 +102,26 @@ Dispatcher.prototype.unbind = function(events, handler) {
  * @param  {?object}    data   The content of the event (optional).
  * @return {dispatcher}        Returns the instance itself.
  */
-Dispatcher.prototype.dispatchEvent = function(events, data) {
-  let i;
-
-  let n;
-
-  let j;
-
-  let m;
-
-  let a;
-
-  let event;
-
-  let eventName;
-
+Dispatcher.prototype.dispatchEvent = function dispatcHEvent(events, data) {
   const self = this;
-
   const eArray = typeof events === "string" ? events.split(" ") : events;
-
   data = data === undefined ? {} : data;
 
-  for (i = 0, n = eArray.length; i !== n; i += 1) {
-    eventName = eArray[i];
-
+  eArray.forEach(eventName => {
     if (this._handlers[eventName]) {
-      event = self.getEvent(eventName, data);
-      a = [];
+      const event = self.getEvent(eventName, data);
+      const savedHandlers = [];
 
-      for (j = 0, m = this._handlers[eventName].length; j !== m; j += 1) {
-        this._handlers[eventName][j].handler(event);
-        if (!this._handlers[eventName][j].one)
-          a.push(this._handlers[eventName][j]);
-      }
+      this._handlers[eventName].forEach(handler => {
+        handler.handler(event);
+        if (!handler.one) {
+          savedHandlers.push(handler);
+        }
+      });
 
-      this._handlers[eventName] = a;
+      this._handlers[eventName] = savedHandlers;
     }
-  }
+  });
 
   return this;
 };
@@ -162,7 +133,7 @@ Dispatcher.prototype.dispatchEvent = function(events, data) {
  * @param  {?object} data   The content of the event (optional).
  * @return {object}         Returns the instance itself.
  */
-Dispatcher.prototype.getEvent = function(event, data) {
+Dispatcher.prototype.getEvent = function getEvent(event, data) {
   return {
     type: event,
     data: data || {},
@@ -176,12 +147,14 @@ Dispatcher.prototype.getEvent = function(event, data) {
  *
  * @param {object} target The target.
  */
-Dispatcher.extend = function(target, args) {
+Dispatcher.extend = function extend(target, args) {
   let k;
-
-  for (k in Dispatcher.prototype)
+  /* eslint-disable-next-line no-restricted-syntax */
+  for (k in Dispatcher.prototype) {
+    /* eslint-disable-next-line no-prototype-builtins */
     if (Dispatcher.prototype.hasOwnProperty(k))
       target[k] = Dispatcher.prototype[k];
+  }
 
   Dispatcher.apply(target, args);
 };
