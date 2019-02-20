@@ -56,54 +56,52 @@ export default {
       len = 1 / Math.sqrt(len);
       normals = [-dy * len, dx * len];
     }
+    const [norm0, norm1] = normals;
 
     // First point
     data[i++] = x1;
     data[i++] = y1;
-    data[i++] = normals[0];
-    data[i++] = normals[1];
+    data[i++] = norm0;
+    data[i++] = norm1;
     data[i++] = thickness;
     data[i++] = color;
 
     // First point flipped
     data[i++] = x1;
     data[i++] = y1;
-    data[i++] = -normals[0];
-    data[i++] = -normals[1];
+    data[i++] = -norm0;
+    data[i++] = -norm1;
     data[i++] = thickness;
     data[i++] = color;
 
     // Second point
     data[i++] = x2;
     data[i++] = y2;
-    data[i++] = normals[0];
-    data[i++] = normals[1];
+    data[i++] = norm0;
+    data[i++] = norm1;
     data[i++] = thickness;
     data[i++] = color;
 
     // Second point flipped
     data[i++] = x2;
     data[i++] = y2;
-    data[i++] = -normals[0];
-    data[i++] = -normals[1];
+    data[i++] = -norm0;
+    data[i++] = -norm1;
     data[i++] = thickness;
     data[i++] = color;
   },
   computeIndices(data) {
     const indices = new Uint16Array(data.length * 6);
     let c = 0;
-    let i = 0;
-    let j;
-    let l;
+    const l = data.length / this.ATTRIBUTES;
 
-    for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
+    for (let i = 0; i < l; i += 4) {
       indices[c++] = i + 0;
       indices[c++] = i + 1;
       indices[c++] = i + 2;
       indices[c++] = i + 2;
       indices[c++] = i + 1;
       indices[c++] = i + 3;
-      i += 3;
     }
 
     return indices;
