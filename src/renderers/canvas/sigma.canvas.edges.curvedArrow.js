@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -105,4 +105,4 @@
     context.closePath();
     context.fill();
   };
-})();
+}

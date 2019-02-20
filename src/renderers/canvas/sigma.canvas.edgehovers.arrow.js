@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.canvas.edgehovers");
 
   /**
@@ -87,4 +87,4 @@
     context.closePath();
     context.fill();
   };
-})();
+}

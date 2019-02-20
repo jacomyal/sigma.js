@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.svg.edges");
 
   /**
@@ -71,4 +71,4 @@
       return this;
     }
   };
-})();
+}

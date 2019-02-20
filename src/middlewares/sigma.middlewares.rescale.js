@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -201,4 +201,4 @@
       maxY
     };
   };
-}.call(this));
+}

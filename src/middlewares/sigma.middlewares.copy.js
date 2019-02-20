@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -28,4 +28,4 @@
     for (i = 0, l = a.length; i < l; i++)
       a[i][`${writePrefix}size`] = a[i][`${readPrefix}size`];
   };
-}.call(this));
+}

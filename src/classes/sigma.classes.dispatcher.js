@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   /**
    * Dispatcher constructor.
    *
@@ -191,12 +191,6 @@
    * EXPORT:
    * *******
    */
-  if (typeof this.sigma !== "undefined") {
-    this.sigma.classes = this.sigma.classes || {};
-    this.sigma.classes.dispatcher = dispatcher;
-  } else if (typeof exports !== "undefined") {
-    if (typeof module !== "undefined" && module.exports)
-      exports = module.exports = dispatcher;
-    exports.dispatcher = dispatcher;
-  } else this.dispatcher = dispatcher;
-}.call(this));
+  sigma.classes = sigma.classes || {};
+  sigma.classes.dispatcher = dispatcher;
+}

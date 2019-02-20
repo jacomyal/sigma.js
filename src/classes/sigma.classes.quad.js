@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   /**
    * Sigma Quadtree Module
    * =====================
@@ -648,12 +648,6 @@
    * EXPORT:
    * *******
    */
-  if (typeof this.sigma !== "undefined") {
-    this.sigma.classes = this.sigma.classes || {};
-    this.sigma.classes.quad = quad;
-  } else if (typeof exports !== "undefined") {
-    if (typeof module !== "undefined" && module.exports)
-      exports = module.exports = quad;
-    exports.quad = quad;
-  } else this.quad = quad;
-}.call(this));
+  sigma.classes = sigma.classes || {};
+  sigma.classes.quad = quad;
+}

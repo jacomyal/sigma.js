@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -43,4 +43,4 @@
     context.lineTo(target[`${prefix}x`], target[`${prefix}y`]);
     context.stroke();
   };
-})();
+}

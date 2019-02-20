@@ -1,4 +1,4 @@
-(function() {
+export default function configure(sigma) {
   sigma.utils.pkg("sigma.canvas.nodes");
 
   /**
@@ -25,4 +25,4 @@
     context.closePath();
     context.fill();
   };
-})();
+}

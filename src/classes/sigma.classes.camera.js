@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   sigma.utils.pkg("sigma.classes");
@@ -252,4 +252,4 @@
       )
     };
   };
-}.call(this));
+}

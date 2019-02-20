@@ -1,10 +1,9 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  const _root = this;
 
   // Initialize packages:
   sigma.utils = sigma.utils || {};
+  sigma.packages = sigma.packages || {};
 
   /**
    * MISC UTILS:
@@ -81,9 +80,20 @@
    * @return {object}         The related package.
    */
   sigma.utils.pkg = function(pkgName) {
-    return (pkgName || "").split(".").reduce(function(context, objName) {
-      return objName in context ? context[objName] : (context[objName] = {});
-    }, _root);
+    const getPackage = (levels, root) => {
+      return levels.reduce((context, objName) => {
+        if (!context[objName]) {
+          context[objName] = {};
+        }
+        return context[objName];
+      }, root);
+    };
+    const levels = (pkgName || "").split(".");
+    if (levels[0] === "sigma") {
+      getPackage(levels.slice(1), sigma);
+    } else {
+      getPackage(levels, sigma.packages);
+    }
   };
 
   /**
@@ -1090,4 +1100,4 @@
           a20 * b02 + a21 * b12 + a22 * b22
         ];
   };
-}.call(this));
+}

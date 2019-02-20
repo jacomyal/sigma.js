@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function configure(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   if (typeof conrad === "undefined") throw new Error("conrad is not declared");
@@ -488,4 +488,4 @@
   sigma.utils.pkg("sigma.svg.nodes");
   sigma.utils.pkg("sigma.svg.edges");
   sigma.utils.pkg("sigma.svg.labels");
-}.call(this));
+}

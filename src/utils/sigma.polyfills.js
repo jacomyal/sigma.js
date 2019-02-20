@@ -1,76 +1,74 @@
-(function(global) {
-  /**
-   * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-   * http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-   * requestAnimationFrame polyfill by Erik Möller.
-   * fixes from Paul Irish and Tino Zijdel
-   * MIT license
-   */
-  let x;
+/**
+ * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+ * http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+ * requestAnimationFrame polyfill by Erik Möller.
+ * fixes from Paul Irish and Tino Zijdel
+ * MIT license
+ */
+let x;
 
-  let lastTime = 0;
+let lastTime = 0;
 
-  const vendors = ["ms", "moz", "webkit", "o"];
+const vendors = ["ms", "moz", "webkit", "o"];
 
-  for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
-    global.requestAnimationFrame = global[`${vendors[x]}RequestAnimationFrame`];
-    global.cancelAnimationFrame =
-      global[`${vendors[x]}CancelAnimationFrame`] ||
-      global[`${vendors[x]}CancelRequestAnimationFrame`];
-  }
+for (x = 0; x < vendors.length && !global.requestAnimationFrame; x++) {
+  global.requestAnimationFrame = global[`${vendors[x]}RequestAnimationFrame`];
+  global.cancelAnimationFrame =
+    global[`${vendors[x]}CancelAnimationFrame`] ||
+    global[`${vendors[x]}CancelRequestAnimationFrame`];
+}
 
-  if (!global.requestAnimationFrame)
-    global.requestAnimationFrame = function(callback, element) {
-      const currTime = new Date().getTime();
+if (!global.requestAnimationFrame)
+  global.requestAnimationFrame = function(callback, element) {
+    const currTime = new Date().getTime();
 
-      const timeToCall = Math.max(0, 16 - (currTime - lastTime));
+    const timeToCall = Math.max(0, 16 - (currTime - lastTime));
 
-      const id = global.setTimeout(function() {
-        callback(currTime + timeToCall);
-      }, timeToCall);
+    const id = global.setTimeout(function() {
+      callback(currTime + timeToCall);
+    }, timeToCall);
 
-      lastTime = currTime + timeToCall;
-      return id;
+    lastTime = currTime + timeToCall;
+    return id;
+  };
+
+if (!global.cancelAnimationFrame)
+  global.cancelAnimationFrame = function(id) {
+    clearTimeout(id);
+  };
+
+/**
+ * Function.prototype.bind polyfill found on MDN.
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
+ * Public domain
+ */
+if (!Function.prototype.bind)
+  Function.prototype.bind = function(oThis) {
+    if (typeof this !== "function")
+      // Closest thing possible to the ECMAScript 5 internal IsCallable
+      // function:
+      throw new TypeError(
+        "Function.prototype.bind - what is trying to be bound is not callable"
+      );
+
+    const aArgs = Array.prototype.slice.call(arguments, 1);
+
+    const fToBind = this;
+
+    let fNOP;
+
+    let fBound;
+
+    fNOP = function() {};
+    fBound = function() {
+      return fToBind.apply(
+        this instanceof fNOP && oThis ? this : oThis,
+        aArgs.concat(Array.prototype.slice.call(arguments))
+      );
     };
 
-  if (!global.cancelAnimationFrame)
-    global.cancelAnimationFrame = function(id) {
-      clearTimeout(id);
-    };
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
 
-  /**
-   * Function.prototype.bind polyfill found on MDN.
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
-   * Public domain
-   */
-  if (!Function.prototype.bind)
-    Function.prototype.bind = function(oThis) {
-      if (typeof this !== "function")
-        // Closest thing possible to the ECMAScript 5 internal IsCallable
-        // function:
-        throw new TypeError(
-          "Function.prototype.bind - what is trying to be bound is not callable"
-        );
-
-      const aArgs = Array.prototype.slice.call(arguments, 1);
-
-      const fToBind = this;
-
-      let fNOP;
-
-      let fBound;
-
-      fNOP = function() {};
-      fBound = function() {
-        return fToBind.apply(
-          this instanceof fNOP && oThis ? this : oThis,
-          aArgs.concat(Array.prototype.slice.call(arguments))
-        );
-      };
-
-      fNOP.prototype = this.prototype;
-      fBound.prototype = new fNOP();
-
-      return fBound;
-    };
-})(this);
+    return fBound;
+  };
