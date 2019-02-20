@@ -535,7 +535,10 @@ Sigma.prototype._forEachRenderer = function _forEachRenderer(name) {
         try {
           renderer[name]();
         } catch (e) {
-          console.log(`Warning: The renderer "${key}" crashed on ".${name}()"`);
+          console.log(
+            `Warning: The renderer "${key}" crashed on ".${name}()"`,
+            e
+          );
         }
       } else {
         renderer[name]();

@@ -81,23 +81,15 @@ export default {
   },
   computeIndices(data) {
     const indices = new Uint16Array(data.length * 6);
-
     let c = 0;
-
-    let i = 0;
-
-    let j;
-
-    let l;
-
-    for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
+    const l = data.length / this.ATTRIBUTES;
+    for (let i = 0; i < l; i += 4) {
       indices[c++] = i + 0;
       indices[c++] = i + 1;
       indices[c++] = i + 2;
       indices[c++] = i + 2;
       indices[c++] = i + 1;
       indices[c++] = i + 3;
-      i += 3;
     }
 
     return indices;

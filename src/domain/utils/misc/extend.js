@@ -33,7 +33,7 @@ export default function extend(...args) {
 
   for (let i = args.length - 1; i >= 0; i--) {
     const arg = args[i];
-    Object.keys(arg).forEach(key => {
+    Object.keys(arg || {}).forEach(key => {
       res[key] = arg[key];
     });
   }

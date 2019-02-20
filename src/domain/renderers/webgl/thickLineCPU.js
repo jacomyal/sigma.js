@@ -78,18 +78,14 @@ export default {
   computeIndices(data) {
     const indices = new Uint16Array(data.length * 6);
     let c = 0;
-    let i = 0;
-    let j;
-    let l;
-
-    for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
+    const l = data.length / this.ATTRIBUTES;
+    for (let i = 0; i < l; i += 4) {
       indices[c++] = i + 0;
       indices[c++] = i + 1;
       indices[c++] = i + 2;
       indices[c++] = i + 2;
       indices[c++] = i + 1;
       indices[c++] = i + 3;
-      i += 3;
     }
 
     return indices;
@@ -97,13 +93,9 @@ export default {
   render(gl, program, data, params) {
     // Define attributes:
     const positionLocation = gl.getAttribLocation(program, "a_position");
-
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const ratioLocation = gl.getUniformLocation(program, "u_ratio");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
 
     // Creating buffer:
