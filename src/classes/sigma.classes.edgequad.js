@@ -674,7 +674,9 @@
 
     // Enforcing presence of boundaries
     if (!params.bounds)
-      throw "sigma.classes.edgequad.index: bounds information not given.";
+      throw new Error(
+        "sigma.classes.edgequad.index: bounds information not given."
+      );
 
     // Prefix
     const prefix = params.prefix || "";

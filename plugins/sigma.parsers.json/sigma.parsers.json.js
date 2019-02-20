@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
   sigma.utils.pkg("sigma.parsers");
@@ -51,7 +51,8 @@
 
     const xhr = sigma.utils.xhr();
 
-    if (!xhr) throw "XMLHttpRequest not supported, cannot load the file.";
+    if (!xhr)
+      throw new Error("XMLHttpRequest not supported, cannot load the file.");
 
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {

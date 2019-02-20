@@ -47,7 +47,7 @@
           handler
         });
       }
-    } else throw "bind: Wrong arguments.";
+    } else throw new Error("bind: Wrong arguments.");
 
     return this;
   };

@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   sigma.utils.pkg("sigma.classes");
 
@@ -60,7 +60,7 @@
       if (c[keys[i]] !== undefined) {
         if (typeof c[keys[i]] === "number" && !isNaN(c[keys[i]]))
           this[keys[i]] = c[keys[i]];
-        else throw `Value for "${keys[i]}" is not a number.`;
+        else throw new Error(`Value for "${keys[i]}" is not a number.`);
       }
 
     this.dispatchEvent("coordinatesUpdated");

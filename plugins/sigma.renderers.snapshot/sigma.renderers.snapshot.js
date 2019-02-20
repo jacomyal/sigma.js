@@ -12,7 +12,7 @@
 
   // Terminating if sigma were not to be found
   if (typeof sigma === "undefined")
-    throw "sigma.renderers.snapshot: sigma not in scope.";
+    throw new Error("sigma.renderers.snapshot: sigma not in scope.");
 
   // Constants
   var CONTEXTS = ["scene", "edges", "nodes", "labels"],

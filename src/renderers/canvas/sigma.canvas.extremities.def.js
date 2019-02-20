@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
   sigma.utils.pkg("sigma.canvas.extremities");

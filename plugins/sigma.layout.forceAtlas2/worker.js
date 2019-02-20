@@ -115,37 +115,41 @@
 
     function np(i, p) {
       // DEBUG: safeguards
-      if (i % W.ppn !== 0) throw `np: non correct (${i}).`;
-      if (i !== parseInt(i)) throw "np: non int.";
+      if (i % W.ppn !== 0) throw new Error(`np: non correct (${i}).`);
+      if (i !== parseInt(i)) throw new Error("np: non int.");
 
       if (p in nodeProperties) return i + nodeProperties[p];
-      throw `${"ForceAtlas2.Worker - " +
-        "Inexistant node property given ("}${p}).`;
+      throw new Error(
+        `${"ForceAtlas2.Worker - " + "Inexistant node property given ("}${p}).`
+      );
     }
 
     function ep(i, p) {
       // DEBUG: safeguards
-      if (i % W.ppe !== 0) throw `ep: non correct (${i}).`;
-      if (i !== parseInt(i)) throw "ep: non int.";
+      if (i % W.ppe !== 0) throw new Error(`ep: non correct (${i}).`);
+      if (i !== parseInt(i)) throw new Error("ep: non int.");
 
       if (p in edgeProperties) return i + edgeProperties[p];
-      throw `${"ForceAtlas2.Worker - " +
-        "Inexistant edge property given ("}${p}).`;
+      throw new Error(
+        `${"ForceAtlas2.Worker - " + "Inexistant edge property given ("}${p}).`
+      );
     }
 
     function rp(i, p) {
       // DEBUG: safeguards
-      if (i % W.ppr !== 0) throw `rp: non correct (${i}).`;
-      if (i !== parseInt(i)) throw "rp: non int.";
+      if (i % W.ppr !== 0) throw new Error(`rp: non correct (${i}).`);
+      if (i !== parseInt(i)) throw new Error("rp: non int.");
 
       if (p in regionProperties) return i + regionProperties[p];
-      throw `${"ForceAtlas2.Worker - " +
-        "Inexistant region property given ("}${p}).`;
+      throw new Error(
+        `${"ForceAtlas2.Worker - " +
+          "Inexistant region property given ("}${p}).`
+      );
     }
 
     // DEBUG
     function nan(v) {
-      if (isNaN(v)) throw "NaN alert!";
+      if (isNaN(v)) throw new Error("NaN alert!");
     }
 
     /**
@@ -1092,7 +1096,7 @@
     eval(getWorkerFn());
   } else {
     // We are requesting the worker from sigma, we retrieve it therefore
-    if (typeof sigma === "undefined") throw "sigma is not declared";
+    if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
     sigma.prototype.getForceAtlas2Worker = getWorkerFn;
   }

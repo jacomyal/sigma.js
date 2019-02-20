@@ -21,7 +21,7 @@
  *  > });
  */
 (function() {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
    * This method takes the ID of node as argument and returns the graph of the
@@ -153,7 +153,8 @@
         return null;
       })();
 
-      if (!xhr) throw "XMLHttpRequest not supported, cannot load the data.";
+      if (!xhr)
+        throw new Error("XMLHttpRequest not supported, cannot load the data.");
 
       xhr.open("GET", path, true);
       xhr.onreadystatechange = function() {

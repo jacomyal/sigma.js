@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Declare neo4j package
   sigma.utils.pkg("sigma.neo4j");
@@ -33,7 +33,8 @@
       password = neo4j.password;
     }
 
-    if (!xhr) throw "XMLHttpRequest not supported, cannot load the file.";
+    if (!xhr)
+      throw new Error("XMLHttpRequest not supported, cannot load the file.");
 
     // Construct the endpoint url
     url += endpoint;

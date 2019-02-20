@@ -1,7 +1,7 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
-  if (typeof conrad === "undefined") throw "conrad is not declared";
+  if (typeof conrad === "undefined") throw new Error("conrad is not declared");
 
   // Initialize packages:
   sigma.utils.pkg("sigma.renderers");
@@ -18,10 +18,10 @@
    */
   sigma.renderers.canvas = function(graph, camera, settings, options) {
     if (typeof options !== "object")
-      throw "sigma.renderers.canvas: Wrong arguments.";
+      throw new Error("sigma.renderers.canvas: Wrong arguments.");
 
     if (!(options.container instanceof HTMLElement))
-      throw "Container not found.";
+      throw new Error("Container not found.");
 
     let k;
 

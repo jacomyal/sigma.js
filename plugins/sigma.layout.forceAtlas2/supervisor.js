@@ -1,5 +1,7 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  "use strict";
+
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
    * Sigma ForceAtlas2.5 Supervisor
@@ -8,23 +10,21 @@
    * Author: Guillaume Plique (Yomguithereal)
    * Version: 0.1
    */
-  const _root = this;
+  var _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  const webWorkers = "Worker" in _root;
+  var webWorkers = "Worker" in _root;
 
   /**
    * Supervisor Object
    * ------------------
    */
   function Supervisor(sigInst, options) {
-    const _this = this;
-
-    const workerFn =
-      sigInst.getForceAtlas2Worker && sigInst.getForceAtlas2Worker();
+    var _this = this,
+      workerFn = sigInst.getForceAtlas2Worker && sigInst.getForceAtlas2Worker();
 
     options = options || {};
 
@@ -48,7 +48,7 @@
     // Web worker or classic DOM events?
     if (this.shouldUseWorker) {
       if (!this.workerUrl) {
-        const blob = this.makeBlob(workerFn);
+        var blob = this.makeBlob(workerFn);
         this.worker = new Worker(URL.createObjectURL(blob));
       } else {
         this.worker = new Worker(this.workerUrl);
@@ -92,7 +92,7 @@
   }
 
   Supervisor.prototype.makeBlob = function(workerFn) {
-    let blob;
+    var blob;
 
     try {
       blob = new Blob([workerFn], { type: "application/javascript" });
@@ -109,21 +109,14 @@
   };
 
   Supervisor.prototype.graphToByteArrays = function() {
-    const nodes = this.graph.nodes();
-
-    const edges = this.graph.edges();
-
-    const nbytes = nodes.length * this.ppn;
-
-    const ebytes = edges.length * this.ppe;
-
-    const nIndex = {};
-
-    let i;
-
-    let j;
-
-    let l;
+    var nodes = this.graph.nodes(),
+      edges = this.graph.edges(),
+      nbytes = nodes.length * this.ppn,
+      ebytes = edges.length * this.ppe,
+      nIndex = {},
+      i,
+      j,
+      l;
 
     // Allocating Byte arrays with correct nb of bytes
     this.nodesByteArray = new Float32Array(nbytes);
@@ -159,14 +152,12 @@
 
   // TODO: make a better send function
   Supervisor.prototype.applyLayoutChanges = function() {
-    const nodes = this.graph.nodes();
-
-    let j = 0;
-
-    let realIndex;
+    var nodes = this.graph.nodes(),
+      j = 0,
+      realIndex;
 
     // Moving nodes
-    for (let i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
+    for (var i = 0, l = this.nodesByteArray.length; i < l; i += this.ppn) {
       nodes[j].x = this.nodesByteArray[i];
       nodes[j].y = this.nodesByteArray[i + 1];
       j++;
@@ -174,12 +165,12 @@
   };
 
   Supervisor.prototype.sendByteArrayToWorker = function(action) {
-    const content = {
+    var content = {
       action: action || "loop",
       nodes: this.nodesByteArray.buffer
     };
 
-    const buffers = [this.nodesByteArray.buffer];
+    var buffers = [this.nodesByteArray.buffer];
 
     if (action === "start") {
       content.config = this.config || {};
@@ -197,8 +188,7 @@
     this.running = true;
 
     // Do not refresh edgequadtree during layout:
-    let k;
-    let c;
+    var k, c;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
       c.edgequadtree._enabled = false;
@@ -217,9 +207,7 @@
     if (!this.running) return;
 
     // Allow to refresh edgequadtree:
-    let k;
-    let c;
-    let bounds;
+    var k, c, bounds;
     for (k in this.sigInst.cameras) {
       c = this.sigInst.cameras[k];
       c.edgequadtree._enabled = true;
@@ -258,7 +246,7 @@
 
     if (!this.started) return;
 
-    const data = { action: "config", config: this.config };
+    var data = { action: "config", config: this.config };
 
     if (this.shouldUseWorker) this.worker.postMessage(data);
     else _root.postMessage(data, "*");

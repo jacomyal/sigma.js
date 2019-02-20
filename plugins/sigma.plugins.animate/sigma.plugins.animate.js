@@ -4,7 +4,7 @@
  * examples/animate.html code sample to know more.
  */
 (function() {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   sigma.utils.pkg("sigma.plugins");
 
