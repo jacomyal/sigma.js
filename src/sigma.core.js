@@ -309,13 +309,9 @@ Sigma.prototype.killCamera = function killCamera(v) {
  */
 Sigma.prototype.addRenderer = function addRenderer(options) {
   let id;
-
   let fn;
-
   let camera;
-
   let renderer;
-
   let o = options || {};
 
   // Polymorphism:
@@ -329,8 +325,9 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
     };
 
   // If the container still is a string, we get it by id
-  if (typeof o.container === "string")
+  if (typeof o.container === "string") {
     o.container = document.getElementById(o.container);
+  }
 
   // Reference the new renderer:
   if (!("id" in o)) {

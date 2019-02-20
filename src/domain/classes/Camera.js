@@ -13,7 +13,7 @@ import Dispatcher from "./Dispatcher";
  * @param  {?object}      options  Eventually some overriding options.
  * @return {camera}                Returns the fresh new camera instance.
  */
-export default function Camera(id, graph, settings, options) {
+export default function camera(id, graph, settings, options) {
   Dispatcher.extend(this);
 
   Object.defineProperty(this, "graph", {
@@ -46,7 +46,7 @@ export default function Camera(id, graph, settings, options) {
  * @param  {object} coordinates The new coordinates object.
  * @return {camera}             Returns the camera.
  */
-Camera.prototype.goTo = function goTo(coordinates) {
+camera.prototype.goTo = function(coordinates) {
   if (!this.settings("enableCamera")) return this;
 
   let i;
@@ -59,7 +59,7 @@ Camera.prototype.goTo = function goTo(coordinates) {
 
   for (i = 0, l = keys.length; i < l; i++)
     if (c[keys[i]] !== undefined) {
-      if (typeof c[keys[i]] === "number" && !Number.isNaN(c[keys[i]]))
+      if (typeof c[keys[i]] === "number" && !isNaN(c[keys[i]]))
         this[keys[i]] = c[keys[i]];
       else throw new Error(`Value for "${keys[i]}" is not a number.`);
     }
@@ -86,7 +86,7 @@ Camera.prototype.goTo = function goTo(coordinates) {
  *                           - A height.
  * @return {camera}        Returns the camera.
  */
-Camera.prototype.applyView = function applyView(read, write, options) {
+camera.prototype.applyView = function(read, write, options) {
   options = options || {};
   write = write !== undefined ? write : this.prefix;
   read = read !== undefined ? read : this.readPrefix;
@@ -143,7 +143,7 @@ Camera.prototype.applyView = function applyView(read, write, options) {
  *                    camera.
  * @return {object}   The point coordinates in the frame of the graph.
  */
-Camera.prototype.graphPosition = function graphPosition(x, y, vector) {
+camera.prototype.graphPosition = function(x, y, vector) {
   let X = 0;
 
   let Y = 0;
@@ -174,7 +174,7 @@ Camera.prototype.graphPosition = function graphPosition(x, y, vector) {
  *                    graph.
  * @return {object}   The point coordinates in the frame of the camera.
  */
-Camera.prototype.cameraPosition = function cameraPosition(x, y, vector) {
+camera.prototype.cameraPosition = function(x, y, vector) {
   let X = 0;
 
   let Y = 0;
@@ -202,11 +202,12 @@ Camera.prototype.cameraPosition = function cameraPosition(x, y, vector) {
  *
  * @return {array} The transformation matrix.
  */
-Camera.prototype.getMatrix = function getMatrix() {
+camera.prototype.getMatrix = function() {
   const scaled = scale(1 / this.ratio);
   const rotated = rotation(this.angle);
   const translated = translation(-this.x, -this.y);
   const matrix = multiply(translated, multiply(rotated, scaled));
+
   return matrix;
 };
 
@@ -223,11 +224,15 @@ Camera.prototype.getMatrix = function getMatrix() {
  * @return {object}        The rectangle as x1, y1, x2 and y2, representing
  *                         two opposite points.
  */
-Camera.prototype.getRectangle = function getRectangle(width, height) {
+camera.prototype.getRectangle = function(width, height) {
   const widthVect = this.cameraPosition(width, 0, true);
+
   const heightVect = this.cameraPosition(0, height, true);
+
   const centerVect = this.cameraPosition(width / 2, height / 2, true);
+
   const marginX = this.cameraPosition(width / 4, 0, true).x;
+
   const marginY = this.cameraPosition(0, height / 4, true).y;
 
   return {
@@ -235,6 +240,8 @@ Camera.prototype.getRectangle = function getRectangle(width, height) {
     y1: this.y - centerVect.y - marginY,
     x2: this.x - centerVect.x + marginX + widthVect.x,
     y2: this.y - centerVect.y - marginY + widthVect.y,
-    height: Math.sqrt(heightVect.x ** 2 + (heightVect.y + 2 * marginY) ** 2)
+    height: Math.sqrt(
+      Math.pow(heightVect.x, 2) + Math.pow(heightVect.y + 2 * marginY, 2)
+    )
   };
 };

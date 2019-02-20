@@ -8,7 +8,7 @@
  * @param  {configurable}             settings     The settings function.
  */
 export default function edgesDef(edge, source, target, context, settings) {
-  let { color } = edge.color;
+  let { color } = edge;
 
   const prefix = settings("prefix") || "";
   const size = edge[`${prefix}size`] || 1;
