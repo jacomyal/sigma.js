@@ -13,7 +13,7 @@ import Dispatcher from "./Dispatcher";
  * @param  {?object}      options  Eventually some overriding options.
  * @return {camera}                Returns the fresh new camera instance.
  */
-export default function camera(id, graph, settings, options) {
+export default function Camera(id, graph, settings, options) {
   Dispatcher.extend(this);
 
   Object.defineProperty(this, "graph", {
@@ -46,7 +46,7 @@ export default function camera(id, graph, settings, options) {
  * @param  {object} coordinates The new coordinates object.
  * @return {camera}             Returns the camera.
  */
-camera.prototype.goTo = function(coordinates) {
+Camera.prototype.goTo = function(coordinates) {
   if (!this.settings("enableCamera")) return this;
 
   let i;
@@ -86,7 +86,7 @@ camera.prototype.goTo = function(coordinates) {
  *                           - A height.
  * @return {camera}        Returns the camera.
  */
-camera.prototype.applyView = function(read, write, options) {
+Camera.prototype.applyView = function(read, write, options) {
   options = options || {};
   write = write !== undefined ? write : this.prefix;
   read = read !== undefined ? read : this.readPrefix;
@@ -143,7 +143,7 @@ camera.prototype.applyView = function(read, write, options) {
  *                    camera.
  * @return {object}   The point coordinates in the frame of the graph.
  */
-camera.prototype.graphPosition = function(x, y, vector) {
+Camera.prototype.graphPosition = function(x, y, vector) {
   let X = 0;
 
   let Y = 0;
@@ -174,7 +174,7 @@ camera.prototype.graphPosition = function(x, y, vector) {
  *                    graph.
  * @return {object}   The point coordinates in the frame of the camera.
  */
-camera.prototype.cameraPosition = function(x, y, vector) {
+Camera.prototype.cameraPosition = function(x, y, vector) {
   let X = 0;
 
   let Y = 0;
@@ -202,7 +202,7 @@ camera.prototype.cameraPosition = function(x, y, vector) {
  *
  * @return {array} The transformation matrix.
  */
-camera.prototype.getMatrix = function() {
+Camera.prototype.getMatrix = function() {
   const scaled = scale(1 / this.ratio);
   const rotated = rotation(this.angle);
   const translated = translation(-this.x, -this.y);
@@ -224,7 +224,7 @@ camera.prototype.getMatrix = function() {
  * @return {object}        The rectangle as x1, y1, x2 and y2, representing
  *                         two opposite points.
  */
-camera.prototype.getRectangle = function(width, height) {
+Camera.prototype.getRectangle = function(width, height) {
   const widthVect = this.cameraPosition(width, 0, true);
 
   const heightVect = this.cameraPosition(0, height, true);
