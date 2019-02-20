@@ -1,3 +1,11 @@
+import Dispatcher from "./Dispatcher";
+import doubleClick from "../utils/events/doubleClick";
+import unbindDoubleClick from "../utils/events/unbindDoubleClick";
+import mouseCoords from "../utils/events/mouseCoords";
+import getCenter from "../utils/events/getCenter";
+import getOffset from "../utils/events/getOffset";
+import zoomTo from "../utils/misc/zoomTo";
+
 export default function touchCaptor(sigma) {
   /**
    * The user inputs default captor. It deals with mouse events, keyboards
@@ -7,7 +15,7 @@ export default function touchCaptor(sigma) {
    *                                 bound.
    * @param  {camera}       camera   The camera related to the target.
    * @param  {configurable} settings The settings function.
-   * @return {sigma.captor}          The fresh new captor instance.
+   * @return {captor}          The fresh new captor instance.
    */
   return function TouchCaptor(target, camera, settings) {
     const _self = this;
@@ -66,9 +74,9 @@ export default function touchCaptor(sigma) {
 
     let _movingTimeoutId;
 
-    sigma.classes.dispatcher.extend(this);
+    Dispatcher.extend(this);
 
-    sigma.utils.doubleClick(_target, "touchstart", _doubleTapHandler);
+    doubleClick(_target, "touchstart", _doubleTapHandler);
     _target.addEventListener("touchstart", _handleStart, false);
     _target.addEventListener("touchend", _handleLeave, false);
     _target.addEventListener("touchcancel", _handleLeave, false);
@@ -76,7 +84,7 @@ export default function touchCaptor(sigma) {
     _target.addEventListener("touchmove", _handleMove, false);
 
     function position(e) {
-      const offset = sigma.utils.getOffset(_target);
+      const offset = getOffset(_target);
 
       return {
         x: e.pageX - offset.left,
@@ -87,8 +95,8 @@ export default function touchCaptor(sigma) {
     /**
      * This method unbinds every handlers that makes the captor work.
      */
-    this.kill = function() {
-      sigma.utils.unbindDoubleClick(_target, "touchstart");
+    this.kill = function kill() {
+      unbindDoubleClick(_target, "touchstart");
       _target.addEventListener("touchstart", _handleStart);
       _target.addEventListener("touchend", _handleLeave);
       _target.addEventListener("touchcancel", _handleLeave);
@@ -301,10 +309,7 @@ export default function touchCaptor(sigma) {
                 y: newStageY
               });
 
-              _self.dispatchEvent(
-                "mousemove",
-                sigma.utils.mouseCoords(e, pos0.x, pos0.y)
-              );
+              _self.dispatchEvent("mousemove", mouseCoords(e, pos0.x, pos0.y));
 
               _self.dispatchEvent("drag");
             }
@@ -318,13 +323,13 @@ export default function touchCaptor(sigma) {
             y1 = pos1.y;
 
             start = _camera.cameraPosition(
-              (_startTouchX0 + _startTouchX1) / 2 - sigma.utils.getCenter(e).x,
-              (_startTouchY0 + _startTouchY1) / 2 - sigma.utils.getCenter(e).y,
+              (_startTouchX0 + _startTouchX1) / 2 - getCenter(e).x,
+              (_startTouchY0 + _startTouchY1) / 2 - getCenter(e).y,
               true
             );
             end = _camera.cameraPosition(
-              (x0 + x1) / 2 - sigma.utils.getCenter(e).x,
-              (y0 + y1) / 2 - sigma.utils.getCenter(e).y,
+              (x0 + x1) / 2 - getCenter(e).x,
+              (y0 + y1) / 2 - getCenter(e).y,
               true
             );
 
@@ -401,15 +406,12 @@ export default function touchCaptor(sigma) {
         ratio = 1 / _settings("doubleClickZoomingRatio");
 
         pos = position(e.touches[0]);
-        _self.dispatchEvent(
-          "doubleclick",
-          sigma.utils.mouseCoords(e, pos.x, pos.y)
-        );
+        _self.dispatchEvent("doubleclick", mouseCoords(e, pos.x, pos.y));
 
         if (_settings("doubleClickEnabled")) {
           pos = _camera.cameraPosition(
-            pos.x - sigma.utils.getCenter(e).x,
-            pos.y - sigma.utils.getCenter(e).y,
+            pos.x - getCenter(e).x,
+            pos.y - getCenter(e).y,
             true
           );
 
@@ -420,7 +422,7 @@ export default function touchCaptor(sigma) {
             }
           };
 
-          sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
+          zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
         if (e.preventDefault) e.preventDefault();

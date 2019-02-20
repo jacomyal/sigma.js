@@ -1,3 +1,6 @@
+import getDistance from "./getDistance";
+import getPointOnQuadraticCurve from "./getPointOnQuadraticCurve";
+
 /**
  * Check if a point is on a quadratic bezier curve segment with a thickness.
  *
@@ -26,14 +29,14 @@ export default function isPointOnQuadraticCurve(
 ) {
   // Fails if the point is too far from the extremities of the segment,
   // preventing for more costly computation:
-  const dP1P2 = sigma.utils.getDistance(x1, y1, x2, y2);
+  const dP1P2 = getDistance(x1, y1, x2, y2);
   if (Math.abs(x - x1) > dP1P2 || Math.abs(y - y1) > dP1P2) {
     return false;
   }
 
-  const dP1 = sigma.utils.getDistance(x, y, x1, y1);
+  const dP1 = getDistance(x, y, x1, y1);
 
-  const dP2 = sigma.utils.getDistance(x, y, x2, y2);
+  const dP2 = getDistance(x, y, x2, y2);
 
   let t = 0.5;
 
@@ -43,9 +46,9 @@ export default function isPointOnQuadraticCurve(
 
   let i = 100;
 
-  let pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
+  let pt = getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
 
-  let dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+  let dt = getDistance(x, y, pt.x, pt.y);
 
   let old_dt;
 
@@ -61,8 +64,8 @@ export default function isPointOnQuadraticCurve(
     (r > rThreshold || r < -rThreshold)
   ) {
     old_dt = dt;
-    pt = sigma.utils.getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
-    dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+    pt = getPointOnQuadraticCurve(t, x1, y1, x2, y2, cpx, cpy);
+    dt = getDistance(x, y, pt.x, pt.y);
 
     if (dt > old_dt) {
       // not the right direction:

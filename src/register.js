@@ -7,11 +7,11 @@ export default function configure(sigma) {
    *
    * Example:
    * ********
-   *  > sigma.utils.pkg('a.b.c');
+   *  > pkg('a.b.c');
    *  > a.b.c;
    *  > // Object {};
    *  >
-   *  > sigma.utils.pkg('a.b.d');
+   *  > pkg('a.b.d');
    *  > a.b;
    *  > // Object { c: {}, d: {} };
    *

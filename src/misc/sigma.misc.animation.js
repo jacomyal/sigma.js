@@ -9,9 +9,9 @@ export default function configure(sigma) {
    *
    * @return {string} Returns the new ID.
    */
-  const _getID = (function() {
+  const _getID = (function getId() {
     let id = 0;
-    return function() {
+    return function next() {
       return `${++id}`;
     };
   })();
@@ -41,7 +41,7 @@ export default function configure(sigma) {
    * @return {number}          The animation id, to make it easy to kill
    *                           through the method "sigma.misc.animation.kill".
    */
-  sigma.misc.animation.camera = function(camera, val, options) {
+  sigma.misc.animation.camera = function camera(camera, val, options) {
     if (
       !(camera instanceof sigma.classes.camera) ||
       typeof val !== "object" ||
@@ -60,19 +60,12 @@ export default function configure(sigma) {
       );
 
     let fn;
-
     let id;
-
     let anim;
-
     let easing;
-
     let duration;
-
     let initialVal;
-
     const o = options || {};
-
     const start = sigma.utils.dateNow();
 
     // Store initial values:
@@ -89,7 +82,7 @@ export default function configure(sigma) {
         ? sigma.utils.easings[o.easing || "quadraticInOut"]
         : o.easing;
 
-    fn = function() {
+    fn = function tick() {
       let coef;
 
       const t = o.duration ? (sigma.utils.dateNow() - start) / o.duration : 1;
@@ -159,7 +152,7 @@ export default function configure(sigma) {
    * @param  {number} id  The id of the animation to kill.
    * @return {object}     Returns the sigma.misc.animation package.
    */
-  sigma.misc.animation.kill = function(id) {
+  sigma.misc.animation.kill = function kill(id) {
     if (arguments.length !== 1 || typeof id !== "number")
       throw new Error("animation.kill: Wrong arguments.");
 
@@ -189,7 +182,7 @@ export default function configure(sigma) {
    * @return {number}                  Returns the number of animations killed
    *                                   that way.
    */
-  sigma.misc.animation.killAll = function(filter) {
+  sigma.misc.animation.killAll = function killAll(filter) {
     let o;
 
     let id;
@@ -234,7 +227,7 @@ export default function configure(sigma) {
    * @return {boolean}              Returns true if any running animation
    *                                matches.
    */
-  sigma.misc.animation.has = function(filter) {
+  sigma.misc.animation.has = function has(filter) {
     let id;
 
     const type = typeof filter === "string" ? filter : null;

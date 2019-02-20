@@ -76,7 +76,8 @@
       "new-cap": "off",
       "no-underscore-dangle": "off",
       "no-plusplus": "off",
-      "no-multi-assign": "off"
+      "no-multi-assign": "off",
+      "no-param-reassign": "off"
     }
   },
   "dependencies": {

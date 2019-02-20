@@ -1,3 +1,6 @@
+import getDistance from "./getDistance";
+import getPointOnBezierCurve from "./getPointOnBezierCurve";
+
 /**
  * Check if a point is on a cubic bezier curve segment with a thickness.
  *
@@ -30,14 +33,14 @@ export default function isPointOnBezierCurve(
 ) {
   // Fails if the point is too far from the extremities of the segment,
   // preventing for more costly computation:
-  const dP1CP1 = sigma.utils.getDistance(x1, y1, cpx1, cpy1);
+  const dP1CP1 = getDistance(x1, y1, cpx1, cpy1);
   if (Math.abs(x - x1) > dP1CP1 || Math.abs(y - y1) > dP1CP1) {
     return false;
   }
 
-  const dP1 = sigma.utils.getDistance(x, y, x1, y1);
+  const dP1 = getDistance(x, y, x1, y1);
 
-  const dP2 = sigma.utils.getDistance(x, y, x2, y2);
+  const dP2 = getDistance(x, y, x2, y2);
 
   let t = 0.5;
 
@@ -47,19 +50,9 @@ export default function isPointOnBezierCurve(
 
   let i = 100;
 
-  let pt = sigma.utils.getPointOnBezierCurve(
-    t,
-    x1,
-    y1,
-    x2,
-    y2,
-    cpx1,
-    cpy1,
-    cpx2,
-    cpy2
-  );
+  let pt = getPointOnBezierCurve(t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2);
 
-  let dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+  let dt = getDistance(x, y, pt.x, pt.y);
 
   let old_dt;
 
@@ -75,18 +68,8 @@ export default function isPointOnBezierCurve(
     (r > rThreshold || r < -rThreshold)
   ) {
     old_dt = dt;
-    pt = sigma.utils.getPointOnBezierCurve(
-      t,
-      x1,
-      y1,
-      x2,
-      y2,
-      cpx1,
-      cpy1,
-      cpx2,
-      cpy2
-    );
-    dt = sigma.utils.getDistance(x, y, pt.x, pt.y);
+    pt = getPointOnBezierCurve(t, x1, y1, x2, y2, cpx1, cpy1, cpx2, cpy2);
+    dt = getDistance(x, y, pt.x, pt.y);
 
     if (dt > old_dt) {
       // not the right direction:

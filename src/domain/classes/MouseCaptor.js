@@ -1,3 +1,13 @@
+import Dispatcher from "./Dispatcher";
+import doubleClick from "../utils/events/doubleClick";
+import unbindDoubleClick from "../utils/events/unbindDoubleClick";
+import mouseCoords from "../utils/events/mouseCoords";
+import getX from "../utils/events/getX";
+import getY from "../utils/events/getY";
+import getCenter from "../utils/events/getCenter";
+import getDelta from "../utils/events/getDelta";
+import zoomTo from "../utils/misc/zoomTo";
+
 export default function mouseCaptor(sigma) {
   /**
    * The user inputs default captor. It deals with mouse events, keyboards
@@ -7,58 +17,40 @@ export default function mouseCaptor(sigma) {
    *                                 bound.
    * @param  {camera}       camera   The camera related to the target.
    * @param  {configurable} settings The settings function.
-   * @return {sigma.captor}          The fresh new captor instance.
+   * @return {captor}          The fresh new captor instance.
    */
   return function MouseCaptor(target, camera, settings) {
     const _self = this;
-
     const _target = target;
-
     const _camera = camera;
-
     const _settings = settings;
 
     // CAMERA MANAGEMENT:
     // ******************
     // The camera position when the user starts dragging:
-
     let _startCameraX;
-
     let _startCameraY;
-
     let _startCameraAngle;
 
     // The latest stage position:
-
     let _lastCameraX;
-
     let _lastCameraY;
-
     let _lastCameraAngle;
-
     let _lastCameraRatio;
 
     // MOUSE MANAGEMENT:
     // *****************
     // The mouse position when the user starts dragging:
-
     let _startMouseX;
-
     let _startMouseY;
-
     let _isMouseDown;
-
     let _isMoving;
-
     let _hasDragged;
-
     let _downStartTime;
-
     let _movingTimeoutId;
+    Dispatcher.extend(this);
 
-    sigma.classes.dispatcher.extend(this);
-
-    sigma.utils.doubleClick(_target, "click", _doubleClickHandler);
+    doubleClick(_target, "click", _doubleClickHandler);
     _target.addEventListener("DOMMouseScroll", _wheelHandler, false);
     _target.addEventListener("mousewheel", _wheelHandler, false);
     _target.addEventListener("mousemove", _moveHandler, false);
@@ -70,8 +62,8 @@ export default function mouseCaptor(sigma) {
     /**
      * This method unbinds every handlers that makes the captor work.
      */
-    this.kill = function() {
-      sigma.utils.unbindDoubleClick(_target, "click");
+    this.kill = function kill() {
+      unbindDoubleClick(_target, "click");
       _target.removeEventListener("DOMMouseScroll", _wheelHandler);
       _target.removeEventListener("mousewheel", _wheelHandler);
       _target.removeEventListener("mousemove", _moveHandler);
@@ -97,7 +89,7 @@ export default function mouseCaptor(sigma) {
 
       // Dispatch event:
       if (_settings("mouseEnabled")) {
-        _self.dispatchEvent("mousemove", sigma.utils.mouseCoords(e));
+        _self.dispatchEvent("mousemove", mouseCoords(e));
 
         if (_isMouseDown) {
           _isMoving = true;
@@ -105,7 +97,7 @@ export default function mouseCaptor(sigma) {
 
           if (_movingTimeoutId) clearTimeout(_movingTimeoutId);
 
-          _movingTimeoutId = setTimeout(function() {
+          _movingTimeoutId = setTimeout(function stopMoving() {
             _isMoving = false;
           }, _settings("dragTimeout"));
 
@@ -113,8 +105,8 @@ export default function mouseCaptor(sigma) {
 
           _camera.isMoving = true;
           pos = _camera.cameraPosition(
-            sigma.utils.getX(e) - _startMouseX,
-            sigma.utils.getY(e) - _startMouseY,
+            getX(e) - _startMouseX,
+            getY(e) - _startMouseY,
             true
           );
 
@@ -153,9 +145,8 @@ export default function mouseCaptor(sigma) {
 
         _camera.isMoving = false;
 
-        const x = sigma.utils.getX(e);
-
-        const y = sigma.utils.getY(e);
+        const x = getX(e);
+        const y = getY(e);
 
         if (_isMoving) {
           sigma.misc.animation.killAll(_camera);
@@ -180,7 +171,7 @@ export default function mouseCaptor(sigma) {
             y: _camera.y
           });
 
-        _self.dispatchEvent("mouseup", sigma.utils.mouseCoords(e));
+        _self.dispatchEvent("mouseup", mouseCoords(e));
 
         // Update _isMoving flag:
         _isMoving = false;
@@ -201,8 +192,8 @@ export default function mouseCaptor(sigma) {
         _lastCameraX = _camera.x;
         _lastCameraY = _camera.y;
 
-        _startMouseX = sigma.utils.getX(e);
-        _startMouseY = sigma.utils.getY(e);
+        _startMouseX = getX(e);
+        _startMouseY = getY(e);
 
         _hasDragged = false;
         _downStartTime = new Date().getTime();
@@ -216,7 +207,7 @@ export default function mouseCaptor(sigma) {
             // Right mouse button pressed
             _self.dispatchEvent(
               "rightclick",
-              sigma.utils.mouseCoords(e, _startMouseX, _startMouseY)
+              mouseCoords(e, _startMouseX, _startMouseY)
             );
             break;
           // case 1:
@@ -226,7 +217,7 @@ export default function mouseCaptor(sigma) {
 
             _self.dispatchEvent(
               "mousedown",
-              sigma.utils.mouseCoords(e, _startMouseX, _startMouseY)
+              mouseCoords(e, _startMouseX, _startMouseY)
             );
         }
       }
@@ -250,7 +241,7 @@ export default function mouseCaptor(sigma) {
      */
     function _clickHandler(e) {
       if (_settings("mouseEnabled")) {
-        const event = sigma.utils.mouseCoords(e);
+        const event = mouseCoords(e);
         event.isDragging =
           new Date().getTime() - _downStartTime > 100 && _hasDragged;
         _self.dispatchEvent("click", event);
@@ -279,13 +270,13 @@ export default function mouseCaptor(sigma) {
 
         _self.dispatchEvent(
           "doubleclick",
-          sigma.utils.mouseCoords(e, _startMouseX, _startMouseY)
+          mouseCoords(e, _startMouseX, _startMouseY)
         );
 
         if (_settings("doubleClickEnabled")) {
           pos = _camera.cameraPosition(
-            sigma.utils.getX(e) - sigma.utils.getCenter(e).x,
-            sigma.utils.getY(e) - sigma.utils.getCenter(e).y,
+            getX(e) - getCenter(e).x,
+            getY(e) - getCenter(e).y,
             true
           );
 
@@ -293,7 +284,7 @@ export default function mouseCaptor(sigma) {
             duration: _settings("doubleClickZoomDuration")
           };
 
-          sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
+          zoomTo(_camera, pos.x, pos.y, ratio, animation);
         }
 
         if (e.preventDefault) e.preventDefault();
@@ -317,7 +308,7 @@ export default function mouseCaptor(sigma) {
 
       let animation;
 
-      const wheelDelta = sigma.utils.getDelta(e);
+      const wheelDelta = getDelta(e);
 
       if (
         _settings("mouseEnabled") &&
@@ -330,8 +321,8 @@ export default function mouseCaptor(sigma) {
             : _settings("zoomingRatio");
 
         pos = _camera.cameraPosition(
-          sigma.utils.getX(e) - sigma.utils.getCenter(e).x,
-          sigma.utils.getY(e) - sigma.utils.getCenter(e).y,
+          getX(e) - getCenter(e).x,
+          getY(e) - getCenter(e).y,
           true
         );
 
@@ -339,7 +330,7 @@ export default function mouseCaptor(sigma) {
           duration: _settings("mouseZoomDuration")
         };
 
-        sigma.utils.zoomTo(_camera, pos.x, pos.y, ratio, animation);
+        zoomTo(_camera, pos.x, pos.y, ratio, animation);
 
         if (e.preventDefault) e.preventDefault();
         else e.returnValue = false;

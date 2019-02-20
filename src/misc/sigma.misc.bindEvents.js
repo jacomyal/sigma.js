@@ -1,9 +1,4 @@
 export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  // Initialize packages:
-  sigma.utils.pkg("sigma.misc");
-
   /**
    * This helper will bind any no-DOM renderer (for instance canvas or WebGL)
    * to its captors, to properly dispatch the good events to the sigma instance
@@ -11,17 +6,12 @@ export default function configure(sigma) {
    *
    * It has to be called in the scope of the related renderer.
    */
-  sigma.misc.bindEvents = function(prefix) {
+  sigma.register("sigma.misc.bindEvents", function bindEvents(prefix) {
     let i;
-
     let l;
-
     let mX;
-
     let mY;
-
     let captor;
-
     const self = this;
 
     function getNodes(e) {
@@ -531,5 +521,5 @@ export default function configure(sigma) {
 
     for (i = 0, l = this.captors.length; i < l; i++)
       bindCaptor(this.captors[i]);
-  };
+  });
 }

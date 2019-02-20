@@ -3,19 +3,19 @@
  *
  * Example:
  * ********
- *  > sigma.utils.id();
+ *  > id();
  *  > // 1;
  *  >
- *  > sigma.utils.id();
+ *  > id();
  *  > // 2;
  *  >
- *  > sigma.utils.id();
+ *  > id();
  *  > // 3;
  *
  * @param  {string} pkgName The name of the package to create/find.
  * @return {object}         The related package.
  */
-export default function id() {
-  let i = 0;
-  return () => ++i;
-}
+export default (() => {
+  let id = 0;
+  return () => ++id;
+})();

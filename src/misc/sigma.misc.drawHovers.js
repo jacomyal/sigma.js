@@ -1,9 +1,4 @@
 export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  // Initialize packages:
-  sigma.utils.pkg("sigma.misc");
-
   /**
    * This method listens to "overNode", "outNode", "overEdge" and "outEdge"
    * events from a renderer and renders the nodes differently on the top layer.
@@ -12,7 +7,7 @@ export default function configure(sigma) {
    *
    * It has to be called in the scope of the related renderer.
    */
-  sigma.misc.drawHovers = function(prefix) {
+  sigma.register("sigma.misc.drawHovers", function drawHovers(prefix) {
     const self = this;
 
     const hoveredNodes = {};
@@ -195,5 +190,5 @@ export default function configure(sigma) {
         }
       }
     }
-  };
+  });
 }

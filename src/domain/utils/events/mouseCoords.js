@@ -1,3 +1,7 @@
+import getX from "./getX";
+import getY from "./getY";
+import getCenter from "./getCenter";
+
 /**
  * Convert mouse coords to sigma coords
  *
@@ -8,11 +12,11 @@
  * @return {object}    The standardized event
  */
 export default function mouseCoords(e, x, y) {
-  x = x || sigma.utils.getX(e);
-  y = y || sigma.utils.getY(e);
+  x = x || getX(e);
+  y = y || getY(e);
   return {
-    x: x - sigma.utils.getCenter(e).x,
-    y: y - sigma.utils.getCenter(e).y,
+    x: x - getCenter(e).x,
+    y: y - getCenter(e).y,
     clientX: e.clientX,
     clientY: e.clientY,
     ctrlKey: e.ctrlKey,

@@ -3,7 +3,6 @@ import TouchCaptor from "./domain/classes/TouchCaptor";
 import Camera from "./domain/classes/Camera";
 import Configurable from "./domain/classes/Configurable";
 import Dispatcher from "./domain/classes/Dispatcher";
-
 import extend from "./domain/utils/misc/extend";
 import dateNow from "./domain/utils/misc/dateNow";
 import id from "./domain/utils/misc/id";
@@ -29,7 +28,6 @@ import getDelta from "./domain/utils/events/getDelta";
 import getOffset from "./domain/utils/events/getOffset";
 import doubleClick from "./domain/utils/events/doubleClick";
 import unbindDoubleClick from "./domain/utils/events/unbindDoubleClick";
-
 import {
   linearNone,
   quadraticIn,
@@ -45,6 +43,41 @@ import translation from "./domain/utils/matrices/translation";
 import rotation from "./domain/utils/matrices/rotation";
 import scale from "./domain/utils/matrices/scale";
 import multiply from "./domain/utils/matrices/multiply";
+import EdgeQuad from "./domain/classes/EdgeQuad";
+import Graph from "./domain/classes/Graph";
+import Quad from "./domain/classes/Quad";
+import edgeHoversArrowCanvas from "./domain/renderers/canvas/edgeHoversArrow";
+import edgeHoversCurveCanvas from "./domain/renderers/canvas/edgeHoversCurve";
+import edgeHoversCurvedArrowCanvas from "./domain/renderers/canvas/edgeHoversCurvedArrow";
+import edgeHoversDefCanvas from "./domain/renderers/canvas/edgeHoversDef";
+import edgesArrowCanvas from "./domain/renderers/canvas/edgesArrow";
+import edgesCurveCanvas from "./domain/renderers/canvas/edgesCurve";
+import edgesCurvedArrowCanvas from "./domain/renderers/canvas/edgesCurvedArrow";
+import edgesDefCanvas from "./domain/renderers/canvas/edgesDef";
+import extremitiesDefCanvas from "./domain/renderers/canvas/extremitiesDef";
+import hoversDefCanvas from "./domain/renderers/canvas/hoversDef";
+import labelsDefCanvas from "./domain/renderers/canvas/labelsDef";
+import nodesDefCanvas from "./domain/renderers/canvas/nodesDef";
+import CanvasRenderer from "./domain/renderers/canvas/index";
+import SvgRenderer from "./domain/renderers/svg/index";
+import edgesCurveSvg from "./domain/renderers/svg/edgesCurve";
+import edgesDefSvg from "./domain/renderers/svg/edgesDef";
+import hoversDefSvg from "./domain/renderers/svg/hoversDef";
+import labelsDefSvg from "./domain/renderers/svg/labelsDef";
+import nodesDefSvg from "./domain/renderers/svg/nodesDef";
+import { show, hide } from "./domain/renderers/svg/utils";
+import WebGLRenderer from "./domain/renderers/webgl/index";
+import webglEdgesArrow from "./domain/renderers/webgl/edgesArrow";
+import webglEdgesDef from "./domain/renderers/webgl/edgesDef";
+import webglEdgesFast from "./domain/renderers/webgl/edgesFast";
+import webglNodesDef from "./domain/renderers/webgl/nodesDef";
+import webglNodesFast from "./domain/renderers/webgl/nodesFast";
+import webglEdgesThickLine from "./domain/renderers/webgl/thickLine";
+import webglThickLineCPU from "./domain/renderers/webgl/thickLineCPU";
+import webglThickLineGPU from "./domain/renderers/webgl/thickLineGPU";
+import copy from "./domain/middleware/copy";
+import rescale from "./domain/middleware/rescale";
+import getBoundaries from "./domain/utils/geometry/getBoundaries";
 
 export default sigma => {
   /**
@@ -80,6 +113,7 @@ export default sigma => {
     isPointOnQuadraticCurve
   );
   sigma.register("sigma.utils.isPointOnBezierCurve", isPointOnBezierCurve);
+  sigma.register("sigma.utils.getBoundaries", getBoundaries);
 
   /**
    * Event Utilities
@@ -93,7 +127,7 @@ export default sigma => {
   sigma.register("sigma.utils.getHeight", getHeight);
   sigma.register("sigma.utils.getDelta", getDelta);
   sigma.register("sigma.utils.getOffset", getOffset);
-  sigma.register("sigma.utils.doubleClick", doubleClick);
+  sigma.register("sigma.utils.doubleClick", doubleClick(sigma));
   sigma.register("sigma.utils.unbindDoubleClick", unbindDoubleClick);
 
   /**
@@ -132,9 +166,55 @@ export default sigma => {
   // Register Classes
   sigma.register("sigma.classes.dispatcher", Dispatcher);
   sigma.register("sigma.classes.configurable", Configurable);
-  sigma.register("sigma.classes.camera", Camera(sigma));
+  sigma.register("sigma.classes.camera", Camera);
+  sigma.register("sigma.classes.edgequad", EdgeQuad);
+  sigma.register("sigma.classes.graph", Graph);
+  sigma.register("sigma.classes.quad", Quad);
 
   // Register Captors
   sigma.register("sigma.captors.mouse", MouseCaptor(sigma));
   sigma.register("sigma.captors.touch", TouchCaptor(sigma));
+
+  // Canvas Renderers
+  sigma.register("sigma.renderers.canvas", CanvasRenderer(sigma));
+  sigma.register("sigma.canvas.edgehovers.arrow", edgeHoversArrowCanvas);
+  sigma.register("sigma.canvas.edgehovers.curve", edgeHoversCurveCanvas);
+  sigma.register(
+    "sigma.canvas.edgehovers.curvedArrow",
+    edgeHoversCurvedArrowCanvas
+  );
+  sigma.register("sigma.canvas.edgehovers.def", edgeHoversDefCanvas);
+  sigma.register("sigma.canvas.edges.arrow", edgesArrowCanvas);
+  sigma.register("sigma.canvas.edges.curve", edgesCurveCanvas);
+  sigma.register("sigma.canvas.edges.curvedArrow", edgesCurvedArrowCanvas);
+  sigma.register("sigma.canvas.edges.def", edgesDefCanvas);
+  sigma.register("sigma.canvas.extremities.def", extremitiesDefCanvas(sigma));
+  sigma.register("sigma.canvas.hovers.def", hoversDefCanvas(sigma));
+  sigma.register("sigma.canvas.labels.def", labelsDefCanvas);
+  sigma.register("sigma.canvas.nodes.def", nodesDefCanvas);
+
+  // SVG Renderer
+  sigma.register("sigma.renderers.svg", SvgRenderer(sigma));
+  sigma.register("sigma.svg.edges.curve", edgesCurveSvg);
+  sigma.register("sigma.svg.edges.def", edgesDefSvg);
+  sigma.register("sigma.svg.hovers.def", hoversDefSvg);
+  sigma.register("sigma.svg.labels.def", labelsDefSvg);
+  sigma.register("sigma.svg.nodes.def", nodesDefSvg);
+  sigma.register("sigma.svg.utils.show", show);
+  sigma.register("sigma.svg.utils.hide", hide);
+
+  // WebGL Renderer
+  sigma.register("sigma.renderers.webgl", WebGLRenderer(sigma));
+  sigma.register("sigma.webgl.edges.arrow", webglEdgesArrow);
+  sigma.register("sigma.webgl.edges.def", webglEdgesDef);
+  sigma.register("sigma.webgl.edges.fast", webglEdgesFast);
+  sigma.register("sigma.webgl.nodes.def", webglNodesDef);
+  sigma.register("sigma.webgl.nodes.fast", webglNodesFast);
+  sigma.register("sigma.webgl.edges.thickLine", webglEdgesThickLine);
+  sigma.register("sigma.webgl.edges.thickLineCPU", webglThickLineCPU);
+  sigma.register("sigma.webgl.edges.thickLineGPU", webglThickLineGPU);
+
+  // Middleware
+  sigma.register("sigma.middlewares.copy", copy);
+  sigma.register("sigma.middlewares.rescale", rescale);
 };

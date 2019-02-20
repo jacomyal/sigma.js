@@ -17,7 +17,7 @@
  *  >       c: '4',
  *  >       d: [ 5 ]
  *  >     };
- *  > sigma.utils.extend(o1, o2);
+ *  > extend(o1, o2);
  *  > // Returns: {
  *  > //   a: 1,
  *  > //   b: 2,
