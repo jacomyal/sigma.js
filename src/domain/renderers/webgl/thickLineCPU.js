@@ -20,15 +20,10 @@ export default {
   ATTRIBUTES: 3,
   addEdge(edge, source, target, data, i, prefix, settings) {
     const thickness = (edge[`${prefix}size`] || 1) / 2;
-
     const x1 = source[`${prefix}x`];
-
     const y1 = source[`${prefix}y`];
-
     const x2 = target[`${prefix}x`];
-
     const y2 = target[`${prefix}y`];
-
     let { color } = edge;
 
     if (!color)
@@ -46,22 +41,18 @@ export default {
 
     // Normalize color:
     color = floatColor(color);
-
     // Computing normals:
     const dx = x2 - x1;
-
     const dy = y2 - y1;
-
     let len = dx * dx + dy * dy;
 
-    var normals;
+    let normals;
 
     if (!len) {
       normals = [0, 0];
     } else {
       len = 1 / Math.sqrt(len);
-
-      var normals = [-dy * len * thickness, dx * len * thickness];
+      normals = [-dy * len * thickness, dx * len * thickness];
     }
 
     // First point
@@ -86,13 +77,9 @@ export default {
   },
   computeIndices(data) {
     const indices = new Uint16Array(data.length * 6);
-
     let c = 0;
-
     let i = 0;
-
     let j;
-
     let l;
 
     for (j = 0, l = data.length / this.ATTRIBUTES; i < l; i++) {
@@ -128,7 +115,7 @@ export default {
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.settings("edgesPowRatio"))
+      params.ratio / params.ratio ** params.settings("edgesPowRatio")
     );
 
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
@@ -168,11 +155,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position;",
@@ -205,7 +188,7 @@ export default {
       gl.VERTEX_SHADER
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -219,7 +202,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
 
     return program;
   }

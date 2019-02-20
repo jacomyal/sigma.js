@@ -21,7 +21,7 @@ export default function edgesArrow(edge, source, target, context, settings) {
   const tX = target[`${prefix}x`];
   const tY = target[`${prefix}y`];
   const aSize = Math.max(size * 2.5, settings("minArrowSize"));
-  const d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2));
+  const d = Math.sqrt((tX - sX) ** 2 + (tY - sY) ** 2);
   const aX = sX + ((tX - sX) * (d - aSize - tSize)) / d;
   const aY = sY + ((tY - sY) * (d - aSize - tSize)) / d;
   const vX = ((tX - sX) * aSize) / d;

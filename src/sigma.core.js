@@ -63,8 +63,6 @@ function Sigma(conf) {
   let i;
   let l;
   let a;
-  let c;
-  let o;
   let id;
 
   Sigma.classes.dispatcher.extend(this);
@@ -96,7 +94,7 @@ function Sigma(conf) {
     };
 
   // Also check "renderer" and "container" keys:
-  o = _conf.renderers || _conf.renderer || _conf.container;
+  const o = _conf.renderers || _conf.renderer || _conf.container;
   if (!_conf.renderers || _conf.renderers.length === 0)
     if (
       typeof o === "string" ||
@@ -250,9 +248,9 @@ Sigma.prototype.addCamera = function addCamera(id) {
     camera.edgequadtree = new Sigma.classes.edgequad();
   }
 
-  camera.bind("coordinatesUpdated", function onCoordinatesUpdated(e) {
-    self.renderCamera(camera, camera.isAnimated);
-  });
+  camera.bind("coordinatesUpdated", () =>
+    self.renderCamera(camera, camera.isAnimated)
+  );
 
   this.renderersPerCamera[id] = [];
   return camera;
@@ -310,8 +308,6 @@ Sigma.prototype.killCamera = function killCamera(v) {
 Sigma.prototype.addRenderer = function addRenderer(options) {
   let id;
   let fn;
-  let camera;
-  let renderer;
   let o = options || {};
 
   // Polymorphism:
@@ -344,7 +340,7 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
   fn = fn || Sigma.renderers.def;
 
   // Find the good camera:
-  camera =
+  const camera =
     "camera" in o
       ? o.camera instanceof Sigma.classes.camera
         ? o.camera
@@ -357,7 +353,7 @@ Sigma.prototype.addRenderer = function addRenderer(options) {
     );
 
   // Instantiate:
-  renderer = new fn(this.graph, camera, this.settings, o);
+  const renderer = new fn(this.graph, camera, this.settings, o);
   this.renderers[id] = renderer;
   Object.defineProperty(renderer, "id", {
     value: id
@@ -456,19 +452,12 @@ Sigma.prototype.killRenderer = function killRenderer(v) {
  */
 Sigma.prototype.refresh = function refresh(options) {
   let i;
-
   let l;
-
   let k;
-
   let a;
-
   let c;
-
   let bounds;
-
   let prefix = 0;
-
   options = options || {};
 
   // Call each middleware:

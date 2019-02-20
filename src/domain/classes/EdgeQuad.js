@@ -315,8 +315,7 @@ const _geom = {
    * @return {object} The projection defined by coordinates (x, y).
    */
   projection(c, a) {
-    const l = (c.x * a.x + c.y * a.y) / (Math.pow(a.x, 2) + Math.pow(a.y, 2));
-
+    const l = (c.x * a.x + c.y * a.y) / (a.x ** 2 + a.y ** 2);
     return {
       x: l * a.x,
       y: l * a.y

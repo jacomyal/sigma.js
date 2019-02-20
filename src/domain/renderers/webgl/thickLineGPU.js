@@ -134,7 +134,7 @@ export default {
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.settings("edgesPowRatio"))
+      params.ratio / params.ratio ** params.settings("edgesPowRatio")
     );
 
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
@@ -201,11 +201,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position1;",
@@ -247,7 +243,7 @@ export default {
       }
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -261,7 +257,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
 
     return program;
   }

@@ -92,10 +92,7 @@ const _geom = {
    * @return {object} Coordinates of the corner (x, y).
    */
   lowerLeftCoor(r) {
-    const width = Math.sqrt(
-      Math.pow(r.x2 - r.x1, 2) + Math.pow(r.y2 - r.y1, 2)
-    );
-
+    const width = Math.sqrt((r.x2 - r.x1) ** 2 + (r.y2 - r.y1) ** 2);
     return {
       x: r.x1 - ((r.y2 - r.y1) * r.height) / width,
       y: r.y1 + ((r.x2 - r.x1) * r.height) / width
@@ -197,7 +194,7 @@ const _geom = {
    * @return {object} The projection defined by coordinates (x, y).
    */
   projection(c, a) {
-    const l = (c.x * a.x + c.y * a.y) / (Math.pow(a.x, 2) + Math.pow(a.y, 2));
+    const l = (c.x * a.x + c.y * a.y) / (a.x ** 2 + a.y ** 2);
 
     return {
       x: l * a.x,
@@ -622,7 +619,9 @@ Quad.prototype.area = function area(rect) {
 
   // Object to array
   const nodesArray = [];
-  for (const i in nodes) nodesArray.push(nodes[i]);
+  for (const i in nodes) {
+    nodesArray.push(nodes[i]);
+  }
 
   // Caching
   this._cache.query = serialized;

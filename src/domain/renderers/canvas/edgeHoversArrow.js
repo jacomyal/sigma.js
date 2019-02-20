@@ -28,7 +28,7 @@ export default function edgeHoversArrow(
 
   size = edge.hover ? settings("edgeHoverSizeRatio") * size : size;
   const aSize = size * 2.5;
-  const d = Math.sqrt(Math.pow(tX - sX, 2) + Math.pow(tY - sY, 2));
+  const d = Math.sqrt((tX - sX) ** 2 + (tY - sY) ** 2);
   const aX = sX + ((tX - sX) * (d - aSize - tSize)) / d;
   const aY = sY + ((tY - sY) * (d - aSize - tSize)) / d;
   const vX = ((tX - sX) * aSize) / d;

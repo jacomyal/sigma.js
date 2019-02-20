@@ -62,7 +62,7 @@ export default {
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,
-      1 / Math.pow(params.ratio, params.settings("nodesPowRatio"))
+      1 / params.ratio ** params.settings("nodesPowRatio")
     );
     gl.uniform1f(scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);

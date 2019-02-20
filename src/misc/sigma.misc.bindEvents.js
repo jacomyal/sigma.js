@@ -59,8 +59,7 @@ export default function configure(sigma) {
             modifiedX < x + s &&
             modifiedY > y - s &&
             modifiedY < y + s &&
-            Math.sqrt(Math.pow(modifiedX - x, 2) + Math.pow(modifiedY - y, 2)) <
-              s
+            Math.sqrt((modifiedX - x) ** 2 + (modifiedY - y) ** 2) < s
           ) {
             // Insert the node:
             inserted = false;

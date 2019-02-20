@@ -29,31 +29,23 @@ export default {
     data[i++] = floatColor(node.color || settings("defaultNodeColor"));
   },
   render(gl, program, data, params) {
-    let buffer;
-
     // Define attributes:
     const positionLocation = gl.getAttribLocation(program, "a_position");
-
     const sizeLocation = gl.getAttribLocation(program, "a_size");
-
     const colorLocation = gl.getAttribLocation(program, "a_color");
-
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-
     const matrixLocation = gl.getUniformLocation(program, "u_matrix");
-
     const ratioLocation = gl.getUniformLocation(program, "u_ratio");
-
     const scaleLocation = gl.getUniformLocation(program, "u_scale");
 
-    buffer = gl.createBuffer();
+    const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
 
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,
-      1 / Math.pow(params.ratio, params.settings("nodesPowRatio"))
+      1 / params.ratio ** params.settings("nodesPowRatio")
     );
     gl.uniform1f(scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);
@@ -94,11 +86,7 @@ export default {
     );
   },
   initProgram(gl) {
-    let vertexShader;
-    let fragmentShader;
-    let program;
-
-    vertexShader = loadShader(
+    const vertexShader = loadShader(
       gl,
       [
         "attribute vec2 a_position;",
@@ -137,7 +125,7 @@ export default {
       gl.VERTEX_SHADER
     );
 
-    fragmentShader = loadShader(
+    const fragmentShader = loadShader(
       gl,
       [
         "precision mediump float;",
@@ -164,7 +152,7 @@ export default {
       gl.FRAGMENT_SHADER
     );
 
-    program = loadProgram(gl, [vertexShader, fragmentShader]);
+    const program = loadProgram(gl, [vertexShader, fragmentShader]);
 
     return program;
   }

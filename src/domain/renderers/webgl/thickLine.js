@@ -139,7 +139,7 @@ export default {
     gl.uniform2f(resolutionLocation, params.width, params.height);
     gl.uniform1f(
       ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.settings("edgesPowRatio"))
+      params.ratio / params.ratio ** params.settings("edgesPowRatio")
     );
 
     gl.uniformMatrix3fv(matrixLocation, false, params.matrix);

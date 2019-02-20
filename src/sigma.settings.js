@@ -211,8 +211,8 @@ const DEFAULT_SETTINGS = {
    */
   // {number} The power degrees applied to the nodes/edges size relatively to
   //          the zooming level. Basically:
-  //           > onScreenR = Math.pow(zoom, nodesPowRatio) * R
-  //           > onScreenT = Math.pow(zoom, edgesPowRatio) * T
+  //           > onScreenR = (zoom ** nodesPowRatio) * R
+  //           > onScreenT = (zoom ** edgesPowRatio) * T
   nodesPowRatio: 0.5,
   edgesPowRatio: 0.5,
 

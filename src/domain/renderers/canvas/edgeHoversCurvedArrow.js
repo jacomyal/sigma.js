@@ -43,14 +43,14 @@ export default function edgeHoversCurvedArrow(
       : getQuadraticControlPoint(sX, sY, tX, tY);
 
   if (source.id === target.id) {
-    d = Math.sqrt(Math.pow(tX - cp.x1, 2) + Math.pow(tY - cp.y1, 2));
+    d = Math.sqrt((tX - cp.x1) ** 2 + (tY - cp.y1) ** 2);
     aSize = size * 2.5;
     aX = cp.x1 + ((tX - cp.x1) * (d - aSize - tSize)) / d;
     aY = cp.y1 + ((tY - cp.y1) * (d - aSize - tSize)) / d;
     vX = ((tX - cp.x1) * aSize) / d;
     vY = ((tY - cp.y1) * aSize) / d;
   } else {
-    d = Math.sqrt(Math.pow(tX - cp.x, 2) + Math.pow(tY - cp.y, 2));
+    d = Math.sqrt((tX - cp.x) ** 2 + (tY - cp.y) ** 2);
     aSize = size * 2.5;
     aX = cp.x + ((tX - cp.x) * (d - aSize - tSize)) / d;
     aY = cp.y + ((tY - cp.y) * (d - aSize - tSize)) / d;
