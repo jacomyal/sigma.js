@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
   sigma.utils.pkg("sigma.plugins");
@@ -14,7 +14,7 @@
   if (!sigma.classes.graph.hasMethod("adjacentNodes"))
     sigma.classes.graph.addMethod("adjacentNodes", function(id) {
       if (typeof id !== "string")
-        throw "adjacentNodes: the node id must be a string.";
+        throw new Error("adjacentNodes: the node id must be a string.");
 
       let target;
 
@@ -34,7 +34,7 @@
   if (!sigma.classes.graph.hasMethod("adjacentEdges"))
     sigma.classes.graph.addMethod("adjacentEdges", function(id) {
       if (typeof id !== "string")
-        throw "adjacentEdges: the node id must be a string.";
+        throw new Error("adjacentEdges: the node id must be a string.");
 
       const a = this.allNeighborsIndex[id];
 
@@ -146,17 +146,17 @@
    */
   function register(fn, p, key) {
     if (key != undefined && typeof key !== "string")
-      throw `The filter key "${key.toString()}" must be a string.`;
+      throw new Error(`The filter key "${key.toString()}" must be a string.`);
 
     if (key != undefined && !key.length)
-      throw "The filter key must be a non-empty string.";
+      throw new Error("The filter key must be a non-empty string.");
 
     if (typeof fn !== "function")
-      throw `The predicate of key "${key}" must be a function.`;
+      throw new Error(`The predicate of key "${key}" must be a function.`);
 
-    if (key === "undo") throw '"undo" is a reserved key.';
+    if (key === "undo") throw new Error('"undo" is a reserved key.');
 
-    if (_keysIndex[key]) throw `The filter "${key}" already exists.`;
+    if (_keysIndex[key]) throw new Error(`The filter "${key}" already exists.`);
 
     if (key) _keysIndex[key] = true;
 
@@ -257,8 +257,8 @@
    */
   Filter.prototype.neighborsOf = function(id, key) {
     if (typeof id !== "string")
-      throw `The node id "${id.toString()}" must be a string.`;
-    if (!id.length) throw "The node id must be a non-empty string.";
+      throw new Error(`The node id "${id.toString()}" must be a string.`);
+    if (!id.length) throw new Error("The node id must be a non-empty string.");
 
     // Wrap the predicate to be applied on the graph and add it to the chain.
     register(Processors.neighbors, id, key);
@@ -431,25 +431,31 @@
    * @return {sigma.plugins.filter} Returns the instance.
    */
   Filter.prototype.import = function(chain) {
-    if (chain === undefined) throw "Wrong arguments.";
+    if (chain === undefined) throw new Error("Wrong arguments.");
 
     if (Object.prototype.toString.call(chain) !== "[object Array]")
-      throw 'The chain" must be an array.';
+      throw new Error('The chain" must be an array.');
 
     const copy = cloneChain(chain);
 
     for (let i = 0, len = copy.length; i < len; i++) {
       if (copy[i].predicate === undefined || copy[i].processor === undefined)
-        throw "Wrong arguments.";
+        throw new Error("Wrong arguments.");
 
       if (copy[i].key != undefined && typeof copy[i].key !== "string")
-        throw `The filter key "${copy[i].key.toString()}" must be a string.`;
+        throw new Error(
+          `The filter key "${copy[i].key.toString()}" must be a string.`
+        );
 
       if (typeof copy[i].predicate !== "function")
-        throw `The predicate of key "${copy[i].key}" must be a function.`;
+        throw new Error(
+          `The predicate of key "${copy[i].key}" must be a function.`
+        );
 
       if (typeof copy[i].processor !== "string")
-        throw `The processor of key "${copy[i].key}" must be a string.`;
+        throw new Error(
+          `The processor of key "${copy[i].key}" must be a string.`
+        );
 
       // Replace the processor name by the corresponding function:
       switch (copy[i].processor) {
@@ -463,7 +469,7 @@
           copy[i].processor = Processors.neighbors;
           break;
         default:
-          throw `Unknown processor ${copy[i].processor}`;
+          throw new Error(`Unknown processor ${copy[i].processor}`);
       }
     }
 

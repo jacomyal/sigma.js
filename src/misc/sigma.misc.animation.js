@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
   sigma.utils.pkg("sigma.misc.animation.running");
@@ -47,7 +47,7 @@
       typeof val !== "object" ||
       !val
     )
-      throw "animation.camera: Wrong arguments.";
+      throw new Error("animation.camera: Wrong arguments.");
 
     if (
       typeof val.x !== "number" &&
@@ -55,7 +55,9 @@
       typeof val.ratio !== "number" &&
       typeof val.angle !== "number"
     )
-      throw "There must be at least one valid coordinate in the given val.";
+      throw new Error(
+        "There must be at least one valid coordinate in the given val."
+      );
 
     let fn;
 
@@ -159,7 +161,7 @@
    */
   sigma.misc.animation.kill = function(id) {
     if (arguments.length !== 1 || typeof id !== "number")
-      throw "animation.kill: Wrong arguments.";
+      throw new Error("animation.kill: Wrong arguments.");
 
     const o = sigma.misc.animation.running[id];
 

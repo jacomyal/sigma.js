@@ -1,6 +1,6 @@
 (function() {
   if (typeof sigma === "undefined") {
-    throw "sigma is not declared";
+    throw new Error("sigma is not declared");
   }
 
   // Default function to compute path length between two nodes:

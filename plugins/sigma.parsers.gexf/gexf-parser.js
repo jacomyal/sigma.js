@@ -443,7 +443,8 @@
       return null;
     })();
 
-    if (!xhr) throw "XMLHttpRequest not supported, cannot load the file.";
+    if (!xhr)
+      throw new Error("XMLHttpRequest not supported, cannot load the file.");
 
     // Async?
     const async = typeof callback === "function";
@@ -496,8 +497,10 @@
    * ----------
    */
   if (typeof this.gexf !== "undefined")
-    throw 'gexf: error - a variable called "gexf" already ' +
-      "exists in the global scope";
+    throw new Error(
+      'gexf: error - a variable called "gexf" already ' +
+        "exists in the global scope"
+    );
 
   this.gexf = {
     // Functions

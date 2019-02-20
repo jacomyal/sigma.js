@@ -109,7 +109,7 @@
     // Recense the instance:
     if (_conf.id) {
       if (__instances[_conf.id])
-        throw `sigma: Instance "${_conf.id}" already exists.`;
+        throw new Error(`sigma: Instance "${_conf.id}" already exists.`);
       Object.defineProperty(this, "id", {
         value: _conf.id
       });
@@ -240,7 +240,7 @@
     }
 
     if (this.cameras[id])
-      throw `sigma.addCamera: The camera "${id}" already exists.`;
+      throw new Error(`sigma.addCamera: The camera "${id}" already exists.`);
 
     camera = new sigma.classes.camera(id, this.graph, this.settings);
     this.cameras[id] = camera;
@@ -271,7 +271,7 @@
   sigma.prototype.killCamera = function(v) {
     v = typeof v === "string" ? this.cameras[v] : v;
 
-    if (!v) throw "sigma.killCamera: The camera is undefined.";
+    if (!v) throw new Error("sigma.killCamera: The camera is undefined.");
 
     let i;
 
@@ -344,7 +344,9 @@
     } else id = o.id;
 
     if (this.renderers[id])
-      throw `sigma.addRenderer: The renderer "${id}" already exists.`;
+      throw new Error(
+        `sigma.addRenderer: The renderer "${id}" already exists.`
+      );
 
     // Find the good constructor:
     fn = typeof o.type === "function" ? o.type : sigma.renderers[o.type];
@@ -359,7 +361,9 @@
         : this.addCamera();
 
     if (this.cameras[camera.id] !== camera)
-      throw "sigma.addRenderer: The camera is not properly referenced.";
+      throw new Error(
+        "sigma.addRenderer: The camera is not properly referenced."
+      );
 
     // Instantiate:
     renderer = new fn(this.graph, camera, this.settings, o);
@@ -424,7 +428,7 @@
   sigma.prototype.killRenderer = function(v) {
     v = typeof v === "string" ? this.renderers[v] : v;
 
-    if (!v) throw "sigma.killRenderer: The renderer is undefined.";
+    if (!v) throw new Error("sigma.killRenderer: The renderer is undefined.");
 
     const a = this.renderersPerCamera[v.camera.id];
 
@@ -704,7 +708,7 @@
    * *******
    */
   if (typeof this.sigma !== "undefined")
-    throw "An object called sigma is already in the global scope.";
+    throw new Error("An object called sigma is already in the global scope.");
 
   this.sigma = sigma;
 }.call(this));

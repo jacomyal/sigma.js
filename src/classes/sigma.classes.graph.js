@@ -172,10 +172,10 @@
       typeof fn !== "function" ||
       arguments.length !== 2
     )
-      throw "addMethod: Wrong arguments.";
+      throw new Error("addMethod: Wrong arguments.");
 
     if (_methods[methodName] || graph[methodName])
-      throw `The method "${methodName}" already exists.`;
+      throw new Error(`The method "${methodName}" already exists.`);
 
     _methods[methodName] = fn;
     _methodBindings[methodName] = Object.create(null);
@@ -252,26 +252,28 @@
       arguments.length < 3 ||
       arguments.length > 4
     )
-      throw "attach: Wrong arguments.";
+      throw new Error("attach: Wrong arguments.");
 
     let bindings;
 
     if (methodName === "constructor") bindings = _initBindings;
     else if (before) {
       if (!_methodBeforeBindings[methodName])
-        throw `The method "${methodName}" does not exist.`;
+        throw new Error(`The method "${methodName}" does not exist.`);
 
       bindings = _methodBeforeBindings[methodName];
     } else {
       if (!_methodBindings[methodName])
-        throw `The method "${methodName}" does not exist.`;
+        throw new Error(`The method "${methodName}" does not exist.`);
 
       bindings = _methodBindings[methodName];
     }
 
     if (bindings[key])
-      throw `A function "${key}" is already attached ` +
-        `to the method "${methodName}".`;
+      throw new Error(
+        `A function "${key}" is already attached ` +
+          `to the method "${methodName}".`
+      );
 
     bindings[key] = fn;
 
@@ -326,9 +328,9 @@
       Object(bindings) !== bindings ||
       arguments.length !== 2
     )
-      throw "addIndex: Wrong arguments.";
+      throw new Error("addIndex: Wrong arguments.");
 
-    if (_indexes[name]) throw `The index "${name}" already exists.`;
+    if (_indexes[name]) throw new Error(`The index "${name}" already exists.`);
 
     let k;
 
@@ -338,7 +340,7 @@
     // Attach the bindings:
     for (k in bindings)
       if (typeof bindings[k] !== "function")
-        throw "The bindings must be functions.";
+        throw new Error("The bindings must be functions.");
       else graph.attach(k, name, bindings[k]);
 
     return this;
@@ -359,12 +361,13 @@
   graph.addMethod("addNode", function(node) {
     // Check that the node is an object and has an id:
     if (Object(node) !== node || arguments.length !== 1)
-      throw "addNode: Wrong arguments.";
+      throw new Error("addNode: Wrong arguments.");
 
     if (typeof node.id !== "string" && typeof node.id !== "number")
-      throw "The node must have a string or number id.";
+      throw new Error("The node must have a string or number id.");
 
-    if (this.nodesIndex[node.id]) throw `The node "${node.id}" already exists.`;
+    if (this.nodesIndex[node.id])
+      throw new Error(`The node "${node.id}" already exists.`);
 
     let k;
 
@@ -419,24 +422,25 @@
   graph.addMethod("addEdge", function(edge) {
     // Check that the edge is an object and has an id:
     if (Object(edge) !== edge || arguments.length !== 1)
-      throw "addEdge: Wrong arguments.";
+      throw new Error("addEdge: Wrong arguments.");
 
     if (typeof edge.id !== "string" && typeof edge.id !== "number")
-      throw "The edge must have a string or number id.";
+      throw new Error("The edge must have a string or number id.");
 
     if (
       (typeof edge.source !== "string" && typeof edge.source !== "number") ||
       !this.nodesIndex[edge.source]
     )
-      throw "The edge source must have an existing node id.";
+      throw new Error("The edge source must have an existing node id.");
 
     if (
       (typeof edge.target !== "string" && typeof edge.target !== "number") ||
       !this.nodesIndex[edge.target]
     )
-      throw "The edge target must have an existing node id.";
+      throw new Error("The edge target must have an existing node id.");
 
-    if (this.edgesIndex[edge.id]) throw `The edge "${edge.id}" already exists.`;
+    if (this.edgesIndex[edge.id])
+      throw new Error(`The edge "${edge.id}" already exists.`);
 
     let k;
 
@@ -532,9 +536,10 @@
       (typeof id !== "string" && typeof id !== "number") ||
       arguments.length !== 1
     )
-      throw "dropNode: Wrong arguments.";
+      throw new Error("dropNode: Wrong arguments.");
 
-    if (!this.nodesIndex[id]) throw `The node "${id}" does not exist.`;
+    if (!this.nodesIndex[id])
+      throw new Error(`The node "${id}" does not exist.`);
 
     let i;
     let k;
@@ -584,9 +589,10 @@
       (typeof id !== "string" && typeof id !== "number") ||
       arguments.length !== 1
     )
-      throw "dropEdge: Wrong arguments.";
+      throw new Error("dropEdge: Wrong arguments.");
 
-    if (!this.edgesIndex[id]) throw `The edge "${id}" does not exist.`;
+    if (!this.edgesIndex[id])
+      throw new Error(`The edge "${id}" does not exist.`);
 
     let i;
     let l;
@@ -754,12 +760,12 @@
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(this.nodesIndex[v[i]]);
-        else throw "nodes: Wrong arguments.";
+        else throw new Error("nodes: Wrong arguments.");
 
       return a;
     }
 
-    throw "nodes: Wrong arguments.";
+    throw new Error("nodes: Wrong arguments.");
   });
 
   /**
@@ -794,12 +800,12 @@
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(which[v[i]]);
-        else throw "degree: Wrong arguments.";
+        else throw new Error("degree: Wrong arguments.");
 
       return a;
     }
 
-    throw "degree: Wrong arguments.";
+    throw new Error("degree: Wrong arguments.");
   });
 
   /**
@@ -838,12 +844,12 @@
       for (i = 0, l = v.length; i < l; i++)
         if (typeof v[i] === "string" || typeof v[i] === "number")
           a.push(this.edgesIndex[v[i]]);
-        else throw "edges: Wrong arguments.";
+        else throw new Error("edges: Wrong arguments.");
 
       return a;
     }
 
-    throw "edges: Wrong arguments.";
+    throw new Error("edges: Wrong arguments.");
   });
 
   /**

@@ -1,5 +1,5 @@
 (function(undefined) {
-  if (typeof sigma === "undefined") throw "sigma is not declared";
+  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
   sigma.utils.pkg("sigma.renderers");
@@ -16,10 +16,10 @@
    */
   sigma.renderers.webgl = function(graph, camera, settings, options) {
     if (typeof options !== "object")
-      throw "sigma.renderers.webgl: Wrong arguments.";
+      throw new Error("sigma.renderers.webgl: Wrong arguments.");
 
     if (!(options.container instanceof HTMLElement))
-      throw "Container not found.";
+      throw new Error("Container not found.");
 
     let k;
 
