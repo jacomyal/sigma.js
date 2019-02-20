@@ -1,4 +1,5 @@
 import id from "../../utils/misc/id";
+import Dispatcher from "../../classes/Dispatcher";
 
 /**
  * This function is the constructor of the svg sigma's renderer.
@@ -19,16 +20,11 @@ export default sigma => {
       throw new Error("Container not found.");
 
     let i;
-
     let l;
-
     let a;
-
     let fn;
-
     const self = this;
-
-    sigma.classes.dispatcher.extend(this);
+    Dispatcher.extend(this);
 
     // Initialize main attributes:
     this.graph = graph;
