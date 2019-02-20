@@ -1,6 +1,5 @@
 import register from "./register";
 import sigma from "./sigma.core";
-import utils from "./utils/sigma.utils";
 import "./utils/sigma.polyfills";
 import settings from "./sigma.settings";
 import graph from "./modules/sigma.classes.graph";
@@ -44,16 +43,14 @@ import bindDOMEvents from "./misc/sigma.misc.bindDOMEvents";
 import drawHovers from "./misc/sigma.misc.drawHovers";
 
 register(sigma);
-utils(sigma);
+registerSigmaModules(sigma);
+
 settings(sigma);
 
 // Main Classes
 graph(sigma);
 quad(sigma);
 edgequad(sigma);
-
-// Captors
-registerSigmaModules(sigma);
 
 // Renderers
 rendererCanvas(sigma);
