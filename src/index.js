@@ -3,13 +3,10 @@ import sigma from "./sigma.core";
 import utils from "./utils/sigma.utils";
 import "./utils/sigma.polyfills";
 import settings from "./sigma.settings";
-import dispatcher from "./modules/sigma.classes.dispatcher";
-import configurable from "./modules/sigma.classes.configurable";
 import graph from "./modules/sigma.classes.graph";
-import camera from "./modules/sigma.classes.camera";
 import quad from "./modules/sigma.classes.quad";
 import edgequad from "./modules/sigma.classes.edgequad";
-import captors from "./modules/sigma.captors";
+import registerSigmaModules from "./sigma.modules";
 import rendererCanvas from "./renderers/sigma.renderers.canvas";
 import rendererWebgl from "./renderers/sigma.renderers.webgl";
 import rendererSvg from "./renderers/sigma.renderers.svg";
@@ -51,15 +48,12 @@ utils(sigma);
 settings(sigma);
 
 // Main Classes
-dispatcher(sigma);
-configurable(sigma);
 graph(sigma);
-camera(sigma);
 quad(sigma);
 edgequad(sigma);
 
 // Captors
-captors(sigma);
+registerSigmaModules(sigma);
 
 // Renderers
 rendererCanvas(sigma);
