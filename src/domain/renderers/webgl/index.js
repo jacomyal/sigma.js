@@ -118,32 +118,21 @@ export default sigma => {
    *
    * @return {WebGLRenderer} Returns the instance itself.
    */
-  WebGLRenderer.prototype.process = function process() {
+  WebGLRenderer.prototype.process = function process(params) {
     let a;
-
     let i;
-
     let l;
-
     let k;
-
     let type;
-
     let renderer;
-
     const { graph } = this;
-
-    var options = extend(options, this.options);
-
+    const options = extend(params, this.options);
     const defaultEdgeType = this.settings(options, "defaultEdgeType");
-
     const defaultNodeType = this.settings(options, "defaultNodeType");
 
     // Empty float arrays:
     for (k in this.nodeFloatArrays) delete this.nodeFloatArrays[k];
-
     for (k in this.edgeFloatArrays) delete this.edgeFloatArrays[k];
-
     for (k in this.edgeIndicesArrays) delete this.edgeIndicesArrays[k];
 
     // Sort edges and nodes per types:
@@ -249,35 +238,20 @@ export default sigma => {
    */
   WebGLRenderer.prototype.render = function render(params) {
     let a;
-
     let i;
-
     let l;
-
     let k;
-
     let o;
-
     let program;
-
     let renderer;
-
     const self = this;
-
     const { graph } = this;
-
     const nodesGl = this.contexts.nodes;
-
     const edgesGl = this.contexts.edges;
-
     let matrix = this.camera.getMatrix();
-
     const options = extend(params, this.options);
-
     const drawLabels = this.settings(options, "drawLabels");
-
     let drawEdges = this.settings(options, "drawEdges");
-
     const drawNodes = this.settings(options, "drawNodes");
 
     // Call the resize function:
