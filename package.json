@@ -12,16 +12,16 @@
   "main": "build/sigma.require.js",
   "scripts": {
     "start": "http-server -p 8000",
-    "test": "grunt travis",
-    "build": "grunt build",
-    "lint": "echo TODO: Lint",
-    "eslint": "eslint .",
+    "build": "rollup -c",
+    "lint": "eslint .",
     "prettify_all": "prettier {src,test,plugins}/**/*.js --write",
-    "prepublish": "grunt npmPrePublish",
-    "ru_build": "rollup -c",
-    "ru_dev": "rollup -c -w"
+    "rollup_dev": "rollup -c -w",
+    "unit_tests": "jest --coverage",
+    "plugin_tests": "grunt test",
+    "test": "run-s unit_tests plugin_tests"
   },
   "devDependencies": {
+    "canvas": "^2.3.1",
     "eslint": "5.3.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-plugin-import": "^2.14.0",
@@ -32,12 +32,13 @@
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-qunit": "^3.1.0",
     "grunt-grunt": "^0.2.2",
-    "grunt-sed": "~0.1.1",
-    "grunt-zip": "~0.15.0",
     "http-server": "~0.9.0",
     "husky": "^1.3.1",
+    "jest": "^24.1.0",
+    "jest-canvas-mock": "^2.0.0-alpha.3",
     "lint-staged": "^8.1.4",
     "load-grunt-tasks": "~0.6.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
     "rollup": "^1.2.2",
     "rollup-plugin-commonjs": "^9.2.0",
@@ -52,13 +53,15 @@
   },
   "lint-staged": {
     "**/*.{js,ts}": [
+      "eslint --fix",
       "prettier --write",
       "git add"
     ]
   },
   "eslintIgnore": [
-    "examples/lib/**/*.js",
-    "build/**/*.js"
+    "build/**/*.js",
+    "examples/**/*.js",
+    "plugins/**/*.js"
   ],
   "eslintConfig": {
     "extends": [
@@ -67,7 +70,8 @@
     ],
     "env": {
       "browser": true,
-      "qunit": true
+      "qunit": true,
+      "jest": true
     },
     "globals": {
       "sigma": "writable"
@@ -76,10 +80,27 @@
       "new-cap": "off",
       "no-underscore-dangle": "off",
       "no-plusplus": "off",
-      "no-multi-assign": "off"
+      "no-multi-assign": "off",
+      "no-param-reassign": "off",
+      "no-console": "off",
+      "no-bitwise": "off"
     }
   },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "jest": {
+    "setupFiles": [
+      "jest-canvas-mock"
+    ]
+  },
   "dependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
+    "babel-jest": "^24.1.0",
     "conrad": "^0.1.0",
     "eslint-config-prettier": "^4.0.0",
     "qunit": "^2.9.1"

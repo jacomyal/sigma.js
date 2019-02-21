@@ -128,41 +128,12 @@ module.exports = grunt => {
         src: npmJsFiles,
         dest: "build/sigma.require.js"
       }
-    },
-    sed: {
-      version: {
-        recursive: true,
-        path: "examples/",
-        pattern: /<!-- START SIGMA IMPORTS -->[\s\S]*<!-- END SIGMA IMPORTS -->/g,
-        replacement: ["<!-- START SIGMA IMPORTS -->"]
-          .concat(
-            coreJsFiles
-              .map(path => `<script src="../${path}"></script>`)
-              .concat("<!-- END SIGMA IMPORTS -->")
-          )
-          .join("\n")
-      }
-    },
-    zip: {
-      release: {
-        dest: "build/release-v<%= pkg.version %>.zip",
-        src: ["README.md", "build/sigma.min.js", "build/plugins/*.min.js"],
-        router(filepath) {
-          return filepath.replace(/build\//, "");
-        }
-      }
     }
   });
 
   loadGruntTasks(grunt);
 
   // By default, will check lint, hint, test and minify:
-  grunt.registerTask("default", ["qunit", "sed", "grunt"]);
-  grunt.registerTask("release", ["qunit", "sed", "grunt", "zip"]);
-  grunt.registerTask("npmPrePublish", ["grunt", "concat:require"]);
-  grunt.registerTask("build", ["grunt", "concat:require"]);
+  grunt.registerTask("default", ["qunit", "grunt"]);
   grunt.registerTask("test", ["qunit"]);
-
-  // For travis-ci.org, only launch tests:
-  grunt.registerTask("travis", ["qunit"]);
 };

@@ -29,7 +29,7 @@
  * > // like { "n0": {"authority": 0.00343, "hub": 0.023975}, "n1": [...]
  */
 
-(function() {
+(function initialize() {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
@@ -40,19 +40,13 @@
    * @return {object} object indexed by node Ids, containing authority and hub measures for each node of the graph.
    */
 
-  sigma.classes.graph.addMethod("HITS", function(isUndirected) {
+  sigma.classes.graph.addMethod("HITS", function HITS(isUndirected) {
     let res = {};
-
     const epsilon = 0.0001;
-
     const hubList = [];
-
     const authList = [];
-
     const nodes = this.nodes();
-
     const nodesCount = nodes.length;
-
     let tempRes = {};
 
     if (!isUndirected) isUndirected = false;
@@ -146,4 +140,4 @@
 
     return res;
   });
-}.call(window));
+})();

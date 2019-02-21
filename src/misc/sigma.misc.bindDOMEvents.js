@@ -1,9 +1,4 @@
 export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  // Initialize packages:
-  sigma.utils.pkg("sigma.misc");
-
   /**
    * This helper will bind any DOM renderer (for instance svg)
    * to its captors, to properly dispatch the good events to the sigma instance
@@ -11,17 +6,15 @@ export default function configure(sigma) {
    *
    * It has to be called in the scope of the related renderer.
    */
-  sigma.misc.bindDOMEvents = function(container) {
+  sigma.register("sigma.misc.bindDOMEvents", function bindDOMEvents(container) {
     const self = this;
 
-    const graph = this.graph;
+    const { graph } = this;
 
     // DOMElement abstraction
     function Element(domElement) {
       // Helpers
-      this.attr = function(attrName) {
-        return domElement.getAttributeNS(null, attrName);
-      };
+      this.attr = attrName => domElement.getAttributeNS(null, attrName);
 
       // Properties
       this.tag = domElement.tagName;
@@ -29,15 +22,15 @@ export default function configure(sigma) {
       this.id = this.attr("id");
 
       // Methods
-      this.isNode = function() {
+      this.isNode = function isNode() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-node`);
       };
 
-      this.isEdge = function() {
+      this.isEdge = function isEdge() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-edge`);
       };
 
-      this.isHover = function() {
+      this.isHover = function isHover() {
         return !!~this.class.indexOf(`${self.settings("classPrefix")}-hover`);
       };
     }
@@ -141,5 +134,5 @@ export default function configure(sigma) {
 
     // Mouseout
     container.addEventListener("mouseout", onOut, true);
-  };
+  });
 }

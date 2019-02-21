@@ -1,9 +1,4 @@
 export default function configure(sigma) {
-  if (typeof sigma === "undefined") throw new Error("sigma is not declared");
-
-  // Initialize packages:
-  sigma.utils.pkg("sigma.misc");
-
   /**
    * This helper will bind any no-DOM renderer (for instance canvas or WebGL)
    * to its captors, to properly dispatch the good events to the sigma instance
@@ -11,17 +6,9 @@ export default function configure(sigma) {
    *
    * It has to be called in the scope of the related renderer.
    */
-  sigma.misc.bindEvents = function(prefix) {
-    let i;
-
-    let l;
-
+  sigma.register("sigma.misc.bindEvents", function bindEvents(prefix) {
     let mX;
-
     let mY;
-
-    let captor;
-
     const self = this;
 
     function getNodes(e) {
@@ -30,34 +17,20 @@ export default function configure(sigma) {
         mY = "y" in e.data ? e.data.y : mY;
       }
 
-      let i;
-
       let j;
-
-      let l;
-
       let n;
-
       let x;
-
       let y;
-
       let s;
-
       let inserted;
-
       const selected = [];
-
       const modifiedX = mX + self.width / 2;
-
       const modifiedY = mY + self.height / 2;
-
       const point = self.camera.cameraPosition(mX, mY);
-
       const nodes = self.camera.quadtree.point(point.x, point.y);
 
       if (nodes.length)
-        for (i = 0, l = nodes.length; i < l; i++) {
+        for (let i = 0; i < nodes.length; i++) {
           n = nodes[i];
           x = n[`${prefix}x`];
           y = n[`${prefix}y`];
@@ -69,8 +42,7 @@ export default function configure(sigma) {
             modifiedX < x + s &&
             modifiedY > y - s &&
             modifiedY < y + s &&
-            Math.sqrt(Math.pow(modifiedX - x, 2) + Math.pow(modifiedY - y, 2)) <
-              s
+            Math.sqrt((modifiedX - x) ** 2 + (modifiedY - y) ** 2) < s
           ) {
             // Insert the node:
             inserted = false;
@@ -112,37 +84,21 @@ export default function configure(sigma) {
       }
 
       let i;
-
       let j;
-
       let l;
-
       let a;
-
       let edge;
-
       let s;
-
       const maxEpsilon = self.settings("edgeHoverPrecision");
-
       let source;
-
       let target;
-
       let cp;
-
       const nodeIndex = {};
-
       let inserted;
-
       const selected = [];
-
       const modifiedX = mX + self.width / 2;
-
       const modifiedY = mY + self.height / 2;
-
       const point = self.camera.cameraPosition(mX, mY);
-
       let edges = [];
 
       if (isCanvas) {
@@ -157,17 +113,17 @@ export default function configure(sigma) {
         edges = self.camera.edgequadtree.point(point.x, point.y);
       }
 
-      function insertEdge(selected, edge) {
+      function insertEdge(ieSelected, ieEdge) {
         inserted = false;
 
-        for (j = 0; j < selected.length; j++)
-          if (edge.size > selected[j].size) {
-            selected.splice(j, 0, edge);
+        for (j = 0; j < ieSelected.length; j++)
+          if (ieEdge.size > ieSelected[j].size) {
+            ieSelected.splice(j, 0, ieEdge);
             inserted = true;
             break;
           }
 
-        if (!inserted) selected.push(edge);
+        if (!inserted) ieSelected.push(ieEdge);
       }
 
       if (edges.length)
@@ -203,7 +159,7 @@ export default function configure(sigma) {
               modifiedY
             ) > target[`${prefix}size`]
           ) {
-            if (edge.type == "curve" || edge.type == "curvedArrow") {
+            if (edge.type === "curve" || edge.type === "curvedArrow") {
               if (source.id === target.id) {
                 cp = sigma.utils.getSelfLoopControlPoints(
                   source[`${prefix}x`],
@@ -271,18 +227,14 @@ export default function configure(sigma) {
 
     function bindCaptor(captor) {
       let nodes;
-
       let edges;
-
       let overNodes = {};
-
       let overEdges = {};
 
       function onClick(e) {
         if (!self.settings("eventsEnabled")) return;
 
         self.dispatchEvent("click", e.data);
-
         nodes = getNodes(e);
         edges = getEdges(e);
 
@@ -368,19 +320,13 @@ export default function configure(sigma) {
       function onOut(e) {
         if (!self.settings("eventsEnabled")) return;
 
-        let k;
-
         let i;
-
         let l;
-
         let le;
-
         const outNodes = [];
-
         const outEdges = [];
 
-        for (k in overNodes) outNodes.push(overNodes[k]);
+        Object.keys(overNodes).forEach(k => outNodes.push(overNodes[k]));
 
         overNodes = {};
         // Dispatch both single and multi events:
@@ -416,27 +362,15 @@ export default function configure(sigma) {
         edges = getEdges(e);
 
         let i;
-
-        let k;
-
         let node;
-
         let edge;
-
         const newOutNodes = [];
-
         const newOverNodes = [];
-
         const currentOverNodes = {};
-
         let l = nodes.length;
-
         const newOutEdges = [];
-
         const newOverEdges = [];
-
         const currentOverEdges = {};
-
         let le = edges.length;
 
         // Check newly overred nodes:
@@ -450,11 +384,12 @@ export default function configure(sigma) {
         }
 
         // Check no more overred nodes:
-        for (k in overNodes)
+        Object.keys(overNodes).forEach(k => {
           if (!currentOverNodes[k]) {
             newOutNodes.push(overNodes[k]);
             delete overNodes[k];
           }
+        });
 
         // Dispatch both single and multi events:
         for (i = 0, l = newOverNodes.length; i < l; i++)
@@ -489,11 +424,12 @@ export default function configure(sigma) {
         }
 
         // Check no more overred edges:
-        for (k in overEdges)
+        Object.keys(overEdges).forEach(k => {
           if (!currentOverEdges[k]) {
             newOutEdges.push(overEdges[k]);
             delete overEdges[k];
           }
+        });
 
         // Dispatch both single and multi events:
         for (i = 0, le = newOverEdges.length; i < le; i++)
@@ -529,7 +465,6 @@ export default function configure(sigma) {
       self.bind("render", onMove);
     }
 
-    for (i = 0, l = this.captors.length; i < l; i++)
-      bindCaptor(this.captors[i]);
-  };
+    this.captors.forEach(c => bindCaptor(c));
+  });
 }
