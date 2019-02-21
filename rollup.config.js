@@ -1,5 +1,6 @@
 import resolve from "rollup-plugin-node-resolve";
 import commonjs from "rollup-plugin-commonjs";
+import { terser } from "rollup-plugin-terser";
 
 function library(ns) {
   return {
@@ -11,7 +12,7 @@ function library(ns) {
         sigma: "sigma"
       }
     },
-    plugins: [resolve(), commonjs()]
+    plugins: [resolve(), commonjs(), terser()]
   };
 }
 
@@ -24,7 +25,7 @@ export default [
       file: "build/sigma.umd.js",
       format: "umd"
     },
-    plugins: [resolve(), commonjs()]
+    plugins: [resolve(), commonjs(), terser()]
   },
   // CommonJS (for Node) and ES module (for bundlers) build.
   // (We could have three entries in the configuration array
@@ -38,18 +39,8 @@ export default [
     output: [
       { file: "build/sigma.cjs.js", format: "cjs" },
       { file: "build/sigma.esm.js", format: "es" }
-    ]
-  },
-  {
-    input: "src/plugins/sigma.exporters.svg/index.js",
-    output: {
-      file: "build/plugins/sigma.exporters.svg.js",
-      format: "umd",
-      globals: {
-        sigma: "sigma"
-      }
-    },
-    plugins: [resolve(), commonjs()]
+    ],
+    plugins: [terser()]
   },
   library("sigma.exporters.svg"),
   library("sigma.layout.noverlap"),

@@ -1,132 +1,14 @@
-const fs = require("fs");
 const loadGruntTasks = require("load-grunt-tasks");
 
 module.exports = grunt => {
-  const coreJsFiles = [
-    // Core:
-    "src/sigma.core.js",
-
-    // Utils:
-    "src/conrad.js",
-    "src/utils/sigma.utils.js",
-    "src/utils/sigma.polyfills.js",
-
-    // Main classes:
-    "src/sigma.settings.js",
-    "src/classes/sigma.classes.dispatcher.js",
-    "src/classes/sigma.classes.configurable.js",
-    "src/classes/sigma.classes.graph.js",
-    "src/classes/sigma.classes.camera.js",
-    "src/classes/sigma.classes.quad.js",
-    "src/classes/sigma.classes.edgequad.js",
-
-    // Captors:
-    "src/captors/sigma.captors.mouse.js",
-    "src/captors/sigma.captors.touch.js",
-
-    // Renderers:
-    "src/renderers/sigma.renderers.canvas.js",
-    "src/renderers/sigma.renderers.webgl.js",
-    "src/renderers/sigma.renderers.svg.js",
-    "src/renderers/sigma.renderers.def.js",
-
-    // Sub functions per engine:
-    "src/renderers/webgl/sigma.webgl.nodes.def.js",
-    "src/renderers/webgl/sigma.webgl.nodes.fast.js",
-    "src/renderers/webgl/sigma.webgl.edges.def.js",
-    "src/renderers/webgl/sigma.webgl.edges.fast.js",
-    "src/renderers/webgl/sigma.webgl.edges.arrow.js",
-    "src/renderers/canvas/sigma.canvas.labels.def.js",
-    "src/renderers/canvas/sigma.canvas.hovers.def.js",
-    "src/renderers/canvas/sigma.canvas.nodes.def.js",
-    "src/renderers/canvas/sigma.canvas.edges.def.js",
-    "src/renderers/canvas/sigma.canvas.edges.dotCurve.js",
-    "src/renderers/canvas/sigma.canvas.edges.arrow.js",
-    "src/renderers/canvas/sigma.canvas.edges.dotCurvedArrow.js",
-    "src/renderers/canvas/sigma.canvas.edgehovers.def.js",
-    "src/renderers/canvas/sigma.canvas.edgehovers.curve.js",
-    "src/renderers/canvas/sigma.canvas.edgehovers.arrow.js",
-    "src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js",
-    "src/renderers/canvas/sigma.canvas.extremities.def.js",
-    "src/renderers/svg/sigma.svg.utils.js",
-    "src/renderers/svg/sigma.svg.nodes.def.js",
-    "src/renderers/svg/sigma.svg.edges.def.js",
-    "src/renderers/svg/sigma.svg.edges.curve.js",
-    "src/renderers/svg/sigma.svg.labels.def.js",
-    "src/renderers/svg/sigma.svg.hovers.def.js",
-
-    // Middlewares:
-    "src/middlewares/sigma.middlewares.rescale.js",
-    "src/middlewares/sigma.middlewares.copy.js",
-
-    // Miscellaneous:
-    "src/misc/sigma.misc.animation.js",
-    "src/misc/sigma.misc.bindEvents.js",
-    "src/misc/sigma.misc.bindDOMEvents.js",
-    "src/misc/sigma.misc.drawHovers.js"
-  ];
-
-  const npmJsFiles = coreJsFiles.slice(0);
-  npmJsFiles.splice(2, 0, "src/sigma.export.js");
-
-  const plugins = [
-    "exporters.svg",
-    "layout.forceAtlas2",
-    "layout.noverlap",
-    "neo4j.cypher",
-    "parsers.gexf",
-    "parsers.json",
-    "pathfinding.astar",
-    "plugins.animate",
-    "plugins.dragNodes",
-    "plugins.filter",
-    "plugins.neighborhoods",
-    "plugins.relativeSize",
-    "renderers.customEdgeShapes",
-    "renderers.customShapes",
-    "renderers.edgeDots",
-    "renderers.edgeLabels",
-    "renderers.parallelEdges",
-    "renderers.snapshot",
-    "statistics.HITS"
-  ];
-
-  const pluginFiles = [];
-
-  const subGrunts = {};
-
-  plugins.forEach(p => {
-    const dir = `plugins/sigma.${p}/`;
-
-    if (fs.existsSync(`${dir}Gruntfile.js`))
-      subGrunts[p] = {
-        gruntfile: `${dir}Gruntfile.js`
-      };
-    else pluginFiles.push(`${dir}**/*.js`);
-  });
-
   // Project configuration:
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
-    grunt: subGrunts,
     qunit: {
       all: {
         options: {
           urls: ["./test/unit.html"]
         }
-      }
-    },
-    concat: {
-      options: {
-        separator: "\n"
-      },
-      dist: {
-        src: coreJsFiles,
-        dest: "build/sigma.js"
-      },
-      require: {
-        src: npmJsFiles,
-        dest: "build/sigma.require.js"
       }
     }
   });
@@ -134,6 +16,5 @@ module.exports = grunt => {
   loadGruntTasks(grunt);
 
   // By default, will check lint, hint, test and minify:
-  grunt.registerTask("default", ["qunit", "grunt"]);
   grunt.registerTask("test", ["qunit"]);
 };
