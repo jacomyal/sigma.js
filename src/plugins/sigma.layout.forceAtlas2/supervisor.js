@@ -1,4 +1,4 @@
-(function(undefined) {
+function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
@@ -316,4 +316,4 @@
   sigma.prototype.isForceAtlas2Running = function(config) {
     return !!this.supervisor && this.supervisor.running;
   };
-}.call(this));
+}

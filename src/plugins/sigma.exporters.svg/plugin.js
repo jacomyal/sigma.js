@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma, global = window) {
   /**
    * Sigma SVG Exporter
    * ===================
@@ -10,14 +10,10 @@
    * Version: 0.0.1
    */
 
-  // Terminating if sigma were not to be found
-  if (typeof sigma === "undefined")
-    throw new Error("sigma.renderers.snapshot: sigma not in scope.");
-
   /**
    * Polyfills
    */
-  const URL = this.URL || this.webkitURL || this;
+  const URL = global.URL || global.webkitURL || global;
 
   /**
    * Utilities
@@ -167,7 +163,7 @@
   /**
    * Extending prototype
    */
-  sigma.prototype.toSVG = function(params) {
+  sigma.prototype.toSVG = function toSVG(params) {
     params = params || {};
 
     const prefix = this.settings("classPrefix");
@@ -243,4 +239,4 @@
 
     return output;
   };
-}.call(this));
+}

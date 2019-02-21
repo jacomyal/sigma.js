@@ -1,4 +1,4 @@
-(function(undefined) {
+function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
@@ -466,4 +466,4 @@
 
     return !!_instance[sigInst.id] && _instance[sigInst.id].running;
   };
-}.call(this));
+}

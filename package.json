@@ -52,16 +52,20 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,ts}": [
+    "src/core/**/*.{js,ts}": [
       "eslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "src/plugins/**/*.{js,ts}": [
       "prettier --write",
       "git add"
     ]
   },
   "eslintIgnore": [
+    "src/plugins/**/*.js",
     "build/**/*.js",
-    "examples/**/*.js",
-    "plugins/**/*.js"
+    "examples/**/*.js"
   ],
   "eslintConfig": {
     "extends": [
