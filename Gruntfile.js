@@ -162,7 +162,4 @@ module.exports = grunt => {
   grunt.registerTask("npmPrePublish", ["grunt", "concat:require"]);
   grunt.registerTask("build", ["grunt", "concat:require"]);
   grunt.registerTask("test", ["qunit"]);
-
-  // For travis-ci.org, only launch tests:
-  grunt.registerTask("travis", ["qunit"]);
 };
