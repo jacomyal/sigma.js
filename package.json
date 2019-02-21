@@ -20,13 +20,15 @@
     "plugin_tests": "grunt test",
     "test": "run-s unit_tests plugin_tests"
   },
+  "dependencies": {
+    "conrad": "^0.1.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
     "babel-jest": "^24.1.0",
     "canvas": "^2.3.1",
-    "conrad": "^0.1.0",
     "eslint": "5.3.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-config-prettier": "^4.0.0",
@@ -104,9 +106,5 @@
     "setupFiles": [
       "jest-canvas-mock"
     ]
-  },
-  "dependencies": {
-    "install": "^0.12.2",
-    "yarn": "^1.13.0"
   }
 }
