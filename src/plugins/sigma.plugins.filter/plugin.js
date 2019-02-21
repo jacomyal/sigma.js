@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
@@ -496,4 +496,4 @@
     }
     return filter;
   };
-}.call(this));
+}

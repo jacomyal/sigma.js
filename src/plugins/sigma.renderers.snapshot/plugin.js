@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma) {
   /**
    * Sigma Renderer Snapshot Utility
    * ================================
@@ -51,7 +51,7 @@
     );
 
     anchor.dispatchEvent(event);
-    delete anchor;
+    anchor = undefined;
   }
 
   // Main function
@@ -122,9 +122,9 @@
       download(dataUrl, params.format || "png", params.filename);
 
     // Cleaning
-    delete mergedContext;
-    delete merged;
-    delete doneContexts;
+    mergedContext = undefined;
+    merged = undefined;
+    doneContexts = undefined;
 
     return dataUrl;
   }
@@ -132,4 +132,4 @@
   // Extending canvas and webl renderers
   sigma.renderers.canvas.prototype.snapshot = snapshot;
   sigma.renderers.webgl.prototype.snapshot = snapshot;
-}.call(this));
+}

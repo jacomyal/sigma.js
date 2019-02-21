@@ -3,7 +3,7 @@
  * sigma.plugins.dragNodes function doc or the examples/basic.html &
  * examples/api-candy.html code samples to know more.
  */
-(function() {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   sigma.utils.pkg("sigma.plugins");
@@ -341,4 +341,4 @@
       delete _instance[s.id];
     }
   };
-}.call(window));
+}

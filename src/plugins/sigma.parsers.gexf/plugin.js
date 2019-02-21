@@ -1,4 +1,6 @@
-(function(undefined) {
+import gexf from "./gexf-parser";
+
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
@@ -101,4 +103,4 @@
     if (typeof target === "string") gexf.fetch(target, parse);
     else if (typeof target === "object") return parse(gexf.parse(target));
   };
-}.call(this));
+}

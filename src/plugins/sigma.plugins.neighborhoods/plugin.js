@@ -20,7 +20,7 @@
  *  >     .refresh();
  *  > });
  */
-(function() {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
@@ -180,4 +180,4 @@
       graph.clear().read(g);
     };
   };
-}.call(window));
+}

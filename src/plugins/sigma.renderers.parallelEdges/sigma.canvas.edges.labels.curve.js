@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize packages:
@@ -25,37 +25,21 @@
     if (typeof edge.label !== "string") return;
 
     const prefix = settings("prefix") || "";
-
     const size = edge[`${prefix}size`] || 1;
-
     if (size < settings("edgeLabelThreshold")) return;
-
     let fontSize;
-
     const sSize = source[`${prefix}size`];
-
     const count = edge.count || 0;
-
     const sX = source[`${prefix}x`];
-
     const sY = source[`${prefix}y`];
-
     const tX = target[`${prefix}x`];
-
     const tY = target[`${prefix}y`];
-
     const dX = tX - sX;
-
     const dY = tY - sY;
-
     const sign = sX < tX ? 1 : -1;
-
     let cp = {};
-
     let c;
-
     let angle;
-
     const t = 0.5; // length of the curve
 
     if (source.id === target.id) {
@@ -126,4 +110,4 @@
 
     context.restore();
   };
-}.call(this));
+}

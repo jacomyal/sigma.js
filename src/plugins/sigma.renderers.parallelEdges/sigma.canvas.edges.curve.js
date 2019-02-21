@@ -1,4 +1,4 @@
-(function() {
+export default function extend(sigma) {
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -66,4 +66,4 @@
     }
     context.stroke();
   };
-})();
+}

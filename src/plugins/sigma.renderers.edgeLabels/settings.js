@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Initialize package:
@@ -34,4 +34,4 @@
 
   // Override default settings:
   sigma.settings.drawEdgeLabels = true;
-}.call(this));
+}

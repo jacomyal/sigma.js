@@ -1,4 +1,4 @@
-(function() {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") {
     throw new Error("sigma is not declared");
   }
@@ -141,4 +141,4 @@
     }
     return undefined;
   });
-}.call(window));
+}

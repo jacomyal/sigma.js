@@ -1,4 +1,6 @@
-(function(undefined) {
+import ShapeLibrary from "./shape-library";
+
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   if (typeof ShapeLibrary === "undefined")
@@ -268,17 +270,4 @@
   ShapeLibrary.enumerate().forEach(function(shape) {
     register(shape.name, shape.drawShape, shape.drawBorder);
   });
-
-  /**
-   * Exporting
-   * ----------
-   */
-  this.CustomShapes = {
-    // Functions
-    init: initPlugin,
-    // add pre-cache images
-
-    // Version
-    version: "0.1"
-  };
-}.call(this));
+}

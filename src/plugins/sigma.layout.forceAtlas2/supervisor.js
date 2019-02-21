@@ -1,4 +1,5 @@
-function extend(sigma) {
+export default function extend(sigma, global = window) {
+  console.log("SUPERVISOR EXTEND");
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
@@ -8,13 +9,12 @@ function extend(sigma) {
    * Author: Guillaume Plique (Yomguithereal)
    * Version: 0.1
    */
-  const _root = this;
 
   /**
    * Feature detection
    * ------------------
    */
-  const webWorkers = "Worker" in _root;
+  const webWorkers = "Worker" in global;
 
   /**
    * Supervisor Object
@@ -28,8 +28,8 @@ function extend(sigma) {
 
     options = options || {};
 
-    // _root URL Polyfill
-    _root.URL = _root.URL || _root.webkitURL;
+    // global URL Polyfill
+    global.URL = global.URL || global.webkitURL;
 
     // Properties
     this.sigInst = sigInst;
@@ -97,8 +97,8 @@ function extend(sigma) {
     try {
       blob = new Blob([workerFn], { type: "application/javascript" });
     } catch (e) {
-      _root.BlobBuilder =
-        _root.BlobBuilder || _root.WebKitBlobBuilder || _root.MozBlobBuilder;
+      global.BlobBuilder =
+        global.BlobBuilder || global.WebKitBlobBuilder || global.MozBlobBuilder;
 
       blob = new BlobBuilder();
       blob.append(workerFn);
@@ -188,7 +188,7 @@ function extend(sigma) {
     }
 
     if (this.shouldUseWorker) this.worker.postMessage(content, buffers);
-    else _root.postMessage(content, "*");
+    else global.postMessage(content, "*");
   };
 
   Supervisor.prototype.start = function() {
@@ -247,7 +247,7 @@ function extend(sigma) {
     if (this.worker) {
       this.worker.terminate();
     } else {
-      _root.postMessage({ action: "kill" }, "*");
+      global.postMessage({ action: "kill" }, "*");
       document.removeEventListener(this.msgName, this.listener);
     }
   };
@@ -261,7 +261,7 @@ function extend(sigma) {
     const data = { action: "config", config: this.config };
 
     if (this.shouldUseWorker) this.worker.postMessage(data);
-    else _root.postMessage(data, "*");
+    else global.postMessage(data, "*");
   };
 
   /**

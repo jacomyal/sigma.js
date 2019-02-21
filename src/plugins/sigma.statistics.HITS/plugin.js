@@ -29,7 +29,7 @@
  * > // like { "n0": {"authority": 0.00343, "hub": 0.023975}, "n1": [...]
  */
 
-(function initialize() {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   /**
@@ -140,4 +140,4 @@
 
     return res;
   });
-})();
+}

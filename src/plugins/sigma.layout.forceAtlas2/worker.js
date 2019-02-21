@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma, global = window) {
   /**
    * Sigma ForceAtlas2.5 Webworker
    * ==============================
@@ -8,9 +8,7 @@
    * Version: 1.0.3
    */
 
-  const _root = this;
-
-  const inWebWorker = !("document" in _root);
+  const inWebWorker = !("document" in global);
 
   /**
    * Worker Function Wrapper
@@ -1100,4 +1098,4 @@
 
     sigma.prototype.getForceAtlas2Worker = getWorkerFn;
   }
-}.call(this));
+}

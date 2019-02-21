@@ -1,4 +1,4 @@
-(function(undefined) {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   // Declare neo4j package
@@ -221,4 +221,4 @@
       callback
     );
   };
-}.call(this));
+}

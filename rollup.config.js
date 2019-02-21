@@ -1,6 +1,20 @@
 import resolve from "rollup-plugin-node-resolve";
 import commonjs from "rollup-plugin-commonjs";
 
+function library(ns) {
+  return {
+    input: `src/plugins/${ns}/index.js`,
+    output: {
+      file: `build/plugins/${ns}.js`,
+      format: "umd",
+      globals: {
+        sigma: "sigma"
+      }
+    },
+    plugins: [resolve(), commonjs()]
+  };
+}
+
 export default [
   // browser-friendly UMD build
   {
@@ -29,12 +43,31 @@ export default [
   {
     input: "src/plugins/sigma.exporters.svg/index.js",
     output: {
-      file: "build/sigma.exporters.svg.js",
+      file: "build/plugins/sigma.exporters.svg.js",
       format: "umd",
       globals: {
         sigma: "sigma"
       }
     },
     plugins: [resolve(), commonjs()]
-  }
+  },
+  library("sigma.exporters.svg"),
+  library("sigma.layout.noverlap"),
+  library("sigma.layout.forceAtlas2"),
+  library("sigma.neo4j.cypher"),
+  library("sigma.parsers.gexf"),
+  library("sigma.parsers.json"),
+  library("sigma.pathfinding.astar"),
+  library("sigma.plugins.animate"),
+  library("sigma.plugins.dragNodes"),
+  library("sigma.plugins.filter"),
+  library("sigma.plugins.neighborhoods"),
+  library("sigma.plugins.relativeSize"),
+  library("sigma.renderers.customEdgeShapes"),
+  library("sigma.renderers.customShapes"),
+  library("sigma.renderers.edgeDots"),
+  library("sigma.renderers.edgeLabels"),
+  library("sigma.renderers.parallelEdges"),
+  library("sigma.renderers.snapshot"),
+  library("sigma.statistics.HITS")
 ];

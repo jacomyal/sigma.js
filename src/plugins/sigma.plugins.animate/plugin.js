@@ -3,7 +3,7 @@
  * some node properties. Check the sigma.plugins.animate function doc or the
  * examples/animate.html code sample to know more.
  */
-(function() {
+export default function extend(sigma) {
   if (typeof sigma === "undefined") throw new Error("sigma is not declared");
 
   sigma.utils.pkg("sigma.plugins");
@@ -191,4 +191,4 @@
       c.edgequadtree._enabled = true;
     }
   };
-}.call(window));
+}

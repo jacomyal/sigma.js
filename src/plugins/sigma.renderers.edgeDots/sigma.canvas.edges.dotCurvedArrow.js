@@ -1,4 +1,4 @@
-(function() {
+export default function extend(sigma) {
   sigma.utils.pkg("sigma.canvas.edges");
 
   /**
@@ -200,4 +200,4 @@
     }
     return getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, bestT);
   }
-})();
+}
