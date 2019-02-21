@@ -15,7 +15,6 @@
     "build": "rollup -c",
     "lint": "eslint .",
     "prettify_all": "prettier {src,test,plugins}/**/*.js --write",
-    "prepublish": "grunt npmPrePublish",
     "rollup_dev": "rollup -c -w",
     "unit_tests": "jest --coverage",
     "plugin_tests": "grunt test",

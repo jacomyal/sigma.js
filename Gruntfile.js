@@ -159,7 +159,6 @@ module.exports = grunt => {
   // By default, will check lint, hint, test and minify:
   grunt.registerTask("default", ["qunit", "sed", "grunt"]);
   grunt.registerTask("release", ["qunit", "sed", "grunt", "zip"]);
-  grunt.registerTask("npmPrePublish", ["grunt", "concat:require"]);
   grunt.registerTask("build", ["grunt", "concat:require"]);
   grunt.registerTask("test", ["qunit"]);
 };
