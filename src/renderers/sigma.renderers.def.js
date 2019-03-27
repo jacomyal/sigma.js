@@ -14,8 +14,8 @@
     canvas = document.createElement('canvas');
     try {
       webgl = !!(
-        canvas.getContext('webgl') ||
-        canvas.getContext('experimental-webgl')
+        canvas.getContext('webgl', {premultipliedAlpha: false}) ||
+        canvas.getContext('experimental-webgl', {premultipliedAlpha: false})
       );
     } catch (e) {
       webgl = false;

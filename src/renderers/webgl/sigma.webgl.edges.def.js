@@ -90,7 +90,7 @@
     },
     render: function(gl, program, data, params) {
       var buffer;
-
+      
       // Define attributes:
       var colorLocation =
             gl.getAttribLocation(program, 'a_color'),
@@ -172,10 +172,10 @@
         20
       );
       gl.vertexAttribPointer(colorLocation,
-        4,
-        gl.UNSIGNED_BYTE,
-        true,
-        this.ATTRIBUTES * Uint8Array.BYTES_PER_ELEMENT * 4,
+        1,
+        gl.FLOAT,
+        false,
+        this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
         24
       );
 
@@ -197,7 +197,7 @@
           'attribute vec2 a_position2;',
           'attribute float a_thickness;',
           'attribute float a_minus;',
-          'attribute vec4 a_color;',
+          'attribute float a_color;',
 
           'uniform vec2 u_resolution;',
           'uniform float u_ratio;',
@@ -227,7 +227,11 @@
             ');',
 
             // Extract the color:
-            'color = a_color;',
+            'float c = a_color;',
+            'color.b = mod(c, 256.0); c = floor(c / 256.0);',
+            'color.g = mod(c, 256.0); c = floor(c / 256.0);',
+            'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
+            'color.a = 1.0; ',
           '}'
         ].join('\n'),
         gl.VERTEX_SHADER

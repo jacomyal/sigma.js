@@ -157,7 +157,7 @@
         b = +val[3];
         if (val[4] !== undefined) a = +val[4];
     }
-    var color = color = (
+    var color = (
       a * 256 * 256 * 256 +
       r * 256 * 256 +
       g * 256 +
