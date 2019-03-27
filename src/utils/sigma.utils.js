@@ -113,6 +113,63 @@
     };
   })();
 
+  
+  var intColorCache = {};
+  sigma.utils.intColor = function(val) {
+      if (intColorCache[val])
+          return intColorCache[val];
+      
+      var original = val,
+          r = 0,
+          g = 0,
+          b = 0,
+          a = 255; // default to fully opaque
+      if (val[0] === '#') {
+        val = val.slice(1);
+        if (val.length === 3) { // format #rgb
+            r = parseInt(val.charAt(0) + val.charAt(0), 16);
+            g = parseInt(val.charAt(1) + val.charAt(1), 16);
+            b = parseInt(val.charAt(2) + val.charAt(2), 16);
+        }
+        else if (val.length === 4) { // format #rgba
+            r = parseInt(val.charAt(0) + val.charAt(0), 16);
+            g = parseInt(val.charAt(1) + val.charAt(1), 16);
+            b = parseInt(val.charAt(2) + val.charAt(2), 16);
+            a = parseInt(val.charAt(3) + val.charAt(3), 16);
+        }
+        else if (val.length === 6) { // format #rrggbb
+            r = parseInt(val.charAt(0) + val.charAt(1), 16);
+            g = parseInt(val.charAt(2) + val.charAt(3), 16);
+            b = parseInt(val.charAt(4) + val.charAt(5), 16);
+        }
+        else { // format #rrggbbaa
+            r = parseInt(val.charAt(0) + val.charAt(1), 16);
+            g = parseInt(val.charAt(2) + val.charAt(3), 16);
+            b = parseInt(val.charAt(4) + val.charAt(5), 16);
+            a = parseInt(val.charAt(6) + val.charAt(7), 16);
+        }
+      } else if (val.match(/^ *rgba? *\(/)) {
+        val = val.match(
+            /^\s*rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+))?\s*\)\s*$/
+        );
+        r = +val[1];
+        g = +val[2];
+        b = +val[3];
+        if (val[4] !== undefined) a = +val[4];
+    }
+    var color = color = (
+      a * 256 * 256 * 256 +
+      r * 256 * 256 +
+      g * 256 +
+      b
+    );
+
+    // Caching the color
+    intColorCache[original] = color;
+
+    return color;
+  }
+  
   /**
    * This function takes an hexa color (for instance "#ffcc00" or "#fc0") or a
    * rgb / rgba color (like "rgb(255,255,12)" or "rgba(255,255,12,1)") and
