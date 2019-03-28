@@ -32,19 +32,21 @@ test('Int color', function() {
     '#D1D1D1',
     '#d1d1d1',
     'rgb(234, 245, 218)',// EA F5 DA
-    'rgba(234, 245, 218, 25)' // ... 19
+    'rgba(234, 245, 218, 25)', // ... 19
+    'rgba(234, 245, 218, .1)' // ... 19
     
   ];
 
   var outputs = [
-    4294967040,
-    4291940817,
-    4291940817,
-    4293588442,
-    434828762
+    [16776960, 1],
+    [13750737, 1],
+    [13750737, 1],
+    [15398362, 1],
+    [15398362, 25],
+    [15398362, 0.1],
   ];
 
   inputs.forEach(function(input, i) {
-    strictEqual(intColor(input), outputs[i]);
+    deepEqual(intColor(input), outputs[i]);
   });
 });
