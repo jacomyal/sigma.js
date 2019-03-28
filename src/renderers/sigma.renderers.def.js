@@ -10,13 +10,15 @@
   // Check if WebGL is enabled:
   var canvas,
       webgl = !!global.WebGLRenderingContext;
+      
   if (webgl) {
     canvas = document.createElement('canvas');
     try {
       webgl = !!(
-        canvas.getContext('webgl', {premultipliedAlpha: false}) ||
-        canvas.getContext('experimental-webgl', {premultipliedAlpha: false})
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl')
       );
+      
     } catch (e) {
       webgl = false;
     }

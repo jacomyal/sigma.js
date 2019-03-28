@@ -123,7 +123,7 @@
           r = 0,
           g = 0,
           b = 0,
-          a = 255; // default to fully opaque
+          a = 1.0; // default to fully opaque, adopt 'canvas' conventions
       if (val[0] === '#') {
         val = val.slice(1);
         if (val.length === 3) { // format #rgb
@@ -150,19 +150,15 @@
         }
       } else if (val.match(/^ *rgba? *\(/)) {
         val = val.match(
-            /^\s*rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+))?\s*\)\s*$/
+            /^\s*rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d*))?\s*\)\s*$/
         );
         r = +val[1];
         g = +val[2];
         b = +val[3];
         if (val[4] !== undefined) a = +val[4];
     }
-    var color = (
-      a * 256 * 256 * 256 +
-      r * 256 * 256 +
-      g * 256 +
-      b
-    );
+    var color = [r*256*256 + g*256 + b, a];
+      
 
     // Caching the color
     intColorCache[original] = color;

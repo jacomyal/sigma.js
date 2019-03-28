@@ -16,28 +16,31 @@
    */
   sigma.webgl.nodes.def = {
     POINTS: 3,
-    ATTRIBUTES: 5,
+    ATTRIBUTES: 6,
     addNode: function(node, data, i, prefix, settings) {
-      var color = sigma.utils.floatColor(
+      var color = sigma.utils.intColor(
         node.color || settings('defaultNodeColor')
       );
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
       data[i++] = node[prefix + 'size'];
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
       data[i++] = 0;
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
       data[i++] = node[prefix + 'size'];
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
       data[i++] = 2 * Math.PI / 3;
 
       data[i++] = node[prefix + 'x'];
       data[i++] = node[prefix + 'y'];
       data[i++] = node[prefix + 'size'];
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
       data[i++] = 4 * Math.PI / 3;
     },
     render: function(gl, program, data, params) {
@@ -96,7 +99,7 @@
       );
       gl.vertexAttribPointer(
         colorLocation,
-        1,
+        2,
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
@@ -108,7 +111,7 @@
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-        16
+        20
       );
 
       gl.drawArrays(
@@ -127,7 +130,7 @@
         [
           'attribute vec2 a_position;',
           'attribute float a_size;',
-          'attribute float a_color;',
+          'attribute vec2 a_color;',
           'attribute float a_angle;',
 
           'uniform vec2 u_resolution;',
@@ -158,11 +161,11 @@
             'gl_Position = vec4(position, 0, 1);',
 
             // Extract the color:
-            'float c = a_color;',
+            'float c = a_color.x;',
             'color.b = mod(c, 256.0); c = floor(c / 256.0);',
             'color.g = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0;',
+            'color.r = mod(c, 256.0); color /= 255.0;',
+            'color.a = a_color.y;',
           '}'
         ].join('\n'),
         gl.VERTEX_SHADER

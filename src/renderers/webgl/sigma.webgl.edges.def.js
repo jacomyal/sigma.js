@@ -14,7 +14,7 @@
    */
   sigma.webgl.edges.def = {
     POINTS: 6,
-    ATTRIBUTES: 7,
+    ATTRIBUTES: 8,
     addEdge: function(edge, source, target, data, i, prefix, settings) {
       var w = (edge[prefix + 'size'] || 1) / 2,
           x1 = source[prefix + 'x'],
@@ -45,7 +45,8 @@
       data[i++] = y2;
       data[i++] = w;
       data[i++] = 0.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
       
       data[i++] = x2;
       data[i++] = y2;
@@ -53,7 +54,9 @@
       data[i++] = y1;
       data[i++] = w;
       data[i++] = 1.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
+      
       
       data[i++] = x2;
       data[i++] = y2;
@@ -61,7 +64,9 @@
       data[i++] = y1;
       data[i++] = w;
       data[i++] = 0.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
+      
       
       data[i++] = x2;
       data[i++] = y2;
@@ -69,7 +74,9 @@
       data[i++] = y1;
       data[i++] = w;
       data[i++] = 0.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
+      
       
       data[i++] = x1;
       data[i++] = y1;
@@ -77,7 +84,9 @@
       data[i++] = y2;
       data[i++] = w;
       data[i++] = 1.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
+      
       
       data[i++] = x1;
       data[i++] = y1;
@@ -85,7 +94,9 @@
       data[i++] = y2;
       data[i++] = w;
       data[i++] = 0.0;
-      data[i++] = color;
+      data[i++] = color[0];
+      data[i++] = color[1];
+      
       
     },
     render: function(gl, program, data, params) {
@@ -172,7 +183,7 @@
         20
       );
       gl.vertexAttribPointer(colorLocation,
-        1,
+        2,
         gl.FLOAT,
         false,
         this.ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
@@ -197,7 +208,7 @@
           'attribute vec2 a_position2;',
           'attribute float a_thickness;',
           'attribute float a_minus;',
-          'attribute float a_color;',
+          'attribute vec2 a_color;',
 
           'uniform vec2 u_resolution;',
           'uniform float u_ratio;',
@@ -227,11 +238,11 @@
             ');',
 
             // Extract the color:
-            'float c = a_color;',
+            'float c = a_color.x;',
             'color.b = mod(c, 256.0); c = floor(c / 256.0);',
             'color.g = mod(c, 256.0); c = floor(c / 256.0);',
-            'color.r = mod(c, 256.0); c = floor(c / 256.0); color /= 255.0;',
-            'color.a = 1.0; ',
+            'color.r = mod(c, 256.0); color /= 255.0;',
+            'color.a = a_color.y;',
           '}'
         ].join('\n'),
         gl.VERTEX_SHADER
