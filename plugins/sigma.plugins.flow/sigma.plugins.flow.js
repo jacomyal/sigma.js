@@ -8,7 +8,6 @@
     throw 'you must import svg-path-properties at first';
   var path = spp;
 
-
   // Initialize package:
   sigma.utils.pkg('sigma.plugins');
 
@@ -21,12 +20,25 @@
    */
   var _instances = {};
 
+  // 创建离屏元素for cache
+  function createOffScreenElement(drawFn, w, h) {
+    const el = document.createElement('canvas');
+    el.width =  2 * w;
+    el.height = 2 * h;
+    
+    drawFn(w, h, el.getContext('2d'));
+
+    return el;
+  }
+
   /*
   *  first  prepare a new layer to show the animation
   *  don't need to watch the event like wheel, move
   *  use the the latest nodes to compute position flow where should be
   * */
-  function Flow(sigmaIns, config) {
+  function Flow(sigmaIns, config, spp) {
+    path = path ? path : spp;
+
     this.graph = sigmaIns.graph;
     this.renderer = sigmaIns.renderers[0];
     this.prefix = sigma.renderers.webgl &&
@@ -45,6 +57,7 @@
         curvedArrow: 'C'
       },
       radius: 5,
+      useCache: true, // 形状都是一样的，请开启缓存。
     }, config);
 
     this.drawingCanvas = null;
@@ -94,7 +107,7 @@
   Flow.prototype.drawFrame = function () {
     var that = this,
       newPosition = [],
-      paths = this.config.paths;
+      { paths, useCache, radius  } = this.config;
 
     paths.forEach(function (p) {
       var pathOutput = that.generatePath(p),
@@ -109,9 +122,23 @@
       });
     });
 
-    newPosition.forEach(function (point) {
-      that.drawPoint(point.center, point.radius);
-    })
+    // radius = 2 * radius;
+    if(useCache) {
+      // 生成离屏元素然后复用
+      const el = createOffScreenElement(this.drawPoint.bind(this), radius , radius);
+      
+      newPosition.forEach(function (point) {
+        const { x, y } = point.center;
+
+        that.drawPointByUsingCache(el, x, y);
+      })
+    } else {
+      newPosition.forEach(function (point) {
+      const { x, y } = point.center;
+
+        that.drawPoint(x, y);
+      })
+    }
   };
 
   Flow.prototype.generatePath = function (path) {
@@ -123,7 +150,7 @@
     var generateSvgPath = function (edge, svgPath) {
       var endPoint = that.graph.nodes([edge.source, edge.target]),
         position = [],
-        edgeType = edge.type || 'def';
+        edgeType = edgeTypeList[edgeType] ?  edge.type : 'def';
 
       // need the screen axis
       endPoint.forEach(function (node) {
@@ -133,7 +160,7 @@
         });
       });
 
-      var position1 = edgeTypeList[edgeType] + position[1].x + ' ' + position[1].y;
+      var position1 = edgeTypeList[edgeType] + position[1].x + ' ' + position[1].y + ' ';
 
       svgPath +=  svgPath ? position1 : 'M' + position[0].x + ' ' + position[0].y + ' ' + position1;
 
@@ -180,14 +207,20 @@
     };
   };
 
-  Flow.prototype.drawPoint = function (point, r) {
-    var ctx = this.drawingContext,
-      flowColor = this.config.flowColor;
+  Flow.prototype.drawPointByUsingCache = function(offScreenEl, x, y) {
+    var ctx = this.drawingContext;
+
+    ctx.drawImage(offScreenEl, x, y);
+  }
+
+  Flow.prototype.drawPoint = function(x, y, context) {
+    var ctx = context || this.drawingContext,
+      { flowColor, radius: r } = this.config;
 
     ctx.beginPath();
     ctx.shadowColor = flowColor;
     ctx.shadowBlur = r * 3;
-    ctx.arc(point.x, point.y, r, 0, 2 * Math.PI);
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.fillStyle = flowColor;
     ctx.fill();
     ctx.closePath();
@@ -237,7 +270,7 @@
 
     this.status = 'start';
 
-    this.animationTimer = setInterval(function () {
+    function animation() {
       var width = that.drawingCanvas.width,
         height = that.drawingCanvas.height;
 
@@ -245,13 +278,19 @@
         that.drawingContext.clearRect(0, 0, width, height);
         pathAnimateProcess[key].percent = (pathAnimateProcess[key].percent + config.speed) % 100;
       }
-      requestAnimationFrame(that.drawFrame.bind(that));
-    }, 16);
+
+      that.drawFrame();
+
+      that.animationTimer = requestAnimationFrame(animation);
+    };
+
+    this.animationTimer = requestAnimationFrame(animation);
   };
   
   Flow.prototype.stop = function () {
     this.status = 'stop';
-    clearInterval(this.animationTimer);
+
+    cancelAnimationFrame(this.animationTimer);
     this.animationTimer = null;
   };
 
@@ -266,9 +305,9 @@
     this.renderer = null;
   };
 
-  sigma.plugins.flow =  function(sigmaIns, config, paths) {
+  sigma.plugins.flow =  function(sigmaIns, config, spp) {
     if (!_instances[sigmaIns.id]) {
-      _instances[sigmaIns.id] = new Flow(sigmaIns, config);
+      _instances[sigmaIns.id] = new Flow(sigmaIns, config, spp);
     }
 
     // while killing sigmaIns, and remove the flow isntance
