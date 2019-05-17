@@ -78,6 +78,7 @@ module.exports = function(grunt) {
     'pathfinding.astar',
     'plugins.animate',
     'plugins.dragNodes',
+    'plugins.fillDiv',
     'plugins.filter',
     'plugins.neighborhoods',
     'plugins.relativeSize',
