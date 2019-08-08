@@ -950,8 +950,12 @@ export default class WebGLRenderer extends Renderer {
     this.renderFrame = requestAnimationFrame(() => {
 
       // Do we need to process data?
-      if (this.needToProcess || this.needToSoftProcess)
-        this.process(this.needToSoftProcess);
+      if (this.needToProcess) {
+        this.process();
+      }
+      else if (this.needToSoftProcess) {
+        this.process(true);
+      }
 
       // Resetting state
       this.renderFrame = null;

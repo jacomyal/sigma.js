@@ -1,6 +1,7 @@
 import {UndirectedGraph} from 'graphology';
 import erdosRenyi from 'graphology-generators/random/erdos-renyi';
 import randomLayout from 'graphology-layout/random';
+import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import choice from 'pandemonium/choice';
 import random from 'pandemonium/random';
 import chroma from 'chroma-js';
@@ -41,7 +42,7 @@ function edit() {
 
     graph.addNode(nodeKey, {
       label: faker.name.findName(),
-      size: Math.max(4, Math.random() * 10),
+      size: Math.max(4, Math.random() * 10) * 2,
       color: chroma.random().hex(),
       x: Math.random(),
       y: Math.random()
@@ -59,3 +60,14 @@ function edit() {
 }
 
 setInterval(edit, 1000);
+
+// Layout experiences
+const layout = new FA2Layout(graph, {settings: {slowDown: 1000000}});
+
+window.startLayout = function() {
+  layout.start();
+};
+
+window.stopLayout = function() {
+  layout.stop();
+};
