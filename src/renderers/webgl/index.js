@@ -436,13 +436,31 @@ export default class WebGLRenderer extends Renderer {
       this.scheduleRender();
     };
 
+    this.listeners.addNodeGraphUpdate = e => {
+
+      // Adding entry to cache
+      this.nodeDataCache[e.key] = new NodeDisplayData(graph.order - 1, this.settings);
+
+      this.listeners.graphUpdate();
+    };
+
+    this.listeners.addEdgeGraphUpdate = e => {
+
+      // Adding entry to cache
+      this.edgeDataCache[e.key] = new EdgeDisplayData(graph.size - 1, this.settings);
+
+      this.listeners.graphUpdate();
+    };
+
+    // TODO: clean cache on drop!
+
     // TODO: bind this on composed state events
     // TODO: it could be possible to update only specific node etc. by holding
     // a fixed-size pool of updated items
-    graph.on('nodeAdded', this.listeners.graphUpdate);
+    graph.on('nodeAdded', this.listeners.addNodeGraphUpdate);
     graph.on('nodeDropped', this.listeners.graphUpdate);
     graph.on('nodeAttributesUpdated', this.listeners.softGraphUpdate);
-    graph.on('edgeAdded', this.listeners.graphUpdate);
+    graph.on('edgeAdded', this.listeners.addEdgeGraphUpdate);
     graph.on('nodeDropped', this.listeners.graphUpdate);
     graph.on('edgeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.on('cleared', this.listeners.graphUpdate);
@@ -1028,10 +1046,10 @@ export default class WebGLRenderer extends Renderer {
     this.captors.mouse.kill();
 
     // Releasing graph handlers
-    graph.removeListener('nodeAdded', this.listeners.graphUpdate);
+    graph.removeListener('nodeAdded', this.listeners.addNodeGraphUpdate);
     graph.removeListener('nodeDropped', this.listeners.graphUpdate);
     graph.removeListener('nodeAttributesUpdated', this.listeners.softGraphUpdate);
-    graph.removeListener('edgeAdded', this.listeners.graphUpdate);
+    graph.removeListener('edgeAdded', this.listeners.addEdgeGraphUpdate);
     graph.removeListener('nodeDropped', this.listeners.graphUpdate);
     graph.removeListener('edgeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.removeListener('cleared', this.listeners.graphUpdate);

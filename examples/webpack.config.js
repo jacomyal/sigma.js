@@ -15,6 +15,10 @@ const EXAMPLES = {
     id: 'drag',
     title: 'Drag'
   },
+  dynamic: {
+    id: 'dynamic',
+    title: 'Dynamic graph (adding & removing items)'
+  },
   events: {
     id: 'events',
     title: 'Events'
