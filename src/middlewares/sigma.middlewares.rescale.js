@@ -36,10 +36,8 @@
           readPrefix,
           true
         ),
-        minX = bounds.minX,
-        minY = bounds.minY,
-        maxX = bounds.maxX,
-        maxY = bounds.maxY,
+        maxBoundaries = settings('maxBoundaries') || bounds,
+        {minX ,minY, maxX, maxY} = maxBoundaries,
         sizeMax = bounds.sizeMax,
         weightMax = bounds.weightMax,
         w = settings('width') || 1,
