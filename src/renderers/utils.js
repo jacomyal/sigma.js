@@ -62,8 +62,6 @@ export function createNormalizationFunction(extent) {
     y: [minY, maxY]
   } = extent;
 
-  let fn;
-
   let ratio = Math.max(maxX - minX, maxY - minY);
 
   if (ratio === 0)
@@ -72,7 +70,7 @@ export function createNormalizationFunction(extent) {
   const dX = (maxX + minX) / 2,
         dY = (maxY + minY) / 2;
 
-  fn = data => {
+  const fn = data => {
     return {
       x: 0.5 + (data.x - dX) / ratio,
       y: 0.5 + (data.y - dY) / ratio
