@@ -19,7 +19,7 @@
         edgeColor = settings('edgeColor'),
         defaultNodeColor = settings('defaultNodeColor'),
         defaultEdgeColor = settings('defaultEdgeColor'),
-        size = edge[prefix + 'size'] || 1,
+        size = settings('edgeHoverSizeRatio') * (edge[prefix + 'size'] || 1),
         tSize = target[prefix + 'size'],
         sX = source[prefix + 'x'],
         sY = source[prefix + 'y'],
