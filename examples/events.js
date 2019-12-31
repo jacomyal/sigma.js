@@ -48,8 +48,8 @@ const renderer = new WebGLRenderer(graph, container, {
   zIndex: true
 });
 
-renderer.on('clickNode', ({node}) => {
-  console.log('Clicking:', node);
+renderer.on('clickNode', ({node, captor}) => {
+  console.log('Clicking:', node, captor);
 });
 
 renderer.on('clickStage', () => {
