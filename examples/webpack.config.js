@@ -3,6 +3,10 @@ const webpack = require('webpack'),
       path = require('path');
 
 const EXAMPLES = {
+  animations: {
+    id: 'animations',
+    title: 'Animations'
+  },
   basic: {
     id: 'basic',
     title: 'Basic'
@@ -35,9 +39,9 @@ const EXAMPLES = {
     id: 'performance',
     title: 'Performance'
   },
-  animations: {
-    id: 'animations',
-    title: 'Animations'
+  settings: {
+    id: 'settings',
+    title: 'Settings'
   },
   tiny: {
     id: 'tiny',

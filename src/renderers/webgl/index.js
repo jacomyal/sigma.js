@@ -12,8 +12,9 @@ import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
 import {NodeDisplayData, EdgeDisplayData} from '../display-data';
-import NodeProgram from './programs/node.fast';
-import EdgeProgram from './programs/edge';
+import CircleNodeProgram from './programs/node.fast';
+import LineEdgeProgram from './programs/edge';
+import ArrowEdgeProgram from './programs/edge.arrow';
 
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
@@ -39,6 +40,7 @@ import {
 import {
   zIndexOrdering
 } from '../../heuristics/z-index';
+import ArrowProgram from './programs/arrow';
 
 /**
  * Constants.
@@ -58,7 +60,9 @@ const DEFAULT_SETTINGS = {
 
   // Component rendering
   defaultNodeColor: '#999',
+  defaultNodeType: 'circle',
   defaultEdgeColor: '#ccc',
+  defaultEdgeType: 'line',
   labelFont: 'Arial',
   labelSize: 14,
   labelWeight: 'normal',
@@ -150,10 +154,11 @@ export default class WebGLRenderer extends Renderer {
 
     // Loading programs
     this.nodePrograms = {
-      def: new NodeProgram(this.contexts.nodes)
+      circle: new CircleNodeProgram(this.contexts.nodes)
     };
     this.edgePrograms = {
-      def: new EdgeProgram(this.contexts.edges)
+      arrow: new ArrowEdgeProgram(this.contexts.edges),
+      line: new LineEdgeProgram(this.contexts.edges)
     };
 
     // Initial resize
@@ -494,7 +499,7 @@ export default class WebGLRenderer extends Renderer {
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
 
-    const nodeProgram = this.nodePrograms.def;
+    const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
     if (!keepArrays)
       nodeProgram.allocate(graph.order);
@@ -540,7 +545,7 @@ export default class WebGLRenderer extends Renderer {
 
     nodeProgram.bufferData();
 
-    const edgeProgram = this.edgePrograms.def;
+    const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
 
     if (!keepArrays)
       edgeProgram.allocate(graph.size);
@@ -597,7 +602,7 @@ export default class WebGLRenderer extends Renderer {
    */
   processNode(key) {
 
-    const nodeProgram = this.nodePrograms.def;
+    const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
     const data = this.graph.getNodeAttributes(key);
 
@@ -618,7 +623,7 @@ export default class WebGLRenderer extends Renderer {
 
     const graph = this.graph;
 
-    const edgeProgram = this.edgePrograms.def;
+    const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
 
     const data = graph.getEdgeAttributes(key),
           extremities = graph.extremities(key),
@@ -792,7 +797,7 @@ export default class WebGLRenderer extends Renderer {
     let program;
 
     // Drawing nodes
-    program = this.nodePrograms.def;
+    program = this.nodePrograms[this.settings.defaultNodeType];
 
     program.render(
       {
@@ -807,7 +812,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Drawing edges
     if (!this.settings.hideEdgesOnMove || !moving) {
-      program = this.edgePrograms.def;
+      program = this.edgePrograms[this.settings.defaultEdgeType];
 
       program.render(
         {
