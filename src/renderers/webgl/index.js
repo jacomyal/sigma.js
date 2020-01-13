@@ -40,7 +40,6 @@ import {
 import {
   zIndexOrdering
 } from '../../heuristics/z-index';
-import ArrowProgram from './programs/arrow';
 
 /**
  * Constants.
@@ -66,6 +65,11 @@ const DEFAULT_SETTINGS = {
   labelFont: 'Arial',
   labelSize: 14,
   labelWeight: 'normal',
+
+  // Labels
+  labelGrid: {
+    renderedSizeThreshold: -Infinity
+  },
 
   // Reducers
   nodeReducer: null,
@@ -857,17 +861,19 @@ export default class WebGLRenderer extends Renderer {
       return this;
 
     // Selecting labels to draw
+    const gridSettings = this.settings.labelGrid;
+
     const labelsToDisplay = labelsToDisplayFromGrid({
       cache: this.nodeDataCache,
       camera: this.camera,
-      displayedLabels: this.displayedLabels,
-      visibleNodes,
       dimensions: this,
-      graph: this.graph
+      displayedLabels: this.displayedLabels,
+      graph: this.graph,
+      renderedSizeThreshold: gridSettings.renderedSizeThreshold,
+      visibleNodes
     });
 
     // Drawing labels
-    // TODO: POW RATIO is currently default 0.5 and harcoded
     const context = this.contexts.labels;
 
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
@@ -878,11 +884,8 @@ export default class WebGLRenderer extends Renderer {
       const {x, y} = this.camera.graphToViewport(this, data.x, data.y);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
+      // TODO: this should be computed in the canvas components?
       const size = data.size / sizeRatio;
-
-      // TODO: this is the label threshold hardcoded
-      // if (size < 8)
-      //   continue;
 
       drawLabel(context, {
         label: data.label,

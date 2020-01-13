@@ -6,7 +6,21 @@
  */
 
 /**
- * Very simple Object.assign-like function.
+ * Checks whether the given value is a plain object.
+ *
+ * @param  {mixed}   value - Target value.
+ * @return {boolean}
+ */
+export function isPlainObject(value) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    value.constructor === Object
+  );
+}
+
+/**
+ * Very simple recursive Object.assign-like function.
  *
  * @param  {object} target       - First object.
  * @param  {object} [...objects] - Objects to merge.
@@ -16,11 +30,19 @@ export function assign(target, ...objects) {
   target = target || {};
 
   for (let i = 0, l = objects.length; i < l; i++) {
-    if (!objects[i])
+    const o = objects[i];
+
+    if (!o)
       continue;
 
-    for (const k in objects[i])
-      target[k] = objects[i][k];
+    for (const k in o) {
+      if (isPlainObject(o[k])) {
+        target[k] = assign(target[k], o[k]);
+      }
+      else {
+        target[k] = o[k];
+      }
+    }
   }
 
   return target;

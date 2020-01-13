@@ -55,10 +55,11 @@ export function labelsToDisplayFromGrid(params) {
   const {
     cache,
     camera,
-    displayedLabels,
-    visibleNodes,
     dimensions,
-    graph
+    displayedLabels,
+    graph,
+    renderedSizeThreshold = -Infinity,
+    visibleNodes
   } = params;
 
   const cameraState = camera.getState(),
@@ -66,6 +67,10 @@ export function labelsToDisplayFromGrid(params) {
 
   const previousCamera = new Camera();
   previousCamera.setState(previousCameraState);
+
+  // TODO: should factorize. This same code is used quite a lot throughout the codebase
+  // TODO: POW RATIO is currently default 0.5 and harcoded
+  const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
   // Camera hasn't moved?
   const still = (
@@ -123,6 +128,10 @@ export function labelsToDisplayFromGrid(params) {
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
           nodeData = cache[node];
+
+    // We filter nodes having a rendered size less than a certain thresold
+    if (nodeData.size / sizeRatio < renderedSizeThreshold)
+      continue;
 
     // Finding our node's cell in the grid
     const pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
