@@ -37,7 +37,6 @@ function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
 
 // TODO: cache camera position of selected nodes to avoid costly computations
 // in anti-collision step
-// TODO: minSize to be displayed
 // TOOD: document a little bit more so future people can understand this mess
 
 /**
@@ -58,6 +57,7 @@ export function labelsToDisplayFromGrid(params) {
     cell: userCell,
     dimensions,
     displayedLabels,
+    fontSize = 14,
     graph,
     renderedSizeThreshold = -Infinity,
     visibleNodes
@@ -269,20 +269,24 @@ export function labelsToDisplayFromGrid(params) {
             p2 = camera.graphToViewport(dimensions, d2.x, d2.y);
 
       const c = collision(
+
+        // First abstract bbox
         p1.x,
         p1.y,
         d1.label.length * 8,
-        14,
+        fontSize,
 
+        // Second abstract bbox
         p2.x,
         p2.y,
         d2.label.length * 8,
-        14
+        fontSize
       );
 
       if (c) {
 
         // NOTE: add degree as tie-breaker here if required in the future
+        // NOTE: add final stable tie-breaker using node key if required
         if (d1.size < d2.size)
           collisions.add(n1);
         else

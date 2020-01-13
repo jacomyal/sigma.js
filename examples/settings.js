@@ -12,6 +12,7 @@ const container = document.getElementById('container');
 
 const settings = {
   defaultEdgeType: 'arrow',
+  labelSize: 20,
   labelGrid: {
     cell: {
       width: 250,

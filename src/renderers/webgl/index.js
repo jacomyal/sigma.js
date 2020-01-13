@@ -844,6 +844,7 @@ export default class WebGLRenderer extends Renderer {
       cell: gridSettings.cell,
       dimensions: this,
       displayedLabels: this.displayedLabels,
+      fontSize: this.settings.labelSize,
       graph: this.graph,
       renderedSizeThreshold: gridSettings.renderedSizeThreshold,
       visibleNodes
