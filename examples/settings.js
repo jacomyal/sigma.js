@@ -13,7 +13,11 @@ const container = document.getElementById('container');
 const settings = {
   defaultEdgeType: 'arrow',
   labelGrid: {
-    renderedSizeThreshold: 10
+    cell: {
+      width: 250,
+      height: 50
+    },
+    renderedSizeThreshold: 8
   }
 };
 

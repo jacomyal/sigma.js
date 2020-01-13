@@ -55,6 +55,7 @@ export function labelsToDisplayFromGrid(params) {
   const {
     cache,
     camera,
+    cell: userCell,
     dimensions,
     displayedLabels,
     graph,
@@ -99,7 +100,10 @@ export function labelsToDisplayFromGrid(params) {
     return Array.from(displayedLabels);
 
   // Adapting cell dimensions
-  const cell = cameraState.ratio >= 1.3 ? DEFAULT_UNZOOMED_CELL : DEFAULT_CELL;
+  let cell = userCell ? userCell : DEFAULT_CELL;
+
+  if (cameraState.ratio >= 1.3)
+    cell = DEFAULT_UNZOOMED_CELL;
 
   const cwr = dimensions.width % cell.width;
   const cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);

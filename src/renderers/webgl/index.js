@@ -41,43 +41,16 @@ import {
   zIndexOrdering
 } from '../../heuristics/z-index';
 
+import {
+  WEBGL_RENDERER_DEFAULT_SETTINGS,
+  validateWebglRendererSettings
+} from './settings';
+
 /**
  * Constants.
  */
 const PIXEL_RATIO = getPixelRatio();
 const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
-
-/**
- * Defaults.
- */
-const DEFAULT_SETTINGS = {
-
-  // Performance
-  hideEdgesOnMove: false,
-  hideLabelsOnMove: false,
-  renderLabels: true,
-
-  // Component rendering
-  defaultNodeColor: '#999',
-  defaultNodeType: 'circle',
-  defaultEdgeColor: '#ccc',
-  defaultEdgeType: 'line',
-  labelFont: 'Arial',
-  labelSize: 14,
-  labelWeight: 'normal',
-
-  // Labels
-  labelGrid: {
-    renderedSizeThreshold: -Infinity
-  },
-
-  // Reducers
-  nodeReducer: null,
-  edgeReducer: null,
-
-  // Features
-  zIndex: false
-};
 
 /**
  * Main class.
@@ -93,7 +66,9 @@ export default class WebGLRenderer extends Renderer {
 
     settings = settings || {};
 
-    this.settings = assign({}, DEFAULT_SETTINGS, settings);
+    this.settings = assign({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
+
+    validateWebglRendererSettings(this.settings);
 
     // Validating
     if (!isGraph(graph))
@@ -866,6 +841,7 @@ export default class WebGLRenderer extends Renderer {
     const labelsToDisplay = labelsToDisplayFromGrid({
       cache: this.nodeDataCache,
       camera: this.camera,
+      cell: gridSettings.cell,
       dimensions: this,
       displayedLabels: this.displayedLabels,
       graph: this.graph,
