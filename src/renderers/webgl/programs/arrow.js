@@ -108,6 +108,8 @@ export default class ArrowProgram extends Program {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
         this.array[i] = 0;
+
+      return;
     }
 
     const thickness = Math.max((data.size || 1) * 2.5, 5),

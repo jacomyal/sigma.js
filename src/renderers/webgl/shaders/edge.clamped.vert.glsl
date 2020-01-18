@@ -26,10 +26,11 @@ void main() {
   thickness = max(min_thickness, thickness);
 
   // Arrow margin
+  // NOTE: it seems we don't need a constant margin into the arrow
   float arrow_pow_ratio = pow_ratio * 2.0;
   float radius = abs(a_radius) * arrow_pow_ratio;
   float arrow_thickness = max(a_thickness * 2.5, 5.0) * arrow_pow_ratio / u_scale;
-  float margin = radius + arrow_thickness - 2.0 * arrow_pow_ratio;
+  float margin = radius + arrow_thickness - arrow_pow_ratio;
   float direction = sign(a_radius);
   vec2 pnormal = vec2(-direction * a_normal.y, direction * a_normal.x);
 

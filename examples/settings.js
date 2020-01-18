@@ -6,12 +6,13 @@ import arctic from './resources/arctic.gexf';
 
 const graph = gexf.parse(Graph, arctic);
 
-graph.forEachEdge(edge => graph.setEdgeAttribute(edge, 'size', 2));
+graph.forEachEdge(edge => graph.setEdgeAttribute(edge, 'size', 10));
 
 const container = document.getElementById('container');
 
 const settings = {
   defaultEdgeType: 'arrow',
+  defaultEdgeColor: 'rgba(0, 0, 0, 0.6)',
   labelSize: 20,
   labelGrid: {
     cell: {
