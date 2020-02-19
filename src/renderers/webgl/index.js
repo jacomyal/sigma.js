@@ -751,6 +751,12 @@ export default class WebGLRenderer extends Renderer {
       this.needToSoftProcess = false;
     }
 
+    // First we need to resize
+    this.resize();
+
+    // Clearing the canvases
+    this.clear();
+
     // If we have no nodes we can stop right there
     if (!this.graph.order)
       return this;
@@ -762,12 +768,6 @@ export default class WebGLRenderer extends Renderer {
       this.captors.mouse.hasDragged ||
       this.captors.mouse.wheelLock
     );
-
-    // First we need to resize
-    this.resize();
-
-    // Clearing the canvases
-    this.clear();
 
     // Then we need to extract a matrix from the camera
     const cameraState = this.camera.getState(),
