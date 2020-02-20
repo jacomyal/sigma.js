@@ -16,9 +16,6 @@ import CircleNodeProgram from './programs/node.fast';
 import LineEdgeProgram from './programs/edge';
 import ArrowEdgeProgram from './programs/edge.arrow';
 
-import drawLabel from '../canvas/components/label';
-import drawHover from '../canvas/components/hover';
-
 import {
   assign
 } from '../../utils';
@@ -854,7 +851,8 @@ export default class WebGLRenderer extends Renderer {
       // TODO: this should be computed in the canvas components?
       const size = data.size / sizeRatio;
 
-      drawLabel(context, {
+      this.settings.labelRenderer(context, {
+        key: labelsToDisplay[i],
         label: data.label,
         size,
         x,
@@ -895,7 +893,8 @@ export default class WebGLRenderer extends Renderer {
 
       const size = data.size / sizeRatio;
 
-      drawHover(context, {
+      this.settings.hoverRenderer(context, {
+        key: node,
         label: data.label,
         color: data.color,
         size,

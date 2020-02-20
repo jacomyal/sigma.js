@@ -1,3 +1,6 @@
+import drawLabel from '../canvas/components/label';
+import drawHover from '../canvas/components/hover';
+
 /**
  * Sigma.js WebGL Renderer Settings
  * =================================
@@ -45,5 +48,9 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   edgeReducer: null,
 
   // Features
-  zIndex: false
+  zIndex: false,
+
+  // Renderers
+  labelRenderer: drawLabel,
+  hoverRenderer: drawHover,
 };
