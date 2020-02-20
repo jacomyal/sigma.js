@@ -718,20 +718,10 @@ export default class WebGLRenderer extends Renderer {
    * @return {WebGLRenderer}
    */
   clear() {
-
-    // NOTE: don't need to clear with preserveDrawingBuffer to false
-
-    // let context = this.contexts.nodes;
-    // context.clear(context.COLOR_BUFFER_BIT);
-
-    // context = this.contexts.edges;
-    // context.clear(context.COLOR_BUFFER_BIT);
-
-    const context = this.contexts.labels;
-    context.clearRect(0, 0, this.width, this.height);
-
-    // context = this.contexts.hovers;
-    // context.clearRect(0, 0, this.width, this.height);
+    this.contexts.nodes.clear(this.contexts.nodes.COLOR_BUFFER_BIT);
+    this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
+    this.contexts.labels.clearRect(0, 0, this.width, this.height);
+    this.contexts.hovers.clearRect(0, 0, this.width, this.height);
 
     return this;
   }
