@@ -31,7 +31,8 @@ import {
 } from './utils';
 
 import {
-  labelsToDisplayFromGrid
+  labelsToDisplayFromGrid,
+  edgeLabelsToDisplayFromNodes
 } from '../../heuristics/labels';
 
 import {
@@ -112,6 +113,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Initializing contexts
     this.createContext('edges');
+    this.createContext('edgeLabels', false);
     this.createContext('nodes');
     this.createContext('labels', false);
     this.createContext('hovers', false);
@@ -719,6 +721,7 @@ export default class WebGLRenderer extends Renderer {
     this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
     this.contexts.labels.clearRect(0, 0, this.width, this.height);
     this.contexts.hovers.clearRect(0, 0, this.width, this.height);
+    this.contexts.edgeLabels.clearRect(0, 0, this.width, this.height);
 
     return this;
   }
@@ -797,6 +800,24 @@ export default class WebGLRenderer extends Renderer {
     if (this.settings.hideLabelsOnMove && moving)
       return this;
 
+    this.renderLabels();
+    this.renderEdgeLabels();
+    this.renderHighlightedNodes();
+
+    return this;
+  }
+
+  /**
+   * Method used to render labels.
+   *
+   * @return {WebGLRenderer}
+   */
+  renderLabels() {
+    if (!this.settings.renderLabels)
+      return this;
+
+    const cameraState = this.camera.getState();
+
     // Finding visible nodes to display their labels
     let visibleNodes;
 
@@ -818,9 +839,6 @@ export default class WebGLRenderer extends Renderer {
         viewRectangle.height
       );
     }
-
-    if (!this.settings.renderLabels)
-      return this;
 
     // Selecting labels to draw
     const gridSettings = this.settings.labelGrid;
@@ -863,8 +881,67 @@ export default class WebGLRenderer extends Renderer {
     // Caching visible nodes and displayed labels
     this.displayedLabels = new Set(labelsToDisplay);
 
-    // Rendering highlighted nodes
-    this.renderHighlightedNodes();
+    return this;
+  }
+
+  /**
+   * Method used to render edge labels, based on which node labels were
+   * rendered.
+   *
+   * @return {WebGLRenderer}
+   */
+  renderEdgeLabels() {
+    if (!this.settings.renderEdgeLabels)
+      return this;
+
+    const cameraState = this.camera.getState();
+    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
+
+    const context = this.contexts.edgeLabels;
+
+    // Clearing
+    context.clearRect(0, 0, this.width, this.height);
+
+    const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
+      graph: this.graph,
+      hoveredNode: this.hoveredNode,
+      displayedNodeLabels: this.displayedLabels,
+      highlightedNodes: this.highlightedNodes
+    });
+
+    for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
+      const edge = edgeLabelsToDisplay[i],
+            extremities = this.graph.extremities(edge),
+            sourceData = this.nodeDataCache[extremities[0]],
+            targetData = this.nodeDataCache[extremities[1]],
+            edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
+
+      const {x: sourceX, y: sourceY} = this.camera.graphToViewport(this, sourceData.x, sourceData.y);
+      const {x: targetX, y: targetY} = this.camera.graphToViewport(this, targetData.x, targetData.y);
+
+      // TODO: we can cache the labels we need to render until the camera's ratio changes
+      // TODO: this should be computed in the canvas components?
+      const size = edgeData.size / sizeRatio;
+
+      this.settings.edgeLabelRenderer(
+        context,
+        {
+          key: edge,
+          label: edgeData.label,
+          color: edgeData.color,
+          size,
+        }, {
+          key: extremities[0],
+          x: sourceX,
+          y: sourceY,
+        }, {
+          key: extremities[1],
+          x: targetX,
+          y: targetY,
+        },
+        this.settings
+      );
+    }
 
     return this;
   }
@@ -957,6 +1034,7 @@ export default class WebGLRenderer extends Renderer {
 
       // Rendering
       this.renderHighlightedNodes();
+      this.renderEdgeLabels();
     });
   }
 

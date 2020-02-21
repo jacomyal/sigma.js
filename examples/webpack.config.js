@@ -46,6 +46,10 @@ const EXAMPLES = {
   tiny: {
     id: 'tiny',
     title: 'Tiny graph'
+  },
+  edgeLabels: {
+    id: 'edge-labels',
+    title: 'Edge labels'
   }
 };
 

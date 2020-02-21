@@ -299,3 +299,50 @@ export function labelsToDisplayFromGrid(params) {
 
   return worthyLabels.filter(l => !collisions.has(l));
 }
+
+/**
+ * Label heuristic selecting edge labels to display, based on displayed node
+ * labels
+ *
+ * @param  {object} params                 - Parameters:
+ * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
+ * @param  {Set}      highlightedNodes     - Highlighted nodes.
+ * @param  {Graph}    graph                - The rendered graph.
+ * @param  {string}   hoveredNode          - Hovered node (optional)
+ * @return {Array}                         - The selected labels.
+ */
+export function edgeLabelsToDisplayFromNodes(params) {
+  const {
+    graph,
+    hoveredNode,
+    highlightedNodes,
+    displayedNodeLabels,
+  } = params;
+
+  const worthyEdges = new Set();
+  const displayedNodeLabelsArray = Array.from(displayedNodeLabels);
+
+  // Each edge connecting a highlighted node has its label displayed:
+  const highlightedNodesArray = Array.from(highlightedNodes);
+  if (hoveredNode && !highlightedNodes.has(hoveredNode))
+    highlightedNodesArray.push(hoveredNode);
+  for (let i = 0; i < highlightedNodesArray.length; i++) {
+    const key = highlightedNodesArray[i];
+    const edges = graph.edges(key);
+
+    for (let j = 0; j < edges.length; j++)
+      worthyEdges.add(edges[j]);
+  }
+
+  // Each edge connecting two nodes with visible labels has its label displayed:
+  for (let i = 0; i < displayedNodeLabelsArray.length; i++) {
+    const key = displayedNodeLabelsArray[i];
+    const edges = graph.outboundEdges(key);
+
+    for (let j = 0; j < edges.length; j++)
+      if (displayedNodeLabels.has(graph.opposite(key, edges[j])))
+        worthyEdges.add(edges[j]);
+  }
+
+  return Array.from(worthyEdges);
+}

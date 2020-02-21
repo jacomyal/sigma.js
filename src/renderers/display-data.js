@@ -48,6 +48,7 @@ export class EdgeDisplayData {
     this.size = 1;
     this.color = settings.defaultEdgeColor;
     this.hidden = false;
+    this.label = '';
   }
 
   assign(data) {
@@ -59,5 +60,8 @@ export class EdgeDisplayData {
 
     if ('hidden' in data)
       this.hidden = data.hidden;
+
+    if ('label' in data)
+      this.label = data.label;
   }
 }

@@ -1,5 +1,6 @@
 import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
+import drawEdgeLabel from '../canvas/components/edge-label';
 
 /**
  * Sigma.js WebGL Renderer Settings
@@ -27,6 +28,7 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
   renderLabels: true,
+  renderEdgeLabels: false,
 
   // Component rendering
   defaultNodeColor: '#999',
@@ -36,6 +38,9 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   labelFont: 'Arial',
   labelSize: 14,
   labelWeight: 'normal',
+  edgeLabelFont: 'Arial',
+  edgeLabelSize: 14,
+  edgeLabelWeight: 'normal',
 
   // Labels
   labelGrid: {
@@ -53,4 +58,5 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   // Renderers
   labelRenderer: drawLabel,
   hoverRenderer: drawHover,
+  edgeLabelRenderer: drawEdgeLabel,
 };
