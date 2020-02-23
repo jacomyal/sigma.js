@@ -341,6 +341,11 @@ export default class WebGLRenderer extends Renderer {
       }
 
       if (nodeToHover && this.hoveredNode !== nodeToHover) {
+
+        // Handling passing from one node to the other directly
+        if (this.hoveredNode !== null)
+          this.emit('leaveNode', {node: this.hoveredNode});
+
         this.hoveredNode = nodeToHover;
         this.emit('enterNode', {node: nodeToHover});
         return this.scheduleHighlightedNodesRender();
