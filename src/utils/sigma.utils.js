@@ -58,7 +58,7 @@
   /**
    * A short "Date.now()" polyfill.
    *
-   * @return {Number} The current time (in ms).
+   * @return {number} The current time (in ms).
    */
   sigma.utils.dateNow = function() {
     return Date.now ? Date.now() : new Date().getTime();
