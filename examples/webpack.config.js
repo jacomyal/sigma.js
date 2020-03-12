@@ -50,6 +50,10 @@ const EXAMPLES = {
   edgeLabels: {
     id: 'edge-labels',
     title: 'Edge labels'
+  },
+  customNodes: {
+    id: 'custom-nodes',
+    title: 'Custom nodes renderer'
   }
 };
 

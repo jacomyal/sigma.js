@@ -2,6 +2,10 @@ import drawLabel from '../canvas/components/label';
 import drawHover from '../canvas/components/hover';
 import drawEdgeLabel from '../canvas/components/edge-label';
 
+import CircleNodeProgram from './programs/node.fast';
+import LineEdgeProgram from './programs/edge';
+import ArrowEdgeProgram from './programs/edge.arrow';
+
 /**
  * Sigma.js WebGL Renderer Settings
  * =================================
@@ -59,4 +63,13 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   labelRenderer: drawLabel,
   hoverRenderer: drawHover,
   edgeLabelRenderer: drawEdgeLabel,
+
+  // Program classes
+  nodeProgramClasses: {
+    circle: CircleNodeProgram
+  },
+  edgeProgramClasses: {
+    arrow: ArrowEdgeProgram,
+    line: LineEdgeProgram
+  },
 };

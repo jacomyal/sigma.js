@@ -12,9 +12,6 @@ import Camera from '../../camera';
 import MouseCaptor from '../../captors/mouse';
 import QuadTree from '../../quadtree';
 import {NodeDisplayData, EdgeDisplayData} from '../display-data';
-import CircleNodeProgram from './programs/node.fast';
-import LineEdgeProgram from './programs/edge';
-import ArrowEdgeProgram from './programs/edge.arrow';
 
 import {
   assign
@@ -131,13 +128,16 @@ export default class WebGLRenderer extends Renderer {
     gl.enable(gl.BLEND);
 
     // Loading programs
-    this.nodePrograms = {
-      circle: new CircleNodeProgram(this.contexts.nodes)
-    };
-    this.edgePrograms = {
-      arrow: new ArrowEdgeProgram(this.contexts.edges),
-      line: new LineEdgeProgram(this.contexts.edges)
-    };
+    this.nodePrograms = {};
+    this.edgePrograms = {};
+    for (const type in this.settings.nodeProgramClasses) {
+      const NodeProgramClass = this.settings.nodeProgramClasses[type];
+      this.nodePrograms[type] = new NodeProgramClass(this.contexts.nodes);
+    }
+    for (const type in this.settings.edgeProgramClasses) {
+      const EdgeProgramClass = this.settings.edgeProgramClasses[type];
+      this.edgePrograms[type] = new EdgeProgramClass(this.contexts.edges);
+    }
 
     // Initial resize
     this.resize();
