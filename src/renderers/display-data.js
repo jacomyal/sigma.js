@@ -22,23 +22,8 @@ export class NodeDisplayData {
   }
 
   assign(data) {
-    if ('x' in data)
-      this.x = data.x;
-
-    if ('y' in data)
-      this.y = data.y;
-
-    if ('size' in data)
-      this.size = data.size;
-
-    if ('color' in data)
-      this.color = data.color;
-
-    if ('hidden' in data)
-      this.hidden = data.hidden;
-
-    if ('label' in data)
-      this.label = data.label;
+    for (const key in data)
+      this[key] = data[key];
   }
 }
 
@@ -52,16 +37,7 @@ export class EdgeDisplayData {
   }
 
   assign(data) {
-    if ('size' in data)
-      this.size = data.size;
-
-    if ('color' in data)
-      this.color = data.color;
-
-    if ('hidden' in data)
-      this.hidden = data.hidden;
-
-    if ('label' in data)
-      this.label = data.label;
+    for (const key in data)
+      this[key] = data[key];
   }
 }
