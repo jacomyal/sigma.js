@@ -489,17 +489,6 @@ export default class WebGLRenderer extends Renderer {
 
     let nodes = graph.nodes();
 
-    // Handling node z-index
-    // TODO: z-index needs us to compute display data before hand
-    // TODO: remains to be seen if reducers are a good or bad thing and if we
-    // should store display data in flat byte arrays indices
-    if (this.settings.zIndex)
-      nodes = zIndexOrdering(
-        this.edgeExtent.z,
-        node => graph.getNodeAttribute(node, 'z'),
-        nodes
-      );
-
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
 
@@ -512,6 +501,21 @@ export default class WebGLRenderer extends Renderer {
 
       // TODO: should assign default also somewhere here if there is a reducer
       displayData.assign(data);
+    }
+
+    // Handling node z-index
+    // TODO: remains to be seen if reducers are a good or bad thing and if we
+    // should store display data in flat byte arrays indices
+    if (this.settings.zIndex)
+      nodes = zIndexOrdering(
+        this.edgeExtent.z,
+        node => this.nodeDataCache[node].z,
+        nodes
+      );
+
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      const node = nodes[i];
+      const displayData = this.nodeDataCache[node];
       this.normalizationFunction.applyTo(displayData);
 
       this.quadtree.add(
@@ -535,14 +539,6 @@ export default class WebGLRenderer extends Renderer {
 
     let edges = graph.edges();
 
-    // Handling edge z-index
-    if (this.settings.zIndex)
-      edges = zIndexOrdering(
-        this.edgeExtent.z,
-        edge => graph.getEdgeAttribute(edge, 'z'),
-        edges
-      );
-
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
@@ -554,6 +550,19 @@ export default class WebGLRenderer extends Renderer {
         data = settings.edgeReducer(edge, data);
 
       displayData.assign(data);
+    }
+
+    // Handling edge z-index
+    if (this.settings.zIndex)
+      edges = zIndexOrdering(
+        this.edgeExtent.z,
+        edge => this.edgeDataCache[edge].z,
+        edges
+      );
+
+    for (let i = 0, l = edges.length; i < l; i++) {
+      const edge = edges[i];
+      const displayData = this.edgeDataCache[edge];
 
       const extremities = graph.extremities(edge),
             sourceData = this.nodeDataCache[extremities[0]],
