@@ -432,6 +432,14 @@ export default class WebGLRenderer extends Renderer {
       this.listeners.graphUpdate();
     };
 
+    this.listeners.dropNodeGraphUpdate = e => {
+
+      // Deleting entry from cache
+      delete this.nodeDataCache[e.key];
+
+      this.listeners.graphUpdate();
+    };
+
     this.listeners.addEdgeGraphUpdate = e => {
 
       // Adding entry to cache
@@ -440,16 +448,22 @@ export default class WebGLRenderer extends Renderer {
       this.listeners.graphUpdate();
     };
 
-    // TODO: clean cache on drop!
+    this.listeners.dropEdgeGraphUpdate = e => {
+
+      // Deleting entry from cache
+      delete this.edgeDataCache[e.key];
+
+      this.listeners.graphUpdate();
+    };
 
     // TODO: bind this on composed state events
     // TODO: it could be possible to update only specific node etc. by holding
     // a fixed-size pool of updated items
     graph.on('nodeAdded', this.listeners.addNodeGraphUpdate);
-    graph.on('nodeDropped', this.listeners.graphUpdate);
+    graph.on('nodeDropped', this.listeners.dropNodeGraphUpdate);
     graph.on('nodeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.on('edgeAdded', this.listeners.addEdgeGraphUpdate);
-    graph.on('nodeDropped', this.listeners.graphUpdate);
+    graph.on('edgeDropped', this.listeners.dropEdgeGraphUpdate);
     graph.on('edgeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.on('cleared', this.listeners.graphUpdate);
 
@@ -1108,10 +1122,10 @@ export default class WebGLRenderer extends Renderer {
 
     // Releasing graph handlers
     graph.removeListener('nodeAdded', this.listeners.addNodeGraphUpdate);
-    graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+    graph.removeListener('nodeDropped', this.listeners.dropNodeGraphUpdate);
     graph.removeListener('nodeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.removeListener('edgeAdded', this.listeners.addEdgeGraphUpdate);
-    graph.removeListener('nodeDropped', this.listeners.graphUpdate);
+    graph.removeListener('edgeDropped', this.listeners.dropEdgeGraphUpdate);
     graph.removeListener('edgeAttributesUpdated', this.listeners.softGraphUpdate);
     graph.removeListener('cleared', this.listeners.graphUpdate);
 

@@ -432,6 +432,7 @@ export default class QuadTree {
 
   clear() {
     this.containers = {};
+    this.cache = null;
 
     return this;
   }
@@ -472,6 +473,7 @@ export default class QuadTree {
       y1 === lr.y1 &&
       y2 === lr.y2 &&
       height === lr.height
+      && this.cache
     ) {
       return this.cache;
     }
