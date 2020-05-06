@@ -10,10 +10,4 @@ import QuadTree from './quadtree';
 import MouseCaptor from './captors/mouse';
 import WebGLRenderer from './renderers/webgl';
 
-export {
-  Renderer,
-  Camera,
-  QuadTree,
-  MouseCaptor,
-  WebGLRenderer
-};
+export {Renderer, Camera, QuadTree, MouseCaptor, WebGLRenderer};

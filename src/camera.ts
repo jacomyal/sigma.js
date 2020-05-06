@@ -121,7 +121,7 @@ export default class Camera extends EventEmitter {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
-          dy = smallestDimension / dimensions.height;
+      dy = smallestDimension / dimensions.height;
 
     // TODO: we keep on the upper left corner!
     // TODO: how to normalize sizes?
@@ -146,7 +146,7 @@ export default class Camera extends EventEmitter {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
-          dy = smallestDimension / dimensions.height;
+      dy = smallestDimension / dimensions.height;
 
     return {
       x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2 / dx,
@@ -163,14 +163,17 @@ export default class Camera extends EventEmitter {
 
   // TODO: angle
   viewRectangle(dimensions) {
-
     // TODO: reduce relative margin?
-    const marginX = 0 * dimensions.width / 8,
-          marginY = 0 * dimensions.height / 8;
+    const marginX = (0 * dimensions.width) / 8,
+      marginY = (0 * dimensions.height) / 8;
 
     const p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
-          p2 = this.viewportToGraph(dimensions, dimensions.width + marginX, 0 - marginY),
-          h = this.viewportToGraph(dimensions, 0, dimensions.height + marginY);
+      p2 = this.viewportToGraph(
+        dimensions,
+        dimensions.width + marginX,
+        0 - marginY
+      ),
+      h = this.viewportToGraph(dimensions, 0, dimensions.height + marginY);
 
     return {
       x1: p1.x,
@@ -188,9 +191,7 @@ export default class Camera extends EventEmitter {
    * @return {Camera}
    */
   setState(state) {
-
-    if (!this.enabled)
-      return this;
+    if (!this.enabled) return this;
 
     // TODO: validations
     // TODO: update by function
@@ -198,17 +199,13 @@ export default class Camera extends EventEmitter {
     // Keeping track of last state
     this.previousState = this.getState();
 
-    if ('x' in state)
-      this.x = state.x;
+    if ('x' in state) this.x = state.x;
 
-    if ('y' in state)
-      this.y = state.y;
+    if ('y' in state) this.y = state.y;
 
-    if ('angle' in state)
-      this.angle = state.angle;
+    if ('angle' in state) this.angle = state.angle;
 
-    if ('ratio' in state)
-      this.ratio = state.ratio;
+    if ('ratio' in state) this.ratio = state.ratio;
 
     // Emitting
     // TODO: don't emit if nothing changed?
@@ -227,25 +224,23 @@ export default class Camera extends EventEmitter {
    * @return {function}            - Return a function to cancel the animation.
    */
   animate(state, options, callback) {
-
-    if (!this.enabled)
-      return this;
+    if (!this.enabled) return this;
 
     // TODO: validation
 
     options = assign({}, ANIMATE_DEFAULTS, options);
 
-    const easing = typeof options.easing === 'function' ?
-      options.easing :
-      easings[options.easing];
+    const easing =
+      typeof options.easing === 'function'
+        ? options.easing
+        : easings[options.easing];
 
     // Canceling previous animation if needed
-    if (this.nextFrame)
-      cancelAnimationFrame(this.nextFrame);
+    if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
 
     // State
     const start = Date.now(),
-          initialState = this.getState();
+      initialState = this.getState();
 
     // Function performing the animation
     const fn = () => {
@@ -256,8 +251,7 @@ export default class Camera extends EventEmitter {
         this.nextFrame = null;
         this.setState(state);
 
-        if (typeof callback === 'function')
-          callback();
+        if (typeof callback === 'function') callback();
 
         return;
       }
@@ -271,9 +265,11 @@ export default class Camera extends EventEmitter {
       if ('y' in state)
         newState.y = initialState.y + (state.y - initialState.y) * coefficient;
       if ('angle' in state)
-        newState.angle = initialState.angle + (state.angle - initialState.angle) * coefficient;
+        newState.angle =
+          initialState.angle + (state.angle - initialState.angle) * coefficient;
       if ('ratio' in state)
-        newState.ratio = initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
+        newState.ratio =
+          initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
 
       this.setState(newState);
 
@@ -283,8 +279,7 @@ export default class Camera extends EventEmitter {
     if (this.nextFrame) {
       cancelAnimationFrame(this.nextFrame);
       this.nextFrame = requestAnimationFrame(fn);
-    }
-    else {
+    } else {
       fn();
     }
   }
@@ -296,16 +291,17 @@ export default class Camera extends EventEmitter {
    * @return {function}
    */
   animatedZoom(factorOrOptions) {
-
     if (!factorOrOptions) {
       return this.animate({ratio: this.ratio / DEFAULT_ZOOMING_RATIO});
-    }
-    else {
+    } else {
       if (typeof factorOrOptions === 'number')
         return this.animate({ratio: this.ratio / factorOrOptions});
       else
         return this.animate(
-          {ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)},
+          {
+            ratio:
+              this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)
+          },
           factorOrOptions
         );
     }
@@ -318,16 +314,17 @@ export default class Camera extends EventEmitter {
    * @return {function}
    */
   animatedUnzoom(factorOrOptions) {
-
     if (!factorOrOptions) {
       return this.animate({ratio: this.ratio * DEFAULT_ZOOMING_RATIO});
-    }
-    else {
+    } else {
       if (typeof factorOrOptions === 'number')
         return this.animate({ratio: this.ratio * factorOrOptions});
       else
         return this.animate(
-          {ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)},
+          {
+            ratio:
+              this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO)
+          },
           factorOrOptions
         );
     }
@@ -340,11 +337,14 @@ export default class Camera extends EventEmitter {
    * @return {function}
    */
   animatedReset(options) {
-    return this.animate({
-      x: 0.5,
-      y: 0.5,
-      ratio: 1,
-      angle: 0
-    }, options);
+    return this.animate(
+      {
+        x: 0.5,
+        y: 0.5,
+        ratio: 1,
+        angle: 0
+      },
+      options
+    );
   }
 }

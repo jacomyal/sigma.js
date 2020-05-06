@@ -1,8 +1,8 @@
-var path = require('path');
+const path = require('path');
 
-var production = !!~process.argv.indexOf('-p');
+const production = !!~process.argv.indexOf('-p');
 
-var moduleConfig = {
+const moduleConfig = {
   rules: [
     {
       test: /\.glsl$/,
@@ -10,9 +10,9 @@ var moduleConfig = {
       loader: 'raw-loader'
     },
     {
-      test: /\.js$/,
+      test: /\.ts$/,
       exclude: /node_modules/,
-      loader: 'babel-loader'
+      loader: 'ts-loader'
     }
   ]
 };
@@ -21,24 +21,29 @@ module.exports = [
   {
     name: 'sigma',
     mode: 'production',
-    entry: './src/endpoint.js',
+    entry: './src/endpoint.ts',
     output: {
       filename: production ? 'sigma.min.js' : 'sigma.js',
       path: path.join(__dirname, 'build'),
       library: 'Sigma',
       libraryTarget: 'umd'
     },
+    resolve: {
+      extensions: ['.ts', '.js']
+    },
     module: moduleConfig
   },
   {
     name: 'sigma-graphology',
     mode: 'production',
-    entry: './src/sigma-graphology.js',
+    entry: './src/sigma-graphology.ts',
     output: {
       filename: production ? 'sigma-graphology.min.js' : 'sigma-graphology.js',
       path: path.join(__dirname, 'build')
     },
+    resolve: {
+      extensions: ['.ts', '.js']
+    },
     module: moduleConfig
   }
 ];
-

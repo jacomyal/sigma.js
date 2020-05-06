@@ -8,12 +8,12 @@
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
-    "dist": "npm run clean && babel src --out-dir . && webpack --config ./webpack.programs.config.js",
+    "dist": "npm run clean && webpack --config ./webpack.programs.config.js",
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "lint": "eslint examples src test",
     "postpublish": "npm run clean",
     "prepublish": "npm run test && npm run dist && npm run build",
-    "test": "mocha --require @babel/register ./test/endpoint.js"
+    "test": "mocha --require ts-node/register ./test/endpoint.ts"
   },
   "sigma": {
     "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers"
@@ -40,10 +40,7 @@
     "graphology-utils": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/register": "^7.7.7",
+    "@types/mocha": "^7.0.2",
     "@yomguithereal/eslint-config": "^4.0.0",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
@@ -66,6 +63,9 @@
     "raw-loader": "^0.5.1",
     "rimraf": "^3.0.0",
     "simple-statistics": "^7.0.7",
+    "ts-loader": "^7.0.2",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.9"
@@ -78,11 +78,6 @@
     "webgl",
     "svg"
   ],
-  "babel": {
-    "presets": [
-      "@babel/env"
-    ]
-  },
   "eslintConfig": {
     "extends": "@yomguithereal/eslint-config/es7"
   }
