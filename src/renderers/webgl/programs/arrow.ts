@@ -10,18 +10,34 @@ import vertexShaderSource from '../shaders/arrow.vert.glsl';
 import fragmentShaderSource from '../shaders/arrow.frag.glsl';
 
 const POINTS = 3,
-      ATTRIBUTES = 10,
-      STRIDE = POINTS * ATTRIBUTES;
+  ATTRIBUTES = 10,
+  STRIDE = POINTS * ATTRIBUTES;
 
 export default class ArrowProgram extends Program {
+  // Binding context
+  gl: any;
+  // Array data
+  array: Float32Array = null;
+  // Initializing buffers
+  buffer: any;
+
+  // Locations
+  positionLocation: any;
+  normalLocation: any;
+  thicknessLocation: any;
+  radiusLocation: any;
+  colorLocation: any;
+  barycentricLocation: any;
+  resolutionLocation: any;
+  ratioLocation: any;
+  matrixLocation: any;
+  scaleLocation: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Binding context
     this.gl = gl;
-
-    // Array data
-    this.array = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -32,8 +48,14 @@ export default class ArrowProgram extends Program {
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.radiusLocation = gl.getAttribLocation(this.program, 'a_radius');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.barycentricLocation = gl.getAttribLocation(
+      this.program,
+      'a_barycentric'
+    );
+    this.resolutionLocation = gl.getUniformLocation(
+      this.program,
+      'u_resolution'
+    );
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -54,35 +76,40 @@ export default class ArrowProgram extends Program {
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.barycentricLocation);
 
-    gl.vertexAttribPointer(this.positionLocation,
+    gl.vertexAttribPointer(
+      this.positionLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
-    gl.vertexAttribPointer(this.normalLocation,
+    gl.vertexAttribPointer(
+      this.normalLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
-    gl.vertexAttribPointer(this.thicknessLocation,
+    gl.vertexAttribPointer(
+      this.thicknessLocation,
       1,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
-    gl.vertexAttribPointer(this.radiusLocation,
+    gl.vertexAttribPointer(
+      this.radiusLocation,
       1,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
-    gl.vertexAttribPointer(this.colorLocation,
+    gl.vertexAttribPointer(
+      this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
@@ -91,7 +118,8 @@ export default class ArrowProgram extends Program {
     );
 
     // TODO: maybe we can optimize here by packing this in a bit mask
-    gl.vertexAttribPointer(this.barycentricLocation,
+    gl.vertexAttribPointer(
+      this.barycentricLocation,
       3,
       gl.FLOAT,
       false,
@@ -105,7 +133,6 @@ export default class ArrowProgram extends Program {
   }
 
   process(sourceData, targetData, data, offset) {
-
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
         this.array[i] = 0;
@@ -114,20 +141,20 @@ export default class ArrowProgram extends Program {
     }
 
     const thickness = Math.max((data.size || 1) * 2.5, 5),
-          radius = targetData.size || 1,
-          x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          color = floatColor(data.color);
+      radius = targetData.size || 1,
+      x1 = sourceData.x,
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      color = floatColor(data.color);
 
     // Computing normals
     const dx = x2 - x1,
-          dy = y2 - y1;
+      dy = y2 - y1;
 
     let len = dx * dx + dy * dy,
-        n1 = 0,
-        n2 = 0;
+      n1 = 0,
+      n2 = 0;
 
     if (len) {
       len = 1 / Math.sqrt(len);
@@ -192,20 +219,13 @@ export default class ArrowProgram extends Program {
 
     // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(
-      this.ratioLocation,
-      params.ratio
-    );
+    gl.uniform1f(this.ratioLocation, params.ratio);
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
 
     // Drawing:
-    gl.drawArrays(
-      gl.TRIANGLES,
-      0,
-      this.array.length / ATTRIBUTES
-    );
+    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
   }
 }

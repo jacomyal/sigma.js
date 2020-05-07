@@ -13,10 +13,28 @@ import vertexShaderSource from '../shaders/edge.clamped.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
 const POINTS = 4,
-      ATTRIBUTES = 7,
-      STRIDE = POINTS * ATTRIBUTES;
+  ATTRIBUTES = 7,
+  STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeClampedProgram extends Program {
+  gl: any;
+  array: any;
+  indicesArray: any;
+  buffer: any;
+  indicesBuffer: any;
+  positionLocation: any;
+  normalLocation: any;
+  thicknessLocation: any;
+  colorLocation: any;
+  radiusLocation: any;
+  resolutionLocation: any;
+  ratioLocation: any;
+  matrixLocation: any;
+  scaleLocation: any;
+  canUse32BitsIndices: any;
+  IndicesArray: any;
+  indicesType: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -37,7 +55,10 @@ export default class EdgeClampedProgram extends Program {
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
     this.radiusLocation = gl.getAttribLocation(this.program, 'a_radius');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.resolutionLocation = gl.getUniformLocation(
+      this.program,
+      'u_resolution'
+    );
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -52,7 +73,9 @@ export default class EdgeClampedProgram extends Program {
     // NOTE: when using webgl2, the extension is enabled by default
     this.canUse32BitsIndices = canUse32BitsIndices(gl);
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
-    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+    this.indicesType = this.canUse32BitsIndices
+      ? gl.UNSIGNED_INT
+      : gl.UNSIGNED_SHORT;
   }
 
   bind() {
@@ -68,35 +91,40 @@ export default class EdgeClampedProgram extends Program {
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.radiusLocation);
 
-    gl.vertexAttribPointer(this.positionLocation,
+    gl.vertexAttribPointer(
+      this.positionLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
-    gl.vertexAttribPointer(this.normalLocation,
+    gl.vertexAttribPointer(
+      this.normalLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
-    gl.vertexAttribPointer(this.thicknessLocation,
+    gl.vertexAttribPointer(
+      this.thicknessLocation,
       1,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
-    gl.vertexAttribPointer(this.colorLocation,
+    gl.vertexAttribPointer(
+      this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20
     );
-    gl.vertexAttribPointer(this.radiusLocation,
+    gl.vertexAttribPointer(
+      this.radiusLocation,
       1,
       gl.FLOAT,
       false,
@@ -110,7 +138,6 @@ export default class EdgeClampedProgram extends Program {
   }
 
   process(sourceData, targetData, data, offset) {
-
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
         this.array[i] = 0;
@@ -119,20 +146,20 @@ export default class EdgeClampedProgram extends Program {
     }
 
     const thickness = data.size || 1,
-          x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          radius = targetData.size || 1,
-          color = floatColor(data.color);
+      x1 = sourceData.x,
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      radius = targetData.size || 1,
+      color = floatColor(data.color);
 
     // Computing normals
     const dx = x2 - x1,
-          dy = y2 - y1;
+      dy = y2 - y1;
 
     let len = dx * dx + dy * dy,
-        n1 = 0,
-        n2 = 0;
+      n1 = 0,
+      n2 = 0;
 
     if (len) {
       len = 1 / Math.sqrt(len);
@@ -185,7 +212,7 @@ export default class EdgeClampedProgram extends Program {
   computeIndices() {
     const l = this.array.length / ATTRIBUTES;
 
-    const size = l + (l / 2);
+    const size = l + l / 2;
 
     const indices = new this.IndicesArray(size);
 

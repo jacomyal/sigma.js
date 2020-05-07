@@ -25,25 +25,31 @@ const DEFAULT_ZOOMING_RATIO = 1.5;
 // TODO: bind camera to renderer rather than sigma
 // TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
 
+export interface CameraState {
+  x?: number;
+  y?: number;
+  angle?: number;
+  ratio?: number;
+}
 /**
  * Camera class
  *
  * @constructor
  */
-export default class Camera extends EventEmitter {
+export default class Camera extends EventEmitter implements CameraState {
+  x: number = 0.5;
+  y: number = 0.5;
+  angle: number = 0;
+  ratio: number = 1;
+  nextFrame: any = null;
+  previousState: CameraState;
+  enabled: boolean = true;
+
   constructor() {
     super();
 
-    // Properties
-    this.x = 0.5;
-    this.y = 0.5;
-    this.angle = 0;
-    this.ratio = 1;
-
     // State
-    this.nextFrame = null;
     this.previousState = this.getState();
-    this.enabled = true;
   }
 
   /**
@@ -51,7 +57,7 @@ export default class Camera extends EventEmitter {
    *
    * @return {Camera}
    */
-  enable() {
+  enable(): Camera {
     this.enabled = true;
     return this;
   }
@@ -61,7 +67,7 @@ export default class Camera extends EventEmitter {
    *
    * @return {Camera}
    */
-  disable() {
+  disable(): Camera {
     this.enabled = false;
     return this;
   }
@@ -71,7 +77,7 @@ export default class Camera extends EventEmitter {
    *
    * @return {object}
    */
-  getState() {
+  getState(): CameraState {
     return {
       x: this.x,
       y: this.y,
@@ -85,7 +91,7 @@ export default class Camera extends EventEmitter {
    *
    * @return {object}
    */
-  getPreviousState() {
+  getPreviousState(): CameraState {
     const state = this.previousState;
 
     return {
@@ -101,7 +107,7 @@ export default class Camera extends EventEmitter {
    *
    * @return {boolean}
    */
-  isAnimated() {
+  isAnimated(): boolean {
     return !!this.nextFrame;
   }
 
@@ -117,7 +123,11 @@ export default class Camera extends EventEmitter {
 
   // TODO: assign to gain one object
   // TODO: angles
-  graphToViewport(dimensions, x, y) {
+  graphToViewport(
+    dimensions: {width: number; height: number},
+    x: number,
+    y: number
+  ): {x: number; y: number} {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
@@ -142,7 +152,11 @@ export default class Camera extends EventEmitter {
    */
 
   // TODO: angles
-  viewportToGraph(dimensions, x, y) {
+  viewportToGraph(
+    dimensions: {width: number; height: number},
+    x: number,
+    y: number
+  ): {x: number; y: number} {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
@@ -162,7 +176,10 @@ export default class Camera extends EventEmitter {
    */
 
   // TODO: angle
-  viewRectangle(dimensions) {
+  viewRectangle(dimensions: {
+    width: number;
+    height: number;
+  }): {x1: number; y1: number; x2: number; y2: number; height: number} {
     // TODO: reduce relative margin?
     const marginX = (0 * dimensions.width) / 8,
       marginY = (0 * dimensions.height) / 8;
@@ -190,7 +207,7 @@ export default class Camera extends EventEmitter {
    * @param  {object} state - New state.
    * @return {Camera}
    */
-  setState(state) {
+  setState(state: CameraState): Camera {
     if (!this.enabled) return this;
 
     // TODO: validations
@@ -223,7 +240,7 @@ export default class Camera extends EventEmitter {
    * @param  {function} callback   - Callback
    * @return {function}            - Return a function to cancel the animation.
    */
-  animate(state, options, callback) {
+  animate(state: CameraState, options?, callback?: () => void) {
     if (!this.enabled) return this;
 
     // TODO: validation
@@ -258,7 +275,7 @@ export default class Camera extends EventEmitter {
 
       const coefficient = easing(t);
 
-      const newState = {};
+      const newState: CameraState = {};
 
       if ('x' in state)
         newState.x = initialState.x + (state.x - initialState.x) * coefficient;
@@ -290,7 +307,7 @@ export default class Camera extends EventEmitter {
    * @param  {number|object} factorOrOptions - Factor or options.
    * @return {function}
    */
-  animatedZoom(factorOrOptions) {
+  animatedZoom(factorOrOptions: number | {[key: string]: any}) {
     if (!factorOrOptions) {
       return this.animate({ratio: this.ratio / DEFAULT_ZOOMING_RATIO});
     } else {
@@ -313,7 +330,7 @@ export default class Camera extends EventEmitter {
    * @param  {number|object} factorOrOptions - Factor or options.
    * @return {function}
    */
-  animatedUnzoom(factorOrOptions) {
+  animatedUnzoom(factorOrOptions: number | {[key: string]: any}) {
     if (!factorOrOptions) {
       return this.animate({ratio: this.ratio * DEFAULT_ZOOMING_RATIO});
     } else {
@@ -336,7 +353,7 @@ export default class Camera extends EventEmitter {
    * @param  {object} options - Options.
    * @return {function}
    */
-  animatedReset(options) {
+  animatedReset(options: {[key: string]: any}) {
     return this.animate(
       {
         x: 0.5,

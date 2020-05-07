@@ -16,10 +16,15 @@ import {
  * @constructor
  */
 export default class Program {
+  vertexShaderSource: any;
+  vertexShader: any;
+  fragmentShaderSource: any;
+  fragmentShader: any;
+  program: any;
+
   constructor(gl, vertexShaderSource, fragmentShaderSource) {
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
-
     this.load(gl);
   }
 
@@ -33,10 +38,7 @@ export default class Program {
     this.vertexShader = loadVertexShader(gl, this.vertexShaderSource);
     this.fragmentShader = loadFragmentShader(gl, this.fragmentShaderSource);
 
-    this.program = loadProgram(gl, [
-      this.vertexShader,
-      this.fragmentShader
-    ]);
+    this.program = loadProgram(gl, [this.vertexShader, this.fragmentShader]);
 
     return this.program;
   }
@@ -54,6 +56,7 @@ export default class Program {
 // TODO: maybe those should handle their own canvases
 export function createCompoundProgram(programClasses) {
   return class CompoundProgram {
+    programs: any;
     constructor(gl) {
       this.programs = programClasses.map(ProgramClass => new ProgramClass(gl));
     }
