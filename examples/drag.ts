@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import gexf from 'graphology-gexf/browser';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 
 import arctic from './resources/arctic.gexf';
 
@@ -20,7 +20,7 @@ const captor = renderer.getMouseCaptor();
 
 // State
 let draggedNode = null,
-    dragging = false;
+  dragging = false;
 
 renderer.on('downNode', e => {
   dragging = true;
@@ -35,9 +35,7 @@ captor.on('mouseup', e => {
 });
 
 captor.on('mousemove', e => {
-
-  if (!dragging)
-    return;
+  if (!dragging) return;
 
   // Get new position of node
   const pos = renderer.normalizationFunction.inverse(
@@ -48,5 +46,5 @@ captor.on('mousemove', e => {
   graph.setNodeAttribute(draggedNode, 'y', pos.y);
 });
 
-window.renderer = renderer;
-window.camera = renderer.getCamera();
+// window.renderer = renderer;
+// window.camera = renderer.getCamera();

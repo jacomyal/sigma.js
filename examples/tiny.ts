@@ -1,5 +1,5 @@
 import {UndirectedGraph} from 'graphology';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 
 const container = document.getElementById('container');
 
@@ -28,6 +28,6 @@ graph.addEdge('Jessica', 'Truman', {
 
 const renderer = new WebGLRenderer(graph, container);
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+// window.graph = graph;
+// window.renderer = renderer;
+// window.camera = renderer.camera;

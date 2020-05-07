@@ -1,6 +1,6 @@
 import Graph from 'graphology';
 import gexf from 'graphology-gexf/browser';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 
 import arctic from './resources/arctic.gexf';
 
@@ -25,4 +25,4 @@ const settings = {
 
 const renderer = new WebGLRenderer(graph, container, settings);
 
-window.renderer = renderer;
+// window.renderer = renderer;
