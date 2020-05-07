@@ -3,8 +3,8 @@
     "outDir": "./build/",
     "noImplicitAny": false,
     "target": "es5",
-    "allowJs": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
-  }
+    "downlevelIteration": true
+  },
+  "files": ["types/global.d.ts", "types/glsl.d.ts"]
 }

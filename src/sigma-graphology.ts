@@ -13,6 +13,13 @@ import QuadTree from './quadtree';
 import MouseCaptor from './captors/mouse';
 import WebGLRenderer from './renderers/webgl';
 
+declare global {
+  interface Window {
+    sigma: any;
+    graphology: graphology;
+  }
+}
+
 const sigma = {
   Renderer,
   Camera,

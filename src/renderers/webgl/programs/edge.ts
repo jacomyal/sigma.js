@@ -20,19 +20,34 @@ import vertexShaderSource from '../shaders/edge.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.frag.glsl';
 
 const POINTS = 4,
-      ATTRIBUTES = 6,
-      STRIDE = POINTS * ATTRIBUTES;
+  ATTRIBUTES = 6,
+  STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeProgram extends Program {
+  // Binding context
+  gl: any;
+  array: any = null;
+  indicesArray: any = null;
+  buffer: any;
+  indicesBuffer: any;
+  Locations: any;
+  positionLocation: any;
+  normalLocation: any;
+  thicknessLocation: any;
+  colorLocation: any;
+  resolutionLocation: any;
+  ratioLocation: any;
+  matrixLocation: any;
+  scaleLocation: any;
+  canUse32BitsIndices: any;
+  IndicesArray: any;
+  indicesType: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Binding context
     this.gl = gl;
-
-    // Array data
-    this.array = null;
-    this.indicesArray = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -43,7 +58,10 @@ export default class EdgeProgram extends Program {
     this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
+    this.resolutionLocation = gl.getUniformLocation(
+      this.program,
+      'u_resolution'
+    );
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -58,7 +76,9 @@ export default class EdgeProgram extends Program {
     // NOTE: when using webgl2, the extension is enabled by default
     this.canUse32BitsIndices = canUse32BitsIndices(gl);
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
-    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+    this.indicesType = this.canUse32BitsIndices
+      ? gl.UNSIGNED_INT
+      : gl.UNSIGNED_SHORT;
   }
 
   bind() {
@@ -73,28 +93,32 @@ export default class EdgeProgram extends Program {
     gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.colorLocation);
 
-    gl.vertexAttribPointer(this.positionLocation,
+    gl.vertexAttribPointer(
+      this.positionLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       0
     );
-    gl.vertexAttribPointer(this.normalLocation,
+    gl.vertexAttribPointer(
+      this.normalLocation,
       2,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       8
     );
-    gl.vertexAttribPointer(this.thicknessLocation,
+    gl.vertexAttribPointer(
+      this.thicknessLocation,
       1,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       16
     );
-    gl.vertexAttribPointer(this.colorLocation,
+    gl.vertexAttribPointer(
+      this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
@@ -108,7 +132,6 @@ export default class EdgeProgram extends Program {
   }
 
   process(sourceData, targetData, data, offset) {
-
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
         this.array[i] = 0;
@@ -117,19 +140,19 @@ export default class EdgeProgram extends Program {
     }
 
     const thickness = data.size || 1,
-          x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          color = floatColor(data.color);
+      x1 = sourceData.x,
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      color = floatColor(data.color);
 
     // Computing normals
     const dx = x2 - x1,
-          dy = y2 - y1;
+      dy = y2 - y1;
 
     let len = dx * dx + dy * dy,
-        n1 = 0,
-        n2 = 0;
+      n1 = 0,
+      n2 = 0;
 
     if (len) {
       len = 1 / Math.sqrt(len);
@@ -178,7 +201,7 @@ export default class EdgeProgram extends Program {
   computeIndices() {
     const l = this.array.length / ATTRIBUTES;
 
-    const size = l + (l / 2);
+    const size = l + l / 2;
 
     const indices = new this.IndicesArray(size);
 

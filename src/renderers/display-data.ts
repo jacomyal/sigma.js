@@ -11,6 +11,14 @@
  * afterwards.
  */
 export class NodeDisplayData {
+  index: string;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  hidden: boolean;
+  label: string;
+
   constructor(index, settings) {
     this.index = index;
     this.x = 0;
@@ -22,12 +30,17 @@ export class NodeDisplayData {
   }
 
   assign(data) {
-    for (const key in data)
-      this[key] = data[key];
+    for (const key in data) this[key] = data[key];
   }
 }
 
 export class EdgeDisplayData {
+  index: any;
+  size: number;
+  color: string;
+  hidden: boolean;
+  label: string;
+
   constructor(index, settings) {
     this.index = index;
     this.size = 1;
@@ -37,7 +50,6 @@ export class EdgeDisplayData {
   }
 
   assign(data) {
-    for (const key in data)
-      this[key] = data[key];
+    for (const key in data) this[key] = data[key];
   }
 }

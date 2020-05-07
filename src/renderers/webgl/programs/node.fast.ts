@@ -12,17 +12,30 @@ import vertexShaderSource from '../shaders/node.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/node.fast.frag.glsl';
 
 const POINTS = 1,
-      ATTRIBUTES = 4;
+  ATTRIBUTES = 4;
 
 export default class NodeProgramFast extends Program {
+  gl: any;
+  // Array data
+  array = null;
+  buffer: any;
+  positionLocation: any;
+  sizeLocation: any;
+  colorLocation: any;
+  matrixLocation: any;
+  ratioLocation: any;
+  scaleLocation: any;
+  vertexShaderSource: any;
+  vertexShader: any;
+  fragmentShaderSource: any;
+  fragmentShader: any;
+  program: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Binding context
     this.gl = gl;
-
-    // Array data
-    this.array = null;
 
     // Initializing buffers
     this.buffer = gl.createBuffer();
@@ -114,10 +127,6 @@ export default class NodeProgramFast extends Program {
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    gl.drawArrays(
-      gl.POINTS,
-      0,
-      this.array.length / ATTRIBUTES
-    );
+    gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
   }
 }

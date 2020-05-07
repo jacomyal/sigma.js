@@ -4,6 +4,13 @@
  *
  * Helpers used by most renderers.
  */
+declare global {
+  interface Screen {
+    deviceXDPI: number;
+    logicalXDPI: number;
+    systemXDPI: number;
+  }
+}
 
 /**
  * Function used to create DOM elements easily.
@@ -15,15 +22,12 @@
 export function createElement(tag, attributes) {
   const element = document.createElement(tag);
 
-  if (!attributes)
-    return element;
+  if (!attributes) return element;
 
   for (const k in attributes) {
     if (k === 'style') {
-      for (const s in attributes[k])
-        element.style[s] = attributes[k][s];
-    }
-    else {
+      for (const s in attributes[k]) element.style[s] = attributes[k][s];
+    } else {
       element.setAttribute(k, attributes[k]);
     }
   }
@@ -39,11 +43,12 @@ export function createElement(tag, attributes) {
 export function getPixelRatio() {
   const screen = window.screen;
 
-  if (typeof screen.deviceXDPI !== 'undefined' &&
-      typeof screen.logicalXDPI !== 'undefined' &&
-      screen.deviceXDPI > screen.logicalXDPI)
+  if (
+    typeof screen.deviceXDPI !== 'undefined' &&
+    typeof screen.logicalXDPI !== 'undefined' &&
+    screen.deviceXDPI > screen.logicalXDPI
+  )
     return screen.systemXDPI / screen.logicalXDPI;
-
   else if (typeof window.devicePixelRatio !== 'undefined')
     return window.devicePixelRatio;
 
@@ -64,11 +69,10 @@ export function createNormalizationFunction(extent) {
 
   let ratio = Math.max(maxX - minX, maxY - minY);
 
-  if (ratio === 0)
-    ratio = 1;
+  if (ratio === 0) ratio = 1;
 
   const dX = (maxX + minX) / 2,
-        dY = (maxY + minY) / 2;
+    dY = (maxY + minY) / 2;
 
   const fn = data => {
     return {
@@ -85,8 +89,8 @@ export function createNormalizationFunction(extent) {
 
   fn.inverse = data => {
     return {
-       x: dX + ratio * (data.x - 0.5),
-       y: dY + ratio * (data.y - 0.5)
+      x: dX + ratio * (data.x - 0.5),
+      y: dY + ratio * (data.y - 0.5)
     };
   };
 

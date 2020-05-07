@@ -11,11 +11,9 @@
  * @param  {mixed}   value - Target value.
  * @return {boolean}
  */
-export function isPlainObject(value) {
+export function isPlainObject(value: any): boolean {
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    value.constructor === Object
+    typeof value === 'object' && value !== null && value.constructor === Object
   );
 }
 
@@ -26,20 +24,18 @@ export function isPlainObject(value) {
  * @param  {object} [...objects] - Objects to merge.
  * @return {object}
  */
-export function assign(target, ...objects) {
+export function assign(target: object, ...objects): object {
   target = target || {};
 
   for (let i = 0, l = objects.length; i < l; i++) {
     const o = objects[i];
 
-    if (!o)
-      continue;
+    if (!o) continue;
 
     for (const k in o) {
       if (isPlainObject(o[k])) {
         target[k] = assign(target[k], o[k]);
-      }
-      else {
+      } else {
         target[k] = o[k];
       }
     }
