@@ -1,6 +1,6 @@
 const webpack = require('webpack'),
-      HtmlWebpackPlugin = require('html-webpack-plugin'),
-      path = require('path');
+  HtmlWebpackPlugin = require('html-webpack-plugin'),
+  path = require('path');
 
 const EXAMPLES = {
   animations: {
@@ -72,14 +72,16 @@ const plugins = [
 for (const key in EXAMPLES) {
   const example = EXAMPLES[key];
 
-  entry[key] = `./${example.id}.js`;
+  entry[key] = `./${example.id}.ts`;
 
-  plugins.push(new HtmlWebpackPlugin({
-    filename: `${example.id}.html`,
-    title: `Sigma.js - ${example.title} Example`,
-    chunks: ['commons', key],
-    template: path.join(__dirname, 'templates', 'default.ejs')
-  }));
+  plugins.push(
+    new HtmlWebpackPlugin({
+      filename: `${example.id}.html`,
+      title: `Sigma.js - ${example.title} Example`,
+      chunks: ['commons', key],
+      template: path.join(__dirname, 'templates', 'default.ejs')
+    })
+  );
 }
 
 module.exports = {
@@ -90,12 +92,15 @@ module.exports = {
     filename: '[name].bundle.js'
   },
   devtool: 'source-map',
+  resolve: {
+    extensions: ['.ts', '.js', '.glsl', '.gefx']
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.ts$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'ts-loader'
       },
       {
         test: /\.(?:glsl|gexf)$/,

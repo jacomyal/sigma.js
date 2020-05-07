@@ -29,7 +29,7 @@ module.exports = [
       libraryTarget: 'umd'
     },
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js', 'glsl']
     },
     module: moduleConfig
   },
@@ -42,7 +42,7 @@ module.exports = [
       path: path.join(__dirname, 'build')
     },
     resolve: {
-      extensions: ['.ts', '.js']
+      extensions: ['.ts', '.js', 'glsl']
     },
     module: moduleConfig
   }

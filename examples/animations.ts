@@ -1,7 +1,7 @@
 import {UndirectedGraph} from 'graphology';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 import circularLayout from 'graphology-layout/circular';
-import {animateNodes} from '../src/animate.js';
+import {animateNodes} from '../src/animate';
 import {scaleLinear} from 'd3-scale';
 import extent from 'simple-statistics/src/extent';
 import miserables from './resources/les-miserables.json';
@@ -50,7 +50,7 @@ miserables.nodes.forEach((node, i) => {
 
 const circle = circularLayout(graph);
 
-let state = 0;
+let state: boolean = false;
 
 function loop() {
   const l = state ? initial : circle;

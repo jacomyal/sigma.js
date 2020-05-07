@@ -6,7 +6,7 @@ import choice from 'pandemonium/choice';
 import random from 'pandemonium/random';
 import chroma from 'chroma-js';
 import faker from 'faker';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 
 const container = document.getElementById('container');
 
@@ -23,9 +23,9 @@ graph.nodes().forEach(node => {
 
 const renderer = new WebGLRenderer(graph, container);
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+// window.graph = graph;
+// window.renderer = renderer;
+// window.camera = renderer.camera;
 
 // Randomly editing the graph every second
 const OPERATIONS = ['addNode'];
@@ -49,9 +49,11 @@ function edit() {
     });
 
     // Adding edges
-    const targets = new Set(Array.from(new Array(random(1, 5)), _ => {
-      return choice(otherNodes);
-    }));
+    const targets = new Set(
+      Array.from(new Array(random(1, 5)), _ => {
+        return choice(otherNodes);
+      })
+    );
 
     targets.forEach(target => {
       graph.addEdge(nodeKey, target, {color: chroma.random().hex()});
@@ -64,10 +66,10 @@ setInterval(edit, 1000);
 // Layout experiences
 const layout = new FA2Layout(graph, {settings: {slowDown: 1000000}});
 
-window.startLayout = function() {
-  layout.start();
-};
-
-window.stopLayout = function() {
-  layout.stop();
-};
+// window.startLayout = function() {
+//   layout.start();
+// };
+//
+// window.stopLayout = function() {
+//   layout.stop();
+// };

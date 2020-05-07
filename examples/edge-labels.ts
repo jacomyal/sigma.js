@@ -1,5 +1,5 @@
 import {DirectedGraph} from 'graphology';
-import WebGLRenderer from '../src/renderers/webgl';
+import WebGLRenderer from '../src/renderers/webgl/index';
 
 const container = document.getElementById('container');
 
@@ -66,6 +66,6 @@ const renderer = new WebGLRenderer(graph, container, {
   renderEdgeLabels: true
 });
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+// window.graph = graph;
+// window.renderer = renderer;
+// window.camera = renderer.camera;

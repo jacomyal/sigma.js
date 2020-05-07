@@ -9,9 +9,20 @@ import vertexShaderSource from '../../src/renderers/webgl/shaders/node.fast.vert
 import fragmentShaderSource from './custom-node-fragment-shader.glsl';
 
 const POINTS = 3,
-      ATTRIBUTES = 5;
+  ATTRIBUTES = 5;
 
 export default class CustomNodeProgram extends Program {
+  gl: any;
+  array: any;
+  buffer: any;
+  program: any;
+  positionLocation: any;
+  sizeLocation: any;
+  colorLocation: any;
+  matrixLocation: any;
+  ratioLocation: any;
+  scaleLocation: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -111,10 +122,6 @@ export default class CustomNodeProgram extends Program {
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
-    gl.drawArrays(
-      gl.POINTS,
-      0,
-      this.array.length / ATTRIBUTES
-    );
+    gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
   }
 }

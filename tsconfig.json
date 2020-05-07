@@ -4,7 +4,8 @@
     "noImplicitAny": false,
     "target": "es5",
     "esModuleInterop": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "resolveJsonModule": true
   },
-  "files": ["types/global.d.ts", "types/glsl.d.ts"]
+  "files": ["types/global.d.ts", "types/glsl.d.ts", "types/gexf.d.ts"]
 }
