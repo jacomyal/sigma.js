@@ -13,33 +13,18 @@ const POINTS = 3,
   ATTRIBUTES = 9;
 
 export default class EdgeTriangleProgram extends Program {
-  // Binding context
-  gl: any;
-  // Array data
-  array: Float32Array = null;
-  buffer: any;
-  positionLocation: any;
-  normalLocation: any;
-  thicknessLocation: any;
-  colorLocation: any;
-  barycentricLocation: any;
-  resolutionLocation: any;
-  ratioLocation: any;
-  matrixLocation: any;
-  scaleLocation: any;
+  positionLocation: GLint;
+  normalLocation: GLint;
+  thicknessLocation: GLint;
+  colorLocation: GLint;
+  barycentricLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Array data
-    this.array = null;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');

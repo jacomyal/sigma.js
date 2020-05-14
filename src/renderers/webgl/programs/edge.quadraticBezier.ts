@@ -13,31 +13,16 @@ const POINTS = 3,
   ATTRIBUTES = 5;
 
 export default class EdgeQuadraticBezierProgram extends Program {
-  // Binding context
-  gl: any;
-  // Array data
-  array: Float32Array = null;
-  buffer: any;
-  positionLocation: any;
-  colorLocation: any;
-  coordLocation: any;
-  resolutionLocation: any;
-  ratioLocation: any;
-  matrixLocation: any;
-  scaleLocation: any;
+  positionLocation: GLint;
+  colorLocation: GLint;
+  coordLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Array data
-    this.array = null;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');

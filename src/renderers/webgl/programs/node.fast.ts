@@ -15,31 +15,15 @@ const POINTS = 1,
   ATTRIBUTES = 4;
 
 export default class NodeProgramFast extends Program {
-  gl: any;
-  // Array data
-  array = null;
-  buffer: any;
-  positionLocation: any;
-  sizeLocation: any;
-  colorLocation: any;
-  matrixLocation: any;
-  ratioLocation: any;
-  scaleLocation: any;
-  vertexShaderSource: any;
-  vertexShader: any;
-  fragmentShaderSource: any;
-  fragmentShader: any;
-  program: any;
+  positionLocation: GLint;
+  sizeLocation: GLint;
+  colorLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     const program = this.program;
 

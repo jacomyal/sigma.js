@@ -12,15 +12,23 @@ import {loadVertexShader, loadFragmentShader, loadProgram} from '../shaders/util
  * @constructor
  */
 export default class Program {
-  vertexShaderSource: any;
-  vertexShader: any;
-  fragmentShaderSource: any;
-  fragmentShader: any;
-  program: any;
+  gl: WebGLRenderingContext;
+  array: Float32Array = null;
+  buffer: WebGLBuffer;
+  vertexShaderSource: string;
+  vertexShader: WebGLShader;
+  fragmentShaderSource: string;
+  fragmentShader: WebGLShader;
+  program: WebGLProgram;
 
-  constructor(gl, vertexShaderSource, fragmentShaderSource) {
+  constructor(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string) {
+    // Binding context
+    this.gl = gl;
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
+    this.buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
     this.load(gl);
   }
 

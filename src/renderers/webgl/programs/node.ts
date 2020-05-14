@@ -20,32 +20,17 @@ const POINTS = 3,
   ATTRIBUTES = 5;
 
 export default class NodeProgram extends Program {
-  // Binding context
-  gl: any;
-  // Array data
-  array: Float32Array = null;
-  buffer: any;
-  positionLocation: any;
-  sizeLocation: any;
-  colorLocation: any;
-  angleLocation: any;
-  resolutionLocation: any;
-  matrixLocation: any;
-  ratioLocation: any;
-  scaleLocation: any;
+  positionLocation: GLint;
+  sizeLocation: GLint;
+  colorLocation: GLint;
+  angleLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Array data
-    this.array = null;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
@@ -64,11 +49,8 @@ export default class NodeProgram extends Program {
     gl.enableVertexAttribArray(this.angleLocation);
 
     gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-
     gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-
     gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
-
     gl.vertexAttribPointer(this.angleLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
   }
 
