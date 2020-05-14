@@ -10,9 +10,24 @@ import vertexShaderSource from '../shaders/edge.triangle.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.triangle.frag.glsl';
 
 const POINTS = 3,
-      ATTRIBUTES = 9;
+  ATTRIBUTES = 9;
 
 export default class EdgeTriangleProgram extends Program {
+  // Binding context
+  gl: any;
+  // Array data
+  array: Float32Array = null;
+  buffer: any;
+  positionLocation: any;
+  normalLocation: any;
+  thicknessLocation: any;
+  colorLocation: any;
+  barycentricLocation: any;
+  resolutionLocation: any;
+  ratioLocation: any;
+  matrixLocation: any;
+  scaleLocation: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -44,40 +59,17 @@ export default class EdgeTriangleProgram extends Program {
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.barycentricLocation);
 
-    gl.vertexAttribPointer(this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    gl.vertexAttribPointer(this.normalLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
-    gl.vertexAttribPointer(this.thicknessLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      16
-    );
-    gl.vertexAttribPointer(this.colorLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      20
-    );
-    gl.vertexAttribPointer(this.barycentricLocation,
+    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+    gl.vertexAttribPointer(
+      this.barycentricLocation,
       3,
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      24
+      24,
     );
   }
 
@@ -86,26 +78,25 @@ export default class EdgeTriangleProgram extends Program {
   }
 
   process(sourceData, targetData, data, offset) {
-
+    let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
-        this.array[i] = 0;
+      for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;
     }
 
     const thickness = data.size || 1,
-          x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          color = floatColor(data.color);
+      x1 = sourceData.x,
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      color = floatColor(data.color);
 
     // Computing normals
     const dx = x2 - x1,
-          dy = y2 - y1;
+      dy = y2 - y1;
 
     let len = dx * dx + dy * dy,
-        n1 = 0,
-        n2 = 0;
+      n1 = 0,
+      n2 = 0;
 
     if (len) {
       len = 1 / Math.sqrt(len);
@@ -114,7 +105,7 @@ export default class EdgeTriangleProgram extends Program {
       n2 = dx * len;
     }
 
-    let i = POINTS * ATTRIBUTES * offset;
+    i = POINTS * ATTRIBUTES * offset;
 
     const array = this.array;
 
@@ -169,20 +160,13 @@ export default class EdgeTriangleProgram extends Program {
 
     // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(
-      this.ratioLocation,
-      params.ratio / Math.pow(params.ratio, params.edgesPowRatio)
-    );
+    gl.uniform1f(this.ratioLocation, params.ratio / Math.pow(params.ratio, params.edgesPowRatio));
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     gl.uniform1f(this.scaleLocation, params.ratio);
 
     // Drawing:
-    gl.drawArrays(
-      gl.TRIANGLES,
-      0,
-      this.array.length / ATTRIBUTES
-    );
+    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
   }
 }

@@ -11,9 +11,19 @@ import vertexShaderSource from '../shaders/edge.fast.vert.glsl';
 import fragmentShaderSource from '../shaders/edge.fast.frag.glsl';
 
 const POINTS = 2,
-      ATTRIBUTES = 3;
+  ATTRIBUTES = 3;
 
 export default class EdgeFastProgram extends Program {
+  // Binding context
+  gl: any;
+  // Array data
+  array: Float32Array = null;
+  buffer: any;
+  positionLocation: any;
+  colorLocation: any;
+  resolutionLocation: any;
+  matrixLocation: any;
+
   constructor(gl) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
@@ -37,20 +47,8 @@ export default class EdgeFastProgram extends Program {
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.colorLocation);
 
-    gl.vertexAttribPointer(this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    gl.vertexAttribPointer(this.colorLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
+    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
   }
 
   allocate(capacity) {
@@ -58,21 +56,20 @@ export default class EdgeFastProgram extends Program {
   }
 
   process(sourceData, targetData, data, offset) {
-
     const array = this.array;
 
+    let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let l = i + POINTS * ATTRIBUTES; i < l; i++)
-        array[i] = 0;
+      for (let l = i + POINTS * ATTRIBUTES; i < l; i++) array[i] = 0;
     }
 
     const x1 = sourceData.x,
-          y1 = sourceData.y,
-          x2 = targetData.x,
-          y2 = targetData.y,
-          color = floatColor(data.color);
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      color = floatColor(data.color);
 
-    let i = POINTS * ATTRIBUTES * offset;
+    i = POINTS * ATTRIBUTES * offset;
 
     // First point
     array[i++] = x1;
@@ -104,10 +101,6 @@ export default class EdgeFastProgram extends Program {
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
     // Drawing:
-    gl.drawArrays(
-      gl.LINES,
-      0,
-      this.array.length / ATTRIBUTES
-    );
+    gl.drawArrays(gl.LINES, 0, this.array.length / ATTRIBUTES);
   }
 }

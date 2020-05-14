@@ -114,7 +114,7 @@ export default class MouseCaptor extends Captor {
     // TODO: factorize
     const dimensions = {
       width: this.container.offsetWidth,
-      height: this.container.offsetHeight
+      height: this.container.offsetHeight,
     };
 
     const clickX = getX(e),
@@ -130,32 +130,22 @@ export default class MouseCaptor extends Captor {
     const clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
       centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
 
-    const clickGraphNew = cameraWithNewRatio.viewportToGraph(
-        dimensions,
-        clickX,
-        clickY
-      ),
-      centerGraphNew = cameraWithNewRatio.viewportToGraph(
-        dimensions,
-        center.x,
-        center.y
-      );
+    const clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
+      centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
 
-    const deltaX =
-        clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-      deltaY =
-        clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+    const deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
+      deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
 
     this.camera.animate(
       {
         x: cameraState.x - deltaX,
         y: cameraState.y - deltaY,
-        ratio: newRatio
+        ratio: newRatio,
       },
       {
         easing: 'quadraticInOut',
-        duration: DOUBLE_CLICK_ZOOMING_DURATION
-      }
+        duration: DOUBLE_CLICK_ZOOMING_DURATION,
+      },
     );
 
     if (e.preventDefault) e.preventDefault();
@@ -207,22 +197,18 @@ export default class MouseCaptor extends Captor {
     if (this.isMoving) {
       this.camera.animate(
         {
-          x:
-            cameraState.x +
-            MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
-          y:
-            cameraState.y +
-            MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y)
+          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
+          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
         },
         {
           duration: MOUSE_INERTIA_DURATION,
-          easing: 'quadraticOut'
-        }
+          easing: 'quadraticOut',
+        },
       );
     } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
       this.camera.setState({
         x: cameraState.x,
-        y: cameraState.y
+        y: cameraState.y,
       });
     }
 
@@ -250,17 +236,13 @@ export default class MouseCaptor extends Captor {
 
       const dimensions = {
         width: this.container.offsetWidth,
-        height: this.container.offsetHeight
+        height: this.container.offsetHeight,
       };
 
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = this.camera.viewportToGraph(
-        dimensions,
-        this.lastMouseX,
-        this.lastMouseY
-      );
+      const lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX, this.lastMouseY);
 
       const mouse = this.camera.viewportToGraph(dimensions, eX, eY);
 
@@ -313,7 +295,7 @@ export default class MouseCaptor extends Captor {
 
     const dimensions = {
       width: this.container.offsetWidth,
-      height: this.container.offsetHeight
+      height: this.container.offsetHeight,
     };
 
     const clickX = getX(e),
@@ -329,33 +311,23 @@ export default class MouseCaptor extends Captor {
     const clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
       centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
 
-    const clickGraphNew = cameraWithNewRatio.viewportToGraph(
-        dimensions,
-        clickX,
-        clickY
-      ),
-      centerGraphNew = cameraWithNewRatio.viewportToGraph(
-        dimensions,
-        center.x,
-        center.y
-      );
+    const clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
+      centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
 
-    const deltaX =
-        clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-      deltaY =
-        clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+    const deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
+      deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
 
     this.camera.animate(
       {
         x: cameraState.x - deltaX,
         y: cameraState.y - deltaY,
-        ratio: newRatio
+        ratio: newRatio,
       },
       {
         easing: 'linear',
-        duration: MOUSE_ZOOM_DURATION
+        duration: MOUSE_ZOOM_DURATION,
       },
-      () => (this.wheelLock = false)
+      () => (this.wheelLock = false),
     );
 
     return false;

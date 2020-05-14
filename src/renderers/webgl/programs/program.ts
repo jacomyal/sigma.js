@@ -4,11 +4,7 @@
  *
  * Class representing a single WebGL program used by sigma's WebGL renderer.
  */
-import {
-  loadVertexShader,
-  loadFragmentShader,
-  loadProgram
-} from '../shaders/utils';
+import {loadVertexShader, loadFragmentShader, loadProgram} from '../shaders/utils';
 
 /**
  * Program class.
@@ -58,34 +54,33 @@ export function createCompoundProgram(programClasses) {
   return class CompoundProgram {
     programs: any;
     constructor(gl) {
-      this.programs = programClasses.map(ProgramClass => new ProgramClass(gl));
+      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl));
     }
 
     allocate(capacity) {
-      this.programs.forEach(program => program.allocate(capacity));
+      this.programs.forEach((program) => program.allocate(capacity));
     }
 
     process() {
       const args = arguments;
 
-      this.programs.forEach(program => program.process(...args));
+      this.programs.forEach((program) => program.process(...args));
     }
 
     computeIndices() {
-      this.programs.forEach(program => {
-        if (typeof program.computeIndices === 'function')
-          program.computeIndices();
+      this.programs.forEach((program) => {
+        if (typeof program.computeIndices === 'function') program.computeIndices();
       });
     }
 
     bufferData() {
-      this.programs.forEach(program => program.bufferData());
+      this.programs.forEach((program) => program.bufferData());
     }
 
     render() {
       const args = arguments;
 
-      this.programs.forEach(program => {
+      this.programs.forEach((program) => {
         program.bind();
         program.bufferData();
         program.render(...args);
