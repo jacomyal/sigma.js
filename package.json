@@ -61,6 +61,7 @@
     "html-webpack-plugin": "^3.2.0",
     "mocha": "^7.0.0",
     "pandemonium": "^1.4.1",
+    "prettier": "^2.0.5",
     "raw-loader": "^0.5.1",
     "rimraf": "^3.0.0",
     "simple-statistics": "^7.0.7",
