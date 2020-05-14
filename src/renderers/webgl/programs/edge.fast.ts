@@ -14,28 +14,13 @@ const POINTS = 2,
   ATTRIBUTES = 3;
 
 export default class EdgeFastProgram extends Program {
-  // Binding context
-  gl: any;
-  // Array data
-  array: Float32Array = null;
-  buffer: any;
-  positionLocation: any;
-  colorLocation: any;
-  resolutionLocation: any;
-  matrixLocation: any;
+  positionLocation: GLint;
+  colorLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Array data
-    this.array = null;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');

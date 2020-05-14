@@ -17,36 +17,25 @@ const POINTS = 4,
   STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeClampedProgram extends Program {
-  gl: any;
-  array: any;
-  indicesArray: any;
-  buffer: any;
-  indicesBuffer: any;
-  positionLocation: any;
-  normalLocation: any;
-  thicknessLocation: any;
-  colorLocation: any;
-  radiusLocation: any;
-  resolutionLocation: any;
-  ratioLocation: any;
-  matrixLocation: any;
-  scaleLocation: any;
-  canUse32BitsIndices: any;
-  IndicesArray: any;
+  IndicesArray: Uint32ArrayConstructor | Uint16ArrayConstructor;
+  indicesArray: Uint32Array | Uint16Array;
+  indicesBuffer: WebGLBuffer;
   indicesType: any;
+  positionLocation: GLint;
+  normalLocation: GLint;
+  thicknessLocation: GLint;
+  colorLocation: GLint;
+  radiusLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
+  canUse32BitsIndices: boolean;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
-    // Binding context
-    this.gl = gl;
-
-    // Array data
-    this.array = null;
-    this.indicesArray = null;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
+    // Initializing indices buffer
     this.indicesBuffer = gl.createBuffer();
 
     // Locations
@@ -76,7 +65,6 @@ export default class EdgeClampedProgram extends Program {
   bind() {
     const gl = this.gl;
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
 
     // Bindings

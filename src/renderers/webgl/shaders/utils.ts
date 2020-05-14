@@ -8,7 +8,7 @@
 /**
  * Function used to load a shader.
  */
-function loadShader(type, gl, source) {
+function loadShader(type: string, gl: WebGLRenderingContext, source: string): WebGLShader {
   const glType = type === 'VERTEX' ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
   // Creating the shader
@@ -44,7 +44,7 @@ export {loadVertexShader, loadFragmentShader};
 /**
  * Function used to load a program.
  */
-export function loadProgram(gl, shaders) {
+export function loadProgram(gl: WebGLRenderingContext, shaders): WebGLProgram {
   const program = gl.createProgram();
 
   let i, l;

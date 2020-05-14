@@ -14,33 +14,20 @@ const POINTS = 3,
   STRIDE = POINTS * ATTRIBUTES;
 
 export default class ArrowProgram extends Program {
-  // Binding context
-  gl: any;
-  // Array data
-  array: Float32Array = null;
-  // Initializing buffers
-  buffer: any;
-
   // Locations
-  positionLocation: any;
-  normalLocation: any;
-  thicknessLocation: any;
-  radiusLocation: any;
-  colorLocation: any;
-  barycentricLocation: any;
-  resolutionLocation: any;
-  ratioLocation: any;
-  matrixLocation: any;
-  scaleLocation: any;
+  positionLocation: GLint;
+  normalLocation: GLint;
+  thicknessLocation: GLint;
+  radiusLocation: GLint;
+  colorLocation: GLint;
+  barycentricLocation: GLint;
+  resolutionLocation: WebGLUniformLocation;
+  ratioLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  scaleLocation: WebGLUniformLocation;
 
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Binding context
-    this.gl = gl;
-
-    // Initializing buffers
-    this.buffer = gl.createBuffer();
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
@@ -59,8 +46,6 @@ export default class ArrowProgram extends Program {
 
   bind() {
     const gl = this.gl;
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
