@@ -2,10 +2,12 @@
   "compilerOptions": {
     "outDir": "./build/",
     "noImplicitAny": false,
+    "strict": false,
     "target": "es5",
+    "sourceMap": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "resolveJsonModule": true
+    "typeRoots": ["./node_modules/@types/", "./types/"]
   },
-  "files": ["types/global.d.ts", "types/glsl.d.ts", "types/gexf.d.ts"]
+  "include": ["./types/**/*", "./src/**/*"]
 }

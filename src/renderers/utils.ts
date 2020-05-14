@@ -4,13 +4,6 @@
  *
  * Helpers used by most renderers.
  */
-declare global {
-  interface Screen {
-    deviceXDPI: number;
-    logicalXDPI: number;
-    systemXDPI: number;
-  }
-}
 
 /**
  * Function used to create DOM elements easily.

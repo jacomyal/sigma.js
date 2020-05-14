@@ -6,26 +6,6 @@
  */
 import {getPixelRatio} from '../renderers/utils';
 
-declare global {
-  interface MouseOrTouchEvent {
-    offsetX: number;
-    offsetY: number;
-    clientX: number;
-    clientY: number;
-    layerX: number;
-    layerY: number;
-    wheelDelta: number;
-  }
-  interface TouchEvent extends MouseOrTouchEvent {}
-  interface MouseEvent extends MouseOrTouchEvent {}
-  interface EventTarget {
-    ownerSVGElement: any;
-    height: number;
-    width: number;
-    namespaceURI: any;
-  }
-}
-
 /**
  * Extract the local X position from a mouse or touch event.
  *
