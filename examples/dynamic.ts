@@ -13,11 +13,11 @@ const container = document.getElementById('container');
 const graph = erdosRenyi(UndirectedGraph, {order: 100, probability: 0.2});
 randomLayout.assign(graph);
 
-graph.nodes().forEach(node => {
+graph.nodes().forEach((node) => {
   graph.mergeNodeAttributes(node, {
     label: faker.name.findName(),
     size: Math.max(4, Math.random() * 10),
-    color: chroma.random().hex()
+    color: chroma.random().hex(),
   });
 });
 
@@ -45,17 +45,17 @@ function edit() {
       size: Math.max(4, Math.random() * 10) * 2,
       color: chroma.random().hex(),
       x: Math.random(),
-      y: Math.random()
+      y: Math.random(),
     });
 
     // Adding edges
     const targets = new Set(
-      Array.from(new Array(random(1, 5)), _ => {
+      Array.from(new Array(random(1, 5)), (_) => {
         return choice(otherNodes);
-      })
+      }),
     );
 
-    targets.forEach(target => {
+    targets.forEach((target) => {
       graph.addEdge(nodeKey, target, {color: chroma.random().hex()});
     });
   }

@@ -8,9 +8,6 @@ import {createCompoundProgram} from './program';
 import ArrowProgram from './arrow';
 import EdgeClampedProgram from './edge.clamped';
 
-const program = createCompoundProgram([
-  EdgeClampedProgram,
-  ArrowProgram
-]);
+const program = createCompoundProgram([EdgeClampedProgram, ArrowProgram]);
 
 export default program;

@@ -26,14 +26,12 @@ export function zIndexOrdering(extent, getter, elements) {
   //   return elements;
 
   // If k is > n, we'll use a standard sort
-  return elements.sort(function(a, b) {
+  return elements.sort(function (a, b) {
     const zA = getter(a) || 0,
-          zB = getter(b) || 0;
+      zB = getter(b) || 0;
 
-    if (zA < zB)
-      return -1;
-    if (zA > zB)
-      return 1;
+    if (zA < zB) return -1;
+    if (zA > zB) return 1;
 
     return 0;
   });

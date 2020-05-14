@@ -5,56 +5,56 @@ const webpack = require('webpack'),
 const EXAMPLES = {
   animations: {
     id: 'animations',
-    title: 'Animations'
+    title: 'Animations',
   },
   basic: {
     id: 'basic',
-    title: 'Basic'
+    title: 'Basic',
   },
   components: {
     id: 'components',
-    title: 'Connected Components'
+    title: 'Connected Components',
   },
   drag: {
     id: 'drag',
-    title: 'Drag'
+    title: 'Drag',
   },
   dynamic: {
     id: 'dynamic',
-    title: 'Dynamic graph (adding & removing items)'
+    title: 'Dynamic graph (adding & removing items)',
   },
   events: {
     id: 'events',
-    title: 'Events'
+    title: 'Events',
   },
   gexf: {
     id: 'gexf',
-    title: 'GEXF'
+    title: 'GEXF',
   },
   layout: {
     id: 'layout',
-    title: 'Force Atlas 2 Layout'
+    title: 'Force Atlas 2 Layout',
   },
   performance: {
     id: 'performance',
-    title: 'Performance'
+    title: 'Performance',
   },
   settings: {
     id: 'settings',
-    title: 'Settings'
+    title: 'Settings',
   },
   tiny: {
     id: 'tiny',
-    title: 'Tiny graph'
+    title: 'Tiny graph',
   },
   edgeLabels: {
     id: 'edge-labels',
-    title: 'Edge labels'
+    title: 'Edge labels',
   },
   customNodes: {
     id: 'custom-nodes',
-    title: 'Custom nodes renderer'
-  }
+    title: 'Custom nodes renderer',
+  },
 };
 
 const entry = {};
@@ -64,9 +64,9 @@ const plugins = [
     filename: 'index.html',
     title: 'Sigma.js - Examples',
     template: path.join(__dirname, 'templates', 'index.ejs'),
-    pages: Object.keys(EXAMPLES).map(key => EXAMPLES[key]),
-    chunks: []
-  })
+    pages: Object.keys(EXAMPLES).map((key) => EXAMPLES[key]),
+    chunks: [],
+  }),
 ];
 
 for (const key in EXAMPLES) {
@@ -79,8 +79,8 @@ for (const key in EXAMPLES) {
       filename: `${example.id}.html`,
       title: `Sigma.js - ${example.title} Example`,
       chunks: ['commons', key],
-      template: path.join(__dirname, 'templates', 'default.ejs')
-    })
+      template: path.join(__dirname, 'templates', 'default.ejs'),
+    }),
   );
 }
 
@@ -89,35 +89,35 @@ module.exports = {
   context: __dirname,
   entry,
   output: {
-    filename: '[name].bundle.js'
+    filename: '[name].bundle.js',
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ['.ts', '.js', '.glsl', '.gefx']
+    extensions: ['.ts', '.js', '.glsl', '.gefx'],
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        loader: 'ts-loader'
+        loader: 'ts-loader',
       },
       {
         test: /\.(?:glsl|gexf)$/,
         exclude: /node_modules/,
-        loader: 'raw-loader'
-      }
-    ]
+        loader: 'raw-loader',
+      },
+    ],
   },
   plugins,
   optimization: {
     splitChunks: {
       chunks: 'initial',
       minChunks: 2,
-      name: 'commons'
-    }
+      name: 'commons',
+    },
   },
   devServer: {
-    port: 8000
-  }
+    port: 8000,
+  },
 };

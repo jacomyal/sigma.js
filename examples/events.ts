@@ -9,24 +9,24 @@ const container = document.getElementById('container');
 
 const graph = erdosRenyi.sparse(UndirectedGraph, {
   order: 500,
-  probability: 0.05
+  probability: 0.05,
 });
 randomLayout.assign(graph);
 
-graph.nodes().forEach(node => {
+graph.nodes().forEach((node) => {
   graph.mergeNodeAttributes(node, {
     label: faker.name.findName(),
     size: Math.max(4, Math.random() * 10),
     color: chroma.random().hex(),
-    zIndex: 0
+    zIndex: 0,
   });
 });
 
-graph.edges().forEach(edge =>
+graph.edges().forEach((edge) =>
   graph.mergeEdgeAttributes(edge, {
     color: '#ccc',
-    zIndex: 0
-  })
+    zIndex: 0,
+  }),
 );
 
 let highlighedNodes = new Set();
@@ -47,7 +47,7 @@ const edgeReducer = (edge, data) => {
 const renderer = new WebGLRenderer(graph, container, {
   nodeReducer,
   edgeReducer,
-  zIndex: true
+  zIndex: true,
 });
 
 renderer.on('clickNode', ({node, captor}) => {

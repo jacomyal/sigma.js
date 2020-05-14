@@ -45,17 +45,13 @@ export function getY(e: MouseEvent | TouchEvent): number {
  * @return {number}     The width of the event's target.
  */
 export function getWidth(e: MouseEvent | TouchEvent): number {
-  const w = !e.target.ownerSVGElement
-    ? e.target.width
-    : e.target.ownerSVGElement.width;
+  const w = !e.target.ownerSVGElement ? e.target.width : e.target.ownerSVGElement.width;
 
   if (typeof w === 'number') return w;
 
   if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
 
-  throw new Error(
-    'sigma/captors/utils.getWidth: could not extract width from event.'
-  );
+  throw new Error('sigma/captors/utils.getWidth: could not extract width from event.');
 }
 
 /**
@@ -65,17 +61,13 @@ export function getWidth(e: MouseEvent | TouchEvent): number {
  * @return {number}     The height of the event's target.
  */
 export function getHeight(e: MouseEvent | TouchEvent): number {
-  const w = !e.target.ownerSVGElement
-    ? e.target.height
-    : e.target.ownerSVGElement.height;
+  const w = !e.target.ownerSVGElement ? e.target.height : e.target.ownerSVGElement.height;
 
   if (typeof w === 'number') return w;
 
   if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
 
-  throw new Error(
-    'sigma/captors/utils.getHeight: could not extract height from event.'
-  );
+  throw new Error('sigma/captors/utils.getHeight: could not extract height from event.');
 }
 
 /**
@@ -85,12 +77,11 @@ export function getHeight(e: MouseEvent | TouchEvent): number {
  * @return {object}     The center of the event's target.
  */
 export function getCenter(e: MouseEvent | TouchEvent): {x: number; y: number} {
-  const ratio =
-    e.target.namespaceURI.indexOf('svg') !== -1 ? 1 : getPixelRatio();
+  const ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 : getPixelRatio();
 
   return {
     x: getWidth(e) / (2 * ratio),
-    y: getHeight(e) / (2 * ratio)
+    y: getHeight(e) / (2 * ratio),
   };
 }
 
@@ -122,7 +113,7 @@ export function getMouseCoords(e: MouseEvent | TouchEvent): MouseCoords {
     ctrlKey: e.ctrlKey,
     metaKey: e.metaKey,
     altKey: e.altKey,
-    shiftKey: e.shiftKey
+    shiftKey: e.shiftKey,
   };
 }
 
@@ -137,7 +128,5 @@ export function getWheelDelta(e: MouseEvent | TouchEvent): number {
 
   if (typeof e.detail !== 'undefined') return e.detail / -9;
 
-  throw new Error(
-    'sigma/captors/utils.getDelta: could not extract delta from event.'
-  );
+  throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
 }

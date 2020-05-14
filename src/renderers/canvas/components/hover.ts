@@ -10,8 +10,8 @@ import drawLabel from './label';
 
 export default function drawHover(context, data, settings) {
   const size = settings.labelSize,
-        font = settings.labelFont,
-        weight = settings.labelWeight;
+    font = settings.labelFont,
+    weight = settings.labelWeight;
 
   context.font = `${weight} ${size}px ${font}`;
 
@@ -26,10 +26,10 @@ export default function drawHover(context, data, settings) {
   const textWidth = context.measureText(data.label).width;
 
   const x = Math.round(data.x - size / 2 - 2),
-        y = Math.round(data.y - size / 2 - 2),
-        w = Math.round(textWidth + size / 2 + data.size + 9),
-        h = Math.round(size + 4),
-        e = Math.round(size / 2 + 2);
+    y = Math.round(data.y - size / 2 - 2),
+    w = Math.round(textWidth + size / 2 + data.size + 9),
+    h = Math.round(size + 4),
+    e = Math.round(size / 2 + 2);
 
   context.moveTo(x, y + e);
   context.moveTo(x, y + e);

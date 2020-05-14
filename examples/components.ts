@@ -7,7 +7,7 @@ import WebGLRenderer from '../src/renderers/webgl/index';
 
 import data from './resources/toflit.json';
 
-const scale = d => Math.max(2, Math.log2(d) * 1.7);
+const scale = (d) => Math.max(2, Math.log2(d) * 1.7);
 
 document.body.innerHTML += `
   <style>
@@ -33,15 +33,15 @@ data.forEach(({source, target}) => {
   graph.mergeEdge(source, target);
 });
 
-graph.nodes().forEach(node => {
+graph.nodes().forEach((node) => {
   graph.setNodeAttribute(node, 'label', node);
   graph.setNodeAttribute(node, 'size', scale(graph.degree(node)));
 });
 
 const components = connectedComponents(graph);
 
-components.forEach(component => {
-  if (component.length < 10) component.forEach(node => graph.dropNode(node));
+components.forEach((component) => {
+  if (component.length < 10) component.forEach((node) => graph.dropNode(node));
 });
 
 const map = louvain(graph);
@@ -56,7 +56,7 @@ for (const node in map) {
 
   h.mergeNode(node, graph.getNodeAttributes(node));
 
-  graph.edges(node).forEach(edge => {
+  graph.edges(node).forEach((edge) => {
     const target = graph.opposite(node, edge);
 
     if (node < target || map[target] !== c) return;
@@ -87,7 +87,7 @@ communities.forEach((h, i) => {
   randomLayout.assign(h);
   forceAtlas2.assign(h, {
     iterations: 100,
-    settings: forceAtlas2.inferSettings(h)
+    settings: forceAtlas2.inferSettings(h),
   });
 
   const container = containers[i];

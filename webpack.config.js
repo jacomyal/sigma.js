@@ -7,14 +7,14 @@ const moduleConfig = {
     {
       test: /\.glsl$/,
       exclude: /node_modules/,
-      loader: 'raw-loader'
+      loader: 'raw-loader',
     },
     {
       test: /\.ts$/,
       exclude: /node_modules/,
-      loader: 'ts-loader'
-    }
-  ]
+      loader: 'ts-loader',
+    },
+  ],
 };
 
 module.exports = [
@@ -26,12 +26,12 @@ module.exports = [
       filename: production ? 'sigma.min.js' : 'sigma.js',
       path: path.join(__dirname, 'build'),
       library: 'Sigma',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
     resolve: {
-      extensions: ['.ts', '.js', 'glsl']
+      extensions: ['.ts', '.js', 'glsl'],
     },
-    module: moduleConfig
+    module: moduleConfig,
   },
   {
     name: 'sigma-graphology',
@@ -39,11 +39,11 @@ module.exports = [
     entry: './src/sigma-graphology.ts',
     output: {
       filename: production ? 'sigma-graphology.min.js' : 'sigma-graphology.js',
-      path: path.join(__dirname, 'build')
+      path: path.join(__dirname, 'build'),
     },
     resolve: {
-      extensions: ['.ts', '.js', 'glsl']
+      extensions: ['.ts', '.js', 'glsl'],
     },
-    module: moduleConfig
-  }
+    module: moduleConfig,
+  },
 ];

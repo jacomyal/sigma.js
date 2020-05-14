@@ -9,26 +9,26 @@ const container = document.getElementById('container');
 
 const graph = erdosRenyi.sparse(UndirectedGraph, {
   order: 1000 * 1000,
-  probability: 0
+  probability: 0,
 });
 randomLayout.assign(graph);
 
-graph.nodes().forEach(node => {
+graph.nodes().forEach((node) => {
   const attr = graph.getNodeAttributes(node);
 
   graph.mergeNodeAttributes(node, {
     label: faker.name.findName(),
     size: Math.max(4, Math.random() * 10),
-    color: chroma.random().hex()
+    color: chroma.random().hex(),
   });
 });
 
-graph.edges().forEach(edge => {
+graph.edges().forEach((edge) => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
 const renderer = new WebGLRenderer(graph, container, {
-  renderLabels: false
+  renderLabels: false,
 });
 
 //window.graph = graph;

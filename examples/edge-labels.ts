@@ -10,7 +10,7 @@ graph.addNode('Alice', {
   x: -2,
   y: 1,
   color: '#FF0',
-  size: 10
+  size: 10,
 });
 
 graph.addNode('Bob', {
@@ -18,7 +18,7 @@ graph.addNode('Bob', {
   x: 1,
   y: 2,
   color: '#00F',
-  size: 5
+  size: 5,
 });
 
 graph.addNode('Charles', {
@@ -26,7 +26,7 @@ graph.addNode('Charles', {
   x: 2,
   y: -1,
   color: '#00F',
-  size: 5
+  size: 5,
 });
 
 graph.addNode('Deborah', {
@@ -34,36 +34,36 @@ graph.addNode('Deborah', {
   x: -1,
   y: -2,
   color: '#00F',
-  size: 5
+  size: 5,
 });
 
 graph.addEdge('Alice', 'Bob', {
   label: 'likes to play with',
-  size: 1
+  size: 1,
 });
 
 graph.addEdge('Bob', 'Charles', {
   label: 'likes to be with',
   color: '#fc0',
-  size: 2
+  size: 2,
 });
 
 graph.addEdge('Charles', 'Deborah', {
   label: 'likes to talk with',
   color: '#CCC',
-  size: 3
+  size: 3,
 });
 
 graph.addEdge('Deborah', 'Alice', {
   label: 'likes to talk with',
   color: '#000',
-  size: 20
+  size: 20,
 });
 
 const renderer = new WebGLRenderer(graph, container, {
   defaultEdgeType: 'arrow',
   defaultEdgeColor: '#888',
-  renderEdgeLabels: true
+  renderEdgeLabels: true,
 });
 
 // window.graph = graph;

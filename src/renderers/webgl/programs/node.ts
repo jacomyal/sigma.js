@@ -52,10 +52,7 @@ export default class NodeProgram extends Program {
     this.sizeLocation = gl.getAttribLocation(this.program, 'a_size');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
     this.angleLocation = gl.getAttribLocation(this.program, 'a_angle');
-    this.resolutionLocation = gl.getUniformLocation(
-      this.program,
-      'u_resolution'
-    );
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -66,41 +63,13 @@ export default class NodeProgram extends Program {
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.angleLocation);
 
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
+    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
 
-    gl.vertexAttribPointer(
-      this.sizeLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
+    gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
 
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      12
-    );
+    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
 
-    gl.vertexAttribPointer(
-      this.angleLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      16
-    );
+    gl.vertexAttribPointer(this.angleLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
   }
 
   allocate(capacity) {
@@ -147,10 +116,7 @@ export default class NodeProgram extends Program {
     gl.useProgram(program);
 
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(
-      this.ratioLocation,
-      1 / Math.pow(params.ratio, params.nodesPowRatio)
-    );
+    gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 

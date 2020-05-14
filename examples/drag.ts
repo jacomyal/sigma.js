@@ -8,7 +8,7 @@ const container = document.getElementById('container');
 
 const graph = gexf.parse(Graph, arctic);
 
-graph.edges().forEach(edge => {
+graph.edges().forEach((edge) => {
   graph.setEdgeAttribute(edge, 'color', '#ccc');
 });
 
@@ -22,25 +22,23 @@ const captor = renderer.getMouseCaptor();
 let draggedNode = null,
   dragging = false;
 
-renderer.on('downNode', e => {
+renderer.on('downNode', (e) => {
   dragging = true;
   draggedNode = e.node;
   camera.disable();
 });
 
-captor.on('mouseup', e => {
+captor.on('mouseup', (e) => {
   dragging = false;
   draggedNode = null;
   camera.enable();
 });
 
-captor.on('mousemove', e => {
+captor.on('mousemove', (e) => {
   if (!dragging) return;
 
   // Get new position of node
-  const pos = renderer.normalizationFunction.inverse(
-    camera.viewportToGraph(renderer, e.x, e.y)
-  );
+  const pos = renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, e.x, e.y));
 
   graph.setNodeAttribute(draggedNode, 'x', pos.x);
   graph.setNodeAttribute(draggedNode, 'y', pos.y);
