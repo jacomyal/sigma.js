@@ -12,7 +12,7 @@ import * as easings from './easings';
  */
 const ANIMATE_DEFAULTS = {
   easing: 'quadraticInOut',
-  duration: 150
+  duration: 150,
 };
 
 /**
@@ -21,10 +21,7 @@ const ANIMATE_DEFAULTS = {
 export function animateNodes(graph, targets, options, callback) {
   options = assign({}, ANIMATE_DEFAULTS, options);
 
-  const easing =
-    typeof options.easing === 'function'
-      ? options.easing
-      : easings[options.easing];
+  const easing = typeof options.easing === 'function' ? options.easing : easings[options.easing];
 
   const start = Date.now();
 
@@ -34,8 +31,7 @@ export function animateNodes(graph, targets, options, callback) {
     const attrs = targets[node];
     startPositions[node] = {};
 
-    for (const k in attrs)
-      startPositions[node][k] = graph.getNodeAttribute(node, k);
+    for (const k in attrs) startPositions[node][k] = graph.getNodeAttribute(node, k);
   }
 
   let frame = null;
@@ -62,8 +58,7 @@ export function animateNodes(graph, targets, options, callback) {
       const attrs = targets[node];
       const s = startPositions[node];
 
-      for (const k in attrs)
-        graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
+      for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
     }
 
     frame = requestAnimationFrame(step);

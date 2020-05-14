@@ -28,14 +28,16 @@ function loadShader(type, gl, source) {
     const infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error(`sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`);
+    throw new Error(
+      `sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`,
+    );
   }
 
   return shader;
 }
 
 const loadVertexShader = loadShader.bind(null, 'VERTEX'),
-      loadFragmentShader = loadShader.bind(null, 'FRAGMENT');
+  loadFragmentShader = loadShader.bind(null, 'FRAGMENT');
 
 export {loadVertexShader, loadFragmentShader};
 
@@ -48,8 +50,7 @@ export function loadProgram(gl, shaders) {
   let i, l;
 
   // Attaching the shaders
-  for (i = 0, l = shaders.length; i < l; i++)
-    gl.attachShader(program, shaders[i]);
+  for (i = 0, l = shaders.length; i < l; i++) gl.attachShader(program, shaders[i]);
 
   gl.linkProgram(program);
 
@@ -57,7 +58,6 @@ export function loadProgram(gl, shaders) {
   const successfullyLinked = gl.getProgramParameter(program, gl.LINK_STATUS);
 
   if (!successfullyLinked) {
-
     gl.deleteProgram(program);
     throw new Error('sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.');
   }

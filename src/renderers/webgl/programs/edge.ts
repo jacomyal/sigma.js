@@ -58,10 +58,7 @@ export default class EdgeProgram extends Program {
     this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.resolutionLocation = gl.getUniformLocation(
-      this.program,
-      'u_resolution'
-    );
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -76,9 +73,7 @@ export default class EdgeProgram extends Program {
     // NOTE: when using webgl2, the extension is enabled by default
     this.canUse32BitsIndices = canUse32BitsIndices(gl);
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
-    this.indicesType = this.canUse32BitsIndices
-      ? gl.UNSIGNED_INT
-      : gl.UNSIGNED_SHORT;
+    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
   }
 
   bind() {
@@ -93,37 +88,16 @@ export default class EdgeProgram extends Program {
     gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.colorLocation);
 
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    gl.vertexAttribPointer(
-      this.normalLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
-    gl.vertexAttribPointer(
-      this.thicknessLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      16
-    );
+    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
     gl.vertexAttribPointer(
       this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      20
+      20,
     );
   }
 
@@ -133,8 +107,7 @@ export default class EdgeProgram extends Program {
 
   process(sourceData, targetData, data, offset) {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
-        this.array[i] = 0;
+      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 
       return;
     }
@@ -239,7 +212,7 @@ export default class EdgeProgram extends Program {
     gl.uniform1f(
       this.ratioLocation,
       // 1 / Math.pow(params.ratio, params.edgesPowRatio)
-      params.ratio
+      params.ratio,
     );
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
@@ -247,11 +220,6 @@ export default class EdgeProgram extends Program {
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
 
     // Drawing:
-    gl.drawElements(
-      gl.TRIANGLES,
-      this.indicesArray.length,
-      this.indicesType,
-      0
-    );
+    gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
   }
 }

@@ -25,7 +25,7 @@ const sigma = {
   Camera,
   QuadTree,
   MouseCaptor,
-  WebGLRenderer
+  WebGLRenderer,
 };
 
 graphology.library = library;

@@ -42,8 +42,7 @@ export function getPixelRatio() {
     screen.deviceXDPI > screen.logicalXDPI
   )
     return screen.systemXDPI / screen.logicalXDPI;
-  else if (typeof window.devicePixelRatio !== 'undefined')
-    return window.devicePixelRatio;
+  else if (typeof window.devicePixelRatio !== 'undefined') return window.devicePixelRatio;
 
   return 1;
 }
@@ -57,7 +56,7 @@ export function getPixelRatio() {
 export function createNormalizationFunction(extent) {
   const {
     x: [minX, maxX],
-    y: [minY, maxY]
+    y: [minY, maxY],
   } = extent;
 
   let ratio = Math.max(maxX - minX, maxY - minY);
@@ -67,23 +66,23 @@ export function createNormalizationFunction(extent) {
   const dX = (maxX + minX) / 2,
     dY = (maxY + minY) / 2;
 
-  const fn = data => {
+  const fn = (data) => {
     return {
       x: 0.5 + (data.x - dX) / ratio,
-      y: 0.5 + (data.y - dY) / ratio
+      y: 0.5 + (data.y - dY) / ratio,
     };
   };
 
   // TODO: possibility to apply this in batch over array of indices
-  fn.applyTo = data => {
+  fn.applyTo = (data) => {
     data.x = 0.5 + (data.x - dX) / ratio;
     data.y = 0.5 + (data.y - dY) / ratio;
   };
 
-  fn.inverse = data => {
+  fn.inverse = (data) => {
     return {
       x: dX + ratio * (data.x - 0.5),
-      y: dY + ratio * (data.y - 0.5)
+      y: dY + ratio * (data.y - 0.5),
     };
   };
 

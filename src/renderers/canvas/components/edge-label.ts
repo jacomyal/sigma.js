@@ -6,9 +6,9 @@
  */
 export default function drawEdgeLabel(context, edgeData, sourceData, targetData, settings) {
   const size = settings.edgeLabelSize,
-        font = settings.edgeLabelFont,
-        weight = settings.edgeLabelWeight,
-        label = edgeData.label;
+    font = settings.edgeLabelFont,
+    weight = settings.edgeLabelWeight,
+    label = edgeData.label;
 
   context.fillStyle = edgeData.color;
   context.font = `${weight} ${size}px ${font}`;
@@ -24,8 +24,7 @@ export default function drawEdgeLabel(context, edgeData, sourceData, targetData,
   if (dx > 0) {
     if (dy > 0) angle = Math.acos(dx / d);
     else angle = Math.asin(dy / d);
-  }
-  else {
+  } else {
     if (dy > 0) angle = Math.acos(dx / d) + Math.PI;
     else angle = Math.asin(dx / d) + Math.PI / 2;
   }
@@ -34,11 +33,7 @@ export default function drawEdgeLabel(context, edgeData, sourceData, targetData,
   context.translate(cx, cy);
   context.rotate(angle);
 
-  context.fillText(
-    label,
-    - textWidth / 2,
-    edgeData.size / 2 + size
-  );
+  context.fillText(label, -textWidth / 2, edgeData.size / 2 + size);
 
   context.restore();
 }

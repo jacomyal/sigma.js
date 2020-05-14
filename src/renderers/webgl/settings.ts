@@ -14,7 +14,6 @@ import ArrowEdgeProgram from './programs/edge.arrow';
  */
 
 export function validateWebglRendererSettings(settings) {
-
   // Label grid cell
   if (
     settings.labelGrid &&
@@ -27,7 +26,6 @@ export function validateWebglRendererSettings(settings) {
 }
 
 export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
-
   // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
@@ -49,7 +47,7 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   // Labels
   labelGrid: {
     cell: null,
-    renderedSizeThreshold: -Infinity
+    renderedSizeThreshold: -Infinity,
   },
 
   // Reducers
@@ -66,10 +64,10 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
 
   // Program classes
   nodeProgramClasses: {
-    circle: CircleNodeProgram
+    circle: CircleNodeProgram,
   },
   edgeProgramClasses: {
     arrow: ArrowEdgeProgram,
-    line: LineEdgeProgram
+    line: LineEdgeProgram,
   },
 };

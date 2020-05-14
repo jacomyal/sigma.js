@@ -13,14 +13,14 @@ import Camera from '../camera';
 // Dimensions of a normal cell
 const DEFAULT_CELL = {
   width: 250,
-  height: 175
+  height: 175,
 };
 
 // Dimensions of an unzoomed cell. This one is usually larger than the normal
 // one to account for the fact that labels will more likely collide.
 const DEFAULT_UNZOOMED_CELL = {
   width: 400,
-  height: 300
+  height: 300,
 };
 
 /**
@@ -34,7 +34,7 @@ function collision(
   x2: number,
   y2: number,
   w2: number,
-  h2: number
+  h2: number,
 ): boolean {
   return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 }
@@ -64,7 +64,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
     fontSize = 14,
     graph,
     renderedSizeThreshold = -Infinity,
-    visibleNodes
+    visibleNodes,
   } = params;
 
   const cameraState = camera.getState(),
@@ -85,20 +85,16 @@ export function labelsToDisplayFromGrid(params): Array<any> {
 
   // State
   const zooming = cameraState.ratio < previousCameraState.ratio,
-    panning =
-      cameraState.x !== previousCameraState.x ||
-      cameraState.y !== previousCameraState.y,
+    panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
     unzooming = cameraState.ratio > previousCameraState.ratio,
     unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1,
     zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
 
   // Trick to discretize unzooming
-  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0)
-    return Array.from(displayedLabels);
+  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) return Array.from(displayedLabels);
 
   // If panning while unzoomed, we shouldn't change label selection
-  if ((unzoomedPanning || still) && displayedLabels.size !== 0)
-    return Array.from(displayedLabels);
+  if ((unzoomedPanning || still) && displayedLabels.size !== 0) return Array.from(displayedLabels);
 
   // When unzoomed & zooming
   if (zooming && cameraState.ratio >= 1) return Array.from(displayedLabels);
@@ -109,12 +105,10 @@ export function labelsToDisplayFromGrid(params): Array<any> {
   if (cameraState.ratio >= 1.3) cell = DEFAULT_UNZOOMED_CELL;
 
   const cwr = dimensions.width % cell.width;
-  const cellWidth =
-    cell.width + cwr / Math.floor(dimensions.width / cell.width);
+  const cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
 
   const chr = dimensions.height % cell.height;
-  const cellHeight =
-    cell.height + chr / Math.floor(dimensions.height / cell.height);
+  const cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
 
   const adjustedWidth = dimensions.width + cellWidth,
     adjustedHeight = dimensions.height + cellHeight,
@@ -146,13 +140,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
 
     // Node is not actually visible on screen
     // NOTE: can optimize margin on the right side (only if we know where the labels go)
-    if (
-      pos.x < adjustedX ||
-      pos.x > adjustedWidth ||
-      pos.y < adjustedY ||
-      pos.y > adjustedHeight
-    )
-      continue;
+    if (pos.x < adjustedX || pos.x > adjustedWidth || pos.y < adjustedY || pos.y > adjustedHeight) continue;
 
     // Keeping track of the maximum node size for certain cases
     if (nodeData.size > maxSize) {
@@ -163,19 +151,10 @@ export function labelsToDisplayFromGrid(params): Array<any> {
     // If panning when zoomed, we consider only displayed labels and newly
     // visible nodes
     if (zoomedPanning) {
-      const ppos = previousCamera.graphToViewport(
-        dimensions,
-        nodeData.x,
-        nodeData.y
-      );
+      const ppos = previousCamera.graphToViewport(dimensions, nodeData.x, nodeData.y);
 
       // Was node visible earlier?
-      if (
-        ppos.x >= panningX &&
-        ppos.x <= panningWidth &&
-        ppos.y >= panningY &&
-        ppos.y <= panningHeight
-      ) {
+      if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
         // Was the label displayed?
         if (!displayedLabels.has(node)) continue;
       }
@@ -236,7 +215,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
   }
 
   // Compiling the labels
-  let biggestNodeShown = worthyLabels.some(node => node === biggestNode);
+  let biggestNodeShown = worthyLabels.some((node) => node === biggestNode);
 
   for (const key in grid) {
     const node = grid[key];
@@ -275,7 +254,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
         p2.x,
         p2.y,
         d2.label.length * 8,
-        fontSize
+        fontSize,
       );
 
       if (c) {
@@ -289,7 +268,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
 
   // console.log(collisions)
 
-  return worthyLabels.filter(l => !collisions.has(l));
+  return worthyLabels.filter((l) => !collisions.has(l));
 }
 
 /**
@@ -311,8 +290,7 @@ export function edgeLabelsToDisplayFromNodes(params): Array<any> {
 
   // Each edge connecting a highlighted node has its label displayed:
   const highlightedNodesArray = Array.from(highlightedNodes);
-  if (hoveredNode && !highlightedNodes.has(hoveredNode))
-    highlightedNodesArray.push(hoveredNode);
+  if (hoveredNode && !highlightedNodes.has(hoveredNode)) highlightedNodesArray.push(hoveredNode);
   for (let i = 0; i < highlightedNodesArray.length; i++) {
     const key = highlightedNodesArray[i];
     const edges = graph.edges(key);
@@ -326,8 +304,7 @@ export function edgeLabelsToDisplayFromNodes(params): Array<any> {
     const edges = graph.outboundEdges(key);
 
     for (let j = 0; j < edges.length; j++)
-      if (displayedNodeLabels.has(graph.opposite(key, edges[j])))
-        worthyEdges.add(edges[j]);
+      if (displayedNodeLabels.has(graph.opposite(key, edges[j]))) worthyEdges.add(edges[j]);
   }
 
   return Array.from(worthyEdges);

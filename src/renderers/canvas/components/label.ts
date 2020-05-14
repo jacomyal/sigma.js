@@ -6,15 +6,11 @@
  */
 export default function drawLabel(context, data, settings) {
   const size = settings.labelSize,
-        font = settings.labelFont,
-        weight = settings.labelWeight;
+    font = settings.labelFont,
+    weight = settings.labelWeight;
 
   context.fillStyle = '#000';
   context.font = `${weight} ${size}px ${font}`;
 
-  context.fillText(
-    data.label,
-    data.x + data.size + 3,
-    data.y + size / 3
-  );
+  context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }

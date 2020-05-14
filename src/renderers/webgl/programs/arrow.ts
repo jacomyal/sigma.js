@@ -48,14 +48,8 @@ export default class ArrowProgram extends Program {
     this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
     this.radiusLocation = gl.getAttribLocation(this.program, 'a_radius');
     this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.barycentricLocation = gl.getAttribLocation(
-      this.program,
-      'a_barycentric'
-    );
-    this.resolutionLocation = gl.getUniformLocation(
-      this.program,
-      'u_resolution'
-    );
+    this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
+    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
     this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
     this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
     this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
@@ -76,45 +70,17 @@ export default class ArrowProgram extends Program {
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.barycentricLocation);
 
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    gl.vertexAttribPointer(
-      this.normalLocation,
-      2,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8
-    );
-    gl.vertexAttribPointer(
-      this.thicknessLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      16
-    );
-    gl.vertexAttribPointer(
-      this.radiusLocation,
-      1,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      20
-    );
+    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
     gl.vertexAttribPointer(
       this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      24
+      24,
     );
 
     // TODO: maybe we can optimize here by packing this in a bit mask
@@ -124,7 +90,7 @@ export default class ArrowProgram extends Program {
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      28
+      28,
     );
   }
 
@@ -134,8 +100,7 @@ export default class ArrowProgram extends Program {
 
   process(sourceData, targetData, data, offset) {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++)
-        this.array[i] = 0;
+      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 
       return;
     }
