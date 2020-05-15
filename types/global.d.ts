@@ -5,6 +5,9 @@ declare global {
     graph: any;
     renderer: any;
     camera: any;
+    startLayout: any;
+    stopLayout: any;
+    layout: any;
   }
 
   interface MouseOrTouchEvent {

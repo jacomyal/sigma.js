@@ -23,9 +23,9 @@ graph.nodes().forEach((node) => {
 
 const renderer = new WebGLRenderer(graph, container);
 
-// window.graph = graph;
-// window.renderer = renderer;
-// window.camera = renderer.camera;
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.camera;
 
 // Randomly editing the graph every second
 const OPERATIONS = ['addNode'];
@@ -66,10 +66,10 @@ setInterval(edit, 1000);
 // Layout experiences
 const layout = new FA2Layout(graph, {settings: {slowDown: 1000000}});
 
-// window.startLayout = function() {
-//   layout.start();
-// };
-//
-// window.stopLayout = function() {
-//   layout.stop();
-// };
+window.startLayout = function () {
+  layout.start();
+};
+
+window.stopLayout = function () {
+  layout.stop();
+};

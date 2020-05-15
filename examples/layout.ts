@@ -42,7 +42,7 @@ const renderer = new WebGLRenderer(graph, container);
 const layout = new FA2Layout(graph, {settings: {barnesHutOptimize: true}});
 layout.start();
 
-// window.graph = graph;
-// window.renderer = renderer;
-// window.camera = renderer.camera;
-// window.layout = layout;
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.camera;
+window.layout = layout;

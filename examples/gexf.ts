@@ -10,5 +10,5 @@ const container = document.getElementById('container');
 
 const renderer = new WebGLRenderer(graph, container);
 
-// window.renderer = renderer;
-// window.camera = renderer.getCamera();
+window.renderer = renderer;
+window.camera = renderer.getCamera();

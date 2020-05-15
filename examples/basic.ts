@@ -20,6 +20,6 @@ graph.nodes().forEach((node) => {
 
 const renderer = new WebGLRenderer(graph, container);
 
-// window.graph = graph;
-// window.renderer = renderer;
-// window.camera = renderer.camera;
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.camera;
