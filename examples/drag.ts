@@ -44,5 +44,5 @@ captor.on('mousemove', (e) => {
   graph.setNodeAttribute(draggedNode, 'y', pos.y);
 });
 
-// window.renderer = renderer;
-// window.camera = renderer.getCamera();
+window.renderer = renderer;
+window.camera = renderer.getCamera();

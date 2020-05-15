@@ -77,6 +77,6 @@ renderer.on('leaveNode', ({node}) => {
   renderer.refresh();
 });
 
-// window.graph = graph;
-// window.renderer = renderer;
-// window.camera = renderer.getCamera();
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.getCamera();

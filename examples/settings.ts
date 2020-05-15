@@ -25,4 +25,4 @@ const settings = {
 
 const renderer = new WebGLRenderer(graph, container, settings);
 
-// window.renderer = renderer;
+window.renderer = renderer;

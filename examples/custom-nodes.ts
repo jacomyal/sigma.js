@@ -24,6 +24,6 @@ const renderer = new WebGLRenderer(graph, container, {
   nodeProgramClasses: {circle: CustomNodeProgram},
 });
 
-// window.graph = graph;
-// window.renderer = renderer;
-// window.camera = renderer.camera;
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.camera;

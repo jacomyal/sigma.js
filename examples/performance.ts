@@ -31,6 +31,6 @@ const renderer = new WebGLRenderer(graph, container, {
   renderLabels: false,
 });
 
-//window.graph = graph;
-//window.renderer = renderer;
-//window.camera = renderer.camera;
+window.graph = graph;
+window.renderer = renderer;
+window.camera = renderer.camera;
