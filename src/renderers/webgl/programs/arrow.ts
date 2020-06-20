@@ -4,10 +4,10 @@
  *
  * Program rendering direction arrows as a simple triangle.
  */
-import Program from './program';
-import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/arrow.vert.glsl';
-import fragmentShaderSource from '../shaders/arrow.frag.glsl';
+import Program from "./program";
+import { floatColor } from "../utils";
+import vertexShaderSource from "../shaders/arrow.vert.glsl";
+import fragmentShaderSource from "../shaders/arrow.frag.glsl";
 
 const POINTS = 3,
   ATTRIBUTES = 10,
@@ -30,16 +30,16 @@ export default class ArrowProgram extends Program {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
-    this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
-    this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
-    this.radiusLocation = gl.getAttribLocation(this.program, 'a_radius');
-    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
-    this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
-    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
-    this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
+    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
+    this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+    this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
+    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    this.ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
+    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    this.scaleLocation = gl.getUniformLocation(this.program, "u_scale");
 
     this.bind();
   }

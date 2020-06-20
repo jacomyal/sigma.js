@@ -4,7 +4,7 @@
  *
  * Miscellenous helper functions related to the captors.
  */
-import {getPixelRatio} from '../renderers/utils';
+import { getPixelRatio } from "../renderers/utils";
 
 /**
  * Extract the local X position from a mouse or touch event.
@@ -13,13 +13,13 @@ import {getPixelRatio} from '../renderers/utils';
  * @return {number}     The local X value of the mouse.
  */
 export function getX(e: MouseEvent | TouchEvent): number {
-  if (typeof e.offsetX !== 'undefined') return e.offsetX;
+  if (typeof e.offsetX !== "undefined") return e.offsetX;
 
-  if (typeof e.layerX !== 'undefined') return e.layerX;
+  if (typeof e.layerX !== "undefined") return e.layerX;
 
-  if (typeof e.clientX !== 'undefined') return e.clientX;
+  if (typeof e.clientX !== "undefined") return e.clientX;
 
-  throw new Error('sigma/captors/utils.getX: could not extract x from event.');
+  throw new Error("sigma/captors/utils.getX: could not extract x from event.");
 }
 
 /**
@@ -29,13 +29,13 @@ export function getX(e: MouseEvent | TouchEvent): number {
  * @return {number}     The local Y value of the mouse.
  */
 export function getY(e: MouseEvent | TouchEvent): number {
-  if (typeof e.offsetY !== 'undefined') return e.offsetY;
+  if (typeof e.offsetY !== "undefined") return e.offsetY;
 
-  if (typeof e.layerY !== 'undefined') return e.layerY;
+  if (typeof e.layerY !== "undefined") return e.layerY;
 
-  if (typeof e.clientY !== 'undefined') return e.clientY;
+  if (typeof e.clientY !== "undefined") return e.clientY;
 
-  throw new Error('sigma/captors/utils.getY: could not extract y from event.');
+  throw new Error("sigma/captors/utils.getY: could not extract y from event.");
 }
 
 /**
@@ -47,11 +47,11 @@ export function getY(e: MouseEvent | TouchEvent): number {
 export function getWidth(e: MouseEvent | TouchEvent): number {
   const w = !e.target.ownerSVGElement ? e.target.width : e.target.ownerSVGElement.width;
 
-  if (typeof w === 'number') return w;
+  if (typeof w === "number") return w;
 
   if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
 
-  throw new Error('sigma/captors/utils.getWidth: could not extract width from event.');
+  throw new Error("sigma/captors/utils.getWidth: could not extract width from event.");
 }
 
 /**
@@ -63,11 +63,11 @@ export function getWidth(e: MouseEvent | TouchEvent): number {
 export function getHeight(e: MouseEvent | TouchEvent): number {
   const w = !e.target.ownerSVGElement ? e.target.height : e.target.ownerSVGElement.height;
 
-  if (typeof w === 'number') return w;
+  if (typeof w === "number") return w;
 
   if (w !== undefined && w.baseVal !== undefined) return w.baseVal.value;
 
-  throw new Error('sigma/captors/utils.getHeight: could not extract height from event.');
+  throw new Error("sigma/captors/utils.getHeight: could not extract height from event.");
 }
 
 /**
@@ -76,8 +76,8 @@ export function getHeight(e: MouseEvent | TouchEvent): number {
  * @param  {event}  e - A mouse or touch event.
  * @return {object}     The center of the event's target.
  */
-export function getCenter(e: MouseEvent | TouchEvent): {x: number; y: number} {
-  const ratio = e.target.namespaceURI.indexOf('svg') !== -1 ? 1 : getPixelRatio();
+export function getCenter(e: MouseEvent | TouchEvent): { x: number; y: number } {
+  const ratio = e.target.namespaceURI.indexOf("svg") !== -1 ? 1 : getPixelRatio();
 
   return {
     x: getWidth(e) / (2 * ratio),
@@ -124,9 +124,9 @@ export function getMouseCoords(e: MouseEvent | TouchEvent): MouseCoords {
  * @return {number}     The wheel delta of the mouse.
  */
 export function getWheelDelta(e: MouseEvent | TouchEvent): number {
-  if (typeof e.wheelDelta !== 'undefined') return e.wheelDelta / 360;
+  if (typeof e.wheelDelta !== "undefined") return e.wheelDelta / 360;
 
-  if (typeof e.detail !== 'undefined') return e.detail / -9;
+  if (typeof e.detail !== "undefined") return e.detail / -9;
 
-  throw new Error('sigma/captors/utils.getDelta: could not extract delta from event.');
+  throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
 }

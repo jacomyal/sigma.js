@@ -4,10 +4,10 @@
  *
  * Program rendering directed edges as a single anti-aliased triangle.
  */
-import Program from './program';
-import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/edge.triangle.vert.glsl';
-import fragmentShaderSource from '../shaders/edge.triangle.frag.glsl';
+import Program from "./program";
+import { floatColor } from "../utils";
+import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
+import fragmentShaderSource from "../shaders/edge.triangle.frag.glsl";
 
 const POINTS = 3,
   ATTRIBUTES = 9;
@@ -27,15 +27,15 @@ export default class EdgeTriangleProgram extends Program {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
-    this.normalLocation = gl.getAttribLocation(this.program, 'a_normal');
-    this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
-    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.barycentricLocation = gl.getAttribLocation(this.program, 'a_barycentric');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
-    this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
-    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
-    this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
+    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+    this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
+    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    this.ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
+    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    this.scaleLocation = gl.getUniformLocation(this.program, "u_scale");
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

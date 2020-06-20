@@ -4,7 +4,7 @@
  *
  * Class representing a single WebGL program used by sigma's WebGL renderer.
  */
-import {loadVertexShader, loadFragmentShader, loadProgram} from '../shaders/utils';
+import { loadVertexShader, loadFragmentShader, loadProgram } from "../shaders/utils";
 
 /**
  * Program class.
@@ -77,7 +77,7 @@ export function createCompoundProgram(programClasses) {
 
     computeIndices() {
       this.programs.forEach((program) => {
-        if (typeof program.computeIndices === 'function') program.computeIndices();
+        if (typeof program.computeIndices === "function") program.computeIndices();
       });
     }
 

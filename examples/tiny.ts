@@ -1,28 +1,28 @@
-import {UndirectedGraph} from 'graphology';
-import WebGLRenderer from '../src/renderers/webgl/index';
+import { UndirectedGraph } from "graphology";
+import WebGLRenderer from "../src/renderers/webgl/index";
 
-const container = document.getElementById('container');
+const container = document.getElementById("container");
 
 const graph = new UndirectedGraph();
 
-graph.addNode('Jessica', {
-  label: 'Jessica',
+graph.addNode("Jessica", {
+  label: "Jessica",
   x: 1,
   y: 1,
-  color: '#FF0',
+  color: "#FF0",
   size: 10,
 });
 
-graph.addNode('Truman', {
-  label: 'Truman',
+graph.addNode("Truman", {
+  label: "Truman",
   x: 0,
   y: 0,
-  color: '#00F',
+  color: "#00F",
   size: 5,
 });
 
-graph.addEdge('Jessica', 'Truman', {
-  color: '#CCC',
+graph.addEdge("Jessica", "Truman", {
+  color: "#CCC",
   size: 1,
 });
 

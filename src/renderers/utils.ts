@@ -18,7 +18,7 @@ export function createElement(tag, attributes) {
   if (!attributes) return element;
 
   for (const k in attributes) {
-    if (k === 'style') {
+    if (k === "style") {
       for (const s in attributes[k]) element.style[s] = attributes[k][s];
     } else {
       element.setAttribute(k, attributes[k]);
@@ -37,12 +37,12 @@ export function getPixelRatio() {
   const screen = window.screen;
 
   if (
-    typeof screen.deviceXDPI !== 'undefined' &&
-    typeof screen.logicalXDPI !== 'undefined' &&
+    typeof screen.deviceXDPI !== "undefined" &&
+    typeof screen.logicalXDPI !== "undefined" &&
     screen.deviceXDPI > screen.logicalXDPI
   )
     return screen.systemXDPI / screen.logicalXDPI;
-  else if (typeof window.devicePixelRatio !== 'undefined') return window.devicePixelRatio;
+  else if (typeof window.devicePixelRatio !== "undefined") return window.devicePixelRatio;
 
   return 1;
 }

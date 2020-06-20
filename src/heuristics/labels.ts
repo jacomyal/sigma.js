@@ -4,7 +4,7 @@
  *
  * Miscelleneous heuristics related to label display.
  */
-import Camera from '../camera';
+import Camera from "../camera";
 
 /**
  * Constants.
@@ -165,7 +165,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
 
     const key = `${xKey}§${yKey}`;
 
-    if (typeof grid[key] === 'undefined') {
+    if (typeof grid[key] === "undefined") {
       // This cell is not yet occupied
       grid[key] = node;
     } else {
@@ -283,7 +283,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params): Array<any> {
-  const {graph, hoveredNode, highlightedNodes, displayedNodeLabels} = params;
+  const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
   const worthyEdges = new Set();
   const displayedNodeLabelsArray = Array.from(displayedNodeLabels);

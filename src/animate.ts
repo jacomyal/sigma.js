@@ -4,14 +4,14 @@
  *
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
-import {assign} from './utils';
-import * as easings from './easings';
+import { assign } from "./utils";
+import * as easings from "./easings";
 
 /**
  * Defaults.
  */
 const ANIMATE_DEFAULTS = {
-  easing: 'quadraticInOut',
+  easing: "quadraticInOut",
   duration: 150,
 };
 
@@ -21,7 +21,7 @@ const ANIMATE_DEFAULTS = {
 export function animateNodes(graph, targets, options, callback) {
   options = assign({}, ANIMATE_DEFAULTS, options);
 
-  const easing = typeof options.easing === 'function' ? options.easing : easings[options.easing];
+  const easing = typeof options.easing === "function" ? options.easing : easings[options.easing];
 
   const start = Date.now();
 
@@ -47,7 +47,7 @@ export function animateNodes(graph, targets, options, callback) {
         for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k]);
       }
 
-      if (typeof callback === 'function') callback();
+      if (typeof callback === "function") callback();
 
       return;
     }

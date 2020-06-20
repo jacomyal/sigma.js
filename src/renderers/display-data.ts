@@ -26,7 +26,7 @@ export class NodeDisplayData {
     this.size = 2;
     this.color = settings.defaultNodeColor;
     this.hidden = false;
-    this.label = '';
+    this.label = "";
   }
 
   assign(data) {
@@ -46,7 +46,7 @@ export class EdgeDisplayData {
     this.size = 1;
     this.color = settings.defaultEdgeColor;
     this.hidden = false;
-    this.label = '';
+    this.label = "";
   }
 
   assign(data) {

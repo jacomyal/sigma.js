@@ -4,8 +4,8 @@
  *
  * Abstract class representing a captor like the user's mouse or touch controls.
  */
-import {EventEmitter} from 'events';
-import Camera from './camera';
+import { EventEmitter } from "events";
+import Camera from "./camera";
 
 export default class Captor extends EventEmitter {
   container: HTMLElement;

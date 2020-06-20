@@ -9,7 +9,7 @@ export default function drawLabel(context, data, settings) {
     font = settings.labelFont,
     weight = settings.labelWeight;
 
-  context.fillStyle = '#000';
+  context.fillStyle = "#000";
   context.font = `${weight} ${size}px ${font}`;
 
   context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);

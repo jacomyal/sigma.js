@@ -3,10 +3,10 @@
  * a custom fragment shader (./custom-node-fragment-shader.glsl) that will draw
  * a disc inside the nodes.
  */
-import Program from '../../src/renderers/webgl/programs/program';
-import {floatColor} from '../../src/renderers/webgl/utils';
-import vertexShaderSource from '../../src/renderers/webgl/shaders/node.fast.vert.glsl';
-import fragmentShaderSource from './custom-node-fragment-shader.glsl';
+import Program from "../../src/renderers/webgl/programs/program";
+import { floatColor } from "../../src/renderers/webgl/utils";
+import vertexShaderSource from "../../src/renderers/webgl/shaders/node.fast.vert.glsl";
+import fragmentShaderSource from "./custom-node-fragment-shader.glsl";
 
 const POINTS = 3,
   ATTRIBUTES = 5;
@@ -39,12 +39,12 @@ export default class CustomNodeProgram extends Program {
     const program = this.program;
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(program, 'a_position');
-    this.sizeLocation = gl.getAttribLocation(program, 'a_size');
-    this.colorLocation = gl.getAttribLocation(program, 'a_color');
-    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-    this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
-    this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
+    this.positionLocation = gl.getAttribLocation(program, "a_position");
+    this.sizeLocation = gl.getAttribLocation(program, "a_size");
+    this.colorLocation = gl.getAttribLocation(program, "a_color");
+    this.matrixLocation = gl.getUniformLocation(program, "u_matrix");
+    this.ratioLocation = gl.getUniformLocation(program, "u_ratio");
+    this.scaleLocation = gl.getUniformLocation(program, "u_scale");
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

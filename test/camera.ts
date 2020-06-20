@@ -4,10 +4,10 @@
  *
  * Testing the camera class.
  */
-import assert from 'assert';
-import Camera from '../src/camera';
+import assert from "assert";
+import Camera from "../src/camera";
 
-describe('Camera', function () {
+describe("Camera", function () {
   it("should be possible to read the camera's state.", function () {
     const camera = new Camera();
 
@@ -22,8 +22,8 @@ describe('Camera', function () {
   it("should be possible to read the camera's previous state.", function () {
     const camera = new Camera();
 
-    camera.setState({x: 34, y: 56, ratio: 4, angle: 10});
-    camera.setState({x: 5, y: -3, ratio: 5, angle: 0});
+    camera.setState({ x: 34, y: 56, ratio: 4, angle: 10 });
+    camera.setState({ x: 5, y: -3, ratio: 5, angle: 0 });
 
     assert.deepEqual(camera.getPreviousState(), {
       x: 34,

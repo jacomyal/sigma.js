@@ -8,7 +8,7 @@
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
  */
-import extend from '@yomguithereal/helpers/extend';
+import extend from "@yomguithereal/helpers/extend";
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
@@ -382,7 +382,7 @@ export default class QuadTree {
   lastRectangle: any = null;
   nodeFilter: any;
 
-  constructor(params: {[key: string]: any} = {}) {
+  constructor(params: { [key: string]: any } = {}) {
     // Allocating the underlying byte array
     const L = Math.pow(4, MAX_LEVEL);
     this.data = new Float32Array(BLOCKS * ((4 * L - 1) / 3));
@@ -396,7 +396,7 @@ export default class QuadTree {
         height: 1,
       });
 
-    if (typeof params.filter === 'function') this.nodeFilter = params.filter;
+    if (typeof params.filter === "function") this.nodeFilter = params.filter;
   }
 
   add(key: any, x: number, y: number, size: number) {
@@ -405,7 +405,7 @@ export default class QuadTree {
     return this;
   }
 
-  resize(boundaries: {x: number; y: number; width: number; height: number}) {
+  resize(boundaries: { x: number; y: number; width: number; height: number }) {
     this.clear();
 
     // Building the quadrants
@@ -465,7 +465,7 @@ export default class QuadTree {
 
     // Is the rectangle axis aligned?
     if (!isAxisAligned(x1, y1, x2, y2))
-      throw new Error('sigma/quadtree.rectangle: shifted view is not yet implemented.');
+      throw new Error("sigma/quadtree.rectangle: shifted view is not yet implemented.");
 
     const collectedNodes = getNodesInAxisAlignedRectangleArea(
       MAX_LEVEL,

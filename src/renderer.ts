@@ -4,7 +4,7 @@
  *
  * Abstract classes extended by all of sigma's renderers.
  */
-import {EventEmitter} from 'events';
+import { EventEmitter } from "events";
 
 /**
  * Renderer class.

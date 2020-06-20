@@ -5,8 +5,8 @@
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
-import drawNode from './node';
-import drawLabel from './label';
+import drawNode from "./node";
+import drawLabel from "./label";
 
 export default function drawHover(context, data, settings) {
   const size = settings.labelSize,
@@ -17,11 +17,11 @@ export default function drawHover(context, data, settings) {
 
   // Then we draw the label background
   context.beginPath();
-  context.fillStyle = '#fff';
+  context.fillStyle = "#fff";
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 0;
   context.shadowBlur = 8;
-  context.shadowColor = '#000';
+  context.shadowColor = "#000";
 
   const textWidth = context.measureText(data.label).width;
 

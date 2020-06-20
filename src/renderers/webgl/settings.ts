@@ -1,10 +1,10 @@
-import drawLabel from '../canvas/components/label';
-import drawHover from '../canvas/components/hover';
-import drawEdgeLabel from '../canvas/components/edge-label';
+import drawLabel from "../canvas/components/label";
+import drawHover from "../canvas/components/hover";
+import drawEdgeLabel from "../canvas/components/edge-label";
 
-import CircleNodeProgram from './programs/node.fast';
-import LineEdgeProgram from './programs/edge';
-import ArrowEdgeProgram from './programs/edge.arrow';
+import CircleNodeProgram from "./programs/node.fast";
+import LineEdgeProgram from "./programs/edge";
+import ArrowEdgeProgram from "./programs/edge.arrow";
 
 /**
  * Sigma.js WebGL Renderer Settings
@@ -18,10 +18,10 @@ export function validateWebglRendererSettings(settings) {
   if (
     settings.labelGrid &&
     settings.labelGrid.cell &&
-    typeof settings.labelGrid.cell === 'object' &&
+    typeof settings.labelGrid.cell === "object" &&
     (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)
   ) {
-    throw new Error('sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.');
+    throw new Error("sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
   }
 }
 
@@ -33,16 +33,16 @@ export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
   renderEdgeLabels: false,
 
   // Component rendering
-  defaultNodeColor: '#999',
-  defaultNodeType: 'circle',
-  defaultEdgeColor: '#ccc',
-  defaultEdgeType: 'line',
-  labelFont: 'Arial',
+  defaultNodeColor: "#999",
+  defaultNodeType: "circle",
+  defaultEdgeColor: "#ccc",
+  defaultEdgeType: "line",
+  labelFont: "Arial",
   labelSize: 14,
-  labelWeight: 'normal',
-  edgeLabelFont: 'Arial',
+  labelWeight: "normal",
+  edgeLabelFont: "Arial",
   edgeLabelSize: 14,
-  edgeLabelWeight: 'normal',
+  edgeLabelWeight: "normal",
 
   // Labels
   labelGrid: {

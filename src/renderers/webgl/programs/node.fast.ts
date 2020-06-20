@@ -6,10 +6,10 @@
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
  */
-import Program from './program';
-import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/node.fast.vert.glsl';
-import fragmentShaderSource from '../shaders/node.fast.frag.glsl';
+import Program from "./program";
+import { floatColor } from "../utils";
+import vertexShaderSource from "../shaders/node.fast.vert.glsl";
+import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
 
 const POINTS = 1,
   ATTRIBUTES = 4;
@@ -28,12 +28,12 @@ export default class NodeProgramFast extends Program {
     const program = this.program;
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(program, 'a_position');
-    this.sizeLocation = gl.getAttribLocation(program, 'a_size');
-    this.colorLocation = gl.getAttribLocation(program, 'a_color');
-    this.matrixLocation = gl.getUniformLocation(program, 'u_matrix');
-    this.ratioLocation = gl.getUniformLocation(program, 'u_ratio');
-    this.scaleLocation = gl.getUniformLocation(program, 'u_scale');
+    this.positionLocation = gl.getAttribLocation(program, "a_position");
+    this.sizeLocation = gl.getAttribLocation(program, "a_size");
+    this.colorLocation = gl.getAttribLocation(program, "a_color");
+    this.matrixLocation = gl.getUniformLocation(program, "u_matrix");
+    this.ratioLocation = gl.getUniformLocation(program, "u_ratio");
+    this.scaleLocation = gl.getUniformLocation(program, "u_scale");
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

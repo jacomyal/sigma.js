@@ -5,10 +5,10 @@
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
  */
-import Program from './program';
-import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/edge.fast.vert.glsl';
-import fragmentShaderSource from '../shaders/edge.fast.frag.glsl';
+import Program from "./program";
+import { floatColor } from "../utils";
+import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
+import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
 
 const POINTS = 2,
   ATTRIBUTES = 3;
@@ -23,10 +23,10 @@ export default class EdgeFastProgram extends Program {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
-    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
-    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

@@ -4,7 +4,7 @@
  *
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
-import {identity, scale, rotate, translate, multiply} from './matrices';
+import { identity, scale, rotate, translate, multiply } from "./matrices";
 
 /**
  * Memoized function returning a float-encoded color from various string
@@ -20,7 +20,7 @@ const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9
 
 export function floatColor(val) {
   // If the color is already computed, we yield it
-  if (typeof FLOAT_COLOR_CACHE[val] !== 'undefined') return FLOAT_COLOR_CACHE[val];
+  if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
 
   let r = 0,
     g = 0,
@@ -28,7 +28,7 @@ export function floatColor(val) {
     a = 1;
 
   // Handling hexadecimal notation
-  if (val[0] === '#') {
+  if (val[0] === "#") {
     if (val.length === 4) {
       r = parseInt(val.charAt(1) + val.charAt(1), 16);
       g = parseInt(val.charAt(2) + val.charAt(2), 16);
@@ -70,9 +70,9 @@ export function floatColor(val) {
 
 // TODO: it's possible to optimize this drastically!
 export function matrixFromCamera(state, dimensions) {
-  const {angle, ratio, x, y} = state;
+  const { angle, ratio, x, y } = state;
 
-  const {width, height} = dimensions;
+  const { width, height } = dimensions;
 
   const matrix = identity();
 
@@ -107,7 +107,7 @@ export function extractPixel(gl, x, y, array) {
  * Function used to know whether given webgl context can use 32 bits indices.
  */
 export function canUse32BitsIndices(gl) {
-  const webgl2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+  const webgl2 = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext;
 
-  return webgl2 || !!gl.getExtension('OES_element_index_uint');
+  return webgl2 || !!gl.getExtension("OES_element_index_uint");
 }

@@ -1,11 +1,11 @@
-import {UndirectedGraph} from 'graphology';
-import erdosRenyi from 'graphology-generators/random/erdos-renyi';
-import randomLayout from 'graphology-layout/random';
-import chroma from 'chroma-js';
-import faker from 'faker';
-import WebGLRenderer from '../src/renderers/webgl/index';
+import { UndirectedGraph } from "graphology";
+import erdosRenyi from "graphology-generators/random/erdos-renyi";
+import randomLayout from "graphology-layout/random";
+import chroma from "chroma-js";
+import faker from "faker";
+import WebGLRenderer from "../src/renderers/webgl/index";
 
-const container = document.getElementById('container');
+const container = document.getElementById("container");
 
 const graph = erdosRenyi.sparse(UndirectedGraph, {
   order: 500,
@@ -24,7 +24,7 @@ graph.nodes().forEach((node) => {
 
 graph.edges().forEach((edge) =>
   graph.mergeEdgeAttributes(edge, {
-    color: '#ccc',
+    color: "#ccc",
     zIndex: 0,
   }),
 );
@@ -33,13 +33,13 @@ let highlighedNodes = new Set();
 let highlighedEdges = new Set();
 
 const nodeReducer = (node, data) => {
-  if (highlighedNodes.has(node)) return {...data, color: '#f00', zIndex: 1};
+  if (highlighedNodes.has(node)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;
 };
 
 const edgeReducer = (edge, data) => {
-  if (highlighedEdges.has(edge)) return {...data, color: '#f00', zIndex: 1};
+  if (highlighedEdges.has(edge)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;
 };
@@ -50,16 +50,16 @@ const renderer = new WebGLRenderer(graph, container, {
   zIndex: true,
 });
 
-renderer.on('clickNode', ({node, captor}) => {
-  console.log('Clicking:', node, captor);
+renderer.on("clickNode", ({ node, captor }) => {
+  console.log("Clicking:", node, captor);
 });
 
-renderer.on('clickStage', () => {
-  console.log('Clicking the stage.');
+renderer.on("clickStage", () => {
+  console.log("Clicking the stage.");
 });
 
-renderer.on('enterNode', ({node}) => {
-  console.log('Entering: ', node);
+renderer.on("enterNode", ({ node }) => {
+  console.log("Entering: ", node);
   highlighedNodes = new Set(graph.neighbors(node));
   highlighedNodes.add(node);
 
@@ -68,8 +68,8 @@ renderer.on('enterNode', ({node}) => {
   renderer.refresh();
 });
 
-renderer.on('leaveNode', ({node}) => {
-  console.log('Leaving:', node);
+renderer.on("leaveNode", ({ node }) => {
+  console.log("Leaving:", node);
 
   highlighedNodes.clear();
   highlighedEdges.clear();

@@ -12,7 +12,7 @@
  * @return {boolean}
  */
 export function isPlainObject(value: any): boolean {
-  return typeof value === 'object' && value !== null && value.constructor === Object;
+  return typeof value === "object" && value !== null && value.constructor === Object;
 }
 
 /**

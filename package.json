@@ -11,13 +11,15 @@
     "dist": "npm run clean && webpack --config ./webpack.programs.config.js",
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
-    "lint": "eslint examples src test",
+    "lint": "eslint $npm_package_sigma_folders",
     "postpublish": "npm run clean",
+    "prettier": "prettier --write $npm_package_sigma_folders",
     "prepublish": "npm run test && npm run dist && npm run build",
     "test": "mocha --require ts-node/register ./test/endpoint.ts"
   },
   "sigma": {
-    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers"
+    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers",
+    "folders": "examples src test"
   },
   "repository": {
     "type": "git",

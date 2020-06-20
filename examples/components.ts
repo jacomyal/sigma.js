@@ -1,11 +1,11 @@
-import {UndirectedGraph} from 'graphology';
-import randomLayout from 'graphology-layout/random';
-import forceAtlas2 from 'graphology-layout-forceatlas2';
-import {connectedComponents} from 'graphology-components';
-import louvain from 'graphology-communities-louvain';
-import WebGLRenderer from '../src/renderers/webgl/index';
+import { UndirectedGraph } from "graphology";
+import randomLayout from "graphology-layout/random";
+import forceAtlas2 from "graphology-layout-forceatlas2";
+import { connectedComponents } from "graphology-components";
+import louvain from "graphology-communities-louvain";
+import WebGLRenderer from "../src/renderers/webgl/index";
 
-import data from './resources/toflit.json';
+import data from "./resources/toflit.json";
 
 const scale = (d) => Math.max(2, Math.log2(d) * 1.7);
 
@@ -25,17 +25,17 @@ document.body.innerHTML += `
   </style>
 `;
 
-const mainContainer = document.getElementById('container');
+const mainContainer = document.getElementById("container");
 
-const graph = new UndirectedGraph({defaultNodeAttributes: {size: 3}});
+const graph = new UndirectedGraph({ defaultNodeAttributes: { size: 3 } });
 
-data.forEach(({source, target}) => {
+data.forEach(({ source, target }) => {
   graph.mergeEdge(source, target);
 });
 
 graph.nodes().forEach((node) => {
-  graph.setNodeAttribute(node, 'label', node);
-  graph.setNodeAttribute(node, 'size', scale(graph.degree(node)));
+  graph.setNodeAttribute(node, "label", node);
+  graph.setNodeAttribute(node, "size", scale(graph.degree(node)));
 });
 
 const components = connectedComponents(graph);
@@ -45,7 +45,7 @@ components.forEach((component) => {
 });
 
 const map = louvain(graph);
-let communities: {[key: string]: any} = {};
+let communities: { [key: string]: any } = {};
 
 for (const node in map) {
   const c = map[node];
@@ -74,11 +74,11 @@ const width = mainContainer.offsetWidth;
 const cellWidth = (width / 3) | 0;
 
 const containers = communities.map((_, i) => {
-  const container = document.createElement('div');
+  const container = document.createElement("div");
   container.style.width = `${cellWidth}px`;
   container.style.left = `${(i % 3) * cellWidth}px`;
   container.style.top = `${Math.floor(i / 3) * 300}px`;
-  container.className = 'subcontainer';
+  container.className = "subcontainer";
   mainContainer.appendChild(container);
   return container;
 });

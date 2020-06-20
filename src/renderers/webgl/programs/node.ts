@@ -7,10 +7,10 @@
  * three times the center of the node, with the color, the size and an angle
  * indicating which "corner" of the triangle to draw.
  */
-import Program from './program';
-import {floatColor} from '../utils';
-import vertexShaderSource from '../shaders/node.vert.glsl';
-import fragmentShaderSource from '../shaders/node.frag.glsl';
+import Program from "./program";
+import { floatColor } from "../utils";
+import vertexShaderSource from "../shaders/node.vert.glsl";
+import fragmentShaderSource from "../shaders/node.frag.glsl";
 
 const ANGLE_1 = 0,
   ANGLE_2 = (2 * Math.PI) / 3,
@@ -33,14 +33,14 @@ export default class NodeProgram extends Program {
     super(gl, vertexShaderSource, fragmentShaderSource);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, 'a_position');
-    this.sizeLocation = gl.getAttribLocation(this.program, 'a_size');
-    this.colorLocation = gl.getAttribLocation(this.program, 'a_color');
-    this.angleLocation = gl.getAttribLocation(this.program, 'a_angle');
-    this.resolutionLocation = gl.getUniformLocation(this.program, 'u_resolution');
-    this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
-    this.ratioLocation = gl.getUniformLocation(this.program, 'u_ratio');
-    this.scaleLocation = gl.getUniformLocation(this.program, 'u_scale');
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.sizeLocation = gl.getAttribLocation(this.program, "a_size");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+    this.angleLocation = gl.getAttribLocation(this.program, "a_angle");
+    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    this.ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
+    this.scaleLocation = gl.getUniformLocation(this.program, "u_scale");
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

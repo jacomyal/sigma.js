@@ -9,7 +9,7 @@
  * Function used to load a shader.
  */
 function loadShader(type: string, gl: WebGLRenderingContext, source: string): WebGLShader {
-  const glType = type === 'VERTEX' ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
+  const glType = type === "VERTEX" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
   // Creating the shader
   const shader = gl.createShader(glType);
@@ -36,10 +36,10 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
   return shader;
 }
 
-const loadVertexShader = loadShader.bind(null, 'VERTEX'),
-  loadFragmentShader = loadShader.bind(null, 'FRAGMENT');
+const loadVertexShader = loadShader.bind(null, "VERTEX"),
+  loadFragmentShader = loadShader.bind(null, "FRAGMENT");
 
-export {loadVertexShader, loadFragmentShader};
+export { loadVertexShader, loadFragmentShader };
 
 /**
  * Function used to load a program.
@@ -59,7 +59,7 @@ export function loadProgram(gl: WebGLRenderingContext, shaders): WebGLProgram {
 
   if (!successfullyLinked) {
     gl.deleteProgram(program);
-    throw new Error('sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.');
+    throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.");
   }
 
   return program;

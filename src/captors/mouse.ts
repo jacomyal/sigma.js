@@ -4,10 +4,10 @@
  *
  * Sigma's captor dealing with the user's mouse.
  */
-import Camera, {CameraState} from '../camera';
-import Captor from '../captor';
+import Camera, { CameraState } from "../camera";
+import Captor from "../captor";
 
-import {getX, getY, getCenter, getWheelDelta, getMouseCoords} from './utils';
+import { getX, getY, getCenter, getWheelDelta, getMouseCoords } from "./utils";
 
 /**
  * Constants.
@@ -56,27 +56,27 @@ export default class MouseCaptor extends Captor {
     this.handleOut = this.handleOut.bind(this);
 
     // Binding events
-    container.addEventListener('click', this.handleClick, false);
-    container.addEventListener('mousedown', this.handleDown, false);
-    container.addEventListener('mousemove', this.handleMove, false);
-    container.addEventListener('DOMMouseScroll', this.handleWheel, false);
-    container.addEventListener('mousewheel', this.handleWheel, false);
-    container.addEventListener('mouseout', this.handleOut, false);
+    container.addEventListener("click", this.handleClick, false);
+    container.addEventListener("mousedown", this.handleDown, false);
+    container.addEventListener("mousemove", this.handleMove, false);
+    container.addEventListener("DOMMouseScroll", this.handleWheel, false);
+    container.addEventListener("mousewheel", this.handleWheel, false);
+    container.addEventListener("mouseout", this.handleOut, false);
 
-    document.addEventListener('mouseup', this.handleUp, false);
+    document.addEventListener("mouseup", this.handleUp, false);
   }
 
   kill() {
     const container = this.container;
 
-    container.removeEventListener('click', this.handleClick);
-    container.removeEventListener('mousedown', this.handleDown);
-    container.removeEventListener('mousemove', this.handleMove);
-    container.removeEventListener('DOMMouseScroll', this.handleWheel);
-    container.removeEventListener('mousewheel', this.handleWheel);
-    container.removeEventListener('mouseout', this.handleOut);
+    container.removeEventListener("click", this.handleClick);
+    container.removeEventListener("mousedown", this.handleDown);
+    container.removeEventListener("mousemove", this.handleMove);
+    container.removeEventListener("DOMMouseScroll", this.handleWheel);
+    container.removeEventListener("mousewheel", this.handleWheel);
+    container.removeEventListener("mouseout", this.handleOut);
 
-    document.removeEventListener('mouseup', this.handleUp);
+    document.removeEventListener("mouseup", this.handleUp);
   }
 
   handleClick(e: MouseEvent | TouchEvent) {
@@ -99,7 +99,7 @@ export default class MouseCaptor extends Captor {
     }, DOUBLE_CLICK_TIMEOUT);
 
     // NOTE: this is here to prevent click events on drag
-    if (!this.hasDragged) this.emit('click', getMouseCoords(e));
+    if (!this.hasDragged) this.emit("click", getMouseCoords(e));
   }
 
   handleDoubleClick(e: MouseEvent | TouchEvent) {
@@ -143,7 +143,7 @@ export default class MouseCaptor extends Captor {
         ratio: newRatio,
       },
       {
-        easing: 'quadraticInOut',
+        easing: "quadraticInOut",
         duration: DOUBLE_CLICK_ZOOMING_DURATION,
       },
     );
@@ -174,7 +174,7 @@ export default class MouseCaptor extends Captor {
       default:
         // Left button pressed
         this.isMouseDown = true;
-        this.emit('mousedown', getMouseCoords(e));
+        this.emit("mousedown", getMouseCoords(e));
     }
   }
 
@@ -202,7 +202,7 @@ export default class MouseCaptor extends Captor {
         },
         {
           duration: MOUSE_INERTIA_DURATION,
-          easing: 'quadraticOut',
+          easing: "quadraticOut",
         },
       );
     } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
@@ -214,13 +214,13 @@ export default class MouseCaptor extends Captor {
 
     this.isMoving = false;
     setImmediate(() => (this.hasDragged = false));
-    this.emit('mouseup', getMouseCoords(e));
+    this.emit("mouseup", getMouseCoords(e));
   }
 
   handleMove(e: MouseEvent | TouchEvent) {
     if (!this.enabled) return;
 
-    this.emit('mousemove', getMouseCoords(e));
+    this.emit("mousemove", getMouseCoords(e));
 
     if (this.isMouseDown) {
       // TODO: dispatch events
@@ -254,7 +254,7 @@ export default class MouseCaptor extends Captor {
       const x = cameraState.x + offsetX,
         y = cameraState.y + offsetY;
 
-      this.camera.setState({x, y});
+      this.camera.setState({ x, y });
 
       this.lastMouseX = eX;
       this.lastMouseY = eY;
@@ -324,7 +324,7 @@ export default class MouseCaptor extends Captor {
         ratio: newRatio,
       },
       {
-        easing: 'linear',
+        easing: "linear",
         duration: MOUSE_ZOOM_DURATION,
       },
       () => (this.wheelLock = false),
