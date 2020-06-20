@@ -8,7 +8,7 @@
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
-    "dist": "npm run clean && tsc src/**/*.ts --outDir . && webpack --config ./webpack.programs.config.js",
+    "dist": "npm run clean && tsc -p ./tsconfig.dist.json && webpack --config ./webpack.programs.config.js",
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_sigma_folders",

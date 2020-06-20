@@ -79,7 +79,7 @@ export default class MouseCaptor extends Captor {
     document.removeEventListener("mouseup", this.handleUp);
   }
 
-  handleClick(e: MouseEvent | TouchEvent) {
+  handleClick(e: MouseEvent) {
     if (!this.enabled) return;
 
     this.clicks++;
@@ -102,7 +102,7 @@ export default class MouseCaptor extends Captor {
     if (!this.hasDragged) this.emit("click", getMouseCoords(e));
   }
 
-  handleDoubleClick(e: MouseEvent | TouchEvent) {
+  handleDoubleClick(e: MouseEvent) {
     if (!this.enabled) return;
 
     const center = getCenter(e);
@@ -156,7 +156,7 @@ export default class MouseCaptor extends Captor {
     return false;
   }
 
-  handleDown(e: MouseEvent | TouchEvent) {
+  handleDown(e: MouseEvent) {
     if (!this.enabled) return;
 
     this.startCameraState = this.camera.getState();
@@ -178,7 +178,7 @@ export default class MouseCaptor extends Captor {
     }
   }
 
-  handleUp(e: MouseEvent | TouchEvent) {
+  handleUp(e: MouseEvent) {
     if (!this.enabled || !this.isMouseDown) return;
 
     this.isMouseDown = false;
@@ -217,7 +217,7 @@ export default class MouseCaptor extends Captor {
     this.emit("mouseup", getMouseCoords(e));
   }
 
-  handleMove(e: MouseEvent | TouchEvent) {
+  handleMove(e: MouseEvent) {
     if (!this.enabled) return;
 
     this.emit("mousemove", getMouseCoords(e));
@@ -268,7 +268,7 @@ export default class MouseCaptor extends Captor {
     return false;
   }
 
-  handleWheel(e: MouseEvent | TouchEvent) {
+  handleWheel(e: WheelEvent) {
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
 

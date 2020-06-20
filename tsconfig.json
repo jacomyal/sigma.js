@@ -7,7 +7,8 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "typeRoots": ["./node_modules/@types/", "./types/"]
+    "typeRoots": ["./node_modules/@types/", "./types/"],
+    "lib": ["dom"]
   },
   "include": ["./types/**/*", "./src/**/*"]
 }

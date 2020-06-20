@@ -34,15 +34,7 @@ export function createElement(tag, attributes) {
  * @return {number}
  */
 export function getPixelRatio() {
-  const screen = window.screen;
-
-  if (
-    typeof screen.deviceXDPI !== "undefined" &&
-    typeof screen.logicalXDPI !== "undefined" &&
-    screen.deviceXDPI > screen.logicalXDPI
-  )
-    return screen.systemXDPI / screen.logicalXDPI;
-  else if (typeof window.devicePixelRatio !== "undefined") return window.devicePixelRatio;
+  if (typeof window.devicePixelRatio !== "undefined") return window.devicePixelRatio;
 
   return 1;
 }
