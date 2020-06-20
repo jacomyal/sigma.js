@@ -24,11 +24,6 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'raw-loader',
       },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-      },
     ],
   },
 };
