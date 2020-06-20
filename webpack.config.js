@@ -29,20 +29,7 @@ module.exports = [
       libraryTarget: 'umd',
     },
     resolve: {
-      extensions: ['.ts', '.js', 'glsl'],
-    },
-    module: moduleConfig,
-  },
-  {
-    name: 'sigma-graphology',
-    mode: 'production',
-    entry: './src/sigma-graphology.ts',
-    output: {
-      filename: production ? 'sigma-graphology.min.js' : 'sigma-graphology.js',
-      path: path.join(__dirname, 'build'),
-    },
-    resolve: {
-      extensions: ['.ts', '.js', 'glsl'],
+      extensions: ['.ts', '.js', '.glsl'],
     },
     module: moduleConfig,
   },

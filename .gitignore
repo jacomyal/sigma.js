@@ -3,3 +3,15 @@ node_modules
 *.log
 *.swp
 .DS_Store
+animate.js
+camera.js
+captor.js
+easings.js
+endpoint.js
+quadtree.js
+renderer.js
+sigma-graphology.js
+utils.js
+captors
+heuristics
+renderers

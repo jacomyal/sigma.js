@@ -4,7 +4,7 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
-import {nodeExtent, edgeExtent} from 'graphology-metrics/extent';
+import graphExtent from 'graphology-metrics/extent';
 import isGraph from 'graphology-utils/is-graph';
 
 import Renderer from '../../renderer';
@@ -24,6 +24,8 @@ import {labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes} from '../../heuri
 import {zIndexOrdering} from '../../heuristics/z-index';
 
 import {WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings} from './settings';
+
+const {nodeExtent, edgeExtent} = graphExtent;
 
 /**
  * Constants.
