@@ -14,7 +14,7 @@
     "lint": "eslint $npm_package_sigma_folders",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_sigma_folders",
-    "prepublish": "npm run test && npm run dist && npm run build",
+    "prepublish": "echo \"Linter should go here...\" && npm run test && npm run dist && npm run build",
     "test": "mocha --require ts-node/register ./test/endpoint.ts"
   },
   "sigma": {
