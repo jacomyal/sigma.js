@@ -340,10 +340,10 @@ export default class WebGLRenderer extends Renderer {
 
         const size = data.size / sizeRatio;
 
-        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) return this.emit("clickNode", { node, captor: e });
+        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) return this.emit("clickNode", { node, captor: e, event: e });
       }
 
-      return this.emit("clickStage");
+      return this.emit("clickStage", { event: e });
     };
 
     this.captors.mouse.on("mousemove", this.listeners.handleMove);
