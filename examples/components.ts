@@ -27,7 +27,7 @@ document.body.innerHTML += `
 
 const mainContainer = document.getElementById("container");
 
-const graph = new UndirectedGraph({ defaultNodeAttributes: { size: 3 } });
+const graph = new UndirectedGraph();
 
 data.forEach(({ source, target }) => {
   graph.mergeEdge(source, target);
