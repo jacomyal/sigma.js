@@ -326,9 +326,7 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // Handling click
-    const createClickListener = (right) => {
-      const clickType = right ? "rightClick" : "click";
-
+    const createClickListener = (eventType) => {
       return (e) => {
         const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
@@ -344,19 +342,21 @@ export default class WebGLRenderer extends Renderer {
           const size = data.size / sizeRatio;
 
           if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
-            return this.emit(`${clickType}Node`, { node, captor: e, event: e });
+            return this.emit(`${eventType}Node`, { node, captor: e, event: e });
         }
 
-        return this.emit(`${clickType}Stage`, { event: e });
+        return this.emit(`${eventType}Stage`, { event: e });
       };
     };
 
-    this.listeners.handleClick = createClickListener(false);
-    this.listeners.handleRightClick = createClickListener(true);
+    this.listeners.handleClick = createClickListener("click");
+    this.listeners.handleRightClick = createClickListener("rightClick");
+    this.listeners.handleDown = createClickListener("down");
 
     this.captors.mouse.on("mousemove", this.listeners.handleMove);
     this.captors.mouse.on("click", this.listeners.handleClick);
     this.captors.mouse.on("rightClick", this.listeners.handleRightClick);
+    this.captors.mouse.on("mousedown", this.listeners.handleDown);
 
     return this;
   }

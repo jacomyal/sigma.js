@@ -58,12 +58,14 @@ renderer.on("rightClickNode", ({ node, captor, event }) => {
   event.preventDefault();
 });
 
+renderer.on("downStage", ({ event }) => {
+  console.log("Downing the stage.", event);
+});
 renderer.on("clickStage", ({ event }) => {
   console.log("Clicking the stage.", event);
 });
 renderer.on("rightClickStage", ({ event }) => {
   console.log("Right Clicking the stage.", event);
-  event.preventDefault();
 });
 
 renderer.on("enterNode", ({ node }) => {
