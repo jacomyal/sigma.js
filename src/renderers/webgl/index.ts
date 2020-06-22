@@ -326,28 +326,37 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // Handling click
-    this.listeners.handleClick = (e) => {
-      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
+    const createClickListener = (right) => {
+      const clickType = right ? "rightClick" : "click";
 
-      const quadNodes = getQuadNodes(e.x, e.y);
+      return (e) => {
+        const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
-      for (let i = 0, l = quadNodes.length; i < l; i++) {
-        const node = quadNodes[i];
+        const quadNodes = getQuadNodes(e.x, e.y);
 
-        const data = this.nodeDataCache[node];
+        for (let i = 0, l = quadNodes.length; i < l; i++) {
+          const node = quadNodes[i];
 
-        const pos = this.camera.graphToViewport(this, data.x, data.y);
+          const data = this.nodeDataCache[node];
 
-        const size = data.size / sizeRatio;
+          const pos = this.camera.graphToViewport(this, data.x, data.y);
 
-        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) return this.emit("clickNode", { node, captor: e, event: e });
-      }
+          const size = data.size / sizeRatio;
 
-      return this.emit("clickStage", { event: e });
+          if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
+            return this.emit(`${clickType}Node`, { node, captor: e, event: e });
+        }
+
+        return this.emit(`${clickType}Stage`, { event: e });
+      };
     };
+
+    this.listeners.handleClick = createClickListener(false);
+    this.listeners.handleRightClick = createClickListener(true);
 
     this.captors.mouse.on("mousemove", this.listeners.handleMove);
     this.captors.mouse.on("click", this.listeners.handleClick);
+    this.captors.mouse.on("rightClick", this.listeners.handleRightClick);
 
     return this;
   }

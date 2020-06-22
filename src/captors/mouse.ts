@@ -49,6 +49,7 @@ export default class MouseCaptor extends Captor {
 
     // Binding methods
     this.handleClick = this.handleClick.bind(this);
+    this.handleRightClick = this.handleRightClick.bind(this);
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);
     this.handleMove = this.handleMove.bind(this);
@@ -57,6 +58,7 @@ export default class MouseCaptor extends Captor {
 
     // Binding events
     container.addEventListener("click", this.handleClick, false);
+    container.addEventListener("contextmenu", this.handleRightClick, false);
     container.addEventListener("mousedown", this.handleDown, false);
     container.addEventListener("mousemove", this.handleMove, false);
     container.addEventListener("DOMMouseScroll", this.handleWheel, false);
@@ -70,6 +72,7 @@ export default class MouseCaptor extends Captor {
     const container = this.container;
 
     container.removeEventListener("click", this.handleClick);
+    container.removeEventListener("contextmenu", this.handleRightClick);
     container.removeEventListener("mousedown", this.handleDown);
     container.removeEventListener("mousemove", this.handleMove);
     container.removeEventListener("DOMMouseScroll", this.handleWheel);
@@ -100,6 +103,12 @@ export default class MouseCaptor extends Captor {
 
     // NOTE: this is here to prevent click events on drag
     if (!this.hasDragged) this.emit("click", getMouseCoords(e));
+  }
+
+  handleRightClick(e: MouseEvent) {
+    if (!this.enabled) return;
+
+    this.emit("rightClick", getMouseCoords(e));
   }
 
   handleDoubleClick(e: MouseEvent) {

@@ -55,7 +55,6 @@ export function getWidth(e: MouseEvent): number {
  * @return {number}     The height of the event's target.
  */
 export function getHeight(e: MouseEvent): number {
-  console.log(e.target);
   const w = (e.target as HTMLCanvasElement).height;
 
   if (typeof w === "number") return w;
@@ -87,7 +86,9 @@ export interface MouseCoords {
   metaKey: boolean;
   altKey: boolean;
   shiftKey: boolean;
+  preventDefault(): void;
 }
+
 /**
  * Convert mouse coords to sigma coords.
  *
@@ -107,6 +108,9 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
     metaKey: e.metaKey,
     altKey: e.altKey,
     shiftKey: e.shiftKey,
+
+    // TODO: this is not ideal... But I am wondering why we don't just pass the event through
+    preventDefault: e.preventDefault.bind(e),
   };
 }
 

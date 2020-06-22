@@ -53,9 +53,17 @@ const renderer = new WebGLRenderer(graph, container, {
 renderer.on("clickNode", ({ node, captor, event }) => {
   console.log("Clicking:", node, captor, event);
 });
+renderer.on("rightClickNode", ({ node, captor, event }) => {
+  console.log("Right Clicking:", node, captor, event);
+  event.preventDefault();
+});
 
 renderer.on("clickStage", ({ event }) => {
   console.log("Clicking the stage.", event);
+});
+renderer.on("rightClickStage", ({ event }) => {
+  console.log("Right Clicking the stage.", event);
+  event.preventDefault();
 });
 
 renderer.on("enterNode", ({ node }) => {
