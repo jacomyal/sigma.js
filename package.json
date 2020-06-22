@@ -15,7 +15,7 @@
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_sigma_folders",
     "prepublish": "echo \"Linter should go here...\" && npm run test && npm run dist && npm run build",
-    "test": "mocha --require ts-node/register ./test/endpoint.ts"
+    "test": "mocha --require ts-node/register --recursive test --extension ts"
   },
   "sigma": {
     "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers",
