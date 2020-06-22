@@ -998,6 +998,12 @@ export default class WebGLRenderer extends Renderer {
   kill() {
     const graph = this.graph;
 
+    // Emitting "kill" events so that plugins and such can cleanup
+    this.emit("kill");
+
+    // Releasing events
+    this.removeAllListeners();
+
     // Releasing camera handlers
     this.camera.removeListener("updated", this.listeners.camera);
 
