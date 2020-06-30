@@ -87,6 +87,7 @@ export interface MouseCoords {
   altKey: boolean;
   shiftKey: boolean;
   preventDefault(): void;
+  original: MouseEvent;
 }
 
 /**
@@ -111,6 +112,7 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
 
     // TODO: this is not ideal... But I am wondering why we don't just pass the event through
     preventDefault: e.preventDefault.bind(e),
+    original: e,
   };
 }
 
