@@ -121,6 +121,9 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
  * @return {number}     The wheel delta of the mouse.
  */
 export function getWheelDelta(e: WheelEvent): number {
+  // TODO: check those ratios again to ensure a clean Chrome/Firefox compat
+  if (typeof e.deltaY !== "undefined") return (e.deltaY * -3) / 360;
+
   if (typeof e.detail !== "undefined") return e.detail / -9;
 
   throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
