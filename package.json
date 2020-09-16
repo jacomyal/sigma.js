@@ -1,6 +1,6 @@
 {
   "name": "sigma",
-  "version": "2.0.0-alpha36",
+  "version": "2.0.0-alpha37",
   "description": "A JavaScript library dedicated to graph drawing.",
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
@@ -16,7 +16,7 @@
     "prettier": "prettier --write $npm_package_sigma_folders",
     "prepublish": "echo \"Linter should go here...\" && npm run test && npm run clean && npm run transpile && npm run build",
     "test": "mocha --require ts-node/register --recursive test --extension ts",
-    "types":  "npx tsc --declaration --emitDeclarationOnly --outDir lib"
+    "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
   "typings": "types",
   "sigma": {
