@@ -8,17 +8,19 @@
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
-    "dist": "npm run clean && tsc -p ./tsconfig.dist.json && webpack --config ./webpack.programs.config.js",
+    "transpile": "tsc -p ./tsconfig.dist.json -d --declarationDir types && webpack --config ./webpack.programs.config.js",
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_sigma_folders",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_sigma_folders",
-    "prepublish": "echo \"Linter should go here...\" && npm run test && npm run dist && npm run build",
-    "test": "mocha --require ts-node/register --recursive test --extension ts"
+    "prepublish": "echo \"Linter should go here...\" && npm run test && npm run clean && npm run transpile && npm run build",
+    "test": "mocha --require ts-node/register --recursive test --extension ts",
+    "types":  "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
+  "typings": "types",
   "sigma": {
-    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers",
+    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers types",
     "folders": "examples src test"
   },
   "repository": {
