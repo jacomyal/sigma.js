@@ -5,7 +5,7 @@
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "main": "endpoint.js",
-  "typings": "types/endpoint.js",
+  "typings": "types/endpoint.d.ts",
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
