@@ -8,6 +8,5 @@ package-lock.json
 .npmignore
 examples
 test
-src
 webpack.config.js
 webpack.programs.config.js
