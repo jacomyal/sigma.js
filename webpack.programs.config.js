@@ -14,7 +14,7 @@ module.exports = {
   entry,
   output: {
     path: path.join(__dirname, 'renderers', 'webgl', 'shaders'),
-    filename: '[name].glsl',
+    filename: '[name].glsl.js',
     libraryTarget: 'commonjs2',
   },
   module: {

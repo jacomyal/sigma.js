@@ -9,7 +9,7 @@
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
-    "transpile": "tsc -p ./tsconfig.dist.json -d --declarationDir types && webpack --config ./webpack.programs.config.js",
+    "transpile": "tsc -p ./tsconfig.dist.json -d --declarationDir types && replace '\\.glsl' '.glsl.js' renderers -r && webpack --config ./webpack.programs.config.js",
     "examples": "webpack-dev-server --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_sigma_folders",
@@ -68,6 +68,7 @@
     "pandemonium": "^1.4.1",
     "prettier": "^2.0.5",
     "raw-loader": "^4.0.1",
+    "replace": "^1.2.0",
     "rimraf": "^3.0.0",
     "simple-statistics": "^7.0.7",
     "ts-loader": "^7.0.2",
