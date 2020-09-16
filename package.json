@@ -5,6 +5,7 @@
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "main": "endpoint.js",
+  "typings": "types/endpoint.js",
   "scripts": {
     "build": "webpack --colors --progress && webpack --colors --progress -p",
     "clean": "rimraf $npm_package_sigma_clean",
@@ -18,7 +19,6 @@
     "test": "mocha --require ts-node/register --recursive test --extension ts",
     "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
-  "typings": "types",
   "sigma": {
     "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js sigma-graphology.js utils.js captors heuristics renderers types",
     "folders": "examples src test"
