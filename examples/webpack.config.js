@@ -35,6 +35,10 @@ const EXAMPLES = {
     id: "layout",
     title: "Force Atlas 2 Layout",
   },
+  noverlap: {
+    id: "noverlap",
+    title: "Noverlap Layout",
+  },
   performance: {
     id: "performance",
     title: "Performance",
