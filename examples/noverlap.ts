@@ -9,13 +9,13 @@ import random from "pandemonium/random";
 
 const container = document.getElementById("container");
 
-const graph = empty(UndirectedGraph, 5000);
+const graph = empty(UndirectedGraph, 500);
 randomLayout.assign(graph);
 
 graph.forEachNode((node) => {
   graph.mergeNodeAttributes(node, {
     label: node,
-    size: random(5, 20),
+    size: random(2, 10),
     color: chroma.random().hex(),
   });
 });
@@ -31,6 +31,7 @@ button.style.top = "10px";
 
 container.appendChild(button);
 
+// NOTE: sizeRatio is only relevant if you apply the algorithm while zooming or unzooming
 const reducer = (sizeRatio) => (key, attr) => {
   const pos = camera.graphToViewport(renderer, attr.x, attr.y);
 
@@ -42,10 +43,9 @@ const reducer = (sizeRatio) => (key, attr) => {
 };
 
 button.onclick = () => {
-  var layout = noverlap(graph, { reducer: reducer(Math.pow(camera.getState().ratio, 0.5)), maxIterations: 1 });
+  var layout = noverlap(graph, { reducer: reducer(Math.pow(camera.getState().ratio, 0.5)), maxIterations: 500 });
 
-  for (const node in layout)
-    layout[node] = camera.viewportToGraph(renderer, layout[node].x, layout[node].y);
+  for (const node in layout) layout[node] = camera.viewportToGraph(renderer, layout[node].x, layout[node].y);
 
   animateNodes(graph, layout, { duration: 100, easing: "linear" }, () => console.log("done"));
 };
