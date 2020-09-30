@@ -43,8 +43,11 @@ const reducer = (sizeRatio) => (key, attr) => {
 
 button.onclick = () => {
   var layout = noverlap(graph, { reducer: reducer(Math.pow(camera.getState().ratio, 0.5)), maxIterations: 1 });
-  console.log(renderer.nodeExtent);
-  animateNodes(graph, layout, { duration: 1000, easing: "linear" }, () => console.log("done"));
+
+  for (const node in layout)
+    layout[node] = camera.viewportToGraph(renderer, layout[node].x, layout[node].y);
+
+  animateNodes(graph, layout, { duration: 100, easing: "linear" }, () => console.log("done"));
 };
 
 window.renderer = renderer;
