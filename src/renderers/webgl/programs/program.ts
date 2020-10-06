@@ -24,6 +24,7 @@ export interface ProcessData {
   y: number;
   size: number;
   color: string;
+  hidden?: boolean;
 }
 /**
  * Program class.
