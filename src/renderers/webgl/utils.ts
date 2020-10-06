@@ -18,7 +18,7 @@ const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
 const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
 
-export function floatColor(val) {
+export function floatColor(val: string): FLOAT32 {
   // If the color is already computed, we yield it
   if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
 

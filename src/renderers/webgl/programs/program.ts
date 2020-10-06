@@ -9,6 +9,22 @@ import { loadVertexShader, loadFragmentShader, loadProgram } from "../shaders/ut
 interface SomeProgramConstructor {
   new (gl: WebGLRenderingContext): Program;
 }
+
+export interface RenderParams {
+  width: number;
+  height: number;
+  ratio: number;
+  nodesPowRatio: number;
+  matrix: Float32Array;
+  scalingRatio: number;
+}
+
+export interface ProcessData {
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+}
 /**
  * Program class.
  *
@@ -42,10 +58,10 @@ export default abstract class Program {
   }
 
   abstract allocate(capacity: any): void;
-  abstract process(...args: any): void;
+  abstract process(data: ProcessData, offset: number): void;
   abstract computeIndices(): void;
   abstract bufferData(): void;
-  abstract render(...args: any): void;
+  abstract render(params: RenderParams): void;
 }
 
 /**
@@ -71,10 +87,8 @@ export function createCompoundProgram(programClasses: Array<SomeProgramConstruct
       this.programs.forEach((program) => program.allocate(capacity));
     }
 
-    process(): void {
-      const args = arguments;
-
-      this.programs.forEach((program) => program.process(...args));
+    process(data: ProcessData, offset: number): void {
+      this.programs.forEach((program) => program.process(data, offset));
     }
 
     computeIndices(): void {
@@ -87,11 +101,10 @@ export function createCompoundProgram(programClasses: Array<SomeProgramConstruct
       this.programs.forEach((program) => program.bufferData());
     }
 
-    render(): void {
-      const args = arguments;
+    render(params: RenderParams): void {
       this.programs.forEach((program) => {
         program.bufferData();
-        program.render(...args);
+        program.render(params);
       });
     }
   };
