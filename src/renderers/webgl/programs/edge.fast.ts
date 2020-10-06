@@ -5,7 +5,7 @@
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
  */
-import Program from "./program";
+import Program, { RenderParams, ProcessData } from "./program";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
@@ -25,8 +25,16 @@ export default class EdgeFastProgram extends Program {
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting resolutionLocation");
+    this.resolutionLocation = resolutionLocation;
+
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -36,11 +44,11 @@ export default class EdgeFastProgram extends Program {
     gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
   }
 
-  allocate(capacity) {
+  allocate(capacity: number): void {
     this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
   }
 
-  process(sourceData, targetData, data, offset) {
+  process(sourceData, targetData, data, offset: number): void {
     const array = this.array;
 
     let i = 0;
@@ -67,14 +75,14 @@ export default class EdgeFastProgram extends Program {
     array[i] = color;
   }
 
-  bufferData() {
+  bufferData(): void {
     const gl = this.gl;
 
     // Vertices data
     gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
-  render(params) {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;

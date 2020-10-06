@@ -104,6 +104,7 @@ export function createCompoundProgram(programClasses: Array<SomeProgramConstruct
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => {
+        // program.bind(); => only on edges
         program.bufferData();
         program.render(params);
       });

@@ -4,7 +4,7 @@
  *
  * Program rendering directed edges as a single anti-aliased triangle.
  */
-import Program from "./program";
+import Program, { RenderParams, ProcessData } from "./program";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.triangle.frag.glsl";
@@ -32,10 +32,26 @@ export default class EdgeTriangleProgram extends Program {
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
-    this.resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    this.ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    this.scaleLocation = gl.getUniformLocation(this.program, "u_scale");
+
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting resolutionLocation");
+    this.resolutionLocation = resolutionLocation;
+
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
+
+    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
+    if (ratioLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting ratioLocation");
+    this.ratioLocation = ratioLocation;
+
+    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
+    if (scaleLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting scaleLocation");
+    this.scaleLocation = scaleLocation;
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -58,11 +74,11 @@ export default class EdgeTriangleProgram extends Program {
     );
   }
 
-  allocate(capacity) {
+  allocate(capacity: number): void {
     this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
   }
 
-  process(sourceData, targetData, data, offset) {
+  process(sourceData, targetData, data, offset: number): void {
     let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;
@@ -130,14 +146,18 @@ export default class EdgeTriangleProgram extends Program {
     array[i] = 20;
   }
 
-  bufferData() {
+  computeIndices() {
+    // nothing todo ?
+  }
+
+  bufferData(): void {
     const gl = this.gl;
 
     // Vertices data
     gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
-  render(params) {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;

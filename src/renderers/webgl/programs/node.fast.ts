@@ -34,17 +34,17 @@ export default class NodeProgramFast extends Program {
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.NodeProgram: error while getting matrixLocation");
+      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.NodeProgram: error while getting ratioLocation");
+      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting ratioLocation");
     this.ratioLocation = ratioLocation;
 
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
     if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.NodeProgram: error while getting scaleLocation");
+      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     // Bindings

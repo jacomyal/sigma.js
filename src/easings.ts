@@ -23,3 +23,13 @@ export const cubicInOut = (k: number): number => {
   if ((k *= 2) < 1) return 0.5 * k * k * k;
   return 0.5 * ((k -= 2) * k * k + 2);
 };
+
+export const easings: { [key: string]: (k: number) => number } = {
+  linear,
+  quadraticIn,
+  quadraticOut,
+  quadraticInOut,
+  cubicIn,
+  cubicOut,
+  cubicInOut,
+};

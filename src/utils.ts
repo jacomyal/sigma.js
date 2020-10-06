@@ -22,7 +22,7 @@ export function isPlainObject(value: any): boolean {
  * @param  {object} [...objects] - Objects to merge.
  * @return {object}
  */
-export function assign(target: object, ...objects): object {
+export function assign<T>(target: any, ...objects: Array<any>): T {
   target = target || {};
 
   for (let i = 0, l = objects.length; i < l; i++) {
@@ -39,5 +39,5 @@ export function assign(target: object, ...objects): object {
     }
   }
 
-  return target;
+  return target as T;
 }
