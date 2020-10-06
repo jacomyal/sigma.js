@@ -13,6 +13,9 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
 
   // Creating the shader
   const shader = gl.createShader(glType);
+  if (shader === null) {
+    throw new Error(`sigma/renderers/webgl/shaders/utils.loadShader: error while creating the shader`);
+  }
 
   // Loading source
   gl.shaderSource(shader, source);
@@ -44,8 +47,11 @@ export { loadVertexShader, loadFragmentShader };
 /**
  * Function used to load a program.
  */
-export function loadProgram(gl: WebGLRenderingContext, shaders): WebGLProgram {
+export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShader>): WebGLProgram {
   const program = gl.createProgram();
+  if (program === null) {
+    throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while creating the program.");
+  }
 
   let i, l;
 
