@@ -12,7 +12,7 @@ quadtree.js
 renderer.js
 sigma-graphology.js
 utils.js
-captors
-heuristics
-renderers
-types
+/captors
+/heuristics
+/renderers
+/types
