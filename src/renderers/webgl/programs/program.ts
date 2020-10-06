@@ -6,46 +6,46 @@
  */
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../shaders/utils";
 
+interface SomeProgramConstructor {
+  new (gl: WebGLRenderingContext): Program;
+}
 /**
  * Program class.
  *
  * @constructor
  */
-export default class Program {
+export default abstract class Program {
   gl: WebGLRenderingContext;
-  array: Float32Array = null;
+  array: Float32Array = new Float32Array();
   buffer: WebGLBuffer;
   vertexShaderSource: string;
   vertexShader: WebGLShader;
   fragmentShaderSource: string;
   fragmentShader: WebGLShader;
   program: WebGLProgram;
+  programs: Array<WebGLProgram> = [];
 
   constructor(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string) {
     // Binding context
     this.gl = gl;
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
-    this.buffer = gl.createBuffer();
+    const buffer = gl.createBuffer();
+    if (buffer === null)
+      throw new Error("sigma/renderers/webgl/program/program.Program: error while creating the buffer");
+    this.buffer = buffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
-    this.load(gl);
-  }
-
-  /**
-   * Method used to load the program into a webgl context.
-   *
-   * @param  {WebGLContext} gl - The WebGL context.
-   * @return {WebGLProgram}
-   */
-  load(gl) {
     this.vertexShader = loadVertexShader(gl, this.vertexShaderSource);
     this.fragmentShader = loadFragmentShader(gl, this.fragmentShaderSource);
-
     this.program = loadProgram(gl, [this.vertexShader, this.fragmentShader]);
-
-    return this.program;
   }
+
+  abstract allocate(capacity: any): void;
+  abstract process(...args: any): void;
+  abstract computeIndices(): void;
+  abstract bufferData(): void;
+  abstract render(...args: any): void;
 }
 
 /**
@@ -56,40 +56,40 @@ export default class Program {
  * @param  {array}    programClasses - Program classes to combine.
  * @return {function}
  */
-
 // TODO: maybe those should handle their own canvases
-export function createCompoundProgram(programClasses) {
+export function createCompoundProgram(programClasses: Array<SomeProgramConstructor>) {
   return class CompoundProgram {
-    programs: any;
-    constructor(gl) {
-      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl));
+    programs: Array<Program>;
+
+    constructor(gl: WebGLRenderingContext) {
+      this.programs = programClasses.map((ProgramClass) => {
+        return new ProgramClass(gl);
+      });
     }
 
-    allocate(capacity) {
+    allocate(capacity: number): void {
       this.programs.forEach((program) => program.allocate(capacity));
     }
 
-    process() {
+    process(): void {
       const args = arguments;
 
       this.programs.forEach((program) => program.process(...args));
     }
 
-    computeIndices() {
+    computeIndices(): void {
       this.programs.forEach((program) => {
         if (typeof program.computeIndices === "function") program.computeIndices();
       });
     }
 
-    bufferData() {
+    bufferData(): void {
       this.programs.forEach((program) => program.bufferData());
     }
 
-    render() {
+    render(): void {
       const args = arguments;
-
       this.programs.forEach((program) => {
-        program.bind();
         program.bufferData();
         program.render(...args);
       });

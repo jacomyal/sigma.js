@@ -9,14 +9,6 @@ declare global {
     stopLayout: any;
     layout: any;
   }
-
-  interface WebGLProgram {
-    allocate(capacity: any): void;
-    process(...args: any): void;
-    computeIndices(): void;
-    bufferData(): void;
-    render(...args: any): void;
-  }
 }
 
 export {};

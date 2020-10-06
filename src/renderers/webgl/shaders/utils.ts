@@ -39,10 +39,12 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
   return shader;
 }
 
-const loadVertexShader = loadShader.bind(null, "VERTEX"),
-  loadFragmentShader = loadShader.bind(null, "FRAGMENT");
-
-export { loadVertexShader, loadFragmentShader };
+export function loadVertexShader(gl: WebGLRenderingContext, source: string): WebGLShader {
+  return loadShader("VERTEX", gl, source);
+}
+export function loadFragmentShader(gl: WebGLRenderingContext, source: string): WebGLShader {
+  return loadShader("FRAGMENT", gl, source);
+}
 
 /**
  * Function used to load a program.
