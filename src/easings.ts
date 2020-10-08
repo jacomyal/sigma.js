@@ -24,7 +24,7 @@ export const cubicInOut = (k: number): number => {
   return 0.5 * ((k -= 2) * k * k + 2);
 };
 
-export const easings: { [key: string]: (k: number) => number } = {
+const easings: { [key: string]: (k: number) => number } = {
   linear,
   quadraticIn,
   quadraticOut,
@@ -33,3 +33,4 @@ export const easings: { [key: string]: (k: number) => number } = {
   cubicOut,
   cubicInOut,
 };
+export default easings;

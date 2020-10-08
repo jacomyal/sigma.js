@@ -27,22 +27,20 @@ const DOUBLE_CLICK_ZOOMING_DURATION = 200;
  * @constructor
  */
 export default class MouseCaptor extends Captor {
-  container: HTMLElement;
-  camera: Camera;
   // State
-  enabled: boolean = true;
-  hasDragged: boolean = false;
-  downStartTime: number = null;
-  lastMouseX: number = null;
-  lastMouseY: number = null;
-  isMouseDown: boolean = false;
-  isMoving: boolean = null;
-  movingTimeout: number = null;
-  startCameraState: CameraState = null;
-  lastCameraState: CameraState = null;
-  clicks: number = 0;
-  doubleClickTimeout: number = null;
-  wheelLock: boolean = false;
+  enabled = true;
+  hasDragged = false;
+  downStartTime: number | null = null;
+  lastMouseX: number | null = null;
+  lastMouseY: number | null = null;
+  isMouseDown = false;
+  isMoving = false;
+  movingTimeout: number | null = null;
+  startCameraState: CameraState | null = null;
+  lastCameraState: CameraState | null = null;
+  clicks = 0;
+  doubleClickTimeout: number | null = null;
+  wheelLock = false;
 
   constructor(container: HTMLElement, camera: Camera) {
     super(container, camera);
@@ -193,8 +191,8 @@ export default class MouseCaptor extends Captor {
     this.isMouseDown = false;
 
     if (this.movingTimeout) {
-      this.movingTimeout = null;
       clearTimeout(this.movingTimeout);
+      this.movingTimeout = null;
     }
 
     const x = getX(e),

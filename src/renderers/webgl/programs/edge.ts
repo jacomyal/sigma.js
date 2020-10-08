@@ -14,7 +14,8 @@
  * This version of the shader balances geometry computation evenly between
  * the CPU & GPU (normals are computed on the CPU side).
  */
-import Program, { RenderParams, ProcessData } from "./program";
+import { ProcessData } from "./common/program";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor, canUse32BitsIndices } from "../utils";
 import vertexShaderSource from "../shaders/edge.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
@@ -23,24 +24,19 @@ const POINTS = 4,
   ATTRIBUTES = 6,
   STRIDE = POINTS * ATTRIBUTES;
 
-export default class EdgeProgram extends Program {
+export default class EdgeProgram extends AbstractEdgeProgram {
+  indicesBuffer: WebGLBuffer;
   IndicesArray: Uint32ArrayConstructor | Uint16ArrayConstructor;
   indicesArray: Uint32Array | Uint16Array;
-  indicesBuffer: WebGLBuffer;
-  indicesType: any;
-  Locations: GLint;
-  positionLocation: GLint;
+  indicesType: GLenum;
+  canUse32BitsIndices: boolean;
   normalLocation: GLint;
   thicknessLocation: GLint;
-  colorLocation: GLint;
-  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
-  matrixLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
-  canUse32BitsIndices: boolean;
 
   constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource);
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
     // Initializing indices buffer
     const indicesBuffer = gl.createBuffer();
@@ -49,20 +45,8 @@ export default class EdgeProgram extends Program {
     this.indicesBuffer = indicesBuffer;
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)
@@ -74,8 +58,6 @@ export default class EdgeProgram extends Program {
       throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
-    this.bind();
-
     // Enabling the OES_element_index_uint extension
     // NOTE: on older GPUs, this means that really large graphs won't
     // have all their edges rendered. But it seems that the
@@ -84,13 +66,14 @@ export default class EdgeProgram extends Program {
     // NOTE: when using webgl2, the extension is enabled by default
     this.canUse32BitsIndices = canUse32BitsIndices(gl);
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+    this.indicesArray = new this.IndicesArray();
     this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+
+    this.bind();
   }
 
   bind(): void {
     const gl = this.gl;
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
@@ -111,14 +94,34 @@ export default class EdgeProgram extends Program {
     );
   }
 
-  allocate(capacity: number): void {
-    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  computeIndices(): void {
+    const l = this.array.length / ATTRIBUTES;
+    const size = l + l / 2;
+    const indices = new this.IndicesArray(size);
+
+    for (let i = 0, c = 0; i < l; i += 4) {
+      indices[c++] = i;
+      indices[c++] = i + 1;
+      indices[c++] = i + 2;
+      indices[c++] = i + 2;
+      indices[c++] = i + 1;
+      indices[c++] = i + 3;
+    }
+
+    this.indicesArray = indices;
   }
 
-  process(sourceData, targetData, data, offset: number) {
+  bufferData(): void {
+    super.bufferData();
+
+    // Indices data
+    const gl = this.gl;
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
+  }
+
+  process(sourceData: any, targetData: any, data: ProcessData, offset: number) {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
-
       return;
     }
 
@@ -181,36 +184,7 @@ export default class EdgeProgram extends Program {
     array[i] = color;
   }
 
-  computeIndices(): void {
-    const l = this.array.length / ATTRIBUTES;
-
-    const size = l + l / 2;
-
-    const indices = new this.IndicesArray(size);
-
-    for (let i = 0, c = 0; i < l; i += 4) {
-      indices[c++] = i;
-      indices[c++] = i + 1;
-      indices[c++] = i + 2;
-      indices[c++] = i + 2;
-      indices[c++] = i + 1;
-      indices[c++] = i + 3;
-    }
-
-    this.indicesArray = indices;
-  }
-
-  bufferData(): void {
-    const gl = this.gl;
-
-    // Vertices data
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-
-    // Indices data
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
-  }
-
-  render(params: RenderParams): void {
+  render(params: RenderEdgeParams): void {
     const gl = this.gl;
 
     const program = this.program;

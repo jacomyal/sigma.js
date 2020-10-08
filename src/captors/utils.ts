@@ -6,6 +6,22 @@
  */
 import { getPixelRatio } from "../renderers/utils";
 
+export interface Coordinates {
+  x: number;
+  y: number;
+}
+
+export interface MouseCoords extends Coordinates {
+  clientX: number;
+  clientY: number;
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
+  shiftKey: boolean;
+  preventDefault(): void;
+  original: MouseEvent;
+}
+
 /**
  * Extract the local X position from a mouse or touch event.
  *
@@ -68,26 +84,13 @@ export function getHeight(e: MouseEvent): number {
  * @param  {event}  e - A mouse or touch event.
  * @return {object}     The center of the event's target.
  */
-export function getCenter(e: MouseEvent | WheelEvent): { x: number; y: number } {
+export function getCenter(e: MouseEvent | WheelEvent): Coordinates {
   const ratio = getPixelRatio();
 
   return {
     x: getWidth(e) / (2 * ratio),
     y: getHeight(e) / (2 * ratio),
   };
-}
-
-export interface MouseCoords {
-  x: number;
-  y: number;
-  clientX: number;
-  clientY: number;
-  ctrlKey: boolean;
-  metaKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
-  preventDefault(): void;
-  original: MouseEvent;
 }
 
 /**

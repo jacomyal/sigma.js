@@ -14,17 +14,7 @@
  * @param  {array}    elements - The array to sort.
  * @return {array} - The sorted array.
  */
-export function zIndexOrdering(extent, getter, elements) {
-  // const n = elements.length;
-
-  // const [min, max] = extent;
-
-  // const k = max - min;
-
-  // No ordering needs to be done
-  // if (k === 0 || k === -Infinity)
-  //   return elements;
-
+export function zIndexOrdering(extent: [number, number], getter: (e: any) => number, elements: Array<any>): Array<any> {
   // If k is > n, we'll use a standard sort
   return elements.sort(function (a, b) {
     const zA = getter(a) || 0,

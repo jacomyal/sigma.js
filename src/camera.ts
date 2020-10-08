@@ -6,17 +6,14 @@
  */
 import { EventEmitter } from "events";
 
-import * as easings from "./easings";
+import { ANIMATE_DEFAULTS, AnimateOptions } from "./animate";
+import easings from "./easings";
 import { assign } from "./utils";
+import { Coordinates } from "./captors/utils";
 
 /**
  * Defaults.
  */
-const ANIMATE_DEFAULTS = {
-  easing: "quadraticInOut",
-  duration: 150,
-};
-
 const DEFAULT_ZOOMING_RATIO = 1.5;
 
 // TODO: animate options = number polymorphism?
@@ -25,11 +22,9 @@ const DEFAULT_ZOOMING_RATIO = 1.5;
 // TODO: bind camera to renderer rather than sigma
 // TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
 
-export interface CameraState {
-  x?: number;
-  y?: number;
-  angle?: number;
-  ratio?: number;
+export interface CameraState extends Coordinates {
+  angle: number;
+  ratio: number;
 }
 /**
  * Camera class
@@ -37,13 +32,13 @@ export interface CameraState {
  * @constructor
  */
 export default class Camera extends EventEmitter implements CameraState {
-  x: number = 0.5;
-  y: number = 0.5;
-  angle: number = 0;
-  ratio: number = 1;
+  x = 0.5;
+  y = 0.5;
+  angle = 0;
+  ratio = 1;
   nextFrame: any = null;
   previousState: CameraState;
-  enabled: boolean = true;
+  enabled = true;
 
   constructor() {
     super();
@@ -123,7 +118,7 @@ export default class Camera extends EventEmitter implements CameraState {
 
   // TODO: assign to gain one object
   // TODO: angles
-  graphToViewport(dimensions: { width: number; height: number }, x: number, y: number): { x: number; y: number } {
+  graphToViewport(dimensions: { width: number; height: number }, x: number, y: number): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
@@ -148,7 +143,7 @@ export default class Camera extends EventEmitter implements CameraState {
    */
 
   // TODO: angles
-  viewportToGraph(dimensions: { width: number; height: number }, x: number, y: number): { x: number; y: number } {
+  viewportToGraph(dimensions: { width: number; height: number }, x: number, y: number): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width,
@@ -195,7 +190,7 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {object} state - New state.
    * @return {Camera}
    */
-  setState(state: CameraState): Camera {
+  setState(state: Partial<CameraState>): Camera {
     if (!this.enabled) return this;
 
     // TODO: validations
@@ -204,13 +199,10 @@ export default class Camera extends EventEmitter implements CameraState {
     // Keeping track of last state
     this.previousState = this.getState();
 
-    if ("x" in state) this.x = state.x;
-
-    if ("y" in state) this.y = state.y;
-
-    if ("angle" in state) this.angle = state.angle;
-
-    if ("ratio" in state) this.ratio = state.ratio;
+    if (state.x) this.x = state.x;
+    if (state.y) this.y = state.y;
+    if (state.angle) this.angle = state.angle;
+    if (state.ratio) this.ratio = state.ratio;
 
     // Emitting
     // TODO: don't emit if nothing changed?
@@ -228,14 +220,13 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {function} callback   - Callback
    * @return {function}            - Return a function to cancel the animation.
    */
-  animate(state: CameraState, options?, callback?: () => void) {
+  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>, callback?: () => void) {
     if (!this.enabled) return this;
 
-    // TODO: validation
+    const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
 
-    options = assign({}, ANIMATE_DEFAULTS, options);
-
-    const easing = typeof options.easing === "function" ? options.easing : easings[options.easing];
+    const easing: (k: number) => number =
+      typeof options.easing === "function" ? options.easing : easings[options.easing];
 
     // Canceling previous animation if needed
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
@@ -260,12 +251,12 @@ export default class Camera extends EventEmitter implements CameraState {
 
       const coefficient = easing(t);
 
-      const newState: CameraState = {};
+      const newState: Partial<CameraState> = {};
 
-      if ("x" in state) newState.x = initialState.x + (state.x - initialState.x) * coefficient;
-      if ("y" in state) newState.y = initialState.y + (state.y - initialState.y) * coefficient;
-      if ("angle" in state) newState.angle = initialState.angle + (state.angle - initialState.angle) * coefficient;
-      if ("ratio" in state) newState.ratio = initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
+      if (state.x) newState.x = initialState.x + (state.x - initialState.x) * coefficient;
+      if (state.y) newState.y = initialState.y + (state.y - initialState.y) * coefficient;
+      if (state.angle) newState.angle = initialState.angle + (state.angle - initialState.angle) * coefficient;
+      if (state.ratio) newState.ratio = initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
 
       this.setState(newState);
 

@@ -10,8 +10,11 @@
  * in byte arrays but this would prove more tedious for the rendering logic
  * afterwards.
  */
+import { WebGLSettings } from "./webgl/settings";
+import { NodeKey, EdgeKey } from "graphology-types";
+
 export class NodeDisplayData {
-  index: string;
+  index: NodeKey;
   x: number;
   y: number;
   size: number;
@@ -19,7 +22,7 @@ export class NodeDisplayData {
   hidden: boolean;
   label: string;
 
-  constructor(index, settings) {
+  constructor(index: NodeKey, settings: WebGLSettings) {
     this.index = index;
     this.x = 0;
     this.y = 0;
@@ -29,19 +32,19 @@ export class NodeDisplayData {
     this.label = "";
   }
 
-  assign(data) {
+  assign(data: Partial<NodeDisplayData>) {
     for (const key in data) this[key] = data[key];
   }
 }
 
 export class EdgeDisplayData {
-  index: any;
+  index: EdgeKey;
   size: number;
   color: string;
   hidden: boolean;
   label: string;
 
-  constructor(index, settings) {
+  constructor(index: EdgeKey, settings: WebGLSettings) {
     this.index = index;
     this.size = 1;
     this.color = settings.defaultEdgeColor;
@@ -49,7 +52,7 @@ export class EdgeDisplayData {
     this.label = "";
   }
 
-  assign(data) {
+  assign(data: Partial<EdgeDisplayData>) {
     for (const key in data) this[key] = data[key];
   }
 }

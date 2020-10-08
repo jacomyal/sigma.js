@@ -5,12 +5,13 @@
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
 import { identity, scale, rotate, translate, multiply } from "./matrices";
+import { CameraState } from "../../camera";
 
 /**
  * Memoized function returning a float-encoded color from various string
  * formats describing colors.
  */
-const FLOAT_COLOR_CACHE = {};
+const FLOAT_COLOR_CACHE: { [key: string]: number } = {};
 const INT8 = new Int8Array(4);
 const INT32 = new Int32Array(INT8.buffer, 0, 1);
 const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
@@ -18,7 +19,7 @@ const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
 const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
 
-export function floatColor(val: string): FLOAT32 {
+export function floatColor(val: string): number {
   // If the color is already computed, we yield it
   if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
 
@@ -43,12 +44,13 @@ export function floatColor(val: string): FLOAT32 {
   // Handling rgb notation
   else if (RGBA_TEST_REGEX.test(val)) {
     const match = val.match(RGBA_EXTRACT_REGEX);
+    if (match !== null) {
+      r = +match[1];
+      g = +match[2];
+      b = +match[3];
 
-    r = +match[1];
-    g = +match[2];
-    b = +match[3];
-
-    if (match[4]) a = +match[4];
+      if (match[4]) a = +match[4];
+    }
   }
 
   a = (a * 255) | 0;
@@ -69,7 +71,7 @@ export function floatColor(val: string): FLOAT32 {
  */
 
 // TODO: it's possible to optimize this drastically!
-export function matrixFromCamera(state, dimensions) {
+export function matrixFromCamera(state: CameraState, dimensions: { width: number; height: number }) {
   const { angle, ratio, x, y } = state;
 
   const { width, height } = dimensions;
@@ -95,7 +97,7 @@ export function matrixFromCamera(state, dimensions) {
 /**
  * Function extracting the color at the given pixel.
  */
-export function extractPixel(gl, x, y, array) {
+export function extractPixel(gl: WebGLRenderingContext, x: number, y: number, array: Uint8Array): Uint8Array {
   const data = array || new Uint8Array(4);
 
   gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
@@ -106,7 +108,7 @@ export function extractPixel(gl, x, y, array) {
 /**
  * Function used to know whether given webgl context can use 32 bits indices.
  */
-export function canUse32BitsIndices(gl) {
+export function canUse32BitsIndices(gl: WebGLRenderingContext): boolean {
   const webgl2 = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext;
 
   return webgl2 || !!gl.getExtension("OES_element_index_uint");

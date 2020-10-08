@@ -6,6 +6,18 @@
  */
 
 /**
+ * Returns a type similar to T, but with the the K set of properties of the type
+ * T optional.
+ */
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+/**
+ * Returns a type similar to T, but with the the K set of properties of the type
+ * T *required*, and the rest optional.
+ */
+export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
+
+/**
  * Checks whether the given value is a plain object.
  *
  * @param  {mixed}   value - Target value.

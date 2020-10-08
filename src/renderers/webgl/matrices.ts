@@ -4,19 +4,19 @@
  *
  * Matrices-related helper functions used by sigma's WebGL renderer.
  */
-export function identity() {
+export function identity(): Float32Array {
   return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 
 // TODO: optimize
-export function scale(m, x, y?) {
+export function scale(m: Float32Array, x: number, y?: number): Float32Array {
   m[0] = x;
-  m[4] = arguments.length > 2 ? y : x;
+  m[4] = y !== undefined && y !== null ? y : x;
 
   return m;
 }
 
-export function rotate(m, r) {
+export function rotate(m: Float32Array, r: number): Float32Array {
   const s = Math.sin(r),
     c = Math.cos(r);
 
@@ -28,14 +28,14 @@ export function rotate(m, r) {
   return m;
 }
 
-export function translate(m, x, y) {
+export function translate(m: Float32Array, x: number, y: number): Float32Array {
   m[6] = x;
   m[7] = y;
 
   return m;
 }
 
-export function multiply(a, b) {
+export function multiply(a: Float32Array, b: Float32Array): Float32Array {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2];

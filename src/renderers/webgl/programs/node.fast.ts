@@ -6,7 +6,8 @@
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
  */
-import Program, { RenderParams, ProcessData } from "./program";
+import { RenderParams, ProcessData } from "./common/program";
+import { AbstractNodeProgram } from "./common/node";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
@@ -14,61 +15,13 @@ import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
 const POINTS = 1,
   ATTRIBUTES = 4;
 
-export default class NodeProgramFast extends Program {
-  positionLocation: GLint;
-  sizeLocation: GLint;
-  colorLocation: GLint;
-  matrixLocation: WebGLUniformLocation;
-  ratioLocation: WebGLUniformLocation;
-  scaleLocation: WebGLUniformLocation;
-
+export default class NodeProgramFast extends AbstractNodeProgram {
   constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource);
-
-    const program = this.program;
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(program, "a_position");
-    this.sizeLocation = gl.getAttribLocation(program, "a_size");
-    this.colorLocation = gl.getAttribLocation(program, "a_color");
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting ratioLocation");
-    this.ratioLocation = ratioLocation;
-
-    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.fast.NodeProgram: error while getting scaleLocation");
-    this.scaleLocation = scaleLocation;
-
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.sizeLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-
-    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      12,
-    );
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+    this.bind();
   }
 
-  allocate(capacity: number): void {
-    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
-  }
-
-  process(data: ProcessData, offset: number): void {
+  process(data: ProcessData, offset: number) {
     const color = floatColor(data.color);
 
     let i = offset * POINTS * ATTRIBUTES;
@@ -90,24 +43,16 @@ export default class NodeProgramFast extends Program {
     array[i] = color;
   }
 
-  computeIndices(): void {
-    // nothing todo ?
-  }
-
-  bufferData(): void {
+  render(params: RenderParams) {
     const gl = this.gl;
 
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-  }
-
-  render(params: RenderParams): void {
-    const gl = this.gl;
     const program = this.program;
-
     gl.useProgram(program);
+
     gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+
     gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
   }
 }

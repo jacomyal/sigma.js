@@ -1,10 +1,9 @@
 /**
  * Sigma.js WebGL Renderer Quadratic Bezier Edge Program
  * ======================================================
- *
- * TODO
  */
-import Program, { RenderParams, ProcessData } from "./program";
+import { ProcessData } from "./common/program";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.quadraticBezier.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.quadraticBezier.frag.glsl";
@@ -12,37 +11,16 @@ import fragmentShaderSource from "../shaders/edge.quadraticBezier.frag.glsl";
 const POINTS = 3,
   ATTRIBUTES = 5;
 
-export default class EdgeQuadraticBezierProgram extends Program {
-  positionLocation: GLint;
-  colorLocation: GLint;
+export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
   coordLocation: GLint;
-  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
-  matrixLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource);
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    // this.thicknessLocation = gl.getAttribLocation(this.program, 'a_thickness');
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.coordLocation = gl.getAttribLocation(this.program, "a_coord");
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeQuadraticBezierProgram: error while getting resolutionLocation",
-      );
-    this.resolutionLocation = resolutionLocation;
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeQuadraticBezierProgram: error while getting matrixLocation",
-      );
-    this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)
@@ -58,36 +36,23 @@ export default class EdgeQuadraticBezierProgram extends Program {
       );
     this.scaleLocation = scaleLocation;
 
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    // gl.enableVertexAttribArray(this.thicknessLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-    gl.enableVertexAttribArray(this.coordLocation);
+    this.bind();
+  }
 
-    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    // gl.vertexAttribPointer(this.thicknessLocation,
-    //   1,
-    //   gl.FLOAT,
-    //   false,
-    //   ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-    //   8
-    // );
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      8,
-    );
+  bind(): void {
+    super.bind();
+
+    // Bindings
+    const gl = this.gl;
+    gl.enableVertexAttribArray(this.coordLocation);
     gl.vertexAttribPointer(this.coordLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
   }
 
-  allocate(capacity: number): void {
-    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  computeIndices(): void {
+    // nothing to do
   }
 
-  process(sourceData, targetData, data, offset: number): void {
+  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
     let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;
@@ -129,14 +94,7 @@ export default class EdgeQuadraticBezierProgram extends Program {
     array[i] = 1;
   }
 
-  bufferData(): void {
-    const gl = this.gl;
-
-    // Vertices data
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-  }
-
-  render(params: RenderParams): void {
+  render(params: RenderEdgeParams): void {
     const gl = this.gl;
 
     const program = this.program;

@@ -4,13 +4,20 @@
  *
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
+import { AbstractGraph, NodeEntry } from "graphology-types";
 import { assign } from "./utils";
-import * as easings from "./easings";
+import { Coordinates } from "./captors/utils";
+import easings from "./easings";
+import { SigmaNode } from "./renderers/webgl/settings";
 
 /**
  * Defaults.
  */
-const ANIMATE_DEFAULTS = {
+export interface AnimateOptions {
+  easing: string | ((k: number) => number);
+  duration: number;
+}
+export const ANIMATE_DEFAULTS = {
   easing: "quadraticInOut",
   duration: 150,
 };
@@ -18,23 +25,29 @@ const ANIMATE_DEFAULTS = {
 /**
  * Function used to animate the nodes.
  */
-export function animateNodes(graph, targets, options, callback) {
-  options = assign({}, ANIMATE_DEFAULTS, options);
+export function animateNodes(
+  graph: AbstractGraph,
+  targets: { [key: string]: Partial<SigmaNode> },
+  opts: Partial<AnimateOptions>,
+  callback: () => void,
+) {
+  const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
 
-  const easing = typeof options.easing === "function" ? options.easing : easings[options.easing];
+  const easing: (k: number) => number = typeof options.easing === "function" ? options.easing : easings[options.easing];
 
   const start = Date.now();
 
-  const startPositions = {};
+  const startPositions: { [key: string]: Partial<SigmaNode> } = {};
 
-  for (const node in targets) {
-    const attrs = targets[node];
-    startPositions[node] = {};
+  Object.keys(targets).forEach((nodeKey: string) => {
+    const node: Partial<SigmaNode> = targets[nodeKey];
+    startPositions[nodeKey] = {};
+    Object.keys(node).forEach((attrName: string) => {
+      startPositions[nodeKey][attrName] = graph.getNodeAttribute(nodeKey, attrName);
+    });
+  });
 
-    for (const k in attrs) startPositions[node][k] = graph.getNodeAttribute(node, k);
-  }
-
-  let frame = null;
+  let frame: number | null = null;
 
   const step = () => {
     let p = (Date.now() - start) / options.duration;

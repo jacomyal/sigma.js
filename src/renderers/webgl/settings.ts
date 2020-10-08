@@ -1,10 +1,14 @@
+import { NodeEntry, EdgeEntry } from "graphology-types";
+
 import drawLabel from "../canvas/components/label";
 import drawHover from "../canvas/components/hover";
 import drawEdgeLabel from "../canvas/components/edge-label";
-
+import { Coordinates } from "../../captors/utils";
 import CircleNodeProgram from "./programs/node.fast";
 import LineEdgeProgram from "./programs/edge";
 import ArrowEdgeProgram from "./programs/edge.arrow";
+import { EdgeProgramConstructor } from "./programs/common/edge";
+import { NodeProgramConstructor } from "./programs/common/node";
 
 /**
  * Sigma.js WebGL Renderer Settings
@@ -13,7 +17,7 @@ import ArrowEdgeProgram from "./programs/edge.arrow";
  * The list of settings for the WebGL renderer and some handy functions.
  */
 
-export function validateWebglRendererSettings(settings) {
+export function validateWebglRendererSettings(settings: WebGLSettings) {
   // Label grid cell
   if (
     settings.labelGrid &&
@@ -25,7 +29,65 @@ export function validateWebglRendererSettings(settings) {
   }
 }
 
-export const WEBGL_RENDERER_DEFAULT_SETTINGS = {
+/**
+ * Sigma.js WebGL Renderer Settings
+ * =================================
+ *
+ * The list of settings for the WebGL renderer and some handy functions.
+ */
+
+export interface SigmaNode extends Coordinates {
+  key: string;
+  label: any;
+  color: any;
+  size: number;
+}
+
+export interface SigmaEdge {
+  key: string;
+  label: any;
+  color: any;
+  size: number;
+}
+
+export interface WebGLSettings {
+  // Performance
+  hideEdgesOnMove: boolean;
+  hideLabelsOnMove: boolean;
+  renderLabels: boolean;
+  renderEdgeLabels: boolean;
+  // Component rendering
+  defaultNodeColor: string;
+  defaultNodeType: string;
+  defaultEdgeColor: string;
+  defaultEdgeType: string;
+  labelFont: string;
+  labelSize: number;
+  labelWeight: string;
+  edgeLabelFont: string;
+  edgeLabelSize: number;
+  edgeLabelWeight: string;
+  // Labels
+  labelGrid: {
+    cell: any;
+    renderedSizeThreshold: number;
+  };
+  // Reducers
+  nodeReducer: null | ((edge: EdgeEntry, data: { [key: string]: any }) => { [key: string]: any });
+  edgeReducer: null | ((node: NodeEntry, data: { [key: string]: any }) => { [key: string]: any });
+  // Features
+  zIndex: boolean;
+  // Renderers
+  labelRenderer: typeof drawLabel;
+  hoverRenderer: typeof drawHover;
+  edgeLabelRenderer: typeof drawEdgeLabel;
+
+  // Program classes
+  nodeProgramClasses: { [key: string]: NodeProgramConstructor };
+  edgeProgramClasses: { [key: string]: EdgeProgramConstructor };
+}
+
+export const WEBGL_RENDERER_DEFAULT_SETTINGS: WebGLSettings = {
   // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,

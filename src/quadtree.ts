@@ -105,56 +105,58 @@ function pointIsInQuad(x: number, y: number, qx: number, qy: number, qw: number,
  * Helper functions that are not bound to the class so an external user
  * cannot mess with them.
  */
-function buildQuadrants(maxLevel, data) {
+function buildQuadrants(maxLevel: number, data: any): void {
   // [block, level]
-  const stack = [0, 0];
+  const stack: Array<number> = [0, 0];
 
   while (stack.length) {
     const level = stack.pop(),
       block = stack.pop();
 
-    const topLeftBlock = 4 * block + BLOCKS,
-      topRightBlock = 4 * block + 2 * BLOCKS,
-      bottomLeftBlock = 4 * block + 3 * BLOCKS,
-      bottomRightBlock = 4 * block + 4 * BLOCKS;
+    if (block && level) {
+      const topLeftBlock = 4 * block + BLOCKS,
+        topRightBlock = 4 * block + 2 * BLOCKS,
+        bottomLeftBlock = 4 * block + 3 * BLOCKS,
+        bottomRightBlock = 4 * block + 4 * BLOCKS;
 
-    const x = data[block + X_OFFSET],
-      y = data[block + Y_OFFSET],
-      width = data[block + WIDTH_OFFSET],
-      height = data[block + HEIGHT_OFFSET],
-      hw = width / 2,
-      hh = height / 2;
+      const x = data[block + X_OFFSET],
+        y = data[block + Y_OFFSET],
+        width = data[block + WIDTH_OFFSET],
+        height = data[block + HEIGHT_OFFSET],
+        hw = width / 2,
+        hh = height / 2;
 
-    data[topLeftBlock + X_OFFSET] = x;
-    data[topLeftBlock + Y_OFFSET] = y;
-    data[topLeftBlock + WIDTH_OFFSET] = hw;
-    data[topLeftBlock + HEIGHT_OFFSET] = hh;
+      data[topLeftBlock + X_OFFSET] = x;
+      data[topLeftBlock + Y_OFFSET] = y;
+      data[topLeftBlock + WIDTH_OFFSET] = hw;
+      data[topLeftBlock + HEIGHT_OFFSET] = hh;
 
-    data[topRightBlock + X_OFFSET] = x + hw;
-    data[topRightBlock + Y_OFFSET] = y;
-    data[topRightBlock + WIDTH_OFFSET] = hw;
-    data[topRightBlock + HEIGHT_OFFSET] = hh;
+      data[topRightBlock + X_OFFSET] = x + hw;
+      data[topRightBlock + Y_OFFSET] = y;
+      data[topRightBlock + WIDTH_OFFSET] = hw;
+      data[topRightBlock + HEIGHT_OFFSET] = hh;
 
-    data[bottomLeftBlock + X_OFFSET] = x;
-    data[bottomLeftBlock + Y_OFFSET] = y + hh;
-    data[bottomLeftBlock + WIDTH_OFFSET] = hw;
-    data[bottomLeftBlock + HEIGHT_OFFSET] = hh;
+      data[bottomLeftBlock + X_OFFSET] = x;
+      data[bottomLeftBlock + Y_OFFSET] = y + hh;
+      data[bottomLeftBlock + WIDTH_OFFSET] = hw;
+      data[bottomLeftBlock + HEIGHT_OFFSET] = hh;
 
-    data[bottomRightBlock + X_OFFSET] = x + hw;
-    data[bottomRightBlock + Y_OFFSET] = y + hh;
-    data[bottomRightBlock + WIDTH_OFFSET] = hw;
-    data[bottomRightBlock + HEIGHT_OFFSET] = hh;
+      data[bottomRightBlock + X_OFFSET] = x + hw;
+      data[bottomRightBlock + Y_OFFSET] = y + hh;
+      data[bottomRightBlock + WIDTH_OFFSET] = hw;
+      data[bottomRightBlock + HEIGHT_OFFSET] = hh;
 
-    if (level < maxLevel - 1) {
-      stack.push(bottomRightBlock, level + 1);
-      stack.push(bottomLeftBlock, level + 1);
-      stack.push(topRightBlock, level + 1);
-      stack.push(topLeftBlock, level + 1);
+      if (level < maxLevel - 1) {
+        stack.push(bottomRightBlock, level + 1);
+        stack.push(bottomLeftBlock, level + 1);
+        stack.push(topRightBlock, level + 1);
+        stack.push(topLeftBlock, level + 1);
+      }
     }
   }
 }
 
-function insertNode(maxLevel, data, containers, key, x, y, size) {
+function insertNode(maxLevel: number, data: any, containers: any, key: string, x: number, y: number, size: number) {
   const x1 = x - size,
     y1 = y - size,
     w = size * 2;
@@ -240,35 +242,6 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
     // If we have more that one collision, we stop here and store the node
     // in the relevant containers
     if (collisions > 1) {
-      // NOTE: this is a nice way to optimize for hover, but not for frustum
-      // since it requires to uniq the collected nodes
-      // if (collisions < 4) {
-
-      //   // If we intersect two quads, we place the node in those two
-      //   if (collidingWithTopLeft) {
-      //     containers[topLeftBlock] = containers[topLeftBlock] || [];
-      //     containers[topLeftBlock].push(key);
-      //   }
-      //   if (collidingWithTopRight) {
-      //     containers[topRightBlock] = containers[topRightBlock] || [];
-      //     containers[topRightBlock].push(key);
-      //   }
-      //   if (collidingWithBottomLeft) {
-      //     containers[bottomLeftBlock] = containers[bottomLeftBlock] || [];
-      //     containers[bottomLeftBlock].push(key);
-      //   }
-      //   if (collidingWithBottomRight) {
-      //     containers[bottomRightBlock] = containers[bottomRightBlock] || [];
-      //     containers[bottomRightBlock].push(key);
-      //   }
-      // }
-      // else {
-
-      //   // Else we keep the node where it is to avoid more pointless computations
-      //   containers[block] = containers[block] || [];
-      //   containers[block].push(key);
-      // }
-
       containers[block] = containers[block] || [];
       containers[block].push(key);
 
@@ -288,11 +261,19 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
   }
 }
 
-function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, w, h) {
+function getNodesInAxisAlignedRectangleArea(
+  maxLevel: number,
+  data: any,
+  containers: any,
+  x1: number,
+  y1: number,
+  w: number,
+  h: number,
+): Array<any> {
   // [block, level]
   const stack = [0, 0];
 
-  const collectedNodes = [];
+  const collectedNodes: Array<any> = [];
 
   let container;
 
@@ -300,70 +281,72 @@ function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, 
     const level = stack.pop(),
       block = stack.pop();
 
-    // Collecting nodes
-    container = containers[block];
+    if (level && block) {
+      // Collecting nodes
+      container = containers[block];
 
-    if (container) extend(collectedNodes, container);
+      if (container) extend(collectedNodes, container);
 
-    // If we reached max level
-    if (level >= maxLevel) continue;
+      // If we reached max level
+      if (level >= maxLevel) continue;
 
-    const topLeftBlock = 4 * block + BLOCKS,
-      topRightBlock = 4 * block + 2 * BLOCKS,
-      bottomLeftBlock = 4 * block + 3 * BLOCKS,
-      bottomRightBlock = 4 * block + 4 * BLOCKS;
+      const topLeftBlock = 4 * block + BLOCKS,
+        topRightBlock = 4 * block + 2 * BLOCKS,
+        bottomLeftBlock = 4 * block + 3 * BLOCKS,
+        bottomRightBlock = 4 * block + 4 * BLOCKS;
 
-    const collidingWithTopLeft = rectangleCollidesWithQuad(
-      x1,
-      y1,
-      w,
-      h,
-      data[topLeftBlock + X_OFFSET],
-      data[topLeftBlock + Y_OFFSET],
-      data[topLeftBlock + WIDTH_OFFSET],
-      data[topLeftBlock + HEIGHT_OFFSET],
-    );
+      const collidingWithTopLeft = rectangleCollidesWithQuad(
+        x1,
+        y1,
+        w,
+        h,
+        data[topLeftBlock + X_OFFSET],
+        data[topLeftBlock + Y_OFFSET],
+        data[topLeftBlock + WIDTH_OFFSET],
+        data[topLeftBlock + HEIGHT_OFFSET],
+      );
 
-    const collidingWithTopRight = rectangleCollidesWithQuad(
-      x1,
-      y1,
-      w,
-      h,
-      data[topRightBlock + X_OFFSET],
-      data[topRightBlock + Y_OFFSET],
-      data[topRightBlock + WIDTH_OFFSET],
-      data[topRightBlock + HEIGHT_OFFSET],
-    );
+      const collidingWithTopRight = rectangleCollidesWithQuad(
+        x1,
+        y1,
+        w,
+        h,
+        data[topRightBlock + X_OFFSET],
+        data[topRightBlock + Y_OFFSET],
+        data[topRightBlock + WIDTH_OFFSET],
+        data[topRightBlock + HEIGHT_OFFSET],
+      );
 
-    const collidingWithBottomLeft = rectangleCollidesWithQuad(
-      x1,
-      y1,
-      w,
-      h,
-      data[bottomLeftBlock + X_OFFSET],
-      data[bottomLeftBlock + Y_OFFSET],
-      data[bottomLeftBlock + WIDTH_OFFSET],
-      data[bottomLeftBlock + HEIGHT_OFFSET],
-    );
+      const collidingWithBottomLeft = rectangleCollidesWithQuad(
+        x1,
+        y1,
+        w,
+        h,
+        data[bottomLeftBlock + X_OFFSET],
+        data[bottomLeftBlock + Y_OFFSET],
+        data[bottomLeftBlock + WIDTH_OFFSET],
+        data[bottomLeftBlock + HEIGHT_OFFSET],
+      );
 
-    const collidingWithBottomRight = rectangleCollidesWithQuad(
-      x1,
-      y1,
-      w,
-      h,
-      data[bottomRightBlock + X_OFFSET],
-      data[bottomRightBlock + Y_OFFSET],
-      data[bottomRightBlock + WIDTH_OFFSET],
-      data[bottomRightBlock + HEIGHT_OFFSET],
-    );
+      const collidingWithBottomRight = rectangleCollidesWithQuad(
+        x1,
+        y1,
+        w,
+        h,
+        data[bottomRightBlock + X_OFFSET],
+        data[bottomRightBlock + Y_OFFSET],
+        data[bottomRightBlock + WIDTH_OFFSET],
+        data[bottomRightBlock + HEIGHT_OFFSET],
+      );
 
-    if (collidingWithTopLeft) stack.push(topLeftBlock, level + 1);
+      if (collidingWithTopLeft) stack.push(topLeftBlock, level + 1);
 
-    if (collidingWithTopRight) stack.push(topRightBlock, level + 1);
+      if (collidingWithTopRight) stack.push(topRightBlock, level + 1);
 
-    if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level + 1);
+      if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level + 1);
 
-    if (collidingWithBottomRight) stack.push(bottomRightBlock, level + 1);
+      if (collidingWithBottomRight) stack.push(bottomRightBlock, level + 1);
+    }
   }
 
   return collectedNodes;
@@ -399,13 +382,13 @@ export default class QuadTree {
     if (typeof params.filter === "function") this.nodeFilter = params.filter;
   }
 
-  add(key: any, x: number, y: number, size: number) {
+  add(key: any, x: number, y: number, size: number): QuadTree {
     insertNode(MAX_LEVEL, this.data, this.containers, key, x, y, size);
 
     return this;
   }
 
-  resize(boundaries: { x: number; y: number; width: number; height: number }) {
+  resize(boundaries: { x: number; y: number; width: number; height: number }): void {
     this.clear();
 
     // Building the quadrants
@@ -417,13 +400,13 @@ export default class QuadTree {
     buildQuadrants(MAX_LEVEL, this.data);
   }
 
-  clear() {
+  clear(): QuadTree {
     this.containers = {};
 
     return this;
   }
 
-  point(x: number, y: number) {
+  point(x: number, y: number): Array<any> {
     const nodes = [];
 
     let block = 0,
@@ -448,7 +431,7 @@ export default class QuadTree {
     return nodes;
   }
 
-  rectangle(x1: number, y1: number, x2: number, y2: number, height: number) {
+  rectangle(x1: number, y1: number, x2: number, y2: number, height: number): any {
     const lr = this.lastRectangle;
 
     if (lr && x1 === lr.x1 && x2 === lr.x2 && y1 === lr.y1 && y2 === lr.y2 && height === lr.height) {

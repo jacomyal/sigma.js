@@ -5,10 +5,16 @@
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
+import { PartialButFor } from "../../../utils";
+import { WebGLSettings, SigmaNode } from "../../webgl/settings";
 import drawNode from "./node";
 import drawLabel from "./label";
 
-export default function drawHover(context, data, settings) {
+export default function drawHover(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<SigmaNode, "x" | "y" | "size" | "label" | "color">,
+  settings: WebGLSettings,
+) {
   const size = settings.labelSize,
     font = settings.labelFont,
     weight = settings.labelWeight;

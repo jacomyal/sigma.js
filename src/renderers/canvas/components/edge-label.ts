@@ -4,7 +4,16 @@
  *
  * Function used by the canvas renderer to display a single edge's label.
  */
-export default function drawEdgeLabel(context, edgeData, sourceData, targetData, settings) {
+import { PartialButFor } from "../../../utils";
+import { WebGLSettings, SigmaEdge, SigmaNode } from "../../webgl/settings";
+
+export default function drawEdgeLabel(
+  context: CanvasRenderingContext2D,
+  edgeData: PartialButFor<SigmaEdge, "label" | "color" | "size">,
+  sourceData: PartialButFor<SigmaNode, "x" | "y">,
+  targetData: PartialButFor<SigmaNode, "x" | "y">,
+  settings: WebGLSettings,
+) {
   const size = settings.edgeLabelSize,
     font = settings.edgeLabelFont,
     weight = settings.edgeLabelWeight,

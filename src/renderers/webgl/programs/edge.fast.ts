@@ -5,7 +5,8 @@
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
  */
-import Program, { RenderParams, ProcessData } from "./program";
+import { ProcessData } from "./common/program";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
@@ -13,42 +14,17 @@ import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
 const POINTS = 2,
   ATTRIBUTES = 3;
 
-export default class EdgeFastProgram extends Program {
-  positionLocation: GLint;
-  colorLocation: GLint;
-  resolutionLocation: WebGLUniformLocation;
-  matrixLocation: WebGLUniformLocation;
-
+export default class EdgeFastProgram extends AbstractEdgeProgram {
   constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource);
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-
-    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+    this.bind();
   }
 
-  allocate(capacity: number): void {
-    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  computeIndices() {
+    //nothing to do
   }
 
-  process(sourceData, targetData, data, offset: number): void {
+  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
     const array = this.array;
 
     let i = 0;
@@ -75,25 +51,13 @@ export default class EdgeFastProgram extends Program {
     array[i] = color;
   }
 
-  bufferData(): void {
+  render(params: RenderEdgeParams): void {
     const gl = this.gl;
-
-    // Vertices data
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-  }
-
-  render(params: RenderParams): void {
-    const gl = this.gl;
-
     const program = this.program;
+
     gl.useProgram(program);
-
-    // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
-    // Drawing:
     gl.drawArrays(gl.LINES, 0, this.array.length / ATTRIBUTES);
   }
 }

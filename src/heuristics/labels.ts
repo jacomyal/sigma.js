@@ -4,8 +4,10 @@
  *
  * Miscelleneous heuristics related to label display.
  */
+import { AbstractGraph, NodeKey } from "graphology-types";
 import Camera from "../camera";
-
+import { SigmaNode } from "../renderers/webgl/settings";
+import Renderer from "../../renderer";
 /**
  * Constants.
  */
@@ -54,7 +56,17 @@ function collision(
  * @param  {Graph}    graph                - The rendered graph.
  * @return {Array}                         - The selected labels.
  */
-export function labelsToDisplayFromGrid(params): Array<any> {
+export function labelsToDisplayFromGrid(params: {
+  cache: { [key: NodeKey]: SigmaNode };
+  camera: Camera;
+  cell: any;
+  dimensions: Renderer;
+  displayedLabels: Set<string>;
+  fontSize: number;
+  graph: AbstractGraph;
+  renderedSizeThreshold: number;
+  visibleNodes: Array<NodeKey>;
+}): Array<any> {
   const {
     cache,
     camera,
@@ -215,7 +227,7 @@ export function labelsToDisplayFromGrid(params): Array<any> {
   }
 
   // Compiling the labels
-  let biggestNodeShown = worthyLabels.some((node) => node === biggestNode);
+  let biggestNodeShown: SigmaNode = worthyLabels.some((node) => node === biggestNode);
 
   for (const key in grid) {
     const node = grid[key];
@@ -282,7 +294,12 @@ export function labelsToDisplayFromGrid(params): Array<any> {
  * @param  {string}   hoveredNode          - Hovered node (optional)
  * @return {Array}                         - The selected labels.
  */
-export function edgeLabelsToDisplayFromNodes(params): Array<any> {
+export function edgeLabelsToDisplayFromNodes(params: {
+  displayedNodeLabels: Set<NodeKey>;
+  highlightedNodes: Set<NodeKey>;
+  graph: AbstractGraph;
+  hoveredNode: string | null;
+}): Array<any> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
   const worthyEdges = new Set();

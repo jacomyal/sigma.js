@@ -4,7 +4,8 @@
  *
  * Program rendering direction arrows as a simple triangle.
  */
-import Program, { RenderParams, ProcessData } from "./program";
+import { ProcessData } from "./common/program";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/arrow.vert.glsl";
 import fragmentShaderSource from "../shaders/arrow.frag.glsl";
@@ -13,39 +14,23 @@ const POINTS = 3,
   ATTRIBUTES = 10,
   STRIDE = POINTS * ATTRIBUTES;
 
-export default class ArrowProgram extends Program {
+export default class ArrowProgram extends AbstractEdgeProgram {
   // Locations
-  positionLocation: GLint;
   normalLocation: GLint;
   thicknessLocation: GLint;
   radiusLocation: GLint;
-  colorLocation: GLint;
   barycentricLocation: GLint;
-  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
-  matrixLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource);
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
     // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)
@@ -95,11 +80,11 @@ export default class ArrowProgram extends Program {
     );
   }
 
-  allocate(capacity: number): void {
-    this.array = new Float32Array(POINTS * ATTRIBUTES * capacity);
+  computeIndices() {
+    //nothing to do
   }
 
-  process(sourceData, targetData, data, offset: number): void {
+  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 
@@ -170,14 +155,7 @@ export default class ArrowProgram extends Program {
     array[i] = 1;
   }
 
-  bufferData(): void {
-    const gl = this.gl;
-
-    // Vertices data
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-  }
-
-  render(params: RenderParams): void {
+  render(params: RenderEdgeParams): void {
     const gl = this.gl;
 
     const program = this.program;

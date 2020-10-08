@@ -4,9 +4,15 @@
  *
  * Function used by the canvas renderer to display a single node.
  */
+import { PartialButFor } from "../../../utils";
+import { SigmaNode } from "../../webgl/settings";
+
 const PI_TIMES_2 = Math.PI * 2;
 
-export default function drawNode(context, data) {
+export default function drawNode(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<SigmaNode, "x" | "y" | "size">,
+): void {
   context.fillStyle = data.color;
   context.beginPath();
   context.arc(data.x, data.y, data.size, 0, PI_TIMES_2, true);

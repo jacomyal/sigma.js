@@ -6,24 +6,19 @@
  */
 import graphExtent from "graphology-metrics/extent";
 import isGraph from "graphology-utils/is-graph";
-
+import { AbstractGraph, NodeEntry, NodeKey, EdgeEntry, EdgeKey } from "graphology-types";
 import Renderer from "../../renderer";
 import Camera from "../../camera";
+import { Coordinates } from "../../captors/utils";
 import MouseCaptor from "../../captors/mouse";
 import QuadTree from "../../quadtree";
 import { NodeDisplayData, EdgeDisplayData } from "../display-data";
-
-import { assign } from "../../utils";
-
 import { createElement, getPixelRatio, createNormalizationFunction } from "../utils";
-
 import { matrixFromCamera } from "./utils";
-
+import { assign } from "../../utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "../../heuristics/labels";
-
 import { zIndexOrdering } from "../../heuristics/z-index";
-
-import { WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
+import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
 
 const { nodeExtent, edgeExtent } = graphExtent;
 
@@ -42,7 +37,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * @param {object}      settings  - Optional settings.
  */
 export default class WebGLRenderer extends Renderer {
-  settings: { [key: string]: any };
+  settings: WebGLSettings;
   graph: any;
   captors: any = {};
   container: any;
@@ -58,18 +53,18 @@ export default class WebGLRenderer extends Renderer {
   normalizationFunction: any = null;
 
   // Starting dimensions
-  width: number = 0;
-  height: number = 0;
+  width = 0;
+  height = 0;
 
   // State
   highlightedNodes: Set<any> = new Set();
   displayedLabels: Set<string> = new Set();
-  hoveredNode = null;
-  wasRenderedInThisFrame: boolean = false;
+  hoveredNode: null | string = null;
+  wasRenderedInThisFrame = false;
   renderFrame: any = null;
   renderHighlightedNodesFrame: any = null;
-  needToProcess: boolean = false;
-  needToSoftProcess: boolean = false;
+  needToProcess = false;
+  needToSoftProcess = false;
 
   // programs
   nodePrograms: any = {};
@@ -77,10 +72,10 @@ export default class WebGLRenderer extends Renderer {
 
   camera: Camera;
 
-  constructor(graph, container, settings = {}) {
+  constructor(graph: AbstractGraph, container: HTMLElement, settings: Partial<WebGLSettings> = {}) {
     super();
 
-    this.settings = assign({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
+    this.settings = assign<WebGLSettings>({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
 
     validateWebglRendererSettings(this.settings);
 
@@ -163,8 +158,8 @@ export default class WebGLRenderer extends Renderer {
    * @param  {boolean} webgl - Whether the context is a webgl or canvas one.
    * @return {WebGLRenderer}
    */
-  createContext(id, webgl = true) {
-    const element = createElement("canvas", {
+  createContext(id: string, webgl = true): WebGLRenderer {
+    const element: HTMLCanvasElement = createElement<HTMLCanvasElement>("canvas", {
       class: `sigma-${id}`,
       style: {
         position: "absolute",
@@ -204,15 +199,13 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  initializeCache() {
+  initializeCache(): void {
     const graph = this.graph;
 
     const nodes = graph.nodes();
-
     for (let i = 0, l = nodes.length; i < l; i++) this.nodeDataCache[nodes[i]] = new NodeDisplayData(i, this.settings);
 
     const edges = graph.edges();
-
     for (let i = 0, l = edges.length; i < l; i++) this.edgeDataCache[edges[i]] = new EdgeDisplayData(i, this.settings);
   }
 
@@ -221,7 +214,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  bindCameraHandlers() {
+  bindCameraHandlers(): WebGLRenderer {
     this.listeners.camera = () => {
       this.scheduleRender();
     };
@@ -236,7 +229,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  bindEventHandlers() {
+  bindEventHandlers(): WebGLRenderer {
     // Handling window resize
     this.listeners.handleResize = () => {
       this.needToSoftProcess = true;
@@ -246,7 +239,7 @@ export default class WebGLRenderer extends Renderer {
     window.addEventListener("resize", this.listeners.handleResize);
 
     // Function checking if the mouse is on the given node
-    const mouseIsOnNode = (mouseX, mouseY, nodeX, nodeY, size) => {
+    const mouseIsOnNode = (mouseX: number, mouseY: number, nodeX: number, nodeY: number, size: number): boolean => {
       return (
         mouseX > nodeX - size &&
         mouseX < nodeX + size &&
@@ -257,7 +250,7 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // Function returning the nodes in the mouse's quad
-    const getQuadNodes = (mouseX, mouseY) => {
+    const getQuadNodes = (mouseX: number, mouseY: number) => {
       const mouseGraphPosition = this.camera.viewportToGraph(this, mouseX, mouseY);
 
       // TODO: minus 1? lol
@@ -265,7 +258,7 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // Handling mouse move
-    this.listeners.handleMove = (e) => {
+    this.listeners.handleMove = (e: Coordinates): void => {
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
 
@@ -304,7 +297,8 @@ export default class WebGLRenderer extends Renderer {
 
         this.hoveredNode = nodeToHover;
         this.emit("enterNode", { node: nodeToHover });
-        return this.scheduleHighlightedNodesRender();
+        this.scheduleHighlightedNodesRender();
+        return;
       }
 
       // Checking if the hovered node is still hovered
@@ -326,7 +320,7 @@ export default class WebGLRenderer extends Renderer {
     };
 
     // Handling click
-    const createClickListener = (eventType) => {
+    const createClickListener = (eventType: string): ((e: any) => void) => {
       return (e) => {
         const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
@@ -366,7 +360,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  bindGraphHandlers() {
+  bindGraphHandlers(): WebGLRenderer {
     const graph = this.graph;
 
     this.listeners.graphUpdate = () => {
@@ -379,17 +373,15 @@ export default class WebGLRenderer extends Renderer {
       this.scheduleRender();
     };
 
-    this.listeners.addNodeGraphUpdate = (e) => {
+    this.listeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
       // Adding entry to cache
       this.nodeDataCache[e.key] = new NodeDisplayData(graph.order - 1, this.settings);
-
       this.listeners.graphUpdate();
     };
 
-    this.listeners.addEdgeGraphUpdate = (e) => {
+    this.listeners.addEdgeGraphUpdate = (e: { key: EdgeKey }): void => {
       // Adding entry to cache
       this.edgeDataCache[e.key] = new EdgeDisplayData(graph.size - 1, this.settings);
-
       this.listeners.graphUpdate();
     };
 
@@ -414,7 +406,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  process(keepArrays = false) {
+  process(keepArrays = false): WebGLRenderer {
     const graph = this.graph,
       settings = this.settings;
 
@@ -445,7 +437,7 @@ export default class WebGLRenderer extends Renderer {
     // TODO: remains to be seen if reducers are a good or bad thing and if we
     // should store display data in flat byte arrays indices
     if (this.settings.zIndex)
-      nodes = zIndexOrdering(this.edgeExtent.z, (node) => graph.getNodeAttribute(node, "z"), nodes);
+      nodes = zIndexOrdering(this.edgeExtent.z, (node: NodeEntry): any => graph.getNodeAttribute(node, "z"), nodes);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -477,12 +469,12 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling edge z-index
     if (this.settings.zIndex)
-      edges = zIndexOrdering(this.edgeExtent.z, (edge) => graph.getEdgeAttribute(edge, "z"), edges);
+      edges = zIndexOrdering(this.edgeExtent.z, (edge: EdgeEntry): any => graph.getEdgeAttribute(edge, "z"), edges);
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      let data = graph.getEdgeAttributes(edge);
+      let data: { [key: string]: any } = graph.getEdgeAttributes(edge);
 
       const displayData = this.edgeDataCache[edge];
 
@@ -512,7 +504,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  processNode(key) {
+  processNode(key: string): WebGLRenderer {
     const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
     const data = this.graph.getNodeAttributes(key);
@@ -527,7 +519,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  processEdge(key) {
+  processEdge(key: string): WebGLRenderer {
     const graph = this.graph;
 
     const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
@@ -552,7 +544,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {Camera}
    */
-  getCamera() {
+  getCamera(): Camera {
     return this.camera;
   }
 
@@ -561,7 +553,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {Camera}
    */
-  getMouseCaptor() {
+  getMouseCaptor(): MouseCaptor {
     return this.captors.mouse;
   }
 
@@ -576,7 +568,7 @@ export default class WebGLRenderer extends Renderer {
     const previousWidth = this.width,
       previousHeight = this.height;
 
-    if (arguments.length > 1) {
+    if (width && height) {
       this.width = width;
       this.height = height;
     } else {
@@ -779,6 +771,7 @@ export default class WebGLRenderer extends Renderer {
         {
           key: labelsToDisplay[i],
           label: data.label,
+          color: "#000",
           size,
           x,
           y,
@@ -861,7 +854,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  renderHighlightedNodes() {
+  renderHighlightedNodes(): void {
     const camera = this.camera;
 
     const sizeRatio = Math.pow(camera.getState().ratio, 0.5);
@@ -872,7 +865,7 @@ export default class WebGLRenderer extends Renderer {
     context.clearRect(0, 0, this.width, this.height);
 
     // Rendering
-    const render = (node) => {
+    const render = (node: string): void => {
       const data = this.nodeDataCache[node];
 
       const { x, y } = camera.graphToViewport(this, data.x, data.y);
@@ -893,7 +886,9 @@ export default class WebGLRenderer extends Renderer {
       );
     };
 
-    if (this.hoveredNode) render(this.hoveredNode);
+    if (this.hoveredNode !== null) {
+      render(this.hoveredNode);
+    }
 
     this.highlightedNodes.forEach(render);
   }
@@ -903,9 +898,9 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  scheduleRender() {
+  scheduleRender(): void {
     // A frame is already scheduled
-    if (this.renderFrame) return this;
+    if (this.renderFrame) return;
 
     // Let's schedule a frame
     this.renderFrame = requestAnimationFrame(() => {
@@ -929,10 +924,9 @@ export default class WebGLRenderer extends Renderer {
   /**
    * Method used to schedule a hover render.
    *
-   * @return {WebGLRenderer}
    */
-  scheduleHighlightedNodesRender() {
-    if (this.renderHighlightedNodesFrame || this.renderFrame) return this;
+  scheduleHighlightedNodesRender(): void {
+    if (this.renderHighlightedNodesFrame || this.renderFrame) return;
 
     this.renderHighlightedNodesFrame = requestAnimationFrame(() => {
       // Resetting state
@@ -949,7 +943,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  refresh() {
+  refresh(): WebGLRenderer {
     this.needToSoftProcess = true;
     this.scheduleRender();
 
@@ -962,7 +956,7 @@ export default class WebGLRenderer extends Renderer {
    * @param  {string} key - The node's key.
    * @return {WebGLRenderer}
    */
-  highlightNode(key) {
+  highlightNode(key: string): WebGLRenderer {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.add(key);
@@ -979,7 +973,7 @@ export default class WebGLRenderer extends Renderer {
    * @param  {string} key - The node's key.
    * @return {WebGLRenderer}
    */
-  unhighlightNode(key) {
+  unhighlightNode(key: string): WebGLRenderer {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.delete(key);
@@ -995,7 +989,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {undefined}
    */
-  kill() {
+  kill(): void {
     const graph = this.graph;
 
     // Emitting "kill" events so that plugins and such can cleanup
@@ -1021,12 +1015,12 @@ export default class WebGLRenderer extends Renderer {
     graph.removeListener("cleared", this.listeners.graphUpdate);
 
     // Releasing cache & state
-    this.quadtree = null;
-    this.nodeDataCache = null;
-    this.edgeDataCache = null;
+    this.quadtree = new QuadTree();
+    this.nodeDataCache = {};
+    this.edgeDataCache = {};
 
-    this.highlightedNodes = null;
-    this.displayedLabels = null;
+    this.highlightedNodes = new Set();
+    this.displayedLabels = new Set();
 
     // Clearing frames
     if (this.renderFrame) {

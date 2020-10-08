@@ -5,6 +5,8 @@
  * Helpers used by most renderers.
  */
 
+import { Coordinates } from "../captors/utils";
+
 /**
  * Function used to create DOM elements easily.
  *
@@ -12,14 +14,17 @@
  * @param  {object} attributes - Attributes map.
  * @return {HTMLElement}
  */
-export function createElement(tag, attributes) {
-  const element = document.createElement(tag);
+export function createElement<T extends HTMLElement>(tag: string, attributes: { [key: string]: any }): T {
+  const element: T = document.createElement(tag) as T;
 
   if (!attributes) return element;
 
   for (const k in attributes) {
     if (k === "style") {
-      for (const s in attributes[k]) element.style[s] = attributes[k][s];
+      const styleAttributes: { [key: string]: any } = attributes[k];
+      Object.keys(styleAttributes).forEach((attrKey: string) => {
+        element.style[attrKey] = styleAttributes[k];
+      });
     } else {
       element.setAttribute(k, attributes[k]);
     }
@@ -33,7 +38,7 @@ export function createElement(tag, attributes) {
  *
  * @return {number}
  */
-export function getPixelRatio() {
+export function getPixelRatio(): number {
   if (typeof window.devicePixelRatio !== "undefined") return window.devicePixelRatio;
 
   return 1;
@@ -45,7 +50,7 @@ export function getPixelRatio() {
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-export function createNormalizationFunction(extent) {
+export function createNormalizationFunction(extent: { x: [number, number]; y: [number, number] }): any {
   const {
     x: [minX, maxX],
     y: [minY, maxY],
@@ -58,7 +63,7 @@ export function createNormalizationFunction(extent) {
   const dX = (maxX + minX) / 2,
     dY = (maxY + minY) / 2;
 
-  const fn = (data) => {
+  const fn = (data: Coordinates): Coordinates => {
     return {
       x: 0.5 + (data.x - dX) / ratio,
       y: 0.5 + (data.y - dY) / ratio,
@@ -66,12 +71,12 @@ export function createNormalizationFunction(extent) {
   };
 
   // TODO: possibility to apply this in batch over array of indices
-  fn.applyTo = (data) => {
+  fn.applyTo = (data: Coordinates): void => {
     data.x = 0.5 + (data.x - dX) / ratio;
     data.y = 0.5 + (data.y - dY) / ratio;
   };
 
-  fn.inverse = (data) => {
+  fn.inverse = (data: Coordinates): Coordinates => {
     return {
       x: dX + ratio * (data.x - 0.5),
       y: dY + ratio * (data.y - 0.5),
