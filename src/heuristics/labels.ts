@@ -4,10 +4,10 @@
  *
  * Miscelleneous heuristics related to label display.
  */
-import { AbstractGraph, NodeKey } from "graphology-types";
+import { AbstractGraph } from "graphology-types";
 import Camera from "../camera";
 import { SigmaNode } from "../renderers/webgl/settings";
-import Renderer from "../../renderer";
+import WebGLRenderer from "../renderers/webgl";
 /**
  * Constants.
  */
@@ -57,15 +57,15 @@ function collision(
  * @return {Array}                         - The selected labels.
  */
 export function labelsToDisplayFromGrid(params: {
-  cache: { [key: NodeKey]: SigmaNode };
+  cache: { [key: string]: SigmaNode };
   camera: Camera;
   cell: any;
-  dimensions: Renderer;
+  dimensions: WebGLRenderer;
   displayedLabels: Set<string>;
   fontSize: number;
   graph: AbstractGraph;
   renderedSizeThreshold: number;
-  visibleNodes: Array<NodeKey>;
+  visibleNodes: Array<string>;
 }): Array<any> {
   const {
     cache,
@@ -134,11 +134,11 @@ export function labelsToDisplayFromGrid(params: {
 
   // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
 
-  const worthyLabels = [];
-  const grid = {};
+  const worthyLabels: Array<string> = [];
+  const grid: any = {};
 
   let maxSize = -Infinity,
-    biggestNode = null;
+    biggestNode: string | null = null;
 
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
@@ -227,7 +227,7 @@ export function labelsToDisplayFromGrid(params: {
   }
 
   // Compiling the labels
-  let biggestNodeShown: SigmaNode = worthyLabels.some((node) => node === biggestNode);
+  let biggestNodeShown: boolean = worthyLabels.some((node) => node === biggestNode);
 
   for (const key in grid) {
     const node = grid[key];
@@ -295,8 +295,8 @@ export function labelsToDisplayFromGrid(params: {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params: {
-  displayedNodeLabels: Set<NodeKey>;
-  highlightedNodes: Set<NodeKey>;
+  displayedNodeLabels: Set<string>;
+  highlightedNodes: Set<string>;
   graph: AbstractGraph;
   hoveredNode: string | null;
 }): Array<any> {

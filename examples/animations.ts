@@ -44,7 +44,7 @@ miserables.nodes.forEach((node, i) => {
 
 const circle = circularLayout(graph);
 
-let state: boolean = false;
+let state = false;
 
 function loop() {
   const l = state ? initial : circle;

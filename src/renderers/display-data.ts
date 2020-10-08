@@ -33,7 +33,7 @@ export class NodeDisplayData {
   }
 
   assign(data: Partial<NodeDisplayData>) {
-    for (const key in data) this[key] = data[key];
+    Object.assign(this, data);
   }
 }
 
@@ -53,6 +53,6 @@ export class EdgeDisplayData {
   }
 
   assign(data: Partial<EdgeDisplayData>) {
-    for (const key in data) this[key] = data[key];
+    Object.assign(this, data);
   }
 }

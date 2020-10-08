@@ -17,18 +17,19 @@ import { Coordinates } from "../captors/utils";
 export function createElement<T extends HTMLElement>(tag: string, attributes: { [key: string]: any }): T {
   const element: T = document.createElement(tag) as T;
 
-  if (!attributes) return element;
-
-  for (const k in attributes) {
-    if (k === "style") {
-      const styleAttributes: { [key: string]: any } = attributes[k];
-      Object.keys(styleAttributes).forEach((attrKey: string) => {
-        element.style[attrKey] = styleAttributes[k];
-      });
+  Object.keys(attributes).forEach((attrName: string) => {
+    if (attrName === "style") {
+      const styleAttributes: { [key: string]: string } = attributes[attrName];
+      element.setAttribute(
+        "style",
+        Object.keys(styleAttributes)
+          .map((attrKey: string) => `${attrKey}: ${styleAttributes[attrKey]}`)
+          .join(";"),
+      );
     } else {
-      element.setAttribute(k, attributes[k]);
+      element.setAttribute(attrName, attributes[attrName]);
     }
-  }
+  });
 
   return element;
 }

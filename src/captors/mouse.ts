@@ -31,8 +31,8 @@ export default class MouseCaptor extends Captor {
   enabled = true;
   hasDragged = false;
   downStartTime: number | null = null;
-  lastMouseX: number | null = null;
-  lastMouseY: number | null = null;
+  lastMouseX = 0;
+  lastMouseY = 0;
   isMouseDown = false;
   isMoving = false;
   movingTimeout: number | null = null;
@@ -59,8 +59,8 @@ export default class MouseCaptor extends Captor {
     container.addEventListener("contextmenu", this.handleRightClick, false);
     container.addEventListener("mousedown", this.handleDown, false);
     container.addEventListener("mousemove", this.handleMove, false);
-    container.addEventListener("DOMMouseScroll", this.handleWheel, false);
-    container.addEventListener("mousewheel", this.handleWheel, false);
+    // container.addEventListener("DOMMouseScroll", this.handleWheel, false);
+    container.addEventListener("wheel", this.handleWheel, false);
     container.addEventListener("mouseout", this.handleOut, false);
 
     document.addEventListener("mouseup", this.handleUp, false);
@@ -73,8 +73,8 @@ export default class MouseCaptor extends Captor {
     container.removeEventListener("contextmenu", this.handleRightClick);
     container.removeEventListener("mousedown", this.handleDown);
     container.removeEventListener("mousemove", this.handleMove);
-    container.removeEventListener("DOMMouseScroll", this.handleWheel);
-    container.removeEventListener("mousewheel", this.handleWheel);
+    // container.removeEventListener("DOMMouseScroll", this.handleWheel);
+    container.removeEventListener("wheel", this.handleWheel);
     container.removeEventListener("mouseout", this.handleOut);
 
     document.removeEventListener("mouseup", this.handleUp);
@@ -87,10 +87,10 @@ export default class MouseCaptor extends Captor {
 
     if (this.clicks === 2) {
       this.clicks = 0;
-
-      clearTimeout(this.doubleClickTimeout);
-      this.doubleClickTimeout = null;
-
+      if (this.doubleClickTimeout !== null) {
+        clearTimeout(this.doubleClickTimeout);
+        this.doubleClickTimeout = null;
+      }
       return this.handleDoubleClick(e);
     }
 
@@ -190,7 +190,7 @@ export default class MouseCaptor extends Captor {
 
     this.isMouseDown = false;
 
-    if (this.movingTimeout) {
+    if (this.movingTimeout !== null) {
       clearTimeout(this.movingTimeout);
       this.movingTimeout = null;
     }
@@ -234,7 +234,9 @@ export default class MouseCaptor extends Captor {
       this.isMoving = true;
       this.hasDragged = true;
 
-      if (this.movingTimeout) clearTimeout(this.movingTimeout);
+      if (this.movingTimeout !== null) {
+        clearTimeout(this.movingTimeout);
+      }
 
       this.movingTimeout = window.setTimeout(() => {
         this.movingTimeout = null;

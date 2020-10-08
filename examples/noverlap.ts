@@ -71,7 +71,7 @@ const fixedButton = createButton("noverlap 500", 0);
 
 fixedButton.onclick = () => {
   console.time("noverlap");
-  var layout = noverlap(graph, { inputReducer, outputReducer, maxIterations: 500, settings: NOVERLAP_SETTINGS });
+  const layout = noverlap(graph, { inputReducer, outputReducer, maxIterations: 500, settings: NOVERLAP_SETTINGS });
   console.timeEnd("noverlap");
 
   animateNodes(graph, layout, { duration: 100, easing: "linear" }, () => console.log("done"));

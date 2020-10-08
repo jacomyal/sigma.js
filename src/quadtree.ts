@@ -407,7 +407,7 @@ export default class QuadTree {
   }
 
   point(x: number, y: number): Array<any> {
-    const nodes = [];
+    const nodes: Array<any> = [];
 
     let block = 0,
       level = 0;

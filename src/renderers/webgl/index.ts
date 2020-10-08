@@ -72,7 +72,7 @@ export default class WebGLRenderer extends Renderer {
 
   camera: Camera;
 
-  constructor(graph: AbstractGraph, container: HTMLElement, settings: Partial<WebGLSettings> = {}) {
+  constructor(graph: AbstractGraph, container: HTMLElement | null, settings: Partial<WebGLSettings> = {}) {
     super();
 
     this.settings = assign<WebGLSettings>({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);

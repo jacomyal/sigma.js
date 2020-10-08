@@ -37,13 +37,14 @@ export function animateNodes(
 
   const start = Date.now();
 
-  const startPositions: { [key: string]: Partial<SigmaNode> } = {};
+  const startPositions: { [key: string]: any } = {};
 
   Object.keys(targets).forEach((nodeKey: string) => {
-    const node: Partial<SigmaNode> = targets[nodeKey];
+    const attrs: Partial<SigmaNode> = targets[nodeKey];
     startPositions[nodeKey] = {};
-    Object.keys(node).forEach((attrName: string) => {
-      startPositions[nodeKey][attrName] = graph.getNodeAttribute(nodeKey, attrName);
+    Object.keys(attrs).forEach((attrName: string) => {
+      const attrValue: any = graph.getNodeAttribute(nodeKey, attrName);
+      startPositions[nodeKey][attrName] = attrValue;
     });
   });
 
@@ -54,11 +55,13 @@ export function animateNodes(
 
     if (p >= 1) {
       // Animation is done
-      for (const node in targets) {
-        const attrs = targets[node];
-
-        for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k]);
-      }
+      Object.keys(targets).forEach((nodeKey: string) => {
+        const attrs: { [key: string]: any } = targets[nodeKey];
+        Object.keys(attrs).forEach((attrName: string) => {
+          const attrValue: any = attrs[attrName];
+          graph.setNodeAttribute(nodeKey, attrName, attrValue);
+        });
+      });
 
       if (typeof callback === "function") callback();
 
@@ -67,12 +70,15 @@ export function animateNodes(
 
     p = easing(p);
 
-    for (const node in targets) {
-      const attrs = targets[node];
-      const s = startPositions[node];
+    Object.keys(targets).forEach((nodeKey: string) => {
+      const attrs: { [key: string]: any } = targets[nodeKey];
+      const s: any = startPositions[nodeKey];
 
-      for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
-    }
+      Object.keys(attrs).forEach((attrName: string) => {
+        const attrValue: any = attrs[attrName];
+        graph.setNodeAttribute(nodeKey, attrName, attrValue * p + s[attrName] * (1 - p));
+      });
+    });
 
     frame = requestAnimationFrame(step);
   };
