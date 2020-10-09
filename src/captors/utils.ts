@@ -4,12 +4,8 @@
  *
  * Miscellenous helper functions related to the captors.
  */
+import { Coordinates } from "../types";
 import { getPixelRatio } from "../renderers/utils";
-
-export interface Coordinates {
-  x: number;
-  y: number;
-}
 
 export interface MouseCoords extends Coordinates {
   clientX: number;

@@ -71,7 +71,7 @@ export function floatColor(val: string): number {
  */
 
 // TODO: it's possible to optimize this drastically!
-export function matrixFromCamera(state: CameraState, dimensions: { width: number; height: number }) {
+export function matrixFromCamera(state: CameraState, dimensions: { width: number; height: number }): Float32Array {
   const { angle, ratio, x, y } = state;
 
   const { width, height } = dimensions;

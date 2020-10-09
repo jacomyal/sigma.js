@@ -4,7 +4,7 @@
  *
  * Program rendering directed edges as a single anti-aliased triangle.
  */
-import { ProcessData } from "./common/program";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
@@ -41,7 +41,7 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
     this.bind();
   }
 
-  bind() {
+  bind(): void {
     const gl = this.gl;
 
     // Bindings
@@ -65,7 +65,7 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
     );
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;

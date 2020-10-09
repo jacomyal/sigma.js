@@ -1,7 +1,8 @@
-import { AbstractProgram, IProgram, RenderParams, ProcessData } from "./program";
+import { AbstractProgram, IProgram, RenderParams } from "./program";
+import { NodeAttributes } from "../../../../types";
 
 export interface INodeProgram extends IProgram {
-  process(data: ProcessData, offset: number): void;
+  process(data: NodeAttributes, offset: number): void;
 }
 
 /**
@@ -48,7 +49,7 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
     this.scaleLocation = scaleLocation;
   }
 
-  bind() {
+  bind(): void {
     const gl = this.gl;
 
     gl.enableVertexAttribArray(this.positionLocation);
@@ -73,7 +74,7 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
     );
   }
 
-  abstract process(data: ProcessData, offset: number): void;
+  abstract process(data: NodeAttributes, offset: number): void;
 }
 
 export interface NodeProgramConstructor {
@@ -112,7 +113,7 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
       this.programs.forEach((program) => program.render(params));
     }
 
-    process(data: ProcessData, offset: number): void {
+    process(data: NodeAttributes, offset: number): void {
       this.programs.forEach((program) => program.process(data, offset));
     }
   };

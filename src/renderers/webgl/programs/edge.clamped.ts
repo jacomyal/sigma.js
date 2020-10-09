@@ -7,7 +7,7 @@
  *
  * This is useful when combined with arrows to draw directed edges.
  */
-import { ProcessData } from "./common/program";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor, canUse32BitsIndices } from "../utils";
 import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
@@ -98,7 +98,7 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
       return;

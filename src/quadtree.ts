@@ -8,7 +8,7 @@
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
  */
-import extend from "@yomguithereal/helpers/extend";
+import { extend } from "@yomguithereal/helpers/extend";
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
@@ -380,7 +380,7 @@ export default class QuadTree {
     if (typeof params.filter === "function") this.nodeFilter = params.filter;
   }
 
-  add(key: any, x: number, y: number, size: number): QuadTree {
+  add(key: string, x: number, y: number, size: number): QuadTree {
     insertNode(MAX_LEVEL, this.data, this.containers, key, x, y, size);
 
     return this;
@@ -411,7 +411,7 @@ export default class QuadTree {
       level = 0;
 
     do {
-      if (this.containers[block]) nodes.push.apply(nodes, this.containers[block]);
+      if (this.containers[block]) nodes.push(...this.containers[block]);
 
       const quad = pointIsInQuad(
         x,

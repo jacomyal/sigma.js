@@ -6,19 +6,22 @@
  */
 import graphExtent from "graphology-metrics/extent";
 import isGraph from "graphology-utils/is-graph";
-import { AbstractGraph, NodeEntry, NodeKey, EdgeEntry, EdgeKey } from "graphology-types";
+import { NodeKey, EdgeKey } from "graphology-types";
+import Graph from "graphology";
 import Renderer from "../../renderer";
 import Camera from "../../camera";
-import { Coordinates } from "../../captors/utils";
 import MouseCaptor from "../../captors/mouse";
+import Captor from "../../captor";
 import QuadTree from "../../quadtree";
-import { NodeDisplayData, EdgeDisplayData } from "../display-data";
+import { Coordinates, Edge, EdgeAttributes, Node, NodeAttributes } from "../../types";
 import { createElement, getPixelRatio, createNormalizationFunction } from "../utils";
 import { matrixFromCamera } from "./utils";
 import { assign } from "../../utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "../../heuristics/labels";
 import { zIndexOrdering } from "../../heuristics/z-index";
 import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
+import { INodeProgram } from "./programs/common/node";
+import { IEdgeProgram } from "./programs/common/edge";
 
 const { nodeExtent, edgeExtent } = graphExtent;
 
@@ -38,15 +41,15 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  */
 export default class WebGLRenderer extends Renderer {
   settings: WebGLSettings;
-  graph: any;
-  captors: any = {};
-  container: any;
+  graph: Graph;
+  captors: { [key: string]: Captor } = {};
+  container: HTMLElement;
   elements: any = {};
   contexts: any = {};
   listeners: any = {};
   quadtree: QuadTree = new QuadTree();
-  nodeDataCache: any = {};
-  edgeDataCache: any = {};
+  nodeDataCache: Record<NodeKey, Node> = {};
+  edgeDataCache: Record<EdgeKey, Edge> = {};
   nodeExtent: any = null;
   edgeExtent: any = null;
 
@@ -67,12 +70,12 @@ export default class WebGLRenderer extends Renderer {
   needToSoftProcess = false;
 
   // programs
-  nodePrograms: any = {};
-  edgePrograms: any = {};
+  nodePrograms: { [key: string]: INodeProgram } = {};
+  edgePrograms: { [key: string]: IEdgeProgram } = {};
 
   camera: Camera;
 
-  constructor(graph: AbstractGraph, container: HTMLElement | null, settings: Partial<WebGLSettings> = {}) {
+  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<WebGLSettings> = {}) {
     super();
 
     this.settings = assign<WebGLSettings>({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
@@ -203,10 +206,10 @@ export default class WebGLRenderer extends Renderer {
     const graph = this.graph;
 
     const nodes = graph.nodes();
-    for (let i = 0, l = nodes.length; i < l; i++) this.nodeDataCache[nodes[i]] = new NodeDisplayData(i, this.settings);
+    for (let i = 0, l = nodes.length; i < l; i++) this.nodeDataCache[nodes[i]] = new Node(i, this.settings);
 
     const edges = graph.edges();
-    for (let i = 0, l = edges.length; i < l; i++) this.edgeDataCache[edges[i]] = new EdgeDisplayData(i, this.settings);
+    for (let i = 0, l = edges.length; i < l; i++) this.edgeDataCache[edges[i]] = new Edge(i, this.settings);
   }
 
   /**
@@ -375,13 +378,13 @@ export default class WebGLRenderer extends Renderer {
 
     this.listeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
       // Adding entry to cache
-      this.nodeDataCache[e.key] = new NodeDisplayData(graph.order - 1, this.settings);
+      this.nodeDataCache[e.key] = new Node(graph.order - 1, this.settings);
       this.listeners.graphUpdate();
     };
 
     this.listeners.addEdgeGraphUpdate = (e: { key: EdgeKey }): void => {
       // Adding entry to cache
-      this.edgeDataCache[e.key] = new EdgeDisplayData(graph.size - 1, this.settings);
+      this.edgeDataCache[e.key] = new Edge(graph.size - 1, this.settings);
       this.listeners.graphUpdate();
     };
 
@@ -418,10 +421,14 @@ export default class WebGLRenderer extends Renderer {
 
     if (this.settings.zIndex) {
       nodeExtentProperties.push("z");
-      this.edgeExtent = edgeExtent(graph, ["z"]);
+      // `as any` is a workaround due to g-metrics that is not plugged on the same
+      // g-types version
+      this.edgeExtent = edgeExtent(graph as any, ["z"]);
     }
 
-    this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
+    // `as any` is a workaround due to g-metrics that is not plugged on the same
+    // g-types version
+    this.nodeExtent = nodeExtent(graph as any, nodeExtentProperties);
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
@@ -437,7 +444,7 @@ export default class WebGLRenderer extends Renderer {
     // TODO: remains to be seen if reducers are a good or bad thing and if we
     // should store display data in flat byte arrays indices
     if (this.settings.zIndex)
-      nodes = zIndexOrdering(this.edgeExtent.z, (node: NodeEntry): any => graph.getNodeAttribute(node, "z"), nodes);
+      nodes = zIndexOrdering(this.edgeExtent.z, (node: NodeKey): any => graph.getNodeAttribute(node, "z"), nodes);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -469,12 +476,12 @@ export default class WebGLRenderer extends Renderer {
 
     // Handling edge z-index
     if (this.settings.zIndex)
-      edges = zIndexOrdering(this.edgeExtent.z, (edge: EdgeEntry): any => graph.getEdgeAttribute(edge, "z"), edges);
+      edges = zIndexOrdering(this.edgeExtent.z, (edge: EdgeKey): any => graph.getEdgeAttribute(edge, "z"), edges);
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      let data: { [key: string]: any } = graph.getEdgeAttributes(edge);
+      let data = graph.getEdgeAttributes(edge);
 
       const displayData = this.edgeDataCache[edge];
 
@@ -507,7 +514,7 @@ export default class WebGLRenderer extends Renderer {
   processNode(key: string): WebGLRenderer {
     const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
-    const data = this.graph.getNodeAttributes(key);
+    const data = this.graph.getNodeAttributes(key) as NodeAttributes;
 
     nodeProgram.process(data, this.nodeDataCache[key].index);
 
@@ -524,10 +531,10 @@ export default class WebGLRenderer extends Renderer {
 
     const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
 
-    const data = graph.getEdgeAttributes(key),
+    const data = graph.getEdgeAttributes(key) as EdgeAttributes,
       extremities = graph.extremities(key),
-      sourceData = graph.getNodeAttributes(extremities[0]),
-      targetData = graph.getNodeAttributes(extremities[1]);
+      sourceData = graph.getNodeAttributes(extremities[0]) as NodeAttributes,
+      targetData = graph.getNodeAttributes(extremities[1]) as NodeAttributes;
 
     edgeProgram.process(sourceData, targetData, data, this.edgeDataCache[key].index);
 
@@ -554,7 +561,7 @@ export default class WebGLRenderer extends Renderer {
    * @return {Camera}
    */
   getMouseCaptor(): MouseCaptor {
-    return this.captors.mouse;
+    return this.captors.mouse as MouseCaptor;
   }
 
   /**
@@ -622,7 +629,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  clear() {
+  clear(): WebGLRenderer {
     this.contexts.nodes.clear(this.contexts.nodes.COLOR_BUFFER_BIT);
     this.contexts.edges.clear(this.contexts.edges.COLOR_BUFFER_BIT);
     this.contexts.labels.clearRect(0, 0, this.width, this.height);
@@ -637,7 +644,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  render() {
+  render(): WebGLRenderer {
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelAnimationFrame(this.renderFrame);
@@ -656,11 +663,8 @@ export default class WebGLRenderer extends Renderer {
     if (!this.graph.order) return this;
 
     // TODO: improve this heuristic or move to the captor itself?
-    const moving =
-      this.camera.isAnimated() ||
-      this.captors.mouse.isMoving ||
-      this.captors.mouse.hasDragged ||
-      this.captors.mouse.wheelLock;
+    const mouseCaptor = this.captors.mouse as MouseCaptor;
+    const moving = this.camera.isAnimated() || mouseCaptor.isMoving || mouseCaptor.hasDragged || mouseCaptor.wheelLock;
 
     // Then we need to extract a matrix from the camera
     const cameraState = this.camera.getState(),
@@ -713,7 +717,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  renderLabels() {
+  renderLabels(): WebGLRenderer {
     if (!this.settings.renderLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -792,7 +796,7 @@ export default class WebGLRenderer extends Renderer {
    *
    * @return {WebGLRenderer}
    */
-  renderEdgeLabels() {
+  renderEdgeLabels(): WebGLRenderer {
     if (!this.settings.renderEdgeLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -865,7 +869,7 @@ export default class WebGLRenderer extends Renderer {
     context.clearRect(0, 0, this.width, this.height);
 
     // Rendering
-    const render = (node: string): void => {
+    const render = (node: NodeKey): void => {
       const data = this.nodeDataCache[node];
 
       const { x, y } = camera.graphToViewport(this, data.x, data.y);

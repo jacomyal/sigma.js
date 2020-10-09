@@ -1,9 +1,9 @@
-import { NodeEntry, EdgeEntry } from "graphology-types";
+import { NodeKey, EdgeKey } from "graphology-types";
 
 import drawLabel from "../canvas/components/label";
 import drawHover from "../canvas/components/hover";
 import drawEdgeLabel from "../canvas/components/edge-label";
-import { Coordinates } from "../../captors/utils";
+import { EdgeAttributes, NodeAttributes } from "../../types";
 import CircleNodeProgram from "./programs/node.fast";
 import LineEdgeProgram from "./programs/edge";
 import ArrowEdgeProgram from "./programs/edge.arrow";
@@ -17,7 +17,7 @@ import { NodeProgramConstructor } from "./programs/common/node";
  * The list of settings for the WebGL renderer and some handy functions.
  */
 
-export function validateWebglRendererSettings(settings: WebGLSettings) {
+export function validateWebglRendererSettings(settings: WebGLSettings): void {
   // Label grid cell
   if (
     settings.labelGrid &&
@@ -35,20 +35,6 @@ export function validateWebglRendererSettings(settings: WebGLSettings) {
  *
  * The list of settings for the WebGL renderer and some handy functions.
  */
-
-export interface SigmaNode extends Coordinates {
-  key: string;
-  label: any;
-  color: any;
-  size: number;
-}
-
-export interface SigmaEdge {
-  key: string;
-  label: any;
-  color: any;
-  size: number;
-}
 
 export interface WebGLSettings {
   // Performance
@@ -73,8 +59,8 @@ export interface WebGLSettings {
     renderedSizeThreshold: number;
   };
   // Reducers
-  nodeReducer: null | ((edge: EdgeEntry, data: { [key: string]: any }) => { [key: string]: any });
-  edgeReducer: null | ((node: NodeEntry, data: { [key: string]: any }) => { [key: string]: any });
+  nodeReducer: null | ((edge: NodeKey, data: any) => NodeAttributes);
+  edgeReducer: null | ((node: EdgeKey, data: any) => EdgeAttributes);
   // Features
   zIndex: boolean;
   // Renderers

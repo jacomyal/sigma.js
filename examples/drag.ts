@@ -28,7 +28,7 @@ renderer.on("downNode", (e) => {
   camera.disable();
 });
 
-captor.on("mouseup", (e) => {
+captor.on("mouseup", () => {
   dragging = false;
   draggedNode = null;
   camera.enable();

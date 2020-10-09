@@ -2,7 +2,7 @@
  * Sigma.js WebGL Renderer Quadratic Bezier Edge Program
  * ======================================================
  */
-import { ProcessData } from "./common/program";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.quadraticBezier.vert.glsl";
@@ -52,7 +52,7 @@ export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
     // nothing to do
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     let i = 0;
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;

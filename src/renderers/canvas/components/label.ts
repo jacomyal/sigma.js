@@ -5,11 +5,12 @@
  * Function used by the canvas renderer to display a single node's label.
  */
 import { PartialButFor } from "../../../utils";
-import { WebGLSettings, SigmaNode } from "../../webgl/settings";
+import { WebGLSettings } from "../../webgl/settings";
+import { NodeAttributes } from "../../../types";
 
 export default function drawLabel(
   context: CanvasRenderingContext2D,
-  data: PartialButFor<SigmaNode, "x" | "y" | "size" | "label" | "color">,
+  data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
   settings: WebGLSettings,
 ): void {
   const size = settings.labelSize,

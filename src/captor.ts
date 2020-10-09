@@ -7,7 +7,7 @@
 import { EventEmitter } from "events";
 import Camera from "./camera";
 
-export default class Captor extends EventEmitter {
+export default abstract class Captor extends EventEmitter {
   container: HTMLElement;
   camera: Camera;
 
@@ -17,4 +17,6 @@ export default class Captor extends EventEmitter {
     this.container = container;
     this.camera = camera;
   }
+
+  abstract kill(): void;
 }

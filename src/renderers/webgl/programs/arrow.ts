@@ -4,8 +4,8 @@
  *
  * Program rendering direction arrows as a simple triangle.
  */
-import { ProcessData } from "./common/program";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/arrow.vert.glsl";
 import fragmentShaderSource from "../shaders/arrow.frag.glsl";
@@ -80,11 +80,11 @@ export default class ArrowProgram extends AbstractEdgeProgram {
     );
   }
 
-  computeIndices() {
+  computeIndices(): void {
     //nothing to do
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 

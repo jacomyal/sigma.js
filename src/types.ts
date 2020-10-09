@@ -10,11 +10,27 @@
  * in byte arrays but this would prove more tedious for the rendering logic
  * afterwards.
  */
-import { WebGLSettings } from "./webgl/settings";
 import { NodeKey, EdgeKey } from "graphology-types";
+import { WebGLSettings } from "./renderers/webgl/settings";
 
-export class NodeDisplayData {
-  index: NodeKey;
+export interface Coordinates {
+  x: number;
+  y: number;
+}
+
+export interface NodeAttributes extends Coordinates {
+  size: number;
+  color: string;
+  hidden: boolean;
+  label: string;
+}
+
+export interface NodeWithKey extends NodeAttributes {
+  key: NodeKey;
+}
+
+export class Node implements NodeAttributes {
+  index: number;
   x: number;
   y: number;
   size: number;
@@ -22,7 +38,7 @@ export class NodeDisplayData {
   hidden: boolean;
   label: string;
 
-  constructor(index: NodeKey, settings: WebGLSettings) {
+  constructor(index: number, settings: WebGLSettings) {
     this.index = index;
     this.x = 0;
     this.y = 0;
@@ -32,19 +48,30 @@ export class NodeDisplayData {
     this.label = "";
   }
 
-  assign(data: Partial<NodeDisplayData>) {
+  assign(data: Partial<Node>): void {
     Object.assign(this, data);
   }
 }
 
-export class EdgeDisplayData {
-  index: EdgeKey;
+export interface EdgeAttributes {
+  size: number;
+  color: string;
+  hidden: boolean;
+  label: string;
+}
+
+export interface EdgeWithKey extends EdgeAttributes {
+  key: EdgeKey;
+}
+
+export class Edge implements EdgeAttributes {
+  index: number;
   size: number;
   color: string;
   hidden: boolean;
   label: string;
 
-  constructor(index: EdgeKey, settings: WebGLSettings) {
+  constructor(index: number, settings: WebGLSettings) {
     this.index = index;
     this.size = 1;
     this.color = settings.defaultEdgeColor;
@@ -52,7 +79,7 @@ export class EdgeDisplayData {
     this.label = "";
   }
 
-  assign(data: Partial<EdgeDisplayData>) {
+  assign(data: Partial<Edge>): void {
     Object.assign(this, data);
   }
 }

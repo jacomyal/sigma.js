@@ -6,15 +6,16 @@
  * state.
  */
 import { PartialButFor } from "../../../utils";
-import { WebGLSettings, SigmaNode } from "../../webgl/settings";
+import { WebGLSettings } from "../../webgl/settings";
+import { NodeAttributes } from "../../../types";
 import drawNode from "./node";
 import drawLabel from "./label";
 
 export default function drawHover(
   context: CanvasRenderingContext2D,
-  data: PartialButFor<SigmaNode, "x" | "y" | "size" | "label" | "color">,
+  data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
   settings: WebGLSettings,
-) {
+): void {
   const size = settings.labelSize,
     font = settings.labelFont,
     weight = settings.labelWeight;

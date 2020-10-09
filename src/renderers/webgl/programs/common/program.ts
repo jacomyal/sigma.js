@@ -15,14 +15,6 @@ export interface RenderParams {
   scalingRatio: number;
 }
 
-export interface ProcessData {
-  x: number;
-  y: number;
-  size: number;
-  color: string;
-  hidden?: boolean;
-}
-
 export interface IProgram {
   bufferData(): void;
   allocate(capacity: number): void;

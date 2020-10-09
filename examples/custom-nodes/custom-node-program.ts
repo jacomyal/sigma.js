@@ -3,7 +3,9 @@
  * a custom fragment shader (./custom-node-fragment-shader.glsl) that will draw
  * a disc inside the nodes.
  */
+import { RenderParams } from "../../src/renderers/webgl/programs/common/program";
 import { AbstractNodeProgram } from "../../src/renderers/webgl/programs/common/node";
+import { NodeAttributes } from "../../src/types";
 import { floatColor } from "../../src/renderers/webgl/utils";
 import vertexShaderSource from "../../src/renderers/webgl/shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "./custom-node-fragment-shader.glsl";
@@ -12,12 +14,12 @@ const POINTS = 3,
   ATTRIBUTES = 5;
 
 export default class CustomNodeProgram extends AbstractNodeProgram {
-  constructor(gl) {
+  constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
     this.bind();
   }
 
-  process(data, offset) {
+  process(data: NodeAttributes, offset: number): void {
     const color = floatColor(data.color);
 
     let i = offset * POINTS * ATTRIBUTES;
@@ -39,7 +41,7 @@ export default class CustomNodeProgram extends AbstractNodeProgram {
     array[i] = color;
   }
 
-  render(params) {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;

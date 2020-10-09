@@ -5,7 +5,7 @@
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
  */
-import { ProcessData } from "./common/program";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
@@ -20,11 +20,11 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
     this.bind();
   }
 
-  computeIndices() {
+  computeIndices(): void {
     //nothing to do
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number): void {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     const array = this.array;
 
     let i = 0;

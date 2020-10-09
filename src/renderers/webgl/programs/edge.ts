@@ -14,8 +14,8 @@
  * This version of the shader balances geometry computation evenly between
  * the CPU & GPU (normals are computed on the CPU side).
  */
-import { ProcessData } from "./common/program";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor, canUse32BitsIndices } from "../utils";
 import vertexShaderSource from "../shaders/edge.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
@@ -119,7 +119,7 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
   }
 
-  process(sourceData: any, targetData: any, data: ProcessData, offset: number) {
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
     if (sourceData.hidden || targetData.hidden || data.hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
       return;

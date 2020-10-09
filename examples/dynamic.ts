@@ -50,7 +50,7 @@ function edit() {
 
     // Adding edges
     const targets = new Set(
-      Array.from(new Array(random(1, 5)), (_) => {
+      Array.from(new Array(random(1, 5)), () => {
         return choice(otherNodes);
       }),
     );

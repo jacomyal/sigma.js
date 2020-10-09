@@ -38,14 +38,14 @@ graph.nodes().forEach((node) => {
   graph.setNodeAttribute(node, "size", scale(graph.degree(node)));
 });
 
-const components = connectedComponents(graph);
+const components = connectedComponents(graph as any);
 
 components.forEach((component) => {
   if (component.length < 10) component.forEach((node) => graph.dropNode(node));
 });
 
-const map = louvain(graph);
-let communities: { [key: string]: any } = {};
+const map: { [key: string]: number } = louvain(graph as any);
+const communities: { [key: string]: UndirectedGraph } = {};
 
 for (const node in map) {
   const c = map[node];
@@ -65,7 +65,7 @@ for (const node in map) {
   });
 }
 
-communities = Object.values(communities)
+const biggerCommunities: Array<UndirectedGraph> = Object.values(communities)
   .sort((a, b) => b.order - a.order)
   .slice(0, 6);
 
@@ -73,7 +73,7 @@ const width = mainContainer.offsetWidth;
 
 const cellWidth = (width / 3) | 0;
 
-const containers = communities.map((_, i) => {
+const containers = biggerCommunities.map((_, i) => {
   const container = document.createElement("div");
   container.style.width = `${cellWidth}px`;
   container.style.left = `${(i % 3) * cellWidth}px`;
@@ -83,14 +83,14 @@ const containers = communities.map((_, i) => {
   return container;
 });
 
-communities.forEach((h, i) => {
-  randomLayout.assign(h);
-  forceAtlas2.assign(h, {
+biggerCommunities.forEach((h, i) => {
+  randomLayout.assign(h as any);
+  forceAtlas2.assign(h as any, {
     iterations: 100,
-    settings: forceAtlas2.inferSettings(h),
+    settings: forceAtlas2.inferSettings(h as any),
   });
 
   const container = containers[i];
 
-  const renderer = new WebGLRenderer(h, container);
+  new WebGLRenderer(h, container);
 });

@@ -4,11 +4,10 @@
  *
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
-import { AbstractGraph, NodeEntry } from "graphology-types";
+import Graph from "graphology";
 import { assign } from "./utils";
-import { Coordinates } from "./captors/utils";
 import easings from "./easings";
-import { SigmaNode } from "./renderers/webgl/settings";
+import { NodeAttributes } from "./types";
 
 /**
  * Defaults.
@@ -26,11 +25,11 @@ export const ANIMATE_DEFAULTS = {
  * Function used to animate the nodes.
  */
 export function animateNodes(
-  graph: AbstractGraph,
-  targets: { [key: string]: Partial<SigmaNode> },
+  graph: Graph,
+  targets: { [key: string]: Partial<NodeAttributes> },
   opts: Partial<AnimateOptions>,
   callback: () => void,
-) {
+): () => void {
   const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
 
   const easing: (k: number) => number = typeof options.easing === "function" ? options.easing : easings[options.easing];
@@ -40,7 +39,7 @@ export function animateNodes(
   const startPositions: { [key: string]: any } = {};
 
   Object.keys(targets).forEach((nodeKey: string) => {
-    const attrs: Partial<SigmaNode> = targets[nodeKey];
+    const attrs: Partial<NodeAttributes> = targets[nodeKey];
     startPositions[nodeKey] = {};
     Object.keys(attrs).forEach((attrName: string) => {
       const attrValue: any = graph.getNodeAttribute(nodeKey, attrName);

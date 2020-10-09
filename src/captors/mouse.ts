@@ -66,7 +66,7 @@ export default class MouseCaptor extends Captor {
     document.addEventListener("mouseup", this.handleUp, false);
   }
 
-  kill() {
+  kill(): void {
     const container = this.container;
 
     container.removeEventListener("click", this.handleClick);
@@ -80,7 +80,7 @@ export default class MouseCaptor extends Captor {
     document.removeEventListener("mouseup", this.handleUp);
   }
 
-  handleClick(e: MouseEvent) {
+  handleClick(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
 
     this.clicks++;
@@ -103,13 +103,13 @@ export default class MouseCaptor extends Captor {
     if (!this.hasDragged) this.emit("click", getMouseCoords(e));
   }
 
-  handleRightClick(e: MouseEvent) {
+  handleRightClick(e: MouseEvent): void {
     if (!this.enabled) return;
 
     this.emit("rightClick", getMouseCoords(e));
   }
 
-  handleDoubleClick(e: MouseEvent) {
+  handleDoubleClick(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
 
     const center = getCenter(e);
@@ -163,7 +163,7 @@ export default class MouseCaptor extends Captor {
     return false;
   }
 
-  handleDown(e: MouseEvent) {
+  handleDown(e: MouseEvent): void {
     if (!this.enabled) return;
 
     this.startCameraState = this.camera.getState();
@@ -185,7 +185,7 @@ export default class MouseCaptor extends Captor {
     }
   }
 
-  handleUp(e: MouseEvent) {
+  handleUp(e: MouseEvent): void {
     if (!this.enabled || !this.isMouseDown) return;
 
     this.isMouseDown = false;
@@ -224,9 +224,8 @@ export default class MouseCaptor extends Captor {
     this.emit("mouseup", getMouseCoords(e));
   }
 
-  handleMove(e: MouseEvent) {
+  handleMove(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
-
     this.emit("mousemove", getMouseCoords(e));
 
     if (this.isMouseDown) {
@@ -277,7 +276,7 @@ export default class MouseCaptor extends Captor {
     return false;
   }
 
-  handleWheel(e: WheelEvent) {
+  handleWheel(e: WheelEvent): boolean {
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
 
@@ -342,7 +341,7 @@ export default class MouseCaptor extends Captor {
     return false;
   }
 
-  handleOut() {
+  handleOut(): void {
     // TODO: dispatch event
   }
 }

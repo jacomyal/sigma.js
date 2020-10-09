@@ -31,6 +31,7 @@ miserables.edges.forEach((edge) => {
 
 const container = document.getElementById("container");
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const renderer = new WebGLRenderer(graph, container);
 
 const initial = {};
@@ -42,7 +43,7 @@ miserables.nodes.forEach((node, i) => {
   };
 });
 
-const circle = circularLayout(graph);
+const circle = circularLayout(graph as any);
 
 let state = false;
 

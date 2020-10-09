@@ -6,8 +6,9 @@
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
  */
-import { RenderParams, ProcessData } from "./common/program";
+import { RenderParams } from "./common/program";
 import { AbstractNodeProgram } from "./common/node";
+import { NodeAttributes } from "../../../types";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
@@ -21,7 +22,7 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: ProcessData, offset: number) {
+  process(data: NodeAttributes, offset: number): void {
     const color = floatColor(data.color);
 
     let i = offset * POINTS * ATTRIBUTES;
@@ -43,7 +44,7 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     array[i] = color;
   }
 
-  render(params: RenderParams) {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;

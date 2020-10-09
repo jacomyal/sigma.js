@@ -7,7 +7,8 @@
  * three times the center of the node, with the color, the size and an angle
  * indicating which "corner" of the triangle to draw.
  */
-import { RenderParams, ProcessData } from "./common/program";
+import { RenderParams } from "./common/program";
+import { NodeAttributes } from "../../../types";
 import { AbstractNodeProgram } from "./common/node";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.vert.glsl";
@@ -50,7 +51,7 @@ export default class NodeProgram extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: ProcessData, offset: number): void {
+  process(data: NodeAttributes, offset: number): void {
     const array = this.array;
     const color = floatColor(data.color);
 

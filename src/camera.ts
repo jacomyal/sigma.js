@@ -9,7 +9,7 @@ import { EventEmitter } from "events";
 import { ANIMATE_DEFAULTS, AnimateOptions } from "./animate";
 import easings from "./easings";
 import { assign } from "./utils";
-import { Coordinates } from "./captors/utils";
+import { Coordinates } from "./types";
 
 /**
  * Defaults.
@@ -218,10 +218,9 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {object}   options    - Options:
    * @param  {number}     duration - Duration of the animation.
    * @param  {function} callback   - Callback
-   * @return {function}            - Return a function to cancel the animation.
    */
-  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>, callback?: () => void) {
-    if (!this.enabled) return this;
+  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>, callback?: () => void): void {
+    if (!this.enabled) return;
 
     const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
 
@@ -277,13 +276,13 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {number|object} factorOrOptions - Factor or options.
    * @return {function}
    */
-  animatedZoom(factorOrOptions: number | { [key: string]: any }) {
+  animatedZoom(factorOrOptions: number | { [key: string]: any }): void {
     if (!factorOrOptions) {
-      return this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
+      this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
     } else {
       if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio / factorOrOptions });
       else
-        return this.animate(
+        this.animate(
           {
             ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
           },
@@ -296,15 +295,14 @@ export default class Camera extends EventEmitter implements CameraState {
    * Method used to unzoom the camera.
    *
    * @param  {number|object} factorOrOptions - Factor or options.
-   * @return {function}
    */
-  animatedUnzoom(factorOrOptions: number | { [key: string]: any }) {
+  animatedUnzoom(factorOrOptions: number | { [key: string]: any }): void {
     if (!factorOrOptions) {
       return this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
     } else {
       if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio * factorOrOptions });
       else
-        return this.animate(
+        this.animate(
           {
             ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
           },
@@ -317,10 +315,9 @@ export default class Camera extends EventEmitter implements CameraState {
    * Method used to reset the camera.
    *
    * @param  {object} options - Options.
-   * @return {function}
    */
-  animatedReset(options: { [key: string]: any }) {
-    return this.animate(
+  animatedReset(options: { [key: string]: any }): void {
+    this.animate(
       {
         x: 0.5,
         y: 0.5,

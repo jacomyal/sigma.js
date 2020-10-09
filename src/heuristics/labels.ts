@@ -4,9 +4,9 @@
  *
  * Miscelleneous heuristics related to label display.
  */
-import { AbstractGraph } from "graphology-types";
+import Graph from "graphology";
 import Camera from "../camera";
-import { SigmaNode } from "../renderers/webgl/settings";
+import { NodeAttributes } from "../types";
 import WebGLRenderer from "../renderers/webgl";
 /**
  * Constants.
@@ -57,13 +57,13 @@ function collision(
  * @return {Array}                         - The selected labels.
  */
 export function labelsToDisplayFromGrid(params: {
-  cache: { [key: string]: SigmaNode };
+  cache: { [key: string]: NodeAttributes };
   camera: Camera;
   cell: any;
   dimensions: WebGLRenderer;
   displayedLabels: Set<string>;
   fontSize: number;
-  graph: AbstractGraph;
+  graph: Graph;
   renderedSizeThreshold: number;
   visibleNodes: Array<string>;
 }): Array<any> {
@@ -297,7 +297,7 @@ export function labelsToDisplayFromGrid(params: {
 export function edgeLabelsToDisplayFromNodes(params: {
   displayedNodeLabels: Set<string>;
   highlightedNodes: Set<string>;
-  graph: AbstractGraph;
+  graph: Graph;
   hoveredNode: string | null;
 }): Array<any> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;

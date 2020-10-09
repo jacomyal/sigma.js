@@ -5,7 +5,7 @@
  * Helpers used by most renderers.
  */
 
-import { Coordinates } from "../captors/utils";
+import { Coordinates } from "../types";
 
 /**
  * Function used to create DOM elements easily.

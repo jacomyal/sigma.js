@@ -9,13 +9,13 @@
  * Returns a type similar to T, but with the the K set of properties of the type
  * T optional.
  */
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>> & { [others: string]: any };
 
 /**
  * Returns a type similar to T, but with the the K set of properties of the type
  * T *required*, and the rest optional.
  */
-export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
+export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>> & { [others: string]: any };
 
 /**
  * Checks whether the given value is a plain object.
@@ -23,6 +23,7 @@ export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K
  * @param  {mixed}   value - Target value.
  * @return {boolean}
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 export function isPlainObject(value: any): boolean {
   return typeof value === "object" && value !== null && value.constructor === Object;
 }
@@ -34,7 +35,7 @@ export function isPlainObject(value: any): boolean {
  * @param  {object} [...objects] - Objects to merge.
  * @return {object}
  */
-export function assign<T>(target: any, ...objects: Array<any>): T {
+export function assign<T>(target: Partial<T> | undefined, ...objects: Array<Partial<T | undefined>>): T {
   target = target || {};
 
   for (let i = 0, l = objects.length; i < l; i++) {
