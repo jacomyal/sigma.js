@@ -110,48 +110,46 @@ function buildQuadrants(maxLevel: number, data: any): void {
   const stack: Array<number> = [0, 0];
 
   while (stack.length) {
-    const level = stack.pop(),
-      block = stack.pop();
+    const level = stack.pop() as number,
+      block = stack.pop() as number;
 
-    if (block && level) {
-      const topLeftBlock = 4 * block + BLOCKS,
-        topRightBlock = 4 * block + 2 * BLOCKS,
-        bottomLeftBlock = 4 * block + 3 * BLOCKS,
-        bottomRightBlock = 4 * block + 4 * BLOCKS;
+    const topLeftBlock = 4 * block + BLOCKS,
+      topRightBlock = 4 * block + 2 * BLOCKS,
+      bottomLeftBlock = 4 * block + 3 * BLOCKS,
+      bottomRightBlock = 4 * block + 4 * BLOCKS;
 
-      const x = data[block + X_OFFSET],
-        y = data[block + Y_OFFSET],
-        width = data[block + WIDTH_OFFSET],
-        height = data[block + HEIGHT_OFFSET],
-        hw = width / 2,
-        hh = height / 2;
+    const x = data[block + X_OFFSET],
+      y = data[block + Y_OFFSET],
+      width = data[block + WIDTH_OFFSET],
+      height = data[block + HEIGHT_OFFSET],
+      hw = width / 2,
+      hh = height / 2;
 
-      data[topLeftBlock + X_OFFSET] = x;
-      data[topLeftBlock + Y_OFFSET] = y;
-      data[topLeftBlock + WIDTH_OFFSET] = hw;
-      data[topLeftBlock + HEIGHT_OFFSET] = hh;
+    data[topLeftBlock + X_OFFSET] = x;
+    data[topLeftBlock + Y_OFFSET] = y;
+    data[topLeftBlock + WIDTH_OFFSET] = hw;
+    data[topLeftBlock + HEIGHT_OFFSET] = hh;
 
-      data[topRightBlock + X_OFFSET] = x + hw;
-      data[topRightBlock + Y_OFFSET] = y;
-      data[topRightBlock + WIDTH_OFFSET] = hw;
-      data[topRightBlock + HEIGHT_OFFSET] = hh;
+    data[topRightBlock + X_OFFSET] = x + hw;
+    data[topRightBlock + Y_OFFSET] = y;
+    data[topRightBlock + WIDTH_OFFSET] = hw;
+    data[topRightBlock + HEIGHT_OFFSET] = hh;
 
-      data[bottomLeftBlock + X_OFFSET] = x;
-      data[bottomLeftBlock + Y_OFFSET] = y + hh;
-      data[bottomLeftBlock + WIDTH_OFFSET] = hw;
-      data[bottomLeftBlock + HEIGHT_OFFSET] = hh;
+    data[bottomLeftBlock + X_OFFSET] = x;
+    data[bottomLeftBlock + Y_OFFSET] = y + hh;
+    data[bottomLeftBlock + WIDTH_OFFSET] = hw;
+    data[bottomLeftBlock + HEIGHT_OFFSET] = hh;
 
-      data[bottomRightBlock + X_OFFSET] = x + hw;
-      data[bottomRightBlock + Y_OFFSET] = y + hh;
-      data[bottomRightBlock + WIDTH_OFFSET] = hw;
-      data[bottomRightBlock + HEIGHT_OFFSET] = hh;
+    data[bottomRightBlock + X_OFFSET] = x + hw;
+    data[bottomRightBlock + Y_OFFSET] = y + hh;
+    data[bottomRightBlock + WIDTH_OFFSET] = hw;
+    data[bottomRightBlock + HEIGHT_OFFSET] = hh;
 
-      if (level < maxLevel - 1) {
-        stack.push(bottomRightBlock, level + 1);
-        stack.push(bottomLeftBlock, level + 1);
-        stack.push(topRightBlock, level + 1);
-        stack.push(topLeftBlock, level + 1);
-      }
+    if (level < maxLevel - 1) {
+      stack.push(bottomRightBlock, level + 1);
+      stack.push(bottomLeftBlock, level + 1);
+      stack.push(topRightBlock, level + 1);
+      stack.push(topLeftBlock, level + 1);
     }
   }
 }
