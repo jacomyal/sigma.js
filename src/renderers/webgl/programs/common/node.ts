@@ -1,6 +1,6 @@
 import { AbstractProgram, IProgram, RenderParams, ProcessData } from "./program";
 
-interface INodeProgram extends IProgram {
+export interface INodeProgram extends IProgram {
   process(data: ProcessData, offset: number): void;
 }
 
@@ -88,7 +88,7 @@ export interface NodeProgramConstructor {
  * @param  {array}    programClasses - Program classes to combine.
  * @return {function}
  */
-export function createNodeCompoundProgram(programClasses: Array<NodeProgramConstructor>) {
+export function createNodeCompoundProgram(programClasses: Array<NodeProgramConstructor>): NodeProgramConstructor {
   return class NodeCompoundProgram implements INodeProgram {
     programs: Array<INodeProgram>;
 

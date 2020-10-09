@@ -4,7 +4,7 @@ export interface RenderEdgeParams extends RenderParams {
   edgesPowRatio: number;
 }
 
-interface IEdgeProgram extends IProgram {
+export interface IEdgeProgram extends IProgram {
   computeIndices(): void;
   process(sourceData: any, targetData: any, data: ProcessData, offset: number): void;
   render(params: RenderEdgeParams): void;
@@ -73,7 +73,7 @@ export interface EdgeProgramConstructor {
   new (gl: WebGLRenderingContext): IEdgeProgram;
 }
 
-export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConstructor>) {
+export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConstructor>): EdgeProgramConstructor {
   return class EdgeCompoundProgram implements IEdgeProgram {
     programs: Array<IEdgeProgram>;
 
