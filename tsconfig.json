@@ -10,5 +10,8 @@
     "typeRoots": ["./node_modules/@types/", "./external-types/"],
     "lib": ["dom"]
   },
-  "include": ["./external-types/**/*", "./src/**/*"]
+  "include": ["./external-types/**/*", "./src/**/*"],
+  "ts-node": {
+    "files": true
+  }
 }
