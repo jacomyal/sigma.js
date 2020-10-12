@@ -1,13 +1,14 @@
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import forceAtlas2 from "graphology-layout-forceatlas2";
-import { connectedComponents } from "graphology-components";
 import louvain from "graphology-communities-louvain";
+import { connectedComponents } from "graphology-components";
+
 import WebGLRenderer from "../src/renderers/webgl/index";
 
 import data from "./resources/toflit.json";
 
-const scale = (d) => Math.max(2, Math.log2(d) * 1.7);
+const scale = (d: number) => Math.max(2, Math.log2(d) * 1.7);
 
 document.body.innerHTML += `
   <style>
@@ -25,7 +26,7 @@ document.body.innerHTML += `
   </style>
 `;
 
-const mainContainer = document.getElementById("container");
+const mainContainer = document.getElementById("container") as HTMLElement;
 
 const graph = new UndirectedGraph();
 
@@ -44,7 +45,7 @@ components.forEach((component) => {
   if (component.length < 10) component.forEach((node) => graph.dropNode(node));
 });
 
-const map: { [key: string]: number } = louvain(graph as any);
+const map: { [key: string]: number } = louvain(graph);
 const communities: { [key: string]: UndirectedGraph } = {};
 
 for (const node in map) {
@@ -84,10 +85,10 @@ const containers = biggerCommunities.map((_, i) => {
 });
 
 biggerCommunities.forEach((h, i) => {
-  randomLayout.assign(h as any);
-  forceAtlas2.assign(h as any, {
+  randomLayout.assign(h);
+  forceAtlas2.assign(h, {
     iterations: 100,
-    settings: forceAtlas2.inferSettings(h as any),
+    settings: forceAtlas2.inferSettings(h),
   });
 
   const container = containers[i];
