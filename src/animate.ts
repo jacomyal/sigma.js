@@ -7,7 +7,6 @@
 import Graph from "graphology";
 import { assign, PlainObject } from "./utils";
 import easings from "./easings";
-import { NodeAttributes } from "./types";
 
 /**
  * Defaults.
@@ -38,13 +37,12 @@ export function animateNodes(
 
   const startPositions: PlainObject<PlainObject<number>> = {};
 
-  Object.keys(targets).forEach((nodeKey: string) => {
-    const attrs: Partial<NodeAttributes> = targets[nodeKey];
-    startPositions[nodeKey] = {};
-    Object.keys(attrs).forEach((attrName: string) => {
-      startPositions[nodeKey][attrName] = graph.getNodeAttribute(nodeKey, attrName) as number;
-    });
-  });
+  for (const node in targets) {
+    const attrs = targets[node];
+    startPositions[node] = {};
+
+    for (const k in attrs) startPositions[node][k] = graph.getNodeAttribute(node, k);
+  }
 
   let frame: number | null = null;
 
@@ -53,13 +51,11 @@ export function animateNodes(
 
     if (p >= 1) {
       // Animation is done
-      Object.keys(targets).forEach((nodeKey: string) => {
-        const nodeAttrsTarget: PlainObject<number> = targets[nodeKey];
+      for (const node in targets) {
+        const attrs = targets[node];
 
-        Object.keys(nodeAttrsTarget).forEach((attrName: string) => {
-          graph.setNodeAttribute(nodeKey, attrName, nodeAttrsTarget[attrName]);
-        });
-      });
+        for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k]);
+      }
 
       if (typeof callback === "function") callback();
 
@@ -68,14 +64,12 @@ export function animateNodes(
 
     p = easing(p);
 
-    Object.keys(targets).forEach((nodeKey: string) => {
-      const attrs: PlainObject<number> = targets[nodeKey];
-      const s: PlainObject<number> = startPositions[nodeKey];
+    for (const node in targets) {
+      const attrs = targets[node];
+      const s = startPositions[node];
 
-      Object.keys(attrs).forEach((attrName: string) => {
-        graph.setNodeAttribute(nodeKey, attrName, attrs[attrName] * p + s[attrName] * (1 - p));
-      });
-    });
+      for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
+    }
 
     frame = requestAnimationFrame(step);
   };

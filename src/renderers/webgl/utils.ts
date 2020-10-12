@@ -4,7 +4,7 @@
  *
  * Miscelleanous helper functions used by sigma's WebGL renderer.
  */
-import { identity, scale, rotate, translate, multiply } from "./matrices";
+import { identity, multiply, rotate, scale, translate } from "./matrices";
 import { CameraState } from "../../camera";
 
 /**
@@ -44,7 +44,7 @@ export function floatColor(val: string): number {
   // Handling rgb notation
   else if (RGBA_TEST_REGEX.test(val)) {
     const match = val.match(RGBA_EXTRACT_REGEX);
-    if (match !== null) {
+    if (match) {
       r = +match[1];
       g = +match[2];
       b = +match[3];
@@ -55,9 +55,7 @@ export function floatColor(val: string): number {
 
   a = (a * 255) | 0;
 
-  const bits = ((a << 24) | (b << 16) | (g << 8) | r) & 0xfeffffff;
-
-  INT32[0] = bits;
+  INT32[0] = ((a << 24) | (b << 16) | (g << 8) | r) & 0xfeffffff;
 
   const color = FLOAT32[0];
 

@@ -39,7 +39,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@yomguithereal/helpers": "^1.1.0",
+    "@yomguithereal/helpers": "^1.1.1",
     "events": "^3.2.0",
     "graphology-metrics": "1.13.0",
     "graphology-utils": "^1.4.0"

@@ -8,7 +8,7 @@
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
  */
-import { extend } from "@yomguithereal/helpers/extend";
+import extend from "@yomguithereal/helpers/extend";
 import { PlainObject } from "./utils";
 import { NodeKey } from "graphology-types";
 
@@ -301,75 +301,73 @@ function getNodesInAxisAlignedRectangleArea(
   let container;
 
   while (stack.length) {
-    const level = stack.pop(),
-      block = stack.pop();
+    const level = stack.pop() as number,
+      block = stack.pop() as number;
 
-    if (level && block) {
-      // Collecting nodes
-      container = containers[block];
+    // Collecting nodes
+    container = containers[block];
 
-      if (container) extend(collectedNodes, container);
+    if (container) extend(collectedNodes, container);
 
-      // If we reached max level
-      if (level >= maxLevel) continue;
+    // If we reached max level
+    if (level >= maxLevel) continue;
 
-      const topLeftBlock = 4 * block + BLOCKS,
-        topRightBlock = 4 * block + 2 * BLOCKS,
-        bottomLeftBlock = 4 * block + 3 * BLOCKS,
-        bottomRightBlock = 4 * block + 4 * BLOCKS;
+    const topLeftBlock = 4 * block + BLOCKS,
+      topRightBlock = 4 * block + 2 * BLOCKS,
+      bottomLeftBlock = 4 * block + 3 * BLOCKS,
+      bottomRightBlock = 4 * block + 4 * BLOCKS;
 
-      const collidingWithTopLeft = rectangleCollidesWithQuad(
-        x1,
-        y1,
-        w,
-        h,
-        data[topLeftBlock + X_OFFSET],
-        data[topLeftBlock + Y_OFFSET],
-        data[topLeftBlock + WIDTH_OFFSET],
-        data[topLeftBlock + HEIGHT_OFFSET],
-      );
+    const collidingWithTopLeft = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      h,
+      data[topLeftBlock + X_OFFSET],
+      data[topLeftBlock + Y_OFFSET],
+      data[topLeftBlock + WIDTH_OFFSET],
+      data[topLeftBlock + HEIGHT_OFFSET],
+    );
 
-      const collidingWithTopRight = rectangleCollidesWithQuad(
-        x1,
-        y1,
-        w,
-        h,
-        data[topRightBlock + X_OFFSET],
-        data[topRightBlock + Y_OFFSET],
-        data[topRightBlock + WIDTH_OFFSET],
-        data[topRightBlock + HEIGHT_OFFSET],
-      );
+    const collidingWithTopRight = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      h,
+      data[topRightBlock + X_OFFSET],
+      data[topRightBlock + Y_OFFSET],
+      data[topRightBlock + WIDTH_OFFSET],
+      data[topRightBlock + HEIGHT_OFFSET],
+    );
 
-      const collidingWithBottomLeft = rectangleCollidesWithQuad(
-        x1,
-        y1,
-        w,
-        h,
-        data[bottomLeftBlock + X_OFFSET],
-        data[bottomLeftBlock + Y_OFFSET],
-        data[bottomLeftBlock + WIDTH_OFFSET],
-        data[bottomLeftBlock + HEIGHT_OFFSET],
-      );
+    const collidingWithBottomLeft = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      h,
+      data[bottomLeftBlock + X_OFFSET],
+      data[bottomLeftBlock + Y_OFFSET],
+      data[bottomLeftBlock + WIDTH_OFFSET],
+      data[bottomLeftBlock + HEIGHT_OFFSET],
+    );
 
-      const collidingWithBottomRight = rectangleCollidesWithQuad(
-        x1,
-        y1,
-        w,
-        h,
-        data[bottomRightBlock + X_OFFSET],
-        data[bottomRightBlock + Y_OFFSET],
-        data[bottomRightBlock + WIDTH_OFFSET],
-        data[bottomRightBlock + HEIGHT_OFFSET],
-      );
+    const collidingWithBottomRight = rectangleCollidesWithQuad(
+      x1,
+      y1,
+      w,
+      h,
+      data[bottomRightBlock + X_OFFSET],
+      data[bottomRightBlock + Y_OFFSET],
+      data[bottomRightBlock + WIDTH_OFFSET],
+      data[bottomRightBlock + HEIGHT_OFFSET],
+    );
 
-      if (collidingWithTopLeft) stack.push(topLeftBlock, level + 1);
+    if (collidingWithTopLeft) stack.push(topLeftBlock, level + 1);
 
-      if (collidingWithTopRight) stack.push(topRightBlock, level + 1);
+    if (collidingWithTopRight) stack.push(topRightBlock, level + 1);
 
-      if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level + 1);
+    if (collidingWithBottomLeft) stack.push(bottomLeftBlock, level + 1);
 
-      if (collidingWithBottomRight) stack.push(bottomRightBlock, level + 1);
-    }
+    if (collidingWithBottomRight) stack.push(bottomRightBlock, level + 1);
   }
 
   return collectedNodes;

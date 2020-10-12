@@ -11,7 +11,7 @@ export function identity(): Float32Array {
 // TODO: optimize
 export function scale(m: Float32Array, x: number, y?: number): Float32Array {
   m[0] = x;
-  m[4] = y !== undefined && y !== null ? y : x;
+  m[4] = typeof y === "number" ? y : x;
 
   return m;
 }

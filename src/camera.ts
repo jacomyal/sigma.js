@@ -299,7 +299,7 @@ export default class Camera extends EventEmitter implements CameraState {
    */
   animatedUnzoom(factorOrOptions: number | (Partial<AnimateOptions> & {factor: number})): void {
     if (!factorOrOptions) {
-      return this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
+      this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
     } else {
       if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio * factorOrOptions });
       else

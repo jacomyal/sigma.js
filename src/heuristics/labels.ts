@@ -133,8 +133,6 @@ export function labelsToDisplayFromGrid(params: {
     panningX = -(cellWidth / 2),
     panningY = -(cellHeight / 2);
 
-  // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
-
   const worthyLabels: Array<NodeKey> = [];
   const grid: Record<string, NodeKey> = {};
 

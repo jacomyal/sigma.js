@@ -31,8 +31,8 @@ export default class MouseCaptor extends Captor {
   enabled = true;
   hasDragged = false;
   downStartTime: number | null = null;
-  lastMouseX = 0;
-  lastMouseY = 0;
+  lastMouseX: number | null = null;
+  lastMouseY: number | null = null;
   isMouseDown = false;
   isMoving = false;
   movingTimeout: number | null = null;
@@ -59,7 +59,6 @@ export default class MouseCaptor extends Captor {
     container.addEventListener("contextmenu", this.handleRightClick, false);
     container.addEventListener("mousedown", this.handleDown, false);
     container.addEventListener("mousemove", this.handleMove, false);
-    // container.addEventListener("DOMMouseScroll", this.handleWheel, false);
     container.addEventListener("wheel", this.handleWheel, false);
     container.addEventListener("mouseout", this.handleOut, false);
 
@@ -73,7 +72,6 @@ export default class MouseCaptor extends Captor {
     container.removeEventListener("contextmenu", this.handleRightClick);
     container.removeEventListener("mousedown", this.handleDown);
     container.removeEventListener("mousemove", this.handleMove);
-    // container.removeEventListener("DOMMouseScroll", this.handleWheel);
     container.removeEventListener("wheel", this.handleWheel);
     container.removeEventListener("mouseout", this.handleOut);
 
@@ -87,7 +85,7 @@ export default class MouseCaptor extends Captor {
 
     if (this.clicks === 2) {
       this.clicks = 0;
-      if (this.doubleClickTimeout !== null) {
+      if (typeof this.doubleClickTimeout === "number") {
         clearTimeout(this.doubleClickTimeout);
         this.doubleClickTimeout = null;
       }
@@ -190,7 +188,7 @@ export default class MouseCaptor extends Captor {
 
     this.isMouseDown = false;
 
-    if (this.movingTimeout !== null) {
+    if (typeof this.movingTimeout === "number") {
       clearTimeout(this.movingTimeout);
       this.movingTimeout = null;
     }
@@ -233,7 +231,7 @@ export default class MouseCaptor extends Captor {
       this.isMoving = true;
       this.hasDragged = true;
 
-      if (this.movingTimeout !== null) {
+      if (typeof this.movingTimeout === "number") {
         clearTimeout(this.movingTimeout);
       }
 
@@ -250,7 +248,7 @@ export default class MouseCaptor extends Captor {
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX, this.lastMouseY);
+      const lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX as number, this.lastMouseY as number);
 
       const mouse = this.camera.viewportToGraph(dimensions, eX, eY);
 
