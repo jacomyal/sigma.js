@@ -14,7 +14,7 @@
  * @param  {array}    elements - The array to sort.
  * @return {array} - The sorted array.
  */
-export function zIndexOrdering(extent: [number, number], getter: (e: any) => number, elements: Array<any>): Array<any> {
+export function zIndexOrdering<T>(extent: [number, number], getter: (e: T) => number, elements: Array<T>): Array<T> {
   // If k is > n, we'll use a standard sort
   return elements.sort(function (a, b) {
     const zA = getter(a) || 0,

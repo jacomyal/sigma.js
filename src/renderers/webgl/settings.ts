@@ -55,12 +55,12 @@ export interface WebGLSettings {
   edgeLabelWeight: string;
   // Labels
   labelGrid: {
-    cell: any;
+    cell: {width: number, height: number} | null;
     renderedSizeThreshold: number;
   };
   // Reducers
-  nodeReducer: null | ((edge: NodeKey, data: any) => NodeAttributes);
-  edgeReducer: null | ((node: EdgeKey, data: any) => EdgeAttributes);
+  nodeReducer: null | ((edge: NodeKey, data: NodeAttributes) => NodeAttributes);
+  edgeReducer: null | ((node: EdgeKey, data: EdgeAttributes) => EdgeAttributes);
   // Features
   zIndex: boolean;
   // Renderers

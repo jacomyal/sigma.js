@@ -9,6 +9,8 @@
  * we don't waste time rendering things the user cannot see anyway.
  */
 import { extend } from "@yomguithereal/helpers/extend";
+import { PlainObject } from "./utils";
+import { NodeKey } from "graphology-types";
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
@@ -49,6 +51,21 @@ const TOP_LEFT = 1,
   TOP_RIGHT = 2,
   BOTTOM_LEFT = 3,
   BOTTOM_RIGHT = 4;
+
+interface Boundaries {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface Rectangle {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  height: number;
+}
 
 /**
  * Geometry helpers.
@@ -105,7 +122,7 @@ function pointIsInQuad(x: number, y: number, qx: number, qy: number, qw: number,
  * Helper functions that are not bound to the class so an external user
  * cannot mess with them.
  */
-function buildQuadrants(maxLevel: number, data: any): void {
+function buildQuadrants(maxLevel: number, data: Float32Array): void {
   // [block, level]
   const stack: Array<number> = [0, 0];
 
@@ -154,7 +171,15 @@ function buildQuadrants(maxLevel: number, data: any): void {
   }
 }
 
-function insertNode(maxLevel: number, data: any, containers: any, key: string, x: number, y: number, size: number) {
+function insertNode(
+  maxLevel: number,
+  data: Float32Array,
+  containers: PlainObject<NodeKey[]>,
+  key: NodeKey,
+  x: number,
+  y: number,
+  size: number,
+) {
   const x1 = x - size,
     y1 = y - size,
     w = size * 2;
@@ -261,17 +286,17 @@ function insertNode(maxLevel: number, data: any, containers: any, key: string, x
 
 function getNodesInAxisAlignedRectangleArea(
   maxLevel: number,
-  data: any,
-  containers: any,
+  data: Float32Array,
+  containers: PlainObject<NodeKey[]>,
   x1: number,
   y1: number,
   w: number,
   h: number,
-): Array<any> {
+): NodeKey[] {
   // [block, level]
   const stack = [0, 0];
 
-  const collectedNodes: Array<any> = [];
+  const collectedNodes: NodeKey[] = [];
 
   let container;
 
@@ -358,12 +383,11 @@ function getNodesInAxisAlignedRectangleArea(
  */
 export default class QuadTree {
   data: Float32Array;
-  containers: any = {};
-  cache: any = null;
-  lastRectangle: any = null;
-  nodeFilter: any;
+  containers: PlainObject<NodeKey[]> = {};
+  cache: NodeKey[] | null = null;
+  lastRectangle: Rectangle | null = null;
 
-  constructor(params: { [key: string]: any } = {}) {
+  constructor(params: { boundaries?: Boundaries } = {}) {
     // Allocating the underlying byte array
     const L = Math.pow(4, MAX_LEVEL);
     this.data = new Float32Array(BLOCKS * ((4 * L - 1) / 3));
@@ -376,17 +400,15 @@ export default class QuadTree {
         width: 1,
         height: 1,
       });
-
-    if (typeof params.filter === "function") this.nodeFilter = params.filter;
   }
 
-  add(key: string, x: number, y: number, size: number): QuadTree {
+  add(key: NodeKey, x: number, y: number, size: number): QuadTree {
     insertNode(MAX_LEVEL, this.data, this.containers, key, x, y, size);
 
     return this;
   }
 
-  resize(boundaries: { x: number; y: number; width: number; height: number }): void {
+  resize(boundaries: Boundaries): void {
     this.clear();
 
     // Building the quadrants
@@ -404,8 +426,8 @@ export default class QuadTree {
     return this;
   }
 
-  point(x: number, y: number): Array<any> {
-    const nodes: Array<any> = [];
+  point(x: number, y: number): NodeKey[] {
+    const nodes: NodeKey[] = [];
 
     let block = 0,
       level = 0;
@@ -429,11 +451,11 @@ export default class QuadTree {
     return nodes;
   }
 
-  rectangle(x1: number, y1: number, x2: number, y2: number, height: number): any {
+  rectangle(x1: number, y1: number, x2: number, y2: number, height: number): NodeKey[] {
     const lr = this.lastRectangle;
 
     if (lr && x1 === lr.x1 && x2 === lr.x2 && y1 === lr.y1 && y2 === lr.y2 && height === lr.height) {
-      return this.cache;
+      return this.cache as NodeKey[];
     }
 
     this.lastRectangle = {
@@ -448,7 +470,7 @@ export default class QuadTree {
     if (!isAxisAligned(x1, y1, x2, y2))
       throw new Error("sigma/quadtree.rectangle: shifted view is not yet implemented.");
 
-    const collectedNodes = getNodesInAxisAlignedRectangleArea(
+    this.cache = getNodesInAxisAlignedRectangleArea(
       MAX_LEVEL,
       this.data,
       this.containers,
@@ -457,8 +479,6 @@ export default class QuadTree {
       Math.abs(x1 - x2) || Math.abs(y1 - y2),
       height,
     );
-
-    this.cache = collectedNodes;
 
     return this.cache;
   }

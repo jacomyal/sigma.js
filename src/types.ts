@@ -18,6 +18,8 @@ export interface Coordinates {
   y: number;
 }
 
+export type Extent = [number, number];
+
 export interface NodeAttributes extends Coordinates {
   size: number;
   color: string;

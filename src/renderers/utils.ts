@@ -5,31 +5,35 @@
  * Helpers used by most renderers.
  */
 
-import { Coordinates } from "../types";
+import { Coordinates, Extent } from "../types";
+import { PlainObject } from "../utils";
 
 /**
  * Function used to create DOM elements easily.
  *
  * @param  {string} tag        - Tag name of the element to create.
+ * @param  {object} style      - Styles map.
  * @param  {object} attributes - Attributes map.
  * @return {HTMLElement}
  */
-export function createElement<T extends HTMLElement>(tag: string, attributes: { [key: string]: any }): T {
+export function createElement<T extends HTMLElement>(
+  tag: string,
+  style?: Partial<CSSStyleDeclaration>,
+  attributes?: PlainObject<string>,
+): T {
   const element: T = document.createElement(tag) as T;
 
-  Object.keys(attributes).forEach((attrName: string) => {
-    if (attrName === "style") {
-      const styleAttributes: { [key: string]: string } = attributes[attrName];
-      element.setAttribute(
-        "style",
-        Object.keys(styleAttributes)
-          .map((attrKey: string) => `${attrKey}: ${styleAttributes[attrKey]}`)
-          .join(";"),
-      );
-    } else {
-      element.setAttribute(attrName, attributes[attrName]);
+  if (style) {
+    for (const k in style) {
+      element.style[k] = style[k] as string;
     }
-  });
+  }
+
+  if (attributes) {
+    for (const k in attributes) {
+      element.setAttribute(k, attributes[k]);
+    }
+  }
 
   return element;
 }
@@ -51,7 +55,12 @@ export function getPixelRatio(): number {
  * @param  {object}   extent  - Extent of the graph.
  * @return {function}
  */
-export function createNormalizationFunction(extent: { x: [number, number]; y: [number, number] }): any {
+export interface NormalizationFunction {
+  (data: Coordinates): Coordinates;
+  inverse(data: Coordinates): Coordinates;
+  applyTo(data: Coordinates): void;
+}
+export function createNormalizationFunction(extent: { x: Extent; y: Extent }): NormalizationFunction {
   const {
     x: [minX, maxX],
     y: [minY, maxY],

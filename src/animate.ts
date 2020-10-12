@@ -5,7 +5,7 @@
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
 import Graph from "graphology";
-import { assign } from "./utils";
+import { assign, PlainObject } from "./utils";
 import easings from "./easings";
 import { NodeAttributes } from "./types";
 
@@ -26,7 +26,7 @@ export const ANIMATE_DEFAULTS = {
  */
 export function animateNodes(
   graph: Graph,
-  targets: { [key: string]: Partial<NodeAttributes> },
+  targets: PlainObject<PlainObject<number>>,
   opts: Partial<AnimateOptions>,
   callback: () => void,
 ): () => void {
@@ -36,14 +36,13 @@ export function animateNodes(
 
   const start = Date.now();
 
-  const startPositions: { [key: string]: any } = {};
+  const startPositions: PlainObject<PlainObject<number>> = {};
 
   Object.keys(targets).forEach((nodeKey: string) => {
     const attrs: Partial<NodeAttributes> = targets[nodeKey];
     startPositions[nodeKey] = {};
     Object.keys(attrs).forEach((attrName: string) => {
-      const attrValue: any = graph.getNodeAttribute(nodeKey, attrName);
-      startPositions[nodeKey][attrName] = attrValue;
+      startPositions[nodeKey][attrName] = graph.getNodeAttribute(nodeKey, attrName) as number;
     });
   });
 
@@ -55,10 +54,10 @@ export function animateNodes(
     if (p >= 1) {
       // Animation is done
       Object.keys(targets).forEach((nodeKey: string) => {
-        const attrs: { [key: string]: any } = targets[nodeKey];
-        Object.keys(attrs).forEach((attrName: string) => {
-          const attrValue: any = attrs[attrName];
-          graph.setNodeAttribute(nodeKey, attrName, attrValue);
+        const nodeAttrsTarget: PlainObject<number> = targets[nodeKey];
+
+        Object.keys(nodeAttrsTarget).forEach((attrName: string) => {
+          graph.setNodeAttribute(nodeKey, attrName, nodeAttrsTarget[attrName]);
         });
       });
 
@@ -70,12 +69,11 @@ export function animateNodes(
     p = easing(p);
 
     Object.keys(targets).forEach((nodeKey: string) => {
-      const attrs: { [key: string]: any } = targets[nodeKey];
-      const s: any = startPositions[nodeKey];
+      const attrs: PlainObject<number> = targets[nodeKey];
+      const s: PlainObject<number> = startPositions[nodeKey];
 
       Object.keys(attrs).forEach((attrName: string) => {
-        const attrValue: any = attrs[attrName];
-        graph.setNodeAttribute(nodeKey, attrName, attrValue * p + s[attrName] * (1 - p));
+        graph.setNodeAttribute(nodeKey, attrName, attrs[attrName] * p + s[attrName] * (1 - p));
       });
     });
 

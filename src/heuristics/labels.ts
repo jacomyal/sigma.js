@@ -8,6 +8,7 @@ import Graph from "graphology";
 import Camera from "../camera";
 import { NodeAttributes } from "../types";
 import WebGLRenderer from "../renderers/webgl";
+import { EdgeKey, NodeKey } from "graphology-types";
 /**
  * Constants.
  */
@@ -59,14 +60,14 @@ function collision(
 export function labelsToDisplayFromGrid(params: {
   cache: { [key: string]: NodeAttributes };
   camera: Camera;
-  cell: any;
+  cell: {width: number, height: number} | null;
   dimensions: WebGLRenderer;
-  displayedLabels: Set<string>;
+  displayedLabels: Set<NodeKey>;
   fontSize: number;
   graph: Graph;
   renderedSizeThreshold: number;
-  visibleNodes: Array<string>;
-}): Array<any> {
+  visibleNodes: NodeKey[];
+}): NodeKey[] {
   const {
     cache,
     camera,
@@ -134,11 +135,11 @@ export function labelsToDisplayFromGrid(params: {
 
   // console.log(cellWidth, cellHeight, dimensions.width / cellWidth, dimensions.height / cellHeight);
 
-  const worthyLabels: Array<string> = [];
-  const grid: any = {};
+  const worthyLabels: Array<NodeKey> = [];
+  const grid: Record<string, NodeKey> = {};
 
   let maxSize = -Infinity,
-    biggestNode: string | null = null;
+    biggestNode: NodeKey | null = null;
 
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
@@ -295,14 +296,14 @@ export function labelsToDisplayFromGrid(params: {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params: {
-  displayedNodeLabels: Set<string>;
-  highlightedNodes: Set<string>;
+  displayedNodeLabels: Set<NodeKey>;
+  highlightedNodes: Set<NodeKey>;
   graph: Graph;
-  hoveredNode: string | null;
-}): Array<any> {
+  hoveredNode: NodeKey | null;
+}): Array<EdgeKey> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
-  const worthyEdges = new Set();
+  const worthyEdges = new Set<EdgeKey>();
   const displayedNodeLabelsArray = Array.from(displayedNodeLabels);
 
   // Each edge connecting a highlighted node has its label displayed:
