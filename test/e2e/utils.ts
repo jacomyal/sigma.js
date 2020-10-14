@@ -5,9 +5,10 @@ import path from "path";
 import fs from "fs";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
-import { pages, Pages } from "./config";
+import { Pages } from "./config";
+
 // to avoid implicit any error
-const webpackConfig = require("./../../examples/webpack.config");
+import webpackConfig = require("./../../examples/webpack.config");
 
 /**
  * Take the screenshots.
@@ -24,17 +25,21 @@ export async function takeScreenshots(pages: Pages, folder: string, suffix = "")
   await Promise.all(
     pages.map((item) => {
       return new Promise(async (resolve, reject) => {
-        // Open a new page
-        const page = await browser.newPage();
-        // Navigate to URL
-        await page.goto(item.url);
-        // Taking the screenshot
-        setTimeout(async () => {
-          // Take the screenshot
-          await page.screenshot({ path: path.resolve(`${folder}/${item.filename}.${suffix}.png`) });
-          console.log(`${item.url} saved in ${item.filename}.${suffix}.png`);
-          resolve();
-        }, item.waitFor || 0);
+        try {
+          // Open a new page
+          const page = await browser.newPage();
+          // Navigate to URL
+          await page.goto(item.url);
+          // Taking the screenshot
+          setTimeout(async () => {
+            // Take the screenshot
+            await page.screenshot({ path: path.resolve(`${folder}/${item.filename}.${suffix}.png`) });
+            console.log(`${item.url} saved in ${item.filename}.${suffix}.png`);
+            resolve();
+          }, item.waitFor || 0);
+        } catch (e) {
+          reject(e);
+        }
       });
     }),
   );
@@ -63,7 +68,7 @@ export function imageDiff(image1: string, image2: string, diffFilename: string):
 }
 
 export function startExampleServer(): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const compiler = Webpack(webpackConfig);
     const devServerOptions = Object.assign({}, webpackConfig.devServer, {
       open: true,
