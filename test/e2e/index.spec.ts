@@ -4,8 +4,8 @@ import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
 import { pages } from "./config";
 
 before(function (done) {
-  // compute the timeout ie. 1sec per screenshot + the waiting time + 10000 for the compilation time
-  this.timeout(10000 + pages.map((page) => page.waitFor || 0).reduce((acc, current) => (acc += 1000 + current), 0));
+  // compute the timeout ie. 1sec per screenshot + the waiting time + 30000 for the compilation time
+  this.timeout(30000 + pages.map((page) => page.waitFor || 0).reduce((acc, current) => (acc += 1000 + current), 0));
 
   // starting the server with examples
   startExampleServer().then(() => {
