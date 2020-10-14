@@ -5,7 +5,7 @@
  * Testing the camera class.
  */
 import assert from "assert";
-import Camera from "../src/camera";
+import Camera from "../../src/camera";
 
 describe("Camera", function () {
   it("should be possible to read the camera's state.", function () {

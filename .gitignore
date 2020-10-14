@@ -17,3 +17,5 @@ node_modules
 /heuristics
 /renderers
 /types
+/test/e2e/screenshots/*.current.png
+/test/e2e/screenshots/*.diff.png

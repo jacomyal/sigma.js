@@ -5,7 +5,7 @@
  * Testing the quadtree class.
  */
 // import assert from 'assert';
-import QuadTree from "../src/quadtree";
+import QuadTree from "../../src/quadtree";
 
 describe("QuadTree", function () {
   const nodes = [
