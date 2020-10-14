@@ -8,7 +8,8 @@ import pixelmatch from "pixelmatch";
 import { Pages } from "./config";
 
 // to avoid implicit any error
-import webpackConfig = require("./../../examples/webpack.config");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const webpackConfig = require("./../../examples/webpack.config");
 
 /**
  * Take the screenshots.
