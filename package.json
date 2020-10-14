@@ -17,7 +17,7 @@
     "prettier": "prettier --write $npm_package_sigma_folders",
     "prepublish": "npm run lint && npm run test && npm run clean && npm run transpile && npm run build",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
-    "test:e2e": "npm run examples && mocha --require ts-node/register ./test/e2e/**/*.spec.ts",
+    "test:e2e": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
     "generate:e2e": "node -r ts-node/register test/e2e/generate.ts",
     "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
@@ -56,6 +56,7 @@
     "@types/pixelmatch": "^5.2.2",
     "@types/pngjs": "^3.4.2",
     "@types/puppeteer": "^3.0.2",
+    "@types/webpack-dev-server": "^3.11.0",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "chroma-js": "^2.1.0",

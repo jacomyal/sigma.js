@@ -1,9 +1,13 @@
+import Webpack from "webpack";
+import WebpackDevServer from "webpack-dev-server";
 import puppeteer from "puppeteer";
 import path from "path";
 import fs from "fs";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 import { pages, Pages } from "./config";
+// to avoid implicit any error
+const webpackConfig = require("./../../examples/webpack.config");
 
 /**
  * Take the screenshots.
@@ -56,4 +60,20 @@ export function imageDiff(image1: string, image2: string, diffFilename: string):
   fs.writeFileSync(path.resolve(diffFilename), PNG.sync.write(diff));
 
   return { diff: nbPixelInDiff, percent: nbPixelInDiff / (width * height) };
+}
+
+export function startExampleServer(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const compiler = Webpack(webpackConfig);
+    const devServerOptions = Object.assign({}, webpackConfig.devServer, {
+      open: true,
+      stats: {
+        colors: true,
+      },
+    });
+    const server = new WebpackDevServer(compiler, devServerOptions);
+    server.listen(8000, "127.0.0.1", () => {
+      resolve();
+    });
+  });
 }
