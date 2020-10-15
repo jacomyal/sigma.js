@@ -27,7 +27,10 @@ describe("Compare screenshots", () => {
         path.resolve(`./test/e2e/screenshots/${test.name}.current.png`),
         path.resolve(`./test/e2e/screenshots/${test.name}.diff.png`),
       );
-      assert.deepEqual(result.diff, 0, `There is a diff on files ${test.name}, please check "${test.name}.diff.png"`);
+      assert(
+        result.percent <= (test.failureThreshold || 0),
+        `There is a diff over ${test.failureThreshold} on ${test.name}, please check "${test.name}.diff.png"`,
+      );
     });
   });
 });

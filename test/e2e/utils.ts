@@ -31,6 +31,9 @@ export async function takeScreenshots(tests: Tests, folder: string, suffix = "")
           const page = await browser.newPage();
           // Navigate to URL
           await page.goto(test.url);
+          if (test.scenario) {
+            await test.scenario(browser, page);
+          }
           // Taking the screenshot
           setTimeout(async () => {
             // Take the screenshot
@@ -72,7 +75,7 @@ export function startExampleServer(): Promise<WebpackDevServer> {
   return new Promise((resolve) => {
     const compiler = Webpack(webpackConfig);
     const devServerOptions = Object.assign({}, webpackConfig.devServer, {
-      open: true,
+      open: false,
       stats: {
         colors: true,
       },
