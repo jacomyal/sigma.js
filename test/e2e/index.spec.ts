@@ -4,16 +4,17 @@ import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
 import { pages } from "./config";
 
 before(function (done) {
-  // compute the timeout ie. 1sec per screenshot + the waiting time + 30000 for the compilation time
-  this.timeout(30000 + pages.map((page) => page.waitFor || 0).reduce((acc, current) => (acc += 1000 + current), 0));
+  // No mocha timeout, but there is a timeout of 30sec in puppeteer loading pages
+  this.timeout(0);
 
   // starting the server with examples
-  startExampleServer().then(() => {
+  startExampleServer().then((server) => {
     console.log("~~~ Start generating screenshots ~~~");
     takeScreenshots(pages, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
       console.log("~~~ End generating screenshots ~~~");
       console.log();
-      done();
+      // closing the server
+      server.close(done);
     });
   });
 });

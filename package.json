@@ -17,8 +17,8 @@
     "prettier": "prettier --write $npm_package_sigma_folders",
     "prepublish": "npm run lint && npm run test && npm run clean && npm run transpile && npm run build",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
-    "test:e2e": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
-    "generate:e2e": "node -r ts-node/register test/e2e/generate.ts",
+    "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
+    "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
     "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
   "sigma": {

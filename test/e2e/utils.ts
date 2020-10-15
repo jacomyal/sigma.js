@@ -68,7 +68,7 @@ export function imageDiff(image1: string, image2: string, diffFilename: string):
   return { diff: nbPixelInDiff, percent: nbPixelInDiff / (width * height) };
 }
 
-export function startExampleServer(): Promise<void> {
+export function startExampleServer(): Promise<WebpackDevServer> {
   return new Promise((resolve) => {
     const compiler = Webpack(webpackConfig);
     const devServerOptions = Object.assign({}, webpackConfig.devServer, {
@@ -79,7 +79,7 @@ export function startExampleServer(): Promise<void> {
     });
     const server = new WebpackDevServer(compiler, devServerOptions);
     server.listen(8000, "127.0.0.1", () => {
-      resolve();
+      resolve(server);
     });
   });
 }

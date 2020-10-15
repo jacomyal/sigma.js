@@ -7,4 +7,4 @@ node_js:
   - "14"
 script:
   - npm test
-  - npm run test:e2e
+  - npm run e2e:test
