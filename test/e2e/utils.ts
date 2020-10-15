@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
-import { Pages } from "./config";
+import { Tests } from "./config";
 
 // to avoid implicit any error
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -14,30 +14,30 @@ const webpackConfig = require("./../../examples/webpack.config");
 /**
  * Take the screenshots.
  *
- * @param {Array<Pages>} pages List of pages that should be taking in screenshot
+ * @param {Array<Tests>} tests List of pages that should be taking in screenshot
  * @param {string} folder Path where to saved the screenshots
  * @param {string} suffix The filename will be suffixed with it
  */
-export async function takeScreenshots(pages: Pages, folder: string, suffix = ""): Promise<void> {
+export async function takeScreenshots(tests: Tests, folder: string, suffix = ""): Promise<void> {
   // Launch the browser
   const browser = await puppeteer.launch();
 
   // for each pages
   await Promise.all(
-    pages.map((item) => {
+    tests.map((test) => {
       return new Promise(async (resolve, reject) => {
         try {
           // Open a new page
           const page = await browser.newPage();
           // Navigate to URL
-          await page.goto(item.url);
+          await page.goto(test.url);
           // Taking the screenshot
           setTimeout(async () => {
             // Take the screenshot
-            await page.screenshot({ path: path.resolve(`${folder}/${item.filename}.${suffix}.png`) });
-            console.log(`${item.url} saved in ${item.filename}.${suffix}.png`);
+            await page.screenshot({ path: path.resolve(`${folder}/${test.name}.${suffix}.png`) });
+            console.log(`${test.url} saved in ${test.name}.${suffix}.png`);
             resolve();
-          }, item.waitFor || 0);
+          }, test.waitFor || 0);
         } catch (e) {
           reject(e);
         }

@@ -1,7 +1,7 @@
 import assert from "assert";
 import path from "path";
 import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
-import { pages } from "./config";
+import { tests } from "./config";
 
 before(function (done) {
   // No mocha timeout, but there is a timeout of 30sec in puppeteer loading pages
@@ -10,7 +10,7 @@ before(function (done) {
   // starting the server with examples
   startExampleServer().then((server) => {
     console.log("~~~ Start generating screenshots ~~~");
-    takeScreenshots(pages, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
+    takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
       console.log("~~~ End generating screenshots ~~~");
       console.log();
       // closing the server
@@ -20,18 +20,14 @@ before(function (done) {
 });
 
 describe("Compare screenshots", () => {
-  pages.forEach((page) => {
-    it(`Screenshots for "${page.filename}" should be the same`, () => {
+  tests.forEach((test) => {
+    it(`Screenshots for "${test.name}" should be the same`, () => {
       const result = imageDiff(
-        path.resolve(`./test/e2e/screenshots/${page.filename}.valid.png`),
-        path.resolve(`./test/e2e/screenshots/${page.filename}.current.png`),
-        path.resolve(`./test/e2e/screenshots/${page.filename}.diff.png`),
+        path.resolve(`./test/e2e/screenshots/${test.name}.valid.png`),
+        path.resolve(`./test/e2e/screenshots/${test.name}.current.png`),
+        path.resolve(`./test/e2e/screenshots/${test.name}.diff.png`),
       );
-      assert.deepEqual(
-        result.diff,
-        0,
-        `There is a diff on files ${page.filename}, please check "${page.filename}.diff.png"`,
-      );
+      assert.deepEqual(result.diff, 0, `There is a diff on files ${test.name}, please check "${test.name}.diff.png"`);
     });
   });
 });
