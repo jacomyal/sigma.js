@@ -287,7 +287,7 @@ export default class WebGLRenderer extends Renderer {
 
     // Function returning the nodes in the mouse's quad
     const getQuadNodes = (mouseX: number, mouseY: number) => {
-      const mouseGraphPosition = this.camera.viewportToGraph(this, mouseX, mouseY);
+      const mouseGraphPosition = this.camera.viewportToGraph(this, { x: mouseX, y: mouseY });
 
       // TODO: minus 1? lol
       return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
@@ -312,7 +312,7 @@ export default class WebGLRenderer extends Renderer {
 
         const data = this.nodeDataCache[node];
 
-        const pos = this.camera.graphToViewport(this, data.x, data.y);
+        const pos = this.camera.graphToViewport(this, data);
 
         const size = data.size / sizeRatio;
 
@@ -341,7 +341,7 @@ export default class WebGLRenderer extends Renderer {
       if (this.hoveredNode) {
         const data = this.nodeDataCache[this.hoveredNode];
 
-        const pos = this.camera.graphToViewport(this, data.x, data.y);
+        const pos = this.camera.graphToViewport(this, data);
 
         const size = data.size / sizeRatio;
 
@@ -367,7 +367,7 @@ export default class WebGLRenderer extends Renderer {
 
           const data = this.nodeDataCache[node];
 
-          const pos = this.camera.graphToViewport(this, data.x, data.y);
+          const pos = this.camera.graphToViewport(this, data);
 
           const size = data.size / sizeRatio;
 
@@ -799,7 +799,7 @@ export default class WebGLRenderer extends Renderer {
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
       const data = this.nodeDataCache[labelsToDisplay[i]];
 
-      const { x, y } = this.camera.graphToViewport(this, data.x, data.y);
+      const { x, y } = this.camera.graphToViewport(this, data);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
@@ -856,8 +856,8 @@ export default class WebGLRenderer extends Renderer {
         targetData = this.nodeDataCache[extremities[1]],
         edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
 
-      const { x: sourceX, y: sourceY } = this.camera.graphToViewport(this, sourceData.x, sourceData.y);
-      const { x: targetX, y: targetY } = this.camera.graphToViewport(this, targetData.x, targetData.y);
+      const { x: sourceX, y: sourceY } = this.camera.graphToViewport(this, sourceData);
+      const { x: targetX, y: targetY } = this.camera.graphToViewport(this, targetData);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
@@ -907,7 +907,7 @@ export default class WebGLRenderer extends Renderer {
     const render = (node: NodeKey): void => {
       const data = this.nodeDataCache[node];
 
-      const { x, y } = camera.graphToViewport(this, data.x, data.y);
+      const { x, y } = camera.graphToViewport(this, data);
 
       const size = data.size / sizeRatio;
 

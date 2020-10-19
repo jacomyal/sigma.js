@@ -9,7 +9,7 @@ import { EventEmitter } from "events";
 import { ANIMATE_DEFAULTS, AnimateOptions } from "./animate";
 import easings from "./easings";
 import { assign } from "./utils";
-import { Coordinates } from "./types";
+import { Coordinates, Dimensions } from "./types";
 
 /**
  * Defaults.
@@ -45,6 +45,17 @@ export default class Camera extends EventEmitter implements CameraState {
 
     // State
     this.previousState = this.getState();
+  }
+
+  /**
+   * Static method used to create a Camera object with a given state.
+   *
+   * @param state
+   * @return {Camera}
+   */
+  static from(state: CameraState): Camera {
+    const camera = new Camera();
+    return camera.setState(state);
   }
 
   /**
@@ -110,25 +121,29 @@ export default class Camera extends EventEmitter implements CameraState {
    * Method returning the coordinates of a point from the graph frame to the
    * viewport.
    *
-   * @param  {object} dimensions - Dimensions of the viewport.
-   * @param  {number} x          - The X coordinate.
-   * @param  {number} y          - The Y coordinate.
-   * @return {object}            - The point coordinates in the viewport.
+   * @param  {object} dimensions  - Dimensions of the viewport.
+   * @param  {object} coordinates - Coordinates of the point.
+   * @return {object}             - The point coordinates in the viewport.
    */
-
-  // TODO: assign to gain one object
-  // TODO: angles
-  graphToViewport(dimensions: { width: number; height: number }, x: number, y: number): Coordinates {
+  graphToViewport(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
-    const dx = smallestDimension / dimensions.width,
-      dy = smallestDimension / dimensions.height;
+    const dx = smallestDimension / dimensions.width;
+    const dy = smallestDimension / dimensions.height;
+    const ratio = this.ratio / smallestDimension;
 
-    // TODO: we keep on the upper left corner!
-    // TODO: how to normalize sizes?
+    // Align with center of the graph:
+    const x1 = (coordinates.x - this.x) / ratio;
+    const y1 = (this.y - coordinates.y) / ratio;
+
+    // Rotate:
+    const x2 = x1 * Math.cos(this.angle) - y1 * Math.sin(this.angle);
+    const y2 = y1 * Math.cos(this.angle) + x1 * Math.sin(this.angle);
+
     return {
-      x: (x - this.x + this.ratio / 2 / dx) * (smallestDimension / this.ratio),
-      y: (this.y - y + this.ratio / 2 / dy) * (smallestDimension / this.ratio),
+      // Translate to center of screen
+      x: x2 + smallestDimension / 2 / dx,
+      y: y2 + smallestDimension / 2 / dy,
     };
   }
 
@@ -136,22 +151,28 @@ export default class Camera extends EventEmitter implements CameraState {
    * Method returning the coordinates of a point from the viewport frame to the
    * graph frame.
    *
-   * @param  {object} dimensions - Dimensions of the viewport.
-   * @param  {number} x          - The X coordinate.
-   * @param  {number} y          - The Y coordinate.
-   * @return {object}            - The point coordinates in the graph frame.
+   * @param  {object} dimensions  - Dimensions of the viewport.
+   * @param  {object} coordinates - Coordinates of the point.
+   * @return {object}             - The point coordinates in the graph frame.
    */
-
-  // TODO: angles
-  viewportToGraph(dimensions: { width: number; height: number }, x: number, y: number): Coordinates {
+  viewportToGraph(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
-    const dx = smallestDimension / dimensions.width,
-      dy = smallestDimension / dimensions.height;
+    const dx = smallestDimension / dimensions.width;
+    const dy = smallestDimension / dimensions.height;
+    const ratio = this.ratio / smallestDimension;
+
+    // Align with center of the graph:
+    const x1 = coordinates.x - smallestDimension / 2 / dx;
+    const y1 = coordinates.y - smallestDimension / 2 / dy;
+
+    // Rotate:
+    const x2 = x1 * Math.cos(-this.angle) - y1 * Math.sin(-this.angle);
+    const y2 = y1 * Math.cos(-this.angle) + x1 * Math.sin(-this.angle);
 
     return {
-      x: (this.ratio / smallestDimension) * x + this.x - this.ratio / 2 / dx,
-      y: -((this.ratio / smallestDimension) * y - this.y - this.ratio / 2 / dy),
+      x: x2 * ratio + this.x,
+      y: -y2 * ratio + this.y,
     };
   }
 
@@ -161,8 +182,6 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {object} - The view's rectangle.
    */
-
-  // TODO: angle
   viewRectangle(dimensions: {
     width: number;
     height: number;
@@ -171,9 +190,9 @@ export default class Camera extends EventEmitter implements CameraState {
     const marginX = (0 * dimensions.width) / 8,
       marginY = (0 * dimensions.height) / 8;
 
-    const p1 = this.viewportToGraph(dimensions, 0 - marginX, 0 - marginY),
-      p2 = this.viewportToGraph(dimensions, dimensions.width + marginX, 0 - marginY),
-      h = this.viewportToGraph(dimensions, 0, dimensions.height + marginY);
+    const p1 = this.viewportToGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }),
+      p2 = this.viewportToGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }),
+      h = this.viewportToGraph(dimensions, { x: 0, y: dimensions.height + marginY });
 
     return {
       x1: p1.x,
@@ -209,6 +228,35 @@ export default class Camera extends EventEmitter implements CameraState {
     this.emit("updated", this.getState());
 
     return this;
+  }
+
+  /**
+   * Method used to (un)zoom, while preserving the position of a viewport point.
+   * Used for instance to
+   *
+   * @param viewportTarget
+   * @param dimensions
+   * @param ratio
+   * @return {CameraState}
+   */
+  getViewportZoomedState(viewportTarget: Coordinates, dimensions: Dimensions, ratio: number): CameraState {
+    // TODO: handle max zoom
+    const ratioDiff = ratio / this.ratio;
+
+    const center = {
+      x: dimensions.width / 2,
+      y: dimensions.height / 2,
+    };
+
+    const graphMousePosition = this.viewportToGraph(dimensions, viewportTarget);
+    const graphCenterPosition = this.viewportToGraph(dimensions, center);
+
+    return {
+      ...this.getState(),
+      x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + this.x,
+      y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + this.y,
+      ratio: ratio,
+    };
   }
 
   /**
@@ -277,7 +325,7 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {number|object} factorOrOptions - Factor or options.
    * @return {function}
    */
-  animatedZoom(factorOrOptions: number | (Partial<AnimateOptions> & {factor: number})): void {
+  animatedZoom(factorOrOptions: number | (Partial<AnimateOptions> & { factor: number })): void {
     if (!factorOrOptions) {
       this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
     } else {
@@ -297,7 +345,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @param  {number|object} factorOrOptions - Factor or options.
    */
-  animatedUnzoom(factorOrOptions: number | (Partial<AnimateOptions> & {factor: number})): void {
+  animatedUnzoom(factorOrOptions: number | (Partial<AnimateOptions> & { factor: number })): void {
     if (!factorOrOptions) {
       this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
     } else {
@@ -327,5 +375,14 @@ export default class Camera extends EventEmitter implements CameraState {
       },
       options,
     );
+  }
+
+  /**
+   * Returns a new Camera instance, with the same state as the current camera.
+   *
+   * @return {Camera}
+   */
+  copy(): Camera {
+    return Camera.from(this.getState());
   }
 }

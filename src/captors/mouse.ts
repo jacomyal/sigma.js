@@ -7,7 +7,7 @@
 import Camera, { CameraState } from "../camera";
 import Captor from "../captor";
 
-import { getX, getY, getCenter, getWheelDelta, getMouseCoords } from "./utils";
+import { getX, getY, getWheelDelta, getMouseCoords } from "./utils";
 
 /**
  * Constants.
@@ -110,43 +110,17 @@ export default class MouseCaptor extends Captor {
   handleDoubleClick(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
 
-    const center = getCenter(e);
-
-    const cameraState = this.camera.getState();
-
-    const newRatio = cameraState.ratio / DOUBLE_CLICK_ZOOMING_RATIO;
-
-    // TODO: factorize
-    const dimensions = {
-      width: this.container.offsetWidth,
-      height: this.container.offsetHeight,
-    };
-
-    const clickX = getX(e),
-      clickY = getY(e);
-
-    // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
-    // TODO: factorize pan & zoomTo
-    const cameraWithNewRatio = new Camera();
-    cameraWithNewRatio.ratio = newRatio;
-    cameraWithNewRatio.x = cameraState.x;
-    cameraWithNewRatio.y = cameraState.y;
-
-    const clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
-      centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
-
-    const clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
-      centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
-
-    const deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-      deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+    const newRatio = this.camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
 
     this.camera.animate(
-      {
-        x: cameraState.x - deltaX,
-        y: cameraState.y - deltaY,
-        ratio: newRatio,
-      },
+      this.camera.getViewportZoomedState(
+        { x: getX(e), y: getY(e) },
+        {
+          width: this.container.offsetWidth,
+          height: this.container.offsetHeight,
+        },
+        newRatio,
+      ),
       {
         easing: "quadraticInOut",
         duration: DOUBLE_CLICK_ZOOMING_DURATION,
@@ -248,9 +222,12 @@ export default class MouseCaptor extends Captor {
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = this.camera.viewportToGraph(dimensions, this.lastMouseX as number, this.lastMouseY as number);
+      const lastMouse = this.camera.viewportToGraph(dimensions, {
+        x: this.lastMouseX as number,
+        y: this.lastMouseY as number,
+      });
 
-      const mouse = this.camera.viewportToGraph(dimensions, eX, eY);
+      const mouse = this.camera.viewportToGraph(dimensions, { x: eX, y: eY });
 
       const offsetX = lastMouse.x - mouse.x,
         offsetY = lastMouse.y - mouse.y;
@@ -290,45 +267,18 @@ export default class MouseCaptor extends Captor {
 
     this.wheelLock = true;
 
-    // TODO: handle max zoom
-    const ratio = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
-
-    const cameraState = this.camera.getState();
-
-    const newRatio = ratio * cameraState.ratio;
-
-    const center = getCenter(e);
-
-    const dimensions = {
-      width: this.container.offsetWidth,
-      height: this.container.offsetHeight,
-    };
-
-    const clickX = getX(e),
-      clickY = getY(e);
-
-    // TODO: baaaad we mustn't mutate the camera, create a Camera.from or #.copy
-    // TODO: factorize pan & zoomTo
-    const cameraWithNewRatio = new Camera();
-    cameraWithNewRatio.ratio = newRatio;
-    cameraWithNewRatio.x = cameraState.x;
-    cameraWithNewRatio.y = cameraState.y;
-
-    const clickGraph = this.camera.viewportToGraph(dimensions, clickX, clickY),
-      centerGraph = this.camera.viewportToGraph(dimensions, center.x, center.y);
-
-    const clickGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, clickX, clickY),
-      centerGraphNew = cameraWithNewRatio.viewportToGraph(dimensions, center.x, center.y);
-
-    const deltaX = clickGraphNew.x - centerGraphNew.x - clickGraph.x + centerGraph.x,
-      deltaY = clickGraphNew.y - centerGraphNew.y - clickGraph.y + centerGraph.y;
+    const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
+    const newRatio = this.camera.getState().ratio * ratioDiff;
 
     this.camera.animate(
-      {
-        x: cameraState.x - deltaX,
-        y: cameraState.y - deltaY,
-        ratio: newRatio,
-      },
+      this.camera.getViewportZoomedState(
+        { x: getX(e), y: getY(e) },
+        {
+          width: this.container.offsetWidth,
+          height: this.container.offsetHeight,
+        },
+        newRatio,
+      ),
       {
         easing: "linear",
         duration: MOUSE_ZOOM_DURATION,

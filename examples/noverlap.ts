@@ -54,7 +54,7 @@ function createButton(text, offset) {
 
 const inputReducer = (key, attr) => {
   let pos = renderer.normalizationFunction(attr);
-  pos = camera.graphToViewport(renderer, pos.x, pos.y);
+  pos = camera.graphToViewport(renderer, pos);
 
   return {
     x: pos.x,
@@ -64,7 +64,7 @@ const inputReducer = (key, attr) => {
 };
 
 const outputReducer = (key, pos) => {
-  return renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, pos.x, pos.y));
+  return renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, pos));
 };
 
 const fixedButton = createButton("noverlap 500", 0);

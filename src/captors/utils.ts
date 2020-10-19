@@ -5,7 +5,6 @@
  * Miscellenous helper functions related to the captors.
  */
 import { Coordinates } from "../types";
-import { getPixelRatio } from "../renderers/utils";
 
 export interface MouseCoords extends Coordinates {
   clientX: number;
@@ -44,49 +43,6 @@ export function getY(e: MouseEvent): number {
   if (typeof e.clientY !== "undefined") return e.clientY;
 
   throw new Error("sigma/captors/utils.getY: could not extract y from event.");
-}
-
-/**
- * Extract the width from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The width of the event's target.
- */
-export function getWidth(e: MouseEvent): number {
-  const w = (e.target as HTMLCanvasElement).width;
-
-  if (typeof w === "number") return w;
-
-  throw new Error("sigma/captors/utils.getWidth: could not extract width from event.");
-}
-
-/**
- * Extract the height from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {number}     The height of the event's target.
- */
-export function getHeight(e: MouseEvent): number {
-  const w = (e.target as HTMLCanvasElement).height;
-
-  if (typeof w === "number") return w;
-
-  throw new Error("sigma/captors/utils.getHeight: could not extract height from event.");
-}
-
-/**
- * Extract the center from a mouse or touch event.
- *
- * @param  {event}  e - A mouse or touch event.
- * @return {object}     The center of the event's target.
- */
-export function getCenter(e: MouseEvent | WheelEvent): Coordinates {
-  const ratio = getPixelRatio();
-
-  return {
-    x: getWidth(e) / (2 * ratio),
-    y: getHeight(e) / (2 * ratio),
-  };
 }
 
 /**

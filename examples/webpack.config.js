@@ -59,6 +59,10 @@ const EXAMPLES = {
     id: "custom-nodes",
     title: "Custom nodes renderer",
   },
+  rotation: {
+    id: "rotation",
+    title: "Camera rotation",
+  },
 };
 
 const entry = {};
