@@ -99,7 +99,11 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
     }
 
     render(params: RenderEdgeParams): void {
-      this.programs.forEach((program) => program.render(params));
+      this.programs.forEach((program) => {
+        program.bind();
+        program.bufferData();
+        program.render(params);
+      });
     }
 
     process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
