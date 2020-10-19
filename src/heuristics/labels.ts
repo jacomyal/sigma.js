@@ -147,7 +147,7 @@ export function labelsToDisplayFromGrid(params: {
     if (nodeData.size / sizeRatio < renderedSizeThreshold) continue;
 
     // Finding our node's cell in the grid
-    const pos = camera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+    const pos = camera.graphToViewport(dimensions, nodeData);
 
     // Node is not actually visible on screen
     // NOTE: can optimize margin on the right side (only if we know where the labels go)
@@ -162,7 +162,7 @@ export function labelsToDisplayFromGrid(params: {
     // If panning when zoomed, we consider only displayed labels and newly
     // visible nodes
     if (zoomedPanning) {
-      const ppos = previousCamera.graphToViewport(dimensions, nodeData.x, nodeData.y);
+      const ppos = previousCamera.graphToViewport(dimensions, nodeData);
 
       // Was node visible earlier?
       if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
@@ -245,14 +245,14 @@ export function labelsToDisplayFromGrid(params: {
   for (let i = 0, l = worthyLabels.length; i < l; i++) {
     const n1 = worthyLabels[i],
       d1 = cache[n1],
-      p1 = camera.graphToViewport(dimensions, d1.x, d1.y);
+      p1 = camera.graphToViewport(dimensions, d1);
 
     if (collisions.has(n1)) continue;
 
     for (let j = i + 1; j < l; j++) {
       const n2 = worthyLabels[j],
         d2 = cache[n2],
-        p2 = camera.graphToViewport(dimensions, d2.x, d2.y);
+        p2 = camera.graphToViewport(dimensions, d2);
 
       const c = collision(
         // First abstract bbox

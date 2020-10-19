@@ -18,6 +18,11 @@ export interface Coordinates {
   y: number;
 }
 
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
 export type Extent = [number, number];
 
 export interface NodeAttributes extends Coordinates {

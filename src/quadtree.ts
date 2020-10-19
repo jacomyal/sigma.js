@@ -52,19 +52,24 @@ const TOP_LEFT = 1,
   BOTTOM_LEFT = 3,
   BOTTOM_RIGHT = 4;
 
-interface Boundaries {
+export interface Boundaries {
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-interface Rectangle {
+export interface Rectangle {
   x1: number;
   y1: number;
   x2: number;
   y2: number;
   height: number;
+}
+
+export interface Vector {
+  x: number;
+  y: number;
 }
 
 /**
@@ -74,17 +79,63 @@ interface Rectangle {
 /**
  * Function returning whether the given rectangle is axis-aligned.
  *
- * @param  {number} x1
- * @param  {number} y1
- * @param  {number} x2
- * @param  {number} y2
+ * @param  {Rectangle} rect
  * @return {boolean}
  */
-function isAxisAligned(x1: number, y1: number, x2: number, y2: number): boolean {
-  return x1 === x2 || y1 === y2;
+export function isRectangleAligned(rect: Rectangle): boolean {
+  return rect.x1 === rect.x2 || rect.y1 === rect.y2;
 }
 
-function squareCollidesWithQuad(
+/**
+ * Function returning the smallest rectangle that contains the given rectangle, and that is aligned with the axis.
+ *
+ * @param {Rectangle} rect
+ * @return {Rectangle}
+ */
+export function getCircumscribedAlignedRectangle(rect: Rectangle): Rectangle {
+  const width = Math.sqrt(Math.pow(rect.x2 - rect.x1, 2) + Math.pow(rect.y2 - rect.y1, 2));
+  const heightVector = {
+    x: ((rect.y1 - rect.y2) * rect.height) / width,
+    y: ((rect.x2 - rect.x1) * rect.height) / width,
+  };
+
+  // Compute all corners:
+  const tl: Vector = { x: rect.x1, y: rect.y1 };
+  const tr: Vector = { x: rect.x2, y: rect.y2 };
+  const bl: Vector = {
+    x: rect.x1 + heightVector.x,
+    y: rect.y1 + heightVector.y,
+  };
+  const br: Vector = {
+    x: rect.x2 + heightVector.x,
+    y: rect.y2 + heightVector.y,
+  };
+
+  const xL = Math.min(tl.x, tr.x, bl.x, br.x);
+  const xR = Math.max(tl.x, tr.x, bl.x, br.x);
+  const yT = Math.min(tl.y, tr.y, bl.y, br.y);
+  const yB = Math.max(tl.y, tr.y, bl.y, br.y);
+
+  return {
+    x1: xL,
+    y1: yT,
+    x2: xR,
+    y2: yT,
+    height: yB - yT,
+  };
+}
+
+/**
+ *
+ * @param x1
+ * @param y1
+ * @param w
+ * @param qx
+ * @param qy
+ * @param qw
+ * @param qh
+ */
+export function squareCollidesWithQuad(
   x1: number,
   y1: number,
   w: number,
@@ -96,7 +147,7 @@ function squareCollidesWithQuad(
   return x1 < qx + qw && x1 + w > qx && y1 < qy + qh && y1 + w > qy;
 }
 
-function rectangleCollidesWithQuad(
+export function rectangleCollidesWithQuad(
   x1: number,
   y1: number,
   w: number,
@@ -464,9 +515,9 @@ export default class QuadTree {
       height,
     };
 
-    // Is the rectangle axis aligned?
-    if (!isAxisAligned(x1, y1, x2, y2))
-      throw new Error("sigma/quadtree.rectangle: shifted view is not yet implemented.");
+    // If the rectangle is shifted, we use the smallest aligned rectangle that contains the shifted one:
+    if (!isRectangleAligned(this.lastRectangle))
+      this.lastRectangle = getCircumscribedAlignedRectangle(this.lastRectangle);
 
     this.cache = getNodesInAxisAlignedRectangleArea(
       MAX_LEVEL,
