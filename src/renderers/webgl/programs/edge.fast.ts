@@ -15,9 +15,48 @@ const POINTS = 2,
   ATTRIBUTES = 3;
 
 export default class EdgeFastProgram extends AbstractEdgeProgram {
+  positionLocation: GLint;
+  colorLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  resolutionLocation: WebGLUniformLocation;
+
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+
+    // Locations:
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+
+    // Uniform locations:
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
+
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting resolutionLocation");
+    this.resolutionLocation = resolutionLocation;
+
     this.bind();
+  }
+
+  bind(): void {
+    const gl = this.gl;
+
+    // Bindings
+    gl.enableVertexAttribArray(this.positionLocation);
+    gl.enableVertexAttribArray(this.colorLocation);
+
+    gl.vertexAttribPointer(
+      this.positionLocation,
+      2,
+      gl.FLOAT,
+      false,
+      this.attributes * Float32Array.BYTES_PER_ELEMENT,
+      0,
+    );
+    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
   }
 
   computeIndices(): void {

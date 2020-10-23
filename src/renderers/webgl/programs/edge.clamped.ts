@@ -22,9 +22,13 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
   indicesArray: Uint32Array | Uint16Array;
   indicesBuffer: WebGLBuffer;
   indicesType: GLenum;
+  positionLocation: GLint;
+  colorLocation: GLint;
   normalLocation: GLint;
   thicknessLocation: GLint;
   radiusLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
   canUse32BitsIndices: boolean;
@@ -38,10 +42,18 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
       throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
     this.indicesBuffer = indicesBuffer;
 
-    // Locations
+    // Locations:
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
+
+    // Uniform locations:
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
 
     const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
     if (resolutionLocation === null)
