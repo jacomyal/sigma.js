@@ -65,7 +65,3 @@ const renderer = new WebGLRenderer(graph, container, {
   defaultEdgeColor: "#888",
   renderEdgeLabels: true,
 });
-
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;

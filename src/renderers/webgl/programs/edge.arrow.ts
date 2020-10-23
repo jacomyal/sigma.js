@@ -5,9 +5,9 @@
  * Compound program rendering edges as an arrow from the source to the target.
  */
 import { createEdgeCompoundProgram } from "./common/edge";
-import ArrowProgram from "./arrow";
+import EdgeArrowHeadProgram from "./edge.arrowHead";
 import EdgeClampedProgram from "./edge.clamped";
 
-const program = createEdgeCompoundProgram([EdgeClampedProgram, ArrowProgram]);
+const program = createEdgeCompoundProgram([EdgeClampedProgram, EdgeArrowHeadProgram]);
 
 export default program;

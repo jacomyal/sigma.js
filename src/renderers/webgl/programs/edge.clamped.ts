@@ -27,10 +27,11 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
   normalLocation: GLint;
   thicknessLocation: GLint;
   radiusLocation: GLint;
-  matrixLocation: WebGLUniformLocation;
-  resolutionLocation: WebGLUniformLocation;
-  ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
+  matrixLocation: WebGLUniformLocation;
+  cameraRatioLocation: WebGLUniformLocation;
+  viewportRatioLocation: WebGLUniformLocation;
+  thicknessRatioLocation: WebGLUniformLocation;
   canUse32BitsIndices: boolean;
 
   constructor(gl: WebGLRenderingContext) {
@@ -49,26 +50,35 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
 
-    // Uniform locations:
+    // Uniform locations
+    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
+    if (scaleLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
+    this.scaleLocation = scaleLocation;
+
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null)
       throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
+    const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
+    if (cameraRatioLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting cameraRatioLocation");
+    this.cameraRatioLocation = cameraRatioLocation;
 
-    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting ratioLocation");
-    this.ratioLocation = ratioLocation;
+    const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
+    if (viewportRatioLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting viewportRatioLocation",
+      );
+    this.viewportRatioLocation = viewportRatioLocation;
 
-    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
-    this.scaleLocation = scaleLocation;
+    const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
+    if (thicknessRatioLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting thicknessRatioLocation",
+      );
+    this.thicknessRatioLocation = thicknessRatioLocation;
 
     // Enabling the OES_element_index_uint extension
     // NOTE: on older GPUs, this means that really large graphs won't
@@ -211,17 +221,11 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     gl.useProgram(program);
 
     // Binding uniforms
-    // TODO: precise the uniform names
-    gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(
-      this.ratioLocation,
-      // 1 / Math.pow(params.ratio, params.edgesPowRatio)
-      params.ratio,
-    );
-
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniform1f(this.cameraRatioLocation, params.ratio);
+    gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
+    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
 
     // Drawing:
     gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
