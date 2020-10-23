@@ -731,7 +731,6 @@ export default class WebGLRenderer extends Renderer {
         width: this.width,
         height: this.height,
         ratio: cameraState.ratio,
-        nodesPowRatio: 0.5,
         edgesPowRatio: 0.5,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });

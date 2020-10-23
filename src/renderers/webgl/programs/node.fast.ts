@@ -6,8 +6,7 @@
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
  */
-import { RenderParams } from "./common/program";
-import { AbstractNodeProgram } from "./common/node";
+import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
 import { NodeAttributes } from "../../../types";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
@@ -44,7 +43,7 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     array[i] = color;
   }
 
-  render(params: RenderParams): void {
+  render(params: RenderNodeParams): void {
     const gl = this.gl;
 
     const program = this.program;
