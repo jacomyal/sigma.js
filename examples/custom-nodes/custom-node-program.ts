@@ -3,8 +3,7 @@
  * a custom fragment shader (./custom-node-fragment-shader.glsl) that will draw
  * a disc inside the nodes.
  */
-import { RenderParams } from "../../src/renderers/webgl/programs/common/program";
-import { AbstractNodeProgram } from "../../src/renderers/webgl/programs/common/node";
+import { AbstractNodeProgram, RenderNodeParams } from "../../src/renderers/webgl/programs/common/node";
 import { NodeAttributes } from "../../src/types";
 import { floatColor } from "../../src/renderers/webgl/utils";
 import vertexShaderSource from "../../src/renderers/webgl/shaders/node.fast.vert.glsl";
@@ -41,7 +40,7 @@ export default class CustomNodeProgram extends AbstractNodeProgram {
     array[i] = color;
   }
 
-  render(params: RenderParams): void {
+  render(params: RenderNodeParams): void {
     const gl = this.gl;
 
     const program = this.program;

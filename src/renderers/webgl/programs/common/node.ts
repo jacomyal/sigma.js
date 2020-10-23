@@ -1,8 +1,14 @@
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { NodeAttributes } from "../../../../types";
+import { RenderEdgeParams } from "./edge";
+
+export interface RenderNodeParams extends RenderParams {
+  nodesPowRatio: number;
+}
 
 export interface INodeProgram extends IProgram {
   process(data: NodeAttributes, offset: number): void;
+  render(params: RenderNodeParams): void;
 }
 
 /**
@@ -109,7 +115,7 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
       // nothing todo, it's already done in each program constructor
     }
 
-    render(params: RenderParams): void {
+    render(params: RenderNodeParams): void {
       this.programs.forEach((program) => program.render(params));
     }
 

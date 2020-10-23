@@ -10,7 +10,6 @@ export interface RenderParams {
   width: number;
   height: number;
   ratio: number;
-  nodesPowRatio: number;
   matrix: Float32Array;
   scalingRatio: number;
 }
