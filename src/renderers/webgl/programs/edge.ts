@@ -30,23 +30,40 @@ export default class EdgeProgram extends AbstractEdgeProgram {
   indicesArray: Uint32Array | Uint16Array;
   indicesType: GLenum;
   canUse32BitsIndices: boolean;
+  positionLocation: GLint;
+  colorLocation: GLint;
   normalLocation: GLint;
   thicknessLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
+    // Locations
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
+    this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
+    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
+
     // Initializing indices buffer
     const indicesBuffer = gl.createBuffer();
     if (indicesBuffer === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting resolutionLocation");
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while initializing the indices buffer");
     this.indicesBuffer = indicesBuffer;
 
-    // Locations
-    this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
-    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
+    // Uniform locations
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting resolutionLocation");
+    this.resolutionLocation = resolutionLocation;
+
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)

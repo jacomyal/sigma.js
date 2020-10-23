@@ -12,7 +12,11 @@ const POINTS = 3,
   ATTRIBUTES = 5;
 
 export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
+  positionLocation: GLint;
+  colorLocation: GLint;
   coordLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
 
@@ -20,7 +24,24 @@ export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
     // Locations
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.coordLocation = gl.getAttribLocation(this.program, "a_coord");
+
+    // Uniform locations:
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeQuadraticBezierProgram: error while getting matrixLocation",
+      );
+    this.matrixLocation = matrixLocation;
+
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeQuadraticBezierProgram: error while getting resolutionLocation",
+      );
+    this.resolutionLocation = resolutionLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)
@@ -40,11 +61,22 @@ export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
   }
 
   bind(): void {
-    super.bind();
+    const gl = this.gl;
 
     // Bindings
-    const gl = this.gl;
+    gl.enableVertexAttribArray(this.positionLocation);
+    gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.coordLocation);
+
+    gl.vertexAttribPointer(
+      this.positionLocation,
+      2,
+      gl.FLOAT,
+      false,
+      this.attributes * Float32Array.BYTES_PER_ELEMENT,
+      0,
+    );
+    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
     gl.vertexAttribPointer(this.coordLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 12);
   }
 

@@ -16,10 +16,14 @@ const POINTS = 3,
 
 export default class ArrowProgram extends AbstractEdgeProgram {
   // Locations
+  positionLocation: GLint;
+  colorLocation: GLint;
   normalLocation: GLint;
   thicknessLocation: GLint;
   radiusLocation: GLint;
   barycentricLocation: GLint;
+  matrixLocation: WebGLUniformLocation;
+  resolutionLocation: WebGLUniformLocation;
   ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
 
@@ -27,10 +31,23 @@ export default class ArrowProgram extends AbstractEdgeProgram {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
     // Locations
+    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
+    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
     this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
+
+    // Uniform locations
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
+
+    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
+    if (resolutionLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting resolutionLocation");
+    this.resolutionLocation = resolutionLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
     if (ratioLocation === null)

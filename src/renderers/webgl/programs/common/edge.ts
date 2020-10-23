@@ -17,11 +17,6 @@ export interface IEdgeProgram extends IProgram {
  * @constructor
  */
 export abstract class AbstractEdgeProgram extends AbstractProgram implements IEdgeProgram {
-  positionLocation: GLint;
-  colorLocation: GLint;
-  resolutionLocation: WebGLUniformLocation;
-  matrixLocation: WebGLUniformLocation;
-
   constructor(
     gl: WebGLRenderingContext,
     vertexShaderSource: string,
@@ -30,41 +25,9 @@ export abstract class AbstractEdgeProgram extends AbstractProgram implements IEd
     attributes: number,
   ) {
     super(gl, vertexShaderSource, fragmentShaderSource, points, attributes);
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-
-    // Uniform Location
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/common/edge: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
-
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/common/edge: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
   }
 
-  bind(): void {
-    const gl = this.gl;
-
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      0,
-    );
-    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
-  }
-
+  abstract bind(): void;
   abstract computeIndices(): void;
   abstract process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void;
   abstract render(params: RenderEdgeParams): void;
