@@ -16,6 +16,5 @@ void main(void) {
   else if (dist > 0.0)
     t = dist / v_border;
 
-  // gl_FragColor = mix(color0, v_color, t);
   gl_FragColor = mix(color0, v_color, t);
 }

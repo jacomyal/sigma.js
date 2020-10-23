@@ -60,7 +60,7 @@ function collision(
 export function labelsToDisplayFromGrid(params: {
   cache: { [key: string]: NodeAttributes };
   camera: Camera;
-  cell: {width: number, height: number} | null;
+  cell: { width: number; height: number } | null;
   dimensions: WebGLRenderer;
   displayedLabels: Set<NodeKey>;
   fontSize: number;
