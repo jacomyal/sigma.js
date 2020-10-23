@@ -55,7 +55,7 @@ export interface WebGLSettings {
   edgeLabelWeight: string;
   // Labels
   labelGrid: {
-    cell: {width: number, height: number} | null;
+    cell: { width: number; height: number } | null;
     renderedSizeThreshold: number;
   };
   // Reducers

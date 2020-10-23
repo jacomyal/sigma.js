@@ -13,7 +13,7 @@ miserables.edges.forEach((edge) => {
   graph.addEdge(+edge.source, +edge.target, { color: "#ccc" });
 });
 
-// Instanciate sigma:
+// Instantiate sigma:
 const container = document.getElementById("container");
 const renderer = new WebGLRenderer(graph, container);
 

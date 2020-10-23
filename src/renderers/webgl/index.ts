@@ -55,7 +55,7 @@ export default class WebGLRenderer extends Renderer {
   quadtree: QuadTree = new QuadTree();
   nodeDataCache: Record<NodeKey, Node> = {};
   edgeDataCache: Record<EdgeKey, Edge> = {};
-  nodeExtent: { x: Extent; y: Extent, z: Extent } | null = null;
+  nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
   edgeExtent: { z: Extent } | null = null;
 
   normalizationFunction: NormalizationFunction | null = null;
@@ -461,7 +461,7 @@ export default class WebGLRenderer extends Renderer {
 
     // `as any` is a workaround due to g-metrics that is not plugged on the same
     // g-types version
-    this.nodeExtent = nodeExtent(graph as any, nodeExtentProperties) as { x: Extent; y: Extent, z: Extent };
+    this.nodeExtent = nodeExtent(graph as any, nodeExtentProperties) as { x: Extent; y: Extent; z: Extent };
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
