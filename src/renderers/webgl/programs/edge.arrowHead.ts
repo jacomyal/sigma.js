@@ -7,14 +7,14 @@
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../utils";
-import vertexShaderSource from "../shaders/arrow.vert.glsl";
-import fragmentShaderSource from "../shaders/arrow.frag.glsl";
+import vertexShaderSource from "../shaders/edge.arrowHead.vert.glsl";
+import fragmentShaderSource from "../shaders/edge.arrowHead.frag.glsl";
 
 const POINTS = 3,
   ATTRIBUTES = 10,
   STRIDE = POINTS * ATTRIBUTES;
 
-export default class ArrowProgram extends AbstractEdgeProgram {
+export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
   // Locations
   positionLocation: GLint;
   colorLocation: GLint;
@@ -23,9 +23,10 @@ export default class ArrowProgram extends AbstractEdgeProgram {
   radiusLocation: GLint;
   barycentricLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  resolutionLocation: WebGLUniformLocation;
-  ratioLocation: WebGLUniformLocation;
   scaleLocation: WebGLUniformLocation;
+  cameraRatioLocation: WebGLUniformLocation;
+  viewportRatioLocation: WebGLUniformLocation;
+  thicknessRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
@@ -39,25 +40,36 @@ export default class ArrowProgram extends AbstractEdgeProgram {
     this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
 
     // Uniform locations
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
-
-    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting ratioLocation");
-    this.ratioLocation = ratioLocation;
-
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
     if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting scaleLocation");
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
+
+    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+    if (matrixLocation === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting matrixLocation");
+    this.matrixLocation = matrixLocation;
+
+    const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
+    if (cameraRatioLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting cameraRatioLocation",
+      );
+    this.cameraRatioLocation = cameraRatioLocation;
+
+    const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
+    if (viewportRatioLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting viewportRatioLocation",
+      );
+    this.viewportRatioLocation = viewportRatioLocation;
+
+    const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
+    if (thicknessRatioLocation === null)
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting thicknessRatioLocation",
+      );
+    this.thicknessRatioLocation = thicknessRatioLocation;
 
     this.bind();
   }
@@ -98,7 +110,7 @@ export default class ArrowProgram extends AbstractEdgeProgram {
   }
 
   computeIndices(): void {
-    //nothing to do
+    // nothing to do
   }
 
   process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
@@ -108,7 +120,7 @@ export default class ArrowProgram extends AbstractEdgeProgram {
       return;
     }
 
-    const thickness = Math.max((data.size || 1) * 2.5, 5),
+    const thickness = data.size || 1,
       radius = targetData.size || 1,
       x1 = sourceData.x,
       y1 = sourceData.y,
@@ -179,12 +191,11 @@ export default class ArrowProgram extends AbstractEdgeProgram {
     gl.useProgram(program);
 
     // Binding uniforms
-    gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(this.ratioLocation, params.ratio);
-
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniform1f(this.cameraRatioLocation, params.ratio);
+    gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
+    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
 
     // Drawing:
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
