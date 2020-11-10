@@ -3,6 +3,7 @@ node_modules
 *.log
 *.swp
 .DS_Store
+.vscode
 /animate.js
 /camera.js
 /captor.js
