@@ -429,9 +429,12 @@ export default class WebGLRenderer extends Renderer {
     graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate);
     graph.on("nodeDropped", this.activeListeners.graphUpdate);
     graph.on("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.on("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.on("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
-    graph.on("nodeDropped", this.activeListeners.graphUpdate);
+    graph.on("edgeDropped", this.activeListeners.graphUpdate);
     graph.on("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.on("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+    graph.on("edgesCleared", this.activeListeners.graphUpdate);
     graph.on("cleared", this.activeListeners.graphUpdate);
 
     return this;
@@ -1047,9 +1050,12 @@ export default class WebGLRenderer extends Renderer {
     graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);
     graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
     graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
-    graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeDropped", this.activeListeners.graphUpdate);
     graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+    graph.removeListener("edgesCleared", this.activeListeners.graphUpdate);
     graph.removeListener("cleared", this.activeListeners.graphUpdate);
 
     // Releasing cache & state
