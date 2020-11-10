@@ -1,7 +1,7 @@
 import { UndirectedGraph } from "graphology";
 import circularLayout from "graphology-layout/circular";
 import { scaleLinear } from "d3-scale";
-import extent from "simple-statistics/src/extent";
+import { extent } from "simple-statistics";
 
 import WebGLRenderer from "../src/renderers/webgl/index";
 import { animateNodes } from "../src/animate";

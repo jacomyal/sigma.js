@@ -1,6 +1,7 @@
 const path = require('path');
 
-const production = !!~process.argv.indexOf('-p');
+let production = process.argv.indexOf('--mode');
+production = production !== -1 ? (process.argv[production + 1] === 'production') : false;
 
 const moduleConfig = {
   rules: [
@@ -20,7 +21,7 @@ const moduleConfig = {
 module.exports = [
   {
     name: 'sigma',
-    mode: 'production',
+    mode: production ? 'production' : 'none',
     entry: './src/endpoint.ts',
     output: {
       filename: production ? 'sigma.min.js' : 'sigma.js',
