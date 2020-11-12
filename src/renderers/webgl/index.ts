@@ -4,11 +4,11 @@
  *
  * File implementing sigma's WebGL Renderer.
  */
+import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";
 import isGraph from "graphology-utils/is-graph";
 import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
-import Renderer from "../../renderer";
 import Camera from "../../camera";
 import MouseCaptor from "../../captors/mouse";
 import Captor from "../../captor";
@@ -43,7 +43,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class WebGLRenderer extends Renderer {
+export default class WebGLRenderer extends EventEmitter {
   settings: WebGLSettings;
   graph: Graph;
   captors: { [key: string]: Captor } = {};
