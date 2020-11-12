@@ -8,10 +8,19 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types/", "./external-types/"],
-    "lib": ["dom"]
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./external-types/"
+    ],
+    "lib": [
+      "dom"
+    ]
   },
-  "include": ["./external-types/**/*", "./src/**/*"],
+  "include": [
+    "./examples/**/*",
+    "./external-types/**/*",
+    "./src/**/*"
+  ],
   "ts-node": {
     "files": true
   }
