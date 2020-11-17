@@ -192,7 +192,7 @@ export default class MouseCaptor extends Captor {
     }
 
     this.isMoving = false;
-    setImmediate(() => (this.hasDragged = false));
+    setTimeout(() => (this.hasDragged = false), 0);
     this.emit("mouseup", getMouseCoords(e));
   }
 
