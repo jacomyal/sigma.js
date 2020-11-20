@@ -57,7 +57,8 @@ function loop() {
 
   animateNodes(graph, l, { duration: 2000 }, () => {
     state = !state;
-    loop();
+    window.dispatchEvent(new Event("AnimationDone"));
+    setTimeout(loop, 500);
   });
 }
 
