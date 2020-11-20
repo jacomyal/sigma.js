@@ -1,1 +1,4588 @@
-!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.Sigma=e():t.Sigma=e()}(window,(function(){return function(t){var e={};function r(i){if(e[i])return e[i].exports;var n=e[i]={i:i,l:!1,exports:{}};return t[i].call(n.exports,n,n.exports,r),n.l=!0,n.exports}return r.m=t,r.c=e,r.d=function(t,e,i){r.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:i})},r.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},r.t=function(t,e){if(1&e&&(t=r(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var i=Object.create(null);if(r.r(i),Object.defineProperty(i,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var n in t)r.d(i,n,function(e){return t[e]}.bind(null,n));return i},r.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return r.d(e,"a",e),e},r.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},r.p="",r(r.s=15)}([function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.canUse32BitsIndices=e.extractPixel=e.matrixFromCamera=e.floatColor=void 0;var i=r(26),n={},o=new Int8Array(4),a=new Int32Array(o.buffer,0,1),s=new Float32Array(o.buffer,0,1),c=/^\s*rgba?\s*\(/,l=/^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;e.floatColor=function(t){if(void 0!==n[t])return n[t];var e=0,r=0,i=0,o=1;if("#"===t[0])4===t.length?(e=parseInt(t.charAt(1)+t.charAt(1),16),r=parseInt(t.charAt(2)+t.charAt(2),16),i=parseInt(t.charAt(3)+t.charAt(3),16)):(e=parseInt(t.charAt(1)+t.charAt(2),16),r=parseInt(t.charAt(3)+t.charAt(4),16),i=parseInt(t.charAt(5)+t.charAt(6),16));else if(c.test(t)){var h=t.match(l);h&&(e=+h[1],r=+h[2],i=+h[3],h[4]&&(o=+h[4]))}o=255*o|0,a[0]=4278190079&(o<<24|i<<16|r<<8|e);var u=s[0];return n[t]=u,u},e.matrixFromCamera=function(t,e){var r=t.angle,n=t.ratio,o=t.x,a=t.y,s=e.width,c=e.height,l=i.identity(),h=Math.min(s,c),u=i.translate(i.identity(),-o,-a),d=i.scale(i.identity(),1/n),f=i.rotate(i.identity(),-r),p=i.scale(i.identity(),h/s*2,h/c*2);return i.multiply(l,p),i.multiply(l,f),i.multiply(l,d),i.multiply(l,u),l},e.extractPixel=function(t,e,r,i){var n=i||new Uint8Array(4);return t.readPixels(e,r,1,1,t.RGBA,t.UNSIGNED_BYTE,n),n},e.canUse32BitsIndices=function(t){return"undefined"!=typeof WebGL2RenderingContext&&t instanceof WebGL2RenderingContext||!!t.getExtension("OES_element_index_uint")}},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=r(3),s=r(16),c=o(r(6)),l=r(4),h=function(t){function e(){var e=t.call(this)||this;return e.x=.5,e.y=.5,e.angle=0,e.ratio=1,e.nextFrame=null,e.enabled=!0,e.previousState=e.getState(),e}return n(e,t),e.prototype.enable=function(){return this.enabled=!0,this},e.prototype.disable=function(){return this.enabled=!1,this},e.prototype.getState=function(){return{x:this.x,y:this.y,angle:this.angle,ratio:this.ratio}},e.prototype.getPreviousState=function(){var t=this.previousState;return{x:t.x,y:t.y,angle:t.angle,ratio:t.ratio}},e.prototype.isAnimated=function(){return!!this.nextFrame},e.prototype.graphToViewport=function(t,e,r){var i=Math.min(t.width,t.height),n=i/t.width,o=i/t.height;return{x:(e-this.x+this.ratio/2/n)*(i/this.ratio),y:(this.y-r+this.ratio/2/o)*(i/this.ratio)}},e.prototype.viewportToGraph=function(t,e,r){var i=Math.min(t.width,t.height),n=i/t.width,o=i/t.height;return{x:this.ratio/i*e+this.x-this.ratio/2/n,y:-(this.ratio/i*r-this.y-this.ratio/2/o)}},e.prototype.viewRectangle=function(t){var e=0*t.width/8,r=0*t.height/8,i=this.viewportToGraph(t,0-e,0-r),n=this.viewportToGraph(t,t.width+e,0-r),o=this.viewportToGraph(t,0,t.height+r);return{x1:i.x,y1:i.y,x2:n.x,y2:n.y,height:n.y-o.y}},e.prototype.setState=function(t){return this.enabled?(this.previousState=this.getState(),t.x&&(this.x=t.x),t.y&&(this.y=t.y),t.angle&&(this.angle=t.angle),t.ratio&&(this.ratio=t.ratio),this.emit("updated",this.getState()),this):this},e.prototype.animate=function(t,e,r){var i=this;if(this.enabled){var n=l.assign({},s.ANIMATE_DEFAULTS,e),o="function"==typeof n.easing?n.easing:c.default[n.easing];this.nextFrame&&cancelAnimationFrame(this.nextFrame);var a=Date.now(),h=this.getState(),u=function(){var e=(Date.now()-a)/n.duration;if(e>=1)return i.nextFrame=null,i.setState(t),void("function"==typeof r&&r());var s=o(e),c={};t.x&&(c.x=h.x+(t.x-h.x)*s),t.y&&(c.y=h.y+(t.y-h.y)*s),t.angle&&(c.angle=h.angle+(t.angle-h.angle)*s),t.ratio&&(c.ratio=h.ratio+(t.ratio-h.ratio)*s),i.setState(c),i.nextFrame=requestAnimationFrame(u)};this.nextFrame?(cancelAnimationFrame(this.nextFrame),this.nextFrame=requestAnimationFrame(u)):u()}},e.prototype.animatedZoom=function(t){if(t){if("number"==typeof t)return this.animate({ratio:this.ratio/t});this.animate({ratio:this.ratio/(t.factor||1.5)},t)}else this.animate({ratio:this.ratio/1.5})},e.prototype.animatedUnzoom=function(t){if(t){if("number"==typeof t)return this.animate({ratio:this.ratio*t});this.animate({ratio:this.ratio*(t.factor||1.5)},t)}else this.animate({ratio:1.5*this.ratio})},e.prototype.animatedReset=function(t){this.animate({x:.5,y:.5,ratio:1,angle:0},t)},e}(a.EventEmitter);e.default=h},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)});Object.defineProperty(e,"__esModule",{value:!0}),e.createEdgeCompoundProgram=e.AbstractEdgeProgram=void 0;var o=function(t){function e(e,r,i,n,o){var a=t.call(this,e,r,i,n,o)||this;a.positionLocation=e.getAttribLocation(a.program,"a_position"),a.colorLocation=e.getAttribLocation(a.program,"a_color");var s=e.getUniformLocation(a.program,"u_resolution");if(null===s)throw new Error("sigma/renderers/webgl/program/common/edge: error while getting resolutionLocation");a.resolutionLocation=s;var c=e.getUniformLocation(a.program,"u_matrix");if(null===c)throw new Error("sigma/renderers/webgl/program/common/edge: error while getting matrixLocation");return a.matrixLocation=c,a}return n(e,t),e.prototype.bind=function(){var t=this.gl;t.enableVertexAttribArray(this.positionLocation),t.enableVertexAttribArray(this.colorLocation),t.vertexAttribPointer(this.positionLocation,2,t.FLOAT,!1,this.attributes*Float32Array.BYTES_PER_ELEMENT,0),t.vertexAttribPointer(this.colorLocation,1,t.FLOAT,!1,this.attributes*Float32Array.BYTES_PER_ELEMENT,8)},e}(r(13).AbstractProgram);e.AbstractEdgeProgram=o,e.createEdgeCompoundProgram=function(t){return function(){function e(e){this.programs=t.map((function(t){return new t(e)}))}return e.prototype.bufferData=function(){this.programs.forEach((function(t){return t.bufferData()}))},e.prototype.allocate=function(t){this.programs.forEach((function(e){return e.allocate(t)}))},e.prototype.bind=function(){},e.prototype.computeIndices=function(){this.programs.forEach((function(t){return t.computeIndices()}))},e.prototype.render=function(t){this.programs.forEach((function(e){return e.render(t)}))},e.prototype.process=function(t,e,r,i){this.programs.forEach((function(n){return n.process(t,e,r,i)}))},e}()}},function(t,e,r){"use strict";var i,n="object"==typeof Reflect?Reflect:null,o=n&&"function"==typeof n.apply?n.apply:function(t,e,r){return Function.prototype.apply.call(t,e,r)};i=n&&"function"==typeof n.ownKeys?n.ownKeys:Object.getOwnPropertySymbols?function(t){return Object.getOwnPropertyNames(t).concat(Object.getOwnPropertySymbols(t))}:function(t){return Object.getOwnPropertyNames(t)};var a=Number.isNaN||function(t){return t!=t};function s(){s.init.call(this)}t.exports=s,t.exports.once=function(t,e){return new Promise((function(r,i){function n(){void 0!==o&&t.removeListener("error",o),r([].slice.call(arguments))}var o;"error"!==e&&(o=function(r){t.removeListener(e,n),i(r)},t.once("error",o)),t.once(e,n)}))},s.EventEmitter=s,s.prototype._events=void 0,s.prototype._eventsCount=0,s.prototype._maxListeners=void 0;var c=10;function l(t){if("function"!=typeof t)throw new TypeError('The "listener" argument must be of type Function. Received type '+typeof t)}function h(t){return void 0===t._maxListeners?s.defaultMaxListeners:t._maxListeners}function u(t,e,r,i){var n,o,a,s;if(l(r),void 0===(o=t._events)?(o=t._events=Object.create(null),t._eventsCount=0):(void 0!==o.newListener&&(t.emit("newListener",e,r.listener?r.listener:r),o=t._events),a=o[e]),void 0===a)a=o[e]=r,++t._eventsCount;else if("function"==typeof a?a=o[e]=i?[r,a]:[a,r]:i?a.unshift(r):a.push(r),(n=h(t))>0&&a.length>n&&!a.warned){a.warned=!0;var c=new Error("Possible EventEmitter memory leak detected. "+a.length+" "+String(e)+" listeners added. Use emitter.setMaxListeners() to increase limit");c.name="MaxListenersExceededWarning",c.emitter=t,c.type=e,c.count=a.length,s=c,console&&console.warn&&console.warn(s)}return t}function d(){if(!this.fired)return this.target.removeListener(this.type,this.wrapFn),this.fired=!0,0===arguments.length?this.listener.call(this.target):this.listener.apply(this.target,arguments)}function f(t,e,r){var i={fired:!1,wrapFn:void 0,target:t,type:e,listener:r},n=d.bind(i);return n.listener=r,i.wrapFn=n,n}function p(t,e,r){var i=t._events;if(void 0===i)return[];var n=i[e];return void 0===n?[]:"function"==typeof n?r?[n.listener||n]:[n]:r?function(t){for(var e=new Array(t.length),r=0;r<e.length;++r)e[r]=t[r].listener||t[r];return e}(n):v(n,n.length)}function g(t){var e=this._events;if(void 0!==e){var r=e[t];if("function"==typeof r)return 1;if(void 0!==r)return r.length}return 0}function v(t,e){for(var r=new Array(e),i=0;i<e;++i)r[i]=t[i];return r}Object.defineProperty(s,"defaultMaxListeners",{enumerable:!0,get:function(){return c},set:function(t){if("number"!=typeof t||t<0||a(t))throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received '+t+".");c=t}}),s.init=function(){void 0!==this._events&&this._events!==Object.getPrototypeOf(this)._events||(this._events=Object.create(null),this._eventsCount=0),this._maxListeners=this._maxListeners||void 0},s.prototype.setMaxListeners=function(t){if("number"!=typeof t||t<0||a(t))throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received '+t+".");return this._maxListeners=t,this},s.prototype.getMaxListeners=function(){return h(this)},s.prototype.emit=function(t){for(var e=[],r=1;r<arguments.length;r++)e.push(arguments[r]);var i="error"===t,n=this._events;if(void 0!==n)i=i&&void 0===n.error;else if(!i)return!1;if(i){var a;if(e.length>0&&(a=e[0]),a instanceof Error)throw a;var s=new Error("Unhandled error."+(a?" ("+a.message+")":""));throw s.context=a,s}var c=n[t];if(void 0===c)return!1;if("function"==typeof c)o(c,this,e);else{var l=c.length,h=v(c,l);for(r=0;r<l;++r)o(h[r],this,e)}return!0},s.prototype.addListener=function(t,e){return u(this,t,e,!1)},s.prototype.on=s.prototype.addListener,s.prototype.prependListener=function(t,e){return u(this,t,e,!0)},s.prototype.once=function(t,e){return l(e),this.on(t,f(this,t,e)),this},s.prototype.prependOnceListener=function(t,e){return l(e),this.prependListener(t,f(this,t,e)),this},s.prototype.removeListener=function(t,e){var r,i,n,o,a;if(l(e),void 0===(i=this._events))return this;if(void 0===(r=i[t]))return this;if(r===e||r.listener===e)0==--this._eventsCount?this._events=Object.create(null):(delete i[t],i.removeListener&&this.emit("removeListener",t,r.listener||e));else if("function"!=typeof r){for(n=-1,o=r.length-1;o>=0;o--)if(r[o]===e||r[o].listener===e){a=r[o].listener,n=o;break}if(n<0)return this;0===n?r.shift():function(t,e){for(;e+1<t.length;e++)t[e]=t[e+1];t.pop()}(r,n),1===r.length&&(i[t]=r[0]),void 0!==i.removeListener&&this.emit("removeListener",t,a||e)}return this},s.prototype.off=s.prototype.removeListener,s.prototype.removeAllListeners=function(t){var e,r,i;if(void 0===(r=this._events))return this;if(void 0===r.removeListener)return 0===arguments.length?(this._events=Object.create(null),this._eventsCount=0):void 0!==r[t]&&(0==--this._eventsCount?this._events=Object.create(null):delete r[t]),this;if(0===arguments.length){var n,o=Object.keys(r);for(i=0;i<o.length;++i)"removeListener"!==(n=o[i])&&this.removeAllListeners(n);return this.removeAllListeners("removeListener"),this._events=Object.create(null),this._eventsCount=0,this}if("function"==typeof(e=r[t]))this.removeListener(t,e);else if(void 0!==e)for(i=e.length-1;i>=0;i--)this.removeListener(t,e[i]);return this},s.prototype.listeners=function(t){return p(this,t,!0)},s.prototype.rawListeners=function(t){return p(this,t,!1)},s.listenerCount=function(t,e){return"function"==typeof t.listenerCount?t.listenerCount(e):g.call(t,e)},s.prototype.listenerCount=g,s.prototype.eventNames=function(){return this._eventsCount>0?i(this._events):[]}},function(t,e,r){"use strict";function i(t){return"object"==typeof t&&null!==t&&t.constructor===Object}Object.defineProperty(e,"__esModule",{value:!0}),e.assign=e.isPlainObject=void 0,e.isPlainObject=i,e.assign=function t(e){for(var r=[],n=1;n<arguments.length;n++)r[n-1]=arguments[n];e=e||{};for(var o=0,a=r.length;o<a;o++){var s=r[o];if(s)for(var c in s)i(s[c])?e[c]=t(e[c],s[c]):e[c]=s[c]}return e}},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)});Object.defineProperty(e,"__esModule",{value:!0});var o=function(t){function e(){return null!==t&&t.apply(this,arguments)||this}return n(e,t),e}(r(3).EventEmitter);e.default=o},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.cubicInOut=e.cubicOut=e.cubicIn=e.quadraticInOut=e.quadraticOut=e.quadraticIn=e.linear=void 0,e.linear=function(t){return t},e.quadraticIn=function(t){return t*t},e.quadraticOut=function(t){return t*(2-t)},e.quadraticInOut=function(t){return(t*=2)<1?.5*t*t:-.5*(--t*(t-2)-1)},e.cubicIn=function(t){return t*t*t},e.cubicOut=function(t){return--t*t*t+1},e.cubicInOut=function(t){return(t*=2)<1?.5*t*t*t:.5*((t-=2)*t*t+2)};var i={linear:e.linear,quadraticIn:e.quadraticIn,quadraticOut:e.quadraticOut,quadraticInOut:e.quadraticInOut,cubicIn:e.cubicIn,cubicOut:e.cubicOut,cubicInOut:e.cubicInOut};e.default=i},function(t,e,r){"use strict";var i=this&&this.__read||function(t,e){var r="function"==typeof Symbol&&t[Symbol.iterator];if(!r)return t;var i,n,o=r.call(t),a=[];try{for(;(void 0===e||e-- >0)&&!(i=o.next()).done;)a.push(i.value)}catch(t){n={error:t}}finally{try{i&&!i.done&&(r=o.return)&&r.call(o)}finally{if(n)throw n.error}}return a},n=this&&this.__spread||function(){for(var t=[],e=0;e<arguments.length;e++)t=t.concat(i(arguments[e]));return t},o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=o(r(17));function s(t,e,r,i,n,o,a){return t<i+o&&t+r>i&&e<n+a&&e+r>n}function c(t,e,r,i,n,o,a,s){return t<n+a&&t+r>n&&e<o+s&&e+i>o}function l(t,e,r,i,n,o){var a=t<r+n/2;return e<i+o/2?a?1:2:a?3:4}var h=function(){function t(t){void 0===t&&(t={}),this.containers={},this.cache=null,this.lastRectangle=null;var e=Math.pow(4,5);this.data=new Float32Array((4*e-1)/3*4),t.boundaries?this.resize(t.boundaries):this.resize({x:0,y:0,width:1,height:1})}return t.prototype.add=function(t,e,r,i){return function(t,e,r,i,n,o,a){for(var c=n-a,l=o-a,h=2*a,u=0,d=0;;){if(u>=t)return r[d]=r[d]||[],void r[d].push(i);var f=4*d+4,p=4*d+8,g=4*d+12,v=4*d+16,m=s(c,l,h,e[f+0],e[f+1],e[f+2],e[f+3]),y=s(c,l,h,e[p+0],e[p+1],e[p+2],e[p+3]),_=s(c,l,h,e[g+0],e[g+1],e[g+2],e[g+3]),b=s(c,l,h,e[v+0],e[v+1],e[v+2],e[v+3]),w=[m,y,_,b].reduce((function(t,e){return e?t+1:t}),0);if(0===w)throw new Error("sigma/quadtree.insertNode: no collision (level: "+u+", key: "+i+", x: "+n+", y: "+o+", size: "+a+").");if(3===w)throw new Error("sigma/quadtree.insertNode: 3 impossible collisions (level: "+u+", key: "+i+", x: "+n+", y: "+o+", size: "+a+").");if(w>1)return r[d]=r[d]||[],void r[d].push(i);u++,m&&(d=f),y&&(d=p),_&&(d=g),b&&(d=v)}}(5,this.data,this.containers,t,e,r,i),this},t.prototype.resize=function(t){this.clear(),this.data[0]=t.x,this.data[1]=t.y,this.data[2]=t.width,this.data[3]=t.height,function(t,e){for(var r=[0,0];r.length;){var i=r.pop(),n=r.pop(),o=4*n+4,a=4*n+8,s=4*n+12,c=4*n+16,l=e[n+0],h=e[n+1],u=e[n+2]/2,d=e[n+3]/2;e[o+0]=l,e[o+1]=h,e[o+2]=u,e[o+3]=d,e[a+0]=l+u,e[a+1]=h,e[a+2]=u,e[a+3]=d,e[s+0]=l,e[s+1]=h+d,e[s+2]=u,e[s+3]=d,e[c+0]=l+u,e[c+1]=h+d,e[c+2]=u,e[c+3]=d,i<t-1&&(r.push(c,i+1),r.push(s,i+1),r.push(a,i+1),r.push(o,i+1))}}(5,this.data)},t.prototype.clear=function(){return this.containers={},this},t.prototype.point=function(t,e){var r=[],i=0,o=0;do{this.containers[i]&&r.push.apply(r,n(this.containers[i])),i=4*i+4*l(t,e,this.data[i+0],this.data[i+1],this.data[i+2],this.data[i+3]),o++}while(o<=5);return r},t.prototype.rectangle=function(t,e,r,i,n){var o=this.lastRectangle;if(o&&t===o.x1&&r===o.x2&&e===o.y1&&i===o.y2&&n===o.height)return this.cache;if(this.lastRectangle={x1:t,y1:e,x2:r,y2:i,height:n},!function(t,e,r,i){return t===r||e===i}(t,e,r,i))throw new Error("sigma/quadtree.rectangle: shifted view is not yet implemented.");return this.cache=function(t,e,r,i,n,o,s){for(var l,h=[0,0],u=[];h.length;){var d=h.pop(),f=h.pop();if((l=r[f])&&a.default(u,l),!(d>=t)){var p=4*f+4,g=4*f+8,v=4*f+12,m=4*f+16,y=c(i,n,o,s,e[p+0],e[p+1],e[p+2],e[p+3]),_=c(i,n,o,s,e[g+0],e[g+1],e[g+2],e[g+3]),b=c(i,n,o,s,e[v+0],e[v+1],e[v+2],e[v+3]),w=c(i,n,o,s,e[m+0],e[m+1],e[m+2],e[m+3]);y&&h.push(p,d+1),_&&h.push(g,d+1),b&&h.push(v,d+1),w&&h.push(m,d+1)}}return u}(5,this.data,this.containers,t,e,Math.abs(t-r)||Math.abs(e-i),n),this.cache},t}();e.default=h},function(t,e,r){"use strict";(function(t){var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=o(r(1)),s=o(r(21)),c=r(22),l=function(e){function r(t,r){var i=e.call(this,t,r)||this;return i.enabled=!0,i.hasDragged=!1,i.downStartTime=null,i.lastMouseX=null,i.lastMouseY=null,i.isMouseDown=!1,i.isMoving=!1,i.movingTimeout=null,i.startCameraState=null,i.lastCameraState=null,i.clicks=0,i.doubleClickTimeout=null,i.wheelLock=!1,i.handleClick=i.handleClick.bind(i),i.handleRightClick=i.handleRightClick.bind(i),i.handleDown=i.handleDown.bind(i),i.handleUp=i.handleUp.bind(i),i.handleMove=i.handleMove.bind(i),i.handleWheel=i.handleWheel.bind(i),i.handleOut=i.handleOut.bind(i),t.addEventListener("click",i.handleClick,!1),t.addEventListener("contextmenu",i.handleRightClick,!1),t.addEventListener("mousedown",i.handleDown,!1),t.addEventListener("mousemove",i.handleMove,!1),t.addEventListener("wheel",i.handleWheel,!1),t.addEventListener("mouseout",i.handleOut,!1),document.addEventListener("mouseup",i.handleUp,!1),i}return n(r,e),r.prototype.kill=function(){var t=this.container;t.removeEventListener("click",this.handleClick),t.removeEventListener("contextmenu",this.handleRightClick),t.removeEventListener("mousedown",this.handleDown),t.removeEventListener("mousemove",this.handleMove),t.removeEventListener("wheel",this.handleWheel),t.removeEventListener("mouseout",this.handleOut),document.removeEventListener("mouseup",this.handleUp)},r.prototype.handleClick=function(t){var e=this;if(this.enabled){if(this.clicks++,2===this.clicks)return this.clicks=0,"number"==typeof this.doubleClickTimeout&&(clearTimeout(this.doubleClickTimeout),this.doubleClickTimeout=null),this.handleDoubleClick(t);setTimeout((function(){e.clicks=0,e.doubleClickTimeout=null}),300),this.hasDragged||this.emit("click",c.getMouseCoords(t))}},r.prototype.handleRightClick=function(t){this.enabled&&this.emit("rightClick",c.getMouseCoords(t))},r.prototype.handleDoubleClick=function(t){if(this.enabled){var e=c.getCenter(t),r=this.camera.getState(),i=r.ratio/2.2,n={width:this.container.offsetWidth,height:this.container.offsetHeight},o=c.getX(t),s=c.getY(t),l=new a.default;l.ratio=i,l.x=r.x,l.y=r.y;var h=this.camera.viewportToGraph(n,o,s),u=this.camera.viewportToGraph(n,e.x,e.y),d=l.viewportToGraph(n,o,s),f=l.viewportToGraph(n,e.x,e.y),p=d.x-f.x-h.x+u.x,g=d.y-f.y-h.y+u.y;return this.camera.animate({x:r.x-p,y:r.y-g,ratio:i},{easing:"quadraticInOut",duration:200}),t.preventDefault?t.preventDefault():t.returnValue=!1,t.stopPropagation(),!1}},r.prototype.handleDown=function(t){this.enabled&&(this.startCameraState=this.camera.getState(),this.lastCameraState=this.startCameraState,this.lastMouseX=c.getX(t),this.lastMouseY=c.getY(t),this.hasDragged=!1,this.downStartTime=Date.now(),t.which,this.isMouseDown=!0,this.emit("mousedown",c.getMouseCoords(t)))},r.prototype.handleUp=function(e){var r=this;if(this.enabled&&this.isMouseDown){this.isMouseDown=!1,"number"==typeof this.movingTimeout&&(clearTimeout(this.movingTimeout),this.movingTimeout=null);var i=c.getX(e),n=c.getY(e),o=this.camera.getState(),a=this.camera.getPreviousState();this.isMoving?this.camera.animate({x:o.x+3*(o.x-a.x),y:o.y+3*(o.y-a.y)},{duration:200,easing:"quadraticOut"}):this.lastMouseX===i&&this.lastMouseY===n||this.camera.setState({x:o.x,y:o.y}),this.isMoving=!1,t((function(){return r.hasDragged=!1})),this.emit("mouseup",c.getMouseCoords(e))}},r.prototype.handleMove=function(t){var e=this;if(this.enabled){if(this.emit("mousemove",c.getMouseCoords(t)),this.isMouseDown){this.isMoving=!0,this.hasDragged=!0,"number"==typeof this.movingTimeout&&clearTimeout(this.movingTimeout),this.movingTimeout=window.setTimeout((function(){e.movingTimeout=null,e.isMoving=!1}),200);var r={width:this.container.offsetWidth,height:this.container.offsetHeight},i=c.getX(t),n=c.getY(t),o=this.camera.viewportToGraph(r,this.lastMouseX,this.lastMouseY),a=this.camera.viewportToGraph(r,i,n),s=o.x-a.x,l=o.y-a.y,h=this.camera.getState(),u=h.x+s,d=h.y+l;this.camera.setState({x:u,y:d}),this.lastMouseX=i,this.lastMouseY=n}return t.preventDefault?t.preventDefault():t.returnValue=!1,t.stopPropagation(),!1}},r.prototype.handleWheel=function(t){var e=this;if(t.preventDefault?t.preventDefault():t.returnValue=!1,t.stopPropagation(),!this.enabled)return!1;var r=c.getWheelDelta(t);if(!r)return!1;if(this.wheelLock)return!1;this.wheelLock=!0;var i=r>0?1/1.7:1.7,n=this.camera.getState(),o=i*n.ratio,s=c.getCenter(t),l={width:this.container.offsetWidth,height:this.container.offsetHeight},h=c.getX(t),u=c.getY(t),d=new a.default;d.ratio=o,d.x=n.x,d.y=n.y;var f=this.camera.viewportToGraph(l,h,u),p=this.camera.viewportToGraph(l,s.x,s.y),g=d.viewportToGraph(l,h,u),v=d.viewportToGraph(l,s.x,s.y),m=g.x-v.x-f.x+p.x,y=g.y-v.y-f.y+p.y;return this.camera.animate({x:n.x-m,y:n.y-y,ratio:o},{easing:"linear",duration:200},(function(){return e.wheelLock=!1})),!1},r.prototype.handleOut=function(){},r}(s.default);e.default=l}).call(this,r(18).setImmediate)},function(t,e){var r;r=function(){return this}();try{r=r||new Function("return this")()}catch(t){"object"==typeof window&&(r=window)}t.exports=r},function(t,e,r){"use strict";var i=this&&this.__read||function(t,e){var r="function"==typeof Symbol&&t[Symbol.iterator];if(!r)return t;var i,n,o=r.call(t),a=[];try{for(;(void 0===e||e-- >0)&&!(i=o.next()).done;)a.push(i.value)}catch(t){n={error:t}}finally{try{i&&!i.done&&(r=o.return)&&r.call(o)}finally{if(n)throw n.error}}return a};Object.defineProperty(e,"__esModule",{value:!0}),e.createNormalizationFunction=e.getPixelRatio=e.createElement=void 0,e.createElement=function(t,e,r){var i=document.createElement(t);if(e)for(var n in e)i.style[n]=e[n];if(r)for(var n in r)i.setAttribute(n,r[n]);return i},e.getPixelRatio=function(){return void 0!==window.devicePixelRatio?window.devicePixelRatio:1},e.createNormalizationFunction=function(t){var e=i(t.x,2),r=e[0],n=e[1],o=i(t.y,2),a=o[0],s=o[1],c=Math.max(n-r,s-a);0===c&&(c=1);var l=(n+r)/2,h=(s+a)/2,u=function(t){return{x:.5+(t.x-l)/c,y:.5+(t.y-h)/c}};return u.applyTo=function(t){t.x=.5+(t.x-l)/c,t.y=.5+(t.y-h)/c},u.inverse=function(t){return{x:l+c*(t.x-.5),y:h+c*(t.y-.5)}},u.ratio=c,u}},function(t,e){t.exports=function(t){return null!==t&&"object"==typeof t&&"function"==typeof t.addUndirectedEdgeWithKey&&"function"==typeof t.dropNode&&"boolean"==typeof t.multi}},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=function(t,e,r){var i=r.labelSize,n=r.labelFont,o=r.labelWeight;t.fillStyle="#000",t.font=o+" "+i+"px "+n,t.fillText(e.label,e.x+e.size+3,e.y+i/3)}},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.AbstractProgram=void 0;var i=r(35),n=function(){function t(t,e,r,n,o){this.array=new Float32Array,this.points=n,this.attributes=o,this.gl=t,this.vertexShaderSource=e,this.fragmentShaderSource=r;var a=t.createBuffer();if(null===a)throw new Error("sigma/renderers/webgl/program/program.Program: error while creating the buffer");this.buffer=a,t.bindBuffer(t.ARRAY_BUFFER,this.buffer),this.vertexShader=i.loadVertexShader(t,this.vertexShaderSource),this.fragmentShader=i.loadFragmentShader(t,this.fragmentShaderSource),this.program=i.loadProgram(t,[this.vertexShader,this.fragmentShader])}return t.prototype.bufferData=function(){var t=this.gl;t.bufferData(t.ARRAY_BUFFER,this.array,t.DYNAMIC_DRAW)},t.prototype.allocate=function(t){this.array=new Float32Array(this.points*this.attributes*t)},t}();e.AbstractProgram=n},function(t,e,r){"use strict";r.r(e),e.default="precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 2.6;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n"},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0}),e.WebGLRenderer=e.MouseCaptor=e.QuadTree=e.Camera=e.Renderer=void 0;var n=i(r(5));e.Renderer=n.default;var o=i(r(1));e.Camera=o.default;var a=i(r(7));e.QuadTree=a.default;var s=i(r(8));e.MouseCaptor=s.default;var c=i(r(23));e.WebGLRenderer=c.default},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0}),e.animateNodes=e.ANIMATE_DEFAULTS=void 0;var n=r(4),o=i(r(6));e.ANIMATE_DEFAULTS={easing:"quadraticInOut",duration:150},e.animateNodes=function(t,r,i,a){var s=n.assign({},e.ANIMATE_DEFAULTS,i),c="function"==typeof s.easing?s.easing:o.default[s.easing],l=Date.now(),h={};for(var u in r){var d=r[u];for(var f in h[u]={},d)h[u][f]=t.getNodeAttribute(u,f)}var p=null,g=function(){var e=(Date.now()-l)/s.duration;if(e>=1){for(var i in r){var n=r[i];for(var o in n)t.setNodeAttribute(i,o,n[o])}"function"==typeof a&&a()}else{for(var i in e=c(e),r){n=r[i];var u=h[i];for(var o in n)t.setNodeAttribute(i,o,n[o]*e+u[o]*(1-e))}p=requestAnimationFrame(g)}};return g(),function(){p&&cancelAnimationFrame(p)}}},function(t,e){t.exports=function(t,e){var r=e.length;if(0!==r){var i=t.length;t.length+=r;for(var n=0;n<r;n++)t[i+n]=e[n]}}},function(t,e,r){(function(t){var i=void 0!==t&&t||"undefined"!=typeof self&&self||window,n=Function.prototype.apply;function o(t,e){this._id=t,this._clearFn=e}e.setTimeout=function(){return new o(n.call(setTimeout,i,arguments),clearTimeout)},e.setInterval=function(){return new o(n.call(setInterval,i,arguments),clearInterval)},e.clearTimeout=e.clearInterval=function(t){t&&t.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(i,this._id)},e.enroll=function(t,e){clearTimeout(t._idleTimeoutId),t._idleTimeout=e},e.unenroll=function(t){clearTimeout(t._idleTimeoutId),t._idleTimeout=-1},e._unrefActive=e.active=function(t){clearTimeout(t._idleTimeoutId);var e=t._idleTimeout;e>=0&&(t._idleTimeoutId=setTimeout((function(){t._onTimeout&&t._onTimeout()}),e))},r(19),e.setImmediate="undefined"!=typeof self&&self.setImmediate||void 0!==t&&t.setImmediate||this&&this.setImmediate,e.clearImmediate="undefined"!=typeof self&&self.clearImmediate||void 0!==t&&t.clearImmediate||this&&this.clearImmediate}).call(this,r(9))},function(t,e,r){(function(t,e){!function(t,r){"use strict";if(!t.setImmediate){var i,n,o,a,s,c=1,l={},h=!1,u=t.document,d=Object.getPrototypeOf&&Object.getPrototypeOf(t);d=d&&d.setTimeout?d:t,"[object process]"==={}.toString.call(t.process)?i=function(t){e.nextTick((function(){p(t)}))}:!function(){if(t.postMessage&&!t.importScripts){var e=!0,r=t.onmessage;return t.onmessage=function(){e=!1},t.postMessage("","*"),t.onmessage=r,e}}()?t.MessageChannel?((o=new MessageChannel).port1.onmessage=function(t){p(t.data)},i=function(t){o.port2.postMessage(t)}):u&&"onreadystatechange"in u.createElement("script")?(n=u.documentElement,i=function(t){var e=u.createElement("script");e.onreadystatechange=function(){p(t),e.onreadystatechange=null,n.removeChild(e),e=null},n.appendChild(e)}):i=function(t){setTimeout(p,0,t)}:(a="setImmediate$"+Math.random()+"$",s=function(e){e.source===t&&"string"==typeof e.data&&0===e.data.indexOf(a)&&p(+e.data.slice(a.length))},t.addEventListener?t.addEventListener("message",s,!1):t.attachEvent("onmessage",s),i=function(e){t.postMessage(a+e,"*")}),d.setImmediate=function(t){"function"!=typeof t&&(t=new Function(""+t));for(var e=new Array(arguments.length-1),r=0;r<e.length;r++)e[r]=arguments[r+1];var n={callback:t,args:e};return l[c]=n,i(c),c++},d.clearImmediate=f}function f(t){delete l[t]}function p(t){if(h)setTimeout(p,0,t);else{var e=l[t];if(e){h=!0;try{!function(t){var e=t.callback,r=t.args;switch(r.length){case 0:e();break;case 1:e(r[0]);break;case 2:e(r[0],r[1]);break;case 3:e(r[0],r[1],r[2]);break;default:e.apply(void 0,r)}}(e)}finally{f(t),h=!1}}}}}("undefined"==typeof self?void 0===t?this:t:self)}).call(this,r(9),r(20))},function(t,e){var r,i,n=t.exports={};function o(){throw new Error("setTimeout has not been defined")}function a(){throw new Error("clearTimeout has not been defined")}function s(t){if(r===setTimeout)return setTimeout(t,0);if((r===o||!r)&&setTimeout)return r=setTimeout,setTimeout(t,0);try{return r(t,0)}catch(e){try{return r.call(null,t,0)}catch(e){return r.call(this,t,0)}}}!function(){try{r="function"==typeof setTimeout?setTimeout:o}catch(t){r=o}try{i="function"==typeof clearTimeout?clearTimeout:a}catch(t){i=a}}();var c,l=[],h=!1,u=-1;function d(){h&&c&&(h=!1,c.length?l=c.concat(l):u=-1,l.length&&f())}function f(){if(!h){var t=s(d);h=!0;for(var e=l.length;e;){for(c=l,l=[];++u<e;)c&&c[u].run();u=-1,e=l.length}c=null,h=!1,function(t){if(i===clearTimeout)return clearTimeout(t);if((i===a||!i)&&clearTimeout)return i=clearTimeout,clearTimeout(t);try{i(t)}catch(e){try{return i.call(null,t)}catch(e){return i.call(this,t)}}}(t)}}function p(t,e){this.fun=t,this.array=e}function g(){}n.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var r=1;r<arguments.length;r++)e[r-1]=arguments[r];l.push(new p(t,e)),1!==l.length||h||s(f)},p.prototype.run=function(){this.fun.apply(null,this.array)},n.title="browser",n.browser=!0,n.env={},n.argv=[],n.version="",n.versions={},n.on=g,n.addListener=g,n.once=g,n.off=g,n.removeListener=g,n.removeAllListeners=g,n.emit=g,n.prependListener=g,n.prependOnceListener=g,n.listeners=function(t){return[]},n.binding=function(t){throw new Error("process.binding is not supported")},n.cwd=function(){return"/"},n.chdir=function(t){throw new Error("process.chdir is not supported")},n.umask=function(){return 0}},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)});Object.defineProperty(e,"__esModule",{value:!0});var o=function(t){function e(e,r){var i=t.call(this)||this;return i.container=e,i.camera=r,i}return n(e,t),e}(r(3).EventEmitter);e.default=o},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.getWheelDelta=e.getMouseCoords=e.getCenter=e.getHeight=e.getWidth=e.getY=e.getX=void 0;var i=r(10);function n(t){if(void 0!==t.offsetX)return t.offsetX;if(void 0!==t.clientX)return t.clientX;throw new Error("sigma/captors/utils.getX: could not extract x from event.")}function o(t){if(void 0!==t.offsetY)return t.offsetY;if(void 0!==t.clientY)return t.clientY;throw new Error("sigma/captors/utils.getY: could not extract y from event.")}function a(t){var e=t.target.width;if("number"==typeof e)return e;throw new Error("sigma/captors/utils.getWidth: could not extract width from event.")}function s(t){var e=t.target.height;if("number"==typeof e)return e;throw new Error("sigma/captors/utils.getHeight: could not extract height from event.")}e.getX=n,e.getY=o,e.getWidth=a,e.getHeight=s,e.getCenter=function(t){var e=i.getPixelRatio();return{x:a(t)/(2*e),y:s(t)/(2*e)}},e.getMouseCoords=function(t){return{x:n(t),y:o(t),clientX:t.clientX,clientY:t.clientY,ctrlKey:t.ctrlKey,metaKey:t.metaKey,altKey:t.altKey,shiftKey:t.shiftKey,preventDefault:t.preventDefault.bind(t),original:t}},e.getWheelDelta=function(t){if(void 0!==t.deltaY)return-3*t.deltaY/360;if(void 0!==t.detail)return t.detail/-9;throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.")}},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=o(r(24)),s=o(r(11)),c=o(r(5)),l=o(r(1)),h=o(r(8)),u=o(r(7)),d=r(25),f=r(10),p=r(0),g=r(4),v=r(27),m=r(28),y=r(29),_=a.default.nodeExtent,b=a.default.edgeExtent,w=f.getPixelRatio(),x=f.getPixelRatio(),L=function(t){function e(e,r,i){void 0===i&&(i={});var n=t.call(this)||this;if(n.captors={},n.elements={},n.canvasContexts={},n.webGLContexts={},n.activeListeners={},n.quadtree=new u.default,n.nodeDataCache={},n.edgeDataCache={},n.nodeExtent=null,n.edgeExtent=null,n.normalizationFunction=null,n.width=0,n.height=0,n.highlightedNodes=new Set,n.displayedLabels=new Set,n.hoveredNode=null,n.renderFrame=null,n.renderHighlightedNodesFrame=null,n.needToProcess=!1,n.needToSoftProcess=!1,n.nodePrograms={},n.edgePrograms={},n.settings=g.assign({},y.WEBGL_RENDERER_DEFAULT_SETTINGS,i),y.validateWebglRendererSettings(n.settings),!s.default(e))throw new Error("sigma/renderers/webgl: invalid graph instance.");if(!(r instanceof HTMLElement))throw new Error("sigma/renderers/webgl: container should be an html element.");n.graph=e,n.container=r,n.initializeCache(),n.createWebGLContext("edges"),n.createWebGLContext("nodes"),n.createCanvasContext("edgeLabels"),n.createCanvasContext("labels"),n.createCanvasContext("hovers"),n.createCanvasContext("mouse");var o=n.webGLContexts.nodes;for(var a in o.blendFunc(o.ONE,o.ONE_MINUS_SRC_ALPHA),o.enable(o.BLEND),(o=n.webGLContexts.edges).blendFunc(o.ONE,o.ONE_MINUS_SRC_ALPHA),o.enable(o.BLEND),n.settings.nodeProgramClasses){var c=n.settings.nodeProgramClasses[a];n.nodePrograms[a]=new c(n.webGLContexts.nodes)}for(var a in n.settings.edgeProgramClasses){var d=n.settings.edgeProgramClasses[a];n.edgePrograms[a]=new d(n.webGLContexts.edges)}return n.resize(),n.camera=new l.default,n.bindCameraHandlers(),n.captors={mouse:new h.default(n.elements.mouse,n.camera)},n.bindEventHandlers(),n.bindGraphHandlers(),n.process(),n.render(),n}return n(e,t),e.prototype.createCanvas=function(t){var e=f.createElement("canvas",{position:"absolute"},{class:"sigma-"+t});return this.elements[t]=e,this.container.appendChild(e),e},e.prototype.createCanvasContext=function(t){var e=this.createCanvas(t);return this.canvasContexts[t]=e.getContext("2d",{preserveDrawingBuffer:!1,antialias:!1}),this},e.prototype.createWebGLContext=function(t){var e,r=this.createCanvas(t),i={preserveDrawingBuffer:!1,antialias:!1};return(e=r.getContext("webgl2",i))||(e=r.getContext("webgl",i)),e||(e=r.getContext("experimental-webgl",i)),this.webGLContexts[t]=e,this},e.prototype.initializeCache=function(){for(var t=this.graph,e=t.nodes(),r=0,i=e.length;r<i;r++)this.nodeDataCache[e[r]]=new d.Node(r,this.settings);var n=t.edges();for(r=0,i=n.length;r<i;r++)this.edgeDataCache[n[r]]=new d.Edge(r,this.settings)},e.prototype.bindCameraHandlers=function(){var t=this;return this.activeListeners.camera=function(){t.scheduleRender()},this.camera.on("updated",this.activeListeners.camera),this},e.prototype.bindEventHandlers=function(){var t=this;this.activeListeners.handleResize=function(){t.needToSoftProcess=!0,t.scheduleRender()},window.addEventListener("resize",this.activeListeners.handleResize);var e=function(t,e,r,i,n){return t>r-n&&t<r+n&&e>i-n&&e<i+n&&Math.sqrt(Math.pow(t-r,2)+Math.pow(e-i,2))<n},r=function(e,r){var i=t.camera.viewportToGraph(t,e,r);return t.quadtree.point(i.x,1-i.y)};this.activeListeners.handleMove=function(i){for(var n=Math.pow(t.camera.getState().ratio,.5),o=r(i.x,i.y),a=1/0,s=null,c=0,l=o.length;c<l;c++){var h=o[c],u=t.nodeDataCache[h],d=t.camera.graphToViewport(t,u.x,u.y),f=u.size/n;if(e(i.x,i.y,d.x,d.y,f)){var p=Math.sqrt(Math.pow(i.x-d.x,2)+Math.pow(i.y-d.y,2));p<a&&(a=p,s=h)}}if(s&&t.hoveredNode!==s)return t.hoveredNode&&t.emit("leaveNode",{node:t.hoveredNode}),t.hoveredNode=s,t.emit("enterNode",{node:s}),void t.scheduleHighlightedNodesRender();if(t.hoveredNode){u=t.nodeDataCache[t.hoveredNode],d=t.camera.graphToViewport(t,u.x,u.y),f=u.size/n;if(!e(i.x,i.y,d.x,d.y,f)){h=t.hoveredNode;return t.hoveredNode=null,t.emit("leaveNode",{node:h}),t.scheduleHighlightedNodesRender()}}};var i=function(i){return function(n){for(var o=Math.pow(t.camera.getState().ratio,.5),a=r(n.x,n.y),s=0,c=a.length;s<c;s++){var l=a[s],h=t.nodeDataCache[l],u=t.camera.graphToViewport(t,h.x,h.y),d=h.size/o;if(e(n.x,n.y,u.x,u.y,d))return t.emit(i+"Node",{node:l,captor:n,event:n})}return t.emit(i+"Stage",{event:n})}};return this.activeListeners.handleClick=i("click"),this.activeListeners.handleRightClick=i("rightClick"),this.activeListeners.handleDown=i("down"),this.captors.mouse.on("mousemove",this.activeListeners.handleMove),this.captors.mouse.on("click",this.activeListeners.handleClick),this.captors.mouse.on("rightClick",this.activeListeners.handleRightClick),this.captors.mouse.on("mousedown",this.activeListeners.handleDown),this},e.prototype.bindGraphHandlers=function(){var t=this,e=this.graph;return this.activeListeners.graphUpdate=function(){t.needToProcess=!0,t.scheduleRender()},this.activeListeners.softGraphUpdate=function(){t.needToSoftProcess=!0,t.scheduleRender()},this.activeListeners.addNodeGraphUpdate=function(r){t.nodeDataCache[r.key]=new d.Node(e.order-1,t.settings),t.activeListeners.graphUpdate()},this.activeListeners.addEdgeGraphUpdate=function(r){t.edgeDataCache[r.key]=new d.Edge(e.size-1,t.settings),t.activeListeners.graphUpdate()},e.on("nodeAdded",this.activeListeners.addNodeGraphUpdate),e.on("nodeDropped",this.activeListeners.graphUpdate),e.on("nodeAttributesUpdated",this.activeListeners.softGraphUpdate),e.on("edgeAdded",this.activeListeners.addEdgeGraphUpdate),e.on("nodeDropped",this.activeListeners.graphUpdate),e.on("edgeAttributesUpdated",this.activeListeners.softGraphUpdate),e.on("cleared",this.activeListeners.graphUpdate),this},e.prototype.process=function(t){void 0===t&&(t=!1);var e=this.graph,r=this.settings;this.quadtree.clear();var i=["x","y","z"];this.settings.zIndex&&(i.push("z"),this.edgeExtent=b(e,["z"])),this.nodeExtent=_(e,i),this.normalizationFunction=f.createNormalizationFunction(this.nodeExtent);var n=this.nodePrograms[this.settings.defaultNodeType];t||n.allocate(e.order);var o=e.nodes();this.settings.zIndex&&(o=m.zIndexOrdering(this.nodeExtent.z,(function(t){return e.getNodeAttribute(t,"z")}),o));for(var a=0,s=o.length;a<s;a++){var c=o[a],l=e.getNodeAttributes(c),h=this.nodeDataCache[c];r.nodeReducer&&(l=r.nodeReducer(c,l)),h.assign(l),this.normalizationFunction.applyTo(h),this.quadtree.add(c,h.x,1-h.y,h.size/this.width),n.process(h,a),h.index=a}n.bufferData();var u=this.edgePrograms[this.settings.defaultEdgeType];t||u.allocate(e.size);var d=e.edges();this.settings.zIndex&&this.edgeExtent&&(d=m.zIndexOrdering(this.edgeExtent.z,(function(t){return e.getEdgeAttribute(t,"z")}),d));for(a=0,s=d.length;a<s;a++){var p=d[a];l=e.getEdgeAttributes(p),h=this.edgeDataCache[p];r.edgeReducer&&(l=r.edgeReducer(p,l)),h.assign(l);var g=e.extremities(p),v=this.nodeDataCache[g[0]],y=this.nodeDataCache[g[1]];u.process(v,y,h,a),h.index=a}return t||"function"!=typeof u.computeIndices||u.computeIndices(),u.bufferData(),this},e.prototype.processNode=function(t){var e=this.nodePrograms[this.settings.defaultNodeType],r=this.graph.getNodeAttributes(t);return e.process(r,this.nodeDataCache[t].index),this},e.prototype.processEdge=function(t){var e=this.graph,r=this.edgePrograms[this.settings.defaultEdgeType],i=e.getEdgeAttributes(t),n=e.extremities(t),o=e.getNodeAttributes(n[0]),a=e.getNodeAttributes(n[1]);return r.process(o,a,i,this.edgeDataCache[t].index),this},e.prototype.getCamera=function(){return this.camera},e.prototype.getMouseCaptor=function(){return this.captors.mouse},e.prototype.resize=function(t,e){var r=this.width,i=this.height;if(t&&e?(this.width=t,this.height=e):(this.width=this.container.offsetWidth,this.height=this.container.offsetHeight),0===this.width)throw new Error("sigma/renderers/webgl: container has no width.");if(0===this.height)throw new Error("sigma/renderers/webgl: container has no height.");if(r===this.width&&i===this.height)return this;for(var n in this.elements){var o=this.elements[n];o.style.width=this.width+"px",o.style.height=this.height+"px"}for(var n in this.canvasContexts)this.elements[n].setAttribute("width",this.width*w+"px"),this.elements[n].setAttribute("height",this.height*w+"px"),1!==w&&this.canvasContexts[n].scale(w,w);for(var n in this.webGLContexts)this.elements[n].setAttribute("width",this.width*x+"px"),this.elements[n].setAttribute("height",this.height*x+"px"),this.webGLContexts[n].viewport(0,0,this.width*x,this.height*x);return this},e.prototype.clear=function(){return this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT),this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT),this.canvasContexts.labels.clearRect(0,0,this.width,this.height),this.canvasContexts.hovers.clearRect(0,0,this.width,this.height),this.canvasContexts.edgeLabels.clearRect(0,0,this.width,this.height),this},e.prototype.render=function(){if(this.renderFrame&&(cancelAnimationFrame(this.renderFrame),this.renderFrame=null,this.needToProcess=!1,this.needToSoftProcess=!1),this.resize(),this.clear(),!this.graph.order)return this;var t=this.captors.mouse,e=this.camera.isAnimated()||t.isMoving||t.hasDragged||t.wheelLock,r=this.camera.getState(),i=p.matrixFromCamera(r,{width:this.width,height:this.height});return this.nodePrograms[this.settings.defaultNodeType].render({matrix:i,width:this.width,height:this.height,ratio:r.ratio,nodesPowRatio:.5,scalingRatio:x}),this.settings.hideEdgesOnMove&&e||this.edgePrograms[this.settings.defaultEdgeType].render({matrix:i,width:this.width,height:this.height,ratio:r.ratio,nodesPowRatio:.5,edgesPowRatio:.5,scalingRatio:x}),this.settings.hideLabelsOnMove&&e||(this.renderLabels(),this.renderEdgeLabels(),this.renderHighlightedNodes()),this},e.prototype.renderLabels=function(){if(!this.settings.renderLabels)return this;var t,e=this.camera.getState();if(e.ratio>=1)t=this.graph.nodes();else{var r=this.camera.viewRectangle(this);t=this.quadtree.rectangle(r.x1,1-r.y1,r.x2,1-r.y2,r.height)}for(var i=this.settings.labelGrid,n=v.labelsToDisplayFromGrid({cache:this.nodeDataCache,camera:this.camera,cell:i.cell,dimensions:this,displayedLabels:this.displayedLabels,fontSize:this.settings.labelSize,graph:this.graph,renderedSizeThreshold:i.renderedSizeThreshold,visibleNodes:t}),o=this.canvasContexts.labels,a=Math.pow(e.ratio,.5),s=0,c=n.length;s<c;s++){var l=this.nodeDataCache[n[s]],h=this.camera.graphToViewport(this,l.x,l.y),u=h.x,d=h.y,f=l.size/a;this.settings.labelRenderer(o,{key:n[s],label:l.label,color:"#000",size:f,x:u,y:d},this.settings)}return this.displayedLabels=new Set(n),this},e.prototype.renderEdgeLabels=function(){if(!this.settings.renderEdgeLabels)return this;var t=this.camera.getState(),e=Math.pow(t.ratio,.5),r=this.canvasContexts.edgeLabels;r.clearRect(0,0,this.width,this.height);for(var i=v.edgeLabelsToDisplayFromNodes({graph:this.graph,hoveredNode:this.hoveredNode,displayedNodeLabels:this.displayedLabels,highlightedNodes:this.highlightedNodes}),n=0,o=i.length;n<o;n++){var a=i[n],s=this.graph.extremities(a),c=this.nodeDataCache[s[0]],l=this.nodeDataCache[s[1]],h=this.edgeDataCache[i[n]],u=this.camera.graphToViewport(this,c.x,c.y),d=u.x,f=u.y,p=this.camera.graphToViewport(this,l.x,l.y),g=p.x,m=p.y,y=h.size/e;this.settings.edgeLabelRenderer(r,{key:a,label:h.label,color:h.color,size:y},{key:s[0],x:d,y:f},{key:s[1],x:g,y:m},this.settings)}return this},e.prototype.renderHighlightedNodes=function(){var t=this,e=this.camera,r=Math.pow(e.getState().ratio,.5),i=this.canvasContexts.hovers;i.clearRect(0,0,this.width,this.height);var n=function(n){var o=t.nodeDataCache[n],a=e.graphToViewport(t,o.x,o.y),s=a.x,c=a.y,l=o.size/r;t.settings.hoverRenderer(i,{key:n,label:o.label,color:o.color,size:l,x:s,y:c},t.settings)};this.hoveredNode&&n(this.hoveredNode),this.highlightedNodes.forEach(n)},e.prototype.scheduleRender=function(){var t=this;this.renderFrame||(this.renderFrame=requestAnimationFrame((function(){t.needToProcess?t.process():t.needToSoftProcess&&t.process(!0),t.renderFrame=null,t.needToProcess=!1,t.needToSoftProcess=!1,t.render()})))},e.prototype.scheduleHighlightedNodesRender=function(){var t=this;this.renderHighlightedNodesFrame||this.renderFrame||(this.renderHighlightedNodesFrame=requestAnimationFrame((function(){t.renderHighlightedNodesFrame=null,t.renderHighlightedNodes(),t.renderEdgeLabels()})))},e.prototype.refresh=function(){return this.needToSoftProcess=!0,this.scheduleRender(),this},e.prototype.highlightNode=function(t){return this.highlightedNodes.add(t),this.scheduleHighlightedNodesRender(),this},e.prototype.unhighlightNode=function(t){return this.highlightedNodes.delete(t),this.scheduleHighlightedNodesRender(),this},e.prototype.kill=function(){var t=this.graph;this.emit("kill"),this.removeAllListeners(),this.camera.removeListener("updated",this.activeListeners.camera),window.removeEventListener("resize",this.activeListeners.handleResize),this.captors.mouse.kill(),t.removeListener("nodeAdded",this.activeListeners.addNodeGraphUpdate),t.removeListener("nodeDropped",this.activeListeners.graphUpdate),t.removeListener("nodeAttributesUpdated",this.activeListeners.softGraphUpdate),t.removeListener("edgeAdded",this.activeListeners.addEdgeGraphUpdate),t.removeListener("nodeDropped",this.activeListeners.graphUpdate),t.removeListener("edgeAttributesUpdated",this.activeListeners.softGraphUpdate),t.removeListener("cleared",this.activeListeners.graphUpdate),this.quadtree=new u.default,this.nodeDataCache={},this.edgeDataCache={},this.highlightedNodes=new Set,this.displayedLabels=new Set,this.renderFrame&&(cancelAnimationFrame(this.renderFrame),this.renderFrame=null),this.renderHighlightedNodesFrame&&(cancelAnimationFrame(this.renderHighlightedNodesFrame),this.renderHighlightedNodesFrame=null);for(var e=this.container;e.firstChild;)e.removeChild(e.firstChild)},e}(c.default);e.default=L},function(t,e,r){var i=r(11);function n(t,e){if(!i(t))throw new Error("graphology-metrics/extent: the given graph is not a valid graphology instance.");var r,n,o,a,s,c,l,h=[].concat(e),u=t.nodes(),d={};for(s=0;s<h.length;s++)d[a=h[s]]=[1/0,-1/0];for(c=0,l=u.length;c<l;c++)for(r=u[c],n=t.getNodeAttributes(r),s=0;s<h.length;s++)(o=n[a=h[s]])<d[a][0]&&(d[a][0]=o),o>d[a][1]&&(d[a][1]=o);return"string"==typeof e?d[e]:d}var o=n;o.nodeExtent=n,o.edgeExtent=function(t,e){if(!i(t))throw new Error("graphology-metrics/extent: the given graph is not a valid graphology instance.");var r,n,o,a,s,c,l,h=[].concat(e),u=t.edges(),d={};for(s=0;s<h.length;s++)d[a=h[s]]=[1/0,-1/0];for(c=0,l=u.length;c<l;c++)for(r=u[c],n=t.getEdgeAttributes(r),s=0;s<h.length;s++)(o=n[a=h[s]])<d[a][0]&&(d[a][0]=o),o>d[a][1]&&(d[a][1]=o);return"string"==typeof e?d[e]:d},t.exports=o},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Edge=e.Node=void 0;var i=function(){function t(t,e){this.index=t,this.x=0,this.y=0,this.size=2,this.color=e.defaultNodeColor,this.hidden=!1,this.label=""}return t.prototype.assign=function(t){Object.assign(this,t)},t}();e.Node=i;var n=function(){function t(t,e){this.index=t,this.size=1,this.color=e.defaultEdgeColor,this.hidden=!1,this.label=""}return t.prototype.assign=function(t){Object.assign(this,t)},t}();e.Edge=n},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.multiply=e.translate=e.rotate=e.scale=e.identity=void 0,e.identity=function(){return Float32Array.of(1,0,0,0,1,0,0,0,1)},e.scale=function(t,e,r){return t[0]=e,t[4]="number"==typeof r?r:e,t},e.rotate=function(t,e){var r=Math.sin(e),i=Math.cos(e);return t[0]=i,t[1]=r,t[3]=-r,t[4]=i,t},e.translate=function(t,e,r){return t[6]=e,t[7]=r,t},e.multiply=function(t,e){var r=t[0],i=t[1],n=t[2],o=t[3],a=t[4],s=t[5],c=t[6],l=t[7],h=t[8],u=e[0],d=e[1],f=e[2],p=e[3],g=e[4],v=e[5],m=e[6],y=e[7],_=e[8];return t[0]=u*r+d*o+f*c,t[1]=u*i+d*a+f*l,t[2]=u*n+d*s+f*h,t[3]=p*r+g*o+v*c,t[4]=p*i+g*a+v*l,t[5]=p*n+g*s+v*h,t[6]=m*r+y*o+_*c,t[7]=m*i+y*a+_*l,t[8]=m*n+y*s+_*h,t}},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0}),e.edgeLabelsToDisplayFromNodes=e.labelsToDisplayFromGrid=void 0;var n=i(r(1)),o={width:250,height:175},a={width:400,height:300};e.labelsToDisplayFromGrid=function(t){var e=t.cache,r=t.camera,i=t.cell,s=t.dimensions,c=t.displayedLabels,l=t.fontSize,h=void 0===l?14:l,u=t.graph,d=t.renderedSizeThreshold,f=void 0===d?-1/0:d,p=t.visibleNodes,g=r.getState(),v=r.getPreviousState(),m=new n.default;m.setState(v);var y=Math.pow(g.ratio,.5),_=g.x===v.x&&g.y===v.y&&g.ratio===v.ratio,b=g.ratio<v.ratio,w=g.x!==v.x||g.y!==v.y,x=g.ratio>v.ratio,L=!b&&!x&&g.ratio>=1,E=w&&c.size&&!b&&!x;if(x&&Math.trunc(100*g.ratio)%5!=0)return Array.from(c);if((L||_)&&0!==c.size)return Array.from(c);if(b&&g.ratio>=1)return Array.from(c);var A=i||o;g.ratio>=1.3&&(A=a);for(var T=s.width%A.width,P=A.width+T/Math.floor(s.width/A.width),M=s.height%A.height,O=A.height+M/Math.floor(s.height/A.height),C=s.width+P,S=s.height+O,N=-P,R=-O,F=s.width+P/2,D=s.height+O/2,k=-P/2,I=-O/2,j=[],z={},U=-1/0,G=null,B=0,Y=p.length;B<Y;B++){var V=e[rt=p[B]];if(!(V.size/y<f)){var W=r.graphToViewport(s,V.x,V.y);if(!(W.x<N||W.x>C||W.y<R||W.y>S)){if(V.size>U&&(U=V.size,G=rt),E){var q=m.graphToViewport(s,V.x,V.y);if(q.x>=k&&q.x<=F&&q.y>=I&&q.y<=D&&!c.has(rt))continue}if(void 0===z[et=Math.floor(W.x/P)+"§"+Math.floor(W.y/O)])z[et]=rt;else{var H=z[et],X=e[H];if(c.size>0){var K=c.has(rt),$=c.has(H);if(!K&&$)continue;if(K&&!$){z[et]=rt;continue}if((E||b)&&K&&$){j.push(rt);continue}}var Q=!1;if(V.size>X.size)Q=!0;else if(V.size===X.size){var Z=u.degree(rt),J=u.degree(H);(Z>J||Z===J&&rt>H)&&(Q=!0)}Q&&(z[et]=rt)}}}}var tt=j.some((function(t){return t===G}));for(var et in z){var rt;(rt=z[et])===G&&(tt=!0),j.push(rt)}!tt&&G&&j.push(G);var it,nt,ot,at,st,ct,lt,ht,ut=new Set;for(B=0,Y=j.length;B<Y;B++){var dt=e[K=j[B]],ft=r.graphToViewport(s,dt.x,dt.y);if(!ut.has(K))for(var pt=B+1;pt<Y;pt++){var gt=e[$=j[pt]],vt=r.graphToViewport(s,gt.x,gt.y);(it=ft.x,nt=ft.y,ot=8*dt.label.length,at=h,st=vt.x,ct=vt.y,lt=8*gt.label.length,ht=h,it<st+lt&&it+ot>st&&nt<ct+ht&&nt+at>ct)&&(dt.size<gt.size?ut.add(K):ut.add($))}}return j.filter((function(t){return!ut.has(t)}))},e.edgeLabelsToDisplayFromNodes=function(t){var e=t.graph,r=t.hoveredNode,i=t.highlightedNodes,n=t.displayedNodeLabels,o=new Set,a=Array.from(n),s=Array.from(i);r&&!i.has(r)&&s.push(r);for(var c=0;c<s.length;c++)for(var l=s[c],h=e.edges(l),u=0;u<h.length;u++)o.add(h[u]);for(c=0;c<a.length;c++)for(l=a[c],h=e.outboundEdges(l),u=0;u<h.length;u++)n.has(e.opposite(l,h[u]))&&o.add(h[u]);return Array.from(o)}},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.zIndexOrdering=void 0,e.zIndexOrdering=function(t,e,r){return r.sort((function(t,r){var i=e(t)||0,n=e(r)||0;return i<n?-1:i>n?1:0}))}},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0}),e.WEBGL_RENDERER_DEFAULT_SETTINGS=e.validateWebglRendererSettings=void 0;var n=i(r(12)),o=i(r(30)),a=i(r(32)),s=i(r(33)),c=i(r(38)),l=i(r(40));e.validateWebglRendererSettings=function(t){if(t.labelGrid&&t.labelGrid.cell&&"object"==typeof t.labelGrid.cell&&(!t.labelGrid.cell.width||!t.labelGrid.cell.height))throw new Error("sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.")},e.WEBGL_RENDERER_DEFAULT_SETTINGS={hideEdgesOnMove:!1,hideLabelsOnMove:!1,renderLabels:!0,renderEdgeLabels:!1,defaultNodeColor:"#999",defaultNodeType:"circle",defaultEdgeColor:"#ccc",defaultEdgeType:"line",labelFont:"Arial",labelSize:14,labelWeight:"normal",edgeLabelFont:"Arial",edgeLabelSize:14,edgeLabelWeight:"normal",labelGrid:{cell:null,renderedSizeThreshold:-1/0},nodeReducer:null,edgeReducer:null,zIndex:!1,labelRenderer:n.default,hoverRenderer:o.default,edgeLabelRenderer:a.default,nodeProgramClasses:{circle:s.default},edgeProgramClasses:{arrow:l.default,line:c.default}}},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var n=i(r(31)),o=i(r(12));e.default=function(t,e,r){var i=r.labelSize,a=r.labelFont,s=r.labelWeight;t.font=s+" "+i+"px "+a,t.beginPath(),t.fillStyle="#fff",t.shadowOffsetX=0,t.shadowOffsetY=0,t.shadowBlur=8,t.shadowColor="#000";var c=t.measureText(e.label).width,l=Math.round(e.x-i/2-2),h=Math.round(e.y-i/2-2),u=Math.round(c+i/2+e.size+9),d=Math.round(i+4),f=Math.round(i/2+2);t.moveTo(l,h+f),t.moveTo(l,h+f),t.arcTo(l,h,l+f,h,f),t.lineTo(l+u,h),t.lineTo(l+u,h+d),t.lineTo(l+f,h+d),t.arcTo(l,h+d,l,h+d-f,f),t.lineTo(l,h+f),t.closePath(),t.fill(),t.shadowOffsetX=0,t.shadowOffsetY=0,t.shadowBlur=0,n.default(t,e),o.default(t,e,r)}},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=2*Math.PI;e.default=function(t,e){t.fillStyle=e.color,t.beginPath(),t.arc(e.x,e.y,e.size,0,i,!0),t.closePath(),t.fill()}},function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default=function(t,e,r,i,n){var o=n.edgeLabelSize,a=n.edgeLabelFont,s=n.edgeLabelWeight,c=e.label;t.fillStyle=e.color,t.font=s+" "+o+"px "+a;var l,h=t.measureText(c).width,u=(r.x+i.x)/2,d=(r.y+i.y)/2,f=i.x-r.x,p=i.y-r.y,g=Math.sqrt(f*f+p*p);l=f>0?p>0?Math.acos(f/g):Math.asin(p/g):p>0?Math.acos(f/g)+Math.PI:Math.asin(f/g)+Math.PI/2,t.save(),t.translate(u,d),t.rotate(l),t.fillText(c,-h/2,e.size/2+o),t.restore()}},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=r(34),s=r(0),c=o(r(36)),l=o(r(37)),h=function(t){function e(e){var r=t.call(this,e,c.default,l.default,1,4)||this;return r.bind(),r}return n(e,t),e.prototype.process=function(t,e){var r=s.floatColor(t.color),i=1*e*4,n=this.array;if(t.hidden)return n[i++]=0,n[i++]=0,n[i++]=0,void(n[i++]=0);n[i++]=t.x,n[i++]=t.y,n[i++]=t.size,n[i]=r},e.prototype.render=function(t){var e=this.gl,r=this.program;e.useProgram(r),e.uniform1f(this.ratioLocation,1/Math.pow(t.ratio,t.nodesPowRatio)),e.uniform1f(this.scaleLocation,t.scalingRatio),e.uniformMatrix3fv(this.matrixLocation,!1,t.matrix),e.drawArrays(e.POINTS,0,this.array.length/4)},e}(a.AbstractNodeProgram);e.default=h},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)});Object.defineProperty(e,"__esModule",{value:!0}),e.createNodeCompoundProgram=e.AbstractNodeProgram=void 0;var o=function(t){function e(e,r,i,n,o){var a=t.call(this,e,r,i,n,o)||this;a.positionLocation=e.getAttribLocation(a.program,"a_position"),a.sizeLocation=e.getAttribLocation(a.program,"a_size"),a.colorLocation=e.getAttribLocation(a.program,"a_color");var s=e.getUniformLocation(a.program,"u_matrix");if(null===s)throw new Error("sigma/renderers/webgl/program/common/node: error while getting matrixLocation");a.matrixLocation=s;var c=e.getUniformLocation(a.program,"u_ratio");if(null===c)throw new Error("sigma/renderers/webgl/program/common/node: error while getting ratioLocation");a.ratioLocation=c;var l=e.getUniformLocation(a.program,"u_scale");if(null===l)throw new Error("sigma/renderers/webgl/program/common/node: error while getting scaleLocation");return a.scaleLocation=l,a}return n(e,t),e.prototype.bind=function(){var t=this.gl;t.enableVertexAttribArray(this.positionLocation),t.enableVertexAttribArray(this.sizeLocation),t.enableVertexAttribArray(this.colorLocation),t.vertexAttribPointer(this.positionLocation,2,t.FLOAT,!1,this.attributes*Float32Array.BYTES_PER_ELEMENT,0),t.vertexAttribPointer(this.sizeLocation,1,t.FLOAT,!1,this.attributes*Float32Array.BYTES_PER_ELEMENT,8),t.vertexAttribPointer(this.colorLocation,4,t.UNSIGNED_BYTE,!0,this.attributes*Float32Array.BYTES_PER_ELEMENT,12)},e}(r(13).AbstractProgram);e.AbstractNodeProgram=o,e.createNodeCompoundProgram=function(t){return function(){function e(e){this.programs=t.map((function(t){return new t(e)}))}return e.prototype.bufferData=function(){this.programs.forEach((function(t){return t.bufferData()}))},e.prototype.allocate=function(t){this.programs.forEach((function(e){return e.allocate(t)}))},e.prototype.bind=function(){},e.prototype.render=function(t){this.programs.forEach((function(e){return e.render(t)}))},e.prototype.process=function(t,e){this.programs.forEach((function(r){return r.process(t,e)}))},e}()}},function(t,e,r){"use strict";function i(t,e,r){var i="VERTEX"===t?e.VERTEX_SHADER:e.FRAGMENT_SHADER,n=e.createShader(i);if(null===n)throw new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while creating the shader");if(e.shaderSource(n,r),e.compileShader(n),!e.getShaderParameter(n,e.COMPILE_STATUS)){var o=e.getShaderInfoLog(n);throw e.deleteShader(n),new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n"+o+"\n"+r)}return n}Object.defineProperty(e,"__esModule",{value:!0}),e.loadProgram=e.loadFragmentShader=e.loadVertexShader=void 0,e.loadVertexShader=function(t,e){return i("VERTEX",t,e)},e.loadFragmentShader=function(t,e){return i("FRAGMENT",t,e)},e.loadProgram=function(t,e){var r,i,n=t.createProgram();if(null===n)throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while creating the program.");for(r=0,i=e.length;r<i;r++)t.attachShader(n,e[r]);if(t.linkProgram(n),!t.getProgramParameter(n,t.LINK_STATUS))throw t.deleteProgram(n),new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.");return n}},function(t,e,r){"use strict";r.r(e),e.default="attribute vec2 a_position;\nattribute float a_size;\nattribute vec4 a_color;\n\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  gl_Position = vec4(\n    (u_matrix * vec3(a_position, 1)).xy,\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  v_border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"},function(t,e,r){"use strict";r.r(e),e.default="precision mediump float;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > v_border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / v_border;\n\n  // gl_FragColor = mix(color0, v_color, t);\n  gl_FragColor = mix(color0, v_color, t);\n}\n"},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=r(2),s=r(0),c=o(r(39)),l=o(r(14)),h=function(t){function e(e){var r=t.call(this,e,c.default,l.default,4,6)||this,i=e.createBuffer();if(null===i)throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting resolutionLocation");r.indicesBuffer=i,r.normalLocation=e.getAttribLocation(r.program,"a_normal"),r.thicknessLocation=e.getAttribLocation(r.program,"a_thickness");var n=e.getUniformLocation(r.program,"u_ratio");if(null===n)throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting ratioLocation");r.ratioLocation=n;var o=e.getUniformLocation(r.program,"u_scale");if(null===o)throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");return r.scaleLocation=o,r.canUse32BitsIndices=s.canUse32BitsIndices(e),r.IndicesArray=r.canUse32BitsIndices?Uint32Array:Uint16Array,r.indicesArray=new r.IndicesArray,r.indicesType=r.canUse32BitsIndices?e.UNSIGNED_INT:e.UNSIGNED_SHORT,r.bind(),r}return n(e,t),e.prototype.bind=function(){var t=this.gl;t.enableVertexAttribArray(this.positionLocation),t.enableVertexAttribArray(this.normalLocation),t.enableVertexAttribArray(this.thicknessLocation),t.enableVertexAttribArray(this.colorLocation),t.vertexAttribPointer(this.positionLocation,2,t.FLOAT,!1,6*Float32Array.BYTES_PER_ELEMENT,0),t.vertexAttribPointer(this.normalLocation,2,t.FLOAT,!1,6*Float32Array.BYTES_PER_ELEMENT,8),t.vertexAttribPointer(this.thicknessLocation,1,t.FLOAT,!1,6*Float32Array.BYTES_PER_ELEMENT,16),t.vertexAttribPointer(this.colorLocation,4,t.UNSIGNED_BYTE,!0,6*Float32Array.BYTES_PER_ELEMENT,20)},e.prototype.computeIndices=function(){for(var t=this.array.length/6,e=t+t/2,r=new this.IndicesArray(e),i=0,n=0;i<t;i+=4)r[n++]=i,r[n++]=i+1,r[n++]=i+2,r[n++]=i+2,r[n++]=i+1,r[n++]=i+3;this.indicesArray=r},e.prototype.bufferData=function(){t.prototype.bufferData.call(this);var e=this.gl;e.bufferData(e.ELEMENT_ARRAY_BUFFER,this.indicesArray,e.STATIC_DRAW)},e.prototype.process=function(t,e,r,i){if(t.hidden||e.hidden||r.hidden)for(var n=24*i,o=n+24;n<o;n++)this.array[n]=0;else{var a=r.size||1,c=t.x,l=t.y,h=e.x,u=e.y,d=s.floatColor(r.color),f=h-c,p=u-l,g=f*f+p*p,v=0,m=0;g&&(v=-p*(g=1/Math.sqrt(g)),m=f*g);var y=24*i,_=this.array;_[y++]=c,_[y++]=l,_[y++]=v,_[y++]=m,_[y++]=a,_[y++]=d,_[y++]=c,_[y++]=l,_[y++]=-v,_[y++]=-m,_[y++]=a,_[y++]=d,_[y++]=h,_[y++]=u,_[y++]=v,_[y++]=m,_[y++]=a,_[y++]=d,_[y++]=h,_[y++]=u,_[y++]=-v,_[y++]=-m,_[y++]=a,_[y]=d}},e.prototype.render=function(t){var e=this.gl,r=this.program;e.useProgram(r),e.uniform2f(this.resolutionLocation,t.width,t.height),e.uniform1f(this.ratioLocation,t.ratio),e.uniformMatrix3fv(this.matrixLocation,!1,t.matrix),e.uniform1f(this.scaleLocation,t.scalingRatio),e.drawElements(e.TRIANGLES,this.indicesArray.length,this.indicesType,0)},e}(a.AbstractEdgeProgram);e.default=h},function(t,e,r){"use strict";r.r(e),e.default="attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float min_thickness = 1.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness * pow_ratio / u_scale;\n\n  // Min thickness for AA\n  thickness = max(min_thickness, thickness);\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"},function(t,e,r){"use strict";var i=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var n=r(2),o=i(r(41)),a=i(r(44)),s=n.createEdgeCompoundProgram([a.default,o.default]);e.default=s},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=r(2),s=r(0),c=o(r(42)),l=o(r(43)),h=function(t){function e(e){var r=t.call(this,e,c.default,l.default,3,10)||this;r.normalLocation=e.getAttribLocation(r.program,"a_normal"),r.thicknessLocation=e.getAttribLocation(r.program,"a_thickness"),r.radiusLocation=e.getAttribLocation(r.program,"a_radius"),r.barycentricLocation=e.getAttribLocation(r.program,"a_barycentric");var i=e.getUniformLocation(r.program,"u_ratio");if(null===i)throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting ratioLocation");r.ratioLocation=i;var n=e.getUniformLocation(r.program,"u_scale");if(null===n)throw new Error("sigma/renderers/webgl/program/edge.ArrowProgram: error while getting scaleLocation");return r.scaleLocation=n,r.bind(),r}return n(e,t),e.prototype.bind=function(){var t=this.gl;t.enableVertexAttribArray(this.positionLocation),t.enableVertexAttribArray(this.normalLocation),t.enableVertexAttribArray(this.thicknessLocation),t.enableVertexAttribArray(this.radiusLocation),t.enableVertexAttribArray(this.colorLocation),t.enableVertexAttribArray(this.barycentricLocation),t.vertexAttribPointer(this.positionLocation,2,t.FLOAT,!1,10*Float32Array.BYTES_PER_ELEMENT,0),t.vertexAttribPointer(this.normalLocation,2,t.FLOAT,!1,10*Float32Array.BYTES_PER_ELEMENT,8),t.vertexAttribPointer(this.thicknessLocation,1,t.FLOAT,!1,10*Float32Array.BYTES_PER_ELEMENT,16),t.vertexAttribPointer(this.radiusLocation,1,t.FLOAT,!1,10*Float32Array.BYTES_PER_ELEMENT,20),t.vertexAttribPointer(this.colorLocation,4,t.UNSIGNED_BYTE,!0,10*Float32Array.BYTES_PER_ELEMENT,24),t.vertexAttribPointer(this.barycentricLocation,3,t.FLOAT,!1,10*Float32Array.BYTES_PER_ELEMENT,28)},e.prototype.computeIndices=function(){},e.prototype.process=function(t,e,r,i){if(t.hidden||e.hidden||r.hidden)for(var n=30*i,o=n+30;n<o;n++)this.array[n]=0;else{var a=Math.max(2.5*(r.size||1),5),c=e.size||1,l=t.x,h=t.y,u=e.x,d=e.y,f=s.floatColor(r.color),p=u-l,g=d-h,v=p*p+g*g,m=0,y=0;v&&(m=-g*(v=1/Math.sqrt(v)),y=p*v);var _=30*i,b=this.array;b[_++]=u,b[_++]=d,b[_++]=-m,b[_++]=-y,b[_++]=a,b[_++]=c,b[_++]=f,b[_++]=1,b[_++]=0,b[_++]=0,b[_++]=u,b[_++]=d,b[_++]=-m,b[_++]=-y,b[_++]=a,b[_++]=c,b[_++]=f,b[_++]=0,b[_++]=1,b[_++]=0,b[_++]=u,b[_++]=d,b[_++]=-m,b[_++]=-y,b[_++]=a,b[_++]=c,b[_++]=f,b[_++]=0,b[_++]=0,b[_]=1}},e.prototype.render=function(t){var e=this.gl,r=this.program;e.useProgram(r),e.uniform2f(this.resolutionLocation,t.width,t.height),e.uniform1f(this.ratioLocation,t.ratio),e.uniformMatrix3fv(this.matrixLocation,!1,t.matrix),e.uniform1f(this.scaleLocation,t.scalingRatio),e.drawArrays(e.TRIANGLES,0,this.array.length/10)},e}(a.AbstractEdgeProgram);e.default=h},function(t,e,r){"use strict";r.r(e),e.default="attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_radius;\nattribute vec4 a_color;\nattribute vec3 a_barycentric;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\n// varying vec3 v_barycentric;\n\nconst float arrow_ratio = 0.66;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  float da = a_barycentric.x;\n  float db = a_barycentric.y;\n  float dc = a_barycentric.z;\n\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5) * 2.0;\n  float radius = (a_radius - 1.0) * pow_ratio;\n  float thickness = a_thickness * pow_ratio / u_scale;\n  float width = arrow_ratio * thickness / 2.0;\n\n  vec2 delta = vec2(\n      da * ((radius) * a_normal.y)\n    + db * ((radius + thickness) * a_normal.y + width * a_normal.x)\n    + dc * ((radius + thickness) * a_normal.y - width * a_normal.x),\n\n      da * (-(radius) * a_normal.x)\n    + db * (-(radius + thickness) * a_normal.x + width * a_normal.y)\n    + dc * (-(radius + thickness) * a_normal.x - width * a_normal.y)\n  );\n\n  delta /= u_resolution;\n\n  // Scale from [[-1 1] [-1 1]] to the container:\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  // v_barycentric = a_barycentric;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"},function(t,e,r){"use strict";r.r(e),e.default="precision mediump float;\n\nvarying vec4 v_color;\n// varying vec3 v_barycentric;\n\nvoid main(void) {\n  // if (any(lessThan(v_barycentric, vec3(0.01))))\n  //   discard;\n  // else\n    gl_FragColor = v_color;\n}\n"},function(t,e,r){"use strict";var i,n=this&&this.__extends||(i=function(t,e){return(i=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,e){t.__proto__=e}||function(t,e){for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&(t[r]=e[r])})(t,e)},function(t,e){function r(){this.constructor=t}i(t,e),t.prototype=null===e?Object.create(e):(r.prototype=e.prototype,new r)}),o=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(e,"__esModule",{value:!0});var a=r(2),s=r(0),c=o(r(45)),l=o(r(14)),h=function(t){function e(e){var r=t.call(this,e,c.default,l.default,4,7)||this,i=e.createBuffer();if(null===i)throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");r.indicesBuffer=i,r.normalLocation=e.getAttribLocation(r.program,"a_normal"),r.thicknessLocation=e.getAttribLocation(r.program,"a_thickness"),r.radiusLocation=e.getAttribLocation(r.program,"a_radius");var n=e.getUniformLocation(r.program,"u_resolution");if(null===n)throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");r.resolutionLocation=n;var o=e.getUniformLocation(r.program,"u_ratio");if(null===o)throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting ratioLocation");r.ratioLocation=o;var a=e.getUniformLocation(r.program,"u_scale");if(null===a)throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");return r.scaleLocation=a,r.canUse32BitsIndices=s.canUse32BitsIndices(e),r.IndicesArray=r.canUse32BitsIndices?Uint32Array:Uint16Array,r.indicesArray=new r.IndicesArray,r.indicesType=r.canUse32BitsIndices?e.UNSIGNED_INT:e.UNSIGNED_SHORT,r.bind(),r}return n(e,t),e.prototype.bind=function(){var t=this.gl;t.bindBuffer(t.ELEMENT_ARRAY_BUFFER,this.indicesBuffer),t.enableVertexAttribArray(this.positionLocation),t.enableVertexAttribArray(this.normalLocation),t.enableVertexAttribArray(this.thicknessLocation),t.enableVertexAttribArray(this.colorLocation),t.enableVertexAttribArray(this.radiusLocation),t.vertexAttribPointer(this.positionLocation,2,t.FLOAT,!1,7*Float32Array.BYTES_PER_ELEMENT,0),t.vertexAttribPointer(this.normalLocation,2,t.FLOAT,!1,7*Float32Array.BYTES_PER_ELEMENT,8),t.vertexAttribPointer(this.thicknessLocation,1,t.FLOAT,!1,7*Float32Array.BYTES_PER_ELEMENT,16),t.vertexAttribPointer(this.colorLocation,4,t.UNSIGNED_BYTE,!0,7*Float32Array.BYTES_PER_ELEMENT,20),t.vertexAttribPointer(this.radiusLocation,1,t.FLOAT,!1,7*Float32Array.BYTES_PER_ELEMENT,24)},e.prototype.process=function(t,e,r,i){if(t.hidden||e.hidden||r.hidden)for(var n=28*i,o=n+28;n<o;n++)this.array[n]=0;else{var a=r.size||1,c=t.x,l=t.y,h=e.x,u=e.y,d=e.size||1,f=s.floatColor(r.color),p=h-c,g=u-l,v=p*p+g*g,m=0,y=0;v&&(m=-g*(v=1/Math.sqrt(v)),y=p*v);var _=28*i,b=this.array;b[_++]=c,b[_++]=l,b[_++]=m,b[_++]=y,b[_++]=a,b[_++]=f,b[_++]=0,b[_++]=c,b[_++]=l,b[_++]=-m,b[_++]=-y,b[_++]=a,b[_++]=f,b[_++]=0,b[_++]=h,b[_++]=u,b[_++]=m,b[_++]=y,b[_++]=a,b[_++]=f,b[_++]=d,b[_++]=h,b[_++]=u,b[_++]=-m,b[_++]=-y,b[_++]=a,b[_++]=f,b[_]=-d}},e.prototype.computeIndices=function(){for(var t=this.array.length/7,e=t+t/2,r=new this.IndicesArray(e),i=0,n=0;i<t;i+=4)r[n++]=i,r[n++]=i+1,r[n++]=i+2,r[n++]=i+2,r[n++]=i+1,r[n++]=i+3;this.indicesArray=r},e.prototype.bufferData=function(){t.prototype.bufferData.call(this);var e=this.gl;e.bufferData(e.ELEMENT_ARRAY_BUFFER,this.indicesArray,e.STATIC_DRAW)},e.prototype.render=function(t){var e=this.gl,r=this.program;e.useProgram(r),e.uniform2f(this.resolutionLocation,t.width,t.height),e.uniform1f(this.ratioLocation,t.ratio),e.uniformMatrix3fv(this.matrixLocation,!1,t.matrix),e.uniform1f(this.scaleLocation,t.scalingRatio),e.drawElements(e.TRIANGLES,this.indicesArray.length,this.indicesType,0)},e}(a.AbstractEdgeProgram);e.default=h},function(t,e,r){"use strict";r.r(e),e.default="attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\nattribute float a_radius;\n\nuniform vec2 u_resolution;\nuniform float u_ratio;\nuniform mat3 u_matrix;\nuniform float u_scale;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float min_thickness = 1.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in pixels\n  float pow_ratio = 1.0 / pow(u_ratio, 0.5);\n  float thickness = a_thickness * pow_ratio / u_scale;\n\n  // Min thickness for AA\n  thickness = max(min_thickness, thickness);\n\n  // Arrow margin\n  // NOTE: it seems we don't need a constant margin into the arrow\n  float arrow_pow_ratio = pow_ratio * 2.0;\n  float radius = abs(a_radius) * arrow_pow_ratio;\n  float arrow_thickness = max(a_thickness * 2.5, 5.0) * arrow_pow_ratio / u_scale;\n  float margin = radius + arrow_thickness - arrow_pow_ratio;\n  float direction = sign(a_radius);\n  vec2 pnormal = vec2(-direction * a_normal.y, direction * a_normal.x);\n\n  // Computing delta relative to viewport\n  vec2 delta = (a_normal * thickness) / u_resolution;\n  vec2 clamped = (pnormal * margin) / u_resolution;\n\n  vec2 position = (u_matrix * vec3(a_position, 1)).xy;\n  position += delta + clamped;\n\n  // Applying\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n"}])}));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Sigma"] = factory();
+	else
+		root["Sigma"] = factory();
+})(self, function() {
+return /******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ([
+/* 0 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WebGLRenderer = exports.MouseCaptor = exports.QuadTree = exports.Camera = void 0;
+/**
+ * Sigma.js Library Endpoint
+ * ==========================
+ *
+ * The library endpoint.
+ */
+var camera_1 = __importDefault(__webpack_require__(1));
+exports.Camera = camera_1.default;
+var quadtree_1 = __importDefault(__webpack_require__(6));
+exports.QuadTree = quadtree_1.default;
+var mouse_1 = __importDefault(__webpack_require__(8));
+exports.MouseCaptor = mouse_1.default;
+var webgl_1 = __importDefault(__webpack_require__(11));
+exports.WebGLRenderer = webgl_1.default;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js Camera Class
+ * ======================
+ *
+ * Class designed to store camera information & used to update it.
+ */
+var events_1 = __webpack_require__(2);
+var animate_1 = __webpack_require__(3);
+var easings_1 = __importDefault(__webpack_require__(5));
+var utils_1 = __webpack_require__(4);
+/**
+ * Defaults.
+ */
+var DEFAULT_ZOOMING_RATIO = 1.5;
+/**
+ * Camera class
+ *
+ * @constructor
+ */
+var Camera = /** @class */ (function (_super) {
+    __extends(Camera, _super);
+    function Camera() {
+        var _this = _super.call(this) || this;
+        _this.x = 0.5;
+        _this.y = 0.5;
+        _this.angle = 0;
+        _this.ratio = 1;
+        _this.nextFrame = null;
+        _this.enabled = true;
+        // State
+        _this.previousState = _this.getState();
+        return _this;
+    }
+    /**
+     * Static method used to create a Camera object with a given state.
+     *
+     * @param state
+     * @return {Camera}
+     */
+    Camera.from = function (state) {
+        var camera = new Camera();
+        return camera.setState(state);
+    };
+    /**
+     * Method used to enable the camera.
+     *
+     * @return {Camera}
+     */
+    Camera.prototype.enable = function () {
+        this.enabled = true;
+        return this;
+    };
+    /**
+     * Method used to disable the camera.
+     *
+     * @return {Camera}
+     */
+    Camera.prototype.disable = function () {
+        this.enabled = false;
+        return this;
+    };
+    /**
+     * Method used to retrieve the camera's current state.
+     *
+     * @return {object}
+     */
+    Camera.prototype.getState = function () {
+        return {
+            x: this.x,
+            y: this.y,
+            angle: this.angle,
+            ratio: this.ratio,
+        };
+    };
+    /**
+     * Method used to retrieve the camera's previous state.
+     *
+     * @return {object}
+     */
+    Camera.prototype.getPreviousState = function () {
+        var state = this.previousState;
+        return {
+            x: state.x,
+            y: state.y,
+            angle: state.angle,
+            ratio: state.ratio,
+        };
+    };
+    /**
+     * Method used to check whether the camera is currently being animated.
+     *
+     * @return {boolean}
+     */
+    Camera.prototype.isAnimated = function () {
+        return !!this.nextFrame;
+    };
+    /**
+     * Method returning the coordinates of a point from the graph frame to the
+     * viewport.
+     *
+     * @param  {object} dimensions  - Dimensions of the viewport.
+     * @param  {object} coordinates - Coordinates of the point.
+     * @return {object}             - The point coordinates in the viewport.
+     */
+    Camera.prototype.graphToViewport = function (dimensions, coordinates) {
+        var smallestDimension = Math.min(dimensions.width, dimensions.height);
+        var dx = smallestDimension / dimensions.width;
+        var dy = smallestDimension / dimensions.height;
+        var ratio = this.ratio / smallestDimension;
+        // Align with center of the graph:
+        var x1 = (coordinates.x - this.x) / ratio;
+        var y1 = (this.y - coordinates.y) / ratio;
+        // Rotate:
+        var x2 = x1 * Math.cos(this.angle) - y1 * Math.sin(this.angle);
+        var y2 = y1 * Math.cos(this.angle) + x1 * Math.sin(this.angle);
+        return {
+            // Translate to center of screen
+            x: x2 + smallestDimension / 2 / dx,
+            y: y2 + smallestDimension / 2 / dy,
+        };
+    };
+    /**
+     * Method returning the coordinates of a point from the viewport frame to the
+     * graph frame.
+     *
+     * @param  {object} dimensions  - Dimensions of the viewport.
+     * @param  {object} coordinates - Coordinates of the point.
+     * @return {object}             - The point coordinates in the graph frame.
+     */
+    Camera.prototype.viewportToGraph = function (dimensions, coordinates) {
+        var smallestDimension = Math.min(dimensions.width, dimensions.height);
+        var dx = smallestDimension / dimensions.width;
+        var dy = smallestDimension / dimensions.height;
+        var ratio = this.ratio / smallestDimension;
+        // Align with center of the graph:
+        var x1 = coordinates.x - smallestDimension / 2 / dx;
+        var y1 = coordinates.y - smallestDimension / 2 / dy;
+        // Rotate:
+        var x2 = x1 * Math.cos(-this.angle) - y1 * Math.sin(-this.angle);
+        var y2 = y1 * Math.cos(-this.angle) + x1 * Math.sin(-this.angle);
+        return {
+            x: x2 * ratio + this.x,
+            y: -y2 * ratio + this.y,
+        };
+    };
+    /**
+     * Method returning the abstract rectangle containing the graph according
+     * to the camera's state.
+     *
+     * @return {object} - The view's rectangle.
+     */
+    Camera.prototype.viewRectangle = function (dimensions) {
+        // TODO: reduce relative margin?
+        var marginX = (0 * dimensions.width) / 8, marginY = (0 * dimensions.height) / 8;
+        var p1 = this.viewportToGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }), p2 = this.viewportToGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }), h = this.viewportToGraph(dimensions, { x: 0, y: dimensions.height + marginY });
+        return {
+            x1: p1.x,
+            y1: p1.y,
+            x2: p2.x,
+            y2: p2.y,
+            height: p2.y - h.y,
+        };
+    };
+    /**
+     * Method used to set the camera's state.
+     *
+     * @param  {object} state - New state.
+     * @return {Camera}
+     */
+    Camera.prototype.setState = function (state) {
+        if (!this.enabled)
+            return this;
+        // TODO: validations
+        // TODO: update by function
+        // Keeping track of last state
+        this.previousState = this.getState();
+        if (state.x)
+            this.x = state.x;
+        if (state.y)
+            this.y = state.y;
+        if (state.angle)
+            this.angle = state.angle;
+        if (state.ratio)
+            this.ratio = state.ratio;
+        // Emitting
+        // TODO: don't emit if nothing changed?
+        this.emit("updated", this.getState());
+        return this;
+    };
+    /**
+     * Method used to (un)zoom, while preserving the position of a viewport point.
+     * Used for instance to
+     *
+     * @param viewportTarget
+     * @param dimensions
+     * @param ratio
+     * @return {CameraState}
+     */
+    Camera.prototype.getViewportZoomedState = function (viewportTarget, dimensions, ratio) {
+        // TODO: handle max zoom
+        var ratioDiff = ratio / this.ratio;
+        var center = {
+            x: dimensions.width / 2,
+            y: dimensions.height / 2,
+        };
+        var graphMousePosition = this.viewportToGraph(dimensions, viewportTarget);
+        var graphCenterPosition = this.viewportToGraph(dimensions, center);
+        return __assign(__assign({}, this.getState()), { x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + this.x, y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + this.y, ratio: ratio });
+    };
+    /**
+     * Method used to animate the camera.
+     *
+     * @param  {object}                    state      - State to reach eventually.
+     * @param  {object}                    opts       - Options:
+     * @param  {number}                      duration - Duration of the animation.
+     * @param  {string | number => number}   easing   - Easing function or name of an existing one
+     * @param  {function}                  callback   - Callback
+     */
+    Camera.prototype.animate = function (state, opts, callback) {
+        var _this = this;
+        if (!this.enabled)
+            return;
+        var options = utils_1.assign({}, animate_1.ANIMATE_DEFAULTS, opts);
+        var easing = typeof options.easing === "function" ? options.easing : easings_1.default[options.easing];
+        // Canceling previous animation if needed
+        if (this.nextFrame)
+            cancelAnimationFrame(this.nextFrame);
+        // State
+        var start = Date.now(), initialState = this.getState();
+        // Function performing the animation
+        var fn = function () {
+            var t = (Date.now() - start) / options.duration;
+            // The animation is over:
+            if (t >= 1) {
+                _this.nextFrame = null;
+                _this.setState(state);
+                if (typeof callback === "function")
+                    callback();
+                return;
+            }
+            var coefficient = easing(t);
+            var newState = {};
+            if (state.x)
+                newState.x = initialState.x + (state.x - initialState.x) * coefficient;
+            if (state.y)
+                newState.y = initialState.y + (state.y - initialState.y) * coefficient;
+            if (state.angle)
+                newState.angle = initialState.angle + (state.angle - initialState.angle) * coefficient;
+            if (state.ratio)
+                newState.ratio = initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
+            _this.setState(newState);
+            _this.nextFrame = requestAnimationFrame(fn);
+        };
+        if (this.nextFrame) {
+            cancelAnimationFrame(this.nextFrame);
+            this.nextFrame = requestAnimationFrame(fn);
+        }
+        else {
+            fn();
+        }
+    };
+    /**
+     * Method used to zoom the camera.
+     *
+     * @param  {number|object} factorOrOptions - Factor or options.
+     * @return {function}
+     */
+    Camera.prototype.animatedZoom = function (factorOrOptions) {
+        if (!factorOrOptions) {
+            this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
+        }
+        else {
+            if (typeof factorOrOptions === "number")
+                return this.animate({ ratio: this.ratio / factorOrOptions });
+            else
+                this.animate({
+                    ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
+                }, factorOrOptions);
+        }
+    };
+    /**
+     * Method used to unzoom the camera.
+     *
+     * @param  {number|object} factorOrOptions - Factor or options.
+     */
+    Camera.prototype.animatedUnzoom = function (factorOrOptions) {
+        if (!factorOrOptions) {
+            this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
+        }
+        else {
+            if (typeof factorOrOptions === "number")
+                return this.animate({ ratio: this.ratio * factorOrOptions });
+            else
+                this.animate({
+                    ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
+                }, factorOrOptions);
+        }
+    };
+    /**
+     * Method used to reset the camera.
+     *
+     * @param  {object} options - Options.
+     */
+    Camera.prototype.animatedReset = function (options) {
+        this.animate({
+            x: 0.5,
+            y: 0.5,
+            ratio: 1,
+            angle: 0,
+        }, options);
+    };
+    /**
+     * Returns a new Camera instance, with the same state as the current camera.
+     *
+     * @return {Camera}
+     */
+    Camera.prototype.copy = function () {
+        return Camera.from(this.getState());
+    };
+    return Camera;
+}(events_1.EventEmitter));
+exports.default = Camera;
+
+
+/***/ }),
+/* 2 */
+/***/ ((module) => {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+var R = typeof Reflect === 'object' ? Reflect : null
+var ReflectApply = R && typeof R.apply === 'function'
+  ? R.apply
+  : function ReflectApply(target, receiver, args) {
+    return Function.prototype.apply.call(target, receiver, args);
+  }
+
+var ReflectOwnKeys
+if (R && typeof R.ownKeys === 'function') {
+  ReflectOwnKeys = R.ownKeys
+} else if (Object.getOwnPropertySymbols) {
+  ReflectOwnKeys = function ReflectOwnKeys(target) {
+    return Object.getOwnPropertyNames(target)
+      .concat(Object.getOwnPropertySymbols(target));
+  };
+} else {
+  ReflectOwnKeys = function ReflectOwnKeys(target) {
+    return Object.getOwnPropertyNames(target);
+  };
+}
+
+function ProcessEmitWarning(warning) {
+  if (console && console.warn) console.warn(warning);
+}
+
+var NumberIsNaN = Number.isNaN || function NumberIsNaN(value) {
+  return value !== value;
+}
+
+function EventEmitter() {
+  EventEmitter.init.call(this);
+}
+module.exports = EventEmitter;
+module.exports.once = once;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._eventsCount = 0;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+var defaultMaxListeners = 10;
+
+function checkListener(listener) {
+  if (typeof listener !== 'function') {
+    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+  }
+}
+
+Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
+  enumerable: true,
+  get: function() {
+    return defaultMaxListeners;
+  },
+  set: function(arg) {
+    if (typeof arg !== 'number' || arg < 0 || NumberIsNaN(arg)) {
+      throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + arg + '.');
+    }
+    defaultMaxListeners = arg;
+  }
+});
+
+EventEmitter.init = function() {
+
+  if (this._events === undefined ||
+      this._events === Object.getPrototypeOf(this)._events) {
+    this._events = Object.create(null);
+    this._eventsCount = 0;
+  }
+
+  this._maxListeners = this._maxListeners || undefined;
+};
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
+  if (typeof n !== 'number' || n < 0 || NumberIsNaN(n)) {
+    throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received ' + n + '.');
+  }
+  this._maxListeners = n;
+  return this;
+};
+
+function _getMaxListeners(that) {
+  if (that._maxListeners === undefined)
+    return EventEmitter.defaultMaxListeners;
+  return that._maxListeners;
+}
+
+EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
+  return _getMaxListeners(this);
+};
+
+EventEmitter.prototype.emit = function emit(type) {
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) args.push(arguments[i]);
+  var doError = (type === 'error');
+
+  var events = this._events;
+  if (events !== undefined)
+    doError = (doError && events.error === undefined);
+  else if (!doError)
+    return false;
+
+  // If there is no 'error' event listener then throw.
+  if (doError) {
+    var er;
+    if (args.length > 0)
+      er = args[0];
+    if (er instanceof Error) {
+      // Note: The comments on the `throw` lines are intentional, they show
+      // up in Node's output if this results in an unhandled exception.
+      throw er; // Unhandled 'error' event
+    }
+    // At least give some kind of context to the user
+    var err = new Error('Unhandled error.' + (er ? ' (' + er.message + ')' : ''));
+    err.context = er;
+    throw err; // Unhandled 'error' event
+  }
+
+  var handler = events[type];
+
+  if (handler === undefined)
+    return false;
+
+  if (typeof handler === 'function') {
+    ReflectApply(handler, this, args);
+  } else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      ReflectApply(listeners[i], this, args);
+  }
+
+  return true;
+};
+
+function _addListener(target, type, listener, prepend) {
+  var m;
+  var events;
+  var existing;
+
+  checkListener(listener);
+
+  events = target._events;
+  if (events === undefined) {
+    events = target._events = Object.create(null);
+    target._eventsCount = 0;
+  } else {
+    // To avoid recursion in the case that type === "newListener"! Before
+    // adding it to the listeners, first emit "newListener".
+    if (events.newListener !== undefined) {
+      target.emit('newListener', type,
+                  listener.listener ? listener.listener : listener);
+
+      // Re-assign `events` because a newListener handler could have caused the
+      // this._events to be assigned to a new object
+      events = target._events;
+    }
+    existing = events[type];
+  }
+
+  if (existing === undefined) {
+    // Optimize the case of one listener. Don't need the extra array object.
+    existing = events[type] = listener;
+    ++target._eventsCount;
+  } else {
+    if (typeof existing === 'function') {
+      // Adding the second element, need to change to array.
+      existing = events[type] =
+        prepend ? [listener, existing] : [existing, listener];
+      // If we've already got an array, just append.
+    } else if (prepend) {
+      existing.unshift(listener);
+    } else {
+      existing.push(listener);
+    }
+
+    // Check for listener leak
+    m = _getMaxListeners(target);
+    if (m > 0 && existing.length > m && !existing.warned) {
+      existing.warned = true;
+      // No error code for this since it is a Warning
+      // eslint-disable-next-line no-restricted-syntax
+      var w = new Error('Possible EventEmitter memory leak detected. ' +
+                          existing.length + ' ' + String(type) + ' listeners ' +
+                          'added. Use emitter.setMaxListeners() to ' +
+                          'increase limit');
+      w.name = 'MaxListenersExceededWarning';
+      w.emitter = target;
+      w.type = type;
+      w.count = existing.length;
+      ProcessEmitWarning(w);
+    }
+  }
+
+  return target;
+}
+
+EventEmitter.prototype.addListener = function addListener(type, listener) {
+  return _addListener(this, type, listener, false);
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.prependListener =
+    function prependListener(type, listener) {
+      return _addListener(this, type, listener, true);
+    };
+
+function onceWrapper() {
+  if (!this.fired) {
+    this.target.removeListener(this.type, this.wrapFn);
+    this.fired = true;
+    if (arguments.length === 0)
+      return this.listener.call(this.target);
+    return this.listener.apply(this.target, arguments);
+  }
+}
+
+function _onceWrap(target, type, listener) {
+  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
+  var wrapped = onceWrapper.bind(state);
+  wrapped.listener = listener;
+  state.wrapFn = wrapped;
+  return wrapped;
+}
+
+EventEmitter.prototype.once = function once(type, listener) {
+  checkListener(listener);
+  this.on(type, _onceWrap(this, type, listener));
+  return this;
+};
+
+EventEmitter.prototype.prependOnceListener =
+    function prependOnceListener(type, listener) {
+      checkListener(listener);
+      this.prependListener(type, _onceWrap(this, type, listener));
+      return this;
+    };
+
+// Emits a 'removeListener' event if and only if the listener was removed.
+EventEmitter.prototype.removeListener =
+    function removeListener(type, listener) {
+      var list, events, position, i, originalListener;
+
+      checkListener(listener);
+
+      events = this._events;
+      if (events === undefined)
+        return this;
+
+      list = events[type];
+      if (list === undefined)
+        return this;
+
+      if (list === listener || list.listener === listener) {
+        if (--this._eventsCount === 0)
+          this._events = Object.create(null);
+        else {
+          delete events[type];
+          if (events.removeListener)
+            this.emit('removeListener', type, list.listener || listener);
+        }
+      } else if (typeof list !== 'function') {
+        position = -1;
+
+        for (i = list.length - 1; i >= 0; i--) {
+          if (list[i] === listener || list[i].listener === listener) {
+            originalListener = list[i].listener;
+            position = i;
+            break;
+          }
+        }
+
+        if (position < 0)
+          return this;
+
+        if (position === 0)
+          list.shift();
+        else {
+          spliceOne(list, position);
+        }
+
+        if (list.length === 1)
+          events[type] = list[0];
+
+        if (events.removeListener !== undefined)
+          this.emit('removeListener', type, originalListener || listener);
+      }
+
+      return this;
+    };
+
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+
+EventEmitter.prototype.removeAllListeners =
+    function removeAllListeners(type) {
+      var listeners, events, i;
+
+      events = this._events;
+      if (events === undefined)
+        return this;
+
+      // not listening for removeListener, no need to emit
+      if (events.removeListener === undefined) {
+        if (arguments.length === 0) {
+          this._events = Object.create(null);
+          this._eventsCount = 0;
+        } else if (events[type] !== undefined) {
+          if (--this._eventsCount === 0)
+            this._events = Object.create(null);
+          else
+            delete events[type];
+        }
+        return this;
+      }
+
+      // emit removeListener for all listeners on all events
+      if (arguments.length === 0) {
+        var keys = Object.keys(events);
+        var key;
+        for (i = 0; i < keys.length; ++i) {
+          key = keys[i];
+          if (key === 'removeListener') continue;
+          this.removeAllListeners(key);
+        }
+        this.removeAllListeners('removeListener');
+        this._events = Object.create(null);
+        this._eventsCount = 0;
+        return this;
+      }
+
+      listeners = events[type];
+
+      if (typeof listeners === 'function') {
+        this.removeListener(type, listeners);
+      } else if (listeners !== undefined) {
+        // LIFO order
+        for (i = listeners.length - 1; i >= 0; i--) {
+          this.removeListener(type, listeners[i]);
+        }
+      }
+
+      return this;
+    };
+
+function _listeners(target, type, unwrap) {
+  var events = target._events;
+
+  if (events === undefined)
+    return [];
+
+  var evlistener = events[type];
+  if (evlistener === undefined)
+    return [];
+
+  if (typeof evlistener === 'function')
+    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
+
+  return unwrap ?
+    unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
+}
+
+EventEmitter.prototype.listeners = function listeners(type) {
+  return _listeners(this, type, true);
+};
+
+EventEmitter.prototype.rawListeners = function rawListeners(type) {
+  return _listeners(this, type, false);
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  if (typeof emitter.listenerCount === 'function') {
+    return emitter.listenerCount(type);
+  } else {
+    return listenerCount.call(emitter, type);
+  }
+};
+
+EventEmitter.prototype.listenerCount = listenerCount;
+function listenerCount(type) {
+  var events = this._events;
+
+  if (events !== undefined) {
+    var evlistener = events[type];
+
+    if (typeof evlistener === 'function') {
+      return 1;
+    } else if (evlistener !== undefined) {
+      return evlistener.length;
+    }
+  }
+
+  return 0;
+}
+
+EventEmitter.prototype.eventNames = function eventNames() {
+  return this._eventsCount > 0 ? ReflectOwnKeys(this._events) : [];
+};
+
+function arrayClone(arr, n) {
+  var copy = new Array(n);
+  for (var i = 0; i < n; ++i)
+    copy[i] = arr[i];
+  return copy;
+}
+
+function spliceOne(list, index) {
+  for (; index + 1 < list.length; index++)
+    list[index] = list[index + 1];
+  list.pop();
+}
+
+function unwrapListeners(arr) {
+  var ret = new Array(arr.length);
+  for (var i = 0; i < ret.length; ++i) {
+    ret[i] = arr[i].listener || arr[i];
+  }
+  return ret;
+}
+
+function once(emitter, name) {
+  return new Promise(function (resolve, reject) {
+    function eventListener() {
+      if (errorListener !== undefined) {
+        emitter.removeListener('error', errorListener);
+      }
+      resolve([].slice.call(arguments));
+    };
+    var errorListener;
+
+    // Adding an error listener is not optional because
+    // if an error is thrown on an event emitter we cannot
+    // guarantee that the actual event we are waiting will
+    // be fired. The result could be a silent way to create
+    // memory or file descriptor leaks, which is something
+    // we should avoid.
+    if (name !== 'error') {
+      errorListener = function errorListener(err) {
+        emitter.removeListener(name, eventListener);
+        reject(err);
+      };
+
+      emitter.once('error', errorListener);
+    }
+
+    emitter.once(name, eventListener);
+  });
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.animateNodes = exports.ANIMATE_DEFAULTS = void 0;
+var utils_1 = __webpack_require__(4);
+var easings_1 = __importDefault(__webpack_require__(5));
+exports.ANIMATE_DEFAULTS = {
+    easing: "quadraticInOut",
+    duration: 150,
+};
+/**
+ * Function used to animate the nodes.
+ */
+function animateNodes(graph, targets, opts, callback) {
+    var options = utils_1.assign({}, exports.ANIMATE_DEFAULTS, opts);
+    var easing = typeof options.easing === "function" ? options.easing : easings_1.default[options.easing];
+    var start = Date.now();
+    var startPositions = {};
+    for (var node in targets) {
+        var attrs = targets[node];
+        startPositions[node] = {};
+        for (var k in attrs)
+            startPositions[node][k] = graph.getNodeAttribute(node, k);
+    }
+    var frame = null;
+    var step = function () {
+        var p = (Date.now() - start) / options.duration;
+        if (p >= 1) {
+            // Animation is done
+            for (var node in targets) {
+                var attrs = targets[node];
+                for (var k in attrs)
+                    graph.setNodeAttribute(node, k, attrs[k]);
+            }
+            if (typeof callback === "function")
+                callback();
+            return;
+        }
+        p = easing(p);
+        for (var node in targets) {
+            var attrs = targets[node];
+            var s = startPositions[node];
+            for (var k in attrs)
+                graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
+        }
+        frame = requestAnimationFrame(step);
+    };
+    step();
+    return function () {
+        if (frame)
+            cancelAnimationFrame(frame);
+    };
+}
+exports.animateNodes = animateNodes;
+
+
+/***/ }),
+/* 4 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+/**
+ * Sigma.js Utils
+ * ===============
+ *
+ * Various helper functions & classes used throughout the library.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.assign = exports.isPlainObject = void 0;
+/**
+ * Checks whether the given value is a plain object.
+ *
+ * @param  {mixed}   value - Target value.
+ * @return {boolean}
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
+function isPlainObject(value) {
+    return typeof value === "object" && value !== null && value.constructor === Object;
+}
+exports.isPlainObject = isPlainObject;
+/**
+ * Very simple recursive Object.assign-like function.
+ *
+ * @param  {object} target       - First object.
+ * @param  {object} [...objects] - Objects to merge.
+ * @return {object}
+ */
+function assign(target) {
+    var objects = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        objects[_i - 1] = arguments[_i];
+    }
+    target = target || {};
+    for (var i = 0, l = objects.length; i < l; i++) {
+        var o = objects[i];
+        if (!o)
+            continue;
+        for (var k in o) {
+            if (isPlainObject(o[k])) {
+                target[k] = assign(target[k], o[k]);
+            }
+            else {
+                target[k] = o[k];
+            }
+        }
+    }
+    return target;
+}
+exports.assign = assign;
+
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.cubicInOut = exports.cubicOut = exports.cubicIn = exports.quadraticInOut = exports.quadraticOut = exports.quadraticIn = exports.linear = void 0;
+/**
+ * Sigma.js Easings
+ * =================
+ *
+ * Handy collection of easing functions.
+ */
+exports.linear = function (k) { return k; };
+exports.quadraticIn = function (k) { return k * k; };
+exports.quadraticOut = function (k) { return k * (2 - k); };
+exports.quadraticInOut = function (k) {
+    if ((k *= 2) < 1)
+        return 0.5 * k * k;
+    return -0.5 * (--k * (k - 2) - 1);
+};
+exports.cubicIn = function (k) { return k * k * k; };
+exports.cubicOut = function (k) { return --k * k * k + 1; };
+exports.cubicInOut = function (k) {
+    if ((k *= 2) < 1)
+        return 0.5 * k * k * k;
+    return 0.5 * ((k -= 2) * k * k + 2);
+};
+var easings = {
+    linear: exports.linear,
+    quadraticIn: exports.quadraticIn,
+    quadraticOut: exports.quadraticOut,
+    quadraticInOut: exports.quadraticInOut,
+    cubicIn: exports.cubicIn,
+    cubicOut: exports.cubicOut,
+    cubicInOut: exports.cubicInOut,
+};
+exports.default = easings;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.rectangleCollidesWithQuad = exports.squareCollidesWithQuad = exports.getCircumscribedAlignedRectangle = exports.isRectangleAligned = void 0;
+/* eslint no-nested-ternary: 0 */
+/* eslint no-constant-condition: 0 */
+/**
+ * Sigma.js Quad Tree Class
+ * =========================
+ *
+ * Class implementing the quad tree data structure used to solve hovers and
+ * determine which elements are currently in the scope of the camera so that
+ * we don't waste time rendering things the user cannot see anyway.
+ */
+var extend_1 = __importDefault(__webpack_require__(7));
+// TODO: should not ask the quadtree when the camera has the whole graph in
+// sight.
+// TODO: a square can be represented as topleft + width, saying for the quad blocks (reduce mem)
+// TODO: jsdoc
+// TODO: be sure we can handle cases overcoming boundaries (because of size) or use a maxed size
+// TODO: filtering unwanted labels beforehand through the filter function
+// NOTE: this is basically a MX-CIF Quadtree at this point
+// NOTE: need to explore R-Trees for edges
+// NOTE: need to explore 2d segment tree for edges
+// NOTE: probably can do faster using spatial hashing
+/**
+ * Constants.
+ *
+ * Note that since we are representing a static 4-ary tree, the indices of the
+ * quadrants are the following:
+ *   - TOP_LEFT:     4i + b
+ *   - TOP_RIGHT:    4i + 2b
+ *   - BOTTOM_LEFT:  4i + 3b
+ *   - BOTTOM_RIGHT: 4i + 4b
+ */
+var BLOCKS = 4, MAX_LEVEL = 5;
+var X_OFFSET = 0, Y_OFFSET = 1, WIDTH_OFFSET = 2, HEIGHT_OFFSET = 3;
+var TOP_LEFT = 1, TOP_RIGHT = 2, BOTTOM_LEFT = 3, BOTTOM_RIGHT = 4;
+/**
+ * Geometry helpers.
+ */
+/**
+ * Function returning whether the given rectangle is axis-aligned.
+ *
+ * @param  {Rectangle} rect
+ * @return {boolean}
+ */
+function isRectangleAligned(rect) {
+    return rect.x1 === rect.x2 || rect.y1 === rect.y2;
+}
+exports.isRectangleAligned = isRectangleAligned;
+/**
+ * Function returning the smallest rectangle that contains the given rectangle, and that is aligned with the axis.
+ *
+ * @param {Rectangle} rect
+ * @return {Rectangle}
+ */
+function getCircumscribedAlignedRectangle(rect) {
+    var width = Math.sqrt(Math.pow(rect.x2 - rect.x1, 2) + Math.pow(rect.y2 - rect.y1, 2));
+    var heightVector = {
+        x: ((rect.y1 - rect.y2) * rect.height) / width,
+        y: ((rect.x2 - rect.x1) * rect.height) / width,
+    };
+    // Compute all corners:
+    var tl = { x: rect.x1, y: rect.y1 };
+    var tr = { x: rect.x2, y: rect.y2 };
+    var bl = {
+        x: rect.x1 + heightVector.x,
+        y: rect.y1 + heightVector.y,
+    };
+    var br = {
+        x: rect.x2 + heightVector.x,
+        y: rect.y2 + heightVector.y,
+    };
+    var xL = Math.min(tl.x, tr.x, bl.x, br.x);
+    var xR = Math.max(tl.x, tr.x, bl.x, br.x);
+    var yT = Math.min(tl.y, tr.y, bl.y, br.y);
+    var yB = Math.max(tl.y, tr.y, bl.y, br.y);
+    return {
+        x1: xL,
+        y1: yT,
+        x2: xR,
+        y2: yT,
+        height: yB - yT,
+    };
+}
+exports.getCircumscribedAlignedRectangle = getCircumscribedAlignedRectangle;
+/**
+ *
+ * @param x1
+ * @param y1
+ * @param w
+ * @param qx
+ * @param qy
+ * @param qw
+ * @param qh
+ */
+function squareCollidesWithQuad(x1, y1, w, qx, qy, qw, qh) {
+    return x1 < qx + qw && x1 + w > qx && y1 < qy + qh && y1 + w > qy;
+}
+exports.squareCollidesWithQuad = squareCollidesWithQuad;
+function rectangleCollidesWithQuad(x1, y1, w, h, qx, qy, qw, qh) {
+    return x1 < qx + qw && x1 + w > qx && y1 < qy + qh && y1 + h > qy;
+}
+exports.rectangleCollidesWithQuad = rectangleCollidesWithQuad;
+function pointIsInQuad(x, y, qx, qy, qw, qh) {
+    var xmp = qx + qw / 2, ymp = qy + qh / 2, top = y < ymp, left = x < xmp;
+    return top ? (left ? TOP_LEFT : TOP_RIGHT) : left ? BOTTOM_LEFT : BOTTOM_RIGHT;
+}
+/**
+ * Helper functions that are not bound to the class so an external user
+ * cannot mess with them.
+ */
+function buildQuadrants(maxLevel, data) {
+    // [block, level]
+    var stack = [0, 0];
+    while (stack.length) {
+        var level = stack.pop(), block = stack.pop();
+        var topLeftBlock = 4 * block + BLOCKS, topRightBlock = 4 * block + 2 * BLOCKS, bottomLeftBlock = 4 * block + 3 * BLOCKS, bottomRightBlock = 4 * block + 4 * BLOCKS;
+        var x = data[block + X_OFFSET], y = data[block + Y_OFFSET], width = data[block + WIDTH_OFFSET], height = data[block + HEIGHT_OFFSET], hw = width / 2, hh = height / 2;
+        data[topLeftBlock + X_OFFSET] = x;
+        data[topLeftBlock + Y_OFFSET] = y;
+        data[topLeftBlock + WIDTH_OFFSET] = hw;
+        data[topLeftBlock + HEIGHT_OFFSET] = hh;
+        data[topRightBlock + X_OFFSET] = x + hw;
+        data[topRightBlock + Y_OFFSET] = y;
+        data[topRightBlock + WIDTH_OFFSET] = hw;
+        data[topRightBlock + HEIGHT_OFFSET] = hh;
+        data[bottomLeftBlock + X_OFFSET] = x;
+        data[bottomLeftBlock + Y_OFFSET] = y + hh;
+        data[bottomLeftBlock + WIDTH_OFFSET] = hw;
+        data[bottomLeftBlock + HEIGHT_OFFSET] = hh;
+        data[bottomRightBlock + X_OFFSET] = x + hw;
+        data[bottomRightBlock + Y_OFFSET] = y + hh;
+        data[bottomRightBlock + WIDTH_OFFSET] = hw;
+        data[bottomRightBlock + HEIGHT_OFFSET] = hh;
+        if (level < maxLevel - 1) {
+            stack.push(bottomRightBlock, level + 1);
+            stack.push(bottomLeftBlock, level + 1);
+            stack.push(topRightBlock, level + 1);
+            stack.push(topLeftBlock, level + 1);
+        }
+    }
+}
+function insertNode(maxLevel, data, containers, key, x, y, size) {
+    var x1 = x - size, y1 = y - size, w = size * 2;
+    var level = 0, block = 0;
+    while (true) {
+        // If we reached max level
+        if (level >= maxLevel) {
+            containers[block] = containers[block] || [];
+            containers[block].push(key);
+            return;
+        }
+        var topLeftBlock = 4 * block + BLOCKS, topRightBlock = 4 * block + 2 * BLOCKS, bottomLeftBlock = 4 * block + 3 * BLOCKS, bottomRightBlock = 4 * block + 4 * BLOCKS;
+        var collidingWithTopLeft = squareCollidesWithQuad(x1, y1, w, data[topLeftBlock + X_OFFSET], data[topLeftBlock + Y_OFFSET], data[topLeftBlock + WIDTH_OFFSET], data[topLeftBlock + HEIGHT_OFFSET]);
+        var collidingWithTopRight = squareCollidesWithQuad(x1, y1, w, data[topRightBlock + X_OFFSET], data[topRightBlock + Y_OFFSET], data[topRightBlock + WIDTH_OFFSET], data[topRightBlock + HEIGHT_OFFSET]);
+        var collidingWithBottomLeft = squareCollidesWithQuad(x1, y1, w, data[bottomLeftBlock + X_OFFSET], data[bottomLeftBlock + Y_OFFSET], data[bottomLeftBlock + WIDTH_OFFSET], data[bottomLeftBlock + HEIGHT_OFFSET]);
+        var collidingWithBottomRight = squareCollidesWithQuad(x1, y1, w, data[bottomRightBlock + X_OFFSET], data[bottomRightBlock + Y_OFFSET], data[bottomRightBlock + WIDTH_OFFSET], data[bottomRightBlock + HEIGHT_OFFSET]);
+        var collisions = [
+            collidingWithTopLeft,
+            collidingWithTopRight,
+            collidingWithBottomLeft,
+            collidingWithBottomRight,
+        ].reduce(function (acc, current) {
+            if (current)
+                return acc + 1;
+            else
+                return acc;
+        }, 0);
+        // If we don't have at least a collision, there is an issue
+        if (collisions === 0)
+            throw new Error("sigma/quadtree.insertNode: no collision (level: " + level + ", key: " + key + ", x: " + x + ", y: " + y + ", size: " + size + ").");
+        // If we have 3 collisions, we have a geometry problem obviously
+        if (collisions === 3)
+            throw new Error("sigma/quadtree.insertNode: 3 impossible collisions (level: " + level + ", key: " + key + ", x: " + x + ", y: " + y + ", size: " + size + ").");
+        // If we have more that one collision, we stop here and store the node
+        // in the relevant containers
+        if (collisions > 1) {
+            containers[block] = containers[block] || [];
+            containers[block].push(key);
+            return;
+        }
+        else {
+            level++;
+        }
+        // Else we recurse into the correct quads
+        if (collidingWithTopLeft)
+            block = topLeftBlock;
+        if (collidingWithTopRight)
+            block = topRightBlock;
+        if (collidingWithBottomLeft)
+            block = bottomLeftBlock;
+        if (collidingWithBottomRight)
+            block = bottomRightBlock;
+    }
+}
+function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, w, h) {
+    // [block, level]
+    var stack = [0, 0];
+    var collectedNodes = [];
+    var container;
+    while (stack.length) {
+        var level = stack.pop(), block = stack.pop();
+        // Collecting nodes
+        container = containers[block];
+        if (container)
+            extend_1.default(collectedNodes, container);
+        // If we reached max level
+        if (level >= maxLevel)
+            continue;
+        var topLeftBlock = 4 * block + BLOCKS, topRightBlock = 4 * block + 2 * BLOCKS, bottomLeftBlock = 4 * block + 3 * BLOCKS, bottomRightBlock = 4 * block + 4 * BLOCKS;
+        var collidingWithTopLeft = rectangleCollidesWithQuad(x1, y1, w, h, data[topLeftBlock + X_OFFSET], data[topLeftBlock + Y_OFFSET], data[topLeftBlock + WIDTH_OFFSET], data[topLeftBlock + HEIGHT_OFFSET]);
+        var collidingWithTopRight = rectangleCollidesWithQuad(x1, y1, w, h, data[topRightBlock + X_OFFSET], data[topRightBlock + Y_OFFSET], data[topRightBlock + WIDTH_OFFSET], data[topRightBlock + HEIGHT_OFFSET]);
+        var collidingWithBottomLeft = rectangleCollidesWithQuad(x1, y1, w, h, data[bottomLeftBlock + X_OFFSET], data[bottomLeftBlock + Y_OFFSET], data[bottomLeftBlock + WIDTH_OFFSET], data[bottomLeftBlock + HEIGHT_OFFSET]);
+        var collidingWithBottomRight = rectangleCollidesWithQuad(x1, y1, w, h, data[bottomRightBlock + X_OFFSET], data[bottomRightBlock + Y_OFFSET], data[bottomRightBlock + WIDTH_OFFSET], data[bottomRightBlock + HEIGHT_OFFSET]);
+        if (collidingWithTopLeft)
+            stack.push(topLeftBlock, level + 1);
+        if (collidingWithTopRight)
+            stack.push(topRightBlock, level + 1);
+        if (collidingWithBottomLeft)
+            stack.push(bottomLeftBlock, level + 1);
+        if (collidingWithBottomRight)
+            stack.push(bottomRightBlock, level + 1);
+    }
+    return collectedNodes;
+}
+/**
+ * QuadTree class.
+ *
+ * @constructor
+ * @param {object} boundaries - The graph boundaries.
+ */
+var QuadTree = /** @class */ (function () {
+    function QuadTree(params) {
+        if (params === void 0) { params = {}; }
+        this.containers = {};
+        this.cache = null;
+        this.lastRectangle = null;
+        // Allocating the underlying byte array
+        var L = Math.pow(4, MAX_LEVEL);
+        this.data = new Float32Array(BLOCKS * ((4 * L - 1) / 3));
+        if (params.boundaries)
+            this.resize(params.boundaries);
+        else
+            this.resize({
+                x: 0,
+                y: 0,
+                width: 1,
+                height: 1,
+            });
+    }
+    QuadTree.prototype.add = function (key, x, y, size) {
+        insertNode(MAX_LEVEL, this.data, this.containers, key, x, y, size);
+        return this;
+    };
+    QuadTree.prototype.resize = function (boundaries) {
+        this.clear();
+        // Building the quadrants
+        this.data[X_OFFSET] = boundaries.x;
+        this.data[Y_OFFSET] = boundaries.y;
+        this.data[WIDTH_OFFSET] = boundaries.width;
+        this.data[HEIGHT_OFFSET] = boundaries.height;
+        buildQuadrants(MAX_LEVEL, this.data);
+    };
+    QuadTree.prototype.clear = function () {
+        this.containers = {};
+        return this;
+    };
+    QuadTree.prototype.point = function (x, y) {
+        var nodes = [];
+        var block = 0, level = 0;
+        do {
+            if (this.containers[block])
+                nodes.push.apply(nodes, __spread(this.containers[block]));
+            var quad = pointIsInQuad(x, y, this.data[block + X_OFFSET], this.data[block + Y_OFFSET], this.data[block + WIDTH_OFFSET], this.data[block + HEIGHT_OFFSET]);
+            block = 4 * block + quad * BLOCKS;
+            level++;
+        } while (level <= MAX_LEVEL);
+        return nodes;
+    };
+    QuadTree.prototype.rectangle = function (x1, y1, x2, y2, height) {
+        var lr = this.lastRectangle;
+        if (lr && x1 === lr.x1 && x2 === lr.x2 && y1 === lr.y1 && y2 === lr.y2 && height === lr.height) {
+            return this.cache;
+        }
+        this.lastRectangle = {
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            height: height,
+        };
+        // If the rectangle is shifted, we use the smallest aligned rectangle that contains the shifted one:
+        if (!isRectangleAligned(this.lastRectangle))
+            this.lastRectangle = getCircumscribedAlignedRectangle(this.lastRectangle);
+        this.cache = getNodesInAxisAlignedRectangleArea(MAX_LEVEL, this.data, this.containers, x1, y1, Math.abs(x1 - x2) || Math.abs(y1 - y2), height);
+        return this.cache;
+    };
+    return QuadTree;
+}());
+exports.default = QuadTree;
+
+
+/***/ }),
+/* 7 */
+/***/ ((module) => {
+
+/**
+ * Extend function
+ * ================
+ *
+ * Function used to push a bunch of values into an array at once.
+ *
+ * Its strategy is to mutate target array's length then setting the new indices
+ * to be the values to add.
+ *
+ * A benchmark proved that it is faster than the following strategies:
+ *   1) `array.push.apply(array, values)`.
+ *   2) A loop of pushes.
+ *   3) `array = array.concat(values)`, obviously.
+ *
+ * Intuitively, this is correct because when adding a lot of elements, the
+ * chosen strategies does not need to handle the `arguments` object to
+ * execute #.apply's variadicity and because the array know its final length
+ * at the beginning, avoiding potential multiple reallocations of the underlying
+ * contiguous array. Some engines may be able to optimize the loop of push
+ * operations but empirically they don't seem to do so.
+ */
+
+/**
+ * Extends the target array with the given values.
+ *
+ * @param  {array} array  - Target array.
+ * @param  {array} values - Values to add.
+ */
+module.exports = function extend(array, values) {
+  var l2 = values.length;
+
+  if (l2 === 0)
+    return;
+
+  var l1 = array.length;
+
+  array.length += l2;
+
+  for (var i = 0; i < l2; i++)
+    array[l1 + i] = values[i];
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var captor_1 = __importDefault(__webpack_require__(9));
+var utils_1 = __webpack_require__(10);
+/**
+ * Constants.
+ */
+var DRAG_TIMEOUT = 200;
+var MOUSE_INERTIA_DURATION = 200;
+var MOUSE_INERTIA_RATIO = 3;
+var MOUSE_ZOOM_DURATION = 200;
+var ZOOMING_RATIO = 1.7;
+var DOUBLE_CLICK_TIMEOUT = 300;
+var DOUBLE_CLICK_ZOOMING_RATIO = 2.2;
+var DOUBLE_CLICK_ZOOMING_DURATION = 200;
+/**
+ * Mouse captor class.
+ *
+ * @constructor
+ */
+var MouseCaptor = /** @class */ (function (_super) {
+    __extends(MouseCaptor, _super);
+    function MouseCaptor(container, camera) {
+        var _this = _super.call(this, container, camera) || this;
+        // State
+        _this.enabled = true;
+        _this.hasDragged = false;
+        _this.downStartTime = null;
+        _this.lastMouseX = null;
+        _this.lastMouseY = null;
+        _this.isMouseDown = false;
+        _this.isMoving = false;
+        _this.movingTimeout = null;
+        _this.startCameraState = null;
+        _this.lastCameraState = null;
+        _this.clicks = 0;
+        _this.doubleClickTimeout = null;
+        _this.wheelLock = false;
+        // Binding methods
+        _this.handleClick = _this.handleClick.bind(_this);
+        _this.handleRightClick = _this.handleRightClick.bind(_this);
+        _this.handleDown = _this.handleDown.bind(_this);
+        _this.handleUp = _this.handleUp.bind(_this);
+        _this.handleMove = _this.handleMove.bind(_this);
+        _this.handleWheel = _this.handleWheel.bind(_this);
+        _this.handleOut = _this.handleOut.bind(_this);
+        // Binding events
+        container.addEventListener("click", _this.handleClick, false);
+        container.addEventListener("contextmenu", _this.handleRightClick, false);
+        container.addEventListener("mousedown", _this.handleDown, false);
+        container.addEventListener("mousemove", _this.handleMove, false);
+        container.addEventListener("wheel", _this.handleWheel, false);
+        container.addEventListener("mouseout", _this.handleOut, false);
+        document.addEventListener("mouseup", _this.handleUp, false);
+        return _this;
+    }
+    MouseCaptor.prototype.kill = function () {
+        var container = this.container;
+        container.removeEventListener("click", this.handleClick);
+        container.removeEventListener("contextmenu", this.handleRightClick);
+        container.removeEventListener("mousedown", this.handleDown);
+        container.removeEventListener("mousemove", this.handleMove);
+        container.removeEventListener("wheel", this.handleWheel);
+        container.removeEventListener("mouseout", this.handleOut);
+        document.removeEventListener("mouseup", this.handleUp);
+    };
+    MouseCaptor.prototype.handleClick = function (e) {
+        var _this = this;
+        if (!this.enabled)
+            return;
+        this.clicks++;
+        if (this.clicks === 2) {
+            this.clicks = 0;
+            if (typeof this.doubleClickTimeout === "number") {
+                clearTimeout(this.doubleClickTimeout);
+                this.doubleClickTimeout = null;
+            }
+            return this.handleDoubleClick(e);
+        }
+        setTimeout(function () {
+            _this.clicks = 0;
+            _this.doubleClickTimeout = null;
+        }, DOUBLE_CLICK_TIMEOUT);
+        // NOTE: this is here to prevent click events on drag
+        if (!this.hasDragged)
+            this.emit("click", utils_1.getMouseCoords(e));
+    };
+    MouseCaptor.prototype.handleRightClick = function (e) {
+        if (!this.enabled)
+            return;
+        this.emit("rightClick", utils_1.getMouseCoords(e));
+    };
+    MouseCaptor.prototype.handleDoubleClick = function (e) {
+        if (!this.enabled)
+            return;
+        var newRatio = this.camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+        this.camera.animate(this.camera.getViewportZoomedState({ x: utils_1.getX(e), y: utils_1.getY(e) }, {
+            width: this.container.offsetWidth,
+            height: this.container.offsetHeight,
+        }, newRatio), {
+            easing: "quadraticInOut",
+            duration: DOUBLE_CLICK_ZOOMING_DURATION,
+        });
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+        e.stopPropagation();
+        return false;
+    };
+    MouseCaptor.prototype.handleDown = function (e) {
+        if (!this.enabled)
+            return;
+        this.startCameraState = this.camera.getState();
+        this.lastCameraState = this.startCameraState;
+        this.lastMouseX = utils_1.getX(e);
+        this.lastMouseY = utils_1.getY(e);
+        this.hasDragged = false;
+        this.downStartTime = Date.now();
+        // TODO: dispatch events
+        switch (e.which) {
+            default:
+                // Left button pressed
+                this.isMouseDown = true;
+                this.emit("mousedown", utils_1.getMouseCoords(e));
+        }
+    };
+    MouseCaptor.prototype.handleUp = function (e) {
+        var _this = this;
+        if (!this.enabled || !this.isMouseDown)
+            return;
+        this.isMouseDown = false;
+        if (typeof this.movingTimeout === "number") {
+            clearTimeout(this.movingTimeout);
+            this.movingTimeout = null;
+        }
+        var x = utils_1.getX(e), y = utils_1.getY(e);
+        var cameraState = this.camera.getState(), previousCameraState = this.camera.getPreviousState();
+        if (this.isMoving) {
+            this.camera.animate({
+                x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
+                y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
+            }, {
+                duration: MOUSE_INERTIA_DURATION,
+                easing: "quadraticOut",
+            });
+        }
+        else if (this.lastMouseX !== x || this.lastMouseY !== y) {
+            this.camera.setState({
+                x: cameraState.x,
+                y: cameraState.y,
+            });
+        }
+        this.isMoving = false;
+        setTimeout(function () { return (_this.hasDragged = false); }, 0);
+        this.emit("mouseup", utils_1.getMouseCoords(e));
+    };
+    MouseCaptor.prototype.handleMove = function (e) {
+        var _this = this;
+        if (!this.enabled)
+            return;
+        this.emit("mousemove", utils_1.getMouseCoords(e));
+        if (this.isMouseDown) {
+            // TODO: dispatch events
+            this.isMoving = true;
+            this.hasDragged = true;
+            if (typeof this.movingTimeout === "number") {
+                clearTimeout(this.movingTimeout);
+            }
+            this.movingTimeout = window.setTimeout(function () {
+                _this.movingTimeout = null;
+                _this.isMoving = false;
+            }, DRAG_TIMEOUT);
+            var dimensions = {
+                width: this.container.offsetWidth,
+                height: this.container.offsetHeight,
+            };
+            var eX = utils_1.getX(e), eY = utils_1.getY(e);
+            var lastMouse = this.camera.viewportToGraph(dimensions, {
+                x: this.lastMouseX,
+                y: this.lastMouseY,
+            });
+            var mouse = this.camera.viewportToGraph(dimensions, { x: eX, y: eY });
+            var offsetX = lastMouse.x - mouse.x, offsetY = lastMouse.y - mouse.y;
+            var cameraState = this.camera.getState();
+            var x = cameraState.x + offsetX, y = cameraState.y + offsetY;
+            this.camera.setState({ x: x, y: y });
+            this.lastMouseX = eX;
+            this.lastMouseY = eY;
+        }
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+        e.stopPropagation();
+        return false;
+    };
+    MouseCaptor.prototype.handleWheel = function (e) {
+        var _this = this;
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+        e.stopPropagation();
+        if (!this.enabled)
+            return false;
+        var delta = utils_1.getWheelDelta(e);
+        if (!delta)
+            return false;
+        if (this.wheelLock)
+            return false;
+        this.wheelLock = true;
+        var ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
+        var newRatio = this.camera.getState().ratio * ratioDiff;
+        this.camera.animate(this.camera.getViewportZoomedState({ x: utils_1.getX(e), y: utils_1.getY(e) }, {
+            width: this.container.offsetWidth,
+            height: this.container.offsetHeight,
+        }, newRatio), {
+            easing: "linear",
+            duration: MOUSE_ZOOM_DURATION,
+        }, function () { return (_this.wheelLock = false); });
+        return false;
+    };
+    MouseCaptor.prototype.handleOut = function () {
+        // TODO: dispatch event
+    };
+    return MouseCaptor;
+}(captor_1.default));
+exports.default = MouseCaptor;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js Captor Class
+ * ======================
+ *
+ * Abstract class representing a captor like the user's mouse or touch controls.
+ */
+var events_1 = __webpack_require__(2);
+var Captor = /** @class */ (function (_super) {
+    __extends(Captor, _super);
+    function Captor(container, camera) {
+        var _this = _super.call(this) || this;
+        // Properties
+        _this.container = container;
+        _this.camera = camera;
+        return _this;
+    }
+    return Captor;
+}(events_1.EventEmitter));
+exports.default = Captor;
+
+
+/***/ }),
+/* 10 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getWheelDelta = exports.getMouseCoords = exports.getY = exports.getX = void 0;
+/**
+ * Extract the local X position from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The local X value of the mouse.
+ */
+function getX(e) {
+    if (typeof e.offsetX !== "undefined")
+        return e.offsetX;
+    if (typeof e.clientX !== "undefined")
+        return e.clientX;
+    throw new Error("sigma/captors/utils.getX: could not extract x from event.");
+}
+exports.getX = getX;
+/**
+ * Extract the local Y position from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The local Y value of the mouse.
+ */
+function getY(e) {
+    if (typeof e.offsetY !== "undefined")
+        return e.offsetY;
+    if (typeof e.clientY !== "undefined")
+        return e.clientY;
+    throw new Error("sigma/captors/utils.getY: could not extract y from event.");
+}
+exports.getY = getY;
+/**
+ * Convert mouse coords to sigma coords.
+ *
+ * @param  {event}   e   - A mouse or touch event.
+ * @param  {number}  [x] - The x coord to convert
+ * @param  {number}  [y] - The y coord to convert
+ *
+ * @return {object}
+ */
+function getMouseCoords(e) {
+    return {
+        x: getX(e),
+        y: getY(e),
+        clientX: e.clientX,
+        clientY: e.clientY,
+        ctrlKey: e.ctrlKey,
+        metaKey: e.metaKey,
+        altKey: e.altKey,
+        shiftKey: e.shiftKey,
+        // TODO: this is not ideal... But I am wondering why we don't just pass the event through
+        preventDefault: e.preventDefault.bind(e),
+        original: e,
+    };
+}
+exports.getMouseCoords = getMouseCoords;
+/**
+ * Extract the wheel delta from a mouse or touch event.
+ *
+ * @param  {event}  e - A mouse or touch event.
+ * @return {number}     The wheel delta of the mouse.
+ */
+function getWheelDelta(e) {
+    // TODO: check those ratios again to ensure a clean Chrome/Firefox compat
+    if (typeof e.deltaY !== "undefined")
+        return (e.deltaY * -3) / 360;
+    if (typeof e.detail !== "undefined")
+        return e.detail / -9;
+    throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
+}
+exports.getWheelDelta = getWheelDelta;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js WebGL Renderer
+ * ========================
+ *
+ * File implementing sigma's WebGL Renderer.
+ */
+var events_1 = __webpack_require__(2);
+var extent_1 = __importDefault(__webpack_require__(12));
+var is_graph_1 = __importDefault(__webpack_require__(13));
+var camera_1 = __importDefault(__webpack_require__(1));
+var mouse_1 = __importDefault(__webpack_require__(8));
+var quadtree_1 = __importDefault(__webpack_require__(6));
+var types_1 = __webpack_require__(14);
+var utils_1 = __webpack_require__(15);
+var utils_2 = __webpack_require__(16);
+var utils_3 = __webpack_require__(4);
+var labels_1 = __webpack_require__(18);
+var z_index_1 = __webpack_require__(19);
+var settings_1 = __webpack_require__(20);
+var nodeExtent = extent_1.default.nodeExtent, edgeExtent = extent_1.default.edgeExtent;
+/**
+ * Constants.
+ */
+var PIXEL_RATIO = utils_1.getPixelRatio();
+var WEBGL_OVERSAMPLING_RATIO = utils_1.getPixelRatio();
+/**
+ * Main class.
+ *
+ * @constructor
+ * @param {Graph}       graph     - Graph to render.
+ * @param {HTMLElement} container - DOM container in which to render.
+ * @param {object}      settings  - Optional settings.
+ */
+var WebGLRenderer = /** @class */ (function (_super) {
+    __extends(WebGLRenderer, _super);
+    function WebGLRenderer(graph, container, settings) {
+        if (settings === void 0) { settings = {}; }
+        var _this = _super.call(this) || this;
+        _this.captors = {};
+        _this.elements = {};
+        _this.canvasContexts = {};
+        _this.webGLContexts = {};
+        _this.activeListeners = {};
+        _this.quadtree = new quadtree_1.default();
+        _this.nodeDataCache = {};
+        _this.edgeDataCache = {};
+        _this.nodeExtent = null;
+        _this.edgeExtent = null;
+        _this.normalizationFunction = null;
+        // Starting dimensions
+        _this.width = 0;
+        _this.height = 0;
+        // State
+        _this.highlightedNodes = new Set();
+        _this.displayedLabels = new Set();
+        _this.hoveredNode = null;
+        _this.renderFrame = null;
+        _this.renderHighlightedNodesFrame = null;
+        _this.needToProcess = false;
+        _this.needToSoftProcess = false;
+        // programs
+        _this.nodePrograms = {};
+        _this.edgePrograms = {};
+        _this.settings = utils_3.assign({}, settings_1.WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
+        settings_1.validateWebglRendererSettings(_this.settings);
+        // Validating
+        if (!is_graph_1.default(graph))
+            throw new Error("sigma/renderers/webgl: invalid graph instance.");
+        if (!(container instanceof HTMLElement))
+            throw new Error("sigma/renderers/webgl: container should be an html element.");
+        // Properties
+        _this.graph = graph;
+        _this.container = container;
+        _this.initializeCache();
+        // Initializing contexts
+        _this.createWebGLContext("edges");
+        _this.createWebGLContext("nodes");
+        _this.createCanvasContext("edgeLabels");
+        _this.createCanvasContext("labels");
+        _this.createCanvasContext("hovers");
+        _this.createCanvasContext("mouse");
+        // Blending
+        var gl = _this.webGLContexts.nodes;
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+        gl = _this.webGLContexts.edges;
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+        // Loading programs
+        for (var type in _this.settings.nodeProgramClasses) {
+            var NodeProgramClass = _this.settings.nodeProgramClasses[type];
+            _this.nodePrograms[type] = new NodeProgramClass(_this.webGLContexts.nodes);
+        }
+        for (var type in _this.settings.edgeProgramClasses) {
+            var EdgeProgramClass = _this.settings.edgeProgramClasses[type];
+            _this.edgePrograms[type] = new EdgeProgramClass(_this.webGLContexts.edges);
+        }
+        // Initial resize
+        _this.resize();
+        // Initializing the camera
+        _this.camera = new camera_1.default();
+        // Binding camera events
+        _this.bindCameraHandlers();
+        // Initializing captors
+        _this.captors = {
+            mouse: new mouse_1.default(_this.elements.mouse, _this.camera),
+        };
+        // Binding event handlers
+        _this.bindEventHandlers();
+        // Binding graph handlers
+        _this.bindGraphHandlers();
+        // Processing data for the first time & render
+        _this.process();
+        _this.render();
+        return _this;
+    }
+    /**---------------------------------------------------------------------------
+     * Internal methods.
+     **---------------------------------------------------------------------------
+     */
+    /**
+     * Internal function used to create a canvas element.
+     * @param  {string} id - Context's id.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.createCanvas = function (id) {
+        var canvas = utils_1.createElement("canvas", {
+            position: "absolute",
+        }, {
+            class: "sigma-" + id,
+        });
+        this.elements[id] = canvas;
+        this.container.appendChild(canvas);
+        return canvas;
+    };
+    /**
+     * Internal function used to create a canvas context and add the relevant
+     * DOM elements.
+     *
+     * @param  {string} id - Context's id.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.createCanvasContext = function (id) {
+        var canvas = this.createCanvas(id);
+        var contextOptions = {
+            preserveDrawingBuffer: false,
+            antialias: false,
+        };
+        this.canvasContexts[id] = canvas.getContext("2d", contextOptions);
+        return this;
+    };
+    /**
+     * Internal function used to create a canvas context and add the relevant
+     * DOM elements.
+     *
+     * @param  {string} id - Context's id.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.createWebGLContext = function (id) {
+        var canvas = this.createCanvas(id);
+        var contextOptions = {
+            preserveDrawingBuffer: false,
+            antialias: false,
+        };
+        var context;
+        // First we try webgl2 for an easy performance boost
+        context = canvas.getContext("webgl2", contextOptions);
+        // Else we fall back to webgl
+        if (!context)
+            context = canvas.getContext("webgl", contextOptions);
+        // Edge, I am looking right at you...
+        if (!context)
+            context = canvas.getContext("experimental-webgl", contextOptions);
+        this.webGLContexts[id] = context;
+        return this;
+    };
+    /**
+     * Method used to initialize display data cache.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.initializeCache = function () {
+        var graph = this.graph;
+        var nodes = graph.nodes();
+        for (var i = 0, l = nodes.length; i < l; i++)
+            this.nodeDataCache[nodes[i]] = new types_1.Node(i, this.settings);
+        var edges = graph.edges();
+        for (var i = 0, l = edges.length; i < l; i++)
+            this.edgeDataCache[edges[i]] = new types_1.Edge(i, this.settings);
+    };
+    /**
+     * Method binding camera handlers.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.bindCameraHandlers = function () {
+        var _this = this;
+        this.activeListeners.camera = function () {
+            _this.scheduleRender();
+        };
+        this.camera.on("updated", this.activeListeners.camera);
+        return this;
+    };
+    /**
+     * Method binding event handlers.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.bindEventHandlers = function () {
+        var _this = this;
+        // Handling window resize
+        this.activeListeners.handleResize = function () {
+            _this.needToSoftProcess = true;
+            _this.scheduleRender();
+        };
+        window.addEventListener("resize", this.activeListeners.handleResize);
+        // Function checking if the mouse is on the given node
+        var mouseIsOnNode = function (mouseX, mouseY, nodeX, nodeY, size) {
+            return (mouseX > nodeX - size &&
+                mouseX < nodeX + size &&
+                mouseY > nodeY - size &&
+                mouseY < nodeY + size &&
+                Math.sqrt(Math.pow(mouseX - nodeX, 2) + Math.pow(mouseY - nodeY, 2)) < size);
+        };
+        // Function returning the nodes in the mouse's quad
+        var getQuadNodes = function (mouseX, mouseY) {
+            var mouseGraphPosition = _this.camera.viewportToGraph(_this, { x: mouseX, y: mouseY });
+            // TODO: minus 1? lol
+            return _this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
+        };
+        // Handling mouse move
+        this.activeListeners.handleMove = function (e) {
+            // NOTE: for the canvas renderer, testing the pixel's alpha should
+            // give some boost but this slows things down for WebGL empirically.
+            // TODO: this should be a method from the camera (or can be passed to graph to display somehow)
+            var sizeRatio = Math.pow(_this.camera.getState().ratio, 0.5);
+            var quadNodes = getQuadNodes(e.x, e.y);
+            // We will hover the node whose center is closest to mouse
+            var minDistance = Infinity, nodeToHover = null;
+            for (var i = 0, l = quadNodes.length; i < l; i++) {
+                var node = quadNodes[i];
+                var data = _this.nodeDataCache[node];
+                var pos = _this.camera.graphToViewport(_this, data);
+                var size = data.size / sizeRatio;
+                if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
+                    var distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
+                    // TODO: sort by min size also for cases where center is the same
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nodeToHover = node;
+                    }
+                }
+            }
+            if (nodeToHover && _this.hoveredNode !== nodeToHover) {
+                // Handling passing from one node to the other directly
+                if (_this.hoveredNode)
+                    _this.emit("leaveNode", { node: _this.hoveredNode });
+                _this.hoveredNode = nodeToHover;
+                _this.emit("enterNode", { node: nodeToHover });
+                _this.scheduleHighlightedNodesRender();
+                return;
+            }
+            // Checking if the hovered node is still hovered
+            if (_this.hoveredNode) {
+                var data = _this.nodeDataCache[_this.hoveredNode];
+                var pos = _this.camera.graphToViewport(_this, data);
+                var size = data.size / sizeRatio;
+                if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
+                    var node = _this.hoveredNode;
+                    _this.hoveredNode = null;
+                    _this.emit("leaveNode", { node: node });
+                    return _this.scheduleHighlightedNodesRender();
+                }
+            }
+        };
+        // Handling click
+        var createClickListener = function (eventType) {
+            return function (e) {
+                var sizeRatio = Math.pow(_this.camera.getState().ratio, 0.5);
+                var quadNodes = getQuadNodes(e.x, e.y);
+                for (var i = 0, l = quadNodes.length; i < l; i++) {
+                    var node = quadNodes[i];
+                    var data = _this.nodeDataCache[node];
+                    var pos = _this.camera.graphToViewport(_this, data);
+                    var size = data.size / sizeRatio;
+                    if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
+                        return _this.emit(eventType + "Node", { node: node, captor: e, event: e });
+                }
+                return _this.emit(eventType + "Stage", { event: e });
+            };
+        };
+        this.activeListeners.handleClick = createClickListener("click");
+        this.activeListeners.handleRightClick = createClickListener("rightClick");
+        this.activeListeners.handleDown = createClickListener("down");
+        this.captors.mouse.on("mousemove", this.activeListeners.handleMove);
+        this.captors.mouse.on("click", this.activeListeners.handleClick);
+        this.captors.mouse.on("rightClick", this.activeListeners.handleRightClick);
+        this.captors.mouse.on("mousedown", this.activeListeners.handleDown);
+        return this;
+    };
+    /**
+     * Method binding graph handlers
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.bindGraphHandlers = function () {
+        var _this = this;
+        var graph = this.graph;
+        this.activeListeners.graphUpdate = function () {
+            _this.needToProcess = true;
+            _this.scheduleRender();
+        };
+        this.activeListeners.softGraphUpdate = function () {
+            _this.needToSoftProcess = true;
+            _this.scheduleRender();
+        };
+        this.activeListeners.addNodeGraphUpdate = function (e) {
+            // Adding entry to cache
+            _this.nodeDataCache[e.key] = new types_1.Node(graph.order - 1, _this.settings);
+            _this.activeListeners.graphUpdate();
+        };
+        this.activeListeners.addEdgeGraphUpdate = function (e) {
+            // Adding entry to cache
+            _this.edgeDataCache[e.key] = new types_1.Edge(graph.size - 1, _this.settings);
+            _this.activeListeners.graphUpdate();
+        };
+        // TODO: clean cache on drop!
+        // TODO: bind this on composed state events
+        // TODO: it could be possible to update only specific node etc. by holding
+        // a fixed-size pool of updated items
+        graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate);
+        graph.on("nodeDropped", this.activeListeners.graphUpdate);
+        graph.on("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+        graph.on("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
+        graph.on("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
+        graph.on("edgeDropped", this.activeListeners.graphUpdate);
+        graph.on("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+        graph.on("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+        graph.on("edgesCleared", this.activeListeners.graphUpdate);
+        graph.on("cleared", this.activeListeners.graphUpdate);
+        return this;
+    };
+    /**
+     * Method used to process the whole graph's data.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.process = function (keepArrays) {
+        if (keepArrays === void 0) { keepArrays = false; }
+        var graph = this.graph, settings = this.settings;
+        // Clearing the quad
+        this.quadtree.clear();
+        // Computing extents
+        var nodeExtentProperties = ["x", "y", "z"];
+        if (this.settings.zIndex) {
+            nodeExtentProperties.push("z");
+            // `as any` is a workaround due to g-metrics that is not plugged on the same
+            // g-types version
+            this.edgeExtent = edgeExtent(graph, ["z"]);
+        }
+        // `as any` is a workaround due to g-metrics that is not plugged on the same
+        // g-types version
+        this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
+        // Rescaling function
+        this.normalizationFunction = utils_1.createNormalizationFunction(this.nodeExtent);
+        var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
+        if (!keepArrays)
+            nodeProgram.allocate(graph.order);
+        var nodes = graph.nodes();
+        // Handling node z-index
+        // TODO: z-index needs us to compute display data before hand
+        // TODO: remains to be seen if reducers are a good or bad thing and if we
+        // should store display data in flat byte arrays indices
+        if (this.settings.zIndex)
+            nodes = z_index_1.zIndexOrdering(this.nodeExtent.z, function (node) { return graph.getNodeAttribute(node, "z"); }, nodes);
+        for (var i = 0, l = nodes.length; i < l; i++) {
+            var node = nodes[i];
+            var data = graph.getNodeAttributes(node);
+            var displayData = this.nodeDataCache[node];
+            if (settings.nodeReducer)
+                data = settings.nodeReducer(node, data);
+            // TODO: should assign default also somewhere here if there is a reducer
+            displayData.assign(data);
+            this.normalizationFunction.applyTo(displayData);
+            this.quadtree.add(node, displayData.x, 1 - displayData.y, displayData.size / this.width);
+            nodeProgram.process(displayData, i);
+            displayData.index = i;
+        }
+        nodeProgram.bufferData();
+        var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
+        if (!keepArrays)
+            edgeProgram.allocate(graph.size);
+        var edges = graph.edges();
+        // Handling edge z-index
+        if (this.settings.zIndex && this.edgeExtent)
+            edges = z_index_1.zIndexOrdering(this.edgeExtent.z, function (edge) { return graph.getEdgeAttribute(edge, "z"); }, edges);
+        for (var i = 0, l = edges.length; i < l; i++) {
+            var edge = edges[i];
+            var data = graph.getEdgeAttributes(edge);
+            var displayData = this.edgeDataCache[edge];
+            if (settings.edgeReducer)
+                data = settings.edgeReducer(edge, data);
+            displayData.assign(data);
+            var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
+            edgeProgram.process(sourceData, targetData, displayData, i);
+            displayData.index = i;
+        }
+        // Computing edge indices if necessary
+        if (!keepArrays && typeof edgeProgram.computeIndices === "function")
+            edgeProgram.computeIndices();
+        edgeProgram.bufferData();
+        return this;
+    };
+    /**
+     * Method used to process a single node.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.processNode = function (key) {
+        var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
+        var data = this.graph.getNodeAttributes(key);
+        nodeProgram.process(data, this.nodeDataCache[key].index);
+        return this;
+    };
+    /**
+     * Method used to process a single edge.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.processEdge = function (key) {
+        var graph = this.graph;
+        var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
+        var data = graph.getEdgeAttributes(key), extremities = graph.extremities(key), sourceData = graph.getNodeAttributes(extremities[0]), targetData = graph.getNodeAttributes(extremities[1]);
+        edgeProgram.process(sourceData, targetData, data, this.edgeDataCache[key].index);
+        return this;
+    };
+    /**---------------------------------------------------------------------------
+     * Public API.
+     **---------------------------------------------------------------------------
+     */
+    /**
+     * Method returning the renderer's camera.
+     *
+     * @return {Camera}
+     */
+    WebGLRenderer.prototype.getCamera = function () {
+        return this.camera;
+    };
+    /**
+     * Method returning the mouse captor.
+     *
+     * @return {Camera}
+     */
+    WebGLRenderer.prototype.getMouseCaptor = function () {
+        return this.captors.mouse;
+    };
+    /**
+     * Method used to resize the renderer.
+     *
+     * @param  {number} width  - Target width.
+     * @param  {number} height - Target height.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.resize = function (width, height) {
+        var previousWidth = this.width, previousHeight = this.height;
+        if (width && height) {
+            this.width = width;
+            this.height = height;
+        }
+        else {
+            this.width = this.container.offsetWidth;
+            this.height = this.container.offsetHeight;
+        }
+        if (this.width === 0)
+            throw new Error("sigma/renderers/webgl: container has no width.");
+        if (this.height === 0)
+            throw new Error("sigma/renderers/webgl: container has no height.");
+        // If nothing has changed, we can stop right here
+        if (previousWidth === this.width && previousHeight === this.height)
+            return this;
+        // Sizing dom elements
+        for (var id in this.elements) {
+            var element = this.elements[id];
+            element.style.width = this.width + "px";
+            element.style.height = this.height + "px";
+        }
+        // Sizing canvas contexts
+        for (var id in this.canvasContexts) {
+            this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
+            this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+            if (PIXEL_RATIO !== 1)
+                this.canvasContexts[id].scale(PIXEL_RATIO, PIXEL_RATIO);
+        }
+        // Sizing WebGL contexts
+        for (var id in this.webGLContexts) {
+            this.elements[id].setAttribute("width", this.width * WEBGL_OVERSAMPLING_RATIO + "px");
+            this.elements[id].setAttribute("height", this.height * WEBGL_OVERSAMPLING_RATIO + "px");
+            this.webGLContexts[id].viewport(0, 0, this.width * WEBGL_OVERSAMPLING_RATIO, this.height * WEBGL_OVERSAMPLING_RATIO);
+        }
+        return this;
+    };
+    /**
+     * Method used to clear the canvases.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.clear = function () {
+        this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
+        this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
+        this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
+        this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
+        this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
+        return this;
+    };
+    /**
+     * Method used to render.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.render = function () {
+        // If a render was scheduled, we cancel it
+        if (this.renderFrame) {
+            cancelAnimationFrame(this.renderFrame);
+            this.renderFrame = null;
+            this.needToProcess = false;
+            this.needToSoftProcess = false;
+        }
+        // First we need to resize
+        this.resize();
+        // Clearing the canvases
+        this.clear();
+        // If we have no nodes we can stop right there
+        if (!this.graph.order)
+            return this;
+        // TODO: improve this heuristic or move to the captor itself?
+        var mouseCaptor = this.captors.mouse;
+        var moving = this.camera.isAnimated() || mouseCaptor.isMoving || mouseCaptor.hasDragged || mouseCaptor.wheelLock;
+        // Then we need to extract a matrix from the camera
+        var cameraState = this.camera.getState(), cameraMatrix = utils_2.matrixFromCamera(cameraState, {
+            width: this.width,
+            height: this.height,
+        });
+        var program;
+        // Drawing nodes
+        program = this.nodePrograms[this.settings.defaultNodeType];
+        program.render({
+            matrix: cameraMatrix,
+            width: this.width,
+            height: this.height,
+            ratio: cameraState.ratio,
+            nodesPowRatio: 0.5,
+            scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+        });
+        // Drawing edges
+        if (!this.settings.hideEdgesOnMove || !moving) {
+            program = this.edgePrograms[this.settings.defaultEdgeType];
+            program.render({
+                matrix: cameraMatrix,
+                width: this.width,
+                height: this.height,
+                ratio: cameraState.ratio,
+                edgesPowRatio: 0.5,
+                scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+            });
+        }
+        // Do not display labels on move per setting
+        if (this.settings.hideLabelsOnMove && moving)
+            return this;
+        this.renderLabels();
+        this.renderEdgeLabels();
+        this.renderHighlightedNodes();
+        return this;
+    };
+    /**
+     * Method used to render labels.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.renderLabels = function () {
+        if (!this.settings.renderLabels)
+            return this;
+        var cameraState = this.camera.getState();
+        // Finding visible nodes to display their labels
+        var visibleNodes;
+        if (cameraState.ratio >= 1) {
+            // Camera is unzoomed so no need to ask the quadtree for visible nodes
+            visibleNodes = this.graph.nodes();
+        }
+        else {
+            // Let's ask the quadtree
+            var viewRectangle = this.camera.viewRectangle(this);
+            visibleNodes = this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height);
+        }
+        // Selecting labels to draw
+        var gridSettings = this.settings.labelGrid;
+        var labelsToDisplay = labels_1.labelsToDisplayFromGrid({
+            cache: this.nodeDataCache,
+            camera: this.camera,
+            cell: gridSettings.cell,
+            dimensions: this,
+            displayedLabels: this.displayedLabels,
+            fontSize: this.settings.labelSize,
+            graph: this.graph,
+            renderedSizeThreshold: gridSettings.renderedSizeThreshold,
+            visibleNodes: visibleNodes,
+        });
+        // Drawing labels
+        var context = this.canvasContexts.labels;
+        var sizeRatio = Math.pow(cameraState.ratio, 0.5);
+        for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
+            var data = this.nodeDataCache[labelsToDisplay[i]];
+            var _a = this.camera.graphToViewport(this, data), x = _a.x, y = _a.y;
+            // TODO: we can cache the labels we need to render until the camera's ratio changes
+            // TODO: this should be computed in the canvas components?
+            var size = data.size / sizeRatio;
+            this.settings.labelRenderer(context, {
+                key: labelsToDisplay[i],
+                label: data.label,
+                color: "#000",
+                size: size,
+                x: x,
+                y: y,
+            }, this.settings);
+        }
+        // Caching visible nodes and displayed labels
+        this.displayedLabels = new Set(labelsToDisplay);
+        return this;
+    };
+    /**
+     * Method used to render edge labels, based on which node labels were
+     * rendered.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.renderEdgeLabels = function () {
+        if (!this.settings.renderEdgeLabels)
+            return this;
+        var cameraState = this.camera.getState();
+        var sizeRatio = Math.pow(cameraState.ratio, 0.5);
+        var context = this.canvasContexts.edgeLabels;
+        // Clearing
+        context.clearRect(0, 0, this.width, this.height);
+        var edgeLabelsToDisplay = labels_1.edgeLabelsToDisplayFromNodes({
+            graph: this.graph,
+            hoveredNode: this.hoveredNode,
+            displayedNodeLabels: this.displayedLabels,
+            highlightedNodes: this.highlightedNodes,
+        });
+        for (var i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
+            var edge = edgeLabelsToDisplay[i], extremities = this.graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]], edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
+            var _a = this.camera.graphToViewport(this, sourceData), sourceX = _a.x, sourceY = _a.y;
+            var _b = this.camera.graphToViewport(this, targetData), targetX = _b.x, targetY = _b.y;
+            // TODO: we can cache the labels we need to render until the camera's ratio changes
+            // TODO: this should be computed in the canvas components?
+            var size = edgeData.size / sizeRatio;
+            this.settings.edgeLabelRenderer(context, {
+                key: edge,
+                label: edgeData.label,
+                color: edgeData.color,
+                size: size,
+            }, {
+                key: extremities[0],
+                x: sourceX,
+                y: sourceY,
+            }, {
+                key: extremities[1],
+                x: targetX,
+                y: targetY,
+            }, this.settings);
+        }
+        return this;
+    };
+    /**
+     * Method used to render the highlighted nodes.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.renderHighlightedNodes = function () {
+        var _this = this;
+        var camera = this.camera;
+        var sizeRatio = Math.pow(camera.getState().ratio, 0.5);
+        var context = this.canvasContexts.hovers;
+        // Clearing
+        context.clearRect(0, 0, this.width, this.height);
+        // Rendering
+        var render = function (node) {
+            var data = _this.nodeDataCache[node];
+            var _a = camera.graphToViewport(_this, data), x = _a.x, y = _a.y;
+            var size = data.size / sizeRatio;
+            _this.settings.hoverRenderer(context, {
+                key: node,
+                label: data.label,
+                color: data.color,
+                size: size,
+                x: x,
+                y: y,
+            }, _this.settings);
+        };
+        if (this.hoveredNode) {
+            render(this.hoveredNode);
+        }
+        this.highlightedNodes.forEach(render);
+    };
+    /**
+     * Method used to schedule a render.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.scheduleRender = function () {
+        var _this = this;
+        // A frame is already scheduled
+        if (this.renderFrame)
+            return;
+        // Let's schedule a frame
+        this.renderFrame = requestAnimationFrame(function () {
+            // Do we need to process data?
+            if (_this.needToProcess) {
+                _this.process();
+            }
+            else if (_this.needToSoftProcess) {
+                _this.process(true);
+            }
+            // Resetting state
+            _this.renderFrame = null;
+            _this.needToProcess = false;
+            _this.needToSoftProcess = false;
+            // Rendering
+            _this.render();
+        });
+    };
+    /**
+     * Method used to schedule a hover render.
+     *
+     */
+    WebGLRenderer.prototype.scheduleHighlightedNodesRender = function () {
+        var _this = this;
+        if (this.renderHighlightedNodesFrame || this.renderFrame)
+            return;
+        this.renderHighlightedNodesFrame = requestAnimationFrame(function () {
+            // Resetting state
+            _this.renderHighlightedNodesFrame = null;
+            // Rendering
+            _this.renderHighlightedNodes();
+            _this.renderEdgeLabels();
+        });
+    };
+    /**
+     * Method used to manually refresh.
+     *
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.refresh = function () {
+        this.needToSoftProcess = true;
+        this.scheduleRender();
+        return this;
+    };
+    /**
+     * Method used to highlight a node.
+     *
+     * @param  {string} key - The node's key.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.highlightNode = function (key) {
+        // TODO: check the existence of the node
+        // TODO: coerce?
+        this.highlightedNodes.add(key);
+        // Rendering
+        this.scheduleHighlightedNodesRender();
+        return this;
+    };
+    /**
+     * Method used to unhighlight a node.
+     *
+     * @param  {string} key - The node's key.
+     * @return {WebGLRenderer}
+     */
+    WebGLRenderer.prototype.unhighlightNode = function (key) {
+        // TODO: check the existence of the node
+        // TODO: coerce?
+        this.highlightedNodes.delete(key);
+        // Rendering
+        this.scheduleHighlightedNodesRender();
+        return this;
+    };
+    /**
+     * Method used to shut the container & release event listeners.
+     *
+     * @return {undefined}
+     */
+    WebGLRenderer.prototype.kill = function () {
+        var graph = this.graph;
+        // Emitting "kill" events so that plugins and such can cleanup
+        this.emit("kill");
+        // Releasing events
+        this.removeAllListeners();
+        // Releasing camera handlers
+        this.camera.removeListener("updated", this.activeListeners.camera);
+        // Releasing DOM events & captors
+        window.removeEventListener("resize", this.activeListeners.handleResize);
+        this.captors.mouse.kill();
+        // Releasing graph handlers
+        graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);
+        graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
+        graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+        graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
+        graph.removeListener("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
+        graph.removeListener("edgeDropped", this.activeListeners.graphUpdate);
+        graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+        graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+        graph.removeListener("edgesCleared", this.activeListeners.graphUpdate);
+        graph.removeListener("cleared", this.activeListeners.graphUpdate);
+        // Releasing cache & state
+        this.quadtree = new quadtree_1.default();
+        this.nodeDataCache = {};
+        this.edgeDataCache = {};
+        this.highlightedNodes = new Set();
+        this.displayedLabels = new Set();
+        // Clearing frames
+        if (this.renderFrame) {
+            cancelAnimationFrame(this.renderFrame);
+            this.renderFrame = null;
+        }
+        if (this.renderHighlightedNodesFrame) {
+            cancelAnimationFrame(this.renderHighlightedNodesFrame);
+            this.renderHighlightedNodesFrame = null;
+        }
+        // Destroying canvases
+        var container = this.container;
+        while (container.firstChild)
+            container.removeChild(container.firstChild);
+    };
+    return WebGLRenderer;
+}(events_1.EventEmitter));
+exports.default = WebGLRenderer;
+
+
+/***/ }),
+/* 12 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * Graphology Extent
+ * ==================
+ *
+ * Simple function returning the extent of selected attributes of the graph.
+ */
+var isGraph = __webpack_require__(13);
+
+/**
+ * Function returning the extent of the selected node attributes.
+ *
+ * @param  {Graph}        graph     - Target graph.
+ * @param  {string|array} attribute - Single or multiple attributes.
+ * @return {array|object}
+ */
+function nodeExtent(graph, attribute) {
+  if (!isGraph(graph))
+    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
+
+  var attributes = [].concat(attribute);
+
+  var nodes = graph.nodes(),
+      node,
+      data,
+      value,
+      key,
+      a,
+      i,
+      l;
+
+  var results = {};
+
+  for (a = 0; a < attributes.length; a++) {
+    key = attributes[a];
+
+    results[key] = [Infinity, -Infinity];
+  }
+
+  for (i = 0, l = nodes.length; i < l; i++) {
+    node = nodes[i];
+    data = graph.getNodeAttributes(node);
+
+    for (a = 0; a < attributes.length; a++) {
+      key = attributes[a];
+      value = data[key];
+
+      if (value < results[key][0])
+        results[key][0] = value;
+
+      if (value > results[key][1])
+        results[key][1] = value;
+    }
+  }
+
+  return typeof attribute === 'string' ? results[attribute] : results;
+}
+
+/**
+ * Function returning the extent of the selected edge attributes.
+ *
+ * @param  {Graph}        graph     - Target graph.
+ * @param  {string|array} attribute - Single or multiple attributes.
+ * @return {array|object}
+ */
+function edgeExtent(graph, attribute) {
+  if (!isGraph(graph))
+    throw new Error('graphology-metrics/extent: the given graph is not a valid graphology instance.');
+
+  var attributes = [].concat(attribute);
+
+  var edges = graph.edges(),
+      edge,
+      data,
+      value,
+      key,
+      a,
+      i,
+      l;
+
+  var results = {};
+
+  for (a = 0; a < attributes.length; a++) {
+    key = attributes[a];
+
+    results[key] = [Infinity, -Infinity];
+  }
+
+  for (i = 0, l = edges.length; i < l; i++) {
+    edge = edges[i];
+    data = graph.getEdgeAttributes(edge);
+
+    for (a = 0; a < attributes.length; a++) {
+      key = attributes[a];
+      value = data[key];
+
+      if (value < results[key][0])
+        results[key][0] = value;
+
+      if (value > results[key][1])
+        results[key][1] = value;
+    }
+  }
+
+  return typeof attribute === 'string' ? results[attribute] : results;
+}
+
+/**
+ * Exporting.
+ */
+var extent = nodeExtent;
+extent.nodeExtent = nodeExtent;
+extent.edgeExtent = edgeExtent;
+
+module.exports = extent;
+
+
+/***/ }),
+/* 13 */
+/***/ ((module) => {
+
+/**
+ * Graphology isGraph
+ * ===================
+ *
+ * Very simple function aiming at ensuring the given variable is a
+ * graphology instance.
+ */
+
+/**
+ * Checking the value is a graphology instance.
+ *
+ * @param  {any}     value - Target value.
+ * @return {boolean}
+ */
+module.exports = function isGraph(value) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.addUndirectedEdgeWithKey === 'function' &&
+    typeof value.dropNode === 'function' &&
+    typeof value.multi === 'boolean'
+  );
+};
+
+
+/***/ }),
+/* 14 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Edge = exports.Node = void 0;
+var Node = /** @class */ (function () {
+    function Node(index, settings) {
+        this.index = index;
+        this.x = 0;
+        this.y = 0;
+        this.size = 2;
+        this.color = settings.defaultNodeColor;
+        this.hidden = false;
+        this.label = "";
+    }
+    Node.prototype.assign = function (data) {
+        Object.assign(this, data);
+    };
+    return Node;
+}());
+exports.Node = Node;
+var Edge = /** @class */ (function () {
+    function Edge(index, settings) {
+        this.index = index;
+        this.size = 1;
+        this.color = settings.defaultEdgeColor;
+        this.hidden = false;
+        this.label = "";
+    }
+    Edge.prototype.assign = function (data) {
+        Object.assign(this, data);
+    };
+    return Edge;
+}());
+exports.Edge = Edge;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+/**
+ * Sigma.js Rendering Utils
+ * ===========================
+ *
+ * Helpers used by most renderers.
+ */
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = void 0;
+/**
+ * Function used to create DOM elements easily.
+ *
+ * @param  {string} tag        - Tag name of the element to create.
+ * @param  {object} style      - Styles map.
+ * @param  {object} attributes - Attributes map.
+ * @return {HTMLElement}
+ */
+function createElement(tag, style, attributes) {
+    var element = document.createElement(tag);
+    if (style) {
+        for (var k in style) {
+            element.style[k] = style[k];
+        }
+    }
+    if (attributes) {
+        for (var k in attributes) {
+            element.setAttribute(k, attributes[k]);
+        }
+    }
+    return element;
+}
+exports.createElement = createElement;
+/**
+ * Function returning the browser's pixel ratio.
+ *
+ * @return {number}
+ */
+function getPixelRatio() {
+    if (typeof window.devicePixelRatio !== "undefined")
+        return window.devicePixelRatio;
+    return 1;
+}
+exports.getPixelRatio = getPixelRatio;
+function createNormalizationFunction(extent) {
+    var _a = __read(extent.x, 2), minX = _a[0], maxX = _a[1], _b = __read(extent.y, 2), minY = _b[0], maxY = _b[1];
+    var ratio = Math.max(maxX - minX, maxY - minY);
+    if (ratio === 0)
+        ratio = 1;
+    var dX = (maxX + minX) / 2, dY = (maxY + minY) / 2;
+    var fn = function (data) {
+        return {
+            x: 0.5 + (data.x - dX) / ratio,
+            y: 0.5 + (data.y - dY) / ratio,
+        };
+    };
+    // TODO: possibility to apply this in batch over array of indices
+    fn.applyTo = function (data) {
+        data.x = 0.5 + (data.x - dX) / ratio;
+        data.y = 0.5 + (data.y - dY) / ratio;
+    };
+    fn.inverse = function (data) {
+        return {
+            x: dX + ratio * (data.x - 0.5),
+            y: dY + ratio * (data.y - 0.5),
+        };
+    };
+    fn.ratio = ratio;
+    return fn;
+}
+exports.createNormalizationFunction = createNormalizationFunction;
+
+
+/***/ }),
+/* 16 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = void 0;
+/**
+ * Sigma.js WebGL Renderer Utils
+ * ==============================
+ *
+ * Miscelleanous helper functions used by sigma's WebGL renderer.
+ */
+var matrices_1 = __webpack_require__(17);
+/**
+ * Memoized function returning a float-encoded color from various string
+ * formats describing colors.
+ */
+var FLOAT_COLOR_CACHE = {};
+var INT8 = new Int8Array(4);
+var INT32 = new Int32Array(INT8.buffer, 0, 1);
+var FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
+var RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
+var RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
+function floatColor(val) {
+    // If the color is already computed, we yield it
+    if (typeof FLOAT_COLOR_CACHE[val] !== "undefined")
+        return FLOAT_COLOR_CACHE[val];
+    var r = 0, g = 0, b = 0, a = 1;
+    // Handling hexadecimal notation
+    if (val[0] === "#") {
+        if (val.length === 4) {
+            r = parseInt(val.charAt(1) + val.charAt(1), 16);
+            g = parseInt(val.charAt(2) + val.charAt(2), 16);
+            b = parseInt(val.charAt(3) + val.charAt(3), 16);
+        }
+        else {
+            r = parseInt(val.charAt(1) + val.charAt(2), 16);
+            g = parseInt(val.charAt(3) + val.charAt(4), 16);
+            b = parseInt(val.charAt(5) + val.charAt(6), 16);
+        }
+    }
+    // Handling rgb notation
+    else if (RGBA_TEST_REGEX.test(val)) {
+        var match = val.match(RGBA_EXTRACT_REGEX);
+        if (match) {
+            r = +match[1];
+            g = +match[2];
+            b = +match[3];
+            if (match[4])
+                a = +match[4];
+        }
+    }
+    a = (a * 255) | 0;
+    INT32[0] = ((a << 24) | (b << 16) | (g << 8) | r) & 0xfeffffff;
+    var color = FLOAT32[0];
+    FLOAT_COLOR_CACHE[val] = color;
+    return color;
+}
+exports.floatColor = floatColor;
+/**
+ * Function returning a matrix from the current state of the camera.
+ */
+// TODO: it's possible to optimize this drastically!
+function matrixFromCamera(state, dimensions) {
+    var angle = state.angle, ratio = state.ratio, x = state.x, y = state.y;
+    var width = dimensions.width, height = dimensions.height;
+    var matrix = matrices_1.identity();
+    var smallestDimension = Math.min(width, height);
+    var cameraCentering = matrices_1.translate(matrices_1.identity(), -x, -y), cameraScaling = matrices_1.scale(matrices_1.identity(), 1 / ratio), cameraRotation = matrices_1.rotate(matrices_1.identity(), -angle), viewportScaling = matrices_1.scale(matrices_1.identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
+    // Logical order is reversed
+    matrices_1.multiply(matrix, viewportScaling);
+    matrices_1.multiply(matrix, cameraRotation);
+    matrices_1.multiply(matrix, cameraScaling);
+    matrices_1.multiply(matrix, cameraCentering);
+    return matrix;
+}
+exports.matrixFromCamera = matrixFromCamera;
+/**
+ * Function extracting the color at the given pixel.
+ */
+function extractPixel(gl, x, y, array) {
+    var data = array || new Uint8Array(4);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    return data;
+}
+exports.extractPixel = extractPixel;
+/**
+ * Function used to know whether given webgl context can use 32 bits indices.
+ */
+function canUse32BitsIndices(gl) {
+    var webgl2 = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext;
+    return webgl2 || !!gl.getExtension("OES_element_index_uint");
+}
+exports.canUse32BitsIndices = canUse32BitsIndices;
+
+
+/***/ }),
+/* 17 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.multiply = exports.translate = exports.rotate = exports.scale = exports.identity = void 0;
+/**
+ * Sigma.js WebGL Matrices Helpers
+ * ================================
+ *
+ * Matrices-related helper functions used by sigma's WebGL renderer.
+ */
+function identity() {
+    return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
+}
+exports.identity = identity;
+// TODO: optimize
+function scale(m, x, y) {
+    m[0] = x;
+    m[4] = typeof y === "number" ? y : x;
+    return m;
+}
+exports.scale = scale;
+function rotate(m, r) {
+    var s = Math.sin(r), c = Math.cos(r);
+    m[0] = c;
+    m[1] = s;
+    m[3] = -s;
+    m[4] = c;
+    return m;
+}
+exports.rotate = rotate;
+function translate(m, x, y) {
+    m[6] = x;
+    m[7] = y;
+    return m;
+}
+exports.translate = translate;
+function multiply(a, b) {
+    var a00 = a[0], a01 = a[1], a02 = a[2];
+    var a10 = a[3], a11 = a[4], a12 = a[5];
+    var a20 = a[6], a21 = a[7], a22 = a[8];
+    var b00 = b[0], b01 = b[1], b02 = b[2];
+    var b10 = b[3], b11 = b[4], b12 = b[5];
+    var b20 = b[6], b21 = b[7], b22 = b[8];
+    a[0] = b00 * a00 + b01 * a10 + b02 * a20;
+    a[1] = b00 * a01 + b01 * a11 + b02 * a21;
+    a[2] = b00 * a02 + b01 * a12 + b02 * a22;
+    a[3] = b10 * a00 + b11 * a10 + b12 * a20;
+    a[4] = b10 * a01 + b11 * a11 + b12 * a21;
+    a[5] = b10 * a02 + b11 * a12 + b12 * a22;
+    a[6] = b20 * a00 + b21 * a10 + b22 * a20;
+    a[7] = b20 * a01 + b21 * a11 + b22 * a21;
+    a[8] = b20 * a02 + b21 * a12 + b22 * a22;
+    return a;
+}
+exports.multiply = multiply;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.edgeLabelsToDisplayFromNodes = exports.labelsToDisplayFromGrid = void 0;
+var camera_1 = __importDefault(__webpack_require__(1));
+/**
+ * Constants.
+ */
+// Dimensions of a normal cell
+var DEFAULT_CELL = {
+    width: 250,
+    height: 175,
+};
+// Dimensions of an unzoomed cell. This one is usually larger than the normal
+// one to account for the fact that labels will more likely collide.
+var DEFAULT_UNZOOMED_CELL = {
+    width: 400,
+    height: 300,
+};
+/**
+ * Helpers.
+ */
+function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
+    return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+// TODO: cache camera position of selected nodes to avoid costly computations
+// in anti-collision step
+// TOOD: document a little bit more so future people can understand this mess
+/**
+ * Label grid heuristic selecting labels to display.
+ *
+ * @param  {object} params                 - Parameters:
+ * @param  {object}   cache                - Cache storing nodes' data.
+ * @param  {Camera}   camera               - The renderer's camera.
+ * @param  {Set}      displayedLabels      - Currently displayed labels.
+ * @param  {Array}    visibleNodes         - Nodes visible for this render.
+ * @param  {Graph}    graph                - The rendered graph.
+ * @return {Array}                         - The selected labels.
+ */
+function labelsToDisplayFromGrid(params) {
+    var cache = params.cache, camera = params.camera, userCell = params.cell, dimensions = params.dimensions, displayedLabels = params.displayedLabels, _a = params.fontSize, fontSize = _a === void 0 ? 14 : _a, graph = params.graph, _b = params.renderedSizeThreshold, renderedSizeThreshold = _b === void 0 ? -Infinity : _b, visibleNodes = params.visibleNodes;
+    var cameraState = camera.getState(), previousCameraState = camera.getPreviousState();
+    var previousCamera = new camera_1.default();
+    previousCamera.setState(previousCameraState);
+    // TODO: should factorize. This same code is used quite a lot throughout the codebase
+    // TODO: POW RATIO is currently default 0.5 and harcoded
+    var sizeRatio = Math.pow(cameraState.ratio, 0.5);
+    // Camera hasn't moved?
+    var still = cameraState.x === previousCameraState.x &&
+        cameraState.y === previousCameraState.y &&
+        cameraState.ratio === previousCameraState.ratio;
+    // State
+    var zooming = cameraState.ratio < previousCameraState.ratio, panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y, unzooming = cameraState.ratio > previousCameraState.ratio, unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1, zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
+    // Trick to discretize unzooming
+    if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0)
+        return Array.from(displayedLabels);
+    // If panning while unzoomed, we shouldn't change label selection
+    if ((unzoomedPanning || still) && displayedLabels.size !== 0)
+        return Array.from(displayedLabels);
+    // When unzoomed & zooming
+    if (zooming && cameraState.ratio >= 1)
+        return Array.from(displayedLabels);
+    // Adapting cell dimensions
+    var cell = userCell ? userCell : DEFAULT_CELL;
+    if (cameraState.ratio >= 1.3)
+        cell = DEFAULT_UNZOOMED_CELL;
+    var cwr = dimensions.width % cell.width;
+    var cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
+    var chr = dimensions.height % cell.height;
+    var cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
+    var adjustedWidth = dimensions.width + cellWidth, adjustedHeight = dimensions.height + cellHeight, adjustedX = -cellWidth, adjustedY = -cellHeight;
+    var panningWidth = dimensions.width + cellWidth / 2, panningHeight = dimensions.height + cellHeight / 2, panningX = -(cellWidth / 2), panningY = -(cellHeight / 2);
+    var worthyLabels = [];
+    var grid = {};
+    var maxSize = -Infinity, biggestNode = null;
+    for (var i = 0, l = visibleNodes.length; i < l; i++) {
+        var node = visibleNodes[i], nodeData = cache[node];
+        // We filter nodes having a rendered size less than a certain thresold
+        if (nodeData.size / sizeRatio < renderedSizeThreshold)
+            continue;
+        // Finding our node's cell in the grid
+        var pos = camera.graphToViewport(dimensions, nodeData);
+        // Node is not actually visible on screen
+        // NOTE: can optimize margin on the right side (only if we know where the labels go)
+        if (pos.x < adjustedX || pos.x > adjustedWidth || pos.y < adjustedY || pos.y > adjustedHeight)
+            continue;
+        // Keeping track of the maximum node size for certain cases
+        if (nodeData.size > maxSize) {
+            maxSize = nodeData.size;
+            biggestNode = node;
+        }
+        // If panning when zoomed, we consider only displayed labels and newly
+        // visible nodes
+        if (zoomedPanning) {
+            var ppos = previousCamera.graphToViewport(dimensions, nodeData);
+            // Was node visible earlier?
+            if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
+                // Was the label displayed?
+                if (!displayedLabels.has(node))
+                    continue;
+            }
+        }
+        var xKey = Math.floor(pos.x / cellWidth), yKey = Math.floor(pos.y / cellHeight);
+        var key = xKey + "\u00A7" + yKey;
+        if (typeof grid[key] === "undefined") {
+            // This cell is not yet occupied
+            grid[key] = node;
+        }
+        else {
+            // We must solve a conflict in this cell
+            var currentNode = grid[key], currentNodeData = cache[currentNode];
+            // We prefer already displayed labels
+            if (displayedLabels.size > 0) {
+                var n1 = displayedLabels.has(node), n2 = displayedLabels.has(currentNode);
+                if (!n1 && n2) {
+                    continue;
+                }
+                if (n1 && !n2) {
+                    grid[key] = node;
+                    continue;
+                }
+                if ((zoomedPanning || zooming) && n1 && n2) {
+                    worthyLabels.push(node);
+                    continue;
+                }
+            }
+            // In case of size & degree equality, we use the node's key so that the
+            // process remains deterministic
+            var won = false;
+            if (nodeData.size > currentNodeData.size) {
+                won = true;
+            }
+            else if (nodeData.size === currentNodeData.size) {
+                var nodeDegree = graph.degree(node), currentNodeDegree = graph.degree(currentNode);
+                if (nodeDegree > currentNodeDegree) {
+                    won = true;
+                }
+                else if (nodeDegree === currentNodeDegree) {
+                    if (node > currentNode)
+                        won = true;
+                }
+            }
+            if (won)
+                grid[key] = node;
+        }
+    }
+    // Compiling the labels
+    var biggestNodeShown = worthyLabels.some(function (node) { return node === biggestNode; });
+    for (var key in grid) {
+        var node = grid[key];
+        if (node === biggestNode)
+            biggestNodeShown = true;
+        worthyLabels.push(node);
+    }
+    // Always keeping biggest node shown on screen
+    if (!biggestNodeShown && biggestNode)
+        worthyLabels.push(biggestNode);
+    // Basic anti-collision
+    var collisions = new Set();
+    for (var i = 0, l = worthyLabels.length; i < l; i++) {
+        var n1 = worthyLabels[i], d1 = cache[n1], p1 = camera.graphToViewport(dimensions, d1);
+        if (collisions.has(n1))
+            continue;
+        for (var j = i + 1; j < l; j++) {
+            var n2 = worthyLabels[j], d2 = cache[n2], p2 = camera.graphToViewport(dimensions, d2);
+            var c = collision(
+            // First abstract bbox
+            p1.x, p1.y, d1.label.length * 8, fontSize, 
+            // Second abstract bbox
+            p2.x, p2.y, d2.label.length * 8, fontSize);
+            if (c) {
+                // NOTE: add degree as tie-breaker here if required in the future
+                // NOTE: add final stable tie-breaker using node key if required
+                if (d1.size < d2.size)
+                    collisions.add(n1);
+                else
+                    collisions.add(n2);
+            }
+        }
+    }
+    // console.log(collisions)
+    return worthyLabels.filter(function (l) { return !collisions.has(l); });
+}
+exports.labelsToDisplayFromGrid = labelsToDisplayFromGrid;
+/**
+ * Label heuristic selecting edge labels to display, based on displayed node
+ * labels
+ *
+ * @param  {object} params                 - Parameters:
+ * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
+ * @param  {Set}      highlightedNodes     - Highlighted nodes.
+ * @param  {Graph}    graph                - The rendered graph.
+ * @param  {string}   hoveredNode          - Hovered node (optional)
+ * @return {Array}                         - The selected labels.
+ */
+function edgeLabelsToDisplayFromNodes(params) {
+    var graph = params.graph, hoveredNode = params.hoveredNode, highlightedNodes = params.highlightedNodes, displayedNodeLabels = params.displayedNodeLabels;
+    var worthyEdges = new Set();
+    var displayedNodeLabelsArray = Array.from(displayedNodeLabels);
+    // Each edge connecting a highlighted node has its label displayed:
+    var highlightedNodesArray = Array.from(highlightedNodes);
+    if (hoveredNode && !highlightedNodes.has(hoveredNode))
+        highlightedNodesArray.push(hoveredNode);
+    for (var i = 0; i < highlightedNodesArray.length; i++) {
+        var key = highlightedNodesArray[i];
+        var edges = graph.edges(key);
+        for (var j = 0; j < edges.length; j++)
+            worthyEdges.add(edges[j]);
+    }
+    // Each edge connecting two nodes with visible labels has its label displayed:
+    for (var i = 0; i < displayedNodeLabelsArray.length; i++) {
+        var key = displayedNodeLabelsArray[i];
+        var edges = graph.outboundEdges(key);
+        for (var j = 0; j < edges.length; j++)
+            if (displayedNodeLabels.has(graph.opposite(key, edges[j])))
+                worthyEdges.add(edges[j]);
+    }
+    return Array.from(worthyEdges);
+}
+exports.edgeLabelsToDisplayFromNodes = edgeLabelsToDisplayFromNodes;
+
+
+/***/ }),
+/* 19 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+/**
+ * Sigma.js zIndex Heuristics
+ * ===========================
+ *
+ * Miscelleneous heuristics related to z-index ordering of nodes & edges.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.zIndexOrdering = void 0;
+/**
+ * Function ordering the given elements in reverse z-order so they drawn
+ * the correct way.
+ *
+ * @param  {number}   extent   - [min, max] z values.
+ * @param  {function} getter   - Z attribute getter function.
+ * @param  {array}    elements - The array to sort.
+ * @return {array} - The sorted array.
+ */
+function zIndexOrdering(extent, getter, elements) {
+    // If k is > n, we'll use a standard sort
+    return elements.sort(function (a, b) {
+        var zA = getter(a) || 0, zB = getter(b) || 0;
+        if (zA < zB)
+            return -1;
+        if (zA > zB)
+            return 1;
+        return 0;
+    });
+    // TODO: counting sort optimization
+}
+exports.zIndexOrdering = zIndexOrdering;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WEBGL_RENDERER_DEFAULT_SETTINGS = exports.validateWebglRendererSettings = void 0;
+var label_1 = __importDefault(__webpack_require__(21));
+var hover_1 = __importDefault(__webpack_require__(22));
+var edge_label_1 = __importDefault(__webpack_require__(24));
+var node_fast_1 = __importDefault(__webpack_require__(25));
+var edge_1 = __importDefault(__webpack_require__(31));
+var edge_arrow_1 = __importDefault(__webpack_require__(35));
+/**
+ * Sigma.js WebGL Renderer Settings
+ * =================================
+ *
+ * The list of settings for the WebGL renderer and some handy functions.
+ */
+function validateWebglRendererSettings(settings) {
+    // Label grid cell
+    if (settings.labelGrid &&
+        settings.labelGrid.cell &&
+        typeof settings.labelGrid.cell === "object" &&
+        (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)) {
+        throw new Error("sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+    }
+}
+exports.validateWebglRendererSettings = validateWebglRendererSettings;
+exports.WEBGL_RENDERER_DEFAULT_SETTINGS = {
+    // Performance
+    hideEdgesOnMove: false,
+    hideLabelsOnMove: false,
+    renderLabels: true,
+    renderEdgeLabels: false,
+    // Component rendering
+    defaultNodeColor: "#999",
+    defaultNodeType: "circle",
+    defaultEdgeColor: "#ccc",
+    defaultEdgeType: "line",
+    labelFont: "Arial",
+    labelSize: 14,
+    labelWeight: "normal",
+    edgeLabelFont: "Arial",
+    edgeLabelSize: 14,
+    edgeLabelWeight: "normal",
+    // Labels
+    labelGrid: {
+        cell: null,
+        renderedSizeThreshold: -Infinity,
+    },
+    // Reducers
+    nodeReducer: null,
+    edgeReducer: null,
+    // Features
+    zIndex: false,
+    // Renderers
+    labelRenderer: label_1.default,
+    hoverRenderer: hover_1.default,
+    edgeLabelRenderer: edge_label_1.default,
+    // Program classes
+    nodeProgramClasses: {
+        circle: node_fast_1.default,
+    },
+    edgeProgramClasses: {
+        arrow: edge_arrow_1.default,
+        line: edge_1.default,
+    },
+};
+
+
+/***/ }),
+/* 21 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function drawLabel(context, data, settings) {
+    var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
+    context.fillStyle = "#000";
+    context.font = weight + " " + size + "px " + font;
+    context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
+}
+exports.default = drawLabel;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var node_1 = __importDefault(__webpack_require__(23));
+var label_1 = __importDefault(__webpack_require__(21));
+function drawHover(context, data, settings) {
+    var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
+    context.font = weight + " " + size + "px " + font;
+    // Then we draw the label background
+    context.beginPath();
+    context.fillStyle = "#fff";
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+    context.shadowBlur = 8;
+    context.shadowColor = "#000";
+    var textWidth = context.measureText(data.label).width;
+    var x = Math.round(data.x - size / 2 - 2), y = Math.round(data.y - size / 2 - 2), w = Math.round(textWidth + size / 2 + data.size + 9), h = Math.round(size + 4), e = Math.round(size / 2 + 2);
+    context.moveTo(x, y + e);
+    context.moveTo(x, y + e);
+    context.arcTo(x, y, x + e, y, e);
+    context.lineTo(x + w, y);
+    context.lineTo(x + w, y + h);
+    context.lineTo(x + e, y + h);
+    context.arcTo(x, y + h, x, y + h - e, e);
+    context.lineTo(x, y + e);
+    context.closePath();
+    context.fill();
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+    context.shadowBlur = 0;
+    // Then we need to draw the node
+    node_1.default(context, data);
+    // And finally we draw the label
+    label_1.default(context, data, settings);
+}
+exports.default = drawHover;
+
+
+/***/ }),
+/* 23 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var PI_TIMES_2 = Math.PI * 2;
+function drawNode(context, data) {
+    context.fillStyle = data.color;
+    context.beginPath();
+    context.arc(data.x, data.y, data.size, 0, PI_TIMES_2, true);
+    context.closePath();
+    context.fill();
+}
+exports.default = drawNode;
+
+
+/***/ }),
+/* 24 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function drawEdgeLabel(context, edgeData, sourceData, targetData, settings) {
+    var size = settings.edgeLabelSize, font = settings.edgeLabelFont, weight = settings.edgeLabelWeight, label = edgeData.label;
+    context.fillStyle = edgeData.color;
+    context.font = weight + " " + size + "px " + font;
+    var textWidth = context.measureText(label).width;
+    var cx = (sourceData.x + targetData.x) / 2;
+    var cy = (sourceData.y + targetData.y) / 2;
+    var dx = targetData.x - sourceData.x;
+    var dy = targetData.y - sourceData.y;
+    var d = Math.sqrt(dx * dx + dy * dy);
+    var angle;
+    if (dx > 0) {
+        if (dy > 0)
+            angle = Math.acos(dx / d);
+        else
+            angle = Math.asin(dy / d);
+    }
+    else {
+        if (dy > 0)
+            angle = Math.acos(dx / d) + Math.PI;
+        else
+            angle = Math.asin(dx / d) + Math.PI / 2;
+    }
+    context.save();
+    context.translate(cx, cy);
+    context.rotate(angle);
+    context.fillText(label, -textWidth / 2, edgeData.size / 2 + size);
+    context.restore();
+}
+exports.default = drawEdgeLabel;
+
+
+/***/ }),
+/* 25 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js WebGL Renderer Node Program
+ * =====================================
+ *
+ * Simple program rendering nodes using GL_POINTS. This is faster than the
+ * three triangle option but has some quirks and is not supported equally by
+ * every GPU.
+ */
+var node_1 = __webpack_require__(26);
+var utils_1 = __webpack_require__(16);
+var node_fast_vert_glsl_1 = __importDefault(__webpack_require__(29));
+var node_fast_frag_glsl_1 = __importDefault(__webpack_require__(30));
+var POINTS = 1, ATTRIBUTES = 4;
+var NodeProgramFast = /** @class */ (function (_super) {
+    __extends(NodeProgramFast, _super);
+    function NodeProgramFast(gl) {
+        var _this = _super.call(this, gl, node_fast_vert_glsl_1.default, node_fast_frag_glsl_1.default, POINTS, ATTRIBUTES) || this;
+        _this.bind();
+        return _this;
+    }
+    NodeProgramFast.prototype.process = function (data, offset) {
+        var color = utils_1.floatColor(data.color);
+        var i = offset * POINTS * ATTRIBUTES;
+        var array = this.array;
+        if (data.hidden) {
+            array[i++] = 0;
+            array[i++] = 0;
+            array[i++] = 0;
+            array[i++] = 0;
+            return;
+        }
+        array[i++] = data.x;
+        array[i++] = data.y;
+        array[i++] = data.size;
+        array[i] = color;
+    };
+    NodeProgramFast.prototype.render = function (params) {
+        var gl = this.gl;
+        var program = this.program;
+        gl.useProgram(program);
+        gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+        gl.uniform1f(this.scaleLocation, params.scalingRatio);
+        gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+        gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
+    };
+    return NodeProgramFast;
+}(node_1.AbstractNodeProgram));
+exports.default = NodeProgramFast;
+
+
+/***/ }),
+/* 26 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createNodeCompoundProgram = exports.AbstractNodeProgram = void 0;
+var program_1 = __webpack_require__(27);
+/**
+ * Node Program class.
+ *
+ * @constructor
+ */
+var AbstractNodeProgram = /** @class */ (function (_super) {
+    __extends(AbstractNodeProgram, _super);
+    function AbstractNodeProgram(gl, vertexShaderSource, fragmentShaderSource, points, attributes) {
+        var _this = _super.call(this, gl, vertexShaderSource, fragmentShaderSource, points, attributes) || this;
+        // Locations
+        _this.positionLocation = gl.getAttribLocation(_this.program, "a_position");
+        _this.sizeLocation = gl.getAttribLocation(_this.program, "a_size");
+        _this.colorLocation = gl.getAttribLocation(_this.program, "a_color");
+        // Uniform Location
+        var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
+        if (matrixLocation === null)
+            throw new Error("sigma/renderers/webgl/program/common/node: error while getting matrixLocation");
+        _this.matrixLocation = matrixLocation;
+        var ratioLocation = gl.getUniformLocation(_this.program, "u_ratio");
+        if (ratioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/common/node: error while getting ratioLocation");
+        _this.ratioLocation = ratioLocation;
+        var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
+        if (scaleLocation === null)
+            throw new Error("sigma/renderers/webgl/program/common/node: error while getting scaleLocation");
+        _this.scaleLocation = scaleLocation;
+        return _this;
+    }
+    AbstractNodeProgram.prototype.bind = function () {
+        var gl = this.gl;
+        gl.enableVertexAttribArray(this.positionLocation);
+        gl.enableVertexAttribArray(this.sizeLocation);
+        gl.enableVertexAttribArray(this.colorLocation);
+        gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
+        gl.vertexAttribPointer(this.colorLocation, 4, gl.UNSIGNED_BYTE, true, this.attributes * Float32Array.BYTES_PER_ELEMENT, 12);
+    };
+    return AbstractNodeProgram;
+}(program_1.AbstractProgram));
+exports.AbstractNodeProgram = AbstractNodeProgram;
+/**
+ * Helper function combining two or more programs into a single compound one.
+ * Note that this is more a quick & easy way to combine program than a really
+ * performant option. More performant programs can be written entirely.
+ *
+ * @param  {array}    programClasses - Program classes to combine.
+ * @return {function}
+ */
+function createNodeCompoundProgram(programClasses) {
+    return /** @class */ (function () {
+        function NodeCompoundProgram(gl) {
+            this.programs = programClasses.map(function (ProgramClass) { return new ProgramClass(gl); });
+        }
+        NodeCompoundProgram.prototype.bufferData = function () {
+            this.programs.forEach(function (program) { return program.bufferData(); });
+        };
+        NodeCompoundProgram.prototype.allocate = function (capacity) {
+            this.programs.forEach(function (program) { return program.allocate(capacity); });
+        };
+        NodeCompoundProgram.prototype.bind = function () {
+            // nothing todo, it's already done in each program constructor
+        };
+        NodeCompoundProgram.prototype.render = function (params) {
+            this.programs.forEach(function (program) { return program.render(params); });
+        };
+        NodeCompoundProgram.prototype.process = function (data, offset) {
+            this.programs.forEach(function (program) { return program.process(data, offset); });
+        };
+        return NodeCompoundProgram;
+    }());
+}
+exports.createNodeCompoundProgram = createNodeCompoundProgram;
+
+
+/***/ }),
+/* 27 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AbstractProgram = void 0;
+/**
+ * Sigma.js WebGL Renderer Program
+ * ================================
+ *
+ * Class representing a single WebGL program used by sigma's WebGL renderer.
+ */
+var utils_1 = __webpack_require__(28);
+/**
+ * Abstract Program class.
+ *
+ * @constructor
+ */
+var AbstractProgram = /** @class */ (function () {
+    function AbstractProgram(gl, vertexShaderSource, fragmentShaderSource, points, attributes) {
+        this.array = new Float32Array();
+        this.points = points;
+        this.attributes = attributes;
+        this.gl = gl;
+        this.vertexShaderSource = vertexShaderSource;
+        this.fragmentShaderSource = fragmentShaderSource;
+        var buffer = gl.createBuffer();
+        if (buffer === null)
+            throw new Error("sigma/renderers/webgl/program/program.Program: error while creating the buffer");
+        this.buffer = buffer;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        this.vertexShader = utils_1.loadVertexShader(gl, this.vertexShaderSource);
+        this.fragmentShader = utils_1.loadFragmentShader(gl, this.fragmentShaderSource);
+        this.program = utils_1.loadProgram(gl, [this.vertexShader, this.fragmentShader]);
+    }
+    AbstractProgram.prototype.bufferData = function () {
+        var gl = this.gl;
+        gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    };
+    AbstractProgram.prototype.allocate = function (capacity) {
+        this.array = new Float32Array(this.points * this.attributes * capacity);
+    };
+    return AbstractProgram;
+}());
+exports.AbstractProgram = AbstractProgram;
+
+
+/***/ }),
+/* 28 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+/**
+ * Sigma.js Shader Utils
+ * ======================
+ *
+ * Code used to load sigma's shaders.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.loadProgram = exports.loadFragmentShader = exports.loadVertexShader = void 0;
+/**
+ * Function used to load a shader.
+ */
+function loadShader(type, gl, source) {
+    var glType = type === "VERTEX" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
+    // Creating the shader
+    var shader = gl.createShader(glType);
+    if (shader === null) {
+        throw new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while creating the shader");
+    }
+    // Loading source
+    gl.shaderSource(shader, source);
+    // Compiling the shader
+    gl.compileShader(shader);
+    // Retrieving compilation status
+    var successfullyCompiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+    // Throwing if something went awry
+    if (!successfullyCompiled) {
+        var infoLog = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n" + infoLog + "\n" + source);
+    }
+    return shader;
+}
+function loadVertexShader(gl, source) {
+    return loadShader("VERTEX", gl, source);
+}
+exports.loadVertexShader = loadVertexShader;
+function loadFragmentShader(gl, source) {
+    return loadShader("FRAGMENT", gl, source);
+}
+exports.loadFragmentShader = loadFragmentShader;
+/**
+ * Function used to load a program.
+ */
+function loadProgram(gl, shaders) {
+    var program = gl.createProgram();
+    if (program === null) {
+        throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while creating the program.");
+    }
+    var i, l;
+    // Attaching the shaders
+    for (i = 0, l = shaders.length; i < l; i++)
+        gl.attachShader(program, shaders[i]);
+    gl.linkProgram(program);
+    // Checking status
+    var successfullyLinked = gl.getProgramParameter(program, gl.LINK_STATUS);
+    if (!successfullyLinked) {
+        gl.deleteProgram(program);
+        throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.");
+    }
+    return program;
+}
+exports.loadProgram = loadProgram;
+
+
+/***/ }),
+/* 29 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute float a_size;\nattribute vec4 a_color;\n\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  gl_Position = vec4(\n    (u_matrix * vec3(a_position, 1)).xy,\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  v_border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
+
+/***/ }),
+/* 30 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > v_border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / v_border;\n\n  gl_FragColor = mix(color0, v_color, t);\n}\n");
+
+/***/ }),
+/* 31 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js WebGL Renderer Edge Program
+ * =====================================
+ *
+ * Program rendering edges as thick lines using four points translated
+ * orthogonally from the source & target's centers by half thickness.
+ *
+ * Rendering two triangles by using only four points is made possible through
+ * the use of indices.
+ *
+ * This method should be faster than the 6 points / 2 triangles approach and
+ * should handle thickness better than with gl.LINES.
+ *
+ * This version of the shader balances geometry computation evenly between
+ * the CPU & GPU (normals are computed on the CPU side).
+ */
+var edge_1 = __webpack_require__(32);
+var utils_1 = __webpack_require__(16);
+var edge_vert_glsl_1 = __importDefault(__webpack_require__(33));
+var edge_frag_glsl_1 = __importDefault(__webpack_require__(34));
+var POINTS = 4, ATTRIBUTES = 6, STRIDE = POINTS * ATTRIBUTES;
+var EdgeProgram = /** @class */ (function (_super) {
+    __extends(EdgeProgram, _super);
+    function EdgeProgram(gl) {
+        var _this = _super.call(this, gl, edge_vert_glsl_1.default, edge_frag_glsl_1.default, POINTS, ATTRIBUTES) || this;
+        // Locations
+        _this.positionLocation = gl.getAttribLocation(_this.program, "a_position");
+        _this.colorLocation = gl.getAttribLocation(_this.program, "a_color");
+        _this.normalLocation = gl.getAttribLocation(_this.program, "a_normal");
+        _this.thicknessLocation = gl.getAttribLocation(_this.program, "a_thickness");
+        // Uniform locations
+        var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
+        if (scaleLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");
+        _this.scaleLocation = scaleLocation;
+        var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
+        if (matrixLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
+        _this.matrixLocation = matrixLocation;
+        var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
+        if (cameraRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting cameraRatioLocation");
+        _this.cameraRatioLocation = cameraRatioLocation;
+        var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
+        if (viewportRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting viewportRatioLocation");
+        _this.viewportRatioLocation = viewportRatioLocation;
+        var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
+        if (thicknessRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting thicknessRatioLocation");
+        _this.thicknessRatioLocation = thicknessRatioLocation;
+        // Enabling the OES_element_index_uint extension
+        // NOTE: on older GPUs, this means that really large graphs won't
+        // have all their edges rendered. But it seems that the
+        // `OES_element_index_uint` is quite everywhere so we'll handle
+        // the potential issue if it really arises.
+        // NOTE: when using webgl2, the extension is enabled by default
+        _this.canUse32BitsIndices = utils_1.canUse32BitsIndices(gl);
+        _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+        _this.indicesArray = new _this.IndicesArray();
+        _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+        _this.bind();
+        return _this;
+    }
+    EdgeProgram.prototype.bind = function () {
+        var gl = this.gl;
+        // Bindings
+        gl.enableVertexAttribArray(this.positionLocation);
+        gl.enableVertexAttribArray(this.normalLocation);
+        gl.enableVertexAttribArray(this.thicknessLocation);
+        gl.enableVertexAttribArray(this.colorLocation);
+        gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+        gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+        gl.vertexAttribPointer(this.colorLocation, 4, gl.UNSIGNED_BYTE, true, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+    };
+    EdgeProgram.prototype.computeIndices = function () {
+        var l = this.array.length / ATTRIBUTES;
+        var size = l + l / 2;
+        var indices = new this.IndicesArray(size);
+        for (var i = 0, c = 0; i < l; i += 4) {
+            indices[c++] = i;
+            indices[c++] = i + 1;
+            indices[c++] = i + 2;
+            indices[c++] = i + 2;
+            indices[c++] = i + 1;
+            indices[c++] = i + 3;
+        }
+        this.indicesArray = indices;
+    };
+    EdgeProgram.prototype.bufferData = function () {
+        _super.prototype.bufferData.call(this);
+        // Indices data
+        var gl = this.gl;
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
+    };
+    EdgeProgram.prototype.process = function (sourceData, targetData, data, offset) {
+        if (sourceData.hidden || targetData.hidden || data.hidden) {
+            for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
+                this.array[i_1] = 0;
+            return;
+        }
+        var thickness = data.size || 1, x1 = sourceData.x, y1 = sourceData.y, x2 = targetData.x, y2 = targetData.y, color = utils_1.floatColor(data.color);
+        // Computing normals
+        var dx = x2 - x1, dy = y2 - y1;
+        var len = dx * dx + dy * dy, n1 = 0, n2 = 0;
+        if (len) {
+            len = 1 / Math.sqrt(len);
+            n1 = -dy * len;
+            n2 = dx * len;
+        }
+        var i = POINTS * ATTRIBUTES * offset;
+        var array = this.array;
+        // First point
+        array[i++] = x1;
+        array[i++] = y1;
+        array[i++] = n1;
+        array[i++] = n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        // First point flipped
+        array[i++] = x1;
+        array[i++] = y1;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        // Second point
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = n1;
+        array[i++] = n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        // Second point flipped
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i] = color;
+    };
+    EdgeProgram.prototype.render = function (params) {
+        var gl = this.gl;
+        var program = this.program;
+        gl.useProgram(program);
+        // Binding uniforms
+        gl.uniform1f(this.scaleLocation, params.scalingRatio);
+        gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+        gl.uniform1f(this.cameraRatioLocation, params.ratio);
+        gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
+        gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
+        // Drawing:
+        gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
+    };
+    return EdgeProgram;
+}(edge_1.AbstractEdgeProgram));
+exports.default = EdgeProgram;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createEdgeCompoundProgram = exports.AbstractEdgeProgram = void 0;
+var program_1 = __webpack_require__(27);
+/**
+ * Edge Program class.
+ *
+ * @constructor
+ */
+var AbstractEdgeProgram = /** @class */ (function (_super) {
+    __extends(AbstractEdgeProgram, _super);
+    function AbstractEdgeProgram(gl, vertexShaderSource, fragmentShaderSource, points, attributes) {
+        return _super.call(this, gl, vertexShaderSource, fragmentShaderSource, points, attributes) || this;
+    }
+    return AbstractEdgeProgram;
+}(program_1.AbstractProgram));
+exports.AbstractEdgeProgram = AbstractEdgeProgram;
+function createEdgeCompoundProgram(programClasses) {
+    return /** @class */ (function () {
+        function EdgeCompoundProgram(gl) {
+            this.programs = programClasses.map(function (ProgramClass) { return new ProgramClass(gl); });
+        }
+        EdgeCompoundProgram.prototype.bufferData = function () {
+            this.programs.forEach(function (program) { return program.bufferData(); });
+        };
+        EdgeCompoundProgram.prototype.allocate = function (capacity) {
+            this.programs.forEach(function (program) { return program.allocate(capacity); });
+        };
+        EdgeCompoundProgram.prototype.bind = function () {
+            // nothing todo, it's already done in each program constructor
+        };
+        EdgeCompoundProgram.prototype.computeIndices = function () {
+            this.programs.forEach(function (program) { return program.computeIndices(); });
+        };
+        EdgeCompoundProgram.prototype.render = function (params) {
+            this.programs.forEach(function (program) {
+                program.bind();
+                program.bufferData();
+                program.render(params);
+            });
+        };
+        EdgeCompoundProgram.prototype.process = function (sourceData, targetData, data, offset) {
+            this.programs.forEach(function (program) { return program.process(sourceData, targetData, data, offset); });
+        };
+        return EdgeCompoundProgram;
+    }());
+}
+exports.createEdgeCompoundProgram = createEdgeCompoundProgram;
+
+
+/***/ }),
+/* 33 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  // Add normal vector to the position in screen space, but correct thickness first:\n  vec2 position = (u_matrix * vec3(a_position + a_normal * thickness * u_cameraRatio, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
+
+/***/ }),
+/* 34 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.001;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n");
+
+/***/ }),
+/* 35 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js WebGL Renderer Edge Arrow Program
+ * ===========================================
+ *
+ * Compound program rendering edges as an arrow from the source to the target.
+ */
+var edge_1 = __webpack_require__(32);
+var edge_arrowHead_1 = __importDefault(__webpack_require__(36));
+var edge_clamped_1 = __importDefault(__webpack_require__(39));
+var program = edge_1.createEdgeCompoundProgram([edge_clamped_1.default, edge_arrowHead_1.default]);
+exports.default = program;
+
+
+/***/ }),
+/* 36 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+/**
+ * Sigma.js WebGL Renderer Arrow Program
+ * ======================================
+ *
+ * Program rendering direction arrows as a simple triangle.
+ */
+var edge_1 = __webpack_require__(32);
+var utils_1 = __webpack_require__(16);
+var edge_arrowHead_vert_glsl_1 = __importDefault(__webpack_require__(37));
+var edge_arrowHead_frag_glsl_1 = __importDefault(__webpack_require__(38));
+var POINTS = 3, ATTRIBUTES = 10, STRIDE = POINTS * ATTRIBUTES;
+var EdgeArrowHeadProgram = /** @class */ (function (_super) {
+    __extends(EdgeArrowHeadProgram, _super);
+    function EdgeArrowHeadProgram(gl) {
+        var _this = _super.call(this, gl, edge_arrowHead_vert_glsl_1.default, edge_arrowHead_frag_glsl_1.default, POINTS, ATTRIBUTES) || this;
+        // Locations
+        _this.positionLocation = gl.getAttribLocation(_this.program, "a_position");
+        _this.colorLocation = gl.getAttribLocation(_this.program, "a_color");
+        _this.normalLocation = gl.getAttribLocation(_this.program, "a_normal");
+        _this.thicknessLocation = gl.getAttribLocation(_this.program, "a_thickness");
+        _this.radiusLocation = gl.getAttribLocation(_this.program, "a_radius");
+        _this.barycentricLocation = gl.getAttribLocation(_this.program, "a_barycentric");
+        // Uniform locations
+        var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
+        if (scaleLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting scaleLocation");
+        _this.scaleLocation = scaleLocation;
+        var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
+        if (matrixLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting matrixLocation");
+        _this.matrixLocation = matrixLocation;
+        var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
+        if (cameraRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting cameraRatioLocation");
+        _this.cameraRatioLocation = cameraRatioLocation;
+        var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
+        if (viewportRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting viewportRatioLocation");
+        _this.viewportRatioLocation = viewportRatioLocation;
+        var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
+        if (thicknessRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting thicknessRatioLocation");
+        _this.thicknessRatioLocation = thicknessRatioLocation;
+        _this.bind();
+        return _this;
+    }
+    EdgeArrowHeadProgram.prototype.bind = function () {
+        var gl = this.gl;
+        // Bindings
+        gl.enableVertexAttribArray(this.positionLocation);
+        gl.enableVertexAttribArray(this.normalLocation);
+        gl.enableVertexAttribArray(this.thicknessLocation);
+        gl.enableVertexAttribArray(this.radiusLocation);
+        gl.enableVertexAttribArray(this.colorLocation);
+        gl.enableVertexAttribArray(this.barycentricLocation);
+        gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+        gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+        gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+        gl.vertexAttribPointer(this.colorLocation, 4, gl.UNSIGNED_BYTE, true, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
+        // TODO: maybe we can optimize here by packing this in a bit mask
+        gl.vertexAttribPointer(this.barycentricLocation, 3, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 28);
+    };
+    EdgeArrowHeadProgram.prototype.computeIndices = function () {
+        // nothing to do
+    };
+    EdgeArrowHeadProgram.prototype.process = function (sourceData, targetData, data, offset) {
+        if (sourceData.hidden || targetData.hidden || data.hidden) {
+            for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
+                this.array[i_1] = 0;
+            return;
+        }
+        var thickness = data.size || 1, radius = targetData.size || 1, x1 = sourceData.x, y1 = sourceData.y, x2 = targetData.x, y2 = targetData.y, color = utils_1.floatColor(data.color);
+        // Computing normals
+        var dx = x2 - x1, dy = y2 - y1;
+        var len = dx * dx + dy * dy, n1 = 0, n2 = 0;
+        if (len) {
+            len = 1 / Math.sqrt(len);
+            n1 = -dy * len;
+            n2 = dx * len;
+        }
+        var i = POINTS * ATTRIBUTES * offset;
+        var array = this.array;
+        // First point
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = radius;
+        array[i++] = color;
+        array[i++] = 1;
+        array[i++] = 0;
+        array[i++] = 0;
+        // Second point
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = radius;
+        array[i++] = color;
+        array[i++] = 0;
+        array[i++] = 1;
+        array[i++] = 0;
+        // Third point
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = radius;
+        array[i++] = color;
+        array[i++] = 0;
+        array[i++] = 0;
+        array[i] = 1;
+    };
+    EdgeArrowHeadProgram.prototype.render = function (params) {
+        var gl = this.gl;
+        var program = this.program;
+        gl.useProgram(program);
+        // Binding uniforms
+        gl.uniform1f(this.scaleLocation, params.scalingRatio);
+        gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+        gl.uniform1f(this.cameraRatioLocation, params.ratio);
+        gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
+        gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
+        // Drawing:
+        gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
+    };
+    return EdgeArrowHeadProgram;
+}(edge_1.AbstractEdgeProgram));
+exports.default = EdgeArrowHeadProgram;
+
+
+/***/ }),
+/* 37 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_radius;\nattribute vec4 a_color;\nattribute vec3 a_barycentric;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\n\nconst float arrowHeadLengthThicknessRatio = 2.5;\nconst float arrowHeadWidthLengthRatio = 0.66;\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  float nodeRadius = a_radius * u_thicknessRatio * u_scale * u_viewportRatio * u_cameraRatio;\n  float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio * u_cameraRatio;\n  float arrowHeadHalfWidth = arrowHeadWidthLengthRatio * arrowHeadLength / 2.0;\n\n  float da = a_barycentric.x;\n  float db = a_barycentric.y;\n  float dc = a_barycentric.z;\n\n  vec2 delta = vec2(\n      da * ((nodeRadius) * a_normal.y)\n    + db * ((nodeRadius + arrowHeadLength) * a_normal.y + arrowHeadHalfWidth * a_normal.x)\n    + dc * ((nodeRadius + arrowHeadLength) * a_normal.y - arrowHeadHalfWidth * a_normal.x),\n\n      da * (-(nodeRadius) * a_normal.x)\n    + db * (-(nodeRadius + arrowHeadLength) * a_normal.x + arrowHeadHalfWidth * a_normal.y)\n    + dc * (-(nodeRadius + arrowHeadLength) * a_normal.x - arrowHeadHalfWidth * a_normal.y)\n  );\n\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
+
+/***/ }),
+/* 38 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\n\nvoid main(void) {\n  gl_FragColor = v_color;\n}\n");
+
+/***/ }),
+/* 39 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var edge_1 = __webpack_require__(32);
+var utils_1 = __webpack_require__(16);
+var edge_clamped_vert_glsl_1 = __importDefault(__webpack_require__(40));
+var edge_frag_glsl_1 = __importDefault(__webpack_require__(34));
+var POINTS = 4, ATTRIBUTES = 7, STRIDE = POINTS * ATTRIBUTES;
+var EdgeClampedProgram = /** @class */ (function (_super) {
+    __extends(EdgeClampedProgram, _super);
+    function EdgeClampedProgram(gl) {
+        var _this = _super.call(this, gl, edge_clamped_vert_glsl_1.default, edge_frag_glsl_1.default, POINTS, ATTRIBUTES) || this;
+        // Initializing indices buffer
+        var indicesBuffer = gl.createBuffer();
+        if (indicesBuffer === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
+        _this.indicesBuffer = indicesBuffer;
+        // Locations:
+        _this.positionLocation = gl.getAttribLocation(_this.program, "a_position");
+        _this.colorLocation = gl.getAttribLocation(_this.program, "a_color");
+        _this.normalLocation = gl.getAttribLocation(_this.program, "a_normal");
+        _this.thicknessLocation = gl.getAttribLocation(_this.program, "a_thickness");
+        _this.radiusLocation = gl.getAttribLocation(_this.program, "a_radius");
+        // Uniform locations
+        var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
+        if (scaleLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
+        _this.scaleLocation = scaleLocation;
+        var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
+        if (matrixLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
+        _this.matrixLocation = matrixLocation;
+        var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
+        if (cameraRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting cameraRatioLocation");
+        _this.cameraRatioLocation = cameraRatioLocation;
+        var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
+        if (viewportRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting viewportRatioLocation");
+        _this.viewportRatioLocation = viewportRatioLocation;
+        var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
+        if (thicknessRatioLocation === null)
+            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting thicknessRatioLocation");
+        _this.thicknessRatioLocation = thicknessRatioLocation;
+        // Enabling the OES_element_index_uint extension
+        // NOTE: on older GPUs, this means that really large graphs won't
+        // have all their edges rendered. But it seems that the
+        // `OES_element_index_uint` is quite everywhere so we'll handle
+        // the potential issue if it really arises.
+        // NOTE: when using webgl2, the extension is enabled by default
+        _this.canUse32BitsIndices = utils_1.canUse32BitsIndices(gl);
+        _this.IndicesArray = _this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+        _this.indicesArray = new _this.IndicesArray();
+        _this.indicesType = _this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+        _this.bind();
+        return _this;
+    }
+    EdgeClampedProgram.prototype.bind = function () {
+        var gl = this.gl;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+        // Bindings
+        gl.enableVertexAttribArray(this.positionLocation);
+        gl.enableVertexAttribArray(this.normalLocation);
+        gl.enableVertexAttribArray(this.thicknessLocation);
+        gl.enableVertexAttribArray(this.colorLocation);
+        gl.enableVertexAttribArray(this.radiusLocation);
+        gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
+        gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
+        gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
+        gl.vertexAttribPointer(this.colorLocation, 4, gl.UNSIGNED_BYTE, true, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+        gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
+    };
+    EdgeClampedProgram.prototype.process = function (sourceData, targetData, data, offset) {
+        if (sourceData.hidden || targetData.hidden || data.hidden) {
+            for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
+                this.array[i_1] = 0;
+            return;
+        }
+        var thickness = data.size || 1, x1 = sourceData.x, y1 = sourceData.y, x2 = targetData.x, y2 = targetData.y, radius = targetData.size || 1, color = utils_1.floatColor(data.color);
+        // Computing normals
+        var dx = x2 - x1, dy = y2 - y1;
+        var len = dx * dx + dy * dy, n1 = 0, n2 = 0;
+        if (len) {
+            len = 1 / Math.sqrt(len);
+            n1 = -dy * len;
+            n2 = dx * len;
+        }
+        var i = POINTS * ATTRIBUTES * offset;
+        var array = this.array;
+        // First point
+        array[i++] = x1;
+        array[i++] = y1;
+        array[i++] = n1;
+        array[i++] = n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        array[i++] = 0;
+        // First point flipped
+        array[i++] = x1;
+        array[i++] = y1;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        array[i++] = 0;
+        // Second point
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = n1;
+        array[i++] = n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        array[i++] = radius;
+        // Second point flipped
+        array[i++] = x2;
+        array[i++] = y2;
+        array[i++] = -n1;
+        array[i++] = -n2;
+        array[i++] = thickness;
+        array[i++] = color;
+        array[i] = -radius;
+    };
+    EdgeClampedProgram.prototype.computeIndices = function () {
+        var l = this.array.length / ATTRIBUTES;
+        var size = l + l / 2;
+        var indices = new this.IndicesArray(size);
+        for (var i = 0, c = 0; i < l; i += 4) {
+            indices[c++] = i;
+            indices[c++] = i + 1;
+            indices[c++] = i + 2;
+            indices[c++] = i + 2;
+            indices[c++] = i + 1;
+            indices[c++] = i + 3;
+        }
+        this.indicesArray = indices;
+    };
+    EdgeClampedProgram.prototype.bufferData = function () {
+        _super.prototype.bufferData.call(this);
+        // Indices data
+        var gl = this.gl;
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
+    };
+    EdgeClampedProgram.prototype.render = function (params) {
+        var gl = this.gl;
+        var program = this.program;
+        gl.useProgram(program);
+        // Binding uniforms
+        gl.uniform1f(this.scaleLocation, params.scalingRatio);
+        gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+        gl.uniform1f(this.cameraRatioLocation, params.ratio);
+        gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
+        gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
+        // Drawing:
+        gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
+    };
+    return EdgeClampedProgram;
+}(edge_1.AbstractEdgeProgram));
+exports.default = EdgeClampedProgram;
+
+
+/***/ }),
+/* 40 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\nattribute float a_radius;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float arrowHeadLengthThicknessRatio = 2.5;\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  float direction = sign(a_radius);\n  float nodeRadius = direction * a_radius * u_thicknessRatio * u_scale * u_viewportRatio;\n  float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio;\n\n  vec2 arrowHeadVector = vec2(-direction * a_normal.y, direction * a_normal.x);\n\n  // Add normal vector to the position in screen space, but correct thickness first:\n  vec2 position = a_position + a_normal * thickness * u_cameraRatio;\n  // Add vector that corrects the arrow head length:\n  position = position + arrowHeadVector * (arrowHeadLength + nodeRadius) * u_cameraRatio;\n  // Apply camera\n  position = (u_matrix * vec3(position, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
+
+/***/ })
+/******/ 	]);
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		if(__webpack_module_cache__[moduleId]) {
+/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+/******/ 	// module exports must be returned from runtime so entry inlining is disabled
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })()
+;
+});

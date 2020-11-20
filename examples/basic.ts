@@ -1,8 +1,10 @@
+import "./random";
+import chroma from "chroma-js";
+import faker from "faker";
 import { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
-import chroma from "chroma-js";
-import faker from "faker";
+
 import WebGLRenderer from "../src/renderers/webgl/index";
 
 const container = document.getElementById("container");

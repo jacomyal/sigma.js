@@ -1,3 +1,4 @@
+import "./random";
 import { UndirectedGraph } from "graphology";
 import WebGLRenderer from "../src/renderers/webgl/index";
 

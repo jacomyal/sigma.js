@@ -1,3 +1,4 @@
+import "./random";
 import Graph from "graphology";
 import gexf from "graphology-gexf/browser";
 import WebGLRenderer from "../src/renderers/webgl/index";

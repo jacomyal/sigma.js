@@ -1,3 +1,4 @@
+import "./random";
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import empty from "graphology-generators/classic/empty";

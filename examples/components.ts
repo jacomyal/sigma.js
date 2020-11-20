@@ -1,3 +1,4 @@
+import "./random";
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import forceAtlas2 from "graphology-layout-forceatlas2";

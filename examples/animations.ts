@@ -1,3 +1,4 @@
+import "./random";
 import { UndirectedGraph } from "graphology";
 import circularLayout from "graphology-layout/circular";
 import { scaleLinear } from "d3-scale";
