@@ -37,7 +37,6 @@ export default class MouseCaptor extends Captor {
   isMoving = false;
   movingTimeout: number | null = null;
   startCameraState: CameraState | null = null;
-  lastCameraState: CameraState | null = null;
   clicks = 0;
   doubleClickTimeout: number | null = null;
   wheelLock = false;
@@ -139,7 +138,6 @@ export default class MouseCaptor extends Captor {
     if (!this.enabled) return;
 
     this.startCameraState = this.camera.getState();
-    this.lastCameraState = this.startCameraState;
 
     this.lastMouseX = getX(e);
     this.lastMouseY = getY(e);

@@ -23,6 +23,7 @@ import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSe
 import { INodeProgram } from "./programs/common/node";
 import { IEdgeProgram } from "./programs/common/edge";
 import { MouseCoords } from "../../captors/utils";
+import TouchCaptor from "../../captors/touch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Listener = (...args: any[]) => void;
@@ -139,6 +140,7 @@ export default class WebGLRenderer extends EventEmitter {
     // Initializing captors
     this.captors = {
       mouse: new MouseCaptor(this.elements.mouse, this.camera),
+      touch: new TouchCaptor(this.elements.mouse, this.camera),
     };
 
     // Binding event handlers
@@ -388,6 +390,9 @@ export default class WebGLRenderer extends EventEmitter {
     this.captors.mouse.on("rightClick", this.activeListeners.handleRightClick);
     this.captors.mouse.on("mousedown", this.activeListeners.handleDown);
 
+    // TODO
+    // Deal with Touch captor events
+
     return this;
   }
 
@@ -598,10 +603,19 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method returning the mouse captor.
    *
-   * @return {Camera}
+   * @return {MouseCaptor}
    */
   getMouseCaptor(): MouseCaptor {
     return this.captors.mouse as MouseCaptor;
+  }
+
+  /**
+   * Method returning the touch captor.
+   *
+   * @return {TouchCaptor}
+   */
+  getTouchCaptor(): TouchCaptor {
+    return this.captors.touch as TouchCaptor;
   }
 
   /**
@@ -701,6 +715,7 @@ export default class WebGLRenderer extends EventEmitter {
     if (!this.graph.order) return this;
 
     // TODO: improve this heuristic or move to the captor itself?
+    // TODO: deal with the touch captor here as well
     const mouseCaptor = this.captors.mouse as MouseCaptor;
     const moving = this.camera.isAnimated() || mouseCaptor.isMoving || mouseCaptor.hasDragged || mouseCaptor.wheelLock;
 
@@ -1045,6 +1060,7 @@ export default class WebGLRenderer extends EventEmitter {
     // Releasing DOM events & captors
     window.removeEventListener("resize", this.activeListeners.handleResize);
     this.captors.mouse.kill();
+    this.captors.touch.kill();
 
     // Releasing graph handlers
     graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);

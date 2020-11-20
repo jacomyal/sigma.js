@@ -1,6 +1,5 @@
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { NodeAttributes } from "../../../../types";
-import { RenderEdgeParams } from "./edge";
 
 export interface RenderNodeParams extends RenderParams {
   nodesPowRatio: number;

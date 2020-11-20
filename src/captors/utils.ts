@@ -18,13 +18,13 @@ export interface MouseCoords extends Coordinates {
 }
 
 /**
- * Extract the local X position from a mouse or touch event.
+ * Extract the local X position from a mouse event or touch object.
  *
- * @param  {event}  e - A mouse or touch event.
+ * @param  {event}  e - A mouse event or touch object.
  * @return {number}     The local X value of the mouse.
  */
-export function getX(e: MouseEvent): number {
-  if (typeof e.offsetX !== "undefined") return e.offsetX;
+export function getX(e: MouseEvent | Touch): number {
+  if (typeof (e as MouseEvent).offsetX !== "undefined") return (e as MouseEvent).offsetX;
 
   if (typeof e.clientX !== "undefined") return e.clientX;
 
@@ -32,13 +32,13 @@ export function getX(e: MouseEvent): number {
 }
 
 /**
- * Extract the local Y position from a mouse or touch event.
+ * Extract the local Y position from a mouse event or touch object.
  *
- * @param  {event}  e - A mouse or touch event.
+ * @param  {event}  e - A mouse event or touch object.
  * @return {number}     The local Y value of the mouse.
  */
-export function getY(e: MouseEvent): number {
-  if (typeof e.offsetY !== "undefined") return e.offsetY;
+export function getY(e: MouseEvent | Touch): number {
+  if (typeof (e as MouseEvent).offsetY !== "undefined") return (e as MouseEvent).offsetY;
 
   if (typeof e.clientY !== "undefined") return e.clientY;
 
@@ -46,11 +46,22 @@ export function getY(e: MouseEvent): number {
 }
 
 /**
+ * Extract the local X and Y coordinates from a mouse event or touch object.
+ *
+ * @param  {event}  e - A mouse event or touch object.
+ * @return {number}     The local Y value of the mouse.
+ */
+export function getPosition(e: MouseEvent | Touch): Coordinates {
+  return {
+    x: getX(e),
+    y: getY(e),
+  };
+}
+
+/**
  * Convert mouse coords to sigma coords.
  *
- * @param  {event}   e   - A mouse or touch event.
- * @param  {number}  [x] - The x coord to convert
- * @param  {number}  [y] - The y coord to convert
+ * @param  {event}   e   - A mouse event or touch object.
  *
  * @return {object}
  */
@@ -72,9 +83,9 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
 }
 
 /**
- * Extract the wheel delta from a mouse or touch event.
+ * Extract the wheel delta from a mouse event or touch object.
  *
- * @param  {event}  e - A mouse or touch event.
+ * @param  {event}  e - A mouse event or touch object.
  * @return {number}     The wheel delta of the mouse.
  */
 export function getWheelDelta(e: WheelEvent): number {
