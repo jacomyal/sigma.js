@@ -25,21 +25,28 @@ export async function takeScreenshots(tests: Tests, folder: string, suffix = "")
   // for each pages
   await Promise.all(
     tests.map((test) => {
+      console.log(`Generate screenshot for ${test.name} : ${test.url}`);
       return new Promise(async (resolve, reject) => {
         try {
           // Open a new page
           const page = await browser.newPage();
           // Navigate to URL
           await page.goto(test.url);
+          console.log(`Page ${test.url} is loaded`);
           if (test.scenario) {
+            console.log(`Running scenario for ${test.name}`);
             await test.scenario(browser, page);
           }
           // Taking the screenshot
           setTimeout(async () => {
-            // Take the screenshot
-            await page.screenshot({ path: path.resolve(`${folder}/${test.name}.${suffix}.png`) });
-            console.log(`${test.url} saved in ${test.name}.${suffix}.png`);
-            resolve();
+            try {
+              // Take the screenshot
+              await page.screenshot({ path: path.resolve(`${folder}/${test.name}.${suffix}.png`) });
+              console.log(`${test.url} saved in ${test.name}.${suffix}.png`);
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
           }, test.waitFor || 0);
         } catch (e) {
           reject(e);

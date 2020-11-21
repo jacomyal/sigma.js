@@ -42,6 +42,7 @@ export const tests: Tests = [
         cEvent.deltaY = -100;
         element.dispatchEvent(cEvent);
       });
+      return;
     },
   },
   { name: "tiny-graph", url: "http://localhost:8000/tiny.html?seed=foo" },
