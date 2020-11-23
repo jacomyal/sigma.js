@@ -78,7 +78,7 @@
     "pixelmatch": "^5.2.1",
     "pngjs": "^6.0.0",
     "prettier": "^2.1.2",
-    "puppeteer": "^5.4.1",
+    "puppeteer": "^5.5.0",
     "raw-loader": "^4.0.2",
     "replace": "^1.2.0",
     "rimraf": "^3.0.0",
