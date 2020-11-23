@@ -8,7 +8,7 @@ let browser: Browser;
 
 before(function (done) {
   // Setting mocha timeout
-  this.timeout(10000);
+  this.timeout(30000);
   // starting the server with examples
   console.log(`Starting server`);
   startExampleServer().then((svr: WebpackDevServer) => {
@@ -23,7 +23,7 @@ before(function (done) {
 });
 
 after(function (done) {
-  this.timeout(10000);
+  this.timeout(30000);
   // Stopping the server
   console.log(`Stopping the server`);
   server.close(() => {
