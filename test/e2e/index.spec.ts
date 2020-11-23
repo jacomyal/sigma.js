@@ -23,7 +23,7 @@ before(function (done) {
 });
 
 after(function (done) {
-  this.timeout(30000);
+  this.timeout(60000);
   // Stopping the server
   console.log(`Stopping the server`);
   server.close(() => {
