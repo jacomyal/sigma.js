@@ -1,62 +1,54 @@
 import Webpack from "webpack";
 import WebpackDevServer from "webpack-dev-server";
-import puppeteer from "puppeteer";
+import puppeteer, { Browser, Page } from "puppeteer";
+import assert from "assert";
 import path from "path";
 import fs from "fs";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
-import { Tests } from "./config";
+import { Test } from "./config";
 
-// to avoid implicit any error
+// To avoid "implicit any" error
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const webpackConfig = require("./../../examples/webpack.config");
 
 /**
  * Take the screenshots.
  *
- * @param {Array<Tests>} tests List of pages that should be taking in screenshot
+ * @param {Test} test Page that should be taking in screenshot
  * @param {string} folder Path where to saved the screenshots
  * @param {string} suffix The filename will be suffixed with it
  */
-export async function takeScreenshots(tests: Tests, folder: string, suffix = ""): Promise<void> {
-  // Launch the browser
-  const browser = await puppeteer.launch();
+export async function takeScreenshot(browser: Browser, test: Test, folder: string, suffix = ""): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    // Open a new page
+    const page: Page = await browser.newPage();
 
-  // for each pages
-  await Promise.all(
-    tests.map((test) => {
+    // Navigate to URL
+    await page.goto(test.url);
+    console.log(`Page ${test.url} is loaded`);
+
+    // Running the scenario (if needed)
+    if (test.scenario) {
+      console.log(`Running scenario for ${test.name}`);
+      await test.scenario(browser, page);
+    }
+
+    // Taking the screenshot
+    setTimeout(() => {
       console.log(`Generate screenshot for ${test.name} : ${test.url}`);
-      return new Promise(async (resolve, reject) => {
-        try {
-          // Open a new page
-          const page = await browser.newPage();
-          // Navigate to URL
-          await page.goto(test.url);
-          console.log(`Page ${test.url} is loaded`);
-          if (test.scenario) {
-            console.log(`Running scenario for ${test.name}`);
-            await test.scenario(browser, page);
-          }
-          // Taking the screenshot
-          setTimeout(async () => {
-            try {
-              // Take the screenshot
-              await page.screenshot({ path: path.resolve(`${folder}/${test.name}.${suffix}.png`) });
-              console.log(`${test.url} saved in ${test.name}.${suffix}.png`);
-              resolve();
-            } catch (e) {
-              reject(e);
-            }
-          }, test.waitFor || 0);
-        } catch (e) {
+      // Take the screenshot
+      page
+        .screenshot({ path: path.resolve(`${folder}/${test.name}.${suffix}.png`) })
+        .then(() => {
+          console.log(`${test.url} saved in ${test.name}.${suffix}.png`);
+          resolve();
+        })
+        .catch((e) => {
           reject(e);
-        }
-      });
-    }),
-  );
-
-  // Close the browser
-  await browser.close();
+        });
+    }, test.waitFor || 0);
+  });
 }
 
 /**
@@ -78,6 +70,9 @@ export function imageDiff(image1: string, image2: string, diffFilename: string):
   return { diff: nbPixelInDiff, percent: nbPixelInDiff / (width * height) };
 }
 
+/**
+ * Start the webpack dev server.
+ */
 export function startExampleServer(): Promise<WebpackDevServer> {
   return new Promise((resolve) => {
     const compiler = Webpack(webpackConfig);
@@ -92,4 +87,17 @@ export function startExampleServer(): Promise<WebpackDevServer> {
       resolve(server);
     });
   });
+}
+
+export async function runTest(browser: Browser, test: Test): Promise<void> {
+  await takeScreenshot(browser, test, "./test/e2e/screenshots/", "current");
+  const result = imageDiff(
+    path.resolve(`./test/e2e/screenshots/${test.name}.valid.png`),
+    path.resolve(`./test/e2e/screenshots/${test.name}.current.png`),
+    path.resolve(`./test/e2e/screenshots/${test.name}.diff.png`),
+  );
+  assert(
+    result.percent <= (test.failureThreshold || 0),
+    `There is a diff over ${test.failureThreshold || 0} on ${test.name}, please check "${test.name}.diff.png"`,
+  );
 }

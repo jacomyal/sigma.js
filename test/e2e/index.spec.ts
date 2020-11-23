@@ -1,36 +1,44 @@
-import assert from "assert";
-import path from "path";
-import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
-import { tests } from "./config";
+import WebpackDevServer from "webpack-dev-server";
+import puppeteer, { Browser, Page } from "puppeteer";
+import { runTest, startExampleServer } from "./utils";
+import { tests, Test } from "./config";
+
+let server: WebpackDevServer;
+let browser: Browser;
 
 before(function (done) {
-  // No mocha timeout, but there is a timeout of 30sec in puppeteer loading pages
-  this.timeout(0);
-
+  // Setting mocha timeout
+  this.timeout(10000);
   // starting the server with examples
-  startExampleServer().then((server) => {
-    console.log("~~~ Start generating screenshots ~~~");
-    takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
-      console.log("~~~ End generating screenshots ~~~");
-      console.log();
-      // closing the server
-      server.close(done);
+  console.log(`Starting server`);
+  startExampleServer().then((svr: WebpackDevServer) => {
+    server = svr;
+    console.log(`Server is started`);
+    // Launch the browser
+    puppeteer.launch().then((brwsr: Browser) => {
+      browser = brwsr;
+      done();
     });
   });
 });
 
-describe("Compare screenshots", () => {
-  tests.forEach((test) => {
-    it(`Screenshots for "${test.name}" should be the same`, () => {
-      const result = imageDiff(
-        path.resolve(`./test/e2e/screenshots/${test.name}.valid.png`),
-        path.resolve(`./test/e2e/screenshots/${test.name}.current.png`),
-        path.resolve(`./test/e2e/screenshots/${test.name}.diff.png`),
-      );
-      assert(
-        result.percent <= (test.failureThreshold || 0),
-        `There is a diff over ${test.failureThreshold || 0} on ${test.name}, please check "${test.name}.diff.png"`,
-      );
+after(function (done) {
+  this.timeout(10000);
+  // Stopping the server
+  console.log(`Stopping the server`);
+  server.close(() => {
+    console.log(`Server is stopped`);
+    browser.close();
+    done();
+  });
+});
+
+describe("E2E Tests", function () {
+  this.timeout(30000);
+
+  tests.map((test: Test) => {
+    it(`Testing ${test.name}`, async () => {
+      return await runTest(browser, test);
     });
   });
 });

@@ -1,13 +1,14 @@
 import { Browser, Page } from "puppeteer";
-export type Tests = Array<{
+
+export interface Test {
   name: string; // Name of the screenshot, without the extension like for example 'example-basic'
   url: string; // Url of the page to take in screenshot
   waitFor?: number; // Time to wait in ms before to take the screenshot
   scenario?: (browser: Browser, page: Page) => Promise<void>;
   failureThreshold?: number; // between 0 and 1, it's a percent. By default it's 0.
-}>;
+}
 
-export const tests: Tests = [
+export const tests: Array<Test> = [
   {
     name: "animations",
     url: "http://localhost:8000/animations.html?seed=foo",
