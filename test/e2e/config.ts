@@ -28,7 +28,6 @@ export const tests: Array<Test> = [
   { name: "gexf", url: "http://localhost:8000/gexf.html?seed=foo" },
   { name: "force-atlas-2-layout", url: "http://localhost:8000/layout.html?seed=foo" },
   { name: "noverlap-layout", url: "http://localhost:8000/noverlap.html?seed=foo", failureThreshold: 0.00005 },
-  { name: "performance", url: "http://localhost:8000/performance.html?seed=foo" },
   { name: "settings", url: "http://localhost:8000/settings.html?seed=foo" },
   {
     name: "settings-mouse-zoom",
