@@ -23,7 +23,7 @@ before(function (done) {
 });
 
 after(function (done) {
-  this.timeout(60000);
+  this.timeout(30000);
   // Stopping the server
   console.log(`Stopping the server`);
   server.close(() => {
@@ -34,7 +34,7 @@ after(function (done) {
 });
 
 describe("E2E Tests", function () {
-  this.timeout(30000);
+  this.timeout(60000);
 
   tests.map((test: Test) => {
     it(`Testing ${test.name}`, async () => {
