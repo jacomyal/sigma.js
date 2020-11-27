@@ -159,45 +159,54 @@ export default class TouchCaptor extends Captor {
         break;
       }
       case 2: {
-        const newCameraPosition: Partial<CameraState> = {};
+        /**
+         * Here is the thinking here:
+         *
+         * 1. We can find the new angle and ratio, by comparing the vector from "touch one" to "touch two" at the start
+         *    of the d'n'd and now
+         *
+         * 2. We can use `Camera#viewportToGraph` inside formula to retrieve the new camera position, using the graph
+         *    position of a touch at the beginning of the d'n'd (using `startCamera.viewportToGraph`) and the viewport
+         *    position of this same touch now
+         */
+        const newCameraState: Partial<CameraState> = {};
 
         const { x: x0, y: y0 } = touchesPositions[0];
         const { x: x1, y: y1 } = touchesPositions[1];
-        const { x: xStart0, y: yStart0 } = (this.startTouchesPositions || [])[0] as Coordinates;
-        const { x: xStart1, y: yStart1 } = (this.startTouchesPositions || [])[1] as Coordinates;
-
-        const startCamera = Camera.from(startCameraState);
-
-        const startCenterPosition = startCamera.viewportToGraph(this.getDimensions(), {
-          x: (xStart0 + xStart1) / 2,
-          y: (yStart0 + yStart1) / 2,
-        });
-        const endCenterPosition = startCamera.viewportToGraph(this.getDimensions(), {
-          x: (x0 + x1) / 2,
-          y: (y0 + y1) / 2,
-        });
 
         const angleDiff = Math.atan2(y1 - y0, x1 - x0) - (this.startTouchesAngle as number);
-        const ratioDiff =
-          Math.sqrt((y1 - y0) * (y1 - y0) + (x1 - x0) * (x1 - x0)) / (this.startTouchesDistance as number);
+        const ratioDiff = Math.hypot(y1 - y0, x1 - x0) / (this.startTouchesDistance as number);
 
-        // Translation:
-        const xDiff = startCenterPosition.x - endCenterPosition.x;
-        const yDiff = startCenterPosition.y - endCenterPosition.y;
+        // 1.
+        newCameraState.ratio = startCameraState.ratio / ratioDiff;
+        newCameraState.angle = startCameraState.angle + angleDiff;
 
-        // Homothetic transformation:
-        newCameraPosition.ratio = startCameraState.ratio / ratioDiff;
-        // TODO: Rescale the diff vector
+        // 2.
+        const dimensions = this.getDimensions();
+        const touchGraphPosition = Camera.from(startCameraState).viewportToGraph(
+          dimensions,
+          (this.startTouchesPositions || [])[0] as Coordinates,
+        );
+        const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
-        // Rotation:
-        newCameraPosition.angle = startCameraState.angle + angleDiff;
-        // TODO: Rotate the diff vector
+        const dx = smallestDimension / dimensions.width;
+        const dy = smallestDimension / dimensions.height;
+        const ratio = newCameraState.ratio / smallestDimension;
 
-        // Finalize:
-        newCameraPosition.x = startCameraState.x + xDiff;
-        newCameraPosition.y = startCameraState.y + yDiff;
+        // Align with center of the graph:
+        let x = x0 - smallestDimension / 2 / dx;
+        let y = y0 - smallestDimension / 2 / dy;
 
-        this.camera.setState(newCameraPosition);
+        // Rotate:
+        [x, y] = [
+          x * Math.cos(-newCameraState.angle) - y * Math.sin(-newCameraState.angle),
+          y * Math.cos(-newCameraState.angle) + x * Math.sin(-newCameraState.angle),
+        ];
+
+        newCameraState.x = touchGraphPosition.x - x * ratio;
+        newCameraState.y = touchGraphPosition.y + y * ratio;
+
+        this.camera.setState(newCameraState);
 
         break;
       }

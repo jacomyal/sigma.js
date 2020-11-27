@@ -165,16 +165,18 @@ export default class Camera extends EventEmitter implements CameraState {
     const ratio = this.ratio / smallestDimension;
 
     // Align with center of the graph:
-    const x1 = coordinates.x - smallestDimension / 2 / dx;
-    const y1 = coordinates.y - smallestDimension / 2 / dy;
+    let x = coordinates.x - smallestDimension / 2 / dx;
+    let y = coordinates.y - smallestDimension / 2 / dy;
 
     // Rotate:
-    const x2 = x1 * Math.cos(-this.angle) - y1 * Math.sin(-this.angle);
-    const y2 = y1 * Math.cos(-this.angle) + x1 * Math.sin(-this.angle);
+    [x, y] = [
+      x * Math.cos(-this.angle) - y * Math.sin(-this.angle),
+      y * Math.cos(-this.angle) + x * Math.sin(-this.angle),
+    ];
 
     return {
-      x: x2 * ratio + this.x,
-      y: -y2 * ratio + this.y,
+      x: x * ratio + this.x,
+      y: -y * ratio + this.y,
     };
   }
 
