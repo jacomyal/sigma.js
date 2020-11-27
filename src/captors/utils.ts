@@ -17,6 +17,16 @@ export interface MouseCoords extends Coordinates {
   original: MouseEvent;
 }
 
+export interface TouchCoords {
+  touches: Coordinates[];
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
+  shiftKey: boolean;
+  preventDefault(): void;
+  original: TouchEvent;
+}
+
 /**
  * Extract the local X position from a mouse event or touch object.
  *
@@ -77,6 +87,30 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
     shiftKey: e.shiftKey,
 
     // TODO: this is not ideal... But I am wondering why we don't just pass the event through
+    preventDefault: e.preventDefault.bind(e),
+    original: e,
+  };
+}
+
+const MAX_TOUCHES = 2;
+export function getTouchesArray(touches: TouchList): Touch[] {
+  const arr = [];
+  for (let i = 0, l = Math.min(touches.length, MAX_TOUCHES); i < l; i++) arr.push(touches[i]);
+  return arr;
+}
+
+/**
+ * Convert touch coords to sigma coords.
+ */
+export function getTouchCoords(e: TouchEvent): TouchCoords {
+  return {
+    touches: getTouchesArray(e.touches).map(getPosition),
+    ctrlKey: e.ctrlKey,
+    metaKey: e.metaKey,
+    altKey: e.altKey,
+    shiftKey: e.shiftKey,
+
+    // TODO: same as for getMouseCoords
     preventDefault: e.preventDefault.bind(e),
     original: e,
   };

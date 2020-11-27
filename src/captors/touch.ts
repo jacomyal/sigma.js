@@ -1,17 +1,11 @@
 import Captor from "../captor";
 import Camera, { CameraState } from "../camera";
 import { Coordinates, Dimensions } from "../types";
-import { getPosition } from "./utils";
+import { getPosition, getTouchCoords, getTouchesArray } from "./utils";
 
 const DRAG_TIMEOUT = 200;
 const TOUCH_INERTIA_RATIO = 3;
 const TOUCH_INERTIA_DURATION = 200;
-
-function getTouchesArray(touches: TouchList, maxTouches = Infinity): Touch[] {
-  const arr = [];
-  for (let i = 0, l = Math.min(touches.length, maxTouches); i < l; i++) arr.push(touches[i]);
-  return arr;
-}
 
 /**
  * Touch captor class.
@@ -24,7 +18,6 @@ export default class TouchCaptor extends Captor {
   startCameraState?: CameraState;
   touchMode = 0; // number of touches down
   movingTimeout?: number;
-  doubleTap = false;
 
   startTouchesPositions?: Coordinates[];
   startTouchesAngle?: number;
@@ -66,7 +59,7 @@ export default class TouchCaptor extends Captor {
 
     e.preventDefault();
 
-    const touches = getTouchesArray(e.touches, 2);
+    const touches = getTouchesArray(e.touches);
     this.isMoving = true;
     this.touchMode = touches.length;
 
@@ -79,6 +72,8 @@ export default class TouchCaptor extends Captor {
       this.startTouchesAngle = Math.atan2(y1 - y0, x1 - x0);
       this.startTouchesDistance = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
     }
+
+    this.emit("touchdown", getTouchCoords(e));
   }
 
   handleLeave(e: TouchEvent): void {
@@ -105,8 +100,6 @@ export default class TouchCaptor extends Captor {
         // Dispatch event
 
         if (this.isMoving) {
-          this.doubleTap = false;
-
           const cameraState = this.camera.getState(),
             previousCameraState = this.camera.getPreviousState();
 
@@ -126,15 +119,17 @@ export default class TouchCaptor extends Captor {
         this.touchMode = 0;
         break;
     }
+
+    this.emit("touchup", getTouchCoords(e));
   }
 
   handleMove(e: TouchEvent): void {
-    if (this.doubleTap || !this.enabled) return;
+    if (!this.enabled) return;
 
     e.preventDefault();
 
     const startCameraState = this.startCameraState as CameraState;
-    const touches = getTouchesArray(e.touches, 2);
+    const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map(getPosition);
     this.isMoving = true;
 
@@ -211,5 +206,7 @@ export default class TouchCaptor extends Captor {
         break;
       }
     }
+
+    this.emit("touchmove", getTouchCoords(e));
   }
 }

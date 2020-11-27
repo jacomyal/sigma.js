@@ -11,7 +11,6 @@ import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
 import Camera from "../../camera";
 import MouseCaptor from "../../captors/mouse";
-import Captor from "../../captor";
 import QuadTree from "../../quadtree";
 import { Coordinates, Edge, EdgeAttributes, Extent, Node, NodeAttributes } from "../../types";
 import { createElement, getPixelRatio, createNormalizationFunction, NormalizationFunction } from "../utils";
@@ -47,7 +46,8 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 export default class WebGLRenderer extends EventEmitter {
   settings: WebGLSettings;
   graph: Graph;
-  captors: { [key: string]: Captor } = {};
+  mouseCaptor: MouseCaptor;
+  touchCaptor: TouchCaptor;
   container: HTMLElement;
   elements: PlainObject<HTMLCanvasElement> = {};
   canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
@@ -138,10 +138,8 @@ export default class WebGLRenderer extends EventEmitter {
     this.bindCameraHandlers();
 
     // Initializing captors
-    this.captors = {
-      mouse: new MouseCaptor(this.elements.mouse, this.camera),
-      touch: new TouchCaptor(this.elements.mouse, this.camera),
-    };
+    this.mouseCaptor = new MouseCaptor(this.elements.mouse, this.camera);
+    this.touchCaptor = new TouchCaptor(this.elements.mouse, this.camera);
 
     // Binding event handlers
     this.bindEventHandlers();
@@ -385,10 +383,10 @@ export default class WebGLRenderer extends EventEmitter {
     this.activeListeners.handleRightClick = createClickListener("rightClick");
     this.activeListeners.handleDown = createClickListener("down");
 
-    this.captors.mouse.on("mousemove", this.activeListeners.handleMove);
-    this.captors.mouse.on("click", this.activeListeners.handleClick);
-    this.captors.mouse.on("rightClick", this.activeListeners.handleRightClick);
-    this.captors.mouse.on("mousedown", this.activeListeners.handleDown);
+    this.mouseCaptor.on("mousemove", this.activeListeners.handleMove);
+    this.mouseCaptor.on("click", this.activeListeners.handleClick);
+    this.mouseCaptor.on("rightClick", this.activeListeners.handleRightClick);
+    this.mouseCaptor.on("mousedown", this.activeListeners.handleDown);
 
     // TODO
     // Deal with Touch captor events
@@ -606,7 +604,7 @@ export default class WebGLRenderer extends EventEmitter {
    * @return {MouseCaptor}
    */
   getMouseCaptor(): MouseCaptor {
-    return this.captors.mouse as MouseCaptor;
+    return this.mouseCaptor;
   }
 
   /**
@@ -615,7 +613,7 @@ export default class WebGLRenderer extends EventEmitter {
    * @return {TouchCaptor}
    */
   getTouchCaptor(): TouchCaptor {
-    return this.captors.touch as TouchCaptor;
+    return this.touchCaptor;
   }
 
   /**
@@ -716,7 +714,7 @@ export default class WebGLRenderer extends EventEmitter {
 
     // TODO: improve this heuristic or move to the captor itself?
     // TODO: deal with the touch captor here as well
-    const mouseCaptor = this.captors.mouse as MouseCaptor;
+    const mouseCaptor = this.mouseCaptor;
     const moving = this.camera.isAnimated() || mouseCaptor.isMoving || mouseCaptor.hasDragged || mouseCaptor.wheelLock;
 
     // Then we need to extract a matrix from the camera
@@ -1059,8 +1057,8 @@ export default class WebGLRenderer extends EventEmitter {
 
     // Releasing DOM events & captors
     window.removeEventListener("resize", this.activeListeners.handleResize);
-    this.captors.mouse.kill();
-    this.captors.touch.kill();
+    this.mouseCaptor.kill();
+    this.touchCaptor.kill();
 
     // Releasing graph handlers
     graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);
