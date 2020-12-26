@@ -16,7 +16,7 @@ const DRAG_TIMEOUT = 200;
 const DRAGGED_EVENTS_TOLERANCE = 3;
 const MOUSE_INERTIA_DURATION = 200;
 const MOUSE_INERTIA_RATIO = 3;
-const MOUSE_ZOOM_DURATION = 200;
+const MOUSE_ZOOM_DURATION = 250;
 const ZOOMING_RATIO = 1.7;
 const DOUBLE_CLICK_TIMEOUT = 300;
 const DOUBLE_CLICK_ZOOMING_RATIO = 2.2;
@@ -40,7 +40,9 @@ export default class MouseCaptor extends Captor {
   startCameraState: CameraState | null = null;
   clicks = 0;
   doubleClickTimeout: number | null = null;
+
   currentWheelDirection: -1 | 0 | 1 = 0;
+  lastWheelTriggerTime?: number;
 
   constructor(container: HTMLElement, camera: Camera) {
     super(container, camera);
@@ -265,10 +267,18 @@ export default class MouseCaptor extends Captor {
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
     const newRatio = this.camera.getState().ratio * ratioDiff;
     const wheelDirection = delta > 0 ? 1 : -1;
+    const now = Date.now();
 
-    if (this.currentWheelDirection === wheelDirection) return false;
+    // Cancel events that are too close too each other and in the same direction:
+    if (
+      this.currentWheelDirection === wheelDirection &&
+      this.lastWheelTriggerTime &&
+      now - this.lastWheelTriggerTime < MOUSE_ZOOM_DURATION / 5
+    )
+      return false;
 
     this.currentWheelDirection = wheelDirection;
+    this.lastWheelTriggerTime = now;
 
     this.camera.animate(
       this.camera.getViewportZoomedState(
@@ -280,7 +290,7 @@ export default class MouseCaptor extends Captor {
         newRatio,
       ),
       {
-        easing: "linear",
+        easing: "quadraticOut",
         duration: MOUSE_ZOOM_DURATION,
       },
       () => {

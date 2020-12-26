@@ -12,7 +12,7 @@ import easings from "./easings";
  * Defaults.
  */
 export interface AnimateOptions {
-  easing: string | ((k: number) => number);
+  easing: keyof typeof easings | ((k: number) => number);
   duration: number;
 }
 export const ANIMATE_DEFAULTS = {
