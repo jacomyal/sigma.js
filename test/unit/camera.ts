@@ -167,4 +167,16 @@ describe("Camera", function () {
     assert.ok(Math.abs(viewportTarget.x - finalViewport.x) < 0.00001);
     assert.ok(Math.abs(viewportTarget.y - finalViewport.y) < 0.00001);
   });
+
+  it("should trigger the animation callback when starting a new animation (regression #1107).", function () {
+    let flag = false;
+
+    const camera = new Camera();
+    camera.animate({}, { duration: 500 }, () => {
+      flag = true;
+    });
+    camera.animate({});
+
+    assert.deepStrictEqual(flag, true);
+  });
 });

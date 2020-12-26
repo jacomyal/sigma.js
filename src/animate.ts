@@ -5,7 +5,7 @@
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
 import Graph from "graphology";
-import { assign, PlainObject } from "./utils";
+import { assign, cancelFrame, PlainObject, requestFrame } from "./utils";
 import easings from "./easings";
 
 /**
@@ -71,12 +71,12 @@ export function animateNodes(
       for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
     }
 
-    frame = requestAnimationFrame(step);
+    frame = requestFrame(step);
   };
 
   step();
 
   return () => {
-    if (frame) cancelAnimationFrame(frame);
+    if (frame) cancelFrame(frame);
   };
 }

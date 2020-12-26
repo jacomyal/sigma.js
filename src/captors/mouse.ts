@@ -283,7 +283,9 @@ export default class MouseCaptor extends Captor {
         easing: "linear",
         duration: MOUSE_ZOOM_DURATION,
       },
-      () => (this.wheelLock = false),
+      () => {
+        this.wheelLock = false;
+      },
     );
 
     return false;

@@ -16,7 +16,7 @@ import QuadTree from "../../quadtree";
 import { Coordinates, Edge, EdgeAttributes, Extent, Node, NodeAttributes } from "../../types";
 import { createElement, getPixelRatio, createNormalizationFunction, NormalizationFunction } from "../utils";
 import { matrixFromCamera } from "./utils";
-import { assign, PlainObject } from "../../utils";
+import { assign, cancelFrame, PlainObject, requestFrame } from "../../utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "../../heuristics/labels";
 import { zIndexOrdering } from "../../heuristics/z-index";
 import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
@@ -685,7 +685,7 @@ export default class WebGLRenderer extends EventEmitter {
   render(): WebGLRenderer {
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
-      cancelAnimationFrame(this.renderFrame);
+      cancelFrame(this.renderFrame);
       this.renderFrame = null;
       this.needToProcess = false;
       this.needToSoftProcess = false;
@@ -944,7 +944,7 @@ export default class WebGLRenderer extends EventEmitter {
     if (this.renderFrame) return;
 
     // Let's schedule a frame
-    this.renderFrame = requestAnimationFrame(() => {
+    this.renderFrame = requestFrame(() => {
       // Do we need to process data?
       if (this.needToProcess) {
         this.process();
@@ -969,7 +969,7 @@ export default class WebGLRenderer extends EventEmitter {
   scheduleHighlightedNodesRender(): void {
     if (this.renderHighlightedNodesFrame || this.renderFrame) return;
 
-    this.renderHighlightedNodesFrame = requestAnimationFrame(() => {
+    this.renderHighlightedNodesFrame = requestFrame(() => {
       // Resetting state
       this.renderHighlightedNodesFrame = null;
 
@@ -1068,12 +1068,12 @@ export default class WebGLRenderer extends EventEmitter {
 
     // Clearing frames
     if (this.renderFrame) {
-      cancelAnimationFrame(this.renderFrame);
+      cancelFrame(this.renderFrame);
       this.renderFrame = null;
     }
 
     if (this.renderHighlightedNodesFrame) {
-      cancelAnimationFrame(this.renderHighlightedNodesFrame);
+      cancelFrame(this.renderHighlightedNodesFrame);
       this.renderHighlightedNodesFrame = null;
     }
 

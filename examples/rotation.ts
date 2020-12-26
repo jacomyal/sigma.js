@@ -1,6 +1,7 @@
 import { UndirectedGraph } from "graphology";
 
 import WebGLRenderer from "../src/renderers/webgl/index";
+import { requestFrame } from "../src/utils";
 import miserables from "./resources/les-miserables.json";
 
 const graph = new UndirectedGraph();
@@ -24,6 +25,6 @@ function rotate() {
     ...camera.getState(),
     angle: camera.getState().angle + 0.01,
   });
-  requestAnimationFrame(rotate);
+  requestFrame(rotate);
 }
 rotate();

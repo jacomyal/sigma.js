@@ -63,3 +63,15 @@ export function assign<T>(target: Partial<T> | undefined, ...objects: Array<Part
 
   return target as T;
 }
+
+/**
+ * Just some dirty trick to make requestAnimationFrame and cancelAnimationFrame "work" in Node.js, for unit tests:
+ */
+export const requestFrame =
+  typeof requestAnimationFrame !== "undefined"
+    ? (callback: FrameRequestCallback) => requestAnimationFrame(callback)
+    : (callback: FrameRequestCallback) => setTimeout(callback, 0);
+export const cancelFrame =
+  typeof cancelAnimationFrame !== "undefined"
+    ? (requestID: number) => cancelAnimationFrame(requestID)
+    : (requestID: number) => clearTimeout(requestID);

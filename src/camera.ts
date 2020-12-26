@@ -8,7 +8,7 @@ import { EventEmitter } from "events";
 
 import { ANIMATE_DEFAULTS, AnimateOptions } from "./animate";
 import easings from "./easings";
-import { assign } from "./utils";
+import { assign, cancelFrame, requestFrame } from "./utils";
 import { Coordinates, Dimensions } from "./types";
 
 /**
@@ -39,6 +39,8 @@ export default class Camera extends EventEmitter implements CameraState {
   nextFrame: number | null = null;
   previousState: CameraState;
   enabled = true;
+
+  animationCallback?: () => void;
 
   constructor() {
     super();
@@ -276,9 +278,6 @@ export default class Camera extends EventEmitter implements CameraState {
     const easing: (k: number) => number =
       typeof options.easing === "function" ? options.easing : easings[options.easing];
 
-    // Canceling previous animation if needed
-    if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
-
     // State
     const start = Date.now(),
       initialState = this.getState();
@@ -292,7 +291,10 @@ export default class Camera extends EventEmitter implements CameraState {
         this.nextFrame = null;
         this.setState(state);
 
-        if (typeof callback === "function") callback();
+        if (this.animationCallback) {
+          this.animationCallback.call(null);
+          this.animationCallback = undefined;
+        }
 
         return;
       }
@@ -308,15 +310,17 @@ export default class Camera extends EventEmitter implements CameraState {
 
       this.setState(newState);
 
-      this.nextFrame = requestAnimationFrame(fn);
+      this.nextFrame = requestFrame(fn);
     };
 
     if (this.nextFrame) {
-      cancelAnimationFrame(this.nextFrame);
-      this.nextFrame = requestAnimationFrame(fn);
+      cancelFrame(this.nextFrame);
+      if (this.animationCallback) this.animationCallback.call(null);
+      this.nextFrame = requestFrame(fn);
     } else {
       fn();
     }
+    this.animationCallback = callback;
   }
 
   /**
