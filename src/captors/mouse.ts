@@ -40,7 +40,7 @@ export default class MouseCaptor extends Captor {
   startCameraState: CameraState | null = null;
   clicks = 0;
   doubleClickTimeout: number | null = null;
-  wheelLock = false;
+  currentWheelDirection: -1 | 0 | 1 = 0;
 
   constructor(container: HTMLElement, camera: Camera) {
     super(container, camera);
@@ -262,12 +262,13 @@ export default class MouseCaptor extends Captor {
 
     if (!delta) return false;
 
-    if (this.wheelLock) return false;
-
-    this.wheelLock = true;
-
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
     const newRatio = this.camera.getState().ratio * ratioDiff;
+    const wheelDirection = delta > 0 ? 1 : -1;
+
+    if (this.currentWheelDirection === wheelDirection) return false;
+
+    this.currentWheelDirection = wheelDirection;
 
     this.camera.animate(
       this.camera.getViewportZoomedState(
@@ -283,7 +284,7 @@ export default class MouseCaptor extends Captor {
         duration: MOUSE_ZOOM_DURATION,
       },
       () => {
-        this.wheelLock = false;
+        this.currentWheelDirection = 0;
       },
     );
 

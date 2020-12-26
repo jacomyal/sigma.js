@@ -716,7 +716,10 @@ export default class WebGLRenderer extends EventEmitter {
     // TODO: deal with the touch captor here as well
     const mouseCaptor = this.mouseCaptor;
     const moving =
-      this.camera.isAnimated() || mouseCaptor.isMoving || mouseCaptor.draggedEvents || mouseCaptor.wheelLock;
+      this.camera.isAnimated() ||
+      mouseCaptor.isMoving ||
+      mouseCaptor.draggedEvents ||
+      mouseCaptor.currentWheelDirection;
 
     // Then we need to extract a matrix from the camera
     const cameraState = this.camera.getState(),
