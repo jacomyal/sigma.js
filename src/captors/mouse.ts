@@ -13,6 +13,7 @@ import { getX, getY, getWheelDelta, getMouseCoords } from "./utils";
  * Constants.
  */
 const DRAG_TIMEOUT = 200;
+const DRAGGED_EVENTS_TOLERANCE = 3;
 const MOUSE_INERTIA_DURATION = 200;
 const MOUSE_INERTIA_RATIO = 3;
 const MOUSE_ZOOM_DURATION = 200;
@@ -29,7 +30,7 @@ const DOUBLE_CLICK_ZOOMING_DURATION = 200;
 export default class MouseCaptor extends Captor {
   // State
   enabled = true;
-  hasDragged = false;
+  draggedEvents = 0;
   downStartTime: number | null = null;
   lastMouseX: number | null = null;
   lastMouseY: number | null = null;
@@ -97,7 +98,7 @@ export default class MouseCaptor extends Captor {
     }, DOUBLE_CLICK_TIMEOUT);
 
     // NOTE: this is here to prevent click events on drag
-    if (!this.hasDragged) this.emit("click", getMouseCoords(e));
+    if (this.draggedEvents < DRAGGED_EVENTS_TOLERANCE) this.emit("click", getMouseCoords(e));
   }
 
   handleRightClick(e: MouseEvent): void {
@@ -142,7 +143,7 @@ export default class MouseCaptor extends Captor {
     this.lastMouseX = getX(e);
     this.lastMouseY = getY(e);
 
-    this.hasDragged = false;
+    this.draggedEvents = 0;
 
     this.downStartTime = Date.now();
 
@@ -190,7 +191,7 @@ export default class MouseCaptor extends Captor {
     }
 
     this.isMoving = false;
-    setTimeout(() => (this.hasDragged = false), 0);
+    setTimeout(() => (this.draggedEvents = 0), 0);
     this.emit("mouseup", getMouseCoords(e));
   }
 
@@ -201,7 +202,7 @@ export default class MouseCaptor extends Captor {
     if (this.isMouseDown) {
       // TODO: dispatch events
       this.isMoving = true;
-      this.hasDragged = true;
+      this.draggedEvents++;
 
       if (typeof this.movingTimeout === "number") {
         clearTimeout(this.movingTimeout);
