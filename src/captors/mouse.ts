@@ -274,11 +274,9 @@ export default class MouseCaptor extends Captor {
       this.currentWheelDirection === wheelDirection &&
       this.lastWheelTriggerTime &&
       now - this.lastWheelTriggerTime < MOUSE_ZOOM_DURATION / 5
-    )
+    ) {
       return false;
-
-    this.currentWheelDirection = wheelDirection;
-    this.lastWheelTriggerTime = now;
+    }
 
     this.camera.animate(
       this.camera.getViewportZoomedState(
@@ -297,6 +295,9 @@ export default class MouseCaptor extends Captor {
         this.currentWheelDirection = 0;
       },
     );
+
+    this.currentWheelDirection = wheelDirection;
+    this.lastWheelTriggerTime = now;
 
     return false;
   }
