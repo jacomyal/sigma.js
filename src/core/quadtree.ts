@@ -9,8 +9,8 @@
  * we don't waste time rendering things the user cannot see anyway.
  */
 import extend from "@yomguithereal/helpers/extend";
-import { PlainObject } from "../utils/utils";
 import { NodeKey } from "graphology-types";
+import { PlainObject } from "../types";
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.

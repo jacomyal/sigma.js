@@ -1,36 +1,36 @@
-const path = require('path');
+const path = require("path");
 
-let production = process.argv.indexOf('--mode');
-production = production !== -1 ? (process.argv[production + 1] === 'production') : false;
+let production = process.argv.indexOf("--mode");
+production = production !== -1 ? process.argv[production + 1] === "production" : false;
 
 const moduleConfig = {
   rules: [
     {
       test: /\.glsl$/,
       exclude: /node_modules/,
-      loader: 'raw-loader',
+      loader: "raw-loader",
     },
     {
       test: /\.ts$/,
       exclude: /node_modules/,
-      loader: 'ts-loader',
+      loader: "ts-loader",
     },
   ],
 };
 
 module.exports = [
   {
-    name: 'sigma',
-    mode: production ? 'production' : 'none',
-    entry: './src/endpoint.ts',
+    name: "sigma",
+    mode: production ? "production" : "none",
+    entry: "./src/index.ts",
     output: {
-      filename: production ? 'sigma.min.js' : 'sigma.js',
-      path: path.join(__dirname, 'build'),
-      library: 'Sigma',
-      libraryTarget: 'umd',
+      filename: production ? "sigma.min.js" : "sigma.js",
+      path: path.join(__dirname, "build"),
+      library: "Sigma",
+      libraryTarget: "umd",
     },
     resolve: {
-      extensions: ['.ts', '.js', '.glsl'],
+      extensions: [".ts", ".js", ".glsl"],
     },
     module: moduleConfig,
   },

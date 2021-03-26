@@ -6,11 +6,11 @@
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
  */
-import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
 import { NodeAttributes } from "../../../types";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
+import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
 
 const POINTS = 1,
   ATTRIBUTES = 4;

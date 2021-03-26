@@ -5,10 +5,10 @@
  * Miscelleneous heuristics related to label display.
  */
 import Graph from "graphology";
-import Camera from "./camera";
+import { EdgeKey, NodeKey } from "graphology-types";
 import { NodeAttributes } from "../types";
 import Sigma from "../sigma";
-import { EdgeKey, NodeKey } from "graphology-types";
+import Camera from "./camera";
 /**
  * Constants.
  */

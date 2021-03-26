@@ -8,10 +8,10 @@
  * indicating which "corner" of the triangle to draw.
  */
 import { NodeAttributes } from "../../../types";
-import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.vert.glsl";
 import fragmentShaderSource from "../shaders/node.frag.glsl";
+import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
 
 const POINTS = 3,
   ATTRIBUTES = 5;

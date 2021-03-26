@@ -6,7 +6,7 @@ import { extent } from "simple-statistics";
 import Sigma from "../src/sigma";
 import { animateNodes } from "../src/utils/animate";
 import miserables from "./resources/les-miserables.json";
-import { PlainObject } from "../src/utils/utils";
+import { PlainObject } from "../src/types";
 
 const graph = new UndirectedGraph();
 

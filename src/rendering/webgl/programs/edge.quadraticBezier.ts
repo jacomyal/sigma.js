@@ -3,10 +3,10 @@
  * ======================================================
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.quadraticBezier.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.quadraticBezier.frag.glsl";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 
 const POINTS = 3,
   ATTRIBUTES = 5;

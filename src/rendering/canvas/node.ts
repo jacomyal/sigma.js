@@ -4,8 +4,7 @@
  *
  * Function used by the canvas renderer to display a single node.
  */
-import { PartialButFor } from "../../utils/utils";
-import { NodeAttributes } from "../../types";
+import { NodeAttributes, PartialButFor } from "../../types";
 
 const PI_TIMES_2 = Math.PI * 2;
 

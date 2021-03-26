@@ -5,10 +5,10 @@
  * Program rendering directed edges as a single anti-aliased triangle.
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.triangle.frag.glsl";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 
 const POINTS = 3,
   ATTRIBUTES = 9;

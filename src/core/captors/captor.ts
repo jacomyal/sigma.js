@@ -3,8 +3,7 @@
  * ======================
  */
 import { EventEmitter } from "events";
-import { Coordinates } from "../../types";
-
+import { Coordinates, MouseCoords, TouchCoords } from "../../types";
 import Camera from "../camera";
 
 /**

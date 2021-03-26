@@ -5,7 +5,8 @@
  * Handy helper functions dealing with nodes & edges attributes animation.
  */
 import Graph from "graphology";
-import { assign, cancelFrame, PlainObject, requestFrame } from "./utils";
+import { PlainObject } from "../types";
+import { assign, cancelFrame, requestFrame } from "./index";
 import easings from "./easings";
 
 /**

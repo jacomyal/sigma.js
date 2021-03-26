@@ -9,7 +9,7 @@
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
-import { floatColor, canUse32BitsIndices } from "../utils";
+import { floatColor, canUse32BitsIndices } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
 

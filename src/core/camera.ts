@@ -8,8 +8,8 @@ import { EventEmitter } from "events";
 
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
-import { assign, cancelFrame, requestFrame } from "../utils/utils";
-import { Coordinates, Dimensions } from "../types";
+import { assign, cancelFrame, requestFrame } from "../utils";
+import { CameraState, Coordinates, Dimensions } from "../types";
 
 /**
  * Defaults.
@@ -22,10 +22,6 @@ const DEFAULT_ZOOMING_RATIO = 1.5;
 // TODO: bind camera to renderer rather than sigma
 // TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
 
-export interface CameraState extends Coordinates {
-  angle: number;
-  ratio: number;
-}
 /**
  * Camera class
  *

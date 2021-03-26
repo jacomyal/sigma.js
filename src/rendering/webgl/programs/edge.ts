@@ -14,11 +14,11 @@
  * This version of the shader balances geometry computation evenly between
  * the CPU & GPU (normals are computed on the CPU side).
  */
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { floatColor, canUse32BitsIndices } from "../../../utils";
 import { EdgeAttributes, NodeAttributes } from "../../../types";
-import { floatColor, canUse32BitsIndices } from "../utils";
 import vertexShaderSource from "../shaders/edge.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 
 const POINTS = 4,
   ATTRIBUTES = 6,

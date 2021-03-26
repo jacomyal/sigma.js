@@ -1,7 +1,6 @@
-import Captor from "./captor";
-import Camera, { CameraState } from "../camera";
-import { Coordinates, Dimensions } from "../../types";
-import { getPosition, getTouchCoords, getTouchesArray } from "./utils";
+import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
+import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
+import Camera from "../camera";
 
 const DRAG_TIMEOUT = 200;
 const TOUCH_INERTIA_RATIO = 3;

@@ -6,10 +6,10 @@
  * won't render thickness correctly on some GPUs and has some quirks.
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 
 const POINTS = 2,
   ATTRIBUTES = 3;

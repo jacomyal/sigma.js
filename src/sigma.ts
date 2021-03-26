@@ -12,20 +12,33 @@ import Graph from "graphology";
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import QuadTree from "./core/quadtree";
-import { Coordinates, Edge, EdgeAttributes, Extent, Node, NodeAttributes } from "./types";
-import { createElement, getPixelRatio, createNormalizationFunction, NormalizationFunction } from "./renderers/utils";
-import { matrixFromCamera } from "./rendering/webgl/utils";
-import { assign, cancelFrame, PlainObject, requestFrame } from "./utils/utils";
+import {
+  Coordinates,
+  Edge,
+  EdgeAttributes,
+  Extent,
+  Listener,
+  MouseCoords,
+  Node,
+  NodeAttributes,
+  PlainObject,
+} from "./types";
+import {
+  createElement,
+  getPixelRatio,
+  createNormalizationFunction,
+  NormalizationFunction,
+  assign,
+  cancelFrame,
+  matrixFromCamera,
+  requestFrame,
+  zIndexOrdering,
+} from "./utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
-import { zIndexOrdering } from "./heuristics/z-index";
 import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
-import { MouseCoords } from "./core/captors/utils";
 import TouchCaptor from "./core/captors/touch";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Listener = (...args: any[]) => void;
 
 const { nodeExtent, edgeExtent } = graphExtent;
 

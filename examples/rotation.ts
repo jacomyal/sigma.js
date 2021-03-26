@@ -1,7 +1,7 @@
 import { UndirectedGraph } from "graphology";
 
 import Sigma from "../src/sigma";
-import { requestFrame } from "../src/utils/utils";
+import { requestFrame } from "../src/utils";
 import miserables from "./resources/les-miserables.json";
 
 const graph = new UndirectedGraph();

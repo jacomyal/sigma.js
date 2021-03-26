@@ -4,11 +4,11 @@
  *
  * Program rendering direction arrows as a simple triangle.
  */
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { EdgeAttributes, NodeAttributes } from "../../../types";
-import { floatColor } from "../utils";
+import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.arrowHead.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.arrowHead.frag.glsl";
+import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 
 const POINTS = 3,
   ATTRIBUTES = 10,
