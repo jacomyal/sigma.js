@@ -61,7 +61,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {Camera}
    */
-  enable(): Camera {
+  enable(): this {
     this.enabled = true;
     return this;
   }
@@ -71,7 +71,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {Camera}
    */
-  disable(): Camera {
+  disable(): this {
     this.enabled = false;
     return this;
   }
@@ -209,7 +209,7 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {object} state - New state.
    * @return {Camera}
    */
-  setState(state: Partial<CameraState>): Camera {
+  setState(state: Partial<CameraState>): this {
     if (!this.enabled) return this;
 
     // TODO: validations

@@ -199,7 +199,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createCanvasContext(id: string): Sigma {
+  createCanvasContext(id: string): this {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -219,7 +219,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createWebGLContext(id: string): Sigma {
+  createWebGLContext(id: string): this {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -263,7 +263,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindCameraHandlers(): Sigma {
+  bindCameraHandlers(): this {
     this.activeListeners.camera = () => {
       this.scheduleRender();
     };
@@ -278,7 +278,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindEventHandlers(): Sigma {
+  bindEventHandlers(): this {
     // Handling window resize
     this.activeListeners.handleResize = () => {
       this.needToSoftProcess = true;
@@ -412,7 +412,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindGraphHandlers(): Sigma {
+  bindGraphHandlers(): this {
     const graph = this.graph;
 
     this.activeListeners.graphUpdate = () => {
@@ -461,7 +461,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  process(keepArrays = false): Sigma {
+  process(keepArrays = false): this {
     const graph = this.graph,
       settings = this.settings;
 
@@ -567,7 +567,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  processNode(key: NodeKey): Sigma {
+  processNode(key: NodeKey): this {
     const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
     const data = this.graph.getNodeAttributes(key) as NodeAttributes;
@@ -582,7 +582,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  processEdge(key: EdgeKey): Sigma {
+  processEdge(key: EdgeKey): this {
     const graph = this.graph;
 
     const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
@@ -636,7 +636,7 @@ export default class Sigma extends EventEmitter {
    * @param  {number} height - Target height.
    * @return {Sigma}
    */
-  resize(width?: number, height?: number): Sigma {
+  resize(width?: number, height?: number): this {
     const previousWidth = this.width,
       previousHeight = this.height;
 
@@ -692,7 +692,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  clear(): Sigma {
+  clear(): this {
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
@@ -707,7 +707,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  render(): Sigma {
+  render(): this {
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
@@ -784,7 +784,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  renderLabels(): Sigma {
+  renderLabels(): this {
     if (!this.settings.renderLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -863,7 +863,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  renderEdgeLabels(): Sigma {
+  renderEdgeLabels(): this {
     if (!this.settings.renderEdgeLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -1014,7 +1014,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  refresh(): Sigma {
+  refresh(): this {
     this.needToSoftProcess = true;
     this.scheduleRender();
 
@@ -1027,7 +1027,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} key - The node's key.
    * @return {Sigma}
    */
-  highlightNode(key: NodeKey): Sigma {
+  highlightNode(key: NodeKey): this {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.add(key);
@@ -1044,7 +1044,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} key - The node's key.
    * @return {Sigma}
    */
-  unhighlightNode(key: NodeKey): Sigma {
+  unhighlightNode(key: NodeKey): this {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.delete(key);
