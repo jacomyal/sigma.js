@@ -73,8 +73,6 @@ export interface NodeAttributes extends Coordinates {
   color: string;
   hidden: boolean;
   label: string;
-  x: number;
-  y: number;
 }
 
 export interface EdgeAttributes {
