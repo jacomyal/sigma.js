@@ -41,34 +41,25 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
 
     // Uniform locations
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting scaleLocation");
+    if (scaleLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
-    if (cameraRatioLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting cameraRatioLocation",
-      );
+    if (cameraRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting cameraRatioLocation");
     this.cameraRatioLocation = cameraRatioLocation;
 
     const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
     if (viewportRatioLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting viewportRatioLocation",
-      );
+      throw new Error("EdgeArrowHeadProgram: error while getting viewportRatioLocation");
     this.viewportRatioLocation = viewportRatioLocation;
 
     const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
     if (thicknessRatioLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting thicknessRatioLocation",
-      );
+      throw new Error("EdgeArrowHeadProgram: error while getting thicknessRatioLocation");
     this.thicknessRatioLocation = thicknessRatioLocation;
 
     this.bind();

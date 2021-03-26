@@ -32,8 +32,7 @@ export default class NodeProgram extends AbstractNodeProgram {
 
     // Resolution location
     const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/node.NodeProgram: error while getting resolutionLocation");
+    if (resolutionLocation === null) throw new Error("NodeProgram: error while getting resolutionLocation");
     this.resolutionLocation = resolutionLocation;
 
     // Bindings

@@ -22,7 +22,7 @@ export function getX(e: MouseEvent | Touch): number {
 
   if (typeof e.clientX !== "undefined") return e.clientX;
 
-  throw new Error("sigma/captors/utils.getX: could not extract x from event.");
+  throw new Error("Captor: could not extract x from event.");
 }
 
 /**
@@ -36,7 +36,7 @@ export function getY(e: MouseEvent | Touch): number {
 
   if (typeof e.clientY !== "undefined") return e.clientY;
 
-  throw new Error("sigma/captors/utils.getY: could not extract y from event.");
+  throw new Error("Captor: could not extract y from event.");
 }
 
 /**
@@ -112,7 +112,7 @@ export function getWheelDelta(e: WheelEvent): number {
 
   if (typeof e.detail !== "undefined") return e.detail / -9;
 
-  throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
+  throw new Error("Captor: could not extract delta from event.");
 }
 
 /**

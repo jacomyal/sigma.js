@@ -51,8 +51,7 @@ export abstract class AbstractProgram implements IProgram {
     this.vertexShaderSource = vertexShaderSource;
     this.fragmentShaderSource = fragmentShaderSource;
     const buffer = gl.createBuffer();
-    if (buffer === null)
-      throw new Error("sigma/renderers/webgl/program/program.Program: error while creating the buffer");
+    if (buffer === null) throw new Error("AbstractProgram: error while creating the buffer");
     this.buffer = buffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 

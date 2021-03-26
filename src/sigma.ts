@@ -101,10 +101,8 @@ export default class Sigma extends EventEmitter {
     validateSettings(this.settings);
 
     // Validating
-    if (!isGraph(graph)) throw new Error("sigma/renderers/webgl: invalid graph instance.");
-
-    if (!(container instanceof HTMLElement))
-      throw new Error("sigma/renderers/webgl: container should be an html element.");
+    if (!isGraph(graph)) throw new Error("Sigma: invalid graph instance.");
+    if (!(container instanceof HTMLElement)) throw new Error("Sigma: container should be an html element.");
 
     // Properties
     this.graph = graph;
@@ -648,9 +646,9 @@ export default class Sigma extends EventEmitter {
       this.height = this.container.offsetHeight;
     }
 
-    if (this.width === 0) throw new Error("sigma/renderers/webgl: container has no width.");
+    if (this.width === 0) throw new Error("Sigma: container has no width.");
 
-    if (this.height === 0) throw new Error("sigma/renderers/webgl: container has no height.");
+    if (this.height === 0) throw new Error("Sigma: container has no height.");
 
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height) return this;

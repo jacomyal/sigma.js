@@ -39,8 +39,7 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
 
     // Initializing indices buffer
     const indicesBuffer = gl.createBuffer();
-    if (indicesBuffer === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
+    if (indicesBuffer === null) throw new Error("EdgeClampedProgram: error while getting resolutionLocation");
     this.indicesBuffer = indicesBuffer;
 
     // Locations:
@@ -52,32 +51,25 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
 
     // Uniform locations
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
+    if (scaleLocation === null) throw new Error("EdgeClampedProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeClampedProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
-    if (cameraRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting cameraRatioLocation");
+    if (cameraRatioLocation === null) throw new Error("EdgeClampedProgram: error while getting cameraRatioLocation");
     this.cameraRatioLocation = cameraRatioLocation;
 
     const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
     if (viewportRatioLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting viewportRatioLocation",
-      );
+      throw new Error("EdgeClampedProgram: error while getting viewportRatioLocation");
     this.viewportRatioLocation = viewportRatioLocation;
 
     const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
     if (thicknessRatioLocation === null)
-      throw new Error(
-        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting thicknessRatioLocation",
-      );
+      throw new Error("EdgeClampedProgram: error while getting thicknessRatioLocation");
     this.thicknessRatioLocation = thicknessRatioLocation;
 
     // Enabling the OES_element_index_uint extension

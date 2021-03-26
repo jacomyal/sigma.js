@@ -36,23 +36,19 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
 
     // Uniform locations
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeTriangleProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting resolutionLocation");
+    if (resolutionLocation === null) throw new Error("EdgeTriangleProgram: error while getting resolutionLocation");
     this.resolutionLocation = resolutionLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting ratioLocation");
+    if (ratioLocation === null) throw new Error("EdgeTriangleProgram: error while getting ratioLocation");
     this.ratioLocation = ratioLocation;
 
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeTriangleProgram: error while getting scaleLocation");
+    if (scaleLocation === null) throw new Error("EdgeTriangleProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     this.bind();

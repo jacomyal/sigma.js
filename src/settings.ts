@@ -25,7 +25,7 @@ export function validateSettings(settings: Settings): void {
     typeof settings.labelGrid.cell === "object" &&
     (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)
   ) {
-    throw new Error("sigma/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+    throw new Error("Settings: invalid `labelGrid.cell`. Expecting {width, height}.");
   }
 }
 
