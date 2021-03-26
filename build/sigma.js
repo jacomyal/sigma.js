@@ -2006,7 +2006,7 @@ function getX(e) {
         return e.offsetX;
     if (typeof e.clientX !== "undefined")
         return e.clientX;
-    throw new Error("sigma/captors/utils.getX: could not extract x from event.");
+    throw new Error("Captor: could not extract x from event.");
 }
 exports.getX = getX;
 /**
@@ -2020,7 +2020,7 @@ function getY(e) {
         return e.offsetY;
     if (typeof e.clientY !== "undefined")
         return e.clientY;
-    throw new Error("sigma/captors/utils.getY: could not extract y from event.");
+    throw new Error("Captor: could not extract y from event.");
 }
 exports.getY = getY;
 /**
@@ -2095,7 +2095,7 @@ function getWheelDelta(e) {
         return (e.deltaY * -3) / 360;
     if (typeof e.detail !== "undefined")
         return e.detail / -9;
-    throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
+    throw new Error("Captor: could not extract delta from event.");
 }
 exports.getWheelDelta = getWheelDelta;
 /**
@@ -2198,13 +2198,13 @@ var Sigma = /** @class */ (function (_super) {
         // programs
         _this.nodePrograms = {};
         _this.edgePrograms = {};
-        _this.settings = utils_1.assign({}, settings_1.WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
-        settings_1.validateWebglRendererSettings(_this.settings);
+        _this.settings = utils_1.assign({}, settings_1.DEFAULT_SETTINGS, settings);
+        settings_1.validateSettings(_this.settings);
         // Validating
         if (!is_graph_1.default(graph))
-            throw new Error("sigma/renderers/webgl: invalid graph instance.");
+            throw new Error("Sigma: invalid graph instance.");
         if (!(container instanceof HTMLElement))
-            throw new Error("sigma/renderers/webgl: container should be an html element.");
+            throw new Error("Sigma: container should be an html element.");
         // Properties
         _this.graph = graph;
         _this.container = container;
@@ -2618,9 +2618,9 @@ var Sigma = /** @class */ (function (_super) {
             this.height = this.container.offsetHeight;
         }
         if (this.width === 0)
-            throw new Error("sigma/renderers/webgl: container has no width.");
+            throw new Error("Sigma: container has no width.");
         if (this.height === 0)
-            throw new Error("sigma/renderers/webgl: container has no height.");
+            throw new Error("Sigma: container has no height.");
         // If nothing has changed, we can stop right here
         if (previousWidth === this.width && previousHeight === this.height)
             return this;
@@ -3413,7 +3413,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.WEBGL_RENDERER_DEFAULT_SETTINGS = exports.validateWebglRendererSettings = void 0;
+exports.DEFAULT_SETTINGS = exports.validateSettings = void 0;
 var label_1 = __importDefault(__webpack_require__(17));
 var hover_1 = __importDefault(__webpack_require__(18));
 var edge_label_1 = __importDefault(__webpack_require__(20));
@@ -3421,22 +3421,22 @@ var node_fast_1 = __importDefault(__webpack_require__(21));
 var edge_1 = __importDefault(__webpack_require__(27));
 var edge_arrow_1 = __importDefault(__webpack_require__(31));
 /**
- * Sigma.js WebGL Renderer Settings
+ * Sigma.js Settings
  * =================================
  *
- * The list of settings for the WebGL renderer and some handy functions.
+ * The list of settings for the renderer and some handy functions.
  */
-function validateWebglRendererSettings(settings) {
+function validateSettings(settings) {
     // Label grid cell
     if (settings.labelGrid &&
         settings.labelGrid.cell &&
         typeof settings.labelGrid.cell === "object" &&
         (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)) {
-        throw new Error("sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+        throw new Error("Settings: invalid `labelGrid.cell`. Expecting {width, height}.");
     }
 }
-exports.validateWebglRendererSettings = validateWebglRendererSettings;
-exports.WEBGL_RENDERER_DEFAULT_SETTINGS = {
+exports.validateSettings = validateSettings;
+exports.DEFAULT_SETTINGS = {
     // Performance
     hideEdgesOnMove: false,
     hideLabelsOnMove: false,
@@ -3721,15 +3721,15 @@ var AbstractNodeProgram = /** @class */ (function (_super) {
         // Uniform Location
         var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
         if (matrixLocation === null)
-            throw new Error("sigma/renderers/webgl/program/common/node: error while getting matrixLocation");
+            throw new Error("AbstractNodeProgram: error while getting matrixLocation");
         _this.matrixLocation = matrixLocation;
         var ratioLocation = gl.getUniformLocation(_this.program, "u_ratio");
         if (ratioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/common/node: error while getting ratioLocation");
+            throw new Error("AbstractNodeProgram: error while getting ratioLocation");
         _this.ratioLocation = ratioLocation;
         var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
         if (scaleLocation === null)
-            throw new Error("sigma/renderers/webgl/program/common/node: error while getting scaleLocation");
+            throw new Error("AbstractNodeProgram: error while getting scaleLocation");
         _this.scaleLocation = scaleLocation;
         return _this;
     }
@@ -3809,7 +3809,7 @@ var AbstractProgram = /** @class */ (function () {
         this.fragmentShaderSource = fragmentShaderSource;
         var buffer = gl.createBuffer();
         if (buffer === null)
-            throw new Error("sigma/renderers/webgl/program/program.Program: error while creating the buffer");
+            throw new Error("AbstractProgram: error while creating the buffer");
         this.buffer = buffer;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         this.vertexShader = utils_1.loadVertexShader(gl, this.vertexShaderSource);
@@ -3850,7 +3850,7 @@ function loadShader(type, gl, source) {
     // Creating the shader
     var shader = gl.createShader(glType);
     if (shader === null) {
-        throw new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while creating the shader");
+        throw new Error("loadShader: error while creating the shader");
     }
     // Loading source
     gl.shaderSource(shader, source);
@@ -3862,7 +3862,7 @@ function loadShader(type, gl, source) {
     if (!successfullyCompiled) {
         var infoLog = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new Error("sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n" + infoLog + "\n" + source);
+        throw new Error("loadShader: error while compiling the shader:\n" + infoLog + "\n" + source);
     }
     return shader;
 }
@@ -3880,7 +3880,7 @@ exports.loadFragmentShader = loadFragmentShader;
 function loadProgram(gl, shaders) {
     var program = gl.createProgram();
     if (program === null) {
-        throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while creating the program.");
+        throw new Error("loadProgram: error while creating the program.");
     }
     var i, l;
     // Attaching the shaders
@@ -3891,7 +3891,7 @@ function loadProgram(gl, shaders) {
     var successfullyLinked = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!successfullyLinked) {
         gl.deleteProgram(program);
-        throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.");
+        throw new Error("loadProgram: error while linking the program.");
     }
     return program;
 }
@@ -3954,23 +3954,23 @@ var EdgeProgram = /** @class */ (function (_super) {
         // Uniform locations
         var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
         if (scaleLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");
+            throw new Error("EdgeProgram: error while getting scaleLocation");
         _this.scaleLocation = scaleLocation;
         var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
         if (matrixLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
+            throw new Error("EdgeProgram: error while getting matrixLocation");
         _this.matrixLocation = matrixLocation;
         var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
         if (cameraRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting cameraRatioLocation");
+            throw new Error("EdgeProgram: error while getting cameraRatioLocation");
         _this.cameraRatioLocation = cameraRatioLocation;
         var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
         if (viewportRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting viewportRatioLocation");
+            throw new Error("EdgeProgram: error while getting viewportRatioLocation");
         _this.viewportRatioLocation = viewportRatioLocation;
         var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
         if (thicknessRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting thicknessRatioLocation");
+            throw new Error("EdgeProgram: error while getting thicknessRatioLocation");
         _this.thicknessRatioLocation = thicknessRatioLocation;
         // Enabling the OES_element_index_uint extension
         // NOTE: on older GPUs, this means that really large graphs won't
@@ -4236,23 +4236,23 @@ var EdgeArrowHeadProgram = /** @class */ (function (_super) {
         // Uniform locations
         var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
         if (scaleLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting scaleLocation");
+            throw new Error("EdgeArrowHeadProgram: error while getting scaleLocation");
         _this.scaleLocation = scaleLocation;
         var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
         if (matrixLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting matrixLocation");
+            throw new Error("EdgeArrowHeadProgram: error while getting matrixLocation");
         _this.matrixLocation = matrixLocation;
         var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
         if (cameraRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting cameraRatioLocation");
+            throw new Error("EdgeArrowHeadProgram: error while getting cameraRatioLocation");
         _this.cameraRatioLocation = cameraRatioLocation;
         var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
         if (viewportRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting viewportRatioLocation");
+            throw new Error("EdgeArrowHeadProgram: error while getting viewportRatioLocation");
         _this.viewportRatioLocation = viewportRatioLocation;
         var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
         if (thicknessRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeArrowHeadProgram: error while getting thicknessRatioLocation");
+            throw new Error("EdgeArrowHeadProgram: error while getting thicknessRatioLocation");
         _this.thicknessRatioLocation = thicknessRatioLocation;
         _this.bind();
         return _this;
@@ -4403,7 +4403,7 @@ var EdgeClampedProgram = /** @class */ (function (_super) {
         // Initializing indices buffer
         var indicesBuffer = gl.createBuffer();
         if (indicesBuffer === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
+            throw new Error("EdgeClampedProgram: error while getting resolutionLocation");
         _this.indicesBuffer = indicesBuffer;
         // Locations:
         _this.positionLocation = gl.getAttribLocation(_this.program, "a_position");
@@ -4414,23 +4414,23 @@ var EdgeClampedProgram = /** @class */ (function (_super) {
         // Uniform locations
         var scaleLocation = gl.getUniformLocation(_this.program, "u_scale");
         if (scaleLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
+            throw new Error("EdgeClampedProgram: error while getting scaleLocation");
         _this.scaleLocation = scaleLocation;
         var matrixLocation = gl.getUniformLocation(_this.program, "u_matrix");
         if (matrixLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
+            throw new Error("EdgeClampedProgram: error while getting matrixLocation");
         _this.matrixLocation = matrixLocation;
         var cameraRatioLocation = gl.getUniformLocation(_this.program, "u_cameraRatio");
         if (cameraRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting cameraRatioLocation");
+            throw new Error("EdgeClampedProgram: error while getting cameraRatioLocation");
         _this.cameraRatioLocation = cameraRatioLocation;
         var viewportRatioLocation = gl.getUniformLocation(_this.program, "u_viewportRatio");
         if (viewportRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting viewportRatioLocation");
+            throw new Error("EdgeClampedProgram: error while getting viewportRatioLocation");
         _this.viewportRatioLocation = viewportRatioLocation;
         var thicknessRatioLocation = gl.getUniformLocation(_this.program, "u_thicknessRatio");
         if (thicknessRatioLocation === null)
-            throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting thicknessRatioLocation");
+            throw new Error("EdgeClampedProgram: error while getting thicknessRatioLocation");
         _this.thicknessRatioLocation = thicknessRatioLocation;
         // Enabling the OES_element_index_uint extension
         // NOTE: on older GPUs, this means that really large graphs won't

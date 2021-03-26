@@ -11,7 +11,7 @@
  * afterwards.
  */
 import { NodeKey, EdgeKey } from "graphology-types";
-import { WebGLSettings } from "./settings";
+import { Settings } from "./settings";
 
 /**
  * Util type to represent maps of typed elements, but implemented with
@@ -95,7 +95,7 @@ export class Node implements NodeAttributes {
   hidden: boolean;
   label: string;
 
-  constructor(index: number, settings: WebGLSettings) {
+  constructor(index: number, settings: Settings) {
     this.index = index;
     this.x = 0;
     this.y = 0;
@@ -128,7 +128,7 @@ export class Edge implements EdgeAttributes {
   hidden: boolean;
   label: string;
 
-  constructor(index: number, settings: WebGLSettings) {
+  constructor(index: number, settings: Settings) {
     this.index = index;
     this.size = 1;
     this.color = settings.defaultEdgeColor;

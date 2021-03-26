@@ -14,7 +14,7 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
   // Creating the shader
   const shader = gl.createShader(glType);
   if (shader === null) {
-    throw new Error(`sigma/renderers/webgl/shaders/utils.loadShader: error while creating the shader`);
+    throw new Error(`loadShader: error while creating the shader`);
   }
 
   // Loading source
@@ -31,9 +31,7 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
     const infoLog = gl.getShaderInfoLog(shader);
 
     gl.deleteShader(shader);
-    throw new Error(
-      `sigma/renderers/webgl/shaders/utils.loadShader: error while compiling the shader:\n${infoLog}\n${source}`,
-    );
+    throw new Error(`loadShader: error while compiling the shader:\n${infoLog}\n${source}`);
   }
 
   return shader;
@@ -52,7 +50,7 @@ export function loadFragmentShader(gl: WebGLRenderingContext, source: string): W
 export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShader>): WebGLProgram {
   const program = gl.createProgram();
   if (program === null) {
-    throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while creating the program.");
+    throw new Error("loadProgram: error while creating the program.");
   }
 
   let i, l;
@@ -67,7 +65,7 @@ export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShade
 
   if (!successfullyLinked) {
     gl.deleteProgram(program);
-    throw new Error("sigma/renderers/webgl/shaders/utils.loadProgram: error while linking the program.");
+    throw new Error("loadProgram: error while linking the program.");
   }
 
   return program;

@@ -29,13 +29,11 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
 
     // Uniform locations:
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeFastProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeFastProgram: error while getting resolutionLocation");
+    if (resolutionLocation === null) throw new Error("EdgeFastProgram: error while getting resolutionLocation");
     this.resolutionLocation = resolutionLocation;
 
     this.bind();

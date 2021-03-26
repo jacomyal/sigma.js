@@ -39,18 +39,15 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
 
     // Uniform Location
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/common/node: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/common/node: error while getting ratioLocation");
+    if (ratioLocation === null) throw new Error("AbstractNodeProgram: error while getting ratioLocation");
     this.ratioLocation = ratioLocation;
 
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/common/node: error while getting scaleLocation");
+    if (scaleLocation === null) throw new Error("AbstractNodeProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
   }
 

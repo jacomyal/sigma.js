@@ -35,7 +35,7 @@ import {
   zIndexOrdering,
 } from "./utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
-import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
+import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
@@ -57,7 +57,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * @param {object}      settings  - Optional settings.
  */
 export default class Sigma extends EventEmitter {
-  settings: WebGLSettings;
+  settings: Settings;
   graph: Graph;
   mouseCaptor: MouseCaptor;
   touchCaptor: TouchCaptor;
@@ -93,18 +93,16 @@ export default class Sigma extends EventEmitter {
 
   camera: Camera;
 
-  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<WebGLSettings> = {}) {
+  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<Settings> = {}) {
     super();
 
-    this.settings = assign<WebGLSettings>({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
+    this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
 
-    validateWebglRendererSettings(this.settings);
+    validateSettings(this.settings);
 
     // Validating
-    if (!isGraph(graph)) throw new Error("sigma/renderers/webgl: invalid graph instance.");
-
-    if (!(container instanceof HTMLElement))
-      throw new Error("sigma/renderers/webgl: container should be an html element.");
+    if (!isGraph(graph)) throw new Error("Sigma: invalid graph instance.");
+    if (!(container instanceof HTMLElement)) throw new Error("Sigma: container should be an html element.");
 
     // Properties
     this.graph = graph;
@@ -648,9 +646,9 @@ export default class Sigma extends EventEmitter {
       this.height = this.container.offsetHeight;
     }
 
-    if (this.width === 0) throw new Error("sigma/renderers/webgl: container has no width.");
+    if (this.width === 0) throw new Error("Sigma: container has no width.");
 
-    if (this.height === 0) throw new Error("sigma/renderers/webgl: container has no height.");
+    if (this.height === 0) throw new Error("Sigma: container has no height.");
 
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height) return this;

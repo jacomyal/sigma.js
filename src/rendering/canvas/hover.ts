@@ -5,7 +5,7 @@
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
-import { WebGLSettings } from "../../settings";
+import { Settings } from "../../settings";
 import { NodeAttributes, PartialButFor } from "../../types";
 import drawNode from "./node";
 import drawLabel from "./label";
@@ -13,7 +13,7 @@ import drawLabel from "./label";
 export default function drawHover(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
-  settings: WebGLSettings,
+  settings: Settings,
 ): void {
   const size = settings.labelSize,
     font = settings.labelFont,

@@ -50,28 +50,23 @@ export default class EdgeProgram extends AbstractEdgeProgram {
 
     // Uniform locations
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");
+    if (scaleLocation === null) throw new Error("EdgeProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
-    if (cameraRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting cameraRatioLocation");
+    if (cameraRatioLocation === null) throw new Error("EdgeProgram: error while getting cameraRatioLocation");
     this.cameraRatioLocation = cameraRatioLocation;
 
     const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
-    if (viewportRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting viewportRatioLocation");
+    if (viewportRatioLocation === null) throw new Error("EdgeProgram: error while getting viewportRatioLocation");
     this.viewportRatioLocation = viewportRatioLocation;
 
     const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
-    if (thicknessRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting thicknessRatioLocation");
+    if (thicknessRatioLocation === null) throw new Error("EdgeProgram: error while getting thicknessRatioLocation");
     this.thicknessRatioLocation = thicknessRatioLocation;
 
     // Enabling the OES_element_index_uint extension
