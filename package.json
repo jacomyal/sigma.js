@@ -9,7 +9,7 @@
   "scripts": {
     "build": "webpack --progress && webpack --progress --mode production",
     "clean": "rimraf $npm_package_config_clean",
-    "transpile": "tsc -p ./tsconfig.transpile.json -d --declarationDir types && replace '\\.glsl' '.glsl.js' renderers -r && webpack --config ./webpack.programs.config.js",
+    "transpile": "tsc -p ./tsconfig.transpile.json -d --declarationDir types && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
     "examples": "webpack serve --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_config_folders --ext .ts",
