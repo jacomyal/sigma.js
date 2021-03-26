@@ -12,17 +12,7 @@ import Graph from "graphology";
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import QuadTree from "./core/quadtree";
-import {
-  Coordinates,
-  Edge,
-  EdgeAttributes,
-  Extent,
-  Listener,
-  MouseCoords,
-  Node,
-  NodeAttributes,
-  PlainObject,
-} from "./types";
+import { Coordinates, EdgeAttributes, Extent, Listener, MouseCoords, NodeAttributes, PlainObject } from "./types";
 import {
   createElement,
   getPixelRatio,
@@ -49,6 +39,30 @@ const PIXEL_RATIO = getPixelRatio();
 const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 
 /**
+ * Important functions.
+ */
+function applyNodeDefaults(settings: Settings, key: NodeKey, data: NodeAttributes): void {
+  if (!data.hasOwnProperty("x") || !data.hasOwnProperty("y"))
+    throw new Error(
+      `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
+    );
+
+  if (!data.color) data.color = settings.defaultNodeColor;
+
+  if (!data.label) data.label = "";
+
+  if (!data.size) data.size = 2;
+}
+
+function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttributes): void {
+  if (!data.color) data.color = settings.defaultEdgeColor;
+
+  if (!data.label) data.label = "";
+
+  if (!data.size) data.size = 0.5;
+}
+
+/**
  * Main class.
  *
  * @constructor
@@ -67,8 +81,10 @@ export default class Sigma extends EventEmitter {
   webGLContexts: PlainObject<WebGLRenderingContext> = {};
   activeListeners: PlainObject<Listener> = {};
   quadtree: QuadTree = new QuadTree();
-  nodeDataCache: Record<NodeKey, Node> = {};
-  edgeDataCache: Record<EdgeKey, Edge> = {};
+  nodeDataCache: Record<NodeKey, Partial<NodeAttributes>> = {};
+  edgeDataCache: Record<EdgeKey, Partial<EdgeAttributes>> = {};
+  nodeKeyToIndex: Record<NodeKey, number> = {};
+  edgeKeyToIndex: Record<EdgeKey, number> = {};
   nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
   edgeExtent: { z: Extent } | null = null;
 
@@ -249,11 +265,23 @@ export default class Sigma extends EventEmitter {
   initializeCache(): void {
     const graph = this.graph;
 
-    const nodes = graph.nodes();
-    for (let i = 0, l = nodes.length; i < l; i++) this.nodeDataCache[nodes[i]] = new Node(i, this.settings);
+    // NOTE: the data caches are never reset to avoid paying a GC cost
+    // But this could prove to be a bad decision. In which case just "reset"
+    // them here.
 
-    const edges = graph.edges();
-    for (let i = 0, l = edges.length; i < l; i++) this.edgeDataCache[edges[i]] = new Edge(i, this.settings);
+    let i = 0;
+
+    graph.forEachNode((key) => {
+      this.nodeKeyToIndex[key] = i++;
+      this.nodeDataCache[key] = {};
+    });
+
+    i = 0;
+
+    graph.forEachEdge((key) => {
+      this.edgeKeyToIndex[key] = i++;
+      this.edgeDataCache[key] = {};
+    });
   }
 
   /**
@@ -321,7 +349,7 @@ export default class Sigma extends EventEmitter {
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
 
-        const data = this.nodeDataCache[node];
+        const data = this.nodeDataCache[node] as NodeAttributes;
 
         const pos = this.camera.graphToViewport(this, data);
 
@@ -350,7 +378,7 @@ export default class Sigma extends EventEmitter {
 
       // Checking if the hovered node is still hovered
       if (this.hoveredNode) {
-        const data = this.nodeDataCache[this.hoveredNode];
+        const data = this.nodeDataCache[this.hoveredNode] as NodeAttributes;
 
         const pos = this.camera.graphToViewport(this, data);
 
@@ -376,7 +404,7 @@ export default class Sigma extends EventEmitter {
         for (let i = 0, l = quadNodes.length; i < l; i++) {
           const node = quadNodes[i];
 
-          const data = this.nodeDataCache[node];
+          const data = this.nodeDataCache[node] as NodeAttributes;
 
           const pos = this.camera.graphToViewport(this, data);
 
@@ -425,13 +453,15 @@ export default class Sigma extends EventEmitter {
 
     this.activeListeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
       // Adding entry to cache
-      this.nodeDataCache[e.key] = new Node(graph.order - 1, this.settings);
+      this.nodeKeyToIndex[e.key] = graph.order - 1;
+      this.nodeDataCache[e.key] = {};
       this.activeListeners.graphUpdate();
     };
 
     this.activeListeners.addEdgeGraphUpdate = (e: { key: EdgeKey }): void => {
       // Adding entry to cache
-      this.edgeDataCache[e.key] = new Edge(graph.size - 1, this.settings);
+      this.nodeKeyToIndex[e.key] = graph.order - 1;
+      this.edgeDataCache[e.key] = {};
       this.activeListeners.graphUpdate();
     };
 
@@ -491,8 +521,6 @@ export default class Sigma extends EventEmitter {
 
     // Handling node z-index
     // TODO: z-index needs us to compute display data before hand
-    // TODO: remains to be seen if reducers are a good or bad thing and if we
-    // should store display data in flat byte arrays indices
     if (this.settings.zIndex)
       nodes = zIndexOrdering<NodeKey>(
         this.nodeExtent.z,
@@ -503,21 +531,29 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
 
-      let data = graph.getNodeAttributes(node) as NodeAttributes;
+      // Node display data resolution:
+      //   1. First we get the node's attributes
+      //   2. We optionally reduce them using the function provided by the user
+      //      Note that this function must return a total object and won't be merged
+      //   3. We apply our defaults, while running some vital checks
+      //   4. We apply the normalization function
 
-      const displayData = this.nodeDataCache[node];
+      let data = graph.getNodeAttributes(node) as NodeAttributes;
 
       if (settings.nodeReducer) data = settings.nodeReducer(node, data);
 
-      // TODO: should assign default also somewhere here if there is a reducer
-      displayData.assign(data);
-      this.normalizationFunction.applyTo(displayData);
+      // We shallow copy the data to avoid mutating both the graph and the reducer's result
+      data = assign(this.nodeDataCache[node], data);
 
-      this.quadtree.add(node, displayData.x, 1 - displayData.y, displayData.size / this.width);
+      applyNodeDefaults(this.settings, node, data);
 
-      nodeProgram.process(displayData, i);
+      this.normalizationFunction.applyTo(data);
 
-      displayData.index = i;
+      this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
+
+      nodeProgram.process(data, i);
+
+      this.nodeKeyToIndex[node] = i;
     }
 
     nodeProgram.bufferData();
@@ -535,21 +571,27 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      let data = graph.getEdgeAttributes(edge) as EdgeAttributes;
+      // Edge display data resolution:
+      //   1. First we get the edge's attributes
+      //   2. We optionally reduce them using the function provided by the user
+      //      Note that this function must return a total object and won't be merged
+      //   3. We apply our defaults, while running some vital checks
 
-      const displayData = this.edgeDataCache[edge];
+      let data = graph.getEdgeAttributes(edge) as EdgeAttributes;
 
       if (settings.edgeReducer) data = settings.edgeReducer(edge, data);
 
-      displayData.assign(data);
+      data = assign(this.edgeDataCache[edge], data);
+
+      applyEdgeDefaults(this.settings, edge, data);
 
       const extremities = graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]],
-        targetData = this.nodeDataCache[extremities[1]];
+        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
+        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes;
 
-      edgeProgram.process(sourceData, targetData, displayData, i);
+      edgeProgram.process(sourceData, targetData, data, i);
 
-      displayData.index = i;
+      this.nodeKeyToIndex[edge] = i;
     }
 
     // Computing edge indices if necessary
@@ -570,7 +612,7 @@ export default class Sigma extends EventEmitter {
 
     const data = this.graph.getNodeAttributes(key) as NodeAttributes;
 
-    nodeProgram.process(data, this.nodeDataCache[key].index);
+    nodeProgram.process(data, this.nodeKeyToIndex[key]);
 
     return this;
   }
@@ -590,7 +632,7 @@ export default class Sigma extends EventEmitter {
       sourceData = graph.getNodeAttributes(extremities[0]) as NodeAttributes,
       targetData = graph.getNodeAttributes(extremities[1]) as NodeAttributes;
 
-    edgeProgram.process(sourceData, targetData, data, this.edgeDataCache[key].index);
+    edgeProgram.process(sourceData, targetData, data, this.edgeKeyToIndex[key]);
 
     return this;
   }
@@ -810,7 +852,7 @@ export default class Sigma extends EventEmitter {
     const gridSettings = this.settings.labelGrid;
 
     const labelsToDisplay = labelsToDisplayFromGrid({
-      cache: this.nodeDataCache,
+      cache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
       camera: this.camera,
       cell: gridSettings.cell,
       dimensions: this,
@@ -827,7 +869,7 @@ export default class Sigma extends EventEmitter {
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
-      const data = this.nodeDataCache[labelsToDisplay[i]];
+      const data = this.nodeDataCache[labelsToDisplay[i]] as NodeAttributes;
 
       const { x, y } = this.camera.graphToViewport(this, data);
 
@@ -882,9 +924,9 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
       const edge = edgeLabelsToDisplay[i],
         extremities = this.graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]],
-        targetData = this.nodeDataCache[extremities[1]],
-        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
+        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
+        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes,
+        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]] as EdgeAttributes;
 
       const { x: sourceX, y: sourceY } = this.camera.graphToViewport(this, sourceData);
       const { x: targetX, y: targetY } = this.camera.graphToViewport(this, targetData);
@@ -935,7 +977,7 @@ export default class Sigma extends EventEmitter {
 
     // Rendering
     const render = (node: NodeKey): void => {
-      const data = this.nodeDataCache[node];
+      const data = this.nodeDataCache[node] as NodeAttributes;
 
       const { x, y } = camera.graphToViewport(this, data);
 
