@@ -26,7 +26,7 @@ export function isPlainObject(value: any): boolean {
  * @param  {object} [...objects] - Objects to merge.
  * @return {object}
  */
-export function assign<T>(target: Partial<T> | undefined, ...objects: Array<Partial<T | undefined>>): T {
+export function assignDeep<T>(target: Partial<T> | undefined, ...objects: Array<Partial<T | undefined>>): T {
   target = target || {};
 
   for (let i = 0, l = objects.length; i < l; i++) {
@@ -36,7 +36,7 @@ export function assign<T>(target: Partial<T> | undefined, ...objects: Array<Part
 
     for (const k in o) {
       if (isPlainObject(o[k])) {
-        target[k] = assign(target[k], o[k]);
+        target[k] = assignDeep(target[k], o[k]);
       } else {
         target[k] = o[k];
       }

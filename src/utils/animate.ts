@@ -7,7 +7,7 @@
  */
 import Graph from "graphology";
 import { PlainObject } from "../types";
-import { assign, cancelFrame, requestFrame } from "./index";
+import { cancelFrame, requestFrame } from "./index";
 import easings from "./easings";
 
 /**
@@ -31,7 +31,7 @@ export function animateNodes(
   opts: Partial<AnimateOptions>,
   callback: () => void,
 ): () => void {
-  const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
+  const options: AnimateOptions = Object.assign({}, ANIMATE_DEFAULTS, opts);
 
   const easing: (k: number) => number = typeof options.easing === "function" ? options.easing : easings[options.easing];
 
