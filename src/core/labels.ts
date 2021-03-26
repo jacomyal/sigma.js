@@ -7,7 +7,7 @@
 import Graph from "graphology";
 import Camera from "./camera";
 import { NodeAttributes } from "../types";
-import Sigma from "../index";
+import Sigma from "../sigma";
 import { EdgeKey, NodeKey } from "graphology-types";
 /**
  * Constants.

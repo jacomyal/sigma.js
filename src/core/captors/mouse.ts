@@ -4,7 +4,7 @@
  *
  * Sigma's captor dealing with the user's mouse.
  */
-import Camera, { CameraState } from "../classes/camera";
+import Camera, { CameraState } from "../camera";
 import Captor from "./captor";
 
 import { getX, getY, getWheelDelta, getMouseCoords } from "./utils";

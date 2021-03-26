@@ -1,6 +1,6 @@
 import Captor from "./captor";
-import Camera, { CameraState } from "../classes/camera";
-import { Coordinates, Dimensions } from "../types";
+import Camera, { CameraState } from "../camera";
+import { Coordinates, Dimensions } from "../../types";
 import { getPosition, getTouchCoords, getTouchesArray } from "./utils";
 
 const DRAG_TIMEOUT = 200;

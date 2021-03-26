@@ -6,7 +6,7 @@ import choice from "pandemonium/choice";
 import random from "pandemonium/random";
 import chroma from "chroma-js";
 import faker from "faker";
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

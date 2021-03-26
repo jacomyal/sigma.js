@@ -5,7 +5,7 @@
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
  */
-import { EdgeAttributes, NodeAttributes } from "../../types";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";

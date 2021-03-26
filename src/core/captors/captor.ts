@@ -3,9 +3,9 @@
  * ======================
  */
 import { EventEmitter } from "events";
-import { Coordinates } from "../types";
+import { Coordinates } from "../../types";
 
-import Camera from "../classes/camera";
+import Camera from "../camera";
 
 /**
  * Captor utils functions

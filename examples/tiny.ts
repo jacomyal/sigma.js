@@ -1,5 +1,5 @@
 import { UndirectedGraph } from "graphology";
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

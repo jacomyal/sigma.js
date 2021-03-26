@@ -5,7 +5,7 @@
  * Testing the quadtree class.
  */
 import assert from "assert";
-import QuadTree, { getCircumscribedAlignedRectangle, isRectangleAligned, Rectangle } from "../../src/classes/quadtree";
+import QuadTree, { getCircumscribedAlignedRectangle, isRectangleAligned, Rectangle } from "../../src/core/quadtree";
 
 describe("QuadTree geometry utils", () => {
   describe("QuadTree#getCircumscribedAlignedRectangle", () => {

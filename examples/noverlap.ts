@@ -1,7 +1,7 @@
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import empty from "graphology-generators/classic/empty";
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 import { animateNodes } from "../src/utils/animate";
 import noverlap from "graphology-layout-noverlap";
 import NoverlapLayoutSupervisor from "graphology-layout-noverlap/worker";

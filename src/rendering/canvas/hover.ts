@@ -5,9 +5,9 @@
  * Function used by the canvas renderer to display a single node's hovered
  * state.
  */
-import { PartialButFor } from "../utils/utils";
-import { WebGLSettings } from "../settings";
-import { NodeAttributes } from "../types";
+import { PartialButFor } from "../../utils/utils";
+import { WebGLSettings } from "../../settings";
+import { NodeAttributes } from "../../types";
 import drawNode from "./node";
 import drawLabel from "./label";
 

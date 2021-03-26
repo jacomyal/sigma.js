@@ -1,6 +1,6 @@
 import { UndirectedGraph } from "graphology";
 
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 import { requestFrame } from "../src/utils/utils";
 import miserables from "./resources/les-miserables.json";
 

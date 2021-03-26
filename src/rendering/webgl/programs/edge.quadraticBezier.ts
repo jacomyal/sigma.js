@@ -2,7 +2,7 @@
  * Sigma.js WebGL Renderer Quadratic Bezier Edge Program
  * ======================================================
  */
-import { EdgeAttributes, NodeAttributes } from "../../types";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/edge.quadraticBezier.vert.glsl";

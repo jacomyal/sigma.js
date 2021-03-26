@@ -3,7 +3,7 @@ import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
 import faker from "faker";
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

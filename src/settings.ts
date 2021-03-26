@@ -1,14 +1,14 @@
 import { NodeKey, EdgeKey } from "graphology-types";
 
-import drawLabel from "./canvas/label";
-import drawHover from "./canvas/hover";
-import drawEdgeLabel from "./canvas/edge-label";
+import drawLabel from "./rendering/canvas/label";
+import drawHover from "./rendering/canvas/hover";
+import drawEdgeLabel from "./rendering/canvas/edge-label";
 import { EdgeAttributes, NodeAttributes } from "./types";
-import CircleNodeProgram from "./webgl/programs/node.fast";
-import LineEdgeProgram from "./webgl/programs/edge";
-import ArrowEdgeProgram from "./webgl/programs/edge.arrow";
-import { EdgeProgramConstructor } from "./webgl/programs/common/edge";
-import { NodeProgramConstructor } from "./webgl/programs/common/node";
+import CircleNodeProgram from "./rendering/webgl/programs/node.fast";
+import LineEdgeProgram from "./rendering/webgl/programs/edge";
+import ArrowEdgeProgram from "./rendering/webgl/programs/edge.arrow";
+import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
+import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
 
 /**
  * Sigma.js WebGL Renderer Settings

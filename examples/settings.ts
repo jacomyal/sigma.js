@@ -1,6 +1,6 @@
 import Graph from "graphology";
 import gexf from "graphology-gexf/browser";
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 
 import arctic from "./resources/arctic.gexf";
 

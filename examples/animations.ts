@@ -3,7 +3,7 @@ import circularLayout from "graphology-layout/circular";
 import { scaleLinear } from "d3-scale";
 import { extent } from "simple-statistics";
 
-import Sigma from "../src";
+import Sigma from "../src/sigma";
 import { animateNodes } from "../src/utils/animate";
 import miserables from "./resources/les-miserables.json";
 import { PlainObject } from "../src/utils/utils";
