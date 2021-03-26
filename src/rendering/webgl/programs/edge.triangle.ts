@@ -3,6 +3,7 @@
  * ==============================================
  *
  * Program rendering directed edges as a single anti-aliased triangle.
+ * @module
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

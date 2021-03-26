@@ -6,6 +6,7 @@
  * does not sit in the middle of target node but instead stays by some margin.
  *
  * This is useful when combined with arrows to draw directed edges.
+ * @module
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";

@@ -3,6 +3,7 @@
  * ======================================
  *
  * Program rendering direction arrows as a simple triangle.
+ * @module
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

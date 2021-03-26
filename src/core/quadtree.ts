@@ -1,5 +1,3 @@
-/* eslint no-nested-ternary: 0 */
-/* eslint no-constant-condition: 0 */
 /**
  * Sigma.js Quad Tree Class
  * =========================
@@ -7,7 +5,10 @@
  * Class implementing the quad tree data structure used to solve hovers and
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
+ * @module
  */
+/* eslint no-nested-ternary: 0 */
+/* eslint no-constant-condition: 0 */
 import extend from "@yomguithereal/helpers/extend";
 import { NodeKey } from "graphology-types";
 import { PlainObject } from "../types";

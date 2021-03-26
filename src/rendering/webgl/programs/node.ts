@@ -6,6 +6,7 @@
  * `gl.TRIANGLES` display mode. So, to draw one node, it will need to store
  * three times the center of the node, with the color, the size and an angle
  * indicating which "corner" of the triangle to draw.
+ * @module
  */
 import { NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

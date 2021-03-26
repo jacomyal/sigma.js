@@ -3,6 +3,7 @@
  * ===========================================
  *
  * Compound program rendering edges as an arrow from the source to the target.
+ * @module
  */
 import { createEdgeCompoundProgram } from "./common/edge";
 import EdgeArrowHeadProgram from "./edge.arrowHead";

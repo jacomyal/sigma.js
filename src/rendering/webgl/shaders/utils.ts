@@ -3,6 +3,7 @@
  * ======================
  *
  * Code used to load sigma's shaders.
+ * @module
  */
 
 /**

@@ -1,3 +1,10 @@
+/**
+ * Sigma.js Touch Captor
+ * ======================
+ *
+ * Sigma's captor dealing with touch.
+ * @module
+ */
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 import Camera from "../camera";

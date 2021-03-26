@@ -1,3 +1,9 @@
+/**
+ * Sigma.js WebGL Abstract Edge Program
+ * =====================================
+ *
+ * @module
+ */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { EdgeAttributes, NodeAttributes } from "../../../../types";
 

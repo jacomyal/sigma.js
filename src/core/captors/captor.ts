@@ -1,6 +1,7 @@
 /**
  * Sigma.js Captor Class
  * ======================
+ * @module
  */
 import { EventEmitter } from "events";
 import { Coordinates, MouseCoords, TouchCoords } from "../../types";

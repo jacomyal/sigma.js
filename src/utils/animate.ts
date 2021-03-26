@@ -3,6 +3,7 @@
  * ===========================
  *
  * Handy helper functions dealing with nodes & edges attributes animation.
+ * @module
  */
 import Graph from "graphology";
 import { PlainObject } from "../types";

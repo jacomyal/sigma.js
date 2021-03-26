@@ -3,6 +3,7 @@
  * =================
  *
  * Handy collection of easing functions.
+ * @module
  */
 export const linear = (k: number): number => k;
 

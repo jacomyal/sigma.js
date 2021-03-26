@@ -5,6 +5,7 @@
  * Simple program rendering nodes using GL_POINTS. This is faster than the
  * three triangle option but has some quirks and is not supported equally by
  * every GPU.
+ * @module
  */
 import { NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

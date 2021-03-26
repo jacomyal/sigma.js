@@ -3,6 +3,7 @@
  * ===============
  *
  * Various helper functions & classes used throughout the library.
+ * @module
  */
 import { CameraState, Coordinates, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate } from "./matrices";

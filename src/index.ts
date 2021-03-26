@@ -3,6 +3,7 @@
  * ==========================
  *
  * The library endpoint.
+ * @module
  */
 import Camera from "./core/camera";
 import QuadTree from "./core/quadtree";

@@ -1,6 +1,7 @@
 /**
  * Sigma.js WebGL Renderer Quadratic Bezier Edge Program
  * ======================================================
+ * @module
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

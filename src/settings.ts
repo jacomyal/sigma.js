@@ -1,3 +1,11 @@
+/**
+ * Sigma.js Settings
+ * =================================
+ *
+ * The list of settings and some handy functions.
+ * @module
+ */
+
 import { NodeKey, EdgeKey } from "graphology-types";
 
 import drawLabel from "./rendering/canvas/label";
@@ -9,13 +17,6 @@ import LineEdgeProgram from "./rendering/webgl/programs/edge";
 import ArrowEdgeProgram from "./rendering/webgl/programs/edge.arrow";
 import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
 import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
-
-/**
- * Sigma.js Settings
- * =================================
- *
- * The list of settings for the renderer and some handy functions.
- */
 
 export function validateSettings(settings: Settings): void {
   // Label grid cell
@@ -30,9 +31,8 @@ export function validateSettings(settings: Settings): void {
 }
 
 /**
- * Sigma.js WebGL Renderer Settings
+ * Sigma.js settings
  * =================================
- *
  */
 export interface Settings {
   // Performance

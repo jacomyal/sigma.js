@@ -1,8 +1,7 @@
 /**
- * Sigma.js WebGL Renderer
- * ========================
- *
- * File implementing sigma's WebGL Renderer.
+ * Sigma.js
+ * ========
+ * @module
  */
 import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";

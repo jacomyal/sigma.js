@@ -13,6 +13,7 @@
  *
  * This version of the shader balances geometry computation evenly between
  * the CPU & GPU (normals are computed on the CPU side).
+ * @module
  */
 import { floatColor, canUse32BitsIndices } from "../../../utils";
 import { EdgeAttributes, NodeAttributes } from "../../../types";

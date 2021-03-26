@@ -3,7 +3,9 @@
  * ================================
  *
  * Matrices-related helper functions used by sigma's WebGL renderer.
+ * @module
  */
+
 export function identity(): Float32Array {
   return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }

@@ -1,6 +1,6 @@
 /**
- * Sigma.js Display Data Classes
- * ==============================
+ * Sigma.js Types
+ * ==============
  *
  * Classes representing nodes & edges display data aiming at facilitating
  * the engine's memory representation and keep them in a pool to avoid
@@ -9,6 +9,7 @@
  * NOTE: it's possible to optimize this further by maintaining display data
  * in byte arrays but this would prove more tedious for the rendering logic
  * afterwards.
+ * @module
  */
 import { NodeKey, EdgeKey } from "graphology-types";
 import { Settings } from "./settings";

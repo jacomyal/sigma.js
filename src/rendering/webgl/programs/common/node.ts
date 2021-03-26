@@ -1,3 +1,9 @@
+/**
+ * Sigma.js WebGL Abstract Node Program
+ * =====================================
+ *
+ * @module
+ */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { NodeAttributes } from "../../../../types";
 

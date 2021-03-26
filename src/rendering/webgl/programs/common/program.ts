@@ -3,6 +3,7 @@
  * ================================
  *
  * Class representing a single WebGL program used by sigma's WebGL renderer.
+ * @module
  */
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
 

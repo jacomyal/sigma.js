@@ -3,6 +3,7 @@
  * ======================
  *
  * Sigma's captor dealing with the user's mouse.
+ * @module
  */
 import { CameraState } from "../../types";
 import Camera from "../camera";

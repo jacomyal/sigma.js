@@ -3,6 +3,7 @@
  * =========================================
  *
  * Function used by the canvas renderer to display a single node's label.
+ * @module
  */
 import { Settings } from "../../settings";
 import { NodeAttributes, PartialButFor } from "../../types";

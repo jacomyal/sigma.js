@@ -3,6 +3,7 @@
  * =============================================
  *
  * Function used by the canvas renderer to display a single edge's label.
+ * @module
  */
 import { Settings } from "../../settings";
 import { EdgeAttributes, NodeAttributes, PartialButFor } from "../../types";

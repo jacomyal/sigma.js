@@ -4,6 +4,7 @@
  *
  * Program rendering edges using GL_LINES which is presumably very fast but
  * won't render thickness correctly on some GPUs and has some quirks.
+ * @module
  */
 import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor } from "../../../utils";

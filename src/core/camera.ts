@@ -3,6 +3,7 @@
  * ======================
  *
  * Class designed to store camera information & used to update it.
+ * @module
  */
 import { EventEmitter } from "events";
 

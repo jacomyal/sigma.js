@@ -3,6 +3,7 @@
  * ===========================
  *
  * Miscelleneous heuristics related to label display.
+ * @module
  */
 import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
