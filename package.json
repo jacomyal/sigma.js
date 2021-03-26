@@ -8,20 +8,21 @@
   "typings": "types/index.d.ts",
   "scripts": {
     "build": "webpack --progress && webpack --progress --mode production",
-    "clean": "rimraf $npm_package_sigma_clean",
+    "clean": "rimraf $npm_package_config_clean",
     "transpile": "tsc -p ./tsconfig.transpile.json -d --declarationDir types && replace '\\.glsl' '.glsl.js' renderers -r && webpack --config ./webpack.programs.config.js",
     "examples": "webpack serve --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
-    "lint": "eslint $npm_package_sigma_folders --ext .ts",
+    "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
-    "prettier": "prettier --write $npm_package_sigma_folders",
+    "prettier": "prettier --write $npm_package_config_folders",
     "prepublish": "npm run lint && npm run test && npm run clean && npm run transpile && npm run build",
+    "prepublishOnly": "npm run prepublish",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
     "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
-  "sigma": {
+  "config": {
     "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js type.js sigma-graphology.js utils.js captors heuristics renderers types",
     "folders": "examples src test"
   },
