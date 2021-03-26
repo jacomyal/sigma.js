@@ -18,7 +18,7 @@ import {
   getPixelRatio,
   createNormalizationFunction,
   NormalizationFunction,
-  assign,
+  assignDeep,
   cancelFrame,
   matrixFromCamera,
   requestFrame,
@@ -112,7 +112,7 @@ export default class Sigma extends EventEmitter {
   constructor(graph: Graph, container: HTMLElement | null, settings: Partial<Settings> = {}) {
     super();
 
-    this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
+    this.settings = assignDeep<Settings>({}, DEFAULT_SETTINGS, settings);
 
     validateSettings(this.settings);
 
@@ -543,7 +543,7 @@ export default class Sigma extends EventEmitter {
       if (settings.nodeReducer) data = settings.nodeReducer(node, data);
 
       // We shallow copy the data to avoid mutating both the graph and the reducer's result
-      data = assign(this.nodeDataCache[node], data);
+      data = Object.assign(this.nodeDataCache[node], data);
 
       applyNodeDefaults(this.settings, node, data);
 
@@ -581,7 +581,8 @@ export default class Sigma extends EventEmitter {
 
       if (settings.edgeReducer) data = settings.edgeReducer(edge, data);
 
-      data = assign(this.edgeDataCache[edge], data);
+      // We shallow copy the data to avoid mutating both the graph and the reducer's result
+      data = Object.assign(this.edgeDataCache[edge], data);
 
       applyEdgeDefaults(this.settings, edge, data);
 

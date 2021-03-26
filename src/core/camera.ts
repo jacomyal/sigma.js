@@ -8,7 +8,7 @@ import { EventEmitter } from "events";
 
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
-import { assign, cancelFrame, requestFrame } from "../utils";
+import { cancelFrame, requestFrame } from "../utils";
 import { CameraState, Coordinates, Dimensions } from "../types";
 
 /**
@@ -271,7 +271,7 @@ export default class Camera extends EventEmitter implements CameraState {
   animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>, callback?: () => void): void {
     if (!this.enabled) return;
 
-    const options: AnimateOptions = assign<AnimateOptions>({}, ANIMATE_DEFAULTS, opts);
+    const options: AnimateOptions = Object.assign({}, ANIMATE_DEFAULTS, opts);
 
     const easing: (k: number) => number =
       typeof options.easing === "function" ? options.easing : easings[options.easing];
