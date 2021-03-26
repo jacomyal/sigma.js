@@ -23,7 +23,7 @@
     "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
   },
   "config": {
-    "clean": "animate.js camera.js captor.js easings.js endpoint.js quadtree.js renderer.js type.js sigma-graphology.js utils.js captors heuristics renderers types",
+    "clean": "core index.js rendering settings.js sigma.js utils",
     "folders": "examples src test"
   },
   "repository": {
