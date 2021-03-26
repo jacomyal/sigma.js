@@ -2,7 +2,7 @@ import { UndirectedGraph } from "graphology";
 import clusters from "graphology-generators/random/clusters";
 import randomLayout from "graphology-layout/random";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
-import faker from "faker";
+import { getRandomName } from "./utils";
 import Sigma from "../src/sigma";
 
 const PALETTE = ["#b4943e", "#777acd", "#60a862", "#c45ca2", "#cb5a4c"];
@@ -24,7 +24,7 @@ graph.nodes().forEach((node) => {
   const attr = graph.getNodeAttributes(node);
 
   graph.mergeNodeAttributes(node, {
-    label: faker.name.findName(),
+    label: getRandomName(),
     size: Math.max(4, Math.random() * 10),
     color: PALETTE[attr.cluster],
   });

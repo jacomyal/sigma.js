@@ -62,7 +62,6 @@
     "chroma-js": "^2.1.1",
     "d3-scale": "^3.2.3",
     "eslint": "^7.22.0",
-    "faker": "^5.1.0",
     "glob": "^7.1.3",
     "graphology": "^0.19.3",
     "graphology-communities-louvain": "^1.4.1",

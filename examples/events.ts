@@ -2,7 +2,7 @@ import { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
-import faker from "faker";
+import { getRandomName } from "./utils";
 import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
@@ -15,7 +15,7 @@ randomLayout.assign(graph);
 
 graph.nodes().forEach((node) => {
   graph.mergeNodeAttributes(node, {
-    label: faker.name.findName(),
+    label: getRandomName(),
     size: Math.max(4, Math.random() * 10),
     color: chroma.random().hex(),
     zIndex: 0,
