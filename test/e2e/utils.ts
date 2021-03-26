@@ -25,7 +25,7 @@ export async function takeScreenshots(tests: Tests, folder: string, suffix = "")
   // for each pages
   await Promise.all(
     tests.map((test) => {
-      return new Promise(async (resolve, reject) => {
+      return new Promise<void>(async (resolve, reject) => {
         try {
           // Open a new page
           const page = await browser.newPage();
