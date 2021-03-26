@@ -1,5 +1,5 @@
 import { DirectedGraph } from "graphology";
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 const container = document.getElementById("container");
 
@@ -60,7 +60,7 @@ graph.addEdge("Deborah", "Alice", {
   size: 20,
 });
 
-const renderer = new WebGLRenderer(graph, container, {
+const renderer = new Sigma(graph, container, {
   defaultEdgeType: "arrow",
   defaultEdgeColor: "#888",
   renderEdgeLabels: true,

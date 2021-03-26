@@ -3,10 +3,10 @@ import circularLayout from "graphology-layout/circular";
 import { scaleLinear } from "d3-scale";
 import { extent } from "simple-statistics";
 
-import WebGLRenderer from "../src/renderers/webgl/index";
-import { animateNodes } from "../src/animate";
+import Sigma from "../src";
+import { animateNodes } from "../src/utils/animate";
 import miserables from "./resources/les-miserables.json";
-import { PlainObject } from "../src/utils";
+import { PlainObject } from "../src/utils/utils";
 
 const graph = new UndirectedGraph();
 
@@ -36,7 +36,7 @@ miserables.edges.forEach((edge) => {
 const container = document.getElementById("container");
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new Sigma(graph, container);
 
 const initial: PlainObject<{ x: number; y: number }> = {};
 

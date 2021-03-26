@@ -1,31 +1,16 @@
 /**
- * Sigma.js Captor Utils
+ * Sigma.js Captor Class
  * ======================
- *
- * Miscellenous helper functions related to the captors.
  */
+import { EventEmitter } from "events";
 import { Coordinates } from "../types";
 
-export interface MouseCoords extends Coordinates {
-  clientX: number;
-  clientY: number;
-  ctrlKey: boolean;
-  metaKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
-  preventDefault(): void;
-  original: MouseEvent;
-}
+import Camera from "../classes/camera";
 
-export interface TouchCoords {
-  touches: Coordinates[];
-  ctrlKey: boolean;
-  metaKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
-  preventDefault(): void;
-  original: TouchEvent;
-}
+/**
+ * Captor utils functions
+ * ======================
+ */
 
 /**
  * Extract the local X position from a mouse event or touch object.
@@ -129,4 +114,21 @@ export function getWheelDelta(e: WheelEvent): number {
   if (typeof e.detail !== "undefined") return e.detail / -9;
 
   throw new Error("sigma/captors/utils.getDelta: could not extract delta from event.");
+}
+
+/**
+ * Abstract class representing a captor like the user's mouse or touch controls.
+ */
+export default abstract class Captor extends EventEmitter {
+  container: HTMLElement;
+  camera: Camera;
+
+  constructor(container: HTMLElement, camera: Camera) {
+    super();
+    // Properties
+    this.container = container;
+    this.camera = camera;
+  }
+
+  abstract kill(): void;
 }

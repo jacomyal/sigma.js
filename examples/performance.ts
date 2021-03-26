@@ -3,7 +3,7 @@ import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
 import faker from "faker";
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 const container = document.getElementById("container");
 
@@ -25,7 +25,7 @@ graph.edges().forEach((edge) => {
   graph.setEdgeAttribute(edge, "color", "#ccc");
 });
 
-const renderer = new WebGLRenderer(graph, container, {
+const renderer = new Sigma(graph, container, {
   renderLabels: false,
 });
 

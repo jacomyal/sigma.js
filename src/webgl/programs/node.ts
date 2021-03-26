@@ -7,7 +7,7 @@
  * three times the center of the node, with the color, the size and an angle
  * indicating which "corner" of the triangle to draw.
  */
-import { NodeAttributes } from "../../../types";
+import { NodeAttributes } from "../../types";
 import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.vert.glsl";

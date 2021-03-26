@@ -5,7 +5,7 @@
  * Testing the camera class.
  */
 import assert from "assert";
-import Camera from "../../src/camera";
+import Camera from "../../src/classes/camera";
 import { Coordinates, Dimensions } from "../../src/types";
 
 describe("Camera", function () {

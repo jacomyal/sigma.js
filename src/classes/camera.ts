@@ -6,10 +6,10 @@
  */
 import { EventEmitter } from "events";
 
-import { ANIMATE_DEFAULTS, AnimateOptions } from "./animate";
-import easings from "./easings";
-import { assign, cancelFrame, requestFrame } from "./utils";
-import { Coordinates, Dimensions } from "./types";
+import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
+import easings from "../utils/easings";
+import { assign, cancelFrame, requestFrame } from "../utils/utils";
+import { Coordinates, Dimensions } from "../types";
 
 /**
  * Defaults.

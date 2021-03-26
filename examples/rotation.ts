@@ -1,7 +1,7 @@
 import { UndirectedGraph } from "graphology";
 
-import WebGLRenderer from "../src/renderers/webgl/index";
-import { requestFrame } from "../src/utils";
+import Sigma from "../src";
+import { requestFrame } from "../src/utils/utils";
 import miserables from "./resources/les-miserables.json";
 
 const graph = new UndirectedGraph();
@@ -16,7 +16,7 @@ miserables.edges.forEach((edge) => {
 
 // Instantiate sigma:
 const container = document.getElementById("container");
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new Sigma(graph, container);
 
 // Setup constant rotation:
 function rotate() {

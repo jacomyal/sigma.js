@@ -4,9 +4,9 @@
  *
  * The library endpoint.
  */
-import Camera from "./camera";
-import QuadTree from "./quadtree";
+import Camera from "./classes/camera";
+import QuadTree from "./classes/quadtree";
 import MouseCaptor from "./captors/mouse";
-import WebGLRenderer from "./renderers/webgl";
+import Sigma from "./index";
 
-export { Camera, QuadTree, MouseCaptor, WebGLRenderer };
+export { Camera, QuadTree, MouseCaptor, Sigma };

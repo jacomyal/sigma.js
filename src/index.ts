@@ -9,20 +9,20 @@ import graphExtent from "graphology-metrics/extent";
 import isGraph from "graphology-utils/is-graph";
 import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
-import Camera from "../../camera";
-import MouseCaptor from "../../captors/mouse";
-import QuadTree from "../../quadtree";
-import { Coordinates, Edge, EdgeAttributes, Extent, Node, NodeAttributes } from "../../types";
-import { createElement, getPixelRatio, createNormalizationFunction, NormalizationFunction } from "../utils";
-import { matrixFromCamera } from "./utils";
-import { assign, cancelFrame, PlainObject, requestFrame } from "../../utils";
-import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "../../heuristics/labels";
-import { zIndexOrdering } from "../../heuristics/z-index";
+import Camera from "./classes/camera";
+import MouseCaptor from "./captors/mouse";
+import QuadTree from "./classes/quadtree";
+import { Coordinates, Edge, EdgeAttributes, Extent, Node, NodeAttributes } from "./types";
+import { createElement, getPixelRatio, createNormalizationFunction, NormalizationFunction } from "./renderers/utils";
+import { matrixFromCamera } from "./webgl/utils";
+import { assign, cancelFrame, PlainObject, requestFrame } from "./utils/utils";
+import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./classes/labels";
+import { zIndexOrdering } from "./heuristics/z-index";
 import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
-import { INodeProgram } from "./programs/common/node";
-import { IEdgeProgram } from "./programs/common/edge";
-import { MouseCoords } from "../../captors/utils";
-import TouchCaptor from "../../captors/touch";
+import { INodeProgram } from "./webgl/programs/common/node";
+import { IEdgeProgram } from "./webgl/programs/common/edge";
+import { MouseCoords } from "./captors/utils";
+import TouchCaptor from "./captors/touch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Listener = (...args: any[]) => void;
@@ -43,7 +43,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class WebGLRenderer extends EventEmitter {
+export default class Sigma extends EventEmitter {
   settings: WebGLSettings;
   graph: Graph;
   mouseCaptor: MouseCaptor;
@@ -160,7 +160,7 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Internal function used to create a canvas element.
    * @param  {string} id - Context's id.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
   createCanvas(id: string): HTMLCanvasElement {
     const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
@@ -184,9 +184,9 @@ export default class WebGLRenderer extends EventEmitter {
    * DOM elements.
    *
    * @param  {string} id - Context's id.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  createCanvasContext(id: string): WebGLRenderer {
+  createCanvasContext(id: string): Sigma {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -204,9 +204,9 @@ export default class WebGLRenderer extends EventEmitter {
    * DOM elements.
    *
    * @param  {string} id - Context's id.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  createWebGLContext(id: string): WebGLRenderer {
+  createWebGLContext(id: string): Sigma {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -233,7 +233,7 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to initialize display data cache.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
   initializeCache(): void {
     const graph = this.graph;
@@ -248,9 +248,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method binding camera handlers.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  bindCameraHandlers(): WebGLRenderer {
+  bindCameraHandlers(): Sigma {
     this.activeListeners.camera = () => {
       this.scheduleRender();
     };
@@ -263,9 +263,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method binding event handlers.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  bindEventHandlers(): WebGLRenderer {
+  bindEventHandlers(): Sigma {
     // Handling window resize
     this.activeListeners.handleResize = () => {
       this.needToSoftProcess = true;
@@ -397,9 +397,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method binding graph handlers
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  bindGraphHandlers(): WebGLRenderer {
+  bindGraphHandlers(): Sigma {
     const graph = this.graph;
 
     this.activeListeners.graphUpdate = () => {
@@ -446,9 +446,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to process the whole graph's data.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  process(keepArrays = false): WebGLRenderer {
+  process(keepArrays = false): Sigma {
     const graph = this.graph,
       settings = this.settings;
 
@@ -552,9 +552,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to process a single node.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  processNode(key: NodeKey): WebGLRenderer {
+  processNode(key: NodeKey): Sigma {
     const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
     const data = this.graph.getNodeAttributes(key) as NodeAttributes;
@@ -567,9 +567,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to process a single edge.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  processEdge(key: EdgeKey): WebGLRenderer {
+  processEdge(key: EdgeKey): Sigma {
     const graph = this.graph;
 
     const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
@@ -621,9 +621,9 @@ export default class WebGLRenderer extends EventEmitter {
    *
    * @param  {number} width  - Target width.
    * @param  {number} height - Target height.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  resize(width?: number, height?: number): WebGLRenderer {
+  resize(width?: number, height?: number): Sigma {
     const previousWidth = this.width,
       previousHeight = this.height;
 
@@ -677,9 +677,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to clear the canvases.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  clear(): WebGLRenderer {
+  clear(): Sigma {
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
@@ -692,9 +692,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to render.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  render(): WebGLRenderer {
+  render(): Sigma {
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
@@ -769,9 +769,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to render labels.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  renderLabels(): WebGLRenderer {
+  renderLabels(): Sigma {
     if (!this.settings.renderLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -848,9 +848,9 @@ export default class WebGLRenderer extends EventEmitter {
    * Method used to render edge labels, based on which node labels were
    * rendered.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  renderEdgeLabels(): WebGLRenderer {
+  renderEdgeLabels(): Sigma {
     if (!this.settings.renderEdgeLabels) return this;
 
     const cameraState = this.camera.getState();
@@ -910,7 +910,7 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to render the highlighted nodes.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
   renderHighlightedNodes(): void {
     const camera = this.camera;
@@ -954,7 +954,7 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to schedule a render.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
   scheduleRender(): void {
     // A frame is already scheduled
@@ -999,9 +999,9 @@ export default class WebGLRenderer extends EventEmitter {
   /**
    * Method used to manually refresh.
    *
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  refresh(): WebGLRenderer {
+  refresh(): Sigma {
     this.needToSoftProcess = true;
     this.scheduleRender();
 
@@ -1012,9 +1012,9 @@ export default class WebGLRenderer extends EventEmitter {
    * Method used to highlight a node.
    *
    * @param  {string} key - The node's key.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  highlightNode(key: NodeKey): WebGLRenderer {
+  highlightNode(key: NodeKey): Sigma {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.add(key);
@@ -1029,9 +1029,9 @@ export default class WebGLRenderer extends EventEmitter {
    * Method used to unhighlight a node.
    *
    * @param  {string} key - The node's key.
-   * @return {WebGLRenderer}
+   * @return {Sigma}
    */
-  unhighlightNode(key: NodeKey): WebGLRenderer {
+  unhighlightNode(key: NodeKey): Sigma {
     // TODO: check the existence of the node
     // TODO: coerce?
     this.highlightedNodes.delete(key);

@@ -4,7 +4,7 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import louvain from "graphology-communities-louvain";
 import { connectedComponents } from "graphology-components";
 
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 import data from "./resources/toflit.json";
 
@@ -93,5 +93,5 @@ biggerCommunities.forEach((h, i) => {
 
   const container = containers[i];
 
-  new WebGLRenderer(h, container);
+  new Sigma(h, container);
 });

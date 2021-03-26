@@ -1,5 +1,5 @@
 import { AbstractProgram, IProgram, RenderParams } from "./program";
-import { EdgeAttributes, NodeAttributes } from "../../../../types";
+import { EdgeAttributes, NodeAttributes } from "../../../types";
 
 export interface RenderEdgeParams extends RenderParams {
   edgesPowRatio: number;

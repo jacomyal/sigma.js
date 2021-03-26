@@ -4,9 +4,9 @@
  *
  * Function used by the canvas renderer to display a single node's label.
  */
-import { PartialButFor } from "../../../utils";
-import { WebGLSettings } from "../../webgl/settings";
-import { NodeAttributes } from "../../../types";
+import { PartialButFor } from "../utils/utils";
+import { WebGLSettings } from "../settings";
+import { NodeAttributes } from "../types";
 
 export default function drawLabel(
   context: CanvasRenderingContext2D,

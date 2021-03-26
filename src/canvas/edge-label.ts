@@ -4,9 +4,9 @@
  *
  * Function used by the canvas renderer to display a single edge's label.
  */
-import { PartialButFor } from "../../../utils";
-import { WebGLSettings } from "../../webgl/settings";
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { PartialButFor } from "../utils/utils";
+import { WebGLSettings } from "../settings";
+import { EdgeAttributes, NodeAttributes } from "../types";
 
 export default function drawEdgeLabel(
   context: CanvasRenderingContext2D,

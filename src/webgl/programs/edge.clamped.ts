@@ -2,76 +2,82 @@
  * Sigma.js WebGL Renderer Edge Program
  * =====================================
  *
- * Program rendering edges as thick lines using four points translated
- * orthogonally from the source & target's centers by half thickness.
+ * Program rendering edges as thick lines but with a twist: the end of edge
+ * does not sit in the middle of target node but instead stays by some margin.
  *
- * Rendering two triangles by using only four points is made possible through
- * the use of indices.
- *
- * This method should be faster than the 6 points / 2 triangles approach and
- * should handle thickness better than with gl.LINES.
- *
- * This version of the shader balances geometry computation evenly between
- * the CPU & GPU (normals are computed on the CPU side).
+ * This is useful when combined with arrows to draw directed edges.
  */
+import { EdgeAttributes, NodeAttributes } from "../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
-import { EdgeAttributes, NodeAttributes } from "../../../types";
 import { floatColor, canUse32BitsIndices } from "../utils";
-import vertexShaderSource from "../shaders/edge.vert.glsl";
+import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
 
 const POINTS = 4,
-  ATTRIBUTES = 6,
+  ATTRIBUTES = 7,
   STRIDE = POINTS * ATTRIBUTES;
 
-export default class EdgeProgram extends AbstractEdgeProgram {
+export default class EdgeClampedProgram extends AbstractEdgeProgram {
   IndicesArray: Uint32ArrayConstructor | Uint16ArrayConstructor;
   indicesArray: Uint32Array | Uint16Array;
+  indicesBuffer: WebGLBuffer;
   indicesType: GLenum;
-  canUse32BitsIndices: boolean;
   positionLocation: GLint;
   colorLocation: GLint;
   normalLocation: GLint;
   thicknessLocation: GLint;
+  radiusLocation: GLint;
   scaleLocation: WebGLUniformLocation;
   matrixLocation: WebGLUniformLocation;
   cameraRatioLocation: WebGLUniformLocation;
   viewportRatioLocation: WebGLUniformLocation;
   thicknessRatioLocation: WebGLUniformLocation;
+  canUse32BitsIndices: boolean;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
-    // Locations
+    // Initializing indices buffer
+    const indicesBuffer = gl.createBuffer();
+    if (indicesBuffer === null)
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting resolutionLocation");
+    this.indicesBuffer = indicesBuffer;
+
+    // Locations:
     this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
     this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
+    this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
 
     // Uniform locations
     const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
     if (scaleLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting scaleLocation");
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting scaleLocation");
     this.scaleLocation = scaleLocation;
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting matrixLocation");
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
     if (cameraRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting cameraRatioLocation");
+      throw new Error("sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting cameraRatioLocation");
     this.cameraRatioLocation = cameraRatioLocation;
 
     const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
     if (viewportRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting viewportRatioLocation");
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting viewportRatioLocation",
+      );
     this.viewportRatioLocation = viewportRatioLocation;
 
     const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
     if (thicknessRatioLocation === null)
-      throw new Error("sigma/renderers/webgl/program/edge.EdgeProgram: error while getting thicknessRatioLocation");
+      throw new Error(
+        "sigma/renderers/webgl/program/edge.EdgeClampedProgram: error while getting thicknessRatioLocation",
+      );
     this.thicknessRatioLocation = thicknessRatioLocation;
 
     // Enabling the OES_element_index_uint extension
@@ -91,11 +97,14 @@ export default class EdgeProgram extends AbstractEdgeProgram {
   bind(): void {
     const gl = this.gl;
 
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.normalLocation);
     gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.colorLocation);
+    gl.enableVertexAttribArray(this.radiusLocation);
 
     gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
@@ -108,6 +117,76 @@ export default class EdgeProgram extends AbstractEdgeProgram {
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
       20,
     );
+    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
+  }
+
+  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
+    if (sourceData.hidden || targetData.hidden || data.hidden) {
+      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
+      return;
+    }
+
+    const thickness = data.size || 1,
+      x1 = sourceData.x,
+      y1 = sourceData.y,
+      x2 = targetData.x,
+      y2 = targetData.y,
+      radius = targetData.size || 1,
+      color = floatColor(data.color);
+
+    // Computing normals
+    const dx = x2 - x1,
+      dy = y2 - y1;
+
+    let len = dx * dx + dy * dy,
+      n1 = 0,
+      n2 = 0;
+
+    if (len) {
+      len = 1 / Math.sqrt(len);
+      n1 = -dy * len;
+      n2 = dx * len;
+    }
+
+    let i = POINTS * ATTRIBUTES * offset;
+
+    const array = this.array;
+
+    // First point
+    array[i++] = x1;
+    array[i++] = y1;
+    array[i++] = n1;
+    array[i++] = n2;
+    array[i++] = thickness;
+    array[i++] = color;
+    array[i++] = 0;
+
+    // First point flipped
+    array[i++] = x1;
+    array[i++] = y1;
+    array[i++] = -n1;
+    array[i++] = -n2;
+    array[i++] = thickness;
+    array[i++] = color;
+    array[i++] = 0;
+
+    // Second point
+    array[i++] = x2;
+    array[i++] = y2;
+    array[i++] = n1;
+    array[i++] = n2;
+    array[i++] = thickness;
+    array[i++] = color;
+    array[i++] = radius;
+
+    // Second point flipped
+    array[i++] = x2;
+    array[i++] = y2;
+    array[i++] = -n1;
+    array[i++] = -n2;
+    array[i++] = thickness;
+    array[i++] = color;
+    array[i] = -radius;
   }
 
   computeIndices(): void {
@@ -133,71 +212,6 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     // Indices data
     const gl = this.gl;
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
-  }
-
-  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
-    if (sourceData.hidden || targetData.hidden || data.hidden) {
-      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
-      return;
-    }
-
-    const thickness = data.size || 1,
-      x1 = sourceData.x,
-      y1 = sourceData.y,
-      x2 = targetData.x,
-      y2 = targetData.y,
-      color = floatColor(data.color);
-
-    // Computing normals
-    const dx = x2 - x1,
-      dy = y2 - y1;
-
-    let len = dx * dx + dy * dy,
-      n1 = 0,
-      n2 = 0;
-
-    if (len) {
-      len = 1 / Math.sqrt(len);
-
-      n1 = -dy * len;
-      n2 = dx * len;
-    }
-
-    let i = POINTS * ATTRIBUTES * offset;
-
-    const array = this.array;
-
-    // First point
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = thickness;
-    array[i++] = color;
-
-    // First point flipped
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = thickness;
-    array[i++] = color;
-
-    // Second point
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = thickness;
-    array[i++] = color;
-
-    // Second point flipped
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = thickness;
-    array[i] = color;
   }
 
   render(params: RenderEdgeParams): void {

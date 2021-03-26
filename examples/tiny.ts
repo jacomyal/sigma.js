@@ -1,5 +1,5 @@
 import { UndirectedGraph } from "graphology";
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 const container = document.getElementById("container");
 
@@ -26,7 +26,7 @@ graph.addEdge("Jessica", "Truman", {
   size: 1,
 });
 
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new Sigma(graph, container);
 
 window.graph = graph;
 window.renderer = renderer;

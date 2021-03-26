@@ -3,7 +3,7 @@ import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
 import faker from "faker";
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 import CustomNodeProgram from "./custom-nodes/custom-node-program";
 
@@ -20,7 +20,7 @@ graph.nodes().forEach((node) => {
   });
 });
 
-const renderer = new WebGLRenderer(graph, container, {
+const renderer = new Sigma(graph, container, {
   nodeProgramClasses: { circle: CustomNodeProgram },
 });
 

@@ -1,8 +1,8 @@
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import empty from "graphology-generators/classic/empty";
-import WebGLRenderer from "../src/renderers/webgl/index";
-import { animateNodes } from "../src/animate";
+import Sigma from "../src";
+import { animateNodes } from "../src/utils/animate";
 import noverlap from "graphology-layout-noverlap";
 import NoverlapLayoutSupervisor from "graphology-layout-noverlap/worker";
 import chroma from "chroma-js";
@@ -32,7 +32,7 @@ graph.forEachNode((node) => {
   });
 });
 
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new Sigma(graph, container);
 const camera = renderer.getCamera();
 
 function createButton(text, offset) {

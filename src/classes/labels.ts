@@ -5,9 +5,9 @@
  * Miscelleneous heuristics related to label display.
  */
 import Graph from "graphology";
-import Camera from "../camera";
+import Camera from "./camera";
 import { NodeAttributes } from "../types";
-import WebGLRenderer from "../renderers/webgl";
+import Sigma from "../index";
 import { EdgeKey, NodeKey } from "graphology-types";
 /**
  * Constants.
@@ -61,7 +61,7 @@ export function labelsToDisplayFromGrid(params: {
   cache: { [key: string]: NodeAttributes };
   camera: Camera;
   cell: { width: number; height: number } | null;
-  dimensions: WebGLRenderer;
+  dimensions: Sigma;
   displayedLabels: Set<NodeKey>;
   fontSize: number;
   graph: Graph;

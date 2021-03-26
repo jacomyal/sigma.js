@@ -7,7 +7,7 @@
  * every GPU.
  */
 import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
-import { NodeAttributes } from "../../../types";
+import { NodeAttributes } from "../../types";
 import { floatColor } from "../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";

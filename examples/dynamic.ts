@@ -6,7 +6,7 @@ import choice from "pandemonium/choice";
 import random from "pandemonium/random";
 import chroma from "chroma-js";
 import faker from "faker";
-import WebGLRenderer from "../src/renderers/webgl/index";
+import Sigma from "../src";
 
 const container = document.getElementById("container");
 
@@ -21,7 +21,7 @@ graph.nodes().forEach((node) => {
   });
 });
 
-const renderer = new WebGLRenderer(graph, container);
+const renderer = new Sigma(graph, container);
 
 window.graph = graph;
 window.renderer = renderer;
