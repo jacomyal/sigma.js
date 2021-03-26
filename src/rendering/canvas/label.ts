@@ -4,13 +4,13 @@
  *
  * Function used by the canvas renderer to display a single node's label.
  */
-import { WebGLSettings } from "../../settings";
+import { Settings } from "../../settings";
 import { NodeAttributes, PartialButFor } from "../../types";
 
 export default function drawLabel(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
-  settings: WebGLSettings,
+  settings: Settings,
 ): void {
   const size = settings.labelSize,
     font = settings.labelFont,

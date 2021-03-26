@@ -4,7 +4,7 @@
  *
  * Function used by the canvas renderer to display a single edge's label.
  */
-import { WebGLSettings } from "../../settings";
+import { Settings } from "../../settings";
 import { EdgeAttributes, NodeAttributes, PartialButFor } from "../../types";
 
 export default function drawEdgeLabel(
@@ -12,7 +12,7 @@ export default function drawEdgeLabel(
   edgeData: PartialButFor<EdgeAttributes, "label" | "color" | "size">,
   sourceData: PartialButFor<NodeAttributes, "x" | "y">,
   targetData: PartialButFor<NodeAttributes, "x" | "y">,
-  settings: WebGLSettings,
+  settings: Settings,
 ): void {
   const size = settings.edgeLabelSize,
     font = settings.edgeLabelFont,

@@ -11,13 +11,13 @@ import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
 import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
 
 /**
- * Sigma.js WebGL Renderer Settings
+ * Sigma.js Settings
  * =================================
  *
- * The list of settings for the WebGL renderer and some handy functions.
+ * The list of settings for the renderer and some handy functions.
  */
 
-export function validateWebglRendererSettings(settings: WebGLSettings): void {
+export function validateSettings(settings: Settings): void {
   // Label grid cell
   if (
     settings.labelGrid &&
@@ -25,7 +25,7 @@ export function validateWebglRendererSettings(settings: WebGLSettings): void {
     typeof settings.labelGrid.cell === "object" &&
     (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)
   ) {
-    throw new Error("sigma/renderers/webgl/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+    throw new Error("sigma/settings: invalid `labelGrid.cell`. Expecting {width, height}.");
   }
 }
 
@@ -33,10 +33,8 @@ export function validateWebglRendererSettings(settings: WebGLSettings): void {
  * Sigma.js WebGL Renderer Settings
  * =================================
  *
- * The list of settings for the WebGL renderer and some handy functions.
  */
-
-export interface WebGLSettings {
+export interface Settings {
   // Performance
   hideEdgesOnMove: boolean;
   hideLabelsOnMove: boolean;
@@ -73,7 +71,7 @@ export interface WebGLSettings {
   edgeProgramClasses: { [key: string]: EdgeProgramConstructor };
 }
 
-export const WEBGL_RENDERER_DEFAULT_SETTINGS: WebGLSettings = {
+export const DEFAULT_SETTINGS: Settings = {
   // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,

@@ -35,7 +35,7 @@ import {
   zIndexOrdering,
 } from "./utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
-import { WebGLSettings, WEBGL_RENDERER_DEFAULT_SETTINGS, validateWebglRendererSettings } from "./settings";
+import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
@@ -57,7 +57,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
  * @param {object}      settings  - Optional settings.
  */
 export default class Sigma extends EventEmitter {
-  settings: WebGLSettings;
+  settings: Settings;
   graph: Graph;
   mouseCaptor: MouseCaptor;
   touchCaptor: TouchCaptor;
@@ -93,12 +93,12 @@ export default class Sigma extends EventEmitter {
 
   camera: Camera;
 
-  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<WebGLSettings> = {}) {
+  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<Settings> = {}) {
     super();
 
-    this.settings = assign<WebGLSettings>({}, WEBGL_RENDERER_DEFAULT_SETTINGS, settings);
+    this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
 
-    validateWebglRendererSettings(this.settings);
+    validateSettings(this.settings);
 
     // Validating
     if (!isGraph(graph)) throw new Error("sigma/renderers/webgl: invalid graph instance.");
