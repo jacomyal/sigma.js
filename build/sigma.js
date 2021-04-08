@@ -25,6 +25,7 @@ exports.Sigma = exports.MouseCaptor = exports.QuadTree = exports.Camera = void 0
  * ==========================
  *
  * The library endpoint.
+ * @module
  */
 var camera_1 = __importDefault(__webpack_require__(1));
 exports.Camera = camera_1.default;
@@ -91,6 +92,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  * ======================
  *
  * Class designed to store camera information & used to update it.
+ * @module
  */
 var events_1 = __webpack_require__(2);
 var animate_1 = __webpack_require__(3);
@@ -316,7 +318,7 @@ var Camera = /** @class */ (function (_super) {
         var _this = this;
         if (!this.enabled)
             return;
-        var options = utils_1.assign({}, animate_1.ANIMATE_DEFAULTS, opts);
+        var options = Object.assign({}, animate_1.ANIMATE_DEFAULTS, opts);
         var easing = typeof options.easing === "function" ? options.easing : easings_1.default[options.easing];
         // State
         var start = Date.now(), initialState = this.getState();
@@ -924,7 +926,7 @@ exports.ANIMATE_DEFAULTS = {
  * Function used to animate the nodes.
  */
 function animateNodes(graph, targets, opts, callback) {
-    var options = index_1.assign({}, exports.ANIMATE_DEFAULTS, opts);
+    var options = Object.assign({}, exports.ANIMATE_DEFAULTS, opts);
     var easing = typeof options.easing === "function" ? options.easing : easings_1.default[options.easing];
     var start = Date.now();
     var startPositions = {};
@@ -989,7 +991,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assign = exports.isPlainObject = void 0;
+exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assignDeep = exports.isPlainObject = void 0;
 var matrices_1 = __webpack_require__(5);
 /**
  * Checks whether the given value is a plain object.
@@ -1009,7 +1011,7 @@ exports.isPlainObject = isPlainObject;
  * @param  {object} [...objects] - Objects to merge.
  * @return {object}
  */
-function assign(target) {
+function assignDeep(target) {
     var objects = [];
     for (var _i = 1; _i < arguments.length; _i++) {
         objects[_i - 1] = arguments[_i];
@@ -1021,7 +1023,7 @@ function assign(target) {
             continue;
         for (var k in o) {
             if (isPlainObject(o[k])) {
-                target[k] = assign(target[k], o[k]);
+                target[k] = assignDeep(target[k], o[k]);
             }
             else {
                 target[k] = o[k];
@@ -1030,7 +1032,7 @@ function assign(target) {
     }
     return target;
 }
-exports.assign = assign;
+exports.assignDeep = assignDeep;
 /**
  * Just some dirty trick to make requestAnimationFrame and cancelAnimationFrame "work" in Node.js, for unit tests:
  */
@@ -1216,14 +1218,15 @@ exports.canUse32BitsIndices = canUse32BitsIndices;
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.multiply = exports.translate = exports.rotate = exports.scale = exports.identity = void 0;
 /**
  * Sigma.js WebGL Matrices Helpers
  * ================================
  *
  * Matrices-related helper functions used by sigma's WebGL renderer.
+ * @module
  */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.multiply = exports.translate = exports.rotate = exports.scale = exports.identity = void 0;
 function identity() {
     return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
@@ -1284,6 +1287,7 @@ exports.cubicInOut = exports.cubicOut = exports.cubicIn = exports.quadraticInOut
  * =================
  *
  * Handy collection of easing functions.
+ * @module
  */
 exports.linear = function (k) { return k; };
 exports.quadraticIn = function (k) { return k * k; };
@@ -1343,8 +1347,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.rectangleCollidesWithQuad = exports.squareCollidesWithQuad = exports.getCircumscribedAlignedRectangle = exports.isRectangleAligned = void 0;
-/* eslint no-nested-ternary: 0 */
-/* eslint no-constant-condition: 0 */
 /**
  * Sigma.js Quad Tree Class
  * =========================
@@ -1352,7 +1354,10 @@ exports.rectangleCollidesWithQuad = exports.squareCollidesWithQuad = exports.get
  * Class implementing the quad tree data structure used to solve hovers and
  * determine which elements are currently in the scope of the camera so that
  * we don't waste time rendering things the user cannot see anyway.
+ * @module
  */
+/* eslint no-nested-ternary: 0 */
+/* eslint no-constant-condition: 0 */
 var extend_1 = __importDefault(__webpack_require__(8));
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
@@ -1989,6 +1994,7 @@ exports.getWheelDelta = exports.getTouchCoords = exports.getTouchesArray = expor
 /**
  * Sigma.js Captor Class
  * ======================
+ * @module
  */
 var events_1 = __webpack_require__(2);
 /**
@@ -2139,10 +2145,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /**
- * Sigma.js WebGL Renderer
- * ========================
- *
- * File implementing sigma's WebGL Renderer.
+ * Sigma.js
+ * ========
+ * @module
  */
 var events_1 = __webpack_require__(2);
 var extent_1 = __importDefault(__webpack_require__(12));
@@ -2150,17 +2155,37 @@ var is_graph_1 = __importDefault(__webpack_require__(13));
 var camera_1 = __importDefault(__webpack_require__(1));
 var mouse_1 = __importDefault(__webpack_require__(9));
 var quadtree_1 = __importDefault(__webpack_require__(7));
-var types_1 = __webpack_require__(14);
 var utils_1 = __webpack_require__(4);
-var labels_1 = __webpack_require__(15);
-var settings_1 = __webpack_require__(16);
-var touch_1 = __importDefault(__webpack_require__(37));
+var labels_1 = __webpack_require__(14);
+var settings_1 = __webpack_require__(15);
+var touch_1 = __importDefault(__webpack_require__(36));
 var nodeExtent = extent_1.default.nodeExtent, edgeExtent = extent_1.default.edgeExtent;
 /**
  * Constants.
  */
 var PIXEL_RATIO = utils_1.getPixelRatio();
 var WEBGL_OVERSAMPLING_RATIO = utils_1.getPixelRatio();
+/**
+ * Important functions.
+ */
+function applyNodeDefaults(settings, key, data) {
+    if (!data.hasOwnProperty("x") || !data.hasOwnProperty("y"))
+        throw new Error("Sigma: could not find a valid position (x, y) for node \"" + key + "\". All your nodes must have a number \"x\" and \"y\". Maybe your forgot to apply a layout or your \"nodeReducer\" is not returning the correct data?");
+    if (!data.color)
+        data.color = settings.defaultNodeColor;
+    if (!data.label)
+        data.label = "";
+    if (!data.size)
+        data.size = 2;
+}
+function applyEdgeDefaults(settings, key, data) {
+    if (!data.color)
+        data.color = settings.defaultEdgeColor;
+    if (!data.label)
+        data.label = "";
+    if (!data.size)
+        data.size = 0.5;
+}
 /**
  * Main class.
  *
@@ -2181,6 +2206,8 @@ var Sigma = /** @class */ (function (_super) {
         _this.quadtree = new quadtree_1.default();
         _this.nodeDataCache = {};
         _this.edgeDataCache = {};
+        _this.nodeKeyToIndex = {};
+        _this.edgeKeyToIndex = {};
         _this.nodeExtent = null;
         _this.edgeExtent = null;
         _this.normalizationFunction = null;
@@ -2198,7 +2225,7 @@ var Sigma = /** @class */ (function (_super) {
         // programs
         _this.nodePrograms = {};
         _this.edgePrograms = {};
-        _this.settings = utils_1.assign({}, settings_1.DEFAULT_SETTINGS, settings);
+        _this.settings = utils_1.assignDeep({}, settings_1.DEFAULT_SETTINGS, settings);
         settings_1.validateSettings(_this.settings);
         // Validating
         if (!is_graph_1.default(graph))
@@ -2316,13 +2343,21 @@ var Sigma = /** @class */ (function (_super) {
      * @return {Sigma}
      */
     Sigma.prototype.initializeCache = function () {
+        var _this = this;
         var graph = this.graph;
-        var nodes = graph.nodes();
-        for (var i = 0, l = nodes.length; i < l; i++)
-            this.nodeDataCache[nodes[i]] = new types_1.Node(i, this.settings);
-        var edges = graph.edges();
-        for (var i = 0, l = edges.length; i < l; i++)
-            this.edgeDataCache[edges[i]] = new types_1.Edge(i, this.settings);
+        // NOTE: the data caches are never reset to avoid paying a GC cost
+        // But this could prove to be a bad decision. In which case just "reset"
+        // them here.
+        var i = 0;
+        graph.forEachNode(function (key) {
+            _this.nodeKeyToIndex[key] = i++;
+            _this.nodeDataCache[key] = {};
+        });
+        i = 0;
+        graph.forEachEdge(function (key) {
+            _this.edgeKeyToIndex[key] = i++;
+            _this.edgeDataCache[key] = {};
+        });
     };
     /**
      * Method binding camera handlers.
@@ -2454,12 +2489,14 @@ var Sigma = /** @class */ (function (_super) {
         };
         this.activeListeners.addNodeGraphUpdate = function (e) {
             // Adding entry to cache
-            _this.nodeDataCache[e.key] = new types_1.Node(graph.order - 1, _this.settings);
+            _this.nodeKeyToIndex[e.key] = graph.order - 1;
+            _this.nodeDataCache[e.key] = {};
             _this.activeListeners.graphUpdate();
         };
         this.activeListeners.addEdgeGraphUpdate = function (e) {
             // Adding entry to cache
-            _this.edgeDataCache[e.key] = new types_1.Edge(graph.size - 1, _this.settings);
+            _this.nodeKeyToIndex[e.key] = graph.order - 1;
+            _this.edgeDataCache[e.key] = {};
             _this.activeListeners.graphUpdate();
         };
         // TODO: clean cache on drop!
@@ -2507,22 +2544,26 @@ var Sigma = /** @class */ (function (_super) {
         var nodes = graph.nodes();
         // Handling node z-index
         // TODO: z-index needs us to compute display data before hand
-        // TODO: remains to be seen if reducers are a good or bad thing and if we
-        // should store display data in flat byte arrays indices
         if (this.settings.zIndex)
             nodes = utils_1.zIndexOrdering(this.nodeExtent.z, function (node) { return graph.getNodeAttribute(node, "z"); }, nodes);
         for (var i = 0, l = nodes.length; i < l; i++) {
             var node = nodes[i];
+            // Node display data resolution:
+            //   1. First we get the node's attributes
+            //   2. We optionally reduce them using the function provided by the user
+            //      Note that this function must return a total object and won't be merged
+            //   3. We apply our defaults, while running some vital checks
+            //   4. We apply the normalization function
             var data = graph.getNodeAttributes(node);
-            var displayData = this.nodeDataCache[node];
             if (settings.nodeReducer)
                 data = settings.nodeReducer(node, data);
-            // TODO: should assign default also somewhere here if there is a reducer
-            displayData.assign(data);
-            this.normalizationFunction.applyTo(displayData);
-            this.quadtree.add(node, displayData.x, 1 - displayData.y, displayData.size / this.width);
-            nodeProgram.process(displayData, i);
-            displayData.index = i;
+            // We shallow copy the data to avoid mutating both the graph and the reducer's result
+            data = Object.assign(this.nodeDataCache[node], data);
+            applyNodeDefaults(this.settings, node, data);
+            this.normalizationFunction.applyTo(data);
+            this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
+            nodeProgram.process(data, i);
+            this.nodeKeyToIndex[node] = i;
         }
         nodeProgram.bufferData();
         var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
@@ -2534,14 +2575,20 @@ var Sigma = /** @class */ (function (_super) {
             edges = utils_1.zIndexOrdering(this.edgeExtent.z, function (edge) { return graph.getEdgeAttribute(edge, "z"); }, edges);
         for (var i = 0, l = edges.length; i < l; i++) {
             var edge = edges[i];
+            // Edge display data resolution:
+            //   1. First we get the edge's attributes
+            //   2. We optionally reduce them using the function provided by the user
+            //      Note that this function must return a total object and won't be merged
+            //   3. We apply our defaults, while running some vital checks
             var data = graph.getEdgeAttributes(edge);
-            var displayData = this.edgeDataCache[edge];
             if (settings.edgeReducer)
                 data = settings.edgeReducer(edge, data);
-            displayData.assign(data);
+            // We shallow copy the data to avoid mutating both the graph and the reducer's result
+            data = Object.assign(this.edgeDataCache[edge], data);
+            applyEdgeDefaults(this.settings, edge, data);
             var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
-            edgeProgram.process(sourceData, targetData, displayData, i);
-            displayData.index = i;
+            edgeProgram.process(sourceData, targetData, data, i);
+            this.nodeKeyToIndex[edge] = i;
         }
         // Computing edge indices if necessary
         if (!keepArrays && typeof edgeProgram.computeIndices === "function")
@@ -2557,7 +2604,7 @@ var Sigma = /** @class */ (function (_super) {
     Sigma.prototype.processNode = function (key) {
         var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
         var data = this.graph.getNodeAttributes(key);
-        nodeProgram.process(data, this.nodeDataCache[key].index);
+        nodeProgram.process(data, this.nodeKeyToIndex[key]);
         return this;
     };
     /**
@@ -2569,7 +2616,7 @@ var Sigma = /** @class */ (function (_super) {
         var graph = this.graph;
         var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
         var data = graph.getEdgeAttributes(key), extremities = graph.extremities(key), sourceData = graph.getNodeAttributes(extremities[0]), targetData = graph.getNodeAttributes(extremities[1]);
-        edgeProgram.process(sourceData, targetData, data, this.edgeDataCache[key].index);
+        edgeProgram.process(sourceData, targetData, data, this.edgeKeyToIndex[key]);
         return this;
     };
     /**---------------------------------------------------------------------------
@@ -2933,6 +2980,29 @@ var Sigma = /** @class */ (function (_super) {
         return this;
     };
     /**
+     * Method used to get all the sigma node attributes.
+     * It's usefull for example to get the position of a node
+     * and to get values that are set by the nodeReducer
+     *
+     * @param  {string} key - The node's key.
+     * @return {Partial<NodeAttributes>} A copy of the desired node's attribute or undefined if not found
+     */
+    Sigma.prototype.getNodeAttributes = function (key) {
+        var node = this.nodeDataCache[key];
+        return node ? Object.assign({}, node) : undefined;
+    };
+    /**
+     * Method used to get all the sigma edge attributes.
+     * It's usefull for example to get values that are set by the edgeReducer.
+     *
+     * @param  {string} key - The edge's key.
+     * @return {Partial<EdgeAttributes> | undefined} A copy of the desired edge's attribute or undefined if not found
+     */
+    Sigma.prototype.getEdgeAttributes = function (key) {
+        var edge = this.edgeDataCache[key];
+        return edge ? Object.assign({}, edge) : undefined;
+    };
+    /**
      * Method used to shut the container & release event listeners.
      *
      * @return {undefined}
@@ -3136,46 +3206,6 @@ module.exports = function isGraph(value) {
 
 /***/ }),
 /* 14 */
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Edge = exports.Node = void 0;
-var Node = /** @class */ (function () {
-    function Node(index, settings) {
-        this.index = index;
-        this.x = 0;
-        this.y = 0;
-        this.size = 2;
-        this.color = settings.defaultNodeColor;
-        this.hidden = false;
-        this.label = "";
-    }
-    Node.prototype.assign = function (data) {
-        Object.assign(this, data);
-    };
-    return Node;
-}());
-exports.Node = Node;
-var Edge = /** @class */ (function () {
-    function Edge(index, settings) {
-        this.index = index;
-        this.size = 1;
-        this.color = settings.defaultEdgeColor;
-        this.hidden = false;
-        this.label = "";
-    }
-    Edge.prototype.assign = function (data) {
-        Object.assign(this, data);
-    };
-    return Edge;
-}());
-exports.Edge = Edge;
-
-
-/***/ }),
-/* 15 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3404,28 +3434,29 @@ exports.edgeLabelsToDisplayFromNodes = edgeLabelsToDisplayFromNodes;
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
+/**
+ * Sigma.js Settings
+ * =================================
+ *
+ * The list of settings and some handy functions.
+ * @module
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEFAULT_SETTINGS = exports.validateSettings = void 0;
-var label_1 = __importDefault(__webpack_require__(17));
-var hover_1 = __importDefault(__webpack_require__(18));
-var edge_label_1 = __importDefault(__webpack_require__(20));
-var node_fast_1 = __importDefault(__webpack_require__(21));
-var edge_1 = __importDefault(__webpack_require__(27));
-var edge_arrow_1 = __importDefault(__webpack_require__(31));
-/**
- * Sigma.js Settings
- * =================================
- *
- * The list of settings for the renderer and some handy functions.
- */
+var label_1 = __importDefault(__webpack_require__(16));
+var hover_1 = __importDefault(__webpack_require__(17));
+var edge_label_1 = __importDefault(__webpack_require__(19));
+var node_fast_1 = __importDefault(__webpack_require__(20));
+var edge_1 = __importDefault(__webpack_require__(26));
+var edge_arrow_1 = __importDefault(__webpack_require__(30));
 function validateSettings(settings) {
     // Label grid cell
     if (settings.labelGrid &&
@@ -3479,7 +3510,7 @@ exports.DEFAULT_SETTINGS = {
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3495,7 +3526,7 @@ exports.default = drawLabel;
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3504,8 +3535,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var node_1 = __importDefault(__webpack_require__(19));
-var label_1 = __importDefault(__webpack_require__(17));
+var node_1 = __importDefault(__webpack_require__(18));
+var label_1 = __importDefault(__webpack_require__(16));
 function drawHover(context, data, settings) {
     var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
     context.font = weight + " " + size + "px " + font;
@@ -3540,7 +3571,7 @@ exports.default = drawHover;
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3558,7 +3589,7 @@ exports.default = drawNode;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3597,7 +3628,7 @@ exports.default = drawEdgeLabel;
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3620,9 +3651,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var utils_1 = __webpack_require__(4);
-var node_fast_vert_glsl_1 = __importDefault(__webpack_require__(22));
-var node_fast_frag_glsl_1 = __importDefault(__webpack_require__(23));
-var node_1 = __webpack_require__(24);
+var node_fast_vert_glsl_1 = __importDefault(__webpack_require__(21));
+var node_fast_frag_glsl_1 = __importDefault(__webpack_require__(22));
+var node_1 = __webpack_require__(23);
 var POINTS = 1, ATTRIBUTES = 4;
 var NodeProgramFast = /** @class */ (function (_super) {
     __extends(NodeProgramFast, _super);
@@ -3662,7 +3693,7 @@ exports.default = NodeProgramFast;
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -3673,7 +3704,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute float a_size;\nattribute vec4 a_color;\n\nuniform float u_ratio;\nuniform float u_scale;\nuniform mat3 u_matrix;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  gl_Position = vec4(\n    (u_matrix * vec3(a_position, 1)).xy,\n    0,\n    1\n  );\n\n  // Multiply the point size twice:\n  //  - x SCALING_RATIO to correct the canvas scaling\n  //  - x 2 to correct the formulae\n  gl_PointSize = a_size * u_ratio * u_scale * 2.0;\n\n  v_border = (1.0 / u_ratio) * (0.5 / a_size);\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -3684,7 +3715,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\nvarying float v_border;\n\nconst float radius = 0.5;\n\nvoid main(void) {\n  vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n  vec2 m = gl_PointCoord - vec2(0.5, 0.5);\n  float dist = radius - length(m);\n\n  float t = 0.0;\n  if (dist > v_border)\n    t = 1.0;\n  else if (dist > 0.0)\n    t = dist / v_border;\n\n  gl_FragColor = mix(color0, v_color, t);\n}\n");
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3704,7 +3735,13 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createNodeCompoundProgram = exports.AbstractNodeProgram = void 0;
-var program_1 = __webpack_require__(25);
+/**
+ * Sigma.js WebGL Abstract Node Program
+ * =====================================
+ *
+ * @module
+ */
+var program_1 = __webpack_require__(24);
 /**
  * Node Program class.
  *
@@ -3780,7 +3817,7 @@ exports.createNodeCompoundProgram = createNodeCompoundProgram;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -3792,8 +3829,9 @@ exports.AbstractProgram = void 0;
  * ================================
  *
  * Class representing a single WebGL program used by sigma's WebGL renderer.
+ * @module
  */
-var utils_1 = __webpack_require__(26);
+var utils_1 = __webpack_require__(25);
 /**
  * Abstract Program class.
  *
@@ -3829,7 +3867,7 @@ exports.AbstractProgram = AbstractProgram;
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -3839,6 +3877,7 @@ exports.AbstractProgram = AbstractProgram;
  * ======================
  *
  * Code used to load sigma's shaders.
+ * @module
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.loadProgram = exports.loadFragmentShader = exports.loadVertexShader = void 0;
@@ -3899,7 +3938,7 @@ exports.loadProgram = loadProgram;
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -3936,11 +3975,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  *
  * This version of the shader balances geometry computation evenly between
  * the CPU & GPU (normals are computed on the CPU side).
+ * @module
  */
 var utils_1 = __webpack_require__(4);
-var edge_vert_glsl_1 = __importDefault(__webpack_require__(28));
-var edge_frag_glsl_1 = __importDefault(__webpack_require__(29));
-var edge_1 = __webpack_require__(30);
+var edge_vert_glsl_1 = __importDefault(__webpack_require__(27));
+var edge_frag_glsl_1 = __importDefault(__webpack_require__(28));
+var edge_1 = __webpack_require__(29);
 var POINTS = 4, ATTRIBUTES = 6, STRIDE = POINTS * ATTRIBUTES;
 var EdgeProgram = /** @class */ (function (_super) {
     __extends(EdgeProgram, _super);
@@ -4082,7 +4122,7 @@ exports.default = EdgeProgram;
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4093,7 +4133,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  // Add normal vector to the position in screen space, but correct thickness first:\n  vec2 position = (u_matrix * vec3(a_position + a_normal * thickness * u_cameraRatio, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4104,7 +4144,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float feather = 0.001;\nconst vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);\n\nvoid main(void) {\n  float dist = length(v_normal) * v_thickness;\n\n  float t = smoothstep(\n    v_thickness - feather,\n    v_thickness,\n    dist\n  );\n\n  gl_FragColor = mix(v_color, color0, t);\n}\n");
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -4124,7 +4164,13 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createEdgeCompoundProgram = exports.AbstractEdgeProgram = void 0;
-var program_1 = __webpack_require__(25);
+/**
+ * Sigma.js WebGL Abstract Edge Program
+ * =====================================
+ *
+ * @module
+ */
+var program_1 = __webpack_require__(24);
 /**
  * Edge Program class.
  *
@@ -4172,7 +4218,7 @@ exports.createEdgeCompoundProgram = createEdgeCompoundProgram;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -4186,16 +4232,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  * ===========================================
  *
  * Compound program rendering edges as an arrow from the source to the target.
+ * @module
  */
-var edge_1 = __webpack_require__(30);
-var edge_arrowHead_1 = __importDefault(__webpack_require__(32));
-var edge_clamped_1 = __importDefault(__webpack_require__(35));
+var edge_1 = __webpack_require__(29);
+var edge_arrowHead_1 = __importDefault(__webpack_require__(31));
+var edge_clamped_1 = __importDefault(__webpack_require__(34));
 var program = edge_1.createEdgeCompoundProgram([edge_clamped_1.default, edge_arrowHead_1.default]);
 exports.default = program;
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -4218,9 +4265,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var utils_1 = __webpack_require__(4);
-var edge_arrowHead_vert_glsl_1 = __importDefault(__webpack_require__(33));
-var edge_arrowHead_frag_glsl_1 = __importDefault(__webpack_require__(34));
-var edge_1 = __webpack_require__(30);
+var edge_arrowHead_vert_glsl_1 = __importDefault(__webpack_require__(32));
+var edge_arrowHead_frag_glsl_1 = __importDefault(__webpack_require__(33));
+var edge_1 = __webpack_require__(29);
 var POINTS = 3, ATTRIBUTES = 10, STRIDE = POINTS * ATTRIBUTES;
 var EdgeArrowHeadProgram = /** @class */ (function (_super) {
     __extends(EdgeArrowHeadProgram, _super);
@@ -4347,7 +4394,7 @@ exports.default = EdgeArrowHeadProgram;
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4358,7 +4405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute float a_radius;\nattribute vec4 a_color;\nattribute vec3 a_barycentric;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\n\nconst float arrowHeadLengthThicknessRatio = 2.5;\nconst float arrowHeadWidthLengthRatio = 0.66;\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  float nodeRadius = a_radius * u_thicknessRatio * u_scale * u_viewportRatio * u_cameraRatio;\n  float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio * u_cameraRatio;\n  float arrowHeadHalfWidth = arrowHeadWidthLengthRatio * arrowHeadLength / 2.0;\n\n  float da = a_barycentric.x;\n  float db = a_barycentric.y;\n  float dc = a_barycentric.z;\n\n  vec2 delta = vec2(\n      da * ((nodeRadius) * a_normal.y)\n    + db * ((nodeRadius + arrowHeadLength) * a_normal.y + arrowHeadHalfWidth * a_normal.x)\n    + dc * ((nodeRadius + arrowHeadLength) * a_normal.y - arrowHeadHalfWidth * a_normal.x),\n\n      da * (-(nodeRadius) * a_normal.x)\n    + db * (-(nodeRadius + arrowHeadLength) * a_normal.x + arrowHeadHalfWidth * a_normal.y)\n    + dc * (-(nodeRadius + arrowHeadLength) * a_normal.x - arrowHeadHalfWidth * a_normal.y)\n  );\n\n  vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4369,7 +4416,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("precision mediump float;\n\nvarying vec4 v_color;\n\nvoid main(void) {\n  gl_FragColor = v_color;\n}\n");
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -4391,10 +4438,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var edge_1 = __webpack_require__(30);
+var edge_1 = __webpack_require__(29);
 var utils_1 = __webpack_require__(4);
-var edge_clamped_vert_glsl_1 = __importDefault(__webpack_require__(36));
-var edge_frag_glsl_1 = __importDefault(__webpack_require__(29));
+var edge_clamped_vert_glsl_1 = __importDefault(__webpack_require__(35));
+var edge_frag_glsl_1 = __importDefault(__webpack_require__(28));
 var POINTS = 4, ATTRIBUTES = 7, STRIDE = POINTS * ATTRIBUTES;
 var EdgeClampedProgram = /** @class */ (function (_super) {
     __extends(EdgeClampedProgram, _super);
@@ -4549,7 +4596,7 @@ exports.default = EdgeClampedProgram;
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4560,7 +4607,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("attribute vec2 a_position;\nattribute vec2 a_normal;\nattribute float a_thickness;\nattribute vec4 a_color;\nattribute float a_radius;\n\nuniform mat3 u_matrix;\nuniform float u_scale;\nuniform float u_cameraRatio;\nuniform float u_viewportRatio;\nuniform float u_thicknessRatio;\n\nvarying vec4 v_color;\nvarying vec2 v_normal;\nvarying float v_thickness;\n\nconst float arrowHeadLengthThicknessRatio = 2.5;\nconst float minThickness = 0.8;\nconst float bias = 255.0 / 254.0;\n\nvoid main() {\n\n  // Computing thickness in screen space:\n  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;\n  thickness = max(thickness, minThickness * u_viewportRatio);\n\n  float direction = sign(a_radius);\n  float nodeRadius = direction * a_radius * u_thicknessRatio * u_scale * u_viewportRatio;\n  float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio;\n\n  vec2 arrowHeadVector = vec2(-direction * a_normal.y, direction * a_normal.x);\n\n  // Add normal vector to the position in screen space, but correct thickness first:\n  vec2 position = a_position + a_normal * thickness * u_cameraRatio;\n  // Add vector that corrects the arrow head length:\n  position = position + arrowHeadVector * (arrowHeadLength + nodeRadius) * u_cameraRatio;\n  // Apply camera\n  position = (u_matrix * vec3(position, 1)).xy;\n\n  gl_Position = vec4(position, 0, 1);\n\n  v_normal = a_normal;\n  v_thickness = thickness;\n\n  // Extract the color:\n  v_color = a_color;\n  v_color.a *= bias;\n}\n");
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";

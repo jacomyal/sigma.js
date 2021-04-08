@@ -1096,6 +1096,31 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method used to get all the sigma node attributes.
+   * It's usefull for example to get the position of a node
+   * and to get values that are set by the nodeReducer
+   *
+   * @param  {string} key - The node's key.
+   * @return {Partial<NodeAttributes>} A copy of the desired node's attribute or undefined if not found
+   */
+  getNodeAttributes(key: NodeKey): Partial<NodeAttributes> | undefined {
+    const node = this.nodeDataCache[key];
+    return node ? Object.assign({}, node) : undefined;
+  }
+
+  /**
+   * Method used to get all the sigma edge attributes.
+   * It's usefull for example to get values that are set by the edgeReducer.
+   *
+   * @param  {string} key - The edge's key.
+   * @return {Partial<EdgeAttributes> | undefined} A copy of the desired edge's attribute or undefined if not found
+   */
+  getEdgeAttributes(key: EdgeKey): Partial<EdgeAttributes> | undefined {
+    const edge = this.edgeDataCache[key];
+    return edge ? Object.assign({}, edge) : undefined;
+  }
+
+  /**
    * Method used to shut the container & release event listeners.
    *
    * @return {undefined}

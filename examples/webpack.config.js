@@ -38,6 +38,10 @@ const EXAMPLES = {
     id: "noverlap",
     title: "Noverlap Layout",
   },
+  panToNode: {
+    id: "pan-to-node",
+    title: "Center graph on a node",
+  },
   performance: {
     id: "performance",
     title: "Performance",
