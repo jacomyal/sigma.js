@@ -29,11 +29,11 @@ exports.Sigma = exports.MouseCaptor = exports.QuadTree = exports.Camera = void 0
  */
 var camera_1 = __importDefault(__webpack_require__(1));
 exports.Camera = camera_1.default;
-var quadtree_1 = __importDefault(__webpack_require__(7));
+var quadtree_1 = __importDefault(__webpack_require__(8));
 exports.QuadTree = quadtree_1.default;
-var mouse_1 = __importDefault(__webpack_require__(9));
+var mouse_1 = __importDefault(__webpack_require__(10));
 exports.MouseCaptor = mouse_1.default;
-var sigma_1 = __importDefault(__webpack_require__(11));
+var sigma_1 = __importDefault(__webpack_require__(12));
 exports.Sigma = sigma_1.default;
 
 
@@ -96,7 +96,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  */
 var events_1 = __webpack_require__(2);
 var animate_1 = __webpack_require__(3);
-var easings_1 = __importDefault(__webpack_require__(6));
+var easings_1 = __importDefault(__webpack_require__(7));
 var utils_1 = __webpack_require__(4);
 /**
  * Defaults.
@@ -917,7 +917,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.animateNodes = exports.ANIMATE_DEFAULTS = void 0;
 var index_1 = __webpack_require__(4);
-var easings_1 = __importDefault(__webpack_require__(6));
+var easings_1 = __importDefault(__webpack_require__(7));
 exports.ANIMATE_DEFAULTS = {
     easing: "quadraticInOut",
     duration: 150,
@@ -990,9 +990,13 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assignDeep = exports.isPlainObject = void 0;
-var matrices_1 = __webpack_require__(5);
+exports.validateGraph = exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assignDeep = exports.isPlainObject = void 0;
+var is_graph_1 = __importDefault(__webpack_require__(5));
+var matrices_1 = __webpack_require__(6);
 /**
  * Checks whether the given value is a plain object.
  *
@@ -1210,10 +1214,54 @@ function canUse32BitsIndices(gl) {
     return webgl2 || !!gl.getExtension("OES_element_index_uint");
 }
 exports.canUse32BitsIndices = canUse32BitsIndices;
+/**
+ * Check if the graph variable is a valid graph, and if sigma can render it.
+ */
+function validateGraph(graph) {
+    // check if it's a valid graphology instance
+    if (!is_graph_1.default(graph))
+        throw new Error("Sigma: invalid graph instance.");
+    // check if nodes have x/y attributes
+    graph.forEachNode(function (key, attributes) {
+        if (!Number.isFinite(attributes.x) || !Number.isFinite(attributes.y)) {
+            throw new Error("Sigma: Coordinates of node " + key + " are invalid. A node must have a numeric 'x' and 'y' attribute.");
+        }
+    });
+}
+exports.validateGraph = validateGraph;
 
 
 /***/ }),
 /* 5 */
+/***/ ((module) => {
+
+/**
+ * Graphology isGraph
+ * ===================
+ *
+ * Very simple function aiming at ensuring the given variable is a
+ * graphology instance.
+ */
+
+/**
+ * Checking the value is a graphology instance.
+ *
+ * @param  {any}     value - Target value.
+ * @return {boolean}
+ */
+module.exports = function isGraph(value) {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.addUndirectedEdgeWithKey === 'function' &&
+    typeof value.dropNode === 'function' &&
+    typeof value.multi === 'boolean'
+  );
+};
+
+
+/***/ }),
+/* 6 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1275,7 +1323,7 @@ exports.multiply = multiply;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1317,7 +1365,7 @@ exports.default = easings;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1358,7 +1406,7 @@ exports.rectangleCollidesWithQuad = exports.squareCollidesWithQuad = exports.get
  */
 /* eslint no-nested-ternary: 0 */
 /* eslint no-constant-condition: 0 */
-var extend_1 = __importDefault(__webpack_require__(8));
+var extend_1 = __importDefault(__webpack_require__(9));
 // TODO: should not ask the quadtree when the camera has the whole graph in
 // sight.
 // TODO: a square can be represented as topleft + width, saying for the quad blocks (reduce mem)
@@ -1649,7 +1697,7 @@ exports.default = QuadTree;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ ((module) => {
 
 /**
@@ -1696,7 +1744,7 @@ module.exports = function extend(array, values) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -1734,7 +1782,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var captor_1 = __importStar(__webpack_require__(10));
+var captor_1 = __importStar(__webpack_require__(11));
 /**
  * Constants.
  */
@@ -1971,7 +2019,7 @@ exports.default = MouseCaptor;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2122,7 +2170,7 @@ exports.default = Captor;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -2150,11 +2198,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  * @module
  */
 var events_1 = __webpack_require__(2);
-var extent_1 = __importDefault(__webpack_require__(12));
-var is_graph_1 = __importDefault(__webpack_require__(13));
+var extent_1 = __importDefault(__webpack_require__(13));
 var camera_1 = __importDefault(__webpack_require__(1));
-var mouse_1 = __importDefault(__webpack_require__(9));
-var quadtree_1 = __importDefault(__webpack_require__(7));
+var mouse_1 = __importDefault(__webpack_require__(10));
+var quadtree_1 = __importDefault(__webpack_require__(8));
 var utils_1 = __webpack_require__(4);
 var labels_1 = __webpack_require__(14);
 var settings_1 = __webpack_require__(15);
@@ -2226,10 +2273,9 @@ var Sigma = /** @class */ (function (_super) {
         _this.nodePrograms = {};
         _this.edgePrograms = {};
         _this.settings = utils_1.assignDeep({}, settings_1.DEFAULT_SETTINGS, settings);
-        settings_1.validateSettings(_this.settings);
         // Validating
-        if (!is_graph_1.default(graph))
-            throw new Error("Sigma: invalid graph instance.");
+        settings_1.validateSettings(_this.settings);
+        utils_1.validateGraph(graph);
         if (!(container instanceof HTMLElement))
             throw new Error("Sigma: container should be an html element.");
         // Properties
@@ -3056,7 +3102,7 @@ exports.default = Sigma;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 /**
@@ -3065,7 +3111,7 @@ exports.default = Sigma;
  *
  * Simple function returning the extent of selected attributes of the graph.
  */
-var isGraph = __webpack_require__(13);
+var isGraph = __webpack_require__(5);
 
 /**
  * Function returning the extent of the selected node attributes.
@@ -3173,35 +3219,6 @@ extent.nodeExtent = nodeExtent;
 extent.edgeExtent = edgeExtent;
 
 module.exports = extent;
-
-
-/***/ }),
-/* 13 */
-/***/ ((module) => {
-
-/**
- * Graphology isGraph
- * ===================
- *
- * Very simple function aiming at ensuring the given variable is a
- * graphology instance.
- */
-
-/**
- * Checking the value is a graphology instance.
- *
- * @param  {any}     value - Target value.
- * @return {boolean}
- */
-module.exports = function isGraph(value) {
-  return (
-    value !== null &&
-    typeof value === 'object' &&
-    typeof value.addUndirectedEdgeWithKey === 'function' &&
-    typeof value.dropNode === 'function' &&
-    typeof value.multi === 'boolean'
-  );
-};
 
 
 /***/ }),
@@ -4664,7 +4681,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var captor_1 = __importStar(__webpack_require__(10));
+var captor_1 = __importStar(__webpack_require__(11));
 var camera_1 = __importDefault(__webpack_require__(1));
 var DRAG_TIMEOUT = 200;
 var TOUCH_INERTIA_RATIO = 3;

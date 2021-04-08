@@ -5,7 +5,6 @@
  */
 import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";
-import isGraph from "graphology-utils/is-graph";
 import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
 import Camera from "./core/camera";
@@ -21,6 +20,7 @@ import {
   cancelFrame,
   matrixFromCamera,
   requestFrame,
+  validateGraph,
   zIndexOrdering,
 } from "./utils";
 import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
@@ -113,10 +113,9 @@ export default class Sigma extends EventEmitter {
 
     this.settings = assignDeep<Settings>({}, DEFAULT_SETTINGS, settings);
 
-    validateSettings(this.settings);
-
     // Validating
-    if (!isGraph(graph)) throw new Error("Sigma: invalid graph instance.");
+    validateSettings(this.settings);
+    validateGraph(graph);
     if (!(container instanceof HTMLElement)) throw new Error("Sigma: container should be an html element.");
 
     // Properties

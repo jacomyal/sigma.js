@@ -5,6 +5,9 @@
  * Various helper functions & classes used throughout the library.
  * @module
  */
+import Graph from "graphology";
+import { Attributes } from "graphology-types";
+import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate } from "./matrices";
 
@@ -280,4 +283,21 @@ export function canUse32BitsIndices(gl: WebGLRenderingContext): boolean {
   const webgl2 = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext;
 
   return webgl2 || !!gl.getExtension("OES_element_index_uint");
+}
+
+/**
+ * Check if the graph variable is a valid graph, and if sigma can render it.
+ */
+export function validateGraph(graph: Graph): void {
+  // check if it's a valid graphology instance
+  if (!isGraph(graph)) throw new Error("Sigma: invalid graph instance.");
+
+  // check if nodes have x/y attributes
+  graph.forEachNode((key: string, attributes: Attributes) => {
+    if (!Number.isFinite(attributes.x) || !Number.isFinite(attributes.y)) {
+      throw new Error(
+        `Sigma: Coordinates of node ${key} are invalid. A node must have a numeric 'x' and 'y' attribute.`,
+      );
+    }
+  });
 }
