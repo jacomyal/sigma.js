@@ -319,7 +319,7 @@ export function edgeLabelsToDisplayFromNodes(params: {
         sourceData = nodeDataCache[extremities[0]],
         targetData = nodeDataCache[extremities[1]],
         edgeData = edgeDataCache[edgeKey];
-      if (edgeData.hidden !== true && sourceData.hidden !== true && targetData.hidden !== true) {
+      if (edgeData.hidden && sourceData.hidden && targetData.hidden) {
         worthyEdges.add(edgeKey);
       }
     }
@@ -331,7 +331,8 @@ export function edgeLabelsToDisplayFromNodes(params: {
     const edges = graph.outboundEdges(key);
 
     for (let j = 0; j < edges.length; j++)
-      if (displayedNodeLabels.has(graph.opposite(key, edges[j]))) worthyEdges.add(edges[j]);
+      if (!edgeDataCache[edges[j]].hidden && displayedNodeLabels.has(graph.opposite(key, edges[j])))
+        worthyEdges.add(edges[j]);
   }
 
   return Array.from(worthyEdges);
