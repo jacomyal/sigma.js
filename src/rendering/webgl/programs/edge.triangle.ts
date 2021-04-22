@@ -87,7 +87,7 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
     offset: number,
   ): void {
     let i = 0;
-    if (hidden === true) {
+    if (hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;
     }
 

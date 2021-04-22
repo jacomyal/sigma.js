@@ -112,7 +112,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     hidden: boolean,
     offset: number,
   ): void {
-    if (hidden === true) {
+    if (hidden) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 
       return;

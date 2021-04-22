@@ -26,7 +26,7 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     const array = this.array;
     let i = offset * POINTS * ATTRIBUTES;
 
-    if (hidden === true) {
+    if (hidden) {
       array[i++] = 0;
       array[i++] = 0;
       array[i++] = 0;
