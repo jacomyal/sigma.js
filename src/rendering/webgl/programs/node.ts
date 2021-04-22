@@ -50,11 +50,20 @@ export default class NodeProgram extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: NodeAttributes, offset: number): void {
+  process(data: NodeAttributes, hidden: boolean, offset: number): void {
     const array = this.array;
-    const color = floatColor(data.color);
-
     let i = offset * POINTS * ATTRIBUTES;
+
+    if (hidden === true) {
+      array[i++] = 0;
+      array[i++] = 0;
+      array[i++] = 0;
+      array[i++] = 0;
+      array[i++] = 0;
+      return;
+    }
+
+    const color = floatColor(data.color);
 
     array[i++] = data.x;
     array[i++] = data.y;

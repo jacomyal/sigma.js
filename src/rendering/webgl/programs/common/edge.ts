@@ -13,7 +13,13 @@ export interface RenderEdgeParams extends RenderParams {
 
 export interface IEdgeProgram extends IProgram {
   computeIndices(): void;
-  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void;
+  process(
+    sourceData: NodeAttributes,
+    targetData: NodeAttributes,
+    data: EdgeAttributes,
+    hidden: boolean,
+    offset: number,
+  ): void;
   render(params: RenderEdgeParams): void;
 }
 
@@ -35,7 +41,13 @@ export abstract class AbstractEdgeProgram extends AbstractProgram implements IEd
 
   abstract bind(): void;
   abstract computeIndices(): void;
-  abstract process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void;
+  abstract process(
+    sourceData: NodeAttributes,
+    targetData: NodeAttributes,
+    data: EdgeAttributes,
+    hidden: boolean,
+    offset: number,
+  ): void;
   abstract render(params: RenderEdgeParams): void;
 }
 
@@ -75,8 +87,14 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
       });
     }
 
-    process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
-      this.programs.forEach((program) => program.process(sourceData, targetData, data, offset));
+    process(
+      sourceData: NodeAttributes,
+      targetData: NodeAttributes,
+      data: EdgeAttributes,
+      hidden: boolean,
+      offset: number,
+    ): void {
+      this.programs.forEach((program) => program.process(sourceData, targetData, data, hidden, offset));
     }
   };
 }

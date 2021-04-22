@@ -51,6 +51,10 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: NodeAttribute
   if (!data.label) data.label = "";
 
   if (!data.size) data.size = 2;
+
+  if (!data.hasOwnProperty("hidden")) data.hidden = false;
+
+  if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
 }
 
 function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttributes): void {
@@ -59,6 +63,8 @@ function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttribute
   if (!data.label) data.label = "";
 
   if (!data.size) data.size = 0.5;
+
+  if (!data.hasOwnProperty("hidden")) data.hidden = false;
 }
 
 /**
@@ -494,6 +500,9 @@ export default class Sigma extends EventEmitter {
     // Clearing the quad
     this.quadtree.clear();
 
+    // CLear the highlightedNodes
+    this.highlightedNodes = new Set();
+
     // Computing extents
     const nodeExtentProperties = ["x", "y", "z"];
 
@@ -549,7 +558,10 @@ export default class Sigma extends EventEmitter {
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
 
-      nodeProgram.process(data, i);
+      nodeProgram.process(data, data.hidden, i);
+
+      // Save the node in the highlighted set if needed
+      if (data.highlighted === true && !data.hidden) this.highlightedNodes.add(node);
 
       this.nodeKeyToIndex[node] = i;
     }
@@ -588,7 +600,8 @@ export default class Sigma extends EventEmitter {
         sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
         targetData = this.nodeDataCache[extremities[1]] as NodeAttributes;
 
-      edgeProgram.process(sourceData, targetData, data, i);
+      const hidden = data.hidden || sourceData.hidden || targetData.hidden;
+      edgeProgram.process(sourceData, targetData, data, hidden, i);
 
       this.nodeKeyToIndex[edge] = i;
     }
@@ -597,41 +610,6 @@ export default class Sigma extends EventEmitter {
     if (!keepArrays && typeof edgeProgram.computeIndices === "function") edgeProgram.computeIndices();
 
     edgeProgram.bufferData();
-
-    return this;
-  }
-
-  /**
-   * Method used to process a single node.
-   *
-   * @return {Sigma}
-   */
-  processNode(key: NodeKey): this {
-    const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
-
-    const data = this.graph.getNodeAttributes(key) as NodeAttributes;
-
-    nodeProgram.process(data, this.nodeKeyToIndex[key]);
-
-    return this;
-  }
-
-  /**
-   * Method used to process a single edge.
-   *
-   * @return {Sigma}
-   */
-  processEdge(key: EdgeKey): this {
-    const graph = this.graph;
-
-    const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
-
-    const data = graph.getEdgeAttributes(key) as EdgeAttributes,
-      extremities = graph.extremities(key),
-      sourceData = graph.getNodeAttributes(extremities[0]) as NodeAttributes,
-      targetData = graph.getNodeAttributes(extremities[1]) as NodeAttributes;
-
-    edgeProgram.process(sourceData, targetData, data, this.edgeKeyToIndex[key]);
 
     return this;
   }
@@ -914,6 +892,8 @@ export default class Sigma extends EventEmitter {
     context.clearRect(0, 0, this.width, this.height);
 
     const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
+      nodeDataCache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
+      edgeDataCache: this.edgeDataCache as Record<NodeKey, EdgeAttributes>,
       graph: this.graph,
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedLabels,

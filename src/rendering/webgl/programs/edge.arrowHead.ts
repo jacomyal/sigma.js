@@ -105,8 +105,14 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     // nothing to do
   }
 
-  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
-    if (sourceData.hidden || targetData.hidden || data.hidden) {
+  process(
+    sourceData: NodeAttributes,
+    targetData: NodeAttributes,
+    data: EdgeAttributes,
+    hidden: boolean,
+    offset: number,
+  ): void {
+    if (hidden === true) {
       for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
 
       return;

@@ -7,7 +7,7 @@
  */
 import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
-import { NodeAttributes } from "../types";
+import { EdgeAttributes, NodeAttributes } from "../types";
 import Sigma from "../sigma";
 import Camera from "./camera";
 /**
@@ -143,6 +143,9 @@ export function labelsToDisplayFromGrid(params: {
   for (let i = 0, l = visibleNodes.length; i < l; i++) {
     const node = visibleNodes[i],
       nodeData = cache[node];
+
+    // We filter hidden nodes
+    if (nodeData.hidden === true) continue;
 
     // We filter nodes having a rendered size less than a certain thresold
     if (nodeData.size / sizeRatio < renderedSizeThreshold) continue;
@@ -288,6 +291,8 @@ export function labelsToDisplayFromGrid(params: {
  * labels
  *
  * @param  {object} params                 - Parameters:
+ * @param  {object}   nodeDataCache        - Cache storing nodes data.
+ * @param  {object}   edgeDataCache        - Cache storing edges data.
  * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
  * @param  {Set}      highlightedNodes     - Highlighted nodes.
  * @param  {Graph}    graph                - The rendered graph.
@@ -295,24 +300,35 @@ export function labelsToDisplayFromGrid(params: {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params: {
+  nodeDataCache: { [key: string]: NodeAttributes };
+  edgeDataCache: { [key: string]: EdgeAttributes };
   displayedNodeLabels: Set<NodeKey>;
   highlightedNodes: Set<NodeKey>;
   graph: Graph;
   hoveredNode: NodeKey | null;
 }): Array<EdgeKey> {
-  const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
+  const { nodeDataCache, edgeDataCache, graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
   const worthyEdges = new Set<EdgeKey>();
   const displayedNodeLabelsArray = Array.from(displayedNodeLabels);
 
-  // Each edge connecting a highlighted node has its label displayed:
+  // Each edge connecting a highlighted node has its label displayed if the other extremity is not hidden:
   const highlightedNodesArray = Array.from(highlightedNodes);
   if (hoveredNode && !highlightedNodes.has(hoveredNode)) highlightedNodesArray.push(hoveredNode);
   for (let i = 0; i < highlightedNodesArray.length; i++) {
     const key = highlightedNodesArray[i];
     const edges = graph.edges(key);
 
-    for (let j = 0; j < edges.length; j++) worthyEdges.add(edges[j]);
+    for (let j = 0; j < edges.length; j++) {
+      const edgeKey = edges[j];
+      const extremities = graph.extremities(edgeKey),
+        sourceData = nodeDataCache[extremities[0]],
+        targetData = nodeDataCache[extremities[1]],
+        edgeData = edgeDataCache[edgeKey];
+      if (edgeData.hidden !== true && sourceData.hidden !== true && targetData.hidden !== true) {
+        worthyEdges.add(edgeKey);
+      }
+    }
   }
 
   // Each edge connecting two nodes with visible labels has its label displayed:

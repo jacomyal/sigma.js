@@ -12,7 +12,7 @@ export interface RenderNodeParams extends RenderParams {
 }
 
 export interface INodeProgram extends IProgram {
-  process(data: NodeAttributes, offset: number): void;
+  process(data: NodeAttributes, hidden: boolean, offset: number): void;
   render(params: RenderNodeParams): void;
 }
 
@@ -82,7 +82,7 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
     );
   }
 
-  abstract process(data: NodeAttributes, offset: number): void;
+  abstract process(data: NodeAttributes, hidden: boolean, offset: number): void;
 }
 
 export interface NodeProgramConstructor {
@@ -121,8 +121,8 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
       this.programs.forEach((program) => program.render(params));
     }
 
-    process(data: NodeAttributes, offset: number): void {
-      this.programs.forEach((program) => program.process(data, offset));
+    process(data: NodeAttributes, hidden: boolean, offset: number): void {
+      this.programs.forEach((program) => program.process(data, hidden, offset));
     }
   };
 }

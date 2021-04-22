@@ -79,9 +79,15 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
     );
   }
 
-  process(sourceData: NodeAttributes, targetData: NodeAttributes, data: EdgeAttributes, offset: number): void {
+  process(
+    sourceData: NodeAttributes,
+    targetData: NodeAttributes,
+    data: EdgeAttributes,
+    hidden: boolean,
+    offset: number,
+  ): void {
     let i = 0;
-    if (sourceData.hidden || targetData.hidden || data.hidden) {
+    if (hidden === true) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) this.array[i] = 0;
     }
 

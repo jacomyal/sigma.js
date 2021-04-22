@@ -22,21 +22,19 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: NodeAttributes, offset: number): void {
-    const color = floatColor(data.color);
-
+  process(data: NodeAttributes, hidden: boolean, offset: number): void {
+    const array = this.array;
     let i = offset * POINTS * ATTRIBUTES;
 
-    const array = this.array;
-
-    if (data.hidden) {
+    if (hidden === true) {
       array[i++] = 0;
       array[i++] = 0;
       array[i++] = 0;
       array[i++] = 0;
-
       return;
     }
+
+    const color = floatColor(data.color);
 
     array[i++] = data.x;
     array[i++] = data.y;

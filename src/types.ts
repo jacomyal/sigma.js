@@ -72,6 +72,7 @@ export interface NodeAttributes extends Coordinates {
   size: number;
   color: string;
   hidden: boolean;
+  highlighted: boolean;
   label: string;
 }
 

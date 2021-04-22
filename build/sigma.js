@@ -2224,6 +2224,10 @@ function applyNodeDefaults(settings, key, data) {
         data.label = "";
     if (!data.size)
         data.size = 2;
+    if (!data.hasOwnProperty("hidden"))
+        data.hidden = false;
+    if (!data.hasOwnProperty("highlighted"))
+        data.highlighted = false;
 }
 function applyEdgeDefaults(settings, key, data) {
     if (!data.color)
@@ -2232,6 +2236,8 @@ function applyEdgeDefaults(settings, key, data) {
         data.label = "";
     if (!data.size)
         data.size = 0.5;
+    if (!data.hasOwnProperty("hidden"))
+        data.hidden = false;
 }
 /**
  * Main class.
@@ -2571,6 +2577,8 @@ var Sigma = /** @class */ (function (_super) {
         var graph = this.graph, settings = this.settings;
         // Clearing the quad
         this.quadtree.clear();
+        // CLear the highlightedNodes
+        this.highlightedNodes = new Set();
         // Computing extents
         var nodeExtentProperties = ["x", "y", "z"];
         if (this.settings.zIndex) {
@@ -2608,7 +2616,10 @@ var Sigma = /** @class */ (function (_super) {
             applyNodeDefaults(this.settings, node, data);
             this.normalizationFunction.applyTo(data);
             this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
-            nodeProgram.process(data, i);
+            nodeProgram.process(data, data.hidden, i);
+            // Save the node in the highlighted set if needed
+            if (data.highlighted === true && !data.hidden)
+                this.highlightedNodes.add(node);
             this.nodeKeyToIndex[node] = i;
         }
         nodeProgram.bufferData();
@@ -2633,36 +2644,14 @@ var Sigma = /** @class */ (function (_super) {
             data = Object.assign(this.edgeDataCache[edge], data);
             applyEdgeDefaults(this.settings, edge, data);
             var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
-            edgeProgram.process(sourceData, targetData, data, i);
+            var hidden = data.hidden || sourceData.hidden || targetData.hidden;
+            edgeProgram.process(sourceData, targetData, data, hidden, i);
             this.nodeKeyToIndex[edge] = i;
         }
         // Computing edge indices if necessary
         if (!keepArrays && typeof edgeProgram.computeIndices === "function")
             edgeProgram.computeIndices();
         edgeProgram.bufferData();
-        return this;
-    };
-    /**
-     * Method used to process a single node.
-     *
-     * @return {Sigma}
-     */
-    Sigma.prototype.processNode = function (key) {
-        var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
-        var data = this.graph.getNodeAttributes(key);
-        nodeProgram.process(data, this.nodeKeyToIndex[key]);
-        return this;
-    };
-    /**
-     * Method used to process a single edge.
-     *
-     * @return {Sigma}
-     */
-    Sigma.prototype.processEdge = function (key) {
-        var graph = this.graph;
-        var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
-        var data = graph.getEdgeAttributes(key), extremities = graph.extremities(key), sourceData = graph.getNodeAttributes(extremities[0]), targetData = graph.getNodeAttributes(extremities[1]);
-        edgeProgram.process(sourceData, targetData, data, this.edgeKeyToIndex[key]);
         return this;
     };
     /**---------------------------------------------------------------------------
@@ -2884,6 +2873,8 @@ var Sigma = /** @class */ (function (_super) {
         // Clearing
         context.clearRect(0, 0, this.width, this.height);
         var edgeLabelsToDisplay = labels_1.edgeLabelsToDisplayFromNodes({
+            nodeDataCache: this.nodeDataCache,
+            edgeDataCache: this.edgeDataCache,
             graph: this.graph,
             hoveredNode: this.hoveredNode,
             displayedNodeLabels: this.displayedLabels,
@@ -3305,6 +3296,9 @@ function labelsToDisplayFromGrid(params) {
     var maxSize = -Infinity, biggestNode = null;
     for (var i = 0, l = visibleNodes.length; i < l; i++) {
         var node = visibleNodes[i], nodeData = cache[node];
+        // We filter hidden nodes
+        if (nodeData.hidden === true)
+            continue;
         // We filter nodes having a rendered size less than a certain thresold
         if (nodeData.size / sizeRatio < renderedSizeThreshold)
             continue;
@@ -3417,6 +3411,8 @@ exports.labelsToDisplayFromGrid = labelsToDisplayFromGrid;
  * labels
  *
  * @param  {object} params                 - Parameters:
+ * @param  {object}   nodeDataCache        - Cache storing nodes data.
+ * @param  {object}   edgeDataCache        - Cache storing edges data.
  * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
  * @param  {Set}      highlightedNodes     - Highlighted nodes.
  * @param  {Graph}    graph                - The rendered graph.
@@ -3424,18 +3420,23 @@ exports.labelsToDisplayFromGrid = labelsToDisplayFromGrid;
  * @return {Array}                         - The selected labels.
  */
 function edgeLabelsToDisplayFromNodes(params) {
-    var graph = params.graph, hoveredNode = params.hoveredNode, highlightedNodes = params.highlightedNodes, displayedNodeLabels = params.displayedNodeLabels;
+    var nodeDataCache = params.nodeDataCache, edgeDataCache = params.edgeDataCache, graph = params.graph, hoveredNode = params.hoveredNode, highlightedNodes = params.highlightedNodes, displayedNodeLabels = params.displayedNodeLabels;
     var worthyEdges = new Set();
     var displayedNodeLabelsArray = Array.from(displayedNodeLabels);
-    // Each edge connecting a highlighted node has its label displayed:
+    // Each edge connecting a highlighted node has its label displayed if the other extremity is not hidden:
     var highlightedNodesArray = Array.from(highlightedNodes);
     if (hoveredNode && !highlightedNodes.has(hoveredNode))
         highlightedNodesArray.push(hoveredNode);
     for (var i = 0; i < highlightedNodesArray.length; i++) {
         var key = highlightedNodesArray[i];
         var edges = graph.edges(key);
-        for (var j = 0; j < edges.length; j++)
-            worthyEdges.add(edges[j]);
+        for (var j = 0; j < edges.length; j++) {
+            var edgeKey = edges[j];
+            var extremities = graph.extremities(edgeKey), sourceData = nodeDataCache[extremities[0]], targetData = nodeDataCache[extremities[1]], edgeData = edgeDataCache[edgeKey];
+            if (edgeData.hidden !== true && sourceData.hidden !== true && targetData.hidden !== true) {
+                worthyEdges.add(edgeKey);
+            }
+        }
     }
     // Each edge connecting two nodes with visible labels has its label displayed:
     for (var i = 0; i < displayedNodeLabelsArray.length; i++) {
@@ -3679,17 +3680,17 @@ var NodeProgramFast = /** @class */ (function (_super) {
         _this.bind();
         return _this;
     }
-    NodeProgramFast.prototype.process = function (data, offset) {
-        var color = utils_1.floatColor(data.color);
-        var i = offset * POINTS * ATTRIBUTES;
+    NodeProgramFast.prototype.process = function (data, hidden, offset) {
         var array = this.array;
-        if (data.hidden) {
+        var i = offset * POINTS * ATTRIBUTES;
+        if (hidden === true) {
             array[i++] = 0;
             array[i++] = 0;
             array[i++] = 0;
             array[i++] = 0;
             return;
         }
+        var color = utils_1.floatColor(data.color);
         array[i++] = data.x;
         array[i++] = data.y;
         array[i++] = data.size;
@@ -3824,8 +3825,8 @@ function createNodeCompoundProgram(programClasses) {
         NodeCompoundProgram.prototype.render = function (params) {
             this.programs.forEach(function (program) { return program.render(params); });
         };
-        NodeCompoundProgram.prototype.process = function (data, offset) {
-            this.programs.forEach(function (program) { return program.process(data, offset); });
+        NodeCompoundProgram.prototype.process = function (data, hidden, offset) {
+            this.programs.forEach(function (program) { return program.process(data, hidden, offset); });
         };
         return NodeCompoundProgram;
     }());
@@ -4074,8 +4075,8 @@ var EdgeProgram = /** @class */ (function (_super) {
         var gl = this.gl;
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
     };
-    EdgeProgram.prototype.process = function (sourceData, targetData, data, offset) {
-        if (sourceData.hidden || targetData.hidden || data.hidden) {
+    EdgeProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
+        if (hidden === true) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;
@@ -4225,8 +4226,8 @@ function createEdgeCompoundProgram(programClasses) {
                 program.render(params);
             });
         };
-        EdgeCompoundProgram.prototype.process = function (sourceData, targetData, data, offset) {
-            this.programs.forEach(function (program) { return program.process(sourceData, targetData, data, offset); });
+        EdgeCompoundProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
+            this.programs.forEach(function (program) { return program.process(sourceData, targetData, data, hidden, offset); });
         };
         return EdgeCompoundProgram;
     }());
@@ -4341,8 +4342,8 @@ var EdgeArrowHeadProgram = /** @class */ (function (_super) {
     EdgeArrowHeadProgram.prototype.computeIndices = function () {
         // nothing to do
     };
-    EdgeArrowHeadProgram.prototype.process = function (sourceData, targetData, data, offset) {
-        if (sourceData.hidden || targetData.hidden || data.hidden) {
+    EdgeArrowHeadProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
+        if (hidden === true) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;
@@ -4524,8 +4525,8 @@ var EdgeClampedProgram = /** @class */ (function (_super) {
         gl.vertexAttribPointer(this.colorLocation, 4, gl.UNSIGNED_BYTE, true, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
         gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
     };
-    EdgeClampedProgram.prototype.process = function (sourceData, targetData, data, offset) {
-        if (sourceData.hidden || targetData.hidden || data.hidden) {
+    EdgeClampedProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
+        if (hidden === true) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;
