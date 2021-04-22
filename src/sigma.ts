@@ -500,7 +500,7 @@ export default class Sigma extends EventEmitter {
     // Clearing the quad
     this.quadtree.clear();
 
-    // CLear the highlightedNodes
+    // Clear the highlightedNodes
     this.highlightedNodes = new Set();
 
     // Computing extents
