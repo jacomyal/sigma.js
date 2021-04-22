@@ -2577,7 +2577,7 @@ var Sigma = /** @class */ (function (_super) {
         var graph = this.graph, settings = this.settings;
         // Clearing the quad
         this.quadtree.clear();
-        // CLear the highlightedNodes
+        // Clear the highlightedNodes
         this.highlightedNodes = new Set();
         // Computing extents
         var nodeExtentProperties = ["x", "y", "z"];
@@ -3266,17 +3266,13 @@ function labelsToDisplayFromGrid(params) {
     // TODO: should factorize. This same code is used quite a lot throughout the codebase
     // TODO: POW RATIO is currently default 0.5 and harcoded
     var sizeRatio = Math.pow(cameraState.ratio, 0.5);
-    // Camera hasn't moved?
-    var still = cameraState.x === previousCameraState.x &&
-        cameraState.y === previousCameraState.y &&
-        cameraState.ratio === previousCameraState.ratio;
     // State
-    var zooming = cameraState.ratio < previousCameraState.ratio, panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y, unzooming = cameraState.ratio > previousCameraState.ratio, unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1, zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
+    var zooming = cameraState.ratio < previousCameraState.ratio, panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y, unzooming = cameraState.ratio > previousCameraState.ratio, unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1, zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
     // Trick to discretize unzooming
     if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0)
         return Array.from(displayedLabels);
     // If panning while unzoomed, we shouldn't change label selection
-    if ((unzoomedPanning || still) && displayedLabels.size !== 0)
+    if (unzoomedPanning && displayedLabels.size !== 0)
         return Array.from(displayedLabels);
     // When unzoomed & zooming
     if (zooming && cameraState.ratio >= 1)
@@ -3297,7 +3293,7 @@ function labelsToDisplayFromGrid(params) {
     for (var i = 0, l = visibleNodes.length; i < l; i++) {
         var node = visibleNodes[i], nodeData = cache[node];
         // We filter hidden nodes
-        if (nodeData.hidden === true)
+        if (nodeData.hidden)
             continue;
         // We filter nodes having a rendered size less than a certain thresold
         if (nodeData.size / sizeRatio < renderedSizeThreshold)
@@ -3433,7 +3429,7 @@ function edgeLabelsToDisplayFromNodes(params) {
         for (var j = 0; j < edges.length; j++) {
             var edgeKey = edges[j];
             var extremities = graph.extremities(edgeKey), sourceData = nodeDataCache[extremities[0]], targetData = nodeDataCache[extremities[1]], edgeData = edgeDataCache[edgeKey];
-            if (edgeData.hidden !== true && sourceData.hidden !== true && targetData.hidden !== true) {
+            if (edgeData.hidden && sourceData.hidden && targetData.hidden) {
                 worthyEdges.add(edgeKey);
             }
         }
@@ -3443,7 +3439,7 @@ function edgeLabelsToDisplayFromNodes(params) {
         var key = displayedNodeLabelsArray[i];
         var edges = graph.outboundEdges(key);
         for (var j = 0; j < edges.length; j++)
-            if (displayedNodeLabels.has(graph.opposite(key, edges[j])))
+            if (!edgeDataCache[edges[j]].hidden && displayedNodeLabels.has(graph.opposite(key, edges[j])))
                 worthyEdges.add(edges[j]);
     }
     return Array.from(worthyEdges);
@@ -3683,7 +3679,7 @@ var NodeProgramFast = /** @class */ (function (_super) {
     NodeProgramFast.prototype.process = function (data, hidden, offset) {
         var array = this.array;
         var i = offset * POINTS * ATTRIBUTES;
-        if (hidden === true) {
+        if (hidden) {
             array[i++] = 0;
             array[i++] = 0;
             array[i++] = 0;
@@ -4076,7 +4072,7 @@ var EdgeProgram = /** @class */ (function (_super) {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
     };
     EdgeProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
-        if (hidden === true) {
+        if (hidden) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;
@@ -4343,7 +4339,7 @@ var EdgeArrowHeadProgram = /** @class */ (function (_super) {
         // nothing to do
     };
     EdgeArrowHeadProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
-        if (hidden === true) {
+        if (hidden) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;
@@ -4526,7 +4522,7 @@ var EdgeClampedProgram = /** @class */ (function (_super) {
         gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
     };
     EdgeClampedProgram.prototype.process = function (sourceData, targetData, data, hidden, offset) {
-        if (hidden === true) {
+        if (hidden) {
             for (var i_1 = offset * STRIDE, l = i_1 + STRIDE; i_1 < l; i_1++)
                 this.array[i_1] = 0;
             return;

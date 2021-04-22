@@ -28,4 +28,18 @@ export const tests: Tests = [
   },
   { name: "tiny", url: "http://localhost:8000/tiny.html" },
   { name: "edge-labels", url: "http://localhost:8000/edge-labels.html" },
+  {
+    name: "node-edge-state",
+    url: "http://localhost:8000/edge-labels.html",
+    waitFor: 2000,
+    scenario: async (browser: Browser, page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        window.graph.setNodeAttribute("Alice", "highlighted", true);
+        window.graph.setNodeAttribute("Bob", "size", 50);
+        window.graph.setNodeAttribute("Bob", "color", "#FF0000");
+        window.graph.setNodeAttribute("Deborah", "hidden", true);
+        window.graph.setEdgeAttribute("Alice", "Bob", "hidden", true);
+      });
+    },
+  },
 ];
