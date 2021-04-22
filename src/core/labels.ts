@@ -91,24 +91,18 @@ export function labelsToDisplayFromGrid(params: {
   // TODO: POW RATIO is currently default 0.5 and harcoded
   const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
-  // Camera hasn't moved?
-  const still =
-    cameraState.x === previousCameraState.x &&
-    cameraState.y === previousCameraState.y &&
-    cameraState.ratio === previousCameraState.ratio;
-
   // State
   const zooming = cameraState.ratio < previousCameraState.ratio,
     panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
     unzooming = cameraState.ratio > previousCameraState.ratio,
-    unzoomedPanning = !zooming && !unzooming && cameraState.ratio >= 1,
+    unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1,
     zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
 
   // Trick to discretize unzooming
   if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) return Array.from(displayedLabels);
 
   // If panning while unzoomed, we shouldn't change label selection
-  if ((unzoomedPanning || still) && displayedLabels.size !== 0) return Array.from(displayedLabels);
+  if (unzoomedPanning && displayedLabels.size !== 0) return Array.from(displayedLabels);
 
   // When unzoomed & zooming
   if (zooming && cameraState.ratio >= 1) return Array.from(displayedLabels);
@@ -145,7 +139,7 @@ export function labelsToDisplayFromGrid(params: {
       nodeData = cache[node];
 
     // We filter hidden nodes
-    if (nodeData.hidden === true) continue;
+    if (nodeData.hidden) continue;
 
     // We filter nodes having a rendered size less than a certain thresold
     if (nodeData.size / sizeRatio < renderedSizeThreshold) continue;
