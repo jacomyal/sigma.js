@@ -4,5 +4,6 @@
     "noImplicitAny": false,
     "strict": false
   },
+  "include": ["./external-types/**/*", "./examples/**/*"],
   "exclude": []
 }

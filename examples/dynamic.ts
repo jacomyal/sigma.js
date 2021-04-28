@@ -5,7 +5,8 @@ import FA2Layout from "graphology-layout-forceatlas2/worker";
 import choice from "pandemonium/choice";
 import random from "pandemonium/random";
 import chroma from "chroma-js";
-import { getRandomName } from "./utils";
+
+import { getRandomName, globalize } from "./utils";
 import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
@@ -22,10 +23,6 @@ graph.nodes().forEach((node) => {
 });
 
 const renderer = new Sigma(graph, container);
-
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
 
 // Randomly editing the graph every second
 const OPERATIONS = ["addNode"];
@@ -66,10 +63,13 @@ setInterval(edit, 1000);
 // Layout experiences
 const layout = new FA2Layout(graph, { settings: { slowDown: 1000000 } });
 
-window.startLayout = function () {
-  layout.start();
-};
-
-window.stopLayout = function () {
-  layout.stop();
-};
+globalize({
+  graph,
+  renderer,
+  startLayout: function () {
+    layout.start();
+  },
+  stopLayout: function () {
+    layout.stop();
+  },
+});

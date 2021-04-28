@@ -1,5 +1,7 @@
 import { DirectedGraph } from "graphology";
+
 import Sigma from "../src/sigma";
+import { globalize } from "./utils";
 
 const container = document.getElementById("container");
 
@@ -66,6 +68,4 @@ const renderer = new Sigma(graph, container, {
   renderEdgeLabels: true,
 });
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+globalize({ graph, renderer });

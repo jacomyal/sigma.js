@@ -1,6 +1,8 @@
 import Graph from "graphology";
 import gexf from "graphology-gexf/browser";
+
 import Sigma from "../src/sigma";
+import { globalize } from "./utils";
 
 import arctic from "./resources/arctic.gexf";
 
@@ -12,7 +14,6 @@ const container = document.getElementById("container");
 
 const settings = {
   defaultEdgeType: "arrow",
-  // defaultEdgeColor: 'rgba(0, 0, 0, 0.6)',
   labelSize: 20,
   labelGrid: {
     cell: {
@@ -25,4 +26,4 @@ const settings = {
 
 const renderer = new Sigma(graph, container, settings);
 
-window.renderer = renderer;
+globalize({ graph, renderer });

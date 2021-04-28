@@ -2,9 +2,9 @@ import { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
-import { getRandomName } from "./utils";
-import Sigma from "../src/sigma";
 
+import { getRandomName, globalize } from "./utils";
+import Sigma from "../src/sigma";
 import CustomNodeProgram from "./custom-nodes/custom-node-program";
 
 const container = document.getElementById("container");
@@ -24,6 +24,4 @@ const renderer = new Sigma(graph, container, {
   nodeProgramClasses: { circle: CustomNodeProgram },
 });
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+globalize({ graph, renderer });

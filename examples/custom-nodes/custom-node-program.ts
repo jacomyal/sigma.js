@@ -22,7 +22,7 @@ export default class CustomNodeProgram extends AbstractNodeProgram {
     let i = offset * POINTS * ATTRIBUTES;
     const array = this.array;
 
-    if (hidden === true) {
+    if (hidden) {
       array[i++] = 0;
       array[i++] = 0;
       array[i++] = 0;

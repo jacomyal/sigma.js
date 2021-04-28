@@ -1,15 +1,14 @@
 import { UndirectedGraph } from "graphology";
 import randomLayout from "graphology-layout/random";
 import empty from "graphology-generators/classic/empty";
-import Sigma from "../src/sigma";
-import { animateNodes } from "../src/utils/animate";
-import noverlap from "graphology-layout-noverlap";
+import noverlap, { NoverlapNodeReducer } from "graphology-layout-noverlap";
 import NoverlapLayoutSupervisor from "graphology-layout-noverlap/worker";
 import chroma from "chroma-js";
 import random from "pandemonium/random";
 
-// import arctic from "./resources/arctic.gexf";
-// import gexf from "graphology-gexf/browser";
+import Sigma from "../src/sigma";
+import { animateNodes } from "../src/utils/animate";
+import { globalize } from "./utils";
 
 const NOVERLAP_SETTINGS = {
   margin: 2,
@@ -17,12 +16,10 @@ const NOVERLAP_SETTINGS = {
   speed: 3,
 };
 
-const container = document.getElementById("container");
+const container = document.getElementById("container") as HTMLDivElement;
 
 const graph = empty(UndirectedGraph, 1000);
 randomLayout.assign(graph);
-
-// const graph = gexf.parse(UndirectedGraph, arctic);
 
 graph.forEachNode((node) => {
   graph.mergeNodeAttributes(node, {
@@ -35,7 +32,7 @@ graph.forEachNode((node) => {
 const renderer = new Sigma(graph, container);
 const camera = renderer.getCamera();
 
-function createButton(text, offset) {
+function createButton(text: string, offset: number) {
   const button = document.createElement("button");
   button.textContent = text;
   button.style.position = "absolute";
@@ -43,7 +40,7 @@ function createButton(text, offset) {
 
   let top = 10;
 
-  top += offset * 20;
+  top += offset * 40;
 
   button.style.top = `${top}px`;
 
@@ -52,7 +49,7 @@ function createButton(text, offset) {
   return button;
 }
 
-const inputReducer = (key, attr) => {
+const inputReducer: NoverlapNodeReducer = (key, attr) => {
   let pos = renderer.normalizationFunction(attr);
   pos = camera.graphToViewport(renderer, pos);
 
@@ -63,7 +60,7 @@ const inputReducer = (key, attr) => {
   };
 };
 
-const outputReducer = (key, pos) => {
+const outputReducer: NoverlapNodeReducer = (key, pos) => {
   return renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, pos));
 };
 
@@ -88,7 +85,6 @@ startButton.onclick = () => {
 
 stopButton.onclick = () => {
   supervisor.stop();
-  console.log(supervisor.converged);
 };
 
-window.renderer = renderer;
+globalize({ graph, renderer });

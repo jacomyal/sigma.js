@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+/* eslint-enable @typescript-eslint/no-var-requires */
 
 const EXAMPLES = {
   animations: {

@@ -39,7 +39,7 @@ graph.nodes().forEach((node) => {
   graph.setNodeAttribute(node, "size", scale(graph.degree(node)));
 });
 
-const components = connectedComponents(graph as any);
+const components = connectedComponents(graph);
 
 components.forEach((component) => {
   if (component.length < 10) component.forEach((node) => graph.dropNode(node));

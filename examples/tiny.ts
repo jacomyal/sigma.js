@@ -1,5 +1,7 @@
 import { UndirectedGraph } from "graphology";
+
 import Sigma from "../src/sigma";
+import { globalize } from "./utils";
 
 const container = document.getElementById("container");
 
@@ -28,6 +30,4 @@ graph.addEdge("Jessica", "Truman", {
 
 const renderer = new Sigma(graph, container);
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+globalize({ graph, renderer });

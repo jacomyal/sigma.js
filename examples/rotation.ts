@@ -2,6 +2,8 @@ import { UndirectedGraph } from "graphology";
 
 import Sigma from "../src/sigma";
 import { requestFrame } from "../src/utils";
+import { globalize } from "./utils";
+
 import miserables from "./resources/les-miserables.json";
 
 const graph = new UndirectedGraph();
@@ -28,3 +30,5 @@ function rotate() {
   requestFrame(rotate);
 }
 rotate();
+
+globalize({ graph, renderer });

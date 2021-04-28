@@ -1,6 +1,9 @@
 import Graph from "graphology";
 import gexf from "graphology-gexf/browser";
+import { NodeKey } from "graphology-types";
+
 import Sigma from "../src/sigma";
+import { globalize } from "./utils";
 
 import arctic from "./resources/arctic.gexf";
 
@@ -19,7 +22,7 @@ const camera = renderer.getCamera();
 const captor = renderer.getMouseCaptor();
 
 // State
-let draggedNode = null,
+let draggedNode: NodeKey | null = null,
   dragging = false;
 
 renderer.on("downNode", (e) => {
@@ -35,7 +38,7 @@ captor.on("mouseup", () => {
 });
 
 captor.on("mousemove", (e) => {
-  if (!dragging) return;
+  if (!dragging || !draggedNode) return;
 
   // Get new position of node
   const pos = renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, e));
@@ -44,5 +47,4 @@ captor.on("mousemove", (e) => {
   graph.setNodeAttribute(draggedNode, "y", pos.y);
 });
 
-window.renderer = renderer;
-window.camera = renderer.getCamera();
+globalize({ graph, renderer });

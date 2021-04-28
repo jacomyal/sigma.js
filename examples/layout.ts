@@ -2,7 +2,8 @@ import { UndirectedGraph } from "graphology";
 import clusters from "graphology-generators/random/clusters";
 import randomLayout from "graphology-layout/random";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
-import { getRandomName } from "./utils";
+
+import { getRandomName, globalize } from "./utils";
 import Sigma from "../src/sigma";
 
 const PALETTE = ["#b4943e", "#777acd", "#60a862", "#c45ca2", "#cb5a4c"];
@@ -42,7 +43,4 @@ const renderer = new Sigma(graph, container);
 const layout = new FA2Layout(graph, { settings: { barnesHutOptimize: true } });
 layout.start();
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
-window.layout = layout;
+globalize({ graph, renderer, layout });

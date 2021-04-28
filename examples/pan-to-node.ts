@@ -2,7 +2,9 @@ import { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
-import { getRandomName } from "./utils";
+import { NodeKey } from "graphology-types";
+
+import { getRandomName, globalize } from "./utils";
 import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
@@ -18,17 +20,17 @@ graph.nodes().forEach((node) => {
   });
 });
 
-const renderer = new Sigma(graph, container);
-
 // Get a random node key :
-const nodeKey = graph.nodes()[Math.ceil(Math.random() * 100)];
+const centerKey: NodeKey = graph.nodes()[Math.ceil(Math.random() * 100)];
 
-// Highlight the node
-renderer.highlightNode(nodeKey);
+const renderer = new Sigma(graph, container, {
+  nodeReducer: (nodeKey: NodeKey, data) => (nodeKey === centerKey ? { ...data, highlighted: true } : data),
+});
 
 // Calling the camera to pan to node
-renderer.camera.animate(renderer.getNodeAttributes(nodeKey), { easing: "linear", duration: 500 });
+renderer.camera.animate(renderer.getNodeAttributes(centerKey) as { x: number; y: number }, {
+  easing: "linear",
+  duration: 500,
+});
 
-window.graph = graph;
-window.renderer = renderer;
-window.camera = renderer.camera;
+globalize({ graph, renderer });
