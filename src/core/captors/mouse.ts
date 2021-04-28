@@ -223,12 +223,12 @@ export default class MouseCaptor extends Captor {
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = this.camera.viewportToGraph(dimensions, {
+      const lastMouse = this.camera.viewportToFramedGraph(dimensions, {
         x: this.lastMouseX as number,
         y: this.lastMouseY as number,
       });
 
-      const mouse = this.camera.viewportToGraph(dimensions, { x: eX, y: eY });
+      const mouse = this.camera.viewportToFramedGraph(dimensions, { x: eX, y: eY });
 
       const offsetX = lastMouse.x - mouse.x,
         offsetY = lastMouse.y - mouse.y;

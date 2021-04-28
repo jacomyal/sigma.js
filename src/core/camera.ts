@@ -117,14 +117,14 @@ export default class Camera extends EventEmitter implements CameraState {
   }
 
   /**
-   * Method returning the coordinates of a point from the graph frame to the
-   * viewport.
+   * Method returning the coordinates of a point from the framed graph system to the
+   * viewport system.
    *
    * @param  {object} dimensions  - Dimensions of the viewport.
    * @param  {object} coordinates - Coordinates of the point.
    * @return {object}             - The point coordinates in the viewport.
    */
-  graphToViewport(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
+  framedGraphToViewport(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width;
@@ -147,14 +147,14 @@ export default class Camera extends EventEmitter implements CameraState {
   }
 
   /**
-   * Method returning the coordinates of a point from the viewport frame to the
-   * graph frame.
+   * Method returning the coordinates of a point from the viewport system to the
+   * framed graph system.
    *
    * @param  {object} dimensions  - Dimensions of the viewport.
    * @param  {object} coordinates - Coordinates of the point.
    * @return {object}             - The point coordinates in the graph frame.
    */
-  viewportToGraph(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
+  viewportToFramedGraph(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
     const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
     const dx = smallestDimension / dimensions.width;
@@ -191,9 +191,9 @@ export default class Camera extends EventEmitter implements CameraState {
     const marginX = (0 * dimensions.width) / 8,
       marginY = (0 * dimensions.height) / 8;
 
-    const p1 = this.viewportToGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }),
-      p2 = this.viewportToGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }),
-      h = this.viewportToGraph(dimensions, { x: 0, y: dimensions.height + marginY });
+    const p1 = this.viewportToFramedGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }),
+      p2 = this.viewportToFramedGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }),
+      h = this.viewportToFramedGraph(dimensions, { x: 0, y: dimensions.height + marginY });
 
     return {
       x1: p1.x,
@@ -249,8 +249,8 @@ export default class Camera extends EventEmitter implements CameraState {
       y: dimensions.height / 2,
     };
 
-    const graphMousePosition = this.viewportToGraph(dimensions, viewportTarget);
-    const graphCenterPosition = this.viewportToGraph(dimensions, center);
+    const graphMousePosition = this.viewportToFramedGraph(dimensions, viewportTarget);
+    const graphCenterPosition = this.viewportToFramedGraph(dimensions, center);
 
     return {
       ...this.getState(),

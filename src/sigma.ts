@@ -10,7 +10,16 @@ import Graph from "graphology";
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import QuadTree from "./core/quadtree";
-import { Coordinates, EdgeAttributes, Extent, Listener, MouseCoords, NodeAttributes, PlainObject } from "./types";
+import {
+  Coordinates,
+  Dimensions,
+  EdgeAttributes,
+  Extent,
+  Listener,
+  MouseCoords,
+  NodeAttributes,
+  PlainObject,
+} from "./types";
 import {
   createElement,
   getPixelRatio,
@@ -76,43 +85,46 @@ function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttribute
  * @param {object}      settings  - Optional settings.
  */
 export default class Sigma extends EventEmitter {
-  settings: Settings;
-  graph: Graph;
-  mouseCaptor: MouseCaptor;
-  touchCaptor: TouchCaptor;
-  container: HTMLElement;
-  elements: PlainObject<HTMLCanvasElement> = {};
-  canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
-  webGLContexts: PlainObject<WebGLRenderingContext> = {};
-  activeListeners: PlainObject<Listener> = {};
-  quadtree: QuadTree = new QuadTree();
-  nodeDataCache: Record<NodeKey, Partial<NodeAttributes>> = {};
-  edgeDataCache: Record<EdgeKey, Partial<EdgeAttributes>> = {};
-  nodeKeyToIndex: Record<NodeKey, number> = {};
-  edgeKeyToIndex: Record<EdgeKey, number> = {};
-  nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
-  edgeExtent: { z: Extent } | null = null;
+  private settings: Settings;
+  private graph: Graph;
+  private mouseCaptor: MouseCaptor;
+  private touchCaptor: TouchCaptor;
+  private container: HTMLElement;
+  private elements: PlainObject<HTMLCanvasElement> = {};
+  private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
+  private webGLContexts: PlainObject<WebGLRenderingContext> = {};
+  private activeListeners: PlainObject<Listener> = {};
+  private quadtree: QuadTree = new QuadTree();
+  private nodeDataCache: Record<NodeKey, Partial<NodeAttributes>> = {};
+  private edgeDataCache: Record<EdgeKey, Partial<EdgeAttributes>> = {};
+  private nodeKeyToIndex: Record<NodeKey, number> = {};
+  private edgeKeyToIndex: Record<EdgeKey, number> = {};
+  private nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
+  private edgeExtent: { z: Extent } | null = null;
 
-  normalizationFunction: NormalizationFunction | null = null;
+  private normalizationFunction: NormalizationFunction = createNormalizationFunction({
+    x: [-Infinity, Infinity],
+    y: [-Infinity, Infinity],
+  });
 
   // Starting dimensions
-  width = 0;
-  height = 0;
+  private width = 0;
+  private height = 0;
 
   // State
-  highlightedNodes: Set<NodeKey> = new Set();
-  displayedLabels: Set<NodeKey> = new Set();
-  hoveredNode: NodeKey | null = null;
-  renderFrame: number | null = null;
-  renderHighlightedNodesFrame: number | null = null;
-  needToProcess = false;
-  needToSoftProcess = false;
+  private highlightedNodes: Set<NodeKey> = new Set();
+  private displayedLabels: Set<NodeKey> = new Set();
+  private hoveredNode: NodeKey | null = null;
+  private renderFrame: number | null = null;
+  private renderHighlightedNodesFrame: number | null = null;
+  private needToProcess = false;
+  private needToSoftProcess = false;
 
   // programs
-  nodePrograms: { [key: string]: INodeProgram } = {};
-  edgePrograms: { [key: string]: IEdgeProgram } = {};
+  private nodePrograms: { [key: string]: INodeProgram } = {};
+  private edgePrograms: { [key: string]: IEdgeProgram } = {};
 
-  camera: Camera;
+  private camera: Camera;
 
   constructor(graph: Graph, container: HTMLElement | null, settings: Partial<Settings> = {}) {
     super();
@@ -193,7 +205,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createCanvas(id: string): HTMLCanvasElement {
+  private createCanvas(id: string): HTMLCanvasElement {
     const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
       "canvas",
       {
@@ -217,7 +229,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createCanvasContext(id: string): this {
+  private createCanvasContext(id: string): this {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -237,7 +249,7 @@ export default class Sigma extends EventEmitter {
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createWebGLContext(id: string): this {
+  private createWebGLContext(id: string): this {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
@@ -266,7 +278,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  initializeCache(): void {
+  private initializeCache(): void {
     const graph = this.graph;
 
     // NOTE: the data caches are never reset to avoid paying a GC cost
@@ -293,9 +305,9 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindCameraHandlers(): this {
+  private bindCameraHandlers(): this {
     this.activeListeners.camera = () => {
-      this.scheduleRender();
+      this.scheduleRefresh();
     };
 
     this.camera.on("updated", this.activeListeners.camera);
@@ -308,11 +320,11 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindEventHandlers(): this {
+  private bindEventHandlers(): this {
     // Handling window resize
     this.activeListeners.handleResize = () => {
       this.needToSoftProcess = true;
-      this.scheduleRender();
+      this.scheduleRefresh();
     };
 
     window.addEventListener("resize", this.activeListeners.handleResize);
@@ -330,7 +342,10 @@ export default class Sigma extends EventEmitter {
 
     // Function returning the nodes in the mouse's quad
     const getQuadNodes = (mouseX: number, mouseY: number) => {
-      const mouseGraphPosition = this.camera.viewportToGraph(this, { x: mouseX, y: mouseY });
+      const mouseGraphPosition = this.camera.viewportToFramedGraph(
+        { width: this.width, height: this.height },
+        { x: mouseX, y: mouseY },
+      );
 
       // TODO: minus 1? lol
       return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
@@ -346,6 +361,8 @@ export default class Sigma extends EventEmitter {
 
       const quadNodes = getQuadNodes(e.x, e.y);
 
+      const dimensions = { width: this.width, height: this.height };
+
       // We will hover the node whose center is closest to mouse
       let minDistance = Infinity,
         nodeToHover = null;
@@ -355,7 +372,7 @@ export default class Sigma extends EventEmitter {
 
         const data = this.nodeDataCache[node] as NodeAttributes;
 
-        const pos = this.camera.graphToViewport(this, data);
+        const pos = this.camera.framedGraphToViewport(dimensions, data);
 
         const size = data.size / sizeRatio;
 
@@ -384,7 +401,7 @@ export default class Sigma extends EventEmitter {
       if (this.hoveredNode) {
         const data = this.nodeDataCache[this.hoveredNode] as NodeAttributes;
 
-        const pos = this.camera.graphToViewport(this, data);
+        const pos = this.camera.framedGraphToViewport(dimensions, data);
 
         const size = data.size / sizeRatio;
 
@@ -404,13 +421,14 @@ export default class Sigma extends EventEmitter {
         const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
         const quadNodes = getQuadNodes(e.x, e.y);
+        const dimensions = { width: this.width, height: this.height };
 
         for (let i = 0, l = quadNodes.length; i < l; i++) {
           const node = quadNodes[i];
 
           const data = this.nodeDataCache[node] as NodeAttributes;
 
-          const pos = this.camera.graphToViewport(this, data);
+          const pos = this.camera.framedGraphToViewport(dimensions, data);
 
           const size = data.size / sizeRatio;
 
@@ -442,17 +460,17 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  bindGraphHandlers(): this {
+  private bindGraphHandlers(): this {
     const graph = this.graph;
 
     this.activeListeners.graphUpdate = () => {
       this.needToProcess = true;
-      this.scheduleRender();
+      this.scheduleRefresh();
     };
 
     this.activeListeners.softGraphUpdate = () => {
       this.needToSoftProcess = true;
-      this.scheduleRender();
+      this.scheduleRefresh();
     };
 
     this.activeListeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
@@ -493,7 +511,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  process(keepArrays = false): this {
+  private process(keepArrays = false): this {
     const graph = this.graph,
       settings = this.settings;
 
@@ -508,14 +526,10 @@ export default class Sigma extends EventEmitter {
 
     if (this.settings.zIndex) {
       nodeExtentProperties.push("z");
-      // `as any` is a workaround due to g-metrics that is not plugged on the same
-      // g-types version
-      this.edgeExtent = edgeExtent(graph as any, ["z"]) as { z: Extent };
+      this.edgeExtent = edgeExtent(graph, ["z"]) as { z: Extent };
     }
 
-    // `as any` is a workaround due to g-metrics that is not plugged on the same
-    // g-types version
-    this.nodeExtent = nodeExtent(graph as any, nodeExtentProperties) as { x: Extent; y: Extent; z: Extent };
+    this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent; z: Extent };
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
@@ -561,7 +575,7 @@ export default class Sigma extends EventEmitter {
       nodeProgram.process(data, data.hidden, i);
 
       // Save the node in the highlighted set if needed
-      if (data.highlighted === true && !data.hidden) this.highlightedNodes.add(node);
+      if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
 
       this.nodeKeyToIndex[node] = i;
     }
@@ -614,90 +628,147 @@ export default class Sigma extends EventEmitter {
     return this;
   }
 
-  /**---------------------------------------------------------------------------
-   * Public API.
-   **---------------------------------------------------------------------------
-   */
-
   /**
-   * Method returning the renderer's camera.
+   * Method used to render labels.
    *
-   * @return {Camera}
-   */
-  getCamera(): Camera {
-    return this.camera;
-  }
-
-  /**
-   * Method returning the mouse captor.
-   *
-   * @return {MouseCaptor}
-   */
-  getMouseCaptor(): MouseCaptor {
-    return this.mouseCaptor;
-  }
-
-  /**
-   * Method returning the touch captor.
-   *
-   * @return {TouchCaptor}
-   */
-  getTouchCaptor(): TouchCaptor {
-    return this.touchCaptor;
-  }
-
-  /**
-   * Method used to resize the renderer.
-   *
-   * @param  {number} width  - Target width.
-   * @param  {number} height - Target height.
    * @return {Sigma}
    */
-  resize(width?: number, height?: number): this {
-    const previousWidth = this.width,
-      previousHeight = this.height;
+  private renderLabels(): this {
+    if (!this.settings.renderLabels) return this;
 
-    if (width && height) {
-      this.width = width;
-      this.height = height;
+    const cameraState = this.camera.getState();
+
+    const dimensions = { width: this.width, height: this.height };
+
+    // Finding visible nodes to display their labels
+    let visibleNodes: NodeKey[];
+
+    if (cameraState.ratio >= 1) {
+      // Camera is unzoomed so no need to ask the quadtree for visible nodes
+      visibleNodes = this.graph.nodes();
     } else {
-      this.width = this.container.offsetWidth;
-      this.height = this.container.offsetHeight;
+      // Let's ask the quadtree
+      const viewRectangle = this.camera.viewRectangle(dimensions);
+
+      visibleNodes = this.quadtree.rectangle(
+        viewRectangle.x1,
+        1 - viewRectangle.y1,
+        viewRectangle.x2,
+        1 - viewRectangle.y2,
+        viewRectangle.height,
+      );
     }
 
-    if (this.width === 0) throw new Error("Sigma: container has no width.");
+    // Selecting labels to draw
+    const gridSettings = this.settings.labelGrid;
 
-    if (this.height === 0) throw new Error("Sigma: container has no height.");
+    const labelsToDisplay = labelsToDisplayFromGrid({
+      cache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
+      camera: this.camera,
+      cell: gridSettings.cell,
+      dimensions,
+      displayedLabels: this.displayedLabels,
+      fontSize: this.settings.labelSize,
+      graph: this.graph,
+      renderedSizeThreshold: gridSettings.renderedSizeThreshold,
+      visibleNodes,
+    });
 
-    // If nothing has changed, we can stop right here
-    if (previousWidth === this.width && previousHeight === this.height) return this;
+    // Drawing labels
+    const context = this.canvasContexts.labels;
 
-    // Sizing dom elements
-    for (const id in this.elements) {
-      const element = this.elements[id];
+    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
-      element.style.width = this.width + "px";
-      element.style.height = this.height + "px";
+    for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
+      const data = this.nodeDataCache[labelsToDisplay[i]] as NodeAttributes;
+
+      const { x, y } = this.camera.framedGraphToViewport(dimensions, data);
+
+      // TODO: we can cache the labels we need to render until the camera's ratio changes
+      // TODO: this should be computed in the canvas components?
+      const size = data.size / sizeRatio;
+
+      this.settings.labelRenderer(
+        context,
+        {
+          key: labelsToDisplay[i],
+          label: data.label,
+          color: "#000",
+          size,
+          x,
+          y,
+        },
+        this.settings,
+      );
     }
 
-    // Sizing canvas contexts
-    for (const id in this.canvasContexts) {
-      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+    // Caching visible nodes and displayed labels
+    this.displayedLabels = new Set(labelsToDisplay);
 
-      if (PIXEL_RATIO !== 1) this.canvasContexts[id].scale(PIXEL_RATIO, PIXEL_RATIO);
-    }
+    return this;
+  }
 
-    // Sizing WebGL contexts
-    for (const id in this.webGLContexts) {
-      this.elements[id].setAttribute("width", this.width * WEBGL_OVERSAMPLING_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * WEBGL_OVERSAMPLING_RATIO + "px");
+  /**
+   * Method used to render edge labels, based on which node labels were
+   * rendered.
+   *
+   * @return {Sigma}
+   */
+  private renderEdgeLabels(): this {
+    if (!this.settings.renderEdgeLabels) return this;
 
-      this.webGLContexts[id].viewport(
-        0,
-        0,
-        this.width * WEBGL_OVERSAMPLING_RATIO,
-        this.height * WEBGL_OVERSAMPLING_RATIO,
+    const cameraState = this.camera.getState();
+    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
+
+    const context = this.canvasContexts.edgeLabels;
+
+    const dimensions = { width: this.width, height: this.height };
+
+    // Clearing
+    context.clearRect(0, 0, this.width, this.height);
+
+    const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
+      nodeDataCache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
+      edgeDataCache: this.edgeDataCache as Record<NodeKey, EdgeAttributes>,
+      graph: this.graph,
+      hoveredNode: this.hoveredNode,
+      displayedNodeLabels: this.displayedLabels,
+      highlightedNodes: this.highlightedNodes,
+    });
+
+    for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
+      const edge = edgeLabelsToDisplay[i],
+        extremities = this.graph.extremities(edge),
+        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
+        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes,
+        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]] as EdgeAttributes;
+
+      const { x: sourceX, y: sourceY } = this.camera.framedGraphToViewport(dimensions, sourceData);
+      const { x: targetX, y: targetY } = this.camera.framedGraphToViewport(dimensions, targetData);
+
+      // TODO: we can cache the labels we need to render until the camera's ratio changes
+      // TODO: this should be computed in the canvas components?
+      const size = edgeData.size / sizeRatio;
+
+      this.settings.edgeLabelRenderer(
+        context,
+        {
+          key: edge,
+          label: edgeData.label,
+          color: edgeData.color,
+          size,
+        },
+        {
+          key: extremities[0],
+          x: sourceX,
+          y: sourceY,
+        },
+        {
+          key: extremities[1],
+          x: targetX,
+          y: targetY,
+        },
+        this.settings,
       );
     }
 
@@ -705,18 +776,64 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
-   * Method used to clear the canvases.
+   * Method used to render the highlighted nodes.
    *
    * @return {Sigma}
    */
-  clear(): this {
-    this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
-    this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
-    this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
-    this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
-    this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
+  private renderHighlightedNodes(): void {
+    const camera = this.camera;
 
-    return this;
+    const sizeRatio = Math.pow(camera.getState().ratio, 0.5);
+
+    const context = this.canvasContexts.hovers;
+
+    // Clearing
+    context.clearRect(0, 0, this.width, this.height);
+
+    // Rendering
+    const render = (node: NodeKey): void => {
+      const data = this.nodeDataCache[node] as NodeAttributes;
+
+      const { x, y } = camera.framedGraphToViewport({ width: this.width, height: this.height }, data);
+
+      const size = data.size / sizeRatio;
+
+      this.settings.hoverRenderer(
+        context,
+        {
+          key: node,
+          label: data.label,
+          color: data.color,
+          size,
+          x,
+          y,
+        },
+        this.settings,
+      );
+    };
+
+    if (this.hoveredNode) {
+      render(this.hoveredNode);
+    }
+
+    this.highlightedNodes.forEach(render);
+  }
+
+  /**
+   * Method used to schedule a hover render.
+   *
+   */
+  private scheduleHighlightedNodesRender(): void {
+    if (this.renderHighlightedNodesFrame || this.renderFrame) return;
+
+    this.renderHighlightedNodesFrame = requestFrame(() => {
+      // Resetting state
+      this.renderHighlightedNodesFrame = null;
+
+      // Rendering
+      this.renderHighlightedNodes();
+      this.renderEdgeLabels();
+    });
   }
 
   /**
@@ -724,7 +841,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  render(): this {
+  private render(): this {
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
@@ -796,282 +913,54 @@ export default class Sigma extends EventEmitter {
     return this;
   }
 
-  /**
-   * Method used to render labels.
-   *
-   * @return {Sigma}
+  /**---------------------------------------------------------------------------
+   * Public API.
+   **---------------------------------------------------------------------------
    */
-  renderLabels(): this {
-    if (!this.settings.renderLabels) return this;
 
-    const cameraState = this.camera.getState();
-
-    // Finding visible nodes to display their labels
-    let visibleNodes: NodeKey[];
-
-    if (cameraState.ratio >= 1) {
-      // Camera is unzoomed so no need to ask the quadtree for visible nodes
-      visibleNodes = this.graph.nodes();
-    } else {
-      // Let's ask the quadtree
-      const viewRectangle = this.camera.viewRectangle(this);
-
-      visibleNodes = this.quadtree.rectangle(
-        viewRectangle.x1,
-        1 - viewRectangle.y1,
-        viewRectangle.x2,
-        1 - viewRectangle.y2,
-        viewRectangle.height,
-      );
-    }
-
-    // Selecting labels to draw
-    const gridSettings = this.settings.labelGrid;
-
-    const labelsToDisplay = labelsToDisplayFromGrid({
-      cache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
-      camera: this.camera,
-      cell: gridSettings.cell,
-      dimensions: this,
-      displayedLabels: this.displayedLabels,
-      fontSize: this.settings.labelSize,
-      graph: this.graph,
-      renderedSizeThreshold: gridSettings.renderedSizeThreshold,
-      visibleNodes,
-    });
-
-    // Drawing labels
-    const context = this.canvasContexts.labels;
-
-    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
-
-    for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
-      const data = this.nodeDataCache[labelsToDisplay[i]] as NodeAttributes;
-
-      const { x, y } = this.camera.graphToViewport(this, data);
-
-      // TODO: we can cache the labels we need to render until the camera's ratio changes
-      // TODO: this should be computed in the canvas components?
-      const size = data.size / sizeRatio;
-
-      this.settings.labelRenderer(
-        context,
-        {
-          key: labelsToDisplay[i],
-          label: data.label,
-          color: "#000",
-          size,
-          x,
-          y,
-        },
-        this.settings,
-      );
-    }
-
-    // Caching visible nodes and displayed labels
-    this.displayedLabels = new Set(labelsToDisplay);
-
-    return this;
+  /**
+   * Method returning the renderer's camera.
+   *
+   * @return {Camera}
+   */
+  getCamera(): Camera {
+    return this.camera;
   }
 
   /**
-   * Method used to render edge labels, based on which node labels were
-   * rendered.
+   * Method returning the renderer's graph.
    *
-   * @return {Sigma}
+   * @return {Graph}
    */
-  renderEdgeLabels(): this {
-    if (!this.settings.renderEdgeLabels) return this;
-
-    const cameraState = this.camera.getState();
-    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
-
-    const context = this.canvasContexts.edgeLabels;
-
-    // Clearing
-    context.clearRect(0, 0, this.width, this.height);
-
-    const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
-      nodeDataCache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
-      edgeDataCache: this.edgeDataCache as Record<NodeKey, EdgeAttributes>,
-      graph: this.graph,
-      hoveredNode: this.hoveredNode,
-      displayedNodeLabels: this.displayedLabels,
-      highlightedNodes: this.highlightedNodes,
-    });
-
-    for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
-      const edge = edgeLabelsToDisplay[i],
-        extremities = this.graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
-        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes,
-        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]] as EdgeAttributes;
-
-      const { x: sourceX, y: sourceY } = this.camera.graphToViewport(this, sourceData);
-      const { x: targetX, y: targetY } = this.camera.graphToViewport(this, targetData);
-
-      // TODO: we can cache the labels we need to render until the camera's ratio changes
-      // TODO: this should be computed in the canvas components?
-      const size = edgeData.size / sizeRatio;
-
-      this.settings.edgeLabelRenderer(
-        context,
-        {
-          key: edge,
-          label: edgeData.label,
-          color: edgeData.color,
-          size,
-        },
-        {
-          key: extremities[0],
-          x: sourceX,
-          y: sourceY,
-        },
-        {
-          key: extremities[1],
-          x: targetX,
-          y: targetY,
-        },
-        this.settings,
-      );
-    }
-
-    return this;
+  getGraph(): Graph {
+    return this.graph;
   }
 
   /**
-   * Method used to render the highlighted nodes.
+   * Method returning the mouse captor.
    *
-   * @return {Sigma}
+   * @return {MouseCaptor}
    */
-  renderHighlightedNodes(): void {
-    const camera = this.camera;
-
-    const sizeRatio = Math.pow(camera.getState().ratio, 0.5);
-
-    const context = this.canvasContexts.hovers;
-
-    // Clearing
-    context.clearRect(0, 0, this.width, this.height);
-
-    // Rendering
-    const render = (node: NodeKey): void => {
-      const data = this.nodeDataCache[node] as NodeAttributes;
-
-      const { x, y } = camera.graphToViewport(this, data);
-
-      const size = data.size / sizeRatio;
-
-      this.settings.hoverRenderer(
-        context,
-        {
-          key: node,
-          label: data.label,
-          color: data.color,
-          size,
-          x,
-          y,
-        },
-        this.settings,
-      );
-    };
-
-    if (this.hoveredNode) {
-      render(this.hoveredNode);
-    }
-
-    this.highlightedNodes.forEach(render);
+  getMouseCaptor(): MouseCaptor {
+    return this.mouseCaptor;
   }
 
   /**
-   * Method used to schedule a render.
+   * Method returning the touch captor.
    *
-   * @return {Sigma}
+   * @return {TouchCaptor}
    */
-  scheduleRender(): void {
-    // A frame is already scheduled
-    if (this.renderFrame) return;
-
-    // Let's schedule a frame
-    this.renderFrame = requestFrame(() => {
-      // Do we need to process data?
-      if (this.needToProcess) {
-        this.process();
-      } else if (this.needToSoftProcess) {
-        this.process(true);
-      }
-
-      // Resetting state
-      this.renderFrame = null;
-      this.needToProcess = false;
-      this.needToSoftProcess = false;
-
-      // Rendering
-      this.render();
-    });
+  getTouchCaptor(): TouchCaptor {
+    return this.touchCaptor;
   }
 
   /**
-   * Method used to schedule a hover render.
+   * Method returning the current renderer's dimensions.
    *
+   * @return {Dimensions}
    */
-  scheduleHighlightedNodesRender(): void {
-    if (this.renderHighlightedNodesFrame || this.renderFrame) return;
-
-    this.renderHighlightedNodesFrame = requestFrame(() => {
-      // Resetting state
-      this.renderHighlightedNodesFrame = null;
-
-      // Rendering
-      this.renderHighlightedNodes();
-      this.renderEdgeLabels();
-    });
-  }
-
-  /**
-   * Method used to manually refresh.
-   *
-   * @return {Sigma}
-   */
-  refresh(): this {
-    this.needToSoftProcess = true;
-    this.scheduleRender();
-
-    return this;
-  }
-
-  /**
-   * Method used to highlight a node.
-   *
-   * @param  {string} key - The node's key.
-   * @return {Sigma}
-   */
-  highlightNode(key: NodeKey): this {
-    // TODO: check the existence of the node
-    // TODO: coerce?
-    this.highlightedNodes.add(key);
-
-    // Rendering
-    this.scheduleHighlightedNodesRender();
-
-    return this;
-  }
-
-  /**
-   * Method used to unhighlight a node.
-   *
-   * @param  {string} key - The node's key.
-   * @return {Sigma}
-   */
-  unhighlightNode(key: NodeKey): this {
-    // TODO: check the existence of the node
-    // TODO: coerce?
-    this.highlightedNodes.delete(key);
-
-    // Rendering
-    this.scheduleHighlightedNodesRender();
-
-    return this;
+  getDimensions(): Dimensions {
+    return { width: this.width, height: this.height };
   }
 
   /**
@@ -1097,6 +986,132 @@ export default class Sigma extends EventEmitter {
   getEdgeAttributes(key: EdgeKey): Partial<EdgeAttributes> | undefined {
     const edge = this.edgeDataCache[key];
     return edge ? Object.assign({}, edge) : undefined;
+  }
+
+  /**
+   * Method used to resize the renderer.
+   *
+   * @return {Sigma}
+   */
+  resize(): this {
+    const previousWidth = this.width,
+      previousHeight = this.height;
+
+    this.width = this.container.offsetWidth;
+    this.height = this.container.offsetHeight;
+
+    if (this.width === 0) throw new Error("Sigma: container has no width.");
+
+    if (this.height === 0) throw new Error("Sigma: container has no height.");
+
+    // If nothing has changed, we can stop right here
+    if (previousWidth === this.width && previousHeight === this.height) return this;
+
+    // Sizing dom elements
+    for (const id in this.elements) {
+      const element = this.elements[id];
+
+      element.style.width = this.width + "px";
+      element.style.height = this.height + "px";
+    }
+
+    // Sizing canvas contexts
+    for (const id in this.canvasContexts) {
+      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+
+      if (PIXEL_RATIO !== 1) this.canvasContexts[id].scale(PIXEL_RATIO, PIXEL_RATIO);
+    }
+
+    // Sizing WebGL contexts
+    for (const id in this.webGLContexts) {
+      this.elements[id].setAttribute("width", this.width * WEBGL_OVERSAMPLING_RATIO + "px");
+      this.elements[id].setAttribute("height", this.height * WEBGL_OVERSAMPLING_RATIO + "px");
+
+      this.webGLContexts[id].viewport(
+        0,
+        0,
+        this.width * WEBGL_OVERSAMPLING_RATIO,
+        this.height * WEBGL_OVERSAMPLING_RATIO,
+      );
+    }
+
+    return this;
+  }
+
+  /**
+   * Method used to clear all the canvases.
+   *
+   * @return {Sigma}
+   */
+  clear(): this {
+    this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
+    this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
+    this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
+    this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
+
+    return this;
+  }
+
+  /**
+   * Method used to refresh all computed data.
+   *
+   * @return {Sigma}
+   */
+  refresh(): this {
+    // Do we need to process data?
+    if (this.needToProcess) {
+      this.process();
+    } else if (this.needToSoftProcess) {
+      this.process(true);
+    }
+
+    // Resetting state
+    this.needToProcess = false;
+    this.needToSoftProcess = false;
+
+    // Rendering
+    this.render();
+
+    return this;
+  }
+
+  /**
+   * Method used to refresh all computed data, at the next available frame.
+   * If this method has already been called this frame, then it will only render once at the next available frame.
+   *
+   * @return {Sigma}
+   */
+  scheduleRefresh(): this {
+    if (!this.renderFrame) {
+      this.renderFrame = requestFrame(() => {
+        this.refresh();
+        this.renderFrame = null;
+      });
+    }
+
+    return this;
+  }
+
+  /**
+   * Method used to translate a point's coordinates from the viewport system (pixel distance from the top-left of the
+   * stage) to the graph system (the reference system of data as they are in the given graph instance).
+   *
+   * @param {Coordinates} viewportPoint
+   */
+  viewportToGraph(viewportPoint: Coordinates): Coordinates {
+    return this.normalizationFunction.inverse(this.camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+  }
+
+  /**
+   * Method used to translate a point's coordinates from the graph system (the reference system of data as they are in
+   * the given graph instance) to the viewport system (pixel distance from the top-left of the stage).
+   *
+   * @param {Coordinates} graphPoint
+   */
+  graphToViewport(graphPoint: Coordinates): Coordinates {
+    return this.camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
   }
 
   /**

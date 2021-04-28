@@ -109,40 +109,40 @@ describe("Camera", function () {
     const graphTopRight: Coordinates = { x: 0.75, y: 0.75 };
     const dimensions: Dimensions = { width: 200, height: 100 };
 
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphCenter), { x: 100, y: 50 });
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphTopRight), { x: 125, y: 25 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphCenter), { x: 100, y: 50 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphTopRight), { x: 125, y: 25 });
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphCenter)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphCenter)),
       graphCenter,
     );
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphTopRight)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphTopRight)),
       graphTopRight,
     );
 
     // Move camera to right and zoom:
     camera.setState({ x: 1, y: 0.5, ratio: 0.5 });
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphCenter), { x: 0, y: 50 });
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphTopRight), { x: 50, y: 0 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphCenter), { x: 0, y: 50 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphTopRight), { x: 50, y: 0 });
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphCenter)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphCenter)),
       graphCenter,
     );
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphTopRight)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphTopRight)),
       graphTopRight,
     );
 
     // Move camera to right, zoom and rotate:
     camera.setState({ x: 1, y: 0.5, ratio: 0.5, angle: Math.PI / 2 });
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphCenter), { x: 100, y: -50 });
-    assert.deepStrictEqual(camera.graphToViewport(dimensions, graphTopRight), { x: 150, y: 0 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphCenter), { x: 100, y: -50 });
+    assert.deepStrictEqual(camera.framedGraphToViewport(dimensions, graphTopRight), { x: 150, y: 0 });
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphCenter)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphCenter)),
       graphCenter,
     );
     assert.deepStrictEqual(
-      camera.viewportToGraph(dimensions, camera.graphToViewport(dimensions, graphTopRight)),
+      camera.viewportToFramedGraph(dimensions, camera.framedGraphToViewport(dimensions, graphTopRight)),
       graphTopRight,
     );
   });
@@ -153,7 +153,7 @@ describe("Camera", function () {
 
     const dimensions: Dimensions = { width: 1800, height: 1000 };
     const viewportTarget: Coordinates = { x: 200, y: 400 };
-    const graphTarget = camera.viewportToGraph(dimensions, viewportTarget);
+    const graphTarget = camera.viewportToFramedGraph(dimensions, viewportTarget);
     const targetRatio = 0.4;
 
     const zoomedState = camera.getViewportZoomedState(viewportTarget, dimensions, targetRatio);
@@ -162,7 +162,7 @@ describe("Camera", function () {
     assert.strictEqual(zoomedCamera.ratio, targetRatio);
     assert.notDeepStrictEqual(camera.getState(), zoomedCamera.getState());
 
-    const finalViewport = zoomedCamera.graphToViewport(dimensions, graphTarget);
+    const finalViewport = zoomedCamera.framedGraphToViewport(dimensions, graphTarget);
     // Check that the error is way smaller than a pixel
     assert.ok(Math.abs(viewportTarget.x - finalViewport.x) < 0.00001);
     assert.ok(Math.abs(viewportTarget.y - finalViewport.y) < 0.00001);

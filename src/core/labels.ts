@@ -7,9 +7,9 @@
  */
 import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
-import { EdgeAttributes, NodeAttributes } from "../types";
-import Sigma from "../sigma";
+import { Dimensions, EdgeAttributes, NodeAttributes } from "../types";
 import Camera from "./camera";
+
 /**
  * Constants.
  */
@@ -62,7 +62,7 @@ export function labelsToDisplayFromGrid(params: {
   cache: { [key: string]: NodeAttributes };
   camera: Camera;
   cell: { width: number; height: number } | null;
-  dimensions: Sigma;
+  dimensions: Dimensions;
   displayedLabels: Set<NodeKey>;
   fontSize: number;
   graph: Graph;
@@ -145,7 +145,7 @@ export function labelsToDisplayFromGrid(params: {
     if (nodeData.size / sizeRatio < renderedSizeThreshold) continue;
 
     // Finding our node's cell in the grid
-    const pos = camera.graphToViewport(dimensions, nodeData);
+    const pos = camera.framedGraphToViewport(dimensions, nodeData);
 
     // Node is not actually visible on screen
     // NOTE: can optimize margin on the right side (only if we know where the labels go)
@@ -160,7 +160,7 @@ export function labelsToDisplayFromGrid(params: {
     // If panning when zoomed, we consider only displayed labels and newly
     // visible nodes
     if (zoomedPanning) {
-      const ppos = previousCamera.graphToViewport(dimensions, nodeData);
+      const ppos = previousCamera.framedGraphToViewport(dimensions, nodeData);
 
       // Was node visible earlier?
       if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
@@ -243,14 +243,14 @@ export function labelsToDisplayFromGrid(params: {
   for (let i = 0, l = worthyLabels.length; i < l; i++) {
     const n1 = worthyLabels[i],
       d1 = cache[n1],
-      p1 = camera.graphToViewport(dimensions, d1);
+      p1 = camera.framedGraphToViewport(dimensions, d1);
 
     if (collisions.has(n1)) continue;
 
     for (let j = i + 1; j < l; j++) {
       const n2 = worthyLabels[j],
         d2 = cache[n2],
-        p2 = camera.graphToViewport(dimensions, d2);
+        p2 = camera.framedGraphToViewport(dimensions, d2);
 
       const c = collision(
         // First abstract bbox

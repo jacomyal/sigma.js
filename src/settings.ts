@@ -57,8 +57,8 @@ export interface Settings {
     renderedSizeThreshold: number;
   };
   // Reducers
-  nodeReducer: null | ((edge: NodeKey, data: NodeAttributes) => NodeAttributes);
-  edgeReducer: null | ((node: EdgeKey, data: EdgeAttributes) => EdgeAttributes);
+  nodeReducer: null | ((node: NodeKey, data: NodeAttributes) => NodeAttributes);
+  edgeReducer: null | ((edge: EdgeKey, data: EdgeAttributes) => EdgeAttributes);
   // Features
   zIndex: boolean;
   // Renderers

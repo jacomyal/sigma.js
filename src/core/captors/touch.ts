@@ -5,7 +5,7 @@
  * Sigma's captor dealing with touch.
  * @module
  */
-import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
+import { CameraState, Coordinates, Dimensions } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 import Camera from "../camera";
 
@@ -174,11 +174,11 @@ export default class TouchCaptor extends Captor {
 
     switch (this.touchMode) {
       case 1: {
-        const { x: xStart, y: yStart } = this.camera.viewportToGraph(
+        const { x: xStart, y: yStart } = this.camera.viewportToFramedGraph(
           this.getDimensions(),
           (this.startTouchesPositions || [])[0] as Coordinates,
         );
-        const { x, y } = this.camera.viewportToGraph(this.getDimensions(), touchesPositions[0]);
+        const { x, y } = this.camera.viewportToFramedGraph(this.getDimensions(), touchesPositions[0]);
 
         this.camera.setState({
           x: startCameraState.x + xStart - x,
@@ -211,7 +211,7 @@ export default class TouchCaptor extends Captor {
 
         // 2.
         const dimensions = this.getDimensions();
-        const touchGraphPosition = Camera.from(startCameraState).viewportToGraph(
+        const touchGraphPosition = Camera.from(startCameraState).viewportToFramedGraph(
           dimensions,
           (this.startTouchesPositions || [])[0] as Coordinates,
         );

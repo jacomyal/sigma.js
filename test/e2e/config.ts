@@ -1,4 +1,6 @@
 import { Browser, Page } from "puppeteer";
+import Graph from "graphology";
+
 export type Tests = Array<{
   name: string; // Name of the screenshot, without the extension like for example 'example-basic'
   url: string; // Url of the page to take in screenshot
@@ -17,8 +19,8 @@ export const tests: Tests = [
     waitFor: 2000,
     scenario: async (browser: Browser, page: Page): Promise<void> => {
       await page.evaluate(() => {
-        const element: any = document.getElementsByClassName("sigma-mouse")[0];
-        const cEvent: any = new Event("wheel");
+        const element = document.getElementsByClassName("sigma-mouse")[0];
+        const cEvent: Event & { clientX?: number; clientY?: number; deltaY?: number } = new Event("wheel");
         cEvent.clientX = 0;
         cEvent.clientY = 0;
         cEvent.deltaY = -100;
@@ -34,11 +36,14 @@ export const tests: Tests = [
     waitFor: 2000,
     scenario: async (browser: Browser, page: Page): Promise<void> => {
       await page.evaluate(() => {
-        window.graph.setNodeAttribute("Alice", "highlighted", true);
-        window.graph.setNodeAttribute("Bob", "size", 50);
-        window.graph.setNodeAttribute("Bob", "color", "#FF0000");
-        window.graph.setNodeAttribute("Deborah", "hidden", true);
-        window.graph.setEdgeAttribute("Alice", "Bob", "hidden", true);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const graph: Graph = window.graph;
+        graph.setNodeAttribute("Alice", "highlighted", true);
+        graph.setNodeAttribute("Bob", "size", 50);
+        graph.setNodeAttribute("Bob", "color", "#FF0000");
+        graph.setNodeAttribute("Deborah", "hidden", true);
+        graph.setEdgeAttribute("Alice", "Bob", "hidden", true);
       });
     },
   },

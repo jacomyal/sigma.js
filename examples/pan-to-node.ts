@@ -28,7 +28,7 @@ const renderer = new Sigma(graph, container, {
 });
 
 // Calling the camera to pan to node
-renderer.camera.animate(renderer.getNodeAttributes(centerKey) as { x: number; y: number }, {
+renderer.getCamera().animate(renderer.getNodeAttributes(centerKey) as { x: number; y: number }, {
   easing: "linear",
   duration: 500,
 });

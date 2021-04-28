@@ -41,7 +41,7 @@ captor.on("mousemove", (e) => {
   if (!dragging || !draggedNode) return;
 
   // Get new position of node
-  const pos = renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, e));
+  const pos = renderer.viewportToGraph(e);
 
   graph.setNodeAttribute(draggedNode, "x", pos.x);
   graph.setNodeAttribute(draggedNode, "y", pos.y);

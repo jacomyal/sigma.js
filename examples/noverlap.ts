@@ -30,7 +30,6 @@ graph.forEachNode((node) => {
 });
 
 const renderer = new Sigma(graph, container);
-const camera = renderer.getCamera();
 
 function createButton(text: string, offset: number) {
   const button = document.createElement("button");
@@ -50,18 +49,11 @@ function createButton(text: string, offset: number) {
 }
 
 const inputReducer: NoverlapNodeReducer = (key, attr) => {
-  let pos = renderer.normalizationFunction(attr);
-  pos = camera.graphToViewport(renderer, pos);
-
-  return {
-    x: pos.x,
-    y: pos.y,
-    size: attr.size,
-  };
+  return { ...attr, ...renderer.graphToViewport(attr) };
 };
 
-const outputReducer: NoverlapNodeReducer = (key, pos) => {
-  return renderer.normalizationFunction.inverse(camera.viewportToGraph(renderer, pos));
+const outputReducer: NoverlapNodeReducer = (key, attr) => {
+  return { ...attr, ...renderer.viewportToGraph(attr) };
 };
 
 const fixedButton = createButton("noverlap 500", 0);
