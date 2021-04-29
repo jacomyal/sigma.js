@@ -24,7 +24,7 @@ void main() {
   float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;
   thickness = max(thickness, minThickness * u_viewportRatio);
 
-  float nodeRadius = a_radius * u_thicknessRatio * u_scale * u_viewportRatio * u_cameraRatio;
+  float nodeRadius = a_radius * u_thicknessRatio * u_viewportRatio * u_cameraRatio;
   float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio * u_cameraRatio;
   float arrowHeadHalfWidth = arrowHeadWidthLengthRatio * arrowHeadLength / 2.0;
 

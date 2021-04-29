@@ -25,7 +25,7 @@ void main() {
   thickness = max(thickness, minThickness * u_viewportRatio);
 
   float direction = sign(a_radius);
-  float nodeRadius = direction * a_radius * u_thicknessRatio * u_scale * u_viewportRatio;
+  float nodeRadius = direction * a_radius * u_thicknessRatio * u_viewportRatio;
   float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio;
 
   vec2 arrowHeadVector = vec2(-direction * a_normal.y, direction * a_normal.x);
