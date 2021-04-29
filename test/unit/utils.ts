@@ -6,6 +6,7 @@ import assert from "assert";
 import Graph, { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
+import choice from "pandemonium/choice";
 import { validateGraph } from "../../src/utils";
 
 describe("validateGraph utils", () => {
@@ -33,7 +34,7 @@ describe("validateGraph utils", () => {
     randomLayout.assign(graph);
 
     // Get a random node, and remove its 'x' attribute
-    const nodeKey = graph.nodes()[Math.ceil(Math.random() * 100)];
+    const nodeKey = choice(graph.nodes());
     graph.removeNodeAttribute(nodeKey, "x");
 
     // Test
