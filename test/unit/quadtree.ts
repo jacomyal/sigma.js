@@ -21,7 +21,7 @@ describe("QuadTree geometry utils", () => {
       assert.deepStrictEqual(rect, getCircumscribedAlignedRectangle(rect));
     });
 
-    it("should return the given rectangle for 'straight' rectangles", () => {
+    it("should return the good circumscribed rectangle for 'tilted' rectangles", () => {
       const rect: Rectangle = {
         x1: 0,
         y1: 0,
@@ -62,7 +62,7 @@ describe("QuadTree geometry utils", () => {
       );
     });
 
-    it("should work with aligned rectangles", () => {
+    it("should work with misaligned rectangles", () => {
       assert.ok(
         !isRectangleAligned({
           x1: 0,
