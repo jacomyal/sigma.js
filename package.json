@@ -19,11 +19,10 @@
     "prepublishOnly": "npm run prepublish",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
-    "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
-    "types": "npx tsc --declaration --emitDeclarationOnly --outDir lib"
+    "e2e:generate": "node -r ts-node/register test/e2e/generate.ts"
   },
   "config": {
-    "clean": "core index.js rendering settings.js sigma.js utils",
+    "clean": "core rendering utils types index.js settings.js sigma.js types.js",
     "folders": "examples src test"
   },
   "repository": {

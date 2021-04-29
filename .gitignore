@@ -5,13 +5,12 @@ node_modules
 .DS_Store
 .vscode
 /core/
-/index.js
-/out/
 /rendering/
+/utils/
+/types
+/index.js
 /settings.js
 /sigma.js
-/utils/
 /types.js
-/types
 /test/e2e/screenshots/*.current.png
 /test/e2e/screenshots/*.diff.png
