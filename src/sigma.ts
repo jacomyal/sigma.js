@@ -1015,7 +1015,7 @@ export default class Sigma extends EventEmitter {
   setSetting<K extends keyof Settings>(key: K, value: Settings[K]): this {
     this.settings[key] = value;
     validateSettings(this.settings);
-    this.needToProcess = true;
+    this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
     this.scheduleRefresh();
     return this;
   }
@@ -1031,7 +1031,7 @@ export default class Sigma extends EventEmitter {
   updateSetting<K extends keyof Settings>(key: K, updater: (value: Settings[K]) => Settings[K]): this {
     this.settings[key] = updater(this.settings[key]);
     validateSettings(this.settings);
-    this.needToProcess = true;
+    this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
     this.scheduleRefresh();
     return this;
   }
