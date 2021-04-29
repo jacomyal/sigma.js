@@ -989,6 +989,48 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method returning the current value for a given setting key.
+   *
+   * @param  {string} key - The setting key to get.
+   * @return {any} The value attached to this setting key or undefined if not found
+   */
+  getSetting<K extends keyof Settings>(key: K): Settings[K] | undefined {
+    return this.settings[key];
+  }
+
+  /**
+   * Method setting the value of a given setting key. Note that this will schedule
+   * a new render next frame.
+   *
+   * @param  {string} key - The setting key to set.
+   * @param  {any}    value - The value to set.
+   * @return {Sigma}
+   */
+  setSetting<K extends keyof Settings>(key: K, value: Settings[K]): this {
+    this.settings[key] = value;
+    validateSettings(this.settings);
+    this.needToProcess = true;
+    this.scheduleRefresh();
+    return this;
+  }
+
+  /**
+   * Method updating the value of a given setting key using the provided function.
+   * Note that this will schedule a new render next frame.
+   *
+   * @param  {string} key - The setting key to set.
+   * @param  {any}    value - The value to set.
+   * @return {Sigma}
+   */
+  updateSetting<K extends keyof Settings>(key: K, updater: (value: Settings[K]) => Settings[K]): this {
+    this.settings[key] = updater(this.settings[key]);
+    validateSettings(this.settings);
+    this.needToProcess = true;
+    this.scheduleRefresh();
+    return this;
+  }
+
+  /**
    * Method used to resize the renderer.
    *
    * @return {Sigma}
