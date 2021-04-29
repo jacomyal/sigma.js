@@ -28,6 +28,7 @@ const POINTS = 4,
 export default class EdgeProgram extends AbstractEdgeProgram {
   IndicesArray: Uint32ArrayConstructor | Uint16ArrayConstructor;
   indicesArray: Uint32Array | Uint16Array;
+  indicesBuffer: WebGLBuffer;
   indicesType: GLenum;
   canUse32BitsIndices: boolean;
   positionLocation: GLint;
@@ -42,6 +43,11 @@ export default class EdgeProgram extends AbstractEdgeProgram {
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+
+    // Initializing indices buffer
+    const indicesBuffer = gl.createBuffer();
+    if (indicesBuffer === null) throw new Error("EdgeProgram: error while getting resolutionLocation");
+    this.indicesBuffer = indicesBuffer;
 
     // Locations
     this.positionLocation = gl.getAttribLocation(this.program, "a_position");
@@ -86,6 +92,8 @@ export default class EdgeProgram extends AbstractEdgeProgram {
 
   bind(): void {
     const gl = this.gl;
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
 
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);

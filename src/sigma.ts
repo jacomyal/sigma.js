@@ -580,6 +580,9 @@ export default class Sigma extends EventEmitter {
       this.nodeKeyToIndex[node] = i;
     }
 
+    // TODO: maybe we should bind and buffer as part of rendering?
+    // We also need to find when it is useful and when it's really not
+    nodeProgram.bind();
     nodeProgram.bufferData();
 
     const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
@@ -623,6 +626,9 @@ export default class Sigma extends EventEmitter {
     // Computing edge indices if necessary
     if (!keepArrays && typeof edgeProgram.computeIndices === "function") edgeProgram.computeIndices();
 
+    // TODO: maybe we should bind and buffer as part of rendering?
+    // We also need to find when it is useful and when it's really not
+    edgeProgram.bind();
     edgeProgram.bufferData();
 
     return this;
