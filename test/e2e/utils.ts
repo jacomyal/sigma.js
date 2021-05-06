@@ -9,7 +9,7 @@ import { Tests } from "./config";
 
 // to avoid implicit any error
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const webpackConfig = require("./../../examples/webpack.config");
+const webpackConfig = require("../../examples/.webpack.config");
 
 /**
  * Take the screenshots.

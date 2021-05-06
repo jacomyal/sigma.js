@@ -1,0 +1,74 @@
+{
+  "animations": {
+    "id": "animations",
+    "title": "Animations"
+  },
+  "basic": {
+    "id": "basic",
+    "title": "Basic"
+  },
+  "components": {
+    "id": "components",
+    "title": "Connected Components"
+  },
+  "drag": {
+    "id": "drag",
+    "title": "Drag"
+  },
+  "dynamic": {
+    "id": "dynamic",
+    "title": "Dynamic graph (adding & removing items)"
+  },
+  "events": {
+    "id": "events",
+    "title": "Events"
+  },
+  "gexf": {
+    "id": "gexf",
+    "title": "GEXF"
+  },
+  "hideEdgesOnMove": {
+    "id": "hide-edges-on-move",
+    "title": "Hide edges on move"
+  },
+  "layout": {
+    "id": "layout",
+    "title": "Force Atlas 2 Layout"
+  },
+  "noverlap": {
+    "id": "noverlap",
+    "title": "Noverlap Layout"
+  },
+  "panToNode": {
+    "id": "pan-to-node",
+    "title": "Center graph on a node"
+  },
+  "performance": {
+    "id": "performance",
+    "title": "Performance"
+  },
+  "settings": {
+    "id": "settings",
+    "title": "Settings"
+  },
+  "tiny": {
+    "id": "tiny",
+    "title": "Tiny graph"
+  },
+  "edgeLabels": {
+    "id": "edge-labels",
+    "title": "Edge labels"
+  },
+  "customNodes": {
+    "id": "custom-nodes",
+    "title": "Custom nodes renderer"
+  },
+  "rotation": {
+    "id": "rotation",
+    "title": "Camera rotation"
+  },
+  "multiPrograms": {
+    "id": "multi-programs",
+    "title": "Multiple programs"
+  }
+}

@@ -9,7 +9,8 @@
     "build": "webpack --progress && webpack --progress --mode production",
     "clean": "rimraf $npm_package_config_clean",
     "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
-    "examples": "webpack serve --config ./examples/webpack.config.js --progress",
+    "examples": "webpack serve --config examples/.webpack.config.js --progress",
+    "examples-build": "webpack --config examples/.webpack.config.js --progress --mode production",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
@@ -19,7 +20,10 @@
     "reinstall": "rimraf node_modules && npm i && npm run clean",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
-    "e2e:generate": "node -r ts-node/register test/e2e/generate.ts"
+    "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
+    "website:prepare": "cd website && npm install",
+    "website:start": "cd website && npm run dev",
+    "website:build": "cd website && npm run build-all"
   },
   "config": {
     "clean": "core rendering utils index.js index.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",

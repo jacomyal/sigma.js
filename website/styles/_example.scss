@@ -1,0 +1,13 @@
+.example {
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+
+  & > * {
+    flex-grow: 1;
+  }
+
+  & > pre {
+    overflow: auto;
+  }
+}

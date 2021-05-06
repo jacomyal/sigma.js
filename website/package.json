@@ -1,0 +1,30 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 8001",
+    "clear": "rimraf www build",
+    "postinstall": "next build",
+    "build-doc": "typedoc ../src/index.ts --out www/doc",
+    "build-examples": "cd .. && npm run examples-build",
+    "build-website": "next build && next export -o www",
+    "build-all": "npm run clear && npm run build-website && npm run build-doc && npm run build-examples"
+  },
+  "dependencies": {
+    "@types/classnames": "^2.2.11",
+    "@types/highlight.js": "^10.1.0",
+    "@types/lodash": "^4.14.168",
+    "@types/node": "^14.14.36",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "classnames": "^2.2.6",
+    "highlight.js": "^10.7.1",
+    "lodash": "^4.17.21",
+    "next": "10.0.9",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "rimraf": "^3.0.2",
+    "sass": "^1.32.8",
+    "typedoc": "^0.20.36",
+    "typescript": "^4.2.3"
+  }
+}

@@ -1,82 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const EXAMPLES = require("./.examples.json");
 /* eslint-enable @typescript-eslint/no-var-requires */
 
-const EXAMPLES = {
-  animations: {
-    id: "animations",
-    title: "Animations",
-  },
-  basic: {
-    id: "basic",
-    title: "Basic",
-  },
-  components: {
-    id: "components",
-    title: "Connected Components",
-  },
-  drag: {
-    id: "drag",
-    title: "Drag",
-  },
-  dynamic: {
-    id: "dynamic",
-    title: "Dynamic graph (adding & removing items)",
-  },
-  events: {
-    id: "events",
-    title: "Events",
-  },
-  gexf: {
-    id: "gexf",
-    title: "GEXF",
-  },
-  hideEdgesOnMove: {
-    id: "hide-edges-on-move",
-    title: "Hide edges on move",
-  },
-  layout: {
-    id: "layout",
-    title: "Force Atlas 2 Layout",
-  },
-  noverlap: {
-    id: "noverlap",
-    title: "Noverlap Layout",
-  },
-  panToNode: {
-    id: "pan-to-node",
-    title: "Center graph on a node",
-  },
-  performance: {
-    id: "performance",
-    title: "Performance",
-  },
-  settings: {
-    id: "settings",
-    title: "Settings",
-  },
-  tiny: {
-    id: "tiny",
-    title: "Tiny graph",
-  },
-  edgeLabels: {
-    id: "edge-labels",
-    title: "Edge labels",
-  },
-  customNodes: {
-    id: "custom-nodes",
-    title: "Custom nodes renderer",
-  },
-  rotation: {
-    id: "rotation",
-    title: "Camera rotation",
-  },
-  multiPrograms: {
-    id: "multi-programs",
-    title: "Multiple programs",
-  },
-};
+let production = process.argv.indexOf("--mode");
+production = production !== -1 ? process.argv[production + 1] === "production" : false;
 
 const entry = {};
 
@@ -106,15 +35,16 @@ for (const key in EXAMPLES) {
 }
 
 module.exports = {
-  mode: "development",
+  mode: production ? "production" : "development",
   context: __dirname,
   entry,
   output: {
     filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "../website/www/demos"),
   },
   devtool: "source-map",
   resolve: {
-    extensions: [".ts", ".js", ".glsl", ".gefx"],
+    extensions: [".ts", ".js", ".glsl", ".gexf"],
   },
   module: {
     rules: [
