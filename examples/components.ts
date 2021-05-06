@@ -4,7 +4,7 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import louvain from "graphology-communities-louvain";
 import { connectedComponents } from "graphology-components";
 
-import Sigma from "../src/sigma";
+import Sigma from "sigma";
 
 import data from "./resources/toflit.json";
 

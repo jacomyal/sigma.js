@@ -2,9 +2,9 @@ import Graph from "graphology";
 import gexf from "graphology-gexf/browser";
 import { NodeKey } from "graphology-types";
 
-import Sigma from "../src/sigma";
-import { globalize } from "./utils";
+import Sigma from "sigma";
 
+import { globalize } from "./utils";
 import arctic from "./resources/arctic.gexf";
 
 const container = document.getElementById("container");

@@ -6,8 +6,9 @@ import choice from "pandemonium/choice";
 import random from "pandemonium/random";
 import chroma from "chroma-js";
 
+import Sigma from "sigma";
+
 import { getRandomName, globalize } from "./utils";
-import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

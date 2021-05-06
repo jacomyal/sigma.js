@@ -1,6 +1,7 @@
 import { UndirectedGraph } from "graphology";
 
-import Sigma from "../src/sigma";
+import Sigma from "sigma";
+
 import { globalize } from "./utils";
 
 const container = document.getElementById("container");

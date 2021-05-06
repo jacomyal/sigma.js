@@ -6,8 +6,9 @@ import NoverlapLayoutSupervisor from "graphology-layout-noverlap/worker";
 import chroma from "chroma-js";
 import random from "pandemonium/random";
 
-import Sigma from "../src/sigma";
-import { animateNodes } from "../src/utils/animate";
+import Sigma from "sigma";
+import { animateNodes } from "sigma/utils/animate";
+
 import { globalize } from "./utils";
 
 const NOVERLAP_SETTINGS = {

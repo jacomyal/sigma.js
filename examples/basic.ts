@@ -3,8 +3,9 @@ import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
 
+import Sigma from "sigma";
+
 import { getRandomName, globalize } from "./utils";
-import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

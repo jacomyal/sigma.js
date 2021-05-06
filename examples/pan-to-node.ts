@@ -4,8 +4,9 @@ import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
 import { NodeKey } from "graphology-types";
 
+import Sigma from "sigma";
+
 import { getRandomName, globalize } from "./utils";
-import Sigma from "../src/sigma";
 
 const container = document.getElementById("container");
 

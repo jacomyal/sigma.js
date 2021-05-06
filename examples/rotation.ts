@@ -1,7 +1,8 @@
 import { UndirectedGraph } from "graphology";
 
-import Sigma from "../src/sigma";
-import { requestFrame } from "../src/utils";
+import Sigma from "sigma";
+import { requestFrame } from "sigma/utils";
+
 import { globalize } from "./utils";
 
 import miserables from "./resources/les-miserables.json";
