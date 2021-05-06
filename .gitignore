@@ -7,10 +7,13 @@ node_modules
 /core/
 /rendering/
 /utils/
-/types
 /index.js
+/index.d.ts
 /settings.js
+/settings.d.ts
 /sigma.js
+/sigma.d.ts
 /types.js
+/types.d.ts
 /test/e2e/screenshots/*.current.png
 /test/e2e/screenshots/*.diff.png

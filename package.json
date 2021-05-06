@@ -5,11 +5,10 @@
   "homepage": "http://sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "main": "index.js",
-  "typings": "types/index.d.ts",
   "scripts": {
     "build": "webpack --progress && webpack --progress --mode production",
     "clean": "rimraf $npm_package_config_clean",
-    "transpile": "tsc -p ./tsconfig.transpile.json -d --declarationDir types && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
+    "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
     "examples": "webpack serve --config ./examples/webpack.config.js --progress",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_config_folders --ext .ts",
@@ -22,7 +21,7 @@
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts"
   },
   "config": {
-    "clean": "core rendering utils types index.js settings.js sigma.js types.js",
+    "clean": "core rendering utils index.js index.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
     "folders": "examples src test"
   },
   "repository": {
@@ -51,8 +50,8 @@
     "graphology-utils": "^2.0.0"
   },
   "devDependencies": {
-    "@types/chroma-js": "^2.1.3",
     "@babel/core": "^7.13.16",
+    "@types/chroma-js": "^2.1.3",
     "@types/d3-scale": "^3.2.2",
     "@types/mocha": "^8.2.2",
     "@types/pixelmatch": "^5.2.3",
