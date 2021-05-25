@@ -2459,7 +2459,7 @@ var Sigma = /** @class */ (function (_super) {
     Sigma.prototype.bindCameraHandlers = function () {
         var _this = this;
         this.activeListeners.camera = function () {
-            _this.scheduleRefresh();
+            _this._scheduleRefresh();
         };
         this.camera.on("updated", this.activeListeners.camera);
         return this;
@@ -2474,7 +2474,7 @@ var Sigma = /** @class */ (function (_super) {
         // Handling window resize
         this.activeListeners.handleResize = function () {
             _this.needToSoftProcess = true;
-            _this.scheduleRefresh();
+            _this._scheduleRefresh();
         };
         window.addEventListener("resize", this.activeListeners.handleResize);
         // Function checking if the mouse is on the given node
@@ -2515,7 +2515,7 @@ var Sigma = /** @class */ (function (_super) {
                     }
                 }
             }
-            if (nodeToHover && _this.hoveredNode !== nodeToHover) {
+            if (nodeToHover && _this.hoveredNode !== nodeToHover && !_this.nodeDataCache[nodeToHover].hidden) {
                 // Handling passing from one node to the other directly
                 if (_this.hoveredNode)
                     _this.emit("leaveNode", { node: _this.hoveredNode });
@@ -2575,11 +2575,11 @@ var Sigma = /** @class */ (function (_super) {
         var graph = this.graph;
         this.activeListeners.graphUpdate = function () {
             _this.needToProcess = true;
-            _this.scheduleRefresh();
+            _this._scheduleRefresh();
         };
         this.activeListeners.softGraphUpdate = function () {
             _this.needToSoftProcess = true;
-            _this.scheduleRefresh();
+            _this._scheduleRefresh();
         };
         this.activeListeners.addNodeGraphUpdate = function (e) {
             // Adding entry to cache
@@ -2696,6 +2696,43 @@ var Sigma = /** @class */ (function (_super) {
         // We also need to find when it is useful and when it's really not
         edgeProgram.bind();
         edgeProgram.bufferData();
+        return this;
+    };
+    /**
+     * Method that decides whether to reprocess graph or not, and then render the
+     * graph.
+     *
+     * @return {Sigma}
+     */
+    Sigma.prototype._refresh = function () {
+        // Do we need to process data?
+        if (this.needToProcess) {
+            this.process();
+        }
+        else if (this.needToSoftProcess) {
+            this.process(true);
+        }
+        // Resetting state
+        this.needToProcess = false;
+        this.needToSoftProcess = false;
+        // Rendering
+        this.render();
+        return this;
+    };
+    /**
+     * Method that schedules a `_refresh` call if none has been scheduled yet. It
+     * will then be processed next available frame.
+     *
+     * @return {Sigma}
+     */
+    Sigma.prototype._scheduleRefresh = function () {
+        var _this = this;
+        if (!this.renderFrame) {
+            this.renderFrame = utils_1.requestFrame(function () {
+                _this._refresh();
+                _this.renderFrame = null;
+            });
+        }
         return this;
     };
     /**
@@ -2827,7 +2864,7 @@ var Sigma = /** @class */ (function (_super) {
                 y: y,
             }, _this.settings);
         };
-        if (this.hoveredNode) {
+        if (this.hoveredNode && !this.nodeDataCache[this.hoveredNode].hidden) {
             render(this.hoveredNode);
         }
         this.highlightedNodes.forEach(render);
@@ -2999,7 +3036,7 @@ var Sigma = /** @class */ (function (_super) {
         this.settings[key] = value;
         settings_1.validateSettings(this.settings);
         this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-        this.scheduleRefresh();
+        this._scheduleRefresh();
         return this;
     };
     /**
@@ -3014,7 +3051,7 @@ var Sigma = /** @class */ (function (_super) {
         this.settings[key] = updater(this.settings[key]);
         settings_1.validateSettings(this.settings);
         this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-        this.scheduleRefresh();
+        this._scheduleRefresh();
         return this;
     };
     /**
@@ -3073,18 +3110,8 @@ var Sigma = /** @class */ (function (_super) {
      * @return {Sigma}
      */
     Sigma.prototype.refresh = function () {
-        // Do we need to process data?
-        if (this.needToProcess) {
-            this.process();
-        }
-        else if (this.needToSoftProcess) {
-            this.process(true);
-        }
-        // Resetting state
-        this.needToProcess = false;
-        this.needToSoftProcess = false;
-        // Rendering
-        this.render();
+        this.needToProcess = true;
+        this._refresh();
         return this;
     };
     /**
@@ -3094,13 +3121,8 @@ var Sigma = /** @class */ (function (_super) {
      * @return {Sigma}
      */
     Sigma.prototype.scheduleRefresh = function () {
-        var _this = this;
-        if (!this.renderFrame) {
-            this.renderFrame = utils_1.requestFrame(function () {
-                _this.refresh();
-                _this.renderFrame = null;
-            });
-        }
+        this.needToProcess = true;
+        this._scheduleRefresh();
         return this;
     };
     /**
