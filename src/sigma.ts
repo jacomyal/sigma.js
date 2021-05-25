@@ -307,7 +307,7 @@ export default class Sigma extends EventEmitter {
    */
   private bindCameraHandlers(): this {
     this.activeListeners.camera = () => {
-      this.scheduleRefresh();
+      this._scheduleRefresh();
     };
 
     this.camera.on("updated", this.activeListeners.camera);
@@ -324,7 +324,7 @@ export default class Sigma extends EventEmitter {
     // Handling window resize
     this.activeListeners.handleResize = () => {
       this.needToSoftProcess = true;
-      this.scheduleRefresh();
+      this._scheduleRefresh();
     };
 
     window.addEventListener("resize", this.activeListeners.handleResize);
@@ -387,7 +387,7 @@ export default class Sigma extends EventEmitter {
         }
       }
 
-      if (nodeToHover && this.hoveredNode !== nodeToHover) {
+      if (nodeToHover && this.hoveredNode !== nodeToHover && !this.nodeDataCache[nodeToHover].hidden) {
         // Handling passing from one node to the other directly
         if (this.hoveredNode) this.emit("leaveNode", { node: this.hoveredNode });
 
@@ -465,12 +465,12 @@ export default class Sigma extends EventEmitter {
 
     this.activeListeners.graphUpdate = () => {
       this.needToProcess = true;
-      this.scheduleRefresh();
+      this._scheduleRefresh();
     };
 
     this.activeListeners.softGraphUpdate = () => {
       this.needToSoftProcess = true;
-      this.scheduleRefresh();
+      this._scheduleRefresh();
     };
 
     this.activeListeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
@@ -630,6 +630,47 @@ export default class Sigma extends EventEmitter {
     // We also need to find when it is useful and when it's really not
     edgeProgram.bind();
     edgeProgram.bufferData();
+
+    return this;
+  }
+
+  /**
+   * Method that decides whether to reprocess graph or not, and then render the
+   * graph.
+   *
+   * @return {Sigma}
+   */
+  private _refresh(): this {
+    // Do we need to process data?
+    if (this.needToProcess) {
+      this.process();
+    } else if (this.needToSoftProcess) {
+      this.process(true);
+    }
+
+    // Resetting state
+    this.needToProcess = false;
+    this.needToSoftProcess = false;
+
+    // Rendering
+    this.render();
+
+    return this;
+  }
+
+  /**
+   * Method that schedules a `_refresh` call if none has been scheduled yet. It
+   * will then be processed next available frame.
+   *
+   * @return {Sigma}
+   */
+  private _scheduleRefresh(): this {
+    if (!this.renderFrame) {
+      this.renderFrame = requestFrame(() => {
+        this._refresh();
+        this.renderFrame = null;
+      });
+    }
 
     return this;
   }
@@ -818,7 +859,7 @@ export default class Sigma extends EventEmitter {
       );
     };
 
-    if (this.hoveredNode) {
+    if (this.hoveredNode && !this.nodeDataCache[this.hoveredNode].hidden) {
       render(this.hoveredNode);
     }
 
@@ -1016,7 +1057,7 @@ export default class Sigma extends EventEmitter {
     this.settings[key] = value;
     validateSettings(this.settings);
     this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-    this.scheduleRefresh();
+    this._scheduleRefresh();
     return this;
   }
 
@@ -1032,7 +1073,7 @@ export default class Sigma extends EventEmitter {
     this.settings[key] = updater(this.settings[key]);
     validateSettings(this.settings);
     this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-    this.scheduleRefresh();
+    this._scheduleRefresh();
     return this;
   }
 
@@ -1108,19 +1149,8 @@ export default class Sigma extends EventEmitter {
    * @return {Sigma}
    */
   refresh(): this {
-    // Do we need to process data?
-    if (this.needToProcess) {
-      this.process();
-    } else if (this.needToSoftProcess) {
-      this.process(true);
-    }
-
-    // Resetting state
-    this.needToProcess = false;
-    this.needToSoftProcess = false;
-
-    // Rendering
-    this.render();
+    this.needToProcess = true;
+    this._refresh();
 
     return this;
   }
@@ -1132,12 +1162,8 @@ export default class Sigma extends EventEmitter {
    * @return {Sigma}
    */
   scheduleRefresh(): this {
-    if (!this.renderFrame) {
-      this.renderFrame = requestFrame(() => {
-        this.refresh();
-        this.renderFrame = null;
-      });
-    }
+    this.needToProcess = true;
+    this._scheduleRefresh();
 
     return this;
   }
