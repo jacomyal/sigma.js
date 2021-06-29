@@ -126,7 +126,7 @@ export default class Sigma extends EventEmitter {
 
   private camera: Camera;
 
-  constructor(graph: Graph, container: HTMLElement | null, settings: Partial<Settings> = {}) {
+  constructor(graph: Graph, container: HTMLElement, settings: Partial<Settings> = {}) {
     super();
 
     this.settings = assignDeep<Settings>({}, DEFAULT_SETTINGS, settings);
