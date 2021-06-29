@@ -95,8 +95,8 @@ export default class Sigma extends EventEmitter {
   private webGLContexts: PlainObject<WebGLRenderingContext> = {};
   private activeListeners: PlainObject<Listener> = {};
   private quadtree: QuadTree = new QuadTree();
-  private nodeDataCache: Record<NodeKey, Partial<NodeAttributes>> = {};
-  private edgeDataCache: Record<EdgeKey, Partial<EdgeAttributes>> = {};
+  private nodeDataCache: Record<NodeKey, NodeAttributes> = {};
+  private edgeDataCache: Record<EdgeKey, EdgeAttributes> = {};
   private nodeKeyToIndex: Record<NodeKey, number> = {};
   private edgeKeyToIndex: Record<EdgeKey, number> = {};
   private nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
@@ -289,14 +289,12 @@ export default class Sigma extends EventEmitter {
 
     graph.forEachNode((key) => {
       this.nodeKeyToIndex[key] = i++;
-      this.nodeDataCache[key] = {};
     });
 
     i = 0;
 
     graph.forEachEdge((key) => {
       this.edgeKeyToIndex[key] = i++;
-      this.edgeDataCache[key] = {};
     });
   }
 
@@ -370,7 +368,7 @@ export default class Sigma extends EventEmitter {
       for (let i = 0, l = quadNodes.length; i < l; i++) {
         const node = quadNodes[i];
 
-        const data = this.nodeDataCache[node] as NodeAttributes;
+        const data = this.nodeDataCache[node];
 
         const pos = this.camera.framedGraphToViewport(dimensions, data);
 
@@ -399,7 +397,7 @@ export default class Sigma extends EventEmitter {
 
       // Checking if the hovered node is still hovered
       if (this.hoveredNode) {
-        const data = this.nodeDataCache[this.hoveredNode] as NodeAttributes;
+        const data = this.nodeDataCache[this.hoveredNode];
 
         const pos = this.camera.framedGraphToViewport(dimensions, data);
 
@@ -426,7 +424,7 @@ export default class Sigma extends EventEmitter {
         for (let i = 0, l = quadNodes.length; i < l; i++) {
           const node = quadNodes[i];
 
-          const data = this.nodeDataCache[node] as NodeAttributes;
+          const data = this.nodeDataCache[node];
 
           const pos = this.camera.framedGraphToViewport(dimensions, data);
 
@@ -476,14 +474,12 @@ export default class Sigma extends EventEmitter {
     this.activeListeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
       // Adding entry to cache
       this.nodeKeyToIndex[e.key] = graph.order - 1;
-      this.nodeDataCache[e.key] = {};
       this.activeListeners.graphUpdate();
     };
 
     this.activeListeners.addEdgeGraphUpdate = (e: { key: EdgeKey }): void => {
       // Adding entry to cache
       this.nodeKeyToIndex[e.key] = graph.order - 1;
-      this.edgeDataCache[e.key] = {};
       this.activeListeners.graphUpdate();
     };
 
@@ -614,8 +610,8 @@ export default class Sigma extends EventEmitter {
       applyEdgeDefaults(this.settings, edge, data);
 
       const extremities = graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
-        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes;
+        sourceData = this.nodeDataCache[extremities[0]],
+        targetData = this.nodeDataCache[extremities[1]];
 
       const hidden = data.hidden || sourceData.hidden || targetData.hidden;
       edgeProgram.process(sourceData, targetData, data, hidden, i);
@@ -710,7 +706,7 @@ export default class Sigma extends EventEmitter {
     const gridSettings = this.settings.labelGrid;
 
     const labelsToDisplay = labelsToDisplayFromGrid({
-      cache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
+      cache: this.nodeDataCache,
       camera: this.camera,
       cell: gridSettings.cell,
       dimensions,
@@ -727,7 +723,7 @@ export default class Sigma extends EventEmitter {
     const sizeRatio = Math.pow(cameraState.ratio, 0.5);
 
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
-      const data = this.nodeDataCache[labelsToDisplay[i]] as NodeAttributes;
+      const data = this.nodeDataCache[labelsToDisplay[i]];
 
       const { x, y } = this.camera.framedGraphToViewport(dimensions, data);
 
@@ -775,8 +771,8 @@ export default class Sigma extends EventEmitter {
     context.clearRect(0, 0, this.width, this.height);
 
     const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
-      nodeDataCache: this.nodeDataCache as Record<NodeKey, NodeAttributes>,
-      edgeDataCache: this.edgeDataCache as Record<NodeKey, EdgeAttributes>,
+      nodeDataCache: this.nodeDataCache,
+      edgeDataCache: this.edgeDataCache,
       graph: this.graph,
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedLabels,
@@ -786,9 +782,9 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
       const edge = edgeLabelsToDisplay[i],
         extremities = this.graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]] as NodeAttributes,
-        targetData = this.nodeDataCache[extremities[1]] as NodeAttributes,
-        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]] as EdgeAttributes;
+        sourceData = this.nodeDataCache[extremities[0]],
+        targetData = this.nodeDataCache[extremities[1]],
+        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
 
       const { x: sourceX, y: sourceY } = this.camera.framedGraphToViewport(dimensions, sourceData);
       const { x: targetX, y: targetY } = this.camera.framedGraphToViewport(dimensions, targetData);
@@ -839,7 +835,7 @@ export default class Sigma extends EventEmitter {
 
     // Rendering
     const render = (node: NodeKey): void => {
-      const data = this.nodeDataCache[node] as NodeAttributes;
+      const data = this.nodeDataCache[node];
 
       const { x, y } = camera.framedGraphToViewport({ width: this.width, height: this.height }, data);
 
