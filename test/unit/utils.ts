@@ -22,9 +22,9 @@ describe("validateGraph utils", () => {
   });
   it("should throw an error if graph is not a valid graphology instance", () => {
     assert.throws(() => {
-      validateGraph((null as unknown) as Graph);
-      validateGraph((undefined as unknown) as Graph);
-      validateGraph(({} as unknown) as Graph);
+      validateGraph(null as unknown as Graph);
+      validateGraph(undefined as unknown as Graph);
+      validateGraph({} as unknown as Graph);
     });
   });
 

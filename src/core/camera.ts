@@ -183,10 +183,13 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {object} - The view's rectangle.
    */
-  viewRectangle(dimensions: {
-    width: number;
+  viewRectangle(dimensions: { width: number; height: number }): {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
     height: number;
-  }): { x1: number; y1: number; x2: number; y2: number; height: number } {
+  } {
     // TODO: reduce relative margin?
     const marginX = (0 * dimensions.width) / 8,
       marginY = (0 * dimensions.height) / 8;
