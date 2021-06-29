@@ -10,4 +10,5 @@ import QuadTree from "./core/quadtree";
 import MouseCaptor from "./core/captors/mouse";
 import Sigma from "./sigma";
 
+export default Sigma;
 export { Camera, QuadTree, MouseCaptor, Sigma };
