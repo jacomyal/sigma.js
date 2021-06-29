@@ -328,7 +328,7 @@ export default class Camera extends EventEmitter implements CameraState {
    * @param  {number|object} factorOrOptions - Factor or options.
    * @return {function}
    */
-  animatedZoom(factorOrOptions: number | (Partial<AnimateOptions> & { factor: number })): void {
+  animatedZoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor: number })): void {
     if (!factorOrOptions) {
       this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
     } else {
@@ -348,7 +348,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @param  {number|object} factorOrOptions - Factor or options.
    */
-  animatedUnzoom(factorOrOptions: number | (Partial<AnimateOptions> & { factor: number })): void {
+  animatedUnzoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor: number })): void {
     if (!factorOrOptions) {
       this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
     } else {
@@ -368,7 +368,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @param  {object} options - Options.
    */
-  animatedReset(options: Partial<AnimateOptions>): void {
+  animatedReset(options?: Partial<AnimateOptions>): void {
     this.animate(
       {
         x: 0.5,
