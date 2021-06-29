@@ -559,12 +559,12 @@ export default class Sigma extends EventEmitter {
       //   3. We apply our defaults, while running some vital checks
       //   4. We apply the normalization function
 
-      let data = graph.getNodeAttributes(node) as NodeAttributes;
+      // We shallow copy node data to avoid dangerous behaviors from reducers
+      let data = Object.assign({}, graph.getNodeAttributes(node)) as NodeAttributes;
 
       if (settings.nodeReducer) data = settings.nodeReducer(node, data);
 
-      // We shallow copy the data to avoid mutating both the graph and the reducer's result
-      data = Object.assign(this.nodeDataCache[node], data);
+      this.nodeDataCache[node] = data;
 
       applyNodeDefaults(this.settings, node, data);
 
@@ -604,12 +604,12 @@ export default class Sigma extends EventEmitter {
       //      Note that this function must return a total object and won't be merged
       //   3. We apply our defaults, while running some vital checks
 
-      let data = graph.getEdgeAttributes(edge) as EdgeAttributes;
+      // We shallow copy edge data to avoid dangerous behaviors from reducers
+      let data = Object.assign({}, graph.getEdgeAttributes(edge)) as EdgeAttributes;
 
       if (settings.edgeReducer) data = settings.edgeReducer(edge, data);
 
-      // We shallow copy the data to avoid mutating both the graph and the reducer's result
-      data = Object.assign(this.edgeDataCache[edge], data);
+      this.edgeDataCache[edge] = data;
 
       applyEdgeDefaults(this.settings, edge, data);
 
