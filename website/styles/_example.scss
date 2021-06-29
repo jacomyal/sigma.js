@@ -1,13 +1,42 @@
+.page-example {
+  display: flex;
+  flex-direction: column;
+}
+
 .example {
-  height: 100vh;
+  flex-grow: 1;
+  position: relative;
+
   display: flex;
   flex-direction: row;
+  justify-content: stretch;
 
   & > * {
-    flex-grow: 1;
+    width: 50%;
   }
 
-  & > pre {
+  .code {
+    position: relative;
     overflow: auto;
+
+    pre {
+      position: absolute;
+    }
+  }
+
+  .demo {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+
+    & > iframe {
+      flex-grow: 1;
+    }
+  }
+
+  iframe {
+    height: 100%;
+    outline: none;
+    border: none;
   }
 }

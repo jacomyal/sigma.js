@@ -13,17 +13,21 @@ const ExampleComponent: FC<{ example: Example }> = ({ example }) => {
   if (!router.isFallback && !example?.name) return <ErrorPage statusCode={404} />;
 
   return (
-    <PageLayout>
+    <PageLayout mainClass="page-example">
       <Head>
         <title>Example {example.name}</title>
       </Head>
 
       <h1>Example {example.name}</h1>
       <div className="example">
-        <pre>
-          <code dangerouslySetInnerHTML={{ __html: example.codeHTML }} />
-        </pre>
-        <iframe src={example.iframePath} />
+        <div className="code">
+          <pre>
+            <code dangerouslySetInnerHTML={{ __html: example.codeHTML }} />
+          </pre>
+        </div>
+        <div className="demo">
+          <iframe src={example.iframePath} />
+        </div>
       </div>
     </PageLayout>
   );

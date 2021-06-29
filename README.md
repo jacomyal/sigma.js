@@ -31,6 +31,10 @@ A development server can be spawned locally to view the examples. Visit `localho
 
 You can play around with the files in directory `examples`, the web pages are live-reloaded whenever the code gets changed.
 
+### Website
+
+The website sources are also hosted in this repository. You can see how it works by reading the dedicated [README](website/README.md) file.
+
 ## Contributing
 
 You can contribute by submitting [issues tickets](http://github.com/jacomyal/sigma.js/issues) and proposing [pull requests](http://github.com/jacomyal/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request.

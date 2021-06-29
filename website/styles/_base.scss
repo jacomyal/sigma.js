@@ -1,0 +1,16 @@
+body {
+  font-family: Lato, sans-serif;
+  margin: 0;
+  padding: 0;
+  visibility: visible !important;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  main {
+    flex-grow: 1;
+  }
+}

@@ -1,12 +1,12 @@
-import React, { FC, PropsWithChildren } from "react";
+import React, { FC } from "react";
 
 import Header from "./header";
 import Footer from "./footer";
 
-const PageLayout: FC<{}> = ({ children }: PropsWithChildren<{}>) => (
+const PageLayout: FC<{ mainClass?: string }> = ({ children, mainClass }) => (
   <>
     <Header />
-    <main>{children}</main>
+    <main className={mainClass || undefined}>{children}</main>
     <Footer />
   </>
 );
