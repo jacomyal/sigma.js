@@ -14,8 +14,8 @@
     "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
-    "prepublish": "npm run lint && npm run test && npm run clean && npm run transpile && npm run build",
-    "prepublishOnly": "npm run prepublish",
+    "prepare": "npm run clean && npm run transpile && npm run build",
+    "prepublishOnly": "npm run lint && npm run test",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts"
