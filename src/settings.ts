@@ -58,7 +58,7 @@ export interface Settings {
   };
   // Reducers
   nodeReducer: null | ((node: NodeKey, data: Partial<NodeDisplayData>) => Partial<NodeDisplayData> & Coordinates);
-  edgeReducer: null | ((edge: EdgeKey, data: Partial<EdgeDisplayData>) => Partial<EdgeDisplayData> & Coordinates);
+  edgeReducer: null | ((edge: EdgeKey, data: Partial<EdgeDisplayData>) => Partial<EdgeDisplayData>);
   // Features
   zIndex: boolean;
   // Renderers
