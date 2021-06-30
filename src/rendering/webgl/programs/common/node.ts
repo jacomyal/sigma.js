@@ -5,14 +5,14 @@
  * @module
  */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
-import { NodeAttributes } from "../../../../types";
+import { NodeDisplayData } from "../../../../types";
 
 export interface RenderNodeParams extends RenderParams {
   nodesPowRatio: number;
 }
 
 export interface INodeProgram extends IProgram {
-  process(data: NodeAttributes, hidden: boolean, offset: number): void;
+  process(data: NodeDisplayData, hidden: boolean, offset: number): void;
   render(params: RenderNodeParams): void;
 }
 
@@ -82,7 +82,7 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
     );
   }
 
-  abstract process(data: NodeAttributes, hidden: boolean, offset: number): void;
+  abstract process(data: NodeDisplayData, hidden: boolean, offset: number): void;
 }
 
 export interface NodeProgramConstructor {
@@ -121,7 +121,7 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
       this.programs.forEach((program) => program.render(params));
     }
 
-    process(data: NodeAttributes, hidden: boolean, offset: number): void {
+    process(data: NodeDisplayData, hidden: boolean, offset: number): void {
       this.programs.forEach((program) => program.process(data, hidden, offset));
     }
   };

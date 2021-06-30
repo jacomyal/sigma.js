@@ -8,7 +8,7 @@
  * indicating which "corner" of the triangle to draw.
  * @module
  */
-import { NodeAttributes } from "../../../types";
+import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.vert.glsl";
 import fragmentShaderSource from "../shaders/node.frag.glsl";
@@ -50,7 +50,7 @@ export default class NodeProgram extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: NodeAttributes, hidden: boolean, offset: number): void {
+  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
     const array = this.array;
     let i = offset * POINTS * ATTRIBUTES;
 

@@ -3,7 +3,7 @@
  * ======================================================
  * @module
  */
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.quadraticBezier.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.quadraticBezier.frag.glsl";
@@ -86,9 +86,9 @@ export default class EdgeQuadraticBezierProgram extends AbstractEdgeProgram {
   }
 
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void {

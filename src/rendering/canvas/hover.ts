@@ -7,13 +7,13 @@
  * @module
  */
 import { Settings } from "../../settings";
-import { NodeAttributes, PartialButFor } from "../../types";
+import { NodeDisplayData, PartialButFor } from "../../types";
 import drawNode from "./node";
 import drawLabel from "./label";
 
 export default function drawHover(
   context: CanvasRenderingContext2D,
-  data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
+  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
 ): void {
   const size = settings.labelSize,

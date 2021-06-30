@@ -6,13 +6,13 @@
  * @module
  */
 import { Settings } from "../../settings";
-import { EdgeAttributes, NodeAttributes, PartialButFor } from "../../types";
+import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../../types";
 
 export default function drawEdgeLabel(
   context: CanvasRenderingContext2D,
-  edgeData: PartialButFor<EdgeAttributes, "label" | "color" | "size">,
-  sourceData: PartialButFor<NodeAttributes, "x" | "y">,
-  targetData: PartialButFor<NodeAttributes, "x" | "y">,
+  edgeData: PartialButFor<EdgeDisplayData, "label" | "color" | "size">,
+  sourceData: PartialButFor<NodeDisplayData, "x" | "y">,
+  targetData: PartialButFor<NodeDisplayData, "x" | "y">,
   settings: Settings,
 ): void {
   const size = settings.edgeLabelSize,
