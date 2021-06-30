@@ -49,7 +49,7 @@ const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 /**
  * Important functions.
  */
-function applyNodeDefaults(settings: Settings, key: NodeKey, data: NodeAttributes): void {
+function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeAttributes>): NodeAttributes {
   if (!data.hasOwnProperty("x") || !data.hasOwnProperty("y"))
     throw new Error(
       `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
@@ -64,9 +64,11 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: NodeAttribute
   if (!data.hasOwnProperty("hidden")) data.hidden = false;
 
   if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
+
+  return data as NodeAttributes;
 }
 
-function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttributes): void {
+function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: Partial<EdgeAttributes>): EdgeAttributes {
   if (!data.color) data.color = settings.defaultEdgeColor;
 
   if (!data.label) data.label = "";
@@ -74,6 +76,8 @@ function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: EdgeAttribute
   if (!data.size) data.size = 0.5;
 
   if (!data.hasOwnProperty("hidden")) data.hidden = false;
+
+  return data as EdgeAttributes;
 }
 
 /**
@@ -556,13 +560,13 @@ export default class Sigma extends EventEmitter {
       //   4. We apply the normalization function
 
       // We shallow copy node data to avoid dangerous behaviors from reducers
-      let data = Object.assign({}, graph.getNodeAttributes(node)) as NodeAttributes;
+      let attr = Object.assign({}, graph.getNodeAttributes(node));
 
-      if (settings.nodeReducer) data = settings.nodeReducer(node, data);
+      if (settings.nodeReducer) attr = settings.nodeReducer(node, attr);
+
+      let data = applyNodeDefaults(this.settings, node, attr);
 
       this.nodeDataCache[node] = data;
-
-      applyNodeDefaults(this.settings, node, data);
 
       this.normalizationFunction.applyTo(data);
 
@@ -601,13 +605,13 @@ export default class Sigma extends EventEmitter {
       //   3. We apply our defaults, while running some vital checks
 
       // We shallow copy edge data to avoid dangerous behaviors from reducers
-      let data = Object.assign({}, graph.getEdgeAttributes(edge)) as EdgeAttributes;
+      let attr = Object.assign({}, graph.getEdgeAttributes(edge));
 
-      if (settings.edgeReducer) data = settings.edgeReducer(edge, data);
+      if (settings.edgeReducer) attr = settings.edgeReducer(edge, attr);
+
+      let data = applyEdgeDefaults(this.settings, edge, attr);
 
       this.edgeDataCache[edge] = data;
-
-      applyEdgeDefaults(this.settings, edge, data);
 
       const extremities = graph.extremities(edge),
         sourceData = this.nodeDataCache[extremities[0]],
