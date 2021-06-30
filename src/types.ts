@@ -30,14 +30,14 @@ export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Listener = (...args: any[]) => void;
 
-export interface CameraState extends Coordinates {
-  angle: number;
-  ratio: number;
-}
-
 export interface Coordinates {
   x: number;
   y: number;
+}
+
+export interface CameraState extends Coordinates {
+  angle: number;
+  ratio: number;
 }
 
 export interface MouseCoords extends Coordinates {
