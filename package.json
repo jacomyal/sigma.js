@@ -16,6 +16,7 @@
     "prettier": "prettier --write $npm_package_config_folders",
     "prepare": "npm run clean && npm run transpile && npm run build",
     "prepublishOnly": "npm run lint && npm run test",
+    "reinstall": "rimraf node_modules && npm i && npm run clean",
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts --exit",
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts"
