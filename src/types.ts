@@ -74,6 +74,7 @@ export interface NodeDisplayData extends Coordinates {
   hidden: boolean;
   highlighted: boolean;
   label: string;
+  zIndex?: number;
 }
 
 export interface EdgeDisplayData {
@@ -81,4 +82,5 @@ export interface EdgeDisplayData {
   color: string;
   hidden: boolean;
   label: string;
+  zIndex?: number;
 }
