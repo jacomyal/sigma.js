@@ -160,7 +160,7 @@ export function createNormalizationFunction(extent: { x: Extent; y: Extent }): N
  * @param  {array}    elements - The array to sort.
  * @return {array} - The sorted array.
  */
-export function zIndexOrdering<T>(extent: [number, number], getter: (e: T) => number, elements: Array<T>): Array<T> {
+export function zIndexOrdering<T>(extent: Extent, getter: (e: T) => number, elements: Array<T>): Array<T> {
   // If k is > n, we'll use a standard sort
   return elements.sort(function (a, b) {
     const zA = getter(a) || 0,
