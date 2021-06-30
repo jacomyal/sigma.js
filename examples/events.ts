@@ -6,7 +6,6 @@ import { EdgeKey, NodeKey } from "graphology-types";
 
 import Sigma from "../src/sigma";
 import { getRandomName, globalize } from "./utils";
-import { EdgeAttributes, NodeAttributes } from "../src/types";
 
 const container = document.getElementById("container");
 
@@ -35,13 +34,13 @@ graph.edges().forEach((edge) =>
 let highlighedNodes = new Set();
 let highlighedEdges = new Set();
 
-const nodeReducer = (node: NodeKey, data: NodeAttributes) => {
+const nodeReducer = (node: NodeKey, data) => {
   if (highlighedNodes.has(node)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;
 };
 
-const edgeReducer = (edge: EdgeKey, data: EdgeAttributes) => {
+const edgeReducer = (edge: EdgeKey, data) => {
   if (highlighedEdges.has(edge)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;
