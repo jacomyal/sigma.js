@@ -5,7 +5,7 @@
  * Program rendering directed edges as a single anti-aliased triangle.
  * @module
  */
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.triangle.frag.glsl";
@@ -80,9 +80,9 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
   }
 
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void {

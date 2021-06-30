@@ -6,12 +6,12 @@
  * @module
  */
 
-import { NodeKey, EdgeKey } from "graphology-types";
+import { Attributes, NodeKey, EdgeKey } from "graphology-types";
 
 import drawLabel from "./rendering/canvas/label";
 import drawHover from "./rendering/canvas/hover";
 import drawEdgeLabel from "./rendering/canvas/edge-label";
-import { EdgeAttributes, NodeAttributes } from "./types";
+import { EdgeDisplayData, NodeDisplayData } from "./types";
 import CircleNodeProgram from "./rendering/webgl/programs/node.fast";
 import LineEdgeProgram from "./rendering/webgl/programs/edge";
 import ArrowEdgeProgram from "./rendering/webgl/programs/edge.arrow";
@@ -57,8 +57,8 @@ export interface Settings {
     renderedSizeThreshold: number;
   };
   // Reducers
-  nodeReducer: null | ((node: NodeKey, data: NodeAttributes) => NodeAttributes);
-  edgeReducer: null | ((edge: EdgeKey, data: EdgeAttributes) => EdgeAttributes);
+  nodeReducer: null | ((node: NodeKey, data: Attributes) => Partial<NodeDisplayData>);
+  edgeReducer: null | ((edge: EdgeKey, data: Attributes) => Partial<EdgeDisplayData>);
   // Features
   zIndex: boolean;
   // Renderers

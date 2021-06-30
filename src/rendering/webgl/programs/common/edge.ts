@@ -5,7 +5,7 @@
  * @module
  */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
-import { EdgeAttributes, NodeAttributes } from "../../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../../types";
 
 export interface RenderEdgeParams extends RenderParams {
   edgesPowRatio: number;
@@ -14,9 +14,9 @@ export interface RenderEdgeParams extends RenderParams {
 export interface IEdgeProgram extends IProgram {
   computeIndices(): void;
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void;
@@ -42,9 +42,9 @@ export abstract class AbstractEdgeProgram extends AbstractProgram implements IEd
   abstract bind(): void;
   abstract computeIndices(): void;
   abstract process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void;
@@ -88,9 +88,9 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
     }
 
     process(
-      sourceData: NodeAttributes,
-      targetData: NodeAttributes,
-      data: EdgeAttributes,
+      sourceData: NodeDisplayData,
+      targetData: NodeDisplayData,
+      data: EdgeDisplayData,
       hidden: boolean,
       offset: number,
     ): void {

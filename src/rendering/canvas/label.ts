@@ -6,11 +6,11 @@
  * @module
  */
 import { Settings } from "../../settings";
-import { NodeAttributes, PartialButFor } from "../../types";
+import { NodeDisplayData, PartialButFor } from "../../types";
 
 export default function drawLabel(
   context: CanvasRenderingContext2D,
-  data: PartialButFor<NodeAttributes, "x" | "y" | "size" | "label" | "color">,
+  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
 ): void {
   const size = settings.labelSize,

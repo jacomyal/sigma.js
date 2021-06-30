@@ -2,11 +2,10 @@ import { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import chroma from "chroma-js";
-import { EdgeKey, NodeKey } from "graphology-types";
+import { Attributes, EdgeKey, NodeKey } from "graphology-types";
 
 import Sigma from "../src/sigma";
 import { getRandomName, globalize } from "./utils";
-import { EdgeAttributes, NodeAttributes } from "../src/types";
 
 const container = document.getElementById("container");
 
@@ -35,13 +34,13 @@ graph.edges().forEach((edge) =>
 let highlighedNodes = new Set();
 let highlighedEdges = new Set();
 
-const nodeReducer = (node: NodeKey, data: NodeAttributes) => {
+const nodeReducer = (node: NodeKey, data: Attributes) => {
   if (highlighedNodes.has(node)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;
 };
 
-const edgeReducer = (edge: EdgeKey, data: EdgeAttributes) => {
+const edgeReducer = (edge: EdgeKey, data: Attributes) => {
   if (highlighedEdges.has(edge)) return { ...data, color: "#f00", zIndex: 1 };
 
   return data;

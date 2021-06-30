@@ -7,7 +7,7 @@
  */
 import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
-import { Dimensions, EdgeAttributes, NodeAttributes } from "../types";
+import { Dimensions, EdgeDisplayData, NodeDisplayData } from "../types";
 import Camera from "./camera";
 
 /**
@@ -59,7 +59,7 @@ function collision(
  * @return {Array}                         - The selected labels.
  */
 export function labelsToDisplayFromGrid(params: {
-  cache: { [key: string]: NodeAttributes };
+  cache: { [key: string]: NodeDisplayData };
   camera: Camera;
   cell: { width: number; height: number } | null;
   dimensions: Dimensions;
@@ -294,8 +294,8 @@ export function labelsToDisplayFromGrid(params: {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params: {
-  nodeDataCache: { [key: string]: NodeAttributes };
-  edgeDataCache: { [key: string]: EdgeAttributes };
+  nodeDataCache: { [key: string]: NodeDisplayData };
+  edgeDataCache: { [key: string]: EdgeDisplayData };
   displayedNodeLabels: Set<NodeKey>;
   highlightedNodes: Set<NodeKey>;
   graph: Graph;

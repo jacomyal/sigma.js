@@ -16,7 +16,7 @@
  * @module
  */
 import { floatColor, canUse32BitsIndices } from "../../../utils";
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import vertexShaderSource from "../shaders/edge.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
@@ -140,9 +140,9 @@ export default class EdgeProgram extends AbstractEdgeProgram {
   }
 
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void {

@@ -68,17 +68,19 @@ export interface Dimensions {
 
 export type Extent = [number, number];
 
-export interface NodeAttributes extends Coordinates {
+export interface NodeDisplayData extends Coordinates {
   size: number;
   color: string;
   hidden: boolean;
   highlighted: boolean;
   label: string;
+  zIndex?: number;
 }
 
-export interface EdgeAttributes {
+export interface EdgeDisplayData {
   size: number;
   color: string;
   hidden: boolean;
   label: string;
+  zIndex?: number;
 }

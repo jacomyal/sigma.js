@@ -7,7 +7,7 @@
  * every GPU.
  * @module
  */
-import { NodeAttributes } from "../../../types";
+import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
@@ -22,7 +22,7 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: NodeAttributes, hidden: boolean, offset: number): void {
+  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
     const array = this.array;
     let i = offset * POINTS * ATTRIBUTES;
 

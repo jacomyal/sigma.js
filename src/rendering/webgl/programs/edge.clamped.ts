@@ -8,7 +8,7 @@
  * This is useful when combined with arrows to draw directed edges.
  * @module
  */
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
 import { floatColor, canUse32BitsIndices } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
@@ -114,9 +114,9 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
   }
 
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void {

@@ -4,7 +4,7 @@
  * a disc inside the nodes.
  */
 import { AbstractNodeProgram, RenderNodeParams } from "../../src/rendering/webgl/programs/common/node";
-import { NodeAttributes } from "../../src/types";
+import { NodeDisplayData } from "../../src/types";
 import { floatColor } from "../../src/utils";
 import vertexShaderSource from "../../src/rendering/webgl/shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "./custom-node-fragment-shader.glsl";
@@ -18,7 +18,7 @@ export default class CustomNodeProgram extends AbstractNodeProgram {
     this.bind();
   }
 
-  process(data: NodeAttributes, hidden: boolean, offset: number): void {
+  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
     let i = offset * POINTS * ATTRIBUTES;
     const array = this.array;
 

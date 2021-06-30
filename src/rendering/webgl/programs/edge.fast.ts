@@ -6,7 +6,7 @@
  * won't render thickness correctly on some GPUs and has some quirks.
  * @module
  */
-import { EdgeAttributes, NodeAttributes } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
@@ -63,9 +63,9 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
   }
 
   process(
-    sourceData: NodeAttributes,
-    targetData: NodeAttributes,
-    data: EdgeAttributes,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
     hidden: boolean,
     offset: number,
   ): void {
