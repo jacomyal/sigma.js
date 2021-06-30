@@ -6,7 +6,7 @@
  * @module
  */
 
-import { NodeKey, EdgeKey } from "graphology-types";
+import { Attributes, NodeKey, EdgeKey } from "graphology-types";
 
 import drawLabel from "./rendering/canvas/label";
 import drawHover from "./rendering/canvas/hover";
@@ -57,8 +57,8 @@ export interface Settings {
     renderedSizeThreshold: number;
   };
   // Reducers
-  nodeReducer: null | ((node: NodeKey, data: Partial<NodeDisplayData>) => Partial<NodeDisplayData>);
-  edgeReducer: null | ((edge: EdgeKey, data: Partial<EdgeDisplayData>) => Partial<EdgeDisplayData>);
+  nodeReducer: null | ((node: NodeKey, data: Attributes) => Partial<NodeDisplayData>);
+  edgeReducer: null | ((edge: EdgeKey, data: Attributes) => Partial<EdgeDisplayData>);
   // Features
   zIndex: boolean;
   // Renderers
