@@ -1016,9 +1016,9 @@ export default class Sigma extends EventEmitter {
    * and to get values that are set by the nodeReducer
    *
    * @param  {string} key - The node's key.
-   * @return {Partial<NodeDisplayData>} A copy of the desired node's attribute or undefined if not found
+   * @return {NodeDisplayData | undefined} A copy of the desired node's attribute or undefined if not found
    */
-  getNodeDisplayData(key: NodeKey): Partial<NodeDisplayData> | undefined {
+  getNodeDisplayData(key: NodeKey): NodeDisplayData | undefined {
     const node = this.nodeDataCache[key];
     return node ? Object.assign({}, node) : undefined;
   }
@@ -1028,9 +1028,9 @@ export default class Sigma extends EventEmitter {
    * It's usefull for example to get values that are set by the edgeReducer.
    *
    * @param  {string} key - The edge's key.
-   * @return {Partial<EdgeDisplayData> | undefined} A copy of the desired edge's attribute or undefined if not found
+   * @return {EdgeDisplayData | undefined} A copy of the desired edge's attribute or undefined if not found
    */
-  getEdgeDisplayData(key: EdgeKey): Partial<EdgeDisplayData> | undefined {
+  getEdgeDisplayData(key: EdgeKey): EdgeDisplayData | undefined {
     const edge = this.edgeDataCache[key];
     return edge ? Object.assign({}, edge) : undefined;
   }
