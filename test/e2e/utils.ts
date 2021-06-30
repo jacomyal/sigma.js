@@ -20,7 +20,7 @@ const webpackConfig = require("./../../examples/webpack.config");
  */
 export async function takeScreenshots(tests: Tests, folder: string, suffix = ""): Promise<void> {
   // Launch the browser
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ args: [`--window-size=800,600`] });
 
   // for each pages
   await Promise.all(

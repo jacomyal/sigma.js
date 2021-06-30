@@ -29,7 +29,9 @@ describe("Compare screenshots", () => {
       );
       assert(
         result.percent <= (test.failureThreshold || 0),
-        `There is a diff over ${test.failureThreshold} on ${test.name}, please check "${test.name}.diff.png"`,
+        `There is a diff over ${test.failureThreshold || 0} (${result.percent}) on ${test.name}, please check "${
+          test.name
+        }.diff.png"`,
       );
     });
   });
