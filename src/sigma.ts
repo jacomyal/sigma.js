@@ -564,7 +564,7 @@ export default class Sigma extends EventEmitter {
 
       if (settings.nodeReducer) attr = settings.nodeReducer(node, attr);
 
-      let data = applyNodeDefaults(this.settings, node, attr);
+      const data = applyNodeDefaults(this.settings, node, attr);
 
       this.nodeDataCache[node] = data;
 
@@ -609,7 +609,7 @@ export default class Sigma extends EventEmitter {
 
       if (settings.edgeReducer) attr = settings.edgeReducer(edge, attr);
 
-      let data = applyEdgeDefaults(this.settings, edge, attr);
+      const data = applyEdgeDefaults(this.settings, edge, attr);
 
       this.edgeDataCache[edge] = data;
 

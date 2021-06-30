@@ -35,6 +35,7 @@ var mouse_1 = __importDefault(__webpack_require__(10));
 exports.MouseCaptor = mouse_1.default;
 var sigma_1 = __importDefault(__webpack_require__(12));
 exports.Sigma = sigma_1.default;
+exports.default = sigma_1.default;
 
 
 /***/ }),
@@ -2265,6 +2266,7 @@ function applyNodeDefaults(settings, key, data) {
         data.hidden = false;
     if (!data.hasOwnProperty("highlighted"))
         data.highlighted = false;
+    return data;
 }
 function applyEdgeDefaults(settings, key, data) {
     if (!data.color)
@@ -2275,6 +2277,7 @@ function applyEdgeDefaults(settings, key, data) {
         data.size = 0.5;
     if (!data.hasOwnProperty("hidden"))
         data.hidden = false;
+    return data;
 }
 /**
  * Main class.
@@ -2443,12 +2446,10 @@ var Sigma = /** @class */ (function (_super) {
         var i = 0;
         graph.forEachNode(function (key) {
             _this.nodeKeyToIndex[key] = i++;
-            _this.nodeDataCache[key] = {};
         });
         i = 0;
         graph.forEachEdge(function (key) {
             _this.edgeKeyToIndex[key] = i++;
-            _this.edgeDataCache[key] = {};
         });
     };
     /**
@@ -2584,13 +2585,11 @@ var Sigma = /** @class */ (function (_super) {
         this.activeListeners.addNodeGraphUpdate = function (e) {
             // Adding entry to cache
             _this.nodeKeyToIndex[e.key] = graph.order - 1;
-            _this.nodeDataCache[e.key] = {};
             _this.activeListeners.graphUpdate();
         };
         this.activeListeners.addEdgeGraphUpdate = function (e) {
             // Adding entry to cache
             _this.nodeKeyToIndex[e.key] = graph.order - 1;
-            _this.edgeDataCache[e.key] = {};
             _this.activeListeners.graphUpdate();
         };
         // TODO: clean cache on drop!
@@ -2646,12 +2645,12 @@ var Sigma = /** @class */ (function (_super) {
             //      Note that this function must return a total object and won't be merged
             //   3. We apply our defaults, while running some vital checks
             //   4. We apply the normalization function
-            var data = graph.getNodeAttributes(node);
+            // We shallow copy node data to avoid dangerous behaviors from reducers
+            var attr = Object.assign({}, graph.getNodeAttributes(node));
             if (settings.nodeReducer)
-                data = settings.nodeReducer(node, data);
-            // We shallow copy the data to avoid mutating both the graph and the reducer's result
-            data = Object.assign(this.nodeDataCache[node], data);
-            applyNodeDefaults(this.settings, node, data);
+                attr = settings.nodeReducer(node, attr);
+            var data = applyNodeDefaults(this.settings, node, attr);
+            this.nodeDataCache[node] = data;
             this.normalizationFunction.applyTo(data);
             this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
             nodeProgram.process(data, data.hidden, i);
@@ -2678,12 +2677,12 @@ var Sigma = /** @class */ (function (_super) {
             //   2. We optionally reduce them using the function provided by the user
             //      Note that this function must return a total object and won't be merged
             //   3. We apply our defaults, while running some vital checks
-            var data = graph.getEdgeAttributes(edge);
+            // We shallow copy edge data to avoid dangerous behaviors from reducers
+            var attr = Object.assign({}, graph.getEdgeAttributes(edge));
             if (settings.edgeReducer)
-                data = settings.edgeReducer(edge, data);
-            // We shallow copy the data to avoid mutating both the graph and the reducer's result
-            data = Object.assign(this.edgeDataCache[edge], data);
-            applyEdgeDefaults(this.settings, edge, data);
+                attr = settings.edgeReducer(edge, attr);
+            var data = applyEdgeDefaults(this.settings, edge, attr);
+            this.edgeDataCache[edge] = data;
             var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
             var hidden = data.hidden || sourceData.hidden || targetData.hidden;
             edgeProgram.process(sourceData, targetData, data, hidden, i);
@@ -2998,9 +2997,9 @@ var Sigma = /** @class */ (function (_super) {
      * and to get values that are set by the nodeReducer
      *
      * @param  {string} key - The node's key.
-     * @return {Partial<NodeAttributes>} A copy of the desired node's attribute or undefined if not found
+     * @return {NodeDisplayData | undefined} A copy of the desired node's attribute or undefined if not found
      */
-    Sigma.prototype.getNodeAttributes = function (key) {
+    Sigma.prototype.getNodeDisplayData = function (key) {
         var node = this.nodeDataCache[key];
         return node ? Object.assign({}, node) : undefined;
     };
@@ -3009,9 +3008,9 @@ var Sigma = /** @class */ (function (_super) {
      * It's usefull for example to get values that are set by the edgeReducer.
      *
      * @param  {string} key - The edge's key.
-     * @return {Partial<EdgeAttributes> | undefined} A copy of the desired edge's attribute or undefined if not found
+     * @return {EdgeDisplayData | undefined} A copy of the desired edge's attribute or undefined if not found
      */
-    Sigma.prototype.getEdgeAttributes = function (key) {
+    Sigma.prototype.getEdgeDisplayData = function (key) {
         var edge = this.edgeDataCache[key];
         return edge ? Object.assign({}, edge) : undefined;
     };
