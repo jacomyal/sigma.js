@@ -183,7 +183,7 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {object} - The view's rectangle.
    */
-  viewRectangle(dimensions: { width: number; height: number }): {
+  viewRectangle(dimensions: Dimensions): {
     x1: number;
     y1: number;
     x2: number;
