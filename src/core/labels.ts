@@ -88,20 +88,25 @@ export function labelsToDisplayFromGrid(params: {
   previousCamera.setState(previousCameraState);
 
   // State
-  const zooming = cameraState.ratio < previousCameraState.ratio,
-    panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
-    unzooming = cameraState.ratio > previousCameraState.ratio,
-    unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1,
-    zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
+  const zooming = cameraState.ratio < previousCameraState.ratio;
+  const panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y;
+  const unzooming = cameraState.ratio > previousCameraState.ratio; // NOTE: unzooming is not !zooming since the zoom can remain constant
+  const unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1;
+  const zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
 
-  // Trick to discretize unzooming
-  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) return Array.from(displayedLabels);
+  let shouldReturnSameLabels = false;
+
+  // Trick to discretize unzooming, i.e. we consider new labels when unzooming
+  // only every 5% increment so that labels won't blink too much
+  if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0) shouldReturnSameLabels = true;
 
   // If panning while unzoomed, we shouldn't change label selection
-  if (unzoomedPanning && displayedLabels.size !== 0) return Array.from(displayedLabels);
+  if (unzoomedPanning && displayedLabels.size !== 0) shouldReturnSameLabels = true;
 
   // When unzoomed & zooming
-  if (zooming && cameraState.ratio >= 1) return Array.from(displayedLabels);
+  if (zooming && cameraState.ratio >= 1) shouldReturnSameLabels = true;
+
+  if (shouldReturnSameLabels) return Array.from(displayedLabels);
 
   // Adapting cell dimensions
   let cell = userCell ? userCell : DEFAULT_CELL;
