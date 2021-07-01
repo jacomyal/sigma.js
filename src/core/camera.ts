@@ -16,12 +16,7 @@ import { CameraState, Coordinates, Dimensions } from "../types";
  * Defaults.
  */
 const DEFAULT_ZOOMING_RATIO = 1.5;
-
-// TODO: animate options = number polymorphism?
-// TODO: pan, zoom, unzoom, reset, rotate, zoomTo
-// TODO: add width / height to camera and add #.resize
-// TODO: bind camera to renderer rather than sigma
-// TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
+const SIZE_SCALING_EXPONENT = 0.5;
 
 /**
  * Camera class
@@ -33,9 +28,16 @@ export default class Camera extends EventEmitter implements CameraState {
   y = 0.5;
   angle = 0;
   ratio = 1;
-  nextFrame: number | null = null;
-  previousState: CameraState;
-  enabled = true;
+
+  private nextFrame: number | null = null;
+  private previousState: CameraState;
+  private enabled = true;
+
+  private sizeRatio: number = 1;
+  private positiveCos: number = 1;
+  private negativeCos: number = 1;
+  private positiveSin: number = 0;
+  private negativeSin: number = 0;
 
   animationCallback?: () => void;
 
@@ -44,6 +46,7 @@ export default class Camera extends EventEmitter implements CameraState {
 
     // State
     this.previousState = this.getState();
+    this.updateCachedValues();
   }
 
   /**
@@ -55,6 +58,18 @@ export default class Camera extends EventEmitter implements CameraState {
   static from(state: CameraState): Camera {
     const camera = new Camera();
     return camera.setState(state);
+  }
+
+  /**
+   * Internal method used to update expensive and therefore cached values
+   * each time the camera state is updated.
+   */
+  private updateCachedValues(): void {
+    this.sizeRatio = Math.pow(this.ratio, SIZE_SCALING_EXPONENT);
+    this.positiveCos = Math.cos(this.angle);
+    this.negativeCos = Math.cos(-this.angle);
+    this.positiveSin = Math.sin(this.angle);
+    this.negativeSin = Math.sin(-this.angle);
   }
 
   /**
@@ -136,8 +151,8 @@ export default class Camera extends EventEmitter implements CameraState {
     const y1 = (this.y - coordinates.y) / ratio;
 
     // Rotate:
-    const x2 = x1 * Math.cos(this.angle) - y1 * Math.sin(this.angle);
-    const y2 = y1 * Math.cos(this.angle) + x1 * Math.sin(this.angle);
+    const x2 = x1 * this.positiveCos - y1 * this.positiveSin;
+    const y2 = y1 * this.positiveCos + x1 * this.positiveSin;
 
     return {
       // Translate to center of screen
@@ -166,10 +181,8 @@ export default class Camera extends EventEmitter implements CameraState {
     let y = coordinates.y - smallestDimension / 2 / dy;
 
     // Rotate:
-    [x, y] = [
-      x * Math.cos(-this.angle) - y * Math.sin(-this.angle),
-      y * Math.cos(-this.angle) + x * Math.sin(-this.angle),
-    ];
+    x = x * this.negativeCos - y * this.negativeSin;
+    y = y * this.negativeCos + x * this.negativeSin;
 
     return {
       x: x * ratio + this.x,
@@ -226,6 +239,8 @@ export default class Camera extends EventEmitter implements CameraState {
     if (state.y) this.y = state.y;
     if (state.angle) this.angle = state.angle;
     if (state.ratio) this.ratio = state.ratio;
+
+    this.updateCachedValues();
 
     // Emitting
     // TODO: don't emit if nothing changed?
