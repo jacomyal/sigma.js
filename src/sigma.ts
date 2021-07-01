@@ -363,7 +363,7 @@ export default class Sigma extends EventEmitter {
 
       const quadNodes = getQuadNodes(e.x, e.y);
 
-      const dimensions = { width: this.width, height: this.height };
+      const dimensions = this.getDimensions();
 
       // We will hover the node whose center is closest to mouse
       let minDistance = Infinity,
@@ -423,7 +423,7 @@ export default class Sigma extends EventEmitter {
         const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
 
         const quadNodes = getQuadNodes(e.x, e.y);
-        const dimensions = { width: this.width, height: this.height };
+        const dimensions = this.getDimensions();
 
         for (let i = 0, l = quadNodes.length; i < l; i++) {
           const node = quadNodes[i];
@@ -685,7 +685,7 @@ export default class Sigma extends EventEmitter {
 
     const cameraState = this.camera.getState();
 
-    const dimensions = { width: this.width, height: this.height };
+    const dimensions = this.getDimensions();
 
     // Finding visible nodes to display their labels
     let visibleNodes: NodeKey[];
@@ -769,7 +769,7 @@ export default class Sigma extends EventEmitter {
 
     const context = this.canvasContexts.edgeLabels;
 
-    const dimensions = { width: this.width, height: this.height };
+    const dimensions = this.getDimensions();
 
     // Clearing
     context.clearRect(0, 0, this.width, this.height);
