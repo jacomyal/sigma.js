@@ -87,10 +87,6 @@ export function labelsToDisplayFromGrid(params: {
   const previousCamera = new Camera();
   previousCamera.setState(previousCameraState);
 
-  // TODO: should factorize. This same code is used quite a lot throughout the codebase
-  // TODO: POW RATIO is currently default 0.5 and harcoded
-  const sizeRatio = Math.pow(cameraState.ratio, 0.5);
-
   // State
   const zooming = cameraState.ratio < previousCameraState.ratio,
     panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y,
@@ -142,7 +138,7 @@ export function labelsToDisplayFromGrid(params: {
     if (nodeData.hidden) continue;
 
     // We filter nodes having a rendered size less than a certain thresold
-    if (nodeData.size / sizeRatio < renderedSizeThreshold) continue;
+    if (camera.scaleSize(nodeData.size) < renderedSizeThreshold) continue;
 
     // Finding our node's cell in the grid
     const pos = camera.framedGraphToViewport(dimensions, nodeData);

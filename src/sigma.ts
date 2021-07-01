@@ -358,9 +358,6 @@ export default class Sigma extends EventEmitter {
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
 
-      // TODO: this should be a method from the camera (or can be passed to graph to display somehow)
-      const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
-
       const quadNodes = getQuadNodes(e.x, e.y);
 
       const dimensions = this.getDimensions();
@@ -376,7 +373,7 @@ export default class Sigma extends EventEmitter {
 
         const pos = this.camera.framedGraphToViewport(dimensions, data);
 
-        const size = data.size / sizeRatio;
+        const size = this.camera.scaleSize(data.size);
 
         if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           const distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
@@ -405,7 +402,7 @@ export default class Sigma extends EventEmitter {
 
         const pos = this.camera.framedGraphToViewport(dimensions, data);
 
-        const size = data.size / sizeRatio;
+        const size = this.camera.scaleSize(data.size);
 
         if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           const node = this.hoveredNode;
@@ -420,8 +417,6 @@ export default class Sigma extends EventEmitter {
     // Handling click
     const createClickListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
-        const sizeRatio = Math.pow(this.camera.getState().ratio, 0.5);
-
         const quadNodes = getQuadNodes(e.x, e.y);
         const dimensions = this.getDimensions();
 
@@ -432,7 +427,7 @@ export default class Sigma extends EventEmitter {
 
           const pos = this.camera.framedGraphToViewport(dimensions, data);
 
-          const size = data.size / sizeRatio;
+          const size = this.camera.scaleSize(data.size);
 
           if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
             return this.emit(`${eventType}Node`, { node, captor: e, event: e });
@@ -724,8 +719,6 @@ export default class Sigma extends EventEmitter {
     // Drawing labels
     const context = this.canvasContexts.labels;
 
-    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
-
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
       const data = this.nodeDataCache[labelsToDisplay[i]];
 
@@ -733,7 +726,7 @@ export default class Sigma extends EventEmitter {
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
-      const size = data.size / sizeRatio;
+      const size = this.camera.scaleSize(data.size);
 
       this.settings.labelRenderer(
         context,
@@ -764,9 +757,6 @@ export default class Sigma extends EventEmitter {
   private renderEdgeLabels(): this {
     if (!this.settings.renderEdgeLabels) return this;
 
-    const cameraState = this.camera.getState();
-    const sizeRatio = Math.pow(cameraState.ratio, 0.5);
-
     const context = this.canvasContexts.edgeLabels;
 
     const dimensions = this.getDimensions();
@@ -795,7 +785,7 @@ export default class Sigma extends EventEmitter {
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
-      const size = edgeData.size / sizeRatio;
+      const size = this.camera.scaleSize(edgeData.size);
 
       this.settings.edgeLabelRenderer(
         context,
@@ -830,8 +820,6 @@ export default class Sigma extends EventEmitter {
   private renderHighlightedNodes(): void {
     const camera = this.camera;
 
-    const sizeRatio = Math.pow(camera.getState().ratio, 0.5);
-
     const context = this.canvasContexts.hovers;
 
     // Clearing
@@ -843,7 +831,7 @@ export default class Sigma extends EventEmitter {
 
       const { x, y } = camera.framedGraphToViewport({ width: this.width, height: this.height }, data);
 
-      const size = data.size / sizeRatio;
+      const size = camera.scaleSize(data.size);
 
       this.settings.hoverRenderer(
         context,
