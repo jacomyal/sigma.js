@@ -1172,20 +1172,30 @@ export default class Sigma extends EventEmitter {
    * Method used to translate a point's coordinates from the viewport system (pixel distance from the top-left of the
    * stage) to the graph system (the reference system of data as they are in the given graph instance).
    *
+   * This method accepts an optional camera which can be useful if you need to translate coordinates
+   * based on a different view than the one being currently being displayed on screen.
+   *
    * @param {Coordinates} viewportPoint
    */
-  viewportToGraph(viewportPoint: Coordinates): Coordinates {
-    return this.normalizationFunction.inverse(this.camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+  viewportToGraph(viewportPoint: Coordinates, camera?: Camera): Coordinates {
+    camera = camera || this.camera;
+
+    return this.normalizationFunction.inverse(camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
   }
 
   /**
    * Method used to translate a point's coordinates from the graph system (the reference system of data as they are in
    * the given graph instance) to the viewport system (pixel distance from the top-left of the stage).
    *
+   * This method accepts an optional camera which can be useful if you need to translate coordinates
+   * based on a different view than the one being currently being displayed on screen.
+   *
    * @param {Coordinates} graphPoint
    */
-  graphToViewport(graphPoint: Coordinates): Coordinates {
-    return this.camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+  graphToViewport(graphPoint: Coordinates, camera?: Camera): Coordinates {
+    camera = camera || this.camera;
+
+    return camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
   }
 
   /**
