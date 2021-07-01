@@ -70,22 +70,6 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -105,11 +89,7 @@ var utils_1 = __webpack_require__(4);
  * Defaults.
  */
 var DEFAULT_ZOOMING_RATIO = 1.5;
-// TODO: animate options = number polymorphism?
-// TODO: pan, zoom, unzoom, reset, rotate, zoomTo
-// TODO: add width / height to camera and add #.resize
-// TODO: bind camera to renderer rather than sigma
-// TODO: add #.graphToDisplay, #.displayToGraph, batch methods later
+var SIZE_SCALING_EXPONENT = 0.5;
 /**
  * Camera class
  *
@@ -125,8 +105,14 @@ var Camera = /** @class */ (function (_super) {
         _this.ratio = 1;
         _this.nextFrame = null;
         _this.enabled = true;
+        _this.sizeRatio = 1;
+        _this.positiveAngleCos = 1;
+        _this.negativeAngleCos = 1;
+        _this.positiveAngleSin = 0;
+        _this.negativeAngleSin = -0;
         // State
         _this.previousState = _this.getState();
+        _this.updateCachedValues();
         return _this;
     }
     /**
@@ -138,6 +124,17 @@ var Camera = /** @class */ (function (_super) {
     Camera.from = function (state) {
         var camera = new Camera();
         return camera.setState(state);
+    };
+    /**
+     * Internal method used to update expensive and therefore cached values
+     * each time the camera state is updated.
+     */
+    Camera.prototype.updateCachedValues = function () {
+        this.sizeRatio = Math.pow(this.ratio, SIZE_SCALING_EXPONENT);
+        this.positiveAngleCos = Math.cos(this.angle);
+        this.negativeAngleCos = Math.cos(-this.angle);
+        this.positiveAngleSin = Math.sin(this.angle);
+        this.negativeAngleSin = Math.sin(-this.angle);
     };
     /**
      * Method used to enable the camera.
@@ -169,6 +166,14 @@ var Camera = /** @class */ (function (_super) {
             angle: this.angle,
             ratio: this.ratio,
         };
+    };
+    /**
+     * Method used to check whether the camera has the given state.
+     *
+     * @return {object}
+     */
+    Camera.prototype.hasState = function (state) {
+        return this.x === state.x && this.y === state.y && this.ratio === state.ratio && this.angle === state.angle;
     };
     /**
      * Method used to retrieve the camera's previous state.
@@ -209,8 +214,8 @@ var Camera = /** @class */ (function (_super) {
         var x1 = (coordinates.x - this.x) / ratio;
         var y1 = (this.y - coordinates.y) / ratio;
         // Rotate:
-        var x2 = x1 * Math.cos(this.angle) - y1 * Math.sin(this.angle);
-        var y2 = y1 * Math.cos(this.angle) + x1 * Math.sin(this.angle);
+        var x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
+        var y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
         return {
             // Translate to center of screen
             x: x2 + smallestDimension / 2 / dx,
@@ -226,23 +231,30 @@ var Camera = /** @class */ (function (_super) {
      * @return {object}             - The point coordinates in the graph frame.
      */
     Camera.prototype.viewportToFramedGraph = function (dimensions, coordinates) {
-        var _a;
         var smallestDimension = Math.min(dimensions.width, dimensions.height);
         var dx = smallestDimension / dimensions.width;
         var dy = smallestDimension / dimensions.height;
         var ratio = this.ratio / smallestDimension;
         // Align with center of the graph:
-        var x = coordinates.x - smallestDimension / 2 / dx;
-        var y = coordinates.y - smallestDimension / 2 / dy;
+        var x1 = coordinates.x - smallestDimension / 2 / dx;
+        var y1 = coordinates.y - smallestDimension / 2 / dy;
         // Rotate:
-        _a = __read([
-            x * Math.cos(-this.angle) - y * Math.sin(-this.angle),
-            y * Math.cos(-this.angle) + x * Math.sin(-this.angle),
-        ], 2), x = _a[0], y = _a[1];
+        var x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
+        var y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
         return {
-            x: x * ratio + this.x,
-            y: -y * ratio + this.y,
+            x: x2 * ratio + this.x,
+            y: -y2 * ratio + this.y,
         };
+    };
+    /**
+     * Method used to scale the given size according to the camera's ratio, i.e.
+     * zooming state.
+     *
+     * @param  {number} size - The size to scale (node size, edge thickness etc.).
+     * @return {number}      - The scaled size.
+     */
+    Camera.prototype.scaleSize = function (size) {
+        return size / this.sizeRatio;
     };
     /**
      * Method returning the abstract rectangle containing the graph according
@@ -283,9 +295,10 @@ var Camera = /** @class */ (function (_super) {
             this.angle = state.angle;
         if (state.ratio)
             this.ratio = state.ratio;
+        this.updateCachedValues();
         // Emitting
-        // TODO: don't emit if nothing changed?
-        this.emit("updated", this.getState());
+        if (!this.hasState(this.previousState))
+            this.emit("updated", this.getState());
         return this;
     };
     /**
@@ -2496,17 +2509,15 @@ var Sigma = /** @class */ (function (_super) {
         this.activeListeners.handleMove = function (e) {
             // NOTE: for the canvas renderer, testing the pixel's alpha should
             // give some boost but this slows things down for WebGL empirically.
-            // TODO: this should be a method from the camera (or can be passed to graph to display somehow)
-            var sizeRatio = Math.pow(_this.camera.getState().ratio, 0.5);
             var quadNodes = getQuadNodes(e.x, e.y);
-            var dimensions = { width: _this.width, height: _this.height };
+            var dimensions = _this.getDimensions();
             // We will hover the node whose center is closest to mouse
             var minDistance = Infinity, nodeToHover = null;
             for (var i = 0, l = quadNodes.length; i < l; i++) {
                 var node = quadNodes[i];
                 var data = _this.nodeDataCache[node];
                 var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                var size = data.size / sizeRatio;
+                var size = _this.camera.scaleSize(data.size);
                 if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
                     var distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
                     // TODO: sort by min size also for cases where center is the same
@@ -2529,7 +2540,7 @@ var Sigma = /** @class */ (function (_super) {
             if (_this.hoveredNode) {
                 var data = _this.nodeDataCache[_this.hoveredNode];
                 var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                var size = data.size / sizeRatio;
+                var size = _this.camera.scaleSize(data.size);
                 if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
                     var node = _this.hoveredNode;
                     _this.hoveredNode = null;
@@ -2541,14 +2552,13 @@ var Sigma = /** @class */ (function (_super) {
         // Handling click
         var createClickListener = function (eventType) {
             return function (e) {
-                var sizeRatio = Math.pow(_this.camera.getState().ratio, 0.5);
                 var quadNodes = getQuadNodes(e.x, e.y);
-                var dimensions = { width: _this.width, height: _this.height };
+                var dimensions = _this.getDimensions();
                 for (var i = 0, l = quadNodes.length; i < l; i++) {
                     var node = quadNodes[i];
                     var data = _this.nodeDataCache[node];
                     var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                    var size = data.size / sizeRatio;
+                    var size = _this.camera.scaleSize(data.size);
                     if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
                         return _this.emit(eventType + "Node", { node: node, captor: e, event: e });
                 }
@@ -2743,7 +2753,7 @@ var Sigma = /** @class */ (function (_super) {
         if (!this.settings.renderLabels)
             return this;
         var cameraState = this.camera.getState();
-        var dimensions = { width: this.width, height: this.height };
+        var dimensions = this.getDimensions();
         // Finding visible nodes to display their labels
         var visibleNodes;
         if (cameraState.ratio >= 1) {
@@ -2770,13 +2780,12 @@ var Sigma = /** @class */ (function (_super) {
         });
         // Drawing labels
         var context = this.canvasContexts.labels;
-        var sizeRatio = Math.pow(cameraState.ratio, 0.5);
         for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
             var data = this.nodeDataCache[labelsToDisplay[i]];
             var _a = this.camera.framedGraphToViewport(dimensions, data), x = _a.x, y = _a.y;
             // TODO: we can cache the labels we need to render until the camera's ratio changes
             // TODO: this should be computed in the canvas components?
-            var size = data.size / sizeRatio;
+            var size = this.camera.scaleSize(data.size);
             this.settings.labelRenderer(context, {
                 key: labelsToDisplay[i],
                 label: data.label,
@@ -2799,10 +2808,8 @@ var Sigma = /** @class */ (function (_super) {
     Sigma.prototype.renderEdgeLabels = function () {
         if (!this.settings.renderEdgeLabels)
             return this;
-        var cameraState = this.camera.getState();
-        var sizeRatio = Math.pow(cameraState.ratio, 0.5);
         var context = this.canvasContexts.edgeLabels;
-        var dimensions = { width: this.width, height: this.height };
+        var dimensions = this.getDimensions();
         // Clearing
         context.clearRect(0, 0, this.width, this.height);
         var edgeLabelsToDisplay = labels_1.edgeLabelsToDisplayFromNodes({
@@ -2819,7 +2826,7 @@ var Sigma = /** @class */ (function (_super) {
             var _b = this.camera.framedGraphToViewport(dimensions, targetData), targetX = _b.x, targetY = _b.y;
             // TODO: we can cache the labels we need to render until the camera's ratio changes
             // TODO: this should be computed in the canvas components?
-            var size = edgeData.size / sizeRatio;
+            var size = this.camera.scaleSize(edgeData.size);
             this.settings.edgeLabelRenderer(context, {
                 key: edge,
                 label: edgeData.label,
@@ -2845,7 +2852,6 @@ var Sigma = /** @class */ (function (_super) {
     Sigma.prototype.renderHighlightedNodes = function () {
         var _this = this;
         var camera = this.camera;
-        var sizeRatio = Math.pow(camera.getState().ratio, 0.5);
         var context = this.canvasContexts.hovers;
         // Clearing
         context.clearRect(0, 0, this.width, this.height);
@@ -2853,7 +2859,7 @@ var Sigma = /** @class */ (function (_super) {
         var render = function (node) {
             var data = _this.nodeDataCache[node];
             var _a = camera.framedGraphToViewport({ width: _this.width, height: _this.height }, data), x = _a.x, y = _a.y;
-            var size = data.size / sizeRatio;
+            var size = camera.scaleSize(data.size);
             _this.settings.hoverRenderer(context, {
                 key: node,
                 label: data.label,
@@ -3128,19 +3134,27 @@ var Sigma = /** @class */ (function (_super) {
      * Method used to translate a point's coordinates from the viewport system (pixel distance from the top-left of the
      * stage) to the graph system (the reference system of data as they are in the given graph instance).
      *
+     * This method accepts an optional camera which can be useful if you need to translate coordinates
+     * based on a different view than the one being currently being displayed on screen.
+     *
      * @param {Coordinates} viewportPoint
      */
-    Sigma.prototype.viewportToGraph = function (viewportPoint) {
-        return this.normalizationFunction.inverse(this.camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+    Sigma.prototype.viewportToGraph = function (viewportPoint, camera) {
+        camera = camera || this.camera;
+        return this.normalizationFunction.inverse(camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
     };
     /**
      * Method used to translate a point's coordinates from the graph system (the reference system of data as they are in
      * the given graph instance) to the viewport system (pixel distance from the top-left of the stage).
      *
+     * This method accepts an optional camera which can be useful if you need to translate coordinates
+     * based on a different view than the one being currently being displayed on screen.
+     *
      * @param {Coordinates} graphPoint
      */
-    Sigma.prototype.graphToViewport = function (graphPoint) {
-        return this.camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+    Sigma.prototype.graphToViewport = function (graphPoint, camera) {
+        camera = camera || this.camera;
+        return camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
     };
     /**
      * Method used to shut the container & release event listeners.
@@ -3379,19 +3393,24 @@ function labelsToDisplayFromGrid(params) {
     var cameraState = camera.getState(), previousCameraState = camera.getPreviousState();
     var previousCamera = new camera_1.default();
     previousCamera.setState(previousCameraState);
-    // TODO: should factorize. This same code is used quite a lot throughout the codebase
-    // TODO: POW RATIO is currently default 0.5 and harcoded
-    var sizeRatio = Math.pow(cameraState.ratio, 0.5);
     // State
-    var zooming = cameraState.ratio < previousCameraState.ratio, panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y, unzooming = cameraState.ratio > previousCameraState.ratio, unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1, zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
-    // Trick to discretize unzooming
+    var zooming = cameraState.ratio < previousCameraState.ratio;
+    var panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y;
+    var unzooming = cameraState.ratio > previousCameraState.ratio; // NOTE: unzooming is not !zooming since the zoom can remain constant
+    var unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1;
+    var zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
+    var shouldReturnSameLabels = false;
+    // Trick to discretize unzooming, i.e. we consider new labels when unzooming
+    // only every 5% increment so that labels won't blink too much
     if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0)
-        return Array.from(displayedLabels);
+        shouldReturnSameLabels = true;
     // If panning while unzoomed, we shouldn't change label selection
     if (unzoomedPanning && displayedLabels.size !== 0)
-        return Array.from(displayedLabels);
+        shouldReturnSameLabels = true;
     // When unzoomed & zooming
     if (zooming && cameraState.ratio >= 1)
+        shouldReturnSameLabels = true;
+    if (shouldReturnSameLabels)
         return Array.from(displayedLabels);
     // Adapting cell dimensions
     var cell = userCell ? userCell : DEFAULT_CELL;
@@ -3412,7 +3431,7 @@ function labelsToDisplayFromGrid(params) {
         if (nodeData.hidden)
             continue;
         // We filter nodes having a rendered size less than a certain thresold
-        if (nodeData.size / sizeRatio < renderedSizeThreshold)
+        if (camera.scaleSize(nodeData.size) < renderedSizeThreshold)
             continue;
         // Finding our node's cell in the grid
         var pos = camera.framedGraphToViewport(dimensions, nodeData);
