@@ -33,11 +33,11 @@ export default class Camera extends EventEmitter implements CameraState {
   private previousState: CameraState;
   private enabled = true;
 
-  private sizeRatio: number = 1;
-  private positiveAngleCos: number = 1;
-  private negativeAngleCos: number = 1;
-  private positiveAngleSin: number = 0;
-  private negativeAngleSin: number = -0;
+  private sizeRatio = 1;
+  private positiveAngleCos = 1;
+  private negativeAngleCos = 1;
+  private positiveAngleSin = 0;
+  private negativeAngleSin = -0;
 
   animationCallback?: () => void;
 
@@ -186,17 +186,28 @@ export default class Camera extends EventEmitter implements CameraState {
     const ratio = this.ratio / smallestDimension;
 
     // Align with center of the graph:
-    let x1 = coordinates.x - smallestDimension / 2 / dx;
-    let y1 = coordinates.y - smallestDimension / 2 / dy;
+    const x1 = coordinates.x - smallestDimension / 2 / dx;
+    const y1 = coordinates.y - smallestDimension / 2 / dy;
 
     // Rotate:
-    let x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
-    let y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
+    const x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
+    const y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
 
     return {
       x: x2 * ratio + this.x,
       y: -y2 * ratio + this.y,
     };
+  }
+
+  /**
+   * Method used to scale the given size according to the camera's ratio, i.e.
+   * zooming state.
+   *
+   * @param  {number} size - The size to scale (node size, edge thickness etc.).
+   * @return {number}      - The scaled size.
+   */
+  scaleSize(size: number): number {
+    return size / this.sizeRatio;
   }
 
   /**

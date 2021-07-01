@@ -4,7 +4,7 @@
  *
  * Testing the camera class.
  */
-import assert from "assert";
+import { assert } from "chai";
 import Camera from "../../src/core/camera";
 import { Coordinates, Dimensions } from "../../src/types";
 
@@ -99,7 +99,7 @@ describe("Camera", function () {
     camera.disable();
     camera.setState(state2);
 
-    assert.notDeepStrictEqual(state1, state2);
+    assert.notDeepEqual(state1, state2);
     assert.deepStrictEqual(camera.getState(), state1);
   });
 
@@ -160,12 +160,12 @@ describe("Camera", function () {
     const zoomedCamera = Camera.from(zoomedState);
 
     assert.strictEqual(zoomedCamera.ratio, targetRatio);
-    assert.notDeepStrictEqual(camera.getState(), zoomedCamera.getState());
+    assert.notDeepEqual(camera.getState(), zoomedCamera.getState());
 
     const finalViewport = zoomedCamera.framedGraphToViewport(dimensions, graphTarget);
     // Check that the error is way smaller than a pixel
-    assert.ok(Math.abs(viewportTarget.x - finalViewport.x) < 0.00001);
-    assert.ok(Math.abs(viewportTarget.y - finalViewport.y) < 0.00001);
+    assert.approximately(viewportTarget.x, finalViewport.x, 0.00001);
+    assert.approximately(viewportTarget.y, finalViewport.y, 0.00001);
   });
 
   it("should trigger the animation callback when starting a new animation (regression #1107).", function () {
@@ -178,5 +178,25 @@ describe("Camera", function () {
     camera.animate({});
 
     assert.deepStrictEqual(flag, true);
+  });
+
+  it("should be possible to scale a size according to ratio.", function () {
+    const camera = new Camera();
+
+    assert.strictEqual(camera.scaleSize(34), 34);
+    assert.strictEqual(camera.scaleSize(0), 0);
+    assert.strictEqual(camera.scaleSize(-3), -3);
+
+    camera.setState({ ratio: 1.5 });
+
+    assert.approximately(camera.scaleSize(34), 27.7608837, 0.00001);
+    assert.approximately(camera.scaleSize(0), 0, 0.00001);
+    assert.approximately(camera.scaleSize(-3), -2.44948974, 0.00001);
+
+    camera.setState({ ratio: 0.5 });
+
+    assert.approximately(camera.scaleSize(34), 48.0832611, 0.00001);
+    assert.approximately(camera.scaleSize(0), 0, 0.00001);
+    assert.approximately(camera.scaleSize(-3), -4.24264068, 0.00001);
   });
 });
