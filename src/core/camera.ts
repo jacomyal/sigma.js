@@ -34,10 +34,10 @@ export default class Camera extends EventEmitter implements CameraState {
   private enabled = true;
 
   private sizeRatio: number = 1;
-  private positiveCos: number = 1;
-  private negativeCos: number = 1;
-  private positiveSin: number = 0;
-  private negativeSin: number = 0;
+  private positiveAngleCos: number = 1;
+  private negativeAngleCos: number = 1;
+  private positiveAngleSin: number = 0;
+  private negativeAngleSin: number = -0;
 
   animationCallback?: () => void;
 
@@ -66,10 +66,10 @@ export default class Camera extends EventEmitter implements CameraState {
    */
   private updateCachedValues(): void {
     this.sizeRatio = Math.pow(this.ratio, SIZE_SCALING_EXPONENT);
-    this.positiveCos = Math.cos(this.angle);
-    this.negativeCos = Math.cos(-this.angle);
-    this.positiveSin = Math.sin(this.angle);
-    this.negativeSin = Math.sin(-this.angle);
+    this.positiveAngleCos = Math.cos(this.angle);
+    this.negativeAngleCos = Math.cos(-this.angle);
+    this.positiveAngleSin = Math.sin(this.angle);
+    this.negativeAngleSin = Math.sin(-this.angle);
   }
 
   /**
@@ -160,8 +160,8 @@ export default class Camera extends EventEmitter implements CameraState {
     const y1 = (this.y - coordinates.y) / ratio;
 
     // Rotate:
-    const x2 = x1 * this.positiveCos - y1 * this.positiveSin;
-    const y2 = y1 * this.positiveCos + x1 * this.positiveSin;
+    const x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
+    const y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
 
     return {
       // Translate to center of screen
@@ -186,16 +186,16 @@ export default class Camera extends EventEmitter implements CameraState {
     const ratio = this.ratio / smallestDimension;
 
     // Align with center of the graph:
-    let x = coordinates.x - smallestDimension / 2 / dx;
-    let y = coordinates.y - smallestDimension / 2 / dy;
+    let x1 = coordinates.x - smallestDimension / 2 / dx;
+    let y1 = coordinates.y - smallestDimension / 2 / dy;
 
     // Rotate:
-    x = x * this.negativeCos - y * this.negativeSin;
-    y = y * this.negativeCos + x * this.negativeSin;
+    let x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
+    let y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
 
     return {
-      x: x * ratio + this.x,
-      y: -y * ratio + this.y,
+      x: x2 * ratio + this.x,
+      y: -y2 * ratio + this.y,
     };
   }
 
