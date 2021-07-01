@@ -107,6 +107,15 @@ export default class Camera extends EventEmitter implements CameraState {
   }
 
   /**
+   * Method used to check whether the camera has the given state.
+   *
+   * @return {object}
+   */
+  hasState(state: CameraState): boolean {
+    return this.x === state.x && this.y === state.y && this.ratio === state.ratio && this.angle === state.angle;
+  }
+
+  /**
    * Method used to retrieve the camera's previous state.
    *
    * @return {object}
