@@ -252,8 +252,7 @@ export default class Camera extends EventEmitter implements CameraState {
     this.updateCachedValues();
 
     // Emitting
-    // TODO: don't emit if nothing changed?
-    this.emit("updated", this.getState());
+    if (!this.hasState(this.previousState)) this.emit("updated", this.getState());
 
     return this;
   }
