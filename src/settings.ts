@@ -19,14 +19,8 @@ import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
 import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
 
 export function validateSettings(settings: Settings): void {
-  // Label grid cell
-  if (
-    settings.labelGrid &&
-    settings.labelGrid.cell &&
-    typeof settings.labelGrid.cell === "object" &&
-    (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)
-  ) {
-    throw new Error("Settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+  if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
+    throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
   }
 }
 
@@ -52,10 +46,9 @@ export interface Settings {
   edgeLabelSize: number;
   edgeLabelWeight: string;
   // Labels
-  labelGrid: {
-    cell: { width: number; height: number } | null;
-    renderedSizeThreshold: number;
-  };
+  labelDensity: number;
+  labelGridCellSize: number;
+  labelRenderedSizeThreshold: number;
   // Reducers
   nodeReducer: null | ((node: NodeKey, data: Attributes) => Partial<NodeDisplayData>);
   edgeReducer: null | ((edge: EdgeKey, data: Attributes) => Partial<EdgeDisplayData>);
@@ -91,10 +84,9 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeLabelWeight: "normal",
 
   // Labels
-  labelGrid: {
-    cell: null,
-    renderedSizeThreshold: -Infinity,
-  },
+  labelDensity: 0.07,
+  labelGridCellSize: 60,
+  labelRenderedSizeThreshold: 6,
 
   // Reducers
   nodeReducer: null,

@@ -30,7 +30,7 @@ export default class Camera extends EventEmitter implements CameraState {
   ratio = 1;
 
   private nextFrame: number | null = null;
-  private previousState: CameraState;
+  private previousState: CameraState | null = null;
   private enabled = true;
 
   private sizeRatio = 1;
@@ -45,7 +45,6 @@ export default class Camera extends EventEmitter implements CameraState {
     super();
 
     // State
-    this.previousState = this.getState();
     this.updateCachedValues();
   }
 
@@ -120,8 +119,10 @@ export default class Camera extends EventEmitter implements CameraState {
    *
    * @return {object}
    */
-  getPreviousState(): CameraState {
+  getPreviousState(): CameraState | null {
     const state = this.previousState;
+
+    if (!state) return null;
 
     return {
       x: state.x,

@@ -32,7 +32,7 @@ import {
   validateGraph,
   zIndexOrdering,
 } from "./utils";
-import { labelsToDisplayFromGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
+import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
@@ -99,6 +99,7 @@ export default class Sigma extends EventEmitter {
   private webGLContexts: PlainObject<WebGLRenderingContext> = {};
   private activeListeners: PlainObject<Listener> = {};
   private quadtree: QuadTree = new QuadTree();
+  private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<NodeKey, NodeDisplayData> = {};
   private edgeDataCache: Record<EdgeKey, EdgeDisplayData> = {};
   private nodeKeyToIndex: Record<NodeKey, number> = {};
@@ -116,8 +117,8 @@ export default class Sigma extends EventEmitter {
   private height = 0;
 
   // State
-  private highlightedNodes: Set<NodeKey> = new Set();
   private displayedLabels: Set<NodeKey> = new Set();
+  private highlightedNodes: Set<NodeKey> = new Set();
   private hoveredNode: NodeKey | null = null;
   private renderFrame: number | null = null;
   private renderHighlightedNodesFrame: number | null = null;
@@ -507,11 +508,17 @@ export default class Sigma extends EventEmitter {
    * @return {Sigma}
    */
   private process(keepArrays = false): this {
-    const graph = this.graph,
-      settings = this.settings;
+    const graph = this.graph;
+    const settings = this.settings;
+    const dimensions = this.getDimensions();
+    const nullCamera = new Camera();
 
     // Clearing the quad
     this.quadtree.clear();
+
+    // Resetting the label grid
+    // TODO: it's probably better to do this explicitly or on resizes for layout and anims
+    this.labelGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
 
     // Clear the highlightedNodes
     this.highlightedNodes = new Set();
@@ -566,6 +573,7 @@ export default class Sigma extends EventEmitter {
       this.normalizationFunction.applyTo(data);
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
+      this.labelGrid.add(node, data.size, nullCamera.framedGraphToViewport(dimensions, data));
 
       nodeProgram.process(data, data.hidden, i);
 
@@ -574,6 +582,8 @@ export default class Sigma extends EventEmitter {
 
       this.nodeKeyToIndex[node] = i;
     }
+
+    this.labelGrid.organize();
 
     // TODO: maybe we should bind and buffer as part of rendering?
     // We also need to find when it is useful and when it's really not
@@ -680,6 +690,8 @@ export default class Sigma extends EventEmitter {
 
     const cameraState = this.camera.getState();
 
+    // this.labelGrid.draw(this.canvasContexts.labels, this.camera);
+
     const dimensions = this.getDimensions();
 
     // Finding visible nodes to display their labels
@@ -702,19 +714,9 @@ export default class Sigma extends EventEmitter {
     }
 
     // Selecting labels to draw
-    const gridSettings = this.settings.labelGrid;
-
-    const labelsToDisplay = labelsToDisplayFromGrid({
-      cache: this.nodeDataCache,
-      camera: this.camera,
-      cell: gridSettings.cell,
-      dimensions,
-      displayedLabels: this.displayedLabels,
-      fontSize: this.settings.labelSize,
-      graph: this.graph,
-      renderedSizeThreshold: gridSettings.renderedSizeThreshold,
-      visibleNodes,
-    });
+    // TODO: drop gridsettings likewise
+    // TODO: optimize through visible nodes
+    const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
 
     // Drawing labels
     const context = this.canvasContexts.labels;
@@ -722,11 +724,16 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
       const data = this.nodeDataCache[labelsToDisplay[i]];
 
+      // If the node is hidden, we don't need to display its label obviously
+      if (data.hidden) continue;
+
       const { x, y } = this.camera.framedGraphToViewport(dimensions, data);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
       const size = this.camera.scaleSize(data.size);
+
+      if (size < this.settings.labelRenderedSizeThreshold) continue;
 
       this.settings.labelRenderer(
         context,
@@ -742,7 +749,6 @@ export default class Sigma extends EventEmitter {
       );
     }
 
-    // Caching visible nodes and displayed labels
     this.displayedLabels = new Set(labelsToDisplay);
 
     return this;
@@ -765,8 +771,6 @@ export default class Sigma extends EventEmitter {
     context.clearRect(0, 0, this.width, this.height);
 
     const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
-      nodeDataCache: this.nodeDataCache,
-      edgeDataCache: this.edgeDataCache,
       graph: this.graph,
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedLabels,
@@ -779,6 +783,12 @@ export default class Sigma extends EventEmitter {
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]],
         edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
+
+      // If the edge is hidden we don't need to display its label
+      // NOTE: the test on sourceData & targetData is probably paranoid at this point?
+      if (edgeData.hidden || sourceData.hidden || targetData.hidden) {
+        continue;
+      }
 
       const { x: sourceX, y: sourceY } = this.camera.framedGraphToViewport(dimensions, sourceData);
       const { x: targetX, y: targetY } = this.camera.framedGraphToViewport(dimensions, targetData);
@@ -1225,8 +1235,7 @@ export default class Sigma extends EventEmitter {
     this.nodeDataCache = {};
     this.edgeDataCache = {};
 
-    this.highlightedNodes = new Set();
-    this.displayedLabels = new Set();
+    this.highlightedNodes.clear();
 
     // Clearing frames
     if (this.renderFrame) {

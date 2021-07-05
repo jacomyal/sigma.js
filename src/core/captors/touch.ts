@@ -129,8 +129,8 @@ export default class TouchCaptor extends Captor {
         // Dispatch event
 
         if (this.isMoving) {
-          const cameraState = this.camera.getState(),
-            previousCameraState = this.camera.getPreviousState();
+          const cameraState = this.camera.getState();
+          const previousCameraState = this.camera.getPreviousState() || { x: 0, y: 0 };
 
           this.camera.animate(
             {
