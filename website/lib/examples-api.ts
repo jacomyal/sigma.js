@@ -10,12 +10,12 @@ const POSTS_DIRECTORY = join(process.cwd(), "../examples");
 /**
  * Returns a cleaned ExampleType object from a full path.
  */
-export function getExample(path: string): Example {
+export function getExample(path: string, title: string): Example {
   const slug = (path.match(/([^\/\.]+)(\.[^\.\/]+)?$/) || [])[1] as string;
   const rawFileContent = fs.readFileSync(path, "utf8");
 
   return {
-    name: slug,
+    name: title,
     codeRaw: rawFileContent,
     codeHTML: hljs.highlightAuto(rawFileContent).value,
     codePath: path,
@@ -29,7 +29,7 @@ export function getExample(path: string): Example {
  */
 export function getExamples(): Example[] {
   return Object.values<{ id: string; title: string }>(examples).map((example) =>
-    getExample(join(POSTS_DIRECTORY, example.id + ".ts")),
+    getExample(join(POSTS_DIRECTORY, example.id + ".ts"), example.title),
   );
 }
 

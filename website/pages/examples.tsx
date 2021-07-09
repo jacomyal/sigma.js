@@ -20,12 +20,12 @@ const ExampleThumbnail: FC<{ example: Example }> = ({ example }) => {
 };
 
 const Blog: FC<{ examples: Example[] }> = ({ examples }) => (
-  <PageLayout>
+  <PageLayout currentPage="examples">
     <Head>
       <title>Examples</title>
     </Head>
 
-    <h1>Examples</h1>
+    <h1 className="mt-5">Examples</h1>
     <br />
     {examples.map((example) => (
       <ExampleThumbnail key={example.name} example={example} />

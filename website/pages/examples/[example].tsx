@@ -13,12 +13,12 @@ const ExampleComponent: FC<{ example: Example }> = ({ example }) => {
   if (!router.isFallback && !example?.name) return <ErrorPage statusCode={404} />;
 
   return (
-    <PageLayout mainClass="page-example">
+    <PageLayout fluid mainClass="page-example">
       <Head>
         <title>Example {example.name}</title>
       </Head>
 
-      <h1>Example {example.name}</h1>
+      <h1 className="mt-2">Example {example.name}</h1>
       <div className="example">
         <div className="code">
           <pre>

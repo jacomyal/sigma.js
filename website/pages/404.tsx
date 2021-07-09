@@ -10,7 +10,7 @@ const Page404: FC<{}> = () => (
     </Head>
 
     <article>
-      <h1>404 - Page not found</h1>
+      <h1 className="mt-5">404 - Page not found</h1>
     </article>
   </PageLayout>
 );

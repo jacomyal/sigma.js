@@ -1,7 +1,4 @@
 body {
-  font-family: Lato, sans-serif;
-  margin: 0;
-  padding: 0;
   visibility: visible !important;
 }
 
@@ -12,5 +9,14 @@ body {
 
   main {
     flex-grow: 1;
+  }
+
+  header {
+    background: $dark;
+  }
+
+  footer {
+    padding: 0.2em 0;
+    border-top: 1px solid $border-color;
   }
 }
