@@ -107,6 +107,7 @@ export default class Sigma extends EventEmitter {
   private nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
   private edgeExtent: { z: Extent } | null = null;
 
+  private customBBox: { x: Extent; y: Extent } | null = null;
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
     x: [-Infinity, Infinity],
     y: [-Infinity, Infinity],
@@ -524,7 +525,7 @@ export default class Sigma extends EventEmitter {
     this.highlightedNodes = new Set();
 
     // Computing extents
-    const nodeExtentProperties = ["x", "y", "z"];
+    const nodeExtentProperties = ["x", "y"];
 
     if (this.settings.zIndex) {
       nodeExtentProperties.push("z");
@@ -534,7 +535,7 @@ export default class Sigma extends EventEmitter {
     this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent; z: Extent };
 
     // Rescaling function
-    this.normalizationFunction = createNormalizationFunction(this.nodeExtent);
+    this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
 
     const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
 
@@ -1206,6 +1207,35 @@ export default class Sigma extends EventEmitter {
     camera = camera || this.camera;
 
     return camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+  }
+
+  /**
+   * Method returning the graph's bounding box.
+   *
+   * @return {{ x: Extent, y: Extent }}
+   */
+  getBBox() {
+    return nodeExtent(this.graph, ["x", "y"]) as { x: Extent; y: Extent };
+  }
+
+  /**
+   * Method returning the graph's custom bounding box, if any.
+   *
+   * @return {{ x: Extent, y: Extent } | null}
+   */
+  getCustomBBox(): { x: Extent; y: Extent } | null {
+    return this.customBBox;
+  }
+
+  /**
+   * Method used to override the graph's bounding box with a custom one. Give `null` as the argument to stop overriding.
+   *
+   * @return {Sigma}
+   */
+  setCustomBBox(customBBox: { x: Extent; y: Extent } | null) {
+    this.customBBox = customBBox;
+    this._scheduleRefresh();
+    return this;
   }
 
   /**

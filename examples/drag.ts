@@ -26,6 +26,7 @@ let draggedNode: NodeKey | null = null,
   dragging = false;
 
 renderer.on("downNode", (e) => {
+  if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
   dragging = true;
   draggedNode = e.node;
   camera.disable();

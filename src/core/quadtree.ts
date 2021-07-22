@@ -43,6 +43,8 @@ import { PlainObject } from "../types";
 const BLOCKS = 4,
   MAX_LEVEL = 5;
 
+const OUTSIDE_BLOCK = "outside";
+
 const X_OFFSET = 0,
   Y_OFFSET = 1,
   WIDTH_OFFSET = 2,
@@ -52,6 +54,8 @@ const TOP_LEFT = 1,
   TOP_RIGHT = 2,
   BOTTOM_LEFT = 3,
   BOTTOM_RIGHT = 4;
+
+let hasWarnedTooMuchOutside = false;
 
 export interface Boundaries {
   x: number;
@@ -302,7 +306,22 @@ function insertNode(
       else return acc;
     }, 0);
 
-    // If we don't have at least a collision, there is an issue
+    // If we have no collision at root level, inject node in the outside block
+    if (collisions === 0 && level === 0) {
+      containers[OUTSIDE_BLOCK].push(key);
+
+      if (!hasWarnedTooMuchOutside && containers[OUTSIDE_BLOCK].length >= 5) {
+        hasWarnedTooMuchOutside = true;
+        console.warn(
+          "sigma/quadtree.insertNode: At least 5 nodes are outside the global quadtree zone. " +
+            "You might have a problem with the normalization function or the custom bounding box.",
+        );
+      }
+
+      return;
+    }
+
+    // If we don't have at least a collision but deeper, there is an issue
     if (collisions === 0)
       throw new Error(
         `sigma/quadtree.insertNode: no collision (level: ${level}, key: ${key}, x: ${x}, y: ${y}, size: ${size}).`,
@@ -433,7 +452,7 @@ function getNodesInAxisAlignedRectangleArea(
  */
 export default class QuadTree {
   data: Float32Array;
-  containers: PlainObject<NodeKey[]> = {};
+  containers: PlainObject<NodeKey[]> = { [OUTSIDE_BLOCK]: [] };
   cache: NodeKey[] | null = null;
   lastRectangle: Rectangle | null = null;
 
@@ -471,7 +490,7 @@ export default class QuadTree {
   }
 
   clear(): QuadTree {
-    this.containers = {};
+    this.containers = { [OUTSIDE_BLOCK]: [] };
 
     return this;
   }
@@ -481,6 +500,9 @@ export default class QuadTree {
 
     let block = 0,
       level = 0;
+
+    // If the point is out of the quadtree, return the full outside block:
+    if (x < 0 || y < 0 || x > 1 || y > 1) return this.containers[OUTSIDE_BLOCK];
 
     do {
       if (this.containers[block]) nodes.push(...this.containers[block]);
@@ -529,6 +551,9 @@ export default class QuadTree {
       Math.abs(x1 - x2) || Math.abs(y1 - y2),
       height,
     );
+
+    // Add all the nodes in the outside block, since they might be relevant, and since they should be very few:
+    this.cache.push(...this.containers[OUTSIDE_BLOCK]);
 
     return this.cache;
   }
