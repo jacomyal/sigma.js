@@ -8,6 +8,7 @@
 import { CameraState, Coordinates, Dimensions } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 import Camera from "../camera";
+import Sigma from "../../sigma";
 
 const DRAG_TIMEOUT = 200;
 const TOUCH_INERTIA_RATIO = 3;
@@ -30,8 +31,8 @@ export default class TouchCaptor extends Captor {
   startTouchesPositions?: Coordinates[];
   lastTouchesPositions?: Coordinates[];
 
-  constructor(container: HTMLElement, camera: Camera) {
-    super(container, camera);
+  constructor(container: HTMLElement, renderer: Sigma) {
+    super(container, renderer);
 
     // Binding methods:
     this.handleStart = this.handleStart.bind(this);
@@ -85,7 +86,7 @@ export default class TouchCaptor extends Captor {
     this.isMoving = true;
     this.touchMode = touches.length;
 
-    this.startCameraState = this.camera.getState();
+    this.startCameraState = this.renderer.getCamera().getState();
     this.startTouchesPositions = touches.map(getPosition);
     this.lastTouchesPositions = this.startTouchesPositions;
 
@@ -129,10 +130,11 @@ export default class TouchCaptor extends Captor {
         // Dispatch event
 
         if (this.isMoving) {
-          const cameraState = this.camera.getState();
-          const previousCameraState = this.camera.getPreviousState() || { x: 0, y: 0 };
+          const camera = this.renderer.getCamera();
+          const cameraState = camera.getState(),
+            previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
 
-          this.camera.animate(
+          camera.animate(
             {
               x: cameraState.x + TOUCH_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
               y: cameraState.y + TOUCH_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
@@ -174,13 +176,14 @@ export default class TouchCaptor extends Captor {
 
     switch (this.touchMode) {
       case 1: {
-        const { x: xStart, y: yStart } = this.camera.viewportToFramedGraph(
+        const camera = this.renderer.getCamera();
+        const { x: xStart, y: yStart } = camera.viewportToFramedGraph(
           this.getDimensions(),
           (this.startTouchesPositions || [])[0] as Coordinates,
         );
-        const { x, y } = this.camera.viewportToFramedGraph(this.getDimensions(), touchesPositions[0]);
+        const { x, y } = camera.viewportToFramedGraph(this.getDimensions(), touchesPositions[0]);
 
-        this.camera.setState({
+        camera.setState({
           x: startCameraState.x + xStart - x,
           y: startCameraState.y + yStart - y,
         });
@@ -234,7 +237,7 @@ export default class TouchCaptor extends Captor {
         newCameraState.x = touchGraphPosition.x - x * ratio;
         newCameraState.y = touchGraphPosition.y + y * ratio;
 
-        this.camera.setState(newCameraState);
+        this.renderer.getCamera().setState(newCameraState);
 
         break;
       }

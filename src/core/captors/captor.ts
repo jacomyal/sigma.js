@@ -5,7 +5,7 @@
  */
 import { EventEmitter } from "events";
 import { Coordinates, MouseCoords, TouchCoords } from "../../types";
-import Camera from "../camera";
+import Sigma from "../../sigma";
 
 /**
  * Captor utils functions
@@ -121,13 +121,13 @@ export function getWheelDelta(e: WheelEvent): number {
  */
 export default abstract class Captor extends EventEmitter {
   container: HTMLElement;
-  camera: Camera;
+  renderer: Sigma;
 
-  constructor(container: HTMLElement, camera: Camera) {
+  constructor(container: HTMLElement, renderer: Sigma) {
     super();
     // Properties
     this.container = container;
-    this.camera = camera;
+    this.renderer = renderer;
   }
 
   abstract kill(): void;

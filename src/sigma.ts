@@ -187,8 +187,8 @@ export default class Sigma extends EventEmitter {
     this.bindCameraHandlers();
 
     // Initializing captors
-    this.mouseCaptor = new MouseCaptor(this.elements.mouse, this.camera);
-    this.touchCaptor = new TouchCaptor(this.elements.mouse, this.camera);
+    this.mouseCaptor = new MouseCaptor(this.elements.mouse, this);
+    this.touchCaptor = new TouchCaptor(this.elements.mouse, this);
 
     // Binding event handlers
     this.bindEventHandlers();
@@ -1188,10 +1188,8 @@ export default class Sigma extends EventEmitter {
    *
    * @param {Coordinates} viewportPoint
    */
-  viewportToGraph(viewportPoint: Coordinates, camera?: Camera): Coordinates {
-    camera = camera || this.camera;
-
-    return this.normalizationFunction.inverse(camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+  viewportToGraph(viewportPoint: Coordinates): Coordinates {
+    return this.normalizationFunction.inverse(this.camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
   }
 
   /**
@@ -1203,10 +1201,8 @@ export default class Sigma extends EventEmitter {
    *
    * @param {Coordinates} graphPoint
    */
-  graphToViewport(graphPoint: Coordinates, camera?: Camera): Coordinates {
-    camera = camera || this.camera;
-
-    return camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+  graphToViewport(graphPoint: Coordinates): Coordinates {
+    return this.camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
   }
 
   /**

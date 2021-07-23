@@ -6,7 +6,7 @@
  * @module
  */
 import { CameraState } from "../../types";
-import Camera from "../camera";
+import Sigma from "../../sigma";
 import Captor, { getX, getY, getWheelDelta, getMouseCoords } from "./captor";
 
 /**
@@ -44,8 +44,8 @@ export default class MouseCaptor extends Captor {
   currentWheelDirection: -1 | 0 | 1 = 0;
   lastWheelTriggerTime?: number;
 
-  constructor(container: HTMLElement, camera: Camera) {
-    super(container, camera);
+  constructor(container: HTMLElement, renderer: Sigma) {
+    super(container, renderer);
 
     // Binding methods
     this.handleClick = this.handleClick.bind(this);
@@ -112,10 +112,11 @@ export default class MouseCaptor extends Captor {
   handleDoubleClick(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
 
-    const newRatio = this.camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+    const camera = this.renderer.getCamera();
+    const newRatio = camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
 
-    this.camera.animate(
-      this.camera.getViewportZoomedState(
+    camera.animate(
+      camera.getViewportZoomedState(
         { x: getX(e), y: getY(e) },
         {
           width: this.container.offsetWidth,
@@ -140,7 +141,7 @@ export default class MouseCaptor extends Captor {
   handleDown(e: MouseEvent): void {
     if (!this.enabled) return;
 
-    this.startCameraState = this.camera.getState();
+    this.startCameraState = this.renderer.getCamera().getState();
 
     this.lastMouseX = getX(e);
     this.lastMouseY = getY(e);
@@ -161,6 +162,7 @@ export default class MouseCaptor extends Captor {
   handleUp(e: MouseEvent): void {
     if (!this.enabled || !this.isMouseDown) return;
 
+    const camera = this.renderer.getCamera();
     this.isMouseDown = false;
 
     if (typeof this.movingTimeout === "number") {
@@ -171,11 +173,11 @@ export default class MouseCaptor extends Captor {
     const x = getX(e),
       y = getY(e);
 
-    const cameraState = this.camera.getState();
-    const previousCameraState = this.camera.getPreviousState() || { x: 0, y: 0 };
+    const cameraState = camera.getState(),
+      previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
 
     if (this.isMoving) {
-      this.camera.animate(
+      camera.animate(
         {
           x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
           y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
@@ -186,7 +188,7 @@ export default class MouseCaptor extends Captor {
         },
       );
     } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
-      this.camera.setState({
+      camera.setState({
         x: cameraState.x,
         y: cameraState.y,
       });
@@ -215,6 +217,7 @@ export default class MouseCaptor extends Captor {
         this.isMoving = false;
       }, DRAG_TIMEOUT);
 
+      const camera = this.renderer.getCamera();
       const dimensions = {
         width: this.container.offsetWidth,
         height: this.container.offsetHeight,
@@ -223,22 +226,22 @@ export default class MouseCaptor extends Captor {
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = this.camera.viewportToFramedGraph(dimensions, {
+      const lastMouse = camera.viewportToFramedGraph(dimensions, {
         x: this.lastMouseX as number,
         y: this.lastMouseY as number,
       });
 
-      const mouse = this.camera.viewportToFramedGraph(dimensions, { x: eX, y: eY });
+      const mouse = camera.viewportToFramedGraph(dimensions, { x: eX, y: eY });
 
       const offsetX = lastMouse.x - mouse.x,
         offsetY = lastMouse.y - mouse.y;
 
-      const cameraState = this.camera.getState();
+      const cameraState = camera.getState();
 
       const x = cameraState.x + offsetX,
         y = cameraState.y + offsetY;
 
-      this.camera.setState({ x, y });
+      camera.setState({ x, y });
 
       this.lastMouseX = eX;
       this.lastMouseY = eY;
@@ -265,7 +268,8 @@ export default class MouseCaptor extends Captor {
     if (!delta) return false;
 
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
-    const newRatio = this.camera.getState().ratio * ratioDiff;
+    const camera = this.renderer.getCamera();
+    const newRatio = camera.getState().ratio * ratioDiff;
     const wheelDirection = delta > 0 ? 1 : -1;
     const now = Date.now();
 
@@ -278,8 +282,8 @@ export default class MouseCaptor extends Captor {
       return false;
     }
 
-    this.camera.animate(
-      this.camera.getViewportZoomedState(
+    camera.animate(
+      camera.getViewportZoomedState(
         { x: getX(e), y: getY(e) },
         {
           width: this.container.offsetWidth,
