@@ -115,20 +115,10 @@ export default class MouseCaptor extends Captor {
     const camera = this.renderer.getCamera();
     const newRatio = camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
 
-    camera.animate(
-      camera.getViewportZoomedState(
-        { x: getX(e), y: getY(e) },
-        {
-          width: this.container.offsetWidth,
-          height: this.container.offsetHeight,
-        },
-        newRatio,
-      ),
-      {
-        easing: "quadraticInOut",
-        duration: DOUBLE_CLICK_ZOOMING_DURATION,
-      },
-    );
+    camera.animate(this.renderer.getViewportZoomedState({ x: getX(e), y: getY(e) }, newRatio), {
+      easing: "quadraticInOut",
+      duration: DOUBLE_CLICK_ZOOMING_DURATION,
+    });
 
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
@@ -218,20 +208,16 @@ export default class MouseCaptor extends Captor {
       }, DRAG_TIMEOUT);
 
       const camera = this.renderer.getCamera();
-      const dimensions = {
-        width: this.container.offsetWidth,
-        height: this.container.offsetHeight,
-      };
 
       const eX = getX(e),
         eY = getY(e);
 
-      const lastMouse = camera.viewportToFramedGraph(dimensions, {
+      const lastMouse = this.renderer.viewportToFramedGraph({
         x: this.lastMouseX as number,
         y: this.lastMouseY as number,
       });
 
-      const mouse = camera.viewportToFramedGraph(dimensions, { x: eX, y: eY });
+      const mouse = this.renderer.viewportToFramedGraph({ x: eX, y: eY });
 
       const offsetX = lastMouse.x - mouse.x,
         offsetY = lastMouse.y - mouse.y;
@@ -283,14 +269,7 @@ export default class MouseCaptor extends Captor {
     }
 
     camera.animate(
-      camera.getViewportZoomedState(
-        { x: getX(e), y: getY(e) },
-        {
-          width: this.container.offsetWidth,
-          height: this.container.offsetHeight,
-        },
-        newRatio,
-      ),
+      this.renderer.getViewportZoomedState({ x: getX(e), y: getY(e) }, newRatio),
       {
         easing: "quadraticOut",
         duration: MOUSE_ZOOM_DURATION,

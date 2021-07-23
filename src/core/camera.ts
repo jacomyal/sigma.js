@@ -10,13 +10,12 @@ import { EventEmitter } from "events";
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
 import { cancelFrame, requestFrame } from "../utils";
-import { CameraState, Coordinates, Dimensions } from "../types";
+import { CameraState } from "../types";
 
 /**
  * Defaults.
  */
 const DEFAULT_ZOOMING_RATIO = 1.5;
-const SIZE_SCALING_EXPONENT = 0.5;
 
 /**
  * Camera class
@@ -33,19 +32,13 @@ export default class Camera extends EventEmitter implements CameraState {
   private previousState: CameraState | null = null;
   private enabled = true;
 
-  private sizeRatio = 1;
-  private positiveAngleCos = 1;
-  private negativeAngleCos = 1;
-  private positiveAngleSin = 0;
-  private negativeAngleSin = -0;
-
   animationCallback?: () => void;
 
   constructor() {
     super();
 
     // State
-    this.updateCachedValues();
+    this.previousState = this.getState();
   }
 
   /**
@@ -57,18 +50,6 @@ export default class Camera extends EventEmitter implements CameraState {
   static from(state: CameraState): Camera {
     const camera = new Camera();
     return camera.setState(state);
-  }
-
-  /**
-   * Internal method used to update expensive and therefore cached values
-   * each time the camera state is updated.
-   */
-  private updateCachedValues(): void {
-    this.sizeRatio = Math.pow(this.ratio, SIZE_SCALING_EXPONENT);
-    this.positiveAngleCos = Math.cos(this.angle);
-    this.negativeAngleCos = Math.cos(-this.angle);
-    this.positiveAngleSin = Math.sin(this.angle);
-    this.negativeAngleSin = Math.sin(-this.angle);
   }
 
   /**
@@ -142,106 +123,6 @@ export default class Camera extends EventEmitter implements CameraState {
   }
 
   /**
-   * Method returning the coordinates of a point from the framed graph system to the
-   * viewport system.
-   *
-   * @param  {object} dimensions  - Dimensions of the viewport.
-   * @param  {object} coordinates - Coordinates of the point.
-   * @return {object}             - The point coordinates in the viewport.
-   */
-  framedGraphToViewport(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
-    const smallestDimension = Math.min(dimensions.width, dimensions.height);
-
-    const dx = smallestDimension / dimensions.width;
-    const dy = smallestDimension / dimensions.height;
-    const ratio = this.ratio / smallestDimension;
-
-    // Align with center of the graph:
-    const x1 = (coordinates.x - this.x) / ratio;
-    const y1 = (this.y - coordinates.y) / ratio;
-
-    // Rotate:
-    const x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
-    const y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
-
-    return {
-      // Translate to center of screen
-      x: x2 + smallestDimension / 2 / dx,
-      y: y2 + smallestDimension / 2 / dy,
-    };
-  }
-
-  /**
-   * Method returning the coordinates of a point from the viewport system to the
-   * framed graph system.
-   *
-   * @param  {object} dimensions  - Dimensions of the viewport.
-   * @param  {object} coordinates - Coordinates of the point.
-   * @return {object}             - The point coordinates in the graph frame.
-   */
-  viewportToFramedGraph(dimensions: Dimensions, coordinates: Coordinates): Coordinates {
-    const smallestDimension = Math.min(dimensions.width, dimensions.height);
-
-    const dx = smallestDimension / dimensions.width;
-    const dy = smallestDimension / dimensions.height;
-    const ratio = this.ratio / smallestDimension;
-
-    // Align with center of the graph:
-    const x1 = coordinates.x - smallestDimension / 2 / dx;
-    const y1 = coordinates.y - smallestDimension / 2 / dy;
-
-    // Rotate:
-    const x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
-    const y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
-
-    return {
-      x: x2 * ratio + this.x,
-      y: -y2 * ratio + this.y,
-    };
-  }
-
-  /**
-   * Method used to scale the given size according to the camera's ratio, i.e.
-   * zooming state.
-   *
-   * @param  {number} size - The size to scale (node size, edge thickness etc.).
-   * @return {number}      - The scaled size.
-   */
-  scaleSize(size: number): number {
-    return size / this.sizeRatio;
-  }
-
-  /**
-   * Method returning the abstract rectangle containing the graph according
-   * to the camera's state.
-   *
-   * @return {object} - The view's rectangle.
-   */
-  viewRectangle(dimensions: Dimensions): {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-    height: number;
-  } {
-    // TODO: reduce relative margin?
-    const marginX = (0 * dimensions.width) / 8,
-      marginY = (0 * dimensions.height) / 8;
-
-    const p1 = this.viewportToFramedGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }),
-      p2 = this.viewportToFramedGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }),
-      h = this.viewportToFramedGraph(dimensions, { x: 0, y: dimensions.height + marginY });
-
-    return {
-      x1: p1.x,
-      y1: p1.y,
-      x2: p2.x,
-      y2: p2.y,
-      height: p2.y - h.y,
-    };
-  }
-
-  /**
    * Method used to set the camera's state.
    *
    * @param  {object} state - New state.
@@ -261,41 +142,10 @@ export default class Camera extends EventEmitter implements CameraState {
     if (state.angle) this.angle = state.angle;
     if (state.ratio) this.ratio = state.ratio;
 
-    this.updateCachedValues();
-
     // Emitting
     if (!this.hasState(this.previousState)) this.emit("updated", this.getState());
 
     return this;
-  }
-
-  /**
-   * Method used to (un)zoom, while preserving the position of a viewport point.
-   * Used for instance to
-   *
-   * @param viewportTarget
-   * @param dimensions
-   * @param ratio
-   * @return {CameraState}
-   */
-  getViewportZoomedState(viewportTarget: Coordinates, dimensions: Dimensions, ratio: number): CameraState {
-    // TODO: handle max zoom
-    const ratioDiff = ratio / this.ratio;
-
-    const center = {
-      x: dimensions.width / 2,
-      y: dimensions.height / 2,
-    };
-
-    const graphMousePosition = this.viewportToFramedGraph(dimensions, viewportTarget);
-    const graphCenterPosition = this.viewportToFramedGraph(dimensions, center);
-
-    return {
-      ...this.getState(),
-      x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + this.x,
-      y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + this.y,
-      ratio: ratio,
-    };
   }
 
   /**

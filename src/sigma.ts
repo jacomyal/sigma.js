@@ -7,10 +7,12 @@ import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";
 import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
+
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import QuadTree from "./core/quadtree";
 import {
+  CameraState,
   Coordinates,
   Dimensions,
   EdgeDisplayData,
@@ -45,6 +47,7 @@ const { nodeExtent, edgeExtent } = graphExtent;
  */
 const PIXEL_RATIO = getPixelRatio();
 const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
+const SIZE_SCALING_EXPONENT = 0.5;
 
 /**
  * Important functions.
@@ -112,6 +115,13 @@ export default class Sigma extends EventEmitter {
     x: [-Infinity, Infinity],
     y: [-Infinity, Infinity],
   });
+
+  // Cache:
+  private cameraSizeRatio = 1;
+  private positiveAngleCos = 1;
+  private negativeAngleCos = 1;
+  private positiveAngleSin = 0;
+  private negativeAngleSin = -0;
 
   // Starting dimensions
   private width = 0;
@@ -346,10 +356,7 @@ export default class Sigma extends EventEmitter {
 
     // Function returning the nodes in the mouse's quad
     const getQuadNodes = (mouseX: number, mouseY: number) => {
-      const mouseGraphPosition = this.camera.viewportToFramedGraph(
-        { width: this.width, height: this.height },
-        { x: mouseX, y: mouseY },
-      );
+      const mouseGraphPosition = this.viewportToFramedGraph({ x: mouseX, y: mouseY });
 
       // TODO: minus 1? lol
       return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
@@ -362,8 +369,6 @@ export default class Sigma extends EventEmitter {
 
       const quadNodes = getQuadNodes(e.x, e.y);
 
-      const dimensions = this.getDimensions();
-
       // We will hover the node whose center is closest to mouse
       let minDistance = Infinity,
         nodeToHover = null;
@@ -373,9 +378,9 @@ export default class Sigma extends EventEmitter {
 
         const data = this.nodeDataCache[node];
 
-        const pos = this.camera.framedGraphToViewport(dimensions, data);
+        const pos = this.framedGraphToViewport(data);
 
-        const size = this.camera.scaleSize(data.size);
+        const size = this.scaleSize(data.size);
 
         if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           const distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
@@ -402,9 +407,9 @@ export default class Sigma extends EventEmitter {
       if (this.hoveredNode) {
         const data = this.nodeDataCache[this.hoveredNode];
 
-        const pos = this.camera.framedGraphToViewport(dimensions, data);
+        const pos = this.framedGraphToViewport(data);
 
-        const size = this.camera.scaleSize(data.size);
+        const size = this.scaleSize(data.size);
 
         if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           const node = this.hoveredNode;
@@ -420,16 +425,15 @@ export default class Sigma extends EventEmitter {
     const createClickListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
         const quadNodes = getQuadNodes(e.x, e.y);
-        const dimensions = this.getDimensions();
 
         for (let i = 0, l = quadNodes.length; i < l; i++) {
           const node = quadNodes[i];
 
           const data = this.nodeDataCache[node];
 
-          const pos = this.camera.framedGraphToViewport(dimensions, data);
+          const pos = this.framedGraphToViewport(data);
 
-          const size = this.camera.scaleSize(data.size);
+          const size = this.scaleSize(data.size);
 
           if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
             return this.emit(`${eventType}Node`, { node, captor: e, event: e });
@@ -574,7 +578,7 @@ export default class Sigma extends EventEmitter {
       this.normalizationFunction.applyTo(data);
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
-      this.labelGrid.add(node, data.size, nullCamera.framedGraphToViewport(dimensions, data));
+      this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, nullCamera.getState()));
 
       nodeProgram.process(data, data.hidden, i);
 
@@ -693,8 +697,6 @@ export default class Sigma extends EventEmitter {
 
     // this.labelGrid.draw(this.canvasContexts.labels, this.camera);
 
-    const dimensions = this.getDimensions();
-
     // Finding visible nodes to display their labels
     let visibleNodes: Set<NodeKey>;
 
@@ -703,7 +705,7 @@ export default class Sigma extends EventEmitter {
       visibleNodes = new Set(this.graph.nodes());
     } else {
       // Let's ask the quadtree
-      const viewRectangle = this.camera.viewRectangle(dimensions);
+      const viewRectangle = this.viewRectangle();
 
       visibleNodes = new Set(
         this.quadtree.rectangle(
@@ -732,11 +734,11 @@ export default class Sigma extends EventEmitter {
       // If the node is hidden, we don't need to display its label obviously
       if (data.hidden) continue;
 
-      const { x, y } = this.camera.framedGraphToViewport(dimensions, data);
+      const { x, y } = this.framedGraphToViewport(data);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
-      const size = this.camera.scaleSize(data.size);
+      const size = this.scaleSize(data.size);
 
       if (size < this.settings.labelRenderedSizeThreshold) continue;
 
@@ -778,8 +780,6 @@ export default class Sigma extends EventEmitter {
 
     const context = this.canvasContexts.edgeLabels;
 
-    const dimensions = this.getDimensions();
-
     // Clearing
     context.clearRect(0, 0, this.width, this.height);
 
@@ -803,12 +803,12 @@ export default class Sigma extends EventEmitter {
         continue;
       }
 
-      const { x: sourceX, y: sourceY } = this.camera.framedGraphToViewport(dimensions, sourceData);
-      const { x: targetX, y: targetY } = this.camera.framedGraphToViewport(dimensions, targetData);
+      const { x: sourceX, y: sourceY } = this.framedGraphToViewport(sourceData);
+      const { x: targetX, y: targetY } = this.framedGraphToViewport(targetData);
 
       // TODO: we can cache the labels we need to render until the camera's ratio changes
       // TODO: this should be computed in the canvas components?
-      const size = this.camera.scaleSize(edgeData.size);
+      const size = this.scaleSize(edgeData.size);
 
       this.settings.edgeLabelRenderer(
         context,
@@ -841,8 +841,6 @@ export default class Sigma extends EventEmitter {
    * @return {Sigma}
    */
   private renderHighlightedNodes(): void {
-    const camera = this.camera;
-
     const context = this.canvasContexts.hovers;
 
     // Clearing
@@ -852,9 +850,9 @@ export default class Sigma extends EventEmitter {
     const render = (node: NodeKey): void => {
       const data = this.nodeDataCache[node];
 
-      const { x, y } = camera.framedGraphToViewport({ width: this.width, height: this.height }, data);
+      const { x, y } = this.framedGraphToViewport(data);
 
-      const size = camera.scaleSize(data.size);
+      const size = this.scaleSize(data.size);
 
       this.settings.hoverRenderer(
         context,
@@ -914,6 +912,9 @@ export default class Sigma extends EventEmitter {
     // Clearing the canvases
     this.clear();
 
+    // Recomputing useful camera-related values:
+    this.updateCachedValues();
+
     // If we have no nodes we can stop right there
     if (!this.graph.order) return this;
 
@@ -969,6 +970,19 @@ export default class Sigma extends EventEmitter {
     this.renderHighlightedNodes();
 
     return this;
+  }
+
+  /**
+   * Internal method used to update expensive and therefore cached values
+   * each time the camera state is updated.
+   */
+  private updateCachedValues(): void {
+    const { ratio, angle } = this.camera.getState();
+    this.cameraSizeRatio = Math.pow(ratio, SIZE_SCALING_EXPONENT);
+    this.positiveAngleCos = Math.cos(angle);
+    this.negativeAngleCos = Math.cos(-angle);
+    this.positiveAngleSin = Math.sin(angle);
+    this.negativeAngleSin = Math.sin(-angle);
   }
 
   /**---------------------------------------------------------------------------
@@ -1076,8 +1090,8 @@ export default class Sigma extends EventEmitter {
    * Method updating the value of a given setting key using the provided function.
    * Note that this will schedule a new render next frame.
    *
-   * @param  {string} key - The setting key to set.
-   * @param  {any}    value - The value to set.
+   * @param  {string}   key     - The setting key to set.
+   * @param  {function} updater - The update function.
    * @return {Sigma}
    */
   updateSetting<K extends keyof Settings>(key: K, updater: (value: Settings[K]) => Settings[K]): this {
@@ -1180,6 +1194,127 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method used to (un)zoom, while preserving the position of a viewport point.
+   * Used for instance to zoom "on the mouse cursor".
+   *
+   * @param viewportTarget
+   * @param newRatio
+   * @return {CameraState}
+   */
+  getViewportZoomedState(viewportTarget: Coordinates, newRatio: number): CameraState {
+    const { ratio, angle, x, y } = this.camera.getState();
+
+    // TODO: handle max zoom
+    const ratioDiff = newRatio / ratio;
+
+    const center = {
+      x: this.width / 2,
+      y: this.height / 2,
+    };
+
+    const graphMousePosition = this.viewportToFramedGraph(viewportTarget);
+    const graphCenterPosition = this.viewportToFramedGraph(center);
+
+    return {
+      angle,
+      x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + x,
+      y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + y,
+      ratio: newRatio,
+    };
+  }
+
+  /**
+   * Method returning the abstract rectangle containing the graph according
+   * to the camera's state.
+   *
+   * @return {object} - The view's rectangle.
+   */
+  viewRectangle(): {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    height: number;
+  } {
+    // TODO: reduce relative margin?
+    const marginX = (0 * this.width) / 8,
+      marginY = (0 * this.height) / 8;
+
+    const p1 = this.viewportToFramedGraph({ x: 0 - marginX, y: 0 - marginY }),
+      p2 = this.viewportToFramedGraph({ x: this.width + marginX, y: 0 - marginY }),
+      h = this.viewportToFramedGraph({ x: 0, y: this.height + marginY });
+
+    return {
+      x1: p1.x,
+      y1: p1.y,
+      x2: p2.x,
+      y2: p2.y,
+      height: p2.y - h.y,
+    };
+  }
+
+  /**
+   * Method returning the coordinates of a point from the framed graph system to the
+   * viewport system.
+   *
+   * @param  {object} coordinates - Coordinates of the point.
+   * @param  {object?} cameraState - An optional camera state, to override the renderer's one.
+   * @return {object}             - The point coordinates in the viewport.
+   */
+  framedGraphToViewport(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
+    const smallestDimension = Math.min(this.width, this.height);
+
+    const state = cameraState || this.camera.getState();
+    const dx = smallestDimension / this.width;
+    const dy = smallestDimension / this.height;
+    const ratio = state.ratio / smallestDimension;
+
+    // Align with center of the graph:
+    const x1 = (coordinates.x - state.x) / ratio;
+    const y1 = (state.y - coordinates.y) / ratio;
+
+    // Rotate:
+    const x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
+    const y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
+
+    return {
+      // Translate to center of screen
+      x: x2 + smallestDimension / 2 / dx,
+      y: y2 + smallestDimension / 2 / dy,
+    };
+  }
+
+  /**
+   * Method returning the coordinates of a point from the viewport system to the
+   * framed graph system.
+   *
+   * @param  {object}  coordinates - Coordinates of the point.
+   * @param  {object?} cameraState - An optional camera state, to override the renderer's one.
+   * @return {object}              - The point coordinates in the graph frame.
+   */
+  viewportToFramedGraph(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
+    const smallestDimension = Math.min(this.width, this.height);
+
+    const state = cameraState || this.camera.getState();
+    const dx = smallestDimension / this.width;
+    const dy = smallestDimension / this.height;
+    const ratio = state.ratio / smallestDimension;
+
+    // Align with center of the graph:
+    const x1 = coordinates.x - smallestDimension / 2 / dx;
+    const y1 = coordinates.y - smallestDimension / 2 / dy;
+
+    // Rotate:
+    const x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
+    const y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
+
+    return {
+      x: x2 * ratio + state.x,
+      y: -y2 * ratio + state.y,
+    };
+  }
+
+  /**
    * Method used to translate a point's coordinates from the viewport system (pixel distance from the top-left of the
    * stage) to the graph system (the reference system of data as they are in the given graph instance).
    *
@@ -1189,7 +1324,7 @@ export default class Sigma extends EventEmitter {
    * @param {Coordinates} viewportPoint
    */
   viewportToGraph(viewportPoint: Coordinates): Coordinates {
-    return this.normalizationFunction.inverse(this.camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+    return this.normalizationFunction.inverse(this.viewportToFramedGraph(viewportPoint));
   }
 
   /**
@@ -1202,7 +1337,7 @@ export default class Sigma extends EventEmitter {
    * @param {Coordinates} graphPoint
    */
   graphToViewport(graphPoint: Coordinates): Coordinates {
-    return this.camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+    return this.framedGraphToViewport(this.normalizationFunction(graphPoint));
   }
 
   /**
@@ -1290,5 +1425,16 @@ export default class Sigma extends EventEmitter {
     const container = this.container;
 
     while (container.firstChild) container.removeChild(container.firstChild);
+  }
+
+  /**
+   * Method used to scale the given size according to the camera's ratio, i.e.
+   * zooming state.
+   *
+   * @param  {number} size - The size to scale (node size, edge thickness etc.).
+   * @return {number}      - The scaled size.
+   */
+  scaleSize(size: number): number {
+    return size / this.cameraSizeRatio;
   }
 }

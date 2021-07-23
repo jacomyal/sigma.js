@@ -7,7 +7,6 @@
  */
 import { CameraState, Coordinates, Dimensions } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
-import Camera from "../camera";
 import Sigma from "../../sigma";
 
 const DRAG_TIMEOUT = 200;
@@ -176,14 +175,12 @@ export default class TouchCaptor extends Captor {
 
     switch (this.touchMode) {
       case 1: {
-        const camera = this.renderer.getCamera();
-        const { x: xStart, y: yStart } = camera.viewportToFramedGraph(
-          this.getDimensions(),
+        const { x: xStart, y: yStart } = this.renderer.viewportToFramedGraph(
           (this.startTouchesPositions || [])[0] as Coordinates,
         );
-        const { x, y } = camera.viewportToFramedGraph(this.getDimensions(), touchesPositions[0]);
+        const { x, y } = this.renderer.viewportToFramedGraph(touchesPositions[0]);
 
-        camera.setState({
+        this.renderer.getCamera().setState({
           x: startCameraState.x + xStart - x,
           y: startCameraState.y + yStart - y,
         });
@@ -214,9 +211,9 @@ export default class TouchCaptor extends Captor {
 
         // 2.
         const dimensions = this.getDimensions();
-        const touchGraphPosition = Camera.from(startCameraState).viewportToFramedGraph(
-          dimensions,
+        const touchGraphPosition = this.renderer.viewportToFramedGraph(
           (this.startTouchesPositions || [])[0] as Coordinates,
+          startCameraState,
         );
         const smallestDimension = Math.min(dimensions.width, dimensions.height);
 

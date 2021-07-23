@@ -7,8 +7,9 @@
  */
 import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
+
 import { Dimensions, Coordinates } from "../types";
-import Camera from "./camera";
+import Sigma from "../sigma";
 
 // TODO: full jsdocs
 
@@ -136,15 +137,12 @@ export class LabelGrid {
     return labels;
   }
 
-  draw(context: CanvasRenderingContext2D, camera: Camera): void {
+  draw(context: CanvasRenderingContext2D, renderer: Sigma): void {
     context.strokeStyle = "red";
     context.lineWidth = 1;
 
     for (let i = 0; i < this.columns; i++) {
-      const pos = camera.framedGraphToViewport(
-        { width: this.width, height: this.height },
-        { x: (i * this.cellSize) / this.width, y: 0 },
-      );
+      const pos = renderer.framedGraphToViewport({ x: (i * this.cellSize) / this.width, y: 0 });
 
       context.beginPath();
       context.moveTo(pos.x, 0);
@@ -153,10 +151,7 @@ export class LabelGrid {
     }
 
     for (let j = 0; j < this.rows; j++) {
-      const pos = camera.framedGraphToViewport(
-        { width: this.width, height: this.height },
-        { x: 0, y: (j * this.cellSize) / this.height },
-      );
+      const pos = renderer.framedGraphToViewport({ x: 0, y: (j * this.cellSize) / this.height });
 
       context.beginPath();
       context.moveTo(0, pos.y);
@@ -171,8 +166,6 @@ export class LabelGrid {
  * labels
  *
  * @param  {object} params                 - Parameters:
- * @param  {object}   nodeDataCache        - Cache storing nodes data.
- * @param  {object}   edgeDataCache        - Cache storing edges data.
  * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
  * @param  {Set}      highlightedNodes     - Highlighted nodes.
  * @param  {Graph}    graph                - The rendered graph.
