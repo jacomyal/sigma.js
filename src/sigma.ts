@@ -932,18 +932,11 @@ export default class Sigma extends EventEmitter {
 
     // Then we need to extract a matrix from the camera
     const cameraState = this.camera.getState();
-    this.matrix = matrixFromCamera(cameraState, {
-      width: this.width,
-      height: this.height,
-    });
-    this.invMatrix = matrixFromCamera(
-      cameraState,
-      {
-        width: this.width,
-        height: this.height,
-      },
-      true,
-    );
+    const viewportDimensions = this.getDimensions();
+    const graphDimensions = this.getGraphDimensions();
+    const padding = this.getSetting("stagePadding") || 0;
+    this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
+    this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
 
     let program;
 
@@ -1044,6 +1037,18 @@ export default class Sigma extends EventEmitter {
    */
   getDimensions(): Dimensions {
     return { width: this.width, height: this.height };
+  }
+
+  /**
+   * Method returning the current graph's dimensions.
+   *
+   * @return {Dimensions}
+   */
+  getGraphDimensions(): Dimensions {
+    return {
+      width: this.nodeExtent.x[1] - this.nodeExtent.x[0],
+      height: this.nodeExtent.y[1] - this.nodeExtent.y[0],
+    };
   }
 
   /**
@@ -1293,7 +1298,15 @@ export default class Sigma extends EventEmitter {
    * @return {object}              - The point coordinates in the graph frame.
    */
   viewportToFramedGraph(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const invMatrix = cameraState ? matrixFromCamera(cameraState, this.getDimensions(), true) : this.invMatrix;
+    const invMatrix = cameraState
+      ? matrixFromCamera(
+          cameraState,
+          this.getDimensions(),
+          this.getGraphDimensions(),
+          this.getSetting("stagePadding") || 0,
+          true,
+        )
+      : this.invMatrix;
 
     const viewportVec = [(coordinates.x / this.width) * 2 - 1, 1 - (coordinates.y / this.height) * 2, 1];
     const framedGraphVec = multiplyVec(invMatrix, viewportVec);

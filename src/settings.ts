@@ -45,6 +45,7 @@ export interface Settings {
   edgeLabelFont: string;
   edgeLabelSize: number;
   edgeLabelWeight: string;
+  stagePadding: number;
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
@@ -82,6 +83,7 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeLabelFont: "Arial",
   edgeLabelSize: 14,
   edgeLabelWeight: "normal",
+  stagePadding: 30,
 
   // Labels
   labelDensity: 0.07,

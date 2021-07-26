@@ -238,25 +238,63 @@ export function floatColor(val: string): number {
 }
 
 /**
+ * In sigma, the graph is normalized into a [0, 1], [0, 1] square, before being given to the various renderers. This
+ * helps dealing with quadtree in particular.
+ * But at some point, we need to rescale it so that it takes the best place in the screen, ie. we always want to see two
+ * nodes "touching" opposite sides of the graph, with the camera being at its default state.
+ *
+ * This function determines this ratio.
+ */
+export function getCorrectionRatio(
+  viewportDimensions: { width: number; height: number },
+  graphDimensions: { width: number; height: number },
+): number {
+  const viewportRatio = viewportDimensions.height / viewportDimensions.width;
+  const graphRatio = graphDimensions.height / graphDimensions.width;
+
+  // If the stage and the graphs are in different directions (such as the graph being wider that tall while the stage
+  // is taller than wide), we can stop here to have indeed nodes touching opposite sides:
+  if ((viewportRatio < 1 && graphRatio > 1) || (viewportRatio > 1 && graphRatio < 1)) {
+    return 1;
+  }
+
+  // Else, we need to fit the graph inside the stage:
+  // 1. If the graph is "squarer" (ie. with a ratio closer to 1), we need to make the largest sides touch;
+  // 2. If the stage is "squarer", we need to make the smallest sides touch.
+  return Math.min(Math.max(graphRatio, 1 / graphRatio), Math.max(1 / viewportRatio, viewportRatio));
+}
+
+/**
  * Function returning a matrix from the current state of the camera.
  */
 
 // TODO: it's possible to optimize this drastically!
 export function matrixFromCamera(
   state: CameraState,
-  dimensions: { width: number; height: number },
+  viewportDimensions: { width: number; height: number },
+  graphDimensions: { width: number; height: number },
+  padding: number,
   inverse?: boolean,
 ): Float32Array {
   const { angle, ratio, x, y } = state;
 
-  const { width, height } = dimensions;
+  const { width, height } = viewportDimensions;
 
   const matrix = identity();
 
-  const smallestDimension = Math.min(width, height);
+  const smallestDimension = Math.min(width, height) - 2 * padding;
+
+  const correctionRatio = getCorrectionRatio(viewportDimensions, graphDimensions);
 
   if (!inverse) {
-    multiply(matrix, scale(identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height)));
+    multiply(
+      matrix,
+      scale(
+        identity(),
+        2 * (smallestDimension / width) * correctionRatio,
+        2 * (smallestDimension / height) * correctionRatio,
+      ),
+    );
     multiply(matrix, rotate(identity(), -angle));
     multiply(matrix, scale(identity(), 1 / ratio));
     multiply(matrix, translate(identity(), -x, -y));
@@ -264,7 +302,14 @@ export function matrixFromCamera(
     multiply(matrix, translate(identity(), x, y));
     multiply(matrix, scale(identity(), ratio));
     multiply(matrix, rotate(identity(), angle));
-    multiply(matrix, scale(identity(), width / smallestDimension / 2, height / smallestDimension / 2));
+    multiply(
+      matrix,
+      scale(
+        identity(),
+        width / smallestDimension / 2 / correctionRatio,
+        height / smallestDimension / 2 / correctionRatio,
+      ),
+    );
   }
 
   return matrix;
