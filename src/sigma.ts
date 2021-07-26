@@ -1278,7 +1278,14 @@ export default class Sigma extends EventEmitter {
    * @return {object}             - The point coordinates in the viewport.
    */
   framedGraphToViewport(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const matrix = cameraState ? matrixFromCamera(cameraState, this.getDimensions()) : this.matrix;
+    const matrix = cameraState
+      ? matrixFromCamera(
+          cameraState,
+          this.getDimensions(),
+          this.getGraphDimensions(),
+          this.getSetting("stagePadding") || 0,
+        )
+      : this.matrix;
 
     const framedGraphVec = [coordinates.x, coordinates.y, 1];
     const viewportVec = multiplyVec(matrix, framedGraphVec);
