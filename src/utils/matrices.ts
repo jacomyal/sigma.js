@@ -37,7 +37,7 @@ export function translate(m: Float32Array, x: number, y: number): Float32Array {
   return m;
 }
 
-export function multiply(a: Float32Array, b: Float32Array): Float32Array {
+export function multiply<T extends number[] | Float32Array>(a: T, b: Float32Array | number[]): T {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2];
@@ -71,4 +71,28 @@ export function multiply(a: Float32Array, b: Float32Array): Float32Array {
   a[8] = b20 * a02 + b21 * a12 + b22 * a22;
 
   return a;
+}
+
+export function multiplyVec<T extends number[] | Float32Array>(a: Float32Array | number[], b: T): T {
+  const a00 = a[0],
+    a01 = a[1],
+    a02 = a[2];
+  const a10 = a[3],
+    a11 = a[4],
+    a12 = a[5];
+  const a20 = a[6],
+    a21 = a[7],
+    a22 = a[8];
+
+  const b0 = b[0],
+    b1 = b[1],
+    b2 = b[2];
+
+  const c = Array.isArray(b) ? [0, 0, 0] : Float32Array.of(0, 0, 0);
+
+  c[0] = b0 * a00 + b1 * a10 + b2 * a20;
+  c[1] = b0 * a01 + b1 * a11 + b2 * a21;
+  c[2] = b0 * a02 + b1 * a12 + b2 * a22;
+
+  return c as T;
 }

@@ -242,7 +242,11 @@ export function floatColor(val: string): number {
  */
 
 // TODO: it's possible to optimize this drastically!
-export function matrixFromCamera(state: CameraState, dimensions: { width: number; height: number }): Float32Array {
+export function matrixFromCamera(
+  state: CameraState,
+  dimensions: { width: number; height: number },
+  inverse?: boolean,
+): Float32Array {
   const { angle, ratio, x, y } = state;
 
   const { width, height } = dimensions;
@@ -251,16 +255,17 @@ export function matrixFromCamera(state: CameraState, dimensions: { width: number
 
   const smallestDimension = Math.min(width, height);
 
-  const cameraCentering = translate(identity(), -x, -y),
-    cameraScaling = scale(identity(), 1 / ratio),
-    cameraRotation = rotate(identity(), -angle),
-    viewportScaling = scale(identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
-
-  // Logical order is reversed
-  multiply(matrix, viewportScaling);
-  multiply(matrix, cameraRotation);
-  multiply(matrix, cameraScaling);
-  multiply(matrix, cameraCentering);
+  if (!inverse) {
+    multiply(matrix, scale(identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height)));
+    multiply(matrix, rotate(identity(), -angle));
+    multiply(matrix, scale(identity(), 1 / ratio));
+    multiply(matrix, translate(identity(), -x, -y));
+  } else {
+    multiply(matrix, translate(identity(), x, y));
+    multiply(matrix, scale(identity(), ratio));
+    multiply(matrix, rotate(identity(), angle));
+    multiply(matrix, scale(identity(), width / smallestDimension / 2, height / smallestDimension / 2));
+  }
 
   return matrix;
 }

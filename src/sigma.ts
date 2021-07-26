@@ -39,6 +39,7 @@ import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
+import { identity, multiplyVec } from "./utils/matrices";
 
 const { nodeExtent, edgeExtent } = graphExtent;
 
@@ -107,9 +108,11 @@ export default class Sigma extends EventEmitter {
   private edgeDataCache: Record<EdgeKey, EdgeDisplayData> = {};
   private nodeKeyToIndex: Record<NodeKey, number> = {};
   private edgeKeyToIndex: Record<EdgeKey, number> = {};
-  private nodeExtent: { x: Extent; y: Extent; z: Extent } | null = null;
+  private nodeExtent: { x: Extent; y: Extent; z: Extent } = { x: [0, 1], y: [0, 1], z: [0, 1] };
   private edgeExtent: { z: Extent } | null = null;
 
+  private matrix: Float32Array = identity();
+  private invMatrix: Float32Array = identity();
   private customBBox: { x: Extent; y: Extent } | null = null;
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
     x: [-Infinity, Infinity],
@@ -928,11 +931,19 @@ export default class Sigma extends EventEmitter {
       mouseCaptor.currentWheelDirection;
 
     // Then we need to extract a matrix from the camera
-    const cameraState = this.camera.getState(),
-      cameraMatrix = matrixFromCamera(cameraState, {
+    const cameraState = this.camera.getState();
+    this.matrix = matrixFromCamera(cameraState, {
+      width: this.width,
+      height: this.height,
+    });
+    this.invMatrix = matrixFromCamera(
+      cameraState,
+      {
         width: this.width,
         height: this.height,
-      });
+      },
+      true,
+    );
 
     let program;
 
@@ -940,7 +951,7 @@ export default class Sigma extends EventEmitter {
     program = this.nodePrograms[this.settings.defaultNodeType];
 
     program.render({
-      matrix: cameraMatrix,
+      matrix: this.matrix,
       width: this.width,
       height: this.height,
       ratio: cameraState.ratio,
@@ -953,7 +964,7 @@ export default class Sigma extends EventEmitter {
       program = this.edgePrograms[this.settings.defaultEdgeType];
 
       program.render({
-        matrix: cameraMatrix,
+        matrix: this.matrix,
         width: this.width,
         height: this.height,
         ratio: cameraState.ratio,
@@ -1262,25 +1273,14 @@ export default class Sigma extends EventEmitter {
    * @return {object}             - The point coordinates in the viewport.
    */
   framedGraphToViewport(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const smallestDimension = Math.min(this.width, this.height);
+    const matrix = cameraState ? matrixFromCamera(cameraState, this.getDimensions()) : this.matrix;
 
-    const state = cameraState || this.camera.getState();
-    const dx = smallestDimension / this.width;
-    const dy = smallestDimension / this.height;
-    const ratio = state.ratio / smallestDimension;
-
-    // Align with center of the graph:
-    const x1 = (coordinates.x - state.x) / ratio;
-    const y1 = (state.y - coordinates.y) / ratio;
-
-    // Rotate:
-    const x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
-    const y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
+    const framedGraphVec = [coordinates.x, coordinates.y, 1];
+    const viewportVec = multiplyVec(matrix, framedGraphVec);
 
     return {
-      // Translate to center of screen
-      x: x2 + smallestDimension / 2 / dx,
-      y: y2 + smallestDimension / 2 / dy,
+      x: ((1 + viewportVec[0]) * this.width) / 2,
+      y: ((1 - viewportVec[1]) * this.height) / 2,
     };
   }
 
@@ -1293,24 +1293,14 @@ export default class Sigma extends EventEmitter {
    * @return {object}              - The point coordinates in the graph frame.
    */
   viewportToFramedGraph(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const smallestDimension = Math.min(this.width, this.height);
+    const invMatrix = cameraState ? matrixFromCamera(cameraState, this.getDimensions(), true) : this.invMatrix;
 
-    const state = cameraState || this.camera.getState();
-    const dx = smallestDimension / this.width;
-    const dy = smallestDimension / this.height;
-    const ratio = state.ratio / smallestDimension;
-
-    // Align with center of the graph:
-    const x1 = coordinates.x - smallestDimension / 2 / dx;
-    const y1 = coordinates.y - smallestDimension / 2 / dy;
-
-    // Rotate:
-    const x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
-    const y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
+    const viewportVec = [(coordinates.x / this.width) * 2 - 1, 1 - (coordinates.y / this.height) * 2, 1];
+    const framedGraphVec = multiplyVec(invMatrix, viewportVec);
 
     return {
-      x: x2 * ratio + state.x,
-      y: -y2 * ratio + state.y,
+      x: framedGraphVec[0],
+      y: framedGraphVec[1],
     };
   }
 
