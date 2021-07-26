@@ -695,21 +695,23 @@ export default class Sigma extends EventEmitter {
     const dimensions = this.getDimensions();
 
     // Finding visible nodes to display their labels
-    let visibleNodes: NodeKey[];
+    let visibleNodes: Set<NodeKey>;
 
     if (cameraState.ratio >= 1) {
       // Camera is unzoomed so no need to ask the quadtree for visible nodes
-      visibleNodes = this.graph.nodes();
+      visibleNodes = new Set(this.graph.nodes());
     } else {
       // Let's ask the quadtree
       const viewRectangle = this.camera.viewRectangle(dimensions);
 
-      visibleNodes = this.quadtree.rectangle(
-        viewRectangle.x1,
-        1 - viewRectangle.y1,
-        viewRectangle.x2,
-        1 - viewRectangle.y2,
-        viewRectangle.height,
+      visibleNodes = new Set(
+        this.quadtree.rectangle(
+          viewRectangle.x1,
+          1 - viewRectangle.y1,
+          viewRectangle.x2,
+          1 - viewRectangle.y2,
+          viewRectangle.height,
+        ),
       );
     }
 
@@ -717,12 +719,14 @@ export default class Sigma extends EventEmitter {
     // TODO: drop gridsettings likewise
     // TODO: optimize through visible nodes
     const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
+    this.displayedLabels = new Set();
 
     // Drawing labels
     const context = this.canvasContexts.labels;
 
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
-      const data = this.nodeDataCache[labelsToDisplay[i]];
+      const node = labelsToDisplay[i];
+      const data = this.nodeDataCache[node];
 
       // If the node is hidden, we don't need to display its label obviously
       if (data.hidden) continue;
@@ -735,10 +739,20 @@ export default class Sigma extends EventEmitter {
 
       if (size < this.settings.labelRenderedSizeThreshold) continue;
 
+      if (!visibleNodes.has(node)) continue;
+
+      // TODO:
+      // Because displayed edge labels depend directly on actually rendered node
+      // labels, we need to only add to this.displayedLabels nodes whose label
+      // is rendered.
+      // This makes this.displayedLabels depend on viewport, which might become
+      // an issue once we start memoizing getLabelsToDisplay.
+      this.displayedLabels.add(node);
+
       this.settings.labelRenderer(
         context,
         {
-          key: labelsToDisplay[i],
+          key: node,
           label: data.label,
           color: "#000",
           size,
@@ -748,8 +762,6 @@ export default class Sigma extends EventEmitter {
         this.settings,
       );
     }
-
-    this.displayedLabels = new Set(labelsToDisplay);
 
     return this;
   }
