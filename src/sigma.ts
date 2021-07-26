@@ -1045,9 +1045,11 @@ export default class Sigma extends EventEmitter {
    * @return {Dimensions}
    */
   getGraphDimensions(): Dimensions {
+    const extent = this.customBBox || this.nodeExtent;
+
     return {
-      width: this.nodeExtent.x[1] - this.nodeExtent.x[0],
-      height: this.nodeExtent.y[1] - this.nodeExtent.y[0],
+      width: extent.x[1] - extent.x[0],
+      height: extent.y[1] - extent.y[0],
     };
   }
 
