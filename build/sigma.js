@@ -59,17 +59,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -89,7 +78,6 @@ var utils_1 = __webpack_require__(4);
  * Defaults.
  */
 var DEFAULT_ZOOMING_RATIO = 1.5;
-var SIZE_SCALING_EXPONENT = 0.5;
 /**
  * Camera class
  *
@@ -104,15 +92,10 @@ var Camera = /** @class */ (function (_super) {
         _this.angle = 0;
         _this.ratio = 1;
         _this.nextFrame = null;
+        _this.previousState = null;
         _this.enabled = true;
-        _this.sizeRatio = 1;
-        _this.positiveAngleCos = 1;
-        _this.negativeAngleCos = 1;
-        _this.positiveAngleSin = 0;
-        _this.negativeAngleSin = -0;
         // State
         _this.previousState = _this.getState();
-        _this.updateCachedValues();
         return _this;
     }
     /**
@@ -124,17 +107,6 @@ var Camera = /** @class */ (function (_super) {
     Camera.from = function (state) {
         var camera = new Camera();
         return camera.setState(state);
-    };
-    /**
-     * Internal method used to update expensive and therefore cached values
-     * each time the camera state is updated.
-     */
-    Camera.prototype.updateCachedValues = function () {
-        this.sizeRatio = Math.pow(this.ratio, SIZE_SCALING_EXPONENT);
-        this.positiveAngleCos = Math.cos(this.angle);
-        this.negativeAngleCos = Math.cos(-this.angle);
-        this.positiveAngleSin = Math.sin(this.angle);
-        this.negativeAngleSin = Math.sin(-this.angle);
     };
     /**
      * Method used to enable the camera.
@@ -182,6 +154,8 @@ var Camera = /** @class */ (function (_super) {
      */
     Camera.prototype.getPreviousState = function () {
         var state = this.previousState;
+        if (!state)
+            return null;
         return {
             x: state.x,
             y: state.y,
@@ -196,83 +170,6 @@ var Camera = /** @class */ (function (_super) {
      */
     Camera.prototype.isAnimated = function () {
         return !!this.nextFrame;
-    };
-    /**
-     * Method returning the coordinates of a point from the framed graph system to the
-     * viewport system.
-     *
-     * @param  {object} dimensions  - Dimensions of the viewport.
-     * @param  {object} coordinates - Coordinates of the point.
-     * @return {object}             - The point coordinates in the viewport.
-     */
-    Camera.prototype.framedGraphToViewport = function (dimensions, coordinates) {
-        var smallestDimension = Math.min(dimensions.width, dimensions.height);
-        var dx = smallestDimension / dimensions.width;
-        var dy = smallestDimension / dimensions.height;
-        var ratio = this.ratio / smallestDimension;
-        // Align with center of the graph:
-        var x1 = (coordinates.x - this.x) / ratio;
-        var y1 = (this.y - coordinates.y) / ratio;
-        // Rotate:
-        var x2 = x1 * this.positiveAngleCos - y1 * this.positiveAngleSin;
-        var y2 = y1 * this.positiveAngleCos + x1 * this.positiveAngleSin;
-        return {
-            // Translate to center of screen
-            x: x2 + smallestDimension / 2 / dx,
-            y: y2 + smallestDimension / 2 / dy,
-        };
-    };
-    /**
-     * Method returning the coordinates of a point from the viewport system to the
-     * framed graph system.
-     *
-     * @param  {object} dimensions  - Dimensions of the viewport.
-     * @param  {object} coordinates - Coordinates of the point.
-     * @return {object}             - The point coordinates in the graph frame.
-     */
-    Camera.prototype.viewportToFramedGraph = function (dimensions, coordinates) {
-        var smallestDimension = Math.min(dimensions.width, dimensions.height);
-        var dx = smallestDimension / dimensions.width;
-        var dy = smallestDimension / dimensions.height;
-        var ratio = this.ratio / smallestDimension;
-        // Align with center of the graph:
-        var x1 = coordinates.x - smallestDimension / 2 / dx;
-        var y1 = coordinates.y - smallestDimension / 2 / dy;
-        // Rotate:
-        var x2 = x1 * this.negativeAngleCos - y1 * this.negativeAngleSin;
-        var y2 = y1 * this.negativeAngleCos + x1 * this.negativeAngleSin;
-        return {
-            x: x2 * ratio + this.x,
-            y: -y2 * ratio + this.y,
-        };
-    };
-    /**
-     * Method used to scale the given size according to the camera's ratio, i.e.
-     * zooming state.
-     *
-     * @param  {number} size - The size to scale (node size, edge thickness etc.).
-     * @return {number}      - The scaled size.
-     */
-    Camera.prototype.scaleSize = function (size) {
-        return size / this.sizeRatio;
-    };
-    /**
-     * Method returning the abstract rectangle containing the graph according
-     * to the camera's state.
-     *
-     * @return {object} - The view's rectangle.
-     */
-    Camera.prototype.viewRectangle = function (dimensions) {
-        // TODO: reduce relative margin?
-        var marginX = (0 * dimensions.width) / 8, marginY = (0 * dimensions.height) / 8;
-        var p1 = this.viewportToFramedGraph(dimensions, { x: 0 - marginX, y: 0 - marginY }), p2 = this.viewportToFramedGraph(dimensions, { x: dimensions.width + marginX, y: 0 - marginY }), h = this.viewportToFramedGraph(dimensions, { x: 0, y: dimensions.height + marginY });
-        return {
-            x1: p1.x,
-            y1: p1.y,
-            x2: p2.x,
-            y2: p2.y,
-            height: p2.y - h.y,
-        };
     };
     /**
      * Method used to set the camera's state.
@@ -295,31 +192,10 @@ var Camera = /** @class */ (function (_super) {
             this.angle = state.angle;
         if (state.ratio)
             this.ratio = state.ratio;
-        this.updateCachedValues();
         // Emitting
         if (!this.hasState(this.previousState))
             this.emit("updated", this.getState());
         return this;
-    };
-    /**
-     * Method used to (un)zoom, while preserving the position of a viewport point.
-     * Used for instance to
-     *
-     * @param viewportTarget
-     * @param dimensions
-     * @param ratio
-     * @return {CameraState}
-     */
-    Camera.prototype.getViewportZoomedState = function (viewportTarget, dimensions, ratio) {
-        // TODO: handle max zoom
-        var ratioDiff = ratio / this.ratio;
-        var center = {
-            x: dimensions.width / 2,
-            y: dimensions.height / 2,
-        };
-        var graphMousePosition = this.viewportToFramedGraph(dimensions, viewportTarget);
-        var graphCenterPosition = this.viewportToFramedGraph(dimensions, center);
-        return __assign(__assign({}, this.getState()), { x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + this.x, y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + this.y, ratio: ratio });
     };
     /**
      * Method used to animate the camera.
@@ -1031,7 +907,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateGraph = exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assignDeep = exports.isPlainObject = void 0;
+exports.validateGraph = exports.canUse32BitsIndices = exports.extractPixel = exports.matrixFromCamera = exports.getCorrectionRatio = exports.floatColor = exports.zIndexOrdering = exports.createNormalizationFunction = exports.getPixelRatio = exports.createElement = exports.cancelFrame = exports.requestFrame = exports.assignDeep = exports.isPlainObject = void 0;
 var is_graph_1 = __importDefault(__webpack_require__(5));
 var matrices_1 = __webpack_require__(6);
 /**
@@ -1217,20 +1093,49 @@ function floatColor(val) {
 }
 exports.floatColor = floatColor;
 /**
+ * In sigma, the graph is normalized into a [0, 1], [0, 1] square, before being given to the various renderers. This
+ * helps dealing with quadtree in particular.
+ * But at some point, we need to rescale it so that it takes the best place in the screen, ie. we always want to see two
+ * nodes "touching" opposite sides of the graph, with the camera being at its default state.
+ *
+ * This function determines this ratio.
+ */
+function getCorrectionRatio(viewportDimensions, graphDimensions) {
+    var viewportRatio = viewportDimensions.height / viewportDimensions.width;
+    var graphRatio = graphDimensions.height / graphDimensions.width;
+    // If the stage and the graphs are in different directions (such as the graph being wider that tall while the stage
+    // is taller than wide), we can stop here to have indeed nodes touching opposite sides:
+    if ((viewportRatio < 1 && graphRatio > 1) || (viewportRatio > 1 && graphRatio < 1)) {
+        return 1;
+    }
+    // Else, we need to fit the graph inside the stage:
+    // 1. If the graph is "squarer" (ie. with a ratio closer to 1), we need to make the largest sides touch;
+    // 2. If the stage is "squarer", we need to make the smallest sides touch.
+    return Math.min(Math.max(graphRatio, 1 / graphRatio), Math.max(1 / viewportRatio, viewportRatio));
+}
+exports.getCorrectionRatio = getCorrectionRatio;
+/**
  * Function returning a matrix from the current state of the camera.
  */
 // TODO: it's possible to optimize this drastically!
-function matrixFromCamera(state, dimensions) {
+function matrixFromCamera(state, viewportDimensions, graphDimensions, padding, inverse) {
     var angle = state.angle, ratio = state.ratio, x = state.x, y = state.y;
-    var width = dimensions.width, height = dimensions.height;
+    var width = viewportDimensions.width, height = viewportDimensions.height;
     var matrix = matrices_1.identity();
-    var smallestDimension = Math.min(width, height);
-    var cameraCentering = matrices_1.translate(matrices_1.identity(), -x, -y), cameraScaling = matrices_1.scale(matrices_1.identity(), 1 / ratio), cameraRotation = matrices_1.rotate(matrices_1.identity(), -angle), viewportScaling = matrices_1.scale(matrices_1.identity(), 2 * (smallestDimension / width), 2 * (smallestDimension / height));
-    // Logical order is reversed
-    matrices_1.multiply(matrix, viewportScaling);
-    matrices_1.multiply(matrix, cameraRotation);
-    matrices_1.multiply(matrix, cameraScaling);
-    matrices_1.multiply(matrix, cameraCentering);
+    var smallestDimension = Math.min(width, height) - 2 * padding;
+    var correctionRatio = getCorrectionRatio(viewportDimensions, graphDimensions);
+    if (!inverse) {
+        matrices_1.multiply(matrix, matrices_1.scale(matrices_1.identity(), 2 * (smallestDimension / width) * correctionRatio, 2 * (smallestDimension / height) * correctionRatio));
+        matrices_1.multiply(matrix, matrices_1.rotate(matrices_1.identity(), -angle));
+        matrices_1.multiply(matrix, matrices_1.scale(matrices_1.identity(), 1 / ratio));
+        matrices_1.multiply(matrix, matrices_1.translate(matrices_1.identity(), -x, -y));
+    }
+    else {
+        matrices_1.multiply(matrix, matrices_1.translate(matrices_1.identity(), x, y));
+        matrices_1.multiply(matrix, matrices_1.scale(matrices_1.identity(), ratio));
+        matrices_1.multiply(matrix, matrices_1.rotate(matrices_1.identity(), angle));
+        matrices_1.multiply(matrix, matrices_1.scale(matrices_1.identity(), width / smallestDimension / 2 / correctionRatio, height / smallestDimension / 2 / correctionRatio));
+    }
     return matrix;
 }
 exports.matrixFromCamera = matrixFromCamera;
@@ -1311,7 +1216,7 @@ module.exports = function isGraph(value) {
  * @module
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.multiply = exports.translate = exports.rotate = exports.scale = exports.identity = void 0;
+exports.multiplyVec = exports.multiply = exports.translate = exports.rotate = exports.scale = exports.identity = void 0;
 function identity() {
     return Float32Array.of(1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
@@ -1357,6 +1262,18 @@ function multiply(a, b) {
     return a;
 }
 exports.multiply = multiply;
+function multiplyVec(a, b) {
+    var a00 = a[0], a01 = a[1], a02 = a[2];
+    var a10 = a[3], a11 = a[4], a12 = a[5];
+    var a20 = a[6], a21 = a[7], a22 = a[8];
+    var b0 = b[0], b1 = b[1], b2 = b[2];
+    var c = Array.isArray(b) ? [0, 0, 0] : Float32Array.of(0, 0, 0);
+    c[0] = b0 * a00 + b1 * a10 + b2 * a20;
+    c[1] = b0 * a01 + b1 * a11 + b2 * a21;
+    c[2] = b0 * a02 + b1 * a12 + b2 * a22;
+    return c;
+}
+exports.multiplyVec = multiplyVec;
 
 
 /***/ }),
@@ -1473,8 +1390,10 @@ var extend_1 = __importDefault(__webpack_require__(9));
  *   - BOTTOM_RIGHT: 4i + 4b
  */
 var BLOCKS = 4, MAX_LEVEL = 5;
+var OUTSIDE_BLOCK = "outside";
 var X_OFFSET = 0, Y_OFFSET = 1, WIDTH_OFFSET = 2, HEIGHT_OFFSET = 3;
 var TOP_LEFT = 1, TOP_RIGHT = 2, BOTTOM_LEFT = 3, BOTTOM_RIGHT = 4;
+var hasWarnedTooMuchOutside = false;
 /**
  * Geometry helpers.
  */
@@ -1607,7 +1526,17 @@ function insertNode(maxLevel, data, containers, key, x, y, size) {
             else
                 return acc;
         }, 0);
-        // If we don't have at least a collision, there is an issue
+        // If we have no collision at root level, inject node in the outside block
+        if (collisions === 0 && level === 0) {
+            containers[OUTSIDE_BLOCK].push(key);
+            if (!hasWarnedTooMuchOutside && containers[OUTSIDE_BLOCK].length >= 5) {
+                hasWarnedTooMuchOutside = true;
+                console.warn("sigma/quadtree.insertNode: At least 5 nodes are outside the global quadtree zone. " +
+                    "You might have a problem with the normalization function or the custom bounding box.");
+            }
+            return;
+        }
+        // If we don't have at least a collision but deeper, there is an issue
         if (collisions === 0)
             throw new Error("sigma/quadtree.insertNode: no collision (level: " + level + ", key: " + key + ", x: " + x + ", y: " + y + ", size: " + size + ").");
         // If we have 3 collisions, we have a geometry problem obviously
@@ -1672,8 +1601,9 @@ function getNodesInAxisAlignedRectangleArea(maxLevel, data, containers, x1, y1, 
  */
 var QuadTree = /** @class */ (function () {
     function QuadTree(params) {
+        var _a;
         if (params === void 0) { params = {}; }
-        this.containers = {};
+        this.containers = (_a = {}, _a[OUTSIDE_BLOCK] = [], _a);
         this.cache = null;
         this.lastRectangle = null;
         // Allocating the underlying byte array
@@ -1703,12 +1633,16 @@ var QuadTree = /** @class */ (function () {
         buildQuadrants(MAX_LEVEL, this.data);
     };
     QuadTree.prototype.clear = function () {
-        this.containers = {};
+        var _a;
+        this.containers = (_a = {}, _a[OUTSIDE_BLOCK] = [], _a);
         return this;
     };
     QuadTree.prototype.point = function (x, y) {
         var nodes = [];
         var block = 0, level = 0;
+        // If the point is out of the quadtree, return the full outside block:
+        if (x < 0 || y < 0 || x > 1 || y > 1)
+            return this.containers[OUTSIDE_BLOCK];
         do {
             if (this.containers[block])
                 nodes.push.apply(nodes, __spreadArray([], __read(this.containers[block])));
@@ -1719,6 +1653,7 @@ var QuadTree = /** @class */ (function () {
         return nodes;
     };
     QuadTree.prototype.rectangle = function (x1, y1, x2, y2, height) {
+        var _a;
         var lr = this.lastRectangle;
         if (lr && x1 === lr.x1 && x2 === lr.x2 && y1 === lr.y1 && y2 === lr.y2 && height === lr.height) {
             return this.cache;
@@ -1734,6 +1669,8 @@ var QuadTree = /** @class */ (function () {
         if (!isRectangleAligned(this.lastRectangle))
             this.lastRectangle = getCircumscribedAlignedRectangle(this.lastRectangle);
         this.cache = getNodesInAxisAlignedRectangleArea(MAX_LEVEL, this.data, this.containers, x1, y1, Math.abs(x1 - x2) || Math.abs(y1 - y2), height);
+        // Add all the nodes in the outside block, since they might be relevant, and since they should be very few:
+        (_a = this.cache).push.apply(_a, __spreadArray([], __read(this.containers[OUTSIDE_BLOCK])));
         return this.cache;
     };
     return QuadTree;
@@ -1849,8 +1786,8 @@ var DOUBLE_CLICK_ZOOMING_DURATION = 200;
  */
 var MouseCaptor = /** @class */ (function (_super) {
     __extends(MouseCaptor, _super);
-    function MouseCaptor(container, camera) {
-        var _this = _super.call(this, container, camera) || this;
+    function MouseCaptor(container, renderer) {
+        var _this = _super.call(this, container, renderer) || this;
         // State
         _this.enabled = true;
         _this.draggedEvents = 0;
@@ -1921,11 +1858,9 @@ var MouseCaptor = /** @class */ (function (_super) {
     MouseCaptor.prototype.handleDoubleClick = function (e) {
         if (!this.enabled)
             return;
-        var newRatio = this.camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
-        this.camera.animate(this.camera.getViewportZoomedState({ x: captor_1.getX(e), y: captor_1.getY(e) }, {
-            width: this.container.offsetWidth,
-            height: this.container.offsetHeight,
-        }, newRatio), {
+        var camera = this.renderer.getCamera();
+        var newRatio = camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+        camera.animate(this.renderer.getViewportZoomedState({ x: captor_1.getX(e), y: captor_1.getY(e) }, newRatio), {
             easing: "quadraticInOut",
             duration: DOUBLE_CLICK_ZOOMING_DURATION,
         });
@@ -1939,7 +1874,7 @@ var MouseCaptor = /** @class */ (function (_super) {
     MouseCaptor.prototype.handleDown = function (e) {
         if (!this.enabled)
             return;
-        this.startCameraState = this.camera.getState();
+        this.startCameraState = this.renderer.getCamera().getState();
         this.lastMouseX = captor_1.getX(e);
         this.lastMouseY = captor_1.getY(e);
         this.draggedEvents = 0;
@@ -1956,15 +1891,16 @@ var MouseCaptor = /** @class */ (function (_super) {
         var _this = this;
         if (!this.enabled || !this.isMouseDown)
             return;
+        var camera = this.renderer.getCamera();
         this.isMouseDown = false;
         if (typeof this.movingTimeout === "number") {
             clearTimeout(this.movingTimeout);
             this.movingTimeout = null;
         }
         var x = captor_1.getX(e), y = captor_1.getY(e);
-        var cameraState = this.camera.getState(), previousCameraState = this.camera.getPreviousState();
+        var cameraState = camera.getState(), previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
         if (this.isMoving) {
-            this.camera.animate({
+            camera.animate({
                 x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
                 y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
             }, {
@@ -1973,7 +1909,7 @@ var MouseCaptor = /** @class */ (function (_super) {
             });
         }
         else if (this.lastMouseX !== x || this.lastMouseY !== y) {
-            this.camera.setState({
+            camera.setState({
                 x: cameraState.x,
                 y: cameraState.y,
             });
@@ -1998,20 +1934,17 @@ var MouseCaptor = /** @class */ (function (_super) {
                 _this.movingTimeout = null;
                 _this.isMoving = false;
             }, DRAG_TIMEOUT);
-            var dimensions = {
-                width: this.container.offsetWidth,
-                height: this.container.offsetHeight,
-            };
+            var camera = this.renderer.getCamera();
             var eX = captor_1.getX(e), eY = captor_1.getY(e);
-            var lastMouse = this.camera.viewportToFramedGraph(dimensions, {
+            var lastMouse = this.renderer.viewportToFramedGraph({
                 x: this.lastMouseX,
                 y: this.lastMouseY,
             });
-            var mouse = this.camera.viewportToFramedGraph(dimensions, { x: eX, y: eY });
+            var mouse = this.renderer.viewportToFramedGraph({ x: eX, y: eY });
             var offsetX = lastMouse.x - mouse.x, offsetY = lastMouse.y - mouse.y;
-            var cameraState = this.camera.getState();
+            var cameraState = camera.getState();
             var x = cameraState.x + offsetX, y = cameraState.y + offsetY;
-            this.camera.setState({ x: x, y: y });
+            camera.setState({ x: x, y: y });
             this.lastMouseX = eX;
             this.lastMouseY = eY;
         }
@@ -2035,7 +1968,8 @@ var MouseCaptor = /** @class */ (function (_super) {
         if (!delta)
             return false;
         var ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
-        var newRatio = this.camera.getState().ratio * ratioDiff;
+        var camera = this.renderer.getCamera();
+        var newRatio = camera.getState().ratio * ratioDiff;
         var wheelDirection = delta > 0 ? 1 : -1;
         var now = Date.now();
         // Cancel events that are too close too each other and in the same direction:
@@ -2044,10 +1978,7 @@ var MouseCaptor = /** @class */ (function (_super) {
             now - this.lastWheelTriggerTime < MOUSE_ZOOM_DURATION / 5) {
             return false;
         }
-        this.camera.animate(this.camera.getViewportZoomedState({ x: captor_1.getX(e), y: captor_1.getY(e) }, {
-            width: this.container.offsetWidth,
-            height: this.container.offsetHeight,
-        }, newRatio), {
+        camera.animate(this.renderer.getViewportZoomedState({ x: captor_1.getX(e), y: captor_1.getY(e) }, newRatio), {
             easing: "quadraticOut",
             duration: MOUSE_ZOOM_DURATION,
         }, function () {
@@ -2206,11 +2137,11 @@ exports.getWheelDelta = getWheelDelta;
  */
 var Captor = /** @class */ (function (_super) {
     __extends(Captor, _super);
-    function Captor(container, camera) {
+    function Captor(container, renderer) {
         var _this = _super.call(this) || this;
         // Properties
         _this.container = container;
-        _this.camera = camera;
+        _this.renderer = renderer;
         return _this;
     }
     return Captor;
@@ -2257,12 +2188,14 @@ var utils_1 = __webpack_require__(4);
 var labels_1 = __webpack_require__(15);
 var settings_1 = __webpack_require__(16);
 var touch_1 = __importDefault(__webpack_require__(37));
+var matrices_1 = __webpack_require__(6);
 var nodeExtent = extent_1.default.nodeExtent, edgeExtent = extent_1.default.edgeExtent;
 /**
  * Constants.
  */
 var PIXEL_RATIO = utils_1.getPixelRatio();
 var WEBGL_OVERSAMPLING_RATIO = utils_1.getPixelRatio();
+var SIZE_SCALING_EXPONENT = 0.5;
 /**
  * Important functions.
  */
@@ -2310,22 +2243,32 @@ var Sigma = /** @class */ (function (_super) {
         _this.webGLContexts = {};
         _this.activeListeners = {};
         _this.quadtree = new quadtree_1.default();
+        _this.labelGrid = new labels_1.LabelGrid();
         _this.nodeDataCache = {};
         _this.edgeDataCache = {};
         _this.nodeKeyToIndex = {};
         _this.edgeKeyToIndex = {};
-        _this.nodeExtent = null;
+        _this.nodeExtent = { x: [0, 1], y: [0, 1], z: [0, 1] };
         _this.edgeExtent = null;
+        _this.matrix = matrices_1.identity();
+        _this.invMatrix = matrices_1.identity();
+        _this.customBBox = null;
         _this.normalizationFunction = utils_1.createNormalizationFunction({
             x: [-Infinity, Infinity],
             y: [-Infinity, Infinity],
         });
+        // Cache:
+        _this.cameraSizeRatio = 1;
+        _this.positiveAngleCos = 1;
+        _this.negativeAngleCos = 1;
+        _this.positiveAngleSin = 0;
+        _this.negativeAngleSin = -0;
         // Starting dimensions
         _this.width = 0;
         _this.height = 0;
         // State
-        _this.highlightedNodes = new Set();
         _this.displayedLabels = new Set();
+        _this.highlightedNodes = new Set();
         _this.hoveredNode = null;
         _this.renderFrame = null;
         _this.renderHighlightedNodesFrame = null;
@@ -2374,8 +2317,8 @@ var Sigma = /** @class */ (function (_super) {
         // Binding camera events
         _this.bindCameraHandlers();
         // Initializing captors
-        _this.mouseCaptor = new mouse_1.default(_this.elements.mouse, _this.camera);
-        _this.touchCaptor = new touch_1.default(_this.elements.mouse, _this.camera);
+        _this.mouseCaptor = new mouse_1.default(_this.elements.mouse, _this);
+        _this.touchCaptor = new touch_1.default(_this.elements.mouse, _this);
         // Binding event handlers
         _this.bindEventHandlers();
         // Binding graph handlers
@@ -2501,7 +2444,7 @@ var Sigma = /** @class */ (function (_super) {
         };
         // Function returning the nodes in the mouse's quad
         var getQuadNodes = function (mouseX, mouseY) {
-            var mouseGraphPosition = _this.camera.viewportToFramedGraph({ width: _this.width, height: _this.height }, { x: mouseX, y: mouseY });
+            var mouseGraphPosition = _this.viewportToFramedGraph({ x: mouseX, y: mouseY });
             // TODO: minus 1? lol
             return _this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
         };
@@ -2510,14 +2453,13 @@ var Sigma = /** @class */ (function (_super) {
             // NOTE: for the canvas renderer, testing the pixel's alpha should
             // give some boost but this slows things down for WebGL empirically.
             var quadNodes = getQuadNodes(e.x, e.y);
-            var dimensions = _this.getDimensions();
             // We will hover the node whose center is closest to mouse
             var minDistance = Infinity, nodeToHover = null;
             for (var i = 0, l = quadNodes.length; i < l; i++) {
                 var node = quadNodes[i];
                 var data = _this.nodeDataCache[node];
-                var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                var size = _this.camera.scaleSize(data.size);
+                var pos = _this.framedGraphToViewport(data);
+                var size = _this.scaleSize(data.size);
                 if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
                     var distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
                     // TODO: sort by min size also for cases where center is the same
@@ -2539,8 +2481,8 @@ var Sigma = /** @class */ (function (_super) {
             // Checking if the hovered node is still hovered
             if (_this.hoveredNode) {
                 var data = _this.nodeDataCache[_this.hoveredNode];
-                var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                var size = _this.camera.scaleSize(data.size);
+                var pos = _this.framedGraphToViewport(data);
+                var size = _this.scaleSize(data.size);
                 if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
                     var node = _this.hoveredNode;
                     _this.hoveredNode = null;
@@ -2553,12 +2495,11 @@ var Sigma = /** @class */ (function (_super) {
         var createClickListener = function (eventType) {
             return function (e) {
                 var quadNodes = getQuadNodes(e.x, e.y);
-                var dimensions = _this.getDimensions();
                 for (var i = 0, l = quadNodes.length; i < l; i++) {
                     var node = quadNodes[i];
                     var data = _this.nodeDataCache[node];
-                    var pos = _this.camera.framedGraphToViewport(dimensions, data);
-                    var size = _this.camera.scaleSize(data.size);
+                    var pos = _this.framedGraphToViewport(data);
+                    var size = _this.scaleSize(data.size);
                     if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
                         return _this.emit(eventType + "Node", { node: node, captor: e, event: e });
                 }
@@ -2625,20 +2566,27 @@ var Sigma = /** @class */ (function (_super) {
      */
     Sigma.prototype.process = function (keepArrays) {
         if (keepArrays === void 0) { keepArrays = false; }
-        var graph = this.graph, settings = this.settings;
+        var graph = this.graph;
+        var settings = this.settings;
+        var dimensions = this.getDimensions();
+        var nullCamera = new camera_1.default();
+        var nullCameraMatrix = utils_1.matrixFromCamera(nullCamera.getState(), this.getDimensions(), this.getGraphDimensions(), this.getSetting("stagePadding") || 0);
         // Clearing the quad
         this.quadtree.clear();
+        // Resetting the label grid
+        // TODO: it's probably better to do this explicitly or on resizes for layout and anims
+        this.labelGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
         // Clear the highlightedNodes
         this.highlightedNodes = new Set();
         // Computing extents
-        var nodeExtentProperties = ["x", "y", "z"];
+        var nodeExtentProperties = ["x", "y"];
         if (this.settings.zIndex) {
             nodeExtentProperties.push("z");
             this.edgeExtent = edgeExtent(graph, ["z"]);
         }
         this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
         // Rescaling function
-        this.normalizationFunction = utils_1.createNormalizationFunction(this.nodeExtent);
+        this.normalizationFunction = utils_1.createNormalizationFunction(this.customBBox || this.nodeExtent);
         var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
         if (!keepArrays)
             nodeProgram.allocate(graph.order);
@@ -2663,12 +2611,14 @@ var Sigma = /** @class */ (function (_super) {
             this.nodeDataCache[node] = data;
             this.normalizationFunction.applyTo(data);
             this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
+            this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
             nodeProgram.process(data, data.hidden, i);
             // Save the node in the highlighted set if needed
             if (data.highlighted && !data.hidden)
                 this.highlightedNodes.add(node);
             this.nodeKeyToIndex[node] = i;
         }
+        this.labelGrid.organize();
         // TODO: maybe we should bind and buffer as part of rendering?
         // We also need to find when it is useful and when it's really not
         nodeProgram.bind();
@@ -2753,41 +2703,48 @@ var Sigma = /** @class */ (function (_super) {
         if (!this.settings.renderLabels)
             return this;
         var cameraState = this.camera.getState();
-        var dimensions = this.getDimensions();
+        // this.labelGrid.draw(this.canvasContexts.labels, this.camera);
         // Finding visible nodes to display their labels
         var visibleNodes;
         if (cameraState.ratio >= 1) {
             // Camera is unzoomed so no need to ask the quadtree for visible nodes
-            visibleNodes = this.graph.nodes();
+            visibleNodes = new Set(this.graph.nodes());
         }
         else {
             // Let's ask the quadtree
-            var viewRectangle = this.camera.viewRectangle(dimensions);
-            visibleNodes = this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height);
+            var viewRectangle = this.viewRectangle();
+            visibleNodes = new Set(this.quadtree.rectangle(viewRectangle.x1, 1 - viewRectangle.y1, viewRectangle.x2, 1 - viewRectangle.y2, viewRectangle.height));
         }
         // Selecting labels to draw
-        var gridSettings = this.settings.labelGrid;
-        var labelsToDisplay = labels_1.labelsToDisplayFromGrid({
-            cache: this.nodeDataCache,
-            camera: this.camera,
-            cell: gridSettings.cell,
-            dimensions: dimensions,
-            displayedLabels: this.displayedLabels,
-            fontSize: this.settings.labelSize,
-            graph: this.graph,
-            renderedSizeThreshold: gridSettings.renderedSizeThreshold,
-            visibleNodes: visibleNodes,
-        });
+        // TODO: drop gridsettings likewise
+        // TODO: optimize through visible nodes
+        var labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
+        this.displayedLabels = new Set();
         // Drawing labels
         var context = this.canvasContexts.labels;
         for (var i = 0, l = labelsToDisplay.length; i < l; i++) {
-            var data = this.nodeDataCache[labelsToDisplay[i]];
-            var _a = this.camera.framedGraphToViewport(dimensions, data), x = _a.x, y = _a.y;
+            var node = labelsToDisplay[i];
+            var data = this.nodeDataCache[node];
+            // If the node is hidden, we don't need to display its label obviously
+            if (data.hidden)
+                continue;
+            var _a = this.framedGraphToViewport(data), x = _a.x, y = _a.y;
             // TODO: we can cache the labels we need to render until the camera's ratio changes
             // TODO: this should be computed in the canvas components?
-            var size = this.camera.scaleSize(data.size);
+            var size = this.scaleSize(data.size);
+            if (size < this.settings.labelRenderedSizeThreshold)
+                continue;
+            if (!visibleNodes.has(node))
+                continue;
+            // TODO:
+            // Because displayed edge labels depend directly on actually rendered node
+            // labels, we need to only add to this.displayedLabels nodes whose label
+            // is rendered.
+            // This makes this.displayedLabels depend on viewport, which might become
+            // an issue once we start memoizing getLabelsToDisplay.
+            this.displayedLabels.add(node);
             this.settings.labelRenderer(context, {
-                key: labelsToDisplay[i],
+                key: node,
                 label: data.label,
                 color: "#000",
                 size: size,
@@ -2795,8 +2752,6 @@ var Sigma = /** @class */ (function (_super) {
                 y: y,
             }, this.settings);
         }
-        // Caching visible nodes and displayed labels
-        this.displayedLabels = new Set(labelsToDisplay);
         return this;
     };
     /**
@@ -2809,12 +2764,9 @@ var Sigma = /** @class */ (function (_super) {
         if (!this.settings.renderEdgeLabels)
             return this;
         var context = this.canvasContexts.edgeLabels;
-        var dimensions = this.getDimensions();
         // Clearing
         context.clearRect(0, 0, this.width, this.height);
         var edgeLabelsToDisplay = labels_1.edgeLabelsToDisplayFromNodes({
-            nodeDataCache: this.nodeDataCache,
-            edgeDataCache: this.edgeDataCache,
             graph: this.graph,
             hoveredNode: this.hoveredNode,
             displayedNodeLabels: this.displayedLabels,
@@ -2822,11 +2774,16 @@ var Sigma = /** @class */ (function (_super) {
         });
         for (var i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
             var edge = edgeLabelsToDisplay[i], extremities = this.graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]], edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
-            var _a = this.camera.framedGraphToViewport(dimensions, sourceData), sourceX = _a.x, sourceY = _a.y;
-            var _b = this.camera.framedGraphToViewport(dimensions, targetData), targetX = _b.x, targetY = _b.y;
+            // If the edge is hidden we don't need to display its label
+            // NOTE: the test on sourceData & targetData is probably paranoid at this point?
+            if (edgeData.hidden || sourceData.hidden || targetData.hidden) {
+                continue;
+            }
+            var _a = this.framedGraphToViewport(sourceData), sourceX = _a.x, sourceY = _a.y;
+            var _b = this.framedGraphToViewport(targetData), targetX = _b.x, targetY = _b.y;
             // TODO: we can cache the labels we need to render until the camera's ratio changes
             // TODO: this should be computed in the canvas components?
-            var size = this.camera.scaleSize(edgeData.size);
+            var size = this.scaleSize(edgeData.size);
             this.settings.edgeLabelRenderer(context, {
                 key: edge,
                 label: edgeData.label,
@@ -2851,15 +2808,14 @@ var Sigma = /** @class */ (function (_super) {
      */
     Sigma.prototype.renderHighlightedNodes = function () {
         var _this = this;
-        var camera = this.camera;
         var context = this.canvasContexts.hovers;
         // Clearing
         context.clearRect(0, 0, this.width, this.height);
         // Rendering
         var render = function (node) {
             var data = _this.nodeDataCache[node];
-            var _a = camera.framedGraphToViewport({ width: _this.width, height: _this.height }, data), x = _a.x, y = _a.y;
-            var size = camera.scaleSize(data.size);
+            var _a = _this.framedGraphToViewport(data), x = _a.x, y = _a.y;
+            var size = _this.scaleSize(data.size);
             _this.settings.hoverRenderer(context, {
                 key: node,
                 label: data.label,
@@ -2907,6 +2863,8 @@ var Sigma = /** @class */ (function (_super) {
         this.resize();
         // Clearing the canvases
         this.clear();
+        // Recomputing useful camera-related values:
+        this.updateCachedValues();
         // If we have no nodes we can stop right there
         if (!this.graph.order)
             return this;
@@ -2918,15 +2876,17 @@ var Sigma = /** @class */ (function (_super) {
             mouseCaptor.draggedEvents ||
             mouseCaptor.currentWheelDirection;
         // Then we need to extract a matrix from the camera
-        var cameraState = this.camera.getState(), cameraMatrix = utils_1.matrixFromCamera(cameraState, {
-            width: this.width,
-            height: this.height,
-        });
+        var cameraState = this.camera.getState();
+        var viewportDimensions = this.getDimensions();
+        var graphDimensions = this.getGraphDimensions();
+        var padding = this.getSetting("stagePadding") || 0;
+        this.matrix = utils_1.matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
+        this.invMatrix = utils_1.matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
         var program;
         // Drawing nodes
         program = this.nodePrograms[this.settings.defaultNodeType];
         program.render({
-            matrix: cameraMatrix,
+            matrix: this.matrix,
             width: this.width,
             height: this.height,
             ratio: cameraState.ratio,
@@ -2937,7 +2897,7 @@ var Sigma = /** @class */ (function (_super) {
         if (!this.settings.hideEdgesOnMove || !moving) {
             program = this.edgePrograms[this.settings.defaultEdgeType];
             program.render({
-                matrix: cameraMatrix,
+                matrix: this.matrix,
                 width: this.width,
                 height: this.height,
                 ratio: cameraState.ratio,
@@ -2952,6 +2912,18 @@ var Sigma = /** @class */ (function (_super) {
         this.renderEdgeLabels();
         this.renderHighlightedNodes();
         return this;
+    };
+    /**
+     * Internal method used to update expensive and therefore cached values
+     * each time the camera state is updated.
+     */
+    Sigma.prototype.updateCachedValues = function () {
+        var _a = this.camera.getState(), ratio = _a.ratio, angle = _a.angle;
+        this.cameraSizeRatio = Math.pow(ratio, SIZE_SCALING_EXPONENT);
+        this.positiveAngleCos = Math.cos(angle);
+        this.negativeAngleCos = Math.cos(-angle);
+        this.positiveAngleSin = Math.sin(angle);
+        this.negativeAngleSin = Math.sin(-angle);
     };
     /**---------------------------------------------------------------------------
      * Public API.
@@ -2996,6 +2968,18 @@ var Sigma = /** @class */ (function (_super) {
      */
     Sigma.prototype.getDimensions = function () {
         return { width: this.width, height: this.height };
+    };
+    /**
+     * Method returning the current graph's dimensions.
+     *
+     * @return {Dimensions}
+     */
+    Sigma.prototype.getGraphDimensions = function () {
+        var extent = this.customBBox || this.nodeExtent;
+        return {
+            width: extent.x[1] - extent.x[0],
+            height: extent.y[1] - extent.y[0],
+        };
     };
     /**
      * Method used to get all the sigma node attributes.
@@ -3048,8 +3032,8 @@ var Sigma = /** @class */ (function (_super) {
      * Method updating the value of a given setting key using the provided function.
      * Note that this will schedule a new render next frame.
      *
-     * @param  {string} key - The setting key to set.
-     * @param  {any}    value - The value to set.
+     * @param  {string}   key     - The setting key to set.
+     * @param  {function} updater - The update function.
      * @return {Sigma}
      */
     Sigma.prototype.updateSetting = function (key, updater) {
@@ -3131,6 +3115,93 @@ var Sigma = /** @class */ (function (_super) {
         return this;
     };
     /**
+     * Method used to (un)zoom, while preserving the position of a viewport point.
+     * Used for instance to zoom "on the mouse cursor".
+     *
+     * @param viewportTarget
+     * @param newRatio
+     * @return {CameraState}
+     */
+    Sigma.prototype.getViewportZoomedState = function (viewportTarget, newRatio) {
+        var _a = this.camera.getState(), ratio = _a.ratio, angle = _a.angle, x = _a.x, y = _a.y;
+        // TODO: handle max zoom
+        var ratioDiff = newRatio / ratio;
+        var center = {
+            x: this.width / 2,
+            y: this.height / 2,
+        };
+        var graphMousePosition = this.viewportToFramedGraph(viewportTarget);
+        var graphCenterPosition = this.viewportToFramedGraph(center);
+        return {
+            angle: angle,
+            x: (graphMousePosition.x - graphCenterPosition.x) * (1 - ratioDiff) + x,
+            y: (graphMousePosition.y - graphCenterPosition.y) * (1 - ratioDiff) + y,
+            ratio: newRatio,
+        };
+    };
+    /**
+     * Method returning the abstract rectangle containing the graph according
+     * to the camera's state.
+     *
+     * @return {object} - The view's rectangle.
+     */
+    Sigma.prototype.viewRectangle = function () {
+        // TODO: reduce relative margin?
+        var marginX = (0 * this.width) / 8, marginY = (0 * this.height) / 8;
+        var p1 = this.viewportToFramedGraph({ x: 0 - marginX, y: 0 - marginY }), p2 = this.viewportToFramedGraph({ x: this.width + marginX, y: 0 - marginY }), h = this.viewportToFramedGraph({ x: 0, y: this.height + marginY });
+        return {
+            x1: p1.x,
+            y1: p1.y,
+            x2: p2.x,
+            y2: p2.y,
+            height: p2.y - h.y,
+        };
+    };
+    /**
+     * Method returning the coordinates of a point from the framed graph system to the viewport system. It allows
+     * overriding anything that is used to get the translation matrix, or even the matrix itself.
+     *
+     * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
+     * of computations.
+     */
+    Sigma.prototype.framedGraphToViewport = function (coordinates, override) {
+        if (override === void 0) { override = {}; }
+        var recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+        var matrix = override.matrix
+            ? override.matrix
+            : recomputeMatrix
+                ? utils_1.matrixFromCamera(override.cameraState || this.camera.getState(), override.viewportDimensions || this.getDimensions(), override.graphDimensions || this.getGraphDimensions(), override.padding || this.getSetting("stagePadding") || 0)
+                : this.matrix;
+        var framedGraphVec = [coordinates.x, coordinates.y, 1];
+        var viewportVec = matrices_1.multiplyVec(matrix, framedGraphVec);
+        return {
+            x: ((1 + viewportVec[0]) * this.width) / 2,
+            y: ((1 - viewportVec[1]) * this.height) / 2,
+        };
+    };
+    /**
+     * Method returning the coordinates of a point from the viewport system to the framed graph system. It allows
+     * overriding anything that is used to get the translation matrix, or even the matrix itself.
+     *
+     * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
+     * of computations.
+     */
+    Sigma.prototype.viewportToFramedGraph = function (coordinates, override) {
+        if (override === void 0) { override = {}; }
+        var recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+        var invMatrix = override.matrix
+            ? override.matrix
+            : recomputeMatrix
+                ? utils_1.matrixFromCamera(override.cameraState || this.camera.getState(), override.viewportDimensions || this.getDimensions(), override.graphDimensions || this.getGraphDimensions(), override.padding || this.getSetting("stagePadding") || 0, true)
+                : this.invMatrix;
+        var viewportVec = [(coordinates.x / this.width) * 2 - 1, 1 - (coordinates.y / this.height) * 2, 1];
+        var framedGraphVec = matrices_1.multiplyVec(invMatrix, viewportVec);
+        return {
+            x: framedGraphVec[0],
+            y: framedGraphVec[1],
+        };
+    };
+    /**
      * Method used to translate a point's coordinates from the viewport system (pixel distance from the top-left of the
      * stage) to the graph system (the reference system of data as they are in the given graph instance).
      *
@@ -3139,9 +3210,8 @@ var Sigma = /** @class */ (function (_super) {
      *
      * @param {Coordinates} viewportPoint
      */
-    Sigma.prototype.viewportToGraph = function (viewportPoint, camera) {
-        camera = camera || this.camera;
-        return this.normalizationFunction.inverse(camera.viewportToFramedGraph(this.getDimensions(), viewportPoint));
+    Sigma.prototype.viewportToGraph = function (viewportPoint) {
+        return this.normalizationFunction.inverse(this.viewportToFramedGraph(viewportPoint));
     };
     /**
      * Method used to translate a point's coordinates from the graph system (the reference system of data as they are in
@@ -3152,9 +3222,34 @@ var Sigma = /** @class */ (function (_super) {
      *
      * @param {Coordinates} graphPoint
      */
-    Sigma.prototype.graphToViewport = function (graphPoint, camera) {
-        camera = camera || this.camera;
-        return camera.framedGraphToViewport(this.getDimensions(), this.normalizationFunction(graphPoint));
+    Sigma.prototype.graphToViewport = function (graphPoint) {
+        return this.framedGraphToViewport(this.normalizationFunction(graphPoint));
+    };
+    /**
+     * Method returning the graph's bounding box.
+     *
+     * @return {{ x: Extent, y: Extent }}
+     */
+    Sigma.prototype.getBBox = function () {
+        return nodeExtent(this.graph, ["x", "y"]);
+    };
+    /**
+     * Method returning the graph's custom bounding box, if any.
+     *
+     * @return {{ x: Extent, y: Extent } | null}
+     */
+    Sigma.prototype.getCustomBBox = function () {
+        return this.customBBox;
+    };
+    /**
+     * Method used to override the graph's bounding box with a custom one. Give `null` as the argument to stop overriding.
+     *
+     * @return {Sigma}
+     */
+    Sigma.prototype.setCustomBBox = function (customBBox) {
+        this.customBBox = customBBox;
+        this._scheduleRefresh();
+        return this;
     };
     /**
      * Method used to shut the container & release event listeners.
@@ -3188,8 +3283,7 @@ var Sigma = /** @class */ (function (_super) {
         this.quadtree = new quadtree_1.default();
         this.nodeDataCache = {};
         this.edgeDataCache = {};
-        this.highlightedNodes = new Set();
-        this.displayedLabels = new Set();
+        this.highlightedNodes.clear();
         // Clearing frames
         if (this.renderFrame) {
             utils_1.cancelFrame(this.renderFrame);
@@ -3203,6 +3297,16 @@ var Sigma = /** @class */ (function (_super) {
         var container = this.container;
         while (container.firstChild)
             container.removeChild(container.firstChild);
+    };
+    /**
+     * Method used to scale the given size according to the camera's ratio, i.e.
+     * zooming state.
+     *
+     * @param  {number} size - The size to scale (node size, edge thickness etc.).
+     * @return {number}      - The scaled size.
+     */
+    Sigma.prototype.scaleSize = function (size) {
+        return size / this.cameraSizeRatio;
     };
     return Sigma;
 }(events_1.EventEmitter));
@@ -3344,206 +3448,134 @@ module.exports = function isGraph(value) {
 
 /***/ }),
 /* 15 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.edgeLabelsToDisplayFromNodes = exports.labelsToDisplayFromGrid = void 0;
-var camera_1 = __importDefault(__webpack_require__(1));
-/**
- * Constants.
- */
-// Dimensions of a normal cell
-var DEFAULT_CELL = {
-    width: 250,
-    height: 175,
-};
-// Dimensions of an unzoomed cell. This one is usually larger than the normal
-// one to account for the fact that labels will more likely collide.
-var DEFAULT_UNZOOMED_CELL = {
-    width: 400,
-    height: 300,
-};
+exports.edgeLabelsToDisplayFromNodes = exports.LabelGrid = exports.axisAlignedRectangularCollision = void 0;
+// TODO: full jsdocs
 /**
  * Helpers.
  */
-function collision(x1, y1, w1, h1, x2, y2, w2, h2) {
+function axisAlignedRectangularCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
     return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 }
-// TODO: cache camera position of selected nodes to avoid costly computations
-// in anti-collision step
-// TOOD: document a little bit more so future people can understand this mess
+exports.axisAlignedRectangularCollision = axisAlignedRectangularCollision;
 /**
- * Label grid heuristic selecting labels to display.
- *
- * @param  {object} params                 - Parameters:
- * @param  {object}   cache                - Cache storing nodes' data.
- * @param  {Camera}   camera               - The renderer's camera.
- * @param  {Set}      displayedLabels      - Currently displayed labels.
- * @param  {Array}    visibleNodes         - Nodes visible for this render.
- * @param  {Graph}    graph                - The rendered graph.
- * @return {Array}                         - The selected labels.
+ * Classes.
  */
-function labelsToDisplayFromGrid(params) {
-    var cache = params.cache, camera = params.camera, userCell = params.cell, dimensions = params.dimensions, displayedLabels = params.displayedLabels, _a = params.fontSize, fontSize = _a === void 0 ? 14 : _a, graph = params.graph, _b = params.renderedSizeThreshold, renderedSizeThreshold = _b === void 0 ? -Infinity : _b, visibleNodes = params.visibleNodes;
-    var cameraState = camera.getState(), previousCameraState = camera.getPreviousState();
-    var previousCamera = new camera_1.default();
-    previousCamera.setState(previousCameraState);
-    // State
-    var zooming = cameraState.ratio < previousCameraState.ratio;
-    var panning = cameraState.x !== previousCameraState.x || cameraState.y !== previousCameraState.y;
-    var unzooming = cameraState.ratio > previousCameraState.ratio; // NOTE: unzooming is not !zooming since the zoom can remain constant
-    var unzoomedPanning = panning && !zooming && !unzooming && cameraState.ratio >= 1;
-    var zoomedPanning = panning && displayedLabels.size && !zooming && !unzooming;
-    var shouldReturnSameLabels = false;
-    // Trick to discretize unzooming, i.e. we consider new labels when unzooming
-    // only every 5% increment so that labels won't blink too much
-    if (unzooming && Math.trunc(cameraState.ratio * 100) % 5 !== 0)
-        shouldReturnSameLabels = true;
-    // If panning while unzoomed, we shouldn't change label selection
-    if (unzoomedPanning && displayedLabels.size !== 0)
-        shouldReturnSameLabels = true;
-    // When unzoomed & zooming
-    if (zooming && cameraState.ratio >= 1)
-        shouldReturnSameLabels = true;
-    if (shouldReturnSameLabels)
-        return Array.from(displayedLabels);
-    // Adapting cell dimensions
-    var cell = userCell ? userCell : DEFAULT_CELL;
-    if (cameraState.ratio >= 1.3)
-        cell = DEFAULT_UNZOOMED_CELL;
-    var cwr = dimensions.width % cell.width;
-    var cellWidth = cell.width + cwr / Math.floor(dimensions.width / cell.width);
-    var chr = dimensions.height % cell.height;
-    var cellHeight = cell.height + chr / Math.floor(dimensions.height / cell.height);
-    var adjustedWidth = dimensions.width + cellWidth, adjustedHeight = dimensions.height + cellHeight, adjustedX = -cellWidth, adjustedY = -cellHeight;
-    var panningWidth = dimensions.width + cellWidth / 2, panningHeight = dimensions.height + cellHeight / 2, panningX = -(cellWidth / 2), panningY = -(cellHeight / 2);
-    var worthyLabels = [];
-    var grid = {};
-    var maxSize = -Infinity, biggestNode = null;
-    for (var i = 0, l = visibleNodes.length; i < l; i++) {
-        var node = visibleNodes[i], nodeData = cache[node];
-        // We filter hidden nodes
-        if (nodeData.hidden)
-            continue;
-        // We filter nodes having a rendered size less than a certain thresold
-        if (camera.scaleSize(nodeData.size) < renderedSizeThreshold)
-            continue;
-        // Finding our node's cell in the grid
-        var pos = camera.framedGraphToViewport(dimensions, nodeData);
-        // Node is not actually visible on screen
-        // NOTE: can optimize margin on the right side (only if we know where the labels go)
-        if (pos.x < adjustedX || pos.x > adjustedWidth || pos.y < adjustedY || pos.y > adjustedHeight)
-            continue;
-        // Keeping track of the maximum node size for certain cases
-        if (nodeData.size > maxSize) {
-            maxSize = nodeData.size;
-            biggestNode = node;
-        }
-        // If panning when zoomed, we consider only displayed labels and newly
-        // visible nodes
-        if (zoomedPanning) {
-            var ppos = previousCamera.framedGraphToViewport(dimensions, nodeData);
-            // Was node visible earlier?
-            if (ppos.x >= panningX && ppos.x <= panningWidth && ppos.y >= panningY && ppos.y <= panningHeight) {
-                // Was the label displayed?
-                if (!displayedLabels.has(node))
-                    continue;
-            }
-        }
-        var xKey = Math.floor(pos.x / cellWidth), yKey = Math.floor(pos.y / cellHeight);
-        var key = xKey + "\u00A7" + yKey;
-        if (typeof grid[key] === "undefined") {
-            // This cell is not yet occupied
-            grid[key] = node;
-        }
-        else {
-            // We must solve a conflict in this cell
-            var currentNode = grid[key], currentNodeData = cache[currentNode];
-            // We prefer already displayed labels
-            if (displayedLabels.size > 0) {
-                var n1 = displayedLabels.has(node), n2 = displayedLabels.has(currentNode);
-                if (!n1 && n2) {
-                    continue;
-                }
-                if (n1 && !n2) {
-                    grid[key] = node;
-                    continue;
-                }
-                if ((zoomedPanning || zooming) && n1 && n2) {
-                    worthyLabels.push(node);
-                    continue;
-                }
-            }
-            // In case of size & degree equality, we use the node's key so that the
-            // process remains deterministic
-            var won = false;
-            if (nodeData.size > currentNodeData.size) {
-                won = true;
-            }
-            else if (nodeData.size === currentNodeData.size) {
-                var nodeDegree = graph.degree(node), currentNodeDegree = graph.degree(currentNode);
-                if (nodeDegree > currentNodeDegree) {
-                    won = true;
-                }
-                else if (nodeDegree === currentNodeDegree) {
-                    if (node > currentNode)
-                        won = true;
-                }
-            }
-            if (won)
-                grid[key] = node;
-        }
+/**
+ * Class representing a single candidate for the label grid selection.
+ *
+ * It also describes a deterministic way to compare two candidates to assess
+ * which one is better.
+ */
+var LabelCandidate = /** @class */ (function () {
+    function LabelCandidate(key, size) {
+        this.key = key;
+        this.size = size;
     }
-    // Compiling the labels
-    var biggestNodeShown = worthyLabels.some(function (node) { return node === biggestNode; });
-    for (var key in grid) {
-        var node = grid[key];
-        if (node === biggestNode)
-            biggestNodeShown = true;
-        worthyLabels.push(node);
+    LabelCandidate.compare = function (first, second) {
+        // First we compare by size
+        if (first.size > second.size)
+            return -1;
+        if (first.size < second.size)
+            return 1;
+        // Then since no two nodes can have the same key, we use it to
+        // deterministically tie-break by key
+        if (first.key > second.key)
+            return 1;
+        // NOTE: this comparator cannot return 0
+        return -1;
+    };
+    return LabelCandidate;
+}());
+/**
+ * Class representing a 2D spatial grid divided into constant-size cells.
+ */
+var LabelGrid = /** @class */ (function () {
+    function LabelGrid() {
+        this.width = 0;
+        this.height = 0;
+        this.cellSize = 0;
+        this.columns = 0;
+        this.rows = 0;
+        this.cells = {};
     }
-    // Always keeping biggest node shown on screen
-    if (!biggestNodeShown && biggestNode)
-        worthyLabels.push(biggestNode);
-    // Basic anti-collision
-    var collisions = new Set();
-    for (var i = 0, l = worthyLabels.length; i < l; i++) {
-        var n1 = worthyLabels[i], d1 = cache[n1], p1 = camera.framedGraphToViewport(dimensions, d1);
-        if (collisions.has(n1))
-            continue;
-        for (var j = i + 1; j < l; j++) {
-            var n2 = worthyLabels[j], d2 = cache[n2], p2 = camera.framedGraphToViewport(dimensions, d2);
-            var c = collision(
-            // First abstract bbox
-            p1.x, p1.y, d1.label.length * 8, fontSize, 
-            // Second abstract bbox
-            p2.x, p2.y, d2.label.length * 8, fontSize);
-            if (c) {
-                // NOTE: add degree as tie-breaker here if required in the future
-                // NOTE: add final stable tie-breaker using node key if required
-                if (d1.size < d2.size)
-                    collisions.add(n1);
-                else
-                    collisions.add(n2);
+    LabelGrid.prototype.resizeAndClear = function (dimensions, cellSize) {
+        this.width = dimensions.width;
+        this.height = dimensions.height;
+        this.cellSize = cellSize;
+        this.columns = Math.ceil(dimensions.width / cellSize);
+        this.rows = Math.ceil(dimensions.height / cellSize);
+        this.cells = {};
+    };
+    LabelGrid.prototype.getIndex = function (pos) {
+        var xIndex = Math.floor(pos.x / this.cellSize);
+        var yIndex = Math.floor(pos.y / this.cellSize);
+        return xIndex * this.columns + yIndex;
+    };
+    LabelGrid.prototype.add = function (key, size, pos) {
+        var candidate = new LabelCandidate(key, size);
+        var index = this.getIndex(pos);
+        var cell = this.cells[index];
+        if (!cell) {
+            cell = [];
+            this.cells[index] = cell;
+        }
+        cell.push(candidate);
+    };
+    LabelGrid.prototype.organize = function () {
+        for (var k in this.cells) {
+            var cell = this.cells[k];
+            cell.sort(LabelCandidate.compare);
+        }
+    };
+    LabelGrid.prototype.getLabelsToDisplay = function (ratio, density) {
+        // TODO: work on visible nodes to optimize? ^ -> threshold outside so that memoization works?
+        // TODO: adjust threshold lower, but increase cells a bit?
+        // TODO: hunt for geom issue in disguise
+        // TODO: memoize while ratio does not move. method to force recompute
+        var cellArea = this.cellSize * this.cellSize;
+        var scaledCellArea = cellArea / ratio / ratio;
+        var scaledDensity = (scaledCellArea * density) / cellArea;
+        var labelsToDisplayPerCell = Math.ceil(scaledDensity);
+        var labels = [];
+        for (var k in this.cells) {
+            var cell = this.cells[k];
+            for (var i = 0; i < Math.min(labelsToDisplayPerCell, cell.length); i++) {
+                labels.push(cell[i].key);
             }
         }
-    }
-    // console.log(collisions)
-    return worthyLabels.filter(function (l) { return !collisions.has(l); });
-}
-exports.labelsToDisplayFromGrid = labelsToDisplayFromGrid;
+        return labels;
+    };
+    LabelGrid.prototype.draw = function (context, renderer) {
+        context.strokeStyle = "red";
+        context.lineWidth = 1;
+        for (var i = 0; i < this.columns; i++) {
+            var pos = renderer.framedGraphToViewport({ x: (i * this.cellSize) / this.width, y: 0 });
+            context.beginPath();
+            context.moveTo(pos.x, 0);
+            context.lineTo(pos.x, this.height);
+            context.stroke();
+        }
+        for (var j = 0; j < this.rows; j++) {
+            var pos = renderer.framedGraphToViewport({ x: 0, y: (j * this.cellSize) / this.height });
+            context.beginPath();
+            context.moveTo(0, pos.y);
+            context.lineTo(this.width, pos.y);
+            context.stroke();
+        }
+    };
+    return LabelGrid;
+}());
+exports.LabelGrid = LabelGrid;
 /**
  * Label heuristic selecting edge labels to display, based on displayed node
  * labels
  *
  * @param  {object} params                 - Parameters:
- * @param  {object}   nodeDataCache        - Cache storing nodes data.
- * @param  {object}   edgeDataCache        - Cache storing edges data.
  * @param  {Set}      displayedNodeLabels  - Currently displayed node labels.
  * @param  {Set}      highlightedNodes     - Highlighted nodes.
  * @param  {Graph}    graph                - The rendered graph.
@@ -3551,33 +3583,22 @@ exports.labelsToDisplayFromGrid = labelsToDisplayFromGrid;
  * @return {Array}                         - The selected labels.
  */
 function edgeLabelsToDisplayFromNodes(params) {
-    var nodeDataCache = params.nodeDataCache, edgeDataCache = params.edgeDataCache, graph = params.graph, hoveredNode = params.hoveredNode, highlightedNodes = params.highlightedNodes, displayedNodeLabels = params.displayedNodeLabels;
-    var worthyEdges = new Set();
-    var displayedNodeLabelsArray = Array.from(displayedNodeLabels);
-    // Each edge connecting a highlighted node has its label displayed if the other extremity is not hidden:
-    var highlightedNodesArray = Array.from(highlightedNodes);
-    if (hoveredNode && !highlightedNodes.has(hoveredNode))
-        highlightedNodesArray.push(hoveredNode);
-    for (var i = 0; i < highlightedNodesArray.length; i++) {
-        var key = highlightedNodesArray[i];
-        var edges = graph.edges(key);
-        for (var j = 0; j < edges.length; j++) {
-            var edgeKey = edges[j];
-            var extremities = graph.extremities(edgeKey), sourceData = nodeDataCache[extremities[0]], targetData = nodeDataCache[extremities[1]], edgeData = edgeDataCache[edgeKey];
-            if (edgeData.hidden && sourceData.hidden && targetData.hidden) {
-                worthyEdges.add(edgeKey);
-            }
+    var graph = params.graph, hoveredNode = params.hoveredNode, highlightedNodes = params.highlightedNodes, displayedNodeLabels = params.displayedNodeLabels;
+    var worthyEdges = [];
+    // TODO: the code below can be optimized using #.forEach and batching the code per adj
+    // We should display an edge's label if:
+    //   - Any of its extremities is highlighted or hovered
+    //   - Both of its extremities has its label shown
+    graph.forEachEdge(function (edge, _, source, target) {
+        if (source === hoveredNode ||
+            target === hoveredNode ||
+            highlightedNodes.has(source) ||
+            highlightedNodes.has(target) ||
+            (displayedNodeLabels.has(source) && displayedNodeLabels.has(target))) {
+            worthyEdges.push(edge);
         }
-    }
-    // Each edge connecting two nodes with visible labels has its label displayed:
-    for (var i = 0; i < displayedNodeLabelsArray.length; i++) {
-        var key = displayedNodeLabelsArray[i];
-        var edges = graph.outboundEdges(key);
-        for (var j = 0; j < edges.length; j++)
-            if (!edgeDataCache[edges[j]].hidden && displayedNodeLabels.has(graph.opposite(key, edges[j])))
-                worthyEdges.add(edges[j]);
-    }
-    return Array.from(worthyEdges);
+    });
+    return worthyEdges;
 }
 exports.edgeLabelsToDisplayFromNodes = edgeLabelsToDisplayFromNodes;
 
@@ -3607,12 +3628,8 @@ var node_fast_1 = __importDefault(__webpack_require__(21));
 var edge_1 = __importDefault(__webpack_require__(27));
 var edge_arrow_1 = __importDefault(__webpack_require__(31));
 function validateSettings(settings) {
-    // Label grid cell
-    if (settings.labelGrid &&
-        settings.labelGrid.cell &&
-        typeof settings.labelGrid.cell === "object" &&
-        (!settings.labelGrid.cell.width || !settings.labelGrid.cell.height)) {
-        throw new Error("Settings: invalid `labelGrid.cell`. Expecting {width, height}.");
+    if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
+        throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
     }
 }
 exports.validateSettings = validateSettings;
@@ -3633,11 +3650,11 @@ exports.DEFAULT_SETTINGS = {
     edgeLabelFont: "Arial",
     edgeLabelSize: 14,
     edgeLabelWeight: "normal",
+    stagePadding: 30,
     // Labels
-    labelGrid: {
-        cell: null,
-        renderedSizeThreshold: -Infinity,
-    },
+    labelDensity: 0.07,
+    labelGridCellSize: 60,
+    labelRenderedSizeThreshold: 6,
     // Reducers
     nodeReducer: null,
     edgeReducer: null,
@@ -4829,12 +4846,8 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var captor_1 = __importStar(__webpack_require__(11));
-var camera_1 = __importDefault(__webpack_require__(1));
 var DRAG_TIMEOUT = 200;
 var TOUCH_INERTIA_RATIO = 3;
 var TOUCH_INERTIA_DURATION = 200;
@@ -4845,8 +4858,8 @@ var TOUCH_INERTIA_DURATION = 200;
  */
 var TouchCaptor = /** @class */ (function (_super) {
     __extends(TouchCaptor, _super);
-    function TouchCaptor(container, camera) {
-        var _this = _super.call(this, container, camera) || this;
+    function TouchCaptor(container, renderer) {
+        var _this = _super.call(this, container, renderer) || this;
         _this.enabled = true;
         _this.isMoving = false;
         _this.touchMode = 0; // number of touches down
@@ -4895,7 +4908,7 @@ var TouchCaptor = /** @class */ (function (_super) {
         var touches = captor_1.getTouchesArray(e.touches);
         this.isMoving = true;
         this.touchMode = touches.length;
-        this.startCameraState = this.camera.getState();
+        this.startCameraState = this.renderer.getCamera().getState();
         this.startTouchesPositions = touches.map(captor_1.getPosition);
         this.lastTouchesPositions = this.startTouchesPositions;
         // When there are two touches down, let's record distance and angle as well:
@@ -4932,8 +4945,9 @@ var TouchCaptor = /** @class */ (function (_super) {
                 // TODO
                 // Dispatch event
                 if (this.isMoving) {
-                    var cameraState = this.camera.getState(), previousCameraState = this.camera.getPreviousState();
-                    this.camera.animate({
+                    var camera = this.renderer.getCamera();
+                    var cameraState = camera.getState(), previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
+                    camera.animate({
                         x: cameraState.x + TOUCH_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
                         y: cameraState.y + TOUCH_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
                     }, {
@@ -4969,9 +4983,9 @@ var TouchCaptor = /** @class */ (function (_super) {
         }, DRAG_TIMEOUT);
         switch (this.touchMode) {
             case 1: {
-                var _b = this.camera.viewportToFramedGraph(this.getDimensions(), (this.startTouchesPositions || [])[0]), xStart = _b.x, yStart = _b.y;
-                var _c = this.camera.viewportToFramedGraph(this.getDimensions(), touchesPositions[0]), x = _c.x, y = _c.y;
-                this.camera.setState({
+                var _b = this.renderer.viewportToFramedGraph((this.startTouchesPositions || [])[0]), xStart = _b.x, yStart = _b.y;
+                var _c = this.renderer.viewportToFramedGraph(touchesPositions[0]), x = _c.x, y = _c.y;
+                this.renderer.getCamera().setState({
                     x: startCameraState.x + xStart - x,
                     y: startCameraState.y + yStart - y,
                 });
@@ -4998,7 +5012,7 @@ var TouchCaptor = /** @class */ (function (_super) {
                 newCameraState.angle = startCameraState.angle + angleDiff;
                 // 2.
                 var dimensions = this.getDimensions();
-                var touchGraphPosition = camera_1.default.from(startCameraState).viewportToFramedGraph(dimensions, (this.startTouchesPositions || [])[0]);
+                var touchGraphPosition = this.renderer.viewportToFramedGraph((this.startTouchesPositions || [])[0], { cameraState: startCameraState });
                 var smallestDimension = Math.min(dimensions.width, dimensions.height);
                 var dx = smallestDimension / dimensions.width;
                 var dy = smallestDimension / dimensions.height;
@@ -5013,7 +5027,7 @@ var TouchCaptor = /** @class */ (function (_super) {
                 ], 2), x = _a[0], y = _a[1];
                 newCameraState.x = touchGraphPosition.x - x * ratio;
                 newCameraState.y = touchGraphPosition.y + y * ratio;
-                this.camera.setState(newCameraState);
+                this.renderer.getCamera().setState(newCameraState);
                 break;
             }
         }
