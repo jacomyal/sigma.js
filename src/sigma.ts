@@ -520,6 +520,12 @@ export default class Sigma extends EventEmitter {
     const settings = this.settings;
     const dimensions = this.getDimensions();
     const nullCamera = new Camera();
+    const nullCameraMatrix = matrixFromCamera(
+      nullCamera.getState(),
+      this.getDimensions(),
+      this.getGraphDimensions(),
+      this.getSetting("stagePadding") || 0,
+    );
 
     // Clearing the quad
     this.quadtree.clear();
@@ -581,7 +587,7 @@ export default class Sigma extends EventEmitter {
       this.normalizationFunction.applyTo(data);
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
-      this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, nullCamera.getState()));
+      this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
       nodeProgram.process(data, data.hidden, i);
 
@@ -1272,20 +1278,31 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
-   * Method returning the coordinates of a point from the framed graph system to the
-   * viewport system.
+   * Method returning the coordinates of a point from the framed graph system to the viewport system. It allows
+   * overriding anything that is used to get the translation matrix, or even the matrix itself.
    *
-   * @param  {object} coordinates - Coordinates of the point.
-   * @param  {object?} cameraState - An optional camera state, to override the renderer's one.
-   * @return {object}             - The point coordinates in the viewport.
+   * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
+   * of computations.
    */
-  framedGraphToViewport(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const matrix = cameraState
+  framedGraphToViewport(
+    coordinates: Coordinates,
+    override: {
+      cameraState?: CameraState;
+      matrix?: Float32Array;
+      viewportDimensions?: Dimensions;
+      graphDimensions?: Dimensions;
+      padding?: number;
+    } = {},
+  ): Coordinates {
+    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+    const matrix = override.matrix
+      ? override.matrix
+      : recomputeMatrix
       ? matrixFromCamera(
-          cameraState,
-          this.getDimensions(),
-          this.getGraphDimensions(),
-          this.getSetting("stagePadding") || 0,
+          override.cameraState || this.camera.getState(),
+          override.viewportDimensions || this.getDimensions(),
+          override.graphDimensions || this.getGraphDimensions(),
+          override.padding || this.getSetting("stagePadding") || 0,
         )
       : this.matrix;
 
@@ -1299,20 +1316,31 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
-   * Method returning the coordinates of a point from the viewport system to the
-   * framed graph system.
+   * Method returning the coordinates of a point from the viewport system to the framed graph system. It allows
+   * overriding anything that is used to get the translation matrix, or even the matrix itself.
    *
-   * @param  {object}  coordinates - Coordinates of the point.
-   * @param  {object?} cameraState - An optional camera state, to override the renderer's one.
-   * @return {object}              - The point coordinates in the graph frame.
+   * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
+   * of computations.
    */
-  viewportToFramedGraph(coordinates: Coordinates, cameraState?: CameraState): Coordinates {
-    const invMatrix = cameraState
+  viewportToFramedGraph(
+    coordinates: Coordinates,
+    override: {
+      cameraState?: CameraState;
+      matrix?: Float32Array;
+      viewportDimensions?: Dimensions;
+      graphDimensions?: Dimensions;
+      padding?: number;
+    } = {},
+  ): Coordinates {
+    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+    const invMatrix = override.matrix
+      ? override.matrix
+      : recomputeMatrix
       ? matrixFromCamera(
-          cameraState,
-          this.getDimensions(),
-          this.getGraphDimensions(),
-          this.getSetting("stagePadding") || 0,
+          override.cameraState || this.camera.getState(),
+          override.viewportDimensions || this.getDimensions(),
+          override.graphDimensions || this.getGraphDimensions(),
+          override.padding || this.getSetting("stagePadding") || 0,
           true,
         )
       : this.invMatrix;

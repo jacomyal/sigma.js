@@ -213,7 +213,7 @@ export default class TouchCaptor extends Captor {
         const dimensions = this.getDimensions();
         const touchGraphPosition = this.renderer.viewportToFramedGraph(
           (this.startTouchesPositions || [])[0] as Coordinates,
-          startCameraState,
+          { cameraState: startCameraState },
         );
         const smallestDimension = Math.min(dimensions.width, dimensions.height);
 
