@@ -11,6 +11,12 @@ import { NodeDisplayData, PartialButFor } from "../../types";
 import drawNode from "./node";
 import drawLabel from "./label";
 
+/**
+ * Draw an hovered node.
+ * - if there is no label => display a shadow on the node
+ * - if the label box is bigger than node size => display a label box that contains the node with a shadow
+ * - else node with shadow and the label box
+ */
 export default function drawHover(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
@@ -23,38 +29,42 @@ export default function drawHover(
   context.font = `${weight} ${size}px ${font}`;
 
   // Then we draw the label background
-  context.beginPath();
-  context.fillStyle = "#fff";
+  context.fillStyle = "#FFF";
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 0;
   context.shadowBlur = 8;
   context.shadowColor = "#000";
 
-  const textWidth = context.measureText(data.label).width;
+  const MARGIN = 2;
 
-  const x = Math.round(data.x - size / 2 - 2),
-    y = Math.round(data.y - size / 2 - 2),
-    w = Math.round(textWidth + size / 2 + data.size + 9),
-    h = Math.round(size + 4),
-    e = Math.round(size / 2 + 2);
+  if (data.label.length > 0) {
+    const textWidth = context.measureText(data.label).width,
+      boxWidth = Math.round(textWidth + 9),
+      boxHeight = Math.round(size + 2 * MARGIN),
+      radious = Math.max(data.size, size / 2) + MARGIN;
 
-  context.moveTo(x, y + e);
-  context.moveTo(x, y + e);
-  context.arcTo(x, y, x + e, y, e);
-  context.lineTo(x + w, y);
-  context.lineTo(x + w, y + h);
-  context.lineTo(x + e, y + h);
-  context.arcTo(x, y + h, x, y + h - e, e);
-  context.lineTo(x, y + e);
+    const angleRadian = Math.asin(boxHeight / 2 / radious);
+    const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radious, 2) - Math.pow(boxHeight / 2, 2)));
 
-  context.closePath();
-  context.fill();
+    context.beginPath();
+    context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
+    context.lineTo(data.x + radious + boxWidth, data.y + boxHeight / 2);
+    context.lineTo(data.x + radious + boxWidth, data.y - boxHeight / 2);
+    context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
+    context.arc(data.x, data.y, radious, angleRadian, -angleRadian);
+    context.closePath();
+    context.fill();
+  } else {
+    context.beginPath();
+    context.arc(data.x, data.y, data.size + MARGIN, 0, Math.PI * 2);
+    context.closePath();
+    context.fill();
+  }
 
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 0;
   context.shadowBlur = 0;
-
-  // Then we need to draw the node
+  // the inner node of the label box
   drawNode(context, data);
 
   // And finally we draw the label

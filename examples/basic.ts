@@ -13,7 +13,7 @@ randomLayout.assign(graph);
 
 graph.nodes().forEach((node) => {
   graph.mergeNodeAttributes(node, {
-    label: getRandomName(),
+    label: Math.random() > 0.5 ? getRandomName() : null,
     size: Math.max(4, Math.random() * 10),
     color: chroma.random().hex(),
   });
