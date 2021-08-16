@@ -177,11 +177,13 @@ export default class MouseCaptor extends Captor {
           easing: "quadraticOut",
         },
       );
-    } else if (this.lastMouseX !== x || this.lastMouseY !== y) {
-      camera.setState({
-        x: cameraState.x,
-        y: cameraState.y,
-      });
+    } else {
+      if (this.lastMouseX !== x || this.lastMouseY !== y) {
+        camera.setState({
+          x: cameraState.x,
+          y: cameraState.y,
+        });
+      }
     }
 
     this.isMoving = false;
@@ -192,7 +194,6 @@ export default class MouseCaptor extends Captor {
   handleMove(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
     this.emit("mousemove", getMouseCoords(e));
-
     if (this.isMouseDown) {
       // TODO: dispatch events
       this.isMoving = true;
@@ -203,8 +204,7 @@ export default class MouseCaptor extends Captor {
       }
 
       this.movingTimeout = window.setTimeout(() => {
-        this.movingTimeout = null;
-        this.isMoving = false;
+        this.handleDown(e);
       }, DRAG_TIMEOUT);
 
       const camera = this.renderer.getCamera();
