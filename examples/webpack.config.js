@@ -32,6 +32,10 @@ const EXAMPLES = {
     id: "gexf",
     title: "GEXF",
   },
+  hideEdgesOnMove: {
+    id: "hide-edges-on-move",
+    title: "Hide edges on move",
+  },
   layout: {
     id: "layout",
     title: "Force Atlas 2 Layout",
@@ -132,6 +136,7 @@ module.exports = {
     },
   },
   devServer: {
+    host: "0.0.0.0",
     port: 8000,
   },
 };
