@@ -13,11 +13,12 @@ export default function drawLabel(
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
 ): void {
-  const size = settings.labelSize,
-    font = settings.labelFont,
-    weight = settings.labelWeight;
+  const size = settings.nodeLabelSize,
+    font = settings.nodeLabelFont,
+    weight = settings.nodeLabelWeight,
+    color = settings.nodeLabelColor || data.color;
 
-  context.fillStyle = "#000";
+  context.fillStyle = color;
   context.font = `${weight} ${size}px ${font}`;
 
   context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);

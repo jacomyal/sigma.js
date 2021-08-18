@@ -39,12 +39,16 @@ export interface Settings {
   defaultNodeType: string;
   defaultEdgeColor: string;
   defaultEdgeType: string;
-  labelFont: string;
-  labelSize: number;
-  labelWeight: string;
+  nodeLabelFont: string;
+  nodeLabelSize: number;
+  nodeLabelWeight: string;
+  // Color for node's label. If undefined, we take the color of the node
+  nodeLabelColor: string | undefined;
   edgeLabelFont: string;
   edgeLabelSize: number;
   edgeLabelWeight: string;
+  // Color for edge's label. If undefined, we take the color of the edge
+  edgeLabelColor: string | undefined;
   stagePadding: number;
   // Labels
   labelDensity: number;
@@ -77,12 +81,14 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultNodeType: "circle",
   defaultEdgeColor: "#ccc",
   defaultEdgeType: "line",
-  labelFont: "Arial",
-  labelSize: 14,
-  labelWeight: "normal",
+  nodeLabelFont: "Arial",
+  nodeLabelSize: 14,
+  nodeLabelWeight: "normal",
+  nodeLabelColor: "#000",
   edgeLabelFont: "Arial",
   edgeLabelSize: 14,
   edgeLabelWeight: "normal",
+  edgeLabelColor: undefined,
   stagePadding: 30,
 
   // Labels

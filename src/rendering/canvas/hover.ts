@@ -16,9 +16,9 @@ export default function drawHover(
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
 ): void {
-  const size = settings.labelSize,
-    font = settings.labelFont,
-    weight = settings.labelWeight;
+  const size = settings.nodeLabelSize,
+    font = settings.nodeLabelFont,
+    weight = settings.nodeLabelWeight;
 
   context.font = `${weight} ${size}px ${font}`;
 

@@ -2746,7 +2746,7 @@ var Sigma = /** @class */ (function (_super) {
             this.settings.labelRenderer(context, {
                 key: node,
                 label: data.label,
-                color: "#000",
+                color: data.color,
                 size: size,
                 x: x,
                 y: y,
@@ -3463,9 +3463,6 @@ function axisAlignedRectangularCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
 }
 exports.axisAlignedRectangularCollision = axisAlignedRectangularCollision;
 /**
- * Classes.
- */
-/**
  * Class representing a single candidate for the label grid selection.
  *
  * It also describes a deterministic way to compare two candidates to assess
@@ -3644,12 +3641,14 @@ exports.DEFAULT_SETTINGS = {
     defaultNodeType: "circle",
     defaultEdgeColor: "#ccc",
     defaultEdgeType: "line",
-    labelFont: "Arial",
-    labelSize: 14,
-    labelWeight: "normal",
+    nodeLabelFont: "Arial",
+    nodeLabelSize: 14,
+    nodeLabelWeight: "normal",
+    nodeLabelColor: "#000",
     edgeLabelFont: "Arial",
     edgeLabelSize: 14,
     edgeLabelWeight: "normal",
+    edgeLabelColor: undefined,
     stagePadding: 30,
     // Labels
     labelDensity: 0.07,
@@ -3683,8 +3682,8 @@ exports.DEFAULT_SETTINGS = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 function drawLabel(context, data, settings) {
-    var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
-    context.fillStyle = "#000";
+    var size = settings.nodeLabelSize, font = settings.nodeLabelFont, weight = settings.nodeLabelWeight, color = settings.nodeLabelColor || data.color;
+    context.fillStyle = color;
     context.font = weight + " " + size + "px " + font;
     context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }
@@ -3704,7 +3703,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var node_1 = __importDefault(__webpack_require__(19));
 var label_1 = __importDefault(__webpack_require__(17));
 function drawHover(context, data, settings) {
-    var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
+    var size = settings.nodeLabelSize, font = settings.nodeLabelFont, weight = settings.nodeLabelWeight;
     context.font = weight + " " + size + "px " + font;
     // Then we draw the label background
     context.beginPath();
@@ -3762,8 +3761,8 @@ exports.default = drawNode;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 function drawEdgeLabel(context, edgeData, sourceData, targetData, settings) {
-    var size = settings.edgeLabelSize, font = settings.edgeLabelFont, weight = settings.edgeLabelWeight, label = edgeData.label;
-    context.fillStyle = edgeData.color;
+    var size = settings.edgeLabelSize, font = settings.edgeLabelFont, weight = settings.edgeLabelWeight, color = settings.edgeLabelColor || edgeData.color, label = edgeData.label;
+    context.fillStyle = color;
     context.font = weight + " " + size + "px " + font;
     var textWidth = context.measureText(label).width;
     var cx = (sourceData.x + targetData.x) / 2;
