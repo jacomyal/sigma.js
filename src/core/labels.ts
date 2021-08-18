@@ -10,10 +10,6 @@ import Graph from "graphology";
 import { Dimensions, Coordinates } from "../types";
 
 /**
- * Classes.
- */
-
-/**
  * Class representing a single candidate for the label grid selection.
  *
  * It also describes a deterministic way to compare two candidates to assess

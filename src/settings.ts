@@ -42,9 +42,11 @@ export interface Settings {
   labelFont: string;
   labelSize: number;
   labelWeight: string;
+  labelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   edgeLabelFont: string;
   edgeLabelSize: number;
   edgeLabelWeight: string;
+  edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   stagePadding: number;
   // Labels
   labelDensity: number;
@@ -80,9 +82,11 @@ export const DEFAULT_SETTINGS: Settings = {
   labelFont: "Arial",
   labelSize: 14,
   labelWeight: "normal",
+  labelColor: { color: "#000" },
   edgeLabelFont: "Arial",
   edgeLabelSize: 14,
   edgeLabelWeight: "normal",
+  edgeLabelColor: { attribute: "color" },
   stagePadding: 30,
 
   // Labels

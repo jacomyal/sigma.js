@@ -18,11 +18,14 @@ export default function drawEdgeLabel(
   const size = settings.edgeLabelSize,
     font = settings.edgeLabelFont,
     weight = settings.edgeLabelWeight,
+    color = settings.edgeLabelColor.attribute
+      ? edgeData[settings.edgeLabelColor.attribute] || settings.edgeLabelColor.color || "#000"
+      : settings.edgeLabelColor.color,
     label = edgeData.label;
 
   if (!label) return;
 
-  context.fillStyle = edgeData.color;
+  context.fillStyle = color;
   context.font = `${weight} ${size}px ${font}`;
   const textWidth = context.measureText(label).width;
 

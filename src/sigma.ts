@@ -789,7 +789,7 @@ export default class Sigma extends EventEmitter {
         {
           key: node,
           label: data.label,
-          color: "#000",
+          color: data.color,
           size,
           x,
           y,
