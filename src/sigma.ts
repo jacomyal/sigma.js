@@ -61,7 +61,10 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeD
 
   if (!data.color) data.color = settings.defaultNodeColor;
 
-  if (!data.label) data.label = "";
+  if (!data.label && data.label !== "") data.label = null;
+
+  if (data.label !== undefined && data.label !== null) data.label = "" + data.label;
+  else data.label = null;
 
   if (!data.size) data.size = 2;
 
@@ -587,7 +590,9 @@ export default class Sigma extends EventEmitter {
       this.normalizationFunction.applyTo(data);
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
-      this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
+
+      if (data.label)
+        this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
       nodeProgram.process(data, data.hidden, i);
 

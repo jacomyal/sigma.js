@@ -37,7 +37,7 @@ export default function drawHover(
 
   const MARGIN = 2;
 
-  if (data.label.length > 0) {
+  if (typeof data.label === "string") {
     const textWidth = context.measureText(data.label).width,
       boxWidth = Math.round(textWidth + 9),
       boxHeight = Math.round(size + 2 * MARGIN),

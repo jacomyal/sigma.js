@@ -69,7 +69,7 @@ export interface Dimensions {
 export type Extent = [number, number];
 
 export interface DisplayData {
-  label: string;
+  label: string | null;
   size: number;
   color: string;
   hidden: boolean;

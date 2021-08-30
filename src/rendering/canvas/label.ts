@@ -13,6 +13,8 @@ export default function drawLabel(
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
 ): void {
+  if (!data.label) return;
+
   const size = settings.labelSize,
     font = settings.labelFont,
     weight = settings.labelWeight;
