@@ -41,7 +41,7 @@ import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
 import { identity, multiplyVec } from "./utils/matrices";
 
-const { nodeExtent, edgeExtent } = graphExtent;
+const { nodeExtent } = graphExtent;
 
 /**
  * Constants.
@@ -72,6 +72,8 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeD
 
   if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
 
+  if (!data.zIndex) data.zIndex = 0;
+
   return data as NodeDisplayData;
 }
 
@@ -83,6 +85,8 @@ function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: Partial<EdgeD
   if (!data.size) data.size = 0.5;
 
   if (!data.hasOwnProperty("hidden")) data.hidden = false;
+
+  if (!data.zIndex) data.zIndex = 0;
 
   return data as EdgeDisplayData;
 }
@@ -111,8 +115,7 @@ export default class Sigma extends EventEmitter {
   private edgeDataCache: Record<EdgeKey, EdgeDisplayData> = {};
   private nodeKeyToIndex: Record<NodeKey, number> = {};
   private edgeKeyToIndex: Record<EdgeKey, number> = {};
-  private nodeExtent: { x: Extent; y: Extent; z: Extent } = { x: [0, 1], y: [0, 1], z: [0, 1] };
-  private edgeExtent: { z: Extent } | null = null;
+  private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
 
   private matrix: Float32Array = identity();
   private invMatrix: Float32Array = identity();
@@ -529,6 +532,8 @@ export default class Sigma extends EventEmitter {
       this.getGraphDimensions(),
       this.getSetting("stagePadding") || 0,
     );
+    const nodeZExtent: [number, number] = [Infinity, -Infinity];
+    const edgeZExtent: [number, number] = [Infinity, -Infinity];
 
     // Clearing the quad
     this.quadtree.clear();
@@ -543,12 +548,7 @@ export default class Sigma extends EventEmitter {
     // Computing extents
     const nodeExtentProperties = ["x", "y"];
 
-    if (this.settings.zIndex) {
-      nodeExtentProperties.push("z");
-      this.edgeExtent = edgeExtent(graph, ["z"]) as { z: Extent };
-    }
-
-    this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent; z: Extent };
+    this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent };
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
@@ -558,15 +558,6 @@ export default class Sigma extends EventEmitter {
     if (!keepArrays) nodeProgram.allocate(graph.order);
 
     let nodes: NodeKey[] = graph.nodes();
-
-    // Handling node z-index
-    // TODO: z-index needs us to compute display data before hand
-    if (this.settings.zIndex)
-      nodes = zIndexOrdering<NodeKey>(
-        this.nodeExtent.z,
-        (node: NodeKey): number => graph.getNodeAttribute(node, "z"),
-        nodes,
-      );
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -588,6 +579,21 @@ export default class Sigma extends EventEmitter {
       this.nodeDataCache[node] = data;
 
       this.normalizationFunction.applyTo(data);
+
+      if (this.settings.zIndex) {
+        if (data.zIndex < nodeZExtent[0]) nodeZExtent[0] = data.zIndex;
+        if (data.zIndex > nodeZExtent[1]) nodeZExtent[1] = data.zIndex;
+      }
+    }
+
+    // Handling node z-index
+    // TODO: z-index needs us to compute display data before hand
+    if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
+      nodes = zIndexOrdering<NodeKey>(nodeZExtent, (node: NodeKey): number => this.nodeDataCache[node].zIndex, nodes);
+
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      const node = nodes[i];
+      const data = this.nodeDataCache[node];
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
 
@@ -615,10 +621,6 @@ export default class Sigma extends EventEmitter {
 
     let edges: EdgeKey[] = graph.edges();
 
-    // Handling edge z-index
-    if (this.settings.zIndex && this.edgeExtent)
-      edges = zIndexOrdering(this.edgeExtent.z, (edge: EdgeKey): number => graph.getEdgeAttribute(edge, "z"), edges);
-
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
@@ -636,6 +638,20 @@ export default class Sigma extends EventEmitter {
       const data = applyEdgeDefaults(this.settings, edge, attr);
 
       this.edgeDataCache[edge] = data;
+
+      if (this.settings.zIndex) {
+        if (data.zIndex < edgeZExtent[0]) edgeZExtent[0] = data.zIndex;
+        if (data.zIndex > edgeZExtent[1]) edgeZExtent[1] = data.zIndex;
+      }
+    }
+
+    // Handling edge z-index
+    if (this.settings.zIndex && edgeZExtent[0] !== edgeZExtent[1])
+      edges = zIndexOrdering(edgeZExtent, (edge: EdgeKey): number => this.edgeDataCache[edge].zIndex, edges);
+
+    for (let i = 0, l = edges.length; i < l; i++) {
+      const edge = edges[i];
+      const data = this.edgeDataCache[edge];
 
       const extremities = graph.extremities(edge),
         sourceData = this.nodeDataCache[extremities[0]],
