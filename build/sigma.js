@@ -1638,11 +1638,8 @@ var QuadTree = /** @class */ (function () {
         return this;
     };
     QuadTree.prototype.point = function (x, y) {
-        var nodes = [];
+        var nodes = this.containers[OUTSIDE_BLOCK];
         var block = 0, level = 0;
-        // If the point is out of the quadtree, return the full outside block:
-        if (x < 0 || y < 0 || x > 1 || y > 1)
-            return this.containers[OUTSIDE_BLOCK];
         do {
             if (this.containers[block])
                 nodes.push.apply(nodes, __spreadArray([], __read(this.containers[block])));
@@ -1915,7 +1912,10 @@ var MouseCaptor = /** @class */ (function (_super) {
             });
         }
         this.isMoving = false;
-        setTimeout(function () { return (_this.draggedEvents = 0); }, 0);
+        setTimeout(function () {
+            _this.draggedEvents = 0;
+            _this.renderer.refresh();
+        }, 0);
         this.emit("mouseup", captor_1.getMouseCoords(e));
     };
     MouseCaptor.prototype.handleMove = function (e) {
@@ -2189,7 +2189,7 @@ var labels_1 = __webpack_require__(15);
 var settings_1 = __webpack_require__(16);
 var touch_1 = __importDefault(__webpack_require__(37));
 var matrices_1 = __webpack_require__(6);
-var nodeExtent = extent_1.default.nodeExtent, edgeExtent = extent_1.default.edgeExtent;
+var nodeExtent = extent_1.default.nodeExtent;
 /**
  * Constants.
  */
@@ -2204,14 +2204,20 @@ function applyNodeDefaults(settings, key, data) {
         throw new Error("Sigma: could not find a valid position (x, y) for node \"" + key + "\". All your nodes must have a number \"x\" and \"y\". Maybe your forgot to apply a layout or your \"nodeReducer\" is not returning the correct data?");
     if (!data.color)
         data.color = settings.defaultNodeColor;
-    if (!data.label)
-        data.label = "";
+    if (!data.label && data.label !== "")
+        data.label = null;
+    if (data.label !== undefined && data.label !== null)
+        data.label = "" + data.label;
+    else
+        data.label = null;
     if (!data.size)
         data.size = 2;
     if (!data.hasOwnProperty("hidden"))
         data.hidden = false;
     if (!data.hasOwnProperty("highlighted"))
         data.highlighted = false;
+    if (!data.zIndex)
+        data.zIndex = 0;
     return data;
 }
 function applyEdgeDefaults(settings, key, data) {
@@ -2223,6 +2229,8 @@ function applyEdgeDefaults(settings, key, data) {
         data.size = 0.5;
     if (!data.hasOwnProperty("hidden"))
         data.hidden = false;
+    if (!data.zIndex)
+        data.zIndex = 0;
     return data;
 }
 /**
@@ -2248,8 +2256,7 @@ var Sigma = /** @class */ (function (_super) {
         _this.edgeDataCache = {};
         _this.nodeKeyToIndex = {};
         _this.edgeKeyToIndex = {};
-        _this.nodeExtent = { x: [0, 1], y: [0, 1], z: [0, 1] };
-        _this.edgeExtent = null;
+        _this.nodeExtent = { x: [0, 1], y: [0, 1] };
         _this.matrix = matrices_1.identity();
         _this.invMatrix = matrices_1.identity();
         _this.customBBox = null;
@@ -2565,12 +2572,15 @@ var Sigma = /** @class */ (function (_super) {
      * @return {Sigma}
      */
     Sigma.prototype.process = function (keepArrays) {
+        var _this = this;
         if (keepArrays === void 0) { keepArrays = false; }
         var graph = this.graph;
         var settings = this.settings;
         var dimensions = this.getDimensions();
         var nullCamera = new camera_1.default();
         var nullCameraMatrix = utils_1.matrixFromCamera(nullCamera.getState(), this.getDimensions(), this.getGraphDimensions(), this.getSetting("stagePadding") || 0);
+        var nodeZExtent = [Infinity, -Infinity];
+        var edgeZExtent = [Infinity, -Infinity];
         // Clearing the quad
         this.quadtree.clear();
         // Resetting the label grid
@@ -2580,10 +2590,6 @@ var Sigma = /** @class */ (function (_super) {
         this.highlightedNodes = new Set();
         // Computing extents
         var nodeExtentProperties = ["x", "y"];
-        if (this.settings.zIndex) {
-            nodeExtentProperties.push("z");
-            this.edgeExtent = edgeExtent(graph, ["z"]);
-        }
         this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
         // Rescaling function
         this.normalizationFunction = utils_1.createNormalizationFunction(this.customBBox || this.nodeExtent);
@@ -2591,10 +2597,6 @@ var Sigma = /** @class */ (function (_super) {
         if (!keepArrays)
             nodeProgram.allocate(graph.order);
         var nodes = graph.nodes();
-        // Handling node z-index
-        // TODO: z-index needs us to compute display data before hand
-        if (this.settings.zIndex)
-            nodes = utils_1.zIndexOrdering(this.nodeExtent.z, function (node) { return graph.getNodeAttribute(node, "z"); }, nodes);
         for (var i = 0, l = nodes.length; i < l; i++) {
             var node = nodes[i];
             // Node display data resolution:
@@ -2610,8 +2612,23 @@ var Sigma = /** @class */ (function (_super) {
             var data = applyNodeDefaults(this.settings, node, attr);
             this.nodeDataCache[node] = data;
             this.normalizationFunction.applyTo(data);
+            if (this.settings.zIndex) {
+                if (data.zIndex < nodeZExtent[0])
+                    nodeZExtent[0] = data.zIndex;
+                if (data.zIndex > nodeZExtent[1])
+                    nodeZExtent[1] = data.zIndex;
+            }
+        }
+        // Handling node z-index
+        // TODO: z-index needs us to compute display data before hand
+        if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
+            nodes = utils_1.zIndexOrdering(nodeZExtent, function (node) { return _this.nodeDataCache[node].zIndex; }, nodes);
+        for (var i = 0, l = nodes.length; i < l; i++) {
+            var node = nodes[i];
+            var data = this.nodeDataCache[node];
             this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
-            this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
+            if (data.label)
+                this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
             nodeProgram.process(data, data.hidden, i);
             // Save the node in the highlighted set if needed
             if (data.highlighted && !data.hidden)
@@ -2627,9 +2644,6 @@ var Sigma = /** @class */ (function (_super) {
         if (!keepArrays)
             edgeProgram.allocate(graph.size);
         var edges = graph.edges();
-        // Handling edge z-index
-        if (this.settings.zIndex && this.edgeExtent)
-            edges = utils_1.zIndexOrdering(this.edgeExtent.z, function (edge) { return graph.getEdgeAttribute(edge, "z"); }, edges);
         for (var i = 0, l = edges.length; i < l; i++) {
             var edge = edges[i];
             // Edge display data resolution:
@@ -2643,6 +2657,19 @@ var Sigma = /** @class */ (function (_super) {
                 attr = settings.edgeReducer(edge, attr);
             var data = applyEdgeDefaults(this.settings, edge, attr);
             this.edgeDataCache[edge] = data;
+            if (this.settings.zIndex) {
+                if (data.zIndex < edgeZExtent[0])
+                    edgeZExtent[0] = data.zIndex;
+                if (data.zIndex > edgeZExtent[1])
+                    edgeZExtent[1] = data.zIndex;
+            }
+        }
+        // Handling edge z-index
+        if (this.settings.zIndex && edgeZExtent[0] !== edgeZExtent[1])
+            edges = utils_1.zIndexOrdering(edgeZExtent, function (edge) { return _this.edgeDataCache[edge].zIndex; }, edges);
+        for (var i = 0, l = edges.length; i < l; i++) {
+            var edge = edges[i];
+            var data = this.edgeDataCache[edge];
             var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
             var hidden = data.hidden || sourceData.hidden || targetData.hidden;
             edgeProgram.process(sourceData, targetData, data, hidden, i);
@@ -3683,6 +3710,8 @@ exports.DEFAULT_SETTINGS = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 function drawLabel(context, data, settings) {
+    if (!data.label)
+        return;
     var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
     context.fillStyle = "#000";
     context.font = weight + " " + size + "px " + font;
@@ -3703,32 +3732,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var node_1 = __importDefault(__webpack_require__(19));
 var label_1 = __importDefault(__webpack_require__(17));
+/**
+ * Draw an hovered node.
+ * - if there is no label => display a shadow on the node
+ * - if the label box is bigger than node size => display a label box that contains the node with a shadow
+ * - else node with shadow and the label box
+ */
 function drawHover(context, data, settings) {
     var size = settings.labelSize, font = settings.labelFont, weight = settings.labelWeight;
     context.font = weight + " " + size + "px " + font;
     // Then we draw the label background
-    context.beginPath();
-    context.fillStyle = "#fff";
+    context.fillStyle = "#FFF";
     context.shadowOffsetX = 0;
     context.shadowOffsetY = 0;
     context.shadowBlur = 8;
     context.shadowColor = "#000";
-    var textWidth = context.measureText(data.label).width;
-    var x = Math.round(data.x - size / 2 - 2), y = Math.round(data.y - size / 2 - 2), w = Math.round(textWidth + size / 2 + data.size + 9), h = Math.round(size + 4), e = Math.round(size / 2 + 2);
-    context.moveTo(x, y + e);
-    context.moveTo(x, y + e);
-    context.arcTo(x, y, x + e, y, e);
-    context.lineTo(x + w, y);
-    context.lineTo(x + w, y + h);
-    context.lineTo(x + e, y + h);
-    context.arcTo(x, y + h, x, y + h - e, e);
-    context.lineTo(x, y + e);
-    context.closePath();
-    context.fill();
+    var MARGIN = 2;
+    if (typeof data.label === "string") {
+        var textWidth = context.measureText(data.label).width, boxWidth = Math.round(textWidth + 9), boxHeight = Math.round(size + 2 * MARGIN), radious = Math.max(data.size, size / 2) + MARGIN;
+        var angleRadian = Math.asin(boxHeight / 2 / radious);
+        var xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radious, 2) - Math.pow(boxHeight / 2, 2)));
+        context.beginPath();
+        context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
+        context.lineTo(data.x + radious + boxWidth, data.y + boxHeight / 2);
+        context.lineTo(data.x + radious + boxWidth, data.y - boxHeight / 2);
+        context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
+        context.arc(data.x, data.y, radious, angleRadian, -angleRadian);
+        context.closePath();
+        context.fill();
+    }
+    else {
+        context.beginPath();
+        context.arc(data.x, data.y, data.size + MARGIN, 0, Math.PI * 2);
+        context.closePath();
+        context.fill();
+    }
     context.shadowOffsetX = 0;
     context.shadowOffsetY = 0;
     context.shadowBlur = 0;
-    // Then we need to draw the node
+    // the inner node of the label box
     node_1.default(context, data);
     // And finally we draw the label
     label_1.default(context, data, settings);
@@ -3763,6 +3805,8 @@ exports.default = drawNode;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 function drawEdgeLabel(context, edgeData, sourceData, targetData, settings) {
     var size = settings.edgeLabelSize, font = settings.edgeLabelFont, weight = settings.edgeLabelWeight, label = edgeData.label;
+    if (!label)
+        return;
     context.fillStyle = edgeData.color;
     context.font = weight + " " + size + "px " + font;
     var textWidth = context.measureText(label).width;
