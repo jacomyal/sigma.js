@@ -496,13 +496,10 @@ export default class QuadTree {
   }
 
   point(x: number, y: number): NodeKey[] {
-    const nodes: NodeKey[] = [];
+    const nodes: NodeKey[] = this.containers[OUTSIDE_BLOCK];
 
     let block = 0,
       level = 0;
-
-    // If the point is out of the quadtree, return the full outside block:
-    if (x < 0 || y < 0 || x > 1 || y > 1) return this.containers[OUTSIDE_BLOCK];
 
     do {
       if (this.containers[block]) nodes.push(...this.containers[block]);
