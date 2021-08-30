@@ -1390,7 +1390,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {{ x: Extent, y: Extent }}
    */
-  getBBox() {
+  getBBox(): { x: Extent; y: Extent } {
     return nodeExtent(this.graph, ["x", "y"]) as { x: Extent; y: Extent };
   }
 
@@ -1408,7 +1408,7 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  setCustomBBox(customBBox: { x: Extent; y: Extent } | null) {
+  setCustomBBox(customBBox: { x: Extent; y: Extent } | null): this {
     this.customBBox = customBBox;
     this._scheduleRefresh();
     return this;
