@@ -72,6 +72,10 @@ const EXAMPLES = {
     id: "rotation",
     title: "Camera rotation",
   },
+  multiPrograms: {
+    id: "multi-programs",
+    title: "Multiple programs",
+  },
 };
 
 const entry = {};

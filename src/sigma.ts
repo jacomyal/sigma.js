@@ -553,14 +553,15 @@ export default class Sigma extends EventEmitter {
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
 
-    const nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
-
-    if (!keepArrays) nodeProgram.allocate(graph.order);
+    const nodesPerPrograms: Record<string, number> = {};
 
     let nodes: NodeKey[] = graph.nodes();
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
+
+      const type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
+      nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
 
       // Node display data resolution:
       //   1. First we get the node's attributes
@@ -586,6 +587,12 @@ export default class Sigma extends EventEmitter {
       }
     }
 
+    for (const type in this.nodePrograms) {
+      if (!keepArrays) this.nodePrograms[type].allocate(nodesPerPrograms[type] || 0);
+      // We reset that count here, so that we can reuse it while calling the Program#process methods:
+      nodesPerPrograms[type] = 0;
+    }
+
     // Handling node z-index
     // TODO: z-index needs us to compute display data before hand
     if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
@@ -594,13 +601,14 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
       const data = this.nodeDataCache[node];
+      const type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
 
       if (data.label)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
-      nodeProgram.process(data, data.hidden, i);
+      this.nodePrograms[type].process(data, data.hidden, nodesPerPrograms[type]++);
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
@@ -610,19 +618,15 @@ export default class Sigma extends EventEmitter {
 
     this.labelGrid.organize();
 
-    // TODO: maybe we should bind and buffer as part of rendering?
-    // We also need to find when it is useful and when it's really not
-    nodeProgram.bind();
-    nodeProgram.bufferData();
-
-    const edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
-
-    if (!keepArrays) edgeProgram.allocate(graph.size);
+    const edgesPerPrograms: Record<string, number> = {};
 
     let edges: EdgeKey[] = graph.edges();
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
+
+      const type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
+      edgesPerPrograms[type] = (edgesPerPrograms[type] || 0) + 1;
 
       // Edge display data resolution:
       //   1. First we get the edge's attributes
@@ -645,6 +649,12 @@ export default class Sigma extends EventEmitter {
       }
     }
 
+    for (const type in this.edgePrograms) {
+      if (!keepArrays) this.edgePrograms[type].allocate(edgesPerPrograms[type] || 0);
+      // We reset that count here, so that we can reuse it while calling the Program#process methods:
+      edgesPerPrograms[type] = 0;
+    }
+
     // Handling edge z-index
     if (this.settings.zIndex && edgeZExtent[0] !== edgeZExtent[1])
       edges = zIndexOrdering(edgeZExtent, (edge: EdgeKey): number => this.edgeDataCache[edge].zIndex, edges);
@@ -652,24 +662,23 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
       const data = this.edgeDataCache[edge];
+      const type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
 
       const extremities = graph.extremities(edge),
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]];
 
       const hidden = data.hidden || sourceData.hidden || targetData.hidden;
-      edgeProgram.process(sourceData, targetData, data, hidden, i);
+      this.edgePrograms[type].process(sourceData, targetData, data, hidden, edgesPerPrograms[type]++);
 
       this.nodeKeyToIndex[edge] = i;
     }
 
-    // Computing edge indices if necessary
-    if (!keepArrays && typeof edgeProgram.computeIndices === "function") edgeProgram.computeIndices();
+    for (const type in this.edgePrograms) {
+      const program = this.edgePrograms[type];
 
-    // TODO: maybe we should bind and buffer as part of rendering?
-    // We also need to find when it is useful and when it's really not
-    edgeProgram.bind();
-    edgeProgram.bufferData();
+      if (!keepArrays && typeof program.computeIndices === "function") program.computeIndices();
+    }
 
     return this;
   }
@@ -965,32 +974,38 @@ export default class Sigma extends EventEmitter {
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
 
-    let program;
-
     // Drawing nodes
-    program = this.nodePrograms[this.settings.defaultNodeType];
+    for (const type in this.nodePrograms) {
+      const program = this.nodePrograms[type];
 
-    program.render({
-      matrix: this.matrix,
-      width: this.width,
-      height: this.height,
-      ratio: cameraState.ratio,
-      nodesPowRatio: 0.5,
-      scalingRatio: WEBGL_OVERSAMPLING_RATIO,
-    });
-
-    // Drawing edges
-    if (!this.settings.hideEdgesOnMove || !moving) {
-      program = this.edgePrograms[this.settings.defaultEdgeType];
-
+      program.bind();
+      program.bufferData();
       program.render({
         matrix: this.matrix,
         width: this.width,
         height: this.height,
         ratio: cameraState.ratio,
-        edgesPowRatio: 0.5,
+        nodesPowRatio: 0.5,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
+    }
+
+    // Drawing edges
+    if (!this.settings.hideEdgesOnMove || !moving) {
+      for (const type in this.edgePrograms) {
+        const program = this.edgePrograms[type];
+
+        program.bind();
+        program.bufferData();
+        program.render({
+          matrix: this.matrix,
+          width: this.width,
+          height: this.height,
+          ratio: cameraState.ratio,
+          edgesPowRatio: 0.5,
+          scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+        });
+      }
     }
 
     // Do not display labels on move per setting
