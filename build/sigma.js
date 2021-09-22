@@ -2593,12 +2593,12 @@ var Sigma = /** @class */ (function (_super) {
         this.nodeExtent = nodeExtent(graph, nodeExtentProperties);
         // Rescaling function
         this.normalizationFunction = utils_1.createNormalizationFunction(this.customBBox || this.nodeExtent);
-        var nodeProgram = this.nodePrograms[this.settings.defaultNodeType];
-        if (!keepArrays)
-            nodeProgram.allocate(graph.order);
+        var nodesPerPrograms = {};
         var nodes = graph.nodes();
         for (var i = 0, l = nodes.length; i < l; i++) {
             var node = nodes[i];
+            var type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
+            nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
             // Node display data resolution:
             //   1. First we get the node's attributes
             //   2. We optionally reduce them using the function provided by the user
@@ -2619,6 +2619,12 @@ var Sigma = /** @class */ (function (_super) {
                     nodeZExtent[1] = data.zIndex;
             }
         }
+        for (var type in this.nodePrograms) {
+            if (!keepArrays)
+                this.nodePrograms[type].allocate(nodesPerPrograms[type] || 0);
+            // We reset that count here, so that we can reuse it while calling the Program#process methods:
+            nodesPerPrograms[type] = 0;
+        }
         // Handling node z-index
         // TODO: z-index needs us to compute display data before hand
         if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
@@ -2626,26 +2632,23 @@ var Sigma = /** @class */ (function (_super) {
         for (var i = 0, l = nodes.length; i < l; i++) {
             var node = nodes[i];
             var data = this.nodeDataCache[node];
+            var type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
             this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
             if (data.label)
                 this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
-            nodeProgram.process(data, data.hidden, i);
+            this.nodePrograms[type].process(data, data.hidden, nodesPerPrograms[type]++);
             // Save the node in the highlighted set if needed
             if (data.highlighted && !data.hidden)
                 this.highlightedNodes.add(node);
             this.nodeKeyToIndex[node] = i;
         }
         this.labelGrid.organize();
-        // TODO: maybe we should bind and buffer as part of rendering?
-        // We also need to find when it is useful and when it's really not
-        nodeProgram.bind();
-        nodeProgram.bufferData();
-        var edgeProgram = this.edgePrograms[this.settings.defaultEdgeType];
-        if (!keepArrays)
-            edgeProgram.allocate(graph.size);
+        var edgesPerPrograms = {};
         var edges = graph.edges();
         for (var i = 0, l = edges.length; i < l; i++) {
             var edge = edges[i];
+            var type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
+            edgesPerPrograms[type] = (edgesPerPrograms[type] || 0) + 1;
             // Edge display data resolution:
             //   1. First we get the edge's attributes
             //   2. We optionally reduce them using the function provided by the user
@@ -2664,24 +2667,29 @@ var Sigma = /** @class */ (function (_super) {
                     edgeZExtent[1] = data.zIndex;
             }
         }
+        for (var type in this.edgePrograms) {
+            if (!keepArrays)
+                this.edgePrograms[type].allocate(edgesPerPrograms[type] || 0);
+            // We reset that count here, so that we can reuse it while calling the Program#process methods:
+            edgesPerPrograms[type] = 0;
+        }
         // Handling edge z-index
         if (this.settings.zIndex && edgeZExtent[0] !== edgeZExtent[1])
             edges = utils_1.zIndexOrdering(edgeZExtent, function (edge) { return _this.edgeDataCache[edge].zIndex; }, edges);
         for (var i = 0, l = edges.length; i < l; i++) {
             var edge = edges[i];
             var data = this.edgeDataCache[edge];
+            var type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
             var extremities = graph.extremities(edge), sourceData = this.nodeDataCache[extremities[0]], targetData = this.nodeDataCache[extremities[1]];
             var hidden = data.hidden || sourceData.hidden || targetData.hidden;
-            edgeProgram.process(sourceData, targetData, data, hidden, i);
+            this.edgePrograms[type].process(sourceData, targetData, data, hidden, edgesPerPrograms[type]++);
             this.nodeKeyToIndex[edge] = i;
         }
-        // Computing edge indices if necessary
-        if (!keepArrays && typeof edgeProgram.computeIndices === "function")
-            edgeProgram.computeIndices();
-        // TODO: maybe we should bind and buffer as part of rendering?
-        // We also need to find when it is useful and when it's really not
-        edgeProgram.bind();
-        edgeProgram.bufferData();
+        for (var type in this.edgePrograms) {
+            var program = this.edgePrograms[type];
+            if (!keepArrays && typeof program.computeIndices === "function")
+                program.computeIndices();
+        }
         return this;
     };
     /**
@@ -2909,28 +2917,35 @@ var Sigma = /** @class */ (function (_super) {
         var padding = this.getSetting("stagePadding") || 0;
         this.matrix = utils_1.matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
         this.invMatrix = utils_1.matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
-        var program;
         // Drawing nodes
-        program = this.nodePrograms[this.settings.defaultNodeType];
-        program.render({
-            matrix: this.matrix,
-            width: this.width,
-            height: this.height,
-            ratio: cameraState.ratio,
-            nodesPowRatio: 0.5,
-            scalingRatio: WEBGL_OVERSAMPLING_RATIO,
-        });
-        // Drawing edges
-        if (!this.settings.hideEdgesOnMove || !moving) {
-            program = this.edgePrograms[this.settings.defaultEdgeType];
+        for (var type in this.nodePrograms) {
+            var program = this.nodePrograms[type];
+            program.bind();
+            program.bufferData();
             program.render({
                 matrix: this.matrix,
                 width: this.width,
                 height: this.height,
                 ratio: cameraState.ratio,
-                edgesPowRatio: 0.5,
+                nodesPowRatio: 0.5,
                 scalingRatio: WEBGL_OVERSAMPLING_RATIO,
             });
+        }
+        // Drawing edges
+        if (!this.settings.hideEdgesOnMove || !moving) {
+            for (var type in this.edgePrograms) {
+                var program = this.edgePrograms[type];
+                program.bind();
+                program.bufferData();
+                program.render({
+                    matrix: this.matrix,
+                    width: this.width,
+                    height: this.height,
+                    ratio: cameraState.ratio,
+                    edgesPowRatio: 0.5,
+                    scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+                });
+            }
         }
         // Do not display labels on move per setting
         if (this.settings.hideLabelsOnMove && moving)
