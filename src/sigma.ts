@@ -1090,8 +1090,8 @@ export default class Sigma extends EventEmitter {
     const extent = this.customBBox || this.nodeExtent;
 
     return {
-      width: extent.x[1] - extent.x[0],
-      height: extent.y[1] - extent.y[0],
+      width: extent.x[1] - extent.x[0] || 1,
+      height: extent.y[1] - extent.y[0] || 1,
     };
   }
 
