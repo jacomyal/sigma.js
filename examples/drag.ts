@@ -29,10 +29,12 @@ renderer.on("downNode", (e) => {
   if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
   dragging = true;
   draggedNode = e.node;
+  graph.setNodeAttribute(draggedNode, "highlighted", true);
   camera.disable();
 });
 
 captor.on("mouseup", () => {
+  graph.removeNodeAttribute(draggedNode, "highlighted");
   dragging = false;
   draggedNode = null;
   camera.enable();
