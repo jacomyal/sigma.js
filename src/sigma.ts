@@ -127,10 +127,6 @@ export default class Sigma extends EventEmitter {
 
   // Cache:
   private cameraSizeRatio = 1;
-  private positiveAngleCos = 1;
-  private negativeAngleCos = 1;
-  private positiveAngleSin = 0;
-  private negativeAngleSin = -0;
 
   // Starting dimensions
   private width = 0;
@@ -1023,12 +1019,8 @@ export default class Sigma extends EventEmitter {
    * each time the camera state is updated.
    */
   private updateCachedValues(): void {
-    const { ratio, angle } = this.camera.getState();
+    const { ratio } = this.camera.getState();
     this.cameraSizeRatio = Math.pow(ratio, SIZE_SCALING_EXPONENT);
-    this.positiveAngleCos = Math.cos(angle);
-    this.negativeAngleCos = Math.cos(-angle);
-    this.positiveAngleSin = Math.sin(angle);
-    this.negativeAngleSin = Math.sin(-angle);
   }
 
   /**---------------------------------------------------------------------------
