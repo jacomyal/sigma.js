@@ -4,6 +4,7 @@ node_modules
 *.swp
 .DS_Store
 .vscode
+build
 /core/
 /rendering/
 /utils/
