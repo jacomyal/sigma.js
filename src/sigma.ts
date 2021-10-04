@@ -913,7 +913,12 @@ export default class Sigma extends EventEmitter {
       render(this.hoveredNode);
     }
 
-    this.highlightedNodes.forEach(render);
+    this.highlightedNodes.forEach((node) => {
+      // The hovered node has already been highlighted
+      if (node === this.hoveredNode) return;
+
+      render(node);
+    });
   }
 
   /**
