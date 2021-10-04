@@ -72,6 +72,8 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeD
 
   if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
 
+  if (!data.type || data.type === "") data.type = settings.defaultNodeType;
+
   if (!data.zIndex) data.zIndex = 0;
 
   return data as NodeDisplayData;
@@ -85,6 +87,8 @@ function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: Partial<EdgeD
   if (!data.size) data.size = 0.5;
 
   if (!data.hasOwnProperty("hidden")) data.hidden = false;
+
+  if (!data.type || data.type === "") data.type = settings.defaultEdgeType;
 
   if (!data.zIndex) data.zIndex = 0;
 
@@ -556,9 +560,6 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
 
-      const type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
-      nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
-
       // Node display data resolution:
       //   1. First we get the node's attributes
       //   2. We optionally reduce them using the function provided by the user
@@ -573,6 +574,7 @@ export default class Sigma extends EventEmitter {
 
       const data = applyNodeDefaults(this.settings, node, attr);
 
+      nodesPerPrograms[data.type] = (nodesPerPrograms[data.type] || 0) + 1;
       this.nodeDataCache[node] = data;
 
       this.normalizationFunction.applyTo(data);
@@ -597,14 +599,13 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
       const data = this.nodeDataCache[node];
-      const type = graph.getNodeAttribute(node, "type") || this.settings.defaultNodeType;
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
 
       if (data.label)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
-      this.nodePrograms[type].process(data, data.hidden, nodesPerPrograms[type]++);
+      this.nodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
@@ -621,9 +622,6 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      const type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
-      edgesPerPrograms[type] = (edgesPerPrograms[type] || 0) + 1;
-
       // Edge display data resolution:
       //   1. First we get the edge's attributes
       //   2. We optionally reduce them using the function provided by the user
@@ -637,6 +635,7 @@ export default class Sigma extends EventEmitter {
 
       const data = applyEdgeDefaults(this.settings, edge, attr);
 
+      edgesPerPrograms[data.type] = (edgesPerPrograms[data.type] || 0) + 1;
       this.edgeDataCache[edge] = data;
 
       if (this.settings.zIndex) {
@@ -658,14 +657,13 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
       const data = this.edgeDataCache[edge];
-      const type = graph.getEdgeAttribute(edge, "type") || this.settings.defaultEdgeType;
 
       const extremities = graph.extremities(edge),
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]];
 
       const hidden = data.hidden || sourceData.hidden || targetData.hidden;
-      this.edgePrograms[type].process(sourceData, targetData, data, hidden, edgesPerPrograms[type]++);
+      this.edgePrograms[data.type].process(sourceData, targetData, data, hidden, edgesPerPrograms[data.type]++);
 
       this.nodeKeyToIndex[edge] = i;
     }

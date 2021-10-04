@@ -74,6 +74,7 @@ export interface DisplayData {
   color: string;
   hidden: boolean;
   zIndex: number;
+  type: string;
 }
 
 export interface NodeDisplayData extends Coordinates, DisplayData {
