@@ -5,7 +5,6 @@ import chroma from "chroma-js";
 import { Attributes, EdgeKey, NodeKey } from "graphology-types";
 
 import Sigma from "sigma";
-import { EdgeAttributes, NodeAttributes } from "sigma/types";
 
 import { getRandomName, globalize } from "./utils";
 
