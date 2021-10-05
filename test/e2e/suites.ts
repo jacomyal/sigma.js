@@ -24,7 +24,7 @@ export type Tests = Array<{
 export const tests: Tests = [
   {
     name: "single-node",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const { Graph, Sigma, container } = dependencies;
 
@@ -37,31 +37,31 @@ export const tests: Tests = [
   },
   {
     name: "square",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const { Graph, Sigma, container } = dependencies;
 
         const graph = new Graph();
-        graph.addNode("upper-left", { x: 0, y: 0, size: 5 });
-        graph.addNode("upper-right", { x: 10, y: 0, size: 5 });
-        graph.addNode("lower-left", { x: 0, y: 10, size: 5 });
-        graph.addNode("lower-right", { x: 10, y: 10, size: 5 });
+        graph.addNode("upper-left", { x: 0, y: 0, size: 10, label: "upper left" });
+        graph.addNode("upper-right", { x: 10, y: 0, size: 10, label: "upper right" });
+        graph.addNode("lower-left", { x: 0, y: 10, size: 10, label: "lower left" });
+        graph.addNode("lower-right", { x: 10, y: 10, size: 10, label: "lower right" });
 
-        graph.addEdge("upper-left", "upper-right", { type: "arrow", size: 5 });
-        graph.addEdge("upper-right", "lower-right", { type: "arrow", size: 5 });
-        graph.addEdge("lower-right", "lower-left", { type: "arrow", size: 5 });
-        graph.addEdge("lower-left", "upper-left", { type: "arrow", size: 5 });
+        graph.addEdge("upper-left", "upper-right", { type: "arrow", size: 5, label: "right" });
+        graph.addEdge("upper-right", "lower-right", { type: "arrow", size: 5, label: "down" });
+        graph.addEdge("lower-right", "lower-left", { type: "arrow", size: 5, label: "left" });
+        graph.addEdge("lower-left", "upper-left", { type: "arrow", size: 5, label: "up" });
 
         graph.addEdge("upper-left", "lower-right", { color: "#f00" });
         graph.addEdge("upper-right", "lower-left", { color: "#f00" });
 
-        new Sigma(graph, container);
+        new Sigma(graph, container, { renderEdgeLabels: true, labelRenderedSizeThreshold: -Infinity });
       });
     },
   },
   {
     name: "les-miserables",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const {
           data: { lesMiserables },
@@ -75,7 +75,7 @@ export const tests: Tests = [
   },
   {
     name: "arctic",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const {
           data: { arctic },
@@ -89,7 +89,7 @@ export const tests: Tests = [
   },
   {
     name: "camera-state-unzoom-pan",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const {
           data: { lesMiserables },
@@ -104,7 +104,7 @@ export const tests: Tests = [
   },
   {
     name: "camera-state-zoom-pan",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const {
           data: { lesMiserables },
@@ -119,7 +119,7 @@ export const tests: Tests = [
   },
   {
     name: "reducers",
-    scenario: async (page) => {
+    scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const {
           data: { lesMiserables },

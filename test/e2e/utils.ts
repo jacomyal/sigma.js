@@ -18,7 +18,7 @@ const webpackConfig = require("./web/webpack.config");
  * @param {string} folder Path where to saved the screenshots
  * @param {string} suffix The filename will be suffixed with it
  */
-export async function takeScreenshots(tests: Tests, folder: string, port: number = 8000, suffix = ""): Promise<void> {
+export async function takeScreenshots(tests: Tests, folder: string, port = 8000, suffix = ""): Promise<void> {
   // Launch the browser
   const browser = await puppeteer.launch({ args: [`--window-size=800,600`] });
   const testPageUrl = `http://localhost:${port}`;
@@ -82,7 +82,7 @@ export function imageDiff(image1: string, image2: string, diffFilename: string):
   return { diff: nbPixelInDiff, percent: nbPixelInDiff / (width * height) };
 }
 
-export function startExampleServer(port: number = 8000): Promise<WebpackDevServer> {
+export function startExampleServer(port = 8000): Promise<WebpackDevServer> {
   return new Promise((resolve) => {
     const compiler = Webpack(webpackConfig);
     const devServerOptions = {
