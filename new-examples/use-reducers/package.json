@@ -1,0 +1,18 @@
+{
+  "name": "sigma-example-use-reducers",
+  "version": "1.0.0",
+  "description": "A minimalist sigma usage example.",
+  "main": "index.js",
+  "scripts": {
+    "start": "kotatsu serve --typescript index.ts"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "graphology": "^0.21.0",
+    "sigma": "latest"
+  },
+  "devDependencies": {
+    "kotatsu": "^0.22.2",
+    "typescript": "4.4.3"
+  }
+}
