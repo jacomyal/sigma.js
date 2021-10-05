@@ -1,7 +1,7 @@
 import Graph from "graphology";
 import Sigma from "sigma";
 
-const container = document.getElementById("sigma-container");
+const container = document.getElementById("sigma-container") as HTMLElement;
 
 const graph = new Graph();
 

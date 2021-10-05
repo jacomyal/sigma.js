@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start:minimal": "kotatsu serve minimal/index.js --index minimal/index.html"
+    "start:minimal": "kotatsu serve minimal/index.ts --index minimal/index.html"
   },
   "kotatsu": {
     "typescript": true,
