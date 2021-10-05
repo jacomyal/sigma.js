@@ -1,6 +1,7 @@
 import { Page } from "puppeteer";
 import Sigma from "../../src";
-import Graph, { GraphConstructor } from "graphology-types";
+import { NodeDisplayData, EdgeDisplayData } from "../../src/types";
+import Graph, { GraphConstructor, NodeKey, EdgeKey } from "graphology-types";
 
 type TestDependencies = {
   Graph: GraphConstructor;
@@ -83,6 +84,60 @@ export const tests: Tests = [
         } = dependencies;
 
         new Sigma(arctic, container);
+      });
+    },
+  },
+  {
+    name: "camera-state-unzoom-pan",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
+
+        const renderer = new Sigma(lesMiserables, container);
+        renderer.getCamera().setState({ ratio: 3, x: 0.8, y: 0.7 });
+      });
+    },
+  },
+  {
+    name: "camera-state-zoom-pan",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
+
+        const renderer = new Sigma(lesMiserables, container);
+        renderer.getCamera().setState({ ratio: 1 / 3, x: 0.8, y: 0.7 });
+      });
+    },
+  },
+  {
+    name: "reducers",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
+
+        const nodeReducer = (key: NodeKey, attr: Partial<NodeDisplayData>) => {
+          const data = attr as NodeDisplayData;
+          return Object.assign({}, data, { color: (data.label || "").charCodeAt(0) % 2 === 0 ? "#1E90FF" : "#FF0000" });
+        };
+
+        const edgeReducer = (key: EdgeKey, attr: Partial<EdgeDisplayData>) => {
+          const data = attr as EdgeDisplayData;
+          return Object.assign({}, data, { color: +key % 2 === 0 ? "#FFFF00" : "#008000" });
+        };
+
+        new Sigma(lesMiserables, container, { nodeReducer, edgeReducer });
       });
     },
   },
