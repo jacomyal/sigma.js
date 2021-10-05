@@ -14,7 +14,7 @@ fetch("./public/arctic.gexf")
     const zoomInBtn = document.getElementById("zoom-in") as HTMLButtonElement;
     const zoomOutBtn = document.getElementById("zoom-out") as HTMLButtonElement;
     const zoomResetBtn = document.getElementById("zoom-reset") as HTMLButtonElement;
-    const labelsThresholdRange = document.getElementById("labels-density") as HTMLInputElement;
+    const labelsThresholdRange = document.getElementById("labels-threshold") as HTMLInputElement;
 
     // Instanciate sigma:
     const renderer = new Sigma(graph, container);
