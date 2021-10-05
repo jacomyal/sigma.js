@@ -34,6 +34,30 @@ export const tests: Tests = [
       });
     },
   },
+  {
+    name: "square",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 5 });
+        graph.addNode("upper-right", { x: 10, y: 0, size: 5 });
+        graph.addNode("lower-left", { x: 0, y: 10, size: 5 });
+        graph.addNode("lower-right", { x: 10, y: 10, size: 5 });
+
+        graph.addEdge("upper-left", "upper-right", { type: "arrow", size: 5 });
+        graph.addEdge("upper-right", "lower-right", { type: "arrow", size: 5 });
+        graph.addEdge("lower-right", "lower-left", { type: "arrow", size: 5 });
+        graph.addEdge("lower-left", "upper-left", { type: "arrow", size: 5 });
+
+        graph.addEdge("upper-left", "lower-right", { color: "#f00" });
+        graph.addEdge("upper-right", "lower-left", { color: "#f00" });
+
+        new Sigma(graph, container);
+      });
+    },
+  },
 ];
 
 // export const tests: Tests = [
