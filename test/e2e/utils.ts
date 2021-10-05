@@ -76,12 +76,11 @@ export function startExampleServer(): Promise<WebpackDevServer> {
     const compiler = Webpack(webpackConfig);
     const devServerOptions = Object.assign({}, webpackConfig.devServer, {
       open: false,
-      stats: {
-        colors: true,
-      },
     });
-    const server = new WebpackDevServer(compiler, devServerOptions);
-    server.listen(8000, "127.0.0.1", () => {
+
+    const server = new WebpackDevServer(devServerOptions, compiler);
+
+    server.startCallback(() => {
       resolve(server);
     });
   });

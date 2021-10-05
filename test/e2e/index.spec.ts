@@ -3,23 +3,27 @@ import path from "path";
 import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
 import { tests } from "./config";
 
-before(function (done) {
-  // No mocha timeout, but there is a timeout of 30sec in puppeteer loading pages
-  this.timeout(0);
-
-  // starting the server with examples
-  startExampleServer().then((server) => {
-    console.log("~~~ Start generating screenshots ~~~");
-    takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
-      console.log("~~~ End generating screenshots ~~~");
-      console.log();
-      // closing the server
-      server.close(done);
-    });
-  });
-});
+// NOTE: --allow-uncaught does not seem to work...
+process.on("uncaughtException", (error) => console.error(error));
+process.on("unhandledRejection", (reason, error) => console.error(reason, error));
 
 describe("Compare screenshots", () => {
+  before(function (done) {
+    // No mocha timeout, but there is a timeout of 30sec in puppeteer loading pages
+    this.timeout(0);
+
+    // starting the server with examples
+    startExampleServer().then((server) => {
+      console.log("~~~ Start generating screenshots ~~~");
+      takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), "current").then(() => {
+        console.log("~~~ End generating screenshots ~~~");
+        console.log();
+        // closing the server
+        server.stopCallback(done);
+      });
+    });
+  });
+
   tests.forEach((test) => {
     it(`Screenshots for "${test.name}" should be the same`, () => {
       const result = imageDiff(

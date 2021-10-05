@@ -6,7 +6,7 @@ async function exec() {
   try {
     const server = await startExampleServer();
     await takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), "valid");
-    server.close(() => {
+    server.stopCallback(() => {
       process.exit();
     });
   } catch (e) {
