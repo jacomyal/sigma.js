@@ -525,13 +525,7 @@ export default class Sigma extends EventEmitter {
     const graph = this.graph;
     const settings = this.settings;
     const dimensions = this.getDimensions();
-    const nullCamera = new Camera();
-    const nullCameraMatrix = matrixFromCamera(
-      nullCamera.getState(),
-      this.getDimensions(),
-      this.getGraphDimensions(),
-      this.getSetting("stagePadding") || 0,
-    );
+
     const nodeZExtent: [number, number] = [Infinity, -Infinity];
     const edgeZExtent: [number, number] = [Infinity, -Infinity];
 
@@ -549,6 +543,16 @@ export default class Sigma extends EventEmitter {
     const nodeExtentProperties = ["x", "y"];
 
     this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent };
+
+    // NOTE: it is important to compute this matrix after computing the node's extent
+    // because #.getGraphDimensions relies on it
+    const nullCamera = new Camera();
+    const nullCameraMatrix = matrixFromCamera(
+      nullCamera.getState(),
+      this.getDimensions(),
+      this.getGraphDimensions(),
+      this.getSetting("stagePadding") || 0,
+    );
 
     // Rescaling function
     this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
