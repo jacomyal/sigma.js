@@ -1,5 +1,5 @@
 {
-  "name": "sigma-example-minimal",
+  "name": "sigma-example-template",
   "version": "1.0.0",
   "description": "A minimalist sigma usage example.",
   "main": "index.js",
