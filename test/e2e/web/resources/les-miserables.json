@@ -1,0 +1,3297 @@
+{
+  "attributes": {
+    "creator": "ofNodesAndEdges.com",
+    "title": "Les Misérables, the characters coappearance weighted graph",
+    "lastModifiedDate": "2010-05-29+01:27"
+  },
+  "nodes": [
+    {
+      "key": "0.0",
+      "attributes": {
+        "label": "Myriel",
+        "authority": 0.01880342,
+        "hub": 0.01880342,
+        "color": "rgb(216,72,45)",
+        "size": 22.714287,
+        "x": 268.72385,
+        "y": 91.18155,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 25,
+        "nansi-weighted-indegree": 25,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 10,
+        "nansi-indegree": 10,
+        "nansi-outdegree": 0
+      }
+    },
+    {
+      "key": "1.0",
+      "attributes": {
+        "label": "Napoleon",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 296.39902,
+        "y": 57.118374,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "2.0",
+      "attributes": {
+        "label": "MlleBaptistine",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": 248.45229,
+        "y": 52.22656,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 17,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 8,
+        "nansi-degree": 3,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "3.0",
+      "attributes": {
+        "label": "MmeMagloire",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": 224.83313,
+        "y": 98.01885,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 19,
+        "nansi-weighted-indegree": 3,
+        "nansi-weighted-outdegree": 16,
+        "nansi-degree": 3,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "4.0",
+      "attributes": {
+        "label": "CountessDeLo",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 270.9098,
+        "y": 149.2961,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "5.0",
+      "attributes": {
+        "label": "Geborand",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 318.6509,
+        "y": 85.41602,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "6.0",
+      "attributes": {
+        "label": "Champtercier",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 330.3126,
+        "y": 117.94921,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "7.0",
+      "attributes": {
+        "label": "Cravatte",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 310.513,
+        "y": 155.66956,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "8.0",
+      "attributes": {
+        "label": "Count",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 295.74683,
+        "y": 124.78035,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "9.0",
+      "attributes": {
+        "label": "OldMan",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 241.03372,
+        "y": 131.8897,
+        "z": 0,
+        "nansi-louvain": 0,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "10.0",
+      "attributes": {
+        "label": "Labarre",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": -55.532795,
+        "y": -246.75798,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 0
+      }
+    },
+    {
+      "key": "11.0",
+      "attributes": {
+        "label": "Valjean",
+        "authority": 0.06324787,
+        "hub": 0.06324787,
+        "color": "rgb(254,240,217)",
+        "size": 45,
+        "x": -8.81755,
+        "y": -60.480377,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 144,
+        "nansi-weighted-indegree": 133,
+        "nansi-weighted-outdegree": 11,
+        "nansi-degree": 36,
+        "nansi-indegree": 32,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "12.0",
+      "attributes": {
+        "label": "Marguerite",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": 116.85369,
+        "y": -100.77216,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "13.0",
+      "attributes": {
+        "label": "MmeDeR",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 78.10812,
+        "y": -16.99423,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "14.0",
+      "attributes": {
+        "label": "Isabeau",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 47.669666,
+        "y": -96.23158,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "15.0",
+      "attributes": {
+        "label": "Gervais",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 20.945133,
+        "y": -118.35298,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "16.0",
+      "attributes": {
+        "label": "Tholomyes",
+        "authority": 0.017094018,
+        "hub": 0.017094018,
+        "color": "rgb(212,64,40)",
+        "size": 21.857143,
+        "x": 232.50653,
+        "y": -165.75543,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 24,
+        "nansi-weighted-indegree": 24,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 9,
+        "nansi-indegree": 9,
+        "nansi-outdegree": 0
+      }
+    },
+    {
+      "key": "17.0",
+      "attributes": {
+        "label": "Listolier",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 322.50223,
+        "y": -210.94756,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 24,
+        "nansi-weighted-indegree": 20,
+        "nansi-weighted-outdegree": 4,
+        "nansi-degree": 7,
+        "nansi-indegree": 6,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "18.0",
+      "attributes": {
+        "label": "Fameuil",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 322.0389,
+        "y": -162.5361,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 24,
+        "nansi-weighted-indegree": 16,
+        "nansi-weighted-outdegree": 8,
+        "nansi-degree": 7,
+        "nansi-indegree": 5,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "19.0",
+      "attributes": {
+        "label": "Blacheville",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 282.84045,
+        "y": -234.37758,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 25,
+        "nansi-weighted-indegree": 13,
+        "nansi-weighted-outdegree": 12,
+        "nansi-degree": 7,
+        "nansi-indegree": 4,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "20.0",
+      "attributes": {
+        "label": "Favourite",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 282.14212,
+        "y": -141.3707,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 26,
+        "nansi-weighted-indegree": 13,
+        "nansi-weighted-outdegree": 13,
+        "nansi-degree": 7,
+        "nansi-indegree": 3,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "21.0",
+      "attributes": {
+        "label": "Dahlia",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 279.24896,
+        "y": -186.69917,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 25,
+        "nansi-weighted-indegree": 8,
+        "nansi-weighted-outdegree": 17,
+        "nansi-degree": 7,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 5
+      }
+    },
+    {
+      "key": "22.0",
+      "attributes": {
+        "label": "Zephine",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": 240.49136,
+        "y": -212.45226,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 24,
+        "nansi-weighted-indegree": 4,
+        "nansi-weighted-outdegree": 20,
+        "nansi-degree": 7,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 6
+      }
+    },
+    {
+      "key": "23.0",
+      "attributes": {
+        "label": "Fantine",
+        "authority": 0.027350428,
+        "hub": 0.027350428,
+        "color": "rgb(237,112,71)",
+        "size": 27,
+        "x": 185.86234,
+        "y": -128.47615,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 44,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 35,
+        "nansi-degree": 15,
+        "nansi-indegree": 6,
+        "nansi-outdegree": 9
+      }
+    },
+    {
+      "key": "24.0",
+      "attributes": {
+        "label": "MmeThenardier",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -15.730793,
+        "y": 46.37429,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 28,
+        "nansi-weighted-indegree": 19,
+        "nansi-weighted-outdegree": 9,
+        "nansi-degree": 11,
+        "nansi-indegree": 9,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "25.0",
+      "attributes": {
+        "label": "Thenardier",
+        "authority": 0.02905983,
+        "hub": 0.02905983,
+        "color": "rgb(241,120,76)",
+        "size": 27.857143,
+        "x": 3.6068764,
+        "y": 98.60965,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 55,
+        "nansi-weighted-indegree": 30,
+        "nansi-weighted-outdegree": 25,
+        "nansi-degree": 16,
+        "nansi-indegree": 13,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "26.0",
+      "attributes": {
+        "label": "Cosette",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -69.92912,
+        "y": -15.777599,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 63,
+        "nansi-weighted-indegree": 28,
+        "nansi-weighted-outdegree": 35,
+        "nansi-degree": 11,
+        "nansi-indegree": 7,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "27.0",
+      "attributes": {
+        "label": "Javert",
+        "authority": 0.03076923,
+        "hub": 0.03076923,
+        "color": "rgb(245,128,81)",
+        "size": 28.714287,
+        "x": 54.198936,
+        "y": 49.115128,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 35,
+        "nansi-weighted-indegree": 8,
+        "nansi-weighted-outdegree": 27,
+        "nansi-degree": 17,
+        "nansi-indegree": 12,
+        "nansi-outdegree": 5
+      }
+    },
+    {
+      "key": "28.0",
+      "attributes": {
+        "label": "Fauchelevent",
+        "authority": 0.008547009,
+        "hub": 0.008547009,
+        "color": "rgb(191,24,15)",
+        "size": 17.571428,
+        "x": 58.138313,
+        "y": -56.714897,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 13,
+        "nansi-weighted-indegree": 5,
+        "nansi-weighted-outdegree": 8,
+        "nansi-degree": 4,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "29.0",
+      "attributes": {
+        "label": "Bamatabois",
+        "authority": 0.015384615,
+        "hub": 0.015384615,
+        "color": "rgb(208,56,35)",
+        "size": 21,
+        "x": 97.39532,
+        "y": -157.35661,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 6,
+        "nansi-weighted-indegree": 4,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 8,
+        "nansi-indegree": 5,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "30.0",
+      "attributes": {
+        "label": "Perpetue",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": 157.66608,
+        "y": -88.86034,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "31.0",
+      "attributes": {
+        "label": "Simplice",
+        "authority": 0.008547009,
+        "hub": 0.008547009,
+        "color": "rgb(191,24,15)",
+        "size": 17.571428,
+        "x": 130.24326,
+        "y": -62.113045,
+        "z": 0,
+        "nansi-louvain": 2,
+        "nansi-weighted-degree": 7,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 7,
+        "nansi-degree": 4,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "32.0",
+      "attributes": {
+        "label": "Scaufflaire",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": -31.725157,
+        "y": -124.8531,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "33.0",
+      "attributes": {
+        "label": "Woman1",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": 45.4282,
+        "y": -2.6807823,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "34.0",
+      "attributes": {
+        "label": "Judge",
+        "authority": 0.011965812,
+        "hub": 0.011965812,
+        "color": "rgb(199,40,25)",
+        "size": 19.285715,
+        "x": -2.146402,
+        "y": -152.7878,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 14,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 5,
+        "nansi-degree": 6,
+        "nansi-indegree": 4,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "35.0",
+      "attributes": {
+        "label": "Champmathieu",
+        "authority": 0.011965812,
+        "hub": 0.011965812,
+        "color": "rgb(199,40,25)",
+        "size": 19.285715,
+        "x": 54.183117,
+        "y": -142.10239,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 14,
+        "nansi-weighted-indegree": 6,
+        "nansi-weighted-outdegree": 8,
+        "nansi-degree": 6,
+        "nansi-indegree": 3,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "36.0",
+      "attributes": {
+        "label": "Brevet",
+        "authority": 0.011965812,
+        "hub": 0.011965812,
+        "color": "rgb(199,40,25)",
+        "size": 19.285715,
+        "x": -21.096437,
+        "y": -192.47128,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 10,
+        "nansi-weighted-indegree": 4,
+        "nansi-weighted-outdegree": 6,
+        "nansi-degree": 6,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "37.0",
+      "attributes": {
+        "label": "Chenildieu",
+        "authority": 0.011965812,
+        "hub": 0.011965812,
+        "color": "rgb(199,40,25)",
+        "size": 19.285715,
+        "x": 56.919018,
+        "y": -184.99847,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 10,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 8,
+        "nansi-degree": 6,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 5
+      }
+    },
+    {
+      "key": "38.0",
+      "attributes": {
+        "label": "Cochepaille",
+        "authority": 0.011965812,
+        "hub": 0.011965812,
+        "color": "rgb(199,40,25)",
+        "size": 19.285715,
+        "x": 21.456747,
+        "y": -211.19899,
+        "z": 0,
+        "nansi-louvain": 4,
+        "nansi-weighted-degree": 10,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 10,
+        "nansi-degree": 6,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 6
+      }
+    },
+    {
+      "key": "39.0",
+      "attributes": {
+        "label": "Pontmercy",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": -69.42261,
+        "y": 66.22773,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 3,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "40.0",
+      "attributes": {
+        "label": "Boulatruelle",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 52.13746,
+        "y": 97.863976,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "41.0",
+      "attributes": {
+        "label": "Eponine",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -84.15585,
+        "y": 140.50175,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 12,
+        "nansi-weighted-indegree": 7,
+        "nansi-weighted-outdegree": 5,
+        "nansi-degree": 11,
+        "nansi-indegree": 9,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "42.0",
+      "attributes": {
+        "label": "Anzelma",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": -47.696083,
+        "y": 112.90357,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 4,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 4,
+        "nansi-degree": 3,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "43.0",
+      "attributes": {
+        "label": "Woman2",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": 10.037987,
+        "y": 7.8234367,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 3,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 3,
+        "nansi-degree": 3,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "44.0",
+      "attributes": {
+        "label": "MotherInnocent",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": 82.99555,
+        "y": -87.651726,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 3,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 3,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "45.0",
+      "attributes": {
+        "label": "Gribier",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": 94.93769,
+        "y": -47.799778,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "46.0",
+      "attributes": {
+        "label": "Jondrette",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": -293.23438,
+        "y": -146.10257,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 0
+      }
+    },
+    {
+      "key": "47.0",
+      "attributes": {
+        "label": "MmeBurgon",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -294.94247,
+        "y": -108.07895,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "48.0",
+      "attributes": {
+        "label": "Gavroche",
+        "authority": 0.03931624,
+        "hub": 0.03931624,
+        "color": "rgb(252,160,114)",
+        "size": 33,
+        "x": -215.57619,
+        "y": 34.40003,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 45,
+        "nansi-weighted-indegree": 43,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 22,
+        "nansi-indegree": 18,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "49.0",
+      "attributes": {
+        "label": "Gillenormand",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": -119.18742,
+        "y": -17.39732,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 26,
+        "nansi-weighted-indegree": 21,
+        "nansi-weighted-outdegree": 5,
+        "nansi-degree": 7,
+        "nansi-indegree": 5,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "50.0",
+      "attributes": {
+        "label": "Magnon",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -57.473045,
+        "y": 29.63873,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "51.0",
+      "attributes": {
+        "label": "MlleGillenormand",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": -93.255005,
+        "y": -60.657784,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 21,
+        "nansi-weighted-indegree": 8,
+        "nansi-weighted-outdegree": 13,
+        "nansi-degree": 7,
+        "nansi-indegree": 4,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "52.0",
+      "attributes": {
+        "label": "MmePontmercy",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -93.764046,
+        "y": 22.565668,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "53.0",
+      "attributes": {
+        "label": "MlleVaubois",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": -132.14008,
+        "y": -66.85538,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "54.0",
+      "attributes": {
+        "label": "LtGillenormand",
+        "authority": 0.008547009,
+        "hub": 0.008547009,
+        "color": "rgb(191,24,15)",
+        "size": 17.571428,
+        "x": -95.75337,
+        "y": -102.71505,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 4,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "55.0",
+      "attributes": {
+        "label": "Marius",
+        "authority": 0.034188036,
+        "hub": 0.034188036,
+        "color": "rgb(252,143,92)",
+        "size": 30.428574,
+        "x": -142.15263,
+        "y": 36.388676,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 97,
+        "nansi-weighted-indegree": 28,
+        "nansi-weighted-outdegree": 69,
+        "nansi-degree": 19,
+        "nansi-indegree": 9,
+        "nansi-outdegree": 10
+      }
+    },
+    {
+      "key": "56.0",
+      "attributes": {
+        "label": "BaronessT",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -160.2533,
+        "y": -24.29684,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "57.0",
+      "attributes": {
+        "label": "Mabeuf",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -267.16248,
+        "y": 196.98003,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 9,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 11,
+        "nansi-indegree": 8,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "58.0",
+      "attributes": {
+        "label": "Enjolras",
+        "authority": 0.027350428,
+        "hub": 0.027350428,
+        "color": "rgb(237,112,71)",
+        "size": 27,
+        "x": -190.88988,
+        "y": 96.44671,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 88,
+        "nansi-weighted-indegree": 64,
+        "nansi-weighted-outdegree": 24,
+        "nansi-degree": 15,
+        "nansi-indegree": 10,
+        "nansi-outdegree": 5
+      }
+    },
+    {
+      "key": "59.0",
+      "attributes": {
+        "label": "Combeferre",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -222.5417,
+        "y": 144.66484,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 67,
+        "nansi-weighted-indegree": 39,
+        "nansi-weighted-outdegree": 28,
+        "nansi-degree": 11,
+        "nansi-indegree": 7,
+        "nansi-outdegree": 4
+      }
+    },
+    {
+      "key": "60.0",
+      "attributes": {
+        "label": "Prouvaire",
+        "authority": 0.017094018,
+        "hub": 0.017094018,
+        "color": "rgb(212,64,40)",
+        "size": 21.857143,
+        "x": -325.61102,
+        "y": 166.71417,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 17,
+        "nansi-weighted-indegree": 11,
+        "nansi-weighted-outdegree": 6,
+        "nansi-degree": 9,
+        "nansi-indegree": 6,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "61.0",
+      "attributes": {
+        "label": "Feuilly",
+        "authority": 0.020512821,
+        "hub": 0.020512821,
+        "color": "rgb(220,80,50)",
+        "size": 23.57143,
+        "x": -276.3468,
+        "y": 145.79153,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 35,
+        "nansi-weighted-indegree": 20,
+        "nansi-weighted-outdegree": 15,
+        "nansi-degree": 11,
+        "nansi-indegree": 5,
+        "nansi-outdegree": 6
+      }
+    },
+    {
+      "key": "62.0",
+      "attributes": {
+        "label": "Courfeyrac",
+        "authority": 0.023931624,
+        "hub": 0.023931624,
+        "color": "rgb(229,96,61)",
+        "size": 25.285713,
+        "x": -251.45561,
+        "y": 97.83937,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 82,
+        "nansi-weighted-indegree": 25,
+        "nansi-weighted-outdegree": 57,
+        "nansi-degree": 13,
+        "nansi-indegree": 5,
+        "nansi-outdegree": 8
+      }
+    },
+    {
+      "key": "63.0",
+      "attributes": {
+        "label": "Bahorel",
+        "authority": 0.022222223,
+        "hub": 0.022222223,
+        "color": "rgb(224,88,55)",
+        "size": 24.428572,
+        "x": -318.40936,
+        "y": 114.202415,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 36,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 27,
+        "nansi-degree": 12,
+        "nansi-indegree": 4,
+        "nansi-outdegree": 8
+      }
+    },
+    {
+      "key": "64.0",
+      "attributes": {
+        "label": "Bossuet",
+        "authority": 0.023931624,
+        "hub": 0.023931624,
+        "color": "rgb(229,96,61)",
+        "size": 25.285713,
+        "x": -278.9682,
+        "y": 45.932438,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 63,
+        "nansi-weighted-indegree": 10,
+        "nansi-weighted-outdegree": 53,
+        "nansi-degree": 13,
+        "nansi-indegree": 3,
+        "nansi-outdegree": 10
+      }
+    },
+    {
+      "key": "65.0",
+      "attributes": {
+        "label": "Joly",
+        "authority": 0.022222223,
+        "hub": 0.022222223,
+        "color": "rgb(224,88,55)",
+        "size": 24.428572,
+        "x": -333.04984,
+        "y": 62.438156,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 41,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 39,
+        "nansi-degree": 12,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 10
+      }
+    },
+    {
+      "key": "66.0",
+      "attributes": {
+        "label": "Grantaire",
+        "authority": 0.01880342,
+        "hub": 0.01880342,
+        "color": "rgb(216,72,45)",
+        "size": 22.714287,
+        "x": -370.2446,
+        "y": 101.73884,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 10,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 10,
+        "nansi-degree": 10,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 9
+      }
+    },
+    {
+      "key": "67.0",
+      "attributes": {
+        "label": "MotherPlutarch",
+        "authority": 0.0034188034,
+        "hub": 0.0034188034,
+        "color": "rgb(179,0,0)",
+        "size": 15,
+        "x": -253.54378,
+        "y": 237.9443,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 3,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 3,
+        "nansi-degree": 1,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "68.0",
+      "attributes": {
+        "label": "Gueulemer",
+        "authority": 0.01880342,
+        "hub": 0.01880342,
+        "color": "rgb(216,72,45)",
+        "size": 22.714287,
+        "x": -16.550194,
+        "y": 152.69055,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 20,
+        "nansi-weighted-indegree": 15,
+        "nansi-weighted-outdegree": 5,
+        "nansi-degree": 10,
+        "nansi-indegree": 4,
+        "nansi-outdegree": 6
+      }
+    },
+    {
+      "key": "69.0",
+      "attributes": {
+        "label": "Babet",
+        "authority": 0.01880342,
+        "hub": 0.01880342,
+        "color": "rgb(216,72,45)",
+        "size": 22.714287,
+        "x": 35.653145,
+        "y": 144.49445,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 23,
+        "nansi-weighted-indegree": 9,
+        "nansi-weighted-outdegree": 14,
+        "nansi-degree": 10,
+        "nansi-indegree": 3,
+        "nansi-outdegree": 7
+      }
+    },
+    {
+      "key": "70.0",
+      "attributes": {
+        "label": "Claquesous",
+        "authority": 0.01880342,
+        "hub": 0.01880342,
+        "color": "rgb(216,72,45)",
+        "size": 22.714287,
+        "x": 58.97649,
+        "y": 188.46011,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 14,
+        "nansi-weighted-indegree": 2,
+        "nansi-weighted-outdegree": 12,
+        "nansi-degree": 10,
+        "nansi-indegree": 2,
+        "nansi-outdegree": 8
+      }
+    },
+    {
+      "key": "71.0",
+      "attributes": {
+        "label": "Montparnasse",
+        "authority": 0.017094018,
+        "hub": 0.017094018,
+        "color": "rgb(212,64,40)",
+        "size": 21.857143,
+        "x": -2.9325058,
+        "y": 200.66508,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 6,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 6,
+        "nansi-degree": 9,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 8
+      }
+    },
+    {
+      "key": "72.0",
+      "attributes": {
+        "label": "Toussaint",
+        "authority": 0.006837607,
+        "hub": 0.006837607,
+        "color": "rgb(187,16,10)",
+        "size": 16.714285,
+        "x": -30.056648,
+        "y": 3.5053203,
+        "z": 0,
+        "nansi-louvain": 1,
+        "nansi-weighted-degree": 2,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 3,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 3
+      }
+    },
+    {
+      "key": "73.0",
+      "attributes": {
+        "label": "Child1",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -244.859,
+        "y": -11.3161335,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 5,
+        "nansi-weighted-indegree": 3,
+        "nansi-weighted-outdegree": 2,
+        "nansi-degree": 2,
+        "nansi-indegree": 1,
+        "nansi-outdegree": 1
+      }
+    },
+    {
+      "key": "74.0",
+      "attributes": {
+        "label": "Child2",
+        "authority": 0.0051282053,
+        "hub": 0.0051282053,
+        "color": "rgb(183,8,5)",
+        "size": 15.857142,
+        "x": -280.33203,
+        "y": -1.466383,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 5,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 5,
+        "nansi-degree": 2,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 2
+      }
+    },
+    {
+      "key": "75.0",
+      "attributes": {
+        "label": "Brujon",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": -56.819256,
+        "y": 182.0544,
+        "z": 0,
+        "nansi-louvain": 3,
+        "nansi-weighted-degree": 9,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 9,
+        "nansi-degree": 7,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 7
+      }
+    },
+    {
+      "key": "76.0",
+      "attributes": {
+        "label": "MmeHucheloup",
+        "authority": 0.013675214,
+        "hub": 0.013675214,
+        "color": "rgb(204,48,30)",
+        "size": 20.142857,
+        "x": -382.06223,
+        "y": 47.045475,
+        "z": 0,
+        "nansi-louvain": 5,
+        "nansi-weighted-degree": 0,
+        "nansi-weighted-indegree": 0,
+        "nansi-weighted-outdegree": 0,
+        "nansi-degree": 7,
+        "nansi-indegree": 0,
+        "nansi-outdegree": 7
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1.0",
+      "target": "0.0",
+      "key": "0"
+    },
+    {
+      "source": "2.0",
+      "target": "0.0",
+      "key": "1",
+      "attributes": {
+        "weight": 8
+      }
+    },
+    {
+      "source": "3.0",
+      "target": "0.0",
+      "key": "2",
+      "attributes": {
+        "weight": 10
+      }
+    },
+    {
+      "source": "3.0",
+      "target": "2.0",
+      "key": "3",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "4.0",
+      "target": "0.0",
+      "key": "4"
+    },
+    {
+      "source": "5.0",
+      "target": "0.0",
+      "key": "5"
+    },
+    {
+      "source": "6.0",
+      "target": "0.0",
+      "key": "6"
+    },
+    {
+      "source": "7.0",
+      "target": "0.0",
+      "key": "7"
+    },
+    {
+      "source": "8.0",
+      "target": "0.0",
+      "key": "8",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "9.0",
+      "target": "0.0",
+      "key": "9"
+    },
+    {
+      "source": "11.0",
+      "target": "0.0",
+      "key": "13",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "11.0",
+      "target": "2.0",
+      "key": "12",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "11.0",
+      "target": "3.0",
+      "key": "11",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "11.0",
+      "target": "10.0",
+      "key": "10"
+    },
+    {
+      "source": "12.0",
+      "target": "11.0",
+      "key": "14"
+    },
+    {
+      "source": "13.0",
+      "target": "11.0",
+      "key": "15"
+    },
+    {
+      "source": "14.0",
+      "target": "11.0",
+      "key": "16"
+    },
+    {
+      "source": "15.0",
+      "target": "11.0",
+      "key": "17"
+    },
+    {
+      "source": "17.0",
+      "target": "16.0",
+      "key": "18",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "18.0",
+      "target": "16.0",
+      "key": "19",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "18.0",
+      "target": "17.0",
+      "key": "20",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "19.0",
+      "target": "16.0",
+      "key": "21",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "19.0",
+      "target": "17.0",
+      "key": "22",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "19.0",
+      "target": "18.0",
+      "key": "23",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "20.0",
+      "target": "16.0",
+      "key": "24",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "20.0",
+      "target": "17.0",
+      "key": "25",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "20.0",
+      "target": "18.0",
+      "key": "26",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "20.0",
+      "target": "19.0",
+      "key": "27",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "21.0",
+      "target": "16.0",
+      "key": "28",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "21.0",
+      "target": "17.0",
+      "key": "29",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "21.0",
+      "target": "18.0",
+      "key": "30",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "21.0",
+      "target": "19.0",
+      "key": "31",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "21.0",
+      "target": "20.0",
+      "key": "32",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "16.0",
+      "key": "33",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "17.0",
+      "key": "34",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "18.0",
+      "key": "35",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "19.0",
+      "key": "36",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "20.0",
+      "key": "37",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "22.0",
+      "target": "21.0",
+      "key": "38",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "11.0",
+      "key": "47",
+      "attributes": {
+        "weight": 9
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "12.0",
+      "key": "46",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "16.0",
+      "key": "39",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "17.0",
+      "key": "40",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "18.0",
+      "key": "41",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "19.0",
+      "key": "42",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "20.0",
+      "key": "43",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "21.0",
+      "key": "44",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "23.0",
+      "target": "22.0",
+      "key": "45",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "24.0",
+      "target": "11.0",
+      "key": "49",
+      "attributes": {
+        "weight": 7
+      }
+    },
+    {
+      "source": "24.0",
+      "target": "23.0",
+      "key": "48",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "25.0",
+      "target": "11.0",
+      "key": "52",
+      "attributes": {
+        "weight": 12
+      }
+    },
+    {
+      "source": "25.0",
+      "target": "23.0",
+      "key": "51"
+    },
+    {
+      "source": "25.0",
+      "target": "24.0",
+      "key": "50",
+      "attributes": {
+        "weight": 13
+      }
+    },
+    {
+      "source": "26.0",
+      "target": "11.0",
+      "key": "54",
+      "attributes": {
+        "weight": 31
+      }
+    },
+    {
+      "source": "26.0",
+      "target": "16.0",
+      "key": "55"
+    },
+    {
+      "source": "26.0",
+      "target": "24.0",
+      "key": "53",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "26.0",
+      "target": "25.0",
+      "key": "56"
+    },
+    {
+      "source": "27.0",
+      "target": "11.0",
+      "key": "57",
+      "attributes": {
+        "weight": 17
+      }
+    },
+    {
+      "source": "27.0",
+      "target": "23.0",
+      "key": "58",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "27.0",
+      "target": "24.0",
+      "key": "60"
+    },
+    {
+      "source": "27.0",
+      "target": "25.0",
+      "key": "59",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "27.0",
+      "target": "26.0",
+      "key": "61"
+    },
+    {
+      "source": "28.0",
+      "target": "11.0",
+      "key": "62",
+      "attributes": {
+        "weight": 8
+      }
+    },
+    {
+      "source": "28.0",
+      "target": "27.0",
+      "key": "63"
+    },
+    {
+      "source": "29.0",
+      "target": "11.0",
+      "key": "66",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "29.0",
+      "target": "23.0",
+      "key": "64"
+    },
+    {
+      "source": "29.0",
+      "target": "27.0",
+      "key": "65"
+    },
+    {
+      "source": "30.0",
+      "target": "23.0",
+      "key": "67"
+    },
+    {
+      "source": "31.0",
+      "target": "11.0",
+      "key": "69",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "31.0",
+      "target": "23.0",
+      "key": "70",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "31.0",
+      "target": "27.0",
+      "key": "71"
+    },
+    {
+      "source": "31.0",
+      "target": "30.0",
+      "key": "68",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "32.0",
+      "target": "11.0",
+      "key": "72"
+    },
+    {
+      "source": "33.0",
+      "target": "11.0",
+      "key": "73",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "33.0",
+      "target": "27.0",
+      "key": "74"
+    },
+    {
+      "source": "34.0",
+      "target": "11.0",
+      "key": "75",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "34.0",
+      "target": "29.0",
+      "key": "76",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "35.0",
+      "target": "11.0",
+      "key": "77",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "35.0",
+      "target": "29.0",
+      "key": "79",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "35.0",
+      "target": "34.0",
+      "key": "78",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "36.0",
+      "target": "11.0",
+      "key": "82",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "36.0",
+      "target": "29.0",
+      "key": "83"
+    },
+    {
+      "source": "36.0",
+      "target": "34.0",
+      "key": "80",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "36.0",
+      "target": "35.0",
+      "key": "81",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "37.0",
+      "target": "11.0",
+      "key": "87",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "37.0",
+      "target": "29.0",
+      "key": "88"
+    },
+    {
+      "source": "37.0",
+      "target": "34.0",
+      "key": "84",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "37.0",
+      "target": "35.0",
+      "key": "85",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "37.0",
+      "target": "36.0",
+      "key": "86",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "38.0",
+      "target": "11.0",
+      "key": "93",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "38.0",
+      "target": "29.0",
+      "key": "94"
+    },
+    {
+      "source": "38.0",
+      "target": "34.0",
+      "key": "89",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "38.0",
+      "target": "35.0",
+      "key": "90",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "38.0",
+      "target": "36.0",
+      "key": "91",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "38.0",
+      "target": "37.0",
+      "key": "92",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "39.0",
+      "target": "25.0",
+      "key": "95"
+    },
+    {
+      "source": "40.0",
+      "target": "25.0",
+      "key": "96"
+    },
+    {
+      "source": "41.0",
+      "target": "24.0",
+      "key": "97",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "41.0",
+      "target": "25.0",
+      "key": "98",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "42.0",
+      "target": "24.0",
+      "key": "101"
+    },
+    {
+      "source": "42.0",
+      "target": "25.0",
+      "key": "100",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "42.0",
+      "target": "41.0",
+      "key": "99",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "43.0",
+      "target": "11.0",
+      "key": "102",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "43.0",
+      "target": "26.0",
+      "key": "103"
+    },
+    {
+      "source": "43.0",
+      "target": "27.0",
+      "key": "104"
+    },
+    {
+      "source": "44.0",
+      "target": "11.0",
+      "key": "106"
+    },
+    {
+      "source": "44.0",
+      "target": "28.0",
+      "key": "105",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "45.0",
+      "target": "28.0",
+      "key": "107",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "47.0",
+      "target": "46.0",
+      "key": "108"
+    },
+    {
+      "source": "48.0",
+      "target": "11.0",
+      "key": "112"
+    },
+    {
+      "source": "48.0",
+      "target": "25.0",
+      "key": "110"
+    },
+    {
+      "source": "48.0",
+      "target": "27.0",
+      "key": "111"
+    },
+    {
+      "source": "48.0",
+      "target": "47.0",
+      "key": "109",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "49.0",
+      "target": "11.0",
+      "key": "114",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "49.0",
+      "target": "26.0",
+      "key": "113",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "50.0",
+      "target": "24.0",
+      "key": "116"
+    },
+    {
+      "source": "50.0",
+      "target": "49.0",
+      "key": "115"
+    },
+    {
+      "source": "51.0",
+      "target": "11.0",
+      "key": "119",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "51.0",
+      "target": "26.0",
+      "key": "118",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "51.0",
+      "target": "49.0",
+      "key": "117",
+      "attributes": {
+        "weight": 9
+      }
+    },
+    {
+      "source": "52.0",
+      "target": "39.0",
+      "key": "121"
+    },
+    {
+      "source": "52.0",
+      "target": "51.0",
+      "key": "120"
+    },
+    {
+      "source": "53.0",
+      "target": "51.0",
+      "key": "122"
+    },
+    {
+      "source": "54.0",
+      "target": "26.0",
+      "key": "125"
+    },
+    {
+      "source": "54.0",
+      "target": "49.0",
+      "key": "124"
+    },
+    {
+      "source": "54.0",
+      "target": "51.0",
+      "key": "123",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "11.0",
+      "key": "131",
+      "attributes": {
+        "weight": 19
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "16.0",
+      "key": "132"
+    },
+    {
+      "source": "55.0",
+      "target": "25.0",
+      "key": "133",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "26.0",
+      "key": "130",
+      "attributes": {
+        "weight": 21
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "39.0",
+      "key": "128"
+    },
+    {
+      "source": "55.0",
+      "target": "41.0",
+      "key": "134",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "48.0",
+      "key": "135",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "49.0",
+      "key": "127",
+      "attributes": {
+        "weight": 12
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "51.0",
+      "key": "126",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "55.0",
+      "target": "54.0",
+      "key": "129"
+    },
+    {
+      "source": "56.0",
+      "target": "49.0",
+      "key": "136"
+    },
+    {
+      "source": "56.0",
+      "target": "55.0",
+      "key": "137"
+    },
+    {
+      "source": "57.0",
+      "target": "41.0",
+      "key": "139"
+    },
+    {
+      "source": "57.0",
+      "target": "48.0",
+      "key": "140"
+    },
+    {
+      "source": "57.0",
+      "target": "55.0",
+      "key": "138"
+    },
+    {
+      "source": "58.0",
+      "target": "11.0",
+      "key": "145",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "58.0",
+      "target": "27.0",
+      "key": "143",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "58.0",
+      "target": "48.0",
+      "key": "142",
+      "attributes": {
+        "weight": 7
+      }
+    },
+    {
+      "source": "58.0",
+      "target": "55.0",
+      "key": "141",
+      "attributes": {
+        "weight": 7
+      }
+    },
+    {
+      "source": "58.0",
+      "target": "57.0",
+      "key": "144"
+    },
+    {
+      "source": "59.0",
+      "target": "48.0",
+      "key": "148",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "59.0",
+      "target": "55.0",
+      "key": "147",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "59.0",
+      "target": "57.0",
+      "key": "149",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "59.0",
+      "target": "58.0",
+      "key": "146",
+      "attributes": {
+        "weight": 15
+      }
+    },
+    {
+      "source": "60.0",
+      "target": "48.0",
+      "key": "150"
+    },
+    {
+      "source": "60.0",
+      "target": "58.0",
+      "key": "151",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "60.0",
+      "target": "59.0",
+      "key": "152",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "61.0",
+      "target": "48.0",
+      "key": "153",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "61.0",
+      "target": "55.0",
+      "key": "158"
+    },
+    {
+      "source": "61.0",
+      "target": "57.0",
+      "key": "157"
+    },
+    {
+      "source": "61.0",
+      "target": "58.0",
+      "key": "154",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "61.0",
+      "target": "59.0",
+      "key": "156",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "61.0",
+      "target": "60.0",
+      "key": "155",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "41.0",
+      "key": "164"
+    },
+    {
+      "source": "62.0",
+      "target": "48.0",
+      "key": "162",
+      "attributes": {
+        "weight": 7
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "55.0",
+      "key": "159",
+      "attributes": {
+        "weight": 9
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "57.0",
+      "key": "163",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "58.0",
+      "key": "160",
+      "attributes": {
+        "weight": 17
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "59.0",
+      "key": "161",
+      "attributes": {
+        "weight": 13
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "60.0",
+      "key": "166",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "62.0",
+      "target": "61.0",
+      "key": "165",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "48.0",
+      "key": "168",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "55.0",
+      "key": "174"
+    },
+    {
+      "source": "63.0",
+      "target": "57.0",
+      "key": "170",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "58.0",
+      "key": "171",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "59.0",
+      "key": "167",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "60.0",
+      "key": "173",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "61.0",
+      "key": "172",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "63.0",
+      "target": "62.0",
+      "key": "169",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "11.0",
+      "key": "184"
+    },
+    {
+      "source": "64.0",
+      "target": "48.0",
+      "key": "177",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "55.0",
+      "key": "175",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "57.0",
+      "key": "183"
+    },
+    {
+      "source": "64.0",
+      "target": "58.0",
+      "key": "179",
+      "attributes": {
+        "weight": 10
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "59.0",
+      "key": "182",
+      "attributes": {
+        "weight": 9
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "60.0",
+      "key": "181",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "61.0",
+      "key": "180",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "62.0",
+      "key": "176",
+      "attributes": {
+        "weight": 12
+      }
+    },
+    {
+      "source": "64.0",
+      "target": "63.0",
+      "key": "178",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "48.0",
+      "key": "187",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "55.0",
+      "key": "194",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "57.0",
+      "key": "193"
+    },
+    {
+      "source": "65.0",
+      "target": "58.0",
+      "key": "189",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "59.0",
+      "key": "192",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "60.0",
+      "key": "191",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "61.0",
+      "key": "190",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "62.0",
+      "key": "188",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "63.0",
+      "key": "185",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "65.0",
+      "target": "64.0",
+      "key": "186",
+      "attributes": {
+        "weight": 7
+      }
+    },
+    {
+      "source": "66.0",
+      "target": "48.0",
+      "key": "200"
+    },
+    {
+      "source": "66.0",
+      "target": "58.0",
+      "key": "196",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "66.0",
+      "target": "59.0",
+      "key": "197"
+    },
+    {
+      "source": "66.0",
+      "target": "60.0",
+      "key": "203"
+    },
+    {
+      "source": "66.0",
+      "target": "61.0",
+      "key": "202"
+    },
+    {
+      "source": "66.0",
+      "target": "62.0",
+      "key": "198",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "66.0",
+      "target": "63.0",
+      "key": "201"
+    },
+    {
+      "source": "66.0",
+      "target": "64.0",
+      "key": "195",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "66.0",
+      "target": "65.0",
+      "key": "199",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "67.0",
+      "target": "57.0",
+      "key": "204",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "68.0",
+      "target": "11.0",
+      "key": "206"
+    },
+    {
+      "source": "68.0",
+      "target": "24.0",
+      "key": "207"
+    },
+    {
+      "source": "68.0",
+      "target": "25.0",
+      "key": "205",
+      "attributes": {
+        "weight": 5
+      }
+    },
+    {
+      "source": "68.0",
+      "target": "27.0",
+      "key": "208"
+    },
+    {
+      "source": "68.0",
+      "target": "41.0",
+      "key": "210"
+    },
+    {
+      "source": "68.0",
+      "target": "48.0",
+      "key": "209"
+    },
+    {
+      "source": "69.0",
+      "target": "11.0",
+      "key": "213"
+    },
+    {
+      "source": "69.0",
+      "target": "24.0",
+      "key": "214"
+    },
+    {
+      "source": "69.0",
+      "target": "25.0",
+      "key": "211",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "69.0",
+      "target": "27.0",
+      "key": "215",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "69.0",
+      "target": "41.0",
+      "key": "217"
+    },
+    {
+      "source": "69.0",
+      "target": "48.0",
+      "key": "216"
+    },
+    {
+      "source": "69.0",
+      "target": "68.0",
+      "key": "212",
+      "attributes": {
+        "weight": 6
+      }
+    },
+    {
+      "source": "70.0",
+      "target": "11.0",
+      "key": "221"
+    },
+    {
+      "source": "70.0",
+      "target": "24.0",
+      "key": "222"
+    },
+    {
+      "source": "70.0",
+      "target": "25.0",
+      "key": "218",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "70.0",
+      "target": "27.0",
+      "key": "223"
+    },
+    {
+      "source": "70.0",
+      "target": "41.0",
+      "key": "224"
+    },
+    {
+      "source": "70.0",
+      "target": "58.0",
+      "key": "225"
+    },
+    {
+      "source": "70.0",
+      "target": "68.0",
+      "key": "220",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "70.0",
+      "target": "69.0",
+      "key": "219",
+      "attributes": {
+        "weight": 4
+      }
+    },
+    {
+      "source": "71.0",
+      "target": "11.0",
+      "key": "230"
+    },
+    {
+      "source": "71.0",
+      "target": "25.0",
+      "key": "233"
+    },
+    {
+      "source": "71.0",
+      "target": "27.0",
+      "key": "226"
+    },
+    {
+      "source": "71.0",
+      "target": "41.0",
+      "key": "232"
+    },
+    {
+      "source": "71.0",
+      "target": "48.0",
+      "key": "231"
+    },
+    {
+      "source": "71.0",
+      "target": "68.0",
+      "key": "228",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "71.0",
+      "target": "69.0",
+      "key": "227",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "71.0",
+      "target": "70.0",
+      "key": "229",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "72.0",
+      "target": "11.0",
+      "key": "236"
+    },
+    {
+      "source": "72.0",
+      "target": "26.0",
+      "key": "234",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "72.0",
+      "target": "27.0",
+      "key": "235"
+    },
+    {
+      "source": "73.0",
+      "target": "48.0",
+      "key": "237",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "74.0",
+      "target": "48.0",
+      "key": "238",
+      "attributes": {
+        "weight": 2
+      }
+    },
+    {
+      "source": "74.0",
+      "target": "73.0",
+      "key": "239",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "75.0",
+      "target": "25.0",
+      "key": "242",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "75.0",
+      "target": "41.0",
+      "key": "244"
+    },
+    {
+      "source": "75.0",
+      "target": "48.0",
+      "key": "243"
+    },
+    {
+      "source": "75.0",
+      "target": "68.0",
+      "key": "241",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "75.0",
+      "target": "69.0",
+      "key": "240",
+      "attributes": {
+        "weight": 3
+      }
+    },
+    {
+      "source": "75.0",
+      "target": "70.0",
+      "key": "245"
+    },
+    {
+      "source": "75.0",
+      "target": "71.0",
+      "key": "246"
+    },
+    {
+      "source": "76.0",
+      "target": "48.0",
+      "key": "252"
+    },
+    {
+      "source": "76.0",
+      "target": "58.0",
+      "key": "253"
+    },
+    {
+      "source": "76.0",
+      "target": "62.0",
+      "key": "251"
+    },
+    {
+      "source": "76.0",
+      "target": "63.0",
+      "key": "250"
+    },
+    {
+      "source": "76.0",
+      "target": "64.0",
+      "key": "247"
+    },
+    {
+      "source": "76.0",
+      "target": "65.0",
+      "key": "248"
+    },
+    {
+      "source": "76.0",
+      "target": "66.0",
+      "key": "249"
+    }
+  ],
+  "options": {
+    "type": "directed",
+    "multi": false,
+    "allowSelfLoops": true
+  }
+}
