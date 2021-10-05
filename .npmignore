@@ -3,8 +3,11 @@ node_modules
 *.log
 *.swp
 .DS_Store
+.idea
+.vscode
 package-lock.json
 .gitignore
+.github
 .npmignore
 examples
 test

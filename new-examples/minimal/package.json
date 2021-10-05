@@ -1,0 +1,17 @@
+{
+  "name": "sigma-example-minimal",
+  "version": "1.0.0",
+  "description": "A minimalist sigma usage example.",
+  "main": "index.js",
+  "scripts": {
+    "start": "kotatsu serve index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "graphology": "^0.21.0",
+    "sigma": "latest"
+  },
+  "devDependencies": {
+    "kotatsu": "^0.22.2"
+  }
+}

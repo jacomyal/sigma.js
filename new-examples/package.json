@@ -1,0 +1,20 @@
+{
+  "name": "sigma-examples",
+  "version": "1.0.0",
+  "description": "Sigma examples root package.",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start:minimal": "kotatsu serve minimal/index.js --index minimal/index.html"
+  },
+  "kotatsu": {
+    "typescript": true,
+    "config": "webpack.config.js"
+  },
+  "dependencies": {
+    "graphology": "^0.21.0"
+  },
+  "devDependencies": {
+    "kotatsu": "^0.22.2"
+  }
+}

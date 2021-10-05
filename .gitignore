@@ -2,9 +2,14 @@ node_modules
 *.tgz
 *.log
 *.swp
+.cache
+.parcel-cache
+.kotatsu
 .DS_Store
+.idea
 .vscode
 build
+dist
 /core/
 /rendering/
 /utils/

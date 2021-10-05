@@ -92,7 +92,6 @@
     "raw-loader": "^4.0.2",
     "replace": "^1.2.1",
     "rimraf": "^3.0.2",
-    "sigma": "file:.",
     "simple-statistics": "^7.7.0",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.2.1",
