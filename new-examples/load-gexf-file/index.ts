@@ -32,7 +32,7 @@ fetch("./public/arctic.gexf")
     });
 
     // Bind labels threshold to range input
-    labelsThresholdRange.addEventListener("change", () => {
+    labelsThresholdRange.addEventListener("input", () => {
       renderer.setSetting("labelRenderedSizeThreshold", +labelsThresholdRange.value);
     });
 
