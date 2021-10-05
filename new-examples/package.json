@@ -5,14 +5,15 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start:minimal": "kotatsu serve minimal/index.ts --index minimal/index.html"
+    "start": "kotatsu serve $npm_config_example/index.ts --index $npm_config_example/index.html --public /public $npm_config_example/public"
   },
   "kotatsu": {
     "typescript": true,
     "config": "webpack.config.js"
   },
   "dependencies": {
-    "graphology": "^0.21.0"
+    "graphology": "^0.21.0",
+    "graphology-gexf": "^0.8.0"
   },
   "devDependencies": {
     "kotatsu": "^0.22.2"
