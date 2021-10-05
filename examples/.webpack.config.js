@@ -45,6 +45,9 @@ module.exports = {
   devtool: "source-map",
   resolve: {
     extensions: [".ts", ".js", ".glsl", ".gexf"],
+    alias: {
+      sigma: path.resolve(__dirname, "../src"),
+    },
   },
   module: {
     rules: [
