@@ -8,7 +8,6 @@
     "start": "kotatsu serve $npm_config_example/index.ts --index $npm_config_example/index.html --public /public $npm_config_example/public"
   },
   "kotatsu": {
-    "typescript": true,
     "config": "webpack.config.js"
   },
   "dependencies": {
@@ -16,6 +15,7 @@
     "graphology-gexf": "^0.8.0"
   },
   "devDependencies": {
-    "kotatsu": "^0.22.2"
+    "kotatsu": "^0.22.2",
+    "typescript": "^4.4.3"
   }
 }

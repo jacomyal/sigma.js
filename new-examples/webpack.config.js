@@ -14,6 +14,14 @@ module.exports = {
         exclude: /node_modules/,
         loader: "raw-loader",
       },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        loader: "ts-loader",
+        options: {
+          configFile: path.resolve(__dirname, "../tsconfig.example.json"),
+        },
+      },
     ],
   },
 };
