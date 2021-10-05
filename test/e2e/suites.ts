@@ -58,6 +58,34 @@ export const tests: Tests = [
       });
     },
   },
+  {
+    name: "les-miserables",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
+
+        new Sigma(lesMiserables, container);
+      });
+    },
+  },
+  {
+    name: "arctic",
+    scenario: async (page) => {
+      await page.evaluate(() => {
+        const {
+          data: { arctic },
+          Sigma,
+          container,
+        } = dependencies;
+
+        new Sigma(arctic, container);
+      });
+    },
+  },
 ];
 
 // export const tests: Tests = [
