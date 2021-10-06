@@ -19,6 +19,7 @@ export type Tests = Array<{
   waitFor?: number; // Time to wait in ms before to take the screenshot
   scenario: (page: Page) => Promise<void>;
   failureThreshold?: number; // between 0 and 1, it's a percent. By default it's 0.
+  dimensions?: { width: number; height: number };
 }>;
 
 export const tests: Tests = [
@@ -56,6 +57,25 @@ export const tests: Tests = [
         graph.addEdge("upper-right", "lower-left", { color: "#f00" });
 
         new Sigma(graph, container, { renderEdgeLabels: true, labelRenderedSizeThreshold: -Infinity });
+      });
+    },
+  },
+  {
+    name: "standing-rectangle",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 10 });
+        graph.addNode("upper-right", { x: 5, y: 0, size: 10 });
+        graph.addNode("lower-left", { x: 0, y: 10, size: 10 });
+        graph.addNode("lower-right", { x: 5, y: 10, size: 10 });
+
+        graph.addEdge("upper-left", "lower-right", { size: 5, color: "#F00" });
+        graph.addEdge("upper-right", "lower-left", { size: 5, color: "#F00" });
+
+        new Sigma(graph, container);
       });
     },
   },

@@ -34,6 +34,9 @@ export async function takeScreenshots(tests: Tests, folder: string, port = 8000,
           await page.goto(testPageUrl);
           await page.exposeFunction("e2eTestScenario", test.scenario);
 
+          const dimensions = test.dimensions || { width: 800, height: 600 };
+          await page.setViewport(dimensions);
+
           test.scenario(page);
 
           // await page.evaluate(() => {
