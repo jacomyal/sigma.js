@@ -1,3 +1,9 @@
+/**
+ * This example showcases sigma's reducers, which aim to facilitate dynamically
+ * changing the appearance of nodes and edges, without actually changing the
+ * main graphology data.
+ */
+
 import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import Graph from "graphology";
