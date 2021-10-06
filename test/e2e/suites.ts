@@ -80,6 +80,26 @@ export const tests: Tests = [
     },
   },
   {
+    name: "settings",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+
+        graph.addNode("John", { x: 6, y: 4, size: 10 });
+        graph.addNode("Mary", { x: 4, y: 2, size: 10 });
+        graph.addNode("Sue", { x: 4, y: 6, size: 10 });
+
+        graph.addEdge("John", "Mary", { size: 5 });
+        graph.addEdge("Mary", "Sue", { size: 5 });
+        graph.addEdge("Sue", "John", { size: 5 });
+
+        new Sigma(graph, container, { defaultNodeColor: "#7FFFD4", defaultEdgeColor: "#AA4A44" });
+      });
+    },
+  },
+  {
     name: "les-miserables",
     scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
@@ -161,44 +181,104 @@ export const tests: Tests = [
       });
     },
   },
-];
+  {
+    name: "les-miserables-mouse-wheel",
+    waitFor: 2000,
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
 
-// export const tests: Tests = [
-//   { name: "drag", url: "http://localhost:8000/drag.html" },
-//   { name: "gexf", url: "http://localhost:8000/gexf.html" },
-//   { name: "settings", url: "http://localhost:8000/settings.html" },
-//   {
-//     name: "settings-mouse-zoom",
-//     url: "http://localhost:8000/settings.html",
-//     waitFor: 2000,
-//     scenario: async (browser: Browser, page: Page): Promise<void> => {
-//       await page.evaluate(() => {
-//         const element = document.getElementsByClassName("sigma-mouse")[0];
-//         const cEvent: Event & { clientX?: number; clientY?: number; deltaY?: number } = new Event("wheel");
-//         cEvent.clientX = 0;
-//         cEvent.clientY = 0;
-//         cEvent.deltaY = -100;
-//         element.dispatchEvent(cEvent);
-//       });
-//     },
-//   },
-//   { name: "tiny", url: "http://localhost:8000/tiny.html" },
-//   { name: "edge-labels", url: "http://localhost:8000/edge-labels.html" },
-//   {
-//     name: "node-edge-state",
-//     url: "http://localhost:8000/edge-labels.html",
-//     waitFor: 2000,
-//     scenario: async (browser: Browser, page: Page): Promise<void> => {
-//       await page.evaluate(() => {
-//         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//         // @ts-ignore
-//         const graph: Graph = window.graph;
-//         graph.setNodeAttribute("Alice", "highlighted", true);
-//         graph.setNodeAttribute("Bob", "size", 50);
-//         graph.setNodeAttribute("Bob", "color", "#FF0000");
-//         graph.setNodeAttribute("Deborah", "hidden", true);
-//         graph.setEdgeAttribute("Alice", "Bob", "hidden", true);
-//       });
-//     },
-//   },
-// ];
+        new Sigma(lesMiserables, container);
+
+        const element = document.getElementsByClassName("sigma-mouse")[0];
+        const cEvent: Event & { clientX?: number; clientY?: number; deltaY?: number } = new Event("wheel");
+        cEvent.clientX = 0;
+        cEvent.clientY = 0;
+        cEvent.deltaY = -100;
+        element.dispatchEvent(cEvent);
+      });
+    },
+  },
+  {
+    name: "node-edge-state",
+    waitFor: 2000,
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph({ type: "directed" });
+
+        graph.addNode("Alice", {
+          label: "Alice",
+          x: -2,
+          y: 1,
+          color: "#FF0",
+          size: 10,
+        });
+
+        graph.addNode("Bob", {
+          label: "Bob",
+          x: 1,
+          y: 2,
+          color: "#00F",
+          size: 5,
+        });
+
+        graph.addNode("Charles", {
+          label: "Charles",
+          x: 2,
+          y: -1,
+          color: "#00F",
+          size: 5,
+        });
+
+        graph.addNode("Deborah", {
+          label: "Deborah",
+          x: -1,
+          y: -2,
+          color: "#00F",
+          size: 5,
+        });
+
+        graph.addEdge("Alice", "Bob", {
+          label: "likes to play with",
+          size: 1,
+        });
+
+        graph.addEdge("Bob", "Charles", {
+          label: "likes to be with",
+          color: "#fc0",
+          size: 2,
+        });
+
+        graph.addEdge("Charles", "Deborah", {
+          label: "likes to talk with",
+          color: "#CCC",
+          size: 3,
+        });
+
+        graph.addEdge("Deborah", "Alice", {
+          label: "likes to talk with",
+          color: "#000",
+          size: 20,
+        });
+
+        new Sigma(graph, container, {
+          defaultEdgeType: "arrow",
+          defaultEdgeColor: "#888",
+          renderEdgeLabels: true,
+        });
+
+        graph.setNodeAttribute("Alice", "highlighted", true);
+        graph.setNodeAttribute("Bob", "size", 50);
+        graph.setNodeAttribute("Bob", "color", "#FF0000");
+        graph.setNodeAttribute("Deborah", "hidden", true);
+        graph.setEdgeAttribute("Alice", "Bob", "hidden", true);
+      });
+    },
+  },
+];

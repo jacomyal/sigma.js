@@ -39,15 +39,6 @@ export async function takeScreenshots(tests: Tests, folder: string, port = 8000,
 
           test.scenario(page);
 
-          // await page.evaluate(() => {
-          //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //   // @ts-ignore
-          //   const deps = window.dependencies;
-          //   console.log(deps, "ICI");
-          //   // @ts-ignore
-          //   return e2eTestScenario(deps);
-          // });
-
           // Taking the screenshot
           setTimeout(async () => {
             // Take the screenshot
