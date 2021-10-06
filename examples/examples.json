@@ -1,6 +1,22 @@
 [
-  { "name": "template", "skip": true },
-  { "name": "load-gexf-file", "title": "Load a graph file" },
-  { "name": "use-reducers", "title": "Dynamically change appearance" },
-  { "name": "csv-to-network-map", "title": "From raw dataset to a map" }
+    {
+        "name": "template",
+        "skip": true
+    },
+    {
+        "name": "load-gexf-file",
+        "title": "Load a graph file"
+    },
+    {
+        "name": "use-reducers",
+        "title": "Dynamically change appearance"
+    },
+    {
+        "name": "csv-to-network-map",
+        "title": "From raw dataset to a map"
+    },
+    {
+        "name": "layouts",
+        "title": "Apply layouts on a graph"
+    }
 ]
