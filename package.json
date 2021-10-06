@@ -11,7 +11,7 @@
     "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
     "gitignore": "jq -r '.sigma.clean' package.json | tr ' ' '\\n' >> .gitignore",
     "lint": "eslint $npm_package_config_folders --ext .ts",
-    "postinstall": "npm run examples:prepare && npm run website:prepare",
+    "postinstall": "npm run examples:prepare",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
     "prepare": "npm run clean && npm run transpile && npm run build",
