@@ -19,7 +19,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: "ts-loader",
         options: {
-          configFile: path.resolve(__dirname, "../tsconfig.example.json"),
+          configFile: path.resolve(__dirname, "../tsconfig.examples.json"),
         },
       },
     ],
