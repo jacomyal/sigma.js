@@ -15,6 +15,7 @@ jobs:
           node-version: 12
 
       - name: Install, Lint & Test
+        id: tests
         continue-on-error: true
         run: |
           npm i
@@ -22,8 +23,12 @@ jobs:
           npm run e2e:test
 
       - name: Uploading screenshots on failure
-        if: failure()
+        if: steps.tests.outcome == 'failure'
         uses: actions/upload-artifact@v2
         with:
           name: failure-screenshots
           path: test/e2e/screenshots/
+
+      - name: Exit signal
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
