@@ -20,7 +20,7 @@
     "test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts",
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
-    "examples:prepare": "cb examples && npm install",
+    "examples:prepare": "cd examples && npm install",
     "website:prepare": "cd website && npm install",
     "website:start": "cd website && npm run dev",
     "website:build": "cd website && npm run build-all"
