@@ -1,7 +1,7 @@
 {
   "name": "sigma-example-use-reducers",
   "version": "1.0.0",
-  "description": "A minimalist sigma usage example.",
+  "description": "This example shows how to use sigma reducers to dynamically change nodes and edges appearance.",
   "main": "index.js",
   "scripts": {
     "start": "kotatsu serve --typescript index.ts --public /public ./public"

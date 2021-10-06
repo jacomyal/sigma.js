@@ -5,7 +5,7 @@
     "clear": "rimraf www build",
     "postinstall": "next build",
     "build-doc": "typedoc ../src/index.ts --out www/doc",
-    "build-examples": "cd .. && npm run examples-build",
+    "build-examples": "cd ../examples && npm run build",
     "build-website": "next build && next export -o www",
     "build-all": "npm run clear && npm run build-website && npm run build-doc && npm run build-examples"
   },
@@ -23,6 +23,7 @@
     "next": "10.0.9",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-icons": "^4.3.1",
     "rimraf": "^3.0.2",
     "sass": "^1.32.8",
     "typedoc": "^0.20.36",

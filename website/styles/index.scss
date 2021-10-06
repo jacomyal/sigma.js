@@ -1,9 +1,10 @@
 @import "~highlight.js/scss/github";
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Khula:wght@300;400&display=swap");
 
 // Bootstrap files:
 @import "~bootstrap/scss/functions";
-@import "bootstrap-variables";
+@import "variables";
+@import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 @import "~bootstrap/scss/utilities";
 
@@ -45,3 +46,4 @@
 // Actual website code files:
 @import "base";
 @import "example";
+@import "homepage";

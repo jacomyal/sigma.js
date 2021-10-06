@@ -3,24 +3,33 @@ import { join } from "path";
 import hljs from "highlight.js";
 
 import { Example } from "./types";
-import examples from "../../examples/.examples.json";
+import examples from "../../examples/examples.json";
+import pkg from "../../package.json";
 
 const POSTS_DIRECTORY = join(process.cwd(), "../examples");
 
 /**
  * Returns a cleaned ExampleType object from a full path.
  */
-export function getExample(path: string, title: string): Example {
-  const slug = (path.match(/([^\/\.]+)(\.[^\.\/]+)?$/) || [])[1] as string;
+export function getExample(name: string, title: string): Example {
+  const path = join(POSTS_DIRECTORY, `${name}/index.ts`);
+  const imagePath = join(POSTS_DIRECTORY, `${name}/thumbnail.png`);
+  const packageJsonContent = JSON.parse(fs.readFileSync(join(POSTS_DIRECTORY, `${name}/package.json`), "utf8"));
   const rawFileContent = fs.readFileSync(path, "utf8");
+  const githubURL = pkg.repository.url.replace(/\.git$/, "") + `/tree/master/examples/${name}`;
+  const codesandboxURL = githubURL.replace("github.com", "githubbox.com");
 
   return {
     name: title,
+    description: packageJsonContent.description,
     codeRaw: rawFileContent,
     codeHTML: hljs.highlightAuto(rawFileContent).value,
     codePath: path,
     htmlPath: path,
-    iframePath: `/demos/${slug}.html`,
+    iframePath: `/demos/${name}.html`,
+    imageBase64: new Buffer(fs.readFileSync(imagePath)).toString("base64"),
+    githubURL,
+    codesandboxURL,
   };
 }
 
@@ -28,9 +37,9 @@ export function getExample(path: string, title: string): Example {
  * Returns the list of all posts.
  */
 export function getExamples(): Example[] {
-  return Object.values<{ id: string; title: string }>(examples).map((example) =>
-    getExample(join(POSTS_DIRECTORY, example.id + ".ts"), example.title),
-  );
+  return examples
+    .filter((example) => !example.skip)
+    .map((example) => getExample(example.name, example.title as string));
 }
 
 /**

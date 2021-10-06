@@ -1,7 +1,7 @@
 {
   "name": "sigma-example-csv-to-network-map",
   "version": "1.0.0",
-  "description": "A sigma example that loads a CSV file and transforms the data to get a drawable network map, using graphology.",
+  "description": "This example loads a raw CSV dataset, and transforms the data to get a drawable network map, using Graphology.",
   "main": "index.js",
   "scripts": {
     "start": "kotatsu serve --typescript index.ts --public /public ./public"

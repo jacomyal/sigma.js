@@ -1,1 +1,6 @@
-[{ "name": "template" }, { "name": "load-gexf-file" }, { "name": "use-reducers" }, { "name": "csv-to-network-map" }]
+[
+  { "name": "template", "skip": true },
+  { "name": "load-gexf-file", "title": "Load a graph file" },
+  { "name": "use-reducers", "title": "Dynamically change appearance" },
+  { "name": "csv-to-network-map", "title": "From raw dataset to a map" }
+]

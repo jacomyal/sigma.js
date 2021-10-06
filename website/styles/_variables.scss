@@ -1,0 +1,8 @@
+// Sigma website theme colors:
+$sigma-red: #b53725;
+
+// Bootstrap variables overrides:
+$primary: $sigma-red !default;
+$font-family-sans-serif: Khula, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+  "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-size-base: 1.1rem;

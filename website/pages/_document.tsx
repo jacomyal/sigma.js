@@ -8,8 +8,9 @@ const CUSTOM_CSS = `
   }
 `;
 
-export default class CustomDocument extends Document<DocumentProps> {
+export default class CustomDocument extends Document<DocumentProps & { bodyClassName?: string }> {
   render() {
+    const bodyClassName = this.props?.__NEXT_DATA__?.props?.pageProps?.bodyClassName;
     return (
       <Html>
         <Head>
@@ -18,7 +19,7 @@ export default class CustomDocument extends Document<DocumentProps> {
           <link rel="shortcut icon" href="images/favicon-96x96.ico" sizes="96x96" />
           <style>{CUSTOM_CSS}</style>
         </Head>
-        <body>
+        <body className={bodyClassName}>
           <Main />
           <NextScript />
         </body>

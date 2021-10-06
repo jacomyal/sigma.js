@@ -1,7 +1,7 @@
 {
   "name": "sigma-example-load-gexf-file",
   "version": "1.0.0",
-  "description": "A sigma example that loads a GEXF graph file and displays it with a few interactive features.",
+  "description": "This example loads a GEXF graph file and displays it with a few classic interactive features.",
   "main": "index.js",
   "scripts": {
     "start": "kotatsu serve --typescript index.ts --public /public ./public"
