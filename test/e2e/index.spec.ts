@@ -26,16 +26,16 @@ describe("Compare screenshots", () => {
 
   tests.forEach((test) => {
     it(`Screenshots for "${test.name}" should be the same`, () => {
+      const failureThreshold = test.failureThreshold || 1e-5;
+
       const result = imageDiff(
         path.resolve(`./test/e2e/screenshots/${test.name}.valid.png`),
         path.resolve(`./test/e2e/screenshots/${test.name}.current.png`),
         path.resolve(`./test/e2e/screenshots/${test.name}.diff.png`),
       );
       assert(
-        result.percent <= (test.failureThreshold || 0),
-        `There is a diff over ${test.failureThreshold || 0} (${result.percent}) on ${test.name}, please check "${
-          test.name
-        }.diff.png"`,
+        result.percent <= failureThreshold,
+        `There is a diff over ${failureThreshold} (${result.percent}) on ${test.name}, please check "${test.name}.diff.png"`,
       );
     });
   });

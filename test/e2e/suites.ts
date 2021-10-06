@@ -18,7 +18,7 @@ export type Tests = Array<{
   name: string; // Name of the screenshot, without the extension like for example 'example-basic'
   waitFor?: number; // Time to wait in ms before to take the screenshot
   scenario: (page: Page) => Promise<void>;
-  failureThreshold?: number; // between 0 and 1, it's a percent. By default it's 0.
+  failureThreshold?: number; // between 0 and 1, it's a percent. By default it's a small epsilon.
   dimensions?: { width: number; height: number };
 }>;
 
