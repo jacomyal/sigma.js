@@ -18,7 +18,7 @@
     "sigma": "latest"
   },
   "devDependencies": {
-    "kotatsu": "^0.22.2",
+    "kotatsu": "^0.22.3",
     "typescript": "4.4.3"
   }
 }
