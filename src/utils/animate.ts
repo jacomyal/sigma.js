@@ -29,7 +29,7 @@ export function animateNodes(
   graph: Graph,
   targets: PlainObject<PlainObject<number>>,
   opts: Partial<AnimateOptions>,
-  callback: () => void,
+  callback?: () => void,
 ): () => void {
   const options: AnimateOptions = Object.assign({}, ANIMATE_DEFAULTS, opts);
 
