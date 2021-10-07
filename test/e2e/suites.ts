@@ -219,6 +219,21 @@ export const tests: Tests = [
     },
   },
   {
+    name: "camera-state-rotation",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const {
+          data: { arctic },
+          Sigma,
+          container,
+        } = dependencies;
+
+        const renderer = new Sigma(arctic, container);
+        renderer.getCamera().setState({ angle: 30 });
+      });
+    },
+  },
+  {
     name: "reducers",
     scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
