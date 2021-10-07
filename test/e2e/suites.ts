@@ -257,28 +257,28 @@ export const tests: Tests = [
       });
     },
   },
-  {
-    name: "les-miserables-mouse-wheel",
-    waitFor: 2000,
-    scenario: async (page: Page): Promise<void> => {
-      await page.evaluate(() => {
-        const {
-          data: { lesMiserables },
-          Sigma,
-          container,
-        } = dependencies;
+  // {
+  //   name: "les-miserables-mouse-wheel",
+  //   waitFor: 2000,
+  //   scenario: async (page: Page): Promise<void> => {
+  //     await page.evaluate(() => {
+  //       const {
+  //         data: { lesMiserables },
+  //         Sigma,
+  //         container,
+  //       } = dependencies;
 
-        new Sigma(lesMiserables, container);
+  //       new Sigma(lesMiserables, container);
 
-        const element = document.getElementsByClassName("sigma-mouse")[0];
-        const cEvent: Event & { clientX?: number; clientY?: number; deltaY?: number } = new Event("wheel");
-        cEvent.clientX = 0;
-        cEvent.clientY = 0;
-        cEvent.deltaY = -100;
-        element.dispatchEvent(cEvent);
-      });
-    },
-  },
+  //       const element = document.getElementsByClassName("sigma-mouse")[0];
+  //       const cEvent: Event & { clientX?: number; clientY?: number; deltaY?: number } = new Event("wheel");
+  //       cEvent.clientX = 0;
+  //       cEvent.clientY = 0;
+  //       cEvent.deltaY = -100;
+  //       element.dispatchEvent(cEvent);
+  //     });
+  //   },
+  // },
   {
     name: "node-edge-state",
     waitFor: 2000,
