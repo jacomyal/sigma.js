@@ -35,16 +35,25 @@ const renderer = new Sigma(graph, container);
 let draggedNode: string | null = null;
 let isDragging = false;
 
-// On mouse down on a node (if we are in the BBOX), we enable the drag mode
+// On mouse down on a node
+//  - we enable the drag mode
+//  - save in the dragged node in the state
+//  - highlight the node
 renderer.on("downNode", (e) => {
-  if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
   isDragging = true;
   draggedNode = e.node;
   graph.setNodeAttribute(draggedNode, "highlighted", true);
+});
+
+// On mouse down, we disable the autoscale by
+//  - force the bbox of the sigma
+//  - Disable the camera, so its state will not be updated
+renderer.getMouseCaptor().on("mousedown", () => {
+  if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
   renderer.getCamera().disable();
 });
 
-// On mouse up, we remove reset the drag mode
+// On mouse up, we reset the autoscale and the dragging mode
 renderer.getMouseCaptor().on("mouseup", () => {
   if (draggedNode) {
     graph.removeNodeAttribute(draggedNode, "highlighted");
