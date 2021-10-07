@@ -18,22 +18,28 @@ Sigma.js v2 is a major refactoring and is currently in version alpha. The stable
 
 ## Installation
 
-Sigma is a javascript library, it is available in `npm` package manager.
+You can install `sigma` (and `graphology` which is required for `sigma` to work) in your JavaScript or TypeScript project using `npm`:
 
-    npm install sigma
+```bash
+npm install graphology sigma
+```
 
 ## Examples
 
-A development server can be spawned locally to view the examples. Visit `localhost:8000` after executing the following commands:
+The `examples` folder holds a series of self-contained TypeScript projects that you can either browse and edit on [CodeSandbox](https://codesandbox.io/) or install locally likewise:
 
-    npm install
-    npm run examples
+```bash
+git clone git@github.com:jacomyal/sigma.js.git
+cd sigma.js
+npm install
+cd examples
+npm start --example=load-gexf-file # Change this to the desired example
+```
 
-You can play around with the files in directory `examples`, the web pages are live-reloaded whenever the code gets changed.
+_List of available examples_
 
-### Website
-
-The website sources are also hosted in this repository. You can see how it works by reading the dedicated [README](website/README.md) file.
+- [Fetching and displaying a graph contained in a gexf file](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file)
+- todo...
 
 ## Contributing
 
