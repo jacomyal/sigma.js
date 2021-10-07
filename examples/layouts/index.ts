@@ -7,7 +7,7 @@ import Graph from "graphology";
 import Sigma from "sigma";
 import { circular } from "graphology-layout";
 import { PlainObject } from "sigma/types";
-import { animateNodes } from "../../utils/animate";
+import { animateNodes } from "sigma/utils/animate";
 import data from "./data.json";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import forceAtlas2 from "graphology-layout-forceatlas2";

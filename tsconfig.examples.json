@@ -5,7 +5,6 @@
     "strict": false,
     "paths": {
       "sigma": ["./src/"],
-      "sigma/utils": ["./src/utils"],
       "sigma/types": ["./src/types"],
       "sigma/utils/animate": ["./src/utils/animate"]
     }

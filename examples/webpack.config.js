@@ -4,6 +4,8 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js", ".glsl"],
     alias: {
+      "sigma/types": path.resolve(__dirname, "../src/types.ts"),
+      "sigma/utils/animate": path.resolve(__dirname, "../src/utils/animate.ts"),
       sigma: path.resolve(__dirname, "../src/index.ts"),
     },
   },
