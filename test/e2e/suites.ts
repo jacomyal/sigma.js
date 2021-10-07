@@ -61,7 +61,7 @@ export const tests: Tests = [
     },
   },
   {
-    name: "standing-rectangle",
+    name: "aspect-ratio-vertical-graph-horizontal-container",
     scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {
         const { Graph, Sigma, container } = dependencies;
@@ -78,6 +78,67 @@ export const tests: Tests = [
         new Sigma(graph, container);
       });
     },
+    dimensions: { width: 800, height: 400 },
+  },
+  {
+    name: "aspect-ratio-horizontal-graph-horizontal-container",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 10 });
+        graph.addNode("upper-right", { x: 10, y: 0, size: 10 });
+        graph.addNode("lower-left", { x: 0, y: 5, size: 10 });
+        graph.addNode("lower-right", { x: 10, y: 5, size: 10 });
+
+        graph.addEdge("upper-left", "lower-right", { size: 5, color: "#F00" });
+        graph.addEdge("upper-right", "lower-left", { size: 5, color: "#F00" });
+
+        new Sigma(graph, container);
+      });
+    },
+    dimensions: { width: 800, height: 400 },
+  },
+  {
+    name: "aspect-ratio-horizontal-graph-vertical-container",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 10 });
+        graph.addNode("upper-right", { x: 10, y: 0, size: 10 });
+        graph.addNode("lower-left", { x: 0, y: 5, size: 10 });
+        graph.addNode("lower-right", { x: 10, y: 5, size: 10 });
+
+        graph.addEdge("upper-left", "lower-right", { size: 5, color: "#F00" });
+        graph.addEdge("upper-right", "lower-left", { size: 5, color: "#F00" });
+
+        new Sigma(graph, container);
+      });
+    },
+    dimensions: { width: 400, height: 800 },
+  },
+  {
+    name: "aspect-ratio-vertical-graph-vertical-container",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 10 });
+        graph.addNode("upper-right", { x: 5, y: 0, size: 10 });
+        graph.addNode("lower-left", { x: 0, y: 10, size: 10 });
+        graph.addNode("lower-right", { x: 5, y: 10, size: 10 });
+
+        graph.addEdge("upper-left", "lower-right", { size: 5, color: "#F00" });
+        graph.addEdge("upper-right", "lower-left", { size: 5, color: "#F00" });
+
+        new Sigma(graph, container);
+      });
+    },
+    dimensions: { width: 400, height: 800 },
   },
   {
     name: "settings",
