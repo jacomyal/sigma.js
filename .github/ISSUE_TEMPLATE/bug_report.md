@@ -1,11 +1,12 @@
 ---
-
 name: Bug report
 about: Create a report to help us improve
 title: ""
 labels: bug
 assignees: ""
----## Guidelines
+---
+
+## Guidelines
 
 Please note that GitHub issues are only meant for bug reports/feature requests.
 If you have questions on how to use Sigma.js, please ask on [StackOverflow](https://stackoverflow.com/questions/tagged/sigma.js) instead of creating an issue here.
