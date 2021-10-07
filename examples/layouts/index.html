@@ -24,17 +24,38 @@
         display:flex;
       }
       #buttons>button {
-          margin-right: 1em;
+          margin-right: 1em;       
+          display: inline-block;
+          text-align: center;
+          background: white;
+          outline: none;
+          border: 1px solid dimgrey;
+          border-radius: 2px;
+          cursor: pointer;
         }
+      #buttons>button img {
+        height:2em;
+      }
+      #buttons>button>span {
+        height:100%;
+        display:flex;
+        align-items: center;
+      }
       #buttons>button:last-child {
           margin-right: 0;
         }
     </style>
     <div id="sigma-container"></div>
     <div id="buttons">
-      <button id="random">random</button>
-      <button id="forceatlas2">start FA2</button>
-      <button id="circular">circular</button>
+      <button id="random"><span><img src="./public/GiPerspectiveDiceSixFaces.svg"/>random</span></button>
+      <button id="forceatlas2">
+        <span >
+          <img id="forceatlas2-start-label" src="./public/BiPlay.svg"/>
+          <img id="forceatlas2-stop-label" style="display: none" src="./public/BiPause.svg"/>
+          Force Atlas 2
+        </span>
+      </button>
+      <button id="circular"><span><img src="./public/BiLoaderCircle.svg"/>circular</span></button>
     </div>
     <script src="build/bundle.js"></script>
   </body>
