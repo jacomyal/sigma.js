@@ -11,5 +11,6 @@ package-lock.json
 .npmignore
 examples
 test
+website
 webpack.config.js
 webpack.programs.config.js
