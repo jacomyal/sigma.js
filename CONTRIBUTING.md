@@ -12,7 +12,7 @@ In this guide you will get an overview of the contribution workflow from opening
 
     - Clone the project to your local computer: `git clone git@github.com:your-username/sigma.js.git`
 
-    - Navigate to the folder sigma.js and add the upstream repository: `git remote add upstream git@github.com:networkx/networkx.git`
+    - Navigate to the folder sigma.js and add the upstream repository: `git remote add upstream git@github.com:jacomyal/sigma.js.git`
 
     - Now, you have remote repositories named:
 
