@@ -39,18 +39,23 @@ let isDragging = false;
 //  - we enable the drag mode
 //  - save in the dragged node in the state
 //  - highlight the node
+//  - disable the camera so its state is not updated
 renderer.on("downNode", (e) => {
   isDragging = true;
   draggedNode = e.node;
   graph.setNodeAttribute(draggedNode, "highlighted", true);
+  renderer.getCamera().disable();
 });
 
-// On mouse down, we disable the autoscale by
-//  - force the bbox of the sigma
-//  - Disable the camera, so its state will not be updated
-renderer.getMouseCaptor().on("mousedown", () => {
-  if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
-  renderer.getCamera().disable();
+// On mouse move, if the drag mode is enabled, we change the position of the draggedNode
+renderer.getMouseCaptor().on("mousemove", (e) => {
+  if (!isDragging || !draggedNode) return;
+
+  // Get new position of node
+  const pos = renderer.viewportToGraph(e);
+
+  graph.setNodeAttribute(draggedNode, "x", pos.x);
+  graph.setNodeAttribute(draggedNode, "y", pos.y);
 });
 
 // On mouse up, we reset the autoscale and the dragging mode
@@ -63,15 +68,9 @@ renderer.getMouseCaptor().on("mouseup", () => {
   renderer.getCamera().enable();
 });
 
-// On mouse move, if the drag mode is enabled, we change the position of the draggedNode
-renderer.getMouseCaptor().on("mousemove", (e) => {
-  if (!isDragging || !draggedNode) return;
-
-  // Get new position of node
-  const pos = renderer.viewportToGraph(e);
-
-  graph.setNodeAttribute(draggedNode, "x", pos.x);
-  graph.setNodeAttribute(draggedNode, "y", pos.y);
+// Disable the autoscale at the first down interaction
+renderer.getMouseCaptor().on("mousedown", () => {
+  if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
 });
 
 //
