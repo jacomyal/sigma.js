@@ -9,7 +9,6 @@ import Graph from "graphology";
 import { EdgeKey, NodeKey } from "graphology-types";
 
 import { Dimensions, Coordinates } from "../types";
-import Sigma from "../sigma";
 
 // TODO: full jsdocs
 
@@ -135,29 +134,6 @@ export class LabelGrid {
     }
 
     return labels;
-  }
-
-  draw(context: CanvasRenderingContext2D, renderer: Sigma): void {
-    context.strokeStyle = "red";
-    context.lineWidth = 1;
-
-    for (let i = 0; i < this.columns; i++) {
-      const pos = renderer.framedGraphToViewport({ x: (i * this.cellSize) / this.width, y: 0 });
-
-      context.beginPath();
-      context.moveTo(pos.x, 0);
-      context.lineTo(pos.x, this.height);
-      context.stroke();
-    }
-
-    for (let j = 0; j < this.rows; j++) {
-      const pos = renderer.framedGraphToViewport({ x: 0, y: (j * this.cellSize) / this.height });
-
-      context.beginPath();
-      context.moveTo(0, pos.y);
-      context.lineTo(this.width, pos.y);
-      context.stroke();
-    }
   }
 }
 

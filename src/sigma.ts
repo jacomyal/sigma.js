@@ -740,8 +740,6 @@ export default class Sigma extends EventEmitter {
 
     const cameraState = this.camera.getState();
 
-    // this.labelGrid.draw(this.canvasContexts.labels, this.camera);
-
     // Finding visible nodes to display their labels
     let visibleNodes: Set<NodeKey>;
 
