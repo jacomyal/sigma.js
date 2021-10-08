@@ -4,7 +4,7 @@
   "description": "This example loads a raw CSV dataset, and transforms the data to get a drawable network map, using Graphology.",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --typescript index.ts --public /public ./public"
+    "start": "kotatsu serve --typescript index.ts --public / ./public"
   },
   "license": "MIT",
   "dependencies": {

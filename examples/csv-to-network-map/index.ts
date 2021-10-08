@@ -21,7 +21,7 @@ import { largestConnectedComponent } from "graphology-components";
 import subgraph from "graphology-operators/subgraph";
 
 // 1. Load CSV file:
-Papa.parse<{ name: string; acronym: string; subject_terms: string }>("./public/data.csv", {
+Papa.parse<{ name: string; acronym: string; subject_terms: string }>("./data.csv", {
   download: true,
   header: true,
   delimiter: ",",
