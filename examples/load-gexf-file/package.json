@@ -4,7 +4,7 @@
   "description": "This example loads a GEXF graph file and displays it with a few classic interactive features.",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --typescript index.ts --public /public ./public"
+    "start": "kotatsu serve --typescript index.ts --public / ./public"
   },
   "license": "MIT",
   "dependencies": {

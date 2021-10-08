@@ -10,7 +10,7 @@ import Graph from "graphology";
 import { parse } from "graphology-gexf/browser";
 
 // Load external GEXF file:
-fetch("./public/arctic.gexf")
+fetch("./arctic.gexf")
   .then((res) => res.text())
   .then((gexf) => {
     // Parse GEXF string:
