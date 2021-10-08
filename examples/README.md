@@ -32,3 +32,20 @@ You should see the example live, using local sigma sources.
 5. Don't forget to port the eventual dependencies you declared in `examples/my-example/package.json` to this directory's `examples/package.json` (so that it can be started with local sigma code)
 
 If you need public files, accessible from the example through a permalink, you need to put them in a `my-example/public` subfolder.
+
+### Caveats
+
+The examples rely on [`kotatsu`](https://github.com/Yomguithereal/kotatsu) because of its out-of-the-box compatibility with `webpack` which is also used in this repository to build the sources (especially to handle shaders).
+
+However, since it is not completely straightforward to serve static file in a CodeSandbox example which does not use a well-known tool such as `create-react-app` we have to cheat a little by using the following `sandbox.config.json` file to force CodeSandbox to consider our examples as using `create-react-app` just so our `public` files are correctly served:
+
+```json
+{
+  "infiniteLoopProtection": true,
+  "hardReloadOnChange": false,
+  "view": "browser",
+  "template": "create-react-app"
+}
+```
+
+Note that this is not required for examples that don't rely on static assets.
