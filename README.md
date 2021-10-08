@@ -26,7 +26,7 @@ npm install graphology sigma
 
 ## Examples
 
-The `examples` folder holds a series of self-contained TypeScript projects that you can either browse and edit on [CodeSandbox](https://codesandbox.io/) or install locally likewise:
+The [`examples`](./examples) folder contains a series of self-contained TypeScript projects that you can either browse and edit on [CodeSandbox](https://codesandbox.io/) or install locally likewise:
 
 ```bash
 git clone git@github.com:jacomyal/sigma.js.git
@@ -39,7 +39,11 @@ npm start --example=load-gexf-file # Change this to the desired example
 _List of available examples_
 
 - [Fetching and displaying a graph contained in a gexf file](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file)
-- todo...
+- [Using node & edge reducers to handle interactivity](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/use-reducers)
+- [Fetching, parsing & wrangling a CSV file to create a network map](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map)
+- [Handling drag and drop of nodes as well as node & edge creation on click](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/drag-n-drop-with-mouse-graph-creation)
+- [Displaying arbitrary elements, such as cluster labels, synchronized with the network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/clusters-labels)
+- [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts)
 
 ## Contributing
 
