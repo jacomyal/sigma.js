@@ -1024,7 +1024,7 @@ export default class Sigma extends EventEmitter {
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
 
-    this.emit('afterRender');
+    this.emit("afterRender");
 
     return this;
   }
