@@ -35,28 +35,28 @@ export default function drawHover(
   context.shadowBlur = 8;
   context.shadowColor = "#000";
 
-  const MARGIN = 2;
+  const PADDING = 2;
 
   if (typeof data.label === "string") {
     const textWidth = context.measureText(data.label).width,
-      boxWidth = Math.round(textWidth + 9),
-      boxHeight = Math.round(size + 2 * MARGIN),
-      radious = Math.max(data.size, size / 2) + MARGIN;
+      boxWidth = Math.round(textWidth + 5),
+      boxHeight = Math.round(size + 2 * PADDING),
+      radius = Math.max(data.size, size / 2) + PADDING;
 
-    const angleRadian = Math.asin(boxHeight / 2 / radious);
-    const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radious, 2) - Math.pow(boxHeight / 2, 2)));
+    const angleRadian = Math.asin(boxHeight / 2 / radius);
+    const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2)));
 
     context.beginPath();
     context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
-    context.lineTo(data.x + radious + boxWidth, data.y + boxHeight / 2);
-    context.lineTo(data.x + radious + boxWidth, data.y - boxHeight / 2);
+    context.lineTo(data.x + radius + boxWidth, data.y + boxHeight / 2);
+    context.lineTo(data.x + radius + boxWidth, data.y - boxHeight / 2);
     context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
-    context.arc(data.x, data.y, radious, angleRadian, -angleRadian);
+    context.arc(data.x, data.y, radius, angleRadian, -angleRadian);
     context.closePath();
     context.fill();
   } else {
     context.beginPath();
-    context.arc(data.x, data.y, data.size + MARGIN, 0, Math.PI * 2);
+    context.arc(data.x, data.y, data.size + PADDING, 0, Math.PI * 2);
     context.closePath();
     context.fill();
   }
