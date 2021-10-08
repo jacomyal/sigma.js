@@ -70,10 +70,8 @@ clustersLayer.innerHTML = clusterLabelsDoms;
 // insert the layer underneath the hovers layer
 container.insertBefore(clustersLayer, document.getElementsByClassName("sigma-hovers")[0]);
 
-// Clusters labels position needs to follow the camera
-const camera = renderer.getCamera();
-camera.on("updated", () => {
-  // listen to camera.updated event
+// Clusters labels position needs to be updated on each render
+renderer.on("afterRender", () => {
   for (const country in countryClusters) {
     const cluster = countryClusters[country];
     const clusterLabel = document.getElementById(cluster.label);
