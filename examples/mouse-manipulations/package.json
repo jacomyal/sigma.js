@@ -1,5 +1,5 @@
 {
-  "name": "sigma-example-drag-n-drog-with-mouse-graph-creation",
+  "name": "sigma-example-mouse-manipulations",
   "version": "1.0.0",
   "description": "Sigma example : Node drag'n'drop, with mouse graph creation",
   "main": "index.js",
@@ -12,7 +12,6 @@
     "sigma": "latest",
     "chroma-js": "^2.1.2",
     "faker": "^5.5.3",
-    "graphology": "^0.21.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
