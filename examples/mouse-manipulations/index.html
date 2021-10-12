@@ -17,7 +17,22 @@
         padding: 0;
         overflow: hidden;
       }
+      .text {
+        font-family: sans-serif;
+        font-style: italic;
+        color: #666666;
+        padding: 2em;
+        position: absolute;
+        inset: 0;
+      }
+      .text p {
+        margin-top: 0;
+      }
     </style>
+    <div class="text">
+      <p>You can move nodes with your mouse.</p>
+      <p>Also, clicking the stage will create new nodes, connected to the closest nodes.</p>
+    </div>
     <div id="sigma-container"></div>
     <script src="build/bundle.js"></script>
   </body>

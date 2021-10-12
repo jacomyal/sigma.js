@@ -1,6 +1,5 @@
 import Graph from "graphology";
 import Sigma from "sigma";
-import faker from "faker";
 import chroma from "chroma-js";
 import { v4 as uuid } from "uuid";
 import SpringSupervisor from "./layout-spring";
@@ -10,17 +9,17 @@ const container = document.getElementById("sigma-container") as HTMLElement;
 
 // Create a sample graph
 const graph = new Graph();
-graph.addNode("Guillaume", { x: 0, y: 0, size: 10, label: "Guillaume", color: chroma.random().hex() });
-graph.addNode("Alexis", { x: -5, y: 5, size: 10, label: "Alexis", color: chroma.random().hex() });
-graph.addNode("Paul", { x: 5, y: 5, size: 10, label: "Paul", color: chroma.random().hex() });
-graph.addNode("Benoit", { x: 0, y: 10, size: 10, label: "Benoit", color: chroma.random().hex() });
-graph.addEdge("Guillaume", "Alexis");
-graph.addEdge("Alexis", "Benoit");
-graph.addEdge("Benoit", "Paul");
-graph.addEdge("Paul", "Guillaume");
+graph.addNode("n1", { x: 0, y: 0, size: 10, color: chroma.random().hex() });
+graph.addNode("n2", { x: -5, y: 5, size: 10, color: chroma.random().hex() });
+graph.addNode("n3", { x: 5, y: 5, size: 10, color: chroma.random().hex() });
+graph.addNode("n4", { x: 0, y: 10, size: 10, color: chroma.random().hex() });
+graph.addEdge("n1", "n2");
+graph.addEdge("n2", "n4");
+graph.addEdge("n4", "n3");
+graph.addEdge("n3", "n1");
 
 // Create the spring layout and start it
-const layout = new SpringSupervisor(graph);
+const layout = new SpringSupervisor(graph, { isNodeFixed: (n) => graph.getNodeAttribute(n, "highlighted") });
 layout.start();
 
 // Create the sigma
@@ -82,14 +81,13 @@ renderer.getMouseCaptor().on("mousedown", () => {
 renderer.on("clickStage", ({ event }: { event: { x: number; y: number } }) => {
   // Sigma (ie. graph) and screen (viewport) coordinates are not the same.
   // So we need to translate the screen x & y coordinates to the graph one by calling the sigma helper `viewportToGraph`
-  const coordForGraph = renderer.viewportToGraph(event);
+  const coordForGraph = renderer.viewportToGraph({ x: event.x, y: event.y });
 
   // We create a new node
   const node = {
-    ...renderer.viewportToGraph({ x: event.x, y: event.y }),
+    ...coordForGraph,
     size: 10,
     color: chroma.random().hex(),
-    label: faker.name.firstName(),
   };
 
   // Searching the two closest nodes to auto-create an edge to it

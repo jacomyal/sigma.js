@@ -40,7 +40,7 @@ const fa2Layout = new FA2Layout(graph, {
 
 // A variable is used to toggle state between start and stop
 let FA2isRunning = false;
-let cancelCurrentAnimation: () => void | null = null;
+let cancelCurrentAnimation: (() => void) | null = null;
 
 // correlate start/stop actions with state management
 function stopFA2() {
