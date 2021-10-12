@@ -17,27 +17,28 @@
 /* Titles font */
 @font-face {
   font-family: Hauora;
-  src: local("Hauora"), url("/assets/fonts/hauora/Hauora-Medium.woff"), url("/assets/fonts/hauora/Hauora-Medium.woff2");
+  src: local("Hauora"), url("./assets/fonts/hauora/Hauora-Medium.woff"),
+    url("./assets/fonts/hauora/Hauora-Medium.woff2");
 }
 
 /* Monospace font */
 @font-face {
   font-family: Cascadia;
-  src: local("Cascadia"), url("/assets/fonts/cascadia/CascadiaCode.ttf"),
-    url("/assets/fonts/cascadia/CascadiaCode.woff2"), url("/assets/fonts/cascadia/CascadiaCode-Regular.otf");
+  src: local("Cascadia"), url("./assets/fonts/cascadia/CascadiaCode.ttf"),
+    url("./assets/fonts/cascadia/CascadiaCode.woff2"), url("./assets/fonts/cascadia/CascadiaCode-Regular.otf");
 }
 
 /* Main font */
 @font-face {
   font-family: Public Sans;
-  src: local("Public Sans"), url("/assets/fonts/public-sans/PublicSans-Regular.woff"),
-    url("/assets/fonts/public-sans/PublicSans-Regular.woff2");
+  src: local("Public Sans"), url("./assets/fonts/public-sans/PublicSans-Regular.woff"),
+    url("./assets/fonts/public-sans/PublicSans-Regular.woff2");
 }
 @font-face {
   font-family: Public Sans;
   font-style: italic;
-  src: local("Public Sans"), url("/assets/fonts/public-sans/PublicSans-LightItalic.woff"),
-    url("/assets/fonts/public-sans/PublicSans-LightItalic.woff2");
+  src: local("Public Sans"), url("./assets/fonts/public-sans/PublicSans-LightItalic.woff"),
+    url("./assets/fonts/public-sans/PublicSans-LightItalic.woff2");
 }
 
 /**
