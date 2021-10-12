@@ -79,6 +79,16 @@ body {
   padding: 0;
   margin: 0;
 }
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  column-gap: 1em;
+}
+.row > * {
+  flex-grow: 1;
+  flex-basis: 0;
+}
 
 /**
  * TOP BAR:
@@ -116,7 +126,6 @@ header .menu {
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  background: #fffffff6;
   padding: 2em;
 }
 header .panel {
@@ -135,15 +144,18 @@ header .panel > * {
   margin-bottom: 1em;
 }
 #toggle-menu,
-#toggle-menu:not(:checked) ~ .panel {
+#toggle-menu:not(:checked) ~ .menu .panel {
   display: none;
 }
-#toggle-menu + label {
+#toggle-menu + .menu label {
   cursor: pointer;
 }
-#toggle-menu:checked + label .show-menu,
-#toggle-menu:not(:checked) + label .hide-menu {
+#toggle-menu:checked + .menu label .show-menu,
+#toggle-menu:not(:checked) + .menu label .hide-menu {
   display: none;
+}
+#toggle-menu:checked + .menu {
+  background: #fffffff6;
 }
 a {
   color: black;
@@ -159,6 +171,7 @@ a.button {
   background: var(--dark-grey);
   color: white;
   transition: var(--transition);
+  text-align: center;
 }
 a.button:hover {
   color: white;
@@ -192,7 +205,7 @@ main section {
 }
 main section.title {
   font-size: 1.4em;
-  width: 55%;
+  max-width: 55%;
   margin: auto;
   min-height: 80vh;
   display: flex;
@@ -205,6 +218,7 @@ main section.title h1 {
 }
 main section.showcase {
   position: relative;
+  border: 1px solid var(--dark-grey);
 }
 main section.showcase .overlay {
   position: absolute;
@@ -215,71 +229,60 @@ main section.showcase .overlay {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  tab-index: 1;
   cursor: pointer;
   background: #666666dd;
   transition: var(--transition);
+  overflow: hidden;
 }
 main section.showcase .overlay:hover {
   background: #666666;
 }
-main .architecture-schema {
+main section.showcase .overlay h2 {
+  margin: 0;
+}
+main #architecture .schema {
   display: flex;
   flex-direction: row;
   justify-content: center;
   max-width: 60%;
   margin: 3em auto auto;
 }
-main .architecture-schema img {
+main #architecture .schema img {
   height: 4em;
 }
-main .architecture-schema > span {
+main #architecture .schema > span {
   height: 1.5em;
   line-height: 1.5em;
   font-size: 3em;
   margin: 0 0.5em;
 }
-main .quickstart-options {
-  display: flex;
-  flex-direction: row;
-}
-main .quickstart-options > div {
-  width: 50%;
-}
-main .quickstart-options pre {
+main #quickstart .options pre {
   display: inline-block;
   padding: 0.5em 1em;
   margin: 0;
 }
-main .quickstart-options code::before {
+main #quickstart .options code::before {
   content: "> ";
   user-select: none;
 }
-main .usecase {
-  display: flex;
-  flex-direction: row;
+main #usecases .usecase {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1em;
 }
-main .usecase:nth-child(2n + 1) {
+main #usecases .usecase:nth-child(2n + 1) {
   flex-direction: row-reverse;
 }
-main .usecase > * {
-  width: calc(50% - 0.5em);
+main #usecases .usecase .thumbnail {
+  border: 1px solid var(--dark-grey);
 }
-main .cookbook {
+main #usecases .usecase .thumbnail img {
+  max-width: 100%;
+}
+main #cookbooks .cookbook {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-main .contributing {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-main .contributing > * {
-  width: calc(33.33% - 0.5em);
 }
 
 /**
@@ -287,16 +290,66 @@ main .contributing > * {
  * *******
  */
 footer {
-  padding: 1em;
-  display: flex;
-  flex-direction: row;
+  padding: 2em 1em;
   max-width: var(--grid-size);
   margin: auto;
-}
-footer > section {
-  flex-grow: 1;
 }
 footer ul {
   list-style: none;
   padding: 0;
+}
+
+/**
+ * RESPONSIVENESS:
+ * ***************
+ */
+@media (max-width: 992px) {
+  body {
+    font-size: 1em;
+  }
+
+  .row {
+    display: block;
+  }
+
+  #toggle-menu:checked + .menu {
+    background: white;
+    width: 100vw;
+    height: 100vh;
+  }
+  #toggle-menu:checked + .menu .panel {
+    flex-grow: 1;
+  }
+  #toggle-menu:checked ~ .links {
+    display: none;
+  }
+
+  main,
+  footer {
+    max-width: 100%;
+  }
+  main section.title {
+    max-width: 100%;
+    padding-left: 3em;
+    min-height: 50vh;
+    font-size: 1.2em;
+  }
+  main section.showcase .overlay {
+    font-size: 1em;
+  }
+  main #architecture .schema {
+    display: block;
+    max-width: 100%;
+  }
+  main #architecture .schema img {
+    height: 4em;
+  }
+  main #architecture .schema > div {
+    max-width: 60%;
+    margin: auto;
+  }
+  main #architecture .schema > span {
+    display: block;
+    text-align: center;
+  }
 }

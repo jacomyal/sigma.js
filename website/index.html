@@ -1,22 +1,27 @@
 <html>
   <head>
-    <meta charset="UTF-8" />
     <title>Sigma.js</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon-16x16.png" />
+    <meta name="theme-color" content="#e22653" />
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
   <body>
     <header>
+      <input type="checkbox" id="toggle-menu" />
       <nav class="menu">
-        <input type="checkbox" id="toggle-menu" />
         <label for="toggle-menu" tabindex="1">
-          <img src="./assets/icon-menu.svg" alt="Toggle menu" class="show-menu" />
-          <img src="./assets/icon-close.svg" alt="Toggle menu" class="hide-menu" />
+          <img src="./assets/images/icon-menu.svg" alt="Toggle menu" class="show-menu" />
+          <img src="./assets/images/icon-close.svg" alt="Toggle menu" class="hide-menu" />
         </label>
 
         <div class="panel">
           <div>
             <a href="#" class="text-title with-logo">
-              <img src="./assets/logo-sigma-ruby.svg" alt="" /> <strong class="text-ruby">sigma</strong
+              <img src="./assets/images/logo-sigma-ruby.svg" alt="" /> <strong class="text-ruby">sigma</strong
               ><strong class="text-grey">.js</strong>
             </a>
           </div>
@@ -31,17 +36,17 @@
           <ul>
             <li>
               <a href="https://github.com/jacomyal/sigma.js" class="with-logo"
-                ><img src="./assets/logo-github.svg" alt="GitHub" /> <span>GitHub</span></a
+                ><img src="./assets/images/logo-github.svg" alt="GitHub" /> <span>GitHub</span></a
               >
             </li>
             <li>
               <a href="https://twitter.com/sigmajs" class="with-logo"
-                ><img src="./assets/logo-twitter.svg" alt="Twitter" /> <span>Twitter</span></a
+                ><img src="./assets/images/logo-twitter.svg" alt="Twitter" /> <span>Twitter</span></a
               >
             </li>
             <li>
               <a href="https://stackoverflow.com/questions/tagged/sigma.js" class="with-logo"
-                ><img src="./assets/logo-stackoverflow.svg" alt="StackOverflow" /> <span>StackOverflow</span></a
+                ><img src="./assets/images/logo-stackoverflow.svg" alt="StackOverflow" /> <span>StackOverflow</span></a
               >
             </li>
           </ul>
@@ -51,14 +56,16 @@
       <nav class="links">
         <ul>
           <li>
-            <a href="https://github.com/jacomyal/sigma.js"><img src="./assets/logo-github.svg" alt="GitHub" /></a>
+            <a href="https://github.com/jacomyal/sigma.js"
+              ><img src="./assets/images/logo-github.svg" alt="GitHub"
+            /></a>
           </li>
           <li>
-            <a href="https://twitter.com/sigmajs"><img src="./assets/logo-twitter.svg" alt="Twitter" /></a>
+            <a href="https://twitter.com/sigmajs"><img src="./assets/images/logo-twitter.svg" alt="Twitter" /></a>
           </li>
           <li>
             <a href="https://stackoverflow.com/questions/tagged/sigma.js"
-              ><img src="./assets/logo-stackoverflow.svg" alt="StackOverflow"
+              ><img src="./assets/images/logo-stackoverflow.svg" alt="StackOverflow"
             /></a>
           </li>
         </ul>
@@ -68,7 +75,7 @@
     <main>
       <section class="title">
         <h1 class="with-logo">
-          <img src="./assets/logo-sigma-ruby.svg" alt="" /> <span class="text-ruby">sigma</span
+          <img src="./assets/images/logo-sigma-ruby.svg" alt="" /> <span class="text-ruby">sigma</span
           ><span class="text-grey">.js</span>
         </h1>
         <i><strong>a JavaScript library aimed at visualizing graphs of thousands of nodes and edges</strong></i>
@@ -76,24 +83,24 @@
 
       <section class="showcase">
         <div>
-          <img src="https://dummyimage.com/1000x500/fff/aaa" alt="" />
+          <img src="https://dummyimage.com/1000x500/fff/aaa" alt="" width="100%" />
         </div>
-        <div class="overlay" onclick="this.remove()">
+        <div class="overlay" onclick="this.remove()" tabindex="1">
           <h2 class="text-title">See sigma.js in action</h2>
           <p>Click here to explore a network of wikipedia pages about data visualization.</p>
         </div>
       </section>
 
-      <section>
-        <h2 id="architecture">Architecture</h2>
+      <section id="architecture">
+        <h2>Architecture</h2>
         <p>
           Sigma.js is a modern JavaScript library for rendering and interacting with network graphs in the browser. It
           works in symbiosis with <a href="https://graphology.github.io/">graphology</a>, a multipurpose graph
           manipulation library.
         </p>
-        <div class="architecture-schema">
+        <div class="schema">
           <div>
-            <img src="./assets/logo-graphology.svg" alt="" />
+            <div class="text-center"><img src="./assets/images/logo-graphology.svg" alt="" /></div>
             <h3>graphology</h3>
             <p>
               <i>handles <strong>graph data model & algorithms</strong></i>
@@ -101,7 +108,7 @@
           </div>
           <span>+</span>
           <div>
-            <img src="./assets/logo-sigma-ruby.svg" alt="" />
+            <div class="text-center"><img src="./assets/images/logo-sigma-ruby.svg" alt="" /></div>
             <h3>sigma.js</h3>
             <p>
               <i>handles <strong>graph rendering & interactions</strong></i>
@@ -109,17 +116,17 @@
           </div>
           <span>=</span>
           <div>
-            <img src="./assets/icon-app.svg" alt="" />
+            <div class="text-center"><img src="./assets/images/icon-app.svg" alt="" /></div>
             <h3 class="text-center">your <span class="text-ruby">♥</span> web app</h3>
           </div>
         </div>
       </section>
 
-      <section>
-        <h2 id="quickstart">Quick start</h2>
-        <div class="quickstart-options">
+      <section id="quickstart">
+        <h2>Quick start</h2>
+        <div class="options row">
           <div>
-            <p>I want sigma.js in my existing project</p>
+            <p>I want sigma.js in my existing project:</p>
             <pre><code>npm install graphology sigma</code></pre>
             <p>
               Learn mode on the library's
@@ -127,7 +134,7 @@
             </p>
           </div>
           <div>
-            <p>I start from nothing</p>
+            <p>I start from nothing:</p>
             <p>
               <a class="button" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/template">
                 Try this CodeSandbox
@@ -137,9 +144,9 @@
         </div>
       </section>
 
-      <section>
-        <h2 id="usecases">Use cases</h2>
-        <div class="usecase">
+      <section id="usecases">
+        <h2>Use cases</h2>
+        <div class="usecase row">
           <div class="thumbnail">
             <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
           </div>
@@ -157,7 +164,7 @@
             </p>
           </div>
         </div>
-        <div class="usecase">
+        <div class="usecase row">
           <div class="thumbnail">
             <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
           </div>
@@ -174,7 +181,7 @@
             </p>
           </div>
         </div>
-        <div class="usecase">
+        <div class="usecase row">
           <div class="thumbnail">
             <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
           </div>
@@ -196,46 +203,9 @@
         </div>
       </section>
 
-      <section>
-        <h2 id="cookbook">Cookbook</h2>
-        <ul class="cookbook">
-          <li>
-            <h4>How can I obtain drawable data from a CSV?</h4>
-            <p>
-              You will process the data with graphology, then render it with sigma.js. You can look at
-              <a href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map">
-                this CodeSandbox
-              </a>
-              for instance.
-            </p>
-          </li>
-          <li>
-            <h4>What graph algorithms are implemented in sigma.js?</h4>
-            <p>
-              None in sigma.js, but graphology has a lot, from
-              <a href="https://github.com/graphology/graphology-generators">graph generators</a> to
-              <a href="https://github.com/graphology/graphology-metrics">metrics</a> or even
-              <a href="https://github.com/graphology/graphology-communities-louvain">community detection</a>.
-              <strong>
-                You can see an overview <a href="https://graphology.github.io/standard-library.html">here</a>.
-              </strong>
-            </p>
-          </li>
-          <li>
-            <h4>Why should I use sigma.js and not <a href="https://d3js.org/">d3.js</a>?</h4>
-            <p>
-              Sigma.js renders graphs using WebGL. It allows drawing larger graphs faster than with Canvas or SVG based
-              solutions. It also makes custom rendering way harder to develop. If you have small graphs (like a few
-              hundreds of nodes and edges) and/or if you need very customized rendering, then
-              <strong>d3.js is indeed a best fit for you</strong>.
-            </p>
-          </li>
-        </ul>
-      </section>
-
-      <section>
-        <h2 id="gofurther">Go further</h2>
-        <div class="contributing">
+      <section id="gofurther">
+        <h2>Go further</h2>
+        <div class="contributing row">
           <div>
             <h4>I want to know more</h4>
             <p>Look at <a href="https://github.com/jacomyal/sigma.js/blob/main/README.md">the documentation</a>.</p>
@@ -262,7 +232,7 @@
       </section>
     </main>
 
-    <footer>
+    <footer class="row">
       <section>
         <p>
           Sigma.js is developped by <a href="https://ouestware.com/en">OuestWare</a> and
