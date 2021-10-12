@@ -97,22 +97,23 @@ body {
 header {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   position: fixed;
   z-index: 1;
   left: 0;
   right: 0;
+  height: 0;
 }
 header img {
   height: 1.6em;
 }
 header .links {
-  flex-grow: 1;
   text-align: right;
   list-style: none;
-  padding: 2em;
 }
 header .links ul {
   margin: 0;
+  padding: 0;
 }
 header .links li {
   display: inline-block;
@@ -126,7 +127,7 @@ header .menu {
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  padding: 2em;
+  height: fit-content;
 }
 header .panel {
   padding: 0 2em;
@@ -142,6 +143,11 @@ header .panel a {
 }
 header .panel > * {
   margin-bottom: 1em;
+}
+/* Deal with padding: */
+header .links,
+header .menu {
+  padding: 2em;
 }
 #toggle-menu,
 #toggle-menu:not(:checked) ~ .menu .panel {
@@ -279,10 +285,14 @@ main #usecases .usecase .thumbnail {
 main #usecases .usecase .thumbnail img {
   max-width: 100%;
 }
-main #cookbooks .cookbook {
+main #cookbook ul {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+main #cookbook h3 {
+  font-size: 1em;
+  margin-top: 2em;
 }
 
 /**
@@ -303,7 +313,7 @@ footer ul {
  * RESPONSIVENESS:
  * ***************
  */
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   body {
     font-size: 1em;
   }
@@ -312,6 +322,11 @@ footer ul {
     display: block;
   }
 
+  /* Deal with padding: */
+  header .links,
+  header .menu {
+    padding: 1em;
+  }
   #toggle-menu:checked + .menu {
     background: white;
     width: 100vw;
@@ -340,6 +355,7 @@ footer ul {
   main #architecture .schema {
     display: block;
     max-width: 100%;
+    text-align: center;
   }
   main #architecture .schema img {
     height: 4em;

@@ -208,6 +208,43 @@
         </div>
       </section>
 
+      <section id="cookbook">
+        <h2>Cookbook</h2>
+        <ul>
+          <li>
+            <h3>How can I obtain drawable data from a CSV?</h3>
+            <p>
+              You will process the data with graphology, then render it with sigma.js. You can look at
+              <a href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map">
+                this CodeSandbox
+              </a>
+              for instance.
+            </p>
+          </li>
+          <li>
+            <h3>What graph algorithms are implemented in sigma.js?</h3>
+            <p>
+              None in sigma.js, but graphology has a lot, from
+              <a href="https://github.com/graphology/graphology-generators">graph generators</a> to
+              <a href="https://github.com/graphology/graphology-metrics">metrics</a> or even
+              <a href="https://github.com/graphology/graphology-communities-louvain">community detection</a>.
+              <strong>
+                You can see an overview <a href="https://graphology.github.io/standard-library.html">here</a>.
+              </strong>
+            </p>
+          </li>
+          <li>
+            <h3>Why should I use sigma.js and not <a href="https://d3js.org/">d3.js</a>?</h3>
+            <p>
+              Sigma.js renders graphs using WebGL. It allows drawing larger graphs faster than with Canvas or SVG based
+              solutions. It also makes custom rendering way harder to develop. If you have small graphs (like a few
+              hundreds of nodes and edges) and/or if you need very customized rendering, then
+              <strong>d3.js is indeed a best fit for you</strong>.
+            </p>
+          </li>
+        </ul>
+      </section>
+
       <section id="gofurther">
         <h2>Go further</h2>
         <div class="contributing row">
