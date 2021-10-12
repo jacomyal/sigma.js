@@ -90,6 +90,10 @@ body {
   flex-grow: 1;
   flex-basis: 0;
 }
+iframe {
+  border: 0;
+  width: 100%;
+}
 
 /**
  * TOP BAR:
@@ -280,13 +284,19 @@ main #usecases .usecase {
 main #usecases .usecase:nth-child(2n + 1) {
   flex-direction: row-reverse;
 }
-main #usecases .usecase .thumbnail {
+main #usecases .thumbnail {
+  height: 400px;
+  overflow: hidden;
   border: 1px solid var(--dark-grey);
+  transition: var(--transition);
 }
-main #usecases .usecase .thumbnail img {
-  max-width: 100%;
+main #usecases .thumbnail img {
+  transition: var(--transition);
 }
-main #cookbook ul {
+main #usecases .usecase:hover .thumbnail img {
+  transform: scale(1.1) rotate(2deg);
+}
+book ul {
   list-style: none;
   margin: 0;
   padding: 0;
