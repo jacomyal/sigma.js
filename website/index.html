@@ -1,0 +1,293 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sigma.js</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="menu">
+        <input type="checkbox" id="toggle-menu" />
+        <label for="toggle-menu" tabindex="1">
+          <img src="./assets/icon-menu.svg" alt="Toggle menu" class="show-menu" />
+          <img src="./assets/icon-close.svg" alt="Toggle menu" class="hide-menu" />
+        </label>
+
+        <div class="panel">
+          <div>
+            <a href="#" class="text-title with-logo">
+              <img src="./assets/logo-sigma-ruby.svg" alt="" /> <strong class="text-ruby">sigma</strong
+              ><strong class="text-grey">.js</strong>
+            </a>
+          </div>
+          <ul>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#quickstart">Quick start</a></li>
+            <li><a href="#usecases">Use cases</a></li>
+            <li><a href="#cookbook">Cookbook</a></li>
+            <li><a href="#gofurther">Go further</a></li>
+            <!--<li><a href="#inthewild">In the wild</a></li>-->
+          </ul>
+          <ul>
+            <li>
+              <a href="https://github.com/jacomyal/sigma.js" class="with-logo"
+                ><img src="./assets/logo-github.svg" alt="GitHub" /> <span>GitHub</span></a
+              >
+            </li>
+            <li>
+              <a href="https://twitter.com/sigmajs" class="with-logo"
+                ><img src="./assets/logo-twitter.svg" alt="Twitter" /> <span>Twitter</span></a
+              >
+            </li>
+            <li>
+              <a href="https://stackoverflow.com/questions/tagged/sigma.js" class="with-logo"
+                ><img src="./assets/logo-stackoverflow.svg" alt="StackOverflow" /> <span>StackOverflow</span></a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <nav class="links">
+        <ul>
+          <li>
+            <a href="https://github.com/jacomyal/sigma.js"><img src="./assets/logo-github.svg" alt="GitHub" /></a>
+          </li>
+          <li>
+            <a href="https://twitter.com/sigmajs"><img src="./assets/logo-twitter.svg" alt="Twitter" /></a>
+          </li>
+          <li>
+            <a href="https://stackoverflow.com/questions/tagged/sigma.js"
+              ><img src="./assets/logo-stackoverflow.svg" alt="StackOverflow"
+            /></a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="title">
+        <h1 class="with-logo">
+          <img src="./assets/logo-sigma-ruby.svg" alt="" /> <span class="text-ruby">sigma</span
+          ><span class="text-grey">.js</span>
+        </h1>
+        <i><strong>a JavaScript library aimed at visualizing graphs of thousands of nodes and edges</strong></i>
+      </section>
+
+      <section class="showcase">
+        <div>
+          <img src="https://dummyimage.com/1000x500/fff/aaa" alt="" />
+        </div>
+        <div class="overlay" onclick="this.remove()">
+          <h2 class="text-title">See sigma.js in action</h2>
+          <p>Click here to explore a network of wikipedia pages about data visualization.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 id="architecture">Architecture</h2>
+        <p>
+          Sigma.js is a modern JavaScript library for rendering and interacting with network graphs in the browser. It
+          works in symbiosis with <a href="https://graphology.github.io/">graphology</a>, a multipurpose graph
+          manipulation library.
+        </p>
+        <div class="architecture-schema">
+          <div>
+            <img src="./assets/logo-graphology.svg" alt="" />
+            <h3>graphology</h3>
+            <p>
+              <i>handles <strong>graph data model & algorithms</strong></i>
+            </p>
+          </div>
+          <span>+</span>
+          <div>
+            <img src="./assets/logo-sigma-ruby.svg" alt="" />
+            <h3>sigma.js</h3>
+            <p>
+              <i>handles <strong>graph rendering & interactions</strong></i>
+            </p>
+          </div>
+          <span>=</span>
+          <div>
+            <img src="./assets/icon-app.svg" alt="" />
+            <h3 class="text-center">your <span class="text-ruby">♥</span> web app</h3>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 id="quickstart">Quick start</h2>
+        <div class="quickstart-options">
+          <div>
+            <p>I want sigma.js in my existing project</p>
+            <pre><code>npm install graphology sigma</code></pre>
+            <p>
+              Learn mode on the library's
+              <a href="https://github.com/jacomyal/sigma.js/#installation">GitHub repository</a>
+            </p>
+          </div>
+          <div>
+            <p>I start from nothing</p>
+            <p>
+              <a class="button" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/template">
+                Try this CodeSandbox
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 id="usecases">Use cases</h2>
+        <div class="usecase">
+          <div class="thumbnail">
+            <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
+          </div>
+          <div>
+            <h2>Display</h2>
+            <p>
+              The most basic use case: You have a graph dataset, with colors, sizes and positions for each node. For
+              instance, you exported a <a href="https://gephi.org/gexf/format/">GEXF graph file</a> from
+              <a href="https://gephi.org/">Gephi</a>. You want to visualize it using sigma.js.
+            </p>
+            <p>
+              <a href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file" class="button">
+                Launch live CodeSandbox
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="usecase">
+          <div class="thumbnail">
+            <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
+          </div>
+          <div>
+            <h2>Explore</h2>
+            <p>
+              Next, you want to add interaction, so that your users can dig into the graph. You want to add a search
+              field, and allow users to see the neighborhood of a node when hovering it.
+            </p>
+            <p>
+              <a href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/use-reducers" class="button">
+                Launch live CodeSandbox
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="usecase">
+          <div class="thumbnail">
+            <img src="https://dummyimage.com/500x400/fff/aaa" alt="" />
+          </div>
+          <div>
+            <h2>Interact</h2>
+            <p>
+              You are developing a web application where users can create and manipulate graphs. You need users to be
+              able to create nodes on click, and to drag and drop nodes.
+            </p>
+            <p>
+              <a
+                href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/drag-n-drop-with-mouse-graph-creation"
+                class="button"
+              >
+                Launch live CodeSandbox
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 id="cookbook">Cookbook</h2>
+        <ul class="cookbook">
+          <li>
+            <h4>How can I obtain drawable data from a CSV?</h4>
+            <p>
+              You will process the data with graphology, then render it with sigma.js. You can look at
+              <a href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map">
+                this CodeSandbox
+              </a>
+              for instance.
+            </p>
+          </li>
+          <li>
+            <h4>What graph algorithms are implemented in sigma.js?</h4>
+            <p>
+              None in sigma.js, but graphology has a lot, from
+              <a href="https://github.com/graphology/graphology-generators">graph generators</a> to
+              <a href="https://github.com/graphology/graphology-metrics">metrics</a> or even
+              <a href="https://github.com/graphology/graphology-communities-louvain">community detection</a>.
+              <strong>
+                You can see an overview <a href="https://graphology.github.io/standard-library.html">here</a>.
+              </strong>
+            </p>
+          </li>
+          <li>
+            <h4>Why should I use sigma.js and not <a href="https://d3js.org/">d3.js</a>?</h4>
+            <p>
+              Sigma.js renders graphs using WebGL. It allows drawing larger graphs faster than with Canvas or SVG based
+              solutions. It also makes custom rendering way harder to develop. If you have small graphs (like a few
+              hundreds of nodes and edges) and/or if you need very customized rendering, then
+              <strong>d3.js is indeed a best fit for you</strong>.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 id="gofurther">Go further</h2>
+        <div class="contributing">
+          <div>
+            <h4>I want to know more</h4>
+            <p>Look at <a href="https://github.com/jacomyal/sigma.js/blob/main/README.md">the documentation</a>.</p>
+          </div>
+          <div>
+            <h4>I have a problem</h4>
+            <p>
+              Ask your questions on <a href="https://stackoverflow.com/questions/tagged/sigma.js">StackOverflow</a>, or
+              report bugs by
+              <a href="https://github.com/jacomyal/sigma.js/issues/new/choose">opening a new GitHub issue</a>.
+            </p>
+          </div>
+          <div>
+            <h4>I want to help</h4>
+            <p>
+              Contributions are welcome! Reading
+              <a href="https://github.com/jacomyal/sigma.js/blob/main/CONTRIBUTING.md">our contribution guide</a> is a
+              good start. You can also help us investigating
+              <a href="https://github.com/jacomyal/sigma.js/issues">existing issues</a> or answering
+              <a href="https://stackoverflow.com/questions/tagged/sigma.js">questions on StackOverflow</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <section>
+        <p>
+          Sigma.js is developped by <a href="https://ouestware.com/en">OuestWare</a> and
+          <a href="https://medialab.sciences-po.fr">Sciences-Po médialab</a>.
+        </p>
+        <ul>
+          <li>
+            <a href="https://twitter.com/sigmajs">twitter.com/sigmajs</a>
+          </li>
+          <li>
+            <a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a>
+          </li>
+        </ul>
+      </section>
+      <section>
+        <p>
+          It is developped under
+          <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.
+        </p>
+        <p>
+          This website uses <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,
+          <a href=" https://public-sans.digital.gov/">Public Sans</a> and
+          <a href="https://github.com/microsoft/cascadia-code">Cascadia Code</a> fonts.
+        </p>
+      </section>
+    </footer>
+  </body>
+</html>

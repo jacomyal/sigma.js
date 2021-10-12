@@ -1,0 +1,302 @@
+:root {
+  --ruby: #e22653;
+  --grey: #999;
+  --dark-grey: #666;
+  --cream: #f9f7ed;
+  --grid-size: 1000px;
+  --transition: all ease-out 300ms;
+}
+
+.text-grey {
+  color: var(--grey);
+}
+.text-ruby {
+  color: var(--ruby);
+}
+
+/* Titles font */
+@font-face {
+  font-family: Hauora;
+  src: local("Hauora"), url("/assets/fonts/hauora/Hauora-Medium.woff"), url("/assets/fonts/hauora/Hauora-Medium.woff2");
+}
+
+/* Monospace font */
+@font-face {
+  font-family: Cascadia;
+  src: local("Cascadia"), url("/assets/fonts/cascadia/CascadiaCode.ttf"),
+    url("/assets/fonts/cascadia/CascadiaCode.woff2"), url("/assets/fonts/cascadia/CascadiaCode-Regular.otf");
+}
+
+/* Main font */
+@font-face {
+  font-family: Public Sans;
+  src: local("Public Sans"), url("/assets/fonts/public-sans/PublicSans-Regular.woff"),
+    url("/assets/fonts/public-sans/PublicSans-Regular.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-style: italic;
+  src: local("Public Sans"), url("/assets/fonts/public-sans/PublicSans-LightItalic.woff"),
+    url("/assets/fonts/public-sans/PublicSans-LightItalic.woff2");
+}
+
+/**
+ * TYPOGRAPHY:
+ * ***********
+ */
+body {
+  font-family: "Public Sans", Lato, Arial, sans-serif;
+  letter-spacing: 0.02em;
+  font-size: 1.2em;
+}
+
+h1,
+h2,
+h3,
+h4,
+.text-title {
+  font-family: Hauora, Roboto, Arial, sans-serif;
+  letter-spacing: 0.06em;
+}
+
+pre,
+code {
+  font-family: Cascadia, monospace;
+  background: var(--cream);
+}
+.text-center {
+  text-align: center;
+}
+
+/**
+ * BASE STYLE / LAYOUT:
+ * ********************
+ */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+/**
+ * TOP BAR:
+ * ********
+ */
+header {
+  display: flex;
+  flex-direction: row;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  right: 0;
+}
+header img {
+  height: 1.6em;
+}
+header .links {
+  flex-grow: 1;
+  text-align: right;
+  list-style: none;
+  padding: 2em;
+}
+header .links ul {
+  margin: 0;
+}
+header .links li {
+  display: inline-block;
+  margin-left: 0.3em;
+}
+header .links a {
+  text-decoration: none;
+}
+header .menu {
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  background: #fffffff6;
+  padding: 2em;
+}
+header .panel {
+  padding: 0 2em;
+  margin: 0;
+  line-height: 1.6em;
+}
+header .panel ul {
+  list-style: none;
+  padding: 0;
+}
+header .panel a {
+  text-decoration: none;
+}
+header .panel > * {
+  margin-bottom: 1em;
+}
+#toggle-menu,
+#toggle-menu:not(:checked) ~ .panel {
+  display: none;
+}
+#toggle-menu + label {
+  cursor: pointer;
+}
+#toggle-menu:checked + label .show-menu,
+#toggle-menu:not(:checked) + label .hide-menu {
+  display: none;
+}
+a {
+  color: black;
+  transition: var(--transition);
+}
+a:hover {
+  color: var(--dark-grey);
+}
+a.button {
+  display: inline-block;
+  text-decoration: none;
+  padding: 1em;
+  background: var(--dark-grey);
+  color: white;
+  transition: var(--transition);
+}
+a.button:hover {
+  color: white;
+  background: var(--grey);
+}
+
+.with-logo {
+  text-decoration: none;
+  position: relative;
+}
+.with-logo img {
+  position: absolute;
+  margin-right: 0.2em;
+  right: 100%;
+  bottom: -0.15em;
+  height: 110%;
+}
+
+/**
+ * MAIN CONTENT:
+ * *************
+ */
+main {
+  max-width: var(--grid-size);
+  padding: 2em 1em;
+  margin: auto;
+  flex-grow: 1;
+}
+main section {
+  margin-bottom: 3em;
+}
+main section.title {
+  font-size: 1.4em;
+  width: 55%;
+  margin: auto;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+main section.title h1 {
+  font-size: 1.7em;
+  margin: 0.5em 0;
+}
+main section.showcase {
+  position: relative;
+}
+main section.showcase .overlay {
+  position: absolute;
+  inset: 0;
+  color: white;
+  padding: 3em;
+  font-size: 1.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  tab-index: 1;
+  cursor: pointer;
+  background: #666666dd;
+  transition: var(--transition);
+}
+main section.showcase .overlay:hover {
+  background: #666666;
+}
+main .architecture-schema {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  max-width: 60%;
+  margin: 3em auto auto;
+}
+main .architecture-schema img {
+  height: 4em;
+}
+main .architecture-schema > span {
+  height: 1.5em;
+  line-height: 1.5em;
+  font-size: 3em;
+  margin: 0 0.5em;
+}
+main .quickstart-options {
+  display: flex;
+  flex-direction: row;
+}
+main .quickstart-options > div {
+  width: 50%;
+}
+main .quickstart-options pre {
+  display: inline-block;
+  padding: 0.5em 1em;
+  margin: 0;
+}
+main .quickstart-options code::before {
+  content: "> ";
+  user-select: none;
+}
+main .usecase {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1em;
+}
+main .usecase:nth-child(2n + 1) {
+  flex-direction: row-reverse;
+}
+main .usecase > * {
+  width: calc(50% - 0.5em);
+}
+main .cookbook {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+main .contributing {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+main .contributing > * {
+  width: calc(33.33% - 0.5em);
+}
+
+/**
+ * FOOTER:
+ * *******
+ */
+footer {
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+  max-width: var(--grid-size);
+  margin: auto;
+}
+footer > section {
+  flex-grow: 1;
+}
+footer ul {
+  list-style: none;
+  padding: 0;
+}
