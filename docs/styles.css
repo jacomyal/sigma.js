@@ -296,7 +296,7 @@ main #usecases .thumbnail img {
 main #usecases .usecase:hover .thumbnail img {
   transform: scale(1.1) rotate(2deg);
 }
-book ul {
+main #cookbook ul {
   list-style: none;
   margin: 0;
   padding: 0;
