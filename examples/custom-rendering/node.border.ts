@@ -7,8 +7,8 @@ import { floatColor } from "sigma/utils";
 import { NodeDisplayData } from "sigma/types";
 import { AbstractNodeProgram, RenderNodeParams } from "sigma/rendering/webgl/programs/common/node";
 
-import vertexShaderSource from "./node.border.vert.glsl";
-import fragmentShaderSource from "./node.border.frag.glsl";
+import vertexShaderSource from "!raw-loader!./node.border.vert.glsl";
+import fragmentShaderSource from "!raw-loader!./node.border.frag.glsl";
 
 const POINTS = 1,
   ATTRIBUTES = 4;
