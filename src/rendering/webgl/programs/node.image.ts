@@ -17,8 +17,9 @@ const POINTS = 1,
 
 type ImageLoading = { status: "loading" };
 type ImageError = { status: "error" };
+type ImagePending = { status: "pending"; image: HTMLImageElement };
 type ImageReady = { status: "ready" } & Coordinates & Dimensions;
-type ImageType = ImageLoading | ImageError | ImageReady;
+type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
 
 function isPowerOf2(value: number): boolean {
   return (value & (value - 1)) == 0;
@@ -28,6 +29,7 @@ export default class NodeProgramImage extends AbstractNodeProgram {
   textureImage: ImageData;
   images: Record<string, ImageType> = {};
   hasReceivedImages = false;
+  pendingImagesFrameID?: number;
 
   texture: WebGLTexture;
   textureLocation: GLint;
@@ -133,14 +135,14 @@ export default class NodeProgramImage extends AbstractNodeProgram {
 
     const image = new Image();
     image.addEventListener("load", () => {
-      this.addToTexture([image]);
       this.images[imageSource] = {
-        status: "ready",
-        x: this.textureImage.width - image.width,
-        y: 0,
-        width: image.width,
-        height: image.height,
+        status: "pending",
+        image,
       };
+
+      if (typeof this.pendingImagesFrameID !== "number") {
+        this.pendingImagesFrameID = requestAnimationFrame(() => this.finalizePendingImages());
+      }
     });
     image.addEventListener("error", () => {
       this.images[imageSource] = { status: "error" };
@@ -149,6 +151,40 @@ export default class NodeProgramImage extends AbstractNodeProgram {
 
     // Load image:
     image.src = imageSource;
+  }
+
+  /**
+   * Helper that takes all pending images and adds them into the texture:
+   */
+  private finalizePendingImages(): void {
+    this.pendingImagesFrameID = undefined;
+
+    const pendingImages: { image: HTMLImageElement; id: string }[] = [];
+    for (const id in this.images) {
+      const state = this.images[id];
+      if (state.status === "pending") {
+        pendingImages.push({
+          id,
+          image: state.image,
+        });
+      }
+    }
+
+    // Add images to texture:
+    let xOffset = this.textureImage.width;
+    this.addToTexture(pendingImages.map(({ image }) => image));
+
+    // Update images state:
+    pendingImages.forEach(({ id, image }) => {
+      this.images[id] = {
+        status: "ready",
+        x: xOffset,
+        y: 0,
+        width: image.width,
+        height: image.height,
+      };
+      xOffset += image.width;
+    });
   }
 
   /**

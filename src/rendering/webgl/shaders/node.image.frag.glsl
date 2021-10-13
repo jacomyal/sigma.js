@@ -9,14 +9,12 @@ uniform sampler2D u_atlas;
 const float radius = 0.5;
 
 void main(void) {
-//  gl_FragColor = texture2D(u_atlas, v_texture.xy + gl_PointCoord * v_texture.zw);
-
   vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
   vec4 color;
 
   if (v_texture.w > 0.0) {
     vec4 texel = texture2D(u_atlas, v_texture.xy + gl_PointCoord * v_texture.zw);
-    color = mix(v_color, texel, texel.a);
+    color = vec4(mix(v_color, texel, texel.a).xyz, max(texel.a, v_color.a));
   } else {
     color = v_color;
   }
