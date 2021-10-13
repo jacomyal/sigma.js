@@ -147,6 +147,7 @@ export default class Sigma extends EventEmitter {
 
   // programs
   private nodePrograms: { [key: string]: INodeProgram } = {};
+  private hoverNodePrograms: { [key: string]: INodeProgram } = {};
   private edgePrograms: { [key: string]: IEdgeProgram } = {};
 
   private camera: Camera;
@@ -173,6 +174,7 @@ export default class Sigma extends EventEmitter {
     this.createCanvasContext("edgeLabels");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
+    this.createWebGLContext("hoverNodes");
     this.createCanvasContext("mouse");
 
     // Blending
@@ -190,6 +192,7 @@ export default class Sigma extends EventEmitter {
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
       this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes);
+      this.hoverNodePrograms[type] = new NodeProgramClass(this.webGLContexts.hoverNodes);
     }
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
@@ -911,16 +914,54 @@ export default class Sigma extends EventEmitter {
       );
     };
 
+    const nodesToRender: NodeKey[] = [];
+
     if (this.hoveredNode && !this.nodeDataCache[this.hoveredNode].hidden) {
-      render(this.hoveredNode);
+      nodesToRender.push(this.hoveredNode);
     }
 
     this.highlightedNodes.forEach((node) => {
       // The hovered node has already been highlighted
-      if (node === this.hoveredNode) return;
-
-      render(node);
+      if (node !== this.hoveredNode) nodesToRender.push(node);
     });
+
+    // Draw labels:
+    nodesToRender.forEach((node) => render(node));
+
+    // Draw WebGL nodes on top of the labels:
+    const nodesPerPrograms: Record<string, number> = {};
+
+    // 1. Count nodes per type:
+    nodesToRender.forEach((node) => {
+      const type = this.nodeDataCache[node].type;
+      nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
+    });
+    // 2. Allocate for each type for the proper number of nodes
+    for (const type in this.hoverNodePrograms) {
+      this.hoverNodePrograms[type].allocate(nodesPerPrograms[type] || 0);
+      // Also reset count, to use when rendering:
+      nodesPerPrograms[type] = 0;
+    }
+    // 3. Process all nodes to render:
+    nodesToRender.forEach((node) => {
+      const data = this.nodeDataCache[node];
+      this.hoverNodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
+    });
+    // 4. Render:
+    for (const type in this.hoverNodePrograms) {
+      const program = this.hoverNodePrograms[type];
+
+      program.bind();
+      program.bufferData();
+      program.render({
+        matrix: this.matrix,
+        width: this.width,
+        height: this.height,
+        ratio: this.camera.ratio,
+        nodesPowRatio: 0.5,
+        scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+      });
+    }
   }
 
   /**

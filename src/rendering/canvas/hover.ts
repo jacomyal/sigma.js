@@ -8,7 +8,6 @@
  */
 import { Settings } from "../../settings";
 import { NodeDisplayData, PartialButFor } from "../../types";
-import drawNode from "./node";
 import drawLabel from "./label";
 
 /**
@@ -64,8 +63,6 @@ export default function drawHover(
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 0;
   context.shadowBlur = 0;
-  // the inner node of the label box
-  drawNode(context, data);
 
   // And finally we draw the label
   drawLabel(context, data, settings);
