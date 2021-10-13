@@ -4,7 +4,7 @@
   "description": "A sigma.js example on how to draw custom nodes.",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --config ./webpack.config.js --typescript index.ts --public /public ./public"
+    "start": "kotatsu serve --config ./webpack.config.js --typescript index.ts --public / ./public"
   },
   "license": "MIT",
   "dependencies": {

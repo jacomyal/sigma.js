@@ -4,7 +4,7 @@
   "description": "This example shows how to use sigma reducers to dynamically change nodes and edges appearance.",
   "main": "index.js",
   "scripts": {
-    "start": "kotatsu serve --typescript index.ts --public /public ./public"
+    "start": "kotatsu serve --typescript index.ts --public / ./public"
   },
   "license": "MIT",
   "dependencies": {
