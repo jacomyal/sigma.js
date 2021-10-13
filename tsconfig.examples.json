@@ -6,6 +6,7 @@
     "paths": {
       "sigma": ["./src/"],
       "sigma/types": ["./src/types"],
+      "sigma/utils": ["./src/utils"],
       "sigma/utils/animate": ["./src/utils/animate"],
       "sigma/rendering/webgl/programs/node.image": ["./src/rendering/webgl/programs/node.image.ts"],
       "sigma/rendering/webgl/programs/common/node": ["./src/rendering/webgl/programs/common/node.ts"]

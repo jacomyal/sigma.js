@@ -5,7 +5,7 @@ module.exports = {
     extensions: [".ts", ".js", ".glsl"],
     alias: {
       "sigma/types": path.resolve(__dirname, "../src/types.ts"),
-      "sigma/utils": path.resolve(__dirname, "../src/utils/index.ts"),
+      "sigma/utils": path.resolve(__dirname, "../src/utils/"),
       "sigma/utils/animate": path.resolve(__dirname, "../src/utils/animate.ts"),
       "sigma/rendering/webgl/programs/node.image": path.resolve(
         __dirname,
