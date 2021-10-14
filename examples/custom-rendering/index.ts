@@ -9,8 +9,8 @@
  * but you can add your own.
  *
  * Here in this example, some nodes are drawn with images in them using the
- * the NodeProgramImage provided by Sigma. Some others are drawn as white disc
- * with a border, and the custom program to draw them is in this directory:
+ * the getNodeProgramImage provided by Sigma. Some others are drawn as white
+ * disc with a border, and the custom program to draw them is in this directory:
  * - "./node.border.ts" is the node program. It tells sigma what data to give to
  *   the GPU and how.
  * - "./node.border.vert.glsl" is the vertex shader. It tells the GPU how to
@@ -25,7 +25,7 @@
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import NodeProgramImage from "sigma/rendering/webgl/programs/node.image";
+import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import NodeProgramBorder from "./node.border";
 
 import SpringSupervisor from "./layout-spring";
@@ -65,7 +65,7 @@ graph.nodes().forEach((node, i) => {
 const renderer = new Sigma(graph, container, {
   // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
   nodeProgramClasses: {
-    image: NodeProgramImage,
+    image: getNodeProgramImage(),
     border: NodeProgramBorder,
   },
   renderEdgeLabels: true,
