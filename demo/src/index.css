@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+#root {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+
+:root {
+  --ruby: #e22653;
+  --grey: #999;
+  --dark-grey: #666;
+  --cream: #f9f7ed;
+  --transition: all ease-out 300ms;
+}
+
+button.ico {
+  display: flex;
+  font-size: 1.5em;
+  width: 2em;
+  height: 2em;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  background: var(--dark-grey);
+  border: none;
+  outline: none;
+  margin-top: 0.2em;
+  cursor: pointer;
+}
+button.ico:hover {
+  background: var(--grey);
+}
+
+.circle {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 1.2em;
+  vertical-align: middle;
+  box-sizing: border-box;
+  background-color: var(--dark-grey);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+input[type="checkbox"] {
+  display: none;
+}
+input[type="checkbox"]:not(:checked) + label {
+  color: var(--dark-grey);
+}
+input[type="checkbox"]:not(:checked) + label .circle {
+  background-color: white !important;
+  border: 3px solid var(--dark-grey);
+}
+input[type="checkbox"] + label {
+  cursor: pointer;
+}
+input[type="checkbox"] + label:hover {
+  opacity: 0.7;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul > li {
+  margin-top: 0.2em;
+}
+
+.panel {
+  background: white;
+  border: 1px solid var(--dark-grey);
+  padding: 1em;
+  margin-top: 0.5em;
+}
+
+.controls {
+  position: absolute;
+  bottom: 0.5em;
+  left: 0.5em;
+}
+.panels {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  min-width: 250px;
+  max-height: calc(100vh - 0.5em);
+  overflow-y: auto;
+  padding: 0.5em;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--grey);
+  border: transparent;
+}
+
+h2 {
+  margin-top: 0;
+}
