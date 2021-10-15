@@ -137,10 +137,10 @@ export default class Camera extends EventEmitter implements CameraState {
     // Keeping track of last state
     this.previousState = this.getState();
 
-    if (state.x) this.x = state.x;
-    if (state.y) this.y = state.y;
-    if (state.angle) this.angle = state.angle;
-    if (state.ratio) this.ratio = state.ratio;
+    if (typeof state.x === "number") this.x = state.x;
+    if (typeof state.y === "number") this.y = state.y;
+    if (typeof state.angle === "number") this.angle = state.angle;
+    if (typeof state.ratio === "number") this.ratio = state.ratio;
 
     // Emitting
     if (!this.hasState(this.previousState)) this.emit("updated", this.getState());
