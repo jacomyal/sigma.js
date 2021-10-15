@@ -1,15 +1,7 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
-#root {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-}
-
-
+/**
+ * VARIABLES:
+ * **********
+ */
 :root {
   --ruby: #e22653;
   --grey: #999;
@@ -18,6 +10,55 @@ body {
   --transition: all ease-out 300ms;
 }
 
+/**
+ * BASE STYLES:
+ * ************
+ */
+body {
+  font-family: sans-serif;
+}
+h2 {
+  margin-top: 0;
+}
+
+/**
+ * LAYOUT:
+ * *******
+ */
+body {
+  margin: 0;
+  padding: 0;
+}
+#root {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+#app-root,
+.sigma-container {
+  position: absolute;
+  inset: 0;
+}
+.controls {
+  position: absolute;
+  bottom: 0.5em;
+  left: 0.5em;
+}
+.panels {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  min-width: 250px;
+  max-height: calc(100vh - 0.5em);
+  overflow-y: auto;
+  padding: 0.5em;
+  scrollbar-width: thin;
+}
+
+/**
+ * USEFUL CLASSES:
+ * ***************
+ */
 button.ico {
   display: flex;
   font-size: 1.5em;
@@ -81,21 +122,6 @@ ul > li {
   margin-top: 0.5em;
 }
 
-.controls {
-  position: absolute;
-  bottom: 0.5em;
-  left: 0.5em;
-}
-.panels {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  min-width: 250px;
-  max-height: calc(100vh - 0.5em);
-  overflow-y: auto;
-  padding: 0.5em;
-  scrollbar-width: thin;
-}
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -105,8 +131,4 @@ ul > li {
 ::-webkit-scrollbar-thumb {
   background-color: var(--grey);
   border: transparent;
-}
-
-h2 {
-  margin-top: 0;
 }

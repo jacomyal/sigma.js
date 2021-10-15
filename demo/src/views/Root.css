@@ -1,9 +1,0 @@
-#app-root,
-.sigma-container {
-  position: absolute;
-  inset: 0;
-}
-
-div.react-sigma-v2 .react-sigma-controls {
-  border: none !important;
-}

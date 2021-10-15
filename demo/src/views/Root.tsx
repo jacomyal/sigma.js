@@ -4,6 +4,7 @@ import { BsMenuAppFill } from "react-icons/bs";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import { omit, mapValues, keyBy, constant } from "lodash";
 
+import GraphSettingsController from "./GraphSettingsController";
 import GraphDataController from "./GraphDataController";
 import ZoomButtons from "./ZoomButtons";
 import ClustersPanel from "./ClustersPanel";
@@ -11,7 +12,6 @@ import TagsPanel from "./TagsPanel";
 import { Dataset, FiltersState } from "../types";
 
 import "react-sigma-v2/lib/react-sigma-v2.css";
-import "./Root.css";
 
 const Root: FC = () => {
   const [showCaption, setShowCaption] = useState(false);
@@ -47,6 +47,7 @@ const Root: FC = () => {
         }}
         className="react-sigma"
       >
+        <GraphSettingsController />
         <GraphDataController dataset={dataset} filters={filtersState} />
         <div className="controls">
           <button type="button" className="ico" onClick={() => setShowCaption(!showCaption)} title="Toggle menu">

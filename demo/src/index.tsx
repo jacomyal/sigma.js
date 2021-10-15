@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import "./index.css";
+import "./styles.css";
 import Root from "./views/Root";
 
 ReactDOM.render(
