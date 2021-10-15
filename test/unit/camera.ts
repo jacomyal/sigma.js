@@ -79,6 +79,41 @@ describe("Camera", function () {
     });
   });
 
+  it("should be possible to reset the camera's state using setState (issue #1136).", function () {
+    const camera = new Camera();
+
+    camera.setState({
+      x: 10,
+      y: -45,
+      angle: Math.PI / 2,
+      ratio: 3,
+    });
+
+    camera.setState({ x: 0 });
+    assert.deepStrictEqual(camera.getState(), {
+      x: 0,
+      y: -45,
+      angle: Math.PI / 2,
+      ratio: 3,
+    });
+
+    camera.setState({ y: 0 });
+    assert.deepStrictEqual(camera.getState(), {
+      x: 0,
+      y: 0,
+      angle: Math.PI / 2,
+      ratio: 3,
+    });
+
+    camera.setState({ angle: 0 });
+    assert.deepStrictEqual(camera.getState(), {
+      x: 0,
+      y: 0,
+      angle: 0,
+      ratio: 3,
+    });
+  });
+
   it("should not be possible to set the camera's state when it's disabled.", function () {
     const camera = new Camera();
     const state1 = {
