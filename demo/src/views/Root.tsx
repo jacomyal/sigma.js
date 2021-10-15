@@ -64,7 +64,7 @@ const Root: FC = () => {
           <div className="panels">
             <ClustersPanel
               clusters={dataset.clusters}
-              visibleClusters={filtersState.clusters}
+              filters={filtersState}
               toggleCluster={(cluster) => {
                 setFiltersState((filters) => ({
                   ...filters,
@@ -76,7 +76,7 @@ const Root: FC = () => {
             />
             <TagsPanel
               tags={dataset.tags}
-              visibleTags={filtersState.tags}
+              filters={filtersState}
               toggleTag={(tag) => {
                 setFiltersState((filters) => ({
                   ...filters,
