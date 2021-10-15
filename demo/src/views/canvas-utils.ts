@@ -1,4 +1,5 @@
-import { PlainObject } from "sigma/types";
+import { NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
+import { Settings } from "sigma/settings";
 
 const TEXT_COLOR = "#000000";
 
@@ -28,7 +29,7 @@ export function drawRoundRect(
 }
 
 /**
- * Custom hover renderer for sigma.
+ * Custom hover renderer
  */
 export function drawHover(context: CanvasRenderingContext2D, data: PlainObject, settings: PlainObject) {
   const size = settings.labelSize;
@@ -86,4 +87,28 @@ export function drawHover(context: CanvasRenderingContext2D, data: PlainObject, 
   context.fillStyle = data.color;
   context.font = `${weight} ${subLabelSize}px ${font}`;
   context.fillText(clusterLabel, data.x + data.size + 3, data.y + size / 3 + 3 + subLabelSize);
+}
+
+/**
+ * Custom label renderer
+ */
+export default function drawLabel(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
+  settings: Settings,
+): void {
+  if (!data.label) return;
+
+  const size = settings.labelSize,
+    font = settings.labelFont,
+    weight = settings.labelWeight;
+
+  context.font = `${weight} ${size}px ${font}`;
+  const width = context.measureText(data.label).width + 8;
+
+  context.fillStyle = "#ffffffcc";
+  context.fillRect(data.x + data.size, data.y + size / 3 - 15, width, 20);
+
+  context.fillStyle = "#000";
+  context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }

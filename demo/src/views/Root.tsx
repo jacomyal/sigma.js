@@ -12,6 +12,7 @@ import TagsPanel from "./TagsPanel";
 import { Dataset, FiltersState } from "../types";
 
 import "react-sigma-v2/lib/react-sigma-v2.css";
+import drawLabel from "./canvas-utils";
 
 const Root: FC = () => {
   const [showCaption, setShowCaption] = useState(false);
@@ -42,8 +43,12 @@ const Root: FC = () => {
         graphOptions={{ type: "directed" }}
         initialSettings={{
           nodeProgramClasses: { image: getNodeProgramImage() },
+          labelRenderer: drawLabel,
           defaultNodeType: "image",
           defaultEdgeType: "arrow",
+          labelDensity: 0.01,
+          labelGridCellSize: 120,
+          labelRenderedSizeThreshold: 8,
         }}
         className="react-sigma"
       >
