@@ -5,7 +5,6 @@
  */
 import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";
-import { NodeKey, EdgeKey } from "graphology-types";
 import Graph from "graphology";
 
 import Camera from "./core/camera";
@@ -53,7 +52,7 @@ const SIZE_SCALING_EXPONENT = 0.5;
 /**
  * Important functions.
  */
-function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeDisplayData>): NodeDisplayData {
+function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
   if (!data.hasOwnProperty("x") || !data.hasOwnProperty("y"))
     throw new Error(
       `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
@@ -79,7 +78,7 @@ function applyNodeDefaults(settings: Settings, key: NodeKey, data: Partial<NodeD
   return data as NodeDisplayData;
 }
 
-function applyEdgeDefaults(settings: Settings, key: EdgeKey, data: Partial<EdgeDisplayData>): EdgeDisplayData {
+function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDisplayData>): EdgeDisplayData {
   if (!data.color) data.color = settings.defaultEdgeColor;
 
   if (!data.label) data.label = "";
@@ -115,10 +114,10 @@ export default class Sigma extends EventEmitter {
   private activeListeners: PlainObject<Listener> = {};
   private quadtree: QuadTree = new QuadTree();
   private labelGrid: LabelGrid = new LabelGrid();
-  private nodeDataCache: Record<NodeKey, NodeDisplayData> = {};
-  private edgeDataCache: Record<EdgeKey, EdgeDisplayData> = {};
-  private nodeKeyToIndex: Record<NodeKey, number> = {};
-  private edgeKeyToIndex: Record<EdgeKey, number> = {};
+  private nodeDataCache: Record<string, NodeDisplayData> = {};
+  private edgeDataCache: Record<string, EdgeDisplayData> = {};
+  private nodeKeyToIndex: Record<string, number> = {};
+  private edgeKeyToIndex: Record<string, number> = {};
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
 
   private matrix: Float32Array = identity();
@@ -137,9 +136,9 @@ export default class Sigma extends EventEmitter {
   private height = 0;
 
   // State
-  private displayedLabels: Set<NodeKey> = new Set();
-  private highlightedNodes: Set<NodeKey> = new Set();
-  private hoveredNode: NodeKey | null = null;
+  private displayedLabels: Set<string> = new Set();
+  private highlightedNodes: Set<string> = new Set();
+  private hoveredNode: string | null = null;
   private renderFrame: number | null = null;
   private renderHighlightedNodesFrame: number | null = null;
   private needToProcess = false;
@@ -488,13 +487,13 @@ export default class Sigma extends EventEmitter {
       this._scheduleRefresh();
     };
 
-    this.activeListeners.addNodeGraphUpdate = (e: { key: NodeKey }): void => {
+    this.activeListeners.addNodeGraphUpdate = (e: { key: string }): void => {
       // Adding entry to cache
       this.nodeKeyToIndex[e.key] = graph.order - 1;
       this.activeListeners.graphUpdate();
     };
 
-    this.activeListeners.addEdgeGraphUpdate = (e: { key: EdgeKey }): void => {
+    this.activeListeners.addEdgeGraphUpdate = (e: { key: string }): void => {
       // Adding entry to cache
       this.nodeKeyToIndex[e.key] = graph.order - 1;
       this.activeListeners.graphUpdate();
@@ -562,7 +561,7 @@ export default class Sigma extends EventEmitter {
 
     const nodesPerPrograms: Record<string, number> = {};
 
-    let nodes: NodeKey[] = graph.nodes();
+    let nodes = graph.nodes();
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -605,7 +604,7 @@ export default class Sigma extends EventEmitter {
     // Handling node z-index
     // TODO: z-index needs us to compute display data before hand
     if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
-      nodes = zIndexOrdering<NodeKey>(nodeZExtent, (node: NodeKey): number => this.nodeDataCache[node].zIndex, nodes);
+      nodes = zIndexOrdering<string>(nodeZExtent, (node: string): number => this.nodeDataCache[node].zIndex, nodes);
 
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -628,7 +627,7 @@ export default class Sigma extends EventEmitter {
 
     const edgesPerPrograms: Record<string, number> = {};
 
-    let edges: EdgeKey[] = graph.edges();
+    let edges = graph.edges();
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
@@ -667,7 +666,7 @@ export default class Sigma extends EventEmitter {
 
     // Handling edge z-index
     if (this.settings.zIndex && edgeZExtent[0] !== edgeZExtent[1])
-      edges = zIndexOrdering(edgeZExtent, (edge: EdgeKey): number => this.edgeDataCache[edge].zIndex, edges);
+      edges = zIndexOrdering(edgeZExtent, (edge: string): number => this.edgeDataCache[edge].zIndex, edges);
 
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
@@ -744,7 +743,7 @@ export default class Sigma extends EventEmitter {
     const cameraState = this.camera.getState();
 
     // Finding visible nodes to display their labels
-    let visibleNodes: Set<NodeKey>;
+    let visibleNodes: Set<string>;
 
     if (cameraState.ratio >= 1) {
       // Camera is unzoomed so no need to ask the quadtree for visible nodes
@@ -893,7 +892,7 @@ export default class Sigma extends EventEmitter {
     context.clearRect(0, 0, this.width, this.height);
 
     // Rendering
-    const render = (node: NodeKey): void => {
+    const render = (node: string): void => {
       const data = this.nodeDataCache[node];
 
       const { x, y } = this.framedGraphToViewport(data);
@@ -914,7 +913,7 @@ export default class Sigma extends EventEmitter {
       );
     };
 
-    const nodesToRender: NodeKey[] = [];
+    const nodesToRender: string[] = [];
 
     if (this.hoveredNode && !this.nodeDataCache[this.hoveredNode].hidden) {
       nodesToRender.push(this.hoveredNode);
@@ -1151,8 +1150,8 @@ export default class Sigma extends EventEmitter {
    * @param  {string} key - The node's key.
    * @return {NodeDisplayData | undefined} A copy of the desired node's attribute or undefined if not found
    */
-  getNodeDisplayData(key: NodeKey): NodeDisplayData | undefined {
-    const node = this.nodeDataCache[key];
+  getNodeDisplayData(key: unknown): NodeDisplayData | undefined {
+    const node = this.nodeDataCache[key as string];
     return node ? Object.assign({}, node) : undefined;
   }
 
@@ -1163,8 +1162,8 @@ export default class Sigma extends EventEmitter {
    * @param  {string} key - The edge's key.
    * @return {EdgeDisplayData | undefined} A copy of the desired edge's attribute or undefined if not found
    */
-  getEdgeDisplayData(key: EdgeKey): EdgeDisplayData | undefined {
-    const edge = this.edgeDataCache[key];
+  getEdgeDisplayData(key: unknown): EdgeDisplayData | undefined {
+    const edge = this.edgeDataCache[key as string];
     return edge ? Object.assign({}, edge) : undefined;
   }
 

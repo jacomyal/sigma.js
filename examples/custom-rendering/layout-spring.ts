@@ -1,5 +1,4 @@
 import Graph from "graphology";
-import { NodeKey } from "graphology-types";
 
 interface Settings {
   xKey: string;
@@ -13,9 +12,9 @@ interface Settings {
   maxMove: number;
 
   // Custom behaviors settings:
-  shouldSkipEdge?: (n: NodeKey) => boolean;
-  shouldSkipNode?: (n: NodeKey) => boolean;
-  isNodeFixed?: (n: NodeKey) => boolean;
+  shouldSkipEdge?: (n: string) => boolean;
+  shouldSkipNode?: (n: string) => boolean;
+  isNodeFixed?: (n: string) => boolean;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -32,7 +31,7 @@ const DEFAULT_SETTINGS: Settings = {
 export default class SpringSupervisor {
   private graph: Graph;
   private settings: Settings;
-  private nodeStates: Record<NodeKey, { dx: number; dy: number; x: number; y: number }> = {};
+  private nodeStates: Record<string, { dx: number; dy: number; x: number; y: number }> = {};
   private frameID?: number;
   private running = false;
 

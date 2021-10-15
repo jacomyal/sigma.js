@@ -7,7 +7,6 @@
 import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 import Graph from "graphology";
-import { NodeKey } from "graphology-types";
 
 import data from "./data.json";
 
@@ -23,15 +22,15 @@ const renderer = new Sigma(graph, container);
 
 // Type and declare internal state:
 interface State {
-  hoveredNode?: NodeKey;
+  hoveredNode?: string;
   searchQuery: string;
 
   // State derived from query:
-  selectedNode?: NodeKey;
-  suggestions?: Set<NodeKey>;
+  selectedNode?: string;
+  suggestions?: Set<string>;
 
   // State derived from hovered node:
-  hoveredNeighbors?: Set<NodeKey>;
+  hoveredNeighbors?: Set<string>;
 }
 const state: State = { searchQuery: "" };
 
@@ -82,7 +81,7 @@ function setSearchQuery(query: string) {
   // Refresh rendering:
   renderer.refresh();
 }
-function setHoveredNode(node?: NodeKey) {
+function setHoveredNode(node?: string) {
   if (node) {
     state.hoveredNode = node;
     state.hoveredNeighbors = new Set(graph.neighbors(node));

@@ -6,7 +6,6 @@
  * @module
  */
 import Graph from "graphology";
-import { EdgeKey, NodeKey } from "graphology-types";
 
 import { Dimensions, Coordinates } from "../types";
 
@@ -21,10 +20,10 @@ import { Dimensions, Coordinates } from "../types";
  * which one is better.
  */
 class LabelCandidate {
-  key: NodeKey;
+  key: string;
   size: number;
 
-  constructor(key: NodeKey, size: number) {
+  constructor(key: string, size: number) {
     this.key = key;
     this.size = size;
   }
@@ -73,7 +72,7 @@ export class LabelGrid {
     return xIndex * this.columns + yIndex;
   }
 
-  add(key: NodeKey, size: number, pos: Coordinates): void {
+  add(key: string, size: number, pos: Coordinates): void {
     const candidate = new LabelCandidate(key, size);
 
     const index = this.getIndex(pos);
@@ -94,7 +93,7 @@ export class LabelGrid {
     }
   }
 
-  getLabelsToDisplay(ratio: number, density: number): Array<NodeKey> {
+  getLabelsToDisplay(ratio: number, density: number): Array<string> {
     // TODO: work on visible nodes to optimize? ^ -> threshold outside so that memoization works?
     // TODO: adjust threshold lower, but increase cells a bit?
     // TODO: hunt for geom issue in disguise
@@ -131,14 +130,14 @@ export class LabelGrid {
  * @return {Array}                         - The selected labels.
  */
 export function edgeLabelsToDisplayFromNodes(params: {
-  displayedNodeLabels: Set<NodeKey>;
-  highlightedNodes: Set<NodeKey>;
+  displayedNodeLabels: Set<string>;
+  highlightedNodes: Set<string>;
   graph: Graph;
-  hoveredNode: NodeKey | null;
-}): Array<EdgeKey> {
+  hoveredNode: string | null;
+}): Array<string> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
-  const worthyEdges: Array<EdgeKey> = [];
+  const worthyEdges: Array<string> = [];
 
   // TODO: the code below can be optimized using #.forEach and batching the code per adj
 

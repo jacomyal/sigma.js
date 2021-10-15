@@ -10,7 +10,6 @@
 /* eslint no-nested-ternary: 0 */
 /* eslint no-constant-condition: 0 */
 import extend from "@yomguithereal/helpers/extend";
-import { NodeKey } from "graphology-types";
 import { PlainObject } from "../types";
 
 // TODO: should not ask the quadtree when the camera has the whole graph in
@@ -230,8 +229,8 @@ function buildQuadrants(maxLevel: number, data: Float32Array): void {
 function insertNode(
   maxLevel: number,
   data: Float32Array,
-  containers: PlainObject<NodeKey[]>,
-  key: NodeKey,
+  containers: PlainObject<string[]>,
+  key: string,
   x: number,
   y: number,
   size: number,
@@ -358,16 +357,16 @@ function insertNode(
 function getNodesInAxisAlignedRectangleArea(
   maxLevel: number,
   data: Float32Array,
-  containers: PlainObject<NodeKey[]>,
+  containers: PlainObject<string[]>,
   x1: number,
   y1: number,
   w: number,
   h: number,
-): NodeKey[] {
+): string[] {
   // [block, level]
   const stack = [0, 0];
 
-  const collectedNodes: NodeKey[] = [];
+  const collectedNodes: string[] = [];
 
   let container;
 
@@ -452,8 +451,8 @@ function getNodesInAxisAlignedRectangleArea(
  */
 export default class QuadTree {
   data: Float32Array;
-  containers: PlainObject<NodeKey[]> = { [OUTSIDE_BLOCK]: [] };
-  cache: NodeKey[] | null = null;
+  containers: PlainObject<string[]> = { [OUTSIDE_BLOCK]: [] };
+  cache: string[] | null = null;
   lastRectangle: Rectangle | null = null;
 
   constructor(params: { boundaries?: Boundaries } = {}) {
@@ -471,7 +470,7 @@ export default class QuadTree {
       });
   }
 
-  add(key: NodeKey, x: number, y: number, size: number): QuadTree {
+  add(key: string, x: number, y: number, size: number): QuadTree {
     insertNode(MAX_LEVEL, this.data, this.containers, key, x, y, size);
 
     return this;
@@ -495,8 +494,8 @@ export default class QuadTree {
     return this;
   }
 
-  point(x: number, y: number): NodeKey[] {
-    const nodes: NodeKey[] = this.containers[OUTSIDE_BLOCK];
+  point(x: number, y: number): string[] {
+    const nodes: string[] = this.containers[OUTSIDE_BLOCK];
 
     let block = 0,
       level = 0;
@@ -520,11 +519,11 @@ export default class QuadTree {
     return nodes;
   }
 
-  rectangle(x1: number, y1: number, x2: number, y2: number, height: number): NodeKey[] {
+  rectangle(x1: number, y1: number, x2: number, y2: number, height: number): string[] {
     const lr = this.lastRectangle;
 
     if (lr && x1 === lr.x1 && x2 === lr.x2 && y1 === lr.y1 && y2 === lr.y2 && height === lr.height) {
-      return this.cache as NodeKey[];
+      return this.cache as string[];
     }
 
     this.lastRectangle = {
