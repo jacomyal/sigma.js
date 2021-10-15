@@ -14,7 +14,7 @@
    width="80px"
    height="80px"
    fill="white"
-   opacity="0.5"
+   opacity="0.8"
    stroke-width="0"
    inkscape:version="0.92.3 (2405546, 2018-03-11)">
   <metadata
@@ -53,7 +53,7 @@
      inkscape:current-layer="svg4" />
   <path
      inkscape:connector-curvature="0"
-     style="opacity:0.5;fill:none;stroke:#ffffff;stroke-width:5"
+     style="opacity:0.8;fill:none;stroke:#ffffff;stroke-width:5"
      d="m 59.999998,17.5 v 50 H 20.000003 v -50 z m -29.894995,15 h 5 v -5 h -5 z m 14.895,0 h 5 v -5 h -5 z m -14.895,15 h 5 v -5 h -5 z m 5,20 h 10 v -10 h -10 z m 9.895,-20 h 5 v -5 h -5 z m -30.000001,-30 h 49.999995 v -5 H 15.000002 Z"
      id="path2" />
 </svg>

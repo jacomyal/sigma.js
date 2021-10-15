@@ -49,6 +49,7 @@ const Root: FC = () => {
           labelDensity: 0.07,
           labelGridCellSize: 60,
           labelRenderedSizeThreshold: 15,
+          labelFont: "Lato, sans-serif",
         }}
         className="react-sigma"
       >
@@ -86,6 +87,7 @@ const Root: FC = () => {
             />
           </div>
         )}
+        <h1>A cartography of Wikipedia pages around data visualization</h1>
       </SigmaContainer>
     </div>
   );

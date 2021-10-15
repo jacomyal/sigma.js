@@ -3,7 +3,7 @@ import { useSigma } from "react-sigma-v2";
 import { sortBy, values } from "lodash";
 
 import { Cluster, FiltersState } from "../types";
-import { MdGroupWork } from "react-icons/md";
+import { MdExpandLess, MdExpandMore, MdGroupWork } from "react-icons/md";
 
 const ClustersPanel: FC<{
   clusters: Cluster[];
@@ -12,6 +12,8 @@ const ClustersPanel: FC<{
 }> = ({ clusters, filters, toggleCluster }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
+
+  const [isDeployed, setIsDeployed] = useState(true);
 
   const nodesPerCluster = useMemo(() => {
     const index: Record<string, number> = {};
@@ -41,44 +43,54 @@ const ClustersPanel: FC<{
   return (
     <div className="clusters panel">
       <h2>
-        <MdGroupWork /> Clusters
+        <MdGroupWork className="text-muted" /> Clusters{" "}
+        <button type="button" onClick={() => setIsDeployed((v) => !v)}>
+          {isDeployed ? <MdExpandLess /> : <MdExpandMore />}
+        </button>
       </h2>
-      <ul>
-        {sortedClusters.map((cluster) => {
-          const nodesCount = nodesPerCluster[cluster.key];
-          const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
-          return (
-            <li
-              className="caption-row"
-              key={cluster.key}
-              title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
-                visibleNodesCount !== nodesCount ? ` (${visibleNodesCount} visible now)` : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={filters.clusters[cluster.key] || false}
-                onChange={() => toggleCluster(cluster.key)}
-                id={`cluster-${cluster.key}`}
-              />
-              <label htmlFor={`cluster-${cluster.key}`}>
-                <span className="circle" style={{ background: cluster.color, borderColor: cluster.color }} />{" "}
-                <div className="node-label">
-                  <span>{cluster.clusterLabel}</span>
-                  <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerCluster + "%" }}>
-                    <div
-                      className="inside-bar"
-                      style={{
-                        width: (100 * visibleNodesCount) / nodesCount + "%",
-                      }}
-                    />
-                  </div>
-                </div>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      {isDeployed && (
+        <div>
+          <p>
+            <i className="text-muted">Click a cluster to show/hide related pages from the network.</i>
+          </p>
+          <ul>
+            {sortedClusters.map((cluster) => {
+              const nodesCount = nodesPerCluster[cluster.key];
+              const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
+              return (
+                <li
+                  className="caption-row"
+                  key={cluster.key}
+                  title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
+                    visibleNodesCount !== nodesCount ? ` (${visibleNodesCount} visible now)` : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filters.clusters[cluster.key] || false}
+                    onChange={() => toggleCluster(cluster.key)}
+                    id={`cluster-${cluster.key}`}
+                  />
+                  <label htmlFor={`cluster-${cluster.key}`}>
+                    <span className="circle" style={{ background: cluster.color, borderColor: cluster.color }} />{" "}
+                    <div className="node-label">
+                      <span>{cluster.clusterLabel}</span>
+                      <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerCluster + "%" }}>
+                        <div
+                          className="inside-bar"
+                          style={{
+                            width: (100 * visibleNodesCount) / nodesCount + "%",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

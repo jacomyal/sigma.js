@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital@0;1&display=swap");
+
 /**
  * VARIABLES:
  * **********
@@ -10,6 +12,9 @@
   --cream: #f9f7ed;
   --transition: all ease-out 300ms;
   --shadow: 0 1px 5px var(--dark-grey);
+  --hover-opacity: 0.7;
+  --stage-padding: 8px;
+  --panels-width: 350px;
 }
 
 /**
@@ -17,10 +22,11 @@
  * ************
  */
 body {
-  font-family: sans-serif;
+  font-family: Lato, sans-serif;
 }
 h2 {
-  margin-top: 0;
+  font-size: 1.3em;
+  margin: 0;
 }
 h2 > * {
   vertical-align: text-top;
@@ -46,18 +52,39 @@ body {
 }
 .controls {
   position: absolute;
-  bottom: 0.5em;
-  left: 0.5em;
+  bottom: var(--stage-padding);
+  left: var(--stage-padding);
+}
+h1 {
+  z-index: 1;
+  position: absolute;
+  top: var(--stage-padding);
+  left: var(--stage-padding);
+  margin: 0;
+  background: #ffffffcc;
+  padding: 0.2em;
+  font-size: 1.8em;
+  max-width: calc(100vw - var(--panels-width) - 2 * var(--stage-padding) - 1em);
 }
 .panels {
   position: absolute;
   bottom: 0;
   right: 0;
-  min-width: 250px;
+  width: 350px;
   max-height: calc(100vh - 0.5em);
   overflow-y: auto;
-  padding: 0.5em;
+  padding: var(--stage-padding);
   scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--grey);
+  border: transparent;
 }
 
 /**
@@ -85,6 +112,49 @@ button.ico:hover {
   color: var(--dark-grey);
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul > li {
+  margin-top: 0.2em;
+}
+.text-muted {
+  color: var(--dark-grey);
+}
+
+/**
+ * CAPTIONS PANELS:
+ * ****************
+ */
+.panel {
+  background: white;
+  padding: 1em;
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+}
+.panel:not(:last-child) {
+  margin-bottom: 0.5em;
+}
+.panel h2 button {
+  float: right;
+  background: white;
+  border: 1px solid black;
+  border-radius: 2px;
+  font-size: 1.2em;
+  height: 1em;
+  width: 1em;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.panel h2 button:hover {
+  opacity: var(--hover-opacity);
+}
+
 .caption-row input[type="checkbox"] {
   display: none;
 }
@@ -93,7 +163,6 @@ button.ico:hover {
 }
 .caption-row input[type="checkbox"]:not(:checked) + label .circle {
   background-color: white !important;
-  border: 3px solid var(--dark-grey);
 }
 .caption-row label {
   display: flex;
@@ -101,7 +170,7 @@ button.ico:hover {
   cursor: pointer;
 }
 .caption-row label:hover {
-  opacity: 0.7;
+  opacity: var(--hover-opacity);
 }
 .caption-row label .circle {
   flex-shrink: 0;
@@ -116,6 +185,8 @@ button.ico:hover {
   background-size: cover;
   background-repeat: no-repeat;
   margin-right: 0.2em;
+  transition: var(--transition);
+  border: 3px solid var(--dark-grey);
 }
 .caption-row label .node-label {
   flex-grow: 1;
@@ -133,31 +204,4 @@ button.ico:hover {
   height: 100%;
   background: var(--dark-grey);
   transition: var(--transition);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-ul > li {
-  margin-top: 0.2em;
-}
-
-.panel {
-  background: white;
-  padding: 1em;
-  margin-top: 0.5em;
-  border-radius: 3px;
-  box-shadow: var(--shadow);
-}
-
-::-webkit-scrollbar {
-  width: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: var(--grey);
-  border: transparent;
 }

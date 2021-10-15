@@ -20,7 +20,7 @@ const GraphDataController: FC<{ dataset: Dataset; filters: FiltersState }> = ({ 
     dataset.nodes.forEach((node) =>
       graph.addNode(node.key, { ...node, ...omit(clusters[node.cluster], "key"), ...omit(tags[node.tag], "key") }),
     );
-    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 2 }));
+    dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
 
     // Use degrees as node sizes:
     const degrees = graph.nodes().map((node) => graph.degree(node));
