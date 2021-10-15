@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 import Sigma from "../../src";
 import { NodeDisplayData, EdgeDisplayData } from "../../src/types";
-import Graph, { GraphConstructor, NodeKey, EdgeKey } from "graphology-types";
+import Graph, { GraphConstructor } from "graphology-types";
 
 type TestDependencies = {
   Graph: GraphConstructor;
@@ -243,12 +243,12 @@ export const tests: Tests = [
           container,
         } = dependencies;
 
-        const nodeReducer = (key: NodeKey, attr: Partial<NodeDisplayData>) => {
+        const nodeReducer = (key: string, attr: Partial<NodeDisplayData>) => {
           const data = attr as NodeDisplayData;
           return Object.assign({}, data, { color: (data.label || "").charCodeAt(0) % 2 === 0 ? "#1E90FF" : "#FF0000" });
         };
 
-        const edgeReducer = (key: EdgeKey, attr: Partial<EdgeDisplayData>) => {
+        const edgeReducer = (key: string, attr: Partial<EdgeDisplayData>) => {
           const data = attr as EdgeDisplayData;
           return Object.assign({}, data, { color: +key % 2 === 0 ? "#FFFF00" : "#008000" });
         };
