@@ -8,6 +8,7 @@
   --dark-grey: #666;
   --cream: #f9f7ed;
   --transition: all ease-out 300ms;
+  --shadow: 0 1px 5px var(--dark-grey);
 }
 
 /**
@@ -64,18 +65,20 @@ button.ico {
   font-size: 1.5em;
   width: 2em;
   height: 2em;
+  border-radius: 3px;
+  box-shadow: var(--shadow);
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: white;
-  background: var(--dark-grey);
+  color: black;
+  background: white;
   border: none;
   outline: none;
   margin-top: 0.2em;
   cursor: pointer;
 }
 button.ico:hover {
-  background: var(--grey);
+  color: var(--dark-grey);
 }
 
 .circle {
@@ -117,9 +120,10 @@ ul > li {
 
 .panel {
   background: white;
-  border: 1px solid var(--dark-grey);
   padding: 1em;
   margin-top: 0.5em;
+  border-radius: 3px;
+  box-shadow: var(--shadow);
 }
 
 ::-webkit-scrollbar {

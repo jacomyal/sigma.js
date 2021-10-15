@@ -46,9 +46,9 @@ const Root: FC = () => {
           labelRenderer: drawLabel,
           defaultNodeType: "image",
           defaultEdgeType: "arrow",
-          labelDensity: 0.01,
-          labelGridCellSize: 120,
-          labelRenderedSizeThreshold: 8,
+          labelDensity: 0.07,
+          labelGridCellSize: 60,
+          labelRenderedSizeThreshold: 15,
         }}
         className="react-sigma"
       >
