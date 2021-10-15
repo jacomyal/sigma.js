@@ -1,19 +1,20 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useSigma } from "react-sigma-v2";
-import { sortBy, values } from "lodash";
+import { sortBy, values, keyBy, mapValues } from "lodash";
 
 import { Cluster, FiltersState } from "../types";
-import { MdExpandLess, MdExpandMore, MdGroupWork } from "react-icons/md";
+import { MdGroupWork } from "react-icons/md";
+import Panel from "./Panel";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/all";
 
 const ClustersPanel: FC<{
   clusters: Cluster[];
   filters: FiltersState;
   toggleCluster: (cluster: string) => void;
-}> = ({ clusters, filters, toggleCluster }) => {
+  setClusters: (clusters: Record<string, boolean>) => void;
+}> = ({ clusters, filters, toggleCluster, setClusters }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
-
-  const [isDeployed, setIsDeployed] = useState(true);
 
   const nodesPerCluster = useMemo(() => {
     const index: Record<string, number> = {};
@@ -22,6 +23,7 @@ const ClustersPanel: FC<{
   }, []);
 
   const maxNodesPerCluster = useMemo(() => Math.max(...values(nodesPerCluster)), [nodesPerCluster]);
+  const visibleClustersCount = useMemo(() => Object.keys(filters.clusters).length, [filters]);
 
   const [visibleNodesPerCluster, setVisibleNodesPerCluster] = useState<Record<string, number>>(nodesPerCluster);
   useEffect(() => {
@@ -41,57 +43,69 @@ const ClustersPanel: FC<{
   );
 
   return (
-    <div className="clusters panel">
-      <h2>
-        <MdGroupWork className="text-muted" /> Clusters{" "}
-        <button type="button" onClick={() => setIsDeployed((v) => !v)}>
-          {isDeployed ? <MdExpandLess /> : <MdExpandMore />}
+    <Panel
+      title={
+        <>
+          <MdGroupWork className="text-muted" /> Clusters
+          {visibleClustersCount < clusters.length ? (
+            <span className="text-muted text-small">
+              {" "}
+              ({visibleClustersCount} / {clusters.length})
+            </span>
+          ) : (
+            ""
+          )}
+        </>
+      }
+    >
+      <p>
+        <i className="text-muted">Click a cluster to show/hide related pages from the network.</i>
+      </p>
+      <p className="buttons">
+        <button className="btn" onClick={() => setClusters(mapValues(keyBy(clusters, "key"), () => true))}>
+          <AiOutlineCheckCircle /> Check all
+        </button>{" "}
+        <button className="btn" onClick={() => setClusters({})}>
+          <AiOutlineCloseCircle /> Uncheck all
         </button>
-      </h2>
-      {isDeployed && (
-        <div>
-          <p>
-            <i className="text-muted">Click a cluster to show/hide related pages from the network.</i>
-          </p>
-          <ul>
-            {sortedClusters.map((cluster) => {
-              const nodesCount = nodesPerCluster[cluster.key];
-              const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
-              return (
-                <li
-                  className="caption-row"
-                  key={cluster.key}
-                  title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
-                    visibleNodesCount !== nodesCount ? ` (${visibleNodesCount} visible now)` : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={filters.clusters[cluster.key] || false}
-                    onChange={() => toggleCluster(cluster.key)}
-                    id={`cluster-${cluster.key}`}
-                  />
-                  <label htmlFor={`cluster-${cluster.key}`}>
-                    <span className="circle" style={{ background: cluster.color, borderColor: cluster.color }} />{" "}
-                    <div className="node-label">
-                      <span>{cluster.clusterLabel}</span>
-                      <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerCluster + "%" }}>
-                        <div
-                          className="inside-bar"
-                          style={{
-                            width: (100 * visibleNodesCount) / nodesCount + "%",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
+      </p>
+      <ul>
+        {sortedClusters.map((cluster) => {
+          const nodesCount = nodesPerCluster[cluster.key];
+          const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
+          return (
+            <li
+              className="caption-row"
+              key={cluster.key}
+              title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
+                visibleNodesCount !== nodesCount ? ` (only ${visibleNodesCount} visible)` : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={filters.clusters[cluster.key] || false}
+                onChange={() => toggleCluster(cluster.key)}
+                id={`cluster-${cluster.key}`}
+              />
+              <label htmlFor={`cluster-${cluster.key}`}>
+                <span className="circle" style={{ background: cluster.color, borderColor: cluster.color }} />{" "}
+                <div className="node-label">
+                  <span>{cluster.clusterLabel}</span>
+                  <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerCluster + "%" }}>
+                    <div
+                      className="inside-bar"
+                      style={{
+                        width: (100 * visibleNodesCount) / nodesCount + "%",
+                      }}
+                    />
+                  </div>
+                </div>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
   );
 };
 

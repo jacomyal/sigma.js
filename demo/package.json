@@ -10,7 +10,7 @@
     "babel-loader": "8.1.0",
     "graphology": "^0.21.0",
     "graphology-layout-forceatlas2": "^0.6.1",
-    "graphology-types": "^0.19.5",
+    "graphology-types": "^0.20.0",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

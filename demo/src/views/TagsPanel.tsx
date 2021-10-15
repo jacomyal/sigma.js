@@ -1,19 +1,20 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
-import { MdCategory, MdExpandLess, MdExpandMore } from "react-icons/md";
+import { MdCategory } from "react-icons/md";
 
 import { FiltersState, Tag } from "../types";
 import { useSigma } from "react-sigma-v2";
-import { sortBy, values } from "lodash";
+import { keyBy, mapValues, sortBy, values } from "lodash";
+import Panel from "./Panel";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/all";
 
 const TagsPanel: FC<{
   tags: Tag[];
   filters: FiltersState;
   toggleTag: (tag: string) => void;
-}> = ({ tags, filters, toggleTag }) => {
+  setTags: (tags: Record<string, boolean>) => void;
+}> = ({ tags, filters, toggleTag, setTags }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
-
-  const [isDeployed, setIsDeployed] = useState(true);
 
   const nodesPerTag = useMemo(() => {
     const index: Record<string, number> = {};
@@ -22,6 +23,7 @@ const TagsPanel: FC<{
   }, []);
 
   const maxNodesPerTag = useMemo(() => Math.max(...values(nodesPerTag)), [nodesPerTag]);
+  const visibleTagsCount = useMemo(() => Object.keys(filters.tags).length, [filters]);
 
   const [visibleNodesPerTag, setVisibleNodesPerTag] = useState<Record<string, number>>(nodesPerTag);
   useEffect(() => {
@@ -41,57 +43,69 @@ const TagsPanel: FC<{
   );
 
   return (
-    <div className="tags panel">
-      <h2>
-        <MdCategory className="text-muted" /> Categories{" "}
-        <button type="button" onClick={() => setIsDeployed((v) => !v)}>
-          {isDeployed ? <MdExpandLess /> : <MdExpandMore />}
+    <Panel
+      title={
+        <>
+          <MdCategory className="text-muted" /> Categories
+          {visibleTagsCount < tags.length ? (
+            <span className="text-muted text-small">
+              {" "}
+              ({visibleTagsCount} / {tags.length})
+            </span>
+          ) : (
+            ""
+          )}
+        </>
+      }
+    >
+      <p>
+        <i className="text-muted">Click a category to show/hide related pages from the network.</i>
+      </p>
+      <p className="buttons">
+        <button className="btn" onClick={() => setTags(mapValues(keyBy(tags, "key"), () => true))}>
+          <AiOutlineCheckCircle /> Check all
+        </button>{" "}
+        <button className="btn" onClick={() => setTags({})}>
+          <AiOutlineCloseCircle /> Uncheck all
         </button>
-      </h2>
-      {isDeployed && (
-        <div>
-          <p>
-            <i className="text-muted">Click a category to show/hide related pages from the network.</i>
-          </p>
-          <ul>
-            {sortedTags.map((tag) => {
-              const nodesCount = nodesPerTag[tag.key];
-              const visibleNodesCount = visibleNodesPerTag[tag.key] || 0;
-              return (
-                <li
-                  className="caption-row"
-                  key={tag.key}
-                  title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
-                    visibleNodesCount !== nodesCount ? ` (${visibleNodesCount} visible now)` : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={filters.tags[tag.key] || false}
-                    onChange={() => toggleTag(tag.key)}
-                    id={`tag-${tag.key}`}
-                  />
-                  <label htmlFor={`tag-${tag.key}`}>
-                    <span className="circle" style={{ backgroundImage: `url(${tag.image})` }} />{" "}
-                    <div className="node-label">
-                      <span>{tag.key}</span>
-                      <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerTag + "%" }}>
-                        <div
-                          className="inside-bar"
-                          style={{
-                            width: (100 * visibleNodesCount) / nodesCount + "%",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
+      </p>
+      <ul>
+        {sortedTags.map((tag) => {
+          const nodesCount = nodesPerTag[tag.key];
+          const visibleNodesCount = visibleNodesPerTag[tag.key] || 0;
+          return (
+            <li
+              className="caption-row"
+              key={tag.key}
+              title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
+                visibleNodesCount !== nodesCount ? ` (only ${visibleNodesCount} visible)` : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={filters.tags[tag.key] || false}
+                onChange={() => toggleTag(tag.key)}
+                id={`tag-${tag.key}`}
+              />
+              <label htmlFor={`tag-${tag.key}`}>
+                <span className="circle" style={{ backgroundImage: `url(${tag.image})` }} />{" "}
+                <div className="node-label">
+                  <span>{tag.key}</span>
+                  <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerTag + "%" }}>
+                    <div
+                      className="inside-bar"
+                      style={{
+                        width: (100 * visibleNodesCount) / nodesCount + "%",
+                      }}
+                    />
+                  </div>
+                </div>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </Panel>
   );
 };
 
