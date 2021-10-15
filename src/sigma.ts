@@ -1378,7 +1378,7 @@ export default class Sigma extends EventEmitter {
       padding?: number;
     } = {},
   ): Coordinates {
-    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !!override.graphDimensions;
     const matrix = override.matrix
       ? override.matrix
       : recomputeMatrix
