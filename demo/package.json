@@ -2,6 +2,7 @@
   "name": "sigma-demo",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/demo",
   "dependencies": {
     "@types/lodash": "^4.14.175",
     "@types/node": "^12.20.33",

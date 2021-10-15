@@ -6,6 +6,7 @@ import { omit, mapValues, keyBy, constant } from "lodash";
 import GraphSettingsController from "./GraphSettingsController";
 import GraphEventsController from "./GraphEventsController";
 import GraphDataController from "./GraphDataController";
+import { FullScreenButton } from "./FullScreenButton";
 import DescriptionPanel from "./DescriptionPanel";
 import { Dataset, FiltersState } from "../types";
 import ClustersPanel from "./ClustersPanel";
@@ -66,6 +67,7 @@ const Root: FC = () => {
         {dataReady && (
           <>
             <div className="controls">
+              <FullScreenButton />
               <ZoomButtons />
             </div>
             <div className="panels">
