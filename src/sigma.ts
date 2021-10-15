@@ -191,12 +191,12 @@ export default class Sigma extends EventEmitter {
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
-      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes);
-      this.hoverNodePrograms[type] = new NodeProgramClass(this.webGLContexts.hoverNodes);
+      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this);
+      this.hoverNodePrograms[type] = new NodeProgramClass(this.webGLContexts.hoverNodes, this);
     }
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
-      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges);
+      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this);
     }
 
     // Initial resize

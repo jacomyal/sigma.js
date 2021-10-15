@@ -6,6 +6,7 @@
  */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { EdgeDisplayData, NodeDisplayData } from "../../../../types";
+import Sigma from "../../../../sigma";
 
 export interface RenderEdgeParams extends RenderParams {
   edgesPowRatio: number;
@@ -52,15 +53,15 @@ export abstract class AbstractEdgeProgram extends AbstractProgram implements IEd
 }
 
 export interface EdgeProgramConstructor {
-  new (gl: WebGLRenderingContext): IEdgeProgram;
+  new (gl: WebGLRenderingContext, renderer: Sigma): IEdgeProgram;
 }
 
 export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConstructor>): EdgeProgramConstructor {
   return class EdgeCompoundProgram implements IEdgeProgram {
     programs: Array<IEdgeProgram>;
 
-    constructor(gl: WebGLRenderingContext) {
-      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl));
+    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl, renderer));
     }
 
     bufferData(): void {

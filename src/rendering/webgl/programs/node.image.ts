@@ -11,6 +11,7 @@ import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.image.vert.glsl";
 import fragmentShaderSource from "../shaders/node.image.frag.glsl";
 import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
+import Sigma from "../../../sigma";
 
 const POINTS = 1,
   ATTRIBUTES = 8;
@@ -27,6 +28,10 @@ type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
  * "built" for each sigma instance:
  */
 export default function getNodeProgramImage() {
+  /**
+   * These attributes are shared between all instances of this exact class,
+   * returned by this call to getNodeProgramImage:
+   */
   const rebindTextureFns: (() => void)[] = [];
   const images: Record<string, ImageType> = {};
   let textureImage: ImageData;
@@ -125,11 +130,15 @@ export default function getNodeProgramImage() {
     texture: WebGLTexture;
     textureLocation: GLint;
     atlasLocation: WebGLUniformLocation;
+    latestRenderParams?: RenderNodeParams;
 
-    constructor(gl: WebGLRenderingContext) {
+    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
       super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
 
-      rebindTextureFns.push(() => this && this.rebindTexture && this.rebindTexture());
+      rebindTextureFns.push(() => {
+        if (this && this.rebindTexture) this.rebindTexture();
+        if (renderer && renderer.scheduleRefresh) renderer.scheduleRefresh();
+      });
 
       textureImage = new ImageData(1, 1);
 
@@ -207,6 +216,8 @@ export default function getNodeProgramImage() {
     }
 
     render(params: RenderNodeParams): void {
+      this.latestRenderParams = params;
+
       const gl = this.gl;
 
       const program = this.program;
@@ -226,6 +237,12 @@ export default function getNodeProgramImage() {
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
       gl.generateMipmap(gl.TEXTURE_2D);
+
+      if (this.latestRenderParams) {
+        this.bind();
+        this.bufferData();
+        this.render(this.latestRenderParams);
+      }
     }
   };
 }

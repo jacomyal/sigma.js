@@ -6,6 +6,7 @@
  */
 import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { NodeDisplayData } from "../../../../types";
+import Sigma from "../../../../sigma";
 
 export interface RenderNodeParams extends RenderParams {
   nodesPowRatio: number;
@@ -86,7 +87,7 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
 }
 
 export interface NodeProgramConstructor {
-  new (gl: WebGLRenderingContext): INodeProgram;
+  new (gl: WebGLRenderingContext, renderer: Sigma): INodeProgram;
 }
 
 /**
@@ -101,8 +102,8 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
   return class NodeCompoundProgram implements INodeProgram {
     programs: Array<INodeProgram>;
 
-    constructor(gl: WebGLRenderingContext) {
-      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl));
+    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl, renderer));
     }
 
     bufferData(): void {
