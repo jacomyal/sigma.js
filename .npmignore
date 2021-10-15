@@ -13,6 +13,7 @@ examples
 external-types
 src
 test
-website
+demo
+docs
 webpack.config.js
 webpack.programs.config.js
