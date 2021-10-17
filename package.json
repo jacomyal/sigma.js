@@ -25,7 +25,8 @@
     "demo:build": "cd demo && npm run build",
     "website:prepare": "rm -Rf website/demo && npm run demo:prepare",
     "website:build": "npm run demo:build && cp -R demo/build website/demo",
-    "website:all": "npm run website:prepare && npm run website:build"
+    "website:all": "npm run website:prepare && npm run website:build",
+    "website:watch": "cd website && npx reload"
   },
   "config": {
     "clean": "core rendering utils index.js index.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
@@ -83,6 +84,7 @@
     "prettier": "^2.4.1",
     "puppeteer": "^10.4.0",
     "raw-loader": "^4.0.2",
+    "reload": "^3.2.0",
     "replace": "^1.2.1",
     "rimraf": "^3.0.2",
     "ts-loader": "^9.2.6",

@@ -46,6 +46,30 @@ _List of available examples_
 - [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts)
 - [Displaying nodes in various custom ways](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering)
 
+Also, a more realistic sigma.js based web application is available in the [`demo`](./demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://sigmajs.org/).
+
+## Website
+
+The current website is a simple manually crafted single-page web site. It is located in the `website` folder. It also showcases the React.js based demo available in the [`demo`](./demo) folder in an iframe. The website itself does not need any build step, though the demo does.
+
+### Development
+
+To start a dev server that will reload the webpage when the code is updated, run:
+
+```bash
+npm run website:watch
+```
+
+Then, open [`localhost:8080`](http://localhost:8080) in your browser. When any file in the `website` directory is saved (including the demo bundle), the page will be reloaded.
+
+### Build
+
+To simply build the demo and copy the bundle in the `website` folder, just run:
+
+```bash
+npm run website:all
+```
+
 ## Contributing
 
 You can contribute by submitting [issues tickets](http://github.com/jacomyal/sigma.js/issues) and proposing [pull requests](http://github.com/jacomyal/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request.
