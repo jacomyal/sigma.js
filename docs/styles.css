@@ -150,7 +150,6 @@ header .menu {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  height: 100vh;
 }
 header .panel {
   padding: 0 2em;
@@ -176,19 +175,32 @@ header .links,
 header .menu {
   padding: 2em;
 }
-#toggle-menu,
-#toggle-menu:not(:checked) ~ .menu .panel {
+#toggle-menu {
   display: none;
+}
+header .menu .panel {
+  position: fixed;
+  background: white;
+  border-right: 1px solid var(--grey);
+  top: 0;
+  left: 0;
+  padding: 0 3em 0 5em;
+  transform: translate(-100%);
+  transition: var(--transition);
 }
 #toggle-menu + .menu label {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+#toggle-menu:checked + .menu .panel {
+  transform: translate(0%);
 }
 #toggle-menu:checked + .menu label .show-menu,
 #toggle-menu:not(:checked) + .menu label .hide-menu {
   display: none;
-}
-#toggle-menu:checked + .menu {
-  background: #fffffff6;
 }
 a {
   color: black;
@@ -322,10 +334,10 @@ main #usecases .thumbnail {
   background-position: center;
   background-repeat: no-repeat;
 }
-main #cookbook ul {
+main #faq ul {
   padding: 0;
 }
-main #cookbook h3 {
+main #faq h3 {
   margin-top: 2em;
 }
 
@@ -361,10 +373,11 @@ footer ul {
   header .menu {
     padding: 1em;
   }
-  #toggle-menu:checked + .menu {
-    background: white;
+  #toggle-menu:checked + .menu .panel {
+    background: #ffffffcc;
     width: 100vw;
     height: 100vh;
+    border: none;
   }
   #toggle-menu:checked + .menu .panel {
     margin: auto;
