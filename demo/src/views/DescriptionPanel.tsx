@@ -27,7 +27,8 @@ const DescriptionPanel: FC = () => {
       </p>
       <p>
         This web application has been developed by <a href="https://www.ouestware.com/en/">OuestWare</a>, using{" "}
-        <a href="https://reactjs.org/">react</a> and <a href="https://sigmajs.org">sigma.js</a>.
+        <a href="https://reactjs.org/">react</a> and <a href="https://sigmajs.org">sigma.js</a>. You can read the source
+        code <a href="https://github.com/jacomyal/sigma.js/tree/main/demo">on GitHub</a>.
       </p>
       <hr />
       <p>
