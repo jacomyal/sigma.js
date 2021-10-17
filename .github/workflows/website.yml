@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 16
 
-      - name: Build sources
+      - name: Build website
         run: npm run website:all
 
       - name: Deploy to GitHub Pages
