@@ -23,5 +23,5 @@ dist
 /types.d.ts
 /test/e2e/screenshots/*.current.png
 /test/e2e/screenshots/*.diff.png
-/docs/demo
+/website/demo
 /www

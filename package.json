@@ -23,8 +23,8 @@
     "demo:prepare": "cd demo && npm install",
     "demo:start": "cd demo && npm run start",
     "demo:build": "cd demo && npm run build",
-    "website:prepare": "rm -Rf docs/demo && npm run demo:prepare",
-    "website:build": "npm run demo:build && cp -R demo/build docs/demo",
+    "website:prepare": "rm -Rf website/demo && npm run demo:prepare",
+    "website:build": "npm run demo:build && cp -R demo/build website/demo",
     "website:all": "npm run website:prepare && npm run website:build"
   },
   "config": {

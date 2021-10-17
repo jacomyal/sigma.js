@@ -14,6 +14,6 @@ external-types
 src
 test
 demo
-docs
+website
 webpack.config.js
 webpack.programs.config.js
