@@ -20,9 +20,12 @@
     "e2e:test": "mocha --require ts-node/register ./test/e2e/**/*.spec.ts",
     "e2e:generate": "node -r ts-node/register test/e2e/generate.ts",
     "examples:prepare": "cd examples && npm install",
-    "website:prepare": "cd website && npm install",
-    "website:start": "cd website && npm run dev",
-    "website:build": "cd website && npm run build-all"
+    "demo:prepare": "cd demo && npm install",
+    "demo:start": "cd demo && npm run start",
+    "demo:build": "cd demo && npm run build",
+    "website:prepare": "rm -Rf docs/demo && npm run demo:prepare",
+    "website:build": "npm run demo:build && cp -R demo/build docs/demo",
+    "website:all": "npm run website:prepare && npm run website:build"
   },
   "config": {
     "clean": "core rendering utils index.js index.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
