@@ -10,6 +10,7 @@
   --dark-grey: #666;
   --light-grey: #ccc;
   --cream: #f9f7ed;
+  --transparent-white: #ffffffcc;
   --transition: all ease-out 300ms;
   --shadow: 0 1px 5px var(--dark-grey);
   --hover-opacity: 0.7;
@@ -70,12 +71,13 @@ body {
 .graph-title {
   z-index: 1;
   position: absolute;
-  top: var(--stage-padding);
-  left: var(--stage-padding);
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   max-width: calc(100vw - var(--panels-width) - 3 * var(--stage-padding));
+  padding: var(--stage-padding);
 }
 .graph-title h1 {
   font-size: 1.8em;
@@ -83,8 +85,7 @@ body {
 .graph-title h1,
 .graph-title h2 {
   margin: 0;
-  background: #ffffffcc;
-  padding: 0.2em;
+  background: var(--transparent-white);
 }
 .panels {
   position: absolute;
@@ -112,15 +113,13 @@ body {
  * ***************
  */
 button.ico {
-  display: flex;
+  display: block;
+  position: relative;
   font-size: 1.5em;
   width: 2em;
   height: 2em;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   color: black;
   background: white;
   border: none;
@@ -130,6 +129,13 @@ button.ico {
 }
 button.ico:hover {
   color: var(--dark-grey);
+}
+button.ico > * {
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 button.btn {
@@ -280,4 +286,48 @@ ul > li {
   height: 1em;
   top: 1em;
   left: 1em;
+}
+
+/**
+ * RESPONSIVENESS:
+ * ***************
+ */
+@media (max-width: 767.98px) {
+  #app-root:not(.show-contents) .contents,
+  #app-root.show-contents .controls {
+    display: none;
+  }
+
+  #app-root.show-contents .contents {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    background: var(--transparent-white);
+  }
+  #app-root.show-contents .graph-title,
+  #app-root.show-contents .panels {
+    height: auto;
+    max-height: unset;
+    max-width: unset;
+    position: static;
+    overflow-y: visible;
+    width: auto;
+  }
+  #app-root.show-contents .graph-title {
+    background: white;
+    padding-right: calc(3em + 2 * var(--stage-padding));
+    min-height: 3em;
+  }
+  #app-root.show-contents .contents .hide-contents {
+    position: absolute;
+    top: var(--stage-padding);
+    right: var(--stage-padding);
+  }
+}
+@media (min-width: 768px) {
+  button.ico.show-contents,
+  button.ico.hide-contents {
+    display: none;
+  }
 }

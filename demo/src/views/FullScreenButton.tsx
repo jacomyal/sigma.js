@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useRef, useState } from "react";
-import { useSigma } from "react-sigma-v2";
 import { BsArrowsFullscreen, BsFullscreenExit } from "react-icons/bs";
 
 function toggleFullScreen() {
@@ -12,8 +11,7 @@ function toggleFullScreen() {
   }
 }
 
-export const FullScreenButton: FC = () => {
-  const sigma = useSigma();
+const FullScreenButton: FC = () => {
   const [isFullScreen, setFullScreen] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLButtonElement>(null);
@@ -26,7 +24,7 @@ export const FullScreenButton: FC = () => {
     return () => {
       document.onfullscreenchange = null;
     };
-  }, [isFullScreen, useSigma]);
+  }, [isFullScreen]);
 
   if (!document.fullscreenEnabled) return null;
 
@@ -42,3 +40,5 @@ export const FullScreenButton: FC = () => {
     </button>
   );
 };
+
+export default FullScreenButton;

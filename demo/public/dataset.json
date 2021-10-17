@@ -24226,47 +24226,47 @@
   "tags": [
     {
       "key": "Chart type",
-      "image": "./images/charttype.svg"
+      "image": "charttype.svg"
     },
     {
       "key": "Company",
-      "image": "./images/company.svg"
+      "image": "company.svg"
     },
     {
       "key": "Concept",
-      "image": "./images/concept.svg"
+      "image": "concept.svg"
     },
     {
       "key": "Field",
-      "image": "./images/field.svg"
+      "image": "field.svg"
     },
     {
       "key": "List",
-      "image": "./images/list.svg"
+      "image": "list.svg"
     },
     {
       "key": "Method",
-      "image": "./images/method.svg"
+      "image": "method.svg"
     },
     {
       "key": "Organization",
-      "image": "./images/organization.svg"
+      "image": "organization.svg"
     },
     {
       "key": "Person",
-      "image": "./images/person.svg"
+      "image": "person.svg"
     },
     {
       "key": "Technology",
-      "image": "./images/technology.svg"
+      "image": "technology.svg"
     },
     {
       "key": "Tool",
-      "image": "./images/tool.svg"
+      "image": "tool.svg"
     },
     {
       "key": "unknown",
-      "image": "./images/unknown.svg"
+      "image": "unknown.svg"
     }
   ]
 }

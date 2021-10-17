@@ -18,7 +18,11 @@ const GraphDataController: FC<{ dataset: Dataset; filters: FiltersState }> = ({ 
     const tags = keyBy(dataset.tags, "key");
 
     dataset.nodes.forEach((node) =>
-      graph.addNode(node.key, { ...node, ...omit(clusters[node.cluster], "key"), ...omit(tags[node.tag], "key") }),
+      graph.addNode(node.key, {
+        ...node,
+        ...omit(clusters[node.cluster], "key"),
+        image: `${process.env.PUBLIC_URL}/images/${tags[node.tag].image}`,
+      }),
     );
     dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
 

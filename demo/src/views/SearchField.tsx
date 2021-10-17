@@ -11,7 +11,7 @@ import { FiltersState } from "../types";
  * 1. We need to hide hidden nodes from results
  * 2. We need custom markup
  */
-export const SearchField: FC<{ filters: FiltersState }> = ({ filters }) => {
+const SearchField: FC<{ filters: FiltersState }> = ({ filters }) => {
   const sigma = useSigma();
 
   const [search, setSearch] = useState<string>("");
@@ -83,3 +83,5 @@ export const SearchField: FC<{ filters: FiltersState }> = ({ filters }) => {
     </div>
   );
 };
+
+export default SearchField;
