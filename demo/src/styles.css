@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Andada+Pro&family=Lato:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora&family=Public+Sans:ital@0;1&display=swap");
 
 /**
  * VARIABLES:
@@ -24,12 +24,14 @@
  * ************
  */
 body {
-  font-family: Lato, sans-serif;
+  font-family: "Public Sans", sans-serif;
   background: white;
+  font-size: 0.9em;
+  overflow: hidden;
 }
 h1,
 h2 {
-  font-family: "Andada Pro", serif;
+  font-family: Lora, serif;
 }
 h2 {
   font-size: 1.3em;
@@ -115,7 +117,7 @@ body {
 button.ico {
   display: block;
   position: relative;
-  font-size: 1.5em;
+  font-size: 1.8em;
   width: 2em;
   height: 2em;
   border-radius: var(--border-radius);
