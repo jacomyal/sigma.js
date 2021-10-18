@@ -12,7 +12,7 @@ import Captor, { getX, getY, getWheelDelta, getMouseCoords } from "./captor";
 /**
  * Constants.
  */
-const DRAG_TIMEOUT = 200;
+const DRAG_TIMEOUT = 100;
 const DRAGGED_EVENTS_TOLERANCE = 3;
 const MOUSE_INERTIA_DURATION = 200;
 const MOUSE_INERTIA_RATIO = 3;
