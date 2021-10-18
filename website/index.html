@@ -30,7 +30,7 @@
               ><strong class="text-grey">.js</strong>
             </a>
           </div>
-          <ul>
+          <ul class="internal">
             <li><a href="#architecture">Architecture</a></li>
             <li><a href="#quickstart">Quick start</a></li>
             <li><a href="#usecases">Use cases</a></li>
@@ -90,9 +90,18 @@
         <div>
           <iframe src="./demo/index.html" allowfullscreen="true" width="100%"></iframe>
         </div>
-        <div class="overlay" onclick="this.remove()" tabindex="1">
-          <h2 class="text-title">See sigma.js in action</h2>
-          <p>Click here to explore a network of wikipedia pages about data visualization.</p>
+        <div class="overlay" onclick="this.classList.add('hide')" tabindex="1">
+          <h2 class="text-title"><span class="bg">See sigma.js in action</span></h2>
+          <div>
+            <span class="bg">Click here to explore a network of wikipedia pages about data visualization.</span>
+          </div>
+        </div>
+        <div class="caption">
+          <a class="button" href="./demo/index.html"> open demo </a>
+          <a class="button" href="https://github.com/jacomyal/sigma.js/tree/main/demo"> see sources on GitHub </a>
+          <button class="button" onClick="document.querySelector('.overlay').classList.remove('hide')">
+            restore overlay over demo
+          </button>
         </div>
       </section>
 
@@ -152,11 +161,13 @@
       <section id="usecases">
         <h2>Use cases</h2>
         <div class="usecase row">
-          <div class="thumbnail" style="background-image: url(./assets/images/thumbnail-display.png)"></div>
+          <a class="thumbnail" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file">
+            <div style="background-image: url(./assets/images/thumbnail-display.png)"></div>
+          </a>
           <div>
             <h2>Display</h2>
             <p>
-              The most basic use case: You have a graph dataset, with colors, sizes and positions for each node. For
+              The most basic use case: you have a graph dataset, with colors, sizes and positions for each node. For
               instance, you exported a <a href="https://gephi.org/gexf/format/">GEXF graph file</a> from
               <a href="https://gephi.org/">Gephi</a>. You want to visualize it using on a web page.
             </p>
@@ -168,7 +179,9 @@
           </div>
         </div>
         <div class="usecase row">
-          <div class="thumbnail" style="background-image: url(./assets/images/thumbnail-explore.png)"></div>
+          <a class="thumbnail" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/use-reducers">
+            <div style="background-image: url(./assets/images/thumbnail-explore.png)"></div>
+          </a>
           <div>
             <h2>Explore</h2>
             <p>
@@ -183,7 +196,9 @@
           </div>
         </div>
         <div class="usecase row">
-          <div class="thumbnail" style="background-image: url(./assets/images/thumbnail-interact.png)"></div>
+          <a class="thumbnail" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/mouse-manipulations">
+            <div style="background-image: url(./assets/images/thumbnail-interact.png)"></div>
+          </a>
           <div>
             <h2>Interact</h2>
             <p>
@@ -198,7 +213,9 @@
           </div>
         </div>
         <div class="usecase row">
-          <div class="thumbnail" style="background-image: url(./assets/images/thumbnail-customize.png)"></div>
+          <a class="thumbnail" href="https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering">
+            <div style="background-image: url(./assets/images/thumbnail-customize.png)"></div>
+          </a>
           <div>
             <h2>Customize</h2>
             <p>
@@ -262,7 +279,7 @@
             <h3>And within an <a href="https://angular.io/">Angular</a> application?</h3>
             <p>
               Yes it is possible, but harder, because we do not have a wrapper yet. So you will have to bind sigma.js
-              lifecycle to your app manually. It is not necessary too difficult though, please take a look on
+              lifecycle to your app manually. It is not necessarily too difficult though, please take a look on
               <a href="https://github.com/sim51/ng-sigma-example">this repository</a> which offers a quick example.
             </p>
           </li>
@@ -301,7 +318,11 @@
     <footer class="row">
       <section>
         <p>
-          Sigma.js is developed by <a href="https://medialab.sciencespo.fr/en/">Sciences-Po médialab</a> and
+          <span class="with-logo">
+            <img src="./assets/images/logo-sigma-ruby.svg" alt="" /> <strong class="text-ruby">sigma</strong
+            ><strong class="text-grey">.js</strong>
+          </span>
+          is developed by <a href="https://medialab.sciencespo.fr/en/">Sciences-Po médialab</a> and
           <a href="https://ouestware.com/en">OuestWare</a>.
         </p>
         <ul>

@@ -68,8 +68,12 @@
  * ***********
  */
 body {
-  font-family: "Public Sans", Lato, Arial, sans-serif;
   font-size: 1.2em;
+}
+body,
+input,
+button {
+  font-family: "Public Sans", Lato, Arial, sans-serif;
 }
 
 h1,
@@ -152,18 +156,12 @@ header .menu {
   flex-direction: row;
   align-items: flex-start;
 }
-header .panel {
-  padding: 0 2em;
-  margin: 0;
-  line-height: 1.6em;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
 header .panel ul {
   list-style: none;
   padding: 0;
+}
+header .panel ul.internal {
+  flex-grow: 1;
 }
 header .panel a {
   text-decoration: none;
@@ -180,12 +178,19 @@ header .menu {
   display: none;
 }
 header .menu .panel {
+  margin: 0;
+  line-height: 1.6em;
+  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6em 3em 2em 5em;
   position: fixed;
   background: white;
   border-right: 1px solid var(--grey);
   top: 0;
   left: 0;
-  padding: 0 3em 0 5em;
+  bottom: 0;
   transform: translate(-100%);
   transition: var(--transition);
 }
@@ -195,6 +200,9 @@ header .menu .panel {
   align-items: center;
   justify-content: center;
   z-index: 10;
+  background: #ffffffcc;
+  padding: 0.3em;
+  transform: translate(-0.3em, -0.3em);
 }
 #toggle-menu:checked + .menu .panel {
   transform: translate(0%);
@@ -210,7 +218,7 @@ a {
 a:hover {
   color: var(--dark-grey);
 }
-a.button {
+.button {
   display: inline-block;
   text-decoration: none;
   padding: 1em;
@@ -218,8 +226,11 @@ a.button {
   color: white;
   transition: var(--transition);
   text-align: center;
+  font-size: 1em;
+  border: none;
+  outline: none;
 }
-a.button:hover {
+.button:hover {
   color: white;
   background: var(--grey);
 }
@@ -274,6 +285,12 @@ main section.showcase iframe {
   height: var(--showcase-height);
   max-height: var(--showcase-max-height);
 }
+main section.showcase .caption {
+  max-width: var(--grid-size);
+  margin: auto;
+  font-size: 0.8em;
+  text-align: right;
+}
 main section.showcase .overlay {
   position: absolute;
   inset: 0;
@@ -284,15 +301,26 @@ main section.showcase .overlay {
   flex-direction: column;
   justify-content: center;
   cursor: pointer;
-  background: #666666dd;
+  background: #ffffff66;
   transition: var(--transition);
   overflow: hidden;
 }
 main section.showcase .overlay:hover {
-  background: #666666;
+  background: #ffffff99;
+}
+main section.showcase .overlay.hide {
+  display: none;
 }
 main section.showcase .overlay h2 {
-  margin: 0;
+  margin: 0 0 1px;
+}
+main section.showcase .overlay .bg {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #666666dd;
+}
+main section.showcase .overlay:hover .bg {
+  background: #666666;
 }
 main #architecture .schema {
   display: flex;
@@ -328,12 +356,20 @@ main #usecases .usecase:nth-child(2n + 1) {
   flex-direction: row-reverse;
 }
 main #usecases .thumbnail {
+  display: block;
   height: 400px;
   overflow: hidden;
   border: 1px solid var(--dark-grey);
+}
+main #usecases .thumbnail > div {
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  transition: var(--transition);
+}
+main #usecases .thumbnail:hover > div {
+  transform: scale(1.1);
 }
 main #faq ul {
   padding: 0;
@@ -374,13 +410,13 @@ footer ul {
   header .menu {
     padding: 1em;
   }
+  header .menu .panel {
+    padding: 6em 3em 2em 3em;
+  }
   #toggle-menu:checked + .menu .panel {
     background: #ffffffcc;
     width: 100vw;
-    height: 100vh;
     border: none;
-  }
-  #toggle-menu:checked + .menu .panel {
     margin: auto;
   }
   #toggle-menu:checked ~ .links {
@@ -390,6 +426,9 @@ footer ul {
   main,
   footer {
     max-width: 100%;
+  }
+  footer .with-logo img {
+    display: none;
   }
   main section.title {
     max-width: 100%;
