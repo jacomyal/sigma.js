@@ -13,8 +13,8 @@ void main(void) {
   vec4 color;
 
   if (v_texture.w > 0.0) {
-    vec4 texel = texture2D(u_atlas, v_texture.xy + gl_PointCoord * v_texture.zw);
-    color = vec4(mix(v_color, texel, texel.a).xyz, max(texel.a, v_color.a));
+    vec4 texel = texture2D(u_atlas, v_texture.xy + gl_PointCoord * v_texture.zw, -1.0);
+    color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
   } else {
     color = v_color;
   }
