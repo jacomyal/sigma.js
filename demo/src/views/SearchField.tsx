@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
+import React, { KeyboardEvent, ChangeEvent, FC, useEffect, useState } from "react";
 import { useSigma } from "react-sigma-v2";
 import { Attributes } from "graphology-types";
 import { BsSearch } from "react-icons/bs";
@@ -32,6 +32,7 @@ const SearchField: FC<{ filters: FiltersState }> = ({ filters }) => {
 
   // Refresh values when search is updated:
   useEffect(() => refreshValues(), [search]);
+
   // Refresh values when filters are updated (but wait a frame first):
   useEffect(() => {
     requestAnimationFrame(refreshValues);
@@ -69,9 +70,23 @@ const SearchField: FC<{ filters: FiltersState }> = ({ filters }) => {
     }
   };
 
+  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && values.length) {
+      setSearch(values[0].label);
+      setSelected(values[0].id);
+    }
+  };
+
   return (
     <div className="search-wrapper">
-      <input type="search" placeholder="Search in nodes..." list="nodes" value={search} onChange={onInputChange} />
+      <input
+        type="search"
+        placeholder="Search in nodes..."
+        list="nodes"
+        value={search}
+        onChange={onInputChange}
+        onKeyPress={onKeyPress}
+      />
       <BsSearch className="icon" />
       <datalist id="nodes">
         {values.map((value: { id: string; label: string }) => (
