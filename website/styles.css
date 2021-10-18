@@ -4,6 +4,7 @@
   --dark-grey: #666;
   --cream: #f9f7ed;
   --grid-size: 1000px;
+  --title-size: 550px;
   --showcase-width: 1400px;
   --showcase-height: 800px;
   --showcase-max-height: calc(100vh - 2em);
@@ -249,7 +250,7 @@ main > section {
 }
 main section.title {
   font-size: 1.4em;
-  max-width: 55%;
+  max-width: var(--title-size);
   margin: auto;
   min-height: 70vh;
   display: flex;
