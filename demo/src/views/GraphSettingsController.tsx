@@ -42,7 +42,7 @@ const GraphSettingsController: FC<{ hoveredNode: string | null }> = ({ children,
         ? (edge, data) =>
             graph.hasExtremity(edge, hoveredNode)
               ? { ...data, color: hoveredColor, size: 4 }
-              : { ...data, color: EDGE_FADE_COLOR, size: 0.2 }
+              : { ...data, color: EDGE_FADE_COLOR, hidden: true }
         : null,
     );
   }, [hoveredNode]);
