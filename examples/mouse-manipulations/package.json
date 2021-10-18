@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "graphology": "^0.21.0",
+    "graphology": "^0.21.1",
     "sigma": "latest",
     "chroma-js": "^2.1.2",
     "uuid": "^8.3.2"

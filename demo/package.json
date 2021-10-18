@@ -9,7 +9,7 @@
     "@types/react": "^17.0.29",
     "@types/react-dom": "^17.0.9",
     "babel-loader": "8.1.0",
-    "graphology": "^0.21.0",
+    "graphology": "^0.21.1",
     "graphology-layout-forceatlas2": "^0.6.1",
     "graphology-types": "^0.20.0",
     "lodash": "^4.17.21",

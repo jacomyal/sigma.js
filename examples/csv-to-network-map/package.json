@@ -9,7 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/papaparse": "^5.2.6",
-    "graphology": "^0.21.0",
+    "graphology": "^0.21.1",
     "graphology-components": "^1.1.0",
     "graphology-layout": "^0.4.0",
     "graphology-layout-forceatlas2": "^0.6.1",
