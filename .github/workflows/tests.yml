@@ -14,10 +14,10 @@ jobs:
         with:
           node-version: 12
 
-      - name: Install, Lint & Test
+      - name: Install, Lint & Unit test
         run: |
           npm i
-          npm test
+          npm run unit:test
 
       - name: E2e tests
         id: e2e
