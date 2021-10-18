@@ -27,16 +27,18 @@ const GraphDataController: FC<{ dataset: Dataset; filters: FiltersState }> = ({ 
     dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
 
     // Use degrees as node sizes:
-    const degrees = graph.nodes().map((node) => graph.degree(node));
-    const minDegree = Math.min(...degrees);
-    const maxDegree = Math.max(...degrees);
+    const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
+    const minDegree = Math.min(...scores);
+    const maxDegree = Math.max(...scores);
     const MIN_NODE_SIZE = 3;
     const MAX_NODE_SIZE = 30;
     graph.forEachNode((node) =>
       graph.setNodeAttribute(
         node,
         "size",
-        ((graph.degree(node) - minDegree) / (maxDegree - minDegree)) * (MAX_NODE_SIZE - MIN_NODE_SIZE) + MIN_NODE_SIZE,
+        ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
+          (MAX_NODE_SIZE - MIN_NODE_SIZE) +
+          MIN_NODE_SIZE,
       ),
     );
 
