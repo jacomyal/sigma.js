@@ -13,14 +13,14 @@
     "config": "webpack.config.js"
   },
   "dependencies": {
-    "@types/papaparse": "^5.2.6",
+    "@types/papaparse": "^5.3.0",
     "chroma-js": "^2.1.2",
     "graphology": "^0.21.1",
     "graphology-components": "^1.1.0",
-    "graphology-gexf": "^0.8.0",
+    "graphology-gexf": "^0.8.1",
     "graphology-layout": "^0.4.0",
     "graphology-layout-forceatlas2": "^0.6.1",
-    "graphology-operators": "^1.4.0",
+    "graphology-operators": "^1.4.1",
     "iwanthue": "^1.5.0",
     "papaparse": "^5.3.1",
     "uuid": "^8.3.2"
