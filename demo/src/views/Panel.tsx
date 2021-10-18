@@ -15,7 +15,7 @@ const Panel: FC<{ title: JSX.Element | string; initiallyDeployed?: boolean }> = 
   useEffect(() => {
     if (isDeployed)
       setTimeout(() => {
-        if (dom.current) dom.current.scrollIntoView({ behavior: "smooth",  });
+        if (dom.current) dom.current.parentElement!.scrollTo({ top: dom.current.offsetTop - 5, behavior: "smooth" });
       }, DURATION);
   }, [isDeployed]);
 
