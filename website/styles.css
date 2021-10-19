@@ -187,7 +187,7 @@ header .menu .panel {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6em 3em 2em 5em;
+  padding: 6em 5em 2em;
   position: fixed;
   background: white;
   box-shadow: var(--box-shadow);
@@ -445,10 +445,10 @@ footer ul {
     padding: 1em;
   }
   header .menu .panel {
-    padding: 6em 3em 2em 3em;
+    padding: 6em 4em 2em;
   }
   #toggle-menu:checked + .menu .panel {
-    background: #ffffffcc;
+    background: #ffffffee;
     width: 100vw;
     border: none;
     margin: auto;
