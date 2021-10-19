@@ -226,7 +226,7 @@ a:hover {
   text-decoration: none;
   padding: 1em;
   background: var(--dark-grey);
-  color: white;
+  color: white !important;
   transition: var(--transition);
   text-align: center;
   font-size: 1em;
@@ -241,10 +241,10 @@ a:hover {
   box-sizing: border-box;
   background: white;
   border: 1px solid var(--dark-grey);
-  color: black;
+  color: black !important;
 }
 .button[disabled] {
-  color: var(--dark-grey);
+  color: var(--dark-grey) !important;
   border-color: var(--grey);
   cursor: default;
 }
