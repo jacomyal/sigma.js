@@ -395,9 +395,14 @@ main #usecases .thumbnail:hover > div {
 }
 main #faq ul {
   padding: 0;
+  list-style: none;
 }
 main #faq h3 {
-  margin-top: 2em;
+  margin-top: 2.4em;
+  margin-bottom: 0;
+}
+main #faq p {
+  margin-top: 0.5em;
 }
 
 /**
