@@ -11,6 +11,7 @@
   --showcase-max-height: calc(100vh - 2em);
   --transition: all ease-out 300ms;
   --hover-opacity: 0.7;
+  --box-shadow: 0 0 8px var(--dark-grey);
 }
 
 .text-grey {
@@ -189,11 +190,11 @@ header .menu .panel {
   padding: 6em 3em 2em 5em;
   position: fixed;
   background: white;
-  border-right: 1px solid var(--grey);
+  box-shadow: var(--box-shadow);
   top: 0;
   left: 0;
   bottom: 0;
-  transform: translate(-100%);
+  transform: translate(calc(-100% - 10px));
   transition: var(--transition);
 }
 #toggle-menu + .menu label {
@@ -287,17 +288,23 @@ main section.title h1 {
 }
 main section.showcase {
   position: relative;
-  border: 1px solid var(--dark-grey);
   max-width: var(--showcase-width);
+}
+main section.showcase .wrapper {
+  position: relative;
+  box-shadow: 0 0 8px var(--grey);
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+}
+main section.showcase .wrapper,
+main section.showcase iframe {
+  width: 100%;
   height: var(--showcase-height);
   max-height: var(--showcase-max-height);
-  margin-bottom: 4em;
+  overflow: hidden;
 }
 main section.showcase iframe {
-  border: 0;
-  max-width: var(--showcase-width);
-  height: var(--showcase-height);
-  max-height: var(--showcase-max-height);
+  border: none;
 }
 main section.showcase .caption {
   font-size: 0.8em;
@@ -381,7 +388,7 @@ main #usecases .thumbnail {
   display: block;
   height: 400px;
   overflow: hidden;
-  border: 1px solid var(--dark-grey);
+  box-shadow: 0 0 8px var(--dark-grey);
 }
 main #usecases .thumbnail > div {
   height: 100%;
