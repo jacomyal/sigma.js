@@ -61,7 +61,7 @@ const DescriptionPanel: FC = () => {
           betweenness centrality
         </a>
         . More central nodes (ie. bigger nodes) are important crossing points in the network. Finally, You can click a
-        node to open the related Wikipedia article
+        node to open the related Wikipedia article.
       </p>
     </Panel>
   );
