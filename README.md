@@ -50,7 +50,9 @@ Also, a more realistic sigma.js based web application is available in the [`demo
 
 ## Website
 
-The current website is a simple manually crafted single-page web site. It is located in the `website` folder. It also showcases the React.js based demo available in the [`demo`](./demo) folder in an iframe. The website itself does not need any build step, though the demo does.
+The current website is a simple manually crafted single-page website. It is located in the `website` folder. It also showcases the React.js based demo available in the [`demo`](./demo) folder in an iframe. The website itself does not need any build step, though the demo does.
+
+It has been kindly designed by [Robin de Mourat](https://github.com/robindemourat/) from the [Sciences-Po médialab](https://medialab.sciencespo.fr/en/) team.
 
 ### Development
 
