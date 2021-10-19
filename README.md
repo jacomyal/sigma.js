@@ -1,20 +1,20 @@
 [![Build Status](https://github.com/jacomyal/sigma.js/workflows/Tests/badge.svg)](https://github.com/jacomyal/sigma.js/actions)
 
-# Sigma v2
+# Sigma.js
 
-Sigma is a JavaScript library dedicated to graph drawing, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal).
+[Sigma.js](https://www.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of nodes and edges, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal).
 
 ## Overview
 
-[sigmajs.org website](https://www.sigmajs.org) provides a global overview of sigma.js v1.
+### Architecture
 
-As of version `v2`, `sigma` focuses on the management of graph display: layout, rendering, interaction... The graph model is managed in a separate library called [`graphology`](https://github.com/graphology/graphology), which is packed with convenience methods to manage graph data structures.
+Since version `v2`, sigma.js focuses on the management of graph display: rendering, interaction... The graph model is managed in a separate library called **[graphology](https://github.com/graphology/graphology)**, which is packed with convenience methods to manage graph data structures, and a lot of satellite libraries to handle various graph-related problems (metrics, community detection, layout algorithms...).
 
-A set of demo examples contain various use-cases that might help you understand how to use sigma v2 (read further below).
+Graphology website offers [a list](https://graphology.github.io/standard-library.html) of these libraries. Most of them can help you solve problems in your sigma.js based web applications.
 
-### Status
+### Rendering
 
-Sigma.js v2 is a major refactoring and is currently in version alpha. The stable version is `v1.2.x`. Although not yet finalized and official, v2 is already in use in production in some organizations.
+Sigma.js uses **WebGL** to render graphs. This makes it good at rendering medium to larger graphs in web pages (thousands of nodes and edges or more). It is also possible to customize rendering, but it is harder than it would be with SVG or Canvas based solutions.
 
 ## Installation
 
