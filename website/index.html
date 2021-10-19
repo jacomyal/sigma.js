@@ -90,18 +90,18 @@
         <div>
           <iframe src="./demo/index.html" allowfullscreen="true" width="100%"></iframe>
         </div>
-        <div class="overlay" onclick="this.classList.add('hide')" tabindex="1">
+        <div class="overlay" tabindex="0">
           <h2 class="text-title"><span class="bg">See sigma.js in action</span></h2>
           <div>
-            <span class="bg">Click here to explore a network of wikipedia pages about data visualization.</span>
+            <span class="bg">Click here to explore a network of Wikipedia pages about data visualization.</span>
           </div>
         </div>
         <div class="caption">
-          <a class="button" href="./demo/index.html"> open demo </a>
-          <a class="button" href="https://github.com/jacomyal/sigma.js/tree/main/demo"> see sources on GitHub </a>
-          <button class="button" onClick="document.querySelector('.overlay').classList.remove('hide')">
-            restore overlay over demo
-          </button>
+          <div class="links">
+            <a href="./demo/index.html">open demo</a>
+            <a href="https://github.com/jacomyal/sigma.js/tree/main/demo">open demo sources</a>
+          </div>
+          <button class="button button-light restore-overlay-button" disabled>restore overlay over demo</button>
         </div>
       </section>
 
@@ -346,6 +346,26 @@
         </p>
       </section>
     </footer>
+
+    <!-- Tracking -->
     <img src="https://matomo.ouestware.com/matomo.php?idsite=26&rec=1&action_name=Homepage&send_image=0" alt="" />
+
+    <!-- Demo overlay interactions -->
+    <script>
+      (() => {
+        const overlay = document.querySelector(".overlay");
+        const button = document.querySelector(".restore-overlay-button");
+
+        overlay.addEventListener("click", () => {
+          overlay.classList.add("hide");
+          button.removeAttribute("disabled");
+        });
+
+        button.addEventListener("click", () => {
+          overlay.classList.remove("hide");
+          button.setAttribute("disabled", "true");
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -4,11 +4,13 @@
   --dark-grey: #666;
   --cream: #f9f7ed;
   --grid-size: 1000px;
+  --grid-h-padding: 2em;
   --title-size: 550px;
   --showcase-width: 1400px;
   --showcase-height: 800px;
   --showcase-max-height: calc(100vh - 2em);
   --transition: all ease-out 300ms;
+  --hover-opacity: 0.7;
 }
 
 .text-grey {
@@ -200,7 +202,7 @@ header .menu .panel {
   align-items: center;
   justify-content: center;
   z-index: 10;
-  background: #ffffffcc;
+  background: #ffffff;
   padding: 0.3em;
   transform: translate(-0.3em, -0.3em);
 }
@@ -229,10 +231,21 @@ a:hover {
   font-size: 1em;
   border: none;
   outline: none;
+  cursor: pointer;
 }
-.button:hover {
-  color: white;
-  background: var(--grey);
+.button:not([disabled]):hover {
+  opacity: var(--hover-opacity);
+}
+.button.button-light {
+  box-sizing: border-box;
+  background: white;
+  border: 1px solid var(--dark-grey);
+  color: black;
+}
+.button[disabled] {
+  color: var(--dark-grey);
+  border-color: var(--grey);
+  cursor: default;
 }
 
 .with-logo {
@@ -252,7 +265,7 @@ a:hover {
  * *************
  */
 main {
-  padding: 2em 1em;
+  padding: 2em var(--grid-h-padding);
   flex-grow: 1;
 }
 main > section {
@@ -278,6 +291,7 @@ main section.showcase {
   max-width: var(--showcase-width);
   height: var(--showcase-height);
   max-height: var(--showcase-max-height);
+  margin-bottom: 4em;
 }
 main section.showcase iframe {
   border: 0;
@@ -286,10 +300,18 @@ main section.showcase iframe {
   max-height: var(--showcase-max-height);
 }
 main section.showcase .caption {
-  max-width: var(--grid-size);
-  margin: auto;
   font-size: 0.8em;
-  text-align: right;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+main section.showcase .caption .button {
+  padding: 0.5em;
+}
+main section.showcase .caption a {
+  white-space: nowrap;
+  margin-right: 1em;
 }
 main section.showcase .overlay {
   position: absolute;
@@ -383,7 +405,7 @@ main #faq h3 {
  * *******
  */
 footer {
-  padding: 2em 1em;
+  padding: 2em var(--grid-h-padding);
   max-width: var(--grid-size);
   margin: auto;
 }
@@ -426,9 +448,6 @@ footer ul {
   main,
   footer {
     max-width: 100%;
-  }
-  footer .with-logo img {
-    display: none;
   }
   main section.title {
     max-width: 100%;
