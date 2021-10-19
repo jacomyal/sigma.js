@@ -1,7 +1,7 @@
 {
   "name": "sigma",
-  "version": "2.0.0-beta16",
-  "description": "A JavaScript library dedicated to graph drawing.",
+  "version": "2.0.0",
+  "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "main": "index.js",
