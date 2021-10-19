@@ -6,7 +6,7 @@ Sigma is a JavaScript library dedicated to graph drawing, mainly developed by [@
 
 ## Overview
 
-[sigmajs.org website](http://sigmajs.org) provides a global overview of sigma.js v1.
+[sigmajs.org website](https://www.sigmajs.org) provides a global overview of sigma.js v1.
 
 As of version `v2`, `sigma` focuses on the management of graph display: layout, rendering, interaction... The graph model is managed in a separate library called [`graphology`](https://github.com/graphology/graphology), which is packed with convenience methods to manage graph data structures.
 
@@ -46,7 +46,7 @@ _List of available examples_
 - [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts)
 - [Displaying nodes in various custom ways](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering)
 
-Also, a more realistic sigma.js based web application is available in the [`demo`](./demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://sigmajs.org/).
+Also, a more realistic sigma.js based web application is available in the [`demo`](./demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://www.sigmajs.org/).
 
 ## Website
 

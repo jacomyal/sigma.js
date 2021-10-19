@@ -46,7 +46,7 @@ const DescriptionPanel: FC = () => {
           react
         </a>{" "}
         and{" "}
-        <a target="_blank" rel="noreferrer" href="https://sigmajs.org">
+        <a target="_blank" rel="noreferrer" href="https://www.sigmajs.org">
           sigma.js
         </a>
         . You can read the source code{" "}
