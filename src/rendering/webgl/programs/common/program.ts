@@ -13,6 +13,7 @@ export interface RenderParams {
   ratio: number;
   matrix: Float32Array;
   scalingRatio: number;
+  correctionRatio: number;
 }
 
 export interface IProgram {

@@ -32,6 +32,7 @@ import {
   requestFrame,
   validateGraph,
   zIndexOrdering,
+  getMatrixImpact,
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
@@ -122,6 +123,7 @@ export default class Sigma extends EventEmitter {
 
   private matrix: Float32Array = identity();
   private invMatrix: Float32Array = identity();
+  private correctionRatio = 1;
   private customBBox: { x: Extent; y: Extent } | null = null;
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
     x: [-Infinity, Infinity],
@@ -959,6 +961,7 @@ export default class Sigma extends EventEmitter {
         height: this.height,
         ratio: this.camera.ratio,
         nodesPowRatio: 0.5,
+        correctionRatio: this.correctionRatio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
     }
@@ -1023,6 +1026,7 @@ export default class Sigma extends EventEmitter {
     const padding = this.getSetting("stagePadding") || 0;
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
+    this.correctionRatio = getMatrixImpact(this.matrix, cameraState.ratio);
 
     // Drawing nodes
     for (const type in this.nodePrograms) {
@@ -1036,6 +1040,7 @@ export default class Sigma extends EventEmitter {
         height: this.height,
         ratio: cameraState.ratio,
         nodesPowRatio: 0.5,
+        correctionRatio: this.correctionRatio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
     }
@@ -1053,6 +1058,7 @@ export default class Sigma extends EventEmitter {
           height: this.height,
           ratio: cameraState.ratio,
           edgesPowRatio: 0.5,
+          correctionRatio: this.correctionRatio,
           scalingRatio: WEBGL_OVERSAMPLING_RATIO,
         });
       }

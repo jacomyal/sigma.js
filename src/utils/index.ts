@@ -9,7 +9,7 @@ import Graph from "graphology";
 import { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Extent, PlainObject } from "../types";
-import { multiply, identity, scale, rotate, translate } from "./matrices";
+import { multiply, identity, scale, rotate, translate, multiplyVec } from "./matrices";
 
 /**
  * Checks whether the given value is a plain object.
@@ -334,6 +334,20 @@ export function matrixFromCamera(
   }
 
   return matrix;
+}
+
+/**
+ * All these transformations we apply on the matrix to get it rescale the graph
+ * as we want make it very hard to get pixel-perfect distances in WebGL. This
+ * function returns the "magic ratio" that cancels all these transformations.
+ *
+ * To get this ratio, we simply watch how the matrix impacts a unit vector size,
+ * but ignoring the camera ratio impact.
+ */
+export function getMatrixImpact(matrix: Float32Array, cameraRatio: number): number {
+  const vect = [0, 1, 0];
+  const [x, y] = multiplyVec(matrix, vect);
+  return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / cameraRatio;
 }
 
 /**
