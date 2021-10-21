@@ -40,6 +40,8 @@ import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
 import { identity, multiplyVec } from "./utils/matrices";
+import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
+import hover from "./rendering/canvas/hover";
 
 const { nodeExtent } = graphExtent;
 
@@ -169,7 +171,7 @@ export default class Sigma extends EventEmitter {
     this.initializeCache();
 
     // Initializing contexts
-    this.createWebGLContext("edges");
+    this.createWebGLContext("edges", { preserveDrawingBuffer: true });
     this.createWebGLContext("nodes");
     this.createCanvasContext("edgeLabels");
     this.createCanvasContext("labels");
@@ -274,15 +276,17 @@ export default class Sigma extends EventEmitter {
    * Internal function used to create a canvas context and add the relevant
    * DOM elements.
    *
-   * @param  {string} id - Context's id.
+   * @param  {string}  id      - Context's id.
+   * @param  {object?} options - #getContext params to override (optional)
    * @return {Sigma}
    */
-  private createWebGLContext(id: string): this {
+  private createWebGLContext(id: string, options?: { preserveDrawingBuffer?: boolean; antialias?: boolean }): this {
     const canvas = this.createCanvas(id);
 
     const contextOptions = {
       preserveDrawingBuffer: false,
       antialias: false,
+      ...(options || {}),
     };
 
     let context;
@@ -518,6 +522,40 @@ export default class Sigma extends EventEmitter {
     graph.on("cleared", this.activeListeners.graphUpdate);
 
     return this;
+  }
+
+  /**
+   * Method looking for an edge colliding with a given point at (x, y). Returns
+   * the key of the edge if any, or null else.
+   */
+  private getEdgeAtPoint(x: number, y: number): string | null {
+    // Check first that pixel is colored:
+    if (!isPixelColored(this.webGLContexts.edges, x, y)) return null;
+
+    // Then, check for each edge if it collides with the point:
+    let match: string | null = null;
+
+    this.graph.forEachEdgeUntil((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
+      const { x: sourceX, y: sourceY } = this.graphToViewport({ x: sourcePosition.x, y: sourcePosition.y });
+      const { x: targetX, y: targetY } = this.graphToViewport({ x: targetPosition.x, y: targetPosition.y });
+      if (
+        doEdgeCollideWithPoint(
+          x,
+          y,
+          sourceX,
+          sourceY,
+          targetX,
+          targetY,
+          // Adapt the edge size to the zoom ratio:
+          this.scaleSize(edgeAttributes.size),
+        )
+      ) {
+        match = key;
+        return true;
+      }
+    });
+
+    return match;
   }
 
   /**
@@ -959,7 +997,7 @@ export default class Sigma extends EventEmitter {
         width: this.width,
         height: this.height,
         ratio: this.camera.ratio,
-        correctionRatio: this.correctionRatio,
+        correctionRatio: this.correctionRatio / this.camera.ratio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
     }
@@ -1024,7 +1062,7 @@ export default class Sigma extends EventEmitter {
     const padding = this.getSetting("stagePadding") || 0;
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
-    this.correctionRatio = getMatrixImpact(this.matrix, cameraState.ratio) / viewportDimensions.height;
+    this.correctionRatio = getMatrixImpact(this.matrix, viewportDimensions);
 
     // Drawing nodes
     for (const type in this.nodePrograms) {
@@ -1037,7 +1075,7 @@ export default class Sigma extends EventEmitter {
         width: this.width,
         height: this.height,
         ratio: cameraState.ratio,
-        correctionRatio: this.correctionRatio,
+        correctionRatio: this.correctionRatio / cameraState.ratio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
     }
@@ -1054,7 +1092,7 @@ export default class Sigma extends EventEmitter {
           width: this.width,
           height: this.height,
           ratio: cameraState.ratio,
-          correctionRatio: this.correctionRatio,
+          correctionRatio: this.correctionRatio / cameraState.ratio,
           scalingRatio: WEBGL_OVERSAMPLING_RATIO,
         });
       }

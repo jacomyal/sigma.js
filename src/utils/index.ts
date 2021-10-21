@@ -8,7 +8,7 @@
 import Graph from "graphology";
 import { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
-import { CameraState, Coordinates, Extent, PlainObject } from "../types";
+import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate, multiplyVec } from "./matrices";
 
 /**
@@ -131,6 +131,7 @@ export function getPixelRatio(): number {
  */
 export interface NormalizationFunction {
   (data: Coordinates): Coordinates;
+  ratio: number;
   inverse(data: Coordinates): Coordinates;
   applyTo(data: Coordinates): void;
 }
@@ -341,13 +342,13 @@ export function matrixFromCamera(
  * as we want make it very hard to get pixel-perfect distances in WebGL. This
  * function returns the "magic ratio" that cancels all these transformations.
  *
- * To get this ratio, we simply watch how the matrix impacts a unit vector size,
- * but ignoring the camera ratio impact.
+ * To get this ratio, compare the length of a vector of 1 vertical unit to its
+ * transposition through the matrix. We divide the result by the height to get
+ * the (0, 1) ratio WebGL will work with:.
  */
-export function getMatrixImpact(matrix: Float32Array, cameraRatio: number): number {
-  const vect = [0, 1, 0];
-  const [x, y] = multiplyVec(matrix, vect);
-  return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / cameraRatio;
+export function getMatrixImpact(matrix: Float32Array, viewportDimensions: Dimensions): number {
+  const [x, y] = multiplyVec(matrix, [0, 1, 0]);
+  return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / viewportDimensions.height;
 }
 
 /**
