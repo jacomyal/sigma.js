@@ -10,7 +10,8 @@ import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { AbstractEdgeProgram } from "./common/edge";
+import { RenderParams } from "./common/program";
 
 const POINTS = 2,
   ATTRIBUTES = 3;
@@ -95,7 +96,7 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
     array[i] = color;
   }
 
-  render(params: RenderEdgeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
     const program = this.program;
 

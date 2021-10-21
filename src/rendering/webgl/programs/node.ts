@@ -12,7 +12,8 @@ import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.vert.glsl";
 import fragmentShaderSource from "../shaders/node.frag.glsl";
-import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
+import { AbstractNodeProgram } from "./common/node";
+import { RenderParams } from "./common/program";
 
 const POINTS = 3,
   ATTRIBUTES = 5;
@@ -84,13 +85,13 @@ export default class NodeProgram extends AbstractNodeProgram {
     array[i] = ANGLE_3;
   }
 
-  render(params: RenderNodeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
     const program = this.program;
 
     gl.useProgram(program);
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+    gl.uniform1f(this.ratioLocation, 1 / Math.sqrt(params.ratio));
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);

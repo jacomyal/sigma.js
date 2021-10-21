@@ -8,10 +8,6 @@ import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { EdgeDisplayData, NodeDisplayData } from "../../../../types";
 import Sigma from "../../../../sigma";
 
-export interface RenderEdgeParams extends RenderParams {
-  edgesPowRatio: number;
-}
-
 export interface IEdgeProgram extends IProgram {
   computeIndices(): void;
   process(
@@ -21,7 +17,7 @@ export interface IEdgeProgram extends IProgram {
     hidden: boolean,
     offset: number,
   ): void;
-  render(params: RenderEdgeParams): void;
+  render(params: RenderParams): void;
 }
 
 /**
@@ -49,7 +45,7 @@ export abstract class AbstractEdgeProgram extends AbstractProgram implements IEd
     hidden: boolean,
     offset: number,
   ): void;
-  abstract render(params: RenderEdgeParams): void;
+  abstract render(params: RenderParams): void;
 }
 
 export interface EdgeProgramConstructor {
@@ -80,7 +76,7 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
       this.programs.forEach((program) => program.computeIndices());
     }
 
-    render(params: RenderEdgeParams): void {
+    render(params: RenderParams): void {
       this.programs.forEach((program) => {
         program.bind();
         program.bufferData();

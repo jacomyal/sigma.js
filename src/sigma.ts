@@ -48,7 +48,6 @@ const { nodeExtent } = graphExtent;
  */
 const PIXEL_RATIO = getPixelRatio();
 const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
-const SIZE_SCALING_EXPONENT = 0.5;
 
 /**
  * Important functions.
@@ -960,7 +959,6 @@ export default class Sigma extends EventEmitter {
         width: this.width,
         height: this.height,
         ratio: this.camera.ratio,
-        nodesPowRatio: 0.5,
         correctionRatio: this.correctionRatio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
@@ -1026,7 +1024,7 @@ export default class Sigma extends EventEmitter {
     const padding = this.getSetting("stagePadding") || 0;
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
-    this.correctionRatio = getMatrixImpact(this.matrix, cameraState.ratio);
+    this.correctionRatio = getMatrixImpact(this.matrix, cameraState.ratio) / viewportDimensions.height;
 
     // Drawing nodes
     for (const type in this.nodePrograms) {
@@ -1039,7 +1037,6 @@ export default class Sigma extends EventEmitter {
         width: this.width,
         height: this.height,
         ratio: cameraState.ratio,
-        nodesPowRatio: 0.5,
         correctionRatio: this.correctionRatio,
         scalingRatio: WEBGL_OVERSAMPLING_RATIO,
       });
@@ -1057,7 +1054,6 @@ export default class Sigma extends EventEmitter {
           width: this.width,
           height: this.height,
           ratio: cameraState.ratio,
-          edgesPowRatio: 0.5,
           correctionRatio: this.correctionRatio,
           scalingRatio: WEBGL_OVERSAMPLING_RATIO,
         });
@@ -1082,7 +1078,7 @@ export default class Sigma extends EventEmitter {
    */
   private updateCachedValues(): void {
     const { ratio } = this.camera.getState();
-    this.cameraSizeRatio = Math.pow(ratio, SIZE_SCALING_EXPONENT);
+    this.cameraSizeRatio = Math.sqrt(ratio);
   }
 
   /**---------------------------------------------------------------------------

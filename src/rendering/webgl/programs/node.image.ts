@@ -10,7 +10,8 @@ import { Coordinates, Dimensions, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.image.vert.glsl";
 import fragmentShaderSource from "../shaders/node.image.frag.glsl";
-import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
+import { AbstractNodeProgram } from "./common/node";
+import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
 
 const POINTS = 1,
@@ -131,7 +132,7 @@ export default function getNodeProgramImage() {
     texture: WebGLTexture;
     textureLocation: GLint;
     atlasLocation: WebGLUniformLocation;
-    latestRenderParams?: RenderNodeParams;
+    latestRenderParams?: RenderParams;
 
     constructor(gl: WebGLRenderingContext, renderer: Sigma) {
       super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
@@ -216,7 +217,7 @@ export default function getNodeProgramImage() {
       }
     }
 
-    render(params: RenderNodeParams): void {
+    render(params: RenderParams): void {
       this.latestRenderParams = params;
 
       const gl = this.gl;
@@ -224,7 +225,7 @@ export default function getNodeProgramImage() {
       const program = this.program;
       gl.useProgram(program);
 
-      gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+      gl.uniform1f(this.ratioLocation, 1 / Math.sqrt(params.ratio));
       gl.uniform1f(this.scaleLocation, params.scalingRatio);
       gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
       gl.uniform1i(this.atlasLocation, 0);

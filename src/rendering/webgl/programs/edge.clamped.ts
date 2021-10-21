@@ -9,10 +9,11 @@
  * @module
  */
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { AbstractEdgeProgram } from "./common/edge";
 import { floatColor, canUse32BitsIndices } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
+import { RenderParams } from "./common/program";
 
 const POINTS = 4,
   ATTRIBUTES = 7,
@@ -213,7 +214,7 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
   }
 
-  render(params: RenderEdgeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;
@@ -224,7 +225,7 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
     gl.uniform1f(this.cameraRatioLocation, params.ratio);
     gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
-    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
+    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.sqrt(params.ratio));
 
     // Drawing:
     gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);

@@ -9,7 +9,8 @@ import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.arrowHead.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.arrowHead.frag.glsl";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { AbstractEdgeProgram } from "./common/edge";
+import { RenderParams } from "./common/program";
 
 const POINTS = 3,
   ATTRIBUTES = 10,
@@ -182,7 +183,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     array[i] = 1;
   }
 
-  render(params: RenderEdgeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;
@@ -193,7 +194,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
     gl.uniform1f(this.cameraRatioLocation, params.ratio);
     gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
-    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.pow(params.ratio, params.edgesPowRatio));
+    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.sqrt(params.ratio));
 
     // Drawing:
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);

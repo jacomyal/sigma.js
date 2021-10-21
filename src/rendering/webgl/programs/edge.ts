@@ -19,7 +19,8 @@ import { floatColor, canUse32BitsIndices } from "../../../utils";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import vertexShaderSource from "../shaders/edge.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.frag.glsl";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { AbstractEdgeProgram } from "./common/edge";
+import { RenderParams } from "./common/program";
 
 const POINTS = 4,
   ATTRIBUTES = 5,
@@ -35,8 +36,8 @@ export default class EdgeProgram extends AbstractEdgeProgram {
   colorLocation: GLint;
   normalLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  ratioLocation: WebGLUniformLocation;
-  zoomLocation: WebGLUniformLocation;
+  sqrtZoomRatioLocation: WebGLUniformLocation;
+  correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
@@ -55,13 +56,13 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     if (matrixLocation === null) throw new Error("EdgeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null) throw new Error("EdgeProgram: error while getting ratioLocation");
-    this.ratioLocation = ratioLocation;
+    const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
+    if (correctionRatioLocation === null) throw new Error("EdgeProgram: error while getting correctionRatioLocation");
+    this.correctionRatioLocation = correctionRatioLocation;
 
-    const zoomLocation = gl.getUniformLocation(this.program, "u_zoom");
-    if (zoomLocation === null) throw new Error("EdgeProgram: error while getting zoomLocation");
-    this.zoomLocation = zoomLocation;
+    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
+    if (sqrtZoomRatioLocation === null) throw new Error("EdgeProgram: error while getting sqrtZoomRatioLocation");
+    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
 
     // Enabling the OES_element_index_uint extension
     // NOTE: on older GPUs, this means that really large graphs won't
@@ -191,18 +192,15 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     array[i] = color;
   }
 
-  render(params: RenderEdgeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
     const program = this.program;
 
     gl.useProgram(program);
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.zoomLocation, Math.pow(params.ratio, params.edgesPowRatio));
-    gl.uniform1f(
-      this.ratioLocation,
-      (params.correctionRatio * Math.pow(params.ratio, params.edgesPowRatio)) / params.height,
-    );
+    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     // Drawing:
     gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);

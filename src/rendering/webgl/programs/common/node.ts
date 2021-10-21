@@ -8,13 +8,9 @@ import { AbstractProgram, IProgram, RenderParams } from "./program";
 import { NodeDisplayData } from "../../../../types";
 import Sigma from "../../../../sigma";
 
-export interface RenderNodeParams extends RenderParams {
-  nodesPowRatio: number;
-}
-
 export interface INodeProgram extends IProgram {
   process(data: NodeDisplayData, hidden: boolean, offset: number): void;
-  render(params: RenderNodeParams): void;
+  render(params: RenderParams): void;
 }
 
 /**
@@ -118,7 +114,7 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
       // nothing todo, it's already done in each program constructor
     }
 
-    render(params: RenderNodeParams): void {
+    render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
     }
 

@@ -11,7 +11,8 @@ import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/node.fast.vert.glsl";
 import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
-import { AbstractNodeProgram, RenderNodeParams } from "./common/node";
+import { AbstractNodeProgram } from "./common/node";
+import { RenderParams } from "./common/program";
 
 const POINTS = 1,
   ATTRIBUTES = 4;
@@ -42,13 +43,13 @@ export default class NodeProgramFast extends AbstractNodeProgram {
     array[i] = color;
   }
 
-  render(params: RenderNodeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;
     gl.useProgram(program);
 
-    gl.uniform1f(this.ratioLocation, 1 / Math.pow(params.ratio, params.nodesPowRatio));
+    gl.uniform1f(this.ratioLocation, 1 / Math.sqrt(params.ratio));
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 

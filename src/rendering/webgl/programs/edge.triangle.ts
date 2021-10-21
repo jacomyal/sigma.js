@@ -9,7 +9,8 @@ import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.triangle.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.triangle.frag.glsl";
-import { AbstractEdgeProgram, RenderEdgeParams } from "./common/edge";
+import { AbstractEdgeProgram } from "./common/edge";
+import { RenderParams } from "./common/program";
 
 const POINTS = 3,
   ATTRIBUTES = 9;
@@ -157,7 +158,7 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
     // nothing todo ?
   }
 
-  render(params: RenderEdgeParams): void {
+  render(params: RenderParams): void {
     const gl = this.gl;
 
     const program = this.program;
@@ -165,7 +166,7 @@ export default class EdgeTriangleProgram extends AbstractEdgeProgram {
 
     // Binding uniforms
     gl.uniform2f(this.resolutionLocation, params.width, params.height);
-    gl.uniform1f(this.ratioLocation, params.ratio / Math.pow(params.ratio, params.edgesPowRatio));
+    gl.uniform1f(this.ratioLocation, params.ratio / Math.sqrt(params.ratio));
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
