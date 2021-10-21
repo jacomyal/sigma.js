@@ -566,7 +566,7 @@ export default class Sigma extends EventEmitter {
           targetPosition.x,
           targetPosition.y,
           // Adapt the edge size to the zoom ratio:
-          edgeAttributes.size * transformationRatio / this.cameraSizeRatio,
+          (edgeAttributes.size * transformationRatio) / this.cameraSizeRatio,
         )
       ) {
         match = key;

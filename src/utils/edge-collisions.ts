@@ -4,8 +4,8 @@
  */
 export function isPixelColored(gl: WebGLRenderingContext, x: number, y: number): boolean {
   const pixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4);
-  gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-  return pixels[(gl.drawingBufferHeight - y) * 4 * gl.drawingBufferWidth + x * 4 + 3] > 0;
+  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+  return pixels[3] > 0;
 }
 
 /**
