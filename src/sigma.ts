@@ -532,22 +532,41 @@ export default class Sigma extends EventEmitter {
     // Check first that pixel is colored:
     if (!isPixelColored(this.webGLContexts.edges, x, y)) return null;
 
-    // Then, check for each edge if it collides with the point:
+    // Check for each edge if it collides with the point:
     let match: string | null = null;
+    const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
 
+    // To translate edge thicknesses to the graph system, we observe by how much
+    // the length of a non-null edge is transformed to between the graph system
+    // and the viewport system:
+    let transformationRatio = 0;
+    this.graph.forEachEdgeUntil((_k, _e, _s, _t, { x: xs, y: ys }, { x: xt, y: yt }) => {
+      if (xs !== xt || ys !== yt) {
+        const graphLength = Math.sqrt(Math.pow(xt - xs, 2) + Math.pow(yt - ys, 2));
+
+        const { x: vp_xs, y: vp_ys } = this.graphToViewport({ x: xs, y: ys });
+        const { x: vp_xt, y: vp_yt } = this.graphToViewport({ x: xt, y: yt });
+        const viewportLength = Math.sqrt(Math.pow(vp_xt - vp_xs, 2) + Math.pow(vp_yt - vp_ys, 2));
+
+        transformationRatio = graphLength / viewportLength;
+        return true;
+      }
+    });
+    // If no non-null edge has been found, return null:
+    if (!transformationRatio) return null;
+
+    // Now we can look for a matching edge:
     this.graph.forEachEdgeUntil((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
-      const { x: sourceX, y: sourceY } = this.graphToViewport({ x: sourcePosition.x, y: sourcePosition.y });
-      const { x: targetX, y: targetY } = this.graphToViewport({ x: targetPosition.x, y: targetPosition.y });
       if (
         doEdgeCollideWithPoint(
-          x,
-          y,
-          sourceX,
-          sourceY,
-          targetX,
-          targetY,
+          graphX,
+          graphY,
+          sourcePosition.x,
+          sourcePosition.y,
+          targetPosition.x,
+          targetPosition.y,
           // Adapt the edge size to the zoom ratio:
-          this.scaleSize(edgeAttributes.size),
+          edgeAttributes.size * transformationRatio / this.cameraSizeRatio,
         )
       ) {
         match = key;

@@ -344,7 +344,7 @@ export function matrixFromCamera(
  *
  * To get this ratio, compare the length of a vector of 1 vertical unit to its
  * transposition through the matrix. We divide the result by the height to get
- * the (0, 1) ratio WebGL will work with:.
+ * the (0, 1) ratio WebGL will work with.
  */
 export function getMatrixImpact(matrix: Float32Array, viewportDimensions: Dimensions): number {
   const [x, y] = multiplyVec(matrix, [0, 1, 0]);
