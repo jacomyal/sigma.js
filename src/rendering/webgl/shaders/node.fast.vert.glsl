@@ -12,7 +12,6 @@ varying float v_border;
 const float bias = 255.0 / 254.0;
 
 void main() {
-
   gl_Position = vec4(
     (u_matrix * vec3(a_position, 1)).xy,
     0,

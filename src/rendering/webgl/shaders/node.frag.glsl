@@ -1,21 +1,20 @@
 precision mediump float;
 
-varying vec4 color;
-varying vec2 center;
-varying float radius;
+varying vec4 v_color;
+varying vec2 v_diffVector;
+varying float v_radius;
+varying float v_border;
 
-const vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
-const float border_size = 0.8;
+const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
-  float dist = length(gl_FragCoord.xy - center);
+  float dist = length(v_diffVector) - v_radius;
 
-  float t = smoothstep(
-    radius + border_size,
-    radius - border_size,
-    dist
-  );
+  float t = 0.0;
+  if (dist > v_border)
+    t = 1.0;
+  else if (dist > 0.0)
+    t = dist / v_border;
 
-  // Here is how we draw a disc instead of a square:
-  gl_FragColor = mix(color0, color, t);
+  gl_FragColor = mix(v_color, transparent, t);
 }
