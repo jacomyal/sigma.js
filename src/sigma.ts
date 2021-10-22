@@ -1081,7 +1081,7 @@ export default class Sigma extends EventEmitter {
     const padding = this.getSetting("stagePadding") || 0;
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
-    this.correctionRatio = getMatrixImpact(this.matrix, viewportDimensions);
+    this.correctionRatio = getMatrixImpact(this.matrix, cameraState, viewportDimensions);
 
     // Drawing nodes
     for (const type in this.nodePrograms) {

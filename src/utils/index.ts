@@ -340,15 +340,27 @@ export function matrixFromCamera(
 /**
  * All these transformations we apply on the matrix to get it rescale the graph
  * as we want make it very hard to get pixel-perfect distances in WebGL. This
- * function returns the "magic ratio" that cancels all these transformations.
+ * function returns a factor that properly cancels the matrix effect on lengths.
  *
- * To get this ratio, compare the length of a vector of 1 vertical unit to its
- * transposition through the matrix. We divide the result by the height to get
- * the (0, 1) ratio WebGL will work with.
+ * [jacomyal]
+ * To be fully honest, I can't really explain happens here... I notice that the
+ * following ratio works (ie. it correctly compensates the matrix impact on all
+ * camera states I could try):
+ * > `R = size(V) / size(M * V) / W`
+ * as long as `M * V` is in the direction of W (ie. parallel to (Ox)). It works
+ * as well with H and a vector that transforms into something parallel to (Oy).
+ *
+ * Also, note that we use `angle` and not `-angle` (that would seem logical,
+ * since we want to anticipate the rotation), because of the fact that in WebGL,
+ * the image is vertically swapped.
  */
-export function getMatrixImpact(matrix: Float32Array, viewportDimensions: Dimensions): number {
-  const [x, y] = multiplyVec(matrix, [0, 1, 0]);
-  return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / viewportDimensions.height;
+export function getMatrixImpact(
+  matrix: Float32Array,
+  cameraState: CameraState,
+  viewportDimensions: Dimensions,
+): number {
+  const [x, y] = multiplyVec(matrix, [Math.cos(cameraState.angle), Math.sin(cameraState.angle), 0]);
+  return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / viewportDimensions.width;
 }
 
 /**

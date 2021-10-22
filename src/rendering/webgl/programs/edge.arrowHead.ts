@@ -13,7 +13,7 @@ import { AbstractEdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
 
 const POINTS = 3,
-  ATTRIBUTES = 10,
+  ATTRIBUTES = 9,
   STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
@@ -21,14 +21,11 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
   positionLocation: GLint;
   colorLocation: GLint;
   normalLocation: GLint;
-  thicknessLocation: GLint;
   radiusLocation: GLint;
   barycentricLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  scaleLocation: WebGLUniformLocation;
-  cameraRatioLocation: WebGLUniformLocation;
-  viewportRatioLocation: WebGLUniformLocation;
-  thicknessRatioLocation: WebGLUniformLocation;
+  sqrtZoomRatioLocation: WebGLUniformLocation;
+  correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
@@ -37,32 +34,21 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
-    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
     this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
 
     // Uniform locations
-    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting scaleLocation");
-    this.scaleLocation = scaleLocation;
-
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
-    if (cameraRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting cameraRatioLocation");
-    this.cameraRatioLocation = cameraRatioLocation;
+    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
+    if (sqrtZoomRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting sqrtZoomRatioLocation");
+    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
 
-    const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
-    if (viewportRatioLocation === null)
-      throw new Error("EdgeArrowHeadProgram: error while getting viewportRatioLocation");
-    this.viewportRatioLocation = viewportRatioLocation;
-
-    const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
-    if (thicknessRatioLocation === null)
-      throw new Error("EdgeArrowHeadProgram: error while getting thicknessRatioLocation");
-    this.thicknessRatioLocation = thicknessRatioLocation;
+    const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
+    if (correctionRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting correctionRatioLocation");
+    this.correctionRatioLocation = correctionRatioLocation;
 
     this.bind();
   }
@@ -73,22 +59,20 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.normalLocation);
-    gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.radiusLocation);
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.barycentricLocation);
 
     gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
-    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
+    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
     gl.vertexAttribPointer(
       this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      24,
+      20,
     );
 
     // TODO: maybe we can optimize here by packing this in a bit mask
@@ -98,7 +82,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
       gl.FLOAT,
       false,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      28,
+      24,
     );
   }
 
@@ -138,8 +122,8 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     if (len) {
       len = 1 / Math.sqrt(len);
 
-      n1 = -dy * len;
-      n2 = dx * len;
+      n1 = -dy * len * thickness;
+      n2 = dx * len * thickness;
     }
 
     let i = POINTS * ATTRIBUTES * offset;
@@ -151,7 +135,6 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
-    array[i++] = thickness;
     array[i++] = radius;
     array[i++] = color;
     array[i++] = 1;
@@ -163,7 +146,6 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
-    array[i++] = thickness;
     array[i++] = radius;
     array[i++] = color;
     array[i++] = 0;
@@ -175,7 +157,6 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
-    array[i++] = thickness;
     array[i++] = radius;
     array[i++] = color;
     array[i++] = 0;
@@ -190,11 +171,9 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     gl.useProgram(program);
 
     // Binding uniforms
-    gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.cameraRatioLocation, params.ratio);
-    gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
-    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.sqrt(params.ratio));
+    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     // Drawing:
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);

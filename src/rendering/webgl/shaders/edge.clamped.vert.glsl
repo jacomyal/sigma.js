@@ -1,48 +1,43 @@
-attribute vec2 a_position;
-attribute vec2 a_normal;
-attribute float a_thickness;
 attribute vec4 a_color;
+attribute vec2 a_normal;
+attribute vec2 a_position;
 attribute float a_radius;
 
 uniform mat3 u_matrix;
-uniform float u_scale;
-uniform float u_cameraRatio;
-uniform float u_viewportRatio;
-uniform float u_thicknessRatio;
+uniform float u_sqrtZoomRatio;
+uniform float u_correctionRatio;
 
 varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-const float arrowHeadLengthThicknessRatio = 2.5;
-const float minThickness = 0.8;
+const float minThickness = 1.7;
 const float bias = 255.0 / 254.0;
+const float arrowHeadLengthThicknessRatio = 2.5;
 
 void main() {
+  float normalLength = length(a_normal);
+  vec2 unitNormal = a_normal / normalLength;
 
-  // Computing thickness in screen space:
-  float thickness = a_thickness * u_thicknessRatio * u_scale * u_viewportRatio / 2.0;
-  thickness = max(thickness, minThickness * u_viewportRatio);
+  // These first computations are taken from edge.vert.glsl. Please read it to
+  // get better comments on what's happening:
+  float pixelsThickness = max(normalLength, minThickness * u_sqrtZoomRatio);
+  float webGLThickness = pixelsThickness * u_correctionRatio;
+  float adaptedWebGLThickness = webGLThickness * u_sqrtZoomRatio;
 
+  // Here, we move the point to leave space for the arrow head:
   float direction = sign(a_radius);
-  float nodeRadius = direction * a_radius * u_thicknessRatio * u_viewportRatio;
-  float arrowHeadLength = thickness * 2.0 * arrowHeadLengthThicknessRatio;
+  float adaptedWebGLNodeRadius = direction * a_radius * 2.0 * u_correctionRatio * u_sqrtZoomRatio;
+  float adaptedWebGLArrowHeadLength = adaptedWebGLThickness * 2.0 * arrowHeadLengthThicknessRatio;
 
-  vec2 arrowHeadVector = vec2(-direction * a_normal.y, direction * a_normal.x);
+  vec2 compensationVector = vec2(-direction * unitNormal.y, direction * unitNormal.x) * (adaptedWebGLNodeRadius + adaptedWebGLArrowHeadLength);
 
-  // Add normal vector to the position in screen space, but correct thickness first:
-  vec2 position = a_position + a_normal * thickness * u_cameraRatio;
-  // Add vector that corrects the arrow head length:
-  position = position + arrowHeadVector * (arrowHeadLength + nodeRadius) * u_cameraRatio;
-  // Apply camera
-  position = (u_matrix * vec3(position, 1)).xy;
+  // Here is the proper position of the vertex
+  gl_Position = vec4((u_matrix * vec3(a_position + unitNormal * adaptedWebGLThickness + compensationVector, 1)).xy, 0, 1);
 
-  gl_Position = vec4(position, 0, 1);
+  v_thickness = webGLThickness / u_sqrtZoomRatio;
 
-  v_normal = a_normal;
-  v_thickness = thickness;
-
-  // Extract the color:
+  v_normal = unitNormal;
   v_color = a_color;
   v_color.a *= bias;
 }

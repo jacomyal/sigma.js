@@ -16,7 +16,7 @@ import fragmentShaderSource from "../shaders/edge.frag.glsl";
 import { RenderParams } from "./common/program";
 
 const POINTS = 4,
-  ATTRIBUTES = 7,
+  ATTRIBUTES = 6,
   STRIDE = POINTS * ATTRIBUTES;
 
 export default class EdgeClampedProgram extends AbstractEdgeProgram {
@@ -27,13 +27,10 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
   positionLocation: GLint;
   colorLocation: GLint;
   normalLocation: GLint;
-  thicknessLocation: GLint;
   radiusLocation: GLint;
-  scaleLocation: WebGLUniformLocation;
   matrixLocation: WebGLUniformLocation;
-  cameraRatioLocation: WebGLUniformLocation;
-  viewportRatioLocation: WebGLUniformLocation;
-  thicknessRatioLocation: WebGLUniformLocation;
+  sqrtZoomRatioLocation: WebGLUniformLocation;
+  correctionRatioLocation: WebGLUniformLocation;
   canUse32BitsIndices: boolean;
 
   constructor(gl: WebGLRenderingContext) {
@@ -48,31 +45,21 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     this.positionLocation = gl.getAttribLocation(this.program, "a_position");
     this.colorLocation = gl.getAttribLocation(this.program, "a_color");
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
-    this.thicknessLocation = gl.getAttribLocation(this.program, "a_thickness");
     this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
 
     // Uniform locations
-    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null) throw new Error("EdgeClampedProgram: error while getting scaleLocation");
-    this.scaleLocation = scaleLocation;
-
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null) throw new Error("EdgeClampedProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const cameraRatioLocation = gl.getUniformLocation(this.program, "u_cameraRatio");
-    if (cameraRatioLocation === null) throw new Error("EdgeClampedProgram: error while getting cameraRatioLocation");
-    this.cameraRatioLocation = cameraRatioLocation;
+    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
+    if (sqrtZoomRatioLocation === null) throw new Error("EdgeClampedProgram: error while getting cameraRatioLocation");
+    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
 
-    const viewportRatioLocation = gl.getUniformLocation(this.program, "u_viewportRatio");
-    if (viewportRatioLocation === null)
+    const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
+    if (correctionRatioLocation === null)
       throw new Error("EdgeClampedProgram: error while getting viewportRatioLocation");
-    this.viewportRatioLocation = viewportRatioLocation;
-
-    const thicknessRatioLocation = gl.getUniformLocation(this.program, "u_thicknessRatio");
-    if (thicknessRatioLocation === null)
-      throw new Error("EdgeClampedProgram: error while getting thicknessRatioLocation");
-    this.thicknessRatioLocation = thicknessRatioLocation;
+    this.correctionRatioLocation = correctionRatioLocation;
 
     // Enabling the OES_element_index_uint extension
     // NOTE: on older GPUs, this means that really large graphs won't
@@ -96,22 +83,20 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     // Bindings
     gl.enableVertexAttribArray(this.positionLocation);
     gl.enableVertexAttribArray(this.normalLocation);
-    gl.enableVertexAttribArray(this.thicknessLocation);
     gl.enableVertexAttribArray(this.colorLocation);
     gl.enableVertexAttribArray(this.radiusLocation);
 
     gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(this.thicknessLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
     gl.vertexAttribPointer(
       this.colorLocation,
       4,
       gl.UNSIGNED_BYTE,
       true,
       ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      20,
+      16,
     );
-    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 24);
+    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 20);
   }
 
   process(
@@ -144,8 +129,9 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
 
     if (len) {
       len = 1 / Math.sqrt(len);
-      n1 = -dy * len;
-      n2 = dx * len;
+
+      n1 = -dy * len * thickness;
+      n2 = dx * len * thickness;
     }
 
     let i = POINTS * ATTRIBUTES * offset;
@@ -157,7 +143,6 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     array[i++] = y1;
     array[i++] = n1;
     array[i++] = n2;
-    array[i++] = thickness;
     array[i++] = color;
     array[i++] = 0;
 
@@ -166,7 +151,6 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     array[i++] = y1;
     array[i++] = -n1;
     array[i++] = -n2;
-    array[i++] = thickness;
     array[i++] = color;
     array[i++] = 0;
 
@@ -175,7 +159,6 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     array[i++] = y2;
     array[i++] = n1;
     array[i++] = n2;
-    array[i++] = thickness;
     array[i++] = color;
     array[i++] = radius;
 
@@ -184,7 +167,6 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
-    array[i++] = thickness;
     array[i++] = color;
     array[i] = -radius;
   }
@@ -221,11 +203,9 @@ export default class EdgeClampedProgram extends AbstractEdgeProgram {
     gl.useProgram(program);
 
     // Binding uniforms
-    gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.cameraRatioLocation, params.ratio);
-    gl.uniform1f(this.viewportRatioLocation, 1 / Math.min(params.width, params.height));
-    gl.uniform1f(this.thicknessRatioLocation, 1 / Math.sqrt(params.ratio));
+    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     // Drawing:
     gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
