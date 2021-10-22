@@ -41,7 +41,6 @@ import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
 import { identity, multiplyVec } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
-import hover from "./rendering/canvas/hover";
 
 const { nodeExtent } = graphExtent;
 
@@ -142,10 +141,13 @@ export default class Sigma extends EventEmitter {
   private displayedLabels: Set<string> = new Set();
   private highlightedNodes: Set<string> = new Set();
   private hoveredNode: string | null = null;
+  private hoveredEdge: string | null = null;
   private renderFrame: number | null = null;
   private renderHighlightedNodesFrame: number | null = null;
   private needToProcess = false;
   private needToSoftProcess = false;
+  private mousePosition: Coordinates = { x: 0, y: 0 };
+  private checkEdgesEventsFrame: number | null = null;
 
   // programs
   private nodePrograms: { [key: string]: INodeProgram } = {};
@@ -435,6 +437,18 @@ export default class Sigma extends EventEmitter {
           return this.scheduleHighlightedNodesRender();
         }
       }
+
+      if (this.settings.enableEdgeHoverEvents === true) {
+        this.checkEdgeHoverEvents();
+      } else if (this.settings.enableEdgeHoverEvents === "debounce") {
+        if (!this.checkEdgesEventsFrame)
+          this.checkEdgesEventsFrame = requestFrame(() => {
+            this.checkEdgeHoverEvents();
+            this.checkEdgesEventsFrame = null;
+          });
+      }
+
+      this.mousePosition = { x: e.x, y: e.y };
     };
 
     // Handling click
@@ -452,6 +466,12 @@ export default class Sigma extends EventEmitter {
             ...baseEvent,
             node: this.hoveredNode,
           });
+
+        if (eventType === "wheel" ? this.settings.enableEdgeWheelEvents : this.settings.enableEdgeClickEvents) {
+          const edge = this.getEdgeAtPoint(e.x, e.y);
+          if (edge) return this.emit(`${eventType}Edge`, { ...baseEvent, edge });
+        }
+
         return this.emit(`${eventType}Stage`, baseEvent);
       };
     };
@@ -525,10 +545,29 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method dealing with "leaveEdge" and "enterEdge" events.
+   *
+   * @return {Sigma}
+   */
+  private checkEdgeHoverEvents(): this {
+    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(this.mousePosition.x, this.mousePosition.y);
+
+    if (edgeToHover !== this.hoveredEdge) {
+      if (this.hoveredEdge) this.emit("leaveEdge", { edge: this.hoveredEdge });
+      if (edgeToHover) this.emit("enterEdge", { edge: edgeToHover });
+      this.hoveredEdge = edgeToHover;
+    }
+
+    return this;
+  }
+
+  /**
    * Method looking for an edge colliding with a given point at (x, y). Returns
    * the key of the edge if any, or null else.
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
+    const { edgeDataCache, nodeDataCache } = this;
+
     // Check first that pixel is colored:
     if (!isPixelColored(this.webGLContexts.edges, x, y)) return null;
 
@@ -540,7 +579,9 @@ export default class Sigma extends EventEmitter {
     // the length of a non-null edge is transformed to between the graph system
     // and the viewport system:
     let transformationRatio = 0;
-    this.graph.forEachEdgeUntil((_k, _e, _s, _t, { x: xs, y: ys }, { x: xt, y: yt }) => {
+    this.graph.forEachEdgeUntil((key, _, sourceId, targetId, { x: xs, y: ys }, { x: xt, y: yt }) => {
+      if (edgeDataCache[key].hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
+
       if (xs !== xt || ys !== yt) {
         const graphLength = Math.sqrt(Math.pow(xt - xs, 2) + Math.pow(yt - ys, 2));
 
