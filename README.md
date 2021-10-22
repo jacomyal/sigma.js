@@ -16,6 +16,8 @@ Graphology website offers [a list](https://graphology.github.io/standard-library
 
 Sigma.js uses **WebGL** to render graphs. This makes it good at rendering medium to larger graphs in web pages (thousands of nodes and edges or more). It is also possible to customize rendering, but it is harder than it would be with SVG or Canvas based solutions.
 
+Each way to draw a node or an edge is implemented as a `program`. You can develop your own, or use the owns provided by sigma. You can check [this example](./examples/custom-rendering/index.ts) to see how to use multiple programs. Also, you can check the list of available programs [here](./src/rendering/webgl/programs).
+
 ## Installation
 
 You can install `sigma` (and `graphology` which is required for `sigma` to work) in your JavaScript or TypeScript project using `npm`:
