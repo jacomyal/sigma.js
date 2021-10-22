@@ -596,22 +596,24 @@ export default class Sigma extends EventEmitter {
     if (!transformationRatio) return null;
 
     // Now we can look for a matching edge:
-    return this.graph.findEdge((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
-      if (
-        doEdgeCollideWithPoint(
-          graphX,
-          graphY,
-          sourcePosition.x,
-          sourcePosition.y,
-          targetPosition.x,
-          targetPosition.y,
-          // Adapt the edge size to the zoom ratio:
-          (edgeAttributes.size * transformationRatio) / this.cameraSizeRatio,
-        )
-      ) {
-        return true;
-      }
-    }) || null;
+    return (
+      this.graph.findEdge((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
+        if (
+          doEdgeCollideWithPoint(
+            graphX,
+            graphY,
+            sourcePosition.x,
+            sourcePosition.y,
+            targetPosition.x,
+            targetPosition.y,
+            // Adapt the edge size to the zoom ratio:
+            (edgeAttributes.size * transformationRatio) / this.cameraSizeRatio,
+          )
+        ) {
+          return true;
+        }
+      }) || null
+    );
   }
 
   /**
