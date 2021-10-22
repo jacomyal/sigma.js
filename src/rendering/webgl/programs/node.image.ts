@@ -28,7 +28,7 @@ type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeProgramImage() {
+export default function getNodeImageProgram(): unknown {
   /**
    * These attributes are shared between all instances of this exact class,
    * returned by this call to getNodeProgramImage:
@@ -128,7 +128,7 @@ export default function getNodeProgramImage() {
     rebindTextureFns.forEach((fn) => fn());
   }
 
-  return class NodeProgramImage extends AbstractNodeProgram {
+  return class NodeImageProgram extends AbstractNodeProgram {
     texture: WebGLTexture;
     textureLocation: GLint;
     atlasLocation: WebGLUniformLocation;

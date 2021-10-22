@@ -17,7 +17,7 @@ import { RenderParams } from "./common/program";
 const POINTS = 1,
   ATTRIBUTES = 4;
 
-export default class NodeProgramFast extends AbstractNodeProgram {
+export default class NodeFastProgram extends AbstractNodeProgram {
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
     this.bind();
