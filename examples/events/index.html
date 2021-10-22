@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sigma example: Events</title>
+  </head>
+  <body>
+    <style>
+      html,
+      body,
+      #sigma-container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      #sigma-container .sigma-mouse {
+        z-index: 100;
+      }
+      #sigma-logs {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      #sigma-logs > div {
+        padding: 3px;
+      }
+      #sigma-logs > div > span {
+        background: #ffffff99;
+      }
+    </style>
+    <div id="sigma-container"></div>
+    <div id="sigma-logs"></div>
+    <script src="build/bundle.js"></script>
+  </body>
+</html>

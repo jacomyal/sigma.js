@@ -46,6 +46,7 @@ _List of available examples_
 - [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts)
 - [Displaying nodes in various custom ways](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering)
 - [Saving the graph as a PNG image](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/png-snapshot)
+- [Use events to implement interactions](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/events)
 
 Also, a more realistic sigma.js based web application is available in the [`demo`](./demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://www.sigmajs.org/).
 
