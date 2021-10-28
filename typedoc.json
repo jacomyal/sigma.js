@@ -1,0 +1,13 @@
+{
+  "entryPointStrategy": "Expand",
+  "entryPoints": ["./src/sigma.ts", "./src/index.ts", "./src/settings.ts", "./src/types.ts", "./src/core"],
+  "exclude": ["./node_modules"],
+  "excludePrivate": true,
+  "includeVersion": true,
+  "out": "website/docs",
+  "readme": "./README.md",
+  "markedOptions": {
+    "breaks": true,
+    "gfm": true
+  }
+}
