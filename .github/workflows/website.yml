@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: 16
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build website
         run: npm run website:all
 
