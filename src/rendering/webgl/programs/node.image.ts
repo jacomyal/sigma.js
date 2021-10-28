@@ -61,6 +61,7 @@ export default function getNodeProgramImage() {
     images[imageSource] = { status: "loading" };
 
     // Load image:
+    image.setAttribute('crossOrigin', '');
     image.src = imageSource;
   }
 
