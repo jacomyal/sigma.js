@@ -8,8 +8,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "graphology": "^0.21.1",
-    "graphology-gexf": "^0.8.1",
+    "graphology": "^0.22.1",
+    "graphology-gexf": "^0.9.0",
     "sigma": "latest"
   },
   "devDependencies": {
