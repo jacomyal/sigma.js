@@ -114,7 +114,7 @@ body {
  * USEFUL CLASSES:
  * ***************
  */
-button.ico {
+div.ico > button {
   display: block;
   position: relative;
   font-size: 1.8em;
@@ -129,10 +129,10 @@ button.ico {
   margin-top: 0.2em;
   cursor: pointer;
 }
-button.ico:hover {
+div.ico > button:hover {
   color: var(--dark-grey);
 }
-button.ico > * {
+div.ico > button > * {
   position: absolute;
   inset: 0;
   left: 50%;

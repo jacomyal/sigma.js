@@ -1,24 +1,24 @@
 import React, { FC, useEffect, useState } from "react";
-import { SigmaContainer } from "react-sigma-v2";
+import { SigmaContainer, ZoomControl, FullScreenControl } from "react-sigma-v2";
+
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import { omit, mapValues, keyBy, constant } from "lodash";
 
 import GraphSettingsController from "./GraphSettingsController";
 import GraphEventsController from "./GraphEventsController";
 import GraphDataController from "./GraphDataController";
-import FullScreenButton from "./FullScreenButton";
 import DescriptionPanel from "./DescriptionPanel";
 import { Dataset, FiltersState } from "../types";
 import ClustersPanel from "./ClustersPanel";
 import SearchField from "./SearchField";
-import ZoomButtons from "./ZoomButtons";
 import drawLabel from "../canvas-utils";
 import GraphTitle from "./GraphTitle";
 import TagsPanel from "./TagsPanel";
 
 import "react-sigma-v2/lib/react-sigma-v2.css";
 import { GrClose } from "react-icons/gr";
-import { BiBookContent } from "react-icons/bi";
+import { BiRadioCircleMarked, BiBookContent } from "react-icons/bi";
+import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
 
 const Root: FC = () => {
   const [showContents, setShowContents] = useState(false);
@@ -70,26 +70,39 @@ const Root: FC = () => {
         {dataReady && (
           <>
             <div className="controls">
-              <button
-                type="button"
-                className="ico show-contents"
-                onClick={() => setShowContents(true)}
-                title="Show caption and description"
-              >
-                <BiBookContent />
-              </button>
-              <FullScreenButton />
-              <ZoomButtons />
+              <div className="ico">
+                <button
+                  type="button"
+                  className="show-contents"
+                  onClick={() => setShowContents(true)}
+                  title="Show caption and description"
+                >
+                  <BiBookContent />
+                </button>
+              </div>
+              <FullScreenControl
+                className="ico"
+                customEnterFullScreen={<BsArrowsFullscreen />}
+                customExitFullScreen={<BsFullscreenExit />}
+              />
+              <ZoomControl
+                className="ico"
+                customZoomIn={<BsZoomIn />}
+                customZoomOut={<BsZoomOut />}
+                customZoomCenter={<BiRadioCircleMarked />}
+              />
             </div>
             <div className="contents">
-              <button
-                type="button"
-                className="ico hide-contents"
-                onClick={() => setShowContents(false)}
-                title="Show caption and description"
-              >
-                <GrClose />
-              </button>
+              <div className="ico">
+                <button
+                  type="button"
+                  className="ico hide-contents"
+                  onClick={() => setShowContents(false)}
+                  title="Show caption and description"
+                >
+                  <GrClose />
+                </button>
+              </div>
               <GraphTitle filters={filtersState} />
               <div className="panels">
                 <SearchField filters={filtersState} />
