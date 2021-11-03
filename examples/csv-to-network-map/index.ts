@@ -17,8 +17,7 @@ import Papa from "papaparse";
 import Graph from "graphology";
 import circular from "graphology-layout/circular";
 import forceAtlas2 from "graphology-layout-forceatlas2";
-import { largestConnectedComponent } from "graphology-components";
-import subgraph from "graphology-operators/subgraph";
+import { largestConnectedComponentSubgraph } from "graphology-components";
 
 // 1. Load CSV file:
 Papa.parse<{ name: string; acronym: string; subject_terms: string }>("./data.csv", {
@@ -51,7 +50,7 @@ Papa.parse<{ name: string; acronym: string; subject_terms: string }>("./data.csv
     });
 
     // 3. Only keep the main connected component:
-    graph = subgraph(graph, largestConnectedComponent(graph));
+    graph = largestConnectedComponentSubgraph(graph);
 
     // 4. Add colors to the nodes, based on node types:
     const COLORS: Record<string, string> = { institution: "#FA5A3D", subject: "#5A75DB" };
