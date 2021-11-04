@@ -39,7 +39,6 @@ const fa2Layout = new FA2Layout(graph, {
 // A button to trigger the layout start/stop actions
 
 // A variable is used to toggle state between start and stop
-let FA2isRunning = false;
 let cancelCurrentAnimation: (() => void) | null = null;
 
 // correlate start/stop actions with state management
@@ -47,19 +46,17 @@ function stopFA2() {
   fa2Layout.stop();
   FA2StartLabel.style.display = "flex";
   FA2StopLabel.style.display = "none";
-  FA2isRunning = false;
 }
 function startFA2() {
   if (cancelCurrentAnimation) cancelCurrentAnimation();
   fa2Layout.start();
   FA2StartLabel.style.display = "none";
   FA2StopLabel.style.display = "flex";
-  FA2isRunning = true;
 }
 
 // the main toggle function
 function toggleFA2Layout() {
-  if (FA2isRunning) {
+  if (fa2Layout.isRunning()) {
     stopFA2();
   } else {
     startFA2();
@@ -74,7 +71,7 @@ FA2Button.addEventListener("click", toggleFA2Layout);
 /** Alternatively a random layout algo exists in graphology: https://github.com/graphology/graphology-layout#random  */
 function randomLayout() {
   // stop fa2 if running
-  if (FA2isRunning) stopFA2();
+  if (fa2Layout.isRunning()) stopFA2();
   if (cancelCurrentAnimation) cancelCurrentAnimation();
 
   // to keep positions scale uniform between layouts, we first calculate positions extents
@@ -105,7 +102,7 @@ randomButton.addEventListener("click", randomLayout);
 /** This example shows how to use an existing deterministic graphology layout */
 function circularLayout() {
   // stop fa2 if running
-  if (FA2isRunning) stopFA2();
+  if (fa2Layout.isRunning()) stopFA2();
   if (cancelCurrentAnimation) cancelCurrentAnimation();
 
   //since we want to use animations we need to process positions before applying them through animateNodes

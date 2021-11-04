@@ -10,7 +10,7 @@
   "dependencies": {
     "graphology": "^0.22.1",
     "graphology-layout": "^0.4.0",
-    "graphology-layout-forceatlas2": "^0.6.1",
+    "graphology-layout-forceatlas2": "^0.8.1",
     "sigma": "latest"
   },
   "devDependencies": {
