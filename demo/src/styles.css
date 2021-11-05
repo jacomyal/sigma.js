@@ -328,8 +328,8 @@ ul > li {
   }
 }
 @media (min-width: 768px) {
-  button.ico.show-contents,
-  button.ico.hide-contents {
-    display: none;
+  button.show-contents,
+  button.hide-contents {
+    display: none !important;
   }
 }
