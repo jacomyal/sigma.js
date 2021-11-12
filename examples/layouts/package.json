@@ -8,8 +8,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "graphology": "^0.22.1",
-    "graphology-layout": "^0.4.0",
+    "graphology": "^0.23.0",
+    "graphology-layout": "^0.4.1",
     "graphology-layout-forceatlas2": "^0.8.1",
     "sigma": "latest"
   },
