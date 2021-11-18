@@ -435,21 +435,8 @@ export default class Sigma extends EventEmitter {
     // Handling click
     const createClickListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
-        const quadNodes = getQuadNodes(e.x, e.y);
-
-        for (let i = 0, l = quadNodes.length; i < l; i++) {
-          const node = quadNodes[i];
-
-          const data = this.nodeDataCache[node];
-
-          const pos = this.framedGraphToViewport(data);
-
-          const size = this.scaleSize(data.size);
-
-          if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size))
-            return this.emit(`${eventType}Node`, { node, captor: e, event: e });
-        }
-
+        if (this.hoveredNode)
+            return this.emit(`${eventType}Node`, { node: this.hoveredNode, captor: e, event: e });
         return this.emit(`${eventType}Stage`, { event: e });
       };
     };
