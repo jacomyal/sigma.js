@@ -25,7 +25,7 @@ Papa.parse<{ name: string; acronym: string; subject_terms: string }>("./data.csv
   header: true,
   delimiter: ",",
   complete: (results) => {
-    let graph: Graph = new Graph();
+    const graph: Graph = new Graph();
 
     // 2. Build the bipartite graph:
     results.data.forEach((line) => {

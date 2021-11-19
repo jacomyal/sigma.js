@@ -15,4 +15,5 @@ graph.addNode("Mary", { x: 10, y: 0, size: 3, label: "Mary" });
 
 graph.addEdge("John", "Mary");
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const renderer = new Sigma(graph, container);

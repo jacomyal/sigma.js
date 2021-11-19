@@ -19,16 +19,16 @@ graph.import(data);
 // Retrieve some useful DOM elements:
 const container = document.getElementById("sigma-container") as HTMLElement;
 
-const FA2Button = document.getElementById("forceatlas2");
+const FA2Button = document.getElementById("forceatlas2") as HTMLElement;
 const FA2StopLabel = document.getElementById("forceatlas2-stop-label") as HTMLElement;
 const FA2StartLabel = document.getElementById("forceatlas2-start-label") as HTMLElement;
 
-const randomButton = document.getElementById("random");
+const randomButton = document.getElementById("random") as HTMLElement;
 
-const circularButton = document.getElementById("circular");
+const circularButton = document.getElementById("circular") as HTMLElement;
 
-/*** FA2 LAYOUT ***/
-/** This example shows how to use the force atlas 2 layout in a web worker */
+/** FA2 LAYOUT **/
+/* This example shows how to use the force atlas 2 layout in a web worker */
 
 // Graphology provides a easy to use implementation of Force Atlas 2 in a web worker
 const sensibleSettings = forceAtlas2.inferSettings(graph);
@@ -65,10 +65,10 @@ function toggleFA2Layout() {
 // bind method to the forceatlas2 button
 FA2Button.addEventListener("click", toggleFA2Layout);
 
-/*** RANDOM LAYOUT ***/
-/** Layout can be handled manually by setting nodes x and y attributes */
-/** This random layout has been coded to show how to manipulate positions directly in the graph instance */
-/** Alternatively a random layout algo exists in graphology: https://github.com/graphology/graphology-layout#random  */
+/** RANDOM LAYOUT **/
+/* Layout can be handled manually by setting nodes x and y attributes */
+/* This random layout has been coded to show how to manipulate positions directly in the graph instance */
+/* Alternatively a random layout algo exists in graphology: https://github.com/graphology/graphology-layout#random  */
 function randomLayout() {
   // stop fa2 if running
   if (fa2Layout.isRunning()) stopFA2();
@@ -98,8 +98,8 @@ function randomLayout() {
 // bind method to the random button
 randomButton.addEventListener("click", randomLayout);
 
-/*** CIRCULAR LAYOUT ***/
-/** This example shows how to use an existing deterministic graphology layout */
+/** CIRCULAR LAYOUT **/
+/* This example shows how to use an existing deterministic graphology layout */
 function circularLayout() {
   // stop fa2 if running
   if (fa2Layout.isRunning()) stopFA2();
@@ -114,5 +114,6 @@ function circularLayout() {
 // bind method to the random button
 circularButton.addEventListener("click", circularLayout);
 
-/*** instantiate sigma into the container */
+/** instantiate sigma into the container **/
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const renderer = new Sigma(graph, container);

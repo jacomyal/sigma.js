@@ -3,12 +3,14 @@ import Graph, { GraphConstructor } from "graphology-types";
 
 import Sigma from "../../src";
 import { NodeDisplayData, EdgeDisplayData } from "../../src/types";
+import { NodeProgramConstructor } from "../../src/rendering/webgl/programs/common/node";
+import { EdgeProgramConstructor } from "../../src/rendering/webgl/programs/common/edge";
 
 type TestDependencies = {
   Graph: GraphConstructor;
   Sigma: typeof Sigma;
   data: { [key: string]: Graph };
-  programs: { [key: string]: any };
+  programs: { [key: string]: NodeProgramConstructor | EdgeProgramConstructor };
   container: HTMLElement;
 };
 

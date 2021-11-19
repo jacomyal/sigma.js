@@ -62,6 +62,7 @@ graph.nodes().forEach((node, i) => {
   graph.setNodeAttribute(node, "y", 100 * Math.sin(angle));
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const renderer = new Sigma(graph, container, {
   // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
   nodeProgramClasses: {

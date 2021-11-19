@@ -29,7 +29,7 @@ function logEvent(event: string, itemType?: "node" | "edge", item?: string): voi
 
 const renderer = new Sigma(graph, container, {
   enableEdgeClickEvents: true,
-  enableEdgeHoverEvents: 'debounce',
+  enableEdgeHoverEvents: "debounce",
 });
 
 ["enterNode", "leaveNode", "clickNode"].forEach((eventType) =>
