@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "graphology": "^0.23.0",
+    "graphology-layout-force": "^0.2.2",
     "sigma": "latest"
   },
   "devDependencies": {

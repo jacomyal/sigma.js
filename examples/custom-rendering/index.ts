@@ -28,7 +28,7 @@ import Sigma from "sigma";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import NodeProgramBorder from "./node.border";
 
-import SpringSupervisor from "./layout-spring";
+import ForceSupervisor from "graphology-layout-force/worker";
 
 const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -72,5 +72,5 @@ const renderer = new Sigma(graph, container, {
 });
 
 // Create the spring layout and start it
-const layout = new SpringSupervisor(graph);
+const layout = new ForceSupervisor(graph);
 layout.start();

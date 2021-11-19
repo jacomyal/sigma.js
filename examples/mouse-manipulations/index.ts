@@ -2,7 +2,7 @@ import Graph from "graphology";
 import Sigma from "sigma";
 import chroma from "chroma-js";
 import { v4 as uuid } from "uuid";
-import SpringSupervisor from "./layout-spring";
+import ForceSupervisor from "graphology-layout-force/worker";
 
 // Retrieve the html document for sigma container
 const container = document.getElementById("sigma-container") as HTMLElement;
@@ -19,7 +19,7 @@ graph.addEdge("n4", "n3");
 graph.addEdge("n3", "n1");
 
 // Create the spring layout and start it
-const layout = new SpringSupervisor(graph, { isNodeFixed: (n) => graph.getNodeAttribute(n, "highlighted") });
+const layout = new ForceSupervisor(graph, { isNodeFixed: (_, attr) => attr.highlighted });
 layout.start();
 
 // Create the sigma
