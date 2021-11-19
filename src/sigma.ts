@@ -572,14 +572,13 @@ export default class Sigma extends EventEmitter {
     if (!isPixelColored(this.webGLContexts.edges, x, y)) return null;
 
     // Check for each edge if it collides with the point:
-    let match: string | null = null;
     const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
 
     // To translate edge thicknesses to the graph system, we observe by how much
     // the length of a non-null edge is transformed to between the graph system
     // and the viewport system:
     let transformationRatio = 0;
-    this.graph.forEachEdgeUntil((key, _, sourceId, targetId, { x: xs, y: ys }, { x: xt, y: yt }) => {
+    this.graph.someEdge((key, _, sourceId, targetId, { x: xs, y: ys }, { x: xt, y: yt }) => {
       if (edgeDataCache[key].hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
 
       if (xs !== xt || ys !== yt) {
@@ -597,7 +596,7 @@ export default class Sigma extends EventEmitter {
     if (!transformationRatio) return null;
 
     // Now we can look for a matching edge:
-    this.graph.forEachEdgeUntil((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
+    return this.graph.findEdge((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
       if (
         doEdgeCollideWithPoint(
           graphX,
@@ -610,12 +609,9 @@ export default class Sigma extends EventEmitter {
           (edgeAttributes.size * transformationRatio) / this.cameraSizeRatio,
         )
       ) {
-        match = key;
         return true;
       }
-    });
-
-    return match;
+    }) || null;
   }
 
   /**
