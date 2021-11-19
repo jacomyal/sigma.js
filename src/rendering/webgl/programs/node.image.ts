@@ -23,12 +23,25 @@ type ImagePending = { status: "pending"; image: HTMLImageElement };
 type ImageReady = { status: "ready" } & Coordinates & Dimensions;
 type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
 
+// This class only exists for the return typing of `getNodeImageProgram`:
+class AbstractNodeImageProgram extends AbstractNodeProgram {
+  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
+  constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+  }
+  bind(): void {}
+  process(data: NodeDisplayData & { image?: string }, hidden: boolean, offset: number): void {}
+  render(params: RenderParams): void {}
+  rebindTexture() {}
+  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
+}
+
 /**
  * To share the texture between the program instances of the graph and the
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeImageProgram(): unknown {
+export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
   /**
    * These attributes are shared between all instances of this exact class,
    * returned by this call to getNodeProgramImage:
@@ -62,7 +75,7 @@ export default function getNodeImageProgram(): unknown {
     images[imageSource] = { status: "loading" };
 
     // Load image:
-    image.setAttribute('crossOrigin', '');
+    image.setAttribute("crossOrigin", "");
     image.src = imageSource;
   }
 
