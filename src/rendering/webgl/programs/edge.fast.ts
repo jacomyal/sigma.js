@@ -20,7 +20,6 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
   positionLocation: GLint;
   colorLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  resolutionLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
@@ -33,10 +32,6 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
     if (matrixLocation === null) throw new Error("EdgeFastProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
-
-    const resolutionLocation = gl.getUniformLocation(this.program, "u_resolution");
-    if (resolutionLocation === null) throw new Error("EdgeFastProgram: error while getting resolutionLocation");
-    this.resolutionLocation = resolutionLocation;
 
     this.bind();
   }
@@ -56,7 +51,14 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
       this.attributes * Float32Array.BYTES_PER_ELEMENT,
       0,
     );
-    gl.vertexAttribPointer(this.colorLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
+    gl.vertexAttribPointer(
+      this.colorLocation,
+      4,
+      gl.UNSIGNED_BYTE,
+      true,
+      this.attributes * Float32Array.BYTES_PER_ELEMENT,
+      8,
+    );
   }
 
   computeIndices(): void {
@@ -101,8 +103,9 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
     const program = this.program;
 
     gl.useProgram(program);
-    gl.uniform2f(this.resolutionLocation, params.width, params.height);
+
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+
     gl.drawArrays(gl.LINES, 0, this.array.length / ATTRIBUTES);
   }
 }
