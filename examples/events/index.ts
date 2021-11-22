@@ -19,6 +19,12 @@ function logEvent(event: string, itemType?: "node" | "edge", item?: string): voi
   if (item && itemType) {
     const label = itemType === "node" ? graph.getNodeAttribute(item, "label") : graph.getEdgeAttribute(item, "label");
     message += `, ${itemType} ${label || "with no label"} (id "${item}")`;
+
+    if (itemType === "edge")
+      message += `, source ${graph.getSourceAttribute(item, "label")}, target: ${graph.getTargetAttribute(
+        item,
+        "label",
+      )}`;
   }
   div.innerHTML = `<span>${message}</span>`;
   logsDOM.appendChild(div);
