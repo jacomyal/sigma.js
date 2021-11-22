@@ -1169,6 +1169,15 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method returning a copy of the settings collection.
+   *
+   * @return {Settings} A copy of the settings collection.
+   */
+  getSettings(): Settings {
+    return { ...this.settings };
+  }
+
+  /**
    * Method returning the current value for a given setting key.
    *
    * @param  {string} key - The setting key to get.
@@ -1560,5 +1569,23 @@ export default class Sigma extends EventEmitter {
    */
   scaleSize(size: number): number {
     return size / this.cameraSizeRatio;
+  }
+
+  /**
+   * Method that returns the collection of all used canvases.
+   * At the moment, the instantiated canvases are the following, and in the
+   * following order in the DOM:
+   * - `edges`
+   * - `nodes`
+   * - `edgeLabels`
+   * - `labels`
+   * - `hovers`
+   * - `hoverNodes`
+   * - `mouse`
+   *
+   * @return {PlainObject<HTMLCanvasElement>} - The collection of canvases.
+   */
+  getCanvases(): PlainObject<HTMLCanvasElement> {
+    return { ...this.elements };
   }
 }

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sigma example: PNG snapshot</title>
+  </head>
+  <body>
+    <style>
+      html,
+      body,
+      #sigma-container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      #controls {
+        position: absolute;
+        top: 0;
+        left: 0;
+        max-width: 100%;
+        max-height: 100%;
+        padding: 1em;
+        background: #ffffff99;
+      }
+    </style>
+    <div id="sigma-container"></div>
+    <div id="controls">
+      <h3>Layers to save</h3>
+      <div>
+        <input type="checkbox" id="layer-edges" checked />
+        <label for="layer-edges">Edges</label>
+      </div>
+      <div>
+        <input type="checkbox" id="layer-nodes" checked />
+        <label for="layer-nodes">Nodes</label>
+      </div>
+      <div>
+        <input type="checkbox" id="layer-edgeLabels" checked />
+        <label for="layer-edgeLabels">Edge labels</label>
+      </div>
+      <div>
+        <input type="checkbox" id="layer-labels" checked />
+        <label for="layer-labels">Node labels</label>
+      </div>
+      <br />
+      <button type="button" id="save-as-png">Save as PNG</button>
+    </div>
+    <script src="build/bundle.js"></script>
+  </body>
+</html>
