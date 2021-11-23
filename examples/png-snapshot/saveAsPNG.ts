@@ -16,6 +16,12 @@ import FileSaver from "file-saver";
 export default async function saveAsPNG(renderer: Sigma, inputLayers?: string[]) {
   const { width, height } = renderer.getDimensions();
 
+  // This pixel ratio is here to deal with retina displays.
+  // Indeed, for dimensions W and H, on a retina display, the canvases
+  // dimensions actually are 2 * W and 2 * H. Sigma properly deals with it, but
+  // we need to readapt here:
+  const pixelRatio = window.devicePixelRatio || 1;
+
   const tmpRoot = document.createElement("DIV");
   tmpRoot.style.width = `${width}px`;
   tmpRoot.style.height = `${height}px`;
@@ -34,19 +40,29 @@ export default async function saveAsPNG(renderer: Sigma, inputLayers?: string[])
 
   // Create a new canvas, on which the different layers will be drawn:
   const canvas = document.createElement("CANVAS") as HTMLCanvasElement;
-  canvas.setAttribute("width", width + "");
-  canvas.setAttribute("height", height + "");
+  canvas.setAttribute("width", width * pixelRatio + "");
+  canvas.setAttribute("height", height * pixelRatio + "");
   const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
   // Draw a white background first:
   ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, width * pixelRatio, height * pixelRatio);
 
   // For each layer, draw it on our canvas:
   const canvases = tmpRenderer.getCanvases();
   const layers = inputLayers ? inputLayers.filter((id) => !!canvases[id]) : Object.keys(canvases);
   layers.forEach((id) => {
-    ctx.drawImage(canvases[id], 0, 0, width, height, 0, 0, width, height);
+    ctx.drawImage(
+      canvases[id],
+      0,
+      0,
+      width * pixelRatio,
+      height * pixelRatio,
+      0,
+      0,
+      width * pixelRatio,
+      height * pixelRatio,
+    );
   });
 
   // Save the canvas as a PNG image:
