@@ -51,6 +51,11 @@ export interface MouseCoords extends Coordinates {
   original: MouseEvent;
 }
 
+export interface WheelCoords extends MouseCoords {
+  deltaY: number; // This will store the `deltaY` from the original event
+  delta: number; // This will store the delta actually used by sigma
+}
+
 export interface TouchCoords {
   touches: Coordinates[];
   ctrlKey: boolean;

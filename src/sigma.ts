@@ -433,20 +433,24 @@ export default class Sigma extends EventEmitter {
     };
 
     // Handling click
-    const createClickListener = (eventType: string): ((e: MouseCoords) => void) => {
+    const createMouseListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
         if (this.hoveredNode) return this.emit(`${eventType}Node`, { node: this.hoveredNode, captor: e, event: e });
         return this.emit(`${eventType}Stage`, { event: e });
       };
     };
 
-    this.activeListeners.handleClick = createClickListener("click");
-    this.activeListeners.handleRightClick = createClickListener("rightClick");
-    this.activeListeners.handleDown = createClickListener("down");
+    this.activeListeners.handleClick = createMouseListener("click");
+    this.activeListeners.handleRightClick = createMouseListener("rightClick");
+    this.activeListeners.handleDoubleClick = createMouseListener("doubleClick");
+    this.activeListeners.handleWheel = createMouseListener("wheel");
+    this.activeListeners.handleDown = createMouseListener("down");
 
     this.mouseCaptor.on("mousemove", this.activeListeners.handleMove);
     this.mouseCaptor.on("click", this.activeListeners.handleClick);
     this.mouseCaptor.on("rightClick", this.activeListeners.handleRightClick);
+    this.mouseCaptor.on("doubleClick", this.activeListeners.handleDoubleClick);
+    this.mouseCaptor.on("wheel", this.activeListeners.handleWheel);
     this.mouseCaptor.on("mousedown", this.activeListeners.handleDown);
 
     // TODO

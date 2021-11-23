@@ -4,7 +4,7 @@
  * @module
  */
 import { EventEmitter } from "events";
-import { Coordinates, MouseCoords, TouchCoords } from "../../types";
+import { Coordinates, MouseCoords, TouchCoords, WheelCoords } from "../../types";
 import Sigma from "../../sigma";
 
 /**
@@ -68,7 +68,7 @@ export function getPosition(e: MouseEvent | Touch, dom?: HTMLElement): Coordinat
 /**
  * Convert mouse coords to sigma coords.
  *
- * @param  {event}   e   - A mouse event or touch object.
+ * @param  {event}  e - A mouse event or touch object.
  * @return {object}
  */
 export function getMouseCoords(e: MouseEvent): MouseCoords {
@@ -85,6 +85,20 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
     // TODO: this is not ideal... But I am wondering why we don't just pass the event through
     preventDefault: e.preventDefault.bind(e),
     original: e,
+  };
+}
+
+/**
+ * Convert mouse wheel event coords to sigma coords.
+ *
+ * @param  {event}  e - A wheel mouse event.
+ * @return {object}
+ */
+export function getWheelCoords(e: WheelEvent): WheelCoords {
+  return {
+    ...getMouseCoords(e),
+    deltaY: e.deltaY,
+    delta: getWheelDelta(e),
   };
 }
 

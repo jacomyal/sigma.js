@@ -7,7 +7,7 @@
  */
 import { CameraState } from "../../types";
 import Sigma from "../../sigma";
-import Captor, { getWheelDelta, getMouseCoords, getPosition } from "./captor";
+import Captor, { getWheelDelta, getMouseCoords, getPosition, getWheelCoords } from "./captor";
 
 /**
  * Constants.
@@ -124,6 +124,8 @@ export default class MouseCaptor extends Captor {
     else e.returnValue = false;
 
     e.stopPropagation();
+
+    this.emit("doubleClick", getMouseCoords(e));
 
     return false;
   }
@@ -283,6 +285,8 @@ export default class MouseCaptor extends Captor {
 
     this.currentWheelDirection = wheelDirection;
     this.lastWheelTriggerTime = now;
+
+    this.emit("wheel", getWheelCoords(e));
 
     return false;
   }
