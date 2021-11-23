@@ -47,6 +47,7 @@ export interface MouseCoords extends Coordinates {
   metaKey: boolean;
   altKey: boolean;
   shiftKey: boolean;
+  defaultPrevented: boolean;
   preventDefault(): void;
   original: MouseEvent;
 }

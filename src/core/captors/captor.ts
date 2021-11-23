@@ -81,9 +81,8 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
     metaKey: e.metaKey,
     altKey: e.altKey,
     shiftKey: e.shiftKey,
-
-    // TODO: this is not ideal... But I am wondering why we don't just pass the event through
-    preventDefault: e.preventDefault.bind(e),
+    defaultPrevented: false,
+    preventDefault(): void {this.defaultPrevented = true},
     original: e,
   };
 }
