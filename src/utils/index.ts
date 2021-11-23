@@ -23,6 +23,27 @@ export function isPlainObject(value: any): boolean {
 }
 
 /**
+ * Helper to use Object.assign with more than two objects.
+ *
+ * @param  {object} target       - First object.
+ * @param  {object} [...objects] - Objects to merge.
+ * @return {object}
+ */
+export function assign<T>(target: Partial<T> | undefined, ...objects: Array<Partial<T | undefined>>): T {
+  target = target || {};
+
+  for (let i = 0, l = objects.length; i < l; i++) {
+    const o = objects[i];
+
+    if (!o) continue;
+
+    Object.assign(target, o);
+  }
+
+  return target as T;
+}
+
+/**
  * Very simple recursive Object.assign-like function.
  *
  * @param  {object} target       - First object.

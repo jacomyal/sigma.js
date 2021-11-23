@@ -26,7 +26,7 @@ import {
   getPixelRatio,
   createNormalizationFunction,
   NormalizationFunction,
-  assignDeep,
+  assign,
   cancelFrame,
   matrixFromCamera,
   requestFrame,
@@ -154,7 +154,7 @@ export default class Sigma extends EventEmitter {
   constructor(graph: Graph, container: HTMLElement, settings: Partial<Settings> = {}) {
     super();
 
-    this.settings = assignDeep<Settings>({}, DEFAULT_SETTINGS, settings);
+    this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
 
     // Validating
     validateSettings(this.settings);
@@ -435,8 +435,7 @@ export default class Sigma extends EventEmitter {
     // Handling click
     const createClickListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
-        if (this.hoveredNode)
-            return this.emit(`${eventType}Node`, { node: this.hoveredNode, captor: e, event: e });
+        if (this.hoveredNode) return this.emit(`${eventType}Node`, { node: this.hoveredNode, captor: e, event: e });
         return this.emit(`${eventType}Stage`, { event: e });
       };
     };
