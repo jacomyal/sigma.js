@@ -41,15 +41,27 @@ export function getY(e: MouseEvent | Touch): number {
 }
 
 /**
- * Extract the local X and Y coordinates from a mouse event or touch object.
+ * Extract the local X and Y coordinates from a mouse event or touch object. If
+ * a DOM element is given, it uses this element's offset to compute the position
+ * (this allows using events that are not bound to the container itself and
+ * still have a proper position).
  *
- * @param  {event}  e - A mouse event or touch object.
- * @return {number}     The local Y value of the mouse.
+ * @param  {event}        e - A mouse event or touch object.
+ * @param  {HTMLElement?} dom - A DOM element to compute offset relatively to.
+ * @return {number}       The local Y value of the mouse.
  */
-export function getPosition(e: MouseEvent | Touch): Coordinates {
+export function getPosition(e: MouseEvent | Touch, dom?: HTMLElement): Coordinates {
+  if (!dom) {
+    return {
+      x: getX(e),
+      y: getY(e),
+    };
+  }
+
+  const bbox = dom.getBoundingClientRect();
   return {
-    x: getX(e),
-    y: getY(e),
+    x: e.pageX - bbox.left,
+    y: e.pageY - bbox.top,
   };
 }
 
@@ -57,7 +69,6 @@ export function getPosition(e: MouseEvent | Touch): Coordinates {
  * Convert mouse coords to sigma coords.
  *
  * @param  {event}   e   - A mouse event or touch object.
- *
  * @return {object}
  */
 export function getMouseCoords(e: MouseEvent): MouseCoords {
@@ -87,9 +98,9 @@ export function getTouchesArray(touches: TouchList): Touch[] {
 /**
  * Convert touch coords to sigma coords.
  */
-export function getTouchCoords(e: TouchEvent): TouchCoords {
+export function getTouchCoords(e: TouchEvent, dom?: HTMLElement): TouchCoords {
   return {
-    touches: getTouchesArray(e.touches).map(getPosition),
+    touches: getTouchesArray(e.touches).map((touch) => getPosition(touch, dom)),
     ctrlKey: e.ctrlKey,
     metaKey: e.metaKey,
     altKey: e.altKey,

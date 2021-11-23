@@ -86,7 +86,7 @@ export default class TouchCaptor extends Captor {
     this.touchMode = touches.length;
 
     this.startCameraState = this.renderer.getCamera().getState();
-    this.startTouchesPositions = touches.map(getPosition);
+    this.startTouchesPositions = touches.map((touch) => getPosition(touch, this.container));
     this.lastTouchesPositions = this.startTouchesPositions;
 
     // When there are two touches down, let's record distance and angle as well:
@@ -163,7 +163,7 @@ export default class TouchCaptor extends Captor {
 
     const startCameraState = this.startCameraState as CameraState;
     const touches = getTouchesArray(e.touches);
-    const touchesPositions = touches.map(getPosition);
+    const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
     this.lastTouchesPositions = touchesPositions;
     this.isMoving = true;
 

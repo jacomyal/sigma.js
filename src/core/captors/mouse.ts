@@ -7,7 +7,7 @@
  */
 import { CameraState } from "../../types";
 import Sigma from "../../sigma";
-import Captor, { getX, getY, getWheelDelta, getMouseCoords } from "./captor";
+import Captor, { getWheelDelta, getMouseCoords, getPosition } from "./captor";
 
 /**
  * Constants.
@@ -60,10 +60,10 @@ export default class MouseCaptor extends Captor {
     container.addEventListener("click", this.handleClick, false);
     container.addEventListener("contextmenu", this.handleRightClick, false);
     container.addEventListener("mousedown", this.handleDown, false);
-    container.addEventListener("mousemove", this.handleMove, false);
     container.addEventListener("wheel", this.handleWheel, false);
     container.addEventListener("mouseout", this.handleOut, false);
 
+    document.addEventListener("mousemove", this.handleMove, false);
     document.addEventListener("mouseup", this.handleUp, false);
   }
 
@@ -73,10 +73,10 @@ export default class MouseCaptor extends Captor {
     container.removeEventListener("click", this.handleClick);
     container.removeEventListener("contextmenu", this.handleRightClick);
     container.removeEventListener("mousedown", this.handleDown);
-    container.removeEventListener("mousemove", this.handleMove);
     container.removeEventListener("wheel", this.handleWheel);
     container.removeEventListener("mouseout", this.handleOut);
 
+    document.removeEventListener("mousemove", this.handleMove);
     document.removeEventListener("mouseup", this.handleUp);
   }
 
@@ -115,7 +115,7 @@ export default class MouseCaptor extends Captor {
     const camera = this.renderer.getCamera();
     const newRatio = camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
 
-    camera.animate(this.renderer.getViewportZoomedState({ x: getX(e), y: getY(e) }, newRatio), {
+    camera.animate(this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio), {
       easing: "quadraticInOut",
       duration: DOUBLE_CLICK_ZOOMING_DURATION,
     });
@@ -133,8 +133,9 @@ export default class MouseCaptor extends Captor {
 
     this.startCameraState = this.renderer.getCamera().getState();
 
-    this.lastMouseX = getX(e);
-    this.lastMouseY = getY(e);
+    const { x, y } = getPosition(e, this.container);
+    this.lastMouseX = x;
+    this.lastMouseY = y;
 
     this.draggedEvents = 0;
 
@@ -160,8 +161,7 @@ export default class MouseCaptor extends Captor {
       this.movingTimeout = null;
     }
 
-    const x = getX(e),
-      y = getY(e);
+    const { x, y } = getPosition(e, this.container);
 
     const cameraState = camera.getState(),
       previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
@@ -212,8 +212,7 @@ export default class MouseCaptor extends Captor {
 
       const camera = this.renderer.getCamera();
 
-      const eX = getX(e),
-        eY = getY(e);
+      const { x: eX, y: eY } = getPosition(e, this.container);
 
       const lastMouse = this.renderer.viewportToFramedGraph({
         x: this.lastMouseX as number,
@@ -234,14 +233,14 @@ export default class MouseCaptor extends Captor {
 
       this.lastMouseX = eX;
       this.lastMouseY = eY;
+
+      if (e.preventDefault) e.preventDefault();
+      else e.returnValue = false;
+
+      e.stopPropagation();
+
+      return false;
     }
-
-    if (e.preventDefault) e.preventDefault();
-    else e.returnValue = false;
-
-    e.stopPropagation();
-
-    return false;
   }
 
   handleWheel(e: WheelEvent): boolean {
@@ -272,7 +271,7 @@ export default class MouseCaptor extends Captor {
     }
 
     camera.animate(
-      this.renderer.getViewportZoomedState({ x: getX(e), y: getY(e) }, newRatio),
+      this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio),
       {
         easing: "quadraticOut",
         duration: MOUSE_ZOOM_DURATION,
