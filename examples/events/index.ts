@@ -35,12 +35,13 @@ function logEvent(event: string, itemType?: "node" | "edge", item?: string): voi
 
 const renderer = new Sigma(graph, container, {
   enableEdgeClickEvents: true,
+  enableEdgeWheelEvents: true,
   enableEdgeHoverEvents: "debounce",
 });
 
-["enterNode", "leaveNode", "clickNode"].forEach((eventType) =>
+["enterNode", "leaveNode", "clickNode", "rightClickNode", "doubleClickNode", "wheelNode"].forEach((eventType) =>
   renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)),
 );
-["enterEdge", "leaveEdge", "clickEdge"].forEach((eventType) =>
+["enterEdge", "leaveEdge", "clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"].forEach((eventType) =>
   renderer.on(eventType, ({ edge }) => logEvent(eventType, "edge", edge)),
 );
