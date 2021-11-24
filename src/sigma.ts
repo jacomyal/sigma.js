@@ -946,30 +946,25 @@ export default class Sigma extends EventEmitter {
         continue;
       }
 
-      const { x: sourceX, y: sourceY } = this.framedGraphToViewport(sourceData);
-      const { x: targetX, y: targetY } = this.framedGraphToViewport(targetData);
-
-      // TODO: we can cache the labels we need to render until the camera's ratio changes
-      // TODO: this should be computed in the canvas components?
-      const size = this.scaleSize(edgeData.size);
-
       this.settings.edgeLabelRenderer(
         context,
         {
           key: edge,
           label: edgeData.label,
           color: edgeData.color,
-          size,
+          size: this.scaleSize(edgeData.size),
         },
         {
           key: extremities[0],
-          x: sourceX,
-          y: sourceY,
+          ...sourceData,
+          ...this.framedGraphToViewport(sourceData),
+          size: this.scaleSize(sourceData.size),
         },
         {
           key: extremities[1],
-          x: targetX,
-          y: targetY,
+          ...targetData,
+          ...this.framedGraphToViewport(targetData),
+          size: this.scaleSize(targetData.size),
         },
         this.settings,
       );
