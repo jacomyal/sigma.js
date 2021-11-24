@@ -1,8 +1,10 @@
 # sigma.js - changelog:
 
-## 2.0.0
+## 2.1.1
 
-- Complete rewrite of the library.
+### Bug fix
+
+- [#1165](https://github.com/jacomyal/sigma.js/issues/1165) - Fixes "ghost hovered nodes" issue
 
 ## 2.1.0
 
@@ -22,3 +24,7 @@
 - [#1157](https://github.com/jacomyal/sigma.js/issues/1157) - Fixes unexpected node interaction with zIndex
 - [#1148](https://github.com/jacomyal/sigma.js/issues/1148) - Fixes `mousemove` unexpected behaviors
 - [#1163](https://github.com/jacomyal/sigma.js/issues/1163) - Implements edge labels ellipsis
+
+## 2.0.0
+
+- Complete rewrite of the library.
