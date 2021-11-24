@@ -146,7 +146,6 @@ export default class Sigma extends EventEmitter {
   private renderHighlightedNodesFrame: number | null = null;
   private needToProcess = false;
   private needToSoftProcess = false;
-  private mousePosition: Coordinates = { x: 0, y: 0 };
   private checkEdgesEventsFrame: number | null = null;
 
   // programs
@@ -438,17 +437,17 @@ export default class Sigma extends EventEmitter {
         }
       }
 
+      const mousePosition = { x: e.x, y: e.y };
+
       if (this.settings.enableEdgeHoverEvents === true) {
-        this.checkEdgeHoverEvents();
+        this.checkEdgeHoverEvents(mousePosition);
       } else if (this.settings.enableEdgeHoverEvents === "debounce") {
         if (!this.checkEdgesEventsFrame)
           this.checkEdgesEventsFrame = requestFrame(() => {
-            this.checkEdgeHoverEvents();
+            this.checkEdgeHoverEvents(mousePosition);
             this.checkEdgesEventsFrame = null;
           });
       }
-
-      this.mousePosition = { x: e.x, y: e.y };
     };
 
     // Handling click
@@ -549,8 +548,8 @@ export default class Sigma extends EventEmitter {
    *
    * @return {Sigma}
    */
-  private checkEdgeHoverEvents(): this {
-    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(this.mousePosition.x, this.mousePosition.y);
+  private checkEdgeHoverEvents(mousePosition: Coordinates): this {
+    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(mousePosition.x, mousePosition.y);
 
     if (edgeToHover !== this.hoveredEdge) {
       if (this.hoveredEdge) this.emit("leaveEdge", { edge: this.hoveredEdge });
