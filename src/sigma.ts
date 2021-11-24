@@ -567,7 +567,9 @@ export default class Sigma extends EventEmitter {
     const { edgeDataCache, nodeDataCache } = this;
 
     // Check first that pixel is colored:
-    if (!isPixelColored(this.webGLContexts.edges, x, y)) return null;
+    // Note that mouse positions must be corrected by pixel ratio to correctly
+    // index the drawing buffer.
+    if (!isPixelColored(this.webGLContexts.edges, x * PIXEL_RATIO, y * PIXEL_RATIO)) return null;
 
     // Check for each edge if it collides with the point:
     const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
