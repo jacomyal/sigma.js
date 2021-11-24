@@ -48,7 +48,6 @@ const { nodeExtent } = graphExtent;
  * Constants.
  */
 const PIXEL_RATIO = getPixelRatio();
-const WEBGL_OVERSAMPLING_RATIO = getPixelRatio();
 
 /**
  * Important functions.
@@ -1055,7 +1054,7 @@ export default class Sigma extends EventEmitter {
         height: this.height,
         ratio: this.camera.ratio,
         correctionRatio: this.correctionRatio / this.camera.ratio,
-        scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+        scalingRatio: PIXEL_RATIO,
       });
     }
   }
@@ -1133,7 +1132,7 @@ export default class Sigma extends EventEmitter {
         height: this.height,
         ratio: cameraState.ratio,
         correctionRatio: this.correctionRatio / cameraState.ratio,
-        scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+        scalingRatio: PIXEL_RATIO,
       });
     }
 
@@ -1150,7 +1149,7 @@ export default class Sigma extends EventEmitter {
           height: this.height,
           ratio: cameraState.ratio,
           correctionRatio: this.correctionRatio / cameraState.ratio,
-          scalingRatio: WEBGL_OVERSAMPLING_RATIO,
+          scalingRatio: PIXEL_RATIO,
         });
       }
     }
@@ -1353,15 +1352,10 @@ export default class Sigma extends EventEmitter {
 
     // Sizing WebGL contexts
     for (const id in this.webGLContexts) {
-      this.elements[id].setAttribute("width", this.width * WEBGL_OVERSAMPLING_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * WEBGL_OVERSAMPLING_RATIO + "px");
+      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
 
-      this.webGLContexts[id].viewport(
-        0,
-        0,
-        this.width * WEBGL_OVERSAMPLING_RATIO,
-        this.height * WEBGL_OVERSAMPLING_RATIO,
-      );
+      this.webGLContexts[id].viewport(0, 0, this.width * PIXEL_RATIO, this.height * PIXEL_RATIO);
     }
 
     return this;
