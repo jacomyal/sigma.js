@@ -10,6 +10,7 @@ import { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate, multiplyVec } from "./matrices";
+import { HTML_COLORS } from "./data";
 
 /**
  * Checks whether the given value is a plain object.
@@ -257,6 +258,10 @@ export function floatColor(val: string): number {
   FLOAT_COLOR_CACHE[val] = color;
 
   return color;
+}
+
+for (const htmlColor in HTML_COLORS) {
+  FLOAT_COLOR_CACHE[htmlColor] = floatColor(HTML_COLORS[htmlColor]);
 }
 
 /**
