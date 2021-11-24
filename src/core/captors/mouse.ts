@@ -116,11 +116,10 @@ export default class MouseCaptor extends Captor {
     else e.returnValue = false;
     e.stopPropagation();
 
-    const mouseCoords = getMouseCoords(e)
+    const mouseCoords = getMouseCoords(e);
     this.emit("doubleClick", mouseCoords);
 
-    if (mouseCoords.defaultPrevented)
-        return false
+    if (mouseCoords.sigmaDefaultPrevented) return false;
 
     // default behavior
     const camera = this.renderer.getCamera();
@@ -130,7 +129,6 @@ export default class MouseCaptor extends Captor {
       easing: "quadraticInOut",
       duration: DOUBLE_CLICK_ZOOMING_DURATION,
     });
-
 
     return false;
   }
@@ -251,24 +249,22 @@ export default class MouseCaptor extends Captor {
   }
 
   handleWheel(e: WheelEvent): boolean {
+    if (!this.enabled) return false;
+
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
-
     e.stopPropagation();
-
-    if (!this.enabled) return false;
 
     const delta = getWheelDelta(e);
 
     if (!delta) return false;
 
-    const wheelCoords = getWheelCoords(e)
+    const wheelCoords = getWheelCoords(e);
     this.emit("wheel", wheelCoords);
 
-    if (wheelCoords.defaultPrevented)
-        return false
+    if (wheelCoords.sigmaDefaultPrevented) return false;
 
-    // default behavior
+    // Default behavior
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
     const camera = this.renderer.getCamera();
     const newRatio = camera.getState().ratio * ratioDiff;

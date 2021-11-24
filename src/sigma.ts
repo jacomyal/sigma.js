@@ -435,8 +435,19 @@ export default class Sigma extends EventEmitter {
     // Handling click
     const createMouseListener = (eventType: string): ((e: MouseCoords) => void) => {
       return (e) => {
-        if (this.hoveredNode) return this.emit(`${eventType}Node`, { node: this.hoveredNode, captor: e, event: e });
-        return this.emit(`${eventType}Stage`, { event: e });
+        const baseEvent = {
+          event: e,
+          preventSigmaDefault(): void {
+            this.event.preventSigmaDefault();
+          },
+        };
+
+        if (this.hoveredNode)
+          return this.emit(`${eventType}Node`, {
+            ...baseEvent,
+            node: this.hoveredNode,
+          });
+        return this.emit(`${eventType}Stage`, baseEvent);
       };
     };
 

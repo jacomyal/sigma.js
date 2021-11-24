@@ -81,8 +81,10 @@ export function getMouseCoords(e: MouseEvent): MouseCoords {
     metaKey: e.metaKey,
     altKey: e.altKey,
     shiftKey: e.shiftKey,
-    defaultPrevented: false,
-    preventDefault(): void {this.defaultPrevented = true},
+    sigmaDefaultPrevented: false,
+    preventSigmaDefault(): void {
+      this.sigmaDefaultPrevented = true;
+    },
     original: e,
   };
 }
