@@ -3,7 +3,7 @@
  * colored, and false else.
  */
 export function isPixelColored(gl: WebGLRenderingContext, x: number, y: number): boolean {
-  const pixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4);
+  const pixels = new Uint8Array(4);
   gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
   return pixels[3] > 0;
 }
