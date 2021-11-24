@@ -99,6 +99,8 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
   }
 
   render(params: RenderParams): void {
+    if (this.hasNothingToRender()) return;
+
     const gl = this.gl;
     const program = this.program;
 

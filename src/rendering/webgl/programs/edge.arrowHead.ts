@@ -43,11 +43,13 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     this.matrixLocation = matrixLocation;
 
     const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
-    if (sqrtZoomRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting sqrtZoomRatioLocation");
+    if (sqrtZoomRatioLocation === null)
+      throw new Error("EdgeArrowHeadProgram: error while getting sqrtZoomRatioLocation");
     this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
-    if (correctionRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting correctionRatioLocation");
+    if (correctionRatioLocation === null)
+      throw new Error("EdgeArrowHeadProgram: error while getting correctionRatioLocation");
     this.correctionRatioLocation = correctionRatioLocation;
 
     this.bind();
@@ -165,6 +167,8 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
   }
 
   render(params: RenderParams): void {
+    if (this.hasNothingToRender()) return;
+
     const gl = this.gl;
 
     const program = this.program;

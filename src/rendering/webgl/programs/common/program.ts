@@ -71,6 +71,10 @@ export abstract class AbstractProgram implements IProgram {
     this.array = new Float32Array(this.points * this.attributes * capacity);
   }
 
+  hasNothingToRender(): boolean {
+    return this.array.length === 0;
+  }
+
   abstract bind(): void;
   abstract render(params: RenderParams): void;
 }
