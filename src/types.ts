@@ -101,6 +101,7 @@ export declare class TypedEventEmitter<Events extends Record<string, Listener>> 
   setMaxListeners(n: number): this;
   getMaxListeners(): number;
   emit<Event extends keyof Events>(type: Event, ...args: Parameters<Events[Event]>): boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(type: string | symbol, ...args: any[]): boolean;
   addListener<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
   addListener(type: string | number, listener: Listener): this;
