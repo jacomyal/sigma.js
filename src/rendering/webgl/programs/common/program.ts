@@ -31,6 +31,7 @@ export interface IProgram {
 export abstract class AbstractProgram implements IProgram {
   points: number;
   attributes: number;
+  capacity = 0;
   gl: WebGLRenderingContext;
   array: Float32Array = new Float32Array();
   buffer: WebGLBuffer;
@@ -69,6 +70,11 @@ export abstract class AbstractProgram implements IProgram {
 
   allocate(capacity: number): void {
     this.array = new Float32Array(this.points * this.attributes * capacity);
+    this.capacity = capacity;
+  }
+
+  hasNothingToRender(): boolean {
+    return this.capacity === 0;
   }
 
   abstract bind(): void;

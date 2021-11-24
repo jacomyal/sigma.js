@@ -231,6 +231,8 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
     }
 
     render(params: RenderParams): void {
+      if (this.hasNothingToRender()) return;
+
       this.latestRenderParams = params;
 
       const gl = this.gl;

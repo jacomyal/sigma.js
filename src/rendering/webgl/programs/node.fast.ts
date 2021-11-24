@@ -44,6 +44,8 @@ export default class NodeFastProgram extends AbstractNodeProgram {
   }
 
   render(params: RenderParams): void {
+    if (this.hasNothingToRender()) return;
+
     const gl = this.gl;
 
     const program = this.program;
