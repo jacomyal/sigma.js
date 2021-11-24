@@ -398,7 +398,7 @@ export default class Sigma extends EventEmitter {
 
         const size = this.scaleSize(data.size);
 
-        if (mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
+        if (!data.hidden && mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
           const distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
 
           // TODO: sort by min size also for cases where center is the same
