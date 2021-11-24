@@ -20,11 +20,14 @@ function logEvent(event: string, itemType?: "node" | "edge", item?: string): voi
     const label = itemType === "node" ? graph.getNodeAttribute(item, "label") : graph.getEdgeAttribute(item, "label");
     message += `, ${itemType} ${label || "with no label"} (id "${item}")`;
 
-    if (itemType === "edge")
+    if (itemType === "edge") {
       message += `, source ${graph.getSourceAttribute(item, "label")}, target: ${graph.getTargetAttribute(
         item,
         "label",
       )}`;
+
+      if (event === "leaveEdge") graph.setEdgeAttribute(item, "color", "#1E2F97");
+    }
   }
   div.innerHTML = `<span>${message}</span>`;
   logsDOM.appendChild(div);
