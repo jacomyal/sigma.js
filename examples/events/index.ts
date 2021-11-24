@@ -26,7 +26,7 @@ function logEvent(event: string, itemType?: "node" | "edge", item?: string): voi
         "label",
       )}`;
 
-      if (event === "leaveEdge") graph.setEdgeAttribute(item, "color", "#1E2F97");
+      if (event === "enterEdge") graph.setEdgeAttribute(item, "color", "#1E2F97");
     }
   }
   div.innerHTML = `<span>${message}</span>`;
