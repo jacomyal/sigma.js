@@ -67,9 +67,9 @@ export default function drawEdgeLabel(
       label = label.slice(0, -2) + ellipsis;
       textLength = context.measureText(label).width;
     }
-  }
 
-  if (label.length < 4) return;
+    if (label.length < 4) return;
+  }
 
   let angle;
   if (dx > 0) {
