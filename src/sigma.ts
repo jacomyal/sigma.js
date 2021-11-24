@@ -3,7 +3,6 @@
  * ========
  * @module
  */
-import { EventEmitter } from "events";
 import Graph from "graphology";
 
 import Camera from "./core/camera";
@@ -20,6 +19,7 @@ import {
   NodeDisplayData,
   PlainObject,
   CoordinateConversionOverride,
+  TypedEventEmitter,
 } from "./types";
 import {
   createElement,
@@ -98,6 +98,52 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
 }
 
 /**
+ * Event types.
+ */
+interface SigmaEvent {
+  event: MouseCoords;
+  preventSigmaDefault(): void;
+}
+
+interface SigmaStageEvent extends SigmaEvent {}
+
+interface SigmaNodeEvent extends SigmaEvent {
+  node: string;
+}
+
+interface SigmaEdgeEvent extends SigmaEvent {
+  edge: string;
+}
+
+type SigmaEvents = {
+  // Lifecycle events
+  afterRender(): void;
+  kill(): void;
+
+  // Stage events
+  clickStage(payload: SigmaStageEvent): void;
+  rightClickStage(payload: SigmaStageEvent): void;
+  doubleClickStage(payload: SigmaStageEvent): void;
+  wheelStage(payload: SigmaStageEvent): void;
+
+  // Node events
+  enterNode(payload: SigmaNodeEvent): void;
+  leaveNode(payload: SigmaNodeEvent): void;
+  clickNode(payload: SigmaNodeEvent): void;
+  rightClickNode(payload: SigmaNodeEvent): void;
+  doubleClickNode(payload: SigmaNodeEvent): void;
+  wheelNode(payload: SigmaNodeEvent): void;
+
+  // Edge events
+  enterEdge(payload: SigmaEdgeEvent): void;
+  leaveEdge(payload: SigmaEdgeEvent): void;
+  clickEdge(payload: SigmaEdgeEvent): void;
+  rightClickEdge(payload: SigmaEdgeEvent): void;
+  doubleClickEdge(payload: SigmaEdgeEvent): void;
+  wheelEdge(payload: SigmaEdgeEvent): void;
+};
+
+/**
  * Main class.
  *
  * @constructor
@@ -105,7 +151,7 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma extends EventEmitter {
+export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   private settings: Settings;
   private graph: Graph;
   private mouseCaptor: MouseCaptor;
