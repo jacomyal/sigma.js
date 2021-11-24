@@ -5,6 +5,7 @@
  * Various type declarations used throughout the library.
  * @module
  */
+import { EventEmitter } from "events";
 
 /**
  * Util type to represent maps of typed elements, but implemented with
@@ -26,9 +27,6 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>> &
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>> & { [others: string]: any };
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Listener = (...args: any[]) => void;
 
 export interface Coordinates {
   x: number;
@@ -88,3 +86,39 @@ export interface NodeDisplayData extends Coordinates, DisplayData {
 }
 
 export interface EdgeDisplayData extends DisplayData {}
+
+/**
+ * Custom event emitter types.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Listener = (...args: any[]) => void;
+
+export declare class TypedEventEmitter<Events extends Record<string, Listener>> extends EventEmitter {
+  static listenerCount(emitter: EventEmitter, type: string | symbol): number;
+  static defaultMaxListeners: number;
+
+  eventNames(): Array<string | symbol>;
+  setMaxListeners(n: number): this;
+  getMaxListeners(): number;
+  emit<Event extends keyof Events>(type: Event, ...args: Parameters<Events[Event]>): boolean;
+  emit(type: string | symbol, ...args: any[]): boolean;
+  addListener<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  addListener(type: string | number, listener: Listener): this;
+  on<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  on(type: string | number, listener: Listener): this;
+  once<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  once(type: string | number, listener: Listener): this;
+  prependListener<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  prependListener(type: string | number, listener: Listener): this;
+  prependOnceListener<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  prependOnceListener(type: string | number, listener: Listener): this;
+  removeListener<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  removeListener(type: string | number, listener: Listener): this;
+  off<Event extends keyof Events>(type: Event, listener: Events[Event]): this;
+  off(type: string | number, listener: Listener): this;
+  removeAllListeners<Event extends keyof Events>(type?: Event): this;
+  removeAllListeners(type?: string | number): this;
+  listeners(type: string | symbol): Listener[];
+  listenerCount(type: string | symbol): number;
+  rawListeners(type: string | symbol): Listener[];
+}
