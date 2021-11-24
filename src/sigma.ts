@@ -3,6 +3,7 @@
  * ========
  * @module
  */
+import { EventEmitter } from "events";
 import Graph from "graphology";
 
 import Camera from "./core/camera";
@@ -151,7 +152,7 @@ type SigmaEvents = {
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma extends TypedEventEmitter<SigmaEvents> {
+export default class Sigma extends (EventEmitter as unknown as new () => TypedEventEmitter<SigmaEvents>) {
   private settings: Settings;
   private graph: Graph;
   private mouseCaptor: MouseCaptor;
