@@ -94,6 +94,8 @@ export declare class TypedEventEmitter<Events extends Record<string, Listener>> 
   static listenerCount(emitter: EventEmitter, type: string | symbol): number;
   static defaultMaxListeners: number;
 
+  rawEmitter: EventEmitter;
+
   eventNames(): Array<string | symbol>;
   setMaxListeners(n: number): this;
   getMaxListeners(): number;
