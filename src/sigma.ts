@@ -21,6 +21,7 @@ import {
   NodeDisplayData,
   PlainObject,
   TypedEventEmitter,
+  MouseInteraction,
 } from "./types";
 import {
   createElement,
@@ -103,43 +104,41 @@ interface SigmaEvent {
   preventSigmaDefault(): void;
 }
 
-interface SigmaStageEvent extends SigmaEvent {}
-
-interface SigmaNodeEvent extends SigmaEvent {
+interface SigmaStageEventPayload extends SigmaEvent {}
+interface SigmaNodeEventPayload extends SigmaEvent {
   node: string;
 }
-
-interface SigmaEdgeEvent extends SigmaEvent {
+interface SigmaEdgeEventPayload extends SigmaEvent {
   edge: string;
 }
 
-type SigmaEvents = {
+type SigmaStageEvents = {
+  [E in MouseInteraction as `${E}Stage`]: (payload: SigmaStageEventPayload) => void;
+};
+
+type SigmaNodeEvents = {
+  [E in MouseInteraction as `${E}Node`]: (payload: SigmaNodeEventPayload) => void;
+};
+
+type SigmaEdgeEvents = {
+  [E in MouseInteraction as `${E}Edge`]: (payload: SigmaEdgeEventPayload) => void;
+};
+
+type SigmaAdditionalEvents = {
   // Lifecycle events
   afterRender(): void;
   kill(): void;
 
-  // Stage events
-  clickStage(payload: SigmaStageEvent): void;
-  rightClickStage(payload: SigmaStageEvent): void;
-  doubleClickStage(payload: SigmaStageEvent): void;
-  wheelStage(payload: SigmaStageEvent): void;
+  // Additional node events
+  enterNode(payload: Pick<SigmaNodeEventPayload, "node">): void;
+  leaveNode(payload: Pick<SigmaNodeEventPayload, "node">): void;
 
-  // Node events
-  enterNode(payload: SigmaNodeEvent): void;
-  leaveNode(payload: SigmaNodeEvent): void;
-  clickNode(payload: SigmaNodeEvent): void;
-  rightClickNode(payload: SigmaNodeEvent): void;
-  doubleClickNode(payload: SigmaNodeEvent): void;
-  wheelNode(payload: SigmaNodeEvent): void;
-
-  // Edge events
-  enterEdge(payload: SigmaEdgeEvent): void;
-  leaveEdge(payload: SigmaEdgeEvent): void;
-  clickEdge(payload: SigmaEdgeEvent): void;
-  rightClickEdge(payload: SigmaEdgeEvent): void;
-  doubleClickEdge(payload: SigmaEdgeEvent): void;
-  wheelEdge(payload: SigmaEdgeEvent): void;
+  // Additional edge events
+  enterEdge(payload: Pick<SigmaEdgeEventPayload, "edge">): void;
+  leaveEdge(payload: Pick<SigmaEdgeEventPayload, "edge">): void;
 };
+
+type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
 
 /**
  * Main class.
@@ -498,7 +497,7 @@ export default class Sigma extends (EventEmitter as unknown as new () => TypedEv
     };
 
     // Handling click
-    const createMouseListener = (eventType: string): ((e: MouseCoords) => void) => {
+    const createMouseListener = (eventType: MouseInteraction): ((e: MouseCoords) => void) => {
       return (e) => {
         const baseEvent = {
           event: e,
