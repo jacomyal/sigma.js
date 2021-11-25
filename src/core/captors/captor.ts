@@ -4,7 +4,7 @@
  * @module
  */
 import { EventEmitter } from "events";
-import { Coordinates, MouseCoords, TouchCoords, WheelCoords } from "../../types";
+import { Coordinates, MouseCoords, TouchCoords, WheelCoords, TypedEventEmitter, Listener } from "../../types";
 import Sigma from "../../sigma";
 
 /**
@@ -102,12 +102,17 @@ export function getWheelDelta(e: WheelEvent): number {
 /**
  * Abstract class representing a captor like the user's mouse or touch controls.
  */
-export default abstract class Captor extends EventEmitter {
+export default abstract class Captor<Events extends Record<string, Listener>> extends (EventEmitter as unknown as {
+  new <T extends Record<string, Listener>>(): TypedEventEmitter<T>;
+})<Events> {
   container: HTMLElement;
   renderer: Sigma;
 
   constructor(container: HTMLElement, renderer: Sigma) {
     super();
+
+    this.rawEmitter = this as EventEmitter;
+
     // Properties
     this.container = container;
     this.renderer = renderer;
