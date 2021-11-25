@@ -84,8 +84,9 @@ export type CoordinateConversionOverride = {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Listener = (...args: any[]) => void;
+export type EventsMapping = Record<string, Listener>;
 
-export declare class TypedEventEmitter<Events extends Record<string, Listener>> {
+interface ITypedEventEmitter<Events extends EventsMapping> {
   rawEmitter: EventEmitter;
 
   eventNames<Event extends keyof Events>(): Array<Event>;
@@ -103,4 +104,13 @@ export declare class TypedEventEmitter<Events extends Record<string, Listener>> 
   listeners<Event extends keyof Events>(type: Event): Events[Event][];
   listenerCount<Event extends keyof Events>(type: Event): number;
   rawListeners<Event extends keyof Events>(type: Event): Events[Event][];
+}
+
+export class TypedEventEmitter<Events extends EventsMapping> extends (EventEmitter as unknown as {
+  new <T extends EventsMapping>(): ITypedEventEmitter<T>;
+})<Events> {
+  constructor() {
+    super();
+    this.rawEmitter = this as EventEmitter;
+  }
 }
