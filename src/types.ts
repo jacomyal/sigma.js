@@ -16,13 +16,6 @@ export type PlainObject<T = any> = { [k: string]: T };
 
 /**
  * Returns a type similar to T, but with the the K set of properties of the type
- * T optional.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>> & { [others: string]: any };
-
-/**
- * Returns a type similar to T, but with the the K set of properties of the type
  * T *required*, and the rest optional.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
