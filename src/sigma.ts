@@ -98,16 +98,16 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
 /**
  * Event types.
  */
-interface SigmaEvent {
+interface SigmaEventPayload {
   event: MouseCoords;
   preventSigmaDefault(): void;
 }
 
-interface SigmaStageEventPayload extends SigmaEvent {}
-interface SigmaNodeEventPayload extends SigmaEvent {
+interface SigmaStageEventPayload extends SigmaEventPayload {}
+interface SigmaNodeEventPayload extends SigmaEventPayload {
   node: string;
 }
-interface SigmaEdgeEventPayload extends SigmaEvent {
+interface SigmaEdgeEventPayload extends SigmaEventPayload {
   edge: string;
 }
 
@@ -129,12 +129,12 @@ type SigmaAdditionalEvents = {
   kill(): void;
 
   // Additional node events
-  enterNode(payload: Pick<SigmaNodeEventPayload, "node">): void;
-  leaveNode(payload: Pick<SigmaNodeEventPayload, "node">): void;
+  enterNode(payload: SigmaNodeEventPayload): void;
+  leaveNode(payload: SigmaNodeEventPayload): void;
 
   // Additional edge events
-  enterEdge(payload: Pick<SigmaEdgeEventPayload, "edge">): void;
-  leaveEdge(payload: Pick<SigmaEdgeEventPayload, "edge">): void;
+  enterEdge(payload: SigmaEdgeEventPayload): void;
+  leaveEdge(payload: SigmaEdgeEventPayload): void;
 };
 
 type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
@@ -424,11 +424,18 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     };
 
     // Handling mouse move
-    this.activeListeners.handleMove = (e: Coordinates): void => {
+    this.activeListeners.handleMove = (e: MouseCoords): void => {
       // NOTE: for the canvas renderer, testing the pixel's alpha should
       // give some boost but this slows things down for WebGL empirically.
 
       const quadNodes = getQuadNodes(e.x, e.y);
+
+      const baseEvent = {
+        event: e,
+        preventSigmaDefault(): void {
+          this.event.preventSigmaDefault();
+        },
+      };
 
       // We will hover the node whose center is closest to mouse
       let minDistance = Infinity,
@@ -456,10 +463,10 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
       if (nodeToHover && this.hoveredNode !== nodeToHover && !this.nodeDataCache[nodeToHover].hidden) {
         // Handling passing from one node to the other directly
-        if (this.hoveredNode) this.emit("leaveNode", { node: this.hoveredNode });
+        if (this.hoveredNode) this.emit("leaveNode", { ...baseEvent, node: this.hoveredNode });
 
         this.hoveredNode = nodeToHover;
-        this.emit("enterNode", { node: nodeToHover });
+        this.emit("enterNode", { ...baseEvent, node: nodeToHover });
         this.scheduleHighlightedNodesRender();
         return;
       }
@@ -476,19 +483,17 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
-          this.emit("leaveNode", { node });
+          this.emit("leaveNode", { ...baseEvent, node });
           return this.scheduleHighlightedNodesRender();
         }
       }
 
-      const mousePosition = { x: e.x, y: e.y };
-
       if (this.settings.enableEdgeHoverEvents === true) {
-        this.checkEdgeHoverEvents(mousePosition);
+        this.checkEdgeHoverEvents(baseEvent);
       } else if (this.settings.enableEdgeHoverEvents === "debounce") {
         if (!this.checkEdgesEventsFrame)
           this.checkEdgesEventsFrame = requestFrame(() => {
-            this.checkEdgeHoverEvents(mousePosition);
+            this.checkEdgeHoverEvents(baseEvent);
             this.checkEdgesEventsFrame = null;
           });
       }
@@ -592,12 +597,12 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    *
    * @return {Sigma}
    */
-  private checkEdgeHoverEvents(mousePosition: Coordinates): this {
-    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(mousePosition.x, mousePosition.y);
+  private checkEdgeHoverEvents(payload: SigmaEventPayload): this {
+    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(payload.event.x, payload.event.y);
 
     if (edgeToHover !== this.hoveredEdge) {
-      if (this.hoveredEdge) this.emit("leaveEdge", { edge: this.hoveredEdge });
-      if (edgeToHover) this.emit("enterEdge", { edge: edgeToHover });
+      if (this.hoveredEdge) this.emit("leaveEdge", { ...payload, edge: this.hoveredEdge });
+      if (edgeToHover) this.emit("enterEdge", { ...payload, edge: edgeToHover });
       this.hoveredEdge = edgeToHover;
     }
 
