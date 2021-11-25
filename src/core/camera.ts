@@ -10,7 +10,7 @@ import { EventEmitter } from "events";
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
 import { cancelFrame, requestFrame } from "../utils";
-import { CameraState } from "../types";
+import { CameraState, TypedEventEmitter } from "../types";
 
 /**
  * Defaults.
@@ -18,11 +18,21 @@ import { CameraState } from "../types";
 const DEFAULT_ZOOMING_RATIO = 1.5;
 
 /**
+ * Event types.
+ */
+type CameraEvents = {
+  updated(state: CameraState): void;
+};
+
+/**
  * Camera class
  *
  * @constructor
  */
-export default class Camera extends EventEmitter implements CameraState {
+export default class Camera
+  extends (EventEmitter as unknown as new () => TypedEventEmitter<CameraEvents>)
+  implements CameraState
+{
   x = 0.5;
   y = 0.5;
   angle = 0;
@@ -39,6 +49,7 @@ export default class Camera extends EventEmitter implements CameraState {
 
   constructor() {
     super();
+    this.rawEmitter = this as EventEmitter;
 
     // State
     this.previousState = this.getState();
