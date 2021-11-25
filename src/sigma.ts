@@ -3,7 +3,6 @@
  * ========
  * @module
  */
-import { EventEmitter } from "events";
 import graphExtent from "graphology-metrics/extent";
 import Graph from "graphology";
 
@@ -148,7 +147,7 @@ type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaA
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma extends (EventEmitter as unknown as new () => TypedEventEmitter<SigmaEvents>) {
+export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   private settings: Settings;
   private graph: Graph;
   private mouseCaptor: MouseCaptor;
@@ -204,7 +203,6 @@ export default class Sigma extends (EventEmitter as unknown as new () => TypedEv
     super();
 
     this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
-    this.rawEmitter = this as EventEmitter;
 
     // Validating
     validateSettings(this.settings);

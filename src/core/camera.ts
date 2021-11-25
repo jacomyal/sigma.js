@@ -5,8 +5,6 @@
  * Class designed to store camera information & used to update it.
  * @module
  */
-import { EventEmitter } from "events";
-
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
 import { cancelFrame, requestFrame } from "../utils";
@@ -29,10 +27,7 @@ type CameraEvents = {
  *
  * @constructor
  */
-export default class Camera
-  extends (EventEmitter as unknown as new () => TypedEventEmitter<CameraEvents>)
-  implements CameraState
-{
+export default class Camera extends TypedEventEmitter<CameraEvents> implements CameraState {
   x = 0.5;
   y = 0.5;
   angle = 0;
@@ -46,7 +41,6 @@ export default class Camera
 
   constructor() {
     super();
-    this.rawEmitter = this as EventEmitter;
 
     // State
     this.previousState = this.getState();
