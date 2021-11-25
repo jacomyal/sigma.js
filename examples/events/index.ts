@@ -46,10 +46,10 @@ const renderer = new Sigma(graph, container, {
   },
 });
 
-["enterNode", "leaveNode", "clickNode", "rightClickNode", "doubleClickNode", "wheelNode"].forEach((eventType) =>
-  renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)),
+(["enterNode", "leaveNode", "clickNode", "rightClickNode", "doubleClickNode", "wheelNode"] as const).forEach(
+  (eventType) => renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)),
 );
-["clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"].forEach((eventType) =>
+(["clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const).forEach((eventType) =>
   renderer.on(eventType, ({ edge }) => logEvent(eventType, "edge", edge)),
 );
 renderer.on("enterEdge", ({ edge }) => {
