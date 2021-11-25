@@ -205,6 +205,7 @@ export default class Sigma extends (EventEmitter as unknown as new () => TypedEv
     super();
 
     this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
+    this.rawEmitter = this as EventEmitter;
 
     // Validating
     validateSettings(this.settings);
