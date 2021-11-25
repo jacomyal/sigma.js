@@ -5,7 +5,7 @@
  * Sigma's captor dealing with the user's mouse.
  * @module
  */
-import { CameraState } from "../../types";
+import { CameraState, MouseCoords, WheelCoords } from "../../types";
 import Sigma from "../../sigma";
 import Captor, { getWheelDelta, getMouseCoords, getPosition, getWheelCoords } from "./captor";
 
@@ -23,11 +23,24 @@ const DOUBLE_CLICK_ZOOMING_RATIO = 2.2;
 const DOUBLE_CLICK_ZOOMING_DURATION = 200;
 
 /**
+ * Event types.
+ */
+type MouseCaptorEvents = {
+  click(coordinates: MouseCoords): void;
+  rightClick(coordinates: MouseCoords): void;
+  doubleClick(coordinates: MouseCoords): void;
+  mouseup(coordinates: MouseCoords): void;
+  mousedown(coordinates: MouseCoords): void;
+  mousemove(coordinates: MouseCoords): void;
+  wheel(coordinates: WheelCoords): void;
+};
+
+/**
  * Mouse captor class.
  *
  * @constructor
  */
-export default class MouseCaptor extends Captor {
+export default class MouseCaptor extends Captor<MouseCaptorEvents> {
   // State
   enabled = true;
   draggedEvents = 0;

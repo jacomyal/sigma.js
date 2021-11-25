@@ -5,7 +5,7 @@
  * Sigma's captor dealing with touch.
  * @module
  */
-import { CameraState, Coordinates, Dimensions } from "../../types";
+import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 import Sigma from "../../sigma";
 
@@ -14,11 +14,20 @@ const TOUCH_INERTIA_RATIO = 3;
 const TOUCH_INERTIA_DURATION = 200;
 
 /**
+ * Event types.
+ */
+type TouchCaptorEvents = {
+  touchdown(coordinates: TouchCoords): void;
+  touchup(coordinates: TouchCoords): void;
+  touchmove(coordinates: TouchCoords): void;
+};
+
+/**
  * Touch captor class.
  *
  * @constructor
  */
-export default class TouchCaptor extends Captor {
+export default class TouchCaptor extends Captor<TouchCaptorEvents> {
   enabled = true;
   isMoving = false;
   startCameraState?: CameraState;
