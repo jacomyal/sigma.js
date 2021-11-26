@@ -96,8 +96,8 @@ export const DEFAULT_SETTINGS: Settings = {
   stagePadding: 30,
 
   // Labels
-  labelDensity: 0.07,
-  labelGridCellSize: 60,
+  labelDensity: 1,
+  labelGridCellSize: 250,
   labelRenderedSizeThreshold: 6,
 
   // Reducers

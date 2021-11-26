@@ -65,7 +65,7 @@ export class LabelGrid {
     const xIndex = Math.floor(pos.x / this.cellSize);
     const yIndex = Math.floor(pos.y / this.cellSize);
 
-    return xIndex * this.columns + yIndex;
+    return yIndex * this.columns + xIndex;
   }
 
   add(key: string, size: number, pos: Coordinates): void {
