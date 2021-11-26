@@ -938,7 +938,7 @@ export default class Sigma extends EventEmitter {
         extremities = this.graph.extremities(edge),
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]],
-        edgeData = this.edgeDataCache[edgeLabelsToDisplay[i]];
+        edgeData = this.edgeDataCache[edge];
 
       // If the edge is hidden we don't need to display its label
       // NOTE: the test on sourceData & targetData is probably paranoid at this point?
