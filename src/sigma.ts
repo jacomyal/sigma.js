@@ -689,12 +689,12 @@ export default class Sigma extends EventEmitter {
       }
     }
 
-    for (const type in nodesPerPrograms) {
+    for (const type in this.nodePrograms) {
       if (!this.nodePrograms.hasOwnProperty(type)) {
         throw new Error(`Sigma: could not find a suitable program for node type "${type}"!`);
       }
 
-      if (!keepArrays) this.nodePrograms[type].allocate(nodesPerPrograms[type]);
+      if (!keepArrays) this.nodePrograms[type].allocate(nodesPerPrograms[type] || 0);
       // We reset that count here, so that we can reuse it while calling the Program#process methods:
       nodesPerPrograms[type] = 0;
     }
@@ -752,12 +752,12 @@ export default class Sigma extends EventEmitter {
       }
     }
 
-    for (const type in edgesPerPrograms) {
+    for (const type in this.edgePrograms) {
       if (!this.edgePrograms.hasOwnProperty(type)) {
         throw new Error(`Sigma: could not find a suitable program for edge type "${type}"!`);
       }
 
-      if (!keepArrays) this.edgePrograms[type].allocate(edgesPerPrograms[type]);
+      if (!keepArrays) this.edgePrograms[type].allocate(edgesPerPrograms[type] || 0);
       // We reset that count here, so that we can reuse it while calling the Program#process methods:
       edgesPerPrograms[type] = 0;
     }
