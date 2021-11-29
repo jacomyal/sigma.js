@@ -1,5 +1,14 @@
 # sigma.js - changelog:
 
+## 2.1.2
+
+### Bug fixes
+
+- [#1168](https://github.com/jacomyal/sigma.js/issues/1168) - Fixes hover and click events when mouse is hovering a hidden node
+- [#1169](https://github.com/jacomyal/sigma.js/issues/1169) - Fixes x / y values in sigma events when mouse is not hovering the sigma container
+- [#1173](https://github.com/jacomyal/sigma.js/issues/1173) - Fixes issue where unused program no longer deallocate back to zero
+- [#1175](https://github.com/jacomyal/sigma.js/issues/1175) - Fixes zoom scrolling in a scrolled webpage
+
 ## 2.1.1
 
 ### Bug fix
