@@ -62,7 +62,7 @@ export default class TouchCaptor extends Captor {
   }
 
   dispatchRelatedMouseEvent(type: string, e: TouchEvent, position?: Coordinates, emitter?: EventTarget): void {
-    const mousePosition = position || getPosition(e.touches[0]);
+    const mousePosition = position || getPosition(e.touches[0], this.container);
     const mouseEvent = new MouseEvent(type, {
       clientX: mousePosition.x,
       clientY: mousePosition.y,
@@ -96,7 +96,7 @@ export default class TouchCaptor extends Captor {
       this.startTouchesDistance = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
     }
 
-    this.emit("touchdown", getTouchCoords(e));
+    this.emit("touchdown", getTouchCoords(e, this.container));
   }
 
   handleLeave(e: TouchEvent): void {
@@ -150,7 +150,7 @@ export default class TouchCaptor extends Captor {
         break;
     }
 
-    this.emit("touchup", getTouchCoords(e));
+    this.emit("touchup", getTouchCoords(e, this.container));
   }
 
   handleMove(e: TouchEvent): void {
@@ -240,6 +240,6 @@ export default class TouchCaptor extends Captor {
       }
     }
 
-    this.emit("touchmove", getTouchCoords(e));
+    this.emit("touchmove", getTouchCoords(e, this.container));
   }
 }

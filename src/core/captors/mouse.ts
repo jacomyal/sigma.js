@@ -100,13 +100,13 @@ export default class MouseCaptor extends Captor {
     }, DOUBLE_CLICK_TIMEOUT);
 
     // NOTE: this is here to prevent click events on drag
-    if (this.draggedEvents < DRAGGED_EVENTS_TOLERANCE) this.emit("click", getMouseCoords(e));
+    if (this.draggedEvents < DRAGGED_EVENTS_TOLERANCE) this.emit("click", getMouseCoords(e, this.container));
   }
 
   handleRightClick(e: MouseEvent): void {
     if (!this.enabled) return;
 
-    this.emit("rightClick", getMouseCoords(e));
+    this.emit("rightClick", getMouseCoords(e, this.container));
   }
 
   handleDoubleClick(e: MouseEvent): void | boolean {
@@ -116,7 +116,7 @@ export default class MouseCaptor extends Captor {
     else e.returnValue = false;
     e.stopPropagation();
 
-    const mouseCoords = getMouseCoords(e);
+    const mouseCoords = getMouseCoords(e, this.container);
     this.emit("doubleClick", mouseCoords);
 
     if (mouseCoords.sigmaDefaultPrevented) return false;
@@ -151,7 +151,7 @@ export default class MouseCaptor extends Captor {
       default:
         // Left button pressed
         this.isMouseDown = true;
-        this.emit("mousedown", getMouseCoords(e));
+        this.emit("mousedown", getMouseCoords(e, this.container));
     }
   }
 
@@ -194,12 +194,12 @@ export default class MouseCaptor extends Captor {
       this.draggedEvents = 0;
       this.renderer.refresh();
     }, 0);
-    this.emit("mouseup", getMouseCoords(e));
+    this.emit("mouseup", getMouseCoords(e, this.container));
   }
 
   handleMove(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
-    this.emit("mousemove", getMouseCoords(e));
+    this.emit("mousemove", getMouseCoords(e, this.container));
 
     if (this.isMouseDown) {
       // TODO: dispatch events
@@ -259,7 +259,7 @@ export default class MouseCaptor extends Captor {
 
     if (!delta) return false;
 
-    const wheelCoords = getWheelCoords(e);
+    const wheelCoords = getWheelCoords(e, this.container);
     this.emit("wheel", wheelCoords);
 
     if (wheelCoords.sigmaDefaultPrevented) return false;
