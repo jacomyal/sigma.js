@@ -20,6 +20,7 @@ import {
   MouseCoords,
   NodeDisplayData,
   PlainObject,
+  CoordinateConversionOverride,
 } from "./types";
 import {
   createElement,
@@ -1466,16 +1467,7 @@ export default class Sigma extends EventEmitter {
    * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
    * of computations.
    */
-  framedGraphToViewport(
-    coordinates: Coordinates,
-    override: {
-      cameraState?: CameraState;
-      matrix?: Float32Array;
-      viewportDimensions?: Dimensions;
-      graphDimensions?: Dimensions;
-      padding?: number;
-    } = {},
-  ): Coordinates {
+  framedGraphToViewport(coordinates: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
     const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !!override.graphDimensions;
     const matrix = override.matrix
       ? override.matrix
@@ -1504,16 +1496,7 @@ export default class Sigma extends EventEmitter {
    * Be careful if overriding dimensions, padding or cameraState, as the computation of the matrix is not the lightest
    * of computations.
    */
-  viewportToFramedGraph(
-    coordinates: Coordinates,
-    override: {
-      cameraState?: CameraState;
-      matrix?: Float32Array;
-      viewportDimensions?: Dimensions;
-      graphDimensions?: Dimensions;
-      padding?: number;
-    } = {},
-  ): Coordinates {
+  viewportToFramedGraph(coordinates: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
     const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
     const invMatrix = override.matrix
       ? override.matrix
@@ -1545,8 +1528,8 @@ export default class Sigma extends EventEmitter {
    *
    * @param {Coordinates} viewportPoint
    */
-  viewportToGraph(viewportPoint: Coordinates): Coordinates {
-    return this.normalizationFunction.inverse(this.viewportToFramedGraph(viewportPoint));
+  viewportToGraph(viewportPoint: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
+    return this.normalizationFunction.inverse(this.viewportToFramedGraph(viewportPoint, override));
   }
 
   /**
@@ -1558,8 +1541,8 @@ export default class Sigma extends EventEmitter {
    *
    * @param {Coordinates} graphPoint
    */
-  graphToViewport(graphPoint: Coordinates): Coordinates {
-    return this.framedGraphToViewport(this.normalizationFunction(graphPoint));
+  graphToViewport(graphPoint: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
+    return this.framedGraphToViewport(this.normalizationFunction(graphPoint), override);
   }
 
   /**

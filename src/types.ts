@@ -88,3 +88,11 @@ export interface NodeDisplayData extends Coordinates, DisplayData {
 }
 
 export interface EdgeDisplayData extends DisplayData {}
+
+export type CoordinateConversionOverride = {
+  cameraState?: CameraState;
+  matrix?: Float32Array;
+  viewportDimensions?: Dimensions;
+  graphDimensions?: Dimensions;
+  padding?: number;
+};
