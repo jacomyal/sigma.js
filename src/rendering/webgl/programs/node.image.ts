@@ -130,7 +130,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
       xOffset = textureImage.width;
     }
     images.forEach((image) => {
-      ctx.drawImage(image, xOffset, 0);
+      ctx.drawImage(image, xOffset, 0, image.width || 1, image.height || 1);
       xOffset += image.width;
     });
 
