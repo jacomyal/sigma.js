@@ -1,5 +1,14 @@
 # sigma.js - changelog:
 
+## 2.1.3
+
+### Bug fixes
+
+- [#1178](https://github.com/jacomyal/sigma.js/issues/1178) - Fixes uncaught error in Firefox when using node.image with images with no size
+- [#1180](https://github.com/jacomyal/sigma.js/issues/1180) - Fixes edge events not being fired when edge size not set in the graph
+- [#1183](https://github.com/jacomyal/sigma.js/issues/1183) - Moves edge labels layer behind nodes layer
+- [#1186](https://github.com/jacomyal/sigma.js/issues/1186) - Fixes hovered nodes when mouse not hover sigma container
+
 ## 2.1.2
 
 ### Bug fixes
