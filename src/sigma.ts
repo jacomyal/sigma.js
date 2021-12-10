@@ -172,8 +172,8 @@ export default class Sigma extends EventEmitter {
 
     // Initializing contexts
     this.createWebGLContext("edges", { preserveDrawingBuffer: true });
-    this.createWebGLContext("nodes");
     this.createCanvasContext("edgeLabels");
+    this.createWebGLContext("nodes");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
     this.createWebGLContext("hoverNodes");
