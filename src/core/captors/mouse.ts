@@ -199,7 +199,20 @@ export default class MouseCaptor extends Captor {
 
   handleMove(e: MouseEvent): void | boolean {
     if (!this.enabled) return;
-    this.emit("mousemove", getMouseCoords(e, this.container));
+
+    const mouseCoords = getMouseCoords(e, this.container);
+
+    // Always trigger a "mousemovebody" event, so that it is possible to develop
+    // a drag-and-drop effect that works even when the mouse is out of the
+    // container:
+    this.emit("mousemovebody", mouseCoords);
+
+    // Only trigger the "mousemove" event when the mouse is actually hovering
+    // the container, to avoid weirdly hovering nodes and/or edges when the
+    // mouse is not hover the container:
+    if (e.target !== this.container) return;
+
+    this.emit("mousemove", mouseCoords);
 
     if (this.isMouseDown) {
       // TODO: dispatch events

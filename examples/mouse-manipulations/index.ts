@@ -47,7 +47,7 @@ renderer.on("downNode", (e) => {
 });
 
 // On mouse move, if the drag mode is enabled, we change the position of the draggedNode
-renderer.getMouseCaptor().on("mousemove", (e) => {
+renderer.getMouseCaptor().on("mousemovebody", (e) => {
   if (!isDragging || !draggedNode) return;
 
   // Get new position of node
