@@ -34,6 +34,7 @@ import {
   validateGraph,
   zIndexOrdering,
   getMatrixImpact,
+  graphExtent,
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
@@ -645,9 +646,7 @@ export default class Sigma extends EventEmitter {
     this.highlightedNodes = new Set();
 
     // Computing extents
-    const nodeExtentProperties = ["x", "y"];
-
-    this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent };
+    this.nodeExtent = graphExtent(graph);
 
     // Resetting `forceLabel` indices
     this.nodesWithForcedLabels = [];
@@ -1586,7 +1585,7 @@ export default class Sigma extends EventEmitter {
    * @return {{ x: Extent, y: Extent }}
    */
   getBBox(): { x: Extent; y: Extent } {
-    return nodeExtent(this.graph, ["x", "y"]) as { x: Extent; y: Extent };
+    return graphExtent(this.graph);
   }
 
   /**
