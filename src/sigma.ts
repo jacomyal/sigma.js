@@ -4,7 +4,6 @@
  * @module
  */
 import { EventEmitter } from "events";
-import graphExtent from "graphology-metrics/extent";
 import Graph from "graphology";
 
 import Camera from "./core/camera";
@@ -33,6 +32,7 @@ import {
   validateGraph,
   zIndexOrdering,
   getMatrixImpact,
+  graphExtent,
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
@@ -41,8 +41,6 @@ import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
 import { identity, multiplyVec } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
-
-const { nodeExtent } = graphExtent;
 
 /**
  * Constants.
@@ -640,9 +638,7 @@ export default class Sigma extends EventEmitter {
     this.highlightedNodes = new Set();
 
     // Computing extents
-    const nodeExtentProperties = ["x", "y"];
-
-    this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent };
+    this.nodeExtent = graphExtent(graph);
 
     // NOTE: it is important to compute this matrix after computing the node's extent
     // because #.getGraphDimensions relies on it
@@ -1568,7 +1564,7 @@ export default class Sigma extends EventEmitter {
    * @return {{ x: Extent, y: Extent }}
    */
   getBBox(): { x: Extent; y: Extent } {
-    return nodeExtent(this.graph, ["x", "y"]) as { x: Extent; y: Extent };
+    return graphExtent(this.graph);
   }
 
   /**

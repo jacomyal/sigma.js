@@ -5,8 +5,7 @@
  * Various helper functions & classes used throughout the library.
  * @module
  */
-import Graph from "graphology";
-import { Attributes } from "graphology-types";
+import Graph, { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate, multiplyVec } from "./matrices";
@@ -121,6 +120,31 @@ export function getPixelRatio(): number {
   if (typeof window.devicePixelRatio !== "undefined") return window.devicePixelRatio;
 
   return 1;
+}
+
+/**
+ * Function returning the graph's node extent in x & y.
+ *
+ * @param  {Graph}
+ * @return {object}
+ */
+export function graphExtent(graph: Graph): { x: Extent; y: Extent } {
+  let xMin = Infinity;
+  let xMax = -Infinity;
+  let yMin = Infinity;
+  let yMax = -Infinity;
+
+  graph.forEachNode((_, attr) => {
+    const { x, y } = attr;
+
+    if (x < xMin) xMin = x;
+    if (x > xMax) xMax = x;
+
+    if (y < yMin) yMin = y;
+    if (y > yMax) yMax = y;
+  });
+
+  return { x: [xMin, xMax], y: [yMin, yMax] };
 }
 
 /**

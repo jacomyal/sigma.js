@@ -55,7 +55,6 @@
   "dependencies": {
     "@yomguithereal/helpers": "^1.1.1",
     "events": "^3.3.0",
-    "graphology-metrics": "1.18.2",
     "graphology-utils": "^2.4.0"
   },
   "devDependencies": {
