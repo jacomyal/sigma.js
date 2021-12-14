@@ -15,7 +15,8 @@ import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
 
 const POINTS = 1,
-  ATTRIBUTES = 8;
+  ATTRIBUTES = 8,
+  MAX_TEXTURE_SIZE = 100;
 
 type ImageLoading = { status: "loading" };
 type ImageError = { status: "error" };
@@ -85,59 +86,59 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
   function finalizePendingImages(): void {
     pendingImagesFrameID = undefined;
 
-    const pendingImages: { image: HTMLImageElement; id: string }[] = [];
+    const pendingImages: { image: HTMLImageElement; id: string; size: number }[] = [];
+
+    // List all pending images:
     for (const id in images) {
       const state = images[id];
       if (state.status === "pending") {
         pendingImages.push({
           id,
           image: state.image,
+          size: Math.min(state.image.width, state.image.height) || 1,
         });
       }
     }
 
     // Add images to texture:
-    let xOffset = textureImage.width;
-    addToTexture(pendingImages.map(({ image }) => image));
-
-    // Update images state:
-    pendingImages.forEach(({ id, image }) => {
-      images[id] = {
-        status: "ready",
-        x: xOffset,
-        y: 0,
-        width: image.width,
-        height: image.height,
-      };
-      xOffset += image.width;
-    });
-  }
-
-  /**
-   * Helper to add an image into the texture (it actually generates a new
-   * texture):
-   */
-  function addToTexture(images: HTMLImageElement[]): void {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    canvas.width = images.reduce((iter, image) => iter + image.width, hasReceivedImages ? textureImage.width : 0);
-    canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...images.map((image) => image.height));
+    canvas.width = pendingImages.reduce((iter, { size }) => iter + size, hasReceivedImages ? textureImage.width : 0);
+    canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => size));
 
     let xOffset = 0;
     if (hasReceivedImages) {
       ctx.putImageData(textureImage, 0, 0);
       xOffset = textureImage.width;
     }
-    images.forEach((image) => {
-      ctx.drawImage(image, xOffset, 0, image.width || 1, image.height || 1);
-      xOffset += image.width;
+    pendingImages.forEach(({ id, image, size }) => {
+      const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
+
+      // Crop image, to only keep the biggest square, centered:
+      let dx = 0,
+        dy = 0;
+      if ((image.width || 0) > (image.height || 0)) {
+        dx = (image.width - image.height) / 2;
+      } else {
+        dy = (image.height - image.width) / 2;
+      }
+      ctx.drawImage(image, dx, dy, size, size, xOffset, 0, imageSizeInTexture, imageSizeInTexture);
+
+      // Update image state:
+      images[id] = {
+        status: "ready",
+        x: xOffset,
+        y: 0,
+        width: imageSizeInTexture,
+        height: imageSizeInTexture,
+      };
+
+      xOffset += imageSizeInTexture;
     });
 
     textureImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
     hasReceivedImages = true;
-
     rebindTextureFns.forEach((fn) => fn());
   }
 
@@ -152,7 +153,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
 
       rebindTextureFns.push(() => {
         if (this && this.rebindTexture) this.rebindTexture();
-        if (renderer && renderer.scheduleRefresh) renderer.scheduleRefresh();
+        if (renderer && renderer.refresh) renderer.refresh();
       });
 
       textureImage = new ImageData(1, 1);
