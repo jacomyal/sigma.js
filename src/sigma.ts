@@ -917,8 +917,7 @@ export default class Sigma extends EventEmitter {
         context,
         {
           key: node,
-          label: data.label,
-          color: data.color,
+          ...data,
           size,
           x,
           y,
@@ -973,8 +972,7 @@ export default class Sigma extends EventEmitter {
         context,
         {
           key: edge,
-          label: edgeData.label,
-          color: edgeData.color,
+          ...edgeData,
           size: this.scaleSize(edgeData.size),
         },
         {
@@ -1020,8 +1018,7 @@ export default class Sigma extends EventEmitter {
         context,
         {
           key: node,
-          label: data.label,
-          color: data.color,
+          ...data,
           size,
           x,
           y,
