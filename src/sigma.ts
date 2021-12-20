@@ -69,6 +69,8 @@ function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDi
 
   if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
 
+  if (!data.hasOwnProperty("forceLabel")) data.forceLabel = false;
+
   if (!data.type || data.type === "") data.type = settings.defaultNodeType;
 
   if (!data.zIndex) data.zIndex = 0;
@@ -84,6 +86,8 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
   if (!data.size) data.size = 0.5;
 
   if (!data.hasOwnProperty("hidden")) data.hidden = false;
+
+  if (!data.hasOwnProperty("forceLabel")) data.forceLabel = false;
 
   if (!data.type || data.type === "") data.type = settings.defaultEdgeType;
 
@@ -114,6 +118,8 @@ export default class Sigma extends EventEmitter {
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
+  private nodesWithForcedLabels: string[] = [];
+  private edgesWithForcedLabels: string[] = [];
   private nodeKeyToIndex: Record<string, number> = {};
   private edgeKeyToIndex: Record<string, number> = {};
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
@@ -145,7 +151,7 @@ export default class Sigma extends EventEmitter {
   private needToSoftProcess = false;
   private checkEdgesEventsFrame: number | null = null;
 
-  // programs
+  // Programs
   private nodePrograms: { [key: string]: INodeProgram } = {};
   private hoverNodePrograms: { [key: string]: INodeProgram } = {};
   private edgePrograms: { [key: string]: IEdgeProgram } = {};
@@ -642,6 +648,10 @@ export default class Sigma extends EventEmitter {
 
     this.nodeExtent = nodeExtent(graph, nodeExtentProperties) as { x: Extent; y: Extent };
 
+    // Resetting `forceLabel` indices
+    this.nodesWithForcedLabels = [];
+    this.edgesWithForcedLabels = [];
+
     // NOTE: it is important to compute this matrix after computing the node's extent
     // because #.getGraphDimensions relies on it
     const nullCamera = new Camera();
@@ -680,6 +690,8 @@ export default class Sigma extends EventEmitter {
       this.nodeDataCache[node] = data;
 
       this.normalizationFunction.applyTo(data);
+
+      if (data.forceLabel) this.nodesWithForcedLabels.push(node);
 
       if (this.settings.zIndex) {
         if (data.zIndex < nodeZExtent[0]) nodeZExtent[0] = data.zIndex;
@@ -743,6 +755,8 @@ export default class Sigma extends EventEmitter {
 
       edgesPerPrograms[data.type] = (edgesPerPrograms[data.type] || 0) + 1;
       this.edgeDataCache[edge] = data;
+
+      if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.push(edge);
 
       if (this.settings.zIndex) {
         if (data.zIndex < edgeZExtent[0]) edgeZExtent[0] = data.zIndex;
@@ -862,7 +876,9 @@ export default class Sigma extends EventEmitter {
     // Selecting labels to draw
     // TODO: drop gridsettings likewise
     // TODO: optimize through visible nodes
-    const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
+    const labelsToDisplay = this.labelGrid
+      .getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity)
+      .concat(this.nodesWithForcedLabels);
     this.displayedLabels = new Set();
 
     // Drawing labels
@@ -871,6 +887,10 @@ export default class Sigma extends EventEmitter {
     for (let i = 0, l = labelsToDisplay.length; i < l; i++) {
       const node = labelsToDisplay[i];
       const data = this.nodeDataCache[node];
+
+      // If the node was already drawn (like if it is eligible AND has
+      // `forceLabel`), we don't want to draw it again
+      if (this.displayedLabels.has(node)) continue;
 
       // If the node is hidden, we don't need to display its label obviously
       if (data.hidden) continue;
@@ -881,7 +901,7 @@ export default class Sigma extends EventEmitter {
       // TODO: this should be computed in the canvas components?
       const size = this.scaleSize(data.size);
 
-      if (size < this.settings.labelRenderedSizeThreshold) continue;
+      if (!data.forceLabel && size < this.settings.labelRenderedSizeThreshold) continue;
 
       if (!visibleNodes.has(node)) continue;
 
@@ -929,7 +949,8 @@ export default class Sigma extends EventEmitter {
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedLabels,
       highlightedNodes: this.highlightedNodes,
-    });
+    }).concat(this.edgesWithForcedLabels);
+    const displayedLabels = new Set<string>();
 
     for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
       const edge = edgeLabelsToDisplay[i],
@@ -937,6 +958,10 @@ export default class Sigma extends EventEmitter {
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]],
         edgeData = this.edgeDataCache[edge];
+
+      // If the edge was already drawn (like if it is eligible AND has
+      // `forceLabel`), we don't want to draw it again
+      if (displayedLabels.has(edge)) continue;
 
       // If the edge is hidden we don't need to display its label
       // NOTE: the test on sourceData & targetData is probably paranoid at this point?
@@ -966,6 +991,7 @@ export default class Sigma extends EventEmitter {
         },
         this.settings,
       );
+      displayedLabels.add(edge);
     }
 
     return this;
@@ -1627,6 +1653,8 @@ export default class Sigma extends EventEmitter {
     this.quadtree = new QuadTree();
     this.nodeDataCache = {};
     this.edgeDataCache = {};
+    this.nodesWithForcedLabels = [];
+    this.edgesWithForcedLabels = [];
 
     this.highlightedNodes.clear();
 

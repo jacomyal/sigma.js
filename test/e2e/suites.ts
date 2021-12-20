@@ -411,4 +411,25 @@ export const tests: Tests = [
       });
     },
   },
+  {
+    name: "force-labels",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("upper-left", { x: 0, y: 0, size: 5, label: "upper left", forceLabel: true });
+        graph.addNode("upper-right", { x: 10, y: 0, size: 5, label: "upper right", forceLabel: true });
+        graph.addNode("lower-left", { x: 0, y: 10, size: 5, label: "lower left" });
+        graph.addNode("lower-right", { x: 10, y: 10, size: 15, label: "lower right" });
+
+        graph.addEdge("upper-left", "upper-right", { type: "arrow", size: 5, label: "right" });
+        graph.addEdge("upper-right", "lower-right", { type: "arrow", size: 5, label: "down" });
+        graph.addEdge("lower-right", "lower-left", { type: "arrow", size: 5, label: "left", forceLabel: true });
+        graph.addEdge("lower-left", "upper-left", { type: "arrow", size: 5, label: "up", forceLabel: true });
+
+        new Sigma(graph, container, { renderEdgeLabels: true, labelRenderedSizeThreshold: 10 });
+      });
+    },
+  },
 ];
