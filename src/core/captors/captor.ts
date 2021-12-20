@@ -41,12 +41,6 @@ export function getPosition(e: MouseEvent | Touch, dom: HTMLElement): Coordinate
 export function getMouseCoords(e: MouseEvent, dom: HTMLElement): MouseCoords {
   return {
     ...getPosition(e, dom),
-    clientX: e.clientX,
-    clientY: e.clientY,
-    ctrlKey: e.ctrlKey,
-    metaKey: e.metaKey,
-    altKey: e.altKey,
-    shiftKey: e.shiftKey,
     sigmaDefaultPrevented: false,
     preventSigmaDefault(): void {
       this.sigmaDefaultPrevented = true;
@@ -65,7 +59,6 @@ export function getMouseCoords(e: MouseEvent, dom: HTMLElement): MouseCoords {
 export function getWheelCoords(e: WheelEvent, dom: HTMLElement): WheelCoords {
   return {
     ...getMouseCoords(e, dom),
-    deltaY: e.deltaY,
     delta: getWheelDelta(e),
   };
 }
@@ -87,13 +80,6 @@ export function getTouchesArray(touches: TouchList): Touch[] {
 export function getTouchCoords(e: TouchEvent, dom: HTMLElement): TouchCoords {
   return {
     touches: getTouchesArray(e.touches).map((touch) => getPosition(touch, dom)),
-    ctrlKey: e.ctrlKey,
-    metaKey: e.metaKey,
-    altKey: e.altKey,
-    shiftKey: e.shiftKey,
-
-    // TODO: same as for getMouseCoords
-    preventDefault: e.preventDefault.bind(e),
     original: e,
   };
 }

@@ -73,7 +73,7 @@ export default class TouchCaptor extends Captor {
     (emitter || this.container).dispatchEvent(mouseEvent);
   }
 
-  handleStart(e: TouchEvent): void | boolean {
+  handleStart(e: TouchEvent): void {
     if (!this.enabled) return;
 
     // Prevent default to avoid default browser behaviors...

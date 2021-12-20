@@ -41,29 +41,17 @@ export interface CameraState extends Coordinates {
 }
 
 export interface MouseCoords extends Coordinates {
-  clientX: number;
-  clientY: number;
-  ctrlKey: boolean;
-  metaKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
   sigmaDefaultPrevented: boolean;
   preventSigmaDefault(): void;
   original: MouseEvent;
 }
 
 export interface WheelCoords extends MouseCoords {
-  deltaY: number; // This will store the `deltaY` from the original event
   delta: number; // This will store the delta actually used by sigma
 }
 
 export interface TouchCoords {
   touches: Coordinates[];
-  ctrlKey: boolean;
-  metaKey: boolean;
-  altKey: boolean;
-  shiftKey: boolean;
-  preventDefault(): void;
   original: TouchEvent;
 }
 

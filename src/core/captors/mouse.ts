@@ -80,7 +80,7 @@ export default class MouseCaptor extends Captor {
     document.removeEventListener("mouseup", this.handleUp);
   }
 
-  handleClick(e: MouseEvent): void | boolean {
+  handleClick(e: MouseEvent): void {
     if (!this.enabled) return;
 
     this.clicks++;
@@ -109,17 +109,16 @@ export default class MouseCaptor extends Captor {
     this.emit("rightClick", getMouseCoords(e, this.container));
   }
 
-  handleDoubleClick(e: MouseEvent): void | boolean {
+  handleDoubleClick(e: MouseEvent): void {
     if (!this.enabled) return;
 
-    if (e.preventDefault) e.preventDefault();
-    else e.returnValue = false;
+    e.preventDefault();
     e.stopPropagation();
 
     const mouseCoords = getMouseCoords(e, this.container);
     this.emit("doubleClick", mouseCoords);
 
-    if (mouseCoords.sigmaDefaultPrevented) return false;
+    if (mouseCoords.sigmaDefaultPrevented) return;
 
     // default behavior
     const camera = this.renderer.getCamera();
@@ -129,8 +128,6 @@ export default class MouseCaptor extends Captor {
       easing: "quadraticInOut",
       duration: DOUBLE_CLICK_ZOOMING_DURATION,
     });
-
-    return false;
   }
 
   handleDown(e: MouseEvent): void {
@@ -147,12 +144,9 @@ export default class MouseCaptor extends Captor {
     this.downStartTime = Date.now();
 
     // TODO: dispatch events
-    switch (e.which) {
-      default:
-        // Left button pressed
-        this.isMouseDown = true;
-        this.emit("mousedown", getMouseCoords(e, this.container));
-    }
+    // Left button pressed
+    this.isMouseDown = true;
+    this.emit("mousedown", getMouseCoords(e, this.container));
   }
 
   handleUp(e: MouseEvent): void {
@@ -197,7 +191,7 @@ export default class MouseCaptor extends Captor {
     this.emit("mouseup", getMouseCoords(e, this.container));
   }
 
-  handleMove(e: MouseEvent): void | boolean {
+  handleMove(e: MouseEvent): void {
     if (!this.enabled) return;
 
     const mouseCoords = getMouseCoords(e, this.container);
@@ -252,30 +246,25 @@ export default class MouseCaptor extends Captor {
       this.lastMouseX = eX;
       this.lastMouseY = eY;
 
-      if (e.preventDefault) e.preventDefault();
-      else e.returnValue = false;
-
+      e.preventDefault();
       e.stopPropagation();
-
-      return false;
     }
   }
 
-  handleWheel(e: WheelEvent): boolean {
-    if (!this.enabled) return false;
+  handleWheel(e: WheelEvent): void {
+    if (!this.enabled) return;
 
-    if (e.preventDefault) e.preventDefault();
-    else e.returnValue = false;
+    e.preventDefault();
     e.stopPropagation();
 
     const delta = getWheelDelta(e);
 
-    if (!delta) return false;
+    if (!delta) return;
 
     const wheelCoords = getWheelCoords(e, this.container);
     this.emit("wheel", wheelCoords);
 
-    if (wheelCoords.sigmaDefaultPrevented) return false;
+    if (wheelCoords.sigmaDefaultPrevented) return;
 
     // Default behavior
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
@@ -290,7 +279,7 @@ export default class MouseCaptor extends Captor {
       this.lastWheelTriggerTime &&
       now - this.lastWheelTriggerTime < MOUSE_ZOOM_DURATION / 5
     ) {
-      return false;
+      return;
     }
 
     camera.animate(
@@ -306,8 +295,6 @@ export default class MouseCaptor extends Captor {
 
     this.currentWheelDirection = wheelDirection;
     this.lastWheelTriggerTime = now;
-
-    return false;
   }
 
   handleOut(): void {
