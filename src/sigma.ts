@@ -4,8 +4,8 @@
  * @module
  */
 import { EventEmitter } from "events";
-import graphExtent from "graphology-metrics/extent";
 import Graph from "graphology";
+import { nodeExtent } from "graphology-metrics/graph/extent";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
@@ -41,8 +41,6 @@ import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
 import { identity, multiplyVec } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
-
-const { nodeExtent } = graphExtent;
 
 /**
  * Constants.
