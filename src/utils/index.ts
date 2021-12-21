@@ -207,13 +207,17 @@ export function zIndexOrdering<T>(extent: Extent, getter: (e: T) => number, elem
  * Memoized function returning a float-encoded color from various string
  * formats describing colors.
  */
-const FLOAT_COLOR_CACHE: { [key: string]: number } = {};
 const INT8 = new Int8Array(4);
 const INT32 = new Int32Array(INT8.buffer, 0, 1);
 const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
 
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
 const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
+
+const FLOAT_COLOR_CACHE: { [key: string]: number } = {};
+for (const htmlColor in HTML_COLORS) {
+  FLOAT_COLOR_CACHE[htmlColor] = floatColor(HTML_COLORS[htmlColor]);
+}
 
 export function floatColor(val: string): number {
   // If the color is already computed, we yield it
@@ -258,10 +262,6 @@ export function floatColor(val: string): number {
   FLOAT_COLOR_CACHE[val] = color;
 
   return color;
-}
-
-for (const htmlColor in HTML_COLORS) {
-  FLOAT_COLOR_CACHE[htmlColor] = floatColor(HTML_COLORS[htmlColor]);
 }
 
 /**
