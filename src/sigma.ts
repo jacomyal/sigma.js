@@ -185,15 +185,12 @@ export default class Sigma extends EventEmitter {
     this.createCanvasContext("mouse");
 
     // Blending
-    let gl = this.webGLContexts.nodes;
+    for (const key in this.webGLContexts) {
+      const gl = this.webGLContexts[key];
 
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
-
-    gl = this.webGLContexts.edges;
-
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      gl.enable(gl.BLEND);
+    }
 
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
