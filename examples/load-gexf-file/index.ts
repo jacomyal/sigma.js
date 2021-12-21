@@ -24,7 +24,10 @@ fetch("./arctic.gexf")
     const labelsThresholdRange = document.getElementById("labels-threshold") as HTMLInputElement;
 
     // Instanciate sigma:
-    const renderer = new Sigma(graph, container);
+    const renderer = new Sigma(graph, container, {
+      minCameraRatio: 0.1,
+      maxCameraRatio: 10,
+    });
     const camera = renderer.getCamera();
 
     // Bind zoom manipulation buttons

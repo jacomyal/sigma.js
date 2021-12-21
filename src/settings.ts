@@ -22,6 +22,13 @@ export function validateSettings(settings: Settings): void {
   if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
     throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
   }
+
+  const { minCameraRatio, maxCameraRatio } = settings;
+  if (typeof minCameraRatio === "number" && typeof maxCameraRatio === "number" && maxCameraRatio < minCameraRatio) {
+    throw new Error(
+      "Settings: invalid camera ratio boundaries. Expecting `maxCameraRatio` to be greater than `minCameraRatio`.",
+    );
+  }
 }
 
 /**
@@ -60,6 +67,8 @@ export interface Settings {
   edgeReducer: null | ((edge: string, data: Attributes) => Partial<EdgeDisplayData>);
   // Features
   zIndex: boolean;
+  minCameraRatio: null | number;
+  maxCameraRatio: null | number;
   // Renderers
   labelRenderer: typeof drawLabel;
   hoverRenderer: typeof drawHover;
@@ -106,6 +115,8 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // Features
   zIndex: false,
+  minCameraRatio: null,
+  maxCameraRatio: null,
 
   // Renderers
   labelRenderer: drawLabel,

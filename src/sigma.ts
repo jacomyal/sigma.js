@@ -224,6 +224,9 @@ export default class Sigma extends EventEmitter {
     // Binding graph handlers
     this.bindGraphHandlers();
 
+    // Trigger eventual settings-related things
+    this.handleSettingsUpdate();
+
     // Processing data for the first time & render
     this.process();
     this.render();
@@ -802,6 +805,18 @@ export default class Sigma extends EventEmitter {
   }
 
   /**
+   * Method that backports potential settings updates where it's needed.
+   * @private
+   */
+  private handleSettingsUpdate(): this {
+    this.camera.minRatio = this.settings.minCameraRatio;
+    this.camera.maxRatio = this.settings.maxCameraRatio;
+    this.camera.setState(this.camera.validateState(this.camera.getState()));
+
+    return this;
+  }
+
+  /**
    * Method that decides whether to reprocess graph or not, and then render the
    * graph.
    *
@@ -1312,6 +1327,7 @@ export default class Sigma extends EventEmitter {
   setSetting<K extends keyof Settings>(key: K, value: Settings[K]): this {
     this.settings[key] = value;
     validateSettings(this.settings);
+    this.handleSettingsUpdate();
     this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
     this._scheduleRefresh();
     return this;
@@ -1328,6 +1344,7 @@ export default class Sigma extends EventEmitter {
   updateSetting<K extends keyof Settings>(key: K, updater: (value: Settings[K]) => Settings[K]): this {
     this.settings[key] = updater(this.settings[key]);
     validateSettings(this.settings);
+    this.handleSettingsUpdate();
     this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
     this._scheduleRefresh();
     return this;

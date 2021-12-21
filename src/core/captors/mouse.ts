@@ -122,7 +122,7 @@ export default class MouseCaptor extends Captor {
 
     // default behavior
     const camera = this.renderer.getCamera();
-    const newRatio = camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO;
+    const newRatio = camera.getBoundedRatio(camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO);
 
     camera.animate(this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio), {
       easing: "quadraticInOut",
@@ -269,7 +269,7 @@ export default class MouseCaptor extends Captor {
     // Default behavior
     const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
     const camera = this.renderer.getCamera();
-    const newRatio = camera.getState().ratio * ratioDiff;
+    const newRatio = camera.getBoundedRatio(camera.getState().ratio * ratioDiff);
     const wheelDirection = delta > 0 ? 1 : -1;
     const now = Date.now();
 

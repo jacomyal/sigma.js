@@ -161,6 +161,7 @@ export default class TouchCaptor extends Captor {
     // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
     if (e.touches.length === 1) this.dispatchRelatedMouseEvent("mousemove", e);
 
+    const camera = this.renderer.getCamera();
     const startCameraState = this.startCameraState as CameraState;
     const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
@@ -180,7 +181,7 @@ export default class TouchCaptor extends Captor {
         );
         const { x, y } = this.renderer.viewportToFramedGraph(touchesPositions[0]);
 
-        this.renderer.getCamera().setState({
+        camera.setState({
           x: startCameraState.x + xStart - x,
           y: startCameraState.y + yStart - y,
         });
@@ -206,7 +207,8 @@ export default class TouchCaptor extends Captor {
         const ratioDiff = Math.hypot(y1 - y0, x1 - x0) / (this.startTouchesDistance as number);
 
         // 1.
-        newCameraState.ratio = startCameraState.ratio / ratioDiff;
+        const newRatio = camera.getBoundedRatio(startCameraState.ratio / ratioDiff);
+        newCameraState.ratio = newRatio;
         newCameraState.angle = startCameraState.angle + angleDiff;
 
         // 2.
@@ -219,7 +221,7 @@ export default class TouchCaptor extends Captor {
 
         const dx = smallestDimension / dimensions.width;
         const dy = smallestDimension / dimensions.height;
-        const ratio = newCameraState.ratio / smallestDimension;
+        const ratio = newRatio / smallestDimension;
 
         // Align with center of the graph:
         let x = x0 - smallestDimension / 2 / dx;
@@ -234,7 +236,7 @@ export default class TouchCaptor extends Captor {
         newCameraState.x = touchGraphPosition.x - x * ratio;
         newCameraState.y = touchGraphPosition.y + y * ratio;
 
-        this.renderer.getCamera().setState(newCameraState);
+        camera.setState(newCameraState);
 
         break;
       }

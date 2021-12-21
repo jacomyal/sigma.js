@@ -148,4 +148,26 @@ describe("Camera", function () {
 
     assert.deepStrictEqual(flag, true);
   });
+
+  it("should check for ratio extrema (feature #1161).", function () {
+    const camera = new Camera();
+
+    camera.minRatio = null;
+    camera.maxRatio = 10;
+    camera.setState({ ratio: 20 });
+    assert.equal(camera.ratio, 10);
+
+    camera.minRatio = 0.1;
+    camera.maxRatio = null;
+    camera.setState({ ratio: 0.05 });
+    assert.equal(camera.ratio, 0.1);
+
+    // Also check weird values (expect maxRatio to "win" that):
+    camera.minRatio = 10;
+    camera.maxRatio = 0.1;
+    camera.setState({ ratio: 0.05 });
+    assert.equal(camera.ratio, 0.1);
+    camera.setState({ ratio: 20 });
+    assert.equal(camera.ratio, 0.1);
+  });
 });

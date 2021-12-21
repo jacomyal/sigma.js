@@ -28,6 +28,9 @@ export default class Camera extends EventEmitter implements CameraState {
   angle = 0;
   ratio = 1;
 
+  minRatio: number | null = null;
+  maxRatio: number | null = null;
+
   private nextFrame: number | null = null;
   private previousState: CameraState | null = null;
   private enabled = true;
@@ -114,6 +117,34 @@ export default class Camera extends EventEmitter implements CameraState {
   }
 
   /**
+   * Method used to check minRatio and maxRatio values.
+   *
+   * @param ratio
+   * @return {number}
+   */
+  getBoundedRatio(ratio: number): number {
+    let r = ratio;
+    if (typeof this.minRatio === "number") r = Math.max(r, this.minRatio);
+    if (typeof this.maxRatio === "number") r = Math.min(r, this.maxRatio);
+    return r;
+  }
+
+  /**
+   * Method used to check various things to return a legit state candidate.
+   *
+   * @param state
+   * @return {object}
+   */
+  validateState(state: Partial<CameraState>): Partial<CameraState> {
+    const validatedState: Partial<CameraState> = {};
+    if (typeof state.x === "number") validatedState.x = state.x;
+    if (typeof state.y === "number") validatedState.y = state.y;
+    if (typeof state.angle === "number") validatedState.angle = state.angle;
+    if (typeof state.ratio === "number") validatedState.ratio = this.getBoundedRatio(state.ratio);
+    return validatedState;
+  }
+
+  /**
    * Method used to check whether the camera is currently being animated.
    *
    * @return {boolean}
@@ -131,16 +162,16 @@ export default class Camera extends EventEmitter implements CameraState {
   setState(state: Partial<CameraState>): this {
     if (!this.enabled) return this;
 
-    // TODO: validations
     // TODO: update by function
 
     // Keeping track of last state
     this.previousState = this.getState();
 
-    if (typeof state.x === "number") this.x = state.x;
-    if (typeof state.y === "number") this.y = state.y;
-    if (typeof state.angle === "number") this.angle = state.angle;
-    if (typeof state.ratio === "number") this.ratio = state.ratio;
+    const validState = this.validateState(state);
+    if (typeof validState.x === "number") this.x = validState.x;
+    if (typeof validState.y === "number") this.y = validState.y;
+    if (typeof validState.angle === "number") this.angle = validState.angle;
+    if (typeof validState.ratio === "number") this.ratio = validState.ratio;
 
     // Emitting
     if (!this.hasState(this.previousState)) this.emit("updated", this.getState());
@@ -161,6 +192,7 @@ export default class Camera extends EventEmitter implements CameraState {
     if (!this.enabled) return;
 
     const options: AnimateOptions = Object.assign({}, ANIMATE_DEFAULTS, opts);
+    const validState = this.validateState(state);
 
     const easing: (k: number) => number =
       typeof options.easing === "function" ? options.easing : easings[options.easing];
@@ -176,7 +208,7 @@ export default class Camera extends EventEmitter implements CameraState {
       // The animation is over:
       if (t >= 1) {
         this.nextFrame = null;
-        this.setState(state);
+        this.setState(validState);
 
         if (this.animationCallback) {
           this.animationCallback.call(null);
@@ -190,10 +222,10 @@ export default class Camera extends EventEmitter implements CameraState {
 
       const newState: Partial<CameraState> = {};
 
-      if (state.x) newState.x = initialState.x + (state.x - initialState.x) * coefficient;
-      if (state.y) newState.y = initialState.y + (state.y - initialState.y) * coefficient;
-      if (state.angle) newState.angle = initialState.angle + (state.angle - initialState.angle) * coefficient;
-      if (state.ratio) newState.ratio = initialState.ratio + (state.ratio - initialState.ratio) * coefficient;
+      if (validState.x) newState.x = initialState.x + (validState.x - initialState.x) * coefficient;
+      if (validState.y) newState.y = initialState.y + (validState.y - initialState.y) * coefficient;
+      if (validState.angle) newState.angle = initialState.angle + (validState.angle - initialState.angle) * coefficient;
+      if (validState.ratio) newState.ratio = initialState.ratio + (validState.ratio - initialState.ratio) * coefficient;
 
       this.setState(newState);
 
