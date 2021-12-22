@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useSigma } from "react-sigma-v2";
 import { sortBy, values, keyBy, mapValues } from "lodash";
+import { MdGroupWork } from "react-icons/md";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 
 import { Cluster, FiltersState } from "../types";
-import { MdGroupWork } from "react-icons/md";
 import Panel from "./Panel";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/all";
 
 const ClustersPanel: FC<{
   clusters: Cluster[];

@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
-import { FiltersState } from "../types";
 import { useSigma } from "react-sigma-v2";
+
+import { FiltersState } from "../types";
 
 function prettyPercentage(val: number): string {
   return (val * 100).toFixed(1) + "%";

@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from "react";
 import { SigmaContainer, ZoomControl, FullScreenControl } from "react-sigma-v2";
+import { omit, mapValues, keyBy, constant } from "lodash";
 
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
-import { omit, mapValues, keyBy, constant } from "lodash";
 
 import GraphSettingsController from "./GraphSettingsController";
 import GraphEventsController from "./GraphEventsController";

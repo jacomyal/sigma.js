@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { BsInfoCircle } from "react-icons/all";
+import { BsInfoCircle } from "react-icons/bs";
 
 import Panel from "./Panel";
 

@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
+import { useSigma } from "react-sigma-v2";
 import { MdCategory } from "react-icons/md";
+import { keyBy, mapValues, sortBy, values } from "lodash";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 
 import { FiltersState, Tag } from "../types";
-import { useSigma } from "react-sigma-v2";
-import { keyBy, mapValues, sortBy, values } from "lodash";
 import Panel from "./Panel";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/all";
 
 const TagsPanel: FC<{
   tags: Tag[];
