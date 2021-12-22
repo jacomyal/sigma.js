@@ -5,7 +5,6 @@
  */
 import { EventEmitter } from "events";
 import Graph from "graphology";
-import { nodeExtent } from "graphology-metrics/graph/extent";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
