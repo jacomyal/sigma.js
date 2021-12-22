@@ -204,12 +204,13 @@ export default class MouseCaptor extends Captor {
     // Only trigger the "mousemove" event when the mouse is actually hovering
     // the container, to avoid weirdly hovering nodes and/or edges when the
     // mouse is not hover the container:
-    if (e.target !== this.container) return;
+    if (e.target === this.container) {
+      this.emit("mousemove", mouseCoords);
+    }
 
-    this.emit("mousemove", mouseCoords);
-
+    // Handle the case when "isMouseDown" all the time, to allow dragging the
+    // stage while the mouse is not hover the container:
     if (this.isMouseDown) {
-      // TODO: dispatch events
       this.isMoving = true;
       this.draggedEvents++;
 
