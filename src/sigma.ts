@@ -600,25 +600,41 @@ export default class Sigma extends EventEmitter {
     // If no non-null edge has been found, return null:
     if (!transformationRatio) return null;
 
-    // Now we can look for a matching edge:
-    return (
-      this.graph.findEdge((key, edgeAttributes, _s, _t, sourcePosition, targetPosition) => {
-        if (
-          doEdgeCollideWithPoint(
-            graphX,
-            graphY,
-            sourcePosition.x,
-            sourcePosition.y,
-            targetPosition.x,
-            targetPosition.y,
-            // Adapt the edge size to the zoom ratio:
-            (edgeDataCache[key].size * transformationRatio) / this.cameraSizeRatio,
-          )
-        ) {
-          return true;
-        }
-      }) || null
-    );
+    // Now we can look for matching edges:
+    const edges = this.graph.filterEdges((key, edgeAttributes, sourceId, targetId, sourcePosition, targetPosition) => {
+      if (edgeDataCache[key].hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
+      if (
+        doEdgeCollideWithPoint(
+          graphX,
+          graphY,
+          sourcePosition.x,
+          sourcePosition.y,
+          targetPosition.x,
+          targetPosition.y,
+          // Adapt the edge size to the zoom ratio:
+          (edgeDataCache[key].size * transformationRatio) / this.cameraSizeRatio,
+        )
+      ) {
+        return true;
+      }
+    });
+
+    if (edges.length === 0) return null; // no edges found
+
+    // if none of the edges have a zIndex, selected the most recently created one to match the rendering order
+    let selectedEdge = edges[edges.length - 1];
+
+    // otherwise select edge with highest zIndex
+    let highestZIndex = -Infinity;
+    for (const edge of edges) {
+      const zIndex = this.graph.getEdgeAttribute(edge, "zIndex");
+      if (zIndex >= highestZIndex) {
+        selectedEdge = edge;
+        highestZIndex = zIndex;
+      }
+    }
+
+    return selectedEdge;
   }
 
   /**
