@@ -719,7 +719,7 @@ export default class Sigma extends EventEmitter {
 
       this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
 
-      if (data.label)
+      if (data.label && !data.hidden)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
       this.nodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
