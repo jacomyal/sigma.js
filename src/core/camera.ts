@@ -222,10 +222,12 @@ export default class Camera extends EventEmitter implements CameraState {
 
       const newState: Partial<CameraState> = {};
 
-      if (validState.x) newState.x = initialState.x + (validState.x - initialState.x) * coefficient;
-      if (validState.y) newState.y = initialState.y + (validState.y - initialState.y) * coefficient;
-      if (validState.angle) newState.angle = initialState.angle + (validState.angle - initialState.angle) * coefficient;
-      if (validState.ratio) newState.ratio = initialState.ratio + (validState.ratio - initialState.ratio) * coefficient;
+      if (typeof validState.x === "number") newState.x = initialState.x + (validState.x - initialState.x) * coefficient;
+      if (typeof validState.y === "number") newState.y = initialState.y + (validState.y - initialState.y) * coefficient;
+      if (typeof validState.angle === "number")
+        newState.angle = initialState.angle + (validState.angle - initialState.angle) * coefficient;
+      if (typeof validState.ratio === "number")
+        newState.ratio = initialState.ratio + (validState.ratio - initialState.ratio) * coefficient;
 
       this.setState(newState);
 
