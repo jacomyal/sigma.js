@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-const fs = require("fs-extra");
+const fs = require("fs");
+const fsExtra = require("fs-extra");
 const path = require("path");
 const rimraf = require("rimraf");
-const { eachSeries } = require("async");
 const kotatsu = require("kotatsu");
+const { eachSeries } = require("async");
 
 const outputDir = process.argv[2];
 
@@ -13,9 +14,7 @@ if (!outputDir) {
 }
 
 rimraf.sync(outputDir);
-fs.mkdirSync(outputDir, { recursive: true });
-
-const examples = require("./examples.json");
+fsExtra.mkdirSync(outputDir, { recursive: true });
 
 function buildExample(name, callback) {
   console.log();
@@ -24,13 +23,12 @@ function buildExample(name, callback) {
   const inputSubFolder = path.resolve(__dirname, name);
   const outputSubFolder = path.resolve(outputDir, name);
 
-  fs.mkdirSync(outputSubFolder);
-  fs.mkdirSync(path.resolve(outputSubFolder, "build"));
-  fs.copyFileSync(path.resolve(inputSubFolder, "index.html"), path.resolve(outputSubFolder, "index.html"));
+  fsExtra.mkdirSync(outputSubFolder);
+  fsExtra.mkdirSync(path.resolve(outputSubFolder, "build"));
+  fsExtra.copyFileSync(path.resolve(inputSubFolder, "index.html"), path.resolve(outputSubFolder, "index.html"));
 
-  if (fs.existsSync(path.resolve(inputSubFolder, "public"))) {
-    fs.mkdirSync(path.resolve(outputSubFolder, "public"));
-    fs.copySync(path.resolve(inputSubFolder, "public"), path.resolve(outputSubFolder, "public"));
+  if (fsExtra.existsSync(path.resolve(inputSubFolder, "public"))) {
+    fsExtra.copySync(path.resolve(inputSubFolder, "public"), outputSubFolder);
   }
 
   kotatsu.build(
@@ -45,10 +43,22 @@ function buildExample(name, callback) {
   );
 }
 
+// List all examples:
+const notExamples = new Set(["build", "node_modules"]);
+const examples = fs
+  .readdirSync("./", { withFileTypes: true })
+  .filter(
+    (dirent) =>
+      dirent.isDirectory() &&
+      !notExamples.has(dirent.name) &&
+      fs.existsSync(path.resolve(__dirname, dirent.name, "index.ts")),
+  )
+  .map((dirent) => dirent.name);
+
 eachSeries(
   examples,
-  (example, next) => {
-    buildExample(example.name, next);
+  (name, next) => {
+    buildExample(name, next);
   },
   (err) => {
     if (err) return console.error(err);
