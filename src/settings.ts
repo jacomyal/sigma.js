@@ -106,7 +106,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // Labels
   labelDensity: 1,
-  labelGridCellSize: 250,
+  labelGridCellSize: 100,
   labelRenderedSizeThreshold: 6,
 
   // Reducers
