@@ -32,6 +32,7 @@ type MouseCaptorEvents = {
   mouseup(coordinates: MouseCoords): void;
   mousedown(coordinates: MouseCoords): void;
   mousemove(coordinates: MouseCoords): void;
+  mousemovebody(coordinates: MouseCoords): void;
   wheel(coordinates: WheelCoords): void;
 };
 
