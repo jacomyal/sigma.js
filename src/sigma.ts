@@ -1625,7 +1625,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    * This method accepts an optional camera which can be useful if you need to translate coordinates
    * based on a different view than the one being currently being displayed on screen.
    *
-   * @param {Coordinates} viewportPoint
+   * @param {Coordinates}                  viewportPoint
+   * @param {CoordinateConversionOverride} override
    */
   viewportToGraph(viewportPoint: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
     return this.normalizationFunction.inverse(this.viewportToFramedGraph(viewportPoint, override));
@@ -1638,7 +1639,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    * This method accepts an optional camera which can be useful if you need to translate coordinates
    * based on a different view than the one being currently being displayed on screen.
    *
-   * @param {Coordinates} graphPoint
+   * @param {Coordinates}                  graphPoint
+   * @param {CoordinateConversionOverride} override
    */
   graphToViewport(graphPoint: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
     return this.framedGraphToViewport(this.normalizationFunction(graphPoint), override);
