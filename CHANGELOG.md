@@ -1,5 +1,32 @@
 # sigma.js - changelog:
 
+## 2.2.0
+
+### Features
+
+- [#1161](https://github.com/jacomyal/sigma.js/issues/1161) - Adds `minZoom` and `maxZoom` settings
+- [#1166](https://github.com/jacomyal/sigma.js/issues/1166) - Adds HTML colors support
+- [#1167](https://github.com/jacomyal/sigma.js/issues/1167) - Adds events TypeScript types
+- [#1176](https://github.com/jacomyal/sigma.js/issues/1176) - Cleans and improves event payloads
+- [#1177](https://github.com/jacomyal/sigma.js/issues/1177) - Allows overriding arguments with `#graphToViewport` and `#vieportToGraph`
+- [#1182](https://github.com/jacomyal/sigma.js/issues/1182) - Adds cached data (from custom reducers) to custom renderers
+- [#1187](https://github.com/jacomyal/sigma.js/issues/1187) - Adds `forceLabel` for nodes and edges
+- [#1188](https://github.com/jacomyal/sigma.js/issues/1188) - Drops `graphology-metrics` dependency
+
+### Bug fixes
+
+- _undocumented_ - Updates dependencies
+- _undocumented_ - Fixes various bugs with the `node.image` program
+- _undocumented_ - Fixes the `build/sigma.js` and `build/sigma.min.js` expositions of sigma
+- [#1172](https://github.com/jacomyal/sigma.js/issues/1172) - Fixes labels grid display (changes which node labels are displayed by default)
+- [#1192](https://github.com/jacomyal/sigma.js/issues/1192) - Fixes alpha blending for most recent WebGL layers
+- [#1193](https://github.com/jacomyal/sigma.js/issues/1193) - Fixes dragging with mouse out of stage
+- [#1194](https://github.com/jacomyal/sigma.js/issues/1194) - Fixes camera transitions to `angle: 0`
+- [#1195](https://github.com/jacomyal/sigma.js/issues/1195) - Improves edge events handling (thanks to @avenzi)
+- [#1199](https://github.com/jacomyal/sigma.js/issues/1199) - Fixes issue with hidden nodes and labels rendering (thanks to @avenzi)
+- [#1200](https://github.com/jacomyal/sigma.js/issues/1200) - Fixes issue with node labels `""`
+- [#1203](https://github.com/jacomyal/sigma.js/issues/1203) - Fixes examples build process
+
 ## 2.1.3
 
 ### Bug fixes
