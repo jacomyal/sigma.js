@@ -1,6 +1,6 @@
 /**
  * Sigma.js Library Endpoint
- * ==========================
+ * =========================
  *
  * The library endpoint.
  * @module

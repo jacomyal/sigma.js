@@ -11,6 +11,8 @@ package-lock.json
 .npmignore
 examples
 external-types
+index-bundle.js
+index-bundle.d.ts
 src
 test
 demo

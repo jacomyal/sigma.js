@@ -22,12 +22,12 @@ module.exports = [
   {
     name: "sigma",
     mode: production ? "production" : "none",
-    entry: "./src/index.ts",
+    entry: "./src/index-bundle.ts",
     output: {
       filename: production ? "sigma.min.js" : "sigma.js",
       path: path.join(__dirname, "build"),
       library: "Sigma",
-      libraryTarget: "umd",
+      libraryTarget: "var",
     },
     resolve: {
       extensions: [".ts", ".js", ".glsl"],

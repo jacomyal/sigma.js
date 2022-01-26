@@ -15,6 +15,8 @@ dist
 /utils/
 /index.js
 /index.d.ts
+/index-bundle.js
+/index-bundle.d.ts
 /settings.js
 /settings.d.ts
 /sigma.js
