@@ -7,6 +7,7 @@ import Sigma from "../../../src";
 import NodeProgram from "../../../src/rendering/webgl/programs/node";
 import NodeFastProgram from "../../../src/rendering/webgl/programs/node.fast";
 import getNodeImageProgram from "../../../src/rendering/webgl/programs/node.image";
+import getNodeCombinedProgram from "../../../src/rendering/webgl/programs/node.combined";
 import EdgeProgram from "../../../src/rendering/webgl/programs/edge";
 import EdgeFastProgram from "../../../src/rendering/webgl/programs/edge.fast";
 import EdgeArrowProgram from "../../../src/rendering/webgl/programs/edge.arrow";
@@ -38,6 +39,7 @@ globalize({
       NodeProgram,
       NodeFastProgram,
       getNodeImageProgram,
+      getNodeCombinedProgram,
       EdgeProgram,
       EdgeFastProgram,
       EdgeArrowProgram,
