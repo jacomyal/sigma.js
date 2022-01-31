@@ -223,7 +223,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
 
       gl.vertexAttribPointer(
         this.textureLocation,
-        4,
+        3,
         gl.FLOAT,
         false,
         this.attributes * Float32Array.BYTES_PER_ELEMENT,
@@ -235,7 +235,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         gl.FLOAT,
         false,
         this.attributes * Float32Array.BYTES_PER_ELEMENT,
-        32,
+        28,
       );
     }
 
@@ -279,7 +279,6 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
         array[i++] = 0;
         array[i++] = 0;
-        array[i++] = 0;
       }
       array[i++] = ANGLE_1;
 
@@ -301,7 +300,6 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
         array[i++] = 0;
         array[i++] = 0;
-        array[i++] = 0;
       }
       array[i++] = ANGLE_2;
 
@@ -316,7 +314,6 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = imageState.y / height + (1 + r) * (imageState.height / height);
         array[i++] = 1;
       } else {
-        array[i++] = 0;
         array[i++] = 0;
         array[i++] = 0;
         array[i++] = 0;

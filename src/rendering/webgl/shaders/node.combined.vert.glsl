@@ -20,9 +20,10 @@ const float bias = 255.0 / 254.0;
 const float marginRatio = 1.2; // 1.05
 
 void main() {
-  //float size = a_size * u_correctionRatio * u_sqrtZoomRatio * 4.0;
-  float size = a_size * u_correctionRatio * u_ratio * 4.0;
+  float size = a_size * u_correctionRatio * u_sqrtZoomRatio * 4.0;
+  //float size = a_size * u_correctionRatio * u_ratio * 4.0;
   // workaround to keep u_scale
+  v_radius = u_ratio;
   v_radius = u_scale;
 
   //size = a_size * u_correctionRatio * u_scale * 2.0;
