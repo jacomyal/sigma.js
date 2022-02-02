@@ -11,6 +11,8 @@ import EdgesFastProgram from "sigma/rendering/webgl/programs/edge.fast";
 
 import circlepack from "graphology-layout/circlepack";
 import clusters from "graphology-generators/random/clusters";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
+import forceAtlas2 from "graphology-layout-forceatlas2";
 
 const rng = seedrandom("sigma");
 
@@ -64,6 +66,23 @@ const renderer = new Sigma(graph, container, {
     "edges-fast": EdgesFastProgram,
   },
 });
+
+// 5. Enable FA2 button:
+const fa2Button = document.getElementById("fa2") as HTMLButtonElement;
+const sensibleSettings = forceAtlas2.inferSettings(graph);
+const fa2Layout = new FA2Layout(graph, {
+  settings: sensibleSettings,
+});
+function toggleFA2Layout() {
+  if (fa2Layout.isRunning()) {
+    fa2Layout.stop();
+    fa2Button.innerHTML = `Start layout ▶`;
+  } else {
+    fa2Layout.start();
+    fa2Button.innerHTML = `Stop layout ⏸`;
+  }
+}
+fa2Button.addEventListener("click", toggleFA2Layout);
 
 // Cheap trick: tilt the camera a bit to make labels more readable:
 renderer.getCamera().setState({
