@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "./build.js build",
+    "build": "npm run clean && ./build.js build",
     "clean": "rimraf build",
     "start": "kotatsu serve $npm_config_example/index.ts --index $npm_config_example/index.html --public / $npm_config_example/public"
   },
