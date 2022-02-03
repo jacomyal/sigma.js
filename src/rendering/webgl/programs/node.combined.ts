@@ -18,13 +18,15 @@ import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
 
 const POINTS = 3,
+  // atttributes sizing:
   // position (xy: 2xfloat)
   // size (1xfloat)
   // color (4xbyte => 1xfloat)
   // uvw (3xfloat) - only pass width for square texture
   // angle (1xfloat)
   ATTRIBUTES = 8,
-  MAX_TEXTURE_SIZE = 100;
+  MAX_TEXTURE_SIZE = 100,
+  MAX_CANVAS_WIDTH = 16384;
 
 const ANGLE_1 = 0,
   ANGLE_2 = (2 * Math.PI) / 3,
@@ -65,6 +67,18 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
   let hasReceivedImages = false;
   let pendingImagesFrameID: number | undefined = undefined;
 
+  // next write position in texture
+  let writePositionX = 0;
+  let writePositionY = 0;
+  // height of current row
+  let writeRowHeight = 0;
+
+  interface PendingImage {
+    image: HTMLImageElement;
+    id: string;
+    size: number;
+  }
+
   /**
    * Helper to load an image:
    */
@@ -98,11 +112,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
   function finalizePendingImages(): void {
     pendingImagesFrameID = undefined;
 
-    const pendingImages: {
-      image: HTMLImageElement;
-      id: string;
-      size: number;
-    }[] = [];
+    const pendingImages: PendingImage[] = [];
 
     // List all pending images:
     for (const id in images) {
@@ -120,48 +130,96 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    // TODO: use quadratic canvas (max. size is 32'767 x 32'767 pixels)
-    // dynamically expand atlas texture
-    canvas.width = pendingImages.reduce(
-      (iter, { size }) => iter + Math.min(MAX_TEXTURE_SIZE, size),
-      hasReceivedImages ? textureImage.width : 0,
-    );
-    canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => size));
-    //console.log(`canvas w=${canvas.width} h=${canvas.height}`);
+    // limit canvas size to avoid browser and platform limits
+    let totalWidth = hasReceivedImages ? textureImage.width : 0;
+    let totalHeight = hasReceivedImages ? textureImage.height : 0;
 
-    let xOffset = 0;
-    let yOffset = 0;
-    if (hasReceivedImages) {
-      ctx.putImageData(textureImage, 0, 0);
-      xOffset = textureImage.width;
-    }
-    pendingImages.forEach(({ id, image, size }) => {
-      const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
+    // initialize image drawing offsets with current write position
+    let xOffset = writePositionX;
+    let yOffset = writePositionY;
 
-      // Crop image, to only keep the biggest square, centered:
-      let dx = 0,
-        dy = 0;
-      if ((image.width || 0) > (image.height || 0)) {
-        dx = (image.width - image.height) / 2;
-      } else {
-        dy = (image.height - image.width) / 2;
+    /**
+     * Draws a (full or partial) row of images into the atlas texture
+     * @param pendingImages
+     */
+    const drawRow = (pendingImages: PendingImage[]) => {
+      // update canvas size before drawing
+      if (canvas.width !== totalWidth || canvas.height !== totalHeight) {
+        canvas.width = Math.min(MAX_CANVAS_WIDTH, totalWidth);
+        canvas.height = totalHeight;
+
+        // draw previous texture into resized canvas
+        if (hasReceivedImages) {
+          ctx.putImageData(textureImage, 0, 0);
+        }
       }
-      ctx.drawImage(image, dx, dy, size, size, xOffset, yOffset, imageSizeInTexture, imageSizeInTexture);
 
-      // Update image state:
-      images[id] = {
-        status: "ready",
-        x: xOffset,
-        y: yOffset,
-        width: imageSizeInTexture,
-        height: imageSizeInTexture,
-      };
+      pendingImages.forEach(({ id, image, size }) => {
+        const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
 
-      xOffset += imageSizeInTexture;
+        // Crop image, to only keep the biggest square, centered:
+        let dx = 0,
+          dy = 0;
+        if ((image.width || 0) > (image.height || 0)) {
+          dx = (image.width - image.height) / 2;
+        } else {
+          dy = (image.height - image.width) / 2;
+        }
+
+        ctx.drawImage(image, dx, dy, size, size, xOffset, yOffset, imageSizeInTexture, imageSizeInTexture);
+
+        // Update image state:
+        images[id] = {
+          status: "ready",
+          x: xOffset,
+          y: yOffset,
+          width: imageSizeInTexture,
+          height: imageSizeInTexture,
+        };
+
+        xOffset += imageSizeInTexture;
+      });
+
+      hasReceivedImages = true;
+      textureImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    };
+
+    let rowImages: PendingImage[] = [];
+    pendingImages.forEach((image) => {
+      const { size } = image;
+      const imageSizeInTexture = Math.min(size, MAX_TEXTURE_SIZE);
+
+      if (writePositionX + imageSizeInTexture > MAX_CANVAS_WIDTH) {
+        // existing row is full: flush row and continue on next line
+        if (rowImages.length > 0) {
+          totalWidth = Math.max(writePositionX, totalWidth);
+          totalHeight = Math.max(writePositionY + writeRowHeight, totalHeight);
+          drawRow(rowImages);
+
+          rowImages = [];
+          writeRowHeight = 0;
+        }
+
+        writePositionX = 0;
+        writePositionY = totalHeight;
+        xOffset = 0;
+        yOffset = totalHeight;
+      }
+
+      // add image to row
+      rowImages.push(image);
+
+      // advance write position and update maximum row height
+      writePositionX += imageSizeInTexture;
+      writeRowHeight = Math.max(writeRowHeight, imageSizeInTexture);
     });
 
-    textureImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    hasReceivedImages = true;
+    // flush pending images in row - keep write position (and drawing cursor)
+    totalWidth = Math.max(writePositionX, totalWidth);
+    totalHeight = Math.max(writePositionY + writeRowHeight, totalHeight);
+    drawRow(rowImages);
+    rowImages = [];
+
     rebindTextureFns.forEach((fn) => fn());
   }
 
@@ -287,8 +345,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
       array[i++] = data.size;
       array[i++] = color;
 
-      // ratio: R/texture_height
-      let r = (8 / 3) * (1 - Math.sin((2 * Math.PI) / 3));
+      const r = (8 / 3) * (1 - Math.sin((2 * Math.PI) / 3));
 
       if (imageState && imageState.status === "ready") {
         // ANGLE_2: top left UV coordinates
