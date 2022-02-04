@@ -27,4 +27,5 @@ dist
 /test/e2e/screenshots/*.diff.png
 /website/demo
 /website/docs
+/website/examples
 /www

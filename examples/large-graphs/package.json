@@ -1,0 +1,23 @@
+{
+  "name": "sigma-example-large-graphs",
+  "version": "1.0.0",
+  "description": "A sigma example to showcase performances.",
+  "main": "index.js",
+  "scripts": {
+    "start": "kotatsu serve --typescript index.ts --public / ./public"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/seedrandom": "^3.0.1",
+    "graphology": "^0.23.0",
+    "graphology-generators": "^0.11.2",
+    "graphology-layout": "^0.5.0",
+    "graphology-layout-forceatlas2": "^0.8.1",
+    "seedrandom": "^3.0.5",
+    "sigma": "latest"
+  },
+  "devDependencies": {
+    "kotatsu": "^0.22.3",
+    "typescript": "4.4.4"
+  }
+}

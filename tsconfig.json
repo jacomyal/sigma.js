@@ -9,7 +9,7 @@
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types/", "./external-types/"],
-    "lib": ["dom"]
+    "lib": ["dom", "dom.iterable"]
   },
   "include": ["./external-types/**/*", "./src/**/*"],
   "ts-node": {

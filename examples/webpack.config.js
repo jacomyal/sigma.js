@@ -7,6 +7,11 @@ module.exports = {
       "sigma/types": path.resolve(__dirname, "../src/types.ts"),
       "sigma/utils": path.resolve(__dirname, "../src/utils/"),
       "sigma/utils/animate": path.resolve(__dirname, "../src/utils/animate.ts"),
+      "sigma/rendering/webgl/programs/edge": path.resolve(__dirname, "../src/rendering/webgl/programs/edge.ts"),
+      "sigma/rendering/webgl/programs/edge.fast": path.resolve(
+        __dirname,
+        "../src/rendering/webgl/programs/edge.fast.ts",
+      ),
       "sigma/rendering/webgl/programs/node.image": path.resolve(
         __dirname,
         "../src/rendering/webgl/programs/node.image.ts",
