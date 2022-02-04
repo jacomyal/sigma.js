@@ -20,7 +20,7 @@ void main(void) {
   vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
   vec4 color;
 
-  if (v_texture.w > 0.0) {
+  if (v_texture.z > 0.0) {
     vec4 texel = texture2D(u_atlas, v_texture.xy, -1.0);
     color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
   } else {
