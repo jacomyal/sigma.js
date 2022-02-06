@@ -104,8 +104,14 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    canvas.width = pendingImages.reduce((iter, { size }) => iter + size, hasReceivedImages ? textureImage.width : 0);
-    canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => size));
+    canvas.width = pendingImages.reduce(
+      (iter, { size }) => iter + Math.min(MAX_TEXTURE_SIZE, size),
+      hasReceivedImages ? textureImage.width : 0,
+    );
+    canvas.height = Math.max(
+      hasReceivedImages ? textureImage.height : 0,
+      ...pendingImages.map(({ size }) => Math.min(MAX_TEXTURE_SIZE, size)),
+    );
 
     let xOffset = 0;
     if (hasReceivedImages) {
