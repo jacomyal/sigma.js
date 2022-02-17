@@ -1424,9 +1424,21 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
 
-    if (this.width === 0) throw new Error("Sigma: container has no width.");
+    if (this.width === 0) {
+      if (this.settings.allowInvalidContainer) this.width = 1;
+      else
+        throw new Error(
+          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seing this error.",
+        );
+    }
 
-    if (this.height === 0) throw new Error("Sigma: container has no height.");
+    if (this.height === 0) {
+      if (this.settings.allowInvalidContainer) this.height = 1;
+      else
+        throw new Error(
+          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seing this error.",
+        );
+    }
 
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height) return this;
