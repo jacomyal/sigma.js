@@ -16,12 +16,12 @@ import vertexShaderSource from "../shaders/node.vert.glsl";
 import fragmentShaderSource from "../shaders/node.frag.glsl";
 import { AbstractProgram, RenderParams } from "./common/program";
 
-const POINTS = 3,
-  ATTRIBUTES = 5;
+const POINTS = 3;
+const ATTRIBUTES = 5;
 
-const ANGLE_1 = 0,
-  ANGLE_2 = (2 * Math.PI) / 3,
-  ANGLE_3 = (4 * Math.PI) / 3;
+const ANGLE_1 = 0;
+const ANGLE_2 = (2 * Math.PI) / 3;
+const ANGLE_3 = (4 * Math.PI) / 3;
 
 export default class NodeProgram extends AbstractProgram {
   positionLocation: GLint;
@@ -98,11 +98,7 @@ export default class NodeProgram extends AbstractProgram {
     let i = offset * POINTS * ATTRIBUTES;
 
     if (hidden) {
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
+      for (let l = i + POINTS * ATTRIBUTES; i < l; i++) array[i] = 0;
       return;
     }
 
