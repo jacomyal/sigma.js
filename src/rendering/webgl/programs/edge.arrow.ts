@@ -9,6 +9,6 @@ import { createEdgeCompoundProgram } from "./common/edge";
 import EdgeArrowHeadProgram from "./edge.arrowHead";
 import EdgeClampedProgram from "./edge.clamped";
 
-const program = createEdgeCompoundProgram([EdgeClampedProgram, EdgeArrowHeadProgram]);
+const EdgeArrowProgram = createEdgeCompoundProgram([EdgeClampedProgram, EdgeArrowHeadProgram]);
 
-export default program;
+export default EdgeArrowProgram;
