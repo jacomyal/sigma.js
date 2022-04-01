@@ -41,7 +41,7 @@ import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
-import { identity, multiplyVec } from "./utils/matrices";
+import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
 
 /**
@@ -1591,12 +1591,11 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.matrix;
 
-    const framedGraphVec = [coordinates.x, coordinates.y, 1];
-    const viewportVec = multiplyVec(matrix, framedGraphVec);
+    const viewportPos = multiplyVec2(matrix, coordinates);
 
     return {
-      x: ((1 + viewportVec[0]) * this.width) / 2,
-      y: ((1 - viewportVec[1]) * this.height) / 2,
+      x: ((1 + viewportPos.x) * this.width) / 2,
+      y: ((1 - viewportPos.y) * this.height) / 2,
     };
   }
 
@@ -1621,13 +1620,10 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.invMatrix;
 
-    const viewportVec = [(coordinates.x / this.width) * 2 - 1, 1 - (coordinates.y / this.height) * 2, 1];
-    const framedGraphVec = multiplyVec(invMatrix, viewportVec);
-
-    return {
-      x: framedGraphVec[0],
-      y: framedGraphVec[1],
-    };
+    return multiplyVec2(invMatrix, {
+      x: (coordinates.x / this.width) * 2 - 1,
+      y: 1 - (coordinates.y / this.height) * 2,
+    });
   }
 
   /**
