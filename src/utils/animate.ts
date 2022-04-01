@@ -13,8 +13,10 @@ import easings from "./easings";
 /**
  * Defaults.
  */
+export type Easing = keyof typeof easings | ((k: number) => number);
+
 export interface AnimateOptions {
-  easing: keyof typeof easings | ((k: number) => number);
+  easing: Easing;
   duration: number;
 }
 export const ANIMATE_DEFAULTS = {
@@ -49,6 +51,8 @@ export function animateNodes(
   let frame: number | null = null;
 
   const step = () => {
+    frame = null;
+
     let p = (Date.now() - start) / options.duration;
 
     if (p >= 1) {
@@ -56,6 +60,7 @@ export function animateNodes(
       for (const node in targets) {
         const attrs = targets[node];
 
+        // We use given values to avoid precision issues and for convenience
         for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k]);
       }
 
