@@ -8,7 +8,7 @@
 import Graph, { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../types";
-import { multiply, identity, scale, rotate, translate, multiplyVec } from "./matrices";
+import { multiply, identity, scale, rotate, translate, multiplyVec2 } from "./matrices";
 import { HTML_COLORS } from "./data";
 
 /**
@@ -411,7 +411,7 @@ export function getMatrixImpact(
   cameraState: CameraState,
   viewportDimensions: Dimensions,
 ): number {
-  const [x, y] = multiplyVec(matrix, [Math.cos(cameraState.angle), Math.sin(cameraState.angle), 0]);
+  const { x, y } = multiplyVec2(matrix, { x: Math.cos(cameraState.angle), y: Math.sin(cameraState.angle) }, 0);
   return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / viewportDimensions.width;
 }
 
