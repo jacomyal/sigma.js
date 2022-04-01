@@ -115,7 +115,11 @@ export function createNodeCompoundProgram(programClasses: Array<NodeProgramConst
     }
 
     render(params: RenderParams): void {
-      this.programs.forEach((program) => program.render(params));
+      this.programs.forEach((program) => {
+        program.bind();
+        program.bufferData();
+        program.render(params);
+      });
     }
 
     process(data: NodeDisplayData, hidden: boolean, offset: number): void {
