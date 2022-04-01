@@ -238,19 +238,13 @@ const FLOAT32 = new Float32Array(INT8.buffer, 0, 1);
 const RGBA_TEST_REGEX = /^\s*rgba?\s*\(/;
 const RGBA_EXTRACT_REGEX = /^\s*rgba?\s*\(\s*([0-9]*)\s*,\s*([0-9]*)\s*,\s*([0-9]*)(?:\s*,\s*(.*)?)?\)\s*$/;
 
-const FLOAT_COLOR_CACHE: { [key: string]: number } = {};
-for (const htmlColor in HTML_COLORS) {
-  FLOAT_COLOR_CACHE[htmlColor] = floatColor(HTML_COLORS[htmlColor]);
-}
+type RGBAColor = { r: number; g: number; b: number; a: number };
 
-export function floatColor(val: string): number {
-  // If the color is already computed, we yield it
-  if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
-
-  let r = 0,
-    g = 0,
-    b = 0,
-    a = 1;
+export function parseColor(val: string): RGBAColor {
+  let r = 0; // byte
+  let g = 0; // byte
+  let b = 0; // byte
+  let a = 1; // float
 
   // Handling hexadecimal notation
   if (val[0] === "#") {
@@ -263,6 +257,8 @@ export function floatColor(val: string): number {
       g = parseInt(val.charAt(3) + val.charAt(4), 16);
       b = parseInt(val.charAt(5) + val.charAt(6), 16);
     }
+
+    // TODO: parse hex with alpha?
   }
 
   // Handling rgb notation
@@ -276,6 +272,33 @@ export function floatColor(val: string): number {
       if (match[4]) a = +match[4];
     }
   }
+
+  return { r, g, b, a };
+}
+
+const FLOAT_COLOR_CACHE: { [key: string]: number } = {};
+for (const htmlColor in HTML_COLORS) {
+  FLOAT_COLOR_CACHE[htmlColor] = floatColor(HTML_COLORS[htmlColor]);
+  // Replicating cache for hex values for free
+  FLOAT_COLOR_CACHE[HTML_COLORS[htmlColor]] = FLOAT_COLOR_CACHE[htmlColor];
+}
+
+export function floatArrayColor(val: string): Float32Array {
+  val = HTML_COLORS[val] || val;
+
+  // NOTE: this variant is not cached because it is mostly used for uniforms
+  const { r, g, b, a } = parseColor(val);
+
+  return new Float32Array([r / 255, g / 255, b / 255, a]);
+}
+
+export function floatColor(val: string): number {
+  // If the color is already computed, we yield it
+  if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
+
+  const parsed = parseColor(val);
+  const { r, g, b } = parsed;
+  let { a } = parsed;
 
   a = (a * 255) | 0;
 
