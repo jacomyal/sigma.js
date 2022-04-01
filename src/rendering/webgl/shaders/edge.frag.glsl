@@ -7,7 +7,6 @@ varying float v_thickness;
 const float feather = 0.001;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
-
 void main(void) {
   float dist = length(v_normal) * v_thickness;
 

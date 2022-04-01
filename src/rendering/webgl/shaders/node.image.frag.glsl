@@ -7,9 +7,9 @@ varying vec4 v_texture;
 uniform sampler2D u_atlas;
 
 const float radius = 0.5;
+const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
-  vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
   vec4 color;
 
   if (v_texture.w > 0.0) {
