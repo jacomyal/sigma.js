@@ -25,7 +25,7 @@ const DOUBLE_CLICK_ZOOMING_DURATION = 200;
 /**
  * Event types.
  */
-type MouseCaptorEvents = {
+export type MouseCaptorEvents = {
   click(coordinates: MouseCoords): void;
   rightClick(coordinates: MouseCoords): void;
   doubleClick(coordinates: MouseCoords): void;

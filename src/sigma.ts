@@ -101,32 +101,32 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
 /**
  * Event types.
  */
-interface SigmaEventPayload {
+export interface SigmaEventPayload {
   event: MouseCoords;
   preventSigmaDefault(): void;
 }
 
-interface SigmaStageEventPayload extends SigmaEventPayload {}
-interface SigmaNodeEventPayload extends SigmaEventPayload {
+export interface SigmaStageEventPayload extends SigmaEventPayload {}
+export interface SigmaNodeEventPayload extends SigmaEventPayload {
   node: string;
 }
-interface SigmaEdgeEventPayload extends SigmaEventPayload {
+export interface SigmaEdgeEventPayload extends SigmaEventPayload {
   edge: string;
 }
 
-type SigmaStageEvents = {
+export type SigmaStageEvents = {
   [E in MouseInteraction as `${E}Stage`]: (payload: SigmaStageEventPayload) => void;
 };
 
-type SigmaNodeEvents = {
+export type SigmaNodeEvents = {
   [E in MouseInteraction as `${E}Node`]: (payload: SigmaNodeEventPayload) => void;
 };
 
-type SigmaEdgeEvents = {
+export type SigmaEdgeEvents = {
   [E in MouseInteraction as `${E}Edge`]: (payload: SigmaEdgeEventPayload) => void;
 };
 
-type SigmaAdditionalEvents = {
+export type SigmaAdditionalEvents = {
   // Lifecycle events
   afterRender(): void;
   kill(): void;
@@ -140,7 +140,7 @@ type SigmaAdditionalEvents = {
   leaveEdge(payload: SigmaEdgeEventPayload): void;
 };
 
-type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
+export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
 
 /**
  * Main class.
