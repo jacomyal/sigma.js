@@ -222,6 +222,8 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
       this.emit("mousemove", mouseCoords);
     }
 
+    if (mouseCoords.sigmaDefaultPrevented) return;
+
     // Handle the case when "isMouseDown" all the time, to allow dragging the
     // stage while the mouse is not hover the container:
     if (this.isMouseDown) {
