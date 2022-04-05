@@ -1,5 +1,27 @@
 # sigma.js - changelog:
 
+## 2.3.0
+
+### Features
+
+- _undocumented_ - Publishes examples to the website
+- [#1142](https://github.com/jacomyal/sigma.js/issues/1142) - Improves TypeScript typings for events
+- [#1170](https://github.com/jacomyal/sigma.js/issues/1170) - Simplifies and optimizes `multiplyVec` internal function
+- [#1196](https://github.com/jacomyal/sigma.js/issues/1196) - Adds new `allowInvalidContainer` to prevent sigma.js from throwing errors when it does not find valid width and/or height
+- [#1205](https://github.com/jacomyal/sigma.js/issues/1205) - Adds a new example showcasing sigma's scalability and performances
+- [#1215](https://github.com/jacomyal/sigma.js/issues/1215) - (ticket still opened) Improves `animateNodes`
+- [#1224](https://github.com/jacomyal/sigma.js/issues/1224) - Adds new internal function `floatArrayColor`
+- [#1225](https://github.com/jacomyal/sigma.js/issues/1225) - Adds new `beforeRender` and `resize` events
+- [#1227](https://github.com/jacomyal/sigma.js/issues/1227) - Implements `#preventSigmaDefault` for mouse move events
+
+### Bug fixes
+
+- [#1214](https://github.com/jacomyal/sigma.js/issues/1214) - Cleans graph lifecycle events handling
+- [#1216](https://github.com/jacomyal/sigma.js/issues/1216) - Fixes CodeSandbox configuration for multiple examples (and the template)
+- [#1219](https://github.com/jacomyal/sigma.js/issues/1219) - Fixes hidden / excess renderings from `node.ts` program
+- [#1223](https://github.com/jacomyal/sigma.js/issues/1223) - Fixes dynamic constant color in various fragment shaders
+- [#1226](https://github.com/jacomyal/sigma.js/issues/1226) - Fixes broken `node.ts` program
+
 ## 2.2.0
 
 ### Features
@@ -8,7 +30,7 @@
 - [#1166](https://github.com/jacomyal/sigma.js/issues/1166) - Adds HTML colors support
 - [#1167](https://github.com/jacomyal/sigma.js/issues/1167) - Adds events TypeScript types
 - [#1176](https://github.com/jacomyal/sigma.js/issues/1176) - Cleans and improves event payloads
-- [#1177](https://github.com/jacomyal/sigma.js/issues/1177) - Allows overriding arguments with `#graphToViewport` and `#vieportToGraph`
+- [#1177](https://github.com/jacomyal/sigma.js/issues/1177) - Allows overriding arguments with `#graphToViewport` and `#viewportToGraph`
 - [#1182](https://github.com/jacomyal/sigma.js/issues/1182) - Adds cached data (from custom reducers) to custom renderers
 - [#1187](https://github.com/jacomyal/sigma.js/issues/1187) - Adds `forceLabel` for nodes and edges
 - [#1188](https://github.com/jacomyal/sigma.js/issues/1188) - Drops `graphology-metrics` dependency
@@ -65,7 +87,7 @@
 ### Bug fixes
 
 - _undocumented_ - Edges thickness rendering is now pixel perfect at camera ratio 1, and no more twice bigger on Retina displays
-- _undocumented_ - Cleans some browser warnings for
+- _undocumented_ - Cleans some browser warnings
 - [#1157](https://github.com/jacomyal/sigma.js/issues/1157) - Fixes unexpected node interaction with zIndex
 - [#1148](https://github.com/jacomyal/sigma.js/issues/1148) - Fixes `mousemove` unexpected behaviors
 - [#1163](https://github.com/jacomyal/sigma.js/issues/1163) - Implements edge labels ellipsis
