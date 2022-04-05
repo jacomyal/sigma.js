@@ -128,7 +128,9 @@ export type SigmaEdgeEvents = {
 
 export type SigmaAdditionalEvents = {
   // Lifecycle events
+  beforeRender(): void;
   afterRender(): void;
+  resize(): void;
   kill(): void;
 
   // Additional node events
@@ -1157,6 +1159,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    * @return {Sigma}
    */
   private render(): this {
+    this.emit("beforeRender");
+
+    const handleEscape = () => {
+      this.emit("afterRender");
+      return this;
+    };
+
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
@@ -1175,7 +1184,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.updateCachedValues();
 
     // If we have no nodes we can stop right there
-    if (!this.graph.order) return this;
+    if (!this.graph.order) return handleEscape();
 
     // TODO: improve this heuristic or move to the captor itself?
     // TODO: deal with the touch captor here as well
@@ -1230,15 +1239,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     }
 
     // Do not display labels on move per setting
-    if (this.settings.hideLabelsOnMove && moving) return this;
+    if (this.settings.hideLabelsOnMove && moving) return handleEscape();
 
     this.renderLabels();
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
 
-    this.emit("afterRender");
-
-    return this;
+    return handleEscape();
   }
 
   /**
@@ -1422,6 +1429,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height) return this;
+
+    this.emit("resize");
 
     // Sizing dom elements
     for (const id in this.elements) {
