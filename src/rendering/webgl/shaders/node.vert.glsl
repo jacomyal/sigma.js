@@ -25,7 +25,7 @@ void main() {
     1
   );
 
-  v_border = u_sqrtZoomRatio * u_sqrtZoomRatio / a_size / 50.0;
+  v_border = u_correctionRatio * u_sqrtZoomRatio * u_sqrtZoomRatio;
   v_diffVector = diffVector;
   v_radius = size / 2.0 / marginRatio;
 

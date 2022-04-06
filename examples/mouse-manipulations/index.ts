@@ -43,7 +43,6 @@ renderer.on("downNode", (e) => {
   isDragging = true;
   draggedNode = e.node;
   graph.setNodeAttribute(draggedNode, "highlighted", true);
-  renderer.getCamera().disable();
 });
 
 // On mouse move, if the drag mode is enabled, we change the position of the draggedNode
@@ -55,6 +54,11 @@ renderer.getMouseCaptor().on("mousemovebody", (e) => {
 
   graph.setNodeAttribute(draggedNode, "x", pos.x);
   graph.setNodeAttribute(draggedNode, "y", pos.y);
+
+  // Prevent sigma to move camera:
+  e.preventSigmaDefault();
+  e.original.preventDefault();
+  e.original.stopPropagation();
 });
 
 // On mouse up, we reset the autoscale and the dragging mode
@@ -64,7 +68,6 @@ renderer.getMouseCaptor().on("mouseup", () => {
   }
   isDragging = false;
   draggedNode = null;
-  renderer.getCamera().enable();
 });
 
 // Disable the autoscale at the first down interaction

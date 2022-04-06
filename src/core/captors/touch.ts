@@ -16,7 +16,7 @@ const TOUCH_INERTIA_DURATION = 200;
 /**
  * Event types.
  */
-type TouchCaptorEvents = {
+export type TouchCaptorEvents = {
   touchdown(coordinates: TouchCoords): void;
   touchup(coordinates: TouchCoords): void;
   touchmove(coordinates: TouchCoords): void;

@@ -40,16 +40,16 @@ npm start --example=load-gexf-file # Change this to the desired example
 
 _List of available examples_
 
-- [Fetching and displaying a graph contained in a gexf file](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file)
-- [Using node & edge reducers to handle interactivity](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/use-reducers)
-- [Fetching, parsing & wrangling a CSV file to create a network map](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map)
-- [Handling drag and drop of nodes as well as node & edge creation on click](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/mouse-manipulations)
-- [Displaying arbitrary elements, such as cluster labels, synchronized with the network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/clusters-labels)
-- [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts)
-- [Displaying nodes in various custom ways](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering)
-- [Saving the graph as a PNG image](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/png-snapshot)
-- [Use events to implement interactions](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/events)
-- [See how sigma behaves with larger graphs](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/large-graphs)
+- [Fetching and displaying a graph contained in a gexf file](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/load-gexf-file) ([fallback link](https://sigmajs.org/examples/load-gexf-file))
+- [Using node & edge reducers to handle interactivity](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/use-reducers) ([fallback link](https://sigmajs.org/examples/use-reducers))
+- [Fetching, parsing & wrangling a CSV file to create a network map](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/csv-to-network-map) ([fallback link](https://sigmajs.org/examples/csv-to-network-map))
+- [Handling drag and drop of nodes as well as node & edge creation on click](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/mouse-manipulations) ([fallback link](https://sigmajs.org/examples/mouse-manipulations))
+- [Displaying arbitrary elements, such as cluster labels, synchronized with the network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/clusters-labels) ([fallback link](https://sigmajs.org/examples/clusters-labels))
+- [Applying different animated layout algorithms to a network](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/layouts) ([fallback link](https://sigmajs.org/examples/layouts))
+- [Displaying nodes in various custom ways](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/custom-rendering) ([fallback link](https://sigmajs.org/examples/custom-rendering))
+- [Saving the graph as a PNG image](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/png-snapshot) ([fallback link](https://sigmajs.org/examples/png-snapshot))
+- [Use events to implement interactions](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/events) ([fallback link](https://sigmajs.org/examples/events))
+- [See how sigma behaves with larger graphs](https://githubbox.com/jacomyal/sigma.js/tree/main/examples/large-graphs) ([fallback link](https://sigmajs.org/examples/large-graphs))
 
 Also, a more realistic sigma.js based web application is available in the [`demo`](./demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://www.sigmajs.org/).
 

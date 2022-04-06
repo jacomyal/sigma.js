@@ -25,7 +25,7 @@ const DOUBLE_CLICK_ZOOMING_DURATION = 200;
 /**
  * Event types.
  */
-type MouseCaptorEvents = {
+export type MouseCaptorEvents = {
   click(coordinates: MouseCoords): void;
   rightClick(coordinates: MouseCoords): void;
   doubleClick(coordinates: MouseCoords): void;
@@ -221,6 +221,8 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     if (e.target === this.container) {
       this.emit("mousemove", mouseCoords);
     }
+
+    if (mouseCoords.sigmaDefaultPrevented) return;
 
     // Handle the case when "isMouseDown" all the time, to allow dragging the
     // stage while the mouse is not hover the container:

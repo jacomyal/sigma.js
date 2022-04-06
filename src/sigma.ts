@@ -41,7 +41,7 @@ import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor from "./core/captors/touch";
-import { identity, multiplyVec } from "./utils/matrices";
+import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
 
 /**
@@ -101,34 +101,36 @@ function applyEdgeDefaults(settings: Settings, key: string, data: Partial<EdgeDi
 /**
  * Event types.
  */
-interface SigmaEventPayload {
+export interface SigmaEventPayload {
   event: MouseCoords;
   preventSigmaDefault(): void;
 }
 
-interface SigmaStageEventPayload extends SigmaEventPayload {}
-interface SigmaNodeEventPayload extends SigmaEventPayload {
+export interface SigmaStageEventPayload extends SigmaEventPayload {}
+export interface SigmaNodeEventPayload extends SigmaEventPayload {
   node: string;
 }
-interface SigmaEdgeEventPayload extends SigmaEventPayload {
+export interface SigmaEdgeEventPayload extends SigmaEventPayload {
   edge: string;
 }
 
-type SigmaStageEvents = {
+export type SigmaStageEvents = {
   [E in MouseInteraction as `${E}Stage`]: (payload: SigmaStageEventPayload) => void;
 };
 
-type SigmaNodeEvents = {
+export type SigmaNodeEvents = {
   [E in MouseInteraction as `${E}Node`]: (payload: SigmaNodeEventPayload) => void;
 };
 
-type SigmaEdgeEvents = {
+export type SigmaEdgeEvents = {
   [E in MouseInteraction as `${E}Edge`]: (payload: SigmaEdgeEventPayload) => void;
 };
 
-type SigmaAdditionalEvents = {
+export type SigmaAdditionalEvents = {
   // Lifecycle events
+  beforeRender(): void;
   afterRender(): void;
+  resize(): void;
   kill(): void;
 
   // Additional node events
@@ -140,7 +142,7 @@ type SigmaAdditionalEvents = {
   leaveEdge(payload: SigmaEdgeEventPayload): void;
 };
 
-type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
+export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
 
 /**
  * Main class.
@@ -166,8 +168,6 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
   private nodesWithForcedLabels: string[] = [];
   private edgesWithForcedLabels: string[] = [];
-  private nodeKeyToIndex: Record<string, number> = {};
-  private edgeKeyToIndex: Record<string, number> = {};
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
 
   private matrix: Float32Array = identity();
@@ -217,8 +217,6 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     // Properties
     this.graph = graph;
     this.container = container;
-
-    this.initializeCache();
 
     // Initializing contexts
     this.createWebGLContext("edges", { preserveDrawingBuffer: true });
@@ -353,31 +351,6 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.webGLContexts[id] = context as WebGLRenderingContext;
 
     return this;
-  }
-
-  /**
-   * Method used to initialize display data cache.
-   *
-   * @return {Sigma}
-   */
-  private initializeCache(): void {
-    const graph = this.graph;
-
-    // NOTE: the data caches are never reset to avoid paying a GC cost
-    // But this could prove to be a bad decision. In which case just "reset"
-    // them here.
-
-    let i = 0;
-
-    graph.forEachNode((key) => {
-      this.nodeKeyToIndex[key] = i++;
-    });
-
-    i = 0;
-
-    graph.forEachEdge((key) => {
-      this.edgeKeyToIndex[key] = i++;
-    });
   }
 
   /**
@@ -566,33 +539,46 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       this._scheduleRefresh();
     };
 
-    this.activeListeners.addNodeGraphUpdate = (e: { key: string }): void => {
-      // Adding entry to cache
-      this.nodeKeyToIndex[e.key] = graph.order - 1;
+    this.activeListeners.dropNodeGraphUpdate = (e: { key: string }): void => {
+      delete this.nodeDataCache[e.key];
+
+      if (this.hoveredNode === e.key) this.hoveredNode = null;
+
       this.activeListeners.graphUpdate();
     };
 
-    this.activeListeners.addEdgeGraphUpdate = (e: { key: string }): void => {
-      // Adding entry to cache
-      this.nodeKeyToIndex[e.key] = graph.order - 1;
+    this.activeListeners.dropEdgeGraphUpdate = (e: { key: string }): void => {
+      delete this.edgeDataCache[e.key];
+
+      if (this.hoveredEdge === e.key) this.hoveredEdge = null;
+
       this.activeListeners.graphUpdate();
     };
 
-    // TODO: clean cache on drop!
+    this.activeListeners.clearEdgesGraphUpdate = (): void => {
+      this.edgeDataCache = {};
+      this.hoveredEdge = null;
 
-    // TODO: bind this on composed state events
-    // TODO: it could be possible to update only specific node etc. by holding
-    // a fixed-size pool of updated items
-    graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate);
-    graph.on("nodeDropped", this.activeListeners.graphUpdate);
+      this.activeListeners.graphUpdate();
+    };
+
+    this.activeListeners.clearGraphUpdate = (): void => {
+      this.nodeDataCache = {};
+      this.hoveredNode = null;
+
+      this.activeListeners.clearEdgesGraphUpdate();
+    };
+
+    graph.on("nodeAdded", this.activeListeners.graphUpdate);
+    graph.on("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
     graph.on("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
     graph.on("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.on("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
-    graph.on("edgeDropped", this.activeListeners.graphUpdate);
+    graph.on("edgeAdded", this.activeListeners.graphUpdate);
+    graph.on("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
     graph.on("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
     graph.on("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.on("edgesCleared", this.activeListeners.graphUpdate);
-    graph.on("cleared", this.activeListeners.graphUpdate);
+    graph.on("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
+    graph.on("cleared", this.activeListeners.clearGraphUpdate);
 
     return this;
   }
@@ -792,8 +778,6 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
-
-      this.nodeKeyToIndex[node] = i;
     }
 
     this.labelGrid.organize();
@@ -853,8 +837,6 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
       const hidden = data.hidden || sourceData.hidden || targetData.hidden;
       this.edgePrograms[data.type].process(sourceData, targetData, data, hidden, edgesPerPrograms[data.type]++);
-
-      this.nodeKeyToIndex[edge] = i;
     }
 
     for (const type in this.edgePrograms) {
@@ -1177,6 +1159,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    * @return {Sigma}
    */
   private render(): this {
+    this.emit("beforeRender");
+
+    const handleEscape = () => {
+      this.emit("afterRender");
+      return this;
+    };
+
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
@@ -1195,7 +1184,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.updateCachedValues();
 
     // If we have no nodes we can stop right there
-    if (!this.graph.order) return this;
+    if (!this.graph.order) return handleEscape();
 
     // TODO: improve this heuristic or move to the captor itself?
     // TODO: deal with the touch captor here as well
@@ -1250,15 +1239,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     }
 
     // Do not display labels on move per setting
-    if (this.settings.hideLabelsOnMove && moving) return this;
+    if (this.settings.hideLabelsOnMove && moving) return handleEscape();
 
     this.renderLabels();
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
 
-    this.emit("afterRender");
-
-    return this;
+    return handleEscape();
   }
 
   /**
@@ -1424,12 +1411,26 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
 
-    if (this.width === 0) throw new Error("Sigma: container has no width.");
+    if (this.width === 0) {
+      if (this.settings.allowInvalidContainer) this.width = 1;
+      else
+        throw new Error(
+          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seing this error.",
+        );
+    }
 
-    if (this.height === 0) throw new Error("Sigma: container has no height.");
+    if (this.height === 0) {
+      if (this.settings.allowInvalidContainer) this.height = 1;
+      else
+        throw new Error(
+          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seing this error.",
+        );
+    }
 
     // If nothing has changed, we can stop right here
     if (previousWidth === this.width && previousHeight === this.height) return this;
+
+    this.emit("resize");
 
     // Sizing dom elements
     for (const id in this.elements) {
@@ -1579,12 +1580,11 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.matrix;
 
-    const framedGraphVec = [coordinates.x, coordinates.y, 1];
-    const viewportVec = multiplyVec(matrix, framedGraphVec);
+    const viewportPos = multiplyVec2(matrix, coordinates);
 
     return {
-      x: ((1 + viewportVec[0]) * this.width) / 2,
-      y: ((1 - viewportVec[1]) * this.height) / 2,
+      x: ((1 + viewportPos.x) * this.width) / 2,
+      y: ((1 - viewportPos.y) * this.height) / 2,
     };
   }
 
@@ -1609,13 +1609,10 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.invMatrix;
 
-    const viewportVec = [(coordinates.x / this.width) * 2 - 1, 1 - (coordinates.y / this.height) * 2, 1];
-    const framedGraphVec = multiplyVec(invMatrix, viewportVec);
-
-    return {
-      x: framedGraphVec[0],
-      y: framedGraphVec[1],
-    };
+    return multiplyVec2(invMatrix, {
+      x: (coordinates.x / this.width) * 2 - 1,
+      y: 1 - (coordinates.y / this.height) * 2,
+    });
   }
 
   /**
@@ -1698,16 +1695,16 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.touchCaptor.kill();
 
     // Releasing graph handlers
-    graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);
+    graph.removeListener("nodeAdded", this.activeListeners.dropNodeGraphUpdate);
     graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
     graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
     graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
-    graph.removeListener("edgeDropped", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
     graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
     graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("edgesCleared", this.activeListeners.graphUpdate);
-    graph.removeListener("cleared", this.activeListeners.graphUpdate);
+    graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
+    graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
 
     // Releasing cache & state
     this.quadtree = new QuadTree();

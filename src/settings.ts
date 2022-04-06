@@ -73,6 +73,8 @@ export interface Settings {
   labelRenderer: typeof drawLabel;
   hoverRenderer: typeof drawHover;
   edgeLabelRenderer: typeof drawEdgeLabel;
+  // Lifecycle
+  allowInvalidContainer: boolean;
 
   // Program classes
   nodeProgramClasses: { [key: string]: NodeProgramConstructor };
@@ -122,6 +124,9 @@ export const DEFAULT_SETTINGS: Settings = {
   labelRenderer: drawLabel,
   hoverRenderer: drawHover,
   edgeLabelRenderer: drawEdgeLabel,
+
+  // Lifecycle
+  allowInvalidContainer: false,
 
   // Program classes
   nodeProgramClasses: {

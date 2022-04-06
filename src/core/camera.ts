@@ -18,7 +18,7 @@ const DEFAULT_ZOOMING_RATIO = 1.5;
 /**
  * Event types.
  */
-type CameraEvents = {
+export type CameraEvents = {
   updated(state: CameraState): void;
 };
 
