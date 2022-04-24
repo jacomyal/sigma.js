@@ -39,6 +39,7 @@ export interface Settings {
   // Performance
   hideEdgesOnMove: boolean;
   hideLabelsOnMove: boolean;
+  renderEdges: boolean,
   renderLabels: boolean;
   renderEdgeLabels: boolean;
   enableEdgeClickEvents: boolean;
@@ -85,6 +86,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
+  renderEdges: true,
   renderLabels: true,
   renderEdgeLabels: false,
   enableEdgeClickEvents: false,

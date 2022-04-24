@@ -61,9 +61,11 @@ const container = document.getElementById("sigma-container") as HTMLElement;
 const renderer = new Sigma(graph, container, {
   defaultEdgeColor: "#e6e6e6",
   defaultEdgeType: state.edgesRenderer,
+  renderEdges: state.edgesRenderer === 'edges-hidden' ? false : true,
   edgeProgramClasses: {
     "edges-default": EdgesDefaultProgram,
     "edges-fast": EdgesFastProgram,
+    "edges-hidden": EdgesFastProgram,
   },
 });
 

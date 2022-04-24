@@ -1221,7 +1221,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     }
 
     // Drawing edges
-    if (!this.settings.hideEdgesOnMove || !moving) {
+    if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.renderEdges) {
       for (const type in this.edgePrograms) {
         const program = this.edgePrograms[type];
 
