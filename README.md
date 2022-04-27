@@ -10,7 +10,7 @@
 
 Since version `v2`, sigma.js focuses on the management of graph display: rendering, interaction... The graph model is managed in a separate library called **[graphology](https://github.com/graphology/graphology)**, which is packed with convenience methods to manage graph data structures, and a lot of satellite libraries to handle various graph-related problems (metrics, community detection, layout algorithms...).
 
-Graphology website offers [a list](https://graphology.github.io/standard-library.html) of these libraries. Most of them can help you solve problems in your sigma.js based web applications.
+Graphology website offers [a list](https://graphology.github.io/standard-library/) of these libraries. Most of them can help you solve problems in your sigma.js based web applications.
 
 ### Rendering
 
