@@ -1263,7 +1263,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    */
   private updateCachedValues(): void {
     const { ratio } = this.camera.getState();
-    this.cameraSizeRatio = Math.sqrt(ratio);
+    this.cameraSizeRatio = this.settings.getCameraSizeRatio(ratio);
   }
 
   /**---------------------------------------------------------------------------
