@@ -1272,6 +1272,15 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   }
 
   /**
+   * Method returning the container DOM element.
+   *
+   * @return {HTMLElement}
+   */
+  getContainer(): HTMLElement {
+    return this.container;
+  }
+
+  /**
    * Method returning the renderer's graph.
    *
    * @return {Graph}
