@@ -45,11 +45,6 @@ import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
 
 /**
- * Constants.
- */
-const PIXEL_RATIO = getPixelRatio();
-
-/**
  * Important functions.
  */
 function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
@@ -182,9 +177,10 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   // Cache:
   private cameraSizeRatio = 1;
 
-  // Starting dimensions
+  // Starting dimensions and pixel ratio
   private width = 0;
   private height = 0;
+  private pixelRatio = getPixelRatio();
 
   // State
   private displayedLabels: Set<string> = new Set();
@@ -623,7 +619,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     // Check first that pixel is colored:
     // Note that mouse positions must be corrected by pixel ratio to correctly
     // index the drawing buffer.
-    if (!isPixelColored(this.webGLContexts.edges, x * PIXEL_RATIO, y * PIXEL_RATIO)) return null;
+    if (!isPixelColored(this.webGLContexts.edges, x * this.pixelRatio, y * this.pixelRatio)) return null;
 
     // Check for each edge if it collides with the point:
     const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
@@ -1144,7 +1140,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         height: this.height,
         ratio: this.camera.ratio,
         correctionRatio: this.correctionRatio / this.camera.ratio,
-        scalingRatio: PIXEL_RATIO,
+        scalingRatio: this.pixelRatio,
       });
     }
   }
@@ -1229,7 +1225,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         height: this.height,
         ratio: cameraState.ratio,
         correctionRatio: this.correctionRatio / cameraState.ratio,
-        scalingRatio: PIXEL_RATIO,
+        scalingRatio: this.pixelRatio,
       });
     }
 
@@ -1246,7 +1242,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
           height: this.height,
           ratio: cameraState.ratio,
           correctionRatio: this.correctionRatio / cameraState.ratio,
-          scalingRatio: PIXEL_RATIO,
+          scalingRatio: this.pixelRatio,
         });
       }
     }
@@ -1423,6 +1419,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
+    this.pixelRatio = getPixelRatio();
 
     if (this.width === 0) {
       if (this.settings.allowInvalidContainer) this.width = 1;
@@ -1455,18 +1452,18 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     // Sizing canvas contexts
     for (const id in this.canvasContexts) {
-      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("width", this.width * this.pixelRatio + "px");
+      this.elements[id].setAttribute("height", this.height * this.pixelRatio + "px");
 
-      if (PIXEL_RATIO !== 1) this.canvasContexts[id].scale(PIXEL_RATIO, PIXEL_RATIO);
+      if (this.pixelRatio !== 1) this.canvasContexts[id].scale(this.pixelRatio, this.pixelRatio);
     }
 
     // Sizing WebGL contexts
     for (const id in this.webGLContexts) {
-      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("width", this.width * this.pixelRatio + "px");
+      this.elements[id].setAttribute("height", this.height * this.pixelRatio + "px");
 
-      this.webGLContexts[id].viewport(0, 0, this.width * PIXEL_RATIO, this.height * PIXEL_RATIO);
+      this.webGLContexts[id].viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
     }
 
     return this;
