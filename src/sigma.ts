@@ -439,7 +439,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       const baseEvent = {
         event: e,
         preventSigmaDefault(): void {
-          this.event.preventSigmaDefault();
+          e.preventSigmaDefault();
         },
       };
 
@@ -489,7 +489,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         const baseEvent = {
           event: e,
           preventSigmaDefault(): void {
-            this.event.preventSigmaDefault();
+            e.preventSigmaDefault();
           },
         };
 
