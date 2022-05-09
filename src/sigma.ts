@@ -170,8 +170,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   private correctionRatio = 1;
   private customBBox: { x: Extent; y: Extent } | null = null;
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
-    x: [-Infinity, Infinity],
-    y: [-Infinity, Infinity],
+    x: [0, 1],
+    y: [0, 1],
   });
 
   // Cache:
@@ -1619,10 +1619,15 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.invMatrix;
 
-    return multiplyVec2(invMatrix, {
+    const res = multiplyVec2(invMatrix, {
       x: (coordinates.x / this.width) * 2 - 1,
       y: 1 - (coordinates.y / this.height) * 2,
     });
+
+    if (isNaN(res.x)) res.x = 0;
+    if (isNaN(res.y)) res.y = 0;
+
+    return res;
   }
 
   /**
