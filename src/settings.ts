@@ -59,7 +59,7 @@ export interface Settings {
   edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   stagePadding: number;
   getCameraSizeRatio: (ratio: number) => number;
-  scaleSize: (size: number, cameraRatio: number) => number;
+
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
