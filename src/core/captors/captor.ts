@@ -38,14 +38,16 @@ export function getPosition(e: MouseEvent | Touch, dom: HTMLElement): Coordinate
  * @return {object}
  */
 export function getMouseCoords(e: MouseEvent, dom: HTMLElement): MouseCoords {
-  return {
+  const res: MouseCoords = {
     ...getPosition(e, dom),
     sigmaDefaultPrevented: false,
     preventSigmaDefault(): void {
-      this.sigmaDefaultPrevented = true;
+      res.sigmaDefaultPrevented = true;
     },
     original: e,
   };
+
+  return res;
 }
 
 /**
