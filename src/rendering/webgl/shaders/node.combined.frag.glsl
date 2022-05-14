@@ -2,9 +2,15 @@ precision mediump float;
 
 varying vec4 v_color;
 varying float v_border;
+varying vec4 v_borderColor;
+varying float v_softborder;
 varying vec4 v_texture;
 varying vec2 v_diffVector;
 varying float v_radius;
+varying float v_angle;
+varying vec2 v_position;
+
+
 
 uniform sampler2D u_atlas;
 
@@ -28,11 +34,20 @@ void main(void) {
   }
 
   float dist = length(v_diffVector) - v_radius;
-  float t = 0.0;
-  if (dist > v_border)
-    t = 1.0;
-  else if (dist > 0.0)
-    t = dist / v_border;
+  vec4 border_color = v_borderColor;
 
-  gl_FragColor = mix(color, transparent, t);
+  if (dist > v_softborder)
+    // outside border
+    gl_FragColor = transparent;
+  else if (dist > 0.0)
+    // outside border antialias
+    gl_FragColor = mix(border_color, transparent, dist / v_softborder);
+  else if (dist > v_radius - v_border + v_softborder)
+    // inner border
+    gl_FragColor = mix(color, border_color, border_color.a);
+  else if (dist > v_radius - v_border)
+    // inner border antialias
+    gl_FragColor = mix(color, border_color, (dist - v_radius + v_border) / v_softborder);
+  else
+    gl_FragColor = color;
 }

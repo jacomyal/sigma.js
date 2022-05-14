@@ -18,17 +18,23 @@ import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
 
 const POINTS = 3,
-  // atttributes sizing:
-  // position (xy: 2xfloat)
-  // size (1xfloat)
-  // color (4xbyte => 1xfloat)
-  // uvw (3xfloat) - only pass width for square texture
-  // angle (1xfloat)
-  ATTRIBUTES = 8,
-  MAX_TEXTURE_SIZE = 100,
-  MAX_CANVAS_WIDTH = 16384;
+  /*
+     atttributes sizing in floats:
+      - position (xy: 2xfloat)
+      - size (1xfloat)
+      - color (4xbyte => 1xfloat)
+      - uvw (3xfloat) - only pass width for square texture
+      - angle (1xfloat)
+      - borderColor (4xbyte = 1xfloat)
+   */
+  ATTRIBUTES = 9,
+  // maximum size of single texture in atlas
+  MAX_TEXTURE_SIZE = 192,
+  // maximum width of atlas texture (limited by browser)
+  // low setting of 2048 works on iPads
+  MAX_CANVAS_WIDTH = 2048;
 
-const ANGLE_1 = 0,
+const ANGLE_1 = 0.0,
   ANGLE_2 = (2 * Math.PI) / 3,
   ANGLE_3 = (4 * Math.PI) / 3;
 
@@ -230,6 +236,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
     sqrtZoomRatioLocation: WebGLUniformLocation;
     correctionRatioLocation: WebGLUniformLocation;
     angleLocation: GLint;
+    borderColorLocation: GLint;
     latestRenderParams?: RenderParams;
 
     constructor(gl: WebGLRenderingContext, renderer: Sigma) {
@@ -245,6 +252,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
       // Attribute Location
       this.textureLocation = gl.getAttribLocation(this.program, "a_texture");
       this.angleLocation = gl.getAttribLocation(this.program, "a_angle");
+      this.borderColorLocation = gl.getAttribLocation(this.program, "a_borderColor");
 
       // Uniform Location
       const atlasLocation = gl.getUniformLocation(this.program, "u_atlas");
@@ -278,6 +286,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
 
       gl.enableVertexAttribArray(this.textureLocation);
       gl.enableVertexAttribArray(this.angleLocation);
+      gl.enableVertexAttribArray(this.borderColorLocation);
 
       gl.vertexAttribPointer(
         this.textureLocation,
@@ -295,9 +304,17 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         this.attributes * Float32Array.BYTES_PER_ELEMENT,
         28,
       );
+      gl.vertexAttribPointer(
+        this.borderColorLocation,
+        4,
+        gl.UNSIGNED_BYTE,
+        true,
+        this.attributes * Float32Array.BYTES_PER_ELEMENT,
+        32,
+      );
     }
 
-    process(data: NodeDisplayData & { image?: string }, hidden: boolean, offset: number): void {
+    process(data: NodeDisplayData & { image?: string; borderColor?: string }, hidden: boolean, offset: number): void {
       const array = this.array;
       let i = offset * POINTS * ATTRIBUTES;
 
@@ -306,6 +323,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
       if (typeof imageSource === "string" && !imageState) loadImage(imageSource);
 
       if (hidden) {
+        // x,y,size,color
         array[i++] = 0;
         array[i++] = 0;
         array[i++] = 0;
@@ -316,10 +334,13 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
         // Angle:
         array[i++] = 0;
+        // Border Color:
+        array[i++] = 0;
         return;
       }
 
       const color = floatColor(data.color);
+      const borderColor = floatColor(data.borderColor ?? data.color);
       array[i++] = data.x;
       array[i++] = data.y;
       array[i++] = data.size;
@@ -339,12 +360,14 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
       }
       array[i++] = ANGLE_1;
+      array[i++] = borderColor;
 
       array[i++] = data.x;
       array[i++] = data.y;
       array[i++] = data.size;
       array[i++] = color;
 
+      // ratio: R/texture_height
       const r = (8 / 3) * (1 - Math.sin((2 * Math.PI) / 3));
 
       if (imageState && imageState.status === "ready") {
@@ -359,6 +382,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
       }
       array[i++] = ANGLE_2;
+      array[i++] = borderColor;
 
       array[i++] = data.x;
       array[i++] = data.y;
@@ -375,7 +399,8 @@ export default function getNodeImageProgram(): typeof AbstractNodeCombinedProgra
         array[i++] = 0;
         array[i++] = 0;
       }
-      array[i] = ANGLE_3;
+      array[i++] = ANGLE_3;
+      array[i++] = borderColor;
     }
 
     render(params: RenderParams): void {
