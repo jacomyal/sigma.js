@@ -397,7 +397,9 @@ export const tests: Tests = [
           size: 64,
           label: "Node 5",
           type: "combined",
-          color: "#cc00ff80",
+          //color: "#cc00ff80",
+          color: "#0000ff",
+          borderColor: "#0000ffff",
           image,
         });
 
