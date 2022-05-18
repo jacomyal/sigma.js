@@ -5,7 +5,8 @@
  * Various helper functions & classes used throughout the library.
  * @module
  */
-import Graph, { Attributes } from "graphology-types";
+import Graph from "graphology";
+import { Attributes } from "graphology-types";
 import isGraph from "graphology-utils/is-graph";
 import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../types";
 import { multiply, identity, scale, rotate, translate, multiplyVec2 } from "./matrices";
