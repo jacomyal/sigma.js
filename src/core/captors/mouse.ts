@@ -76,6 +76,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     container.addEventListener("mousedown", this.handleDown, false);
     container.addEventListener("wheel", this.handleWheel, false);
     container.addEventListener("mouseout", this.handleOut, false);
+    container.addEventListener("mousemove", this.handleMove, false);
 
     document.addEventListener("mousemove", this.handleMove, false);
     document.addEventListener("mouseup", this.handleUp, false);
@@ -89,6 +90,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     container.removeEventListener("mousedown", this.handleDown);
     container.removeEventListener("wheel", this.handleWheel);
     container.removeEventListener("mouseout", this.handleOut);
+    container.removeEventListener("mousemove", this.handleMove);
 
     document.removeEventListener("mousemove", this.handleMove);
     document.removeEventListener("mouseup", this.handleUp);
