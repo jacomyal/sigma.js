@@ -3,7 +3,7 @@
  * ========
  * @module
  */
-import Graph from "graphology";
+import Graph from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";

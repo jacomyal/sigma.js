@@ -5,7 +5,7 @@
  * Miscelleneous heuristics related to label display.
  * @module
  */
-import Graph from "graphology";
+import Graph from "graphology-types";
 
 import { Dimensions, Coordinates } from "../types";
 
