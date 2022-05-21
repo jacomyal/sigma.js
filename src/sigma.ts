@@ -784,7 +784,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       if (typeof data.label === "string" && !data.hidden)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
-      this.nodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
+      const nodeProgram = this.nodePrograms[data.type];
+      if (nodeProgram) {
+        nodeProgram.process(data, data.hidden, nodesPerPrograms[data.type]++);
+      } else {
+        console.error(`Node Program of type "${data.type}" specified by node, but not included in "nodeProgramClasses" field of Sigma configuration`);
+      }
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
