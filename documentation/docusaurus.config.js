@@ -26,7 +26,22 @@ const config = {
     defaultLocale: "en",
     locales: ["en"],
   },
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus-plugin-typedoc",
+      {
+        tsconfig: "../tsconfig.json",
+        out: "typedoc",
+        entryPoints: ["../src/index.ts"],
+        sidebar: {
+          categoryLabel: "Typescript documentation",
+          position: 999,
+          fullNames: true,
+        },
+      },
+    ],
+  ],
   presets: [
     [
       "classic",
