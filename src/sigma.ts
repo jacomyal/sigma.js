@@ -468,7 +468,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
           this.hoveredNode = null;
 
           this.emit("leaveNode", { ...baseEvent, node });
-          return this.scheduleHighlightedNodesRender();
+          this.scheduleHighlightedNodesRender();
+          return;
         }
       }
 
@@ -1128,7 +1129,9 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       const data = this.nodeDataCache[node];
       this.hoverNodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
     });
-    // 4. Render:
+    // 4. Clear hovered nodes layer:
+    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
+    // 5. Render:
     for (const type in this.hoverNodePrograms) {
       const program = this.hoverNodePrograms[type];
 
@@ -1486,7 +1489,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   clear(): this {
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
-    this.webGLContexts.hoverNodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
