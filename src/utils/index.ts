@@ -260,8 +260,9 @@ export function parseColor(val: string): RGBAColor {
       g = parseInt(val.charAt(3) + val.charAt(4), 16);
       b = parseInt(val.charAt(5) + val.charAt(6), 16);
     }
-
-    // TODO: parse hex with alpha?
+    if (val.length === 9) {
+      a = parseInt(val.charAt(7) + val.charAt(8), 16) / 255;
+    }
   }
 
   // Handling rgb notation
