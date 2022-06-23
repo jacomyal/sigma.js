@@ -10,8 +10,8 @@
 import {AbstractNodeProgram} from 'sigma/rendering/webgl/programs/common/node';
 import {RenderParams} from 'sigma/rendering/webgl/programs/common/program';
 
-import fragmentShaderSource from './node.fast.frag.glsl';
-import vertexShaderSource from './node.fast.vert.glsl';
+import fragmentShaderSource from 'sigma/rendering/webgl/shaders/node.fast.frag.glsl';
+import vertexShaderSource from 'sigma/rendering/webgl/shaders/node.fast.vert.glsl';
 
 let POINTS = 1;
 const ATTRIBUTES = 4;

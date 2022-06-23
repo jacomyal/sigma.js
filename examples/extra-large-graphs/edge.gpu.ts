@@ -9,8 +9,8 @@
 import { AbstractEdgeProgram }  from "sigma/rendering/webgl/programs/common/edge";
 import { RenderParams } from "sigma/rendering/webgl/programs/common/program";
 
-import fragmentShaderSource from "./edge.fast.frag.glsl";
-import vertexShaderSource from "./edge.fast.vert.glsl";
+import fragmentShaderSource from "sigma/rendering/webgl/shaders/edge.fast.frag.glsl";
+import vertexShaderSource from "sigma/rendering/webgl/shaders/edge.fast.vert.glsl";
 
 let POINTS = 2;
 const ATTRIBUTES = 3;
