@@ -26,7 +26,7 @@ async function request(obj) {
 }
 
 const SERVER             = 'http://localhost:3010';
-const DATASET_ROUTE      = '/graphology/read_large_demo?filename=../../public/fewer-edges.json';
+const DATASET_ROUTE      = '/graphology/read_large_demo?filename=../../public/graphology.json';
 const NODES_ROUTE        = '/graphology/get_column/nodes';
 const NODES_BOUNDS_ROUTE = '/graphology/nodes/bounds';
 const NODES_BUFFER_ROUTE = '/graphology/nodes';
