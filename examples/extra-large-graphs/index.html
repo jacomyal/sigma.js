@@ -10,18 +10,38 @@
     <style>
       html,
       body,
-      #sigma-container {
+      #sigma-gpu-container {
         width: 100%;
-        height: 100%;
+        height: 17em;
         margin: 0;
         padding: 0;
         overflow: hidden;
         font-family: sans-serif;
       }
-      #buttons {
+      #sigma-container {
+        width: 100%;
+        height: 17em;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      #labels-gpu {
         position: absolute;
         right: 1em;
         top: 1em;
+        display: flex;
+      }
+      #labels-host {
+        position: absolute;
+        left: 1em;
+        top: 18em;
+        display: flex;
+      }
+      #buttons {
+        position: absolute;
+        right: 1em;
+        top: 18em;
         display: flex;
       }
 
@@ -38,35 +58,85 @@
       fieldset > div {
         margin-bottom: 0.2em;
       }
-      button {
-        margin-right: 1em;
-        display: inline-block;
-        text-align: center;
-        background: white;
-        outline: none;
-        border: 1px solid dimgrey;
-        border-radius: 2px;
-        cursor: pointer;
-      }
     </style>
+    <div id="sigma-gpu-container"></div>
+    <div id="labels-gpu">
+      <form>
+        <fieldset>
+          <h4>Gpu Graph</h4>
+          <div>
+            <div type="number" id="order_gpu" name="order">
+            </div>
+            <label for="order_gpu">Number of nodes</label>
+          </div>
+          <div>
+            <div type="number" id="size_gpu" name="size">
+            </div>
+            <label for="size_gpu">Number of edges</label>
+          </div>
+          <div>
+            <div id="io_time_gpu" name="io_time">
+            </div>
+            <label for="io_time_gpu">I/O Load Time</label>
+          </div>
+          <div>
+            <div id="render_time_gpu" name="render_time">
+            </div>
+            <label for="render_time_gpu">Render Time</label>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
     <div id="sigma-container"></div>
+    <div id="labels-host">
+      <form>
+        <fieldset>
+          <h4>Host Graph</h4>
+          <div>
+            <div id="io_time_host" name="io_time_host">
+            </div>
+            <label for="io_time_host">I/O Load Time</label>
+          </div>
+          <div>
+            <div id="render_time_host" name="render_time_host">
+            </div>
+            <label for="render_time_host">Render Time</label>
+          </div>
+        </fieldset>
+      </form>
+    </div>
     <div id="buttons">
       <form>
         <fieldset>
           <h4>Graph</h4>
           <div>
-            <div type="number" id="order" name="order" min="2" step="1" value="">
-            </div>
+            <input type="number" id="order" name="order" min="2" step="1"/>
             <label for="order">Number of nodes</label>
           </div>
           <div>
-            <div type="number" id="size" name="size" min="1" step="1" value="">
-            </div>
+            <input type="number" id="size" name="size" min="1" step="1" />
             <label for="size">Number of edges</label>
+          </div>
+          <div>
+            <input type="number" id="clusters" name="clusters" min="1" step="1"/>
+            <label for="clusters">Number of clusters</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <h4>Edges renderer</h4>
+          <div>
+            <input type="radio" name="edges-renderer" id="edges-default" value="edges-default" />
+            <label for="edges-default">Default</label>
+          </div>
+          <div>
+            <input type="radio" name="edges-renderer" id="edges-fast" value="edges-fast" checked />
+            <label for="edges-fast">Faster (only 1px thick edges)</label>
           </div>
         </fieldset>
         <fieldset>
           <button type="submit">Reset graph</button>
+          <button type="button" id="fa2">Start layout ▶</button>
         </fieldset>
       </form>
     </div>
