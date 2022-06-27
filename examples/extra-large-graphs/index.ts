@@ -52,20 +52,14 @@ const rng = seedrandom('sigma');
     },
   });
 
-  // Enable FA2 button:
-  const fa2Button        = document.getElementById('fa2') as HTMLButtonElement;
-  const sensibleSettings = forceAtlas2.inferSettings(graph);
-  const fa2Layout        = new FA2Layout(graph, {
-    settings: sensibleSettings,
-  });
-  function toggleFA2Layout() {
-    if (fa2Layout.isRunning()) {
-      fa2Layout.stop();
-      fa2Button.innerHTML = `Start layout ▶`;
-    } else {
-      fa2Layout.start();
-      fa2Button.innerHTML = `Stop layout ⏸`;
-    }
-  }
-  fa2Button.addEventListener('click', toggleFA2Layout);
+  const updateFields = () => {
+    const orderField = document.getElementById('order') as HTMLDivElement;
+    orderField.innerHTML = String(nodes.numRows / 4);
+    const sizeField = document.getElementById('size') as HTMLDivElement;
+    sizeField.innerHTML = String(edges.numRows / 6);
+  };
+
+  setTimeout(() => {
+    updateFields();
+  }, 100);
 })();
