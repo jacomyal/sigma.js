@@ -24,6 +24,7 @@ const rng = seedrandom("sigma");
 // node-rapids demo for sigma.js
 (async function() {
   await (async function() {
+    console.log('extra-large-graphs');
 
     // Load the graph via node-rapids. It will be resident on your
     // local GPU.
@@ -73,8 +74,7 @@ const rng = seedrandom("sigma");
   // Original demo, plus performance measures
 
   await (async function() {
-
-    console.log('Large-graphs');
+    console.log('large-graphs');
 
     // 1. Read query string, and set form values accordingly:
     const query = new URLSearchParams(location.search).entries();
