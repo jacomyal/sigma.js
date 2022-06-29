@@ -1,7 +1,7 @@
 # Extra Large Graphs Demo with `@rapidsai/node` GPU acceleration
 
 RAPIDS.ai is an open source GPU-acceleration project. We're building new
-tools with familiar APIs and extending existing tools to that more
+tools with familiar APIs and extending existing tools so that more
 scientists and users can take advantage of GPU performance.
 
 This project creates a `RapidsGraphologyGraph` subclass of `Graph`,
@@ -12,7 +12,7 @@ that has been built using [node-rapids](https://www.github.com/rapidsai/node).
 # Performance
 
 Using a GPU for graph rendering offers substantial performance increases.
-In this demo, I've included screenshots of performance comparison's between
+In this demo, I've included screenshots of performance comparisons between
 using our GPU-backed `RapidsGraphologyGraph` and the original renderer
 included in the `large-graphs` demo.
 
@@ -34,8 +34,8 @@ GPU case) and parsed in-browser, execution time is similar or longer.
 # What Is Happening
 
 In order to run this demo, you need the `@rapidsai/demo` npm package,
-a system with an NVIDIA GPU from around 2018 forward (Turing architecture
-and up), and have previously installed the [CUDA Toolkit] (https://developer.nvidia.com/cuda-toolkit).
+a system with a fairly modern NVIDIA GPU, and have previously installed
+the [CUDA Toolkit] (https://developer.nvidia.com/cuda-toolkit).
 
 The node-rapids workspace [demo-api-server](https://github.com/rapidsai/node)
 is available as a backend to any HTTP client. At this time only limited
@@ -58,11 +58,18 @@ Due to native dependency distribution complexity, pre-packaged builds of
 the node-rapids modules are presently only available via our [public docker images](https://github.com/orgs/rapidsai/packages/container/package/node).
 See [USAGE.md](https://github.com/rapidsai/node/tree/main/USAGE.md) for more details.
 
+Generate a graph of your liking, or provide another:
+
+```bash
+cd $SIGMAJSHOME/examples/extra-large-graphs
+node generate-graph.js 10000 20000 3 graphology.json
+```
+
 Run `@rapidsai/demo-api-server` via docker:
 
 ```bash
 REPO=ghcr.io/rapidsai/node
-VERSIONS="22.02.00-runtime-node18.2.0-cuda11.6.2-ubuntu20.04"
+VERSIONS="22.06.00-runtime-node16.15.1-cuda11.6.2-ubuntu20.04"
 
 # Be sure to pass either the `--runtime=nvidia` or `--gpus` flag!
 docker run --rm \
@@ -72,19 +79,12 @@ docker run --rm \
     -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
     -v "/usr/share/fonts:/usr/share/fonts:ro" \
     -v "/usr/share/icons:/usr/share/icons:ro" \
+    -v "$(realpath -m ./graphology.json):/home/node/node_modules/@rapidsai/demo-api-server/public/graphology.json"
     $REPO:$VERSIONS-demo \
     npx @rapidsai/demo-api-server
 ```
 
 We expect to have full `npm` support soon.
-
-Next generate a graph of your liking, or provide another:
-
-```bash
-cd $SIGMAJSHOME/examples/extra-large-graphs
-node generate-graph.js 10000 20000 3 graphology.json
-cp graphology.json $DOCKERROOT/node/modules/demo/api-server/public
-```
 
 Finally run the `extra-large-graphs` demo in the normal fashion:
 

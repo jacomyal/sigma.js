@@ -39,7 +39,7 @@ try {
   });
 
   // 2. Save the graph:
-  fs.writeFile(outputName, JSON.stringify(graph.toJSON(), {}, 2), (err) => {
+  fs.writeFileSync(outputName, JSON.stringify(graph.toJSON(), {}, 2), (err) => {
     if(err) {
       console.log('unable to save file');
     } else {
