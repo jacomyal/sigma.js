@@ -147,9 +147,9 @@ export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents &
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma extends TypedEventEmitter<SigmaEvents> {
+export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEmitter<SigmaEvents> {
   private settings: Settings;
-  private graph: Graph;
+  private graph: GraphType;
   private mouseCaptor: MouseCaptor;
   private touchCaptor: TouchCaptor;
   private container: HTMLElement;
@@ -200,7 +200,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
   private camera: Camera;
 
-  constructor(graph: Graph, container: HTMLElement, settings: Partial<Settings> = {}) {
+  constructor(graph: GraphType, container: HTMLElement, settings: Partial<Settings> = {}) {
     super();
 
     this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
@@ -1297,7 +1297,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    *
    * @return {Graph}
    */
-  getGraph(): Graph {
+  getGraph(): GraphType {
     return this.graph;
   }
 
