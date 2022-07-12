@@ -11,6 +11,7 @@ import { Attributes } from "graphology-types";
 import drawLabel from "./rendering/canvas/label";
 import drawHover from "./rendering/canvas/hover";
 import drawEdgeLabel from "./rendering/canvas/edge-label";
+import drawEdgeHover from "./rendering/canvas/edge-hover";
 import { EdgeDisplayData, NodeDisplayData } from "./types";
 import CircleNodeProgram from "./rendering/webgl/programs/node.fast";
 import LineEdgeProgram from "./rendering/webgl/programs/edge";
@@ -44,6 +45,7 @@ export interface Settings {
   enableEdgeClickEvents: boolean;
   enableEdgeWheelEvents: boolean;
   enableEdgeHoverEvents: boolean | "debounce";
+  enableEdgeHoverHighlight: boolean;
   // Component rendering
   defaultNodeColor: string;
   defaultNodeType: string;
@@ -57,6 +59,8 @@ export interface Settings {
   edgeLabelSize: number;
   edgeLabelWeight: string;
   edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
+  edgeHighlightWidthFactor: number;
+  edgeHighlightAlpha: number;
   stagePadding: number;
   // Labels
   labelDensity: number;
@@ -73,6 +77,7 @@ export interface Settings {
   labelRenderer: typeof drawLabel;
   hoverRenderer: typeof drawHover;
   edgeLabelRenderer: typeof drawEdgeLabel;
+  edgeHoverRenderer: typeof drawEdgeHover;
   // Lifecycle
   allowInvalidContainer: boolean;
 
@@ -90,6 +95,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableEdgeClickEvents: false,
   enableEdgeWheelEvents: false,
   enableEdgeHoverEvents: false,
+  enableEdgeHoverHighlight: true,
 
   // Component rendering
   defaultNodeColor: "#999",
@@ -104,6 +110,8 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeLabelSize: 14,
   edgeLabelWeight: "normal",
   edgeLabelColor: { attribute: "color" },
+  edgeHighlightWidthFactor: 1.7,
+  edgeHighlightAlpha: 0.6,
   stagePadding: 30,
 
   // Labels
@@ -124,6 +132,7 @@ export const DEFAULT_SETTINGS: Settings = {
   labelRenderer: drawLabel,
   hoverRenderer: drawHover,
   edgeLabelRenderer: drawEdgeLabel,
+  edgeHoverRenderer: drawEdgeHover,
 
   // Lifecycle
   allowInvalidContainer: false,

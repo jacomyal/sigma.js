@@ -185,6 +185,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   // State
   private displayedLabels: Set<string> = new Set();
   private highlightedNodes: Set<string> = new Set();
+  private highlightedEdges: Set<string> = new Set();
   private hoveredNode: string | null = null;
   private hoveredEdge: string | null = null;
   private renderFrame: number | null = null;
@@ -217,6 +218,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     // Initializing contexts
     this.createWebGLContext("edges", { preserveDrawingBuffer: true });
     this.createCanvasContext("edgeLabels");
+    this.createCanvasContext("edgeHovers");
     this.createWebGLContext("nodes");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
@@ -705,6 +707,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     // Clear the highlightedNodes
     this.highlightedNodes = new Set();
+    this.highlightedEdges = new Set();
 
     // Computing extents
     this.nodeExtent = graphExtent(graph);
@@ -847,6 +850,8 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
       const hidden = data.hidden || sourceData.hidden || targetData.hidden;
       this.edgePrograms[data.type].process(sourceData, targetData, data, hidden, edgesPerPrograms[data.type]++);
+
+      if (data.highlighted && !hidden) this.highlightedEdges.add(edge);
     }
 
     for (const type in this.edgePrograms) {
@@ -1148,6 +1153,47 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     }
   }
 
+  private renderHighlightedEdges(): void {
+    const context = this.canvasContexts.edgeHovers;
+
+    // Clearing
+    context.clearRect(0, 0, this.width, this.height);
+
+    // Rendering
+    const render = (edge: string): void => {
+      const data = this.edgeDataCache[edge];
+      const size = this.scaleSize(data.size);
+
+      const [sourceKey, targetKey] = [this.graph.source(edge), this.graph.target(edge)];
+      const [sourceData, targetData] = [this.nodeDataCache[sourceKey], this.nodeDataCache[targetKey]];
+
+      this.settings.edgeHoverRenderer(
+        context,
+        {
+          key: edge,
+          ...data,
+          size,
+          source: {
+            key: sourceKey,
+            data: { ...sourceData, ...this.framedGraphToViewport(sourceData) },
+          },
+          target: {
+            key: targetKey,
+            data: { ...targetData, ...this.framedGraphToViewport(targetData) },
+          },
+        },
+        this.settings,
+      );
+    };
+
+    const edgesToRender: string[] = Array.from(this.highlightedEdges);
+
+    // draw highlight
+    edgesToRender.forEach((edge) => {
+      render(edge);
+    });
+  }
+
   /**
    * Method used to schedule a hover render.
    *
@@ -1256,6 +1302,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.renderLabels();
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
+    this.renderHighlightedEdges();
 
     return handleEscape();
   }
@@ -1492,6 +1539,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
+    this.canvasContexts.edgeHovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
 
     return this;

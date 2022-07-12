@@ -80,9 +80,15 @@ export default function drawEdgeLabel(
     else angle = Math.asin(dx / d) + Math.PI / 2;
   }
 
+  const highlightOffset =
+    edgeData.highlighted && settings.edgeHighlightWidthFactor > 1
+      ? (edgeData.size * (settings.edgeHighlightWidthFactor - 1)) / 2
+      : 0;
+
   context.save();
   context.translate(cx, cy);
   context.rotate(angle);
+  context.translate(0, highlightOffset);
 
   context.fillText(label, -textLength / 2, edgeData.size / 2 + size);
 

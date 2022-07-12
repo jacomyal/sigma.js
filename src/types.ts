@@ -65,11 +65,16 @@ export interface DisplayData {
   type: string;
 }
 
-export interface NodeDisplayData extends Coordinates, DisplayData {
-  highlighted: boolean;
+export interface HighlightProtocol {
+  highlighted?: boolean;
+  highlightColor?: Set<string>;
 }
 
-export interface EdgeDisplayData extends DisplayData {}
+export interface NodeDisplayData extends Coordinates, DisplayData, HighlightProtocol {
+}
+
+export interface EdgeDisplayData extends DisplayData, HighlightProtocol {
+}
 
 export type CoordinateConversionOverride = {
   cameraState?: CameraState;
