@@ -1437,7 +1437,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       if (this.settings.allowInvalidContainer) this.width = 1;
       else
         throw new Error(
-          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seing this error.",
+          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seeing this error.",
         );
     }
 
@@ -1445,7 +1445,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       if (this.settings.allowInvalidContainer) this.height = 1;
       else
         throw new Error(
-          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seing this error.",
+          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seeing this error.",
         );
     }
 
