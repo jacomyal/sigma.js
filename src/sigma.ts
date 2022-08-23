@@ -3,7 +3,7 @@
  * ========
  * @module
  */
-import Graph from "graphology";
+import Graph from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
@@ -40,14 +40,9 @@ import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
-import TouchCaptor from "./core/captors/touch";
+import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
-
-/**
- * Constants.
- */
-const PIXEL_RATIO = getPixelRatio();
 
 /**
  * Important functions.
@@ -152,9 +147,9 @@ export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents &
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma extends TypedEventEmitter<SigmaEvents> {
+export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEmitter<SigmaEvents> {
   private settings: Settings;
-  private graph: Graph;
+  private graph: GraphType;
   private mouseCaptor: MouseCaptor;
   private touchCaptor: TouchCaptor;
   private container: HTMLElement;
@@ -175,16 +170,17 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   private correctionRatio = 1;
   private customBBox: { x: Extent; y: Extent } | null = null;
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
-    x: [-Infinity, Infinity],
-    y: [-Infinity, Infinity],
+    x: [0, 1],
+    y: [0, 1],
   });
 
   // Cache:
   private cameraSizeRatio = 1;
 
-  // Starting dimensions
+  // Starting dimensions and pixel ratio
   private width = 0;
   private height = 0;
+  private pixelRatio = getPixelRatio();
 
   // State
   private displayedLabels: Set<string> = new Set();
@@ -204,7 +200,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
   private camera: Camera;
 
-  constructor(graph: Graph, container: HTMLElement, settings: Partial<Settings> = {}) {
+  constructor(graph: GraphType, container: HTMLElement, settings: Partial<Settings> = {}) {
     super();
 
     this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
@@ -395,6 +391,62 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   }
 
   /**
+   * Method that checks whether or not a node collides with a given position.
+   */
+  private mouseIsOnNode({ x, y }: Coordinates, { x: nodeX, y: nodeY }: Coordinates, size: number): boolean {
+    return (
+      x > nodeX - size &&
+      x < nodeX + size &&
+      y > nodeY - size &&
+      y < nodeY + size &&
+      Math.sqrt(Math.pow(x - nodeX, 2) + Math.pow(y - nodeY, 2)) < size
+    );
+  }
+
+  /**
+   * Method that returns all nodes in quad at a given position.
+   */
+  private getQuadNodes(position: Coordinates): string[] {
+    const mouseGraphPosition = this.viewportToFramedGraph(position);
+
+    return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
+  }
+
+  /**
+   * Method that returns the closest node to a given position.
+   */
+  private getNodeAtPosition(position: Coordinates): string | null {
+    const { x, y } = position;
+    const quadNodes = this.getQuadNodes(position);
+
+    // We will hover the node whose center is closest to mouse
+    let minDistance = Infinity,
+      nodeAtPosition = null;
+
+    for (let i = 0, l = quadNodes.length; i < l; i++) {
+      const node = quadNodes[i];
+
+      const data = this.nodeDataCache[node];
+
+      const nodePosition = this.framedGraphToViewport(data);
+
+      const size = this.scaleSize(data.size);
+
+      if (!data.hidden && this.mouseIsOnNode(position, nodePosition, size)) {
+        const distance = Math.sqrt(Math.pow(x - nodePosition.x, 2) + Math.pow(y - nodePosition.y, 2));
+
+        // TODO: sort by min size also for cases where center is the same
+        if (distance < minDistance) {
+          minDistance = distance;
+          nodeAtPosition = node;
+        }
+      }
+    }
+
+    return nodeAtPosition;
+  }
+
+  /**
    * Method binding event handlers.
    *
    * @return {Sigma}
@@ -408,62 +460,16 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     window.addEventListener("resize", this.activeListeners.handleResize);
 
-    // Function checking if the mouse is on the given node
-    const mouseIsOnNode = (mouseX: number, mouseY: number, nodeX: number, nodeY: number, size: number): boolean => {
-      return (
-        mouseX > nodeX - size &&
-        mouseX < nodeX + size &&
-        mouseY > nodeY - size &&
-        mouseY < nodeY + size &&
-        Math.sqrt(Math.pow(mouseX - nodeX, 2) + Math.pow(mouseY - nodeY, 2)) < size
-      );
-    };
-
-    // Function returning the nodes in the mouse's quad
-    const getQuadNodes = (mouseX: number, mouseY: number) => {
-      const mouseGraphPosition = this.viewportToFramedGraph({ x: mouseX, y: mouseY });
-
-      // TODO: minus 1? lol
-      return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
-    };
-
     // Handling mouse move
     this.activeListeners.handleMove = (e: MouseCoords): void => {
-      // NOTE: for the canvas renderer, testing the pixel's alpha should
-      // give some boost but this slows things down for WebGL empirically.
-
-      const quadNodes = getQuadNodes(e.x, e.y);
-
       const baseEvent = {
         event: e,
         preventSigmaDefault(): void {
-          this.event.preventSigmaDefault();
+          e.preventSigmaDefault();
         },
       };
 
-      // We will hover the node whose center is closest to mouse
-      let minDistance = Infinity,
-        nodeToHover = null;
-
-      for (let i = 0, l = quadNodes.length; i < l; i++) {
-        const node = quadNodes[i];
-
-        const data = this.nodeDataCache[node];
-
-        const pos = this.framedGraphToViewport(data);
-
-        const size = this.scaleSize(data.size);
-
-        if (!data.hidden && mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
-          const distance = Math.sqrt(Math.pow(e.x - pos.x, 2) + Math.pow(e.y - pos.y, 2));
-
-          // TODO: sort by min size also for cases where center is the same
-          if (distance < minDistance) {
-            minDistance = distance;
-            nodeToHover = node;
-          }
-        }
-      }
+      const nodeToHover = this.getNodeAtPosition(e);
 
       if (nodeToHover && this.hoveredNode !== nodeToHover && !this.nodeDataCache[nodeToHover].hidden) {
         // Handling passing from one node to the other directly
@@ -483,12 +489,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
         const size = this.scaleSize(data.size);
 
-        if (!mouseIsOnNode(e.x, e.y, pos.x, pos.y, size)) {
+        if (!this.mouseIsOnNode(e, pos, size)) {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
           this.emit("leaveNode", { ...baseEvent, node });
-          return this.scheduleHighlightedNodesRender();
+          this.scheduleHighlightedNodesRender();
+          return;
         }
       }
 
@@ -509,14 +516,17 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         const baseEvent = {
           event: e,
           preventSigmaDefault(): void {
-            this.event.preventSigmaDefault();
+            e.preventSigmaDefault();
           },
         };
 
-        if (this.hoveredNode)
+        const isFakeSigmaMouseEvent = (e.original as FakeSigmaMouseEvent).isFakeSigmaMouseEvent;
+        const nodeAtPosition = isFakeSigmaMouseEvent ? this.getNodeAtPosition(e) : this.hoveredNode;
+
+        if (nodeAtPosition)
           return this.emit(`${eventType}Node`, {
             ...baseEvent,
-            node: this.hoveredNode,
+            node: nodeAtPosition,
           });
 
         if (eventType === "wheel" ? this.settings.enableEdgeWheelEvents : this.settings.enableEdgeClickEvents) {
@@ -636,7 +646,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     // Check first that pixel is colored:
     // Note that mouse positions must be corrected by pixel ratio to correctly
     // index the drawing buffer.
-    if (!isPixelColored(this.webGLContexts.edges, x * PIXEL_RATIO, y * PIXEL_RATIO)) return null;
+    if (!isPixelColored(this.webGLContexts.edges, x * this.pixelRatio, y * this.pixelRatio)) return null;
 
     // Check for each edge if it collides with the point:
     const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
@@ -800,7 +810,9 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       if (typeof data.label === "string" && !data.hidden)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
 
-      this.nodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
+      const nodeProgram = this.nodePrograms[data.type];
+      if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
+      nodeProgram.process(data, data.hidden, nodesPerPrograms[data.type]++);
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
@@ -1145,7 +1157,9 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       const data = this.nodeDataCache[node];
       this.hoverNodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
     });
-    // 4. Render:
+    // 4. Clear hovered nodes layer:
+    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
+    // 5. Render:
     for (const type in this.hoverNodePrograms) {
       const program = this.hoverNodePrograms[type];
 
@@ -1157,7 +1171,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         height: this.height,
         ratio: this.camera.ratio,
         correctionRatio: this.correctionRatio / this.camera.ratio,
-        scalingRatio: PIXEL_RATIO,
+        scalingRatio: this.pixelRatio,
       });
     }
   }
@@ -1242,7 +1256,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         height: this.height,
         ratio: cameraState.ratio,
         correctionRatio: this.correctionRatio / cameraState.ratio,
-        scalingRatio: PIXEL_RATIO,
+        scalingRatio: this.pixelRatio,
       });
     }
 
@@ -1259,7 +1273,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
           height: this.height,
           ratio: cameraState.ratio,
           correctionRatio: this.correctionRatio / cameraState.ratio,
-          scalingRatio: PIXEL_RATIO,
+          scalingRatio: this.pixelRatio,
         });
       }
     }
@@ -1298,11 +1312,20 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
   }
 
   /**
+   * Method returning the container DOM element.
+   *
+   * @return {HTMLElement}
+   */
+  getContainer(): HTMLElement {
+    return this.container;
+  }
+
+  /**
    * Method returning the renderer's graph.
    *
    * @return {Graph}
    */
-  getGraph(): Graph {
+  getGraph(): GraphType {
     return this.graph;
   }
 
@@ -1436,12 +1459,13 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
+    this.pixelRatio = getPixelRatio();
 
     if (this.width === 0) {
       if (this.settings.allowInvalidContainer) this.width = 1;
       else
         throw new Error(
-          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seing this error.",
+          "Sigma: Container has no width. You can set the allowInvalidContainer setting to true to stop seeing this error.",
         );
     }
 
@@ -1449,7 +1473,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       if (this.settings.allowInvalidContainer) this.height = 1;
       else
         throw new Error(
-          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seing this error.",
+          "Sigma: Container has no height. You can set the allowInvalidContainer setting to true to stop seeing this error.",
         );
     }
 
@@ -1468,18 +1492,18 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     // Sizing canvas contexts
     for (const id in this.canvasContexts) {
-      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("width", this.width * this.pixelRatio + "px");
+      this.elements[id].setAttribute("height", this.height * this.pixelRatio + "px");
 
-      if (PIXEL_RATIO !== 1) this.canvasContexts[id].scale(PIXEL_RATIO, PIXEL_RATIO);
+      if (this.pixelRatio !== 1) this.canvasContexts[id].scale(this.pixelRatio, this.pixelRatio);
     }
 
     // Sizing WebGL contexts
     for (const id in this.webGLContexts) {
-      this.elements[id].setAttribute("width", this.width * PIXEL_RATIO + "px");
-      this.elements[id].setAttribute("height", this.height * PIXEL_RATIO + "px");
+      this.elements[id].setAttribute("width", this.width * this.pixelRatio + "px");
+      this.elements[id].setAttribute("height", this.height * this.pixelRatio + "px");
 
-      this.webGLContexts[id].viewport(0, 0, this.width * PIXEL_RATIO, this.height * PIXEL_RATIO);
+      this.webGLContexts[id].viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
     }
 
     return this;
@@ -1496,8 +1520,7 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
 
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
     this.webGLContexts.edgesForeground.clear(this.webGLContexts.edgesForeground.COLOR_BUFFER_BIT);
-
-    this.webGLContexts.hoverNodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
@@ -1639,10 +1662,15 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
         )
       : this.invMatrix;
 
-    return multiplyVec2(invMatrix, {
+    const res = multiplyVec2(invMatrix, {
       x: (coordinates.x / this.width) * 2 - 1,
       y: 1 - (coordinates.y / this.height) * 2,
     });
+
+    if (isNaN(res.x)) res.x = 0;
+    if (isNaN(res.y)) res.y = 0;
+
+    return res;
   }
 
   /**

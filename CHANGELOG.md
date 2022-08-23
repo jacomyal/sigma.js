@@ -1,5 +1,20 @@
 # sigma.js - changelog:
 
+## 2.3.1
+
+### Bug fixes
+
+- [#1230](https://github.com/jacomyal/sigma.js/pull/1230) - Updates broken link to graphology in README.md (thanks to @alexduhem)
+- [#1236](https://github.com/jacomyal/sigma.js/issues/1236) - Fixes `#preventSigmaDefault` scoping
+- [#1237](https://github.com/jacomyal/sigma.js/issues/1237) - Updates `pixelRatio` on resize
+- [#1240](https://github.com/jacomyal/sigma.js/issues/1240) - Fixes click events for touch devices
+- [#1244](https://github.com/jacomyal/sigma.js/issues/1244) - Stops relying on graphology for types (issue only partially fixed yet)
+- [#1249](https://github.com/jacomyal/sigma.js/issues/1249) - Fixes hovered nodes layer not being cleared
+
+### Feature
+
+- [#1239](https://github.com/jacomyal/sigma.js/pull/1239) - Adds `getContainer` method to public API (thanks to @stefanprobst)
+
 ## 2.3.0
 
 ### Features

@@ -130,6 +130,8 @@ export function getPixelRatio(): number {
  * @return {object}
  */
 export function graphExtent(graph: Graph): { x: Extent; y: Extent } {
+  if (!graph.order) return { x: [0, 1], y: [0, 1] };
+
   let xMin = Infinity;
   let xMax = -Infinity;
   let yMin = Infinity;
@@ -166,12 +168,13 @@ export function createNormalizationFunction(extent: { x: Extent; y: Extent }): N
     y: [minY, maxY],
   } = extent;
 
-  let ratio = Math.max(maxX - minX, maxY - minY);
-
-  if (ratio === 0) ratio = 1;
-
-  const dX = (maxX + minX) / 2,
+  let ratio = Math.max(maxX - minX, maxY - minY),
+    dX = (maxX + minX) / 2,
     dY = (maxY + minY) / 2;
+
+  if (ratio === 0 || Math.abs(ratio) === Infinity || isNaN(ratio)) ratio = 1;
+  if (isNaN(dX)) dX = 0;
+  if (isNaN(dY)) dY = 0;
 
   const fn = (data: Coordinates): Coordinates => {
     return {
@@ -257,8 +260,9 @@ export function parseColor(val: string): RGBAColor {
       g = parseInt(val.charAt(3) + val.charAt(4), 16);
       b = parseInt(val.charAt(5) + val.charAt(6), 16);
     }
-
-    // TODO: parse hex with alpha?
+    if (val.length === 9) {
+      a = parseInt(val.charAt(7) + val.charAt(8), 16) / 255;
+    }
   }
 
   // Handling rgb notation

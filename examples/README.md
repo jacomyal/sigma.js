@@ -18,8 +18,9 @@ Since each example declares `"sigma": "latest"` in its dependencies, if you want
 Our solution to this problem is that you can run an example from this directory:
 
 1. Open a terminal in this examples listing directory: `cd path/to/sigma/examples`
-2. Run `npm start --example=my-example`, with `my-example` being the name of an example subdirectory
-3. Open [localhost:3000](http://localhost:3000/) in your browser
+2. Run `npm install` to install examples dependencies
+3. Run `npm start --example=my-example`, with `my-example` being the name of an example subdirectory
+4. Open [localhost:3000](http://localhost:3000/) in your browser
 
 You should see the example live, using local sigma sources.
 

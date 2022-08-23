@@ -5,7 +5,7 @@
  * Handy helper functions dealing with nodes & edges attributes animation.
  * @module
  */
-import Graph from "graphology";
+import Graph from "graphology-types";
 import { PlainObject } from "../types";
 import { cancelFrame, requestFrame } from "./index";
 import easings from "./easings";
