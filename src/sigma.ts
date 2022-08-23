@@ -222,6 +222,10 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
     this.createWebGLContext("edges", { preserveDrawingBuffer: true });
     this.createCanvasContext("edgeLabels");
     this.createWebGLContext("nodes");
+
+    this.createWebGLContext("edgesForeground", { preserveDrawingBuffer: true });
+    this.createWebGLContext("nodesForeground");
+
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
     this.createWebGLContext("hoverNodes");
@@ -235,15 +239,37 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
       gl.enable(gl.BLEND);
     }
 
+    for (const [key, value] of Object.entries({ ...this.settings.nodeProgramClasses })) {
+      this.settings.nodeProgramClasses[`${key}Foreground`] = value;
+    }
+
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
-      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this);
+      let context;
+      if (type.includes("Foreground")) {
+        context = this.webGLContexts.nodesForeground;
+      } else {
+        context = this.webGLContexts.nodes;
+      }
+      this.nodePrograms[type] = new NodeProgramClass(context, this);
       this.hoverNodePrograms[type] = new NodeProgramClass(this.webGLContexts.hoverNodes, this);
     }
+
+    for (const [key, value] of Object.entries({ ...this.settings.edgeProgramClasses })) {
+      this.settings.edgeProgramClasses[`${key}Foreground`] = value;
+    }
+
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
-      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this);
+      let context;
+      if (type.includes("Foreground")) {
+        context = this.webGLContexts.edgesForeground;
+      } else {
+        context = this.webGLContexts.edges;
+      }
+
+      this.edgePrograms[type] = new EdgeProgramClass(context, this);
     }
 
     // Initial resize
@@ -1466,7 +1492,11 @@ export default class Sigma extends TypedEventEmitter<SigmaEvents> {
    */
   clear(): this {
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.nodesForeground.clear(this.webGLContexts.nodesForeground.COLOR_BUFFER_BIT);
+
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
+    this.webGLContexts.edgesForeground.clear(this.webGLContexts.edgesForeground.COLOR_BUFFER_BIT);
+
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
