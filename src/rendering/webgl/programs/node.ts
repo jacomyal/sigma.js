@@ -30,7 +30,7 @@ export default class NodeProgram extends AbstractProgram {
   angleLocation: GLint;
 
   matrixLocation: WebGLUniformLocation;
-  sqrtZoomRatioLocation: WebGLUniformLocation;
+  adjustedZoomRatioLocation: WebGLUniformLocation;
   correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
@@ -47,9 +47,9 @@ export default class NodeProgram extends AbstractProgram {
     if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
-    if (sqrtZoomRatioLocation === null) throw new Error("NodeProgram: error while getting sqrtZoomRatioLocation");
-    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
+    const adjustedZoomRatioLocation = gl.getUniformLocation(this.program, "u_adjustedZoomRatio");
+    if (adjustedZoomRatioLocation === null) throw new Error("NodeProgram: error while getting adjustedZoomRatioLocation");
+    this.adjustedZoomRatioLocation = adjustedZoomRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
     if (correctionRatioLocation === null) throw new Error("NodeProgram: error while getting correctionRatioLocation");
@@ -132,7 +132,7 @@ export default class NodeProgram extends AbstractProgram {
     gl.useProgram(program);
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.adjustedZoomRatioLocation, params.nodesSizeZoomAdjuster(params.ratio));
     gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);

@@ -1172,6 +1172,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         ratio: this.camera.ratio,
         correctionRatio: this.correctionRatio / this.camera.ratio,
         scalingRatio: this.pixelRatio,
+        nodesSizeZoomAdjuster: this.settings.nodesSizeZoomAdjuster,
       });
     }
   }
@@ -1240,6 +1241,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const viewportDimensions = this.getDimensions();
     const graphDimensions = this.getGraphDimensions();
     const padding = this.getSetting("stagePadding") || 0;
+    const nodesSizeZoomAdjuster = this.getSetting("nodesSizeZoomAdjuster") || Math.sqrt;
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
     this.correctionRatio = getMatrixImpact(this.matrix, cameraState, viewportDimensions);
@@ -1257,6 +1259,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         ratio: cameraState.ratio,
         correctionRatio: this.correctionRatio / cameraState.ratio,
         scalingRatio: this.pixelRatio,
+        nodesSizeZoomAdjuster: nodesSizeZoomAdjuster,
       });
     }
 
@@ -1274,6 +1277,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
           ratio: cameraState.ratio,
           correctionRatio: this.correctionRatio / cameraState.ratio,
           scalingRatio: this.pixelRatio,
+          nodesSizeZoomAdjuster: nodesSizeZoomAdjuster,
         });
       }
     }
@@ -1294,7 +1298,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private updateCachedValues(): void {
     const { ratio } = this.camera.getState();
-    this.cameraSizeRatio = Math.sqrt(ratio);
+    const nodesSizeZoomAdjuster = this.getSetting("nodesSizeZoomAdjuster") || Math.sqrt;
+    this.cameraSizeRatio = nodesSizeZoomAdjuster(ratio);
   }
 
   /**---------------------------------------------------------------------------

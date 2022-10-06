@@ -14,6 +14,7 @@ export interface RenderParams {
   matrix: Float32Array;
   scalingRatio: number;
   correctionRatio: number;
+  nodesSizeZoomAdjuster: (ratio: number) => number;
 }
 
 export interface IProgram {
