@@ -51,7 +51,7 @@ export default class NodeFastProgram extends AbstractNodeProgram {
     const program = this.program;
     gl.useProgram(program);
 
-    gl.uniform1f(this.ratioLocation, 1 / Math.sqrt(params.ratio));
+    gl.uniform1f(this.ratioLocation, 1 / params.nodesSizeZoomAdjuster(params.ratio));
     gl.uniform1f(this.scaleLocation, params.scalingRatio);
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
 
