@@ -13,18 +13,22 @@ const logsDOM = document.getElementById("sigma-logs") as HTMLElement;
 const graph = new Graph();
 graph.import(data);
 
-function logEvent(event: string, itemType?: "node" | "edge", item?: string): void {
+function logEvent(event: string, itemType?: "node" | "edge" | "positions", item?: string | MouseEvent): void {
   const div = document.createElement("div");
   let message = `Event "${event}"`;
   if (item && itemType) {
-    const label = itemType === "node" ? graph.getNodeAttribute(item, "label") : graph.getEdgeAttribute(item, "label");
-    message += `, ${itemType} ${label || "with no label"} (id "${item}")`;
+    if (itemType === "positions") {
+      message += `, x ${item.x}, y ${item.y}`;
+    } else {
+      const label = itemType === "node" ? graph.getNodeAttribute(item, "label") : graph.getEdgeAttribute(item, "label");
+      message += `, ${itemType} ${label || "with no label"} (id "${item}")`;
 
-    if (itemType === "edge") {
-      message += `, source ${graph.getSourceAttribute(item, "label")}, target: ${graph.getTargetAttribute(
-        item,
-        "label",
-      )}`;
+      if (itemType === "edge") {
+        message += `, source ${graph.getSourceAttribute(item, "label")}, target: ${graph.getTargetAttribute(
+          item,
+          "label",
+        )}`;
+      }
     }
   }
   div.innerHTML = `<span>${message}</span>`;
@@ -60,4 +64,25 @@ renderer.on("leaveEdge", ({ edge }) => {
   logEvent("leaveEdge", "edge", edge);
   hoveredEdge = null;
   renderer.refresh();
+});
+
+
+renderer.on("downStage", ({ event }) => {
+  logEvent("downStage", "positions", event);
+});
+
+renderer.on("clickStage", ({ event }) => {
+  logEvent("clickStage", "positions", event);
+});
+
+renderer.on("doubleClickStage", ({ event }) => {
+  logEvent("doubleClickStage", "positions", event);
+});
+
+renderer.on("rightClickStage", ({ event }) => {
+  logEvent("rightClickStage", "positions", event);
+});
+
+renderer.on("wheelStage", ({ event }) => {
+  logEvent("wheelStage", "positions", event);
 });
