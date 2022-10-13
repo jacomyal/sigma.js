@@ -13,7 +13,7 @@ const logsDOM = document.getElementById("sigma-logs") as HTMLElement;
 const graph = new Graph();
 graph.import(data);
 
-function logEvent(event: string, itemType?: "node" | "edge" | "positions", item?: string): void {
+function logEvent(event: string, itemType?: "node" | "edge" | "positions", item?: string | MouseEvent): void {
   const div = document.createElement("div");
   let message = `Event "${event}"`;
   if (item && itemType) {
@@ -69,25 +69,20 @@ renderer.on("leaveEdge", ({ edge }) => {
 
 renderer.on("downStage", ({ event }) => {
   logEvent("downStage", "positions", event);
-  renderer.refresh();
 });
 
 renderer.on("clickStage", ({ event }) => {
   logEvent("clickStage", "positions", event);
-  renderer.refresh();
 });
 
 renderer.on("doubleClickStage", ({ event }) => {
   logEvent("doubleClickStage", "positions", event);
-  renderer.refresh();
 });
 
 renderer.on("rightClickStage", ({ event }) => {
   logEvent("rightClickStage", "positions", event);
-  renderer.refresh();
 });
 
 renderer.on("wheelStage", ({ event }) => {
   logEvent("wheelStage", "positions", event);
-  renderer.refresh();
 });
