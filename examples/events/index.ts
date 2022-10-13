@@ -4,6 +4,7 @@
 
 import Graph from "graphology";
 import Sigma from "sigma";
+import { MouseCoords } from "sigma/types";
 
 import data from "./data.json";
 
@@ -13,11 +14,12 @@ const logsDOM = document.getElementById("sigma-logs") as HTMLElement;
 const graph = new Graph();
 graph.import(data);
 
-function logEvent(event: string, itemType?: "node" | "edge" | "positions", item?: string | MouseEvent): void {
+function logEvent(event: string, itemType: "node" | "edge" | "positions", item: string | MouseCoords): void {
   const div = document.createElement("div");
   let message = `Event "${event}"`;
   if (item && itemType) {
     if (itemType === "positions") {
+      item = item as MouseCoords;
       message += `, x ${item.x}, y ${item.y}`;
     } else {
       const label = itemType === "node" ? graph.getNodeAttribute(item, "label") : graph.getEdgeAttribute(item, "label");
@@ -52,9 +54,11 @@ const renderer = new Sigma(graph, container, {
 
 const nodeEvents = ["enterNode", "leaveNode", "clickNode", "rightClickNode", "doubleClickNode", "wheelNode"] as const;
 const edgeEvents = ["clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const;
+const stageEvents = ["downStage", "clickStage", "doubleClickStage", "wheelStage"] as const;
 
 nodeEvents.forEach((eventType) => renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)));
 edgeEvents.forEach((eventType) => renderer.on(eventType, ({ edge }) => logEvent(eventType, "edge", edge)));
+
 renderer.on("enterEdge", ({ edge }) => {
   logEvent("enterEdge", "edge", edge);
   hoveredEdge = edge;
@@ -66,23 +70,8 @@ renderer.on("leaveEdge", ({ edge }) => {
   renderer.refresh();
 });
 
-
-renderer.on("downStage", ({ event }) => {
-  logEvent("downStage", "positions", event);
-});
-
-renderer.on("clickStage", ({ event }) => {
-  logEvent("clickStage", "positions", event);
-});
-
-renderer.on("doubleClickStage", ({ event }) => {
-  logEvent("doubleClickStage", "positions", event);
-});
-
-renderer.on("rightClickStage", ({ event }) => {
-  logEvent("rightClickStage", "positions", event);
-});
-
-renderer.on("wheelStage", ({ event }) => {
-  logEvent("wheelStage", "positions", event);
+stageEvents.forEach((eventType) => {
+  renderer.on(eventType, ({ event }) => {
+    logEvent(eventType, "positions", event);
+  });
 });
