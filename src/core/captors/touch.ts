@@ -120,7 +120,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     // Prevent default to avoid default browser behaviors...
     e.preventDefault();
     // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
-    if (e.touches.length === 0 && this.lastTouches && this.lastTouches.length) {
+    if (e.touches.length === 0 && this.lastTouches && this.lastTouches.length && !this.hasMoved) {
       this.dispatchRelatedMouseEvent("mouseup", e, this.lastTouches[0], document);
       this.dispatchRelatedMouseEvent("click", e, this.lastTouches[0]);
     }
