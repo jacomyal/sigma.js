@@ -11,7 +11,7 @@
     "babel-loader": "8.2.3",
     "graphology": "^0.23.2",
     "graphology-layout-forceatlas2": "^0.8.1",
-    "graphology-types": "^0.23.0",
+    "graphology-types": "^0.24.5",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-animate-height": "^2.0.23",

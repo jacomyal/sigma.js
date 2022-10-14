@@ -25,6 +25,7 @@
     "graphology-layout": "^0.5.0",
     "graphology-layout-force": "^0.2.3",
     "graphology-layout-forceatlas2": "^0.8.1",
+    "graphology-types": "^0.24.5",
     "iwanthue": "^1.5.1",
     "papaparse": "^5.3.1",
     "seedrandom": "^3.0.5",
