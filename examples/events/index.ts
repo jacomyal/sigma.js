@@ -52,8 +52,16 @@ const renderer = new Sigma(graph, container, {
   },
 });
 
-const nodeEvents = ["enterNode", "leaveNode", "clickNode", "rightClickNode", "doubleClickNode", "wheelNode"] as const;
-const edgeEvents = ["clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const;
+const nodeEvents = [
+  "enterNode",
+  "leaveNode",
+  "downNode",
+  "clickNode",
+  "rightClickNode",
+  "doubleClickNode",
+  "wheelNode",
+] as const;
+const edgeEvents = ["downEdge", "clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const;
 const stageEvents = ["downStage", "clickStage", "doubleClickStage", "wheelStage"] as const;
 
 nodeEvents.forEach((eventType) => renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)));

@@ -32,6 +32,7 @@ export type TouchCaptorEvents = {
 export default class TouchCaptor extends Captor<TouchCaptorEvents> {
   enabled = true;
   isMoving = false;
+  hasMoved = false;
   startCameraState?: CameraState;
   touchMode = 0; // number of touches down
   movingTimeout?: number;
@@ -96,7 +97,6 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     if (e.touches.length === 1) this.dispatchRelatedMouseEvent("mousedown", e);
 
     const touches = getTouchesArray(e.touches);
-    this.isMoving = true;
     this.touchMode = touches.length;
 
     this.startCameraState = this.renderer.getCamera().getState();
@@ -120,7 +120,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     // Prevent default to avoid default browser behaviors...
     e.preventDefault();
     // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
-    if (e.touches.length === 0 && this.lastTouches && this.lastTouches.length) {
+    if (e.touches.length === 0 && this.lastTouches && this.lastTouches.length && !this.hasMoved) {
       this.dispatchRelatedMouseEvent("mouseup", e, this.lastTouches[0], document);
       this.dispatchRelatedMouseEvent("click", e, this.lastTouches[0]);
     }
@@ -165,6 +165,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
         break;
     }
 
+    this.hasMoved = false;
     this.emit("touchup", getTouchCoords(e, this.container));
   }
 
@@ -183,6 +184,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     this.lastTouches = touches;
     this.lastTouchesPositions = touchesPositions;
     this.isMoving = true;
+    this.hasMoved = true;
 
     if (this.movingTimeout) clearTimeout(this.movingTimeout);
 
