@@ -6,14 +6,12 @@
  * @module
  */
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
-import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
+import Captor, { getPosition, getTouchCoords, getTouchesArray, FakeSigmaMouseEvent } from "./captor";
 import Sigma from "../../sigma";
 
 const DRAG_TIMEOUT = 200;
 const TOUCH_INERTIA_RATIO = 3;
 const TOUCH_INERTIA_DURATION = 200;
-
-export type FakeSigmaMouseEvent = MouseEvent & { isFakeSigmaMouseEvent?: true };
 
 /**
  * Event types.

@@ -6,6 +6,8 @@
 import { Coordinates, MouseCoords, TouchCoords, WheelCoords, TypedEventEmitter, EventsMapping } from "../../types";
 import Sigma from "../../sigma";
 
+export type FakeSigmaMouseEvent = MouseEvent & { isFakeSigmaMouseEvent?: true };
+
 /**
  * Captor utils functions
  * ======================
@@ -24,10 +26,15 @@ import Sigma from "../../sigma";
 export function getPosition(e: MouseEvent | Touch, dom: HTMLElement): Coordinates {
   const bbox = dom.getBoundingClientRect();
 
-  return {
-    x: e.clientX - bbox.left,
-    y: e.clientY - bbox.top,
-  };
+  return (e as FakeSigmaMouseEvent).isFakeSigmaMouseEvent ?
+    {
+      x: e.clientX,
+      y: e.clientY
+    } :
+    {
+      x: e.clientX - bbox.left,
+      y: e.clientY - bbox.top,
+    };
 }
 
 /**

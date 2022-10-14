@@ -40,7 +40,8 @@ import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
-import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
+import TouchCaptor from "./core/captors/touch";
+import { FakeSigmaMouseEvent } from "./core/captors/captor";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
 
