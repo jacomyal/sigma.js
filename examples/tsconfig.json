@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "strict": false,
+    "paths": {
+      "sigma": ["../src/"],
+      "sigma/types": ["../src/types"],
+      "sigma/utils": ["../src/utils"],
+      "sigma/utils/animate": ["../src/utils/animate"],
+      "sigma/rendering/webgl/programs/edge": ["../src/rendering/webgl/programs/edge.ts"],
+      "sigma/rendering/webgl/programs/edge.fast": ["../src/rendering/webgl/programs/edge.fast.ts"],
+      "sigma/rendering/webgl/programs/node.image": ["../src/rendering/webgl/programs/node.image.ts"],
+      "sigma/rendering/webgl/programs/common/node": ["../src/rendering/webgl/programs/common/node.ts"],
+      "sigma/rendering/webgl/programs/common/program": ["../src/rendering/webgl/programs/common/program.ts"]
+    }
+  },
+  "include": ["../external-types/**/*", "../examples/**/*", "../src/**/*"],
+  "exclude": []
+}

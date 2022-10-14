@@ -77,6 +77,7 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
     let i = 0;
     if (hidden) {
       for (let l = i + POINTS * ATTRIBUTES; i < l; i++) array[i] = 0;
+      return;
     }
 
     const x1 = sourceData.x,

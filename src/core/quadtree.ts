@@ -549,7 +549,7 @@ export default class QuadTree {
     );
 
     // Add all the nodes in the outside block, since they might be relevant, and since they should be very few:
-    this.cache.push(...this.containers[OUTSIDE_BLOCK]);
+    extend(this.cache, this.containers[OUTSIDE_BLOCK]);
 
     return this.cache;
   }

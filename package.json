@@ -76,7 +76,7 @@
     "graphology": "^0.23.2",
     "graphology-generators": "^0.11.2",
     "graphology-layout": "^0.5.0",
-    "graphology-types": "^0.23.0",
+    "graphology-types": "^0.24.5",
     "html-webpack-plugin": "^5.5.0",
     "mocha": "^9.1.3",
     "pandemonium": "^2.3.0",

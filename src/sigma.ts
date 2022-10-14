@@ -594,6 +594,26 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
+   * Method used to unbind handlers from the graph.
+   *
+   * @return {undefined}
+   */
+  private unbindGraphHandlers() {
+    const graph = this.graph;
+
+    graph.removeListener("nodeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
+    graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
+    graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+    graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
+    graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
+  }
+
+  /**
    * Method dealing with "leaveEdge" and "enterEdge" events.
    *
    * @return {Sigma}
@@ -1304,6 +1324,45 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
+   * Method used to set the renderer's graph.
+   *
+   * @return {Graph}
+   */
+  setGraph(graph: GraphType): void {
+    if (graph === this.graph) return;
+
+    // Unbinding handlers on the current graph
+    this.unbindGraphHandlers();
+
+    // Clearing the graph data caches
+    this.nodeDataCache = {};
+    this.edgeDataCache = {};
+
+    // Cleaning renderer state tied to the current graph
+    this.displayedLabels.clear();
+    this.highlightedNodes.clear();
+    this.hoveredNode = null;
+    this.hoveredEdge = null;
+    this.nodesWithForcedLabels.length = 0;
+    this.edgesWithForcedLabels.length = 0;
+
+    if (this.checkEdgesEventsFrame !== null) {
+      cancelFrame(this.checkEdgesEventsFrame);
+      this.checkEdgesEventsFrame = null;
+    }
+
+    // Installing new graph
+    this.graph = graph;
+
+    // Binding new handlers
+    this.bindGraphHandlers();
+
+    // Re-rendering now to avoid discrepancies from now to next frame
+    this.process();
+    this.render();
+  }
+
+  /**
    * Method returning the mouse captor.
    *
    * @return {MouseCaptor}
@@ -1707,8 +1766,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @return {undefined}
    */
   kill(): void {
-    const graph = this.graph;
-
     // Emitting "kill" events so that plugins and such can cleanup
     this.emit("kill");
 
@@ -1724,16 +1781,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.touchCaptor.kill();
 
     // Releasing graph handlers
-    graph.removeListener("nodeAdded", this.activeListeners.dropNodeGraphUpdate);
-    graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
-    graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
-    graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
-    graph.removeListener("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
-    graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
-    graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
-    graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
+    this.unbindGraphHandlers();
 
     // Releasing cache & state
     this.quadtree = new QuadTree();
