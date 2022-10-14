@@ -601,8 +601,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private unbindGraphHandlers() {
     const graph = this.graph;
 
-    graph.removeListener("nodeAdded", this.activeListeners.dropNodeGraphUpdate);
-    graph.removeListener("nodeDropped", this.activeListeners.graphUpdate);
+    graph.removeListener("nodeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
     graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
     graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
