@@ -37,7 +37,7 @@ void main() {
 
   // For the fragment shader though, we need a thickness that takes the "magic"
   // correction ratio into account (as in webGLThickness), but so that the
-  // antialiasint effect does not depend on the zoom level. So here's yet
+  // antialiasing effect does not depend on the zoom level. So here's yet
   // another thickness version:
   v_thickness = webGLThickness / u_sqrtZoomRatio;
 
