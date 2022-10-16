@@ -77,8 +77,9 @@ export interface Settings {
   allowInvalidContainer: boolean;
 
   // Program classes
-  nodeProgramClasses: { [key: string]: NodeProgramConstructor };
-  edgeProgramClasses: { [key: string]: EdgeProgramConstructor };
+  nodeProgramClasses: { [type: string]: NodeProgramConstructor };
+  hoverNodeProgramClasses: { [type: string]: NodeProgramConstructor };
+  edgeProgramClasses: { [type: string]: EdgeProgramConstructor };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -132,6 +133,7 @@ export const DEFAULT_SETTINGS: Settings = {
   nodeProgramClasses: {
     circle: CircleNodeProgram,
   },
+  hoverNodeProgramClasses: {},
   edgeProgramClasses: {
     arrow: ArrowEdgeProgram,
     line: LineEdgeProgram,
