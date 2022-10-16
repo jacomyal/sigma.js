@@ -5,6 +5,8 @@ uniform mat3 u_matrix;
 
 varying vec4 v_color;
 
+const float bias = 255.0 / 254.0;
+
 void main() {
   // Scale from [[-1 1] [-1 1]] to the container:
   gl_Position = vec4(
@@ -15,4 +17,5 @@ void main() {
 
   // Extract the color:
   v_color = a_color;
+  v_color.a *= bias;
 }
