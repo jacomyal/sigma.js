@@ -235,7 +235,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
       this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this);
-      this.hoverNodePrograms[type] = new NodeProgramClass(this.webGLContexts.hoverNodes, this);
+
+      let HoverNodeProgramClass = NodeProgramClass;
+      if (type in this.settings.hoverNodeProgramClasses) {
+        HoverNodeProgramClass = this.settings.hoverNodeProgramClasses[type];
+      }
+
+      this.hoverNodePrograms[type] = new HoverNodeProgramClass(this.webGLContexts.hoverNodes, this);
     }
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
