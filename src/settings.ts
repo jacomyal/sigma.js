@@ -5,9 +5,9 @@
  * The list of settings and some handy functions.
  * @module
  */
-
 import { Attributes } from "graphology-types";
 
+import { assign } from "./utils";
 import drawLabel from "./rendering/canvas/label";
 import drawHover from "./rendering/canvas/hover";
 import drawEdgeLabel from "./rendering/canvas/edge-label";
@@ -17,19 +17,6 @@ import LineEdgeProgram from "./rendering/webgl/programs/edge";
 import ArrowEdgeProgram from "./rendering/webgl/programs/edge.arrow";
 import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
 import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
-
-export function validateSettings(settings: Settings): void {
-  if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
-    throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
-  }
-
-  const { minCameraRatio, maxCameraRatio } = settings;
-  if (typeof minCameraRatio === "number" && typeof maxCameraRatio === "number" && maxCameraRatio < minCameraRatio) {
-    throw new Error(
-      "Settings: invalid camera ratio boundaries. Expecting `maxCameraRatio` to be greater than `minCameraRatio`.",
-    );
-  }
-}
 
 /**
  * Sigma.js settings
@@ -130,12 +117,38 @@ export const DEFAULT_SETTINGS: Settings = {
   allowInvalidContainer: false,
 
   // Program classes
-  nodeProgramClasses: {
-    circle: CircleNodeProgram,
-  },
+  nodeProgramClasses: {},
   nodeHoverProgramClasses: {},
-  edgeProgramClasses: {
-    arrow: ArrowEdgeProgram,
-    line: LineEdgeProgram,
-  },
+  edgeProgramClasses: {},
 };
+
+export const DEFAULT_NODE_PROGRAM_CLASSES = {
+  circle: CircleNodeProgram,
+};
+
+export const DEFAULT_EDGE_PROGRAM_CLASSES = {
+  arrow: ArrowEdgeProgram,
+  line: LineEdgeProgram,
+};
+
+export function validateSettings(settings: Settings): void {
+  if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
+    throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
+  }
+
+  const { minCameraRatio, maxCameraRatio } = settings;
+  if (typeof minCameraRatio === "number" && typeof maxCameraRatio === "number" && maxCameraRatio < minCameraRatio) {
+    throw new Error(
+      "Settings: invalid camera ratio boundaries. Expecting `maxCameraRatio` to be greater than `minCameraRatio`.",
+    );
+  }
+}
+
+export function resolveSettings(settings: Partial<Settings>): Settings {
+  const resolvedSettings = assign({}, DEFAULT_SETTINGS, settings);
+
+  resolvedSettings.nodeProgramClasses = assign({}, DEFAULT_NODE_PROGRAM_CLASSES, resolvedSettings.nodeProgramClasses);
+  resolvedSettings.edgeProgramClasses = assign({}, DEFAULT_EDGE_PROGRAM_CLASSES, resolvedSettings.edgeProgramClasses);
+
+  return resolvedSettings;
+}

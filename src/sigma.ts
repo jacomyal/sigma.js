@@ -27,7 +27,6 @@ import {
   getPixelRatio,
   createNormalizationFunction,
   NormalizationFunction,
-  assign,
   cancelFrame,
   matrixFromCamera,
   requestFrame,
@@ -37,7 +36,7 @@ import {
   graphExtent,
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
-import { Settings, DEFAULT_SETTINGS, validateSettings } from "./settings";
+import { Settings, validateSettings, resolveSettings } from "./settings";
 import { INodeProgram } from "./rendering/webgl/programs/common/node";
 import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
@@ -203,7 +202,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   constructor(graph: GraphType, container: HTMLElement, settings: Partial<Settings> = {}) {
     super();
 
-    this.settings = assign<Settings>({}, DEFAULT_SETTINGS, settings);
+    // Resolving settings
+    this.settings = resolveSettings(settings);
 
     // Validating
     validateSettings(this.settings);
