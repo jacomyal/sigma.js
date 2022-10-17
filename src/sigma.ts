@@ -195,7 +195,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
   // Programs
   private nodePrograms: { [key: string]: INodeProgram } = {};
-  private hoverNodePrograms: { [key: string]: INodeProgram } = {};
+  private nodeHoverPrograms: { [key: string]: INodeProgram } = {};
   private edgePrograms: { [key: string]: IEdgeProgram } = {};
 
   private camera: Camera;
@@ -236,12 +236,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
       this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this);
 
-      let HoverNodeProgramClass = NodeProgramClass;
-      if (type in this.settings.hoverNodeProgramClasses) {
-        HoverNodeProgramClass = this.settings.hoverNodeProgramClasses[type];
+      let NodeHoverProgram = NodeProgramClass;
+      if (type in this.settings.nodeHoverProgramClasses) {
+        NodeHoverProgram = this.settings.nodeHoverProgramClasses[type];
       }
 
-      this.hoverNodePrograms[type] = new HoverNodeProgramClass(this.webGLContexts.hoverNodes, this);
+      this.nodeHoverPrograms[type] = new NodeHoverProgram(this.webGLContexts.hoverNodes, this);
     }
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
@@ -1147,21 +1147,21 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
     });
     // 2. Allocate for each type for the proper number of nodes
-    for (const type in this.hoverNodePrograms) {
-      this.hoverNodePrograms[type].allocate(nodesPerPrograms[type] || 0);
+    for (const type in this.nodeHoverPrograms) {
+      this.nodeHoverPrograms[type].allocate(nodesPerPrograms[type] || 0);
       // Also reset count, to use when rendering:
       nodesPerPrograms[type] = 0;
     }
     // 3. Process all nodes to render:
     nodesToRender.forEach((node) => {
       const data = this.nodeDataCache[node];
-      this.hoverNodePrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
+      this.nodeHoverPrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
     });
     // 4. Clear hovered nodes layer:
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
     // 5. Render:
-    for (const type in this.hoverNodePrograms) {
-      const program = this.hoverNodePrograms[type];
+    for (const type in this.nodeHoverPrograms) {
+      const program = this.nodeHoverPrograms[type];
 
       program.bind();
       program.bufferData();
