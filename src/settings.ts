@@ -78,7 +78,7 @@ export interface Settings {
 
   // Program classes
   nodeProgramClasses: { [type: string]: NodeProgramConstructor };
-  hoverNodeProgramClasses: { [type: string]: NodeProgramConstructor };
+  nodeHoverProgramClasses: { [type: string]: NodeProgramConstructor };
   edgeProgramClasses: { [type: string]: EdgeProgramConstructor };
 }
 
@@ -133,7 +133,7 @@ export const DEFAULT_SETTINGS: Settings = {
   nodeProgramClasses: {
     circle: CircleNodeProgram,
   },
-  hoverNodeProgramClasses: {},
+  nodeHoverProgramClasses: {},
   edgeProgramClasses: {
     arrow: ArrowEdgeProgram,
     line: LineEdgeProgram,
