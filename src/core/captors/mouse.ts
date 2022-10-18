@@ -147,19 +147,20 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
   handleDown(e: MouseEvent): void {
     if (!this.enabled) return;
 
-    this.startCameraState = this.renderer.getCamera().getState();
+    // We only start dragging on left button
+    if (e.button === 0) {
+      this.startCameraState = this.renderer.getCamera().getState();
 
-    const { x, y } = getPosition(e, this.container);
-    this.lastMouseX = x;
-    this.lastMouseY = y;
+      const { x, y } = getPosition(e, this.container);
+      this.lastMouseX = x;
+      this.lastMouseY = y;
 
-    this.draggedEvents = 0;
+      this.draggedEvents = 0;
 
-    this.downStartTime = Date.now();
+      this.downStartTime = Date.now();
+      this.isMouseDown = true;
+    }
 
-    // TODO: dispatch events
-    // Left button pressed
-    this.isMouseDown = true;
     this.emit("mousedown", getMouseCoords(e, this.container));
   }
 
