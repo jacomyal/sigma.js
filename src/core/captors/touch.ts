@@ -39,7 +39,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
 
   startTouchesAngle?: number;
   startTouchesDistance?: number;
-  startTouchesPositions?: Coordinates[];
+  startTouchesPositions = [] as Coordinates[];
   lastTouchesPositions?: Coordinates[];
   lastTouches?: Touch[];
 
@@ -160,12 +160,12 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
           );
         }
 
+        this.hasMoved = false;
         this.isMoving = false;
         this.touchMode = 0;
         break;
     }
 
-    this.hasMoved = false;
     this.emit("touchup", getTouchCoords(e, this.container));
   }
 
@@ -177,14 +177,28 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
     if (e.touches.length === 1) this.dispatchRelatedMouseEvent("mousemove", e);
 
-    const camera = this.renderer.getCamera();
-    const startCameraState = this.startCameraState as CameraState;
     const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
     this.lastTouches = touches;
     this.lastTouchesPositions = touchesPositions;
+
+    // If a move was initiated at some point and we get back to startpoint,
+    // we should still consider that we did move (which also happens after a
+    // multiple touch when only one touch remains in which case handleStart
+    // is recalled within handleLeave).
+    this.hasMoved = this.hasMoved ||
+      // Some mobile browsers report non distant moves so we check that one
+      // of the touches has an actual distance from the origin position
+      touchesPositions.some((position, idx) =>
+        Math.abs(position.x - this.startTouchesPositions[idx].x) +
+        Math.abs(position.y - this.startTouchesPositions[idx].y) > 0
+      );
+    // If there was no move, do not trigger touch moves behavior
+    if (!this.hasMoved) {
+      return;
+    }
+
     this.isMoving = true;
-    this.hasMoved = true;
 
     if (this.movingTimeout) clearTimeout(this.movingTimeout);
 
@@ -192,6 +206,8 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
       this.isMoving = false;
     }, DRAG_TIMEOUT);
 
+    const camera = this.renderer.getCamera();
+    const startCameraState = this.startCameraState as CameraState;
     switch (this.touchMode) {
       case 1: {
         const { x: xStart, y: yStart } = this.renderer.viewportToFramedGraph(
