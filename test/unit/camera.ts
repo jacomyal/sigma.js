@@ -79,6 +79,33 @@ describe("Camera", function () {
     });
   });
 
+  it("should be possible to update a camera's state.", function () {
+    const camera = new Camera();
+
+    camera.setState({ x: 10, y: -10, angle: 5, ratio: 3 });
+    camera.updateState((state) => {
+      return {
+        x: state.x * 2,
+        y: state.y + 7,
+        angle: state.angle * 3,
+        ratio: state.ratio + 1,
+      };
+    });
+
+    assert.deepStrictEqual(camera.getState(), {
+      x: 20,
+      y: -3,
+      angle: 15,
+      ratio: 4,
+    });
+
+    camera.updateState((state) => {
+      return { angle: state.angle + 1 };
+    });
+
+    assert.deepStrictEqual(camera.getState(), { x: 20, y: -3, angle: 16, ratio: 4 });
+  });
+
   it("should be possible to reset the camera's state using setState (issue #1136).", function () {
     const camera = new Camera();
 

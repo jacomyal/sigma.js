@@ -185,6 +185,18 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
   }
 
   /**
+   * Method used to update the camera's state using a function.
+   *
+   * @param  {function} updater - Updated function taking current state and
+   *                              returning next state.
+   * @return {Camera}
+   */
+  updateState(updater: (state: CameraState) => Partial<CameraState>): this {
+    this.setState(updater(this.getState()));
+    return this;
+  }
+
+  /**
    * Method used to animate the camera.
    *
    * @param  {object}                    state      - State to reach eventually.
