@@ -39,7 +39,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
 
   startTouchesAngle?: number;
   startTouchesDistance?: number;
-  startTouchesPositions = [] as Coordinates[];
+  startTouchesPositions: Coordinates[] = [];
   lastTouchesPositions?: Coordinates[];
   lastTouches?: Touch[];
 
@@ -186,13 +186,14 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     // we should still consider that we did move (which also happens after a
     // multiple touch when only one touch remains in which case handleStart
     // is recalled within handleLeave).
-    this.hasMoved = this.hasMoved ||
-      // Some mobile browsers report non distant moves so we check that one
-      // of the touches has an actual distance from the origin position
-      touchesPositions.some((position, idx) =>
-        Math.abs(position.x - this.startTouchesPositions[idx].x) +
-        Math.abs(position.y - this.startTouchesPositions[idx].y) > 0
-      );
+    // Now, some mobile browsers report zero-distance moves so we also check that
+    // one of the touches did actually move from the origin position.
+    this.hasMoved ||= touchesPositions.some((position, idx) => {
+      const startPosition = this.startTouchesPositions[idx];
+
+      return position.x !== startPosition.x || position.y !== startPosition.y;
+    });
+
     // If there was no move, do not trigger touch moves behavior
     if (!this.hasMoved) {
       return;
@@ -208,6 +209,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
 
     const camera = this.renderer.getCamera();
     const startCameraState = this.startCameraState as CameraState;
+
     switch (this.touchMode) {
       case 1: {
         const { x: xStart, y: yStart } = this.renderer.viewportToFramedGraph(
