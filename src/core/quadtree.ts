@@ -10,24 +10,15 @@
 /* eslint no-nested-ternary: 0 */
 /* eslint no-constant-condition: 0 */
 import extend from "@yomguithereal/helpers/extend";
-import { PlainObject } from "../types";
 
-// TODO: should not ask the quadtree when the camera has the whole graph in
-// sight.
-
-// TODO: a square can be represented as topleft + width, saying for the quad blocks (reduce mem)
-
-// TODO: jsdoc
-
-// TODO: be sure we can handle cases overcoming boundaries (because of size) or use a maxed size
-
-// TODO: filtering unwanted labels beforehand through the filter function
-
-// NOTE: this is basically a MX-CIF Quadtree at this point
-// NOTE: need to explore R-Trees for edges
-// NOTE: need to explore 2d segment tree for edges
-
-// NOTE: probably can do faster using spatial hashing
+/**
+ * Notes:
+ *
+ *   - a square can be represented as topleft + width, saying for the quad blocks,
+ *     to reduce overall memory usage (which is already pretty low).
+ *   - this implementation of a quadtree is often called a MX-CIF quadtree.
+ *   - we could explore spatial hashing (hilbert quadtrees, notably).
+ */
 
 /**
  * Constants.
@@ -39,20 +30,22 @@ import { PlainObject } from "../types";
  *   - BOTTOM_LEFT:  4i + 3b
  *   - BOTTOM_RIGHT: 4i + 4b
  */
-const BLOCKS = 4,
-  MAX_LEVEL = 5;
+const BLOCKS = 4;
+const MAX_LEVEL = 5;
 
-const OUTSIDE_BLOCK = "outside";
+// Outside block is max block index + 1, i.e.:
+// BLOCKS * ((4 * (4 ** MAX_LEVEL) - 1) / 3)
+const OUTSIDE_BLOCK = 5460;
 
-const X_OFFSET = 0,
-  Y_OFFSET = 1,
-  WIDTH_OFFSET = 2,
-  HEIGHT_OFFSET = 3;
+const X_OFFSET = 0;
+const Y_OFFSET = 1;
+const WIDTH_OFFSET = 2;
+const HEIGHT_OFFSET = 3;
 
-const TOP_LEFT = 1,
-  TOP_RIGHT = 2,
-  BOTTOM_LEFT = 3,
-  BOTTOM_RIGHT = 4;
+const TOP_LEFT = 1;
+const TOP_RIGHT = 2;
+const BOTTOM_LEFT = 3;
+const BOTTOM_RIGHT = 4;
 
 let hasWarnedTooMuchOutside = false;
 
@@ -229,7 +222,7 @@ function buildQuadrants(maxLevel: number, data: Float32Array): void {
 function insertNode(
   maxLevel: number,
   data: Float32Array,
-  containers: PlainObject<string[]>,
+  containers: Record<number, string[]>,
   key: string,
   x: number,
   y: number,
@@ -357,7 +350,7 @@ function insertNode(
 function getNodesInAxisAlignedRectangleArea(
   maxLevel: number,
   data: Float32Array,
-  containers: PlainObject<string[]>,
+  containers: Record<number, string[]>,
   x1: number,
   y1: number,
   w: number,
@@ -451,7 +444,7 @@ function getNodesInAxisAlignedRectangleArea(
  */
 export default class QuadTree {
   data: Float32Array;
-  containers: PlainObject<string[]> = { [OUTSIDE_BLOCK]: [] };
+  containers: Record<number, string[]> = { [OUTSIDE_BLOCK]: [] };
   cache: string[] | null = null;
   lastRectangle: Rectangle | null = null;
 
@@ -495,13 +488,13 @@ export default class QuadTree {
   }
 
   point(x: number, y: number): string[] {
-    const nodes: string[] = this.containers[OUTSIDE_BLOCK];
+    const nodes = this.containers[OUTSIDE_BLOCK].slice();
 
     let block = 0,
       level = 0;
 
     do {
-      if (this.containers[block]) nodes.push(...this.containers[block]);
+      if (this.containers[block]) extend(nodes, this.containers[block]);
 
       const quad = pointIsInQuad(
         x,
