@@ -4,6 +4,7 @@
  * @module
  */
 import Graph from "graphology-types";
+import extend from "@yomguithereal/helpers/extend";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
@@ -42,6 +43,12 @@ import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
+
+/**
+ * Constants.
+ */
+const X_LABEL_MARGIN = 150;
+const Y_LABEL_MARGIN = 50;
 
 /**
  * Important functions.
@@ -949,33 +956,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     const cameraState = this.camera.getState();
 
-    // Finding visible nodes to display their labels
-    let visibleNodes: Set<string>;
-
-    if (cameraState.ratio >= 1) {
-      // Camera is unzoomed so no need to ask the quadtree for visible nodes
-      visibleNodes = new Set(this.graph.nodes());
-    } else {
-      // Let's ask the quadtree
-      const viewRectangle = this.viewRectangle();
-
-      visibleNodes = new Set(
-        this.quadtree.rectangle(
-          viewRectangle.x1,
-          1 - viewRectangle.y1,
-          viewRectangle.x2,
-          1 - viewRectangle.y2,
-          viewRectangle.height,
-        ),
-      );
-    }
-
     // Selecting labels to draw
-    // TODO: drop gridsettings likewise
-    // TODO: optimize through visible nodes
-    const labelsToDisplay = this.labelGrid
-      .getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity)
-      .concat(this.nodesWithForcedLabels);
+    const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
+    extend(labelsToDisplay, this.nodesWithForcedLabels);
+
     this.displayedLabels = new Set();
 
     // Drawing labels
@@ -987,6 +971,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       // If the node was already drawn (like if it is eligible AND has
       // `forceLabel`), we don't want to draw it again
+      // NOTE: we can do better probably
       if (this.displayedLabels.has(node)) continue;
 
       // If the node is hidden, we don't need to display its label obviously
@@ -994,15 +979,29 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const { x, y } = this.framedGraphToViewport(data);
 
-      // TODO: we can cache the labels we need to render until the camera's ratio changes
-      // TODO: this should be computed in the canvas components?
+      // NOTE: we can cache the labels we need to render until the camera's ratio changes
       const size = this.scaleSize(data.size);
 
+      // Is node big enough?
       if (!data.forceLabel && size < this.settings.labelRenderedSizeThreshold) continue;
 
-      if (!visibleNodes.has(node)) continue;
+      // Is node actually on screen (with some margin)
+      // NOTE: we used to rely on the quadtree for this, but the coordinates
+      // conversion make it unreliable and at that point we already converted
+      // to viewport coordinates and since the label grid already culls the
+      // number of potential labels to display this looks like a good
+      // performance compromise.
+      // NOTE: labelGrid.getLabelsToDisplay could probably optimize by not
+      // considering cells obviously outside of the range of the current
+      // view rectangle.
+      if (
+        x < -X_LABEL_MARGIN ||
+        x > this.width + X_LABEL_MARGIN ||
+        y < -Y_LABEL_MARGIN ||
+        y > this.height + Y_LABEL_MARGIN
+      )
+        continue;
 
-      // TODO:
       // Because displayed edge labels depend directly on actually rendered node
       // labels, we need to only add to this.displayedLabels nodes whose label
       // is rendered.
