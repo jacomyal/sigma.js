@@ -1200,7 +1200,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private render(): this {
     this.emit("beforeRender");
 
-    const handleEscape = () => {
+    const exitRender = () => {
       this.emit("afterRender");
       return this;
     };
@@ -1223,7 +1223,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.updateCachedValues();
 
     // If we have no nodes we can stop right there
-    if (!this.graph.order) return handleEscape();
+    if (!this.graph.order) return exitRender();
 
     // TODO: improve this heuristic or move to the captor itself?
     // TODO: deal with the touch captor here as well
@@ -1278,13 +1278,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     }
 
     // Do not display labels on move per setting
-    if (this.settings.hideLabelsOnMove && moving) return handleEscape();
+    if (this.settings.hideLabelsOnMove && moving) return exitRender();
 
     this.renderLabels();
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
 
-    return handleEscape();
+    return exitRender();
   }
 
   /**
