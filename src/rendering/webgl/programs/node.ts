@@ -6,8 +6,6 @@
  * `gl.TRIANGLES` display mode. So, to draw one node, it will need to store
  * three times the center of the node, with the color, the size and an angle
  * indicating which "corner" of the triangle to draw.
- * It does not extend AbstractNodeProgram, which works very differently, and
- * really targets the gl.POINTS drawing methods.
  * @module
  */
 import { NodeDisplayData } from "../../../types";
@@ -30,7 +28,7 @@ export default class NodeProgram extends AbstractProgram {
   angleLocation: GLint;
 
   matrixLocation: WebGLUniformLocation;
-  adjustedZoomRatioLocation: WebGLUniformLocation;
+  sizeRatioLocation: WebGLUniformLocation;
   correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
@@ -47,9 +45,9 @@ export default class NodeProgram extends AbstractProgram {
     if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const adjustedZoomRatioLocation = gl.getUniformLocation(this.program, "u_adjustedZoomRatio");
-    if (adjustedZoomRatioLocation === null) throw new Error("NodeProgram: error while getting adjustedZoomRatioLocation");
-    this.adjustedZoomRatioLocation = adjustedZoomRatioLocation;
+    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
+    if (sizeRatioLocation === null) throw new Error("NodeProgram: error while getting sizeRatioLocation");
+    this.sizeRatioLocation = sizeRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
     if (correctionRatioLocation === null) throw new Error("NodeProgram: error while getting correctionRatioLocation");
@@ -132,7 +130,7 @@ export default class NodeProgram extends AbstractProgram {
     gl.useProgram(program);
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.adjustedZoomRatioLocation, params.nodesSizeZoomAdjuster(params.ratio));
+    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
     gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);

@@ -36,7 +36,8 @@ export default class EdgeProgram extends AbstractEdgeProgram {
   colorLocation: GLint;
   normalLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  sqrtZoomRatioLocation: WebGLUniformLocation;
+  zoomRatioLocation: WebGLUniformLocation;
+  sizeRatioLocation: WebGLUniformLocation;
   correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
@@ -56,13 +57,17 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     if (matrixLocation === null) throw new Error("EdgeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
+    const zoomRatioLocation = gl.getUniformLocation(this.program, "u_zoomRatio");
+    if (zoomRatioLocation === null) throw new Error("EdgeProgram: error while getting zoomRatioLocation");
+    this.zoomRatioLocation = zoomRatioLocation;
+
+    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
+    if (sizeRatioLocation === null) throw new Error("EdgeProgram: error while getting sizeRatioLocation");
+    this.sizeRatioLocation = sizeRatioLocation;
+
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
     if (correctionRatioLocation === null) throw new Error("EdgeProgram: error while getting correctionRatioLocation");
     this.correctionRatioLocation = correctionRatioLocation;
-
-    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
-    if (sqrtZoomRatioLocation === null) throw new Error("EdgeProgram: error while getting sqrtZoomRatioLocation");
-    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
 
     // Enabling the OES_element_index_uint extension
     // NOTE: on older GPUs, this means that really large graphs won't
@@ -201,7 +206,8 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     gl.useProgram(program);
 
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.zoomRatioLocation, params.zoomRatio);
+    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
     gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     // Drawing:
