@@ -1297,8 +1297,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private updateCachedValues(): void {
     const { ratio } = this.camera.getState();
-    const nodesSizeZoomAdjuster = this.getSetting("zoomToSizeRatioFunction") || Math.sqrt;
-    this.cameraSizeRatio = nodesSizeZoomAdjuster(ratio);
+    this.cameraSizeRatio = this.settings.zoomToSizeRatioFunction(ratio);
   }
 
   /**---------------------------------------------------------------------------
