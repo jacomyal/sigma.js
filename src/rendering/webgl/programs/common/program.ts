@@ -10,11 +10,11 @@ import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders
 export interface RenderParams {
   width: number;
   height: number;
-  ratio: number;
-  matrix: Float32Array;
-  scalingRatio: number;
+  sizeRatio: number;
+  zoomRatio: number;
+  pixelRatio: number;
   correctionRatio: number;
-  nodesSizeZoomAdjuster: (ratio: number) => number;
+  matrix: Float32Array;
 }
 
 export interface IProgram {

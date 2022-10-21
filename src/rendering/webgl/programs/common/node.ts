@@ -23,8 +23,8 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
   sizeLocation: GLint;
   colorLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  ratioLocation: WebGLUniformLocation;
-  scaleLocation: WebGLUniformLocation;
+  sizeRatioLocation: WebGLUniformLocation;
+  pixelRatioLocation: WebGLUniformLocation;
 
   constructor(
     gl: WebGLRenderingContext,
@@ -45,13 +45,28 @@ export abstract class AbstractNodeProgram extends AbstractProgram implements INo
     if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const ratioLocation = gl.getUniformLocation(this.program, "u_ratio");
-    if (ratioLocation === null) throw new Error("AbstractNodeProgram: error while getting ratioLocation");
-    this.ratioLocation = ratioLocation;
+    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
+    if (sizeRatioLocation === null) throw new Error("AbstractNodeProgram: error while getting sizeRatioLocation");
+    this.sizeRatioLocation = sizeRatioLocation;
 
-    const scaleLocation = gl.getUniformLocation(this.program, "u_scale");
-    if (scaleLocation === null) throw new Error("AbstractNodeProgram: error while getting scaleLocation");
-    this.scaleLocation = scaleLocation;
+    const pixelRatioLocation = gl.getUniformLocation(this.program, "u_pixelRatio");
+    if (pixelRatioLocation === null) throw new Error("AbstractNodeProgram: error while getting pixelRatioLocation");
+    this.pixelRatioLocation = pixelRatioLocation;
+  }
+
+  render(params: RenderParams): void {
+    if (this.hasNothingToRender()) return;
+
+    const gl = this.gl;
+    const program = this.program;
+
+    gl.useProgram(program);
+
+    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
+    gl.uniform1f(this.pixelRatioLocation, params.pixelRatio);
+
+    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / this.attributes);
   }
 
   bind(): void {
