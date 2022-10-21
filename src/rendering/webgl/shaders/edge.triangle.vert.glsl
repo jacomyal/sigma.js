@@ -3,7 +3,7 @@ attribute vec2 a_normal;
 attribute vec2 a_position;
 
 uniform mat3 u_matrix;
-uniform float u_sqrtZoomRatio;
+uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
 varying vec4 v_color;
@@ -18,11 +18,10 @@ void main() {
   float normalLength = length(a_normal);
   vec2 unitNormal = a_normal / normalLength;
   if (normalLength <= 0.0) unitNormal = a_normal;
-  float pixelsThickness = max(normalLength, minThickness * u_sqrtZoomRatio);
-  float webGLThickness = pixelsThickness * u_correctionRatio;
-  float adaptedWebGLThickness = webGLThickness * u_sqrtZoomRatio;
+  float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
+  float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
 
-  gl_Position = vec4((u_matrix * vec3(a_position + unitNormal * adaptedWebGLThickness, 1)).xy, 0, 1);
+  gl_Position = vec4((u_matrix * vec3(a_position + unitNormal * webGLThickness, 1)).xy, 0, 1);
 
   v_color = a_color;
   v_color.a *= bias;
