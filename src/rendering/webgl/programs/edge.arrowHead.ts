@@ -24,7 +24,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
   radiusLocation: GLint;
   barycentricLocation: GLint;
   matrixLocation: WebGLUniformLocation;
-  sqrtZoomRatioLocation: WebGLUniformLocation;
+  sizeRatioLocation: WebGLUniformLocation;
   correctionRatioLocation: WebGLUniformLocation;
 
   constructor(gl: WebGLRenderingContext) {
@@ -42,10 +42,9 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     if (matrixLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
-    const sqrtZoomRatioLocation = gl.getUniformLocation(this.program, "u_sqrtZoomRatio");
-    if (sqrtZoomRatioLocation === null)
-      throw new Error("EdgeArrowHeadProgram: error while getting sqrtZoomRatioLocation");
-    this.sqrtZoomRatioLocation = sqrtZoomRatioLocation;
+    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
+    if (sizeRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting sizeRatioLocation");
+    this.sizeRatioLocation = sizeRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
     if (correctionRatioLocation === null)
@@ -176,7 +175,7 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
 
     // Binding uniforms
     gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sqrtZoomRatioLocation, Math.sqrt(params.ratio));
+    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
     gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
 
     // Drawing:

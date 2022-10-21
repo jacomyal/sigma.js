@@ -19,7 +19,7 @@ void main() {
   vec2 unitNormal = a_normal / normalLength;
 
   // We require edges to be at least `minThickness` pixels thick *on screen*
-  // (so we need to compensate the SQRT zoom ratio):
+  // (so we need to compensate the size ratio):
   float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
 
   // Then, we need to retrieve the normalized thickness of the edge in the WebGL
