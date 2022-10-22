@@ -141,7 +141,11 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   // such as this.gl etc. but this could be dropped, I just feel it makes
   // the class easier to implement, regarding our usual practice
   abstract processItem(array: Float32Array, i: number, data: NodeDisplayData): void;
-  abstract setUniforms(gl: WebGLRenderingContext, params: RenderParams): void;
+  abstract setUniforms(
+    gl: WebGLRenderingContext,
+    locations: Record<string, WebGLUniformLocation>,
+    params: RenderParams,
+  ): void;
   abstract draw(gl: WebGLRenderingContext, params: RenderParams): void;
 
   render(params: RenderParams): void {
@@ -150,7 +154,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     this.bind();
     this.bufferData();
     this.gl.useProgram(this.program);
-    this.setUniforms(this.gl, params);
+    this.setUniforms(this.gl, this.uniformLocations, params);
     this.draw(this.gl, params);
   }
 }
@@ -185,10 +189,14 @@ export class NodeFastProgram extends NodeProgram {
     array[i] = color;
   }
 
-  setUniforms(gl: WebGLRenderingContext, params: RenderParams): void {
-    gl.uniformMatrix3fv(this.uniformLocations.u_matrix, false, params.matrix);
-    gl.uniform1f(this.uniformLocations.u_sqrtZoomRatioLocation, Math.sqrt(params.ratio));
-    gl.uniform1f(this.uniformLocations.u_correctionRatioLocation, params.correctionRatio);
+  setUniforms(
+    gl: WebGLRenderingContext,
+    { u_matrix, u_sqrtZoomRatio, u_correctionRatio }: Record<string, WebGLUniformLocation>,
+    params: RenderParams,
+  ): void {
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_sqrtZoomRatio, Math.sqrt(params.ratio));
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
   }
 
   draw(gl: WebGLRenderingContext, _params: RenderParams): void {
