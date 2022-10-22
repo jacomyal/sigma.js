@@ -47,7 +47,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   capacity = 0;
   verticesCount = 0;
 
-  constructor(gl: WebGLRenderingContext) {
+  constructor(gl: WebGLRenderingContext, _renderer: Sigma) {
     this.gl = gl;
 
     const buffer = gl.createBuffer();
