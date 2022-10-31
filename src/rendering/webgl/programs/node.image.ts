@@ -118,7 +118,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
 
     // Add images to texture:
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const ctx = canvas.getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
 
     // limit canvas size to avoid browser and platform limits
     let totalWidth = hasReceivedImages ? textureImage.width : 0;
