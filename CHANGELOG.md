@@ -1,11 +1,33 @@
 # sigma.js - changelog:
 
+## 2.4.0 (provisional)
+
+### Bug fixes
+
+- [#1206](https://github.com/jacomyal/sigma.js/pull/1206), [#1257](https://github.com/jacomyal/sigma.js/issues/1257) - Fixing `node.image` program (thanks to @kaij and @boogheta)
+- [#1286](https://github.com/jacomyal/sigma.js/issues/1286) - Fixing right-click erroneously triggering camera drag events
+- [#1242](https://github.com/jacomyal/sigma.js/pull/1242), [#1282](https://github.com/jacomyal/sigma.js/pull/1282) - Fixing multiple issues related to touch captor (thanks to @kaij and @boogheta)
+- [#1272](https://github.com/jacomyal/sigma.js/issues/1272) - Fixing quadtree-related stack overflows
+- Fixing graph event leak on `Sigma.kill`
+- [#1253](https://github.com/jacomyal/sigma.js/issues/1253) - Fixing `edge.fast` program not respecting `hidden`
+- Fixing `edge.fast` vert shader not unpacking color correctly
+- [#1251](https://github.com/jacomyal/sigma.js/pull/1251) - Fixing alpha value parsing of hex colors (thanks to @kaij)
+
+### Features
+
+- [#1285](https://github.com/jacomyal/sigma.js/issues/1285) - Fixing label selection when camera is rotated
+- [#1289](https://github.com/jacomyal/sigma.js/issues/1289) - Adding `Camera.updateState`
+- Program classes given in settings (`nodeProgramClasses`, `edgeProgramClasses`) are now merged with default ones for convenience
+- [#1287](https://github.com/jacomyal/sigma.js/pull/1287) - Adding the `hoverNodeProgramClasses` setting so that it is possible to have different programs rendering nodes and their hover
+- [#1273](https://github.com/jacomyal/sigma.js/issues/1273) - Adding the `Sigma.setGraph` method to renderers
+- Adding renderer generic type to specify graph type (thanks to @lf-)
+
 ## 2.3.1
 
 ### Bug fixes
 
 - [#1230](https://github.com/jacomyal/sigma.js/pull/1230) - Updates broken link to graphology in README.md (thanks to @alexduhem)
-- [#1236](https://github.com/jacomyal/sigma.js/issues/1236) - Fixes `#preventSigmaDefault` scoping
+- [#1236](https://github.com/jacomyal/sigma.js/issues/1236) - Fixes `#.preventSigmaDefault` scoping
 - [#1237](https://github.com/jacomyal/sigma.js/issues/1237) - Updates `pixelRatio` on resize
 - [#1240](https://github.com/jacomyal/sigma.js/issues/1240) - Fixes click events for touch devices
 - [#1244](https://github.com/jacomyal/sigma.js/issues/1244) - Stops relying on graphology for types (issue only partially fixed yet)
