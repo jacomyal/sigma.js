@@ -21,11 +21,12 @@ export abstract class AbstractNodeProgram {
 // TODO: edge vs. node
 // TODO: indices
 
-export type AttributeSpecification = {
+export interface AttributeSpecification {
   name: string;
   size: number;
   type: number;
-};
+  normalized?: boolean;
+}
 
 export abstract class NodeProgram implements AbstractNodeProgram {
   abstract readonly VERTICES: number;
@@ -101,8 +102,29 @@ export abstract class NodeProgram implements AbstractNodeProgram {
       gl.enableVertexAttribArray(this.attributeLocations[attributeName]);
     }
 
-    // TODO: vertexAttribPointer etc. that strides automagically (I don't want
-    // to manage this by hand anymore).
+    let offset = 0;
+
+    for (const attributeName in this.ATTRIBUTES) {
+      const location = this.attributeLocations[attributeName];
+      const attribute = this.ATTRIBUTES[attributeName];
+
+      gl.vertexAttribPointer(
+        location,
+        attribute.size,
+        attribute.type,
+        attribute.normalized || false,
+        this.ARRAY_ITEMS_PER_VERTEX * Float32Array.BYTES_PER_ELEMENT,
+        offset,
+      );
+
+      if (attribute.type === WebGLRenderingContext.UNSIGNED_BYTE) {
+        offset += attribute.size;
+      } else if (attribute.type === WebGLRenderingContext.FLOAT) {
+        offset += attribute.size * 4;
+      } else {
+        throw new Error("yet unsupported attribute type");
+      }
+    }
   }
 
   private bufferData(): void {
@@ -178,7 +200,7 @@ export class NodeFastProgram extends NodeProgram {
   readonly ATTRIBUTES = [
     { name: "a_position", size: 2, type: FLOAT },
     { name: "a_size", size: 1, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE },
+    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
     { name: "a_angle", size: 1, type: FLOAT },
   ];
 
