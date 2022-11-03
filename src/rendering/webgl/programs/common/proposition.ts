@@ -130,7 +130,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     let i = offset * this.STRIDE;
 
     // NOTE: dealing with the hidden issues automatically
-    if (!hidden) return this.processItem(this.array, i, data);
+    if (!hidden) return this.processShownItem(this.array, i, data);
 
     for (let l = i + this.STRIDE; i < l; i++) {
       this.array[i] = 0;
@@ -140,7 +140,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   // NOTE: I chose to explicitly pass members of the class to the methods
   // such as this.gl etc. but this could be dropped, I just feel it makes
   // the class easier to implement, regarding our usual practice
-  abstract processItem(array: Float32Array, i: number, data: NodeDisplayData): void;
+  abstract processShownItem(array: Float32Array, i: number, data: NodeDisplayData): void;
   abstract setUniforms(
     gl: WebGLRenderingContext,
     locations: Record<string, WebGLUniformLocation>,
@@ -180,7 +180,7 @@ export class NodeFastProgram extends NodeProgram {
     { name: "a_angle", size: 1, type: FLOAT },
   ];
 
-  processItem(array: Float32Array, i: number, data: NodeDisplayData): void {
+  processShownItem(array: Float32Array, i: number, data: NodeDisplayData): void {
     const color = floatColor(data.color);
 
     array[i++] = data.x;
