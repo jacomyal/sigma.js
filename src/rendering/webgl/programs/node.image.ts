@@ -16,7 +16,11 @@ import Sigma from "../../../sigma";
 
 const POINTS = 1,
   ATTRIBUTES = 8,
-  MAX_TEXTURE_SIZE = 100;
+  // maximum size of single texture in atlas
+  MAX_TEXTURE_SIZE = 192,
+  // maximum width of atlas texture (limited by browser)
+  // low setting of 3072 works on phones & tablets
+  MAX_CANVAS_WIDTH = 3072;
 
 type ImageLoading = { status: "loading" };
 type ImageError = { status: "error" };
@@ -53,6 +57,18 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
   let hasReceivedImages = false;
   let pendingImagesFrameID: number | undefined = undefined;
 
+  // next write position in texture
+  let writePositionX = 0;
+  let writePositionY = 0;
+  // height of current row
+  let writeRowHeight = 0;
+
+  interface PendingImage {
+    image: HTMLImageElement;
+    id: string;
+    size: number;
+  }
+
   /**
    * Helper to load an image:
    */
@@ -86,7 +102,7 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
   function finalizePendingImages(): void {
     pendingImagesFrameID = undefined;
 
-    const pendingImages: { image: HTMLImageElement; id: string; size: number }[] = [];
+    const pendingImages: PendingImage[] = [];
 
     // List all pending images:
     for (const id in images) {
@@ -102,43 +118,97 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
 
     // Add images to texture:
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const ctx = canvas.getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
 
-    canvas.width = pendingImages.reduce((iter, { size }) => iter + size, hasReceivedImages ? textureImage.width : 0);
-    canvas.height = Math.max(hasReceivedImages ? textureImage.height : 0, ...pendingImages.map(({ size }) => size));
+    // limit canvas size to avoid browser and platform limits
+    let totalWidth = hasReceivedImages ? textureImage.width : 0;
+    let totalHeight = hasReceivedImages ? textureImage.height : 0;
 
-    let xOffset = 0;
-    if (hasReceivedImages) {
-      ctx.putImageData(textureImage, 0, 0);
-      xOffset = textureImage.width;
-    }
-    pendingImages.forEach(({ id, image, size }) => {
-      const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
+    // initialize image drawing offsets with current write position
+    let xOffset = writePositionX;
+    let yOffset = writePositionY;
 
-      // Crop image, to only keep the biggest square, centered:
-      let dx = 0,
-        dy = 0;
-      if ((image.width || 0) > (image.height || 0)) {
-        dx = (image.width - image.height) / 2;
-      } else {
-        dy = (image.height - image.width) / 2;
+    /**
+     * Draws a (full or partial) row of images into the atlas texture
+     * @param pendingImages
+     */
+    const drawRow = (pendingImages: PendingImage[]) => {
+      // update canvas size before drawing
+      if (canvas.width !== totalWidth || canvas.height !== totalHeight) {
+        canvas.width = Math.min(MAX_CANVAS_WIDTH, totalWidth);
+        canvas.height = totalHeight;
+
+        // draw previous texture into resized canvas
+        if (hasReceivedImages) {
+          ctx.putImageData(textureImage, 0, 0);
+        }
       }
-      ctx.drawImage(image, dx, dy, size, size, xOffset, 0, imageSizeInTexture, imageSizeInTexture);
 
-      // Update image state:
-      images[id] = {
-        status: "ready",
-        x: xOffset,
-        y: 0,
-        width: imageSizeInTexture,
-        height: imageSizeInTexture,
-      };
+      pendingImages.forEach(({ id, image, size }) => {
+        const imageSizeInTexture = Math.min(MAX_TEXTURE_SIZE, size);
 
-      xOffset += imageSizeInTexture;
+        // Crop image, to only keep the biggest square, centered:
+        let dx = 0,
+          dy = 0;
+        if ((image.width || 0) > (image.height || 0)) {
+          dx = (image.width - image.height) / 2;
+        } else {
+          dy = (image.height - image.width) / 2;
+        }
+        ctx.drawImage(image, dx, dy, size, size, xOffset, yOffset, imageSizeInTexture, imageSizeInTexture);
+
+        // Update image state:
+        images[id] = {
+          status: "ready",
+          x: xOffset,
+          y: yOffset,
+          width: imageSizeInTexture,
+          height: imageSizeInTexture,
+        };
+
+        xOffset += imageSizeInTexture;
+      });
+
+      hasReceivedImages = true;
+      textureImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    };
+
+    let rowImages: PendingImage[] = [];
+    pendingImages.forEach((image) => {
+      const { size } = image;
+      const imageSizeInTexture = Math.min(size, MAX_TEXTURE_SIZE);
+
+      if (writePositionX + imageSizeInTexture > MAX_CANVAS_WIDTH) {
+        // existing row is full: flush row and continue on next line
+        if (rowImages.length > 0) {
+          totalWidth = Math.max(writePositionX, totalWidth);
+          totalHeight = Math.max(writePositionY + writeRowHeight, totalHeight);
+          drawRow(rowImages);
+
+          rowImages = [];
+          writeRowHeight = 0;
+        }
+
+        writePositionX = 0;
+        writePositionY = totalHeight;
+        xOffset = 0;
+        yOffset = totalHeight;
+      }
+
+      // add image to row
+      rowImages.push(image);
+
+      // advance write position and update maximum row height
+      writePositionX += imageSizeInTexture;
+      writeRowHeight = Math.max(writeRowHeight, imageSizeInTexture);
     });
 
-    textureImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    hasReceivedImages = true;
+    // flush pending images in row - keep write position (and drawing cursor)
+    totalWidth = Math.max(writePositionX, totalWidth);
+    totalHeight = Math.max(writePositionY + writeRowHeight, totalHeight);
+    drawRow(rowImages);
+    rowImages = [];
+
     rebindTextureFns.forEach((fn) => fn());
   }
 
