@@ -36,6 +36,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   abstract readonly ATTRIBUTES: Array<AttributeSpecification>;
   STRIDE: number = 0;
 
+  renderer: Sigma;
   gl: WebGLRenderingContext;
   buffer: WebGLBuffer;
   array: Float32Array = new Float32Array();
@@ -47,8 +48,9 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   capacity = 0;
   verticesCount = 0;
 
-  constructor(gl: WebGLRenderingContext, _renderer: Sigma) {
+  constructor(gl: WebGLRenderingContext, renderer: Sigma) {
     this.gl = gl;
+    this.renderer = renderer;
 
     const buffer = gl.createBuffer();
     if (buffer === null) throw new Error("Program: error while creating the webgl buffer.");
