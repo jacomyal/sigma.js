@@ -31,7 +31,7 @@
     "website:watch": "cd website && npx reload"
   },
   "config": {
-    "clean": "core rendering utils index.js index.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
+    "clean": "build core rendering utils index.js index.d.ts index-bundle.js index-bundle.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
     "folders": "examples src test"
   },
   "repository": {
