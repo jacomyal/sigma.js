@@ -1,6 +1,6 @@
 # sigma.js - changelog:
 
-## 2.4.0 (provisional)
+## 2.4.0
 
 ### Bug fixes
 
