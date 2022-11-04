@@ -1,5 +1,5 @@
 {
-  "entryPointStrategy": "Expand",
+  "entryPointStrategy": "expand",
   "entryPoints": ["./src/sigma.ts", "./src/index.ts", "./src/settings.ts", "./src/types.ts", "./src/core"],
   "exclude": ["./node_modules"],
   "excludePrivate": true,

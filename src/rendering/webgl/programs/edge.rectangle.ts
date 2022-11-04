@@ -17,8 +17,8 @@
  */
 import { floatColor, canUse32BitsIndices } from "../../../utils";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
-import vertexShaderSource from "../shaders/edge.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.frag.glsl";
+import vertexShaderSource from "../shaders/edge.rectangle.vert.glsl";
+import fragmentShaderSource from "../shaders/edge.rectangle.frag.glsl";
 import { AbstractEdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
 
@@ -26,7 +26,7 @@ const POINTS = 4,
   ATTRIBUTES = 5,
   STRIDE = POINTS * ATTRIBUTES;
 
-export default class EdgeProgram extends AbstractEdgeProgram {
+export default class EdgeRectangleProgram extends AbstractEdgeProgram {
   IndicesArray: Uint32ArrayConstructor | Uint16ArrayConstructor;
   indicesArray: Uint32Array | Uint16Array;
   indicesBuffer: WebGLBuffer;
@@ -45,7 +45,7 @@ export default class EdgeProgram extends AbstractEdgeProgram {
 
     // Initializing indices buffer
     const indicesBuffer = gl.createBuffer();
-    if (indicesBuffer === null) throw new Error("EdgeProgram: error while creating indicesBuffer");
+    if (indicesBuffer === null) throw new Error("EdgeRectangleProgram: error while creating indicesBuffer");
     this.indicesBuffer = indicesBuffer;
 
     // Locations
@@ -54,19 +54,20 @@ export default class EdgeProgram extends AbstractEdgeProgram {
     this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
 
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("EdgeProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeRectangleProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const zoomRatioLocation = gl.getUniformLocation(this.program, "u_zoomRatio");
-    if (zoomRatioLocation === null) throw new Error("EdgeProgram: error while getting zoomRatioLocation");
+    if (zoomRatioLocation === null) throw new Error("EdgeRectangleProgram: error while getting zoomRatioLocation");
     this.zoomRatioLocation = zoomRatioLocation;
 
     const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
-    if (sizeRatioLocation === null) throw new Error("EdgeProgram: error while getting sizeRatioLocation");
+    if (sizeRatioLocation === null) throw new Error("EdgeRectangleProgram: error while getting sizeRatioLocation");
     this.sizeRatioLocation = sizeRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
-    if (correctionRatioLocation === null) throw new Error("EdgeProgram: error while getting correctionRatioLocation");
+    if (correctionRatioLocation === null)
+      throw new Error("EdgeRectangleProgram: error while getting correctionRatioLocation");
     this.correctionRatioLocation = correctionRatioLocation;
 
     // Enabling the OES_element_index_uint extension

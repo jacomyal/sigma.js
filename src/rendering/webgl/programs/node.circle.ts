@@ -10,8 +10,8 @@
  */
 import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/node.vert.glsl";
-import fragmentShaderSource from "../shaders/node.frag.glsl";
+import vertexShaderSource from "../shaders/node.circle.vert.glsl";
+import fragmentShaderSource from "../shaders/node.circle.frag.glsl";
 import { AbstractProgram, RenderParams } from "./common/program";
 
 const POINTS = 3;
@@ -21,7 +21,7 @@ const ANGLE_1 = 0;
 const ANGLE_2 = (2 * Math.PI) / 3;
 const ANGLE_3 = (4 * Math.PI) / 3;
 
-export default class NodeProgram extends AbstractProgram {
+export default class NodeCircleProgram extends AbstractProgram {
   positionLocation: GLint;
   sizeLocation: GLint;
   colorLocation: GLint;
@@ -42,15 +42,16 @@ export default class NodeProgram extends AbstractProgram {
 
     // Uniform Location
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("NodeCircleProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
-    if (sizeRatioLocation === null) throw new Error("NodeProgram: error while getting sizeRatioLocation");
+    if (sizeRatioLocation === null) throw new Error("NodeCircleProgram: error while getting sizeRatioLocation");
     this.sizeRatioLocation = sizeRatioLocation;
 
     const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
-    if (correctionRatioLocation === null) throw new Error("NodeProgram: error while getting correctionRatioLocation");
+    if (correctionRatioLocation === null)
+      throw new Error("NodeCircleProgram: error while getting correctionRatioLocation");
     this.correctionRatioLocation = correctionRatioLocation;
 
     this.bind();

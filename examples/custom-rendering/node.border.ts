@@ -14,7 +14,7 @@ import fragmentShaderSource from "!raw-loader!./node.border.frag.glsl";
 const POINTS = 1,
   ATTRIBUTES = 4;
 
-export default class NodeProgramBorder extends AbstractNodeProgram {
+export default class NodeBorderProgram extends AbstractNodeProgram {
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
     this.bind();

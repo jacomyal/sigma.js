@@ -6,8 +6,8 @@ import Sigma from "sigma";
 import Graph from "graphology";
 import seedrandom from "seedrandom";
 
-import EdgesDefaultProgram from "sigma/rendering/webgl/programs/edge";
-import EdgesFastProgram from "sigma/rendering/webgl/programs/edge.fast";
+import EdgeRectangleProgram from "sigma/rendering/webgl/programs/edge.rectangle";
+import EdgeLineProgram from "sigma/rendering/webgl/programs/edge.line";
 
 import circlepack from "graphology-layout/circlepack";
 import clusters from "graphology-generators/random/clusters";
@@ -62,8 +62,8 @@ const renderer = new Sigma(graph, container, {
   defaultEdgeColor: "#e6e6e6",
   defaultEdgeType: state.edgesRenderer,
   edgeProgramClasses: {
-    "edges-default": EdgesDefaultProgram,
-    "edges-fast": EdgesFastProgram,
+    "edges-default": EdgeRectangleProgram,
+    "edges-fast": EdgeLineProgram,
   },
 });
 

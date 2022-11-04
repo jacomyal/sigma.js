@@ -383,11 +383,11 @@ export const tests: Tests = [
       await page.evaluate(() => {
         const { Graph, Sigma, container, programs } = dependencies;
         const {
-          NodeProgram,
-          NodeFastProgram,
+          NodeCircleProgram,
+          NodePointProgram,
           getNodeImageProgram,
-          EdgeProgram,
-          EdgeFastProgram,
+          EdgeRectangleProgram,
+          EdgeLineProgram,
           EdgeArrowProgram,
           EdgeTriangleProgram,
         } = programs;
@@ -414,13 +414,13 @@ export const tests: Tests = [
 
         new Sigma(graph, container, {
           nodeProgramClasses: {
-            node: NodeProgram,
-            fast: NodeFastProgram,
+            node: NodeCircleProgram,
+            fast: NodePointProgram,
             image: getNodeImageProgram(),
           },
           edgeProgramClasses: {
-            edge: EdgeProgram,
-            fast: EdgeFastProgram,
+            edge: EdgeRectangleProgram,
+            fast: EdgeLineProgram,
             arrow: EdgeArrowProgram,
             triangle: EdgeTriangleProgram,
           },

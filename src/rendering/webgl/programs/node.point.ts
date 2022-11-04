@@ -9,15 +9,15 @@
  */
 import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/node.fast.vert.glsl";
-import fragmentShaderSource from "../shaders/node.fast.frag.glsl";
+import vertexShaderSource from "../shaders/node.point.vert.glsl";
+import fragmentShaderSource from "../shaders/node.point.frag.glsl";
 import { AbstractNodeProgram } from "./common/node";
 import { RenderParams } from "./common/program";
 
 const POINTS = 1,
   ATTRIBUTES = 4;
 
-export default class NodeFastProgram extends AbstractNodeProgram {
+export default class NodePointProgram extends AbstractNodeProgram {
   constructor(gl: WebGLRenderingContext) {
     super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
     this.bind();

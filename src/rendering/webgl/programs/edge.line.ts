@@ -8,15 +8,15 @@
  */
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/edge.fast.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.fast.frag.glsl";
+import vertexShaderSource from "../shaders/edge.line.vert.glsl";
+import fragmentShaderSource from "../shaders/edge.line.frag.glsl";
 import { AbstractEdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
 
 const POINTS = 2,
   ATTRIBUTES = 3;
 
-export default class EdgeFastProgram extends AbstractEdgeProgram {
+export default class EdgeLineProgram extends AbstractEdgeProgram {
   positionLocation: GLint;
   colorLocation: GLint;
   matrixLocation: WebGLUniformLocation;
@@ -30,7 +30,7 @@ export default class EdgeFastProgram extends AbstractEdgeProgram {
 
     // Uniform locations:
     const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("EdgeFastProgram: error while getting matrixLocation");
+    if (matrixLocation === null) throw new Error("EdgeLineProgram: error while getting matrixLocation");
     this.matrixLocation = matrixLocation;
 
     this.bind();

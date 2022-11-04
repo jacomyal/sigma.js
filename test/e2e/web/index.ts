@@ -4,11 +4,11 @@ import { SerializedGraph } from "graphology-types";
 import Sigma from "../../../src";
 
 // Programs to test
-import NodeProgram from "../../../src/rendering/webgl/programs/node";
-import NodeFastProgram from "../../../src/rendering/webgl/programs/node.fast";
+import NodeCircleProgram from "../../../src/rendering/webgl/programs/node.circle";
+import NodePointProgram from "../../../src/rendering/webgl/programs/node.point";
 import getNodeImageProgram from "../../../src/rendering/webgl/programs/node.image";
-import EdgeProgram from "../../../src/rendering/webgl/programs/edge";
-import EdgeFastProgram from "../../../src/rendering/webgl/programs/edge.fast";
+import EdgeRectangleProgram from "../../../src/rendering/webgl/programs/edge.rectangle";
+import EdgeLineProgram from "../../../src/rendering/webgl/programs/edge.line";
 import EdgeArrowProgram from "../../../src/rendering/webgl/programs/edge.arrow";
 import EdgeTriangleProgram from "../../../src/rendering/webgl/programs/edge.triangle";
 
@@ -35,11 +35,11 @@ globalize({
     Sigma,
     data: { arctic, lesMiserables },
     programs: {
-      NodeProgram,
-      NodeFastProgram,
+      NodeCircleProgram,
+      NodePointProgram,
       getNodeImageProgram,
-      EdgeProgram,
-      EdgeFastProgram,
+      EdgeLineProgram,
+      EdgeRectangleProgram,
       EdgeArrowProgram,
       EdgeTriangleProgram,
     },

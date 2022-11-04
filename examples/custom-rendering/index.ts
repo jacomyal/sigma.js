@@ -26,7 +26,7 @@ import Graph from "graphology";
 import Sigma from "sigma";
 
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
-import NodeProgramBorder from "./node.border";
+import NodeBorderProgram from "./node.border";
 
 import ForceSupervisor from "graphology-layout-force/worker";
 
@@ -67,7 +67,7 @@ const renderer = new Sigma(graph, container, {
   // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
   nodeProgramClasses: {
     image: getNodeProgramImage(),
-    border: NodeProgramBorder,
+    border: NodeBorderProgram,
   },
   renderEdgeLabels: true,
 });

@@ -12,7 +12,7 @@ import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { AbstractEdgeProgram } from "./common/edge";
 import { floatColor, canUse32BitsIndices } from "../../../utils";
 import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.frag.glsl";
+import fragmentShaderSource from "../shaders/edge.rectangle.frag.glsl";
 import { RenderParams } from "./common/program";
 
 const POINTS = 4,
