@@ -2,8 +2,17 @@
 
 ## 2.4.0
 
+### Features
+
+- [#1289](https://github.com/jacomyal/sigma.js/issues/1289) - Adding `Camera.updateState`
+- Program classes given in settings (`nodeProgramClasses`, `edgeProgramClasses`) are now merged with default ones for convenience
+- [#1287](https://github.com/jacomyal/sigma.js/pull/1287) - Adding the `hoverNodeProgramClasses` setting so that it is possible to have different programs rendering nodes and their hover
+- [#1273](https://github.com/jacomyal/sigma.js/issues/1273) - Adding the `Sigma.setGraph` method to renderers
+- Adding renderer generic type to specify graph type (thanks to @lf-)
+
 ### Bug fixes
 
+- [#1285](https://github.com/jacomyal/sigma.js/issues/1285) - Fixing label selection when camera is rotated
 - [#1206](https://github.com/jacomyal/sigma.js/pull/1206), [#1257](https://github.com/jacomyal/sigma.js/issues/1257) - Fixing `node.image` program (thanks to @kaij and @boogheta)
 - [#1286](https://github.com/jacomyal/sigma.js/issues/1286) - Fixing right-click erroneously triggering camera drag events
 - [#1242](https://github.com/jacomyal/sigma.js/pull/1242), [#1282](https://github.com/jacomyal/sigma.js/pull/1282) - Fixing multiple issues related to touch captor (thanks to @kaij and @boogheta)
@@ -13,16 +22,11 @@
 - Fixing `edge.fast` vert shader not unpacking color correctly
 - [#1251](https://github.com/jacomyal/sigma.js/pull/1251) - Fixing alpha value parsing of hex colors (thanks to @kaij)
 
-### Features
-
-- [#1285](https://github.com/jacomyal/sigma.js/issues/1285) - Fixing label selection when camera is rotated
-- [#1289](https://github.com/jacomyal/sigma.js/issues/1289) - Adding `Camera.updateState`
-- Program classes given in settings (`nodeProgramClasses`, `edgeProgramClasses`) are now merged with default ones for convenience
-- [#1287](https://github.com/jacomyal/sigma.js/pull/1287) - Adding the `hoverNodeProgramClasses` setting so that it is possible to have different programs rendering nodes and their hover
-- [#1273](https://github.com/jacomyal/sigma.js/issues/1273) - Adding the `Sigma.setGraph` method to renderers
-- Adding renderer generic type to specify graph type (thanks to @lf-)
-
 ## 2.3.1
+
+### Feature
+
+- [#1239](https://github.com/jacomyal/sigma.js/pull/1239) - Adds `getContainer` method to public API (thanks to @stefanprobst)
 
 ### Bug fixes
 
@@ -32,10 +36,6 @@
 - [#1240](https://github.com/jacomyal/sigma.js/issues/1240) - Fixes click events for touch devices
 - [#1244](https://github.com/jacomyal/sigma.js/issues/1244) - Stops relying on graphology for types (issue only partially fixed yet)
 - [#1249](https://github.com/jacomyal/sigma.js/issues/1249) - Fixes hovered nodes layer not being cleared
-
-### Feature
-
-- [#1239](https://github.com/jacomyal/sigma.js/pull/1239) - Adds `getContainer` method to public API (thanks to @stefanprobst)
 
 ## 2.3.0
 
