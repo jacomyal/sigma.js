@@ -4,12 +4,12 @@
 
 The graph contains nodes having arbitrary `(x, y)` positions.
 
-![graph-space](./img/graph-space.svg)
+<img alt="graph-space" src="./img/graph-space.svg" width="300">
 
 ## 2. Normalized graph space: `framedGraph`
 
 First we compute the extend (min & max values) for `x` and `y` coordinates in graph space.
 
-![graph-space-extent](./img/graph-space-extent.svg)
+<img alt="graph-space-extent" src="./img/graph-space-extent.svg" width="300">
 
 Then we normalize this space into a square such that graphspace `min` becomes `0` and graphspace max `1`.
