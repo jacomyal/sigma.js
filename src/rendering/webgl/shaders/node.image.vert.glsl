@@ -3,8 +3,8 @@ attribute float a_size;
 attribute vec4 a_color;
 attribute vec4 a_texture;
 
-uniform float u_ratio;
-uniform float u_scale;
+uniform float u_sizeRatio;
+uniform float u_pixelRatio;
 uniform mat3 u_matrix;
 
 varying vec4 v_color;
@@ -23,9 +23,9 @@ void main() {
   // Multiply the point size twice:
   //  - x SCALING_RATIO to correct the canvas scaling
   //  - x 2 to correct the formulae
-  gl_PointSize = a_size * u_ratio * u_scale * 2.0;
+  gl_PointSize = a_size / u_sizeRatio * u_pixelRatio * 2.0;
 
-  v_border = (1.0 / u_ratio) * (0.5 / a_size);
+  v_border = (0.5 / a_size) * u_sizeRatio;
 
   // Extract the color:
   v_color = a_color;

@@ -1168,9 +1168,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         matrix: this.matrix,
         width: this.width,
         height: this.height,
-        ratio: this.camera.ratio,
-        correctionRatio: this.correctionRatio / this.camera.ratio,
-        scalingRatio: this.pixelRatio,
+        pixelRatio: this.pixelRatio,
+        zoomRatio: this.camera.ratio,
+        sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+        correctionRatio: this.correctionRatio,
       });
     }
   }
@@ -1253,9 +1254,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         matrix: this.matrix,
         width: this.width,
         height: this.height,
-        ratio: cameraState.ratio,
-        correctionRatio: this.correctionRatio / cameraState.ratio,
-        scalingRatio: this.pixelRatio,
+        pixelRatio: this.pixelRatio,
+        zoomRatio: this.camera.ratio,
+        sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+        correctionRatio: this.correctionRatio,
       });
     }
 
@@ -1270,9 +1272,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
           matrix: this.matrix,
           width: this.width,
           height: this.height,
-          ratio: cameraState.ratio,
-          correctionRatio: this.correctionRatio / cameraState.ratio,
-          scalingRatio: this.pixelRatio,
+          pixelRatio: this.pixelRatio,
+          zoomRatio: this.camera.ratio,
+          sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+          correctionRatio: this.correctionRatio,
         });
       }
     }
@@ -1293,7 +1296,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private updateCachedValues(): void {
     const { ratio } = this.camera.getState();
-    this.cameraSizeRatio = Math.sqrt(ratio);
+    this.cameraSizeRatio = this.settings.zoomToSizeRatioFunction(ratio);
   }
 
   /**---------------------------------------------------------------------------

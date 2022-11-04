@@ -222,6 +222,23 @@ export const tests: Tests = [
     },
   },
   {
+    name: "custom-zoomToSizeRatioFunction",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const {
+          data: { lesMiserables },
+          Sigma,
+          container,
+        } = dependencies;
+
+        const renderer = new Sigma(lesMiserables, container, {
+          zoomToSizeRatioFunction: (x) => x,
+        });
+        renderer.getCamera().setState({ ratio: 3, x: 0.8, y: 0.7 });
+      });
+    },
+  },
+  {
     name: "camera-state-rotation",
     scenario: async (page: Page): Promise<void> => {
       await page.evaluate(() => {

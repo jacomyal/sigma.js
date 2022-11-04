@@ -5,7 +5,7 @@ attribute vec4 a_color;
 attribute vec3 a_barycentric;
 
 uniform mat3 u_matrix;
-uniform float u_sqrtZoomRatio;
+uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
 varying vec4 v_color;
@@ -22,25 +22,24 @@ void main() {
   // These first computations are taken from edge.vert.glsl and
   // edge.clamped.vert.glsl. Please read it to get better comments on what's
   // happening:
-  float pixelsThickness = max(normalLength, minThickness * u_sqrtZoomRatio);
-  float webGLThickness = pixelsThickness * u_correctionRatio;
-  float adaptedWebGLThickness = webGLThickness * u_sqrtZoomRatio;
-  float adaptedWebGLNodeRadius = a_radius * 2.0 * u_correctionRatio * u_sqrtZoomRatio;
-  float adaptedWebGLArrowHeadLength = adaptedWebGLThickness * 2.0 * arrowHeadLengthThicknessRatio;
-  float adaptedWebGLArrowHeadHalfWidth = adaptedWebGLArrowHeadLength * arrowHeadWidthLengthRatio / 2.0;
+  float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
+  float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
+  float webGLNodeRadius = a_radius * 2.0 * u_correctionRatio / u_sizeRatio;
+  float webGLArrowHeadLength = webGLThickness * 2.0 * arrowHeadLengthThicknessRatio;
+  float webGLArrowHeadHalfWidth = webGLArrowHeadLength * arrowHeadWidthLengthRatio / 2.0;
 
   float da = a_barycentric.x;
   float db = a_barycentric.y;
   float dc = a_barycentric.z;
 
   vec2 delta = vec2(
-      da * (adaptedWebGLNodeRadius * unitNormal.y)
-    + db * ((adaptedWebGLNodeRadius + adaptedWebGLArrowHeadLength) * unitNormal.y + adaptedWebGLArrowHeadHalfWidth * unitNormal.x)
-    + dc * ((adaptedWebGLNodeRadius + adaptedWebGLArrowHeadLength) * unitNormal.y - adaptedWebGLArrowHeadHalfWidth * unitNormal.x),
+      da * (webGLNodeRadius * unitNormal.y)
+    + db * ((webGLNodeRadius + webGLArrowHeadLength) * unitNormal.y + webGLArrowHeadHalfWidth * unitNormal.x)
+    + dc * ((webGLNodeRadius + webGLArrowHeadLength) * unitNormal.y - webGLArrowHeadHalfWidth * unitNormal.x),
 
-      da * (-adaptedWebGLNodeRadius * unitNormal.x)
-    + db * (-(adaptedWebGLNodeRadius + adaptedWebGLArrowHeadLength) * unitNormal.x + adaptedWebGLArrowHeadHalfWidth * unitNormal.y)
-    + dc * (-(adaptedWebGLNodeRadius + adaptedWebGLArrowHeadLength) * unitNormal.x - adaptedWebGLArrowHeadHalfWidth * unitNormal.y)
+      da * (-webGLNodeRadius * unitNormal.x)
+    + db * (-(webGLNodeRadius + webGLArrowHeadLength) * unitNormal.x + webGLArrowHeadHalfWidth * unitNormal.y)
+    + dc * (-(webGLNodeRadius + webGLArrowHeadLength) * unitNormal.x - webGLArrowHeadHalfWidth * unitNormal.y)
   );
 
   vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;

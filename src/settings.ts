@@ -45,6 +45,7 @@ export interface Settings {
   edgeLabelWeight: string;
   edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   stagePadding: number;
+  zoomToSizeRatioFunction: (ratio: number) => number;
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
@@ -93,6 +94,7 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeLabelWeight: "normal",
   edgeLabelColor: { attribute: "color" },
   stagePadding: 30,
+  zoomToSizeRatioFunction: Math.sqrt,
 
   // Labels
   labelDensity: 1,
