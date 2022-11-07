@@ -17,10 +17,6 @@ export abstract class AbstractNodeProgram {
 // --------------------------
 // Typical Sigma node program
 // --------------------------
-
-// TODO: edge vs. node
-// TODO: indices
-
 export interface AttributeSpecification {
   name: string;
   size: number;
@@ -133,7 +129,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
 
   private bufferData(): void {
     const gl = this.gl;
-    gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    this.gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
   // NOTE: implementing `reallocateIndices` is optional
@@ -165,23 +161,16 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     let i = offset * this.STRIDE;
 
     // NOTE: dealing with the hidden issues automatically
-    if (!hidden) return this.processShownItem(this.array, i, data);
+    if (!hidden) return this.processShownItem(i, data);
 
     for (let l = i + this.STRIDE; i < l; i++) {
       this.array[i] = 0;
     }
   }
 
-  // NOTE: I chose to explicitly pass members of the class to the methods
-  // such as this.gl etc. but this could be dropped, I just feel it makes
-  // the class easier to implement, regarding our usual practice
-  abstract processShownItem(array: Float32Array, i: number, data: NodeDisplayData): void;
-  abstract setUniforms(
-    gl: WebGLRenderingContext,
-    locations: Record<string, WebGLUniformLocation>,
-    params: RenderParams,
-  ): void;
-  abstract draw(gl: WebGLRenderingContext, params: RenderParams): void;
+  abstract processShownItem(i: number, data: NodeDisplayData): void;
+  abstract setUniforms(params: RenderParams): void;
+  abstract draw(params: RenderParams): void;
 
   render(params: RenderParams): void {
     if (this.hasNothingToRender()) return;
@@ -189,8 +178,8 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     this.bind();
     this.bufferData();
     this.gl.useProgram(this.program);
-    this.setUniforms(this.gl, this.uniformLocations, params);
-    this.draw(this.gl, params);
+    this.setUniforms(params);
+    this.draw(params);
   }
 }
 
@@ -215,7 +204,9 @@ export class NodeFastProgram extends NodeProgram {
     { name: "a_angle", size: 1, type: FLOAT },
   ];
 
-  processShownItem(array: Float32Array, i: number, data: NodeDisplayData): void {
+  processShownItem(i: number, data: NodeDisplayData): void {
+    const array = this.array;
+
     const color = floatColor(data.color);
 
     array[i++] = data.x;
@@ -224,17 +215,17 @@ export class NodeFastProgram extends NodeProgram {
     array[i] = color;
   }
 
-  setUniforms(
-    gl: WebGLRenderingContext,
-    { u_matrix, u_sqrtZoomRatio, u_correctionRatio }: Record<string, WebGLUniformLocation>,
-    params: RenderParams,
-  ): void {
+  setUniforms(params: RenderParams): void {
+    const gl = this.gl;
+    const { u_matrix, u_sqrtZoomRatio, u_correctionRatio } = this.uniformLocations;
+
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_sqrtZoomRatio, Math.sqrt(params.ratio));
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
   }
 
-  draw(gl: WebGLRenderingContext, _params: RenderParams): void {
+  draw(_params: RenderParams): void {
+    const gl = this.gl;
     gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }
 }
