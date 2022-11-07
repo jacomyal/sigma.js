@@ -1,7 +1,7 @@
 import type Sigma from "../../../../sigma";
 import type { NodeDisplayData } from "../../../../types";
 import type { RenderParams } from "./program";
-import { floatColor } from "../../../../utils";
+import { floatColor, canUse32BitsIndices } from "../../../../utils";
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
 
 // ---------------------------------------------------------------------
@@ -39,8 +39,12 @@ export abstract class NodeProgram implements AbstractNodeProgram {
 
   renderer: Sigma;
   gl: WebGLRenderingContext;
+  canUse32BitsIndices: boolean;
+  indicesType: number;
+  IndicesArray: Uint16ArrayConstructor | Uint32ArrayConstructor;
   buffer: WebGLBuffer;
   array: Float32Array = new Float32Array();
+  indicesArray: Uint16Array | Uint32Array | null = null;
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
   program: WebGLProgram;
@@ -64,9 +68,11 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     this.fragmentShader = fragmentShader;
     this.program = program;
 
-    this.initMembers();
-    this.initLocations();
-    this.bind();
+    this.canUse32BitsIndices = canUse32BitsIndices(this.gl);
+    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+    this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
+
+    this.init();
   }
 
   private loadProgram() {
@@ -77,11 +83,9 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     return [vertexShader, fragmentShader, program];
   }
 
-  private initMembers() {
+  private init() {
     this.STRIDE = this.VERTICES * this.ARRAY_ITEMS_PER_VERTEX;
-  }
 
-  private initLocations() {
     this.UNIFORMS.forEach((uniformName) => {
       const location = this.gl.getUniformLocation(this.program, uniformName);
       if (location === null) throw new Error(`Program: error while getting location for uniform "${uniformName}".`);
@@ -132,6 +136,11 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
   }
 
+  // NOTE: implementing `reallocateIndices` is optional
+  reallocateIndices(_IndicesArray: Uint16ArrayConstructor | Uint32ArrayConstructor, _capacity: number): void {
+    return;
+  }
+
   reallocate(capacity: number): void {
     // NOTE: we should test here capacity changes and assess whether arrays
     // must be dynamically reallocated or not. This makes the keepArrays
@@ -144,6 +153,8 @@ export abstract class NodeProgram implements AbstractNodeProgram {
     this.capacity = capacity;
     this.verticesCount = this.VERTICES * capacity;
     this.array = new Float32Array(this.verticesCount * this.ARRAY_ITEMS_PER_VERTEX);
+
+    if (typeof this.reallocateIndices === "function") this.reallocateIndices(this.IndicesArray, capacity);
   }
 
   hasNothingToRender(): boolean {
