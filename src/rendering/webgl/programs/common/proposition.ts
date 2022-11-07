@@ -24,7 +24,7 @@ export interface AttributeSpecification {
   normalized?: boolean;
 }
 
-export abstract class NodeProgram<Uniform extends string> implements AbstractNodeProgram {
+export abstract class NodeProgram<Uniform extends string = string> implements AbstractNodeProgram {
   abstract readonly VERTICES: number;
   abstract readonly ARRAY_ITEMS_PER_VERTEX: number;
   abstract readonly VERTEX_SHADER_SOURCE: string;
