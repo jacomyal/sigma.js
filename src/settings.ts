@@ -13,8 +13,9 @@ import drawHover from "./rendering/canvas/hover";
 import drawEdgeLabel from "./rendering/canvas/edge-label";
 import { EdgeDisplayData, NodeDisplayData } from "./types";
 import NodePointProgram from "./rendering/webgl/programs/node.point";
-import EdgeRectangleProgram from "./rendering/webgl/programs/edge.rectangle";
-import EdgeArrowProgram from "./rendering/webgl/programs/edge.arrow";
+import EdgeLineProgram from "./rendering/webgl/programs/edge.line";
+// import EdgeRectangleProgram from "./rendering/webgl/programs/edge.rectangle";
+// import EdgeArrowProgram from "./rendering/webgl/programs/edge.arrow";
 import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
 import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
 
@@ -129,8 +130,8 @@ export const DEFAULT_NODE_PROGRAM_CLASSES = {
 };
 
 export const DEFAULT_EDGE_PROGRAM_CLASSES = {
-  arrow: EdgeArrowProgram,
-  line: EdgeRectangleProgram,
+  arrow: EdgeLineProgram,
+  line: EdgeLineProgram,
 };
 
 export function validateSettings(settings: Settings): void {

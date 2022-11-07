@@ -4,101 +4,35 @@
  *
  * @module
  */
-import { AbstractProgram, IProgram, RenderParams } from "./program";
-import { NodeDisplayData } from "../../../../types";
 import Sigma from "../../../../sigma";
+import { AbstractProgram, Program, RenderParams } from "./program";
+import { NodeDisplayData } from "../../../../types";
 
-export interface INodeProgram extends IProgram {
-  process(data: NodeDisplayData, hidden: boolean, offset: number): void;
-  render(params: RenderParams): void;
+export abstract class AbstractNodeProgram extends AbstractProgram {
+  abstract process(offset: number, data: NodeDisplayData): void;
 }
 
-/**
- * Node Program class.
- *
- * @constructor
- */
-export abstract class AbstractNodeProgram extends AbstractProgram implements INodeProgram {
-  positionLocation: GLint;
-  sizeLocation: GLint;
-  colorLocation: GLint;
-  matrixLocation: WebGLUniformLocation;
-  sizeRatioLocation: WebGLUniformLocation;
-  pixelRatioLocation: WebGLUniformLocation;
+export abstract class NodeProgram<Uniform extends string = string>
+  extends Program<Uniform>
+  implements AbstractNodeProgram
+{
+  process(offset: number, data: NodeDisplayData): void {
+    let i = offset * this.STRIDE;
+    // NOTE: dealing with hidden items automatically
+    if (data.hidden) {
+      for (let l = i + this.STRIDE; i < l; i++) {
+        this.array[i] = 0;
+      }
+      return;
+    }
 
-  constructor(
-    gl: WebGLRenderingContext,
-    vertexShaderSource: string,
-    fragmentShaderSource: string,
-    points: number,
-    attributes: number,
-  ) {
-    super(gl, vertexShaderSource, fragmentShaderSource, points, attributes);
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.sizeLocation = gl.getAttribLocation(this.program, "a_size");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-
-    // Uniform Location
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("AbstractNodeProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
-    if (sizeRatioLocation === null) throw new Error("AbstractNodeProgram: error while getting sizeRatioLocation");
-    this.sizeRatioLocation = sizeRatioLocation;
-
-    const pixelRatioLocation = gl.getUniformLocation(this.program, "u_pixelRatio");
-    if (pixelRatioLocation === null) throw new Error("AbstractNodeProgram: error while getting pixelRatioLocation");
-    this.pixelRatioLocation = pixelRatioLocation;
+    return this.processShownItem(i, data);
   }
-
-  render(params: RenderParams): void {
-    if (this.hasNothingToRender()) return;
-
-    const gl = this.gl;
-    const program = this.program;
-
-    gl.useProgram(program);
-
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
-    gl.uniform1f(this.pixelRatioLocation, params.pixelRatio);
-
-    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / this.attributes);
-  }
-
-  bind(): void {
-    const gl = this.gl;
-
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.sizeLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      0,
-    );
-    gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      12,
-    );
-  }
-
-  abstract process(data: NodeDisplayData, hidden: boolean, offset: number): void;
+  abstract processShownItem(i: number, data: NodeDisplayData): void;
 }
 
 export interface NodeProgramConstructor {
-  new (gl: WebGLRenderingContext, renderer: Sigma): INodeProgram;
+  new (gl: WebGLRenderingContext, renderer: Sigma): AbstractNodeProgram;
 }
 
 /**
@@ -110,35 +44,25 @@ export interface NodeProgramConstructor {
  * @return {function}
  */
 export function createNodeCompoundProgram(programClasses: Array<NodeProgramConstructor>): NodeProgramConstructor {
-  return class NodeCompoundProgram implements INodeProgram {
-    programs: Array<INodeProgram>;
+  return class NodeCompoundProgram implements AbstractNodeProgram {
+    programs: Array<AbstractNodeProgram>;
 
     constructor(gl: WebGLRenderingContext, renderer: Sigma) {
-      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl, renderer));
-    }
-
-    bufferData(): void {
-      this.programs.forEach((program) => program.bufferData());
-    }
-
-    allocate(capacity: number): void {
-      this.programs.forEach((program) => program.allocate(capacity));
-    }
-
-    bind(): void {
-      // nothing todo, it's already done in each program constructor
-    }
-
-    render(params: RenderParams): void {
-      this.programs.forEach((program) => {
-        program.bind();
-        program.bufferData();
-        program.render(params);
+      this.programs = programClasses.map((Program) => {
+        return new Program(gl, renderer);
       });
     }
 
-    process(data: NodeDisplayData, hidden: boolean, offset: number): void {
-      this.programs.forEach((program) => program.process(data, hidden, offset));
+    reallocate(capacity: number): void {
+      this.programs.forEach((program) => program.reallocate(capacity));
+    }
+
+    process(offset: number, data: NodeDisplayData): void {
+      this.programs.forEach((program) => program.process(offset, data));
+    }
+
+    render(params: RenderParams): void {
+      this.programs.forEach((program) => program.render(params));
     }
   };
 }

@@ -4,94 +4,75 @@
  *
  * @module
  */
-import { AbstractProgram, IProgram, RenderParams } from "./program";
-import { EdgeDisplayData, NodeDisplayData } from "../../../../types";
 import Sigma from "../../../../sigma";
+import { AbstractProgram, Program, RenderParams } from "./program";
+import { NodeDisplayData, EdgeDisplayData } from "../../../../types";
 
-export interface IEdgeProgram extends IProgram {
-  computeIndices(): void;
-  process(
+export abstract class AbstractEdgeProgram extends AbstractProgram {
+  abstract process(
+    offset: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
-    hidden: boolean,
-    offset: number,
   ): void;
-  render(params: RenderParams): void;
 }
 
-/**
- * Edge Program class.
- *
- * @constructor
- */
-export abstract class AbstractEdgeProgram extends AbstractProgram implements IEdgeProgram {
-  constructor(
-    gl: WebGLRenderingContext,
-    vertexShaderSource: string,
-    fragmentShaderSource: string,
-    points: number,
-    attributes: number,
-  ) {
-    super(gl, vertexShaderSource, fragmentShaderSource, points, attributes);
-  }
+export abstract class EdgeProgram<Uniform extends string = string>
+  extends Program<Uniform>
+  implements AbstractEdgeProgram
+{
+  process(offset: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData): void {
+    let i = offset * this.STRIDE;
+    // NOTE: dealing with hidden items automatically
+    if (data.hidden || sourceData.hidden || targetData.hidden) {
+      for (let l = i + this.STRIDE; i < l; i++) {
+        this.array[i] = 0;
+      }
+      return;
+    }
 
-  abstract bind(): void;
-  abstract computeIndices(): void;
-  abstract process(
+    return this.processShownItem(i, sourceData, targetData, data);
+  }
+  abstract processShownItem(
+    i: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
-    hidden: boolean,
-    offset: number,
   ): void;
-  abstract render(params: RenderParams): void;
 }
 
 export interface EdgeProgramConstructor {
-  new (gl: WebGLRenderingContext, renderer: Sigma): IEdgeProgram;
+  new (gl: WebGLRenderingContext, renderer: Sigma): AbstractEdgeProgram;
 }
 
+/**
+ * Helper function combining two or more programs into a single compound one.
+ * Note that this is more a quick & easy way to combine program than a really
+ * performant option. More performant programs can be written entirely.
+ *
+ * @param  {array}    programClasses - Program classes to combine.
+ * @return {function}
+ */
 export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConstructor>): EdgeProgramConstructor {
-  return class EdgeCompoundProgram implements IEdgeProgram {
-    programs: Array<IEdgeProgram>;
+  return class EdgeCompoundProgram implements AbstractEdgeProgram {
+    programs: Array<AbstractEdgeProgram>;
 
     constructor(gl: WebGLRenderingContext, renderer: Sigma) {
-      this.programs = programClasses.map((ProgramClass) => new ProgramClass(gl, renderer));
-    }
-
-    bufferData(): void {
-      this.programs.forEach((program) => program.bufferData());
-    }
-
-    allocate(capacity: number): void {
-      this.programs.forEach((program) => program.allocate(capacity));
-    }
-
-    bind(): void {
-      // nothing todo, it's already done in each program constructor
-    }
-
-    computeIndices(): void {
-      this.programs.forEach((program) => program.computeIndices());
-    }
-
-    render(params: RenderParams): void {
-      this.programs.forEach((program) => {
-        program.bind();
-        program.bufferData();
-        program.render(params);
+      this.programs = programClasses.map((Program) => {
+        return new Program(gl, renderer);
       });
     }
 
-    process(
-      sourceData: NodeDisplayData,
-      targetData: NodeDisplayData,
-      data: EdgeDisplayData,
-      hidden: boolean,
-      offset: number,
-    ): void {
-      this.programs.forEach((program) => program.process(sourceData, targetData, data, hidden, offset));
+    reallocate(capacity: number): void {
+      this.programs.forEach((program) => program.reallocate(capacity));
+    }
+
+    process(offset: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData): void {
+      this.programs.forEach((program) => program.process(offset, sourceData, targetData, data));
+    }
+
+    render(params: RenderParams): void {
+      this.programs.forEach((program) => program.render(params));
     }
   };
 }

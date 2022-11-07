@@ -38,8 +38,8 @@ import {
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, validateSettings, resolveSettings } from "./settings";
-import { INodeProgram } from "./rendering/webgl/programs/common/node";
-import { IEdgeProgram } from "./rendering/webgl/programs/common/edge";
+import { AbstractNodeProgram } from "./rendering/webgl/programs/common/node";
+import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
@@ -196,13 +196,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private renderFrame: number | null = null;
   private renderHighlightedNodesFrame: number | null = null;
   private needToProcess = false;
-  private needToSoftProcess = false;
   private checkEdgesEventsFrame: number | null = null;
 
   // Programs
-  private nodePrograms: { [key: string]: INodeProgram } = {};
-  private nodeHoverPrograms: { [key: string]: INodeProgram } = {};
-  private edgePrograms: { [key: string]: IEdgeProgram } = {};
+  private nodePrograms: { [key: string]: AbstractNodeProgram } = {};
+  private nodeHoverPrograms: { [key: string]: AbstractNodeProgram } = {};
+  private edgePrograms: { [key: string]: AbstractEdgeProgram } = {};
 
   private camera: Camera;
 
@@ -441,7 +440,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private bindEventHandlers(): this {
     // Handling window resize
     this.activeListeners.handleResize = () => {
-      this.needToSoftProcess = true;
       this._scheduleRefresh();
     };
 
@@ -557,11 +555,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this._scheduleRefresh();
     };
 
-    this.activeListeners.softGraphUpdate = () => {
-      this.needToSoftProcess = true;
-      this._scheduleRefresh();
-    };
-
     this.activeListeners.dropNodeGraphUpdate = (e: { key: string }): void => {
       delete this.nodeDataCache[e.key];
 
@@ -594,11 +587,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     graph.on("nodeAdded", this.activeListeners.graphUpdate);
     graph.on("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
-    graph.on("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.on("nodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.on("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.on("edgeAdded", this.activeListeners.graphUpdate);
     graph.on("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
-    graph.on("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.on("edgeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.on("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.on("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
     graph.on("cleared", this.activeListeners.clearGraphUpdate);
@@ -616,11 +609,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     graph.removeListener("nodeAdded", this.activeListeners.graphUpdate);
     graph.removeListener("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
-    graph.removeListener("nodeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("nodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
     graph.removeListener("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
-    graph.removeListener("edgeAttributesUpdated", this.activeListeners.softGraphUpdate);
+    graph.removeListener("edgeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
     graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
     graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
@@ -721,7 +714,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Sigma}
    */
-  private process(keepArrays = false): this {
+  private process(): this {
     const graph = this.graph;
     const settings = this.settings;
     const dimensions = this.getDimensions();
@@ -798,7 +791,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         throw new Error(`Sigma: could not find a suitable program for node type "${type}"!`);
       }
 
-      if (!keepArrays) this.nodePrograms[type].allocate(nodesPerPrograms[type] || 0);
+      this.nodePrograms[type].reallocate(nodesPerPrograms[type] || 0);
       // We reset that count here, so that we can reuse it while calling the Program#process methods:
       nodesPerPrograms[type] = 0;
     }
@@ -819,7 +812,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const nodeProgram = this.nodePrograms[data.type];
       if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-      nodeProgram.process(data, data.hidden, nodesPerPrograms[data.type]++);
+      nodeProgram.process(nodesPerPrograms[data.type]++, data);
 
       // Save the node in the highlighted set if needed
       if (data.highlighted && !data.hidden) this.highlightedNodes.add(node);
@@ -863,7 +856,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         throw new Error(`Sigma: could not find a suitable program for edge type "${type}"!`);
       }
 
-      if (!keepArrays) this.edgePrograms[type].allocate(edgesPerPrograms[type] || 0);
+      this.edgePrograms[type].reallocate(edgesPerPrograms[type] || 0);
       // We reset that count here, so that we can reuse it while calling the Program#process methods:
       edgesPerPrograms[type] = 0;
     }
@@ -880,14 +873,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         sourceData = this.nodeDataCache[extremities[0]],
         targetData = this.nodeDataCache[extremities[1]];
 
-      const hidden = data.hidden || sourceData.hidden || targetData.hidden;
-      this.edgePrograms[data.type].process(sourceData, targetData, data, hidden, edgesPerPrograms[data.type]++);
-    }
-
-    for (const type in this.edgePrograms) {
-      const program = this.edgePrograms[type];
-
-      if (!keepArrays && typeof program.computeIndices === "function") program.computeIndices();
+      this.edgePrograms[data.type].process(edgesPerPrograms[data.type]++, sourceData, targetData, data);
     }
 
     return this;
@@ -915,13 +901,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Do we need to process data?
     if (this.needToProcess) {
       this.process();
-    } else if (this.needToSoftProcess) {
-      this.process(true);
     }
 
     // Resetting state
     this.needToProcess = false;
-    this.needToSoftProcess = false;
 
     // Rendering
     this.render();
@@ -1147,14 +1130,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     });
     // 2. Allocate for each type for the proper number of nodes
     for (const type in this.nodeHoverPrograms) {
-      this.nodeHoverPrograms[type].allocate(nodesPerPrograms[type] || 0);
+      this.nodeHoverPrograms[type].reallocate(nodesPerPrograms[type] || 0);
       // Also reset count, to use when rendering:
       nodesPerPrograms[type] = 0;
     }
     // 3. Process all nodes to render:
     nodesToRender.forEach((node) => {
       const data = this.nodeDataCache[node];
-      this.nodeHoverPrograms[data.type].process(data, data.hidden, nodesPerPrograms[data.type]++);
+      this.nodeHoverPrograms[data.type].process(nodesPerPrograms[data.type]++, data);
     });
     // 4. Clear hovered nodes layer:
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
@@ -1162,8 +1145,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (const type in this.nodeHoverPrograms) {
       const program = this.nodeHoverPrograms[type];
 
-      program.bind();
-      program.bufferData();
       program.render({
         matrix: this.matrix,
         width: this.width,
@@ -1211,7 +1192,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       cancelFrame(this.renderFrame);
       this.renderFrame = null;
       this.needToProcess = false;
-      this.needToSoftProcess = false;
     }
 
     // First we need to resize
@@ -1244,21 +1224,21 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
     this.correctionRatio = getMatrixImpact(this.matrix, cameraState, viewportDimensions);
 
+    const params = {
+      matrix: this.matrix,
+      width: this.width,
+      height: this.height,
+      pixelRatio: this.pixelRatio,
+      zoomRatio: this.camera.ratio,
+      sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+      correctionRatio: this.correctionRatio,
+    };
+
     // Drawing nodes
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
 
-      program.bind();
-      program.bufferData();
-      program.render({
-        matrix: this.matrix,
-        width: this.width,
-        height: this.height,
-        pixelRatio: this.pixelRatio,
-        zoomRatio: this.camera.ratio,
-        sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
-        correctionRatio: this.correctionRatio,
-      });
+      program.render(params);
     }
 
     // Drawing edges
@@ -1266,17 +1246,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       for (const type in this.edgePrograms) {
         const program = this.edgePrograms[type];
 
-        program.bind();
-        program.bufferData();
-        program.render({
-          matrix: this.matrix,
-          width: this.width,
-          height: this.height,
-          pixelRatio: this.pixelRatio,
-          zoomRatio: this.camera.ratio,
-          sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
-          correctionRatio: this.correctionRatio,
-        });
+        program.render(params);
       }
     }
 

@@ -6,87 +6,36 @@
  * won't render thickness correctly on some GPUs and has some quirks.
  * @module
  */
-import { EdgeDisplayData, NodeDisplayData } from "../../../types";
+import { NodeDisplayData, EdgeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
+import { EdgeProgram } from "./common/edge";
+import { RenderParams } from "./common/program";
 import vertexShaderSource from "../shaders/edge.line.vert.glsl";
 import fragmentShaderSource from "../shaders/edge.line.frag.glsl";
-import { AbstractEdgeProgram } from "./common/edge";
-import { RenderParams } from "./common/program";
 
-const POINTS = 2,
-  ATTRIBUTES = 3;
+const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class EdgeLineProgram extends AbstractEdgeProgram {
-  positionLocation: GLint;
-  colorLocation: GLint;
-  matrixLocation: WebGLUniformLocation;
+const UNIFORMS = ["u_matrix"] as const;
 
-  constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
+export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]> {
+  readonly VERTICES = 2;
+  readonly ARRAY_ITEMS_PER_VERTEX = 3;
+  readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
+  readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
+  readonly UNIFORMS = UNIFORMS;
+  readonly ATTRIBUTES = [
+    { name: "a_position", size: 2, type: FLOAT },
+    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+  ];
 
-    // Locations:
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-
-    // Uniform locations:
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("EdgeLineProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    this.bind();
-  }
-
-  bind(): void {
-    const gl = this.gl;
-
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      0,
-    );
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      8,
-    );
-  }
-
-  computeIndices(): void {
-    //nothing to do
-  }
-
-  process(
-    sourceData: NodeDisplayData,
-    targetData: NodeDisplayData,
-    data: EdgeDisplayData,
-    hidden: boolean,
-    offset: number,
-  ): void {
+  processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const array = this.array;
 
-    let i = 0;
-    if (hidden) {
-      for (let l = i + POINTS * ATTRIBUTES; i < l; i++) array[i] = 0;
-      return;
-    }
-
-    const x1 = sourceData.x,
-      y1 = sourceData.y,
-      x2 = targetData.x,
-      y2 = targetData.y,
-      color = floatColor(data.color);
-
-    i = POINTS * ATTRIBUTES * offset;
+    const x1 = sourceData.x;
+    const y1 = sourceData.y;
+    const x2 = targetData.x;
+    const y2 = targetData.y;
+    const color = floatColor(data.color);
 
     // First point
     array[i++] = x1;
@@ -99,16 +48,17 @@ export default class EdgeLineProgram extends AbstractEdgeProgram {
     array[i] = color;
   }
 
-  render(params: RenderParams): void {
-    if (this.hasNothingToRender()) return;
-
+  setUniforms(params: RenderParams): void {
     const gl = this.gl;
-    const program = this.program;
 
-    gl.useProgram(program);
+    const { u_matrix } = this.uniformLocations;
 
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+  }
 
-    gl.drawArrays(gl.LINES, 0, this.array.length / ATTRIBUTES);
+  draw(_params: RenderParams): void {
+    const gl = this.gl;
+
+    gl.drawArrays(gl.LINES, 0, this.verticesCount);
   }
 }

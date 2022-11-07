@@ -9,52 +9,49 @@
  */
 import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
+import { NodeProgram } from "./common/node";
+import { RenderParams } from "./common/program";
 import vertexShaderSource from "../shaders/node.point.vert.glsl";
 import fragmentShaderSource from "../shaders/node.point.frag.glsl";
-import { AbstractNodeProgram } from "./common/node";
-import { RenderParams } from "./common/program";
 
-const POINTS = 1,
-  ATTRIBUTES = 4;
+const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class NodePointProgram extends AbstractNodeProgram {
-  constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
-    this.bind();
-  }
+const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
-  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
+export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number]> {
+  readonly VERTICES = 1;
+  readonly ARRAY_ITEMS_PER_VERTEX = 4;
+  readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
+  readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
+  readonly UNIFORMS = UNIFORMS;
+  readonly ATTRIBUTES = [
+    { name: "a_position", size: 2, type: FLOAT },
+    { name: "a_size", size: 1, type: FLOAT },
+    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+  ];
+
+  processShownItem(i: number, data: NodeDisplayData) {
     const array = this.array;
-    let i = offset * POINTS * ATTRIBUTES;
-
-    if (hidden) {
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      return;
-    }
-
-    const color = floatColor(data.color);
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
-    array[i] = color;
+    array[i] = floatColor(data.color);
   }
 
-  render(params: RenderParams): void {
-    if (this.hasNothingToRender()) return;
-
+  setUniforms(params: RenderParams): void {
     const gl = this.gl;
 
-    const program = this.program;
-    gl.useProgram(program);
+    const { u_sizeRatio, u_pixelRatio, u_matrix } = this.uniformLocations;
 
-    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
-    gl.uniform1f(this.pixelRatioLocation, params.pixelRatio);
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_pixelRatio, params.pixelRatio);
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+  }
 
-    gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
+  draw(_params: RenderParams): void {
+    const gl = this.gl;
+
+    gl.drawArrays(gl.POINTS, 0, this.verticesCount);
   }
 }
