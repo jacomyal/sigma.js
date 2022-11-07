@@ -24,12 +24,12 @@ export interface AttributeSpecification {
   normalized?: boolean;
 }
 
-export abstract class NodeProgram implements AbstractNodeProgram {
+export abstract class NodeProgram<Uniform extends string> implements AbstractNodeProgram {
   abstract readonly VERTICES: number;
   abstract readonly ARRAY_ITEMS_PER_VERTEX: number;
   abstract readonly VERTEX_SHADER_SOURCE: string;
   abstract readonly FRAGMENT_SHADER_SOURCE: string;
-  abstract readonly UNIFORMS: Array<string>;
+  abstract readonly UNIFORMS: ReadonlyArray<Uniform>;
   abstract readonly ATTRIBUTES: Array<AttributeSpecification>;
   STRIDE: number = 0;
 
@@ -44,7 +44,7 @@ export abstract class NodeProgram implements AbstractNodeProgram {
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
   program: WebGLProgram;
-  uniformLocations: Record<string, WebGLUniformLocation> = {};
+  uniformLocations = {} as Record<Uniform, WebGLUniformLocation>;
   attributeLocations: Record<string, GLint> = {};
   capacity = 0;
   verticesCount = 0;
@@ -191,12 +191,14 @@ import fragmentShaderSource from "../shaders/node.frag.glsl";
 
 const { FLOAT, UNSIGNED_BYTE } = WebGLRenderingContext;
 
-export class NodeFastProgram extends NodeProgram {
+const UNIFORMS = ["u_matrix", "u_sqrtZoomRatio", "u_correctionRatio"] as const;
+
+export class NodeFastProgram extends NodeProgram<typeof UNIFORMS[number]> {
   readonly VERTICES = 1;
   readonly ARRAY_ITEMS_PER_VERTEX = 5;
   readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
   readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  readonly UNIFORMS = ["u_matrix", "u_sqrtZoomRatio", "u_correctionRatio"];
+  readonly UNIFORMS = UNIFORMS;
   readonly ATTRIBUTES = [
     { name: "a_position", size: 2, type: FLOAT },
     { name: "a_size", size: 1, type: FLOAT },
