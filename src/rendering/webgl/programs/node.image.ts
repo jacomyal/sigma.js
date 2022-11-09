@@ -204,8 +204,8 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
   return class NodeImageProgram extends NodeProgram<typeof UNIFORMS[number]> {
     getDefinition() {
       return {
-        VERTICES: 3,
-        ARRAY_ITEMS_PER_VERTEX: 5,
+        VERTICES: 1,
+        ARRAY_ITEMS_PER_VERTEX: 8,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
         UNIFORMS,

@@ -1,5 +1,5 @@
 /**
- * This class copies sigma/rendering/webgl/programs/node.fast, but with a tiny
+ * This class copies sigma/rendering/webgl/programs/node.circle, but with a tiny
  * difference: The fragment shader ("./node.border.frag.glsl") draws a white
  * disc with a colored border.
  */

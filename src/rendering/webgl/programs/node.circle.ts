@@ -21,7 +21,7 @@ const ANGLE_1 = 0;
 const ANGLE_2 = (2 * Math.PI) / 3;
 const ANGLE_3 = (4 * Math.PI) / 3;
 
-const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
 export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[number]> {
   getDefinition() {
@@ -67,10 +67,10 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
   setUniforms(params: RenderParams): void {
     const gl = this.gl;
 
-    const { u_sizeRatio, u_pixelRatio, u_matrix } = this.uniformLocations;
+    const { u_sizeRatio, u_correctionRatio, u_matrix } = this.uniformLocations;
 
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
-    gl.uniform1f(u_pixelRatio, params.pixelRatio);
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
   }
 
