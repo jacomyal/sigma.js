@@ -273,7 +273,9 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       }
     }
 
-    setUniforms(params: RenderParams): void {
+    draw(params: RenderParams): void {
+      this.latestRenderParams = params;
+
       const gl = this.gl;
 
       const { u_sizeRatio, u_pixelRatio, u_matrix, u_atlas } = this.uniformLocations;
@@ -282,12 +284,6 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       gl.uniform1f(u_pixelRatio, params.pixelRatio);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
-    }
-
-    draw(params: RenderParams): void {
-      const gl = this.gl;
-
-      this.latestRenderParams = params;
 
       gl.drawArrays(gl.POINTS, 0, this.verticesCount);
     }

@@ -64,7 +64,7 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
     array[i] = ANGLE_3;
   }
 
-  setUniforms(params: RenderParams): void {
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
     const { u_sizeRatio, u_correctionRatio, u_matrix } = this.uniformLocations;
@@ -72,10 +72,6 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-  }
-
-  draw(_params: RenderParams): void {
-    const gl = this.gl;
 
     gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }

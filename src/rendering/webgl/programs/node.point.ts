@@ -43,7 +43,7 @@ export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number
     array[i] = floatColor(data.color);
   }
 
-  setUniforms(params: RenderParams): void {
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
     const { u_sizeRatio, u_pixelRatio, u_matrix } = this.uniformLocations;
@@ -51,10 +51,6 @@ export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-  }
-
-  draw(_params: RenderParams): void {
-    const gl = this.gl;
 
     gl.drawArrays(gl.POINTS, 0, this.verticesCount);
   }

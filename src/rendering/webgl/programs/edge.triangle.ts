@@ -77,7 +77,7 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
     array[i] = color;
   }
 
-  setUniforms(params: RenderParams): void {
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
     const { u_matrix, u_sizeRatio, u_correctionRatio } = this.uniformLocations;
@@ -85,10 +85,6 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
-  }
-
-  draw(_params: RenderParams): void {
-    const gl = this.gl;
 
     gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }

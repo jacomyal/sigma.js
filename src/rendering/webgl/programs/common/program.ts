@@ -190,7 +190,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     return this.verticesCount === 0;
   }
 
-  abstract setUniforms(params: RenderParams): void;
   abstract draw(params: RenderParams): void;
 
   render(params: RenderParams): void {
@@ -199,7 +198,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     this.bind();
     this.bufferData();
     this.gl.useProgram(this.program);
-    this.setUniforms(params);
     this.draw(params);
   }
 }

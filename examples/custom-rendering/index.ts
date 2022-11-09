@@ -73,5 +73,5 @@ const renderer = new Sigma(graph, container, {
 });
 
 // Create the spring layout and start it
-// const layout = new ForceSupervisor(graph);
-// layout.start();
+const layout = new ForceSupervisor(graph);
+layout.start();

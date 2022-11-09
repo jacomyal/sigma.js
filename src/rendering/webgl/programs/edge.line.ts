@@ -52,16 +52,12 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
     array[i] = color;
   }
 
-  setUniforms(params: RenderParams): void {
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
     const { u_matrix } = this.uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-  }
-
-  draw(_params: RenderParams): void {
-    const gl = this.gl;
 
     gl.drawArrays(gl.LINES, 0, this.verticesCount);
   }

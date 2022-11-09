@@ -113,7 +113,7 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     array[i] = color;
   }
 
-  setUniforms(params: RenderParams): void {
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
     const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio } = this.uniformLocations;
@@ -122,10 +122,6 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     gl.uniform1f(u_zoomRatio, params.zoomRatio);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
-  }
-
-  draw(_params: RenderParams): void {
-    const gl = this.gl;
 
     if (!this.indicesArray) throw new Error("EdgeRectangleProgram: indicesArray should be allocated when drawing!");
 
