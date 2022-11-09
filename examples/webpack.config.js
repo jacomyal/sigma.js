@@ -20,9 +20,22 @@ module.exports = {
         __dirname,
         "../src/rendering/webgl/programs/common/node.ts",
       ),
+      "sigma/rendering/webgl/programs/common/edge": path.resolve(
+        __dirname,
+        "../src/rendering/webgl/programs/common/edge.ts",
+      ),
+      "sigma/rendering/webgl/programs/common/edge.fast.frag.glsl": path.resolve(
+        __dirname,
+        "../src/rendering/webgl/programs/common/edge.fast.frag.glsl",
+      ),
+      "sigma/rendering/webgl/shaders": path.resolve(
+        __dirname, 
+        "../src/rendering/webgl/shaders/",
+      ),
       sigma: path.resolve(__dirname, "../src/index.ts"),
-    },
-  },
+      "apache-arrow": require.resolve("apache-arrow/Arrow.es2015.min")
+    }
+},
   module: {
     rules: [
       {

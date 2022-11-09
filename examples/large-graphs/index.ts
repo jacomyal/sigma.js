@@ -55,6 +55,7 @@ graph.forEachNode((node, { cluster }) => {
     color: colors[cluster + ""],
   });
 });
+console.log(graph);
 
 // 4. Render the graph:
 const container = document.getElementById("sigma-container") as HTMLElement;
