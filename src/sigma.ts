@@ -277,8 +277,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.handleSettingsUpdate();
 
     // Processing data for the first time & render
-    this.process();
-    this.render();
+    this.refresh();
   }
 
   /**---------------------------------------------------------------------------
@@ -368,7 +367,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private bindCameraHandlers(): this {
     this.activeListeners.camera = () => {
-      this._scheduleRefresh();
+      this.scheduleRender();
     };
 
     this.camera.on("updated", this.activeListeners.camera);
@@ -440,7 +439,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private bindEventHandlers(): this {
     // Handling window resize
     this.activeListeners.handleResize = () => {
-      this._scheduleRefresh();
+      this.scheduleRender();
     };
 
     window.addEventListener("resize", this.activeListeners.handleResize);
@@ -551,8 +550,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const graph = this.graph;
 
     this.activeListeners.graphUpdate = () => {
-      this.needToProcess = true;
-      this._scheduleRefresh();
+      this.scheduleRefresh();
     };
 
     this.activeListeners.dropNodeGraphUpdate = (e: { key: string }): void => {
@@ -892,44 +890,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Method that decides whether to reprocess graph or not, and then render the
-   * graph.
-   *
-   * @return {Sigma}
-   */
-  private _refresh(): this {
-    // Do we need to process data?
-    if (this.needToProcess) {
-      this.process();
-    }
-
-    // Resetting state
-    this.needToProcess = false;
-
-    // Rendering
-    this.render();
-
-    return this;
-  }
-
-  /**
-   * Method that schedules a `_refresh` call if none has been scheduled yet. It
-   * will then be processed next available frame.
-   *
-   * @return {Sigma}
-   */
-  private _scheduleRefresh(): this {
-    if (!this.renderFrame) {
-      this.renderFrame = requestFrame(() => {
-        this._refresh();
-        this.renderFrame = null;
-      });
-    }
-
-    return this;
-  }
-
-  /**
    * Method used to render labels.
    *
    * @return {Sigma}
@@ -1191,17 +1151,20 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     if (this.renderFrame) {
       cancelFrame(this.renderFrame);
       this.renderFrame = null;
-      this.needToProcess = false;
     }
 
     // First we need to resize
     this.resize();
 
-    // Clearing the canvases
-    this.clear();
-
     // Recomputing useful camera-related values:
     this.updateCachedValues();
+
+    // Do we need to reprocess data?
+    if (this.needToProcess) this.process();
+    this.needToProcess = false;
+
+    // Clearing the canvases
+    this.clear();
 
     // If we have no nodes we can stop right there
     if (!this.graph.order) return exitRender();
@@ -1336,8 +1299,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.bindGraphHandlers();
 
     // Re-rendering now to avoid discrepancies from now to next frame
-    this.process();
-    this.render();
+    this.refresh();
   }
 
   /**
@@ -1437,8 +1399,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.settings[key] = value;
     validateSettings(this.settings);
     this.handleSettingsUpdate();
-    this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-    this._scheduleRefresh();
+    this.scheduleRefresh();
     return this;
   }
 
@@ -1454,8 +1415,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.settings[key] = updater(this.settings[key]);
     validateSettings(this.settings);
     this.handleSettingsUpdate();
-    this.needToProcess = true; // TODO: some keys may work with only needToSoftProcess or even nothing
-    this._scheduleRefresh();
+    this.scheduleRefresh();
     return this;
   }
 
@@ -1537,27 +1497,46 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Method used to refresh all computed data.
+   * Method used to refresh, i.e. force the renderer to fully reprocess graph
+   * data and render.
    *
    * @return {Sigma}
    */
   refresh(): this {
     this.needToProcess = true;
-    this._refresh();
+    this.render();
 
     return this;
   }
 
   /**
-   * Method used to refresh all computed data, at the next available frame.
-   * If this method has already been called this frame, then it will only render once at the next available frame.
+   * Method used to schedule a render at the next available frame.
+   * This method can be safely called on a same frame because it basically
+   * debounce refresh to the next frame.
+   *
+   * @return {Sigma}
+   */
+  scheduleRender(): this {
+    if (!this.renderFrame) {
+      this.renderFrame = requestFrame(() => {
+        this.render();
+      });
+    }
+
+    return this;
+  }
+
+  /**
+   * Method used to schedule a refresh (i.e. fully reprocess graph data and render)
+   * at the next available frame.
+   * This method can be safely called on a same frame because it basically
+   * debounce refresh to the next frame.
    *
    * @return {Sigma}
    */
   scheduleRefresh(): this {
     this.needToProcess = true;
-    this._scheduleRefresh();
-
+    this.scheduleRender();
     return this;
   }
 
@@ -1734,7 +1713,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   setCustomBBox(customBBox: { x: Extent; y: Extent } | null): this {
     this.customBBox = customBBox;
-    this._scheduleRefresh();
+    this.scheduleRender();
     return this;
   }
 
