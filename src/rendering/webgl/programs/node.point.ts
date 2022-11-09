@@ -19,12 +19,12 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number]> {
-  readonly VERTICES = 1;
-  readonly ARRAY_ITEMS_PER_VERTEX = 4;
-  readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
-  readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  readonly UNIFORMS = UNIFORMS;
-  readonly ATTRIBUTES = [
+  VERTICES = 1;
+  ARRAY_ITEMS_PER_VERTEX = 4;
+  VERTEX_SHADER_SOURCE = vertexShaderSource;
+  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
+  UNIFORMS = UNIFORMS;
+  ATTRIBUTES = [
     { name: "a_position", size: 2, type: FLOAT },
     { name: "a_size", size: 1, type: FLOAT },
     { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },

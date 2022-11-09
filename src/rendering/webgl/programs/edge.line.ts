@@ -18,12 +18,12 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_matrix"] as const;
 
 export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  readonly VERTICES = 2;
-  readonly ARRAY_ITEMS_PER_VERTEX = 3;
-  readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
-  readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  readonly UNIFORMS = UNIFORMS;
-  readonly ATTRIBUTES = [
+  VERTICES = 2;
+  ARRAY_ITEMS_PER_VERTEX = 3;
+  VERTEX_SHADER_SOURCE = vertexShaderSource;
+  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
+  UNIFORMS = UNIFORMS;
+  ATTRIBUTES = [
     { name: "a_position", size: 2, type: FLOAT },
     { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
   ];

@@ -34,12 +34,12 @@ export abstract class AbstractProgram {
 }
 
 export abstract class Program<Uniform extends string = string> implements AbstractProgram {
-  abstract readonly VERTICES: number;
-  abstract readonly ARRAY_ITEMS_PER_VERTEX: number;
-  abstract readonly VERTEX_SHADER_SOURCE: string;
-  abstract readonly FRAGMENT_SHADER_SOURCE: string;
-  abstract readonly UNIFORMS: ReadonlyArray<Uniform>;
-  abstract readonly ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  abstract VERTICES: number;
+  abstract ARRAY_ITEMS_PER_VERTEX: number;
+  abstract VERTEX_SHADER_SOURCE: string;
+  abstract FRAGMENT_SHADER_SOURCE: string;
+  abstract UNIFORMS: ReadonlyArray<Uniform>;
+  abstract ATTRIBUTES: Array<ProgramAttributeSpecification>;
   STRIDE = 0;
 
   renderer: Sigma;
@@ -83,7 +83,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   private loadProgram() {
     const vertexShader = loadVertexShader(this.gl, this.VERTEX_SHADER_SOURCE);
     const fragmentShader = loadFragmentShader(this.gl, this.FRAGMENT_SHADER_SOURCE);
-    const program = loadProgram(this.gl, [this.vertexShader, this.fragmentShader]);
+    const program = loadProgram(this.gl, [vertexShader, fragmentShader]);
 
     return [vertexShader, fragmentShader, program];
   }
@@ -139,10 +139,14 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   private bufferData(): void {
     const gl = this.gl;
     this.gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+
+    if (this.indicesArray) {
+      this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
+    }
   }
 
   // NOTE: implementing `reallocateIndices` is optional
-  reallocateIndices(_capacity: number): void {
+  reallocateIndices(): void {
     return;
   }
 
@@ -156,7 +160,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     this.verticesCount = this.VERTICES * capacity;
     this.array = new Float32Array(this.verticesCount * this.ARRAY_ITEMS_PER_VERTEX);
 
-    if (typeof this.reallocateIndices === "function") this.reallocateIndices(capacity);
+    if (typeof this.reallocateIndices === "function") this.reallocateIndices();
   }
 
   hasNothingToRender(): boolean {

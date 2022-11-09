@@ -3,53 +3,60 @@
  * difference: The fragment shader ("./node.border.frag.glsl") draws a white
  * disc with a colored border.
  */
-import { floatColor } from "sigma/utils";
+/**
+ * Sigma.js WebGL Renderer Node Program
+ * =====================================
+ *
+ * Simple program rendering nodes using GL_POINTS. This is faster than the
+ * three triangle option but has some quirks and is not supported equally by
+ * every GPU.
+ * @module
+ */
 import { NodeDisplayData } from "sigma/types";
-import { AbstractNodeProgram } from "sigma/rendering/webgl/programs/common/node";
+import { floatColor } from "sigma/utils";
+import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
 import { RenderParams } from "sigma/rendering/webgl/programs/common/program";
-
 import vertexShaderSource from "!raw-loader!./node.border.vert.glsl";
 import fragmentShaderSource from "!raw-loader!./node.border.frag.glsl";
 
-const POINTS = 1,
-  ATTRIBUTES = 4;
+const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class NodeBorderProgram extends AbstractNodeProgram {
-  constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
-    this.bind();
-  }
+const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
-  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
+export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[number]> {
+  VERTICES = 1;
+  ARRAY_ITEMS_PER_VERTEX = 4;
+  VERTEX_SHADER_SOURCE = vertexShaderSource;
+  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
+  UNIFORMS = UNIFORMS;
+  ATTRIBUTES = [
+    { name: "a_position", size: 2, type: FLOAT },
+    { name: "a_size", size: 1, type: FLOAT },
+    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+  ];
+
+  processShownItem(i: number, data: NodeDisplayData) {
     const array = this.array;
-    let i = offset * POINTS * ATTRIBUTES;
-
-    if (hidden) {
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      array[i++] = 0;
-      return;
-    }
-
-    const color = floatColor(data.color);
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
-    array[i] = color;
+    array[i] = floatColor(data.color);
   }
 
-  render(params: RenderParams): void {
+  setUniforms(params: RenderParams): void {
     const gl = this.gl;
 
-    const program = this.program;
-    gl.useProgram(program);
+    const { u_sizeRatio, u_pixelRatio, u_matrix } = this.uniformLocations;
 
-    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
-    gl.uniform1f(this.pixelRatioLocation, params.pixelRatio);
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_pixelRatio, params.pixelRatio);
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+  }
 
-    gl.drawArrays(gl.POINTS, 0, this.array.length / ATTRIBUTES);
+  draw(_params: RenderParams): void {
+    const gl = this.gl;
+
+    gl.drawArrays(gl.POINTS, 0, this.verticesCount);
   }
 }
