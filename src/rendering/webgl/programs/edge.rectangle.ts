@@ -24,20 +24,22 @@ import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_sizeRatio", "u_correctionRatio"] as const;
+const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_dimensions"] as const;
 
 export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[number]> {
   getDefinition() {
     return {
       VERTICES: 4,
-      ARRAY_ITEMS_PER_VERTEX: 5,
+      ARRAY_ITEMS_PER_VERTEX: 7,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
-        { name: "a_normal", size: 2, type: FLOAT },
+        { name: "a_opposite", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_direction", size: 1, type: FLOAT }, // TODO: can be a byte or a bool
+        { name: "a_thickness", size: 1, type: FLOAT },
       ],
     };
   }
@@ -67,61 +69,53 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     const y2 = targetData.y;
     const color = floatColor(data.color);
 
-    // Computing normals
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-
-    let len = dx * dx + dy * dy;
-    let n1 = 0;
-    let n2 = 0;
-
-    if (len) {
-      len = 1 / Math.sqrt(len);
-
-      n1 = -dy * len * thickness;
-      n2 = dx * len * thickness;
-    }
-
     const array = this.array;
 
     // First point
     array[i++] = x1;
     array[i++] = y1;
-    array[i++] = n1;
-    array[i++] = n2;
+    array[i++] = x2;
+    array[i++] = y2;
     array[i++] = color;
+    array[i++] = 1;
+    array[i++] = thickness;
 
     // First point flipped
     array[i++] = x1;
     array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
+    array[i++] = x2;
+    array[i++] = y2;
     array[i++] = color;
+    array[i++] = -1;
+    array[i++] = thickness;
 
     // Second point
     array[i++] = x2;
     array[i++] = y2;
-    array[i++] = n1;
-    array[i++] = n2;
+    array[i++] = x1;
+    array[i++] = y1;
     array[i++] = color;
+    array[i++] = -1;
+    array[i++] = thickness;
 
     // Second point flipped
     array[i++] = x2;
     array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i] = color;
+    array[i++] = x1;
+    array[i++] = y1;
+    array[i++] = color;
+    array[i++] = 1;
+    array[i++] = thickness;
   }
 
   draw(params: RenderParams): void {
     const gl = this.gl;
 
-    const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio } = this.uniformLocations;
+    const { u_matrix, u_zoomRatio, u_dimensions } = this.uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_zoomRatio, params.zoomRatio);
-    gl.uniform1f(u_sizeRatio, params.sizeRatio);
-    gl.uniform1f(u_correctionRatio, params.correctionRatio);
+    gl.uniform2f(u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
 
     if (!this.indicesArray) throw new Error("EdgeRectangleProgram: indicesArray should be allocated when drawing!");
 

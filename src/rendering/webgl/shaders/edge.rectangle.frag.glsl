@@ -4,7 +4,7 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-const float feather = 0.001;
+const float feather = 0.7;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {

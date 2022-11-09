@@ -1,42 +1,56 @@
 attribute vec4 a_color;
-attribute vec2 a_normal;
+attribute float a_direction;
+attribute float a_thickness;
 attribute vec2 a_position;
+attribute vec2 a_opposite;
 
 uniform mat3 u_matrix;
-uniform float u_sizeRatio;
 uniform float u_zoomRatio;
-uniform float u_correctionRatio;
+uniform vec2 u_dimensions;
 
 varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-const float minThickness = 1.7;
 const float bias = 255.0 / 254.0;
+const float minThickness = 0.5;
+const float feather = 0.7;
+
+vec2 clipspaceToViewport(vec2 pos, vec2 dimensions) {
+  return vec2(
+    (pos.x + 1.0) * dimensions.x / 2.0,
+    (pos.y + 1.0) * dimensions.y / 2.0
+  );
+}
+
+vec2 viewportToClipspace(vec2 pos, vec2 dimensions) {
+  return vec2(
+    pos.x / dimensions.x * 2.0 - 1.0,
+    pos.y / dimensions.y * 2.0 - 1.0
+  );
+}
 
 void main() {
-  float normalLength = length(a_normal);
-  vec2 unitNormal = a_normal / normalLength;
+  vec2 position = (u_matrix * vec3(a_position, 1)).xy;
+  vec2 opposite = (u_matrix * vec3(a_opposite, 1)).xy;
 
-  // We require edges to be at least `minThickness` pixels thick *on screen*
-  // (so we need to compensate the size ratio):
-  float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
+  vec2 viewportPosition = clipspaceToViewport(position, u_dimensions);
+  vec2 viewportOpposite = clipspaceToViewport(opposite, u_dimensions);
 
-  // Then, we need to retrieve the normalized thickness of the edge in the WebGL
-  // referential (in a ([0, 1], [0, 1]) space), using our "magic" correction
-  // ratio:
-  float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
+  vec2 delta = viewportOpposite.xy - viewportPosition.xy;
+  vec2 normal = vec2(-delta.y, delta.x) * a_direction;
+  vec2 unitNormal = normalize(normal);
 
-  // Here is the proper position of the vertex
-  gl_Position = vec4((u_matrix * vec3(a_position + unitNormal * webGLThickness, 1)).xy, 0, 1);
-
-  // For the fragment shader though, we need a thickness that takes the "magic"
-  // correction ratio into account (as in webGLThickness), but so that the
-  // antialiasing effect does not depend on the zoom level. So here's yet
-  // another thickness version:
-  v_thickness = webGLThickness / u_zoomRatio;
+  float thickness = max(minThickness, a_thickness / u_zoomRatio) / 2.0;
 
   v_normal = unitNormal;
+  v_thickness = thickness + feather;
+
+  vec2 viewportOffsetPosition = viewportPosition + unitNormal * v_thickness;
+
+  position = viewportToClipspace(viewportOffsetPosition, u_dimensions);
+  gl_Position = vec4(position, 0, 1);
+
   v_color = a_color;
   v_color.a *= bias;
 }
