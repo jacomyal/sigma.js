@@ -12,8 +12,8 @@ import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
 import { RenderParams } from "./common/program";
-import vertexShaderSource from "../shaders/node.circle.vert.glsl";
-import fragmentShaderSource from "../shaders/node.circle.frag.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/node.circle.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
@@ -24,17 +24,21 @@ const ANGLE_3 = (4 * Math.PI) / 3;
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[number]> {
-  VERTICES = 3;
-  ARRAY_ITEMS_PER_VERTEX = 5;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  UNIFORMS = UNIFORMS;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_size", size: 1, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-    { name: "a_angle", size: 1, type: FLOAT },
-  ];
+  getDefinition() {
+    return {
+      VERTICES: 3,
+      ARRAY_ITEMS_PER_VERTEX: 5,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_size", size: 1, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_angle", size: 1, type: FLOAT },
+      ],
+    };
+  }
 
   processShownItem(i: number, data: NodeDisplayData) {
     const array = this.array;

@@ -9,26 +9,30 @@ import { NodeDisplayData, EdgeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
-import vertexShaderSource from "../shaders/edge.arrowHead.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.arrowHead.frag.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/edge.arrowHead.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/edge.arrowHead.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
 
 export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  VERTICES = 3;
-  ARRAY_ITEMS_PER_VERTEX = 9;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  UNIFORMS = UNIFORMS;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_normal", size: 2, type: FLOAT },
-    { name: "a_radius", size: 1, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-    { name: "a_barycentric", size: 3, type: FLOAT },
-  ];
+  getDefinition() {
+    return {
+      VERTICES: 3,
+      ARRAY_ITEMS_PER_VERTEX: 9,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_normal", size: 2, type: FLOAT },
+        { name: "a_radius", size: 1, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_barycentric", size: 3, type: FLOAT },
+      ],
+    };
+  }
 
   processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const thickness = data.size || 1;

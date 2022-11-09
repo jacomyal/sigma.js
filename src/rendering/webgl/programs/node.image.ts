@@ -8,8 +8,8 @@
  */
 import { Coordinates, Dimensions, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/node.image.vert.glsl";
-import fragmentShaderSource from "../shaders/node.image.frag.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
 import { NodeProgram, NodeProgramConstructor } from "./common/node";
 import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
@@ -202,17 +202,21 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
   const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_atlas"] as const;
 
   return class NodeImageProgram extends NodeProgram<typeof UNIFORMS[number]> {
-    readonly VERTICES = 3;
-    readonly ARRAY_ITEMS_PER_VERTEX = 5;
-    readonly VERTEX_SHADER_SOURCE = vertexShaderSource;
-    readonly FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-    readonly UNIFORMS = UNIFORMS;
-    readonly ATTRIBUTES = [
-      { name: "a_position", size: 2, type: FLOAT },
-      { name: "a_size", size: 1, type: FLOAT },
-      { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-      { name: "a_texture", size: 4, type: FLOAT },
-    ];
+    getDefinition() {
+      return {
+        VERTICES: 3,
+        ARRAY_ITEMS_PER_VERTEX: 5,
+        VERTEX_SHADER_SOURCE,
+        FRAGMENT_SHADER_SOURCE,
+        UNIFORMS,
+        ATTRIBUTES: [
+          { name: "a_position", size: 2, type: FLOAT },
+          { name: "a_size", size: 1, type: FLOAT },
+          { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          { name: "a_texture", size: 4, type: FLOAT },
+        ],
+      };
+    }
 
     texture: WebGLTexture;
     latestRenderParams?: RenderParams;

@@ -26,6 +26,15 @@ export interface ProgramAttributeSpecification {
   normalized?: boolean;
 }
 
+export interface ProgramDefinition<Uniform extends string = string> {
+  VERTICES: number;
+  ARRAY_ITEMS_PER_VERTEX: number;
+  VERTEX_SHADER_SOURCE: string;
+  FRAGMENT_SHADER_SOURCE: string;
+  UNIFORMS: ReadonlyArray<Uniform>;
+  ATTRIBUTES: Array<ProgramAttributeSpecification>;
+}
+
 export abstract class AbstractProgram {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_gl: WebGLRenderingContext, _renderer: Sigma) {}
@@ -33,22 +42,23 @@ export abstract class AbstractProgram {
   abstract render(params: RenderParams): void;
 }
 
-export abstract class Program<Uniform extends string = string> implements AbstractProgram {
-  abstract VERTICES: number;
-  abstract ARRAY_ITEMS_PER_VERTEX: number;
-  abstract VERTEX_SHADER_SOURCE: string;
-  abstract FRAGMENT_SHADER_SOURCE: string;
-  abstract UNIFORMS: ReadonlyArray<Uniform>;
-  abstract ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  STRIDE = 0;
+export abstract class Program<Uniform extends string = string> implements AbstractProgram, ProgramDefinition {
+  VERTICES: number;
+  ARRAY_ITEMS_PER_VERTEX: number;
+  VERTEX_SHADER_SOURCE: string;
+  FRAGMENT_SHADER_SOURCE: string;
+  UNIFORMS: ReadonlyArray<Uniform>;
+  ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  STRIDE: number;
 
   renderer: Sigma;
   gl: WebGLRenderingContext;
-  canUse32BitsIndices: boolean;
-  indicesType: number;
-  IndicesArray: Uint16ArrayConstructor | Uint32ArrayConstructor;
   buffer: WebGLBuffer;
   array: Float32Array = new Float32Array();
+  canUse32BitsIndices: boolean;
+  indicesType: number;
+  indicesBuffer: WebGLBuffer;
+  IndicesArray: Uint16ArrayConstructor | Uint32ArrayConstructor;
   indicesArray: Uint16Array | Uint32Array | null = null;
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
@@ -58,86 +68,99 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   capacity = 0;
   verticesCount = 0;
 
+  abstract getDefinition(): ProgramDefinition<Uniform>;
+
   constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+    // Reading program definition
+    const definition = this.getDefinition();
+
+    this.VERTICES = definition.VERTICES;
+    this.ARRAY_ITEMS_PER_VERTEX = definition.ARRAY_ITEMS_PER_VERTEX;
+    this.VERTEX_SHADER_SOURCE = definition.VERTEX_SHADER_SOURCE;
+    this.FRAGMENT_SHADER_SOURCE = definition.FRAGMENT_SHADER_SOURCE;
+    this.UNIFORMS = definition.UNIFORMS;
+    this.ATTRIBUTES = definition.ATTRIBUTES;
+
+    // Computing stride
+    this.STRIDE = this.VERTICES * this.ARRAY_ITEMS_PER_VERTEX;
+
+    // Members
     this.gl = gl;
     this.renderer = renderer;
 
+    // Webgl buffers
     const buffer = gl.createBuffer();
     if (buffer === null) throw new Error("Program: error while creating the webgl buffer.");
     this.buffer = buffer;
 
-    // Not doing this in the constructor because of abstract members
-    const [vertexShader, fragmentShader, program] = this.loadProgram();
+    const indicesBuffer = gl.createBuffer();
+    if (indicesBuffer === null) throw new Error("Program: error while creating the webgl indices buffer.");
+    this.indicesBuffer = indicesBuffer;
 
-    this.vertexShader = vertexShader;
-    this.fragmentShader = fragmentShader;
-    this.program = program;
+    // Shaders and program
+    this.vertexShader = loadVertexShader(this.gl, this.VERTEX_SHADER_SOURCE);
+    this.fragmentShader = loadFragmentShader(this.gl, this.FRAGMENT_SHADER_SOURCE);
+    this.program = loadProgram(this.gl, [this.vertexShader, this.fragmentShader]);
 
+    // Indices
     this.canUse32BitsIndices = canUse32BitsIndices(this.gl);
     this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
     this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
 
-    this.init();
-  }
-
-  private loadProgram() {
-    const vertexShader = loadVertexShader(this.gl, this.VERTEX_SHADER_SOURCE);
-    const fragmentShader = loadFragmentShader(this.gl, this.FRAGMENT_SHADER_SOURCE);
-    const program = loadProgram(this.gl, [vertexShader, fragmentShader]);
-
-    return [vertexShader, fragmentShader, program];
-  }
-
-  private init() {
-    this.STRIDE = this.VERTICES * this.ARRAY_ITEMS_PER_VERTEX;
-
+    // Initializing locations
     this.UNIFORMS.forEach((uniformName) => {
       const location = this.gl.getUniformLocation(this.program, uniformName);
       if (location === null) throw new Error(`Program: error while getting location for uniform "${uniformName}".`);
       this.uniformLocations[uniformName] = location;
     });
 
-    for (const attributeName in this.ATTRIBUTES) {
-      const location = this.gl.getAttribLocation(this.program, attributeName);
-      if (location === -1) throw new Error(`Program: error while getting location for attribute "${attributeName}".`);
-      this.attributeLocations[attributeName] = location;
-    }
+    this.ATTRIBUTES.forEach((attr) => {
+      const location = this.gl.getAttribLocation(this.program, attr.name);
+      if (location === -1) throw new Error(`Program: error while getting location for attribute "${attr.name}".`);
+      this.attributeLocations[attr.name] = location;
+    });
   }
 
   private bind(): void {
     const gl = this.gl;
 
-    for (const attributeName in this.ATTRIBUTES) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+
+    if (this.indicesArray) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+    }
+
+    for (const attributeName in this.attributeLocations) {
       gl.enableVertexAttribArray(this.attributeLocations[attributeName]);
     }
 
     let offset = 0;
 
-    for (const attributeName in this.ATTRIBUTES) {
-      const location = this.attributeLocations[attributeName];
-      const attribute = this.ATTRIBUTES[attributeName];
+    this.ATTRIBUTES.forEach((attr) => {
+      const location = this.attributeLocations[attr.name];
 
       gl.vertexAttribPointer(
         location,
-        attribute.size,
-        attribute.type,
-        attribute.normalized || false,
+        attr.size,
+        attr.type,
+        attr.normalized || false,
         this.ARRAY_ITEMS_PER_VERTEX * Float32Array.BYTES_PER_ELEMENT,
         offset,
       );
 
-      if (attribute.type === WebGLRenderingContext.UNSIGNED_BYTE) {
-        offset += attribute.size;
-      } else if (attribute.type === WebGLRenderingContext.FLOAT) {
-        offset += attribute.size * 4;
+      if (attr.type === WebGLRenderingContext.UNSIGNED_BYTE) {
+        offset += attr.size;
+      } else if (attr.type === WebGLRenderingContext.FLOAT) {
+        offset += attr.size * 4;
       } else {
         throw new Error("yet unsupported attribute type");
       }
-    }
+    });
   }
 
   private bufferData(): void {
     const gl = this.gl;
+
     this.gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
 
     if (this.indicesArray) {

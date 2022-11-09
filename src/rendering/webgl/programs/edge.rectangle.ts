@@ -19,27 +19,31 @@ import { NodeDisplayData, EdgeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
-import vertexShaderSource from "../shaders/edge.rectangle.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.rectangle.frag.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/edge.rectangle.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_pixelRatio", "u_correctionRatio"] as const;
+const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_sizeRatio", "u_correctionRatio"] as const;
 
 export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  VERTICES = 4;
-  ARRAY_ITEMS_PER_VERTEX = 5;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  UNIFORMS = UNIFORMS;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_normal", size: 2, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-  ];
+  getDefinition() {
+    return {
+      VERTICES: 4,
+      ARRAY_ITEMS_PER_VERTEX: 5,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_normal", size: 2, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+      ],
+    };
+  }
 
   reallocateIndices() {
-    const l = this.capacity;
+    const l = this.verticesCount;
     const size = l + l / 2;
     const indices = new this.IndicesArray(size);
 
@@ -112,12 +116,12 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
   setUniforms(params: RenderParams): void {
     const gl = this.gl;
 
-    const { u_matrix, u_zoomRatio, u_correctionRatio, u_pixelRatio } = this.uniformLocations;
+    const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio } = this.uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_zoomRatio, params.zoomRatio);
-    gl.uniform1f(u_correctionRatio, params.sizeRatio);
-    gl.uniform1f(u_pixelRatio, params.correctionRatio);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
   }
 
   draw(_params: RenderParams): void {

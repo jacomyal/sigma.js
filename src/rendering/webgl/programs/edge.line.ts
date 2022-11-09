@@ -10,23 +10,27 @@ import { NodeDisplayData, EdgeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
-import vertexShaderSource from "../shaders/edge.line.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.line.frag.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/edge.line.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/edge.line.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix"] as const;
 
 export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  VERTICES = 2;
-  ARRAY_ITEMS_PER_VERTEX = 3;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  UNIFORMS = UNIFORMS;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-  ];
+  getDefinition() {
+    return {
+      VERTICES: 2,
+      ARRAY_ITEMS_PER_VERTEX: 3,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+      ],
+    };
+  }
 
   processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const array = this.array;

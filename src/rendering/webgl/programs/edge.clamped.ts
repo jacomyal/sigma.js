@@ -9,21 +9,26 @@
  * @module
  */
 import EdgeRectangleProgram from "./edge.rectangle";
-import vertexShaderSource from "../shaders/edge.clamped.vert.glsl";
+import VERTEX_SHADER_SOURCE from "../shaders/edge.clamped.vert.glsl";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 export default class EdgeClampedProgram extends EdgeRectangleProgram {
-  ARRAY_ITEMS_PER_VERTEX = 6;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_normal", size: 2, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-    { name: "a_radius", size: 1, type: FLOAT },
-  ];
+  getDefinition() {
+    return {
+      ...super.getDefinition(),
+      ARRAY_ITEMS_PER_VERTEX: 6,
+      VERTEX_SHADER_SOURCE,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_normal", size: 2, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_radius", size: 1, type: FLOAT },
+      ],
+    };
+  }
 
   processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const thickness = data.size || 1;

@@ -16,24 +16,28 @@ import { NodeDisplayData } from "sigma/types";
 import { floatColor } from "sigma/utils";
 import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
 import { RenderParams } from "sigma/rendering/webgl/programs/common/program";
-import vertexShaderSource from "!raw-loader!./node.border.vert.glsl";
-import fragmentShaderSource from "!raw-loader!./node.border.frag.glsl";
+import VERTEX_SHADER_SOURCE from "!raw-loader!./node.border.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "!raw-loader!./node.border.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[number]> {
-  VERTICES = 1;
-  ARRAY_ITEMS_PER_VERTEX = 4;
-  VERTEX_SHADER_SOURCE = vertexShaderSource;
-  FRAGMENT_SHADER_SOURCE = fragmentShaderSource;
-  UNIFORMS = UNIFORMS;
-  ATTRIBUTES = [
-    { name: "a_position", size: 2, type: FLOAT },
-    { name: "a_size", size: 1, type: FLOAT },
-    { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-  ];
+  getDefinition() {
+    return {
+      VERTICES: 1,
+      ARRAY_ITEMS_PER_VERTEX: 4,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_size", size: 1, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+      ],
+    };
+  }
 
   processShownItem(i: number, data: NodeDisplayData) {
     const array = this.array;
