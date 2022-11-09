@@ -246,7 +246,7 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       if (this.latestRenderParams) this.render(this.latestRenderParams);
     }
 
-    processShownItem(i: number, data: NodeDisplayData & { image?: string }): void {
+    processVisibleItem(i: number, data: NodeDisplayData & { image?: string }): void {
       const array = this.array;
 
       const imageSource = data.image;

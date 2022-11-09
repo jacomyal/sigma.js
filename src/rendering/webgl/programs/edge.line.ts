@@ -32,7 +32,7 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
     };
   }
 
-  processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const array = this.array;
 
     const x1 = sourceData.x;

@@ -34,7 +34,7 @@ export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number
     };
   }
 
-  processShownItem(i: number, data: NodeDisplayData) {
+  processVisibleItem(i: number, data: NodeDisplayData) {
     const array = this.array;
 
     array[i++] = data.x;

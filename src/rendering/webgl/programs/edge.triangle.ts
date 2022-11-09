@@ -32,7 +32,7 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
     };
   }
 
-  processShownItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const thickness = data.size || 1;
     const x1 = sourceData.x;
     const y1 = sourceData.y;

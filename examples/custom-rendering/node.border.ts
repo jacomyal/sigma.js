@@ -39,7 +39,7 @@ export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[numbe
     };
   }
 
-  processShownItem(i: number, data: NodeDisplayData) {
+  processVisibleItem(i: number, data: NodeDisplayData) {
     const array = this.array;
 
     array[i++] = data.x;

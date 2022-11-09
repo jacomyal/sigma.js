@@ -31,9 +31,9 @@ export abstract class EdgeProgram<Uniform extends string = string>
       return;
     }
 
-    return this.processShownItem(i, sourceData, targetData, data);
+    return this.processVisibleItem(i, sourceData, targetData, data);
   }
-  abstract processShownItem(
+  abstract processVisibleItem(
     i: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,

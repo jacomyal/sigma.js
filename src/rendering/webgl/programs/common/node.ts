@@ -26,9 +26,9 @@ export abstract class NodeProgram<Uniform extends string = string>
       return;
     }
 
-    return this.processShownItem(i, data);
+    return this.processVisibleItem(i, data);
   }
-  abstract processShownItem(i: number, data: NodeDisplayData): void;
+  abstract processVisibleItem(i: number, data: NodeDisplayData): void;
 }
 
 export interface NodeProgramConstructor {
