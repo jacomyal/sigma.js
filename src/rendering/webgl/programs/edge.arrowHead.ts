@@ -5,120 +5,51 @@
  * Program rendering direction arrows as a simple triangle.
  * @module
  */
-import { EdgeDisplayData, NodeDisplayData } from "../../../types";
+import { NodeDisplayData, EdgeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/edge.arrowHead.vert.glsl";
-import fragmentShaderSource from "../shaders/edge.arrowHead.frag.glsl";
-import { AbstractEdgeProgram } from "./common/edge";
+import { EdgeProgram } from "./common/edge";
 import { RenderParams } from "./common/program";
+import VERTEX_SHADER_SOURCE from "../shaders/edge.arrowHead.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/edge.arrowHead.frag.glsl";
 
-const POINTS = 3,
-  ATTRIBUTES = 9,
-  STRIDE = POINTS * ATTRIBUTES;
+const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
-  // Locations
-  positionLocation: GLint;
-  colorLocation: GLint;
-  normalLocation: GLint;
-  radiusLocation: GLint;
-  barycentricLocation: GLint;
-  matrixLocation: WebGLUniformLocation;
-  sizeRatioLocation: WebGLUniformLocation;
-  correctionRatioLocation: WebGLUniformLocation;
+const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
 
-  constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-    this.normalLocation = gl.getAttribLocation(this.program, "a_normal");
-    this.radiusLocation = gl.getAttribLocation(this.program, "a_radius");
-    this.barycentricLocation = gl.getAttribLocation(this.program, "a_barycentric");
-
-    // Uniform locations
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
-    if (sizeRatioLocation === null) throw new Error("EdgeArrowHeadProgram: error while getting sizeRatioLocation");
-    this.sizeRatioLocation = sizeRatioLocation;
-
-    const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
-    if (correctionRatioLocation === null)
-      throw new Error("EdgeArrowHeadProgram: error while getting correctionRatioLocation");
-    this.correctionRatioLocation = correctionRatioLocation;
-
-    this.bind();
+export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[number]> {
+  getDefinition() {
+    return {
+      VERTICES: 3,
+      ARRAY_ITEMS_PER_VERTEX: 9,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_normal", size: 2, type: FLOAT },
+        { name: "a_radius", size: 1, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_barycentric", size: 3, type: FLOAT },
+      ],
+    };
   }
 
-  bind(): void {
-    const gl = this.gl;
-
-    // Bindings
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.normalLocation);
-    gl.enableVertexAttribArray(this.radiusLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-    gl.enableVertexAttribArray(this.barycentricLocation);
-
-    gl.vertexAttribPointer(this.positionLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.vertexAttribPointer(this.normalLocation, 2, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(this.radiusLocation, 1, gl.FLOAT, false, ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT, 16);
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      20,
-    );
-
-    // TODO: maybe we can optimize here by packing this in a bit mask
-    gl.vertexAttribPointer(
-      this.barycentricLocation,
-      3,
-      gl.FLOAT,
-      false,
-      ATTRIBUTES * Float32Array.BYTES_PER_ELEMENT,
-      24,
-    );
-  }
-
-  computeIndices(): void {
-    // nothing to do
-  }
-
-  process(
-    sourceData: NodeDisplayData,
-    targetData: NodeDisplayData,
-    data: EdgeDisplayData,
-    hidden: boolean,
-    offset: number,
-  ): void {
-    if (hidden) {
-      for (let i = offset * STRIDE, l = i + STRIDE; i < l; i++) this.array[i] = 0;
-
-      return;
-    }
-
-    const thickness = data.size || 1,
-      radius = targetData.size || 1,
-      x1 = sourceData.x,
-      y1 = sourceData.y,
-      x2 = targetData.x,
-      y2 = targetData.y,
-      color = floatColor(data.color);
+  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+    const thickness = data.size || 1;
+    const radius = targetData.size || 1;
+    const x1 = sourceData.x;
+    const y1 = sourceData.y;
+    const x2 = targetData.x;
+    const y2 = targetData.y;
+    const color = floatColor(data.color);
 
     // Computing normals
-    const dx = x2 - x1,
-      dy = y2 - y1;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
 
-    let len = dx * dx + dy * dy,
-      n1 = 0,
-      n2 = 0;
+    let len = dx * dx + dy * dy;
+    let n1 = 0;
+    let n2 = 0;
 
     if (len) {
       len = 1 / Math.sqrt(len);
@@ -126,8 +57,6 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
       n1 = -dy * len * thickness;
       n2 = dx * len * thickness;
     }
-
-    let i = POINTS * ATTRIBUTES * offset;
 
     const array = this.array;
 
@@ -165,20 +94,15 @@ export default class EdgeArrowHeadProgram extends AbstractEdgeProgram {
     array[i] = 1;
   }
 
-  render(params: RenderParams): void {
-    if (this.hasNothingToRender()) return;
-
+  draw(params: RenderParams): void {
     const gl = this.gl;
 
-    const program = this.program;
-    gl.useProgram(program);
+    const { u_matrix, u_sizeRatio, u_correctionRatio } = this.uniformLocations;
 
-    // Binding uniforms
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
-    gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
 
-    // Drawing:
-    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
+    gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }
 }

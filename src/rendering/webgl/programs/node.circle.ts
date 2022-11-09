@@ -10,96 +10,38 @@
  */
 import { NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import vertexShaderSource from "../shaders/node.circle.vert.glsl";
-import fragmentShaderSource from "../shaders/node.circle.frag.glsl";
-import { AbstractProgram, RenderParams } from "./common/program";
+import { NodeProgram } from "./common/node";
+import { RenderParams } from "./common/program";
+import VERTEX_SHADER_SOURCE from "../shaders/node.circle.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
 
-const POINTS = 3;
-const ATTRIBUTES = 5;
+const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const ANGLE_1 = 0;
 const ANGLE_2 = (2 * Math.PI) / 3;
 const ANGLE_3 = (4 * Math.PI) / 3;
 
-export default class NodeCircleProgram extends AbstractProgram {
-  positionLocation: GLint;
-  sizeLocation: GLint;
-  colorLocation: GLint;
-  angleLocation: GLint;
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
-  matrixLocation: WebGLUniformLocation;
-  sizeRatioLocation: WebGLUniformLocation;
-  correctionRatioLocation: WebGLUniformLocation;
-
-  constructor(gl: WebGLRenderingContext) {
-    super(gl, vertexShaderSource, fragmentShaderSource, POINTS, ATTRIBUTES);
-
-    // Locations
-    this.positionLocation = gl.getAttribLocation(this.program, "a_position");
-    this.sizeLocation = gl.getAttribLocation(this.program, "a_size");
-    this.colorLocation = gl.getAttribLocation(this.program, "a_color");
-    this.angleLocation = gl.getAttribLocation(this.program, "a_angle");
-
-    // Uniform Location
-    const matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-    if (matrixLocation === null) throw new Error("NodeCircleProgram: error while getting matrixLocation");
-    this.matrixLocation = matrixLocation;
-
-    const sizeRatioLocation = gl.getUniformLocation(this.program, "u_sizeRatio");
-    if (sizeRatioLocation === null) throw new Error("NodeCircleProgram: error while getting sizeRatioLocation");
-    this.sizeRatioLocation = sizeRatioLocation;
-
-    const correctionRatioLocation = gl.getUniformLocation(this.program, "u_correctionRatio");
-    if (correctionRatioLocation === null)
-      throw new Error("NodeCircleProgram: error while getting correctionRatioLocation");
-    this.correctionRatioLocation = correctionRatioLocation;
-
-    this.bind();
+export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[number]> {
+  getDefinition() {
+    return {
+      VERTICES: 3,
+      ARRAY_ITEMS_PER_VERTEX: 5,
+      VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      UNIFORMS,
+      ATTRIBUTES: [
+        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_size", size: 1, type: FLOAT },
+        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_angle", size: 1, type: FLOAT },
+      ],
+    };
   }
 
-  bind(): void {
-    const gl = this.gl;
-
-    gl.enableVertexAttribArray(this.positionLocation);
-    gl.enableVertexAttribArray(this.sizeLocation);
-    gl.enableVertexAttribArray(this.colorLocation);
-    gl.enableVertexAttribArray(this.angleLocation);
-
-    gl.vertexAttribPointer(
-      this.positionLocation,
-      2,
-      gl.FLOAT,
-      false,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      0,
-    );
-    gl.vertexAttribPointer(this.sizeLocation, 1, gl.FLOAT, false, this.attributes * Float32Array.BYTES_PER_ELEMENT, 8);
-    gl.vertexAttribPointer(
-      this.colorLocation,
-      4,
-      gl.UNSIGNED_BYTE,
-      true,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      12,
-    );
-    gl.vertexAttribPointer(
-      this.angleLocation,
-      1,
-      gl.FLOAT,
-      false,
-      this.attributes * Float32Array.BYTES_PER_ELEMENT,
-      16,
-    );
-  }
-
-  process(data: NodeDisplayData, hidden: boolean, offset: number): void {
+  processVisibleItem(i: number, data: NodeDisplayData) {
     const array = this.array;
-    let i = offset * POINTS * ATTRIBUTES;
-
-    if (hidden) {
-      for (let l = i + POINTS * ATTRIBUTES; i < l; i++) array[i] = 0;
-      return;
-    }
 
     const color = floatColor(data.color);
 
@@ -122,18 +64,15 @@ export default class NodeCircleProgram extends AbstractProgram {
     array[i] = ANGLE_3;
   }
 
-  render(params: RenderParams): void {
-    if (this.hasNothingToRender()) return;
-
+  draw(params: RenderParams): void {
     const gl = this.gl;
-    const program = this.program;
 
-    gl.useProgram(program);
+    const { u_sizeRatio, u_correctionRatio, u_matrix } = this.uniformLocations;
 
-    gl.uniformMatrix3fv(this.matrixLocation, false, params.matrix);
-    gl.uniform1f(this.sizeRatioLocation, params.sizeRatio);
-    gl.uniform1f(this.correctionRatioLocation, params.correctionRatio);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this.array.length / ATTRIBUTES);
+    gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }
 }
