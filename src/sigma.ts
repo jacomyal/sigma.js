@@ -189,7 +189,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private pixelRatio = getPixelRatio();
 
   // State
-  private displayedLabels: Set<string> = new Set();
+  private displayedNodeLabels: Set<string> = new Set();
+  private displayedEdgeLabels: Set<string> = new Set();
   private highlightedNodes: Set<string> = new Set();
   private hoveredNode: string | null = null;
   private hoveredEdge: string | null = null;
@@ -903,7 +904,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
     extend(labelsToDisplay, this.nodesWithForcedLabels);
 
-    this.displayedLabels = new Set();
+    this.displayedNodeLabels = new Set();
 
     // Drawing labels
     const context = this.canvasContexts.labels;
@@ -915,7 +916,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // If the node was already drawn (like if it is eligible AND has
       // `forceLabel`), we don't want to draw it again
       // NOTE: we can do better probably
-      if (this.displayedLabels.has(node)) continue;
+      if (this.displayedNodeLabels.has(node)) continue;
 
       // If the node is hidden, we don't need to display its label obviously
       if (data.hidden) continue;
@@ -946,11 +947,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         continue;
 
       // Because displayed edge labels depend directly on actually rendered node
-      // labels, we need to only add to this.displayedLabels nodes whose label
+      // labels, we need to only add to this.displayedNodeLabels nodes whose label
       // is rendered.
-      // This makes this.displayedLabels depend on viewport, which might become
+      // This makes this.displayedNodeLabels depend on viewport, which might become
       // an issue once we start memoizing getLabelsToDisplay.
-      this.displayedLabels.add(node);
+      this.displayedNodeLabels.add(node);
 
       this.settings.labelRenderer(
         context,
@@ -985,7 +986,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const edgeLabelsToDisplay = edgeLabelsToDisplayFromNodes({
       graph: this.graph,
       hoveredNode: this.hoveredNode,
-      displayedNodeLabels: this.displayedLabels,
+      displayedNodeLabels: this.displayedNodeLabels,
       highlightedNodes: this.highlightedNodes,
     }).concat(this.edgesWithForcedLabels);
     const displayedLabels = new Set<string>();
@@ -1030,6 +1031,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       );
       displayedLabels.add(edge);
     }
+
+    this.displayedEdgeLabels = displayedLabels;
 
     return this;
   }
@@ -1280,7 +1283,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.edgeDataCache = {};
 
     // Cleaning renderer state tied to the current graph
-    this.displayedLabels.clear();
+    this.displayedNodeLabels.clear();
+    this.displayedEdgeLabels.clear();
     this.highlightedNodes.clear();
     this.hoveredNode = null;
     this.hoveredEdge = null;
@@ -1366,6 +1370,24 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   getEdgeDisplayData(key: unknown): EdgeDisplayData | undefined {
     const edge = this.edgeDataCache[key as string];
     return edge ? Object.assign({}, edge) : undefined;
+  }
+
+  /**
+   * Method used to get the set of currently displayed node labels.
+   *
+   * @return {Set<string>} A set of node keys whose label is displayed.
+   */
+  getNodeDisplayedLabels(): Set<string> {
+    return new Set(this.displayedNodeLabels);
+  }
+
+  /**
+   * Method used to get the set of currently displayed edge labels.
+   *
+   * @return {Set<string>} A set of edge keys whose label is displayed.
+   */
+  getEdgeDisplayedLabels(): Set<string> {
+    return new Set(this.displayedEdgeLabels);
   }
 
   /**
