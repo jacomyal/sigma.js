@@ -15,10 +15,9 @@
  * the CPU & GPU (normals are computed on the CPU side).
  * @module
  */
-import { NodeDisplayData, EdgeDisplayData } from "../../../types";
+import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
-import { RenderParams } from "./common/program";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.rectangle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
 

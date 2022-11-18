@@ -79,6 +79,16 @@ export type CoordinateConversionOverride = {
   padding?: number;
 };
 
+export interface RenderParams {
+  width: number;
+  height: number;
+  sizeRatio: number;
+  zoomRatio: number;
+  pixelRatio: number;
+  correctionRatio: number;
+  matrix: Float32Array;
+}
+
 /**
  * Custom event emitter types.
  */

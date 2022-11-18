@@ -7,10 +7,9 @@
  * every GPU.
  * @module
  */
-import { NodeDisplayData } from "../../../types";
+import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
-import { RenderParams } from "./common/program";
 import VERTEX_SHADER_SOURCE from "../shaders/node.point.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.point.frag.glsl";
 

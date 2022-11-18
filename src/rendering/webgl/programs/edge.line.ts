@@ -6,10 +6,9 @@
  * won't render thickness correctly on some GPUs and has some quirks.
  * @module
  */
-import { NodeDisplayData, EdgeDisplayData } from "../../../types";
+import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
-import { RenderParams } from "./common/program";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.line.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.line.frag.glsl";
 

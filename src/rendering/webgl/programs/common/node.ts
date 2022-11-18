@@ -5,8 +5,8 @@
  * @module
  */
 import Sigma from "../../../../sigma";
-import { AbstractProgram, Program, RenderParams } from "./program";
-import { NodeDisplayData } from "../../../../types";
+import { AbstractProgram, Program } from "./program";
+import { NodeDisplayData, RenderParams } from "../../../../types";
 
 export abstract class AbstractNodeProgram extends AbstractProgram {
   abstract process(offset: number, data: NodeDisplayData): void;

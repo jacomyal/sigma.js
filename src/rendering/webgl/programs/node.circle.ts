@@ -8,10 +8,9 @@
  * indicating which "corner" of the triangle to draw.
  * @module
  */
-import { NodeDisplayData } from "../../../types";
+import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
-import { RenderParams } from "./common/program";
 import VERTEX_SHADER_SOURCE from "../shaders/node.circle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
 

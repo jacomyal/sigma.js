@@ -6,18 +6,9 @@
  * @module
  */
 import type Sigma from "../../../../sigma";
+import type { RenderParams } from "../../../../types";
 import { canUse32BitsIndices } from "../../../../utils";
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
-
-export interface RenderParams {
-  width: number;
-  height: number;
-  sizeRatio: number;
-  zoomRatio: number;
-  pixelRatio: number;
-  correctionRatio: number;
-  matrix: Float32Array;
-}
 
 export interface ProgramAttributeSpecification {
   name: string;

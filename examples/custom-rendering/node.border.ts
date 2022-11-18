@@ -12,10 +12,9 @@
  * every GPU.
  * @module
  */
-import { NodeDisplayData } from "sigma/types";
+import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
-import { RenderParams } from "sigma/rendering/webgl/programs/common/program";
 import VERTEX_SHADER_SOURCE from "!raw-loader!./node.border.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "!raw-loader!./node.border.frag.glsl";
 

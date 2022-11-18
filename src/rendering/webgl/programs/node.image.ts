@@ -6,12 +6,11 @@
  * the classic colored disc.
  * @module
  */
-import { Coordinates, Dimensions, NodeDisplayData } from "../../../types";
+import { Coordinates, Dimensions, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
 import { NodeProgram, NodeProgramConstructor } from "./common/node";
-import { RenderParams } from "./common/program";
 import Sigma from "../../../sigma";
 
 // maximum size of single texture in atlas
