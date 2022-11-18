@@ -17,13 +17,13 @@ import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const ANGLE_1 = 0;
-const ANGLE_2 = (2 * Math.PI) / 3;
-const ANGLE_3 = (4 * Math.PI) / 3;
-
 const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
 export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[number]> {
+  static readonly ANGLE_1 = 0;
+  static readonly ANGLE_2 = (2 * Math.PI) / 3;
+  static readonly ANGLE_3 = (4 * Math.PI) / 3;
+
   getDefinition() {
     return {
       VERTICES: 3,
@@ -49,19 +49,19 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
     array[i++] = data.y;
     array[i++] = data.size;
     array[i++] = color;
-    array[i++] = ANGLE_1;
+    array[i++] = NodeCircleProgram.ANGLE_1;
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
     array[i++] = color;
-    array[i++] = ANGLE_2;
+    array[i++] = NodeCircleProgram.ANGLE_2;
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
     array[i++] = color;
-    array[i] = ANGLE_3;
+    array[i] = NodeCircleProgram.ANGLE_3;
   }
 
   draw(params: RenderParams): void {
