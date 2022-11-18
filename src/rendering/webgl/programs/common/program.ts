@@ -10,6 +10,17 @@ import type { RenderParams } from "../../../../types";
 import { canUse32BitsIndices } from "../../../../utils";
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
 
+const SIZE_FACTOR_PER_ATTRIBUTE_TYPE = {
+  [WebGL2RenderingContext.BOOL]: 1,
+  [WebGL2RenderingContext.BYTE]: 1,
+  [WebGL2RenderingContext.UNSIGNED_BYTE]: 1,
+  [WebGL2RenderingContext.SHORT]: 2,
+  [WebGL2RenderingContext.UNSIGNED_SHORT]: 2,
+  [WebGL2RenderingContext.INT]: 4,
+  [WebGL2RenderingContext.UNSIGNED_INT]: 4,
+  [WebGL2RenderingContext.FLOAT]: 4,
+};
+
 export interface ProgramAttributeSpecification {
   name: string;
   size: number;
@@ -139,13 +150,12 @@ export abstract class Program<Uniform extends string = string> implements Abstra
         offset,
       );
 
-      if (attr.type === WebGLRenderingContext.UNSIGNED_BYTE) {
-        offset += attr.size;
-      } else if (attr.type === WebGLRenderingContext.FLOAT) {
-        offset += attr.size * 4;
-      } else {
-        throw new Error("yet unsupported attribute type");
-      }
+      const sizeFactor = SIZE_FACTOR_PER_ATTRIBUTE_TYPE[attr.type];
+
+      if (typeof sizeFactor !== "number")
+        throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"!`);
+
+      offset += attr.size * sizeFactor;
     });
   }
 
