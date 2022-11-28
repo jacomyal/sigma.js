@@ -1260,6 +1260,18 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
+   * Method setting the renderer's camera.
+   *
+   * @param  {Camera} camera - New camera.
+   * @return {Sigma}
+   */
+  setCamera(camera: Camera): void {
+    this.unbindCameraHandlers();
+    this.camera = camera;
+    this.bindCameraHandlers();
+  }
+
+  /**
    * Method returning the container DOM element.
    *
    * @return {HTMLElement}
