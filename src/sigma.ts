@@ -377,6 +377,16 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
+   * Method unbinding camera handlers.
+   *
+   * @return {Sigma}
+   */
+  private unbindCameraHandlers(): this {
+    this.camera.removeListener("updated", this.activeListeners.camera);
+    return this;
+  }
+
+  /**
    * Method that checks whether or not a node collides with a given position.
    */
   private mouseIsOnNode({ x, y }: Coordinates, { x: nodeX, y: nodeY }: Coordinates, size: number): boolean {
@@ -1752,7 +1762,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.removeAllListeners();
 
     // Releasing camera handlers
-    this.camera.removeListener("updated", this.activeListeners.camera);
+    this.unbindCameraHandlers();
 
     // Releasing DOM events & captors
     window.removeEventListener("resize", this.activeListeners.handleResize);
