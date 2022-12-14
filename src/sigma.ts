@@ -402,7 +402,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   /**
    * Method that returns the closest node to a given position.
    */
-  private getNodeAtPosition(position: Coordinates): string | null {
+  private getNodeAtPosition(position: Coordinates, ignoreSmall = false): string | null {
     const { x, y } = position;
     const quadNodes = this.getQuadNodes(position);
 
@@ -424,8 +424,17 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
         // TODO: sort by min size also for cases where center is the same
         if (distance < minDistance) {
-          minDistance = distance;
-          nodeAtPosition = node;
+          if (ignoreSmall) {
+            const size = this.scaleSize(data.size);
+            const bigEnough = size >= this.settings.labelRenderedSizeThreshold;
+            if (bigEnough) {
+              minDistance = distance;
+              nodeAtPosition = node;
+            }
+          } else {
+            minDistance = distance;
+            nodeAtPosition = node;
+          }
         }
       }
     }
@@ -456,7 +465,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         },
       };
 
-      const nodeToHover = this.getNodeAtPosition(e);
+      const nodeToHover = this.getNodeAtPosition(e, true);
 
       if (nodeToHover && this.hoveredNode !== nodeToHover && !this.nodeDataCache[nodeToHover].hidden) {
         // Handling passing from one node to the other directly
@@ -1126,7 +1135,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const nodesToRender: string[] = [];
 
     if (this.hoveredNode && !this.nodeDataCache[this.hoveredNode].hidden) {
-      nodesToRender.push(this.hoveredNode);
+      const data = this.nodeDataCache[this.hoveredNode];
+      const size = this.scaleSize(data.size);
+      const bigEnough = size >= this.settings.labelRenderedSizeThreshold;
+      if (bigEnough) {
+        nodesToRender.push(this.hoveredNode);
+      }
     }
 
     this.highlightedNodes.forEach((node) => {

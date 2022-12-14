@@ -1,6 +1,6 @@
 {
-  "name": "sigma",
-  "version": "2.4.0",
+  "name": "sigma-jh",
+  "version": "2.4.2",
   "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
@@ -13,7 +13,6 @@
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
     "prepare": "npm run clean && npm run transpile && npm run build && npm run examples:prepare && npm run demo:prepare",
-    "prepublishOnly": "npm run lint && npm test",
     "reinstall": "rimraf examples/node_modules && rimraf demo/node_modules && rimraf node_modules && npm i && npm run clean",
     "test": "npm run unit:test && npm run e2e:test",
     "unit:test": "mocha --require ts-node/register ./test/unit/**/*.ts",
