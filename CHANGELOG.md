@@ -1,5 +1,9 @@
 ## sigma.js - changelog:
 
+#### 1.2.2 - release (Jan 11, 2023)
+
+- Fixing references to curved edges canvas renderers in Gruntfile (thanks to [@gonzo2025](https://github.com/gonzo2025)).
+
 #### 1.2.1 - release (Oct 13, 2017)
 
 - Fixing the [A*](https://github.com/jacomyal/sigma.js/tree/master/plugins/sigma.pathfinding.astar) plugin (thanks to [@RohitJV](https://github.com/RohitJV)).
