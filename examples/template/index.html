@@ -16,9 +16,86 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
+        /* background-color: #023047 */
+      }
+      #search {
+        position: absolute;
+        right: 1em;
+        top: 1em;
+      }
+      #legend {
+        position: absolute;
+        right: 1em;
+        bottom: 1em;
+      }
+      #buttons {
+        position: absolute;
+        left: 1em;
+        top: 1em;
+        display: flex;
+      }
+      #buttons > button {
+        margin-right: 1em;
+        display: inline-block;
+        text-align: center;
+        background: white;
+        outline: none;
+        border: 1px solid dimgrey;
+        border-radius: 2px;
+        cursor: pointer;
+      }
+      #buttons > button > span {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+      #buttons > button:last-child {
+        margin-right: 0;
       }
     </style>
     <div id="sigma-container"></div>
+    <div id="buttons">
+      <button id="random">
+        <span>random</span>
+      </button>
+      <button id="forceatlas2">
+        <span>
+          Force Atlas 2
+        </span>
+      </button>
+      <button id="circular">
+        <span>circular</span>
+      </button>
+    </div>
+    <div id="search">
+      <input
+        type="search"
+        id="search-input"
+        list="suggestions"
+        placeholder="Try searching for a node..."
+      />
+      <datalist id="suggestions"></datalist>
+    </div>
+    <table id="legend">
+      <tr>
+        <td bgcolor="#4695d6" height="10em" width="10em" border-radius="50%">
+          &nbsp;
+        </td>
+        <td>&nbsp; Tags &nbsp;</td>
+      </tr>
+      <tr>
+        <td bgcolor="#fed95c" height="10em" width="10em">&nbsp;</td>
+        <td>&nbsp; Water &nbsp;</td>
+      </tr>
+      <tr>
+        <td bgcolor="#fa6e57" height="10em" width="10em">&nbsp;</td>
+        <td>&nbsp; Space &nbsp;</td>
+      </tr>
+      <tr>
+        <td bgcolor="#f69e53" height="10em" width="10em">&nbsp;</td>
+        <td>&nbsp; Environment &nbsp;</td>
+      </tr>
+    </table>
     <script src="build/bundle.js"></script>
   </body>
 </html>
