@@ -182,6 +182,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
   // Cache:
   private cameraSizeRatio = 1;
+  private graphToViewportRatio = 1;
 
   // Starting dimensions and pixel ratio
   private width = 0;
@@ -693,7 +694,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
           targetPosition.x,
           targetPosition.y,
           // Adapt the edge size to the zoom ratio:
-          (edgeDataCache[key].size * transformationRatio) / this.cameraSizeRatio,
+          this.scaleSize(edgeDataCache[key].size * transformationRatio),
         )
       ) {
         return true;
@@ -810,11 +811,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     if (this.settings.zIndex && nodeZExtent[0] !== nodeZExtent[1])
       nodes = zIndexOrdering<string>(nodeZExtent, (node: string): number => this.nodeDataCache[node].zIndex, nodes);
 
+    const normalizationRatio = this.normalizationFunction.ratio;
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
       const data = this.nodeDataCache[node];
 
-      this.quadtree.add(node, data.x, 1 - data.y, data.size / this.width);
+      this.quadtree.add(node, data.x, 1 - data.y, this.scaleSize(data.size, 1) / normalizationRatio);
 
       if (typeof data.label === "string" && !data.hidden)
         this.labelGrid.add(node, data.size, this.framedGraphToViewport(data, { matrix: nullCameraMatrix }));
@@ -1124,7 +1126,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         height: this.height,
         pixelRatio: this.pixelRatio,
         zoomRatio: this.camera.ratio,
-        sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+        sizeRatio: 1 / this.scaleSize(),
         correctionRatio: this.correctionRatio,
       });
     }
@@ -1169,9 +1171,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // First we need to resize
     this.resize();
 
-    // Recomputing useful camera-related values:
-    this.updateCachedValues();
-
     // Do we need to reprocess data?
     if (this.needToProcess) this.process();
     this.needToProcess = false;
@@ -1199,6 +1198,17 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
     this.correctionRatio = getMatrixImpact(this.matrix, cameraState, viewportDimensions);
+    this.graphToViewportRatio = this.getGraphToViewportRatio();
+
+    // [jacomyal]
+    // This comment is related to the one above the `getMatrixImpact` definition:
+    // - `this.correctionRatio` is somehow not completely explained
+    // - `this.graphToViewportRatio` is the ratio of a distance in the viewport divided by the same distance in the
+    //   graph
+    // - `this.normalizationFunction.ratio` is basically `Math.max(graphDX, graphDY)`
+    // And now, I observe that if I multiply these three ratios, I have something constant, which value remains 2, even
+    // when I change the graph, the viewport or the camera. It might be useful later so I prefer to let this comment:
+    // console.log(this.graphToViewportRatio * this.correctionRatio * this.normalizationFunction.ratio * 2);
 
     const params = {
       matrix: this.matrix,
@@ -1206,7 +1216,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       height: this.height,
       pixelRatio: this.pixelRatio,
       zoomRatio: this.camera.ratio,
-      sizeRatio: this.settings.zoomToSizeRatioFunction(this.camera.ratio),
+      sizeRatio: 1 / this.scaleSize(),
       correctionRatio: this.correctionRatio,
     };
 
@@ -1234,15 +1244,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.renderHighlightedNodes();
 
     return exitRender();
-  }
-
-  /**
-   * Internal method used to update expensive and therefore cached values
-   * each time the camera state is updated.
-   */
-  private updateCachedValues(): void {
-    const { ratio } = this.camera.getState();
-    this.cameraSizeRatio = this.settings.zoomToSizeRatioFunction(ratio);
   }
 
   /**---------------------------------------------------------------------------
@@ -1721,6 +1722,22 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
+   * Method returning the distance multiplier between the graph system and the
+   * viewport system.
+   */
+  getGraphToViewportRatio(): number {
+    const graphP1 = { x: 0, y: 0 };
+    const graphP2 = { x: 1, y: 1 };
+    const graphD = Math.sqrt(Math.pow(graphP1.x - graphP2.x, 2) + Math.pow(graphP1.y - graphP2.y, 2));
+
+    const viewportP1 = this.graphToViewport(graphP1);
+    const viewportP2 = this.graphToViewport(graphP2);
+    const viewportD = Math.sqrt(Math.pow(viewportP1.x - viewportP2.x, 2) + Math.pow(viewportP1.y - viewportP2.y, 2));
+
+    return viewportD / graphD;
+  }
+
+  /**
    * Method returning the graph's bounding box.
    *
    * @return {{ x: Extent, y: Extent }}
@@ -1802,11 +1819,15 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * Method used to scale the given size according to the camera's ratio, i.e.
    * zooming state.
    *
-   * @param  {number} size - The size to scale (node size, edge thickness etc.).
-   * @return {number}      - The scaled size.
+   * @param  {number?} size -        The size to scale (node size, edge thickness etc.).
+   * @param  {number?} cameraRatio - A camera ratio (defaults to the actual camera ratio).
+   * @return {number}              - The scaled size.
    */
-  scaleSize(size: number): number {
-    return size / this.cameraSizeRatio;
+  scaleSize(size = 1, cameraRatio = this.camera.ratio): number {
+    return (
+      (size / this.settings.zoomToSizeRatioFunction(cameraRatio)) *
+      (this.getSetting("itemSizesReference") === "positions" ? cameraRatio * this.graphToViewportRatio : 1)
+    );
   }
 
   /**

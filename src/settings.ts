@@ -46,6 +46,7 @@ export interface Settings {
   edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   stagePadding: number;
   zoomToSizeRatioFunction: (ratio: number) => number;
+  itemSizesReference: "screen" | "positions";
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
@@ -95,6 +96,7 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeLabelColor: { attribute: "color" },
   stagePadding: 30,
   zoomToSizeRatioFunction: Math.sqrt,
+  itemSizesReference: "screen",
 
   // Labels
   labelDensity: 1,
