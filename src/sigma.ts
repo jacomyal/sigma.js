@@ -181,7 +181,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   });
 
   // Cache:
-  private cameraSizeRatio = 1;
   private graphToViewportRatio = 1;
 
   // Starting dimensions and pixel ratio
