@@ -47,6 +47,7 @@ export interface Settings {
   stagePadding: number;
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
+  canvasOrder: ("edges" | "nodes" | "edgeLabels" | "labels" | "hovers" | "hoverNodes" | "mouse")[];
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
@@ -97,6 +98,7 @@ export const DEFAULT_SETTINGS: Settings = {
   stagePadding: 30,
   zoomToSizeRatioFunction: Math.sqrt,
   itemSizesReference: "screen",
+  canvasOrder: ["edges", "nodes", "edgeLabels", "labels", "hovers", "hoverNodes", "mouse"],
 
   // Labels
   labelDensity: 1,
@@ -149,7 +151,9 @@ export function validateSettings(settings: Settings): void {
 }
 
 export function resolveSettings(settings: Partial<Settings>): Settings {
+  console.log("resolveSettings", settings);
   const resolvedSettings = assign({}, DEFAULT_SETTINGS, settings);
+  console.log("resolvedSettings", resolvedSettings);
 
   resolvedSettings.nodeProgramClasses = assign({}, DEFAULT_NODE_PROGRAM_CLASSES, resolvedSettings.nodeProgramClasses);
   resolvedSettings.edgeProgramClasses = assign({}, DEFAULT_EDGE_PROGRAM_CLASSES, resolvedSettings.edgeProgramClasses);
