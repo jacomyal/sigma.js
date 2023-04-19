@@ -47,6 +47,7 @@ export interface Settings {
   stagePadding: number;
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
+  canvasOrder: ("edges" | "nodes" | "edgeLabels" | "labels" | "hovers" | "hoverNodes" | "mouse")[];
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
@@ -97,6 +98,7 @@ export const DEFAULT_SETTINGS: Settings = {
   stagePadding: 30,
   zoomToSizeRatioFunction: Math.sqrt,
   itemSizesReference: "screen",
+  canvasOrder: ["edges", "nodes", "edgeLabels", "labels", "hovers", "hoverNodes", "mouse"],
 
   // Labels
   labelDensity: 1,
