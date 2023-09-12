@@ -10,7 +10,7 @@ import type { RenderParams } from "../../../../types";
 import { canUse32BitsIndices } from "../../../../utils";
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
 
-const SIZE_FACTOR_PER_ATTRIBUTE_TYPE = {
+const SIZE_FACTOR_PER_ATTRIBUTE_TYPE :Record<number,number>= {
   [WebGL2RenderingContext.BOOL]: 1,
   [WebGL2RenderingContext.BYTE]: 1,
   [WebGL2RenderingContext.UNSIGNED_BYTE]: 1,
