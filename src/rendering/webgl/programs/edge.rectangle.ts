@@ -40,23 +40,6 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     };
   }
 
-  reallocateIndices() {
-    const l = this.verticesCount;
-    const size = l + l / 2;
-    const indices = new this.IndicesArray(size);
-
-    for (let i = 0, c = 0; i < l; i += 4) {
-      indices[c++] = i;
-      indices[c++] = i + 1;
-      indices[c++] = i + 2;
-      indices[c++] = i + 2;
-      indices[c++] = i + 1;
-      indices[c++] = i + 3;
-    }
-
-    this.indicesArray = indices;
-  }
-
   processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
     const thickness = data.size || 1;
     const x1 = sourceData.x;
@@ -103,6 +86,20 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     array[i++] = n2;
     array[i++] = color;
 
+    // Second point again
+    array[i++] = x2;
+    array[i++] = y2;
+    array[i++] = n1;
+    array[i++] = n2;
+    array[i++] = color;
+
+    // First point flipped again
+    array[i++] = x1;
+    array[i++] = y1;
+    array[i++] = -n1;
+    array[i++] = -n2;
+    array[i++] = color;
+
     // Second point flipped
     array[i++] = x2;
     array[i++] = y2;
@@ -121,8 +118,6 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
 
-    if (!this.indicesArray) throw new Error("EdgeRectangleProgram: indicesArray should be allocated when drawing!");
-
-    gl.drawElements(gl.TRIANGLES, this.indicesArray.length, this.indicesType, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
   }
 }

@@ -7,7 +7,6 @@
  */
 import type Sigma from "../../../../sigma";
 import type { RenderParams } from "../../../../types";
-import { canUse32BitsIndices } from "../../../../utils";
 import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
 
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
@@ -65,11 +64,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   gl: WebGLRenderingContext;
   buffer: WebGLBuffer;
   array: Float32Array = new Float32Array();
-  canUse32BitsIndices: boolean;
-  indicesType: number;
-  indicesBuffer: WebGLBuffer;
-  IndicesArray: Uint16ArrayConstructor | Uint32ArrayConstructor;
-  indicesArray: Uint16Array | Uint32Array | null = null;
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
   program: WebGLProgram;
@@ -103,19 +97,10 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     if (buffer === null) throw new Error("Program: error while creating the webgl buffer.");
     this.buffer = buffer;
 
-    const indicesBuffer = gl.createBuffer();
-    if (indicesBuffer === null) throw new Error("Program: error while creating the webgl indices buffer.");
-    this.indicesBuffer = indicesBuffer;
-
     // Shaders and program
     this.vertexShader = loadVertexShader(this.gl, this.VERTEX_SHADER_SOURCE);
     this.fragmentShader = loadFragmentShader(this.gl, this.FRAGMENT_SHADER_SOURCE);
     this.program = loadProgram(this.gl, [this.vertexShader, this.fragmentShader]);
-
-    // Indices
-    this.canUse32BitsIndices = canUse32BitsIndices(this.gl);
-    this.indicesType = this.canUse32BitsIndices ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-    this.IndicesArray = this.canUse32BitsIndices ? Uint32Array : Uint16Array;
 
     // Initializing locations
     this.UNIFORMS.forEach((uniformName) => {
@@ -135,10 +120,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     const gl = this.gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-
-    if (this.indicesArray) {
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
-    }
 
     for (const attributeName in this.attributeLocations) {
       gl.enableVertexAttribArray(this.attributeLocations[attributeName]);
@@ -171,15 +152,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     const gl = this.gl;
 
     this.gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
-
-    if (this.indicesArray) {
-      this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesArray, gl.STATIC_DRAW);
-    }
-  }
-
-  // NOTE: implementing `reallocateIndices` is optional
-  reallocateIndices(): void {
-    return;
   }
 
   reallocate(capacity: number): void {
@@ -191,8 +163,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     this.capacity = capacity;
     this.verticesCount = this.VERTICES * capacity;
     this.array = new Float32Array(this.verticesCount * this.ARRAY_ITEMS_PER_VERTEX);
-
-    if (typeof this.reallocateIndices === "function") this.reallocateIndices();
   }
 
   hasNothingToRender(): boolean {
