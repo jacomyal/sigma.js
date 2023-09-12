@@ -29,7 +29,6 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
   getDefinition() {
     return {
       VERTICES: 4,
-      ARRAY_ITEMS_PER_VERTEX: 5,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,

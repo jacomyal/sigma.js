@@ -21,6 +21,15 @@ const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.FLOAT]: 4,
 };
 
+function getAttributeItemsCount(attr: ProgramAttributeSpecification): number {
+  return attr.normalized ? 1 : attr.size;
+}
+function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number {
+  let res = 0;
+  attrs.forEach((attr) => (res += getAttributeItemsCount(attr)));
+  return res;
+}
+
 export interface ProgramAttributeSpecification {
   name: string;
   size: number;
@@ -30,7 +39,6 @@ export interface ProgramAttributeSpecification {
 
 export interface ProgramDefinition<Uniform extends string = string> {
   VERTICES: number;
-  ARRAY_ITEMS_PER_VERTEX: number;
   VERTEX_SHADER_SOURCE: string;
   FRAGMENT_SHADER_SOURCE: string;
   UNIFORMS: ReadonlyArray<Uniform>;
@@ -77,11 +85,11 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     const definition = this.getDefinition();
 
     this.VERTICES = definition.VERTICES;
-    this.ARRAY_ITEMS_PER_VERTEX = definition.ARRAY_ITEMS_PER_VERTEX;
     this.VERTEX_SHADER_SOURCE = definition.VERTEX_SHADER_SOURCE;
     this.FRAGMENT_SHADER_SOURCE = definition.FRAGMENT_SHADER_SOURCE;
     this.UNIFORMS = definition.UNIFORMS;
     this.ATTRIBUTES = definition.ATTRIBUTES;
+    this.ARRAY_ITEMS_PER_VERTEX = getAttributesItemsCount(this.ATTRIBUTES);
 
     // Computing stride
     this.STRIDE = this.VERTICES * this.ARRAY_ITEMS_PER_VERTEX;

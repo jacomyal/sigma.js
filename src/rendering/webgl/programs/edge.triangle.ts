@@ -19,7 +19,6 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
   getDefinition() {
     return {
       VERTICES: 3,
-      ARRAY_ITEMS_PER_VERTEX: 5,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,

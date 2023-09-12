@@ -204,7 +204,6 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
     getDefinition() {
       return {
         VERTICES: 1,
-        ARRAY_ITEMS_PER_VERTEX: 8,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
         UNIFORMS,

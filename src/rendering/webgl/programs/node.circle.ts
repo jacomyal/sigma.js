@@ -26,7 +26,6 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
   getDefinition() {
     return {
       VERTICES: 3,
-      ARRAY_ITEMS_PER_VERTEX: 5,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,

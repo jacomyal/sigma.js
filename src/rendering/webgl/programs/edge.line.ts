@@ -20,7 +20,6 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
   getDefinition() {
     return {
       VERTICES: 2,
-      ARRAY_ITEMS_PER_VERTEX: 3,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,

@@ -19,7 +19,6 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
   getDefinition() {
     return {
       ...super.getDefinition(),
-      ARRAY_ITEMS_PER_VERTEX: 6,
       VERTEX_SHADER_SOURCE,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },

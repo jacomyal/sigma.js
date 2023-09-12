@@ -19,7 +19,6 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
   getDefinition() {
     return {
       VERTICES: 3,
-      ARRAY_ITEMS_PER_VERTEX: 9,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,

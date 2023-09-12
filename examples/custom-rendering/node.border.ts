@@ -26,7 +26,6 @@ export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[numbe
   getDefinition() {
     return {
       VERTICES: 1,
-      ARRAY_ITEMS_PER_VERTEX: 4,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,
