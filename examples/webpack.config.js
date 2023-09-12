@@ -20,7 +20,7 @@ module.exports = {
         __dirname,
         "../src/rendering/webgl/programs/common/node.ts",
       ),
-      sigma: path.resolve(__dirname, "../src/index.ts"),
+      sigma: path.resolve(__dirname, "../src"),
     },
   },
   module: {
