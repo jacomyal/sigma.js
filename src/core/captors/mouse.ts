@@ -200,6 +200,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
 
     this.isMoving = false;
     setTimeout(() => {
+      const shouldRefresh = this.draggedEvents > 0;
       this.draggedEvents = 0;
 
       // NOTE: this refresh is here to make sure `hideEdgesOnMove` can work
@@ -208,7 +209,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
       // See also issue: https://github.com/jacomyal/sigma.js/issues/1290
       // It could be possible to render instead of scheduling a refresh but for
       // now it seems good enough.
-      this.renderer.refresh();
+      if (shouldRefresh) this.renderer.refresh();
     }, 0);
     this.emit("mouseup", getMouseCoords(e, this.container));
   }
