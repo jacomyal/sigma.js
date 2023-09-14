@@ -44,6 +44,12 @@ export interface ProgramDefinition<Uniform extends string = string> {
   ATTRIBUTES: Array<ProgramAttributeSpecification>;
 }
 
+export interface InstancedProgramDefinition<Uniform extends string = string>
+  extends Omit<ProgramDefinition<Uniform>, "CONSTANT_DATA" | "CONSTANT_ATTRIBUTES"> {
+  CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  CONSTANT_DATA: number[];
+}
+
 export abstract class AbstractProgram {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_gl: WebGLRenderingContext, _renderer: Sigma) {}
@@ -53,15 +59,17 @@ export abstract class AbstractProgram {
 
 export abstract class Program<Uniform extends string = string> implements AbstractProgram, ProgramDefinition {
   VERTICES: number;
-  ARRAY_ITEMS_PER_VERTEX: number;
   VERTEX_SHADER_SOURCE: string;
   FRAGMENT_SHADER_SOURCE: string;
   UNIFORMS: ReadonlyArray<Uniform>;
   ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  ATTRIBUTES_ITEMS_COUNT: number;
+  CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  CONSTANT_DATA: Float32Array = new Float32Array();
   STRIDE: number;
 
   renderer: Sigma;
-  gl: WebGLRenderingContext;
+  gl: WebGLRenderingContext | WebGL2RenderingContext;
   buffer: WebGLBuffer;
   array: Float32Array = new Float32Array();
   vertexShader: WebGLShader;
@@ -72,21 +80,28 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   capacity = 0;
   verticesCount = 0;
 
-  abstract getDefinition(): ProgramDefinition<Uniform>;
+  isInstanced: boolean;
+  constantBuffer: WebGLBuffer = {} as WebGLBuffer;
 
-  constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+  abstract getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform>;
+
+  constructor(gl: WebGLRenderingContext | WebGL2RenderingContext, renderer: Sigma) {
     // Reading program definition
     const definition = this.getDefinition();
+
+    this.isInstanced = false;
 
     this.VERTICES = definition.VERTICES;
     this.VERTEX_SHADER_SOURCE = definition.VERTEX_SHADER_SOURCE;
     this.FRAGMENT_SHADER_SOURCE = definition.FRAGMENT_SHADER_SOURCE;
     this.UNIFORMS = definition.UNIFORMS;
     this.ATTRIBUTES = definition.ATTRIBUTES;
-    this.ARRAY_ITEMS_PER_VERTEX = getAttributesItemsCount(this.ATTRIBUTES);
+    this.CONSTANT_ATTRIBUTES = [];
+    this.CONSTANT_DATA = new Float32Array();
 
     // Computing stride
-    this.STRIDE = this.VERTICES * this.ARRAY_ITEMS_PER_VERTEX;
+    this.ATTRIBUTES_ITEMS_COUNT = getAttributesItemsCount(this.ATTRIBUTES);
+    this.STRIDE = this.VERTICES * this.ATTRIBUTES_ITEMS_COUNT;
 
     // Members
     this.gl = gl;
@@ -114,44 +129,88 @@ export abstract class Program<Uniform extends string = string> implements Abstra
       if (location === -1) throw new Error(`Program: error while getting location for attribute "${attr.name}".`);
       this.attributeLocations[attr.name] = location;
     });
+
+    // For instanced programs:
+    if ("CONSTANT_ATTRIBUTES" in definition) {
+      this.isInstanced = true;
+
+      const constantAttributesItemsCount = getAttributesItemsCount(definition.CONSTANT_ATTRIBUTES);
+
+      if (definition.CONSTANT_DATA.length !== constantAttributesItemsCount * this.VERTICES)
+        throw new Error(
+          `Program: error while getting constant data (expected ${
+            constantAttributesItemsCount * this.VERTICES
+          } items, received ${this.CONSTANT_DATA.length} instead`,
+        );
+
+      this.STRIDE = this.ATTRIBUTES_ITEMS_COUNT;
+      this.CONSTANT_DATA = new Float32Array(definition.CONSTANT_DATA);
+      this.CONSTANT_ATTRIBUTES = definition.CONSTANT_ATTRIBUTES;
+      this.CONSTANT_ATTRIBUTES.forEach((attr) => {
+        const location = this.gl.getAttribLocation(this.program, attr.name);
+        if (location === -1) throw new Error(`Program: error while getting location for attribute "${attr.name}".`);
+        this.attributeLocations[attr.name] = location;
+      });
+
+      const constantBuffer = gl.createBuffer();
+      if (constantBuffer === null) throw new Error("Program: error while creating the webgl constant buffer.");
+      this.constantBuffer = constantBuffer;
+    }
   }
 
-  private bind(): void {
+  protected bind(): void {
     const gl = this.gl;
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-
-    for (const attributeName in this.attributeLocations) {
-      gl.enableVertexAttribArray(this.attributeLocations[attributeName]);
-    }
-
     let offset = 0;
 
-    this.ATTRIBUTES.forEach((attr) => {
-      const location = this.attributeLocations[attr.name];
+    if (!this.isInstanced) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
-      gl.vertexAttribPointer(
-        location,
-        attr.size,
-        attr.type,
-        attr.normalized || false,
-        this.ARRAY_ITEMS_PER_VERTEX * Float32Array.BYTES_PER_ELEMENT,
-        offset,
-      );
+      offset = 0;
+      this.ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, offset)));
+      gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    } else {
+      // Handle constant data (things that remain unchanged for all items):
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.constantBuffer);
 
-      const sizeFactor = SIZE_FACTOR_PER_ATTRIBUTE_TYPE[attr.type];
+      offset = 0;
+      this.CONSTANT_ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, offset, false)));
+      gl.bufferData(gl.ARRAY_BUFFER, this.CONSTANT_DATA, gl.DYNAMIC_DRAW);
 
-      if (typeof sizeFactor !== "number")
-        throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"!`);
+      // Handle "instance specific" data (things that vary for each item):
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
-      offset += attr.size * sizeFactor;
-    });
+      offset = 0;
+      this.ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, offset, true)));
+      gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    }
   }
 
-  private bufferData(): void {
+  private bindAttribute(attr: ProgramAttributeSpecification, offset: number, setDivisor?: boolean): number {
     const gl = this.gl;
+    const location = this.attributeLocations[attr.name];
 
-    this.gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(location);
+
+    const stride = !this.isInstanced
+      ? getAttributesItemsCount(this.ATTRIBUTES) * Float32Array.BYTES_PER_ELEMENT
+      : getAttributesItemsCount(setDivisor ? this.ATTRIBUTES : this.CONSTANT_ATTRIBUTES) *
+        Float32Array.BYTES_PER_ELEMENT;
+
+    gl.vertexAttribPointer(location, attr.size, attr.type, attr.normalized || false, stride, offset);
+
+    if (this.isInstanced && setDivisor) {
+      if (gl instanceof WebGL2RenderingContext) {
+        gl.vertexAttribDivisor(location, 1);
+      } else {
+        const ext = gl.getExtension("ANGLE_instanced_arrays");
+        if (ext) ext.vertexAttribDivisorANGLE(location, 1);
+      }
+    }
+
+    const sizeFactor = SIZE_FACTOR_PER_ATTRIBUTE_TYPE[attr.type];
+    if (typeof sizeFactor !== "number") throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"!`);
+
+    return attr.size * sizeFactor;
   }
 
   reallocate(capacity: number): void {
@@ -162,7 +221,11 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
     this.capacity = capacity;
     this.verticesCount = this.VERTICES * capacity;
-    this.array = new Float32Array(this.verticesCount * this.ARRAY_ITEMS_PER_VERTEX);
+    this.array = new Float32Array(
+      !this.isInstanced
+        ? this.verticesCount * getAttributesItemsCount(this.ATTRIBUTES)
+        : this.capacity * getAttributesItemsCount(this.ATTRIBUTES),
+    );
   }
 
   hasNothingToRender(): boolean {
@@ -175,8 +238,22 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     if (this.hasNothingToRender()) return;
 
     this.bind();
-    this.bufferData();
     this.gl.useProgram(this.program);
     this.draw(params);
+  }
+
+  drawWebGL(method: GLenum): void {
+    const gl = this.gl;
+
+    if (!this.isInstanced) {
+      gl.drawArrays(method, 0, this.verticesCount);
+    } else {
+      if (gl instanceof WebGL2RenderingContext) {
+        gl.drawArraysInstanced(method, 0, this.VERTICES, this.capacity);
+      } else {
+        const ext = gl.getExtension("ANGLE_instanced_arrays");
+        if (ext) ext.drawArraysInstancedANGLE(method, 0, this.VERTICES, this.capacity);
+      }
+    }
   }
 }

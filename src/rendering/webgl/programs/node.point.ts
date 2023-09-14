@@ -50,6 +50,6 @@ export default class NodePointProgram extends NodeProgram<typeof UNIFORMS[number
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
-    gl.drawArrays(gl.POINTS, 0, this.verticesCount);
+    this.drawWebGL(gl.POINTS);
   }
 }

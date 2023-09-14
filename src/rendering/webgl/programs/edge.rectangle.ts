@@ -118,6 +118,6 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
+    this.drawWebGL(gl.TRIANGLES);
   }
 }

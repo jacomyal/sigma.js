@@ -57,6 +57,6 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
-    gl.drawArrays(gl.LINES, 0, this.verticesCount);
+    this.drawWebGL(gl.LINES);
   }
 }

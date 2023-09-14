@@ -33,33 +33,20 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        { name: "a_angle", size: 1, type: FLOAT },
       ],
+      CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
+      CONSTANT_DATA: [NodeCircleProgram.ANGLE_1, NodeCircleProgram.ANGLE_2, NodeCircleProgram.ANGLE_3],
     };
   }
 
   processVisibleItem(i: number, data: NodeDisplayData) {
     const array = this.array;
-
     const color = floatColor(data.color);
 
     array[i++] = data.x;
     array[i++] = data.y;
     array[i++] = data.size;
     array[i++] = color;
-    array[i++] = NodeCircleProgram.ANGLE_1;
-
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
-    array[i++] = NodeCircleProgram.ANGLE_2;
-
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
-    array[i] = NodeCircleProgram.ANGLE_3;
   }
 
   draw(params: RenderParams): void {
@@ -71,6 +58,6 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this.verticesCount);
+    this.drawWebGL(gl.TRIANGLES);
   }
 }

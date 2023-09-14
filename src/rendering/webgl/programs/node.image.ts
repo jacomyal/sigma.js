@@ -283,7 +283,7 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
 
-      gl.drawArrays(gl.POINTS, 0, this.verticesCount);
+      this.drawWebGL(gl.POINTS);
     }
   };
 }
