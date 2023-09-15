@@ -4,7 +4,6 @@
  * @module
  */
 import Graph from "graphology-types";
-import extend from "@yomguithereal/helpers/extend";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
@@ -168,8 +167,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
-  private nodesWithForcedLabels: string[] = [];
-  private edgesWithForcedLabels: string[] = [];
+  // indices to keep trace of the index of the item inside programs
+  private nodeProgramIndex: Record<string, number> = {};
+  private edgeProgramIndex: Record<string, number> = {};
+  private nodesWithForcedLabels: Set<string> = new Set<string>();
+  private edgesWithForcedLabels: Set<string> = new Set<string>();
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
   private nodeZExtent: [number, number] = [Infinity, -Infinity];
   private edgeZExtent: [number, number] = [Infinity, -Infinity];
@@ -564,78 +566,76 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private bindGraphHandlers(): this {
     const graph = this.graph;
 
-    this.activeListeners.eachNodeAttributesUpdatedGraphUpdate = () => {
-      // we clear node's indices
-      this.clearNodeIndices();
-      const nodes = this.graph.nodes();
+    this.activeListeners.eachNodeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
+      const updatedFields = e.hints?.attributes;
       // we process all nodes
-      nodes.forEach((node) => this.nodeAdd(node));
-      // schedule a render
-      this.scheduleRefresh();
+      const nodes = this.graph.nodes();
+      nodes.forEach((node) => this.updateNode(node));
+
+      // if coord, size, type or zIndex have changed, we need to schedule a render
+      // (size is needed in the quadtree and zIndex for the programIndex)
+      const layoutChanged =
+        updatedFields && ["x", "y", "size", "zIndex", "type"].some((f) => updatedFields.includes(f));
+      this.refresh({ partialGraph: { nodes: graph.nodes() }, layoutUnchanged: !layoutChanged, schedule: true });
     };
 
-    this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate = () => {
-      // we clear edge's indices
-      this.clearEdgeIndices();
+    this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
+      const updatedFields = e.hints?.attributes;
       // we process all edges
       const edges = this.graph.edges();
-      edges.forEach((edge) => this.edgeAdd(edge));
-      // schedule a render
-      this.scheduleRefresh();
+      edges.forEach((edge) => this.updateEdge(edge));
+      const layoutChanged = updatedFields && ["zIndex", "type"].some((f) => updatedFields?.includes(f));
+      this.refresh({ partialGraph: { edges: graph.edges() }, layoutUnchanged: !layoutChanged, schedule: true });
     };
 
     // On add node, we add the node in indices and then call for a render
     this.activeListeners.addNodeGraphUpdate = (payload: { key: string }): void => {
       const node = payload.key;
       // we process the node
-      this.nodeAdd(node);
+      this.addNode(node);
       // schedule a render for the node
-      this.scheduleRefresh();
+      this.refresh({ partialGraph: { nodes: [node] }, layoutUnchanged: false, schedule: true });
     };
 
     // On update node, we update indices and then call for a render
     this.activeListeners.updateNodeGraphUpdate = (payload: { key: string }): void => {
       const node = payload.key;
-      // we process the node
-      this.nodeUpdate(node);
       // schedule a render for the node
-      this.scheduleRefresh();
+      this.refresh({ partialGraph: { nodes: [node] }, layoutUnchanged: false, schedule: true });
     };
 
     // On drop node, we remove the node from indices and then call for a refresh
     this.activeListeners.dropNodeGraphUpdate = (payload: { key: string }): void => {
       const node = payload.key;
       // we process the node
-      this.nodeRemove(node);
+      this.removeNode(node);
       // schedule a render for everything
-      this.scheduleRefresh();
+      this.refresh({ schedule: true });
     };
 
     // On add edge, we remove the edge from indices and then call for a refresh
     this.activeListeners.addEdgeGraphUpdate = (payload: { key: string }): void => {
       const edge = payload.key;
       // we process the edge
-      this.edgeAdd(edge);
+      this.addEdge(edge);
       // schedule a render for the edge
-      this.scheduleRefresh();
+      this.refresh({ partialGraph: { edges: [edge] }, schedule: true });
     };
 
     // On update edge, we update indices and then call for a refresh
     this.activeListeners.updateEdgeGraphUpdate = (payload: { key: string }): void => {
       const edge = payload.key;
-      // we process the edge
-      this.edgeUpdate(edge);
-      // schedule a render for the edge
-      this.scheduleRefresh();
+      // schedule a repaint for the edge
+      this.refresh({ partialGraph: { edges: [edge] }, layoutUnchanged: false, schedule: true });
     };
 
     // On drop edge, we remove the edge from indices and then call for a refresh
     this.activeListeners.dropEdgeGraphUpdate = (payload: { key: string }): void => {
       const edge = payload.key;
       // we process the edge
-      this.edgeRemove(edge);
+      this.removeEdge(edge);
       // schedule a render for all edges
-      this.scheduleRefresh();
+      this.refresh({ schedule: true });
     };
 
     // On clear edges, we clear the edge indices and then call for a refresh
@@ -644,7 +644,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this.clearEdgeState();
       this.clearEdgeIndices();
       // schedule a render for all edges
-      this.scheduleRefresh();
+      this.refresh({ schedule: true });
     };
 
     // On graph clear, we clear indices and then call for a refresh
@@ -658,7 +658,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this.clearNodeIndices();
 
       // schedule a render for all
-      this.scheduleRefresh();
+      this.refresh({ schedule: true });
     };
 
     graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate); // OK
@@ -828,7 +828,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       const node = nodes[i];
       const data = this.nodeDataCache[node];
 
-      // get initial coordinates
+      // Get initial coordinates
       const attrs = graph.getNodeAttributes(node);
       data.x = attrs.x;
       data.y = attrs.y;
@@ -868,10 +868,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
       const data = this.nodeDataCache[node];
-
-      const nodeProgram = this.nodePrograms[data.type];
-      if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-      nodeProgram.process(nodesPerPrograms[data.type]++, data);
+      this.addNodeToProgram(node, nodesPerPrograms[data.type]++);
     }
 
     //
@@ -909,12 +906,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
       const data = this.edgeDataCache[edge];
-
-      const extremities = graph.extremities(edge),
-        sourceData = this.nodeDataCache[extremities[0]],
-        targetData = this.nodeDataCache[extremities[1]];
-
-      this.edgePrograms[data.type].process(edgesPerPrograms[data.type]++, sourceData, targetData, data);
+      this.addEdgeToProgram(edge, edgesPerPrograms[data.type]++);
     }
 
     return this;
@@ -943,8 +935,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const cameraState = this.camera.getState();
 
     // Selecting labels to draw
-    const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
-    extend(labelsToDisplay, this.nodesWithForcedLabels);
+    const labelsToDisplay = this.labelGrid
+      .getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity)
+      .concat(Array.from(this.nodesWithForcedLabels));
 
     this.displayedNodeLabels = new Set();
 
@@ -1030,9 +1023,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedNodeLabels,
       highlightedNodes: this.highlightedNodes,
-    }).concat(this.edgesWithForcedLabels);
-    const displayedLabels = new Set<string>();
+    }).concat(Array.from(this.edgesWithForcedLabels));
 
+    const displayedLabels = new Set<string>();
     for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
       const edge = edgeLabelsToDisplay[i],
         extremities = this.graph.extremities(edge),
@@ -1272,6 +1265,223 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.renderHighlightedNodes();
 
     return exitRender();
+  }
+
+  /**
+   * Add a node in the internal data structures.
+   * @private
+   * @param key The node's graphology ID
+   */
+  private addNode(key: string): void {
+    // Node display data resolution:
+    //  1. First we get the node's attributes
+    //  2. We optionally reduce them using the function provided by the user
+    //     Note that this function must return a total object and won't be merged
+    //  3. We apply our defaults, while running some vital checks
+    //  4. We apply the normalization function
+    // We shallow copy node data to avoid dangerous behaviors from reducers
+    let attr = Object.assign({}, this.graph.getNodeAttributes(key));
+    if (this.settings.nodeReducer) attr = this.settings.nodeReducer(key, attr);
+    const data = applyNodeDefaults(this.settings, key, attr);
+    this.nodeDataCache[key] = data;
+
+    // Label
+    // we delete and add if needed because this function is also used fro update
+    this.nodesWithForcedLabels.delete(key);
+    if (data.forceLabel && !data.hidden) this.nodesWithForcedLabels.add(key);
+
+    // Highlighted
+    // we remove and re add if needed because this function is also used fro update
+    this.highlightedNodes.delete(key);
+    if (data.highlighted && !data.hidden) this.highlightedNodes.add(key);
+
+    // zIndex
+    if (this.settings.zIndex) {
+      if (data.zIndex < this.nodeZExtent[0]) this.nodeZExtent[0] = data.zIndex;
+      if (data.zIndex > this.nodeZExtent[1]) this.nodeZExtent[1] = data.zIndex;
+    }
+  }
+
+  /**
+   * Update a node the internal data structures.
+   * @private
+   * @param key The node's graphology ID
+   */
+  private updateNode(key: string): void {
+    this.addNode(key);
+
+    // Re-apply normalization on the node
+    const data = this.nodeDataCache[key];
+    this.normalizationFunction.applyTo(data);
+  }
+
+  /**
+   * Remove a node from the internal data structures.
+   * @private
+   * @param key The node's graphology ID
+   */
+  private removeNode(key: string): void {
+    // Remove from node cache
+    delete this.nodeDataCache[key];
+    // Remove from node program index
+    delete this.nodeProgramIndex[key];
+    // Remove from higlighted nodes
+    this.highlightedNodes.delete(key);
+    // Remove from hovered
+    if (this.hoveredNode === key) this.hoveredNode = null;
+    // Remove from forced label
+    this.nodesWithForcedLabels.delete(key);
+  }
+
+  /**
+   * Add an edge into the internal data structures.
+   * @private
+   * @param key The edge's graphology ID
+   */
+  private addEdge(key: string): void {
+    // Edge display data resolution:
+    //  1. First we get the edge's attributes
+    //  2. We optionally reduce them using the function provided by the user
+    //  3. Note that this function must return a total object and won't be merged
+    //  4. We apply our defaults, while running some vital checks
+    // We shallow copy edge data to avoid dangerous behaviors from reducers
+    let attr = Object.assign({}, this.graph.getEdgeAttributes(key));
+    if (this.settings.edgeReducer) attr = this.settings.edgeReducer(key, attr);
+    const data = applyEdgeDefaults(this.settings, key, attr);
+    this.edgeDataCache[key] = data;
+
+    // Forced label
+    // we filter and re push if needed because this function is also used fro update
+    this.edgesWithForcedLabels.delete(key);
+    if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.add(key);
+
+    // Check zIndex
+    if (this.settings.zIndex) {
+      if (data.zIndex < this.edgeZExtent[0]) this.edgeZExtent[0] = data.zIndex;
+      if (data.zIndex > this.edgeZExtent[1]) this.edgeZExtent[1] = data.zIndex;
+    }
+  }
+
+  /**
+   * Update an edge in the internal data structures.
+   * @private
+   * @param key The edge's graphology ID
+   */
+  private updateEdge(key: string): void {
+    this.addEdge(key);
+  }
+
+  /**
+   * Remove an edge from the internal data structures.
+   * @private
+   * @param key The edge's graphology ID
+   */
+  private removeEdge(key: string): void {
+    // Remove from edge cache
+    delete this.edgeDataCache[key];
+    // Remove from programId index
+    delete this.edgeProgramIndex[key];
+    // Remove from hovered
+    if (this.hoveredEdge === key) this.hoveredEdge = null;
+    // Remove from forced label
+    this.edgesWithForcedLabels.delete(key);
+  }
+
+  /**
+   * Clear all indices related to nodes.
+   * @private
+   */
+  private clearNodeIndices(): void {
+    // Quadtree, labelGrid & nodeExtent are only manage/populated in the process function
+    this.quadtree = new QuadTree();
+    this.labelGrid = new LabelGrid();
+    this.nodeExtent = { x: [0, 1], y: [0, 1] };
+    this.nodeDataCache = {};
+    this.edgeProgramIndex = {};
+    this.nodesWithForcedLabels = new Set<string>();
+    this.nodeZExtent = [Infinity, -Infinity];
+  }
+
+  /**
+   * Clear all indices related to edges.
+   * @private
+   */
+  private clearEdgeIndices(): void {
+    this.edgeDataCache = {};
+    this.edgeProgramIndex = {};
+    this.edgesWithForcedLabels = new Set<string>();
+    this.edgeZExtent = [Infinity, -Infinity];
+  }
+
+  /**
+   * Clear all indices.
+   * @private
+   */
+  private clearIndices(): void {
+    this.clearEdgeIndices();
+    this.clearNodeIndices();
+  }
+
+  /**
+   * Clear all graph state related to nodes.
+   * @private
+   */
+  private clearNodeState(): void {
+    this.displayedNodeLabels = new Set();
+    this.highlightedNodes = new Set();
+    this.hoveredNode = null;
+  }
+
+  /**
+   * Clear all graph state related to edges.
+   * @private
+   */
+  private clearEdgeState(): void {
+    this.displayedEdgeLabels = new Set();
+    this.highlightedNodes = new Set();
+    this.hoveredEdge = null;
+  }
+
+  /**
+   * Clear all graph state.
+   * @private
+   */
+  private clearState(): void {
+    this.clearEdgeState();
+    this.clearNodeState();
+  }
+
+  /**
+   * Add the node data to its program.
+   * @private
+   * @param node The node's graphology ID
+   * @param index The index where to place the edge in the program
+   */
+  private addNodeToProgram(node: string, index: number): void {
+    const data = this.nodeDataCache[node];
+    const nodeProgram = this.nodePrograms[data.type];
+    if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
+    nodeProgram.process(index, data);
+    // Saving program index
+    this.nodeProgramIndex[node] = index;
+  }
+
+  /**
+   * Add the edge data to its program.
+   * @private
+   * @param edge The edge's graphology ID
+   * @param index The index where to place the edge in the program
+   */
+  private addEdgeToProgram(edge: string, index: number): void {
+    const data = this.edgeDataCache[edge];
+    const edgeProgram = this.edgePrograms[data.type];
+    if (!edgeProgram) throw new Error(`Sigma: could not find a suitable program for edge type "${data.type}"!`);
+    const extremities = this.graph.extremities(edge),
+      sourceData = this.nodeDataCache[extremities[0]],
+      targetData = this.nodeDataCache[extremities[1]];
+    edgeProgram.process(index, sourceData, targetData, data);
+    // Saving program index
+    this.edgeProgramIndex[edge] = index;
   }
 
   /**---------------------------------------------------------------------------
@@ -1562,17 +1772,56 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Sigma}
    */
-  refresh(): this {
-    // Re-index graph data
-    this.nodeExtent = graphExtent(this.graph);
-    this.clearEdgeIndices();
-    this.clearNodeIndices();
-    this.graph.forEachNode((node) => this.nodeAdd(node));
-    this.graph.forEachEdge((edge) => this.edgeAdd(edge));
+  refresh(opts?: {
+    partialGraph?: { nodes?: string[]; edges?: string[] };
+    schedule?: boolean;
+    layoutUnchanged?: boolean;
+  }): this {
+    const layoutUnchanged = opts?.layoutUnchanged !== undefined ? opts?.layoutUnchanged : false;
+    const schedule = opts?.schedule !== undefined ? opts.schedule : false;
+    const fullRefresh = !opts || !opts.partialGraph;
 
-    // Call the render
-    this.needToProcess = true;
-    this.render();
+    if (fullRefresh) {
+      // Re-index graph data
+      this.clearEdgeIndices();
+      this.clearNodeIndices();
+      this.graph.forEachNode((node) => this.addNode(node));
+      this.graph.forEachEdge((edge) => this.addEdge(edge));
+    } else {
+      const nodes = opts.partialGraph?.nodes || [];
+      for (let i = 0, l = nodes?.length || 0; i < l; i++) {
+        const node = nodes[i];
+        // Recompute node's data (ie. apply reducer)
+        this.updateNode(node);
+        // Add node to the program if layout is unchanged.
+        // otherwise it will be done in the process function
+        if (layoutUnchanged) {
+          const programIndex = this.nodeProgramIndex[node];
+          if (programIndex === undefined) throw new Error(`Sigma: node "${node}" can't be repaint`);
+          this.addNodeToProgram(node, programIndex);
+        }
+      }
+
+      const edges = opts?.partialGraph?.edges || [];
+      for (let i = 0, l = edges.length; i < l; i++) {
+        const edge = edges[i];
+        // Recompute edge's data (ie. apply reducer)
+        this.updateEdge(edge);
+        // Add edge to the program
+        // otherwise it will be done in the process function
+        if (layoutUnchanged) {
+          const programIndex = this.edgeProgramIndex[edge];
+          if (programIndex === undefined) throw new Error(`Sigma: edge "${edge}" can't be repaint`);
+          this.addEdgeToProgram(edge, programIndex);
+        }
+      }
+    }
+
+    // Do we need to call the process function ?
+    if (fullRefresh || !layoutUnchanged) this.needToProcess = true;
+
+    if (schedule) this.scheduleRender();
+    else this.render();
 
     return this;
   }
@@ -1602,10 +1851,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Sigma}
    */
-  scheduleRefresh(): this {
-    this.needToProcess = true;
-    this.scheduleRender();
-    return this;
+  scheduleRefresh(opts?: { partialGraph?: { nodes?: string[]; edges?: string[] }; layoutUnchange?: boolean }): this {
+    return this.refresh({ ...opts, schedule: true });
   }
 
   /**
@@ -1891,176 +2138,5 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   getCanvases(): PlainObject<HTMLCanvasElement> {
     return { ...this.elements };
-  }
-
-  /**
-   * Add a node in the internal data structures.
-   * @returns true if the node changed the extents of the graph, so if we need to reprocess the whole graph.
-   *
-   *  Node display data resolution:
-   *   1. First we get the node's attributes
-   *   2. We optionally reduce them using the function provided by the user
-   *      Note that this function must return a total object and won't be merged
-   *   3. We apply our defaults, while running some vital checks
-   *   4. We apply the normalization function
-   */
-  private nodeAdd(key: string): boolean {
-    // Node cache
-    // We shallow copy node data to avoid dangerous behaviors from reducers
-    let attr = Object.assign({}, this.graph.getNodeAttributes(key));
-    if (this.settings.nodeReducer) attr = this.settings.nodeReducer(key, attr);
-    const data = applyNodeDefaults(this.settings, key, attr);
-    this.nodeDataCache[key] = data;
-
-    // Highlighted
-    if (data.highlighted && !data.hidden) this.highlightedNodes.add(key);
-    // Label
-    if (data.forceLabel) this.nodesWithForcedLabels.push(key);
-
-    // zIndex
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.nodeZExtent[0]) this.nodeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.nodeZExtent[1]) this.nodeZExtent[1] = data.zIndex;
-    }
-
-    if (
-      data.x < this.nodeExtent.x[0] ||
-      data.x > this.nodeExtent.x[1] ||
-      data.y < this.nodeExtent.x[0] ||
-      data.y > this.nodeExtent.y[1]
-    ) {
-      return true;
-    }
-
-    // this.normalizationFunction.applyTo(data);
-    // this.quadtree.add(key, data.x, data.y, data.size);
-
-    return false;
-  }
-
-  /**
-   * Update a node the internal data structures.
-   */
-  private nodeUpdate(key: string): boolean {
-    return this.nodeAdd(key);
-  }
-
-  /**
-   * Remove a node from the internal data structures.
-   *
-   * @param key The node's graphology ID
-   */
-  private nodeRemove(key: string): void {
-    // Remove from node cache
-    delete this.nodeDataCache[key];
-    // Remove from higlighted nodes
-    this.highlightedNodes.delete(key);
-    // Remove from hovered
-    if (this.hoveredNode === key) this.hoveredNode = null;
-    // Remove from forced label
-    this.nodesWithForcedLabels = this.nodesWithForcedLabels.filter((e) => e !== key);
-  }
-
-  /**
-   * Add an edge into the internal data structures.
-   *
-   * Edge display data resolution:
-   *   1. First we get the edge's attributes
-   *   2. We optionally reduce them using the function provided by the user
-   *      Note that this function must return a total object and won't be merged
-   *   3. We apply our defaults, while running some vital checks
-   */
-  private edgeAdd(key: string): void {
-    // Cache data
-    // We shallow copy edge data to avoid dangerous behaviors from reducers
-    let attr = Object.assign({}, this.graph.getEdgeAttributes(key));
-    if (this.settings.edgeReducer) attr = this.settings.edgeReducer(key, attr);
-    const data = applyEdgeDefaults(this.settings, key, attr);
-    this.edgeDataCache[key] = data;
-
-    // Forced label
-    if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.push(key);
-
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.edgeZExtent[0]) this.edgeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.edgeZExtent[1]) this.edgeZExtent[1] = data.zIndex;
-    }
-  }
-
-  /**
-   * Update an edge in the internal data structures
-   */
-  private edgeUpdate(key: string): void {
-    this.edgeRemove(key);
-    this.edgeAdd(key);
-  }
-
-  /**
-   * Remove an edge from the internal data structures.
-   *
-   * @param key The edge's graphology ID
-   */
-  private edgeRemove(key: string): void {
-    // Remove from edge cache
-    delete this.edgeDataCache[key];
-    // Remove from hovered
-    if (this.hoveredEdge === key) this.hoveredEdge = null;
-    // Remove from forced label
-    this.edgesWithForcedLabels = this.edgesWithForcedLabels.filter((e) => e !== key);
-  }
-
-  /**
-   * Clear all indices related to nodes.
-   */
-  private clearNodeIndices(): void {
-    this.quadtree = new QuadTree();
-    this.labelGrid = new LabelGrid();
-    this.nodeDataCache = {};
-    this.nodesWithForcedLabels = [];
-    this.nodeExtent = { x: [0, 1], y: [0, 1] };
-    this.nodeZExtent = [Infinity, -Infinity];
-  }
-
-  /**
-   * Clear all indices related to edges.
-   */
-  private clearEdgeIndices(): void {
-    this.edgeDataCache = {};
-    this.edgesWithForcedLabels = [];
-    this.edgeZExtent = [Infinity, -Infinity];
-  }
-
-  /**
-   * Clear all indices.
-   */
-  private clearIndices(): void {
-    this.clearEdgeIndices();
-    this.clearNodeIndices();
-  }
-
-  /**
-   * Clear all graph state related to nodes.
-   */
-  private clearNodeState(): void {
-    this.displayedNodeLabels = new Set();
-    this.highlightedNodes = new Set();
-    this.hoveredNode = null;
-  }
-
-  /**
-   * Clear all graph state related to edges.
-   */
-  private clearEdgeState(): void {
-    this.displayedEdgeLabels = new Set();
-    this.highlightedNodes = new Set();
-    this.hoveredEdge = null;
-  }
-
-  /**
-   * Clear all graph state.
-   */
-  private clearState(): void {
-    this.clearEdgeState();
-    this.clearNodeState();
   }
 }
