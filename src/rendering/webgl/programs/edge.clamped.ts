@@ -21,10 +21,26 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
       ...super.getDefinition(),
       VERTEX_SHADER_SOURCE,
       ATTRIBUTES: [
-        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_positionStart", size: 2, type: FLOAT },
+        { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_radius", size: 1, type: FLOAT },
+      ],
+      CONSTANT_ATTRIBUTES: [
+        // If 0, then position will be a_positionStart
+        // If 1, then position will be a_positionEnd
+        { name: "a_positionCoef", size: 1, type: FLOAT },
+        { name: "a_normalCoef", size: 1, type: FLOAT },
+        { name: "a_radiusCoef", size: 1, type: FLOAT },
+      ],
+      CONSTANT_DATA: [
+        [0, 1, 0],
+        [0, -1, 0],
+        [1, 1, 1],
+        [1, 1, 1],
+        [0, -1, 0],
+        [1, -1, -1],
       ],
     };
   }
@@ -56,36 +72,13 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
 
     const array = this.array;
 
-    // First point
     array[i++] = x1;
     array[i++] = y1;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = color;
-    array[i++] = 0;
-
-    // First point flipped
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = color;
-    array[i++] = 0;
-
-    // Second point
     array[i++] = x2;
     array[i++] = y2;
     array[i++] = n1;
     array[i++] = n2;
     array[i++] = color;
     array[i++] = radius;
-
-    // Second point flipped
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = color;
-    array[i] = -radius;
   }
 }

@@ -35,7 +35,7 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
       CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
-      CONSTANT_DATA: [NodeCircleProgram.ANGLE_1, NodeCircleProgram.ANGLE_2, NodeCircleProgram.ANGLE_3],
+      CONSTANT_DATA: [[NodeCircleProgram.ANGLE_1], [NodeCircleProgram.ANGLE_2], [NodeCircleProgram.ANGLE_3]],
     };
   }
 

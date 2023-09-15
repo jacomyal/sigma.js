@@ -23,9 +23,21 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,
       ATTRIBUTES: [
-        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_positionStart", size: 2, type: FLOAT },
+        { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+      ],
+      CONSTANT_ATTRIBUTES: [
+        // If 0, then position will be a_positionStart
+        // If 1, then position will be a_positionEnd
+        { name: "a_positionCoef", size: 1, type: FLOAT },
+        { name: "a_normalCoef", size: 1, type: FLOAT },
+      ],
+      CONSTANT_DATA: [
+        [0, 1],
+        [0, -1],
+        [1, 0],
       ],
     };
   }
@@ -58,21 +70,11 @@ export default class EdgeTriangleProgram extends EdgeProgram<typeof UNIFORMS[num
     // First point
     array[i++] = x1;
     array[i++] = y1;
+    array[i++] = x2;
+    array[i++] = y2;
     array[i++] = n1;
     array[i++] = n2;
     array[i++] = color;
-
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = color;
-
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = 0;
-    array[i++] = 0;
-    array[i] = color;
   }
 
   draw(params: RenderParams): void {

@@ -28,14 +28,29 @@ const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_sizeRatio", "u_correctionRatio"]
 export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[number]> {
   getDefinition() {
     return {
-      VERTICES: 4,
+      VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       UNIFORMS,
       ATTRIBUTES: [
-        { name: "a_position", size: 2, type: FLOAT },
+        { name: "a_positionStart", size: 2, type: FLOAT },
+        { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+      ],
+      CONSTANT_ATTRIBUTES: [
+        // If 0, then position will be a_positionStart
+        // If 2, then position will be a_positionEnd
+        { name: "a_positionCoef", size: 1, type: FLOAT },
+        { name: "a_normalCoef", size: 1, type: FLOAT },
+      ],
+      CONSTANT_DATA: [
+        [0, 1],
+        [0, -1],
+        [1, 1],
+        [1, 1],
+        [0, -1],
+        [1, -1],
       ],
     };
   }
@@ -65,47 +80,13 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
 
     const array = this.array;
 
-    // First point
     array[i++] = x1;
     array[i++] = y1;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = color;
-
-    // First point flipped
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = color;
-
-    // Second point
     array[i++] = x2;
     array[i++] = y2;
     array[i++] = n1;
     array[i++] = n2;
     array[i++] = color;
-
-    // Second point again
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = color;
-
-    // First point flipped again
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = color;
-
-    // Second point flipped
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i] = color;
   }
 
   draw(params: RenderParams): void {

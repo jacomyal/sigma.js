@@ -47,7 +47,7 @@ export interface ProgramDefinition<Uniform extends string = string> {
 export interface InstancedProgramDefinition<Uniform extends string = string>
   extends Omit<ProgramDefinition<Uniform>, "CONSTANT_DATA" | "CONSTANT_ATTRIBUTES"> {
   CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  CONSTANT_DATA: number[];
+  CONSTANT_DATA: number[][];
 }
 
 export abstract class AbstractProgram {
@@ -136,19 +136,30 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
       const constantAttributesItemsCount = getAttributesItemsCount(definition.CONSTANT_ATTRIBUTES);
 
-      if (definition.CONSTANT_DATA.length !== constantAttributesItemsCount * this.VERTICES)
+      if (definition.CONSTANT_DATA.length !== this.VERTICES)
         throw new Error(
-          `Program: error while getting constant data (expected ${
-            constantAttributesItemsCount * this.VERTICES
-          } items, received ${this.CONSTANT_DATA.length} instead`,
+          `Program: error while getting constant data (expected ${this.VERTICES} items, received ${definition.CONSTANT_DATA.length} instead)`,
         );
 
+      const constantData: number[] = [];
+      for (let i = 0; i < definition.CONSTANT_DATA.length; i++) {
+        const vector = definition.CONSTANT_DATA[i];
+
+        if (vector.length !== constantAttributesItemsCount)
+          throw new Error(
+            `Program: error while getting constant data (one vector has ${vector.length} items instead of ${constantAttributesItemsCount})`,
+          );
+
+        constantData.push(...vector);
+      }
+
       this.STRIDE = this.ATTRIBUTES_ITEMS_COUNT;
-      this.CONSTANT_DATA = new Float32Array(definition.CONSTANT_DATA);
+      this.CONSTANT_DATA = new Float32Array(constantData);
       this.CONSTANT_ATTRIBUTES = definition.CONSTANT_ATTRIBUTES;
       this.CONSTANT_ATTRIBUTES.forEach((attr) => {
         const location = this.gl.getAttribLocation(this.program, attr.name);
-        if (location === -1) throw new Error(`Program: error while getting location for attribute "${attr.name}".`);
+        if (location === -1)
+          throw new Error(`Program: error while getting location for constant attribute "${attr.name}".`);
         this.attributeLocations[attr.name] = location;
       });
 
@@ -192,7 +203,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     gl.enableVertexAttribArray(location);
 
     const stride = !this.isInstanced
-      ? getAttributesItemsCount(this.ATTRIBUTES) * Float32Array.BYTES_PER_ELEMENT
+      ? this.ATTRIBUTES_ITEMS_COUNT * Float32Array.BYTES_PER_ELEMENT
       : getAttributesItemsCount(setDivisor ? this.ATTRIBUTES : this.CONSTANT_ATTRIBUTES) *
         Float32Array.BYTES_PER_ELEMENT;
 
@@ -223,8 +234,8 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     this.verticesCount = this.VERTICES * capacity;
     this.array = new Float32Array(
       !this.isInstanced
-        ? this.verticesCount * getAttributesItemsCount(this.ATTRIBUTES)
-        : this.capacity * getAttributesItemsCount(this.ATTRIBUTES),
+        ? this.verticesCount * this.ATTRIBUTES_ITEMS_COUNT
+        : this.capacity * this.ATTRIBUTES_ITEMS_COUNT,
     );
   }
 

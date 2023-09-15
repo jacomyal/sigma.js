@@ -27,7 +27,12 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_radius", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        { name: "a_barycentric", size: 3, type: FLOAT },
+      ],
+      CONSTANT_ATTRIBUTES: [{ name: "a_barycentric", size: 3, type: FLOAT }],
+      CONSTANT_DATA: [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
       ],
     };
   }
@@ -58,38 +63,12 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
 
     const array = this.array;
 
-    // First point
     array[i++] = x2;
     array[i++] = y2;
     array[i++] = -n1;
     array[i++] = -n2;
     array[i++] = radius;
     array[i++] = color;
-    array[i++] = 1;
-    array[i++] = 0;
-    array[i++] = 0;
-
-    // Second point
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = radius;
-    array[i++] = color;
-    array[i++] = 0;
-    array[i++] = 1;
-    array[i++] = 0;
-
-    // Third point
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = radius;
-    array[i++] = color;
-    array[i++] = 0;
-    array[i++] = 0;
-    array[i] = 1;
   }
 
   draw(params: RenderParams): void {
