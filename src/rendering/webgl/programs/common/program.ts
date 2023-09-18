@@ -44,8 +44,7 @@ export interface ProgramDefinition<Uniform extends string = string> {
   ATTRIBUTES: Array<ProgramAttributeSpecification>;
 }
 
-export interface InstancedProgramDefinition<Uniform extends string = string>
-  extends Omit<ProgramDefinition<Uniform>, "CONSTANT_DATA" | "CONSTANT_ATTRIBUTES"> {
+export interface InstancedProgramDefinition<Uniform extends string = string> extends ProgramDefinition<Uniform> {
   CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
   CONSTANT_DATA: number[][];
 }
@@ -185,7 +184,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
       offset = 0;
       this.CONSTANT_ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, offset, false)));
-      gl.bufferData(gl.ARRAY_BUFFER, this.CONSTANT_DATA, gl.DYNAMIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, this.CONSTANT_DATA, gl.STATIC_DRAW);
 
       // Handle "instance specific" data (things that vary for each item):
       gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
@@ -193,6 +192,17 @@ export abstract class Program<Uniform extends string = string> implements Abstra
       offset = 0;
       this.ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, offset, true)));
       gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  }
+
+  protected unbind(): void {
+    if (!this.isInstanced) {
+      this.ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr));
+    } else {
+      this.CONSTANT_ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, false));
+      this.ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, true));
     }
   }
 
@@ -204,7 +214,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
     const stride = !this.isInstanced
       ? this.ATTRIBUTES_ITEMS_COUNT * Float32Array.BYTES_PER_ELEMENT
-      : getAttributesItemsCount(setDivisor ? this.ATTRIBUTES : this.CONSTANT_ATTRIBUTES) *
+      : (setDivisor ? this.ATTRIBUTES_ITEMS_COUNT : getAttributesItemsCount(this.CONSTANT_ATTRIBUTES)) *
         Float32Array.BYTES_PER_ELEMENT;
 
     gl.vertexAttribPointer(location, attr.size, attr.type, attr.normalized || false, stride, offset);
@@ -222,6 +232,22 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     if (typeof sizeFactor !== "number") throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"!`);
 
     return attr.size * sizeFactor;
+  }
+
+  private unbindAttribute(attr: ProgramAttributeSpecification, unsetDivisor?: boolean) {
+    const gl = this.gl;
+    const location = this.attributeLocations[attr.name];
+
+    gl.disableVertexAttribArray(location);
+
+    if (this.isInstanced && unsetDivisor) {
+      if (gl instanceof WebGL2RenderingContext) {
+        gl.vertexAttribDivisor(location, 0);
+      } else {
+        const ext = gl.getExtension("ANGLE_instanced_arrays");
+        if (ext) ext.vertexAttribDivisorANGLE(location, 0);
+      }
+    }
   }
 
   reallocate(capacity: number): void {
@@ -251,6 +277,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     this.bind();
     this.gl.useProgram(this.program);
     this.draw(params);
+    this.unbind();
   }
 
   drawWebGL(method: GLenum): void {
