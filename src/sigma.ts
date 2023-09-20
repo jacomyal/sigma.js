@@ -42,6 +42,7 @@ import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
+import { extend } from "./utils/array";
 
 /**
  * Constants.
@@ -935,9 +936,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const cameraState = this.camera.getState();
 
     // Selecting labels to draw
-    const labelsToDisplay = this.labelGrid
-      .getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity)
-      .concat(Array.from(this.nodesWithForcedLabels));
+    const labelsToDisplay = this.labelGrid.getLabelsToDisplay(cameraState.ratio, this.settings.labelDensity);
+    extend(labelsToDisplay, this.nodesWithForcedLabels);
 
     this.displayedNodeLabels = new Set();
 
@@ -1023,7 +1023,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       hoveredNode: this.hoveredNode,
       displayedNodeLabels: this.displayedNodeLabels,
       highlightedNodes: this.highlightedNodes,
-    }).concat(Array.from(this.edgesWithForcedLabels));
+    });
+    extend(edgeLabelsToDisplay, this.edgesWithForcedLabels);
 
     const displayedLabels = new Set<string>();
     for (let i = 0, l = edgeLabelsToDisplay.length; i < l; i++) {
