@@ -577,7 +577,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // (size is needed in the quadtree and zIndex for the programIndex)
       const layoutChanged =
         updatedFields && ["x", "y", "size", "zIndex", "type"].some((f) => updatedFields.includes(f));
-      this.refresh({ partialGraph: { nodes: graph.nodes() }, layoutUnchanged: !layoutChanged, schedule: true });
+      this.refresh({ partialGraph: { nodes: graph.nodes() }, skipIndexation: !layoutChanged, schedule: true });
     };
 
     this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
@@ -586,7 +586,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       const edges = this.graph.edges();
       edges.forEach((edge) => this.updateEdge(edge));
       const layoutChanged = updatedFields && ["zIndex", "type"].some((f) => updatedFields?.includes(f));
-      this.refresh({ partialGraph: { edges: graph.edges() }, layoutUnchanged: !layoutChanged, schedule: true });
+      this.refresh({ partialGraph: { edges: graph.edges() }, skipIndexation: !layoutChanged, schedule: true });
     };
 
     // On add node, we add the node in indices and then call for a render
@@ -595,14 +595,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // we process the node
       this.addNode(node);
       // schedule a render for the node
-      this.refresh({ partialGraph: { nodes: [node] }, layoutUnchanged: false, schedule: true });
+      this.refresh({ partialGraph: { nodes: [node] }, skipIndexation: false, schedule: true });
     };
 
     // On update node, we update indices and then call for a render
     this.activeListeners.updateNodeGraphUpdate = (payload: { key: string }): void => {
       const node = payload.key;
       // schedule a render for the node
-      this.refresh({ partialGraph: { nodes: [node] }, layoutUnchanged: false, schedule: true });
+      this.refresh({ partialGraph: { nodes: [node] }, skipIndexation: false, schedule: true });
     };
 
     // On drop node, we remove the node from indices and then call for a refresh
@@ -627,7 +627,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.activeListeners.updateEdgeGraphUpdate = (payload: { key: string }): void => {
       const edge = payload.key;
       // schedule a repaint for the edge
-      this.refresh({ partialGraph: { edges: [edge] }, layoutUnchanged: false, schedule: true });
+      this.refresh({ partialGraph: { edges: [edge] }, skipIndexation: false, schedule: true });
     };
 
     // On drop edge, we remove the edge from indices and then call for a refresh
@@ -1768,17 +1768,20 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Method used to refresh, i.e. force the renderer to fully reprocess graph
+   * Method used to refresh, i.e. force the renderer to reprocess graph
    * data and render, but keep the state.
+   * - if a partialGraph is provided, we only reprocess those nodes & edges.
+   * - if schedule is TRUE, we schedule a render instead of sync render
+   * - if skipIndexation is TRUE, then quadtree, labelGrid & program indexation are skipped (can be used if you haven't modify x, y, zIndex & size)
    *
    * @return {Sigma}
    */
   refresh(opts?: {
     partialGraph?: { nodes?: string[]; edges?: string[] };
     schedule?: boolean;
-    layoutUnchanged?: boolean;
+    skipIndexation?: boolean;
   }): this {
-    const layoutUnchanged = opts?.layoutUnchanged !== undefined ? opts?.layoutUnchanged : false;
+    const skipIndexation = opts?.skipIndexation !== undefined ? opts?.skipIndexation : false;
     const schedule = opts?.schedule !== undefined ? opts.schedule : false;
     const fullRefresh = !opts || !opts.partialGraph;
 
@@ -1796,7 +1799,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         this.updateNode(node);
         // Add node to the program if layout is unchanged.
         // otherwise it will be done in the process function
-        if (layoutUnchanged) {
+        if (skipIndexation) {
           const programIndex = this.nodeProgramIndex[node];
           if (programIndex === undefined) throw new Error(`Sigma: node "${node}" can't be repaint`);
           this.addNodeToProgram(node, programIndex);
@@ -1810,7 +1813,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         this.updateEdge(edge);
         // Add edge to the program
         // otherwise it will be done in the process function
-        if (layoutUnchanged) {
+        if (skipIndexation) {
           const programIndex = this.edgeProgramIndex[edge];
           if (programIndex === undefined) throw new Error(`Sigma: edge "${edge}" can't be repaint`);
           this.addEdgeToProgram(edge, programIndex);
@@ -1819,7 +1822,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     }
 
     // Do we need to call the process function ?
-    if (fullRefresh || !layoutUnchanged) this.needToProcess = true;
+    if (fullRefresh || !skipIndexation) this.needToProcess = true;
 
     if (schedule) this.scheduleRender();
     else this.render();
