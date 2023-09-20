@@ -78,20 +78,37 @@ function setSearchQuery(query: string) {
     state.suggestions = undefined;
   }
 
-  // Refresh rendering:
-  renderer.refresh();
+  // Refresh rendering
+  // You can directly call `renderer.refresh()`, but if you need performances
+  // you can provide some options to the refresh method.
+  // In this case, we don't touch the graph data so we can skip its reindexation
+  renderer.refresh({
+    skipIndexation: true,
+  });
 }
 function setHoveredNode(node?: string) {
   if (node) {
     state.hoveredNode = node;
     state.hoveredNeighbors = new Set(graph.neighbors(node));
-  } else {
+  }
+
+  // Compute the partial that we need to re-render
+  // to optimized the refresh
+  const partialGraph = { nodes: [], edges: [] };
+  partialGraph.nodes = graph.nodes().filter((n) => n !== state.hoveredNode && !state.hoveredNeighbors.has(n));
+  partialGraph.edges = graph.edges().filter((e) => graph.extremities(e).some((n) => partialGraph.nodes.includes(n)));
+
+  if (!node) {
     state.hoveredNode = undefined;
     state.hoveredNeighbors = undefined;
   }
 
-  // Refresh rendering:
-  renderer.refresh();
+  // Refresh rendering
+  renderer.refresh({
+    partialGraph,
+    // We don't touch the graph data so we can skip its reindexation
+    skipIndexation: true,
+  });
 }
 
 // Bind search input interactions:
@@ -124,9 +141,13 @@ renderer.setSetting("nodeReducer", (node, data) => {
 
   if (state.selectedNode === node) {
     res.highlighted = true;
-  } else if (state.suggestions && !state.suggestions.has(node)) {
-    res.label = "";
-    res.color = "#f6f6f6";
+  } else if (state.suggestions) {
+    if (state.suggestions.has(node)) {
+      res.forceLabel = true;
+    } else {
+      res.label = "";
+      res.color = "#f6f6f6";
+    }
   }
 
   return res;
