@@ -8,9 +8,6 @@
 import { Attributes } from "graphology-types";
 
 import { assign } from "./utils";
-import drawLabel from "./rendering/canvas/label";
-import drawHover from "./rendering/canvas/hover";
-import drawEdgeLabel from "./rendering/canvas/edge-label";
 import { EdgeDisplayData, NodeDisplayData } from "./types";
 import NodePointProgram from "./rendering/webgl/programs/node.point";
 import EdgeRectangleProgram from "./rendering/webgl/programs/edge.rectangle";
@@ -58,10 +55,6 @@ export interface Settings {
   zIndex: boolean;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
-  // Renderers
-  labelRenderer: typeof drawLabel;
-  hoverRenderer: typeof drawHover;
-  edgeLabelRenderer: typeof drawEdgeLabel;
   // Lifecycle
   allowInvalidContainer: boolean;
 
@@ -111,11 +104,6 @@ export const DEFAULT_SETTINGS: Settings = {
   zIndex: false,
   minCameraRatio: null,
   maxCameraRatio: null,
-
-  // Renderers
-  labelRenderer: drawLabel,
-  hoverRenderer: drawHover,
-  edgeLabelRenderer: drawEdgeLabel,
 
   // Lifecycle
   allowInvalidContainer: false,

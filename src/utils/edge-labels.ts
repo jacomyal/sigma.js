@@ -1,14 +1,15 @@
-/**
- * Sigma.js Canvas Renderer Edge Label Component
- * =============================================
- *
- * Function used by the canvas renderer to display a single edge's label.
- * @module
- */
-import { Settings } from "../../settings";
-import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../../types";
+import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../types";
+import { Settings } from "../settings";
 
-export default function drawEdgeLabel(
+export type EdgeLabelDrawingFunction = (
+  context: CanvasRenderingContext2D,
+  edgeData: PartialButFor<EdgeDisplayData, "label" | "color" | "size">,
+  sourceData: PartialButFor<NodeDisplayData, "x" | "y" | "size">,
+  targetData: PartialButFor<NodeDisplayData, "x" | "y" | "size">,
+  settings: Settings,
+) => void;
+
+export function drawStraightEdgeLabel(
   context: CanvasRenderingContext2D,
   edgeData: PartialButFor<EdgeDisplayData, "label" | "color" | "size">,
   sourceData: PartialButFor<NodeDisplayData, "x" | "y" | "size">,

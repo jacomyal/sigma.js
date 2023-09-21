@@ -12,6 +12,9 @@ import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
 import { NodeProgram, NodeProgramConstructor } from "./common/node";
 import Sigma from "../../../sigma";
+import { checkDiscNodeCollision } from "../../../utils/node-collisions";
+import { drawDiscNodeLabel } from "../../../utils/node-labels";
+import { drawDiscNodeHover } from "../../../utils/node-hover";
 
 // maximum size of single texture in atlas
 const MAX_TEXTURE_SIZE = 192;
@@ -201,6 +204,10 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
   const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_atlas"] as const;
 
   return class NodeImageProgram extends NodeProgram<typeof UNIFORMS[number]> {
+    checkCollision = checkDiscNodeCollision;
+    drawLabel = drawDiscNodeLabel;
+    drawHover = drawDiscNodeHover;
+
     getDefinition() {
       return {
         VERTICES: 1,

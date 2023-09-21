@@ -7,6 +7,8 @@
 import Sigma from "../../../../sigma";
 import { AbstractProgram, Program } from "./program";
 import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../../types";
+import { EdgeCollisionDetectionFunction } from "../../../../utils/edge-collisions";
+import { EdgeLabelDrawingFunction } from "../../../../utils/edge-labels";
 
 export abstract class AbstractEdgeProgram extends AbstractProgram {
   abstract process(
@@ -15,6 +17,9 @@ export abstract class AbstractEdgeProgram extends AbstractProgram {
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
+
+  abstract checkCollision: EdgeCollisionDetectionFunction;
+  abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
 export abstract class EdgeProgram<Uniform extends string = string>
@@ -33,12 +38,16 @@ export abstract class EdgeProgram<Uniform extends string = string>
 
     return this.processVisibleItem(i, sourceData, targetData, data);
   }
+
   abstract processVisibleItem(
     i: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
+
+  abstract checkCollision: EdgeCollisionDetectionFunction;
+  abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
 export interface EdgeProgramConstructor {
@@ -73,6 +82,13 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
+    }
+
+    checkCollision(...args: Parameters<EdgeCollisionDetectionFunction>) {
+      return this.programs.some((program) => program.checkCollision(...args));
+    }
+    drawLabel(...args: Parameters<EdgeLabelDrawingFunction>) {
+      return this.programs[0].drawLabel(...args);
     }
   };
 }

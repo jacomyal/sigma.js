@@ -7,6 +7,9 @@ module.exports = {
       "sigma/types": path.resolve(__dirname, "../src/types.ts"),
       "sigma/utils": path.resolve(__dirname, "../src/utils/"),
       "sigma/utils/animate": path.resolve(__dirname, "../src/utils/animate.ts"),
+      "sigma/utils/node-hover": path.resolve(__dirname, "../src/utils/node-hover"),
+      "sigma/utils/node-labels": path.resolve(__dirname, "../src/utils/node-labels"),
+      "sigma/utils/node-collisions": path.resolve(__dirname, "../src/utils/node-collisions"),
       "sigma/rendering/webgl/programs/edge": path.resolve(__dirname, "../src/rendering/webgl/programs/edge.ts"),
       "sigma/rendering/webgl/programs/edge.fast": path.resolve(
         __dirname,

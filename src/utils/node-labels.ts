@@ -1,14 +1,13 @@
-/**
- * Sigma.js Canvas Renderer Label Component
- * =========================================
- *
- * Function used by the canvas renderer to display a single node's label.
- * @module
- */
-import { Settings } from "../../settings";
-import { NodeDisplayData, PartialButFor } from "../../types";
+import { NodeDisplayData, PartialButFor } from "../types";
+import { Settings } from "../settings";
 
-export default function drawLabel(
+export type NodeLabelDrawingFunction = (
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
+  settings: Settings,
+) => void;
+
+export function drawDiscNodeLabel(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,

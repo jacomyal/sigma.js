@@ -1,14 +1,12 @@
-/**
- * Sigma.js Canvas Renderer Hover Component
- * =========================================
- *
- * Function used by the canvas renderer to display a single node's hovered
- * state.
- * @module
- */
-import { Settings } from "../../settings";
-import { NodeDisplayData, PartialButFor } from "../../types";
-import drawLabel from "./label";
+import { Settings } from "../settings";
+import { NodeDisplayData, PartialButFor } from "../types";
+import { drawDiscNodeLabel } from "./node-labels";
+
+export type NodeHoverDrawingFunction = (
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
+  settings: Settings,
+) => void;
 
 /**
  * Draw an hovered node.
@@ -16,7 +14,7 @@ import drawLabel from "./label";
  * - if the label box is bigger than node size => display a label box that contains the node with a shadow
  * - else node with shadow and the label box
  */
-export default function drawHover(
+export function drawDiscNodeHover(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
@@ -65,5 +63,5 @@ export default function drawHover(
   context.shadowBlur = 0;
 
   // And finally we draw the label
-  drawLabel(context, data, settings);
+  drawDiscNodeLabel(context, data, settings);
 }

@@ -15,6 +15,9 @@
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
+import { checkDiscNodeCollision } from "sigma/utils/node-collisions";
+import { drawDiscNodeLabel } from "sigma/utils/node-labels";
+import { drawDiscNodeHover } from "sigma/utils/node-hover";
 import VERTEX_SHADER_SOURCE from "!raw-loader!./node.border.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "!raw-loader!./node.border.frag.glsl";
 
@@ -23,6 +26,10 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[number]> {
+  checkCollision = checkDiscNodeCollision;
+  drawLabel = drawDiscNodeLabel;
+  drawHover = drawDiscNodeHover;
+
   getDefinition() {
     return {
       VERTICES: 1,

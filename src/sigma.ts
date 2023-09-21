@@ -41,7 +41,7 @@ import { AbstractNodeProgram } from "./rendering/webgl/programs/common/node";
 import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
-import { doEdgeCollideWithPoint, isPixelColored } from "./utils/edge-collisions";
+import { isPixelColored } from "./utils/edge-collisions";
 import { extend } from "./utils/array";
 
 /**
@@ -394,19 +394,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Method that checks whether or not a node collides with a given position.
-   */
-  private mouseIsOnNode({ x, y }: Coordinates, { x: nodeX, y: nodeY }: Coordinates, size: number): boolean {
-    return (
-      x > nodeX - size &&
-      x < nodeX + size &&
-      y > nodeY - size &&
-      y < nodeY + size &&
-      Math.sqrt(Math.pow(x - nodeX, 2) + Math.pow(y - nodeY, 2)) < size
-    );
-  }
-
-  /**
    * Method that returns all nodes in quad at a given position.
    */
   private getQuadNodes(position: Coordinates): string[] {
@@ -435,7 +422,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const size = this.scaleSize(data.size);
 
-      if (!data.hidden && this.mouseIsOnNode(position, nodePosition, size)) {
+      const NodeProgram = this.nodePrograms[data.type];
+      if (!data.hidden && NodeProgram.checkCollision(position.x, position.y, nodePosition.x, nodePosition.y, size)) {
         const distance = Math.sqrt(Math.pow(x - nodePosition.x, 2) + Math.pow(y - nodePosition.y, 2));
 
         // TODO: sort by min size also for cases where center is the same
@@ -491,7 +479,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
         const size = this.scaleSize(data.size);
 
-        if (!this.mouseIsOnNode(e, pos, size)) {
+        const NodeProgram = this.nodePrograms[data.type];
+        if (!NodeProgram.checkCollision(e.x, e.y, pos.x, pos.y, size)) {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
@@ -749,9 +738,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     // Now we can look for matching edges:
     const edges = this.graph.filterEdges((key, edgeAttributes, sourceId, targetId, sourcePosition, targetPosition) => {
-      if (edgeDataCache[key].hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
+      const edgeData = edgeDataCache[key];
+      if (edgeData.hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
+
+      const EdgeProgram = this.edgePrograms[edgeData.type];
       if (
-        doEdgeCollideWithPoint(
+        EdgeProgram.checkCollision(
           graphX,
           graphY,
           sourcePosition.x,
@@ -759,7 +751,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
           targetPosition.x,
           targetPosition.y,
           // Adapt the edge size to the zoom ratio:
-          this.scaleSize(edgeDataCache[key].size * transformationRatio),
+          this.scaleSize(edgeData.size * transformationRatio),
         )
       ) {
         return true;
@@ -986,7 +978,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // an issue once we start memoizing getLabelsToDisplay.
       this.displayedNodeLabels.add(node);
 
-      this.settings.labelRenderer(
+      const nodeProgram = this.nodePrograms[data.type];
+      nodeProgram.drawLabel(
         context,
         {
           key: node,
@@ -1042,7 +1035,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         continue;
       }
 
-      this.settings.edgeLabelRenderer(
+      const edgeProgram = this.edgePrograms[edgeData.type];
+      edgeProgram.drawLabel(
         context,
         {
           key: edge,
@@ -1090,7 +1084,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const size = this.scaleSize(data.size);
 
-      this.settings.hoverRenderer(
+      const nodeProgram = this.nodePrograms[data.type];
+      nodeProgram.drawHover(
         context,
         {
           key: node,
@@ -1611,7 +1606,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
   /**
    * Method used to get all the sigma edge attributes.
-   * It's usefull for example to get values that are set by the edgeReducer.
+   * It's useful for example to get values that are set by the edgeReducer.
    *
    * @param  {string} key - The edge's key.
    * @return {EdgeDisplayData | undefined} A copy of the desired edge's attribute or undefined if not found
@@ -1833,7 +1828,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   /**
    * Method used to schedule a render at the next available frame.
    * This method can be safely called on a same frame because it basically
-   * debounce refresh to the next frame.
+   * debounces refresh to the next frame.
    *
    * @return {Sigma}
    */
@@ -1851,7 +1846,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * Method used to schedule a refresh (i.e. fully reprocess graph data and render)
    * at the next available frame.
    * This method can be safely called on a same frame because it basically
-   * debounce refresh to the next frame.
+   * debounces refresh to the next frame.
    *
    * @return {Sigma}
    */

@@ -11,12 +11,17 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.line.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.line.frag.glsl";
+import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
+import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix"] as const;
 
 export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]> {
+  checkCollision = checkStraightEdgeCollision;
+  drawLabel = drawStraightEdgeLabel;
+
   getDefinition() {
     return {
       VERTICES: 2,

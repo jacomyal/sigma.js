@@ -12,10 +12,15 @@ import EdgeRectangleProgram from "./edge.rectangle";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.clamped.vert.glsl";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
+import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
+import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 export default class EdgeClampedProgram extends EdgeRectangleProgram {
+  checkCollision = checkStraightEdgeCollision;
+  drawLabel = drawStraightEdgeLabel;
+
   getDefinition() {
     return {
       ...super.getDefinition(),
