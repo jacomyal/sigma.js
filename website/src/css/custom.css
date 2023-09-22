@@ -1,0 +1,96 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* Titles font */
+@font-face {
+  font-family: Hauora;
+  src: local("Hauora"), url("/fonts/hauora/Hauora-Medium.woff"), url("/fonts/hauora/Hauora-Medium.woff2");
+}
+@font-face {
+  font-family: Hauora;
+  font-weight: bold;
+  src: local("Hauora"), url("/fonts/hauora/Hauora-Bold.woff"), url("/fonts/hauora/Hauora-Bold.woff2");
+}
+
+/* Monospace font */
+@font-face {
+  font-family: Cascadia;
+  src: local("Cascadia"), url("/fonts/cascadia/CascadiaCode.ttf"), url("/fonts/cascadia/CascadiaCode.woff2"),
+    url("/fonts/cascadia/CascadiaCode-Regular.otf");
+}
+
+/* Main font */
+@font-face {
+  font-family: Public Sans;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-Regular.woff"),
+    url("/fonts/public-sans/PublicSans-Regular.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-style: italic;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-LightItalic.woff"),
+    url("/fonts/public-sans/PublicSans-LightItalic.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-weight: bold;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-SemiBold.woff"),
+    url("/fonts/public-sans/PublicSans-SemiBold.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-style: italic;
+  font-weight: bold;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-SemiBoldItalic.woff"),
+    url("/fonts/public-sans/PublicSans-SemiBoldItalic.woff2");
+}
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #e22653;
+  --ifm-color-primary-dark: #c92249;
+  --ifm-color-primary-darker: #a31c3b;
+  --ifm-color-primary-darkest: #631124;
+  --ifm-color-primary-light: #f02957;
+  --ifm-color-primary-lighter: #fc2b5c;
+  --ifm-color-primary-lightest: #ff5b7e;
+  --ifm-code-font-size: 95%;
+  --ifm-font-family-base: "Public Sans", Lato, Arial, sans-serif;
+  --ifm-heading-font-family: Hauora, Roboto, Arial, sans-serif;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.text-ruby {
+  color: var(--ifm-color-primary);
+}
+.text-grey {
+  color: #999;
+}
+.with-logo {
+  text-decoration: none;
+  position: relative;
+}
+.with-logo img {
+  position: absolute;
+  margin-right: 0.2em;
+  right: 100%;
+  bottom: -0.15em;
+  height: 110%;
+}
+
+footer {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+footer ul {
+  list-style: none;
+  padding: 0;
+}
