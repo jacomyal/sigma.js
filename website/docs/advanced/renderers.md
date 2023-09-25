@@ -38,7 +38,7 @@ Additionally, sigma.js offers helpers to compose programs, making it easier to c
 
 Sigma.js comes with a set of predefined programs:
 
-### For edges:
+### For edges
 
 - **`edge.line`**: This is the most efficient method, rendering edges using the `gl.LINES` method. However, it always draws edges as 1px thick lines, regardless of zoom levels.
 
@@ -46,7 +46,7 @@ Sigma.js comes with a set of predefined programs:
 
 - **`edge.arrow`**: This is a composite renderer that uses `edge.clamped` (for drawing the arrow body) and `edge.arrowHead` (for drawing the arrow head).
 
-### For nodes:
+### For nodes
 
 - **`node.point`**: This method displays nodes as squares using the `gl.POINTS` method. A circle is then "carved" into this square in the fragment shader. It's highly efficient in terms of both RAM and execution speed. However, due to the limitations of the `gl.POINTS` method, nodes can't be drawn with a radius exceeding 100px.
 

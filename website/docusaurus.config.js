@@ -32,6 +32,32 @@ const config = {
     locales: ["en"],
   },
 
+  plugins: [
+    [
+      "docusaurus-plugin-typedoc",
+
+      // Plugin / TypeDoc options
+      {
+        entryPoints: [
+          "../src/sigma.ts",
+          "../src/core/camera.ts",
+          "../src/core/quadtree.ts",
+          "../src/core/captors/mouse.ts",
+          "../src/core/captors/touch.ts",
+        ],
+        watch: true,
+        tsconfig: "../tsconfig.json",
+        out: "typedoc",
+        readme: "none",
+        sidebar: {
+          categoryLabel: "TypeScript documentation",
+          position: 999,
+          fullNames: true,
+        },
+      },
+    ],
+  ],
+
   presets: [
     [
       "classic",
