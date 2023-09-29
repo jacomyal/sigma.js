@@ -1,8 +1,13 @@
 attribute vec2 a_position;
 attribute vec2 a_normal;
 attribute float a_radius;
-attribute vec4 a_color;
 attribute vec3 a_barycentric;
+
+#ifdef PICKING_MODE
+attribute vec4 a_id;
+#else
+attribute vec4 a_color;
+#endif
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -46,7 +51,12 @@ void main() {
 
   gl_Position = vec4(position, 0, 1);
 
-  // Extract the color:
+  #ifdef PICKING_MODE
+  // For picking mode, we use the ID as the color:
+  v_color = a_id;
+  #else
+  // For normal mode, we use the color:
   v_color = a_color;
   v_color.a *= bias;
+  #endif
 }

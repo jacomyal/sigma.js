@@ -10,6 +10,14 @@ void main(void) {
   vec2 m = gl_PointCoord - vec2(0.5, 0.5);
   float dist = radius - length(m);
 
+  // No antialiasing for picking mode:
+  #ifdef PICKING_MODE
+  if (dist > v_border)
+    gl_FragColor = v_color;
+  else
+    gl_FragColor = transparent;
+
+  #else
   float t = 0.0;
   if (dist > v_border)
     t = 1.0;
@@ -17,4 +25,5 @@ void main(void) {
     t = dist / v_border;
 
   gl_FragColor = mix(transparent, v_color, t);
+  #endif
 }

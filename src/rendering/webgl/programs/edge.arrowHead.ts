@@ -10,15 +10,14 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.arrowHead.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.arrowHead.frag.glsl";
-import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
 import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
+import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
 
-export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  checkCollision = checkStraightEdgeCollision;
+export default class EdgeArrowHeadProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
   drawLabel = drawStraightEdgeLabel;
 
   getDefinition() {
@@ -26,12 +25,14 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
       VERTICES: 3,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.TRIANGLES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_radius", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
       CONSTANT_ATTRIBUTES: [{ name: "a_barycentric", size: 3, type: FLOAT }],
       CONSTANT_DATA: [
@@ -42,7 +43,13 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
     };
   }
 
-  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(
+    edgeIndex: number,
+    startIndex: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+  ) {
     const thickness = data.size || 1;
     const radius = targetData.size || 1;
     const x1 = sourceData.x;
@@ -68,23 +75,20 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<typeof UNIFORMS[nu
 
     const array = this.array;
 
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = -n1;
-    array[i++] = -n2;
-    array[i++] = radius;
-    array[i++] = color;
+    array[startIndex++] = x2;
+    array[startIndex++] = y2;
+    array[startIndex++] = -n1;
+    array[startIndex++] = -n2;
+    array[startIndex++] = radius;
+    array[startIndex++] = color;
+    array[startIndex++] = edgeIndex;
   }
 
-  draw(params: RenderParams): void {
-    const gl = this.gl;
-
-    const { u_matrix, u_sizeRatio, u_correctionRatio } = this.uniformLocations;
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_matrix, u_sizeRatio, u_correctionRatio } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
-
-    this.drawWebGL(gl.TRIANGLES);
   }
 }

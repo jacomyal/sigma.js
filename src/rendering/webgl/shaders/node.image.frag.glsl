@@ -10,6 +10,17 @@ const float radius = 0.5;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
+  vec2 m = gl_PointCoord - vec2(0.5, 0.5);
+  float dist = length(m);
+
+  // No antialiasing for picking mode:
+  #ifdef PICKING_MODE
+  if (dist > radius)
+    gl_FragColor = transparent;
+  else
+    gl_FragColor = v_color;
+
+  #else
   vec4 color;
 
   if (v_texture.w > 0.0) {
@@ -19,9 +30,6 @@ void main(void) {
     color = v_color;
   }
 
-  vec2 m = gl_PointCoord - vec2(0.5, 0.5);
-  float dist = length(m);
-
   if (dist < radius - v_border) {
     gl_FragColor = color;
   } else if (dist < radius) {
@@ -29,4 +37,5 @@ void main(void) {
   } else {
     gl_FragColor = transparent;
   }
+  #endif
 }

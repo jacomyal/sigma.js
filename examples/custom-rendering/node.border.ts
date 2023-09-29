@@ -15,18 +15,17 @@
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
-import { checkDiscNodeCollision } from "sigma/utils/node-collisions";
 import { drawDiscNodeLabel } from "sigma/utils/node-labels";
 import { drawDiscNodeHover } from "sigma/utils/node-hover";
 import VERTEX_SHADER_SOURCE from "!raw-loader!./node.border.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "!raw-loader!./node.border.frag.glsl";
+import { ProgramInfo } from "sigma/rendering/webgl/programs/common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
-export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[number]> {
-  checkCollision = checkDiscNodeCollision;
+export default class NodeBorderProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
   drawLabel = drawDiscNodeLabel;
   drawHover = drawDiscNodeHover;
 
@@ -35,33 +34,32 @@ export default class NodeBorderProgram extends NodeProgram<typeof UNIFORMS[numbe
       VERTICES: 1,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.POINTS,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
     };
   }
 
-  processVisibleItem(i: number, data: NodeDisplayData) {
+  processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData) {
     const array = this.array;
 
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i] = floatColor(data.color);
+    array[startIndex++] = data.x;
+    array[startIndex++] = data.y;
+    array[startIndex++] = data.size;
+    array[startIndex++] = floatColor(data.color);
+    array[startIndex++] = nodeIndex;
   }
 
-  draw(params: RenderParams): void {
-    const gl = this.gl;
-
-    const { u_sizeRatio, u_pixelRatio, u_matrix } = this.uniformLocations;
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_sizeRatio, u_pixelRatio, u_matrix } = uniformLocations;
 
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-
-    gl.drawArrays(gl.POINTS, 0, this.verticesCount);
   }
 }

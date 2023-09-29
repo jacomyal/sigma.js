@@ -1,7 +1,8 @@
+attribute vec4 a_id;
+attribute vec4 a_color;
 attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
-attribute vec4 a_color;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -29,6 +30,12 @@ void main() {
   v_diffVector = diffVector;
   v_radius = size / 2.0 / marginRatio;
 
+  #ifdef PICKING_MODE
+  // For picking mode, we use the ID as the color:
+  v_color = a_id;
+  #else
+  // For normal mode, we use the color:
   v_color = a_color;
   v_color.a *= bias;
+  #endif
 }

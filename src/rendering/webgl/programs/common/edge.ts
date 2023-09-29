@@ -7,18 +7,18 @@
 import Sigma from "../../../../sigma";
 import { AbstractProgram, Program } from "./program";
 import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../../types";
-import { EdgeCollisionDetectionFunction } from "../../../../utils/edge-collisions";
 import { EdgeLabelDrawingFunction } from "../../../../utils/edge-labels";
+import { indexToColor } from "../../../../utils";
 
 export abstract class AbstractEdgeProgram extends AbstractProgram {
   abstract process(
+    edgeIndex: number,
     offset: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
 
-  abstract checkCollision: EdgeCollisionDetectionFunction;
   abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
@@ -26,7 +26,13 @@ export abstract class EdgeProgram<Uniform extends string = string>
   extends Program<Uniform>
   implements AbstractEdgeProgram
 {
-  process(offset: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData): void {
+  process(
+    edgeIndex: number,
+    offset: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+  ): void {
     let i = offset * this.STRIDE;
     // NOTE: dealing with hidden items automatically
     if (data.hidden || sourceData.hidden || targetData.hidden) {
@@ -36,22 +42,22 @@ export abstract class EdgeProgram<Uniform extends string = string>
       return;
     }
 
-    return this.processVisibleItem(i, sourceData, targetData, data);
+    return this.processVisibleItem(indexToColor(edgeIndex), i, sourceData, targetData, data);
   }
 
   abstract processVisibleItem(
-    i: number,
+    edgeIndex: number,
+    startIndex: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
 
-  abstract checkCollision: EdgeCollisionDetectionFunction;
   abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
 export interface EdgeProgramConstructor {
-  new (gl: WebGLRenderingContext, renderer: Sigma): AbstractEdgeProgram;
+  new (gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma): AbstractEdgeProgram;
 }
 
 /**
@@ -66,9 +72,9 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
   return class EdgeCompoundProgram implements AbstractEdgeProgram {
     programs: Array<AbstractEdgeProgram>;
 
-    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
       this.programs = programClasses.map((Program) => {
-        return new Program(gl, renderer);
+        return new Program(gl, pickGl, renderer);
       });
     }
 
@@ -76,17 +82,20 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
       this.programs.forEach((program) => program.reallocate(capacity));
     }
 
-    process(offset: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData): void {
-      this.programs.forEach((program) => program.process(offset, sourceData, targetData, data));
+    process(
+      edgeIndex: number,
+      offset: number,
+      sourceData: NodeDisplayData,
+      targetData: NodeDisplayData,
+      data: EdgeDisplayData,
+    ): void {
+      this.programs.forEach((program) => program.process(edgeIndex, offset, sourceData, targetData, data));
     }
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
     }
 
-    checkCollision(...args: Parameters<EdgeCollisionDetectionFunction>) {
-      return this.programs.some((program) => program.checkCollision(...args));
-    }
     drawLabel(...args: Parameters<EdgeLabelDrawingFunction>) {
       return this.programs[0].drawLabel(...args);
     }

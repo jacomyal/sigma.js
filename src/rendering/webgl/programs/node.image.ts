@@ -12,9 +12,9 @@ import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
 import { NodeProgram, NodeProgramConstructor } from "./common/node";
 import Sigma from "../../../sigma";
-import { checkDiscNodeCollision } from "../../../utils/node-collisions";
 import { drawDiscNodeLabel } from "../../../utils/node-labels";
 import { drawDiscNodeHover } from "../../../utils/node-hover";
+import { ProgramInfo } from "./common/program";
 
 // maximum size of single texture in atlas
 const MAX_TEXTURE_SIZE = 192;
@@ -203,8 +203,7 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
 
   const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_atlas"] as const;
 
-  return class NodeImageProgram extends NodeProgram<typeof UNIFORMS[number]> {
-    checkCollision = checkDiscNodeCollision;
+  return class NodeImageProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
     drawLabel = drawDiscNodeLabel;
     drawHover = drawDiscNodeHover;
 
@@ -213,11 +212,13 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
         VERTICES: 1,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
+        METHOD: WebGLRenderingContext.POINTS,
         UNIFORMS,
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_size", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_texture", size: 4, type: FLOAT },
         ],
       };
@@ -226,8 +227,8 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
     texture: WebGLTexture;
     latestRenderParams?: RenderParams;
 
-    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
-      super(gl, renderer);
+    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
+      super(gl, pickGl, renderer);
 
       rebindTextureFns.push(() => {
         if (this && this.rebindTexture) this.rebindTexture();
@@ -242,7 +243,7 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
     }
 
     rebindTexture() {
-      const gl = this.gl;
+      const gl = this.normalProgram.gl;
 
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
@@ -251,46 +252,43 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       if (this.latestRenderParams) this.render(this.latestRenderParams);
     }
 
-    processVisibleItem(i: number, data: NodeDisplayData & { image?: string }): void {
+    processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData & { image?: string }): void {
       const array = this.array;
 
       const imageSource = data.image;
       const imageState = imageSource && images[imageSource];
       if (typeof imageSource === "string" && !imageState) loadImage(imageSource);
 
-      array[i++] = data.x;
-      array[i++] = data.y;
-      array[i++] = data.size;
-      array[i++] = floatColor(data.color);
+      array[startIndex++] = data.x;
+      array[startIndex++] = data.y;
+      array[startIndex++] = data.size;
+      array[startIndex++] = floatColor(data.color);
+      array[startIndex++] = nodeIndex;
 
       // Reference texture:
       if (imageState && imageState.status === "ready") {
         const { width, height } = textureImage;
-        array[i++] = imageState.x / width;
-        array[i++] = imageState.y / height;
-        array[i++] = imageState.width / width;
-        array[i++] = imageState.height / height;
+        array[startIndex++] = imageState.x / width;
+        array[startIndex++] = imageState.y / height;
+        array[startIndex++] = imageState.width / width;
+        array[startIndex++] = imageState.height / height;
       } else {
-        array[i++] = 0;
-        array[i++] = 0;
-        array[i++] = 0;
-        array[i++] = 0;
+        array[startIndex++] = 0;
+        array[startIndex++] = 0;
+        array[startIndex++] = 0;
+        array[startIndex++] = 0;
       }
     }
 
-    draw(params: RenderParams): void {
+    setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
       this.latestRenderParams = params;
 
-      const gl = this.gl;
-
-      const { u_sizeRatio, u_pixelRatio, u_matrix, u_atlas } = this.uniformLocations;
+      const { u_sizeRatio, u_pixelRatio, u_matrix, u_atlas } = uniformLocations;
 
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
       gl.uniform1f(u_pixelRatio, params.pixelRatio);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
-
-      this.drawWebGL(gl.POINTS);
     }
   };
 }

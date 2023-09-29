@@ -9,12 +9,10 @@
  */
 import SigmaClass from "./sigma";
 import Camera from "./core/camera";
-import QuadTree from "./core/quadtree";
 import MouseCaptor from "./core/captors/mouse";
 
 class Sigma extends SigmaClass {
   static Camera = Camera;
-  static QuadTree = QuadTree;
   static MouseCaptor = MouseCaptor;
   static Sigma = SigmaClass;
 }

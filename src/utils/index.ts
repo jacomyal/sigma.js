@@ -287,15 +287,11 @@ for (const htmlColor in HTML_COLORS) {
   FLOAT_COLOR_CACHE[HTML_COLORS[htmlColor]] = FLOAT_COLOR_CACHE[htmlColor];
 }
 
-export function floatArrayColor(val: string): Float32Array {
-  val = HTML_COLORS[val] || val;
-
-  // NOTE: this variant is not cached because it is mostly used for uniforms
-  const { r, g, b, a } = parseColor(val);
-
-  return new Float32Array([r / 255, g / 255, b / 255, a]);
+export function rgbaToFloat(r: number, g: number, b: number, a: number, masking?: boolean): number {
+  INT32[0] = (a << 24) | (b << 16) | (g << 8) | r;
+  if (masking) INT32[0] = INT32[0] & 0xfeffffff;
+  return FLOAT32[0];
 }
-
 export function floatColor(val: string): number {
   // If the color is already computed, we yield it
   if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
@@ -303,22 +299,39 @@ export function floatColor(val: string): number {
   const parsed = parseColor(val);
   const { r, g, b } = parsed;
   let { a } = parsed;
-
   a = (a * 255) | 0;
 
-  INT32[0] = ((a << 24) | (b << 16) | (g << 8) | r) & 0xfeffffff;
-
-  const color = FLOAT32[0];
+  const color = rgbaToFloat(r, g, b, a, true);
 
   FLOAT_COLOR_CACHE[val] = color;
 
   return color;
 }
 
+const FLOAT_INDEX_CACHE: { [key: number]: number } = {};
+
+export function indexToColor(index: number): number {
+  // If the index is already computed, we yield it
+  if (typeof FLOAT_INDEX_CACHE[index] !== "undefined") return FLOAT_INDEX_CACHE[index];
+
+  const r = (index & 0xff000000) >>> 24;
+  const g = (index & 0x00ff0000) >>> 16;
+  const b = (index & 0x0000ff00) >>> 8;
+  const a = index & 0x000000ff;
+
+  const color = rgbaToFloat(r, g, b, a);
+  FLOAT_INDEX_CACHE[index] = color;
+
+  return color;
+}
+export function colorToIndex(r: number, g: number, b: number, a: number): number {
+  return a + (b << 8) + (g << 16) + (r << 24);
+}
+
 /**
  * In sigma, the graph is normalized into a [0, 1], [0, 1] square, before being given to the various renderers. This
- * helps dealing with quadtree in particular.
- * But at some point, we need to rescale it so that it takes the best place in the screen, ie. we always want to see two
+ * helps to deal with quadtree in particular.
+ * But at some point, we need to rescale it so that it takes the best place in the screen, i.e. we always want to see two
  * nodes "touching" opposite sides of the graph, with the camera being at its default state.
  *
  * This function determines this ratio.
@@ -337,7 +350,7 @@ export function getCorrectionRatio(
   }
 
   // Else, we need to fit the graph inside the stage:
-  // 1. If the graph is "squarer" (ie. with a ratio closer to 1), we need to make the largest sides touch;
+  // 1. If the graph is "squarer" (i.e. with a ratio closer to 1), we need to make the largest sides touch;
   // 2. If the stage is "squarer", we need to make the smallest sides touch.
   return Math.min(Math.max(graphRatio, 1 / graphRatio), Math.max(1 / viewportRatio, viewportRatio));
 }
@@ -400,15 +413,15 @@ export function matrixFromCamera(
  *
  * [jacomyal]
  * To be fully honest, I can't really explain happens here... I notice that the
- * following ratio works (ie. it correctly compensates the matrix impact on all
+ * following ratio works (i.e. it correctly compensates the matrix impact on all
  * camera states I could try):
  * > `R = size(V) / size(M * V) / W`
  * as long as `M * V` is in the direction of W (ie. parallel to (Ox)). It works
  * as well with H and a vector that transforms into something parallel to (Oy).
  *
  * Also, note that we use `angle` and not `-angle` (that would seem logical,
- * since we want to anticipate the rotation), because of the fact that in WebGL,
- * the image is vertically swapped.
+ * since we want to anticipate the rotation), because the image is vertically
+ * swapped in WebGL.
  */
 export function getMatrixImpact(
   matrix: Float32Array,

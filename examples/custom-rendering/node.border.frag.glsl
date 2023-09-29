@@ -11,6 +11,13 @@ void main(void) {
   vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
   float distToCenter = length(gl_PointCoord - vec2(0.5, 0.5));
 
+  #ifdef PICKING_MODE
+  if (distToCenter < radius)
+    gl_FragColor = v_color;
+  else
+    gl_FragColor = transparent;
+  #else
+  // For normal mode, we use the color:
   float t = 0.0;
   if (distToCenter < halfRadius - v_border)
     gl_FragColor = white;
@@ -22,4 +29,5 @@ void main(void) {
     gl_FragColor = mix(transparent, v_color, (radius - distToCenter) / v_border);
   else
     gl_FragColor = transparent;
+  #endif
 }

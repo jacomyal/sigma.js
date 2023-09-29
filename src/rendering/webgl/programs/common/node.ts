@@ -7,13 +7,12 @@
 import Sigma from "../../../../sigma";
 import { AbstractProgram, Program } from "./program";
 import { NodeDisplayData, NonEmptyArray, RenderParams } from "../../../../types";
-import { NodeCollisionDetectionFunction } from "../../../../utils/node-collisions";
 import { NodeLabelDrawingFunction } from "../../../../utils/node-labels";
 import { NodeHoverDrawingFunction } from "../../../../utils/node-hover";
+import { indexToColor } from "../../../../utils";
 
 export abstract class AbstractNodeProgram extends AbstractProgram {
-  abstract process(offset: number, data: NodeDisplayData): void;
-  abstract checkCollision: NodeCollisionDetectionFunction;
+  abstract process(nodeIndex: number, offset: number, data: NodeDisplayData): void;
   abstract drawLabel: NodeLabelDrawingFunction;
   abstract drawHover: NodeHoverDrawingFunction;
 }
@@ -22,7 +21,7 @@ export abstract class NodeProgram<Uniform extends string = string>
   extends Program<Uniform>
   implements AbstractNodeProgram
 {
-  process(offset: number, data: NodeDisplayData): void {
+  process(nodeIndex: number, offset: number, data: NodeDisplayData): void {
     let i = offset * this.STRIDE;
     // NOTE: dealing with hidden items automatically
     if (data.hidden) {
@@ -32,17 +31,16 @@ export abstract class NodeProgram<Uniform extends string = string>
       return;
     }
 
-    return this.processVisibleItem(i, data);
+    return this.processVisibleItem(indexToColor(nodeIndex), i, data);
   }
 
-  abstract processVisibleItem(i: number, data: NodeDisplayData): void;
-  abstract checkCollision: NodeCollisionDetectionFunction;
+  abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
   abstract drawLabel: NodeLabelDrawingFunction;
   abstract drawHover: NodeHoverDrawingFunction;
 }
 
 export interface NodeProgramConstructor {
-  new (gl: WebGLRenderingContext, renderer: Sigma): AbstractNodeProgram;
+  new (gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma): AbstractNodeProgram;
 }
 
 /**
@@ -59,9 +57,9 @@ export function createNodeCompoundProgram(
   return class NodeCompoundProgram implements AbstractNodeProgram {
     programs: NonEmptyArray<AbstractNodeProgram>;
 
-    constructor(gl: WebGLRenderingContext, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
       this.programs = programClasses.map((Program) => {
-        return new Program(gl, renderer);
+        return new Program(gl, pickGl, renderer);
       }) as NonEmptyArray<AbstractNodeProgram>;
     }
 
@@ -69,17 +67,14 @@ export function createNodeCompoundProgram(
       this.programs.forEach((program) => program.reallocate(capacity));
     }
 
-    process(offset: number, data: NodeDisplayData): void {
-      this.programs.forEach((program) => program.process(offset, data));
+    process(nodeIndex: number, offset: number, data: NodeDisplayData): void {
+      this.programs.forEach((program) => program.process(nodeIndex, offset, data));
     }
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
     }
 
-    checkCollision(...args: Parameters<NodeCollisionDetectionFunction>): boolean {
-      return this.programs.some((program) => program.checkCollision(...args));
-    }
     drawLabel(...args: Parameters<NodeLabelDrawingFunction>): void {
       return this.programs[0].drawLabel(...args);
     }

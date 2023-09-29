@@ -13,20 +13,19 @@ import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
 import VERTEX_SHADER_SOURCE from "../shaders/node.circle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
-import { checkDiscNodeCollision } from "../../../utils/node-collisions";
 import { drawDiscNodeLabel } from "../../../utils/node-labels";
 import { drawDiscNodeHover } from "../../../utils/node-hover";
+import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
-export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[number]> {
+export default class NodeCircleProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;
 
-  checkCollision = checkDiscNodeCollision;
   drawLabel = drawDiscNodeLabel;
   drawHover = drawDiscNodeHover;
 
@@ -35,36 +34,35 @@ export default class NodeCircleProgram extends NodeProgram<typeof UNIFORMS[numbe
       VERTICES: 3,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.TRIANGLES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
       CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
       CONSTANT_DATA: [[NodeCircleProgram.ANGLE_1], [NodeCircleProgram.ANGLE_2], [NodeCircleProgram.ANGLE_3]],
     };
   }
 
-  processVisibleItem(i: number, data: NodeDisplayData) {
+  processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData) {
     const array = this.array;
     const color = floatColor(data.color);
 
-    array[i++] = data.x;
-    array[i++] = data.y;
-    array[i++] = data.size;
-    array[i++] = color;
+    array[startIndex++] = data.x;
+    array[startIndex++] = data.y;
+    array[startIndex++] = data.size;
+    array[startIndex++] = color;
+    array[startIndex++] = nodeIndex;
   }
 
-  draw(params: RenderParams): void {
-    const gl = this.gl;
-
-    const { u_sizeRatio, u_correctionRatio, u_matrix } = this.uniformLocations;
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_sizeRatio, u_correctionRatio, u_matrix } = uniformLocations;
 
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-
-    this.drawWebGL(gl.TRIANGLES);
   }
 }

@@ -1,3 +1,4 @@
+attribute vec4 a_id;
 attribute vec4 a_color;
 attribute vec2 a_normal;
 attribute float a_normalCoef;
@@ -43,6 +44,13 @@ void main() {
   v_thickness = webGLThickness / u_zoomRatio;
 
   v_normal = unitNormal;
+
+  #ifdef PICKING_MODE
+  // For picking mode, we use the ID as the color:
+  v_color = a_id;
+  #else
+  // For normal mode, we use the color:
   v_color = a_color;
   v_color.a *= bias;
+  #endif
 }

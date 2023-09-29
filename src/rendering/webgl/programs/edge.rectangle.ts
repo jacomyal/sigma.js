@@ -20,15 +20,14 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.rectangle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
-import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
 import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
+import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_sizeRatio", "u_correctionRatio"] as const;
 
-export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  checkCollision = checkStraightEdgeCollision;
+export default class EdgeRectangleProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
   drawLabel = drawStraightEdgeLabel;
 
   getDefinition() {
@@ -36,12 +35,14 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
       VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.TRIANGLES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },
         { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
       CONSTANT_ATTRIBUTES: [
         // If 0, then position will be a_positionStart
@@ -60,7 +61,13 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
     };
   }
 
-  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(
+    edgeIndex: number,
+    startIndex: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+  ) {
     const thickness = data.size || 1;
     const x1 = sourceData.x;
     const y1 = sourceData.y;
@@ -85,25 +92,22 @@ export default class EdgeRectangleProgram extends EdgeProgram<typeof UNIFORMS[nu
 
     const array = this.array;
 
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = color;
+    array[startIndex++] = x1;
+    array[startIndex++] = y1;
+    array[startIndex++] = x2;
+    array[startIndex++] = y2;
+    array[startIndex++] = n1;
+    array[startIndex++] = n2;
+    array[startIndex++] = color;
+    array[startIndex++] = edgeIndex;
   }
 
-  draw(params: RenderParams): void {
-    const gl = this.gl;
-
-    const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio } = this.uniformLocations;
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_zoomRatio, params.zoomRatio);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
-
-    this.drawWebGL(gl.TRIANGLES);
   }
 }

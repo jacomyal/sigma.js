@@ -2,7 +2,7 @@
  * Sigma.js Labels Heuristics
  * ===========================
  *
- * Miscelleneous heuristics related to label display.
+ * Miscellaneous heuristics related to label display.
  * @module
  */
 import Graph from "graphology-types";

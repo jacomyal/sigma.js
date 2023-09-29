@@ -11,15 +11,14 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.line.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.line.frag.glsl";
-import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
 import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
+import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix"] as const;
 
-export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]> {
-  checkCollision = checkStraightEdgeCollision;
+export default class EdgeLineProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
   drawLabel = drawStraightEdgeLabel;
 
   getDefinition() {
@@ -27,15 +26,23 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
       VERTICES: 2,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.LINES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
       ],
     };
   }
 
-  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(
+    edgeIndex: number,
+    startIndex: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+  ) {
     const array = this.array;
 
     const x1 = sourceData.x;
@@ -45,23 +52,21 @@ export default class EdgeLineProgram extends EdgeProgram<typeof UNIFORMS[number]
     const color = floatColor(data.color);
 
     // First point
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = color;
+    array[startIndex++] = x1;
+    array[startIndex++] = y1;
+    array[startIndex++] = color;
+    array[startIndex++] = edgeIndex;
 
     // Second point
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i] = color;
+    array[startIndex++] = x2;
+    array[startIndex++] = y2;
+    array[startIndex++] = color;
+    array[startIndex++] = edgeIndex;
   }
 
-  draw(params: RenderParams): void {
-    const gl = this.gl;
-
-    const { u_matrix } = this.uniformLocations;
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_matrix } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-
-    this.drawWebGL(gl.LINES);
   }
 }

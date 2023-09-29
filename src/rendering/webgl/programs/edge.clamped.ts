@@ -12,13 +12,11 @@ import EdgeRectangleProgram from "./edge.rectangle";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.clamped.vert.glsl";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
-import { checkStraightEdgeCollision } from "../../../utils/edge-collisions";
 import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 export default class EdgeClampedProgram extends EdgeRectangleProgram {
-  checkCollision = checkStraightEdgeCollision;
   drawLabel = drawStraightEdgeLabel;
 
   getDefinition() {
@@ -30,6 +28,7 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
         { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_radius", size: 1, type: FLOAT },
       ],
       CONSTANT_ATTRIBUTES: [
@@ -50,7 +49,13 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
     };
   }
 
-  processVisibleItem(i: number, sourceData: NodeDisplayData, targetData: NodeDisplayData, data: EdgeDisplayData) {
+  processVisibleItem(
+    edgeIndex: number,
+    startIndex: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+  ) {
     const thickness = data.size || 1;
     const x1 = sourceData.x;
     const y1 = sourceData.y;
@@ -77,13 +82,14 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
 
     const array = this.array;
 
-    array[i++] = x1;
-    array[i++] = y1;
-    array[i++] = x2;
-    array[i++] = y2;
-    array[i++] = n1;
-    array[i++] = n2;
-    array[i++] = color;
-    array[i++] = radius;
+    array[startIndex++] = x1;
+    array[startIndex++] = y1;
+    array[startIndex++] = x2;
+    array[startIndex++] = y2;
+    array[startIndex++] = n1;
+    array[startIndex++] = n2;
+    array[startIndex++] = color;
+    array[startIndex++] = edgeIndex;
+    array[startIndex++] = radius;
   }
 }

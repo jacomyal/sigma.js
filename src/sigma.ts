@@ -7,7 +7,6 @@ import Graph from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
-import QuadTree from "./core/quadtree";
 import {
   CameraState,
   Coordinates,
@@ -34,6 +33,7 @@ import {
   zIndexOrdering,
   getMatrixImpact,
   graphExtent,
+  colorToIndex,
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, validateSettings, resolveSettings } from "./settings";
@@ -41,8 +41,8 @@ import { AbstractNodeProgram } from "./rendering/webgl/programs/common/node";
 import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
-import { isPixelColored } from "./utils/edge-collisions";
 import { extend } from "./utils/array";
+import { getPixelColor } from "./utils/edge-collisions";
 
 /**
  * Constants.
@@ -163,8 +163,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
   private webGLContexts: PlainObject<WebGLRenderingContext> = {};
   private activeListeners: PlainObject<Listener> = {};
-  // indices related to graph data
-  private quadtree: QuadTree = new QuadTree();
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
@@ -188,6 +186,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
   // Cache:
   private graphToViewportRatio = 1;
+  private itemIDsIndex: Record<number, { type: "node" | "edge"; id: string }> = {};
+  private nodeIndices: Record<string, number> = {};
+  private edgeIndices: Record<string, number> = {};
 
   // Starting dimensions and pixel ratio
   private width = 0;
@@ -229,13 +230,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.container = container;
 
     // Initializing contexts
-    this.createWebGLContext("edges", { preserveDrawingBuffer: true });
+    this.createWebGLContext("edges");
     this.createCanvasContext("edgeLabels");
     this.createWebGLContext("nodes");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
     this.createWebGLContext("hoverNodes");
-    this.createCanvasContext("mouse");
 
     // Blending
     for (const key in this.webGLContexts) {
@@ -245,21 +245,24 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       gl.enable(gl.BLEND);
     }
 
+    this.createWebGLContext("picking", { preserveDrawingBuffer: true, hidden: true });
+    this.createCanvasContext("mouse");
+
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
-      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this);
+      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this.webGLContexts.picking, this);
 
       let NodeHoverProgram = NodeProgramClass;
       if (type in this.settings.nodeHoverProgramClasses) {
         NodeHoverProgram = this.settings.nodeHoverProgramClasses[type];
       }
 
-      this.nodeHoverPrograms[type] = new NodeHoverProgram(this.webGLContexts.hoverNodes, this);
+      this.nodeHoverPrograms[type] = new NodeHoverProgram(this.webGLContexts.hoverNodes, null, this);
     }
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
-      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this);
+      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this.webGLContexts.picking, this);
     }
 
     // Initial resize
@@ -343,8 +346,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @param  {object?} options - #getContext params to override (optional)
    * @return {Sigma}
    */
-  private createWebGLContext(id: string, options?: { preserveDrawingBuffer?: boolean; antialias?: boolean }): this {
+  private createWebGLContext(
+    id: string,
+    options?: { preserveDrawingBuffer?: boolean; antialias?: boolean; hidden?: boolean },
+  ): this {
     const canvas = this.createCanvas(id);
+    if (options?.hidden) canvas.remove();
 
     const contextOptions = {
       preserveDrawingBuffer: false,
@@ -394,47 +401,15 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Method that returns all nodes in quad at a given position.
-   */
-  private getQuadNodes(position: Coordinates): string[] {
-    const mouseGraphPosition = this.viewportToFramedGraph(position);
-
-    return this.quadtree.point(mouseGraphPosition.x, 1 - mouseGraphPosition.y);
-  }
-
-  /**
    * Method that returns the closest node to a given position.
    */
   private getNodeAtPosition(position: Coordinates): string | null {
     const { x, y } = position;
-    const quadNodes = this.getQuadNodes(position);
+    const color = getPixelColor(this.webGLContexts.picking, x, y);
+    const index = colorToIndex(...color);
+    const itemAt = this.itemIDsIndex[index];
 
-    // We will hover the node whose center is closest to mouse
-    let minDistance = Infinity,
-      nodeAtPosition = null;
-
-    for (let i = 0, l = quadNodes.length; i < l; i++) {
-      const node = quadNodes[i];
-
-      const data = this.nodeDataCache[node];
-
-      const nodePosition = this.framedGraphToViewport(data);
-
-      const size = this.scaleSize(data.size);
-
-      const NodeProgram = this.nodePrograms[data.type];
-      if (!data.hidden && NodeProgram.checkCollision(position.x, position.y, nodePosition.x, nodePosition.y, size)) {
-        const distance = Math.sqrt(Math.pow(x - nodePosition.x, 2) + Math.pow(y - nodePosition.y, 2));
-
-        // TODO: sort by min size also for cases where center is the same
-        if (distance < minDistance) {
-          minDistance = distance;
-          nodeAtPosition = node;
-        }
-      }
-    }
-
-    return nodeAtPosition;
+    return itemAt && itemAt.type === "node" ? itemAt.id : null;
   }
 
   /**
@@ -473,14 +448,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       // Checking if the hovered node is still hovered
       if (this.hoveredNode) {
-        const data = this.nodeDataCache[this.hoveredNode];
-
-        const pos = this.framedGraphToViewport(data);
-
-        const size = this.scaleSize(data.size);
-
-        const NodeProgram = this.nodePrograms[data.type];
-        if (!NodeProgram.checkCollision(e.x, e.y, pos.x, pos.y, size)) {
+        if (this.getNodeAtPosition(e) !== this.hoveredNode) {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
@@ -556,14 +524,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private bindGraphHandlers(): this {
     const graph = this.graph;
 
-    const LAYOUT_IMPACTING_FIELDS = new Set(["x", "y", "size", "zIndex", "type"]);
+    const LAYOUT_IMPACTING_FIELDS = new Set(["x", "y", "zIndex", "type"]);
     this.activeListeners.eachNodeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
       const updatedFields = e.hints?.attributes;
       // we process all nodes
       this.graph.forEachNode((node) => this.updateNode(node));
 
-      // if coord, size, type or zIndex have changed, we need to schedule a render
-      // (size is needed in the quadtree and zIndex for the programIndex)
+      // if coord, type or zIndex have changed, we need to schedule a render
+      // (zIndex for the programIndex)
       const layoutChanged = !updatedFields || updatedFields.some((f) => LAYOUT_IMPACTING_FIELDS.has(f));
       this.refresh({ partialGraph: { nodes: graph.nodes() }, skipIndexation: !layoutChanged, schedule: true });
     };
@@ -705,75 +673,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * the key of the edge if any, or null else.
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
-    const { edgeDataCache, nodeDataCache } = this;
+    const color = getPixelColor(this.webGLContexts.picking, x, y);
+    const index = colorToIndex(...color);
+    const itemAt = this.itemIDsIndex[index];
 
-    // Check first that pixel is colored:
-    // Note that mouse positions must be corrected by pixel ratio to correctly
-    // index the drawing buffer.
-    if (!isPixelColored(this.webGLContexts.edges, x * this.pixelRatio, y * this.pixelRatio)) return null;
-
-    // Check for each edge if it collides with the point:
-    const { x: graphX, y: graphY } = this.viewportToGraph({ x, y });
-
-    // To translate edge thicknesses to the graph system, we observe by how much
-    // the length of a non-null edge is transformed to between the graph system
-    // and the viewport system:
-    let transformationRatio = 0;
-    this.graph.someEdge((key, _, sourceId, targetId, { x: xs, y: ys }, { x: xt, y: yt }) => {
-      if (edgeDataCache[key].hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
-
-      if (xs !== xt || ys !== yt) {
-        const graphLength = Math.sqrt(Math.pow(xt - xs, 2) + Math.pow(yt - ys, 2));
-
-        const { x: vp_xs, y: vp_ys } = this.graphToViewport({ x: xs, y: ys });
-        const { x: vp_xt, y: vp_yt } = this.graphToViewport({ x: xt, y: yt });
-        const viewportLength = Math.sqrt(Math.pow(vp_xt - vp_xs, 2) + Math.pow(vp_yt - vp_ys, 2));
-
-        transformationRatio = graphLength / viewportLength;
-        return true;
-      }
-    });
-    // If no non-null edge has been found, return null:
-    if (!transformationRatio) return null;
-
-    // Now we can look for matching edges:
-    const edges = this.graph.filterEdges((key, edgeAttributes, sourceId, targetId, sourcePosition, targetPosition) => {
-      const edgeData = edgeDataCache[key];
-      if (edgeData.hidden || nodeDataCache[sourceId].hidden || nodeDataCache[targetId].hidden) return false;
-
-      const EdgeProgram = this.edgePrograms[edgeData.type];
-      if (
-        EdgeProgram.checkCollision(
-          graphX,
-          graphY,
-          sourcePosition.x,
-          sourcePosition.y,
-          targetPosition.x,
-          targetPosition.y,
-          // Adapt the edge size to the zoom ratio:
-          this.scaleSize(edgeData.size * transformationRatio),
-        )
-      ) {
-        return true;
-      }
-    });
-
-    if (edges.length === 0) return null; // no edges found
-
-    // if none of the edges have a zIndex, selected the most recently created one to match the rendering order
-    let selectedEdge = edges[edges.length - 1];
-
-    // otherwise select edge with highest zIndex
-    let highestZIndex = -Infinity;
-    for (const edge of edges) {
-      const zIndex = this.graph.getEdgeAttribute(edge, "zIndex");
-      if (zIndex >= highestZIndex) {
-        selectedEdge = edge;
-        highestZIndex = zIndex;
-      }
-    }
-
-    return selectedEdge;
+    return itemAt && itemAt.type === "edge" ? itemAt.id : null;
   }
 
   /**
@@ -781,7 +685,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *  - extent
    *  - normalizationFunction
    *  - compute node's coordinate
-   *  - quadtree
    *  - labelgrid
    *  - program data allocation
    * @return {Sigma}
@@ -809,9 +712,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Resetting the label grid
     // TODO: it's probably better to do this explicitly or on resizes for layout and anims
     this.labelGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
-    this.quadtree.clear();
 
     const nodesPerPrograms: Record<string, number> = {};
+    const nodeIndices: typeof this.nodeIndices = {};
+    const edgeIndices: typeof this.edgeIndices = {};
+    const itemIDsIndex: typeof this.itemIDsIndex = {};
+    let incrID = 1;
+
     let nodes = graph.nodes();
 
     // Do some indexation on the whole graph
@@ -824,9 +731,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       data.x = attrs.x;
       data.y = attrs.y;
       this.normalizationFunction.applyTo(data);
-
-      // coordinates indexation in quadtree
-      this.quadtree.add(node, data.x, 1 - data.y, this.scaleSize(data.size, 1) / this.normalizationFunction.ratio);
 
       // labelgrid
       if (typeof data.label === "string" && !data.hidden)
@@ -860,6 +764,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       const node = nodes[i];
       const data = this.nodeDataCache[node];
       this.addNodeToProgram(node, nodesPerPrograms[data.type]++);
+
+      itemIDsIndex[incrID] = { type: "node", id: node };
+      nodeIndices[node] = incrID;
+      incrID++;
     }
 
     //
@@ -897,8 +805,16 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
       const data = this.edgeDataCache[edge];
+
       this.addEdgeToProgram(edge, edgesPerPrograms[data.type]++);
+      itemIDsIndex[incrID] = { type: "edge", id: edge };
+      edgeIndices[edge] = incrID;
+      incrID++;
     }
+
+    this.itemIDsIndex = itemIDsIndex;
+    this.nodeIndices = nodeIndices;
+    this.edgeIndices = edgeIndices;
 
     return this;
   }
@@ -1129,7 +1045,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // 3. Process all nodes to render:
     nodesToRender.forEach((node) => {
       const data = this.nodeDataCache[node];
-      this.nodeHoverPrograms[data.type].process(nodesPerPrograms[data.type]++, data);
+      this.nodeHoverPrograms[data.type].process(0, nodesPerPrograms[data.type]++, data);
     });
     // 4. Clear hovered nodes layer:
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
@@ -1388,8 +1304,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @private
    */
   private clearNodeIndices(): void {
-    // Quadtree, labelGrid & nodeExtent are only manage/populated in the process function
-    this.quadtree = new QuadTree();
+    // LabelGrid & nodeExtent are only manage/populated in the process function
     this.labelGrid = new LabelGrid();
     this.nodeExtent = { x: [0, 1], y: [0, 1] };
     this.nodeDataCache = {};
@@ -1457,7 +1372,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-    nodeProgram.process(index, data);
+    nodeProgram.process(this.nodeIndices[node], index, data);
     // Saving program index
     this.nodeProgramIndex[node] = index;
   }
@@ -1475,7 +1390,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const extremities = this.graph.extremities(edge),
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
-    edgeProgram.process(index, sourceData, targetData, data);
+    edgeProgram.process(this.edgeIndices[edge], index, sourceData, targetData, data);
     // Saving program index
     this.edgeProgramIndex[edge] = index;
   }
@@ -1755,6 +1670,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.picking.clear(this.webGLContexts.picking.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
@@ -1767,7 +1683,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * data and render, but keep the state.
    * - if a partialGraph is provided, we only reprocess those nodes & edges.
    * - if schedule is TRUE, we schedule a render instead of sync render
-   * - if skipIndexation is TRUE, then quadtree, labelGrid & program indexation are skipped (can be used if you haven't modify x, y, zIndex & size)
+   * - if skipIndexation is TRUE, then labelGrid & program indexation are skipped (can be used if you haven't modify x, y, zIndex & size)
    *
    * @return {Sigma}
    */
@@ -2073,6 +1989,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Releasing cache & state
     this.clearIndices();
     this.clearState();
+
+    this.nodeDataCache = {};
+    this.edgeDataCache = {};
+
+    this.highlightedNodes.clear();
 
     // Clearing frames
     if (this.renderFrame) {

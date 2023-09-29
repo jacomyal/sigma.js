@@ -1,6 +1,7 @@
+attribute vec4 a_id;
+attribute vec4 a_color;
 attribute vec2 a_position;
 attribute float a_size;
-attribute vec4 a_color;
 
 uniform float u_sizeRatio;
 uniform float u_pixelRatio;
@@ -25,7 +26,12 @@ void main() {
 
   v_border = (0.5 / a_size) * u_sizeRatio;
 
-  // Extract the color:
+  #ifdef PICKING_MODE
+  // For picking mode, we use the ID as the color:
+  v_color = a_id;
+  #else
+  // For normal mode, we use the color:
   v_color = a_color;
   v_color.a *= bias;
+  #endif
 }
