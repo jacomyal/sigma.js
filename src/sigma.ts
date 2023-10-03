@@ -1820,10 +1820,25 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this.renderHighlightedNodesFrame = null;
     }
 
+    // Destroying WebGL contexts
+    for (const id in this.webGLContexts) {
+      const context = this.webGLContexts[id];
+      context.getExtension("WEBGL_lose_context")?.loseContext();
+    }
+
     // Destroying canvases
     const container = this.container;
 
     while (container.firstChild) container.removeChild(container.firstChild);
+
+    // Destroying remaining collections
+    this.canvasContexts = {};
+    this.webGLContexts = {};
+    this.elements = {};
+
+    this.nodePrograms = {};
+    this.nodeHoverPrograms = {};
+    this.edgePrograms = {};
   }
 
   /**
