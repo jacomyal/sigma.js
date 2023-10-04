@@ -21,6 +21,7 @@ const webpackConfig = require("./web/webpack.config");
 export async function takeScreenshots(tests: Tests, folder: string, port = 8000, suffix = ""): Promise<void> {
   // Launch the browser
   const browser = await puppeteer.launch({
+    headless: "new",
     args: ["--window-size=800,600", "--font-render-hinting=none", "--disable-font-subpixel-positioning"],
   });
   const testPageUrl = `http://localhost:${port}`;
