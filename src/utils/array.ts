@@ -22,8 +22,8 @@ export function extend<T>(array: T[], values: Set<T>): void {
   array.length += l2;
 
   let i = 0;
-  for (const value of values) {
+  values.forEach((value) => {
     array[l1 + i] = value;
     i++;
-  }
+  });
 }

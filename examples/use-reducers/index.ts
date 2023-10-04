@@ -92,11 +92,10 @@ function setHoveredNode(node?: string) {
     state.hoveredNeighbors = new Set(graph.neighbors(node));
   }
 
-  // Compute the partial that we need to re-render
-  // to optimized the refresh
-  const partialGraph = { nodes: [], edges: [] };
-  partialGraph.nodes = graph.nodes().filter((n) => n !== state.hoveredNode && !state.hoveredNeighbors.has(n));
-  partialGraph.edges = graph.edges().filter((e) => graph.extremities(e).some((n) => partialGraph.nodes.includes(n)));
+  // Compute the partial that we need to re-render to optimize the refresh
+  const nodes = graph.filterNodes((n) => n !== state.hoveredNode && !state.hoveredNeighbors.has(n));
+  const nodesIndex = new Set(nodes);
+  const edges = graph.filterEdges((e) => graph.extremities(e).some((n) => nodesIndex.has(n)));
 
   if (!node) {
     state.hoveredNode = undefined;
@@ -105,7 +104,10 @@ function setHoveredNode(node?: string) {
 
   // Refresh rendering
   renderer.refresh({
-    partialGraph,
+    partialGraph: {
+      nodes,
+      edges,
+    },
     // We don't touch the graph data so we can skip its reindexation
     skipIndexation: true,
   });

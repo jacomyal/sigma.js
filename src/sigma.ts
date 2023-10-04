@@ -567,24 +567,22 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private bindGraphHandlers(): this {
     const graph = this.graph;
 
+    const LAYOUT_IMPACTING_FIELDS = new Set(["x", "y", "size", "zIndex", "type"]);
     this.activeListeners.eachNodeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
       const updatedFields = e.hints?.attributes;
       // we process all nodes
-      const nodes = this.graph.nodes();
-      nodes.forEach((node) => this.updateNode(node));
+      this.graph.forEachNode((node) => this.updateNode(node));
 
       // if coord, size, type or zIndex have changed, we need to schedule a render
       // (size is needed in the quadtree and zIndex for the programIndex)
-      const layoutChanged =
-        updatedFields && ["x", "y", "size", "zIndex", "type"].some((f) => updatedFields.includes(f));
+      const layoutChanged = !updatedFields || updatedFields.some((f) => LAYOUT_IMPACTING_FIELDS.has(f));
       this.refresh({ partialGraph: { nodes: graph.nodes() }, skipIndexation: !layoutChanged, schedule: true });
     };
 
     this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
       const updatedFields = e.hints?.attributes;
       // we process all edges
-      const edges = this.graph.edges();
-      edges.forEach((edge) => this.updateEdge(edge));
+      this.graph.forEachEdge((edge) => this.updateEdge(edge));
       const layoutChanged = updatedFields && ["zIndex", "type"].some((f) => updatedFields?.includes(f));
       this.refresh({ partialGraph: { edges: graph.edges() }, skipIndexation: !layoutChanged, schedule: true });
     };
@@ -1286,13 +1284,15 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const data = applyNodeDefaults(this.settings, key, attr);
     this.nodeDataCache[key] = data;
 
-    // Label
-    // we delete and add if needed because this function is also used fro update
+    // Label:
+    // We delete and add if needed because this function is also used from
+    // update
     this.nodesWithForcedLabels.delete(key);
     if (data.forceLabel && !data.hidden) this.nodesWithForcedLabels.add(key);
 
-    // Highlighted
-    // we remove and re add if needed because this function is also used fro update
+    // Highlighted:
+    // We remove and re add if needed because this function is also used from
+    // update
     this.highlightedNodes.delete(key);
     if (data.highlighted && !data.hidden) this.highlightedNodes.add(key);
 
