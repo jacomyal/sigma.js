@@ -149,7 +149,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
             `Program: error while getting constant data (one vector has ${vector.length} items instead of ${constantAttributesItemsCount})`,
           );
 
-        constantData.push(...vector);
+        for (let j = 0; j < vector.length; j++) constantData.push(vector[j]);
       }
 
       this.STRIDE = this.ATTRIBUTES_ITEMS_COUNT;
@@ -224,12 +224,13 @@ export abstract class Program<Uniform extends string = string> implements Abstra
         gl.vertexAttribDivisor(location, 1);
       } else {
         const ext = gl.getExtension("ANGLE_instanced_arrays");
-        if (ext) ext.vertexAttribDivisorANGLE(location, 1);
+        if (!ext) throw new Error(`Program.bind: cannot retrieve WebGL extension "ANGLE_instanced_arrays"`);
+        ext.vertexAttribDivisorANGLE(location, 1);
       }
     }
 
     const sizeFactor = SIZE_FACTOR_PER_ATTRIBUTE_TYPE[attr.type];
-    if (typeof sizeFactor !== "number") throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"!`);
+    if (typeof sizeFactor !== "number") throw new Error(`Program.bind: yet unsupported attribute type "${attr.type}"`);
 
     return attr.size * sizeFactor;
   }

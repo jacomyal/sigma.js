@@ -431,15 +431,6 @@ export function extractPixel(gl: WebGLRenderingContext, x: number, y: number, ar
 }
 
 /**
- * Function used to know whether given webgl context can use 32 bits indices.
- */
-export function canUse32BitsIndices(gl: WebGLRenderingContext): boolean {
-  const webgl2 = typeof WebGL2RenderingContext !== "undefined" && gl instanceof WebGL2RenderingContext;
-
-  return webgl2 || !!gl.getExtension("OES_element_index_uint");
-}
-
-/**
  * Check if the graph variable is a valid graph, and if sigma can render it.
  */
 export function validateGraph(graph: Graph): void {
