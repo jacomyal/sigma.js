@@ -8,7 +8,7 @@
   "scripts": {
     "build": "webpack --progress && webpack --progress --mode production",
     "clean": "rimraf $npm_package_config_clean",
-    "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r && webpack --config ./webpack.programs.config.js",
+    "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r --silent && webpack --config ./webpack.programs.config.js",
     "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
