@@ -12,7 +12,7 @@
     "typeRoots": ["./node_modules/@types/", "./external-types/"],
     "lib": ["dom", "dom.iterable"]
   },
-  "include": ["./external-types/**/*", "./src/**/*"],
+  "include": ["./external-types/**/*", "./src/**/*", "./test/**/*"],
   "ts-node": {
     "files": true
   }

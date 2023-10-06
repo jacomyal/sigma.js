@@ -1,11 +1,11 @@
 import path from "path";
-import { startExampleServer, takeScreenshots } from "./utils";
-import { tests } from "./suites";
+import { startExampleServer, takeScreenshots } from "../utils";
+import screenshotsSuite from "../suites/screenshots";
 
 async function exec() {
   try {
     const server = await startExampleServer();
-    await takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), 8000, "valid");
+    await takeScreenshots(screenshotsSuite, path.resolve(`./test/e2e/screenshots`), 8000, "valid");
     server.stopCallback(() => {
       process.exit();
     });

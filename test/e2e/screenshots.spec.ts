@@ -1,7 +1,7 @@
 import assert from "assert";
 import path from "path";
 import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
-import { tests } from "./suites";
+import screenshotsSuite from "./suites/screenshots";
 
 // NOTE: --allow-uncaught does not seem to work...
 process.on("uncaughtException", (error) => console.error(error));
@@ -15,7 +15,7 @@ describe("Compare screenshots", () => {
     // starting the server with examples
     startExampleServer().then((server) => {
       console.log("~~~ Start generating screenshots ~~~");
-      takeScreenshots(tests, path.resolve(`./test/e2e/screenshots`), 8000, "current").then(() => {
+      takeScreenshots(screenshotsSuite, path.resolve(`./test/e2e/screenshots`), 8000, "current").then(() => {
         console.log("~~~ End generating screenshots ~~~");
         console.log();
         // closing the server
@@ -24,7 +24,7 @@ describe("Compare screenshots", () => {
     });
   });
 
-  tests.forEach((test) => {
+  screenshotsSuite.forEach((test) => {
     it(`Screenshots for "${test.name}" should be the same`, () => {
       const failureThreshold = test.failureThreshold || 1e-5;
 

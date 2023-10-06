@@ -1,31 +1,9 @@
 import { Page } from "puppeteer";
-import Graph, { GraphConstructor } from "graphology-types";
 
-import Sigma from "../../src";
-import { NodeDisplayData, EdgeDisplayData } from "../../src/types";
+import { NodeDisplayData, EdgeDisplayData } from "../../../src/types";
+import { Tests } from "../utils";
 
-type TestDependencies = {
-  Graph: GraphConstructor;
-  Sigma: typeof Sigma;
-  data: { [key: string]: Graph };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  programs: { [key: string]: any };
-  container: HTMLElement;
-};
-
-declare global {
-  const dependencies: TestDependencies;
-}
-
-export type Tests = Array<{
-  name: string; // Name of the screenshot, without the extension like for example 'example-basic'
-  waitFor?: number; // Time to wait in ms before to take the screenshot
-  scenario: (page: Page) => Promise<void>;
-  failureThreshold?: number; // between 0 and 1, it's a percent. By default it's a small epsilon.
-  dimensions?: { width: number; height: number };
-}>;
-
-export const tests: Tests = [
+const tests: Tests = [
   {
     name: "single-node",
     scenario: async (page: Page): Promise<void> => {
@@ -450,3 +428,5 @@ export const tests: Tests = [
     },
   },
 ];
+
+export default tests;

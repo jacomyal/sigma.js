@@ -4,5 +4,6 @@
     "outDir": ".",
     "sourceMap": false
   },
+  "include": ["./external-types/**/*", "./src/**/*"],
   "exclude": []
 }

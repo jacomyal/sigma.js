@@ -10,6 +10,13 @@ node_modules
 .vscode
 build
 dist
+/test/e2e/reports
+/test/e2e/screenshots/*.current.png
+/test/e2e/screenshots/*.diff.png
+/website/build
+/www
+
+# Built sources:
 /core/
 /rendering/
 /utils/
@@ -23,7 +30,3 @@ dist
 /sigma.d.ts
 /types.js
 /types.d.ts
-/test/e2e/screenshots/*.current.png
-/test/e2e/screenshots/*.diff.png
-/website/build
-/www

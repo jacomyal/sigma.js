@@ -16,6 +16,27 @@ import EdgeTriangleProgram from "../../../src/rendering/webgl/programs/edge.tria
 import ARCTIC from "./resources/arctic.json";
 import LES_MISERABLES from "./resources/les-miserables.json";
 
+// Utils:
+const rafNTimes = (fn: (step: number) => void, n: number) => {
+  return new Promise((globalResolve) => {
+    let count = 0;
+
+    function executeAndRequestFrame() {
+      fn(count);
+
+      count++;
+      if (count < n) {
+        requestAnimationFrame(() => executeAndRequestFrame());
+      } else {
+        globalResolve(undefined); // ou retournez tout autre résultat que vous souhaitez obtenir
+      }
+    }
+
+    executeAndRequestFrame();
+  });
+};
+
+// Data:
 const arctic = Graph.from(ARCTIC as SerializedGraph);
 const lesMiserables = Graph.from(LES_MISERABLES as SerializedGraph);
 
@@ -44,5 +65,8 @@ globalize({
       EdgeTriangleProgram,
     },
     container,
+
+    // Utils:
+    rafNTimes,
   },
 });
