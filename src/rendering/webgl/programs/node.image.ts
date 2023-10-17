@@ -60,6 +60,8 @@ interface AbstractNodeImageProgramParams {
  * To share the texture between the program instances of the graph and the
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
+ * 
+ * @param params Optional parameters for creating a node image program.
  */
 export default function getNodeImageProgram(params?: AbstractNodeImageProgramParams): typeof AbstractNodeImageProgram {
   /**
