@@ -42,11 +42,26 @@ class AbstractNodeImageProgram extends AbstractNodeProgram {
 }
 
 /**
+ * Optional parameters for creating a node image program.
+ */
+interface AbstractNodeImageProgramParams {
+  /**
+   * Custom "crossOrigin" attribute used to request the image.
+   * 
+   * By default, this is set to an empty string, implying "anonymous".
+   * Setting this to `null` will cause the image to be fetched without CORS.
+   * 
+   * See also https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin.
+   */
+  crossOrigin?: "" | "anonymous" | "use-credentials" | null;
+}
+
+/**
  * To share the texture between the program instances of the graph and the
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
+export default function getNodeImageProgram(params?: AbstractNodeImageProgramParams): typeof AbstractNodeImageProgram {
   /**
    * These attributes are shared between all instances of this exact class,
    * returned by this call to getNodeProgramImage:
@@ -62,6 +77,9 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
   let writePositionY = 0;
   // height of current row
   let writeRowHeight = 0;
+
+  // img crossOrigin setting
+  const crossOrigin = params?.crossOrigin === undefined ? "" : params.crossOrigin;
 
   interface PendingImage {
     image: HTMLImageElement;
@@ -92,7 +110,9 @@ export default function getNodeImageProgram(): typeof AbstractNodeImageProgram {
     images[imageSource] = { status: "loading" };
 
     // Load image:
-    image.setAttribute("crossOrigin", "");
+    if(crossOrigin !== null) {
+      image.setAttribute("crossOrigin", crossOrigin);
+    }
     image.src = imageSource;
   }
 
