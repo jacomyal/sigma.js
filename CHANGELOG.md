@@ -1,5 +1,23 @@
 # sigma.js - changelog:
 
+## 3.0.0 - _work in progress_
+
+### Breaking changes
+
+- **Completely rewrites programs API**
+- **Renames all existing programs**
+- **Moves `labelRenderer`, `hoverRenderer` and `edgeLabelRenderer` from settings to each renderer**
+
+### Features
+
+- [#1386](https://github.com/jacomyal/sigma.js/issues/1386) Improves `Sigma.kill` method
+- [#1382](https://github.com/jacomyal/sigma.js/issues/1382) Handles click/hover nodes and edges with [picking](https://webglfundamentals.org/webgl/lessons/webgl-picking.html) rather than with custom computations
+- [#1372](https://github.com/jacomyal/sigma.js/issues/1372) Improves render/refresh lifecycle and APIs
+- [#1322](https://github.com/jacomyal/sigma.js/issues/1322) Implements [WebGL instancing](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/drawArraysInstanced) in programs
+- [#1346](https://github.com/jacomyal/sigma.js/issues/1346) Adds documentation in the website
+- [#1034](https://github.com/jacomyal/sigma.js/issues/1034) Adds new `Sigma.setCamera` method
+- [#1185](https://github.com/jacomyal/sigma.js/issues/1185) Adds new `zoomToSizeRatioFunction` and `itemSizesReference` setting
+
 ## 2.4.0
 
 ### Features
