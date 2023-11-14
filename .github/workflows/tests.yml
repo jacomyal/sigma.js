@@ -17,12 +17,12 @@ jobs:
       - name: Install, Lint & Unit test
         run: |
           npm i
-          npm run unit:test
+          npm run sigma:unit:test
 
       - name: E2e tests
         id: e2e
         continue-on-error: true
-        run: npm run e2e:test
+        run: npm run sigma:e2e:test
 
       - name: Uploading screenshots on failure
         if: steps.e2e.outcome == 'failure'

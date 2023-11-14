@@ -1,19 +1,16 @@
 {
-  "compilerOptions": {
-    "outDir": "./build/",
-    "noImplicitAny": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es5",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "resolveJsonModule": true,
-    "typeRoots": ["./node_modules/@types/", "./external-types/"],
-    "lib": ["dom", "dom.iterable"]
-  },
-  "include": ["./external-types/**/*", "./src/**/*", "./test/**/*"],
-  "ts-node": {
-    "files": true
+    "extends": "./tsconfig.base.json",
+    "files": [],
+    "references": [
+      { "path": "./packages/demo" },
+      { "path": "./packages/examples" },
+      { "path": "./packages/sigma" }
+    ],
+    "watchOptions": {
+      "excludeDirectories": ["**/node_modules"]
+    },
+    "compilerOptions": {
+      "noFallthroughCasesInSwitch": false
+    }
   }
-}
+  
