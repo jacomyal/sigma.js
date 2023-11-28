@@ -40,7 +40,7 @@ export abstract class NodeProgram<Uniform extends string = string>
 }
 
 export interface NodeProgramConstructor {
-  new (gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma): AbstractNodeProgram;
+  new (gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma): AbstractNodeProgram;
 }
 
 /**
@@ -57,9 +57,9 @@ export function createNodeCompoundProgram(
   return class NodeCompoundProgram implements AbstractNodeProgram {
     programs: NonEmptyArray<AbstractNodeProgram>;
 
-    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
       this.programs = programClasses.map((Program) => {
-        return new Program(gl, pickGl, renderer);
+        return new Program(gl, pickingBuffer, renderer);
       }) as NonEmptyArray<AbstractNodeProgram>;
     }
 

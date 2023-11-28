@@ -57,7 +57,7 @@ export abstract class EdgeProgram<Uniform extends string = string>
 }
 
 export interface EdgeProgramConstructor {
-  new (gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma): AbstractEdgeProgram;
+  new (gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma): AbstractEdgeProgram;
 }
 
 /**
@@ -72,9 +72,9 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
   return class EdgeCompoundProgram implements AbstractEdgeProgram {
     programs: Array<AbstractEdgeProgram>;
 
-    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
       this.programs = programClasses.map((Program) => {
-        return new Program(gl, pickGl, renderer);
+        return new Program(gl, pickingBuffer, renderer);
       });
     }
 

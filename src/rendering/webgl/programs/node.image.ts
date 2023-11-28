@@ -227,8 +227,8 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
     texture: WebGLTexture;
     latestRenderParams?: RenderParams;
 
-    constructor(gl: WebGLRenderingContext, pickGl: WebGLRenderingContext | null, renderer: Sigma) {
-      super(gl, pickGl, renderer);
+    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
+      super(gl, pickingBuffer, renderer);
 
       rebindTextureFns.push(() => {
         if (this && this.rebindTexture) this.rebindTexture();

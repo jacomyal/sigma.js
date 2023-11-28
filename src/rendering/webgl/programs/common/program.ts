@@ -33,8 +33,10 @@ function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number
 
 export interface ProgramInfo<Uniform extends string = string> {
   name: string;
+  enableAlphaBlending: boolean;
   program: WebGLProgram;
   gl: WebGLRenderingContext | WebGL2RenderingContext;
+  frameBuffer: WebGLFramebuffer | null;
   buffer: WebGLBuffer;
   constantBuffer: WebGLBuffer;
   uniformLocations: Record<Uniform, WebGLUniformLocation>;
@@ -97,7 +99,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
   constructor(
     gl: WebGLRenderingContext | WebGL2RenderingContext,
-    pickGl: WebGLRenderingContext | WebGL2RenderingContext | null,
+    pickingBuffer: WebGLFramebuffer | null,
     renderer: Sigma,
   ) {
     // Reading and caching program definition
@@ -119,13 +121,14 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
     // Members
     this.renderer = renderer;
-    this.normalProgram = this.getProgramInfo("normal", gl, def.VERTEX_SHADER_SOURCE, def.FRAGMENT_SHADER_SOURCE);
-    this.pickProgram = pickGl
+    this.normalProgram = this.getProgramInfo("normal", gl, def.VERTEX_SHADER_SOURCE, def.FRAGMENT_SHADER_SOURCE, null);
+    this.pickProgram = pickingBuffer
       ? this.getProgramInfo(
           "pick",
-          pickGl,
+          gl,
           PICKING_PREFIX + def.VERTEX_SHADER_SOURCE,
           PICKING_PREFIX + def.FRAGMENT_SHADER_SOURCE,
+          pickingBuffer,
         )
       : null;
 
@@ -155,10 +158,11 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   }
 
   private getProgramInfo(
-    name: string,
+    name: "normal" | "pick",
     gl: WebGLRenderingContext | WebGL2RenderingContext,
     vertexShaderSource: string,
     fragmentShaderSource: string,
+    frameBuffer: WebGLFramebuffer | null,
   ): ProgramInfo {
     const def = this.getDefinition();
 
@@ -197,11 +201,13 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     return {
       name,
       program,
-      gl: gl,
+      gl,
+      frameBuffer,
       buffer,
       constantBuffer: constantBuffer || ({} as WebGLBuffer),
       uniformLocations,
       attributeLocations,
+      enableAlphaBlending: name !== "pick",
     };
   }
 
@@ -233,10 +239,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
-  protected bind(): void {
-    this.bindProgram(this.normalProgram);
-    if (this.pickProgram) this.bindProgram(this.pickProgram);
-  }
 
   private unbindProgram(program: ProgramInfo): void {
     if (!this.isInstanced) {
@@ -245,10 +247,6 @@ export abstract class Program<Uniform extends string = string> implements Abstra
       this.CONSTANT_ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, program, false));
       this.ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, program, true));
     }
-  }
-  protected unbind(): void {
-    this.unbindProgram(this.normalProgram);
-    if (this.pickProgram) this.unbindProgram(this.pickProgram);
   }
 
   private bindAttribute(
@@ -326,21 +324,33 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
   private renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
-    const { gl, program } = programInfo;
+    const { gl, program, enableAlphaBlending } = programInfo;
+
+    if (enableAlphaBlending) gl.enable(gl.BLEND);
+    else gl.disable(gl.BLEND);
+
     gl.useProgram(program);
     this.setUniforms(params, programInfo);
     this.drawWebGL(this.METHOD, programInfo);
   }
+
   render(params: RenderParams): void {
     if (this.hasNothingToRender()) return;
 
-    this.bind();
+    this.bindProgram(this.normalProgram);
     this.renderProgram(params, this.normalProgram);
-    if (this.pickProgram) this.renderProgram(params, this.pickProgram);
-    this.unbind();
+    this.unbindProgram(this.normalProgram);
+
+    if (this.pickProgram) {
+      this.bindProgram(this.pickProgram);
+      this.renderProgram(params, this.pickProgram);
+      this.unbindProgram(this.pickProgram);
+    }
   }
 
-  drawWebGL(method: GLenum, { gl }: ProgramInfo): void {
+  drawWebGL(method: GLenum, { gl, frameBuffer }: ProgramInfo): void {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+
     if (!this.isInstanced) {
       gl.drawArrays(method, 0, this.verticesCount);
     } else {

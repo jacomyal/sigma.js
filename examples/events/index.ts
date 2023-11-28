@@ -42,9 +42,7 @@ function logEvent(event: string, itemType: "node" | "edge" | "positions", item: 
 
 let hoveredEdge = null;
 const renderer = new Sigma(graph, container, {
-  enableEdgeClickEvents: true,
-  enableEdgeWheelEvents: true,
-  enableEdgeHoverEvents: "debounce",
+  enableEdgeEvents: true,
   edgeReducer(edge, data) {
     const res = { ...data };
     if (edge === hoveredEdge) res.color = "#cc0000";

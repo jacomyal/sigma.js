@@ -25,9 +25,7 @@ export interface Settings {
   hideLabelsOnMove: boolean;
   renderLabels: boolean;
   renderEdgeLabels: boolean;
-  enableEdgeClickEvents: boolean;
-  enableEdgeWheelEvents: boolean;
-  enableEdgeHoverEvents: boolean | "debounce";
+  enableEdgeEvents: boolean;
   // Component rendering
   defaultNodeColor: string;
   defaultNodeType: string;
@@ -70,9 +68,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hideLabelsOnMove: false,
   renderLabels: true,
   renderEdgeLabels: false,
-  enableEdgeClickEvents: false,
-  enableEdgeWheelEvents: false,
-  enableEdgeHoverEvents: false,
+  enableEdgeEvents: false,
 
   // Component rendering
   defaultNodeColor: "#999",

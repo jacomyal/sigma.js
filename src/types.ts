@@ -15,7 +15,7 @@ import { EventEmitter } from "events";
 export type PlainObject<T = any> = { [k: string]: T };
 
 /**
- * Returns a type similar to T, but with the the K set of properties of the type
+ * Returns a type similar to T, but with the K set of properties of the type
  * T *required*, and the rest optional.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

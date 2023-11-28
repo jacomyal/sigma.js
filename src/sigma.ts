@@ -42,7 +42,7 @@ import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { extend } from "./utils/array";
-import { getPixelColor } from "./utils/edge-collisions";
+import { getPixelColor } from "./utils/picking";
 
 /**
  * Constants.
@@ -162,11 +162,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private elements: PlainObject<HTMLCanvasElement> = {};
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
   private webGLContexts: PlainObject<WebGLRenderingContext> = {};
+  private pickingLayers: Set<string> = new Set();
+  private textures: PlainObject<WebGLTexture> = {};
+  private frameBuffers: PlainObject<WebGLFramebuffer> = {};
   private activeListeners: PlainObject<Listener> = {};
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
-  // indices to keep trace of the index of the item inside programs
+  // indices to keep track of the index of the item inside programs
   private nodeProgramIndex: Record<string, number> = {};
   private edgeProgramIndex: Record<string, number> = {};
   private nodesWithForcedLabels: Set<string> = new Set<string>();
@@ -201,6 +204,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private highlightedNodes: Set<string> = new Set();
   private hoveredNode: string | null = null;
   private hoveredEdge: string | null = null;
+
   // Internal states
   private renderFrame: number | null = null;
   private renderHighlightedNodesFrame: number | null = null;
@@ -230,28 +234,22 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.container = container;
 
     // Initializing contexts
-    this.createWebGLContext("edges");
+    this.pickingLayers = new Set(["edges", "nodes"]);
+    this.createWebGLContext("edges", { picking: settings.enableEdgeEvents });
     this.createCanvasContext("edgeLabels");
-    this.createWebGLContext("nodes");
+    this.createWebGLContext("nodes", { picking: true });
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
     this.createWebGLContext("hoverNodes");
-
-    // Blending
-    for (const key in this.webGLContexts) {
-      const gl = this.webGLContexts[key];
-
-      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-      gl.enable(gl.BLEND);
-    }
-
-    this.createWebGLContext("picking", { preserveDrawingBuffer: true, hidden: true });
     this.createCanvasContext("mouse");
+
+    // Initial resize
+    this.resize();
 
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
       const NodeProgramClass = this.settings.nodeProgramClasses[type];
-      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this.webGLContexts.picking, this);
+      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this.frameBuffers.nodes, this);
 
       let NodeHoverProgram = NodeProgramClass;
       if (type in this.settings.nodeHoverProgramClasses) {
@@ -260,13 +258,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       this.nodeHoverPrograms[type] = new NodeHoverProgram(this.webGLContexts.hoverNodes, null, this);
     }
+
     for (const type in this.settings.edgeProgramClasses) {
       const EdgeProgramClass = this.settings.edgeProgramClasses[type];
-      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this.webGLContexts.picking, this);
+      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this.frameBuffers.edges, this);
     }
-
-    // Initial resize
-    this.resize();
 
     // Initializing the camera
     this.camera = new Camera();
@@ -339,8 +335,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   }
 
   /**
-   * Internal function used to create a canvas context and add the relevant
-   * DOM elements.
+   * Internal function used to create a WebGL context and add the relevant DOM
+   * elements.
    *
    * @param  {string}  id      - Context's id.
    * @param  {object?} options - #getContext params to override (optional)
@@ -348,7 +344,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private createWebGLContext(
     id: string,
-    options?: { preserveDrawingBuffer?: boolean; antialias?: boolean; hidden?: boolean },
+    options?: { preserveDrawingBuffer?: boolean; antialias?: boolean; hidden?: boolean; picking?: boolean },
   ): this {
     const canvas = this.createCanvas(id);
     if (options?.hidden) canvas.remove();
@@ -370,7 +366,41 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Edge, I am looking right at you...
     if (!context) context = canvas.getContext("experimental-webgl", contextOptions);
 
-    this.webGLContexts[id] = context as WebGLRenderingContext;
+    const gl = context as WebGLRenderingContext;
+    this.webGLContexts[id] = gl;
+
+    // Blending:
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    // Prepare frame buffer for picking layers:
+    if (options?.picking) {
+      const newFrameBuffer = gl.createFramebuffer();
+      if (!newFrameBuffer) throw new Error(`Sigma: cannot create a new frame buffer for layer ${id}`);
+      this.frameBuffers[id] = newFrameBuffer;
+    }
+
+    return this;
+  }
+
+  /**
+   * Method (re)binding WebGL texture (for picking).
+   *
+   * @return {Sigma}
+   */
+  private resetWebGLTexture(id: string): this {
+    const gl = this.webGLContexts[id] as WebGLRenderingContext;
+
+    const frameBuffer = this.frameBuffers[id];
+    const currentTexture = this.textures[id];
+    if (currentTexture) gl.deleteTexture(currentTexture);
+
+    const pickingTexture = gl.createTexture();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.bindTexture(gl.TEXTURE_2D, pickingTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickingTexture, 0);
+
+    this.textures[id] = pickingTexture as WebGLTexture;
 
     return this;
   }
@@ -405,7 +435,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private getNodeAtPosition(position: Coordinates): string | null {
     const { x, y } = position;
-    const color = getPixelColor(this.webGLContexts.picking, x, y);
+    const color = getPixelColor(this.webGLContexts.nodes, this.frameBuffers.nodes, x, y);
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -458,14 +488,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         }
       }
 
-      if (this.settings.enableEdgeHoverEvents === true) {
+      if (this.settings.enableEdgeEvents) {
         this.checkEdgeHoverEvents(baseEvent);
-      } else if (this.settings.enableEdgeHoverEvents === "debounce") {
-        if (!this.checkEdgesEventsFrame)
-          this.checkEdgesEventsFrame = requestFrame(() => {
-            this.checkEdgeHoverEvents(baseEvent);
-            this.checkEdgesEventsFrame = null;
-          });
       }
     };
 
@@ -488,7 +512,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
             node: nodeAtPosition,
           });
 
-        if (eventType === "wheel" ? this.settings.enableEdgeWheelEvents : this.settings.enableEdgeClickEvents) {
+        if (this.settings.enableEdgeEvents) {
           const edge = this.getEdgeAtPoint(e.x, e.y);
           if (edge) return this.emit(`${eventType}Edge`, { ...baseEvent, edge });
         }
@@ -673,7 +697,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * the key of the edge if any, or null else.
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
-    const color = getPixelColor(this.webGLContexts.picking, x, y);
+    const color = getPixelColor(this.webGLContexts.edges, this.frameBuffers.edges, x, y);
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -762,12 +786,12 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Add data to programs
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
-      const data = this.nodeDataCache[node];
-      this.addNodeToProgram(node, nodesPerPrograms[data.type]++);
-
       itemIDsIndex[incrID] = { type: "node", id: node };
       nodeIndices[node] = incrID;
       incrID++;
+
+      const data = this.nodeDataCache[node];
+      this.addNodeToProgram(node, nodeIndices[node], nodesPerPrograms[data.type]++);
     }
 
     //
@@ -804,12 +828,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Add data to programs
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
-      const data = this.edgeDataCache[edge];
 
-      this.addEdgeToProgram(edge, edgesPerPrograms[data.type]++);
       itemIDsIndex[incrID] = { type: "edge", id: edge };
       edgeIndices[edge] = incrID;
       incrID++;
+
+      const data = this.edgeDataCache[edge];
+      this.addEdgeToProgram(edge, edgeIndices[edge], edgesPerPrograms[data.type]++);
     }
 
     this.itemIDsIndex = itemIDsIndex;
@@ -1111,6 +1136,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Clearing the canvases
     this.clear();
 
+    // Prepare the textures
+    this.pickingLayers.forEach((layer) => this.resetWebGLTexture(layer));
+
     // If we have no nodes we can stop right there
     if (!this.graph.order) return exitRender();
 
@@ -1263,7 +1291,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.edgeDataCache[key] = data;
 
     // Forced label
-    // we filter and re push if needed because this function is also used fro update
+    // we filter and re push if needed because this function is also used from
+    // update
     this.edgesWithForcedLabels.delete(key);
     if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.add(key);
 
@@ -1366,33 +1395,35 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * Add the node data to its program.
    * @private
    * @param node The node's graphology ID
-   * @param index The index where to place the edge in the program
+   * @param fingerprint A fingerprint used to identity the node with picking
+   * @param position The index where to place the node in the program
    */
-  private addNodeToProgram(node: string, index: number): void {
+  private addNodeToProgram(node: string, fingerprint: number, position: number): void {
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-    nodeProgram.process(this.nodeIndices[node], index, data);
+    nodeProgram.process(fingerprint, position, data);
     // Saving program index
-    this.nodeProgramIndex[node] = index;
+    this.nodeProgramIndex[node] = position;
   }
 
   /**
    * Add the edge data to its program.
    * @private
    * @param edge The edge's graphology ID
-   * @param index The index where to place the edge in the program
+   * @param fingerprint A fingerprint used to identity the edge with picking
+   * @param position The index where to place the edge in the program
    */
-  private addEdgeToProgram(edge: string, index: number): void {
+  private addEdgeToProgram(edge: string, fingerprint: number, position: number): void {
     const data = this.edgeDataCache[edge];
     const edgeProgram = this.edgePrograms[data.type];
     if (!edgeProgram) throw new Error(`Sigma: could not find a suitable program for edge type "${data.type}"!`);
     const extremities = this.graph.extremities(edge),
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
-    edgeProgram.process(this.edgeIndices[edge], index, sourceData, targetData, data);
+    edgeProgram.process(fingerprint, position, sourceData, targetData, data);
     // Saving program index
-    this.edgeProgramIndex[edge] = index;
+    this.edgeProgramIndex[edge] = position;
   }
 
   /**---------------------------------------------------------------------------
@@ -1655,7 +1686,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this.elements[id].setAttribute("width", this.width * this.pixelRatio + "px");
       this.elements[id].setAttribute("height", this.height * this.pixelRatio + "px");
 
-      this.webGLContexts[id].viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+      const gl = this.webGLContexts[id];
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+      // Clear picking texture if needed
+      if (this.pickingLayers.has(id)) {
+        const currentTexture = this.textures[id];
+        if (currentTexture) gl.deleteTexture(currentTexture);
+      }
     }
 
     return this;
@@ -1670,7 +1708,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
-    this.webGLContexts.picking.clear(this.webGLContexts.picking.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
@@ -1713,7 +1750,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         if (skipIndexation) {
           const programIndex = this.nodeProgramIndex[node];
           if (programIndex === undefined) throw new Error(`Sigma: node "${node}" can't be repaint`);
-          this.addNodeToProgram(node, programIndex);
+          this.addNodeToProgram(node, this.nodeIndices[node], programIndex);
         }
       }
 
@@ -1727,7 +1764,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         if (skipIndexation) {
           const programIndex = this.edgeProgramIndex[edge];
           if (programIndex === undefined) throw new Error(`Sigma: edge "${edge}" can't be repaint`);
-          this.addEdgeToProgram(edge, programIndex);
+          this.addEdgeToProgram(edge, this.edgeIndices[edge], programIndex);
         }
       }
     }
