@@ -80,7 +80,7 @@ This will generate a JSON report at `test/e2e/reports/my-report.json`.
 Then, you can compare it to some reference report, by running:
 
 ```bash
-npm run e2e:compare-benchmarks -- --reference reference-report.json --report my-report.json
+npm run e2e:compare-benchmarks -- --reference test/e2e/reports/reference-report.json --report test/e2e/reports/my-report.json
 ```
 
 ## Website

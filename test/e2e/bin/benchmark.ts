@@ -1,4 +1,5 @@
 import { writeFileSync } from "fs";
+import { execSync } from "child_process";
 import commandLineArgs, { OptionDefinition } from "command-line-args";
 
 import benchmarkTests from "../suites/benchmarks";
@@ -19,10 +20,23 @@ function getNowString() {
     addZeros(d.getSeconds())
   );
 }
+function getCurrentGitBranch(): string {
+  try {
+    return execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" }).trim();
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la branche Git :", error instanceof Error ? error.message : error);
+    return "N/A";
+  }
+}
 
 const OPTIONS: OptionDefinition[] = [
-  { name: "filename", alias: "f", type: String, defaultValue: `${getNowString()}-report.json` },
-  { name: "runs", alias: "r", type: Number, defaultValue: 10 },
+  {
+    name: "filename",
+    alias: "f",
+    type: String,
+    defaultValue: `${getNowString()}-${getCurrentGitBranch()}-report.json`,
+  },
+  { name: "runs", alias: "r", type: Number, defaultValue: 5 },
   { name: "noHeadless", type: Boolean, defaultValue: false },
 ];
 

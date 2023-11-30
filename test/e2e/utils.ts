@@ -6,7 +6,6 @@ import fs from "fs";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 import Graph from "graphology";
-import { GraphConstructor } from "graphology-types";
 
 import Sigma from "../../src/sigma";
 
@@ -18,16 +17,18 @@ declare global {
   const dependencies: TestDependencies;
 }
 
-export type Tests = Array<{
+export type Test = {
   name: string; // Name of the screenshot, without the extension like for example 'example-basic'
   waitFor?: number; // Time to wait in ms before to take the screenshot
   scenario: (page: Page) => Promise<void>;
   failureThreshold?: number; // between 0 and 1, it's a percent. By default, it's a small epsilon.
   dimensions?: { width: number; height: number };
-}>;
+};
+
+export type Tests = Test[];
 
 export type TestDependencies = {
-  Graph: GraphConstructor;
+  Graph: typeof Graph;
   Sigma: typeof Sigma;
   data: { [key: string]: Graph };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

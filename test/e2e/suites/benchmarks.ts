@@ -1,98 +1,68 @@
 import { Page } from "puppeteer";
 
-import { Tests } from "../utils";
+import { Test, Tests } from "../utils";
 
-const tests: Tests = [
-  {
-    name: "n-renders-small-scene",
+const TIMES = 20;
+
+const METHODS = ["refresh", "render"] as const;
+type Method = (typeof METHODS)[number];
+
+const SIZES = ["small", "medium", "large"] as const;
+type Size = (typeof SIZES)[number];
+
+const SCREEN_SIZES: Record<Size, number> = {
+  small: 600,
+  medium: 1600,
+  large: 2600,
+};
+const GRAPHS: Record<Size, string> = {
+  small: "lesMiserables",
+  medium: "arctic",
+  large: "largeGraph",
+};
+
+function getTest(method: Method, screenSize: Size, graphSize: Size): Test {
+  const graphKey = GRAPHS[graphSize];
+  const screenKey = SCREEN_SIZES[screenSize];
+
+  return {
+    name: `${method}-${screenSize}-scene-${graphSize}-graph`,
     scenario: async (page: Page): Promise<void> => {
-      await page.evaluate(() => {
-        const {
-          data: { arctic },
-          Sigma,
-          container,
-          rafNTimes,
-        } = dependencies;
+      await page.evaluate(
+        (method: string, graphKey: string, times: number) => {
+          const { data, Sigma, container, rafNTimes } = dependencies;
 
-        new Sigma(arctic, container);
+          const graph = data[graphKey];
+          const sigma = new Sigma(graph, container);
+          const camera = sigma.getCamera();
 
-        return rafNTimes(() => {
-          // This simulates a layout iteration, that triggers a full reindex of the graph:
-          arctic.forEachNode((node) => arctic.mergeNodeAttributes(node, { x: Math.random(), y: Math.random() }));
-        }, 20);
-      });
-    },
-  },
-  {
-    name: "n-refreshes-small-scene",
-    scenario: async (page: Page): Promise<void> => {
-      await page.evaluate(() => {
-        const {
-          data: { arctic },
-          Sigma,
-          container,
-          rafNTimes,
-        } = dependencies;
-
-        const sigma = new Sigma(arctic, container);
-        const camera = sigma.getCamera();
-
-        return rafNTimes(() => {
-          // This simulates a user interaction, that triggers a render of the graph:
-          camera.setState({ angle: camera.angle + 0.1 });
-        }, 20);
-      });
-    },
-  },
-  {
-    name: "n-renders-large-scene",
-    scenario: async (page: Page): Promise<void> => {
-      await page.evaluate(() => {
-        const {
-          data: { arctic },
-          Sigma,
-          container,
-          rafNTimes,
-        } = dependencies;
-
-        new Sigma(arctic, container);
-
-        return rafNTimes(() => {
-          // This simulates a layout iteration, that triggers a full reindex of the graph:
-          arctic.forEachNode((node) => arctic.mergeNodeAttributes(node, { x: Math.random(), y: Math.random() }));
-        }, 20);
-      });
+          switch (method) {
+            case "refresh":
+              return rafNTimes(() => {
+                // This simulates a layout iteration, that triggers a full reindex of the graph:
+                graph.forEachNode((node) => graph.mergeNodeAttributes(node, { x: Math.random(), y: Math.random() }));
+              }, times);
+            case "render":
+              return rafNTimes(() => {
+                // This simulates a user interaction, that triggers a render of the graph:
+                camera.setState({ angle: camera.angle + 0.1 });
+              }, times);
+          }
+        },
+        method,
+        graphKey,
+        TIMES,
+      );
     },
     dimensions: {
-      width: 2600,
-      height: 2600,
+      width: screenKey,
+      height: screenKey,
     },
-  },
-  {
-    name: "n-refreshes-large-scene",
-    scenario: async (page: Page): Promise<void> => {
-      await page.evaluate(() => {
-        const {
-          data: { arctic },
-          Sigma,
-          container,
-          rafNTimes,
-        } = dependencies;
+  };
+}
 
-        const sigma = new Sigma(arctic, container);
-        const camera = sigma.getCamera();
-
-        return rafNTimes(() => {
-          // This simulates a user interaction, that triggers a render of the graph:
-          camera.setState({ angle: camera.angle + 0.1 });
-        }, 20);
-      });
-    },
-    dimensions: {
-      width: 2600,
-      height: 2600,
-    },
-  },
-];
+const tests: Tests = METHODS.flatMap((method) =>
+  SIZES.flatMap((screenSize) => SIZES.map((graphSize) => getTest(method, screenSize, graphSize))),
+);
 
 export default tests;

@@ -15,11 +15,8 @@ async function exec() {
   if (!report) throw new Error(`Cannot find report "${report}"`);
   if (!reference) throw new Error(`Cannot find reference report "${reference}"`);
 
-  const cleanedReport = report.replace(/\.json$/, "") + ".json";
-  const cleanedReference = reference.replace(/\.json$/, "") + ".json";
-
-  process.env.REFERENCE_REPORT = path.join(__dirname, "../reports/", cleanedReference);
-  process.env.NEW_REPORT = path.join(__dirname, "../reports/", cleanedReport);
+  process.env.REFERENCE_REPORT = report;
+  process.env.NEW_REPORT = reference;
 
   const mocha = new Mocha({
     require: ["ts-node/register"],

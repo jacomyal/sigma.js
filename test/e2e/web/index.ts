@@ -15,6 +15,7 @@ import EdgeTriangleProgram from "../../../src/rendering/webgl/programs/edge.tria
 // Useful data
 import ARCTIC from "./resources/arctic.json";
 import LES_MISERABLES from "./resources/les-miserables.json";
+import LARGE_GRAPH from "./resources/large-graph.json";
 
 // Utils:
 const rafNTimes = (fn: (step: number) => void, n: number) => {
@@ -39,6 +40,7 @@ const rafNTimes = (fn: (step: number) => void, n: number) => {
 // Data:
 const arctic = Graph.from(ARCTIC as SerializedGraph);
 const lesMiserables = Graph.from(LES_MISERABLES as SerializedGraph);
+const largeGraph = Graph.from(LARGE_GRAPH as SerializedGraph);
 
 const container = document.getElementById("container") as HTMLElement;
 
@@ -54,7 +56,7 @@ globalize({
   dependencies: {
     Graph,
     Sigma,
-    data: { arctic, lesMiserables },
+    data: { arctic, lesMiserables, largeGraph },
     programs: {
       NodeCircleProgram,
       NodePointProgram,
