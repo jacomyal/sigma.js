@@ -88,6 +88,8 @@ export interface RenderParams {
   pixelRatio: number;
   correctionRatio: number;
   matrix: Float32Array;
+  downSizingRatio: number;
+  downSizedSizeRatio: number;
 }
 
 /**

@@ -33,7 +33,7 @@ function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number
 
 export interface ProgramInfo<Uniform extends string = string> {
   name: string;
-  enableAlphaBlending: boolean;
+  isPicking: boolean;
   program: WebGLProgram;
   gl: WebGLRenderingContext | WebGL2RenderingContext;
   frameBuffer: WebGLFramebuffer | null;
@@ -207,7 +207,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
       constantBuffer: constantBuffer || ({} as WebGLBuffer),
       uniformLocations,
       attributeLocations,
-      enableAlphaBlending: name !== "pick",
+      isPicking: name === "pick",
     };
   }
 
@@ -324,9 +324,9 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
   private renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
-    const { gl, program, enableAlphaBlending } = programInfo;
+    const { gl, program, isPicking } = programInfo;
 
-    if (enableAlphaBlending) gl.enable(gl.BLEND);
+    if (!isPicking) gl.enable(gl.BLEND);
     else gl.disable(gl.BLEND);
 
     gl.useProgram(program);
@@ -337,15 +337,22 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   render(params: RenderParams): void {
     if (this.hasNothingToRender()) return;
 
-    this.bindProgram(this.normalProgram);
-    this.renderProgram(params, this.normalProgram);
-    this.unbindProgram(this.normalProgram);
-
     if (this.pickProgram) {
+      this.pickProgram.gl.viewport(
+        0,
+        0,
+        (params.width * params.pixelRatio) / params.downSizingRatio,
+        (params.height * params.pixelRatio) / params.downSizingRatio,
+      );
       this.bindProgram(this.pickProgram);
       this.renderProgram(params, this.pickProgram);
       this.unbindProgram(this.pickProgram);
     }
+
+    this.normalProgram.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
+    this.bindProgram(this.normalProgram);
+    this.renderProgram(params, this.normalProgram);
+    this.unbindProgram(this.normalProgram);
   }
 
   drawWebGL(method: GLenum, { gl, frameBuffer }: ProgramInfo): void {

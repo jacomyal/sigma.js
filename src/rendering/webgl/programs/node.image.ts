@@ -280,14 +280,15 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
       }
     }
 
-    setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    setUniforms(params: RenderParams, { gl, uniformLocations, isPicking }: ProgramInfo): void {
+      const { sizeRatio, downSizedSizeRatio, pixelRatio, matrix } = params;
       this.latestRenderParams = params;
 
       const { u_sizeRatio, u_pixelRatio, u_matrix, u_atlas } = uniformLocations;
 
-      gl.uniform1f(u_sizeRatio, params.sizeRatio);
-      gl.uniform1f(u_pixelRatio, params.pixelRatio);
-      gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+      gl.uniform1f(u_pixelRatio, pixelRatio);
+      gl.uniform1f(u_sizeRatio, isPicking ? downSizedSizeRatio : sizeRatio);
+      gl.uniformMatrix3fv(u_matrix, false, matrix);
       gl.uniform1i(u_atlas, 0);
     }
   };

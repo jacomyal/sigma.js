@@ -84,11 +84,11 @@ export default class EdgeArrowHeadProgram extends EdgeProgram<(typeof UNIFORMS)[
     array[startIndex++] = edgeIndex;
   }
 
-  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+  setUniforms(params: RenderParams, { gl, uniformLocations, isPicking }: ProgramInfo): void {
     const { u_matrix, u_sizeRatio, u_correctionRatio } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_sizeRatio, isPicking ? params.downSizedSizeRatio : params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
   }
 }

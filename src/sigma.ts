@@ -20,6 +20,7 @@ import {
   CoordinateConversionOverride,
   TypedEventEmitter,
   MouseInteraction,
+  RenderParams,
 } from "./types";
 import {
   createElement,
@@ -169,7 +170,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
-  // indices to keep track of the index of the item inside programs
+
+  // Indices to keep track of the index of the item inside programs
   private nodeProgramIndex: Record<string, number> = {};
   private edgeProgramIndex: Record<string, number> = {};
   private nodesWithForcedLabels: Set<string> = new Set<string>();
@@ -197,6 +199,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private width = 0;
   private height = 0;
   private pixelRatio = getPixelRatio();
+  private pickingDownSizingRatio = 2 * this.pixelRatio;
 
   // Graph State
   private displayedNodeLabels: Set<string> = new Set();
@@ -397,7 +400,17 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const pickingTexture = gl.createTexture();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.bindTexture(gl.TEXTURE_2D, pickingTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      this.width / this.pickingDownSizingRatio,
+      this.height / this.pickingDownSizingRatio,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      null,
+    );
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickingTexture, 0);
 
     this.textures[id] = pickingTexture as WebGLTexture;
@@ -435,7 +448,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private getNodeAtPosition(position: Coordinates): string | null {
     const { x, y } = position;
-    const color = getPixelColor(this.webGLContexts.nodes, this.frameBuffers.nodes, x, y);
+    const color = getPixelColor(this.webGLContexts.nodes, this.frameBuffers.nodes, x, y, this.pickingDownSizingRatio);
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -697,7 +710,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * the key of the edge if any, or null else.
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
-    const color = getPixelColor(this.webGLContexts.edges, this.frameBuffers.edges, x, y);
+    const color = getPixelColor(this.webGLContexts.edges, this.frameBuffers.edges, x, y, this.pickingDownSizingRatio);
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -1085,7 +1098,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         pixelRatio: this.pixelRatio,
         zoomRatio: this.camera.ratio,
         sizeRatio: 1 / this.scaleSize(),
+        downSizedSizeRatio: 1 / this.scaleSize() / this.pickingDownSizingRatio,
         correctionRatio: this.correctionRatio,
+        downSizingRatio: this.pickingDownSizingRatio,
       });
     }
   }
@@ -1171,14 +1186,16 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // when I change the graph, the viewport or the camera. It might be useful later so I prefer to let this comment:
     // console.log(this.graphToViewportRatio * this.correctionRatio * this.normalizationFunction.ratio * 2);
 
-    const params = {
+    const params: RenderParams = {
       matrix: this.matrix,
       width: this.width,
       height: this.height,
       pixelRatio: this.pixelRatio,
       zoomRatio: this.camera.ratio,
       sizeRatio: 1 / this.scaleSize(),
+      downSizedSizeRatio: (1 / this.scaleSize()) * this.pickingDownSizingRatio,
       correctionRatio: this.correctionRatio,
+      downSizingRatio: this.pickingDownSizingRatio,
     };
 
     // Drawing nodes
