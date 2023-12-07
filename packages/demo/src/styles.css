@@ -121,8 +121,8 @@ div.ico > button {
   display: block;
   position: relative;
   font-size: 1.8em;
-  width: 2rem;
-  height: 2rem;
+  width: 2em;
+  height: 2em;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   color: black;
@@ -136,11 +136,11 @@ div.ico > button:hover {
   color: var(--dark-grey);
 }
 div.ico > button > * {
-  /* position: absolute;
+  position: absolute;
   inset: 0;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%); */
+  transform: translate(-50%, -50%);
 }
 
 button.btn {

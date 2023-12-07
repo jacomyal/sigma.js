@@ -16,7 +16,6 @@ import SearchField from "./SearchField";
 import GraphTitle from "./GraphTitle";
 import TagsPanel from "./TagsPanel";
 
-import "@react-sigma/core/lib/react-sigma.min.css";
 import { GrClose } from "react-icons/gr";
 import { BiRadioCircleMarked, BiBookContent } from "react-icons/bi";
 import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
