@@ -41,7 +41,6 @@ const config = {
         entryPoints: [
           "../sigma/src/sigma.ts",
           "../sigma/src/core/camera.ts",
-          "../sigma/src/core/quadtree.ts",
           "../sigma/src/core/captors/mouse.ts",
           "../sigma/src/core/captors/touch.ts",
         ],

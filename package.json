@@ -15,7 +15,7 @@
       "demo:start": "npm start --workspace=@sigma/demo",
       "demo:build": "npm run build --workspace=@sigma/demo",
       "website:build": "npm run build --workspace=@sigma/website",
-      "website:all": "npm run website:build && npm run demo:build && cp -R demo/build website/build/demo && npm run examples:build && cp -R examples/build website/build/examples"
+      "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples"
     },
     "devDependencies": {
       "typescript": "^5.2.2"
