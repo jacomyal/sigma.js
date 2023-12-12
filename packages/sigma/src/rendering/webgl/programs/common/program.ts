@@ -157,7 +157,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     }
   }
 
-  private getProgramInfo(
+  protected getProgramInfo(
     name: "normal" | "pick",
     gl: WebGLRenderingContext | WebGL2RenderingContext,
     vertexShaderSource: string,
@@ -211,7 +211,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     };
   }
 
-  private bindProgram(program: ProgramInfo): void {
+  protected bindProgram(program: ProgramInfo): void {
     let offset = 0;
 
     const { gl, buffer } = program;
@@ -240,7 +240,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 
-  private unbindProgram(program: ProgramInfo): void {
+  protected unbindProgram(program: ProgramInfo): void {
     if (!this.isInstanced) {
       this.ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, program));
     } else {
@@ -249,7 +249,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     }
   }
 
-  private bindAttribute(
+  protected bindAttribute(
     attr: ProgramAttributeSpecification,
     program: ProgramInfo,
     offset: number,
@@ -284,7 +284,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
     return attr.size * sizeFactor;
   }
 
-  private unbindAttribute(attr: ProgramAttributeSpecification, program: ProgramInfo, unsetDivisor?: boolean) {
+  protected unbindAttribute(attr: ProgramAttributeSpecification, program: ProgramInfo, unsetDivisor?: boolean) {
     const location = program.attributeLocations[attr.name];
     const gl = program.gl;
 
@@ -323,7 +323,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
 
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
-  private renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
+  protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program, isPicking } = programInfo;
 
     if (!isPicking) gl.enable(gl.BLEND);

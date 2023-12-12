@@ -233,7 +233,10 @@ export default function getNodeImageProgram(
       super(gl, pickingBuffer, renderer);
 
       rebindTextureFns.push(() => {
-        if (this && this.rebindTexture) this.rebindTexture();
+        if (this && this.bindTexture) {
+          this.bindTexture();
+          if (this.latestRenderParams) this.render(this.latestRenderParams);
+        }
         if (renderer && renderer.refresh) renderer.refresh();
       });
 
@@ -244,14 +247,38 @@ export default function getNodeImageProgram(
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
     }
 
-    rebindTexture() {
+    bindTexture() {
       const gl = this.normalProgram.gl;
 
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
       gl.generateMipmap(gl.TEXTURE_2D);
+    }
 
-      if (this.latestRenderParams) this.render(this.latestRenderParams);
+    render(params: RenderParams): void {
+      if (this.hasNothingToRender()) return;
+
+      if (this.pickProgram) {
+        this.pickProgram.gl.viewport(
+          0,
+          0,
+          (params.width * params.pixelRatio) / params.downSizingRatio,
+          (params.height * params.pixelRatio) / params.downSizingRatio,
+        );
+        this.bindProgram(this.pickProgram);
+        this.renderProgram(params, this.pickProgram);
+        this.unbindProgram(this.pickProgram);
+      }
+
+      // Rebind texture (since it's been just unbound by picking):
+      const gl = this.normalProgram.gl;
+      gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+      // Draw normal program:
+      this.normalProgram.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
+      this.bindProgram(this.normalProgram);
+      this.renderProgram(params, this.normalProgram);
+      this.unbindProgram(this.normalProgram);
     }
 
     processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData & { image?: string }): void {
