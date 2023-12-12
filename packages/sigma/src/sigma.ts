@@ -932,8 +932,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // an issue once we start memoizing getLabelsToDisplay.
       this.displayedNodeLabels.add(node);
 
-      const nodeProgram = this.nodePrograms[data.type];
-      nodeProgram.drawLabel(
+      const { nodeProgramClasses, defaultDrawNodeLabel } = this.settings;
+      const drawLabel = nodeProgramClasses[data.type].drawLabel || defaultDrawNodeLabel;
+      drawLabel(
         context,
         {
           key: node,
@@ -989,8 +990,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         continue;
       }
 
-      const edgeProgram = this.edgePrograms[edgeData.type];
-      edgeProgram.drawLabel(
+      const { edgeProgramClasses, defaultDrawEdgeLabel } = this.settings;
+      const drawLabel = edgeProgramClasses[edgeData.type].drawLabel || defaultDrawEdgeLabel;
+      drawLabel(
         context,
         {
           key: edge,
@@ -1038,8 +1040,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const size = this.scaleSize(data.size);
 
-      const nodeProgram = this.nodePrograms[data.type];
-      nodeProgram.drawHover(
+      const { nodeProgramClasses, defaultDrawNodeHover } = this.settings;
+      const drawHover = nodeProgramClasses[data.type].drawHover || defaultDrawNodeHover;
+      drawHover(
         context,
         {
           key: node,

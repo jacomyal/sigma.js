@@ -12,15 +12,18 @@ import { NodeHoverDrawingFunction } from "../../../../utils/node-hover";
 import { indexToColor } from "../../../../utils";
 
 export abstract class AbstractNodeProgram extends AbstractProgram {
+  static drawLabel: NodeLabelDrawingFunction | undefined;
+  static drawHover: NodeHoverDrawingFunction | undefined;
   abstract process(nodeIndex: number, offset: number, data: NodeDisplayData): void;
-  abstract drawLabel: NodeLabelDrawingFunction;
-  abstract drawHover: NodeHoverDrawingFunction;
 }
 
 export abstract class NodeProgram<Uniform extends string = string>
   extends Program<Uniform>
   implements AbstractNodeProgram
 {
+  static drawLabel: NodeLabelDrawingFunction | undefined = undefined;
+  static drawHover: NodeHoverDrawingFunction | undefined = undefined;
+
   process(nodeIndex: number, offset: number, data: NodeDisplayData): void {
     let i = offset * this.STRIDE;
     // NOTE: dealing with hidden items automatically
@@ -35,13 +38,26 @@ export abstract class NodeProgram<Uniform extends string = string>
   }
 
   abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
-  abstract drawLabel: NodeLabelDrawingFunction;
-  abstract drawHover: NodeHoverDrawingFunction;
 }
 
-export interface NodeProgramConstructor {
-  new (gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma): AbstractNodeProgram;
+class NodeImageClass implements AbstractNodeProgram {
+  static drawLabel: NodeLabelDrawingFunction | undefined = undefined;
+  static drawHover: NodeHoverDrawingFunction | undefined = undefined;
+
+  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
+    return this;
+  }
+  reallocate(_capacity: number): void {
+    return undefined;
+  }
+  process(_nodeIndex: number, _offset: number, _data: NodeDisplayData): void {
+    return undefined;
+  }
+  render(_params: RenderParams): void {
+    return undefined;
+  }
 }
+export type NodeProgramType = typeof NodeImageClass;
 
 /**
  * Helper function combining two or more programs into a single compound one.
@@ -49,18 +65,25 @@ export interface NodeProgramConstructor {
  * performant option. More performant programs can be written entirely.
  *
  * @param  {array}    programClasses - Program classes to combine.
+ * @param  {function} drawLabel - An optional node "draw label" function.
+ * @param  {function} drawHover - An optional node "draw hover" function.
  * @return {function}
  */
 export function createNodeCompoundProgram(
-  programClasses: NonEmptyArray<NodeProgramConstructor>,
-): NodeProgramConstructor {
+  programClasses: NonEmptyArray<NodeProgramType>,
+  drawLabel?: NodeLabelDrawingFunction,
+  drawHover?: NodeLabelDrawingFunction,
+): NodeProgramType {
   return class NodeCompoundProgram implements AbstractNodeProgram {
+    static drawLabel = drawLabel;
+    static drawHover = drawHover;
+
     programs: NonEmptyArray<AbstractNodeProgram>;
 
     constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
       this.programs = programClasses.map((Program) => {
         return new Program(gl, pickingBuffer, renderer);
-      }) as NonEmptyArray<AbstractNodeProgram>;
+      }) as unknown as NonEmptyArray<AbstractNodeProgram>;
     }
 
     reallocate(capacity: number): void {
@@ -73,13 +96,6 @@ export function createNodeCompoundProgram(
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
-    }
-
-    drawLabel(...args: Parameters<NodeLabelDrawingFunction>): void {
-      return this.programs[0].drawLabel(...args);
-    }
-    drawHover(...args: Parameters<NodeHoverDrawingFunction>): void {
-      return this.programs[0].drawHover(...args);
     }
   };
 }

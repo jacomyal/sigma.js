@@ -12,8 +12,6 @@ import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
 import VERTEX_SHADER_SOURCE from "../shaders/node.point.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.point.frag.glsl";
-import { drawDiscNodeLabel } from "../../../utils/node-labels";
-import { drawDiscNodeHover } from "../../../utils/node-hover";
 import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
@@ -21,9 +19,6 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodePointProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
-  drawLabel = drawDiscNodeLabel;
-  drawHover = drawDiscNodeHover;
-
   getDefinition() {
     return {
       VERTICES: 1,

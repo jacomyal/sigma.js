@@ -11,6 +11,8 @@ import { EdgeLabelDrawingFunction } from "../../../../utils/edge-labels";
 import { indexToColor } from "../../../../utils";
 
 export abstract class AbstractEdgeProgram extends AbstractProgram {
+  static drawLabel: EdgeLabelDrawingFunction | undefined;
+
   abstract process(
     edgeIndex: number,
     offset: number,
@@ -18,14 +20,14 @@ export abstract class AbstractEdgeProgram extends AbstractProgram {
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
-
-  abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
 export abstract class EdgeProgram<Uniform extends string = string>
   extends Program<Uniform>
   implements AbstractEdgeProgram
 {
+  static drawLabel: EdgeLabelDrawingFunction | undefined = undefined;
+
   process(
     edgeIndex: number,
     offset: number,
@@ -52,13 +54,31 @@ export abstract class EdgeProgram<Uniform extends string = string>
     targetData: NodeDisplayData,
     data: EdgeDisplayData,
   ): void;
-
-  abstract drawLabel: EdgeLabelDrawingFunction;
 }
 
-export interface EdgeProgramConstructor {
-  new (gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma): AbstractEdgeProgram;
+class EdgeImageClass implements AbstractEdgeProgram {
+  static drawLabel: EdgeLabelDrawingFunction | undefined = undefined;
+
+  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
+    return this;
+  }
+  reallocate(_capacity: number): void {
+    return undefined;
+  }
+  process(
+    _edgeIndex: number,
+    _offset: number,
+    _sourceData: NodeDisplayData,
+    _targetData: NodeDisplayData,
+    _data: EdgeDisplayData,
+  ): void {
+    return undefined;
+  }
+  render(_params: RenderParams): void {
+    return undefined;
+  }
 }
+export type EdgeProgramType = typeof EdgeImageClass;
 
 /**
  * Helper function combining two or more programs into a single compound one.
@@ -66,10 +86,16 @@ export interface EdgeProgramConstructor {
  * performant option. More performant programs can be written entirely.
  *
  * @param  {array}    programClasses - Program classes to combine.
+ * @param  {function} drawLabel - An optional edge "draw label" function.
  * @return {function}
  */
-export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConstructor>): EdgeProgramConstructor {
+export function createEdgeCompoundProgram(
+  programClasses: Array<EdgeProgramType>,
+  drawLabel?: EdgeLabelDrawingFunction,
+): EdgeProgramType {
   return class EdgeCompoundProgram implements AbstractEdgeProgram {
+    static drawLabel = drawLabel;
+
     programs: Array<AbstractEdgeProgram>;
 
     constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
@@ -94,10 +120,6 @@ export function createEdgeCompoundProgram(programClasses: Array<EdgeProgramConst
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
-    }
-
-    drawLabel(...args: Parameters<EdgeLabelDrawingFunction>) {
-      return this.programs[0].drawLabel(...args);
     }
   };
 }

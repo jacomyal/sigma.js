@@ -12,8 +12,11 @@ import { EdgeDisplayData, NodeDisplayData } from "./types";
 import NodePointProgram from "./rendering/webgl/programs/node.point";
 import EdgeRectangleProgram from "./rendering/webgl/programs/edge.rectangle";
 import EdgeArrowProgram from "./rendering/webgl/programs/edge.arrow";
-import { EdgeProgramConstructor } from "./rendering/webgl/programs/common/edge";
-import { NodeProgramConstructor } from "./rendering/webgl/programs/common/node";
+import { EdgeProgramType } from "./rendering/webgl/programs/common/edge";
+import { NodeProgramType } from "./rendering/webgl/programs/common/node";
+import { drawStraightEdgeLabel, EdgeLabelDrawingFunction } from "./utils/edge-labels";
+import { drawDiscNodeLabel, NodeLabelDrawingFunction } from "./utils/node-labels";
+import { drawDiscNodeHover, NodeHoverDrawingFunction } from "./utils/node-hover";
 
 /**
  * Sigma.js settings
@@ -42,24 +45,31 @@ export interface Settings {
   stagePadding: number;
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
+  defaultDrawEdgeLabel: EdgeLabelDrawingFunction;
+  defaultDrawNodeLabel: NodeLabelDrawingFunction;
+  defaultDrawNodeHover: NodeHoverDrawingFunction;
+
   // Labels
   labelDensity: number;
   labelGridCellSize: number;
   labelRenderedSizeThreshold: number;
+
   // Reducers
   nodeReducer: null | ((node: string, data: Attributes) => Partial<NodeDisplayData>);
   edgeReducer: null | ((edge: string, data: Attributes) => Partial<EdgeDisplayData>);
+
   // Features
   zIndex: boolean;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
+
   // Lifecycle
   allowInvalidContainer: boolean;
 
   // Program classes
-  nodeProgramClasses: { [type: string]: NodeProgramConstructor };
-  nodeHoverProgramClasses: { [type: string]: NodeProgramConstructor };
-  edgeProgramClasses: { [type: string]: EdgeProgramConstructor };
+  nodeProgramClasses: { [type: string]: NodeProgramType };
+  nodeHoverProgramClasses: { [type: string]: NodeProgramType };
+  edgeProgramClasses: { [type: string]: EdgeProgramType };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -86,6 +96,9 @@ export const DEFAULT_SETTINGS: Settings = {
   stagePadding: 30,
   zoomToSizeRatioFunction: Math.sqrt,
   itemSizesReference: "screen",
+  defaultDrawEdgeLabel: drawStraightEdgeLabel,
+  defaultDrawNodeLabel: drawDiscNodeLabel,
+  defaultDrawNodeHover: drawDiscNodeHover,
 
   // Labels
   labelDensity: 1,
@@ -110,11 +123,11 @@ export const DEFAULT_SETTINGS: Settings = {
   edgeProgramClasses: {},
 };
 
-export const DEFAULT_NODE_PROGRAM_CLASSES = {
+export const DEFAULT_NODE_PROGRAM_CLASSES: Record<string, NodeProgramType> = {
   circle: NodePointProgram,
 };
 
-export const DEFAULT_EDGE_PROGRAM_CLASSES = {
+export const DEFAULT_EDGE_PROGRAM_CLASSES: Record<string, EdgeProgramType> = {
   arrow: EdgeArrowProgram,
   line: EdgeRectangleProgram,
 };

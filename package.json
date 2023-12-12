@@ -1,24 +1,24 @@
 {
-    "name": "@sigma/root",
-    "version": "3.0.0-alpha3",
-    "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
-    "homepage": "https://www.sigmajs.org",
-    "bugs": "http://github.com/jacomyal/sigma.js/issues",
-    "workspaces": [
-      "packages/*"
-    ],
-    "scripts": {
-      "sigma:unit:test":"npm run unit:test --workspace=sigma",
-      "sigma:e2e:test":"npm run e2e:test --workspace=sigma",
-      "examples:build": "npm run build --workspace=@sigma/examples",
-      "examples:start": "npm run start --workspace=@sigma/examples",
-      "demo:start": "npm start --workspace=@sigma/demo",
-      "demo:build": "npm run build --workspace=@sigma/demo",
-      "website:build": "npm run build --workspace=@sigma/website",
-      "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples"
-    },
-    "devDependencies": {
-      "typescript": "^5.2.2"
-    }
+  "name": "@sigma/root",
+  "version": "3.0.0-alpha3",
+  "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "sigma:build": "npm run build --workspace=sigma",
+    "sigma:transpile": "npm run transpile --workspace=sigma",
+    "sigma:test": "npm run test --workspace=sigma",
+    "examples:build": "npm run build --workspace=@sigma/examples",
+    "examples:start": "npm run start --workspace=@sigma/examples",
+    "demo:start": "npm start --workspace=@sigma/demo",
+    "demo:build": "npm run build --workspace=@sigma/demo",
+    "website:build": "npm run build --workspace=@sigma/website",
+    "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
   }
-  
+}

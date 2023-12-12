@@ -11,7 +11,6 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.line.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.line.frag.glsl";
-import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
 import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
@@ -19,8 +18,6 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_matrix"] as const;
 
 export default class EdgeLineProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
-  drawLabel = drawStraightEdgeLabel;
-
   getDefinition() {
     return {
       VERTICES: 2,

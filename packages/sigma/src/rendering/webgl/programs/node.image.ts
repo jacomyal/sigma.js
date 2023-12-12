@@ -10,10 +10,9 @@ import { Coordinates, Dimensions, NodeDisplayData, RenderParams } from "../../..
 import { floatColor } from "../../../utils";
 import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
-import { NodeProgram, NodeProgramConstructor } from "./common/node";
+import { NodeProgram, NodeProgramType } from "./common/node";
 import Sigma from "../../../sigma";
-import { drawDiscNodeLabel } from "../../../utils/node-labels";
-import { drawDiscNodeHover } from "../../../utils/node-hover";
+import { NodeLabelDrawingFunction } from "../../../utils/node-labels";
 import { ProgramInfo } from "./common/program";
 
 // maximum size of single texture in atlas
@@ -28,12 +27,17 @@ type ImagePending = { status: "pending"; image: HTMLImageElement };
 type ImageReady = { status: "ready" } & Coordinates & Dimensions;
 type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
 
+const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_atlas"] as const;
+
 /**
  * To share the texture between the program instances of the graph and the
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeImageProgram(): NodeProgramConstructor {
+export default function getNodeImageProgram(
+  drawLabel?: NodeLabelDrawingFunction,
+  drawHover?: NodeLabelDrawingFunction,
+): NodeProgramType {
   /**
    * These attributes are shared between all instances of this exact class,
    * returned by this call to getNodeProgramImage:
@@ -201,11 +205,9 @@ export default function getNodeImageProgram(): NodeProgramConstructor {
 
   const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-  const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_atlas"] as const;
-
   return class NodeImageProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
-    drawLabel = drawDiscNodeLabel;
-    drawHover = drawDiscNodeHover;
+    static drawLabel = drawLabel;
+    static drawHover = drawHover;
 
     getDefinition() {
       return {

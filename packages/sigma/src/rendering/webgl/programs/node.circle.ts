@@ -13,8 +13,6 @@ import { floatColor } from "../../../utils";
 import { NodeProgram } from "./common/node";
 import VERTEX_SHADER_SOURCE from "../shaders/node.circle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/node.circle.frag.glsl";
-import { drawDiscNodeLabel } from "../../../utils/node-labels";
-import { drawDiscNodeHover } from "../../../utils/node-hover";
 import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
@@ -25,9 +23,6 @@ export default class NodeCircleProgram extends NodeProgram<(typeof UNIFORMS)[num
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;
-
-  drawLabel = drawDiscNodeLabel;
-  drawHover = drawDiscNodeHover;
 
   getDefinition() {
     return {

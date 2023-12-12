@@ -20,7 +20,6 @@ import { floatColor } from "../../../utils";
 import { EdgeProgram } from "./common/edge";
 import VERTEX_SHADER_SOURCE from "../shaders/edge.rectangle.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
-import { drawStraightEdgeLabel } from "../../../utils/edge-labels";
 import { ProgramInfo } from "./common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
@@ -28,8 +27,6 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_matrix", "u_zoomRatio", "u_sizeRatio", "u_correctionRatio"] as const;
 
 export default class EdgeRectangleProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
-  drawLabel = drawStraightEdgeLabel;
-
   getDefinition() {
     return {
       VERTICES: 6,
