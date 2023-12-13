@@ -237,7 +237,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.container = container;
 
     // Initializing contexts
-    this.pickingLayers = new Set(["edges", "nodes"]);
     this.createWebGLContext("edges", { picking: settings.enableEdgeEvents });
     this.createCanvasContext("edgeLabels");
     this.createWebGLContext("nodes", { picking: true });
@@ -377,6 +376,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     // Prepare frame buffer for picking layers:
     if (options?.picking) {
+      this.pickingLayers.add(id);
       const newFrameBuffer = gl.createFramebuffer();
       if (!newFrameBuffer) throw new Error(`Sigma: cannot create a new frame buffer for layer ${id}`);
       this.frameBuffers[id] = newFrameBuffer;
