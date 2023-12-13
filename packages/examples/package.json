@@ -1,6 +1,6 @@
 {
   "name": "@sigma/examples",
-  "version": "3.0.0-alpha3",
+  "private": true,
   "description": "Sigma examples root package.",
   "main": "index.js",
   "license": "MIT",

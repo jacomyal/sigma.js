@@ -1,6 +1,5 @@
 {
   "name": "@sigma/website",
-  "version": "3.0.0-alpha3",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

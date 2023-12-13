@@ -1,6 +1,5 @@
 {
   "name": "@sigma/demo",
-  "version": "3.0.0-alpha3",
   "private": true,
   "homepage": "/demo",
   "dependencies": {

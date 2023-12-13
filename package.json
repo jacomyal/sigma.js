@@ -1,6 +1,5 @@
 {
   "name": "@sigma/root",
-  "version": "3.0.0-alpha3",
   "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
@@ -21,6 +20,8 @@
     "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples"
   },
   "devDependencies": {
+    "lerna": "^8.0.0",
     "typescript": "^5.2.2"
-  }
+  },
+  "dependencies": {}
 }
