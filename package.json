@@ -11,6 +11,8 @@
     "sigma:build": "npm run build --workspace=sigma",
     "sigma:transpile": "npm run transpile --workspace=sigma",
     "sigma:test": "npm run test --workspace=sigma",
+    "sigma:unit:test": "npm run unit:test --workspace=sigma",
+    "sigma:e2e:test": "npm run e2e:test --workspace=sigma",
     "examples:build": "npm run build --workspace=@sigma/examples",
     "examples:start": "npm run start --workspace=@sigma/examples",
     "demo:start": "npm start --workspace=@sigma/demo",
