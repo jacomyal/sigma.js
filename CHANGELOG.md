@@ -6,6 +6,7 @@
 
 - **Completely rewrites programs API**
 - **Renames all existing programs**
+- **Restructures sources as a multipackage repository (using [Lerna](https://lerna.js.org/))**
 - **Moves `labelRenderer`, `hoverRenderer` and `edgeLabelRenderer` from settings to each renderer**
 
 ### Features
