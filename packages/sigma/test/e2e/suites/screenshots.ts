@@ -427,6 +427,20 @@ const tests: Tests = [
       });
     },
   },
+  {
+    name: "kill",
+    scenario: async (page: Page): Promise<void> => {
+      await page.evaluate(() => {
+        const { Graph, Sigma, container } = dependencies;
+
+        const graph = new Graph();
+        graph.addNode("test", { x: 0, y: 0, size: 10, color: "#1E90FF" });
+
+        const sigma = new Sigma(graph, container);
+        sigma.kill();
+      });
+    },
+  },
 ];
 
 export default tests;

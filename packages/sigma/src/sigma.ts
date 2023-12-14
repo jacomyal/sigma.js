@@ -654,16 +654,16 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       this.refresh({ schedule: true });
     };
 
-    graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate); // OK
-    graph.on("nodeDropped", this.activeListeners.dropNodeGraphUpdate); // OK
-    graph.on("nodeAttributesUpdated", this.activeListeners.updateNodeGraphUpdate); // OK
+    graph.on("nodeAdded", this.activeListeners.addNodeGraphUpdate);
+    graph.on("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
+    graph.on("nodeAttributesUpdated", this.activeListeners.updateNodeGraphUpdate);
     graph.on("eachNodeAttributesUpdated", this.activeListeners.eachNodeAttributesUpdatedGraphUpdate);
-    graph.on("edgeAdded", this.activeListeners.addEdgeGraphUpdate); //OK
-    graph.on("edgeDropped", this.activeListeners.dropEdgeGraphUpdate); //OK
-    graph.on("edgeAttributesUpdated", this.activeListeners.updateEdgeGraphUpdate); //OK
+    graph.on("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
+    graph.on("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
+    graph.on("edgeAttributesUpdated", this.activeListeners.updateEdgeGraphUpdate);
     graph.on("eachEdgeAttributesUpdated", this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate);
-    graph.on("edgesCleared", this.activeListeners.clearEdgesGraphUpdate); //OK
-    graph.on("cleared", this.activeListeners.clearGraphUpdate); //OK
+    graph.on("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
+    graph.on("cleared", this.activeListeners.clearGraphUpdate);
 
     return this;
   }
@@ -676,14 +676,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private unbindGraphHandlers() {
     const graph = this.graph;
 
-    graph.removeListener("nodeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("nodeAdded", this.activeListeners.addNodeGraphUpdate);
     graph.removeListener("nodeDropped", this.activeListeners.dropNodeGraphUpdate);
-    graph.removeListener("nodeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("edgeAdded", this.activeListeners.graphUpdate);
+    graph.removeListener("nodeAttributesUpdated", this.activeListeners.updateNodeGraphUpdate);
+    graph.removeListener("eachNodeAttributesUpdated", this.activeListeners.eachNodeAttributesUpdatedGraphUpdate);
+    graph.removeListener("edgeAdded", this.activeListeners.addEdgeGraphUpdate);
     graph.removeListener("edgeDropped", this.activeListeners.dropEdgeGraphUpdate);
-    graph.removeListener("edgeAttributesUpdated", this.activeListeners.graphUpdate);
-    graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.graphUpdate);
+    graph.removeListener("edgeAttributesUpdated", this.activeListeners.updateEdgeGraphUpdate);
+    graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate);
     graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
     graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
   }
