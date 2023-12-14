@@ -13,7 +13,7 @@
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
     "prepare": "npm run clean && npm run transpile && npm run build",
-    "prepublishOnly": "npm run lint && npm test",
+    "prepublishOnly": "cp ../../README.md . && npm run lint && npm test",
     "reinstall": "rimraf examples/node_modules && rimraf demo/node_modules && rimraf node_modules && npm i && npm run clean",
     "test": "npm run unit:test && npm run e2e:test",
     "unit:test": "mocha --require ts-node/register ./test/unit/**/*.ts",

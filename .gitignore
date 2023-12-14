@@ -16,6 +16,7 @@ packages/sigma/test/e2e/screenshots/*.current.png
 packages/sigma/test/e2e/screenshots/*.diff.png
 
 # Built sources:
+packages/sigma/README.md
 packages/sigma/core/
 packages/sigma/rendering/
 packages/sigma/utils/
