@@ -1101,7 +1101,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         pixelRatio: this.pixelRatio,
         zoomRatio: this.camera.ratio,
         sizeRatio: 1 / this.scaleSize(),
-        downSizedSizeRatio: 1 / this.scaleSize() / this.pickingDownSizingRatio,
         correctionRatio: this.correctionRatio,
         downSizingRatio: this.pickingDownSizingRatio,
       });
@@ -1196,7 +1195,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       pixelRatio: this.pixelRatio,
       zoomRatio: this.camera.ratio,
       sizeRatio: 1 / this.scaleSize(),
-      downSizedSizeRatio: (1 / this.scaleSize()) * this.pickingDownSizingRatio,
       correctionRatio: this.correctionRatio,
       downSizingRatio: this.pickingDownSizingRatio,
     };

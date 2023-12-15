@@ -345,7 +345,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
         (params.height * params.pixelRatio) / params.downSizingRatio,
       );
       this.bindProgram(this.pickProgram);
-      this.renderProgram(params, this.pickProgram);
+      this.renderProgram({ ...params, pixelRatio: params.pixelRatio / params.downSizingRatio }, this.pickProgram);
       this.unbindProgram(this.pickProgram);
     }
 

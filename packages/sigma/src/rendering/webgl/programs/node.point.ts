@@ -45,14 +45,11 @@ export default class NodePointProgram extends NodeProgram<(typeof UNIFORMS)[numb
     array[startIndex++] = nodeIndex;
   }
 
-  setUniforms(
-    { sizeRatio, downSizedSizeRatio, pixelRatio, matrix }: RenderParams,
-    { gl, uniformLocations, isPicking }: ProgramInfo,
-  ): void {
+  setUniforms({ sizeRatio, pixelRatio, matrix }: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
     const { u_sizeRatio, u_pixelRatio, u_matrix } = uniformLocations;
 
     gl.uniform1f(u_pixelRatio, pixelRatio);
-    gl.uniform1f(u_sizeRatio, isPicking ? downSizedSizeRatio : sizeRatio);
+    gl.uniform1f(u_sizeRatio, sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, matrix);
   }
 }

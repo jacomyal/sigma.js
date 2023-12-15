@@ -53,11 +53,11 @@ export default class NodeCircleProgram extends NodeProgram<(typeof UNIFORMS)[num
     array[startIndex++] = nodeIndex;
   }
 
-  setUniforms(params: RenderParams, { gl, uniformLocations, isPicking }: ProgramInfo): void {
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
     const { u_sizeRatio, u_correctionRatio, u_matrix } = uniformLocations;
 
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
-    gl.uniform1f(u_sizeRatio, isPicking ? params.downSizedSizeRatio : params.sizeRatio);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
   }
 }

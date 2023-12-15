@@ -255,30 +255,13 @@ export default function getNodeImageProgram(
       gl.generateMipmap(gl.TEXTURE_2D);
     }
 
-    render(params: RenderParams): void {
-      if (this.hasNothingToRender()) return;
-
-      if (this.pickProgram) {
-        this.pickProgram.gl.viewport(
-          0,
-          0,
-          (params.width * params.pixelRatio) / params.downSizingRatio,
-          (params.height * params.pixelRatio) / params.downSizingRatio,
-        );
-        this.bindProgram(this.pickProgram);
-        this.renderProgram(params, this.pickProgram);
-        this.unbindProgram(this.pickProgram);
+    protected renderProgram(params: RenderParams, programInfo: ProgramInfo) {
+      if (!programInfo.isPicking) {
+        // Rebind texture (since it's been just unbound by picking):
+        const gl = programInfo.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
       }
-
-      // Rebind texture (since it's been just unbound by picking):
-      const gl = this.normalProgram.gl;
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-      // Draw normal program:
-      this.normalProgram.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
-      this.bindProgram(this.normalProgram);
-      this.renderProgram(params, this.normalProgram);
-      this.unbindProgram(this.normalProgram);
+      super.renderProgram(params, programInfo);
     }
 
     processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData & { image?: string }): void {
@@ -309,14 +292,14 @@ export default function getNodeImageProgram(
       }
     }
 
-    setUniforms(params: RenderParams, { gl, uniformLocations, isPicking }: ProgramInfo): void {
-      const { sizeRatio, downSizedSizeRatio, pixelRatio, matrix } = params;
+    setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+      const { sizeRatio, pixelRatio, matrix } = params;
       this.latestRenderParams = params;
 
       const { u_sizeRatio, u_pixelRatio, u_matrix, u_atlas } = uniformLocations;
 
       gl.uniform1f(u_pixelRatio, pixelRatio);
-      gl.uniform1f(u_sizeRatio, isPicking ? downSizedSizeRatio : sizeRatio);
+      gl.uniform1f(u_sizeRatio, sizeRatio);
       gl.uniformMatrix3fv(u_matrix, false, matrix);
       gl.uniform1i(u_atlas, 0);
     }
