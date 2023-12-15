@@ -9,11 +9,11 @@ import { Attributes } from "graphology-types";
 
 import { assign } from "./utils";
 import { EdgeDisplayData, NodeDisplayData } from "./types";
-import NodePointProgram from "./rendering/webgl/programs/node.point";
-import EdgeRectangleProgram from "./rendering/webgl/programs/edge.rectangle";
-import EdgeArrowProgram from "./rendering/webgl/programs/edge.arrow";
-import { EdgeProgramType } from "./rendering/webgl/programs/common/edge";
-import { NodeProgramType } from "./rendering/webgl/programs/common/node";
+import NodePointProgram from "./rendering/programs/node-point";
+import EdgeRectangleProgram from "./rendering/programs/edge-rectangle";
+import EdgeArrowProgram from "./rendering/programs/edge-arrow";
+import { EdgeProgramType } from "./rendering/edge";
+import { NodeProgramType } from "./rendering/node";
 import { drawStraightEdgeLabel, EdgeLabelDrawingFunction } from "./utils/edge-labels";
 import { drawDiscNodeLabel, NodeLabelDrawingFunction } from "./utils/node-labels";
 import { drawDiscNodeHover, NodeHoverDrawingFunction } from "./utils/node-hover";

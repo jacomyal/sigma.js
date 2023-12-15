@@ -1,47 +1,46 @@
 /**
- * Sigma.js WebGL Renderer Edge Program
- * =====================================
+ * Sigma.js WebGL Renderer Triangle Edge Program
+ * ==============================================
  *
- * Program rendering edges as thick lines but with a twist: the end of edge
- * does not sit in the middle of target node but instead stays by some margin.
- *
- * This is useful when combined with arrows to draw directed edges.
+ * Program rendering directed edges as a single triangle.
  * @module
  */
-import EdgeRectangleProgram from "./edge.rectangle";
-import VERTEX_SHADER_SOURCE from "../shaders/edge.clamped.vert.glsl";
-import { EdgeDisplayData, NodeDisplayData } from "../../../types";
+import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
+import { EdgeProgram } from "../../edge";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import { ProgramInfo } from "../../program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class EdgeClampedProgram extends EdgeRectangleProgram {
+const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
+
+export default class EdgeTriangleProgram extends EdgeProgram<(typeof UNIFORMS)[number]> {
   getDefinition() {
     return {
-      ...super.getDefinition(),
+      VERTICES: 3,
       VERTEX_SHADER_SOURCE,
+      FRAGMENT_SHADER_SOURCE,
+      METHOD: WebGLRenderingContext.TRIANGLES,
+      UNIFORMS,
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },
         { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        { name: "a_radius", size: 1, type: FLOAT },
       ],
       CONSTANT_ATTRIBUTES: [
         // If 0, then position will be a_positionStart
         // If 1, then position will be a_positionEnd
         { name: "a_positionCoef", size: 1, type: FLOAT },
         { name: "a_normalCoef", size: 1, type: FLOAT },
-        { name: "a_radiusCoef", size: 1, type: FLOAT },
       ],
       CONSTANT_DATA: [
-        [0, 1, 0],
-        [0, -1, 0],
-        [1, 1, 1],
-        [1, 1, 1],
-        [0, -1, 0],
-        [1, -1, -1],
+        [0, 1],
+        [0, -1],
+        [1, 0],
       ],
     };
   }
@@ -64,8 +63,6 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
     const dx = x2 - x1;
     const dy = y2 - y1;
 
-    const radius = targetData.size || 1;
-
     let len = dx * dx + dy * dy;
     let n1 = 0;
     let n2 = 0;
@@ -79,6 +76,7 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
 
     const array = this.array;
 
+    // First point
     array[startIndex++] = x1;
     array[startIndex++] = y1;
     array[startIndex++] = x2;
@@ -87,6 +85,13 @@ export default class EdgeClampedProgram extends EdgeRectangleProgram {
     array[startIndex++] = n2;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
-    array[startIndex++] = radius;
+  }
+
+  setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_matrix, u_sizeRatio, u_correctionRatio } = uniformLocations;
+
+    gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_sizeRatio, params.sizeRatio);
+    gl.uniform1f(u_correctionRatio, params.correctionRatio);
   }
 }

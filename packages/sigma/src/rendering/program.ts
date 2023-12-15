@@ -5,9 +5,9 @@
  * Class representing a single WebGL program used by sigma's WebGL renderer.
  * @module
  */
-import type Sigma from "../../../../sigma";
-import type { RenderParams } from "../../../../types";
-import { loadVertexShader, loadFragmentShader, loadProgram } from "../../shaders/utils";
+import type Sigma from "../sigma";
+import type { RenderParams } from "../types";
+import { loadVertexShader, loadFragmentShader, loadProgram } from "./utils";
 
 const PICKING_PREFIX = `#define PICKING_MODE\n`;
 

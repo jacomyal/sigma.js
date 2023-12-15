@@ -17,10 +17,10 @@
  */
 import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
-import { EdgeProgram } from "./common/edge";
-import VERTEX_SHADER_SOURCE from "../shaders/edge.rectangle.vert.glsl";
-import FRAGMENT_SHADER_SOURCE from "../shaders/edge.rectangle.frag.glsl";
-import { ProgramInfo } from "./common/program";
+import { EdgeProgram } from "../../edge";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import { ProgramInfo } from "../../program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

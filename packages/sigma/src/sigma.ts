@@ -38,8 +38,8 @@ import {
 } from "./utils";
 import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
 import { Settings, validateSettings, resolveSettings } from "./settings";
-import { AbstractNodeProgram } from "./rendering/webgl/programs/common/node";
-import { AbstractEdgeProgram } from "./rendering/webgl/programs/common/edge";
+import { AbstractNodeProgram } from "./rendering/node";
+import { AbstractEdgeProgram } from "./rendering/edge";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { identity, multiplyVec2 } from "./utils/matrices";
 import { extend } from "./utils/array";

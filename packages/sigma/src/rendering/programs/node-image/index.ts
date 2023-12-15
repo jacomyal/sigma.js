@@ -8,12 +8,12 @@
  */
 import { Coordinates, Dimensions, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
-import VERTEX_SHADER_SOURCE from "../shaders/node.image.vert.glsl";
-import FRAGMENT_SHADER_SOURCE from "../shaders/node.image.frag.glsl";
-import { NodeProgram, NodeProgramType } from "./common/node";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import { NodeProgram, NodeProgramType } from "../../node";
 import Sigma from "../../../sigma";
 import { NodeLabelDrawingFunction } from "../../../utils/node-labels";
-import { ProgramInfo } from "./common/program";
+import { ProgramInfo } from "../../program";
 
 // maximum size of single texture in atlas
 const MAX_TEXTURE_SIZE = 192;
