@@ -30,6 +30,16 @@ export default function NotFoundWrapper(props) {
           This page cannot be served in the development version, but you can edit its HTML code directly if it needs
           modifications.
         </div>
+        <br />
+        <div>
+          Please open{" "}
+          <a href="/docs">
+            <strong>
+              <code>/docs</code>
+            </strong>
+          </a>{" "}
+          to access the documentation.
+        </div>
       </div>
     );
   }

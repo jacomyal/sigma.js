@@ -34,6 +34,14 @@ When you're looking to create a custom `NodeProgram`, there are specific compone
 
 Additionally, sigma.js offers helpers to compose programs, making it easier to combine different functionalities.
 
+## Picking
+
+To detect collision between a given point (the mouse position, or where a touch event occurred for instance) and nodes and edges, we use a technic called **[picking](https://webglfundamentals.org/webgl/lessons/webgl-picking.html)**.
+
+Basically, we draw two images: One that the users see, with proper nodes and edges colors, antialiasing etc... And another one, where each item is drawn with a unique color. To know which item is at a given position, we look at the color of the corresponding pixel in the "picking image", and if it has a color, we get which item has this unique color.
+
+Each program must provide code to render on both the normal image and the picking image. For this, we use a "preprocessor" called `PICKING_MODE`. When the program is used to generate the normal image, `PICKING_MODE` is `false`, while it's `true` for picking. Please read the existing programs to have a better idea on how to use that.
+
 ## Existing programs
 
 Sigma.js comes with a set of predefined programs:
