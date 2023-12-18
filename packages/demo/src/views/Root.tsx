@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { SigmaContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
 import { omit, mapValues, keyBy, constant } from "lodash";
 import { DirectedGraph } from "graphology";
-
-import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
+import getNodeProgramImage from "sigma/rendering/programs/node-image";
 
 import GraphSettingsController from "./GraphSettingsController";
 import GraphEventsController from "./GraphEventsController";
@@ -12,7 +11,7 @@ import DescriptionPanel from "./DescriptionPanel";
 import { Dataset, FiltersState } from "../types";
 import ClustersPanel from "./ClustersPanel";
 import SearchField from "./SearchField";
-// import drawLabel from "../canvas-utils";
+import { drawLabel, drawHover } from "../canvas-utils";
 import GraphTitle from "./GraphTitle";
 import TagsPanel from "./TagsPanel";
 
@@ -52,7 +51,8 @@ const Root: FC = () => {
         graph={DirectedGraph}
         settings={{
           nodeProgramClasses: { image: getNodeProgramImage() },
-          // labelRenderer: drawLabel,
+          defaultDrawNodeLabel: drawLabel,
+          defaultDrawNodeHover: drawHover,
           defaultNodeType: "image",
           defaultEdgeType: "arrow",
           labelDensity: 0.07,

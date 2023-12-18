@@ -1,9 +1,9 @@
 import { useSigma, useSetSettings } from "@react-sigma/core";
+import { Attributes } from "graphology-types";
 import { FC, useEffect } from "react";
 
-// import { drawHover } from "../canvas-utils";
+import { drawHover, drawLabel } from "../canvas-utils";
 import useDebounce from "../use-debounce";
-import { Attributes } from "graphology-types";
 
 const NODE_FADE_COLOR = "#bbb";
 const EDGE_FADE_COLOR = "#eee";
@@ -25,8 +25,8 @@ const GraphSettingsController: FC<{ hoveredNode: string | null }> = ({ children,
     const hoveredColor: string = debouncedHoveredNode ? sigma.getNodeDisplayData(debouncedHoveredNode)!.color : "";
 
     setSettings({
-      // hoverRenderer: (context, data, settings) =>
-      //   drawHover(context, { ...sigma.getNodeDisplayData(data.key), ...data }, settings),
+      defaultDrawNodeLabel: drawLabel,
+      defaultDrawNodeHover: drawHover,
       nodeReducer: (node: string, data: Attributes) => {
         if (debouncedHoveredNode) {
           return node === debouncedHoveredNode ||

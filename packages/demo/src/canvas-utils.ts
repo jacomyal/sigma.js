@@ -92,7 +92,7 @@ export function drawHover(context: CanvasRenderingContext2D, data: PlainObject, 
 /**
  * Custom label renderer
  */
-export default function drawLabel(
+export function drawLabel(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings,
