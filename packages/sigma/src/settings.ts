@@ -14,9 +14,9 @@ import EdgeRectangleProgram from "./rendering/programs/edge-rectangle";
 import EdgeArrowProgram from "./rendering/programs/edge-arrow";
 import { EdgeProgramType } from "./rendering";
 import { NodeProgramType } from "./rendering";
-import { drawStraightEdgeLabel, EdgeLabelDrawingFunction } from "./utils/edge-labels";
-import { drawDiscNodeLabel, NodeLabelDrawingFunction } from "./utils/node-labels";
-import { drawDiscNodeHover, NodeHoverDrawingFunction } from "./utils/node-hover";
+import { drawStraightEdgeLabel, EdgeLabelDrawingFunction } from "./rendering/edge-labels";
+import { drawDiscNodeLabel, NodeLabelDrawingFunction } from "./rendering/node-labels";
+import { drawDiscNodeHover, NodeHoverDrawingFunction } from "./rendering/node-hover";
 
 /**
  * Sigma.js settings

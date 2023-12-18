@@ -12,7 +12,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import { NodeProgram, NodeProgramType } from "../../node";
 import Sigma from "../../../sigma";
-import { NodeLabelDrawingFunction } from "../../../utils/node-labels";
+import { NodeLabelDrawingFunction } from "../../node-labels";
 import { ProgramInfo } from "../../program";
 
 // maximum size of single texture in atlas
