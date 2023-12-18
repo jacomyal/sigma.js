@@ -324,10 +324,15 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
-    const { gl, program, isPicking } = programInfo;
+    const { gl, program } = programInfo;
 
-    if (!isPicking) gl.enable(gl.BLEND);
-    else gl.disable(gl.BLEND);
+    // With the current fix for #1397, the alpha blending is enabled for the
+    // picking layer:
+    gl.enable(gl.BLEND);
+
+    // Original code:
+    // if (!isPicking) gl.enable(gl.BLEND);
+    // else gl.disable(gl.BLEND);
 
     gl.useProgram(program);
     this.setUniforms(params, programInfo);

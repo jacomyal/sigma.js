@@ -314,18 +314,31 @@ export function indexToColor(index: number): number {
   // If the index is already computed, we yield it
   if (typeof FLOAT_INDEX_CACHE[index] !== "undefined") return FLOAT_INDEX_CACHE[index];
 
-  const r = (index & 0xff000000) >>> 24;
-  const g = (index & 0x00ff0000) >>> 16;
-  const b = (index & 0x0000ff00) >>> 8;
-  const a = index & 0x000000ff;
+  // To address issue #1397, one strategy is to keep encoding 4 bytes colors,
+  // but with alpha hard-set to 1.0 (or 255):
+  const r = (index & 0x00ff0000) >>> 16;
+  const g = (index & 0x0000ff00) >>> 8;
+  const b = index & 0x000000ff;
+  const a = 0x000000ff;
 
-  const color = rgbaToFloat(r, g, b, a);
+  // The original 4 bytes color encoding was the following:
+  // const r = (index & 0xff000000) >>> 24;
+  // const g = (index & 0x00ff0000) >>> 16;
+  // const b = (index & 0x0000ff00) >>> 8;
+  // const a = index & 0x000000ff;
+
+  const color = rgbaToFloat(r, g, b, a, true);
   FLOAT_INDEX_CACHE[index] = color;
 
   return color;
 }
-export function colorToIndex(r: number, g: number, b: number, a: number): number {
-  return a + (b << 8) + (g << 16) + (r << 24);
+export function colorToIndex(r: number, g: number, b: number, _a: number): number {
+  // As for the function indexToColor, because of #1397 and the "alpha is always
+  // 1.0" strategy, we need to fix this function as well:
+  return b + (g << 8) + (r << 16);
+
+  // The original 4 bytes color decoding is the following:
+  // return a + (b << 8) + (g << 16) + (r << 24);
 }
 
 /**

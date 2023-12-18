@@ -54,6 +54,7 @@ void main() {
   #else
   // For normal mode, we use the color:
   v_color = a_color;
-  v_color.a *= bias;
   #endif
+
+  v_color.a *= bias;
 }

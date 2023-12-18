@@ -34,9 +34,10 @@ void main() {
   #else
   // For normal mode, we use the color:
   v_color = a_color;
-  v_color.a *= bias;
 
   // Pass the texture coordinates:
   v_texture = a_texture;
   #endif
+
+  v_color.a *= bias;
 }

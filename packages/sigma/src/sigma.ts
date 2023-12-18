@@ -799,8 +799,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     // Add data to programs
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
-      itemIDsIndex[incrID] = { type: "node", id: node };
+
       nodeIndices[node] = incrID;
+      itemIDsIndex[nodeIndices[node]] = { type: "node", id: node };
       incrID++;
 
       const data = this.nodeDataCache[node];
@@ -842,8 +843,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     for (let i = 0, l = edges.length; i < l; i++) {
       const edge = edges[i];
 
-      itemIDsIndex[incrID] = { type: "edge", id: edge };
       edgeIndices[edge] = incrID;
+      itemIDsIndex[edgeIndices[edge]] = { type: "edge", id: edge };
       incrID++;
 
       const data = this.edgeDataCache[edge];
