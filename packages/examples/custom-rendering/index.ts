@@ -25,7 +25,7 @@
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
+import getNodeProgramImage from "sigma/rendering/programs/node-image";
 import NodeBorderProgram from "./node.border";
 
 import ForceSupervisor from "graphology-layout-force/worker";

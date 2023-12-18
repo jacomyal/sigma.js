@@ -4,26 +4,18 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js", ".glsl"],
     alias: {
-      "sigma/types": path.resolve(__dirname, "../sigma/src/types.ts"),
-      "sigma/utils": path.resolve(__dirname, "../sigma/src/utils/"),
-      "sigma/utils/animate": path.resolve(__dirname, "../sigma/src/utils/animate.ts"),
+      sigma: path.resolve(__dirname, "../sigma/src/"),
+      "sigma/types": path.resolve(__dirname, "../sigma/src/types"),
+      "sigma/utils": path.resolve(__dirname, "../sigma/src/utils"),
+      "sigma/utils/animate": path.resolve(__dirname, "../sigma/src/utils/animate"),
       "sigma/utils/node-hover": path.resolve(__dirname, "../sigma/src/utils/node-hover"),
       "sigma/utils/node-labels": path.resolve(__dirname, "../sigma/src/utils/node-labels"),
       "sigma/utils/node-collisions": path.resolve(__dirname, "../sigma/src/utils/node-collisions"),
-      "sigma/rendering/webgl/programs/edge": path.resolve(__dirname, "../sigma/src/rendering/webgl/programs/edge.ts"),
-      "sigma/rendering/webgl/programs/edge.fast": path.resolve(
-        __dirname,
-        "../sigma/src/rendering/webgl/programs/edge.fast.ts",
-      ),
-      "sigma/rendering/webgl/programs/node.image": path.resolve(
-        __dirname,
-        "../sigma/src/rendering/webgl/programs/node.image.ts",
-      ),
-      "sigma/rendering/webgl/programs/common/node": path.resolve(
-        __dirname,
-        "../sigma/src/rendering/webgl/programs/common/node.ts",
-      ),
-      sigma: path.resolve(__dirname, "../sigma/src"),
+      "sigma/rendering": path.resolve(__dirname, "../sigma/src/rendering"),
+      "sigma/rendering/program": path.resolve(__dirname, "../sigma/src/rendering/program"),
+      "sigma/rendering/programs/edge-rectangle": path.resolve(__dirname, "../sigma/rendering/programs/edge-rectangle"),
+      "sigma/rendering/programs/edge-line": path.resolve(__dirname, "../sigma/rendering/programs/edge-line"),
+      "sigma/rendering/programs/node-image": path.resolve(__dirname, "../sigma/rendering/programs/node-image"),
     },
   },
   module: {

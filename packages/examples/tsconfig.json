@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noImplicitAny": false,
-    "declaration":false,
+    "declaration": false,
     "strict": false,
     "paths": {
       "sigma": ["../sigma/src/"],
@@ -12,11 +12,11 @@
       "sigma/utils/node-hover": ["../sigma/src/utils/node-hover"],
       "sigma/utils/node-labels": ["../sigma/src/utils/node-labels"],
       "sigma/utils/node-collisions": ["../sigma/src/utils/node-collisions"],
-      "sigma/rendering/webgl/programs/edge.rectangle": ["../sigma/src/rendering/webgl/programs/edge.rectangle.ts"],
-      "sigma/rendering/webgl/programs/edge.line": ["../sigma/src/rendering/webgl/programs/edge.line.ts"],
-      "sigma/rendering/webgl/programs/node.image": ["../sigma/src/rendering/webgl/programs/node.image.ts"],
-      "sigma/rendering/webgl/programs/common/node": ["../sigma/src/rendering/webgl/programs/common/node.ts"],
-      "sigma/rendering/webgl/programs/common/program": ["../sigma/src/rendering/webgl/programs/common/program.ts"]
+      "sigma/rendering": ["../sigma/src/rendering"],
+      "sigma/rendering/program": ["../sigma/src/rendering/program"],
+      "sigma/rendering/programs/edge-rectangle": ["../sigma/rendering/programs/edge-rectangle"],
+      "sigma/rendering/programs/edge-line": ["../sigma/rendering/programs/edge-line"],
+      "sigma/rendering/programs/node-image": ["../sigma/rendering/programs/node-image"]
     }
   },
   "include": ["../sigma/external-types/**/*", "**/*", "../sigma/src/**/*"],

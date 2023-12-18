@@ -1,5 +1,5 @@
 /**
- * This class copies sigma/rendering/webgl/programs/node.circle, but with a tiny
+ * This class copies sigma/rendering/programs/node-circle, but with a tiny
  * difference: The fragment shader ("./node.border.frag.glsl") draws a white
  * disc with a colored border.
  */
@@ -14,10 +14,9 @@
  */
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
-import { NodeProgram } from "sigma/rendering/webgl/programs/common/node";
+import { ProgramInfo, NodeProgram } from "sigma/rendering";
 import VERTEX_SHADER_SOURCE from "!raw-loader!./node.border.vert.glsl";
 import FRAGMENT_SHADER_SOURCE from "!raw-loader!./node.border.frag.glsl";
-import { ProgramInfo } from "sigma/rendering/webgl/programs/common/program";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

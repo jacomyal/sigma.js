@@ -6,8 +6,8 @@ import Sigma from "sigma";
 import Graph from "graphology";
 import seedrandom from "seedrandom";
 
-import EdgeRectangleProgram from "sigma/rendering/webgl/programs/edge.rectangle";
-import EdgeLineProgram from "sigma/rendering/webgl/programs/edge.line";
+import EdgeRectangleProgram from "sigma/rendering/programs/edge-rectangle";
+import EdgeLineProgram from "sigma/rendering/programs/edge-line";
 
 import circlepack from "graphology-layout/circlepack";
 import clusters from "graphology-generators/random/clusters";
