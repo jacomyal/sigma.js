@@ -23,7 +23,7 @@ type ImagePending = { status: "pending"; image: HTMLImageElement };
 type ImageReady = { status: "ready" } & Coordinates & Dimensions;
 type ImageType = ImageLoading | ImageError | ImagePending | ImageReady;
 
-const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix", "u_atlas"] as const;
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix", "u_colorizeImages", "u_atlas"] as const;
 
 interface CreateNodeImageProgramOptions {
   padding: number;
@@ -59,7 +59,7 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions = {
  * "built" for each sigma instance:
  */
 export default function getNodeImageProgram(options?: Partial<CreateNodeImageProgramOptions>): NodeProgramType {
-  const { drawHover, drawLabel }: CreateNodeImageProgramOptions = {
+  const { drawHover, drawLabel, drawingMode }: CreateNodeImageProgramOptions = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
     ...(options || {}),
   };
@@ -326,13 +326,14 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_sizeRatio, u_correctionRatio, u_matrix, u_atlas } = uniformLocations;
+      const { u_sizeRatio, u_correctionRatio, u_matrix, u_atlas, u_colorizeImages } = uniformLocations;
       this.latestRenderParams = params;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
+      gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1.0 : 0.0);
     }
   };
 }
