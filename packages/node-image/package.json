@@ -1,0 +1,59 @@
+{
+  "name": "@sigma/node-image",
+  "version": "3.0.0",
+  "description": "A node program that renders images for sigma.js",
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "edge",
+    "node",
+    "index.js",
+    "*.d.ts"
+  ],
+  "scripts": {
+    "dist": "tsc -p ./tsconfig.transpile.json -d",
+    "clean": "rm *.js *.d.ts",
+    "dev": "kotatsu serve playground/index.ts --index playground/index.html --open",
+    "prettier": "prettier --write '**/*.ts'",
+    "prepublishOnly": "npm run dist",
+    "postpublish": "npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    },
+    {
+      "name": "Guillaume Plique",
+      "url": "http://github.com/Yomguithereal"
+    }
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "sigma": ">=3.0.0-beta.4"
+  },
+  "devDependencies": {
+    "@types/chroma-js": "^2.4.3",
+    "chroma-js": "^2.4.2",
+    "graphology": "^0.25.4",
+    "graphology-components": "^1.5.4",
+    "graphology-generators": "^0.11.2",
+    "graphology-layout": "^0.6.1",
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-types": "^0.24.7",
+    "kotatsu": "^0.23.1",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  }
+}
