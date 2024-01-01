@@ -11,12 +11,6 @@ import { Atlas, DEFAULT_TEXTURE_MANAGER_OPTIONS, TextureManager, TextureManagerO
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-// maximum size of single texture in atlas
-const MAX_TEXTURE_SIZE = Infinity;
-// maximum width of atlas texture (limited by browser)
-// low setting of 3072 works on phones & tablets
-const MAX_CANVAS_WIDTH = 3072;
-
 interface CreateNodeImageProgramOptions extends TextureManagerOptions {
   // - If "background", color will be used to color full node behind the image.
   // - If "color", color will be used to color image pixels (for pictograms)

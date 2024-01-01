@@ -7,7 +7,14 @@ import { Coordinates } from "sigma/types";
  */
 export type ImageLoading = { status: "loading" };
 export type ImageError = { status: "error" };
-export type ImageReady = { status: "ready"; image: HTMLImageElement };
+export type ImageReady = {
+  status: "ready";
+  image: HTMLImageElement;
+  sourceX: number;
+  sourceY: number;
+  sourceSize: number;
+  destinationSize: number;
+};
 export type ImageType = ImageLoading | ImageError | ImageReady;
 
 export type Atlas = Record<string, Coordinates & { size: number }>;
@@ -126,36 +133,40 @@ export async function loadImage(imageSource: string, { size }: { size?: number }
 }
 
 /**
- * This helper draws an image on the texture, with the proper size and position.
+ * This helper computes exact coordinates to draw an image onto a texture.
  */
-export function drawImage(
-  ctx: CanvasRenderingContext2D,
+export function refineImage(
   image: HTMLImageElement,
-  { x, y }: { x: number; y: number },
-  {
-    mode,
-    size,
-    padding,
-    contains,
-  }: { mode: "max" | "force" | "auto"; size: number; padding: number; contains?: boolean },
-): number {
-  const sizeOnImage = contains ? Math.max(image.width, image.height) : Math.min(image.width, image.height);
-  const sizeOnTexture = mode === "auto" ? sizeOnImage : mode === "force" ? size : Math.min(size, sizeOnImage);
+  corrector: PictogramCenteringCorrector,
+  { objectFit, size, correctCentering }: TextureManagerOptions,
+): Omit<ImageReady, "status" | "image"> {
+  const sourceSize =
+    objectFit === "contain" ? Math.max(image.width, image.height) : Math.min(image.width, image.height);
+  const destinationSize =
+    size.mode === "auto" ? sourceSize : size.mode === "force" ? size.value : Math.min(size.value, sourceSize);
+  let sourceX = (image.width - sourceSize) / 2;
+  let sourceY = (image.height - sourceSize) / 2;
 
-  let xInImage = (image.width - sizeOnImage) / 2;
-  let yInImage = (image.height - sizeOnImage) / 2;
+  if (correctCentering) {
+    const correction = corrector.getCorrectionOffset(image, sourceSize);
+    sourceX = correction.x;
+    sourceY = correction.y;
+  }
 
-  ctx.drawImage(image, xInImage, yInImage, sizeOnImage, sizeOnImage, x, y, sizeOnTexture, sizeOnTexture);
-
-  return sizeOnTexture;
+  return {
+    sourceX,
+    sourceY,
+    sourceSize,
+    destinationSize,
+  };
 }
 
-export function drawTexture(
-  ctx: CanvasRenderingContext2D,
-  images: Record<string, ImageType>,
-  corrector: PictogramCenteringCorrector,
-  { size, objectFit, correctCentering }: TextureManagerOptions,
-): Atlas {
+/**
+ * This helper takes a collection of image states and a context, draw all the
+ * images in the context, and returns an atlas to get where each image is drawn
+ * on the texture.
+ */
+export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string, ImageType>): Atlas {
   const MAX_CANVAS_WIDTH = 3072;
   const TARGET_FILL_PERCENTAGE = 0.6;
 
@@ -174,40 +185,21 @@ export function drawTexture(
     const imageState = images[key];
     if (imageState.status !== "ready") continue;
 
-    const image = imageState.image;
-    const sourceSize =
-      objectFit === "contain" ? Math.max(image.width, image.height) : Math.min(image.width, image.height);
-    const destinationSize =
-      size.mode === "auto" ? sourceSize : size.mode === "force" ? size.value : Math.min(size.value, sourceSize);
-    let sourceX = (image.width - sourceSize) / 2;
-    let sourceY = (image.height - sourceSize) / 2;
-
-    if (correctCentering) {
-      const correction = corrector.getCorrectionOffset(image, sourceSize);
-      sourceX = correction.x;
-      sourceY = correction.y;
-    }
-
-    maxItemWidth = Math.max(maxItemWidth, destinationSize);
-    totalArea += destinationSize ** 2;
+    maxItemWidth = Math.max(maxItemWidth, imageState.destinationSize);
+    totalArea += imageState.destinationSize ** 2;
     imagesArray.push({
       key,
-      image,
-      sourceX,
-      sourceY,
-      sourceSize,
-      destinationSize,
+      ...imageState,
     });
   }
   imagesArray.sort((a, b) => (a.destinationSize > b.destinationSize ? -1 : 1));
 
-  // 2. Set canvas width, and predict its height:
+  // 2. Predict canvas width:
   const predictedTotalArea = totalArea / TARGET_FILL_PERCENTAGE;
-  const canvas = ctx.canvas;
-  canvas.width = Math.max(Math.min(MAX_CANVAS_WIDTH, Math.sqrt(predictedTotalArea)), maxItemWidth);
-  canvas.height = predictedTotalArea / canvas.width;
+  const predictedWidth = Math.min(Math.max(Math.sqrt(predictedTotalArea), maxItemWidth), MAX_CANVAS_WIDTH);
 
-  // 3. Fill texture:
+  // 3. Refine images coordinates:
+  const refinedImagesArray: ((typeof imagesArray)[number] & { destinationX: number; destinationY: number })[] = [];
   let x = 0;
   let y = 0;
   let currentRowHeight = 0;
@@ -215,14 +207,22 @@ export function drawTexture(
   const atlas: Atlas = {};
   for (let i = 0, l = imagesArray.length; i < l; i++) {
     const { key, image, sourceSize, sourceX, sourceY, destinationSize } = imagesArray[i];
-    if (x + destinationSize > canvas.width) {
+    if (x + destinationSize > predictedWidth) {
       maxRowWidth = Math.max(maxRowWidth, x);
       x = 0;
       y += currentRowHeight;
       currentRowHeight = destinationSize;
     }
-    ctx.fillStyle = "#000";
-    ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x, y, destinationSize, destinationSize);
+    refinedImagesArray.push({
+      key,
+      image,
+      sourceX,
+      sourceY,
+      sourceSize,
+      destinationX: x,
+      destinationY: y,
+      destinationSize,
+    });
     atlas[key] = {
       x,
       y,
@@ -234,10 +234,28 @@ export function drawTexture(
     currentRowHeight = Math.max(currentRowHeight, destinationSize);
   }
 
-  // 4. Crop texture to best dimensions:
+  // 4. Crop texture to final best dimensions:
   maxRowWidth = Math.max(maxRowWidth, x);
-  // canvas.width = maxRowWidth;
-  // canvas.height = y + currentRowHeight;
+  const canvas = ctx.canvas;
+  canvas.width = maxRowWidth;
+  canvas.height = y + currentRowHeight;
+
+  // 5. Fill texture:
+  for (let i = 0, l = refinedImagesArray.length; i < l; i++) {
+    const { image, sourceSize, sourceX, sourceY, destinationSize, destinationX, destinationY } = refinedImagesArray[i];
+
+    ctx.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      sourceSize,
+      sourceSize,
+      destinationX,
+      destinationY,
+      destinationSize,
+      destinationSize,
+    );
+  }
 
   return atlas;
 }
@@ -320,7 +338,7 @@ export class TextureManager extends EventEmitter {
     }, DEBOUNCE_TIMEOUT);
   }
   private generateTexture() {
-    this.atlas = drawTexture(this.ctx, this.imageStates, this.corrector, this.options);
+    this.atlas = drawTexture(this.ctx, this.imageStates);
     this.texture = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.emit(TextureManager.NEW_TEXTURE_EVENT, { atlas: this.atlas, texture: this.texture });
   }
@@ -337,6 +355,7 @@ export class TextureManager extends EventEmitter {
       this.imageStates[source] = {
         status: "ready",
         image,
+        ...refineImage(image, this.corrector, this.options),
       };
       this.scheduleGenerateTexture();
     } catch (e) {
