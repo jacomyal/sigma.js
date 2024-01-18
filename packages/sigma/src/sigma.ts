@@ -400,17 +400,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const pickingTexture = gl.createTexture();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.bindTexture(gl.TEXTURE_2D, pickingTexture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      this.width / this.pickingDownSizingRatio,
-      this.height / this.pickingDownSizingRatio,
-      0,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      null,
-    );
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickingTexture, 0);
 
     this.textures[id] = pickingTexture as WebGLTexture;
@@ -448,7 +438,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    */
   private getNodeAtPosition(position: Coordinates): string | null {
     const { x, y } = position;
-    const color = getPixelColor(this.webGLContexts.nodes, this.frameBuffers.nodes, x, y, this.pickingDownSizingRatio);
+    const color = getPixelColor(
+      this.webGLContexts.nodes,
+      this.frameBuffers.nodes,
+      x,
+      y,
+      this.pixelRatio,
+      this.pickingDownSizingRatio,
+    );
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -710,7 +707,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * the key of the edge if any, or null else.
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
-    const color = getPixelColor(this.webGLContexts.edges, this.frameBuffers.edges, x, y, this.pickingDownSizingRatio);
+    const color = getPixelColor(
+      this.webGLContexts.edges,
+      this.frameBuffers.edges,
+      x,
+      y,
+      this.pixelRatio,
+      this.pickingDownSizingRatio,
+    );
     const index = colorToIndex(...color);
     const itemAt = this.itemIDsIndex[index];
 
@@ -1898,13 +1902,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const matrix = override.matrix
       ? override.matrix
       : recomputeMatrix
-      ? matrixFromCamera(
-          override.cameraState || this.camera.getState(),
-          override.viewportDimensions || this.getDimensions(),
-          override.graphDimensions || this.getGraphDimensions(),
-          override.padding || this.getSetting("stagePadding") || 0,
-        )
-      : this.matrix;
+        ? matrixFromCamera(
+            override.cameraState || this.camera.getState(),
+            override.viewportDimensions || this.getDimensions(),
+            override.graphDimensions || this.getGraphDimensions(),
+            override.padding || this.getSetting("stagePadding") || 0,
+          )
+        : this.matrix;
 
     const viewportPos = multiplyVec2(matrix, coordinates);
 
@@ -1926,14 +1930,14 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     const invMatrix = override.matrix
       ? override.matrix
       : recomputeMatrix
-      ? matrixFromCamera(
-          override.cameraState || this.camera.getState(),
-          override.viewportDimensions || this.getDimensions(),
-          override.graphDimensions || this.getGraphDimensions(),
-          override.padding || this.getSetting("stagePadding") || 0,
-          true,
-        )
-      : this.invMatrix;
+        ? matrixFromCamera(
+            override.cameraState || this.camera.getState(),
+            override.viewportDimensions || this.getDimensions(),
+            override.graphDimensions || this.getGraphDimensions(),
+            override.padding || this.getSetting("stagePadding") || 0,
+            true,
+          )
+        : this.invMatrix;
 
     const res = multiplyVec2(invMatrix, {
       x: (coordinates.x / this.width) * 2 - 1,
