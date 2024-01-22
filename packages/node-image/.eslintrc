@@ -1,0 +1,26 @@
+{
+  // Specify the environments where the code will run
+  "env": {
+    "jest": true, // Enable Jest for testing
+    "browser": true // Enable browser environment
+  },
+
+  // Stop ESLint from searching for configuration in parent folders
+  "root": true,
+
+  // Specify the parser for TypeScript (using @typescript-eslint/parser)
+  "parser": "@typescript-eslint/parser", // Leverages TS ESTree to lint TypeScript
+
+  // Add additional rules and configuration options
+  "plugins": ["@typescript-eslint"],
+
+  // Extend various ESLint configurations and plugins
+  "extends": [
+    "eslint:recommended", // ESLint recommended rules
+    "plugin:@typescript-eslint/recommended", // TypeScript recommended rules
+    "plugin:@typescript-eslint/eslint-recommended", // ESLint overrides for TypeScript
+    "prettier", // Prettier rules
+    "plugin:prettier/recommended", // Prettier plugin integration
+    "plugin:storybook/recommended" // Recommended rules for Storybook
+  ]
+}

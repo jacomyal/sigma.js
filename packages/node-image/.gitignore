@@ -1,9 +1,5 @@
 node_modules
-.DS_Store
-.vscode
-
 dist
-build
 
-*.d.ts
-*.js
+#storybook build directory
+storybook-static
