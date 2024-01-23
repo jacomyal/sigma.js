@@ -293,6 +293,9 @@ export function rgbaToFloat(r: number, g: number, b: number, a: number, masking?
   return FLOAT32[0];
 }
 export function floatColor(val: string): number {
+  // The html color names are case-insensitive
+  val = val.toLowerCase();
+
   // If the color is already computed, we yield it
   if (typeof FLOAT_COLOR_CACHE[val] !== "undefined") return FLOAT_COLOR_CACHE[val];
 
