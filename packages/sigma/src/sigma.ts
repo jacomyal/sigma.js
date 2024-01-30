@@ -1728,9 +1728,11 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @return {Sigma}
    */
   clear(): this {
-    this.webGLContexts.nodes.clear(this.webGLContexts.nodes.COLOR_BUFFER_BIT);
-    this.webGLContexts.edges.clear(this.webGLContexts.edges.COLOR_BUFFER_BIT);
-    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
+    this.webGLContexts.nodes.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+    this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    this.webGLContexts.edges.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+    this.webGLContexts.edges.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    this.webGLContexts.hoverNodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
