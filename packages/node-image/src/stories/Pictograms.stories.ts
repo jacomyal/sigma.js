@@ -1,4 +1,4 @@
-import { createPictogramsStage } from "./Pictograms.js";
+import { createPictogramsStage } from "./Pictograms";
 
 export default {
   title: "node-image/Pictograms",

@@ -2,10 +2,6 @@
   "name": "@sigma/node-image",
   "version": "3.0.0",
   "description": "A node program that renders images for sigma.js",
-  "type": "module",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
   "files": [
     "/dist"
   ],
@@ -32,7 +28,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "sigma": ">=3.0.0-beta.4"
+    "sigma": ">3.0.0-beta.4"
   },
   "scripts": {
     "format": "prettier --write --parser typescript '**/*.ts'",
@@ -42,13 +38,6 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.7",
-    "@storybook/addon-interactions": "^7.6.7",
-    "@storybook/addon-links": "^7.6.7",
-    "@storybook/blocks": "^7.6.7",
-    "@storybook/html": "^7.6.7",
-    "@storybook/html-vite": "^7.6.7",
-    "@storybook/test": "^7.6.7",
     "@types/chroma-js": "^2.4.3",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
@@ -58,8 +47,8 @@
     "eslint-plugin-prettier": "^5.1.2",
     "eslint-plugin-storybook": "^0.6.15",
     "graphology": "^0.25.4",
-    "storybook": "^7.6.7",
     "vite": "^5.0.10",
-    "vite-plugin-dts": "^3.7.0"
+    "vite-plugin-dts": "^3.7.0",
+    "sigma": "3.0.0-beta.5"
   }
 }

@@ -1,9 +1,8 @@
 import Graph from "graphology";
-
 import Sigma from "sigma";
 import chroma from "chroma-js";
 
-import { createNodeImageProgram } from "../";
+import { createNodeImageProgram } from "..";
 import "./stage.css";
 
 export const createPictogramsStage = () => {

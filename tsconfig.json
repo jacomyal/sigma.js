@@ -4,7 +4,8 @@
     "references": [
       { "path": "./packages/demo" },
       { "path": "./packages/examples" },
-      { "path": "./packages/sigma" }
+      { "path": "./packages/sigma" },
+      { "path": "./packages/node-image" }
     ],
     "watchOptions": {
       "excludeDirectories": ["**/node_modules"]
