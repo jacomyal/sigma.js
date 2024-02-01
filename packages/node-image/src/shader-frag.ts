@@ -10,6 +10,7 @@ varying vec4 v_texture;
 
 uniform sampler2D u_atlas;
 uniform float u_cameraAngle;
+uniform float u_percentagePadding;
 uniform bool u_colorizeImages;
 uniform bool u_keepWithinCircle;
 
@@ -20,7 +21,7 @@ const float radius = 0.5;
 void main(void) {
   float dist = length(v_diffVector);
   float border = v_border;
-  vec4 color;
+  vec4 color = gl_FragColor;
 
   float c = cos(-u_cameraAngle);
   float s = sin(-u_cameraAngle);
@@ -41,10 +42,11 @@ void main(void) {
  
   // Second case: Image loaded into the texture
   else {
+    float paddingRatio = 1.0 + 2.0 * u_percentagePadding;
     float coef = u_keepWithinCircle ? 1.0 : ${Math.SQRT2};
-    vec2 coordinateInTexture = diffVector * vec2(1.0, -1.0) / v_radius / 2.0 * coef + vec2(0.5, 0.5);
+    vec2 coordinateInTexture = diffVector * vec2(paddingRatio, -paddingRatio) / v_radius / 2.0 * coef + vec2(0.5, 0.5);
     vec4 texel = texture2D(u_atlas, (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
- 
+
     // Colorize all visible image pixels:
     if (u_colorizeImages) {
       color = mix(gl_FragColor, v_color, texel.a);
@@ -53,6 +55,11 @@ void main(void) {
     // Colorize background pixels, keep image pixel colors:
     else {
       color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
+    }
+
+    // Erase pixels "in the padding":
+    if (abs(diffVector.x) > v_radius / paddingRatio || abs(diffVector.y) > v_radius / paddingRatio) {
+      color = u_colorizeImages ? gl_FragColor : v_color;
     }
   }
   #endif

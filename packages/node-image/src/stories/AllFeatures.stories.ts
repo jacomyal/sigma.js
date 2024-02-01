@@ -34,13 +34,13 @@ const createPictogramsStage = () => {
     {
       type: "padding",
       renderer: createNodeImageProgram({
-        padding: 5,
+        padding: 0.25,
       }),
     },
     {
       type: "padding-color",
       renderer: createNodeImageProgram({
-        padding: 5,
+        padding: 0.25,
         drawingMode: "color",
       }),
     },

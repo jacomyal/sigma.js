@@ -24,9 +24,6 @@ export type TextureManagerOptions = {
   // - If mode "force", will always scale images to the given value.
   // - If mode "max", will downscale images larger than the given value.
   size: { mode: "auto" } | { mode: "max"; value: number } | { mode: "force"; value: number };
-  // The padding should be expressed as a [0, 1] percentage.
-  // A padding of 0.05 will always be 5% of the diameter of a node.
-  padding: number;
   // Tries to mimic the related CSS property.
   objectFit: "contain" | "cover" | "fill";
   // If true, the image is centered on its alpha barycenter.
@@ -35,12 +32,14 @@ export type TextureManagerOptions = {
 
 export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
   size: { mode: "max", value: 512 },
-  padding: 0,
   objectFit: "cover",
   correctCentering: false,
 };
 
 export const DEBOUNCE_TIMEOUT = 100;
+
+// This margin helps avoiding images collisions in the texture:
+export const MARGIN_IN_TEXTURE = 1;
 
 /**
  * Helpers:
@@ -87,8 +86,8 @@ export async function loadSVGImage(imageSource: string, { size }: { size?: numbe
 
   const root = svg.documentElement;
 
-  let originalWidth = root.getAttribute("width");
-  let originalHeight = root.getAttribute("height");
+  const originalWidth = root.getAttribute("width");
+  const originalHeight = root.getAttribute("height");
 
   if (!originalWidth || !originalHeight)
     throw new Error("loadSVGImage: cannot use `size` if target SVG has no definite dimensions.");
@@ -207,11 +206,12 @@ export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string
   const atlas: Atlas = {};
   for (let i = 0, l = imagesArray.length; i < l; i++) {
     const { key, image, sourceSize, sourceX, sourceY, destinationSize } = imagesArray[i];
-    if (x + destinationSize > predictedWidth) {
+    const destinationSizeWithMargin = destinationSize + MARGIN_IN_TEXTURE;
+    if (x + destinationSizeWithMargin > predictedWidth) {
       maxRowWidth = Math.max(maxRowWidth, x);
       x = 0;
       y += currentRowHeight;
-      currentRowHeight = destinationSize;
+      currentRowHeight = destinationSizeWithMargin;
     }
     refinedImagesArray.push({
       key,
@@ -226,12 +226,10 @@ export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string
     atlas[key] = {
       x,
       y,
-      // This function handles rectangle for future-proof-ness, but the atlas
-      // actually expects squares.
-      size: Math.max(destinationSize, destinationSize),
+      size: destinationSize,
     };
-    x += destinationSize;
-    currentRowHeight = Math.max(currentRowHeight, destinationSize);
+    x += destinationSizeWithMargin;
+    currentRowHeight = Math.max(currentRowHeight, destinationSizeWithMargin);
   }
 
   // 4. Crop texture to final best dimensions:

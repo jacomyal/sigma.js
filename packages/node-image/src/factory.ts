@@ -20,6 +20,9 @@ interface CreateNodeImageProgramOptions extends TextureManagerOptions {
   // Allows overriding drawLabel and drawHover returned class static methods.
   drawLabel: NodeLabelDrawingFunction | undefined;
   drawHover: NodeLabelDrawingFunction | undefined;
+  // The padding should be expressed as a [0, 1] percentage.
+  // A padding of 0.05 will always be 5% of the diameter of a node.
+  padding: number;
 }
 
 const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions = {
@@ -28,12 +31,14 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions = {
   keepWithinCircle: true,
   drawLabel: undefined,
   drawHover: undefined,
+  padding: 0,
 };
 
 const UNIFORMS = [
   "u_sizeRatio",
   "u_correctionRatio",
   "u_cameraAngle",
+  "u_percentagePadding",
   "u_matrix",
   "u_colorizeImages",
   "u_keepWithinCircle",
@@ -51,6 +56,7 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
     drawLabel,
     drawingMode,
     keepWithinCircle,
+    padding,
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
@@ -167,13 +173,22 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_sizeRatio, u_correctionRatio, u_matrix, u_atlas, u_colorizeImages, u_keepWithinCircle, u_cameraAngle } =
-        uniformLocations;
+      const {
+        u_sizeRatio,
+        u_correctionRatio,
+        u_matrix,
+        u_atlas,
+        u_colorizeImages,
+        u_keepWithinCircle,
+        u_cameraAngle,
+        u_percentagePadding,
+      } = uniformLocations;
       this.latestRenderParams = params;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, keepWithinCircle ? params.sizeRatio : params.sizeRatio / Math.SQRT2);
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
+      gl.uniform1f(u_percentagePadding, padding);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
