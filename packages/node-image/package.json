@@ -1,6 +1,6 @@
 {
   "name": "@sigma/node-image",
-  "version": "3.0.0",
+  "version": "3.0.0-beta.1",
   "description": "A node program that renders images for sigma.js",
   "type": "module",
   "main": "dist/index.cjs.js",
