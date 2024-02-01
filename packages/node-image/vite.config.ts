@@ -9,7 +9,7 @@ export default defineConfig({
       name, // Sets the name of the generated library.
       entry: "./src/index.ts", // Specifies the entry point for building the library.
       fileName: (format) => `index.${format}.js`, // Generates the output file name based on the format.
-      formats: ["es"], // Specifies the output formats (CommonJS and ES modules).
+      formats: ["cjs", "es"], // Specifies the output formats (CommonJS and ES modules).
     },
     rollupOptions: {
       external: [...Object.keys(peerDependencies)], // Defines external dependencies for Rollup bundling.

@@ -2,6 +2,10 @@
   "name": "@sigma/node-image",
   "version": "3.0.0",
   "description": "A node program that renders images for sigma.js",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "files": [
     "/dist"
   ],
@@ -28,7 +32,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "sigma": ">3.0.0-beta.5"
+    "sigma": ">=3.0.0-beta.5"
   },
   "scripts": {
     "format": "prettier --write --parser typescript '**/*.ts'",
@@ -48,7 +52,6 @@
     "eslint-plugin-storybook": "^0.6.15",
     "graphology": "^0.25.4",
     "vite": "^5.0.10",
-    "vite-plugin-dts": "^3.7.0",
-    "sigma": "3.0.0-beta.5"
+    "vite-plugin-dts": "^3.7.0"
   }
 }
