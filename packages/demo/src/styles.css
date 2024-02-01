@@ -115,7 +115,7 @@ body {
  * ***************
  */
 div.ico {
-  --sigma-controls-size:2rem;
+  --sigma-controls-size: 2rem;
 }
 div.ico > button {
   display: block;

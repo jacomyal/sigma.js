@@ -27,7 +27,7 @@ const TagsPanel: FC<{
 
   const [visibleNodesPerTag, setVisibleNodesPerTag] = useState<Record<string, number>>(nodesPerTag);
   useEffect(() => {
-    // To ensure the graphology instance has up to data "hidden" values for
+    // To ensure the graphology instance has up to date "hidden" values for
     // nodes, we wait for next frame before reindexing. This won't matter in the
     // UX, because of the visible nodes bar width transition.
     requestAnimationFrame(() => {
@@ -88,10 +88,7 @@ const TagsPanel: FC<{
                 id={`tag-${tag.key}`}
               />
               <label htmlFor={`tag-${tag.key}`}>
-                <span
-                  className="circle"
-                  style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/${tag.image})` }}
-                />{" "}
+                <span className="circle" style={{ backgroundImage: `url(/images/${tag.image})` }} />{" "}
                 <div className="node-label">
                   <span>{tag.key}</span>
                   <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerTag + "%" }}>

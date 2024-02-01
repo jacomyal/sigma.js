@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { SigmaContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
 import { omit, mapValues, keyBy, constant } from "lodash";
 import { DirectedGraph } from "graphology";
-import getNodeProgramImage from "sigma/rendering/programs/node-image";
+import { createNodeImageProgram } from "@sigma/node-image";
 
 import GraphSettingsController from "./GraphSettingsController";
 import GraphEventsController from "./GraphEventsController";
@@ -18,6 +18,7 @@ import TagsPanel from "./TagsPanel";
 import { GrClose } from "react-icons/gr";
 import { BiRadioCircleMarked, BiBookContent } from "react-icons/bi";
 import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
+import { Settings } from "sigma/settings";
 
 const Root: FC = () => {
   const [showContents, setShowContents] = useState(false);
@@ -28,10 +29,29 @@ const Root: FC = () => {
     tags: {},
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const sigmaSettings: Partial<Settings> = useMemo(
+    () => ({
+      nodeProgramClasses: {
+        image: createNodeImageProgram({
+          size: { mode: "force", value: 256 },
+        }),
+      },
+      defaultDrawNodeLabel: drawLabel,
+      defaultDrawNodeHover: drawHover,
+      defaultNodeType: "image",
+      defaultEdgeType: "arrow",
+      labelDensity: 0.07,
+      labelGridCellSize: 60,
+      labelRenderedSizeThreshold: 15,
+      labelFont: "Lato, sans-serif",
+      zIndex: true,
+    }),
+    [],
+  );
 
   // Load data on mount:
   useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/dataset.json`)
+    fetch(`/dataset.json`)
       .then((res) => res.json())
       .then((dataset: Dataset) => {
         setDataset(dataset);
@@ -47,22 +67,7 @@ const Root: FC = () => {
 
   return (
     <div id="app-root" className={showContents ? "show-contents" : ""}>
-      <SigmaContainer
-        graph={DirectedGraph}
-        settings={{
-          nodeProgramClasses: { image: getNodeProgramImage() },
-          defaultDrawNodeLabel: drawLabel,
-          defaultDrawNodeHover: drawHover,
-          defaultNodeType: "image",
-          defaultEdgeType: "arrow",
-          labelDensity: 0.07,
-          labelGridCellSize: 60,
-          labelRenderedSizeThreshold: 15,
-          labelFont: "Lato, sans-serif",
-          zIndex: true,
-        }}
-        className="react-sigma"
-      >
+      <SigmaContainer graph={DirectedGraph} settings={sigmaSettings} className="react-sigma">
         <GraphSettingsController hoveredNode={hoveredNode} />
         <GraphEventsController setHoveredNode={setHoveredNode} />
         <GraphDataController dataset={dataset} filters={filtersState} />

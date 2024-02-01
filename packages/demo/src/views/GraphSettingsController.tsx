@@ -1,6 +1,6 @@
 import { useSigma, useSetSettings } from "@react-sigma/core";
 import { Attributes } from "graphology-types";
-import { FC, useEffect } from "react";
+import { FC, PropsWithChildren, useEffect } from "react";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import useDebounce from "../use-debounce";
@@ -8,7 +8,7 @@ import useDebounce from "../use-debounce";
 const NODE_FADE_COLOR = "#bbb";
 const EDGE_FADE_COLOR = "#eee";
 
-const GraphSettingsController: FC<{ hoveredNode: string | null }> = ({ children, hoveredNode }) => {
+const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null }>> = ({ children, hoveredNode }) => {
   const sigma = useSigma();
   const setSettings = useSetSettings();
   const graph = sigma.getGraph();

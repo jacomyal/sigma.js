@@ -1,11 +1,14 @@
 import { useRegisterEvents, useSigma } from "@react-sigma/core";
-import { FC, useEffect } from "react";
+import { FC, PropsWithChildren, useEffect } from "react";
 
 function getMouseLayer() {
   return document.querySelector(".sigma-mouse");
 }
 
-const GraphEventsController: FC<{ setHoveredNode: (node: string | null) => void }> = ({ setHoveredNode, children }) => {
+const GraphEventsController: FC<PropsWithChildren<{ setHoveredNode: (node: string | null) => void }>> = ({
+  setHoveredNode,
+  children,
+}) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
   const registerEvents = useRegisterEvents();

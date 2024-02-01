@@ -1,10 +1,14 @@
 import { useSigma } from "@react-sigma/core";
-import { FC, useEffect } from "react";
+import { FC, PropsWithChildren, useEffect } from "react";
 import { keyBy, omit } from "lodash";
 
 import { Dataset, FiltersState } from "../types";
 
-const GraphDataController: FC<{ dataset: Dataset; filters: FiltersState }> = ({ dataset, filters, children }) => {
+const GraphDataController: FC<PropsWithChildren<{ dataset: Dataset; filters: FiltersState }>> = ({
+  dataset,
+  filters,
+  children,
+}) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
 
@@ -21,7 +25,7 @@ const GraphDataController: FC<{ dataset: Dataset; filters: FiltersState }> = ({ 
       graph.addNode(node.key, {
         ...node,
         ...omit(clusters[node.cluster], "key"),
-        image: `${process.env.PUBLIC_URL}/images/${tags[node.tag].image}`,
+        image: `/images/${tags[node.tag].image}`,
       }),
     );
     dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));

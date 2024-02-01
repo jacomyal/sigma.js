@@ -3,39 +3,32 @@
   "private": true,
   "homepage": "/demo",
   "dependencies": {
-    "@types/lodash": "^4.14.178",
-    "@types/node": "^17.0.2",
-    "@types/react": "^17.0.37",
-    "@types/react-dom": "^17.0.11",
-    "babel-loader": "8.2.3",
-    "graphology": "^0.25.1",
+    "@react-sigma/core": "^3.4.2",
+    "@sigma/node-image": "3.0.0",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.11.15",
+    "@types/react": "^18.2.51",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "graphology": "^0.25.4",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-types": "^0.24.7",
     "lodash": "^4.17.21",
-    "react": "^17.0.2",
-    "react-animate-height": "^2.0.23",
-    "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1",
-    "react-scripts": "5.0.0",
-    "@react-sigma/core": "^3.4.2"
+    "react": "^18.2.0",
+    "react-animate-height": "^3.2.3",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-tsconfig-paths": "^4.3.1"
   },
   "overrides": {
-    "sigma": "3.0.0-beta.2"
+    "sigma": "3.0.0-beta.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "rules": {
-      "react-hooks/exhaustive-deps": "off"
-    }
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
