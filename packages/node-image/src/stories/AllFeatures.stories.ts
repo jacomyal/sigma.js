@@ -1,10 +1,10 @@
 import Sigma from "sigma";
 import Graph from "graphology";
 import chroma from "chroma-js";
+import { Meta, StoryObj } from "@storybook/html";
 
 import { createNodeImageProgram } from "../index.ts";
 import "./stage.css";
-import { Meta, StoryObj } from "@storybook/html";
 
 const createPictogramsStage = () => {
   const stage = document.createElement("div");
@@ -48,6 +48,23 @@ const createPictogramsStage = () => {
       type: "center",
       renderer: createNodeImageProgram({
         keepWithinCircle: true,
+        correctCentering: true,
+      }),
+    },
+    {
+      type: "scaled-no-crop",
+      renderer: createNodeImageProgram({
+        size: { mode: "force", value: 256 },
+        drawingMode: "color",
+        keepWithinCircle: false,
+      }),
+    },
+    {
+      type: "scaled-no-crop-centered",
+      renderer: createNodeImageProgram({
+        size: { mode: "force", value: 256 },
+        drawingMode: "color",
+        keepWithinCircle: false,
         correctCentering: true,
       }),
     },

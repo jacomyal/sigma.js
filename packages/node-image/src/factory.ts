@@ -172,7 +172,7 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
       this.latestRenderParams = params;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
-      gl.uniform1f(u_sizeRatio, params.sizeRatio);
+      gl.uniform1f(u_sizeRatio, keepWithinCircle ? params.sizeRatio : params.sizeRatio / Math.SQRT2);
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);

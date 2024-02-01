@@ -11,6 +11,7 @@ varying vec4 v_texture;
 uniform sampler2D u_atlas;
 uniform float u_cameraAngle;
 uniform bool u_colorizeImages;
+uniform bool u_keepWithinCircle;
 
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -18,33 +19,29 @@ const float radius = 0.5;
 
 void main(void) {
   float dist = length(v_diffVector);
+  vec4 color;
+
+  float c = cos(-u_cameraAngle);
+  float s = sin(-u_cameraAngle);
+  vec2 diffVector = mat2(c, s, -s, c) * (v_diffVector);
 
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
-  if (dist > v_radius)
-    gl_FragColor = transparent;
-  else
-    gl_FragColor = v_color;
+  color = v_color;
 
   #else
   // First case: No image to display
   if (v_texture.w <= 0.0) {
     if (!u_colorizeImages) {
-      if (dist < v_radius - v_border) {
-        gl_FragColor = v_color;
-      } else if (dist < v_radius) {
-        gl_FragColor = mix(transparent, v_color, (v_radius - dist) / v_border);
-      }
+      color = v_color;
     }
   }
  
   // Second case: Image loaded into the texture
   else {
-    float c = cos(-u_cameraAngle);
-    float s = sin(-u_cameraAngle);
-    vec2 coordinateInTexture = mat2(c, s, -s, c) * (v_diffVector) * vec2(1.0, -1.0) / v_radius / 2.0 + vec2(0.5, 0.5);
+    float coef = u_keepWithinCircle ? 1.0 : ${Math.SQRT2};
+    vec2 coordinateInTexture = diffVector * vec2(1.0, -1.0) / v_radius / 2.0 * coef + vec2(0.5, 0.5);
     vec4 texel = texture2D(u_atlas, (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
-    vec4 color;
  
     // Colorize all visible image pixels:
     if (u_colorizeImages) {
@@ -55,14 +52,27 @@ void main(void) {
     else {
       color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
     }
+  }
+  #endif
 
+  // Crop in a circle when u_keepWithinCircle is truthy:
+  if (u_keepWithinCircle) {
     if (dist < v_radius - v_border) {
       gl_FragColor = color;
     } else if (dist < v_radius) {
       gl_FragColor = mix(transparent, color, (v_radius - dist) / v_border);
     }
   }
-  #endif
+
+  // Crop in a square else:
+  else {
+    float squareHalfSize = v_radius * ${Math.SQRT1_2 * Math.cos(Math.PI / 12)};
+    if (abs(diffVector.x) > squareHalfSize || abs(diffVector.y) > squareHalfSize) {
+      gl_FragColor = transparent;
+    } else {
+      gl_FragColor = color;
+    }
+  }
 }
 `;
 
