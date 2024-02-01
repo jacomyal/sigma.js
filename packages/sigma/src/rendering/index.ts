@@ -8,7 +8,6 @@ export { ProgramInfo } from "./program";
 
 export { default as NodeCircleProgram } from "./programs/node-circle";
 export { default as NodePointProgram } from "./programs/node-point";
-export { default as getNodeImageProgram } from "./programs/node-image";
 
 export { default as EdgeArrowProgram } from "./programs/edge-arrow";
 export { default as EdgeArrowHeadProgram } from "./programs/edge-arrow-head";

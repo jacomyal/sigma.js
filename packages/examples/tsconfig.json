@@ -16,7 +16,6 @@
       "sigma/rendering/program": ["../sigma/src/rendering/program"],
       "sigma/rendering/programs/edge-rectangle": ["../sigma/rendering/programs/edge-rectangle"],
       "sigma/rendering/programs/edge-line": ["../sigma/rendering/programs/edge-line"],
-      "sigma/rendering/programs/node-image": ["../sigma/rendering/programs/node-image"]
     }
   },
   "include": ["../sigma/external-types/**/*", "**/*", "../sigma/src/**/*"],

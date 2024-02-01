@@ -6,7 +6,6 @@ import Sigma from "../../../src";
 // Programs to test
 import NodeCircleProgram from "../../../src/rendering/programs/node-circle";
 import NodePointProgram from "../../../src/rendering/programs/node-point";
-import getNodeImageProgram from "../../../src/rendering/programs/node-image";
 import EdgeRectangleProgram from "../../../src/rendering/programs/edge-rectangle";
 import EdgeLineProgram from "../../../src/rendering/programs/edge-line";
 import EdgeArrowProgram from "../../../src/rendering/programs/edge-arrow";
@@ -60,7 +59,6 @@ globalize({
     programs: {
       NodeCircleProgram,
       NodePointProgram,
-      getNodeImageProgram,
       EdgeLineProgram,
       EdgeRectangleProgram,
       EdgeArrowProgram,

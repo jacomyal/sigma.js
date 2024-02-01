@@ -15,7 +15,6 @@ module.exports = {
       "sigma/rendering/program": path.resolve(__dirname, "../sigma/src/rendering/program"),
       "sigma/rendering/programs/edge-rectangle": path.resolve(__dirname, "../sigma/rendering/programs/edge-rectangle"),
       "sigma/rendering/programs/edge-line": path.resolve(__dirname, "../sigma/rendering/programs/edge-line"),
-      "sigma/rendering/programs/node-image": path.resolve(__dirname, "../sigma/rendering/programs/node-image"),
     },
   },
   module: {

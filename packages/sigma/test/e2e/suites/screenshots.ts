@@ -363,7 +363,6 @@ const tests: Tests = [
         const {
           NodeCircleProgram,
           NodePointProgram,
-          getNodeImageProgram,
           EdgeRectangleProgram,
           EdgeLineProgram,
           EdgeArrowProgram,
@@ -394,7 +393,7 @@ const tests: Tests = [
           nodeProgramClasses: {
             node: NodeCircleProgram,
             fast: NodePointProgram,
-            image: getNodeImageProgram(),
+            image: NodeCircleProgram, // createNodeImageProgram(),
           },
           edgeProgramClasses: {
             edge: EdgeRectangleProgram,

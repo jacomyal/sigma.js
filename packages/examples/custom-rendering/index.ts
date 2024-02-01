@@ -25,10 +25,10 @@
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import getNodeProgramImage from "sigma/rendering/programs/node-image";
 import NodeBorderProgram from "./node.border";
 
 import ForceSupervisor from "graphology-layout-force/worker";
+import { NodeCircleProgram } from "sigma/rendering";
 
 const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -65,7 +65,7 @@ graph.nodes().forEach((node, i) => {
 new Sigma(graph, container, {
   // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
   nodeProgramClasses: {
-    image: getNodeProgramImage(),
+    image: NodeCircleProgram, // createNodeProgramImage(),
     border: NodeBorderProgram,
   },
   renderEdgeLabels: true,
