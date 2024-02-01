@@ -19,6 +19,7 @@ const float radius = 0.5;
 
 void main(void) {
   float dist = length(v_diffVector);
+  float border = v_border;
   vec4 color;
 
   float c = cos(-u_cameraAngle);
@@ -27,6 +28,7 @@ void main(void) {
 
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
+  border = 0.0;
   color = v_color;
 
   #else
@@ -57,10 +59,10 @@ void main(void) {
 
   // Crop in a circle when u_keepWithinCircle is truthy:
   if (u_keepWithinCircle) {
-    if (dist < v_radius - v_border) {
+    if (dist < v_radius - border) {
       gl_FragColor = color;
     } else if (dist < v_radius) {
-      gl_FragColor = mix(transparent, color, (v_radius - dist) / v_border);
+      gl_FragColor = mix(transparent, color, (v_radius - dist) / border);
     }
   }
 
