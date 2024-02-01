@@ -269,7 +269,7 @@ export class PictogramCenteringCorrector {
 
   constructor() {
     this.canvas = document.createElement("canvas");
-    this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.context = this.canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D;
   }
 
   getCorrectionOffset(image: HTMLImageElement, size: number): Coordinates {
