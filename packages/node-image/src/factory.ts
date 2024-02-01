@@ -33,6 +33,7 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions = {
 const UNIFORMS = [
   "u_sizeRatio",
   "u_correctionRatio",
+  "u_cameraAngle",
   "u_matrix",
   "u_colorizeImages",
   "u_keepWithinCircle",
@@ -166,12 +167,13 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_sizeRatio, u_correctionRatio, u_matrix, u_atlas, u_colorizeImages, u_keepWithinCircle } =
+      const { u_sizeRatio, u_correctionRatio, u_matrix, u_atlas, u_colorizeImages, u_keepWithinCircle, u_cameraAngle } =
         uniformLocations;
       this.latestRenderParams = params;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
+      gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1i(u_atlas, 0);
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);

@@ -9,6 +9,7 @@ varying float v_border;
 varying vec4 v_texture;
 
 uniform sampler2D u_atlas;
+uniform float u_cameraAngle;
 uniform bool u_colorizeImages;
 
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
@@ -39,8 +40,10 @@ void main(void) {
  
   // Second case: Image loaded into the texture
   else {
-    vec2 coordinateInTexture = v_diffVector * vec2(1.0, -1.0) / v_radius / 2.0 + vec2(0.5, 0.5);
-    vec4 texel = texture2D(u_atlas, v_texture.xy + coordinateInTexture * v_texture.zw, -1.0);
+    float c = cos(-u_cameraAngle);
+    float s = sin(-u_cameraAngle);
+    vec2 coordinateInTexture = mat2(c, s, -s, c) * (v_diffVector) * vec2(1.0, -1.0) / v_radius / 2.0 + vec2(0.5, 0.5);
+    vec4 texel = texture2D(u_atlas, (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
     vec4 color;
  
     // Colorize all visible image pixels:
