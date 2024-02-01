@@ -86,6 +86,7 @@ export interface RenderParams {
   sizeRatio: number;
   zoomRatio: number;
   pixelRatio: number;
+  cameraAngle: number;
   correctionRatio: number;
   matrix: Float32Array;
   downSizingRatio: number;
