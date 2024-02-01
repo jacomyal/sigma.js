@@ -4,7 +4,6 @@
   "homepage": "/demo",
   "dependencies": {
     "@react-sigma/core": "^3.4.2",
-    "@sigma/node-image": "3.0.0",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.15",
     "@types/react": "^18.2.51",
