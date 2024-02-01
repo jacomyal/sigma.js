@@ -2086,6 +2086,16 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.webGLContexts = {};
     this.elements = {};
 
+    // Kill programs:
+    for (const type in this.nodePrograms) {
+      this.nodePrograms[type].kill();
+    }
+    for (const type in this.nodeHoverPrograms) {
+      this.nodeHoverPrograms[type].kill();
+    }
+    for (const type in this.edgePrograms) {
+      this.edgePrograms[type].kill();
+    }
     this.nodePrograms = {};
     this.nodeHoverPrograms = {};
     this.edgePrograms = {};

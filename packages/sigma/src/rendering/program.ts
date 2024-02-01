@@ -69,6 +69,7 @@ export abstract class AbstractProgram {
   constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma) {}
   abstract reallocate(capacity: number): void;
   abstract render(params: RenderParams): void;
+  abstract kill(): void;
 }
 
 export abstract class Program<Uniform extends string = string> implements AbstractProgram, InstancedProgramDefinition {
@@ -156,6 +157,8 @@ export abstract class Program<Uniform extends string = string> implements Abstra
       this.STRIDE = this.ATTRIBUTES_ITEMS_COUNT;
     }
   }
+
+  abstract kill(): void;
 
   protected getProgramInfo(
     name: "normal" | "pick",

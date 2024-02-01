@@ -28,6 +28,10 @@ export abstract class EdgeProgram<Uniform extends string = string>
 {
   static drawLabel: EdgeLabelDrawingFunction | undefined = undefined;
 
+  kill(): void {
+    return undefined;
+  }
+
   process(
     edgeIndex: number,
     offset: number,
@@ -61,6 +65,9 @@ class EdgeImageClass implements AbstractEdgeProgram {
 
   constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
     return this;
+  }
+  kill(): void {
+    return undefined;
   }
   reallocate(_capacity: number): void {
     return undefined;
@@ -120,6 +127,10 @@ export function createEdgeCompoundProgram(
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
+    }
+
+    kill(): void {
+      this.programs.forEach((program) => program.kill());
     }
   };
 }

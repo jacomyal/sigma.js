@@ -24,6 +24,10 @@ export abstract class NodeProgram<Uniform extends string = string>
   static drawLabel: NodeLabelDrawingFunction | undefined = undefined;
   static drawHover: NodeHoverDrawingFunction | undefined = undefined;
 
+  kill(): void {
+    return undefined;
+  }
+
   process(nodeIndex: number, offset: number, data: NodeDisplayData): void {
     let i = offset * this.STRIDE;
     // NOTE: dealing with hidden items automatically
@@ -46,6 +50,9 @@ class NodeImageClass implements AbstractNodeProgram {
 
   constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
     return this;
+  }
+  kill(): void {
+    return undefined;
   }
   reallocate(_capacity: number): void {
     return undefined;
@@ -96,6 +103,10 @@ export function createNodeCompoundProgram(
 
     render(params: RenderParams): void {
       this.programs.forEach((program) => program.render(params));
+    }
+
+    kill(): void {
+      this.programs.forEach((program) => program.kill());
     }
   };
 }
