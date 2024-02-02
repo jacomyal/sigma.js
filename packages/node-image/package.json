@@ -38,8 +38,7 @@
     "format": "prettier --write --parser typescript '**/*.ts'",
     "lint": "eslint . --ext .ts --ignore-path .gitignore --fix",
     "build": "tsc && vite build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.4.3",
