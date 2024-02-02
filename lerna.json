@@ -1,4 +1,7 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "version": "independent"
+  "version": "independent",
+  "private": false,
+  "push": false,
+  "includeMergedTags": true
 }
