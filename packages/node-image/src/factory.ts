@@ -120,11 +120,10 @@ export default function getNodeImageProgram(options?: Partial<CreateNodeImagePro
       };
       textureManager.on(TextureManager.NEW_TEXTURE_EVENT, this.textureManagerCallback);
 
-      this.atlas = {};
-      this.textureImage = new ImageData(1, 1);
+      this.atlas = textureManager.getAtlas();
+      this.textureImage = textureManager.getTexture();
       this.texture = gl.createTexture() as WebGLTexture;
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+      this.bindTexture();
     }
 
     kill() {
