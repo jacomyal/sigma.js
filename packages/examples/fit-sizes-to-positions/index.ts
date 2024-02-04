@@ -5,6 +5,7 @@
 
 import Graph from "graphology";
 import Sigma from "sigma";
+import { NodeCircleProgram } from "sigma/rendering";
 
 const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -23,4 +24,7 @@ graph.addEdge("Daniel", "Andrea", { size: 8 });
 new Sigma(graph, container, {
   itemSizesReference: "positions",
   zoomToSizeRatioFunction: (x) => x,
+  nodeProgramClasses: {
+    circle: NodeCircleProgram,
+  },
 });
