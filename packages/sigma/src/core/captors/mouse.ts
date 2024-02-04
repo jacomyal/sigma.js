@@ -33,6 +33,8 @@ export type MouseCaptorEvents = {
   mousedown(coordinates: MouseCoords): void;
   mousemove(coordinates: MouseCoords): void;
   mousemovebody(coordinates: MouseCoords): void;
+  mouseleave(coordinates: MouseCoords): void;
+  mouseenter(coordinates: MouseCoords): void;
   wheel(coordinates: WheelCoords): void;
 };
 
@@ -68,14 +70,15 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     this.handleUp = this.handleUp.bind(this);
     this.handleMove = this.handleMove.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
-    this.handleOut = this.handleOut.bind(this);
+    this.handleLeave = this.handleLeave.bind(this);
 
     // Binding events
     container.addEventListener("click", this.handleClick, false);
     container.addEventListener("contextmenu", this.handleRightClick, false);
     container.addEventListener("mousedown", this.handleDown, false);
     container.addEventListener("wheel", this.handleWheel, false);
-    container.addEventListener("mouseout", this.handleOut, false);
+    container.addEventListener("mouseleave", this.handleLeave, false);
+    container.addEventListener("mouseenter", this.handleEnter, false);
 
     document.addEventListener("mousemove", this.handleMove, false);
     document.addEventListener("mouseup", this.handleUp, false);
@@ -88,7 +91,8 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     container.removeEventListener("contextmenu", this.handleRightClick);
     container.removeEventListener("mousedown", this.handleDown);
     container.removeEventListener("wheel", this.handleWheel);
-    container.removeEventListener("mouseout", this.handleOut);
+    container.removeEventListener("mouseleave", this.handleLeave);
+    container.removeEventListener("mouseenter", this.handleEnter);
 
     document.removeEventListener("mousemove", this.handleMove);
     document.removeEventListener("mouseup", this.handleUp);
@@ -277,6 +281,14 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     }
   }
 
+  handleLeave(e: MouseEvent): void {
+    this.emit("mouseleave", getMouseCoords(e, this.container));
+  }
+
+  handleEnter(e: MouseEvent): void {
+    this.emit("mouseenter", getMouseCoords(e, this.container));
+  }
+
   handleWheel(e: WheelEvent): void {
     if (!this.enabled) return;
 
@@ -321,9 +333,5 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
 
     this.currentWheelDirection = wheelDirection;
     this.lastWheelTriggerTime = now;
-  }
-
-  handleOut(): void {
-    // TODO: dispatch event
   }
 }

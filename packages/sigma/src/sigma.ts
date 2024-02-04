@@ -134,14 +134,6 @@ export type SigmaAdditionalEvents = {
   afterRender(): void;
   resize(): void;
   kill(): void;
-
-  // Additional node events
-  enterNode(payload: SigmaNodeEventPayload): void;
-  leaveNode(payload: SigmaNodeEventPayload): void;
-
-  // Additional edge events
-  enterEdge(payload: SigmaEdgeEventPayload): void;
-  leaveEdge(payload: SigmaEdgeEventPayload): void;
 };
 
 export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
@@ -499,8 +491,48 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       }
 
       if (this.settings.enableEdgeEvents) {
-        this.checkEdgeHoverEvents(baseEvent);
+        const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(baseEvent.event.x, baseEvent.event.y);
+
+        if (edgeToHover !== this.hoveredEdge) {
+          if (this.hoveredEdge) this.emit("leaveEdge", { ...baseEvent, edge: this.hoveredEdge });
+          if (edgeToHover) this.emit("enterEdge", { ...baseEvent, edge: edgeToHover });
+          this.hoveredEdge = edgeToHover;
+        }
       }
+    };
+
+    // Handling mouse leave stage:
+    this.activeListeners.handleLeave = (e: MouseCoords): void => {
+      const baseEvent = {
+        event: e,
+        preventSigmaDefault(): void {
+          e.preventSigmaDefault();
+        },
+      };
+
+      if (this.hoveredNode) {
+        this.emit("leaveNode", { ...baseEvent, node: this.hoveredNode });
+        this.scheduleHighlightedNodesRender();
+      }
+
+      if (this.settings.enableEdgeEvents && this.hoveredEdge) {
+        this.emit("leaveEdge", { ...baseEvent, edge: this.hoveredEdge });
+        this.scheduleHighlightedNodesRender();
+      }
+
+      this.emit("leaveStage", { ...baseEvent });
+    };
+
+    // Handling mouse enter stage:
+    this.activeListeners.handleEnter = (e: MouseCoords): void => {
+      const baseEvent = {
+        event: e,
+        preventSigmaDefault(): void {
+          e.preventSigmaDefault();
+        },
+      };
+
+      this.emit("enterStage", { ...baseEvent });
     };
 
     // Handling click
@@ -545,6 +577,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.mouseCaptor.on("wheel", this.activeListeners.handleWheel);
     this.mouseCaptor.on("mousedown", this.activeListeners.handleDown);
     this.mouseCaptor.on("mouseup", this.activeListeners.handleUp);
+    this.mouseCaptor.on("mouseleave", this.activeListeners.handleLeave);
+    this.mouseCaptor.on("mouseenter", this.activeListeners.handleEnter);
 
     // TODO
     // Deal with Touch captor events
@@ -685,23 +719,6 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     graph.removeListener("eachEdgeAttributesUpdated", this.activeListeners.eachEdgeAttributesUpdatedGraphUpdate);
     graph.removeListener("edgesCleared", this.activeListeners.clearEdgesGraphUpdate);
     graph.removeListener("cleared", this.activeListeners.clearGraphUpdate);
-  }
-
-  /**
-   * Method dealing with "leaveEdge" and "enterEdge" events.
-   *
-   * @return {Sigma}
-   */
-  private checkEdgeHoverEvents(payload: SigmaEventPayload): this {
-    const edgeToHover = this.hoveredNode ? null : this.getEdgeAtPoint(payload.event.x, payload.event.y);
-
-    if (edgeToHover !== this.hoveredEdge) {
-      if (this.hoveredEdge) this.emit("leaveEdge", { ...payload, edge: this.hoveredEdge });
-      if (edgeToHover) this.emit("enterEdge", { ...payload, edge: edgeToHover });
-      this.hoveredEdge = edgeToHover;
-    }
-
-    return this;
   }
 
   /**
