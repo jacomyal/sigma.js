@@ -71,6 +71,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
     this.handleMove = this.handleMove.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
+    this.handleEnter = this.handleEnter.bind(this);
 
     // Binding events
     container.addEventListener("click", this.handleClick, false);
