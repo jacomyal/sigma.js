@@ -18,23 +18,17 @@
     "demo:build": "npm run build --workspace=@sigma/demo",
     "website:build": "npm run build --workspace=@sigma/website",
     "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples",
-    "storybook:run": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "storybook:run": "npm run start --workspace=@sigma/storybook",
+    "storybook:build": "npm run build --workspace=@sigma/storybook"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.12",
-    "@storybook/addon-interactions": "^7.6.12",
-    "@storybook/addon-links": "^7.6.12",
-    "@storybook/blocks": "^7.6.12",
-    "@storybook/html": "^7.6.12",
-    "@storybook/html-vite": "^7.6.12",
-    "@storybook/html-webpack5": "^7.6.12",
-    "@storybook/test": "^7.6.12",
     "lerna": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^7.6.12",
     "typescript": "^5.2.2",
     "vite": "^5.0.12"
+  },
+  "dependencies": {
+    "@storybook/react": "^7.6.12"
   }
 }

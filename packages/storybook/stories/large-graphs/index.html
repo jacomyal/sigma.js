@@ -1,0 +1,45 @@
+<style>
+  html,
+  body,
+  #storybook-root,
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+  #buttons {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    display: flex;
+  }
+  h4 {
+    margin: 0;
+  }
+  fieldset {
+    border: none;
+  }
+  h4,
+  fieldset > div {
+    margin-bottom: 0.2em;
+  }
+  button {
+    margin-right: 1em;
+    display: inline-block;
+    text-align: center;
+    background: white;
+    outline: none;
+    border: 1px solid dimgrey;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+</style>
+<div id="sigma-container"></div>
+<div id="buttons">
+    <fieldset>
+      <button type="button" id="fa2">Start layout ▶</button>
+    </fieldset>
+</div>
