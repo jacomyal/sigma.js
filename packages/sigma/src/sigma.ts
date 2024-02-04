@@ -536,6 +536,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.activeListeners.handleDoubleClick = createMouseListener("doubleClick");
     this.activeListeners.handleWheel = createMouseListener("wheel");
     this.activeListeners.handleDown = createMouseListener("down");
+    this.activeListeners.handleUp = createMouseListener("up");
 
     this.mouseCaptor.on("mousemove", this.activeListeners.handleMove);
     this.mouseCaptor.on("click", this.activeListeners.handleClick);
@@ -543,6 +544,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     this.mouseCaptor.on("doubleClick", this.activeListeners.handleDoubleClick);
     this.mouseCaptor.on("wheel", this.activeListeners.handleWheel);
     this.mouseCaptor.on("mousedown", this.activeListeners.handleDown);
+    this.mouseCaptor.on("mouseup", this.activeListeners.handleUp);
 
     // TODO
     // Deal with Touch captor events

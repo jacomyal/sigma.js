@@ -54,13 +54,14 @@ const nodeEvents = [
   "enterNode",
   "leaveNode",
   "downNode",
+  "upNode",
   "clickNode",
   "rightClickNode",
   "doubleClickNode",
   "wheelNode",
 ] as const;
-const edgeEvents = ["downEdge", "clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const;
-const stageEvents = ["downStage", "clickStage", "doubleClickStage", "wheelStage"] as const;
+const edgeEvents = ["downEdge", "upEdge", "clickEdge", "rightClickEdge", "doubleClickEdge", "wheelEdge"] as const;
+const stageEvents = ["downStage", "upStage", "clickStage", "doubleClickStage", "wheelStage"] as const;
 
 nodeEvents.forEach((eventType) => renderer.on(eventType, ({ node }) => logEvent(eventType, "node", node)));
 edgeEvents.forEach((eventType) => renderer.on(eventType, ({ edge }) => logEvent(eventType, "edge", edge)));

@@ -33,7 +33,7 @@ export interface CameraState extends Coordinates {
   ratio: number;
 }
 
-export type MouseInteraction = "click" | "doubleClick" | "rightClick" | "wheel" | "down";
+export type MouseInteraction = "click" | "doubleClick" | "rightClick" | "wheel" | "down" | "up";
 
 export interface MouseCoords extends Coordinates {
   sigmaDefaultPrevented: boolean;
