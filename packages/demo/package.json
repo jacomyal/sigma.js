@@ -4,9 +4,10 @@
   "homepage": "/demo",
   "dependencies": {
     "@react-sigma/core": "^3.4.2",
+    "@sigma/node-image": ">=3.0.0-beta.3",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.15",
-    "@types/react": "^18.2.51",
+    "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "graphology": "^0.25.4",
@@ -17,12 +18,10 @@
     "react-animate-height": "^3.2.3",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
+    "sigma": ">=3.0.0-beta.6",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
     "vite-tsconfig-paths": "^4.3.1"
-  },
-  "overrides": {
-    "sigma": "3.0.0-beta.5"
   },
   "scripts": {
     "start": "vite",
@@ -40,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "vite-plugin-checker": "^0.6.4"
   }
 }

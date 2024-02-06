@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { useSigma } from "@react-sigma/core";
 import { MdCategory } from "react-icons/md";
 import { keyBy, mapValues, sortBy, values } from "lodash";

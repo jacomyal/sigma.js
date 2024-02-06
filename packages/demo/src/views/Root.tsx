@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { SigmaContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
 import { omit, mapValues, keyBy, constant } from "lodash";
 import { DirectedGraph } from "graphology";

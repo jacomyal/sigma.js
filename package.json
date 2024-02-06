@@ -17,7 +17,7 @@
     "demo:start": "npm start --workspace=@sigma/demo",
     "demo:build": "npm run build --workspace=@sigma/demo",
     "website:build": "npm run build --workspace=@sigma/website",
-    "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run examples:build && cp -R packages/examples/build packages/website/build/examples",
+    "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run storybook:build && cp -R packages/storybook/storybook-static packages/website/build/storybook",
     "storybook:run": "npm run start --workspace=@sigma/storybook",
     "storybook:build": "npm run build --workspace=@sigma/storybook"
   },
