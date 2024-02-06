@@ -88,7 +88,7 @@ const TagsPanel: FC<{
                 id={`tag-${tag.key}`}
               />
               <label htmlFor={`tag-${tag.key}`}>
-                <span className="circle" style={{ backgroundImage: `url(/images/${tag.image})` }} />{" "}
+                <span className="circle" style={{ backgroundImage: `url(./images/${tag.image})` }} />{" "}
                 <div className="node-label">
                   <span>{tag.key}</span>
                   <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerTag + "%" }}>

@@ -51,7 +51,7 @@ const Root: FC = () => {
 
   // Load data on mount:
   useEffect(() => {
-    fetch(`/dataset.json`)
+    fetch(`./dataset.json`)
       .then((res) => res.json())
       .then((dataset: Dataset) => {
         setDataset(dataset);
