@@ -1,20 +1,19 @@
 // Dependencies
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
-import Sigma from "../../../src";
 
+import Sigma from "../../../src";
+import EdgeArrowProgram from "../../../src/rendering/programs/edge-arrow";
+import EdgeLineProgram from "../../../src/rendering/programs/edge-line";
+import EdgeRectangleProgram from "../../../src/rendering/programs/edge-rectangle";
+import EdgeTriangleProgram from "../../../src/rendering/programs/edge-triangle";
 // Programs to test
 import NodeCircleProgram from "../../../src/rendering/programs/node-circle";
 import NodePointProgram from "../../../src/rendering/programs/node-point";
-import EdgeRectangleProgram from "../../../src/rendering/programs/edge-rectangle";
-import EdgeLineProgram from "../../../src/rendering/programs/edge-line";
-import EdgeArrowProgram from "../../../src/rendering/programs/edge-arrow";
-import EdgeTriangleProgram from "../../../src/rendering/programs/edge-triangle";
-
 // Useful data
 import ARCTIC from "./resources/arctic.json";
-import LES_MISERABLES from "./resources/les-miserables.json";
 import LARGE_GRAPH from "./resources/large-graph.json";
+import LES_MISERABLES from "./resources/les-miserables.json";
 
 // Utils:
 const rafNTimes = (fn: (step: number) => void, n: number) => {

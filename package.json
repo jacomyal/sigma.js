@@ -9,8 +9,7 @@
   "scripts": {
     "build": "preconstruct build",
     "watch": "preconstruct watch",
-    "sigma:build": "npm run build --workspace=sigma",
-    "sigma:transpile": "npm run transpile --workspace=sigma",
+    "prettify": "prettier --write .",
     "sigma:test": "npm run test --workspace=sigma",
     "sigma:unit:test": "npm run unit:test --workspace=sigma",
     "sigma:e2e:test": "npm run e2e:test --workspace=sigma",
@@ -23,11 +22,17 @@
     "storybook:run": "npm run start --workspace=@sigma/storybook",
     "storybook:build": "npm run build --workspace=@sigma/storybook"
   },
-  "devDependencies": {
+  "dependencies": {
     "@babel/core": "^7.23.9",
     "@babel/preset-typescript": "^7.23.3",
     "@preconstruct/cli": "^2.8.3",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-storybook": "^0.6.15",
     "lerna": "^8.0.0",
+    "prettier": "^3.2.5",
     "typescript": "^5.2.2"
   },
   "preconstruct": {

@@ -7,9 +7,9 @@
  * useful classes as static properties.
  * @module
  */
-import SigmaClass from "./sigma";
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
+import SigmaClass from "./sigma";
 
 class Sigma extends SigmaClass {
   static Camera = Camera;

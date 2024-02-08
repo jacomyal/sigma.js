@@ -1,4 +1,4 @@
-import { useSigma, useSetSettings } from "@react-sigma/core";
+import { useSetSettings, useSigma } from "@react-sigma/core";
 import { Attributes } from "graphology-types";
 import { FC, PropsWithChildren, useEffect } from "react";
 
@@ -22,7 +22,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
    * instance:
    */
   useEffect(() => {
-    const hoveredColor: string = debouncedHoveredNode ? sigma.getNodeDisplayData(debouncedHoveredNode)!.color : "";
+    const hoveredColor: string = (debouncedHoveredNode && sigma.getNodeDisplayData(debouncedHoveredNode)?.color) || "";
 
     setSettings({
       defaultDrawNodeLabel: drawLabel,
@@ -53,7 +53,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
    * neighborhood:
    */
   useEffect(() => {
-    const hoveredColor: string = debouncedHoveredNode ? sigma.getNodeDisplayData(debouncedHoveredNode)!.color : "";
+    const hoveredColor: string = (debouncedHoveredNode && sigma.getNodeDisplayData(debouncedHoveredNode)?.color) || "";
 
     sigma.setSetting(
       "nodeReducer",

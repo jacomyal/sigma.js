@@ -6,9 +6,10 @@
  * @module
  */
 import Graph from "graphology-types";
+
 import { PlainObject } from "../types";
-import { cancelFrame, requestFrame } from "./index";
 import easings from "./easings";
+import { cancelFrame, requestFrame } from "./index";
 
 /**
  * Defaults.

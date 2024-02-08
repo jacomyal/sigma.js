@@ -7,42 +7,42 @@ import Graph from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
+import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
+import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
+import { AbstractEdgeProgram } from "./rendering/edge";
+import { AbstractNodeProgram } from "./rendering/node";
+import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
   CameraState,
+  CoordinateConversionOverride,
   Coordinates,
   Dimensions,
   EdgeDisplayData,
   Extent,
   Listener,
   MouseCoords,
+  MouseInteraction,
   NodeDisplayData,
   PlainObject,
-  CoordinateConversionOverride,
-  TypedEventEmitter,
-  MouseInteraction,
   RenderParams,
+  TypedEventEmitter,
 } from "./types";
 import {
-  createElement,
-  getPixelRatio,
-  createNormalizationFunction,
   NormalizationFunction,
   cancelFrame,
+  colorToIndex,
+  createElement,
+  createNormalizationFunction,
+  getMatrixImpact,
+  getPixelRatio,
+  graphExtent,
   matrixFromCamera,
   requestFrame,
   validateGraph,
   zIndexOrdering,
-  getMatrixImpact,
-  graphExtent,
-  colorToIndex,
 } from "./utils";
-import { edgeLabelsToDisplayFromNodes, LabelGrid } from "./core/labels";
-import { Settings, validateSettings, resolveSettings } from "./settings";
-import { AbstractNodeProgram } from "./rendering/node";
-import { AbstractEdgeProgram } from "./rendering/edge";
-import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
-import { identity, multiplyVec2 } from "./utils/matrices";
 import { extend } from "./utils/array";
+import { identity, multiplyVec2 } from "./utils/matrices";
 import { getPixelColor } from "./utils/picking";
 
 /**
@@ -50,12 +50,13 @@ import { getPixelColor } from "./utils/picking";
  */
 const X_LABEL_MARGIN = 150;
 const Y_LABEL_MARGIN = 50;
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * Important functions.
  */
 function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
-  if (!data.hasOwnProperty("x") || !data.hasOwnProperty("y"))
+  if (!hasOwnProperty.call(data, "x") || !hasOwnProperty.call(data, "y"))
     throw new Error(
       `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
     );
@@ -69,11 +70,11 @@ function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDi
 
   if (!data.size) data.size = 2;
 
-  if (!data.hasOwnProperty("hidden")) data.hidden = false;
+  if (!hasOwnProperty.call(data, "hidden")) data.hidden = false;
 
-  if (!data.hasOwnProperty("highlighted")) data.highlighted = false;
+  if (!hasOwnProperty.call(data, "highlighted")) data.highlighted = false;
 
-  if (!data.hasOwnProperty("forceLabel")) data.forceLabel = false;
+  if (!hasOwnProperty.call(data, "forceLabel")) data.forceLabel = false;
 
   if (!data.type || data.type === "") data.type = settings.defaultNodeType;
 
@@ -89,9 +90,9 @@ function applyEdgeDefaults(settings: Settings, _key: string, data: Partial<EdgeD
 
   if (!data.size) data.size = 0.5;
 
-  if (!data.hasOwnProperty("hidden")) data.hidden = false;
+  if (!hasOwnProperty.call(data, "hidden")) data.hidden = false;
 
-  if (!data.hasOwnProperty("forceLabel")) data.forceLabel = false;
+  if (!hasOwnProperty.call(data, "forceLabel")) data.forceLabel = false;
 
   if (!data.type || data.type === "") data.type = settings.defaultEdgeType;
 
@@ -108,7 +109,7 @@ export interface SigmaEventPayload {
   preventSigmaDefault(): void;
 }
 
-export interface SigmaStageEventPayload extends SigmaEventPayload {}
+export type SigmaStageEventPayload = SigmaEventPayload;
 export interface SigmaNodeEventPayload extends SigmaEventPayload {
   node: string;
 }
@@ -803,7 +804,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
     // Allocate memory to programs
     for (const type in this.nodePrograms) {
-      if (!this.nodePrograms.hasOwnProperty(type)) {
+      if (!hasOwnProperty.call(this.nodePrograms, type)) {
         throw new Error(`Sigma: could not find a suitable program for node type "${type}"!`);
       }
       this.nodePrograms[type].reallocate(nodesPerPrograms[type] || 0);
@@ -854,7 +855,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       );
 
     for (const type in this.edgePrograms) {
-      if (!this.edgePrograms.hasOwnProperty(type)) {
+      if (!hasOwnProperty.call(this.edgePrograms, type)) {
         throw new Error(`Sigma: could not find a suitable program for edge type "${type}"!`);
       }
       this.edgePrograms[type].reallocate(edgesPerPrograms[type] || 0);

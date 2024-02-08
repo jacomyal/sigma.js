@@ -5,9 +5,9 @@
  * The library endpoint.
  * @module
  */
-import Sigma from "./sigma";
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
+import Sigma from "./sigma";
 
 export default Sigma;
 export { Camera, MouseCaptor, Sigma };

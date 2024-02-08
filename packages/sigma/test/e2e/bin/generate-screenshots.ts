@@ -1,6 +1,7 @@
 import path from "path";
-import { startExampleServer, takeScreenshots } from "../utils";
+
 import screenshotsSuite from "../suites/screenshots";
+import { startExampleServer, takeScreenshots } from "../utils";
 
 async function exec() {
   try {

@@ -2,9 +2,9 @@
  * This is a minimal example of sigma. You can use it as a base to write new
  * examples, or reproducible test cases for new issues, for instance.
  */
-
 import Graph from "graphology";
 import Sigma from "sigma";
+
 import { onStoryDown } from "../utils";
 
 export default () => {

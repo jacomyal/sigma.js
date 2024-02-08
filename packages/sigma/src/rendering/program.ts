@@ -7,7 +7,7 @@
  */
 import type Sigma from "../sigma";
 import type { RenderParams } from "../types";
-import { loadVertexShader, loadFragmentShader, loadProgram } from "./utils";
+import { loadFragmentShader, loadProgram, loadVertexShader } from "./utils";
 
 const PICKING_PREFIX = `#define PICKING_MODE\n`;
 

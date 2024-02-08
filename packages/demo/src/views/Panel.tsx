@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
-import { MdExpandLess, MdExpandMore } from "react-icons/md";
 import AnimateHeight from "react-animate-height";
+import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 const DURATION = 300;
 
@@ -15,7 +15,7 @@ const Panel: FC<PropsWithChildren<{ title: JSX.Element | string; initiallyDeploy
   useEffect(() => {
     if (isDeployed)
       setTimeout(() => {
-        if (dom.current) dom.current.parentElement!.scrollTo({ top: dom.current.offsetTop - 5, behavior: "smooth" });
+        if (dom.current) dom.current.parentElement?.scrollTo({ top: dom.current.offsetTop - 5, behavior: "smooth" });
       }, DURATION);
   }, [isDeployed]);
 

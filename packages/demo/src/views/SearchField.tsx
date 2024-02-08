@@ -1,6 +1,6 @@
-import { KeyboardEvent, ChangeEvent, FC, useEffect, useState } from "react";
 import { useSigma } from "@react-sigma/core";
 import { Attributes } from "graphology-types";
+import { ChangeEvent, FC, KeyboardEvent, useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 
 import { FiltersState } from "../types";

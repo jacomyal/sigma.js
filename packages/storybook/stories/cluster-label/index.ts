@@ -2,7 +2,6 @@
  * This is a minimal example of sigma. You can use it as a base to write new
  * examples, or reproducible test cases for new issues, for instance.
  */
-
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import iwanthue from "iwanthue";

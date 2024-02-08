@@ -70,7 +70,7 @@ export interface DisplayData {
 export interface NodeDisplayData extends Coordinates, DisplayData {
   highlighted: boolean;
 }
-export interface EdgeDisplayData extends DisplayData {}
+export type EdgeDisplayData = DisplayData;
 
 export type CoordinateConversionOverride = {
   cameraState?: CameraState;

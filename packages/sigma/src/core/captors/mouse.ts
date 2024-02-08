@@ -5,9 +5,9 @@
  * Sigma's captor dealing with the user's mouse.
  * @module
  */
-import { CameraState, MouseCoords, WheelCoords } from "../../types";
 import Sigma from "../../sigma";
-import Captor, { getWheelDelta, getMouseCoords, getPosition, getWheelCoords } from "./captor";
+import { CameraState, MouseCoords, WheelCoords } from "../../types";
+import Captor, { getMouseCoords, getPosition, getWheelCoords, getWheelDelta } from "./captor";
 
 /**
  * Constants.

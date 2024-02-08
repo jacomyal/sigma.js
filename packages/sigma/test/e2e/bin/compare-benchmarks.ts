@@ -1,6 +1,6 @@
 import commandLineArgs, { OptionDefinition } from "command-line-args";
-import path from "path";
 import Mocha from "mocha";
+import path from "path";
 
 const OPTIONS: OptionDefinition[] = [
   { name: "report", alias: "f", type: String },

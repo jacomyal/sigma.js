@@ -3,14 +3,15 @@
  * examples, or reproducible test cases for new issues, for instance.
  */
 import Graph from "graphology";
-import Sigma from "sigma";
 import { circular } from "graphology-layout";
+import forceAtlas2 from "graphology-layout-forceatlas2";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
+import Sigma from "sigma";
 import { PlainObject } from "sigma/types";
 import { animateNodes } from "sigma/utils/animate";
-import FA2Layout from "graphology-layout-forceatlas2/worker";
-import forceAtlas2 from "graphology-layout-forceatlas2";
-import data from "./data.json";
+
 import { onStoryDown } from "../utils";
+import data from "./data.json";
 
 export default () => {
   // Initialize the graph object with data

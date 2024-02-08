@@ -7,6 +7,7 @@ import Graph, { UndirectedGraph } from "graphology";
 import erdosRenyi from "graphology-generators/random/erdos-renyi";
 import randomLayout from "graphology-layout/random";
 import choice from "pandemonium/choice";
+
 import { validateGraph } from "../../src/utils";
 
 describe("validateGraph utils", () => {

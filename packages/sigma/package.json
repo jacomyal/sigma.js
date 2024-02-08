@@ -18,7 +18,6 @@
   "scripts": {
     "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
-    "prettier": "prettier --write $npm_package_config_folders",
     "prepublishOnly": "cp ../../README.md . && npm run lint && npm test",
     "reinstall": "rimraf examples/node_modules && rimraf demo/node_modules && rimraf node_modules && npm i && npm run clean",
     "test": "npm run unit:test && npm run e2e:test",
@@ -80,7 +79,6 @@
     "pandemonium": "^2.4.1",
     "pixelmatch": "^5.3.0",
     "pngjs": "^7.0.0",
-    "prettier": "^3.0.3",
     "puppeteer": "^21.1.1",
     "raw-loader": "^4.0.2",
     "reload": "^3.2.1",
@@ -134,24 +132,5 @@
       "default": "./utils/dist/sigma-utils.cjs.js"
     },
     "./package.json": "./package.json"
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "extends": [
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "rules": {
-      "@typescript-eslint/camelcase": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-          "argsIgnorePattern": "^_"
-        }
-      ]
-    }
   }
 }

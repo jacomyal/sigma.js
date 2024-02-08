@@ -1,6 +1,6 @@
-import { writeFileSync } from "fs";
 import { execSync } from "child_process";
 import commandLineArgs, { OptionDefinition } from "command-line-args";
+import { writeFileSync } from "fs";
 
 import benchmarkTests from "../suites/benchmarks";
 import { getReport, startExampleServer } from "../utils";

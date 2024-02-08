@@ -21,14 +21,13 @@
  *   position inside the shape. Basically, the GPU wants to draw a square, but
  *   we "carve" a disc in it.
  */
-
-import Graph from "graphology";
-import Sigma from "sigma";
-import ForceSupervisor from "graphology-layout-force/worker";
 import { createNodeImageProgram } from "@sigma/node-image";
+import Graph from "graphology";
+import ForceSupervisor from "graphology-layout-force/worker";
+import Sigma from "sigma";
 
-import NodeBorderProgram from "./node.border";
 import { onStoryDown } from "../utils";
+import NodeBorderProgram from "./node.border";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;

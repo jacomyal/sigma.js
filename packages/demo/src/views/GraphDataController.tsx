@@ -1,6 +1,6 @@
 import { useSigma } from "@react-sigma/core";
-import { FC, PropsWithChildren, useEffect } from "react";
 import { keyBy, omit } from "lodash";
+import { FC, PropsWithChildren, useEffect } from "react";
 
 import { Dataset, FiltersState } from "../types";
 

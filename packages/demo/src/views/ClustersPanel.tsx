@@ -1,8 +1,8 @@
-import { FC, useEffect, useMemo, useState } from "react";
 import { useSigma } from "@react-sigma/core";
-import { sortBy, values, keyBy, mapValues } from "lodash";
-import { MdGroupWork } from "react-icons/md";
+import { keyBy, mapValues, sortBy, values } from "lodash";
+import { FC, useEffect, useMemo, useState } from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
+import { MdGroupWork } from "react-icons/md";
 
 import { Cluster, FiltersState } from "../types";
 import Panel from "./Panel";

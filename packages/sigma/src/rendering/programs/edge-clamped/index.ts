@@ -8,10 +8,10 @@
  * This is useful when combined with arrows to draw directed edges.
  * @module
  */
-import EdgeRectangleProgram from "../edge-rectangle";
-import VERTEX_SHADER_SOURCE from "./vert.glsl";
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
+import EdgeRectangleProgram from "../edge-rectangle";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

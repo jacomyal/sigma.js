@@ -3,8 +3,8 @@
  * ======================
  * @module
  */
-import { Coordinates, MouseCoords, TouchCoords, WheelCoords, TypedEventEmitter, EventsMapping } from "../../types";
 import Sigma from "../../sigma";
+import { Coordinates, EventsMapping, MouseCoords, TouchCoords, TypedEventEmitter, WheelCoords } from "../../types";
 
 /**
  * Captor utils functions

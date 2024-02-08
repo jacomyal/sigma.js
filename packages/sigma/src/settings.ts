@@ -7,16 +7,16 @@
  */
 import { Attributes } from "graphology-types";
 
-import { assign } from "./utils";
-import { EdgeDisplayData, NodeDisplayData } from "./types";
-import NodePointProgram from "./rendering/programs/node-point";
-import EdgeRectangleProgram from "./rendering/programs/edge-rectangle";
-import EdgeArrowProgram from "./rendering/programs/edge-arrow";
 import { EdgeProgramType } from "./rendering";
 import { NodeProgramType } from "./rendering";
-import { drawStraightEdgeLabel, EdgeLabelDrawingFunction } from "./rendering/edge-labels";
-import { drawDiscNodeLabel, NodeLabelDrawingFunction } from "./rendering/node-labels";
-import { drawDiscNodeHover, NodeHoverDrawingFunction } from "./rendering/node-hover";
+import { EdgeLabelDrawingFunction, drawStraightEdgeLabel } from "./rendering/edge-labels";
+import { NodeHoverDrawingFunction, drawDiscNodeHover } from "./rendering/node-hover";
+import { NodeLabelDrawingFunction, drawDiscNodeLabel } from "./rendering/node-labels";
+import EdgeArrowProgram from "./rendering/programs/edge-arrow";
+import EdgeRectangleProgram from "./rendering/programs/edge-rectangle";
+import NodePointProgram from "./rendering/programs/node-point";
+import { EdgeDisplayData, NodeDisplayData } from "./types";
+import { assign } from "./utils";
 
 /**
  * Sigma.js settings

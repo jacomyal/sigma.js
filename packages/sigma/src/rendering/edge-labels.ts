@@ -1,5 +1,5 @@
-import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../types";
 import { Settings } from "../settings";
+import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../types";
 
 export type EdgeLabelDrawingFunction = (
   context: CanvasRenderingContext2D,

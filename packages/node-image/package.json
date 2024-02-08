@@ -52,9 +52,6 @@
     "@typescript-eslint/parser": "^6.16.0",
     "chroma-js": "^2.4.2",
     "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.2",
-    "eslint-plugin-storybook": "^0.6.15",
     "graphology": "^0.25.4",
     "vite": "^5.0.10",
     "vite-plugin-dts": "^3.7.0"

@@ -5,10 +5,10 @@
  * Class designed to store camera information & used to update it.
  * @module
  */
+import { CameraState, TypedEventEmitter } from "../types";
+import { cancelFrame, requestFrame } from "../utils";
 import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
 import easings from "../utils/easings";
-import { cancelFrame, requestFrame } from "../utils";
-import { CameraState, TypedEventEmitter } from "../types";
 
 /**
  * Defaults.

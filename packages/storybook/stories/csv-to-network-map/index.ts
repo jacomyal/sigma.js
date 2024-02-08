@@ -11,13 +11,13 @@
  * column. We will here transform this dataset to a institution/subject
  * bipartite network map.
  */
-
-import Sigma from "sigma";
-import Papa from "papaparse";
 import Graph from "graphology";
-import circular from "graphology-layout/circular";
-import forceAtlas2 from "graphology-layout-forceatlas2";
 import { cropToLargestConnectedComponent } from "graphology-components";
+import forceAtlas2 from "graphology-layout-forceatlas2";
+import circular from "graphology-layout/circular";
+import Papa from "papaparse";
+import Sigma from "sigma";
+
 import { onStoryDown } from "../utils";
 
 export default () => {

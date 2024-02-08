@@ -1,5 +1,5 @@
-import Sigma from "sigma";
 import FileSaver from "file-saver";
+import Sigma from "sigma";
 
 /**
  * There is a bug I can't find sources about, that makes it impossible to render

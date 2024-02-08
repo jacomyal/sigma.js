@@ -1,8 +1,9 @@
-import Graph from "graphology";
-import Sigma from "sigma";
 import chroma from "chroma-js";
-import { v4 as uuid } from "uuid";
+import Graph from "graphology";
 import ForceSupervisor from "graphology-layout-force/worker";
+import Sigma from "sigma";
+import { v4 as uuid } from "uuid";
+
 import { onStoryDown } from "../utils";
 
 export default () => {

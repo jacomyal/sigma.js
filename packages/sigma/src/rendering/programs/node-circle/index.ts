@@ -11,9 +11,9 @@
 import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "../../node";
-import VERTEX_SHADER_SOURCE from "./vert.glsl";
-import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import { ProgramInfo } from "../../program";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

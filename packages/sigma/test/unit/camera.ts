@@ -5,6 +5,7 @@
  * Testing the camera class.
  */
 import { assert } from "chai";
+
 import Camera from "../../src/core/camera";
 
 describe("Camera", function () {

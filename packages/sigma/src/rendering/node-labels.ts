@@ -1,5 +1,5 @@
-import { NodeDisplayData, PartialButFor } from "../types";
 import { Settings } from "../settings";
+import { NodeDisplayData, PartialButFor } from "../types";
 
 export type NodeLabelDrawingFunction = (
   context: CanvasRenderingContext2D,

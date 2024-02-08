@@ -1,28 +1,30 @@
 /**
  * This example aims at showcasing sigma's performances.
  */
-
-import Sigma from "sigma";
 import Graph from "graphology";
-import seedrandom from "seedrandom";
-
-import EdgeRectangleProgram from "sigma/rendering/programs/edge-rectangle";
-import EdgeLineProgram from "sigma/rendering/programs/edge-line";
-import circlepack from "graphology-layout/circlepack";
 import clusters from "graphology-generators/random/clusters";
-import FA2Layout from "graphology-layout-forceatlas2/worker";
 import forceAtlas2 from "graphology-layout-forceatlas2";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
+import circlepack from "graphology-layout/circlepack";
+import seedrandom from "seedrandom";
+import Sigma from "sigma";
+import { EdgeLineProgram, EdgeRectangleProgram } from "sigma/rendering";
+
 import { onStoryDown } from "../utils";
 
-export default (args: any) => {
+const DEFAULT_ARGS = {
+  order: 5000,
+  size: 1000,
+  clusters: 3,
+  edgesRenderer: "edges-default",
+};
+
+export default (input: { args: typeof DEFAULT_ARGS }) => {
   //{ order: number; size: number; clusters: number; edgesRenderer: string }) => {
   const rng = seedrandom("sigma");
   const state = {
-    order: 5000,
-    size: 1000,
-    clusters: 3,
-    edgesRenderer: "edges-default",
-    ...args.args,
+    ...DEFAULT_ARGS,
+    ...input.args,
   };
 
   // 1. Generate a graph:

@@ -3,6 +3,7 @@
  * difference: The fragment shader ("./node.border.frag.glsl") draws a white
  * disc with a colored border.
  */
+
 /**
  * Sigma.js WebGL Renderer Node Program
  * =====================================
@@ -12,11 +13,12 @@
  * every GPU.
  * @module
  */
+import { NodeProgram, ProgramInfo } from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
-import { ProgramInfo, NodeProgram } from "sigma/rendering";
-import VERTEX_SHADER_SOURCE from "./node.border.vert.glsl";
+
 import FRAGMENT_SHADER_SOURCE from "./node.border.frag.glsl";
+import VERTEX_SHADER_SOURCE from "./node.border.vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

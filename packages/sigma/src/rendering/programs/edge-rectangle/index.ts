@@ -15,12 +15,12 @@
  * the CPU & GPU (normals are computed on the CPU side).
  * @module
  */
-import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "../../edge";
-import VERTEX_SHADER_SOURCE from "./vert.glsl";
-import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import { ProgramInfo } from "../../program";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

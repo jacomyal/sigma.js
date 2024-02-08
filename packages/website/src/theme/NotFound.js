@@ -1,6 +1,6 @@
-import React from "react";
-import NotFound from "@theme-original/NotFound";
 import { useLocation } from "@docusaurus/router";
+import NotFound from "@theme-original/NotFound";
+import React from "react";
 
 export default function NotFoundWrapper(props) {
   const location = useLocation();

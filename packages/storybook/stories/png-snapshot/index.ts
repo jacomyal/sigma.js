@@ -2,12 +2,12 @@
  * This is an example of sigma showing how to snapshot the rendered graph as a
  * PNG file.
  */
-
-import Sigma from "sigma";
 import Graph from "graphology";
 import ForceSupervisor from "graphology-layout-force/worker";
-import saveAsPNG from "./saveAsPNG";
+import Sigma from "sigma";
+
 import { onStoryDown } from "../utils";
+import saveAsPNG from "./saveAsPNG";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;

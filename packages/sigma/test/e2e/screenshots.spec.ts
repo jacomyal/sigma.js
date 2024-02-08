@@ -1,7 +1,8 @@
 import assert from "assert";
 import path from "path";
-import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
+
 import screenshotsSuite from "./suites/screenshots";
+import { imageDiff, startExampleServer, takeScreenshots } from "./utils";
 
 // NOTE: --allow-uncaught does not seem to work...
 process.on("uncaughtException", (error) => console.error(error));

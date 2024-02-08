@@ -5,10 +5,10 @@
  * @module
  */
 import Sigma from "../sigma";
-import { AbstractProgram, Program } from "./program";
-import { NodeDisplayData, EdgeDisplayData, RenderParams } from "../types";
-import { EdgeLabelDrawingFunction } from "./edge-labels";
+import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../types";
 import { indexToColor } from "../utils";
+import { EdgeLabelDrawingFunction } from "./edge-labels";
+import { AbstractProgram, Program } from "./program";
 
 export abstract class AbstractEdgeProgram extends AbstractProgram {
   static drawLabel: EdgeLabelDrawingFunction | undefined;

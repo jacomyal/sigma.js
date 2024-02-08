@@ -1,5 +1,5 @@
-import path, { dirname, join } from "path";
 import type { StorybookConfig } from "@storybook/html-vite";
+import path, { dirname, join } from "path";
 import { mergeConfig } from "vite";
 
 /** @type { import('@storybook/html-vite').StorybookConfig } */

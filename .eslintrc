@@ -1,0 +1,29 @@
+{
+  "env": {
+    "jest": true,
+    "browser": true
+  },
+  "root": true,
+  "ignorePatterns": ["*.js", "*.d.ts"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "prettier",
+    "plugin:storybook/recommended"
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
+  }
+}

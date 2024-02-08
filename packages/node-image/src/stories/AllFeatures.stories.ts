@@ -1,7 +1,7 @@
-import Sigma from "sigma";
-import Graph from "graphology";
-import chroma from "chroma-js";
 import { Meta, StoryObj } from "@storybook/html";
+import chroma from "chroma-js";
+import Graph from "graphology";
+import Sigma from "sigma";
 
 import { createNodeImageProgram } from "../index.ts";
 import "./stage.css";

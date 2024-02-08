@@ -5,11 +5,11 @@
  * @module
  */
 import Sigma from "../sigma";
-import { AbstractProgram, Program } from "./program";
 import { NodeDisplayData, NonEmptyArray, RenderParams } from "../types";
-import { NodeLabelDrawingFunction } from "./node-labels";
-import { NodeHoverDrawingFunction } from "./node-hover";
 import { indexToColor } from "../utils";
+import { NodeHoverDrawingFunction } from "./node-hover";
+import { NodeLabelDrawingFunction } from "./node-labels";
+import { AbstractProgram, Program } from "./program";
 
 export abstract class AbstractNodeProgram extends AbstractProgram {
   static drawLabel: NodeLabelDrawingFunction | undefined;

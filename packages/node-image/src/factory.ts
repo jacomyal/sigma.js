@@ -1,12 +1,12 @@
 import Sigma from "sigma";
-import { floatColor } from "sigma/utils";
 import { NodeProgram } from "sigma/rendering";
-import { NodeDisplayData, RenderParams } from "sigma/types";
 import { NodeProgramType, ProgramInfo } from "sigma/rendering";
 import { NodeLabelDrawingFunction } from "sigma/rendering";
+import { NodeDisplayData, RenderParams } from "sigma/types";
+import { floatColor } from "sigma/utils";
 
-import VERTEX_SHADER_SOURCE from "./shader-vert";
 import FRAGMENT_SHADER_SOURCE from "./shader-frag";
+import VERTEX_SHADER_SOURCE from "./shader-vert";
 import { Atlas, DEFAULT_TEXTURE_MANAGER_OPTIONS, TextureManager, TextureManagerOptions } from "./texture";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;

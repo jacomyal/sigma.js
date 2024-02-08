@@ -1,24 +1,23 @@
-import { FC, useEffect, useMemo, useState } from "react";
-import { SigmaContainer, ZoomControl, FullScreenControl } from "@react-sigma/core";
-import { omit, mapValues, keyBy, constant } from "lodash";
-import { DirectedGraph } from "graphology";
+import { FullScreenControl, SigmaContainer, ZoomControl } from "@react-sigma/core";
 import { createNodeImageProgram } from "@sigma/node-image";
+import { DirectedGraph } from "graphology";
+import { constant, keyBy, mapValues, omit } from "lodash";
+import { FC, useEffect, useMemo, useState } from "react";
+import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
+import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
+import { GrClose } from "react-icons/gr";
+import { Settings } from "sigma/settings";
 
-import GraphSettingsController from "./GraphSettingsController";
-import GraphEventsController from "./GraphEventsController";
-import GraphDataController from "./GraphDataController";
-import DescriptionPanel from "./DescriptionPanel";
+import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState } from "../types";
 import ClustersPanel from "./ClustersPanel";
-import SearchField from "./SearchField";
-import { drawLabel, drawHover } from "../canvas-utils";
+import DescriptionPanel from "./DescriptionPanel";
+import GraphDataController from "./GraphDataController";
+import GraphEventsController from "./GraphEventsController";
+import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
+import SearchField from "./SearchField";
 import TagsPanel from "./TagsPanel";
-
-import { GrClose } from "react-icons/gr";
-import { BiRadioCircleMarked, BiBookContent } from "react-icons/bi";
-import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
-import { Settings } from "sigma/settings";
 
 const Root: FC = () => {
   const [showContents, setShowContents] = useState(false);

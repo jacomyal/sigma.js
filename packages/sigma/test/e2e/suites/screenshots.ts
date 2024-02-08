@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
 
-import { NodeDisplayData, EdgeDisplayData } from "../../../src/types";
+import { EdgeDisplayData, NodeDisplayData } from "../../../src/types";
 import { Tests } from "../utils";
 
 const tests: Tests = [

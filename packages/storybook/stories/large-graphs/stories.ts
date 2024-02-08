@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 
+import play from "./index";
 import template from "./index.html?raw";
 import source from "./index?raw";
-import play from "./index";
 
 type StoryArgs = {
   order: number;

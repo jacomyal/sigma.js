@@ -1,5 +1,5 @@
-import { NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
 import { Settings } from "sigma/settings";
+import { NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
 
 const TEXT_COLOR = "#000000";
 

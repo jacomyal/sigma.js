@@ -39,7 +39,7 @@ yarn add sigma graphology
 Here's a basic example using CDNs to create a graph with minimal data and render it using sigma.js:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />

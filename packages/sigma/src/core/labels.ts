@@ -7,7 +7,7 @@
  */
 import Graph from "graphology-types";
 
-import { Dimensions, Coordinates } from "../types";
+import { Coordinates, Dimensions } from "../types";
 
 /**
  * Class representing a single candidate for the label grid selection.

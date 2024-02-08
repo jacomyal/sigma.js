@@ -4,10 +4,10 @@
  * out buttons, reset zoom button, and a slider to increase or decrease the
  * quantity of labels displayed on screen.
  */
-
-import Sigma from "sigma";
 import Graph from "graphology";
 import { parse } from "graphology-gexf/browser";
+import Sigma from "sigma";
+
 import { onStoryDown } from "../utils";
 
 export default () => {

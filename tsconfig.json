@@ -1,17 +1,16 @@
 {
-    "extends": "./tsconfig.base.json",
-    "files": [],
-    "references": [
-      { "path": "./packages/demo" },
-      { "path": "./packages/sigma" },
-      { "path": "./packages/storybook" },
-      { "path": "./packages/node-image" }
-    ],
-    "watchOptions": {
-      "excludeDirectories": ["**/node_modules"]
-    },
-    "compilerOptions": {
-      "noFallthroughCasesInSwitch": false
-    }
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./packages/demo" },
+    { "path": "./packages/sigma" },
+    { "path": "./packages/storybook" },
+    { "path": "./packages/node-image" }
+  ],
+  "watchOptions": {
+    "excludeDirectories": ["**/node_modules"]
+  },
+  "compilerOptions": {
+    "noFallthroughCasesInSwitch": false
   }
-  
+}

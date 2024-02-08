@@ -1,11 +1,11 @@
+import fs from "fs";
+import Graph from "graphology";
+import path from "path";
+import pixelmatch from "pixelmatch";
+import { PNG } from "pngjs";
+import puppeteer, { Page } from "puppeteer";
 import Webpack from "webpack";
 import WebpackDevServer from "webpack-dev-server";
-import puppeteer, { Page } from "puppeteer";
-import path from "path";
-import fs from "fs";
-import { PNG } from "pngjs";
-import pixelmatch from "pixelmatch";
-import Graph from "graphology";
 
 import Sigma from "../../src/sigma";
 
@@ -45,7 +45,7 @@ export type TestReport = {
   average: number;
 };
 
-function bindLogs(page: Page, prefix: string) {
+function _bindLogs(page: Page, prefix: string) {
   page.on("console", async (msg) => {
     const msgArgs = msg.args();
     const cleanedArgs = [];
@@ -74,6 +74,7 @@ export async function takeScreenshots(tests: Tests, folder: string, port = 8000,
   // for each pages
   await Promise.all(
     tests.map((test) => {
+      // eslint-disable-next-line no-async-promise-executor
       return new Promise<void>(async (resolve, reject) => {
         try {
           // Open a new page
@@ -85,7 +86,7 @@ export async function takeScreenshots(tests: Tests, folder: string, port = 8000,
           const dimensions = test.dimensions || { width: 800, height: 600 };
           await page.setViewport(dimensions);
 
-          // bindLogs(page, `[${test.name} -> page]`);
+          // _bindLogs(page, `[${test.name} -> page]`);
           test.scenario(page);
 
           // Taking the screenshot
@@ -133,7 +134,7 @@ export async function getReport(tests: Tests, runs: number, headless: boolean, p
         await page.setViewport(dimensions);
 
         const t1 = Date.now();
-        // bindLogs(page, `[${test.name} -> page]`);
+        // _bindLogs(page, `[${test.name} -> page]`);
         await test.scenario(page);
         const time = Date.now() - t1;
         records.push(time);

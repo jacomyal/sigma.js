@@ -5,9 +5,9 @@
  * Sigma's captor dealing with touch.
  * @module
  */
+import Sigma from "../../sigma";
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
-import Sigma from "../../sigma";
 
 const DRAG_TIMEOUT = 200;
 const TOUCH_INERTIA_RATIO = 3;

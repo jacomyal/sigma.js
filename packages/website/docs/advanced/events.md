@@ -82,6 +82,7 @@ In TypeScript:
 
 ```typescript
 import EventEmitter from "events";
+
 // Because of the typed events, sigma must be cast to a simple EventEmitter to emit custom events:
 (sigma as EventEmitter).on("myCustomEvent", ({ data }) => console.log("data", data));
 (sigma as EventEmitter).emit("myCustomEvent", { data: "something something" });
