@@ -55,38 +55,6 @@ _List of available examples_
 
 Also, a more realistic sigma.js based web application is available in the [`demo`](https://github.com/jacomyal/sigma.js/tree/main/packages/demo) folder. It aims to show a real-world usecase, and is the main showcase of [sigma.js website](https://www.sigmajs.org/).
 
-## Testing
-
-Some minor helpers are unit tested, but the main way sigma.js is tested is with generated screenshots. Those screenshots are generated with [Puppeteer](https://pptr.dev/) on a headless Chrome/Chromium. Also, there are now some benchmarking scenarii, to ensure some features do not bring a bad impact on performances.
-
-You can check that everything is fine (unit tests and screenshots) by simply running:
-
-```bash
-npm run test
-```
-
-If at some point, you actually have a good reason to break some screenshots, you can run `npm run e2e:generate-screenshots` to erase reference screenshots.
-
-## Benchmarking
-
-You can run the benchmark scenarii by running:
-
-```bash
-cd path/to/sigma.js
-cd packages/sigma
-npm run e2e:benchmark -- --filename my-report.json
-```
-
-This will generate a JSON report at `test/e2e/reports/my-report.json`.
-
-Then, you can compare it to some reference report, by running:
-
-```bash
-cd path/to/sigma.js
-cd packages/sigma
-npm run e2e:compare-benchmarks -- --reference test/e2e/reports/reference-report.json --report test/e2e/reports/my-report.json
-```
-
 ## Website
 
 The current website is based on [Docusaurus](https://docusaurus.io/), with a static homepage. It is located in the `website` folder. It also showcases the React.js based demo available in the [`demo`](https://github.com/jacomyal/sigma.js/tree/main/packages/demo) folder in an iframe. The website itself does not need any build step, though the demo does.

@@ -11,9 +11,9 @@ node_modules
 build
 dist
 /www
-packages/sigma/test/e2e/reports
-packages/sigma/test/e2e/screenshots/*.current.png
-packages/sigma/test/e2e/screenshots/*.diff.png
+packages/test/e2e/reports
+packages/test/e2e/screenshots/*.current.png
+packages/test/e2e/screenshots/*.diff.png
 packages/storybook/storybook-static
 
 # Built sources:

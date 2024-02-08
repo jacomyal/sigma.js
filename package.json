@@ -7,11 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "preconstruct build",
+    "build": "preconstruct build && npm run build-bundle --workspace=sigma",
     "watch": "preconstruct watch",
     "prettify": "prettier --write .",
     "lint": "eslint .",
-    "test": "npm run test --workspace=sigma",
+    "test": "npm run test --workspace=@sigma/test",
     "storybook:run": "npm run start --workspace=@sigma/storybook",
     "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
@@ -27,7 +27,8 @@
     "eslint-plugin-storybook": "^0.6.15",
     "lerna": "^8.1.2",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^7.1.1"
   },
   "preconstruct": {
     "packages": [

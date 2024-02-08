@@ -17,13 +17,7 @@
   "sideEffects": false,
   "scripts": {
     "build-bundle": "vite build",
-    "prepublishOnly": "cp ../../README.md . && npm run build-bundle",
-    "test": "npm run unit:test && npm run e2e:test",
-    "unit:test": "mocha --require ts-node/register ./test/unit/**/*.ts",
-    "e2e:test": "mocha --require ts-node/register test/e2e/screenshots.spec.ts",
-    "e2e:generate-screenshots": "node -r ts-node/register test/e2e/bin/generate-screenshots.ts",
-    "e2e:benchmark": "node -r ts-node/register test/e2e/bin/benchmark.ts",
-    "e2e:compare-benchmarks": "node -r ts-node/register test/e2e/bin/compare-benchmarks.ts"
+    "prepublishOnly": "cp ../../README.md . && npm run build-bundle"
   },
   "repository": {
     "type": "git",
@@ -45,45 +39,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@yomguithereal/helpers": "^1.1.1",
     "events": "^3.3.0",
     "graphology-utils": "^2.5.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.6",
-    "@types/command-line-args": "^5.2.1",
-    "@types/events": "^3.0.3",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.6.5",
-    "@types/pixelmatch": "^5.2.4",
-    "@types/pngjs": "^6.0.2",
-    "@types/tapable": "^2.2.5",
-    "@typescript-eslint/eslint-plugin": "^5.7.0",
-    "@typescript-eslint/parser": "^5.7.0",
-    "chai": "^4.3.8",
-    "command-line-args": "^5.2.1",
-    "eslint": "^8.49.0",
-    "glob": "^10.3.4",
-    "graphology": "^0.25.4",
-    "graphology-generators": "^0.11.2",
-    "graphology-layout": "^0.6.1",
-    "graphology-types": "^0.24.7",
-    "html-webpack-plugin": "^5.5.3",
-    "mocha": "^10.2.0",
-    "pandemonium": "^2.4.1",
-    "pixelmatch": "^5.3.0",
-    "pngjs": "^7.0.0",
-    "puppeteer": "^21.1.1",
-    "raw-loader": "^4.0.2",
-    "reload": "^3.2.1",
-    "replace": "^1.2.2",
-    "rimraf": "^5.0.1",
-    "ts-loader": "^9.4.4",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.1.4",
-    "webpack": "^5.90.1",
-    "webpack-dev-server": "^4.15.1"
+    "vite": "^5.1.4"
   },
   "keywords": [
     "graph",

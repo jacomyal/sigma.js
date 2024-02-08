@@ -3,8 +3,9 @@
   "files": [],
   "references": [
     { "path": "./packages/demo" },
-    { "path": "./packages/sigma" },
+    { "path": "./packages/test" },
     { "path": "./packages/storybook" },
+    { "path": "./packages/sigma" },
     { "path": "./packages/node-image" }
   ],
   "watchOptions": {
