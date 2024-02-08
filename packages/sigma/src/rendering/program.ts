@@ -5,6 +5,8 @@
  * Class representing a single WebGL program used by sigma's WebGL renderer.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import type Sigma from "../sigma";
 import type { RenderParams } from "../types";
 import { loadFragmentShader, loadProgram, loadVertexShader } from "./utils";
@@ -64,15 +66,22 @@ export interface InstancedProgramDefinition<Uniform extends string = string> ext
   CONSTANT_DATA: number[][];
 }
 
-export abstract class AbstractProgram {
+export abstract class AbstractProgram<N extends Attributes, E extends Attributes, G extends Attributes> {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma) {}
+  constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
   abstract render(params: RenderParams): void;
   abstract kill(): void;
 }
 
-export abstract class Program<Uniform extends string = string> implements AbstractProgram, InstancedProgramDefinition {
+export abstract class Program<
+    N extends Attributes,
+    E extends Attributes,
+    G extends Attributes,
+    Uniform extends string = string,
+  >
+  implements AbstractProgram<N, E, G>, InstancedProgramDefinition
+{
   VERTICES: number;
   VERTEX_SHADER_SOURCE: string;
   FRAGMENT_SHADER_SOURCE: string;
@@ -85,7 +94,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   ATTRIBUTES_ITEMS_COUNT: number;
   STRIDE: number;
 
-  renderer: Sigma;
+  renderer: Sigma<N, E, G>;
   array: Float32Array = new Float32Array();
   constantArray: Float32Array = new Float32Array();
   capacity = 0;
@@ -101,7 +110,7 @@ export abstract class Program<Uniform extends string = string> implements Abstra
   constructor(
     gl: WebGLRenderingContext | WebGL2RenderingContext,
     pickingBuffer: WebGLFramebuffer | null,
-    renderer: Sigma,
+    renderer: Sigma<N, E, G>,
   ) {
     // Reading and caching program definition
     const def = this.getDefinition();

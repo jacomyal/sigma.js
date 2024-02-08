@@ -5,6 +5,8 @@
  * Sigma's captor dealing with the user's mouse.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import Sigma from "../../sigma";
 import { CameraState, MouseCoords, WheelCoords } from "../../types";
 import Captor, { getMouseCoords, getPosition, getWheelCoords, getWheelDelta } from "./captor";
@@ -43,7 +45,12 @@ export type MouseCaptorEvents = {
  *
  * @constructor
  */
-export default class MouseCaptor extends Captor<MouseCaptorEvents> {
+export default class MouseCaptor<N extends Attributes, E extends Attributes, G extends Attributes> extends Captor<
+  MouseCaptorEvents,
+  N,
+  E,
+  G
+> {
   // State
   enabled = true;
   draggedEvents = 0;
@@ -60,7 +67,7 @@ export default class MouseCaptor extends Captor<MouseCaptorEvents> {
   currentWheelDirection: -1 | 0 | 1 = 0;
   lastWheelTriggerTime?: number;
 
-  constructor(container: HTMLElement, renderer: Sigma) {
+  constructor(container: HTMLElement, renderer: Sigma<N, E, G>) {
     super(container, renderer);
 
     // Binding methods

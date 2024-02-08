@@ -5,6 +5,8 @@
  * Sigma's captor dealing with touch.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import Sigma from "../../sigma";
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
@@ -29,7 +31,12 @@ export type TouchCaptorEvents = {
  *
  * @constructor
  */
-export default class TouchCaptor extends Captor<TouchCaptorEvents> {
+export default class TouchCaptor<N extends Attributes, E extends Attributes, G extends Attributes> extends Captor<
+  TouchCaptorEvents,
+  N,
+  E,
+  G
+> {
   enabled = true;
   isMoving = false;
   hasMoved = false;
@@ -43,7 +50,7 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
   lastTouchesPositions?: Coordinates[];
   lastTouches?: Touch[];
 
-  constructor(container: HTMLElement, renderer: Sigma) {
+  constructor(container: HTMLElement, renderer: Sigma<N, E, G>) {
     super(container, renderer);
 
     // Binding methods:

@@ -27,7 +27,7 @@ import { assign } from "./utils";
  * Sigma.js settings
  * =================================
  */
-export interface Settings {
+export interface Settings<N extends Attributes, E extends Attributes, G extends Attributes> {
   // Performance
   hideEdgesOnMove: boolean;
   hideLabelsOnMove: boolean;
@@ -50,9 +50,9 @@ export interface Settings {
   stagePadding: number;
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
-  defaultDrawEdgeLabel: EdgeLabelDrawingFunction;
-  defaultDrawNodeLabel: NodeLabelDrawingFunction;
-  defaultDrawNodeHover: NodeHoverDrawingFunction;
+  defaultDrawEdgeLabel: EdgeLabelDrawingFunction<N, E, G>;
+  defaultDrawNodeLabel: NodeLabelDrawingFunction<N, E, G>;
+  defaultDrawNodeHover: NodeHoverDrawingFunction<N, E, G>;
 
   // Labels
   labelDensity: number;
@@ -60,8 +60,8 @@ export interface Settings {
   labelRenderedSizeThreshold: number;
 
   // Reducers
-  nodeReducer: null | ((node: string, data: Attributes) => Partial<NodeDisplayData>);
-  edgeReducer: null | ((edge: string, data: Attributes) => Partial<EdgeDisplayData>);
+  nodeReducer: null | ((node: string, data: N) => Partial<NodeDisplayData>);
+  edgeReducer: null | ((edge: string, data: E) => Partial<EdgeDisplayData>);
 
   // Features
   zIndex: boolean;
@@ -72,12 +72,12 @@ export interface Settings {
   allowInvalidContainer: boolean;
 
   // Program classes
-  nodeProgramClasses: { [type: string]: NodeProgramType };
-  nodeHoverProgramClasses: { [type: string]: NodeProgramType };
-  edgeProgramClasses: { [type: string]: EdgeProgramType };
+  nodeProgramClasses: { [type: string]: NodeProgramType<N, E, G> };
+  nodeHoverProgramClasses: { [type: string]: NodeProgramType<N, E, G> };
+  edgeProgramClasses: { [type: string]: EdgeProgramType<N, E, G> };
 }
 
-export const DEFAULT_SETTINGS: Settings = {
+export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   // Performance
   hideEdgesOnMove: false,
   hideLabelsOnMove: false,
@@ -137,7 +137,9 @@ export const DEFAULT_EDGE_PROGRAM_CLASSES: Record<string, EdgeProgramType> = {
   line: EdgeRectangleProgram,
 };
 
-export function validateSettings(settings: Settings): void {
+export function validateSettings<N extends Attributes, E extends Attributes, G extends Attributes>(
+  settings: Settings<N, E, G>,
+): void {
   if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
     throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
   }
@@ -150,7 +152,11 @@ export function validateSettings(settings: Settings): void {
   }
 }
 
-export function resolveSettings(settings: Partial<Settings>): Settings {
+export function resolveSettings<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(settings: Partial<Settings<N, E, G>>): Settings<N, E, G> {
   const resolvedSettings = assign({}, DEFAULT_SETTINGS, settings);
 
   resolvedSettings.nodeProgramClasses = assign({}, DEFAULT_NODE_PROGRAM_CLASSES, resolvedSettings.nodeProgramClasses);

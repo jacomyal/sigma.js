@@ -8,6 +8,8 @@
  * This is useful when combined with arrows to draw directed edges.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import { EdgeDisplayData, NodeDisplayData } from "../../../types";
 import { floatColor } from "../../../utils";
 import EdgeRectangleProgram from "../edge-rectangle";
@@ -15,7 +17,11 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class EdgeClampedProgram extends EdgeRectangleProgram {
+export default class EdgeClampedProgram<
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends EdgeRectangleProgram<N, E, G> {
   getDefinition() {
     return {
       ...super.getDefinition(),

@@ -8,6 +8,8 @@
  * indicating which "corner" of the triangle to draw.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "../../node";
@@ -19,7 +21,11 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
-export default class NodeCircleProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
+export default class NodeCircleProgram<
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends NodeProgram<N, E, G, (typeof UNIFORMS)[number]> {
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;

@@ -4,14 +4,20 @@
  *
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import Sigma from "../sigma";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../types";
 import { indexToColor } from "../utils";
 import { EdgeLabelDrawingFunction } from "./edge-labels";
 import { AbstractProgram, Program } from "./program";
 
-export abstract class AbstractEdgeProgram extends AbstractProgram {
-  static drawLabel: EdgeLabelDrawingFunction | undefined;
+export abstract class AbstractEdgeProgram<
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends AbstractProgram<N, E, G> {
+  abstract drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined;
 
   abstract process(
     edgeIndex: number,
@@ -22,11 +28,16 @@ export abstract class AbstractEdgeProgram extends AbstractProgram {
   ): void;
 }
 
-export abstract class EdgeProgram<Uniform extends string = string>
-  extends Program<Uniform>
-  implements AbstractEdgeProgram
+export abstract class EdgeProgram<
+    N extends Attributes,
+    E extends Attributes,
+    G extends Attributes,
+    Uniform extends string = string,
+  >
+  extends Program<N, E, G, Uniform>
+  implements AbstractEdgeProgram<N, E, G>
 {
-  static drawLabel: EdgeLabelDrawingFunction | undefined = undefined;
+  drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined = undefined;
 
   kill(): void {
     return undefined;
@@ -60,12 +71,18 @@ export abstract class EdgeProgram<Uniform extends string = string>
   ): void;
 }
 
-class EdgeImageClass implements AbstractEdgeProgram {
-  static drawLabel: EdgeLabelDrawingFunction | undefined = undefined;
-
-  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
+class EdgeImageClass<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> implements AbstractEdgeProgram<N, E, G>
+{
+  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
     return this;
   }
+
+  drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined = undefined;
+
   kill(): void {
     return undefined;
   }
@@ -85,7 +102,11 @@ class EdgeImageClass implements AbstractEdgeProgram {
     return undefined;
   }
 }
-export type EdgeProgramType = typeof EdgeImageClass;
+export type EdgeProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = typeof EdgeImageClass<N, E, G>;
 
 /**
  * Helper function combining two or more programs into a single compound one.
@@ -96,20 +117,20 @@ export type EdgeProgramType = typeof EdgeImageClass;
  * @param  {function} drawLabel - An optional edge "draw label" function.
  * @return {function}
  */
-export function createEdgeCompoundProgram(
-  programClasses: Array<EdgeProgramType>,
-  drawLabel?: EdgeLabelDrawingFunction,
-): EdgeProgramType {
-  return class EdgeCompoundProgram implements AbstractEdgeProgram {
-    static drawLabel = drawLabel;
+export function createEdgeCompoundProgram<N extends Attributes, E extends Attributes, G extends Attributes>(
+  programClasses: Array<EdgeProgramType<N, E, G>>,
+  drawLabel?: EdgeLabelDrawingFunction<N, E, G>,
+): EdgeProgramType<N, E, G> {
+  return class EdgeCompoundProgram implements AbstractEdgeProgram<N, E, G> {
+    programs: Array<AbstractEdgeProgram<N, E, G>>;
 
-    programs: Array<AbstractEdgeProgram>;
-
-    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       this.programs = programClasses.map((Program) => {
         return new Program(gl, pickingBuffer, renderer);
       });
     }
+
+    drawLabel = drawLabel;
 
     reallocate(capacity: number): void {
       this.programs.forEach((program) => program.reallocate(capacity));

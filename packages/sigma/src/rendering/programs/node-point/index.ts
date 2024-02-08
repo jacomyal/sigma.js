@@ -7,6 +7,8 @@
  * every GPU.
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { NodeProgram } from "../../node";
@@ -18,7 +20,11 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
-export default class NodePointProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
+export default class NodePointProgram<
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends NodeProgram<N, E, G, (typeof UNIFORMS)[number]> {
   getDefinition() {
     return {
       VERTICES: 1,

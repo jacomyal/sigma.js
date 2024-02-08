@@ -3,7 +3,7 @@
  * ========
  * @module
  */
-import Graph from "graphology-types";
+import Graph, { Attributes } from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
@@ -55,7 +55,11 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
  * Important functions.
  */
-function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
+function applyNodeDefaults<N extends Attributes, E extends Attributes, G extends Attributes>(
+  settings: Settings<N, E, G>,
+  key: string,
+  data: Partial<NodeDisplayData>,
+): NodeDisplayData {
   if (!hasOwnProperty.call(data, "x") || !hasOwnProperty.call(data, "y"))
     throw new Error(
       `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
@@ -83,7 +87,11 @@ function applyNodeDefaults(settings: Settings, key: string, data: Partial<NodeDi
   return data as NodeDisplayData;
 }
 
-function applyEdgeDefaults(settings: Settings, _key: string, data: Partial<EdgeDisplayData>): EdgeDisplayData {
+function applyEdgeDefaults<N extends Attributes, E extends Attributes, G extends Attributes>(
+  settings: Settings<N, E, G>,
+  _key: string,
+  data: Partial<EdgeDisplayData>,
+): EdgeDisplayData {
   if (!data.color) data.color = settings.defaultEdgeColor;
 
   if (!data.label) data.label = "";
@@ -147,11 +155,15 @@ export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents &
  * @param {HTMLElement} container - DOM container in which to render.
  * @param {object}      settings  - Optional settings.
  */
-export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEmitter<SigmaEvents> {
-  private settings: Settings;
-  private graph: GraphType;
-  private mouseCaptor: MouseCaptor;
-  private touchCaptor: TouchCaptor;
+export default class Sigma<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends TypedEventEmitter<SigmaEvents> {
+  private settings: Settings<N, E, G>;
+  private graph: Graph<N, E, G>;
+  private mouseCaptor: MouseCaptor<N, E, G>;
+  private touchCaptor: TouchCaptor<N, E, G>;
   private container: HTMLElement;
   private elements: PlainObject<HTMLCanvasElement> = {};
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
@@ -208,13 +220,13 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
   private checkEdgesEventsFrame: number | null = null;
 
   // Programs
-  private nodePrograms: { [key: string]: AbstractNodeProgram } = {};
-  private nodeHoverPrograms: { [key: string]: AbstractNodeProgram } = {};
-  private edgePrograms: { [key: string]: AbstractEdgeProgram } = {};
+  private nodePrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
+  private nodeHoverPrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
+  private edgePrograms: { [key: string]: AbstractEdgeProgram<N, E, G> } = {};
 
   private camera: Camera;
 
-  constructor(graph: GraphType, container: HTMLElement, settings: Partial<Settings> = {}) {
+  constructor(graph: Graph<N, E, G>, container: HTMLElement, settings: Partial<Settings<N, E, G>> = {}) {
     super();
 
     // Resolving settings
@@ -957,8 +969,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
       // an issue once we start memoizing getLabelsToDisplay.
       this.displayedNodeLabels.add(node);
 
-      const { nodeProgramClasses, defaultDrawNodeLabel } = this.settings;
-      const drawLabel = nodeProgramClasses[data.type].drawLabel || defaultDrawNodeLabel;
+      const { defaultDrawNodeLabel } = this.settings;
+      const nodeProgram = this.nodePrograms[data.type];
+      const drawLabel = nodeProgram?.drawLabel || defaultDrawNodeLabel;
       drawLabel(
         context,
         {
@@ -1015,8 +1028,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
         continue;
       }
 
-      const { edgeProgramClasses, defaultDrawEdgeLabel } = this.settings;
-      const drawLabel = edgeProgramClasses[edgeData.type].drawLabel || defaultDrawEdgeLabel;
+      const { defaultDrawEdgeLabel } = this.settings;
+      const edgeProgram = this.edgePrograms[edgeData.type];
+      const drawLabel = edgeProgram?.drawLabel || defaultDrawEdgeLabel;
       drawLabel(
         context,
         {
@@ -1065,8 +1079,9 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
 
       const size = this.scaleSize(data.size);
 
-      const { nodeProgramClasses, defaultDrawNodeHover } = this.settings;
-      const drawHover = nodeProgramClasses[data.type].drawHover || defaultDrawNodeHover;
+      const { defaultDrawNodeHover } = this.settings;
+      const nodeProgram = this.nodePrograms[data.type];
+      const drawHover = nodeProgram?.drawHover || defaultDrawNodeHover;
       drawHover(
         context,
         {
@@ -1263,8 +1278,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     //  3. We apply our defaults, while running some vital checks
     //  4. We apply the normalization function
     // We shallow copy node data to avoid dangerous behaviors from reducers
-    let attr = Object.assign({}, this.graph.getNodeAttributes(key));
-    if (this.settings.nodeReducer) attr = this.settings.nodeReducer(key, attr);
+    let attr = Object.assign({}, this.graph.getNodeAttributes(key)) as Partial<NodeDisplayData>;
+    if (this.settings.nodeReducer) attr = this.settings.nodeReducer(key, attr as N);
     const data = applyNodeDefaults(this.settings, key, attr);
     this.nodeDataCache[key] = data;
 
@@ -1330,8 +1345,8 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
     //  3. Note that this function must return a total object and won't be merged
     //  4. We apply our defaults, while running some vital checks
     // We shallow copy edge data to avoid dangerous behaviors from reducers
-    let attr = Object.assign({}, this.graph.getEdgeAttributes(key));
-    if (this.settings.edgeReducer) attr = this.settings.edgeReducer(key, attr);
+    let attr = Object.assign({}, this.graph.getEdgeAttributes(key)) as Partial<EdgeDisplayData>;
+    if (this.settings.edgeReducer) attr = this.settings.edgeReducer(key, attr as E);
     const data = applyEdgeDefaults(this.settings, key, attr);
     this.edgeDataCache[key] = data;
 
@@ -1511,7 +1526,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Graph}
    */
-  getGraph(): GraphType {
+  getGraph(): Graph<N, E, G> {
     return this.graph;
   }
 
@@ -1520,7 +1535,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Graph}
    */
-  setGraph(graph: GraphType): void {
+  setGraph(graph: Graph<N, E, G>): void {
     if (graph === this.graph) return;
 
     // Unbinding handlers on the current graph
@@ -1546,7 +1561,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {MouseCaptor}
    */
-  getMouseCaptor(): MouseCaptor {
+  getMouseCaptor(): MouseCaptor<N, E, G> {
     return this.mouseCaptor;
   }
 
@@ -1555,7 +1570,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {TouchCaptor}
    */
-  getTouchCaptor(): TouchCaptor {
+  getTouchCaptor(): TouchCaptor<N, E, G> {
     return this.touchCaptor;
   }
 
@@ -1630,7 +1645,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    *
    * @return {Settings} A copy of the settings collection.
    */
-  getSettings(): Settings {
+  getSettings(): Settings<N, E, G> {
     return { ...this.settings };
   }
 
@@ -1640,7 +1655,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @param  {string} key - The setting key to get.
    * @return {any} The value attached to this setting key or undefined if not found
    */
-  getSetting<K extends keyof Settings>(key: K): Settings[K] | undefined {
+  getSetting<K extends keyof Settings<N, E, G>>(key: K): Settings<N, E, G>[K] | undefined {
     return this.settings[key];
   }
 
@@ -1652,7 +1667,7 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @param  {any}    value - The value to set.
    * @return {Sigma}
    */
-  setSetting<K extends keyof Settings>(key: K, value: Settings[K]): this {
+  setSetting<K extends keyof Settings<N, E, G>>(key: K, value: Settings<N, E, G>[K]): this {
     this.settings[key] = value;
     validateSettings(this.settings);
     this.handleSettingsUpdate();
@@ -1668,7 +1683,10 @@ export default class Sigma<GraphType extends Graph = Graph> extends TypedEventEm
    * @param  {function} updater - The update function.
    * @return {Sigma}
    */
-  updateSetting<K extends keyof Settings>(key: K, updater: (value: Settings[K]) => Settings[K]): this {
+  updateSetting<K extends keyof Settings<N, E, G>>(
+    key: K,
+    updater: (value: Settings<N, E, G>[K]) => Settings<N, E, G>[K],
+  ): this {
     this.settings[key] = updater(this.settings[key]);
     validateSettings(this.settings);
     this.handleSettingsUpdate();

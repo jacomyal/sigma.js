@@ -3,6 +3,8 @@
  * ======================
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import Sigma from "../../sigma";
 import { Coordinates, EventsMapping, MouseCoords, TouchCoords, TypedEventEmitter, WheelCoords } from "../../types";
 
@@ -103,13 +105,17 @@ export function getWheelDelta(e: WheelEvent): number {
 /**
  * Abstract class representing a captor like the user's mouse or touch controls.
  */
-export default abstract class Captor<Events extends EventsMapping> extends TypedEventEmitter<Events> {
+export default abstract class Captor<
+  Events extends EventsMapping,
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends TypedEventEmitter<Events> {
   container: HTMLElement;
-  renderer: Sigma;
+  renderer: Sigma<N, E, G>;
 
-  constructor(container: HTMLElement, renderer: Sigma) {
+  constructor(container: HTMLElement, renderer: Sigma<N, E, G>) {
     super();
-
     // Properties
     this.container = container;
     this.renderer = renderer;

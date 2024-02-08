@@ -1,16 +1,18 @@
+import { Attributes } from "graphology-types";
+
 import { Settings } from "../settings";
 import { NodeDisplayData, PartialButFor } from "../types";
 
-export type NodeLabelDrawingFunction = (
+export type NodeLabelDrawingFunction<N extends Attributes, E extends Attributes, G extends Attributes> = (
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
-  settings: Settings,
+  settings: Settings<N, E, G>,
 ) => void;
 
-export function drawDiscNodeLabel(
+export function drawDiscNodeLabel<N extends Attributes, E extends Attributes, G extends Attributes>(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
-  settings: Settings,
+  settings: Settings<N, E, G>,
 ): void {
   if (!data.label) return;
 

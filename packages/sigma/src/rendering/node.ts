@@ -4,6 +4,8 @@
  *
  * @module
  */
+import { Attributes } from "graphology-types";
+
 import Sigma from "../sigma";
 import { NodeDisplayData, NonEmptyArray, RenderParams } from "../types";
 import { indexToColor } from "../utils";
@@ -11,18 +13,27 @@ import { NodeHoverDrawingFunction } from "./node-hover";
 import { NodeLabelDrawingFunction } from "./node-labels";
 import { AbstractProgram, Program } from "./program";
 
-export abstract class AbstractNodeProgram extends AbstractProgram {
-  static drawLabel: NodeLabelDrawingFunction | undefined;
-  static drawHover: NodeHoverDrawingFunction | undefined;
+export abstract class AbstractNodeProgram<
+  N extends Attributes,
+  E extends Attributes,
+  G extends Attributes,
+> extends AbstractProgram<N, E, G> {
+  abstract drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
+  abstract drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
   abstract process(nodeIndex: number, offset: number, data: NodeDisplayData): void;
 }
 
-export abstract class NodeProgram<Uniform extends string = string>
-  extends Program<Uniform>
-  implements AbstractNodeProgram
+export abstract class NodeProgram<
+    N extends Attributes,
+    E extends Attributes,
+    G extends Attributes,
+    Uniform extends string = string,
+  >
+  extends Program<N, E, G, Uniform>
+  implements AbstractNodeProgram<N, E, G>
 {
-  static drawLabel: NodeLabelDrawingFunction | undefined = undefined;
-  static drawHover: NodeHoverDrawingFunction | undefined = undefined;
+  drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
+  drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
 
   kill(): void {
     return undefined;
@@ -44,13 +55,15 @@ export abstract class NodeProgram<Uniform extends string = string>
   abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
 }
 
-class NodeImageClass implements AbstractNodeProgram {
-  static drawLabel: NodeLabelDrawingFunction | undefined = undefined;
-  static drawHover: NodeHoverDrawingFunction | undefined = undefined;
-
-  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma) {
+class NodeImageClass<N extends Attributes, E extends Attributes, G extends Attributes>
+  implements AbstractNodeProgram<N, E, G>
+{
+  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
     return this;
   }
+  drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
+  drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
+
   kill(): void {
     return undefined;
   }
@@ -64,7 +77,11 @@ class NodeImageClass implements AbstractNodeProgram {
     return undefined;
   }
 }
-export type NodeProgramType = typeof NodeImageClass;
+export type NodeProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = typeof NodeImageClass<N, E, G>;
 
 /**
  * Helper function combining two or more programs into a single compound one.
@@ -76,22 +93,23 @@ export type NodeProgramType = typeof NodeImageClass;
  * @param  {function} drawHover - An optional node "draw hover" function.
  * @return {function}
  */
-export function createNodeCompoundProgram(
-  programClasses: NonEmptyArray<NodeProgramType>,
-  drawLabel?: NodeLabelDrawingFunction,
-  drawHover?: NodeLabelDrawingFunction,
-): NodeProgramType {
-  return class NodeCompoundProgram implements AbstractNodeProgram {
-    static drawLabel = drawLabel;
-    static drawHover = drawHover;
+export function createNodeCompoundProgram<N extends Attributes, E extends Attributes, G extends Attributes>(
+  programClasses: NonEmptyArray<NodeProgramType<N, E, G>>,
+  drawLabel?: NodeLabelDrawingFunction<N, E, G>,
+  drawHover?: NodeLabelDrawingFunction<N, E, G>,
+): NodeProgramType<N, E, G> {
+  return class NodeCompoundProgram implements AbstractNodeProgram<N, E, G> {
+    programs: NonEmptyArray<AbstractNodeProgram<N, E, G>>;
 
-    programs: NonEmptyArray<AbstractNodeProgram>;
-
-    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma) {
+    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       this.programs = programClasses.map((Program) => {
         return new Program(gl, pickingBuffer, renderer);
-      }) as unknown as NonEmptyArray<AbstractNodeProgram>;
+      }) as unknown as NonEmptyArray<AbstractNodeProgram<N, E, G>>;
     }
+
+    drawLabel = drawLabel;
+
+    drawHover = drawHover;
 
     reallocate(capacity: number): void {
       this.programs.forEach((program) => program.reallocate(capacity));
