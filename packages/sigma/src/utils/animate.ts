@@ -8,7 +8,7 @@
 import Graph from "graphology-types";
 
 import { PlainObject } from "../types";
-import easings from "./easings";
+import { easings } from "./easings";
 import { cancelFrame, requestFrame } from "./index";
 
 /**

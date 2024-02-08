@@ -12,6 +12,14 @@ import { CameraState, Coordinates, Dimensions, Extent, PlainObject } from "../ty
 import { HTML_COLORS } from "./data";
 import { identity, multiply, multiplyVec2, rotate, scale, translate } from "./matrices";
 
+// Exports other utils form sibling files:
+export * from "./animate";
+export * from "./array";
+export * from "./data";
+export * from "./easings";
+export * from "./matrices";
+export * from "./picking";
+
 /**
  * Checks whether the given value is a plain object.
  *

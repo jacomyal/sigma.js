@@ -7,6 +7,7 @@
     "rootDir": "./src",
     "outDir": "build",
     "declarationDir": null,
-    "declaration": false
+    "declaration": false,
+    "noImplicitAny": false
   }
 }

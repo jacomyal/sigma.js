@@ -2,11 +2,12 @@
  * Just some shortcuts to ease importing various rendering related things from
  * the codebase:
  */
-export { NodeProgram } from "./node";
+export { NodeProgram, AbstractNodeProgram } from "./node";
 export type { NodeProgramType } from "./node";
-export { EdgeProgram } from "./edge";
+export { EdgeProgram, AbstractEdgeProgram } from "./edge";
 export type { EdgeProgramType } from "./edge";
-export type { ProgramInfo } from "./program";
+export { Program, AbstractProgram } from "./program";
+export type { ProgramInfo, ProgramDefinition } from "./program";
 
 // Canvas helpers
 export type { EdgeLabelDrawingFunction } from "./edge-labels";

@@ -9,8 +9,7 @@ import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
-import { AbstractEdgeProgram } from "./rendering/edge";
-import { AbstractNodeProgram } from "./rendering/node";
+import { AbstractEdgeProgram, AbstractNodeProgram } from "./rendering";
 import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
   CameraState,
@@ -33,17 +32,18 @@ import {
   colorToIndex,
   createElement,
   createNormalizationFunction,
+  extend,
   getMatrixImpact,
+  getPixelColor,
   getPixelRatio,
   graphExtent,
+  identity,
   matrixFromCamera,
+  multiplyVec2,
   requestFrame,
   validateGraph,
   zIndexOrdering,
 } from "./utils";
-import { extend } from "./utils/array";
-import { identity, multiplyVec2 } from "./utils/matrices";
-import { getPixelColor } from "./utils/picking";
 
 /**
  * Constants.

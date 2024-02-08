@@ -1,7 +1,5 @@
 import Sigma from "sigma";
-import { NodeProgram } from "sigma/rendering";
-import { NodeProgramType, ProgramInfo } from "sigma/rendering";
-import { NodeLabelDrawingFunction } from "sigma/rendering";
+import { NodeLabelDrawingFunction, NodeProgram, NodeProgramType, ProgramInfo } from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 

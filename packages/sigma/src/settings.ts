@@ -7,14 +7,19 @@
  */
 import { Attributes } from "graphology-types";
 
-import { EdgeProgramType } from "./rendering";
-import { NodeProgramType } from "./rendering";
-import { EdgeLabelDrawingFunction, drawStraightEdgeLabel } from "./rendering/edge-labels";
-import { NodeHoverDrawingFunction, drawDiscNodeHover } from "./rendering/node-hover";
-import { NodeLabelDrawingFunction, drawDiscNodeLabel } from "./rendering/node-labels";
-import EdgeArrowProgram from "./rendering/programs/edge-arrow";
-import EdgeRectangleProgram from "./rendering/programs/edge-rectangle";
-import NodePointProgram from "./rendering/programs/node-point";
+import {
+  EdgeArrowProgram,
+  EdgeLabelDrawingFunction,
+  EdgeProgramType,
+  EdgeRectangleProgram,
+  NodeHoverDrawingFunction,
+  NodeLabelDrawingFunction,
+  NodePointProgram,
+  NodeProgramType,
+  drawDiscNodeHover,
+  drawDiscNodeLabel,
+  drawStraightEdgeLabel,
+} from "./rendering";
 import { EdgeDisplayData, NodeDisplayData } from "./types";
 import { assign } from "./utils";
 

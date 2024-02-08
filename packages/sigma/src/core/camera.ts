@@ -6,9 +6,7 @@
  * @module
  */
 import { CameraState, TypedEventEmitter } from "../types";
-import { cancelFrame, requestFrame } from "../utils";
-import { ANIMATE_DEFAULTS, AnimateOptions } from "../utils/animate";
-import easings from "../utils/easings";
+import { ANIMATE_DEFAULTS, AnimateOptions, cancelFrame, easings, requestFrame } from "../utils";
 
 /**
  * Defaults.

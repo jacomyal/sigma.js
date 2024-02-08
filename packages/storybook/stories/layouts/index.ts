@@ -8,7 +8,7 @@ import forceAtlas2 from "graphology-layout-forceatlas2";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma from "sigma";
 import { PlainObject } from "sigma/types";
-import { animateNodes } from "sigma/utils/animate";
+import { animateNodes } from "sigma/utils";
 
 import { onStoryDown } from "../utils";
 import data from "./data.json";

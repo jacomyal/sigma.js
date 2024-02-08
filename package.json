@@ -10,17 +10,10 @@
     "build": "preconstruct build",
     "watch": "preconstruct watch",
     "prettify": "prettier --write .",
-    "sigma:test": "npm run test --workspace=sigma",
-    "sigma:unit:test": "npm run unit:test --workspace=sigma",
-    "sigma:e2e:test": "npm run e2e:test --workspace=sigma",
-    "examples:build": "npm run build --workspace=@sigma/examples",
-    "examples:start": "npm run start --workspace=@sigma/examples",
-    "demo:start": "npm start --workspace=@sigma/demo",
-    "demo:build": "npm run build --workspace=@sigma/demo",
-    "website:build": "npm run build --workspace=@sigma/website",
-    "website:all": "npm run website:build && npm run demo:build && cp -R packages/demo/build packages/website/build/demo && npm run storybook:build && cp -R packages/storybook/storybook-static packages/website/build/storybook",
+    "lint": "eslint .",
+    "test": "npm run test --workspace=sigma",
     "storybook:run": "npm run start --workspace=@sigma/storybook",
-    "storybook:build": "npm run build --workspace=@sigma/storybook"
+    "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook"
   },
   "dependencies": {
     "@babel/core": "^7.23.9",
@@ -31,9 +24,9 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-storybook": "^0.6.15",
-    "lerna": "^8.0.0",
+    "lerna": "^8.1.2",
     "prettier": "^3.2.5",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   },
   "preconstruct": {
     "packages": [
