@@ -15,8 +15,8 @@
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 import { ProgramInfo, NodeProgram } from "sigma/rendering";
-import VERTEX_SHADER_SOURCE from "./node.border.vert.glsl?raw";
-import FRAGMENT_SHADER_SOURCE from "./node.border.frag.glsl?raw";
+import VERTEX_SHADER_SOURCE from "./node.border.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./node.border.frag.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

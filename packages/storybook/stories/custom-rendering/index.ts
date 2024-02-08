@@ -25,7 +25,8 @@
 import Graph from "graphology";
 import Sigma from "sigma";
 import ForceSupervisor from "graphology-layout-force/worker";
-import { NodeCircleProgram } from "sigma/rendering";
+import { createNodeImageProgram } from "@sigma/node-image";
+
 import NodeBorderProgram from "./node.border";
 import { onStoryDown } from "../utils";
 
@@ -65,7 +66,7 @@ export default () => {
   const renderer = new Sigma(graph, container, {
     // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
     nodeProgramClasses: {
-      image: NodeCircleProgram,
+      image: createNodeImageProgram(),
       border: NodeBorderProgram,
     },
     renderEdgeLabels: true,

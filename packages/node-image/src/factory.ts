@@ -1,9 +1,9 @@
 import Sigma from "sigma";
 import { floatColor } from "sigma/utils";
-import { NodeProgram } from "sigma/rendering/node";
+import { NodeProgram } from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { NodeProgramType, ProgramInfo } from "sigma/rendering";
-import { NodeLabelDrawingFunction } from "sigma/rendering/node-labels";
+import { NodeLabelDrawingFunction } from "sigma/rendering";
 
 import VERTEX_SHADER_SOURCE from "./shader-vert";
 import FRAGMENT_SHADER_SOURCE from "./shader-frag";

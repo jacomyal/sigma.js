@@ -1,0 +1,4 @@
+{
+  "main": "dist/sigma-utils.cjs.js",
+  "module": "dist/sigma-utils.esm.js"
+}

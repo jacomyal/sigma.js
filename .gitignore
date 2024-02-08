@@ -18,16 +18,3 @@ packages/storybook/storybook-static
 
 # Built sources:
 packages/sigma/README.md
-packages/sigma/core/
-packages/sigma/rendering/
-packages/sigma/utils/
-packages/sigma/index.js
-packages/sigma/index.d.ts
-packages/sigma/index-bundle.js
-packages/sigma/index-bundle.d.ts
-packages/sigma/settings.js
-packages/sigma/settings.d.ts
-packages/sigma/sigma.js
-packages/sigma/sigma.d.ts
-packages/sigma/types.js
-packages/sigma/types.d.ts

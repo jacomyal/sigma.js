@@ -1,3 +1,5 @@
+// language=GLSL
+const SHADER_SOURCE = /*glsl*/ `
 attribute vec2 a_position;
 attribute vec2 a_normal;
 attribute float a_radius;
@@ -61,3 +63,6 @@ void main() {
 
   v_color.a *= bias;
 }
+`;
+
+export default SHADER_SOURCE;

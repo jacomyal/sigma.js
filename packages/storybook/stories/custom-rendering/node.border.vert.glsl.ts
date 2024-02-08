@@ -1,3 +1,5 @@
+// language=GLSL
+const SHADER_SOURCE = /*glsl*/ `
 attribute vec4 a_id;
 attribute vec4 a_color;
 attribute vec2 a_position;
@@ -36,3 +38,6 @@ void main() {
 
   v_color.a *= bias;
 }
+`;
+
+export default SHADER_SOURCE;

@@ -7,6 +7,8 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "preconstruct build",
+    "watch": "preconstruct watch",
     "sigma:build": "npm run build --workspace=sigma",
     "sigma:transpile": "npm run transpile --workspace=sigma",
     "sigma:test": "npm run test --workspace=sigma",
@@ -22,13 +24,16 @@
     "storybook:build": "npm run build --workspace=@sigma/storybook"
   },
   "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-typescript": "^7.23.3",
+    "@preconstruct/cli": "^2.8.3",
     "lerna": "^8.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.12"
+    "typescript": "^5.2.2"
   },
-  "dependencies": {
-    "@storybook/react": "^7.6.12"
+  "preconstruct": {
+    "packages": [
+      "packages/sigma",
+      "packages/node-image"
+    ]
   }
 }

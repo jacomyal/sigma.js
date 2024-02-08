@@ -4,15 +4,21 @@
   "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
-  "main": "index.js",
+  "main": "dist/sigma.cjs.js",
+  "module": "dist/sigma.esm.js",
+  "types": "dist/sigma.cjs.d.ts",
+  "files": [
+    "/dist",
+    "/types",
+    "/settings",
+    "/rendering",
+    "/utils"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "build": "webpack --progress && webpack --progress --mode production",
-    "clean": "rimraf $npm_package_config_clean",
-    "transpile": "tsc -p ./tsconfig.transpile.json -d && replace '\\.glsl' '.glsl.js' rendering -r --silent && webpack --config ./webpack.programs.config.js",
     "lint": "eslint $npm_package_config_folders --ext .ts",
     "postpublish": "npm run clean",
     "prettier": "prettier --write $npm_package_config_folders",
-    "prepare": "npm run clean && npm run transpile && npm run build",
     "prepublishOnly": "cp ../../README.md . && npm run lint && npm test",
     "reinstall": "rimraf examples/node_modules && rimraf demo/node_modules && rimraf node_modules && npm i && npm run clean",
     "test": "npm run unit:test && npm run e2e:test",
@@ -51,7 +57,6 @@
     "graphology-utils": "^2.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.17",
     "@types/chai": "^4.3.6",
     "@types/command-line-args": "^5.2.1",
     "@types/events": "^3.0.3",
@@ -60,11 +65,8 @@
     "@types/pixelmatch": "^5.2.4",
     "@types/pngjs": "^6.0.2",
     "@types/tapable": "^2.2.5",
-    "@types/webpack-dev-server": "^4.7.2",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
-    "babel-eslint": "^10.1.0",
-    "babel-loader": "^9.1.3",
     "chai": "^4.3.8",
     "command-line-args": "^5.2.1",
     "eslint": "^8.49.0",
@@ -86,10 +88,7 @@
     "rimraf": "^5.0.1",
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "typescript": "^5.2.2"
   },
   "keywords": [
     "graph",
@@ -99,6 +98,43 @@
     "canvas",
     "webgl"
   ],
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts",
+      "types.ts",
+      "settings.ts",
+      "rendering/index.ts",
+      "utils/index.ts"
+    ]
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma.esm.js",
+      "import": "./dist/sigma.cjs.mjs",
+      "default": "./dist/sigma.cjs.js"
+    },
+    "./types": {
+      "module": "./types/dist/sigma-types.esm.js",
+      "import": "./types/dist/sigma-types.cjs.mjs",
+      "default": "./types/dist/sigma-types.cjs.js"
+    },
+    "./settings": {
+      "module": "./settings/dist/sigma-settings.esm.js",
+      "import": "./settings/dist/sigma-settings.cjs.mjs",
+      "default": "./settings/dist/sigma-settings.cjs.js"
+    },
+    "./rendering": {
+      "module": "./rendering/dist/sigma-rendering.esm.js",
+      "import": "./rendering/dist/sigma-rendering.cjs.mjs",
+      "default": "./rendering/dist/sigma-rendering.cjs.js"
+    },
+    "./utils": {
+      "module": "./utils/dist/sigma-utils.esm.js",
+      "import": "./utils/dist/sigma-utils.cjs.mjs",
+      "default": "./utils/dist/sigma-utils.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
     "plugins": [

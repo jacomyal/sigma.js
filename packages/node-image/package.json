@@ -2,13 +2,13 @@
   "name": "@sigma/node-image",
   "version": "3.0.0-beta.3",
   "description": "A node program that renders images for sigma.js",
-  "type": "module",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/sigma-node-image.cjs.js",
+  "module": "dist/sigma-node-image.esm.js",
+  "types": "dist/sigma-node-image.cjs.d.ts",
   "files": [
     "/dist"
   ],
+  "sideEffects": false,
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "repository": {
@@ -31,14 +31,20 @@
     }
   ],
   "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
   "peerDependencies": {
     "sigma": ">=3.0.0-beta.6"
   },
-  "scripts": {
-    "format": "prettier --write --parser typescript '**/*.ts'",
-    "lint": "eslint . --ext .ts --ignore-path .gitignore --fix",
-    "build": "tsc && vite build",
-    "prepublishOnly": "npm run build"
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-node-image.esm.js",
+      "import": "./dist/sigma-node-image.cjs.mjs",
+      "default": "./dist/sigma-node-image.cjs.js"
+    }
   },
   "devDependencies": {
     "@types/chroma-js": "^2.4.3",

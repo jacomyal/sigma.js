@@ -30,7 +30,10 @@
     "@storybook/html-vite": "^7.6.12",
     "@storybook/html-webpack5": "^7.6.12",
     "@storybook/test": "^7.6.12",
+    "@storybook/react": "^7.6.12",
     "@storybook/web-components": "^7.6.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "storybook-addon-run-script": "^0.1.4",
     "storybook": "^7.6.12"
   },

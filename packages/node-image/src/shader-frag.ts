@@ -1,5 +1,5 @@
 // language=GLSL
-const FRAGMENT_SHADER_SOURCE = /*glsl*/ `
+const SHADER_SOURCE = /*glsl*/ `
 precision mediump float;
 
 varying vec4 v_color;
@@ -85,4 +85,4 @@ void main(void) {
 }
 `;
 
-export default FRAGMENT_SHADER_SOURCE;
+export default SHADER_SOURCE;
