@@ -86,7 +86,7 @@ export async function takeScreenshots(tests: Tests, folder: string, port = 8000,
           const dimensions = test.dimensions || { width: 800, height: 600 };
           await page.setViewport(dimensions);
 
-          // _bindLogs(page, `[${test.name} -> page]`);
+          _bindLogs(page, `[${test.name} -> page]`);
           test.scenario(page);
 
           // Taking the screenshot
@@ -134,7 +134,7 @@ export async function getReport(tests: Tests, runs: number, headless: boolean, p
         await page.setViewport(dimensions);
 
         const t1 = Date.now();
-        // _bindLogs(page, `[${test.name} -> page]`);
+        _bindLogs(page, `[${test.name} -> page]`);
         await test.scenario(page);
         const time = Date.now() - t1;
         records.push(time);

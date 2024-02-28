@@ -47,6 +47,8 @@ function getTest(method: Method, screenSize: Size, graphSize: Size): Test {
                 // This simulates a user interaction, that triggers a render of the graph:
                 camera.setState({ angle: camera.angle + 0.1 });
               }, times);
+            default:
+              return;
           }
         },
         method,

@@ -241,7 +241,7 @@ const tests: Tests = [
           container,
         } = dependencies;
 
-        const nodeReducer = (key: string, attr: Partial<NodeDisplayData>) => {
+        const nodeReducer = (_key: string, attr: Partial<NodeDisplayData>) => {
           const data = attr as NodeDisplayData;
           return Object.assign({}, data, { color: (data.label || "").charCodeAt(0) % 2 === 0 ? "#1E90FF" : "#FF0000" });
         };

@@ -134,6 +134,8 @@ export default class TouchCaptor extends Captor<TouchCaptorEvents> {
     }
 
     switch (this.touchMode) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       case 2:
         if (e.touches.length === 1) {
           this.handleStart(e);

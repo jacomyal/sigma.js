@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "test": "npm run test --workspace=sigma",
     "storybook:run": "npm run start --workspace=@sigma/storybook",
-    "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook"
+    "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@babel/core": "^7.23.9",
