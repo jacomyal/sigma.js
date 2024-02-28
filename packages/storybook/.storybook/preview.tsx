@@ -1,6 +1,6 @@
 import { Preview } from "@storybook/html";
 
-const forceReloadDecorator = (storyFn, context) => {
+const forceReloadDecorator: Preview["decorators"] = (storyFn, context) => {
   if (context.globals.shouldReload) {
     // Change search params of the iframe
     const searchParams = new URLSearchParams(window.parent.location.search);
@@ -16,7 +16,7 @@ const forceReloadDecorator = (storyFn, context) => {
     window.location.reload();
 
     // The reload is fired, but the story renderer is already started.
-    // To avoid blink effect and console error, we returns the template inside a full
+    // To avoid blink effect and console error, we return the template inside a full
     // invisible div
     return `<div style="height:100%;width:100%;visibility:hidden">${storyFn()}</div>`;
   }
