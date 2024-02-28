@@ -16,20 +16,14 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "lint": "eslint $npm_package_config_folders --ext .ts",
-    "postpublish": "npm run clean",
-    "prepublishOnly": "cp ../../README.md . && npm run lint && npm test",
-    "reinstall": "rimraf examples/node_modules && rimraf demo/node_modules && rimraf node_modules && npm i && npm run clean",
+    "build-bundle": "vite build",
+    "prepublishOnly": "cp ../../README.md . && npm run build-bundle",
     "test": "npm run unit:test && npm run e2e:test",
     "unit:test": "mocha --require ts-node/register ./test/unit/**/*.ts",
     "e2e:test": "mocha --require ts-node/register test/e2e/screenshots.spec.ts",
     "e2e:generate-screenshots": "node -r ts-node/register test/e2e/bin/generate-screenshots.ts",
     "e2e:benchmark": "node -r ts-node/register test/e2e/bin/benchmark.ts",
     "e2e:compare-benchmarks": "node -r ts-node/register test/e2e/bin/compare-benchmarks.ts"
-  },
-  "config": {
-    "clean": "build core rendering utils index.js index.d.ts index-bundle.js index-bundle.d.ts settings.js settings.d.ts sigma.js sigma.d.ts types.js types.d.ts",
-    "folders": "src test"
   },
   "repository": {
     "type": "git",
@@ -87,6 +81,7 @@
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
+    "vite": "^5.1.4",
     "webpack": "^5.90.1",
     "webpack-dev-server": "^4.15.1"
   },
