@@ -42,7 +42,7 @@ Basically, we draw two images: One that the users see, with proper nodes and edg
 
 Each program must provide code to render on both the normal image and the picking image. For this, we use a "preprocessor" called `PICKING_MODE`. When the program is used to generate the normal image, `PICKING_MODE` is `false`, while it's `true` for picking. Please read the existing programs to have a better idea on how to use that.
 
-## Existing programs
+## Core programs
 
 Sigma.js comes with a set of predefined programs:
 
@@ -60,6 +60,10 @@ Sigma.js comes with a set of predefined programs:
 
 - **`node.circle`**: This method displays nodes as squares, represented by two triangles (similar to `edge.rectangle`). A circle is then "carved" into this square in the fragment shader.
 
-- **`node.image`**: This method operates similarly to `node.point`, but it fills the circles with images using a texture atlas.
-
 For a deeper understanding and practical examples, developers are encouraged to explore the existing sigma.js sources and examples. This hands-on approach will provide a clearer picture of how to effectively use and customize renderers in sigma.js.
+
+## Additional programs
+
+Some more programs are also exposed, but as they carry more complexity, they are published as additional packages.
+
+- [**`@sigma/node-image`**](https://www.npmjs.com/package/@sigma/node-image): This package exposes a factory to create a program that operates similarly to `node.circle`, but filling the circles with images using a texture atlas.

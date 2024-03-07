@@ -9,7 +9,7 @@ Sigma.js offers a variety of resources to assist developers in understanding and
 
 1. **Documentation**: This documentation provides in-depth information on sigma.js-specific topics. It covers both foundational concepts and advanced features, ensuring developers have a comprehensive understanding of the library.
 
-2. **Examples**: For practical insights, sigma.js includes a set of [examples](https://github.com/jacomyal/sigma.js/tree/main/examples) that address diverse challenges and scenarios. These examples serve as hands-on guides, demonstrating how different problems can be tackled using the library.
+2. **Storybook**: For practical insights, sigma.js includes a set of examples base on [Storybook](https://storybook.js.org/). It is published [on the website](https://sigmajs.org/storybook), and addresses diverse challenges and scenarios. These examples serve as hands-on guides, demonstrating how different problems can be tackled using the library.
 
 3. **Source Code**: To delve deeper into the workings of sigma.js, the source code is a valuable resource. It is extensively commented, offering clarity on the library's operations and functionalities.
 
