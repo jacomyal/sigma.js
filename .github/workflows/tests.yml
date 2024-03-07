@@ -42,7 +42,7 @@ jobs:
 
       - name: Check for linting errors
         continue-on-error: true
-        run: npm lint
+        run: npm run lint
 
       - name: Run all tests
         run: npm run test
