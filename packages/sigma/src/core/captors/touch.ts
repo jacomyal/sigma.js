@@ -31,12 +31,11 @@ export type TouchCaptorEvents = {
  *
  * @constructor
  */
-export default class TouchCaptor<N extends Attributes, E extends Attributes, G extends Attributes> extends Captor<
-  TouchCaptorEvents,
-  N,
-  E,
-  G
-> {
+export default class TouchCaptor<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends Captor<TouchCaptorEvents, N, E, G> {
   enabled = true;
   isMoving = false;
   hasMoved = false;

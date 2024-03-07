@@ -1,9 +1,14 @@
 import { Attributes } from "graphology-types";
+
 import { Settings } from "../settings";
 import { NodeDisplayData, PartialButFor } from "../types";
 import { drawDiscNodeLabel } from "./node-labels";
 
-export type NodeHoverDrawingFunction<N extends Attributes, E extends Attributes, G extends Attributes> = (
+export type NodeHoverDrawingFunction<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = (
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings<N, E, G>,
@@ -15,7 +20,11 @@ export type NodeHoverDrawingFunction<N extends Attributes, E extends Attributes,
  * - if the label box is bigger than node size => display a label box that contains the node with a shadow
  * - else node with shadow and the label box
  */
-export function drawDiscNodeHover<N extends Attributes, E extends Attributes, G extends Attributes>(
+export function drawDiscNodeHover<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
   settings: Settings<N, E, G>,

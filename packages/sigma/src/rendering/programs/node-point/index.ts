@@ -21,10 +21,10 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
 export default class NodePointProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
-> extends NodeProgram<N, E, G, (typeof UNIFORMS)[number]> {
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
   getDefinition() {
     return {
       VERTICES: 1,

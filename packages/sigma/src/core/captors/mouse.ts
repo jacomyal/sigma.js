@@ -45,12 +45,11 @@ export type MouseCaptorEvents = {
  *
  * @constructor
  */
-export default class MouseCaptor<N extends Attributes, E extends Attributes, G extends Attributes> extends Captor<
-  MouseCaptorEvents,
-  N,
-  E,
-  G
-> {
+export default class MouseCaptor<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends Captor<MouseCaptorEvents, N, E, G> {
   // State
   enabled = true;
   draggedEvents = 0;

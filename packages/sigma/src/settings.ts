@@ -27,7 +27,11 @@ import { assign } from "./utils";
  * Sigma.js settings
  * =================================
  */
-export interface Settings<N extends Attributes, E extends Attributes, G extends Attributes> {
+export interface Settings<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> {
   // Performance
   hideEdgesOnMove: boolean;
   hideLabelsOnMove: boolean;
@@ -137,9 +141,11 @@ export const DEFAULT_EDGE_PROGRAM_CLASSES: Record<string, EdgeProgramType> = {
   line: EdgeRectangleProgram,
 };
 
-export function validateSettings<N extends Attributes, E extends Attributes, G extends Attributes>(
-  settings: Settings<N, E, G>,
-): void {
+export function validateSettings<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(settings: Settings<N, E, G>): void {
   if (typeof settings.labelDensity !== "number" || settings.labelDensity < 0) {
     throw new Error("Settings: invalid `labelDensity`. Expecting a positive number.");
   }

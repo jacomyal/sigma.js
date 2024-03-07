@@ -3,7 +3,11 @@ import { Attributes } from "graphology-types";
 import { Settings } from "../settings";
 import { EdgeDisplayData, NodeDisplayData, PartialButFor } from "../types";
 
-export type EdgeLabelDrawingFunction<N extends Attributes, E extends Attributes, G extends Attributes> = (
+export type EdgeLabelDrawingFunction<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = (
   context: CanvasRenderingContext2D,
   edgeData: PartialButFor<EdgeDisplayData, "label" | "color" | "size">,
   sourceData: PartialButFor<NodeDisplayData, "x" | "y" | "size">,
@@ -11,7 +15,11 @@ export type EdgeLabelDrawingFunction<N extends Attributes, E extends Attributes,
   settings: Settings<N, E, G>,
 ) => void;
 
-export function drawStraightEdgeLabel<N extends Attributes, E extends Attributes, G extends Attributes>(
+export function drawStraightEdgeLabel<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
   context: CanvasRenderingContext2D,
   edgeData: PartialButFor<EdgeDisplayData, "label" | "color" | "size">,
   sourceData: PartialButFor<NodeDisplayData, "x" | "y" | "size">,

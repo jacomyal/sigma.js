@@ -13,9 +13,9 @@ import { EdgeLabelDrawingFunction } from "./edge-labels";
 import { AbstractProgram, Program } from "./program";
 
 export abstract class AbstractEdgeProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
 > extends AbstractProgram<N, E, G> {
   abstract drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined;
 
@@ -29,12 +29,12 @@ export abstract class AbstractEdgeProgram<
 }
 
 export abstract class EdgeProgram<
-    N extends Attributes,
-    E extends Attributes,
-    G extends Attributes,
     Uniform extends string = string,
+    N extends Attributes = Attributes,
+    E extends Attributes = Attributes,
+    G extends Attributes = Attributes,
   >
-  extends Program<N, E, G, Uniform>
+  extends Program<Uniform, N, E, G>
   implements AbstractEdgeProgram<N, E, G>
 {
   drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined = undefined;
@@ -117,7 +117,11 @@ export type EdgeProgramType<
  * @param  {function} drawLabel - An optional edge "draw label" function.
  * @return {function}
  */
-export function createEdgeCompoundProgram<N extends Attributes, E extends Attributes, G extends Attributes>(
+export function createEdgeCompoundProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
   programClasses: Array<EdgeProgramType<N, E, G>>,
   drawLabel?: EdgeLabelDrawingFunction<N, E, G>,
 ): EdgeProgramType<N, E, G> {

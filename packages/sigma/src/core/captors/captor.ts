@@ -107,9 +107,9 @@ export function getWheelDelta(e: WheelEvent): number {
  */
 export default abstract class Captor<
   Events extends EventsMapping,
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
 > extends TypedEventEmitter<Events> {
   container: HTMLElement;
   renderer: Sigma<N, E, G>;

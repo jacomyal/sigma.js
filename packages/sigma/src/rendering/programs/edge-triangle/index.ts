@@ -19,10 +19,10 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
 
 export default class EdgeTriangleProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
-> extends EdgeProgram<N, E, G, (typeof UNIFORMS)[number]> {
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
   getDefinition() {
     return {
       VERTICES: 3,

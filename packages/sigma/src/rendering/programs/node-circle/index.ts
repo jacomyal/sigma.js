@@ -22,10 +22,10 @@ const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
 
 export default class NodeCircleProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
-> extends NodeProgram<N, E, G, (typeof UNIFORMS)[number]> {
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;

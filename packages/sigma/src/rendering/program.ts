@@ -66,7 +66,11 @@ export interface InstancedProgramDefinition<Uniform extends string = string> ext
   CONSTANT_DATA: number[][];
 }
 
-export abstract class AbstractProgram<N extends Attributes, E extends Attributes, G extends Attributes> {
+export abstract class AbstractProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
@@ -75,10 +79,10 @@ export abstract class AbstractProgram<N extends Attributes, E extends Attributes
 }
 
 export abstract class Program<
-    N extends Attributes,
-    E extends Attributes,
-    G extends Attributes,
     Uniform extends string = string,
+    N extends Attributes = Attributes,
+    E extends Attributes = Attributes,
+    G extends Attributes = Attributes,
   >
   implements AbstractProgram<N, E, G>, InstancedProgramDefinition
 {

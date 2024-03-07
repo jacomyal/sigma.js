@@ -50,9 +50,11 @@ const UNIFORMS = [
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeImageProgram<N extends Attributes, E extends Attributes, G extends Attributes>(
-  options?: Partial<CreateNodeImageProgramOptions<N, E, G>>,
-): NodeProgramType<N, E, G> {
+export default function getNodeImageProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(options?: Partial<CreateNodeImageProgramOptions<N, E, G>>): NodeProgramType<N, E, G> {
   const {
     drawHover,
     drawLabel,
@@ -74,7 +76,7 @@ export default function getNodeImageProgram<N extends Attributes, E extends Attr
    */
   const textureManager = new TextureManager(textureManagerOptions);
 
-  return class NodeImageProgram extends NodeProgram<N, E, G, (typeof UNIFORMS)[number]> {
+  return class NodeImageProgram extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;

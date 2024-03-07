@@ -55,11 +55,11 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
  * Important functions.
  */
-function applyNodeDefaults<N extends Attributes, E extends Attributes, G extends Attributes>(
-  settings: Settings<N, E, G>,
-  key: string,
-  data: Partial<NodeDisplayData>,
-): NodeDisplayData {
+function applyNodeDefaults<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(settings: Settings<N, E, G>, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
   if (!hasOwnProperty.call(data, "x") || !hasOwnProperty.call(data, "y"))
     throw new Error(
       `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
@@ -87,11 +87,11 @@ function applyNodeDefaults<N extends Attributes, E extends Attributes, G extends
   return data as NodeDisplayData;
 }
 
-function applyEdgeDefaults<N extends Attributes, E extends Attributes, G extends Attributes>(
-  settings: Settings<N, E, G>,
-  _key: string,
-  data: Partial<EdgeDisplayData>,
-): EdgeDisplayData {
+function applyEdgeDefaults<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(settings: Settings<N, E, G>, _key: string, data: Partial<EdgeDisplayData>): EdgeDisplayData {
   if (!data.color) data.color = settings.defaultEdgeColor;
 
   if (!data.label) data.label = "";

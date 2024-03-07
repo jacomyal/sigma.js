@@ -14,9 +14,9 @@ import { NodeLabelDrawingFunction } from "./node-labels";
 import { AbstractProgram, Program } from "./program";
 
 export abstract class AbstractNodeProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
 > extends AbstractProgram<N, E, G> {
   abstract drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
   abstract drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
@@ -24,12 +24,12 @@ export abstract class AbstractNodeProgram<
 }
 
 export abstract class NodeProgram<
-    N extends Attributes,
-    E extends Attributes,
-    G extends Attributes,
     Uniform extends string = string,
+    N extends Attributes = Attributes,
+    E extends Attributes = Attributes,
+    G extends Attributes = Attributes,
   >
-  extends Program<N, E, G, Uniform>
+  extends Program<Uniform, N, E, G>
   implements AbstractNodeProgram<N, E, G>
 {
   drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
@@ -55,8 +55,11 @@ export abstract class NodeProgram<
   abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
 }
 
-class NodeImageClass<N extends Attributes, E extends Attributes, G extends Attributes>
-  implements AbstractNodeProgram<N, E, G>
+class NodeImageClass<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> implements AbstractNodeProgram<N, E, G>
 {
   constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
     return this;
@@ -93,7 +96,11 @@ export type NodeProgramType<
  * @param  {function} drawHover - An optional node "draw hover" function.
  * @return {function}
  */
-export function createNodeCompoundProgram<N extends Attributes, E extends Attributes, G extends Attributes>(
+export function createNodeCompoundProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
   programClasses: NonEmptyArray<NodeProgramType<N, E, G>>,
   drawLabel?: NodeLabelDrawingFunction<N, E, G>,
   drawHover?: NodeLabelDrawingFunction<N, E, G>,

@@ -18,9 +18,9 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 export default class EdgeClampedProgram<
-  N extends Attributes,
-  E extends Attributes,
-  G extends Attributes,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
 > extends EdgeRectangleProgram<N, E, G> {
   getDefinition() {
     return {
