@@ -45,15 +45,5 @@
       "import": "./dist/sigma-node-image.cjs.mjs",
       "default": "./dist/sigma-node-image.cjs.js"
     }
-  },
-  "devDependencies": {
-    "@types/chroma-js": "^2.4.3",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "chroma-js": "^2.4.2",
-    "eslint": "^8.56.0",
-    "graphology": "^0.25.4",
-    "vite": "^5.0.10",
-    "vite-plugin-dts": "^3.7.0"
   }
 }

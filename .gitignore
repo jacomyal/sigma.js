@@ -2,19 +2,6 @@ node_modules
 *.tgz
 *.log
 *.swp
-.cache
-.parcel-cache
-.kotatsu
 .DS_Store
 .idea
 .vscode
-build
-dist
-/www
-packages/test/e2e/reports
-packages/test/e2e/screenshots/*.current.png
-packages/test/e2e/screenshots/*.diff.png
-packages/storybook/storybook-static
-
-# Built sources:
-packages/sigma/README.md

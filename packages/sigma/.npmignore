@@ -1,0 +1,5 @@
+.gitignore
+node_modules
+src
+tsconfig.json
+vite.config.mts

@@ -17,7 +17,7 @@
   "sideEffects": false,
   "scripts": {
     "build-bundle": "vite build",
-    "prepublishOnly": "cp ../../README.md . && npm run build-bundle"
+    "prepublishOnly": "cp ../../README.md ."
   },
   "repository": {
     "type": "git",
