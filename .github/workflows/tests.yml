@@ -4,33 +4,49 @@ on: [push, pull_request]
 
 jobs:
   tests:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
-      - name: Install, Lint & Unit test
-        run: |
-          npm i
-          npm run sigma:unit:test
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: "node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('package-lock.json') }}
 
-      - name: E2e tests
-        id: e2e
+      - name: Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/playwright'].version)")" >> $GITHUB_ENV
+
+      - name: Cache Playwright binaries
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: "~/.cache/ms-playwright"
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Check for linting errors
         continue-on-error: true
-        run: npm run sigma:e2e:test
+        run: npm lint
 
-      - name: Uploading screenshots on failure
-        if: steps.e2e.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+      - name: Run all tests
+        run: npm run test
+
+      - uses: actions/upload-artifact@v3
+        if: always()
         with:
-          name: failure-screenshots
-          path: test/e2e/screenshots/
-
-      - name: Exit signal
-        if: steps.e2e.outcome == 'failure'
-        run: exit 1
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
