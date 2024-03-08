@@ -1,15 +1,7 @@
-/**
- * Sigma.js Animation Helpers
- * ===========================
- *
- * Handy helper functions dealing with nodes & edges attributes animation.
- * @module
- */
 import Graph from "graphology-types";
 
 import { PlainObject } from "../types";
 import { easings } from "./easings";
-import { cancelFrame, requestFrame } from "./index";
 
 /**
  * Defaults.
@@ -79,12 +71,12 @@ export function animateNodes(
       for (const k in attrs) graph.setNodeAttribute(node, k, attrs[k] * p + s[k] * (1 - p));
     }
 
-    frame = requestFrame(step);
+    frame = requestAnimationFrame(step);
   };
 
   step();
 
   return () => {
-    if (frame) cancelFrame(frame);
+    if (frame) cancelAnimationFrame(frame);
   };
 }

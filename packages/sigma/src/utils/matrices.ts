@@ -1,10 +1,3 @@
-/**
- * Sigma.js WebGL Matrices Helpers
- * ================================
- *
- * Matrices-related helper functions used by sigma's WebGL renderer.
- * @module
- */
 import { Coordinates } from "../types";
 
 export function identity(): Float32Array {

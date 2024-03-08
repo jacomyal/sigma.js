@@ -1,10 +1,3 @@
-/**
- * Sigma.js Easings
- * =================
- *
- * Handy collection of easing functions.
- * @module
- */
 export const linear = (k: number): number => k;
 
 export const quadraticIn = (k: number): number => k * k;

@@ -6,7 +6,7 @@
  * @module
  */
 import { CameraState, TypedEventEmitter } from "../types";
-import { ANIMATE_DEFAULTS, AnimateOptions, cancelFrame, easings, requestFrame } from "../utils";
+import { ANIMATE_DEFAULTS, AnimateOptions, easings } from "../utils";
 
 /**
  * Defaults.
@@ -246,13 +246,13 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
       this.setState(newState);
 
-      this.nextFrame = requestFrame(fn);
+      this.nextFrame = requestAnimationFrame(fn);
     };
 
     if (this.nextFrame) {
-      cancelFrame(this.nextFrame);
+      cancelAnimationFrame(this.nextFrame);
       if (this.animationCallback) this.animationCallback.call(null);
-      this.nextFrame = requestFrame(fn);
+      this.nextFrame = requestAnimationFrame(fn);
     } else {
       fn();
     }

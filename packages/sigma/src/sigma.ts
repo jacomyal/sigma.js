@@ -28,7 +28,6 @@ import {
 } from "./types";
 import {
   NormalizationFunction,
-  cancelFrame,
   colorToIndex,
   createElement,
   createNormalizationFunction,
@@ -40,7 +39,6 @@ import {
   identity,
   matrixFromCamera,
   multiplyVec2,
-  requestFrame,
   validateGraph,
   zIndexOrdering,
 } from "./utils";
@@ -1155,7 +1153,7 @@ export default class Sigma<
   private scheduleHighlightedNodesRender(): void {
     if (this.renderHighlightedNodesFrame || this.renderFrame) return;
 
-    this.renderHighlightedNodesFrame = requestFrame(() => {
+    this.renderHighlightedNodesFrame = requestAnimationFrame(() => {
       // Resetting state
       this.renderHighlightedNodesFrame = null;
 
@@ -1180,7 +1178,7 @@ export default class Sigma<
 
     // If a render was scheduled, we cancel it
     if (this.renderFrame) {
-      cancelFrame(this.renderFrame);
+      cancelAnimationFrame(this.renderFrame);
       this.renderFrame = null;
     }
 
@@ -1542,7 +1540,7 @@ export default class Sigma<
     this.unbindGraphHandlers();
 
     if (this.checkEdgesEventsFrame !== null) {
-      cancelFrame(this.checkEdgesEventsFrame);
+      cancelAnimationFrame(this.checkEdgesEventsFrame);
       this.checkEdgesEventsFrame = null;
     }
 
@@ -1852,7 +1850,7 @@ export default class Sigma<
    */
   scheduleRender(): this {
     if (!this.renderFrame) {
-      this.renderFrame = requestFrame(() => {
+      this.renderFrame = requestAnimationFrame(() => {
         this.render();
       });
     }
@@ -2099,12 +2097,12 @@ export default class Sigma<
 
     // Clearing frames
     if (this.renderFrame) {
-      cancelFrame(this.renderFrame);
+      cancelAnimationFrame(this.renderFrame);
       this.renderFrame = null;
     }
 
     if (this.renderHighlightedNodesFrame) {
-      cancelFrame(this.renderHighlightedNodesFrame);
+      cancelAnimationFrame(this.renderHighlightedNodesFrame);
       this.renderHighlightedNodesFrame = null;
     }
 
