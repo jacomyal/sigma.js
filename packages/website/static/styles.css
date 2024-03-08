@@ -399,6 +399,49 @@ main #usecases .thumbnail > div {
 main #usecases .thumbnail:hover > div {
   transform: scale(1.1);
 }
+main #inthewild .usages {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+main #inthewild .usages::after {
+  content: " ";
+  flex: auto;
+}
+main #inthewild .usages > div {
+  width: 323px;
+  margin-right: 0.5em;
+  margin-bottom: 1em;
+}
+main #inthewild .thumbnail {
+  display: block;
+  height: 176px;
+  overflow: hidden;
+}
+main #inthewild .thumbnail > div {
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: var(--transition);
+  background-blend-mode: multiply;
+  background-color: lightgray;
+}
+main #inthewild .thumbnail:hover {
+  box-shadow: 0 0 8px var(--dark-grey);
+}
+main #inthewild .thumbnail:hover > div {
+  transform: scale(1.1);
+  background-color: transparent;
+}
+main #inthewild .sumup {
+  margin: 1em;
+  width: 100%;
+}
+main #inthewild .sumup h3,
+main #inthewild .sumup p {
+  margin: 0;
+}
 main #faq ul {
   padding: 0;
   list-style: none;
