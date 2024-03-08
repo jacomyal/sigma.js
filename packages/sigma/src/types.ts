@@ -129,6 +129,44 @@ export class TypedEventEmitter<Events extends EventsMapping> extends (EventEmitt
 }
 
 /**
+ * Event types.
+ */
+export interface SigmaEventPayload {
+  event: MouseCoords;
+  preventSigmaDefault(): void;
+}
+
+export type SigmaStageEventPayload = SigmaEventPayload;
+export interface SigmaNodeEventPayload extends SigmaEventPayload {
+  node: string;
+}
+export interface SigmaEdgeEventPayload extends SigmaEventPayload {
+  edge: string;
+}
+
+export type SigmaStageEvents = {
+  [E in MouseInteraction as `${E}Stage`]: (payload: SigmaStageEventPayload) => void;
+};
+
+export type SigmaNodeEvents = {
+  [E in MouseInteraction as `${E}Node`]: (payload: SigmaNodeEventPayload) => void;
+};
+
+export type SigmaEdgeEvents = {
+  [E in MouseInteraction as `${E}Edge`]: (payload: SigmaEdgeEventPayload) => void;
+};
+
+export type SigmaAdditionalEvents = {
+  // Lifecycle events
+  beforeRender(): void;
+  afterRender(): void;
+  resize(): void;
+  kill(): void;
+};
+
+export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
+
+/**
  * Export various other types:
  */
 export type { CameraEvents } from "./core/camera";
