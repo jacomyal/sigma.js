@@ -127,3 +127,10 @@ export class TypedEventEmitter<Events extends EventsMapping> extends (EventEmitt
     this.rawEmitter = this as EventEmitter;
   }
 }
+
+/**
+ * Export various other types:
+ */
+export type { CameraEvents } from "./core/camera";
+export type { MouseCaptorEvents } from "./core/captors/mouse";
+export type { TouchCaptorEvents, FakeSigmaMouseEvent } from "./core/captors/touch";

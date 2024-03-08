@@ -17,6 +17,9 @@ export { drawDiscNodeLabel } from "./node-labels";
 export type { NodeHoverDrawingFunction } from "./node-hover";
 export { drawDiscNodeHover } from "./node-hover";
 
+// Other various program helpers
+export * from "./utils";
+
 // Built-in node programs
 export { default as NodeCircleProgram } from "./programs/node-circle";
 export { default as NodePointProgram } from "./programs/node-point";
