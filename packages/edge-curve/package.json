@@ -1,10 +1,10 @@
 {
-  "name": "@sigma/node-image",
-  "version": "3.0.0-beta.5",
-  "description": "A node program that renders images for sigma.js",
-  "main": "dist/sigma-node-image.cjs.js",
-  "module": "dist/sigma-node-image.esm.js",
-  "types": "dist/sigma-node-image.cjs.d.ts",
+  "name": "@sigma/edge-curve",
+  "version": "3.0.0-beta.1",
+  "description": "An edge program that renders edges as curves for sigma.js",
+  "main": "dist/sigma-edge-curve.cjs.js",
+  "module": "dist/sigma-edge-curve.esm.js",
+  "types": "dist/sigma-edge-curve.cjs.d.ts",
   "files": [
     "/dist"
   ],
@@ -22,12 +22,12 @@
   ],
   "contributors": [
     {
-      "name": "Alexis Jacomy",
-      "url": "http://github.com/jacomyal"
-    },
-    {
       "name": "Guillaume Plique",
       "url": "http://github.com/Yomguithereal"
+    },
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
     }
   ],
   "license": "MIT",
@@ -41,9 +41,9 @@
   },
   "exports": {
     ".": {
-      "module": "./dist/sigma-node-image.esm.js",
-      "import": "./dist/sigma-node-image.cjs.mjs",
-      "default": "./dist/sigma-node-image.cjs.js"
+      "module": "./dist/sigma-edge-curve.esm.js",
+      "import": "./dist/sigma-edge-curve.cjs.mjs",
+      "default": "./dist/sigma-edge-curve.cjs.js"
     }
   }
 }

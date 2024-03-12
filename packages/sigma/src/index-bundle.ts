@@ -7,7 +7,8 @@
  * useful classes as static properties.
  * @module
  */
-import { NodeImageProgram } from "@sigma/node-image";
+import EdgeCurveProgram from "@sigma/edge-curve";
+import { createNodeImageProgram } from "@sigma/node-image";
 
 import * as rendering from "./rendering";
 import * as utils from "./utils";
@@ -20,7 +21,7 @@ class Sigma extends SigmaClass {
   static MouseCaptor = MouseCaptor;
   static Sigma = SigmaClass;
 
-  static rendering = { ...rendering, NodeImageProgram };
+  static rendering = { ...rendering, createNodeImageProgram, EdgeCurveProgram };
   static utils = utils;
 }
 

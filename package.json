@@ -33,7 +33,8 @@
   "preconstruct": {
     "packages": [
       "packages/sigma",
-      "packages/node-image"
+      "packages/node-image",
+      "packages/edge-curve"
     ]
   }
 }
