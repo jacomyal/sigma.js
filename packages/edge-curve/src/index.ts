@@ -19,7 +19,7 @@ export default class EdgeCurveProgram<
 > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
   getDefinition() {
     return {
-      VERTICES: 4,
+      VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.TRIANGLES,
@@ -38,6 +38,8 @@ export default class EdgeCurveProgram<
       ],
       CONSTANT_DATA: [
         [0, 1],
+        [0, -1],
+        [1, 1],
         [0, -1],
         [1, 1],
         [1, -1],
