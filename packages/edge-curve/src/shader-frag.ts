@@ -12,7 +12,7 @@ float det(vec2 a, vec2 b) {
   return a.x * b.y - b.x * a.y;
 }
 
-vec2 get_distance_vector(vec2 b0, vec2 b1, vec2 b2) {
+vec2 getDistanceVector(vec2 b0, vec2 b1, vec2 b2) {
   float a = det(b0, b2), b = 2.0 * det(b1, b0), d = 2.0 * det(b2, b1);
   float f = b * d - a * a;
   vec2 d21 = b2 - b1, d10 = b1 - b0, d20 = b2 - b0;
@@ -26,7 +26,7 @@ vec2 get_distance_vector(vec2 b0, vec2 b1, vec2 b2) {
 }
 
 float distToQuadraticBezierCurve(vec2 p, vec2 b0, vec2 b1, vec2 b2) {
-  return length(get_distance_vector(b0 - p, b1 - p, b2 - p));
+  return length(getDistanceVector(b0 - p, b1 - p, b2 - p));
 }
 
 const float epsilon = 0.7;

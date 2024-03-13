@@ -1,5 +1,6 @@
 // language=GLSL
 const VERTEX_SHADER_SOURCE = /*glsl*/ `
+attribute vec4 a_id;
 attribute vec4 a_color;
 attribute float a_direction;
 attribute float a_thickness;

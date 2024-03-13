@@ -3,10 +3,10 @@ import Graph from "graphology";
 import Sigma from "sigma";
 
 import EdgeCurveProgram from "../index.ts";
-import data from "./data.json";
+import data from "./data/les-miserables.json";
 import "./stage.css";
 
-const createPictogramsStage = () => {
+const createStage = () => {
   const stage = document.createElement("div");
   stage.classList.add("stage");
 
@@ -24,17 +24,17 @@ const createPictogramsStage = () => {
   return stage;
 };
 
-const meta: Meta<typeof createPictogramsStage> = {
+const meta: Meta<typeof createStage> = {
   title: "edge-curve",
-  render: () => createPictogramsStage(),
+  render: () => createStage(),
   parameters: {
     layout: "fullscreen",
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof createPictogramsStage>;
+type Story = StoryObj<typeof createStage>;
 
-export const ComparisonExample: Story = {
-  name: "All features at once",
+export const BasicExample: Story = {
+  name: "Basic example",
 };

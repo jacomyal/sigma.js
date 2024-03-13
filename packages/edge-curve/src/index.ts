@@ -1,22 +1,24 @@
 import { Attributes } from "graphology-types";
 import { EdgeProgram, ProgramInfo } from "sigma/rendering";
-import { EdgeDisplayData, NodeDisplayData, RenderParams } from "sigma/types";
+import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
+import { drawCurvedEdgeLabel } from "./edge-labels.ts";
 import FRAGMENT_SHADER_SOURCE from "./shader-frag";
 import VERTEX_SHADER_SOURCE from "./shader-vert";
+import { CurvedEdgeDisplayData, DEFAULT_EDGE_CURVATURE } from "./utils.ts";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_dimensions", "u_pixelRatio"] as const;
-
-const DEFAULT_EDGE_CURVATURE = 0.25;
 
 export default class EdgeCurveProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  drawLabel = drawCurvedEdgeLabel;
+
   getDefinition() {
     return {
       VERTICES: 6,
@@ -52,7 +54,7 @@ export default class EdgeCurveProgram<
     startIndex: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
-    data: EdgeDisplayData & { curvature?: number },
+    data: CurvedEdgeDisplayData,
   ) {
     const thickness = data.size || 1;
     const x1 = sourceData.x;
@@ -84,3 +86,5 @@ export default class EdgeCurveProgram<
     gl.uniform2f(u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
   }
 }
+
+export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils.ts";
