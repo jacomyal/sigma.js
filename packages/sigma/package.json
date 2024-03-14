@@ -40,10 +40,10 @@
   "license": "MIT",
   "dependencies": {
     "events": "^3.3.0",
-    "graphology-utils": "^2.5.0"
+    "graphology-utils": "^2.5.2"
   },
   "devDependencies": {
-    "vite": "^5.1.4"
+    "vite": "^5.1.6"
   },
   "keywords": [
     "graph",
