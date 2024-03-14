@@ -36,8 +36,12 @@ void main(void) {
   float dist = distToQuadraticBezierCurve(gl_FragCoord.xy, v_cpA, v_cpB, v_cpC);
 
   if (dist < v_thickness + epsilon) {
+    #ifdef PICKING_MODE
+    gl_FragColor = v_color;
+    #else
     float inCurve = 1.0 - smoothstep(v_thickness - epsilon, v_thickness + epsilon, dist);
     gl_FragColor = inCurve * vec4(v_color.rgb * v_color.a, v_color.a);
+    #endif
   } else {
     gl_FragColor = transparent;
   }
