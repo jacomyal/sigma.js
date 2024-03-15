@@ -49,10 +49,6 @@ export function indexParallelEdgesIndex(graph: Graph, options?: Partial<typeof D
     undirectedIndex[undirectedId].push(edge);
   });
 
-  let case1 = 0;
-  let case2 = 0;
-  let case3 = 0;
-
   // Store index attributes:
   for (const directedId in directedIndex) {
     const edges = directedIndex[directedId];
@@ -61,7 +57,6 @@ export function indexParallelEdgesIndex(graph: Graph, options?: Partial<typeof D
 
     // If the edge is alone, in both side:
     if (directedCount === 1 && undirectedCount === 1) {
-      case1++;
       const edge = edges[0];
       graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, null);
       graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, null);
@@ -69,7 +64,6 @@ export function indexParallelEdgesIndex(graph: Graph, options?: Partial<typeof D
 
     // If the edge is alone, but there is at least one edge in the opposite direction:
     else if (directedCount === 1) {
-      case2++;
       const edge = edges[0];
       graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, 0);
       graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, 1);
@@ -78,14 +72,10 @@ export function indexParallelEdgesIndex(graph: Graph, options?: Partial<typeof D
     // If the edge is not alone:
     else {
       for (let i = 0; i < directedCount; i++) {
-        case3++;
         const edge = edges[i];
         graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, i);
         graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, directedCount);
       }
     }
   }
-  console.log("case 1", case1);
-  console.log("case 2", case2);
-  console.log("case 3", case3);
 }
