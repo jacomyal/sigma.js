@@ -36,7 +36,7 @@ In this guide you will get an overview of the contribution workflow from opening
 
 3.  Test your contribution:
 
-    - Run the test suite locally: `npm run test && npm run e2e:test`
+    - Run the test suite locally: `npm run test`
 
 4.  Submit your contribution:
 

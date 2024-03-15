@@ -6,7 +6,8 @@
 
 - **Completely rewrites programs API**
 - **Renames all existing programs**
-- **Restructures sources as a multipackage repository (using [Lerna](https://lerna.js.org/))**
+- **Restructures sources as a multi-package repository (using [Lerna](https://lerna.js.org/))**
+- **Moves the `node.image` renderer as a new package [`@sigma/node-image`](https://www.npmjs.com/package/@sigma/node-image)**
 - **Moves `labelRenderer`, `hoverRenderer` and `edgeLabelRenderer` from settings to each renderer**
 
 ### Features
@@ -18,6 +19,7 @@
 - [#1346](https://github.com/jacomyal/sigma.js/issues/1346) Adds documentation in the website
 - [#1034](https://github.com/jacomyal/sigma.js/issues/1034) Adds new `Sigma.setCamera` method
 - [#1185](https://github.com/jacomyal/sigma.js/issues/1185) Adds new `zoomToSizeRatioFunction` and `itemSizesReference` setting
+- [#1231](https://github.com/jacomyal/sigma.js/issues/1231) Adds new [`@sigma/edge-curve`](https://www.npmjs.com/package/@sigma/edge-curve) renderer, as a new package
 
 ## 2.4.0
 
