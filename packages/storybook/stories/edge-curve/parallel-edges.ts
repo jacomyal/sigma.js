@@ -1,14 +1,10 @@
-import { Meta, StoryObj } from "@storybook/html";
+import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { MultiGraph } from "graphology";
 import Sigma from "sigma";
 import { EdgeArrowProgram } from "sigma/rendering";
 
-import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "../index.ts";
-import "./stage.css";
-
-const createStage = () => {
-  const stage = document.createElement("div");
-  stage.classList.add("stage");
+export default () => {
+  const container = document.getElementById("sigma-container") as HTMLElement;
 
   // Create a graph, with various parallel edges:
   const graph = new MultiGraph();
@@ -58,7 +54,7 @@ const createStage = () => {
     },
   );
 
-  new Sigma(graph, stage, {
+  new Sigma(graph, container, {
     allowInvalidContainer: true,
     defaultEdgeType: "straight",
     edgeProgramClasses: {
@@ -66,21 +62,4 @@ const createStage = () => {
       curved: EdgeCurveProgram,
     },
   });
-
-  return stage;
-};
-
-const meta: Meta<typeof createStage> = {
-  title: "edge-curve",
-  render: () => createStage(),
-  parameters: {
-    layout: "fullscreen",
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof createStage>;
-
-export const ParallelEdgesExample: Story = {
-  name: "Parallel edges",
 };

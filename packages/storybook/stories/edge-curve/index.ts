@@ -1,14 +1,10 @@
-import { Meta, StoryObj } from "@storybook/html";
+import { createNodeImageProgram } from "@sigma/node-image";
 import chroma from "chroma-js";
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import { createNodeImageProgram } from "../index.ts";
-import "./stage.css";
-
-const createPictogramsStage = () => {
-  const stage = document.createElement("div");
-  stage.classList.add("stage");
+export default () => {
+  const container = document.getElementById("sigma-container") as HTMLElement;
 
   const IMAGES = [
     // Images
@@ -130,7 +126,7 @@ const createPictogramsStage = () => {
     });
   });
 
-  new Sigma(graph, stage, {
+  new Sigma(graph, container, {
     allowInvalidContainer: true,
     stagePadding: 50,
     itemSizesReference: "positions",
@@ -144,20 +140,5 @@ const createPictogramsStage = () => {
     ),
   });
 
-  return stage;
-};
-
-const meta: Meta<typeof createPictogramsStage> = {
-  title: "node-image",
-  render: () => createPictogramsStage(),
-  parameters: {
-    layout: "fullscreen",
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof createPictogramsStage>;
-
-export const ComparisonExample: Story = {
-  name: "All features at once",
+  return container;
 };

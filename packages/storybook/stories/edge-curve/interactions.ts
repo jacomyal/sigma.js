@@ -1,21 +1,18 @@
-import { Meta, StoryObj } from "@storybook/html";
+import EdgeCurveProgram from "@sigma/edge-curve";
 import Graph from "graphology";
 import Sigma from "sigma";
 import { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 
-import EdgeCurveProgram from "../index.ts";
 import data from "./data/les-miserables.json";
-import "./stage.css";
 
-const createStage = () => {
-  const stage = document.createElement("div");
-  stage.classList.add("stage");
+export default () => {
+  const container = document.getElementById("sigma-container") as HTMLElement;
 
   const graph = new Graph();
   graph.import(data);
 
   let state: { type: "idle" } | { type: "hovered"; edge: string; source: string; target: string } = { type: "idle" };
-  const sigma = new Sigma(graph, stage, {
+  const sigma = new Sigma(graph, container, {
     allowInvalidContainer: true,
     enableEdgeEvents: true,
     defaultEdgeType: "curve",
@@ -63,21 +60,4 @@ const createStage = () => {
     state = { type: "idle" };
     sigma.refresh();
   });
-
-  return stage;
-};
-
-const meta: Meta<typeof createStage> = {
-  title: "edge-curve",
-  render: () => createStage(),
-  parameters: {
-    layout: "fullscreen",
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof createStage>;
-
-export const InteractionsExample: Story = {
-  name: "Interactions",
 };

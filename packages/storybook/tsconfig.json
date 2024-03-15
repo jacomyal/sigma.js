@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": [".storybook/*.tsx", "stories"]
+  "include": ["./types/raw.d.ts", ".storybook/*.tsx", "stories"]
 }
