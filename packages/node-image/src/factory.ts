@@ -1,6 +1,12 @@
 import { Attributes } from "graphology-types";
 import Sigma from "sigma";
-import { NodeLabelDrawingFunction, NodeProgram, NodeProgramType, ProgramInfo } from "sigma/rendering";
+import {
+  NodeHoverDrawingFunction,
+  NodeLabelDrawingFunction,
+  NodeProgram,
+  NodeProgramType,
+  ProgramInfo,
+} from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
@@ -19,10 +25,12 @@ interface CreateNodeImageProgramOptions<N extends Attributes, E extends Attribut
   keepWithinCircle: boolean;
   // Allows overriding drawLabel and drawHover returned class static methods.
   drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
-  drawHover: NodeLabelDrawingFunction<N, E, G> | undefined;
+  drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
   // The padding should be expressed as a [0, 1] percentage.
   // A padding of 0.05 will always be 5% of the diameter of a node.
   padding: number;
+  // Allows using a different color attribute name.
+  colorAttribute: string;
 }
 
 const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions<Attributes, Attributes, Attributes> = {
@@ -32,6 +40,7 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions<Attribute
   drawLabel: undefined,
   drawHover: undefined,
   padding: 0,
+  colorAttribute: "color",
 };
 
 const UNIFORMS = [
@@ -61,6 +70,7 @@ export default function getNodeImageProgram<
     drawingMode,
     keepWithinCircle,
     padding,
+    colorAttribute,
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions<N, E, G> = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
@@ -155,7 +165,7 @@ export default function getNodeImageProgram<
 
     processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData & { image?: string }): void {
       const array = this.array;
-      const color = floatColor(data.color);
+      const color = floatColor(data[colorAttribute as "color"]);
 
       const imageSource = data.image;
       const imagePosition = imageSource ? this.atlas[imageSource] : undefined;
