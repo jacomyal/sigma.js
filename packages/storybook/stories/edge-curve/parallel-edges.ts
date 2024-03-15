@@ -3,6 +3,8 @@ import { MultiGraph } from "graphology";
 import Sigma from "sigma";
 import { EdgeArrowProgram } from "sigma/rendering";
 
+import { onStoryDown } from "../utils";
+
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -54,12 +56,16 @@ export default () => {
     },
   );
 
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
     allowInvalidContainer: true,
     defaultEdgeType: "straight",
     edgeProgramClasses: {
       straight: EdgeArrowProgram,
       curved: EdgeCurveProgram,
     },
+  });
+
+  onStoryDown(() => {
+    renderer.kill();
   });
 };

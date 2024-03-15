@@ -3,6 +3,8 @@ import { MultiGraph } from "graphology";
 import Sigma from "sigma";
 import { EdgeArrowProgram } from "sigma/rendering";
 
+import { onStoryDown } from "../utils";
+
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -26,7 +28,7 @@ export default () => {
   graph.addEdge("e", "d", { forceLabel: true, size: 2, label: "works with", type: "curved" });
   graph.addEdge("f", "e", { forceLabel: true, label: "works with", type: "curved" });
 
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
     allowInvalidContainer: true,
     defaultEdgeType: "straight",
     renderEdgeLabels: true,
@@ -34,5 +36,9 @@ export default () => {
       straight: EdgeArrowProgram,
       curved: EdgeCurveProgram,
     },
+  });
+
+  onStoryDown(() => {
+    renderer.kill();
   });
 };

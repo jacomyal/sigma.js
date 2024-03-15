@@ -3,6 +3,7 @@ import Graph from "graphology";
 import Sigma from "sigma";
 import { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 
+import { onStoryDown } from "../utils";
 import data from "./data/les-miserables.json";
 
 export default () => {
@@ -59,5 +60,9 @@ export default () => {
   sigma.on("leaveEdge", () => {
     state = { type: "idle" };
     sigma.refresh();
+  });
+
+  onStoryDown(() => {
+    sigma.kill();
   });
 };

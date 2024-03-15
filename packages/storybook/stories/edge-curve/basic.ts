@@ -2,6 +2,7 @@ import EdgeCurveProgram from "@sigma/edge-curve";
 import Graph from "graphology";
 import Sigma from "sigma";
 
+import { onStoryDown } from "../utils";
 import data from "./data/les-miserables.json";
 
 export default () => {
@@ -10,11 +11,15 @@ export default () => {
   const graph = new Graph();
   graph.import(data);
 
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
     allowInvalidContainer: true,
     defaultEdgeType: "curve",
     edgeProgramClasses: {
       curve: EdgeCurveProgram,
     },
+  });
+
+  onStoryDown(() => {
+    renderer.kill();
   });
 };

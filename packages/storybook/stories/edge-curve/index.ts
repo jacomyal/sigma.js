@@ -3,6 +3,8 @@ import chroma from "chroma-js";
 import Graph from "graphology";
 import Sigma from "sigma";
 
+import { onStoryDown } from "../utils";
+
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -126,7 +128,7 @@ export default () => {
     });
   });
 
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
     allowInvalidContainer: true,
     stagePadding: 50,
     itemSizesReference: "positions",
@@ -140,5 +142,7 @@ export default () => {
     ),
   });
 
-  return container;
+  onStoryDown(() => {
+    renderer.kill();
+  });
 };
