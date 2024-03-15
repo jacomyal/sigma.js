@@ -2,9 +2,9 @@
  * Just some shortcuts to ease importing various rendering related things from
  * the codebase:
  */
-export { NodeProgram, AbstractNodeProgram } from "./node";
+export { NodeProgram, AbstractNodeProgram, createNodeCompoundProgram } from "./node";
 export type { NodeProgramType } from "./node";
-export { EdgeProgram, AbstractEdgeProgram } from "./edge";
+export { EdgeProgram, AbstractEdgeProgram, createEdgeCompoundProgram } from "./edge";
 export type { EdgeProgramType } from "./edge";
 export { Program, AbstractProgram } from "./program";
 export type { ProgramInfo, ProgramDefinition } from "./program";
