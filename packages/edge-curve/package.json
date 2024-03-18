@@ -44,6 +44,7 @@
       "module": "./dist/sigma-edge-curve.esm.js",
       "import": "./dist/sigma-edge-curve.cjs.mjs",
       "default": "./dist/sigma-edge-curve.cjs.js"
-    }
+    },
+    "./package.json": "./package.json"
   }
 }

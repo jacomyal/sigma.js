@@ -44,6 +44,7 @@
       "module": "./dist/sigma-node-image.esm.js",
       "import": "./dist/sigma-node-image.cjs.mjs",
       "default": "./dist/sigma-node-image.cjs.js"
-    }
+    },
+    "./package.json": "./package.json"
   }
 }

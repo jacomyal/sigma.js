@@ -78,15 +78,15 @@
       "import": "./settings/dist/sigma-settings.cjs.mjs",
       "default": "./settings/dist/sigma-settings.cjs.js"
     },
-    "./rendering": {
-      "module": "./rendering/dist/sigma-rendering.esm.js",
-      "import": "./rendering/dist/sigma-rendering.cjs.mjs",
-      "default": "./rendering/dist/sigma-rendering.cjs.js"
-    },
     "./utils": {
       "module": "./utils/dist/sigma-utils.esm.js",
       "import": "./utils/dist/sigma-utils.cjs.mjs",
       "default": "./utils/dist/sigma-utils.cjs.js"
+    },
+    "./rendering": {
+      "module": "./rendering/dist/sigma-rendering.esm.js",
+      "import": "./rendering/dist/sigma-rendering.cjs.mjs",
+      "default": "./rendering/dist/sigma-rendering.cjs.js"
     },
     "./package.json": "./package.json"
   }
