@@ -1,4 +1,4 @@
-import { createNodeImageProgram } from "@sigma/node-image";
+import { NodeImageProgram } from "@sigma/node-image";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
@@ -56,14 +56,16 @@ const dependencies: BrowserTestDependencies = {
   Graph,
   Sigma,
   data: { arctic, lesMiserables, largeGraph },
-  programs: {
+  nodePrograms: {
     NodeCircleProgram,
     NodePointProgram,
+    NodeImageProgram,
+  },
+  edgePrograms: {
     EdgeLineProgram,
     EdgeRectangleProgram,
     EdgeArrowProgram,
     EdgeTriangleProgram,
-    createNodeImageProgram,
   },
   container,
 

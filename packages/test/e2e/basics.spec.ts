@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { EdgeDisplayData, NodeDisplayData } from "sigma/types";
+
 import { BrowserTestDependencies } from "../helpers";
 
 declare global {
@@ -331,16 +332,9 @@ const suite = [
   {
     name: "programs",
     run: () => {
-      const { Graph, Sigma, container, programs } = dependencies;
-      const {
-        createNodeImageProgram,
-        NodeCircleProgram,
-        NodePointProgram,
-        EdgeRectangleProgram,
-        EdgeLineProgram,
-        EdgeArrowProgram,
-        EdgeTriangleProgram,
-      } = programs;
+      const { Graph, Sigma, container, nodePrograms, edgePrograms } = dependencies;
+      const { NodeImageProgram, NodeCircleProgram, NodePointProgram } = nodePrograms;
+      const { EdgeRectangleProgram, EdgeLineProgram, EdgeArrowProgram, EdgeTriangleProgram } = edgePrograms;
 
       const graph = new Graph();
       graph.addNode("n1", { x: 30, y: 120, size: 15, label: "Node 1", type: "node", color: "#ffcc00" });
@@ -366,7 +360,7 @@ const suite = [
         nodeProgramClasses: {
           node: NodeCircleProgram,
           fast: NodePointProgram,
-          image: createNodeImageProgram(),
+          image: NodeImageProgram,
         },
         edgeProgramClasses: {
           edge: EdgeRectangleProgram,
@@ -415,7 +409,7 @@ suite.forEach((scenario) => {
     await page.goto("http://localhost:5173/");
     await page.evaluate(scenario.run);
     await expect(page).toHaveScreenshot(`${scenario.name}.png`, {
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixelRatio: 0,
     });
   });
 });

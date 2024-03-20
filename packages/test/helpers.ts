@@ -1,5 +1,6 @@
 import Graph from "graphology";
 import Sigma from "sigma";
+import { EdgeProgramType, NodeProgramType } from "sigma/rendering";
 
 export function rafNTimes(fn: (step: number) => void, n: number): Promise<void> {
   return new Promise((globalResolve) => {
@@ -24,7 +25,8 @@ export type BrowserTestDependencies = {
   Graph: typeof Graph;
   Sigma: typeof Sigma;
   data: { [key: string]: Graph };
-  programs: { [key: string]: unknown };
+  nodePrograms: { [key: string]: NodeProgramType };
+  edgePrograms: { [key: string]: EdgeProgramType };
   container: HTMLElement;
   rafNTimes: typeof rafNTimes;
 };
