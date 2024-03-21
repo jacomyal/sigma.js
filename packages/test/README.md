@@ -1,4 +1,4 @@
-# Sigma.js tests
+# Sigma.js - Tests
 
 This package contains everything to test sigma.js and its related sub-packages.
 
