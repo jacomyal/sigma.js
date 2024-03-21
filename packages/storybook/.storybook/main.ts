@@ -14,7 +14,6 @@ const config: StorybookConfig = {
   framework: getAbsolutePath("@storybook/html-vite"),
   typescript: {
     check: true,
-    skipBabel: false,
   },
   docs: {
     autodocs: "tag",
@@ -24,7 +23,7 @@ const config: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, {
       resolve: {
-        preserveSymlinks: true,
+        preserveSymlinks: false,
       },
     });
   },

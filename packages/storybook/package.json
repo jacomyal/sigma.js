@@ -26,13 +26,9 @@
     "@storybook/addon-interactions": "^8.0.0",
     "@storybook/addon-links": "^8.0.0",
     "@storybook/addon-storysource": "^8.0.0",
-    "@storybook/blocks": "^8.0.0",
     "@storybook/html": "^8.0.0",
     "@storybook/html-vite": "^8.0.0",
-    "@storybook/html-webpack5": "^8.0.0",
     "@storybook/web-components": "^8.0.0",
-    "@storybook/test": "^8.0.0",
-    "storybook-addon-run-script": "^0.1.4",
     "storybook": "^8.0.0"
   },
   "scripts": {

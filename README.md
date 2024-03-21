@@ -2,54 +2,58 @@
 
 # Sigma.js
 
-[Sigma.js](https://www.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of nodes and edges, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal).
+[Sigma.js](https://www.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of nodes and edges using WebGL, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal), and built on top of [graphology](https://graphology.github.io/).
 
-## Overview
+## How to use in your project
 
-Here are some quick insights on the codebase. To know more on these topics, please read the **[documentation](https://sigmajs.org/docs)**.
+To integrate sigma into your project, follow these simple steps:
 
-### Architecture
+1. **Installation:** Add `sigma` and `graphology` to your project by running the following command:
 
-Since version `v2`, sigma.js focuses on the management of graph display: rendering, interaction... The graph model is managed in a separate library called **[graphology](https://github.com/graphology/graphology)**, which is packed with convenience methods to manage graph data structures, and a lot of satellite libraries to handle various graph-related problems (metrics, community detection, layout algorithms...).
+   ```bash
+   npm install sigma graphology
+   ```
 
-Graphology website offers [a list](https://graphology.github.io/standard-library/) of these libraries. Most of them can help you solve problems in your sigma.js based web applications.
+2. **Usage:** Import sigma into your JavaScript or TypeScript file:
 
-### Rendering
+   ```javascript
+   import Graph from "graphology";
+   import Sigma from "sigma";
+   ```
 
-Sigma.js uses **WebGL** to render graphs. This makes it good at rendering medium to larger graphs in web pages (thousands of nodes and edges or more). It is also possible to customize rendering, but it is harder than it would be with SVG or Canvas based solutions.
+   Then, create a new `Sigma` instance with your graph data and target container:
 
-Each way to draw a node or an edge is implemented as a `program`. You can develop your own, or use the owns provided by sigma. You can check [this example](https://github.com/jacomyal/sigma.js/tree/main/packages/examples/custom-rendering/index.ts) to see how to use multiple programs. Also, you can check the list of available programs [here](https://github.com/jacomyal/sigma.js/tree/main/packages/sigma/src/rendering/webgl/programs).
+   ```javascript
+   const graph = new Graph();
+   graph.addNode("1", { label: "Node 1", x: 0, y: 0, size: 10, color: "blue" });
+   graph.addNode("2", { label: "Node 2", x: 1, y: 1, size: 20, color: "red" });
+   graph.addEdge("1", "2", { size: 5, color: "purple" });
 
-## Installation
+   const sigmaInstance = new Sigma(graph, document.getElementById("container"));
+   ```
 
-You can install `sigma` (and `graphology` which is required for `sigma` to work) in your JavaScript or TypeScript project using `npm`:
+## How to develop locally
 
-```bash
-npm install graphology sigma
-```
-
-## Storybook
-
-The [`Storybook`](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook) package contains a series of examples that you can either browse likewise:
+To run the [Storybook](https://storybook.js.org/) locally:
 
 ```bash
 git clone git@github.com:jacomyal/sigma.js.git
 cd sigma.js
 npm install
-npm run storybook:run
+npm run start
 ```
 
-Also, a more realistic sigma.js based web application is available in the [`demo`](https://github.com/jacomyal/sigma.js/tree/main/packages/demo) folder. It aims to show a real-world use case, and is the main showcase of [sigma.js website](https://www.sigmajs.org/).
+This will open the Storybook in your web browser, which live reloads when you modify the stories or the package sources.
 
-## Website
+## Resources
 
-The current website is based on [Docusaurus](https://docusaurus.io/), with a static homepage. It is located in the `website` folder. It also showcases the React.js based demo available in the [`demo`](https://github.com/jacomyal/sigma.js/tree/main/packages/demo) folder in an iframe. The website itself does not need any build step, though the demo does.
+- **GitHub Project:** The source code and collaborative development efforts for Sigma.js are hosted on [GitHub](https://github.com/sigma).
+- **Website:** The official website, [sigmajs.org](https://sigmajs.org), kindly designed by [Robin de Mourat](https://github.com/robindemourat/) from the [Sciences-Po médialab](https://medialab.sciencespo.fr/en/) team, showcases the library's capabilities.
+- **Documentation:** A detailed documentation, built with [Docusaurus](https://docusaurus.io/), is available at [sigmajs.org/docs](https://sigmajs.org/docs). It provides extensive guides and API references for users.
+- **Storybook:** Interactive examples can be found at [sigmajs.org/storybook](https://sigmajs.org/storybook).
+- **Demo:** A comprehensive demo, available at [sigmajs.org/demo](https://sigmajs.org/demo), features a full-featured React-based web application utilizing Sigma.js.
 
-The homepage and identity have been kindly designed by [Robin de Mourat](https://github.com/robindemourat/) from the [Sciences-Po médialab](https://medialab.sciencespo.fr/en/) team.
-
-Read the dedicated [README](https://github.com/jacomyal/sigma.js/tree/main/packages/website) to know more on how to build it.
-
-## Contributing
+## How to contribute
 
 You can contribute by submitting [issues tickets](http://github.com/jacomyal/sigma.js/issues) and proposing [pull requests](http://github.com/jacomyal/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request.
 
