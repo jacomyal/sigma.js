@@ -26,7 +26,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
-          build_dir: website/build
+          build_dir: packages/website/build
           fqdn: www.sigmajs.org
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
