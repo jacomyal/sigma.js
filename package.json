@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
     "build": "preconstruct build && npm run build-bundle --workspace=sigma",
     "watch": "preconstruct watch",
     "prettify": "prettier --write .",
@@ -27,6 +28,7 @@
     "eslint-plugin-storybook": "^0.8.0",
     "lerna": "^8.1.2",
     "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
     "typescript": "^5.4.2",
     "typescript-eslint": "^7.2.0"
   },
