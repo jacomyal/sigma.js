@@ -22,6 +22,6 @@ export default defineConfig({
     outDir: "build",
   },
   resolve: {
-    preserveSymlinks: true,
+    preserveSymlinks: false,
   },
 });
