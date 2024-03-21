@@ -10,7 +10,7 @@ varying float v_border;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
-  float dist = length(v_diffVector) - v_radius;
+  float dist = length(v_diffVector) - v_radius + v_border;
 
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE

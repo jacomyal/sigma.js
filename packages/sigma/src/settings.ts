@@ -12,9 +12,9 @@ import {
   EdgeLabelDrawingFunction,
   EdgeProgramType,
   EdgeRectangleProgram,
+  NodeCircleProgram,
   NodeHoverDrawingFunction,
   NodeLabelDrawingFunction,
-  NodePointProgram,
   NodeProgramType,
   drawDiscNodeHover,
   drawDiscNodeLabel,
@@ -133,7 +133,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
 };
 
 export const DEFAULT_NODE_PROGRAM_CLASSES: Record<string, NodeProgramType> = {
-  circle: NodePointProgram,
+  circle: NodeCircleProgram,
 };
 
 export const DEFAULT_EDGE_PROGRAM_CLASSES: Record<string, EdgeProgramType> = {

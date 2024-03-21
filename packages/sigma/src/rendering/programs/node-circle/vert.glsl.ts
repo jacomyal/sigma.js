@@ -16,21 +16,20 @@ varying float v_radius;
 varying float v_border;
 
 const float bias = 255.0 / 254.0;
-const float marginRatio = 1.05;
 
 void main() {
   float size = a_size * u_correctionRatio / u_sizeRatio * 4.0;
   vec2 diffVector = size * vec2(cos(a_angle), sin(a_angle));
-  vec2 position = a_position + diffVector * marginRatio;
+  vec2 position = a_position + diffVector;
   gl_Position = vec4(
     (u_matrix * vec3(position, 1)).xy,
     0,
     1
   );
 
-  v_border = u_correctionRatio;
+  v_border = u_correctionRatio * 2.0;
   v_diffVector = diffVector;
-  v_radius = size / 2.0 / marginRatio;
+  v_radius = size / 2.0;
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:
