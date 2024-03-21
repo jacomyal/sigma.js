@@ -2,7 +2,7 @@ import { Attributes } from "graphology-types";
 import { Settings } from "sigma/settings";
 import { NodeDisplayData, PartialButFor } from "sigma/types";
 
-import { CurvedEdgeDisplayData, DEFAULT_EDGE_CURVATURE } from "./utils.ts";
+import { CurvedEdgeDisplayData, DEFAULT_EDGE_CURVATURE } from "./utils";
 
 interface Point {
   x: number;
