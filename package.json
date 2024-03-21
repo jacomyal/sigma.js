@@ -14,6 +14,7 @@
     "test": "npm run test --workspace=@sigma/test",
     "start": "npm run start --workspace=@sigma/storybook",
     "postinstall": "preconstruct dev",
+    "postpublish": "preconstruct dev",
     "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
