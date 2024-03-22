@@ -1,5 +1,7 @@
 [![Build Status](https://github.com/jacomyal/sigma.js/workflows/Tests/badge.svg)](https://github.com/jacomyal/sigma.js/actions)
 
+<br />
+
 ![Sigma.js](packages/website/static/img/logo-sigma-text.png)
 
 **[Website](https://www.sigmajs.org/)** | **[Documentation](https://www.sigmajs.org/docs)** | **[Storybook](https://www.sigmajs.org/storybook)**
