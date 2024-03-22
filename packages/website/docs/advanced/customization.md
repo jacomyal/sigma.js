@@ -30,7 +30,7 @@ Beyond these settings, sigma.js allows for more advanced customization of labels
 
 For most common cases (ie. straight edges and round nodes), you can directly override the `defaultDrawEdgeLabel`, `defaultDrawNodeLabel` and `defaultDrawNodeHover` settings. When you start having various shapes of nodes and/or edges (square nodes, curved edges...), you need to specify labels and hovered items renderers for each program. Each node program can have optional `drawLabel` and `drawHover` static methods, and each edge program can have an optional `drawLabel` static method.
 
-For a practical demonstration of this method, check out the website's demo, specifically the [`canvas-utils.ts` section](https://github.com/jacomyal/sigma.js/blob/main/demo/src/canvas-utils.ts).
+For a practical demonstration of this method, check out the website's demo, specifically the [`canvas-utils.ts` section](https://github.com/jacomyal/sigma.js/blob/main/packages/demo/src/canvas-utils.ts).
 
 ## Custom renderers
 
