@@ -65,7 +65,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/jacomyal/sigma.js/tree/main/packages/website/docs",
+          editUrl: "https://github.com/jacomyal/sigma.js/tree/main/packages/website",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
