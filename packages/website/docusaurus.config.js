@@ -36,13 +36,12 @@ const config = {
       // Plugin / TypeDoc options
       {
         entryPoints: [
-          "../sigma/src/sigma.ts",
-          "../sigma/src/core/camera.ts",
-          "../sigma/src/core/captors/mouse.ts",
-          "../sigma/src/core/captors/touch.ts",
-          "../sigma/src/rendering/program.ts",
-          "../sigma/src/rendering/node.ts",
-          "../sigma/src/rendering/edge.ts",
+          "../sigma/src/index.ts",
+          "../sigma/src/settings.ts",
+          "../sigma/src/rendering/index.ts",
+          "../sigma/src/utils/index.ts",
+          "../node-image/src/index.ts",
+          "../edge-curve/src/index.ts",
         ],
         watch: true,
         tsconfig: "../sigma/tsconfig.json",
