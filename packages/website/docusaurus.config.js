@@ -30,6 +30,8 @@ const config = {
   },
 
   plugins: [
+    "docusaurus-plugin-matomo",
+
     [
       "docusaurus-plugin-typedoc",
 
@@ -77,7 +79,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
       navbar: {
         items: [
           {
@@ -86,6 +87,10 @@ const config = {
             position: "right",
           },
         ],
+      },
+      matomo: {
+        matomoUrl: "https://matomo.ouestware.com/",
+        siteId: 26,
       },
     }),
 };

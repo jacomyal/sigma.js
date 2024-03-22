@@ -19,6 +19,7 @@
     "@docusaurus/types": "3.1.1",
     "@mdx-js/react": "^3.0.1",
     "@tsconfig/docusaurus": "^2.0.2",
+    "docusaurus-plugin-matomo": "^0.0.8",
     "docusaurus-plugin-typedoc": "^0.22.0",
     "prism-react-renderer": "^2.3.1",
     "typedoc": "^0.25.12",
