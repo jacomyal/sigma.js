@@ -1,6 +1,6 @@
 // language=GLSL
 const SHADER_SOURCE = /*glsl*/ `
-precision mediump float;
+precision highp float;
 
 varying vec4 v_color;
 varying float v_thickness;
