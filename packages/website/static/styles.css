@@ -506,7 +506,7 @@ footer ul {
   main section.title {
     max-width: 100%;
     padding-left: 3em;
-    min-height: 50vh;
+    min-height: 80vh;
     font-size: 1.2em;
   }
   main section.showcase .overlay {
