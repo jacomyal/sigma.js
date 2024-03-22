@@ -7,6 +7,7 @@
 - **Completely rewrites programs API**
 - **Renames all existing programs**
 - **Restructures sources as a multi-package repository (using [Lerna](https://lerna.js.org/))**
+- **Replaces the default node program by `NodeCircleProgram`**
 - **Moves the `node.image` renderer as a new package [`@sigma/node-image`](https://www.npmjs.com/package/@sigma/node-image)**
 - **Moves `labelRenderer`, `hoverRenderer` and `edgeLabelRenderer` from settings to each renderer**
 
