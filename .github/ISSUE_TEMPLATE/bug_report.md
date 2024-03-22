@@ -23,7 +23,7 @@ To help us understand your issue, please specify important details, primarily:
 
 Additionally, include (as appropriate) console logs, stacktraces, and other debug info.
 
-We recommend you to create a live example of your issue on [CodeSandbox](https://codesandbox.io/) so we can reproduce it. You can start with this template: https://githubbox.com/jacomyal/sigma.js/tree/main/examples/template
+We recommend you to create a live example of your issue on [CodeSandbox](https://codesandbox.io/) so we can reproduce it. You can start with this template: https://codesandbox.io/p/sandbox/sigma-template-82mpns
 
 ## Example bug report
 
