@@ -14,7 +14,7 @@ const DescriptionPanel: FC = () => {
       }
     >
       <p>
-        This map represents a <i>network</i> of Wikipedia articles around the topic of "Data vizualisation". Each{" "}
+        This map represents a <i>network</i> of Wikipedia articles around the topic of "Data visualisation". Each{" "}
         <i>node</i> represents an article, and each edge a{" "}
         <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/See_also">
           "See also" link
@@ -50,7 +50,7 @@ const DescriptionPanel: FC = () => {
           sigma.js
         </a>
         . You can read the source code{" "}
-        <a target="_blank" rel="noreferrer" href="https://github.com/jacomyal/sigma.js/tree/main/demo">
+        <a target="_blank" rel="noreferrer" href="https://github.com/jacomyal/sigma.js/tree/main/packages/demo">
           on GitHub
         </a>
         .
