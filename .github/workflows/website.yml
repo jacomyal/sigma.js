@@ -28,5 +28,6 @@ jobs:
           target_branch: gh-pages
           build_dir: packages/website/build
           fqdn: www.sigmajs.org
+          jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
