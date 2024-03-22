@@ -13,4 +13,4 @@ Sigma.js offers a variety of resources to assist developers in understanding and
 
 3. **Source Code**: To delve deeper into the workings of sigma.js, the source code is a valuable resource. It is extensively commented, offering clarity on the library's operations and functionalities.
 
-4. **Demo Application**: For a real-world perspective, the sigma.js repository features a complete [demo](https://www.sigmajs.org/demo/index.html) ([sources](https://github.com/jacomyal/sigma.js/tree/main/demo)) built with [React](https://react.dev/). This demo mirrors the structure of a typical application, providing a practical view of how sigma.js can be integrated and used in a project context.
+4. **Demo Application**: For a real-world perspective, the sigma.js repository features a complete [demo](https://www.sigmajs.org/demo/index.html) ([sources](https://github.com/jacomyal/sigma.js/tree/main/packages/demo)) built with [React](https://react.dev/). This demo mirrors the structure of a typical application, providing a practical view of how sigma.js can be integrated and used in a project context.
