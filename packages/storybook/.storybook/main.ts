@@ -18,6 +18,9 @@ const config: StorybookConfig = {
   docs: {
     autodocs: "tag",
   },
+  core: {
+    disableTelemetry: true,
+  },
   staticDirs: ["../public"],
   logLevel: "debug",
   async viteFinal(config) {
