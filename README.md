@@ -1,6 +1,10 @@
 [![Build Status](https://github.com/jacomyal/sigma.js/workflows/Tests/badge.svg)](https://github.com/jacomyal/sigma.js/actions)
 
-# Sigma.js
+![Sigma.js](packages/website/static/img/logo-sigma-text.png)
+
+**[Website](https://www.sigmajs.org/)** | **[Documentation](https://www.sigmajs.org/docs)** | **[Storybook](https://www.sigmajs.org/storybook)**
+
+---
 
 [Sigma.js](https://www.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of nodes and edges using WebGL, mainly developed by [@jacomyal](https://github.com/jacomyal) and [@Yomguithereal](https://github.com/Yomguithereal), and built on top of [graphology](https://graphology.github.io/).
 
