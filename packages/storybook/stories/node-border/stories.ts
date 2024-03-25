@@ -5,6 +5,10 @@ import nodeBorderPlay from "./node-border";
 import nodeBorderSource from "./node-border?raw";
 import pixelsBorderPlay from "./pixels-border";
 import pixelsBorderSource from "./pixels-border?raw";
+import variableSizesPlay from "./variable-sizes";
+import variableSizesSource from "./variable-sizes?raw";
+import withImagesPlay from "./with-images";
+import withImagesSource from "./with-images?raw";
 
 const meta: Meta = {
   id: "node-border",
@@ -34,6 +38,30 @@ export const pixelsBorder: Story = {
   parameters: {
     storySource: {
       source: pixelsBorderSource,
+    },
+  },
+};
+
+export const withImages: Story = {
+  name: "Combined with images",
+  render: () => template,
+  play: withImagesPlay,
+  args: {},
+  parameters: {
+    storySource: {
+      source: withImagesSource,
+    },
+  },
+};
+
+export const variableSizes: Story = {
+  name: "Variable border sizes",
+  render: () => template,
+  play: variableSizesPlay,
+  args: {},
+  parameters: {
+    storySource: {
+      source: variableSizesSource,
     },
   },
 };
