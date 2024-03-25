@@ -13,7 +13,7 @@ attribute vec4 a_id;
 attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
-${borders.flatMap(({ size }, i) => ("attribute" in size ? [`attribute vec4 a_borderSize_${i + 1};`] : [])).join("\n")}
+${borders.flatMap(({ size }, i) => ("attribute" in size ? [`attribute float a_borderSize_${i + 1};`] : [])).join("\n")}
 ${borders.flatMap(({ color }, i) => ("attribute" in color ? [`attribute vec4 a_borderColor_${i + 1};`] : [])).join("\n")}
 
 uniform mat3 u_matrix;
