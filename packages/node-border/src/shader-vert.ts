@@ -33,7 +33,8 @@ varying vec4 v_color;
 ${borders.map((_, i) => `varying vec4 v_borderColor_${i + 1};`).join("\n")}
 #endif
 
-float bias = 255.0 / 254.0;
+const float bias = 255.0 / 254.0;
+const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main() {
   float size = a_size * u_correctionRatio / u_sizeRatio * 4.0;
@@ -75,17 +76,22 @@ ${borders.map((_, i) => `  v_borderSize_${i + 1} = v_borderSize_${i} - borderSiz
   v_color = a_id;
   v_color.a *= bias;
   #else
+  vec4 v_borderColor_0 = transparent;
 ${borders
   .map(({ color }, i) => {
+    const res: string[] = [];
     if ("attribute" in color) {
-      return `  v_borderColor_${i + 1} = a_borderColor_${i + 1};
-  v_borderColor_${i + 1}.a *= bias;`;
+      res.push(`  v_borderColor_${i + 1} = a_borderColor_${i + 1};`);
     } else if ("transparent" in color) {
-      return `  v_borderColor_${i + 1} = vec4(0.0, 0.0, 0.0, 0.0);`;
+      res.push(`  v_borderColor_${i + 1} = vec4(0.0, 0.0, 0.0, 0.0);`);
     } else {
-      return `  v_borderColor_${i + 1} = u_borderColor_${i + 1};
-  v_borderColor_${i + 1}.a *= bias;`;
+      res.push(`  v_borderColor_${i + 1} = u_borderColor_${i + 1}`);
     }
+
+    res.push(`  v_borderColor_${i + 1}.a *= bias;`);
+    res.push(`  if (borderSize_${i + 1} <= 1.0 * u_correctionRatio) { v_borderColor_${i + 1} = v_borderColor_${i}; }`);
+
+    return res.join("\n");
   })
   .join("\n")}
   #endif
