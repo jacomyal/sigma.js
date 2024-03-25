@@ -20,17 +20,12 @@ void main(void) {
     gl_FragColor = transparent;
   #else
   // For normal mode, we use the color:
-  float t = 0.0;
-  if (distToCenter < halfRadius - v_border)
-    gl_FragColor = white;
-  else if (distToCenter < halfRadius)
-    gl_FragColor = mix(v_color, white, (halfRadius - distToCenter) / v_border);
-  else if (distToCenter < radius - v_border)
-    gl_FragColor = v_color;
-  else if (distToCenter < radius)
+  if (distToCenter > radius)
+    gl_FragColor = transparent;
+  else if (distToCenter > radius - v_border)
     gl_FragColor = mix(transparent, v_color, (radius - distToCenter) / v_border);
   else
-    gl_FragColor = transparent;
+    gl_FragColor = mix(v_color, white, (radius - distToCenter) / radius);
   #endif
 }
 `;

@@ -1,30 +1,15 @@
-/**
- * This class copies sigma/rendering/programs/node-circle, but with a tiny
- * difference: The fragment shader ("./node.border.frag.glsl") draws a white
- * disc with a colored border.
- */
-
-/**
- * Sigma.js WebGL Renderer Node Program
- * =====================================
- *
- * Simple program rendering nodes using GL_POINTS. This is faster than the
- * three triangle option but has some quirks and is not supported equally by
- * every GPU.
- * @module
- */
 import { NodeProgram, ProgramInfo } from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
-import FRAGMENT_SHADER_SOURCE from "./node.border.frag.glsl";
-import VERTEX_SHADER_SOURCE from "./node.border.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./node.gradient.frag.glsl";
+import VERTEX_SHADER_SOURCE from "./node.gradient.vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
-export default class NodeBorderProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
+export default class NodeGradientProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
   getDefinition() {
     return {
       VERTICES: 1,

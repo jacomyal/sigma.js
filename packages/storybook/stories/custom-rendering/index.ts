@@ -9,17 +9,18 @@
  * but you can add your own.
  *
  * Here in this example, some nodes are drawn with images in them using the
- * the getNodeProgramImage provided by Sigma. Some others are drawn as white
- * disc with a border, and the custom program to draw them is in this directory:
- * - "./node.border.ts" is the node program. It tells sigma what data to give to
- *   the GPU and how.
- * - "./node.border.vert.glsl" is the vertex shader. It tells the GPU how to
+ * createNodeImageProgram provided by @sigma/node-image. Some others are drawn
+ * as white disc with a border, and the custom program to draw them is in this
+ * directory:
+ * - "./node.gradient.ts" is the node program. It tells sigma what data to give
+ *   to the GPU and how.
+ * - "./node.gradient.vert.glsl" is the vertex shader. It tells the GPU how to
  *   interpret the data provided by the program to obtain a node position,
  *   mostly.
- * - "./node.border.frag.glsl" is the fragment shader. It tells for each pixel
- *   what color it should get, relatively to data given by the program and its
- *   position inside the shape. Basically, the GPU wants to draw a square, but
- *   we "carve" a disc in it.
+ * - "./node.gradient.frag.glsl" is the fragment shader. It tells for each
+ *   pixel what color it should get, relatively to data given by the program
+ *   and its position inside the shape. Basically, the GPU wants to draw a
+ *   square, but we "carve" a disc in it.
  */
 import { createNodeImageProgram } from "@sigma/node-image";
 import Graph from "graphology";
@@ -27,7 +28,7 @@ import ForceSupervisor from "graphology-layout-force/worker";
 import Sigma from "sigma";
 
 import { onStoryDown } from "../utils";
-import NodeBorderProgram from "./node.border";
+import NodeGradientProgram from "./node.gradient";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
@@ -43,9 +44,9 @@ export default () => {
   graph.addNode("Suzan", { size: 15, label: "Suzan", type: "image", image: "./user.svg", color: RED });
   graph.addNode("Nantes", { size: 15, label: "Nantes", type: "image", image: "./city.svg", color: BLUE });
   graph.addNode("New-York", { size: 15, label: "New-York", type: "image", image: "./city.svg", color: BLUE });
-  graph.addNode("Sushis", { size: 7, label: "Sushis", type: "border", color: GREEN });
-  graph.addNode("Falafels", { size: 7, label: "Falafels", type: "border", color: GREEN });
-  graph.addNode("Kouign Amann", { size: 7, label: "Kouign Amann", type: "border", color: GREEN });
+  graph.addNode("Sushis", { size: 7, label: "Sushis", type: "gradient", color: GREEN });
+  graph.addNode("Falafels", { size: 7, label: "Falafels", type: "gradient", color: GREEN });
+  graph.addNode("Kouign Amann", { size: 7, label: "Kouign Amann", type: "gradient", color: GREEN });
 
   graph.addEdge("John", "Mary", { type: "line", label: "works with", size: 5 });
   graph.addEdge("Mary", "Suzan", { type: "line", label: "works with", size: 5 });
@@ -66,7 +67,7 @@ export default () => {
     // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
     nodeProgramClasses: {
       image: createNodeImageProgram(),
-      border: NodeBorderProgram,
+      gradient: NodeGradientProgram,
     },
     renderEdgeLabels: true,
   });
