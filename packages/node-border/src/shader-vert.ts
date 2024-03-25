@@ -85,7 +85,7 @@ ${borders
     } else if ("transparent" in color) {
       res.push(`  v_borderColor_${i + 1} = vec4(0.0, 0.0, 0.0, 0.0);`);
     } else {
-      res.push(`  v_borderColor_${i + 1} = u_borderColor_${i + 1}`);
+      res.push(`  v_borderColor_${i + 1} = u_borderColor_${i + 1};`);
     }
 
     res.push(`  v_borderColor_${i + 1}.a *= bias;`);
