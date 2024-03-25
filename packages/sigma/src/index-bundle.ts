@@ -8,6 +8,7 @@
  * @module
  */
 import EdgeCurveProgram from "@sigma/edge-curve";
+import { createNodeBorderProgram } from "@sigma/node-border";
 import { createNodeImageProgram } from "@sigma/node-image";
 
 import * as rendering from "./rendering";
@@ -21,7 +22,7 @@ class Sigma extends SigmaClass {
   static MouseCaptor = MouseCaptor;
   static Sigma = SigmaClass;
 
-  static rendering = { ...rendering, createNodeImageProgram, EdgeCurveProgram };
+  static rendering = { ...rendering, createNodeImageProgram, createNodeBorderProgram, EdgeCurveProgram };
   static utils = utils;
 }
 

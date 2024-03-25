@@ -240,6 +240,21 @@ export function floatColor(val: string): number {
 
   return color;
 }
+export function colorToArray(val: string, masking?: boolean): [number, number, number, number] {
+  FLOAT32[0] = floatColor(val);
+  let intValue = INT32[0];
+
+  if (masking) {
+    intValue = intValue | 0x01000000;
+  }
+
+  const r = intValue & 0xff;
+  const g = (intValue >> 8) & 0xff;
+  const b = (intValue >> 16) & 0xff;
+  const a = (intValue >> 24) & 0xff;
+
+  return [r, g, b, a];
+}
 
 const FLOAT_INDEX_CACHE: { [key: number]: number } = {};
 export function indexToColor(index: number): number {

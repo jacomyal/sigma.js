@@ -1,0 +1,46 @@
+{
+  "name": "@sigma/node-border",
+  "version": "3.0.0-beta.1",
+  "description": "A node program that renders concentric discs in nodes for sigma.js",
+  "main": "dist/sigma-node-border.cjs.js",
+  "module": "dist/sigma-node-border.esm.js",
+  "types": "dist/sigma-node-border.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    }
+  ],
+  "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "sigma": ">=3.0.0-beta.14"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-node-border.esm.js",
+      "import": "./dist/sigma-node-border.cjs.mjs",
+      "default": "./dist/sigma-node-border.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

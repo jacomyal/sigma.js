@@ -21,6 +21,7 @@
 - [#1034](https://github.com/jacomyal/sigma.js/issues/1034) Adds new `Sigma.setCamera` method
 - [#1185](https://github.com/jacomyal/sigma.js/issues/1185) Adds new `zoomToSizeRatioFunction` and `itemSizesReference` setting
 - [#1231](https://github.com/jacomyal/sigma.js/issues/1231) Adds new [`@sigma/edge-curve`](https://www.npmjs.com/package/@sigma/edge-curve) renderer, as a new package
+- Adds new [`@sigma/node-border`](https://www.npmjs.com/package/@sigma/node-border) renderer, as a new package
 
 ## 2.4.0
 

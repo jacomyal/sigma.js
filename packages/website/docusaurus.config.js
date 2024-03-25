@@ -43,6 +43,7 @@ const config = {
           "../sigma/src/rendering/index.ts",
           "../sigma/src/utils/index.ts",
           "../node-image/src/index.ts",
+          "../node-border/src/index.ts",
           "../edge-curve/src/index.ts",
         ],
         watch: true,
