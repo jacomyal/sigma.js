@@ -66,7 +66,7 @@ ${borders
     .flatMap(({ size }, i) => (!("fill" in size) ? [`borderSize_${i + 1}`] : []))
     .join(" + ")}) ) / ${fillCounts};
 ${borders.flatMap(({ size }, i) => ("fill" in size ? [`  float borderSize_${i + 1} = fillBorderSize;`] : [])).join("\n")}
-  
+
   // Finally, normalize all border sizes, to start from the full size and to end with the smallest:
   float v_borderSize_0 = v_radius;
 ${borders.map((_, i) => `  v_borderSize_${i + 1} = v_borderSize_${i} - borderSize_${i + 1};`).join("\n")}

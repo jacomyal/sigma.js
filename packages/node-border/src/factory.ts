@@ -27,9 +27,6 @@ export default function getNodeBorderProgram<
     ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
   ];
 
-  console.log(getVertexShader(options));
-  console.log(getFragmentShader(options));
-
   return class NodeBorderProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
