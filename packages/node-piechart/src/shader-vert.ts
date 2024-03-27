@@ -1,12 +1,13 @@
 import { CreateNodePiechartProgramOptions, numberToGLSLFloat } from "./utils";
 
-export default function getVertexShader({ slices }: CreateNodePiechartProgramOptions) {
+export default function getVertexShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL
   const SHADER = /*glsl*/ `
 attribute vec4 a_id;
 attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
+${"attribute" in offset ? "attribute float a_offset;\n" : ""}
 ${slices.flatMap(({ size }, i) => ("attribute" in size ? [`attribute float a_sliceValue_${i + 1};`] : [])).join("\n")}
 ${slices.flatMap(({ color }, i) => ("attribute" in color ? [`attribute vec4 a_sliceColor_${i + 1};`] : [])).join("\n")}
 
@@ -20,6 +21,7 @@ varying vec2 v_diffVector;
 varying float v_aaBorder;
 varying float v_radius;
 ${slices.map((_, i) => `varying float v_sliceValue_${i + 1};`).join("\n")}
+${"attribute" in offset ? "varying float v_offset;\n" : ""}
 
 #ifdef PICKING_MODE
 varying vec4 v_color;
@@ -45,6 +47,7 @@ void main() {
   v_radius = size / 2.0;
   v_aaBorder = u_correctionRatio * 2.0;
   v_diffVector = diffVector;
+  ${"attribute" in offset ? "v_offset = a_offset;\n" : ""}
 
 ${slices
   .map(
@@ -54,7 +57,6 @@ ${slices
   .join("\n")}
 
   #ifdef PICKING_MODE
-  // For picking mode, we use the ID as the color:
   v_color = a_id;
   v_color.a *= bias;
   #else

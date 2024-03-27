@@ -5,6 +5,8 @@ import fixedColorsSource from "./fixed-colors?raw";
 import fixedSizesPlay from "./fixed-sizes";
 import fixedSizesSource from "./fixed-sizes?raw";
 import template from "./index.html?raw";
+import offsetsPlay from "./offsets";
+import offsetsSource from "./offsets?raw";
 
 const meta: Meta = {
   id: "node-piechart",
@@ -34,6 +36,18 @@ export const fixedSizes: Story = {
   parameters: {
     storySource: {
       source: fixedSizesSource,
+    },
+  },
+};
+
+export const offsets: Story = {
+  name: "Varying offsets",
+  render: () => template,
+  play: offsetsPlay,
+  args: {},
+  parameters: {
+    storySource: {
+      source: offsetsSource,
     },
   },
 };
