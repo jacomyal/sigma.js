@@ -14,11 +14,9 @@ ${slices.flatMap(({ color }, i) => ("attribute" in color ? [`attribute vec4 a_sl
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
-uniform vec4 u_defaultColor;
 ${slices.flatMap(({ color }, i) => ("value" in color ? [`uniform vec4 u_sliceColor_${i + 1};`] : [])).join("\n")}
 
 varying vec2 v_diffVector;
-varying float v_aaBorder;
 varying float v_radius;
 ${slices.map((_, i) => `varying float v_sliceValue_${i + 1};`).join("\n")}
 ${"attribute" in offset ? "varying float v_offset;\n" : ""}
@@ -26,7 +24,6 @@ ${"attribute" in offset ? "varying float v_offset;\n" : ""}
 #ifdef PICKING_MODE
 varying vec4 v_color;
 #else
-varying vec4 v_defaultColor;
 // For normal mode, we use the border colors defined in the program:
 ${slices.map((_, i) => `varying vec4 v_sliceColor_${i + 1};`).join("\n")}
 #endif
@@ -45,7 +42,6 @@ void main() {
   );
 
   v_radius = size / 2.0;
-  v_aaBorder = u_correctionRatio * 2.0;
   v_diffVector = diffVector;
   ${"attribute" in offset ? "v_offset = a_offset;\n" : ""}
 
@@ -60,8 +56,6 @@ ${slices
   v_color = a_id;
   v_color.a *= bias;
   #else
-  v_defaultColor = u_defaultColor;
-  v_defaultColor.a *= bias;
 ${slices
   .map(({ color }, i) => {
     const res: string[] = [];

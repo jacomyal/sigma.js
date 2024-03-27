@@ -6,7 +6,6 @@ export default function getFragmentShader({ borders }: CreateNodeBorderProgramOp
 precision highp float;
 
 varying vec2 v_diffVector;
-varying float v_aaBorder;
 varying float v_radius;
 ${borders.map((_, i) => `varying float v_borderSize_${i + 1};`).join("\n")}
 
@@ -17,10 +16,14 @@ varying vec4 v_color;
 ${borders.map((_, i) => `varying vec4 v_borderColor_${i + 1};`).join("\n")}
 #endif
 
+uniform float u_correctionRatio;
+
+const float bias = 255.0 / 254.0;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
   float dist = length(v_diffVector);
+  float aaBorder = 2.0 * u_correctionRatio;
   float v_borderSize_0 = v_radius;
   vec4 v_borderColor_0 = transparent;
 
@@ -36,8 +39,8 @@ void main(void) {
     gl_FragColor = v_borderColor_0;
   } else ${borders
     .map(
-      (_, i) => `if (dist > v_borderSize_${i} - v_aaBorder) {
-    gl_FragColor = mix(v_borderColor_${i + 1}, v_borderColor_${i}, (dist - v_borderSize_${i} + v_aaBorder) / v_aaBorder);
+      (_, i) => `if (dist > v_borderSize_${i} - aaBorder) {
+    gl_FragColor = mix(v_borderColor_${i + 1}, v_borderColor_${i}, (dist - v_borderSize_${i} + aaBorder) / aaBorder);
   } else if (dist > v_borderSize_${i + 1}) {
     gl_FragColor = v_borderColor_${i + 1};
   } else `,

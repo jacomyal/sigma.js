@@ -17,7 +17,6 @@ uniform float u_correctionRatio;
 ${borders.flatMap(({ color }, i) => ("value" in color ? [`uniform vec4 u_borderColor_${i + 1};`] : [])).join("\n")}
 
 varying vec2 v_diffVector;
-varying float v_aaBorder;
 varying float v_radius;
 ${borders.map((_, i) => `varying float v_borderSize_${i + 1};`).join("\n")}
 
@@ -42,7 +41,6 @@ void main() {
   );
 
   v_radius = size / 2.0;
-  v_aaBorder = u_correctionRatio * 2.0;
   v_diffVector = diffVector;
 
   // Let's first compute the size of "non-fill" borders:

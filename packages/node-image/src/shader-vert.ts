@@ -14,7 +14,6 @@ uniform float u_correctionRatio;
 varying vec4 v_color;
 varying vec2 v_diffVector;
 varying float v_radius;
-varying float v_border;
 varying vec4 v_texture;
 
 const float bias = 255.0 / 254.0;
@@ -30,7 +29,6 @@ void main() {
     1
   );
 
-  v_border = u_correctionRatio;
   v_diffVector = diffVector;
   v_radius = size / 2.0 / marginRatio;
 

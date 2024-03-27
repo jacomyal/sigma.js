@@ -27,7 +27,6 @@ void main() {
     1
   );
 
-  v_border = u_correctionRatio * 2.0;
   v_diffVector = diffVector;
   v_radius = size / 2.0;
 

@@ -5,10 +5,10 @@ precision highp float;
 varying vec4 v_color;
 varying vec2 v_diffVector;
 varying float v_radius;
-varying float v_border;
 varying vec4 v_texture;
 
 uniform sampler2D u_atlas;
+uniform float u_correctionRatio;
 uniform float u_cameraAngle;
 uniform float u_percentagePadding;
 uniform bool u_colorizeImages;
@@ -19,8 +19,8 @@ const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 const float radius = 0.5;
 
 void main(void) {
+  float border = 2.0 * u_correctionRatio;
   float dist = length(v_diffVector);
-  float border = v_border;
   vec4 color = gl_FragColor;
 
   float c = cos(-u_cameraAngle);
