@@ -2,13 +2,13 @@ export type NodeBorderSizeMode = "relative" | "pixels";
 export const DEFAULT_BORDER_SIZE_MODE: NodeBorderSizeMode = "relative";
 
 export type NodeSliceColor = { value: string } | { attribute: string; defaultValue?: string } | { transparent: true };
-export type NodesliceValue = { value: number } | { attribute: string };
+export type NodeSliceValue = { value: number } | { attribute: string };
 
 export interface CreateNodePiechartProgramOptions {
   defaultColor?: string;
   slices: {
     color: NodeSliceColor;
-    size: NodesliceValue;
+    size: NodeSliceValue;
   }[];
 }
 
