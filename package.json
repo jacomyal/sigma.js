@@ -38,6 +38,7 @@
       "packages/sigma",
       "packages/node-border",
       "packages/node-image",
+      "packages/node-piechart",
       "packages/edge-curve"
     ],
     "exports": {

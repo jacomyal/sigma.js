@@ -8,6 +8,7 @@
     { "path": "./packages/sigma" },
     { "path": "./packages/node-border" },
     { "path": "./packages/node-image" },
+    { "path": "./packages/node-piechart" },
     { "path": "./packages/edge-curve" }
   ],
   "watchOptions": {
