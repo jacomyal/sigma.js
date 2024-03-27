@@ -15,8 +15,8 @@
     "plugin:storybook/recommended"
   ],
   "rules": {
-    "no-unused-vars": "off",
     "no-prototype-builtins": "off",
+    "no-console": "warn",
     "import/extensions": [
       "warn",
       "never",

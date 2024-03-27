@@ -46,10 +46,7 @@ type Story = StoryObj<StoryArgs>;
 
 export const story: Story = {
   name: "Performances showcase",
-  render: (args) => {
-    console.log("template", args);
-    return template;
-  },
+  render: () => template,
   play,
   args: {
     order: 5000,

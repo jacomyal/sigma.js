@@ -73,7 +73,6 @@ const dependencies: BrowserTestDependencies = {
   rafNTimes,
 };
 
-console.log("GLOBALIZE DEPENDENCIES");
 globalize({
   dependencies,
 });

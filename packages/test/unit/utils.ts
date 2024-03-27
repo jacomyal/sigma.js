@@ -7,8 +7,6 @@ import { describe, expect, test } from "vitest";
 
 describe("validateGraph utils", () => {
   test("it should work on a valid graph", () => {
-    console.log("window", typeof window.document.getElementById);
-
     // Create a valid random graph
     const graph = erdosRenyi(UndirectedGraph, { order: 100, probability: 0.2 });
     randomLayout.assign(graph);
