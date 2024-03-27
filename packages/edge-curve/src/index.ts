@@ -87,4 +87,4 @@ export default class EdgeCurveProgram<
   }
 }
 
-export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils.ts";
+export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils";

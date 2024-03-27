@@ -5,7 +5,7 @@ import { colorToArray, floatColor } from "sigma/utils";
 
 import getFragmentShader from "./shader-frag";
 import getVertexShader from "./shader-vert";
-import { CreateNodeBorderProgramOptions, DEFAULT_COLOR, DEFAULT_CREATE_NODE_BORDER_OPTIONS } from "./utils.ts";
+import { CreateNodeBorderProgramOptions, DEFAULT_COLOR, DEFAULT_CREATE_NODE_BORDER_OPTIONS } from "./utils";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

@@ -1,4 +1,4 @@
-import { CreateNodeBorderProgramOptions } from "./utils.ts";
+import { CreateNodeBorderProgramOptions } from "./utils";
 
 export default function getFragmentShader({ borders }: CreateNodeBorderProgramOptions) {
   // language=GLSL

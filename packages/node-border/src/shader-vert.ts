@@ -1,9 +1,4 @@
-import {
-  CreateNodeBorderProgramOptions,
-  DEFAULT_BORDER_SIZE_MODE,
-  NodeBorderSize,
-  numberToGLSLFloat,
-} from "./utils.ts";
+import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSize, numberToGLSLFloat } from "./utils";
 
 export default function getVertexShader({ borders }: CreateNodeBorderProgramOptions) {
   const fillCounts = numberToGLSLFloat(borders.filter(({ size }) => "fill" in size).length);
