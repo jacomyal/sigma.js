@@ -28,7 +28,7 @@ import ForceSupervisor from "graphology-layout-force/worker";
 import Sigma from "sigma";
 
 import { onStoryDown } from "../utils";
-import NodeGradientProgram from "./node.gradient";
+import NodeGradientProgram from "./node-gradient";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;

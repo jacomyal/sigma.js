@@ -2,8 +2,8 @@ import { NodeProgram, ProgramInfo } from "sigma/rendering";
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
-import FRAGMENT_SHADER_SOURCE from "./node.gradient.frag.glsl";
-import VERTEX_SHADER_SOURCE from "./node.gradient.vert.glsl";
+import FRAGMENT_SHADER_SOURCE from "./node-gradient-frag.glsl";
+import VERTEX_SHADER_SOURCE from "./node-gradient-vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 

@@ -6,7 +6,7 @@
   "root": true,
   "ignorePatterns": ["*.js", "*.d.ts"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["import", "@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -17,6 +17,14 @@
   "rules": {
     "no-unused-vars": "off",
     "no-prototype-builtins": "off",
+    "import/extensions": [
+      "warn",
+      "never",
+      {
+        "json": "always",
+        "glsl": "always"
+      }
+    ],
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
