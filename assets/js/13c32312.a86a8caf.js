@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_sigma_website=self.webpackChunk_sigma_website||[]).push([[9601],{1966:e=>{e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"default"}')}}]);
