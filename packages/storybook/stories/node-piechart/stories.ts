@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/web-components";
 
 import fixedColorsPlay from "./fixed-colors";
 import fixedColorsSource from "./fixed-colors?raw";
-import fixedSizesPlay from "./fixed-sizes";
-import fixedSizesSource from "./fixed-sizes?raw";
+import fixedValuesPlay from "./fixed-values";
+import fixedValuesSource from "./fixed-values?raw";
 import template from "./index.html?raw";
 import offsetsPlay from "./offsets";
 import offsetsSource from "./offsets?raw";
@@ -17,7 +17,7 @@ export default meta;
 type Story = StoryObj;
 
 export const fixedColors: Story = {
-  name: "Fixed colors, varying sizes",
+  name: "Fixed colors, varying values",
   render: () => template,
   play: fixedColorsPlay,
   args: {},
@@ -28,14 +28,14 @@ export const fixedColors: Story = {
   },
 };
 
-export const fixedSizes: Story = {
-  name: "Fixed sizes, varying colors",
+export const fixedValues: Story = {
+  name: "Fixed values, varying colors",
   render: () => template,
-  play: fixedSizesPlay,
+  play: fixedValuesPlay,
   args: {},
   parameters: {
     storySource: {
-      source: fixedSizesSource,
+      source: fixedValuesSource,
     },
   },
 };

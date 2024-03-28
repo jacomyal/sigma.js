@@ -65,8 +65,8 @@ export default () => {
     defaultColor: "#BCB7C4",
     offset: { attribute: "offset" },
     slices: [
-      { color: { value: "yellow" }, size: { value: 1 } },
-      { color: { value: "orange" }, size: { value: 1 } },
+      { color: { value: "yellow" }, value: { value: 1 } },
+      { color: { value: "orange" }, value: { value: 1 } },
     ],
   });
   const renderer = new Sigma(graph, container, {

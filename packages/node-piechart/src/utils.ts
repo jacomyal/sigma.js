@@ -1,14 +1,14 @@
 import { NonEmptyArray } from "sigma/src/types.ts";
 
 export type NodeSliceColor = { value: string } | { attribute: string; defaultValue?: string } | { transparent: true };
-export type NodeSliceSize = { value: number } | { attribute: string };
+export type NodeSliceValue = { value: number } | { attribute: string };
 
 export interface CreateNodePiechartProgramOptions {
   defaultColor: string;
-  offset: NodeSliceSize;
+  offset: NodeSliceValue;
   slices: NonEmptyArray<{
     color: NodeSliceColor;
-    size: NodeSliceSize;
+    value: NodeSliceValue;
   }>;
 }
 

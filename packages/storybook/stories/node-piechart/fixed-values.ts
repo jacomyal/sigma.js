@@ -1,5 +1,4 @@
-import { createNodePiechartProgram } from "@sigma/node-piechart";
-import { CreateNodePiechartProgramOptions } from "@sigma/node-piechart/src/utils";
+import { CreateNodePiechartProgramOptions, createNodePiechartProgram } from "@sigma/node-piechart";
 import Graph from "graphology";
 import Sigma from "sigma";
 import { DEFAULT_NODE_PROGRAM_CLASSES } from "sigma/settings";
@@ -75,9 +74,11 @@ export default () => {
   const nodeProgramClasses = { ...DEFAULT_NODE_PROGRAM_CLASSES };
 
   for (let i = 2; i <= maxCount; i++) {
-    const slices: CreateNodePiechartProgramOptions["slices"] = [];
-    for (let j = 0; j < i; j++) slices.push({ color: { attribute: j ? `color-${j}` : "color" }, size: { value: 1 } });
-    nodeProgramClasses[`pie-${i}`] = createNodePiechartProgram({ slices });
+    const slices: CreateNodePiechartProgramOptions["slices"] = [{ color: { attribute: "color" }, value: { value: 1 } }];
+    for (let j = 1; j < i; j++) slices.push({ color: { attribute: `color-${j}` }, value: { value: 1 } });
+    nodeProgramClasses[`pie-${i}`] = createNodePiechartProgram({
+      slices,
+    });
   }
   const renderer = new Sigma(graph, container, {
     nodeProgramClasses,

@@ -56,8 +56,8 @@ export default function getNodePiechartProgram<
               ? [{ name: `a_sliceColor_${i + 1}`, size: 4, type: UNSIGNED_BYTE, normalized: true }]
               : [],
           ),
-          ...slices.flatMap(({ size }, i) =>
-            "attribute" in size ? [{ name: `a_sliceValue_${i + 1}`, size: 1, type: FLOAT }] : [],
+          ...slices.flatMap(({ value }, i) =>
+            "attribute" in value ? [{ name: `a_sliceValue_${i + 1}`, size: 1, type: FLOAT }] : [],
           ),
         ],
         CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
@@ -79,9 +79,9 @@ export default function getNodePiechartProgram<
         if ("attribute" in color)
           array[startIndex++] = floatColor(data[color.attribute as "color"] || color.defaultValue || DEFAULT_COLOR);
       });
-      slices.forEach(({ size }) => {
-        if ("attribute" in size) {
-          array[startIndex++] = data[size.attribute as "size"] || 0;
+      slices.forEach(({ value }) => {
+        if ("attribute" in value) {
+          array[startIndex++] = data[value.attribute as "size"] || 0;
         }
       });
     }
