@@ -80,7 +80,7 @@ void main() {
   // For normal mode, we use the color:
   v_color = a_color;
   #endif
-    
+
   v_color.a *= bias;
 }
 `;

@@ -73,7 +73,7 @@ ${slices
       `  float sliceValue_${i + 1} = ${"attribute" in value ? `v_sliceValue_${i + 1}` : numberToGLSLFloat(value.value)};`,
   )
   .join("\n")}
-    
+
   // Angles and final color:
   float total = ${slices.map((_, i) => `sliceValue_${i + 1}`).join(" + ")};
   float angle_0 = 0.0;

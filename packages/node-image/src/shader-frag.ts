@@ -39,7 +39,7 @@ void main(void) {
       color = v_color;
     }
   }
- 
+
   // Second case: Image loaded into the texture
   else {
     float paddingRatio = 1.0 + 2.0 * u_percentagePadding;
@@ -51,7 +51,7 @@ void main(void) {
     if (u_colorizeImages) {
       color = mix(gl_FragColor, v_color, texel.a);
     }
- 
+
     // Colorize background pixels, keep image pixel colors:
     else {
       color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
