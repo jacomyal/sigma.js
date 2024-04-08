@@ -22,11 +22,8 @@
     "vite": "^5.2.8",
     "vite-tsconfig-paths": "^4.3.2"
   },
-  "overrides": {
-    "sigma": "3.0.0-beta.16"
-  },
   "peerDependencies": {
-    "sigma": "3.0.0-beta.16"
+    "sigma": "3.0.0-beta.17"
   },
   "scripts": {
     "start": "vite",

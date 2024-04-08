@@ -33,7 +33,7 @@
     ]
   },
   "peerDependencies": {
-    "sigma": ">=3.0.0-beta.14"
+    "sigma": ">=3.0.0-beta.17"
   },
   "exports": {
     ".": {
