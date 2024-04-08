@@ -435,8 +435,7 @@ main #inthewild .thumbnail:hover > div {
   background-color: transparent;
 }
 main #inthewild .sumup {
-  margin: 1em;
-  width: 100%;
+  padding: 1em;
 }
 main #inthewild .sumup h3,
 main #inthewild .sumup p {
