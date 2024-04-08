@@ -1,6 +1,6 @@
-import createEdgeCurveProgram from "./factory.ts";
+import createEdgeCurveProgram from "./factory";
 
-export { default as createEdgeCurveProgram } from "./factory.ts";
+export { default as createEdgeCurveProgram } from "./factory";
 export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils";
 
 const EdgeCurveProgram = createEdgeCurveProgram();

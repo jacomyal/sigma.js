@@ -1,4 +1,4 @@
-import { CreateEdgeCurveProgramOptions } from "./utils.ts";
+import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getVertexShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
   // language=GLSL

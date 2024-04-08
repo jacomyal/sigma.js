@@ -1,4 +1,4 @@
-import { CreateEdgeCurveProgramOptions } from "./utils.ts";
+import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
   // language=GLSL

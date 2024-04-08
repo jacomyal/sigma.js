@@ -4,8 +4,8 @@ import { EdgeDisplayData, NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
 import { getDrawCurvedEdgeLabel } from "./edge-labels";
-import getFragmentShader from "./shader-frag.ts";
-import getVertexShader from "./shader-vert.ts";
+import getFragmentShader from "./shader-frag";
+import getVertexShader from "./shader-vert";
 import { CreateEdgeCurveProgramOptions, DEFAULT_EDGE_CURVATURE, DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS } from "./utils";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
