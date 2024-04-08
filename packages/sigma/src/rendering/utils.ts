@@ -71,3 +71,10 @@ export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShade
 
   return program;
 }
+
+/**
+ * Function use to print a float for inserting in a GLSL program.
+ */
+export function numberToGLSLFloat(n: number): string {
+  return n % 1 === 0 ? n.toFixed(1) : n.toString();
+}

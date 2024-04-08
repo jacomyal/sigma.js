@@ -1,4 +1,6 @@
-import { CreateNodePiechartProgramOptions, numberToGLSLFloat } from "./utils";
+import { numberToGLSLFloat } from "sigma/rendering";
+
+import { CreateNodePiechartProgramOptions } from "./utils";
 
 export default function getFragmentShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL

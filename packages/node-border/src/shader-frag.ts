@@ -1,4 +1,6 @@
-import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSize, numberToGLSLFloat } from "./utils";
+import { numberToGLSLFloat } from "sigma/rendering";
+
+import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSize } from "./utils";
 
 export default function getFragmentShader({ borders }: CreateNodeBorderProgramOptions) {
   const fillCounts = numberToGLSLFloat(borders.filter(({ size }) => "fill" in size).length);

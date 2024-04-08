@@ -22,7 +22,3 @@ export const DEFAULT_CREATE_NODE_BORDER_OPTIONS: CreateNodeBorderProgramOptions 
 };
 
 export const DEFAULT_COLOR = "#000000";
-
-export function numberToGLSLFloat(n: number): string {
-  return n % 1 === 0 ? n.toFixed(1) : n.toString();
-}
