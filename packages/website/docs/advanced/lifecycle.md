@@ -36,7 +36,7 @@ Rendering in sigma involves two primary steps: processing the data and then visu
 
 ### Two-step rendering mechanism
 
-1. **Processing**: Before rendering, sigma must process the data. This involves tasks like reindexing the internal quadtree, invoking the `nodeReducer` and `edgeReducer` settings, and indexing data for the WebGL renderers.
+1. **Processing**: Before rendering, sigma must process the data. This involves tasks like invoking the `nodeReducer` and `edgeReducer` settings, and indexing data for the WebGL renderers.
 2. **Rendering**: After processing, sigma visualizes the graph by generating each layer in the canvas element.
 
 ### Automatic rendering triggers
