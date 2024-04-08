@@ -1,5 +1,8 @@
-// language=GLSL
-const VERTEX_SHADER_SOURCE = /*glsl*/ `
+import { CreateEdgeCurveProgramOptions } from "./utils.ts";
+
+export default function getVertexShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
+  // language=GLSL
+  const SHADER = /*glsl*/ `
 attribute vec4 a_id;
 attribute vec4 a_color;
 attribute float a_direction;
@@ -8,6 +11,7 @@ attribute vec2 a_source;
 attribute vec2 a_target;
 attribute float a_current;
 attribute float a_curvature;
+${arrowHead ? "attribute float a_targetSize;\n" : ""}
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -19,6 +23,15 @@ varying float v_thickness;
 varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
+${
+  arrowHead
+    ? `
+varying float v_targetSize;
+varying vec2 v_targetPoint;
+uniform float u_widenessToThicknessRatio;
+`
+    : ""
+}
 
 const float bias = 255.0 / 254.0;
 const float epsilon = 0.7;
@@ -66,12 +79,21 @@ void main() {
 
   vec2 viewportOffsetPosition = (
     viewportPosition +
-    unitNormal * (boundingBoxThickness / 2.0 + curveThickness + epsilon) *
+    unitNormal * (boundingBoxThickness / 2.0 + ${arrowHead ? "curveThickness * u_widenessToThicknessRatio" : "curveThickness"} + epsilon) *
     max(0.0, a_direction) // NOTE: cutting the bounding box in half to avoid overdraw
   );
 
   position = viewportToClipspace(viewportOffsetPosition, u_dimensions);
   gl_Position = vec4(position, 0, 1);
+    
+${
+  arrowHead
+    ? `
+  v_targetSize = a_targetSize * u_pixelRatio / u_sizeRatio;
+  v_targetPoint = viewportTarget;
+`
+    : ""
+}
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:
@@ -85,4 +107,5 @@ void main() {
 }
 `;
 
-export default VERTEX_SHADER_SOURCE;
+  return SHADER;
+}

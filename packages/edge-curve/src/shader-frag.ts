@@ -1,5 +1,8 @@
-// language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
+import { CreateEdgeCurveProgramOptions } from "./utils.ts";
+
+export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
+  // language=GLSL
+  const SHADER = /*glsl*/ `
 precision highp float;
 
 varying vec4 v_color;
@@ -7,6 +10,16 @@ varying float v_thickness;
 varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
+${
+  arrowHead
+    ? `
+varying float v_targetSize;
+varying vec2 v_targetPoint;
+
+uniform float u_lengthToThicknessRatio;
+uniform float u_widenessToThicknessRatio;`
+    : ""
+}
 
 float det(vec2 a, vec2 b) {
   return a.x * b.y - b.x * a.y;
@@ -34,12 +47,24 @@ const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
   float dist = distToQuadraticBezierCurve(gl_FragCoord.xy, v_cpA, v_cpB, v_cpC);
+  float thickness = v_thickness;
+${
+  arrowHead
+    ? `
+  float distToTarget = length(gl_FragCoord.xy - v_targetPoint);
+  float arrowLength = v_targetSize + v_thickness * u_lengthToThicknessRatio * 2.0;
+  if (distToTarget < arrowLength) {
+    thickness = (distToTarget - v_targetSize) / (arrowLength - v_targetSize) * u_widenessToThicknessRatio * thickness;
+  }
+`
+    : ""
+}
 
-  if (dist < v_thickness + epsilon) {
+  if (dist < thickness + epsilon) {
     #ifdef PICKING_MODE
     gl_FragColor = v_color;
     #else
-    float inCurve = 1.0 - smoothstep(v_thickness - epsilon, v_thickness + epsilon, dist);
+    float inCurve = 1.0 - smoothstep(thickness - epsilon, thickness + epsilon, dist);
     gl_FragColor = inCurve * vec4(v_color.rgb * v_color.a, v_color.a);
     #endif
   } else {
@@ -48,4 +73,5 @@ void main(void) {
 }
 `;
 
-export default SHADER_SOURCE;
+  return SHADER;
+}

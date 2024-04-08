@@ -1,4 +1,4 @@
-import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "@sigma/edge-curve";
+import { DEFAULT_EDGE_CURVATURE, EdgeCurvedArrowProgram, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { MultiGraph } from "graphology";
 import Sigma from "sigma";
 import { EdgeArrowProgram } from "sigma/rendering";
@@ -61,7 +61,7 @@ export default () => {
     defaultEdgeType: "straight",
     edgeProgramClasses: {
       straight: EdgeArrowProgram,
-      curved: EdgeCurveProgram,
+      curved: EdgeCurvedArrowProgram,
     },
   });
 

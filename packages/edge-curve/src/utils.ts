@@ -1,21 +1,36 @@
 import Graph from "graphology";
-import { EdgeDisplayData } from "sigma/types";
-
-export type CurvedEdgeDisplayData = EdgeDisplayData & { curvature?: number };
 
 export const DEFAULT_EDGE_CURVATURE = 0.25;
 
-const DEFAULT_OPTIONS = {
-  edgeIndexAttribute: "parallelIndex",
-  edgeMaxIndexAttribute: "parallelMaxIndex",
+export type CreateEdgeCurveProgramOptions = {
+  // If 0, then edges have no arrow head. Else, the head is as long as this ratio times the thickness.
+  curvatureAttribute: string;
+  defaultCurvature: number;
+  arrowHead: null | {
+    lengthToThicknessRatio: number;
+    widenessToThicknessRatio: number;
+  };
+};
+
+export const DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS: CreateEdgeCurveProgramOptions = {
+  arrowHead: null,
+  curvatureAttribute: "curvature",
+  defaultCurvature: DEFAULT_EDGE_CURVATURE,
 };
 
 /**
  * This function helps to identify parallel edges, to adjust their curvatures.
  */
-export function indexParallelEdgesIndex(graph: Graph, options?: Partial<typeof DEFAULT_OPTIONS>): void {
+const DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS = {
+  edgeIndexAttribute: "parallelIndex",
+  edgeMaxIndexAttribute: "parallelMaxIndex",
+};
+export function indexParallelEdgesIndex(
+  graph: Graph,
+  options?: Partial<typeof DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS>,
+): void {
   const opts = {
-    ...DEFAULT_OPTIONS,
+    ...DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS,
     ...(options || {}),
   };
 

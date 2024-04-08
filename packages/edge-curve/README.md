@@ -2,9 +2,20 @@
 
 This package contains a curved edges renderer for [sigma.js](https://sigmajs.org).
 
+It handles various aspects, such as:
+
+- Varying curvatures
+- Arrow heads
+- Parallel curved edges
+
 The edges are rendered as [quadratic Bézier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Quadratic_B%C3%A9zier_curves). This package exports by default `EdgeCurveProgram`, the renderer for sigma. Edges can have a `curvature` value, to make them more or less curved.
 
-It also exports `DEFAULT_EDGE_CURVATURE` (the default curvature value for edges) and `indexParallelEdgesIndex`, a utility function to find parallel edges, and help adapt their `curvature` for display (see the [dedicated example](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/edge-curve/parallel-edges.ts) to see how it works)
+It also exports:
+
+- `EdgeCurvedArrowProgram`, a program with defaults settings adapted to render edges as curved arrows
+- `createEdgeCurveProgram`, the factory to build a `CustomEdgeCurveProgram` with customized settings
+- `DEFAULT_EDGE_CURVATURE`, the default curvature value for edges
+- `indexParallelEdgesIndex`, a utility function to find parallel edges, and help adapt their `curvature` for display (see the [dedicated example](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/edge-curve/parallel-edges.ts) to see how it works)
 
 ## How to use
 
