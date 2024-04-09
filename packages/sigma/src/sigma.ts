@@ -1632,7 +1632,7 @@ export default class Sigma<
     this.settings[key] = value;
     validateSettings(this.settings);
     this.handleSettingsUpdate();
-    this.refresh();
+    this.scheduleRefresh();
     return this;
   }
 
