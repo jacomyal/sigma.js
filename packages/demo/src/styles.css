@@ -25,7 +25,6 @@
  */
 body {
   font-family: "Public Sans", sans-serif;
-  background: white;
   font-size: 0.9em;
   overflow: hidden;
 }
@@ -62,6 +61,7 @@ body {
 }
 #app-root,
 .sigma-container {
+  background: white;
   position: absolute;
   inset: 0;
 }
