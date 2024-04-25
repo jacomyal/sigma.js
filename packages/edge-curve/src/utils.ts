@@ -23,6 +23,7 @@ export const DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS: CreateEdgeCurveProgramOptions =
  */
 const DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS = {
   edgeIndexAttribute: "parallelIndex",
+  edgeMinIndexAttribute: "parallelMinIndex",
   edgeMaxIndexAttribute: "parallelMaxIndex",
 };
 export function indexParallelEdgesIndex(
@@ -80,15 +81,28 @@ export function indexParallelEdgesIndex(
     // If the edge is alone, but there is at least one edge in the opposite direction:
     else if (directedCount === 1) {
       const edge = edges[0];
-      graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, 0);
+      graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, 1);
       graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, 1);
     }
 
-    // If the edge is not alone:
+    // If the edge is not alone, and all edges are in the same direction:
+    else if (directedCount === undirectedCount) {
+      const max = (directedCount - 1) / 2;
+      const min = -max;
+      for (let i = 0; i < directedCount; i++) {
+        const edge = edges[i];
+        const edgeIndex = -(directedCount - 1) / 2 + i;
+        graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, edgeIndex);
+        graph.setEdgeAttribute(edge, opts.edgeMinIndexAttribute, min);
+        graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, max);
+      }
+    }
+
+    // If the edge is not alone, and there are edges in both directions:
     else {
       for (let i = 0; i < directedCount; i++) {
         const edge = edges[i];
-        graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, i);
+        graph.setEdgeAttribute(edge, opts.edgeIndexAttribute, i + 1);
         graph.setEdgeAttribute(edge, opts.edgeMaxIndexAttribute, directedCount);
       }
     }

@@ -79,7 +79,7 @@ void main() {
 
   vec2 viewportOffsetPosition = (
     viewportPosition +
-    unitNormal * (boundingBoxThickness / 2.0 + ${arrowHead ? "curveThickness * u_widenessToThicknessRatio" : "curveThickness"} + epsilon) *
+    unitNormal * (boundingBoxThickness / 2.0 + sign(boundingBoxThickness) * (${arrowHead ? "curveThickness * u_widenessToThicknessRatio" : "curveThickness"} + epsilon)) *
     max(0.0, a_direction) // NOTE: cutting the bounding box in half to avoid overdraw
   );
 
