@@ -23,7 +23,7 @@
     "vite-tsconfig-paths": "^4.3.2"
   },
   "peerDependencies": {
-    "sigma": "3.0.0-beta.17"
+    "sigma": ">=3.0.0-beta.17"
   },
   "scripts": {
     "start": "vite",
