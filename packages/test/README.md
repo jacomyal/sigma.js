@@ -21,4 +21,4 @@ Unit testing is performed using [Vitest](https://vitest.dev/), using the [browse
 
 ## Benchmarking
 
-Benchmarking scenarii have been written to run using the `vitest bench` command. Unfortunately, at the moment, **they don't work properly** because of [some issue](https://github.com/vitest-dev/vitest/issues/5041) with Vitest benchmark mode compatibility with the browser mode.
+Benchmarking scenarii have been written to run using the `vitest bench` command.
