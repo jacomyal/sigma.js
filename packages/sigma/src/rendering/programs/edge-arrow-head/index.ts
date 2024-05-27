@@ -16,7 +16,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio"] as const;
+const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio", "u_minEdgeThickness"] as const;
 
 export default class EdgeArrowHeadProgram<
   N extends Attributes = Attributes,
@@ -88,10 +88,11 @@ export default class EdgeArrowHeadProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_matrix, u_sizeRatio, u_correctionRatio } = uniformLocations;
+    const { u_matrix, u_sizeRatio, u_correctionRatio, u_minEdgeThickness } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
+    gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
   }
 }

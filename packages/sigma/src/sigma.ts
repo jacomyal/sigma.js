@@ -1105,6 +1105,7 @@ export default class Sigma<
         sizeRatio: 1 / this.scaleSize(),
         correctionRatio: this.correctionRatio,
         downSizingRatio: this.pickingDownSizingRatio,
+        minEdgeThickness: this.settings.minEdgeThickness,
       });
     }
   }
@@ -1200,6 +1201,7 @@ export default class Sigma<
       sizeRatio: 1 / this.scaleSize(),
       correctionRatio: this.correctionRatio,
       downSizingRatio: this.pickingDownSizingRatio,
+      minEdgeThickness: this.settings.minEdgeThickness,
     };
 
     // Drawing nodes

@@ -90,6 +90,7 @@ export interface RenderParams {
   correctionRatio: number;
   matrix: Float32Array;
   downSizingRatio: number;
+  minEdgeThickness: number;
 }
 
 /**

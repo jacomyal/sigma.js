@@ -12,15 +12,17 @@ uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_zoomRatio;
 uniform float u_correctionRatio;
+uniform float u_minEdgeThickness;
 
 varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
-const float minThickness = 1.7;
 const float bias = 255.0 / 254.0;
 
 void main() {
+  float minThickness = u_minEdgeThickness;
+
   vec2 normal = a_normal * a_normalCoef;
   vec2 position = a_positionStart * (1.0 - a_positionCoef) + a_positionEnd * a_positionCoef;
 

@@ -14,15 +14,17 @@ attribute vec4 a_color;
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
+uniform float u_minEdgeThickness;
 
 varying vec4 v_color;
 
-const float minThickness = 1.7;
 const float bias = 255.0 / 254.0;
 const float arrowHeadWidthLengthRatio = 0.66;
 const float arrowHeadLengthThicknessRatio = 2.5;
 
 void main() {
+  float minThickness = u_minEdgeThickness;
+
   float normalLength = length(a_normal);
   vec2 unitNormal = a_normal / normalLength;
 

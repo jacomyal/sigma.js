@@ -57,6 +57,7 @@ export interface Settings<
   defaultDrawEdgeLabel: EdgeLabelDrawingFunction<N, E, G>;
   defaultDrawNodeLabel: NodeLabelDrawingFunction<N, E, G>;
   defaultDrawNodeHover: NodeHoverDrawingFunction<N, E, G>;
+  minEdgeThickness: number;
 
   // Labels
   labelDensity: number;
@@ -108,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   defaultDrawEdgeLabel: drawStraightEdgeLabel,
   defaultDrawNodeLabel: drawDiscNodeLabel,
   defaultDrawNodeHover: drawDiscNodeHover,
+  minEdgeThickness: 1.7,
 
   // Labels
   labelDensity: 1,

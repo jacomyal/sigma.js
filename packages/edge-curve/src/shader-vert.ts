@@ -17,6 +17,7 @@ uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_pixelRatio;
 uniform vec2 u_dimensions;
+uniform float u_minEdgeThickness;
 
 varying vec4 v_color;
 varying float v_thickness;
@@ -35,7 +36,6 @@ uniform float u_widenessToThicknessRatio;
 
 const float bias = 255.0 / 254.0;
 const float epsilon = 0.7;
-const float minThickness = 0.3;
 
 vec2 clipspaceToViewport(vec2 pos, vec2 dimensions) {
   return vec2(
@@ -52,6 +52,8 @@ vec2 viewportToClipspace(vec2 pos, vec2 dimensions) {
 }
 
 void main() {
+  float minThickness = u_minEdgeThickness;
+
   // Selecting the correct position
   // Branchless "position = a_source if a_current == 1.0 else a_target"
   vec2 position = a_source * max(0.0, a_current) + a_target * max(0.0, 1.0 - a_current);
