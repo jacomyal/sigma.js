@@ -216,20 +216,15 @@ export default class Sigma<
 
     // Loading programs
     for (const type in this.settings.nodeProgramClasses) {
-      const NodeProgramClass = this.settings.nodeProgramClasses[type];
-      this.nodePrograms[type] = new NodeProgramClass(this.webGLContexts.nodes, this.frameBuffers.nodes, this);
-
-      let NodeHoverProgram = NodeProgramClass;
-      if (type in this.settings.nodeHoverProgramClasses) {
-        NodeHoverProgram = this.settings.nodeHoverProgramClasses[type];
-      }
-
-      this.nodeHoverPrograms[type] = new NodeHoverProgram(this.webGLContexts.hoverNodes, null, this);
+      this.registerNodeProgram(
+        type,
+        this.settings.nodeProgramClasses[type],
+        this.settings.nodeHoverProgramClasses[type],
+      );
     }
 
     for (const type in this.settings.edgeProgramClasses) {
-      const EdgeProgramClass = this.settings.edgeProgramClasses[type];
-      this.edgePrograms[type] = new EdgeProgramClass(this.webGLContexts.edges, this.frameBuffers.edges, this);
+      this.registerEdgeProgram(type, this.settings.edgeProgramClasses[type]);
     }
 
     // Initializing the camera
@@ -299,6 +294,74 @@ export default class Sigma<
 
     this.canvasContexts[id] = canvas.getContext("2d", contextOptions) as CanvasRenderingContext2D;
 
+    return this;
+  }
+
+  /**
+   * Internal function used to register a node program
+   *
+   * @param  {string}           key              - The program's key, matching the related nodes "type" values.
+   * @param  {NodeProgramType}  NodeProgramClass - A nodes program class.
+   * @param  {NodeProgramType?} NodeHoverProgram - A nodes program class to render hovered nodes (optional).
+   * @return {Sigma}
+   */
+  private registerNodeProgram(
+    key: string,
+    NodeProgramClass: NodeProgramType<N, E, G>,
+    NodeHoverProgram?: NodeProgramType<N, E, G>,
+  ): this {
+    if (this.nodePrograms[key]) this.nodePrograms[key].kill();
+    if (this.nodeHoverPrograms[key]) this.nodeHoverPrograms[key].kill();
+    this.nodePrograms[key] = new NodeProgramClass(this.webGLContexts.nodes, this.frameBuffers.nodes, this);
+    this.nodeHoverPrograms[key] = new (NodeHoverProgram || NodeProgramClass)(this.webGLContexts.hoverNodes, null, this);
+    return this;
+  }
+
+  /**
+   * Internal function used to register an edge program
+   *
+   * @param  {string}          key              - The program's key, matching the related edges "type" values.
+   * @param  {EdgeProgramType} EdgeProgramClass - An edges program class.
+   * @return {Sigma}
+   */
+  private registerEdgeProgram(key: string, EdgeProgramClass: EdgeProgramType<N, E, G>): this {
+    if (this.edgePrograms[key]) this.edgePrograms[key].kill();
+    this.edgePrograms[key] = new EdgeProgramClass(this.webGLContexts.edges, this.frameBuffers.edges, this);
+    return this;
+  }
+
+  /**
+   * Internal function used to unregister a node program
+   *
+   * @param  {string} key - The program's key, matching the related nodes "type" values.
+   * @return {Sigma}
+   */
+  private unregisterNodeProgram(key: string): this {
+    if (this.nodePrograms[key]) {
+      const { [key]: program, ...programs } = this.nodePrograms;
+      program.kill();
+      this.nodePrograms = programs;
+    }
+    if (this.nodeHoverPrograms[key]) {
+      const { [key]: program, ...programs } = this.nodeHoverPrograms;
+      program.kill();
+      this.nodePrograms = programs;
+    }
+    return this;
+  }
+
+  /**
+   * Internal function used to unregister an edge program
+   *
+   * @param  {string} key - The program's key, matching the related edges "type" values.
+   * @return {Sigma}
+   */
+  private unregisterEdgeProgram(key: string): this {
+    if (this.edgePrograms[key]) {
+      const { [key]: program, ...programs } = this.edgePrograms;
+      program.kill();
+      this.edgePrograms = programs;
+    }
     return this;
   }
 
@@ -859,10 +922,44 @@ export default class Sigma<
    * Method that backports potential settings updates where it's needed.
    * @private
    */
-  private handleSettingsUpdate(): this {
-    this.camera.minRatio = this.settings.minCameraRatio;
-    this.camera.maxRatio = this.settings.maxCameraRatio;
+  private handleSettingsUpdate(oldSettings?: Settings<N, E, G>): this {
+    const settings = this.settings;
+
+    this.camera.minRatio = settings.minCameraRatio;
+    this.camera.maxRatio = settings.maxCameraRatio;
     this.camera.setState(this.camera.validateState(this.camera.getState()));
+
+    if (oldSettings) {
+      // Check edge programs:
+      if (oldSettings.edgeProgramClasses !== settings.edgeProgramClasses) {
+        for (const type in settings.edgeProgramClasses) {
+          if (settings.edgeProgramClasses[type] !== oldSettings.edgeProgramClasses[type]) {
+            this.registerEdgeProgram(type, settings.edgeProgramClasses[type]);
+          }
+        }
+        for (const type in oldSettings.edgeProgramClasses) {
+          if (!settings.edgeProgramClasses[type]) this.unregisterEdgeProgram(type);
+        }
+      }
+
+      // Check node programs:
+      if (
+        oldSettings.nodeProgramClasses !== settings.nodeProgramClasses ||
+        oldSettings.nodeHoverProgramClasses !== settings.nodeHoverProgramClasses
+      ) {
+        for (const type in settings.nodeProgramClasses) {
+          if (
+            settings.nodeProgramClasses[type] !== oldSettings.nodeProgramClasses[type] ||
+            settings.nodeHoverProgramClasses[type] !== oldSettings.nodeHoverProgramClasses[type]
+          ) {
+            this.registerNodeProgram(type, settings.nodeProgramClasses[type], settings.nodeHoverProgramClasses[type]);
+          }
+        }
+        for (const type in oldSettings.nodeProgramClasses) {
+          if (!settings.nodeProgramClasses[type]) this.unregisterNodeProgram(type);
+        }
+      }
+    }
 
     return this;
   }
@@ -1631,9 +1728,10 @@ export default class Sigma<
    * @return {Sigma}
    */
   setSetting<K extends keyof Settings<N, E, G>>(key: K, value: Settings<N, E, G>[K]): this {
+    const oldValues = { ...this.settings };
     this.settings[key] = value;
     validateSettings(this.settings);
-    this.handleSettingsUpdate();
+    this.handleSettingsUpdate(oldValues);
     this.scheduleRefresh();
     return this;
   }
@@ -1650,10 +1748,7 @@ export default class Sigma<
     key: K,
     updater: (value: Settings<N, E, G>[K]) => Settings<N, E, G>[K],
   ): this {
-    this.settings[key] = updater(this.settings[key]);
-    validateSettings(this.settings);
-    this.handleSettingsUpdate();
-    this.scheduleRefresh();
+    this.setSetting(key, updater(this.settings[key]));
     return this;
   }
 
