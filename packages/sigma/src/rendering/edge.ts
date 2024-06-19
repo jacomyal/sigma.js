@@ -40,7 +40,7 @@ export abstract class EdgeProgram<
   drawLabel: EdgeLabelDrawingFunction<N, E, G> | undefined = undefined;
 
   kill(): void {
-    return undefined;
+    super.kill();
   }
 
   process(

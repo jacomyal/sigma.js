@@ -10,7 +10,7 @@ import { Attributes } from "graphology-types";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
 import { EdgeProgram } from "../../edge";
-import { ProgramInfo } from "../../program";
+import { ProgramInfo } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 

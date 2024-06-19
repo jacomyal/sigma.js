@@ -9,7 +9,7 @@ import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
-import { AbstractEdgeProgram, AbstractNodeProgram } from "./rendering";
+import { AbstractEdgeProgram, AbstractNodeProgram, EdgeProgramType, NodeProgramType } from "./rendering";
 import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
   CameraState,

@@ -7,7 +7,6 @@ export type { NodeProgramType } from "./node";
 export { EdgeProgram, AbstractEdgeProgram, createEdgeCompoundProgram } from "./edge";
 export type { EdgeProgramType } from "./edge";
 export { Program, AbstractProgram } from "./program";
-export type { ProgramInfo, ProgramDefinition } from "./program";
 
 // Canvas helpers
 export type { EdgeLabelDrawingFunction } from "./edge-labels";

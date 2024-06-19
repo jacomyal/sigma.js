@@ -36,7 +36,7 @@ export abstract class NodeProgram<
   drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
 
   kill(): void {
-    return undefined;
+    super.kill();
   }
 
   process(nodeIndex: number, offset: number, data: NodeDisplayData): void {

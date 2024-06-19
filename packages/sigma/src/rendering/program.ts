@@ -9,7 +9,17 @@ import { Attributes } from "graphology-types";
 
 import type Sigma from "../sigma";
 import type { RenderParams } from "../types";
-import { loadFragmentShader, loadProgram, loadVertexShader } from "./utils";
+import {
+  InstancedProgramDefinition,
+  ProgramAttributeSpecification,
+  ProgramDefinition,
+  ProgramInfo,
+  getAttributesItemsCount,
+  killProgram,
+  loadFragmentShader,
+  loadProgram,
+  loadVertexShader,
+} from "./utils";
 
 const PICKING_PREFIX = `#define PICKING_MODE\n`;
 
@@ -23,48 +33,6 @@ const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.UNSIGNED_INT]: 4,
   [WebGL2RenderingContext.FLOAT]: 4,
 };
-
-function getAttributeItemsCount(attr: ProgramAttributeSpecification): number {
-  return attr.normalized ? 1 : attr.size;
-}
-function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number {
-  let res = 0;
-  attrs.forEach((attr) => (res += getAttributeItemsCount(attr)));
-  return res;
-}
-
-export interface ProgramInfo<Uniform extends string = string> {
-  name: string;
-  isPicking: boolean;
-  program: WebGLProgram;
-  gl: WebGLRenderingContext | WebGL2RenderingContext;
-  frameBuffer: WebGLFramebuffer | null;
-  buffer: WebGLBuffer;
-  constantBuffer: WebGLBuffer;
-  uniformLocations: Record<Uniform, WebGLUniformLocation>;
-  attributeLocations: Record<string, GLint>;
-}
-
-export interface ProgramAttributeSpecification {
-  name: string;
-  size: number;
-  type: number;
-  normalized?: boolean;
-}
-
-export interface ProgramDefinition<Uniform extends string = string> {
-  VERTICES: number;
-  VERTEX_SHADER_SOURCE: string;
-  FRAGMENT_SHADER_SOURCE: string;
-  UNIFORMS: ReadonlyArray<Uniform>;
-  ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  METHOD: GLenum;
-}
-
-export interface InstancedProgramDefinition<Uniform extends string = string> extends ProgramDefinition<Uniform> {
-  CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  CONSTANT_DATA: number[][];
-}
 
 export abstract class AbstractProgram<
   N extends Attributes = Attributes,
@@ -171,7 +139,14 @@ export abstract class Program<
     }
   }
 
-  abstract kill(): void;
+  kill() {
+    killProgram(this.normalProgram);
+
+    if (this.pickProgram) {
+      killProgram(this.pickProgram);
+      this.pickProgram = null;
+    }
+  }
 
   protected getProgramInfo(
     name: "normal" | "pick",
@@ -224,6 +199,8 @@ export abstract class Program<
       uniformLocations,
       attributeLocations,
       isPicking: name === "pick",
+      vertexShader,
+      fragmentShader,
     };
   }
 

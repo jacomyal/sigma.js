@@ -1,14 +1,47 @@
-/**
- * Sigma.js Shader Utils
- * ======================
- *
- * Code used to load sigma's shaders.
- * @module
- */
+export function getAttributeItemsCount(attr: ProgramAttributeSpecification): number {
+  return attr.normalized ? 1 : attr.size;
+}
+export function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number {
+  let res = 0;
+  attrs.forEach((attr) => (res += getAttributeItemsCount(attr)));
+  return res;
+}
 
-/**
- * Function used to load a shader.
- */
+export interface ProgramInfo<Uniform extends string = string> {
+  name: string;
+  isPicking: boolean;
+  program: WebGLProgram;
+  gl: WebGLRenderingContext | WebGL2RenderingContext;
+  frameBuffer: WebGLFramebuffer | null;
+  buffer: WebGLBuffer;
+  constantBuffer: WebGLBuffer;
+  uniformLocations: Record<Uniform, WebGLUniformLocation>;
+  attributeLocations: Record<string, GLint>;
+  vertexShader: WebGLShader;
+  fragmentShader: WebGLShader;
+}
+
+export interface ProgramAttributeSpecification {
+  name: string;
+  size: number;
+  type: number;
+  normalized?: boolean;
+}
+
+export interface ProgramDefinition<Uniform extends string = string> {
+  VERTICES: number;
+  VERTEX_SHADER_SOURCE: string;
+  FRAGMENT_SHADER_SOURCE: string;
+  UNIFORMS: ReadonlyArray<Uniform>;
+  ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  METHOD: GLenum;
+}
+
+export interface InstancedProgramDefinition<Uniform extends string = string> extends ProgramDefinition<Uniform> {
+  CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
+  CONSTANT_DATA: number[][];
+}
+
 function loadShader(type: string, gl: WebGLRenderingContext, source: string): WebGLShader {
   const glType = type === "VERTEX" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
@@ -70,6 +103,13 @@ export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShade
   }
 
   return program;
+}
+
+export function killProgram({ gl, buffer, program, vertexShader, fragmentShader }: ProgramInfo): void {
+  gl.deleteShader(vertexShader);
+  gl.deleteShader(fragmentShader);
+  gl.deleteProgram(program);
+  gl.deleteBuffer(buffer);
 }
 
 /**
