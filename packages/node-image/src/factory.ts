@@ -31,6 +31,8 @@ interface CreateNodeImageProgramOptions<N extends Attributes, E extends Attribut
   padding: number;
   // Allows using a different color attribute name.
   colorAttribute: string;
+  // Allows using a different image attribute name.
+  imageAttribute: string;
 }
 
 const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions<Attributes, Attributes, Attributes> = {
@@ -41,6 +43,7 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions<Attribute
   drawHover: undefined,
   padding: 0,
   colorAttribute: "color",
+  imageAttribute: "image",
 };
 
 const UNIFORMS = [
@@ -71,6 +74,7 @@ export default function getNodeImageProgram<
     keepWithinCircle,
     padding,
     colorAttribute,
+    imageAttribute,
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions<N, E, G> = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
@@ -167,7 +171,7 @@ export default function getNodeImageProgram<
       const array = this.array;
       const color = floatColor(data[colorAttribute as "color"]);
 
-      const imageSource = data.image;
+      const imageSource = data[imageAttribute as "image"];
       const imagePosition = imageSource ? this.atlas[imageSource] : undefined;
 
       if (typeof imageSource === "string" && !imagePosition) textureManager.registerImage(imageSource);
