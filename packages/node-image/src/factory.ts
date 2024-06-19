@@ -10,7 +10,7 @@ import {
 import { NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
-import FRAGMENT_SHADER_SOURCE from "./shader-frag";
+import getFragmentShader from "./shader-frag";
 import VERTEX_SHADER_SOURCE from "./shader-vert";
 import { Atlas, DEFAULT_TEXTURE_MANAGER_OPTIONS, TextureManager, TextureManagerOptions } from "./texture";
 
@@ -67,6 +67,11 @@ export default function getNodeImageProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 >(options?: Partial<CreateNodeImageProgramOptions<N, E, G>>): NodeProgramType<N, E, G> {
+  // Compute effective MAX_TEXTURE_SIZE from WebGL contexts:
+  const gl = document.createElement("canvas").getContext("webgl") as WebGLRenderingContext;
+  const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  (gl.canvas as HTMLCanvasElement).remove();
+
   const {
     drawHover,
     drawLabel,
@@ -78,6 +83,7 @@ export default function getNodeImageProgram<
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions<N, E, G> = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
+    ...{ maxTextureSize },
     ...(options || {}),
     drawLabel: undefined,
     drawHover: undefined,
@@ -103,7 +109,7 @@ export default function getNodeImageProgram<
       return {
         VERTICES: 3,
         VERTEX_SHADER_SOURCE,
-        FRAGMENT_SHADER_SOURCE,
+        FRAGMENT_SHADER_SOURCE: getFragmentShader({ texturesCount: textureManager.getTextures().length }),
         METHOD: WebGLRenderingContext.TRIANGLES,
         UNIFORMS,
         ATTRIBUTES: [
@@ -112,6 +118,7 @@ export default function getNodeImageProgram<
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_texture", size: 4, type: FLOAT },
+          { name: "a_textureIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
         CONSTANT_DATA: [[NodeImageProgram.ANGLE_1], [NodeImageProgram.ANGLE_2], [NodeImageProgram.ANGLE_3]],
@@ -119,51 +126,91 @@ export default function getNodeImageProgram<
     }
 
     atlas: Atlas;
-    texture: WebGLTexture;
-    textureImage: ImageData;
+    textures: WebGLTexture[];
+    textureImages: ImageData[];
     latestRenderParams?: RenderParams;
-    textureManagerCallback: () => void;
+    textureManagerCallback: null | ((newAtlasData: { atlas: Atlas; textures: ImageData[] }) => void) = null;
 
     constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       super(gl, pickingBuffer, renderer);
 
-      this.textureManagerCallback = () => {
-        if (!this) return;
+      this.textureManagerCallback = ({ atlas, textures }: { atlas: Atlas; textures: ImageData[] }) => {
+        const shouldUpgradeShaders = textures.length !== this.textures.length;
+        this.atlas = atlas;
+        this.textureImages = textures;
 
-        if (this.bindTexture) {
-          this.atlas = textureManager.getAtlas();
-          this.textureImage = textureManager.getTexture();
-          this.bindTexture();
-          if (this.latestRenderParams) this.render(this.latestRenderParams);
-        }
+        if (shouldUpgradeShaders) this.upgradeShaders();
+        this.bindTextures();
 
-        if (renderer && renderer.refresh) renderer.refresh();
+        if (this.latestRenderParams) this.render(this.latestRenderParams);
+
+        if (this.renderer && this.renderer.refresh) this.renderer.refresh();
       };
       textureManager.on(TextureManager.NEW_TEXTURE_EVENT, this.textureManagerCallback);
 
       this.atlas = textureManager.getAtlas();
-      this.textureImage = textureManager.getTexture();
-      this.texture = gl.createTexture() as WebGLTexture;
-      this.bindTexture();
+      this.textureImages = textureManager.getTextures();
+      this.textures = this.textureImages.map(() => gl.createTexture() as WebGLTexture);
+      this.bindTextures();
+    }
+
+    private upgradeShaders() {
+      const def = this.getDefinition();
+      const { program, buffer, vertexShader, fragmentShader, gl } = this.normalProgram;
+      gl.deleteProgram(program);
+      gl.deleteBuffer(buffer);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
+      this.normalProgram = this.getProgramInfo(
+        "normal",
+        gl,
+        def.VERTEX_SHADER_SOURCE,
+        def.FRAGMENT_SHADER_SOURCE,
+        null,
+      );
     }
 
     kill() {
-      textureManager.off(TextureManager.NEW_TEXTURE_EVENT, this.textureManagerCallback);
+      const gl = this.normalProgram?.gl;
+      if (gl) {
+        for (let i = 0; i < this.textures.length; i++) {
+          gl.deleteTexture(this.textures[i]);
+        }
+      }
+
+      if (this.textureManagerCallback) {
+        textureManager.off(TextureManager.NEW_TEXTURE_EVENT, this.textureManagerCallback);
+        this.textureManagerCallback = null;
+      }
+
+      super.kill();
     }
 
-    bindTexture() {
+    protected bindTextures() {
       const gl = this.normalProgram.gl;
 
-      gl.bindTexture(gl.TEXTURE_2D, this.texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textureImage);
-      gl.generateMipmap(gl.TEXTURE_2D);
+      for (let i = 0; i < this.textureImages.length; i++) {
+        if (i >= this.textures.length) {
+          const texture = gl.createTexture();
+          if (texture) this.textures.push(texture);
+        }
+
+        gl.activeTexture(gl.TEXTURE0 + i);
+        gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textureImages[i]);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      }
     }
 
     protected renderProgram(params: RenderParams, programInfo: ProgramInfo) {
       if (!programInfo.isPicking) {
         // Rebind texture (since it's been just unbound by picking):
         const gl = programInfo.gl;
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+        for (let i = 0; i < this.textureImages.length; i++) {
+          gl.activeTexture(gl.TEXTURE0 + i);
+          gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
+        }
       }
       super.renderProgram(params, programInfo);
     }
@@ -184,13 +231,15 @@ export default function getNodeImageProgram<
       array[startIndex++] = nodeIndex;
 
       // Reference texture:
-      if (imagePosition) {
-        const { width, height } = this.textureImage;
+      if (imagePosition && typeof imagePosition.textureIndex === "number") {
+        const { width, height } = this.textureImages[imagePosition.textureIndex];
         array[startIndex++] = imagePosition.x / width;
         array[startIndex++] = imagePosition.y / height;
         array[startIndex++] = imagePosition.size / width;
         array[startIndex++] = imagePosition.size / height;
+        array[startIndex++] = imagePosition.textureIndex;
       } else {
+        array[startIndex++] = 0;
         array[startIndex++] = 0;
         array[startIndex++] = 0;
         array[startIndex++] = 0;
@@ -216,7 +265,10 @@ export default function getNodeImageProgram<
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniform1f(u_percentagePadding, padding);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-      gl.uniform1i(u_atlas, 0);
+      gl.uniform1iv(
+        u_atlas,
+        [...new Array(this.textureImages.length)].map((_, i) => i),
+      );
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
       gl.uniform1i(u_keepWithinCircle, keepWithinCircle ? 1 : 0);
     }

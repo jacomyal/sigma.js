@@ -1,13 +1,15 @@
-// language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
+export default function getFragmentShader({ texturesCount }: { texturesCount: number }) {
+  // language=GLSL
+  const SHADER = /*glsl*/ `
 precision highp float;
 
 varying vec4 v_color;
 varying vec2 v_diffVector;
 varying float v_radius;
 varying vec4 v_texture;
+varying float v_textureIndex;
 
-uniform sampler2D u_atlas;
+uniform sampler2D u_atlas[${texturesCount}];
 uniform float u_correctionRatio;
 uniform float u_cameraAngle;
 uniform float u_percentagePadding;
@@ -45,21 +47,40 @@ void main(void) {
     float paddingRatio = 1.0 + 2.0 * u_percentagePadding;
     float coef = u_keepWithinCircle ? 1.0 : ${Math.SQRT2};
     vec2 coordinateInTexture = diffVector * vec2(paddingRatio, -paddingRatio) / v_radius / 2.0 * coef + vec2(0.5, 0.5);
-    vec4 texel = texture2D(u_atlas, (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
+    int index = int(v_textureIndex + 0.5); // +0.5 avoid rounding errors
 
-    // Colorize all visible image pixels:
-    if (u_colorizeImages) {
-      color = mix(gl_FragColor, v_color, texel.a);
+    bool noTextureFound = false;
+    vec4 texel;
+
+    ${
+      [...new Array(texturesCount)].map(
+        (_, i) =>
+          `if (index == ${i}) texel = texture2D(u_atlas[${i}], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);`,
+      ).join(`
+    else `) +
+      `else {
+      texel = texture2D(u_atlas[0], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
+      noTextureFound = true;
+    }`
     }
 
-    // Colorize background pixels, keep image pixel colors:
-    else {
-      color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
-    }
+    if (noTextureFound) {
+      color = v_color;
+    } else {
+      // Colorize all visible image pixels:
+      if (u_colorizeImages) {
+        color = mix(gl_FragColor, v_color, texel.a);
+      }
 
-    // Erase pixels "in the padding":
-    if (abs(diffVector.x) > v_radius / paddingRatio || abs(diffVector.y) > v_radius / paddingRatio) {
-      color = u_colorizeImages ? gl_FragColor : v_color;
+      // Colorize background pixels, keep image pixel colors:
+      else {
+        color = vec4(mix(v_color, texel, texel.a).rgb, max(texel.a, v_color.a));
+      }
+
+      // Erase pixels "in the padding":
+      if (abs(diffVector.x) > v_radius / paddingRatio || abs(diffVector.y) > v_radius / paddingRatio) {
+        color = u_colorizeImages ? gl_FragColor : v_color;
+      }
     }
   }
   #endif
@@ -85,4 +106,5 @@ void main(void) {
 }
 `;
 
-export default SHADER_SOURCE;
+  return SHADER;
+}

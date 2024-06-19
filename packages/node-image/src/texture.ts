@@ -14,10 +14,11 @@ export type ImageReady = {
   sourceY: number;
   sourceSize: number;
   destinationSize: number;
+  textureIndex?: number;
 };
 export type ImageType = ImageLoading | ImageError | ImageReady;
 
-export type Atlas = Record<string, Coordinates & { size: number }>;
+export type Atlas = Record<string, Coordinates & { size: number; textureIndex?: number }>;
 
 export type TextureManagerOptions = {
   // - If mode "auto", will always display images with their given size.
@@ -28,17 +29,20 @@ export type TextureManagerOptions = {
   objectFit: "contain" | "cover" | "fill";
   // If true, the image is centered on its alpha barycenter.
   correctCentering: boolean;
+  // Max texture size (use gl.getParameter(gl.MAX_TEXTURE_SIZE)).
+  maxTextureSize: number;
 };
 
 export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
   size: { mode: "max", value: 512 },
   objectFit: "cover",
   correctCentering: false,
+  maxTextureSize: 4096,
 };
 
 export const DEBOUNCE_TIMEOUT = 100;
 
-// This margin helps avoiding images collisions in the texture:
+// This margin helps to avoid images collisions in the texture:
 export const MARGIN_IN_TEXTURE = 1;
 
 /**
@@ -138,7 +142,7 @@ export function refineImage(
   image: HTMLImageElement,
   corrector: PictogramCenteringCorrector,
   { objectFit, size, correctCentering }: TextureManagerOptions,
-): Omit<ImageReady, "status" | "image"> {
+): Omit<ImageReady, "status" | "image" | "textureIndex"> {
   const sourceSize =
     objectFit === "contain" ? Math.max(image.width, image.height) : Math.min(image.width, image.height);
   const destinationSize =
@@ -161,58 +165,48 @@ export function refineImage(
 }
 
 /**
- * This helper takes a collection of image states and a context, draw all the
- * images in the context, and returns an atlas to get where each image is drawn
- * on the texture.
+ * This helper takes an array of ready-to-draw images, and draws as much as possible in a single texture.
+ * It then returns the atlas of the draw images, as well as the texture itself.
  */
-export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string, ImageType>): Atlas {
-  const MAX_CANVAS_WIDTH = 3072;
-  const TARGET_FILL_PERCENTAGE = 0.6;
+export function drawTexture(
+  images: (Omit<ImageReady, "status"> & { key: string })[],
+  ctx: CanvasRenderingContext2D,
+  maxTextureSize: number,
+): { atlas: Atlas; texture: ImageData } {
+  images = images.slice(0);
 
-  // 1. Sort images by height, decreasingly:
-  const imagesArray: {
-    key: string;
-    image: HTMLImageElement;
-    sourceX: number;
-    sourceY: number;
-    sourceSize: number;
-    destinationSize: number;
-  }[] = [];
-  let totalArea = 0;
-  let maxItemWidth = 0;
-  for (const key in images) {
-    const imageState = images[key];
-    if (imageState.status !== "ready") continue;
+  // 1. Sort remaining images by height, decreasingly:
+  images.sort((a, b) => (a.destinationSize > b.destinationSize ? -1 : 1));
 
-    maxItemWidth = Math.max(maxItemWidth, imageState.destinationSize);
-    totalArea += imageState.destinationSize ** 2;
-    imagesArray.push({
-      key,
-      ...imageState,
-    });
-  }
-  imagesArray.sort((a, b) => (a.destinationSize > b.destinationSize ? -1 : 1));
-
-  // 2. Predict canvas width:
-  const predictedTotalArea = totalArea / TARGET_FILL_PERCENTAGE;
-  const predictedWidth = Math.min(Math.max(Math.sqrt(predictedTotalArea), maxItemWidth), MAX_CANVAS_WIDTH);
-
-  // 3. Refine images coordinates:
-  const refinedImagesArray: ((typeof imagesArray)[number] & { destinationX: number; destinationY: number })[] = [];
+  // 2. Refine images coordinates:
+  const refinedImagesArray: ((typeof images)[number] & { key: string } & {
+    destinationX: number;
+    destinationY: number;
+  })[] = [];
   let x = 0;
   let y = 0;
   let currentRowHeight = 0;
   let maxRowWidth = 0;
   const atlas: Atlas = {};
-  for (let i = 0, l = imagesArray.length; i < l; i++) {
-    const { key, image, sourceSize, sourceX, sourceY, destinationSize } = imagesArray[i];
+  for (let i = 0, l = images.length; i < l; i++) {
+    const { key, image, sourceSize, sourceX, sourceY, destinationSize } = images[i];
     const destinationSizeWithMargin = destinationSize + MARGIN_IN_TEXTURE;
-    if (x + destinationSizeWithMargin > predictedWidth) {
+
+    // If the image does not fit, just skip it:
+    if (
+      y + destinationSizeWithMargin > maxTextureSize ||
+      (x + destinationSizeWithMargin > maxTextureSize &&
+        y + destinationSizeWithMargin + currentRowHeight > maxTextureSize)
+    )
+      continue;
+
+    if (x + destinationSizeWithMargin > maxTextureSize) {
       maxRowWidth = Math.max(maxRowWidth, x);
       x = 0;
       y += currentRowHeight;
       currentRowHeight = destinationSizeWithMargin;
     }
+
     refinedImagesArray.push({
       key,
       image,
@@ -232,13 +226,13 @@ export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string
     currentRowHeight = Math.max(currentRowHeight, destinationSizeWithMargin);
   }
 
-  // 4. Crop texture to final best dimensions:
+  // 3. Crop texture to final best dimensions:
   maxRowWidth = Math.max(maxRowWidth, x);
   const canvas = ctx.canvas;
   canvas.width = maxRowWidth;
   canvas.height = y + currentRowHeight;
 
-  // 5. Fill texture:
+  // 4. Fill texture:
   for (let i = 0, l = refinedImagesArray.length; i < l; i++) {
     const { image, sourceSize, sourceX, sourceY, destinationSize, destinationX, destinationY } = refinedImagesArray[i];
 
@@ -255,7 +249,71 @@ export function drawTexture(ctx: CanvasRenderingContext2D, images: Record<string
     );
   }
 
-  return atlas;
+  return {
+    atlas,
+    texture: ctx.getImageData(0, 0, canvas.width, canvas.height),
+  };
+}
+
+/**
+ * This helper takes a collection of image states and a context, draw all the
+ * images in the context, and returns an atlas to get where each image is drawn
+ * on the texture.
+ */
+export function drawTextures(
+  { atlas: prevAtlas, textures: prevTextures }: { atlas: Atlas; textures: ImageData[] },
+  images: Record<string, ImageType>,
+  ctx: CanvasRenderingContext2D,
+  maxTextureSize: number,
+): { atlas: Atlas; textures: ImageData[] } {
+  const res = {
+    atlas: {} as Atlas,
+    textures: [...prevTextures.slice(0, -1)],
+  };
+
+  // 1. Extract images that are ready to draw, but not drawn yet:
+  let imagesToDraw: (Omit<ImageReady, "status"> & { key: string })[] = [];
+  for (const key in images) {
+    // Skip images that are not ready yet:
+    const imageState = images[key];
+    if (imageState.status !== "ready") continue;
+
+    // Skip all images from all textures but the last one:
+    const textureIndex = prevAtlas[key]?.textureIndex;
+    if (typeof textureIndex === "number" && textureIndex < prevTextures.length - 1) {
+      res.atlas[key] = prevAtlas[key];
+      continue;
+    }
+
+    // Keep all the rest:
+    imagesToDraw.push({
+      key,
+      ...imageState,
+    });
+  }
+
+  // 2. Sort remaining images by size, decreasingly:
+  imagesToDraw.sort();
+
+  // 3. Draw remaining images on new textures until there are none remaining:
+  while (imagesToDraw.length) {
+    const { atlas, texture } = drawTexture(imagesToDraw, ctx, maxTextureSize);
+    const remainingImages: typeof imagesToDraw = [];
+    imagesToDraw.forEach((image) => {
+      if (atlas[image.key]) {
+        res.atlas[image.key] = {
+          ...atlas[image.key],
+          textureIndex: res.textures.length,
+        };
+      } else {
+        remainingImages.push(image);
+      }
+    });
+    res.textures.push(texture);
+    imagesToDraw = remainingImages;
+  }
+
+  return res;
 }
 
 /**
@@ -319,7 +377,7 @@ export class TextureManager extends EventEmitter {
   private corrector = new PictogramCenteringCorrector();
 
   private imageStates: Record<string, ImageType> = {};
-  private texture: ImageData = this.ctx.getImageData(0, 0, 1, 1);
+  private textures: ImageData[] = [this.ctx.getImageData(0, 0, 1, 1)];
   private atlas: Atlas = {};
 
   constructor(options: Partial<TextureManagerOptions> = {}) {
@@ -331,14 +389,21 @@ export class TextureManager extends EventEmitter {
     if (typeof this.frameId === "number") return;
 
     this.frameId = window.setTimeout(() => {
-      this.generateTexture();
+      this.generateTextures();
       this.frameId = undefined;
     }, DEBOUNCE_TIMEOUT);
   }
-  private generateTexture() {
-    this.atlas = drawTexture(this.ctx, this.imageStates);
-    this.texture = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-    this.emit(TextureManager.NEW_TEXTURE_EVENT, { atlas: this.atlas, texture: this.texture });
+  private generateTextures() {
+    const { atlas, textures } = drawTextures(
+      { atlas: this.atlas, textures: this.textures },
+      this.imageStates,
+      this.ctx,
+      this.options.maxTextureSize,
+    );
+
+    this.atlas = atlas;
+    this.textures = textures;
+    this.emit(TextureManager.NEW_TEXTURE_EVENT, { atlas, textures });
   }
 
   // PUBLIC API:
@@ -365,7 +430,7 @@ export class TextureManager extends EventEmitter {
   getAtlas(): Atlas {
     return this.atlas;
   }
-  getTexture(): ImageData {
-    return this.texture;
+  getTextures(): ImageData[] {
+    return this.textures;
   }
 }

@@ -6,6 +6,7 @@ attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
 attribute vec4 a_texture;
+attribute float a_textureIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -15,6 +16,7 @@ varying vec4 v_color;
 varying vec2 v_diffVector;
 varying float v_radius;
 varying vec4 v_texture;
+varying float v_textureIndex;
 
 const float bias = 255.0 / 254.0;
 const float marginRatio = 1.05;
@@ -40,6 +42,7 @@ void main() {
   v_color = a_color;
 
   // Pass the texture coordinates:
+  v_textureIndex = a_textureIndex;
   v_texture = a_texture;
   #endif
 
