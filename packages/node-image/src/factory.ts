@@ -95,6 +95,7 @@ export default function getNodeImageProgram<
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
 
+    static textureManager = textureManager;
     static drawLabel = drawLabel;
     static drawHover = drawHover;
 
