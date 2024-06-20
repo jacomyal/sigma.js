@@ -67,9 +67,12 @@ export default function getNodeImageProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 >(options?: Partial<CreateNodeImageProgramOptions<N, E, G>>): NodeProgramType<N, E, G> {
-  // Compute effective MAX_TEXTURE_SIZE from WebGL contexts:
+  // Compute effective MAX_TEXTURE_SIZE from the current WebGL context:
   const gl = document.createElement("canvas").getContext("webgl") as WebGLRenderingContext;
-  const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  const defaultMaxTextureSize = Math.min(
+    gl.getParameter(gl.MAX_TEXTURE_SIZE),
+    DEFAULT_TEXTURE_MANAGER_OPTIONS.maxTextureSize,
+  );
   (gl.canvas as HTMLCanvasElement).remove();
 
   const {
@@ -83,7 +86,7 @@ export default function getNodeImageProgram<
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions<N, E, G> = {
     ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
-    ...{ maxTextureSize },
+    ...{ maxTextureSize: defaultMaxTextureSize },
     ...(options || {}),
     drawLabel: undefined,
     drawHover: undefined,

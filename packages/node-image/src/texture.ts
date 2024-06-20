@@ -5,6 +5,7 @@ import { Coordinates } from "sigma/types";
  * Useful types:
  * *************
  */
+export type TextureCursor = Coordinates & { rowHeight: number; maxRowWidth: number };
 export type ImageLoading = { status: "loading" };
 export type ImageError = { status: "error" };
 export type ImageReady = {
@@ -31,6 +32,9 @@ export type TextureManagerOptions = {
   correctCentering: boolean;
   // Max texture size (use gl.getParameter(gl.MAX_TEXTURE_SIZE)).
   maxTextureSize: number;
+  // Minimal time (in ms) between two consecutive textures generations.
+  // If null, then no timeout will be used (for debug purpose only!).
+  debounceTimeout: number | null;
 };
 
 export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
@@ -38,9 +42,8 @@ export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
   objectFit: "cover",
   correctCentering: false,
   maxTextureSize: 4096,
+  debounceTimeout: 500,
 };
-
-export const DEBOUNCE_TIMEOUT = 100;
 
 // This margin helps to avoid images collisions in the texture:
 export const MARGIN_IN_TEXTURE = 1;
@@ -171,22 +174,16 @@ export function refineImage(
 export function drawTexture(
   images: (Omit<ImageReady, "status"> & { key: string })[],
   ctx: CanvasRenderingContext2D,
-  maxTextureSize: number,
-): { atlas: Atlas; texture: ImageData } {
-  images = images.slice(0);
+  cursor: TextureCursor,
+): { atlas: Atlas; texture: ImageData; cursor: TextureCursor } {
+  const { width, height } = ctx.canvas;
 
-  // 1. Sort remaining images by height, decreasingly:
-  images.sort((a, b) => (a.destinationSize > b.destinationSize ? -1 : 1));
-
-  // 2. Refine images coordinates:
+  // Refine images coordinates:
   const refinedImagesArray: ((typeof images)[number] & { key: string } & {
     destinationX: number;
     destinationY: number;
   })[] = [];
-  let x = 0;
-  let y = 0;
-  let currentRowHeight = 0;
-  let maxRowWidth = 0;
+  let { x, y, rowHeight, maxRowWidth } = cursor;
   const atlas: Atlas = {};
   for (let i = 0, l = images.length; i < l; i++) {
     const { key, image, sourceSize, sourceX, sourceY, destinationSize } = images[i];
@@ -194,17 +191,17 @@ export function drawTexture(
 
     // If the image does not fit, just skip it:
     if (
-      y + destinationSizeWithMargin > maxTextureSize ||
-      (x + destinationSizeWithMargin > maxTextureSize &&
-        y + destinationSizeWithMargin + currentRowHeight > maxTextureSize)
-    )
+      y + destinationSizeWithMargin > height ||
+      (x + destinationSizeWithMargin > width && y + destinationSizeWithMargin + rowHeight > height)
+    ) {
       continue;
+    }
 
-    if (x + destinationSizeWithMargin > maxTextureSize) {
+    if (x + destinationSizeWithMargin > width) {
       maxRowWidth = Math.max(maxRowWidth, x);
       x = 0;
-      y += currentRowHeight;
-      currentRowHeight = destinationSizeWithMargin;
+      y += rowHeight;
+      rowHeight = destinationSizeWithMargin;
     }
 
     refinedImagesArray.push({
@@ -223,16 +220,15 @@ export function drawTexture(
       size: destinationSize,
     };
     x += destinationSizeWithMargin;
-    currentRowHeight = Math.max(currentRowHeight, destinationSizeWithMargin);
+    rowHeight = Math.max(rowHeight, destinationSizeWithMargin);
   }
 
-  // 3. Crop texture to final best dimensions:
+  // Crop texture to final best dimensions:
   maxRowWidth = Math.max(maxRowWidth, x);
-  const canvas = ctx.canvas;
-  canvas.width = maxRowWidth;
-  canvas.height = y + currentRowHeight;
+  const effectiveWidth = maxRowWidth;
+  const effectiveHeight = y + rowHeight;
 
-  // 4. Fill texture:
+  // Fill texture:
   for (let i = 0, l = refinedImagesArray.length; i < l; i++) {
     const { image, sourceSize, sourceX, sourceY, destinationSize, destinationX, destinationY } = refinedImagesArray[i];
 
@@ -251,7 +247,8 @@ export function drawTexture(
 
   return {
     atlas,
-    texture: ctx.getImageData(0, 0, canvas.width, canvas.height),
+    texture: ctx.getImageData(0, 0, effectiveWidth, effectiveHeight),
+    cursor: { x, y, rowHeight, maxRowWidth },
   };
 }
 
@@ -261,29 +258,30 @@ export function drawTexture(
  * on the texture.
  */
 export function drawTextures(
-  { atlas: prevAtlas, textures: prevTextures }: { atlas: Atlas; textures: ImageData[] },
+  {
+    atlas: prevAtlas,
+    textures: prevTextures,
+    cursor: prevCursor,
+  }: { atlas: Atlas; textures: ImageData[]; cursor: TextureCursor },
   images: Record<string, ImageType>,
   ctx: CanvasRenderingContext2D,
-  maxTextureSize: number,
-): { atlas: Atlas; textures: ImageData[] } {
+): { atlas: Atlas; textures: ImageData[]; cursor: TextureCursor } {
   const res = {
-    atlas: {} as Atlas,
+    atlas: { ...prevAtlas },
     textures: [...prevTextures.slice(0, -1)],
+    cursor: { ...prevCursor },
   };
 
-  // 1. Extract images that are ready to draw, but not drawn yet:
+  // Extract images that are ready to draw, but not drawn yet:
   let imagesToDraw: (Omit<ImageReady, "status"> & { key: string })[] = [];
   for (const key in images) {
     // Skip images that are not ready yet:
     const imageState = images[key];
     if (imageState.status !== "ready") continue;
 
-    // Skip all images from all textures but the last one:
+    // Skip all images that already exist in a texture:
     const textureIndex = prevAtlas[key]?.textureIndex;
-    if (typeof textureIndex === "number" && textureIndex < prevTextures.length - 1) {
-      res.atlas[key] = prevAtlas[key];
-      continue;
-    }
+    if (typeof textureIndex === "number") continue;
 
     // Keep all the rest:
     imagesToDraw.push({
@@ -292,12 +290,11 @@ export function drawTextures(
     });
   }
 
-  // 2. Sort remaining images by size, decreasingly:
-  imagesToDraw.sort();
-
-  // 3. Draw remaining images on new textures until there are none remaining:
+  // Draw remaining images on new textures until there are none remaining:
   while (imagesToDraw.length) {
-    const { atlas, texture } = drawTexture(imagesToDraw, ctx, maxTextureSize);
+    const { atlas, texture, cursor } = drawTexture(imagesToDraw, ctx, res.cursor);
+    res.cursor = cursor;
+
     const remainingImages: typeof imagesToDraw = [];
     imagesToDraw.forEach((image) => {
       if (atlas[image.key]) {
@@ -311,6 +308,11 @@ export function drawTextures(
     });
     res.textures.push(texture);
     imagesToDraw = remainingImages;
+
+    if (imagesToDraw.length) {
+      res.cursor = { x: 0, y: 0, rowHeight: 0, maxRowWidth: 0 };
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
   }
 
   return res;
@@ -378,31 +380,39 @@ export class TextureManager extends EventEmitter {
 
   private imageStates: Record<string, ImageType> = {};
   private textures: ImageData[] = [this.ctx.getImageData(0, 0, 1, 1)];
+  private lastTextureCursor: TextureCursor = { x: 0, y: 0, rowHeight: 0, maxRowWidth: 0 };
   private atlas: Atlas = {};
 
   constructor(options: Partial<TextureManagerOptions> = {}) {
     super();
     this.options = { ...DEFAULT_TEXTURE_MANAGER_OPTIONS, ...options };
+    this.canvas.width = this.options.maxTextureSize;
+    this.canvas.height = this.options.maxTextureSize;
   }
 
   private scheduleGenerateTexture() {
     if (typeof this.frameId === "number") return;
 
-    this.frameId = window.setTimeout(() => {
+    if (typeof this.options.debounceTimeout === "number") {
+      this.frameId = window.setTimeout(() => {
+        this.generateTextures();
+        this.frameId = undefined;
+      }, this.options.debounceTimeout);
+    } else {
       this.generateTextures();
-      this.frameId = undefined;
-    }, DEBOUNCE_TIMEOUT);
+    }
   }
   private generateTextures() {
-    const { atlas, textures } = drawTextures(
-      { atlas: this.atlas, textures: this.textures },
+    const { atlas, textures, cursor } = drawTextures(
+      { atlas: this.atlas, textures: this.textures, cursor: this.lastTextureCursor },
       this.imageStates,
       this.ctx,
-      this.options.maxTextureSize,
     );
 
     this.atlas = atlas;
     this.textures = textures;
+    this.lastTextureCursor = cursor;
+
     this.emit(TextureManager.NEW_TEXTURE_EVENT, { atlas, textures });
   }
 
