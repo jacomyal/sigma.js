@@ -2,7 +2,7 @@
 
 This package contains a node image renderer for [sigma.js](https://sigmajs.org).
 
-Images are stored in a [texture atlas](https://webglfundamentals.org/webgl/lessons/webgl-3d-textures.html). The atlas is bound to the class and not the instance, so that it is preserved even when the sigma instance is respawned. For that reason, and to allow using different renderers (bound to different atlas), the main export is **`createNodeImageProgram`**, a factory that creates a renderer class.
+Images are stored in a [textures atlas](https://webglfundamentals.org/webgl/lessons/webgl-3d-textures.html). The atlas is bound to the class and not the instance, so that it is preserved even when the sigma instance is respawned. For that reason, and to allow using different renderers (bound to different atlas), the main export is **`createNodeImageProgram`**, a factory that creates a renderer class. Also, since there is a [maximum texture size](https://www.khronos.org/opengl/wiki/Texture#:~:text=GL_MAX_TEXTURE_SIZE), the atlas can use multiple textures at once.
 
 It also exports two core classes, built with the proper settings, to help using it in an easier way:
 
@@ -46,3 +46,6 @@ Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/m
 - `drawLabel`(`NodeLabelDrawingFunction | undefined`, default: `undefined`): Will override the `drawLabel` method from the returned class.
 - `drawHover` (`NodeHoverDrawingFunction | undefined`, default: `undefined`): Will override the `drawHover` method from the returned class.
 - `colorAttribute` (`string`, default: `"color"`): Allows using a different node attribute name than `"color"`.
+- `imageAttribute` (`string`, default: `"image"`): Allows using a different node attribute name than `"image"`.
+- `maxTextureSize` (`number`, default: `4096`): Allows specifying a custom maximum texture size.
+- `debounceTimeout` (`number`, default: `500`): Allows customizing the minimal time between two consecutive textures generations.
