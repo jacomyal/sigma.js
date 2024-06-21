@@ -1,3 +1,5 @@
+import { DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS } from "sigma/rendering";
+
 import createEdgeCurveProgram from "./factory";
 
 export { default as createEdgeCurveProgram } from "./factory";
@@ -7,8 +9,5 @@ const EdgeCurveProgram = createEdgeCurveProgram();
 export default EdgeCurveProgram;
 
 export const EdgeCurvedArrowProgram = createEdgeCurveProgram({
-  arrowHead: {
-    lengthToThicknessRatio: 2.5,
-    widenessToThicknessRatio: 2,
-  },
+  arrowHead: DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS,
 });
