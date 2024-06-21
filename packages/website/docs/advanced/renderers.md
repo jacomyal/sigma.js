@@ -44,21 +44,23 @@ Each program must provide code to render on both the normal image and the pickin
 
 ## Core programs
 
-Sigma.js comes with a set of predefined programs:
+Sigma.js comes with a set of predefined programs, all exported from `"sigma/rendering"`:
 
 ### For edges
 
-- **`edge.line`**: This is the most efficient method, rendering edges using the `gl.LINES` method. However, it always draws edges as 1px thick lines, regardless of zoom levels.
+- **`EdgeLineProgram`**: This is the most efficient method, rendering edges using the `gl.LINES` method. However, it always draws edges as 1px thick lines, regardless of zoom levels.
 
-- **`edge.rectangle`**: This is the default edge renderer. It portrays edges as thick rectangles connecting node pairs, with each rectangle being represented by two triangles.
+- **`EdgeRectangleProgram`**: This is the default edge renderer. It portrays edges as thick rectangles connecting node pairs, with each rectangle being represented by two triangles.
 
-- **`edge.arrow`**: This is a composite renderer that uses `edge.clamped` (for drawing the arrow body) and `edge.arrowHead` (for drawing the arrow head).
+- **`EdgeArrowProgram`**: This is a composite renderer that uses `EdgeClampedProgram` (for drawing the arrow body) and `EdgeArrowHeadProgram` (for drawing the arrow head).
+
+> **_NOTE:_** The three programs `EdgeArrowProgram`, `EdgeClampedProgram` and `EdgeArrowHeadProgram` each also exist as a factory, to allow generating a program with custom arrow head width and length (relatively to the edge thicknesses). The factory are called `createEdgeArrowProgram`, `createEdgeClampedProgram` and `createEdgeArrowHeadProgram`.
 
 ### For nodes
 
-- **`node.point`**: This method displays nodes as squares using the `gl.POINTS` method. A circle is then "carved" into this square in the fragment shader. It's highly efficient in terms of both RAM and execution speed. However, due to the limitations of the `gl.POINTS` method, nodes can't be drawn with a radius exceeding 100px.
+- **`NodePointProgram`**: This method displays nodes as squares using the `gl.POINTS` method. A circle is then "carved" into this square in the fragment shader. It's highly efficient in terms of both RAM and execution speed. However, due to the limitations of the `gl.POINTS` method, nodes can't be drawn with a radius exceeding 100px.
 
-- **`node.circle`**: This method displays nodes as squares, represented by two triangles (similar to `edge.rectangle`). A circle is then "carved" into this square in the fragment shader.
+- **`NodeCircleProgram`**: This method displays nodes as squares, represented by two triangles (similar to `EdgeRectangleProgram`). A circle is then "carved" into this square in the fragment shader.
 
 For a deeper understanding and practical examples, developers are encouraged to explore the existing sigma.js sources and examples. This hands-on approach will provide a clearer picture of how to effectively use and customize renderers in sigma.js.
 
@@ -66,7 +68,7 @@ For a deeper understanding and practical examples, developers are encouraged to 
 
 Some more programs are also exposed, but as they carry more complexity, they are published as additional packages.
 
-- [**`@sigma/node-image`**](https://www.npmjs.com/package/@sigma/node-image): This package exposes a factory to create a program that operates similarly to `node.circle`, but filling the circles with images using a texture atlas.
-- [**`@sigma/node-border`**](https://www.npmjs.com/package/@sigma/node-border): This package exposes a factory to create a program that operates similarly to `node.circle`, but drawing concentric discs.
-- [**`@sigma/node-piechart`**](https://www.npmjs.com/package/@sigma/node-piechart): This package exposes a factory to create a program that operates similarly to `node.circle`, but drawing nodes as pie-charts.
+- [**`@sigma/node-image`**](https://www.npmjs.com/package/@sigma/node-image): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but filling the circles with images using a texture atlas.
+- [**`@sigma/node-border`**](https://www.npmjs.com/package/@sigma/node-border): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing concentric discs.
+- [**`@sigma/node-piechart`**](https://www.npmjs.com/package/@sigma/node-piechart): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing nodes as pie-charts.
 - [**`@sigma/edge-curve`**](https://www.npmjs.com/package/@sigma/edge-curve): This package exposes an edge renderer that draw edges as curves.
