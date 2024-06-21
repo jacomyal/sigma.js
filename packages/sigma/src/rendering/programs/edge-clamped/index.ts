@@ -1,98 +1,136 @@
-/**
- * Sigma.js WebGL Renderer Edge Program
- * =====================================
- *
- * Program rendering edges as thick lines but with a twist: the end of edge
- * does not sit in the middle of target node but instead stays by some margin.
- *
- * This is useful when combined with arrows to draw directed edges.
- * @module
- */
 import { Attributes } from "graphology-types";
 
-import { EdgeDisplayData, NodeDisplayData } from "../../../types";
+import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
-import EdgeRectangleProgram from "../edge-rectangle";
+import { EdgeProgram, EdgeProgramType } from "../../edge";
+import { ProgramInfo } from "../../utils";
+import { CreateEdgeArrowHeadProgramOptions, DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS } from "../edge-arrow-head";
+import FRAGMENT_SHADER_SOURCE from "../edge-rectangle/frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default class EdgeClampedProgram<
+const UNIFORMS = [
+  "u_matrix",
+  "u_zoomRatio",
+  "u_sizeRatio",
+  "u_correctionRatio",
+  "u_minEdgeThickness",
+  "u_lengthToThicknessRatio",
+] as const;
+
+export type CreateEdgeClampedProgramOptions = Pick<CreateEdgeArrowHeadProgramOptions, "lengthToThicknessRatio">;
+
+export const DEFAULT_EDGE_CLAMPED_PROGRAM_OPTIONS: CreateEdgeClampedProgramOptions = {
+  lengthToThicknessRatio: DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS.lengthToThicknessRatio,
+};
+
+export function createEdgeClampedProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends EdgeRectangleProgram<N, E, G> {
-  getDefinition() {
-    return {
-      ...super.getDefinition(),
-      VERTEX_SHADER_SOURCE,
-      ATTRIBUTES: [
-        { name: "a_positionStart", size: 2, type: FLOAT },
-        { name: "a_positionEnd", size: 2, type: FLOAT },
-        { name: "a_normal", size: 2, type: FLOAT },
-        { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        { name: "a_radius", size: 1, type: FLOAT },
-      ],
-      CONSTANT_ATTRIBUTES: [
-        // If 0, then position will be a_positionStart
-        // If 1, then position will be a_positionEnd
-        { name: "a_positionCoef", size: 1, type: FLOAT },
-        { name: "a_normalCoef", size: 1, type: FLOAT },
-        { name: "a_radiusCoef", size: 1, type: FLOAT },
-      ],
-      CONSTANT_DATA: [
-        [0, 1, 0],
-        [0, -1, 0],
-        [1, 1, 1],
-        [1, 1, 1],
-        [0, -1, 0],
-        [1, -1, -1],
-      ],
-    };
-  }
+>(inputOptions?: Partial<CreateEdgeClampedProgramOptions>): EdgeProgramType<N, E, G> {
+  const options = {
+    ...DEFAULT_EDGE_CLAMPED_PROGRAM_OPTIONS,
+    ...(inputOptions || {}),
+  };
 
-  processVisibleItem(
-    edgeIndex: number,
-    startIndex: number,
-    sourceData: NodeDisplayData,
-    targetData: NodeDisplayData,
-    data: EdgeDisplayData,
-  ) {
-    const thickness = data.size || 1;
-    const x1 = sourceData.x;
-    const y1 = sourceData.y;
-    const x2 = targetData.x;
-    const y2 = targetData.y;
-    const color = floatColor(data.color);
-
-    // Computing normals
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-
-    const radius = targetData.size || 1;
-
-    let len = dx * dx + dy * dy;
-    let n1 = 0;
-    let n2 = 0;
-
-    if (len) {
-      len = 1 / Math.sqrt(len);
-
-      n1 = -dy * len * thickness;
-      n2 = dx * len * thickness;
+  return class EdgeClampedProgram<
+    N extends Attributes = Attributes,
+    E extends Attributes = Attributes,
+    G extends Attributes = Attributes,
+  > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+    getDefinition() {
+      return {
+        VERTICES: 6,
+        VERTEX_SHADER_SOURCE,
+        FRAGMENT_SHADER_SOURCE,
+        METHOD: WebGLRenderingContext.TRIANGLES,
+        UNIFORMS,
+        ATTRIBUTES: [
+          { name: "a_positionStart", size: 2, type: FLOAT },
+          { name: "a_positionEnd", size: 2, type: FLOAT },
+          { name: "a_normal", size: 2, type: FLOAT },
+          { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          { name: "a_radius", size: 1, type: FLOAT },
+        ],
+        CONSTANT_ATTRIBUTES: [
+          // If 0, then position will be a_positionStart
+          // If 1, then position will be a_positionEnd
+          { name: "a_positionCoef", size: 1, type: FLOAT },
+          { name: "a_normalCoef", size: 1, type: FLOAT },
+          { name: "a_radiusCoef", size: 1, type: FLOAT },
+        ],
+        CONSTANT_DATA: [
+          [0, 1, 0],
+          [0, -1, 0],
+          [1, 1, 1],
+          [1, 1, 1],
+          [0, -1, 0],
+          [1, -1, -1],
+        ],
+      };
     }
 
-    const array = this.array;
+    processVisibleItem(
+      edgeIndex: number,
+      startIndex: number,
+      sourceData: NodeDisplayData,
+      targetData: NodeDisplayData,
+      data: EdgeDisplayData,
+    ) {
+      const thickness = data.size || 1;
+      const x1 = sourceData.x;
+      const y1 = sourceData.y;
+      const x2 = targetData.x;
+      const y2 = targetData.y;
+      const color = floatColor(data.color);
 
-    array[startIndex++] = x1;
-    array[startIndex++] = y1;
-    array[startIndex++] = x2;
-    array[startIndex++] = y2;
-    array[startIndex++] = n1;
-    array[startIndex++] = n2;
-    array[startIndex++] = color;
-    array[startIndex++] = edgeIndex;
-    array[startIndex++] = radius;
-  }
+      // Computing normals
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+
+      const radius = targetData.size || 1;
+
+      let len = dx * dx + dy * dy;
+      let n1 = 0;
+      let n2 = 0;
+
+      if (len) {
+        len = 1 / Math.sqrt(len);
+
+        n1 = -dy * len * thickness;
+        n2 = dx * len * thickness;
+      }
+
+      const array = this.array;
+
+      array[startIndex++] = x1;
+      array[startIndex++] = y1;
+      array[startIndex++] = x2;
+      array[startIndex++] = y2;
+      array[startIndex++] = n1;
+      array[startIndex++] = n2;
+      array[startIndex++] = color;
+      array[startIndex++] = edgeIndex;
+      array[startIndex++] = radius;
+    }
+
+    setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+      const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio, u_minEdgeThickness, u_lengthToThicknessRatio } =
+        uniformLocations;
+
+      gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+      gl.uniform1f(u_zoomRatio, params.zoomRatio);
+      gl.uniform1f(u_sizeRatio, params.sizeRatio);
+      gl.uniform1f(u_correctionRatio, params.correctionRatio);
+      gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+      gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
+    }
+  };
 }
+
+const EdgeClampedProgram = createEdgeClampedProgram();
+
+export default EdgeClampedProgram;

@@ -15,13 +15,13 @@ uniform float u_zoomRatio;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 uniform float u_minEdgeThickness;
+uniform float u_lengthToThicknessRatio;
 
 varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 
 const float bias = 255.0 / 254.0;
-const float arrowHeadLengthThicknessRatio = 2.5;
 
 void main() {
   float minThickness = u_minEdgeThickness;
@@ -41,7 +41,7 @@ void main() {
   // Here, we move the point to leave space for the arrow head:
   float direction = sign(radius);
   float webGLNodeRadius = direction * radius * 2.0 * u_correctionRatio / u_sizeRatio;
-  float webGLArrowHeadLength = webGLThickness * 2.0 * arrowHeadLengthThicknessRatio;
+  float webGLArrowHeadLength = webGLThickness * u_lengthToThicknessRatio * 2.0;
 
   vec2 compensationVector = vec2(-direction * unitNormal.y, direction * unitNormal.x) * (webGLNodeRadius + webGLArrowHeadLength);
 

@@ -1,14 +1,17 @@
-/**
- * Sigma.js WebGL Renderer Edge Arrow Program
- * ===========================================
- *
- * Compound program rendering edges as an arrow from the source to the target.
- * @module
- */
-import { EdgeProgramType, createEdgeCompoundProgram } from "../../edge";
-import EdgeArrowHeadProgram from "../edge-arrow-head";
-import EdgeClampedProgram from "../edge-clamped";
+import { Attributes } from "graphology-types";
 
-const EdgeArrowProgram: EdgeProgramType = createEdgeCompoundProgram([EdgeClampedProgram, EdgeArrowHeadProgram]);
+import { EdgeProgramType, createEdgeCompoundProgram } from "../../edge";
+import { CreateEdgeArrowHeadProgramOptions, createEdgeArrowHeadProgram } from "../edge-arrow-head";
+import { createEdgeClampedProgram } from "../edge-clamped";
+
+export function createEdgeArrowProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(inputOptions?: Partial<CreateEdgeArrowHeadProgramOptions>): EdgeProgramType<N, E, G> {
+  return createEdgeCompoundProgram([createEdgeClampedProgram(inputOptions), createEdgeArrowHeadProgram(inputOptions)]);
+}
+
+const EdgeArrowProgram = createEdgeArrowProgram();
 
 export default EdgeArrowProgram;
