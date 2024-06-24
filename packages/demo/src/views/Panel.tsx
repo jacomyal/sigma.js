@@ -1,10 +1,10 @@
-import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
+import { FC, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
 import AnimateHeight from "react-animate-height";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 const DURATION = 300;
 
-const Panel: FC<PropsWithChildren<{ title: JSX.Element | string; initiallyDeployed?: boolean }>> = ({
+const Panel: FC<PropsWithChildren<{ title: ReactNode | string; initiallyDeployed?: boolean }>> = ({
   title,
   initiallyDeployed,
   children,

@@ -16,7 +16,7 @@ export interface ProgramInfo<Uniform extends string = string> {
   buffer: WebGLBuffer;
   constantBuffer: WebGLBuffer;
   uniformLocations: Record<Uniform, WebGLUniformLocation>;
-  attributeLocations: Record<string, GLint>;
+  attributeLocations: Record<string, number>; // Record<string, GLint>
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
 }
@@ -34,7 +34,7 @@ export interface ProgramDefinition<Uniform extends string = string> {
   FRAGMENT_SHADER_SOURCE: string;
   UNIFORMS: ReadonlyArray<Uniform>;
   ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  METHOD: GLenum;
+  METHOD: number; // GLenum
 }
 
 export interface InstancedProgramDefinition<Uniform extends string = string> extends ProgramDefinition<Uniform> {

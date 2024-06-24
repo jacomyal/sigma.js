@@ -4,7 +4,7 @@
     "browser": true
   },
   "root": true,
-  "ignorePatterns": ["*.js", "*.d.ts"],
+  "ignorePatterns": ["*.js"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["import", "@typescript-eslint"],
   "extends": [
@@ -15,6 +15,7 @@
     "plugin:storybook/recommended"
   ],
   "rules": {
+    "no-undef": "error",
     "no-prototype-builtins": "off",
     "no-console": "warn",
     "import/extensions": [
@@ -33,5 +34,14 @@
         "caughtErrorsIgnorePattern": "^_"
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/dist/*.d.ts", "**/dist/**/*.d.ts", "**/dist/*.d.mts", "**/dist/**/*.d.mts"],
+      "rules": {
+        "import/extensions": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
 }

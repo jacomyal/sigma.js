@@ -3,6 +3,7 @@ import { EdgeDisplayData, NodeDisplayData } from "sigma/types";
 
 import { BrowserTestDependencies } from "../helpers";
 
+/* global dependencies */
 declare global {
   const dependencies: BrowserTestDependencies;
 }
@@ -191,7 +192,7 @@ const suite = [
       } = dependencies;
 
       const renderer = new Sigma(lesMiserables, container, {
-        zoomToSizeRatioFunction: (x) => x,
+        zoomToSizeRatioFunction: (x: number) => x,
       });
       renderer.getCamera().setState({ ratio: 3, x: 0.8, y: 0.7 });
     },

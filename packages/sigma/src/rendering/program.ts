@@ -59,7 +59,7 @@ export abstract class Program<
   FRAGMENT_SHADER_SOURCE: string;
   UNIFORMS: ReadonlyArray<Uniform>;
   ATTRIBUTES: Array<ProgramAttributeSpecification>;
-  METHOD: GLenum;
+  METHOD: number; // GLenum
   CONSTANT_ATTRIBUTES: Array<ProgramAttributeSpecification>;
   CONSTANT_DATA: number[][];
 
@@ -353,7 +353,7 @@ export abstract class Program<
     this.unbindProgram(this.normalProgram);
   }
 
-  drawWebGL(method: GLenum, { gl, frameBuffer }: ProgramInfo): void {
+  drawWebGL(method: number /* GLenum */, { gl, frameBuffer }: ProgramInfo): void {
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
 
     if (!this.isInstanced) {
