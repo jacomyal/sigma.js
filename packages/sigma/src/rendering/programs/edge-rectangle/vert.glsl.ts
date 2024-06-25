@@ -11,12 +11,15 @@ attribute float a_positionCoef;
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_zoomRatio;
+uniform float u_pixelRatio;
 uniform float u_correctionRatio;
 uniform float u_minEdgeThickness;
+uniform float u_feather;
 
 varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
+varying float v_feather;
 
 const float bias = 255.0 / 254.0;
 
@@ -48,6 +51,8 @@ void main() {
   v_thickness = webGLThickness / u_zoomRatio;
 
   v_normal = unitNormal;
+
+  v_feather = u_feather * u_correctionRatio / u_zoomRatio / u_pixelRatio * 2.0;
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:

@@ -15,6 +15,8 @@ const UNIFORMS = [
   "u_zoomRatio",
   "u_sizeRatio",
   "u_correctionRatio",
+  "u_pixelRatio",
+  "u_feather",
   "u_minEdgeThickness",
   "u_lengthToThicknessRatio",
 ] as const;
@@ -118,13 +120,23 @@ export function createEdgeClampedProgram<
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_matrix, u_zoomRatio, u_correctionRatio, u_sizeRatio, u_minEdgeThickness, u_lengthToThicknessRatio } =
-        uniformLocations;
+      const {
+        u_matrix,
+        u_zoomRatio,
+        u_feather,
+        u_pixelRatio,
+        u_correctionRatio,
+        u_sizeRatio,
+        u_minEdgeThickness,
+        u_lengthToThicknessRatio,
+      } = uniformLocations;
 
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1f(u_zoomRatio, params.zoomRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
+      gl.uniform1f(u_pixelRatio, params.pixelRatio);
+      gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
     }

@@ -7,6 +7,7 @@ precision highp float;
 
 varying vec4 v_color;
 varying float v_thickness;
+varying float v_feather;
 varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
@@ -42,7 +43,6 @@ float distToQuadraticBezierCurve(vec2 p, vec2 b0, vec2 b1, vec2 b2) {
   return length(getDistanceVector(b0 - p, b1 - p, b2 - p));
 }
 
-const float epsilon = 0.7;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
@@ -52,20 +52,25 @@ ${
   arrowHead
     ? `
   float distToTarget = length(gl_FragCoord.xy - v_targetPoint);
-  float arrowLength = v_targetSize + v_thickness * u_lengthToThicknessRatio * 2.0;
+  float arrowLength = v_targetSize + thickness * u_lengthToThicknessRatio;
   if (distToTarget < arrowLength) {
     thickness = (distToTarget - v_targetSize) / (arrowLength - v_targetSize) * u_widenessToThicknessRatio * thickness;
-  }
-`
+  }`
     : ""
 }
 
-  if (dist < thickness + epsilon) {
+  float halfThickness = thickness / 2.0;
+  if (dist < halfThickness) {
     #ifdef PICKING_MODE
     gl_FragColor = v_color;
     #else
-    float inCurve = 1.0 - smoothstep(thickness - epsilon, thickness + epsilon, dist);
-    gl_FragColor = inCurve * vec4(v_color.rgb * v_color.a, v_color.a);
+    float t = smoothstep(
+      halfThickness - v_feather,
+      halfThickness,
+      dist
+    );
+
+    gl_FragColor = mix(v_color, transparent, t);
     #endif
   } else {
     gl_FragColor = transparent;

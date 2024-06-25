@@ -25,6 +25,7 @@ export default function createEdgeCurveProgram<
     "u_sizeRatio",
     "u_dimensions",
     "u_pixelRatio",
+    "u_feather",
     "u_minEdgeThickness",
     ...(arrowHead ? ["u_lengthToThicknessRatio", "u_widenessToThicknessRatio"] : []),
   ] as const;
@@ -93,11 +94,12 @@ export default function createEdgeCurveProgram<
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_matrix, u_pixelRatio, u_sizeRatio, u_dimensions, u_minEdgeThickness } = uniformLocations;
+      const { u_matrix, u_pixelRatio, u_feather, u_sizeRatio, u_dimensions, u_minEdgeThickness } = uniformLocations;
 
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
       gl.uniform1f(u_pixelRatio, params.pixelRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
+      gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform2f(u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
 

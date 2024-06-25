@@ -91,6 +91,7 @@ export interface RenderParams {
   matrix: Float32Array;
   downSizingRatio: number;
   minEdgeThickness: number;
+  antiAliasingFeather: number;
 }
 
 /**

@@ -18,9 +18,11 @@ uniform float u_sizeRatio;
 uniform float u_pixelRatio;
 uniform vec2 u_dimensions;
 uniform float u_minEdgeThickness;
+uniform float u_feather;
 
 varying vec4 v_color;
 varying float v_thickness;
+varying float v_feather;
 varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
@@ -71,9 +73,10 @@ void main() {
   vec2 normal = vec2(-delta.y, delta.x) * a_direction;
   vec2 unitNormal = normal / len;
   float boundingBoxThickness = len * a_curvature;
-  float curveThickness = max(minThickness, a_thickness / 2.0 / u_sizeRatio * u_pixelRatio);
 
-  v_thickness = curveThickness;
+  float curveThickness = max(minThickness, a_thickness / u_sizeRatio);
+  v_thickness = curveThickness * u_pixelRatio;
+  v_feather = u_feather;
 
   v_cpA = viewportSource;
   v_cpB = 0.5 * (viewportSource + viewportTarget) + unitNormal * a_direction * boundingBoxThickness;

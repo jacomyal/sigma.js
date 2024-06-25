@@ -31,8 +31,8 @@ void main() {
   // These first computations are taken from edge.vert.glsl and
   // edge.clamped.vert.glsl. Please read it to get better comments on what's
   // happening:
-  float pixelsThickness = max(normalLength, minThickness * u_sizeRatio);
-  float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
+  float pixelsThickness = max(normalLength / u_sizeRatio, minThickness);
+  float webGLThickness = pixelsThickness * u_correctionRatio;
   float webGLNodeRadius = a_radius * 2.0 * u_correctionRatio / u_sizeRatio;
   float webGLArrowHeadLength = webGLThickness * u_lengthToThicknessRatio * 2.0;
   float webGLArrowHeadThickness = webGLThickness * u_widenessToThicknessRatio;

@@ -58,6 +58,7 @@ export interface Settings<
   defaultDrawNodeLabel: NodeLabelDrawingFunction<N, E, G>;
   defaultDrawNodeHover: NodeHoverDrawingFunction<N, E, G>;
   minEdgeThickness: number;
+  antiAliasingFeather: number;
 
   // Labels
   labelDensity: number;
@@ -110,6 +111,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   defaultDrawNodeLabel: drawDiscNodeLabel,
   defaultDrawNodeHover: drawDiscNodeHover,
   minEdgeThickness: 1.7,
+  antiAliasingFeather: 1,
 
   // Labels
   labelDensity: 1,

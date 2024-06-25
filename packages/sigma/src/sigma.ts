@@ -1203,6 +1203,7 @@ export default class Sigma<
         correctionRatio: this.correctionRatio,
         downSizingRatio: this.pickingDownSizingRatio,
         minEdgeThickness: this.settings.minEdgeThickness,
+        antiAliasingFeather: this.settings.antiAliasingFeather,
       });
     }
   }
@@ -1299,6 +1300,7 @@ export default class Sigma<
       correctionRatio: this.correctionRatio,
       downSizingRatio: this.pickingDownSizingRatio,
       minEdgeThickness: this.settings.minEdgeThickness,
+      antiAliasingFeather: this.settings.antiAliasingFeather,
     };
 
     // Drawing nodes
