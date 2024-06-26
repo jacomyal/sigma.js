@@ -1,6 +1,6 @@
 {
   "name": "@sigma/edge-curve",
-  "version": "3.0.0-beta.12",
+  "version": "3.0.0-beta.13",
   "description": "An edge program that renders edges as curves for sigma.js",
   "main": "dist/sigma-edge-curve.cjs.js",
   "module": "dist/sigma-edge-curve.esm.js",
