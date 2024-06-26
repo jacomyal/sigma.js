@@ -1,6 +1,6 @@
 import { Attributes } from "graphology-types";
+import { EdgeLabelDrawingFunction } from "sigma/rendering";
 import { Settings } from "sigma/settings";
-import { EdgeLabelDrawingFunction } from "sigma/src/rendering";
 
 import { CreateEdgeCurveProgramOptions } from "./utils";
 

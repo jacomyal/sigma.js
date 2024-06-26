@@ -29,7 +29,7 @@ export const DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS: CreateEdgeCurveProgramOptions =
 /**
  * This function helps to identify parallel edges, to adjust their curvatures.
  */
-const DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS = {
+export const DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS = {
   edgeIndexAttribute: "parallelIndex",
   edgeMinIndexAttribute: "parallelMinIndex",
   edgeMaxIndexAttribute: "parallelMaxIndex",

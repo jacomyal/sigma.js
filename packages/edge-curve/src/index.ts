@@ -3,8 +3,14 @@ import { DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS, EdgeProgramType } from "sigma/
 import createEdgeCurveProgram from "./factory";
 
 export { default as createEdgeCurveProgram } from "./factory";
-export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils";
-export { createDrawCurvedEdgeLabel } from "./edge-labels.ts";
+export { type CreateEdgeCurveProgramOptions } from "./utils";
+export {
+  indexParallelEdgesIndex,
+  DEFAULT_EDGE_CURVATURE,
+  DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS,
+  DEFAULT_INDEX_PARALLEL_EDGES_OPTIONS,
+} from "./utils";
+export { createDrawCurvedEdgeLabel } from "./edge-labels";
 
 const EdgeCurveProgram: EdgeProgramType = createEdgeCurveProgram();
 export default EdgeCurveProgram;
