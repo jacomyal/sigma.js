@@ -28,7 +28,7 @@ function getCurveLength(p0: Point, p1: Point, p2: Point): number {
   return length;
 }
 
-export function getDrawCurvedEdgeLabel<
+export function createDrawCurvedEdgeLabel<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,

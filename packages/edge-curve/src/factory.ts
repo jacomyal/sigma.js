@@ -3,7 +3,7 @@ import { EdgeProgram, EdgeProgramType, ProgramInfo } from "sigma/rendering";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "sigma/types";
 import { floatColor } from "sigma/utils";
 
-import { getDrawCurvedEdgeLabel } from "./edge-labels";
+import { createDrawCurvedEdgeLabel } from "./edge-labels";
 import getFragmentShader from "./shader-frag";
 import getVertexShader from "./shader-vert";
 import { CreateEdgeCurveProgramOptions, DEFAULT_EDGE_CURVATURE, DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS } from "./utils";
@@ -14,12 +14,12 @@ export default function createEdgeCurveProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(inputOptions?: Partial<CreateEdgeCurveProgramOptions>): EdgeProgramType<N, E, G> {
+>(inputOptions?: Partial<CreateEdgeCurveProgramOptions<N, E, G>>): EdgeProgramType<N, E, G> {
   const options: CreateEdgeCurveProgramOptions = {
     ...DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS,
     ...(inputOptions || {}),
   };
-  const { arrowHead, curvatureAttribute } = options;
+  const { arrowHead, curvatureAttribute, drawLabel } = options as CreateEdgeCurveProgramOptions<N, E, G>;
   const UNIFORMS = [
     "u_matrix",
     "u_sizeRatio",
@@ -31,7 +31,7 @@ export default function createEdgeCurveProgram<
   ] as const;
 
   return class EdgeCurveProgram extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
-    drawLabel = getDrawCurvedEdgeLabel<N, E, G>(options);
+    drawLabel = drawLabel || createDrawCurvedEdgeLabel<N, E, G>(options);
 
     getDefinition() {
       return {

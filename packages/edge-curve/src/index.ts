@@ -4,6 +4,7 @@ import createEdgeCurveProgram from "./factory";
 
 export { default as createEdgeCurveProgram } from "./factory";
 export { indexParallelEdgesIndex, DEFAULT_EDGE_CURVATURE } from "./utils";
+export { createDrawCurvedEdgeLabel } from "./edge-labels.ts";
 
 const EdgeCurveProgram: EdgeProgramType = createEdgeCurveProgram();
 export default EdgeCurveProgram;

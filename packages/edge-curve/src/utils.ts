@@ -1,8 +1,14 @@
 import Graph from "graphology";
+import { Attributes } from "graphology-types";
+import { EdgeLabelDrawingFunction } from "sigma/rendering";
 
 export const DEFAULT_EDGE_CURVATURE = 0.25;
 
-export type CreateEdgeCurveProgramOptions = {
+export type CreateEdgeCurveProgramOptions<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = {
   // If 0, then edges have no arrow head. Else, the head is as long as this ratio times the thickness.
   curvatureAttribute: string;
   defaultCurvature: number;
@@ -10,6 +16,8 @@ export type CreateEdgeCurveProgramOptions = {
     lengthToThicknessRatio: number;
     widenessToThicknessRatio: number;
   };
+  // Allows overriding drawLabel returned class method.
+  drawLabel?: EdgeLabelDrawingFunction<N, E, G> | undefined;
 };
 
 export const DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS: CreateEdgeCurveProgramOptions = {
