@@ -35,7 +35,13 @@ export type TextureManagerOptions = {
   // Minimal time (in ms) between two consecutive textures generations.
   // If null, then no timeout will be used (for debug purpose only!).
   debounceTimeout: number | null;
+  // "crossOrigin" attribute used to request the image.
+  // By default, this is set to an empty string, implying "anonymous".
+  // Setting this to `null` will cause the image to be fetched without CORS.
+  crossOrigin: CrossOrigin
 };
+
+type CrossOrigin = "anonymous" | "use-credentials";
 
 export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
   size: { mode: "max", value: 512 },
@@ -43,6 +49,7 @@ export const DEFAULT_TEXTURE_MANAGER_OPTIONS: TextureManagerOptions = {
   correctCentering: false,
   maxTextureSize: 4096,
   debounceTimeout: 500,
+  crossOrigin: "anonymous",
 };
 
 // This margin helps to avoid images collisions in the texture:
@@ -56,7 +63,7 @@ export const MARGIN_IN_TEXTURE = 1;
  * This helper loads an image at a given URL, and returns an HTMLImageElement
  * with it displayed once it's properly loaded, within a promise.
  */
-export function loadRasterImage(imageSource: string): Promise<HTMLImageElement> {
+export function loadRasterImage(imageSource: string, { crossOrigin }: { crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
 
@@ -76,7 +83,11 @@ export function loadRasterImage(imageSource: string): Promise<HTMLImageElement> 
     );
 
     // Load image:
-    image.setAttribute("crossOrigin", "");
+    if (crossOrigin === "use-credentials")
+      image.setAttribute("crossOrigin", "use-credentials");
+    else {
+      image.setAttribute("crossOrigin", "anonymous");
+    }
     image.src = imageSource;
   });
 }
@@ -86,8 +97,13 @@ export function loadRasterImage(imageSource: string): Promise<HTMLImageElement> 
  * size, and returns an HTMLImageElement with it displayed once it's properly
  * loaded, within a promise.
  */
-export async function loadSVGImage(imageSource: string, { size }: { size?: number } = {}): Promise<HTMLImageElement> {
-  const resp = await fetch(imageSource);
+export async function loadSVGImage(imageSource: string, { size, crossOrigin }: { size?: number, crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
+  let resp: Response;
+  if (crossOrigin === "use-credentials") {
+    resp = await fetch(imageSource, { credentials: "include" });
+  } else {
+    resp = await fetch(imageSource);
+  }
   const svgString = await resp.text();
   const svg = new DOMParser().parseFromString(svgString, "image/svg+xml");
 
@@ -121,18 +137,18 @@ export async function loadSVGImage(imageSource: string, { size }: { size?: numbe
 /**
  * This helper loads an image using the proper function.
  */
-export async function loadImage(imageSource: string, { size }: { size?: number } = {}): Promise<HTMLImageElement> {
+export async function loadImage(imageSource: string, { size, crossOrigin }: { size?: number, crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
   const isSVG = imageSource.split(/[#?]/)[0].split(".").pop()?.trim().toLowerCase() === "svg";
 
   let image: HTMLImageElement;
   if (isSVG && size) {
     try {
-      image = await loadSVGImage(imageSource, { size });
+      image = await loadSVGImage(imageSource, { size, crossOrigin });
     } catch (e) {
-      image = await loadRasterImage(imageSource);
+      image = await loadRasterImage(imageSource, { crossOrigin });
     }
   } else {
-    image = await loadRasterImage(imageSource);
+    image = await loadRasterImage(imageSource, { crossOrigin });
   }
 
   return image;
@@ -424,7 +440,10 @@ export class TextureManager extends EventEmitter {
 
     try {
       const { size } = this.options;
-      const image = await loadImage(source, { size: size.mode === "force" ? size.value : undefined });
+      const image = await loadImage(source, {
+        size: size.mode === "force" ? size.value : undefined,
+        crossOrigin: this.options.crossOrigin
+      });
       this.imageStates[source] = {
         status: "ready",
         image,
