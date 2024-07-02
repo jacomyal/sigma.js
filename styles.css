@@ -1,0 +1,530 @@
+:root {
+  --ruby: #e22653;
+  --grey: #999;
+  --dark-grey: #666;
+  --cream: #f9f7ed;
+  --grid-size: 1000px;
+  --grid-h-padding: 2em;
+  --title-size: 550px;
+  --showcase-width: 1400px;
+  --showcase-height: 800px;
+  --showcase-max-height: calc(100vh - 2em);
+  --transition: all ease-out 300ms;
+  --hover-opacity: 0.7;
+  --box-shadow: 0 0 8px var(--dark-grey);
+}
+
+.text-grey {
+  color: var(--grey);
+}
+.text-ruby {
+  color: var(--ruby);
+}
+
+/* Titles font */
+@font-face {
+  font-family: Hauora;
+  src: local("Hauora"), url("/fonts/hauora/Hauora-Medium.woff"), url("/fonts/hauora/Hauora-Medium.woff2");
+}
+@font-face {
+  font-family: Hauora;
+  font-weight: bold;
+  src: local("Hauora"), url("/fonts/hauora/Hauora-Bold.woff"), url("/fonts/hauora/Hauora-Bold.woff2");
+}
+
+/* Monospace font */
+@font-face {
+  font-family: Cascadia;
+  src: local("Cascadia"), url("/fonts/cascadia/CascadiaCode.ttf"), url("/fonts/cascadia/CascadiaCode.woff2"),
+    url("/fonts/cascadia/CascadiaCode-Regular.otf");
+}
+
+/* Main font */
+@font-face {
+  font-family: Public Sans;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-Regular.woff"),
+    url("/fonts/public-sans/PublicSans-Regular.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-style: italic;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-LightItalic.woff"),
+    url("/fonts/public-sans/PublicSans-LightItalic.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-weight: bold;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-SemiBold.woff"),
+    url("/fonts/public-sans/PublicSans-SemiBold.woff2");
+}
+@font-face {
+  font-family: Public Sans;
+  font-style: italic;
+  font-weight: bold;
+  src: local("Public Sans"), url("/fonts/public-sans/PublicSans-SemiBoldItalic.woff"),
+    url("/fonts/public-sans/PublicSans-SemiBoldItalic.woff2");
+}
+
+/**
+ * TYPOGRAPHY:
+ * ***********
+ */
+body {
+  font-size: 1.2em;
+}
+body,
+input,
+button {
+  font-family: "Public Sans", Lato, Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+.text-title {
+  font-family: Hauora, Roboto, Arial, sans-serif;
+}
+
+pre,
+code {
+  font-family: Cascadia, monospace;
+  background: var(--cream);
+}
+.text-center {
+  text-align: center;
+}
+
+/**
+ * BASE STYLE / LAYOUT:
+ * ********************
+ */
+html {
+  scroll-behavior: smooth;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  column-gap: 1em;
+}
+.row > * {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+/**
+ * TOP BAR:
+ * ********
+ */
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+header img {
+  height: 1.6em;
+}
+header .links {
+  text-align: right;
+  list-style: none;
+}
+header .links ul {
+  margin: 0;
+  padding: 0;
+}
+header .links li {
+  display: inline-block;
+  margin-left: 0.3em;
+}
+header .links a {
+  text-decoration: none;
+}
+header .menu {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+header .panel ul {
+  list-style: none;
+  padding: 0;
+}
+header .panel ul.internal {
+  flex-grow: 1;
+}
+header .panel a {
+  text-decoration: none;
+}
+header .panel > * {
+  margin-bottom: 1em;
+}
+/* Deal with padding: */
+header .links,
+header .menu {
+  padding: 2em;
+}
+#toggle-menu {
+  display: none;
+}
+header .menu .panel {
+  margin: 0;
+  line-height: 1.6em;
+  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6em 5em 2em;
+  position: fixed;
+  background: white;
+  box-shadow: var(--box-shadow);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transform: translate(calc(-100% - 10px));
+  transition: var(--transition);
+}
+#toggle-menu + .menu label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: #ffffff;
+  padding: 0.3em;
+  transform: translate(-0.3em, -0.3em);
+}
+#toggle-menu:checked + .menu .panel {
+  transform: translate(0%);
+}
+#toggle-menu:checked + .menu label .show-menu,
+#toggle-menu:not(:checked) + .menu label .hide-menu {
+  display: none;
+}
+a {
+  color: black;
+  transition: var(--transition);
+}
+a:hover {
+  color: var(--dark-grey);
+}
+.button {
+  display: inline-block;
+  text-decoration: none;
+  padding: 1em;
+  background: var(--dark-grey);
+  color: white !important;
+  transition: var(--transition);
+  text-align: center;
+  font-size: 1em;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.button:not([disabled]):hover {
+  opacity: var(--hover-opacity);
+}
+.button.button-light {
+  box-sizing: border-box;
+  background: white;
+  border: 1px solid var(--dark-grey);
+  color: black !important;
+}
+.button[disabled] {
+  color: var(--dark-grey) !important;
+  border-color: var(--grey);
+  cursor: default;
+}
+
+.with-logo {
+  text-decoration: none;
+  position: relative;
+}
+.with-logo img {
+  position: absolute;
+  margin-right: 0.2em;
+  right: 100%;
+  bottom: -0.15em;
+  height: 110%;
+}
+
+/**
+ * MAIN CONTENT:
+ * *************
+ */
+main {
+  padding: 2em var(--grid-h-padding);
+  flex-grow: 1;
+}
+main > section {
+  margin: auto auto 3em;
+  max-width: var(--grid-size);
+}
+main section.title {
+  font-size: 1.4em;
+  max-width: var(--title-size);
+  margin: auto;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+main section.title h1 {
+  font-size: 1.7em;
+  margin: 0.5em 0;
+}
+main section.showcase {
+  position: relative;
+  max-width: var(--showcase-width);
+}
+main section.showcase .wrapper {
+  position: relative;
+  box-shadow: 0 0 8px var(--grey);
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+}
+main section.showcase .wrapper,
+main section.showcase iframe {
+  width: 100%;
+  height: var(--showcase-height);
+  max-height: var(--showcase-max-height);
+  overflow: hidden;
+}
+main section.showcase iframe {
+  border: none;
+}
+main section.showcase .caption {
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+main section.showcase .caption .button {
+  padding: 0.5em;
+}
+main section.showcase .caption a {
+  white-space: nowrap;
+  margin-right: 1em;
+}
+main section.showcase .overlay {
+  position: absolute;
+  inset: 0;
+  color: white;
+  padding: 3em;
+  font-size: 1.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  background: #ffffff66;
+  transition: var(--transition);
+  overflow: hidden;
+}
+main section.showcase .overlay:hover {
+  background: #ffffff99;
+}
+main section.showcase .overlay.hide {
+  display: none;
+}
+main section.showcase .overlay h2 {
+  margin: 0 0 1px;
+}
+main section.showcase .overlay .bg {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #666666dd;
+}
+main section.showcase .overlay:hover .bg {
+  background: #666666;
+}
+main #architecture .schema {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  max-width: 60%;
+  margin: 3em auto auto;
+}
+main #architecture .schema img {
+  height: 4em;
+}
+main #architecture .schema > span {
+  height: 1.5em;
+  line-height: 1.5em;
+  font-size: 3em;
+  margin: 0 0.5em;
+}
+main #quickstart .options pre {
+  display: inline-block;
+  padding: 0.5em 1em;
+  margin: 0;
+}
+main #quickstart .options code::before {
+  content: "> ";
+  user-select: none;
+}
+main #usecases .usecase {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1em;
+}
+main #usecases .usecase:nth-child(2n + 1) {
+  flex-direction: row-reverse;
+}
+main #usecases .thumbnail {
+  display: block;
+  height: 400px;
+  overflow: hidden;
+  box-shadow: 0 0 8px var(--dark-grey);
+}
+main #usecases .thumbnail > div {
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: var(--transition);
+}
+main #usecases .thumbnail:hover > div {
+  transform: scale(1.1);
+}
+main #inthewild .usages {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+main #inthewild .usages::after {
+  content: " ";
+  flex: auto;
+}
+main #inthewild .usages > div {
+  width: 323px;
+  margin-right: 0.5em;
+  margin-bottom: 1em;
+}
+main #inthewild .thumbnail {
+  display: block;
+  height: 176px;
+  overflow: hidden;
+}
+main #inthewild .thumbnail > div {
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: var(--transition);
+  background-blend-mode: multiply;
+  background-color: lightgray;
+}
+main #inthewild .thumbnail:hover {
+  box-shadow: 0 0 8px var(--dark-grey);
+}
+main #inthewild .thumbnail:hover > div {
+  transform: scale(1.1);
+  background-color: transparent;
+}
+main #inthewild .sumup {
+  padding: 1em;
+}
+main #inthewild .sumup h3,
+main #inthewild .sumup p {
+  margin: 0;
+}
+main #faq ul {
+  padding: 0;
+  list-style: none;
+}
+main #faq h3 {
+  margin-top: 2.4em;
+  margin-bottom: 0;
+}
+main #faq p {
+  margin-top: 0.5em;
+}
+
+/**
+ * FOOTER:
+ * *******
+ */
+footer {
+  padding: 2em var(--grid-h-padding);
+  max-width: var(--grid-size);
+  margin: auto;
+}
+footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+/**
+ * RESPONSIVENESS:
+ * ***************
+ */
+@media (max-width: 768px) {
+  body {
+    font-size: 1em;
+  }
+
+  .row {
+    display: block;
+  }
+
+  /* Deal with padding: */
+  header .links,
+  header .menu {
+    padding: 1em;
+  }
+  header .menu .panel {
+    padding: 6em 4em 2em;
+  }
+  #toggle-menu:checked + .menu .panel {
+    background: #ffffffee;
+    width: 100vw;
+    border: none;
+    margin: auto;
+  }
+  #toggle-menu:checked ~ .links {
+    display: none;
+  }
+
+  main,
+  footer {
+    max-width: 100%;
+  }
+  main section.title {
+    max-width: 100%;
+    padding-left: 3em;
+    min-height: 80vh;
+    font-size: 1.2em;
+  }
+  main section.showcase .overlay {
+    font-size: 1em;
+  }
+  main #architecture .schema {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+  }
+  main #architecture .schema img {
+    height: 4em;
+  }
+  main #architecture .schema > div {
+    max-width: 60%;
+    margin: auto;
+  }
+  main #architecture .schema > span {
+    display: block;
+    text-align: center;
+  }
+}
