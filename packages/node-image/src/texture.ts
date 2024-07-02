@@ -36,9 +36,9 @@ export type TextureManagerOptions = {
   // If null, then no timeout will be used (for debug purpose only!).
   debounceTimeout: number | null;
   // "crossOrigin" attribute used to request the image.
-  // By default, this is set to an empty string, implying "anonymous".
+  // By default, this is set to "anonymous".
   // Setting this to `null` will cause the image to be fetched without CORS.
-  crossOrigin: CrossOrigin
+  crossOrigin: CrossOrigin | null;
 };
 
 type CrossOrigin = "anonymous" | "use-credentials";
@@ -63,7 +63,10 @@ export const MARGIN_IN_TEXTURE = 1;
  * This helper loads an image at a given URL, and returns an HTMLImageElement
  * with it displayed once it's properly loaded, within a promise.
  */
-export function loadRasterImage(imageSource: string, { crossOrigin }: { crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
+export function loadRasterImage(
+  imageSource: string,
+  { crossOrigin }: { crossOrigin?: CrossOrigin } = {},
+): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
 
@@ -83,10 +86,8 @@ export function loadRasterImage(imageSource: string, { crossOrigin }: { crossOri
     );
 
     // Load image:
-    if (crossOrigin === "use-credentials")
-      image.setAttribute("crossOrigin", "use-credentials");
-    else {
-      image.setAttribute("crossOrigin", "anonymous");
+    if (crossOrigin) {
+      image.setAttribute("crossOrigin", crossOrigin);
     }
     image.src = imageSource;
   });
@@ -97,7 +98,10 @@ export function loadRasterImage(imageSource: string, { crossOrigin }: { crossOri
  * size, and returns an HTMLImageElement with it displayed once it's properly
  * loaded, within a promise.
  */
-export async function loadSVGImage(imageSource: string, { size, crossOrigin }: { size?: number, crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
+export async function loadSVGImage(
+  imageSource: string,
+  { size, crossOrigin }: { size?: number; crossOrigin?: CrossOrigin } = {},
+): Promise<HTMLImageElement> {
   let resp: Response;
   if (crossOrigin === "use-credentials") {
     resp = await fetch(imageSource, { credentials: "include" });
@@ -137,7 +141,10 @@ export async function loadSVGImage(imageSource: string, { size, crossOrigin }: {
 /**
  * This helper loads an image using the proper function.
  */
-export async function loadImage(imageSource: string, { size, crossOrigin }: { size?: number, crossOrigin?: CrossOrigin } = {}): Promise<HTMLImageElement> {
+export async function loadImage(
+  imageSource: string,
+  { size, crossOrigin }: { size?: number; crossOrigin?: CrossOrigin } = {},
+): Promise<HTMLImageElement> {
   const isSVG = imageSource.split(/[#?]/)[0].split(".").pop()?.trim().toLowerCase() === "svg";
 
   let image: HTMLImageElement;
@@ -442,7 +449,7 @@ export class TextureManager extends EventEmitter {
       const { size } = this.options;
       const image = await loadImage(source, {
         size: size.mode === "force" ? size.value : undefined,
-        crossOrigin: this.options.crossOrigin
+        crossOrigin: this.options.crossOrigin || undefined,
       });
       this.imageStates[source] = {
         status: "ready",
