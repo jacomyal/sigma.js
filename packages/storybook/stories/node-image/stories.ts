@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 
 import template from "./index.html?raw";
+import localImagesPlay from "./local-images";
+import localImagesSource from "./local-images?raw";
 import nodeImagesPlay from "./node-images";
 import nodeImagesSource from "./node-images?raw";
 import nodePictogramsPlay from "./node-pictograms";
@@ -50,6 +52,18 @@ export const nodePictogramsWithBackground: Story = {
   parameters: {
     storySource: {
       source: nodePictogramsBackgroundSource,
+    },
+  },
+};
+
+export const localImages: Story = {
+  name: "Displaying local images",
+  render: () => template,
+  play: localImagesPlay,
+  args: {},
+  parameters: {
+    storySource: {
+      source: localImagesSource,
     },
   },
 };
