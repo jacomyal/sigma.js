@@ -93,6 +93,8 @@ export interface RenderParams {
   downSizingRatio: number;
   minEdgeThickness: number;
   antiAliasingFeather: number;
+  maxNodesDepth: number;
+  maxEdgesDepth: number;
 }
 
 /**

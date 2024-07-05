@@ -1,4 +1,4 @@
-import { Extent, PlainObject } from "../types";
+import { PlainObject } from "../types";
 
 /**
  * Function used to create DOM elements easily.
@@ -35,10 +35,9 @@ export function getPixelRatio(): number {
 }
 
 /**
- * Function ordering the given elements in reverse z-order so they drawn
- * the correct way.
+ * Function ordering the given elements in reverse z-order, so they are drawn the correct way.
  */
-export function zIndexOrdering<T>(_extent: Extent, getter: (e: T) => number, elements: Array<T>): Array<T> {
+export function zIndexOrdering<T>(getter: (e: T) => number, elements: Array<T>): Array<T> {
   // If k is > n, we'll use a standard sort
   return elements.sort(function (a, b) {
     const zA = getter(a) || 0,

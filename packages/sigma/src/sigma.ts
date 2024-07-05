@@ -143,8 +143,8 @@ export default class Sigma<
   private nodesWithForcedLabels: Set<string> = new Set<string>();
   private edgesWithForcedLabels: Set<string> = new Set<string>();
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
-  private nodeZExtent: [number, number] = [Infinity, -Infinity];
-  private edgeZExtent: [number, number] = [Infinity, -Infinity];
+  private nodeDepths: Record<string, number> = {};
+  private edgeDepths: Record<string, number> = {};
 
   private matrix: Float32Array = identity();
   private invMatrix: Float32Array = identity();
@@ -540,13 +540,13 @@ export default class Sigma<
   private bindGraphHandlers(): this {
     const graph = this.graph;
 
-    const LAYOUT_IMPACTING_FIELDS = new Set(["x", "y", "zIndex", "type"]);
+    const LAYOUT_IMPACTING_FIELDS = new Set(["x", "y", "type"]);
     this.activeListeners.eachNodeAttributesUpdatedGraphUpdate = (e: { hints?: { attributes?: string[] } }) => {
       const updatedFields = e.hints?.attributes;
       // we process all nodes
       this.graph.forEachNode((node) => this.updateNode(node));
 
-      // if coord, type or zIndex have changed, we need to schedule a render
+      // if coord or type have changed, we need to schedule a render
       // (zIndex for the programIndex)
       const layoutChanged = !updatedFields || updatedFields.some((f) => LAYOUT_IMPACTING_FIELDS.has(f));
       this.refresh({ partialGraph: { nodes: graph.nodes() }, skipIndexation: !layoutChanged, schedule: true });
@@ -556,7 +556,7 @@ export default class Sigma<
       const updatedFields = e.hints?.attributes;
       // we process all edges
       this.graph.forEachEdge((edge) => this.updateEdge(edge));
-      const layoutChanged = updatedFields && ["zIndex", "type"].some((f) => updatedFields?.includes(f));
+      const layoutChanged = updatedFields?.includes("type");
       this.refresh({ partialGraph: { edges: graph.edges() }, skipIndexation: !layoutChanged, schedule: true });
     };
 
@@ -727,7 +727,7 @@ export default class Sigma<
     const itemIDsIndex: typeof this.itemIDsIndex = {};
     let incrID = 1;
 
-    let nodes = graph.nodes();
+    const nodes = graph.nodes();
 
     // Do some indexation on the whole graph
     for (let i = 0, l = nodes.length; i < l; i++) {
@@ -760,12 +760,15 @@ export default class Sigma<
     }
 
     // Order nodes by zIndex before to add them to program
-    if (this.settings.zIndex && this.nodeZExtent[0] !== this.nodeZExtent[1])
-      nodes = zIndexOrdering<string>(
-        this.nodeZExtent,
+    this.nodeDepths = {};
+    if (this.settings.zIndex) {
+      const sortedNodes = zIndexOrdering<string>(
         (node: string): number => this.nodeDataCache[node].zIndex,
-        nodes,
+        nodes.slice(0),
       );
+
+      for (let i = 0, l = sortedNodes.length; i < l; i++) this.nodeDepths[sortedNodes[i]] = l - 1 - i;
+    }
 
     // Add data to programs
     for (let i = 0, l = nodes.length; i < l; i++) {
@@ -784,7 +787,7 @@ export default class Sigma<
     //
 
     const edgesPerPrograms: Record<string, number> = {};
-    let edges = graph.edges();
+    const edges = graph.edges();
 
     // Allocate memory to programs
     for (let i = 0, l = edges.length; i < l; i++) {
@@ -794,12 +797,15 @@ export default class Sigma<
     }
 
     // Order edges by zIndex before to add them to program
-    if (this.settings.zIndex && this.edgeZExtent[0] !== this.edgeZExtent[1])
-      edges = zIndexOrdering<string>(
-        this.edgeZExtent,
+    this.edgeDepths = {};
+    if (this.settings.zIndex) {
+      const sortedEdges = zIndexOrdering<string>(
         (edge: string): number => this.edgeDataCache[edge].zIndex,
-        edges,
+        edges.slice(0),
       );
+
+      for (let i = 0, l = sortedEdges.length; i < l; i++) this.edgeDepths[sortedEdges[i]] = l - 1 - i;
+    }
 
     for (const type in this.edgePrograms) {
       if (!hasOwnProperty.call(this.edgePrograms, type)) {
@@ -842,8 +848,10 @@ export default class Sigma<
     this.camera.setState(this.camera.validateState(this.camera.getState()));
 
     if (oldSettings) {
+      const zIndexingUpdated = !!oldSettings.zIndex !== !!settings.zIndex;
+
       // Check edge programs:
-      if (oldSettings.edgeProgramClasses !== settings.edgeProgramClasses) {
+      if (zIndexingUpdated || oldSettings.edgeProgramClasses !== settings.edgeProgramClasses) {
         for (const type in settings.edgeProgramClasses) {
           if (settings.edgeProgramClasses[type] !== oldSettings.edgeProgramClasses[type]) {
             this.registerEdgeProgram(type, settings.edgeProgramClasses[type]);
@@ -856,6 +864,7 @@ export default class Sigma<
 
       // Check node programs:
       if (
+        zIndexingUpdated ||
         oldSettings.nodeProgramClasses !== settings.nodeProgramClasses ||
         oldSettings.nodeHoverProgramClasses !== settings.nodeHoverProgramClasses
       ) {
@@ -1244,12 +1253,6 @@ export default class Sigma<
     // update
     this.highlightedNodes.delete(key);
     if (data.highlighted && !data.hidden) this.highlightedNodes.add(key);
-
-    // zIndex
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.nodeZExtent[0]) this.nodeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.nodeZExtent[1]) this.nodeZExtent[1] = data.zIndex;
-    }
   }
 
   /**
@@ -1275,7 +1278,7 @@ export default class Sigma<
     delete this.nodeDataCache[key];
     // Remove from node program index
     delete this.nodeProgramIndex[key];
-    // Remove from higlighted nodes
+    // Remove from highlighted nodes
     this.highlightedNodes.delete(key);
     // Remove from hovered
     if (this.hoveredNode === key) this.hoveredNode = null;
@@ -1305,12 +1308,6 @@ export default class Sigma<
     // update
     this.edgesWithForcedLabels.delete(key);
     if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.add(key);
-
-    // Check zIndex
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.edgeZExtent[0]) this.edgeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.edgeZExtent[1]) this.edgeZExtent[1] = data.zIndex;
-    }
   }
 
   /**
@@ -1349,7 +1346,6 @@ export default class Sigma<
     this.nodeDataCache = {};
     this.edgeProgramIndex = {};
     this.nodesWithForcedLabels = new Set<string>();
-    this.nodeZExtent = [Infinity, -Infinity];
   }
 
   /**
@@ -1360,7 +1356,6 @@ export default class Sigma<
     this.edgeDataCache = {};
     this.edgeProgramIndex = {};
     this.edgesWithForcedLabels = new Set<string>();
-    this.edgeZExtent = [Infinity, -Infinity];
   }
 
   /**
@@ -1412,7 +1407,7 @@ export default class Sigma<
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-    nodeProgram.process(fingerprint, position, data);
+    nodeProgram.process(fingerprint, position, { ...data, zIndex: this.nodeDepths[node] });
     // Saving program index
     this.nodeProgramIndex[node] = position;
   }
@@ -1431,7 +1426,7 @@ export default class Sigma<
     const extremities = this.graph.extremities(edge),
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
-    edgeProgram.process(fingerprint, position, sourceData, targetData, data);
+    edgeProgram.process(fingerprint, position, sourceData, targetData, { ...data, zIndex: this.edgeDepths[edge] });
     // Saving program index
     this.edgeProgramIndex[edge] = position;
   }
@@ -1460,6 +1455,8 @@ export default class Sigma<
       downSizingRatio: this.pickingDownSizingRatio,
       minEdgeThickness: this.settings.minEdgeThickness,
       antiAliasingFeather: this.settings.antiAliasingFeather,
+      maxEdgesDepth: this.graph.size + 1,
+      maxNodesDepth: this.graph.order + 1,
     };
   }
 

@@ -22,6 +22,7 @@ import {
 } from "./utils";
 
 const PICKING_PREFIX = `#define PICKING_MODE\n`;
+const Z_INDEXING_PREFIX = `#define Z_INDEXING\n`;
 
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.BOOL]: 1,
@@ -76,6 +77,7 @@ export abstract class Program<
   pickProgram: ProgramInfo | null;
 
   isInstanced: boolean;
+  isZIndexing: boolean;
 
   abstract getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform>;
 
@@ -84,11 +86,16 @@ export abstract class Program<
     pickingBuffer: WebGLFramebuffer | null,
     renderer: Sigma<N, E, G>,
   ) {
+    this.renderer = renderer;
+    this.isZIndexing = !!renderer.getSetting("zIndex");
+
+    const zIndexingPrefix = this.isZIndexing ? Z_INDEXING_PREFIX : "";
+
     // Reading and caching program definition
     const def = this.getDefinition();
     this.VERTICES = def.VERTICES;
-    this.VERTEX_SHADER_SOURCE = def.VERTEX_SHADER_SOURCE;
-    this.FRAGMENT_SHADER_SOURCE = def.FRAGMENT_SHADER_SOURCE;
+    this.VERTEX_SHADER_SOURCE = zIndexingPrefix + def.VERTEX_SHADER_SOURCE;
+    this.FRAGMENT_SHADER_SOURCE = zIndexingPrefix + def.FRAGMENT_SHADER_SOURCE;
     this.UNIFORMS = def.UNIFORMS;
     this.ATTRIBUTES = def.ATTRIBUTES;
     this.METHOD = def.METHOD;
@@ -102,14 +109,19 @@ export abstract class Program<
     this.STRIDE = this.VERTICES * this.ATTRIBUTES_ITEMS_COUNT;
 
     // Members
-    this.renderer = renderer;
-    this.normalProgram = this.getProgramInfo("normal", gl, def.VERTEX_SHADER_SOURCE, def.FRAGMENT_SHADER_SOURCE, null);
+    this.normalProgram = this.getProgramInfo(
+      "normal",
+      gl,
+      this.VERTEX_SHADER_SOURCE,
+      this.FRAGMENT_SHADER_SOURCE,
+      null,
+    );
     this.pickProgram = pickingBuffer
       ? this.getProgramInfo(
           "pick",
           gl,
-          PICKING_PREFIX + def.VERTEX_SHADER_SOURCE,
-          PICKING_PREFIX + def.FRAGMENT_SHADER_SOURCE,
+          PICKING_PREFIX + this.VERTEX_SHADER_SOURCE,
+          PICKING_PREFIX + this.FRAGMENT_SHADER_SOURCE,
           pickingBuffer,
         )
       : null;
