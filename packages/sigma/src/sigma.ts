@@ -143,8 +143,6 @@ export default class Sigma<
   private nodesWithForcedLabels: Set<string> = new Set<string>();
   private edgesWithForcedLabels: Set<string> = new Set<string>();
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
-  private nodeDepths: Record<string, number> = {};
-  private edgeDepths: Record<string, number> = {};
 
   private matrix: Float32Array = identity();
   private invMatrix: Float32Array = identity();
@@ -760,14 +758,15 @@ export default class Sigma<
     }
 
     // Order nodes by zIndex before to add them to program
-    this.nodeDepths = {};
     if (this.settings.zIndex) {
       const sortedNodes = zIndexOrdering<string>(
         (node: string): number => this.nodeDataCache[node].zIndex,
         nodes.slice(0),
       );
 
-      for (let i = 0, l = sortedNodes.length; i < l; i++) this.nodeDepths[sortedNodes[i]] = l - 1 - i;
+      for (let i = 0, l = sortedNodes.length; i < l; i++) {
+        this.nodeDataCache[sortedNodes[i]].depth = l - 1 - i;
+      }
     }
 
     // Add data to programs
@@ -797,14 +796,15 @@ export default class Sigma<
     }
 
     // Order edges by zIndex before to add them to program
-    this.edgeDepths = {};
     if (this.settings.zIndex) {
       const sortedEdges = zIndexOrdering<string>(
         (edge: string): number => this.edgeDataCache[edge].zIndex,
         edges.slice(0),
       );
 
-      for (let i = 0, l = sortedEdges.length; i < l; i++) this.edgeDepths[sortedEdges[i]] = l - 1 - i;
+      for (let i = 0, l = sortedEdges.length; i < l; i++) {
+        this.edgeDataCache[sortedEdges[i]].depth = l - 1 - i;
+      }
     }
 
     for (const type in this.edgePrograms) {
@@ -1407,7 +1407,7 @@ export default class Sigma<
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
-    nodeProgram.process(fingerprint, position, { ...data, zIndex: this.nodeDepths[node] });
+    nodeProgram.process(fingerprint, position, data);
     // Saving program index
     this.nodeProgramIndex[node] = position;
   }
@@ -1426,7 +1426,7 @@ export default class Sigma<
     const extremities = this.graph.extremities(edge),
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
-    edgeProgram.process(fingerprint, position, sourceData, targetData, { ...data, zIndex: this.edgeDepths[edge] });
+    edgeProgram.process(fingerprint, position, sourceData, targetData, data);
     // Saving program index
     this.edgeProgramIndex[edge] = position;
   }

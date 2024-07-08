@@ -5,6 +5,10 @@ attribute vec4 a_color;
 attribute vec2 a_position;
 attribute float a_size;
 
+#ifdef HAS_DEPTH
+attribute float a_zIndex;
+#endif
+
 uniform float u_sizeRatio;
 uniform float u_pixelRatio;
 uniform mat3 u_matrix;
@@ -27,6 +31,10 @@ void main() {
   gl_PointSize = a_size / u_sizeRatio * u_pixelRatio * 2.0;
 
   v_border = (0.5 / a_size) * u_sizeRatio;
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_zIndex;
+  #endif
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:

@@ -33,6 +33,11 @@ ${slices
   .join("\n")}
 #endif
 
+#ifdef HAS_DEPTH
+attribute float a_zIndex;
+uniform float u_maxZIndex;
+#endif
+
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main() {
@@ -48,6 +53,10 @@ void main() {
   v_radius = size / 2.0;
   v_diffVector = diffVector;
   ${"attribute" in offset ? "v_offset = a_offset;\n" : ""}
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_zIndex / u_maxZIndex;
+  #endif
 
   #ifdef PICKING_MODE
   v_color = a_id;

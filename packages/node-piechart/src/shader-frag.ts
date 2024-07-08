@@ -88,6 +88,10 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
     gl_FragColor = color;
   } else if (dist < v_radius) {
     gl_FragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
+  } else {
+    #ifdef HAS_DEPTH
+    discard;
+    #endif
   }
   #endif
 }

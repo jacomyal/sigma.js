@@ -22,7 +22,7 @@ import {
 } from "./utils";
 
 const PICKING_PREFIX = `#define PICKING_MODE\n`;
-const Z_INDEXING_PREFIX = `#define Z_INDEXING\n`;
+const HAS_DEPTH_PREFIX = `#define HAS_DEPTH\n`;
 
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.BOOL]: 1,
@@ -77,7 +77,7 @@ export abstract class Program<
   pickProgram: ProgramInfo | null;
 
   isInstanced: boolean;
-  isZIndexing: boolean;
+  hasDepth: boolean;
 
   abstract getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform>;
 
@@ -87,15 +87,15 @@ export abstract class Program<
     renderer: Sigma<N, E, G>,
   ) {
     this.renderer = renderer;
-    this.isZIndexing = !!renderer.getSetting("zIndex");
+    this.hasDepth = !!renderer.getSetting("zIndex");
 
-    const zIndexingPrefix = this.isZIndexing ? Z_INDEXING_PREFIX : "";
+    const depthPrefix = this.hasDepth ? HAS_DEPTH_PREFIX : "";
 
     // Reading and caching program definition
     const def = this.getDefinition();
     this.VERTICES = def.VERTICES;
-    this.VERTEX_SHADER_SOURCE = zIndexingPrefix + def.VERTEX_SHADER_SOURCE;
-    this.FRAGMENT_SHADER_SOURCE = zIndexingPrefix + def.FRAGMENT_SHADER_SOURCE;
+    this.VERTEX_SHADER_SOURCE = depthPrefix + def.VERTEX_SHADER_SOURCE;
+    this.FRAGMENT_SHADER_SOURCE = depthPrefix + def.FRAGMENT_SHADER_SOURCE;
     this.UNIFORMS = def.UNIFORMS;
     this.ATTRIBUTES = def.ATTRIBUTES;
     this.METHOD = def.METHOD;
@@ -330,6 +330,12 @@ export abstract class Program<
 
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program } = programInfo;
+
+    if (this.hasDepth) {
+      gl.enable(gl.DEPTH_TEST);
+    } else {
+      gl.disable(gl.DEPTH_TEST);
+    }
 
     // With the current fix for #1397, the alpha blending is enabled for the
     // picking layer:

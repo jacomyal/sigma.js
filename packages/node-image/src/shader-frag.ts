@@ -92,13 +92,21 @@ void main(void) {
     } else if (dist < v_radius) {
       gl_FragColor = mix(transparent, color, (v_radius - dist) / border);
     }
+
+    #ifdef HAS_DEPTH
+    if (dist >= v_radius) discard;
+    #endif
   }
 
   // Crop in a square else:
   else {
     float squareHalfSize = v_radius * ${Math.SQRT1_2 * Math.cos(Math.PI / 12)};
     if (abs(diffVector.x) > squareHalfSize || abs(diffVector.y) > squareHalfSize) {
+      #ifdef HAS_DEPTH
+      discard;
+      #else
       gl_FragColor = transparent;
+      #endif
     } else {
       gl_FragColor = color;
     }

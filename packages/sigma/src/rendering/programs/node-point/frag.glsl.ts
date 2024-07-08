@@ -20,13 +20,15 @@ void main(void) {
     gl_FragColor = transparent;
 
   #else
-  float t = 0.0;
-  if (dist > v_border)
-    t = 1.0;
-  else if (dist > 0.0)
-    t = dist / v_border;
-
-  gl_FragColor = mix(transparent, v_color, t);
+  if (dist > v_border) {
+    gl_FragColor = v_color;
+  } else if (dist > 0.0) {
+    gl_FragColor = mix(transparent, v_color, dist / v_border);
+  } else {
+    #ifdef HAS_DEPTH
+    discard;
+    #endif
+  }
   #endif
 }
 `;

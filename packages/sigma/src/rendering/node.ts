@@ -52,7 +52,7 @@ export abstract class NodeProgram<
     return this.processVisibleItem(indexToColor(nodeIndex), i, data);
   }
 
-  abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
+  abstract processVisibleItem(nodeId: number, startIndex: number, data: NodeDisplayData): void;
 }
 
 class NodeProgramClass<
@@ -123,7 +123,10 @@ export function createNodeCompoundProgram<
     }
 
     process(nodeIndex: number, offset: number, data: NodeDisplayData): void {
-      this.programs.forEach((program) => program.process(nodeIndex, offset, data));
+      const l = this.programs.length;
+      this.programs.forEach((program, i) =>
+        program.process(nodeIndex, offset, { ...data, depth: data.depth + 1 - i / l }),
+      );
     }
 
     render(params: RenderParams): void {

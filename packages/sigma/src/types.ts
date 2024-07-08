@@ -64,6 +64,7 @@ export interface DisplayData {
   hidden: boolean;
   forceLabel: boolean;
   zIndex: number;
+  depth: number;
   type: string;
 }
 

@@ -20,18 +20,11 @@ export default function getNodeBorderProgram<
   };
   const { borders } = options;
 
-  const UNIFORMS = [
-    "u_sizeRatio",
-    "u_correctionRatio",
-    "u_matrix",
-    ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
-  ];
-
   return class NodeBorderProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
-  > extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  > extends NodeProgram<string, N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
@@ -42,10 +35,17 @@ export default function getNodeBorderProgram<
         VERTEX_SHADER_SOURCE: getVertexShader(options),
         FRAGMENT_SHADER_SOURCE: getFragmentShader(options),
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS,
+        UNIFORMS: [
+          "u_sizeRatio",
+          "u_correctionRatio",
+          "u_matrix",
+          ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
+          ...(this.hasDepth ? ["u_maxZIndex"] : []),
+        ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
           { name: "a_size", size: 1, type: FLOAT },
           ...borders.flatMap(({ color }, i) =>
             "attribute" in color
@@ -67,6 +67,9 @@ export default function getNodeBorderProgram<
       array[startIndex++] = data.x;
       array[startIndex++] = data.y;
       array[startIndex++] = nodeIndex;
+      if (this.hasDepth) {
+        array[startIndex++] = data.depth;
+      }
       array[startIndex++] = data.size;
       borders.forEach(({ color }) => {
         if ("attribute" in color)
@@ -91,6 +94,8 @@ export default function getNodeBorderProgram<
           gl.uniform4f(location, r / 255, g / 255, b / 255, a / 255);
         }
       });
+
+      if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, params.maxNodesDepth);
     }
   };
 }

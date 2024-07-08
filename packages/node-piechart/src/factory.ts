@@ -20,21 +20,11 @@ export default function getNodePiechartProgram<
   };
   const { slices, offset } = options;
 
-  const UNIFORMS = [
-    "u_sizeRatio",
-    "u_correctionRatio",
-    "u_cameraAngle",
-    "u_matrix",
-    "u_defaultColor",
-    ...("value" in offset ? ["u_offset"] : []),
-    ...slices.flatMap(({ color }, i) => ("value" in color ? [`u_sliceColor_${i + 1}`] : [])),
-  ];
-
   return class NodeBorderProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
-  > extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  > extends NodeProgram<string, N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
@@ -45,10 +35,20 @@ export default function getNodePiechartProgram<
         VERTEX_SHADER_SOURCE: getVertexShader(options),
         FRAGMENT_SHADER_SOURCE: getFragmentShader(options),
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS,
+        UNIFORMS: [
+          "u_sizeRatio",
+          "u_correctionRatio",
+          "u_cameraAngle",
+          "u_matrix",
+          "u_defaultColor",
+          ...(this.hasDepth ? ["u_maxZIndex"] : []),
+          ...("value" in offset ? ["u_offset"] : []),
+          ...slices.flatMap(({ color }, i) => ("value" in color ? [`u_sliceColor_${i + 1}`] : [])),
+        ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
           { name: "a_size", size: 1, type: FLOAT },
           ...("attribute" in offset ? [{ name: "a_offset", size: 1, type: FLOAT }] : []),
           ...slices.flatMap(({ color }, i) =>
@@ -71,6 +71,9 @@ export default function getNodePiechartProgram<
       array[startIndex++] = data.x;
       array[startIndex++] = data.y;
       array[startIndex++] = nodeIndex;
+      if (this.hasDepth) {
+        array[startIndex++] = data.depth;
+      }
       array[startIndex++] = data.size;
       if ("attribute" in offset) {
         array[startIndex++] = data[offset.attribute as "size"] || 0;
@@ -94,6 +97,7 @@ export default function getNodePiechartProgram<
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
+      if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, params.maxNodesDepth);
       if ("value" in offset) gl.uniform1f(uniformLocations.u_offset, offset.value);
 
       const [r, g, b, a] = colorToArray(options.defaultColor || DEFAULT_COLOR);

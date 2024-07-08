@@ -18,25 +18,24 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
-
 export default class NodePointProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+> extends NodeProgram<string, N, E, G> {
   getDefinition() {
     return {
       VERTICES: 1,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.POINTS,
-      UNIFORMS,
+      UNIFORMS: ["u_sizeRatio", "u_pixelRatio", "u_matrix", ...(this.hasDepth ? ["u_maxZIndex"] : [])],
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
       ],
     };
   }
@@ -49,13 +48,21 @@ export default class NodePointProgram<
     array[startIndex++] = data.size;
     array[startIndex++] = floatColor(data.color);
     array[startIndex++] = nodeIndex;
+    if (this.hasDepth) {
+      array[startIndex++] = data.depth;
+    }
   }
 
-  setUniforms({ sizeRatio, pixelRatio, matrix }: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+  setUniforms(
+    { sizeRatio, pixelRatio, matrix, maxNodesDepth }: RenderParams,
+    { gl, uniformLocations }: ProgramInfo,
+  ): void {
     const { u_sizeRatio, u_pixelRatio, u_matrix } = uniformLocations;
 
     gl.uniform1f(u_pixelRatio, pixelRatio);
     gl.uniform1f(u_sizeRatio, sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, matrix);
+
+    if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, maxNodesDepth);
   }
 }

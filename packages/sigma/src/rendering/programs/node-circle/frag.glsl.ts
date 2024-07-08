@@ -22,13 +22,15 @@ void main(void) {
     gl_FragColor = v_color;
 
   #else
-  float t = 0.0;
-  if (dist > border)
-    t = 1.0;
-  else if (dist > 0.0)
-    t = dist / border;
-
-  gl_FragColor = mix(v_color, transparent, t);
+  if (dist > border) {
+    #ifdef HAS_DEPTH
+    discard;
+    #endif
+  } else if (dist > 0.0) {
+    gl_FragColor = mix(v_color, transparent, dist / border);
+  } else {
+    gl_FragColor = v_color;
+  }
   #endif
 }
 `;

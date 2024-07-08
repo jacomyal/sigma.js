@@ -46,17 +46,6 @@ const DEFAULT_CREATE_NODE_IMAGE_OPTIONS: CreateNodeImageProgramOptions<Attribute
   imageAttribute: "image",
 };
 
-const UNIFORMS = [
-  "u_sizeRatio",
-  "u_correctionRatio",
-  "u_cameraAngle",
-  "u_percentagePadding",
-  "u_matrix",
-  "u_colorizeImages",
-  "u_keepWithinCircle",
-  "u_atlas",
-] as const;
-
 /**
  * To share the texture between the program instances of the graph and the
  * hovered nodes (to prevent some flickering, mostly), this program must be
@@ -99,7 +88,7 @@ export default function getNodeImageProgram<
    */
   const textureManager = new TextureManager(textureManagerOptions);
 
-  return class NodeImageProgram extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  return class NodeImageProgram extends NodeProgram<string, N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
@@ -114,12 +103,23 @@ export default function getNodeImageProgram<
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE: getFragmentShader({ texturesCount: textureManager.getTextures().length }),
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS,
+        UNIFORMS: [
+          "u_sizeRatio",
+          "u_correctionRatio",
+          "u_cameraAngle",
+          "u_percentagePadding",
+          "u_matrix",
+          "u_colorizeImages",
+          "u_keepWithinCircle",
+          "u_atlas",
+          ...(this.hasDepth ? ["u_maxZIndex"] : []),
+        ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_size", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
           { name: "a_texture", size: 4, type: FLOAT },
           { name: "a_textureIndex", size: 1, type: FLOAT },
         ],
@@ -131,7 +131,6 @@ export default function getNodeImageProgram<
     atlas: Atlas;
     textures: WebGLTexture[];
     textureImages: ImageData[];
-    latestRenderParams?: RenderParams;
     textureManagerCallback: null | ((newAtlasData: { atlas: Atlas; textures: ImageData[] }) => void) = null;
 
     constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
@@ -145,9 +144,10 @@ export default function getNodeImageProgram<
         if (shouldUpgradeShaders) this.upgradeShaders();
         this.bindTextures();
 
-        if (this.latestRenderParams) this.render(this.latestRenderParams);
-
-        if (this.renderer && this.renderer.refresh) this.renderer.refresh();
+        if (this.renderer?.refresh)
+          this.renderer.refresh({
+            schedule: true,
+          });
       };
       textureManager.on(TextureManager.NEW_TEXTURE_EVENT, this.textureManagerCallback);
 
@@ -233,6 +233,10 @@ export default function getNodeImageProgram<
       array[startIndex++] = color;
       array[startIndex++] = nodeIndex;
 
+      if (this.hasDepth) {
+        array[startIndex++] = data.depth;
+      }
+
       // Reference texture:
       if (imagePosition && typeof imagePosition.textureIndex === "number") {
         const { width, height } = this.textureImages[imagePosition.textureIndex];
@@ -261,7 +265,6 @@ export default function getNodeImageProgram<
         u_cameraAngle,
         u_percentagePadding,
       } = uniformLocations;
-      this.latestRenderParams = params;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, keepWithinCircle ? params.sizeRatio : params.sizeRatio / Math.SQRT2);
@@ -274,6 +277,8 @@ export default function getNodeImageProgram<
       );
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
       gl.uniform1i(u_keepWithinCircle, keepWithinCircle ? 1 : 0);
+
+      if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, params.maxNodesDepth);
     }
   };
 }

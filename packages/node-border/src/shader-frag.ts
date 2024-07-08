@@ -88,8 +88,10 @@ ${borders
     return res.join("\n");
   })
   .join("\n")}
-  if (dist > adjustedBorderSize_0) {
-    gl_FragColor = borderColor_0;
+  if (dist > v_radius) {
+    #ifdef HAS_DEPTH
+    discard;
+    #endif
   } else ${borders
     .map(
       (_, i) => `if (dist > adjustedBorderSize_${i} - aaBorder) {

@@ -6,6 +6,10 @@ attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
 
+#ifdef HAS_DEPTH
+attribute float a_zIndex;
+#endif
+
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
@@ -29,6 +33,10 @@ void main() {
 
   v_diffVector = diffVector;
   v_radius = size / 2.0;
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_zIndex;
+  #endif
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:
