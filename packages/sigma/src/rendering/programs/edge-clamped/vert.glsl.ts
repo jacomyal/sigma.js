@@ -10,6 +10,10 @@ attribute float a_positionCoef;
 attribute float a_radius;
 attribute float a_radiusCoef;
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+#endif
+
 uniform mat3 u_matrix;
 uniform float u_zoomRatio;
 uniform float u_sizeRatio;
@@ -23,12 +27,6 @@ varying vec4 v_color;
 varying vec2 v_normal;
 varying float v_thickness;
 varying float v_feather;
-
-#ifdef HAS_DEPTH
-attribute float a_depth;
-uniform float a_maxDepth;
-#endif
-
 const float bias = 255.0 / 254.0;
 
 void main() {
@@ -63,7 +61,7 @@ void main() {
   v_feather = u_feather * u_correctionRatio / u_zoomRatio / u_pixelRatio * 2.0;
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_depth / a_maxDepth;
+  gl_Position.z = a_depth;
   #endif
 
   #ifdef PICKING_MODE

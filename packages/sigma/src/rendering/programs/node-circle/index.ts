@@ -19,11 +19,13 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
+
 export default class NodeCircleProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends NodeProgram<string, N, E, G> {
+> extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
   static readonly ANGLE_1 = 0;
   static readonly ANGLE_2 = (2 * Math.PI) / 3;
   static readonly ANGLE_3 = (4 * Math.PI) / 3;
@@ -34,7 +36,7 @@ export default class NodeCircleProgram<
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.TRIANGLES,
-      UNIFORMS: ["u_sizeRatio", "u_correctionRatio", "u_matrix", ...(this.hasDepth ? ["a_maxDepth"] : [])],
+      UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
@@ -67,7 +69,5 @@ export default class NodeCircleProgram<
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
-
-    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
   }
 }

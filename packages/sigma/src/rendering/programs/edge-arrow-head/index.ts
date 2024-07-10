@@ -19,6 +19,15 @@ export const DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS: CreateEdgeArrowHeadProgram
   widenessToThicknessRatio: 2,
 };
 
+const UNIFORMS = [
+  "u_matrix",
+  "u_sizeRatio",
+  "u_correctionRatio",
+  "u_minEdgeThickness",
+  "u_lengthToThicknessRatio",
+  "u_widenessToThicknessRatio",
+] as const;
+
 export function createEdgeArrowHeadProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -33,22 +42,14 @@ export function createEdgeArrowHeadProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
-  > extends EdgeProgram<string, N, E, G> {
+  > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
     getDefinition() {
       return {
         VERTICES: 3,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS: [
-          "u_matrix",
-          "u_sizeRatio",
-          "u_correctionRatio",
-          "u_minEdgeThickness",
-          "u_lengthToThicknessRatio",
-          "u_widenessToThicknessRatio",
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
-        ],
+        UNIFORMS,
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_normal", size: 2, type: FLOAT },
@@ -126,8 +127,6 @@ export function createEdgeArrowHeadProgram<
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
       gl.uniform1f(u_widenessToThicknessRatio, options.widenessToThicknessRatio);
-
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
     }
   };
 }

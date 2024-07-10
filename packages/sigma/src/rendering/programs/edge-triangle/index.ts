@@ -16,24 +16,20 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
+const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio", "u_minEdgeThickness"] as const;
+
 export default class EdgeTriangleProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends EdgeProgram<string, N, E, G> {
+> extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
   getDefinition() {
     return {
       VERTICES: 3,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.TRIANGLES,
-      UNIFORMS: [
-        "u_matrix",
-        "u_sizeRatio",
-        "u_correctionRatio",
-        "u_minEdgeThickness",
-        ...(this.hasDepth ? ["a_maxDepth"] : []),
-      ],
+      UNIFORMS,
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },
         { name: "a_positionEnd", size: 2, type: FLOAT },
@@ -107,7 +103,5 @@ export default class EdgeTriangleProgram<
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
-
-    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
   }
 }

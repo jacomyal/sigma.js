@@ -38,7 +38,6 @@ export default function createEdgeCurveProgram<
           "u_feather",
           "u_minEdgeThickness",
           ...(arrowHead ? ["u_lengthToThicknessRatio", "u_widenessToThicknessRatio"] : []),
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
         ],
         ATTRIBUTES: [
           { name: "a_source", size: 2, type: FLOAT },
@@ -106,8 +105,6 @@ export default function createEdgeCurveProgram<
       gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform2f(u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
-
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
 
       if (arrowHead) {
         const { u_lengthToThicknessRatio, u_widenessToThicknessRatio } = uniformLocations;

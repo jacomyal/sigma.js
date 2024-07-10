@@ -112,7 +112,6 @@ export default function getNodeImageProgram<
           "u_colorizeImages",
           "u_keepWithinCircle",
           "u_atlas",
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
         ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
@@ -277,8 +276,6 @@ export default function getNodeImageProgram<
       );
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
       gl.uniform1i(u_keepWithinCircle, keepWithinCircle ? 1 : 0);
-
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
     }
   };
 }

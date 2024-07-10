@@ -333,6 +333,7 @@ export abstract class Program<
 
     if (this.hasDepth) {
       gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LEQUAL);
     } else {
       gl.disable(gl.DEPTH_TEST);
     }

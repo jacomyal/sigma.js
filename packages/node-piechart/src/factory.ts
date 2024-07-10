@@ -41,7 +41,6 @@ export default function getNodePiechartProgram<
           "u_cameraAngle",
           "u_matrix",
           "u_defaultColor",
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
           ...("value" in offset ? ["u_offset"] : []),
           ...slices.flatMap(({ color }, i) => ("value" in color ? [`u_sliceColor_${i + 1}`] : [])),
         ],
@@ -97,7 +96,6 @@ export default function getNodePiechartProgram<
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
 
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
       if ("value" in offset) gl.uniform1f(uniformLocations.u_offset, offset.value);
 
       const [r, g, b, a] = colorToArray(options.defaultColor || DEFAULT_COLOR);

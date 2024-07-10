@@ -4,14 +4,13 @@ attribute vec4 a_id;
 attribute vec4 a_color;
 attribute vec2 a_position;
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+#endif
+
 uniform mat3 u_matrix;
 
 varying vec4 v_color;
-
-#ifdef HAS_DEPTH
-attribute float a_depth;
-uniform float a_maxDepth;
-#endif
 
 const float bias = 255.0 / 254.0;
 
@@ -24,7 +23,7 @@ void main() {
   );
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_depth / a_maxDepth;
+  gl_Position.z = a_depth;
   #endif
 
   #ifdef PICKING_MODE

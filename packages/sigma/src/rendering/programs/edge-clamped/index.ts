@@ -16,6 +16,17 @@ export const DEFAULT_EDGE_CLAMPED_PROGRAM_OPTIONS: CreateEdgeClampedProgramOptio
   lengthToThicknessRatio: DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS.lengthToThicknessRatio,
 };
 
+const UNIFORMS = [
+  "u_matrix",
+  "u_zoomRatio",
+  "u_sizeRatio",
+  "u_correctionRatio",
+  "u_pixelRatio",
+  "u_feather",
+  "u_minEdgeThickness",
+  "u_lengthToThicknessRatio",
+] as const;
+
 export function createEdgeClampedProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -30,24 +41,14 @@ export function createEdgeClampedProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
-  > extends EdgeProgram<string, N, E, G> {
+  > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
     getDefinition() {
       return {
         VERTICES: 6,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS: [
-          "u_matrix",
-          "u_zoomRatio",
-          "u_sizeRatio",
-          "u_correctionRatio",
-          "u_pixelRatio",
-          "u_feather",
-          "u_minEdgeThickness",
-          "u_lengthToThicknessRatio",
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
-        ],
+        UNIFORMS,
         ATTRIBUTES: [
           { name: "a_positionStart", size: 2, type: FLOAT },
           { name: "a_positionEnd", size: 2, type: FLOAT },
@@ -142,8 +143,6 @@ export function createEdgeClampedProgram<
       gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
-
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
     }
   };
 }

@@ -40,7 +40,6 @@ export default function getNodeBorderProgram<
           "u_correctionRatio",
           "u_matrix",
           ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
-          ...(this.hasDepth ? ["a_maxDepth"] : []),
         ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
@@ -94,8 +93,6 @@ export default function getNodeBorderProgram<
           gl.uniform4f(location, r / 255, g / 255, b / 255, a / 255);
         }
       });
-
-      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
     }
   };
 }

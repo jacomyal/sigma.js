@@ -26,27 +26,28 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
+const UNIFORMS = [
+  "u_matrix",
+  "u_zoomRatio",
+  "u_sizeRatio",
+  "u_correctionRatio",
+  "u_pixelRatio",
+  "u_feather",
+  "u_minEdgeThickness",
+] as const;
+
 export default class EdgeRectangleProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends EdgeProgram<string, N, E, G> {
+> extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
   getDefinition() {
     return {
       VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.TRIANGLES,
-      UNIFORMS: [
-        "u_matrix",
-        "u_zoomRatio",
-        "u_sizeRatio",
-        "u_correctionRatio",
-        "u_pixelRatio",
-        "u_feather",
-        "u_minEdgeThickness",
-        ...(this.hasDepth ? ["a_maxDepth"] : []),
-      ],
+      UNIFORMS,
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },
         { name: "a_positionEnd", size: 2, type: FLOAT },
@@ -127,7 +128,5 @@ export default class EdgeRectangleProgram<
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniform1f(u_feather, params.antiAliasingFeather);
     gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
-
-    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
   }
 }

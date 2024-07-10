@@ -41,12 +41,12 @@ import {
   matrixFromCamera,
   multiplyVec2,
   validateGraph,
-  zIndexOrdering,
 } from "./utils";
 
 /**
  * Constants.
  */
+const EPSILON = 0.00001;
 const X_LABEL_MARGIN = 150;
 const Y_LABEL_MARGIN = 50;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -759,13 +759,20 @@ export default class Sigma<
 
     // Order nodes by zIndex before to add them to program
     if (this.settings.zIndex) {
-      const sortedNodes = zIndexOrdering<string>(
-        (node: string): number => this.nodeDataCache[node].zIndex,
-        nodes.slice(0),
-      );
+      let minNodeZIndex = 0;
+      let maxNodeZIndex = 0;
+      for (let i = 0, l = nodes.length; i < l; i++) {
+        const zIndex = this.nodeDataCache[nodes[i]].zIndex;
+        if (zIndex < minNodeZIndex) minNodeZIndex = zIndex;
+        if (zIndex > maxNodeZIndex) maxNodeZIndex = zIndex;
+      }
 
-      for (let i = 0, l = sortedNodes.length; i < l; i++) {
-        this.nodeDataCache[sortedNodes[i]].depth = l - 1 - i;
+      minNodeZIndex -= EPSILON;
+      maxNodeZIndex += EPSILON;
+
+      for (let i = 0, l = nodes.length; i < l; i++) {
+        const zIndex = this.nodeDataCache[nodes[i]].zIndex;
+        this.nodeDataCache[nodes[i]].depth = (maxNodeZIndex - zIndex) / (maxNodeZIndex - minNodeZIndex);
       }
     }
 
@@ -797,13 +804,19 @@ export default class Sigma<
 
     // Order edges by zIndex before to add them to program
     if (this.settings.zIndex) {
-      const sortedEdges = zIndexOrdering<string>(
-        (edge: string): number => this.edgeDataCache[edge].zIndex,
-        edges.slice(0),
-      );
+      let minEdgeZIndex = 0;
+      let maxEdgeZIndex = 0;
+      for (let i = 0, l = edges.length; i < l; i++) {
+        const zIndex = this.edgeDataCache[edges[i]].zIndex;
+        if (zIndex < minEdgeZIndex) minEdgeZIndex = zIndex;
+        if (zIndex > maxEdgeZIndex) maxEdgeZIndex = zIndex;
+      }
+      minEdgeZIndex -= EPSILON;
+      maxEdgeZIndex += EPSILON;
 
-      for (let i = 0, l = sortedEdges.length; i < l; i++) {
-        this.edgeDataCache[sortedEdges[i]].depth = l - 1 - i;
+      for (let i = 0, l = edges.length; i < l; i++) {
+        const zIndex = this.edgeDataCache[edges[i]].zIndex;
+        this.edgeDataCache[edges[i]].depth = (maxEdgeZIndex - zIndex) / (maxEdgeZIndex - minEdgeZIndex);
       }
     }
 
@@ -1455,8 +1468,6 @@ export default class Sigma<
       downSizingRatio: this.pickingDownSizingRatio,
       minEdgeThickness: this.settings.minEdgeThickness,
       antiAliasingFeather: this.settings.antiAliasingFeather,
-      maxEdgesDepth: this.graph.size,
-      maxNodesDepth: this.graph.order,
     };
   }
 

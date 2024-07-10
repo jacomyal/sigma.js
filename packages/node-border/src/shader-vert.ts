@@ -7,6 +7,10 @@ attribute vec2 a_position;
 attribute float a_size;
 attribute float a_angle;
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+#endif
+
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
@@ -30,11 +34,6 @@ ${borders
   .join("\n")}
 #endif
 
-#ifdef HAS_DEPTH
-attribute float a_depth;
-uniform float a_maxDepth;
-#endif
-
 const float bias = 255.0 / 254.0;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -52,7 +51,7 @@ void main() {
   v_diffVector = diffVector;
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_depth / a_maxDepth;
+  gl_Position.z = a_depth;
   #endif
 
   #ifdef PICKING_MODE

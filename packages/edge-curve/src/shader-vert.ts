@@ -13,6 +13,10 @@ attribute float a_current;
 attribute float a_curvature;
 ${arrowHead ? "attribute float a_targetSize;\n" : ""}
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+#endif
+
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_pixelRatio;
@@ -35,11 +39,6 @@ uniform float u_widenessToThicknessRatio;
 `
     : ""
 }
-
-#ifdef HAS_DEPTH
-attribute float a_depth;
-uniform float a_maxDepth;
-#endif
 
 const float bias = 255.0 / 254.0;
 const float epsilon = 0.7;
@@ -97,7 +96,7 @@ void main() {
   gl_Position = vec4(position, 0, 1);
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_depth / a_maxDepth;
+  gl_Position.z = a_depth;
   #endif
     
 ${
