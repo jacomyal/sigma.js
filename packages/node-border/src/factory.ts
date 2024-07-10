@@ -40,12 +40,12 @@ export default function getNodeBorderProgram<
           "u_correctionRatio",
           "u_matrix",
           ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
-          ...(this.hasDepth ? ["u_maxZIndex"] : []),
+          ...(this.hasDepth ? ["a_maxDepth"] : []),
         ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
-          ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
+          ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
           { name: "a_size", size: 1, type: FLOAT },
           ...borders.flatMap(({ color }, i) =>
             "attribute" in color
@@ -95,7 +95,7 @@ export default function getNodeBorderProgram<
         }
       });
 
-      if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, params.maxNodesDepth);
+      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
     }
   };
 }

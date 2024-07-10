@@ -31,8 +31,8 @@ ${borders
 #endif
 
 #ifdef HAS_DEPTH
-attribute float a_zIndex;
-uniform float u_maxZIndex;
+attribute float a_depth;
+uniform float a_maxDepth;
 #endif
 
 const float bias = 255.0 / 254.0;
@@ -52,7 +52,7 @@ void main() {
   v_diffVector = diffVector;
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_zIndex / u_maxZIndex;
+  gl_Position.z = a_depth / a_maxDepth;
   #endif
 
   #ifdef PICKING_MODE

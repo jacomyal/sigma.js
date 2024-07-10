@@ -5,6 +5,10 @@ attribute vec2 a_normal;
 attribute float a_radius;
 attribute vec3 a_barycentric;
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+#endif
+
 #ifdef PICKING_MODE
 attribute vec4 a_id;
 #else
@@ -54,6 +58,10 @@ void main() {
   vec2 position = (u_matrix * vec3(a_position + delta, 1)).xy;
 
   gl_Position = vec4(position, 0, 1);
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_depth;
+  #endif
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:

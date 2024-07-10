@@ -19,8 +19,8 @@ varying vec4 v_texture;
 varying float v_textureIndex;
 
 #ifdef HAS_DEPTH
-attribute float a_zIndex;
-uniform float u_maxZIndex;
+attribute float a_depth;
+uniform float a_maxDepth;
 #endif
 
 const float bias = 255.0 / 254.0;
@@ -40,7 +40,7 @@ void main() {
   v_radius = size / 2.0 / marginRatio;
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_zIndex / u_maxZIndex;
+  gl_Position.z = a_depth / a_maxDepth;
   #endif
 
   #ifdef PICKING_MODE

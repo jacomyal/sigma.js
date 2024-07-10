@@ -20,17 +20,8 @@ export default function createEdgeCurveProgram<
     ...(inputOptions || {}),
   };
   const { arrowHead, curvatureAttribute, drawLabel } = options as CreateEdgeCurveProgramOptions<N, E, G>;
-  const UNIFORMS = [
-    "u_matrix",
-    "u_sizeRatio",
-    "u_dimensions",
-    "u_pixelRatio",
-    "u_feather",
-    "u_minEdgeThickness",
-    ...(arrowHead ? ["u_lengthToThicknessRatio", "u_widenessToThicknessRatio"] : []),
-  ] as const;
 
-  return class EdgeCurveProgram extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  return class EdgeCurveProgram extends EdgeProgram<string, N, E, G> {
     drawLabel = drawLabel || createDrawCurvedEdgeLabel<N, E, G>(options);
 
     getDefinition() {
@@ -39,7 +30,16 @@ export default function createEdgeCurveProgram<
         VERTEX_SHADER_SOURCE: getVertexShader(options),
         FRAGMENT_SHADER_SOURCE: getFragmentShader(options),
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS,
+        UNIFORMS: [
+          "u_matrix",
+          "u_sizeRatio",
+          "u_dimensions",
+          "u_pixelRatio",
+          "u_feather",
+          "u_minEdgeThickness",
+          ...(arrowHead ? ["u_lengthToThicknessRatio", "u_widenessToThicknessRatio"] : []),
+          ...(this.hasDepth ? ["a_maxDepth"] : []),
+        ],
         ATTRIBUTES: [
           { name: "a_source", size: 2, type: FLOAT },
           { name: "a_target", size: 2, type: FLOAT },
@@ -48,6 +48,7 @@ export default function createEdgeCurveProgram<
           { name: "a_curvature", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
         ],
         CONSTANT_ATTRIBUTES: [
           { name: "a_current", size: 1, type: FLOAT }, // TODO: could optimize to bool
@@ -91,6 +92,9 @@ export default function createEdgeCurveProgram<
       array[startIndex++] = curvature;
       array[startIndex++] = color;
       array[startIndex++] = edgeIndex;
+      if (this.hasDepth) {
+        array[startIndex++] = data.depth;
+      }
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
@@ -102,6 +106,8 @@ export default function createEdgeCurveProgram<
       gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform2f(u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+
+      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
 
       if (arrowHead) {
         const { u_lengthToThicknessRatio, u_widenessToThicknessRatio } = uniformLocations;

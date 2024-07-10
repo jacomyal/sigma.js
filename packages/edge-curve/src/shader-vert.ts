@@ -36,6 +36,11 @@ uniform float u_widenessToThicknessRatio;
     : ""
 }
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+uniform float a_maxDepth;
+#endif
+
 const float bias = 255.0 / 254.0;
 const float epsilon = 0.7;
 
@@ -90,6 +95,10 @@ void main() {
 
   position = viewportToClipspace(viewportOffsetPosition, u_dimensions);
   gl_Position = vec4(position, 0, 1);
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_depth / a_maxDepth;
+  #endif
     
 ${
   arrowHead

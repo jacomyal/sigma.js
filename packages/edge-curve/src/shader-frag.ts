@@ -73,7 +73,9 @@ ${
     gl_FragColor = mix(v_color, transparent, t);
     #endif
   } else {
-    gl_FragColor = transparent;
+    #ifdef HAS_DEPTH
+    discard;
+    #endif
   }
 }
 `;

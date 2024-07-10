@@ -21,6 +21,11 @@ varying vec2 v_normal;
 varying float v_thickness;
 varying float v_feather;
 
+#ifdef HAS_DEPTH
+attribute float a_depth;
+uniform float a_maxDepth;
+#endif
+
 const float bias = 255.0 / 254.0;
 
 void main() {
@@ -53,6 +58,10 @@ void main() {
   v_normal = unitNormal;
 
   v_feather = u_feather * u_correctionRatio / u_zoomRatio / u_pixelRatio * 2.0;
+
+  #ifdef HAS_DEPTH
+  gl_Position.z = a_depth / a_maxDepth;
+  #endif
 
   #ifdef PICKING_MODE
   // For picking mode, we use the ID as the color:

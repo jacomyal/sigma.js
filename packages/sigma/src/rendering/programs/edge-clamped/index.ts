@@ -10,17 +10,6 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = [
-  "u_matrix",
-  "u_zoomRatio",
-  "u_sizeRatio",
-  "u_correctionRatio",
-  "u_pixelRatio",
-  "u_feather",
-  "u_minEdgeThickness",
-  "u_lengthToThicknessRatio",
-] as const;
-
 export type CreateEdgeClampedProgramOptions = Pick<CreateEdgeArrowHeadProgramOptions, "lengthToThicknessRatio">;
 
 export const DEFAULT_EDGE_CLAMPED_PROGRAM_OPTIONS: CreateEdgeClampedProgramOptions = {
@@ -41,14 +30,24 @@ export function createEdgeClampedProgram<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
-  > extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  > extends EdgeProgram<string, N, E, G> {
     getDefinition() {
       return {
         VERTICES: 6,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
         METHOD: WebGLRenderingContext.TRIANGLES,
-        UNIFORMS,
+        UNIFORMS: [
+          "u_matrix",
+          "u_zoomRatio",
+          "u_sizeRatio",
+          "u_correctionRatio",
+          "u_pixelRatio",
+          "u_feather",
+          "u_minEdgeThickness",
+          "u_lengthToThicknessRatio",
+          ...(this.hasDepth ? ["a_maxDepth"] : []),
+        ],
         ATTRIBUTES: [
           { name: "a_positionStart", size: 2, type: FLOAT },
           { name: "a_positionEnd", size: 2, type: FLOAT },
@@ -56,6 +55,7 @@ export function createEdgeClampedProgram<
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_radius", size: 1, type: FLOAT },
+          ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
         ],
         CONSTANT_ATTRIBUTES: [
           // If 0, then position will be a_positionStart
@@ -117,6 +117,9 @@ export function createEdgeClampedProgram<
       array[startIndex++] = color;
       array[startIndex++] = edgeIndex;
       array[startIndex++] = radius;
+      if (this.hasDepth) {
+        array[startIndex++] = data.depth;
+      }
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
@@ -139,6 +142,8 @@ export function createEdgeClampedProgram<
       gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
+
+      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
     }
   };
 }

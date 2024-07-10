@@ -112,14 +112,14 @@ export default function getNodeImageProgram<
           "u_colorizeImages",
           "u_keepWithinCircle",
           "u_atlas",
-          ...(this.hasDepth ? ["u_maxZIndex"] : []),
+          ...(this.hasDepth ? ["a_maxDepth"] : []),
         ],
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },
           { name: "a_size", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
-          ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
+          ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
           { name: "a_texture", size: 4, type: FLOAT },
           { name: "a_textureIndex", size: 1, type: FLOAT },
         ],
@@ -278,7 +278,7 @@ export default function getNodeImageProgram<
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
       gl.uniform1i(u_keepWithinCircle, keepWithinCircle ? 1 : 0);
 
-      if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, params.maxNodesDepth);
+      if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxNodesDepth);
     }
   };
 }

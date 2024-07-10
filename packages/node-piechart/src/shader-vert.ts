@@ -34,8 +34,8 @@ ${slices
 #endif
 
 #ifdef HAS_DEPTH
-attribute float a_zIndex;
-uniform float u_maxZIndex;
+attribute float a_depth;
+uniform float a_maxDepth;
 #endif
 
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
@@ -55,7 +55,7 @@ void main() {
   ${"attribute" in offset ? "v_offset = a_offset;\n" : ""}
 
   #ifdef HAS_DEPTH
-  gl_Position.z = a_zIndex / u_maxZIndex;
+  gl_Position.z = a_depth / a_maxDepth;
   #endif
 
   #ifdef PICKING_MODE

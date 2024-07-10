@@ -1455,8 +1455,8 @@ export default class Sigma<
       downSizingRatio: this.pickingDownSizingRatio,
       minEdgeThickness: this.settings.minEdgeThickness,
       antiAliasingFeather: this.settings.antiAliasingFeather,
-      maxEdgesDepth: this.graph.size + 1,
-      maxNodesDepth: this.graph.order + 1,
+      maxEdgesDepth: this.graph.size,
+      maxNodesDepth: this.graph.order,
     };
   }
 
@@ -1871,10 +1871,12 @@ export default class Sigma<
     this.emit("beforeClear");
 
     this.webGLContexts.nodes.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
     this.webGLContexts.edges.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.edges.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
-    this.webGLContexts.hoverNodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    this.webGLContexts.edges.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    this.webGLContexts.hoverNodes.clear(
+      WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT,
+    );
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);

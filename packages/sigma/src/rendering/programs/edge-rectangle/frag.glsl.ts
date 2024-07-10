@@ -22,6 +22,10 @@ void main(void) {
     dist
   );
 
+  #ifdef HAS_DEPTH
+  if (t >= 1.0) { discard; }
+  #endif
+
   gl_FragColor = mix(v_color, transparent, t);
   #endif
 }

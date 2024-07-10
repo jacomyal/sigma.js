@@ -29,13 +29,13 @@ export default class NodePointProgram<
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.POINTS,
-      UNIFORMS: ["u_sizeRatio", "u_pixelRatio", "u_matrix", ...(this.hasDepth ? ["u_maxZIndex"] : [])],
+      UNIFORMS: ["u_sizeRatio", "u_pixelRatio", "u_matrix", ...(this.hasDepth ? ["a_maxDepth"] : [])],
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
-        ...(this.hasDepth ? [{ name: "a_zIndex", size: 1, type: FLOAT }] : []),
+        ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
       ],
     };
   }
@@ -63,6 +63,6 @@ export default class NodePointProgram<
     gl.uniform1f(u_sizeRatio, sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, matrix);
 
-    if (this.hasDepth) gl.uniform1f(uniformLocations.u_maxZIndex, maxNodesDepth);
+    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, maxNodesDepth);
   }
 }

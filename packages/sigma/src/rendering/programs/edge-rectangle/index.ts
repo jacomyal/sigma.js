@@ -26,34 +26,34 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = [
-  "u_matrix",
-  "u_zoomRatio",
-  "u_sizeRatio",
-  "u_correctionRatio",
-  "u_pixelRatio",
-  "u_feather",
-  "u_minEdgeThickness",
-] as const;
-
 export default class EdgeRectangleProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+> extends EdgeProgram<string, N, E, G> {
   getDefinition() {
     return {
       VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.TRIANGLES,
-      UNIFORMS,
+      UNIFORMS: [
+        "u_matrix",
+        "u_zoomRatio",
+        "u_sizeRatio",
+        "u_correctionRatio",
+        "u_pixelRatio",
+        "u_feather",
+        "u_minEdgeThickness",
+        ...(this.hasDepth ? ["a_maxDepth"] : []),
+      ],
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },
         { name: "a_positionEnd", size: 2, type: FLOAT },
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
       ],
       CONSTANT_ATTRIBUTES: [
         // If 0, then position will be a_positionStart
@@ -111,6 +111,9 @@ export default class EdgeRectangleProgram<
     array[startIndex++] = n2;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    if (this.hasDepth) {
+      array[startIndex++] = data.depth;
+    }
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
@@ -124,5 +127,7 @@ export default class EdgeRectangleProgram<
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniform1f(u_feather, params.antiAliasingFeather);
     gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+
+    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
   }
 }

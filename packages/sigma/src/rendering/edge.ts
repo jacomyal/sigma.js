@@ -63,7 +63,7 @@ export abstract class EdgeProgram<
   }
 
   abstract processVisibleItem(
-    edgeIndex: number,
+    edgeId: number,
     startIndex: number,
     sourceData: NodeDisplayData,
     targetData: NodeDisplayData,
@@ -147,7 +147,10 @@ export function createEdgeCompoundProgram<
       targetData: NodeDisplayData,
       data: EdgeDisplayData,
     ): void {
-      this.programs.forEach((program) => program.process(edgeIndex, offset, sourceData, targetData, data));
+      const l = this.programs.length;
+      this.programs.forEach((program, i) =>
+        program.process(edgeIndex, offset, sourceData, targetData, { ...data, depth: data.depth + 1 - i / l }),
+      );
     }
 
     render(params: RenderParams): void {

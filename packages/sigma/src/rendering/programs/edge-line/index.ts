@@ -17,24 +17,23 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-const UNIFORMS = ["u_matrix"] as const;
-
 export default class EdgeLineProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> extends EdgeProgram<(typeof UNIFORMS)[number], N, E, G> {
+> extends EdgeProgram<string, N, E, G> {
   getDefinition() {
     return {
       VERTICES: 2,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
       METHOD: WebGLRenderingContext.LINES,
-      UNIFORMS,
+      UNIFORMS: ["u_matrix", ...(this.hasDepth ? ["a_maxDepth"] : [])],
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        ...(this.hasDepth ? [{ name: "a_depth", size: 1, type: FLOAT }] : []),
       ],
     };
   }
@@ -59,17 +58,25 @@ export default class EdgeLineProgram<
     array[startIndex++] = y1;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    if (this.hasDepth) {
+      array[startIndex++] = data.depth;
+    }
 
     // Second point
     array[startIndex++] = x2;
     array[startIndex++] = y2;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    if (this.hasDepth) {
+      array[startIndex++] = data.depth;
+    }
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
     const { u_matrix } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+
+    if (this.hasDepth) gl.uniform1f(uniformLocations.a_maxDepth, params.maxEdgesDepth);
   }
 }
