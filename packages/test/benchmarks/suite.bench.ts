@@ -22,40 +22,48 @@ const GRAPHS = {
   medium: MEDIUM_GRAPH as SerializedGraph,
   large: LARGE_GRAPH as SerializedGraph,
 };
+const BOOLEANS = [false, true];
 
 METHODS.forEach((method) => {
   describe(`Benchmarking method "${method}"`, () => {
     SIZES.forEach((screenSize) =>
-      SIZES.forEach((graphSize) => {
-        const size = SCREEN_SIZES[screenSize];
+      SIZES.forEach((graphSize) =>
+        BOOLEANS.forEach((bool) => {
+          const size = SCREEN_SIZES[screenSize];
 
-        const container = document.createElement("div");
-        document.body.append(container);
-        container.style.width = `${size}px`;
-        container.style.height = `${size}px`;
+          const container = document.createElement("div");
+          document.body.append(container);
+          container.style.width = `${size}px`;
+          container.style.height = `${size}px`;
 
-        const graph = new MultiGraph();
-        graph.import(GRAPHS[graphSize] as SerializedGraph);
+          const graph = new MultiGraph();
+          graph.import(GRAPHS[graphSize] as SerializedGraph);
 
-        const sigma = new Sigma(graph, container);
-        const camera = sigma.getCamera();
-        bench(
-          `${screenSize} scene, ${graphSize} graph`,
-          () => {
-            switch (method) {
-              case "refresh":
-                // This simulates a layout iteration, that triggers a full reindex of the graph:
-                graph.forEachNode((node) => graph.mergeNodeAttributes(node, { x: Math.random(), y: Math.random() }));
-                break;
-              case "render":
-                // This simulates a user interaction, that triggers a render of the graph:
-                camera.setState({ angle: camera.angle + 0.1 });
-                break;
-            }
-          },
-          { iterations: ITERATIONS },
-        );
-      }),
+          let i = graph.order;
+          graph.forEachNode((node) => graph.setNodeAttribute(node, "zIndex", i--));
+          i = graph.size;
+          graph.forEachEdge((edge) => graph.setEdgeAttribute(edge, "zIndex", i--));
+
+          const sigma = new Sigma(graph, container, { zIndex: bool });
+          const camera = sigma.getCamera();
+          bench(
+            `${screenSize} scene, ${graphSize} graph, zIndex ${bool}`,
+            () => {
+              switch (method) {
+                case "refresh":
+                  // This simulates a layout iteration, that triggers a full reindex of the graph:
+                  graph.forEachNode((node) => graph.mergeNodeAttributes(node, { x: Math.random(), y: Math.random() }));
+                  break;
+                case "render":
+                  // This simulates a user interaction, that triggers a render of the graph:
+                  camera.setState({ angle: camera.angle + 0.1 });
+                  break;
+              }
+            },
+            { iterations: ITERATIONS },
+          );
+        }),
+      ),
     );
   });
 });
