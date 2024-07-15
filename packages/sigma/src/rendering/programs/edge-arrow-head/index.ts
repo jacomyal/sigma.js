@@ -7,7 +7,7 @@ import { ProgramInfo } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 export type CreateEdgeArrowHeadProgramOptions = {
   lengthToThicknessRatio: number;
@@ -48,7 +48,7 @@ export function createEdgeArrowHeadProgram<
         VERTICES: 3,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE,
-        METHOD: WebGLRenderingContext.TRIANGLES,
+        METHOD: WebGL2RenderingContext.TRIANGLES,
         UNIFORMS,
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },

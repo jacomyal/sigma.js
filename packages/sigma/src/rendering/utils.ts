@@ -11,7 +11,7 @@ export interface ProgramInfo<Uniform extends string = string> {
   name: string;
   isPicking: boolean;
   program: WebGLProgram;
-  gl: WebGLRenderingContext | WebGL2RenderingContext;
+  gl: WebGL2RenderingContext;
   frameBuffer: WebGLFramebuffer | null;
   buffer: WebGLBuffer;
   constantBuffer: WebGLBuffer;
@@ -42,7 +42,7 @@ export interface InstancedProgramDefinition<Uniform extends string = string> ext
   CONSTANT_DATA: number[][];
 }
 
-function loadShader(type: string, gl: WebGLRenderingContext, source: string): WebGLShader {
+function loadShader(type: string, gl: WebGL2RenderingContext, source: string): WebGLShader {
   const glType = type === "VERTEX" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
   // Creating the shader
@@ -71,17 +71,17 @@ function loadShader(type: string, gl: WebGLRenderingContext, source: string): We
   return shader;
 }
 
-export function loadVertexShader(gl: WebGLRenderingContext, source: string): WebGLShader {
+export function loadVertexShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
   return loadShader("VERTEX", gl, source);
 }
-export function loadFragmentShader(gl: WebGLRenderingContext, source: string): WebGLShader {
+export function loadFragmentShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
   return loadShader("FRAGMENT", gl, source);
 }
 
 /**
  * Function used to load a program.
  */
-export function loadProgram(gl: WebGLRenderingContext, shaders: Array<WebGLShader>): WebGLProgram {
+export function loadProgram(gl: WebGL2RenderingContext, shaders: Array<WebGLShader>): WebGLProgram {
   const program = gl.createProgram();
   if (program === null) {
     throw new Error("loadProgram: error while creating the program.");

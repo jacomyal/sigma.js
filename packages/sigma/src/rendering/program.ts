@@ -41,7 +41,7 @@ export abstract class AbstractProgram<
   G extends Attributes = Attributes,
 > {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma<N, E, G>) {}
+  constructor(_gl: WebGL2RenderingContext, _pickGl: WebGL2RenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
   abstract render(params: RenderParams): void;
   abstract kill(): void;
@@ -81,11 +81,7 @@ export abstract class Program<
 
   abstract getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform>;
 
-  constructor(
-    gl: WebGLRenderingContext | WebGL2RenderingContext,
-    pickingBuffer: WebGLFramebuffer | null,
-    renderer: Sigma<N, E, G>,
-  ) {
+  constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
     this.renderer = renderer;
     this.hasDepth = !!renderer.getSetting("zIndex");
 
@@ -162,7 +158,7 @@ export abstract class Program<
 
   protected getProgramInfo(
     name: "normal" | "pick",
-    gl: WebGLRenderingContext | WebGL2RenderingContext,
+    gl: WebGL2RenderingContext,
     vertexShaderSource: string,
     fragmentShaderSource: string,
     frameBuffer: WebGLFramebuffer | null,
@@ -277,12 +273,7 @@ export abstract class Program<
       gl.vertexAttribPointer(location, attr.size, attr.type, attr.normalized || false, stride, offset);
 
       if (this.isInstanced && setDivisor) {
-        if (gl instanceof WebGL2RenderingContext) {
-          gl.vertexAttribDivisor(location, 1);
-        } else {
-          const ext = gl.getExtension("ANGLE_instanced_arrays");
-          if (ext) ext.vertexAttribDivisorANGLE(location, 1);
-        }
+        gl.vertexAttribDivisor(location, 1);
       }
     }
 
@@ -297,12 +288,7 @@ export abstract class Program<
       gl.disableVertexAttribArray(location);
 
       if (this.isInstanced && unsetDivisor) {
-        if (gl instanceof WebGL2RenderingContext) {
-          gl.vertexAttribDivisor(location, 0);
-        } else {
-          const ext = gl.getExtension("ANGLE_instanced_arrays");
-          if (ext) ext.vertexAttribDivisorANGLE(location, 0);
-        }
+        gl.vertexAttribDivisor(location, 0);
       }
     }
   }
@@ -378,12 +364,7 @@ export abstract class Program<
     if (!this.isInstanced) {
       gl.drawArrays(method, 0, this.verticesCount);
     } else {
-      if (gl instanceof WebGL2RenderingContext) {
-        gl.drawArraysInstanced(method, 0, this.VERTICES, this.capacity);
-      } else {
-        const ext = gl.getExtension("ANGLE_instanced_arrays");
-        if (ext) ext.drawArraysInstancedANGLE(method, 0, this.VERTICES, this.capacity);
-      }
+      gl.drawArraysInstanced(method, 0, this.VERTICES, this.capacity);
     }
   }
 }

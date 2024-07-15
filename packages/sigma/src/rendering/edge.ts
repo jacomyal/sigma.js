@@ -77,7 +77,7 @@ class EdgeProgramClass<
   G extends Attributes = Attributes,
 > implements AbstractEdgeProgram<N, E, G>
 {
-  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
+  constructor(_gl: WebGL2RenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
     return this;
   }
 
@@ -128,7 +128,7 @@ export function createEdgeCompoundProgram<
   return class EdgeCompoundProgram implements AbstractEdgeProgram<N, E, G> {
     programs: Array<AbstractEdgeProgram<N, E, G>>;
 
-    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
+    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       this.programs = programClasses.map((Program) => {
         return new Program(gl, pickingBuffer, renderer);
       });

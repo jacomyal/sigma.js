@@ -14,7 +14,7 @@ import getFragmentShader from "./shader-frag";
 import VERTEX_SHADER_SOURCE from "./shader-vert";
 import { Atlas, DEFAULT_TEXTURE_MANAGER_OPTIONS, TextureManager, TextureManagerOptions } from "./texture";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 interface CreateNodeImageProgramOptions<N extends Attributes, E extends Attributes, G extends Attributes>
   extends TextureManagerOptions {
@@ -57,7 +57,7 @@ export default function getNodeImageProgram<
   G extends Attributes = Attributes,
 >(options?: Partial<CreateNodeImageProgramOptions<N, E, G>>): NodeProgramType<N, E, G> {
   // Compute effective MAX_TEXTURE_SIZE from the current WebGL context:
-  const gl = document.createElement("canvas").getContext("webgl") as WebGLRenderingContext;
+  const gl = document.createElement("canvas").getContext("webgl") as WebGL2RenderingContext;
   const defaultMaxTextureSize = Math.min(
     gl.getParameter(gl.MAX_TEXTURE_SIZE),
     DEFAULT_TEXTURE_MANAGER_OPTIONS.maxTextureSize,
@@ -102,7 +102,7 @@ export default function getNodeImageProgram<
         VERTICES: 3,
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE: getFragmentShader({ texturesCount: textureManager.getTextures().length }),
-        METHOD: WebGLRenderingContext.TRIANGLES,
+        METHOD: WebGL2RenderingContext.TRIANGLES,
         UNIFORMS: [
           "u_sizeRatio",
           "u_correctionRatio",
@@ -132,7 +132,7 @@ export default function getNodeImageProgram<
     textureImages: ImageData[];
     textureManagerCallback: null | ((newAtlasData: { atlas: Atlas; textures: ImageData[] }) => void) = null;
 
-    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
+    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       super(gl, pickingBuffer, renderer);
 
       this.textureManagerCallback = ({ atlas, textures }: { atlas: Atlas; textures: ImageData[] }) => {

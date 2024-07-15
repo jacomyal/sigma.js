@@ -61,7 +61,7 @@ class NodeProgramClass<
   G extends Attributes = Attributes,
 > implements AbstractNodeProgram<N, E, G>
 {
-  constructor(_gl: WebGLRenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
+  constructor(_gl: WebGL2RenderingContext, _pickingBuffer: WebGLFramebuffer | null, _renderer: Sigma<N, E, G>) {
     return this;
   }
   drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
@@ -108,7 +108,7 @@ export function createNodeCompoundProgram<
   return class NodeCompoundProgram implements AbstractNodeProgram<N, E, G> {
     programs: NonEmptyArray<AbstractNodeProgram<N, E, G>>;
 
-    constructor(gl: WebGLRenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
+    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       this.programs = programClasses.map((Program) => {
         return new Program(gl, pickingBuffer, renderer);
       }) as unknown as NonEmptyArray<AbstractNodeProgram<N, E, G>>;

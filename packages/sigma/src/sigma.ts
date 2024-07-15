@@ -128,7 +128,7 @@ export default class Sigma<
   private container: HTMLElement;
   private elements: PlainObject<HTMLCanvasElement> = {};
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
-  private webGLContexts: PlainObject<WebGLRenderingContext> = {};
+  private webGLContexts: PlainObject<WebGL2RenderingContext> = {};
   private pickingLayers: Set<string> = new Set();
   private textures: PlainObject<WebGLTexture> = {};
   private frameBuffers: PlainObject<WebGLFramebuffer> = {};
@@ -327,7 +327,7 @@ export default class Sigma<
    * @return {Sigma}
    */
   private resetWebGLTexture(id: string): this {
-    const gl = this.webGLContexts[id] as WebGLRenderingContext;
+    const gl = this.webGLContexts[id] as WebGL2RenderingContext;
 
     const frameBuffer = this.frameBuffers[id];
     const currentTexture = this.textures[id];
@@ -1549,18 +1549,12 @@ export default class Sigma<
       ...(options || {}),
     };
 
-    let context;
+    const context = canvas.getContext("webgl2", contextOptions);
 
-    // First we try webgl2 for an easy performance boost
-    context = canvas.getContext("webgl2", contextOptions);
+    if (!context)
+      throw new Error("Sigma.js requires WebGL2 to work. Please check this site: https://get.webgl.org/webgl2/");
 
-    // Else we fall back to webgl
-    if (!context) context = canvas.getContext("webgl", contextOptions);
-
-    // Edge, I am looking right at you...
-    if (!context) context = canvas.getContext("experimental-webgl", contextOptions);
-
-    const gl = context as WebGLRenderingContext;
+    const gl = context as WebGL2RenderingContext;
     this.webGLContexts[id] = gl;
 
     // Blending:
@@ -1881,12 +1875,12 @@ export default class Sigma<
   clear(): this {
     this.emit("beforeClear");
 
-    this.webGLContexts.nodes.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
-    this.webGLContexts.edges.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.edges.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    this.webGLContexts.nodes.bindFramebuffer(WebGL2RenderingContext.FRAMEBUFFER, null);
+    this.webGLContexts.nodes.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+    this.webGLContexts.edges.bindFramebuffer(WebGL2RenderingContext.FRAMEBUFFER, null);
+    this.webGLContexts.edges.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
     this.webGLContexts.hoverNodes.clear(
-      WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT,
+      WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT,
     );
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
