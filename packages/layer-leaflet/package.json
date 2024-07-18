@@ -1,0 +1,44 @@
+{
+  "name": "@sigma/layer-leaflet",
+  "version": "3.0.0-beta.13",
+  "description": "A plugin to set a geographical map in background",
+  "main": "dist/sigma-layer-leaflet.cjs.js",
+  "module": "dist/sigma-layer-leaflet.esm.js",
+  "types": "dist/sigma-layer-leaflet.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "leaflet": "^1.9.4",
+    "sigma": ">=3.0.0-beta.10"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-layer-leaflet.esm.js",
+      "import": "./dist/sigma-layer-leaflet.cjs.mjs",
+      "default": "./dist/sigma-layer-leaflet.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.12"
+  }
+}
