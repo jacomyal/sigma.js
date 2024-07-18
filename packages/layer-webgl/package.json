@@ -1,0 +1,46 @@
+{
+  "name": "@sigma/layer-webgl",
+  "version": "3.0.0-beta.0",
+  "description": "A package to help drawing custom WebGL layers with sigma.js",
+  "main": "dist/sigma-layer-webgl.cjs.js",
+  "module": "dist/sigma-layer-webgl.esm.js",
+  "types": "dist/sigma-layer-webgl.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    }
+  ],
+  "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "sigma": ">=3.0.0-beta.24"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-layer-webgl.esm.js",
+      "import": "./dist/sigma-layer-webgl.cjs.mjs",
+      "default": "./dist/sigma-layer-webgl.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

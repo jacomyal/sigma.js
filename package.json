@@ -37,6 +37,7 @@
   "preconstruct": {
     "packages": [
       "packages/sigma",
+      "packages/layer-webgl",
       "packages/node-border",
       "packages/node-image",
       "packages/node-piechart",

@@ -42,6 +42,7 @@ const config = {
           "../sigma/src/settings.ts",
           "../sigma/src/rendering/index.ts",
           "../sigma/src/utils/index.ts",
+          "../layer-webgl/src/index.ts",
           "../node-border/src/index.ts",
           "../node-image/src/index.ts",
           "../node-piechart/src/index.ts",
