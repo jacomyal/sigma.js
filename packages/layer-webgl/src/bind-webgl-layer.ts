@@ -40,9 +40,7 @@ export default function bindWebGLLayer(id: string, renderer: Sigma, ProgramClass
     renderer.removeListener("kill", _clean);
 
     program.kill();
-    const ext = gl.getExtension("WEBGL_lose_context");
-    if (ext) ext.loseContext();
-    canvas.remove();
+    renderer.killLayer(id);
 
     isCleaned = true;
   };

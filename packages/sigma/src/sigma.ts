@@ -1449,6 +1449,7 @@ export default class Sigma<
   getRenderParams(): RenderParams {
     return {
       matrix: this.matrix,
+      invMatrix: this.invMatrix,
       width: this.width,
       height: this.height,
       pixelRatio: this.pixelRatio,
@@ -1514,7 +1515,7 @@ export default class Sigma<
   }
 
   /**
-   * Internal function used to create a WebGL context and add the relevant DOM
+   * Function used to create a WebGL context and add the relevant DOM
    * elements.
    *
    * @param  {string}  id      - Context's id.
@@ -1566,6 +1567,32 @@ export default class Sigma<
     }
 
     return gl;
+  }
+
+  /**
+   * Function used to properly kill a canvas layer.
+   *
+   * @param  {string} id - Layer id.
+   * @return {Sigma}
+   */
+  killLayer(id: string): this {
+    const canvas = this.elements[id];
+
+    if (!canvas) throw new Error(`Sigma: cannot kill layer ${id}, which does not exist`);
+
+    if (this.webGLContexts[id]) {
+      const gl = this.webGLContexts[id];
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      delete this.webGLContexts[id];
+    } else {
+      delete this.canvasContexts[id];
+    }
+
+    // Delete canvas:
+    canvas.remove();
+    delete this.elements[id];
+
+    return this;
   }
 
   /**
@@ -2187,12 +2214,6 @@ export default class Sigma<
       this.renderHighlightedNodesFrame = null;
     }
 
-    // Destroying WebGL contexts
-    for (const id in this.webGLContexts) {
-      const context = this.webGLContexts[id];
-      context.getExtension("WEBGL_lose_context")?.loseContext();
-    }
-
     // Destroying canvases
     const container = this.container;
 
@@ -2216,6 +2237,11 @@ export default class Sigma<
     this.nodePrograms = {};
     this.nodeHoverPrograms = {};
     this.edgePrograms = {};
+
+    // Kill all canvas/WebGL contexts
+    for (const id in this.elements) {
+      this.killLayer(id);
+    }
   }
 
   /**

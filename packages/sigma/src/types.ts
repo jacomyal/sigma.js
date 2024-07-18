@@ -89,6 +89,7 @@ export interface RenderParams {
   cameraAngle: number;
   correctionRatio: number;
   matrix: Float32Array;
+  invMatrix: Float32Array;
   downSizingRatio: number;
   minEdgeThickness: number;
   antiAliasingFeather: number;
