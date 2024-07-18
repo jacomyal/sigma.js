@@ -35,10 +35,16 @@ void main() {
   vec2 position = (u_invMatrix * vec3(gl_FragCoord.xy * 2.0 / vec2(u_width, u_height) - vec2(1.0, 1.0), 1)).xy;
   float score = 0.0;
 
+  float factor = 0.5 / u_correctionRatio;
+  float radius = u_radius * u_zoomModifier;
+  float correctedRadius = radius / factor;
+
   for (int i = 0; i < NODES_COUNT; i++) {
     vec2 nodePos = u_nodesPosition[i].xy;
-    float d = distance(position, nodePos) / 2.0 / u_correctionRatio;
-    score += smoothstep(u_radius * u_zoomModifier, 0.0, d);
+    if (distance(position.x, nodePos.x) >= correctedRadius || distance(position.y, nodePos.y) >= correctedRadius) continue;
+    float d = distance(position, nodePos) * factor;
+    score += smoothstep(radius, 0.0, d);
+    if (score >= 1.0) break;
   }
     
   ${halos
