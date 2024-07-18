@@ -22,7 +22,7 @@ const config: StorybookConfig = {
     disableTelemetry: true,
   },
   staticDirs: ["../public"],
-  logLevel: "debug",
+  logLevel: "error",
   async viteFinal(config) {
     return mergeConfig(config, {
       resolve: {
