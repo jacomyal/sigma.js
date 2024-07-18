@@ -160,6 +160,10 @@ export type SigmaEdgeEvents = {
 
 export type SigmaAdditionalEvents = {
   // Lifecycle events
+  beforeClear(): void;
+  afterClear(): void;
+  beforeProcess(): void;
+  afterProcess(): void;
   beforeRender(): void;
   afterRender(): void;
   resize(): void;

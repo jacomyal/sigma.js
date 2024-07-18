@@ -368,3 +368,23 @@ export abstract class Program<
     }
   }
 }
+
+class ProgramClass<
+  Uniform extends string = string,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends Program<Uniform, N, E, G> {
+  getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform> {
+    return {} as unknown as ProgramDefinition<Uniform>;
+  }
+  setUniforms(_params: RenderParams, _programInfo: ProgramInfo) {
+    return undefined;
+  }
+}
+export type ProgramType<
+  Uniform extends string = string,
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = typeof ProgramClass<Uniform, N, E, G>;

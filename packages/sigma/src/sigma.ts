@@ -256,48 +256,6 @@ export default class Sigma<
    */
 
   /**
-   * Internal function used to create a canvas element.
-   * @param  {string} id - Context's id.
-   * @return {Sigma}
-   */
-  private createCanvas(id: string): HTMLCanvasElement {
-    const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
-      "canvas",
-      {
-        position: "absolute",
-      },
-      {
-        class: `sigma-${id}`,
-      },
-    );
-
-    this.elements[id] = canvas;
-    this.container.appendChild(canvas);
-
-    return canvas;
-  }
-
-  /**
-   * Internal function used to create a canvas context and add the relevant
-   * DOM elements.
-   *
-   * @param  {string} id - Context's id.
-   * @return {Sigma}
-   */
-  private createCanvasContext(id: string): this {
-    const canvas = this.createCanvas(id);
-
-    const contextOptions = {
-      preserveDrawingBuffer: false,
-      antialias: false,
-    };
-
-    this.canvasContexts[id] = canvas.getContext("2d", contextOptions) as CanvasRenderingContext2D;
-
-    return this;
-  }
-
-  /**
    * Internal function used to register a node program
    *
    * @param  {string}           key              - The program's key, matching the related nodes "type" values.
@@ -362,55 +320,6 @@ export default class Sigma<
       program.kill();
       this.edgePrograms = programs;
     }
-    return this;
-  }
-
-  /**
-   * Internal function used to create a WebGL context and add the relevant DOM
-   * elements.
-   *
-   * @param  {string}  id      - Context's id.
-   * @param  {object?} options - #getContext params to override (optional)
-   * @return {Sigma}
-   */
-  private createWebGLContext(
-    id: string,
-    options?: { preserveDrawingBuffer?: boolean; antialias?: boolean; hidden?: boolean; picking?: boolean },
-  ): this {
-    const canvas = this.createCanvas(id);
-    if (options?.hidden) canvas.remove();
-
-    const contextOptions = {
-      preserveDrawingBuffer: false,
-      antialias: false,
-      ...(options || {}),
-    };
-
-    let context;
-
-    // First we try webgl2 for an easy performance boost
-    context = canvas.getContext("webgl2", contextOptions);
-
-    // Else we fall back to webgl
-    if (!context) context = canvas.getContext("webgl", contextOptions);
-
-    // Edge, I am looking right at you...
-    if (!context) context = canvas.getContext("experimental-webgl", contextOptions);
-
-    const gl = context as WebGLRenderingContext;
-    this.webGLContexts[id] = gl;
-
-    // Blending:
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    // Prepare frame buffer for picking layers:
-    if (options?.picking) {
-      this.pickingLayers.add(id);
-      const newFrameBuffer = gl.createFramebuffer();
-      if (!newFrameBuffer) throw new Error(`Sigma: cannot create a new frame buffer for layer ${id}`);
-      this.frameBuffers[id] = newFrameBuffer;
-    }
-
     return this;
   }
 
@@ -787,6 +696,8 @@ export default class Sigma<
    * @return {Sigma}
    */
   private process(): this {
+    this.emit("beforeProcess");
+
     const graph = this.graph;
     const settings = this.settings;
     const dimensions = this.getDimensions();
@@ -915,6 +826,7 @@ export default class Sigma<
     this.nodeIndices = nodeIndices;
     this.edgeIndices = edgeIndices;
 
+    this.emit("afterProcess");
     return this;
   }
 
@@ -1189,22 +1101,10 @@ export default class Sigma<
     // 4. Clear hovered nodes layer:
     this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
     // 5. Render:
+    const renderParams = this.getRenderParams();
     for (const type in this.nodeHoverPrograms) {
       const program = this.nodeHoverPrograms[type];
-
-      program.render({
-        matrix: this.matrix,
-        width: this.width,
-        height: this.height,
-        pixelRatio: this.pixelRatio,
-        cameraAngle: this.camera.angle,
-        zoomRatio: this.camera.ratio,
-        sizeRatio: 1 / this.scaleSize(),
-        correctionRatio: this.correctionRatio,
-        downSizingRatio: this.pickingDownSizingRatio,
-        minEdgeThickness: this.settings.minEdgeThickness,
-        antiAliasingFeather: this.settings.antiAliasingFeather,
-      });
+      program.render(renderParams);
     }
   }
 
@@ -1286,22 +1186,10 @@ export default class Sigma<
     //   graph
     // - `this.normalizationFunction.ratio` is basically `Math.max(graphDX, graphDY)`
     // And now, I observe that if I multiply these three ratios, I have something constant, which value remains 2, even
-    // when I change the graph, the viewport or the camera. It might be useful later so I prefer to let this comment:
+    // when I change the graph, the viewport or the camera. It might be useful later, so I prefer to let this comment:
     // console.log(this.graphToViewportRatio * this.correctionRatio * this.normalizationFunction.ratio * 2);
 
-    const params: RenderParams = {
-      matrix: this.matrix,
-      width: this.width,
-      height: this.height,
-      pixelRatio: this.pixelRatio,
-      zoomRatio: this.camera.ratio,
-      cameraAngle: this.camera.angle,
-      sizeRatio: 1 / this.scaleSize(),
-      correctionRatio: this.correctionRatio,
-      downSizingRatio: this.pickingDownSizingRatio,
-      minEdgeThickness: this.settings.minEdgeThickness,
-      antiAliasingFeather: this.settings.antiAliasingFeather,
-    };
+    const params: RenderParams = this.getRenderParams();
 
     // Drawing nodes
     for (const type in this.nodePrograms) {
@@ -1554,6 +1442,133 @@ export default class Sigma<
    */
 
   /**
+   * Function used to get the render params.
+   *
+   * @return {RenderParams}
+   */
+  getRenderParams(): RenderParams {
+    return {
+      matrix: this.matrix,
+      width: this.width,
+      height: this.height,
+      pixelRatio: this.pixelRatio,
+      zoomRatio: this.camera.ratio,
+      cameraAngle: this.camera.angle,
+      sizeRatio: 1 / this.scaleSize(),
+      correctionRatio: this.correctionRatio,
+      downSizingRatio: this.pickingDownSizingRatio,
+      minEdgeThickness: this.settings.minEdgeThickness,
+      antiAliasingFeather: this.settings.antiAliasingFeather,
+    };
+  }
+
+  /**
+   * Function used to create a canvas element.
+   *
+   * @param  {string} id - Context's id.
+   * @return {Sigma}
+   */
+  createCanvas(id: string, options: { beforeLayer?: string } | { afterLayer?: string } = {}): HTMLCanvasElement {
+    if (this.elements[id]) throw new Error(`Sigma: a layer named "${id}" already exists`);
+
+    const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
+      "canvas",
+      {
+        position: "absolute",
+      },
+      {
+        class: `sigma-${id}`,
+      },
+    );
+
+    this.elements[id] = canvas;
+
+    if ("beforeLayer" in options && options.beforeLayer) {
+      this.elements[options.beforeLayer].before(canvas);
+    } else if ("afterLayer" in options && options.afterLayer) {
+      this.elements[options.afterLayer].after(canvas);
+    } else {
+      this.container.appendChild(canvas);
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Function used to create a canvas context and add the relevant DOM elements.
+   *
+   * @param  {string} id - Context's id.
+   * @return {Sigma}
+   */
+  createCanvasContext(id: string): this {
+    const canvas = this.createCanvas(id);
+
+    const contextOptions = {
+      preserveDrawingBuffer: false,
+      antialias: false,
+    };
+
+    this.canvasContexts[id] = canvas.getContext("2d", contextOptions) as CanvasRenderingContext2D;
+
+    return this;
+  }
+
+  /**
+   * Internal function used to create a WebGL context and add the relevant DOM
+   * elements.
+   *
+   * @param  {string}  id      - Context's id.
+   * @param  {object?} options - #getContext params to override (optional)
+   * @return {WebGLRenderingContext}
+   */
+  createWebGLContext(
+    id: string,
+    options?: {
+      preserveDrawingBuffer?: boolean;
+      antialias?: boolean;
+      hidden?: boolean;
+      picking?: boolean;
+      canvas?: HTMLCanvasElement;
+    },
+  ): WebGLRenderingContext {
+    const canvas = options?.canvas || this.createCanvas(id);
+    if (options?.hidden) canvas.remove();
+
+    const contextOptions = {
+      preserveDrawingBuffer: false,
+      antialias: false,
+      ...(options || {}),
+    };
+
+    let context;
+
+    // First we try webgl2 for an easy performance boost
+    context = canvas.getContext("webgl2", contextOptions);
+
+    // Else we fall back to webgl
+    if (!context) context = canvas.getContext("webgl", contextOptions);
+
+    // Edge, I am looking right at you...
+    if (!context) context = canvas.getContext("experimental-webgl", contextOptions);
+
+    const gl = context as WebGLRenderingContext;
+    this.webGLContexts[id] = gl;
+
+    // Blending:
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+    // Prepare frame buffer for picking layers:
+    if (options?.picking) {
+      this.pickingLayers.add(id);
+      const newFrameBuffer = gl.createFramebuffer();
+      if (!newFrameBuffer) throw new Error(`Sigma: cannot create a new frame buffer for layer ${id}`);
+      this.frameBuffers[id] = newFrameBuffer;
+    }
+
+    return gl;
+  }
+
+  /**
    * Method returning the renderer's camera.
    *
    * @return {Camera}
@@ -1757,9 +1772,10 @@ export default class Sigma<
   /**
    * Method used to resize the renderer.
    *
+   * @param  {boolean} force - If true, then resize is processed even if size is unchanged (optional).
    * @return {Sigma}
    */
-  resize(): this {
+  resize(force?: boolean): this {
     const previousWidth = this.width,
       previousHeight = this.height;
 
@@ -1784,7 +1800,7 @@ export default class Sigma<
     }
 
     // If nothing has changed, we can stop right here
-    if (previousWidth === this.width && previousHeight === this.height) return this;
+    if (!force && previousWidth === this.width && previousHeight === this.height) return this;
 
     this.emit("resize");
 
@@ -1828,6 +1844,8 @@ export default class Sigma<
    * @return {Sigma}
    */
   clear(): this {
+    this.emit("beforeClear");
+
     this.webGLContexts.nodes.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
     this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
     this.webGLContexts.edges.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
@@ -1837,6 +1855,7 @@ export default class Sigma<
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
 
+    this.emit("afterClear");
     return this;
   }
 
