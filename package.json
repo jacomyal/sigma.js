@@ -40,7 +40,8 @@
       "packages/node-border",
       "packages/node-image",
       "packages/node-piechart",
-      "packages/edge-curve"
+      "packages/edge-curve",
+      "packages/layer-leaflet"
     ],
     "exports": {
       "importConditionDefaultExport": "default"
