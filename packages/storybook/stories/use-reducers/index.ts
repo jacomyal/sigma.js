@@ -7,8 +7,8 @@ import Graph from "graphology";
 import Sigma from "sigma";
 import { Coordinates, EdgeDisplayData, NodeDisplayData } from "sigma/types";
 
+import data from "../_data/data.json";
 import { onStoryDown } from "../utils";
-import data from "./data.json";
 
 export default () => {
   // Retrieve some useful DOM elements:

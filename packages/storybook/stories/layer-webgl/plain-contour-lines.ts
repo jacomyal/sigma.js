@@ -2,7 +2,7 @@ import { bindWebGLLayer, createMetaballsProgram } from "@sigma/layer-webgl";
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import data from "../../public/data.json";
+import data from "../_data/data.json";
 import { onStoryDown } from "../utils";
 
 export default () => {

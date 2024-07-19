@@ -5,7 +5,7 @@ import chroma from "chroma-js";
 import Graph from "graphology";
 import Sigma from "sigma";
 
-import data from "../../public/data.json";
+import data from "../_data/data.json";
 import { onStoryDown } from "../utils";
 
 const DEFAULT_ARGS = {

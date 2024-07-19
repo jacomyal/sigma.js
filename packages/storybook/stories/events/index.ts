@@ -5,8 +5,8 @@ import Graph from "graphology";
 import Sigma from "sigma";
 import { MouseCoords } from "sigma/types";
 
+import data from "../_data/data.json";
 import { onStoryDown } from "../utils";
-import data from "./data.json";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;

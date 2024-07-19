@@ -10,8 +10,8 @@ import Sigma from "sigma";
 import { PlainObject } from "sigma/types";
 import { animateNodes } from "sigma/utils";
 
+import data from "../_data/data.json";
 import { onStoryDown } from "../utils";
-import data from "./data.json";
 
 export default () => {
   // Initialize the graph object with data
