@@ -18,6 +18,7 @@ export default () => {
       louvain.assign(graph, { nodeCommunityAttribute: "community" });
       const communities = new Set<string>();
       graph.forEachNode((_, attrs) => communities.add(attrs.community));
+      const communitiesArray = Array.from(communities);
 
       // Retrieve some useful DOM elements:
       const container = document.getElementById("sigma-container") as HTMLElement;
@@ -30,9 +31,7 @@ export default () => {
       const select = document.createElement("select");
       select.innerHTML =
         `<option value="">No community</option>` +
-        Array.from(communities)
-          .map((str) => `<option value="${str}">Community ${str}</option>`)
-          .join("");
+        communitiesArray.map((str) => `<option value="${str}">Community ${str}</option>`).join("");
       select.style.position = "absolute";
       select.style.right = "10px";
       select.style.bottom = "10px";
@@ -40,7 +39,7 @@ export default () => {
 
       // Handle metaballs layer:
       let cleanWebGLLayer: null | (() => void) = null;
-      select.addEventListener("change", () => {
+      const checkSelectedOption = () => {
         if (cleanWebGLLayer) cleanWebGLLayer();
 
         const community = select.value;
@@ -53,7 +52,12 @@ export default () => {
         } else {
           cleanWebGLLayer = null;
         }
-      });
+      };
+      select.addEventListener("change", checkSelectedOption);
+
+      // Select first community:
+      select.value = communitiesArray[0];
+      checkSelectedOption();
     });
 
   onStoryDown(() => {

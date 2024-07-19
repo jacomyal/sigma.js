@@ -40,7 +40,7 @@ export default () => {
   checkboxesContainer.style.bottom = "10px";
   document.body.append(checkboxesContainer);
 
-  communitiesArray.forEach((community) => {
+  communitiesArray.forEach((community, i) => {
     const id = `cb-${community}`;
     const checkboxContainer = document.createElement("div");
     checkboxContainer.innerHTML += `
@@ -51,8 +51,7 @@ export default () => {
     const checkbox = checkboxesContainer.querySelector(`#${id}`) as HTMLInputElement;
 
     let clean: null | (() => void) = null;
-
-    checkbox.addEventListener("click", () => {
+    const toggle = () => {
       if (clean) {
         clean();
         clean = null;
@@ -69,7 +68,14 @@ export default () => {
           ),
         );
       }
-    });
+    };
+
+    checkbox.addEventListener("change", toggle);
+
+    if (!i) {
+      checkbox.checked = true;
+      toggle();
+    }
   });
 
   onStoryDown(() => {
