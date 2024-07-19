@@ -16,7 +16,7 @@ export function latlngToGraph(map: Map, coord: { lat: number; lng: number }): { 
 }
 
 /**
- * Given a graph coords returns it's lat/lng coords.
+ * Given a graph coords returns its lat/lng coords.
  */
 export function graphToLatlng(map: Map, coords: { x: number; y: number }): { lat: number; lng: number } {
   const data = map.unproject([coords.x, map.getContainer().clientHeight - coords.y], 0);
@@ -24,20 +24,20 @@ export function graphToLatlng(map: Map, coords: { x: number; y: number }): { lat
 }
 
 /**
- * Synchronise the sigma BBOX with the leaflet one.
+ * Synchronise the sigma BBox with the leaflet one.
  */
 export function syncLeafletBboxWithGraph(sigma: Sigma, map: Map, animate: boolean): void {
   const viewportDimensions = sigma.getDimensions();
 
-  // Graph BBOX
+  // Graph BBox
   const graphBottomLeft = sigma.viewportToGraph({ x: 0, y: viewportDimensions.height }, { padding: 0 });
   const graphTopRight = sigma.viewportToGraph({ x: viewportDimensions.width, y: 0 }, { padding: 0 });
 
-  // Geo BBOX
+  // Geo BBox
   const geoSouthWest = graphToLatlng(map, graphBottomLeft);
   const geoNorthEast = graphToLatlng(map, graphTopRight);
 
-  // Set map BBOX
+  // Set map BBox
   const bounds = new LatLngBounds(geoSouthWest, geoNorthEast);
   const opts = animate ? { animate: true, duration: 0.001 } : { animate: false };
   map.flyToBounds(bounds, opts);
@@ -57,7 +57,7 @@ export function syncLeafletBboxWithGraph(sigma: Sigma, map: Map, animate: boolea
 }
 
 /**
- * Settings the min & max camera ratio of sigma to not be hover the possibility of leaflet
+ * Settings the min & max camera ratio of sigma to not be over the capabilities of Leaflet
  * - Max zoom is when whe can see the whole map
  * - Min zoom is when we are at zoom 18 on leaflet
  */

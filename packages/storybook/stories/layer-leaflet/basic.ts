@@ -15,6 +15,7 @@ export default () => {
   const graph = Graph.from(data as SerializedGraph);
   graph.updateEachNodeAttributes((_node, attributes) => ({
     ...attributes,
+    label: attributes.fullName,
     x: 0,
     y: 0,
   }));
@@ -22,11 +23,12 @@ export default () => {
   // initiate sigma
   const renderer = new Sigma(graph, container, {
     labelRenderedSizeThreshold: 20,
+    defaultNodeColor: "#e22352",
+    defaultEdgeColor: "#ffaeaf",
+    minEdgeThickness: 1,
     nodeReducer: (node, attrs) => {
       return {
         ...attrs,
-        label: attrs.fullName,
-        color: "#e22352",
         size: Math.sqrt(graph.degree(node)) / 2,
       };
     },

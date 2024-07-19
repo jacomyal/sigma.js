@@ -28,7 +28,7 @@ export default function bindLeafletLayer(
     zoomControl: false,
     zoomSnap: 0,
     zoom: 0,
-    // we force the maxZoom with a higher tile value so leaflet function are not stucks
+    // we force the maxZoom with a higher tile value so leaflet function are not stuck
     // in a restricted area. It avoids side effect
     maxZoom: 20,
   }).setView([0, 0], 0);
@@ -83,7 +83,7 @@ export default function bindLeafletLayer(
 
   // WHen the map is ready
   map.whenReady(() => {
-    // Update the sigma graph for geopspatial coords
+    // Update the sigma graph for geospatial coords
     updateGraphCoordinates(sigma.getGraph());
 
     // Do the first sync
