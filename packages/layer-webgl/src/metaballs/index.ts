@@ -1,24 +1,27 @@
 import { Attributes } from "graphology-types";
+import Sigma from "sigma";
 import { ProgramInfo } from "sigma/rendering";
-import Sigma from "sigma/src";
 import { RenderParams } from "sigma/types";
 import { colorToArray } from "sigma/utils";
 
 import { WebGLLayerDefinition, WebGLLayerProgram, WebGLLayerProgramType } from "../webgl-layer-program";
 import getFragmentShader from "./shader-frag";
-import { ContourLineOptions, DEFAULT_CONTOUR_LINE_OPTIONS } from "./types";
+import { DEFAULT_METABALLS_OPTIONS, MetaballsOptions } from "./types";
 
-export function createContourLineProgram<
+export * from "./types";
+export { default as getMetaballsFragmentShader } from "./shader-frag";
+
+export function createMetaballsProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(nodes: string[], options?: Partial<ContourLineOptions>): WebGLLayerProgramType<N, E, G> {
-  const { radius, zoomToRadiusRatioFunction, threshold, lineWidth, feather, backgroundColor, contourColor } = {
-    ...DEFAULT_CONTOUR_LINE_OPTIONS,
+>(nodes: string[], options?: Partial<MetaballsOptions>): WebGLLayerProgramType<N, E, G> {
+  const { halos, radius, zoomToRadiusRatioFunction } = {
+    ...DEFAULT_METABALLS_OPTIONS,
     ...(options || {}),
   };
 
-  return class ContourLineProgramClass<
+  return class MetaballsProgramClass<
     N extends Attributes = Attributes,
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
@@ -28,7 +31,7 @@ export function createContourLineProgram<
       pickingBuffer: WebGLFramebuffer | null,
       renderer: Sigma<N, E, G>,
     ) {
-      if (!(gl instanceof WebGL2RenderingContext)) throw new Error("createContourLineProgram only works with WebGL2");
+      if (!(gl instanceof WebGL2RenderingContext)) throw new Error("createMetaballsProgram only works with WebGL2");
       super(gl, pickingBuffer, renderer);
     }
 
@@ -36,7 +39,7 @@ export function createContourLineProgram<
       const res = new Float32Array(nodes.length * 2);
       nodes.forEach((n, i) => {
         const nodePosition = this.renderer.getNodeDisplayData(n);
-        if (!nodePosition) throw new Error(`ContourLineProgramClass: Node ${n} not found`);
+        if (!nodePosition) throw new Error(`MetaballsProgramClass: Node ${n} not found`);
 
         res[2 * i] = nodePosition.x;
         res[2 * i + 1] = nodePosition.y;
@@ -46,17 +49,9 @@ export function createContourLineProgram<
 
     getCustomLayerDefinition(): WebGLLayerDefinition {
       return {
-        FRAGMENT_SHADER_SOURCE: getFragmentShader({ nodesCount: nodes.length }),
+        FRAGMENT_SHADER_SOURCE: getFragmentShader({ halos, nodesCount: nodes.length }),
+        DATA_UNIFORMS: ["u_nodesPosition", "u_radius", ...halos.map((_, i) => `u_borderColor_${i + 1}`)],
         CAMERA_UNIFORMS: ["u_invMatrix", "u_width", "u_height", "u_correctionRatio", "u_zoomModifier"],
-        DATA_UNIFORMS: [
-          "u_nodesPosition",
-          "u_radius",
-          "u_threshold",
-          "u_lineWidth",
-          "u_feather",
-          "u_backgroundColor",
-          "u_contourColor",
-        ],
       };
     }
     setCameraUniforms(
@@ -70,19 +65,16 @@ export function createContourLineProgram<
       gl.uniformMatrix3fv(u_invMatrix, false, invMatrix);
     }
     cacheDataUniforms({ gl, uniformLocations }: ProgramInfo) {
-      const { u_radius, u_nodesPosition, u_threshold, u_lineWidth, u_feather, u_backgroundColor, u_contourColor } =
-        uniformLocations;
+      const { u_radius, u_nodesPosition } = uniformLocations;
 
       gl.uniform1f(u_radius, radius);
       gl.uniform2fv(u_nodesPosition, this.getNodesPositionArray());
-      gl.uniform1f(u_threshold, threshold);
-      gl.uniform1f(u_lineWidth, lineWidth);
-      gl.uniform1f(u_feather, feather);
 
-      const [ecR, ecG, ecB, ecA] = colorToArray(backgroundColor);
-      gl.uniform4f(u_backgroundColor, ecR / 255, ecG / 255, ecB / 255, ecA / 255);
-      const [scR, scG, scB, scA] = colorToArray(contourColor);
-      gl.uniform4f(u_contourColor, scR / 255, scG / 255, scB / 255, scA / 255);
+      halos.forEach(({ color }, i) => {
+        const location = uniformLocations[`u_borderColor_${i + 1}`];
+        const [r, g, b, a] = colorToArray(color || "#0000");
+        gl.uniform4f(location, r / 255, g / 255, b / 255, a / 255);
+      });
     }
   };
 }

@@ -1,7 +1,7 @@
 import { Attributes } from "graphology-types";
+import Sigma from "sigma";
 import { Program, ProgramDefinition, type ProgramInfo } from "sigma/rendering";
-import Sigma from "sigma/src";
-import { RenderParams } from "sigma/src/types.ts";
+import { RenderParams } from "sigma/types";
 
 import getVertexShader from "./shader-vert.ts";
 
