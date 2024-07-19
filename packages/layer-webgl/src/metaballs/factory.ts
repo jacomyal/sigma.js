@@ -1,5 +1,6 @@
 import { Attributes } from "graphology-types";
 import { ProgramInfo } from "sigma/rendering";
+import Sigma from "sigma/src";
 import { RenderParams } from "sigma/types";
 import { colorToArray } from "sigma/utils";
 
@@ -22,6 +23,15 @@ export function createMetaballsProgram<
     E extends Attributes = Attributes,
     G extends Attributes = Attributes,
   > extends WebGLLayerProgram<N, E, G> {
+    constructor(
+      gl: WebGLRenderingContext | WebGL2RenderingContext,
+      pickingBuffer: WebGLFramebuffer | null,
+      renderer: Sigma<N, E, G>,
+    ) {
+      if (!(gl instanceof WebGL2RenderingContext)) throw new Error("createMetaballsProgram only works with WebGL2");
+      super(gl, pickingBuffer, renderer);
+    }
+
     private getNodesPositionArray(): Float32Array {
       const res = new Float32Array(nodes.length * 2);
       nodes.forEach((n, i) => {

@@ -1,7 +1,6 @@
 export default function getFragmentShader({ nodesCount }: { nodesCount: number }) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
-#extension GL_OES_standard_derivatives : enable
+  const SHADER = /*glsl*/ `#version 300 es
 #define NODES_COUNT ${nodesCount}
 #define PI 3.141592653589793238
 
@@ -24,6 +23,9 @@ uniform float u_lineWidth;
 uniform float u_feather;
 uniform vec4 u_backgroundColor;
 uniform vec4 u_contourColor;
+
+// Output
+out vec4 fragColor;
 
 // Library:
 float linearstep(float edge0, float edge1, float x) {
@@ -68,7 +70,7 @@ void main() {
 
   // Determine fragment color from the score (and its derivative):
   float t = contour(score, u_threshold, u_lineWidth, u_feather);
-  gl_FragColor = mix(u_backgroundColor, u_contourColor, t);
+  fragColor = mix(u_backgroundColor, u_contourColor, t);
 }
 `;
 

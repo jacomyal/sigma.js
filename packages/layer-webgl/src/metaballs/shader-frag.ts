@@ -10,7 +10,7 @@ export default function getFragmentShader({
   halos: MetaballsOptions["halos"];
 }) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
+  const SHADER = /*glsl*/ `#version 300 es
 #define NODES_COUNT ${nodesCount}
 
 precision highp float;
@@ -28,6 +28,9 @@ uniform float u_zoomModifier;
 
 // Halos uniforms:
 ${halos.map((_, i) => `uniform vec4 u_borderColor_${i + 1};`).join("\n")}
+
+// Output
+out vec4 fragColor;
 
 const vec4 u_borderColor_${halos.length + 1} = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -50,14 +53,14 @@ void main() {
   ${halos
     .map(
       ({ threshold, feather }, i) => `if (score > ${numberToGLSLFloat(threshold)}) {
-    gl_FragColor = u_borderColor_${i + 1};
+    fragColor = u_borderColor_${i + 1};
   } else if (score > ${numberToGLSLFloat(threshold - feather)}) {
     float t = smoothstep(
       ${numberToGLSLFloat(threshold)},
       ${numberToGLSLFloat(threshold - feather)},
       score
     );
-    gl_FragColor = mix(u_borderColor_${i + 1}, u_borderColor_${i + 2}, t);
+    fragColor = mix(u_borderColor_${i + 1}, u_borderColor_${i + 2}, t);
   }`,
     )
     .join(" else ")} else {

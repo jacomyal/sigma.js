@@ -28,7 +28,7 @@ export function createContourLineProgram<
       pickingBuffer: WebGLFramebuffer | null,
       renderer: Sigma<N, E, G>,
     ) {
-      gl.getExtension("OES_standard_derivatives");
+      if (!(gl instanceof WebGL2RenderingContext)) throw new Error("createContourLineProgram only works with WebGL2");
       super(gl, pickingBuffer, renderer);
     }
 
