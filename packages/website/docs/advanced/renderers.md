@@ -72,3 +72,10 @@ Some more programs are also exposed, but as they carry more complexity, they are
 - [**`@sigma/node-border`**](https://www.npmjs.com/package/@sigma/node-border): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing concentric discs.
 - [**`@sigma/node-piechart`**](https://www.npmjs.com/package/@sigma/node-piechart): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing nodes as pie-charts.
 - [**`@sigma/edge-curve`**](https://www.npmjs.com/package/@sigma/edge-curve): This package exposes an edge renderer that draw edges as curves.
+
+## Additional layers
+
+There are also some other packages, that allow rendering additional layers as backgrounds, to display more contextual information.
+
+- [**`@sigma/layer-leaflet`**](https://www.npmjs.com/package/@sigma/layer-leaflet): This package exposes a function to bind a [Leaflet](https://leafletjs.com/) map layer to an existing sigma instance.
+- [**`@sigma/layer-webgl`**](https://www.npmjs.com/package/@sigma/layer-webgl): This package exposes helpers to create WebGL custom layers and bind them to existing sigma instances. It also exposes some base layers, such as [metaballs](https://www.sigmajs.org/storybook/?path=/story/layer-webgl--metaballs) or [contour lines](https://www.sigmajs.org/storybook/?path=/story/layer-webgl--contour-line).
