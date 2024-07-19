@@ -4,3 +4,4 @@ export { default as bindWebGLLayer } from "./bind-webgl-layer.ts";
 
 // Pre-existing custom layers:
 export * from "./metaballs/factory";
+export * from "./contour-line/factory";

@@ -1544,7 +1544,7 @@ export default class Sigma<
     let context;
 
     // First we try webgl2 for an easy performance boost
-    context = canvas.getContext("webgl2", contextOptions);
+    // context = canvas.getContext("webgl2", contextOptions);
 
     // Else we fall back to webgl
     if (!context) context = canvas.getContext("webgl", contextOptions);
