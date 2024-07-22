@@ -7,15 +7,14 @@ This package enables adding custom WebGL layers in [sigma.js](https://sigmajs.or
 
 This package also exports some preexisting layers, that render various shapes:
 
-- `createMetaballsProgram` allows rendering metaballs as a background layer, around a set of given nodes;
-- `createContourLineProgram` allows rendering a contour line as a background layer, around a set of given nodes.
+- `createContoursProgram` allows rendering contour lines as a background layer, around a set of given nodes, with one or multiple levels, and with of without fixed width levels separations.
 
 ## How to use
 
 Within your application that uses sigma.js, you can use [`@sigma/layer-webgl`](https://www.npmjs.com/package/@sigma/layer-webgl) as following:
 
 ```typescript
-import { createMetaballsProgram } from "@sigma/layer-webgl";
+import { createContoursProgram } from "@sigma/layer-webgl";
 
 const graph = new Graph();
 graph.addNode("john", {
@@ -35,7 +34,7 @@ graph.addEdge("jack", "john");
 const renderer = new Sigma(graph, container);
 
 // Bind a custom layer to the renderer:
-bindWebGLLayer("metaballs", renderer, createMetaballsProgram(graph.nodes()));
+bindWebGLLayer("metaballs", renderer, createContoursProgram(graph.nodes()));
 ```
 
 Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/layer-webgl) for more advanced examples.

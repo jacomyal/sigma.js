@@ -1,4 +1,4 @@
-import { bindWebGLLayer, createMetaballsProgram } from "@sigma/layer-webgl";
+import { bindWebGLLayer, createContoursProgram } from "@sigma/layer-webgl";
 import Graph from "graphology";
 import louvain from "graphology-communities-louvain";
 import { parse } from "graphology-gexf/browser";
@@ -47,7 +47,7 @@ export default () => {
           cleanWebGLLayer = bindWebGLLayer(
             "metaball",
             renderer,
-            createMetaballsProgram(graph.filterNodes((_node, attributes) => attributes.community === +community)),
+            createContoursProgram(graph.filterNodes((_node, attributes) => attributes.community === +community)),
           );
         } else {
           cleanWebGLLayer = null;

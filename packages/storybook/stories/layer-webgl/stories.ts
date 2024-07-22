@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 
-import ContourLinePlay from "./contour-line";
-import ContourLineSource from "./contour-line?raw";
+import ContourLinePlay from "./contours-highlight-group";
+import ContourLineSource from "./contours-highlight-group?raw";
+import metaballsPlay from "./contours-metaballs";
+import metaballsSource from "./contours-metaballs?raw";
+import plainContourLinePlay from "./contours-multi-levels";
+import plainContourLineSource from "./contours-multi-levels?raw";
 import template from "./index.html?raw";
-import metaballsPlay from "./metaballs";
-import metaballsSource from "./metaballs?raw";
-import plainContourLinePlay from "./plain-contour-lines";
-import plainContourLineSource from "./plain-contour-lines?raw";
 
 const meta: Meta = {
   id: "layer-webgl",
@@ -29,7 +29,7 @@ export const metaballs: Story = {
 };
 
 export const ContourLine: Story = {
-  name: "Contour lines",
+  name: "Highlight groups of nodes",
   render: () => template,
   play: ContourLinePlay,
   args: {},
@@ -41,7 +41,7 @@ export const ContourLine: Story = {
 };
 
 export const plainContourLine: Story = {
-  name: "Plain contour lines",
+  name: "Multiple levels",
   render: () => template,
   play: plainContourLinePlay,
   args: {},

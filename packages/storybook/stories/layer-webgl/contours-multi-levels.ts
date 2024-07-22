@@ -1,4 +1,4 @@
-import { bindWebGLLayer, createMetaballsProgram } from "@sigma/layer-webgl";
+import { bindWebGLLayer, createContoursProgram } from "@sigma/layer-webgl";
 import Graph from "graphology";
 import Sigma from "sigma";
 
@@ -18,53 +18,49 @@ export default () => {
   bindWebGLLayer(
     "metaball",
     renderer,
-    createMetaballsProgram(graph.nodes(), {
+    createContoursProgram(graph.nodes(), {
       radius: 150,
-      halos: [
+      feather: 1,
+      border: {
+        color: "#000000",
+        thickness: 4,
+      },
+      levels: [
         {
           color: "#fff7f3",
           threshold: 0.9,
-          feather: 0.005,
         },
         {
           color: "#fde0dd",
           threshold: 0.8,
-          feather: 0.005,
         },
         {
           color: "#fcc5c0",
           threshold: 0.7,
-          feather: 0.005,
         },
         {
           color: "#fa9fb5",
           threshold: 0.6,
-          feather: 0.005,
         },
         {
           color: "#f768a1",
           threshold: 0.5,
-          feather: 0.005,
         },
         {
           color: "#dd3497",
           threshold: 0.4,
-          feather: 0.005,
         },
         {
           color: "#ae017e",
           threshold: 0.3,
-          feather: 0.005,
         },
         {
           color: "#7a0177",
           threshold: 0.2,
-          feather: 0.005,
         },
         {
           color: "#49006a",
           threshold: -0.1,
-          feather: 0,
         },
       ],
     }),

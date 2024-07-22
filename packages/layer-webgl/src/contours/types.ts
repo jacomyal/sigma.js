@@ -1,21 +1,25 @@
-export type MetaballsOptions = {
+export type ContoursOptions = {
   radius: number;
+  feather: number;
   zoomToRadiusRatioFunction: (ratio: number) => number;
-  halos: {
+  levels: {
     color?: string;
     threshold: number;
-    feather: number;
   }[];
+  border?: {
+    color: string;
+    thickness: number;
+  };
 };
 
-export const DEFAULT_METABALLS_OPTIONS: MetaballsOptions = {
+export const DEFAULT_CONTOURS_OPTIONS: ContoursOptions = {
   radius: 100,
+  feather: 1.5,
   zoomToRadiusRatioFunction: (ratio) => Math.sqrt(ratio),
-  halos: [
+  levels: [
     {
-      color: "#999999",
+      color: "#cccccc",
       threshold: 0.5,
-      feather: 0.01,
     },
   ],
 };

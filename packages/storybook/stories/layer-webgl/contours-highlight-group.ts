@@ -1,4 +1,4 @@
-import { bindWebGLLayer, createContourLineProgram } from "@sigma/layer-webgl";
+import { bindWebGLLayer, createContoursProgram } from "@sigma/layer-webgl";
 import Graph from "graphology";
 import louvain from "graphology-communities-louvain";
 import iwanthue from "iwanthue";
@@ -59,11 +59,20 @@ export default () => {
         clean = bindWebGLLayer(
           `community-${community}`,
           renderer,
-          createContourLineProgram(
+          createContoursProgram(
             graph.filterNodes((_, attr) => attr.community === community),
             {
               radius: 150,
-              contourColor: palette[community],
+              border: {
+                color: palette[community],
+                thickness: 8,
+              },
+              levels: [
+                {
+                  color: "#00000000",
+                  threshold: 0.5,
+                },
+              ],
             },
           ),
         );
