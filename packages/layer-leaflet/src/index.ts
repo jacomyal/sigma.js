@@ -44,6 +44,9 @@ export default function bindLeafletLayer(
   // `stagePadding: 0` is mandatory, so the bbox of the map & Sigma is the same.
   sigma.setSetting("stagePadding", 0);
 
+  // disable camera rotation (leaflet doesn't handle it)
+  sigma.setSetting("enableCameraRotation", false);
+
   // Function that change the given graph by generating the sigma x,y coords by taking the geo coordinates
   // and project them in the 2D space of the map
   function updateGraphCoordinates(graph: Graph) {
@@ -79,9 +82,10 @@ export default function bindLeafletLayer(
     sigma.off("afterRender", fnSyncLeaflet);
     sigma.off("resize", fnOnResize);
     sigma.setSetting("stagePadding", DEFAULT_SETTINGS.stagePadding);
+    sigma.setSetting("enableCameraRotation", true);
   }
 
-  // WHen the map is ready
+  // When the map is ready
   map.whenReady(() => {
     // Update the sigma graph for geospatial coords
     updateGraphCoordinates(sigma.getGraph());

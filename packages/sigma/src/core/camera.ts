@@ -33,6 +33,7 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   minRatio: number | null = null;
   maxRatio: number | null = null;
+  enabledRotation = true;
 
   private nextFrame: number | null = null;
   private previousState: CameraState | null = null;
@@ -142,7 +143,7 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
     const validatedState: Partial<CameraState> = {};
     if (typeof state.x === "number") validatedState.x = state.x;
     if (typeof state.y === "number") validatedState.y = state.y;
-    if (typeof state.angle === "number") validatedState.angle = state.angle;
+    if (this.enabledRotation && typeof state.angle === "number") validatedState.angle = state.angle;
     if (typeof state.ratio === "number") validatedState.ratio = this.getBoundedRatio(state.ratio);
     return validatedState;
   }
@@ -173,7 +174,7 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
     const validState = this.validateState(state);
     if (typeof validState.x === "number") this.x = validState.x;
     if (typeof validState.y === "number") this.y = validState.y;
-    if (typeof validState.angle === "number") this.angle = validState.angle;
+    if (this.enabledRotation && typeof validState.angle === "number") this.angle = validState.angle;
     if (typeof validState.ratio === "number") this.ratio = validState.ratio;
 
     // Emitting
@@ -239,7 +240,7 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
       if (typeof validState.x === "number") newState.x = initialState.x + (validState.x - initialState.x) * coefficient;
       if (typeof validState.y === "number") newState.y = initialState.y + (validState.y - initialState.y) * coefficient;
-      if (typeof validState.angle === "number")
+      if (this.enabledRotation && typeof validState.angle === "number")
         newState.angle = initialState.angle + (validState.angle - initialState.angle) * coefficient;
       if (typeof validState.ratio === "number")
         newState.ratio = initialState.ratio + (validState.ratio - initialState.ratio) * coefficient;

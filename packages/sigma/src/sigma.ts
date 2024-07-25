@@ -839,6 +839,7 @@ export default class Sigma<
 
     this.camera.minRatio = settings.minCameraRatio;
     this.camera.maxRatio = settings.maxCameraRatio;
+    this.camera.enabledRotation = settings.enableCameraRotation;
     this.camera.setState(this.camera.validateState(this.camera.getState()));
 
     if (oldSettings) {

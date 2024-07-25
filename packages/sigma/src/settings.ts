@@ -73,6 +73,7 @@ export interface Settings<
   zIndex: boolean;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
+  enableCameraRotation: boolean;
 
   // Lifecycle
   allowInvalidContainer: boolean;
@@ -126,6 +127,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   zIndex: false,
   minCameraRatio: null,
   maxCameraRatio: null,
+  enableCameraRotation: true,
 
   // Lifecycle
   allowInvalidContainer: false,
