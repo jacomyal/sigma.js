@@ -65,8 +65,12 @@ export function setSigmaRatioBounds(sigma: Sigma, map: Map): void {
   const worldPixelSize = map.getPixelWorldBounds().getSize();
 
   // Max zoom
-  const maxZoomRatio = worldPixelSize.y / sigma.getDimensions().width;
+  const maxZoomRatio = Math.min(
+    worldPixelSize.x / sigma.getDimensions().height,
+    worldPixelSize.y / sigma.getDimensions().width,
+  );
   sigma.setSetting("maxCameraRatio", maxZoomRatio);
+
   // Min zoom
   const minZoomRatio = worldPixelSize.y / LEAFLET_MAX_PIXEL;
   sigma.setSetting("minCameraRatio", minZoomRatio);
