@@ -1,0 +1,47 @@
+{
+  "name": "@sigma/layer-maplibre",
+  "version": "3.0.0-beta.1",
+  "description": "A plugin to set a geographical map in background",
+  "main": "dist/sigma-layer-maplibre.cjs.js",
+  "module": "dist/sigma-layer-maplibre.esm.js",
+  "types": "dist/sigma-layer-maplibre.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "contributors": [
+    {
+      "name": "Benoît Simard",
+      "url": "http://github.com/sim51"
+    }
+  ],
+  "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "maplibre-gl": "^4.5.0",
+    "sigma": ">=3.0.0-beta.10"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-layer-maplibre.esm.js",
+      "import": "./dist/sigma-layer-maplibre.cjs.mjs",
+      "default": "./dist/sigma-layer-maplibre.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

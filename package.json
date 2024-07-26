@@ -42,7 +42,8 @@
       "packages/node-image",
       "packages/node-piechart",
       "packages/edge-curve",
-      "packages/layer-leaflet"
+      "packages/layer-leaflet",
+      "packages/layer-maplibre"
     ],
     "exports": {
       "importConditionDefaultExport": "default"
