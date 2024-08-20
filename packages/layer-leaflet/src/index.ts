@@ -8,6 +8,11 @@ import { graphToLatlng, latlngToGraph, setSigmaRatioBounds, syncMapWithSigma, sy
 
 /**
  * On the graph, we store the 2D projection of the geographical lat/long.
+ *
+ * @param sigma The sigma instance
+ * @param opts.mapOptions Options that will be provided to the map constructor.
+ * @param opts.tileLayer Tile layer configuration for the map (default is openstreetmap)
+ * @param opts.getNodeLatLng Function to retrieve lat/long values from a node's attributs (default is lat & lng)
  */
 export default function bindLeafletLayer(
   sigma: Sigma,
@@ -75,7 +80,7 @@ export default function bindLeafletLayer(
 
   // Function that sync the map with sigma
   function fnSyncMapWithSigma(firstIteration = false) {
-    syncMapWithSigma(sigma, map, firstIteration, true);
+    syncMapWithSigma(sigma, map, firstIteration);
   }
 
   // Function that sync sigma with map if it's needed

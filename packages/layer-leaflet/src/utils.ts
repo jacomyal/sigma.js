@@ -58,7 +58,7 @@ export function syncSigmaWithMap(sigma: Sigma, map: Map): void {
 /**
  * Synchronise map BBOX with the Sigma one.
  */
-export function syncMapWithSigma(sigma: Sigma, map: Map, firstIteration = false, animate: boolean = false): void {
+export function syncMapWithSigma(sigma: Sigma, map: Map, firstIteration = false): void {
   const viewportDimensions = sigma.getDimensions();
 
   // Graph BBox
@@ -71,8 +71,7 @@ export function syncMapWithSigma(sigma: Sigma, map: Map, firstIteration = false,
 
   // Set map BBox
   const bounds = new LatLngBounds(geoSouthWest, geoNorthEast);
-  const opts = animate ? { animate: true, duration: 0.1 } : { animate: false };
-  map.flyToBounds(bounds, opts);
+  map.flyToBounds(bounds, { animate: false });
 
   if (!firstIteration) {
     // Handle side effects when bounds have some "void" area on top or bottom of the map

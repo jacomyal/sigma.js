@@ -8,6 +8,10 @@ import { graphToLatlng, latlngToGraph, syncMapWithSigma, syncSigmaWithMap } from
 
 /**
  * On the graph, we store the 2D projection of the geographical lat/long.
+ *
+ * @param sigma The sigma instance
+ * @param opts.mapOptions Options that will be provided to map constructor.
+ * @param opts.getNodeLatLng Function to retrieve lat/long values from a node's attributs (default is lat & lng)
  */
 export default function bindMaplibreLayer(
   sigma: Sigma,
