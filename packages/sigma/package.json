@@ -1,6 +1,6 @@
 {
   "name": "sigma",
-  "version": "3.0.0-beta.26",
+  "version": "3.0.0-beta.27",
   "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
   "homepage": "https://www.sigmajs.org",
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
