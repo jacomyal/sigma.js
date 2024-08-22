@@ -71,6 +71,7 @@ Some more programs are also exposed, but as they carry more complexity, they are
 - [**`@sigma/node-image`**](https://www.npmjs.com/package/@sigma/node-image): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but filling the circles with images using a texture atlas.
 - [**`@sigma/node-border`**](https://www.npmjs.com/package/@sigma/node-border): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing concentric discs.
 - [**`@sigma/node-piechart`**](https://www.npmjs.com/package/@sigma/node-piechart): This package exposes a factory to create a program that operates similarly to `NodeCircleProgram`, but drawing nodes as pie-charts.
+- [**`@sigma/node-square`**](https://www.npmjs.com/package/@sigma/node-square): This package exposes a simple program that renders nodes as squares.
 - [**`@sigma/edge-curve`**](https://www.npmjs.com/package/@sigma/edge-curve): This package exposes an edge renderer that draw edges as curves.
 
 ## Additional layers

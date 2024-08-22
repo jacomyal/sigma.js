@@ -1,0 +1,46 @@
+{
+  "name": "@sigma/node-square",
+  "version": "3.0.0-beta.0",
+  "description": "A node program that renders nodes as squares for sigma.js",
+  "main": "dist/sigma-node-square.cjs.js",
+  "module": "dist/sigma-node-square.esm.js",
+  "types": "dist/sigma-node-square.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma"
+  ],
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    }
+  ],
+  "license": "MIT",
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "sigma": ">=3.0.0-beta.17"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-node-square.esm.js",
+      "import": "./dist/sigma-node-square.cjs.mjs",
+      "default": "./dist/sigma-node-square.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
