@@ -16,7 +16,7 @@ jobs:
           node-version: 18
 
       - name: Build sources
-        run: npm i # Build is part of the `prepare` hook that runs as post install
+        run: npm install && npm run build
 
       - name: Uploading files
         uses: svenstaro/upload-release-action@v2
