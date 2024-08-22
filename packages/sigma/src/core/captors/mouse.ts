@@ -238,7 +238,7 @@ export default class MouseCaptor<
     // Only trigger the "mousemove" event when the mouse is actually hovering
     // the container, to avoid weirdly hovering nodes and/or edges when the
     // mouse is not hover the container:
-    if (e.target === this.container) {
+    if (e.target === this.container || e.composedPath()[0] === this.container) {
       this.emit("mousemove", mouseCoords);
     }
 
