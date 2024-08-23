@@ -72,6 +72,9 @@ export default () => {
           },
         });
 
+        // Put the mouse canvas on top, so events can be catched even if the logs container is in front
+        renderer.getCanvases().mouse.style.cssText = "z-index: 100; position: absolute";
+
         const nodeEvents = [
           "enterNode",
           "leaveNode",
