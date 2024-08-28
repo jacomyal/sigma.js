@@ -50,10 +50,11 @@ export function createDrawCurvedEdgeLabel<
     context.font = `${weight} ${size}px ${font}`;
 
     // Computing positions without considering nodes sizes:
-    let sourceX = sourceData.x;
-    let sourceY = sourceData.y;
-    let targetX = targetData.x;
-    let targetY = targetData.y;
+    const ltr = sourceData.x < targetData.x;
+    let sourceX = ltr ? sourceData.x : targetData.x;
+    let sourceY = ltr ? sourceData.y : targetData.y;
+    let targetX = ltr ? targetData.x : sourceData.x;
+    let targetY = ltr ? targetData.y : sourceData.y;
     const centerX = (sourceX + targetX) / 2;
     const centerY = (sourceY + targetY) / 2;
     const diffX = targetX - sourceX;
