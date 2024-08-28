@@ -50,18 +50,20 @@ export function createDrawCurvedEdgeLabel<
     context.font = `${weight} ${size}px ${font}`;
 
     // Computing positions without considering nodes sizes:
-    let sourceX = sourceData.x;
-    let sourceY = sourceData.y;
-    let targetX = targetData.x;
-    let targetY = targetData.y;
+    const ltr = sourceData.x < targetData.x;
+    let sourceX = ltr ? sourceData.x : targetData.x;
+    let sourceY = ltr ? sourceData.y : targetData.y;
+    let targetX = ltr ? targetData.x : sourceData.x;
+    let targetY = ltr ? targetData.y : sourceData.y;
     const centerX = (sourceX + targetX) / 2;
     const centerY = (sourceY + targetY) / 2;
     const diffX = targetX - sourceX;
     const diffY = targetY - sourceY;
     const diff = Math.sqrt(diffX ** 2 + diffY ** 2);
     // Anchor point:
-    let anchorX = centerX + diffY * curvature;
-    let anchorY = centerY - diffX * curvature;
+    const orientation = ltr ? 1 : -1;
+    let anchorX = centerX + diffY * curvature * orientation;
+    let anchorY = centerY - diffX * curvature * orientation;
 
     // Adapt curve points to edge thickness:
     const offset = edgeData.size * 0.7 + 5;
