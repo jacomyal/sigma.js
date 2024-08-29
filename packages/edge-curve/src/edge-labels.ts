@@ -32,7 +32,11 @@ export function createDrawCurvedEdgeLabel<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->({ curvatureAttribute, defaultCurvature }: CreateEdgeCurveProgramOptions): EdgeLabelDrawingFunction<N, E, G> {
+>({
+  curvatureAttribute,
+  defaultCurvature,
+  keepLabelUpright = true,
+}: CreateEdgeCurveProgramOptions & { keepLabelUpright?: boolean }): EdgeLabelDrawingFunction<N, E, G> {
   return (context, edgeData, sourceData, targetData, settings: Settings<N, E, G>): void => {
     const size = settings.edgeLabelSize,
       curvature = edgeData[curvatureAttribute] || defaultCurvature,
@@ -50,7 +54,7 @@ export function createDrawCurvedEdgeLabel<
     context.font = `${weight} ${size}px ${font}`;
 
     // Computing positions without considering nodes sizes:
-    const ltr = sourceData.x < targetData.x;
+    const ltr = !keepLabelUpright || sourceData.x < targetData.x;
     let sourceX = ltr ? sourceData.x : targetData.x;
     let sourceY = ltr ? sourceData.y : targetData.y;
     let targetX = ltr ? targetData.x : sourceData.x;
