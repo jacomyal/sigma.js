@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     lib: {
-      name: "sigma",
+      name: "Sigma",
       entry: "./src/index-bundle.ts",
       fileName: () => "sigma.min.js",
       formats: ["umd"],
