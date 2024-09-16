@@ -13,18 +13,18 @@
     "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.1.1",
-    "@docusaurus/module-type-aliases": "3.1.1",
-    "@docusaurus/preset-classic": "^3.1.1",
-    "@docusaurus/types": "3.1.1",
+    "@docusaurus/core": "^3.5.2",
+    "@docusaurus/module-type-aliases": "^3.5.2",
+    "@docusaurus/preset-classic": "^3.5.2",
+    "@docusaurus/types": "^3.5.2",
     "@mdx-js/react": "^3.0.1",
-    "@tsconfig/docusaurus": "^2.0.2",
+    "@tsconfig/docusaurus": "^2.0.3",
     "docusaurus-plugin-matomo": "^0.0.8",
-    "docusaurus-plugin-typedoc": "^0.22.0",
-    "prism-react-renderer": "^2.3.1",
-    "typedoc": "^0.25.12",
-    "typedoc-plugin-markdown": "^3.17.1",
-    "zero-md": "^2.5.4"
+    "docusaurus-plugin-typedoc": "^1.0.5",
+    "prism-react-renderer": "^2.4.0",
+    "typedoc": "^0.26.7",
+    "typedoc-plugin-markdown": "^4.2.7",
+    "zero-md": "^3.1.4"
   },
   "browserslist": {
     "production": [
