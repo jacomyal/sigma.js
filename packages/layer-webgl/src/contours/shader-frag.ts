@@ -1,6 +1,6 @@
 import { numberToGLSLFloat } from "sigma/rendering";
 
-import { ContoursOptions } from "./types.ts";
+import { ContoursOptions } from "./types";
 
 export default function getFragmentShader({
   nodesCount,

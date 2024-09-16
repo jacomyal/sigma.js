@@ -3,7 +3,7 @@ import Sigma from "sigma";
 import { Program, ProgramDefinition, type ProgramInfo } from "sigma/rendering";
 import { RenderParams } from "sigma/types";
 
-import getVertexShader from "./shader-vert.ts";
+import getVertexShader from "./shader-vert";
 
 const QUAD_VERTICES = [-1, 1, 1, 1, -1, -1, 1, -1];
 
