@@ -19,10 +19,12 @@ function Footer() {
                 <a href="/docs">documentation</a>
               </li>
               <li>
-                <a href="https://twitter.com/sigmajs">twitter.com/sigmajs</a>
+                <a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a>
               </li>
               <li>
-                <a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a>
+                <a rel="me" href="https://vis.social/@sigmajs">
+                  vis.social/@sigmajs (Mastodon)
+                </a>
               </li>
             </ul>
           </div>
