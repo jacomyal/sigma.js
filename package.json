@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "test": "npm run test --workspace=@sigma/test",
     "start": "preconstruct dev && npm run start --workspace=@sigma/storybook",
+    "createPackage": "ts-node bin/create-package.ts",
     "postinstall": "preconstruct dev",
     "postpublish": "preconstruct dev",
     "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
@@ -31,6 +32,7 @@
     "lerna": "^8.1.2",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.2",
     "typescript-eslint": "^7.2.0"
   },

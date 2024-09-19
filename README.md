@@ -64,3 +64,12 @@ This will open the Storybook in your web browser, which live reloads when you mo
 You can contribute by submitting [issues tickets](http://github.com/jacomyal/sigma.js/issues) and proposing [pull requests](http://github.com/jacomyal/sigma.js/pulls). Make sure that tests and linting pass before submitting any pull request.
 
 You can also browse the related documentation [here](https://github.com/jacomyal/sigma.js/tree/main/CONTRIBUTING.md).
+
+## How to start a new package
+
+Run `npm run createPackage` from the project root. It will:
+
+- Ask you the new package name
+- Copy the `packages/template` folder
+- Update the new package `package.json` entries (name, description, exports)
+- Update various other files (buildable packages list in `tsconfig.json`, Preconstruct compatible packages list in `package.json`...)

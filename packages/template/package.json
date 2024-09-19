@@ -1,0 +1,32 @@
+{
+  "name": "@sigma/template",
+  "private": true,
+  "version": "0.0.1-alpha.0",
+  "description": "A template to start a new package in the sigma.js monorepo",
+  "main": "dist/sigma-template.cjs.js",
+  "module": "dist/sigma-template.esm.js",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-template.esm.js",
+      "import": "./dist/sigma-template.cjs.mjs",
+      "default": "./dist/sigma-template.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
