@@ -46,7 +46,8 @@
       "packages/edge-curve",
       "packages/layer-leaflet",
       "packages/layer-maplibre",
-      "packages/layer-webgl"
+      "packages/layer-webgl",
+      "packages/utils"
     ],
     "exports": {
       "importConditionDefaultExport": "default"
