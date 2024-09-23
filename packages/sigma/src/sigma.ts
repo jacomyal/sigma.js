@@ -1467,7 +1467,8 @@ export default class Sigma<
   /**
    * Function used to create a canvas element.
    *
-   * @param  {string} id - Context's id.
+   * @param {string} id - Context's id.
+   * @param options
    * @return {Sigma}
    */
   createCanvas(id: string, options: { beforeLayer?: string } | { afterLayer?: string } = {}): HTMLCanvasElement {
@@ -1990,7 +1991,9 @@ export default class Sigma<
   getViewportZoomedState(viewportTarget: Coordinates, newRatio: number): CameraState {
     const { ratio, angle, x, y } = this.camera.getState();
 
-    // TODO: handle max zoom
+    const { minCameraRatio, maxCameraRatio } = this.settings;
+    if (typeof maxCameraRatio === "number") newRatio = Math.min(newRatio, maxCameraRatio);
+    if (typeof minCameraRatio === "number") newRatio = Math.max(newRatio, minCameraRatio);
     const ratioDiff = newRatio / ratio;
 
     const center = {
@@ -2022,13 +2025,9 @@ export default class Sigma<
     y2: number;
     height: number;
   } {
-    // TODO: reduce relative margin?
-    const marginX = (0 * this.width) / 8,
-      marginY = (0 * this.height) / 8;
-
-    const p1 = this.viewportToFramedGraph({ x: 0 - marginX, y: 0 - marginY }),
-      p2 = this.viewportToFramedGraph({ x: this.width + marginX, y: 0 - marginY }),
-      h = this.viewportToFramedGraph({ x: 0, y: this.height + marginY });
+    const p1 = this.viewportToFramedGraph({ x: 0, y: 0 }),
+      p2 = this.viewportToFramedGraph({ x: this.width, y: 0 }),
+      h = this.viewportToFramedGraph({ x: 0, y: this.height });
 
     return {
       x1: p1.x,
