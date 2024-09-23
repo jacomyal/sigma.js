@@ -1,1 +1,2 @@
-export * from "./fitViewportToNodes.ts";
+export * from "./fitViewportToNodes";
+export * from "./getNodesInViewport";
