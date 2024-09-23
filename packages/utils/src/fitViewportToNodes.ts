@@ -2,10 +2,10 @@ import Sigma from "sigma";
 import type { CameraState } from "sigma/types";
 import { getCorrectionRatio } from "sigma/utils";
 
-export type FitNodesToScreenOptions = {
+export type FitViewportToNodesOptions = {
   animate: boolean;
 };
-export const DEFAULT_FIT_NODES_TO_SCREEN_OPTIONS: FitNodesToScreenOptions = {
+export const DEFAULT_FIT_VIEWPORT_To_NODES_OPTIONS: FitViewportToNodesOptions = {
   animate: true,
 };
 
@@ -15,12 +15,12 @@ export const DEFAULT_FIT_NODES_TO_SCREEN_OPTIONS: FitNodesToScreenOptions = {
  *
  * @param sigma A Sigma instance
  * @param nodes A list of nodes IDs
- * @param opts  An optional and partial FitNodesToScreenOptions object
+ * @param opts  An optional and partial FitViewportToNodesOptions object
  */
-export function getCameraStateToFitNodesToViewport(
+export function getCameraStateToFitViewportToNodes(
   sigma: Sigma,
   nodes: string[],
-  _opts: Partial<Omit<FitNodesToScreenOptions, "animate">> = {},
+  _opts: Partial<Omit<FitViewportToNodesOptions, "animate">> = {},
 ): CameraState {
   let minX = Infinity;
   let maxX = -Infinity;
@@ -39,7 +39,7 @@ export function getCameraStateToFitNodesToViewport(
   const graph = sigma.getGraph();
   graph.forEachNode((node, { x, y }) => {
     const data = sigma.getNodeDisplayData(node);
-    if (!data) throw new Error(`getCameraStateToFitNodesToViewport: Node ${node} not found in sigma's graph.`);
+    if (!data) throw new Error(`getCameraStateToFitViewportToNodes: Node ${node} not found in sigma's graph.`);
     const { x: framedX, y: framedY } = data;
 
     minX = Math.min(minX, x);
@@ -86,16 +86,16 @@ export function getCameraStateToFitNodesToViewport(
  *
  * @param sigma A Sigma instance
  * @param nodes A list of nodes IDs
- * @param opts  An optional and partial FitNodesToScreenOptions object
+ * @param opts  An optional and partial FitViewportToNodesOptions object
  */
-export function fitNodesToViewport(sigma: Sigma, nodes: string[], opts: Partial<FitNodesToScreenOptions> = {}): void {
+export function fitViewportToNodes(sigma: Sigma, nodes: string[], opts: Partial<FitViewportToNodesOptions> = {}): void {
   const { animate } = {
-    ...DEFAULT_FIT_NODES_TO_SCREEN_OPTIONS,
+    ...DEFAULT_FIT_VIEWPORT_To_NODES_OPTIONS,
     ...opts,
   };
 
   const camera = sigma.getCamera();
-  const newCameraState = getCameraStateToFitNodesToViewport(sigma, nodes, opts);
+  const newCameraState = getCameraStateToFitViewportToNodes(sigma, nodes, opts);
   if (animate) {
     camera.animate(newCameraState);
   } else {

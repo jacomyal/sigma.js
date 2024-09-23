@@ -1,4 +1,4 @@
-import { fitNodesToViewport } from "@sigma/utils";
+import { fitViewportToNodes } from "@sigma/utils";
 import Graph from "graphology";
 import louvain from "graphology-communities-louvain";
 import iwanthue from "iwanthue";
@@ -50,7 +50,7 @@ export default () => {
     const button = buttonsContainer.querySelector(`#${id}`) as HTMLButtonElement;
 
     button.addEventListener("click", () => {
-      fitNodesToViewport(
+      fitViewportToNodes(
         renderer,
         graph.filterNodes((_, attr) => attr.community === community),
         { animate: true },

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 
-import FitNodesToViewportPlay from "./fit-nodes-to-viewport";
-import FitNodesToViewportSource from "./fit-nodes-to-viewport?raw";
+import FitViewportToNodesPlay from "./fit-viewport-to-nodes";
+import FitViewportToNodesSource from "./fit-viewport-to-nodes?raw";
 import template from "./index.html?raw";
 
 const meta: Meta = {
@@ -12,14 +12,14 @@ export default meta;
 
 type Story = StoryObj;
 
-export const FitNodesToViewport: Story = {
-  name: "Fit nodes to viewport",
+export const FitViewportToNodes: Story = {
+  name: "Fit viewport to nodes",
   render: () => template,
-  play: FitNodesToViewportPlay,
+  play: FitViewportToNodesPlay,
   args: {},
   parameters: {
     storySource: {
-      source: FitNodesToViewportSource,
+      source: FitViewportToNodesSource,
     },
   },
 };
