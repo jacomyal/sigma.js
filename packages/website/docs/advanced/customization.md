@@ -28,7 +28,7 @@ Labels play a crucial role in making the graph informative. Sigma.js provides se
 
 Beyond these settings, sigma.js allows for more advanced customization of labels and hovered nodes through canvas context manipulation. By overriding the default methods that handle label and node hovering rendering, you can achieve a unique visual style that deviates from the standard sigma.js appearance. This approach is less complex than working directly with WebGL renderers and offers a way to give your application a distinct feel.
 
-For most common cases (ie. straight edges and round nodes), you can directly override the `defaultDrawEdgeLabel`, `defaultDrawNodeLabel` and `defaultDrawNodeHover` settings. When you start having various shapes of nodes and/or edges (square nodes, curved edges...), you need to specify labels and hovered items renderers for each program. Each node program can have optional `drawLabel` and `drawHover` static methods, and each edge program can have an optional `drawLabel` static method.
+For most common cases (ie. straight edges and round nodes), you can directly override the `defaultDrawEdgeLabel`, `defaultDrawNodeLabel` and `defaultDrawNodeHover` settings. When you start having various shapes of nodes and/or edges (square nodes, curved edges...), you need to specify labels and hovered items renderers for each program. Each node program can have optional `drawLabel` and `drawHover` methods, and each edge program can have an optional `drawLabel` method.
 
 For a practical demonstration of this method, check out the website's demo, specifically the [`canvas-utils.ts` section](https://github.com/jacomyal/sigma.js/blob/main/packages/demo/src/canvas-utils.ts).
 

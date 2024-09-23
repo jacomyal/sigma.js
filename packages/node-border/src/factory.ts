@@ -9,16 +9,16 @@ import { CreateNodeBorderProgramOptions, DEFAULT_COLOR, DEFAULT_CREATE_NODE_BORD
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default function getNodeBorderProgram<
+export default function createNodeBorderProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(inputOptions?: Partial<CreateNodeBorderProgramOptions>): NodeProgramType<N, E, G> {
-  const options: CreateNodeBorderProgramOptions = {
-    ...DEFAULT_CREATE_NODE_BORDER_OPTIONS,
+>(inputOptions?: Partial<CreateNodeBorderProgramOptions<N, E, G>>): NodeProgramType<N, E, G> {
+  const options: CreateNodeBorderProgramOptions<N, E, G> = {
+    ...(DEFAULT_CREATE_NODE_BORDER_OPTIONS as CreateNodeBorderProgramOptions<N, E, G>),
     ...(inputOptions || {}),
   };
-  const { borders } = options;
+  const { borders, drawLabel, drawHover } = options;
 
   const UNIFORMS = [
     "u_sizeRatio",
@@ -27,14 +27,12 @@ export default function getNodeBorderProgram<
     ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
   ];
 
-  return class NodeBorderProgram<
-    N extends Attributes = Attributes,
-    E extends Attributes = Attributes,
-    G extends Attributes = Attributes,
-  > extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  return class NodeBorderProgram extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
+    drawLabel = drawLabel;
+    drawHover = drawHover;
 
     getDefinition() {
       return {

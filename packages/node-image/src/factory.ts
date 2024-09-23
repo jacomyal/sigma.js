@@ -16,14 +16,17 @@ import { Atlas, DEFAULT_TEXTURE_MANAGER_OPTIONS, TextureManager, TextureManagerO
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-interface CreateNodeImageProgramOptions<N extends Attributes, E extends Attributes, G extends Attributes>
-  extends TextureManagerOptions {
+interface CreateNodeImageProgramOptions<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> extends TextureManagerOptions {
   // - If "background", color will be used to color full node behind the image.
   // - If "color", color will be used to color image pixels (for pictograms)
   drawingMode: "background" | "color";
   // If true, the images are always cropped to the circle
   keepWithinCircle: boolean;
-  // Allows overriding drawLabel and drawHover returned class static methods.
+  // Allows overriding drawLabel and drawHover returned class methods.
   drawLabel: NodeLabelDrawingFunction<N, E, G> | undefined;
   drawHover: NodeHoverDrawingFunction<N, E, G> | undefined;
   // The padding should be expressed as a [0, 1] percentage.
@@ -62,7 +65,7 @@ const UNIFORMS = [
  * hovered nodes (to prevent some flickering, mostly), this program must be
  * "built" for each sigma instance:
  */
-export default function getNodeImageProgram<
+export default function createNodeImageProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
@@ -85,17 +88,16 @@ export default function getNodeImageProgram<
     imageAttribute,
     ...textureManagerOptions
   }: CreateNodeImageProgramOptions<N, E, G> = {
-    ...DEFAULT_CREATE_NODE_IMAGE_OPTIONS,
+    ...(DEFAULT_CREATE_NODE_IMAGE_OPTIONS as CreateNodeImageProgramOptions<N, E, G>),
     ...{ maxTextureSize: defaultMaxTextureSize },
     ...(options || {}),
-    drawLabel: undefined,
-    drawHover: undefined,
   };
 
   /**
    * This texture manager is shared between all instances of this exact class,
-   * returned by this call to getNodeProgramImage. This means that remounting
-   * the sigma instance will not reload the images and regenerate the texture.
+   * returned by this call to createNodeProgramImage. This means that
+   * remounting the sigma instance will not reload the images and regenerate
+   * the texture.
    */
   const textureManager = new TextureManager(textureManagerOptions);
 
@@ -103,10 +105,10 @@ export default function getNodeImageProgram<
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
+    drawLabel = drawLabel;
+    drawHover = drawHover;
 
     static textureManager = textureManager;
-    static drawLabel = drawLabel;
-    static drawHover = drawHover;
 
     getDefinition() {
       return {

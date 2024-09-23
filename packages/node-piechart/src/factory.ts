@@ -9,16 +9,16 @@ import { CreateNodePiechartProgramOptions, DEFAULT_COLOR, DEFAULT_CREATE_NODE_PI
 
 const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
 
-export default function getNodePiechartProgram<
+export default function createNodePiechartProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(inputOptions: PartialButFor<CreateNodePiechartProgramOptions, "slices">): NodeProgramType<N, E, G> {
-  const options = {
-    ...DEFAULT_CREATE_NODE_PIECHART_OPTIONS,
+>(inputOptions: PartialButFor<CreateNodePiechartProgramOptions<N, E, G>, "slices">): NodeProgramType<N, E, G> {
+  const options: CreateNodePiechartProgramOptions<N, E, G> = {
+    ...(DEFAULT_CREATE_NODE_PIECHART_OPTIONS as Omit<CreateNodePiechartProgramOptions<N, E, G>, "slices">),
     ...inputOptions,
   };
-  const { slices, offset } = options;
+  const { slices, offset, drawHover, drawLabel } = options;
 
   const UNIFORMS = [
     "u_sizeRatio",
@@ -30,14 +30,12 @@ export default function getNodePiechartProgram<
     ...slices.flatMap(({ color }, i) => ("value" in color ? [`u_sliceColor_${i + 1}`] : [])),
   ];
 
-  return class NodeBorderProgram<
-    N extends Attributes = Attributes,
-    E extends Attributes = Attributes,
-    G extends Attributes = Attributes,
-  > extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
+  return class NodeBorderProgram extends NodeProgram<(typeof UNIFORMS)[number], N, E, G> {
     static readonly ANGLE_1 = 0;
     static readonly ANGLE_2 = (2 * Math.PI) / 3;
     static readonly ANGLE_3 = (4 * Math.PI) / 3;
+    drawLabel = drawLabel;
+    drawHover = drawHover;
 
     getDefinition() {
       return {
