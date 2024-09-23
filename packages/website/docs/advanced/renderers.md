@@ -79,4 +79,5 @@ Some more programs are also exposed, but as they carry more complexity, they are
 There are also some other packages, that allow rendering additional layers as backgrounds, to display more contextual information.
 
 - [**`@sigma/layer-leaflet`**](https://www.npmjs.com/package/@sigma/layer-leaflet): This package exposes a function to bind a [Leaflet](https://leafletjs.com/) map layer to an existing sigma instance.
+- [**`@sigma/layer-leaflet`**](https://www.npmjs.com/package/@sigma/layer-maplibre): Similarly, this package exposes a function to bind a [MapLibre](https://maplibre.org/) map layer to an existing sigma instance.
 - [**`@sigma/layer-webgl`**](https://www.npmjs.com/package/@sigma/layer-webgl): This package exposes helpers to create WebGL custom layers and bind them to existing sigma instances. It also exposes some base layers, such as [metaballs](https://www.sigmajs.org/storybook/?path=/story/layer-webgl--metaballs) or [contour lines](https://www.sigmajs.org/storybook/?path=/story/layer-webgl--contour-line).
