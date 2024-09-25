@@ -24,4 +24,4 @@ const sigma = new Sigma(graph, container);
 bindMaplibreLayer(sigma);
 ```
 
-Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/layer-maplibre) for more advanced examples.
+Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/3-additional-packages/layer-maplibre) for more advanced examples.

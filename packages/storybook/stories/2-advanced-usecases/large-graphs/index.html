@@ -1,0 +1,79 @@
+<style>
+  html,
+  body,
+  #storybook-root,
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+  #buttons {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    display: flex;
+  }
+
+  input[type="number"] {
+    width: 5em;
+  }
+  h4 {
+    margin: 0;
+  }
+  fieldset {
+    border: none;
+  }
+  h4,
+  fieldset > div {
+    margin-bottom: 0.2em;
+  }
+  button {
+    margin-right: 1em;
+    display: inline-block;
+    text-align: center;
+    background: white;
+    outline: none;
+    border: 1px solid dimgrey;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+</style>
+<div id="sigma-container"></div>
+<div id="buttons">
+  <form target="_top" action="./">
+    <input type="hidden" name="path" value="/story/large-graphs--story" />
+    <fieldset>
+      <h4>Graph</h4>
+      <div>
+        <input type="number" id="order" name="order" min="2" step="1" value="5000" />
+        <label for="order">Number of nodes</label>
+      </div>
+      <div>
+        <input type="number" id="size" name="size" min="1" step="1" value="10000" />
+        <label for="size">Number of edges</label>
+      </div>
+      <div>
+        <input type="number" id="clusters" name="clusters" min="1" step="1" value="3" />
+        <label for="clusters">Number of clusters</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <h4>Edges renderer</h4>
+      <div>
+        <input type="radio" name="edges-renderer" id="edges-default" value="edges-default" />
+        <label for="edges-default">Default</label>
+      </div>
+      <div>
+        <input type="radio" name="edges-renderer" id="edges-fast" value="edges-fast" checked />
+        <label for="edges-fast">Faster (only 1px thick edges)</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <button type="submit">Reset graph</button>
+      <button type="button" id="fa2">Start layout ▶</button>
+    </fieldset>
+  </form>
+</div>

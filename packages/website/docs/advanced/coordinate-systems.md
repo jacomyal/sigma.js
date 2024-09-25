@@ -21,7 +21,7 @@ Then we normalize this space into a "square" (quotation marks hereafter explaine
 
 But, to complicate this a bit, it is important to understand that the aspect ratio of the original graph space remains inscribed in our normalized "square".
 
-This means either `x` or `y` dimension (the one having the smallest extent) will not be translated to `min = 0` and `max = 1` but will instead have something like `min > 0` and `max {' < '} 1`.
+This means either `x` or `y` dimension (the one having the smallest extent) will not be translated to `min = 0` and `max = 1` but will instead have something like `min > 0` and `max < 1`.
 
 <img alt="framed-graph-space" src="/img/coordinate-systems/framed-graph-space.svg" width="300" />
 

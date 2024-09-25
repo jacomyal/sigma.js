@@ -23,14 +23,14 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^8.0.0",
-    "@storybook/addon-interactions": "^8.0.0",
-    "@storybook/addon-links": "^8.0.0",
-    "@storybook/addon-storysource": "^8.0.0",
-    "@storybook/html": "^8.0.0",
-    "@storybook/html-vite": "^8.0.0",
-    "@storybook/web-components": "^8.0.0",
-    "storybook": "^8.0.0"
+    "@storybook/addon-essentials": "^8.3.3",
+    "@storybook/addon-storysource": "^8.3.3",
+    "@storybook/html": "^8.3.3",
+    "@storybook/html-vite": "^8.3.3",
+    "@storybook/manager-api": "^8.3.3",
+    "@storybook/theming": "^8.3.3",
+    "@storybook/web-components": "^8.3.3",
+    "storybook": "^8.3.3"
   },
   "scripts": {
     "start": "storybook dev -p 6006",

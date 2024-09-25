@@ -15,7 +15,7 @@ It also exports:
 - `EdgeCurvedArrowProgram`, a program with defaults settings adapted to render edges as curved arrows
 - `createEdgeCurveProgram`, the factory to build a `CustomEdgeCurveProgram` with customized settings
 - `DEFAULT_EDGE_CURVATURE`, the default curvature value for edges
-- `indexParallelEdgesIndex`, a utility function to find parallel edges, and help adapt their `curvature` for display (see the [dedicated example](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/edge-curve/parallel-edges.ts) to see how it works)
+- `indexParallelEdgesIndex`, a utility function to find parallel edges, and help adapt their `curvature` for display (see the [dedicated example](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/3-additional-packages/edge-curve/parallel-edges.ts) to see how it works)
 
 ## How to use
 
@@ -36,4 +36,4 @@ const sigma = new Sigma(graph, container, {
 });
 ```
 
-Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/edge-curve) for more advanced examples.
+Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/3-additional-packages/edge-curve) for more advanced examples.

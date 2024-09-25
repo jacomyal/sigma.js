@@ -4,19 +4,14 @@ import { mergeConfig } from "vite";
 
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 const config: StorybookConfig = {
-  stories: ["../stories/**/stories.ts", "../../**/src/**/*.mdx", "../../**/src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+  stories: ["../stories/**/*.mdx", "../stories/**/stories.ts"],
   addons: [
-    getAbsolutePath("@storybook/addon-links"),
-    getAbsolutePath("@storybook/addon-essentials"),
-    getAbsolutePath("@storybook/addon-interactions"),
+    { name: "@storybook/addon-essentials", options: { actions: false, controls: false } },
     getAbsolutePath("@storybook/addon-storysource"),
   ],
   framework: getAbsolutePath("@storybook/html-vite"),
   typescript: {
     check: true,
-  },
-  docs: {
-    autodocs: "tag",
   },
   core: {
     disableTelemetry: true,

@@ -13,7 +13,7 @@ A fundamental way to influence the look of your graph is by specifying sizes and
 
 ### Dynamic appearance with reducers
 
-Reducers offer a dynamic approach to adjust the appearance. They are particularly useful when you want to emphasize specific parts of the graph or highlight the neighborhood of a particular node. For hands-on examples of how to employ reducers for dynamic appearance adjustments, refer to the [`use-reducers`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/use-reducers) and [`events`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/events) examples.
+Reducers offer a dynamic approach to adjust the appearance. They are particularly useful when you want to emphasize specific parts of the graph or highlight the neighborhood of a particular node. For hands-on examples of how to employ reducers for dynamic appearance adjustments, refer to the [`use-reducers`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/4-use-reducers/index.ts) and [`events`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/2-events/index.ts) examples.
 
 ## Labels and hovered nodes
 
@@ -36,4 +36,4 @@ For a practical demonstration of this method, check out the website's demo, spec
 
 For those seeking a deeper level of customization, sigma.js allows the creation of custom renderers. This option is ideal for those who want nodes and edges rendered in non-standard ways, such as nodes with borders or unique shapes.
 
-The [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/custom-rendering) example provides a detailed guide on how to craft bordered nodes, serving as a starting point for those interested in exploring this advanced customization avenue.
+The [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/5-custom-rendering/index.ts) example provides a detailed guide on how to craft bordered nodes, serving as a starting point for those interested in exploring this advanced customization avenue.

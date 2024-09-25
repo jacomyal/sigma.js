@@ -8,4 +8,12 @@ document.body.append(image);
 
 addons.setConfig({
   theme,
+  showToolbar: false,
+  panelPosition: "bottom",
+  bottomPanelHeight: 380,
+  sidebar: {
+    renderLabel(item) {
+      return item.name.replace(/--/g, "/");
+    },
+  },
 });

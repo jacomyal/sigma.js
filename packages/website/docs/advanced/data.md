@@ -17,7 +17,7 @@ Nodes in sigma.js have several recognized attributes that determine their appear
 
 - **`x`, `y`**: These attributes determine the position of the node on the canvas. They are typically set using layout algorithms but can also be manually specified.
 
-- **`type`**: This attribute defines the visual representation of the node, such as `'circle'`, `'square'`, etc. If not specified, the `defaultNodeType` setting will be used instead. The type value must match a key in the `nodeProgramClasses` collection from the settings. Please check the [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/custom-rendering/index.ts) story to see an actual example.
+- **`type`**: This attribute defines the visual representation of the node, such as `'circle'`, `'square'`, etc. If not specified, the `defaultNodeType` setting will be used instead. The type value must match a key in the `nodeProgramClasses` collection from the settings. Please check the [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/5-custom-rendering/index.ts) story to see an actual example.
 
 - **`size`**: Represents the radius of the node. A larger value will render a bigger node.
 
@@ -43,7 +43,7 @@ Edges have their own set of attributes:
 
 - **`label`**: The text displayed near the edge, typically representing its weight or type.
 
-- **`type`**: This attribute defines the visual representation of the edge, such as `'line'`, `'arrow'`, `'curve''`, etc. If not specified, the `defaultEdgeType` setting will be used instead. The type value must match a key in the `edgeProgramClasses` collection from the settings. Please check the [`parallel-edges`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/edge-curve/parallel-edges.ts) story to see an actual example.
+- **`type`**: This attribute defines the visual representation of the edge, such as `'line'`, `'arrow'`, `'curve''`, etc. If not specified, the `defaultEdgeType` setting will be used instead. The type value must match a key in the `edgeProgramClasses` collection from the settings. Please check the [`parallel-edges`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/3-additional-packages/edge-curve/parallel-edges.ts) story to see an actual example.
 
 ### Additional edge attributes
 

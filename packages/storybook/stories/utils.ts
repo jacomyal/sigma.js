@@ -10,3 +10,10 @@ export function onStoryDown(cleanFn: () => void) {
     observer.observe(storyRoot, { childList: true });
   }
 }
+
+export function wrapStory(story: () => void | (() => void)) {
+  return () => {
+    const cleanFn = story();
+    if (cleanFn) onStoryDown(cleanFn);
+  };
+}

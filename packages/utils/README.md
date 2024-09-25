@@ -10,4 +10,4 @@ These functions allow moving a sigma instance's camera so that it fits to a give
 
 This function allows retrieving the list of nodes that are visible (even partially) in the current viewport.
 
-Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/utils) for more advanced examples.
+Please check the related [Storybook](https://github.com/jacomyal/sigma.js/tree/main/packages/storybook/stories/3-additional-packages/utils) for more advanced examples.
