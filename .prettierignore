@@ -2,7 +2,12 @@
 **/build/*
 **/node_modules/*
 
+# Tests
+**/coverage/**
+**/playwright-report/**
+**/text-results/**
+
 # Doc and examples
 **/storybook-static/*
-**/typedoc
-**/.docusaurus
+**/typedoc/**
+**/.docusaurus/**
