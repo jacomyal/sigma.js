@@ -1,7 +1,8 @@
 import { Preview } from "@storybook/html";
 
+let _shouldReload = false;
 const forceReloadDecorator: Preview["decorators"] = (storyFn, context) => {
-  if (context.globals.shouldReload) {
+  if (_shouldReload) {
     // Change search params of the iframe
     const searchParams = new URLSearchParams(window.parent.location.search);
     searchParams.set(
@@ -18,10 +19,13 @@ const forceReloadDecorator: Preview["decorators"] = (storyFn, context) => {
     // The reload is fired, but the story renderer is already started.
     // To avoid blink effect and console error, we return the template inside a full
     // invisible div
-    return `<div style="height:100%;width:100%;visibility:hidden">${storyFn()}</div>`;
+    return `<div style="height:100%;width:100%;">
+      ${storyFn()}
+      <script>document.body.style.visibility = 'hidden';</script>
+    </div>`;
   }
 
-  context.globals.shouldReload = true;
+  _shouldReload = true;
   return storyFn();
 };
 
