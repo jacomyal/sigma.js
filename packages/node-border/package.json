@@ -1,6 +1,6 @@
 {
   "name": "@sigma/node-border",
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "description": "A node program that renders concentric discs in nodes for sigma.js",
   "main": "dist/sigma-node-border.cjs.js",
   "module": "dist/sigma-node-border.esm.js",
