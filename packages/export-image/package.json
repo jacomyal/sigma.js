@@ -1,0 +1,37 @@
+{
+  "name": "@sigma/export-image",
+  "version": "3.0.0-beta.0",
+  "description": "An helper to capture snapshots of sigma.js instances as images",
+  "main": "dist/sigma-export-image.cjs.js",
+  "module": "dist/sigma-export-image.esm.js",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git"
+  },
+  "dependencies": {
+    "file-saver": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7"
+  },
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-export-image.esm.js",
+      "import": "./dist/sigma-export-image.cjs.mjs",
+      "default": "./dist/sigma-export-image.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

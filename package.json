@@ -47,6 +47,7 @@
       "packages/layer-leaflet",
       "packages/layer-maplibre",
       "packages/layer-webgl",
+      "packages/export-image",
       "packages/utils"
     ],
     "exports": {

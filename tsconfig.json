@@ -40,6 +40,9 @@
     },
     {
       "path": "./packages/utils"
+    },
+    {
+      "path": "./packages/export-image"
     }
   ],
   "watchOptions": {
