@@ -13,7 +13,8 @@
   "bugs": "http://github.com/jacomyal/sigma.js/issues",
   "repository": {
     "type": "git",
-    "url": "http://github.com/jacomyal/sigma.js.git"
+    "url": "http://github.com/jacomyal/sigma.js.git",
+    "directory": "packages/edge-curve"
   },
   "keywords": [
     "graph",

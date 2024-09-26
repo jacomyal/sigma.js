@@ -79,6 +79,7 @@ async function createPackage() {
   const packageJson = await readJSONFile<Record<string, unknown>>(packageJsonPath);
   packageJson.name = `@sigma/${packageName}`;
   packageJson.description = "TODO";
+  (packageJson.repository as Record<string, unknown>).directory = `packages/${packageName}`;
   delete packageJson.private;
 
   await writeJSONFile(packageJsonPath, packageJson);
