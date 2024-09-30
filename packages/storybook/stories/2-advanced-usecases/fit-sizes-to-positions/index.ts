@@ -1,28 +1,62 @@
 /**
- * This is a minimal example of sigma. You can use it as a base to write new
- * examples, or reproducible test cases for new issues, for instance.
+ * Sigma has been designed to display any graph in a "readable way" by default:
+ * https://www.sigmajs.org/docs/advanced/coordinate-systems
+ *
+ * This design principle is enforced by three main features:
+ * 1. Graph is rescaled and centered to fit by default in the viewport
+ * 2. Node sizes are interpolated by default to fit in a pixels range,
+ *    independent of the viewport (and not correlated to the nodes positions)
+ * 3. When users scroll into the graph, the node sizes do not scale with the
+ *    zoom ratio, but with its square root instead
+ *
+ * In some cases, it is better to disable these features, to have better
+ * control over the way nodes are displayed on screen.
+ *
+ * This example shows how to disable these three features.
  */
+import { NodeSquareProgram } from "@sigma/node-square";
+import chroma from "chroma-js";
 import Graph from "graphology";
 import Sigma from "sigma";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
 
+  // Let's first build a graph that will look like a perfect grid:
   const graph = new Graph();
+  const colorScale = chroma.scale(["yellow", "navy"]).mode("lch");
+  const GRID_SIZE = 20;
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      const color = colorScale((col + row) / (GRID_SIZE * 2)).hex();
+      graph.addNode(`${row}/${col}`, {
+        x: 20 * col,
+        y: 20 * row,
+        size: 5,
+        color,
+      });
 
-  graph.addNode("Andrea", { x: 0, y: 0, size: 6, label: "Andrea", color: "blue" });
-  graph.addNode("Bill", { x: 10, y: 0, size: 4, label: "Bill", color: "red" });
-  graph.addNode("Carole", { x: 10, y: 10, size: 6, label: "Carole", color: "green" });
-  graph.addNode("Daniel", { x: 0, y: 10, size: 4, label: "Daniel", color: "purple" });
-
-  graph.addEdge("Andrea", "Bill", { size: 12 });
-  graph.addEdge("Bill", "Carole", { size: 12 });
-  graph.addEdge("Carole", "Daniel", { size: 8 });
-  graph.addEdge("Daniel", "Andrea", { size: 8 });
+      if (row >= 1) graph.addEdge(`${row - 1}/${col}`, `${row}/${col}`, { size: 10 });
+      if (col >= 1) graph.addEdge(`${row}/${col - 1}`, `${row}/${col}`, { size: 10 });
+    }
+  }
 
   const renderer = new Sigma(graph, container, {
+    // This flag tells sigma to disable the nodes and edges sizes interpolation
+    // and instead scales them in the same way it handles positions:
     itemSizesReference: "positions",
+    // This function tells sigma to grow sizes linearly with the zoom, instead
+    // of relatively to the zoom ratio's square root:
     zoomToSizeRatioFunction: (x) => x,
+    // This disables the default sigma rescaling, so that by default, positions
+    // and sizes are preserved on screen (in pixels):
+    autoRescale: false,
+    // Finally, let's indicate that we want square nodes, to get a perfect
+    // grid:
+    defaultNodeType: "square",
+    nodeProgramClasses: {
+      square: NodeSquareProgram,
+    },
   });
 
   return () => {

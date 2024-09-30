@@ -52,13 +52,17 @@ export interface Settings<
   edgeLabelWeight: string;
   edgeLabelColor: { attribute: string; color?: string } | { color: string; attribute?: undefined };
   stagePadding: number;
-  zoomToSizeRatioFunction: (ratio: number) => number;
-  itemSizesReference: "screen" | "positions";
   defaultDrawEdgeLabel: EdgeLabelDrawingFunction<N, E, G>;
   defaultDrawNodeLabel: NodeLabelDrawingFunction<N, E, G>;
   defaultDrawNodeHover: NodeHoverDrawingFunction<N, E, G>;
   minEdgeThickness: number;
   antiAliasingFeather: number;
+
+  // Size and scaling
+  zoomToSizeRatioFunction: (ratio: number) => number;
+  itemSizesReference: "screen" | "positions";
+  autoRescale: boolean;
+  autoCenter: boolean;
 
   // Labels
   labelDensity: number;
@@ -106,13 +110,17 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   edgeLabelWeight: "normal",
   edgeLabelColor: { attribute: "color" },
   stagePadding: 30,
-  zoomToSizeRatioFunction: Math.sqrt,
-  itemSizesReference: "screen",
   defaultDrawEdgeLabel: drawStraightEdgeLabel,
   defaultDrawNodeLabel: drawDiscNodeLabel,
   defaultDrawNodeHover: drawDiscNodeHover,
   minEdgeThickness: 1.7,
   antiAliasingFeather: 1,
+
+  // Size and scaling
+  zoomToSizeRatioFunction: Math.sqrt,
+  itemSizesReference: "screen",
+  autoRescale: true,
+  autoCenter: true,
 
   // Labels
   labelDensity: 1,

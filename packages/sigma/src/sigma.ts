@@ -706,6 +706,16 @@ export default class Sigma<
     // NODES
     //
     this.nodeExtent = graphExtent(this.graph);
+    if (!this.settings.autoRescale) {
+      const { width, height } = dimensions;
+      const { x, y } = this.nodeExtent;
+
+      this.nodeExtent = {
+        x: [(x[0] + x[1]) / 2 - width / 2, (x[0] + x[1]) / 2 + width / 2],
+        y: [(y[0] + y[1]) / 2 - height / 2, (y[0] + y[1]) / 2 + height / 2],
+      };
+    }
+
     this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
 
     // NOTE: it is important to compute this matrix after computing the node's extent
@@ -715,7 +725,7 @@ export default class Sigma<
       nullCamera.getState(),
       dimensions,
       this.getGraphDimensions(),
-      this.getSetting("stagePadding") || 0,
+      this.getStagePadding(),
     );
     // Resetting the label grid
     // TODO: it's probably better to do this explicitly or on resizes for layout and anims
@@ -1174,7 +1184,7 @@ export default class Sigma<
     const cameraState = this.camera.getState();
     const viewportDimensions = this.getDimensions();
     const graphDimensions = this.getGraphDimensions();
-    const padding = this.getSetting("stagePadding") || 0;
+    const padding = this.getStagePadding();
     this.matrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding);
     this.invMatrix = matrixFromCamera(cameraState, viewportDimensions, graphDimensions, padding, true);
     this.correctionRatio = getMatrixImpact(this.matrix, cameraState, viewportDimensions);
@@ -1462,6 +1472,16 @@ export default class Sigma<
       minEdgeThickness: this.settings.minEdgeThickness,
       antiAliasingFeather: this.settings.antiAliasingFeather,
     };
+  }
+
+  /**
+   * Function used to retrieve the actual stage padding value.
+   *
+   * @return {number}
+   */
+  getStagePadding(): number {
+    const { stagePadding, autoRescale } = this.settings;
+    return autoRescale ? stagePadding || 0 : 0;
   }
 
   /**
@@ -2054,7 +2074,7 @@ export default class Sigma<
             override.cameraState || this.camera.getState(),
             override.viewportDimensions || this.getDimensions(),
             override.graphDimensions || this.getGraphDimensions(),
-            override.padding || this.getSetting("stagePadding") || 0,
+            override.padding || this.getStagePadding(),
           )
         : this.matrix;
 
@@ -2082,7 +2102,7 @@ export default class Sigma<
             override.cameraState || this.camera.getState(),
             override.viewportDimensions || this.getDimensions(),
             override.graphDimensions || this.getGraphDimensions(),
-            override.padding || this.getSetting("stagePadding") || 0,
+            override.padding || this.getStagePadding(),
             true,
           )
         : this.invMatrix;
