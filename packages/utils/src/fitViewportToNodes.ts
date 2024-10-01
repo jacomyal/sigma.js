@@ -22,10 +22,8 @@ export function getCameraStateToFitViewportToNodes(
   nodes: string[],
   _opts: Partial<Omit<FitViewportToNodesOptions, "animate">> = {},
 ): CameraState {
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minY = Infinity;
-  let maxY = -Infinity;
+  if (!nodes.length) throw new Error("getCameraStateToFitViewportToNodes: There should be at least one node.");
+
   let groupMinX = Infinity;
   let groupMaxX = -Infinity;
   let groupMinY = Infinity;
@@ -35,35 +33,32 @@ export function getCameraStateToFitViewportToNodes(
   let groupFramedMinY = Infinity;
   let groupFramedMaxY = -Infinity;
 
-  const group = new Set(nodes);
   const graph = sigma.getGraph();
-  graph.forEachNode((node, { x, y }) => {
+  nodes.forEach((node) => {
     const data = sigma.getNodeDisplayData(node);
     if (!data) throw new Error(`getCameraStateToFitViewportToNodes: Node ${node} not found in sigma's graph.`);
+
+    const { x, y } = graph.getNodeAttributes(node);
     const { x: framedX, y: framedY } = data;
 
-    minX = Math.min(minX, x);
-    maxX = Math.max(maxX, x);
-    minY = Math.min(minY, y);
-    maxY = Math.max(maxY, y);
-    if (group.has(node)) {
-      groupMinX = Math.min(groupMinX, x);
-      groupMaxX = Math.max(groupMaxX, x);
-      groupMinY = Math.min(groupMinY, y);
-      groupMaxY = Math.max(groupMaxY, y);
-      groupFramedMinX = Math.min(groupFramedMinX, framedX);
-      groupFramedMaxX = Math.max(groupFramedMaxX, framedX);
-      groupFramedMinY = Math.min(groupFramedMinY, framedY);
-      groupFramedMaxY = Math.max(groupFramedMaxY, framedY);
-    }
+    groupMinX = Math.min(groupMinX, x);
+    groupMaxX = Math.max(groupMaxX, x);
+    groupMinY = Math.min(groupMinY, y);
+    groupMaxY = Math.max(groupMaxY, y);
+    groupFramedMinX = Math.min(groupFramedMinX, framedX);
+    groupFramedMaxX = Math.max(groupFramedMaxX, framedX);
+    groupFramedMinY = Math.min(groupFramedMinY, framedY);
+    groupFramedMaxY = Math.max(groupFramedMaxY, framedY);
   });
+
+  const { x, y } = sigma.getCustomBBox() || sigma.getBBox();
+  const graphWidth = x[1] - x[0];
+  const graphHeight = y[1] - y[0];
 
   const groupCenterX = (groupFramedMinX + groupFramedMaxX) / 2;
   const groupCenterY = (groupFramedMinY + groupFramedMaxY) / 2;
-  const groupWidth = groupMaxX - groupMinX || 1;
-  const groupHeight = groupMaxY - groupMinY || 1;
-  const graphWidth = maxX - minX || 1;
-  const graphHeight = maxY - minY || 1;
+  const groupWidth = groupMaxX - groupMinX || graphWidth;
+  const groupHeight = groupMaxY - groupMinY || graphHeight;
 
   const { width, height } = sigma.getDimensions();
   const correction = getCorrectionRatio({ width, height }, { width: graphWidth, height: graphHeight });
@@ -74,6 +69,7 @@ export function getCameraStateToFitViewportToNodes(
   const camera = sigma.getCamera();
   return {
     ...camera.getState(),
+    angle: 0,
     x: groupCenterX,
     y: groupCenterY,
     ratio,
