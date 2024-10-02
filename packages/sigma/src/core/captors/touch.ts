@@ -7,13 +7,19 @@
  */
 import { Attributes } from "graphology-types";
 
+import { DEFAULT_SETTINGS, Settings } from "../../settings";
 import Sigma from "../../sigma";
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 
-const DRAG_TIMEOUT = 200;
-const TOUCH_INERTIA_RATIO = 3;
-const TOUCH_INERTIA_DURATION = 200;
+export const TOUCH_SETTINGS_KEYS = ["dragTimeout", "inertiaDuration", "inertiaRatio"] as const;
+
+export type TouchSettingKey = (typeof TOUCH_SETTINGS_KEYS)[number];
+export type TouchSettings = Pick<Settings, TouchSettingKey>;
+export const DEFAULT_TOUCH_SETTINGS = TOUCH_SETTINGS_KEYS.reduce(
+  (iter, key) => ({ ...iter, [key]: DEFAULT_SETTINGS[key] }),
+  {},
+) as TouchSettings;
 
 export type FakeSigmaMouseEvent = MouseEvent & { isFakeSigmaMouseEvent?: true };
 
@@ -48,6 +54,8 @@ export default class TouchCaptor<
   startTouchesPositions: Coordinates[] = [];
   lastTouchesPositions?: Coordinates[];
   lastTouches?: Touch[];
+
+  settings: TouchSettings = DEFAULT_TOUCH_SETTINGS;
 
   constructor(container: HTMLElement, renderer: Sigma<N, E, G>) {
     super(container, renderer);
@@ -161,11 +169,11 @@ export default class TouchCaptor<
 
           camera.animate(
             {
-              x: cameraState.x + TOUCH_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
-              y: cameraState.y + TOUCH_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
+              x: cameraState.x + this.settings.inertiaRatio * (cameraState.x - previousCameraState.x),
+              y: cameraState.y + this.settings.inertiaRatio * (cameraState.y - previousCameraState.y),
             },
             {
-              duration: TOUCH_INERTIA_DURATION,
+              duration: this.settings.inertiaDuration,
               easing: "quadraticOut",
             },
           );
@@ -216,7 +224,7 @@ export default class TouchCaptor<
 
     this.movingTimeout = window.setTimeout(() => {
       this.isMoving = false;
-    }, DRAG_TIMEOUT);
+    }, this.settings.dragTimeout);
 
     const camera = this.renderer.getCamera();
     const startCameraState = this.startCameraState as CameraState;
@@ -290,5 +298,9 @@ export default class TouchCaptor<
     }
 
     this.emit("touchmove", getTouchCoords(e, this.container));
+  }
+
+  setSettings(settings: TouchSettings): void {
+    this.settings = settings;
   }
 }

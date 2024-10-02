@@ -235,7 +235,9 @@ export default class Sigma<
 
     // Initializing captors
     this.mouseCaptor = new MouseCaptor(this.elements.mouse, this);
+    this.mouseCaptor.setSettings(this.settings);
     this.touchCaptor = new TouchCaptor(this.elements.mouse, this);
+    this.touchCaptor.setSettings(this.settings);
 
     // Binding event handlers
     this.bindEventHandlers();
@@ -883,6 +885,10 @@ export default class Sigma<
         }
       }
     }
+
+    // Update captors settings:
+    this.mouseCaptor.setSettings(this.settings);
+    this.touchCaptor.setSettings(this.settings);
 
     return this;
   }
@@ -1781,7 +1787,7 @@ export default class Sigma<
    * @param  {string} key - The setting key to get.
    * @return {any} The value attached to this setting key or undefined if not found
    */
-  getSetting<K extends keyof Settings<N, E, G>>(key: K): Settings<N, E, G>[K] | undefined {
+  getSetting<K extends keyof Settings<N, E, G>>(key: K): Settings<N, E, G>[K] {
     return this.settings[key];
   }
 

@@ -58,6 +58,17 @@ export interface Settings<
   minEdgeThickness: number;
   antiAliasingFeather: number;
 
+  // Mouse and touch settings
+  dragTimeout: number;
+  draggedEventsTolerance: number;
+  inertiaDuration: number;
+  inertiaRatio: number;
+  zoomDuration: number;
+  zoomingRatio: number;
+  doubleClickTimeout: number;
+  doubleClickZoomingRatio: number;
+  doubleClickZoomingDuration: number;
+
   // Size and scaling
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
@@ -115,6 +126,17 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   defaultDrawNodeHover: drawDiscNodeHover,
   minEdgeThickness: 1.7,
   antiAliasingFeather: 1,
+
+  // Mouse and touch settings
+  dragTimeout: 100,
+  draggedEventsTolerance: 3,
+  inertiaDuration: 200,
+  inertiaRatio: 3,
+  zoomDuration: 250,
+  zoomingRatio: 1.7,
+  doubleClickTimeout: 300,
+  doubleClickZoomingRatio: 2.2,
+  doubleClickZoomingDuration: 200,
 
   // Size and scaling
   zoomToSizeRatioFunction: Math.sqrt,

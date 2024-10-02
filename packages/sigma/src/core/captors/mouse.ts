@@ -7,22 +7,29 @@
  */
 import { Attributes } from "graphology-types";
 
+import { DEFAULT_SETTINGS, Settings } from "../../settings";
 import Sigma from "../../sigma";
 import { CameraState, MouseCoords, WheelCoords } from "../../types";
 import Captor, { getMouseCoords, getPosition, getWheelCoords, getWheelDelta } from "./captor";
 
-/**
- * Constants.
- */
-const DRAG_TIMEOUT = 100;
-const DRAGGED_EVENTS_TOLERANCE = 3;
-const MOUSE_INERTIA_DURATION = 200;
-const MOUSE_INERTIA_RATIO = 3;
-const MOUSE_ZOOM_DURATION = 250;
-const ZOOMING_RATIO = 1.7;
-const DOUBLE_CLICK_TIMEOUT = 300;
-const DOUBLE_CLICK_ZOOMING_RATIO = 2.2;
-const DOUBLE_CLICK_ZOOMING_DURATION = 200;
+export const MOUSE_SETTINGS_KEYS = [
+  "doubleClickTimeout",
+  "doubleClickZoomingDuration",
+  "doubleClickZoomingRatio",
+  "dragTimeout",
+  "draggedEventsTolerance",
+  "inertiaDuration",
+  "inertiaRatio",
+  "zoomDuration",
+  "zoomingRatio",
+] as const;
+
+export type MouseSettingKey = (typeof MOUSE_SETTINGS_KEYS)[number];
+export type MouseSettings = Pick<Settings, MouseSettingKey>;
+export const DEFAULT_MOUSE_SETTINGS = MOUSE_SETTINGS_KEYS.reduce(
+  (iter, key) => ({ ...iter, [key]: DEFAULT_SETTINGS[key] }),
+  {},
+) as MouseSettings;
 
 /**
  * Event types.
@@ -65,6 +72,8 @@ export default class MouseCaptor<
 
   currentWheelDirection: -1 | 0 | 1 = 0;
   lastWheelTriggerTime?: number;
+
+  settings: MouseSettings = DEFAULT_MOUSE_SETTINGS;
 
   constructor(container: HTMLElement, renderer: Sigma<N, E, G>) {
     super(container, renderer);
@@ -122,10 +131,11 @@ export default class MouseCaptor<
     setTimeout(() => {
       this.clicks = 0;
       this.doubleClickTimeout = null;
-    }, DOUBLE_CLICK_TIMEOUT);
+    }, this.settings.doubleClickTimeout);
 
     // NOTE: this is here to prevent click events on drag
-    if (this.draggedEvents < DRAGGED_EVENTS_TOLERANCE) this.emit("click", getMouseCoords(e, this.container));
+    if (this.draggedEvents < this.settings.draggedEventsTolerance)
+      this.emit("click", getMouseCoords(e, this.container));
   }
 
   handleRightClick(e: MouseEvent): void {
@@ -147,11 +157,11 @@ export default class MouseCaptor<
 
     // default behavior
     const camera = this.renderer.getCamera();
-    const newRatio = camera.getBoundedRatio(camera.getState().ratio / DOUBLE_CLICK_ZOOMING_RATIO);
+    const newRatio = camera.getBoundedRatio(camera.getState().ratio / this.settings.doubleClickZoomingRatio);
 
     camera.animate(this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio), {
       easing: "quadraticInOut",
-      duration: DOUBLE_CLICK_ZOOMING_DURATION,
+      duration: this.settings.doubleClickZoomingDuration,
     });
   }
 
@@ -194,11 +204,11 @@ export default class MouseCaptor<
     if (this.isMoving) {
       camera.animate(
         {
-          x: cameraState.x + MOUSE_INERTIA_RATIO * (cameraState.x - previousCameraState.x),
-          y: cameraState.y + MOUSE_INERTIA_RATIO * (cameraState.y - previousCameraState.y),
+          x: cameraState.x + this.settings.inertiaRatio * (cameraState.x - previousCameraState.x),
+          y: cameraState.y + this.settings.inertiaRatio * (cameraState.y - previousCameraState.y),
         },
         {
-          duration: MOUSE_INERTIA_DURATION,
+          duration: this.settings.inertiaDuration,
           easing: "quadraticOut",
         },
       );
@@ -257,7 +267,7 @@ export default class MouseCaptor<
       this.movingTimeout = window.setTimeout(() => {
         this.movingTimeout = null;
         this.isMoving = false;
-      }, DRAG_TIMEOUT);
+      }, this.settings.dragTimeout);
 
       const camera = this.renderer.getCamera();
 
@@ -312,7 +322,7 @@ export default class MouseCaptor<
     if (wheelCoords.sigmaDefaultPrevented) return;
 
     // Default behavior
-    const ratioDiff = delta > 0 ? 1 / ZOOMING_RATIO : ZOOMING_RATIO;
+    const ratioDiff = delta > 0 ? 1 / this.settings.zoomingRatio : this.settings.zoomingRatio;
     const camera = this.renderer.getCamera();
     const newRatio = camera.getBoundedRatio(camera.getState().ratio * ratioDiff);
     const wheelDirection = delta > 0 ? 1 : -1;
@@ -322,7 +332,7 @@ export default class MouseCaptor<
     if (
       this.currentWheelDirection === wheelDirection &&
       this.lastWheelTriggerTime &&
-      now - this.lastWheelTriggerTime < MOUSE_ZOOM_DURATION / 5
+      now - this.lastWheelTriggerTime < this.settings.zoomDuration / 5
     ) {
       return;
     }
@@ -331,7 +341,7 @@ export default class MouseCaptor<
       this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio),
       {
         easing: "quadraticOut",
-        duration: MOUSE_ZOOM_DURATION,
+        duration: this.settings.zoomDuration,
       },
       () => {
         this.currentWheelDirection = 0;
@@ -340,5 +350,9 @@ export default class MouseCaptor<
 
     this.currentWheelDirection = wheelDirection;
     this.lastWheelTriggerTime = now;
+  }
+
+  setSettings(settings: MouseSettings): void {
+    this.settings = settings;
   }
 }
