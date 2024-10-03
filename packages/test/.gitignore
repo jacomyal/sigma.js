@@ -1,3 +1,4 @@
 coverage
 playwright-report
 test-results
+**/__screenshots__
