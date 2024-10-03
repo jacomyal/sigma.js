@@ -1,6 +1,6 @@
 {
   "name": "@sigma/utils",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0-beta.5",
   "description": "A set of utils functions to ease the use of sigma.js",
   "main": "dist/sigma-utils.cjs.js",
   "module": "dist/sigma-utils.esm.js",
