@@ -5,7 +5,7 @@ import { getCorrectionRatio } from "sigma/utils";
 export type FitViewportToNodesOptions = {
   animate: boolean;
 };
-export const DEFAULT_FIT_VIEWPORT_To_NODES_OPTIONS: FitViewportToNodesOptions = {
+export const DEFAULT_FIT_VIEWPORT_TO_NODES_OPTIONS: FitViewportToNodesOptions = {
   animate: true,
 };
 
@@ -52,8 +52,8 @@ export function getCameraStateToFitViewportToNodes(
   });
 
   const { x, y } = sigma.getCustomBBox() || sigma.getBBox();
-  const graphWidth = x[1] - x[0];
-  const graphHeight = y[1] - y[0];
+  const graphWidth = x[1] - x[0] || 1;
+  const graphHeight = y[1] - y[0] || 1;
 
   const groupCenterX = (groupFramedMinX + groupFramedMaxX) / 2;
   const groupCenterY = (groupFramedMinY + groupFramedMaxY) / 2;
@@ -86,7 +86,7 @@ export function getCameraStateToFitViewportToNodes(
  */
 export function fitViewportToNodes(sigma: Sigma, nodes: string[], opts: Partial<FitViewportToNodesOptions> = {}): void {
   const { animate } = {
-    ...DEFAULT_FIT_VIEWPORT_To_NODES_OPTIONS,
+    ...DEFAULT_FIT_VIEWPORT_TO_NODES_OPTIONS,
     ...opts,
   };
 

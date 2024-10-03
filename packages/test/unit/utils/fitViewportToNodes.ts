@@ -2,6 +2,7 @@ import { getCameraStateToFitViewportToNodes } from "@sigma/utils";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
+import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
@@ -97,6 +98,44 @@ describe("@sigma/utils", () => {
         ratio: 1,
         angle: 0,
       });
+    });
+
+    test<SigmaTestContext>("it should put a single node to the center of the viewport when called with only one node", ({
+      sigma,
+    }) => {
+      const camera = sigma.getCamera();
+      const graph = sigma.getGraph();
+      const node = "n4";
+
+      const newCameraState = getCameraStateToFitViewportToNodes(sigma, [node]);
+      camera.setState(newCameraState);
+      sigma.refresh();
+
+      const nodeViewportPosition = sigma.graphToViewport(graph.getNodeAttributes(node) as Coordinates);
+      expect(nodeViewportPosition).toEqual({ x: 50, y: 50 });
+    });
+
+    test<SigmaTestContext>("it should work when the graph has only one node (regression #1473)", ({ sigma }) => {
+      const camera = sigma.getCamera();
+      const graph = sigma.getGraph();
+      const node = "n4";
+      graph.dropNode("n1");
+      graph.dropNode("n2");
+      graph.dropNode("n3");
+      sigma.refresh();
+
+      const newCameraState = getCameraStateToFitViewportToNodes(sigma, [node]);
+      camera.setState(newCameraState);
+      sigma.refresh();
+
+      const nodeViewportPosition = sigma.graphToViewport(graph.getNodeAttributes(node) as Coordinates);
+      expect(camera.getState()).toEqual({
+        x: 0.5,
+        y: 0.5,
+        ratio: 1,
+        angle: 0,
+      });
+      expect(nodeViewportPosition).toEqual({ x: 50, y: 50 });
     });
   });
 });
