@@ -22,8 +22,6 @@ export type CameraEvents = {
 
 /**
  * Camera class
- *
- * @constructor
  */
 export default class Camera extends TypedEventEmitter<CameraEvents> implements CameraState {
   x = 0.5;
@@ -50,9 +48,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Static method used to create a Camera object with a given state.
-   *
-   * @param state
-   * @return {Camera}
    */
   static from(state: CameraState): Camera {
     const camera = new Camera();
@@ -61,8 +56,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to enable the camera.
-   *
-   * @return {Camera}
    */
   enable(): this {
     this.enabled = true;
@@ -71,8 +64,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to disable the camera.
-   *
-   * @return {Camera}
    */
   disable(): this {
     this.enabled = false;
@@ -81,8 +72,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to retrieve the camera's current state.
-   *
-   * @return {object}
    */
   getState(): CameraState {
     return {
@@ -95,8 +84,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to check whether the camera has the given state.
-   *
-   * @return {object}
    */
   hasState(state: CameraState): boolean {
     return this.x === state.x && this.y === state.y && this.ratio === state.ratio && this.angle === state.angle;
@@ -104,8 +91,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to retrieve the camera's previous state.
-   *
-   * @return {object}
    */
   getPreviousState(): CameraState | null {
     const state = this.previousState;
@@ -122,9 +107,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to check minRatio and maxRatio values.
-   *
-   * @param ratio
-   * @return {number}
    */
   getBoundedRatio(ratio: number): number {
     let r = ratio;
@@ -135,9 +117,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to check various things to return a legit state candidate.
-   *
-   * @param state
-   * @return {object}
    */
   validateState(state: Partial<CameraState>): Partial<CameraState> {
     const validatedState: Partial<CameraState> = {};
@@ -150,8 +129,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to check whether the camera is currently being animated.
-   *
-   * @return {boolean}
    */
   isAnimated(): boolean {
     return !!this.nextFrame;
@@ -159,14 +136,9 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to set the camera's state.
-   *
-   * @param  {object} state - New state.
-   * @return {Camera}
    */
   setState(state: Partial<CameraState>): this {
     if (!this.enabled) return this;
-
-    // TODO: update by function
 
     // Keeping track of last state
     this.previousState = this.getState();
@@ -185,10 +157,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to update the camera's state using a function.
-   *
-   * @param  {function} updater - Updated function taking current state and
-   *                              returning next state.
-   * @return {Camera}
    */
   updateState(updater: (state: CameraState) => Partial<CameraState>): this {
     this.setState(updater(this.getState()));
@@ -197,17 +165,22 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Method used to animate the camera.
-   *
-   * @param  {object}                    state      - State to reach eventually.
-   * @param  {object}                    opts       - Options:
-   * @param  {number}                      duration - Duration of the animation.
-   * @param  {string | number => number}   easing   - Easing function or name of an existing one
-   * @param  {function}                  callback   - Callback
    */
-  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>, callback?: () => void): void {
+  animate(state: Partial<CameraState>, opts: Partial<AnimateOptions>, callback: () => void): void;
+  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>): Promise<void>;
+  animate(
+    state: Partial<CameraState>,
+    opts: Partial<AnimateOptions> = {},
+    callback?: () => void,
+  ): void | Promise<void> {
+    if (!callback) return new Promise((resolve) => this.animate(state, opts, resolve));
+
     if (!this.enabled) return;
 
-    const options: AnimateOptions = Object.assign({}, ANIMATE_DEFAULTS, opts);
+    const options: AnimateOptions = {
+      ...ANIMATE_DEFAULTS,
+      ...opts,
+    };
     const validState = this.validateState(state);
 
     const easing: (k: number) => number =
@@ -257,57 +230,47 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
     } else {
       fn();
     }
+
     this.animationCallback = callback;
   }
 
   /**
    * Method used to zoom the camera.
-   *
-   * @param  {number|object} factorOrOptions - Factor or options.
-   * @return {function}
    */
-  animatedZoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): void {
-    if (!factorOrOptions) {
-      this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
-    } else {
-      if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio / factorOrOptions });
-      else
-        this.animate(
-          {
-            ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
-          },
-          factorOrOptions,
-        );
-    }
+  animatedZoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): Promise<void> {
+    if (!factorOrOptions) return this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
+
+    if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio / factorOrOptions });
+
+    return this.animate(
+      {
+        ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
+      },
+      factorOrOptions,
+    );
   }
 
   /**
    * Method used to unzoom the camera.
-   *
-   * @param  {number|object} factorOrOptions - Factor or options.
    */
-  animatedUnzoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): void {
-    if (!factorOrOptions) {
-      this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
-    } else {
-      if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio * factorOrOptions });
-      else
-        this.animate(
-          {
-            ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
-          },
-          factorOrOptions,
-        );
-    }
+  animatedUnzoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): Promise<void> {
+    if (!factorOrOptions) return this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
+
+    if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio * factorOrOptions });
+
+    return this.animate(
+      {
+        ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
+      },
+      factorOrOptions,
+    );
   }
 
   /**
    * Method used to reset the camera.
-   *
-   * @param  {object} options - Options.
    */
-  animatedReset(options?: Partial<AnimateOptions>): void {
-    this.animate(
+  animatedReset(options?: Partial<AnimateOptions>): Promise<void> {
+    return this.animate(
       {
         x: 0.5,
         y: 0.5,
@@ -320,8 +283,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   /**
    * Returns a new Camera instance, with the same state as the current camera.
-   *
-   * @return {Camera}
    */
   copy(): Camera {
     return Camera.from(this.getState());

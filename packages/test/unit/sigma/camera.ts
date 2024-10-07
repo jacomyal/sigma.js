@@ -1,6 +1,10 @@
 import { Camera } from "sigma";
 import { describe, expect, test } from "vitest";
 
+function wait(timeout: number): Promise<void> {
+  return new Promise<void>((resolve) => setTimeout(resolve, timeout));
+}
+
 describe("Camera", function () {
   test("it should be possible to read the camera's state.", function () {
     const camera = new Camera();
@@ -158,16 +162,26 @@ describe("Camera", function () {
     expect(camera.getState()).toEqual(state1);
   });
 
-  test("it should trigger the animation callback when starting a new animation (regression #1107).", function () {
-    let flag = false;
-
+  test("it should check for ratio extrema (feature #1161).", function () {
     const camera = new Camera();
-    camera.animate({}, { duration: 500 }, () => {
-      flag = true;
-    });
-    camera.animate({});
 
-    expect(flag).toEqual(true);
+    camera.minRatio = null;
+    camera.maxRatio = 10;
+    camera.setState({ ratio: 20 });
+    expect(camera.ratio).toEqual(10);
+
+    camera.minRatio = 0.1;
+    camera.maxRatio = null;
+    camera.setState({ ratio: 0.05 });
+    expect(camera.ratio).toEqual(0.1);
+
+    // Also check weird values (expect maxRatio to "win" that):
+    camera.minRatio = 10;
+    camera.maxRatio = 0.1;
+    camera.setState({ ratio: 0.05 });
+    expect(camera.ratio).toEqual(0.1);
+    camera.setState({ ratio: 20 });
+    expect(camera.ratio).toEqual(0.1);
   });
 
   test("it should check for ratio extrema (feature #1161).", function () {
@@ -190,5 +204,80 @@ describe("Camera", function () {
     expect(camera.ratio).toEqual(0.1);
     camera.setState({ ratio: 20 });
     expect(camera.ratio).toEqual(0.1);
+  });
+
+  describe("Animations", () => {
+    test("it should trigger the animation callback when starting a new animation (regression #1107).", function () {
+      let flag = false;
+
+      const camera = new Camera();
+      camera.animate({}, { duration: 500 }, () => {
+        flag = true;
+      });
+      camera.animate({});
+
+      expect(flag).toEqual(true);
+    });
+
+    test("it should return promises that resolve when animation ends, when called without callback.", async function () {
+      const camera = new Camera();
+      const targetState = {
+        x: 1,
+        y: 0,
+        ratio: 0.1,
+        angle: Math.PI,
+      };
+      const duration = 50;
+      const t0 = Date.now();
+      await camera.animate(targetState, { duration });
+      const t1 = Date.now();
+
+      expect(Math.abs(t1 - t0 - duration)).toBeLessThan(duration / 2);
+      expect(camera.getState()).toEqual(targetState);
+    });
+
+    test("it should resolve promises when animation is interrupted by a new animation (using #animate).", async function () {
+      const camera = new Camera();
+      const targetState1 = { ...camera.getState(), x: 1 };
+      const targetState2 = { ...camera.getState(), x: 2 };
+      const duration = 50;
+      const delay = 10;
+
+      const t0 = Date.now();
+      await Promise.all([
+        camera.animate(targetState1, { duration }),
+        (async () => {
+          await wait(10);
+          await camera.animate(targetState2, { duration: 0 });
+        })(),
+      ]);
+      const t1 = Date.now();
+
+      expect(camera.getState()).toEqual(targetState2);
+      // Time measures are very rough at this scale, we just want to check that t1 - t0 (the actual spent time)
+      // is basically closer to delay than to duration:
+      expect(Math.abs(t1 - t0 - delay)).toBeLessThan(delay);
+    });
+
+    test("it should resolve promises when animation is interrupted by a new animation (using the shortcut methods).", async function () {
+      const camera = new Camera();
+      const duration = 50;
+      const delay = 10;
+
+      const t0 = Date.now();
+      await Promise.all([
+        camera.animatedZoom({ duration }),
+        (async () => {
+          await wait(10);
+          await camera.animatedReset({ duration: 0 });
+        })(),
+      ]);
+      const t1 = Date.now();
+
+      expect(camera.ratio).toEqual(1);
+      // Time measures are very rough at this scale, we just want to check that t1 - t0 (the actual spent time)
+      // is basically closer to delay than to duration:
+      expect(Math.abs(t1 - t0 - delay)).toBeLessThan(delay);
+    });
   });
 });
