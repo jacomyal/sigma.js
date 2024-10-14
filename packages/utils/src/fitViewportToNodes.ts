@@ -84,7 +84,11 @@ export function getCameraStateToFitViewportToNodes(
  * @param nodes A list of nodes IDs
  * @param opts  An optional and partial FitViewportToNodesOptions object
  */
-export function fitViewportToNodes(sigma: Sigma, nodes: string[], opts: Partial<FitViewportToNodesOptions> = {}): void {
+export async function fitViewportToNodes(
+  sigma: Sigma,
+  nodes: string[],
+  opts: Partial<FitViewportToNodesOptions> = {},
+): Promise<void> {
   const { animate } = {
     ...DEFAULT_FIT_VIEWPORT_TO_NODES_OPTIONS,
     ...opts,
@@ -93,7 +97,7 @@ export function fitViewportToNodes(sigma: Sigma, nodes: string[], opts: Partial<
   const camera = sigma.getCamera();
   const newCameraState = getCameraStateToFitViewportToNodes(sigma, nodes, opts);
   if (animate) {
-    camera.animate(newCameraState);
+    await camera.animate(newCameraState);
   } else {
     camera.setState(newCameraState);
   }
