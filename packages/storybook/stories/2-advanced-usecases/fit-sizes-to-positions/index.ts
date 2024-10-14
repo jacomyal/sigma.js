@@ -18,6 +18,7 @@ import { NodeSquareProgram } from "@sigma/node-square";
 import chroma from "chroma-js";
 import Graph from "graphology";
 import Sigma from "sigma";
+import { DEFAULT_SETTINGS } from "sigma/settings";
 
 export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
@@ -57,6 +58,39 @@ export default () => {
     nodeProgramClasses: {
       square: NodeSquareProgram,
     },
+  });
+
+  // Handle controls:
+  const linearZoomToSizeRatioFunction = document.getElementById("linearZoomToSizeRatioFunction") as HTMLInputElement;
+  const itemSizesReferencePositions = document.getElementById("itemSizesReferencePositions") as HTMLInputElement;
+  const disabledAutoRescale = document.getElementById("disabledAutoRescale") as HTMLInputElement;
+  const resetCamera = document.getElementById("resetCamera") as HTMLButtonElement;
+
+  // Set initial form values:
+  linearZoomToSizeRatioFunction.checked =
+    renderer.getSetting("zoomToSizeRatioFunction") !== DEFAULT_SETTINGS.zoomToSizeRatioFunction;
+  itemSizesReferencePositions.checked = renderer.getSetting("itemSizesReference") === "positions";
+  disabledAutoRescale.checked = !renderer.getSetting("autoRescale");
+
+  // Handle controls updates:
+  function refreshSettings() {
+    renderer.setSetting(
+      "zoomToSizeRatioFunction",
+      linearZoomToSizeRatioFunction.checked ? (x) => x : DEFAULT_SETTINGS.zoomToSizeRatioFunction,
+    );
+    renderer.setSetting(
+      "itemSizesReference",
+      itemSizesReferencePositions.checked ? "positions" : DEFAULT_SETTINGS.itemSizesReference,
+    );
+    renderer.setSetting("autoRescale", !disabledAutoRescale.checked);
+  }
+  [linearZoomToSizeRatioFunction, itemSizesReferencePositions, disabledAutoRescale].forEach((input) =>
+    input.addEventListener("change", refreshSettings),
+  );
+
+  // Handle reset camera button:
+  resetCamera.addEventListener("click", () => {
+    renderer.getCamera().animatedReset();
   });
 
   return () => {

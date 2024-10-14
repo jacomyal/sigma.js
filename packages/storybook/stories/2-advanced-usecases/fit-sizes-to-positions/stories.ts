@@ -14,7 +14,7 @@ export default meta;
 type Story = StoryObj;
 
 export const story: Story = {
-  name: "Disable sigma's autoRescale features",
+  name: "Customize how sigma handles sizes and positions",
   render: () => template,
   play: wrapStory(play),
   args: {},

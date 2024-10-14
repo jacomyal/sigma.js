@@ -9,5 +9,40 @@
     padding: 0 !important;
     overflow: hidden;
   }
+  #controls {
+    font-family: sans-serif;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffffffcc;
+    padding: 10px;
+  }
+  #controls fieldset {
+    outline: none;
+    border: none;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+  }
+  #controls fieldset label {
+    flex-grow: 1;
+  }
 </style>
 <div id="sigma-container"></div>
+<section id="controls">
+  <fieldset>
+    <label for="linearZoomToSizeRatioFunction">Use linear <code>zoomToSizeRatioFunction</code></label>
+    <input type="checkbox" id="linearZoomToSizeRatioFunction" />
+  </fieldset>
+  <fieldset>
+    <label for="itemSizesReferencePositions">Set <code>itemSizesReference</code> to <code>"positions"</code></label>
+    <input type="checkbox" id="itemSizesReferencePositions" />
+  </fieldset>
+  <fieldset>
+    <label for="disabledAutoRescale">Disable <code>autoRescale</code>?</label>
+    <input type="checkbox" id="disabledAutoRescale" />
+  </fieldset>
+  <fieldset>
+    <button id="resetCamera">Reset camera</button>
+  </fieldset>
+</section>
