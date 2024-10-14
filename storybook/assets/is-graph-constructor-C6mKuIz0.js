@@ -1,0 +1,1 @@
+var r=function(t){return t!==null&&typeof t=="function"&&typeof t.prototype=="object"&&typeof t.prototype.addUndirectedEdgeWithKey=="function"&&typeof t.prototype.dropNode=="function"};export{r as i};
