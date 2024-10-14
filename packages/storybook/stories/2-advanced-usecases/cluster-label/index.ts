@@ -68,8 +68,9 @@ export default () => {
     clusterLabelsDoms += `<div id='${cluster.label}' class="clusterLabel" style="top:${viewportPos.y}px;left:${viewportPos.x}px;color:${cluster.color}">${cluster.label}</div>`;
   }
   clustersLayer.innerHTML = clusterLabelsDoms;
+
   // insert the layer underneath the hovers layer
-  container.insertBefore(clustersLayer, document.getElementsByClassName("sigma-hovers")[0]);
+  container.insertBefore(clustersLayer, container.querySelector(".sigma-hovers"));
 
   // Clusters labels position needs to be updated on each render
   renderer.on("afterRender", () => {

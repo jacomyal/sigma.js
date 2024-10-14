@@ -1,6 +1,6 @@
 ---
 title: Publishing new versions
-sidebar_position: 7
+sidebar_position: 8
 ---
 
 As the code is structured as a monorepo, we use [Lerna](https://github.com/lerna/lerna) to help version and publish the different packages handled in the repository.
