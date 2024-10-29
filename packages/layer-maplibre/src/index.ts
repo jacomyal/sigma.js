@@ -2,7 +2,6 @@ import Graph from "graphology";
 import { Attributes } from "graphology-types";
 import { LngLat, Map, MapOptions } from "maplibre-gl";
 import { Sigma } from "sigma";
-import { DEFAULT_SETTINGS } from "sigma/settings";
 
 import { graphToLatlng, latlngToGraph, syncMapWithSigma, syncSigmaWithMap } from "./utils";
 
@@ -33,13 +32,13 @@ export default function bindMaplibreLayer(
 
   // Initialize the map
   const map = new Map({
-    ...(opts?.mapOptions || {}),
     container: mapContainerId,
     style: "https://demotiles.maplibre.org/style.json",
     center: [0, 0],
     zoom: 1,
     minPitch: 0,
     maxPitch: 0,
+    ...(opts?.mapOptions || {}),
   });
 
   // `stagePadding: 0` is mandatory, so the bbox of the map & Sigma is the same.

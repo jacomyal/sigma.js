@@ -32,16 +32,17 @@ afterEach<SigmaTestContext>(async ({ sigma }) => {
 
 describe("@sigma/layer-maplibre", () => {
   test<SigmaTestContext>("calling clean function multiple times should work", ({ sigma }) => {
-    const { clean } = bindMapLayer(sigma);
+    const { clean } = bindMapLayer(sigma, { mapOptions: { style: undefined } });
+
     expect(() => {
       clean();
       clean();
     }).not.to.throw();
   });
-  test<SigmaTestContext>("clean the map should reset sigma'settings to its previous value", ({ sigma }) => {
+  test<SigmaTestContext>("clean the map should reset sigma settings to its previous value", ({ sigma }) => {
     const prevSettings = sigma.getSettings();
 
-    const { clean } = bindMapLayer(sigma);
+    const { clean } = bindMapLayer(sigma, { mapOptions: { style: undefined } });
     const settings = sigma.getSettings();
 
     clean();

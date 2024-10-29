@@ -38,7 +38,7 @@ describe("@sigma/layer-leaflet", () => {
       clean();
     }).not.to.throw();
   });
-  test<SigmaTestContext>("clean the map should reset sigma'settings to its previous value", ({ sigma }) => {
+  test<SigmaTestContext>("clean the map should reset sigma settings to its previous value", ({ sigma }) => {
     const prevSettings = sigma.getSettings();
 
     const { clean } = bindMapLayer(sigma);
