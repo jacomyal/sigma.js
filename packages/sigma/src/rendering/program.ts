@@ -39,7 +39,6 @@ export abstract class AbstractProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 > {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_gl: WebGLRenderingContext, _pickGl: WebGLRenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
   abstract render(params: RenderParams): void;
@@ -369,7 +368,7 @@ export abstract class Program<
   }
 }
 
-class ProgramClass<
+class _ProgramClass<
   Uniform extends string = string,
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -387,4 +386,4 @@ export type ProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = typeof ProgramClass<Uniform, N, E, G>;
+> = typeof _ProgramClass<Uniform, N, E, G>;

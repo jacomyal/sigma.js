@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* global __dirname */
 import * as process from "node:process";
 import * as path from "path";
 import * as readline from "readline";

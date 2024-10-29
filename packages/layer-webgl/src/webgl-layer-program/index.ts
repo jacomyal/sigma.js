@@ -70,7 +70,7 @@ export abstract class WebGLLayerProgram<
   }
 }
 
-class WebGLLayerProgramClass<
+class _WebGLLayerProgramClass<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
@@ -93,4 +93,4 @@ export type WebGLLayerProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = typeof WebGLLayerProgramClass<N, E, G>;
+> = typeof _WebGLLayerProgramClass<N, E, G>;

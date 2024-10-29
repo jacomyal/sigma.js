@@ -21,6 +21,7 @@ export default [
     ignores: [
       "**/*.js",
       // Built files
+      "**/dist/*",
       "**/build/*",
       "**/node_modules/*",
       // Doc and examples

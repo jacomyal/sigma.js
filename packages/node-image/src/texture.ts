@@ -151,7 +151,7 @@ export async function loadImage(
   if (isSVG && size) {
     try {
       image = await loadSVGImage(imageSource, { size, crossOrigin });
-    } catch (e) {
+    } catch (_e) {
       image = await loadRasterImage(imageSource, { crossOrigin });
     }
   } else {
@@ -457,7 +457,7 @@ export class TextureManager extends EventEmitter {
         ...refineImage(image, this.corrector, this.options),
       };
       this.scheduleGenerateTexture();
-    } catch (e) {
+    } catch (_e) {
       this.imageStates[source] = {
         status: "error",
       };

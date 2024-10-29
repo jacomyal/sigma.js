@@ -71,7 +71,7 @@ export abstract class EdgeProgram<
   ): void;
 }
 
-class EdgeProgramClass<
+class _EdgeProgramClass<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
@@ -106,7 +106,7 @@ export type EdgeProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = typeof EdgeProgramClass<N, E, G>;
+> = typeof _EdgeProgramClass<N, E, G>;
 
 /**
  * Helper function combining two or more programs into a single compound one.

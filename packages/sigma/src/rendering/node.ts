@@ -55,7 +55,7 @@ export abstract class NodeProgram<
   abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
 }
 
-class NodeProgramClass<
+class _NodeProgramClass<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
@@ -84,7 +84,7 @@ export type NodeProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = typeof NodeProgramClass<N, E, G>;
+> = typeof _NodeProgramClass<N, E, G>;
 
 /**
  * Helper function combining two or more programs into a single compound one.
