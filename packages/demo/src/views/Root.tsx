@@ -20,6 +20,7 @@ import SearchField from "./SearchField";
 import TagsPanel from "./TagsPanel";
 
 const Root: FC = () => {
+  const graph = useMemo(() => new DirectedGraph(), []);
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
@@ -53,11 +54,39 @@ const Root: FC = () => {
     fetch(`./dataset.json`)
       .then((res) => res.json())
       .then((dataset: Dataset) => {
-        setDataset(dataset);
+        const clusters = keyBy(dataset.clusters, "key");
+        const tags = keyBy(dataset.tags, "key");
+
+        dataset.nodes.forEach((node) =>
+          graph.addNode(node.key, {
+            ...node,
+            ...omit(clusters[node.cluster], "key"),
+            image: `./images/${tags[node.tag].image}`,
+          }),
+        );
+        dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
+
+        // Use degrees as node sizes:
+        const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
+        const minDegree = Math.min(...scores);
+        const maxDegree = Math.max(...scores);
+        const MIN_NODE_SIZE = 3;
+        const MAX_NODE_SIZE = 30;
+        graph.forEachNode((node) =>
+          graph.setNodeAttribute(
+            node,
+            "size",
+            ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
+              (MAX_NODE_SIZE - MIN_NODE_SIZE) +
+              MIN_NODE_SIZE,
+          ),
+        );
+
         setFiltersState({
           clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
           tags: mapValues(keyBy(dataset.tags, "key"), constant(true)),
         });
+        setDataset(dataset);
         requestAnimationFrame(() => setDataReady(true));
       });
   }, []);
@@ -66,10 +95,10 @@ const Root: FC = () => {
 
   return (
     <div id="app-root" className={showContents ? "show-contents" : ""}>
-      <SigmaContainer graph={DirectedGraph} settings={sigmaSettings} className="react-sigma">
+      <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
         <GraphSettingsController hoveredNode={hoveredNode} />
         <GraphEventsController setHoveredNode={setHoveredNode} />
-        <GraphDataController dataset={dataset} filters={filtersState} />
+        <GraphDataController filters={filtersState} />
 
         {dataReady && (
           <>

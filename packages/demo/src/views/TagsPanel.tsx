@@ -78,7 +78,11 @@ const TagsPanel: FC<{
               className="caption-row"
               key={tag.key}
               title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
-                visibleNodesCount !== nodesCount ? ` (only ${visibleNodesCount} visible)` : ""
+                visibleNodesCount !== nodesCount
+                  ? visibleNodesCount > 0
+                    ? ` (only ${visibleNodesCount > 1 ? `${visibleNodesCount} are` : "one is"} visible)`
+                    : " (all hidden)"
+                  : ""
               }`}
             >
               <input
