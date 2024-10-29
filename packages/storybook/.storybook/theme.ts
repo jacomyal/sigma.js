@@ -5,7 +5,7 @@ export default create({
   fontCode: "monospace",
   brandTitle: "sigma.js",
   brandUrl: "https://www.sigmajs.org/",
-  brandImage: "https://www.sigmajs.org/img/logo-sigma.png",
+  brandImage: "https://www.sigmajs.org/img/logo-sigma-text.svg",
   brandTarget: "_self",
   colorPrimary: "#e22653",
   colorSecondary: "#999",
