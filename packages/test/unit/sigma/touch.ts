@@ -1,10 +1,16 @@
-import { userEvent } from "@vitest/browser/context";
+import { userEvent as rawUserEvent } from "@vitest/browser/context";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+
+// Mock incoming userEvent.pointer API types:
+type PointerAction = { target?: HTMLElement; coords?: Coordinates } & ({ keys: string } | { pointerName: string });
+const userEvent = rawUserEvent as typeof rawUserEvent & {
+  pointer(input: PointerAction | PointerAction[]): Promise<void>;
+};
 
 interface SigmaTestContext {
   sigma: Sigma;
