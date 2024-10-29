@@ -240,14 +240,14 @@ describe("Camera", function () {
       const camera = new Camera();
       const targetState1 = { ...camera.getState(), x: 1 };
       const targetState2 = { ...camera.getState(), x: 2 };
-      const duration = 50;
-      const delay = 10;
+      const duration = 500;
+      const delay = 50;
 
       const t0 = Date.now();
       await Promise.all([
         camera.animate(targetState1, { duration }),
-        (async () => {
-          await wait(10);
+        (async (): Promise<void> => {
+          await wait(delay);
           await camera.animate(targetState2, { duration: 0 });
         })(),
       ]);
@@ -256,19 +256,20 @@ describe("Camera", function () {
       expect(camera.getState()).toEqual(targetState2);
       // Time measures are very rough at this scale, we just want to check that t1 - t0 (the actual spent time)
       // is basically closer to delay than to duration:
-      expect(Math.abs(t1 - t0 - delay)).toBeLessThan(delay);
+      const spentTime = t1 - t0;
+      expect(Math.abs(spentTime - delay)).toBeLessThan(Math.abs(spentTime - duration));
     });
 
     test("it should resolve promises when animation is interrupted by a new animation (using the shortcut methods).", async function () {
       const camera = new Camera();
-      const duration = 50;
-      const delay = 10;
+      const duration = 500;
+      const delay = 50;
 
       const t0 = Date.now();
       await Promise.all([
         camera.animatedZoom({ duration }),
-        (async () => {
-          await wait(10);
+        (async (): Promise<void> => {
+          await wait(delay);
           await camera.animatedReset({ duration: 0 });
         })(),
       ]);
@@ -277,7 +278,8 @@ describe("Camera", function () {
       expect(camera.ratio).toEqual(1);
       // Time measures are very rough at this scale, we just want to check that t1 - t0 (the actual spent time)
       // is basically closer to delay than to duration:
-      expect(Math.abs(t1 - t0 - delay)).toBeLessThan(delay);
+      const spentTime = t1 - t0;
+      expect(Math.abs(spentTime - delay)).toBeLessThan(Math.abs(spentTime - duration));
     });
   });
 });

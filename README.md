@@ -2,7 +2,7 @@
 
 <br />
 
-![Sigma.js](packages/website/static/img/logo-sigma-text.png)
+![Sigma.js](packages/website/static/img/logo-sigma-text.svg)
 
 **[Website](https://www.sigmajs.org/)** | **[Documentation](https://www.sigmajs.org/docs)** | **[Storybook](https://www.sigmajs.org/storybook)** | <strong><a rel="me" href="https://vis.social/@sigmajs">Mastodon</a></strong>
 
