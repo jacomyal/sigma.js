@@ -1731,7 +1731,7 @@ export default class Sigma<
 
   /**
    * Method used to get all the sigma node attributes.
-   * It's usefull for example to get the position of a node
+   * It's useful for example to get the position of a node
    * and to get values that are set by the nodeReducer
    *
    * @param  {string} key - The node's key.

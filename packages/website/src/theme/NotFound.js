@@ -18,8 +18,8 @@ export default function NotFoundWrapper(props) {
         }}
       >
         <div>
-          The homepage of this website is not in the React-Router workflow: The sources are not in{" "}
-          <code>/docs</code>, but in{" "}
+          The homepage of this website is not in the React-Router workflow: The sources are not in <code>/docs</code>,
+          but in{" "}
           <strong>
             <code>/static/index.html</code>
           </strong>{" "}
