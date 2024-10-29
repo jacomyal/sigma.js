@@ -2,7 +2,6 @@ import Graph from "graphology";
 import { Attributes } from "graphology-types";
 import L, { MapOptions } from "leaflet";
 import { Sigma } from "sigma";
-import { DEFAULT_SETTINGS } from "sigma/settings";
 
 import { graphToLatlng, latlngToGraph, setSigmaRatioBounds, syncMapWithSigma, syncSigmaWithMap } from "./utils";
 
@@ -22,6 +21,10 @@ export default function bindLeafletLayer(
     getNodeLatLng?: (nodeAttributes: Attributes) => { lat: number; lng: number };
   },
 ) {
+  // Keeping data for the cleanup
+  let isKilled = false;
+  const prevSigmaSettings = sigma.getSettings();
+
   // Creating map container
   const mapContainer = document.createElement("div");
   const mapContainerId = `${sigma.getContainer().id}-map`;
@@ -109,12 +112,21 @@ export default function bindLeafletLayer(
 
   // Clean up function to remove everything
   function clean() {
-    map.remove();
-    mapContainer.remove();
-    sigma.off("afterRender", fnSyncMapWithSigma);
-    sigma.off("resize", fnOnResize);
-    sigma.setSetting("stagePadding", DEFAULT_SETTINGS.stagePadding);
-    sigma.setSetting("enableCameraRotation", true);
+    if (!isKilled) {
+      isKilled = true;
+
+      map.remove();
+      mapContainer.remove();
+
+      sigma.off("afterRender", fnSyncMapWithSigma);
+      sigma.off("resize", fnOnResize);
+
+      // Reset settings
+      sigma.setSetting("stagePadding", prevSigmaSettings.stagePadding);
+      sigma.setSetting("enableCameraRotation", prevSigmaSettings.enableCameraRotation);
+      sigma.setSetting("minCameraRatio", prevSigmaSettings.minCameraRatio);
+      sigma.setSetting("maxCameraRatio", prevSigmaSettings.maxCameraRatio);
+    }
   }
 
   // When the map is ready

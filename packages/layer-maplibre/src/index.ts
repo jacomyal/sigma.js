@@ -20,6 +20,10 @@ export default function bindMaplibreLayer(
     getNodeLatLng?: (nodeAttributes: Attributes) => { lat: number; lng: number };
   },
 ) {
+  // Keeping data for the cleanup
+  let isKilled = false;
+  const prevSigmaSettings = sigma.getSettings();
+
   // Creating map container
   const mapContainer = document.createElement("div");
   const mapContainerId = `${sigma.getContainer().id}-map`;
@@ -91,13 +95,20 @@ export default function bindMaplibreLayer(
 
   // Clean up function to remove everything
   function clean() {
-    map.off("moveend", fnSyncSigmaWithMap);
-    map.remove();
-    mapContainer.remove();
-    sigma.off("afterRender", fnSyncMapWithSigma);
-    sigma.off("resize", fnOnResize);
-    sigma.setSetting("stagePadding", DEFAULT_SETTINGS.stagePadding);
-    sigma.setSetting("enableCameraRotation", true);
+    if (!isKilled) {
+      isKilled = true;
+
+      map.off("moveend", fnSyncSigmaWithMap);
+      map.remove();
+      mapContainer.remove();
+
+      sigma.off("afterRender", fnSyncMapWithSigma);
+      sigma.off("resize", fnOnResize);
+
+      // Reset settings
+      sigma.setSetting("stagePadding", prevSigmaSettings.stagePadding);
+      sigma.setSetting("enableCameraRotation", prevSigmaSettings.enableCameraRotation);
+    }
   }
 
   // Update the sigma graph for geospatial coords
