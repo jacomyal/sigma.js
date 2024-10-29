@@ -1,6 +1,6 @@
 {
   "name": "@sigma/layer-leaflet",
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "description": "A plugin to set a geographical map in background",
   "main": "dist/sigma-layer-leaflet.cjs.js",
   "module": "dist/sigma-layer-leaflet.esm.js",
