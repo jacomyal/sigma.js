@@ -29,8 +29,8 @@ export default function bindLeafletLayer(
   const mapContainer = document.createElement("div");
   const mapContainerId = `${sigma.getContainer().id}-map`;
   mapContainer.setAttribute("id", mapContainerId);
-  mapContainer.setAttribute("style", "position: relative; top:0; left:0; width: 100%; height:100%; z-index:-1");
-  sigma.getContainer().appendChild(mapContainer);
+  mapContainer.setAttribute("style", "position: absolute; inset: 0");
+  sigma.getContainer().prepend(mapContainer);
 
   // Initialize the map
   const map = L.map(mapContainerId, {
