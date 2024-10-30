@@ -5,14 +5,12 @@ import Sigma from "sigma";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
+import { wait } from "../_helpers";
+
 interface SigmaTestContext {
   sigma: Sigma;
   graph: Graph;
   container: HTMLDivElement;
-}
-
-function wait(timeout: number): Promise<void> {
-  return new Promise<void>((resolve) => setTimeout(resolve, timeout));
 }
 
 const STAGE_WIDTH = 200;

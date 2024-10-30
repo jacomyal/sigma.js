@@ -1,4 +1,3 @@
-import { userEvent as rawUserEvent } from "@vitest/browser/context";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
@@ -6,34 +5,50 @@ import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-// Mock incoming userEvent.pointer API types:
-type PointerAction = { target?: HTMLElement; coords?: Coordinates } & ({ keys: string } | { pointerName: string });
-const userEvent = rawUserEvent as typeof rawUserEvent & {
-  pointer(input: PointerAction | PointerAction[]): Promise<void>;
-};
+import { add, expectObjectsToBeClose, remove, rotate, wait } from "../_helpers";
+
+// Helpers to simulate touch events:
+type TouchSpec = Coordinates & { id: number };
+type TouchEventType = "touchstart" | "touchend" | "touchmove";
+async function simulateTouchEvent(element: HTMLElement, type: TouchEventType, touches: TouchSpec[]) {
+  const touchEvents: Touch[] = [];
+
+  touches.forEach((touch) => {
+    touchEvents.push(
+      new Touch({
+        clientX: touch.x,
+        clientY: touch.y,
+        identifier: touch.id,
+        target: element,
+      }),
+    );
+  });
+
+  element.dispatchEvent(
+    new TouchEvent(type, {
+      touches: touchEvents,
+      view: window,
+      cancelable: true,
+      bubbles: true,
+    }),
+  );
+
+  await wait(0);
+}
 
 interface SigmaTestContext {
   sigma: Sigma;
   graph: Graph;
-  container: HTMLDivElement;
+  target: HTMLElement;
 }
 
-function wait(timeout: number): Promise<void> {
-  return new Promise<void>((resolve) => setTimeout(resolve, timeout));
-}
-
-function add<T extends Coordinates>(p: T, vec: Coordinates): T {
-  return {
-    ...p,
-    x: p.x + vec.x,
-    y: p.y + vec.y,
-  };
-}
-
+// Tests context:
 const STAGE_WIDTH = 200;
 const STAGE_HEIGHT = 400;
-const T_A = { x: STAGE_WIDTH / 3, y: STAGE_HEIGHT / 3 };
-const T_B = { x: (STAGE_WIDTH * 2) / 3, y: (STAGE_HEIGHT * 2) / 3 };
+const ID_A = 1;
+const ID_B = 2;
+const T_A = { id: ID_A, x: STAGE_WIDTH / 3, y: STAGE_HEIGHT / 3 };
+const T_B = { id: ID_B, x: (STAGE_WIDTH * 2) / 3, y: (STAGE_HEIGHT * 2) / 3 };
 
 const GRAPH: Pick<SerializedGraph, "nodes" | "edges"> = {
   nodes: [
@@ -55,7 +70,7 @@ beforeEach<SigmaTestContext>(async (context) => {
     doubleClickZoomingDuration: 30,
   });
   context.graph = graph;
-  context.container = container;
+  context.target = context.sigma.getCanvases().mouse;
 });
 
 afterEach<SigmaTestContext>(async ({ sigma }) => {
@@ -63,121 +78,109 @@ afterEach<SigmaTestContext>(async ({ sigma }) => {
   sigma.getContainer().remove();
 });
 
-describe.skip("Sigma multi-touch management", () => {
+// Actual tests:
+describe("Sigma multi-touch management", () => {
   test<SigmaTestContext>("the camera should not move when touches are down and up, without moving at all", async ({
     sigma,
-    container,
+    target,
   }) => {
     const initialCameraState = { ...sigma.getCamera().getState() };
 
-    await userEvent.pointer({
-      keys: "[TouchA>]",
-      target: container,
-      coords: T_A,
-    });
-    await userEvent.pointer({
-      keys: "[TouchB>]",
-      target: container,
-      coords: T_B,
-    });
-    await userEvent.pointer({ keys: "[/TouchA]" });
-    await userEvent.pointer({ keys: "[/TouchB]" });
-    await wait(200);
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await simulateTouchEvent(target, "touchmove", [T_A, T_B]);
+    await wait(10);
+
+    await simulateTouchEvent(target, "touchend", [T_B]);
+    await simulateTouchEvent(target, "touchend", []);
+    await wait(10);
 
     expect(sigma.getCamera().getState()).toEqual(initialCameraState);
   });
 
   test<SigmaTestContext>("the camera should move (no zoom, no rotation) when both touches move the same", async ({
     sigma,
-    container,
+    target,
   }) => {
-    const initialCameraState = { ...sigma.getCamera().getState() };
-    const diff = { x: 12, y: 34 };
+    const camera = sigma.getCamera();
+    const initialCameraState = camera.getState();
 
-    await userEvent.pointer([
-      {
-        keys: "[TouchA>]",
-        target: container,
-        coords: T_A,
-      },
-      {
-        keys: "[TouchB>]",
-        target: container,
-        coords: T_B,
-      },
-    ]);
+    const diff = { x: 100, y: 100 };
+    const targetA = add(T_A, diff);
+    const targetB = add(T_B, diff);
+    const expectedCameraState = {
+      ...initialCameraState,
+      ...sigma.viewportToFramedGraph(remove(sigma.framedGraphToViewport(initialCameraState), diff)),
+    };
 
-    await userEvent.pointer([
-      { pointerName: "TouchA", coords: add(T_A, diff) },
-      { pointerName: "TouchB", coords: add(T_B, diff) },
-    ]);
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await wait(10);
 
-    await userEvent.pointer([{ keys: "[/TouchA]" }, { keys: "[/TouchB]" }]);
-    await wait(200);
+    await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
+    await wait(10);
 
-    expect(sigma.getCamera().getState()).toEqual(add(initialCameraState, diff));
+    await simulateTouchEvent(target, "touchend", [targetB]);
+    await simulateTouchEvent(target, "touchend", []);
+    await wait(10);
+
+    const newCameraState = camera.getState();
+    expectObjectsToBeClose(newCameraState, expectedCameraState);
   });
 
   test<SigmaTestContext>("the camera should zoom (no move, no rotation) when both touches move, while keeping the same center and orientation", async ({
     sigma,
-    container,
+    target,
   }) => {
-    const initialCameraState = { ...sigma.getCamera().getState() };
+    const camera = sigma.getCamera();
+    const initialCameraState = camera.getState();
 
-    await userEvent.pointer([
-      {
-        keys: "[TouchA>]",
-        target: container,
-        coords: T_A,
-      },
-      {
-        keys: "[TouchB>]",
-        target: container,
-        coords: T_B,
-      },
-    ]);
+    const targetA = { id: ID_A, x: 0, y: 0 };
+    const targetB = { id: ID_B, x: STAGE_WIDTH, y: STAGE_HEIGHT };
+    const expectedCameraState = { ...initialCameraState, ratio: initialCameraState.ratio / 3 };
 
-    await userEvent.pointer([
-      { pointerName: "TouchA", coords: { x: 0, y: 0 } },
-      { pointerName: "TouchB", coords: { x: STAGE_WIDTH, y: STAGE_HEIGHT } },
-    ]);
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await wait(10);
 
-    await userEvent.pointer([{ keys: "[/TouchA]" }, { keys: "[/TouchB]" }]);
-    await wait(200);
+    await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
+    await wait(10);
 
-    expect(sigma.getCamera().getState()).toEqual({ ...initialCameraState, ratio: initialCameraState.ratio * 3 });
+    await simulateTouchEvent(target, "touchend", [targetB]);
+    await simulateTouchEvent(target, "touchend", []);
+    await wait(10);
+
+    const newCameraState = camera.getState();
+    expectObjectsToBeClose(newCameraState, expectedCameraState);
   });
 
   test<SigmaTestContext>("the camera should rotate (no move, no zoom) when both touches move, while keeping the same center and distance", async ({
     sigma,
-    container,
+    target,
   }) => {
-    const initialCameraState = { ...sigma.getCamera().getState() };
+    const camera = sigma.getCamera();
+    const initialCameraState = camera.getState();
 
-    await userEvent.pointer([
-      {
-        keys: "[TouchA>]",
-        target: container,
-        coords: T_A,
-      },
-      {
-        keys: "[TouchB>]",
-        target: container,
-        coords: T_B,
-      },
-    ]);
-
-    await userEvent.pointer([
-      { pointerName: "TouchA", coords: { x: T_A.y, y: -T_A.x } },
-      { pointerName: "TouchB", coords: { x: T_B.y, y: -T_B.x } },
-    ]);
-
-    await userEvent.pointer([{ keys: "[/TouchA]" }, { keys: "[/TouchB]" }]);
-    await wait(200);
-
-    expect(sigma.getCamera().getState()).toEqual({
+    const center = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 };
+    const targetA = rotate(T_A, center, Math.PI / 2);
+    const targetB = rotate(T_B, center, Math.PI / 2);
+    const expectedCameraState = {
       ...initialCameraState,
       angle: initialCameraState.angle + Math.PI / 2,
-    });
+    };
+
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await wait(10);
+
+    await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
+    await wait(10);
+
+    await simulateTouchEvent(target, "touchend", [targetB]);
+    await simulateTouchEvent(target, "touchend", []);
+    await wait(10);
+
+    const newCameraState = camera.getState();
+    expectObjectsToBeClose(newCameraState, expectedCameraState);
   });
 });

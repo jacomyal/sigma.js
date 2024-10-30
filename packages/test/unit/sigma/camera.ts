@@ -1,9 +1,7 @@
 import { Camera } from "sigma";
 import { describe, expect, test } from "vitest";
 
-function wait(timeout: number): Promise<void> {
-  return new Promise<void>((resolve) => setTimeout(resolve, timeout));
-}
+import { wait } from "../_helpers";
 
 describe("Camera", function () {
   test("it should be possible to read the camera's state.", function () {
