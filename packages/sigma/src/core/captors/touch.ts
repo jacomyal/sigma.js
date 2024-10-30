@@ -21,8 +21,6 @@ export const DEFAULT_TOUCH_SETTINGS = TOUCH_SETTINGS_KEYS.reduce(
   {},
 ) as TouchSettings;
 
-export type FakeSigmaMouseEvent = MouseEvent & { isFakeSigmaMouseEvent?: true };
-
 /**
  * Event types.
  */
@@ -88,27 +86,10 @@ export default class TouchCaptor<
     };
   }
 
-  dispatchRelatedMouseEvent(type: string, e: TouchEvent, touch?: Touch, emitter?: EventTarget): void {
-    const mousePosition = touch || e.touches[0];
-    const mouseEvent = new MouseEvent(type, {
-      clientX: mousePosition.clientX,
-      clientY: mousePosition.clientY,
-      altKey: e.altKey,
-      ctrlKey: e.ctrlKey,
-    });
-
-    (mouseEvent as FakeSigmaMouseEvent).isFakeSigmaMouseEvent = true;
-
-    (emitter || this.container).dispatchEvent(mouseEvent);
-  }
-
   handleStart(e: TouchEvent): void {
     if (!this.enabled) return;
 
-    // Prevent default to avoid default browser behaviors...
     e.preventDefault();
-    // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
-    if (e.touches.length === 1) this.dispatchRelatedMouseEvent("mousedown", e);
 
     const touches = getTouchesArray(e.touches);
     this.touchMode = touches.length;
@@ -131,16 +112,7 @@ export default class TouchCaptor<
   handleLeave(e: TouchEvent): void {
     if (!this.enabled) return;
 
-    // Prevent default to avoid default browser behaviors...
     e.preventDefault();
-    // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
-    if (e.touches.length === 0 && this.lastTouches && this.lastTouches.length) {
-      this.dispatchRelatedMouseEvent("mouseup", e, this.lastTouches[0], document);
-      // ... and only click if no move was made
-      if (!this.hasMoved) {
-        this.dispatchRelatedMouseEvent("click", e, this.lastTouches[0]);
-      }
-    }
 
     if (this.movingTimeout) {
       this.isMoving = false;
@@ -191,17 +163,14 @@ export default class TouchCaptor<
   handleMove(e: TouchEvent): void {
     if (!this.enabled) return;
 
-    // Prevent default to avoid default browser behaviors...
     e.preventDefault();
-    // ...but simulate mouse behavior anyway, to get the MouseCaptor working as well:
-    if (e.touches.length === 1) this.dispatchRelatedMouseEvent("mousemove", e);
 
     const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
     this.lastTouches = touches;
     this.lastTouchesPositions = touchesPositions;
 
-    // If a move was initiated at some point, and we get back to startpoint,
+    // If a move was initiated at some point, and we get back to start point,
     // we should still consider that we did move (which also happens after a
     // multiple touch when only one touch remains in which case handleStart
     // is recalled within handleLeave).

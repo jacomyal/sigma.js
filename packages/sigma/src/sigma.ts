@@ -7,7 +7,7 @@ import Graph, { Attributes } from "graphology-types";
 
 import Camera from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
-import TouchCaptor, { FakeSigmaMouseEvent } from "./core/captors/touch";
+import TouchCaptor from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
 import { AbstractEdgeProgram, AbstractNodeProgram, EdgeProgramType, NodeProgramType } from "./rendering";
 import { Settings, resolveSettings, validateSettings } from "./settings";
@@ -493,8 +493,7 @@ export default class Sigma<
           },
         };
 
-        const isFakeSigmaMouseEvent = (e.original as FakeSigmaMouseEvent).isFakeSigmaMouseEvent;
-        const nodeAtPosition = isFakeSigmaMouseEvent ? this.getNodeAtPosition(e) : this.hoveredNode;
+        const nodeAtPosition = this.getNodeAtPosition(e);
 
         if (nodeAtPosition)
           return this.emit(`${eventType}Node`, {
