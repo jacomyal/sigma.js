@@ -201,7 +201,7 @@ export default class TouchCaptor<
     this.lastTouches = touches;
     this.lastTouchesPositions = touchesPositions;
 
-    // If a move was initiated at some point and we get back to startpoint,
+    // If a move was initiated at some point, and we get back to startpoint,
     // we should still consider that we did move (which also happens after a
     // multiple touch when only one touch remains in which case handleStart
     // is recalled within handleLeave).
@@ -228,6 +228,7 @@ export default class TouchCaptor<
 
     const camera = this.renderer.getCamera();
     const startCameraState = this.startCameraState as CameraState;
+    const padding = this.renderer.getSetting("stagePadding");
 
     switch (this.touchMode) {
       case 1: {
@@ -253,7 +254,12 @@ export default class TouchCaptor<
          *    position of a touch at the beginning of the d'n'd (using `startCamera.viewportToGraph`) and the viewport
          *    position of this same touch now
          */
-        const newCameraState: Partial<CameraState> = {};
+        const newCameraState: CameraState = {
+          x: 0.5,
+          y: 0.5,
+          angle: 0,
+          ratio: 1,
+        };
 
         const { x: x0, y: y0 } = touchesPositions[0];
         const { x: x1, y: y1 } = touchesPositions[1];
@@ -272,7 +278,7 @@ export default class TouchCaptor<
           (this.startTouchesPositions || [])[0] as Coordinates,
           { cameraState: startCameraState },
         );
-        const smallestDimension = Math.min(dimensions.width, dimensions.height);
+        const smallestDimension = Math.min(dimensions.width, dimensions.height) - 2 * padding;
 
         const dx = smallestDimension / dimensions.width;
         const dy = smallestDimension / dimensions.height;
