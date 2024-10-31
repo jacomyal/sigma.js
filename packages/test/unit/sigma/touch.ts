@@ -1,40 +1,10 @@
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
-import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-import { add, expectObjectsToBeClose, remove, rotate, wait } from "../_helpers";
-
-// Helpers to simulate touch events:
-type TouchSpec = Coordinates & { id: number };
-type TouchEventType = "touchstart" | "touchend" | "touchmove";
-async function simulateTouchEvent(element: HTMLElement, type: TouchEventType, touches: TouchSpec[]) {
-  const touchEvents: Touch[] = [];
-
-  touches.forEach((touch) => {
-    touchEvents.push(
-      new Touch({
-        clientX: touch.x,
-        clientY: touch.y,
-        identifier: touch.id,
-        target: element,
-      }),
-    );
-  });
-
-  element.dispatchEvent(
-    new TouchEvent(type, {
-      touches: touchEvents,
-      view: window,
-      cancelable: true,
-      bubbles: true,
-    }),
-  );
-
-  await wait(0);
-}
+import { add, expectObjectsToBeClose, remove, rotate, simulateTouchEvent } from "../_helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -89,11 +59,9 @@ describe("Sigma multi-touch management", () => {
     await simulateTouchEvent(target, "touchstart", [T_A]);
     await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
     await simulateTouchEvent(target, "touchmove", [T_A, T_B]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchend", [T_B]);
     await simulateTouchEvent(target, "touchend", []);
-    await wait(10);
 
     expect(sigma.getCamera().getState()).toEqual(initialCameraState);
   });
@@ -115,14 +83,11 @@ describe("Sigma multi-touch management", () => {
 
     await simulateTouchEvent(target, "touchstart", [T_A]);
     await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchend", [targetB]);
     await simulateTouchEvent(target, "touchend", []);
-    await wait(10);
 
     const newCameraState = camera.getState();
     expectObjectsToBeClose(newCameraState, expectedCameraState);
@@ -141,14 +106,11 @@ describe("Sigma multi-touch management", () => {
 
     await simulateTouchEvent(target, "touchstart", [T_A]);
     await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchend", [targetB]);
     await simulateTouchEvent(target, "touchend", []);
-    await wait(10);
 
     const newCameraState = camera.getState();
     expectObjectsToBeClose(newCameraState, expectedCameraState);
@@ -171,14 +133,11 @@ describe("Sigma multi-touch management", () => {
 
     await simulateTouchEvent(target, "touchstart", [T_A]);
     await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchmove", [targetA, targetB]);
-    await wait(10);
 
     await simulateTouchEvent(target, "touchend", [targetB]);
     await simulateTouchEvent(target, "touchend", []);
-    await wait(10);
 
     const newCameraState = camera.getState();
     expectObjectsToBeClose(newCameraState, expectedCameraState);

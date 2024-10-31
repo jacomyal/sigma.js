@@ -68,6 +68,7 @@ export interface Settings<
   doubleClickTimeout: number;
   doubleClickZoomingRatio: number;
   doubleClickZoomingDuration: number;
+  tapMoveTolerance: number;
 
   // Size and scaling
   zoomToSizeRatioFunction: (ratio: number) => number;
@@ -137,6 +138,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   doubleClickTimeout: 300,
   doubleClickZoomingRatio: 2.2,
   doubleClickZoomingDuration: 200,
+  tapMoveTolerance: 10,
 
   // Size and scaling
   zoomToSizeRatioFunction: Math.sqrt,

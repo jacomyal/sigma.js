@@ -6,6 +6,7 @@
 import Graph, { Attributes } from "graphology-types";
 
 import Camera from "./core/camera";
+import { cleanMouseCoords } from "./core/captors/captor";
 import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
@@ -25,6 +26,7 @@ import {
   PlainObject,
   RenderParams,
   SigmaEvents,
+  TouchCoords,
   TypedEventEmitter,
 } from "./types";
 import {
@@ -209,7 +211,7 @@ export default class Sigma<
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
     this.createWebGLContext("hoverNodes");
-    this.createCanvasContext("mouse");
+    this.createCanvasContext("mouse", { style: { touchAction: "none", userSelect: "none" } });
 
     // Initial resize
     this.resize();
@@ -407,15 +409,17 @@ export default class Sigma<
     window.addEventListener("resize", this.activeListeners.handleResize);
 
     // Handling mouse move
-    this.activeListeners.handleMove = (e: MouseCoords): void => {
+    this.activeListeners.handleMove = (e: MouseCoords | TouchCoords): void => {
+      const event = cleanMouseCoords(e);
+
       const baseEvent = {
-        event: e,
+        event,
         preventSigmaDefault(): void {
-          e.preventSigmaDefault();
+          event.preventSigmaDefault();
         },
       };
 
-      const nodeToHover = this.getNodeAtPosition(e);
+      const nodeToHover = this.getNodeAtPosition(event);
       if (nodeToHover && this.hoveredNode !== nodeToHover && !this.nodeDataCache[nodeToHover].hidden) {
         // Handling passing from one node to the other directly
         if (this.hoveredNode) this.emit("leaveNode", { ...baseEvent, node: this.hoveredNode });
@@ -428,7 +432,7 @@ export default class Sigma<
 
       // Checking if the hovered node is still hovered
       if (this.hoveredNode) {
-        if (this.getNodeAtPosition(e) !== this.hoveredNode) {
+        if (this.getNodeAtPosition(event) !== this.hoveredNode) {
           const node = this.hoveredNode;
           this.hoveredNode = null;
 
@@ -449,12 +453,26 @@ export default class Sigma<
       }
     };
 
-    // Handling mouse leave stage:
-    this.activeListeners.handleLeave = (e: MouseCoords): void => {
-      const baseEvent = {
-        event: e,
+    // Handling mouse move over body (only to dispatch the proper event):
+    this.activeListeners.handleMoveBody = (e: MouseCoords | TouchCoords): void => {
+      const event = cleanMouseCoords(e);
+
+      this.emit("moveBody", {
+        event,
         preventSigmaDefault(): void {
-          e.preventSigmaDefault();
+          event.preventSigmaDefault();
+        },
+      });
+    };
+
+    // Handling mouse leave stage:
+    this.activeListeners.handleLeave = (e: MouseCoords | TouchCoords): void => {
+      const event = cleanMouseCoords(e);
+
+      const baseEvent = {
+        event,
+        preventSigmaDefault(): void {
+          event.preventSigmaDefault();
         },
       };
 
@@ -472,11 +490,13 @@ export default class Sigma<
     };
 
     // Handling mouse enter stage:
-    this.activeListeners.handleEnter = (e: MouseCoords): void => {
+    this.activeListeners.handleEnter = (e: MouseCoords | TouchCoords): void => {
+      const event = cleanMouseCoords(e);
+
       const baseEvent = {
-        event: e,
+        event,
         preventSigmaDefault(): void {
-          e.preventSigmaDefault();
+          event.preventSigmaDefault();
         },
       };
 
@@ -484,16 +504,18 @@ export default class Sigma<
     };
 
     // Handling click
-    const createMouseListener = (eventType: MouseInteraction): ((e: MouseCoords) => void) => {
+    const createInteractionListener = (eventType: MouseInteraction): ((e: MouseCoords | TouchCoords) => void) => {
       return (e) => {
+        const event = cleanMouseCoords(e);
+
         const baseEvent = {
-          event: e,
-          preventSigmaDefault(): void {
-            e.preventSigmaDefault();
+          event,
+          preventSigmaDefault: () => {
+            event.preventSigmaDefault();
           },
         };
 
-        const nodeAtPosition = this.getNodeAtPosition(e);
+        const nodeAtPosition = this.getNodeAtPosition(event);
 
         if (nodeAtPosition)
           return this.emit(`${eventType}Node`, {
@@ -502,7 +524,7 @@ export default class Sigma<
           });
 
         if (this.settings.enableEdgeEvents) {
-          const edge = this.getEdgeAtPoint(e.x, e.y);
+          const edge = this.getEdgeAtPoint(event.x, event.y);
           if (edge) return this.emit(`${eventType}Edge`, { ...baseEvent, edge });
         }
 
@@ -510,14 +532,15 @@ export default class Sigma<
       };
     };
 
-    this.activeListeners.handleClick = createMouseListener("click");
-    this.activeListeners.handleRightClick = createMouseListener("rightClick");
-    this.activeListeners.handleDoubleClick = createMouseListener("doubleClick");
-    this.activeListeners.handleWheel = createMouseListener("wheel");
-    this.activeListeners.handleDown = createMouseListener("down");
-    this.activeListeners.handleUp = createMouseListener("up");
+    this.activeListeners.handleClick = createInteractionListener("click");
+    this.activeListeners.handleRightClick = createInteractionListener("rightClick");
+    this.activeListeners.handleDoubleClick = createInteractionListener("doubleClick");
+    this.activeListeners.handleWheel = createInteractionListener("wheel");
+    this.activeListeners.handleDown = createInteractionListener("down");
+    this.activeListeners.handleUp = createInteractionListener("up");
 
     this.mouseCaptor.on("mousemove", this.activeListeners.handleMove);
+    this.mouseCaptor.on("mousemovebody", this.activeListeners.handleMoveBody);
     this.mouseCaptor.on("click", this.activeListeners.handleClick);
     this.mouseCaptor.on("rightClick", this.activeListeners.handleRightClick);
     this.mouseCaptor.on("doubleClick", this.activeListeners.handleDoubleClick);
@@ -527,8 +550,13 @@ export default class Sigma<
     this.mouseCaptor.on("mouseleave", this.activeListeners.handleLeave);
     this.mouseCaptor.on("mouseenter", this.activeListeners.handleEnter);
 
-    // TODO
-    // Deal with Touch captor events
+    this.touchCaptor.on("touchdown", this.activeListeners.handleDown);
+    this.touchCaptor.on("touchdown", this.activeListeners.handleMove);
+    this.touchCaptor.on("touchup", this.activeListeners.handleUp);
+    this.touchCaptor.on("touchmove", this.activeListeners.handleMove);
+    this.touchCaptor.on("tap", this.activeListeners.handleClick);
+    this.touchCaptor.on("doubletap", this.activeListeners.handleDoubleClick);
+    this.touchCaptor.on("touchmove", this.activeListeners.handleMoveBody);
 
     return this;
   }
@@ -1496,7 +1524,10 @@ export default class Sigma<
    * @param options
    * @return {Sigma}
    */
-  createCanvas(id: string, options: { beforeLayer?: string } | { afterLayer?: string } = {}): HTMLCanvasElement {
+  createCanvas(
+    id: string,
+    options: { style?: Partial<CSSStyleDeclaration> } & ({ beforeLayer?: string } | { afterLayer?: string }) = {},
+  ): HTMLCanvasElement {
     if (this.elements[id]) throw new Error(`Sigma: a layer named "${id}" already exists`);
 
     const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
@@ -1508,6 +1539,8 @@ export default class Sigma<
         class: `sigma-${id}`,
       },
     );
+
+    if (options.style) Object.assign(canvas.style, options.style);
 
     this.elements[id] = canvas;
 
@@ -1528,8 +1561,8 @@ export default class Sigma<
    * @param  {string} id - Context's id.
    * @return {Sigma}
    */
-  createCanvasContext(id: string): this {
-    const canvas = this.createCanvas(id);
+  createCanvasContext(id: string, options: { style?: Partial<CSSStyleDeclaration> } = {}): this {
+    const canvas = this.createCanvas(id, options);
 
     const contextOptions = {
       preserveDrawingBuffer: false,
@@ -1551,21 +1584,20 @@ export default class Sigma<
    */
   createWebGLContext(
     id: string,
-    options?: {
+    options: {
       preserveDrawingBuffer?: boolean;
       antialias?: boolean;
       hidden?: boolean;
       picking?: boolean;
-      canvas?: HTMLCanvasElement;
-    },
+    } & ({ canvas?: HTMLCanvasElement; style?: undefined } | { style?: CSSStyleDeclaration; canvas?: undefined }) = {},
   ): WebGLRenderingContext {
-    const canvas = options?.canvas || this.createCanvas(id);
-    if (options?.hidden) canvas.remove();
+    const canvas = options?.canvas || this.createCanvas(id, options);
+    if (options.hidden) canvas.remove();
 
     const contextOptions = {
       preserveDrawingBuffer: false,
       antialias: false,
-      ...(options || {}),
+      ...options,
     };
 
     let context;
@@ -1586,7 +1618,7 @@ export default class Sigma<
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     // Prepare frame buffer for picking layers:
-    if (options?.picking) {
+    if (options.picking) {
       this.pickingLayers.add(id);
       const newFrameBuffer = gl.createFramebuffer();
       if (!newFrameBuffer) throw new Error(`Sigma: cannot create a new frame buffer for layer ${id}`);

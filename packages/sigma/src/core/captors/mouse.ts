@@ -89,15 +89,15 @@ export default class MouseCaptor<
     this.handleEnter = this.handleEnter.bind(this);
 
     // Binding events
-    container.addEventListener("click", this.handleClick, false);
-    container.addEventListener("contextmenu", this.handleRightClick, false);
-    container.addEventListener("mousedown", this.handleDown, false);
-    container.addEventListener("wheel", this.handleWheel, false);
-    container.addEventListener("mouseleave", this.handleLeave, false);
-    container.addEventListener("mouseenter", this.handleEnter, false);
+    container.addEventListener("click", this.handleClick, { capture: false });
+    container.addEventListener("contextmenu", this.handleRightClick, { capture: false });
+    container.addEventListener("mousedown", this.handleDown, { capture: false });
+    container.addEventListener("wheel", this.handleWheel, { capture: false });
+    container.addEventListener("mouseleave", this.handleLeave, { capture: false });
+    container.addEventListener("mouseenter", this.handleEnter, { capture: false });
 
-    document.addEventListener("mousemove", this.handleMove, false);
-    document.addEventListener("mouseup", this.handleUp, false);
+    document.addEventListener("mousemove", this.handleMove, { capture: false });
+    document.addEventListener("mouseup", this.handleUp, { capture: false });
   }
 
   kill(): void {

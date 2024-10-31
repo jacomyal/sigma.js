@@ -12,7 +12,15 @@ import Sigma from "../../sigma";
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 
-export const TOUCH_SETTINGS_KEYS = ["dragTimeout", "inertiaDuration", "inertiaRatio"] as const;
+export const TOUCH_SETTINGS_KEYS = [
+  "dragTimeout",
+  "inertiaDuration",
+  "inertiaRatio",
+  "doubleClickTimeout",
+  "doubleClickZoomingRatio",
+  "doubleClickZoomingDuration",
+  "tapMoveTolerance",
+] as const;
 
 export type TouchSettingKey = (typeof TOUCH_SETTINGS_KEYS)[number];
 export type TouchSettings = Pick<Settings, TouchSettingKey>;
@@ -24,11 +32,8 @@ export const DEFAULT_TOUCH_SETTINGS = TOUCH_SETTINGS_KEYS.reduce(
 /**
  * Event types.
  */
-export type TouchCaptorEvents = {
-  touchdown(coordinates: TouchCoords): void;
-  touchup(coordinates: TouchCoords): void;
-  touchmove(coordinates: TouchCoords): void;
-};
+export type TouchCaptorEventType = "touchdown" | "touchup" | "touchmove" | "touchmovebody" | "tap" | "doubletap";
+export type TouchCaptorEvents = Record<TouchCaptorEventType, (coordinates: TouchCoords) => void>;
 
 /**
  * Touch captor class.
@@ -51,7 +56,8 @@ export default class TouchCaptor<
   startTouchesDistance?: number;
   startTouchesPositions: Coordinates[] = [];
   lastTouchesPositions?: Coordinates[];
-  lastTouches?: Touch[];
+  lastTouches: Touch[] = [];
+  lastTap: null | { position: Coordinates; time: number } = null;
 
   settings: TouchSettings = DEFAULT_TOUCH_SETTINGS;
 
@@ -64,19 +70,19 @@ export default class TouchCaptor<
     this.handleMove = this.handleMove.bind(this);
 
     // Binding events
-    container.addEventListener("touchstart", this.handleStart, false);
-    container.addEventListener("touchend", this.handleLeave, false);
-    container.addEventListener("touchcancel", this.handleLeave, false);
-    container.addEventListener("touchmove", this.handleMove, false);
+    container.addEventListener("touchstart", this.handleStart, { capture: false });
+    container.addEventListener("touchcancel", this.handleLeave, { capture: false });
+    document.addEventListener("touchend", this.handleLeave, { capture: false, passive: false });
+    document.addEventListener("touchmove", this.handleMove, { capture: false, passive: false });
   }
 
   kill(): void {
     const container = this.container;
 
     container.removeEventListener("touchstart", this.handleStart);
-    container.removeEventListener("touchend", this.handleLeave);
     container.removeEventListener("touchcancel", this.handleLeave);
-    container.removeEventListener("touchmove", this.handleMove);
+    document.removeEventListener("touchend", this.handleLeave);
+    document.removeEventListener("touchmove", this.handleMove);
   }
 
   getDimensions(): Dimensions {
@@ -96,8 +102,6 @@ export default class TouchCaptor<
 
     this.startCameraState = this.renderer.getCamera().getState();
     this.startTouchesPositions = touches.map((touch) => getPosition(touch, this.container));
-    this.lastTouches = touches;
-    this.lastTouchesPositions = this.startTouchesPositions;
 
     // When there are two touches down, let's record distance and angle as well:
     if (this.touchMode === 2) {
@@ -106,13 +110,15 @@ export default class TouchCaptor<
       this.startTouchesDistance = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2));
     }
 
-    this.emit("touchdown", getTouchCoords(e, this.container));
+    this.emit("touchdown", getTouchCoords(e, this.lastTouches, this.container));
+    this.lastTouches = touches;
+    this.lastTouchesPositions = this.startTouchesPositions;
   }
 
   handleLeave(e: TouchEvent): void {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.startTouchesPositions.length) return;
 
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
 
     if (this.movingTimeout) {
       this.isMoving = false;
@@ -131,9 +137,6 @@ export default class TouchCaptor<
         }
       /* falls through */
       case 1:
-        // TODO
-        // Dispatch event
-
         if (this.isMoving) {
           const camera = this.renderer.getCamera();
           const cameraState = camera.getState(),
@@ -157,18 +160,60 @@ export default class TouchCaptor<
         break;
     }
 
-    this.emit("touchup", getTouchCoords(e, this.container));
+    this.emit("touchup", getTouchCoords(e, this.lastTouches, this.container));
+
+    // When the last touch ends and there hasn't been too much movement, trigger a "tap" or "doubletap" event:
+    if (!e.touches.length) {
+      const position = getPosition(this.lastTouches[0], this.container);
+      const downPosition = this.startTouchesPositions[0];
+      const dSquare = (position.x - downPosition.x) ** 2 + (position.y - downPosition.y) ** 2;
+
+      if (!e.touches.length && dSquare < this.settings.tapMoveTolerance ** 2) {
+        // Only trigger "doubletap" when the last tap is recent enough:
+        if (this.lastTap && Date.now() - this.lastTap.time < this.settings.doubleClickTimeout) {
+          const touchCoords = getTouchCoords(e, this.lastTouches, this.container);
+          this.emit("doubletap", touchCoords);
+          this.lastTap = null;
+
+          if (!touchCoords.sigmaDefaultPrevented) {
+            const camera = this.renderer.getCamera();
+            const newRatio = camera.getBoundedRatio(camera.getState().ratio / this.settings.doubleClickZoomingRatio);
+
+            camera.animate(this.renderer.getViewportZoomedState(position, newRatio), {
+              easing: "quadraticInOut",
+              duration: this.settings.doubleClickZoomingDuration,
+            });
+          }
+        }
+        // Else, trigger a normal "tap" event:
+        else {
+          const touchCoords = getTouchCoords(e, this.lastTouches, this.container);
+          this.emit("tap", touchCoords);
+          this.lastTap = { time: Date.now(), position: touchCoords.touches[0] || touchCoords.previousTouches[0] };
+        }
+      }
+    }
+
+    this.lastTouches = getTouchesArray(e.touches);
+    this.startTouchesPositions = [];
   }
 
   handleMove(e: TouchEvent): void {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.startTouchesPositions.length) return;
 
     e.preventDefault();
 
     const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
+
+    const lastTouches = this.lastTouches;
     this.lastTouches = touches;
     this.lastTouchesPositions = touchesPositions;
+
+    const touchCoords = getTouchCoords(e, lastTouches, this.container);
+    this.emit("touchmove", touchCoords);
+
+    if (touchCoords.sigmaDefaultPrevented) return;
 
     // If a move was initiated at some point, and we get back to start point,
     // we should still consider that we did move (which also happens after a
@@ -179,7 +224,7 @@ export default class TouchCaptor<
     this.hasMoved ||= touchesPositions.some((position, idx) => {
       const startPosition = this.startTouchesPositions[idx];
 
-      return position.x !== startPosition.x || position.y !== startPosition.y;
+      return startPosition && (position.x !== startPosition.x || position.y !== startPosition.y);
     });
 
     // If there was no move, do not trigger touch moves behavior
@@ -271,8 +316,6 @@ export default class TouchCaptor<
         break;
       }
     }
-
-    this.emit("touchmove", getTouchCoords(e, this.container));
   }
 
   setSettings(settings: TouchSettings): void {

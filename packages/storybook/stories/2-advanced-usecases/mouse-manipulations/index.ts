@@ -44,37 +44,35 @@ export default () => {
     isDragging = true;
     draggedNode = e.node;
     graph.setNodeAttribute(draggedNode, "highlighted", true);
+    if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
   });
 
   // On mouse move, if the drag mode is enabled, we change the position of the draggedNode
-  renderer.getMouseCaptor().on("mousemovebody", (e) => {
+  renderer.on("moveBody", ({ event }) => {
     if (!isDragging || !draggedNode) return;
 
     // Get new position of node
-    const pos = renderer.viewportToGraph(e);
+    const pos = renderer.viewportToGraph(event);
 
     graph.setNodeAttribute(draggedNode, "x", pos.x);
     graph.setNodeAttribute(draggedNode, "y", pos.y);
 
     // Prevent sigma to move camera:
-    e.preventSigmaDefault();
-    e.original.preventDefault();
-    e.original.stopPropagation();
+    event.preventSigmaDefault();
+    event.original.preventDefault();
+    event.original.stopPropagation();
   });
 
-  // On mouse up, we reset the autoscale and the dragging mode
-  renderer.getMouseCaptor().on("mouseup", () => {
+  // On mouse up, we reset the dragging mode
+  const handleUp = () => {
     if (draggedNode) {
       graph.removeNodeAttribute(draggedNode, "highlighted");
     }
     isDragging = false;
     draggedNode = null;
-  });
-
-  // Disable the autoscale at the first down interaction
-  renderer.getMouseCaptor().on("mousedown", () => {
-    if (!renderer.getCustomBBox()) renderer.setCustomBBox(renderer.getBBox());
-  });
+  };
+  renderer.on("upNode", handleUp);
+  renderer.on("upStage", handleUp);
 
   //
   // Create node (and edge) by click

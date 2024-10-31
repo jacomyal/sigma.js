@@ -38,7 +38,7 @@ export type MouseInteraction = "click" | "doubleClick" | "rightClick" | "wheel" 
 export interface MouseCoords extends Coordinates {
   sigmaDefaultPrevented: boolean;
   preventSigmaDefault(): void;
-  original: MouseEvent;
+  original: MouseEvent | TouchEvent;
 }
 
 export interface WheelCoords extends MouseCoords {
@@ -47,6 +47,9 @@ export interface WheelCoords extends MouseCoords {
 
 export interface TouchCoords {
   touches: Coordinates[];
+  previousTouches: Coordinates[];
+  sigmaDefaultPrevented: boolean;
+  preventSigmaDefault(): void;
   original: TouchEvent;
 }
 
@@ -169,9 +172,12 @@ export type SigmaAdditionalEvents = {
   afterRender(): void;
   resize(): void;
   kill(): void;
+  // Body events
+  moveBody(payload: SigmaStageEventPayload): void;
 };
 
 export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents & SigmaAdditionalEvents;
+export type SigmaEventType = keyof SigmaEvents;
 
 /**
  * Export various other types:

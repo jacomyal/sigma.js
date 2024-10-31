@@ -38,3 +38,44 @@ export function expectObjectsToBeClose<T extends Record<string, number>>(o1: T, 
     expect.soft(o1[key], `expected["${key}"] = actual["${key}"]`).toBeCloseTo(o2[key], numDigits);
   }
 }
+
+// Helpers to simulate touch events:
+export type TouchSpec = Coordinates & { id: number };
+export type TouchEventType = "touchstart" | "touchend" | "touchmove";
+export async function simulateTouchEvent(element: HTMLElement, type: TouchEventType, touchInputs: TouchSpec[]) {
+  const touches: Touch[] = [];
+
+  touchInputs.forEach((touch) => {
+    touches.push(
+      new Touch({
+        clientX: touch.x,
+        clientY: touch.y,
+        identifier: touch.id,
+        target: element,
+      }),
+    );
+  });
+
+  element.dispatchEvent(
+    new TouchEvent(type, {
+      touches,
+      view: window,
+      cancelable: true,
+      bubbles: true,
+    }),
+  );
+
+  await wait(10);
+}
+
+export type MouseEventType = "mousedown" | "mouseup" | "mousemove";
+export async function simulateMouseEvent(element: HTMLElement, type: MouseEventType, position: Coordinates) {
+  element.dispatchEvent(
+    new MouseEvent(type, {
+      clientX: position.x,
+      clientY: position.y,
+    }),
+  );
+
+  await wait(10);
+}

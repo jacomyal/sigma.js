@@ -53,6 +53,26 @@ export function getMouseCoords(e: MouseEvent, dom: HTMLElement): MouseCoords {
 }
 
 /**
+ * Takes a touch coords or a mouse coords, and always returns a clean mouse coords object.
+ */
+export function cleanMouseCoords(e: MouseCoords | TouchCoords): MouseCoords {
+  const res: MouseCoords =
+    "x" in e
+      ? e
+      : {
+          ...(e.touches[0] || e.previousTouches[0]),
+          original: e.original,
+          sigmaDefaultPrevented: e.sigmaDefaultPrevented,
+          preventSigmaDefault: () => {
+            e.sigmaDefaultPrevented = true;
+            res.sigmaDefaultPrevented = true;
+          },
+        };
+
+  return res;
+}
+
+/**
  * Convert mouse wheel event coords to sigma coords.
  *
  * @param  {event}       e   - A wheel mouse event.
@@ -76,15 +96,23 @@ export function getTouchesArray(touches: TouchList): Touch[] {
 /**
  * Convert touch coords to sigma coords.
  *
- * @param  {event}       e   - A touch event.
- * @param  {HTMLElement} dom - A DOM element to compute offset relatively to.
+ * @param  {event}       e               - A touch event.
+ * @param  {Touch[]}     previousTouches - An array of the previously stored touches.
+ * @param  {HTMLElement} dom             - A DOM element to compute offset relatively to.
  * @return {object}
  */
-export function getTouchCoords(e: TouchEvent, dom: HTMLElement): TouchCoords {
-  return {
+export function getTouchCoords(e: TouchEvent, previousTouches: Touch[], dom: HTMLElement): TouchCoords {
+  const res: TouchCoords = {
     touches: getTouchesArray(e.touches).map((touch) => getPosition(touch, dom)),
+    previousTouches: previousTouches.map((touch) => getPosition(touch, dom)),
+    sigmaDefaultPrevented: false,
+    preventSigmaDefault(): void {
+      res.sigmaDefaultPrevented = true;
+    },
     original: e,
   };
+
+  return res;
 }
 
 /**
