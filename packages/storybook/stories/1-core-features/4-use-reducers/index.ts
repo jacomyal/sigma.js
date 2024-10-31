@@ -92,11 +92,6 @@ export default () => {
       state.hoveredNeighbors = new Set(graph.neighbors(node));
     }
 
-    // Compute the partial that we need to re-render to optimize the refresh
-    const nodes = graph.filterNodes((n) => n !== state.hoveredNode && !state.hoveredNeighbors?.has(n));
-    const nodesIndex = new Set(nodes);
-    const edges = graph.filterEdges((e) => graph.extremities(e).some((n) => nodesIndex.has(n)));
-
     if (!node) {
       state.hoveredNode = undefined;
       state.hoveredNeighbors = undefined;
@@ -104,10 +99,6 @@ export default () => {
 
     // Refresh rendering
     renderer.refresh({
-      partialGraph: {
-        nodes,
-        edges,
-      },
       // We don't touch the graph data so we can skip its reindexation
       skipIndexation: true,
     });
@@ -163,7 +154,10 @@ export default () => {
   renderer.setSetting("edgeReducer", (edge, data) => {
     const res: Partial<EdgeDisplayData> = { ...data };
 
-    if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
+    if (
+      state.hoveredNode &&
+      !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
+    ) {
       res.hidden = true;
     }
 
