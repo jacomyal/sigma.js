@@ -178,4 +178,4 @@ export type SigmaEvents = SigmaStageEvents & SigmaNodeEvents & SigmaEdgeEvents &
  */
 export type { CameraEvents } from "./core/camera";
 export type { MouseCaptorEvents } from "./core/captors/mouse";
-export type { TouchCaptorEvents, FakeSigmaMouseEvent } from "./core/captors/touch";
+export type { TouchCaptorEvents } from "./core/captors/touch";
