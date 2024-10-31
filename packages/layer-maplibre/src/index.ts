@@ -25,14 +25,13 @@ export default function bindMaplibreLayer(
 
   // Creating map container
   const mapContainer = document.createElement("div");
-  const mapContainerId = `${sigma.getContainer().id}-map`;
-  mapContainer.setAttribute("id", mapContainerId);
+  mapContainer.classList.add("sigma-layer-maplibre");
   mapContainer.setAttribute("style", "position: absolute; inset: 0");
   sigma.getContainer().prepend(mapContainer);
 
   // Initialize the map
   const map = new Map({
-    container: mapContainerId,
+    container: mapContainer,
     style: "https://demotiles.maplibre.org/style.json",
     center: [0, 0],
     zoom: 1,
