@@ -5,7 +5,7 @@
 # Tests
 **/coverage/**
 **/playwright-report/**
-**/text-results/**
+**/test-results/**
 
 # Doc and examples
 **/storybook-static/*
