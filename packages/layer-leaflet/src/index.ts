@@ -26,9 +26,11 @@ export default function bindLeafletLayer(
   const prevSigmaSettings = sigma.getSettings();
 
   // Creating map container
-  const mapContainer = document.createElement("div");
-  mapContainer.classList.add("sigma-layer-leaflet");
-  mapContainer.setAttribute("style", "position: absolute; inset: 0; z-index: 0");
+  const mapContainer = sigma.createLayer("layer-leaflet", "div", {
+    style: { position: "absolute", inset: "0", zIndex: "0" },
+    // 'edges' is the first sigma layer
+    beforeLayer: "edges",
+  });
   sigma.getContainer().prepend(mapContainer);
 
   // Initialize the map
@@ -104,6 +106,7 @@ export default function bindLeafletLayer(
   // When sigma is resize, we need to update the graph coordinate (the ref has changed)
   // and recompute the zoom bounds
   function fnOnResize() {
+    map.invalidateSize();
     updateGraphCoordinates(sigma.getGraph());
     fnSyncSigmaWithMap();
     setSigmaRatioBounds(sigma, map);

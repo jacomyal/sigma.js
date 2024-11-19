@@ -24,9 +24,11 @@ export default function bindMaplibreLayer(
   const prevSigmaSettings = sigma.getSettings();
 
   // Creating map container
-  const mapContainer = document.createElement("div");
-  mapContainer.classList.add("sigma-layer-maplibre");
-  mapContainer.setAttribute("style", "position: absolute; inset: 0");
+  const mapContainer = sigma.createLayer("layer-leaflet", "div", {
+    style: { position: "absolute", inset: "0" },
+    // 'edges' is the first sigma layer
+    beforeLayer: "edges",
+  });
   sigma.getContainer().prepend(mapContainer);
 
   // Initialize the map
