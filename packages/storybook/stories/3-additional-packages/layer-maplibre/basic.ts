@@ -37,6 +37,12 @@ export default () => {
     getNodeLatLng: (attrs: Attributes) => ({ lat: attrs.latitude, lng: attrs.longitude }),
   });
 
+  const widthBtn = document.getElementById("change-width") as HTMLButtonElement;
+  widthBtn.addEventListener("click", () => {
+    container.style.width = 50 + Math.random() * 50 + "%";
+    renderer.resize(true);
+  });
+
   return () => {
     renderer.kill();
   };
