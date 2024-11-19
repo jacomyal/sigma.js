@@ -1,10 +1,12 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+const TAGLINE = "a JavaScript library aimed at visualizing graphs of thousands of nodes and edges";
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "sigma.js",
-  tagline: "a JavaScript library aimed at visualizing graphs of thousands of nodes and edges",
+  tagline: TAGLINE,
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
@@ -89,6 +91,16 @@ const config = {
         matomoUrl: "https://matomo.ouestware.com/",
         siteId: 26,
       },
+      metadata: [
+        {
+          name: "description",
+          content: TAGLINE,
+        },
+        {
+          name: "theme-color",
+          content: "#e22653",
+        },
+      ],
     }),
 };
 
