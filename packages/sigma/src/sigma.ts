@@ -2344,9 +2344,12 @@ export default class Sigma<
    * - `hoverNodes`
    * - `mouse`
    *
-   * @return {PlainObject<HTMLElement>} - The collection of canvases.
+   * @return {PlainObject<HTMLCanvasElement>} - The collection of canvases.
    */
-  getCanvases(): PlainObject<HTMLElement> {
-    return { ...this.elements };
+  getCanvases(): PlainObject<HTMLCanvasElement> {
+    const res: Record<string, HTMLCanvasElement> = {};
+    for (const layer in this.elements)
+      if (this.elements[layer] instanceof HTMLCanvasElement) res[layer] = this.elements[layer] as HTMLCanvasElement;
+    return res;
   }
 }
