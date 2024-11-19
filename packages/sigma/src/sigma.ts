@@ -128,7 +128,7 @@ export default class Sigma<
   private mouseCaptor: MouseCaptor<N, E, G>;
   private touchCaptor: TouchCaptor<N, E, G>;
   private container: HTMLElement;
-  private elements: PlainObject<HTMLCanvasElement> = {};
+  private elements: PlainObject<HTMLElement> = {};
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
   private webGLContexts: PlainObject<WebGLRenderingContext> = {};
   private pickingLayers: Set<string> = new Set();
@@ -1518,6 +1518,46 @@ export default class Sigma<
   }
 
   /**
+   * Function used to create a layer element.
+   *
+   * @param {string} id - Context's id.
+   * @param {string} tag - The HTML tag to use.
+   * @param options
+   * @return {Sigma}
+   */
+  createLayer<T extends HTMLElement>(
+    id: string,
+    tag: string,
+    options: { style?: Partial<CSSStyleDeclaration> } & ({ beforeLayer?: string } | { afterLayer?: string }) = {},
+  ): T {
+    if (this.elements[id]) throw new Error(`Sigma: a layer named "${id}" already exists`);
+
+    const element = createElement<T>(
+      tag,
+      {
+        position: "absolute",
+      },
+      {
+        class: `sigma-${id}`,
+      },
+    );
+
+    if (options.style) Object.assign(element.style, options.style);
+
+    this.elements[id] = element;
+
+    if ("beforeLayer" in options && options.beforeLayer) {
+      this.elements[options.beforeLayer].before(element);
+    } else if ("afterLayer" in options && options.afterLayer) {
+      this.elements[options.afterLayer].after(element);
+    } else {
+      this.container.appendChild(element);
+    }
+
+    return element;
+  }
+
+  /**
    * Function used to create a canvas element.
    *
    * @param {string} id - Context's id.
@@ -1528,31 +1568,7 @@ export default class Sigma<
     id: string,
     options: { style?: Partial<CSSStyleDeclaration> } & ({ beforeLayer?: string } | { afterLayer?: string }) = {},
   ): HTMLCanvasElement {
-    if (this.elements[id]) throw new Error(`Sigma: a layer named "${id}" already exists`);
-
-    const canvas: HTMLCanvasElement = createElement<HTMLCanvasElement>(
-      "canvas",
-      {
-        position: "absolute",
-      },
-      {
-        class: `sigma-${id}`,
-      },
-    );
-
-    if (options.style) Object.assign(canvas.style, options.style);
-
-    this.elements[id] = canvas;
-
-    if ("beforeLayer" in options && options.beforeLayer) {
-      this.elements[options.beforeLayer].before(canvas);
-    } else if ("afterLayer" in options && options.afterLayer) {
-      this.elements[options.afterLayer].after(canvas);
-    } else {
-      this.container.appendChild(canvas);
-    }
-
-    return canvas;
+    return this.createLayer(id, "canvas", options);
   }
 
   /**
@@ -2328,9 +2344,9 @@ export default class Sigma<
    * - `hoverNodes`
    * - `mouse`
    *
-   * @return {PlainObject<HTMLCanvasElement>} - The collection of canvases.
+   * @return {PlainObject<HTMLElement>} - The collection of canvases.
    */
-  getCanvases(): PlainObject<HTMLCanvasElement> {
+  getCanvases(): PlainObject<HTMLElement> {
     return { ...this.elements };
   }
 }
