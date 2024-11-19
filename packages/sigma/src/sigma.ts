@@ -1904,8 +1904,6 @@ export default class Sigma<
     // If nothing has changed, we can stop right here
     if (!force && previousWidth === this.width && previousHeight === this.height) return this;
 
-    this.emit("resize");
-
     // Sizing dom elements
     for (const id in this.elements) {
       const element = this.elements[id];
@@ -1936,6 +1934,8 @@ export default class Sigma<
         if (currentTexture) gl.deleteTexture(currentTexture);
       }
     }
+
+    this.emit("resize");
 
     return this;
   }
