@@ -1645,26 +1645,26 @@ export default class Sigma<
   }
 
   /**
-   * Function used to properly kill a canvas layer.
+   * Function used to properly kill a layer.
    *
    * @param  {string} id - Layer id.
    * @return {Sigma}
    */
   killLayer(id: string): this {
-    const canvas = this.elements[id];
+    const element = this.elements[id];
 
-    if (!canvas) throw new Error(`Sigma: cannot kill layer ${id}, which does not exist`);
+    if (!element) throw new Error(`Sigma: cannot kill layer ${id}, which does not exist`);
 
     if (this.webGLContexts[id]) {
       const gl = this.webGLContexts[id];
       gl.getExtension("WEBGL_lose_context")?.loseContext();
       delete this.webGLContexts[id];
-    } else {
+    } else if (this.canvasContexts[id]) {
       delete this.canvasContexts[id];
     }
 
-    // Delete canvas:
-    canvas.remove();
+    // Delete layer element
+    element.remove();
     delete this.elements[id];
 
     return this;

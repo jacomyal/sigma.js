@@ -26,7 +26,8 @@ export default function bindLeafletLayer(
   const prevSigmaSettings = sigma.getSettings();
 
   // Creating map container
-  const mapContainer = sigma.createLayer("layer-leaflet", "div", {
+  const mapLayerName = "layer-leaflet";
+  const mapContainer = sigma.createLayer(mapLayerName, "div", {
     style: { position: "absolute", inset: "0", zIndex: "0" },
     // 'edges' is the first sigma layer
     beforeLayer: "edges",
@@ -118,7 +119,8 @@ export default function bindLeafletLayer(
       isKilled = true;
 
       map.remove();
-      mapContainer.remove();
+
+      sigma.killLayer(mapLayerName);
 
       sigma.off("afterRender", fnSyncMapWithSigma);
       sigma.off("resize", fnOnResize);

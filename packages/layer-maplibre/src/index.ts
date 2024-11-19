@@ -24,7 +24,8 @@ export default function bindMaplibreLayer(
   const prevSigmaSettings = sigma.getSettings();
 
   // Creating map container
-  const mapContainer = sigma.createLayer("layer-leaflet", "div", {
+  const mapLayerName = "layer-maplibre";
+  const mapContainer = sigma.createLayer(mapLayerName, "div", {
     style: { position: "absolute", inset: "0" },
     // 'edges' is the first sigma layer
     beforeLayer: "edges",
@@ -100,7 +101,8 @@ export default function bindMaplibreLayer(
 
       map.off("moveend", fnSyncSigmaWithMap);
       map.remove();
-      mapContainer.remove();
+
+      sigma.killLayer(mapLayerName);
 
       sigma.off("afterRender", fnSyncMapWithSigma);
       sigma.off("resize", fnOnResize);
