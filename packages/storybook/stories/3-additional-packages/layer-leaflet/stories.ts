@@ -6,6 +6,8 @@ import basicSource from "./basic?raw";
 import geojsonPlay from "./geojson";
 import geojsonSource from "./geojson?raw";
 import template from "./index.html?raw";
+import resizePlay from "./resize";
+import resizeSource from "./resize?raw";
 import tilelayerPlay from "./tilelayer";
 import tilelayerSource from "./tilelayer?raw";
 
@@ -46,6 +48,17 @@ export const withAGeoJson: Story = {
   parameters: {
     storySource: {
       source: geojsonSource,
+    },
+  },
+};
+
+export const resize: Story = {
+  name: "Change dimensions",
+  render: () => template,
+  play: wrapStory(resizePlay),
+  parameters: {
+    storySource: {
+      source: resizeSource,
     },
   },
 };

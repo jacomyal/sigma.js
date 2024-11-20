@@ -29,12 +29,11 @@ export function graphToLatlng(map: Map, coords: { x: number; y: number }): { lat
  * BBOX sync : map to sigma
  */
 export function syncSigmaWithMap(sigma: Sigma, map: Map): void {
-  const mapBound = map.getBounds();
-
   // Compute sigma center
-  const center = sigma.viewportToFramedGraph(sigma.graphToViewport(latlngToGraph(map, mapBound.getCenter())));
+  const center = sigma.viewportToFramedGraph(sigma.graphToViewport(latlngToGraph(map, map.getCenter())));
 
   // Compute sigma ratio
+  const mapBound = map.getBounds();
   const northEast = sigma.graphToViewport(latlngToGraph(map, mapBound.getNorthEast()));
   const southWest = sigma.graphToViewport(latlngToGraph(map, mapBound.getSouthWest()));
   const viewportBoundDimension = {
@@ -45,6 +44,7 @@ export function syncSigmaWithMap(sigma: Sigma, map: Map): void {
   const ratio =
     Math.min(viewportBoundDimension.width / viewportDim.width, viewportBoundDimension.height / viewportDim.height) *
     sigma.getCamera().getState().ratio;
+
   sigma.getCamera().setState({ ...center, ratio: ratio });
 }
 

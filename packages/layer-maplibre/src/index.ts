@@ -90,8 +90,29 @@ export default function bindMaplibreLayer(
   // When sigma is resize, we need to update the graph coordinate (the ref has changed)
   // and recompute the zoom bounds
   function fnOnResize() {
-    updateGraphCoordinates(sigma.getGraph());
-    fnSyncSigmaWithMap();
+    // Avoid sync map with sigma while we do the resize
+    // otherwise there is a sideeffect...
+    sigma.off("afterRender", fnSyncMapWithSigma);
+    const center = map.getCenter();
+
+    // Ask the map to resize
+    map.once("resize", () => {
+      // NB: resize can change the center of the map, and we want to keep it
+      map.setCenter(center);
+
+      // Map ref has changed, we need to update the graph coordinates
+      updateGraphCoordinates(sigma.getGraph());
+
+      // Do the sync
+      fnSyncSigmaWithMap();
+
+      // Re-enable the map sync with sigma in the next frame
+      setTimeout(() => {
+        fnSyncMapWithSigma();
+        sigma.on("afterRender", fnSyncMapWithSigma);
+      }, 0);
+    });
+    map.resize();
   }
 
   // Clean up function to remove everything

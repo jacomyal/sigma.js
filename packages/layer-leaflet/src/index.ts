@@ -107,10 +107,18 @@ export default function bindLeafletLayer(
   // When sigma is resize, we need to update the graph coordinate (the ref has changed)
   // and recompute the zoom bounds
   function fnOnResize() {
-    map.invalidateSize();
+    // Ask the map to resize
+    // NB: resize can change the center of the map, and we want to keep it
+    const center = map.getCenter();
+    map.invalidateSize({ pan: false, animate: false, duration: 0 });
+    map.setView(center);
+
+    // Map ref has changed, we need to update the graph coordinates & bounds
     updateGraphCoordinates(sigma.getGraph());
-    fnSyncSigmaWithMap();
     setSigmaRatioBounds(sigma, map);
+
+    // Do the sync
+    fnSyncSigmaWithMap();
   }
 
   // Clean up function to remove everything
