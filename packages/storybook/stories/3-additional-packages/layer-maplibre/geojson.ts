@@ -1,6 +1,5 @@
 /**
- * This is a minimal example of sigma. You can use it as a base to write new
- * examples, or reproducible test cases for new issues, for instance.
+ * This story shows how to handle custom interactions with MapLibre when using @sigma/layer-maplibre.
  */
 import bindMaplibreLayer, { graphToLatlng } from "@sigma/layer-maplibre";
 import { FeatureCollection } from "geojson";

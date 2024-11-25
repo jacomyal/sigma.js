@@ -1,6 +1,5 @@
 /**
- * This is a minimal example of sigma. You can use it as a base to write new
- * examples, or reproducible test cases for new issues, for instance.
+ * This story presents a basic use case of @sigma/layer-maplibre.
  */
 import bindMaplibreLayer from "@sigma/layer-maplibre";
 import Graph from "graphology";

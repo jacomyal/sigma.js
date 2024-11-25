@@ -1,6 +1,5 @@
 /**
- * This is a minimal example of sigma. You can use it as a base to write new
- * examples, or reproducible test cases for new issues, for instance.
+ * This story presents a basic use case of @sigma/layer-leaflet.
  */
 import bindLeafletLayer from "@sigma/layer-leaflet";
 import Graph from "graphology";

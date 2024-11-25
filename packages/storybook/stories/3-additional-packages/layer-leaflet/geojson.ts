@@ -1,6 +1,5 @@
 /**
- * This is a minimal example of sigma. You can use it as a base to write new
- * examples, or reproducible test cases for new issues, for instance.
+ * This story shows how to handle custom interactions with Leaflet when using @sigma/layer-leaflet.
  */
 import bindLeafletLayer, { graphToLatlng } from "@sigma/layer-leaflet";
 import { FeatureCollection } from "geojson";

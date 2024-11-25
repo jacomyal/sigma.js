@@ -1,3 +1,6 @@
+/**
+ * This story shows how to use a custom tile layer with @sigma/layer-leaflet.
+ */
 import bindLeafletLayer from "@sigma/layer-leaflet";
 import Graph from "graphology";
 import { Attributes, SerializedGraph } from "graphology-types";
