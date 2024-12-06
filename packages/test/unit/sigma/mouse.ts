@@ -2,6 +2,7 @@ import { userEvent } from "@vitest/browser/context";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
+import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
@@ -79,4 +80,20 @@ describe("Sigma mouse management", () => {
     },
     { retry: 2 },
   );
+
+  test<SigmaTestContext>("it should dispatch an 'enterNode' event when the mouse is hover the node", async ({
+    sigma,
+    graph,
+    container,
+  }) => {
+    const position = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+    let triggeredEventsCount = 0;
+    sigma.on("enterNode", () => {
+      triggeredEventsCount++;
+    });
+
+    await userEvent.hover(container, { position });
+    expect(triggeredEventsCount).toBe(1);
+    expect(sigma["hoveredNode"]).toBe("n1");
+  });
 });
