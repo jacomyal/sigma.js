@@ -1717,6 +1717,10 @@ export default class Sigma<
   setGraph(graph: Graph<N, E, G>): void {
     if (graph === this.graph) return;
 
+    // Check hoveredNode and hoveredEdge
+    if (this.hoveredNode && !graph.hasNode(this.hoveredNode)) this.hoveredNode = null;
+    if (this.hoveredEdge && !graph.hasEdge(this.hoveredEdge)) this.hoveredEdge = null;
+
     // Unbinding handlers on the current graph
     this.unbindGraphHandlers();
 
