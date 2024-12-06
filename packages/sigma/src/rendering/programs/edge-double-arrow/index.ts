@@ -2,16 +2,20 @@ import { Attributes } from "graphology-types";
 
 import { EdgeProgramType, createEdgeCompoundProgram } from "../../edge";
 import { CreateEdgeArrowHeadProgramOptions, createEdgeArrowHeadProgram } from "../edge-arrow-head";
-import { createEdgeClampedProgram } from "../edge-clamped";
+import { createEdgeDoubleClampedProgram } from "../edge-double-clamped";
 
-export function createEdgeArrowProgram<
+export function createEdgeDoubleArrowProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 >(inputOptions?: Partial<Omit<CreateEdgeArrowHeadProgramOptions, "extremity">>): EdgeProgramType<N, E, G> {
-  return createEdgeCompoundProgram([createEdgeClampedProgram(inputOptions), createEdgeArrowHeadProgram(inputOptions)]);
+  return createEdgeCompoundProgram([
+    createEdgeDoubleClampedProgram(inputOptions),
+    createEdgeArrowHeadProgram(inputOptions),
+    createEdgeArrowHeadProgram({ ...inputOptions, extremity: "source" }),
+  ]);
 }
 
-const EdgeArrowProgram = createEdgeArrowProgram();
+const EdgeDoubleArrowProgram = createEdgeDoubleArrowProgram();
 
-export default EdgeArrowProgram;
+export default EdgeDoubleArrowProgram;

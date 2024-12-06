@@ -25,9 +25,11 @@ export { default as NodeCircleProgram } from "./programs/node-circle";
 export { default as NodePointProgram } from "./programs/node-point";
 
 // Built-in edge programs
-export * from "./programs/edge-arrow-head";
-export * from "./programs/edge-clamped";
+export { default as EdgeArrowHeadProgram } from "./programs/edge-arrow-head";
+export { default as EdgeClampedProgram } from "./programs/edge-clamped";
+export { default as EdgeDoubleClampedProgram } from "./programs/edge-double-clamped";
 export { createEdgeArrowProgram, default as EdgeArrowProgram } from "./programs/edge-arrow";
+export { createEdgeDoubleArrowProgram, default as EdgeDoubleArrowProgram } from "./programs/edge-double-arrow";
 export { default as EdgeLineProgram } from "./programs/edge-line";
 export { default as EdgeRectangleProgram } from "./programs/edge-rectangle";
 export { default as EdgeTriangleProgram } from "./programs/edge-triangle";
