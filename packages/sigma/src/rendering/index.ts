@@ -25,11 +25,26 @@ export { default as NodeCircleProgram } from "./programs/node-circle";
 export { default as NodePointProgram } from "./programs/node-point";
 
 // Built-in edge programs
-export { default as EdgeArrowHeadProgram } from "./programs/edge-arrow-head";
-export { default as EdgeClampedProgram } from "./programs/edge-clamped";
-export { default as EdgeDoubleClampedProgram } from "./programs/edge-double-clamped";
-export { createEdgeArrowProgram, default as EdgeArrowProgram } from "./programs/edge-arrow";
-export { createEdgeDoubleArrowProgram, default as EdgeDoubleArrowProgram } from "./programs/edge-double-arrow";
+export {
+  default as EdgeArrowHeadProgram,
+  createEdgeArrowHeadProgram,
+  DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS,
+  type CreateEdgeArrowHeadProgramOptions,
+} from "./programs/edge-arrow-head";
+export {
+  default as EdgeClampedProgram,
+  createEdgeClampedProgram,
+  DEFAULT_EDGE_CLAMPED_PROGRAM_OPTIONS,
+  type CreateEdgeClampedProgramOptions,
+} from "./programs/edge-clamped";
+export {
+  default as EdgeDoubleClampedProgram,
+  createEdgeDoubleClampedProgram,
+  DEFAULT_EDGE_DOUBLE_CLAMPED_PROGRAM_OPTIONS,
+  type CreateEdgeDoubleClampedProgramOptions,
+} from "./programs/edge-double-clamped";
+export { default as EdgeArrowProgram, createEdgeArrowProgram } from "./programs/edge-arrow";
+export { default as EdgeDoubleArrowProgram, createEdgeDoubleArrowProgram } from "./programs/edge-double-arrow";
 export { default as EdgeLineProgram } from "./programs/edge-line";
 export { default as EdgeRectangleProgram } from "./programs/edge-rectangle";
 export { default as EdgeTriangleProgram } from "./programs/edge-triangle";
