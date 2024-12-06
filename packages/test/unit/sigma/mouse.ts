@@ -96,4 +96,23 @@ describe("Sigma mouse management", () => {
     expect(triggeredEventsCount).toBe(1);
     expect(sigma["hoveredNode"]).toBe("n1");
   });
+
+  test<SigmaTestContext>("it should not throw when `setGraph` is called while a node is hovered (issue #1486)", async ({
+    sigma,
+    graph,
+    container,
+  }) => {
+    const position = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+
+    await userEvent.hover(container, { position });
+    const newGraph = new Graph();
+    newGraph.import({
+      nodes: [
+        { key: "n3", attributes: { x: 0, y: 0, size: 5 } },
+        { key: "n4", attributes: { x: 50, y: 50, size: 5 } },
+      ],
+      edges: [{ source: "n3", target: "n4" }],
+    });
+    sigma.setGraph(newGraph);
+  });
 });
