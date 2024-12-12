@@ -1,6 +1,6 @@
 {
   "name": "@sigma/node-square",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0",
   "description": "A node program that renders nodes as squares for sigma.js",
   "main": "dist/sigma-node-square.cjs.js",
   "module": "dist/sigma-node-square.esm.js",

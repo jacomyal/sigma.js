@@ -1,6 +1,6 @@
 {
   "name": "@sigma/export-image",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "description": "An helper to capture snapshots of sigma.js instances as images",
   "main": "dist/sigma-export-image.cjs.js",
   "module": "dist/sigma-export-image.esm.js",
