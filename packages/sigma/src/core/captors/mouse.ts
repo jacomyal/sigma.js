@@ -307,10 +307,8 @@ export default class MouseCaptor<
   }
 
   handleWheel(e: WheelEvent): void {
-    if (!this.enabled) return;
-
-    e.preventDefault();
-    e.stopPropagation();
+    const camera = this.renderer.getCamera();
+    if (!this.enabled || !camera.enabledZooming) return;
 
     const delta = getWheelDelta(e);
 
@@ -319,16 +317,26 @@ export default class MouseCaptor<
     const wheelCoords = getWheelCoords(e, this.container);
     this.emit("wheel", wheelCoords);
 
-    if (wheelCoords.sigmaDefaultPrevented) return;
+    if (wheelCoords.sigmaDefaultPrevented) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
 
     // Default behavior
+    const currentRatio = camera.getState().ratio;
     const ratioDiff = delta > 0 ? 1 / this.settings.zoomingRatio : this.settings.zoomingRatio;
-    const camera = this.renderer.getCamera();
-    const newRatio = camera.getBoundedRatio(camera.getState().ratio * ratioDiff);
+    const newRatio = camera.getBoundedRatio(currentRatio * ratioDiff);
     const wheelDirection = delta > 0 ? 1 : -1;
     const now = Date.now();
 
-    // Cancel events that are too close too each other and in the same direction:
+    // Exit early without preventing default behavior when ratio doesn't change:
+    if (currentRatio === newRatio) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Cancel events that are too close each other and in the same direction:
     if (
       this.currentWheelDirection === wheelDirection &&
       this.lastWheelTriggerTime &&

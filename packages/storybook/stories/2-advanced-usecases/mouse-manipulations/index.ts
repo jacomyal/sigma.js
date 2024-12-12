@@ -24,7 +24,7 @@ export default () => {
   layout.start();
 
   // Create the sigma
-  const renderer = new Sigma(graph, container);
+  const renderer = new Sigma(graph, container, { minCameraRatio: 0.5, maxCameraRatio: 2 });
 
   //
   // Drag'n'drop feature
