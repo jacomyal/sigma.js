@@ -20,7 +20,7 @@ import {
   drawDiscNodeLabel,
   drawStraightEdgeLabel,
 } from "./rendering";
-import { EdgeDisplayData, NodeDisplayData } from "./types";
+import { AtLeastOne, EdgeDisplayData, NodeDisplayData } from "./types";
 import { assign } from "./utils";
 
 /**
@@ -38,6 +38,7 @@ export interface Settings<
   renderLabels: boolean;
   renderEdgeLabels: boolean;
   enableEdgeEvents: boolean;
+
   // Component rendering
   defaultNodeColor: string;
   defaultNodeType: string;
@@ -89,7 +90,13 @@ export interface Settings<
   zIndex: boolean;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
+  enableCameraZooming: boolean;
+  enableCameraPanning: boolean;
   enableCameraRotation: boolean;
+  cameraPanBoundaries:
+    | null
+    | true
+    | AtLeastOne<{ tolerance: number; boundaries: { x: [number, number]; y: [number, number] } }>;
 
   // Lifecycle
   allowInvalidContainer: boolean;
@@ -159,7 +166,10 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   zIndex: false,
   minCameraRatio: null,
   maxCameraRatio: null,
+  enableCameraZooming: true,
+  enableCameraPanning: true,
   enableCameraRotation: true,
+  cameraPanBoundaries: null,
 
   // Lifecycle
   allowInvalidContainer: false,
@@ -201,7 +211,7 @@ export function resolveSettings<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 >(settings: Partial<Settings<N, E, G>>): Settings<N, E, G> {
-  const resolvedSettings = assign({}, DEFAULT_SETTINGS, settings);
+  const resolvedSettings = assign({}, DEFAULT_SETTINGS as Settings<N, E, G>, settings);
 
   resolvedSettings.nodeProgramClasses = assign({}, DEFAULT_NODE_PROGRAM_CLASSES, resolvedSettings.nodeProgramClasses);
   resolvedSettings.edgeProgramClasses = assign({}, DEFAULT_EDGE_PROGRAM_CLASSES, resolvedSettings.edgeProgramClasses);

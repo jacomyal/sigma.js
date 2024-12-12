@@ -31,7 +31,10 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
 
   minRatio: number | null = null;
   maxRatio: number | null = null;
+  enabledZooming = true;
+  enabledPanning = true;
   enabledRotation = true;
+  clean: ((state: CameraState) => CameraState) | null = null;
 
   private nextFrame: number | null = null;
   private previousState: CameraState | null = null;
@@ -120,11 +123,12 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
    */
   validateState(state: Partial<CameraState>): Partial<CameraState> {
     const validatedState: Partial<CameraState> = {};
-    if (typeof state.x === "number") validatedState.x = state.x;
-    if (typeof state.y === "number") validatedState.y = state.y;
+    if (this.enabledPanning && typeof state.x === "number") validatedState.x = state.x;
+    if (this.enabledPanning && typeof state.y === "number") validatedState.y = state.y;
+    if (this.enabledZooming && typeof state.ratio === "number")
+      validatedState.ratio = this.getBoundedRatio(state.ratio);
     if (this.enabledRotation && typeof state.angle === "number") validatedState.angle = state.angle;
-    if (typeof state.ratio === "number") validatedState.ratio = this.getBoundedRatio(state.ratio);
-    return validatedState;
+    return this.clean ? this.clean({ ...this.getState(), ...validatedState }) : validatedState;
   }
 
   /**
@@ -146,8 +150,8 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
     const validState = this.validateState(state);
     if (typeof validState.x === "number") this.x = validState.x;
     if (typeof validState.y === "number") this.y = validState.y;
-    if (this.enabledRotation && typeof validState.angle === "number") this.angle = validState.angle;
     if (typeof validState.ratio === "number") this.ratio = validState.ratio;
+    if (typeof validState.angle === "number") this.angle = validState.angle;
 
     // Emitting
     if (!this.hasState(this.previousState)) this.emit("updated", this.getState());

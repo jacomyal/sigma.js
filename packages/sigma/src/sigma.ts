@@ -878,7 +878,20 @@ export default class Sigma<
 
     this.camera.minRatio = settings.minCameraRatio;
     this.camera.maxRatio = settings.maxCameraRatio;
+    this.camera.enabledZooming = settings.enableCameraZooming;
+    this.camera.enabledPanning = settings.enableCameraPanning;
     this.camera.enabledRotation = settings.enableCameraRotation;
+    if (settings.cameraPanBoundaries) {
+      this.camera.clean = (state) =>
+        this.cleanCameraState(
+          state,
+          settings.cameraPanBoundaries && typeof settings.cameraPanBoundaries === "object"
+            ? settings.cameraPanBoundaries
+            : {},
+        );
+    } else {
+      this.camera.clean = null;
+    }
     this.camera.setState(this.camera.validateState(this.camera.getState()));
 
     if (oldSettings) {
@@ -918,6 +931,73 @@ export default class Sigma<
     this.touchCaptor.setSettings(this.settings);
 
     return this;
+  }
+
+  private cleanCameraState(
+    state: CameraState,
+    { tolerance = 0, boundaries }: { tolerance?: number; boundaries?: Record<"x" | "y", [number, number]> } = {},
+  ): CameraState {
+    const newState = { ...state };
+
+    // Extract necessary properties
+    const {
+      x: [xMinGraph, xMaxGraph],
+      y: [yMinGraph, yMaxGraph],
+    } = boundaries || this.nodeExtent;
+
+    // Transform the four corners of the graph rectangle using the provided camera state
+    const corners = [
+      this.graphToViewport({ x: xMinGraph, y: yMinGraph }, { cameraState: state }),
+      this.graphToViewport({ x: xMaxGraph, y: yMinGraph }, { cameraState: state }),
+      this.graphToViewport({ x: xMinGraph, y: yMaxGraph }, { cameraState: state }),
+      this.graphToViewport({ x: xMaxGraph, y: yMaxGraph }, { cameraState: state }),
+    ];
+
+    // Look for new extents, based on these four corners
+    let xMin = Infinity,
+      xMax = -Infinity,
+      yMin = Infinity,
+      yMax = -Infinity;
+    corners.forEach(({ x, y }) => {
+      xMin = Math.min(xMin, x);
+      xMax = Math.max(xMax, x);
+      yMin = Math.min(yMin, y);
+      yMax = Math.max(yMax, y);
+    });
+
+    // For each dimension, constraint the smaller element (camera or graph) to fit in the larger one:
+    const graphWidth = xMax - xMin;
+    const graphHeight = yMax - yMin;
+    const { width, height } = this.getDimensions();
+    let dx = 0;
+    let dy = 0;
+
+    if (graphWidth >= width) {
+      if (xMax < width - tolerance) dx = xMax - (width - tolerance);
+      else if (xMin > tolerance) dx = xMin - tolerance;
+    } else {
+      if (xMax > width + tolerance) dx = xMax - (width + tolerance);
+      else if (xMin < -tolerance) dx = xMin + tolerance;
+    }
+    if (graphHeight >= height) {
+      if (yMax < height - tolerance) dy = yMax - (height - tolerance);
+      else if (yMin > tolerance) dy = yMin - tolerance;
+    } else {
+      if (yMax > height + tolerance) dy = yMax - (height + tolerance);
+      else if (yMin < -tolerance) dy = yMin + tolerance;
+    }
+
+    if (dx || dy) {
+      // Transform [dx, dy] from viewport to graph (using two different point to transform that vector):
+      const origin = this.viewportToFramedGraph({ x: 0, y: 0 }, { cameraState: state });
+      const delta = this.viewportToFramedGraph({ x: dx, y: dy }, { cameraState: state });
+      dx = delta.x - origin.x;
+      dy = delta.y - origin.y;
+      newState.x += dx;
+      newState.y += dy;
+    }
+
+    return newState;
   }
 
   /**
@@ -1575,6 +1655,7 @@ export default class Sigma<
    * Function used to create a canvas context and add the relevant DOM elements.
    *
    * @param  {string} id - Context's id.
+   * @param  options
    * @return {Sigma}
    */
   createCanvasContext(id: string, options: { style?: Partial<CSSStyleDeclaration> } = {}): this {
@@ -1872,6 +1953,21 @@ export default class Sigma<
     updater: (value: Settings<N, E, G>[K]) => Settings<N, E, G>[K],
   ): this {
     this.setSetting(key, updater(this.settings[key]));
+    return this;
+  }
+
+  /**
+   * Method setting multiple settings at once.
+   *
+   * @param  {Partial<Settings>} settings - The settings to set.
+   * @return {Sigma}
+   */
+  setSettings(settings: Partial<Settings<N, E, G>>): this {
+    const oldValues = { ...this.settings };
+    this.settings = { ...this.settings, ...settings };
+    validateSettings(this.settings);
+    this.handleSettingsUpdate(oldValues);
+    this.scheduleRefresh();
     return this;
   }
 

@@ -21,6 +21,11 @@ export type PlainObject<T = any> = { [k: string]: T };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PartialButFor<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>> & { [others: string]: any };
 
+/**
+ * Returns a type similar to Partial<T>, but with at least one key set.
+ */
+export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export interface Coordinates {
