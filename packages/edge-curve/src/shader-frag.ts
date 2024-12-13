@@ -1,6 +1,9 @@
 import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
+  const hasTargetArrowHead = arrowHead?.extremity === "target" || arrowHead?.extremity === "both";
+  const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
+
   // language=GLSL
   const SHADER = /*glsl*/ `
 precision highp float;
@@ -12,11 +15,22 @@ varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
 ${
-  arrowHead
+  hasTargetArrowHead
     ? `
 varying float v_targetSize;
-varying vec2 v_targetPoint;
-
+varying vec2 v_targetPoint;`
+    : ""
+}
+${
+  hasSourceArrowHead
+    ? `
+varying float v_sourceSize;
+varying vec2 v_sourcePoint;`
+    : ""
+}
+${
+  arrowHead
+    ? `
 uniform float u_lengthToThicknessRatio;
 uniform float u_widenessToThicknessRatio;`
     : ""
@@ -49,12 +63,22 @@ void main(void) {
   float dist = distToQuadraticBezierCurve(gl_FragCoord.xy, v_cpA, v_cpB, v_cpC);
   float thickness = v_thickness;
 ${
-  arrowHead
+  hasTargetArrowHead
     ? `
   float distToTarget = length(gl_FragCoord.xy - v_targetPoint);
-  float arrowLength = v_targetSize + thickness * u_lengthToThicknessRatio;
-  if (distToTarget < arrowLength) {
-    thickness = (distToTarget - v_targetSize) / (arrowLength - v_targetSize) * u_widenessToThicknessRatio * thickness;
+  float targetArrowLength = v_targetSize + thickness * u_lengthToThicknessRatio;
+  if (distToTarget < targetArrowLength) {
+    thickness = (distToTarget - v_targetSize) / (targetArrowLength - v_targetSize) * u_widenessToThicknessRatio * thickness;
+  }`
+    : ""
+}
+${
+  hasSourceArrowHead
+    ? `
+  float distToSource = length(gl_FragCoord.xy - v_sourcePoint);
+  float sourceArrowLength = v_sourceSize + thickness * u_lengthToThicknessRatio;
+  if (distToSource < sourceArrowLength) {
+    thickness = (distToSource - v_sourceSize) / (sourceArrowLength - v_sourceSize) * u_widenessToThicknessRatio * thickness;
   }`
     : ""
 }

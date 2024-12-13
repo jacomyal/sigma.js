@@ -1,6 +1,9 @@
 import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getVertexShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
+  const hasTargetArrowHead = arrowHead?.extremity === "target" || arrowHead?.extremity === "both";
+  const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
+
   // language=GLSL
   const SHADER = /*glsl*/ `
 attribute vec4 a_id;
@@ -11,7 +14,8 @@ attribute vec2 a_source;
 attribute vec2 a_target;
 attribute float a_current;
 attribute float a_curvature;
-${arrowHead ? "attribute float a_targetSize;\n" : ""}
+${hasTargetArrowHead ? "attribute float a_targetSize;\n" : ""}
+${hasSourceArrowHead ? "attribute float a_sourceSize;\n" : ""}
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -27,12 +31,23 @@ varying vec2 v_cpA;
 varying vec2 v_cpB;
 varying vec2 v_cpC;
 ${
-  arrowHead
+  hasTargetArrowHead
     ? `
 varying float v_targetSize;
-varying vec2 v_targetPoint;
-uniform float u_widenessToThicknessRatio;
-`
+varying vec2 v_targetPoint;`
+    : ""
+}
+${
+  hasSourceArrowHead
+    ? `
+varying float v_sourceSize;
+varying vec2 v_sourcePoint;`
+    : ""
+}
+${
+  arrowHead
+    ? `
+uniform float u_widenessToThicknessRatio;`
     : ""
 }
 
@@ -92,10 +107,18 @@ void main() {
   gl_Position = vec4(position, 0, 1);
     
 ${
-  arrowHead
+  hasTargetArrowHead
     ? `
   v_targetSize = a_targetSize * u_pixelRatio / u_sizeRatio;
   v_targetPoint = viewportTarget;
+`
+    : ""
+}
+${
+  hasSourceArrowHead
+    ? `
+  v_sourceSize = a_sourceSize * u_pixelRatio / u_sizeRatio;
+  v_sourcePoint = viewportSource;
 `
     : ""
 }

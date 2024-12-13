@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 
 import { wrapStory } from "../../utils";
+import arrowHeadsPlay from "./arrow-heads";
+import arrowHeadsSource from "./arrow-heads?raw";
 import basicPlay from "./basic";
 import basicSource from "./basic?raw";
 import template from "./index.html?raw";
@@ -63,6 +65,18 @@ export const parallelEdges: Story = {
   parameters: {
     storySource: {
       source: parallelEdgesSource,
+    },
+  },
+};
+
+export const arrowHeads: Story = {
+  name: "Arrow heads",
+  render: () => template,
+  play: wrapStory(arrowHeadsPlay),
+  args: {},
+  parameters: {
+    storySource: {
+      source: arrowHeadsSource,
     },
   },
 };

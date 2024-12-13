@@ -20,6 +20,8 @@ export default function createEdgeCurveProgram<
     ...(inputOptions || {}),
   };
   const { arrowHead, curvatureAttribute, drawLabel } = options as CreateEdgeCurveProgramOptions<N, E, G>;
+  const hasTargetArrowHead = arrowHead?.extremity === "target" || arrowHead?.extremity === "both";
+  const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
   const UNIFORMS = [
     "u_matrix",
     "u_sizeRatio",
@@ -43,7 +45,8 @@ export default function createEdgeCurveProgram<
         ATTRIBUTES: [
           { name: "a_source", size: 2, type: FLOAT },
           { name: "a_target", size: 2, type: FLOAT },
-          ...(arrowHead ? [{ name: "a_targetSize", size: 1, type: FLOAT }] : []),
+          ...(hasTargetArrowHead ? [{ name: "a_targetSize", size: 1, type: FLOAT }] : []),
+          ...(hasSourceArrowHead ? [{ name: "a_sourceSize", size: 1, type: FLOAT }] : []),
           { name: "a_thickness", size: 1, type: FLOAT },
           { name: "a_curvature", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
@@ -86,7 +89,8 @@ export default function createEdgeCurveProgram<
       array[startIndex++] = y1;
       array[startIndex++] = x2;
       array[startIndex++] = y2;
-      if (arrowHead) array[startIndex++] = targetData.size;
+      if (hasTargetArrowHead) array[startIndex++] = targetData.size;
+      if (hasSourceArrowHead) array[startIndex++] = sourceData.size;
       array[startIndex++] = thickness;
       array[startIndex++] = curvature;
       array[startIndex++] = color;

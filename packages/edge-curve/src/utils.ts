@@ -13,6 +13,7 @@ export type CreateEdgeCurveProgramOptions<
   curvatureAttribute: string;
   defaultCurvature: number;
   arrowHead: null | {
+    extremity: "target" | "source" | "both";
     lengthToThicknessRatio: number;
     widenessToThicknessRatio: number;
   };

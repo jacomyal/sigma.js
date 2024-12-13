@@ -18,3 +18,10 @@ export default EdgeCurveProgram;
 export const EdgeCurvedArrowProgram: EdgeProgramType = createEdgeCurveProgram({
   arrowHead: DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS,
 });
+
+export const EdgeCurvedDoubleArrowProgram: EdgeProgramType = createEdgeCurveProgram({
+  arrowHead: {
+    ...DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS,
+    extremity: "both",
+  },
+});
