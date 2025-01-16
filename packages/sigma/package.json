@@ -43,7 +43,7 @@
     "graphology-utils": "^2.5.2"
   },
   "devDependencies": {
-    "vite": "^5.1.6"
+    "vite": "^6.0.7"
   },
   "keywords": [
     "graph",
