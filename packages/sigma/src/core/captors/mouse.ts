@@ -230,7 +230,7 @@ export default class MouseCaptor<
       // See also issue: https://github.com/jacomyal/sigma.js/issues/1290
       // It could be possible to render instead of scheduling a refresh but for
       // now it seems good enough.
-      if (shouldRefresh) this.renderer.refresh();
+      if (shouldRefresh && this.renderer.getSetting("hideEdgesOnMove")) this.renderer.refresh();
     }, 0);
     this.emit("mouseup", getMouseCoords(e, this.container));
   }
