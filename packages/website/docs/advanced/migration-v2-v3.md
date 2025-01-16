@@ -1,6 +1,6 @@
 ---
 title: Migrating from v2 to v3
-sidebar_position: 9
+sidebar_position: 10
 ---
 
 This guide will help users migrating their applications from sigma v2.\* to v3.\*.
