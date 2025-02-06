@@ -2,11 +2,11 @@
   "name": "@sigma/storybook",
   "private": true,
   "dependencies": {
-    "@types/chroma-js": "^3.1.0",
+    "@types/chroma-js": "^3.1.1",
     "@types/papaparse": "^5.3.15",
     "@types/seedrandom": "^3.0.8",
     "chroma-js": "^3.1.2",
-    "graphology": "^0.25.4",
+    "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
     "graphology-components": "^1.5.4",
     "graphology-generators": "^0.11.2",
@@ -16,19 +16,19 @@
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-types": "^0.24.8",
     "iwanthue": "^2.0.0",
-    "papaparse": "^5.5.1",
+    "papaparse": "^5.5.2",
     "seedrandom": "^3.0.5",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^8.5.0",
-    "@storybook/addon-storysource": "^8.5.0",
-    "@storybook/html": "^8.5.0",
-    "@storybook/html-vite": "^8.5.0",
-    "@storybook/manager-api": "^8.5.0",
-    "@storybook/theming": "^8.5.0",
-    "@storybook/web-components": "^8.5.0",
-    "storybook": "^8.5.0"
+    "@storybook/addon-essentials": "8.4.7",
+    "@storybook/addon-storysource": "8.4.7",
+    "@storybook/html": "8.4.7",
+    "@storybook/html-vite": "8.4.7",
+    "@storybook/manager-api": "8.4.7",
+    "@storybook/theming": "8.4.7",
+    "@storybook/web-components": "8.4.7",
+    "storybook": "8.4.7"
   },
   "scripts": {
     "start": "storybook dev -p 6006",
