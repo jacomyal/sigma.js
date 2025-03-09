@@ -1,16 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "packages/demo/package.json",
-      "use": "@vercel/node",
-      "config": {
-        "buildCommand": "npm run build",
-        "outputDirectory": "build"
-      }
-    }
-  ],
+  "framework": "vite",
+  "installCommand": "cd packages/demo && npm install",
+  "buildCommand": "cd packages/demo && npm run build",
+  "outputDirectory": "packages/demo/build",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/packages/demo/build/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 } 
