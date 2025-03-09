@@ -1,6 +1,4 @@
 {
-  "version": 2,
-  "framework": "create-react-app",
-  "buildCommand": "ls -la && pwd && find . -type d | sort",
+  "buildCommand": "ls -la && find . -type d -maxdepth 2 && echo '---TRYING TO BUILD---' && cd packages/demo && npm install && npm run build",
   "outputDirectory": "packages/demo/build"
 } 
