@@ -1,8 +1,16 @@
 {
-  "buildCommand": "npm install && cd packages/demo && npm install && npm run build",
-  "outputDirectory": "packages/demo/build",
-  "installCommand": "echo 'Installing only project dependencies'",
+  "version": 2,
+  "builds": [
+    {
+      "src": "packages/demo/package.json",
+      "use": "@vercel/node",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": "build"
+      }
+    }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/packages/demo/build/index.html" }
   ]
 } 
