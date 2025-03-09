@@ -1,10 +1,6 @@
 {
   "version": 2,
-  "framework": "vite",
-  "installCommand": "cd packages/demo && npm install",
-  "buildCommand": "cd packages/demo && npm run build",
-  "outputDirectory": "packages/demo/build",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "framework": "create-react-app",
+  "buildCommand": "ls -la && pwd && find . -type d | sort",
+  "outputDirectory": "packages/demo/build"
 } 
