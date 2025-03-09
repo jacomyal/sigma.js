@@ -1,69 +1,9 @@
 import { FC } from "react";
 import { BsInfoCircle } from "react-icons/bs";
-import { useSigma } from "@react-sigma/core";
 
 import Panel from "./Panel";
 
-interface DescriptionPanelProps {
-  selectedNode?: string | null;
-}
-
-// Interfejs dla definicji encji
-interface Definition {
-  text: string;
-  strength: number;
-}
-
-const DescriptionPanel: FC<DescriptionPanelProps> = ({ selectedNode }) => {
-  const sigma = selectedNode ? useSigma() : null;
-  const graph = sigma?.getGraph();
-  
-  // Gdy mamy wybrany węzeł, pobieramy jego dane i wyświetlamy szczegóły
-  if (selectedNode && graph && graph.hasNode(selectedNode)) {
-    const nodeAttributes = graph.getNodeAttributes(selectedNode);
-    const { label, entity_types, definitions } = nodeAttributes;
-    
-    // Sortujemy definicje według strength (malejąco)
-    const sortedDefinitions: Definition[] = definitions && Array.isArray(definitions) 
-      ? [...definitions].sort((a, b) => b.strength - a.strength)
-      : [];
-    
-    return (
-      <Panel
-        initiallyDeployed
-        title={
-          <>
-            <BsInfoCircle className="text-muted" /> Informacje o encji: {label}
-          </>
-        }
-      >
-        {entity_types && (
-          <div className="node-detail">
-            <h4>Typy encji:</h4>
-            <p>{entity_types}</p>
-          </div>
-        )}
-        
-        {sortedDefinitions && sortedDefinitions.length > 0 ? (
-          <div className="node-detail">
-            <h4>Definicje:</h4>
-            <ol className="definitions-list">
-              {sortedDefinitions.map((def, index) => (
-                <li key={index} className="definition-item">
-                  <p>{def.text}</p>
-                  <small className="strength-info">Siła definicji: {def.strength}</small>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ) : (
-          <p>Brak definicji dla tej encji.</p>
-        )}
-      </Panel>
-    );
-  }
-  
-  // Gdy nie ma wybranego węzła, wyświetlamy standardowy opis
+const DescriptionPanel: FC = () => {
   return (
     <Panel
       initiallyDeployed
@@ -121,7 +61,7 @@ const DescriptionPanel: FC<DescriptionPanelProps> = ({ selectedNode }) => {
           betweenness centrality
         </a>
         . More central nodes (ie. bigger nodes) are important crossing points in the network. Finally, You can click a
-        node to view more information about it.
+        node to open the related Wikipedia article.
       </p>
     </Panel>
   );

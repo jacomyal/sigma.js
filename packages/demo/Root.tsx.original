@@ -4,7 +4,7 @@ import { DirectedGraph } from "graphology";
 import { constant, keyBy, mapValues, omit } from "lodash";
 import { FC, useEffect, useMemo, useState } from "react";
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
-import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut, BsMoon, BsSun } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreenExit, BsZoomIn, BsZoomOut } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import { Settings } from "sigma/settings";
 
@@ -16,7 +16,6 @@ import GraphDataController from "./GraphDataController";
 import GraphEventsController from "./GraphEventsController";
 import GraphSettingsController from "./GraphSettingsController";
 import GraphTitle from "./GraphTitle";
-import RelationsPanel from "./RelationsPanel";
 import SearchField from "./SearchField";
 import TagsPanel from "./TagsPanel";
 
@@ -30,8 +29,6 @@ const Root: FC = () => {
     tags: {},
   });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
       nodeProgramClasses: {
@@ -52,18 +49,9 @@ const Root: FC = () => {
     [],
   );
 
-  // Effect for dark mode
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }, [darkMode]);
-
   // Load data on mount:
   useEffect(() => {
-    fetch(`./ai_news_dataset.json`)
+    fetch(`./dataset.json`)
       .then((res) => res.json())
       .then((dataset: Dataset) => {
         const clusters = keyBy(dataset.clusters, "key");
@@ -109,21 +97,11 @@ const Root: FC = () => {
     <div id="app-root" className={showContents ? "show-contents" : ""}>
       <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
         <GraphSettingsController hoveredNode={hoveredNode} />
-        <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
+        <GraphEventsController setHoveredNode={setHoveredNode} />
         <GraphDataController filters={filtersState} />
 
         {dataReady && (
           <>
-            <button
-              className="theme-switcher"
-              onClick={() => setDarkMode(!darkMode)}
-              title={darkMode ? "Przełącz na tryb jasny" : "Przełącz na tryb ciemny"}
-            >
-              {darkMode ? <BsSun /> : <BsMoon />}
-            </button>
-
-            <GraphTitle filters={filtersState} />
-            
             <div className="controls">
               <div className="react-sigma-control ico">
                 <button
@@ -150,17 +128,17 @@ const Root: FC = () => {
               <div className="ico">
                 <button
                   type="button"
-                  className="hide-contents"
+                  className="ico hide-contents"
                   onClick={() => setShowContents(false)}
                   title="Show caption and description"
                 >
                   <GrClose />
                 </button>
               </div>
+              <GraphTitle filters={filtersState} />
               <div className="panels">
                 <SearchField filters={filtersState} />
-                <DescriptionPanel selectedNode={selectedNode} />
-                <RelationsPanel selectedNode={selectedNode} />
+                <DescriptionPanel />
                 <ClustersPanel
                   clusters={dataset.clusters}
                   filters={filtersState}

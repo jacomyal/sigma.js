@@ -5,8 +5,12 @@ function getMouseLayer() {
   return document.querySelector(".sigma-mouse");
 }
 
-const GraphEventsController: FC<PropsWithChildren<{ setHoveredNode: (node: string | null) => void }>> = ({
+const GraphEventsController: FC<PropsWithChildren<{ 
+  setHoveredNode: (node: string | null) => void,
+  setSelectedNode: (node: string | null) => void
+}>> = ({
   setHoveredNode,
+  setSelectedNode,
   children,
 }) => {
   const sigma = useSigma();
@@ -21,7 +25,7 @@ const GraphEventsController: FC<PropsWithChildren<{ setHoveredNode: (node: strin
     registerEvents({
       clickNode({ node }) {
         if (!graph.getNodeAttribute(node, "hidden")) {
-          window.open(graph.getNodeAttribute(node, "URL"), "_blank");
+          setSelectedNode(node);
         }
       },
       enterNode({ node }) {

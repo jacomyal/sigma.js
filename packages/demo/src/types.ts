@@ -6,6 +6,8 @@ export interface NodeData {
   cluster: string;
   x: number;
   y: number;
+  entity_types?: string;
+  entity_definition?: string;
 }
 
 export interface Cluster {
