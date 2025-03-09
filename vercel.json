@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd packages/demo && npm install && npm run build",
+  "buildCommand": "npm install && cd packages/demo && npm install && npm run build",
   "outputDirectory": "packages/demo/build",
-  "installCommand": "echo 'Skipping main install'",
+  "installCommand": "echo 'Installing only project dependencies'",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
