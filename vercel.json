@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd packages/demo && npm install && npm run build",
+  "outputDirectory": "packages/demo/build",
+  "installCommand": "echo 'Skipping main install'",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+} 
