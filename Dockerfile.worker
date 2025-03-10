@@ -1,0 +1,11 @@
+# Dockerfile.worker
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY python/requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY python/fetch_graph_data.py ./
+
+CMD ["python", "fetch_graph_data.py"] 

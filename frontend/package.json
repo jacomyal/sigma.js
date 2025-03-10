@@ -1,0 +1,49 @@
+{
+  "name": "@sigma/demo",
+  "private": true,
+  "homepage": "/demo",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@react-sigma/core": "^5.0.1",
+    "@sigma/node-image": ">=3.0.0",
+    "graphology": "^0.25.4",
+    "graphology-layout-forceatlas2": "^0.10.1",
+    "graphology-types": "^0.24.8",
+    "lodash": "^4.17.21",
+    "react": "^19.0.0",
+    "react-animate-height": "^3.2.3",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "sigma": "^3.0.0"
+  },
+  "peerDependencies": {
+    "sigma": ">=3.0.0-beta.33"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.14",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-checker": "^0.8.0",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

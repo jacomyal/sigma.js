@@ -519,17 +519,17 @@ def main():
         # Przetwarzanie danych
         graph_data = process_data(data)
         
-            # Konwersja do formatu Sigma.js
+        # Konwersja do formatu Sigma.js
         sigma_data = convert_to_sigma_format(graph_data)
         
         # Układanie węzłów według kategorii
         arranged_data = arrange_nodes_by_category(sigma_data)
-            
-                # Zapisanie wynikowego grafu
+        
+        # Zapisanie wynikowego grafu
         save_graph_data(arranged_data, output_file)
-                print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
+        print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
     else:
-        print("Nie udało się pobrać danych z bazy.") 
+        print("Nie udało się pobrać danych z bazy.")
 
 # Główna funkcja
 if __name__ == "__main__":

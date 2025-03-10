@@ -1,62 +1,15 @@
 {
-  "name": "@sigma/root",
-  "description": "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges.",
-  "homepage": "https://www.sigmajs.org",
-  "bugs": "http://github.com/jacomyal/sigma.js/issues",
-  "workspaces": [
-    "packages/*"
-  ],
+  "name": "knowledge-graph-app",
+  "version": "1.0.0",
+  "description": "Aplikacja do wizualizacji grafów wiedzy",
   "scripts": {
-    "clean": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
-    "build": "npm run build --workspace=@sigma/demo",
-    "prettify": "prettier --write .",
-    "lint": "eslint .",
-    "test": "npm run test --workspace=@sigma/test",
-    "start": "npm run start --workspace=@sigma/demo",
-    "createPackage": "ts-node bin/create-package.ts",
-    "postpublish": "preconstruct dev",
-    "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
-    "prepublishOnly": "npm run test && npm run build && npm run lint"
+    "start": "node backend/api-server.js",
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
-  "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/preset-typescript": "^7.26.0",
-    "@eslint/compat": "^1.2.5",
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
-    "@preconstruct/cli": "^2.8.10",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "^8.20.0",
-    "@typescript-eslint/parser": "^8.20.0",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^5.2.2",
-    "eslint-plugin-storybook": "^0.11.2",
-    "globals": "^15.14.0",
-    "lerna": "^8.1.9",
-    "prettier": "^3.4.2",
-    "rimraf": "^6.0.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
-  },
-  "preconstruct": {
-    "packages": [
-      "packages/sigma",
-      "packages/node-border",
-      "packages/node-image",
-      "packages/node-piechart",
-      "packages/node-square",
-      "packages/edge-curve",
-      "packages/layer-leaflet",
-      "packages/layer-maplibre",
-      "packages/layer-webgl",
-      "packages/export-image",
-      "packages/utils"
-    ],
-    "exports": {
-      "importConditionDefaultExport": "default"
-    }
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
   }
 }

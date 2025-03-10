@@ -1,43 +1,39 @@
-# Etap budowania
-FROM node:18-alpine AS build
+# Bazowy obraz z Node.js i Pythonem
+FROM node:18-bullseye
 
+# Ustaw katalog roboczy
 WORKDIR /app
 
-# Kopiujemy pliki package.json i instalujemy zależności
-COPY package*.json ./
-COPY lerna.json ./
-COPY tsconfig*.json ./
-COPY babel.config.js ./
-
-# Kopiujemy katalogi packages
-COPY packages ./packages
-
-# Instalujemy zależności
+# Kopiuj i instaluj zależności Node.js
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Budujemy aplikację demo
-RUN cd packages/demo && npm run build
+# Kopiuj kod backendu i frontendu
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
 
-# Etap produkcyjny
-FROM node:18-alpine AS production
+# Instaluj zależności backendu
+WORKDIR /app/backend
+RUN npm install
 
+# Buduj frontend
+WORKDIR /app/frontend
+RUN npm install
+RUN npm run build
+
+# Wróć do głównego katalogu
 WORKDIR /app
 
-# Kopiujemy zbudowaną aplikację demo
-COPY --from=build /app/packages/demo/build ./build
+# Kopiuj skrypt Pythona i zależności
+COPY python/ ./python/
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r python/requirements.txt
 
-# Kopiujemy plik API i dane
-COPY api-server.js ./
-COPY graph_data_cache.json ./
-
-# Instalujemy tylko zależności produkcyjne dla API
-RUN npm install express cors body-parser
+# Eksponuj port 8080
+EXPOSE 8080
 
 # Zmienna środowiskowa dla portu
-ENV PORT=5001
+ENV PORT=8080
 
-# Eksponujemy port
-EXPOSE 5001
-
-# Uruchamiamy serwer API
-CMD ["node", "api-server.js"] 
+# Uruchom serwer
+CMD ["node", "backend/api-server.js"] 

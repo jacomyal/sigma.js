@@ -1,0 +1,46 @@
+name: knowledge-graph-app
+services:
+  - name: web
+    github:
+      repo: salek7/sensai_graph
+      branch: main
+    dockerfile_path: Dockerfile
+    http_port: 8080
+    instance_size_slug: basic-xs
+    instance_count: 1
+    routes:
+      - path: /
+    envs:
+      - key: PORT
+        value: "8080"
+      - key: MYSQL_HOST
+        value: "${MYSQL_HOST}"
+      - key: MYSQL_USER
+        value: "${MYSQL_USER}"
+      - key: MYSQL_PASSWORD
+        value: "${MYSQL_PASSWORD}"
+      - key: MYSQL_DATABASE
+        value: "${MYSQL_DATABASE}"
+      - key: MYSQL_PORT
+        value: "${MYSQL_PORT}"
+
+workers:
+  - name: data-fetcher
+    github:
+      repo: salek7/sensai_graph
+      branch: main
+    dockerfile_path: Dockerfile.worker
+    instance_size_slug: basic-xs
+    instance_count: 1
+    envs:
+      - key: MYSQL_HOST
+        value: "${MYSQL_HOST}"
+      - key: MYSQL_USER
+        value: "${MYSQL_USER}"
+      - key: MYSQL_PASSWORD
+        value: "${MYSQL_PASSWORD}"
+      - key: MYSQL_DATABASE
+        value: "${MYSQL_DATABASE}"
+      - key: MYSQL_PORT
+        value: "${MYSQL_PORT}"
+    schedule: "0 0 * * *" # Uruchamiaj codziennie o północy 

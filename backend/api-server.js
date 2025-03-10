@@ -13,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Ścieżka do pliku cache
-const CACHE_FILE_PATH = path.join(__dirname, 'graph_data_cache.json');
+const CACHE_FILE_PATH = path.join(__dirname, '..', 'graph_data_cache.json');
 
 // Cache dla danych grafu
 let graphDataCache = null;
@@ -85,10 +85,10 @@ app.get('/api/graph-data', (req, res) => {
   console.log('Cache nieaktualny, pobieranie danych grafu z bazy danych...');
   
   // Tymczasowy plik wynikowy
-  const tempOutputFile = path.join(__dirname, 'temp_dataset.json');
+  const tempOutputFile = path.join(__dirname, '..', 'temp_dataset.json');
   
   // Wywołanie skryptu Python
-  exec(`python3 fetch_graph_data.py --output=${tempOutputFile}`, (error, stdout, stderr) => {
+  exec(`python3 ${path.join(__dirname, '..', 'python', 'fetch_graph_data.py')} --output=${tempOutputFile}`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Błąd wykonania skryptu: ${error.message}`);
       return res.status(500).json({ error: 'Nie udało się pobrać danych z bazy' });
@@ -125,7 +125,7 @@ app.get('/api/graph-data', (req, res) => {
       }
     } else {
       // Sprawdź, czy plik wynikowy jest w innej lokalizacji (zgodnie z logiką skryptu)
-      const defaultOutputFile = path.join(__dirname, 'packages/demo/public/ai_news_dataset.json');
+      const defaultOutputFile = path.join(__dirname, '..', 'frontend', 'public', 'ai_news_dataset.json');
       
       if (fs.existsSync(defaultOutputFile)) {
         try {
@@ -197,12 +197,12 @@ app.get('/api/cache-status', (req, res) => {
   }
 });
 
-// Serwowanie statycznych plików z katalogu build
-app.use(express.static(path.join(__dirname, 'build')));
+// Serwowanie statycznych plików z katalogu frontend/build
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')));
 
 // Obsługa wszystkich pozostałych ścieżek, aby React Router działał poprawnie
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'build', 'index.html'));
 });
 
 // Uruchomienie serwera

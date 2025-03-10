@@ -73,3 +73,86 @@ Run `npm run createPackage` from the project root. It will:
 - Copy the `packages/template` folder
 - Update the new package `package.json` entries (name, description, exports)
 - Update various other files (buildable packages list in `tsconfig.json`, Preconstruct compatible packages list in `package.json`...)
+
+# Knowledge Graph Visualization
+
+Aplikacja do wizualizacji grafów wiedzy, wykorzystująca dane z bazy MySQL do tworzenia interaktywnych grafów.
+
+## Technologie
+
+- **Frontend**: React, Sigma.js, Vite
+- **Backend**: Node.js, Express
+- **Baza danych**: MySQL
+- **Skrypty**: Python
+
+## Struktura projektu
+
+```
+knowledge-graph-app/
+├── frontend/           # React + Vite + Sigma.js
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.js
+├── backend/            # Node.js + Express
+│   ├── api-server.js
+│   └── package.json
+├── python/             # Skrypt Pythona
+│   ├── fetch_graph_data.py
+│   └── requirements.txt
+├── Dockerfile          # Dla monolitu (frontend + backend)
+├── Dockerfile.worker   # Dla skryptu Pythona
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+
+## Instalacja i uruchomienie
+
+### Lokalne uruchomienie
+
+1. Zainstaluj zależności:
+   ```bash
+   npm run install:all
+   ```
+
+2. Zbuduj frontend:
+   ```bash
+   npm run build
+   ```
+
+3. Uruchom serwer:
+   ```bash
+   npm start
+   ```
+
+4. Otwórz przeglądarkę i przejdź do `http://localhost:8080`
+
+### Uruchomienie w Dockerze
+
+1. Zbuduj obraz Docker:
+   ```bash
+   docker build -t knowledge-graph-app .
+   ```
+
+2. Uruchom kontener:
+   ```bash
+   docker run -p 8080:8080 knowledge-graph-app
+   ```
+
+3. Otwórz przeglądarkę i przejdź do `http://localhost:8080`
+
+## Wdrożenie na DigitalOcean App Platform
+
+1. Utwórz nową aplikację w DigitalOcean App Platform
+2. Wybierz opcję "Import from GitHub" i wskaż swoje repozytorium
+3. Skonfiguruj zmienne środowiskowe dla połączenia z MySQL
+4. Wdróż aplikację
+
+## Zmienne środowiskowe
+
+- `PORT` - port, na którym działa serwer (domyślnie 8080)
+- `MYSQL_HOST` - host bazy danych MySQL
+- `MYSQL_USER` - użytkownik bazy danych MySQL
+- `MYSQL_PASSWORD` - hasło do bazy danych MySQL
+- `MYSQL_DATABASE` - nazwa bazy danych MySQL
+- `MYSQL_PORT` - port bazy danych MySQL

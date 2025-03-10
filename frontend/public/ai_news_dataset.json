@@ -1,0 +1,6405 @@
+{
+  "nodes": [
+    {
+      "key": "AI",
+      "label": "AI",
+      "tag": "Artificial",
+      "URL": "",
+      "cluster": "Artificial Intelligence, Technology",
+      "x": 80.02923493438652,
+      "y": -505.94718328120194,
+      "score": 1.0,
+      "categories": "Artificial Intelligence, Technology",
+      "entity_type": "Concept",
+      "definitions": [
+        {
+          "text": "Artificial intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial intelligence tools that automate and speed up claims processing",
+          "strength": 90.0
+        },
+        {
+          "text": "Artificial intelligence experiments and digital projects",
+          "strength": 90.0
+        },
+        {
+          "text": "Influence of artificial intelligence on diverse aspects of society",
+          "strength": 100.0
+        },
+        {
+          "text": "Future of AI",
+          "strength": 95.0
+        },
+        {
+          "text": "General term for the field of artificial intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "Reshaping education and used in cyber-security training initiatives",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial Intelligence",
+          "strength": 90.0
+        },
+        {
+          "text": "General concept of Artificial Intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Sztuczna inteligencja",
+          "strength": 95.0
+        },
+        {
+          "text": "Modele sztucznej inteligencji mia\u0142y u\u0142atwia\u0107 \u017cycie, ale nowe badania pokazuj\u0105, \u017ce mog\u0105 tak\u017ce\u2026 oszukiwa\u0107.",
+          "strength": 98.0
+        },
+        {
+          "text": "Generic term for artificial intelligence",
+          "strength": 75.0
+        },
+        {
+          "text": "AI-powered business training",
+          "strength": 98.0
+        },
+        {
+          "text": "AI frenzy leads US venture capital to biggest splurge in three years",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial intelligence as a focus of government funding and innovation",
+          "strength": 90.0
+        },
+        {
+          "text": "Becoming an integral part of the workplace",
+          "strength": 90.0
+        },
+        {
+          "text": "HPE's server margins were further pressured by the higher than normal AI inventory caused by the rapid transition of demand to next generation GPUs and related components",
+          "strength": 90.0
+        },
+        {
+          "text": "Intelligence demonstrated by machines",
+          "strength": 90.0
+        },
+        {
+          "text": "Artificial intelligence transforming the world at breakneck speed",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial intelligence shaping nearly every aspect of human life",
+          "strength": 98.0
+        },
+        {
+          "text": "Using computer systems to perform tasks that normally require human intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "Increased adoption of AI applications",
+          "strength": 90.0
+        },
+        {
+          "text": "Technology of tomorrow",
+          "strength": 100.0
+        },
+        {
+          "text": "General term for artificial intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "Essential tool driving efficiency across industries",
+          "strength": 98.0
+        },
+        {
+          "text": "AI",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial intelligence research and development",
+          "strength": 98.0
+        },
+        {
+          "text": "Artificial intelligence advancements expected at GTC 2025",
+          "strength": 99.0
+        },
+        {
+          "text": "Artificial Intelligence, a key focus of the International AI-Semiconductor Conference 2025",
+          "strength": 98.0
+        },
+        {
+          "text": "Revolution reshaping every industry",
+          "strength": 99.0
+        },
+        {
+          "text": "Artificial intelligence used for coding and software development",
+          "strength": 98.0
+        },
+        {
+          "text": "Artificial intelligence solutions",
+          "strength": 90.0
+        },
+        {
+          "text": "The overarching field of developing intelligent machines and systems",
+          "strength": 100.0
+        },
+        {
+          "text": "Umbrella term for technologies involving machine learning, natural language processing, and other advanced algorithms",
+          "strength": 90.0
+        },
+        {
+          "text": "Tools are extensions of our minds",
+          "strength": 98.0
+        },
+        {
+          "text": "Using AI to transform coaching businesses by automating tasks",
+          "strength": 98.0
+        },
+        {
+          "text": "Umbrella term for algorithms and systems designed to perform tasks that typically require human intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Technology reshaping business, work and everyday life",
+          "strength": 100.0
+        },
+        {
+          "text": "Artificial intelligence capabilities",
+          "strength": 90.0
+        },
+        {
+          "text": "AI-based quality control technologies to tackle specific challenges on its factory floors",
+          "strength": 98.0
+        },
+        {
+          "text": "Use of artificial intelligence in creating game assets",
+          "strength": 95.0
+        },
+        {
+          "text": "Sztuczna inteligencja staje si\u0119 kluczowym elementem strategii gospodarczej i geopolitycznej.",
+          "strength": 98.0
+        },
+        {
+          "text": "Model generatywnej sztucznej inteligencji jest we wszystkich zadaniach jest w pe\u0142ni samodzielny i nie potrzebuje kontroli cz\u0142owieka",
+          "strength": 99.0
+        },
+        {
+          "text": "Technology used to simplify website creation",
+          "strength": 98.0
+        },
+        {
+          "text": "Sztuczna inteligencja wkracza w obszar pracy tw\u00f3rczej, wspomagaj\u0105c grafik\u00f3w, copywriter\u00f3w czy programist\u00f3w",
+          "strength": 95.0
+        },
+        {
+          "text": "Sztuczna inteligencja zmienia spos\u00f3b, w jaki firmy i spo\u0142ecze\u0144stwa korzystaj\u0105 z innowacyjnych rozwi\u0105za\u0144",
+          "strength": 98.0
+        },
+        {
+          "text": "Sztuczna inteligencja usprawni proces rozstrzygania spor\u00f3w podatkowych",
+          "strength": 98.0
+        },
+        {
+          "text": "Artificial intelligence applied to improve office equipment",
+          "strength": 90.0
+        },
+        {
+          "text": "Use of artificial intelligence to improve service quality, automate tasks, and enhance efficiency",
+          "strength": 100.0
+        },
+        {
+          "text": "Umiej\u0119tno\u015b\u0107 generowania tekstu oraz przetwarzanie j\u0119zyka naturalnego",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "AI",
+          "target": "Google",
+          "description": "More than 25% of new code is written by AI at Google",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Amazon",
+          "description": "Taking steps to combat AI cheating",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Huawei",
+          "description": "Approach to mobile AI emphasizes transformations that benefit the mobile industry",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "DeepSeek",
+          "description": "Claims training a model is cheaper than other companies",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Gemini",
+          "description": "Narz\u0119dzie oferuj\u0105ce funkcje wykorzystuj\u0105ce sztuczn\u0105 inteligencj\u0119",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "OpenAI",
+          "description": "Modele OpenAI",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Manus",
+          "description": "Described as a revolutionary AI agent",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Microsoft",
+          "description": "Develops LLM model of deep reasoning in AI",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Intel",
+          "description": "Several AI leaders are considering a deal that could save Intel",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Microsoft",
+          "description": "Microsoft executive believes AI development faces risk of entrenched bias due to underrepresentation of women",
+          "strength": 95.0
+        },
+        {
+          "source": "AI",
+          "target": "Microsoft",
+          "description": "Microsoft believes that AI has the incredible potential to free clinicians from much of the administrative burden in healthcare",
+          "strength": 90.0
+        },
+        {
+          "source": "AI",
+          "target": "Google",
+          "description": "Google has a team responsible for AI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "OpenAI",
+          "description": "OpenAI is an AI research and deployment company",
+          "strength": 99.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "xAI",
+          "description": "xAI is an AI company",
+          "strength": 96.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Meta",
+          "description": "Company involved in AI and a collaborative effort with NIC and NVIDIA",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Google",
+          "description": "Company involved in AI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "IBM",
+          "description": "Company involved in AI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Samsung",
+          "description": "Company involved in AI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "DeepSeek",
+          "description": "Developing lower cost AI models",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Nvidia",
+          "description": "Companies benefit from what Nvidia has already done",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "OpenAI",
+          "description": "Develops AI models",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Google",
+          "description": "Subject to a DOJ proposal regarding AI investments",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Meta",
+          "description": "Increasingly relies on AI for coding, reducing the need for human programmers",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Silicon Valley",
+          "description": "Is experiencing a broader trend of AI-driven development",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Nvidia",
+          "description": "Nvidia provides the foundational infrastructure for AI development",
+          "strength": 95.0
+        },
+        {
+          "source": "AI",
+          "target": "Machine learning",
+          "description": "Is a subfield of AI",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Apple",
+          "description": "Apple is a major player in the AI industry, developing its own AI technologies and integrating them into its products",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "ChatGPT",
+          "description": "ChatGPT is an AI chatbot that Apple integrates with Siri",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "Claude",
+          "description": "Claude is a large language model, similar to those being developed alongside AI",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "Gemini",
+          "description": "Gemini is a large language model, similar to those being developed alongside AI",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "LLM",
+          "description": "LLMs are a key component of many AI systems",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "OpenAI",
+          "description": "OpenAI is a research company that develops AI models like ChatGPT",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "xAI",
+          "description": "xAI is a research company that develops AI models like Grok 3",
+          "strength": 0
+        },
+        {
+          "source": "AI",
+          "target": "Generative AI",
+          "description": "Specific type of AI model used for content creation",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "ChatGPT",
+          "description": "An AI chatbot that students use to write essays",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Sam Altman",
+          "description": "CEO of OpenAI, which aims to create magic intelligence in the sky",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "ChatGPT",
+          "description": "Interacting with AI as if it\u2019s an oracle risks blindly accepting its outputs, like with ChatGPT",
+          "strength": 70.0
+        },
+        {
+          "source": "AI",
+          "target": "Sam Altman",
+          "description": "Sam Altman literally said his company\u2019s goal is to create magic intelligence in the sky",
+          "strength": 70.0
+        },
+        {
+          "source": "AI",
+          "target": "Generative AI",
+          "description": "Given the opportunity to expand our minds with generative AI, we\u2019ll take it",
+          "strength": 70.0
+        },
+        {
+          "source": "AI",
+          "target": "Generative AI",
+          "description": "Subset of AI focused on content creation",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Google",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Microsoft",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Amazon",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Meta",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Samsung",
+          "description": "Users do not see significant added value in AI-based functions",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Chiny",
+          "description": "Kraj, kt\u00f3ry planuje przeznaczy\u0107 co najmniej 1 bilion juan\u00f3w na rozw\u00f3j AI w ci\u0105gu pi\u0119ciu lat.",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Manus",
+          "description": "Is a fully autonomous AI agent",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI",
+          "target": "Huawei",
+          "description": "Introduces AI to offices with IdeaHub ES3/S3",
+          "strength": 92.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Generative AI",
+      "label": "Generative AI",
+      "tag": "Machine",
+      "URL": "",
+      "cluster": "Machine Learning, Technology",
+      "x": -554.298679936443,
+      "y": 609.5921024805712,
+      "score": 1.0,
+      "categories": "Machine Learning, Technology",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "AI models that generate new content",
+          "strength": 90.0
+        },
+        {
+          "text": "AI that mimics human qualities such as appearance, writing, and voices",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology's adoption by businesses",
+          "strength": 88.0
+        },
+        {
+          "text": "Using generative AI to create custom wine labels",
+          "strength": 80.0
+        },
+        {
+          "text": "Type of AI that generates new content",
+          "strength": 90.0
+        },
+        {
+          "text": "Artificial intelligence technology used to generate content, particularly images",
+          "strength": 93.0
+        },
+        {
+          "text": "Type of AI focused on generating new content",
+          "strength": 85.0
+        },
+        {
+          "text": "AI model capable of generating new content, used in the GOV.UK Chat chatbot",
+          "strength": 82.0
+        },
+        {
+          "text": "Developments in generative AI used for dynamic generation of content descriptions",
+          "strength": 92.0
+        },
+        {
+          "text": "US Generative AI Innovation Leader Global Consulting Emerging Markets Leader",
+          "strength": 90.0
+        },
+        {
+          "text": "AI models that can generate new content, such as text, images, or audio",
+          "strength": 90.0
+        },
+        {
+          "text": "Users of generative AI and the departments that are creating their own AI applications",
+          "strength": 90.0
+        },
+        {
+          "text": "AI systems designed to create and generate content",
+          "strength": 90.0
+        },
+        {
+          "text": "AI models capable of generating new content, such as music",
+          "strength": 90.0
+        },
+        {
+          "text": "AI models like ChatGPT and DeepSeek used by students for various tasks",
+          "strength": 85.0
+        },
+        {
+          "text": "AI that makes data interactive and available in natural language, or creates new images or sound in response to a prompt",
+          "strength": 98.0
+        },
+        {
+          "text": "A type of AI focused on generating new content, such as text, images, or audio",
+          "strength": 85.0
+        },
+        {
+          "text": "AI technology used for generating content",
+          "strength": 70.0
+        },
+        {
+          "text": "A type of artificial intelligence focused on generating new content",
+          "strength": 60.0
+        },
+        {
+          "text": "AI that can generate complex responses that mimic human-like conversation",
+          "strength": 97.0
+        },
+        {
+          "text": "AI models capable of generating new content",
+          "strength": 75.0
+        },
+        {
+          "text": "AI that generates new content",
+          "strength": 85.0
+        },
+        {
+          "text": "AI that can generate new content, such as text, images, or code",
+          "strength": 95.0
+        },
+        {
+          "text": "Type of artificial intelligence focused on generating new content",
+          "strength": 85.0
+        },
+        {
+          "text": "Move to make search more efficient",
+          "strength": 88.0
+        },
+        {
+          "text": "Type of artificial intelligence",
+          "strength": 75.0
+        },
+        {
+          "text": "Using generative AI in molecule discovery",
+          "strength": 80.0
+        },
+        {
+          "text": "A fully managed service that helps developers and organizations build, scale, and fine-tune AI applications",
+          "strength": 85.0
+        },
+        {
+          "text": "Generative AI will evolve this year to not only provide information but also perform tasks to help us run our businesses more productively",
+          "strength": 80.0
+        },
+        {
+          "text": "AI technology focused on generating new content",
+          "strength": 82.0
+        },
+        {
+          "text": "Optimizing Generative AI capabilities such as large language models (LLMs) performance",
+          "strength": 92.0
+        },
+        {
+          "text": "AI tools that can generate new content, such as text, images, or audio",
+          "strength": 88.0
+        },
+        {
+          "text": "A type of AI that can generate new content, such as text, images, or code",
+          "strength": 90.0
+        },
+        {
+          "text": "Uses machine learning algorithms to 'create' new content based on patterns it learned from analyzing large amounts of data",
+          "strength": 97.0
+        },
+        {
+          "text": "AI models trained on a large volume of text",
+          "strength": 92.0
+        },
+        {
+          "text": "AI models that can create text, images, audio, code, and video",
+          "strength": 90.0
+        },
+        {
+          "text": "AI tools used for creating assets in game development",
+          "strength": 92.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Generative AI",
+          "target": "Artificial Intelligence",
+          "description": "McKinsey expects $2.6 trillion to $4.4 trillion in added economic growth stemming from the technology's adoption by businesses",
+          "strength": 0
+        },
+        {
+          "source": "Generative AI",
+          "target": "Artificial Intelligence",
+          "description": "Generative AI is a subfield of Artificial Intelligence",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "Large Language Models",
+          "description": "Generative AI uses Large Language Models to generate creative outputs",
+          "strength": 90.0
+        },
+        {
+          "source": "Generative AI",
+          "target": "ChatGPT",
+          "description": "ChatGPT is a Generative AI tool",
+          "strength": 95.0
+        },
+        {
+          "source": "Generative AI",
+          "target": "Artificial Intelligence",
+          "description": "Type of AI used by students for various tasks",
+          "strength": 88.0
+        },
+        {
+          "source": "Generative AI",
+          "target": "ChatGPT",
+          "description": "Example of Generative AI model",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "DeepSeek",
+          "description": "Example of Generative AI tool",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "GPT-4",
+          "description": "Is an example of a Large Language Model used in Generative AI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "Google",
+          "description": "Expanding generative AI's presence in its search services",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "Large Language Models",
+          "description": "Generative AI capabilities include large language models (LLMs)",
+          "strength": 95.0
+        },
+        {
+          "source": "Generative AI",
+          "target": "AI",
+          "description": "Specific type of AI model used for content creation",
+          "strength": 0
+        },
+        {
+          "source": "Generative AI",
+          "target": "AI",
+          "description": "Given the opportunity to expand our minds with generative AI, we\u2019ll take it",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "DeepSeek",
+          "description": "Classified as a Generative AI service",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "Hugging Face",
+          "description": "Functions as a Generative AI platform",
+          "strength": 78.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Generative AI",
+          "target": "AI",
+          "description": "Subset of AI focused on content creation",
+          "strength": 95.0
+        }
+      ]
+    },
+    {
+      "key": "ChatGPT",
+      "label": "ChatGPT",
+      "tag": "Natural",
+      "URL": "",
+      "cluster": "Natural Language Processing, Chatbot",
+      "x": -7.0337840289533915,
+      "y": 835.0909688844297,
+      "score": 1.0,
+      "categories": "Natural Language Processing, Chatbot",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "Generative AI model released by OpenAI",
+          "strength": 95.0
+        },
+        {
+          "text": "AI chatbot developed by OpenAI",
+          "strength": 95.0
+        },
+        {
+          "text": "Using ChatGPT to develop, label and price an entire bottle",
+          "strength": 82.0
+        },
+        {
+          "text": "Generative AI model used to generate responses to questions or requests",
+          "strength": 92.0
+        },
+        {
+          "text": "AI model used to create a social media prospecting app",
+          "strength": 90.0
+        },
+        {
+          "text": "Traditional AI chatbot that requires human input",
+          "strength": 70.0
+        },
+        {
+          "text": "AI models developed by OpenAI",
+          "strength": 95.0
+        },
+        {
+          "text": "AI chatbot that debuted and spurred AI feature development in smartphones",
+          "strength": 90.0
+        },
+        {
+          "text": "Language model that can change its responses under the influence of sad stories",
+          "strength": 95.0
+        },
+        {
+          "text": "Well-known chatbot that takes action when the user asks it to",
+          "strength": 85.0
+        },
+        {
+          "text": "A large language model chatbot developed by OpenAI",
+          "strength": 85.0
+        },
+        {
+          "text": "Generative AI model that gained mainstream popularity",
+          "strength": 90.0
+        },
+        {
+          "text": "A Generative AI tool that launched in 2022",
+          "strength": 88.0
+        },
+        {
+          "text": "Generative AI tool used by students, also approved by Calgary Board of Education for teachers",
+          "strength": 85.0
+        },
+        {
+          "text": "Platform that generated fake case citations and fabricated legal facts",
+          "strength": 85.0
+        },
+        {
+          "text": "Mentioned in tags, likely a reference to OpenAI's popular chatbot",
+          "strength": 65.0
+        },
+        {
+          "text": "Chatbot that scientific community was abuzz with discussion about its potential",
+          "strength": 95.0
+        },
+        {
+          "text": "Advanced language model developed by OpenAI",
+          "strength": 95.0
+        },
+        {
+          "text": "AI-powered chatbot developed by OpenAI",
+          "strength": 92.0
+        },
+        {
+          "text": "Product of OpenAI, a household name helping bring generative AI into the mainstream",
+          "strength": 90.0
+        },
+        {
+          "text": "Advanced language model known for its conversational abilities",
+          "strength": 85.0
+        },
+        {
+          "text": "Top AI tool capable of natural language processing",
+          "strength": 98.0
+        },
+        {
+          "text": "An AI chatbot developed by OpenAI",
+          "strength": 85.0
+        },
+        {
+          "text": "Conversational AI chatbot used for various tasks",
+          "strength": 95.0
+        },
+        {
+          "text": "AI model that trains on datasets",
+          "strength": 88.0
+        },
+        {
+          "text": "AI model used to summarize responses into shareable quotes",
+          "strength": 88.0
+        },
+        {
+          "text": "AI model that can generate text, images, audio, code, and video, surged in popularity following the release of OpenAI\u2019s ChatGPT in late 2022",
+          "strength": 95.0
+        },
+        {
+          "text": "Broad-based LLMs like ChatGPT",
+          "strength": 75.0
+        },
+        {
+          "text": "Chatbot developed by OpenAI",
+          "strength": 95.0
+        },
+        {
+          "text": "Tekst stworzony przez ChatGPT, ale poprawiony przez copywritera, mo\u017ce by\u0107 uznany za utw\u00f3r chroniony prawem autorskim?",
+          "strength": 90.0
+        },
+        {
+          "text": "AI model developed by OpenAI",
+          "strength": 85.0
+        },
+        {
+          "text": "Komercyjny model LLM",
+          "strength": 85.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "Released by OpenAI",
+          "strength": 92.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "ChatGPT is created by OpenAI",
+          "strength": 92.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Manus",
+          "description": "Unlike traditional AI chatbots like ChatGPT, Manus is capable of making decisions and performing tasks on its own without constant supervision",
+          "strength": 85.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "Developed by OpenAI as a conversational AI model",
+          "strength": 92.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Sztuczna inteligencja",
+          "description": "The debut of ChatGPT spurred AI feature development in smartphones",
+          "strength": 90.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Manus",
+          "description": "Distinguished from chatbots like ChatGPT due to its autonomous operation",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "Developed ChatGPT",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Generative AI",
+          "description": "ChatGPT is a Generative AI tool",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Generative AI",
+          "description": "Example of Generative AI model",
+          "strength": 85.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "ChatGPT is a product of OpenAI",
+          "strength": 95.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "DeepSeek",
+          "description": "DeepSeek created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "DeepSeek",
+          "description": "Developed an AI model with performance on par with ChatGPT",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "AI",
+          "description": "ChatGPT is an AI chatbot that Apple integrates with Siri",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "ChatGPT was developed by OpenAI",
+          "strength": 0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "AI",
+          "description": "An AI chatbot that students use to write essays",
+          "strength": 90.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Google",
+          "description": "Highlights ignorance compared to the internet",
+          "strength": 75.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "AI",
+          "description": "Interacting with AI as if it\u2019s an oracle risks blindly accepting its outputs, like with ChatGPT",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "Developed by OpenAI as their most advanced language model",
+          "strength": 92.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "Developed by OpenAI",
+          "strength": 90.0
+        },
+        {
+          "source": "ChatGPT",
+          "target": "Sztuczna inteligencja",
+          "description": "ChatGPT is an example of Sztuczna inteligencja",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "ChatGPT",
+          "target": "OpenAI",
+          "description": "OpenAI is the creator of ChatGPT",
+          "strength": 90.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Large Language Models",
+      "label": "Large Language Models",
+      "tag": "Natural",
+      "URL": "",
+      "cluster": "Natural Language Processing, Machine Learning",
+      "x": 922.895159673388,
+      "y": -580.6880105769627,
+      "score": 0.45,
+      "categories": "Natural Language Processing, Machine Learning",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "AI models trained on large amounts of text data",
+          "strength": 92.0
+        },
+        {
+          "text": "AI models that process and generate human language",
+          "strength": 92.0
+        },
+        {
+          "text": "Language models with a large number of parameters",
+          "strength": 95.0
+        },
+        {
+          "text": "A 'double-edged sword' bringing both efficiency gains and challenges",
+          "strength": 95.0
+        },
+        {
+          "text": "Promising computational models for studying LN functions",
+          "strength": 98.0
+        },
+        {
+          "text": "AI models trained on large amounts of text data to understand and generate human language",
+          "strength": 92.0
+        },
+        {
+          "text": "Models trained on vast amounts of data to generate creative outputs",
+          "strength": 87.0
+        },
+        {
+          "text": "Advanced AI models that enable chatbots to engage in more natural, fluid dialogues",
+          "strength": 91.0
+        },
+        {
+          "text": "Optimizing Generative AI capabilities such as large language models (LLMs) performance",
+          "strength": 93.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Large Language Models",
+          "target": "Artificial Intelligence",
+          "description": "Generative AI and large language models are driving the AI explosion across industries",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Large Language Models",
+          "target": "DeepSeek",
+          "description": "Develops large language models",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Large Language Models",
+          "target": "Artificial Intelligence",
+          "description": "A subset of Artificial Intelligence technology",
+          "strength": 90.0
+        },
+        {
+          "source": "Large Language Models",
+          "target": "Artificial Intelligence",
+          "description": "Large Language Models are a subfield of Artificial Intelligence",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Large Language Models",
+          "target": "Generative AI",
+          "description": "Generative AI uses Large Language Models to generate creative outputs",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Large Language Models",
+          "target": "Generative AI",
+          "description": "Generative AI capabilities include large language models (LLMs)",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Large Language Models",
+          "target": "Artificial Intelligence",
+          "description": "LLMs are used to improve efficiency and optimize energy consumption",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "Meta",
+      "label": "Meta",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Social Media",
+      "x": -803.2670188708126,
+      "y": 883.7658265120579,
+      "score": 0.8,
+      "categories": "Technology, Social Media",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Tech company that uses Leetcode to evaluate software engineers",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that highlighted an interesting use case for AI agents",
+          "strength": 90.0
+        },
+        {
+          "text": "Company that develops large language models and where Yann LeCun works",
+          "strength": 80.0
+        },
+        {
+          "text": "Company whose open source Llama 3.1 LLM is the base for FoxBrain",
+          "strength": 85.0
+        },
+        {
+          "text": "Company that used artificial intelligence (AI) and noninvasive brain scans to unravel how thoughts are translated into typed sentences",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology company exploring AI models",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose AI models are being tested by Microsoft",
+          "strength": 75.0
+        },
+        {
+          "text": "Company that has withdrawn from DEI initiatives",
+          "strength": 65.0
+        },
+        {
+          "text": "Company involved in a collaborative effort with NIC, NVIDIA, and AI for Vietnam",
+          "strength": 80.0
+        },
+        {
+          "text": "Company rolling out new AI agents to help with customer service",
+          "strength": 90.0
+        },
+        {
+          "text": "Company facing a copyright lawsuit for using authors' books to train its Llama AI models",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology company facing legal scrutiny over the use of copyrighted works to train AI models",
+          "strength": 95.0
+        },
+        {
+          "text": "Company increasingly relying on AI for coding",
+          "strength": 95.0
+        },
+        {
+          "text": "Company integrating AI across its platforms, including WhatsApp",
+          "strength": 90.0
+        },
+        {
+          "text": "Tech giant investing in AI development",
+          "strength": 92.0
+        },
+        {
+          "text": "Company that developed Meta AI",
+          "strength": 75.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Meta",
+          "target": "Microsoft",
+          "description": "Microsoft has already begun testing AI models from Meta",
+          "strength": 82.0
+        },
+        {
+          "source": "Meta",
+          "target": "AI",
+          "description": "Company involved in AI and a collaborative effort with NIC and NVIDIA",
+          "strength": 85.0
+        },
+        {
+          "source": "Meta",
+          "target": "AI agents",
+          "description": "Meta is rolling out new AI agents to help with customer service on Instagram, Facebook, and WhatsApp",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Meta",
+          "target": "Facebook",
+          "description": "Owned by Meta, where AI-powered customer service agents are being piloted",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Meta",
+          "target": "OpenAI",
+          "description": "Meta sought to build better AI models to combat the rise of OpenAI",
+          "strength": 88.0
+        },
+        {
+          "source": "Meta",
+          "target": "AI",
+          "description": "Increasingly relies on AI for coding, reducing the need for human programmers",
+          "strength": 95.0
+        },
+        {
+          "source": "Meta",
+          "target": "Silicon Valley",
+          "description": "Located in Silicon Valley",
+          "strength": 65.0
+        },
+        {
+          "source": "Meta",
+          "target": "AI",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "Google",
+      "label": "Google",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Search Engine",
+      "x": -595.4635390309177,
+      "y": 834.1237824096079,
+      "score": 1.0,
+      "categories": "Technology, Search Engine",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Tech company where more than 25% of new code is written by AI",
+          "strength": 90.0
+        },
+        {
+          "text": "Company that released 'agentic' features into their AI assistants",
+          "strength": 75.0
+        },
+        {
+          "text": "Company at the forefront of providing AI features on smartphones",
+          "strength": 88.0
+        },
+        {
+          "text": "Offering essential training and resources to entrepreneurs",
+          "strength": 95.0
+        },
+        {
+          "text": "Company that released small language models and developed Gemini 1.0 Ultra",
+          "strength": 85.0
+        },
+        {
+          "text": "Investing in nuclear power for AI electricity demand",
+          "strength": 90.0
+        },
+        {
+          "text": "Company providing summaries before search results using AI",
+          "strength": 68.0
+        },
+        {
+          "text": "Tech company that created GameNGen and Genie 2, exploring AI gameplay simulations and playable worlds",
+          "strength": 85.0
+        },
+        {
+          "text": "Large technology firm providing cloud-based AI solutions and infrastructure",
+          "strength": 87.0
+        },
+        {
+          "text": "Technology company involved in AI development",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that the US Department of Justice is still calling for to sell its web browser Chrome",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology giant developing AI Overview and Gemini 2.0",
+          "strength": 95.0
+        },
+        {
+          "text": "Company that has removed diversity and equity mentions from its AI team's page",
+          "strength": 95.0
+        },
+        {
+          "text": "Leading technology company known for its search engine and AI initiatives",
+          "strength": 98.0
+        },
+        {
+          "text": "The company behind these models, is a leader in AI innovation",
+          "strength": 99.0
+        },
+        {
+          "text": "Company that has announced plans to expand generative AI\u2019s presence in its search services",
+          "strength": 95.0
+        },
+        {
+          "text": "Company competing with OpenAI",
+          "strength": 70.0
+        },
+        {
+          "text": "Key player from the tech industry in attendance at GTC 2025",
+          "strength": 70.0
+        },
+        {
+          "text": "Top global tech giant attending the International AI-Semiconductor Conference 2025",
+          "strength": 85.0
+        },
+        {
+          "text": "Technology company subject to a DOJ proposal regarding AI investments",
+          "strength": 65.0
+        },
+        {
+          "text": "Major technology company known for its search engine and AI initiatives",
+          "strength": 90.0
+        },
+        {
+          "text": "A technology company specializing in Internet-related services and products",
+          "strength": 80.0
+        },
+        {
+          "text": "Company whose early search engine was a cognitive partner",
+          "strength": 88.0
+        },
+        {
+          "text": "Tech giant investing in AI development",
+          "strength": 92.0
+        },
+        {
+          "text": "Led data center innovation for Google",
+          "strength": 80.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Google",
+          "target": "AI",
+          "description": "More than 25% of new code is written by AI at Google",
+          "strength": 90.0
+        },
+        {
+          "source": "Google",
+          "target": "Sztuczna inteligencja",
+          "description": "Leading in providing AI features on smartphones",
+          "strength": 80.0
+        },
+        {
+          "source": "Google",
+          "target": "Artificial Intelligence",
+          "description": "Uses AI to provide summaries before search results",
+          "strength": 68.0
+        },
+        {
+          "source": "Google",
+          "target": "Artificial Intelligence",
+          "description": "Google has made significant investments in AI",
+          "strength": 90.0
+        },
+        {
+          "source": "Google",
+          "target": "Anthropic",
+          "description": "Google has invested billions into Anthropic",
+          "strength": 85.0
+        },
+        {
+          "source": "Google",
+          "target": "AI",
+          "description": "Google has a team responsible for AI",
+          "strength": 90.0
+        },
+        {
+          "source": "Google",
+          "target": "OpenAI",
+          "description": "Google joins other large tech companies like OpenAI in limiting DEI initiatives",
+          "strength": 65.0
+        },
+        {
+          "source": "Google",
+          "target": "Gemini",
+          "description": "Gemini is part of Google's efforts to advance AI capabilities",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Google",
+          "target": "OpenAI",
+          "description": "Google's AI Mode is a direct response to OpenAI's ChatGPT",
+          "strength": 92.0
+        },
+        {
+          "source": "Google",
+          "target": "Perplexity",
+          "description": "Directly competing with Google in the AI-powered search engine market",
+          "strength": 91.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Google",
+          "target": "Generative AI",
+          "description": "Expanding generative AI's presence in its search services",
+          "strength": 75.0
+        },
+        {
+          "source": "Google",
+          "target": "AI",
+          "description": "Company involved in AI",
+          "strength": 90.0
+        },
+        {
+          "source": "Google",
+          "target": "AI",
+          "description": "Subject to a DOJ proposal regarding AI investments",
+          "strength": 70.0
+        },
+        {
+          "source": "Google",
+          "target": "Apple",
+          "description": "Apple and Google are competitors in the technology industry, including AI",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Google",
+          "target": "ChatGPT",
+          "description": "Highlights ignorance compared to the internet",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Google",
+          "target": "AI",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "Amazon",
+      "label": "Amazon",
+      "tag": "E-commerce",
+      "URL": "",
+      "cluster": "E-commerce, Technology",
+      "x": 218.1455423430166,
+      "y": 447.0685776702685,
+      "score": 0.65,
+      "categories": "E-commerce, Technology",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Company that had made offers to Lee then rescinded them",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose startup-funding divisions invested in Figure AI",
+          "strength": 75.0
+        },
+        {
+          "text": "One of AI's biggest players",
+          "strength": 70.0
+        },
+        {
+          "text": "Investing in nuclear power for AI electricity demand",
+          "strength": 90.0
+        },
+        {
+          "text": "Since its initial public offering back in 1997",
+          "strength": 65.0
+        },
+        {
+          "text": "Company that has withdrawn from DEI initiatives",
+          "strength": 65.0
+        },
+        {
+          "text": "Company competing with OpenAI",
+          "strength": 70.0
+        },
+        {
+          "text": "Cloud partnership with Amazon",
+          "strength": 75.0
+        },
+        {
+          "text": "Tech company known for e-commerce and cloud computing (AWS), investing in AI data centers and custom AI chips",
+          "strength": 80.0
+        },
+        {
+          "text": "Tech giant focused on conquering a new market with lucrative opportunities",
+          "strength": 95.0
+        },
+        {
+          "text": "The pioneer of AI-driven e-commerce, is utilizing Bedrock\u2019s LLM-as-a-Judge to refine the accuracy of its personalized shopping assistant",
+          "strength": 90.0
+        },
+        {
+          "text": "Multinational technology company investing heavily in AI",
+          "strength": 80.0
+        },
+        {
+          "text": "Tech giant investing in AI development",
+          "strength": 92.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Amazon",
+          "target": "AI",
+          "description": "Taking steps to combat AI cheating",
+          "strength": 75.0
+        },
+        {
+          "source": "Amazon",
+          "target": "Artificial Intelligence",
+          "description": "Amazon is one of the biggest players in AI",
+          "strength": 70.0
+        },
+        {
+          "source": "Amazon",
+          "target": "Artificial Intelligence",
+          "description": "Focused on scaling its artificial intelligence ventures",
+          "strength": 95.0
+        },
+        {
+          "source": "Amazon",
+          "target": "AI",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "OpenAI",
+      "label": "OpenAI",
+      "tag": "Research",
+      "URL": "",
+      "cluster": "Research, Technology",
+      "x": 846.8167163365274,
+      "y": 103.93596719129528,
+      "score": 1.0,
+      "categories": "Research, Technology",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Company that released ChatGPT",
+          "strength": 80.0
+        },
+        {
+          "text": "Company that created ChatGPT and Operator",
+          "strength": 98.0
+        },
+        {
+          "text": "Company providing AI models",
+          "strength": 90.0
+        },
+        {
+          "text": "Company that recently moved into the next phase with its \u201cOperator\u201d agent project",
+          "strength": 95.0
+        },
+        {
+          "text": "Leading AI research company",
+          "strength": 90.0
+        },
+        {
+          "text": "Launched NextGenAI, a consortium of 15 research institutions that will integrate AI into education and accelerate scientific discoveries",
+          "strength": 95.0
+        },
+        {
+          "text": "Company developing AI models",
+          "strength": 98.0
+        },
+        {
+          "text": "Modele OpenAI",
+          "strength": 88.0
+        },
+        {
+          "text": "Company strategically investing in startups that push the boundaries of AI",
+          "strength": 95.0
+        },
+        {
+          "text": "Company that released small language models and developed ChatGPT and GPT-4",
+          "strength": 90.0
+        },
+        {
+          "text": "More established models like those of OpenAI",
+          "strength": 80.0
+        },
+        {
+          "text": "Company looking to roll out specialised AI agents",
+          "strength": 95.0
+        },
+        {
+          "text": "Company that developed deep research",
+          "strength": 80.0
+        },
+        {
+          "text": "Company that debuted Operator, signaling the evolution of AI",
+          "strength": 90.0
+        },
+        {
+          "text": "Company mentioned in comparison to Alibaba's AI model",
+          "strength": 75.0
+        },
+        {
+          "text": "AI research and deployment company",
+          "strength": 95.0
+        },
+        {
+          "text": "Key partner of Microsoft, known for developing advanced AI models",
+          "strength": 95.0
+        },
+        {
+          "text": "Providers like Google and OpenAI use encryption and data retention policies",
+          "strength": 85.0
+        },
+        {
+          "text": "Company that has removed diversity and inclusion mentions from its recruitment page",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that developed ChatGPT and is competing with Google in AI search",
+          "strength": 90.0
+        },
+        {
+          "text": "An AI research and deployment company",
+          "strength": 99.0
+        },
+        {
+          "text": "Company at the center of a legal dispute with Elon Musk",
+          "strength": 99.0
+        },
+        {
+          "text": "Company that introduced the SWE-Lancer benchmark to evaluate AI language models",
+          "strength": 95.0
+        },
+        {
+          "text": "Key player from the tech industry in attendance at GTC 2025",
+          "strength": 70.0
+        },
+        {
+          "text": "Company leading a consortium to spend on AI infrastructure through Project Stargate",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose models are used by software firms",
+          "strength": 90.0
+        },
+        {
+          "text": "Company being sued by The New York Times over copyright issues",
+          "strength": 75.0
+        },
+        {
+          "text": "Company that developed AI systems, also facing legal action over copyright issues",
+          "strength": 95.0
+        },
+        {
+          "text": "Company known for developing advanced AI models",
+          "strength": 90.0
+        },
+        {
+          "text": "AI vendor that has limited access to its Voice Engine for speech synthesis",
+          "strength": 75.0
+        },
+        {
+          "text": "Company developing AI with the goal to create magic intelligence in the sky",
+          "strength": 90.0
+        },
+        {
+          "text": "Company that developed ChatGPT",
+          "strength": 92.0
+        },
+        {
+          "text": "Tw\u00f3rcy ChataGPT",
+          "strength": 95.0
+        },
+        {
+          "text": "Company supporting the Stargate project and developing AI models like ChatGPT",
+          "strength": 95.0
+        },
+        {
+          "text": "Firma, kt\u00f3ra przekaza\u0142a 60 mln dol. na badanie dochodu podstawowego",
+          "strength": 92.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "Released by OpenAI",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "AI agents",
+          "description": "OpenAI is developing AI agents like Operator",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "ChatGPT is created by OpenAI",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Sam Altman",
+          "description": "Sam Altman is the CEO of OpenAI",
+          "strength": 80.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Operator",
+          "description": "Operator is a new AI 'agent' from OpenAI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Microsoft's AI platform supports models from OpenAI",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Operator",
+          "description": "Developed by OpenAI as an agent project",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "Developed by OpenAI as a conversational AI model",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Receives a 75% discount on AWS costs from Microsoft, its sister company",
+          "strength": 88.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Owns 49% of OpenAI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "AI",
+          "description": "Modele OpenAI",
+          "strength": 80.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "A big backer of OpenAI",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Sam Altman",
+          "description": "Legally controlled by Sam Altman, the CEO of OpenAI",
+          "strength": 80.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "Developed ChatGPT",
+          "strength": 90.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Manus",
+          "description": "Implied to be superior to agentic tools such as OpenAI\u2019s deep research",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Manus",
+          "description": "Manus outperforms deep research on a popular benchmark for general AI assistants called GAIA",
+          "strength": 70.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Operator",
+          "description": "Developed Operator, an AI capable of executing complex workflows",
+          "strength": 92.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Operator",
+          "description": "Developed by OpenAI",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Microsoft is an early backer of OpenAI",
+          "strength": 92.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Microsoft is developing AI models to compete with OpenAI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "GPT-4",
+          "description": "OpenAI developed the GPT-4 model",
+          "strength": 93.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Google",
+          "description": "Google joins other large tech companies like OpenAI in limiting DEI initiatives",
+          "strength": 65.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Google",
+          "description": "Google's AI Mode is a direct response to OpenAI's ChatGPT",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Microsoft is an investor and collaborator with OpenAI",
+          "strength": 90.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Elon Musk",
+          "description": "Elon Musk is a key supporter turned adversary of OpenAI",
+          "strength": 94.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "AI",
+          "description": "OpenAI is an AI research and deployment company",
+          "strength": 99.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "ChatGPT is a product of OpenAI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Elon Musk",
+          "description": "Elon Musk is in a legal dispute with OpenAI",
+          "strength": 97.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Microsoft",
+          "description": "Microsoft is one of the backers of OpenAI",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "AI",
+          "description": "Develops AI models",
+          "strength": 95.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Meta",
+          "description": "Meta sought to build better AI models to combat the rise of OpenAI",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "Artificial Intelligence",
+          "description": "Sam Altman, of OpenAI, uses the umbrella term of \u2018A.I.\u2019 to connect generative A.I. and large language models to robotics",
+          "strength": 92.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "AI",
+          "description": "OpenAI is a research company that develops AI models like ChatGPT",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "ChatGPT was developed by OpenAI",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "Developed by OpenAI as their most advanced language model",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "Developed by OpenAI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "OpenAI",
+          "target": "ChatGPT",
+          "description": "OpenAI is the creator of ChatGPT",
+          "strength": 90.0
+        },
+        {
+          "source": "OpenAI",
+          "target": "Sam Altman",
+          "description": "CEO OpenAI",
+          "strength": 90.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Artificial Intelligence",
+      "label": "Artificial Intelligence",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Future Trends",
+      "x": 599.7359835085051,
+      "y": -80.1644800224459,
+      "score": 1.0,
+      "categories": "Technology, Future Trends",
+      "entity_type": "Concept",
+      "definitions": [
+        {
+          "text": "Technology discussed as a game changer for businesses",
+          "strength": 90.0
+        },
+        {
+          "text": "Technology that businesses can integrate efficiently to supplement labor without displacing a workforce",
+          "strength": 98.0
+        },
+        {
+          "text": "Growing interest in AI and its current impact on various industries like healthcare, manufacturing, agriculture and education",
+          "strength": 98.0
+        },
+        {
+          "text": "Technology being promoted as a transformative force",
+          "strength": 100.0
+        },
+        {
+          "text": "Branch of computer science focused on creating intelligent machines",
+          "strength": 100.0
+        },
+        {
+          "text": "Use of AI by malicious actors to target healthcare organizations",
+          "strength": 98.0
+        },
+        {
+          "text": "Companies train their AI models using the works of writers, artists and creatives",
+          "strength": 98.0
+        },
+        {
+          "text": "Use of computational methods to perform tasks that typically require human intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "The field of AI used to enhance learning tools, content creation, and interactive educational experiences",
+          "strength": 90.0
+        },
+        {
+          "text": "A broad field encompassing the development of intelligent machines and systems",
+          "strength": 60.0
+        },
+        {
+          "text": "The broad concept of artificial intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "Use of AI to help manage the health of its elderly population",
+          "strength": 98.0
+        },
+        {
+          "text": "The artificial intelligence (AI) sector",
+          "strength": 98.0
+        },
+        {
+          "text": "Advanced artificial intelligence technologies",
+          "strength": 98.0
+        },
+        {
+          "text": "Crucial factor for the growth of the IT services sector",
+          "strength": 100.0
+        },
+        {
+          "text": "Field of computer science focused on creating intelligent machines",
+          "strength": 85.0
+        },
+        {
+          "text": "The field of developing intelligent machines",
+          "strength": 90.0
+        },
+        {
+          "text": "Technology that advances rapidly, bringing both efficiency gains and challenges",
+          "strength": 98.0
+        },
+        {
+          "text": "Manufacturing of intelligence \u2014 a digital good that nations must produce to maintain technological sovereignty",
+          "strength": 100.0
+        },
+        {
+          "text": "General concept of AI",
+          "strength": 75.0
+        },
+        {
+          "text": "Umbrella term for quantum computing",
+          "strength": 90.0
+        },
+        {
+          "text": "A field of computer science dedicated to creating systems that can perform tasks that typically require human intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Increasing energy demand to power AI",
+          "strength": 100.0
+        },
+        {
+          "text": "The broad concept of machines capable of performing tasks that typically require human intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "Using AI to enhance care and cut costs in medicine",
+          "strength": 100.0
+        },
+        {
+          "text": "Branch of computer science using data processing systems to perform functions normally associated with human intelligence",
+          "strength": 99.0
+        },
+        {
+          "text": "Use of computational methods to mimic human intelligence for problem-solving and automation",
+          "strength": 98.0
+        },
+        {
+          "text": "The use of artificial intelligence is expanding across many different industries",
+          "strength": 90.0
+        },
+        {
+          "text": "The theory and development of computer systems able to perform tasks that normally require human intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Technologies that enable machines to perform tasks that typically require human intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "Technology that allows computers to perform tasks that typically require human intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "Use of AI in schools for tasks like lesson planning and report card comments",
+          "strength": 98.0
+        },
+        {
+          "text": "Intelligence demonstrated by machines, in contrast to the natural intelligence displayed by humans",
+          "strength": 98.0
+        },
+        {
+          "text": "Use of AI in judiciary",
+          "strength": 95.0
+        },
+        {
+          "text": "Area of MLex coverage",
+          "strength": 90.0
+        },
+        {
+          "text": "A technological revolution opening up great opportunities for education",
+          "strength": 98.0
+        },
+        {
+          "text": "Equitable artificial intelligence (AI) approaches can mitigate ancestral bias in training data and contribute to equitable representation in medical research",
+          "strength": 90.0
+        },
+        {
+          "text": "Use of AI to secure transactions and identify threats",
+          "strength": 98.0
+        },
+        {
+          "text": "Ability of a digital computer or computer-controlled robot to perform tasks commonly associated with intelligent beings",
+          "strength": 75.0
+        },
+        {
+          "text": "AI brings precision to treatments by identifying key factors for long-term recovery",
+          "strength": 98.0
+        },
+        {
+          "text": "The broad field of creating machines capable of performing tasks that typically require human intelligence",
+          "strength": 95.0
+        },
+        {
+          "text": "Application of AI in geoscientific fields",
+          "strength": 98.0
+        },
+        {
+          "text": "Technology to cut phone waiting times for public services",
+          "strength": 90.0
+        },
+        {
+          "text": "The broad concept of AI and its applications in the travel and hospitality industry",
+          "strength": 99.0
+        },
+        {
+          "text": "The broad concept of machines mimicking human intelligence",
+          "strength": 90.0
+        },
+        {
+          "text": "News and resources on artificial intelligence systems, innovations and initiatives worldwide.",
+          "strength": 65.0
+        },
+        {
+          "text": "AI advancements developed through LocusLABS",
+          "strength": 98.0
+        },
+        {
+          "text": "Field of computer science dedicated to creating machines that can perform tasks that typically require human intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "General term for artificial intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "Development of infrastructure related to artificial intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "The broad field of creating intelligent machines",
+          "strength": 75.0
+        },
+        {
+          "text": "Catalyst that should lift leading chip stocks higher over the next decade",
+          "strength": 98.0
+        },
+        {
+          "text": "Field of computer science focused on creating machines capable of performing tasks that typically require human intelligence",
+          "strength": 98.0
+        },
+        {
+          "text": "The field of developing intelligent systems and models",
+          "strength": 90.0
+        },
+        {
+          "text": "The development of computer systems able to perform tasks that normally require human intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Intelligence exhibited by machines or software",
+          "strength": 100.0
+        },
+        {
+          "text": "Technology that enables machines to perform tasks that typically require human intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "Potential of artificial intelligence (AI) in achieving sustainability goals",
+          "strength": 98.0
+        },
+        {
+          "text": "Umbrella term connecting generative AI and large language models to robotics",
+          "strength": 98.0
+        },
+        {
+          "text": "Leveraged to amplify Moscow's influence at an unprecedented scale",
+          "strength": 90.0
+        },
+        {
+          "text": "Use of computer systems to perform tasks that normally require human intelligence",
+          "strength": 90.0
+        },
+        {
+          "text": "Sztuczna inteligencja zdominowa\u0142a rozmowy na tegorocznym MWC w Barcelonie",
+          "strength": 98.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Artificial Intelligence",
+          "target": "Nvidia",
+          "description": "Dominance in AI graphic processing units",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Generative AI",
+          "description": "McKinsey expects $2.6 trillion to $4.4 trillion in added economic growth stemming from the technology's adoption by businesses",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Large Language Models",
+          "description": "Generative AI and large language models are driving the AI explosion across industries",
+          "strength": 85.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Microsoft",
+          "description": "Microsoft is investing heavily in AI, with a $13bn business in annual recurring revenue",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "AI models",
+          "description": "AI models are trained on the world\u2019s knowledge",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "AI agents",
+          "description": "AI agents are digital assistants that take action on your behalf",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "AI models",
+          "description": "AI models are a specific application of Artificial Intelligence",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Manus",
+          "description": "Described as a game-changer in Artificial Intelligence",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Huawei",
+          "description": "Chinese companies like Huawei have traditionally relied on two main options for manufacturing their self-designed AI chips",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Large Language Models",
+          "description": "A subset of Artificial Intelligence technology",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "DeepSeek",
+          "description": "A domestic model driving technological innovation in China",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Generative AI",
+          "description": "Generative AI is a subfield of Artificial Intelligence",
+          "strength": 70.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Large Language Models",
+          "description": "Large Language Models are a subfield of Artificial Intelligence",
+          "strength": 70.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Alphabet",
+          "description": "Alphabet is one of the biggest players in AI",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Amazon",
+          "description": "Amazon is one of the biggest players in AI",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Microsoft",
+          "description": "Microsoft is one of the biggest players in AI",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "China",
+          "description": "China is expanding university enrollment to develop talent in AI",
+          "strength": 95.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "DeepSeek",
+          "description": "DeepSeek created AI models comparable to those in the United States",
+          "strength": 90.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "Includes machine learning as a subset",
+          "strength": 90.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine learning",
+          "description": "Machine learning is a subfield of Artificial Intelligence",
+          "strength": 95.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "Machine Learning is a subfield of Artificial Intelligence",
+          "strength": 85.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Generative AI",
+          "description": "Type of AI used by students for various tasks",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Google",
+          "description": "Uses AI to provide summaries before search results",
+          "strength": 68.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "China",
+          "description": "Has long nurtured ambitions to become a leader in the field of AI",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "DeepSeek",
+          "description": "Released a model that operates effectively, highlighting China's AI sector",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Microsoft",
+          "description": "Conducted a study on the impact of trust in AI",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "AI systems often incorporate machine learning techniques for enhanced functionality",
+          "strength": 0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "A specific type of Artificial Intelligence used for predictive analysis",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "Machine learning is a subset of artificial intelligence",
+          "strength": 90.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Facebook",
+          "description": "Leverages AI for content moderation and personalized user experiences",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Alphabet",
+          "description": "Invests heavily in AI and deep learning technologies",
+          "strength": 72.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Microsoft",
+          "description": "Integrates deep learning capabilities into its software products and services",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "Often used together for geophysical data analysis",
+          "strength": 95.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Manus",
+          "description": "Described as a general AI agent",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "AI agents",
+          "description": "Utilizes AI to automate workflows",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Microsoft",
+          "description": "Investing in the development of AI infrastructure",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Google",
+          "description": "Google has made significant investments in AI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Anthropic",
+          "description": "Company focused on developing AI technologies, receiving investments from Google",
+          "strength": 72.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "IBM",
+          "description": "Remains a vital player in the field of Artificial Intelligence",
+          "strength": 93.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Amazon",
+          "description": "Focused on scaling its artificial intelligence ventures",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "AI agents",
+          "description": "AI agents will play a key role in the industry\u2019s next high growth phase",
+          "strength": 92.0
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Machine Learning",
+          "description": "Machine learning is viewed as a crucial digital technology for advancing corporate sustainability",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Large Language Models",
+          "description": "LLMs are used to improve efficiency and optimize energy consumption",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "OpenAI",
+          "description": "Sam Altman, of OpenAI, uses the umbrella term of \u2018A.I.\u2019 to connect generative A.I. and large language models to robotics",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Artificial Intelligence",
+          "target": "Silicon Valley",
+          "description": "Silicon Valley is experiencing an A.I. boom",
+          "strength": 65.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Nvidia",
+      "label": "Nvidia",
+      "tag": "Hardware",
+      "URL": "",
+      "cluster": "Hardware, Investment",
+      "x": -512.3245242851651,
+      "y": -993.7922675413571,
+      "score": 0.8,
+      "categories": "Hardware, Investment",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Company with a market cap that currently exceeds $3 trillion",
+          "strength": 98.0
+        },
+        {
+          "text": "Company providing AI platform support",
+          "strength": 80.0
+        },
+        {
+          "text": "Company that invested in Figure AI",
+          "strength": 75.0
+        },
+        {
+          "text": "Provided support through the Taipei-1 Supercomputer and technical consultation, enabling Hon Hai Research Institute to successfully complete the model pre-training",
+          "strength": 90.0
+        },
+        {
+          "text": "Technology company mentioned in the context of AI infrastructure and market capitalization",
+          "strength": 72.0
+        },
+        {
+          "text": "Nvidia-backed startup could be hottest tech IPO of the year",
+          "strength": 75.0
+        },
+        {
+          "text": "Company that was a chief pioneer in GPU development",
+          "strength": 95.0
+        },
+        {
+          "text": "Tech stock that plummeted after DeepSeek said it created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 70.0
+        },
+        {
+          "text": "Leading designer of GPUs used to train AI models and run inference",
+          "strength": 95.0
+        },
+        {
+          "text": "Company with a lead in graphics processing units (GPUs) providing ample opportunities for long-term growth",
+          "strength": 97.0
+        },
+        {
+          "text": "Chipmaker with an equity stake in SoundHound AI and Nebius Group",
+          "strength": 97.0
+        },
+        {
+          "text": "Company whose products benefit other companies",
+          "strength": 70.0
+        },
+        {
+          "text": "Dominant provider of computational infrastructure for AI",
+          "strength": 100.0
+        },
+        {
+          "text": "Company that may release an expensive new chip every year",
+          "strength": 75.0
+        },
+        {
+          "text": "A technology company specializing in graphics processing units (GPUs)",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose chips will be used in the Stargate project",
+          "strength": 95.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Nvidia",
+          "target": "Artificial Intelligence",
+          "description": "Dominance in AI graphic processing units",
+          "strength": 0
+        },
+        {
+          "source": "Nvidia",
+          "target": "Microsoft",
+          "description": "Microsoft's AI platform supports models from Nvidia",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Nvidia",
+          "target": "Apple",
+          "description": "Apple and Nvidia are members of the $3 trillion club",
+          "strength": 65.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Nvidia",
+          "target": "DeepSeek",
+          "description": "Nvidia's stock plummeted after DeepSeek created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 75.0
+        },
+        {
+          "source": "Nvidia",
+          "target": "GPUs",
+          "description": "Nvidia is the leading designer of GPUs",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Nvidia",
+          "target": "GPUs",
+          "description": "Nvidia is the leading designer of graphics processing units (GPUs)",
+          "strength": 95.0
+        },
+        {
+          "source": "Nvidia",
+          "target": "GPUs",
+          "description": "Nvidia has a lead in graphics processing units (GPUs)",
+          "strength": 94.0
+        },
+        {
+          "source": "Nvidia",
+          "target": "AI",
+          "description": "Companies benefit from what Nvidia has already done",
+          "strength": 75.0
+        },
+        {
+          "source": "Nvidia",
+          "target": "AI",
+          "description": "Nvidia provides the foundational infrastructure for AI development",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Nvidia",
+          "target": "GPUs",
+          "description": "Nvidia is the dominant provider of GPUs for AI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Nvidia",
+          "target": "GPUs",
+          "description": "Is the dominant provider of GPUs",
+          "strength": 95.0
+        }
+      ]
+    },
+    {
+      "key": "AI agents",
+      "label": "AI agents",
+      "tag": "Automation",
+      "URL": "",
+      "cluster": "Automation, Digital Assistants",
+      "x": 393.9047126661849,
+      "y": -696.4788372067951,
+      "score": 0.6,
+      "categories": "Automation, Digital Assistants",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Autonomous digital assistants that can complete practical tasks",
+          "strength": 98.0
+        },
+        {
+          "text": "Digital assistants that take action on your behalf",
+          "strength": 88.0
+        },
+        {
+          "text": "Apps that utilize AI to undertake tasks and automate outcomes",
+          "strength": 98.0
+        },
+        {
+          "text": "Specialised AI agents capable of executing tasks",
+          "strength": 85.0
+        },
+        {
+          "text": "Self-learning, adaptive digital assistants that will manage the entire hospitality tech ecosystem autonomously",
+          "strength": 98.0
+        },
+        {
+          "text": "Autonomous or semi-autonomous programs that perceive their environment, make decisions and take actions to achieve specific goals with or without human oversight",
+          "strength": 95.0
+        },
+        {
+          "text": "AI entities treated as 'digital labor' that supplements or replaces the human workforce",
+          "strength": 95.0
+        },
+        {
+          "text": "AI-powered virtual assistants and chatbots used to handle customer service and enterprise operations",
+          "strength": 93.0
+        },
+        {
+          "text": "AI agents that automate time-intensive workflows, such as email responses, account applications, and form processing",
+          "strength": 85.0
+        },
+        {
+          "text": "Programs that are able to make decisions, carry out actions, and ultimately learn from the interactions they have",
+          "strength": 98.0
+        },
+        {
+          "text": "AI-powered customer service agents to assist businesses",
+          "strength": 95.0
+        },
+        {
+          "text": "AI entities able to handle complex tasks autonomously",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "AI agents",
+          "target": "OpenAI",
+          "description": "OpenAI is developing AI agents like Operator",
+          "strength": 90.0
+        },
+        {
+          "source": "AI agents",
+          "target": "Claude",
+          "description": "Claude has 'computer use' capabilities, similar to AI agents",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI agents",
+          "target": "Sam Altman",
+          "description": "Sam Altman predicts that AI agents could join the workforce this year",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI agents",
+          "target": "Artificial Intelligence",
+          "description": "AI agents are digital assistants that take action on your behalf",
+          "strength": 90.0
+        },
+        {
+          "source": "AI agents",
+          "target": "Operator",
+          "description": "Evolved into autonomous agents",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI agents",
+          "target": "Artificial Intelligence",
+          "description": "Utilizes AI to automate workflows",
+          "strength": 70.0
+        },
+        {
+          "source": "AI agents",
+          "target": "Artificial Intelligence",
+          "description": "AI agents will play a key role in the industry\u2019s next high growth phase",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI agents",
+          "target": "Microsoft",
+          "description": "Competing with Microsoft, which also appears to be focused on agentic AI opportunities",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI agents",
+          "target": "Meta",
+          "description": "Meta is rolling out new AI agents to help with customer service on Instagram, Facebook, and WhatsApp",
+          "strength": 95.0
+        }
+      ]
+    },
+    {
+      "key": "Anthropic",
+      "label": "Anthropic",
+      "tag": "AI",
+      "URL": "",
+      "cluster": "AI Research, Chatbots",
+      "x": 287.46751856475066,
+      "y": -637.0446446388773,
+      "score": 0.45,
+      "categories": "AI Research, Chatbots",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Company that introduced 'computer use' capabilities to its Claude chatbot",
+          "strength": 80.0
+        },
+        {
+          "text": "AI company known for its focus on AI safety and research",
+          "strength": 80.0
+        },
+        {
+          "text": "Company developing AI models",
+          "strength": 75.0
+        },
+        {
+          "text": "Performance levels that reportedly rival those of OpenAI and Anthropic",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that Google has poured billions into",
+          "strength": 85.0
+        },
+        {
+          "text": "Top AI labs like Anthropic, Stability AI, and AI21 Labs",
+          "strength": 80.0
+        },
+        {
+          "text": "Company whose technology is used by Granola",
+          "strength": 75.0
+        },
+        {
+          "text": "Firma rozwijaj\u0105ca model AI Claude",
+          "strength": 75.0
+        },
+        {
+          "text": "Firma, kt\u00f3rej CEO uwa\u017ca, \u017ce doch\u00f3d podstawowy to absolutne minimum",
+          "strength": 78.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Anthropic",
+          "target": "Claude",
+          "description": "Anthropic introduced 'computer use' capabilities to its Claude chatbot",
+          "strength": 90.0
+        },
+        {
+          "source": "Anthropic",
+          "target": "AI models",
+          "description": "MAI performance levels reportedly rival those of OpenAI and Anthropic",
+          "strength": 78.0
+        },
+        {
+          "source": "Anthropic",
+          "target": "Google",
+          "description": "Google has invested billions into Anthropic",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Anthropic",
+          "target": "Artificial Intelligence",
+          "description": "Company focused on developing AI technologies, receiving investments from Google",
+          "strength": 72.0
+        },
+        {
+          "source": "Anthropic",
+          "target": "Claude",
+          "description": "Claude jest modelem AI rozwijanym przez Anthropic",
+          "strength": 90.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Claude",
+      "label": "Claude",
+      "tag": "Chatbot",
+      "URL": "",
+      "cluster": "Chatbot",
+      "x": -361.666752368629,
+      "y": 761.1376243993816,
+      "score": 0.35,
+      "categories": "Chatbot",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "Anthropic's chatbot with 'computer use' capabilities",
+          "strength": 85.0
+        },
+        {
+          "text": "AI model used by Manus to perform tasks",
+          "strength": 80.0
+        },
+        {
+          "text": "Top AI tool capable of natural language processing",
+          "strength": 90.0
+        },
+        {
+          "text": "Large language model developed by Anthropic",
+          "strength": 75.0
+        },
+        {
+          "text": "AI model that trains on datasets",
+          "strength": 85.0
+        },
+        {
+          "text": "Model AI od Anthropic wykorzystywany przez Manus",
+          "strength": 80.0
+        },
+        {
+          "text": "Komercyjny model LLM",
+          "strength": 75.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Claude",
+          "target": "Anthropic",
+          "description": "Anthropic introduced 'computer use' capabilities to its Claude chatbot",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Claude",
+          "target": "AI agents",
+          "description": "Claude has 'computer use' capabilities, similar to AI agents",
+          "strength": 80.0
+        },
+        {
+          "source": "Claude",
+          "target": "Manus",
+          "description": "Uses Claude model to perform tasks",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Claude",
+          "target": "AI",
+          "description": "Claude is a large language model, similar to those being developed alongside AI",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Claude",
+          "target": "Manus",
+          "description": "Wykorzystuje model Claude od Anthropic",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Claude",
+          "target": "Anthropic",
+          "description": "Claude jest modelem AI rozwijanym przez Anthropic",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "Hugging Face",
+      "label": "Hugging Face",
+      "tag": "Ethics",
+      "URL": "",
+      "cluster": "Ethics, Research",
+      "x": -21.929600222968247,
+      "y": 565.0949699648254,
+      "score": 0.3,
+      "categories": "Ethics, Research",
+      "entity_type": "Platform",
+      "definitions": [
+        {
+          "text": "AI company where Margaret Mitchell is the chief ethics scientist",
+          "strength": 80.0
+        },
+        {
+          "text": "Company whose head of product called Manus the most impressive AI tool",
+          "strength": 70.0
+        },
+        {
+          "text": "Company where four researchers made a forceful argument that fully autonomous AI agents should not be developed",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose head of product called Manus the most impressive AI tool he\u2019s ever tried",
+          "strength": 75.0
+        },
+        {
+          "text": "Open-source hub for AI models",
+          "strength": 75.0
+        },
+        {
+          "text": "Platforma wymiany modeli i narz\u0119dzi AI",
+          "strength": 70.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Hugging Face",
+          "target": "Manus",
+          "description": "Was called the most impressive AI tool by Hugging Face's head of product",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Hugging Face",
+          "target": "Manus",
+          "description": "Head of product at Hugging Face called Manus the most impressive AI tool he\u2019s ever tried",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Hugging Face",
+          "target": "Generative AI",
+          "description": "Functions as a Generative AI platform",
+          "strength": 78.0
+        }
+      ]
+    },
+    {
+      "key": "Operator",
+      "label": "Operator",
+      "tag": "Agent",
+      "URL": "",
+      "cluster": "Agent, Digital Assistant",
+      "x": -779.426666862699,
+      "y": 220.95928620261293,
+      "score": 0.25,
+      "categories": "Agent, Digital Assistant",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "AI 'agent' from OpenAI that can navigate a web browser to perform tasks",
+          "strength": 97.0
+        },
+        {
+          "text": "OpenAI's agent project that can interact with other websites to undertake specific tasks assigned to it",
+          "strength": 92.0
+        },
+        {
+          "text": "AI tool that is outperformed by Manus in the GAIA benchmark",
+          "strength": 72.0
+        },
+        {
+          "text": "AI evolved from passive assistants into autonomous agents, capable of executing complex workflows without human micromanagement",
+          "strength": 92.0
+        },
+        {
+          "text": "AI-powered tool by OpenAI that can search and complete transactions",
+          "strength": 80.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Operator",
+          "target": "OpenAI",
+          "description": "Operator is a new AI 'agent' from OpenAI",
+          "strength": 95.0
+        },
+        {
+          "source": "Operator",
+          "target": "OpenAI",
+          "description": "Developed by OpenAI as an agent project",
+          "strength": 92.0
+        },
+        {
+          "source": "Operator",
+          "target": "OpenAI",
+          "description": "Developed Operator, an AI capable of executing complex workflows",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Operator",
+          "target": "AI agents",
+          "description": "Evolved into autonomous agents",
+          "strength": 90.0
+        },
+        {
+          "source": "Operator",
+          "target": "OpenAI",
+          "description": "Developed by OpenAI",
+          "strength": 85.0
+        }
+      ]
+    },
+    {
+      "key": "Perplexity",
+      "label": "Perplexity",
+      "tag": "Search",
+      "URL": "",
+      "cluster": "Search Engine",
+      "x": 162.51557565245912,
+      "y": 314.54698469051255,
+      "score": 0.35,
+      "categories": "Search Engine",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Company that released 'agentic' features into their AI assistants",
+          "strength": 75.0
+        },
+        {
+          "text": "Company offering AI-powered search technology",
+          "strength": 75.0
+        },
+        {
+          "text": "Company offering AI-powered search engine",
+          "strength": 70.0
+        },
+        {
+          "text": "An AI-powered search engine that is directly competing with Google",
+          "strength": 90.0
+        },
+        {
+          "text": "Company whose CEO is offering a challenge related to asking questions through their mobile app",
+          "strength": 90.0
+        },
+        {
+          "text": "AI model that trains on datasets",
+          "strength": 85.0
+        },
+        {
+          "text": "AI search engine",
+          "strength": 68.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Perplexity",
+          "target": "Google",
+          "description": "Directly competing with Google in the AI-powered search engine market",
+          "strength": 91.0
+        }
+      ]
+    },
+    {
+      "key": "Sam Altman",
+      "label": "Sam Altman",
+      "tag": "CEO",
+      "URL": "",
+      "cluster": "CEO",
+      "x": 175.68605387305502,
+      "y": 290.84360489100504,
+      "score": 0.4,
+      "categories": "CEO",
+      "entity_type": "Person",
+      "definitions": [
+        {
+          "text": "CEO of OpenAI",
+          "strength": 75.0
+        },
+        {
+          "text": "CEO of OpenAI and announced Thrive AI Health",
+          "strength": 80.0
+        },
+        {
+          "text": "CEO of OpenAI, aiming to create magic intelligence in the sky",
+          "strength": 82.0
+        },
+        {
+          "text": "CEO OpenAI, zwolennik bezwarunkowego dochodu podstawowego",
+          "strength": 95.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Sam Altman",
+          "target": "OpenAI",
+          "description": "Sam Altman is the CEO of OpenAI",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sam Altman",
+          "target": "AI agents",
+          "description": "Sam Altman predicts that AI agents could join the workforce this year",
+          "strength": 80.0
+        },
+        {
+          "source": "Sam Altman",
+          "target": "OpenAI",
+          "description": "Legally controlled by Sam Altman, the CEO of OpenAI",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sam Altman",
+          "target": "Elon Musk",
+          "description": "Elon Musk is in a public war of words with Sam Altman",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sam Altman",
+          "target": "Elon Musk",
+          "description": "Sam Altman and Elon Musk co-founded OpenAI in 2015",
+          "strength": 90.0
+        },
+        {
+          "source": "Sam Altman",
+          "target": "AI",
+          "description": "CEO of OpenAI, which aims to create magic intelligence in the sky",
+          "strength": 85.0
+        },
+        {
+          "source": "Sam Altman",
+          "target": "AI",
+          "description": "Sam Altman literally said his company\u2019s goal is to create magic intelligence in the sky",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sam Altman",
+          "target": "OpenAI",
+          "description": "CEO OpenAI",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "Machine Learning",
+      "label": "Machine Learning",
+      "tag": "Data",
+      "URL": "",
+      "cluster": "Data Analysis, Algorithms",
+      "x": 44.413169320924,
+      "y": -391.43125208617494,
+      "score": 1.0,
+      "categories": "Data Analysis, Algorithms",
+      "entity_type": "Field",
+      "definitions": [
+        {
+          "text": "Course included in the Bachelor of Science in Artificial Intelligence program",
+          "strength": 85.0
+        },
+        {
+          "text": "Type of AI that learns from data without explicit programming",
+          "strength": 90.0
+        },
+        {
+          "text": "A field of AI focused on algorithms that learn from data",
+          "strength": 80.0
+        },
+        {
+          "text": "A type of artificial intelligence that allows computer systems to learn from data without being explicitly programmed",
+          "strength": 92.0
+        },
+        {
+          "text": "Ability of computers to learn from provided data without being programmed",
+          "strength": 88.0
+        },
+        {
+          "text": "A type of AI that allows systems to learn from data without being explicitly programmed",
+          "strength": 85.0
+        },
+        {
+          "text": "A method for equitable genomic precision medicine",
+          "strength": 85.0
+        },
+        {
+          "text": "Using algorithms to learn from data to predict outcomes",
+          "strength": 90.0
+        },
+        {
+          "text": "Method that predicts novel mosquito repellents",
+          "strength": 95.0
+        },
+        {
+          "text": "Use of ML to secure transactions",
+          "strength": 90.0
+        },
+        {
+          "text": "A field focused on enabling computers to learn from data without explicit programming",
+          "strength": 95.0
+        },
+        {
+          "text": "A method of data analysis that automates analytical model building",
+          "strength": 95.0
+        },
+        {
+          "text": "Study of computer algorithms that improve automatically through experience",
+          "strength": 90.0
+        },
+        {
+          "text": "A form of AI used to analyze more than 80 baseline factors to predict recovery and nonrecovery from GAD",
+          "strength": 95.0
+        },
+        {
+          "text": "A subset of AI that focuses on enabling systems to learn from data without being explicitly programmed",
+          "strength": 92.0
+        },
+        {
+          "text": "Application of ML in geoscientific fields",
+          "strength": 98.0
+        },
+        {
+          "text": "AI technology used in modern healthcare",
+          "strength": 92.0
+        },
+        {
+          "text": "Leveraged by LocusINTELLIGENCE to continuously adapt and optimize fulfillment operations at scale",
+          "strength": 80.0
+        },
+        {
+          "text": "A specialization held by Daniel Dominguez from the University of Washington, focused on creating innovative solutions",
+          "strength": 70.0
+        },
+        {
+          "text": "Viewed as the most crucial digital technologies for advancing corporate sustainability",
+          "strength": 90.0
+        },
+        {
+          "text": "A subset of AI focused on enabling systems to learn from data without explicit programming, used to refine phishing attacks and identify vulnerabilities",
+          "strength": 93.0
+        },
+        {
+          "text": "Advances in machine learning has voice cloning become convincing, easy to use, and widely accessible",
+          "strength": 75.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "Includes machine learning as a subset",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "Machine Learning is a subfield of Artificial Intelligence",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "AI systems often incorporate machine learning techniques for enhanced functionality",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Deep Learning",
+          "description": "Deep Learning is a type of Machine Learning",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "A specific type of Artificial Intelligence used for predictive analysis",
+          "strength": 90.0
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "Machine learning is a subset of artificial intelligence",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "Often used together for geophysical data analysis",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Deep Learning",
+          "description": "Deep Learning is a subset of Machine Learning",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine Learning",
+          "target": "Artificial Intelligence",
+          "description": "Machine learning is viewed as a crucial digital technology for advancing corporate sustainability",
+          "strength": 92.0
+        }
+      ]
+    },
+    {
+      "key": "Deep Learning",
+      "label": "Deep Learning",
+      "tag": "Neural",
+      "URL": "",
+      "cluster": "Neural Networks, Algorithms",
+      "x": -653.4194425829123,
+      "y": -877.6441077853033,
+      "score": 0.3,
+      "categories": "Neural Networks, Algorithms",
+      "entity_type": "Technique",
+      "definitions": [
+        {
+          "text": "Course included in the Bachelor of Science in Artificial Intelligence program",
+          "strength": 85.0
+        },
+        {
+          "text": "A subset of machine learning involving neural networks with multiple layers",
+          "strength": 90.0
+        },
+        {
+          "text": "A type of machine learning based on artificial neural networks with representation learning",
+          "strength": 88.0
+        },
+        {
+          "text": "Advanced machine learning technique planned for future model refinement",
+          "strength": 80.0
+        },
+        {
+          "text": "A subset of machine learning using deep neural networks",
+          "strength": 80.0
+        },
+        {
+          "text": "AI technology used in modern healthcare",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Deep Learning",
+          "target": "GPUs",
+          "description": "Uses GPUs for resource-intensive tasks",
+          "strength": 85.0
+        },
+        {
+          "source": "Deep Learning",
+          "target": "Machine Learning",
+          "description": "Deep Learning is a type of Machine Learning",
+          "strength": 70.0
+        },
+        {
+          "source": "Deep Learning",
+          "target": "Machine Learning",
+          "description": "Deep Learning is a subset of Machine Learning",
+          "strength": 85.0
+        }
+      ]
+    },
+    {
+      "key": "China",
+      "label": "China",
+      "tag": "Cybersecurity",
+      "URL": "",
+      "cluster": "Cybersecurity, Geopolitics, Threat Actors",
+      "x": -315.11310541586886,
+      "y": 69.78525555808005,
+      "score": 0.4,
+      "categories": "Cybersecurity, Geopolitics, Threat Actors",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "State that poses a great threat to AI academic research",
+          "strength": 70.0
+        },
+        {
+          "text": "Country expanding university enrollment to develop talent in AI and other strategic areas",
+          "strength": 90.0
+        },
+        {
+          "text": "Country with Increasing AI adoption in emerging economies",
+          "strength": 65.0
+        },
+        {
+          "text": "One of the major players in the global AI policy ecosystem",
+          "strength": 90.0
+        },
+        {
+          "text": "Country with ambitions to become a leader in the field of AI",
+          "strength": 95.0
+        },
+        {
+          "text": "Country strategically investing in humanoid robot development to accelerate digital transformation",
+          "strength": 80.0
+        },
+        {
+          "text": "Mentioned in the context of mature process chip taxes",
+          "strength": 60.0
+        },
+        {
+          "text": "Country that might retaliate against the US-led pursuit of superintelligent AI",
+          "strength": 65.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "China",
+          "target": "Artificial Intelligence",
+          "description": "China is expanding university enrollment to develop talent in AI",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "China",
+          "target": "Artificial Intelligence",
+          "description": "Has long nurtured ambitions to become a leader in the field of AI",
+          "strength": 92.0
+        }
+      ]
+    },
+    {
+      "key": "Microsoft",
+      "label": "Microsoft",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, AI Platform, Cloud Computing",
+      "x": 497.62661609472343,
+      "y": -17.40447469666924,
+      "score": 1.0,
+      "categories": "Technology, AI Platform, Cloud Computing",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Technology company investing heavily in AI and related infrastructure",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology company with significant investment in and partnership with OpenAI",
+          "strength": 90.0
+        },
+        {
+          "text": "Company developing its own LLM model of deep reasoning",
+          "strength": 65.0
+        },
+        {
+          "text": "Big OpenAI backer and investor in Figure AI",
+          "strength": 85.0
+        },
+        {
+          "text": "Company that released small language models",
+          "strength": 80.0
+        },
+        {
+          "text": "Microsoft has committed to training 10 million people in AI",
+          "strength": 80.0
+        },
+        {
+          "text": "Technology company mentioned in the context of market capitalization",
+          "strength": 68.0
+        },
+        {
+          "text": "One of AI's biggest players",
+          "strength": 70.0
+        },
+        {
+          "text": "Paying to restart Three Mile Island",
+          "strength": 95.0
+        },
+        {
+          "text": "Company that conducted a study on the impact of trust in AI",
+          "strength": 70.0
+        },
+        {
+          "text": "A technology company involved in AI research and development",
+          "strength": 70.0
+        },
+        {
+          "text": "A multinational technology company",
+          "strength": 70.0
+        },
+        {
+          "text": "A major player in AI and cloud computing, Microsoft integrates deep learning capabilities into its software products and services, enhancing user experiences across platforms",
+          "strength": 70.0
+        },
+        {
+          "text": "Tech giant that created Muse, a gameplay ideation tool, and is exploring AI-generated games",
+          "strength": 95.0
+        },
+        {
+          "text": "Large technology firm providing cloud-based AI solutions and infrastructure",
+          "strength": 87.0
+        },
+        {
+          "text": "A technology company providing AI solutions and services",
+          "strength": 80.0
+        },
+        {
+          "text": "Technology company that released AI sales agents",
+          "strength": 90.0
+        },
+        {
+          "text": "Company believes that inclusion is a shared responsibility",
+          "strength": 90.0
+        },
+        {
+          "text": "Technology company involved in AI development and deployment",
+          "strength": 95.0
+        },
+        {
+          "text": "American technology giant investing in AI infrastructure and training programs",
+          "strength": 95.0
+        },
+        {
+          "text": "Hosted a webinar titled \u2018Unlocking the Potential of Generative AI in Governance: Enhancing Productivity with Responsible AI\u2019",
+          "strength": 95.0
+        },
+        {
+          "text": "Technology company that introduced Microsoft Dragon Copilot",
+          "strength": 97.0
+        },
+        {
+          "text": "Developing its own AI models to compete with OpenAI",
+          "strength": 98.0
+        },
+        {
+          "text": "Investor and collaborator with OpenAI",
+          "strength": 92.0
+        },
+        {
+          "text": "Backer of OpenAI",
+          "strength": 75.0
+        },
+        {
+          "text": "Cloud partnership with Microsoft",
+          "strength": 75.0
+        },
+        {
+          "text": "Cloud computing company investing heavily in AI data centers",
+          "strength": 70.0
+        },
+        {
+          "text": "Leading tech producer focused on agentic AI opportunities",
+          "strength": 85.0
+        },
+        {
+          "text": "A technology company known for its software products and cloud services",
+          "strength": 75.0
+        },
+        {
+          "text": "Large commercial AI vendor",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that conducted research on the dependence on AI tools",
+          "strength": 85.0
+        },
+        {
+          "text": "Tech giant investing in AI development",
+          "strength": 92.0
+        },
+        {
+          "text": "Owner of Activision, presented model Muse for generating game graphics",
+          "strength": 82.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Microsoft's AI platform supports models from OpenAI",
+          "strength": 85.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Nvidia",
+          "description": "Microsoft's AI platform supports models from Nvidia",
+          "strength": 80.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Artificial Intelligence",
+          "description": "Microsoft is investing heavily in AI, with a $13bn business in annual recurring revenue",
+          "strength": 95.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Silicon Valley",
+          "description": "Microsoft is a major player in Silicon Valley",
+          "strength": 75.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Receives a 75% discount on AWS costs from Microsoft, its sister company",
+          "strength": 88.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Owns 49% of OpenAI",
+          "strength": 95.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI",
+          "description": "Develops LLM model of deep reasoning in AI",
+          "strength": 70.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "A big backer of OpenAI",
+          "strength": 85.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Apple",
+          "description": "Apple and Microsoft are members of the $3 trillion club",
+          "strength": 65.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "Artificial Intelligence",
+          "description": "Microsoft is one of the biggest players in AI",
+          "strength": 70.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Artificial Intelligence",
+          "description": "Conducted a study on the impact of trust in AI",
+          "strength": 75.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Artificial Intelligence",
+          "description": "Integrates deep learning capabilities into its software products and services",
+          "strength": 70.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI",
+          "description": "Microsoft executive believes AI development faces risk of entrenched bias due to underrepresentation of women",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "DeepSeek",
+          "description": "Microsoft is exploring DeepSeek as a third-party option for Copilot",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Microsoft is an early backer of OpenAI",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "Artificial Intelligence",
+          "description": "Investing in the development of AI infrastructure",
+          "strength": 95.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI",
+          "description": "Microsoft believes that AI has the incredible potential to free clinicians from much of the administrative burden in healthcare",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Microsoft is developing AI models to compete with OpenAI",
+          "strength": 95.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "xAI",
+          "description": "Microsoft has already begun testing AI models from xAI",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "Meta",
+          "description": "Microsoft has already begun testing AI models from Meta",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "DeepSeek",
+          "description": "Microsoft has already begun testing AI models from DeepSeek",
+          "strength": 82.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI models",
+          "description": "Microsoft is developing its own AI models",
+          "strength": 97.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Microsoft is an investor and collaborator with OpenAI",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "OpenAI",
+          "description": "Microsoft is one of the backers of OpenAI",
+          "strength": 80.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI agents",
+          "description": "Competing with Microsoft, which also appears to be focused on agentic AI opportunities",
+          "strength": 82.0
+        },
+        {
+          "source": "Microsoft",
+          "target": "Apple",
+          "description": "Apple and Microsoft are competitors in the technology industry",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Microsoft",
+          "target": "AI",
+          "description": "Investing heavily in AI development",
+          "strength": 90.0
+        }
+      ]
+    },
+    {
+      "key": "AI models",
+      "label": "AI models",
+      "tag": "Machine",
+      "URL": "",
+      "cluster": "Machine Learning, Data Training, Algorithms",
+      "x": 254.79560456993613,
+      "y": -668.2431593505671,
+      "score": 0.35,
+      "categories": "Machine Learning, Data Training, Algorithms",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "AI models trained on copyrighted material",
+          "strength": 90.0
+        },
+        {
+          "text": "Trained using the works of writers, artists and creatives",
+          "strength": 95.0
+        },
+        {
+          "text": "Models behind each use case",
+          "strength": 90.0
+        },
+        {
+          "text": "Powerful AI models",
+          "strength": 88.0
+        },
+        {
+          "text": "Self-optimizing and self-regulating models, upholding moral standards while enhancing functionality",
+          "strength": 93.0
+        },
+        {
+          "text": "Models developed by Microsoft to compete with OpenAI",
+          "strength": 92.0
+        },
+        {
+          "text": "Specific algorithms or systems designed to perform AI tasks",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "AI models",
+          "target": "Artificial Intelligence",
+          "description": "AI models are trained on the world\u2019s knowledge",
+          "strength": 90.0
+        },
+        {
+          "source": "AI models",
+          "target": "Artificial Intelligence",
+          "description": "AI models are a specific application of Artificial Intelligence",
+          "strength": 90.0
+        },
+        {
+          "source": "AI models",
+          "target": "Anthropic",
+          "description": "MAI performance levels reportedly rival those of OpenAI and Anthropic",
+          "strength": 78.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI models",
+          "target": "Microsoft",
+          "description": "Microsoft is developing its own AI models",
+          "strength": 97.0,
+          "is_reverse": true
+        },
+        {
+          "source": "AI models",
+          "target": "GPUs",
+          "description": "GPUs are used for training and running AI models",
+          "strength": 90.0
+        },
+        {
+          "source": "AI models",
+          "target": "DeepSeek",
+          "description": "Demonstrated efficient training methods for AI models",
+          "strength": 85.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Silicon Valley",
+      "label": "Silicon Valley",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Business, Innovation",
+      "x": 813.1952455296914,
+      "y": 392.22643966765236,
+      "score": 0.25,
+      "categories": "Technology, Business, Innovation",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "Region known for technology innovation",
+          "strength": 75.0
+        },
+        {
+          "text": "Region where the feud between Elon Musk and Sam Altman is taking place",
+          "strength": 70.0
+        },
+        {
+          "text": "Region known for technology innovation and startups",
+          "strength": 65.0
+        },
+        {
+          "text": "Region experiencing a shift towards AI-driven development",
+          "strength": 85.0
+        },
+        {
+          "text": "Region known for technology and innovation",
+          "strength": 82.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Silicon Valley",
+          "target": "Microsoft",
+          "description": "Microsoft is a major player in Silicon Valley",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Silicon Valley",
+          "target": "AI",
+          "description": "Is experiencing a broader trend of AI-driven development",
+          "strength": 88.0
+        },
+        {
+          "source": "Silicon Valley",
+          "target": "Meta",
+          "description": "Located in Silicon Valley",
+          "strength": 65.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Silicon Valley",
+          "target": "DeepSeek",
+          "description": "Proved that you can make a reasoning model for cheap, and you can run it for cheaper than Silicon Valley companies",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Silicon Valley",
+          "target": "Artificial Intelligence",
+          "description": "Silicon Valley is experiencing an A.I. boom",
+          "strength": 65.0
+        }
+      ]
+    },
+    {
+      "key": "IBM",
+      "label": "IBM",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Consulting",
+      "x": 684.3637198155432,
+      "y": 682.225065723108,
+      "score": 0.45,
+      "categories": "Technology, Consulting",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Technology company whose Watson is utilized by Sevilla FC",
+          "strength": 85.0
+        },
+        {
+          "text": "Company that released small language models",
+          "strength": 80.0
+        },
+        {
+          "text": "A multinational technology company",
+          "strength": 70.0
+        },
+        {
+          "text": "Large technology firm providing cloud-based AI solutions and infrastructure",
+          "strength": 87.0
+        },
+        {
+          "text": "A leading provider of global hybrid cloud, artificial intelligence, and consulting expertise",
+          "strength": 95.0
+        },
+        {
+          "text": "Top global tech giant attending the International AI-Semiconductor Conference 2025",
+          "strength": 85.0
+        },
+        {
+          "text": "A vital AI player focusing on niche AI models and hybrid cloud solutions",
+          "strength": 95.0
+        },
+        {
+          "text": "Firma, wsp\u00f3\u0142tworz\u0105ca projekt InstructLab",
+          "strength": 80.0
+        },
+        {
+          "text": "Company whose AI-based system was previously tested by McDonald's for taking customer orders in drive-thrus",
+          "strength": 70.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "IBM",
+          "target": "AI",
+          "description": "Company involved in AI",
+          "strength": 90.0
+        },
+        {
+          "source": "IBM",
+          "target": "Artificial Intelligence",
+          "description": "Remains a vital player in the field of Artificial Intelligence",
+          "strength": 93.0
+        }
+      ]
+    },
+    {
+      "key": "DeepSeek",
+      "label": "DeepSeek",
+      "tag": "AI",
+      "URL": "",
+      "cluster": "AI Development, Chatbot, Model Development",
+      "x": -117.35894067000197,
+      "y": 502.6846462050721,
+      "score": 1.0,
+      "categories": "AI Development, Chatbot, Model Development",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Chinese AI chatbot company",
+          "strength": 88.0
+        },
+        {
+          "text": "Artificial intelligence model integrated into Namibox platform to enhance AI-driven learning tools",
+          "strength": 95.0
+        },
+        {
+          "text": "Chinese AI company whose launch is comparable to the stir caused by Manus",
+          "strength": 75.0
+        },
+        {
+          "text": "Chinese AI company focused on developing AI models",
+          "strength": 82.0
+        },
+        {
+          "text": "Company that develops large language models",
+          "strength": 75.0
+        },
+        {
+          "text": "Domestic models driving technological innovation and China's economic growth",
+          "strength": 85.0
+        },
+        {
+          "text": "Company with world-leading standards in AI models",
+          "strength": 70.0
+        },
+        {
+          "text": "Company whose distillation model performance is close to FoxBrain",
+          "strength": 70.0
+        },
+        {
+          "text": "A China-based artificial intelligence (AI) research organisation, is alarmingly vulnerable to jailbreaking compared with those of its peers",
+          "strength": 95.0
+        },
+        {
+          "text": "AI startup that created AI models comparable to those in the United States at a lower cost",
+          "strength": 92.0
+        },
+        {
+          "text": "Generative AI tool used by high school students",
+          "strength": 82.0
+        },
+        {
+          "text": "Company that released the R1 model, increasing the possibilities for the proliferation of powerful open models",
+          "strength": 78.0
+        },
+        {
+          "text": "Startup that released a model operating effectively with fewer resources",
+          "strength": 85.0
+        },
+        {
+          "text": "AI model that is being compared to Manus, raising concerns about China's AI advancements",
+          "strength": 85.0
+        },
+        {
+          "text": "Chinese AI company",
+          "strength": 85.0
+        },
+        {
+          "text": "Company mentioned in comparison to Alibaba's AI model",
+          "strength": 70.0
+        },
+        {
+          "text": "AI model used as a reference for AgiBot's development path",
+          "strength": 75.0
+        },
+        {
+          "text": "Chinese AI company offering reasoning capabilities",
+          "strength": 88.0
+        },
+        {
+          "text": "Company whose AI models are being tested by Microsoft",
+          "strength": 75.0
+        },
+        {
+          "text": "Chinese AI company that created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 85.0
+        },
+        {
+          "text": "Chi\u0144ska firma DeepSeek, rosn\u0105ca konkurencja dla Open AI w dziedzinie sztucznej inteligencji",
+          "strength": 75.0
+        },
+        {
+          "text": "Chinese company that developed an AI model with performance comparable to ChatGPT at a lower cost",
+          "strength": 88.0
+        },
+        {
+          "text": "Chinese company developing lower cost AI models",
+          "strength": 80.0
+        },
+        {
+          "text": "Chinese research lab demonstrating efficient AI model training",
+          "strength": 85.0
+        },
+        {
+          "text": "Chinese A.I. company that released R1",
+          "strength": 80.0
+        },
+        {
+          "text": "Chinese chatbot launched on January 10, 2025",
+          "strength": 85.0
+        },
+        {
+          "text": "Model AI, do kt\u00f3rego por\u00f3wnywany jest Manus",
+          "strength": 80.0
+        },
+        {
+          "text": "Chi\u0144ski model j\u0119zykowy, kt\u00f3ry pojawi\u0142 si\u0119 rok przed Manus",
+          "strength": 75.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Has caused a stir comparable to the launch of DeepSeek",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "DeepSeek",
+          "target": "AI",
+          "description": "Claims training a model is cheaper than other companies",
+          "strength": 75.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Large Language Models",
+          "description": "Develops large language models",
+          "strength": 70.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Artificial Intelligence",
+          "description": "A domestic model driving technological innovation in China",
+          "strength": 82.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Artificial Intelligence",
+          "description": "DeepSeek created AI models comparable to those in the United States",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Generative AI",
+          "description": "Example of Generative AI tool",
+          "strength": 82.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Artificial Intelligence",
+          "description": "Released a model that operates effectively, highlighting China's AI sector",
+          "strength": 88.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Compared to DeepSeek in terms of AI advancement",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Manus is alarming some U.S. observers who worry that China is catching up in what is often cast as a race for AI supremacy, as with DeepSeek",
+          "strength": 85.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Other influential AI accounts on X sought to draw comparisons between Manus and Chinese AI company DeepSeek",
+          "strength": 70.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Microsoft",
+          "description": "Microsoft is exploring DeepSeek as a third-party option for Copilot",
+          "strength": 85.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Microsoft",
+          "description": "Microsoft has already begun testing AI models from DeepSeek",
+          "strength": 82.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "ChatGPT",
+          "description": "DeepSeek created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 88.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Nvidia",
+          "description": "Nvidia's stock plummeted after DeepSeek created an AI system that can compete against chatbots such as OpenAI\u2019s ChatGPT at much lower costs",
+          "strength": 75.0,
+          "is_reverse": true
+        },
+        {
+          "source": "DeepSeek",
+          "target": "ChatGPT",
+          "description": "Developed an AI model with performance on par with ChatGPT",
+          "strength": 92.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "AI",
+          "description": "Developing lower cost AI models",
+          "strength": 85.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "AI models",
+          "description": "Demonstrated efficient training methods for AI models",
+          "strength": 85.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Silicon Valley",
+          "description": "Proved that you can make a reasoning model for cheap, and you can run it for cheaper than Silicon Valley companies",
+          "strength": 80.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Generative AI",
+          "description": "Classified as a Generative AI service",
+          "strength": 88.0
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Por\u00f3wnywany do modelu DeepSeek",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "DeepSeek",
+          "target": "Manus",
+          "description": "Manus appeared a year after DeepSeek",
+          "strength": 80.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Huawei",
+      "label": "Huawei",
+      "tag": "Telecommunications",
+      "URL": "",
+      "cluster": "Telecommunications, Technology, AI Solutions",
+      "x": -580.8762356237764,
+      "y": -369.449317163556,
+      "score": 0.25,
+      "categories": "Telecommunications, Technology, AI Solutions",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Huawei unveils AI-Centric 5.5G solutions",
+          "strength": 98.0
+        },
+        {
+          "text": "Chinese tech company reportedly acquiring AI chips",
+          "strength": 100.0
+        },
+        {
+          "text": "Pomys\u0142y Huaweia na wdra\u017canie AI w sieciach kom\u00f3rkowych",
+          "strength": 95.0
+        },
+        {
+          "text": "Og\u0142osi\u0142 na MWC ca\u0142y pakiet rozwi\u0105za\u0144 AI-centric 5.5G",
+          "strength": 90.0
+        },
+        {
+          "text": "A technology company that presented the IdeaHub ES3/S3",
+          "strength": 95.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Huawei",
+          "target": "AI",
+          "description": "Approach to mobile AI emphasizes transformations that benefit the mobile industry",
+          "strength": 90.0
+        },
+        {
+          "source": "Huawei",
+          "target": "Artificial Intelligence",
+          "description": "Chinese companies like Huawei have traditionally relied on two main options for manufacturing their self-designed AI chips",
+          "strength": 80.0
+        },
+        {
+          "source": "Huawei",
+          "target": "AI",
+          "description": "Introduces AI to offices with IdeaHub ES3/S3",
+          "strength": 92.0
+        }
+      ]
+    },
+    {
+      "key": "Manus",
+      "label": "Manus",
+      "tag": "AI",
+      "URL": "",
+      "cluster": "AI Agent, Autonomous Systems, General AI",
+      "x": 430.9677699408669,
+      "y": 281.67079703683066,
+      "score": 0.45,
+      "categories": "AI Agent, Autonomous Systems, General AI",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "A fully autonomous artificial intelligence agent capable of making decisions and performing tasks on its own without constant supervision",
+          "strength": 98.0
+        },
+        {
+          "text": "Revolutionary AI agent developed in China, capable of performing complex tasks independently",
+          "strength": 98.0
+        },
+        {
+          "text": "An AI agent that can think and act independently",
+          "strength": 75.0
+        },
+        {
+          "text": "A general AI agent that turns your thoughts into actions",
+          "strength": 95.0
+        },
+        {
+          "text": "A new AI agent developed by Chinese startup Monica, demonstrates capabilities in handling complex tasks from travel planning to financial analysis without human intervention.",
+          "strength": 95.0
+        },
+        {
+          "text": "An agentic AI platform that launched in preview last week",
+          "strength": 95.0
+        },
+        {
+          "text": "General AI agent that can create complex travel itineraries",
+          "strength": 95.0
+        },
+        {
+          "text": "Autonomiczny agent AI, kt\u00f3ry \u0142\u0105czy koncepcj\u0119 z wykonaniem",
+          "strength": 95.0
+        },
+        {
+          "text": "Pierwszy na \u015bwiecie w pe\u0142ni autonomiczny agent AI, kt\u00f3ry dzia\u0142a bez ludzkiej ingerencji",
+          "strength": 98.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Has caused a stir comparable to the launch of DeepSeek",
+          "strength": 80.0
+        },
+        {
+          "source": "Manus",
+          "target": "Hugging Face",
+          "description": "Was called the most impressive AI tool by Hugging Face's head of product",
+          "strength": 85.0
+        },
+        {
+          "source": "Manus",
+          "target": "Artificial Intelligence",
+          "description": "Described as a game-changer in Artificial Intelligence",
+          "strength": 70.0
+        },
+        {
+          "source": "Manus",
+          "target": "ChatGPT",
+          "description": "Unlike traditional AI chatbots like ChatGPT, Manus is capable of making decisions and performing tasks on its own without constant supervision",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Manus",
+          "target": "AI",
+          "description": "Described as a revolutionary AI agent",
+          "strength": 95.0
+        },
+        {
+          "source": "Manus",
+          "target": "Chiny",
+          "description": "Developed in Chiny",
+          "strength": 90.0
+        },
+        {
+          "source": "Manus",
+          "target": "ChatGPT",
+          "description": "Distinguished from chatbots like ChatGPT due to its autonomous operation",
+          "strength": 85.0
+        },
+        {
+          "source": "Manus",
+          "target": "Gemini",
+          "description": "Distinguished from chatbots like Gemini due to its autonomous operation",
+          "strength": 85.0
+        },
+        {
+          "source": "Manus",
+          "target": "Sztuczna inteligencja",
+          "description": "Described as an autonomous system in the field of Sztuczna inteligencja",
+          "strength": 80.0
+        },
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Compared to DeepSeek in terms of AI advancement",
+          "strength": 85.0
+        },
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Manus is alarming some U.S. observers who worry that China is catching up in what is often cast as a race for AI supremacy, as with DeepSeek",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Manus",
+          "target": "Claude",
+          "description": "Uses Claude model to perform tasks",
+          "strength": 80.0
+        },
+        {
+          "source": "Manus",
+          "target": "Hugging Face",
+          "description": "Head of product at Hugging Face called Manus the most impressive AI tool he\u2019s ever tried",
+          "strength": 75.0
+        },
+        {
+          "source": "Manus",
+          "target": "OpenAI",
+          "description": "Implied to be superior to agentic tools such as OpenAI\u2019s deep research",
+          "strength": 70.0
+        },
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Other influential AI accounts on X sought to draw comparisons between Manus and Chinese AI company DeepSeek",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Manus",
+          "target": "OpenAI",
+          "description": "Manus outperforms deep research on a popular benchmark for general AI assistants called GAIA",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Manus",
+          "target": "Artificial Intelligence",
+          "description": "Described as a general AI agent",
+          "strength": 90.0
+        },
+        {
+          "source": "Manus",
+          "target": "Claude",
+          "description": "Wykorzystuje model Claude od Anthropic",
+          "strength": 85.0
+        },
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Por\u00f3wnywany do modelu DeepSeek",
+          "strength": 80.0
+        },
+        {
+          "source": "Manus",
+          "target": "AI",
+          "description": "Is a fully autonomous AI agent",
+          "strength": 95.0
+        },
+        {
+          "source": "Manus",
+          "target": "Chiny",
+          "description": "Created by Chinese engineers",
+          "strength": 90.0
+        },
+        {
+          "source": "Manus",
+          "target": "DeepSeek",
+          "description": "Manus appeared a year after DeepSeek",
+          "strength": 80.0
+        }
+      ]
+    },
+    {
+      "key": "Gemini",
+      "label": "Gemini",
+      "tag": "Natural",
+      "URL": "",
+      "cluster": "Natural Language Processing, Multimodal AI",
+      "x": 995.3421502117096,
+      "y": -622.2872746192971,
+      "score": 0.6,
+      "categories": "Natural Language Processing, Multimodal AI",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "Google's multimodal AI model",
+          "strength": 88.0
+        },
+        {
+          "text": "AI tool that offers features that can surprise",
+          "strength": 98.0
+        },
+        {
+          "text": "Well-known chatbot that takes action when the user asks it to",
+          "strength": 85.0
+        },
+        {
+          "text": "Impressively fluid personal chatbots",
+          "strength": 85.0
+        },
+        {
+          "text": "AI tool approved by the Calgary Catholic School District for teachers",
+          "strength": 65.0
+        },
+        {
+          "text": "Google's language model",
+          "strength": 85.0
+        },
+        {
+          "text": "Framework is part of Google's efforts to advance AI capabilities, providing developers with powerful tools for text and image processing",
+          "strength": 98.0
+        },
+        {
+          "text": "Top AI tool capable of natural language processing",
+          "strength": 90.0
+        },
+        {
+          "text": "Google's AI model",
+          "strength": 82.0
+        },
+        {
+          "text": "Large language model developed by Google",
+          "strength": 75.0
+        },
+        {
+          "text": "AI model that trains on datasets",
+          "strength": 85.0
+        },
+        {
+          "text": "Komercyjny model LLM",
+          "strength": 75.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Gemini",
+          "target": "AI",
+          "description": "Narz\u0119dzie oferuj\u0105ce funkcje wykorzystuj\u0105ce sztuczn\u0105 inteligencj\u0119",
+          "strength": 95.0
+        },
+        {
+          "source": "Gemini",
+          "target": "Manus",
+          "description": "Distinguished from chatbots like Gemini due to its autonomous operation",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Gemini",
+          "target": "Alphabet",
+          "description": "Gemini is owned by Alphabet",
+          "strength": 90.0
+        },
+        {
+          "source": "Gemini",
+          "target": "Google",
+          "description": "Gemini is part of Google's efforts to advance AI capabilities",
+          "strength": 95.0
+        },
+        {
+          "source": "Gemini",
+          "target": "AI",
+          "description": "Gemini is a large language model, similar to those being developed alongside AI",
+          "strength": 0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Apple",
+      "label": "Apple",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology",
+      "x": -338.2954981087172,
+      "y": 594.9344242462519,
+      "score": 0.25,
+      "categories": "Technology",
+      "entity_type": "Organization",
+      "definitions": [
+        {
+          "text": "Consumer Electronics",
+          "strength": 50.0
+        },
+        {
+          "text": "Technology company mentioned in the context of market capitalization",
+          "strength": 68.0
+        },
+        {
+          "text": "Company that announced the M3 iPad Air",
+          "strength": 65.0
+        },
+        {
+          "text": "A technology company known for its hardware and software products",
+          "strength": 95.0
+        },
+        {
+          "text": "Smartfon\u00f3w Apple",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Apple",
+          "target": "Samsung",
+          "description": "Competing smartphone manufacturers in the AI feature space",
+          "strength": 70.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Apple",
+          "target": "Microsoft",
+          "description": "Apple and Microsoft are members of the $3 trillion club",
+          "strength": 65.0
+        },
+        {
+          "source": "Apple",
+          "target": "Nvidia",
+          "description": "Apple and Nvidia are members of the $3 trillion club",
+          "strength": 65.0
+        },
+        {
+          "source": "Apple",
+          "target": "AI",
+          "description": "Apple is a major player in the AI industry, developing its own AI technologies and integrating them into its products",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Apple",
+          "target": "Google",
+          "description": "Apple and Google are competitors in the technology industry, including AI",
+          "strength": 0
+        },
+        {
+          "source": "Apple",
+          "target": "Microsoft",
+          "description": "Apple and Microsoft are competitors in the technology industry",
+          "strength": 0
+        },
+        {
+          "source": "Apple",
+          "target": "Samsung",
+          "description": "Samsung is a competitor to Apple in the consumer electronics market",
+          "strength": 0
+        }
+      ]
+    },
+    {
+      "key": "Samsung",
+      "label": "Samsung",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Consumer Electronics, AI Development",
+      "x": -120.3637026637034,
+      "y": 965.7164057934265,
+      "score": 0.3,
+      "categories": "Technology, Consumer Electronics, AI Development",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "Leading smartphone manufacturer providing AI features on its devices",
+          "strength": 92.0
+        },
+        {
+          "text": "Korean company that may supply HBM to Huawei",
+          "strength": 75.0
+        },
+        {
+          "text": "Top global tech giant attending the International AI-Semiconductor Conference 2025",
+          "strength": 85.0
+        },
+        {
+          "text": "A South Korean multinational electronics company",
+          "strength": 75.0
+        },
+        {
+          "text": "Smartfon\u00f3w Samsung",
+          "strength": 90.0
+        },
+        {
+          "text": "Planuje zastosowa\u0107 te procesory, by uzyska\u0107 3,2x wi\u0119ksz\u0105 g\u0119sto\u015b\u0107 i wydajno\u015b\u0107 w swojej chmurze sieciowej",
+          "strength": 65.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Samsung",
+          "target": "Apple",
+          "description": "Competing smartphone manufacturers in the AI feature space",
+          "strength": 70.0
+        },
+        {
+          "source": "Samsung",
+          "target": "Sztuczna inteligencja",
+          "description": "Developing AI features for its smartphones",
+          "strength": 85.0
+        },
+        {
+          "source": "Samsung",
+          "target": "AI",
+          "description": "Company involved in AI",
+          "strength": 90.0
+        },
+        {
+          "source": "Samsung",
+          "target": "Apple",
+          "description": "Samsung is a competitor to Apple in the consumer electronics market",
+          "strength": 0,
+          "is_reverse": true
+        },
+        {
+          "source": "Samsung",
+          "target": "AI",
+          "description": "Users do not see significant added value in AI-based functions",
+          "strength": 88.0
+        }
+      ]
+    },
+    {
+      "key": "Sztuczna inteligencja",
+      "label": "Sztuczna inteligencja",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Mobile Computing",
+      "x": -524.5830334749712,
+      "y": 93.67477324459242,
+      "score": 0.3,
+      "categories": "Technology, Mobile Computing",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "Polish term for Artificial Intelligence",
+          "strength": 95.0
+        },
+        {
+          "text": "Area of study",
+          "strength": 60.0
+        },
+        {
+          "text": "General term referring to artificial intelligence and its applications in public administration",
+          "strength": 98.0
+        },
+        {
+          "text": "General term for artificial intelligence",
+          "strength": 100.0
+        },
+        {
+          "text": "Generic term for artificial intelligence",
+          "strength": 70.0
+        },
+        {
+          "text": "New technologies, such as artificial intelligence and autonomous robots, are revolutionizing the food industry and courier services.",
+          "strength": 95.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Sztuczna inteligencja",
+          "target": "Samsung",
+          "description": "Developing AI features for its smartphones",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sztuczna inteligencja",
+          "target": "Google",
+          "description": "Leading in providing AI features on smartphones",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sztuczna inteligencja",
+          "target": "ChatGPT",
+          "description": "The debut of ChatGPT spurred AI feature development in smartphones",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sztuczna inteligencja",
+          "target": "Manus",
+          "description": "Described as an autonomous system in the field of Sztuczna inteligencja",
+          "strength": 80.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Sztuczna inteligencja",
+          "target": "ChatGPT",
+          "description": "ChatGPT is an example of Sztuczna inteligencja",
+          "strength": 70.0
+        }
+      ]
+    },
+    {
+      "key": "Machine learning",
+      "label": "Machine learning",
+      "tag": "Algorithm",
+      "URL": "",
+      "cluster": "Algorithm, Data Analysis",
+      "x": 922.5599066843829,
+      "y": -64.59271184391673,
+      "score": 0.25,
+      "categories": "Algorithm, Data Analysis",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Technika wykorzystywana przez systemy sztucznej inteligencji, kt\u00f3re stale ucz\u0105 si\u0119 i doskonal\u0105 na podstawie danych",
+          "strength": 92.0
+        },
+        {
+          "text": "Algorithms that allow computer systems to learn from data without being explicitly programmed",
+          "strength": 90.0
+        },
+        {
+          "text": "A type of artificial intelligence that allows computer systems to learn from data without being explicitly programmed",
+          "strength": 90.0
+        },
+        {
+          "text": "A type of AI that allows systems to learn from data without explicit programming",
+          "strength": 85.0
+        },
+        {
+          "text": "Machine learning can have a significant positive impact on society and industry",
+          "strength": 80.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Machine learning",
+          "target": "Artificial Intelligence",
+          "description": "Machine learning is a subfield of Artificial Intelligence",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Machine learning",
+          "target": "AI",
+          "description": "Is a subfield of AI",
+          "strength": 85.0
+        }
+      ]
+    },
+    {
+      "key": "GPT-4",
+      "label": "GPT-4",
+      "tag": "Natural",
+      "URL": "",
+      "cluster": "Natural Language Processing",
+      "x": -435.549025260622,
+      "y": 417.071002538215,
+      "score": 0.25,
+      "categories": "Natural Language Processing",
+      "entity_type": "Model",
+      "definitions": [
+        {
+          "text": "AI model exposed to descriptions of difficult events to measure its reaction to stress",
+          "strength": 95.0
+        },
+        {
+          "text": "Impressively fluid personal chatbot",
+          "strength": 90.0
+        },
+        {
+          "text": "Advanced language model developed by OpenAI capable of natural language processing",
+          "strength": 95.0
+        },
+        {
+          "text": "Model used by Microsoft 365 Copilot when it launched in 2023",
+          "strength": 90.0
+        },
+        {
+          "text": "Advanced language model used for blog content generation",
+          "strength": 97.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "GPT-4",
+          "target": "Generative AI",
+          "description": "Is an example of a Large Language Model used in Generative AI",
+          "strength": 95.0
+        },
+        {
+          "source": "GPT-4",
+          "target": "OpenAI",
+          "description": "OpenAI developed the GPT-4 model",
+          "strength": 93.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Chiny",
+      "label": "Chiny",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Innovation",
+      "x": 572.5154946157752,
+      "y": -92.46082497826876,
+      "score": 0.25,
+      "categories": "Technology, Innovation",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "Country that developed the AI agent Manus",
+          "strength": 70.0
+        },
+        {
+          "text": "Region with potentially isolated technology sector",
+          "strength": 60.0
+        },
+        {
+          "text": "Kraj stawiaj\u0105cy na skal\u0119 i brak regulacji w rozwoju AI",
+          "strength": 90.0
+        },
+        {
+          "text": "Country that may be outpacing the United States in AI development",
+          "strength": 85.0
+        },
+        {
+          "text": "Country competing with the United States in the technological field, especially in AI",
+          "strength": 65.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Chiny",
+          "target": "Manus",
+          "description": "Developed in Chiny",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Chiny",
+          "target": "AI",
+          "description": "Kraj, kt\u00f3ry planuje przeznaczy\u0107 co najmniej 1 bilion juan\u00f3w na rozw\u00f3j AI w ci\u0105gu pi\u0119ciu lat.",
+          "strength": 92.0
+        },
+        {
+          "source": "Chiny",
+          "target": "Manus",
+          "description": "Created by Chinese engineers",
+          "strength": 90.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Intel",
+      "label": "Intel",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Manufacturing, Investment",
+      "x": -753.8785322439612,
+      "y": -248.69742418531553,
+      "score": 0.45,
+      "categories": "Technology, Manufacturing, Investment",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "Company whose startup-funding divisions invested in Figure AI",
+          "strength": 75.0
+        },
+        {
+          "text": "American company that may supply components to Huawei",
+          "strength": 65.0
+        },
+        {
+          "text": "Several AI leaders are considering a deal that could save Intel",
+          "strength": 70.0
+        },
+        {
+          "text": "One of the major players in the development of CPUs for personal computers",
+          "strength": 70.0
+        },
+        {
+          "text": "Mentioned in the context of potential partnerships and competition with TSMC",
+          "strength": 70.0
+        },
+        {
+          "text": "Key player from the tech industry in attendance at GTC 2025",
+          "strength": 70.0
+        },
+        {
+          "text": "Company mentioned as a top global tech giant attending the conference",
+          "strength": 82.0
+        },
+        {
+          "text": "A technology company and manufacturer of semiconductor chips",
+          "strength": 75.0
+        },
+        {
+          "text": "Przedstawi\u0142 na targach now\u0105 generacj\u0119 procesor\u00f3w Xeon 6 SoC zoptymalizowanych pod sieci 5G",
+          "strength": 88.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Intel",
+          "target": "AI",
+          "description": "Several AI leaders are considering a deal that could save Intel",
+          "strength": 70.0
+        }
+      ]
+    },
+    {
+      "key": "LLM",
+      "label": "LLM",
+      "tag": "Language",
+      "URL": "",
+      "cluster": "Language Model, Natural Language Processing",
+      "x": -72.34633933149007,
+      "y": -663.4746813347272,
+      "score": 0.25,
+      "categories": "Language Model, Natural Language Processing",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Large Language Model",
+          "strength": 90.0
+        },
+        {
+          "text": "Large Language Models used for dynamic generation of content descriptions",
+          "strength": 93.0
+        },
+        {
+          "text": "Language model",
+          "strength": 78.0
+        },
+        {
+          "text": "General term for Large Language Models",
+          "strength": 85.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "LLM",
+          "target": "AI",
+          "description": "LLMs are a key component of many AI systems",
+          "strength": 0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "GPUs",
+      "label": "GPUs",
+      "tag": "Hardware",
+      "URL": "",
+      "cluster": "Hardware, Processing, Computation",
+      "x": 134.13980727605986,
+      "y": 339.0778650252437,
+      "score": 0.3,
+      "categories": "Hardware, Processing, Computation",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Graphics Processing Units used for training AI models",
+          "strength": 88.0
+        },
+        {
+          "text": "Hardware accelerators used for deep learning and resource-intensive tasks",
+          "strength": 85.0
+        },
+        {
+          "text": "Physical components necessary for deep learning systems",
+          "strength": 64.0
+        },
+        {
+          "text": "Graphics processing units used to train AI models and run inference",
+          "strength": 90.0
+        },
+        {
+          "text": "Graphics processing units, Nvidia's lead product, used for AI inferencing",
+          "strength": 96.0
+        },
+        {
+          "text": "Graphics Processing Units, specialized processors for parallel computing",
+          "strength": 95.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "GPUs",
+          "target": "Deep Learning",
+          "description": "Uses GPUs for resource-intensive tasks",
+          "strength": 85.0,
+          "is_reverse": true
+        },
+        {
+          "source": "GPUs",
+          "target": "Nvidia",
+          "description": "Nvidia is the leading designer of GPUs",
+          "strength": 95.0
+        },
+        {
+          "source": "GPUs",
+          "target": "Nvidia",
+          "description": "Nvidia is the leading designer of graphics processing units (GPUs)",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "GPUs",
+          "target": "Nvidia",
+          "description": "Nvidia has a lead in graphics processing units (GPUs)",
+          "strength": 94.0,
+          "is_reverse": true
+        },
+        {
+          "source": "GPUs",
+          "target": "AI models",
+          "description": "GPUs are used for training and running AI models",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "GPUs",
+          "target": "Nvidia",
+          "description": "Nvidia is the dominant provider of GPUs for AI",
+          "strength": 95.0
+        },
+        {
+          "source": "GPUs",
+          "target": "Nvidia",
+          "description": "Is the dominant provider of GPUs",
+          "strength": 95.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Facebook",
+      "label": "Facebook",
+      "tag": "Social",
+      "URL": "",
+      "cluster": "Social Media, Technology, Communication",
+      "x": -94.18006848173661,
+      "y": -157.90685531216968,
+      "score": 0.25,
+      "categories": "Social Media, Technology, Communication",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Social media platform owned by Meta Platforms",
+          "strength": 70.0
+        },
+        {
+          "text": "Pioneering advancements in deep learning frameworks and applications, Facebook leverages AI for content moderation and personalized user experiences",
+          "strength": 80.0
+        },
+        {
+          "text": "Popular social media platform used as a data source for the model",
+          "strength": 75.0
+        },
+        {
+          "text": "Platform where Meta has launched a pilot program introducing AI-powered customer service agents to assist businesses",
+          "strength": 70.0
+        },
+        {
+          "text": "Platforma spo\u0142eczno\u015bciowa, kt\u00f3rej wsp\u00f3\u0142za\u0142o\u017cycielem jest Dustin Moskovitz, jeden z tw\u00f3rc\u00f3w Asany",
+          "strength": 60.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Facebook",
+          "target": "Artificial Intelligence",
+          "description": "Leverages AI for content moderation and personalized user experiences",
+          "strength": 80.0
+        },
+        {
+          "source": "Facebook",
+          "target": "Meta",
+          "description": "Owned by Meta, where AI-powered customer service agents are being piloted",
+          "strength": 75.0
+        }
+      ]
+    },
+    {
+      "key": "Alphabet",
+      "label": "Alphabet",
+      "tag": "Technology",
+      "URL": "",
+      "cluster": "Technology, Investment",
+      "x": 393.5264630064962,
+      "y": 742.3737225109055,
+      "score": 0.25,
+      "categories": "Technology, Investment",
+      "entity_type": "Technology",
+      "definitions": [
+        {
+          "text": "One of AI's biggest players",
+          "strength": 70.0
+        },
+        {
+          "text": "Company that owns Gemini",
+          "strength": 85.0
+        },
+        {
+          "text": "The parent company of Google, Alphabet invests heavily in AI and deep learning technologies, pushing the boundaries of what is possible in data analysis and machine learning",
+          "strength": 72.0
+        },
+        {
+          "text": "Cloud computing company investing heavily in AI data centers",
+          "strength": 70.0
+        },
+        {
+          "text": "Multinational conglomerate, parent company of Google, investing heavily in AI",
+          "strength": 80.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Alphabet",
+          "target": "Artificial Intelligence",
+          "description": "Alphabet is one of the biggest players in AI",
+          "strength": 70.0
+        },
+        {
+          "source": "Alphabet",
+          "target": "Gemini",
+          "description": "Gemini is owned by Alphabet",
+          "strength": 90.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Alphabet",
+          "target": "Artificial Intelligence",
+          "description": "Invests heavily in AI and deep learning technologies",
+          "strength": 72.0
+        }
+      ]
+    },
+    {
+      "key": "xAI",
+      "label": "xAI",
+      "tag": "Research",
+      "URL": "",
+      "cluster": "Research",
+      "x": 83.31574284426233,
+      "y": 282.5984454583704,
+      "score": 0.3,
+      "categories": "Research",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "AI company exploring AI models",
+          "strength": 75.0
+        },
+        {
+          "text": "Company whose AI models are being tested by Microsoft",
+          "strength": 75.0
+        },
+        {
+          "text": "AI company founded by Elon Musk, competing with OpenAI",
+          "strength": 94.0
+        },
+        {
+          "text": "AI startup founded by Elon Musk",
+          "strength": 90.0
+        },
+        {
+          "text": "Company adopting Nvidia's GB200 chip to power its Grok AI models",
+          "strength": 90.0
+        },
+        {
+          "text": "An AI research company",
+          "strength": 70.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "xAI",
+          "target": "Microsoft",
+          "description": "Microsoft has already begun testing AI models from xAI",
+          "strength": 82.0
+        },
+        {
+          "source": "xAI",
+          "target": "Elon Musk",
+          "description": "xAI is an AI company founded by Elon Musk",
+          "strength": 95.0
+        },
+        {
+          "source": "xAI",
+          "target": "AI",
+          "description": "xAI is an AI company",
+          "strength": 96.0
+        },
+        {
+          "source": "xAI",
+          "target": "Elon Musk",
+          "description": "Elon Musk is the founder of xAI",
+          "strength": 92.0,
+          "is_reverse": true
+        },
+        {
+          "source": "xAI",
+          "target": "AI",
+          "description": "xAI is a research company that develops AI models like Grok 3",
+          "strength": 0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "Elon Musk",
+      "label": "Elon Musk",
+      "tag": "Business",
+      "URL": "",
+      "cluster": "Business, Legal",
+      "x": -567.6129366543055,
+      "y": 572.1096477996393,
+      "score": 0.25,
+      "categories": "Business, Legal",
+      "entity_type": "Person",
+      "definitions": [
+        {
+          "text": "Key supporter turned adversary of OpenAI; founder of xAI",
+          "strength": 95.0
+        },
+        {
+          "text": "Tesla Chief Executive and founder of xAI",
+          "strength": 98.0
+        },
+        {
+          "text": "CEO of DOGE",
+          "strength": 80.0
+        },
+        {
+          "text": "CEO of Tesla and SpaceX, planning to introduce humanoid robots",
+          "strength": 70.0
+        },
+        {
+          "text": "Lider AI, popiera bezwarunkowy doch\u00f3d podstawowy",
+          "strength": 90.0
+        }
+      ],
+      "relations": [
+        {
+          "source": "Elon Musk",
+          "target": "OpenAI",
+          "description": "Elon Musk is a key supporter turned adversary of OpenAI",
+          "strength": 94.0
+        },
+        {
+          "source": "Elon Musk",
+          "target": "xAI",
+          "description": "xAI is an AI company founded by Elon Musk",
+          "strength": 95.0,
+          "is_reverse": true
+        },
+        {
+          "source": "Elon Musk",
+          "target": "OpenAI",
+          "description": "Elon Musk is in a legal dispute with OpenAI",
+          "strength": 97.0
+        },
+        {
+          "source": "Elon Musk",
+          "target": "Sam Altman",
+          "description": "Elon Musk is in a public war of words with Sam Altman",
+          "strength": 95.0
+        },
+        {
+          "source": "Elon Musk",
+          "target": "xAI",
+          "description": "Elon Musk is the founder of xAI",
+          "strength": 92.0
+        },
+        {
+          "source": "Elon Musk",
+          "target": "Sam Altman",
+          "description": "Sam Altman and Elon Musk co-founded OpenAI in 2015",
+          "strength": 90.0,
+          "is_reverse": true
+        }
+      ]
+    },
+    {
+      "key": "SoftBank",
+      "label": "SoftBank",
+      "tag": "Investment",
+      "URL": "",
+      "cluster": "Investment, Technology",
+      "x": -221.56286454651513,
+      "y": -474.1495761199617,
+      "score": 0.25,
+      "categories": "Investment, Technology",
+      "entity_type": "Unknown",
+      "definitions": [
+        {
+          "text": "Company that teamed up with OpenAI and Oracle on multibillion-dollar AI project",
+          "strength": 70.0
+        },
+        {
+          "text": "Company leading a consortium to spend on AI infrastructure through Project Stargate",
+          "strength": 70.0
+        },
+        {
+          "text": "One of the investors in Digits",
+          "strength": 70.0
+        },
+        {
+          "text": "Zainicjowa\u0142 sojusz AI-RAN Alliance, kt\u00f3rego cz\u0142onkostwo do MWC 2025 wzros\u0142o siedmiokrotnie",
+          "strength": 75.0
+        },
+        {
+          "text": "Company supporting the Stargate project",
+          "strength": 80.0
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "edges": [
+    [
+      "ChatGPT",
+      "OpenAI"
+    ],
+    [
+      "Google",
+      "AI"
+    ],
+    [
+      "Amazon",
+      "AI"
+    ],
+    [
+      "Nvidia",
+      "Artificial Intelligence"
+    ],
+    [
+      "Generative AI",
+      "Artificial Intelligence"
+    ],
+    [
+      "AI agents",
+      "OpenAI"
+    ],
+    [
+      "Anthropic",
+      "Claude"
+    ],
+    [
+      "Claude",
+      "AI agents"
+    ],
+    [
+      "OpenAI",
+      "Sam Altman"
+    ],
+    [
+      "Operator",
+      "OpenAI"
+    ],
+    [
+      "Sam Altman",
+      "AI agents"
+    ],
+    [
+      "Artificial Intelligence",
+      "Large Language Models"
+    ],
+    [
+      "Microsoft",
+      "OpenAI"
+    ],
+    [
+      "Microsoft",
+      "Nvidia"
+    ],
+    [
+      "Microsoft",
+      "Artificial Intelligence"
+    ],
+    [
+      "AI models",
+      "Artificial Intelligence"
+    ],
+    [
+      "AI agents",
+      "Artificial Intelligence"
+    ],
+    [
+      "Microsoft",
+      "Silicon Valley"
+    ],
+    [
+      "Huawei",
+      "AI"
+    ],
+    [
+      "Manus",
+      "DeepSeek"
+    ],
+    [
+      "Manus",
+      "Hugging Face"
+    ],
+    [
+      "Manus",
+      "Artificial Intelligence"
+    ],
+    [
+      "ChatGPT",
+      "Manus"
+    ],
+    [
+      "OpenAI",
+      "Microsoft"
+    ],
+    [
+      "DeepSeek",
+      "AI"
+    ],
+    [
+      "Samsung",
+      "Apple"
+    ],
+    [
+      "Samsung",
+      "Sztuczna inteligencja"
+    ],
+    [
+      "Google",
+      "Sztuczna inteligencja"
+    ],
+    [
+      "ChatGPT",
+      "Sztuczna inteligencja"
+    ],
+    [
+      "Gemini",
+      "AI"
+    ],
+    [
+      "OpenAI",
+      "AI"
+    ],
+    [
+      "Manus",
+      "AI"
+    ],
+    [
+      "Manus",
+      "Chiny"
+    ],
+    [
+      "Manus",
+      "ChatGPT"
+    ],
+    [
+      "Manus",
+      "Gemini"
+    ],
+    [
+      "Manus",
+      "Sztuczna inteligencja"
+    ],
+    [
+      "Microsoft",
+      "AI"
+    ],
+    [
+      "Huawei",
+      "Artificial Intelligence"
+    ],
+    [
+      "DeepSeek",
+      "Large Language Models"
+    ],
+    [
+      "OpenAI",
+      "ChatGPT"
+    ],
+    [
+      "Large Language Models",
+      "Artificial Intelligence"
+    ],
+    [
+      "DeepSeek",
+      "Artificial Intelligence"
+    ],
+    [
+      "Apple",
+      "Microsoft"
+    ],
+    [
+      "Apple",
+      "Nvidia"
+    ],
+    [
+      "Artificial Intelligence",
+      "Generative AI"
+    ],
+    [
+      "Intel",
+      "AI"
+    ],
+    [
+      "Alphabet",
+      "Artificial Intelligence"
+    ],
+    [
+      "Amazon",
+      "Artificial Intelligence"
+    ],
+    [
+      "Artificial Intelligence",
+      "China"
+    ],
+    [
+      "Artificial Intelligence",
+      "DeepSeek"
+    ],
+    [
+      "Artificial Intelligence",
+      "Machine Learning"
+    ],
+    [
+      "Gemini",
+      "Alphabet"
+    ],
+    [
+      "Artificial Intelligence",
+      "Machine learning"
+    ],
+    [
+      "Generative AI",
+      "Large Language Models"
+    ],
+    [
+      "Generative AI",
+      "ChatGPT"
+    ],
+    [
+      "ChatGPT",
+      "Generative AI"
+    ],
+    [
+      "DeepSeek",
+      "Generative AI"
+    ],
+    [
+      "Google",
+      "Artificial Intelligence"
+    ],
+    [
+      "China",
+      "Artificial Intelligence"
+    ],
+    [
+      "Deep Learning",
+      "GPUs"
+    ],
+    [
+      "Deep Learning",
+      "Machine Learning"
+    ],
+    [
+      "Machine Learning",
+      "Artificial Intelligence"
+    ],
+    [
+      "Facebook",
+      "Artificial Intelligence"
+    ],
+    [
+      "DeepSeek",
+      "Manus"
+    ],
+    [
+      "Manus",
+      "Claude"
+    ],
+    [
+      "Manus",
+      "OpenAI"
+    ],
+    [
+      "OpenAI",
+      "Manus"
+    ],
+    [
+      "OpenAI",
+      "Operator"
+    ],
+    [
+      "Operator",
+      "AI agents"
+    ],
+    [
+      "GPT-4",
+      "Generative AI"
+    ],
+    [
+      "Machine Learning",
+      "Deep Learning"
+    ],
+    [
+      "AI",
+      "Microsoft"
+    ],
+    [
+      "DeepSeek",
+      "Microsoft"
+    ],
+    [
+      "xAI",
+      "Microsoft"
+    ],
+    [
+      "Meta",
+      "Microsoft"
+    ],
+    [
+      "Anthropic",
+      "AI models"
+    ],
+    [
+      "Microsoft",
+      "AI models"
+    ],
+    [
+      "OpenAI",
+      "GPT-4"
+    ],
+    [
+      "Google",
+      "Anthropic"
+    ],
+    [
+      "Anthropic",
+      "Artificial Intelligence"
+    ],
+    [
+      "Google",
+      "OpenAI"
+    ],
+    [
+      "Gemini",
+      "Google"
+    ],
+    [
+      "Perplexity",
+      "Google"
+    ],
+    [
+      "Google",
+      "Generative AI"
+    ],
+    [
+      "Elon Musk",
+      "OpenAI"
+    ],
+    [
+      "xAI",
+      "Elon Musk"
+    ],
+    [
+      "xAI",
+      "AI"
+    ],
+    [
+      "DeepSeek",
+      "ChatGPT"
+    ],
+    [
+      "Elon Musk",
+      "Sam Altman"
+    ],
+    [
+      "Elon Musk",
+      "xAI"
+    ],
+    [
+      "Nvidia",
+      "DeepSeek"
+    ],
+    [
+      "Sam Altman",
+      "Elon Musk"
+    ],
+    [
+      "GPUs",
+      "Nvidia"
+    ],
+    [
+      "Nvidia",
+      "GPUs"
+    ],
+    [
+      "Meta",
+      "AI"
+    ],
+    [
+      "IBM",
+      "AI"
+    ],
+    [
+      "Samsung",
+      "AI"
+    ],
+    [
+      "IBM",
+      "Artificial Intelligence"
+    ],
+    [
+      "Artificial Intelligence",
+      "AI agents"
+    ],
+    [
+      "Microsoft",
+      "AI agents"
+    ],
+    [
+      "Nvidia",
+      "AI"
+    ],
+    [
+      "AI agents",
+      "Meta"
+    ],
+    [
+      "Facebook",
+      "Meta"
+    ],
+    [
+      "Meta",
+      "OpenAI"
+    ],
+    [
+      "Silicon Valley",
+      "AI"
+    ],
+    [
+      "Meta",
+      "Silicon Valley"
+    ],
+    [
+      "AI",
+      "Nvidia"
+    ],
+    [
+      "AI models",
+      "GPUs"
+    ],
+    [
+      "DeepSeek",
+      "AI models"
+    ],
+    [
+      "Machine learning",
+      "AI"
+    ],
+    [
+      "OpenAI",
+      "Artificial Intelligence"
+    ],
+    [
+      "DeepSeek",
+      "Silicon Valley"
+    ],
+    [
+      "Silicon Valley",
+      "Artificial Intelligence"
+    ],
+    [
+      "AI",
+      "Apple"
+    ],
+    [
+      "AI",
+      "ChatGPT"
+    ],
+    [
+      "AI",
+      "Claude"
+    ],
+    [
+      "AI",
+      "Gemini"
+    ],
+    [
+      "AI",
+      "LLM"
+    ],
+    [
+      "AI",
+      "OpenAI"
+    ],
+    [
+      "AI",
+      "xAI"
+    ],
+    [
+      "Apple",
+      "Google"
+    ],
+    [
+      "Apple",
+      "Samsung"
+    ],
+    [
+      "Generative AI",
+      "AI"
+    ],
+    [
+      "ChatGPT",
+      "AI"
+    ],
+    [
+      "ChatGPT",
+      "Google"
+    ],
+    [
+      "Sam Altman",
+      "AI"
+    ],
+    [
+      "AI",
+      "Sam Altman"
+    ],
+    [
+      "AI",
+      "Generative AI"
+    ],
+    [
+      "Hugging Face",
+      "Generative AI"
+    ],
+    [
+      "Sztuczna inteligencja",
+      "ChatGPT"
+    ],
+    [
+      "Claude",
+      "Anthropic"
+    ],
+    [
+      "Chiny",
+      "AI"
+    ],
+    [
+      "Sam Altman",
+      "OpenAI"
+    ]
+  ],
+  "clusters": [
+    {
+      "key": "Artificial Intelligence, Technology",
+      "color": "#e6194B",
+      "clusterLabel": "Artificial Intelligence, Technology"
+    },
+    {
+      "key": "Machine Learning, Technology",
+      "color": "#3cb44b",
+      "clusterLabel": "Machine Learning, Technology"
+    },
+    {
+      "key": "Natural Language Processing, Chatbot",
+      "color": "#ffe119",
+      "clusterLabel": "Natural Language Processing, Chatbot"
+    },
+    {
+      "key": "Natural Language Processing, Machine Learning",
+      "color": "#4363d8",
+      "clusterLabel": "Natural Language Processing, Machine Learning"
+    },
+    {
+      "key": "Technology, Social Media",
+      "color": "#f58231",
+      "clusterLabel": "Technology, Social Media"
+    },
+    {
+      "key": "Technology, Search Engine",
+      "color": "#911eb4",
+      "clusterLabel": "Technology, Search Engine"
+    },
+    {
+      "key": "E-commerce, Technology",
+      "color": "#42d4f4",
+      "clusterLabel": "E-commerce, Technology"
+    },
+    {
+      "key": "Research, Technology",
+      "color": "#f032e6",
+      "clusterLabel": "Research, Technology"
+    },
+    {
+      "key": "Technology, Future Trends",
+      "color": "#bfef45",
+      "clusterLabel": "Technology, Future Trends"
+    },
+    {
+      "key": "Hardware, Investment",
+      "color": "#fabed4",
+      "clusterLabel": "Hardware, Investment"
+    },
+    {
+      "key": "Automation, Digital Assistants",
+      "color": "#469990",
+      "clusterLabel": "Automation, Digital Assistants"
+    },
+    {
+      "key": "AI Research, Chatbots",
+      "color": "#dcbeff",
+      "clusterLabel": "AI Research, Chatbots"
+    },
+    {
+      "key": "Chatbot",
+      "color": "#9A6324",
+      "clusterLabel": "Chatbot"
+    },
+    {
+      "key": "Ethics, Research",
+      "color": "#fffac8",
+      "clusterLabel": "Ethics, Research"
+    },
+    {
+      "key": "Agent, Digital Assistant",
+      "color": "#800000",
+      "clusterLabel": "Agent, Digital Assistant"
+    },
+    {
+      "key": "Search Engine",
+      "color": "#aaffc3",
+      "clusterLabel": "Search Engine"
+    },
+    {
+      "key": "CEO",
+      "color": "#808000",
+      "clusterLabel": "CEO"
+    },
+    {
+      "key": "Data Analysis, Algorithms",
+      "color": "#ffd8b1",
+      "clusterLabel": "Data Analysis, Algorithms"
+    },
+    {
+      "key": "Neural Networks, Algorithms",
+      "color": "#000075",
+      "clusterLabel": "Neural Networks, Algorithms"
+    },
+    {
+      "key": "Cybersecurity, Geopolitics, Threat Actors",
+      "color": "#a9a9a9",
+      "clusterLabel": "Cybersecurity, Geopolitics, Threat Actors"
+    },
+    {
+      "key": "Technology, AI Platform, Cloud Computing",
+      "color": "#e6194B",
+      "clusterLabel": "Technology, AI Platform, Cloud Computing"
+    },
+    {
+      "key": "Machine Learning, Data Training, Algorithms",
+      "color": "#3cb44b",
+      "clusterLabel": "Machine Learning, Data Training, Algorithms"
+    },
+    {
+      "key": "Technology, Business, Innovation",
+      "color": "#ffe119",
+      "clusterLabel": "Technology, Business, Innovation"
+    },
+    {
+      "key": "Technology, Consulting",
+      "color": "#4363d8",
+      "clusterLabel": "Technology, Consulting"
+    },
+    {
+      "key": "AI Development, Chatbot, Model Development",
+      "color": "#f58231",
+      "clusterLabel": "AI Development, Chatbot, Model Development"
+    },
+    {
+      "key": "Telecommunications, Technology, AI Solutions",
+      "color": "#911eb4",
+      "clusterLabel": "Telecommunications, Technology, AI Solutions"
+    },
+    {
+      "key": "AI Agent, Autonomous Systems, General AI",
+      "color": "#42d4f4",
+      "clusterLabel": "AI Agent, Autonomous Systems, General AI"
+    },
+    {
+      "key": "Natural Language Processing, Multimodal AI",
+      "color": "#f032e6",
+      "clusterLabel": "Natural Language Processing, Multimodal AI"
+    },
+    {
+      "key": "Technology",
+      "color": "#bfef45",
+      "clusterLabel": "Technology"
+    },
+    {
+      "key": "Technology, Consumer Electronics, AI Development",
+      "color": "#fabed4",
+      "clusterLabel": "Technology, Consumer Electronics, AI Development"
+    },
+    {
+      "key": "Technology, Mobile Computing",
+      "color": "#469990",
+      "clusterLabel": "Technology, Mobile Computing"
+    },
+    {
+      "key": "Algorithm, Data Analysis",
+      "color": "#dcbeff",
+      "clusterLabel": "Algorithm, Data Analysis"
+    },
+    {
+      "key": "Natural Language Processing",
+      "color": "#9A6324",
+      "clusterLabel": "Natural Language Processing"
+    },
+    {
+      "key": "Technology, Innovation",
+      "color": "#fffac8",
+      "clusterLabel": "Technology, Innovation"
+    },
+    {
+      "key": "Technology, Manufacturing, Investment",
+      "color": "#800000",
+      "clusterLabel": "Technology, Manufacturing, Investment"
+    },
+    {
+      "key": "Language Model, Natural Language Processing",
+      "color": "#aaffc3",
+      "clusterLabel": "Language Model, Natural Language Processing"
+    },
+    {
+      "key": "Hardware, Processing, Computation",
+      "color": "#808000",
+      "clusterLabel": "Hardware, Processing, Computation"
+    },
+    {
+      "key": "Social Media, Technology, Communication",
+      "color": "#ffd8b1",
+      "clusterLabel": "Social Media, Technology, Communication"
+    },
+    {
+      "key": "Technology, Investment",
+      "color": "#000075",
+      "clusterLabel": "Technology, Investment"
+    },
+    {
+      "key": "Research",
+      "color": "#a9a9a9",
+      "clusterLabel": "Research"
+    },
+    {
+      "key": "Business, Legal",
+      "color": "#e6194B",
+      "clusterLabel": "Business, Legal"
+    },
+    {
+      "key": "Investment, Technology",
+      "color": "#3cb44b",
+      "clusterLabel": "Investment, Technology"
+    }
+  ],
+  "tags": [
+    {
+      "key": "Artificial",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Machine",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Natural",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Technology",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "E-commerce",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Research",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Hardware",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Automation",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "AI",
+      "image": "technology.svg"
+    },
+    {
+      "key": "Chatbot",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Ethics",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Agent",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Search",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "CEO",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Data",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Neural",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Cybersecurity",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Telecommunications",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Algorithm",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Language",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Social",
+      "image": "organization.svg"
+    },
+    {
+      "key": "Business",
+      "image": "unknown.svg"
+    },
+    {
+      "key": "Investment",
+      "image": "unknown.svg"
+    }
+  ]
+}

@@ -1,0 +1,349 @@
+{
+  "nodes": [
+    {
+      "key": "AI",
+      "label": "AI",
+      "tag": "Concept",
+      "entity_type": "Concept",
+      "categories": "Artificial Intelligence, Technology",
+      "color": "#4e79a7",
+      "x": 12.0,
+      "y": 0.0,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Machine Learning",
+      "label": "Machine Learning",
+      "tag": "Field",
+      "entity_type": "Field",
+      "categories": "Machine Learning, Artificial Intelligence",
+      "color": "#f28e2c",
+      "x": 8.234898018587335,
+      "y": 7.818314824680298,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Deep Learning",
+      "label": "Deep Learning",
+      "tag": "Technique",
+      "entity_type": "Technique",
+      "categories": "Machine Learning, Neural Networks",
+      "color": "#ff9da7",
+      "x": -0.22520933956314337,
+      "y": 9.749279121818237,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "ChatGPT",
+      "label": "ChatGPT",
+      "tag": "Model",
+      "entity_type": "Model",
+      "categories": "Natural Language Processing, Artificial Intelligence",
+      "color": "#edc949",
+      "x": -7.00968867902419,
+      "y": 4.338837391175582,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "GPT-4",
+      "label": "GPT-4",
+      "tag": "Model",
+      "entity_type": "Model",
+      "categories": "Natural Language Processing, Artificial Intelligence",
+      "color": "#edc949",
+      "x": -8.391654690274295,
+      "y": 6.24095042376589,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "OpenAI",
+      "label": "OpenAI",
+      "tag": "Organization",
+      "entity_type": "Organization",
+      "categories": "Research, Artificial Intelligence",
+      "color": "#76b7b2",
+      "x": -7.009688679024192,
+      "y": -4.33883739117558,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Google",
+      "label": "Google",
+      "tag": "Organization",
+      "entity_type": "Organization",
+      "categories": "Technology, Artificial Intelligence",
+      "color": "#76b7b2",
+      "x": -8.391654690274297,
+      "y": -2.4367243585852725,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Microsoft",
+      "label": "Microsoft",
+      "tag": "Organization",
+      "entity_type": "Organization",
+      "categories": "Technology, Software",
+      "color": "#76b7b2",
+      "x": -10.627722667774087,
+      "y": -3.163266886590633,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Nvidia",
+      "label": "Nvidia",
+      "tag": "Organization",
+      "entity_type": "Organization",
+      "categories": "Hardware, Technology",
+      "color": "#76b7b2",
+      "x": -10.627722667774087,
+      "y": -5.514407895760526,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Computer Vision",
+      "label": "Computer Vision",
+      "tag": "Field",
+      "entity_type": "Field",
+      "categories": "Computer Vision, Artificial Intelligence",
+      "color": "#f28e2c",
+      "x": 5.2348980185873355,
+      "y": 9.550365632249175,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Robotics",
+      "label": "Robotics",
+      "tag": "Field",
+      "entity_type": "Field",
+      "categories": "Robotics, Hardware",
+      "color": "#f28e2c",
+      "x": 5.234898018587335,
+      "y": 6.0862640171114215,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Ethics in AI",
+      "label": "Ethics in AI",
+      "tag": "Concept",
+      "entity_type": "Concept",
+      "categories": "Ethics, Artificial Intelligence",
+      "color": "#4e79a7",
+      "x": 8.0,
+      "y": 2.4492935982947064e-16,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Sam Altman",
+      "label": "Sam Altman",
+      "tag": "Person",
+      "entity_type": "Person",
+      "categories": "Business, Artificial Intelligence",
+      "color": "#59a14f",
+      "x": -0.22520933956314604,
+      "y": -9.749279121818237,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Elon Musk",
+      "label": "Elon Musk",
+      "tag": "Person",
+      "entity_type": "Person",
+      "categories": "Business, Technology",
+      "color": "#59a14f",
+      "x": -4.225209339563146,
+      "y": -9.749279121818237,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "TensorFlow",
+      "label": "TensorFlow",
+      "tag": "Tool",
+      "entity_type": "Tool",
+      "categories": "Software, Machine Learning",
+      "color": "#9c755f",
+      "x": 8.234898018587334,
+      "y": -7.818314824680299,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "PyTorch",
+      "label": "PyTorch",
+      "tag": "Tool",
+      "entity_type": "Tool",
+      "categories": "Software, Machine Learning",
+      "color": "#9c755f",
+      "x": 4.234898018587334,
+      "y": -7.818314824680299,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "DALL-E",
+      "label": "DALL-E",
+      "tag": "Model",
+      "entity_type": "Model",
+      "categories": "Computer Vision, Natural Language Processing",
+      "color": "#edc949",
+      "x": -10.627722667774085,
+      "y": 5.514407895760529,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Stable Diffusion",
+      "label": "Stable Diffusion",
+      "tag": "Model",
+      "entity_type": "Model",
+      "categories": "Computer Vision, Artificial Intelligence",
+      "color": "#edc949",
+      "x": -10.627722667774085,
+      "y": 3.1632668865906366,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Anthropic",
+      "label": "Anthropic",
+      "tag": "Organization",
+      "entity_type": "Organization",
+      "categories": "Research, Ethics",
+      "color": "#76b7b2",
+      "x": -8.391654690274297,
+      "y": -6.240950423765887,
+      "size": 10,
+      "score": 1
+    },
+    {
+      "key": "Claude",
+      "label": "Claude",
+      "tag": "Model",
+      "entity_type": "Model",
+      "categories": "Natural Language Processing, Ethics",
+      "color": "#edc949",
+      "x": -8.391654690274295,
+      "y": 2.436724358585275,
+      "size": 10,
+      "score": 1
+    }
+  ],
+  "edges": [],
+  "clusters": [
+    {
+      "key": "Artificial Intelligence",
+      "color": "#cccccc",
+      "clusterLabel": "Artificial Intelligence"
+    },
+    {
+      "key": "Machine Learning",
+      "color": "#cccccc",
+      "clusterLabel": "Machine Learning"
+    },
+    {
+      "key": "Natural Language Processing",
+      "color": "#cccccc",
+      "clusterLabel": "Natural Language Processing"
+    },
+    {
+      "key": "Computer Vision",
+      "color": "#cccccc",
+      "clusterLabel": "Computer Vision"
+    },
+    {
+      "key": "Robotics",
+      "color": "#cccccc",
+      "clusterLabel": "Robotics"
+    },
+    {
+      "key": "Ethics",
+      "color": "#cccccc",
+      "clusterLabel": "Ethics"
+    },
+    {
+      "key": "Business",
+      "color": "#cccccc",
+      "clusterLabel": "Business"
+    },
+    {
+      "key": "Research",
+      "color": "#cccccc",
+      "clusterLabel": "Research"
+    },
+    {
+      "key": "Hardware",
+      "color": "#cccccc",
+      "clusterLabel": "Hardware"
+    },
+    {
+      "key": "Software",
+      "color": "#cccccc",
+      "clusterLabel": "Software"
+    }
+  ],
+  "tags": [
+    {
+      "key": "Concept",
+      "image": "default.svg",
+      "color": "#4e79a7"
+    },
+    {
+      "key": "Field",
+      "image": "default.svg",
+      "color": "#f28e2c"
+    },
+    {
+      "key": "Technology",
+      "image": "default.svg",
+      "color": "#e15759"
+    },
+    {
+      "key": "Organization",
+      "image": "default.svg",
+      "color": "#76b7b2"
+    },
+    {
+      "key": "Person",
+      "image": "default.svg",
+      "color": "#59a14f"
+    },
+    {
+      "key": "Model",
+      "image": "default.svg",
+      "color": "#edc949"
+    },
+    {
+      "key": "Platform",
+      "image": "default.svg",
+      "color": "#af7aa1"
+    },
+    {
+      "key": "Technique",
+      "image": "default.svg",
+      "color": "#ff9da7"
+    },
+    {
+      "key": "Tool",
+      "image": "default.svg",
+      "color": "#9c755f"
+    },
+    {
+      "key": "Unknown",
+      "image": "default.svg",
+      "color": "#bab0ab"
+    }
+  ]
+}

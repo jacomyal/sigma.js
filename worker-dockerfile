@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+# Ustaw katalog roboczy
+WORKDIR /app
+
+# Skopiuj pliki Pythona i zainstaluj zależności
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+# Skopiuj skrypt do pobierania danych
+COPY fetch_graph_data.py ./
+
+# Uruchom skrypt
+CMD ["python", "fetch_graph_data.py"] 
