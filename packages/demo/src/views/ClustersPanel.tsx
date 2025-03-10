@@ -18,7 +18,25 @@ const ClustersPanel: FC<{
 
   const nodesPerCluster = useMemo(() => {
     const index: Record<string, number> = {};
-    graph.forEachNode((_, { cluster }) => (index[cluster] = (index[cluster] || 0) + 1));
+    
+    // Zliczamy węzły dla każdej kategorii osobno
+    graph.forEachNode((node) => {
+      const allCategories = graph.getNodeAttribute(node, "allCategories") || [];
+      
+      // Jeśli węzeł ma przypisane kategorie, zliczamy go dla każdej z nich
+      if (allCategories.length > 0) {
+        allCategories.forEach((category: string) => {
+          index[category] = (index[category] || 0) + 1;
+        });
+      } else {
+        // Jeśli nie ma kategorii, używamy głównego klastra
+        const cluster = graph.getNodeAttribute(node, "cluster");
+        if (cluster) {
+          index[cluster] = (index[cluster] || 0) + 1;
+        }
+      }
+    });
+    
     return index;
   }, []);
 
@@ -32,13 +50,33 @@ const ClustersPanel: FC<{
     // UX, because of the visible nodes bar width transition.
     requestAnimationFrame(() => {
       const index: Record<string, number> = {};
-      graph.forEachNode((_, { cluster, hidden }) => !hidden && (index[cluster] = (index[cluster] || 0) + 1));
+      
+      // Zliczamy widoczne węzły dla każdej kategorii
+      graph.forEachNode((_, attributes) => {
+        if (attributes.hidden) return;
+        
+        const allCategories = attributes.allCategories || [];
+        
+        // Jeśli węzeł ma przypisane kategorie, zliczamy go dla każdej z nich
+        if (allCategories.length > 0) {
+          allCategories.forEach((category: string) => {
+            index[category] = (index[category] || 0) + 1;
+          });
+        } else {
+          // Jeśli nie ma kategorii, używamy głównego klastra
+          const cluster = attributes.cluster;
+          if (cluster) {
+            index[cluster] = (index[cluster] || 0) + 1;
+          }
+        }
+      });
+      
       setVisibleNodesPerCluster(index);
     });
   }, [filters]);
 
   const sortedClusters = useMemo(
-    () => sortBy(clusters, (cluster) => -nodesPerCluster[cluster.key]),
+    () => sortBy(clusters, (cluster) => -(nodesPerCluster[cluster.key] || 0)),
     [clusters, nodesPerCluster],
   );
 
@@ -46,7 +84,7 @@ const ClustersPanel: FC<{
     <Panel
       title={
         <>
-          <MdGroupWork className="text-muted" /> Clusters
+          <MdGroupWork className="text-muted" /> Categories
           {visibleClustersCount < clusters.length ? (
             <span className="text-muted text-small">
               {" "}
@@ -59,7 +97,7 @@ const ClustersPanel: FC<{
       }
     >
       <p>
-        <i className="text-muted">Click a cluster to show/hide related pages from the network.</i>
+        <i className="text-muted">Click a category to show/hide related entities from the network.</i>
       </p>
       <p className="buttons">
         <button className="btn" onClick={() => setClusters(mapValues(keyBy(clusters, "key"), () => true))}>
@@ -71,13 +109,17 @@ const ClustersPanel: FC<{
       </p>
       <ul>
         {sortedClusters.map((cluster) => {
-          const nodesCount = nodesPerCluster[cluster.key];
+          const nodesCount = nodesPerCluster[cluster.key] || 0;
           const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
+          
+          // Pomijamy kategorie bez węzłów
+          if (nodesCount === 0) return null;
+          
           return (
             <li
               className="caption-row"
               key={cluster.key}
-              title={`${nodesCount} page${nodesCount > 1 ? "s" : ""}${
+              title={`${nodesCount} entity${nodesCount > 1 ? "ies" : ""}${
                 visibleNodesCount !== nodesCount
                   ? visibleNodesCount > 0
                     ? ` (only ${visibleNodesCount > 1 ? `${visibleNodesCount} are` : "one is"} visible)`
@@ -94,7 +136,7 @@ const ClustersPanel: FC<{
               <label htmlFor={`cluster-${cluster.key}`}>
                 <span className="circle" style={{ background: cluster.color, borderColor: cluster.color }} />{" "}
                 <div className="node-label">
-                  <span>{cluster.clusterLabel}</span>
+                  <span>{cluster.clusterLabel} ({nodesCount} entities)</span>
                   <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerCluster + "%" }}>
                     <div
                       className="inside-bar"
