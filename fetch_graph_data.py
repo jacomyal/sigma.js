@@ -1,13 +1,23 @@
 import os
+import sys
+import json
+import random
+import argparse
+import math
 import pymysql
 import pandas as pd
-import json
+import numpy as np
+from datetime import datetime
+from collections import Counter
 import re
 import csv
 from io import StringIO
-import random
-from collections import Counter
-import math
+
+# Parsowanie argumentów wiersza poleceń
+def parse_args():
+    parser = argparse.ArgumentParser(description='Pobierz dane grafu z bazy i przekształć do formatu Sigma.js')
+    parser.add_argument('--output', type=str, help='Ścieżka do pliku wynikowego JSON')
+    return parser.parse_args()
 
 # Ustawienie zmiennych środowiskowych
 os.environ['DB_SCHEME'] = 'mysql'
@@ -135,8 +145,8 @@ def fetch_graph_data():
         
         print(f"Pobrano {len(rows)} wierszy z bazy danych")
         
-        # Oczekiwane nagłówki
-        entity_headers = ['type', 'entity_name', 'entity_types', 'entity_definition', 'entity_strength', 'entity_occurrence']
+        # Zmiana nagłówków dla nowego formatu danych
+        entity_headers = ['type', 'entity_name', 'entity_type', 'entity_category', 'entity_definition', 'entity_strength', 'entity_occurrence']
         relation_headers = ['type', 'source_entity', 'target_entity', 'relationship_description', 'relationship_strength']
         
         graph_data = []
@@ -218,274 +228,213 @@ def analyze_data(graph_data):
     
     return entity_counts
 
-# Konwersja danych do formatu Sigma.js
-def convert_to_sigma_format(graph_data, entity_counts, min_occurrence=5):
-    # Filtrujemy encje, które występują co najmniej min_occurrence razy
-    frequent_entities = {entity: count for entity, count in entity_counts.items() if count >= min_occurrence}
-    
-    if not frequent_entities:
-        print("Ostrzeżenie: Brak encji spełniających kryterium minimalnej liczby wystąpień")
-        return None
-    
-    # Przygotowanie struktur danych
-    nodes = []
-    edges = []
-    cluster_map = {}
-    tag_map = {}
-    
-    # Przestrzeń kolorów dla klastrów
-    colors = [
-        "#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", 
-        "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabed4", 
-        "#469990", "#dcbeff", "#9A6324", "#fffac8", "#800000", 
-        "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9"
-    ]
-    
-    # Słownik do zbierania relacji
-    entity_relations = {}
-    
-    # Zbieramy najpierw wszystkie relacje
-    for graph in graph_data:
-        if not 'relations' in graph or not isinstance(graph['relations'], pd.DataFrame):
-            continue
-            
-        if not 'source_entity' in graph['relations'].columns or not 'target_entity' in graph['relations'].columns:
-            continue
-        
-        for _, relation in graph['relations'].iterrows():
-            if pd.isna(relation['source_entity']) or pd.isna(relation['target_entity']):
-                continue
-                
-            source = relation['source_entity']
-            target = relation['target_entity']
-            
-            # Pomijamy relacje, których encje nie spełniają kryterium częstości
-            if source not in frequent_entities or target not in frequent_entities:
-                continue
-            
-            # Zapisujemy relację dla źródłowej encji
-            if source not in entity_relations:
-                entity_relations[source] = []
-                
-            # Dodajemy do listy relacji, jeśli nie istnieje taka sama
-            relationship_description = relation['relationship_description'] if 'relationship_description' in relation and pd.notna(relation['relationship_description']) else ""
-            relationship_strength = 0
-            
-            try:
-                if 'relationship_strength' in relation and pd.notna(relation['relationship_strength']):
-                    relationship_strength = float(relation['relationship_strength'])
-            except (ValueError, TypeError):
-                pass
-                
-            new_relation = {
-                "source": source,
-                "target": target,
-                "description": relationship_description,
-                "strength": relationship_strength
-            }
-            
-            # Sprawdzamy, czy relacja już istnieje
-            if not any(r["source"] == source and r["target"] == target and r["description"] == relationship_description for r in entity_relations[source]):
-                entity_relations[source].append(new_relation)
-                
-            # Zapisujemy relację również dla docelowej encji
-            if target not in entity_relations:
-                entity_relations[target] = []
-                
-            # Dodajemy odwrotną relację dla docelowej encji
-            reverse_relation = {
-                "source": target,
-                "target": source,
-                "description": relationship_description,
-                "strength": relationship_strength,
-                "is_reverse": True  # Oznaczamy, że jest to relacja odwrotna
-            }
-            
-            # Sprawdzamy, czy relacja już istnieje
-            if not any(r["source"] == target and r["target"] == source and r["description"] == relationship_description for r in entity_relations[target]):
-                entity_relations[target].append(reverse_relation)
-    
-    # Zbieramy wszystkie encje
-    for graph in graph_data:
-        if not 'entities' in graph or not isinstance(graph['entities'], pd.DataFrame) or 'entity_name' not in graph['entities'].columns:
-            continue
-            
-        if not 'relations' in graph or not isinstance(graph['relations'], pd.DataFrame):
-            continue
-            
-        # Dodajemy encje
-        for _, entity in graph['entities'].iterrows():
-            entity_name = entity['entity_name']
-            
-            # Pomijamy encje, które występują rzadziej niż min_occurrence
-            if entity_name not in frequent_entities:
-                continue
-            
-            # Pobieramy typ encji jako tag
-            entity_types = []
-            if 'entity_types' in entity and pd.notna(entity['entity_types']):
-                entity_types = entity['entity_types'].split(',') if isinstance(entity['entity_types'], str) else []
-            
-            tag = entity_types[0].strip() if entity_types else "Unknown"
-            
-            # Upraszczamy tag do jednej kategorii (bez spacji i podkategorii)
-            simple_tag = tag.split()[0] if ' ' in tag else tag
-            
-            # Tworzymy klaster na podstawie tagu
-            cluster = simple_tag
-            
-            # Sprawdzamy, czy ta encja już istnieje w nodes
-            existing_node_index = next((i for i, node in enumerate(nodes) if node['key'] == entity_name), None)
-            
-            if existing_node_index is None:
-                # Przypisujemy kolor do klastra, jeśli jeszcze nie istnieje
-                if cluster not in cluster_map:
-                    color_index = len(cluster_map) % len(colors)
-                    cluster_map[cluster] = {
-                        "key": cluster,
-                        "color": colors[color_index],
-                        "clusterLabel": cluster
-                    }
-                
-                # Przypisujemy obraz do tagu, jeśli jeszcze nie istnieje
-                if simple_tag not in tag_map:
-                    # Mapowanie typów na obrazy
-                    tag_images = {
-                        "AI": "technology.svg",
-                        "Person": "person.svg",
-                        "Organization": "organization.svg",
-                        "Company": "company.svg",
-                        "Tool": "tool.svg",
-                        "Application": "technology.svg",
-                        "Platform": "technology.svg",
-                        "Service": "technology.svg",
-                        "Online": "tool.svg",
-                        "Community": "organization.svg",
-                        "Social": "organization.svg",
-                        "News": "organization.svg"
-                    }
-                    
-                    # Wybieramy domyślny obraz
-                    image = "unknown.svg"
-                    
-                    # Szukamy odpowiedniego obrazu na podstawie słów kluczowych w tagu
-                    for key, img in tag_images.items():
-                        if key.lower() in simple_tag.lower():
-                            image = img
-                            break
-                    
-                    tag_map[simple_tag] = {
-                        "key": simple_tag,
-                        "image": image
-                    }
-                
-                # Obliczamy scoring na podstawie liczby wystąpień
-                score = min(1.0, entity_counts[entity_name] / 20)  # Normalizacja, max 1.0
-                
-                # Przygotowujemy tablicę definicji
-                definitions = []
-                if 'entity_definition' in entity and pd.notna(entity['entity_definition']) and entity['entity_definition']:
-                    # Bezpieczna konwersja entity_strength na liczbę lub wartość domyślna
-                    try:
-                        if 'entity_strength' in entity and pd.notna(entity['entity_strength']):
-                            strength = float(entity['entity_strength'])
-                        else:
-                            strength = 50.0
-                    except (ValueError, TypeError):
-                        strength = 50.0
-                        
-                    definitions.append({
-                        "text": entity['entity_definition'],
-                        "strength": strength
-                    })
-                
-                # Pobieramy relacje dla tej encji
-                relations = entity_relations.get(entity_name, [])
-                
-                # Dodajemy encję jako węzeł
-                nodes.append({
-                    "key": entity_name,
-                    "label": entity_name,
-                    "tag": simple_tag,
-                    "URL": "",
-                    "cluster": cluster,
-                    "x": random.uniform(-1000, 1000),  # Losowe współrzędne początkowe
-                    "y": random.uniform(-1000, 1000),
-                    "score": score,
-                    "entity_types": entity['entity_types'] if 'entity_types' in entity and pd.notna(entity['entity_types']) else "",
-                    "definitions": definitions,
-                    "relations": relations
-                })
-            else:
-                # Encja już istnieje, dodajemy nową definicję jeśli istnieje
-                if 'entity_definition' in entity and pd.notna(entity['entity_definition']) and entity['entity_definition']:
-                    # Bezpieczna konwersja entity_strength na liczbę lub wartość domyślna
-                    try:
-                        if 'entity_strength' in entity and pd.notna(entity['entity_strength']):
-                            strength = float(entity['entity_strength'])
-                        else:
-                            strength = 50.0
-                    except (ValueError, TypeError):
-                        strength = 50.0
-                    
-                    # Dodajemy nową definicję do istniejących
-                    definition = {
-                        "text": entity['entity_definition'],
-                        "strength": strength
-                    }
-                    
-                    # Sprawdzamy czy już mamy taką definicję
-                    if "definitions" not in nodes[existing_node_index]:
-                        nodes[existing_node_index]["definitions"] = []
-                    
-                    # Dodajemy tylko jeśli nie ma duplikatu
-                    if not any(d["text"] == definition["text"] for d in nodes[existing_node_index]["definitions"]):
-                        nodes[existing_node_index]["definitions"].append(definition)
-    
-    # Dodajemy krawędzie
-    edge_keys = set()  # Zbiór do śledzenia unikalnych krawędzi
-    
-    for graph in graph_data:
-        if not 'relations' in graph or not isinstance(graph['relations'], pd.DataFrame):
-            continue
-            
-        if not 'source_entity' in graph['relations'].columns or not 'target_entity' in graph['relations'].columns:
-            continue
-        
-        for _, relation in graph['relations'].iterrows():
-            if pd.isna(relation['source_entity']) or pd.isna(relation['target_entity']):
-                continue
-                
-            source = relation['source_entity']
-            target = relation['target_entity']
-            
-            # Pomijamy krawędzie, których encje nie spełniają kryterium częstości
-            if source not in frequent_entities or target not in frequent_entities:
-                continue
-            
-            # Tworzymy unikalny klucz dla krawędzi
-            edge_key = f"{source}|{target}"
-            
-            # Sprawdzamy czy ta krawędź już istnieje
-            if edge_key not in edge_keys:
-                edges.append([source, target])
-                edge_keys.add(edge_key)
-    
-    # Tworzymy wynikowy JSON
-    result = {
-        "nodes": nodes,
-        "edges": edges,
-        "clusters": list(cluster_map.values()),
-        "tags": list(tag_map.values())
+def process_data(data):
+    """
+    Przetwarza dane z bazy danych i tworzy strukturę grafu.
+    Koloruje i grupuje węzły według typów encji.
+    """
+    # Definiujemy kolory dla typów encji
+    entity_type_colors = {
+        "Concept": "#4e79a7",
+        "Field": "#f28e2c",
+        "Technology": "#e15759",
+        "Organization": "#76b7b2",
+        "Person": "#59a14f",
+        "Model": "#edc949",
+        "Platform": "#af7aa1",
+        "Technique": "#ff9da7",
+        "Tool": "#9c755f",
+        "Unknown": "#bab0ab"
     }
     
-    print(f"Utworzono graf z {len(nodes)} węzłami i {len(edges)} krawędziami")
-    print(f"Liczba klastrów: {len(cluster_map)}, Liczba tagów: {len(tag_map)}")
+    # Tworzymy strukturę grafu
+    graph = {
+        "nodes": [],
+        "edges": [],
+        "clusters": [],
+        "tags": []
+    }
     
-    return result
+    # Zbieramy wszystkie kategorie i typy encji
+    all_categories = set()
+    all_entity_types = set()
+    
+    for row in data:
+        categories = row[3]  # entity_category
+        entity_type = row[2]  # entity_type
+        
+        # Zbieramy kategorie
+        if categories:
+            for category in categories.split(','):
+                category = category.strip()
+                if category:
+                    all_categories.add(category)
+        
+        # Zbieramy typy encji
+        if entity_type:
+            all_entity_types.add(entity_type)
+        else:
+            all_entity_types.add("Unknown")
+    
+    # Dodajemy klastry (kategorie)
+    for category in all_categories:
+        graph["clusters"].append({
+            "key": category,
+            "color": "#cccccc",  # Neutralny kolor, bo kolorujemy po typach
+            "clusterLabel": category
+        })
+    
+    # Dodajemy tagi (typy encji)
+    for entity_type in all_entity_types:
+        color = entity_type_colors.get(entity_type, entity_type_colors.get("Unknown", "#cccccc"))
+        graph["tags"].append({
+            "key": entity_type,
+            "image": "default.svg",
+            "color": color  # Kolor tagu
+        })
+    
+    # Słownik do śledzenia już dodanych encji
+    added_entities = {}
+    
+    # Dodajemy węzły
+    for row in data:
+        entity_type_value = row[0]  # type
+        entity_name = row[1]  # entity_name
+        entity_type = row[2]  # entity_type
+        categories = row[3]   # entity_category
+        definition = row[4]   # entity_definition
+        
+        # Pomijamy wiersze bez nazwy encji
+        if not entity_name:
+            continue
+        
+        # Jeśli encja nie została jeszcze dodana, dodajemy ją
+        if entity_name not in added_entities:
+            # Używamy typu encji do kolorowania
+            if not entity_type:
+                entity_type = "Unknown"
+            
+            # Wybieramy kolor na podstawie typu encji
+            color = entity_type_colors.get(entity_type, entity_type_colors.get("Unknown", "#cccccc"))
+            
+            # Tworzymy węzeł
+            node = {
+                "key": entity_name,
+                "label": entity_name,
+                "tag": entity_type_value,
+                "entity_type": entity_type,
+                "categories": categories,
+                "color": color,  # Kolor na podstawie typu encji
+                "definition": definition,
+                "x": random.random(),
+                "y": random.random(),
+                "size": 10,
+                "score": 1
+            }
+            
+            graph["nodes"].append(node)
+            added_entities[entity_name] = len(graph["nodes"]) - 1
+    
+    # Dodajemy unikalne tagi (typy encji)
+    unique_tags = set()
+    for node in graph["nodes"]:
+        unique_tags.add(node["tag"])
+    
+    for tag in unique_tags:
+        if not any(t["key"] == tag for t in graph["tags"]):
+            graph["tags"].append({
+                "key": tag,
+                "image": "default.svg"
+            })
+    
+    return graph
+
+def convert_to_sigma_format(graph_data):
+    """
+    Konwertuje dane grafu do formatu używanego przez Sigma.js.
+    """
+    sigma_data = {
+        "nodes": [],
+        "edges": [],
+        "clusters": graph_data["clusters"],
+        "tags": graph_data["tags"]
+    }
+    
+    # Dodajemy węzły
+    for node in graph_data["nodes"]:
+        sigma_node = {
+            "key": node["key"],
+            "label": node["label"],
+            "tag": node["tag"],
+            "entity_type": node["entity_type"],  # Używamy poprawnego entity_type
+            "categories": node["categories"],
+            "color": node["color"],
+            "definition": node["definition"],
+            "x": node["x"],
+            "y": node["y"],
+            "size": node["size"],
+            "score": node["score"]
+        }
+        sigma_data["nodes"].append(sigma_node)
+    
+    # Dodajemy krawędzie
+    for edge in graph_data["edges"]:
+        sigma_edge = {
+            "source": edge["source"],
+            "target": edge["target"],
+            "size": edge["size"]
+        }
+        sigma_data["edges"].append(sigma_edge)
+    
+    return sigma_data
+
+def arrange_nodes_by_category(graph_data):
+    """
+    Układa węzły w przestrzeni według ich typów encji.
+    """
+    # Grupujemy węzły według typów encji
+    type_nodes = {}
+    for node in graph_data["nodes"]:
+        entity_type = node.get("entity_type", "Unknown")
+        # Upewnij się, że entity_type nie jest None ani pustym stringiem
+        if not entity_type:
+            entity_type = "Unknown"
+        
+        # Normalizujemy typ encji (usuwamy spacje, konwertujemy na małe litery)
+        # aby "Company" i "company" były traktowane jako ten sam typ
+        normalized_type = entity_type.strip().lower()
+        
+        if normalized_type not in type_nodes:
+            type_nodes[normalized_type] = []
+        type_nodes[normalized_type].append((node, entity_type))  # Zapisujemy oryginalny typ
+    
+    # Obliczamy liczbę typów i tworzymy układ kołowy
+    num_types = len(type_nodes)
+    radius = 10
+    
+    # Dla każdego typu, umieszczamy jego węzły w określonym obszarze
+    angle_step = 2 * math.pi / num_types
+    for i, (normalized_type, nodes_with_types) in enumerate(type_nodes.items()):
+        # Obliczamy środek obszaru dla tego typu
+        angle = i * angle_step
+        center_x = radius * math.cos(angle)
+        center_y = radius * math.sin(angle)
+        
+        # Rozmieszczamy węzły wokół środka obszaru
+        node_radius = 2
+        node_angle_step = 2 * math.pi / max(len(nodes_with_types), 1)
+        for j, (node, original_type) in enumerate(nodes_with_types):
+            node_angle = j * node_angle_step
+            node["x"] = center_x + node_radius * math.cos(node_angle)
+            node["y"] = center_y + node_radius * math.sin(node_angle)
+            
+            # Upewniamy się, że węzeł ma poprawny entity_type
+            node["entity_type"] = original_type
+    
+    return graph_data
 
 # Zapisz dane grafu do pliku JSON
-def save_graph_data(graph_data, filename="public/dataset.json"):
+def save_graph_data(graph_data, filename="packages/demo/public/ai_news_dataset.json"):
     # Upewnij się, że ścieżka do pliku istnieje
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     
@@ -494,25 +443,94 @@ def save_graph_data(graph_data, filename="public/dataset.json"):
     
     print(f"Zapisano dane grafu do pliku {filename}")
 
+def fetch_data_from_db():
+    """
+    Pobiera dane z bazy danych MySQL.
+    """
+    try:
+        # Nawiązanie połączenia z bazą danych
+        connection = pymysql.connect(
+            host=os.environ['DB_HOST'],
+            user=os.environ['DB_USER'],
+            password=os.environ['DB_PASS'],
+            database=os.environ['DB_NAME'],
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        
+        print("Połączono z bazą danych")
+        
+        with connection.cursor() as cursor:
+            # Pobieramy dane encji
+            sql = """
+            SELECT 
+                type, 
+                entity_name, 
+                entity_type, 
+                entity_category, 
+                entity_definition, 
+                entity_strength, 
+                entity_occurrence
+            FROM entities
+            """
+            cursor.execute(sql)
+            entities = cursor.fetchall()
+            
+            print(f"Pobrano {len(entities)} wierszy z tabeli entities")
+            
+            # Konwertujemy dane do listy krotek
+            data = []
+            for entity in entities:
+                data.append((
+                    entity['type'],
+                    entity['entity_name'],
+                    entity['entity_type'],
+                    entity['entity_category'],
+                    entity['entity_definition'],
+                    entity['entity_strength'] if 'entity_strength' in entity else None,
+                    entity['entity_occurrence'] if 'entity_occurrence' in entity else None
+                ))
+            
+            return data
+    except Exception as e:
+        print(f"Błąd podczas pobierania danych z bazy: {e}")
+        return []
+    finally:
+        if 'connection' in locals() and connection:
+            connection.close()
+            print("Połączenie z bazą danych zamknięte")
+
+def main():
+    """
+    Główna funkcja programu.
+    """
+    # Parsowanie argumentów wiersza poleceń
+    parser = argparse.ArgumentParser(description='Pobierz dane grafu z bazy danych i zapisz je w formacie JSON.')
+    parser.add_argument('--output', dest='output_file', default='packages/demo/public/ai_news_dataset.json',
+                      help='Ścieżka do pliku wyjściowego JSON (domyślnie: packages/demo/public/ai_news_dataset.json)')
+    args = parser.parse_args()
+    
+    output_file = args.output_file
+    
+    # Pobieranie danych z bazy
+    data = fetch_data_from_db()
+    
+    if data:
+        # Przetwarzanie danych
+        graph_data = process_data(data)
+        
+        # Konwersja do formatu Sigma.js
+        sigma_data = convert_to_sigma_format(graph_data)
+        
+        # Układanie węzłów według kategorii
+        arranged_data = arrange_nodes_by_category(sigma_data)
+        
+        # Zapisanie wynikowego grafu
+        save_graph_data(arranged_data, output_file)
+        print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
+    else:
+        print("Nie udało się pobrać danych z bazy.")
+
 # Główna funkcja
 if __name__ == "__main__":
-    print("Pobieranie danych z bazy...")
-    graph_data = fetch_graph_data()
-    
-    if graph_data:
-        entity_counts = analyze_data(graph_data)
-        
-        if entity_counts:
-            # Konwersja do formatu Sigma.js
-            sigma_data = convert_to_sigma_format(graph_data, entity_counts, min_occurrence=5)
-            
-            if sigma_data:
-                # Zapisanie wynikowego grafu
-                save_graph_data(sigma_data, "packages/demo/public/ai_news_dataset.json")
-                print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
-            else:
-                print("Nie udało się utworzyć danych w formacie Sigma.js")
-        else:
-            print("Brak encji do analizy")
-    else:
-        print("Nie udało się pobrać danych z bazy.") 
+    main() 

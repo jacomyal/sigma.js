@@ -150,6 +150,7 @@ const Root: FC = () => {
   const [showContents, setShowContents] = useState(false);
   const [dataReady, setDataReady] = useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     entityTypes: {},
@@ -308,6 +309,10 @@ const Root: FC = () => {
         });
         setDataset(dataset);
         requestAnimationFrame(() => setDataReady(true));
+      })
+      .catch((error) => {
+        console.error("Błąd podczas ładowania danych:", error);
+        setError("Nie udało się załadować danych. Spróbuj ponownie później.");
       });
   }, []);
 
@@ -326,101 +331,119 @@ const Root: FC = () => {
   if (!dataset) return null;
 
   return (
-    <div id="app-root" className={showContents ? "show-contents" : ""}>
-      <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
-        <GraphSettingsController hoveredNode={hoveredNode} />
-        <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
-        <GraphDataController filters={filtersState} />
-        {dataReady && <RefreshLayoutButton onRefresh={rearrangeNodes} />}
-
-        {dataReady && (
-          <>
-            <button
-              className="theme-switcher"
-              onClick={toggleDarkMode}
-              title={darkMode ? "Przełącz na tryb jasny" : "Przełącz na tryb ciemny"}
-            >
-              {darkMode ? <BsSun /> : <BsMoon />}
-            </button>
-
-            <GraphTitle filters={filtersState} />
-            
-            <div className="controls">
-              <div className="react-sigma-control ico">
-                <button
-                  type="button"
-                  className="show-contents"
-                  onClick={() => setShowContents(true)}
-                  title="Show caption and description"
-                >
-                  <BiBookContent />
-                </button>
-              </div>
-              <FullScreenControl className="ico">
-                <BsArrowsFullscreen />
-                <BsFullscreenExit />
-              </FullScreenControl>
-
-              <ZoomControl className="ico">
-                <BsZoomIn />
-                <BsZoomOut />
-                <BiRadioCircleMarked />
-              </ZoomControl>
+    <div className={`app-root ${darkMode ? 'dark-mode' : 'light-mode'}`}>
+      {!dataReady ? (
+        <div className="loading-screen">
+          {error ? (
+            <div className="error-message">
+              <p>{error}</p>
+              <button onClick={() => window.location.reload()}>Odśwież stronę</button>
             </div>
-            <div className="contents">
-              <div className="ico">
+          ) : (
+            <>
+              <div className="spinner"></div>
+              <div>Ładowanie danych...</div>
+            </>
+          )}
+        </div>
+      ) : (
+        <div id="app-root" className={showContents ? "show-contents" : ""}>
+          <SigmaContainer graph={graph} settings={sigmaSettings} className="react-sigma">
+            <GraphSettingsController hoveredNode={hoveredNode} />
+            <GraphEventsController setHoveredNode={setHoveredNode} setSelectedNode={setSelectedNode} />
+            <GraphDataController filters={filtersState} />
+            {dataReady && <RefreshLayoutButton onRefresh={rearrangeNodes} />}
+
+            {dataReady && (
+              <>
                 <button
-                  type="button"
-                  className="hide-contents"
-                  onClick={() => setShowContents(false)}
-                  title="Show caption and description"
+                  className="theme-switcher"
+                  onClick={toggleDarkMode}
+                  title={darkMode ? "Przełącz na tryb jasny" : "Przełącz na tryb ciemny"}
                 >
-                  <GrClose />
+                  {darkMode ? <BsSun /> : <BsMoon />}
                 </button>
-              </div>
-              <div className="panels">
-                <SearchField filters={filtersState} />
-                <DescriptionPanel selectedNode={selectedNode} />
-                <RelationsPanel selectedNode={selectedNode} />
-                <ClustersPanel
-                  clusters={dataset.clusters}
-                  filters={filtersState}
-                  setClusters={(clusters) =>
-                    setFiltersState((filters) => ({
-                      ...filters,
-                      clusters,
-                    }))
-                  }
-                  toggleCluster={(cluster) => {
-                    setFiltersState((filters) => ({
-                      ...filters,
-                      clusters: filters.clusters[cluster]
-                        ? omit(filters.clusters, cluster)
-                        : { ...filters.clusters, [cluster]: true },
-                    }));
-                  }}
-                />
-                <TypesPanel
-                  tags={dataset.tags}
-                  filters={filtersState}
-                  toggleEntityType={(entityType) => {
-                    setFiltersState((filters) => ({
-                      ...filters,
-                      entityTypes: filters.entityTypes[entityType] ? omit(filters.entityTypes, entityType) : { ...filters.entityTypes, [entityType]: true },
-                    }));
-                  }}
-                  setEntityTypes={(entityTypes) =>
-                    setFiltersState((filters) => ({
-                      ...filters,
-                      entityTypes,
-                    }))
-                  }
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </SigmaContainer>
+
+                <GraphTitle filters={filtersState} />
+                
+                <div className="controls">
+                  <div className="react-sigma-control ico">
+                    <button
+                      type="button"
+                      className="show-contents"
+                      onClick={() => setShowContents(true)}
+                      title="Show caption and description"
+                    >
+                      <BiBookContent />
+                    </button>
+                  </div>
+                  <FullScreenControl className="ico">
+                    <BsArrowsFullscreen />
+                    <BsFullscreenExit />
+                  </FullScreenControl>
+
+                  <ZoomControl className="ico">
+                    <BsZoomIn />
+                    <BsZoomOut />
+                    <BiRadioCircleMarked />
+                  </ZoomControl>
+                </div>
+                <div className="contents">
+                  <div className="ico">
+                    <button
+                      type="button"
+                      className="hide-contents"
+                      onClick={() => setShowContents(false)}
+                      title="Show caption and description"
+                    >
+                      <GrClose />
+                    </button>
+                  </div>
+                  <div className="panels">
+                    <SearchField filters={filtersState} />
+                    <DescriptionPanel selectedNode={selectedNode} />
+                    <RelationsPanel selectedNode={selectedNode} />
+                    <ClustersPanel
+                      clusters={dataset.clusters}
+                      filters={filtersState}
+                      setClusters={(clusters) =>
+                        setFiltersState((filters) => ({
+                          ...filters,
+                          clusters,
+                        }))
+                      }
+                      toggleCluster={(cluster) => {
+                        setFiltersState((filters) => ({
+                          ...filters,
+                          clusters: filters.clusters[cluster]
+                            ? omit(filters.clusters, cluster)
+                            : { ...filters.clusters, [cluster]: true },
+                        }));
+                      }}
+                    />
+                    <TypesPanel
+                      tags={dataset.tags}
+                      filters={filtersState}
+                      toggleEntityType={(entityType) => {
+                        setFiltersState((filters) => ({
+                          ...filters,
+                          entityTypes: filters.entityTypes[entityType] ? omit(filters.entityTypes, entityType) : { ...filters.entityTypes, [entityType]: true },
+                        }));
+                      }}
+                      setEntityTypes={(entityTypes) =>
+                        setFiltersState((filters) => ({
+                          ...filters,
+                          entityTypes,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </SigmaContainer>
+        </div>
+      )}
     </div>
   );
 };

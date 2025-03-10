@@ -1,0 +1,108 @@
+---
+description: 
+globs: *.tsx
+alwaysApply: false
+---
+# Knowledge Graph Generator - Custom Rules
+
+You are an expert in creating knowledge graphs using SQL data and the sigma.js library.
+
+## Code Structure and Style
+
+- Write clean, modular code with appropriate types and comments
+- Apply functional programming patterns
+- Use descriptive variable names (e.g., `isLoading`, `graphData`, `entityNodes`)
+- Structure files logically: database modules, CSV parsing, graph visualization
+- Implement proper error handling and logging
+- Document code with JSDoc/docstring style comments
+
+## Database Handling
+
+- Use environment variables for connection configuration
+- Implement connection pooling for efficient resource management
+- Use parameterized SQL queries to prevent SQL injection
+- Handle connection and query errors gracefully
+- Use transactions where necessary
+- Optimize queries through indexing and pagination
+
+## CSV Data Processing
+
+- Validate CSV structure before processing
+- Clean input data from unnecessary elements (e.g., `{{completed}}`, ```csv`)
+- Handle different encoding formats and special characters
+- Normalize entity names for consistency
+- Parse entity types as arrays, not as single strings
+- Map relationship and entity strengths to numerical values
+- Check data integrity (all entities in relationships must exist)
+
+## Knowledge Graph Generation
+
+- Use appropriate data structures for graph representation (nodes, edges)
+- Filter nodes and edges with too low weight
+- Group similar entities (based on types)
+- Implement mechanisms for enriching the graph with additional metadata
+- Optimize performance for large graphs
+- Handle real-time graph updates
+
+## Visualization with sigma.js
+
+- Configure sigma.js for optimal performance
+- Implement responsive graph display across different devices
+- Apply clear color schemes based on entity types
+- Scale nodes and edges based on their strength (entity_strength, relationship_strength)
+- Implement advanced interactive features (zooming, filtering, searching)
+- Customize graph layout algorithms (ForceAtlas2, Fruchterman-Reingold) for specific cases
+
+## Performance and Optimization
+
+- Implement caching mechanisms for large datasets
+- Use batch processing for large graphs
+- Optimize graph rendering by reducing non-essential nodes
+- Monitor and optimize memory usage
+- Implement pagination mechanisms for very large graphs
+- Use web workers for secondary calculations
+
+## User Interface
+
+- Provide readable labels for nodes and edges
+- Implement information panels for entity details
+- Add filtering and search tools
+- Enable graph export to various formats (JSON, CSV, PNG)
+- Ensure intuitive navigation controls (pan, zoom, select)
+- Support dark/light themes for better visibility
+
+## Security and Data Integrity
+
+- Sanitize input data to prevent XSS attacks
+- Implement proper authentication for database access
+- Handle sensitive data appropriately
+- Validate all input parameters before processing
+- Implement data backup and recovery mechanisms
+- Log all data modifications for audit purposes
+
+## Testing and Debugging
+
+- Write unit tests for critical components
+- Implement integration tests for graph generation
+- Use advanced debugging tools for graph visualization
+- Test with various data scales (small, medium, large graphs)
+- Validate visual output against expected results
+- Monitor performance metrics during testing
+
+## Documentation
+
+- Create comprehensive API documentation
+- Provide usage examples for common scenarios
+- Document database schema and CSV format requirements
+- Include troubleshooting guides for common issues
+- Maintain a changelog for version tracking
+- Include architectural diagrams for better understanding
+
+## Maintenance and Updates
+
+- Follow semantic versioning for releases
+- Implement update mechanisms for the visualization engine
+- Monitor for sigma.js library updates
+- Maintain backward compatibility where possible
+- Optimize for current browser technologies
+- Implement feedback collection for continuous improvement

@@ -40,11 +40,11 @@ const RelationsPanel: FC<RelationsPanelProps> = ({ selectedNode }) => {
       <Panel
         title={
           <>
-            <BsLink45Deg className="text-muted" /> Relacje: {label}
+            <BsLink45Deg className="text-muted" /> Relations: {label}
           </>
         }
       >
-        <p>Brak relacji dla tej encji.</p>
+        <p>No relations for this entity.</p>
       </Panel>
     );
   }
@@ -89,7 +89,7 @@ const RelationsPanel: FC<RelationsPanelProps> = ({ selectedNode }) => {
     <Panel
       title={
         <>
-          <BsLink45Deg className="text-muted" /> Relacje: {label}
+          <BsLink45Deg className="text-muted" /> Relations: {label}
         </>
       }
     >
@@ -121,9 +121,19 @@ const RelationsPanel: FC<RelationsPanelProps> = ({ selectedNode }) => {
               <ul className="relation-descriptions">
                 {sortedDescriptions.map((desc, descIndex) => (
                   <li key={descIndex} className="relation-description">
-                    <p>{desc.text || "Brak opisu relacji"}</p>
+                    <p>{desc.text || "No relation description"}</p>
                     {desc.strength > 0 && (
-                      <small className="strength-info">Siła relacji: {desc.strength}</small>
+                      <div className="strength-container">
+                        <small className="strength-label">Relation Strength:</small>
+                        <div className="strength-bar-container">
+                          <div 
+                            className="strength-bar" 
+                            style={{ width: `${desc.strength}%` }}
+                            title={`Relation Strength: ${desc.strength}`}
+                          ></div>
+                        </div>
+                        <small className="strength-value">{desc.strength}</small>
+                      </div>
                     )}
                   </li>
                 ))}

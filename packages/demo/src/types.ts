@@ -6,7 +6,8 @@ export interface NodeData {
   cluster: string;
   x: number;
   y: number;
-  entity_types?: string;
+  categories?: string;
+  entity_type?: string;
   entity_definition?: string;
 }
 
@@ -30,5 +31,5 @@ export interface Dataset {
 
 export interface FiltersState {
   clusters: Record<string, boolean>;
-  tags: Record<string, boolean>;
+  entityTypes: Record<string, boolean>;
 }

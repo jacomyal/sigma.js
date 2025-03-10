@@ -573,3 +573,80 @@ ul > li {
 :root[data-theme="dark"] .sigma-scene {
   background: #121212 !important; /* Ciemny szary, prawie czarny */
 }
+
+/* Stylowanie przycisków odświeżania układu */
+.refresh-layout-buttons {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  z-index: 1;
+  display: flex;
+  gap: 5px;
+}
+
+.refresh-layout-buttons .react-sigma-control button {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.refresh-layout-buttons .react-sigma-control button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+[data-theme="dark"] .refresh-layout-buttons .react-sigma-control button {
+  background-color: rgba(50, 50, 50, 0.8);
+  border-color: #444;
+  color: #fff;
+}
+
+[data-theme="dark"] .refresh-layout-buttons .react-sigma-control button:hover {
+  background-color: rgba(70, 70, 70, 1);
+}
+
+/* Style dla pasków siły definicji i relacji */
+.strength-container {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  gap: 8px;
+}
+
+.strength-label {
+  color: var(--dark-grey);
+  min-width: 120px;
+}
+
+.strength-bar-container {
+  flex-grow: 1;
+  height: 10px;
+  background-color: var(--light-grey);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  background-color: var(--ruby);
+  border-radius: 5px;
+}
+
+.strength-value {
+  min-width: 25px;
+  text-align: right;
+  color: var(--dark-grey);
+}
+
+:root[data-theme="dark"] .strength-bar {
+  background-color: #ffffff;
+}
+
+:root[data-theme="dark"] .strength-bar-container {
+  background-color: #333333;
+}
