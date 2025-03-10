@@ -8,13 +8,12 @@
   ],
   "scripts": {
     "clean": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
-    "build": "preconstruct build && npm run build-bundle --workspace=sigma",
+    "build": "npm run build --workspace=@sigma/demo",
     "prettify": "prettier --write .",
     "lint": "eslint .",
     "test": "npm run test --workspace=@sigma/test",
-    "start": "preconstruct dev && npm run start --workspace=@sigma/storybook",
+    "start": "npm run start --workspace=@sigma/demo",
     "createPackage": "ts-node bin/create-package.ts",
-    "postinstall": "preconstruct dev",
     "postpublish": "preconstruct dev",
     "website:build": "npm run build --workspace=@sigma/website && npm run build --workspace=@sigma/demo && cp -R packages/demo/build packages/website/build/demo && npm run build --workspace=@sigma/storybook && cp -R packages/storybook/storybook-static packages/website/build/storybook",
     "prepublishOnly": "npm run test && npm run build && npm run lint"
