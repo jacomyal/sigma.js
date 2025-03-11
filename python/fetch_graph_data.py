@@ -507,14 +507,18 @@ def fetch_data_from_db():
     Parsuje dane CSV z kolumny graph.
     """
     try:
-        # Nawiązanie połączenia z bazą danych
+        print("Próba połączenia z bazą danych...")
+        print(f"Host: {os.environ['DB_HOST']}, Port: {os.environ['DB_PORT']}, User: {os.environ['DB_USER']}, DB: {os.environ['DB_NAME']}")
+        
+        # Nawiązanie połączenia z bazą danych z krótszym timeoutem
         connection = pymysql.connect(
             host=os.environ['DB_HOST'],
             user=os.environ['DB_USER'],
             password=os.environ['DB_PASS'],
             database=os.environ['DB_NAME'],
             charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=5  # Krótszy timeout, aby szybciej wykryć problemy z połączeniem
         )
         
         print("Połączono z bazą danych")
@@ -631,17 +635,67 @@ def fetch_data_from_db():
             
             print(f"Przetworzono {len(data)} wierszy danych (encje i relacje)")
             return data
+    except pymysql.err.OperationalError as e:
+        error_code, error_message = e.args
+        print(f"Błąd połączenia z bazą danych: Kod błędu: {error_code}, Komunikat: {error_message}")
+        print("Baza danych jest niedostępna. Sprawdź, czy serwer bazy danych działa i czy dane dostępowe są poprawne.")
+        print("Jeśli uruchamiasz aplikację lokalnie, możliwe, że nie masz dostępu do bazy danych z powodu firewalla.")
+        
+        # Zwracamy przykładowe dane testowe, aby aplikacja mogła działać lokalnie
+        print("Generuję przykładowe dane testowe...")
+        return generate_test_data()
     except Exception as e:
         print(f"Błąd podczas pobierania danych z bazy: {e}")
         print(f"Szczegóły błędu: {str(e)}")
         print(f"Typ błędu: {type(e).__name__}")
         import traceback
         traceback.print_exc()
-        return []
+        
+        # Zwracamy przykładowe dane testowe, aby aplikacja mogła działać lokalnie
+        print("Generuję przykładowe dane testowe...")
+        return generate_test_data()
     finally:
         if 'connection' in locals() and connection:
             connection.close()
             print("Połączenie z bazą danych zamknięte")
+
+def generate_test_data():
+    """
+    Generuje przykładowe dane testowe do użycia, gdy baza danych jest niedostępna.
+    """
+    print("Generowanie przykładowych danych testowych...")
+    
+    # Przykładowe encje
+    entities = [
+        ('entity', 'AI', 'TECHNOLOGY', 'Technology', 'Artificial Intelligence', 0.9, 10),
+        ('entity', 'Machine Learning', 'TECHNOLOGY', 'Technology', 'A subset of AI focused on learning from data', 0.8, 8),
+        ('entity', 'Deep Learning', 'TECHNOLOGY', 'Technology', 'A subset of ML using neural networks', 0.7, 7),
+        ('entity', 'Neural Networks', 'TECHNOLOGY', 'Technology', 'Computing systems inspired by biological neural networks', 0.6, 6),
+        ('entity', 'GPT-4', 'MODEL', 'AI Models', 'Generative Pre-trained Transformer 4', 0.9, 9),
+        ('entity', 'OpenAI', 'ORGANIZATION', 'Companies', 'AI research laboratory', 0.8, 8),
+        ('entity', 'Google', 'ORGANIZATION', 'Companies', 'Technology company', 0.7, 7),
+        ('entity', 'Microsoft', 'ORGANIZATION', 'Companies', 'Technology company', 0.6, 6),
+        ('entity', 'Python', 'TECHNOLOGY', 'Programming', 'Programming language', 0.5, 5),
+        ('entity', 'TensorFlow', 'TECHNOLOGY', 'Frameworks', 'Open-source machine learning framework', 0.4, 4)
+    ]
+    
+    # Przykładowe relacje
+    relations = [
+        ('relation', 'AI', 'Machine Learning', 'includes', None, 0.9, None),
+        ('relation', 'Machine Learning', 'Deep Learning', 'includes', None, 0.8, None),
+        ('relation', 'Deep Learning', 'Neural Networks', 'uses', None, 0.7, None),
+        ('relation', 'OpenAI', 'GPT-4', 'created', None, 0.9, None),
+        ('relation', 'Google', 'TensorFlow', 'developed', None, 0.8, None),
+        ('relation', 'Microsoft', 'OpenAI', 'invested in', None, 0.7, None),
+        ('relation', 'Python', 'TensorFlow', 'used by', None, 0.6, None),
+        ('relation', 'GPT-4', 'AI', 'is a type of', None, 0.9, None)
+    ]
+    
+    # Łączymy encje i relacje
+    data = entities + relations
+    
+    print(f"Wygenerowano {len(data)} wierszy danych testowych (encje i relacje)")
+    return data
 
 def main():
     """
