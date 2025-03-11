@@ -491,15 +491,35 @@ def arrange_nodes_by_category(graph_data):
     
     return graph_data
 
-# Zapisz dane grafu do pliku JSON
-def save_graph_data(graph_data, filename="packages/demo/public/ai_news_dataset.json"):
-    # Upewnij się, że ścieżka do pliku istnieje
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(graph_data, f, indent=2, ensure_ascii=False)
-    
-    print(f"Zapisano dane grafu do pliku {filename}")
+def save_graph_data(graph_data, filename):
+    """
+    Zapisuje dane grafu do pliku JSON.
+    """
+    try:
+        # Sprawdzamy, czy ścieżka do pliku jest poprawna
+        if not filename or not filename.strip():
+            filename = 'dataset.json'  # Domyślna nazwa pliku, jeśli nie podano
+            print(f"Nie podano nazwy pliku wyjściowego, używam domyślnej: {filename}")
+        
+        # Upewniamy się, że katalog istnieje
+        directory = os.path.dirname(filename)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+        
+        # Zapisujemy dane do pliku
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(graph_data, f, ensure_ascii=False, indent=2)
+        
+        print(f"Dane grafu zostały zapisane do pliku: {filename}")
+    except Exception as e:
+        print(f"Błąd podczas zapisywania danych do pliku: {e}")
+        print(f"Próbuję zapisać do pliku w bieżącym katalogu: dataset.json")
+        try:
+            with open('dataset.json', 'w', encoding='utf-8') as f:
+                json.dump(graph_data, f, ensure_ascii=False, indent=2)
+            print("Dane grafu zostały zapisane do pliku: dataset.json")
+        except Exception as e2:
+            print(f"Nie udało się zapisać danych do pliku: {e2}")
 
 def fetch_data_from_db():
     """
@@ -859,31 +879,30 @@ def main():
     Główna funkcja programu.
     """
     # Parsowanie argumentów wiersza poleceń
-    parser = argparse.ArgumentParser(description='Pobierz dane grafu z bazy danych i zapisz je w formacie JSON.')
-    parser.add_argument('--output', dest='output_file', default='packages/demo/public/ai_news_dataset.json',
-                      help='Ścieżka do pliku wyjściowego JSON (domyślnie: packages/demo/public/ai_news_dataset.json)')
+    parser = argparse.ArgumentParser(description='Pobierz dane grafu z bazy danych i zapisz do pliku JSON.')
+    parser.add_argument('--output', dest='output_file', default='dataset.json',
+                        help='Ścieżka do pliku wyjściowego (domyślnie: dataset.json)')
     args = parser.parse_args()
     
-    output_file = args.output_file
-    
-    # Pobieranie danych z bazy
+    # Pobierz dane z bazy
     data = fetch_data_from_db()
     
-    if data:
-        # Przetwarzanie danych
-        graph_data = process_data(data)
-        
-        # Konwersja do formatu Sigma.js
-        sigma_data = convert_to_sigma_format(graph_data)
-        
-        # Układanie węzłów według kategorii
-        arranged_data = arrange_nodes_by_category(sigma_data)
-        
-        # Zapisanie wynikowego grafu
-        save_graph_data(arranged_data, output_file)
-        print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
-    else:
+    if not data:
         print("Nie udało się pobrać danych z bazy.")
+        return
+    
+    # Przetwórz dane
+    graph_data = process_data(data)
+    
+    # Konwertuj do formatu Sigma.js
+    sigma_data = convert_to_sigma_format(graph_data)
+    
+    # Rozmieść węzły według kategorii
+    arranged_data = arrange_nodes_by_category(sigma_data)
+    
+    # Zapisz dane do pliku
+    save_graph_data(arranged_data, args.output_file)
+    print("Gotowe! Teraz możesz zmodyfikować aplikację Sigma.js, aby wyświetlała nowe dane.")
 
 # Główna funkcja
 if __name__ == "__main__":
