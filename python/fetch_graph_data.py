@@ -507,14 +507,18 @@ def fetch_data_from_db():
     Parsuje dane CSV z kolumny graph.
     """
     try:
-        # Nawiązanie połączenia z bazą danych
+        print("Próba połączenia z bazą danych...")
+        print(f"Host: {os.environ['DB_HOST']}, Port: {os.environ['DB_PORT']}, User: {os.environ['DB_USER']}, DB: {os.environ['DB_NAME']}")
+        
+        # Nawiązanie połączenia z bazą danych z krótszym timeoutem
         connection = pymysql.connect(
             host=os.environ['DB_HOST'],
             user=os.environ['DB_USER'],
             password=os.environ['DB_PASS'],
             database=os.environ['DB_NAME'],
             charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10  # Dłuższy timeout, aby dać więcej czasu na połączenie
         )
         
         print("Połączono z bazą danych")
@@ -531,9 +535,7 @@ def fetch_data_from_db():
             
             if not results or len(results) == 0:
                 print("Brak danych w tabeli ai_news_graph")
-                return generate_test_data()
-            
-            print(f"Pobrano {len(results)} rekordów z tabeli ai_news_graph")
+                return []
             
             all_data = []
             
@@ -542,130 +544,261 @@ def fetch_data_from_db():
                     print(f"Brak danych CSV dla id={result['id']}")
                     continue
                 
-                print(f"Przetwarzanie danych dla id={result['id']}")
+                print(f"Pobrano dane z tabeli ai_news_graph dla id={result['id']}")
+                print(f"URL: {result['url']}")
+                print(f"Długość danych CSV: {len(result['graph'])} znaków")
                 
                 # Parsowanie danych CSV z kolumny graph
                 csv_data = clean_csv_data(result['graph'])
                 
                 # Używamy StringIO do parsowania CSV jako strumienia
                 csv_io = StringIO(csv_data)
-                csv_reader = csv.reader(csv_io)
                 
-                # Pomijamy nagłówek
-                headers = next(csv_reader, None)
-                if not headers:
-                    print(f"Brak nagłówków w danych CSV dla id={result['id']}")
-                    continue
-                
-                # Mapowanie indeksów kolumn
+                # Próbujemy odczytać dane CSV
                 try:
-                    # Sprawdzamy, czy mamy 'type' czy 'entity_name' w nagłówkach
-                    if 'type' in headers:
-                        type_idx = headers.index('type')
-                    else:
-                        print(f"Brak kolumny 'type' w nagłówkach dla id={result['id']}")
+                    # Najpierw sprawdzamy, czy dane są poprawnym CSV
+                    sample_reader = csv.reader(csv_io)
+                    headers = next(sample_reader, None)
+                    
+                    if not headers:
+                        print("Brak nagłówków w danych CSV")
                         continue
                     
-                    # Sprawdzamy, czy mamy 'entity' czy 'entity_name' w nagłówkach
-                    if 'entity' in headers:
-                        entity_name_idx = headers.index('entity')
-                    elif 'entity_name' in headers:
-                        entity_name_idx = headers.index('entity_name')
-                    else:
-                        print(f"Brak kolumny 'entity' lub 'entity_name' w nagłówkach dla id={result['id']}")
+                    print(f"Znaleziono nagłówki: {headers}")
+                    
+                    # Resetujemy pozycję w StringIO
+                    csv_io.seek(0)
+                    
+                    # Odczytujemy wszystkie wiersze
+                    all_rows = list(csv.reader(csv_io))
+                    print(f"Odczytano {len(all_rows)} wierszy CSV (włącznie z nagłówkiem)")
+                    
+                    if len(all_rows) <= 1:
+                        print("Brak danych w CSV (tylko nagłówek)")
                         continue
                     
-                    # Pozostałe kolumny
-                    entity_type_idx = headers.index('entity_type') if 'entity_type' in headers else -1
-                    entity_category_idx = headers.index('category') if 'category' in headers else -1
-                    entity_definition_idx = headers.index('definition') if 'definition' in headers else -1
-                    entity_strength_idx = headers.index('strength') if 'strength' in headers else -1
-                    entity_occurrence_idx = headers.index('occurrence') if 'occurrence' in headers else -1
+                    # Resetujemy pozycję w StringIO
+                    csv_io.seek(0)
                     
-                    # Kolumny dla relacji
-                    source_idx = headers.index('source') if 'source' in headers else -1
-                    target_idx = headers.index('target') if 'target' in headers else -1
-                    relation_idx = headers.index('relation') if 'relation' in headers else -1
+                    # Odczytujemy CSV ponownie
+                    csv_reader = csv.reader(csv_io)
+                    headers = next(csv_reader, None)
                     
-                except ValueError as e:
-                    print(f"Błąd podczas mapowania kolumn dla id={result['id']}: {e}")
-                    print(f"Dostępne nagłówki: {headers}")
+                    # Mapowanie indeksów kolumn
+                    try:
+                        # Sprawdzamy, czy mamy kolumnę 'type'
+                        if 'type' in headers:
+                            type_idx = headers.index('type')
+                        else:
+                            print(f"Brak kolumny 'type' w nagłówkach: {headers}")
+                            continue
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_name' lub 'entity'
+                        if 'entity_name' in headers:
+                            entity_name_idx = headers.index('entity_name')
+                        elif 'entity' in headers:
+                            entity_name_idx = headers.index('entity')
+                        else:
+                            print(f"Brak kolumny 'entity_name' lub 'entity' w nagłówkach: {headers}")
+                            continue
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_type' lub 'entity_types'
+                        if 'entity_type' in headers:
+                            entity_type_idx = headers.index('entity_type')
+                        elif 'entity_types' in headers:
+                            entity_type_idx = headers.index('entity_types')
+                        else:
+                            print(f"Brak kolumny 'entity_type' lub 'entity_types' w nagłówkach: {headers}")
+                            continue
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_category' lub 'category'
+                        if 'entity_category' in headers:
+                            entity_category_idx = headers.index('entity_category')
+                        elif 'category' in headers:
+                            entity_category_idx = headers.index('category')
+                        else:
+                            # Jeśli nie ma kolumny z kategorią, używamy pustej wartości
+                            entity_category_idx = -1
+                            print("Brak kolumny z kategorią, będzie używana pusta wartość")
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_definition' lub 'definition'
+                        if 'entity_definition' in headers:
+                            entity_definition_idx = headers.index('entity_definition')
+                        elif 'definition' in headers:
+                            entity_definition_idx = headers.index('definition')
+                        else:
+                            # Jeśli nie ma kolumny z definicją, używamy pustej wartości
+                            entity_definition_idx = -1
+                            print("Brak kolumny z definicją, będzie używana pusta wartość")
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_strength' lub 'strength'
+                        if 'entity_strength' in headers:
+                            entity_strength_idx = headers.index('entity_strength')
+                        elif 'strength' in headers:
+                            entity_strength_idx = headers.index('strength')
+                        elif 'relationship_strength' in headers:
+                            entity_strength_idx = headers.index('relationship_strength')
+                        else:
+                            # Jeśli nie ma kolumny z siłą, używamy pustej wartości
+                            entity_strength_idx = -1
+                            print("Brak kolumny z siłą, będzie używana pusta wartość")
+                        
+                        # Sprawdzamy, czy mamy kolumnę 'entity_occurrence' lub 'occurrence'
+                        if 'entity_occurrence' in headers:
+                            entity_occurrence_idx = headers.index('entity_occurrence')
+                        elif 'occurrence' in headers:
+                            entity_occurrence_idx = headers.index('occurrence')
+                        else:
+                            # Jeśli nie ma kolumny z wystąpieniami, używamy pustej wartości
+                            entity_occurrence_idx = -1
+                            print("Brak kolumny z wystąpieniami, będzie używana pusta wartość")
+                        
+                        # Sprawdzamy, czy mamy kolumny dla relacji
+                        if 'source_entity' in headers:
+                            source_idx = headers.index('source_entity')
+                        elif 'source' in headers:
+                            source_idx = headers.index('source')
+                        else:
+                            source_idx = -1
+                            print("Brak kolumny ze źródłem relacji")
+                        
+                        if 'target_entity' in headers:
+                            target_idx = headers.index('target_entity')
+                        elif 'target' in headers:
+                            target_idx = headers.index('target')
+                        else:
+                            target_idx = -1
+                            print("Brak kolumny z celem relacji")
+                        
+                        if 'relationship_description' in headers:
+                            relation_idx = headers.index('relationship_description')
+                        elif 'relation' in headers:
+                            relation_idx = headers.index('relation')
+                        else:
+                            relation_idx = -1
+                            print("Brak kolumny z opisem relacji")
+                        
+                    except ValueError as e:
+                        print(f"Błąd podczas mapowania kolumn: {e}")
+                        print(f"Dostępne nagłówki: {headers}")
+                        continue
+                    
+                    # Konwertujemy dane do listy krotek
+                    for row in csv_reader:
+                        if not row or len(row) < 2:  # Pomijamy puste wiersze lub wiersze z za małą liczbą kolumn
+                            continue
+                        
+                        row_type = row[type_idx].lower() if type_idx >= 0 and type_idx < len(row) else ""
+                        
+                        if row_type == 'ent' or row_type == 'entity':
+                            # Przetwarzanie encji
+                            entity_name = row[entity_name_idx] if entity_name_idx >= 0 and entity_name_idx < len(row) else ""
+                            
+                            # Pomijamy wiersze bez nazwy encji
+                            if not entity_name:
+                                continue
+                            
+                            # Pobieramy typ encji
+                            entity_type = ""
+                            if entity_type_idx >= 0 and entity_type_idx < len(row):
+                                entity_type = row[entity_type_idx]
+                                # Jeśli typ encji jest listą (np. "AI, Technology"), bierzemy pierwszy element
+                                if entity_type and ',' in entity_type:
+                                    entity_type = entity_type.split(',')[0].strip()
+                            
+                            # Pobieramy kategorię encji
+                            entity_category = ""
+                            if entity_category_idx >= 0 and entity_category_idx < len(row):
+                                entity_category = row[entity_category_idx]
+                            
+                            # Pobieramy definicję encji
+                            entity_definition = ""
+                            if entity_definition_idx >= 0 and entity_definition_idx < len(row):
+                                entity_definition = row[entity_definition_idx]
+                            
+                            # Pobieramy siłę encji
+                            entity_strength = None
+                            if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
+                                try:
+                                    entity_strength = float(row[entity_strength_idx])
+                                except ValueError:
+                                    pass
+                            
+                            # Pobieramy liczbę wystąpień encji
+                            entity_occurrence = None
+                            if entity_occurrence_idx >= 0 and entity_occurrence_idx < len(row) and row[entity_occurrence_idx]:
+                                try:
+                                    entity_occurrence = int(row[entity_occurrence_idx])
+                                except ValueError:
+                                    pass
+                            
+                            all_data.append((
+                                'entity',
+                                entity_name,
+                                entity_type,
+                                entity_category,
+                                entity_definition,
+                                entity_strength,
+                                entity_occurrence
+                            ))
+                        elif row_type == 'rel' or row_type == 'relation':
+                            # Przetwarzanie relacji
+                            source = row[source_idx] if source_idx >= 0 and source_idx < len(row) else ""
+                            target = row[target_idx] if target_idx >= 0 and target_idx < len(row) else ""
+                            relation = row[relation_idx] if relation_idx >= 0 and relation_idx < len(row) else ""
+                            
+                            # Pomijamy relacje bez źródła lub celu
+                            if not source or not target:
+                                continue
+                            
+                            # Pobieramy siłę relacji
+                            relation_strength = None
+                            if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
+                                try:
+                                    relation_strength = float(row[entity_strength_idx])
+                                except ValueError:
+                                    pass
+                            
+                            all_data.append((
+                                'relation',
+                                source,
+                                target,
+                                relation,
+                                None,  # definition
+                                relation_strength,
+                                None   # occurrence
+                            ))
+                    
+                    print(f"Przetworzono {len(all_data)} wierszy danych (encje i relacje) dla id={result['id']}")
+                    
+                except Exception as e:
+                    print(f"Błąd podczas parsowania CSV dla id={result['id']}: {e}")
+                    print(f"Typ błędu: {type(e).__name__}")
+                    import traceback
+                    traceback.print_exc()
                     continue
-                
-                # Konwertujemy dane do listy krotek
-                for row in csv_reader:
-                    if not row or len(row) < 2:
-                        continue
-                    
-                    row_type = row[type_idx] if type_idx >= 0 and type_idx < len(row) else ""
-                    
-                    if row_type.lower() == 'entity':
-                        # Przetwarzanie encji
-                        entity_name = row[entity_name_idx] if entity_name_idx >= 0 and entity_name_idx < len(row) else ""
-                        entity_type = row[entity_type_idx] if entity_type_idx >= 0 and entity_type_idx < len(row) else ""
-                        entity_category = row[entity_category_idx] if entity_category_idx >= 0 and entity_category_idx < len(row) else ""
-                        entity_definition = row[entity_definition_idx] if entity_definition_idx >= 0 and entity_definition_idx < len(row) else ""
-                        
-                        # Wartości liczbowe
-                        entity_strength = None
-                        if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
-                            try:
-                                entity_strength = float(row[entity_strength_idx])
-                            except ValueError:
-                                pass
-                        
-                        entity_occurrence = None
-                        if entity_occurrence_idx >= 0 and entity_occurrence_idx < len(row) and row[entity_occurrence_idx]:
-                            try:
-                                entity_occurrence = int(row[entity_occurrence_idx])
-                            except ValueError:
-                                pass
-                        
-                        all_data.append((
-                            'entity',
-                            entity_name,
-                            entity_type,
-                            entity_category,
-                            entity_definition,
-                            entity_strength,
-                            entity_occurrence
-                        ))
-                    elif row_type.lower() == 'relation':
-                        # Przetwarzanie relacji
-                        source = row[source_idx] if source_idx >= 0 and source_idx < len(row) else ""
-                        target = row[target_idx] if target_idx >= 0 and target_idx < len(row) else ""
-                        relation = row[relation_idx] if relation_idx >= 0 and relation_idx < len(row) else ""
-                        
-                        # Wartość liczbowa dla siły relacji
-                        relation_strength = None
-                        if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
-                            try:
-                                relation_strength = float(row[entity_strength_idx])
-                            except ValueError:
-                                pass
-                        
-                        all_data.append((
-                            'relation',
-                            source,
-                            target,
-                            relation,
-                            None,  # definition
-                            relation_strength,
-                            None   # occurrence
-                        ))
             
             print(f"Łącznie przetworzono {len(all_data)} wierszy danych (encje i relacje)")
             
-            # Jeśli nie znaleziono żadnych danych, generujemy testowe dane
-            if len(all_data) == 0:
-                print("Nie znaleziono żadnych poprawnych danych, generuję testowe dane...")
-                return generate_test_data()
-                
+            # Jeśli nie mamy żadnych danych, zwracamy pustą listę
+            if not all_data:
+                print("Brak danych po przetworzeniu CSV.")
+                return []
+            
             return all_data
+    except pymysql.err.OperationalError as e:
+        error_code, error_message = e.args
+        print(f"Błąd połączenia z bazą danych: Kod błędu: {error_code}, Komunikat: {error_message}")
+        print("Baza danych jest niedostępna. Sprawdź, czy serwer bazy danych działa i czy dane dostępowe są poprawne.")
+        print("Jeśli uruchamiasz aplikację lokalnie, możliwe, że nie masz dostępu do bazy danych z powodu firewalla.")
+        return []
     except Exception as e:
         print(f"Błąd podczas pobierania danych z bazy: {e}")
-        print("Generuję testowe dane...")
-        return generate_test_data()
+        print(f"Szczegóły błędu: {str(e)}")
+        print(f"Typ błędu: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        return []
     finally:
         if 'connection' in locals() and connection:
             connection.close()
