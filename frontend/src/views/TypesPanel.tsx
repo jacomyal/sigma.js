@@ -60,7 +60,7 @@ const TypesPanel: FC<{
         
         types.push({
           key: entityType,
-          image: matchingTag ? matchingTag.image : "unknown.svg"
+          color: matchingTag ? matchingTag.color : "#bab0ab" // Domyślny kolor dla nieznanych typów
         });
       }
     });
@@ -127,7 +127,7 @@ const TypesPanel: FC<{
                 id={`type-${type.key}`}
               />
               <label htmlFor={`type-${type.key}`}>
-                <span className="circle" style={{ backgroundImage: `url(./images/${type.image})` }} />{" "}
+                <span className="circle" style={{ backgroundColor: type.color }} />{" "}
                 <div className="node-label">
                   <span>{type.key} ({nodesCount} entities)</span>
                   <div className="bar" style={{ width: (100 * nodesCount) / maxNodesPerType + "%" }}>

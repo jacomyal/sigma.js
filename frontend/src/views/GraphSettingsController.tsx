@@ -33,7 +33,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             graph.hasEdge(node, debouncedHoveredNode) ||
             graph.hasEdge(debouncedHoveredNode, node)
             ? { ...data, zIndex: 1 }
-            : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false };
+            : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, highlighted: false };
         }
         return data;
       },
@@ -63,7 +63,7 @@ const GraphSettingsController: FC<PropsWithChildren<{ hoveredNode: string | null
             graph.hasEdge(node, debouncedHoveredNode) ||
             graph.hasEdge(debouncedHoveredNode, node)
               ? { ...data, zIndex: 1 }
-              : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, image: null, highlighted: false }
+              : { ...data, zIndex: 0, label: "", color: NODE_FADE_COLOR, highlighted: false }
         : null,
     );
     sigma.setSetting(

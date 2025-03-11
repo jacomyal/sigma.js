@@ -19,7 +19,7 @@ export interface Cluster {
 
 export interface Tag {
   key: string;
-  image: string;
+  color: string;
 }
 
 export interface Dataset {

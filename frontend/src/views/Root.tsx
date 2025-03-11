@@ -278,7 +278,6 @@ const Root: FC = () => {
             clusterLabel: mainCategory,
             // Zapisujemy wszystkie kategorie węzła do późniejszego filtrowania
             allCategories: nodeCategories,
-            image: `./images/${tags[node.tag].image}`,
           });
         });
         

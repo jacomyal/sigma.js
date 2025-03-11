@@ -289,7 +289,6 @@ def process_data(data):
         color = entity_type_colors.get(entity_type, entity_type_colors.get("Unknown", "#cccccc"))
         graph["tags"].append({
             "key": entity_type,
-            "image": "default.svg",
             "color": color  # Kolor tagu
         })
     
