@@ -1,0 +1,16 @@
+entity_name,entity_type,entity_category,entity_definition,entity_strength
+AI,Technology,Technology,Sztuczna Inteligencja,100
+ML,Technology,Technology,Uczenie Maszynowe,90
+DL,Technology,Technology,Głębokie Uczenie,80
+NLP,Technology,Technology,Przetwarzanie Języka Naturalnego,85
+CV,Technology,Technology,Widzenie Komputerowe,82
+RL,Technology,Technology,Uczenie ze Wzmocnieniem,75
+GPT,Model,Model,Generative Pre-trained Transformer,95
+BERT,Model,Model,Bidirectional Encoder Representations from Transformers,88
+CNN,Model,Model,Convolutional Neural Network,78
+RNN,Model,Model,Recurrent Neural Network,70
+Python,Tool,Tool,Język programowania Python,85
+TensorFlow,Tool,Tool,Biblioteka do uczenia maszynowego,80
+PyTorch,Tool,Tool,Biblioteka do uczenia maszynowego,80
+Transformers,Architecture,Architecture,Architektura modeli językowych,90
+BigData,Concept,Concept,Duże zbiory danych,65 

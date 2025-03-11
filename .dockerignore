@@ -1,9 +1,5 @@
 node_modules
-frontend/dist
-frontend/node_modules
-backend/node_modules
 .git
-.gitignore
 .github
 .vscode
 .DS_Store
@@ -35,6 +31,8 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.gitignore
+.idea
 README.md
 LICENSE
 *.md

@@ -18,17 +18,15 @@ const GraphDataController: FC<PropsWithChildren<{ filters: FiltersState }>> = ({
       const entityType = attributes.entity_type || tag;
       const allCategories = attributes.allCategories || [];
       
-      // Węzeł jest widoczny, jeśli przynajmniej jedna z jego kategorii jest zaznaczona
-      // ORAZ jego typ encji jest zaznaczony
-      let isCategoryVisible = false;
+      // Domyślnie węzeł jest widoczny
+      let isCategoryVisible = true;
       
       if (allCategories.length > 0) {
         // Sprawdzamy, czy którakolwiek z kategorii węzła jest zaznaczona
         isCategoryVisible = allCategories.some(category => clusters[category]);
       } else {
-        // Jeśli węzeł nie ma kategorii, używamy głównego klastra
-        const cluster = attributes.cluster;
-        isCategoryVisible = cluster ? clusters[cluster] : false;
+        // Jeśli węzeł nie ma kategorii, jest widoczny
+        isCategoryVisible = true;
       }
       
       // Sprawdzamy, czy typ encji węzła jest zaznaczony

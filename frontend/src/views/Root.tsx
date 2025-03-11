@@ -147,15 +147,15 @@ const arrangeNodesInCircle = (graph: DirectedGraph) => {
 };
 
 const Root: FC = () => {
-  const graph = useMemo(() => new DirectedGraph(), []);
-  const [showContents, setShowContents] = useState(false);
-  const [dataReady, setDataReady] = useState(false);
   const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [dataReady, setDataReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [graph, setGraph] = useState<DirectedGraph>(new DirectedGraph());
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     entityTypes: {},
   });
+  const [showContents, setShowContents] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   
@@ -192,118 +192,151 @@ const Root: FC = () => {
     localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
 
+  // Funkcja do budowania grafu z danych
+  const buildGraph = (data: Dataset): DirectedGraph => {
+    const newGraph = new DirectedGraph();
+    
+    // Pobieramy tagi do użycia przy tworzeniu węzłów
+    const tags = keyBy(data.tags, "key");
+
+    // Tworzymy mapę kolorów dla typów encji
+    const entityTypeColors: Record<string, string> = {};
+    const colorPalette = [
+      "#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f",
+      "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab",
+      "#6b9ac4", "#d1a14e", "#d37879", "#8cd0cb", "#7bb36d",
+      "#f2dd63", "#c49cc0", "#ffbdc6", "#b8917d", "#d8d0cb"
+    ];
+    
+    // Zbieramy wszystkie unikalne typy encji
+    const entityTypesSet = new Set<string>();
+    const entityTypesRecord: Record<string, boolean> = {};
+    
+    data.nodes.forEach((node) => {
+      const entityType = node.entity_type || node.tag;
+      if (entityType) {
+        entityTypesSet.add(entityType);
+        entityTypesRecord[entityType] = true;
+      }
+    });
+    
+    // Przypisujemy kolory do typów encji
+    Array.from(entityTypesSet).forEach((entityType, index) => {
+      entityTypeColors[entityType] = colorPalette[index % colorPalette.length];
+      // Upewniamy się, że typ encji jest zaznaczony w filtrach
+      entityTypesRecord[entityType] = true;
+    });
+
+    data.nodes.forEach((node) => {
+      // Dla każdego węzła, przypisujemy mu wszystkie jego kategorie jako atrybuty
+      const nodeCategories = node.categories ? node.categories.split(',').map(cat => cat.trim()) : [];
+      const mainCategory = nodeCategories.length > 0 ? nodeCategories[0] : "Unknown";
+      const entityType = node.entity_type || node.tag || "Unknown";
+      
+      newGraph.addNode(node.key, {
+        ...node,
+        // Używamy typu encji do kolorowania węzła
+        color: entityTypeColors[entityType] || "#ccc",
+        // Zachowujemy informację o klastrze dla tooltipa
+        clusterLabel: mainCategory,
+        // Zapisujemy wszystkie kategorie węzła do późniejszego filtrowania
+        allCategories: nodeCategories,
+      });
+    });
+    
+    data.edges.forEach(([source, target]) => newGraph.addEdge(source, target, { size: 1 }));
+
+    // Używamy oryginalnej wielkości węzła z pliku JSON zamiast obliczać ją na podstawie wartości score
+    newGraph.forEachNode((node) => {
+      // Zachowujemy oryginalną wielkość węzła z pliku JSON
+      const originalSize = newGraph.getNodeAttribute(node, "size");
+      if (originalSize) {
+        // Nie zmieniamy wielkości węzła, używamy wartości z pliku JSON
+        console.log(`Węzeł ${node} ma wielkość: ${originalSize}`);
+      } else {
+        // Jeśli wielkość nie jest określona, ustawiamy domyślną wartość
+        newGraph.setNodeAttribute(node, "size", 5);
+      }
+    });
+
+    // Układamy węzły według typów encji
+    arrangeNodesByEntityType(newGraph);
+
+    setFiltersState({
+      clusters: mapValues(keyBy(data.clusters, "key"), constant(true)),
+      entityTypes: entityTypesRecord,
+    });
+    
+    return newGraph;
+  };
+
   // Load data on mount:
   useEffect(() => {
-    // Adres API - w trybie dev korzystamy z lokalnego API, a w produkcji z pliku JSON
-    const apiUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:5001/api/graph-data' 
-      : './ai_news_dataset.json';
+    // Ustawiamy URL do pliku JSON wygenerowanego z danych SQL
+    const apiUrl = './sql_graph.json';
     
     console.log(`Pobieranie danych z: ${apiUrl}`);
     
     fetch(apiUrl)
-      .then((res) => res.json())
-      .then((dataset: Dataset) => {
-        // Przetwarzamy klastry - rozbijamy kategorie po przecinku
-        const processedClusters: Cluster[] = [];
-        const clusterColorMap: Record<string, string> = {};
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setDataset(data);
         
-        // Najpierw zbieramy wszystkie unikalne kategorie i przypisujemy im kolory
-        dataset.clusters.forEach((cluster) => {
-          const categories = cluster.key.split(',').map(cat => cat.trim());
-          categories.forEach((category) => {
-            if (!clusterColorMap[category]) {
-              // Używamy koloru z oryginalnego klastra lub generujemy nowy
-              clusterColorMap[category] = cluster.color;
-            }
-          });
-        });
+        // Sprawdzenie czy dataset istnieje
+        if (!data) {
+          console.error("Dataset jest undefined!");
+          return;
+        }
         
-        // Tworzymy nowe klastry dla każdej unikalnej kategorii
-        Object.keys(clusterColorMap).forEach((category) => {
-          processedClusters.push({
-            key: category,
-            color: clusterColorMap[category],
-            clusterLabel: category
-          });
-        });
+        // Sprawdzenie czy dataset.nodes istnieje
+        if (!data.nodes || !Array.isArray(data.nodes)) {
+          console.error("Dataset.nodes jest undefined lub nie jest tablicą!");
+          return;
+        }
         
-        // Zastępujemy oryginalne klastry przetworzonymi
-        dataset.clusters = processedClusters;
+        // Logowanie długości poszczególnych elementów datasetu
+        console.log("Liczba nodes:", data.nodes.length);
         
-        // Pobieramy tagi do użycia przy tworzeniu węzłów
-        const tags = keyBy(dataset.tags, "key");
-
-        // Tworzymy mapę kolorów dla typów encji
-        const entityTypeColors: Record<string, string> = {};
-        const colorPalette = [
-          "#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f",
-          "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab",
-          "#6b9ac4", "#d1a14e", "#d37879", "#8cd0cb", "#7bb36d",
-          "#f2dd63", "#c49cc0", "#ffbdc6", "#b8917d", "#d8d0cb"
-        ];
+        if (data.edges && Array.isArray(data.edges)) {
+          console.log("Liczba edges:", data.edges.length);
+        } else {
+          console.error("Dataset.edges jest undefined lub nie jest tablicą!");
+        }
         
-        // Zbieramy wszystkie unikalne typy encji
-        const entityTypesSet = new Set<string>();
-        const entityTypesRecord: Record<string, boolean> = {};
+        if (data.clusters && Array.isArray(data.clusters)) {
+          console.log("Liczba clusters:", data.clusters.length);
+        } else {
+          console.error("Dataset.clusters jest undefined lub nie jest tablicą!");
+        }
         
-        dataset.nodes.forEach((node) => {
-          const entityType = node.entity_type || node.tag;
-          if (entityType) {
-            entityTypesSet.add(entityType);
-            entityTypesRecord[entityType] = true;
-          }
-        });
+        if (data.tags && Array.isArray(data.tags)) {
+          console.log("Liczba tags:", data.tags.length);
+        } else {
+          console.error("Dataset.tags jest undefined lub nie jest tablicą!");
+        }
         
-        // Przypisujemy kolory do typów encji
-        Array.from(entityTypesSet).forEach((entityType, index) => {
-          entityTypeColors[entityType] = colorPalette[index % colorPalette.length];
-        });
-
-        dataset.nodes.forEach((node) => {
-          // Dla każdego węzła, przypisujemy mu wszystkie jego kategorie jako atrybuty
-          const nodeCategories = node.categories ? node.categories.split(',').map(cat => cat.trim()) : [];
-          const mainCategory = nodeCategories.length > 0 ? nodeCategories[0] : "Unknown";
-          const entityType = node.entity_type || node.tag || "Unknown";
-          
-          graph.addNode(node.key, {
-            ...node,
-            // Używamy typu encji do kolorowania węzła
-            color: entityTypeColors[entityType] || "#ccc",
-            // Zachowujemy informację o klastrze dla tooltipa
-            clusterLabel: mainCategory,
-            // Zapisujemy wszystkie kategorie węzła do późniejszego filtrowania
-            allCategories: nodeCategories,
-          });
-        });
+        // Logowanie przykładowego node
+        if (data.nodes.length > 0) {
+          console.log("Przykładowy node:", data.nodes[0]);
+        }
         
-        dataset.edges.forEach(([source, target]) => graph.addEdge(source, target, { size: 1 }));
-
-        // Use degrees as node sizes:
-        const scores = graph.nodes().map((node) => graph.getNodeAttribute(node, "score"));
-        const minDegree = Math.min(...scores);
-        const maxDegree = Math.max(...scores);
-        const MIN_NODE_SIZE = 3;
-        const MAX_NODE_SIZE = 30;
-        graph.forEachNode((node) =>
-          graph.setNodeAttribute(
-            node,
-            "size",
-            ((graph.getNodeAttribute(node, "score") - minDegree) / (maxDegree - minDegree)) *
-              (MAX_NODE_SIZE - MIN_NODE_SIZE) +
-              MIN_NODE_SIZE,
-          ),
-        );
-
-        // Układamy węzły według typów encji
-        arrangeNodesByEntityType(graph);
-
-        setFiltersState({
-          clusters: mapValues(keyBy(dataset.clusters, "key"), constant(true)),
-          entityTypes: entityTypesRecord,
-        });
-        setDataset(dataset);
-        requestAnimationFrame(() => setDataReady(true));
+        // Sprawdzenie czy edges jest tablicą
+        if (!data.edges || !Array.isArray(data.edges)) {
+          throw new Error("Dataset.edges nie jest tablicą!");
+        }
+        
+        const newGraph = buildGraph(data);
+        setGraph(newGraph);
+        
+        // Używamy prostszego układu grafu
+        arrangeNodesInCircle(newGraph);
+        
+        setDataReady(true);
       })
       .catch((error) => {
         console.error("Błąd podczas ładowania danych:", error);
@@ -314,7 +347,7 @@ const Root: FC = () => {
   // Funkcja do ponownego układania węzłów
   const rearrangeNodes = useCallback(() => {
     if (graph && dataset) {
-      arrangeNodesByEntityType(graph);
+      arrangeNodesInCircle(graph);
     }
   }, [graph, dataset]);
 

@@ -1,0 +1,26 @@
+source_entity,target_entity,relationship_description,relationship_strength
+AI,ML,jest nadrzędne do,90
+AI,DL,jest nadrzędne do,85
+AI,NLP,jest nadrzędne do,80
+AI,CV,jest nadrzędne do,80
+AI,RL,jest nadrzędne do,75
+ML,DL,wykorzystuje,85
+ML,NLP,wykorzystuje,80
+ML,CV,wykorzystuje,80
+ML,RL,wykorzystuje,75
+DL,NLP,jest stosowane w,80
+DL,CV,jest stosowane w,80
+DL,CNN,wykorzystuje,85
+DL,RNN,wykorzystuje,80
+NLP,GPT,wykorzystuje,90
+NLP,BERT,wykorzystuje,85
+NLP,Transformers,wykorzystuje,90
+CV,CNN,wykorzystuje,85
+RL,RNN,wykorzystuje,75
+Python,TensorFlow,jest używany do,85
+Python,PyTorch,jest używany do,85
+TensorFlow,ML,wspiera,80
+PyTorch,ML,wspiera,80
+GPT,Transformers,bazuje na,95
+BERT,Transformers,bazuje na,90
+BigData,ML,jest analizowane przez,75 

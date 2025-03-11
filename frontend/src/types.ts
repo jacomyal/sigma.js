@@ -6,9 +6,12 @@ export interface NodeData {
   cluster: string;
   x: number;
   y: number;
+  score: number;
   categories?: string;
   entity_type?: string;
   entity_definition?: string;
+  definitions?: Array<{text: string; strength: number}>;
+  relations?: Array<{source: string; target: string; description: string; strength: number; is_reverse?: boolean}>;
 }
 
 export interface Cluster {

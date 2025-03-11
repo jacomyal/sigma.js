@@ -1,9 +1,30 @@
-node_modules
-*.tgz
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Logi i pliki tymczasowe
 *.log
-*.swp
+*.tmp
 .DS_Store
-.idea
-.vscode
+
+# Pliki IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Pliki cache
+.cache/
+.pytest_cache/
 
 *storybook.log
