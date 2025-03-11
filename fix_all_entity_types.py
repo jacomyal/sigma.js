@@ -62,6 +62,7 @@ default_entity_types = {
     "Apple": "Organization",
     "IBM": "Organization",
     "NVIDIA": "Organization",
+    "Nvidia": "Organization",
     "Tesla": "Organization",
     "DeepMind": "Organization",
     "Anthropic": "Organization",

@@ -2602,7 +2602,7 @@
       "y": -993.7922675413571,
       "score": 0.8,
       "categories": "Hardware, Investment",
-      "entity_type": "Unknown",
+      "entity_type": "Organization",
       "definitions": [
         {
           "text": "Company with a market cap that currently exceeds $3 trillion",
