@@ -174,6 +174,27 @@ app.get('/api/refresh-cache', (req, res) => {
   refreshDataFromDB(res);
 });
 
+// Alias dla endpointu refresh-cache (dla kompatybilności)
+app.get('/api/refresh-data', (req, res) => {
+  console.log('Wywołano endpoint /api/refresh-data (alias dla /api/refresh-cache)');
+  // Resetujemy cache
+  graphDataCache = null;
+  lastCacheTime = null;
+  
+  // Usuwamy plik cache, jeśli istnieje
+  if (fs.existsSync(CACHE_FILE_PATH)) {
+    try {
+      fs.unlinkSync(CACHE_FILE_PATH);
+      console.log('Plik cache został usunięty');
+    } catch (err) {
+      console.error('Błąd podczas usuwania pliku cache:', err);
+    }
+  }
+  
+  // Pobieramy świeże dane
+  refreshDataFromDB(res);
+});
+
 // Endpoint do sprawdzania statusu cache
 app.get('/api/cache-status', (req, res) => {
   if (isCacheValid()) {

@@ -633,6 +633,10 @@ def fetch_data_from_db():
             return data
     except Exception as e:
         print(f"Błąd podczas pobierania danych z bazy: {e}")
+        print(f"Szczegóły błędu: {str(e)}")
+        print(f"Typ błędu: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
         return []
     finally:
         if 'connection' in locals() and connection:
