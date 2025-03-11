@@ -3,6 +3,55 @@ import os
 import csv
 from io import StringIO
 
+# Funkcja do automatycznego określania typu encji na podstawie kategorii, definicji lub nazwy
+def guess_entity_type(node):
+    # Słowniki słów kluczowych dla różnych typów encji
+    keywords = {
+        "Organization": ["company", "corporation", "organization", "enterprise", "firm", "business", "startup", "inc", "ltd", "llc", "corp"],
+        "Person": ["researcher", "scientist", "ceo", "founder", "director", "professor", "dr.", "phd"],
+        "Technology": ["technology", "hardware", "software", "platform", "system", "device", "tool", "framework", "library", "api"],
+        "Concept": ["concept", "theory", "principle", "idea", "paradigm", "philosophy", "approach"],
+        "Model": ["model", "algorithm", "neural network", "transformer", "llm", "large language model", "gpt", "bert", "llama"],
+        "Field": ["field", "discipline", "domain", "area", "industry", "sector"],
+        "Method": ["method", "technique", "approach", "procedure", "process", "methodology"],
+        "Location": ["country", "city", "region", "location", "place", "area", "continent"]
+    }
+    
+    # Sprawdzamy kategorie
+    if 'categories' in node and node['categories']:
+        categories = node['categories'].lower()
+        for entity_type, type_keywords in keywords.items():
+            for keyword in type_keywords:
+                if keyword.lower() in categories:
+                    return entity_type
+    
+    # Sprawdzamy definicje
+    if 'definitions' in node and isinstance(node['definitions'], list):
+        for definition in node['definitions']:
+            if 'text' in definition and definition['text']:
+                text = definition['text'].lower()
+                # Sprawdzamy, czy definicja zaczyna się od "Company" lub zawiera inne słowa kluczowe
+                if text.startswith("company") or text.startswith("organization"):
+                    return "Organization"
+                
+                for entity_type, type_keywords in keywords.items():
+                    for keyword in type_keywords:
+                        if keyword.lower() in text:
+                            return entity_type
+    
+    # Sprawdzamy nazwę encji
+    label = node['label'].lower()
+    # Jeśli nazwa kończy się na "AI", "Inc", "Corp", "Ltd" itp., to prawdopodobnie jest to organizacja
+    if label.endswith("ai") or label.endswith("inc") or label.endswith("corp") or label.endswith("ltd"):
+        return "Organization"
+    
+    # Jeśli nazwa zawiera "GPT", "LLM", "Model" itp., to prawdopodobnie jest to model
+    if "gpt" in label or "llm" in label or "model" in label:
+        return "Model"
+    
+    # Domyślnie zwracamy "Unknown"
+    return "Unknown"
+
 # Ścieżka do pliku JSON
 json_file_path = 'packages/demo/public/ai_news_dataset.json'
 
@@ -75,6 +124,8 @@ default_entity_types = {
     "Midjourney": "Tool",
     "DALL-E": "Model",
     "Stable Diffusion": "Model",
+    "DeepSeek": "Organization",
+    "Manus": "Organization",
     "Python": "Language",
     "JavaScript": "Language",
     "TypeScript": "Language",
@@ -360,9 +411,14 @@ for node in data['nodes']:
             if current_type in ["Technology", "Field", "Concept", "Model", "Method", "Location", "Person", "Event", "Organization"]:
                 print(f"Zachowano entity_type dla '{label}': {current_type}")
             else:
-                node['entity_type'] = "Unknown"
-                fixed_nodes += 1
-                print(f"Naprawiono entity_type dla '{label}' (nieznany): {current_type} -> Unknown")
+                # Próbujemy automatycznie określić typ encji na podstawie kategorii, definicji lub nazwy
+                auto_type = guess_entity_type(node)
+                if auto_type != "Unknown":
+                    node['entity_type'] = auto_type
+                    fixed_nodes += 1
+                    print(f"Naprawiono entity_type dla '{label}' (auto): {current_type} -> {auto_type}")
+                else:
+                    print(f"Naprawiono entity_type dla '{label}' (nieznany): {current_type} -> {auto_type}")
 
 print(f"\nNaprawiono {fixed_nodes} węzłów")
 

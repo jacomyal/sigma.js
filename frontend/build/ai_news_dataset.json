@@ -2753,7 +2753,7 @@
       "y": -696.4788372067951,
       "score": 0.6,
       "categories": "Automation, Digital Assistants",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "Autonomous digital assistants that can complete practical tasks",
@@ -3104,7 +3104,7 @@
       "y": 220.95928620261293,
       "score": 0.25,
       "categories": "Agent, Digital Assistant",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "AI 'agent' from OpenAI that can navigate a web browser to perform tasks",
@@ -3171,7 +3171,7 @@
       "y": 314.54698469051255,
       "score": 0.35,
       "categories": "Search Engine",
-      "entity_type": "Unknown",
+      "entity_type": "Organization",
       "definitions": [
         {
           "text": "Company that released 'agentic' features into their AI assistants",
@@ -3528,7 +3528,7 @@
       "y": 69.78525555808005,
       "score": 0.4,
       "categories": "Cybersecurity, Geopolitics, Threat Actors",
-      "entity_type": "Unknown",
+      "entity_type": "Model",
       "definitions": [
         {
           "text": "State that poses a great threat to AI academic research",
@@ -3910,7 +3910,7 @@
       "y": -668.2431593505671,
       "score": 0.35,
       "categories": "Machine Learning, Data Training, Algorithms",
-      "entity_type": "Unknown",
+      "entity_type": "Model",
       "definitions": [
         {
           "text": "AI models trained on copyrighted material",
@@ -4126,7 +4126,7 @@
       "y": 502.6846462050721,
       "score": 1.0,
       "categories": "AI Development, Chatbot, Model Development",
-      "entity_type": "Unknown",
+      "entity_type": "Organization",
       "definitions": [
         {
           "text": "Chinese AI chatbot company",
@@ -4386,7 +4386,7 @@
       "y": -369.449317163556,
       "score": 0.25,
       "categories": "Telecommunications, Technology, AI Solutions",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "Huawei unveils AI-Centric 5.5G solutions",
@@ -4440,7 +4440,7 @@
       "y": 281.67079703683066,
       "score": 0.45,
       "categories": "AI Agent, Autonomous Systems, General AI",
-      "entity_type": "Unknown",
+      "entity_type": "Organization",
       "definitions": [
         {
           "text": "A fully autonomous artificial intelligence agent capable of making decisions and performing tasks on its own without constant supervision",
@@ -4949,7 +4949,7 @@
       "y": -64.59271184391673,
       "score": 0.25,
       "categories": "Algorithm, Data Analysis",
-      "entity_type": "Unknown",
+      "entity_type": "Model",
       "definitions": [
         {
           "text": "Technika wykorzystywana przez systemy sztucznej inteligencji, kt\u00f3re stale ucz\u0105 si\u0119 i doskonal\u0105 na podstawie danych",
@@ -5161,7 +5161,7 @@
       "y": -663.4746813347272,
       "score": 0.25,
       "categories": "Language Model, Natural Language Processing",
-      "entity_type": "Unknown",
+      "entity_type": "Model",
       "definitions": [
         {
           "text": "Large Language Model",
@@ -5200,7 +5200,7 @@
       "y": 339.0778650252437,
       "score": 0.3,
       "categories": "Hardware, Processing, Computation",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "Graphics Processing Units used for training AI models",
@@ -5287,7 +5287,7 @@
       "y": -157.90685531216968,
       "score": 0.25,
       "categories": "Social Media, Technology, Communication",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "Social media platform owned by Meta Platforms",
@@ -5390,7 +5390,7 @@
       "y": 282.5984454583704,
       "score": 0.3,
       "categories": "Research",
-      "entity_type": "Unknown",
+      "entity_type": "Organization",
       "definitions": [
         {
           "text": "AI company exploring AI models",
@@ -5536,7 +5536,7 @@
       "y": -474.1495761199617,
       "score": 0.25,
       "categories": "Investment, Technology",
-      "entity_type": "Unknown",
+      "entity_type": "Technology",
       "definitions": [
         {
           "text": "Company that teamed up with OpenAI and Oracle on multibillion-dollar AI project",
