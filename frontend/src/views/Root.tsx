@@ -1,14 +1,15 @@
 import { FullScreenControl, SigmaContainer, ZoomControl, useSigma } from "@react-sigma/core";
-import { createNodeImageProgram } from "@sigma/node-image";
 import { DirectedGraph } from "graphology";
 import { circular } from "graphology-layout";
 import { constant, keyBy, mapValues, omit } from "lodash";
-import { FC, useEffect, useMemo, useState, useCallback } from "react";
+import { FC, useEffect, useMemo, useState, useCallback, useRef, MouseEvent } from "react";
 import { BiBookContent, BiRadioCircleMarked } from "react-icons/bi";
 import { BsArrowsFullscreen, BsFullscreenExit, BsMoon, BsSun, BsZoomIn, BsZoomOut } from "react-icons/bs";
 import { GrClose } from "react-icons/gr";
 import { MdOutlineRefresh, MdOutlineCircle } from "react-icons/md";
 import { Settings } from "sigma/settings";
+import { Attributes } from "graphology-types";
+import { useRegisterEvents } from "@react-sigma/core";
 
 import { drawHover, drawLabel } from "../canvas-utils";
 import { Dataset, FiltersState, Cluster } from "../types";
@@ -166,14 +167,9 @@ const Root: FC = () => {
   
   const sigmaSettings: Partial<Settings> = useMemo(
     () => ({
-      nodeProgramClasses: {
-        image: createNodeImageProgram({
-          size: { mode: "force", value: 256 },
-        }),
-      },
       defaultDrawNodeLabel: drawLabel,
       defaultDrawNodeHover: drawHover,
-      defaultNodeType: "image",
+      defaultNodeType: "circle",
       defaultEdgeType: "arrow",
       labelDensity: 0.07,
       labelGridCellSize: 60,
