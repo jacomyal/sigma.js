@@ -74,14 +74,8 @@ function loadCacheFromFile() {
 // Próba załadowania cache przy starcie serwera
 loadCacheFromFile();
 
-// Endpoint do pobierania danych z bazy i zwracania w formacie JSON
-app.get('/api/graph-data', (req, res) => {
-  // Sprawdzamy, czy mamy aktualne dane w cache
-  if (isCacheValid()) {
-    console.log('Zwracam dane z cache (ostatnie odświeżenie: ' + new Date(lastCacheTime).toLocaleString() + ')');
-    return res.json(graphDataCache);
-  }
-
+// Funkcja do odświeżania danych z bazy
+function refreshDataFromDB(res) {
   console.log('Cache nieaktualny, pobieranie danych grafu z bazy danych...');
   
   // Tymczasowy plik wynikowy
@@ -95,62 +89,49 @@ app.get('/api/graph-data', (req, res) => {
     }
     
     if (stderr) {
-      console.error(`Błędy ze skryptu: ${stderr}`);
+      console.error(`Błędy standardowe: ${stderr}`);
     }
     
-    console.log(`Wynik skryptu: ${stdout}`);
+    console.log(`Wyjście skryptu: ${stdout}`);
     
-    // Sprawdzenie, czy plik został utworzony
-    if (fs.existsSync(tempOutputFile)) {
-      try {
-        // Odczytaj wynikowy plik JSON
-        const graphData = JSON.parse(fs.readFileSync(tempOutputFile, 'utf8'));
-        
-        // Usuń tymczasowy plik
-        fs.unlinkSync(tempOutputFile);
-        
-        // Aktualizacja cache
-        graphDataCache = graphData;
-        lastCacheTime = Date.now();
-        console.log('Cache zaktualizowany o: ' + new Date(lastCacheTime).toLocaleString());
-        
-        // Zapisz cache do pliku
-        saveCacheToFile();
-        
-        // Zwróć dane jako odpowiedź JSON
-        return res.json(graphData);
-      } catch (err) {
-        console.error(`Błąd przetwarzania pliku JSON: ${err.message}`);
-        return res.status(500).json({ error: 'Błąd przetwarzania danych grafu' });
-      }
-    } else {
-      // Sprawdź, czy plik wynikowy jest w innej lokalizacji (zgodnie z logiką skryptu)
-      const defaultOutputFile = path.join(__dirname, '..', 'frontend', 'public', 'ai_news_dataset.json');
+    try {
+      // Odczytujemy dane z pliku tymczasowego
+      const graphData = JSON.parse(fs.readFileSync(tempOutputFile, 'utf8'));
       
-      if (fs.existsSync(defaultOutputFile)) {
-        try {
-          // Odczytaj wynikowy plik JSON
-          const graphData = JSON.parse(fs.readFileSync(defaultOutputFile, 'utf8'));
-          
-          // Aktualizacja cache
-          graphDataCache = graphData;
-          lastCacheTime = Date.now();
-          console.log('Cache zaktualizowany o: ' + new Date(lastCacheTime).toLocaleString());
-          
-          // Zapisz cache do pliku
-          saveCacheToFile();
-          
-          // Zwróć dane jako odpowiedź JSON
-          return res.json(graphData);
-        } catch (err) {
-          console.error(`Błąd przetwarzania pliku JSON: ${err.message}`);
-          return res.status(500).json({ error: 'Błąd przetwarzania danych grafu' });
-        }
-      } else {
-        return res.status(500).json({ error: 'Skrypt nie wygenerował pliku wynikowego' });
-      }
+      // Aktualizujemy cache
+      graphDataCache = graphData;
+      lastCacheTime = Date.now();
+      
+      // Zapisujemy cache do pliku
+      saveCacheToFile();
+      
+      // Usuwamy plik tymczasowy
+      fs.unlinkSync(tempOutputFile);
+      
+      return res.json({
+        success: true,
+        message: 'Dane zostały odświeżone',
+        data: graphData,
+        nodesCount: graphData.nodes.length,
+        edgesCount: graphData.edges.length
+      });
+    } catch (err) {
+      console.error('Błąd podczas przetwarzania danych:', err);
+      return res.status(500).json({ error: 'Nie udało się przetworzyć danych' });
     }
   });
+}
+
+// Endpoint do pobierania danych z bazy i zwracania w formacie JSON
+app.get('/api/graph-data', (req, res) => {
+  // Sprawdzamy, czy mamy aktualne dane w cache
+  if (isCacheValid()) {
+    console.log('Zwracam dane z cache (ostatnie odświeżenie: ' + new Date(lastCacheTime).toLocaleString() + ')');
+    return res.json(graphDataCache);
+  }
+
+  // Jeśli cache jest nieaktualny, pobieramy świeże dane
+  refreshDataFromDB(res);
 });
 
 // Endpoint do ręcznego odświeżania cache
@@ -169,8 +150,28 @@ app.post('/api/refresh-cache', (req, res) => {
     }
   }
   
-  console.log('Cache został zresetowany. Następne żądanie pobierze świeże dane.');
-  return res.json({ success: true, message: 'Cache został zresetowany' });
+  // Pobieramy świeże dane
+  refreshDataFromDB(res);
+});
+
+// Endpoint GET do ręcznego odświeżania cache (preferowana metoda)
+app.get('/api/refresh-cache', (req, res) => {
+  // Resetujemy cache
+  graphDataCache = null;
+  lastCacheTime = null;
+  
+  // Usuwamy plik cache, jeśli istnieje
+  if (fs.existsSync(CACHE_FILE_PATH)) {
+    try {
+      fs.unlinkSync(CACHE_FILE_PATH);
+      console.log('Plik cache został usunięty');
+    } catch (err) {
+      console.error('Błąd podczas usuwania pliku cache:', err);
+    }
+  }
+  
+  // Pobieramy świeże dane
+  refreshDataFromDB(res);
 });
 
 // Endpoint do sprawdzania statusu cache
