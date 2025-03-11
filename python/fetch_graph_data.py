@@ -235,15 +235,18 @@ def process_data(data):
     """
     # Definiujemy kolory dla typów encji
     entity_type_colors = {
-        "Concept": "#4e79a7",
-        "Field": "#f28e2c",
-        "Technology": "#e15759",
-        "Organization": "#76b7b2",
-        "Person": "#59a14f",
-        "Model": "#edc949",
-        "Platform": "#af7aa1",
-        "Technique": "#ff9da7",
-        "Tool": "#9c755f",
+        "CONCEPT": "#4e79a7",
+        "FIELD": "#f28e2c",
+        "TECHNOLOGY": "#e15759",
+        "ORGANIZATION": "#76b7b2",
+        "PERSON": "#59a14f",
+        "MODEL": "#edc949",
+        "PLATFORM": "#af7aa1",
+        "TECHNIQUE": "#ff9da7",
+        "TOOL": "#9c755f",
+        "EVENT": "#b07aa6",
+        "LOCATION": "#ffb55a",
+        "PRODUCT": "#8cd17d",
         "Unknown": "#bab0ab"
     }
     
@@ -259,9 +262,23 @@ def process_data(data):
     all_categories = set()
     all_entity_types = set()
     
+    # Słownik do śledzenia już dodanych encji
+    added_entities = {}
+    
+    # Najpierw przetwarzamy encje
     for row in data:
-        categories = row[3]  # entity_category
+        row_type = row[0]  # type
+        
+        if row_type.lower() != 'entity':
+            continue
+            
+        entity_name = row[1]  # entity_name
         entity_type = row[2]  # entity_type
+        categories = row[3]  # entity_category
+        
+        # Pomijamy wiersze bez nazwy encji
+        if not entity_name:
+            continue
         
         # Zbieramy kategorie
         if categories:
@@ -272,6 +289,8 @@ def process_data(data):
         
         # Zbieramy typy encji
         if entity_type:
+            # Konwertujemy na wielkie litery dla spójności
+            entity_type = entity_type.upper()
             all_entity_types.add(entity_type)
         else:
             all_entity_types.add("Unknown")
@@ -293,16 +312,19 @@ def process_data(data):
             "color": color  # Kolor tagu
         })
     
-    # Słownik do śledzenia już dodanych encji
-    added_entities = {}
-    
     # Dodajemy węzły
     for row in data:
-        entity_type_value = row[0]  # type
+        row_type = row[0]  # type
+        
+        if row_type.lower() != 'entity':
+            continue
+            
         entity_name = row[1]  # entity_name
         entity_type = row[2]  # entity_type
         categories = row[3]   # entity_category
         definition = row[4]   # entity_definition
+        entity_strength = row[5]  # entity_strength
+        entity_occurrence = row[6]  # entity_occurrence
         
         # Pomijamy wiersze bez nazwy encji
         if not entity_name:
@@ -313,39 +335,70 @@ def process_data(data):
             # Używamy typu encji do kolorowania
             if not entity_type:
                 entity_type = "Unknown"
+            else:
+                # Konwertujemy na wielkie litery dla spójności
+                entity_type = entity_type.upper()
             
             # Wybieramy kolor na podstawie typu encji
             color = entity_type_colors.get(entity_type, entity_type_colors.get("Unknown", "#cccccc"))
+            
+            # Obliczamy rozmiar węzła na podstawie siły i wystąpień
+            size = 5  # Domyślny rozmiar
+            if entity_strength is not None:
+                size = max(3, min(15, 3 + entity_strength * 10))  # Skalujemy od 3 do 15
+            elif entity_occurrence is not None:
+                size = max(3, min(15, 3 + entity_occurrence))  # Skalujemy od 3 do 15
             
             # Tworzymy węzeł
             node = {
                 "key": entity_name,
                 "label": entity_name,
-                "tag": entity_type_value,
+                "tag": entity_type,
                 "entity_type": entity_type,
                 "categories": categories,
                 "color": color,  # Kolor na podstawie typu encji
                 "definition": definition,
                 "x": random.random(),
                 "y": random.random(),
-                "size": 10,
-                "score": 1
+                "size": size,
+                "score": entity_strength if entity_strength is not None else 1
             }
             
             graph["nodes"].append(node)
             added_entities[entity_name] = len(graph["nodes"]) - 1
     
-    # Dodajemy unikalne tagi (typy encji)
-    unique_tags = set()
-    for node in graph["nodes"]:
-        unique_tags.add(node["tag"])
-    
-    for tag in unique_tags:
-        if not any(t["key"] == tag for t in graph["tags"]):
-            graph["tags"].append({
-                "key": tag,
-                "image": "default.svg"
-            })
+    # Teraz dodajemy krawędzie (relacje)
+    for row in data:
+        row_type = row[0]  # type
+        
+        if row_type.lower() != 'relation':
+            continue
+            
+        source = row[1]  # source
+        target = row[2]  # target
+        relation = row[3]  # relation
+        relation_strength = row[5]  # relation_strength
+        
+        # Pomijamy relacje bez źródła lub celu
+        if not source or not target:
+            continue
+        
+        # Sprawdzamy, czy źródło i cel istnieją w grafie
+        if source in added_entities and target in added_entities:
+            # Obliczamy rozmiar krawędzi na podstawie siły relacji
+            size = 1  # Domyślny rozmiar
+            if relation_strength is not None:
+                size = max(0.5, min(5, relation_strength * 5))  # Skalujemy od 0.5 do 5
+            
+            # Tworzymy krawędź
+            edge = {
+                "source": source,
+                "target": target,
+                "label": relation,
+                "size": size
+            }
+            
+            graph["edges"].append(edge)
     
     return graph
 
@@ -384,6 +437,11 @@ def convert_to_sigma_format(graph_data):
             "target": edge["target"],
             "size": edge["size"]
         }
+        
+        # Dodajemy etykietę krawędzi, jeśli istnieje
+        if "label" in edge and edge["label"]:
+            sigma_edge["label"] = edge["label"]
+        
         sigma_data["edges"].append(sigma_edge)
     
     return sigma_data
@@ -445,7 +503,8 @@ def save_graph_data(graph_data, filename="packages/demo/public/ai_news_dataset.j
 
 def fetch_data_from_db():
     """
-    Pobiera dane z bazy danych MySQL.
+    Pobiera dane z bazy danych MySQL, z tabeli ai_news_graph.
+    Parsuje dane CSV z kolumny graph.
     """
     try:
         # Nawiązanie połączenia z bazą danych
@@ -461,36 +520,116 @@ def fetch_data_from_db():
         print("Połączono z bazą danych")
         
         with connection.cursor() as cursor:
-            # Pobieramy dane encji
+            # Pobieramy dane z tabeli ai_news_graph
             sql = """
-            SELECT 
-                type, 
-                entity_name, 
-                entity_type, 
-                entity_category, 
-                entity_definition, 
-                entity_strength, 
-                entity_occurrence
-            FROM entities
+            SELECT id, url, graph
+            FROM ai_news_graph
+            ORDER BY id DESC
+            LIMIT 1
             """
             cursor.execute(sql)
-            entities = cursor.fetchall()
+            result = cursor.fetchone()
             
-            print(f"Pobrano {len(entities)} wierszy z tabeli entities")
+            if not result or 'graph' not in result or not result['graph']:
+                print("Brak danych w tabeli ai_news_graph")
+                return []
+            
+            print(f"Pobrano dane z tabeli ai_news_graph dla id={result['id']}")
+            
+            # Parsowanie danych CSV z kolumny graph
+            csv_data = clean_csv_data(result['graph'])
+            
+            # Używamy StringIO do parsowania CSV jako strumienia
+            csv_io = StringIO(csv_data)
+            csv_reader = csv.reader(csv_io)
+            
+            # Pomijamy nagłówek
+            headers = next(csv_reader, None)
+            if not headers:
+                print("Brak nagłówków w danych CSV")
+                return []
+            
+            # Mapowanie indeksów kolumn
+            try:
+                type_idx = headers.index('type')
+                entity_name_idx = headers.index('entity')
+                entity_type_idx = headers.index('entity_type')
+                entity_category_idx = headers.index('category')
+                entity_definition_idx = headers.index('definition') if 'definition' in headers else -1
+                entity_strength_idx = headers.index('strength') if 'strength' in headers else -1
+                entity_occurrence_idx = headers.index('occurrence') if 'occurrence' in headers else -1
+                source_idx = headers.index('source') if 'source' in headers else -1
+                target_idx = headers.index('target') if 'target' in headers else -1
+                relation_idx = headers.index('relation') if 'relation' in headers else -1
+            except ValueError as e:
+                print(f"Błąd podczas mapowania kolumn: {e}")
+                print(f"Dostępne nagłówki: {headers}")
+                return []
             
             # Konwertujemy dane do listy krotek
             data = []
-            for entity in entities:
-                data.append((
-                    entity['type'],
-                    entity['entity_name'],
-                    entity['entity_type'],
-                    entity['entity_category'],
-                    entity['entity_definition'],
-                    entity['entity_strength'] if 'entity_strength' in entity else None,
-                    entity['entity_occurrence'] if 'entity_occurrence' in entity else None
-                ))
+            for row in csv_reader:
+                if not row:
+                    continue
+                
+                row_type = row[type_idx] if type_idx >= 0 and type_idx < len(row) else ""
+                
+                if row_type.lower() == 'entity':
+                    # Przetwarzanie encji
+                    entity_name = row[entity_name_idx] if entity_name_idx >= 0 and entity_name_idx < len(row) else ""
+                    entity_type = row[entity_type_idx] if entity_type_idx >= 0 and entity_type_idx < len(row) else ""
+                    entity_category = row[entity_category_idx] if entity_category_idx >= 0 and entity_category_idx < len(row) else ""
+                    entity_definition = row[entity_definition_idx] if entity_definition_idx >= 0 and entity_definition_idx < len(row) else ""
+                    
+                    # Wartości liczbowe
+                    entity_strength = None
+                    if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
+                        try:
+                            entity_strength = float(row[entity_strength_idx])
+                        except ValueError:
+                            pass
+                    
+                    entity_occurrence = None
+                    if entity_occurrence_idx >= 0 and entity_occurrence_idx < len(row) and row[entity_occurrence_idx]:
+                        try:
+                            entity_occurrence = int(row[entity_occurrence_idx])
+                        except ValueError:
+                            pass
+                    
+                    data.append((
+                        'entity',
+                        entity_name,
+                        entity_type,
+                        entity_category,
+                        entity_definition,
+                        entity_strength,
+                        entity_occurrence
+                    ))
+                elif row_type.lower() == 'relation':
+                    # Przetwarzanie relacji
+                    source = row[source_idx] if source_idx >= 0 and source_idx < len(row) else ""
+                    target = row[target_idx] if target_idx >= 0 and target_idx < len(row) else ""
+                    relation = row[relation_idx] if relation_idx >= 0 and relation_idx < len(row) else ""
+                    
+                    # Wartość liczbowa dla siły relacji
+                    relation_strength = None
+                    if entity_strength_idx >= 0 and entity_strength_idx < len(row) and row[entity_strength_idx]:
+                        try:
+                            relation_strength = float(row[entity_strength_idx])
+                        except ValueError:
+                            pass
+                    
+                    data.append((
+                        'relation',
+                        source,
+                        target,
+                        relation,
+                        None,  # definition
+                        relation_strength,
+                        None   # occurrence
+                    ))
             
+            print(f"Przetworzono {len(data)} wierszy danych (encje i relacje)")
             return data
     except Exception as e:
         print(f"Błąd podczas pobierania danych z bazy: {e}")
