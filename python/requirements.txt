@@ -1,2 +1,4 @@
 mysql-connector-python==8.0.32
-pymysql==1.0.3 
+pymysql==1.0.3
+pandas==2.0.0
+numpy==1.24.3 
