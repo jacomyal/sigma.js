@@ -173,6 +173,123 @@ app.post('/api/refresh-cache', (req, res) => {
   return res.json({ success: true, message: 'Cache został zresetowany' });
 });
 
+// Endpoint do odświeżania danych z bazy - wywoływany przez Cloud Scheduler
+app.post('/api/refresh-data', (req, res) => {
+  console.log('Rozpoczęto odświeżanie danych z bazy danych...');
+  
+  // Tymczasowy plik wynikowy
+  const tempOutputFile = path.join(__dirname, 'temp_dataset.json');
+  
+  // Wywołanie skryptu Python
+  exec(`python3 fetch_graph_data.py --output=${tempOutputFile}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Błąd wykonania skryptu: ${error.message}`);
+      return res.status(500).json({ error: 'Nie udało się pobrać danych z bazy', details: error.message });
+    }
+    
+    if (stderr) {
+      console.error(`Błędy ze skryptu: ${stderr}`);
+    }
+    
+    console.log(`Wynik skryptu: ${stdout}`);
+    
+    // Sprawdzenie, czy plik został utworzony
+    if (fs.existsSync(tempOutputFile)) {
+      try {
+        // Odczytaj wynikowy plik JSON
+        const graphData = JSON.parse(fs.readFileSync(tempOutputFile, 'utf8'));
+        
+        // Usuń tymczasowy plik
+        fs.unlinkSync(tempOutputFile);
+        
+        // Aktualizacja cache
+        graphDataCache = graphData;
+        lastCacheTime = Date.now();
+        console.log('Cache zaktualizowany o: ' + new Date(lastCacheTime).toLocaleString());
+        
+        // Zapisz cache do pliku
+        saveCacheToFile();
+        
+        // Skopiuj plik do katalogów frontend/public i frontend/build
+        const frontendPublicPath = path.join(__dirname, 'frontend/public/ai_news_dataset.json');
+        const frontendBuildPath = path.join(__dirname, 'frontend/build/ai_news_dataset.json');
+        
+        try {
+          fs.writeFileSync(frontendPublicPath, JSON.stringify(graphData), 'utf8');
+          console.log('Dane zapisane do: ' + frontendPublicPath);
+          
+          if (fs.existsSync(path.dirname(frontendBuildPath))) {
+            fs.writeFileSync(frontendBuildPath, JSON.stringify(graphData), 'utf8');
+            console.log('Dane zapisane do: ' + frontendBuildPath);
+          }
+        } catch (copyErr) {
+          console.error('Błąd podczas kopiowania danych do katalogów frontend:', copyErr);
+        }
+        
+        // Zwróć dane jako odpowiedź JSON
+        return res.json({ 
+          success: true, 
+          message: 'Dane zostały pomyślnie odświeżone',
+          timestamp: new Date(lastCacheTime).toLocaleString(),
+          nodesCount: graphData.nodes ? graphData.nodes.length : 0,
+          edgesCount: graphData.edges ? graphData.edges.length : 0
+        });
+      } catch (err) {
+        console.error(`Błąd przetwarzania pliku JSON: ${err.message}`);
+        return res.status(500).json({ error: 'Błąd przetwarzania danych grafu', details: err.message });
+      }
+    } else {
+      // Sprawdź, czy plik wynikowy jest w innej lokalizacji (zgodnie z logiką skryptu)
+      const defaultOutputFile = path.join(__dirname, 'packages/demo/public/ai_news_dataset.json');
+      
+      if (fs.existsSync(defaultOutputFile)) {
+        try {
+          // Odczytaj wynikowy plik JSON
+          const graphData = JSON.parse(fs.readFileSync(defaultOutputFile, 'utf8'));
+          
+          // Aktualizacja cache
+          graphDataCache = graphData;
+          lastCacheTime = Date.now();
+          console.log('Cache zaktualizowany o: ' + new Date(lastCacheTime).toLocaleString());
+          
+          // Zapisz cache do pliku
+          saveCacheToFile();
+          
+          // Skopiuj plik do katalogów frontend/public i frontend/build
+          const frontendPublicPath = path.join(__dirname, 'frontend/public/ai_news_dataset.json');
+          const frontendBuildPath = path.join(__dirname, 'frontend/build/ai_news_dataset.json');
+          
+          try {
+            fs.writeFileSync(frontendPublicPath, JSON.stringify(graphData), 'utf8');
+            console.log('Dane zapisane do: ' + frontendPublicPath);
+            
+            if (fs.existsSync(path.dirname(frontendBuildPath))) {
+              fs.writeFileSync(frontendBuildPath, JSON.stringify(graphData), 'utf8');
+              console.log('Dane zapisane do: ' + frontendBuildPath);
+            }
+          } catch (copyErr) {
+            console.error('Błąd podczas kopiowania danych do katalogów frontend:', copyErr);
+          }
+          
+          // Zwróć dane jako odpowiedź JSON
+          return res.json({ 
+            success: true, 
+            message: 'Dane zostały pomyślnie odświeżone',
+            timestamp: new Date(lastCacheTime).toLocaleString(),
+            nodesCount: graphData.nodes ? graphData.nodes.length : 0,
+            edgesCount: graphData.edges ? graphData.edges.length : 0
+          });
+        } catch (err) {
+          console.error(`Błąd przetwarzania pliku JSON: ${err.message}`);
+          return res.status(500).json({ error: 'Błąd przetwarzania danych grafu', details: err.message });
+        }
+      } else {
+        return res.status(500).json({ error: 'Skrypt nie wygenerował pliku wynikowego' });
+      }
+    }
+  });
+});
+
 // Endpoint do sprawdzania statusu cache
 app.get('/api/cache-status', (req, res) => {
   if (isCacheValid()) {
