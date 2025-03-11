@@ -23,6 +23,7 @@
     "@react-sigma/core": "^5.0.1",
     "@sigma/node-image": ">=3.0.0",
     "graphology": "^0.25.4",
+    "graphology-layout": "^0.6.1",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-types": "^0.24.8",
     "lodash": "^4.17.21",
