@@ -1474,6 +1474,7 @@ export default class Sigma<
     this.edgeProgramIndex = {};
     this.nodesWithForcedLabels = new Set<string>();
     this.nodeZExtent = [Infinity, -Infinity];
+    this.highlightedNodes = new Set();
   }
 
   /**
