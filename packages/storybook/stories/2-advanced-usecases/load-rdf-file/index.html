@@ -1,0 +1,49 @@
+<style>
+  html,
+  body,
+  #storybook-root,
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  #buttons {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    display: flex;
+  }
+  #buttons > button {
+    margin-right: 1em;
+    display: inline-block;
+    text-align: center;
+    background: white;
+    outline: none;
+    border: 1px solid dimgrey;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  #buttons > button img {
+    height: 2em;
+  }
+  #buttons > button > span {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  #buttons > button:last-child {
+    margin-right: 0;
+  }
+</style>
+<div id="sigma-container"></div>
+<div id="buttons">
+  <button id="forceatlas2">
+    <span>
+      <img id="forceatlas2-start-label" src="./BiPlay.svg" />
+      <img id="forceatlas2-stop-label" style="display: none" src="./BiPause.svg" />
+      Force Atlas 2
+    </span>
+  </button>
+</div>

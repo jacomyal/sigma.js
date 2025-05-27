@@ -16,6 +16,7 @@
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-types": "^0.24.8",
     "iwanthue": "^2.0.0",
+    "jsonld": "^8.3.3",
     "papaparse": "^5.5.2",
     "seedrandom": "^3.0.5",
     "uuid": "^11.0.5"
@@ -28,6 +29,7 @@
     "@storybook/manager-api": "8.4.7",
     "@storybook/theming": "8.4.7",
     "@storybook/web-components": "8.4.7",
+    "@types/jsonld": "^1.5.15",
     "storybook": "8.4.7"
   },
   "scripts": {
