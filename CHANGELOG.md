@@ -1,6 +1,19 @@
 # sigma.js - changelog:
 
-## 3.0.0 - _work in progress_
+## 3.0.2
+
+### Bug fixes
+
+- [#1517](https://github.com/jacomyal/sigma.js/issues/1517) - Fixing calling `setGraph` with highlighted nodes (thanks to @AeternusSamurai)
+- Fixing an issue, with sigma not properly cleaning WebGL contexts in its `kill()` method ([commit](https://github.com/jacomyal/sigma.js/commit/c292888d69cf5d9b111194d554df0cb3a86f4a60))
+
+## 3.0.1
+
+### Bug fix
+
+- [#1500](https://github.com/jacomyal/sigma.js/issues/1500) - Fixing lag on stop dragging (thanks @ouzhou for the report and the research)
+
+## 3.0.0
 
 ### Breaking changes
 
