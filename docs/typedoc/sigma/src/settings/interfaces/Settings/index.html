@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-typedoc/sigma/src/settings/interfaces/Settings" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.7.0">
+<title data-rh="true">Interface: Settings\&lt;N, E, G\&gt; | sigma.js</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://www.sigmajs.org/docs/typedoc/sigma/src/settings/interfaces/Settings"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="theme-color" content="#e22653"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Interface: Settings\&lt;N, E, G\&gt; | sigma.js"><meta data-rh="true" name="description" content="Defined in30"><meta data-rh="true" property="og:description" content="Defined in30"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.sigmajs.org/docs/typedoc/sigma/src/settings/interfaces/Settings"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/settings/interfaces/Settings" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/settings/interfaces/Settings" hreflang="x-default"><link rel="preconnect" href="https://matomo.ouestware.com/">
+<script>var _paq=window._paq=window._paq||[];_paq.push(["setRequestMethod","POST"]),_paq.push(["trackPageView"]),_paq.push(["enableLinkTracking"]),_paq.push(["enableHeartBeatTimer"]),function(){var e="https://matomo.ouestware.com/";_paq.push(["setRequestMethod","POST"]),_paq.push(["setTrackerUrl",e+"matomo.php"]),_paq.push(["setSiteId","26"]);var a=document,t=a.createElement("script"),p=a.getElementsByTagName("script")[0];t.type="text/javascript",t.async=!0,t.src=e+"matomo.js",p.parentNode.insertBefore(t,p)}()</script><link rel="stylesheet" href="/assets/css/styles.ac0f26fa.css">
+<script src="/assets/js/runtime~main.857be78f.js" defer="defer"></script>
+<script src="/assets/js/main.1d211a62.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const n=new URLSearchParams(window.location.search).entries();for(var[t,e]of n)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_G6ar" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/logo-sigma-ruby.svg" alt="sigma.js logo"></div><b class="navbar__title text--truncate"><span class="text-ruby">sigma</span><span class="text-grey">.js</span></b></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/jacomyal/sigma.js" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_awgD"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_OLSw colorModeToggle_Hg9V"><button class="clean-btn toggleButton_wYmb toggleButtonDisabled_vaDU" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_Sxwe"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_Yem1"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_bmvg"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_UyTV"><div class="docsWrapper_XLvK"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_z1FD" type="button"></button><div class="docRoot_HciC"><aside class="theme-doc-sidebar-container docSidebarContainer_e5ai"><div class="sidebarViewport_N8x0"><div class="sidebar_vJCc"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_qiME"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/quickstart">Quickstart Guide</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/resources">Resources</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/docs/category/advanced-topics">Advanced topics</a><button aria-label="Expand sidebar category &#x27;Advanced topics&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" href="/docs/category/typedoc-api">Typedoc API</a><button aria-label="Collapse sidebar category &#x27;Typedoc API&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/edge-curve/src/">edge-curve</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-leaflet/src/">layer-leaflet</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-maplibre/src/">layer-maplibre</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-webgl/src/">layer-webgl</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-border/src/">node-border</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-image/src/">node-image</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-piechart/src/">node-piechart</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-square/src/">node-square</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/">sigma</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/typedoc/sigma/src/">src</a><button aria-label="Collapse sidebar category &#x27;src&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/classes/Camera">Classes</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/rendering/">rendering</a><button aria-label="Expand sidebar category &#x27;rendering&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/typedoc/sigma/src/settings/">settings</a><button aria-label="Collapse sidebar category &#x27;settings&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/settings/interfaces/Settings">Interfaces</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/typedoc/sigma/src/settings/interfaces/Settings">Settings</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/settings/variables/DEFAULT_EDGE_PROGRAM_CLASSES">Variables</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/settings/functions/resolveSettings">Functions</a></div></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/utils/">utils</a><button aria-label="Expand sidebar category &#x27;utils&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li></ul></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_namt"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_YAwJ"><div class="docItemContainer_Rv5Z"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_zCmv" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/category/typedoc-api"><span itemprop="name">Typedoc API</span></a><meta itemprop="position" content="1"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">sigma</span><meta itemprop="position" content="2"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/typedoc/sigma/src/"><span itemprop="name">src</span></a><meta itemprop="position" content="3"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/typedoc/sigma/src/settings/"><span itemprop="name">settings</span></a><meta itemprop="position" content="4"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Interfaces</span><meta itemprop="position" content="5"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">Settings</span><meta itemprop="position" content="6"></li></ul></nav><div class="tocCollapsible_O_Qc theme-doc-toc-mobile tocMobile_tjDr"><button type="button" class="clean-btn tocCollapsibleButton_htYj">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Interface: Settings&lt;N, E, G&gt;</h1></header>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L30" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:30</a></p>
+<h1>Sigma.js settings</h1>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters">Type Parameters<a href="#type-parameters" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h2>
+<p>• <strong>N</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>E</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>G</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="allowinvalidcontainer">allowInvalidContainer<a href="#allowinvalidcontainer" class="hash-link" aria-label="Direct link to allowInvalidContainer" title="Direct link to allowInvalidContainer">​</a></h3>
+<blockquote>
+<p><strong>allowInvalidContainer</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L102" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:102</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="antialiasingfeather">antiAliasingFeather<a href="#antialiasingfeather" class="hash-link" aria-label="Direct link to antiAliasingFeather" title="Direct link to antiAliasingFeather">​</a></h3>
+<blockquote>
+<p><strong>antiAliasingFeather</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L60" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:60</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="autocenter">autoCenter<a href="#autocenter" class="hash-link" aria-label="Direct link to autoCenter" title="Direct link to autoCenter">​</a></h3>
+<blockquote>
+<p><strong>autoCenter</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L78" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:78</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="autorescale">autoRescale<a href="#autorescale" class="hash-link" aria-label="Direct link to autoRescale" title="Direct link to autoRescale">​</a></h3>
+<blockquote>
+<p><strong>autoRescale</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L77" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:77</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="camerapanboundaries">cameraPanBoundaries<a href="#camerapanboundaries" class="hash-link" aria-label="Direct link to cameraPanBoundaries" title="Direct link to cameraPanBoundaries">​</a></h3>
+<blockquote>
+<p><strong>cameraPanBoundaries</strong>: <code>null</code> | <code>true</code> | <code>AtLeastOne</code>&lt;{ <code>boundaries</code>: { <code>x</code>: [<code>number</code>, <code>number</code>]; <code>y</code>: [<code>number</code>, <code>number</code>]; }; <code>tolerance</code>: <code>number</code>; }&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L96" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:96</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultdrawedgelabel">defaultDrawEdgeLabel<a href="#defaultdrawedgelabel" class="hash-link" aria-label="Direct link to defaultDrawEdgeLabel" title="Direct link to defaultDrawEdgeLabel">​</a></h3>
+<blockquote>
+<p><strong>defaultDrawEdgeLabel</strong>: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/EdgeLabelDrawingFunction"><code>EdgeLabelDrawingFunction</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L56" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:56</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultdrawnodehover">defaultDrawNodeHover<a href="#defaultdrawnodehover" class="hash-link" aria-label="Direct link to defaultDrawNodeHover" title="Direct link to defaultDrawNodeHover">​</a></h3>
+<blockquote>
+<p><strong>defaultDrawNodeHover</strong>: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/NodeHoverDrawingFunction"><code>NodeHoverDrawingFunction</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L58" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:58</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultdrawnodelabel">defaultDrawNodeLabel<a href="#defaultdrawnodelabel" class="hash-link" aria-label="Direct link to defaultDrawNodeLabel" title="Direct link to defaultDrawNodeLabel">​</a></h3>
+<blockquote>
+<p><strong>defaultDrawNodeLabel</strong>: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/NodeLabelDrawingFunction"><code>NodeLabelDrawingFunction</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L57" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:57</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultedgecolor">defaultEdgeColor<a href="#defaultedgecolor" class="hash-link" aria-label="Direct link to defaultEdgeColor" title="Direct link to defaultEdgeColor">​</a></h3>
+<blockquote>
+<p><strong>defaultEdgeColor</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L45" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:45</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultedgetype">defaultEdgeType<a href="#defaultedgetype" class="hash-link" aria-label="Direct link to defaultEdgeType" title="Direct link to defaultEdgeType">​</a></h3>
+<blockquote>
+<p><strong>defaultEdgeType</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L46" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:46</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultnodecolor">defaultNodeColor<a href="#defaultnodecolor" class="hash-link" aria-label="Direct link to defaultNodeColor" title="Direct link to defaultNodeColor">​</a></h3>
+<blockquote>
+<p><strong>defaultNodeColor</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L43" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:43</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="defaultnodetype">defaultNodeType<a href="#defaultnodetype" class="hash-link" aria-label="Direct link to defaultNodeType" title="Direct link to defaultNodeType">​</a></h3>
+<blockquote>
+<p><strong>defaultNodeType</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L44" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:44</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="doubleclicktimeout">doubleClickTimeout<a href="#doubleclicktimeout" class="hash-link" aria-label="Direct link to doubleClickTimeout" title="Direct link to doubleClickTimeout">​</a></h3>
+<blockquote>
+<p><strong>doubleClickTimeout</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L69" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:69</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="doubleclickzoomingduration">doubleClickZoomingDuration<a href="#doubleclickzoomingduration" class="hash-link" aria-label="Direct link to doubleClickZoomingDuration" title="Direct link to doubleClickZoomingDuration">​</a></h3>
+<blockquote>
+<p><strong>doubleClickZoomingDuration</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L71" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:71</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="doubleclickzoomingratio">doubleClickZoomingRatio<a href="#doubleclickzoomingratio" class="hash-link" aria-label="Direct link to doubleClickZoomingRatio" title="Direct link to doubleClickZoomingRatio">​</a></h3>
+<blockquote>
+<p><strong>doubleClickZoomingRatio</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L70" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:70</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="draggedeventstolerance">draggedEventsTolerance<a href="#draggedeventstolerance" class="hash-link" aria-label="Direct link to draggedEventsTolerance" title="Direct link to draggedEventsTolerance">​</a></h3>
+<blockquote>
+<p><strong>draggedEventsTolerance</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L64" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:64</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="dragtimeout">dragTimeout<a href="#dragtimeout" class="hash-link" aria-label="Direct link to dragTimeout" title="Direct link to dragTimeout">​</a></h3>
+<blockquote>
+<p><strong>dragTimeout</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L63" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:63</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgelabelcolor">edgeLabelColor<a href="#edgelabelcolor" class="hash-link" aria-label="Direct link to edgeLabelColor" title="Direct link to edgeLabelColor">​</a></h3>
+<blockquote>
+<p><strong>edgeLabelColor</strong>: { <code>attribute</code>: <code>string</code>; <code>color</code>: <code>string</code>; } | { <code>attribute</code>: <code>undefined</code>; <code>color</code>: <code>string</code>; }</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L54" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:54</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgelabelfont">edgeLabelFont<a href="#edgelabelfont" class="hash-link" aria-label="Direct link to edgeLabelFont" title="Direct link to edgeLabelFont">​</a></h3>
+<blockquote>
+<p><strong>edgeLabelFont</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L51" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:51</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgelabelsize">edgeLabelSize<a href="#edgelabelsize" class="hash-link" aria-label="Direct link to edgeLabelSize" title="Direct link to edgeLabelSize">​</a></h3>
+<blockquote>
+<p><strong>edgeLabelSize</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L52" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:52</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgelabelweight">edgeLabelWeight<a href="#edgelabelweight" class="hash-link" aria-label="Direct link to edgeLabelWeight" title="Direct link to edgeLabelWeight">​</a></h3>
+<blockquote>
+<p><strong>edgeLabelWeight</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L53" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:53</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgeprogramclasses">edgeProgramClasses<a href="#edgeprogramclasses" class="hash-link" aria-label="Direct link to edgeProgramClasses" title="Direct link to edgeProgramClasses">​</a></h3>
+<blockquote>
+<p><strong>edgeProgramClasses</strong>: <code>object</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L107" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:107</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="index-signature">Index Signature<a href="#index-signature" class="hash-link" aria-label="Direct link to Index Signature" title="Direct link to Index Signature">​</a></h4>
+<p>[<code>type</code>: <code>string</code>]: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/EdgeProgramType"><code>EdgeProgramType</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="edgereducer">edgeReducer<a href="#edgereducer" class="hash-link" aria-label="Direct link to edgeReducer" title="Direct link to edgeReducer">​</a></h3>
+<blockquote>
+<p><strong>edgeReducer</strong>: <code>null</code> | (<code>edge</code>, <code>data</code>) =&gt; <code>Partial</code>&lt;<code>DisplayData</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L87" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:87</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="enablecamerapanning">enableCameraPanning<a href="#enablecamerapanning" class="hash-link" aria-label="Direct link to enableCameraPanning" title="Direct link to enableCameraPanning">​</a></h3>
+<blockquote>
+<p><strong>enableCameraPanning</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L94" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:94</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="enablecamerarotation">enableCameraRotation<a href="#enablecamerarotation" class="hash-link" aria-label="Direct link to enableCameraRotation" title="Direct link to enableCameraRotation">​</a></h3>
+<blockquote>
+<p><strong>enableCameraRotation</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L95" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:95</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="enablecamerazooming">enableCameraZooming<a href="#enablecamerazooming" class="hash-link" aria-label="Direct link to enableCameraZooming" title="Direct link to enableCameraZooming">​</a></h3>
+<blockquote>
+<p><strong>enableCameraZooming</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L93" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:93</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="enableedgeevents">enableEdgeEvents<a href="#enableedgeevents" class="hash-link" aria-label="Direct link to enableEdgeEvents" title="Direct link to enableEdgeEvents">​</a></h3>
+<blockquote>
+<p><strong>enableEdgeEvents</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L40" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:40</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="hideedgesonmove">hideEdgesOnMove<a href="#hideedgesonmove" class="hash-link" aria-label="Direct link to hideEdgesOnMove" title="Direct link to hideEdgesOnMove">​</a></h3>
+<blockquote>
+<p><strong>hideEdgesOnMove</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L36" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:36</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="hidelabelsonmove">hideLabelsOnMove<a href="#hidelabelsonmove" class="hash-link" aria-label="Direct link to hideLabelsOnMove" title="Direct link to hideLabelsOnMove">​</a></h3>
+<blockquote>
+<p><strong>hideLabelsOnMove</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L37" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:37</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="inertiaduration">inertiaDuration<a href="#inertiaduration" class="hash-link" aria-label="Direct link to inertiaDuration" title="Direct link to inertiaDuration">​</a></h3>
+<blockquote>
+<p><strong>inertiaDuration</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L65" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:65</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="inertiaratio">inertiaRatio<a href="#inertiaratio" class="hash-link" aria-label="Direct link to inertiaRatio" title="Direct link to inertiaRatio">​</a></h3>
+<blockquote>
+<p><strong>inertiaRatio</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L66" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:66</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="itemsizesreference">itemSizesReference<a href="#itemsizesreference" class="hash-link" aria-label="Direct link to itemSizesReference" title="Direct link to itemSizesReference">​</a></h3>
+<blockquote>
+<p><strong>itemSizesReference</strong>: <code>&quot;screen&quot;</code> | <code>&quot;positions&quot;</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L76" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:76</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelcolor">labelColor<a href="#labelcolor" class="hash-link" aria-label="Direct link to labelColor" title="Direct link to labelColor">​</a></h3>
+<blockquote>
+<p><strong>labelColor</strong>: { <code>attribute</code>: <code>string</code>; <code>color</code>: <code>string</code>; } | { <code>attribute</code>: <code>undefined</code>; <code>color</code>: <code>string</code>; }</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L50" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:50</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labeldensity">labelDensity<a href="#labeldensity" class="hash-link" aria-label="Direct link to labelDensity" title="Direct link to labelDensity">​</a></h3>
+<blockquote>
+<p><strong>labelDensity</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L81" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:81</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelfont">labelFont<a href="#labelfont" class="hash-link" aria-label="Direct link to labelFont" title="Direct link to labelFont">​</a></h3>
+<blockquote>
+<p><strong>labelFont</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L47" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:47</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelgridcellsize">labelGridCellSize<a href="#labelgridcellsize" class="hash-link" aria-label="Direct link to labelGridCellSize" title="Direct link to labelGridCellSize">​</a></h3>
+<blockquote>
+<p><strong>labelGridCellSize</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L82" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:82</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelrenderedsizethreshold">labelRenderedSizeThreshold<a href="#labelrenderedsizethreshold" class="hash-link" aria-label="Direct link to labelRenderedSizeThreshold" title="Direct link to labelRenderedSizeThreshold">​</a></h3>
+<blockquote>
+<p><strong>labelRenderedSizeThreshold</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L83" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:83</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelsize">labelSize<a href="#labelsize" class="hash-link" aria-label="Direct link to labelSize" title="Direct link to labelSize">​</a></h3>
+<blockquote>
+<p><strong>labelSize</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L48" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:48</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="labelweight">labelWeight<a href="#labelweight" class="hash-link" aria-label="Direct link to labelWeight" title="Direct link to labelWeight">​</a></h3>
+<blockquote>
+<p><strong>labelWeight</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L49" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:49</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="maxcameraratio">maxCameraRatio<a href="#maxcameraratio" class="hash-link" aria-label="Direct link to maxCameraRatio" title="Direct link to maxCameraRatio">​</a></h3>
+<blockquote>
+<p><strong>maxCameraRatio</strong>: <code>null</code> | <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L92" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:92</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="mincameraratio">minCameraRatio<a href="#mincameraratio" class="hash-link" aria-label="Direct link to minCameraRatio" title="Direct link to minCameraRatio">​</a></h3>
+<blockquote>
+<p><strong>minCameraRatio</strong>: <code>null</code> | <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L91" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:91</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="minedgethickness">minEdgeThickness<a href="#minedgethickness" class="hash-link" aria-label="Direct link to minEdgeThickness" title="Direct link to minEdgeThickness">​</a></h3>
+<blockquote>
+<p><strong>minEdgeThickness</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L59" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:59</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="nodehoverprogramclasses">nodeHoverProgramClasses<a href="#nodehoverprogramclasses" class="hash-link" aria-label="Direct link to nodeHoverProgramClasses" title="Direct link to nodeHoverProgramClasses">​</a></h3>
+<blockquote>
+<p><strong>nodeHoverProgramClasses</strong>: <code>object</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L106" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:106</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="index-signature-1">Index Signature<a href="#index-signature-1" class="hash-link" aria-label="Direct link to Index Signature" title="Direct link to Index Signature">​</a></h4>
+<p>[<code>type</code>: <code>string</code>]: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/NodeProgramType"><code>NodeProgramType</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="nodeprogramclasses">nodeProgramClasses<a href="#nodeprogramclasses" class="hash-link" aria-label="Direct link to nodeProgramClasses" title="Direct link to nodeProgramClasses">​</a></h3>
+<blockquote>
+<p><strong>nodeProgramClasses</strong>: <code>object</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L105" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:105</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="index-signature-2">Index Signature<a href="#index-signature-2" class="hash-link" aria-label="Direct link to Index Signature" title="Direct link to Index Signature">​</a></h4>
+<p>[<code>type</code>: <code>string</code>]: <a href="/docs/typedoc/sigma/src/rendering/type-aliases/NodeProgramType"><code>NodeProgramType</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="nodereducer">nodeReducer<a href="#nodereducer" class="hash-link" aria-label="Direct link to nodeReducer" title="Direct link to nodeReducer">​</a></h3>
+<blockquote>
+<p><strong>nodeReducer</strong>: <code>null</code> | (<code>node</code>, <code>data</code>) =&gt; <code>Partial</code>&lt;<code>NodeDisplayData</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L86" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:86</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="renderedgelabels">renderEdgeLabels<a href="#renderedgelabels" class="hash-link" aria-label="Direct link to renderEdgeLabels" title="Direct link to renderEdgeLabels">​</a></h3>
+<blockquote>
+<p><strong>renderEdgeLabels</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L39" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:39</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="renderlabels">renderLabels<a href="#renderlabels" class="hash-link" aria-label="Direct link to renderLabels" title="Direct link to renderLabels">​</a></h3>
+<blockquote>
+<p><strong>renderLabels</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L38" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:38</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="stagepadding">stagePadding<a href="#stagepadding" class="hash-link" aria-label="Direct link to stagePadding" title="Direct link to stagePadding">​</a></h3>
+<blockquote>
+<p><strong>stagePadding</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L55" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:55</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="tapmovetolerance">tapMoveTolerance<a href="#tapmovetolerance" class="hash-link" aria-label="Direct link to tapMoveTolerance" title="Direct link to tapMoveTolerance">​</a></h3>
+<blockquote>
+<p><strong>tapMoveTolerance</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L72" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:72</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="zindex">zIndex<a href="#zindex" class="hash-link" aria-label="Direct link to zIndex" title="Direct link to zIndex">​</a></h3>
+<blockquote>
+<p><strong>zIndex</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L90" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:90</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="zoomduration">zoomDuration<a href="#zoomduration" class="hash-link" aria-label="Direct link to zoomDuration" title="Direct link to zoomDuration">​</a></h3>
+<blockquote>
+<p><strong>zoomDuration</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L67" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:67</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="zoomingratio">zoomingRatio<a href="#zoomingratio" class="hash-link" aria-label="Direct link to zoomingRatio" title="Direct link to zoomingRatio">​</a></h3>
+<blockquote>
+<p><strong>zoomingRatio</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L68" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:68</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="zoomtosizeratiofunction">zoomToSizeRatioFunction()<a href="#zoomtosizeratiofunction" class="hash-link" aria-label="Direct link to zoomToSizeRatioFunction()" title="Direct link to zoomToSizeRatioFunction()">​</a></h3>
+<blockquote>
+<p><strong>zoomToSizeRatioFunction</strong>: (<code>ratio</code>) =&gt; <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/settings.ts#L75" target="_blank" rel="noopener noreferrer">sigma/src/settings.ts:75</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters">Parameters<a href="#parameters" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="ratio">ratio<a href="#ratio" class="hash-link" aria-label="Direct link to ratio" title="Direct link to ratio">​</a></h5>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns">Returns<a href="#returns" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>number</code></p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/jacomyal/sigma.js/tree/main/packages/website/docs/typedoc/sigma/src/settings/interfaces/Settings.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_UohW" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_g62E"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/typedoc/sigma/src/settings/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">sigma/src/settings</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/typedoc/sigma/src/settings/variables/DEFAULT_EDGE_PROGRAM_CLASSES"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">DEFAULT_EDGE_PROGRAM_CLASSES</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_TN1Q thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#type-parameters" class="table-of-contents__link toc-highlight">Type Parameters</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#allowinvalidcontainer" class="table-of-contents__link toc-highlight">allowInvalidContainer</a></li><li><a href="#antialiasingfeather" class="table-of-contents__link toc-highlight">antiAliasingFeather</a></li><li><a href="#autocenter" class="table-of-contents__link toc-highlight">autoCenter</a></li><li><a href="#autorescale" class="table-of-contents__link toc-highlight">autoRescale</a></li><li><a href="#camerapanboundaries" class="table-of-contents__link toc-highlight">cameraPanBoundaries</a></li><li><a href="#defaultdrawedgelabel" class="table-of-contents__link toc-highlight">defaultDrawEdgeLabel</a></li><li><a href="#defaultdrawnodehover" class="table-of-contents__link toc-highlight">defaultDrawNodeHover</a></li><li><a href="#defaultdrawnodelabel" class="table-of-contents__link toc-highlight">defaultDrawNodeLabel</a></li><li><a href="#defaultedgecolor" class="table-of-contents__link toc-highlight">defaultEdgeColor</a></li><li><a href="#defaultedgetype" class="table-of-contents__link toc-highlight">defaultEdgeType</a></li><li><a href="#defaultnodecolor" class="table-of-contents__link toc-highlight">defaultNodeColor</a></li><li><a href="#defaultnodetype" class="table-of-contents__link toc-highlight">defaultNodeType</a></li><li><a href="#doubleclicktimeout" class="table-of-contents__link toc-highlight">doubleClickTimeout</a></li><li><a href="#doubleclickzoomingduration" class="table-of-contents__link toc-highlight">doubleClickZoomingDuration</a></li><li><a href="#doubleclickzoomingratio" class="table-of-contents__link toc-highlight">doubleClickZoomingRatio</a></li><li><a href="#draggedeventstolerance" class="table-of-contents__link toc-highlight">draggedEventsTolerance</a></li><li><a href="#dragtimeout" class="table-of-contents__link toc-highlight">dragTimeout</a></li><li><a href="#edgelabelcolor" class="table-of-contents__link toc-highlight">edgeLabelColor</a></li><li><a href="#edgelabelfont" class="table-of-contents__link toc-highlight">edgeLabelFont</a></li><li><a href="#edgelabelsize" class="table-of-contents__link toc-highlight">edgeLabelSize</a></li><li><a href="#edgelabelweight" class="table-of-contents__link toc-highlight">edgeLabelWeight</a></li><li><a href="#edgeprogramclasses" class="table-of-contents__link toc-highlight">edgeProgramClasses</a></li><li><a href="#edgereducer" class="table-of-contents__link toc-highlight">edgeReducer</a></li><li><a href="#enablecamerapanning" class="table-of-contents__link toc-highlight">enableCameraPanning</a></li><li><a href="#enablecamerarotation" class="table-of-contents__link toc-highlight">enableCameraRotation</a></li><li><a href="#enablecamerazooming" class="table-of-contents__link toc-highlight">enableCameraZooming</a></li><li><a href="#enableedgeevents" class="table-of-contents__link toc-highlight">enableEdgeEvents</a></li><li><a href="#hideedgesonmove" class="table-of-contents__link toc-highlight">hideEdgesOnMove</a></li><li><a href="#hidelabelsonmove" class="table-of-contents__link toc-highlight">hideLabelsOnMove</a></li><li><a href="#inertiaduration" class="table-of-contents__link toc-highlight">inertiaDuration</a></li><li><a href="#inertiaratio" class="table-of-contents__link toc-highlight">inertiaRatio</a></li><li><a href="#itemsizesreference" class="table-of-contents__link toc-highlight">itemSizesReference</a></li><li><a href="#labelcolor" class="table-of-contents__link toc-highlight">labelColor</a></li><li><a href="#labeldensity" class="table-of-contents__link toc-highlight">labelDensity</a></li><li><a href="#labelfont" class="table-of-contents__link toc-highlight">labelFont</a></li><li><a href="#labelgridcellsize" class="table-of-contents__link toc-highlight">labelGridCellSize</a></li><li><a href="#labelrenderedsizethreshold" class="table-of-contents__link toc-highlight">labelRenderedSizeThreshold</a></li><li><a href="#labelsize" class="table-of-contents__link toc-highlight">labelSize</a></li><li><a href="#labelweight" class="table-of-contents__link toc-highlight">labelWeight</a></li><li><a href="#maxcameraratio" class="table-of-contents__link toc-highlight">maxCameraRatio</a></li><li><a href="#mincameraratio" class="table-of-contents__link toc-highlight">minCameraRatio</a></li><li><a href="#minedgethickness" class="table-of-contents__link toc-highlight">minEdgeThickness</a></li><li><a href="#nodehoverprogramclasses" class="table-of-contents__link toc-highlight">nodeHoverProgramClasses</a></li><li><a href="#nodeprogramclasses" class="table-of-contents__link toc-highlight">nodeProgramClasses</a></li><li><a href="#nodereducer" class="table-of-contents__link toc-highlight">nodeReducer</a></li><li><a href="#renderedgelabels" class="table-of-contents__link toc-highlight">renderEdgeLabels</a></li><li><a href="#renderlabels" class="table-of-contents__link toc-highlight">renderLabels</a></li><li><a href="#stagepadding" class="table-of-contents__link toc-highlight">stagePadding</a></li><li><a href="#tapmovetolerance" class="table-of-contents__link toc-highlight">tapMoveTolerance</a></li><li><a href="#zindex" class="table-of-contents__link toc-highlight">zIndex</a></li><li><a href="#zoomduration" class="table-of-contents__link toc-highlight">zoomDuration</a></li><li><a href="#zoomingratio" class="table-of-contents__link toc-highlight">zoomingRatio</a></li><li><a href="#zoomtosizeratiofunction" class="table-of-contents__link toc-highlight">zoomToSizeRatioFunction()</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="row"><div class="footer__col col"><p><a href="/" class="with-logo"><img src="/img/logo-sigma-ruby.svg" alt=""> <strong class="text-ruby">sigma</strong><strong class="text-grey">.js</strong></a> <!-- -->is published by <a href="https://medialab.sciencespo.fr/en/">Sciences-Po médialab</a> and<!-- --> <a href="https://ouestware.com/en">OuestWare</a>.</p><ul><li><a href="/docs">documentation</a></li><li><a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a></li><li><a rel="me" href="https://vis.social/@sigmajs">vis.social/@sigmajs (Mastodon)</a></li></ul></div><div class="footer__col col"><p>It is developed under<!-- --> <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.</p><p>This website uses <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,<!-- --> <a href="https://public-sans.digital.gov/">Public Sans</a> and<!-- --> <a href="https://github.com/microsoft/cascadia-code">Cascadia Code</a> fonts.</p></div></div></div></footer></div>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-typedoc/sigma/src/rendering/classes/EdgeLineProgram" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.7.0">
+<title data-rh="true">Class: EdgeLineProgram\&lt;N, E, G\&gt; | sigma.js</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://www.sigmajs.org/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="theme-color" content="#e22653"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Class: EdgeLineProgram\&lt;N, E, G\&gt; | sigma.js"><meta data-rh="true" name="description" content="Defined in22"><meta data-rh="true" property="og:description" content="Defined in22"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.sigmajs.org/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram" hreflang="x-default"><link rel="preconnect" href="https://matomo.ouestware.com/">
+<script>var _paq=window._paq=window._paq||[];_paq.push(["setRequestMethod","POST"]),_paq.push(["trackPageView"]),_paq.push(["enableLinkTracking"]),_paq.push(["enableHeartBeatTimer"]),function(){var e="https://matomo.ouestware.com/";_paq.push(["setRequestMethod","POST"]),_paq.push(["setTrackerUrl",e+"matomo.php"]),_paq.push(["setSiteId","26"]);var a=document,t=a.createElement("script"),p=a.getElementsByTagName("script")[0];t.type="text/javascript",t.async=!0,t.src=e+"matomo.js",p.parentNode.insertBefore(t,p)}()</script><link rel="stylesheet" href="/assets/css/styles.ac0f26fa.css">
+<script src="/assets/js/runtime~main.857be78f.js" defer="defer"></script>
+<script src="/assets/js/main.1d211a62.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const n=new URLSearchParams(window.location.search).entries();for(var[t,e]of n)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_G6ar" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/logo-sigma-ruby.svg" alt="sigma.js logo"></div><b class="navbar__title text--truncate"><span class="text-ruby">sigma</span><span class="text-grey">.js</span></b></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/jacomyal/sigma.js" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_awgD"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_OLSw colorModeToggle_Hg9V"><button class="clean-btn toggleButton_wYmb toggleButtonDisabled_vaDU" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_Sxwe"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_Yem1"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_bmvg"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_UyTV"><div class="docsWrapper_XLvK"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_z1FD" type="button"></button><div class="docRoot_HciC"><aside class="theme-doc-sidebar-container docSidebarContainer_e5ai"><div class="sidebarViewport_N8x0"><div class="sidebar_vJCc"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_qiME"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/quickstart">Quickstart Guide</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/resources">Resources</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/docs/category/advanced-topics">Advanced topics</a><button aria-label="Expand sidebar category &#x27;Advanced topics&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" href="/docs/category/typedoc-api">Typedoc API</a><button aria-label="Collapse sidebar category &#x27;Typedoc API&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/edge-curve/src/">edge-curve</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-leaflet/src/">layer-leaflet</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-maplibre/src/">layer-maplibre</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-webgl/src/">layer-webgl</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-border/src/">node-border</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-image/src/">node-image</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-piechart/src/">node-piechart</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-square/src/">node-square</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/">sigma</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/typedoc/sigma/src/">src</a><button aria-label="Collapse sidebar category &#x27;src&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/classes/Camera">Classes</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/typedoc/sigma/src/rendering/">rendering</a><button aria-label="Collapse sidebar category &#x27;rendering&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/AbstractEdgeProgram">Classes</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/AbstractEdgeProgram">AbstractEdgeProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/AbstractNodeProgram">AbstractNodeProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/AbstractProgram">AbstractProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram">EdgeLineProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram">EdgeProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/EdgeRectangleProgram">EdgeRectangleProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/EdgeTriangleProgram">EdgeTriangleProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/NodeCircleProgram">NodeCircleProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/NodePointProgram">NodePointProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/NodeProgram">NodeProgram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-6 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/rendering/classes/Program">Program</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/rendering/interfaces/InstancedProgramDefinition">Interfaces</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/rendering/type-aliases/CreateEdgeArrowHeadProgramOptions">Type Aliases</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/rendering/variables/DEFAULT_EDGE_ARROW_HEAD_PROGRAM_OPTIONS">Variables</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-5 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/sigma/src/rendering/functions/createEdgeArrowHeadProgram">Functions</a></div></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/settings/">settings</a><button aria-label="Expand sidebar category &#x27;settings&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/utils/">utils</a><button aria-label="Expand sidebar category &#x27;utils&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li></ul></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_namt"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_YAwJ"><div class="docItemContainer_Rv5Z"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_zCmv" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/category/typedoc-api"><span itemprop="name">Typedoc API</span></a><meta itemprop="position" content="1"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">sigma</span><meta itemprop="position" content="2"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/typedoc/sigma/src/"><span itemprop="name">src</span></a><meta itemprop="position" content="3"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/typedoc/sigma/src/rendering/"><span itemprop="name">rendering</span></a><meta itemprop="position" content="4"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Classes</span><meta itemprop="position" content="5"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">EdgeLineProgram</span><meta itemprop="position" content="6"></li></ul></nav><div class="tocCollapsible_O_Qc theme-doc-toc-mobile tocMobile_tjDr"><button type="button" class="clean-btn tocCollapsibleButton_htYj">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Class: EdgeLineProgram&lt;N, E, G&gt;</h1></header>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/programs/edge-line/index.ts#L22" target="_blank" rel="noopener noreferrer">sigma/src/rendering/programs/edge-line/index.ts:22</a></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="extends">Extends<a href="#extends" class="hash-link" aria-label="Direct link to Extends" title="Direct link to Extends">​</a></h2>
+<ul>
+<li><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>&lt;<em>typeof</em> <code>UNIFORMS</code>[<code>number</code>], <code>N</code>, <code>E</code>, <code>G</code>&gt;</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters">Type Parameters<a href="#type-parameters" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h2>
+<p>• <strong>N</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>E</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>G</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="constructors">Constructors<a href="#constructors" class="hash-link" aria-label="Direct link to Constructors" title="Direct link to Constructors">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="new-edgelineprogram">new EdgeLineProgram()<a href="#new-edgelineprogram" class="hash-link" aria-label="Direct link to new EdgeLineProgram()" title="Direct link to new EdgeLineProgram()">​</a></h3>
+<blockquote>
+<p><strong>new EdgeLineProgram</strong>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;(<code>gl</code>, <code>pickingBuffer</code>, <code>renderer</code>): <a href="/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram"><code>EdgeLineProgram</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L81" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:81</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters">Parameters<a href="#parameters" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="gl">gl<a href="#gl" class="hash-link" aria-label="Direct link to gl" title="Direct link to gl">​</a></h5>
+<p><code>WebGLRenderingContext</code> | <code>WebGL2RenderingContext</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="pickingbuffer">pickingBuffer<a href="#pickingbuffer" class="hash-link" aria-label="Direct link to pickingBuffer" title="Direct link to pickingBuffer">​</a></h5>
+<p><code>null</code> | <code>WebGLFramebuffer</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="renderer">renderer<a href="#renderer" class="hash-link" aria-label="Direct link to renderer" title="Direct link to renderer">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/classes/Sigma"><code>Sigma</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns">Returns<a href="#returns" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram"><code>EdgeLineProgram</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from">Inherited from<a href="#inherited-from" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#constructors"><code>constructor</code></a></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="array">array<a href="#array" class="hash-link" aria-label="Direct link to array" title="Direct link to array">​</a></h3>
+<blockquote>
+<p><strong>array</strong>: <code>Float32Array</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L69" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:69</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-1">Inherited from<a href="#inherited-from-1" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#array"><code>array</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="attributes">ATTRIBUTES<a href="#attributes" class="hash-link" aria-label="Direct link to ATTRIBUTES" title="Direct link to ATTRIBUTES">​</a></h3>
+<blockquote>
+<p><strong>ATTRIBUTES</strong>: <a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramAttributeSpecification"><code>ProgramAttributeSpecification</code></a>[]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L60" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:60</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-2">Inherited from<a href="#inherited-from-2" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#attributes"><code>ATTRIBUTES</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="attributes_items_count">ATTRIBUTES_ITEMS_COUNT<a href="#attributes_items_count" class="hash-link" aria-label="Direct link to ATTRIBUTES_ITEMS_COUNT" title="Direct link to ATTRIBUTES_ITEMS_COUNT">​</a></h3>
+<blockquote>
+<p><strong>ATTRIBUTES_ITEMS_COUNT</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L65" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:65</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-3">Inherited from<a href="#inherited-from-3" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#attributes_items_count"><code>ATTRIBUTES_ITEMS_COUNT</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="capacity">capacity<a href="#capacity" class="hash-link" aria-label="Direct link to capacity" title="Direct link to capacity">​</a></h3>
+<blockquote>
+<p><strong>capacity</strong>: <code>number</code> = <code>0</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L71" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:71</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-4">Inherited from<a href="#inherited-from-4" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#capacity"><code>capacity</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="constant_attributes">CONSTANT_ATTRIBUTES<a href="#constant_attributes" class="hash-link" aria-label="Direct link to CONSTANT_ATTRIBUTES" title="Direct link to CONSTANT_ATTRIBUTES">​</a></h3>
+<blockquote>
+<p><strong>CONSTANT_ATTRIBUTES</strong>: <a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramAttributeSpecification"><code>ProgramAttributeSpecification</code></a>[]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L62" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:62</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-5">Inherited from<a href="#inherited-from-5" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#constant_attributes"><code>CONSTANT_ATTRIBUTES</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="constant_data">CONSTANT_DATA<a href="#constant_data" class="hash-link" aria-label="Direct link to CONSTANT_DATA" title="Direct link to CONSTANT_DATA">​</a></h3>
+<blockquote>
+<p><strong>CONSTANT_DATA</strong>: <code>number</code>[][]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L63" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:63</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-6">Inherited from<a href="#inherited-from-6" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#constant_data"><code>CONSTANT_DATA</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="constantarray">constantArray<a href="#constantarray" class="hash-link" aria-label="Direct link to constantArray" title="Direct link to constantArray">​</a></h3>
+<blockquote>
+<p><strong>constantArray</strong>: <code>Float32Array</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L70" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:70</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-7">Inherited from<a href="#inherited-from-7" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#constantarray"><code>constantArray</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="drawlabel">drawLabel<a href="#drawlabel" class="hash-link" aria-label="Direct link to drawLabel" title="Direct link to drawLabel">​</a></h3>
+<blockquote>
+<p><strong>drawLabel</strong>: <code>undefined</code> | <a href="/docs/typedoc/sigma/src/rendering/type-aliases/EdgeLabelDrawingFunction"><code>EdgeLabelDrawingFunction</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt; = <code>undefined</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/edge.ts#L40" target="_blank" rel="noopener noreferrer">sigma/src/rendering/edge.ts:40</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-8">Inherited from<a href="#inherited-from-8" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#drawlabel"><code>drawLabel</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="fragment_shader_source">FRAGMENT_SHADER_SOURCE<a href="#fragment_shader_source" class="hash-link" aria-label="Direct link to FRAGMENT_SHADER_SOURCE" title="Direct link to FRAGMENT_SHADER_SOURCE">​</a></h3>
+<blockquote>
+<p><strong>FRAGMENT_SHADER_SOURCE</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L58" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:58</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-9">Inherited from<a href="#inherited-from-9" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#fragment_shader_source"><code>FRAGMENT_SHADER_SOURCE</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="isinstanced">isInstanced<a href="#isinstanced" class="hash-link" aria-label="Direct link to isInstanced" title="Direct link to isInstanced">​</a></h3>
+<blockquote>
+<p><strong>isInstanced</strong>: <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L77" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:77</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-10">Inherited from<a href="#inherited-from-10" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#isinstanced"><code>isInstanced</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="method">METHOD<a href="#method" class="hash-link" aria-label="Direct link to METHOD" title="Direct link to METHOD">​</a></h3>
+<blockquote>
+<p><strong>METHOD</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L61" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:61</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-11">Inherited from<a href="#inherited-from-11" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#method"><code>METHOD</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="normalprogram">normalProgram<a href="#normalprogram" class="hash-link" aria-label="Direct link to normalProgram" title="Direct link to normalProgram">​</a></h3>
+<blockquote>
+<p><strong>normalProgram</strong>: <a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L74" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:74</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-12">Inherited from<a href="#inherited-from-12" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#normalprogram"><code>normalProgram</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="pickprogram">pickProgram<a href="#pickprogram" class="hash-link" aria-label="Direct link to pickProgram" title="Direct link to pickProgram">​</a></h3>
+<blockquote>
+<p><strong>pickProgram</strong>: <code>null</code> | <a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L75" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:75</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-13">Inherited from<a href="#inherited-from-13" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#pickprogram"><code>pickProgram</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="renderer-1">renderer<a href="#renderer-1" class="hash-link" aria-label="Direct link to renderer" title="Direct link to renderer">​</a></h3>
+<blockquote>
+<p><strong>renderer</strong>: <a href="/docs/typedoc/sigma/src/classes/Sigma"><code>Sigma</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L68" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:68</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-14">Inherited from<a href="#inherited-from-14" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#renderer-1"><code>renderer</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="stride">STRIDE<a href="#stride" class="hash-link" aria-label="Direct link to STRIDE" title="Direct link to STRIDE">​</a></h3>
+<blockquote>
+<p><strong>STRIDE</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L66" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:66</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-15">Inherited from<a href="#inherited-from-15" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#stride"><code>STRIDE</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="uniforms">UNIFORMS<a href="#uniforms" class="hash-link" aria-label="Direct link to UNIFORMS" title="Direct link to UNIFORMS">​</a></h3>
+<blockquote>
+<p><strong>UNIFORMS</strong>: readonly <code>&quot;u_matrix&quot;</code>[]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L59" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:59</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-16">Inherited from<a href="#inherited-from-16" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#uniforms"><code>UNIFORMS</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="vertex_shader_source">VERTEX_SHADER_SOURCE<a href="#vertex_shader_source" class="hash-link" aria-label="Direct link to VERTEX_SHADER_SOURCE" title="Direct link to VERTEX_SHADER_SOURCE">​</a></h3>
+<blockquote>
+<p><strong>VERTEX_SHADER_SOURCE</strong>: <code>string</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L57" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:57</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-17">Inherited from<a href="#inherited-from-17" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#vertex_shader_source"><code>VERTEX_SHADER_SOURCE</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="vertices">VERTICES<a href="#vertices" class="hash-link" aria-label="Direct link to VERTICES" title="Direct link to VERTICES">​</a></h3>
+<blockquote>
+<p><strong>VERTICES</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L56" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:56</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-18">Inherited from<a href="#inherited-from-18" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#vertices"><code>VERTICES</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="verticescount">verticesCount<a href="#verticescount" class="hash-link" aria-label="Direct link to verticesCount" title="Direct link to verticesCount">​</a></h3>
+<blockquote>
+<p><strong>verticesCount</strong>: <code>number</code> = <code>0</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L72" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:72</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-19">Inherited from<a href="#inherited-from-19" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#verticescount"><code>verticesCount</code></a></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="methods">Methods<a href="#methods" class="hash-link" aria-label="Direct link to Methods" title="Direct link to Methods">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="bindattribute">bindAttribute()<a href="#bindattribute" class="hash-link" aria-label="Direct link to bindAttribute()" title="Direct link to bindAttribute()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>bindAttribute</strong>(<code>attr</code>, <code>program</code>, <code>offset</code>, <code>setDivisor</code>?): <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L244" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:244</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-1">Parameters<a href="#parameters-1" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="attr">attr<a href="#attr" class="hash-link" aria-label="Direct link to attr" title="Direct link to attr">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramAttributeSpecification"><code>ProgramAttributeSpecification</code></a></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="program">program<a href="#program" class="hash-link" aria-label="Direct link to program" title="Direct link to program">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="offset">offset<a href="#offset" class="hash-link" aria-label="Direct link to offset" title="Direct link to offset">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="setdivisor">setDivisor?<a href="#setdivisor" class="hash-link" aria-label="Direct link to setDivisor?" title="Direct link to setDivisor?">​</a></h5>
+<p><code>boolean</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-1">Returns<a href="#returns-1" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-20">Inherited from<a href="#inherited-from-20" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#bindattribute"><code>bindAttribute</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="bindprogram">bindProgram()<a href="#bindprogram" class="hash-link" aria-label="Direct link to bindProgram()" title="Direct link to bindProgram()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>bindProgram</strong>(<code>program</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L206" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:206</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-2">Parameters<a href="#parameters-2" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="program-1">program<a href="#program-1" class="hash-link" aria-label="Direct link to program" title="Direct link to program">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-2">Returns<a href="#returns-2" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-21">Inherited from<a href="#inherited-from-21" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#bindprogram"><code>bindProgram</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="drawwebgl">drawWebGL()<a href="#drawwebgl" class="hash-link" aria-label="Direct link to drawWebGL()" title="Direct link to drawWebGL()">​</a></h3>
+<blockquote>
+<p><strong>drawWebGL</strong>(<code>method</code>, <code>__namedParameters</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L355" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:355</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-3">Parameters<a href="#parameters-3" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="method-1">method<a href="#method-1" class="hash-link" aria-label="Direct link to method" title="Direct link to method">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="__namedparameters">__namedParameters<a href="#__namedparameters" class="hash-link" aria-label="Direct link to __namedParameters" title="Direct link to __namedParameters">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-3">Returns<a href="#returns-3" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-22">Inherited from<a href="#inherited-from-22" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#drawwebgl"><code>drawWebGL</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="getdefinition">getDefinition()<a href="#getdefinition" class="hash-link" aria-label="Direct link to getDefinition()" title="Direct link to getDefinition()">​</a></h3>
+<blockquote>
+<p><strong>getDefinition</strong>(): <code>object</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/programs/edge-line/index.ts#L27" target="_blank" rel="noopener noreferrer">sigma/src/rendering/programs/edge-line/index.ts:27</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-4">Returns<a href="#returns-4" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>object</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="attributes-1">ATTRIBUTES<a href="#attributes-1" class="hash-link" aria-label="Direct link to ATTRIBUTES" title="Direct link to ATTRIBUTES">​</a></h5>
+<blockquote>
+<p><strong>ATTRIBUTES</strong>: ({ <code>name</code>: <code>string</code>; <code>normalized</code>: <code>undefined</code>; <code>size</code>: <code>number</code>; <code>type</code>: <code>5126</code>; } | { <code>name</code>: <code>string</code>; <code>normalized</code>: <code>boolean</code>; <code>size</code>: <code>number</code>; <code>type</code>: <code>5121</code>; })[]</p>
+</blockquote>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="fragment_shader_source-1">FRAGMENT_SHADER_SOURCE<a href="#fragment_shader_source-1" class="hash-link" aria-label="Direct link to FRAGMENT_SHADER_SOURCE" title="Direct link to FRAGMENT_SHADER_SOURCE">​</a></h5>
+<blockquote>
+<p><strong>FRAGMENT_SHADER_SOURCE</strong>: <code>string</code></p>
+</blockquote>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="method-2">METHOD<a href="#method-2" class="hash-link" aria-label="Direct link to METHOD" title="Direct link to METHOD">​</a></h5>
+<blockquote>
+<p><strong>METHOD</strong>: <code>1</code> = <code>WebGLRenderingContext.LINES</code></p>
+</blockquote>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="uniforms-1">UNIFORMS<a href="#uniforms-1" class="hash-link" aria-label="Direct link to UNIFORMS" title="Direct link to UNIFORMS">​</a></h5>
+<blockquote>
+<p><strong>UNIFORMS</strong>: readonly [<code>&quot;u_matrix&quot;</code>]</p>
+</blockquote>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="vertex_shader_source-1">VERTEX_SHADER_SOURCE<a href="#vertex_shader_source-1" class="hash-link" aria-label="Direct link to VERTEX_SHADER_SOURCE" title="Direct link to VERTEX_SHADER_SOURCE">​</a></h5>
+<blockquote>
+<p><strong>VERTEX_SHADER_SOURCE</strong>: <code>string</code></p>
+</blockquote>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="vertices-1">VERTICES<a href="#vertices-1" class="hash-link" aria-label="Direct link to VERTICES" title="Direct link to VERTICES">​</a></h5>
+<blockquote>
+<p><strong>VERTICES</strong>: <code>number</code> = <code>2</code></p>
+</blockquote>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="overrides">Overrides<a href="#overrides" class="hash-link" aria-label="Direct link to Overrides" title="Direct link to Overrides">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#getdefinition"><code>getDefinition</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="getprograminfo">getProgramInfo()<a href="#getprograminfo" class="hash-link" aria-label="Direct link to getProgramInfo()" title="Direct link to getProgramInfo()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>getProgramInfo</strong>(<code>name</code>, <code>gl</code>, <code>vertexShaderSource</code>, <code>fragmentShaderSource</code>, <code>frameBuffer</code>): <a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L150" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:150</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-4">Parameters<a href="#parameters-4" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="name">name<a href="#name" class="hash-link" aria-label="Direct link to name" title="Direct link to name">​</a></h5>
+<p><code>&quot;normal&quot;</code> | <code>&quot;pick&quot;</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="gl-1">gl<a href="#gl-1" class="hash-link" aria-label="Direct link to gl" title="Direct link to gl">​</a></h5>
+<p><code>WebGLRenderingContext</code> | <code>WebGL2RenderingContext</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="vertexshadersource">vertexShaderSource<a href="#vertexshadersource" class="hash-link" aria-label="Direct link to vertexShaderSource" title="Direct link to vertexShaderSource">​</a></h5>
+<p><code>string</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="fragmentshadersource">fragmentShaderSource<a href="#fragmentshadersource" class="hash-link" aria-label="Direct link to fragmentShaderSource" title="Direct link to fragmentShaderSource">​</a></h5>
+<p><code>string</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="framebuffer">frameBuffer<a href="#framebuffer" class="hash-link" aria-label="Direct link to frameBuffer" title="Direct link to frameBuffer">​</a></h5>
+<p><code>null</code> | <code>WebGLFramebuffer</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-5">Returns<a href="#returns-5" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-23">Inherited from<a href="#inherited-from-23" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#getprograminfo"><code>getProgramInfo</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="hasnothingtorender">hasNothingToRender()<a href="#hasnothingtorender" class="hash-link" aria-label="Direct link to hasNothingToRender()" title="Direct link to hasNothingToRender()">​</a></h3>
+<blockquote>
+<p><strong>hasNothingToRender</strong>(): <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L312" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:312</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-6">Returns<a href="#returns-6" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>boolean</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-24">Inherited from<a href="#inherited-from-24" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#hasnothingtorender"><code>hasNothingToRender</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="kill">kill()<a href="#kill" class="hash-link" aria-label="Direct link to kill()" title="Direct link to kill()">​</a></h3>
+<blockquote>
+<p><strong>kill</strong>(): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/edge.ts#L42" target="_blank" rel="noopener noreferrer">sigma/src/rendering/edge.ts:42</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-7">Returns<a href="#returns-7" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-25">Inherited from<a href="#inherited-from-25" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#kill"><code>kill</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="process">process()<a href="#process" class="hash-link" aria-label="Direct link to process()" title="Direct link to process()">​</a></h3>
+<blockquote>
+<p><strong>process</strong>(<code>edgeIndex</code>, <code>offset</code>, <code>sourceData</code>, <code>targetData</code>, <code>data</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/edge.ts#L46" target="_blank" rel="noopener noreferrer">sigma/src/rendering/edge.ts:46</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-5">Parameters<a href="#parameters-5" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="edgeindex">edgeIndex<a href="#edgeindex" class="hash-link" aria-label="Direct link to edgeIndex" title="Direct link to edgeIndex">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="offset-1">offset<a href="#offset-1" class="hash-link" aria-label="Direct link to offset" title="Direct link to offset">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="sourcedata">sourceData<a href="#sourcedata" class="hash-link" aria-label="Direct link to sourceData" title="Direct link to sourceData">​</a></h5>
+<p><code>NodeDisplayData</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="targetdata">targetData<a href="#targetdata" class="hash-link" aria-label="Direct link to targetData" title="Direct link to targetData">​</a></h5>
+<p><code>NodeDisplayData</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="data">data<a href="#data" class="hash-link" aria-label="Direct link to data" title="Direct link to data">​</a></h5>
+<p><code>DisplayData</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-8">Returns<a href="#returns-8" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-26">Inherited from<a href="#inherited-from-26" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#process"><code>process</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="processvisibleitem">processVisibleItem()<a href="#processvisibleitem" class="hash-link" aria-label="Direct link to processVisibleItem()" title="Direct link to processVisibleItem()">​</a></h3>
+<blockquote>
+<p><strong>processVisibleItem</strong>(<code>edgeIndex</code>, <code>startIndex</code>, <code>sourceData</code>, <code>targetData</code>, <code>data</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/programs/edge-line/index.ts#L42" target="_blank" rel="noopener noreferrer">sigma/src/rendering/programs/edge-line/index.ts:42</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-6">Parameters<a href="#parameters-6" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="edgeindex-1">edgeIndex<a href="#edgeindex-1" class="hash-link" aria-label="Direct link to edgeIndex" title="Direct link to edgeIndex">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="startindex">startIndex<a href="#startindex" class="hash-link" aria-label="Direct link to startIndex" title="Direct link to startIndex">​</a></h5>
+<p><code>number</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="sourcedata-1">sourceData<a href="#sourcedata-1" class="hash-link" aria-label="Direct link to sourceData" title="Direct link to sourceData">​</a></h5>
+<p><code>NodeDisplayData</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="targetdata-1">targetData<a href="#targetdata-1" class="hash-link" aria-label="Direct link to targetData" title="Direct link to targetData">​</a></h5>
+<p><code>NodeDisplayData</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="data-1">data<a href="#data-1" class="hash-link" aria-label="Direct link to data" title="Direct link to data">​</a></h5>
+<p><code>DisplayData</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-9">Returns<a href="#returns-9" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="overrides-1">Overrides<a href="#overrides-1" class="hash-link" aria-label="Direct link to Overrides" title="Direct link to Overrides">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#processvisibleitem"><code>processVisibleItem</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="reallocate">reallocate()<a href="#reallocate" class="hash-link" aria-label="Direct link to reallocate()" title="Direct link to reallocate()">​</a></h3>
+<blockquote>
+<p><strong>reallocate</strong>(<code>capacity</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L297" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:297</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-7">Parameters<a href="#parameters-7" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="capacity-1">capacity<a href="#capacity-1" class="hash-link" aria-label="Direct link to capacity" title="Direct link to capacity">​</a></h5>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-10">Returns<a href="#returns-10" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-27">Inherited from<a href="#inherited-from-27" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#reallocate"><code>reallocate</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="render">render()<a href="#render" class="hash-link" aria-label="Direct link to render()" title="Direct link to render()">​</a></h3>
+<blockquote>
+<p><strong>render</strong>(<code>params</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L334" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:334</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-8">Parameters<a href="#parameters-8" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="params">params<a href="#params" class="hash-link" aria-label="Direct link to params" title="Direct link to params">​</a></h5>
+<p><code>RenderParams</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-11">Returns<a href="#returns-11" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-28">Inherited from<a href="#inherited-from-28" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#render"><code>render</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="renderprogram">renderProgram()<a href="#renderprogram" class="hash-link" aria-label="Direct link to renderProgram()" title="Direct link to renderProgram()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>renderProgram</strong>(<code>params</code>, <code>programInfo</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L318" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:318</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-9">Parameters<a href="#parameters-9" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="params-1">params<a href="#params-1" class="hash-link" aria-label="Direct link to params" title="Direct link to params">​</a></h5>
+<p><code>RenderParams</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="programinfo">programInfo<a href="#programinfo" class="hash-link" aria-label="Direct link to programInfo" title="Direct link to programInfo">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-12">Returns<a href="#returns-12" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-29">Inherited from<a href="#inherited-from-29" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#renderprogram"><code>renderProgram</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="setuniforms">setUniforms()<a href="#setuniforms" class="hash-link" aria-label="Direct link to setUniforms()" title="Direct link to setUniforms()">​</a></h3>
+<blockquote>
+<p><strong>setUniforms</strong>(<code>params</code>, <code>__namedParameters</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/programs/edge-line/index.ts#L70" target="_blank" rel="noopener noreferrer">sigma/src/rendering/programs/edge-line/index.ts:70</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-10">Parameters<a href="#parameters-10" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="params-2">params<a href="#params-2" class="hash-link" aria-label="Direct link to params" title="Direct link to params">​</a></h5>
+<p><code>RenderParams</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="__namedparameters-1">__namedParameters<a href="#__namedparameters-1" class="hash-link" aria-label="Direct link to __namedParameters" title="Direct link to __namedParameters">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-13">Returns<a href="#returns-13" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="overrides-2">Overrides<a href="#overrides-2" class="hash-link" aria-label="Direct link to Overrides" title="Direct link to Overrides">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#setuniforms"><code>setUniforms</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="unbindattribute">unbindAttribute()<a href="#unbindattribute" class="hash-link" aria-label="Direct link to unbindAttribute()" title="Direct link to unbindAttribute()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>unbindAttribute</strong>(<code>attr</code>, <code>program</code>, <code>unsetDivisor</code>?): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L279" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:279</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-11">Parameters<a href="#parameters-11" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="attr-1">attr<a href="#attr-1" class="hash-link" aria-label="Direct link to attr" title="Direct link to attr">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramAttributeSpecification"><code>ProgramAttributeSpecification</code></a></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="program-2">program<a href="#program-2" class="hash-link" aria-label="Direct link to program" title="Direct link to program">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="unsetdivisor">unsetDivisor?<a href="#unsetdivisor" class="hash-link" aria-label="Direct link to unsetDivisor?" title="Direct link to unsetDivisor?">​</a></h5>
+<p><code>boolean</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-14">Returns<a href="#returns-14" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-30">Inherited from<a href="#inherited-from-30" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#unbindattribute"><code>unbindAttribute</code></a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="unbindprogram">unbindProgram()<a href="#unbindprogram" class="hash-link" aria-label="Direct link to unbindProgram()" title="Direct link to unbindProgram()">​</a></h3>
+<blockquote>
+<p><code>protected</code> <strong>unbindProgram</strong>(<code>program</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/rendering/program.ts#L235" target="_blank" rel="noopener noreferrer">sigma/src/rendering/program.ts:235</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-12">Parameters<a href="#parameters-12" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="program-3">program<a href="#program-3" class="hash-link" aria-label="Direct link to program" title="Direct link to program">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/rendering/interfaces/ProgramInfo"><code>ProgramInfo</code></a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-15">Returns<a href="#returns-15" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-31">Inherited from<a href="#inherited-from-31" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><code>EdgeProgram</code></a>.<a href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram#unbindprogram"><code>unbindProgram</code></a></p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/jacomyal/sigma.js/tree/main/packages/website/docs/typedoc/sigma/src/rendering/classes/EdgeLineProgram.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_UohW" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_g62E"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/typedoc/sigma/src/rendering/classes/AbstractProgram"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">AbstractProgram</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/typedoc/sigma/src/rendering/classes/EdgeProgram"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">EdgeProgram</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_TN1Q thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#extends" class="table-of-contents__link toc-highlight">Extends</a></li><li><a href="#type-parameters" class="table-of-contents__link toc-highlight">Type Parameters</a></li><li><a href="#constructors" class="table-of-contents__link toc-highlight">Constructors</a><ul><li><a href="#new-edgelineprogram" class="table-of-contents__link toc-highlight">new EdgeLineProgram()</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#array" class="table-of-contents__link toc-highlight">array</a></li><li><a href="#attributes" class="table-of-contents__link toc-highlight">ATTRIBUTES</a></li><li><a href="#attributes_items_count" class="table-of-contents__link toc-highlight">ATTRIBUTES_ITEMS_COUNT</a></li><li><a href="#capacity" class="table-of-contents__link toc-highlight">capacity</a></li><li><a href="#constant_attributes" class="table-of-contents__link toc-highlight">CONSTANT_ATTRIBUTES</a></li><li><a href="#constant_data" class="table-of-contents__link toc-highlight">CONSTANT_DATA</a></li><li><a href="#constantarray" class="table-of-contents__link toc-highlight">constantArray</a></li><li><a href="#drawlabel" class="table-of-contents__link toc-highlight">drawLabel</a></li><li><a href="#fragment_shader_source" class="table-of-contents__link toc-highlight">FRAGMENT_SHADER_SOURCE</a></li><li><a href="#isinstanced" class="table-of-contents__link toc-highlight">isInstanced</a></li><li><a href="#method" class="table-of-contents__link toc-highlight">METHOD</a></li><li><a href="#normalprogram" class="table-of-contents__link toc-highlight">normalProgram</a></li><li><a href="#pickprogram" class="table-of-contents__link toc-highlight">pickProgram</a></li><li><a href="#renderer-1" class="table-of-contents__link toc-highlight">renderer</a></li><li><a href="#stride" class="table-of-contents__link toc-highlight">STRIDE</a></li><li><a href="#uniforms" class="table-of-contents__link toc-highlight">UNIFORMS</a></li><li><a href="#vertex_shader_source" class="table-of-contents__link toc-highlight">VERTEX_SHADER_SOURCE</a></li><li><a href="#vertices" class="table-of-contents__link toc-highlight">VERTICES</a></li><li><a href="#verticescount" class="table-of-contents__link toc-highlight">verticesCount</a></li></ul></li><li><a href="#methods" class="table-of-contents__link toc-highlight">Methods</a><ul><li><a href="#bindattribute" class="table-of-contents__link toc-highlight">bindAttribute()</a></li><li><a href="#bindprogram" class="table-of-contents__link toc-highlight">bindProgram()</a></li><li><a href="#drawwebgl" class="table-of-contents__link toc-highlight">drawWebGL()</a></li><li><a href="#getdefinition" class="table-of-contents__link toc-highlight">getDefinition()</a></li><li><a href="#getprograminfo" class="table-of-contents__link toc-highlight">getProgramInfo()</a></li><li><a href="#hasnothingtorender" class="table-of-contents__link toc-highlight">hasNothingToRender()</a></li><li><a href="#kill" class="table-of-contents__link toc-highlight">kill()</a></li><li><a href="#process" class="table-of-contents__link toc-highlight">process()</a></li><li><a href="#processvisibleitem" class="table-of-contents__link toc-highlight">processVisibleItem()</a></li><li><a href="#reallocate" class="table-of-contents__link toc-highlight">reallocate()</a></li><li><a href="#render" class="table-of-contents__link toc-highlight">render()</a></li><li><a href="#renderprogram" class="table-of-contents__link toc-highlight">renderProgram()</a></li><li><a href="#setuniforms" class="table-of-contents__link toc-highlight">setUniforms()</a></li><li><a href="#unbindattribute" class="table-of-contents__link toc-highlight">unbindAttribute()</a></li><li><a href="#unbindprogram" class="table-of-contents__link toc-highlight">unbindProgram()</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="row"><div class="footer__col col"><p><a href="/" class="with-logo"><img src="/img/logo-sigma-ruby.svg" alt=""> <strong class="text-ruby">sigma</strong><strong class="text-grey">.js</strong></a> <!-- -->is published by <a href="https://medialab.sciencespo.fr/en/">Sciences-Po médialab</a> and<!-- --> <a href="https://ouestware.com/en">OuestWare</a>.</p><ul><li><a href="/docs">documentation</a></li><li><a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a></li><li><a rel="me" href="https://vis.social/@sigmajs">vis.social/@sigmajs (Mastodon)</a></li></ul></div><div class="footer__col col"><p>It is developed under<!-- --> <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.</p><p>This website uses <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,<!-- --> <a href="https://public-sans.digital.gov/">Public Sans</a> and<!-- --> <a href="https://github.com/microsoft/cascadia-code">Cascadia Code</a> fonts.</p></div></div></div></footer></div>
+</body>
+</html>

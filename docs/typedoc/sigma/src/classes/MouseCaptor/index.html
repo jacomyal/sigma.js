@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-typedoc/sigma/src/classes/MouseCaptor" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.7.0">
+<title data-rh="true">Class: MouseCaptor\&lt;N, E, G\&gt; | sigma.js</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://www.sigmajs.org/docs/typedoc/sigma/src/classes/MouseCaptor"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="theme-color" content="#e22653"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Class: MouseCaptor\&lt;N, E, G\&gt; | sigma.js"><meta data-rh="true" name="description" content="Defined in55"><meta data-rh="true" property="og:description" content="Defined in55"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.sigmajs.org/docs/typedoc/sigma/src/classes/MouseCaptor"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/classes/MouseCaptor" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.sigmajs.org/docs/typedoc/sigma/src/classes/MouseCaptor" hreflang="x-default"><link rel="preconnect" href="https://matomo.ouestware.com/">
+<script>var _paq=window._paq=window._paq||[];_paq.push(["setRequestMethod","POST"]),_paq.push(["trackPageView"]),_paq.push(["enableLinkTracking"]),_paq.push(["enableHeartBeatTimer"]),function(){var e="https://matomo.ouestware.com/";_paq.push(["setRequestMethod","POST"]),_paq.push(["setTrackerUrl",e+"matomo.php"]),_paq.push(["setSiteId","26"]);var a=document,t=a.createElement("script"),p=a.getElementsByTagName("script")[0];t.type="text/javascript",t.async=!0,t.src=e+"matomo.js",p.parentNode.insertBefore(t,p)}()</script><link rel="stylesheet" href="/assets/css/styles.ac0f26fa.css">
+<script src="/assets/js/runtime~main.857be78f.js" defer="defer"></script>
+<script src="/assets/js/main.1d211a62.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const n=new URLSearchParams(window.location.search).entries();for(var[t,e]of n)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_G6ar" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/logo-sigma-ruby.svg" alt="sigma.js logo"></div><b class="navbar__title text--truncate"><span class="text-ruby">sigma</span><span class="text-grey">.js</span></b></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/jacomyal/sigma.js" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_awgD"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_OLSw colorModeToggle_Hg9V"><button class="clean-btn toggleButton_wYmb toggleButtonDisabled_vaDU" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_Sxwe"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_Yem1"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_bmvg"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_UyTV"><div class="docsWrapper_XLvK"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_z1FD" type="button"></button><div class="docRoot_HciC"><aside class="theme-doc-sidebar-container docSidebarContainer_e5ai"><div class="sidebarViewport_N8x0"><div class="sidebar_vJCc"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_qiME"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/quickstart">Quickstart Guide</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/docs/resources">Resources</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/docs/category/advanced-topics">Advanced topics</a><button aria-label="Expand sidebar category &#x27;Advanced topics&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" href="/docs/category/typedoc-api">Typedoc API</a><button aria-label="Collapse sidebar category &#x27;Typedoc API&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/edge-curve/src/">edge-curve</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-leaflet/src/">layer-leaflet</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-maplibre/src/">layer-maplibre</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/layer-webgl/src/">layer-webgl</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-border/src/">node-border</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-image/src/">node-image</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-piechart/src/">node-piechart</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" tabindex="0" href="/docs/typedoc/node-square/src/">node-square</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/">sigma</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/docs/typedoc/sigma/src/">src</a><button aria-label="Collapse sidebar category &#x27;src&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" tabindex="0" href="/docs/typedoc/sigma/src/classes/Camera">Classes</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-5 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/classes/Camera">Camera</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-5 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/typedoc/sigma/src/classes/MouseCaptor">MouseCaptor</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-5 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/classes/Sigma">Sigma</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-5 menu__list-item"><a class="menu__link" tabindex="0" href="/docs/typedoc/sigma/src/classes/TouchCaptor">TouchCaptor</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/rendering/">rendering</a><button aria-label="Expand sidebar category &#x27;rendering&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/settings/">settings</a><button aria-label="Expand sidebar category &#x27;settings&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-4 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" tabindex="0" href="/docs/typedoc/sigma/src/utils/">utils</a><button aria-label="Expand sidebar category &#x27;utils&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li></ul></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_namt"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_YAwJ"><div class="docItemContainer_Rv5Z"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_zCmv" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/category/typedoc-api"><span itemprop="name">Typedoc API</span></a><meta itemprop="position" content="1"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">sigma</span><meta itemprop="position" content="2"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/typedoc/sigma/src/"><span itemprop="name">src</span></a><meta itemprop="position" content="3"></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Classes</span><meta itemprop="position" content="4"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">MouseCaptor</span><meta itemprop="position" content="5"></li></ul></nav><div class="tocCollapsible_O_Qc theme-doc-toc-mobile tocMobile_tjDr"><button type="button" class="clean-btn tocCollapsibleButton_htYj">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Class: MouseCaptor&lt;N, E, G&gt;</h1></header>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L55" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:55</a></p>
+<p>Mouse captor class.</p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="extends">Extends<a href="#extends" class="hash-link" aria-label="Direct link to Extends" title="Direct link to Extends">​</a></h2>
+<ul>
+<li><code>default</code>&lt;<code>MouseCaptorEvents</code>, <code>N</code>, <code>E</code>, <code>G</code>&gt;</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters">Type Parameters<a href="#type-parameters" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h2>
+<p>• <strong>N</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>E</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<p>• <strong>G</strong> <em>extends</em> <code>Attributes</code> = <code>Attributes</code></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="constructors">Constructors<a href="#constructors" class="hash-link" aria-label="Direct link to Constructors" title="Direct link to Constructors">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="new-mousecaptor">new MouseCaptor()<a href="#new-mousecaptor" class="hash-link" aria-label="Direct link to new MouseCaptor()" title="Direct link to new MouseCaptor()">​</a></h3>
+<blockquote>
+<p><strong>new MouseCaptor</strong>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;(<code>container</code>, <code>renderer</code>): <a href="/docs/typedoc/sigma/src/classes/MouseCaptor"><code>MouseCaptor</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L78" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:78</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters">Parameters<a href="#parameters" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="container">container<a href="#container" class="hash-link" aria-label="Direct link to container" title="Direct link to container">​</a></h5>
+<p><code>HTMLElement</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="renderer">renderer<a href="#renderer" class="hash-link" aria-label="Direct link to renderer" title="Direct link to renderer">​</a></h5>
+<p><a href="/docs/typedoc/sigma/src/classes/Sigma"><code>Sigma</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns">Returns<a href="#returns" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><a href="/docs/typedoc/sigma/src/classes/MouseCaptor"><code>MouseCaptor</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="overrides">Overrides<a href="#overrides" class="hash-link" aria-label="Direct link to Overrides" title="Direct link to Overrides">​</a></h4>
+<p><code>Captor&lt;MouseCaptorEvents, N, E, G&gt;.constructor</code></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="properties">Properties<a href="#properties" class="hash-link" aria-label="Direct link to Properties" title="Direct link to Properties">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="clicks">clicks<a href="#clicks" class="hash-link" aria-label="Direct link to clicks" title="Direct link to clicks">​</a></h3>
+<blockquote>
+<p><strong>clicks</strong>: <code>number</code> = <code>0</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L70" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:70</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="container-1">container<a href="#container-1" class="hash-link" aria-label="Direct link to container" title="Direct link to container">​</a></h3>
+<blockquote>
+<p><strong>container</strong>: <code>HTMLElement</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/captor.ts#L142" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/captor.ts:142</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from">Inherited from<a href="#inherited-from" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.container</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="currentwheeldirection">currentWheelDirection<a href="#currentwheeldirection" class="hash-link" aria-label="Direct link to currentWheelDirection" title="Direct link to currentWheelDirection">​</a></h3>
+<blockquote>
+<p><strong>currentWheelDirection</strong>: <code>-1</code> | <code>0</code> | <code>1</code> = <code>0</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L73" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:73</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="doubleclicktimeout">doubleClickTimeout<a href="#doubleclicktimeout" class="hash-link" aria-label="Direct link to doubleClickTimeout" title="Direct link to doubleClickTimeout">​</a></h3>
+<blockquote>
+<p><strong>doubleClickTimeout</strong>: <code>null</code> | <code>number</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L71" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:71</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="downstarttime">downStartTime<a href="#downstarttime" class="hash-link" aria-label="Direct link to downStartTime" title="Direct link to downStartTime">​</a></h3>
+<blockquote>
+<p><strong>downStartTime</strong>: <code>null</code> | <code>number</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L63" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:63</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="draggedevents">draggedEvents<a href="#draggedevents" class="hash-link" aria-label="Direct link to draggedEvents" title="Direct link to draggedEvents">​</a></h3>
+<blockquote>
+<p><strong>draggedEvents</strong>: <code>number</code> = <code>0</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L62" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:62</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="enabled">enabled<a href="#enabled" class="hash-link" aria-label="Direct link to enabled" title="Direct link to enabled">​</a></h3>
+<blockquote>
+<p><strong>enabled</strong>: <code>boolean</code> = <code>true</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L61" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:61</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="ismousedown">isMouseDown<a href="#ismousedown" class="hash-link" aria-label="Direct link to isMouseDown" title="Direct link to isMouseDown">​</a></h3>
+<blockquote>
+<p><strong>isMouseDown</strong>: <code>boolean</code> = <code>false</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L66" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:66</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="ismoving">isMoving<a href="#ismoving" class="hash-link" aria-label="Direct link to isMoving" title="Direct link to isMoving">​</a></h3>
+<blockquote>
+<p><strong>isMoving</strong>: <code>boolean</code> = <code>false</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L67" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:67</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="lastmousex">lastMouseX<a href="#lastmousex" class="hash-link" aria-label="Direct link to lastMouseX" title="Direct link to lastMouseX">​</a></h3>
+<blockquote>
+<p><strong>lastMouseX</strong>: <code>null</code> | <code>number</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L64" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:64</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="lastmousey">lastMouseY<a href="#lastmousey" class="hash-link" aria-label="Direct link to lastMouseY" title="Direct link to lastMouseY">​</a></h3>
+<blockquote>
+<p><strong>lastMouseY</strong>: <code>null</code> | <code>number</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L65" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:65</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="lastwheeltriggertime">lastWheelTriggerTime?<a href="#lastwheeltriggertime" class="hash-link" aria-label="Direct link to lastWheelTriggerTime?" title="Direct link to lastWheelTriggerTime?">​</a></h3>
+<blockquote>
+<p><code>optional</code> <strong>lastWheelTriggerTime</strong>: <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L74" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:74</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="movingtimeout">movingTimeout<a href="#movingtimeout" class="hash-link" aria-label="Direct link to movingTimeout" title="Direct link to movingTimeout">​</a></h3>
+<blockquote>
+<p><strong>movingTimeout</strong>: <code>null</code> | <code>number</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L68" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:68</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="rawemitter">rawEmitter<a href="#rawemitter" class="hash-link" aria-label="Direct link to rawEmitter" title="Direct link to rawEmitter">​</a></h3>
+<blockquote>
+<p><strong>rawEmitter</strong>: <code>EventEmitter</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L114" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:114</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-1">Inherited from<a href="#inherited-from-1" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.rawEmitter</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="renderer-1">renderer<a href="#renderer-1" class="hash-link" aria-label="Direct link to renderer" title="Direct link to renderer">​</a></h3>
+<blockquote>
+<p><strong>renderer</strong>: <a href="/docs/typedoc/sigma/src/classes/Sigma"><code>Sigma</code></a>&lt;<code>N</code>, <code>E</code>, <code>G</code>&gt;</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/captor.ts#L143" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/captor.ts:143</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-2">Inherited from<a href="#inherited-from-2" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.renderer</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="settings">settings<a href="#settings" class="hash-link" aria-label="Direct link to settings" title="Direct link to settings">​</a></h3>
+<blockquote>
+<p><strong>settings</strong>: <code>MouseSettings</code> = <code>DEFAULT_MOUSE_SETTINGS</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L76" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:76</a></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="startcamerastate">startCameraState<a href="#startcamerastate" class="hash-link" aria-label="Direct link to startCameraState" title="Direct link to startCameraState">​</a></h3>
+<blockquote>
+<p><strong>startCameraState</strong>: <code>null</code> | <code>CameraState</code> = <code>null</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L69" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:69</a></p>
+<h2 class="anchor anchorWithStickyNavbar_fF9Z" id="methods">Methods<a href="#methods" class="hash-link" aria-label="Direct link to Methods" title="Direct link to Methods">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="addlistener">addListener()<a href="#addlistener" class="hash-link" aria-label="Direct link to addListener()" title="Direct link to addListener()">​</a></h3>
+<blockquote>
+<p><strong>addListener</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L120" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:120</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-1">Type Parameters<a href="#type-parameters-1" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-1">Parameters<a href="#parameters-1" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type">type<a href="#type" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener">listener<a href="#listener" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-1">Returns<a href="#returns-1" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-3">Inherited from<a href="#inherited-from-3" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.addListener</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="emit">emit()<a href="#emit" class="hash-link" aria-label="Direct link to emit()" title="Direct link to emit()">​</a></h3>
+<blockquote>
+<p><strong>emit</strong>&lt;<code>Event</code>&gt;(<code>type</code>, ...<code>args</code>): <code>boolean</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L119" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:119</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-2">Type Parameters<a href="#type-parameters-2" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-2">Parameters<a href="#parameters-2" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-1">type<a href="#type-1" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="args">args<a href="#args" class="hash-link" aria-label="Direct link to args" title="Direct link to args">​</a></h5>
+<p>...<code>Parameters</code>&lt;<code>MouseCaptorEvents</code>[<code>Event</code>]&gt;</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-2">Returns<a href="#returns-2" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>boolean</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-4">Inherited from<a href="#inherited-from-4" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.emit</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="eventnames">eventNames()<a href="#eventnames" class="hash-link" aria-label="Direct link to eventNames()" title="Direct link to eventNames()">​</a></h3>
+<blockquote>
+<p><strong>eventNames</strong>&lt;<code>Event</code>&gt;(): <code>Event</code>[]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L116" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:116</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-3">Type Parameters<a href="#type-parameters-3" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-3">Returns<a href="#returns-3" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>Event</code>[]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-5">Inherited from<a href="#inherited-from-5" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.eventNames</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="getmaxlisteners">getMaxListeners()<a href="#getmaxlisteners" class="hash-link" aria-label="Direct link to getMaxListeners()" title="Direct link to getMaxListeners()">​</a></h3>
+<blockquote>
+<p><strong>getMaxListeners</strong>(): <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L118" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:118</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-4">Returns<a href="#returns-4" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-6">Inherited from<a href="#inherited-from-6" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.getMaxListeners</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handleclick">handleClick()<a href="#handleclick" class="hash-link" aria-label="Direct link to handleClick()" title="Direct link to handleClick()">​</a></h3>
+<blockquote>
+<p><strong>handleClick</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L117" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:117</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-3">Parameters<a href="#parameters-3" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e">e<a href="#e" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-5">Returns<a href="#returns-5" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handledoubleclick">handleDoubleClick()<a href="#handledoubleclick" class="hash-link" aria-label="Direct link to handleDoubleClick()" title="Direct link to handleDoubleClick()">​</a></h3>
+<blockquote>
+<p><strong>handleDoubleClick</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L147" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:147</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-4">Parameters<a href="#parameters-4" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-1">e<a href="#e-1" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-6">Returns<a href="#returns-6" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handledown">handleDown()<a href="#handledown" class="hash-link" aria-label="Direct link to handleDown()" title="Direct link to handleDown()">​</a></h3>
+<blockquote>
+<p><strong>handleDown</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L168" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:168</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-5">Parameters<a href="#parameters-5" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-2">e<a href="#e-2" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-7">Returns<a href="#returns-7" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handleenter">handleEnter()<a href="#handleenter" class="hash-link" aria-label="Direct link to handleEnter()" title="Direct link to handleEnter()">​</a></h3>
+<blockquote>
+<p><strong>handleEnter</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L305" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:305</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-6">Parameters<a href="#parameters-6" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-3">e<a href="#e-3" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-8">Returns<a href="#returns-8" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handleleave">handleLeave()<a href="#handleleave" class="hash-link" aria-label="Direct link to handleLeave()" title="Direct link to handleLeave()">​</a></h3>
+<blockquote>
+<p><strong>handleLeave</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L301" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:301</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-7">Parameters<a href="#parameters-7" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-4">e<a href="#e-4" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-9">Returns<a href="#returns-9" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handlemove">handleMove()<a href="#handlemove" class="hash-link" aria-label="Direct link to handleMove()" title="Direct link to handleMove()">​</a></h3>
+<blockquote>
+<p><strong>handleMove</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L238" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:238</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-8">Parameters<a href="#parameters-8" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-5">e<a href="#e-5" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-10">Returns<a href="#returns-10" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handlerightclick">handleRightClick()<a href="#handlerightclick" class="hash-link" aria-label="Direct link to handleRightClick()" title="Direct link to handleRightClick()">​</a></h3>
+<blockquote>
+<p><strong>handleRightClick</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L141" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:141</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-9">Parameters<a href="#parameters-9" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-6">e<a href="#e-6" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-11">Returns<a href="#returns-11" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handleup">handleUp()<a href="#handleup" class="hash-link" aria-label="Direct link to handleUp()" title="Direct link to handleUp()">​</a></h3>
+<blockquote>
+<p><strong>handleUp</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L188" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:188</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-10">Parameters<a href="#parameters-10" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-7">e<a href="#e-7" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>MouseEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-12">Returns<a href="#returns-12" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="handlewheel">handleWheel()<a href="#handlewheel" class="hash-link" aria-label="Direct link to handleWheel()" title="Direct link to handleWheel()">​</a></h3>
+<blockquote>
+<p><strong>handleWheel</strong>(<code>e</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L309" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:309</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-11">Parameters<a href="#parameters-11" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="e-8">e<a href="#e-8" class="hash-link" aria-label="Direct link to e" title="Direct link to e">​</a></h5>
+<p><code>WheelEvent</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-13">Returns<a href="#returns-13" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="kill">kill()<a href="#kill" class="hash-link" aria-label="Direct link to kill()" title="Direct link to kill()">​</a></h3>
+<blockquote>
+<p><strong>kill</strong>(): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L103" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:103</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-14">Returns<a href="#returns-14" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="overrides-1">Overrides<a href="#overrides-1" class="hash-link" aria-label="Direct link to Overrides" title="Direct link to Overrides">​</a></h4>
+<p><code>Captor.kill</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="listenercount">listenerCount()<a href="#listenercount" class="hash-link" aria-label="Direct link to listenerCount()" title="Direct link to listenerCount()">​</a></h3>
+<blockquote>
+<p><strong>listenerCount</strong>&lt;<code>Event</code>&gt;(<code>type</code>): <code>number</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L129" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:129</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-4">Type Parameters<a href="#type-parameters-4" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-12">Parameters<a href="#parameters-12" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-2">type<a href="#type-2" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-15">Returns<a href="#returns-15" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-7">Inherited from<a href="#inherited-from-7" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.listenerCount</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="listeners">listeners()<a href="#listeners" class="hash-link" aria-label="Direct link to listeners()" title="Direct link to listeners()">​</a></h3>
+<blockquote>
+<p><strong>listeners</strong>&lt;<code>Event</code>&gt;(<code>type</code>): <code>MouseCaptorEvents</code>[<code>Event</code>][]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L128" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:128</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-5">Type Parameters<a href="#type-parameters-5" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-13">Parameters<a href="#parameters-13" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-3">type<a href="#type-3" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-16">Returns<a href="#returns-16" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>][]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-8">Inherited from<a href="#inherited-from-8" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.listeners</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="off">off()<a href="#off" class="hash-link" aria-label="Direct link to off()" title="Direct link to off()">​</a></h3>
+<blockquote>
+<p><strong>off</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L126" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:126</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-6">Type Parameters<a href="#type-parameters-6" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-14">Parameters<a href="#parameters-14" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-4">type<a href="#type-4" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-1">listener<a href="#listener-1" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-17">Returns<a href="#returns-17" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-9">Inherited from<a href="#inherited-from-9" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.off</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="on">on()<a href="#on" class="hash-link" aria-label="Direct link to on()" title="Direct link to on()">​</a></h3>
+<blockquote>
+<p><strong>on</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L121" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:121</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-7">Type Parameters<a href="#type-parameters-7" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-15">Parameters<a href="#parameters-15" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-5">type<a href="#type-5" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-2">listener<a href="#listener-2" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-18">Returns<a href="#returns-18" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-10">Inherited from<a href="#inherited-from-10" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.on</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="once">once()<a href="#once" class="hash-link" aria-label="Direct link to once()" title="Direct link to once()">​</a></h3>
+<blockquote>
+<p><strong>once</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L122" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:122</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-8">Type Parameters<a href="#type-parameters-8" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-16">Parameters<a href="#parameters-16" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-6">type<a href="#type-6" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-3">listener<a href="#listener-3" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-19">Returns<a href="#returns-19" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-11">Inherited from<a href="#inherited-from-11" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.once</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="prependlistener">prependListener()<a href="#prependlistener" class="hash-link" aria-label="Direct link to prependListener()" title="Direct link to prependListener()">​</a></h3>
+<blockquote>
+<p><strong>prependListener</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L123" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:123</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-9">Type Parameters<a href="#type-parameters-9" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-17">Parameters<a href="#parameters-17" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-7">type<a href="#type-7" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-4">listener<a href="#listener-4" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-20">Returns<a href="#returns-20" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-12">Inherited from<a href="#inherited-from-12" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.prependListener</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="prependoncelistener">prependOnceListener()<a href="#prependoncelistener" class="hash-link" aria-label="Direct link to prependOnceListener()" title="Direct link to prependOnceListener()">​</a></h3>
+<blockquote>
+<p><strong>prependOnceListener</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L124" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:124</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-10">Type Parameters<a href="#type-parameters-10" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-18">Parameters<a href="#parameters-18" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-8">type<a href="#type-8" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-5">listener<a href="#listener-5" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-21">Returns<a href="#returns-21" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-13">Inherited from<a href="#inherited-from-13" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.prependOnceListener</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="rawlisteners">rawListeners()<a href="#rawlisteners" class="hash-link" aria-label="Direct link to rawListeners()" title="Direct link to rawListeners()">​</a></h3>
+<blockquote>
+<p><strong>rawListeners</strong>&lt;<code>Event</code>&gt;(<code>type</code>): <code>MouseCaptorEvents</code>[<code>Event</code>][]</p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L130" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:130</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-11">Type Parameters<a href="#type-parameters-11" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-19">Parameters<a href="#parameters-19" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-9">type<a href="#type-9" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-22">Returns<a href="#returns-22" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>][]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-14">Inherited from<a href="#inherited-from-14" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.rawListeners</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="removealllisteners">removeAllListeners()<a href="#removealllisteners" class="hash-link" aria-label="Direct link to removeAllListeners()" title="Direct link to removeAllListeners()">​</a></h3>
+<blockquote>
+<p><strong>removeAllListeners</strong>&lt;<code>Event</code>&gt;(<code>type</code>?): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L127" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:127</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-12">Type Parameters<a href="#type-parameters-12" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-20">Parameters<a href="#parameters-20" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-10">type?<a href="#type-10" class="hash-link" aria-label="Direct link to type?" title="Direct link to type?">​</a></h5>
+<p><code>Event</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-23">Returns<a href="#returns-23" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-15">Inherited from<a href="#inherited-from-15" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.removeAllListeners</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="removelistener">removeListener()<a href="#removelistener" class="hash-link" aria-label="Direct link to removeListener()" title="Direct link to removeListener()">​</a></h3>
+<blockquote>
+<p><strong>removeListener</strong>&lt;<code>Event</code>&gt;(<code>type</code>, <code>listener</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L125" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:125</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="type-parameters-13">Type Parameters<a href="#type-parameters-13" class="hash-link" aria-label="Direct link to Type Parameters" title="Direct link to Type Parameters">​</a></h4>
+<p>• <strong>Event</strong> <em>extends</em> keyof <code>MouseCaptorEvents</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-21">Parameters<a href="#parameters-21" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="type-11">type<a href="#type-11" class="hash-link" aria-label="Direct link to type" title="Direct link to type">​</a></h5>
+<p><code>Event</code></p>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="listener-6">listener<a href="#listener-6" class="hash-link" aria-label="Direct link to listener" title="Direct link to listener">​</a></h5>
+<p><code>MouseCaptorEvents</code>[<code>Event</code>]</p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-24">Returns<a href="#returns-24" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-16">Inherited from<a href="#inherited-from-16" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.removeListener</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="setmaxlisteners">setMaxListeners()<a href="#setmaxlisteners" class="hash-link" aria-label="Direct link to setMaxListeners()" title="Direct link to setMaxListeners()">​</a></h3>
+<blockquote>
+<p><strong>setMaxListeners</strong>(<code>n</code>): <code>this</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/types.ts#L117" target="_blank" rel="noopener noreferrer">sigma/src/types.ts:117</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-22">Parameters<a href="#parameters-22" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="n">n<a href="#n" class="hash-link" aria-label="Direct link to n" title="Direct link to n">​</a></h5>
+<p><code>number</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-25">Returns<a href="#returns-25" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>this</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="inherited-from-17">Inherited from<a href="#inherited-from-17" class="hash-link" aria-label="Direct link to Inherited from" title="Direct link to Inherited from">​</a></h4>
+<p><code>Captor.setMaxListeners</code></p>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_fF9Z" id="setsettings">setSettings()<a href="#setsettings" class="hash-link" aria-label="Direct link to setSettings()" title="Direct link to setSettings()">​</a></h3>
+<blockquote>
+<p><strong>setSettings</strong>(<code>settings</code>): <code>void</code></p>
+</blockquote>
+<p>Defined in: <a href="https://github.com/jacomyal/sigma.js/blob/13062dc5be4f876d7c188411b120bb5a3a0be6f4/packages/sigma/src/core/captors/mouse.ts#L363" target="_blank" rel="noopener noreferrer">sigma/src/core/captors/mouse.ts:363</a></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="parameters-23">Parameters<a href="#parameters-23" class="hash-link" aria-label="Direct link to Parameters" title="Direct link to Parameters">​</a></h4>
+<h5 class="anchor anchorWithStickyNavbar_fF9Z" id="settings-1">settings<a href="#settings-1" class="hash-link" aria-label="Direct link to settings" title="Direct link to settings">​</a></h5>
+<p><code>MouseSettings</code></p>
+<h4 class="anchor anchorWithStickyNavbar_fF9Z" id="returns-26">Returns<a href="#returns-26" class="hash-link" aria-label="Direct link to Returns" title="Direct link to Returns">​</a></h4>
+<p><code>void</code></p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/jacomyal/sigma.js/tree/main/packages/website/docs/typedoc/sigma/src/classes/MouseCaptor.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_UohW" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_g62E"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/typedoc/sigma/src/classes/Camera"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Camera</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/typedoc/sigma/src/classes/Sigma"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Sigma</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_TN1Q thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#extends" class="table-of-contents__link toc-highlight">Extends</a></li><li><a href="#type-parameters" class="table-of-contents__link toc-highlight">Type Parameters</a></li><li><a href="#constructors" class="table-of-contents__link toc-highlight">Constructors</a><ul><li><a href="#new-mousecaptor" class="table-of-contents__link toc-highlight">new MouseCaptor()</a></li></ul></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a><ul><li><a href="#clicks" class="table-of-contents__link toc-highlight">clicks</a></li><li><a href="#container-1" class="table-of-contents__link toc-highlight">container</a></li><li><a href="#currentwheeldirection" class="table-of-contents__link toc-highlight">currentWheelDirection</a></li><li><a href="#doubleclicktimeout" class="table-of-contents__link toc-highlight">doubleClickTimeout</a></li><li><a href="#downstarttime" class="table-of-contents__link toc-highlight">downStartTime</a></li><li><a href="#draggedevents" class="table-of-contents__link toc-highlight">draggedEvents</a></li><li><a href="#enabled" class="table-of-contents__link toc-highlight">enabled</a></li><li><a href="#ismousedown" class="table-of-contents__link toc-highlight">isMouseDown</a></li><li><a href="#ismoving" class="table-of-contents__link toc-highlight">isMoving</a></li><li><a href="#lastmousex" class="table-of-contents__link toc-highlight">lastMouseX</a></li><li><a href="#lastmousey" class="table-of-contents__link toc-highlight">lastMouseY</a></li><li><a href="#lastwheeltriggertime" class="table-of-contents__link toc-highlight">lastWheelTriggerTime?</a></li><li><a href="#movingtimeout" class="table-of-contents__link toc-highlight">movingTimeout</a></li><li><a href="#rawemitter" class="table-of-contents__link toc-highlight">rawEmitter</a></li><li><a href="#renderer-1" class="table-of-contents__link toc-highlight">renderer</a></li><li><a href="#settings" class="table-of-contents__link toc-highlight">settings</a></li><li><a href="#startcamerastate" class="table-of-contents__link toc-highlight">startCameraState</a></li></ul></li><li><a href="#methods" class="table-of-contents__link toc-highlight">Methods</a><ul><li><a href="#addlistener" class="table-of-contents__link toc-highlight">addListener()</a></li><li><a href="#emit" class="table-of-contents__link toc-highlight">emit()</a></li><li><a href="#eventnames" class="table-of-contents__link toc-highlight">eventNames()</a></li><li><a href="#getmaxlisteners" class="table-of-contents__link toc-highlight">getMaxListeners()</a></li><li><a href="#handleclick" class="table-of-contents__link toc-highlight">handleClick()</a></li><li><a href="#handledoubleclick" class="table-of-contents__link toc-highlight">handleDoubleClick()</a></li><li><a href="#handledown" class="table-of-contents__link toc-highlight">handleDown()</a></li><li><a href="#handleenter" class="table-of-contents__link toc-highlight">handleEnter()</a></li><li><a href="#handleleave" class="table-of-contents__link toc-highlight">handleLeave()</a></li><li><a href="#handlemove" class="table-of-contents__link toc-highlight">handleMove()</a></li><li><a href="#handlerightclick" class="table-of-contents__link toc-highlight">handleRightClick()</a></li><li><a href="#handleup" class="table-of-contents__link toc-highlight">handleUp()</a></li><li><a href="#handlewheel" class="table-of-contents__link toc-highlight">handleWheel()</a></li><li><a href="#kill" class="table-of-contents__link toc-highlight">kill()</a></li><li><a href="#listenercount" class="table-of-contents__link toc-highlight">listenerCount()</a></li><li><a href="#listeners" class="table-of-contents__link toc-highlight">listeners()</a></li><li><a href="#off" class="table-of-contents__link toc-highlight">off()</a></li><li><a href="#on" class="table-of-contents__link toc-highlight">on()</a></li><li><a href="#once" class="table-of-contents__link toc-highlight">once()</a></li><li><a href="#prependlistener" class="table-of-contents__link toc-highlight">prependListener()</a></li><li><a href="#prependoncelistener" class="table-of-contents__link toc-highlight">prependOnceListener()</a></li><li><a href="#rawlisteners" class="table-of-contents__link toc-highlight">rawListeners()</a></li><li><a href="#removealllisteners" class="table-of-contents__link toc-highlight">removeAllListeners()</a></li><li><a href="#removelistener" class="table-of-contents__link toc-highlight">removeListener()</a></li><li><a href="#setmaxlisteners" class="table-of-contents__link toc-highlight">setMaxListeners()</a></li><li><a href="#setsettings" class="table-of-contents__link toc-highlight">setSettings()</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="row"><div class="footer__col col"><p><a href="/" class="with-logo"><img src="/img/logo-sigma-ruby.svg" alt=""> <strong class="text-ruby">sigma</strong><strong class="text-grey">.js</strong></a> <!-- -->is published by <a href="https://medialab.sciencespo.fr/en/">Sciences-Po médialab</a> and<!-- --> <a href="https://ouestware.com/en">OuestWare</a>.</p><ul><li><a href="/docs">documentation</a></li><li><a href="https://github.com/jacomyal/sigma.js">github.com/jacomyal/sigma.js</a></li><li><a rel="me" href="https://vis.social/@sigmajs">vis.social/@sigmajs (Mastodon)</a></li></ul></div><div class="footer__col col"><p>It is developed under<!-- --> <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.</p><p>This website uses <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,<!-- --> <a href="https://public-sans.digital.gov/">Public Sans</a> and<!-- --> <a href="https://github.com/microsoft/cascadia-code">Cascadia Code</a> fonts.</p></div></div></div></footer></div>
+</body>
+</html>
