@@ -2393,11 +2393,6 @@ export default class Sigma<
 
     while (container.firstChild) container.removeChild(container.firstChild);
 
-    // Destroying remaining collections
-    this.canvasContexts = {};
-    this.webGLContexts = {};
-    this.elements = {};
-
     // Kill programs:
     for (const type in this.nodePrograms) {
       this.nodePrograms[type].kill();
@@ -2416,6 +2411,11 @@ export default class Sigma<
     for (const id in this.elements) {
       this.killLayer(id);
     }
+
+    // Destroying remaining collections
+    this.canvasContexts = {};
+    this.webGLContexts = {};
+    this.elements = {};
   }
 
   /**
