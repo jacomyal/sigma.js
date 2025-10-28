@@ -32,7 +32,7 @@ export abstract class WebGLLayerProgram<
   abstract getCustomLayerDefinition(): WebGLLayerDefinition;
 
   constructor(
-    gl: WebGLRenderingContext | WebGL2RenderingContext,
+    gl: WebGL2RenderingContext,
     pickingBuffer: WebGLFramebuffer | null,
     renderer: Sigma<N, E, G>,
   ) {
@@ -49,8 +49,8 @@ export abstract class WebGLLayerProgram<
       FRAGMENT_SHADER_SOURCE,
       VERTEX_SHADER_SOURCE: getVertexShader(),
       VERTICES: 6,
-      METHOD: WebGLRenderingContext.TRIANGLE_STRIP,
-      ATTRIBUTES: [{ name: "a_position", size: 2, type: WebGLRenderingContext.FLOAT }],
+      METHOD: WebGL2RenderingContext.TRIANGLE_STRIP,
+      ATTRIBUTES: [{ name: "a_position", size: 2, type: WebGL2RenderingContext.FLOAT }],
     };
   }
   hasNothingToRender() {

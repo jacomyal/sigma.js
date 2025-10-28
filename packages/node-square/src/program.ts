@@ -7,7 +7,7 @@ import FRAGMENT_SHADER_SOURCE from "./shader-frag";
 import VERTEX_SHADER_SOURCE from "./shader-vert";
 import { drawSquareNodeHover, drawSquareNodeLabel } from "./utils";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_cameraAngle", "u_matrix"] as const;
 
@@ -26,7 +26,7 @@ export class NodeSquareProgram<
       VERTICES: 6,
       VERTEX_SHADER_SOURCE: VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE: FRAGMENT_SHADER_SOURCE,
-      METHOD: WebGLRenderingContext.TRIANGLES,
+      METHOD: WebGL2RenderingContext.TRIANGLES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },

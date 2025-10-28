@@ -1,22 +1,23 @@
 // language=GLSL
-const VERTEX_SHADER_SOURCE = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute vec2 a_position;
-attribute float a_size;
-attribute float a_angle;
-attribute vec4 a_texture;
-attribute float a_textureIndex;
+const VERTEX_SHADER_SOURCE = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec4 a_color;
+in vec2 a_position;
+in float a_size;
+in float a_angle;
+in vec4 a_texture;
+in float a_textureIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
-varying vec4 v_color;
-varying vec2 v_diffVector;
-varying float v_radius;
-varying vec4 v_texture;
-varying float v_textureIndex;
+out vec4 v_color;
+out vec2 v_diffVector;
+out float v_radius;
+out vec4 v_texture;
+out float v_textureIndex;
 
 const float bias = 255.0 / 254.0;
 const float marginRatio = 1.05;

@@ -8,7 +8,7 @@ import getFragmentShader from "./shader-frag";
 import getVertexShader from "./shader-vert";
 import { CreateEdgeCurveProgramOptions, DEFAULT_EDGE_CURVATURE, DEFAULT_EDGE_CURVE_PROGRAM_OPTIONS } from "./utils";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 export default function createEdgeCurveProgram<
   N extends Attributes = Attributes,
@@ -40,7 +40,7 @@ export default function createEdgeCurveProgram<
         VERTICES: 6,
         VERTEX_SHADER_SOURCE: getVertexShader(options),
         FRAGMENT_SHADER_SOURCE: getFragmentShader(options),
-        METHOD: WebGLRenderingContext.TRIANGLES,
+        METHOD: WebGL2RenderingContext.TRIANGLES,
         UNIFORMS,
         ATTRIBUTES: [
           { name: "a_source", size: 2, type: FLOAT },

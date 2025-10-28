@@ -152,7 +152,7 @@ export const HTML_COLORS: Record<string, string> = {
 /**
  * Function extracting the color at the given pixel.
  */
-export function extractPixel(gl: WebGLRenderingContext, x: number, y: number, array: Uint8Array): Uint8Array {
+export function extractPixel(gl: WebGL2RenderingContext, x: number, y: number, array: Uint8Array): Uint8Array {
   const data = array || new Uint8Array(4);
 
   gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
@@ -290,7 +290,7 @@ export function colorToIndex(r: number, g: number, b: number, _a: number): numbe
 }
 
 export function getPixelColor(
-  gl: WebGLRenderingContext,
+  gl: WebGL2RenderingContext,
   frameBuffer: WebGLBuffer | null,
   x: number,
   y: number,

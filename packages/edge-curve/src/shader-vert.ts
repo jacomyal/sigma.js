@@ -5,17 +5,18 @@ export default function getVertexShader({ arrowHead }: CreateEdgeCurveProgramOpt
   const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
 
   // language=GLSL
-  const SHADER = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute float a_direction;
-attribute float a_thickness;
-attribute vec2 a_source;
-attribute vec2 a_target;
-attribute float a_current;
-attribute float a_curvature;
-${hasTargetArrowHead ? "attribute float a_targetSize;\n" : ""}
-${hasSourceArrowHead ? "attribute float a_sourceSize;\n" : ""}
+  const SHADER = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec4 a_color;
+in float a_direction;
+in float a_thickness;
+in vec2 a_source;
+in vec2 a_target;
+in float a_current;
+in float a_curvature;
+${hasTargetArrowHead ? "in float a_targetSize;\n" : ""}
+${hasSourceArrowHead ? "in float a_sourceSize;\n" : ""}
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -24,24 +25,24 @@ uniform vec2 u_dimensions;
 uniform float u_minEdgeThickness;
 uniform float u_feather;
 
-varying vec4 v_color;
-varying float v_thickness;
-varying float v_feather;
-varying vec2 v_cpA;
-varying vec2 v_cpB;
-varying vec2 v_cpC;
+out vec4 v_color;
+out float v_thickness;
+out float v_feather;
+out vec2 v_cpA;
+out vec2 v_cpB;
+out vec2 v_cpC;
 ${
   hasTargetArrowHead
     ? `
-varying float v_targetSize;
-varying vec2 v_targetPoint;`
+out float v_targetSize;
+out vec2 v_targetPoint;`
     : ""
 }
 ${
   hasSourceArrowHead
     ? `
-varying float v_sourceSize;
-varying vec2 v_sourcePoint;`
+out float v_sourceSize;
+out vec2 v_sourcePoint;`
     : ""
 }
 ${

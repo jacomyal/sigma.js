@@ -16,7 +16,7 @@ import { ProgramInfo } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
 
@@ -30,7 +30,7 @@ export default class NodePointProgram<
       VERTICES: 1,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
-      METHOD: WebGLRenderingContext.POINTS,
+      METHOD: WebGL2RenderingContext.POINTS,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },

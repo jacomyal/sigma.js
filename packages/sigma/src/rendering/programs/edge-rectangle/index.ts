@@ -24,7 +24,7 @@ import { ProgramInfo } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 const UNIFORMS = [
   "u_matrix",
@@ -46,7 +46,7 @@ export default class EdgeRectangleProgram<
       VERTICES: 6,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
-      METHOD: WebGLRenderingContext.TRIANGLES,
+      METHOD: WebGL2RenderingContext.TRIANGLES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_positionStart", size: 2, type: FLOAT },

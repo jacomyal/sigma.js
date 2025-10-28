@@ -7,7 +7,7 @@ import getFragmentShader from "./shader-frag";
 import getVertexShader from "./shader-vert";
 import { CreateNodePiechartProgramOptions, DEFAULT_COLOR, DEFAULT_CREATE_NODE_PIECHART_OPTIONS } from "./utils";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 export default function createNodePiechartProgram<
   N extends Attributes = Attributes,
@@ -42,7 +42,7 @@ export default function createNodePiechartProgram<
         VERTICES: 3,
         VERTEX_SHADER_SOURCE: getVertexShader(options),
         FRAGMENT_SHADER_SOURCE: getFragmentShader(options),
-        METHOD: WebGLRenderingContext.TRIANGLES,
+        METHOD: WebGL2RenderingContext.TRIANGLES,
         UNIFORMS,
         ATTRIBUTES: [
           { name: "a_position", size: 2, type: FLOAT },

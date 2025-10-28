@@ -1,13 +1,13 @@
 export default function getFragmentShader({ texturesCount }: { texturesCount: number }) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
+  const SHADER = /*glsl*/ `#version 300 es
 precision highp float;
 
-varying vec4 v_color;
-varying vec2 v_diffVector;
-varying float v_radius;
-varying vec4 v_texture;
-varying float v_textureIndex;
+in vec4 v_color;
+in vec2 v_diffVector;
+in float v_radius;
+in vec4 v_texture;
+in float v_textureIndex;
 
 uniform sampler2D u_atlas[${texturesCount}];
 uniform float u_correctionRatio;
@@ -16,6 +16,8 @@ uniform float u_percentagePadding;
 uniform bool u_colorizeImages;
 uniform bool u_keepWithinCircle;
 
+out vec4 fragColor;
+
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 const float radius = 0.5;
@@ -23,7 +25,7 @@ const float radius = 0.5;
 void main(void) {
   float border = 2.0 * u_correctionRatio;
   float dist = length(v_diffVector);
-  vec4 color = gl_FragColor;
+  vec4 color = fragColor;
 
   float c = cos(-u_cameraAngle);
   float s = sin(-u_cameraAngle);
@@ -55,11 +57,11 @@ void main(void) {
     ${
       [...new Array(texturesCount)].map(
         (_, i) =>
-          `if (index == ${i}) texel = texture2D(u_atlas[${i}], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);`,
+          `if (index == ${i}) texel = texture(u_atlas[${i}], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);`,
       ).join(`
     else `) +
       `else {
-      texel = texture2D(u_atlas[0], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
+      texel = texture(u_atlas[0], (v_texture.xy + coordinateInTexture * v_texture.zw), -1.0);
       noTextureFound = true;
     }`
     }
@@ -69,7 +71,7 @@ void main(void) {
     } else {
       // Colorize all visible image pixels:
       if (u_colorizeImages) {
-        color = mix(gl_FragColor, v_color, texel.a);
+        color = mix(fragColor, v_color, texel.a);
       }
 
       // Colorize background pixels, keep image pixel colors:
@@ -79,7 +81,7 @@ void main(void) {
 
       // Erase pixels "in the padding":
       if (abs(diffVector.x) > v_radius / paddingRatio || abs(diffVector.y) > v_radius / paddingRatio) {
-        color = u_colorizeImages ? gl_FragColor : v_color;
+        color = u_colorizeImages ? fragColor : v_color;
       }
     }
   }
@@ -88,9 +90,9 @@ void main(void) {
   // Crop in a circle when u_keepWithinCircle is truthy:
   if (u_keepWithinCircle) {
     if (dist < v_radius - border) {
-      gl_FragColor = color;
+      fragColor = color;
     } else if (dist < v_radius) {
-      gl_FragColor = mix(transparent, color, (v_radius - dist) / border);
+      fragColor = mix(transparent, color, (v_radius - dist) / border);
     }
   }
 
@@ -98,9 +100,9 @@ void main(void) {
   else {
     float squareHalfSize = v_radius * ${Math.SQRT1_2 * Math.cos(Math.PI / 12)};
     if (abs(diffVector.x) > squareHalfSize || abs(diffVector.y) > squareHalfSize) {
-      gl_FragColor = transparent;
+      fragColor = transparent;
     } else {
-      gl_FragColor = color;
+      fragColor = color;
     }
   }
 }

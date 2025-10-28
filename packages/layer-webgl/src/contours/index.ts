@@ -29,11 +29,10 @@ export function createContoursProgram<
     nodesTexture: WebGLTexture;
 
     constructor(
-      gl: WebGLRenderingContext | WebGL2RenderingContext,
+      gl: WebGL2RenderingContext,
       pickingBuffer: WebGLFramebuffer | null,
       renderer: Sigma<N, E, G>,
     ) {
-      if (!(gl instanceof WebGL2RenderingContext)) throw new Error("createContoursProgram only works with WebGL2");
       super(gl, pickingBuffer, renderer);
 
       this.nodesTexture = gl.createTexture() as WebGLTexture;

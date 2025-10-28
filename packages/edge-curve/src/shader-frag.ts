@@ -5,27 +5,27 @@ export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramO
   const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
 
   // language=GLSL
-  const SHADER = /*glsl*/ `
+  const SHADER = /*glsl*/ `#version 300 es
 precision highp float;
 
-varying vec4 v_color;
-varying float v_thickness;
-varying float v_feather;
-varying vec2 v_cpA;
-varying vec2 v_cpB;
-varying vec2 v_cpC;
+in vec4 v_color;
+in float v_thickness;
+in float v_feather;
+in vec2 v_cpA;
+in vec2 v_cpB;
+in vec2 v_cpC;
 ${
   hasTargetArrowHead
     ? `
-varying float v_targetSize;
-varying vec2 v_targetPoint;`
+in float v_targetSize;
+in vec2 v_targetPoint;`
     : ""
 }
 ${
   hasSourceArrowHead
     ? `
-varying float v_sourceSize;
-varying vec2 v_sourcePoint;`
+in float v_sourceSize;
+in vec2 v_sourcePoint;`
     : ""
 }
 ${
@@ -35,6 +35,8 @@ uniform float u_lengthToThicknessRatio;
 uniform float u_widenessToThicknessRatio;`
     : ""
 }
+
+out vec4 fragColor;
 
 float det(vec2 a, vec2 b) {
   return a.x * b.y - b.x * a.y;
@@ -86,7 +88,7 @@ ${
   float halfThickness = thickness / 2.0;
   if (dist < halfThickness) {
     #ifdef PICKING_MODE
-    gl_FragColor = v_color;
+    fragColor = v_color;
     #else
     float t = smoothstep(
       halfThickness - v_feather,
@@ -94,10 +96,10 @@ ${
       dist
     );
 
-    gl_FragColor = mix(v_color, transparent, t);
+    fragColor = mix(v_color, transparent, t);
     #endif
   } else {
-    gl_FragColor = transparent;
+    fragColor = transparent;
   }
 }
 `;

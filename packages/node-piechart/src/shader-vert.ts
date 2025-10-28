@@ -2,33 +2,34 @@ import { CreateNodePiechartProgramOptions } from "./utils";
 
 export default function getVertexShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec2 a_position;
-attribute float a_size;
-attribute float a_angle;
+  const SHADER = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec2 a_position;
+in float a_size;
+in float a_angle;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
-varying vec2 v_diffVector;
-varying float v_radius;
+out vec2 v_diffVector;
+out float v_radius;
 
-${"attribute" in offset ? "attribute float a_offset;\n" : ""}
-${"attribute" in offset ? "varying float v_offset;\n" : ""}
+${"attribute" in offset ? "in float a_offset;\n" : ""}
+${"attribute" in offset ? "out float v_offset;\n" : ""}
 
 #ifdef PICKING_MODE
-varying vec4 v_color;
+out vec4 v_color;
 #else
 ${slices
   .flatMap(({ value }, i) =>
-    "attribute" in value ? [`attribute float a_sliceValue_${i + 1};`, `varying float v_sliceValue_${i + 1};`] : [],
+    "attribute" in value ? [`in float a_sliceValue_${i + 1};`, `out float v_sliceValue_${i + 1};`] : [],
   )
   .join("\n")}
 ${slices
   .flatMap(({ color }, i) =>
-    "attribute" in color ? [`attribute vec4 a_sliceColor_${i + 1};`, `varying vec4 v_sliceColor_${i + 1};`] : [],
+    "attribute" in color ? [`in vec4 a_sliceColor_${i + 1};`, `out vec4 v_sliceColor_${i + 1};`] : [],
   )
   .join("\n")}
 #endif

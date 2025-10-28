@@ -1,9 +1,11 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
 precision mediump float;
 
-varying vec4 v_color;
-varying float v_border;
+in vec4 v_color;
+in float v_border;
+
+out vec4 fragColor;
 
 const float radius = 0.5;
 const float halfRadius = 0.35;
@@ -15,17 +17,17 @@ void main(void) {
 
   #ifdef PICKING_MODE
   if (distToCenter < radius)
-    gl_FragColor = v_color;
+    fragColor = v_color;
   else
-    gl_FragColor = transparent;
+    fragColor = transparent;
   #else
   // For normal mode, we use the color:
   if (distToCenter > radius)
-    gl_FragColor = transparent;
+    fragColor = transparent;
   else if (distToCenter > radius - v_border)
-    gl_FragColor = mix(transparent, v_color, (radius - distToCenter) / v_border);
+    fragColor = mix(transparent, v_color, (radius - distToCenter) / v_border);
   else
-    gl_FragColor = mix(v_color, white, (radius - distToCenter) / radius);
+    fragColor = mix(v_color, white, (radius - distToCenter) / radius);
   #endif
 }
 `;

@@ -1,16 +1,17 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute vec2 a_position;
-attribute float a_size;
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec4 a_color;
+in vec2 a_position;
+in float a_size;
 
 uniform float u_sizeRatio;
 uniform float u_pixelRatio;
 uniform mat3 u_matrix;
 
-varying vec4 v_color;
-varying float v_border;
+out vec4 v_color;
+out float v_border;
 
 const float bias = 255.0 / 254.0;
 

@@ -15,7 +15,7 @@ import { ProgramInfo } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
-const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
 const UNIFORMS = ["u_matrix"] as const;
 
@@ -29,7 +29,7 @@ export default class EdgeLineProgram<
       VERTICES: 2,
       VERTEX_SHADER_SOURCE,
       FRAGMENT_SHADER_SOURCE,
-      METHOD: WebGLRenderingContext.LINES,
+      METHOD: WebGL2RenderingContext.LINES,
       UNIFORMS,
       ATTRIBUTES: [
         { name: "a_position", size: 2, type: FLOAT },

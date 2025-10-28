@@ -6,21 +6,21 @@ export default function getFragmentShader({ borders }: CreateNodeBorderProgramOp
   const fillCounts = numberToGLSLFloat(borders.filter(({ size }) => "fill" in size).length);
 
   // language=GLSL
-  const SHADER = /*glsl*/ `
+  const SHADER = /*glsl*/ `#version 300 es
 precision highp float;
 
-varying vec2 v_diffVector;
-varying float v_radius;
+in vec2 v_diffVector;
+in float v_radius;
 
 #ifdef PICKING_MODE
-varying vec4 v_color;
+in vec4 v_color;
 #else
 // For normal mode, we use the border colors defined in the program:
-${borders.flatMap(({ size }, i) => ("attribute" in size ? [`varying float v_borderSize_${i + 1};`] : [])).join("\n")}
+${borders.flatMap(({ size }, i) => ("attribute" in size ? [`in float v_borderSize_${i + 1};`] : [])).join("\n")}
 ${borders
   .flatMap(({ color }, i) =>
     "attribute" in color
-      ? [`varying vec4 v_borderColor_${i + 1};`]
+      ? [`in vec4 v_borderColor_${i + 1};`]
       : "value" in color
         ? [`uniform vec4 u_borderColor_${i + 1};`]
         : [],
@@ -29,6 +29,8 @@ ${borders
 #endif
 
 uniform float u_correctionRatio;
+
+out vec4 fragColor;
 
 const float bias = 255.0 / 254.0;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
@@ -42,10 +44,10 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   if (dist > v_radius)
-    gl_FragColor = transparent;
+    fragColor = transparent;
   else {
-    gl_FragColor = v_color;
-    gl_FragColor.a *= bias;
+    fragColor = v_color;
+    fragColor.a *= bias;
   }
   #else
   // Sizes:
@@ -89,13 +91,13 @@ ${borders
   })
   .join("\n")}
   if (dist > adjustedBorderSize_0) {
-    gl_FragColor = borderColor_0;
+    fragColor = borderColor_0;
   } else ${borders
     .map(
       (_, i) => `if (dist > adjustedBorderSize_${i} - aaBorder) {
-    gl_FragColor = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);
+    fragColor = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);
   } else if (dist > adjustedBorderSize_${i + 1}) {
-    gl_FragColor = borderColor_${i + 1};
+    fragColor = borderColor_${i + 1};
   } else `,
     )
     .join("")} { /* Nothing to add here */ }

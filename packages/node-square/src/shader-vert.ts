@@ -1,17 +1,18 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute vec2 a_position;
-attribute float a_size;
-attribute float a_angle;
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec4 a_color;
+in vec2 a_position;
+in float a_size;
+in float a_angle;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_cameraAngle;
 uniform float u_correctionRatio;
 
-varying vec4 v_color;
+out vec4 v_color;
 
 const float bias = 255.0 / 254.0;
 const float sqrt_8 = sqrt(8.0);

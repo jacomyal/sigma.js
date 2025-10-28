@@ -2,30 +2,31 @@ import { CreateNodeBorderProgramOptions } from "./utils";
 
 export default function getVertexShader({ borders }: CreateNodeBorderProgramOptions) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
-attribute vec2 a_position;
-attribute float a_size;
-attribute float a_angle;
+  const SHADER = /*glsl*/ `#version 300 es
+
+in vec2 a_position;
+in float a_size;
+in float a_angle;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
-varying vec2 v_diffVector;
-varying float v_radius;
+out vec2 v_diffVector;
+out float v_radius;
 
 #ifdef PICKING_MODE
-attribute vec4 a_id;
-varying vec4 v_color;
+in vec4 a_id;
+out vec4 v_color;
 #else
 ${borders
   .flatMap(({ size }, i) =>
-    "attribute" in size ? [`attribute float a_borderSize_${i + 1};`, `varying float v_borderSize_${i + 1};`] : [],
+    "attribute" in size ? [`in float a_borderSize_${i + 1};`, `out float v_borderSize_${i + 1};`] : [],
   )
   .join("\n")}
 ${borders
   .flatMap(({ color }, i) =>
-    "attribute" in color ? [`attribute vec4 a_borderColor_${i + 1};`, `varying vec4 v_borderColor_${i + 1};`] : [],
+    "attribute" in color ? [`in vec4 a_borderColor_${i + 1};`, `out vec4 v_borderColor_${i + 1};`] : [],
   )
   .join("\n")}
 #endif

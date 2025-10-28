@@ -4,25 +4,27 @@ import { CreateNodePiechartProgramOptions } from "./utils";
 
 export default function getFragmentShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL
-  const SHADER = /*glsl*/ `
+  const SHADER = /*glsl*/ `#version 300 es
 precision highp float;
 
-varying vec2 v_diffVector;
-varying float v_radius;
+in vec2 v_diffVector;
+in float v_radius;
 
 #ifdef PICKING_MODE
-varying vec4 v_color;
+in vec4 v_color;
 #else
 // For normal mode, we use the border colors defined in the program:
-${slices.flatMap(({ value }, i) => ("attribute" in value ? [`varying float v_sliceValue_${i + 1};`] : [])).join("\n")}
-${slices.map(({ color }, i) => ("attribute" in color ? `varying vec4 v_sliceColor_${i + 1};` : `uniform vec4 u_sliceColor_${i + 1};`)).join("\n")}
+${slices.flatMap(({ value }, i) => ("attribute" in value ? [`in float v_sliceValue_${i + 1};`] : [])).join("\n")}
+${slices.map(({ color }, i) => ("attribute" in color ? `in vec4 v_sliceColor_${i + 1};` : `uniform vec4 u_sliceColor_${i + 1};`)).join("\n")}
 #endif
 
 uniform vec4 u_defaultColor;
 uniform float u_cameraAngle;
 uniform float u_correctionRatio;
 
-${"attribute" in offset ? "varying float v_offset;\n" : ""}
+out vec4 fragColor;
+
+${"attribute" in offset ? "in float v_offset;\n" : ""}
 ${"value" in offset ? "uniform float u_offset;\n" : ""}
 
 const float bias = 255.0 / 254.0;
@@ -42,10 +44,10 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   if (dist > v_radius)
-    gl_FragColor = transparent;
+    fragColor = transparent;
   else {
-    gl_FragColor = v_color;
-    gl_FragColor.a *= bias;
+    fragColor = v_color;
+    fragColor.a *= bias;
   }
   #else
   // Colors:
@@ -85,9 +87,9 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
   }
 
   if (dist < v_radius - aaBorder) {
-    gl_FragColor = color;
+    fragColor = color;
   } else if (dist < v_radius) {
-    gl_FragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
+    fragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
   }
   #endif
 }
