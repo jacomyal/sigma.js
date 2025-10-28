@@ -1,14 +1,15 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute vec2 a_normal;
-attribute float a_normalCoef;
-attribute vec2 a_positionStart;
-attribute vec2 a_positionEnd;
-attribute float a_positionCoef;
-attribute float a_radius;
-attribute float a_radiusCoef;
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
+
+in vec4 a_id;
+in vec4 a_color;
+in vec2 a_normal;
+in float a_normalCoef;
+in vec2 a_positionStart;
+in vec2 a_positionEnd;
+in float a_positionCoef;
+in float a_radius;
+in float a_radiusCoef;
 
 uniform mat3 u_matrix;
 uniform float u_zoomRatio;
@@ -19,10 +20,10 @@ uniform float u_minEdgeThickness;
 uniform float u_lengthToThicknessRatio;
 uniform float u_feather;
 
-varying vec4 v_color;
-varying vec2 v_normal;
-varying float v_thickness;
-varying float v_feather;
+out vec4 v_color;
+out vec2 v_normal;
+out float v_thickness;
+out float v_feather;
 
 const float bias = 255.0 / 254.0;
 

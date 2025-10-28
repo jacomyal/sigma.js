@@ -130,7 +130,7 @@ export default class Sigma<
   private container: HTMLElement;
   private elements: PlainObject<HTMLElement> = {};
   private canvasContexts: PlainObject<CanvasRenderingContext2D> = {};
-  private webGLContexts: PlainObject<WebGLRenderingContext> = {};
+  private webGLContexts: PlainObject<WebGL2RenderingContext> = {};
   private pickingLayers: Set<string> = new Set();
   private textures: PlainObject<WebGLTexture> = {};
   private frameBuffers: PlainObject<WebGLFramebuffer> = {};
@@ -333,7 +333,7 @@ export default class Sigma<
    * @return {Sigma}
    */
   private resetWebGLTexture(id: string): this {
-    const gl = this.webGLContexts[id] as WebGLRenderingContext;
+    const gl = this.webGLContexts[id] as WebGL2RenderingContext;
 
     const frameBuffer = this.frameBuffers[id];
     const currentTexture = this.textures[id];
@@ -1673,12 +1673,12 @@ export default class Sigma<
   }
 
   /**
-   * Function used to create a WebGL context and add the relevant DOM
+   * Function used to create a WebGL 2 context and add the relevant DOM
    * elements.
    *
    * @param  {string}  id      - Context's id.
    * @param  {object?} options - #getContext params to override (optional)
-   * @return {WebGLRenderingContext}
+   * @return {WebGL2RenderingContext}
    */
   createWebGLContext(
     id: string,
@@ -1688,28 +1688,28 @@ export default class Sigma<
       hidden?: boolean;
       picking?: boolean;
     } & ({ canvas?: HTMLCanvasElement; style?: undefined } | { style?: CSSStyleDeclaration; canvas?: undefined }) = {},
-  ): WebGLRenderingContext {
+  ): WebGL2RenderingContext {
     const canvas = options?.canvas || this.createCanvas(id, options);
     if (options.hidden) canvas.remove();
 
     const contextOptions = {
       preserveDrawingBuffer: false,
       antialias: false,
+      depth: true,
       ...options,
     };
 
-    let context;
+    // Request WebGL 2 context
+    const context = canvas.getContext("webgl2", contextOptions);
 
-    // First we try webgl2 for an easy performance boost
-    context = canvas.getContext("webgl2", contextOptions);
+    if (!context) {
+      throw new Error(
+        "Sigma: WebGL 2 is not supported by your browser. " +
+        "Please use a modern browser (Chrome 56+, Firefox 51+, Safari 15+, Edge 79+)."
+      );
+    }
 
-    // Else we fall back to webgl
-    if (!context) context = canvas.getContext("webgl", contextOptions);
-
-    // Edge, I am looking right at you...
-    if (!context) context = canvas.getContext("experimental-webgl", contextOptions);
-
-    const gl = context as WebGLRenderingContext;
+    const gl = context as WebGL2RenderingContext;
     this.webGLContexts[id] = gl;
 
     // Blending:

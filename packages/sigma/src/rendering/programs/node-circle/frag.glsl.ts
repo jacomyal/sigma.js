@@ -1,12 +1,14 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
 precision highp float;
 
-varying vec4 v_color;
-varying vec2 v_diffVector;
-varying float v_radius;
+in vec4 v_color;
+in vec2 v_diffVector;
+in float v_radius;
 
 uniform float u_correctionRatio;
+
+out vec4 fragColor;
 
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -17,9 +19,9 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   if (dist > border)
-    gl_FragColor = transparent;
+    fragColor = transparent;
   else
-    gl_FragColor = v_color;
+    fragColor = v_color;
 
   #else
   float t = 0.0;
@@ -28,7 +30,7 @@ void main(void) {
   else if (dist > 0.0)
     t = dist / border;
 
-  gl_FragColor = mix(v_color, transparent, t);
+  fragColor = mix(v_color, transparent, t);
   #endif
 }
 `;

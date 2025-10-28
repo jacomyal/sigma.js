@@ -1,14 +1,15 @@
 // language=GLSL
-const SHADER_SOURCE = /*glsl*/ `
-attribute vec2 a_position;
-attribute vec2 a_normal;
-attribute float a_radius;
-attribute vec3 a_barycentric;
+const SHADER_SOURCE = /*glsl*/ `#version 300 es
+
+in vec2 a_position;
+in vec2 a_normal;
+in float a_radius;
+in vec3 a_barycentric;
 
 #ifdef PICKING_MODE
-attribute vec4 a_id;
+in vec4 a_id;
 #else
-attribute vec4 a_color;
+in vec4 a_color;
 #endif
 
 uniform mat3 u_matrix;
@@ -18,7 +19,7 @@ uniform float u_minEdgeThickness;
 uniform float u_lengthToThicknessRatio;
 uniform float u_widenessToThicknessRatio;
 
-varying vec4 v_color;
+out vec4 v_color;
 
 const float bias = 255.0 / 254.0;
 
