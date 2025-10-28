@@ -28,11 +28,7 @@ export function createContoursProgram<
   > extends WebGLLayerProgram<N, E, G> {
     nodesTexture: WebGLTexture;
 
-    constructor(
-      gl: WebGL2RenderingContext,
-      pickingBuffer: WebGLFramebuffer | null,
-      renderer: Sigma<N, E, G>,
-    ) {
+    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       super(gl, pickingBuffer, renderer);
 
       this.nodesTexture = gl.createTexture() as WebGLTexture;

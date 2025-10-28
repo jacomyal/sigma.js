@@ -35,6 +35,7 @@ export default class EdgeLineProgram<
         { name: "a_position", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_zIndex", size: 1, type: FLOAT },
       ],
     };
   }
@@ -59,12 +60,14 @@ export default class EdgeLineProgram<
     array[startIndex++] = y1;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    array[startIndex++] = data.zIndex;
 
     // Second point
     array[startIndex++] = x2;
     array[startIndex++] = y2;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    array[startIndex++] = data.zIndex;
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

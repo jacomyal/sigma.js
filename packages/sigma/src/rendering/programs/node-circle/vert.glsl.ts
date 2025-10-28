@@ -6,6 +6,7 @@ in vec4 a_color;
 in vec2 a_position;
 in float a_size;
 in float a_angle;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -15,6 +16,7 @@ out vec4 v_color;
 out vec2 v_diffVector;
 out float v_radius;
 out float v_border;
+out float v_zIndex;
 
 const float bias = 255.0 / 254.0;
 
@@ -40,6 +42,7 @@ void main() {
   #endif
 
   v_color.a *= bias;
+  v_zIndex = a_zIndex;
 }
 `;
 

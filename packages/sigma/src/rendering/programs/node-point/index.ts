@@ -37,6 +37,7 @@ export default class NodePointProgram<
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_zIndex", size: 1, type: FLOAT },
       ],
     };
   }
@@ -49,6 +50,7 @@ export default class NodePointProgram<
     array[startIndex++] = data.size;
     array[startIndex++] = floatColor(data.color);
     array[startIndex++] = nodeIndex;
+    array[startIndex++] = data.zIndex;
   }
 
   setUniforms({ sizeRatio, pixelRatio, matrix }: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

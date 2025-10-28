@@ -56,6 +56,7 @@ export function createEdgeClampedProgram<
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_radius", size: 1, type: FLOAT },
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [
           // If 0, then position will be a_positionStart
@@ -117,6 +118,7 @@ export function createEdgeClampedProgram<
       array[startIndex++] = color;
       array[startIndex++] = edgeIndex;
       array[startIndex++] = radius;
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

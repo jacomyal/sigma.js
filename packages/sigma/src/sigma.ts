@@ -43,7 +43,6 @@ import {
   matrixFromCamera,
   multiplyVec2,
   validateGraph,
-  zIndexOrdering,
 } from "./utils";
 
 /**
@@ -83,7 +82,7 @@ function applyNodeDefaults<
 
   if (!data.type || data.type === "") data.type = settings.defaultNodeType;
 
-  if (!data.zIndex) data.zIndex = 0;
+  if (!data.zIndex) data.zIndex = settings.defaultNodeZIndex;
 
   return data as NodeDisplayData;
 }
@@ -105,7 +104,7 @@ function applyEdgeDefaults<
 
   if (!data.type || data.type === "") data.type = settings.defaultEdgeType;
 
-  if (!data.zIndex) data.zIndex = 0;
+  if (!data.zIndex) data.zIndex = settings.defaultEdgeZIndex;
 
   return data as EdgeDisplayData;
 }
@@ -145,8 +144,6 @@ export default class Sigma<
   private nodesWithForcedLabels: Set<string> = new Set<string>();
   private edgesWithForcedLabels: Set<string> = new Set<string>();
   private nodeExtent: { x: Extent; y: Extent } = { x: [0, 1], y: [0, 1] };
-  private nodeZExtent: [number, number] = [Infinity, -Infinity];
-  private edgeZExtent: [number, number] = [Infinity, -Infinity];
 
   private matrix: Float32Array = identity();
   private invMatrix: Float32Array = identity();
@@ -184,7 +181,6 @@ export default class Sigma<
 
   // Programs
   private nodePrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
-  private nodeHoverPrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
   private edgePrograms: { [key: string]: AbstractEdgeProgram<N, E, G> } = {};
 
   private camera: Camera;
@@ -205,12 +201,10 @@ export default class Sigma<
     this.container = container;
 
     // Initializing contexts
-    this.createWebGLContext("edges", { picking: settings.enableEdgeEvents });
+    this.createWebGLContext("scene", { picking: true });
     this.createCanvasContext("edgeLabels");
-    this.createWebGLContext("nodes", { picking: true });
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
-    this.createWebGLContext("hoverNodes");
     this.createCanvasContext("mouse", { style: { touchAction: "none", userSelect: "none" } });
 
     // Initial resize
@@ -262,20 +256,20 @@ export default class Sigma<
   /**
    * Internal function used to register a node program
    *
-   * @param  {string}           key              - The program's key, matching the related nodes "type" values.
-   * @param  {NodeProgramType}  NodeProgramClass - A nodes program class.
-   * @param  {NodeProgramType?} NodeHoverProgram - A nodes program class to render hovered nodes (optional).
+   * @param  {string}           key               - The program's key, matching the related nodes "type" values.
+   * @param  {NodeProgramType}  NodeProgramClass  - A nodes program class.
+   * @param  {NodeProgramType?} _NodeHoverProgram - A nodes program class to render hovered nodes (optional).
    * @return {Sigma}
    */
   private registerNodeProgram(
     key: string,
     NodeProgramClass: NodeProgramType<N, E, G>,
-    NodeHoverProgram?: NodeProgramType<N, E, G>,
+    _NodeHoverProgram?: NodeProgramType<N, E, G>,
   ): this {
     if (this.nodePrograms[key]) this.nodePrograms[key].kill();
-    if (this.nodeHoverPrograms[key]) this.nodeHoverPrograms[key].kill();
-    this.nodePrograms[key] = new NodeProgramClass(this.webGLContexts.nodes, this.frameBuffers.nodes, this);
-    this.nodeHoverPrograms[key] = new (NodeHoverProgram || NodeProgramClass)(this.webGLContexts.hoverNodes, null, this);
+    this.nodePrograms[key] = new NodeProgramClass(this.webGLContexts.scene, this.frameBuffers.scene, this);
+    // Note: NodeHoverProgram parameter is kept for backwards compatibility but is no longer used
+    // Highlighted nodes are now rendered with regular programs using z-index depth testing
     return this;
   }
 
@@ -288,7 +282,7 @@ export default class Sigma<
    */
   private registerEdgeProgram(key: string, EdgeProgramClass: EdgeProgramType<N, E, G>): this {
     if (this.edgePrograms[key]) this.edgePrograms[key].kill();
-    this.edgePrograms[key] = new EdgeProgramClass(this.webGLContexts.edges, this.frameBuffers.edges, this);
+    this.edgePrograms[key] = new EdgeProgramClass(this.webGLContexts.scene, this.frameBuffers.scene, this);
     return this;
   }
 
@@ -301,11 +295,6 @@ export default class Sigma<
   private unregisterNodeProgram(key: string): this {
     if (this.nodePrograms[key]) {
       const { [key]: program, ...programs } = this.nodePrograms;
-      program.kill();
-      this.nodePrograms = programs;
-    }
-    if (this.nodeHoverPrograms[key]) {
-      const { [key]: program, ...programs } = this.nodeHoverPrograms;
       program.kill();
       this.nodePrograms = programs;
     }
@@ -381,8 +370,8 @@ export default class Sigma<
   private getNodeAtPosition(position: Coordinates): string | null {
     const { x, y } = position;
     const color = getPixelColor(
-      this.webGLContexts.nodes,
-      this.frameBuffers.nodes,
+      this.webGLContexts.scene,
+      this.frameBuffers.scene,
       x,
       y,
       this.pixelRatio,
@@ -702,8 +691,8 @@ export default class Sigma<
    */
   private getEdgeAtPoint(x: number, y: number): string | null {
     const color = getPixelColor(
-      this.webGLContexts.edges,
-      this.frameBuffers.edges,
+      this.webGLContexts.scene,
+      this.frameBuffers.scene,
       x,
       y,
       this.pixelRatio,
@@ -766,7 +755,7 @@ export default class Sigma<
     const itemIDsIndex: typeof this.itemIDsIndex = {};
     let incrID = 1;
 
-    let nodes = graph.nodes();
+    const nodes = graph.nodes();
 
     // Do some indexation on the whole graph
     for (let i = 0, l = nodes.length; i < l; i++) {
@@ -798,14 +787,6 @@ export default class Sigma<
       nodesPerPrograms[type] = 0;
     }
 
-    // Order nodes by zIndex before to add them to program
-    if (this.settings.zIndex && this.nodeZExtent[0] !== this.nodeZExtent[1])
-      nodes = zIndexOrdering<string>(
-        this.nodeZExtent,
-        (node: string): number => this.nodeDataCache[node].zIndex,
-        nodes,
-      );
-
     // Add data to programs
     for (let i = 0, l = nodes.length; i < l; i++) {
       const node = nodes[i];
@@ -823,7 +804,7 @@ export default class Sigma<
     //
 
     const edgesPerPrograms: Record<string, number> = {};
-    let edges = graph.edges();
+    const edges = graph.edges();
 
     // Allocate memory to programs
     for (let i = 0, l = edges.length; i < l; i++) {
@@ -831,14 +812,6 @@ export default class Sigma<
       const data = this.edgeDataCache[edge];
       edgesPerPrograms[data.type] = (edgesPerPrograms[data.type] || 0) + 1;
     }
-
-    // Order edges by zIndex before to add them to program
-    if (this.settings.zIndex && this.edgeZExtent[0] !== this.edgeZExtent[1])
-      edges = zIndexOrdering<string>(
-        this.edgeZExtent,
-        (edge: string): number => this.edgeDataCache[edge].zIndex,
-        edges,
-      );
 
     for (const type in this.edgePrograms) {
       if (!hasOwnProperty.call(this.edgePrograms, type)) {
@@ -1155,7 +1128,10 @@ export default class Sigma<
   }
 
   /**
-   * Method used to render the highlighted nodes.
+   * Method used to render the highlighted nodes hover effects.
+   * Note: With depth testing enabled, highlighted nodes are automatically
+   * rendered on top via their z-index values. This method only renders
+   * the canvas-based hover effects (halos, borders, etc.).
    *
    * @return {Sigma}
    */
@@ -1165,7 +1141,7 @@ export default class Sigma<
     // Clearing
     context.clearRect(0, 0, this.width, this.height);
 
-    // Rendering
+    // Rendering canvas-based hover effects
     const render = (node: string): void => {
       const data = this.nodeDataCache[node];
 
@@ -1200,36 +1176,8 @@ export default class Sigma<
       if (node !== this.hoveredNode) nodesToRender.push(node);
     });
 
-    // Draw labels:
+    // Draw canvas-based hover effects:
     nodesToRender.forEach((node) => render(node));
-
-    // Draw WebGL nodes on top of the labels:
-    const nodesPerPrograms: Record<string, number> = {};
-
-    // 1. Count nodes per type:
-    nodesToRender.forEach((node) => {
-      const type = this.nodeDataCache[node].type;
-      nodesPerPrograms[type] = (nodesPerPrograms[type] || 0) + 1;
-    });
-    // 2. Allocate for each type for the proper number of nodes
-    for (const type in this.nodeHoverPrograms) {
-      this.nodeHoverPrograms[type].reallocate(nodesPerPrograms[type] || 0);
-      // Also reset count, to use when rendering:
-      nodesPerPrograms[type] = 0;
-    }
-    // 3. Process all nodes to render:
-    nodesToRender.forEach((node) => {
-      const data = this.nodeDataCache[node];
-      this.nodeHoverPrograms[data.type].process(0, nodesPerPrograms[data.type]++, data);
-    });
-    // 4. Clear hovered nodes layer:
-    this.webGLContexts.hoverNodes.clear(this.webGLContexts.hoverNodes.COLOR_BUFFER_BIT);
-    // 5. Render:
-    const renderParams = this.getRenderParams();
-    for (const type in this.nodeHoverPrograms) {
-      const program = this.nodeHoverPrograms[type];
-      program.render(renderParams);
-    }
   }
 
   /**
@@ -1345,6 +1293,8 @@ export default class Sigma<
    * @param key The node's graphology ID
    */
   private addNode(key: string): void {
+    const { nodeReducer, minZIndex, maxZIndex } = this.settings;
+
     // Node display data resolution:
     //  1. First we get the node's attributes
     //  2. We optionally reduce them using the function provided by the user
@@ -1353,7 +1303,7 @@ export default class Sigma<
     //  4. We apply the normalization function
     // We shallow copy node data to avoid dangerous behaviors from reducers
     let attr = Object.assign({}, this.graph.getNodeAttributes(key)) as Partial<NodeDisplayData>;
-    if (this.settings.nodeReducer) attr = this.settings.nodeReducer(key, attr as N);
+    if (nodeReducer) attr = nodeReducer(key, attr as N);
     const data = applyNodeDefaults(this.settings, key, attr);
     this.nodeDataCache[key] = data;
 
@@ -1369,11 +1319,16 @@ export default class Sigma<
     this.highlightedNodes.delete(key);
     if (data.highlighted && !data.hidden) this.highlightedNodes.add(key);
 
-    // zIndex
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.nodeZExtent[0]) this.nodeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.nodeZExtent[1]) this.nodeZExtent[1] = data.zIndex;
+    // zIndex validation and normalization
+    if (data.zIndex < minZIndex || data.zIndex > maxZIndex) {
+      throw new Error(
+        `Node "${key}": z-index ${data.zIndex} is out of range [${minZIndex}, ${maxZIndex}]. ` +
+          `Adjust the node's zIndex or update the minZIndex/maxZIndex settings.`,
+      );
     }
+    // Normalize z-index to [0, 1] depth range for GPU depth buffer
+    // Invert so higher z-index = lower depth value = renders on top
+    data.zIndex = 1.0 - (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
   }
 
   /**
@@ -1413,6 +1368,8 @@ export default class Sigma<
    * @param key The edge's graphology ID
    */
   private addEdge(key: string): void {
+    const { edgeReducer, minZIndex, maxZIndex } = this.settings;
+
     // Edge display data resolution:
     //  1. First we get the edge's attributes
     //  2. We optionally reduce them using the function provided by the user
@@ -1420,7 +1377,7 @@ export default class Sigma<
     //  4. We apply our defaults, while running some vital checks
     // We shallow copy edge data to avoid dangerous behaviors from reducers
     let attr = Object.assign({}, this.graph.getEdgeAttributes(key)) as Partial<EdgeDisplayData>;
-    if (this.settings.edgeReducer) attr = this.settings.edgeReducer(key, attr as E);
+    if (edgeReducer) attr = edgeReducer(key, attr as E);
     const data = applyEdgeDefaults(this.settings, key, attr);
     this.edgeDataCache[key] = data;
 
@@ -1430,11 +1387,16 @@ export default class Sigma<
     this.edgesWithForcedLabels.delete(key);
     if (data.forceLabel && !data.hidden) this.edgesWithForcedLabels.add(key);
 
-    // Check zIndex
-    if (this.settings.zIndex) {
-      if (data.zIndex < this.edgeZExtent[0]) this.edgeZExtent[0] = data.zIndex;
-      if (data.zIndex > this.edgeZExtent[1]) this.edgeZExtent[1] = data.zIndex;
+    // zIndex validation and normalization
+    if (data.zIndex < minZIndex || data.zIndex > maxZIndex) {
+      throw new Error(
+        `Edge "${key}": z-index ${data.zIndex} is out of range [${minZIndex}, ${maxZIndex}]. ` +
+          `Adjust the edge's zIndex or update the minZIndex/maxZIndex settings.`,
+      );
     }
+    // Normalize z-index to [0, 1] depth range for GPU depth buffer
+    // Invert so higher z-index = lower depth value = renders on top
+    data.zIndex = 1.0 - (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
   }
 
   /**
@@ -1473,7 +1435,6 @@ export default class Sigma<
     this.nodeDataCache = {};
     this.edgeProgramIndex = {};
     this.nodesWithForcedLabels = new Set<string>();
-    this.nodeZExtent = [Infinity, -Infinity];
     this.highlightedNodes = new Set();
   }
 
@@ -1485,7 +1446,6 @@ export default class Sigma<
     this.edgeDataCache = {};
     this.edgeProgramIndex = {};
     this.edgesWithForcedLabels = new Set<string>();
-    this.edgeZExtent = [Infinity, -Infinity];
   }
 
   /**
@@ -1537,6 +1497,7 @@ export default class Sigma<
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
+
     nodeProgram.process(fingerprint, position, data);
     // Saving program index
     this.nodeProgramIndex[node] = position;
@@ -1556,6 +1517,7 @@ export default class Sigma<
     const extremities = this.graph.extremities(edge),
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
+
     edgeProgram.process(fingerprint, position, sourceData, targetData, data);
     // Saving program index
     this.edgeProgramIndex[edge] = position;
@@ -1628,8 +1590,12 @@ export default class Sigma<
     this.elements[id] = element;
 
     if ("beforeLayer" in options && options.beforeLayer) {
+      if (!(options.beforeLayer in this.elements))
+        throw new Error(`Sigma: Cannot find \`beforeLayer\` with name "${options.beforeLayer}".`);
       this.elements[options.beforeLayer].before(element);
     } else if ("afterLayer" in options && options.afterLayer) {
+      if (!(options.afterLayer in this.elements))
+        throw new Error(`Sigma: Cannot find \`afterLayer\` with name "${options.afterLayer}".`);
       this.elements[options.afterLayer].after(element);
     } else {
       this.container.appendChild(element);
@@ -1705,7 +1671,7 @@ export default class Sigma<
     if (!context) {
       throw new Error(
         "Sigma: WebGL 2 is not supported by your browser. " +
-        "Please use a modern browser (Chrome 56+, Firefox 51+, Safari 15+, Edge 79+)."
+          "Please use a modern browser (Chrome 56+, Firefox 51+, Safari 15+, Edge 79+).",
       );
     }
 
@@ -1714,6 +1680,11 @@ export default class Sigma<
 
     // Blending:
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    // Depth testing:
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
 
     // Prepare frame buffer for picking layers:
     if (options.picking) {
@@ -2049,11 +2020,8 @@ export default class Sigma<
   clear(): this {
     this.emit("beforeClear");
 
-    this.webGLContexts.nodes.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.nodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
-    this.webGLContexts.edges.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-    this.webGLContexts.edges.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
-    this.webGLContexts.hoverNodes.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    this.webGLContexts.scene.bindFramebuffer(WebGL2RenderingContext.FRAMEBUFFER, null);
+    this.webGLContexts.scene.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
     this.canvasContexts.labels.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.hovers.clearRect(0, 0, this.width, this.height);
     this.canvasContexts.edgeLabels.clearRect(0, 0, this.width, this.height);
@@ -2397,14 +2365,10 @@ export default class Sigma<
     for (const type in this.nodePrograms) {
       this.nodePrograms[type].kill();
     }
-    for (const type in this.nodeHoverPrograms) {
-      this.nodeHoverPrograms[type].kill();
-    }
     for (const type in this.edgePrograms) {
       this.edgePrograms[type].kill();
     }
     this.nodePrograms = {};
-    this.nodeHoverPrograms = {};
     this.edgePrograms = {};
 
     // Kill all canvas/WebGL contexts

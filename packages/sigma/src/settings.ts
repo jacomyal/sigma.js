@@ -87,7 +87,10 @@ export interface Settings<
   edgeReducer: null | ((edge: string, data: E) => Partial<EdgeDisplayData>);
 
   // Features
-  zIndex: boolean;
+  minZIndex: number;
+  maxZIndex: number;
+  defaultNodeZIndex: number;
+  defaultEdgeZIndex: number;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
   enableCameraZooming: boolean;
@@ -163,7 +166,10 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   edgeReducer: null,
 
   // Features
-  zIndex: false,
+  minZIndex: 0,
+  maxZIndex: 10000,
+  defaultNodeZIndex: 5000,
+  defaultEdgeZIndex: 0,
   minCameraRatio: null,
   maxCameraRatio: null,
   enableCameraZooming: true,
@@ -203,6 +209,11 @@ export function validateSettings<
     throw new Error(
       "Settings: invalid camera ratio boundaries. Expecting `maxCameraRatio` to be greater than `minCameraRatio`.",
     );
+  }
+
+  const { minZIndex, maxZIndex } = settings;
+  if (maxZIndex <= minZIndex) {
+    throw new Error("Settings: `maxZIndex` must be greater than `minZIndex`.");
   }
 }
 

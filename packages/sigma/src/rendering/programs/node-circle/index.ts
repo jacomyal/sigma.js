@@ -42,6 +42,7 @@ export default class NodeCircleProgram<
         { name: "a_size", size: 1, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_zIndex", size: 1, type: FLOAT },
       ],
       CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
       CONSTANT_DATA: [[NodeCircleProgram.ANGLE_1], [NodeCircleProgram.ANGLE_2], [NodeCircleProgram.ANGLE_3]],
@@ -57,6 +58,7 @@ export default class NodeCircleProgram<
     array[startIndex++] = data.size;
     array[startIndex++] = color;
     array[startIndex++] = nodeIndex;
+    array[startIndex++] = data.zIndex;
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

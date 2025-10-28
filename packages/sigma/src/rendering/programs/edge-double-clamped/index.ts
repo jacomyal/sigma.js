@@ -57,6 +57,7 @@ export function createEdgeDoubleClampedProgram<
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_sourceRadius", size: 1, type: FLOAT },
           { name: "a_targetRadius", size: 1, type: FLOAT },
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [
           // If 0, then position will be a_positionStart
@@ -121,6 +122,7 @@ export function createEdgeDoubleClampedProgram<
       array[startIndex++] = edgeIndex;
       array[startIndex++] = sourceRadius;
       array[startIndex++] = targetRadius;
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

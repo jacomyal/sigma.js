@@ -8,6 +8,7 @@ in vec4 a_id;
 in vec2 a_position;
 in float a_size;
 in float a_angle;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -15,6 +16,7 @@ uniform float u_correctionRatio;
 
 out vec2 v_diffVector;
 out float v_radius;
+out float v_zIndex;
 
 ${"attribute" in offset ? "in float a_offset;\n" : ""}
 ${"attribute" in offset ? "out float v_offset;\n" : ""}
@@ -60,6 +62,8 @@ ${slices
   .flatMap(({ color }, i) => ("attribute" in color ? [`  v_sliceColor_${i + 1} = a_sliceColor_${i + 1};`] : []))
   .join("\n")}
   #endif
+
+  v_zIndex = a_zIndex;
 }
 `;
 

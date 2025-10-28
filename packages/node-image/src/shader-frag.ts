@@ -8,6 +8,7 @@ in vec2 v_diffVector;
 in float v_radius;
 in vec4 v_texture;
 in float v_textureIndex;
+in float v_zIndex;
 
 uniform sampler2D u_atlas[${texturesCount}];
 uniform float u_correctionRatio;
@@ -105,6 +106,8 @@ void main(void) {
       fragColor = color;
     }
   }
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

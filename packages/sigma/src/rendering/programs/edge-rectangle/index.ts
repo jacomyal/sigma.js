@@ -54,6 +54,7 @@ export default class EdgeRectangleProgram<
         { name: "a_normal", size: 2, type: FLOAT },
         { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
         { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+        { name: "a_zIndex", size: 1, type: FLOAT },
       ],
       CONSTANT_ATTRIBUTES: [
         // If 0, then position will be a_positionStart
@@ -111,6 +112,7 @@ export default class EdgeRectangleProgram<
     array[startIndex++] = n2;
     array[startIndex++] = color;
     array[startIndex++] = edgeIndex;
+    array[startIndex++] = data.zIndex;
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

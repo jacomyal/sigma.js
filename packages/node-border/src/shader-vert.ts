@@ -7,6 +7,7 @@ export default function getVertexShader({ borders }: CreateNodeBorderProgramOpti
 in vec2 a_position;
 in float a_size;
 in float a_angle;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -14,6 +15,7 @@ uniform float u_correctionRatio;
 
 out vec2 v_diffVector;
 out float v_radius;
+out float v_zIndex;
 
 #ifdef PICKING_MODE
 in vec4 a_id;
@@ -57,6 +59,8 @@ ${borders
   .flatMap(({ color }, i) => ("attribute" in color ? [`  v_borderColor_${i + 1} = a_borderColor_${i + 1};`] : []))
   .join("\n")}
   #endif
+
+  v_zIndex = a_zIndex;
 }
 `;
 

@@ -4,6 +4,7 @@ precision mediump float;
 
 in vec4 v_color;
 in float v_border;
+in float v_zIndex;
 
 out vec4 fragColor;
 
@@ -29,6 +30,8 @@ void main(void) {
   else
     fragColor = mix(v_color, white, (radius - distToCenter) / radius);
   #endif
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

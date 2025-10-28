@@ -8,12 +8,14 @@ in float a_normalCoef;
 in vec2 a_positionStart;
 in vec2 a_positionEnd;
 in float a_positionCoef;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
 
 out vec4 v_color;
+out float v_zIndex;
 
 const float minThickness = 1.7;
 const float bias = 255.0 / 254.0;
@@ -42,6 +44,8 @@ void main() {
   #endif
 
   v_color.a *= bias;
+
+  v_zIndex = a_zIndex;
 }
 `;
 

@@ -5,6 +5,7 @@ in vec2 a_position;
 in vec2 a_normal;
 in float a_radius;
 in vec3 a_barycentric;
+in float a_zIndex;
 
 #ifdef PICKING_MODE
 in vec4 a_id;
@@ -20,6 +21,7 @@ uniform float u_lengthToThicknessRatio;
 uniform float u_widenessToThicknessRatio;
 
 out vec4 v_color;
+out float v_zIndex;
 
 const float bias = 255.0 / 254.0;
 
@@ -65,6 +67,8 @@ void main() {
   #endif
 
   v_color.a *= bias;
+
+  v_zIndex = a_zIndex;
 }
 `;
 

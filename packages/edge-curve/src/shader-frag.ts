@@ -14,6 +14,7 @@ in float v_feather;
 in vec2 v_cpA;
 in vec2 v_cpB;
 in vec2 v_cpC;
+in float v_zIndex;
 ${
   hasTargetArrowHead
     ? `
@@ -101,6 +102,8 @@ ${
   } else {
     fragColor = transparent;
   }
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

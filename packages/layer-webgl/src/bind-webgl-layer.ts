@@ -8,7 +8,7 @@ import { WebGLLayerProgramType } from "./webgl-layer-program";
 export default function bindWebGLLayer(id: string, renderer: Sigma, ProgramClass: WebGLLayerProgramType): () => void {
   let isCleaned = false;
 
-  const canvas = renderer.createCanvas(id, { beforeLayer: "edges" });
+  const canvas = renderer.createCanvas(id, { beforeLayer: "scene" });
   const gl = renderer.createWebGLContext(id, { canvas });
   const program = new ProgramClass(gl, null, renderer);
 

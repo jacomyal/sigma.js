@@ -31,11 +31,7 @@ export abstract class WebGLLayerProgram<
   abstract setCameraUniforms(params: RenderParams, programInfo: ProgramInfo): void;
   abstract getCustomLayerDefinition(): WebGLLayerDefinition;
 
-  constructor(
-    gl: WebGL2RenderingContext,
-    pickingBuffer: WebGLFramebuffer | null,
-    renderer: Sigma<N, E, G>,
-  ) {
+  constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
     super(gl, pickingBuffer, renderer);
     this.verticesCount = QUAD_VERTICES.length / 2;
   }

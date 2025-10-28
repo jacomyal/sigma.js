@@ -11,6 +11,7 @@ precision highp float;
 
 in vec2 v_diffVector;
 in float v_radius;
+in float v_zIndex;
 
 #ifdef PICKING_MODE
 in vec4 v_color;
@@ -102,6 +103,8 @@ ${borders
     )
     .join("")} { /* Nothing to add here */ }
   #endif
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

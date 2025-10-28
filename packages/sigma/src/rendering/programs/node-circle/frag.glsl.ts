@@ -5,6 +5,7 @@ precision highp float;
 in vec4 v_color;
 in vec2 v_diffVector;
 in float v_radius;
+in float v_zIndex;
 
 uniform float u_correctionRatio;
 
@@ -32,6 +33,8 @@ void main(void) {
 
   fragColor = mix(v_color, transparent, t);
   #endif
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

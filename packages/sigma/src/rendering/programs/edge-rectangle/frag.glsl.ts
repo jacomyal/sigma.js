@@ -6,6 +6,7 @@ in vec4 v_color;
 in vec2 v_normal;
 in float v_thickness;
 in float v_feather;
+in float v_zIndex;
 
 out vec4 fragColor;
 
@@ -26,6 +27,8 @@ void main(void) {
 
   fragColor = mix(v_color, transparent, t);
   #endif
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

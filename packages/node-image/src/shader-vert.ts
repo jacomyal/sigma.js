@@ -8,6 +8,7 @@ in float a_size;
 in float a_angle;
 in vec4 a_texture;
 in float a_textureIndex;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -18,6 +19,7 @@ out vec2 v_diffVector;
 out float v_radius;
 out vec4 v_texture;
 out float v_textureIndex;
+out float v_zIndex;
 
 const float bias = 255.0 / 254.0;
 const float marginRatio = 1.05;
@@ -48,6 +50,8 @@ void main() {
   #endif
 
   v_color.a *= bias;
+
+  v_zIndex = a_zIndex;
 }
 `;
 

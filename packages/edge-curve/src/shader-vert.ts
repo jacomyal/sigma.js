@@ -17,6 +17,7 @@ in float a_current;
 in float a_curvature;
 ${hasTargetArrowHead ? "in float a_targetSize;\n" : ""}
 ${hasSourceArrowHead ? "in float a_sourceSize;\n" : ""}
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
@@ -31,6 +32,7 @@ out float v_feather;
 out vec2 v_cpA;
 out vec2 v_cpB;
 out vec2 v_cpC;
+out float v_zIndex;
 ${
   hasTargetArrowHead
     ? `
@@ -133,6 +135,8 @@ ${
   #endif
 
   v_color.a *= bias;
+
+  v_zIndex = a_zIndex;
 }
 `;
 

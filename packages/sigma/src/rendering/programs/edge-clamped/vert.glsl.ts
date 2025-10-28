@@ -10,6 +10,7 @@ in vec2 a_positionEnd;
 in float a_positionCoef;
 in float a_radius;
 in float a_radiusCoef;
+in float a_zIndex;
 
 uniform mat3 u_matrix;
 uniform float u_zoomRatio;
@@ -24,6 +25,7 @@ out vec4 v_color;
 out vec2 v_normal;
 out float v_thickness;
 out float v_feather;
+out float v_zIndex;
 
 const float bias = 255.0 / 254.0;
 
@@ -67,6 +69,8 @@ void main() {
   #endif
 
   v_color.a *= bias;
+
+  v_zIndex = a_zIndex;
 }
 `;
 

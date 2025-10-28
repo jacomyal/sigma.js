@@ -9,6 +9,7 @@ precision highp float;
 
 in vec2 v_diffVector;
 in float v_radius;
+in float v_zIndex;
 
 #ifdef PICKING_MODE
 in vec4 v_color;
@@ -92,6 +93,8 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
     fragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
   }
   #endif
+
+  gl_FragDepth = v_zIndex;
 }
 `;
 

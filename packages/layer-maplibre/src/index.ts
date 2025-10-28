@@ -27,8 +27,7 @@ export default function bindMaplibreLayer(
   const mapLayerName = "layer-maplibre";
   const mapContainer = sigma.createLayer(mapLayerName, "div", {
     style: { position: "absolute", inset: "0" },
-    // 'edges' is the first sigma layer
-    beforeLayer: "edges",
+    beforeLayer: "scene",
   });
   sigma.getContainer().prepend(mapContainer);
 
