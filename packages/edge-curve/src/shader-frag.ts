@@ -1,3 +1,5 @@
+import { OIT_GLSL } from "sigma/utils";
+
 import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
@@ -8,6 +10,8 @@ export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramO
   const SHADER = /*glsl*/ `#version 300 es
 // Shader: edge-curve fragment
 precision highp float;
+
+${OIT_GLSL}
 
 in vec4 v_color;
 in float v_thickness;
@@ -106,11 +110,8 @@ ${
 
   vec4 color = mix(v_color, transparent, t);
 
-  // Weighted Blended OIT
-  float weight = color.a * clamp(0.03 / (1e-5 + pow(gl_FragDepth / 200.0, 4.0)), 1e-2, 3e3);
-
-  fragColor = vec4(color.rgb * color.a, color.a) * weight;
-  revealage = color.a;
+  fragColor = oitFragColor(color, v_zIndex);
+  revealage = oitRevealage(color);
   #endif
 
   gl_FragDepth = v_zIndex;

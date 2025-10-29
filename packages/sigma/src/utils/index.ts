@@ -10,6 +10,7 @@ export * from "./colors";
 export * from "./coordinates";
 export * from "./data";
 export * from "./easings";
+export * from "./glsl";
 export * from "./graph";
 export * from "./matrices";
 export * from "./misc";

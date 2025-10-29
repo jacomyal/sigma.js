@@ -1,4 +1,5 @@
 import { numberToGLSLFloat } from "sigma/rendering";
+import { OIT_GLSL } from "sigma/utils";
 
 import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSize } from "./utils";
 
@@ -9,6 +10,8 @@ export default function getFragmentShader({ borders }: CreateNodeBorderProgramOp
   const SHADER = /*glsl*/ `#version 300 es
 // Shader: node-border fragment
 precision highp float;
+
+${OIT_GLSL}
 
 in vec2 v_diffVector;
 in float v_radius;
@@ -104,12 +107,8 @@ ${borders
     )
     .join("")} { /* Nothing to add here */ }
 
-  // Weighted Blended OIT
-  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
-
-  vec4 color = fragColor;
-  fragColor = vec4(color.rgb * color.a, color.a) * weight;
-  revealage = color.a;
+  fragColor = oitFragColor(fragColor, v_zIndex);
+  revealage = oitRevealage(fragColor);
   #endif
 
   gl_FragDepth = v_zIndex;

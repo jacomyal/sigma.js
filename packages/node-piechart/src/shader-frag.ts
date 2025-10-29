@@ -1,4 +1,5 @@
 import { numberToGLSLFloat } from "sigma/rendering";
+import { OIT_GLSL } from "sigma/utils";
 
 import { CreateNodePiechartProgramOptions } from "./utils";
 
@@ -7,6 +8,8 @@ export default function getFragmentShader({ slices, offset }: CreateNodePiechart
   const SHADER = /*glsl*/ `#version 300 es
 // Shader: node-piechart fragment
 precision highp float;
+
+${OIT_GLSL}
 
 in vec2 v_diffVector;
 in float v_radius;
@@ -96,12 +99,8 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
     fragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
   }
 
-  // Weighted Blended OIT
-  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
-
-  vec4 finalColor = fragColor;
-  fragColor = vec4(finalColor.rgb * finalColor.a, finalColor.a) * weight;
-  revealage = finalColor.a;
+  fragColor = oitFragColor(fragColor, v_zIndex);
+  revealage = oitRevealage(fragColor);
   #endif
 
   gl_FragDepth = v_zIndex;

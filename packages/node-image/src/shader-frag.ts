@@ -1,8 +1,12 @@
+import { OIT_GLSL } from "sigma/utils";
+
 export default function getFragmentShader({ texturesCount }: { texturesCount: number }) {
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
 // Shader: node-image fragment
 precision highp float;
+
+${OIT_GLSL}
 
 in vec4 v_color;
 in vec2 v_diffVector;
@@ -111,12 +115,8 @@ void main(void) {
     }
   }
 
-  // Weighted Blended OIT
-  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
-
-  vec4 finalColor = fragColor;
-  fragColor = vec4(finalColor.rgb * finalColor.a, finalColor.a) * weight;
-  revealage = finalColor.a;
+  fragColor = oitFragColor(fragColor, v_zIndex);
+  revealage = oitRevealage(fragColor);
 
   gl_FragDepth = v_zIndex;
 }
