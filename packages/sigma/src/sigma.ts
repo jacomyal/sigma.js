@@ -370,11 +370,15 @@ export default class Sigma<
     if (!oitFrameBuffer) throw new Error(`Sigma: cannot create OIT framebuffer for layer ${id}`);
     gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
 
+    // OIT textures need to match screen resolution including pixelRatio
+    const viewportWidth = this.width * this.pixelRatio;
+    const viewportHeight = this.height * this.pixelRatio;
+
     // Create depth renderbuffer FIRST (required for framebuffer completeness check)
     const depthBuffer = gl.createRenderbuffer();
     if (!depthBuffer) throw new Error(`Sigma: cannot create OIT depth buffer for layer ${id}`);
     gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, this.width, this.height);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, viewportWidth, viewportHeight);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 
     // Create accumulation texture (RGBA32F for high precision)
@@ -387,7 +391,7 @@ export default class Sigma<
     const accumFormat: number = gl.RGBA16F;
     const accumType: number = gl.HALF_FLOAT;
 
-    gl.texImage2D(gl.TEXTURE_2D, 0, accumFormat, this.width, this.height, 0, gl.RGBA, accumType, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, accumFormat, viewportWidth, viewportHeight, 0, gl.RGBA, accumType, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -398,7 +402,7 @@ export default class Sigma<
     const revealTexture = gl.createTexture();
     if (!revealTexture) throw new Error(`Sigma: cannot create OIT reveal texture for layer ${id}`);
     gl.bindTexture(gl.TEXTURE_2D, revealTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, viewportWidth, viewportHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -439,7 +443,7 @@ export default class Sigma<
           `Attachments - Accum: ${accumType}, ` +
           `Reveal: ${revealType}, ` +
           `Depth: ${depthType} (${depthWidth}x${depthHeight}).\n` +
-          `Container size: ${this.width}x${this.height}`,
+          `Container size: ${this.width}x${this.height}, OIT size: ${viewportWidth}x${viewportHeight}`,
       );
     }
 
@@ -1438,9 +1442,8 @@ export default class Sigma<
     // Bind OIT framebuffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
 
-    // IMPORTANT: Set viewport to match OIT framebuffer dimensions
-    // The viewport might have been set for the screen framebuffer with pixelRatio
-    gl.viewport(0, 0, this.width, this.height);
+    // IMPORTANT: Set viewport to match OIT framebuffer dimensions (including pixelRatio)
+    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
 
     // Ensure drawBuffers is set for MRT before rendering
     gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
