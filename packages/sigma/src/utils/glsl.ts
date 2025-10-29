@@ -29,11 +29,12 @@ export const OIT_GLSL = /*glsl*/ `
  * @return Weight value for OIT blending
  */
 float oitWeight(float alpha, float zIndex) {
-  // Convert zIndex to depth: 0 = near (should get high weight), 1 = far (should get low weight)
+  // Convert zIndex to depth: zIndex 1 = near (depth 0), zIndex 0 = far (depth 1)
   float depth = 1.0 - zIndex;
 
   // Standard weighted blended OIT formula
-  // Near fragments (depth ≈ 0) get weight ≈ 3000, far fragments (depth ≈ 1) get weight ≈ 10
+  // Near fragments (zIndex ≈ 1, depth ≈ 0) get weight ≈ 3000
+  // Far fragments (zIndex ≈ 0, depth ≈ 1) get weight ≈ 10
   return alpha * clamp(10.0 / (0.00001 + pow(depth + 0.00001, 3.0)), 0.01, 3000.0);
 }
 

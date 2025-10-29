@@ -1459,6 +1459,10 @@ export default class Sigma<
     // Configure OIT blend modes
     this.configureOITBlending("scene");
 
+    // Disable depth testing for OIT - all fragments must accumulate regardless of depth
+    // The weight function handles visual ordering, not the depth buffer
+    gl.disable(gl.DEPTH_TEST);
+
     // Check for GL errors before rendering
     let glError = gl.getError();
     if (glError !== gl.NO_ERROR) {
@@ -1491,6 +1495,9 @@ export default class Sigma<
         throw new Error(`OIT Pass 1: GL error after edge rendering: ${glError} (0x${glError.toString(16)})`);
       }
     }
+
+    // Re-enable depth testing for next frame
+    gl.enable(gl.DEPTH_TEST);
 
     // OIT Pass 2: Composite to screen
 
@@ -1559,9 +1566,9 @@ export default class Sigma<
           `Adjust the node's zIndex or update the minZIndex/maxZIndex settings.`,
       );
     }
-    // Normalize z-index to [0, 1] depth range for GPU depth buffer
-    // Invert so higher z-index = lower depth value = renders on top
-    data.zIndex = 1.0 - (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
+    // Normalize z-index to [0, 1] range for OIT weight function
+    // Higher z-index = higher value = closer to camera = renders on top
+    data.zIndex = (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
   }
 
   /**
@@ -1627,9 +1634,9 @@ export default class Sigma<
           `Adjust the edge's zIndex or update the minZIndex/maxZIndex settings.`,
       );
     }
-    // Normalize z-index to [0, 1] depth range for GPU depth buffer
-    // Invert so higher z-index = lower depth value = renders on top
-    data.zIndex = 1.0 - (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
+    // Normalize z-index to [0, 1] range for OIT weight function
+    // Higher z-index = higher value = closer to camera = renders on top
+    data.zIndex = (data.zIndex - minZIndex) / (maxZIndex - minZIndex || 1);
   }
 
   /**
