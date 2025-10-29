@@ -382,14 +382,17 @@ export default class Sigma<
     if (!accumTexture) throw new Error(`Sigma: cannot create OIT accumulation texture for layer ${id}`);
 
     gl.bindTexture(gl.TEXTURE_2D, accumTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+
+    // RGBA16F is color-renderable in WebGL 2 with EXT_color_buffer_half_float or as baseline
+    const accumFormat: number = gl.RGBA16F;
+    const accumType: number = gl.HALF_FLOAT;
+
+    gl.texImage2D(gl.TEXTURE_2D, 0, accumFormat, this.width, this.height, 0, gl.RGBA, accumType, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, accumTexture, 0);
-
-    // Don't check framebuffer status yet - need both color attachments + drawBuffers first
 
     // Create reveal texture (RGBA8 instead of R8 for guaranteed color-renderable support)
     const revealTexture = gl.createTexture();
@@ -403,7 +406,6 @@ export default class Sigma<
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, revealTexture, 0);
 
     // Set draw buffers for MRT (Multiple Render Targets)
-    // IMPORTANT: Must call drawBuffers() BEFORE checking framebuffer completeness
     // A framebuffer with multiple attachments is incomplete until drawBuffers is called
     gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 
@@ -1436,6 +1438,13 @@ export default class Sigma<
     // Bind OIT framebuffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
 
+    // IMPORTANT: Set viewport to match OIT framebuffer dimensions
+    // The viewport might have been set for the screen framebuffer with pixelRatio
+    gl.viewport(0, 0, this.width, this.height);
+
+    // Ensure drawBuffers is set for MRT before rendering
+    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
     // Clear OIT buffers
     // Clear accumulation buffer to (0, 0, 0, 0)
     gl.clearBufferfv(gl.COLOR, 0, [0, 0, 0, 0]);
@@ -1447,10 +1456,23 @@ export default class Sigma<
     // Configure OIT blend modes
     this.configureOITBlending("scene");
 
+    // Check for GL errors before rendering
+    let glError = gl.getError();
+    if (glError !== gl.NO_ERROR) {
+      throw new Error(`OIT Pass 1: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
+    }
+
     // Drawing nodes
+    // console.log("[OIT Pass 1] Rendering nodes...");
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
       program.render(params);
+    }
+
+    // Check for GL errors after node rendering
+    glError = gl.getError();
+    if (glError !== gl.NO_ERROR) {
+      throw new Error(`OIT Pass 1: GL error after node rendering: ${glError} (0x${glError.toString(16)})`);
     }
 
     // Drawing edges
@@ -1459,6 +1481,12 @@ export default class Sigma<
         const program = this.edgePrograms[type];
         program.render(params);
       }
+
+      // Check for GL errors after edge rendering
+      glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(`OIT Pass 1: GL error after edge rendering: ${glError} (0x${glError.toString(16)})`);
+      }
     }
 
     // OIT Pass 2: Composite to screen
@@ -1466,13 +1494,18 @@ export default class Sigma<
     // Unbind OIT framebuffer (render to screen)
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
+    // Restore viewport to screen dimensions (with pixel ratio)
+    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
     // Restore default blending
     this.restoreDefaultBlending("scene");
 
     // Run composite shader to resolve OIT
-    if (this.oitCompositeProgram) {
-      this.oitCompositeProgram.render(accumTexture, revealTexture);
+    if (!this.oitCompositeProgram) {
+      throw new Error("OIT Pass 2: No composite program initialized!");
     }
+
+    this.oitCompositeProgram.render(accumTexture, revealTexture);
 
     // Do not display labels on move per setting
     if (this.settings.hideLabelsOnMove && moving) return exitRender();

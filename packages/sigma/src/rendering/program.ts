@@ -322,7 +322,14 @@ export abstract class Program<
   render(params: RenderParams): void {
     if (this.hasNothingToRender()) return;
 
+    // For OIT rendering, we need to preserve the framebuffer binding across pick/normal rendering
+    const gl = this.normalProgram.gl;
+    let savedFramebuffer: WebGLFramebuffer | null = null;
+
     if (this.pickProgram) {
+      // Save the current framebuffer binding (might be OIT framebuffer)
+      savedFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
+
       this.pickProgram.gl.viewport(
         0,
         0,
@@ -332,6 +339,9 @@ export abstract class Program<
       this.bindProgram(this.pickProgram);
       this.renderProgram({ ...params, pixelRatio: params.pixelRatio / params.downSizingRatio }, this.pickProgram);
       this.unbindProgram(this.pickProgram);
+
+      // Restore the saved framebuffer binding for normal rendering
+      gl.bindFramebuffer(gl.FRAMEBUFFER, savedFramebuffer);
     }
 
     this.normalProgram.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
@@ -341,7 +351,11 @@ export abstract class Program<
   }
 
   drawWebGL(method: number /* GLenum */, { gl, frameBuffer }: ProgramInfo): void {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    // Only bind framebuffer if explicitly set (for picking).
+    // If null, use the currently bound framebuffer (for OIT rendering).
+    if (frameBuffer !== null) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    }
 
     if (!this.isInstanced) {
       gl.drawArrays(method, 0, this.verticesCount);

@@ -19,6 +19,9 @@ export interface OITCompositeProgramInfo {
     u_accumTexture: WebGLUniformLocation;
     u_revealTexture: WebGLUniformLocation;
   };
+  attributeLocations: {
+    a_position: number;
+  };
   buffer: WebGLBuffer;
 }
 
@@ -44,12 +47,27 @@ export class OITCompositeProgram {
       throw new Error("OITCompositeProgram: failed to create shader program");
     }
 
+    // Validate the program
+    gl.validateProgram(program);
+    const validateStatus = gl.getProgramParameter(program, gl.VALIDATE_STATUS);
+    if (!validateStatus) {
+      const info = gl.getProgramInfoLog(program);
+      throw new Error(`[OIT Composite Init] Program validation failed: ${info}`);
+    }
+
     // Get uniform locations
     const u_accumTexture = gl.getUniformLocation(program, "u_accumTexture");
     const u_revealTexture = gl.getUniformLocation(program, "u_revealTexture");
 
     if (!u_accumTexture || !u_revealTexture) {
       throw new Error("OITCompositeProgram: failed to get uniform locations");
+    }
+
+    // Get attribute locations
+    const a_position = gl.getAttribLocation(program, "a_position");
+
+    if (a_position < 0) {
+      throw new Error("OITCompositeProgram: failed to get attribute location for a_position");
     }
 
     // Create full-screen quad buffer (two triangles)
@@ -77,6 +95,9 @@ export class OITCompositeProgram {
         u_accumTexture,
         u_revealTexture,
       },
+      attributeLocations: {
+        a_position,
+      },
       buffer,
     };
   }
@@ -86,7 +107,7 @@ export class OITCompositeProgram {
       throw new Error("OITCompositeProgram: not initialized");
     }
 
-    const { program, gl, uniformLocations, buffer } = this.programInfo;
+    const { program, gl, uniformLocations, attributeLocations, buffer } = this.programInfo;
 
     // Ensure we're rendering to the screen framebuffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -109,9 +130,8 @@ export class OITCompositeProgram {
 
     // Set up vertex attributes
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    const positionLocation = gl.getAttribLocation(program, "a_position");
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(attributeLocations.a_position);
+    gl.vertexAttribPointer(attributeLocations.a_position, 2, FLOAT, false, 0, 0);
 
     // Disable depth testing and blending for composite pass
     gl.disable(gl.DEPTH_TEST);
@@ -119,6 +139,12 @@ export class OITCompositeProgram {
 
     // Render full-screen quad
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    // Check for errors
+    const glError = gl.getError();
+    if (glError !== gl.NO_ERROR) {
+      throw new Error(`OIT Composite: GL error: ${glError} (0x${glError.toString(16)})`);
+    }
 
     // Re-enable depth testing and blending for next frame
     gl.enable(gl.DEPTH_TEST);
