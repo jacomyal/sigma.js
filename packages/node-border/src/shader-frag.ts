@@ -100,7 +100,14 @@ ${borders
   } else ${borders
     .map(
       (_, i) => `if (dist > adjustedBorderSize_${i} - aaBorder) {
-    fragColor = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);
+    ${
+      i === 0
+        ? // For outermost border, reduce alpha instead of mixing with transparent/black
+          `fragColor = borderColor_${i + 1};
+    fragColor.a *= 1.0 - (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder;`
+        : // For inner borders, mix colors normally (both are non-black)
+          `fragColor = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);`
+    }
   } else if (dist > adjustedBorderSize_${i + 1}) {
     fragColor = borderColor_${i + 1};
   } else `,

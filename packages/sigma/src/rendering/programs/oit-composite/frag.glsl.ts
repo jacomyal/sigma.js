@@ -19,8 +19,13 @@ void main(void) {
   // Avoid division by zero
   vec3 averageColor = accum.rgb / max(accum.a, 1e-5);
 
-  // Final color with proper alpha blending
-  fragColor = vec4(averageColor, 1.0 - reveal);
+  // Calculate final alpha (transparency = reveal, so alpha = 1 - reveal)
+  float alpha = 1.0 - reveal;
+
+  // Output premultiplied alpha for proper blending with background
+  // With blend mode (ONE, ONE_MINUS_SRC_ALPHA):
+  // result = averageColor * alpha + background * (1 - alpha)
+  fragColor = vec4(averageColor * alpha, alpha);
 }
 `;
 

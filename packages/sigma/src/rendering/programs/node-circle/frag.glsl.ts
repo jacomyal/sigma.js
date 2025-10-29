@@ -17,8 +17,6 @@ uniform float u_correctionRatio;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
-
 void main(void) {
   float border = u_correctionRatio * 2.0;
   float dist = length(v_diffVector) - v_radius + border;
@@ -34,11 +32,12 @@ void main(void) {
   if (dist > border)
     discard;
 
-  float t = 0.0;
-  if (dist > 0.0)
-    t = dist / border;
-
-  vec4 color = mix(v_color, transparent, t);
+  // Anti-aliasing: reduce alpha at edges while keeping RGB color
+  vec4 color = v_color;
+  if (dist > 0.0) {
+    float t = dist / border;
+    color.a *= (1.0 - t);
+  }
 
   // Weighted Blended OIT
   fragColor = oitFragColor(color, v_zIndex);

@@ -25,8 +25,6 @@ uniform bool u_keepWithinCircle;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
-
 const float radius = 0.5;
 
 void main(void) {
@@ -98,10 +96,12 @@ void main(void) {
   if (u_keepWithinCircle) {
     if (dist >= v_radius) {
       discard;
-    } else if (dist < v_radius - border) {
-      fragColor = color;
     } else {
-      fragColor = mix(transparent, color, (v_radius - dist) / border);
+      fragColor = color;
+      // Anti-aliasing: reduce alpha at edges while keeping RGB color
+      if (dist >= v_radius - border) {
+        fragColor.a *= (v_radius - dist) / border;
+      }
     }
   }
 

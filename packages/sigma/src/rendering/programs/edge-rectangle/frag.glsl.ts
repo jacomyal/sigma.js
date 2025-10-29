@@ -16,8 +16,6 @@ in float v_zIndex;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
-
 void main(void) {
   // We only handle antialiasing for normal mode:
   #ifdef PICKING_MODE
@@ -30,13 +28,14 @@ void main(void) {
     discard;
   }
 
+  // Anti-aliasing: reduce alpha at edges while keeping RGB color
+  vec4 color = v_color;
   float t = smoothstep(
     v_thickness - v_feather,
     v_thickness,
     dist
   );
-
-  vec4 color = mix(v_color, transparent, t);
+  color.a *= (1.0 - t);
 
   fragColor = oitFragColor(color, v_zIndex);
   revealage = oitRevealage(color);

@@ -66,8 +66,6 @@ float distToQuadraticBezierCurve(vec2 p, vec2 b0, vec2 b1, vec2 b2) {
   return length(getDistanceVector(b0 - p, b1 - p, b2 - p));
 }
 
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
-
 void main(void) {
   float dist = distToQuadraticBezierCurve(gl_FragCoord.xy, v_cpA, v_cpB, v_cpC);
   float thickness = v_thickness;
@@ -102,13 +100,14 @@ ${
   #ifdef PICKING_MODE
   fragColor = v_color;
   #else
+  // Anti-aliasing: reduce alpha at edges while keeping RGB color
+  vec4 color = v_color;
   float t = smoothstep(
     halfThickness - v_feather,
     halfThickness,
     dist
   );
-
-  vec4 color = mix(v_color, transparent, t);
+  color.a *= (1.0 - t);
 
   fragColor = oitFragColor(color, v_zIndex);
   revealage = oitRevealage(color);

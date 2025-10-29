@@ -34,7 +34,6 @@ ${"attribute" in offset ? "in float v_offset;\n" : ""}
 ${"value" in offset ? "uniform float u_offset;\n" : ""}
 
 const float bias = 255.0 / 254.0;
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
   float aaBorder = u_correctionRatio * 2.0;;
@@ -93,10 +92,12 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
   // Discard fragments completely outside the circle
   if (dist >= v_radius) {
     discard;
-  } else if (dist < v_radius - aaBorder) {
-    fragColor = color;
   } else {
-    fragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
+    fragColor = color;
+    // Anti-aliasing: reduce alpha at edges while keeping RGB color
+    if (dist >= v_radius - aaBorder) {
+      fragColor.a *= (v_radius - dist) / aaBorder;
+    }
   }
 
   fragColor = oitFragColor(fragColor, v_zIndex);

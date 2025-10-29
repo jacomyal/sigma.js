@@ -15,7 +15,6 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
 const float radius = 0.5;
-const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
 void main(void) {
   vec2 m = gl_PointCoord - vec2(0.5, 0.5);
@@ -32,13 +31,12 @@ void main(void) {
   if (dist <= 0.0)
     discard;
 
-  float t = 0.0;
-  if (dist > v_border)
-    t = 1.0;
-  else if (dist > 0.0)
-    t = dist / v_border;
-
-  vec4 color = mix(transparent, v_color, t);
+  // Anti-aliasing: reduce alpha at edges while keeping RGB color
+  vec4 color = v_color;
+  if (dist <= v_border) {
+    float t = dist / v_border;
+    color.a *= t;
+  }
 
   // Weighted Blended OIT
   fragColor = oitFragColor(color, v_zIndex);
