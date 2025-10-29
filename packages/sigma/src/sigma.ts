@@ -387,9 +387,11 @@ export default class Sigma<
 
     gl.bindTexture(gl.TEXTURE_2D, accumTexture);
 
-    // RGBA16F is color-renderable in WebGL 2 with EXT_color_buffer_half_float or as baseline
-    const accumFormat: number = gl.RGBA16F;
-    const accumType: number = gl.HALF_FLOAT;
+    // Use RGBA32F for accumulation to avoid overflow with many overlapping fragments
+    // RGBA16F max (65,504) is too low when multiple opaque fragments accumulate at high pixelRatio
+    // Requires EXT_color_buffer_float extension (checked above)
+    const accumFormat: number = gl.RGBA32F;
+    const accumType: number = gl.FLOAT;
 
     gl.texImage2D(gl.TEXTURE_2D, 0, accumFormat, viewportWidth, viewportHeight, 0, gl.RGBA, accumType, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

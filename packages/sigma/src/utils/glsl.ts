@@ -35,7 +35,16 @@ float oitWeight(float alpha, float zIndex) {
   // Standard weighted blended OIT formula
   // Near fragments (zIndex ≈ 1, depth ≈ 0) get weight ≈ 3000
   // Far fragments (zIndex ≈ 0, depth ≈ 1) get weight ≈ 10
-  return alpha * clamp(10.0 / (0.00001 + pow(depth + 0.00001, 3.0)), 0.01, 3000.0);
+  float baseWeight = clamp(10.0 / (0.00001 + pow(depth + 0.00001, 3.0)), 0.01, 3000.0);
+
+  // Weight boost for opaque fragments to make them properly occlude
+  // Without this, opaque fragments still blend with background (weighted average issue)
+  // With RGBA32F accumulation buffer (max ~3.4e38), we can use large multipliers safely
+  if (alpha >= 0.99) {
+    baseWeight *= 1000.0;  // 3000 → 3,000,000 for opaque (99.9997% dominance over far fragments)
+  }
+
+  return alpha * baseWeight;
 }
 
 /**
