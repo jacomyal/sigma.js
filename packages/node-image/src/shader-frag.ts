@@ -1,6 +1,7 @@
 export default function getFragmentShader({ texturesCount }: { texturesCount: number }) {
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: node-image fragment
 precision highp float;
 
 in vec4 v_color;
@@ -17,7 +18,8 @@ uniform float u_percentagePadding;
 uniform bool u_colorizeImages;
 uniform bool u_keepWithinCircle;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out float revealage;
 
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -90,9 +92,11 @@ void main(void) {
 
   // Crop in a circle when u_keepWithinCircle is truthy:
   if (u_keepWithinCircle) {
-    if (dist < v_radius - border) {
+    if (dist >= v_radius) {
+      discard;
+    } else if (dist < v_radius - border) {
       fragColor = color;
-    } else if (dist < v_radius) {
+    } else {
       fragColor = mix(transparent, color, (v_radius - dist) / border);
     }
   }
@@ -101,11 +105,18 @@ void main(void) {
   else {
     float squareHalfSize = v_radius * ${Math.SQRT1_2 * Math.cos(Math.PI / 12)};
     if (abs(diffVector.x) > squareHalfSize || abs(diffVector.y) > squareHalfSize) {
-      fragColor = transparent;
+      discard;
     } else {
       fragColor = color;
     }
   }
+
+  // Weighted Blended OIT
+  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
+
+  vec4 finalColor = fragColor;
+  fragColor = vec4(finalColor.rgb * finalColor.a, finalColor.a) * weight;
+  revealage = finalColor.a;
 
   gl_FragDepth = v_zIndex;
 }

@@ -1,5 +1,6 @@
 // language=GLSL
 const SHADER_SOURCE = /*glsl*/ `#version 300 es
+// Shader: edge-arrow-head vertex
 
 in vec2 a_position;
 in vec2 a_normal;

@@ -11,6 +11,7 @@ import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
 import { AbstractEdgeProgram, AbstractNodeProgram, EdgeProgramType, NodeProgramType } from "./rendering";
+import { OITCompositeProgram } from "./rendering/programs/oit-composite";
 import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
   CameraState,
@@ -138,6 +139,11 @@ export default class Sigma<
   private nodeDataCache: Record<string, NodeDisplayData> = {};
   private edgeDataCache: Record<string, EdgeDisplayData> = {};
 
+  // OIT (Order-Independent Transparency) textures for weighted blended OIT
+  private oitAccumTextures: PlainObject<WebGLTexture> = {};
+  private oitRevealTextures: PlainObject<WebGLTexture> = {};
+  private oitFrameBuffers: PlainObject<WebGLFramebuffer> = {};
+
   // Indices to keep track of the index of the item inside programs
   private nodeProgramIndex: Record<string, number> = {};
   private edgeProgramIndex: Record<string, number> = {};
@@ -182,6 +188,7 @@ export default class Sigma<
   // Programs
   private nodePrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
   private edgePrograms: { [key: string]: AbstractEdgeProgram<N, E, G> } = {};
+  private oitCompositeProgram: OITCompositeProgram;
 
   private camera: Camera;
 
@@ -202,6 +209,8 @@ export default class Sigma<
 
     // Initializing contexts
     this.createWebGLContext("scene", { picking: true });
+    // Note: OIT framebuffers are created on first render when dimensions are known
+    this.oitCompositeProgram = new OITCompositeProgram(this.webGLContexts.scene); // Initialize OIT composite shader
     this.createCanvasContext("edgeLabels");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
@@ -335,6 +344,155 @@ export default class Sigma<
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickingTexture, 0);
 
     this.textures[id] = pickingTexture as WebGLTexture;
+
+    return this;
+  }
+
+  /**
+   * Method setting up OIT (Order-Independent Transparency) framebuffers with MRT.
+   * Creates accumulation and reveal textures for weighted blended OIT.
+   *
+   * @return {Sigma}
+   */
+  private setupOITFramebuffer(id: string): this {
+    const gl = this.webGLContexts[id] as WebGL2RenderingContext;
+
+    // Try to enable floating point extension (optional, we'll fall back to RGBA8 if needed)
+    gl.getExtension("EXT_color_buffer_float");
+
+    // Delete existing OIT textures if any
+    if (this.oitAccumTextures[id]) gl.deleteTexture(this.oitAccumTextures[id]);
+    if (this.oitRevealTextures[id]) gl.deleteTexture(this.oitRevealTextures[id]);
+    if (this.oitFrameBuffers[id]) gl.deleteFramebuffer(this.oitFrameBuffers[id]);
+
+    // Create OIT framebuffer
+    const oitFrameBuffer = gl.createFramebuffer();
+    if (!oitFrameBuffer) throw new Error(`Sigma: cannot create OIT framebuffer for layer ${id}`);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
+
+    // Create depth renderbuffer FIRST (required for framebuffer completeness check)
+    const depthBuffer = gl.createRenderbuffer();
+    if (!depthBuffer) throw new Error(`Sigma: cannot create OIT depth buffer for layer ${id}`);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, this.width, this.height);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+
+    // Create accumulation texture (RGBA32F for high precision)
+    const accumTexture = gl.createTexture();
+    if (!accumTexture) throw new Error(`Sigma: cannot create OIT accumulation texture for layer ${id}`);
+
+    gl.bindTexture(gl.TEXTURE_2D, accumTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, accumTexture, 0);
+
+    // Don't check framebuffer status yet - need both color attachments + drawBuffers first
+
+    // Create reveal texture (RGBA8 instead of R8 for guaranteed color-renderable support)
+    const revealTexture = gl.createTexture();
+    if (!revealTexture) throw new Error(`Sigma: cannot create OIT reveal texture for layer ${id}`);
+    gl.bindTexture(gl.TEXTURE_2D, revealTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, revealTexture, 0);
+
+    // Set draw buffers for MRT (Multiple Render Targets)
+    // IMPORTANT: Must call drawBuffers() BEFORE checking framebuffer completeness
+    // A framebuffer with multiple attachments is incomplete until drawBuffers is called
+    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+    // Check status after drawBuffers
+    const finalStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    if (finalStatus !== gl.FRAMEBUFFER_COMPLETE) {
+      // Get detailed diagnostic info
+      const accumType = gl.getFramebufferAttachmentParameter(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0,
+        gl.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+      );
+      const revealType = gl.getFramebufferAttachmentParameter(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT1,
+        gl.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+      );
+      const depthType = gl.getFramebufferAttachmentParameter(
+        gl.FRAMEBUFFER,
+        gl.DEPTH_ATTACHMENT,
+        gl.FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+      );
+
+      // Check renderbuffer size
+      gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+      const depthWidth = gl.getRenderbufferParameter(gl.RENDERBUFFER, gl.RENDERBUFFER_WIDTH);
+      const depthHeight = gl.getRenderbufferParameter(gl.RENDERBUFFER, gl.RENDERBUFFER_HEIGHT);
+
+      throw new Error(
+        `Sigma: OIT framebuffer incomplete after drawBuffers. Status: ${finalStatus}.\n` +
+          `Attachments - Accum: ${accumType}, ` +
+          `Reveal: ${revealType}, ` +
+          `Depth: ${depthType} (${depthWidth}x${depthHeight}).\n` +
+          `Container size: ${this.width}x${this.height}`,
+      );
+    }
+
+    // Store references
+    this.oitFrameBuffers[id] = oitFrameBuffer;
+    this.oitAccumTextures[id] = accumTexture;
+    this.oitRevealTextures[id] = revealTexture;
+
+    // Unbind framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return this;
+  }
+
+  /**
+   * Method configuring OIT blend modes for weighted blended OIT.
+   * Sets different blend functions for accumulation and reveal buffers.
+   *
+   * @return {Sigma}
+   */
+  private configureOITBlending(id: string): this {
+    const gl = this.webGLContexts[id] as WebGL2RenderingContext;
+
+    // Enable blending
+    gl.enable(gl.BLEND);
+
+    // Try to use per-buffer blend modes (requires OES_draw_buffers_indexed extension)
+    // This extension allows different blend functions for each draw buffer
+    const extDrawBuffersIndexed = gl.getExtension("OES_draw_buffers_indexed") as {
+      blendFunciOES: (buf: number, src: number, dst: number) => void;
+    } | null;
+
+    if (!extDrawBuffersIndexed) {
+      throw new Error("Sigma: OES_draw_buffers_indexed not supported.");
+    }
+
+    // Draw buffer 0 (accumulation): additive blending
+    extDrawBuffersIndexed.blendFunciOES(0, gl.ONE, gl.ONE);
+
+    // Draw buffer 1 (reveal): multiplicative blending
+    extDrawBuffersIndexed.blendFunciOES(1, gl.ZERO, gl.ONE_MINUS_SRC_COLOR);
+
+    return this;
+  }
+
+  /**
+   * Method restoring default blend mode after OIT rendering.
+   *
+   * @return {Sigma}
+   */
+  private restoreDefaultBlending(id: string): this {
+    const gl = this.webGLContexts[id] as WebGL2RenderingContext;
+
+    // Restore default premultiplied alpha blending
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     return this;
   }
@@ -1229,6 +1387,11 @@ export default class Sigma<
     // Prepare the textures
     this.pickingLayers.forEach((layer) => this.resetWebGLTexture(layer));
 
+    // Create OIT framebuffer on first render or after resize
+    if (!this.oitFrameBuffers.scene) {
+      this.setupOITFramebuffer("scene");
+    }
+
     // If we have no nodes we can stop right there
     if (!this.graph.order) return exitRender();
 
@@ -1263,6 +1426,27 @@ export default class Sigma<
 
     const params: RenderParams = this.getRenderParams();
 
+    const gl = this.webGLContexts.scene;
+    const oitFrameBuffer = this.oitFrameBuffers.scene;
+    const accumTexture = this.oitAccumTextures.scene;
+    const revealTexture = this.oitRevealTextures.scene;
+
+    // OIT Pass 1: Render to OIT buffers
+
+    // Bind OIT framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
+
+    // Clear OIT buffers
+    // Clear accumulation buffer to (0, 0, 0, 0)
+    gl.clearBufferfv(gl.COLOR, 0, [0, 0, 0, 0]);
+    // Clear reveal buffer to 1.0 (full opacity)
+    gl.clearBufferfv(gl.COLOR, 1, [1, 0, 0, 0]);
+    // Clear depth buffer
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+
+    // Configure OIT blend modes
+    this.configureOITBlending("scene");
+
     // Drawing nodes
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
@@ -1275,6 +1459,19 @@ export default class Sigma<
         const program = this.edgePrograms[type];
         program.render(params);
       }
+    }
+
+    // OIT Pass 2: Composite to screen
+
+    // Unbind OIT framebuffer (render to screen)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // Restore default blending
+    this.restoreDefaultBlending("scene");
+
+    // Run composite shader to resolve OIT
+    if (this.oitCompositeProgram) {
+      this.oitCompositeProgram.render(accumTexture, revealTexture);
     }
 
     // Do not display labels on move per setting
@@ -2005,6 +2202,20 @@ export default class Sigma<
         const currentTexture = this.textures[id];
         if (currentTexture) gl.deleteTexture(currentTexture);
       }
+
+      // Invalidate OIT framebuffers on resize so they get recreated with new dimensions
+      if (this.oitFrameBuffers[id]) {
+        gl.deleteFramebuffer(this.oitFrameBuffers[id]);
+        delete this.oitFrameBuffers[id];
+      }
+      if (this.oitAccumTextures[id]) {
+        gl.deleteTexture(this.oitAccumTextures[id]);
+        delete this.oitAccumTextures[id];
+      }
+      if (this.oitRevealTextures[id]) {
+        gl.deleteTexture(this.oitRevealTextures[id]);
+        delete this.oitRevealTextures[id];
+      }
     }
 
     this.emit("resize");
@@ -2368,6 +2579,7 @@ export default class Sigma<
     for (const type in this.edgePrograms) {
       this.edgePrograms[type].kill();
     }
+    this.oitCompositeProgram.kill();
     this.nodePrograms = {};
     this.edgePrograms = {};
 

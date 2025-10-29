@@ -1,5 +1,6 @@
 // language=GLSL
 const VERTEX_SHADER_SOURCE = /*glsl*/ `#version 300 es
+// Shader: node-image vertex
 
 in vec4 a_id;
 in vec4 a_color;

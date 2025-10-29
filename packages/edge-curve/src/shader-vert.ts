@@ -6,6 +6,7 @@ export default function getVertexShader({ arrowHead }: CreateEdgeCurveProgramOpt
 
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: edge-curve vertex
 
 in vec4 a_id;
 in vec4 a_color;

@@ -3,6 +3,7 @@ import { CreateNodePiechartProgramOptions } from "./utils";
 export default function getVertexShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: node-piechart vertex
 
 in vec4 a_id;
 in vec2 a_position;

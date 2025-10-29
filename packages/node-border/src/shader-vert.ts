@@ -3,6 +3,7 @@ import { CreateNodeBorderProgramOptions } from "./utils";
 export default function getVertexShader({ borders }: CreateNodeBorderProgramOptions) {
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: node-border vertex
 
 in vec2 a_position;
 in float a_size;

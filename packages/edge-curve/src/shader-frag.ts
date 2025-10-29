@@ -6,6 +6,7 @@ export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramO
 
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: edge-curve fragment
 precision highp float;
 
 in vec4 v_color;
@@ -37,7 +38,8 @@ uniform float u_widenessToThicknessRatio;`
     : ""
 }
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out float revealage;
 
 float det(vec2 a, vec2 b) {
   return a.x * b.y - b.x * a.y;
@@ -87,21 +89,29 @@ ${
 }
 
   float halfThickness = thickness / 2.0;
-  if (dist < halfThickness) {
-    #ifdef PICKING_MODE
-    fragColor = v_color;
-    #else
-    float t = smoothstep(
-      halfThickness - v_feather,
-      halfThickness,
-      dist
-    );
 
-    fragColor = mix(v_color, transparent, t);
-    #endif
-  } else {
-    fragColor = transparent;
+  // Discard fragments completely outside the edge
+  if (dist >= halfThickness) {
+    discard;
   }
+
+  #ifdef PICKING_MODE
+  fragColor = v_color;
+  #else
+  float t = smoothstep(
+    halfThickness - v_feather,
+    halfThickness,
+    dist
+  );
+
+  vec4 color = mix(v_color, transparent, t);
+
+  // Weighted Blended OIT
+  float weight = color.a * clamp(0.03 / (1e-5 + pow(gl_FragDepth / 200.0, 4.0)), 1e-2, 3e3);
+
+  fragColor = vec4(color.rgb * color.a, color.a) * weight;
+  revealage = color.a;
+  #endif
 
   gl_FragDepth = v_zIndex;
 }

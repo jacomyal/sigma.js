@@ -1,0 +1,138 @@
+/**
+ * Sigma.js OIT Composite Program
+ * ==================================
+ *
+ * Program that performs the final composite pass for Weighted Blended OIT.
+ * Combines the accumulation and reveal textures into the final image.
+ * @module
+ */
+import { loadFragmentShader, loadProgram, loadVertexShader } from "../../utils";
+import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
+import VERTEX_SHADER_SOURCE from "./vert.glsl";
+
+const { FLOAT } = WebGL2RenderingContext;
+
+export interface OITCompositeProgramInfo {
+  program: WebGLProgram;
+  gl: WebGL2RenderingContext;
+  uniformLocations: {
+    u_accumTexture: WebGLUniformLocation;
+    u_revealTexture: WebGLUniformLocation;
+  };
+  buffer: WebGLBuffer;
+}
+
+export class OITCompositeProgram {
+  private gl: WebGL2RenderingContext;
+  private programInfo: OITCompositeProgramInfo | null = null;
+
+  constructor(gl: WebGL2RenderingContext) {
+    this.gl = gl;
+    this.initialize();
+  }
+
+  private initialize(): void {
+    const gl = this.gl;
+
+    // Create shader program
+    const program = loadProgram(gl, [
+      loadVertexShader(gl, VERTEX_SHADER_SOURCE),
+      loadFragmentShader(gl, FRAGMENT_SHADER_SOURCE),
+    ]);
+
+    if (!program) {
+      throw new Error("OITCompositeProgram: failed to create shader program");
+    }
+
+    // Get uniform locations
+    const u_accumTexture = gl.getUniformLocation(program, "u_accumTexture");
+    const u_revealTexture = gl.getUniformLocation(program, "u_revealTexture");
+
+    if (!u_accumTexture || !u_revealTexture) {
+      throw new Error("OITCompositeProgram: failed to get uniform locations");
+    }
+
+    // Create full-screen quad buffer (two triangles)
+    const buffer = gl.createBuffer();
+    if (!buffer) {
+      throw new Error("OITCompositeProgram: failed to create buffer");
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    // prettier-ignore
+    const vertices = new Float32Array([
+      -1, -1,  // Bottom-left
+       1, -1,  // Bottom-right
+      -1,  1,  // Top-left
+      -1,  1,  // Top-left
+       1, -1,  // Bottom-right
+       1,  1,  // Top-right
+    ]);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    this.programInfo = {
+      program,
+      gl,
+      uniformLocations: {
+        u_accumTexture,
+        u_revealTexture,
+      },
+      buffer,
+    };
+  }
+
+  render(accumTexture: WebGLTexture, revealTexture: WebGLTexture): void {
+    if (!this.programInfo) {
+      throw new Error("OITCompositeProgram: not initialized");
+    }
+
+    const { program, gl, uniformLocations, buffer } = this.programInfo;
+
+    // Ensure we're rendering to the screen framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // Set viewport to full canvas size
+    const canvas = gl.canvas as HTMLCanvasElement;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // Use the composite shader program
+    gl.useProgram(program);
+
+    // Bind textures
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, accumTexture);
+    gl.uniform1i(uniformLocations.u_accumTexture, 0);
+
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, revealTexture);
+    gl.uniform1i(uniformLocations.u_revealTexture, 1);
+
+    // Set up vertex attributes
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    const positionLocation = gl.getAttribLocation(program, "a_position");
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, FLOAT, false, 0, 0);
+
+    // Disable depth testing and blending for composite pass
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+
+    // Render full-screen quad
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    // Re-enable depth testing and blending for next frame
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+  }
+
+  kill(): void {
+    if (this.programInfo) {
+      const { gl, program, buffer } = this.programInfo;
+      gl.deleteProgram(program);
+      gl.deleteBuffer(buffer);
+      this.programInfo = null;
+    }
+  }
+}
+
+export default OITCompositeProgram;

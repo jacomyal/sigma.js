@@ -7,6 +7,7 @@ export default function getFragmentShader({ borders }: CreateNodeBorderProgramOp
 
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: node-border fragment
 precision highp float;
 
 in vec2 v_diffVector;
@@ -31,7 +32,8 @@ ${borders
 
 uniform float u_correctionRatio;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out float revealage;
 
 const float bias = 255.0 / 254.0;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
@@ -45,11 +47,9 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   if (dist > v_radius)
-    fragColor = transparent;
-  else {
-    fragColor = v_color;
-    fragColor.a *= bias;
-  }
+    discard;
+  fragColor = v_color;
+  fragColor.a *= bias;
   #else
   // Sizes:
 ${borders
@@ -91,8 +91,9 @@ ${borders
     return res.join("\n");
   })
   .join("\n")}
+  // Discard fragments completely outside the circle
   if (dist > adjustedBorderSize_0) {
-    fragColor = borderColor_0;
+    discard;
   } else ${borders
     .map(
       (_, i) => `if (dist > adjustedBorderSize_${i} - aaBorder) {
@@ -102,6 +103,13 @@ ${borders
   } else `,
     )
     .join("")} { /* Nothing to add here */ }
+
+  // Weighted Blended OIT
+  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
+
+  vec4 color = fragColor;
+  fragColor = vec4(color.rgb * color.a, color.a) * weight;
+  revealage = color.a;
   #endif
 
   gl_FragDepth = v_zIndex;

@@ -5,6 +5,7 @@ import { CreateNodePiechartProgramOptions } from "./utils";
 export default function getFragmentShader({ slices, offset }: CreateNodePiechartProgramOptions) {
   // language=GLSL
   const SHADER = /*glsl*/ `#version 300 es
+// Shader: node-piechart fragment
 precision highp float;
 
 in vec2 v_diffVector;
@@ -23,7 +24,8 @@ uniform vec4 u_defaultColor;
 uniform float u_cameraAngle;
 uniform float u_correctionRatio;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out float revealage;
 
 ${"attribute" in offset ? "in float v_offset;\n" : ""}
 ${"value" in offset ? "uniform float u_offset;\n" : ""}
@@ -45,11 +47,9 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   if (dist > v_radius)
-    fragColor = transparent;
-  else {
-    fragColor = v_color;
-    fragColor.a *= bias;
-  }
+    discard;
+  fragColor = v_color;
+  fragColor.a *= bias;
   #else
   // Colors:
 ${slices
@@ -87,11 +87,21 @@ ${slices.map((_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i +
     ${slices.map((_, i) => `if (angle < angle_${i + 1}) color = sliceColor_${i + 1};`).join("\n    else ")}
   }
 
-  if (dist < v_radius - aaBorder) {
+  // Discard fragments completely outside the circle
+  if (dist >= v_radius) {
+    discard;
+  } else if (dist < v_radius - aaBorder) {
     fragColor = color;
-  } else if (dist < v_radius) {
+  } else {
     fragColor = mix(transparent, color, (v_radius - dist) / aaBorder);
   }
+
+  // Weighted Blended OIT
+  float weight = fragColor.a * clamp(0.03 / (1e-5 + pow(v_zIndex / 200.0, 4.0)), 1e-2, 3e3);
+
+  vec4 finalColor = fragColor;
+  fragColor = vec4(finalColor.rgb * finalColor.a, finalColor.a) * weight;
+  revealage = finalColor.a;
   #endif
 
   gl_FragDepth = v_zIndex;
