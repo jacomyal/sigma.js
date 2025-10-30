@@ -49,7 +49,12 @@ export abstract class NodeProgram<
       return;
     }
 
-    return this.processVisibleItem(indexToColor(nodeIndex), i, data);
+    // Apply layer tie-breaker for compound programs
+    // Create shallow copy to avoid modifying the cache
+    const dataWithLayerTieBreaker = { ...data };
+    dataWithLayerTieBreaker.zIndex = data.zIndex + this.layerIndex * this.renderer.settings.zIndexLayerTieBreaker;
+
+    return this.processVisibleItem(indexToColor(nodeIndex), i, dataWithLayerTieBreaker);
   }
 
   abstract processVisibleItem(nodeIndex: number, i: number, data: NodeDisplayData): void;
@@ -109,8 +114,14 @@ export function createNodeCompoundProgram<
     programs: NonEmptyArray<AbstractNodeProgram<N, E, G>>;
 
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      this.programs = programClasses.map((Program) => {
-        return new Program(gl, pickingBuffer, renderer);
+      this.programs = programClasses.map((Program, index) => {
+        const program = new Program(gl, pickingBuffer, renderer);
+        // Assign layer index for OIT layer tie-breaking
+        // This ensures multi-layer nodes (e.g., node-border + node-fill) render correctly
+        if ("layerIndex" in program) {
+          (program as { layerIndex: number }).layerIndex = index;
+        }
+        return program;
       }) as unknown as NonEmptyArray<AbstractNodeProgram<N, E, G>>;
     }
 

@@ -91,6 +91,8 @@ export interface Settings<
   maxZIndex: number;
   defaultNodeZIndex: number;
   defaultEdgeZIndex: number;
+  zIndexItemTieBreaker: number;
+  zIndexLayerTieBreaker: number;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
   enableCameraZooming: boolean;
@@ -170,9 +172,13 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
 
   // Features
   minZIndex: 0,
-  maxZIndex: 10000,
-  defaultNodeZIndex: 5000,
+  maxZIndex: 1,
+  defaultNodeZIndex: 0.5,
   defaultEdgeZIndex: 0,
+  // Smaller epsilon values to support 10M items without exceeding [0,1] range
+  // With 10M items and 1e-10: 10M × 1e-10 = 0.001, leaving plenty of headroom
+  zIndexItemTieBreaker: 1e-10,
+  zIndexLayerTieBreaker: 1e-13,
   minCameraRatio: null,
   maxCameraRatio: null,
   enableCameraZooming: true,

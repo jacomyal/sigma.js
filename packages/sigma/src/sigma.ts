@@ -1781,7 +1781,14 @@ export default class Sigma<
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
 
-    nodeProgram.process(fingerprint, position, data);
+    // Apply item tie-breaker to zIndex to ensure nodes with identical zIndex don't blend
+    // Create shallow copy to avoid modifying the cache
+    const dataWithTieBreaker = { ...data };
+    dataWithTieBreaker.zIndex = data.zIndex + fingerprint * this.settings.zIndexItemTieBreaker;
+    // Clamp to [0, 1] to prevent overflow with many items
+    dataWithTieBreaker.zIndex = Math.max(0.0, Math.min(1.0, dataWithTieBreaker.zIndex));
+
+    nodeProgram.process(fingerprint, position, dataWithTieBreaker);
     // Saving program index
     this.nodeProgramIndex[node] = position;
   }
@@ -1801,7 +1808,14 @@ export default class Sigma<
       sourceData = this.nodeDataCache[extremities[0]],
       targetData = this.nodeDataCache[extremities[1]];
 
-    edgeProgram.process(fingerprint, position, sourceData, targetData, data);
+    // Apply item tie-breaker to zIndex to ensure edges with identical zIndex don't blend
+    // Create shallow copy to avoid modifying the cache
+    const dataWithTieBreaker = { ...data };
+    dataWithTieBreaker.zIndex = data.zIndex + fingerprint * this.settings.zIndexItemTieBreaker;
+    // Clamp to [0, 1] to prevent overflow with many items
+    dataWithTieBreaker.zIndex = Math.max(0.0, Math.min(1.0, dataWithTieBreaker.zIndex));
+
+    edgeProgram.process(fingerprint, position, sourceData, targetData, dataWithTieBreaker);
     // Saving program index
     this.edgeProgramIndex[edge] = position;
   }

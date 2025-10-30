@@ -59,7 +59,12 @@ export abstract class EdgeProgram<
       return;
     }
 
-    return this.processVisibleItem(indexToColor(edgeIndex), i, sourceData, targetData, data);
+    // Apply layer tie-breaker for compound programs
+    // Create shallow copy to avoid modifying the cache
+    const dataWithLayerTieBreaker = { ...data };
+    dataWithLayerTieBreaker.zIndex = data.zIndex + this.layerIndex * this.renderer.settings.zIndexLayerTieBreaker;
+
+    return this.processVisibleItem(indexToColor(edgeIndex), i, sourceData, targetData, dataWithLayerTieBreaker);
   }
 
   abstract processVisibleItem(
@@ -129,8 +134,14 @@ export function createEdgeCompoundProgram<
     programs: Array<AbstractEdgeProgram<N, E, G>>;
 
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      this.programs = programClasses.map((Program) => {
-        return new Program(gl, pickingBuffer, renderer);
+      this.programs = programClasses.map((Program, index) => {
+        const program = new Program(gl, pickingBuffer, renderer);
+        // Assign layer index for OIT layer tie-breaking
+        // This ensures multi-layer edges (e.g., edge-line + arrow-head) render correctly
+        if ("layerIndex" in program) {
+          (program as { layerIndex: number }).layerIndex = index;
+        }
+        return program;
       });
     }
 

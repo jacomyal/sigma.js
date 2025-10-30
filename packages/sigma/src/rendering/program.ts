@@ -72,6 +72,7 @@ export abstract class Program<
   constantArray: Float32Array = new Float32Array();
   capacity = 0;
   verticesCount = 0;
+  layerIndex = 0;
 
   normalProgram: ProgramInfo;
   pickProgram: ProgramInfo | null;
