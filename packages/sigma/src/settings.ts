@@ -108,6 +108,9 @@ export interface Settings<
   nodeProgramClasses: { [type: string]: NodeProgramType<N, E, G> };
   nodeHoverProgramClasses: { [type: string]: NodeProgramType<N, E, G> };
   edgeProgramClasses: { [type: string]: EdgeProgramType<N, E, G> };
+
+  // Debug
+  DEBUG_displayPickingLayer: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
@@ -184,6 +187,9 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   nodeProgramClasses: {},
   nodeHoverProgramClasses: {},
   edgeProgramClasses: {},
+
+  // Debug
+  DEBUG_displayPickingLayer: false,
 };
 
 export const DEFAULT_NODE_PROGRAM_CLASSES: Record<string, NodeProgramType> = {

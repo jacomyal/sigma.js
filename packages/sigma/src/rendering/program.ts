@@ -306,13 +306,16 @@ export abstract class Program<
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program } = programInfo;
 
-    // With the current fix for #1397, the alpha blending is enabled for the
-    // picking layer:
-    gl.enable(gl.BLEND);
+    // Detect if this is picking mode
+    const isPicking = programInfo === this.pickProgram;
 
-    // Original code:
-    // if (!isPicking) gl.enable(gl.BLEND);
-    // else gl.disable(gl.BLEND);
+    // For picking, we need blending disabled to get exact colors
+    // For normal rendering, we need blending enabled for transparency
+    if (isPicking) {
+      gl.disable(gl.BLEND);
+    } else {
+      gl.enable(gl.BLEND);
+    }
 
     gl.useProgram(program);
     this.setUniforms(params, programInfo);
@@ -330,6 +333,18 @@ export abstract class Program<
       // Save the current framebuffer binding (might be OIT framebuffer)
       savedFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
 
+      // Save current depth test state and depth function
+      const depthTestEnabled = gl.getParameter(gl.DEPTH_TEST) as boolean;
+      const depthFunc = gl.getParameter(gl.DEPTH_FUNC) as number;
+
+      // Enable depth testing for picking to ensure proper occlusion
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true); // Enable depth writes
+
+      // Use GEQUAL (greater or equal) so higher zIndex values (nodes) appear on top
+      // This matches the OIT normalization where higher zIndex = higher value
+      gl.depthFunc(gl.GEQUAL);
+
       this.pickProgram.gl.viewport(
         0,
         0,
@@ -339,6 +354,14 @@ export abstract class Program<
       this.bindProgram(this.pickProgram);
       this.renderProgram({ ...params, pixelRatio: params.pixelRatio / params.downSizingRatio }, this.pickProgram);
       this.unbindProgram(this.pickProgram);
+
+      // Restore depth test state
+      if (!depthTestEnabled) {
+        gl.disable(gl.DEPTH_TEST);
+      }
+
+      // Restore depth function
+      gl.depthFunc(depthFunc);
 
       // Restore the saved framebuffer binding for normal rendering
       gl.bindFramebuffer(gl.FRAMEBUFFER, savedFramebuffer);

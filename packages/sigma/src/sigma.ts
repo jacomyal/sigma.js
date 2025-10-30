@@ -12,6 +12,7 @@ import TouchCaptor from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
 import { AbstractEdgeProgram, AbstractNodeProgram, EdgeProgramType, NodeProgramType } from "./rendering";
 import { OITCompositeProgram } from "./rendering/programs/oit-composite";
+import { TextureDisplayProgram } from "./rendering/programs/texture-display";
 import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
   CameraState,
@@ -134,6 +135,7 @@ export default class Sigma<
   private pickingLayers: Set<string> = new Set();
   private textures: PlainObject<WebGLTexture> = {};
   private frameBuffers: PlainObject<WebGLFramebuffer> = {};
+  private depthRenderbuffers: PlainObject<WebGLRenderbuffer> = {};
   private activeListeners: PlainObject<Listener> = {};
   private labelGrid: LabelGrid = new LabelGrid();
   private nodeDataCache: Record<string, NodeDisplayData> = {};
@@ -189,6 +191,7 @@ export default class Sigma<
   private nodePrograms: { [key: string]: AbstractNodeProgram<N, E, G> } = {};
   private edgePrograms: { [key: string]: AbstractEdgeProgram<N, E, G> } = {};
   private oitCompositeProgram: OITCompositeProgram;
+  private textureDisplayProgram: TextureDisplayProgram;
 
   private camera: Camera;
 
@@ -211,6 +214,7 @@ export default class Sigma<
     this.createWebGLContext("scene", { picking: true });
     // Note: OIT framebuffers are created on first render when dimensions are known
     this.oitCompositeProgram = new OITCompositeProgram(this.webGLContexts.scene); // Initialize OIT composite shader
+    this.textureDisplayProgram = new TextureDisplayProgram(this.webGLContexts.scene); // Initialize texture display shader
     this.createCanvasContext("edgeLabels");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
@@ -337,13 +341,38 @@ export default class Sigma<
     const currentTexture = this.textures[id];
     if (currentTexture) gl.deleteTexture(currentTexture);
 
+    const currentDepthBuffer = this.depthRenderbuffers[id];
+    if (currentDepthBuffer) gl.deleteRenderbuffer(currentDepthBuffer);
+
+    // Create color texture for picking IDs
     const pickingTexture = gl.createTexture();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.bindTexture(gl.TEXTURE_2D, pickingTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    // Set texture parameters to make it complete for sampling
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickingTexture, 0);
 
+    // Create depth renderbuffer for proper depth testing
+    const depthBuffer = gl.createRenderbuffer();
+    if (!depthBuffer) throw new Error(`Sigma: cannot create depth buffer for picking layer ${id}`);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, this.width, this.height);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+
+    // Clear both color and depth buffers
+    // Use 0.0 for depth because picking uses GEQUAL (higher values are closer)
+    gl.clearColor(0, 0, 0, 0);
+    gl.clearDepth(0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     this.textures[id] = pickingTexture as WebGLTexture;
+    this.depthRenderbuffers[id] = depthBuffer;
 
     return this;
   }
@@ -1512,12 +1541,24 @@ export default class Sigma<
     // Restore default blending
     this.restoreDefaultBlending("scene");
 
-    // Run composite shader to resolve OIT
-    if (!this.oitCompositeProgram) {
-      throw new Error("OIT Pass 2: No composite program initialized!");
+    // Debug mode: display picking layer, or normal mode: composite OIT layers
+    if (this.settings.DEBUG_displayPickingLayer) {
+      // Debug mode: display the picking layer texture
+      const pickingTexture = this.textures.scene;
+      if (!pickingTexture) {
+        throw new Error("OIT Pass 2: No picking texture available!");
+      }
+      if (!this.textureDisplayProgram) {
+        throw new Error("OIT Pass 2: No texture display program initialized!");
+      }
+      this.textureDisplayProgram.render(pickingTexture, this.pickingDownSizingRatio);
+    } else {
+      // Normal mode: run composite shader to resolve OIT
+      if (!this.oitCompositeProgram) {
+        throw new Error("OIT Pass 2: No composite program initialized!");
+      }
+      this.oitCompositeProgram.render(accumTexture, revealTexture);
     }
-
-    this.oitCompositeProgram.render(accumTexture, revealTexture);
 
     // Do not display labels on move per setting
     if (this.settings.hideLabelsOnMove && moving) return exitRender();
@@ -2625,6 +2666,7 @@ export default class Sigma<
       this.edgePrograms[type].kill();
     }
     this.oitCompositeProgram.kill();
+    this.textureDisplayProgram.kill();
     this.nodePrograms = {};
     this.edgePrograms = {};
 
