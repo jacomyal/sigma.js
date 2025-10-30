@@ -57,6 +57,7 @@ export default function createNodePiechartProgram<
           ...slices.flatMap(({ value }, i) =>
             "attribute" in value ? [{ name: `a_sliceValue_${i + 1}`, size: 1, type: FLOAT }] : [],
           ),
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
         CONSTANT_DATA: [[NodeBorderProgram.ANGLE_1], [NodeBorderProgram.ANGLE_2], [NodeBorderProgram.ANGLE_3]],
@@ -82,6 +83,7 @@ export default function createNodePiechartProgram<
           array[startIndex++] = data[value.attribute as "size"] || 0;
         }
       });
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

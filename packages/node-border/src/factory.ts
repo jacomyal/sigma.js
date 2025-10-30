@@ -53,6 +53,7 @@ export default function createNodeBorderProgram<
           ...borders.flatMap(({ size }, i) =>
             "attribute" in size ? [{ name: `a_borderSize_${i + 1}`, size: 1, type: FLOAT }] : [],
           ),
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
         CONSTANT_DATA: [[NodeBorderProgram.ANGLE_1], [NodeBorderProgram.ANGLE_2], [NodeBorderProgram.ANGLE_3]],
@@ -73,6 +74,7 @@ export default function createNodeBorderProgram<
       borders.forEach(({ size }) => {
         if ("attribute" in size) array[startIndex++] = data[size.attribute as "size"] || size.defaultValue;
       });
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

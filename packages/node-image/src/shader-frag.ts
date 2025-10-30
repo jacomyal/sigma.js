@@ -30,7 +30,6 @@ const float radius = 0.5;
 void main(void) {
   float border = 2.0 * u_correctionRatio;
   float dist = length(v_diffVector);
-  vec4 color = fragColor;
 
   float c = cos(-u_cameraAngle);
   float s = sin(-u_cameraAngle);
@@ -39,9 +38,11 @@ void main(void) {
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
   border = 0.0;
-  color = v_color;
+  fragColor = v_color;
 
   #else
+  vec4 color = fragColor;
+
   // First case: No image to display
   if (v_texture.w <= 0.0) {
     if (!u_colorizeImages) {
@@ -90,7 +91,6 @@ void main(void) {
       }
     }
   }
-  #endif
 
   // Crop in a circle when u_keepWithinCircle is truthy:
   if (u_keepWithinCircle) {
@@ -117,6 +117,7 @@ void main(void) {
 
   fragColor = oitFragColor(fragColor, v_zIndex);
   revealage = oitRevealage(fragColor);
+  #endif
 
   gl_FragDepth = v_zIndex;
 }

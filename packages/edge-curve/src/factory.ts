@@ -51,6 +51,7 @@ export default function createEdgeCurveProgram<
           { name: "a_curvature", size: 1, type: FLOAT },
           { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [
           { name: "a_current", size: 1, type: FLOAT }, // TODO: could optimize to bool
@@ -95,6 +96,7 @@ export default function createEdgeCurveProgram<
       array[startIndex++] = curvature;
       array[startIndex++] = color;
       array[startIndex++] = edgeIndex;
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

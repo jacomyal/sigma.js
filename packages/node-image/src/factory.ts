@@ -124,6 +124,7 @@ export default function createNodeImageProgram<
           { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
           { name: "a_texture", size: 4, type: FLOAT },
           { name: "a_textureIndex", size: 1, type: FLOAT },
+          { name: "a_zIndex", size: 1, type: FLOAT },
         ],
         CONSTANT_ATTRIBUTES: [{ name: "a_angle", size: 1, type: FLOAT }],
         CONSTANT_DATA: [[NodeImageProgram.ANGLE_1], [NodeImageProgram.ANGLE_2], [NodeImageProgram.ANGLE_3]],
@@ -250,6 +251,8 @@ export default function createNodeImageProgram<
         array[startIndex++] = 0;
         array[startIndex++] = 0;
       }
+
+      array[startIndex++] = data.zIndex;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
