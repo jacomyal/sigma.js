@@ -1468,7 +1468,7 @@ export default class Sigma<
     const accumTexture = this.oitAccumTextures.scene;
     const revealTexture = this.oitRevealTextures.scene;
 
-    // OIT Pass 1: Render to OIT buffers
+    // Two-Pass OIT Rendering: Opaque items first, then transparent with OIT
 
     // Bind OIT framebuffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
@@ -1487,48 +1487,93 @@ export default class Sigma<
     // Clear depth buffer
     gl.clear(gl.DEPTH_BUFFER_BIT);
 
-    // Configure OIT blend modes
-    this.configureOITBlending("scene");
-
-    // Disable depth testing for OIT - all fragments must accumulate regardless of depth
-    // The weight function handles visual ordering, not the depth buffer
-    gl.disable(gl.DEPTH_TEST);
-
     // Check for GL errors before rendering
     let glError = gl.getError();
     if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT Pass 1: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
+      throw new Error(`OIT: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
     }
 
-    // Drawing nodes
-    // console.log("[OIT Pass 1] Rendering nodes...");
+    // ========================================================================
+    // Pass 1a: Render OPAQUE items (alpha >= 0.99) with depth testing
+    // ========================================================================
+
+    // Enable depth testing and depth writes for opaque items
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
+    gl.depthMask(true); // Write to depth buffer
+
+    // Disable blending for opaque items (they fully replace what's behind)
+    gl.disable(gl.BLEND);
+
+    // Drawing opaque nodes
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
-      program.render(params);
+      program.render(params, { mode: "opaque" });
     }
 
-    // Check for GL errors after node rendering
+    // Check for GL errors after opaque node rendering
     glError = gl.getError();
     if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT Pass 1: GL error after node rendering: ${glError} (0x${glError.toString(16)})`);
+      throw new Error(`OIT Pass 1a: GL error after opaque node rendering: ${glError} (0x${glError.toString(16)})`);
     }
 
-    // Drawing edges
+    // Drawing opaque edges
     if (!this.settings.hideEdgesOnMove || !moving) {
       for (const type in this.edgePrograms) {
         const program = this.edgePrograms[type];
-        program.render(params);
+        program.render(params, { mode: "opaque" });
       }
 
-      // Check for GL errors after edge rendering
+      // Check for GL errors after opaque edge rendering
       glError = gl.getError();
       if (glError !== gl.NO_ERROR) {
-        throw new Error(`OIT Pass 1: GL error after edge rendering: ${glError} (0x${glError.toString(16)})`);
+        throw new Error(`OIT Pass 1a: GL error after opaque edge rendering: ${glError} (0x${glError.toString(16)})`);
       }
     }
 
-    // Re-enable depth testing for next frame
+    // ========================================================================
+    // Pass 1b: Render TRANSPARENT items (alpha < 0.99) with OIT
+    // ========================================================================
+
+    // Keep depth testing enabled to respect opaque item depths
+    // But disable depth writes so transparent items don't occlude each other
     gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
+    gl.depthMask(false); // Don't write to depth buffer (transparent items don't occlude)
+
+    // Configure OIT blending for transparent items
+    this.configureOITBlending("scene");
+
+    // Drawing transparent nodes
+    for (const type in this.nodePrograms) {
+      const program = this.nodePrograms[type];
+      program.render(params, { mode: "transparent" });
+    }
+
+    // Check for GL errors after transparent node rendering
+    glError = gl.getError();
+    if (glError !== gl.NO_ERROR) {
+      throw new Error(`OIT Pass 1b: GL error after transparent node rendering: ${glError} (0x${glError.toString(16)})`);
+    }
+
+    // Drawing transparent edges
+    if (!this.settings.hideEdgesOnMove || !moving) {
+      for (const type in this.edgePrograms) {
+        const program = this.edgePrograms[type];
+        program.render(params, { mode: "transparent" });
+      }
+
+      // Check for GL errors after transparent edge rendering
+      glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(
+          `OIT Pass 1b: GL error after transparent edge rendering: ${glError} (0x${glError.toString(16)})`,
+        );
+      }
+    }
+
+    // Restore depth mask for next frame
+    gl.depthMask(true);
 
     // OIT Pass 2: Composite to screen
 

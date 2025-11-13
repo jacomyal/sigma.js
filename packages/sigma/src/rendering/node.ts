@@ -52,7 +52,7 @@ export abstract class NodeProgram<
     // Apply layer tie-breaker for compound programs
     // Create shallow copy to avoid modifying the cache
     const dataWithLayerTieBreaker = { ...data };
-    dataWithLayerTieBreaker.zIndex = data.zIndex + this.layerIndex * this.renderer.settings.zIndexLayerTieBreaker;
+    dataWithLayerTieBreaker.zIndex = data.zIndex + this.layerIndex * this.renderer.getSetting("zIndexLayerTieBreaker");
 
     return this.processVisibleItem(indexToColor(nodeIndex), i, dataWithLayerTieBreaker);
   }

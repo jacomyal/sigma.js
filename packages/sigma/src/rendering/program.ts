@@ -25,6 +25,10 @@ function pickifyShader(shader: string): string {
   return shader.replace(/\n/, `\n#define PICKING_MODE\n`);
 }
 
+function opaquifyShader(shader: string): string {
+  return shader.replace(/\n/, `\n#define OPAQUE_PASS\n`);
+}
+
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.BOOL]: 1,
   [WebGL2RenderingContext.BYTE]: 1,
@@ -43,7 +47,7 @@ export abstract class AbstractProgram<
 > {
   constructor(_gl: WebGL2RenderingContext, _pickGl: WebGL2RenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
-  abstract render(params: RenderParams): void;
+  abstract render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void;
   abstract kill(): void;
 }
 
@@ -75,6 +79,7 @@ export abstract class Program<
   layerIndex = 0;
 
   normalProgram: ProgramInfo;
+  opaqueProgram: ProgramInfo; // Opaque variant for two-pass rendering
   pickProgram: ProgramInfo | null;
 
   isInstanced: boolean;
@@ -102,6 +107,13 @@ export abstract class Program<
     // Members
     this.renderer = renderer;
     this.normalProgram = this.getProgramInfo("normal", gl, def.VERTEX_SHADER_SOURCE, def.FRAGMENT_SHADER_SOURCE, null);
+    this.opaqueProgram = this.getProgramInfo(
+      "opaque",
+      gl,
+      def.VERTEX_SHADER_SOURCE,
+      opaquifyShader(def.FRAGMENT_SHADER_SOURCE),
+      null,
+    );
     this.pickProgram = pickingBuffer
       ? this.getProgramInfo(
           "pick",
@@ -139,6 +151,7 @@ export abstract class Program<
 
   kill() {
     killProgram(this.normalProgram);
+    killProgram(this.opaqueProgram);
 
     if (this.pickProgram) {
       killProgram(this.pickProgram);
@@ -147,7 +160,7 @@ export abstract class Program<
   }
 
   protected getProgramInfo(
-    name: "normal" | "pick",
+    name: "normal" | "opaque" | "pick",
     gl: WebGL2RenderingContext,
     vertexShaderSource: string,
     fragmentShaderSource: string,
@@ -323,14 +336,16 @@ export abstract class Program<
     this.drawWebGL(this.METHOD, programInfo);
   }
 
-  render(params: RenderParams): void {
+  render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void {
     if (this.hasNothingToRender()) return;
+
+    const mode = options?.mode || "all";
 
     // For OIT rendering, we need to preserve the framebuffer binding across pick/normal rendering
     const gl = this.normalProgram.gl;
     let savedFramebuffer: WebGLFramebuffer | null = null;
 
-    if (this.pickProgram) {
+    if (this.pickProgram && mode === "all") {
       // Save the current framebuffer binding (might be OIT framebuffer)
       savedFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
 
@@ -368,10 +383,16 @@ export abstract class Program<
       gl.bindFramebuffer(gl.FRAMEBUFFER, savedFramebuffer);
     }
 
-    this.normalProgram.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
-    this.bindProgram(this.normalProgram);
-    this.renderProgram(params, this.normalProgram);
-    this.unbindProgram(this.normalProgram);
+    // Select the appropriate program based on mode
+    const program = mode === "opaque" ? this.opaqueProgram : this.normalProgram;
+
+    // Only render if mode is appropriate (skip if mode is "opaque" or "transparent" specifically)
+    if (mode === "opaque" || mode === "transparent" || mode === "all") {
+      program.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
+      this.bindProgram(program);
+      this.renderProgram(params, program);
+      this.unbindProgram(program);
+    }
   }
 
   drawWebGL(method: number /* GLenum */, { gl, frameBuffer }: ProgramInfo): void {
