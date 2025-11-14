@@ -114,8 +114,26 @@ ${borders
     )
     .join("")} { /* Nothing to add here */ }
 
-  fragColor = oitFragColor(fragColor, v_zIndex);
-  revealage = oitRevealage(fragColor);
+  // Two-pass rendering: opaque and transparent items render separately
+  #ifdef OPAQUE_PASS
+  // Opaque pass: only render opaque fragments (alpha >= 0.99)
+  if (fragColor.a < 0.99) {
+    discard;
+  }
+  // Output for opaque: premultiplied color + revealage = 0.0
+  vec4 opaqueColor = fragColor;
+  fragColor = vec4(opaqueColor.rgb * opaqueColor.a, opaqueColor.a);
+  revealage = 0.0;
+  #else
+  // Transparent pass: only render transparent fragments (alpha < 0.99)
+  if (fragColor.a >= 0.99) {
+    discard;
+  }
+  // Weighted Blended OIT
+  vec4 transparentColor = fragColor;
+  fragColor = oitFragColor(transparentColor, v_zIndex);
+  revealage = oitRevealage(transparentColor);
+  #endif
   #endif
 
   gl_FragDepth = v_zIndex;
