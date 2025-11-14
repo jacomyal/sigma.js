@@ -320,12 +320,15 @@ export abstract class Program<
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program } = programInfo;
 
-    // Detect if this is picking mode
+    // Detect if this is picking or opaque mode
     const isPicking = programInfo === this.pickProgram;
+    const isOpaque = programInfo === this.opaqueProgram;
 
-    // For picking, we need blending disabled to get exact colors
-    // For normal rendering, we need blending enabled for transparency
-    if (isPicking) {
+    // For picking and opaque pass, we need blending disabled
+    // - Picking needs exact colors without blending
+    // - Opaque pass writes colors directly (no transparency)
+    // For transparent rendering, we need blending enabled
+    if (isPicking || isOpaque) {
       gl.disable(gl.BLEND);
     } else {
       gl.enable(gl.BLEND);
