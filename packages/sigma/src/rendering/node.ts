@@ -137,8 +137,8 @@ export function createNodeCompoundProgram<
       this.programs.forEach((program) => program.process(nodeIndex, offset, data));
     }
 
-    render(params: RenderParams): void {
-      this.programs.forEach((program) => program.render(params));
+    render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void {
+      this.programs.forEach((program) => program.render(params, options));
     }
 
     kill(): void {

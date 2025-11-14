@@ -161,8 +161,8 @@ export function createEdgeCompoundProgram<
       this.programs.forEach((program) => program.process(edgeIndex, offset, sourceData, targetData, data));
     }
 
-    render(params: RenderParams): void {
-      this.programs.forEach((program) => program.render(params));
+    render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void {
+      this.programs.forEach((program) => program.render(params, options));
     }
 
     kill(): void {
