@@ -1494,6 +1494,47 @@ export default class Sigma<
     }
 
     // ========================================================================
+    // Picking Pass: Render picking buffer for click detection
+    // ========================================================================
+    // Note: Picking buffer must be rendered with mode: "all" before the
+    // two-pass OIT rendering. This populates the picking framebuffer with
+    // unique colors for each element, used for click detection.
+
+    // Render nodes to picking buffer
+    for (const type in this.nodePrograms) {
+      const program = this.nodePrograms[type];
+      program.render(params, { mode: "all" });
+    }
+
+    // Render edges to picking buffer
+    if (!this.settings.hideEdgesOnMove || !moving) {
+      for (const type in this.edgePrograms) {
+        const program = this.edgePrograms[type];
+        program.render(params, { mode: "all" });
+      }
+    }
+
+    // Check for GL errors after picking pass
+    glError = gl.getError();
+    if (glError !== gl.NO_ERROR) {
+      throw new Error(`OIT: GL error after picking pass: ${glError} (0x${glError.toString(16)})`);
+    }
+
+    // Clear depth buffer after picking pass to prevent pollution
+    // The picking pass writes depth values when rendering with mode: "all",
+    // so we must clear the depth buffer before the opaque/transparent passes
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+
+    // Restore WebGL state after picking pass for MRT (Multiple Render Targets)
+    // The picking framebuffer has only 1 color attachment, but OIT uses 2 attachments.
+    // Switching framebuffers may have corrupted the drawBuffers state, so restore it.
+    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+    // Restore viewport to OIT framebuffer dimensions
+    // The picking pass may have changed the viewport, so restore it
+    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+    // ========================================================================
     // Pass 1a: Render OPAQUE items (alpha >= 0.99) with depth testing
     // ========================================================================
 

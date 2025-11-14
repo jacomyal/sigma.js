@@ -386,8 +386,8 @@ export abstract class Program<
     // Select the appropriate program based on mode
     const program = mode === "opaque" ? this.opaqueProgram : this.normalProgram;
 
-    // Only render if mode is appropriate (skip if mode is "opaque" or "transparent" specifically)
-    if (mode === "opaque" || mode === "transparent" || mode === "all") {
+    // Only render if mode is appropriate (skip normal rendering for "all" mode which is picking-only)
+    if (mode === "opaque" || mode === "transparent") {
       program.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
       this.bindProgram(program);
       this.renderProgram(params, program);
