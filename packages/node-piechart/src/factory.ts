@@ -26,6 +26,7 @@ export default function createNodePiechartProgram<
     "u_cameraAngle",
     "u_matrix",
     "u_defaultColor",
+    "u_opaqueThreshold",
     ...("value" in offset ? ["u_offset"] : []),
     ...slices.flatMap(({ color }, i) => ("value" in color ? [`u_sliceColor_${i + 1}`] : [])),
   ];
@@ -87,12 +88,13 @@ export default function createNodePiechartProgram<
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_sizeRatio, u_correctionRatio, u_cameraAngle, u_matrix, u_defaultColor } = uniformLocations;
+      const { u_sizeRatio, u_correctionRatio, u_cameraAngle, u_matrix, u_defaultColor, u_opaqueThreshold } = uniformLocations;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
       gl.uniform1f(u_cameraAngle, params.cameraAngle);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+      gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
 
       if ("value" in offset) gl.uniform1f(uniformLocations.u_offset, offset.value);
 

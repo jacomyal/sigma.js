@@ -101,6 +101,7 @@ export interface RenderParams {
   downSizingRatio: number;
   minEdgeThickness: number;
   antiAliasingFeather: number;
+  opaqueThreshold: number;
 }
 
 /**

@@ -17,7 +17,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-const UNIFORMS = ["u_matrix"] as const;
+const UNIFORMS = ["u_matrix", "u_opaqueThreshold"] as const;
 
 export default class EdgeLineProgram<
   N extends Attributes = Attributes,
@@ -71,8 +71,9 @@ export default class EdgeLineProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_matrix } = uniformLocations;
+    const { u_matrix, u_opaqueThreshold } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
   }
 }

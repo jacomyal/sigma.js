@@ -16,7 +16,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio", "u_minEdgeThickness"] as const;
+const UNIFORMS = ["u_matrix", "u_sizeRatio", "u_correctionRatio", "u_minEdgeThickness", "u_opaqueThreshold"] as const;
 
 export default class EdgeTriangleProgram<
   N extends Attributes = Attributes,
@@ -96,11 +96,12 @@ export default class EdgeTriangleProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_matrix, u_sizeRatio, u_correctionRatio, u_minEdgeThickness } = uniformLocations;
+    const { u_matrix, u_sizeRatio, u_correctionRatio, u_minEdgeThickness, u_opaqueThreshold } = uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+    gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
   }
 }

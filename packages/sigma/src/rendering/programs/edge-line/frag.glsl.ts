@@ -10,6 +10,8 @@ ${OIT_GLSL}
 in vec4 v_color;
 in float v_zIndex;
 
+uniform float u_opaqueThreshold;
+
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
@@ -19,16 +21,16 @@ void main(void) {
   #else
   // Two-pass rendering: opaque and transparent items render separately
   #ifdef OPAQUE_PASS
-  // Opaque pass: only render opaque fragments (alpha >= 0.99)
-  if (v_color.a < 0.99) {
+  // Opaque pass: only render opaque fragments (alpha >= threshold)
+  if (v_color.a < u_opaqueThreshold) {
     discard;
   }
   // Output for opaque: premultiplied color + revealage = 0.0
   fragColor = vec4(v_color.rgb * v_color.a, v_color.a);
   revealage = 0.0;
   #else
-  // Transparent pass: only render transparent fragments (alpha < 0.99)
-  if (v_color.a >= 0.99) {
+  // Transparent pass: only render transparent fragments (alpha < threshold)
+  if (v_color.a >= u_opaqueThreshold) {
     discard;
   }
   // Weighted Blended OIT

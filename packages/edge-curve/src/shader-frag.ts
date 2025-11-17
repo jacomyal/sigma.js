@@ -42,6 +42,8 @@ uniform float u_widenessToThicknessRatio;`
     : ""
 }
 
+uniform float u_opaqueThreshold;
+
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float revealage;
 
@@ -111,16 +113,16 @@ ${
 
   // Two-pass rendering: opaque and transparent items render separately
   #ifdef OPAQUE_PASS
-  // Opaque pass: only render opaque fragments (alpha >= 0.99)
-  if (color.a < 0.99) {
+  // Opaque pass: only render opaque fragments (alpha >= threshold)
+  if (color.a < u_opaqueThreshold) {
     discard;
   }
   // Output for opaque: premultiplied color + revealage = 0.0
   fragColor = vec4(color.rgb * color.a, color.a);
   revealage = 0.0;
   #else
-  // Transparent pass: only render transparent fragments (alpha < 0.99)
-  if (color.a >= 0.99) {
+  // Transparent pass: only render transparent fragments (alpha < threshold)
+  if (color.a >= u_opaqueThreshold) {
     discard;
   }
   // Weighted Blended OIT

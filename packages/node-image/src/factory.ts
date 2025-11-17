@@ -58,6 +58,7 @@ const UNIFORMS = [
   "u_colorizeImages",
   "u_keepWithinCircle",
   "u_atlas",
+  "u_opaqueThreshold",
 ] as const;
 
 /**
@@ -265,6 +266,7 @@ export default function createNodeImageProgram<
         u_keepWithinCircle,
         u_cameraAngle,
         u_percentagePadding,
+        u_opaqueThreshold,
       } = uniformLocations;
       this.latestRenderParams = params;
 
@@ -277,6 +279,7 @@ export default function createNodeImageProgram<
         u_atlas,
         [...new Array(this.textureImages.length)].map((_, i) => i),
       );
+      gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
       gl.uniform1i(u_colorizeImages, drawingMode === "color" ? 1 : 0);
       gl.uniform1i(u_keepWithinCircle, keepWithinCircle ? 1 : 0);
     }

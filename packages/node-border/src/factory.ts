@@ -24,6 +24,7 @@ export default function createNodeBorderProgram<
     "u_sizeRatio",
     "u_correctionRatio",
     "u_matrix",
+    "u_opaqueThreshold",
     ...borders.flatMap(({ color }, i) => ("value" in color ? [`u_borderColor_${i + 1}`] : [])),
   ];
 
@@ -78,11 +79,12 @@ export default function createNodeBorderProgram<
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-      const { u_sizeRatio, u_correctionRatio, u_matrix } = uniformLocations;
+      const { u_sizeRatio, u_correctionRatio, u_matrix, u_opaqueThreshold } = uniformLocations;
 
       gl.uniform1f(u_correctionRatio, params.correctionRatio);
       gl.uniform1f(u_sizeRatio, params.sizeRatio);
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+      gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
 
       borders.forEach(({ color }, i) => {
         if ("value" in color) {

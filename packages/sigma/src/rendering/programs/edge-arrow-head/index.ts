@@ -16,6 +16,7 @@ const UNIFORMS = [
   "u_minEdgeThickness",
   "u_lengthToThicknessRatio",
   "u_widenessToThicknessRatio",
+  "u_opaqueThreshold",
 ] as const;
 
 export type CreateEdgeArrowHeadProgramOptions = {
@@ -123,6 +124,7 @@ export function createEdgeArrowHeadProgram<
         u_minEdgeThickness,
         u_lengthToThicknessRatio,
         u_widenessToThicknessRatio,
+        u_opaqueThreshold,
       } = uniformLocations;
 
       gl.uniformMatrix3fv(u_matrix, false, params.matrix);
@@ -131,6 +133,7 @@ export function createEdgeArrowHeadProgram<
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
       gl.uniform1f(u_widenessToThicknessRatio, options.widenessToThicknessRatio);
+      gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
     }
   };
 }

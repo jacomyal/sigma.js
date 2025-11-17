@@ -9,7 +9,7 @@ import { drawSquareNodeHover, drawSquareNodeLabel } from "./utils";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_cameraAngle", "u_matrix"] as const;
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_cameraAngle", "u_matrix", "u_opaqueThreshold"] as const;
 
 const PI = Math.PI;
 
@@ -53,11 +53,12 @@ export class NodeSquareProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_sizeRatio, u_correctionRatio, u_cameraAngle, u_matrix } = uniformLocations;
+    const { u_sizeRatio, u_correctionRatio, u_cameraAngle, u_matrix, u_opaqueThreshold } = uniformLocations;
 
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniform1f(u_cameraAngle, params.cameraAngle);
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
   }
 }

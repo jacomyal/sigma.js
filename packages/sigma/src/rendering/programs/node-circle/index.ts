@@ -19,7 +19,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix"] as const;
+const UNIFORMS = ["u_sizeRatio", "u_correctionRatio", "u_matrix", "u_opaqueThreshold"] as const;
 
 export default class NodeCircleProgram<
   N extends Attributes = Attributes,
@@ -62,10 +62,11 @@ export default class NodeCircleProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_sizeRatio, u_correctionRatio, u_matrix } = uniformLocations;
+    const { u_sizeRatio, u_correctionRatio, u_matrix, u_opaqueThreshold } = uniformLocations;
 
     gl.uniform1f(u_correctionRatio, params.correctionRatio);
     gl.uniform1f(u_sizeRatio, params.sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
+    gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
   }
 }

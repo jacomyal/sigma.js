@@ -34,6 +34,7 @@ const UNIFORMS = [
   "u_pixelRatio",
   "u_feather",
   "u_minEdgeThickness",
+  "u_opaqueThreshold",
 ] as const;
 
 export default class EdgeRectangleProgram<
@@ -116,7 +117,7 @@ export default class EdgeRectangleProgram<
   }
 
   setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_matrix, u_zoomRatio, u_feather, u_pixelRatio, u_correctionRatio, u_sizeRatio, u_minEdgeThickness } =
+    const { u_matrix, u_zoomRatio, u_feather, u_pixelRatio, u_correctionRatio, u_sizeRatio, u_minEdgeThickness, u_opaqueThreshold } =
       uniformLocations;
 
     gl.uniformMatrix3fv(u_matrix, false, params.matrix);
@@ -126,5 +127,6 @@ export default class EdgeRectangleProgram<
     gl.uniform1f(u_pixelRatio, params.pixelRatio);
     gl.uniform1f(u_feather, params.antiAliasingFeather);
     gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+    gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
   }
 }

@@ -58,6 +58,7 @@ export interface Settings<
   defaultDrawNodeHover: NodeHoverDrawingFunction<N, E, G>;
   minEdgeThickness: number;
   antiAliasingFeather: number;
+  opaqueThreshold: number;
 
   // Mouse and touch settings
   dragTimeout: number;
@@ -142,6 +143,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   defaultDrawNodeHover: drawDiscNodeHover,
   minEdgeThickness: 1.7,
   antiAliasingFeather: 1,
+  opaqueThreshold: 0.99,
 
   // Mouse and touch settings
   dragTimeout: 100,

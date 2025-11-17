@@ -1930,6 +1930,7 @@ export default class Sigma<
       downSizingRatio: this.pickingDownSizingRatio,
       minEdgeThickness: this.settings.minEdgeThickness,
       antiAliasingFeather: this.settings.antiAliasingFeather,
+      opaqueThreshold: this.settings.opaqueThreshold,
     };
   }
 

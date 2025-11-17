@@ -18,7 +18,7 @@ import VERTEX_SHADER_SOURCE from "./vert.glsl";
 
 const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix"] as const;
+const UNIFORMS = ["u_sizeRatio", "u_pixelRatio", "u_matrix", "u_opaqueThreshold"] as const;
 
 export default class NodePointProgram<
   N extends Attributes = Attributes,
@@ -53,11 +53,12 @@ export default class NodePointProgram<
     array[startIndex++] = data.zIndex;
   }
 
-  setUniforms({ sizeRatio, pixelRatio, matrix }: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
-    const { u_sizeRatio, u_pixelRatio, u_matrix } = uniformLocations;
+  setUniforms({ sizeRatio, pixelRatio, matrix, opaqueThreshold }: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
+    const { u_sizeRatio, u_pixelRatio, u_matrix, u_opaqueThreshold } = uniformLocations;
 
     gl.uniform1f(u_pixelRatio, pixelRatio);
     gl.uniform1f(u_sizeRatio, sizeRatio);
     gl.uniformMatrix3fv(u_matrix, false, matrix);
+    gl.uniform1f(u_opaqueThreshold, opaqueThreshold);
   }
 }
