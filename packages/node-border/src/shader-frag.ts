@@ -1,17 +1,16 @@
 import { numberToGLSLFloat } from "sigma/rendering";
-import { OIT_GLSL } from "sigma/utils";
+import { fragmentShaderHeader, twoPassRendering } from "sigma/utils";
 
 import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSize } from "./utils";
 
 export default function getFragmentShader({ borders }: CreateNodeBorderProgramOptions) {
   const fillCounts = numberToGLSLFloat(borders.filter(({ size }) => "fill" in size).length);
+  const rendering = twoPassRendering({ colorVar: "fragColor" });
 
   // language=GLSL
-  const SHADER = /*glsl*/ `#version 300 es
-// Shader: node-border fragment
-precision highp float;
-
-${OIT_GLSL}
+  const SHADER = /*glsl*/ `${fragmentShaderHeader({
+    name: "node-border fragment",
+  })}
 
 in vec2 v_diffVector;
 in float v_radius;
@@ -36,8 +35,7 @@ ${borders
 uniform float u_correctionRatio;
 uniform float u_opaqueThreshold;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out float revealage;
+${rendering.declarations}
 
 const float bias = 255.0 / 254.0;
 const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
@@ -115,29 +113,10 @@ ${borders
     )
     .join("")} { /* Nothing to add here */ }
 
-  // Two-pass rendering: opaque and transparent items render separately
-  #ifdef OPAQUE_PASS
-  // Opaque pass: only render opaque fragments (alpha >= threshold)
-  if (fragColor.a < u_opaqueThreshold) {
-    discard;
-  }
-  // Output for opaque: premultiplied color + revealage = 0.0
-  vec4 opaqueColor = fragColor;
-  fragColor = vec4(opaqueColor.rgb * opaqueColor.a, opaqueColor.a);
-  revealage = 0.0;
-  #else
-  // Transparent pass: only render transparent fragments (alpha < threshold)
-  if (fragColor.a >= u_opaqueThreshold) {
-    discard;
-  }
-  // Weighted Blended OIT
-  vec4 transparentColor = fragColor;
-  fragColor = oitFragColor(transparentColor, v_zIndex);
-  revealage = oitRevealage(transparentColor);
-  #endif
+  ${rendering.main}
   #endif
 
-  gl_FragDepth = v_zIndex;
+  ${rendering.depth}
 }
 `;
 

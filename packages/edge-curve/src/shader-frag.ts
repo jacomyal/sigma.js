@@ -1,17 +1,17 @@
-import { OIT_GLSL } from "sigma/utils";
+import { fragmentShaderHeader, twoPassRendering } from "sigma/utils";
 
 import { CreateEdgeCurveProgramOptions } from "./utils";
 
 export default function getFragmentShader({ arrowHead }: CreateEdgeCurveProgramOptions) {
   const hasTargetArrowHead = arrowHead?.extremity === "target" || arrowHead?.extremity === "both";
   const hasSourceArrowHead = arrowHead?.extremity === "source" || arrowHead?.extremity === "both";
+  const rendering = twoPassRendering();
 
   // language=GLSL
-  const SHADER = /*glsl*/ `#version 300 es
-// Shader: edge-curve fragment
-precision highp float;
-
-${OIT_GLSL}
+  const SHADER = /*glsl*/ `${fragmentShaderHeader({
+    name: "edge-curve fragment",
+    includeAntialiasing: true,
+  })}
 
 in vec4 v_color;
 in float v_thickness;
@@ -44,8 +44,7 @@ uniform float u_widenessToThicknessRatio;`
 
 uniform float u_opaqueThreshold;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out float revealage;
+${rendering.declarations}
 
 float det(vec2 a, vec2 b) {
   return a.x * b.y - b.x * a.y;
@@ -103,35 +102,12 @@ ${
   fragColor = v_color;
   #else
   // Anti-aliasing: reduce alpha at edges while keeping RGB color
-  vec4 color = v_color;
-  float t = smoothstep(
-    halfThickness - v_feather,
-    halfThickness,
-    dist
-  );
-  color.a *= (1.0 - t);
+  vec4 color = applySmoothAA(v_color, dist, halfThickness - v_feather, halfThickness);
 
-  // Two-pass rendering: opaque and transparent items render separately
-  #ifdef OPAQUE_PASS
-  // Opaque pass: only render opaque fragments (alpha >= threshold)
-  if (color.a < u_opaqueThreshold) {
-    discard;
-  }
-  // Output for opaque: premultiplied color + revealage = 0.0
-  fragColor = vec4(color.rgb * color.a, color.a);
-  revealage = 0.0;
-  #else
-  // Transparent pass: only render transparent fragments (alpha < threshold)
-  if (color.a >= u_opaqueThreshold) {
-    discard;
-  }
-  // Weighted Blended OIT
-  fragColor = oitFragColor(color, v_zIndex);
-  revealage = oitRevealage(color);
-  #endif
+  ${rendering.main}
   #endif
 
-  gl_FragDepth = v_zIndex;
+  ${rendering.depth}
 }
 `;
 
