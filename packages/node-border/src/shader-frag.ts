@@ -5,11 +5,12 @@ import { CreateNodeBorderProgramOptions, DEFAULT_BORDER_SIZE_MODE, NodeBorderSiz
 
 export default function getFragmentShader({ borders }: CreateNodeBorderProgramOptions) {
   const fillCounts = numberToGLSLFloat(borders.filter(({ size }) => "fill" in size).length);
-  const rendering = twoPassRendering({ colorVar: "fragColor" });
+  const rendering = twoPassRendering({ colorVar: "color" });
 
   // language=GLSL
   const SHADER = /*glsl*/ `${fragmentShaderHeader({
     name: "node-border fragment",
+    includeAntialiasing: true,
   })}
 
 in vec2 v_diffVector;
@@ -48,12 +49,13 @@ void main(void) {
 
   // No antialiasing for picking mode:
   #ifdef PICKING_MODE
-  if (dist > v_radius)
-    discard;
-  fragColor = v_color;
-  fragColor.a *= bias;
+    if (dist > v_radius)
+      discard;
+    fragColor = v_color;
+    fragColor.a *= bias;
   #else
-  // Sizes:
+    vec4 color = transparent;
+    // Sizes:
 ${borders
   .flatMap(({ size }, i) => {
     if ("fill" in size) return [];
@@ -95,23 +97,27 @@ ${borders
   .join("\n")}
   // Discard fragments completely outside the circle
   if (dist > adjustedBorderSize_0) {
-    discard;
+    color = borderColor_0;
   } else ${borders
     .map(
       (_, i) => `if (dist > adjustedBorderSize_${i} - aaBorder) {
     ${
       i === 0
         ? // For outermost border, reduce alpha instead of mixing with transparent/black
-          `fragColor = borderColor_${i + 1};
-    fragColor.a *= 1.0 - (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder;`
+          `color = borderColor_${i + 1};
+    color.a *= 1.0 - (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder;`
         : // For inner borders, mix colors normally (both are non-black)
-          `fragColor = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);`
+          `color = mix(borderColor_${i + 1}, borderColor_${i}, (dist - adjustedBorderSize_${i} + aaBorder) / aaBorder);`
     }
   } else if (dist > adjustedBorderSize_${i + 1}) {
-    fragColor = borderColor_${i + 1};
+    color = borderColor_${i + 1};
   } else `,
     )
     .join("")} { /* Nothing to add here */ }
+
+  // Apply anti-aliasing at the outer edge
+  float edgeDist = dist - v_radius + aaBorder;
+  color = applyLinearAA(color, edgeDist, aaBorder);
 
   ${rendering.main}
   #endif
