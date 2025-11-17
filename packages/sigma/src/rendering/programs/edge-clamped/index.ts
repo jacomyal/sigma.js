@@ -18,6 +18,7 @@ const UNIFORMS = [
   "u_pixelRatio",
   "u_feather",
   "u_minEdgeThickness",
+  "u_opaqueThreshold",
   "u_lengthToThicknessRatio",
 ] as const;
 
@@ -130,6 +131,7 @@ export function createEdgeClampedProgram<
         u_correctionRatio,
         u_sizeRatio,
         u_minEdgeThickness,
+        u_opaqueThreshold,
         u_lengthToThicknessRatio,
       } = uniformLocations;
 
@@ -140,6 +142,7 @@ export function createEdgeClampedProgram<
       gl.uniform1f(u_pixelRatio, params.pixelRatio);
       gl.uniform1f(u_feather, params.antiAliasingFeather);
       gl.uniform1f(u_minEdgeThickness, params.minEdgeThickness);
+      gl.uniform1f(u_opaqueThreshold, params.opaqueThreshold);
       gl.uniform1f(u_lengthToThicknessRatio, options.lengthToThicknessRatio);
     }
   };
