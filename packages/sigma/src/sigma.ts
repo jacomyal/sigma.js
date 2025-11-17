@@ -991,7 +991,7 @@ export default class Sigma<
       incrID++;
 
       const data = this.nodeDataCache[node];
-      this.addNodeToProgram(node, nodeIndices[node], nodesPerPrograms[data.type]++);
+      this.addNodeToProgram(node, nodeIndices[node], nodesPerPrograms[data.type]++, i, l);
     }
 
     //
@@ -1026,7 +1026,7 @@ export default class Sigma<
       incrID++;
 
       const data = this.edgeDataCache[edge];
-      this.addEdgeToProgram(edge, edgeIndices[edge], edgesPerPrograms[data.type]++);
+      this.addEdgeToProgram(edge, edgeIndices[edge], edgesPerPrograms[data.type]++, i, l);
     }
 
     this.itemIDsIndex = itemIDsIndex;
@@ -1861,8 +1861,16 @@ export default class Sigma<
    * @param node The node's graphology ID
    * @param fingerprint A fingerprint used to identity the node with picking
    * @param position The index where to place the node in the program
+   * @param orderIndex The index of this node in the iteration order (optional, uses fingerprint if not provided)
+   * @param totalCount The total number of nodes (optional, uses fingerprint if not provided)
    */
-  private addNodeToProgram(node: string, fingerprint: number, position: number): void {
+  private addNodeToProgram(
+    node: string,
+    fingerprint: number,
+    position: number,
+    orderIndex?: number,
+    totalCount?: number,
+  ): void {
     const data = this.nodeDataCache[node];
     const nodeProgram = this.nodePrograms[data.type];
     if (!nodeProgram) throw new Error(`Sigma: could not find a suitable program for node type "${data.type}"!`);
@@ -1870,7 +1878,15 @@ export default class Sigma<
     // Apply item tie-breaker to zIndex to ensure nodes with identical zIndex don't blend
     // Create shallow copy to avoid modifying the cache
     const dataWithTieBreaker = { ...data };
-    dataWithTieBreaker.zIndex = data.zIndex + fingerprint * this.settings.zIndexItemTieBreaker;
+    // Use order-based depth offset when available (full process), otherwise fall back to fingerprint (partial updates)
+    // Items later in iteration order get higher zIndex for better depth separation
+    // For order-based offset, we use a larger range (0.0001) to prevent depth fighting with antialiasing
+    // This supports up to 10k items with the same base zIndex before range exhaustion
+    const depthOffset =
+      orderIndex !== undefined && totalCount !== undefined
+        ? (orderIndex / (totalCount || 1)) * 0.0001
+        : fingerprint * this.settings.zIndexItemTieBreaker;
+    dataWithTieBreaker.zIndex = data.zIndex + depthOffset;
     // Clamp to [0, 1] to prevent overflow with many items
     dataWithTieBreaker.zIndex = Math.max(0.0, Math.min(1.0, dataWithTieBreaker.zIndex));
 
@@ -1885,8 +1901,16 @@ export default class Sigma<
    * @param edge The edge's graphology ID
    * @param fingerprint A fingerprint used to identity the edge with picking
    * @param position The index where to place the edge in the program
+   * @param orderIndex The index of this edge in the iteration order (optional, uses fingerprint if not provided)
+   * @param totalCount The total number of edges (optional, uses fingerprint if not provided)
    */
-  private addEdgeToProgram(edge: string, fingerprint: number, position: number): void {
+  private addEdgeToProgram(
+    edge: string,
+    fingerprint: number,
+    position: number,
+    orderIndex?: number,
+    totalCount?: number,
+  ): void {
     const data = this.edgeDataCache[edge];
     const edgeProgram = this.edgePrograms[data.type];
     if (!edgeProgram) throw new Error(`Sigma: could not find a suitable program for edge type "${data.type}"!`);
@@ -1897,7 +1921,15 @@ export default class Sigma<
     // Apply item tie-breaker to zIndex to ensure edges with identical zIndex don't blend
     // Create shallow copy to avoid modifying the cache
     const dataWithTieBreaker = { ...data };
-    dataWithTieBreaker.zIndex = data.zIndex + fingerprint * this.settings.zIndexItemTieBreaker;
+    // Use order-based depth offset when available (full process), otherwise fall back to fingerprint (partial updates)
+    // Items later in iteration order get higher zIndex for better depth separation
+    // For order-based offset, we use a larger range (0.0001) to prevent depth fighting with antialiasing
+    // This supports up to 10k items with the same base zIndex before range exhaustion
+    const depthOffset =
+      orderIndex !== undefined && totalCount !== undefined
+        ? (orderIndex / (totalCount || 1)) * 0.0001
+        : fingerprint * this.settings.zIndexItemTieBreaker;
+    dataWithTieBreaker.zIndex = data.zIndex + depthOffset;
     // Clamp to [0, 1] to prevent overflow with many items
     dataWithTieBreaker.zIndex = Math.max(0.0, Math.min(1.0, dataWithTieBreaker.zIndex));
 
