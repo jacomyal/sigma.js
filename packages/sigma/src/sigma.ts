@@ -1507,7 +1507,7 @@ export default class Sigma<
     }
 
     // Render edges to picking buffer
-    if (!this.settings.hideEdgesOnMove || !moving) {
+    if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.enableEdgeEvents) {
       for (const type in this.edgePrograms) {
         const program = this.edgePrograms[type];
         program.render(params, { mode: "all" });
