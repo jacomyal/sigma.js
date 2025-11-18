@@ -6,6 +6,7 @@
  * Used for debugging purposes (e.g., displaying picking layer).
  * @module
  */
+import { Settings } from "../../../settings";
 import { loadFragmentShader, loadProgram, loadVertexShader } from "../../utils";
 import FRAGMENT_SHADER_SOURCE from "./frag.glsl";
 import VERTEX_SHADER_SOURCE from "./vert.glsl";
@@ -27,10 +28,12 @@ export interface TextureDisplayProgramInfo {
 
 export class TextureDisplayProgram {
   private gl: WebGL2RenderingContext;
+  private settings: Settings;
   private programInfo: TextureDisplayProgramInfo | null = null;
 
-  constructor(gl: WebGL2RenderingContext) {
+  constructor(gl: WebGL2RenderingContext, settings: Settings) {
     this.gl = gl;
+    this.settings = settings;
     this.initialize();
   }
 
@@ -140,9 +143,11 @@ export class TextureDisplayProgram {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     // Check for errors
-    const glError = gl.getError();
-    if (glError !== gl.NO_ERROR) {
-      throw new Error(`Texture Display: GL error: ${glError} (0x${glError.toString(16)})`);
+    if (this.settings.DEBUG_checkWebGLErrors) {
+      const glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(`Texture Display: GL error: ${glError} (0x${glError.toString(16)})`);
+      }
     }
 
     // Re-enable depth testing and blending for next frame

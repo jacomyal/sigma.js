@@ -117,6 +117,7 @@ export interface Settings<
   DEBUG_gpuTiming: boolean;
   DEBUG_gpuTimingAverageWindow: number;
   DEBUG_gpuTimingVisualOverlay: boolean;
+  DEBUG_checkWebGLErrors: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
@@ -204,6 +205,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   DEBUG_gpuTiming: false,
   DEBUG_gpuTimingAverageWindow: 60,
   DEBUG_gpuTimingVisualOverlay: false,
+  DEBUG_checkWebGLErrors: false,
 };
 
 export const DEFAULT_NODE_PROGRAM_CLASSES: Record<string, NodeProgramType> = {

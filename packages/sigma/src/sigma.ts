@@ -219,8 +219,8 @@ export default class Sigma<
     // Initializing contexts
     this.createWebGLContext("scene", { picking: true });
     // Note: OIT framebuffers are created on first render when dimensions are known
-    this.oitCompositeProgram = new OITCompositeProgram(this.webGLContexts.scene); // Initialize OIT composite shader
-    this.textureDisplayProgram = new TextureDisplayProgram(this.webGLContexts.scene); // Initialize texture display shader
+    this.oitCompositeProgram = new OITCompositeProgram(this.webGLContexts.scene, this.settings as Settings); // Initialize OIT composite shader
+    this.textureDisplayProgram = new TextureDisplayProgram(this.webGLContexts.scene, this.settings as Settings); // Initialize texture display shader
     this.createCanvasContext("edgeLabels");
     this.createCanvasContext("labels");
     this.createCanvasContext("hovers");
@@ -1556,9 +1556,13 @@ export default class Sigma<
     gl.clear(gl.DEPTH_BUFFER_BIT);
 
     // Check for GL errors before rendering
-    let glError = gl.getError();
-    if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
+    // Performance: gl.getError() forces GPU/CPU synchronization (40-60ms overhead per frame)
+    // Only enable via DEBUG_checkWebGLErrors setting when debugging WebGL issues
+    if (this.settings.DEBUG_checkWebGLErrors) {
+      const glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(`OIT: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
+      }
     }
 
     // ========================================================================
@@ -1587,9 +1591,11 @@ export default class Sigma<
     this.gpuTimingManager?.endPass("picking");
 
     // Check for GL errors after picking pass
-    glError = gl.getError();
-    if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT: GL error after picking pass: ${glError} (0x${glError.toString(16)})`);
+    if (this.settings.DEBUG_checkWebGLErrors) {
+      const glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(`OIT: GL error after picking pass: ${glError} (0x${glError.toString(16)})`);
+      }
     }
 
     // Clear depth buffer after picking pass to prevent pollution
@@ -1627,9 +1633,11 @@ export default class Sigma<
     }
 
     // Check for GL errors after opaque node rendering
-    glError = gl.getError();
-    if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT Pass 1a: GL error after opaque node rendering: ${glError} (0x${glError.toString(16)})`);
+    if (this.settings.DEBUG_checkWebGLErrors) {
+      const glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(`OIT Pass 1a: GL error after opaque node rendering: ${glError} (0x${glError.toString(16)})`);
+      }
     }
 
     // Drawing opaque edges
@@ -1640,9 +1648,11 @@ export default class Sigma<
       }
 
       // Check for GL errors after opaque edge rendering
-      glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(`OIT Pass 1a: GL error after opaque edge rendering: ${glError} (0x${glError.toString(16)})`);
+      if (this.settings.DEBUG_checkWebGLErrors) {
+        const glError = gl.getError();
+        if (glError !== gl.NO_ERROR) {
+          throw new Error(`OIT Pass 1a: GL error after opaque edge rendering: ${glError} (0x${glError.toString(16)})`);
+        }
       }
     }
 
@@ -1670,9 +1680,13 @@ export default class Sigma<
     }
 
     // Check for GL errors after transparent node rendering
-    glError = gl.getError();
-    if (glError !== gl.NO_ERROR) {
-      throw new Error(`OIT Pass 1b: GL error after transparent node rendering: ${glError} (0x${glError.toString(16)})`);
+    if (this.settings.DEBUG_checkWebGLErrors) {
+      const glError = gl.getError();
+      if (glError !== gl.NO_ERROR) {
+        throw new Error(
+          `OIT Pass 1b: GL error after transparent node rendering: ${glError} (0x${glError.toString(16)})`,
+        );
+      }
     }
 
     // Drawing transparent edges
@@ -1683,11 +1697,13 @@ export default class Sigma<
       }
 
       // Check for GL errors after transparent edge rendering
-      glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(
-          `OIT Pass 1b: GL error after transparent edge rendering: ${glError} (0x${glError.toString(16)})`,
-        );
+      if (this.settings.DEBUG_checkWebGLErrors) {
+        const glError = gl.getError();
+        if (glError !== gl.NO_ERROR) {
+          throw new Error(
+            `OIT Pass 1b: GL error after transparent edge rendering: ${glError} (0x${glError.toString(16)})`,
+          );
+        }
       }
     }
 
@@ -1777,7 +1793,7 @@ export default class Sigma<
    * @return {Sigma}
    */
   private createGPUTimingOverlay(): this {
-    const overlay = createElement("div", {
+    const overlay: HTMLDivElement = createElement("div", {
       position: "absolute",
       top: "10px",
       left: "10px",
