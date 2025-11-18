@@ -42,7 +42,7 @@ void main(void) {
   fragColor = v_color;
 
   #else
-  vec4 color = fragColor;
+  vec4 color = vec4(0.0);
 
   // First case: No image to display
   if (v_texture.w <= 0.0) {
@@ -78,7 +78,7 @@ void main(void) {
     } else {
       // Colorize all visible image pixels:
       if (u_colorizeImages) {
-        color = mix(fragColor, v_color, texel.a);
+        color = vec4(v_color.rgb, texel.a);
       }
 
       // Colorize background pixels, keep image pixel colors:
@@ -88,7 +88,7 @@ void main(void) {
 
       // Erase pixels "in the padding":
       if (abs(diffVector.x) > v_radius / paddingRatio || abs(diffVector.y) > v_radius / paddingRatio) {
-        color = u_colorizeImages ? fragColor : v_color;
+        color = vec4(0.0);
       }
     }
   }
@@ -98,10 +98,9 @@ void main(void) {
     if (dist >= v_radius) {
       discard;
     } else {
-      fragColor = color;
       // Anti-aliasing: reduce alpha at edges while keeping RGB color
       if (dist >= v_radius - border) {
-        fragColor.a *= (v_radius - dist) / border;
+        color.a *= (v_radius - dist) / border;
       }
     }
   }
@@ -111,30 +110,26 @@ void main(void) {
     float squareHalfSize = v_radius * ${Math.SQRT1_2 * Math.cos(Math.PI / 12)};
     if (abs(diffVector.x) > squareHalfSize || abs(diffVector.y) > squareHalfSize) {
       discard;
-    } else {
-      fragColor = color;
     }
   }
 
   // Two-pass rendering: opaque and transparent items render separately
   #ifdef OPAQUE_PASS
   // Opaque pass: only render opaque fragments (alpha >= threshold)
-  if (fragColor.a < u_opaqueThreshold) {
+  if (color.a < u_opaqueThreshold) {
     discard;
   }
   // Output for opaque: premultiplied color + revealage = 0.0
-  vec4 opaqueColor = fragColor;
-  fragColor = vec4(opaqueColor.rgb * opaqueColor.a, opaqueColor.a);
+  fragColor = vec4(color.rgb * color.a, color.a);
   revealage = 0.0;
   #else
   // Transparent pass: only render transparent fragments (alpha < threshold)
-  if (fragColor.a >= u_opaqueThreshold) {
+  if (color.a >= u_opaqueThreshold) {
     discard;
   }
   // Weighted Blended OIT
-  vec4 transparentColor = fragColor;
-  fragColor = oitFragColor(transparentColor, v_zIndex);
-  revealage = oitRevealage(transparentColor);
+  fragColor = oitFragColor(color, v_zIndex);
+  revealage = oitRevealage(color);
   #endif
   #endif
 
