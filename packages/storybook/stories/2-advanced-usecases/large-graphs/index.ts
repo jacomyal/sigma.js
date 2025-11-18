@@ -95,12 +95,42 @@ export default () => {
   }
   fa2Button.addEventListener("click", toggleFA2Layout);
 
+  // 6. Enable camera animation button:
+  const cameraAnimationButton = document.getElementById("camera-animation") as HTMLButtonElement;
+  let animationFrameId: number | null = null;
+
+  function animateCamera() {
+    const camera = renderer.getCamera();
+    const currentState = camera.getState();
+    camera.setState({
+      angle: currentState.angle + (Math.PI / 180), // Rotate by 1 degree (in radians)
+    });
+    animationFrameId = requestAnimationFrame(animateCamera);
+  }
+
+  function toggleCameraAnimation() {
+    if (animationFrameId !== null) {
+      // Stop animation
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+      cameraAnimationButton.innerHTML = `Start camera animation ▶`;
+    } else {
+      // Start animation
+      animateCamera();
+      cameraAnimationButton.innerHTML = `Stop camera animation ⏸`;
+    }
+  }
+  cameraAnimationButton.addEventListener("click", toggleCameraAnimation);
+
   // Cheap trick: tilt the camera a bit to make labels more readable:
   renderer.getCamera().setState({
     angle: 0.2,
   });
 
   return () => {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+    }
     fa2Layout.kill();
     renderer.kill();
   };
