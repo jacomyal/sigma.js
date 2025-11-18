@@ -37,7 +37,10 @@ float oitWeight(float alpha, float zIndex) {
   // Far fragments (zIndex ≈ 0, depth ≈ 1) get weight ≈ 10
   // Note: Opaque items (alpha >= 0.99) are now rendered in a separate pass with depth testing,
   // so no weight boost is needed here
-  float baseWeight = clamp(10.0 / (0.00001 + pow(depth + 0.00001, 3.0)), 0.01, 3000.0);
+  // Performance optimization: use multiplication instead of pow() for cube calculation
+  float d = depth + 0.00001;
+  float d3 = d * d * d;  // Much faster than pow(d, 3.0) on most GPUs
+  float baseWeight = clamp(10.0 / (0.00001 + d3), 0.01, 3000.0);
 
   return alpha * baseWeight;
 }
