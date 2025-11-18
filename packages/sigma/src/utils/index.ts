@@ -11,6 +11,7 @@ export * from "./coordinates";
 export * from "./data";
 export * from "./easings";
 export * from "./glsl";
+export * from "./gpu-timing";
 export * from "./graph";
 export * from "./matrices";
 export * from "./misc";

@@ -38,6 +38,7 @@ export default () => {
   const container = document.getElementById("sigma-container") as HTMLElement;
   const shuffleButton = document.getElementById("shuffle") as HTMLButtonElement;
   const debugPickingCheckbox = document.getElementById("debug-picking") as HTMLInputElement;
+  const debugGPUPerfs = document.getElementById("debug-gpu") as HTMLInputElement;
   const alphaSlider = document.getElementById("alpha-slider") as HTMLInputElement;
   const alphaValue = document.getElementById("alpha-value") as HTMLSpanElement;
   const thresholdSlider = document.getElementById("threshold-slider") as HTMLInputElement;
@@ -199,6 +200,12 @@ export default () => {
   // Debug picking layer checkbox
   debugPickingCheckbox.addEventListener("change", () => {
     renderer.setSetting("DEBUG_displayPickingLayer", debugPickingCheckbox.checked);
+  });
+
+  // Debug picking layer checkbox
+  debugGPUPerfs.addEventListener("change", () => {
+    renderer.setSetting("DEBUG_gpuTiming", debugGPUPerfs.checked);
+    renderer.setSetting("DEBUG_gpuTimingVisualOverlay", debugGPUPerfs.checked);
   });
 
   // Alpha slider

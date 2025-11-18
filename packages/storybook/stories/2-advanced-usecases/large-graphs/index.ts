@@ -25,7 +25,9 @@ export default () => {
   for (const [key, value] of query) {
     const domList = document.getElementsByName(key);
     if (domList.length === 1) {
-      (domList[0] as HTMLInputElement).value = value;
+      const input = domList[0] as HTMLInputElement;
+      if (input.type === "checkbox") input.checked = value === "on";
+      else input.value = value;
     } else if (domList.length > 1) {
       domList.forEach((dom: HTMLElement) => {
         const input = dom as HTMLInputElement;
@@ -41,6 +43,7 @@ export default () => {
     size: +document.querySelector<HTMLInputElement>("#size")!.value,
     clusters: +document.querySelector<HTMLInputElement>("#clusters")!.value,
     edgesRenderer: document.querySelector<HTMLInputElement>('[name="edges-renderer"]:checked')!.value,
+    debugGPU: document.querySelector<HTMLInputElement>("#debug-gpu")!.checked,
   };
 
   // 3. Generate a graph:
@@ -63,6 +66,7 @@ export default () => {
 
   // 4. Render the graph:
   const container = document.getElementById("sigma-container") as HTMLElement;
+
   const renderer = new Sigma(graph, container, {
     defaultEdgeColor: "#e6e6e6",
     defaultEdgeType: state.edgesRenderer,
@@ -70,6 +74,8 @@ export default () => {
       "edges-default": EdgeRectangleProgram,
       "edges-fast": EdgeLineProgram,
     },
+    DEBUG_gpuTiming: state.debugGPU,
+    DEBUG_gpuTimingVisualOverlay: state.debugGPU,
   });
 
   // 5. Enable FA2 button:

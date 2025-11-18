@@ -46,6 +46,7 @@ import {
   multiplyVec2,
   validateGraph,
 } from "./utils";
+import { GPUTimingManager, GPUTimingResult } from "./utils/gpu-timing";
 
 /**
  * Constants.
@@ -193,6 +194,11 @@ export default class Sigma<
   private oitCompositeProgram: OITCompositeProgram;
   private textureDisplayProgram: TextureDisplayProgram;
 
+  // GPU Timing
+  private gpuTimingManager: GPUTimingManager | null = null;
+  private lastTimingLog: number = 0;
+  private gpuTimingOverlayElement: HTMLDivElement | null = null;
+
   private camera: Camera;
 
   constructor(graph: Graph<N, E, G>, container: HTMLElement, settings: Partial<Settings<N, E, G>> = {}) {
@@ -256,6 +262,27 @@ export default class Sigma<
 
     // Trigger eventual settings-related things
     this.handleSettingsUpdate();
+
+    // Initialize GPU timing if enabled
+    if (this.settings.DEBUG_gpuTiming) {
+      this.gpuTimingManager = new GPUTimingManager(
+        this.webGLContexts.scene,
+        this.settings.DEBUG_gpuTimingAverageWindow,
+      );
+      if (!this.gpuTimingManager.isSupported()) {
+        console.warn(
+          "[Sigma] GPU timing was enabled but is not supported on this browser. The EXT_disjoint_timer_query_webgl2 extension is required.",
+        );
+        this.gpuTimingManager = null;
+      } else {
+        console.log("[Sigma] GPU timing enabled successfully");
+      }
+    }
+
+    // Create GPU timing HTML overlay if visual overlay is enabled
+    if (this.settings.DEBUG_gpuTimingVisualOverlay) {
+      this.createGPUTimingOverlay();
+    }
 
     // Processing data for the first time & render
     this.refresh();
@@ -1098,6 +1125,47 @@ export default class Sigma<
     this.mouseCaptor.setSettings(this.settings);
     this.touchCaptor.setSettings(this.settings);
 
+    // Handle GPU timing changes
+    if (oldSettings) {
+      // DEBUG_gpuTiming changed
+      if (oldSettings.DEBUG_gpuTiming !== settings.DEBUG_gpuTiming) {
+        if (settings.DEBUG_gpuTiming && !this.gpuTimingManager) {
+          // Enable GPU timing
+          this.gpuTimingManager = new GPUTimingManager(this.webGLContexts.scene, settings.DEBUG_gpuTimingAverageWindow);
+          if (!this.gpuTimingManager.isSupported()) {
+            console.warn(
+              "[Sigma] GPU timing was enabled but is not supported on this browser. The EXT_disjoint_timer_query_webgl2 extension is required.",
+            );
+            this.gpuTimingManager = null;
+          } else {
+            console.log("[Sigma] GPU timing enabled successfully");
+          }
+        } else if (!settings.DEBUG_gpuTiming && this.gpuTimingManager) {
+          // Disable GPU timing
+          this.gpuTimingManager.dispose();
+          this.gpuTimingManager = null;
+          console.log("[Sigma] GPU timing disabled");
+        }
+      }
+
+      // DEBUG_gpuTimingAverageWindow changed
+      if (oldSettings.DEBUG_gpuTimingAverageWindow !== settings.DEBUG_gpuTimingAverageWindow && this.gpuTimingManager) {
+        this.gpuTimingManager.setAverageWindow(settings.DEBUG_gpuTimingAverageWindow);
+      }
+
+      // DEBUG_gpuTimingVisualOverlay changed
+      if (oldSettings.DEBUG_gpuTimingVisualOverlay !== settings.DEBUG_gpuTimingVisualOverlay) {
+        if (settings.DEBUG_gpuTimingVisualOverlay && !this.gpuTimingOverlayElement) {
+          // Create overlay
+          this.createGPUTimingOverlay();
+        } else if (!settings.DEBUG_gpuTimingVisualOverlay && this.gpuTimingOverlayElement) {
+          // Remove overlay
+          this.gpuTimingOverlayElement.remove();
+          this.gpuTimingOverlayElement = null;
+        }
+      }
+    }
+
     return this;
   }
 
@@ -1500,6 +1568,8 @@ export default class Sigma<
     // two-pass OIT rendering. This populates the picking framebuffer with
     // unique colors for each element, used for click detection.
 
+    this.gpuTimingManager?.beginPass("picking");
+
     // Render nodes to picking buffer
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
@@ -1513,6 +1583,8 @@ export default class Sigma<
         program.render(params, { mode: "all" });
       }
     }
+
+    this.gpuTimingManager?.endPass("picking");
 
     // Check for GL errors after picking pass
     glError = gl.getError();
@@ -1546,6 +1618,8 @@ export default class Sigma<
     // Disable blending for opaque items (they fully replace what's behind)
     gl.disable(gl.BLEND);
 
+    this.gpuTimingManager?.beginPass("opaque");
+
     // Drawing opaque nodes
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
@@ -1572,6 +1646,8 @@ export default class Sigma<
       }
     }
 
+    this.gpuTimingManager?.endPass("opaque");
+
     // ========================================================================
     // Pass 1b: Render TRANSPARENT items (alpha < 0.99) with OIT
     // ========================================================================
@@ -1584,6 +1660,8 @@ export default class Sigma<
 
     // Configure OIT blending for transparent items
     this.configureOITBlending("scene");
+
+    this.gpuTimingManager?.beginPass("transparent");
 
     // Drawing transparent nodes
     for (const type in this.nodePrograms) {
@@ -1613,6 +1691,8 @@ export default class Sigma<
       }
     }
 
+    this.gpuTimingManager?.endPass("transparent");
+
     // Restore depth mask for next frame
     gl.depthMask(true);
 
@@ -1626,6 +1706,8 @@ export default class Sigma<
 
     // Restore default blending
     this.restoreDefaultBlending("scene");
+
+    this.gpuTimingManager?.beginPass("composite");
 
     // Debug mode: display picking layer, or normal mode: composite OIT layers
     if (this.settings.DEBUG_displayPickingLayer) {
@@ -1646,14 +1728,118 @@ export default class Sigma<
       this.oitCompositeProgram.render(accumTexture, revealTexture);
     }
 
+    this.gpuTimingManager?.endPass("composite");
+
+    // Collect GPU timing results (async)
+    if (this.gpuTimingManager) {
+      this.gpuTimingManager.collectResults();
+
+      // Console logging (throttled to once per second)
+      const now = Date.now();
+      if (now - this.lastTimingLog > 1000) {
+        const timings = this.gpuTimingManager.getTimings();
+        if (timings.raw.total !== null) {
+          console.log("[Sigma GPU Timing]", {
+            raw: {
+              picking: timings.raw.picking?.toFixed(3) + "ms",
+              opaque: timings.raw.opaque?.toFixed(3) + "ms",
+              transparent: timings.raw.transparent?.toFixed(3) + "ms",
+              composite: timings.raw.composite?.toFixed(3) + "ms",
+              total: timings.raw.total?.toFixed(3) + "ms",
+            },
+            averaged: {
+              picking: timings.averaged.picking?.toFixed(3) + "ms",
+              opaque: timings.averaged.opaque?.toFixed(3) + "ms",
+              transparent: timings.averaged.transparent?.toFixed(3) + "ms",
+              composite: timings.averaged.composite?.toFixed(3) + "ms",
+              total: timings.averaged.total?.toFixed(3) + "ms",
+            },
+          });
+        }
+        this.lastTimingLog = now;
+      }
+    }
+
     // Do not display labels on move per setting
     if (this.settings.hideLabelsOnMove && moving) return exitRender();
 
     this.renderLabels();
     this.renderEdgeLabels();
     this.renderHighlightedNodes();
+    this.renderGPUTimingOverlay();
 
     return exitRender();
+  }
+
+  /**
+   * Method that creates the GPU timing HTML overlay element.
+   *
+   * @return {Sigma}
+   */
+  private createGPUTimingOverlay(): this {
+    const overlay = createElement("div", {
+      position: "absolute",
+      top: "10px",
+      left: "10px",
+      padding: "10px",
+      fontFamily: "monospace",
+      fontSize: "12px",
+      color: "#fff",
+      backgroundColor: "rgba(0, 0, 0, 0.75)",
+      border: "1px solid rgba(255, 255, 255, 0.3)",
+      borderRadius: "4px",
+      pointerEvents: "none",
+      zIndex: "1000",
+      whiteSpace: "pre",
+    });
+
+    this.container.appendChild(overlay);
+    this.gpuTimingOverlayElement = overlay;
+
+    return this;
+  }
+
+  /**
+   * Method that updates the GPU timing overlay stats panel.
+   *
+   * @return {Sigma}
+   */
+  private renderGPUTimingOverlay(): this {
+    if (!this.gpuTimingOverlayElement) return this;
+
+    if (!this.gpuTimingManager) {
+      // Show error message if timing is not supported
+      this.gpuTimingOverlayElement.textContent =
+        "GPU Timing Not Supported\n" +
+        "──────────────────────────\n" +
+        "The EXT_disjoint_timer_query_webgl2\n" +
+        "extension is not available in your browser.";
+      return this;
+    }
+
+    const timings = this.gpuTimingManager.getTimings();
+    if (timings.raw.total === null) {
+      this.gpuTimingOverlayElement.textContent = "GPU Timing\n──────────────────────────\nWaiting for results...";
+      return this;
+    }
+
+    // Format timing data
+    const lines = [
+      "GPU Timing (ms)",
+      "                avg     raw",
+      "───────────────────────────",
+      `Picking:     ${timings.averaged.picking?.toFixed(2).padStart(6)}  ${timings.raw.picking?.toFixed(2).padStart(6)}`,
+      `Opaque:      ${timings.averaged.opaque?.toFixed(2).padStart(6)}  ${timings.raw.opaque?.toFixed(2).padStart(6)}`,
+      `Transparent: ${timings.averaged.transparent?.toFixed(2).padStart(6)}  ${timings.raw.transparent?.toFixed(2).padStart(6)}`,
+      `Composite:   ${timings.averaged.composite?.toFixed(2).padStart(6)}  ${timings.raw.composite?.toFixed(2).padStart(6)}`,
+      "───────────────────────────",
+      `Total:       ${timings.averaged.total?.toFixed(2).padStart(6)}  ${timings.raw.total?.toFixed(2).padStart(6)}`,
+      "",
+    ];
+
+    this.gpuTimingOverlayElement.textContent = lines.join("\n");
+
+    return this;
   }
 
   /**
@@ -2227,6 +2413,17 @@ export default class Sigma<
   }
 
   /**
+   * Method returning GPU timing measurements for rendering passes.
+   * Returns both raw (per-frame) and averaged timing data.
+   *
+   * @return {GPUTimingResult | null} - Timing data or null if GPU timing is disabled or unsupported
+   */
+  getGPUTimings(): GPUTimingResult | null {
+    if (!this.gpuTimingManager) return null;
+    return this.gpuTimingManager.getTimings();
+  }
+
+  /**
    * Method returning the current renderer's dimensions.
    *
    * @return {Dimensions}
@@ -2797,6 +2994,18 @@ export default class Sigma<
     }
     for (const type in this.edgePrograms) {
       this.edgePrograms[type].kill();
+    }
+
+    // Cleanup GPU timing manager
+    if (this.gpuTimingManager) {
+      this.gpuTimingManager.dispose();
+      this.gpuTimingManager = null;
+    }
+
+    // Cleanup GPU timing overlay element
+    if (this.gpuTimingOverlayElement) {
+      this.gpuTimingOverlayElement.remove();
+      this.gpuTimingOverlayElement = null;
     }
     this.oitCompositeProgram.kill();
     this.textureDisplayProgram.kill();
