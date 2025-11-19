@@ -48,6 +48,7 @@ export abstract class AbstractProgram<
   constructor(_gl: WebGL2RenderingContext, _pickGl: WebGL2RenderingContext, _renderer: Sigma<N, E, G>) {}
   abstract reallocate(capacity: number): void;
   abstract render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void;
+  abstract renderPickingOnly(params: RenderParams): void;
   abstract kill(): void;
 }
 
@@ -317,6 +318,23 @@ export abstract class Program<
 
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
+  /**
+   * Renders only the picking pass for this program.
+   * This method is called during the batched picking pass and assumes:
+   * - The picking framebuffer is already bound
+   * - Depth testing is already configured (enabled, GEQUAL, depth writes enabled)
+   * - The viewport is already set for the picking buffer
+   *
+   * This eliminates the need for gl.getParameter() calls to save/restore state.
+   */
+  renderPickingOnly(params: RenderParams): void {
+    if (this.hasNothingToRender() || !this.pickProgram) return;
+
+    this.bindProgram(this.pickProgram);
+    this.renderProgram({ ...params, pixelRatio: params.pixelRatio / params.downSizingRatio }, this.pickProgram);
+    this.unbindProgram(this.pickProgram);
+  }
+
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program } = programInfo;
 
@@ -339,71 +357,25 @@ export abstract class Program<
     this.drawWebGL(this.METHOD, programInfo);
   }
 
-  render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void {
+  render(params: RenderParams, options?: { mode?: "opaque" | "transparent" }): void {
     if (this.hasNothingToRender()) return;
 
-    const mode = options?.mode || "all";
-
-    // For OIT rendering, we need to preserve the framebuffer binding across pick/normal rendering
-    const gl = this.normalProgram.gl;
-    let savedFramebuffer: WebGLFramebuffer | null = null;
-
-    if (this.pickProgram && mode === "all") {
-      // Save the current framebuffer binding (might be OIT framebuffer)
-      savedFramebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
-
-      // Save current depth test state and depth function
-      const depthTestEnabled = gl.getParameter(gl.DEPTH_TEST) as boolean;
-      const depthFunc = gl.getParameter(gl.DEPTH_FUNC) as number;
-
-      // Enable depth testing for picking to ensure proper occlusion
-      gl.enable(gl.DEPTH_TEST);
-      gl.depthMask(true); // Enable depth writes
-
-      // Use GEQUAL (greater or equal) so higher zIndex values (nodes) appear on top
-      // This matches the OIT normalization where higher zIndex = higher value
-      gl.depthFunc(gl.GEQUAL);
-
-      this.pickProgram.gl.viewport(
-        0,
-        0,
-        (params.width * params.pixelRatio) / params.downSizingRatio,
-        (params.height * params.pixelRatio) / params.downSizingRatio,
-      );
-      this.bindProgram(this.pickProgram);
-      this.renderProgram({ ...params, pixelRatio: params.pixelRatio / params.downSizingRatio }, this.pickProgram);
-      this.unbindProgram(this.pickProgram);
-
-      // Restore depth test state
-      if (!depthTestEnabled) {
-        gl.disable(gl.DEPTH_TEST);
-      }
-
-      // Restore depth function
-      gl.depthFunc(depthFunc);
-
-      // Restore the saved framebuffer binding for normal rendering
-      gl.bindFramebuffer(gl.FRAMEBUFFER, savedFramebuffer);
-    }
+    const mode = options?.mode || "transparent";
 
     // Select the appropriate program based on mode
     const program = mode === "opaque" ? this.opaqueProgram : this.normalProgram;
 
-    // Only render if mode is appropriate (skip normal rendering for "all" mode which is picking-only)
-    if (mode === "opaque" || mode === "transparent") {
-      program.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
-      this.bindProgram(program);
-      this.renderProgram(params, program);
-      this.unbindProgram(program);
-    }
+    program.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
+    this.bindProgram(program);
+    this.renderProgram(params, program);
+    this.unbindProgram(program);
   }
 
-  drawWebGL(method: number /* GLenum */, { gl, frameBuffer }: ProgramInfo): void {
-    // Only bind framebuffer if explicitly set (for picking).
-    // If null, use the currently bound framebuffer (for OIT rendering).
-    if (frameBuffer !== null) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-    }
+  drawWebGL(method: number /* GLenum */, { gl }: ProgramInfo): void {
+    // Framebuffer binding is managed externally:
+    // - Picking: framebuffer bound once in sigma.ts before the batched picking pass
+    // - Normal: OIT framebuffer already bound in sigma.ts before render passes
+    // This eliminates redundant framebuffer binds (N programs → 1 bind instead of N binds)
 
     if (!this.isInstanced) {
       gl.drawArrays(method, 0, this.verticesCount);

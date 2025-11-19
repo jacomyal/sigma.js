@@ -103,7 +103,10 @@ class _EdgeProgramClass<
   ): void {
     return undefined;
   }
-  render(_params: RenderParams): void {
+  render(_params: RenderParams, _options?: { mode?: "opaque" | "transparent" | "all" }): void {
+    return undefined;
+  }
+  renderPickingOnly(_params: RenderParams): void {
     return undefined;
   }
 }
@@ -163,6 +166,10 @@ export function createEdgeCompoundProgram<
 
     render(params: RenderParams, options?: { mode?: "opaque" | "transparent" | "all" }): void {
       this.programs.forEach((program) => program.render(params, options));
+    }
+
+    renderPickingOnly(params: RenderParams): void {
+      this.programs.forEach((program) => program.renderPickingOnly(params));
     }
 
     kill(): void {

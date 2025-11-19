@@ -1568,23 +1568,42 @@ export default class Sigma<
     // ========================================================================
     // Picking Pass: Render picking buffer for click detection
     // ========================================================================
-    // Note: Picking buffer must be rendered with mode: "all" before the
-    // two-pass OIT rendering. This populates the picking framebuffer with
-    // unique colors for each element, used for click detection.
+    // Note: Picking buffer must be rendered before the two-pass OIT rendering.
+    // This populates the picking framebuffer with unique colors for each element,
+    // used for click detection.
+    //
+    // OPTIMIZATION: All picking is batched together to avoid gl.getParameter() calls.
+    // We set up the picking state once, render all programs, then restore state once.
 
     this.gpuTimingManager?.beginPass("picking");
 
-    // Render nodes to picking buffer
+    // Set up picking framebuffer and WebGL state ONCE
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.scene);
+    gl.viewport(
+      0,
+      0,
+      (this.width * this.pixelRatio) / this.pickingDownSizingRatio,
+      (this.height * this.pixelRatio) / this.pickingDownSizingRatio,
+    );
+
+    // Enable depth testing for picking to ensure proper occlusion
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthMask(true); // Enable depth writes
+    // Use GEQUAL (greater or equal) so higher zIndex values (nodes) appear on top
+    // This matches the OIT normalization where higher zIndex = higher value
+    gl.depthFunc(gl.GEQUAL);
+
+    // Render all nodes to picking buffer
     for (const type in this.nodePrograms) {
       const program = this.nodePrograms[type];
-      program.render(params, { mode: "all" });
+      program.renderPickingOnly(params);
     }
 
-    // Render edges to picking buffer
+    // Render all edges to picking buffer
     if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.enableEdgeEvents) {
       for (const type in this.edgePrograms) {
         const program = this.edgePrograms[type];
-        program.render(params, { mode: "all" });
+        program.renderPickingOnly(params);
       }
     }
 
@@ -1598,18 +1617,22 @@ export default class Sigma<
       }
     }
 
+    // Restore WebGL state after picking pass (done ONCE for all programs)
+    // Switch back to OIT framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
+
     // Clear depth buffer after picking pass to prevent pollution
-    // The picking pass writes depth values when rendering with mode: "all",
-    // so we must clear the depth buffer before the opaque/transparent passes
+    // The picking pass writes depth values, so we must clear before the opaque/transparent passes
     gl.clear(gl.DEPTH_BUFFER_BIT);
 
-    // Restore WebGL state after picking pass for MRT (Multiple Render Targets)
+    // Disable depth test (will be re-enabled for opaque pass)
+    gl.disable(gl.DEPTH_TEST);
+
+    // Restore drawBuffers for MRT (Multiple Render Targets)
     // The picking framebuffer has only 1 color attachment, but OIT uses 2 attachments.
-    // Switching framebuffers may have corrupted the drawBuffers state, so restore it.
     gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 
     // Restore viewport to OIT framebuffer dimensions
-    // The picking pass may have changed the viewport, so restore it
     gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
 
     // ========================================================================
