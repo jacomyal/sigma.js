@@ -39,6 +39,7 @@ export default () => {
   const shuffleButton = document.getElementById("shuffle") as HTMLButtonElement;
   const debugPickingCheckbox = document.getElementById("debug-picking") as HTMLInputElement;
   const debugGPUPerfs = document.getElementById("debug-gpu") as HTMLInputElement;
+  const enableOITCheckbox = document.getElementById("enable-oit") as HTMLInputElement;
   const alphaSlider = document.getElementById("alpha-slider") as HTMLInputElement;
   const alphaValue = document.getElementById("alpha-value") as HTMLSpanElement;
   const thresholdSlider = document.getElementById("threshold-slider") as HTMLInputElement;
@@ -202,10 +203,15 @@ export default () => {
     renderer.setSetting("DEBUG_displayPickingLayer", debugPickingCheckbox.checked);
   });
 
-  // Debug picking layer checkbox
+  // Debug GPU performances checkbox
   debugGPUPerfs.addEventListener("change", () => {
     renderer.setSetting("DEBUG_gpuTiming", debugGPUPerfs.checked);
     renderer.setSetting("DEBUG_gpuTimingVisualOverlay", debugGPUPerfs.checked);
+  });
+
+  // Enable OIT checkbox
+  enableOITCheckbox.addEventListener("change", () => {
+    renderer.setSetting("enableOIT", enableOITCheckbox.checked);
   });
 
   // Alpha slider

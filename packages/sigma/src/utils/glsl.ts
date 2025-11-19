@@ -287,6 +287,47 @@ export function fragmentShaderHeader(
 }
 
 /**
+ * Generates simple single-pass rendering code for non-OIT mode (painter's algorithm).
+ *
+ * This template handles two rendering modes:
+ * 1. PICKING_MODE: Simple color output for mouse interaction
+ * 2. Normal rendering: Direct color output with standard alpha blending
+ *
+ * @param options Configuration for variable names
+ * @returns Object with { declarations, main } containing the rendering code
+ *
+ * @example
+ * ```typescript
+ * const rendering = singlePassRendering({ colorVar: "v_color" });
+ * const SHADER = `
+ * ${rendering.declarations}
+ * void main(void) {
+ *   ${rendering.main}
+ * }
+ * `;
+ * ```
+ */
+export function singlePassRendering(
+  options: {
+    colorVar?: string;
+    pickingColorVar?: string;
+  } = {},
+): { declarations: string; main: string } {
+  const { colorVar = "color", pickingColorVar = "v_color" } = options;
+
+  const declarations = `out vec4 fragColor;`;
+
+  const main = `#ifdef PICKING_MODE
+  fragColor = ${pickingColorVar};
+  #else
+  // Single-pass rendering: direct color output with standard alpha blending
+  fragColor = vec4(${colorVar}.rgb * ${colorVar}.a, ${colorVar}.a);
+  #endif`;
+
+  return { declarations, main };
+}
+
+/**
  * Generates the standard two-pass rendering code used in most fragment shaders.
  *
  * This template handles three rendering modes:

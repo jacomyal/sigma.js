@@ -88,6 +88,7 @@ export interface Settings<
   edgeReducer: null | ((edge: string, data: E) => Partial<EdgeDisplayData>);
 
   // Features
+  enableOIT: boolean;
   minZIndex: number;
   maxZIndex: number;
   defaultNodeZIndex: number;
@@ -177,6 +178,7 @@ export const DEFAULT_SETTINGS: Settings<Attributes, Attributes, Attributes> = {
   edgeReducer: null,
 
   // Features
+  enableOIT: false,
   minZIndex: 0,
   maxZIndex: 1,
   defaultNodeZIndex: 0.5,

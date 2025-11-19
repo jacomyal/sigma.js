@@ -12,6 +12,7 @@ export interface GPUTimingData {
   opaque: number | null;
   transparent: number | null;
   composite: number | null;
+  render: number | null; // For painter's algorithm single-pass rendering
   total: number | null;
 }
 
@@ -25,7 +26,7 @@ interface TimingQuery {
   pass: RenderPass;
 }
 
-export type RenderPass = "picking" | "opaque" | "transparent" | "composite";
+export type RenderPass = "picking" | "opaque" | "transparent" | "composite" | "render";
 
 /**
  * GPU Timing Manager
@@ -53,6 +54,7 @@ export class GPUTimingManager {
       opaque: null,
       transparent: null,
       composite: null,
+      render: null,
       total: null,
     };
 
@@ -67,7 +69,7 @@ export class GPUTimingManager {
     }
 
     // Create query pool for each render pass
-    const passes: RenderPass[] = ["picking", "opaque", "transparent", "composite"];
+    const passes: RenderPass[] = ["picking", "opaque", "transparent", "composite", "render"];
     for (const pass of passes) {
       const pool: WebGLQuery[] = [];
       for (let i = 0; i < this.poolSize; i++) {
@@ -214,6 +216,7 @@ export class GPUTimingManager {
       opaque: this.calculateAverage("opaque"),
       transparent: this.calculateAverage("transparent"),
       composite: this.calculateAverage("composite"),
+      render: this.calculateAverage("render"),
       total: null,
     };
 
@@ -225,6 +228,9 @@ export class GPUTimingManager {
       averaged.composite !== null
     ) {
       averaged.total = averaged.picking + averaged.opaque + averaged.transparent + averaged.composite;
+    } else if (averaged.picking !== null && averaged.render !== null) {
+      // For painter's algorithm mode: total = picking + render
+      averaged.total = averaged.picking + averaged.render;
     }
 
     return {
@@ -253,6 +259,7 @@ export class GPUTimingManager {
       opaque: null,
       transparent: null,
       composite: null,
+      render: null,
       total: null,
     };
 

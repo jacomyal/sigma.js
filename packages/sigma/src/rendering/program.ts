@@ -80,7 +80,7 @@ export abstract class Program<
   layerIndex = 0;
 
   normalProgram: ProgramInfo;
-  opaqueProgram: ProgramInfo; // Opaque variant for two-pass rendering
+  opaqueProgram: ProgramInfo | null; // Opaque variant for two-pass rendering (only when OIT enabled)
   pickProgram: ProgramInfo | null;
 
   isInstanced: boolean;
@@ -108,13 +108,10 @@ export abstract class Program<
     // Members
     this.renderer = renderer;
     this.normalProgram = this.getProgramInfo("normal", gl, def.VERTEX_SHADER_SOURCE, def.FRAGMENT_SHADER_SOURCE, null);
-    this.opaqueProgram = this.getProgramInfo(
-      "opaque",
-      gl,
-      def.VERTEX_SHADER_SOURCE,
-      opaquifyShader(def.FRAGMENT_SHADER_SOURCE),
-      null,
-    );
+    // Only create opaque program variant when OIT is enabled
+    this.opaqueProgram = renderer.getSettings().enableOIT
+      ? this.getProgramInfo("opaque", gl, def.VERTEX_SHADER_SOURCE, opaquifyShader(def.FRAGMENT_SHADER_SOURCE), null)
+      : null;
     this.pickProgram = pickingBuffer
       ? this.getProgramInfo(
           "pick",
@@ -152,7 +149,11 @@ export abstract class Program<
 
   kill() {
     killProgram(this.normalProgram);
-    killProgram(this.opaqueProgram);
+
+    if (this.opaqueProgram) {
+      killProgram(this.opaqueProgram);
+      this.opaqueProgram = null;
+    }
 
     if (this.pickProgram) {
       killProgram(this.pickProgram);
@@ -340,7 +341,7 @@ export abstract class Program<
 
     // Detect if this is picking or opaque mode
     const isPicking = programInfo === this.pickProgram;
-    const isOpaque = programInfo === this.opaqueProgram;
+    const isOpaque = this.opaqueProgram !== null && programInfo === this.opaqueProgram;
 
     // For picking and opaque pass, we need blending disabled
     // - Picking needs exact colors without blending
@@ -363,7 +364,8 @@ export abstract class Program<
     const mode = options?.mode || "transparent";
 
     // Select the appropriate program based on mode
-    const program = mode === "opaque" ? this.opaqueProgram : this.normalProgram;
+    // When OIT is disabled (opaqueProgram is null), always use normalProgram
+    const program = mode === "opaque" && this.opaqueProgram ? this.opaqueProgram : this.normalProgram;
 
     program.gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
     this.bindProgram(program);

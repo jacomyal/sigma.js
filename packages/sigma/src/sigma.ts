@@ -1164,6 +1164,40 @@ export default class Sigma<
           this.gpuTimingOverlayElement = null;
         }
       }
+
+      // enableOIT changed - need to recreate programs with appropriate shader variants
+      if (oldSettings.enableOIT !== settings.enableOIT) {
+        console.log(`[Sigma] Switching to ${settings.enableOIT ? "OIT" : "painter's algorithm"} rendering mode`);
+
+        // Recreate all node programs with new OIT setting
+        for (const type in settings.nodeProgramClasses) {
+          this.registerNodeProgram(type, settings.nodeProgramClasses[type], settings.nodeHoverProgramClasses[type]);
+        }
+
+        // Recreate all edge programs with new OIT setting
+        for (const type in settings.edgeProgramClasses) {
+          this.registerEdgeProgram(type, settings.edgeProgramClasses[type]);
+        }
+
+        // If switching to OIT mode, we need to create the framebuffer on next render
+        // If switching from OIT mode, the framebuffer will simply not be used
+        if (settings.enableOIT) {
+          // Delete existing OIT framebuffer so it will be recreated with correct state
+          const gl = this.webGLContexts.scene;
+          if (this.oitFrameBuffers.scene) {
+            gl.deleteFramebuffer(this.oitFrameBuffers.scene);
+            delete this.oitFrameBuffers.scene;
+          }
+          if (this.oitAccumTextures.scene) {
+            gl.deleteTexture(this.oitAccumTextures.scene);
+            delete this.oitAccumTextures.scene;
+          }
+          if (this.oitRevealTextures.scene) {
+            gl.deleteTexture(this.oitRevealTextures.scene);
+            delete this.oitRevealTextures.scene;
+          }
+        }
+      }
     }
 
     return this;
@@ -1492,8 +1526,8 @@ export default class Sigma<
     // Prepare the textures
     this.pickingLayers.forEach((layer) => this.resetWebGLTexture(layer));
 
-    // Create OIT framebuffer on first render or after resize
-    if (!this.oitFrameBuffers.scene) {
+    // Create OIT framebuffer on first render or after resize (only when OIT is enabled)
+    if (this.settings.enableOIT && !this.oitFrameBuffers.scene) {
       this.setupOITFramebuffer("scene");
     }
 
@@ -1532,242 +1566,342 @@ export default class Sigma<
     const params: RenderParams = this.getRenderParams();
 
     const gl = this.webGLContexts.scene;
-    const oitFrameBuffer = this.oitFrameBuffers.scene;
-    const accumTexture = this.oitAccumTextures.scene;
-    const revealTexture = this.oitRevealTextures.scene;
 
-    // Two-Pass OIT Rendering: Opaque items first, then transparent with OIT
+    // Branch based on OIT setting
+    if (this.settings.enableOIT) {
+      // ======================================================================
+      // OIT Rendering Path: Three-pass rendering with Order-Independent Transparency
+      // ======================================================================
 
-    // Bind OIT framebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
+      const oitFrameBuffer = this.oitFrameBuffers.scene;
+      const accumTexture = this.oitAccumTextures.scene;
+      const revealTexture = this.oitRevealTextures.scene;
 
-    // IMPORTANT: Set viewport to match OIT framebuffer dimensions (including pixelRatio)
-    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+      // Bind OIT framebuffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
 
-    // Ensure drawBuffers is set for MRT before rendering
-    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+      // IMPORTANT: Set viewport to match OIT framebuffer dimensions (including pixelRatio)
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
 
-    // Clear OIT buffers
-    // Clear accumulation buffer to (0, 0, 0, 0)
-    gl.clearBufferfv(gl.COLOR, 0, [0, 0, 0, 0]);
-    // Clear reveal buffer to 1.0 (full opacity)
-    gl.clearBufferfv(gl.COLOR, 1, [1, 0, 0, 0]);
-    // Clear depth buffer
-    gl.clear(gl.DEPTH_BUFFER_BIT);
+      // Ensure drawBuffers is set for MRT before rendering
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 
-    // Check for GL errors before rendering
-    // Performance: gl.getError() forces GPU/CPU synchronization (40-60ms overhead per frame)
-    // Only enable via DEBUG_checkWebGLErrors setting when debugging WebGL issues
-    if (this.settings.DEBUG_checkWebGLErrors) {
-      const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(`OIT: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
-      }
-    }
+      // Clear OIT buffers
+      // Clear accumulation buffer to (0, 0, 0, 0)
+      gl.clearBufferfv(gl.COLOR, 0, [0, 0, 0, 0]);
+      // Clear reveal buffer to 1.0 (full opacity)
+      gl.clearBufferfv(gl.COLOR, 1, [1, 0, 0, 0]);
+      // Clear depth buffer
+      gl.clear(gl.DEPTH_BUFFER_BIT);
 
-    // ========================================================================
-    // Picking Pass: Render picking buffer for click detection
-    // ========================================================================
-    // Note: Picking buffer must be rendered before the two-pass OIT rendering.
-    // This populates the picking framebuffer with unique colors for each element,
-    // used for click detection.
-    //
-    // OPTIMIZATION: All picking is batched together to avoid gl.getParameter() calls.
-    // We set up the picking state once, render all programs, then restore state once.
-
-    this.gpuTimingManager?.beginPass("picking");
-
-    // Set up picking framebuffer and WebGL state ONCE
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.scene);
-    gl.viewport(
-      0,
-      0,
-      (this.width * this.pixelRatio) / this.pickingDownSizingRatio,
-      (this.height * this.pixelRatio) / this.pickingDownSizingRatio,
-    );
-
-    // Enable depth testing for picking to ensure proper occlusion
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(true); // Enable depth writes
-    // Use GEQUAL (greater or equal) so higher zIndex values (nodes) appear on top
-    // This matches the OIT normalization where higher zIndex = higher value
-    gl.depthFunc(gl.GEQUAL);
-
-    // Render all nodes to picking buffer
-    for (const type in this.nodePrograms) {
-      const program = this.nodePrograms[type];
-      program.renderPickingOnly(params);
-    }
-
-    // Render all edges to picking buffer
-    if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.enableEdgeEvents) {
-      for (const type in this.edgePrograms) {
-        const program = this.edgePrograms[type];
-        program.renderPickingOnly(params);
-      }
-    }
-
-    this.gpuTimingManager?.endPass("picking");
-
-    // Check for GL errors after picking pass
-    if (this.settings.DEBUG_checkWebGLErrors) {
-      const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(`OIT: GL error after picking pass: ${glError} (0x${glError.toString(16)})`);
-      }
-    }
-
-    // Restore WebGL state after picking pass (done ONCE for all programs)
-    // Switch back to OIT framebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
-
-    // Clear depth buffer after picking pass to prevent pollution
-    // The picking pass writes depth values, so we must clear before the opaque/transparent passes
-    gl.clear(gl.DEPTH_BUFFER_BIT);
-
-    // Disable depth test (will be re-enabled for opaque pass)
-    gl.disable(gl.DEPTH_TEST);
-
-    // Restore drawBuffers for MRT (Multiple Render Targets)
-    // The picking framebuffer has only 1 color attachment, but OIT uses 2 attachments.
-    gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
-
-    // Restore viewport to OIT framebuffer dimensions
-    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
-
-    // ========================================================================
-    // Pass 1a: Render OPAQUE items (alpha >= 0.99) with depth testing
-    // ========================================================================
-
-    // Enable depth testing and depth writes for opaque items
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
-    gl.depthMask(true); // Write to depth buffer
-
-    // Disable blending for opaque items (they fully replace what's behind)
-    gl.disable(gl.BLEND);
-
-    this.gpuTimingManager?.beginPass("opaque");
-
-    // Drawing opaque nodes
-    for (const type in this.nodePrograms) {
-      const program = this.nodePrograms[type];
-      program.render(params, { mode: "opaque" });
-    }
-
-    // Check for GL errors after opaque node rendering
-    if (this.settings.DEBUG_checkWebGLErrors) {
-      const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(`OIT Pass 1a: GL error after opaque node rendering: ${glError} (0x${glError.toString(16)})`);
-      }
-    }
-
-    // Drawing opaque edges
-    if (!this.settings.hideEdgesOnMove || !moving) {
-      for (const type in this.edgePrograms) {
-        const program = this.edgePrograms[type];
-        program.render(params, { mode: "opaque" });
-      }
-
-      // Check for GL errors after opaque edge rendering
+      // Check for GL errors before rendering
+      // Performance: gl.getError() forces GPU/CPU synchronization (40-60ms overhead per frame)
+      // Only enable via DEBUG_checkWebGLErrors setting when debugging WebGL issues
       if (this.settings.DEBUG_checkWebGLErrors) {
         const glError = gl.getError();
         if (glError !== gl.NO_ERROR) {
-          throw new Error(`OIT Pass 1a: GL error after opaque edge rendering: ${glError} (0x${glError.toString(16)})`);
+          throw new Error(`OIT: GL error before rendering: ${glError} (0x${glError.toString(16)})`);
         }
       }
-    }
 
-    this.gpuTimingManager?.endPass("opaque");
+      // ========================================================================
+      // Picking Pass: Render picking buffer for click detection
+      // ========================================================================
+      // Note: Picking buffer must be rendered before the two-pass OIT rendering.
+      // This populates the picking framebuffer with unique colors for each element,
+      // used for click detection.
+      //
+      // OPTIMIZATION: All picking is batched together to avoid gl.getParameter() calls.
+      // We set up the picking state once, render all programs, then restore state once.
 
-    // ========================================================================
-    // Pass 1b: Render TRANSPARENT items (alpha < 0.99) with OIT
-    // ========================================================================
+      this.gpuTimingManager?.beginPass("picking");
 
-    // Keep depth testing enabled to respect opaque item depths
-    // But disable depth writes so transparent items don't occlude each other
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
-    gl.depthMask(false); // Don't write to depth buffer (transparent items don't occlude)
+      // Set up picking framebuffer and WebGL state ONCE
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.scene);
+      gl.viewport(
+        0,
+        0,
+        (this.width * this.pixelRatio) / this.pickingDownSizingRatio,
+        (this.height * this.pixelRatio) / this.pickingDownSizingRatio,
+      );
 
-    // Configure OIT blending for transparent items
-    this.configureOITBlending("scene");
+      // Enable depth testing for picking to ensure proper occlusion
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true); // Enable depth writes
+      // Use GEQUAL (greater or equal) so higher zIndex values (nodes) appear on top
+      // This matches the OIT normalization where higher zIndex = higher value
+      gl.depthFunc(gl.GEQUAL);
 
-    this.gpuTimingManager?.beginPass("transparent");
-
-    // Drawing transparent nodes
-    for (const type in this.nodePrograms) {
-      const program = this.nodePrograms[type];
-      program.render(params, { mode: "transparent" });
-    }
-
-    // Check for GL errors after transparent node rendering
-    if (this.settings.DEBUG_checkWebGLErrors) {
-      const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        throw new Error(
-          `OIT Pass 1b: GL error after transparent node rendering: ${glError} (0x${glError.toString(16)})`,
-        );
+      // Render all nodes to picking buffer
+      for (const type in this.nodePrograms) {
+        const program = this.nodePrograms[type];
+        program.renderPickingOnly(params);
       }
-    }
 
-    // Drawing transparent edges
-    if (!this.settings.hideEdgesOnMove || !moving) {
-      for (const type in this.edgePrograms) {
-        const program = this.edgePrograms[type];
+      // Render all edges to picking buffer
+      if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.enableEdgeEvents) {
+        for (const type in this.edgePrograms) {
+          const program = this.edgePrograms[type];
+          program.renderPickingOnly(params);
+        }
+      }
+
+      this.gpuTimingManager?.endPass("picking");
+
+      // Check for GL errors after picking pass
+      if (this.settings.DEBUG_checkWebGLErrors) {
+        const glError = gl.getError();
+        if (glError !== gl.NO_ERROR) {
+          throw new Error(`OIT: GL error after picking pass: ${glError} (0x${glError.toString(16)})`);
+        }
+      }
+
+      // Restore WebGL state after picking pass (done ONCE for all programs)
+      // Switch back to OIT framebuffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, oitFrameBuffer);
+
+      // Clear depth buffer after picking pass to prevent pollution
+      // The picking pass writes depth values, so we must clear before the opaque/transparent passes
+      gl.clear(gl.DEPTH_BUFFER_BIT);
+
+      // Disable depth test (will be re-enabled for opaque pass)
+      gl.disable(gl.DEPTH_TEST);
+
+      // Restore drawBuffers for MRT (Multiple Render Targets)
+      // The picking framebuffer has only 1 color attachment, but OIT uses 2 attachments.
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+      // Restore viewport to OIT framebuffer dimensions
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+      // ========================================================================
+      // Pass 1a: Render OPAQUE items (alpha >= 0.99) with depth testing
+      // ========================================================================
+
+      // Enable depth testing and depth writes for opaque items
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
+      gl.depthMask(true); // Write to depth buffer
+
+      // Disable blending for opaque items (they fully replace what's behind)
+      gl.disable(gl.BLEND);
+
+      this.gpuTimingManager?.beginPass("opaque");
+
+      // Drawing opaque nodes
+      for (const type in this.nodePrograms) {
+        const program = this.nodePrograms[type];
+        program.render(params, { mode: "opaque" });
+      }
+
+      // Check for GL errors after opaque node rendering
+      if (this.settings.DEBUG_checkWebGLErrors) {
+        const glError = gl.getError();
+        if (glError !== gl.NO_ERROR) {
+          throw new Error(`OIT Pass 1a: GL error after opaque node rendering: ${glError} (0x${glError.toString(16)})`);
+        }
+      }
+
+      // Drawing opaque edges
+      if (!this.settings.hideEdgesOnMove || !moving) {
+        for (const type in this.edgePrograms) {
+          const program = this.edgePrograms[type];
+          program.render(params, { mode: "opaque" });
+        }
+
+        // Check for GL errors after opaque edge rendering
+        if (this.settings.DEBUG_checkWebGLErrors) {
+          const glError = gl.getError();
+          if (glError !== gl.NO_ERROR) {
+            throw new Error(`OIT Pass 1a: GL error after opaque edge rendering: ${glError} (0x${glError.toString(16)})`);
+          }
+        }
+      }
+
+      this.gpuTimingManager?.endPass("opaque");
+
+      // ========================================================================
+      // Pass 1b: Render TRANSPARENT items (alpha < 0.99) with OIT
+      // ========================================================================
+
+      // Keep depth testing enabled to respect opaque item depths
+      // But disable depth writes so transparent items don't occlude each other
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.GEQUAL); // Higher zIndex values appear on top
+      gl.depthMask(false); // Don't write to depth buffer (transparent items don't occlude)
+
+      // Configure OIT blending for transparent items
+      this.configureOITBlending("scene");
+
+      this.gpuTimingManager?.beginPass("transparent");
+
+      // Drawing transparent nodes
+      for (const type in this.nodePrograms) {
+        const program = this.nodePrograms[type];
         program.render(params, { mode: "transparent" });
       }
 
-      // Check for GL errors after transparent edge rendering
+      // Check for GL errors after transparent node rendering
       if (this.settings.DEBUG_checkWebGLErrors) {
         const glError = gl.getError();
         if (glError !== gl.NO_ERROR) {
           throw new Error(
-            `OIT Pass 1b: GL error after transparent edge rendering: ${glError} (0x${glError.toString(16)})`,
+            `OIT Pass 1b: GL error after transparent node rendering: ${glError} (0x${glError.toString(16)})`,
           );
         }
       }
-    }
 
-    this.gpuTimingManager?.endPass("transparent");
+      // Drawing transparent edges
+      if (!this.settings.hideEdgesOnMove || !moving) {
+        for (const type in this.edgePrograms) {
+          const program = this.edgePrograms[type];
+          program.render(params, { mode: "transparent" });
+        }
 
-    // Restore depth mask for next frame
-    gl.depthMask(true);
-
-    // OIT Pass 2: Composite to screen
-
-    // Unbind OIT framebuffer (render to screen)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    // Restore viewport to screen dimensions (with pixel ratio)
-    gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
-
-    // Restore default blending
-    this.restoreDefaultBlending("scene");
-
-    this.gpuTimingManager?.beginPass("composite");
-
-    // Debug mode: display picking layer, or normal mode: composite OIT layers
-    if (this.settings.DEBUG_displayPickingLayer) {
-      // Debug mode: display the picking layer texture
-      const pickingTexture = this.textures.scene;
-      if (!pickingTexture) {
-        throw new Error("OIT Pass 2: No picking texture available!");
+        // Check for GL errors after transparent edge rendering
+        if (this.settings.DEBUG_checkWebGLErrors) {
+          const glError = gl.getError();
+          if (glError !== gl.NO_ERROR) {
+            throw new Error(
+              `OIT Pass 1b: GL error after transparent edge rendering: ${glError} (0x${glError.toString(16)})`,
+            );
+          }
+        }
       }
-      if (!this.textureDisplayProgram) {
-        throw new Error("OIT Pass 2: No texture display program initialized!");
+
+      this.gpuTimingManager?.endPass("transparent");
+
+      // Restore depth mask for next frame
+      gl.depthMask(true);
+
+      // OIT Pass 2: Composite to screen
+
+      // Unbind OIT framebuffer (render to screen)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      // Restore viewport to screen dimensions (with pixel ratio)
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+      // Restore default blending
+      this.restoreDefaultBlending("scene");
+
+      this.gpuTimingManager?.beginPass("composite");
+
+      // Debug mode: display picking layer, or normal mode: composite OIT layers
+      if (this.settings.DEBUG_displayPickingLayer) {
+        // Debug mode: display the picking layer texture
+        const pickingTexture = this.textures.scene;
+        if (!pickingTexture) {
+          throw new Error("OIT Pass 2: No picking texture available!");
+        }
+        if (!this.textureDisplayProgram) {
+          throw new Error("OIT Pass 2: No texture display program initialized!");
+        }
+        this.textureDisplayProgram.render(pickingTexture, this.pickingDownSizingRatio);
+      } else {
+        // Normal mode: run composite shader to resolve OIT
+        if (!this.oitCompositeProgram) {
+          throw new Error("OIT Pass 2: No composite program initialized!");
+        }
+        this.oitCompositeProgram.render(accumTexture, revealTexture);
       }
-      this.textureDisplayProgram.render(pickingTexture, this.pickingDownSizingRatio);
+
+      this.gpuTimingManager?.endPass("composite");
     } else {
-      // Normal mode: run composite shader to resolve OIT
-      if (!this.oitCompositeProgram) {
-        throw new Error("OIT Pass 2: No composite program initialized!");
-      }
-      this.oitCompositeProgram.render(accumTexture, revealTexture);
-    }
+      // ======================================================================
+      // Painter's Algorithm Path: Single-pass rendering with CPU-sorted order
+      // ======================================================================
 
-    this.gpuTimingManager?.endPass("composite");
+      // Set viewport to screen dimensions
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+      // Bind to screen framebuffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      // Disable depth testing for painter's algorithm (rely on draw order only)
+      gl.disable(gl.DEPTH_TEST);
+
+      // Enable standard alpha blending
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      // ========================================================================
+      // Picking Pass (non-OIT mode): Render picking buffer without depth testing
+      // ========================================================================
+
+      this.gpuTimingManager?.beginPass("picking");
+
+      // Set up picking framebuffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.scene);
+      gl.viewport(
+        0,
+        0,
+        (this.width * this.pixelRatio) / this.pickingDownSizingRatio,
+        (this.height * this.pixelRatio) / this.pickingDownSizingRatio,
+      );
+
+      // No depth testing for picking in painter's algorithm mode
+      gl.disable(gl.DEPTH_TEST);
+      gl.disable(gl.BLEND);
+
+      // Render in naive order: edges first, then nodes
+      // This matches the painter's algorithm rendering order
+      if ((!this.settings.hideEdgesOnMove || !moving) && this.settings.enableEdgeEvents) {
+        for (const type in this.edgePrograms) {
+          const program = this.edgePrograms[type];
+          program.renderPickingOnly(params);
+        }
+      }
+
+      for (const type in this.nodePrograms) {
+        const program = this.nodePrograms[type];
+        program.renderPickingOnly(params);
+      }
+
+      this.gpuTimingManager?.endPass("picking");
+
+      // ========================================================================
+      // Single Render Pass: Render all items in sorted order
+      // ========================================================================
+
+      this.gpuTimingManager?.beginPass("render");
+
+      // Switch back to screen framebuffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
+
+      // Enable standard alpha blending
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      // Render edges first (they should appear behind nodes)
+      if (!this.settings.hideEdgesOnMove || !moving) {
+        for (const type in this.edgePrograms) {
+          const program = this.edgePrograms[type];
+          program.render(params);
+        }
+      }
+
+      // Then render nodes (they should appear on top of edges)
+      for (const type in this.nodePrograms) {
+        const program = this.nodePrograms[type];
+        program.render(params);
+      }
+
+      this.gpuTimingManager?.endPass("render");
+
+      // Debug mode: display picking layer
+      if (this.settings.DEBUG_displayPickingLayer) {
+        const pickingTexture = this.textures.scene;
+        if (!pickingTexture) {
+          throw new Error("Painter: No picking texture available!");
+        }
+        if (!this.textureDisplayProgram) {
+          throw new Error("Painter: No texture display program initialized!");
+        }
+        this.textureDisplayProgram.render(pickingTexture, this.pickingDownSizingRatio);
+      }
+    }
 
     // Collect GPU timing results (async)
     if (this.gpuTimingManager) {
@@ -1784,6 +1918,7 @@ export default class Sigma<
               opaque: timings.raw.opaque?.toFixed(3) + "ms",
               transparent: timings.raw.transparent?.toFixed(3) + "ms",
               composite: timings.raw.composite?.toFixed(3) + "ms",
+              render: timings.raw.render?.toFixed(3) + "ms",
               total: timings.raw.total?.toFixed(3) + "ms",
             },
             averaged: {
@@ -1791,6 +1926,7 @@ export default class Sigma<
               opaque: timings.averaged.opaque?.toFixed(3) + "ms",
               transparent: timings.averaged.transparent?.toFixed(3) + "ms",
               composite: timings.averaged.composite?.toFixed(3) + "ms",
+              render: timings.averaged.render?.toFixed(3) + "ms",
               total: timings.averaged.total?.toFixed(3) + "ms",
             },
           });
