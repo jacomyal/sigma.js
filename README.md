@@ -93,7 +93,7 @@ the [Sciences Po médialab](https://medialab.sciencespo.fr/en/), who also mainta
 [graphology](https://graphology.github.io/).
 
 The project was initially supported by Sciences Po médialab through the v1 and v2 development. OuestWare has provided
-continuous support since, and [G.V()](https://gdotv.com/) actively sponsored the v3 and v4 development. The current
+continuous support since, and [gdotv](https://gdotv.com/) actively sponsored the v3 and v4 development. The current
 website was designed by [Robin de Mourat](https://github.com/robindemourat/).
 
 Since v4, sigma's development also includes help from LLMs. They are used to draft mechanical code, while the
