@@ -145,6 +145,7 @@ export default defineConfig({
                 { slug: "how-to/nodes/colors-sizes" },
                 { slug: "how-to/nodes/shapes" },
                 { slug: "how-to/nodes/fill-layers" },
+                { slug: "how-to/nodes/backdrops" },
               ],
             },
             {
@@ -159,7 +160,6 @@ export default defineConfig({
               label: "Styling labels",
               items: [
                 { slug: "how-to/labels/styles-positioning" },
-                { slug: "how-to/labels/backdrops" },
                 { slug: "how-to/labels/attachments" },
               ],
             },

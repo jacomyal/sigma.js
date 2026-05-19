@@ -6,9 +6,19 @@ sidebar:
 
 import SigmaExample from "../../../../components/SigmaExample.astro";
 
-Sigma renders labels for both nodes and edges on the GPU using SDF text. This page covers font styles, positioning, and visibility for both.
+Sigma renders labels for both nodes and edges on the GPU using SDF text. This page covers font styles, positioning,
+visibility, and label backgrounds for both.
 
 ## Node labels
+
+:::note[Node label backgrounds vs. node backdrops]
+Both render a shape behind nodes or labels, but they sit on opposite ends of a tradeoff. **Label backgrounds**
+(`labelBackgroundColor`, `labelBackgroundPadding`) are a flat colored rect behind label text. They are cheap to render,
+intended to be always-on, and also the hit area for label events when `nodeLabelEvents` / `edgeLabelEvents` is enabled.
+[**Backdrops**](/how-to/nodes/backdrops/) are a styled GPU shape (shadow, border, corner radius, configurable area)
+around a node and/or its label. They are much more expensive, meant for a handful of elements at a time, and typically
+tied to hover or highlight states.
+:::
 
 ### Positioning
 
@@ -41,6 +51,33 @@ styles: {
 }
 ```
 
+### Background
+
+A flat colored rectangle can be drawn behind each label, controlled by two style properties:
+
+| Property                 | Type     | Description                                     |
+| ------------------------ | -------- | ----------------------------------------------- |
+| `labelBackgroundColor`   | `string` | Fill color. Transparent (or omitted) = no fill. |
+| `labelBackgroundPadding` | `number` | Padding around the label text, in pixels.       |
+
+```typescript
+styles: {
+  nodes: [
+    {
+      labelBackgroundColor: "rgba(255, 255, 255, 0.8)",
+      labelBackgroundPadding: 4,
+    },
+  ],
+}
+```
+
+Label backgrounds are deliberately minimal: no border, shadow, or corner radius. Use
+[backdrops](/how-to/nodes/backdrops/) if you need a richer styled shape.
+
+The same rectangle also acts as the **hit area for label events**: when `nodeLabelEvents` is enabled, hovering or
+clicking inside it fires the corresponding `*Label` event, even when the fill is transparent. Use the
+`labelPickingPadding` setting to extend the hit area beyond the visual padding without enlarging the visible background.
+
 ### Visibility
 
 By default, sigma uses density-based culling to avoid overlapping labels. You can override this per-node:
@@ -61,7 +98,8 @@ styles: {
 }
 ```
 
-The `labelRenderedSizeThreshold` and `labelDensity` settings control the density-based culling behavior (see [Settings](/reference/settings/)).
+The `labelRenderedSizeThreshold` and `labelDensity` settings control the density-based culling behavior (see
+[Settings](/reference/settings/)).
 
 This example demonstrates label rendering at various font sizes and styles:
 
@@ -134,6 +172,11 @@ primitives: {
   },
 },
 ```
+
+### Background
+
+Edge labels accept the same `labelBackgroundColor` and `labelBackgroundPadding` properties as node labels, and similarly
+act as the hit area for edge label events when `edgeLabelEvents` is enabled.
 
 This example shows how to manipulate edge label positioning, font size modes, and text borders:
 

@@ -6,7 +6,21 @@ sidebar:
 
 import SigmaExample from "../../../../components/SigmaExample.astro";
 
-Backdrops are decorative shapes drawn behind nodes and their labels. They are typically used for hover effects, making the hovered node and its label stand out from the rest of the graph.
+Backdrops are styled GPU shapes drawn around a node and, optionally, its label. They support a fill color, border, drop
+shadow, corner radius, and configurable coverage area. They are designed to make a node visually stand out from the rest
+of the graph.
+
+Because a backdrop is a fully styled shape rendered per element, it is **expensive compared to other node properties**.
+It is meant for a handful of elements at a time (typically the hovered or otherwise highlighted node, not for every node
+in the graph).
+
+:::note[Backdrops vs. label backgrounds]
+Both render a shape behind nodes or labels, but they sit on opposite ends of a tradeoff. Backdrops are a styled GPU
+shape (shadow, border, corner radius, configurable area). They are expensive, meant for a handful of elements at a time,
+and typically tied to hover or highlight states. [Label backgrounds](/how-to/labels/styles-positioning/#background)
+(`labelBackgroundColor`, `labelBackgroundPadding`) are a flat colored rect behind label text. They are cheap, intended
+to be always-on, and also the hit area for label events when `nodeLabelEvents` / `edgeLabelEvents` is enabled.
+:::
 
 ## Properties
 

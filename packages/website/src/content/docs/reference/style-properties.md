@@ -64,7 +64,10 @@ These are the built-in style properties available for nodes:
 
 ### Backdrop properties
 
-Backdrops render a background shape behind nodes and their labels, typically used for hover effects.
+Backdrops render a styled GPU shape (fill, border, shadow, corner radius) behind nodes and/or their labels. They are
+expensive compared to other node properties and meant for a handful of elements at a time, typically hovered or
+highlighted. For a cheap, always-on flat rectangle behind a label only (which also serves as the hit area for label
+events), use `labelBackgroundColor` / `labelBackgroundPadding` above instead.
 
 | Property               | Type                          | Description                                                   |
 | ---------------------- | ----------------------------- | ------------------------------------------------------------- |
