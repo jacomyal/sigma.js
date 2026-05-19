@@ -8,5 +8,4 @@
 **/test-results/**
 
 # Doc and examples
-**/typedoc/**
-**/.docusaurus/**
+**/.astro/**
