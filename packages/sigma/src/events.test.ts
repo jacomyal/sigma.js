@@ -210,9 +210,9 @@ describe("Sigma interaction events", () => {
 // -----------------------------------------------------------------------------
 //
 // These cover the "separate" path for both nodes and edges: clicking a
-// label ribbon/rect must fire `clickNodeLabel` / `clickEdgeLabel`. Node
-// and edge labels share LABEL_ID_OFFSET in the picking buffer;
-// disjointness comes from their distinct index ranges.
+// label ribbon/rect must fire `clickNodeLabel` / `clickEdgeLabel`. The two
+// label kinds each get their own contiguous range in the unified picking
+// allocation; disjointness comes from those ranges, not a magic offset.
 
 describe("Sigma label events", () => {
   interface LabelEventContext {

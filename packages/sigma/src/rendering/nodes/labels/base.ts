@@ -55,11 +55,6 @@ export abstract class LabelProgram<
   measureLabel?(text: string, fontSize: number, fontKey?: string): { width: number; height: number };
 
   /**
-   * Screen-space bounds for each label (for hit testing).
-   */
-  protected labelBounds: Map<string, { x: number; y: number; width: number; height: number }> = new Map();
-
-  /**
    * Total number of characters currently in the buffer.
    */
   protected totalCharacterCount = 0;
@@ -68,11 +63,6 @@ export abstract class LabelProgram<
    * Buffer capacity (in characters) - only reallocate when exceeded.
    */
   protected bufferCapacity = 0;
-
-  kill(): void {
-    this.labelBounds.clear();
-    super.kill();
-  }
 
   /**
    * Process a label and write its character data to the GPU buffer.
@@ -103,29 +93,6 @@ export abstract class LabelProgram<
    * @param charIndex - Index of character within the label text
    */
   protected abstract processCharacter(index: number, labelData: DataType, char: string, charIndex: number): void;
-
-  /**
-   * Get the label at a given screen position.
-   *
-   * Uses the cached screen-space bounds for efficient hit testing.
-   */
-  getLabelAtPosition(x: number, y: number): string | null {
-    for (const [labelKey, bounds] of this.labelBounds) {
-      if (x >= bounds.x && x <= bounds.x + bounds.width && y >= bounds.y && y <= bounds.y + bounds.height) {
-        return labelKey;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Update screen-space bounds for a label.
-   *
-   * Called during rendering to keep bounds in sync with camera.
-   */
-  protected updateLabelBounds(labelKey: string, screenX: number, screenY: number, width: number, height: number): void {
-    this.labelBounds.set(labelKey, { x: screenX, y: screenY, width, height });
-  }
 
   /**
    * Check if there's nothing to render.

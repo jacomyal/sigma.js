@@ -24,21 +24,11 @@ import { numberToGLSLFloat } from "../../utils";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
 import { LabelOptions, SDFShape } from "../types";
 
-// Label picking IDs are offset above the node+edge id range whenever any
-// interaction on a label is configured as `"separate"` (see
-// `hasAnySeparate` in core/label-events.ts). Node labels use
-// `nodeIndices[k] + LABEL_ID_OFFSET` and edge labels use
-// `edgeIndices[k] + LABEL_ID_OFFSET`; the two bands never collide because
-// sigma assigns disjoint index ranges to nodes ([1, graph.order]) and
-// edges ([graph.order + 1, graph.order + M]).
-// In pure-extend configurations the label rect keeps the raw parent id
-// instead, so `getNodeAtPosition` / `getEdgeAtPoint` find the parent
-// directly and the full 16M id space is available.
-// Combined node+edge count is therefore capped at ~8 million when the
-// offset is in use, well beyond what sigma can render at interactive
-// framerates. The picking framebuffer uses a 24-bit RGB id encoding, so
-// the offset must stay within [0, 2^24).
-export const LABEL_ID_OFFSET = 1 << 23;
+// Label picking IDs are allocated by core/interactive-kinds.ts when at least
+// one interaction on a label is configured as `"separate"`. The label
+// programs read their allocated range from `internals.pickingState.offsets`
+// and compute the IDs they write at render time. In pure-extend mode the
+// label rect writes the parent's id, so a hit resolves to the parent kind.
 
 // ============================================================================
 // Data type

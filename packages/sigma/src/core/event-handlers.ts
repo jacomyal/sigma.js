@@ -3,22 +3,23 @@
  * =======================
  *
  * Registers mouse/touch interaction handlers and graph event handlers on behalf
- * of sigma. Extracted here to shrink sigma.ts; sigma creates a context object
- * with bound methods and passes it to these functions.
+ * of sigma. Picking and event dispatch are uniform across interactive kinds:
+ * a single pixel read resolves to one `Hit`, the kind decides how the hit is
+ * routed per verb (e.g. labels reroute to the parent in "extend" mode), and
+ * the same enter/leave/click pipeline applies to every kind.
  *
  * @module
  */
 import Graph, { Attributes } from "graphology-types";
 
-import { Listener, MouseCoords, MouseInteraction, PlainObject, TouchCoords } from "../types";
+import { Listener, MouseCoords, MouseInteraction, PlainObject, SigmaEventPayload, TouchCoords } from "../types";
 import { cleanMouseCoords } from "./captors/captor";
 import MouseCaptor from "./captors/mouse";
 import TouchCaptor from "./captors/touch";
 import { EdgeGroupIndex } from "./edge-groups";
-import { hasAnyEnabled, resolveLabelMode } from "./label-events";
-import { SigmaInternals } from "./sigma-internals";
+import { Hit, eventName, eventPayload, isHitValid, resolveForVerb, setHover } from "./interactive-kinds";
+import { AnyInternals, SigmaInternals } from "./sigma-internals";
 
-// Partial refresh options (mirrors sigma's refresh() opts)
 type RefreshOpts = {
   partialGraph?: { nodes?: string[]; edges?: string[] };
   schedule?: boolean;
@@ -26,9 +27,22 @@ type RefreshOpts = {
 };
 
 /**
- * Everything the mouse/touch interaction handlers need from sigma.
- * Sigma creates this object inline with bound methods and direct property refs.
+ * Resolves the picking pixel at `event` to a hit, applies the kind's per-verb
+ * routing (extend/separate/false for labels, identity otherwise), and drops
+ * hits the kind rejects via `isHitValid` (e.g. hidden nodes).
  */
+function resolveEventHit(i: AnyInternals, event: { x: number; y: number }, verb: MouseInteraction): Hit | null {
+  let hit = i.getHitAtPosition(event);
+  if (hit) hit = resolveForVerb(i, hit, verb);
+  if (hit && !isHitValid(i, hit)) hit = null;
+  return hit;
+}
+
+function sameHit(a: Hit | null, b: Hit | null): boolean {
+  if (!a || !b) return a === b;
+  return a.kind === b.kind && a.key === b.key;
+}
+
 export function bindInteractionHandlers<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -42,113 +56,26 @@ export function bindInteractionHandlers<
   activeListeners.handleResize = () => internals.scheduleRefresh();
   window.addEventListener("resize", activeListeners.handleResize);
 
-  // Hover detection
+  // Hover detection: one resolution, one enter/leave transition.
   activeListeners.handleMove = (e: MouseCoords | TouchCoords): void => {
     const event = cleanMouseCoords(e);
-    const baseEvent = {
-      event,
-      preventSigmaDefault(): void {
-        event.preventSigmaDefault();
-      },
-    };
+    const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
 
     const { stateManager } = internals;
-    const { nodeLabelEvents, edgeLabelEvents } = internals.settings;
+    const hit = resolveEventHit(internals, event, "enter");
+    const prev = stateManager.hovered;
+    if (sameHit(prev, hit)) return;
 
-    let nodeToHover = internals.getNodeAtPosition(event);
-    let edgeToHover: string | null = null;
-    let labelToHover: { key: string; parentType: "node" | "edge" } | null = null;
-    if (!nodeToHover && (hasAnyEnabled(nodeLabelEvents) || hasAnyEnabled(edgeLabelEvents))) {
-      const labelHit = internals.getLabelAtPosition(event.x, event.y);
-      if (labelHit) {
-        const setting = labelHit.parentType === "node" ? nodeLabelEvents : edgeLabelEvents;
-        const mode = resolveLabelMode(setting, "enter");
-        if (mode === "extend") {
-          if (labelHit.parentType === "node") nodeToHover = labelHit.key;
-          else edgeToHover = labelHit.key;
-        } else if (mode === "separate") {
-          labelToHover = labelHit;
-        }
-      }
+    if (prev) {
+      setHover(internals, prev, false);
+      internals.emit(eventName(prev.kind, "leave"), eventPayload(prev, baseEvent));
     }
-
-    if (
-      nodeToHover &&
-      stateManager.hoveredNode !== nodeToHover &&
-      internals.nodeDataCache[nodeToHover]?.visibility !== "hidden"
-    ) {
-      if (stateManager.hoveredNode) {
-        const previousNode = stateManager.hoveredNode;
-        stateManager.setHoveredNode(nodeToHover);
-        internals.setNodeState(previousNode, { isHovered: false });
-        internals.emit("leaveNode", { ...baseEvent, node: previousNode });
-      } else {
-        stateManager.setHoveredNode(nodeToHover);
-      }
-      internals.setNodeState(nodeToHover, { isHovered: true });
-      internals.emit("enterNode", { ...baseEvent, node: nodeToHover });
-      internals.updateContainerCursor();
-      return;
+    stateManager.setHovered(hit);
+    if (hit) {
+      setHover(internals, hit, true);
+      internals.emit(eventName(hit.kind, "enter"), eventPayload(hit, baseEvent));
     }
-
-    if (stateManager.hoveredNode) {
-      if (nodeToHover !== stateManager.hoveredNode) {
-        const node = stateManager.hoveredNode;
-        stateManager.setHoveredNode(null);
-        internals.setNodeState(node, { isHovered: false });
-        internals.emit("leaveNode", { ...baseEvent, node });
-        internals.updateContainerCursor();
-        return;
-      }
-    }
-
-    if (internals.settings.enableEdgeEvents || edgeToHover) {
-      if (!edgeToHover && !stateManager.hoveredNode && internals.settings.enableEdgeEvents) {
-        edgeToHover = internals.getEdgeAtPoint(event.x, event.y);
-      }
-
-      if (edgeToHover !== stateManager.hoveredEdge) {
-        if (stateManager.hoveredEdge) {
-          internals.setEdgeState(stateManager.hoveredEdge, { isHovered: false });
-          internals.emit("leaveEdge", { ...baseEvent, edge: stateManager.hoveredEdge });
-        }
-        stateManager.setHoveredEdge(edgeToHover);
-        if (edgeToHover) {
-          internals.setEdgeState(edgeToHover, { isHovered: true });
-          internals.emit("enterEdge", { ...baseEvent, edge: edgeToHover });
-        }
-        internals.updateContainerCursor();
-      }
-    }
-
-    const prev = stateManager.hoveredLabel;
-    const unchanged =
-      (!prev && !labelToHover) ||
-      (!!prev && !!labelToHover && prev.key === labelToHover.key && prev.parentType === labelToHover.parentType);
-
-    if (!unchanged) {
-      if (prev) {
-        stateManager.setHoveredLabel(null);
-        if (prev.parentType === "node") {
-          internals.setNodeState(prev.key, { isLabelHovered: false });
-          internals.emit("leaveNodeLabel", { ...baseEvent, node: prev.key });
-        } else {
-          internals.setEdgeState(prev.key, { isLabelHovered: false });
-          internals.emit("leaveEdgeLabel", { ...baseEvent, edge: prev.key });
-        }
-      }
-      stateManager.setHoveredLabel(labelToHover);
-      if (labelToHover) {
-        if (labelToHover.parentType === "node") {
-          internals.setNodeState(labelToHover.key, { isLabelHovered: true });
-          internals.emit("enterNodeLabel", { ...baseEvent, node: labelToHover.key });
-        } else {
-          internals.setEdgeState(labelToHover.key, { isLabelHovered: true });
-          internals.emit("enterEdgeLabel", { ...baseEvent, edge: labelToHover.key });
-        }
-      }
-      internals.updateContainerCursor();
-    }
+    internals.updateContainerCursor();
   };
 
   // Drag movement (body-level, fires even outside the canvas)
@@ -173,114 +100,41 @@ export function bindInteractionHandlers<
       event.preventSigmaDefault();
     }
 
-    internals.emit("moveBody", {
-      event,
-      preventSigmaDefault(): void {
-        event.preventSigmaDefault();
-      },
-    });
+    internals.emit("moveBody", { event, preventSigmaDefault: () => event.preventSigmaDefault() });
   };
 
+  // Mouse leaves the canvas: emit a leave for whatever was hovered, then leaveStage.
   activeListeners.handleLeave = (e: MouseCoords | TouchCoords): void => {
     const event = cleanMouseCoords(e);
-    const baseEvent = {
-      event,
-      preventSigmaDefault(): void {
-        event.preventSigmaDefault();
-      },
-    };
+    const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
 
     const { stateManager } = internals;
-    if (stateManager.hoveredNode) {
-      const node = stateManager.hoveredNode;
-      stateManager.setHoveredNode(null);
-      internals.setNodeState(node, { isHovered: false });
-      internals.emit("leaveNode", { ...baseEvent, node });
-    }
-
-    if (internals.settings.enableEdgeEvents && stateManager.hoveredEdge) {
-      const edge = stateManager.hoveredEdge;
-      stateManager.setHoveredEdge(null);
-      internals.setEdgeState(edge, { isHovered: false });
-      internals.emit("leaveEdge", { ...baseEvent, edge });
-    }
-
-    if (stateManager.hoveredLabel) {
-      const prev = stateManager.hoveredLabel;
-      stateManager.setHoveredLabel(null);
-      if (prev.parentType === "node") {
-        internals.setNodeState(prev.key, { isLabelHovered: false });
-        internals.emit("leaveNodeLabel", { ...baseEvent, node: prev.key });
-      } else {
-        internals.setEdgeState(prev.key, { isLabelHovered: false });
-        internals.emit("leaveEdgeLabel", { ...baseEvent, edge: prev.key });
-      }
+    const prev = stateManager.hovered;
+    if (prev) {
+      stateManager.setHovered(null);
+      setHover(internals, prev, false);
+      internals.emit(eventName(prev.kind, "leave"), eventPayload(prev, baseEvent));
       internals.updateContainerCursor();
     }
-
     internals.emit("leaveStage", baseEvent);
   };
 
   activeListeners.handleEnter = (e: MouseCoords | TouchCoords): void => {
     const event = cleanMouseCoords(e);
-    internals.emit("enterStage", {
-      event,
-      preventSigmaDefault(): void {
-        event.preventSigmaDefault();
-      },
-    });
+    internals.emit("enterStage", { event, preventSigmaDefault: () => event.preventSigmaDefault() });
   };
 
-  const tryEmitLabel = (
-    eventType: MouseInteraction,
-    event: MouseCoords,
-    baseEvent: { event: MouseCoords; preventSigmaDefault(): void },
-  ): boolean => {
-    const { nodeLabelEvents, edgeLabelEvents } = internals.settings;
-    if (!hasAnyEnabled(nodeLabelEvents) && !hasAnyEnabled(edgeLabelEvents)) return false;
-    const hit = internals.getLabelAtPosition(event.x, event.y);
-    if (!hit) return false;
-    const setting = hit.parentType === "node" ? nodeLabelEvents : edgeLabelEvents;
-    const mode = resolveLabelMode(setting, eventType);
-    if (mode === false) return false;
-    if (mode === "extend") {
-      if (hit.parentType === "node") {
-        internals.emit(`${eventType}Node`, { ...baseEvent, node: hit.key });
-      } else {
-        internals.emit(`${eventType}Edge`, { ...baseEvent, edge: hit.key });
-      }
-    } else {
-      if (hit.parentType === "node") {
-        internals.emit(`${eventType}NodeLabel`, { ...baseEvent, node: hit.key });
-      } else {
-        internals.emit(`${eventType}EdgeLabel`, { ...baseEvent, edge: hit.key });
-      }
-    }
-    return true;
-  };
-
-  // Click-family events: route to node / label / edge / stage
-  const createInteractionListener = (eventType: MouseInteraction): ((e: MouseCoords | TouchCoords) => void) => {
+  // Click-family events: one resolved hit per verb. No hit → falls through to stage.
+  const createInteractionListener = (verb: MouseInteraction): ((e: MouseCoords | TouchCoords) => void) => {
     return (e) => {
       const event = cleanMouseCoords(e);
-      const baseEvent = {
-        event,
-        preventSigmaDefault: () => {
-          event.preventSigmaDefault();
-        },
-      };
-
-      const nodeAtPosition = internals.getNodeAtPosition(event);
-      if (nodeAtPosition) return internals.emit(`${eventType}Node`, { ...baseEvent, node: nodeAtPosition });
-
-      if (tryEmitLabel(eventType, event, baseEvent)) return;
-
-      if (internals.settings.enableEdgeEvents) {
-        const edge = internals.getEdgeAtPoint(event.x, event.y);
-        if (edge) return internals.emit(`${eventType}Edge`, { ...baseEvent, edge });
+      const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
+      const hit = resolveEventHit(internals, event, verb);
+      if (hit) {
+        internals.emit(eventName(hit.kind, verb), eventPayload(hit, baseEvent));
+        return;
       }
-
-      return internals.emit(`${eventType}Stage`, baseEvent);
+      internals.emit(`${verb}Stage`, baseEvent);
     };
   };
 
@@ -289,48 +143,38 @@ export function bindInteractionHandlers<
   activeListeners.handleDoubleClick = createInteractionListener("doubleClick");
   activeListeners.handleWheel = createInteractionListener("wheel");
 
-  // down: like the generic listener, but also arms the drag manager when a node is hit
+  // down: same as the generic listener, but also arms the drag manager on a node hit.
   activeListeners.handleDown = (e: MouseCoords | TouchCoords): void => {
     const event = cleanMouseCoords(e);
-    const baseEvent = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
+    const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
 
-    const nodeAtPosition = internals.getNodeAtPosition(event);
-    if (nodeAtPosition) {
-      if (internals.settings.enableNodeDrag) internals.dragManager.pendingNode = nodeAtPosition;
-      return internals.emit("downNode", { ...baseEvent, node: nodeAtPosition });
+    const hit = resolveEventHit(internals, event, "down");
+    if (hit) {
+      if (hit.kind === "node" && internals.settings.enableNodeDrag) {
+        internals.dragManager.pendingNode = hit.key;
+      }
+      internals.emit(eventName(hit.kind, "down"), eventPayload(hit, baseEvent));
+      return;
     }
-
-    if (tryEmitLabel("down", event, baseEvent)) return;
-
-    if (internals.settings.enableEdgeEvents) {
-      const edge = internals.getEdgeAtPoint(event.x, event.y);
-      if (edge) return internals.emit("downEdge", { ...baseEvent, edge });
-    }
-
-    return internals.emit("downStage", baseEvent);
+    internals.emit("downStage", baseEvent);
   };
 
-  // up: like the generic listener, but also ends any active drag session
+  // up: same as the generic listener, but also ends any active drag session.
   activeListeners.handleUp = (e: MouseCoords | TouchCoords): void => {
     const event = cleanMouseCoords(e);
-    const baseEvent = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
+    const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
 
     const dragResult = internals.dragManager.end();
     if (dragResult) {
       internals.emit("nodeDragEnd", { node: dragResult.node, allDraggedNodes: dragResult.allNodes, ...baseEvent });
     }
 
-    const nodeAtPosition = internals.getNodeAtPosition(event);
-    if (nodeAtPosition) return internals.emit("upNode", { ...baseEvent, node: nodeAtPosition });
-
-    if (tryEmitLabel("up", event, baseEvent)) return;
-
-    if (internals.settings.enableEdgeEvents) {
-      const edge = internals.getEdgeAtPoint(event.x, event.y);
-      if (edge) return internals.emit("upEdge", { ...baseEvent, edge });
+    const hit = resolveEventHit(internals, event, "up");
+    if (hit) {
+      internals.emit(eventName(hit.kind, "up"), eventPayload(hit, baseEvent));
+      return;
     }
-
-    return internals.emit("upStage", baseEvent);
+    internals.emit("upStage", baseEvent);
   };
 
   mouseCaptor.on("mousemove", activeListeners.handleMove);
@@ -353,9 +197,6 @@ export function bindInteractionHandlers<
   touchCaptor.on("touchmove", activeListeners.handleMoveBody);
 }
 
-/**
- * Everything the graph event handlers need from sigma.
- */
 export function bindGraphHandlers(
   ctx: {
     graph: Graph;

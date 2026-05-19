@@ -17,7 +17,7 @@ export { EdgeProgram } from "./edges";
 export type { EdgeProgramType } from "./edges";
 export { Program } from "./program";
 export type { ProgramType } from "./program";
-export { LabelProgram, LabelBackgroundProgram, LABEL_ID_OFFSET, createLabelBackgroundProgram } from "./nodes/labels";
+export { LabelProgram, LabelBackgroundProgram, createLabelBackgroundProgram } from "./nodes/labels";
 export type { LabelProgramType, LabelBackgroundProgramType, LabelBackgroundData } from "./nodes/labels";
 export { BackdropProgram } from "./nodes/backdrops";
 export type { BackdropProgramType, BackdropDisplayData } from "./nodes/backdrops";

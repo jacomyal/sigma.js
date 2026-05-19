@@ -12,7 +12,6 @@ import { LabelAttachmentContext } from "../primitives";
 import {
   BackdropDisplayData,
   EdgeLabelBackgroundData,
-  LABEL_ID_OFFSET,
   LabelBackgroundData,
   POSITION_MODE_MAP,
   getShapeId,
@@ -28,7 +27,7 @@ import {
   multiplyVec2,
   parseFontString,
 } from "../utils";
-import { hasAnyEnabled, hasAnySeparate } from "./label-events";
+import { KIND_REGISTRY, pickingIdOf } from "./interactive-kinds";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./labels";
 import { SigmaInternals } from "./sigma-internals";
 
@@ -400,13 +399,10 @@ export class LabelRenderer<
 
   /** Render label background rectangles (picking + optional visual) for displayed node labels. */
   renderLabelBackgrounds(params: RenderParams, depth?: string): void {
-    const { labelBackgroundProgram, nodeDataCache, nodeIndices, nodeShapeMap, nodeGlobalShapeIds, settings } =
-      this.internals;
+    const { labelBackgroundProgram, nodeDataCache, nodeShapeMap, nodeGlobalShapeIds } = this.internals;
     if (!labelBackgroundProgram) return;
 
-    const { nodeLabelEvents } = settings;
-    const eventsEnabled = hasAnyEnabled(nodeLabelEvents);
-    const useOffset = hasAnySeparate(nodeLabelEvents);
+    const eventsEnabled = KIND_REGISTRY.nodeLabel.writesPickingThisFrame(this.internals);
 
     const nodes: string[] = [];
     for (const key of this.displayedNodeLabels) {
@@ -425,7 +421,6 @@ export class LabelRenderer<
     for (let i = 0; i < nodes.length; i++) {
       const key = nodes[i];
       const data = nodeDataCache[key];
-      const nodeIndex = nodeIndices[key];
 
       const { width: labelWidth, height: labelHeight } = this.measureNodeLabel(data);
 
@@ -437,7 +432,11 @@ export class LabelRenderer<
         shapeId = getShapeId(data.shape || "circle");
       }
 
-      const pickingIndex = useOffset ? nodeIndex + LABEL_ID_OFFSET : nodeIndex;
+      // In separate mode the label kind has its own range; otherwise the rect
+      // writes the parent node's picking ID so a hit resolves as a node.
+      const pickingIndex =
+        pickingIdOf(this.internals.pickingState, "nodeLabel", key) ||
+        pickingIdOf(this.internals.pickingState, "node", key);
       const bgColor = data.labelBackgroundColor ? floatColor(data.labelBackgroundColor) : floatColor("transparent");
 
       const bgData: LabelBackgroundData = {
@@ -495,8 +494,7 @@ export class LabelRenderer<
 
   /** Render label attachments (icons, badges, etc.) after nodes but before labels. */
   renderAttachments(params: RenderParams, depth?: string): void {
-    const { attachmentManager, attachmentProgram, nodeDataCache, nodesWithBackdrop, nodeIndices, pixelRatio } =
-      this.internals;
+    const { attachmentManager, attachmentProgram, nodeDataCache, nodesWithBackdrop, pixelRatio } = this.internals;
     if (!attachmentManager || !attachmentProgram) return;
 
     let validCount = 0;
@@ -512,8 +510,8 @@ export class LabelRenderer<
       const entry = attachmentManager.getEntry(key, data.labelAttachment);
       if (!entry) continue;
 
-      const nodeIndex = nodeIndices[key];
-      if (nodeIndex === undefined) continue;
+      const nodeIndex = pickingIdOf(this.internals.pickingState, "node", key);
+      if (nodeIndex === 0) continue;
 
       const { width: labelWidth, height: labelHeight } = this.measureNodeLabel(data);
       const positionMode = POSITION_MODE_MAP[data.labelPosition || "right"] ?? 0;
@@ -555,9 +553,10 @@ export class LabelRenderer<
       graph.filterNodes((node) => stateManager.getNodeState(node).isHighlighted),
     );
 
+    const hovered = stateManager.hovered;
     const list = edgeLabelsToDisplayFromNodes({
       graph,
-      hoveredNode: stateManager.hoveredNode,
+      hoveredNode: hovered?.kind === "node" ? hovered.key : null,
       displayedNodeLabels: this.displayedNodeLabels,
       highlightedNodes,
     });
@@ -684,20 +683,10 @@ export class LabelRenderer<
    * via `pickingFrameBuffer: null`.
    */
   renderEdgeLabelBackgrounds(params: RenderParams, depth?: string): void {
-    const {
-      edgeLabelBackgroundProgram,
-      edgeLabelProgram,
-      edgeDataCache,
-      edgeIndices,
-      primitives,
-      edgeDataTexture,
-      settings,
-    } = this.internals;
+    const { edgeLabelBackgroundProgram, edgeLabelProgram, edgeDataCache, primitives, edgeDataTexture } = this.internals;
     if (!edgeLabelBackgroundProgram || !edgeLabelProgram || !edgeDataTexture) return;
 
-    const { edgeLabelEvents } = settings;
-    const eventsEnabled = hasAnyEnabled(edgeLabelEvents);
-    const useOffset = hasAnySeparate(edgeLabelEvents);
+    const eventsEnabled = KIND_REGISTRY.edgeLabel.writesPickingThisFrame(this.internals);
     const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;
     const defaultEdgeLabelPosition = "over" as const;
 
@@ -723,8 +712,9 @@ export class LabelRenderer<
       const position = edgeData.labelPosition ?? defaultEdgeLabelPosition;
       const positionMode = typeof position === "string" ? (EDGE_POSITION_MODE_MAP[position] ?? 0) : 0;
 
-      const edgePickingIndex = edgeIndices[edge];
-      const pickingIndex = useOffset ? edgePickingIndex + LABEL_ID_OFFSET : edgePickingIndex;
+      const pickingIndex =
+        pickingIdOf(this.internals.pickingState, "edgeLabel", edge) ||
+        pickingIdOf(this.internals.pickingState, "edge", edge);
       const bgColor = edgeData.labelBackgroundColor
         ? floatColor(edgeData.labelBackgroundColor)
         : floatColor("transparent");

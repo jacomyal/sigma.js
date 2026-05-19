@@ -21,7 +21,7 @@ import {
   createNodeState,
 } from "../types/styles";
 import { hasNewPartialProps } from "../utils";
-import { LabelHit } from "./sigma-internals";
+import { Hit, KindName, kindsDependingOn } from "./interactive-kinds";
 
 export class StateManager<NS = {}, ES = {}, GS = {}> {
   // Per-item state maps (lazily populated on first access).
@@ -31,10 +31,8 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
   // Graph-level state, kept up to date by updateGraphStateFrom* methods.
   graphState: FullGraphState<GS>;
 
-  // Hover tracking: at most one hovered node, edge, and label at a time.
-  hoveredNode: string | null = null;
-  hoveredEdge: string | null = null;
-  hoveredLabel: LabelHit | null = null;
+  // At most one item is hovered at a time, of any kind.
+  hovered: Hit | null = null;
 
   // Dirty sets consumed by sigma's refreshState / render cycle.
   dirtyNodes: Set<string> = new Set();
@@ -140,31 +138,28 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     }
   }
 
-  // Lifecycle
+  // Lifecycle: when an item is removed, clear hover for that item and any
+  // dependent kind (e.g. a node's removal clears both `node` and `nodeLabel`).
   removeNode(key: string): void {
     this.nodeStates.delete(key);
     this.dirtyNodes.delete(key);
-    if (this.hoveredNode === key) this.hoveredNode = null;
-    if (this.hoveredLabel?.parentType === "node" && this.hoveredLabel.key === key) this.hoveredLabel = null;
+    this.clearHoveredFor("node", key);
   }
   removeEdge(key: string): void {
     this.edgeStates.delete(key);
     this.dirtyEdges.delete(key);
-    if (this.hoveredEdge === key) this.hoveredEdge = null;
-    if (this.hoveredLabel?.parentType === "edge" && this.hoveredLabel.key === key) this.hoveredLabel = null;
+    this.clearHoveredFor("edge", key);
   }
 
   clearNodes(): void {
     this.nodeStates.clear();
     this.dirtyNodes.clear();
-    this.hoveredNode = null;
-    if (this.hoveredLabel?.parentType === "node") this.hoveredLabel = null;
+    this.clearHoveredForKinds(kindsDependingOn("node"));
   }
   clearEdges(): void {
     this.edgeStates.clear();
     this.dirtyEdges.clear();
-    this.hoveredEdge = null;
-    if (this.hoveredLabel?.parentType === "edge") this.hoveredLabel = null;
+    this.clearHoveredForKinds(kindsDependingOn("edge"));
   }
   resetGraphState(): void {
     this.graphState = createGraphState<GS>(this.customGraphStateDefaults);
@@ -177,15 +172,17 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.graphStateChanged = false;
   }
 
-  // Hover tracking — simple setters so sigma doesn't write hover fields directly.
-  setHoveredNode(key: string | null): void {
-    this.hoveredNode = key;
+  setHovered(hit: Hit | null): void {
+    this.hovered = hit;
   }
-  setHoveredEdge(key: string | null): void {
-    this.hoveredEdge = key;
+
+  private clearHoveredFor(target: KindName, key: string): void {
+    if (this.hovered && this.hovered.key === key && kindsDependingOn(target).includes(this.hovered.kind)) {
+      this.hovered = null;
+    }
   }
-  setHoveredLabel(hit: LabelHit | null): void {
-    this.hoveredLabel = hit;
+  private clearHoveredForKinds(kinds: KindName[]): void {
+    if (this.hovered && kinds.includes(this.hovered.kind)) this.hovered = null;
   }
 
   // Graph flag computation
@@ -202,7 +199,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     }
 
     // Also check edges for hover
-    if (!hasHovered && this.hoveredEdge) hasHovered = true;
+    if (!hasHovered && this.hovered?.kind === "edge") hasHovered = true;
 
     const isIdle = !this.graphState.isPanning && !this.graphState.isZooming && !isDragging;
 
@@ -218,7 +215,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.graphState = { ...this.graphState, hasHovered, hasHighlighted, isDragging, isIdle };
   }
   updateGraphStateFromEdges(): void {
-    let hasHovered = this.hoveredNode !== null;
+    let hasHovered = this.hovered?.kind === "node";
 
     if (!hasHovered) {
       for (const [, state] of this.edgeStates) {
@@ -242,35 +239,36 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.graphStateFlagsDirty = false;
   }
 
-  // Hover tracking
-  updateHoveredNodeTracking(key: string, oldState: FullNodeState<NS>, newState: FullNodeState<NS>): void {
+  // When `isHovered` flips on a node/edge, keep the top-level `hovered` slot
+  // consistent (one body-hovered item at a time).
+  private updateHoveredNodeTracking(key: string, oldState: FullNodeState<NS>, newState: FullNodeState<NS>): void {
     if (oldState.isHovered === newState.isHovered) return;
 
     if (newState.isHovered) {
-      // Clear previous hovered node if different
-      if (this.hoveredNode && this.hoveredNode !== key) {
-        const prevState = this.getNodeState(this.hoveredNode);
-        this.nodeStates.set(this.hoveredNode, { ...prevState, isHovered: false });
-        this.dirtyNodes.add(this.hoveredNode);
+      if (this.hovered?.kind === "node" && this.hovered.key !== key) {
+        const prevKey = this.hovered.key;
+        const prevState = this.getNodeState(prevKey);
+        this.nodeStates.set(prevKey, { ...prevState, isHovered: false });
+        this.dirtyNodes.add(prevKey);
       }
-      this.hoveredNode = key;
-    } else if (this.hoveredNode === key) {
-      this.hoveredNode = null;
+      this.hovered = { kind: "node", key };
+    } else if (this.hovered?.kind === "node" && this.hovered.key === key) {
+      this.hovered = null;
     }
   }
-  updateHoveredEdgeTracking(key: string, oldState: FullEdgeState<ES>, newState: FullEdgeState<ES>): void {
+  private updateHoveredEdgeTracking(key: string, oldState: FullEdgeState<ES>, newState: FullEdgeState<ES>): void {
     if (oldState.isHovered === newState.isHovered) return;
 
     if (newState.isHovered) {
-      // Clear previous hovered edge if different
-      if (this.hoveredEdge && this.hoveredEdge !== key) {
-        const prevState = this.getEdgeState(this.hoveredEdge);
-        this.edgeStates.set(this.hoveredEdge, { ...prevState, isHovered: false });
-        this.dirtyEdges.add(this.hoveredEdge);
+      if (this.hovered?.kind === "edge" && this.hovered.key !== key) {
+        const prevKey = this.hovered.key;
+        const prevState = this.getEdgeState(prevKey);
+        this.edgeStates.set(prevKey, { ...prevState, isHovered: false });
+        this.dirtyEdges.add(prevKey);
       }
-      this.hoveredEdge = key;
-    } else if (this.hoveredEdge === key) {
-      this.hoveredEdge = null;
+      this.hovered = { kind: "edge", key };
+    } else if (this.hovered?.kind === "edge" && this.hovered.key === key) {
+      this.hovered = null;
     }
   }
 }

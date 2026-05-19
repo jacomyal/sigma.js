@@ -98,7 +98,8 @@ describe("Sigma mouse management", () => {
 
     await userEvent.hover(container, { position, timeout: 5000 });
     expect(triggeredEventsCount).toBe(1);
-    expect(sigma["stateManager"].hoveredNode).toBe("n1");
+    expect(sigma["stateManager"].hovered?.key).toBe("n1");
+    expect(sigma["stateManager"].hovered?.kind).toBe("node");
   });
 
   test<SigmaTestContext>("it should not throw when `setGraph` is called while a node is hovered (issue #1486)", async ({

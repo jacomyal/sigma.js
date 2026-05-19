@@ -27,13 +27,17 @@ import { Settings } from "../settings";
 import { CameraState, Coordinates, Dimensions, EdgeDisplayData, NodeDisplayData } from "../types";
 import { BaseEdgeState, BaseNodeState } from "../types/styles";
 import { DragManager } from "./drag-manager";
+import type { Hit, PickingState } from "./interactive-kinds";
 import { StyleAnalysis } from "./styles";
 
-/** A picking hit on a label, identifying its parent item. */
-export interface LabelHit {
-  key: string;
-  parentType: "node" | "edge";
-}
+/**
+ * Variance escape hatch for code that operates on internals without caring
+ * about the concrete N/E/G types — picking, hover, event dispatch. Use this
+ * in signatures where a specific `SigmaInternals<N, E, G>` should flow in
+ * without a cast.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyInternals = SigmaInternals<any, any, any>;
 
 export type SigmaInternals<
   N extends Attributes = Attributes,
@@ -46,8 +50,6 @@ export type SigmaInternals<
   nodesWithForcedLabels: Set<string>;
   nodesWithBackdrop: Set<string>;
   edgesWithForcedLabels: Set<string>;
-  nodeIndices: Record<string, number>;
-  edgeIndices: Record<string, number>;
   // Settings and configuration
   settings: Settings;
   primitives: PrimitivesDeclaration | null;
@@ -55,16 +57,14 @@ export type SigmaInternals<
   // Graph and managers
   graph: Graph<N, E, G>;
   stateManager: {
-    hoveredNode: string | null;
-    hoveredEdge: string | null;
-    hoveredLabel: LabelHit | null;
-    setHoveredNode(key: string | null): void;
-    setHoveredEdge(key: string | null): void;
-    setHoveredLabel(hit: LabelHit | null): void;
+    hovered: Hit | null;
+    setHovered(hit: Hit | null): void;
     getNodeState(key: string): BaseNodeState;
   };
   dragManager: DragManager;
   nodeStyleAnalysis: StyleAnalysis;
+  // Picking state (rebuilt after each indexation)
+  pickingState: PickingState;
   // WebGL programs
   labelProgram: LabelProgram<string, N, E, G> | null;
   edgeLabelProgram: EdgeLabelProgram<string, N, E, G> | null;
@@ -82,9 +82,7 @@ export type SigmaInternals<
   getGraphDimensions(): Dimensions;
   getStagePadding(): number;
   getCameraState(): CameraState;
-  getNodeAtPosition(pos: Coordinates): string | null;
-  getEdgeAtPoint(x: number, y: number): string | null;
-  getLabelAtPosition(x: number, y: number): LabelHit | null;
+  getHitAtPosition(pos: Coordinates): Hit | null;
   setNodeState(key: string, state: Partial<BaseNodeState>): void;
   setEdgeState(key: string, state: Partial<BaseEdgeState>): void;
   updateContainerCursor(): void;

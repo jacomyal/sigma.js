@@ -11,10 +11,20 @@ import TouchCaptor from "./core/captors/touch";
 import { DragManager } from "./core/drag-manager";
 import { EdgeGroupIndex } from "./core/edge-groups";
 import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers } from "./core/event-handlers";
-import { hasAnyEnabled as hasAnyLabelEventEnabled } from "./core/label-events";
+import {
+  Hit,
+  KIND_REGISTRY,
+  PickingState,
+  allocateLabelIds,
+  createPickingState,
+  getCursor,
+  pickingIdOf,
+  registerItem,
+  resetKind,
+} from "./core/interactive-kinds";
 import { LabelRenderer } from "./core/label-renderer";
 import { SDFAtlasManager } from "./core/sdf-atlas";
-import { LabelHit, SigmaInternals } from "./core/sigma-internals";
+import { SigmaInternals } from "./core/sigma-internals";
 import { StateManager } from "./core/state-manager";
 import {
   ResolvedStageStyle,
@@ -44,7 +54,6 @@ import {
   EdgeLabelProgram,
   EdgePath,
   EdgeProgram,
-  LABEL_ID_OFFSET,
   LabelBackgroundProgram,
   LabelBackgroundProgramType,
   LabelProgram,
@@ -167,9 +176,9 @@ export default class Sigma<
 
   // Cache:
   private graphToViewportRatio = 1;
-  private nodeItemIDsIndex: Record<number, string> = {};
-  private edgeItemIDsIndex: Record<number, string> = {};
-  private labelItemIDsIndex: Record<number, LabelHit> = {};
+  // Sole source of truth for picking-ID encoding. The label and partial-refresh
+  // paths query this via `pickingIdOf`; nothing else in sigma touches IDs.
+  private pickingState: PickingState = createPickingState();
   private prevNodeVisibilities: Record<string, string | undefined> = {};
 
   // Starting dimensions
@@ -460,8 +469,6 @@ export default class Sigma<
       nodesWithForcedLabels: new Set<string>(),
       nodesWithBackdrop: new Set<string>(),
       edgesWithForcedLabels: new Set<string>(),
-      nodeIndices: {},
-      edgeIndices: {},
       settings: resolvedSettings,
       primitives: resolvedPrimitives,
       pixelRatio: getPixelRatio(),
@@ -469,6 +476,7 @@ export default class Sigma<
       stateManager: this.stateManager,
       dragManager,
       nodeStyleAnalysis,
+      pickingState: this.pickingState,
       labelProgram,
       edgeLabelProgram,
       edgeLabelBackgroundProgram,
@@ -484,9 +492,7 @@ export default class Sigma<
       getGraphDimensions: () => this.getGraphDimensions(),
       getStagePadding: () => this.getStagePadding(),
       getCameraState: () => this.camera.getState(),
-      getNodeAtPosition: (pos) => this.getNodeAtPosition(pos),
-      getEdgeAtPoint: (x, y) => this.getEdgeAtPoint(x, y),
-      getLabelAtPosition: (x, y) => this.getLabelAtPosition(x, y),
+      getHitAtPosition: (pos) => this.getHitAtPosition(pos),
       setNodeState: (key, state) => this.setNodeState(key, state),
       setEdgeState: (key, state) => this.setEdgeState(key, state),
       updateContainerCursor: () => this.updateContainerCursor(),
@@ -637,10 +643,11 @@ export default class Sigma<
   }
 
   /**
-   * Method that returns the closest node to a given position.
+   * Returns the topmost pickable hit at a given viewport position, by reading
+   * one pixel of the picking framebuffer and looking it up in the unified
+   * picking table. Returns null if the pixel is empty.
    */
-  private getNodeAtPosition(position: Coordinates): string | null {
-    const { x, y } = position;
+  private getHitAtPosition(position: Coordinates): Hit | null {
     const gl = this.webGLContext!;
 
     // Read from picking framebuffer (scaled by downSizingRatio)
@@ -649,13 +656,13 @@ export default class Sigma<
     const color = getPixelColor(
       gl,
       this.pickingFrameBuffer,
-      x,
-      y,
+      position.x,
+      position.y,
       this.internals.pixelRatio,
       this.internals.settings.pickingDownSizingRatio,
     );
     const index = colorToIndex(...color);
-    return this.nodeItemIDsIndex[index] ?? null;
+    return this.pickingState.lookup[index] ?? null;
   }
 
   private bindEventHandlers(): this {
@@ -698,44 +705,6 @@ export default class Sigma<
    */
   private unbindGraphHandlers() {
     unbindGraphHandlers(this.internals.graph, this.activeListeners);
-  }
-
-  /**
-   * Method looking for an edge colliding with a given point at (x, y). Returns
-   * the key of the edge if any, or null else.
-   */
-  private getEdgeAtPoint(x: number, y: number): string | null {
-    const gl = this.webGLContext!;
-
-    // Read from picking framebuffer (scaled by downSizingRatio)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
-
-    const color = getPixelColor(
-      gl,
-      this.pickingFrameBuffer,
-      x,
-      y,
-      this.internals.pixelRatio,
-      this.internals.settings.pickingDownSizingRatio,
-    );
-    const index = colorToIndex(...color);
-    return this.edgeItemIDsIndex[index] ?? null;
-  }
-
-  private getLabelAtPosition(x: number, y: number): LabelHit | null {
-    if (this.labelRenderer.displayedNodeLabels.size === 0 && this.labelRenderer.displayedEdgeLabels.size === 0) {
-      return null;
-    }
-    const color = getPixelColor(
-      this.webGLContext!,
-      this.pickingFrameBuffer,
-      x,
-      y,
-      this.internals.pixelRatio,
-      this.internals.settings.pickingDownSizingRatio,
-    );
-    const index = colorToIndex(...color);
-    return this.labelItemIDsIndex[index] ?? null;
   }
 
   private getNodeShapeId(data: NodeDisplayData): number {
@@ -788,10 +757,8 @@ export default class Sigma<
     // TODO: it's probably better to do this explicitly or on resizes for layout and anims
     this.labelRenderer.labelGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
 
-    const nodeIndices: typeof this.internals.nodeIndices = {};
-    const nodeItemIDsIndex: typeof this.nodeItemIDsIndex = {};
-    let incrID = 1;
     let visibilityChanged = false;
+    resetKind(this.pickingState, "node");
 
     const nodes = graph.nodes();
 
@@ -832,17 +799,12 @@ export default class Sigma<
       fragments[fragments.length - 1].count += items.size;
       for (const node of items) {
         this.nodeBaseDepth[node] = depth;
-        nodeIndices[node] = incrID;
-        nodeItemIDsIndex[incrID] = node;
-        incrID++;
         this.nodeProgram.allocateNode?.(node);
-        this.addNodeToProgram(node, nodeIndices[node], nodeProcessCount++);
+        registerItem(this.pickingState, "node", node);
+        this.addNodeToProgram(node, nodeProcessCount++);
       }
     });
     this.nodeProgram.invalidateBuffers();
-
-    this.nodeItemIDsIndex = nodeItemIDsIndex;
-    this.internals.nodeIndices = nodeIndices;
 
     // Track visibility so the next processNodes call can detect changes
     for (let i = 0, l = nodes.length; i < l; i++) {
@@ -860,7 +822,8 @@ export default class Sigma<
 
   /**
    * Processes all edge data: updates the edge data texture and vertex buffer.
-   * Node picking IDs occupy 1..graph.order, so edge IDs start at graph.order+1.
+   * Picking IDs are assigned by the picking allocator, which reserves edges
+   * a contiguous range right after the node range.
    * Must be called after processNodes() so node texture indices are available.
    */
   private processEdges(): void {
@@ -871,10 +834,7 @@ export default class Sigma<
     this.edgeProgram.reallocate(edges.length);
 
     let edgeProcessCount = 0;
-    const edgeIndices: typeof this.internals.edgeIndices = {};
-    const edgeItemIDsIndex: typeof this.edgeItemIDsIndex = {};
-    // Node IDs occupy 1..graph.order, so edges start after
-    let incrID = graph.order + 1;
+    resetKind(this.pickingState, "edge");
 
     const maxDepthLevels = settings.maxDepthLevels;
     this.depthRanges.edges = {};
@@ -888,30 +848,11 @@ export default class Sigma<
       fragments[fragments.length - 1].count += items.size;
       for (const edge of items) {
         this.edgeBaseDepth[edge] = depth;
-        edgeIndices[edge] = incrID;
-        edgeItemIDsIndex[incrID] = edge;
-        incrID++;
-        this.addEdgeToProgram(edge, edgeIndices[edge], edgeProcessCount++);
+        registerItem(this.pickingState, "edge", edge);
+        this.addEdgeToProgram(edge, edgeProcessCount++);
       }
     });
     this.edgeProgram.invalidateBuffers();
-
-    this.edgeItemIDsIndex = edgeItemIDsIndex;
-    this.internals.edgeIndices = edgeIndices;
-  }
-
-  // Rebuild the label picking index from current node + edge index maps.
-  // Node and edge ranges are disjoint ([1, graph.order] and [graph.order + 1,
-  // graph.order + M]), so sharing LABEL_ID_OFFSET never collides.
-  private rebuildLabelItemIDsIndex(): void {
-    const labelItemIDsIndex: typeof this.labelItemIDsIndex = {};
-    for (const node in this.internals.nodeIndices) {
-      labelItemIDsIndex[this.internals.nodeIndices[node] + LABEL_ID_OFFSET] = { key: node, parentType: "node" };
-    }
-    for (const edge in this.internals.edgeIndices) {
-      labelItemIDsIndex[this.internals.edgeIndices[edge] + LABEL_ID_OFFSET] = { key: edge, parentType: "edge" };
-    }
-    this.labelItemIDsIndex = labelItemIDsIndex;
   }
 
   private getDepthOffset(depth: string): number {
@@ -1093,10 +1034,9 @@ export default class Sigma<
       this.internals.attachmentManager?.clear();
       const visibilityChanged = this.processNodes();
       if (this.pendingProcess === "full" || visibilityChanged) this.processEdges();
-      // Rebuild unconditionally, against current node + edge indices. On a
-      // nodes-only refresh processEdges is skipped but the cached edgeIndices
-      // are still valid, so edge-label picking keeps working.
-      this.rebuildLabelItemIDsIndex();
+      // Allocate label IDs after node/edge IDs. On a nodes-only refresh the
+      // cached edge IDs in the picking state are preserved.
+      allocateLabelIds(this.pickingState, this.internals);
       this.pendingProcess = "none";
       this.emit("afterProcess");
     }
@@ -1140,8 +1080,8 @@ export default class Sigma<
 
     this.frameId++;
     const params: RenderParams = this.getRenderParams();
-    // When edge events are disabled, skip the edge picking pass to avoid GPU overhead
-    const edgeParams: RenderParams = this.internals.settings.enableEdgeEvents
+    // Skip the edge picking pass when the edge kind isn't pickable this frame.
+    const edgeParams: RenderParams = KIND_REGISTRY.edge.writesPickingThisFrame(this.internals)
       ? params
       : { ...params, pickingFrameBuffer: null };
     this.labelRenderer.resetFrame();
@@ -1217,7 +1157,7 @@ export default class Sigma<
       // GPU work.
       if (this.internals.settings.renderEdgeLabels && (!this.internals.settings.hideLabelsOnMove || !moving)) {
         this.labelRenderer.renderEdgeLabelBackgrounds(
-          hasAnyLabelEventEnabled(this.internals.settings.edgeLabelEvents)
+          KIND_REGISTRY.edgeLabel.writesPickingThisFrame(this.internals)
             ? params
             : { ...params, pickingFrameBuffer: null },
           depth,
@@ -1249,7 +1189,7 @@ export default class Sigma<
       // Label backgrounds for this depth (after nodes so picking overwrites nodes in "over" mode).
       // Picking is skipped when node label events are disabled; transparent nodes discard in the visual pass.
       this.labelRenderer.renderLabelBackgrounds(
-        hasAnyLabelEventEnabled(this.internals.settings.nodeLabelEvents)
+        KIND_REGISTRY.nodeLabel.writesPickingThisFrame(this.internals)
           ? params
           : { ...params, pickingFrameBuffer: null },
         depth,
@@ -1573,8 +1513,6 @@ export default class Sigma<
     this.edgeProgramIndex = {};
     this.internals.nodesWithForcedLabels = new Set<string>();
     this.internals.nodesWithBackdrop = new Set<string>();
-    this.nodeItemIDsIndex = {};
-    this.labelItemIDsIndex = {};
     this.prevNodeVisibilities = {};
     // Clear bucket data
     this.itemBuckets.nodes.clearAll();
@@ -1592,8 +1530,7 @@ export default class Sigma<
     this.edgeProgramIndex = {};
     this.edgeTextureIndexCache = {};
     this.internals.edgesWithForcedLabels = new Set<string>();
-    this.edgeItemIDsIndex = {};
-    this.internals.edgeIndices = {};
+    resetKind(this.pickingState, "edge");
     // Clear bucket data
     this.itemBuckets.edges.clearAll();
     this.zIndexCache.edges = {};
@@ -1643,29 +1580,29 @@ export default class Sigma<
   }
 
   /**
-   * Add the node data to its program.
+   * Add the node data to its program. The picking ID is looked up from the
+   * picking state (callers shouldn't pass it).
    * @private
    * @param node The node's graphology ID
-   * @param fingerprint A fingerprint used to identity the node with picking
    * @param position The index where to place the node in the program
    */
-  private addNodeToProgram(node: string, fingerprint: number, position: number): void {
+  private addNodeToProgram(node: string, position: number): void {
     const data = this.internals.nodeDataCache[node];
     this.internals.nodeDataTexture!.allocate(node);
     this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, this.getNodeShapeId(data));
     const textureIndex = this.internals.nodeDataTexture!.getIndex(node);
-    this.nodeProgram.process(fingerprint, position, data, textureIndex, node);
+    this.nodeProgram.process(pickingIdOf(this.pickingState, "node", node), position, data, textureIndex, node);
     this.nodeProgramIndex[node] = position;
   }
 
   /**
-   * Add the edge data to its program.
+   * Add the edge data to its program. The picking ID is looked up from the
+   * picking state (callers shouldn't pass it).
    * @private
    * @param edge The edge's graphology ID
-   * @param fingerprint A fingerprint used to identity the edge with picking
    * @param position The index where to place the edge in the program
    */
-  private addEdgeToProgram(edge: string, fingerprint: number, position: number): void {
+  private addEdgeToProgram(edge: string, position: number): void {
     const data = this.internals.edgeDataCache[edge];
     const source = this.internals.graph.source(edge);
     const target = this.internals.graph.target(edge);
@@ -1694,7 +1631,7 @@ export default class Sigma<
     );
 
     this.edgeProgram.process(
-      fingerprint,
+      pickingIdOf(this.pickingState, "edge", edge),
       position,
       this.internals.nodeDataCache[source],
       this.internals.nodeDataCache[target],
@@ -1939,7 +1876,7 @@ export default class Sigma<
   ): this {
     if (!this.depthLayers.includes(depth))
       throw new Error(
-        `Sigma: cannot add custom layer program at depth "${depth}" — ` +
+        `Sigma: cannot add custom layer program at depth "${depth}", ` +
           `it must be declared in primitives.depthLayers. Current layers: ${this.depthLayers.join(", ")}`,
       );
     this.customLayerPrograms.set(depth, program);
@@ -2009,11 +1946,13 @@ export default class Sigma<
   setGraph(graph: Graph<N, E, G>): this {
     if (graph === this.internals.graph) return this;
 
-    // Check hoveredNode and hoveredEdge
-    if (this.stateManager.hoveredNode && !graph.hasNode(this.stateManager.hoveredNode))
-      this.stateManager.setHoveredNode(null);
-    if (this.stateManager.hoveredEdge && !graph.hasEdge(this.stateManager.hoveredEdge))
-      this.stateManager.setHoveredEdge(null);
+    // If the previously hovered item no longer exists in the new graph, clear it.
+    const hit = this.stateManager.hovered;
+    if (hit) {
+      const baseKind = KIND_REGISTRY[hit.kind].parent ?? hit.kind;
+      const stillExists = baseKind === "node" ? graph.hasNode(hit.key) : graph.hasEdge(hit.key);
+      if (!stillExists) this.stateManager.setHovered(null);
+    }
 
     // Unbinding handlers on the current graph
     this.unbindGraphHandlers();
@@ -2173,7 +2112,7 @@ export default class Sigma<
 
   /**
    * Internal: toggle the graph-level `isPanning` flag. Called by captors when
-   * the user starts/stops dragging the stage. Not meant for user code — use
+   * the user starts/stops dragging the stage. Not meant for user code, use
    * `setGraphState` for custom flags instead.
    */
   _setPanning(isPanning: boolean): void {
@@ -2215,22 +2154,13 @@ export default class Sigma<
 
   /**
    * Update the container's CSS cursor based on the currently hovered item,
-   * falling back to the stage cursor style.
+   * falling back to the stage cursor style. The hovered item's kind owns the
+   * cursor lookup (e.g. node labels read `labelCursor` rather than `cursor`).
    */
   private updateContainerCursor(): void {
-    if (this.stateManager.hoveredNode) {
-      this.container.style.cursor =
-        this.internals.nodeDataCache[this.stateManager.hoveredNode]?.cursor || this.resolvedStageStyle.cursor || "";
-    } else if (this.stateManager.hoveredLabel) {
-      const { key, parentType } = this.stateManager.hoveredLabel;
-      const cache = parentType === "edge" ? this.internals.edgeDataCache : this.internals.nodeDataCache;
-      this.container.style.cursor = cache[key]?.labelCursor || this.resolvedStageStyle.cursor || "";
-    } else if (this.stateManager.hoveredEdge) {
-      this.container.style.cursor =
-        this.internals.edgeDataCache[this.stateManager.hoveredEdge]?.cursor || this.resolvedStageStyle.cursor || "";
-    } else {
-      this.container.style.cursor = this.resolvedStageStyle.cursor || "";
-    }
+    const hit = this.stateManager.hovered;
+    const stage = this.resolvedStageStyle.cursor || "";
+    this.container.style.cursor = hit ? getCursor(this.internals, hit) || stage : stage;
   }
 
   /**
@@ -2481,7 +2411,7 @@ export default class Sigma<
       }
       const programIndex = this.nodeProgramIndex[node];
       if (programIndex !== undefined) {
-        this.addNodeToProgram(node, this.internals.nodeIndices[node], programIndex);
+        this.addNodeToProgram(node, programIndex);
         this.nodeProgram.invalidateBuffers();
       }
       return;
@@ -2583,7 +2513,7 @@ export default class Sigma<
     // GPU program update
     const programIndex = this.nodeProgramIndex[node];
     if (programIndex !== undefined) {
-      this.addNodeToProgram(node, this.internals.nodeIndices[node], programIndex);
+      this.addNodeToProgram(node, programIndex);
       this.nodeProgram.invalidateBuffers();
     }
   }
@@ -2606,7 +2536,7 @@ export default class Sigma<
       }
       const programIndex = this.edgeProgramIndex[edge];
       if (programIndex !== undefined) {
-        this.addEdgeToProgram(edge, this.internals.edgeIndices[edge], programIndex);
+        this.addEdgeToProgram(edge, programIndex);
         this.edgeProgram.invalidateBuffers();
       }
       return;
@@ -2675,7 +2605,7 @@ export default class Sigma<
         data.tail !== oldTail;
 
       if (structuralDataChanged) {
-        this.addEdgeToProgram(edge, this.internals.edgeIndices[edge], programIndex);
+        this.addEdgeToProgram(edge, programIndex);
         this.edgeProgram.invalidateBuffers();
       } else {
         // Fast path: skip edge data texture, only update vertex buffer + attribute texture
@@ -2686,7 +2616,7 @@ export default class Sigma<
         const edgeTextureIndex = this.edgeTextureIndexCache[edge];
 
         this.edgeProgram.process(
-          this.internals.edgeIndices[edge],
+          pickingIdOf(this.pickingState, "edge", edge),
           programIndex,
           sourceData,
           targetData,
@@ -2743,7 +2673,7 @@ export default class Sigma<
         if (skipIndexation) {
           const programIndex = this.nodeProgramIndex[node];
           if (programIndex === undefined) throw new Error(`Sigma: node "${node}" can't be repaint`);
-          this.addNodeToProgram(node, this.internals.nodeIndices[node], programIndex);
+          this.addNodeToProgram(node, programIndex);
         }
       }
       if (skipIndexation && nodes.length > 0) this.nodeProgram.invalidateBuffers();
@@ -2758,7 +2688,7 @@ export default class Sigma<
         if (skipIndexation) {
           const programIndex = this.edgeProgramIndex[edge];
           if (programIndex === undefined) throw new Error(`Sigma: edge "${edge}" can't be repaint`);
-          this.addEdgeToProgram(edge, this.internals.edgeIndices[edge], programIndex);
+          this.addEdgeToProgram(edge, programIndex);
         }
       }
       if (skipIndexation && edges.length > 0) this.edgeProgram.invalidateBuffers();
