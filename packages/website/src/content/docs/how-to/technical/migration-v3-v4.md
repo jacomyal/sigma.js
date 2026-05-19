@@ -257,41 +257,17 @@ renderer.on("enterNode", ({ node }) => {
 State updates are separate from graph data, and `refresh({ skipIndexation: true })` avoids re-indexing the graph when
 only visual state changed.
 
-### 4. Replace `zIndex` with depth layers
+### 4. Replace `zIndex` with `depth` + `zIndex`
 
-**Before (v3):**
+v3 had a single continuous `zIndex` per item. v4 splits that into two axes:
 
-```typescript
-nodeReducer: (node, data) => {
-  if (isHighlighted(node)) {
-    return { ...data, zIndex: 1 };
-  }
-  return data;
-},
-```
+- **`depth`**: assigns an item to a named bucket from `primitives.depthLayers` (categorical, painted as one draw call
+  per bucket).
+- **`zIndex`**: sub-orders items _within_ a bucket (numeric, clamped to `[0, maxDepthLevels - 1]`).
 
-**After (v4):**
-
-```typescript
-primitives: {
-  depthLayers: ["edges", "nodes", "topNodes"],
-},
-styles: {
-  nodes: [
-    {
-      whenState: "isHighlighted",
-      then: { depth: "topNodes" },
-    },
-  ],
-},
-```
-
-:::note
-This does not apply to cases where you want nodes to be sorted in a very specific way. In these cases, you should keep
-using the `zIndex` primitive.
-
-But it replaces all cases where some part of the graph should appear at another depth, and in a much more efficient way.
-:::
+Most v3 `zIndex` usage maps to `depth` in v4. Reserve `zIndex` for cases where you genuinely need a continuous order
+inside the same bucket (e.g. "sort by degree"). For the full model, see
+[Depth and z-order](/concepts/depth-and-z-order/).
 
 ### 5. Update imports from removed packages
 

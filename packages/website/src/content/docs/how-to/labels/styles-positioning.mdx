@@ -101,6 +101,28 @@ styles: {
 The `labelRenderedSizeThreshold` and `labelDensity` settings control the density-based culling behavior (see
 [Settings](/reference/settings/)).
 
+### Stacking labels above other nodes
+
+A node's label is painted in the same depth bucket as the node itself, which means it can be hidden by unrelated nodes
+that sit on top. To detach a label from its node and route it into a higher bucket, set `labelDepth`:
+
+```typescript
+primitives: {
+  // Declare a higher bucket the labels will live in:
+  depthLayers: ["edges", "nodes", "topNodes"],
+},
+styles: {
+  nodes: [
+    // Geometry stays in "nodes", but labels paint above everything else:
+    { depth: "nodes", labelDepth: "topNodes" },
+  ],
+},
+```
+
+When a rule sets `depth` without `labelDepth`, the label follows the node automatically. Set `labelDepth` explicitly
+only when you want the label to part ways with its parent. See [Depth and z-order](/concepts/depth-and-z-order/) for the
+full model.
+
 This example demonstrates label rendering at various font sizes and styles:
 
 <SigmaExample id="styling/label-rendering" height="500px" />

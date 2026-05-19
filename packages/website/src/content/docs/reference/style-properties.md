@@ -39,10 +39,13 @@ These are the built-in style properties available for nodes:
 
 ### Ordering
 
-| Property | Type     | Description                                                                      |
-| -------- | -------- | -------------------------------------------------------------------------------- |
-| `depth`  | `string` | Depth layer for render ordering (must match a layer in `primitives.depthLayers`) |
-| `zIndex` | `number` | Z-index within the depth layer                                                   |
+| Property | Type     | Description                                                                       |
+| -------- | -------- | --------------------------------------------------------------------------------- |
+| `depth`  | `string` | Depth bucket for render ordering (must match a layer in `primitives.depthLayers`) |
+| `zIndex` | `number` | Sub-order within the bucket, clamped to `[0, maxDepthLevels - 1]`                 |
+
+`depth` and `zIndex` work together as a two-axis sort. See [Depth and z-order](/concepts/depth-and-z-order/) for the
+full model and recipes.
 
 ### Label properties
 
@@ -55,7 +58,7 @@ These are the built-in style properties available for nodes:
 | `labelVisibility`          | `"auto" \| "visible" \| "hidden"`                   | `"auto"` uses density-based culling, `"visible"` forces display         |
 | `labelPosition`            | `"right" \| "left" \| "above" \| "below" \| "over"` | Label position relative to node                                         |
 | `labelAngle`               | `number`                                            | Label rotation angle in radians                                         |
-| `labelDepth`               | `string`                                            | Depth layer for label rendering (defaults to `depth`)                   |
+| `labelDepth`               | `string`                                            | Depth layer for label rendering (defaults to related node's `depth`)    |
 | `labelAttachment`          | `string \| null`                                    | Label attachment name (references `primitives.nodes.labelAttachments`)  |
 | `labelAttachmentPlacement` | `"below" \| "above" \| "left" \| "right"`           | Attachment position relative to label                                   |
 | `labelBackgroundColor`     | `string`                                            | Label background fill color (transparent = no background)               |
@@ -107,10 +110,12 @@ events), use `labelBackgroundColor` / `labelBackgroundPadding` above instead.
 
 ### Ordering
 
-| Property | Type     | Description                     |
-| -------- | -------- | ------------------------------- |
-| `depth`  | `string` | Depth layer for render ordering |
-| `zIndex` | `number` | Z-index within the depth layer  |
+| Property | Type     | Description                                                       |
+| -------- | -------- | ----------------------------------------------------------------- |
+| `depth`  | `string` | Depth bucket for render ordering                                  |
+| `zIndex` | `number` | Sub-order within the bucket, clamped to `[0, maxDepthLevels - 1]` |
+
+See [Depth and z-order](/concepts/depth-and-z-order/) for the full model.
 
 ### Label properties
 
@@ -122,7 +127,7 @@ events), use `labelBackgroundColor` / `labelBackgroundPadding` above instead.
 | `labelFont`              | `string`                                           | Label font family                                                                     |
 | `labelVisibility`        | `"auto" \| "visible" \| "hidden"`                  | Label visibility mode                                                                 |
 | `labelPosition`          | `number \| "over" \| "above" \| "below" \| "auto"` | Position mode, or a ratio along the edge (`0` = source, `0.5` = middle, `1` = target) |
-| `labelDepth`             | `string`                                           | Depth layer for label rendering (defaults to `depth`)                                 |
+| `labelDepth`             | `string`                                           | Depth layer for label rendering (defaults to related edge's `depth` value)            |
 | `labelBackgroundColor`   | `string`                                           | Label background fill color (transparent = no background)                             |
 | `labelBackgroundPadding` | `number`                                           | Padding around the label background in pixels                                         |
 | `labelCursor`            | `string`                                           | CSS cursor to show when hovering the label (requires `edgeLabelEvents`)               |

@@ -158,10 +158,7 @@ export default defineConfig({
             },
             {
               label: "Styling labels",
-              items: [
-                { slug: "how-to/labels/styles-positioning" },
-                { slug: "how-to/labels/attachments" },
-              ],
+              items: [{ slug: "how-to/labels/styles-positioning" }, { slug: "how-to/labels/attachments" }],
             },
             {
               label: "Adding interactivity",
@@ -197,6 +194,7 @@ export default defineConfig({
             { slug: "concepts/styles-and-primitives" },
             { slug: "concepts/lifecycle" },
             { slug: "concepts/rendering" },
+            { slug: "concepts/depth-and-z-order" },
             { slug: "concepts/coordinate-systems" },
             { slug: "concepts/sizes" },
           ],

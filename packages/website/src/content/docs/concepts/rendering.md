@@ -28,18 +28,32 @@ Labels are rendered on the GPU using an **SDF-based text atlas**. Sigma pre-rast
 
 Sigma creates two DOM elements stacked inside the container:
 
-- **`stage`** (WebGL canvas): The main rendering surface. All nodes, edges, labels, backdrops, and extremities are drawn here.
+- **`stage`** (WebGL canvas): The main rendering surface. All nodes, edges, labels, backdrops, and extremities are drawn
+  here.
 - **`mouse`** (div): A transparent layer on top that captures all mouse and touch interactions.
 
-You can insert additional DOM elements (HTML overlays, custom canvases) between or above these layers using `createCanvas()` or `createLayer()`. See the [custom HTML/SVG elements](/how-to/layers/sync-html-svg/) how-to for practical examples.
+You can insert additional DOM elements (HTML overlays, custom canvases) between (only for other WebGL renderings), below
+or above these layers using `createCanvas()` or `createLayer()`. See the
+[custom HTML/SVG elements](/how-to/layers/sync-html-svg/) and [WebGL layers](/how-to/layers/webgl-layers/) how-tos for
+practical examples.
 
 ## Depth layers
 
-Within the single WebGL canvas, rendering order is controlled through **depth layers** declared in `primitives.depthLayers`. Elements assigned to later depth layers are drawn on top of earlier ones.
+Within the single WebGL canvas, rendering order is controlled through **depth layers** declared in
+`primitives.depthLayers`. Elements assigned to later depth layers are drawn on top of earlier ones.
 
-Each depth layer gets its own WebGL draw call, with elements sorted by `zIndex` within each layer. The `depth` and `labelDepth` style properties assign elements to specific depth layers. For example, setting `depth: "topNodes"` on a hovered node renders it on top of all regular nodes.
+For each named bucket in `depthLayers`, sigma paints in a fixed order: custom WebGL layer (if any), edges, edge labels,
+backdrops, nodes, label attachments, node labels. The `depth` and `labelDepth` style properties choose which bucket
+each element and each label go into. For example, setting `depth: "topNodes"` on a hovered node renders it on top of all
+regular nodes.
 
-You can define custom depth layers for your own use cases (e.g., a `"selectedNodes"` layer between `nodes` and `topNodes`).
+Within a bucket, items are further sub-ordered by the `zIndex` style property (an integer clamped to
+`[0, maxDepthLevels - 1]`). `depth` is the coarse, categorical axis; `zIndex` is the fine, continuous axis. Moving an
+item between buckets or between `zIndex` levels re-buckets a single item. It does not re-process the rest of the graph,
+which is the main performance reason v4 uses this two-axis model instead of v3's single continuous `zIndex`.
+
+You can define custom depth layers for your own use cases (e.g., a `"selectedNodes"` layer between `nodes` and
+`topNodes`). See [Depth and z-order](/concepts/depth-and-z-order/) for the full model and common recipes.
 
 ## Picking
 

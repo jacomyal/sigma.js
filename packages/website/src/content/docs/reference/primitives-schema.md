@@ -216,6 +216,6 @@ Default:
 ["edges", "nodes", "topEdges", "topNodes"];
 ```
 
-Nodes and edges are assigned to depth layers via the `depth` and `labelDepth` style properties. See
-[Hover and search](/how-to/interactivity/hover-search/) page for a common use-case, where depth is used to bring
-highlighted nodes and edges above the rest of the graph.
+Nodes and edges are assigned to depth layers via the `depth` and `labelDepth` style properties; the `zIndex` style
+property sub-orders items _within_ a bucket. See [Depth and z-order](/concepts/depth-and-z-order/) for the full model
+and recipes, and the [Hover and search](/how-to/interactivity/hover-search/) page for a typical interactive use-case.
