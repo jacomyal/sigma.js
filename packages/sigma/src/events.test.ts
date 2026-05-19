@@ -309,3 +309,142 @@ describe("Sigma label events", () => {
     expect(events).toEqual([{ edge: graph.edges()[0] }]);
   });
 });
+
+// -----------------------------------------------------------------------------
+// Per-interaction label event modes
+// -----------------------------------------------------------------------------
+//
+// Covers the Record form of `nodeLabelEvents` / `edgeLabelEvents`: an
+// interaction set to "extend" should fire the parent event when the label is
+// hit, while a different interaction set to "separate" should fire the
+// dedicated *Label event for the same label rect.
+
+interface MixedContext {
+  sigma: Sigma;
+  container: HTMLDivElement;
+  graph: Graph;
+}
+
+const setupMixed = async (context: MixedContext, nodeLabelEvents: object | string | false): Promise<void> => {
+  const graph = new Graph();
+  graph.addNode("n1", { x: 0, y: 0, size: 15, label: "N1", color: "blue" });
+  graph.addNode("n2", { x: 100, y: 0, size: 15, label: "N2", color: "red" });
+  graph.addEdge("n1", "n2", { label: "MID", size: 6 });
+
+  const container = createElement("div", {
+    width: `${STAGE_WIDTH}px`,
+    height: `${STAGE_HEIGHT}px`,
+  }) as HTMLDivElement;
+  document.body.append(container);
+
+  const sigma = new Sigma(graph, container, {
+    settings: {
+      renderLabels: true,
+      renderEdgeLabels: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      nodeLabelEvents: nodeLabelEvents as any,
+      doubleClickTimeout: 0,
+    },
+    nodeReducer: (_key, data) => ({
+      ...data,
+      labelVisibility: "visible",
+      labelBackgroundColor: "#eee",
+    }),
+    edgeReducer: (_key, data) => ({
+      ...data,
+      labelVisibility: "visible",
+      labelBackgroundColor: "#eee",
+    }),
+  });
+  context.sigma = sigma;
+  context.graph = graph;
+  context.container = container;
+  await new Promise<void>((resolve) => sigma.once("afterRender", () => resolve()));
+};
+
+describe("Sigma per-interaction label events: extend-only click", () => {
+  beforeEach<MixedContext>(async (ctx) => setupMixed(ctx, { click: "extend" }));
+  afterEach<MixedContext>(({ sigma }) => {
+    sigma.kill();
+    sigma.getContainer().remove();
+  });
+
+  test<MixedContext>("click on label fires clickNode (extend) not clickNodeLabel", async ({
+    sigma,
+    graph,
+    container,
+  }) => {
+    const nodeClicks: string[] = [];
+    const labelClicks: string[] = [];
+    sigma.on("clickNode", ({ node }) => nodeClicks.push(node));
+    sigma.on("clickNodeLabel", ({ node }) => labelClicks.push(node));
+
+    const nodePos = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+    for (const dx of [30, 40, 50, 60]) {
+      await userEvent.click(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
+      await wait(10);
+      if (nodeClicks.length) break;
+    }
+
+    expect(nodeClicks).toContain("n1");
+    expect(labelClicks).toEqual([]);
+  });
+});
+
+describe("Sigma per-interaction label events: mixed click=extend + enter=separate", () => {
+  beforeEach<MixedContext>(async (ctx) => setupMixed(ctx, { click: "extend", enter: "separate", leave: "separate" }));
+  afterEach<MixedContext>(({ sigma }) => {
+    sigma.kill();
+    sigma.getContainer().remove();
+  });
+
+  test<MixedContext>("hover fires enterNodeLabel, click fires clickNode", async ({ sigma, graph, container }) => {
+    const nodeClicks: string[] = [];
+    const labelClicks: string[] = [];
+    const labelEnters: string[] = [];
+    sigma.on("clickNode", ({ node }) => nodeClicks.push(node));
+    sigma.on("clickNodeLabel", ({ node }) => labelClicks.push(node));
+    sigma.on("enterNodeLabel", ({ node }) => labelEnters.push(node));
+
+    const nodePos = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+    for (const dx of [30, 40, 50, 60]) {
+      await userEvent.hover(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
+      await wait(10);
+      if (labelEnters.length) break;
+    }
+    for (const dx of [30, 40, 50, 60]) {
+      await userEvent.click(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
+      await wait(10);
+      if (nodeClicks.length) break;
+    }
+
+    expect(labelEnters).toContain("n1");
+    expect(nodeClicks).toContain("n1");
+    expect(labelClicks).toEqual([]);
+  });
+});
+
+describe("Sigma per-interaction label events: default key", () => {
+  beforeEach<MixedContext>(async (ctx) => setupMixed(ctx, { default: "separate", click: "extend" }));
+  afterEach<MixedContext>(({ sigma }) => {
+    sigma.kill();
+    sigma.getContainer().remove();
+  });
+
+  test<MixedContext>("click=extend overrides default=separate", async ({ sigma, graph, container }) => {
+    const nodeClicks: string[] = [];
+    const labelClicks: string[] = [];
+    sigma.on("clickNode", ({ node }) => nodeClicks.push(node));
+    sigma.on("clickNodeLabel", ({ node }) => labelClicks.push(node));
+
+    const nodePos = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+    for (const dx of [30, 40, 50, 60]) {
+      await userEvent.click(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
+      await wait(10);
+      if (nodeClicks.length) break;
+    }
+
+    expect(nodeClicks).toContain("n1");
+    expect(labelClicks).toEqual([]);
+  });
+});

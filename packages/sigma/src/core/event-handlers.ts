@@ -15,6 +15,7 @@ import { cleanMouseCoords } from "./captors/captor";
 import MouseCaptor from "./captors/mouse";
 import TouchCaptor from "./captors/touch";
 import { EdgeGroupIndex } from "./edge-groups";
+import { hasAnyEnabled, resolveLabelMode } from "./label-events";
 import { SigmaInternals } from "./sigma-internals";
 
 // Partial refresh options (mirrors sigma's refresh() opts)
@@ -52,7 +53,25 @@ export function bindInteractionHandlers<
     };
 
     const { stateManager } = internals;
-    const nodeToHover = internals.getNodeAtPosition(event);
+    const { nodeLabelEvents, edgeLabelEvents } = internals.settings;
+
+    let nodeToHover = internals.getNodeAtPosition(event);
+    let edgeToHover: string | null = null;
+    let labelToHover: { key: string; parentType: "node" | "edge" } | null = null;
+    if (!nodeToHover && (hasAnyEnabled(nodeLabelEvents) || hasAnyEnabled(edgeLabelEvents))) {
+      const labelHit = internals.getLabelAtPosition(event.x, event.y);
+      if (labelHit) {
+        const setting = labelHit.parentType === "node" ? nodeLabelEvents : edgeLabelEvents;
+        const mode = resolveLabelMode(setting, "enter");
+        if (mode === "extend") {
+          if (labelHit.parentType === "node") nodeToHover = labelHit.key;
+          else edgeToHover = labelHit.key;
+        } else if (mode === "separate") {
+          labelToHover = labelHit;
+        }
+      }
+    }
+
     if (
       nodeToHover &&
       stateManager.hoveredNode !== nodeToHover &&
@@ -73,7 +92,7 @@ export function bindInteractionHandlers<
     }
 
     if (stateManager.hoveredNode) {
-      if (internals.getNodeAtPosition(event) !== stateManager.hoveredNode) {
+      if (nodeToHover !== stateManager.hoveredNode) {
         const node = stateManager.hoveredNode;
         stateManager.setHoveredNode(null);
         internals.setNodeState(node, { isHovered: false });
@@ -83,8 +102,10 @@ export function bindInteractionHandlers<
       }
     }
 
-    if (internals.settings.enableEdgeEvents) {
-      const edgeToHover = stateManager.hoveredNode ? null : internals.getEdgeAtPoint(event.x, event.y);
+    if (internals.settings.enableEdgeEvents || edgeToHover) {
+      if (!edgeToHover && !stateManager.hoveredNode && internals.settings.enableEdgeEvents) {
+        edgeToHover = internals.getEdgeAtPoint(event.x, event.y);
+      }
 
       if (edgeToHover !== stateManager.hoveredEdge) {
         if (stateManager.hoveredEdge) {
@@ -100,42 +121,33 @@ export function bindInteractionHandlers<
       }
     }
 
-    const { nodeLabelEvents, edgeLabelEvents } = internals.settings;
-    if (nodeLabelEvents === "separate" || edgeLabelEvents === "separate") {
-      // `getLabelAtPosition` only returns non-null when picking wrote a
-      // LABEL_ID_OFFSET id — which only happens for parent types in
-      // "separate" mode. So any hit here is already known to be separate.
-      const labelToHover = stateManager.hoveredNode ? null : internals.getLabelAtPosition(event.x, event.y);
-      const prev = stateManager.hoveredLabel;
-      // Compare by key + parentType so we don't re-fire on equivalent hits
-      // returned as freshly-allocated objects across frames.
-      const unchanged =
-        (!prev && !labelToHover) ||
-        (!!prev && !!labelToHover && prev.key === labelToHover.key && prev.parentType === labelToHover.parentType);
+    const prev = stateManager.hoveredLabel;
+    const unchanged =
+      (!prev && !labelToHover) ||
+      (!!prev && !!labelToHover && prev.key === labelToHover.key && prev.parentType === labelToHover.parentType);
 
-      if (!unchanged) {
-        if (prev) {
-          stateManager.setHoveredLabel(null);
-          if (prev.parentType === "node") {
-            internals.setNodeState(prev.key, { isLabelHovered: false });
-            internals.emit("leaveNodeLabel", { ...baseEvent, node: prev.key });
-          } else {
-            internals.setEdgeState(prev.key, { isLabelHovered: false });
-            internals.emit("leaveEdgeLabel", { ...baseEvent, edge: prev.key });
-          }
+    if (!unchanged) {
+      if (prev) {
+        stateManager.setHoveredLabel(null);
+        if (prev.parentType === "node") {
+          internals.setNodeState(prev.key, { isLabelHovered: false });
+          internals.emit("leaveNodeLabel", { ...baseEvent, node: prev.key });
+        } else {
+          internals.setEdgeState(prev.key, { isLabelHovered: false });
+          internals.emit("leaveEdgeLabel", { ...baseEvent, edge: prev.key });
         }
-        stateManager.setHoveredLabel(labelToHover);
-        if (labelToHover) {
-          if (labelToHover.parentType === "node") {
-            internals.setNodeState(labelToHover.key, { isLabelHovered: true });
-            internals.emit("enterNodeLabel", { ...baseEvent, node: labelToHover.key });
-          } else {
-            internals.setEdgeState(labelToHover.key, { isLabelHovered: true });
-            internals.emit("enterEdgeLabel", { ...baseEvent, edge: labelToHover.key });
-          }
-        }
-        internals.updateContainerCursor();
       }
+      stateManager.setHoveredLabel(labelToHover);
+      if (labelToHover) {
+        if (labelToHover.parentType === "node") {
+          internals.setNodeState(labelToHover.key, { isLabelHovered: true });
+          internals.emit("enterNodeLabel", { ...baseEvent, node: labelToHover.key });
+        } else {
+          internals.setEdgeState(labelToHover.key, { isLabelHovered: true });
+          internals.emit("enterEdgeLabel", { ...baseEvent, edge: labelToHover.key });
+        }
+      }
+      internals.updateContainerCursor();
     }
   };
 
@@ -219,23 +231,30 @@ export function bindInteractionHandlers<
     });
   };
 
-  // Try to emit a label event at the given position. Returns true if a
-  // label-event was emitted. Only "separate" mode produces a label hit —
-  // "extend" mode writes parent ids instead, so `getNodeAtPosition` /
-  // `getEdgeAtPoint` pick them up as node/edge events.
   const tryEmitLabel = (
-    eventType: "click" | "rightClick" | "doubleClick" | "down" | "up",
+    eventType: MouseInteraction,
     event: MouseCoords,
     baseEvent: { event: MouseCoords; preventSigmaDefault(): void },
   ): boolean => {
     const { nodeLabelEvents, edgeLabelEvents } = internals.settings;
-    if (nodeLabelEvents !== "separate" && edgeLabelEvents !== "separate") return false;
+    if (!hasAnyEnabled(nodeLabelEvents) && !hasAnyEnabled(edgeLabelEvents)) return false;
     const hit = internals.getLabelAtPosition(event.x, event.y);
     if (!hit) return false;
-    if (hit.parentType === "node") {
-      internals.emit(`${eventType}NodeLabel`, { ...baseEvent, node: hit.key });
+    const setting = hit.parentType === "node" ? nodeLabelEvents : edgeLabelEvents;
+    const mode = resolveLabelMode(setting, eventType);
+    if (mode === false) return false;
+    if (mode === "extend") {
+      if (hit.parentType === "node") {
+        internals.emit(`${eventType}Node`, { ...baseEvent, node: hit.key });
+      } else {
+        internals.emit(`${eventType}Edge`, { ...baseEvent, edge: hit.key });
+      }
     } else {
-      internals.emit(`${eventType}EdgeLabel`, { ...baseEvent, edge: hit.key });
+      if (hit.parentType === "node") {
+        internals.emit(`${eventType}NodeLabel`, { ...baseEvent, node: hit.key });
+      } else {
+        internals.emit(`${eventType}EdgeLabel`, { ...baseEvent, edge: hit.key });
+      }
     }
     return true;
   };
@@ -254,9 +273,7 @@ export function bindInteractionHandlers<
       const nodeAtPosition = internals.getNodeAtPosition(event);
       if (nodeAtPosition) return internals.emit(`${eventType}Node`, { ...baseEvent, node: nodeAtPosition });
 
-      if (eventType === "click" || eventType === "rightClick" || eventType === "doubleClick") {
-        if (tryEmitLabel(eventType, event, baseEvent)) return;
-      }
+      if (tryEmitLabel(eventType, event, baseEvent)) return;
 
       if (internals.settings.enableEdgeEvents) {
         const edge = internals.getEdgeAtPoint(event.x, event.y);

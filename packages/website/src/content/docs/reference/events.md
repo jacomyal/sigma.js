@@ -72,28 +72,46 @@ dragging should not stop when the mouse leaves the stage.
 ### Label events
 
 Label events fire for clicks and hovers over rendered labels. They are disabled by default, and configured separately
-for node and edge labels via `nodeLabelEvents` and `edgeLabelEvents`. Each accepts:
+for node and edge labels via `nodeLabelEvents` and `edgeLabelEvents`. Each accepts one of:
 
+- `false`: label hits are ignored.
 - `"extend"`: label hits are routed to the parent node/edge event (e.g. clicking a node's label fires `clickNode`).
 - `"separate"`: labels become independent targets and their own label events fire instead.
+- a `Record` keyed by interaction (`click`, `rightClick`, `doubleClick`, `wheel`, `down`, `up`, `enter`, `leave`), each
+  mapped to one of the modes above. An optional `default` entry applies to any interaction not listed; interactions
+  with no entry and no `default` resolve to `false`.
+
+The `Record` form lets a single label area behave differently per interaction. For example, clicks routed to the parent
+node while hovers fire dedicated label events:
+
+```ts
+nodeLabelEvents: {
+  click: "extend",
+  enter: "separate",
+  leave: "separate",
+  default: false,
+}
+```
 
 Node and edge labels emit distinct events so handlers don't have to branch on a parent-type discriminator:
 
-#### Node label events (`nodeLabelEvents: "separate"`)
+#### Node label events
 
 - **clickNodeLabel**, **rightClickNodeLabel**, **doubleClickNodeLabel**
+- **wheelNodeLabel**
 - **downNodeLabel**, **upNodeLabel**
 - **enterNodeLabel**, **leaveNodeLabel**
 
-Payload: `{ node: string, event, preventSigmaDefault() }`.
+Payload: `{ node: string, event, preventSigmaDefault() }`. Emitted only for interactions resolved to `"separate"`.
 
-#### Edge label events (`edgeLabelEvents: "separate"`)
+#### Edge label events
 
 - **clickEdgeLabel**, **rightClickEdgeLabel**, **doubleClickEdgeLabel**
+- **wheelEdgeLabel**
 - **downEdgeLabel**, **upEdgeLabel**
 - **enterEdgeLabel**, **leaveEdgeLabel**
 
-Payload: `{ edge: string, event, preventSigmaDefault() }`.
+Payload: `{ edge: string, event, preventSigmaDefault() }`. Emitted only for interactions resolved to `"separate"`.
 
 ## Lifecycle events
 

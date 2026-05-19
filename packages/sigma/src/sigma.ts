@@ -11,6 +11,7 @@ import TouchCaptor from "./core/captors/touch";
 import { DragManager } from "./core/drag-manager";
 import { EdgeGroupIndex } from "./core/edge-groups";
 import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers } from "./core/event-handlers";
+import { hasAnyEnabled as hasAnyLabelEventEnabled } from "./core/label-events";
 import { LabelRenderer } from "./core/label-renderer";
 import { SDFAtlasManager } from "./core/sdf-atlas";
 import { LabelHit, SigmaInternals } from "./core/sigma-internals";
@@ -1216,7 +1217,9 @@ export default class Sigma<
       // GPU work.
       if (this.internals.settings.renderEdgeLabels && (!this.internals.settings.hideLabelsOnMove || !moving)) {
         this.labelRenderer.renderEdgeLabelBackgrounds(
-          this.internals.settings.edgeLabelEvents ? params : { ...params, pickingFrameBuffer: null },
+          hasAnyLabelEventEnabled(this.internals.settings.edgeLabelEvents)
+            ? params
+            : { ...params, pickingFrameBuffer: null },
           depth,
         );
         this.labelRenderer.renderEdgeLabels(params, depth);
@@ -1246,7 +1249,9 @@ export default class Sigma<
       // Label backgrounds for this depth (after nodes so picking overwrites nodes in "over" mode).
       // Picking is skipped when node label events are disabled; transparent nodes discard in the visual pass.
       this.labelRenderer.renderLabelBackgrounds(
-        this.internals.settings.nodeLabelEvents ? params : { ...params, pickingFrameBuffer: null },
+        hasAnyLabelEventEnabled(this.internals.settings.nodeLabelEvents)
+          ? params
+          : { ...params, pickingFrameBuffer: null },
         depth,
       );
 

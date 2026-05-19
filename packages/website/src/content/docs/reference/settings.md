@@ -27,21 +27,35 @@ renderer.setSettings({ hideEdgesOnMove: true });
 
 ## Rendering
 
-| Setting                  | Type                              | Default | Description                                                                                                              |
-| ------------------------ | --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `renderLabels`           | `boolean`                         | `true`  | Whether to render node labels                                                                                            |
-| `renderEdgeLabels`       | `boolean`                         | `false` | Whether to render edge labels                                                                                            |
-| `enableEdgeEvents`       | `boolean`                         | `false` | Enable mouse events on edges (has a performance cost)                                                                    |
-| `nodeLabelEvents`        | `false \| "extend" \| "separate"` | `false` | Enable node label events. `"extend"` routes hits to the parent node event; `"separate"` makes labels standalone targets. |
-| `edgeLabelEvents`        | `false \| "extend" \| "separate"` | `false` | Enable edge label events. `"extend"` routes hits to the parent edge event; `"separate"` makes labels standalone targets. |
-| `stagePadding`           | `number`                          | `30`    | Padding around the graph in pixels                                                                                       |
-| `minEdgeThickness`       | `number`                          | `1.7`   | Minimum edge thickness in pixels                                                                                         |
-| `antiAliasingFeather`    | `number`                          | `1`     | Anti-aliasing feather amount for WebGL rendering                                                                         |
-| `pickingDownSizingRatio` | `number`                          | `2`     | Down-sizing ratio for the picking framebuffer                                                                            |
-| `nodePickingPadding`     | `number`                          | `0`     | Extra pixel padding added around nodes when picking under the cursor                                                     |
-| `edgePickingPadding`     | `number`                          | `4`     | Extra pixel padding added around edges when picking under the cursor                                                     |
-| `labelPickingPadding`    | `number`                          | `10`    | Extra pixel padding added around labels when picking under the cursor                                                    |
-| `maxDepthLevels`         | `number`                          | `20`    | Maximum number of depth levels for z-ordering                                                                            |
+| Setting                  | Type      | Default | Description                                                           |
+| ------------------------ | --------- | ------- | --------------------------------------------------------------------- |
+| `renderLabels`           | `boolean` | `true`  | Whether to render node labels                                         |
+| `renderEdgeLabels`       | `boolean` | `false` | Whether to render edge labels                                         |
+| `enableEdgeEvents`       | `boolean` | `false` | Enable mouse events on edges (has a performance cost)                 |
+| `nodeLabelEvents`        | see below | `false` | Enable node label events.                                             |
+| `edgeLabelEvents`        | see below | `false` | Enable edge label events.                                             |
+| `stagePadding`           | `number`  | `30`    | Padding around the graph in pixels                                    |
+| `minEdgeThickness`       | `number`  | `1.7`   | Minimum edge thickness in pixels                                      |
+| `antiAliasingFeather`    | `number`  | `1`     | Anti-aliasing feather amount for WebGL rendering                      |
+| `pickingDownSizingRatio` | `number`  | `2`     | Down-sizing ratio for the picking framebuffer                         |
+| `nodePickingPadding`     | `number`  | `0`     | Extra pixel padding added around nodes when picking under the cursor  |
+| `edgePickingPadding`     | `number`  | `4`     | Extra pixel padding added around edges when picking under the cursor  |
+| `labelPickingPadding`    | `number`  | `10`    | Extra pixel padding added around labels when picking under the cursor |
+| `maxDepthLevels`         | `number`  | `20`    | Maximum number of depth levels for z-ordering                         |
+
+### Label events
+
+`nodeLabelEvents` and `edgeLabelEvents` accept:
+
+```typescript
+false | "extend" | "separate" | (Partial<Record<Interaction, false | "extend" | "separate">> & { default?: false | "extend" | "separate" })
+```
+
+- `"extend"` routes label hits to the parent node/edge event.
+- `"separate"` makes labels standalone targets that fire their own events.
+- The `Record` form lets each interaction (click, hover, …) pick its own mode, with an optional `default` fallback.
+
+See [Label events](/reference/events/#label-events) for the full description and an example.
 
 ## Camera
 

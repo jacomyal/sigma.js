@@ -28,6 +28,7 @@ import {
   multiplyVec2,
   parseFontString,
 } from "../utils";
+import { hasAnyEnabled, hasAnySeparate } from "./label-events";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./labels";
 import { SigmaInternals } from "./sigma-internals";
 
@@ -404,6 +405,8 @@ export class LabelRenderer<
     if (!labelBackgroundProgram) return;
 
     const { nodeLabelEvents } = settings;
+    const eventsEnabled = hasAnyEnabled(nodeLabelEvents);
+    const useOffset = hasAnySeparate(nodeLabelEvents);
 
     const nodes: string[] = [];
     for (const key of this.displayedNodeLabels) {
@@ -411,7 +414,7 @@ export class LabelRenderer<
       if (!data || data.visibility === "hidden") continue;
       if (depth && data.labelDepth !== depth) continue;
       // When events are disabled, skip nodes with no visual background — nothing to render.
-      if (!nodeLabelEvents && !data.labelBackgroundColor) continue;
+      if (!eventsEnabled && !data.labelBackgroundColor) continue;
       nodes.push(key);
     }
 
@@ -434,7 +437,7 @@ export class LabelRenderer<
         shapeId = getShapeId(data.shape || "circle");
       }
 
-      const pickingIndex = nodeLabelEvents === "separate" ? nodeIndex + LABEL_ID_OFFSET : nodeIndex;
+      const pickingIndex = useOffset ? nodeIndex + LABEL_ID_OFFSET : nodeIndex;
       const bgColor = data.labelBackgroundColor ? floatColor(data.labelBackgroundColor) : floatColor("transparent");
 
       const bgData: LabelBackgroundData = {
@@ -693,6 +696,8 @@ export class LabelRenderer<
     if (!edgeLabelBackgroundProgram || !edgeLabelProgram || !edgeDataTexture) return;
 
     const { edgeLabelEvents } = settings;
+    const eventsEnabled = hasAnyEnabled(edgeLabelEvents);
+    const useOffset = hasAnySeparate(edgeLabelEvents);
     const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;
     const defaultEdgeLabelPosition = "over" as const;
 
@@ -700,7 +705,7 @@ export class LabelRenderer<
     const toRender: string[] = [];
     for (const edge of candidates) {
       // When events are disabled, skip edges with no visual background — nothing to render.
-      if (!edgeLabelEvents && !edgeDataCache[edge].labelBackgroundColor) continue;
+      if (!eventsEnabled && !edgeDataCache[edge].labelBackgroundColor) continue;
       toRender.push(edge);
     }
 
@@ -719,7 +724,7 @@ export class LabelRenderer<
       const positionMode = typeof position === "string" ? (EDGE_POSITION_MODE_MAP[position] ?? 0) : 0;
 
       const edgePickingIndex = edgeIndices[edge];
-      const pickingIndex = edgeLabelEvents === "separate" ? edgePickingIndex + LABEL_ID_OFFSET : edgePickingIndex;
+      const pickingIndex = useOffset ? edgePickingIndex + LABEL_ID_OFFSET : edgePickingIndex;
       const bgColor = edgeData.labelBackgroundColor
         ? floatColor(edgeData.labelBackgroundColor)
         : floatColor("transparent");

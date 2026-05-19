@@ -5,7 +5,7 @@
  * The list of settings and some handy functions.
  * @module sigma/settings
  */
-import { AtLeastOne, Coordinates } from "./types";
+import { AtLeastOne, Coordinates, LabelEventsSetting } from "./types";
 import { assign } from "./utils";
 
 /**
@@ -23,8 +23,8 @@ export interface Settings {
   renderLabels: boolean;
   renderEdgeLabels: boolean;
   enableEdgeEvents: boolean;
-  nodeLabelEvents: false | "extend" | "separate";
-  edgeLabelEvents: false | "extend" | "separate";
+  nodeLabelEvents: LabelEventsSetting;
+  edgeLabelEvents: LabelEventsSetting;
   pickingDownSizingRatio: number;
   nodePickingPadding: number;
   edgePickingPadding: number;

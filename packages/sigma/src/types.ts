@@ -41,6 +41,26 @@ export interface CameraState extends Coordinates {
 
 export type MouseInteraction = "click" | "doubleClick" | "rightClick" | "wheel" | "down" | "up" | "leave" | "enter";
 
+/**
+ * How label hits are routed for a given interaction:
+ * - `false`: label hits are ignored (fall through to edge/stage).
+ * - `"extend"`: a label hit is treated as a hit on its parent node/edge.
+ * - `"separate"`: a label hit fires a dedicated `*NodeLabel` / `*EdgeLabel`
+ *   event.
+ */
+export type LabelEventMode = false | "extend" | "separate";
+
+/**
+ * Per-interaction label event configuration.
+ *
+ * Either a single mode applied to every interaction, or a `Record` keyed by
+ * `MouseInteraction` with a `default` fallback. Interactions not listed and
+ * with no `default` resolve to `false`.
+ */
+export type LabelEventsSetting =
+  | LabelEventMode
+  | (Partial<Record<MouseInteraction, LabelEventMode>> & { default?: LabelEventMode });
+
 export interface MouseCoords extends Coordinates {
   sigmaDefaultPrevented: boolean;
   preventSigmaDefault(): void;
@@ -400,6 +420,7 @@ export type SigmaNodeLabelEvents = {
   clickNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
   rightClickNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
   doubleClickNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
+  wheelNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
   downNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
   upNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
   enterNodeLabel: (payload: SigmaNodeLabelEventPayload) => void;
@@ -410,6 +431,7 @@ export type SigmaEdgeLabelEvents = {
   clickEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
   rightClickEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
   doubleClickEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
+  wheelEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
   downEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
   upEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
   enterEdgeLabel: (payload: SigmaEdgeLabelEventPayload) => void;
