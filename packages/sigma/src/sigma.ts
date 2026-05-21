@@ -119,6 +119,14 @@ const NODE_DATA_TEXTURE_UNIT = 3;
 // Texture unit for the shared edge data texture (source/target indices, thickness, curvature, etc.)
 const EDGE_DATA_TEXTURE_UNIT = 4;
 
+/** A custom WebGL layer program; see {@link Sigma#addCustomLayerProgram}. */
+type CustomLayerProgram = {
+  render(params: RenderParams): void;
+  kill(): void;
+  preRender?(params: RenderParams): void;
+  cacheData?(): void;
+};
+
 /**
  * Main class.
  *
@@ -212,16 +220,8 @@ export default class Sigma<
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
   private depthLayers: readonly string[] = [...DEFAULT_DEPTH_LAYERS];
 
-  // Custom layer programs (fullscreen quad effects rendered at specific depth positions)
-  private customLayerPrograms = new Map<
-    string,
-    {
-      render(params: RenderParams): void;
-      kill(): void;
-      preRender?(params: RenderParams): void;
-      cacheData?(): void;
-    }
-  >();
+  // Custom layer programs (fullscreen quad effects), keyed by unique id
+  private customLayerPrograms = new Map<string, { depth: string; program: CustomLayerProgram }>();
 
   // Shape slug for edge clamping (encodes shape name, params, rotateWithCamera)
   private nodeShapeSlug: string | null = null;
@@ -816,7 +816,7 @@ export default class Sigma<
 
     this.labelRenderer.processWebGLLabels(nodes);
 
-    for (const program of this.customLayerPrograms.values()) {
+    for (const { program } of this.customLayerPrograms.values()) {
       if (program.cacheData) program.cacheData();
     }
 
@@ -1124,7 +1124,7 @@ export default class Sigma<
 
     // Pre-render pass for custom layers (offscreen work like density splatting)
     // before the depth loop to avoid framebuffer switching mid-loop.
-    for (const program of this.customLayerPrograms.values()) {
+    for (const { program } of this.customLayerPrograms.values()) {
       if (program.preRender) program.preRender(params);
     }
 
@@ -1134,9 +1134,10 @@ export default class Sigma<
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     for (const depth of this.depthLayers) {
-      // Custom layer program at this depth
-      const customLayer = this.customLayerPrograms.get(depth);
-      if (customLayer) customLayer.render(params);
+      // Custom layer programs registered at this depth, in registration order
+      for (const customLayer of this.customLayerPrograms.values()) {
+        if (customLayer.depth === depth) customLayer.program.render(params);
+      }
 
       // Edges in this depth
       const edgeRanges = this.depthRanges.edges[depth];
@@ -1819,36 +1820,32 @@ export default class Sigma<
   }
 
   /**
-   * Registers a custom layer program to be rendered at the given depth layer position.
-   * The depth name must exist in the primitives depthLayers array.
+   * Registers a custom layer program under a unique `id`, so it can later be
+   * removed with {@link Sigma#removeCustomLayerProgram}. It renders at the given
+   * `depth`, which must be declared in the primitives depthLayers array; several
+   * programs may share a depth and render in registration order. Reusing an `id`
+   * disposes the program previously registered under it.
    */
-  addCustomLayerProgram(
-    depth: string,
-    program: {
-      render(params: RenderParams): void;
-      kill(): void;
-      preRender?(params: RenderParams): void;
-      cacheData?(): void;
-    },
-  ): this {
+  addCustomLayerProgram(id: string, depth: ExtractDepthLayersFromPrimitives<P>, program: CustomLayerProgram): this {
     if (!this.depthLayers.includes(depth))
       throw new Error(
         `Sigma: cannot add custom layer program at depth "${depth}", ` +
           `it must be declared in primitives.depthLayers. Current layers: ${this.depthLayers.join(", ")}`,
       );
-    this.customLayerPrograms.set(depth, program);
+    this.customLayerPrograms.get(id)?.program.kill();
+    this.customLayerPrograms.set(id, { depth, program });
     this.refresh();
     return this;
   }
 
   /**
-   * Removes a custom layer program previously registered at the given depth.
+   * Removes (and disposes) the custom layer program registered under the given id.
    */
-  removeCustomLayerProgram(depth: string): this {
-    const program = this.customLayerPrograms.get(depth);
-    if (program) {
-      program.kill();
-      this.customLayerPrograms.delete(depth);
+  removeCustomLayerProgram(id: string): this {
+    const entry = this.customLayerPrograms.get(id);
+    if (entry) {
+      entry.program.kill();
+      this.customLayerPrograms.delete(id);
       this.scheduleRender();
     }
     return this;
@@ -2966,7 +2963,7 @@ export default class Sigma<
     this.internals.attachmentManager = null;
 
     // Kill custom layer programs
-    for (const program of this.customLayerPrograms.values()) program.kill();
+    for (const { program } of this.customLayerPrograms.values()) program.kill();
     this.customLayerPrograms.clear();
 
     // Cleanup SDF atlas

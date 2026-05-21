@@ -49,7 +49,8 @@ const renderer = new Sigma(graph, container, {
   },
 });
 
-// Draw a red contour around a group of nodes:
+// Draw a red contour around a group of nodes, at the "community-highlight" depth
+// layer (the first argument must be one of the renderer's declared depthLayers):
 const communityNodes = ["node1", "node2", "node3", "node4"];
 const clean = bindWebGLLayer(
   "community-highlight",
@@ -91,13 +92,22 @@ createContoursProgram(nodeIds, {
 
 ## Multiple layers
 
-Each call to `bindWebGLLayer` requires a unique string ID. You can add as many layers as you need:
+Each `bindWebGLLayer` call creates an independent layer, removed through its own cleanup function. Layers may share
+the same depth, in which case they render in registration order:
 
 ```typescript
-const cleanA = bindWebGLLayer("highlights", renderer, createContoursProgram(groupA, optionsA));
-const cleanB = bindWebGLLayer("highlights", renderer, createContoursProgram(groupB, optionsB));
+const cleanA = bindWebGLLayer("community-highlight", renderer, createContoursProgram(groupA, optionsA));
+const cleanB = bindWebGLLayer("community-highlight", renderer, createContoursProgram(groupB, optionsB));
 
 // Remove individually:
 cleanA();
 cleanB();
+```
+
+By default, each layer gets a generated id. Pass an explicit `id` as the last argument when you want re-binding to
+replace a layer instead of stacking a new one. It can be useful when re-binding on every data change:
+
+```typescript
+// Re-running this keeps a single "heatmap" layer instead of accumulating them:
+bindWebGLLayer("heatmap", renderer, createHeatmapProgram(nodes, options), "heatmap");
 ```

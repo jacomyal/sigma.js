@@ -492,6 +492,7 @@ export type { ResolvedStageStyle, StyleDependency, StyleAnalysis } from "./core/
  */
 export type {
   PrimitivesDeclaration,
+  ExtractDepthLayersFromPrimitives,
   NodePrimitives,
   EdgePrimitives,
   LabelAttachmentContent,
