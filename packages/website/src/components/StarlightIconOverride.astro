@@ -32,7 +32,7 @@ const PhosphorIcons: Partial<Record<StarlightIcon, string>> = {
   magnifier: extractSvgContent(magnifierSvg),
 };
 
-const { name, label, size = "1em", color } = Astro.props;
+const { name, label, size = "1em", color } = Astro.props as Props;
 const a11yAttrs = label ? ({ "aria-label": label } as const) : ({ "aria-hidden": "true" } as const);
 
 const phosphorPath = PhosphorIcons[name];

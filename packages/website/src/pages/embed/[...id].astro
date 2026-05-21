@@ -65,7 +65,9 @@ const { Component, source } = Astro.props;
       document.querySelectorAll<HTMLButtonElement>(".tabs .tab").forEach((tab) => {
         tab.addEventListener("click", () => {
           const tabName = tab.dataset.tab!;
-          document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === tabName));
+          document
+            .querySelectorAll<HTMLElement>(".tab")
+            .forEach((t) => t.classList.toggle("active", t.dataset.tab === tabName));
           document
             .querySelectorAll(".panel")
             .forEach((p) =>

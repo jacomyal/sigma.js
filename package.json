@@ -11,6 +11,7 @@
     "build": "preconstruct build && npm run build-bundle --workspace=sigma",
     "prettify": "prettier --write .",
     "lint": "eslint .",
+    "check": "npm run check --workspaces --if-present",
     "test": "vitest run && npm run test:type --workspace=@sigma/test && npm run test:e2e --workspace=@sigma/test",
     "test:unit": "vitest run",
     "test:type": "npm run test:type --workspace=@sigma/test",

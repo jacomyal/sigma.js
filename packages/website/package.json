@@ -4,9 +4,11 @@
   "scripts": {
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "check": "astro check --minimumSeverity warning"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@astrojs/starlight": "^0.32",
     "@iconify-json/ph": "^1",
     "@phosphor-icons/core": "^2",
@@ -40,11 +42,13 @@
     "sigma": "*",
     "starlight-links-validator": "^0.19.2",
     "starlight-typedoc": "^0.21.5",
-    "typedoc": "^0.28"
+    "typedoc": "^0.28",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@types/papaparse": "^5.5.2"
+    "@types/papaparse": "^5.5.2",
+    "@types/seedrandom": "^3.0.8"
   },
   "engines": {
     "node": ">=18.14"

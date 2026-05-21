@@ -10,7 +10,6 @@
 <script>
   import Graph from "graphology";
   import Sigma from "sigma";
-  import type { BaseEdgeState, BaseGraphState, BaseNodeState } from "sigma/types";
   import { DEFAULT_STYLES } from "sigma/types";
   import type { Attributes } from "graphology-types";
 
@@ -42,77 +41,78 @@
     }
   }
 
-  const renderer = new Sigma(graph, container, {
-    customNodeState: {
-      isSelected: false,
-    },
-    customGraphState: {
-      selectionSize: 0,
-    },
-    settings: {
-      autoRescale: "once",
-      itemSizesReference: "positions",
-      enableNodeDrag: true,
-      // Multi-node drag: if the dragged node is selected, drag the whole selection
-      getDraggedNodes: (node) => {
-        if (renderer.getNodeState(node).isSelected) {
-          return graph.filterNodes((n: string) => renderer.getNodeState(n).isSelected);
-        }
-        return [node];
+  const renderer: Sigma<Attributes, Attributes, Attributes, { isSelected: boolean }, {}, { selectionSize: number }> =
+    new Sigma(graph, container, {
+      customNodeState: {
+        isSelected: false,
       },
-      // Snap positions to sub-grid
-      dragPositionToAttributes: (position) => ({
-        x: Math.round(position.x / SNAP_SIZE) * SNAP_SIZE,
-        y: Math.round(position.y / SNAP_SIZE) * SNAP_SIZE,
-      }),
-    },
-    styles: {
-      nodes: [
-        DEFAULT_STYLES.nodes,
-        {
-          color: "grey",
-          size: 2,
-          backdropColor: "#ffffff",
-          backdropShadowColor: "transparent",
-          backdropBorderColor: "black",
-          backdropBorderWidth: 2,
-          backdropPadding: 4,
-          cursor: "grab",
-        },
-        {
-          when: (_, state, graphState) =>
-            (!!graphState.selectionSize && !state.isSelected) ||
-            (!graphState.selectionSize && graphState.isDragging && !state.isDragged),
-          then: {
-            color: "lightgrey",
-          },
-        },
-        // Selected nodes
-        {
-          whenState: "isSelected",
-          then: {
-            backdropVisibility: "visible",
-          },
-        },
-        // Dragged nodes appear on top
-        {
-          whenState: "isDragged",
-          then: {
-            depth: "topNodes",
-            cursor: "grabbing",
-          },
-        },
-      ],
-      edges: {
-        size: 1,
-        color: (_, _state, graphState) => (graphState.selectionSize || graphState.isDragging ? "lightgrey" : "grey"),
+      customGraphState: {
+        selectionSize: 0,
       },
-      stage: {
-        whenState: "isDragging",
-        then: { cursor: "grabbing" },
+      settings: {
+        autoRescale: "once",
+        itemSizesReference: "positions",
+        enableNodeDrag: true,
+        // Multi-node drag: if the dragged node is selected, drag the whole selection
+        getDraggedNodes: (node) => {
+          if (renderer.getNodeState(node).isSelected) {
+            return graph.filterNodes((n: string) => renderer.getNodeState(n).isSelected);
+          }
+          return [node];
+        },
+        // Snap positions to sub-grid
+        dragPositionToAttributes: (position) => ({
+          x: Math.round(position.x / SNAP_SIZE) * SNAP_SIZE,
+          y: Math.round(position.y / SNAP_SIZE) * SNAP_SIZE,
+        }),
       },
-    },
-  });
+      styles: {
+        nodes: [
+          DEFAULT_STYLES.nodes,
+          {
+            color: "grey",
+            size: 2,
+            backdropColor: "#ffffff",
+            backdropShadowColor: "transparent",
+            backdropBorderColor: "black",
+            backdropBorderWidth: 2,
+            backdropPadding: 4,
+            cursor: "grab",
+          },
+          {
+            when: (_, state, graphState) =>
+              (!!graphState.selectionSize && !state.isSelected) ||
+              (!graphState.selectionSize && graphState.isDragging && !state.isDragged),
+            then: {
+              color: "lightgrey",
+            },
+          },
+          // Selected nodes
+          {
+            whenState: "isSelected",
+            then: {
+              backdropVisibility: "visible",
+            },
+          },
+          // Dragged nodes appear on top
+          {
+            whenState: "isDragged",
+            then: {
+              depth: "topNodes",
+              cursor: "grabbing",
+            },
+          },
+        ],
+        edges: {
+          size: 1,
+          color: (_, _state, graphState) => (graphState.selectionSize || graphState.isDragging ? "lightgrey" : "grey"),
+        },
+        stage: {
+          whenState: "isDragging",
+          then: { cursor: "grabbing" },
+        },
+      },
+    });
 
   // Click to toggle selection, shift+click for multi-select
   renderer.on("clickNode", ({ node, event }) => {
