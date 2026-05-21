@@ -42,7 +42,7 @@ These are the built-in style properties available for nodes:
 | Property | Type     | Description                                                                       |
 | -------- | -------- | --------------------------------------------------------------------------------- |
 | `depth`  | `string` | Depth bucket for render ordering (must match a layer in `primitives.depthLayers`) |
-| `zIndex` | `number` | Sub-order within the bucket, clamped to `[0, maxDepthLevels - 1]`                 |
+| `zIndex` | `number` | Continuous sub-order within the bucket (lower paints first)                       |
 
 `depth` and `zIndex` work together as a two-axis sort. See [Depth and z-order](/concepts/depth-and-z-order/) for the
 full model and recipes.
@@ -110,10 +110,10 @@ events), use `labelBackgroundColor` / `labelBackgroundPadding` above instead.
 
 ### Ordering
 
-| Property | Type     | Description                                                       |
-| -------- | -------- | ----------------------------------------------------------------- |
-| `depth`  | `string` | Depth bucket for render ordering                                  |
-| `zIndex` | `number` | Sub-order within the bucket, clamped to `[0, maxDepthLevels - 1]` |
+| Property | Type     | Description                                                 |
+| -------- | -------- | ----------------------------------------------------------- |
+| `depth`  | `string` | Depth bucket for render ordering                            |
+| `zIndex` | `number` | Continuous sub-order within the bucket (lower paints first) |
 
 See [Depth and z-order](/concepts/depth-and-z-order/) for the full model.
 

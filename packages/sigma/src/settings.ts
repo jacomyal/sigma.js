@@ -62,7 +62,6 @@ export interface Settings {
   labelPixelSnapping: boolean;
 
   // Camera and features
-  maxDepthLevels: number;
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
   enableCameraZooming: boolean;
@@ -131,7 +130,6 @@ export const DEFAULT_SETTINGS: Settings = {
   labelPixelSnapping: true,
 
   // Camera and features
-  maxDepthLevels: 20,
   minCameraRatio: null,
   maxCameraRatio: null,
   enableCameraZooming: true,

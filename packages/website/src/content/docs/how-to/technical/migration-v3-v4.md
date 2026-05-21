@@ -263,7 +263,7 @@ v3 had a single continuous `zIndex` per item. v4 splits that into two axes:
 
 - **`depth`**: assigns an item to a named bucket from `primitives.depthLayers` (categorical, painted as one draw call
   per bucket).
-- **`zIndex`**: sub-orders items _within_ a bucket (numeric, clamped to `[0, maxDepthLevels - 1]`).
+- **`zIndex`**: sub-orders items _within_ a bucket (continuous numeric, lower paints first).
 
 Most v3 `zIndex` usage maps to `depth` in v4. Reserve `zIndex` for cases where you genuinely need a continuous order
 inside the same bucket (e.g. "sort by degree"). For the full model, see

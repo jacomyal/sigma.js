@@ -41,7 +41,6 @@ renderer.setSettings({ hideEdgesOnMove: true });
 | `nodePickingPadding`     | `number`  | `0`     | Extra pixel padding added around nodes when picking under the cursor  |
 | `edgePickingPadding`     | `number`  | `4`     | Extra pixel padding added around edges when picking under the cursor  |
 | `labelPickingPadding`    | `number`  | `10`    | Extra pixel padding added around labels when picking under the cursor |
-| `maxDepthLevels`         | `number`  | `20`    | Maximum number of depth levels for z-ordering                         |
 
 ### Label events
 

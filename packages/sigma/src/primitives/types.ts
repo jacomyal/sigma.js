@@ -169,7 +169,7 @@ export interface EdgePrimitives {
 export interface PrimitivesDeclaration {
   nodes?: NodePrimitives;
   edges?: EdgePrimitives;
-  depthLayers?: string[];
+  depthLayers?: readonly string[];
 }
 
 // =============================================================================
@@ -230,7 +230,26 @@ export const DEFAULT_EDGE_PRIMITIVES: Required<EdgePrimitives> = {
   label: {},
 };
 
-export const DEFAULT_DEPTH_LAYERS = ["edges", "topEdges", "nodes", "topNodes"] as const;
+export const DEFAULT_NODE_DEPTH_LAYERS = ["nodes", "topNodes"] as const;
+export const DEFAULT_EDGE_DEPTH_LAYERS = ["edges", "topEdges"] as const;
+export const DEFAULT_DEPTH_LAYERS = [...DEFAULT_EDGE_DEPTH_LAYERS, ...DEFAULT_NODE_DEPTH_LAYERS] as const;
+
+export type DefaultDepthLayer = (typeof DEFAULT_DEPTH_LAYERS)[number];
+export type DefaultNodeDepthLayer = (typeof DEFAULT_NODE_DEPTH_LAYERS)[number];
+export type DefaultEdgeDepthLayer = (typeof DEFAULT_EDGE_DEPTH_LAYERS)[number];
+
+/**
+ * Extracts the depth-layer union from a primitives declaration: the literal
+ * `depthLayers` tuple when one is declared, otherwise the default layers. A
+ * widened `string[]` (no literal info) also falls back to the defaults.
+ */
+export type ExtractDepthLayersFromPrimitives<P extends PrimitivesDeclaration> = P extends {
+  depthLayers: infer D extends readonly string[];
+}
+  ? string[] extends D
+    ? DefaultDepthLayer
+    : D[number]
+  : DefaultDepthLayer;
 
 export const DEFAULT_PRIMITIVES: Required<PrimitivesDeclaration> = {
   nodes: DEFAULT_NODE_PRIMITIVES,

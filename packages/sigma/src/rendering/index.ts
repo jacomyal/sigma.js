@@ -21,8 +21,7 @@ export { LabelProgram, LabelBackgroundProgram, createLabelBackgroundProgram } fr
 export type { LabelProgramType, LabelBackgroundProgramType, LabelBackgroundData } from "./nodes/labels";
 export { BackdropProgram } from "./nodes/backdrops";
 export type { BackdropProgramType, BackdropDisplayData } from "./nodes/backdrops";
-export { Bucket, BucketCollection, clampZIndex } from "./bucket";
-export type { ProcessItemFunction } from "./bucket";
+export { DepthBucketCollection } from "./bucket";
 
 // Other various program helpers
 export * from "./utils";

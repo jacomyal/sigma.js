@@ -475,7 +475,7 @@ export type {
   StageStyleValue,
   StageStyles,
 } from "./types/styles";
-export { DEFAULT_STYLES } from "./types/styles";
+export { DEFAULT_STYLES, DEPTHLESS_STYLES } from "./types/styles";
 export {
   resolveGraphicValue,
   evaluateStatePredicate,

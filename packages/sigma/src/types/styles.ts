@@ -9,6 +9,7 @@
  */
 import { AbstractGraph } from "graphology-types";
 
+import type { DefaultEdgeDepthLayer, DefaultNodeDepthLayer } from "../primitives/types";
 import { Easing } from "../utils/easings";
 
 /**
@@ -353,9 +354,10 @@ export type NodeStyleProperties<
   NS extends BaseNodeState = BaseNodeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
-> = NodeBuiltInVariables<NA, NS, GS> &
+  Layer extends string = string,
+> = NodeBuiltInVariables<NA, NS, GS, string, Layer> &
   NodeBackdropBuiltInVariables<NA, NS, GS> &
-  NodeLabelBuiltInVariables<NA, NS, GS> & {
+  NodeLabelBuiltInVariables<NA, NS, GS, Layer> & {
     [K in keyof ProgramVariables]?: GraphicValue<NA, NS, GS, ProgramVariables[K]>;
   };
 
@@ -439,8 +441,9 @@ export type EdgeStyleProperties<
   ES extends BaseEdgeState = BaseEdgeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
-> = EdgeBuiltInVariables<EA, ES, GS> &
-  EdgeLabelBuiltInVariables<EA, ES, GS> & {
+  Layer extends string = string,
+> = EdgeBuiltInVariables<EA, ES, GS, string, Layer> &
+  EdgeLabelBuiltInVariables<EA, ES, GS, Layer> & {
     [K in keyof ProgramVariables]?: GraphicValue<EA, ES, GS, ProgramVariables[K]>;
   };
 
@@ -465,12 +468,13 @@ export type NodeStylePropertiesLeaf<
   NS extends BaseNodeState = BaseNodeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > = {
-  [K in keyof NodeStyleProperties<NA, NS, GS, ProgramVariables>]?: LeafValue<
+  [K in keyof NodeStyleProperties<NA, NS, GS, ProgramVariables, Layer>]?: LeafValue<
     NA,
     NS,
     GS,
-    ExtractBaseType<NodeStyleProperties<NA, NS, GS, ProgramVariables>[K]>
+    ExtractBaseType<NodeStyleProperties<NA, NS, GS, ProgramVariables, Layer>[K]>
   >;
 };
 
@@ -483,12 +487,13 @@ export type EdgeStylePropertiesLeaf<
   ES extends BaseEdgeState = BaseEdgeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > = {
-  [K in keyof EdgeStyleProperties<EA, ES, GS, ProgramVariables>]?: LeafValue<
+  [K in keyof EdgeStyleProperties<EA, ES, GS, ProgramVariables, Layer>]?: LeafValue<
     EA,
     ES,
     GS,
-    ExtractBaseType<EdgeStyleProperties<EA, ES, GS, ProgramVariables>[K]>
+    ExtractBaseType<EdgeStyleProperties<EA, ES, GS, ProgramVariables, Layer>[K]>
   >;
 };
 
@@ -500,12 +505,13 @@ export type NodeStylePropertiesWithConditionals<
   NS extends BaseNodeState = BaseNodeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > = {
-  [K in keyof NodeStyleProperties<NA, NS, GS, ProgramVariables>]?: GraphicValue<
+  [K in keyof NodeStyleProperties<NA, NS, GS, ProgramVariables, Layer>]?: GraphicValue<
     NA,
     NS,
     GS,
-    ExtractBaseType<NodeStyleProperties<NA, NS, GS, ProgramVariables>[K]>
+    ExtractBaseType<NodeStyleProperties<NA, NS, GS, ProgramVariables, Layer>[K]>
   >;
 };
 
@@ -517,12 +523,13 @@ export type EdgeStylePropertiesWithConditionals<
   ES extends BaseEdgeState = BaseEdgeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > = {
-  [K in keyof EdgeStyleProperties<EA, ES, GS, ProgramVariables>]?: GraphicValue<
+  [K in keyof EdgeStyleProperties<EA, ES, GS, ProgramVariables, Layer>]?: GraphicValue<
     EA,
     ES,
     GS,
-    ExtractBaseType<EdgeStyleProperties<EA, ES, GS, ProgramVariables>[K]>
+    ExtractBaseType<EdgeStyleProperties<EA, ES, GS, ProgramVariables, Layer>[K]>
   >;
 };
 
@@ -540,25 +547,26 @@ export type NodeStyleRule<
   NS extends BaseNodeState = BaseNodeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > =
   | {
       when: (attributes: NA, state: NS, graphState: GS, graph: AbstractGraph) => boolean;
-      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
-      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
+      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
+      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
     }
   | {
       whenState: StatePredicate<NS>;
-      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
-      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
+      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
+      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
     }
   | {
       whenData: DataPredicate<NA>;
-      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
-      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>;
+      then: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
+      else?: NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>;
     }
-  | { matchData: string; cases: Record<string, NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>> }
-  | { matchState: keyof NS; cases: Record<string, NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables>> }
-  | NodeStylePropertiesWithConditionals<NA, NS, GS, ProgramVariables>;
+  | { matchData: string; cases: Record<string, NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>> }
+  | { matchState: keyof NS; cases: Record<string, NodeStylePropertiesLeaf<NA, NS, GS, ProgramVariables, Layer>> }
+  | NodeStylePropertiesWithConditionals<NA, NS, GS, ProgramVariables, Layer>;
 
 /**
  * A style rule for edges. One of:
@@ -574,25 +582,26 @@ export type EdgeStyleRule<
   ES extends BaseEdgeState = BaseEdgeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > =
   | {
       when: (attributes: EA, state: ES, graphState: GS, graph: AbstractGraph) => boolean;
-      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
-      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
+      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
+      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
     }
   | {
       whenState: StatePredicate<ES>;
-      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
-      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
+      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
+      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
     }
   | {
       whenData: DataPredicate<EA>;
-      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
-      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>;
+      then: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
+      else?: EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>;
     }
-  | { matchData: string; cases: Record<string, EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>> }
-  | { matchState: keyof ES; cases: Record<string, EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables>> }
-  | EdgeStylePropertiesWithConditionals<EA, ES, GS, ProgramVariables>;
+  | { matchData: string; cases: Record<string, EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>> }
+  | { matchState: keyof ES; cases: Record<string, EdgeStylePropertiesLeaf<EA, ES, GS, ProgramVariables, Layer>> }
+  | EdgeStylePropertiesWithConditionals<EA, ES, GS, ProgramVariables, Layer>;
 
 /**
  * Node styles declaration.
@@ -605,7 +614,8 @@ export type NodeStyles<
   NS extends BaseNodeState = BaseNodeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
-> = NodeStyleRule<NA, NS, GS, ProgramVariables> | NodeStyleRule<NA, NS, GS, ProgramVariables>[];
+  Layer extends string = string,
+> = NodeStyleRule<NA, NS, GS, ProgramVariables, Layer> | NodeStyleRule<NA, NS, GS, ProgramVariables, Layer>[];
 
 /**
  * Edge styles declaration.
@@ -618,7 +628,8 @@ export type EdgeStyles<
   ES extends BaseEdgeState = BaseEdgeState,
   GS extends BaseGraphState = BaseGraphState,
   ProgramVariables = EmptyVariables,
-> = EdgeStyleRule<EA, ES, GS, ProgramVariables> | EdgeStyleRule<EA, ES, GS, ProgramVariables>[];
+  Layer extends string = string,
+> = EdgeStyleRule<EA, ES, GS, ProgramVariables, Layer> | EdgeStyleRule<EA, ES, GS, ProgramVariables, Layer>[];
 
 /**
  * Complete styles declaration.
@@ -697,9 +708,10 @@ export interface StylesDeclaration<
   GS = {}, // additional custom graph state fields
   NodeProgramVariables = EmptyVariables,
   EdgeProgramVariables = EmptyVariables,
+  Layer extends string = string,
 > {
-  nodes?: NodeStyles<NA, FullNodeState<NS>, FullGraphState<GS>, NodeProgramVariables>;
-  edges?: EdgeStyles<EA, FullEdgeState<ES>, FullGraphState<GS>, EdgeProgramVariables>;
+  nodes?: NodeStyles<NA, FullNodeState<NS>, FullGraphState<GS>, NodeProgramVariables, Layer>;
+  edges?: EdgeStyles<EA, FullEdgeState<ES>, FullGraphState<GS>, EdgeProgramVariables, Layer>;
   stage?: StageStyles<FullGraphState<GS>>;
 }
 
@@ -762,78 +774,97 @@ export function createGraphState<GS = {}>(defaults?: GS): FullGraphState<GS> {
   return { ...DEFAULT_GRAPH_STATE, ...defaults } as FullGraphState<GS>;
 }
 
+// Default visual style values, shared by DEPTHLESS_STYLES and DEFAULT_STYLES.
+const baseNodeStyle = {
+  x: { attribute: "x" },
+  y: { attribute: "y" },
+  size: {
+    whenState: "isHovered",
+    then: { attribute: "size", defaultValue: 12 },
+    else: { attribute: "size", defaultValue: 10 },
+  },
+  color: { attribute: "color", defaultValue: "#666" },
+  label: { attribute: "label" },
+  visibility: {
+    whenState: "isHidden",
+    then: "hidden",
+    else: "visible",
+  },
+  labelVisibility: {
+    whenState: "isHovered",
+    then: "visible",
+    else: "auto",
+  },
+  backdropVisibility: {
+    whenState: "isHovered",
+    then: "visible",
+    else: "hidden",
+  },
+  backdropColor: "#ffffff",
+  backdropShadowColor: "rgba(0, 0, 0, 0.5)",
+  backdropShadowBlur: 12,
+  backdropPadding: 6,
+} as const satisfies NodeStylePropertiesWithConditionals<Attributes, BaseNodeState, BaseGraphState>;
+
+const baseEdgeStyle = {
+  size: { attribute: "size", defaultValue: 1 },
+  color: { attribute: "color", defaultValue: "#ccc" },
+  label: { attribute: "label" },
+  visibility: {
+    whenState: "isHidden",
+    then: "hidden",
+    else: "visible",
+  },
+} as const satisfies EdgeStylePropertiesWithConditionals<Attributes, BaseEdgeState, BaseGraphState>;
+
+/**
+ * Default *visual* styles, with no depth-layer assignment.
+ *
+ * `DEFAULT_STYLES` minus its `depth` rules. Because they declare no `depth`,
+ * they splice into a styles array whatever the declared `depthLayers` (and
+ * whatever the custom node/edge/graph state). Use as a base when bringing
+ * custom depth layers and assigning `depth` yourself:
+ *
+ *     styles: { nodes: [DEPTHLESS_STYLES.nodes, { depth: "myLayer" }] }
+ *
+ * Kept as their precise literal type on purpose: widening to `NodeStyleRule` /
+ * `EdgeStyleRule` would reintroduce a `depth` property and block the splice.
+ */
+export const DEPTHLESS_STYLES = {
+  nodes: baseNodeStyle,
+  edges: baseEdgeStyle,
+};
+
 /**
  * Default styles declaration.
  *
- * Provides sensible defaults with hover/highlight handling:
- * - Node size increases slightly on hover
- * - Node zIndex increases on highlight (1) and hover (2) for proper layering
- * - Hidden items via isHidden state
+ * `DEPTHLESS_STYLES` plus the default `depth` rules: hover/highlight lift items to
+ * the `topNodes` / `topEdges` layers.
  *
  * Users can:
  * - Use DEFAULT_STYLES as-is for sensible defaults
  * - Extend with spread: { nodes: { ...DEFAULT_STYLES.nodes, size: 20 } }
  * - Replace entirely by providing their own styles object
+ * - Use DEPTHLESS_STYLES instead when declaring custom `depthLayers`
  */
-export const DEFAULT_STYLES: { nodes: NodeStyleRule; edges: EdgeStyleRule } = {
+export const DEFAULT_STYLES: {
+  nodes: NodeStyleRule<Attributes, BaseNodeState, BaseGraphState, EmptyVariables, DefaultNodeDepthLayer>;
+  edges: EdgeStyleRule<Attributes, BaseEdgeState, BaseGraphState, EmptyVariables, DefaultEdgeDepthLayer>;
+} = {
   nodes: {
-    x: { attribute: "x" },
-    y: { attribute: "y" },
-    size: {
-      whenState: "isHovered",
-      then: { attribute: "size", defaultValue: 12 },
-      else: { attribute: "size", defaultValue: 10 },
-    },
-    color: { attribute: "color", defaultValue: "#666" },
-    label: { attribute: "label" },
-    visibility: {
-      whenState: "isHidden",
-      then: "hidden",
-      else: "visible",
-    },
+    ...baseNodeStyle,
     depth: {
       whenState: "isHovered",
       then: "topNodes",
       else: "nodes",
     },
-    labelVisibility: {
-      whenState: "isHovered",
-      then: "visible",
-      else: "auto",
-    },
-    zIndex: {
-      whenState: "isHovered",
-      then: 1,
-      else: 0,
-    },
-    backdropVisibility: {
-      whenState: "isHovered",
-      then: "visible",
-      else: "hidden",
-    },
-    backdropColor: "#ffffff",
-    backdropShadowColor: "rgba(0, 0, 0, 0.5)",
-    backdropShadowBlur: 12,
-    backdropPadding: 6,
   },
   edges: {
-    size: { attribute: "size", defaultValue: 1 },
-    color: { attribute: "color", defaultValue: "#ccc" },
-    label: { attribute: "label" },
-    visibility: {
-      whenState: "isHidden",
-      then: "hidden",
-      else: "visible",
-    },
+    ...baseEdgeStyle,
     depth: {
       whenState: ["isHighlighted", "isHovered"],
       then: "topEdges",
       else: "edges",
-    },
-    zIndex: {
-      whenState: "isHovered",
-      then: 1,
-      else: 0,
     },
   },
 } as const;

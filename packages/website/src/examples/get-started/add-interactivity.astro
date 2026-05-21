@@ -10,7 +10,7 @@
 <script>
   import Graph from "graphology";
   import Sigma from "sigma";
-  import { DEFAULT_STYLES } from "sigma/types";
+  import { DEPTHLESS_STYLES, DEFAULT_STYLES } from "sigma/types";
 
   interface Dataset {
     nodes: { key: string; label: string; tag: string; cluster: string; x: number; y: number; score: number }[];
@@ -92,7 +92,7 @@
         },
       ],
       edges: [
-        DEFAULT_STYLES.edges,
+        DEPTHLESS_STYLES.edges,
         { color: "#ccc", size: 5 },
         {
           when: (_attrs, state, graphState) => graphState.hasActiveSubgraph && !state.isActive,

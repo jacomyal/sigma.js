@@ -36,6 +36,9 @@ import {
 } from "./core/styles";
 import {
   DEFAULT_DEPTH_LAYERS,
+  DEFAULT_EDGE_DEPTH_LAYERS,
+  DEFAULT_NODE_DEPTH_LAYERS,
+  ExtractDepthLayersFromPrimitives,
   ExtractEdgeVarsFromPrimitives,
   ExtractNodeVarsFromPrimitives,
   PrimitivesDeclaration,
@@ -47,7 +50,7 @@ import {
   AttachmentProgram,
   BackdropProgram,
   BackdropProgramType,
-  BucketCollection,
+  DepthBucketCollection,
   EdgeDataTexture,
   EdgeLabelBackgroundProgram,
   EdgeLabelBackgroundProgramType,
@@ -131,7 +134,7 @@ export default class Sigma<
   NS = {}, // additional custom node state fields
   ES = {}, // additional custom edge state fields
   GS = {}, // additional custom graph state fields
-  P extends PrimitivesDeclaration = PrimitivesDeclaration,
+  const P extends PrimitivesDeclaration = PrimitivesDeclaration,
 > extends TypedEventEmitter<SigmaEvents> {
   // Reducers (optional escape hatches for complex styling logic)
   private nodeReducer: NodeReducer<N, E, G, NS, GS> | null = null;
@@ -207,7 +210,7 @@ export default class Sigma<
   private edgeProgram: EdgeProgram<string, N, E, G>;
 
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
-  private depthLayers: string[] = [...DEFAULT_DEPTH_LAYERS];
+  private depthLayers: readonly string[] = [...DEFAULT_DEPTH_LAYERS];
 
   // Custom layer programs (fullscreen quad effects rendered at specific depth positions)
   private customLayerPrograms = new Map<
@@ -226,13 +229,8 @@ export default class Sigma<
   // WebGL Labels (SDF-based rendering)
   private sdfAtlas: SDFAtlasManager | null = null;
 
-  // Bucket collections for depth management (supports future item types like labels)
-  private itemBuckets: Record<"nodes" | "edges", BucketCollection>;
-  // Track previous zIndex to detect changes
-  private zIndexCache: Record<"nodes" | "edges", Record<string, number>> = {
-    nodes: {},
-    edges: {},
-  };
+  // Per-depth buckets; each collection owns its items' depth placement
+  private itemBuckets: Record<"nodes" | "edges", DepthBucketCollection>;
   // Track {offset, count} fragment ranges per depth for range-rendering
   private depthRanges: { nodes: DepthRanges; edges: DepthRanges } = { nodes: {}, edges: {} };
   // Depth assigned to each item during the last process() call
@@ -253,7 +251,8 @@ export default class Sigma<
         NoInfer<ES>,
         NoInfer<GS>,
         ExtractNodeVarsFromPrimitives<P>,
-        ExtractEdgeVarsFromPrimitives<P>
+        ExtractEdgeVarsFromPrimitives<P>,
+        ExtractDepthLayersFromPrimitives<P>
       >;
       settings?: Partial<Settings>;
       nodeReducer?: NodeReducer<N, E, G, NS, GS>;
@@ -355,11 +354,18 @@ export default class Sigma<
     // Cache resolved depth layers (never changes after construction)
     this.depthLayers = resolvedPrimitives.depthLayers ?? [...DEFAULT_DEPTH_LAYERS];
 
-    // Initialize bucket collections with numDepthLayers * maxDepthLevels
-    const numDepthLayers = this.depthLayers.length;
+    if (!styles?.nodes && !DEFAULT_NODE_DEPTH_LAYERS.every((layer) => this.depthLayers.includes(layer)))
+      throw new Error(
+        `Sigma: depthLayers must include ${DEFAULT_NODE_DEPTH_LAYERS.join(", ")} for the built-in node styles.`,
+      );
+    if (!styles?.edges && !DEFAULT_EDGE_DEPTH_LAYERS.every((layer) => this.depthLayers.includes(layer)))
+      throw new Error(
+        `Sigma: depthLayers must include ${DEFAULT_EDGE_DEPTH_LAYERS.join(", ")} for the built-in edge styles.`,
+      );
+
     this.itemBuckets = {
-      nodes: new BucketCollection(numDepthLayers * resolvedSettings.maxDepthLevels),
-      edges: new BucketCollection(numDepthLayers * resolvedSettings.maxDepthLevels),
+      nodes: new DepthBucketCollection(this.depthLayers),
+      edges: new DepthBucketCollection(this.depthLayers),
     };
 
     // Initializing stage canvas and WebGL context
@@ -787,23 +793,20 @@ export default class Sigma<
     this.nodeProgram.reallocate(nodes.length);
     let nodeProcessCount = 0;
 
-    const maxDepthLevels = settings.maxDepthLevels;
     this.depthRanges.nodes = {};
     this.nodeBaseDepth = {};
-    this.itemBuckets.nodes.forEachBucketByZIndex((zIndex, bucket) => {
-      const items = bucket.getItems();
-      const depthIndex = Math.floor(zIndex / maxDepthLevels);
-      const depth = this.depthLayers[depthIndex] ?? this.depthLayers[0];
-      if (!this.depthRanges.nodes[depth]) this.depthRanges.nodes[depth] = [{ offset: nodeProcessCount, count: 0 }];
-      const fragments = this.depthRanges.nodes[depth];
-      fragments[fragments.length - 1].count += items.size;
+    const nodeDataCache = this.internals.nodeDataCache;
+    for (const depth of this.depthLayers) {
+      const items = this.itemBuckets.nodes.getSorted(depth, (k) => nodeDataCache[k].zIndex);
+      if (items.length === 0) continue;
+      this.depthRanges.nodes[depth] = [{ offset: nodeProcessCount, count: items.length }];
       for (const node of items) {
         this.nodeBaseDepth[node] = depth;
         this.nodeProgram.allocateNode?.(node);
         registerItem(this.pickingState, "node", node);
         this.addNodeToProgram(node, nodeProcessCount++);
       }
-    });
+    }
     this.nodeProgram.invalidateBuffers();
 
     // Track visibility so the next processNodes call can detect changes
@@ -828,7 +831,6 @@ export default class Sigma<
    */
   private processEdges(): void {
     const graph = this.internals.graph;
-    const settings = this.internals.settings;
     const edges = graph.edges();
 
     this.edgeProgram.reallocate(edges.length);
@@ -836,28 +838,20 @@ export default class Sigma<
     let edgeProcessCount = 0;
     resetKind(this.pickingState, "edge");
 
-    const maxDepthLevels = settings.maxDepthLevels;
     this.depthRanges.edges = {};
     this.edgeBaseDepth = {};
-    this.itemBuckets.edges.forEachBucketByZIndex((zIndex, bucket) => {
-      const items = bucket.getItems();
-      const depthIndex = Math.floor(zIndex / maxDepthLevels);
-      const depth = this.depthLayers[depthIndex] ?? this.depthLayers[0];
-      if (!this.depthRanges.edges[depth]) this.depthRanges.edges[depth] = [{ offset: edgeProcessCount, count: 0 }];
-      const fragments = this.depthRanges.edges[depth];
-      fragments[fragments.length - 1].count += items.size;
+    const edgeDataCache = this.internals.edgeDataCache;
+    for (const depth of this.depthLayers) {
+      const items = this.itemBuckets.edges.getSorted(depth, (k) => edgeDataCache[k].zIndex);
+      if (items.length === 0) continue;
+      this.depthRanges.edges[depth] = [{ offset: edgeProcessCount, count: items.length }];
       for (const edge of items) {
         this.edgeBaseDepth[edge] = depth;
         registerItem(this.pickingState, "edge", edge);
         this.addEdgeToProgram(edge, edgeProcessCount++);
       }
-    });
+    }
     this.edgeProgram.invalidateBuffers();
-  }
-
-  private getDepthOffset(depth: string): number {
-    const idx = this.depthLayers.indexOf(depth);
-    return (idx >= 0 ? idx : 0) * this.internals.settings.maxDepthLevels;
   }
 
   /**
@@ -886,7 +880,7 @@ export default class Sigma<
    * Method that backports potential settings updates where it's needed.
    * @private
    */
-  private handleSettingsUpdate(oldSettings?: Settings): this {
+  private handleSettingsUpdate(): this {
     const settings = this.internals.settings;
 
     this.camera.minRatio = settings.minCameraRatio;
@@ -906,16 +900,6 @@ export default class Sigma<
       this.camera.clean = null;
     }
     this.camera.setState(this.camera.validateState(this.camera.getState()));
-
-    if (oldSettings) {
-      // Check maxDepthLevels:
-      if (oldSettings.maxDepthLevels !== settings.maxDepthLevels) {
-        const numDepthLayers = this.depthLayers.length;
-        this.itemBuckets.nodes.setMaxDepthLevels(numDepthLayers * settings.maxDepthLevels);
-        this.itemBuckets.edges.setMaxDepthLevels(numDepthLayers * settings.maxDepthLevels);
-        this.pendingProcess = "full";
-      }
-    }
 
     // Update captors settings:
     this.mouseCaptor.setSettings(this.internals.settings);
@@ -1007,6 +991,23 @@ export default class Sigma<
   }
 
   /**
+   * Rebuilds the node/edge program buffers from the data caches. Runs whenever
+   * `pendingProcess` is set: on a structural change, or when refreshState()
+   * escalates an in-place refresh that changed an item's render order.
+   */
+  private processData(): void {
+    this.emit("beforeProcess");
+    this.internals.attachmentManager?.clear();
+    const visibilityChanged = this.processNodes();
+    if (this.pendingProcess === "full" || visibilityChanged) this.processEdges();
+    // Allocate label IDs after node/edge IDs. On a nodes-only refresh the
+    // cached edge IDs in the picking state are preserved.
+    allocateLabelIds(this.pickingState, this.internals);
+    this.pendingProcess = "none";
+    this.emit("afterProcess");
+  }
+
+  /**
    * Method used to render.
    *
    * @return {Sigma}
@@ -1029,22 +1030,16 @@ export default class Sigma<
     this.resize();
 
     // Do we need to reprocess data?
-    if (this.pendingProcess !== "none") {
-      this.emit("beforeProcess");
-      this.internals.attachmentManager?.clear();
-      const visibilityChanged = this.processNodes();
-      if (this.pendingProcess === "full" || visibilityChanged) this.processEdges();
-      // Allocate label IDs after node/edge IDs. On a nodes-only refresh the
-      // cached edge IDs in the picking state are preserved.
-      allocateLabelIds(this.pickingState, this.internals);
-      this.pendingProcess = "none";
-      this.emit("afterProcess");
-    }
+    if (this.pendingProcess !== "none") this.processData();
 
     // Do we need to refresh state (styles in-place, no reprocess)?
     if (this.needToRefreshState) this.refreshState();
     this.needToRefreshState = false;
     this.stateManager.clearDirtyTracking();
+
+    // refreshState() can escalate to a reprocess (a zIndex change is a
+    // reordering, which an in-place refresh cannot apply).
+    if (this.pendingProcess !== "none") this.processData();
 
     // Clearing the canvases
     this.clear();
@@ -1310,20 +1305,9 @@ export default class Sigma<
       this.internals.nodesWithBackdrop.add(key);
     }
 
-    // Bucket management for depth ordering (depth encoded into zIndex range)
-    const newZIndex =
-      this.getDepthOffset(data.depth) +
-      Math.max(0, Math.min(this.internals.settings.maxDepthLevels - 1, Math.floor(data.zIndex)));
-    const oldZIndex = this.zIndexCache.nodes[key];
-
-    if (oldZIndex !== undefined && oldZIndex !== newZIndex) {
-      this.itemBuckets.nodes.moveItem(oldZIndex, newZIndex, key);
-    } else if (oldZIndex === undefined) {
-      this.itemBuckets.nodes.addItem(newZIndex, key);
-    } else {
-      this.itemBuckets.nodes.updateItem(newZIndex, key);
-    }
-    this.zIndexCache.nodes[key] = newZIndex;
+    // Place the node in its depth bucket; processNodes() re-sorts each bucket
+    // by zIndex on the next render.
+    this.itemBuckets.nodes.set(key, data.depth);
   }
 
   /**
@@ -1346,14 +1330,7 @@ export default class Sigma<
    */
   private removeNode(key: string): void {
     // Remove from bucket
-    const data = this.internals.nodeDataCache[key];
-    if (data) {
-      const zIndex = this.zIndexCache.nodes[key];
-      if (zIndex !== undefined) {
-        this.itemBuckets.nodes.removeItem(zIndex, key);
-        delete this.zIndexCache.nodes[key];
-      }
-    }
+    this.itemBuckets.nodes.remove(key);
     // Remove from node cache
     delete this.internals.nodeDataCache[key];
     delete this.nodeGraphCoords[key];
@@ -1447,20 +1424,9 @@ export default class Sigma<
     if (data.labelVisibility === "visible" && data.visibility !== "hidden")
       this.internals.edgesWithForcedLabels.add(key);
 
-    // Bucket management for depth ordering (depth encoded into zIndex range)
-    const newZIndex =
-      this.getDepthOffset(data.depth) +
-      Math.max(0, Math.min(this.internals.settings.maxDepthLevels - 1, Math.floor(data.zIndex)));
-    const oldZIndex = this.zIndexCache.edges[key];
-
-    if (oldZIndex !== undefined && oldZIndex !== newZIndex) {
-      this.itemBuckets.edges.moveItem(oldZIndex, newZIndex, key);
-    } else if (oldZIndex === undefined) {
-      this.itemBuckets.edges.addItem(newZIndex, key);
-    } else {
-      this.itemBuckets.edges.updateItem(newZIndex, key);
-    }
-    this.zIndexCache.edges[key] = newZIndex;
+    // Place the edge in its depth bucket; processEdges() re-sorts each bucket
+    // by zIndex on the next render.
+    this.itemBuckets.edges.set(key, data.depth);
   }
 
   /**
@@ -1479,14 +1445,7 @@ export default class Sigma<
    */
   private removeEdge(key: string): void {
     // Remove from bucket
-    const data = this.internals.edgeDataCache[key];
-    if (data) {
-      const zIndex = this.zIndexCache.edges[key];
-      if (zIndex !== undefined) {
-        this.itemBuckets.edges.removeItem(zIndex, key);
-        delete this.zIndexCache.edges[key];
-      }
-    }
+    this.itemBuckets.edges.remove(key);
     // Remove from edge cache
     delete this.internals.edgeDataCache[key];
     // Remove from programId index
@@ -1516,7 +1475,6 @@ export default class Sigma<
     this.prevNodeVisibilities = {};
     // Clear bucket data
     this.itemBuckets.nodes.clearAll();
-    this.zIndexCache.nodes = {};
     this.depthRanges.nodes = {};
     this.nodeBaseDepth = {};
   }
@@ -1533,7 +1491,6 @@ export default class Sigma<
     resetKind(this.pickingState, "edge");
     // Clear bucket data
     this.itemBuckets.edges.clearAll();
-    this.zIndexCache.edges = {};
     this.depthRanges.edges = {};
     this.edgeBaseDepth = {};
     this.edgeGroups.clear();
@@ -2227,10 +2184,9 @@ export default class Sigma<
    * @return {Sigma}
    */
   setSetting<K extends keyof Settings>(key: K, value: Settings[K]): this {
-    const oldValues = { ...this.internals.settings };
     this.internals.settings[key] = value;
     validateSettings(this.internals.settings);
-    this.handleSettingsUpdate(oldValues);
+    this.handleSettingsUpdate();
     this.scheduleRefresh();
     return this;
   }
@@ -2255,10 +2211,9 @@ export default class Sigma<
    * @return {Sigma}
    */
   setSettings(settings: Partial<Settings>): this {
-    const oldValues = { ...this.internals.settings };
     this.internals.settings = { ...this.internals.settings, ...settings };
     validateSettings(this.internals.settings);
-    this.handleSettingsUpdate(oldValues);
+    this.handleSettingsUpdate();
     this.scheduleRefresh();
     return this;
   }
@@ -2352,21 +2307,29 @@ export default class Sigma<
     const needFullEdgeRefresh =
       this.stateManager.graphStateChanged && this.edgeStyleAnalysis.dependency === "graph-state";
 
+    // A zIndex change reorders items, which an in-place refresh cannot apply
+    // (render order is buffer order). Track it and escalate to a reprocess below.
+    let orderChanged = false;
+
     // Nodes
     if (needFullNodeRefresh) {
-      this.internals.graph.forEachNode((node) => this.refreshNodeState(node));
+      this.internals.graph.forEachNode((node) => {
+        if (this.refreshNodeState(node)) orderChanged = true;
+      });
     } else if (this.internals.nodeStyleAnalysis.dependency !== "static") {
       for (const node of this.stateManager.dirtyNodes) {
-        this.refreshNodeState(node);
+        if (this.refreshNodeState(node)) orderChanged = true;
       }
     }
 
     // Edges
     if (needFullEdgeRefresh) {
-      this.internals.graph.forEachEdge((edge) => this.refreshEdgeState(edge));
+      this.internals.graph.forEachEdge((edge) => {
+        if (this.refreshEdgeState(edge)) orderChanged = true;
+      });
     } else if (this.edgeStyleAnalysis.dependency !== "static") {
       for (const edge of this.stateManager.dirtyEdges) {
-        this.refreshEdgeState(edge);
+        if (this.refreshEdgeState(edge)) orderChanged = true;
       }
     }
 
@@ -2376,18 +2339,22 @@ export default class Sigma<
     }
 
     this.stateManager.clearDirtyTracking();
+
+    // render() runs the escalated reprocess right after refreshState().
+    if (orderChanged) this.pendingProcess = "full";
   }
 
   /**
    * Re-evaluate a single node's style and rewrite its GPU data.
    * Lean path: patches cache in place, skips unchanged bookkeeping.
    */
-  private refreshNodeState(node: string): void {
+  private refreshNodeState(node: string): boolean {
     const data = this.internals.nodeDataCache[node];
 
     // If node not yet cached or a reducer exists, fall back to full path
     if (!data || this.nodeReducer) {
       const oldDepth = this.internals.nodeDataCache[node]?.depth;
+      const oldZIndex = this.internals.nodeDataCache[node]?.zIndex;
       const oldAttachment = this.internals.nodeDataCache[node]?.labelAttachment;
       this.updateNode(node);
       const newData = this.internals.nodeDataCache[node];
@@ -2414,7 +2381,7 @@ export default class Sigma<
         this.addNodeToProgram(node, programIndex);
         this.nodeProgram.invalidateBuffers();
       }
-      return;
+      return oldZIndex !== undefined && newData.zIndex !== oldZIndex;
     }
 
     // Re-evaluate style directly into the cached display data object
@@ -2495,20 +2462,11 @@ export default class Sigma<
       this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, shapeId);
     }
 
-    // Bucket management if depth or zIndex changed
-    const newZIndex =
-      this.getDepthOffset(data.depth) +
-      Math.max(0, Math.min(this.internals.settings.maxDepthLevels - 1, Math.floor(data.zIndex)));
-    const cachedZIndex = this.zIndexCache.nodes[node];
-    if (cachedZIndex !== undefined && cachedZIndex !== newZIndex) {
-      this.itemBuckets.nodes.moveItem(cachedZIndex, newZIndex, node);
-      this.zIndexCache.nodes[node] = newZIndex;
-    } else if (cachedZIndex !== undefined && (data.depth !== oldDepth || data.zIndex !== oldZIndex)) {
-      this.itemBuckets.nodes.updateItem(cachedZIndex, node);
-    }
-    if (data.depth !== oldDepth) {
-      this.updateNodeDepthRanges(node, oldDepth, data.depth);
-    }
+    // Update the depth bucket. A depth change is reflected immediately via
+    // depth ranges; a zIndex change is a reordering, escalated by the boolean
+    // returned below.
+    this.itemBuckets.nodes.set(node, data.depth);
+    if (data.depth !== oldDepth) this.updateNodeDepthRanges(node, oldDepth, data.depth);
 
     // GPU program update
     const programIndex = this.nodeProgramIndex[node];
@@ -2516,6 +2474,8 @@ export default class Sigma<
       this.addNodeToProgram(node, programIndex);
       this.nodeProgram.invalidateBuffers();
     }
+
+    return data.zIndex !== oldZIndex;
   }
 
   /**
@@ -2523,12 +2483,13 @@ export default class Sigma<
    * Lean path: re-evaluates style but patches cache in place, skips
    * unchanged bookkeeping, and avoids full addEdgeToProgram overhead.
    */
-  private refreshEdgeState(edge: string): void {
+  private refreshEdgeState(edge: string): boolean {
     const data = this.internals.edgeDataCache[edge];
 
     // If edge not yet cached or a reducer exists, fall back to full path
     if (!data || this.edgeReducer) {
       const oldDepth = data?.depth;
+      const oldZIndex = data?.zIndex;
       this.updateEdge(edge);
       const newData = this.internals.edgeDataCache[edge];
       if (oldDepth && newData.depth !== oldDepth) {
@@ -2539,7 +2500,7 @@ export default class Sigma<
         this.addEdgeToProgram(edge, programIndex);
         this.edgeProgram.invalidateBuffers();
       }
-      return;
+      return oldZIndex !== undefined && newData.zIndex !== oldZIndex;
     }
 
     // Re-evaluate style directly into the cached display data object
@@ -2578,20 +2539,11 @@ export default class Sigma<
         this.internals.edgesWithForcedLabels.add(edge);
     }
 
-    // Bucket management if depth or zIndex changed
-    const newZIndex =
-      this.getDepthOffset(data.depth) +
-      Math.max(0, Math.min(this.internals.settings.maxDepthLevels - 1, Math.floor(data.zIndex)));
-    const cachedZIndex = this.zIndexCache.edges[edge];
-    if (cachedZIndex !== undefined && cachedZIndex !== newZIndex) {
-      this.itemBuckets.edges.moveItem(cachedZIndex, newZIndex, edge);
-      this.zIndexCache.edges[edge] = newZIndex;
-    } else if (cachedZIndex !== undefined && (data.depth !== oldDepth || data.zIndex !== oldZIndex)) {
-      this.itemBuckets.edges.updateItem(cachedZIndex, edge);
-    }
-    if (data.depth !== oldDepth) {
-      this.updateEdgeDepthRanges(edge, oldDepth, data.depth);
-    }
+    // Update the depth bucket. A depth change is reflected immediately via
+    // depth ranges; a zIndex change is a reordering, escalated by the boolean
+    // returned below.
+    this.itemBuckets.edges.set(edge, data.depth);
+    if (data.depth !== oldDepth) this.updateEdgeDepthRanges(edge, oldDepth, data.depth);
 
     // GPU update
     const programIndex = this.edgeProgramIndex[edge];
@@ -2626,6 +2578,8 @@ export default class Sigma<
         this.edgeProgram.invalidateBuffers();
       }
     }
+
+    return data.zIndex !== oldZIndex;
   }
 
   /**

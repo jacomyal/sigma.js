@@ -43,15 +43,8 @@ styles: {
 `zIndex` orders items _inside_ a single bucket. Items in a later bucket always paint above items in an earlier one,
 regardless of `zIndex`. Inside one bucket, higher `zIndex` paints on top.
 
-The combined sort key is, conceptually:
-
-```
-sortKey = depthLayerIndex * maxDepthLevels + zIndex
-```
-
-`zIndex` is floored and clamped to `[0, maxDepthLevels - 1]` (default `maxDepthLevels = 20`, see
-[`maxDepthLevels`](/reference/settings/)). If you need more than 20 distinct sub-orders within one bucket, raise the
-setting.
+`zIndex` is a continuous numeric sort key. Any finite value works (negative, fractional, large). Items in a bucket are
+sorted by `zIndex` on the CPU during processing.
 
 Use `zIndex` when you want a _continuous_ ordering (e.g. "sort nodes by degree"). Use `depth` when you want a
 _categorical_ bucket that interactions can promote items into.
@@ -109,10 +102,10 @@ items into your own buckets.
 ## Cost model
 
 - Each named bucket costs **one node draw call and one edge draw call** (skipped when the bucket is empty; occasionally
-  split into a few contiguous fragments when items have recently moved between buckets). Inside a bucket, `zIndex`
-  changes are reorganized on the CPU side only. No extra GPU cost.
-- Moving an item between buckets or `zIndex` levels updates a single bucket; it does not re-process the rest of the
-  graph.
+  split into a few contiguous fragments when items have recently moved between buckets).
+- Changing an item's `depth` moves it between buckets in place, without re-processing the rest of the graph.
+- Changing an item's `zIndex` re-sorts the bucket and triggers a full reprocess, so treat `zIndex` as a mostly-static
+  order, not a per-frame interaction axis.
 - Adding buckets is cheap. Adding hundreds of buckets is not. Keep `depthLayers` to a handful of named values, and use
   `zIndex` for the fine-grained order.
 
@@ -149,14 +142,13 @@ styles: {
 styles: {
   nodes: [
     {
-      zIndex: { attribute: "degree", min: 0, max: 19, minValue: 0, maxValue: 100 },
+      zIndex: { attribute: "degree" },
     },
   ],
 }
 ```
 
-`zIndex` is clamped to `[0, maxDepthLevels - 1]`, so bind the numeric range explicitly to keep within bounds (or raise
-`maxDepthLevels`).
+Any numeric attribute works directly as a `zIndex` — no range to bind, no clamping.
 
 ### Labels above unrelated nodes
 

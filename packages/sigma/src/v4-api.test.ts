@@ -2,7 +2,7 @@
  * Unit tests for the v4 API (primitives and styles integration).
  */
 import Graph from "graphology";
-import Sigma from "sigma";
+import Sigma, { DEFAULT_EDGE_DEPTH_LAYERS, DEFAULT_NODE_DEPTH_LAYERS } from "sigma";
 import { layerFill, sdfCircle } from "sigma/rendering";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -182,6 +182,72 @@ describe("Sigma v4 API", () => {
       expect(sigma).toBeDefined();
 
       sigma.kill();
+    });
+  });
+
+  describe("Depth layers", () => {
+    // The `as unknown as "nodes"` casts feed an invalid depth past the type
+    // guard, so the runtime depth-domain check can be exercised.
+    test<SigmaTestContext>("throws when rendering a node with a depth outside the domain", ({ container }) => {
+      const graph = new Graph();
+      graph.addNode("n1", { x: 0, y: 0 });
+
+      expect(() => {
+        new Sigma(graph, container, {
+          styles: { nodes: { depth: "notARealLayer" as unknown as "nodes" } },
+        });
+      }).toThrow();
+    });
+
+    test<SigmaTestContext>("throws when a state-conditional style resolves to an invalid depth", ({ container }) => {
+      const graph = new Graph();
+      graph.addNode("n1", { x: 0, y: 0 });
+
+      const sigma = new Sigma(graph, container, {
+        styles: {
+          nodes: [
+            { depth: "nodes" },
+            { whenState: "isHighlighted", then: { depth: "notARealLayer" as unknown as "nodes" } },
+          ],
+        },
+      });
+      // Default depth ("nodes") is valid, so the initial render is fine:
+      sigma.refresh();
+
+      // Promoting the node resolves its depth to the invalid layer:
+      sigma.setNodeState("n1", { isHighlighted: true });
+      expect(() => sigma.refresh()).toThrow();
+
+      sigma.kill();
+    });
+
+    test<SigmaTestContext>("throws when styles is omitted and depthLayers drops a default layer", ({ container }) => {
+      const graph = new Graph();
+      expect(() => {
+        new Sigma(graph, container, {
+          primitives: { depthLayers: ["back", "front"] },
+        });
+      }).toThrow();
+    });
+
+    test<SigmaTestContext>("throws when styles.nodes is omitted and node layers are missing", ({ container }) => {
+      const graph = new Graph();
+      expect(() => {
+        new Sigma(graph, container, {
+          primitives: { depthLayers: [...DEFAULT_EDGE_DEPTH_LAYERS] },
+          styles: { edges: { depth: "edges" } },
+        });
+      }).toThrow();
+    });
+
+    test<SigmaTestContext>("throws when styles.edges is omitted and edge layers are missing", ({ container }) => {
+      const graph = new Graph();
+      expect(() => {
+        new Sigma(graph, container, {
+          primitives: { depthLayers: [...DEFAULT_NODE_DEPTH_LAYERS] },
+          styles: { nodes: { depth: "nodes" } },
+        });
+      }).toThrow();
     });
   });
 

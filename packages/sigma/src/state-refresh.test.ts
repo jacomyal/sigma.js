@@ -372,9 +372,6 @@ describe("State refresh: depth and zIndex", () => {
     const graph = createTestGraph();
     const container = createContainer();
     const sigma = new Sigma(graph, container, {
-      primitives: {
-        depthLayers: ["edges", "nodes", "topNodes"],
-      },
       styles: {
         nodes: [{ depth: "nodes" }, { whenState: "isHighlighted", then: { depth: "topNodes" } }],
       },

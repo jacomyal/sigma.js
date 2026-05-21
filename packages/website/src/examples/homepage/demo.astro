@@ -67,7 +67,7 @@
   import { extremityArrow, layerFill, layerPlain, pathCurved, pathLine, pathLoop, sdfDiamond } from "sigma/rendering";
   import { layerBorder } from "@sigma/node-border";
   import type { Coordinates, LabelAttachmentContent, LabelAttachmentContext } from "sigma/types";
-  import { DEFAULT_STYLES } from "sigma/types";
+  import { DEPTHLESS_STYLES } from "sigma/types";
   import { nodeExtent } from "graphology-metrics/graph/extent";
   import { bindWebGLLayer, createColorLayerProgram } from "@sigma/layer-webgl";
   import { loadDataset } from "./load-dataset";
@@ -164,7 +164,7 @@
         background: BACKGROUND,
       },
       nodes: [
-        DEFAULT_STYLES.nodes,
+        DEPTHLESS_STYLES.nodes,
         {
           color: {
             attribute: "modularityClass",
@@ -206,7 +206,7 @@
         },
       ],
       edges: [
-        DEFAULT_STYLES.edges,
+        DEPTHLESS_STYLES.edges,
         {
           depth: "edges",
           path: "straight",

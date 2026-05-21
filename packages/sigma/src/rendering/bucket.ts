@@ -1,327 +1,72 @@
 /**
- * Sigma.js Bucket Class
+ * Sigma.js Depth Buckets
  * ======================
  *
- * A bucket is a collection of items (nodes or edges) at a specific zIndex level.
- * Buckets enable efficient dirty-flag optimization for depth-sorted rendering.
+ * Groups item keys (nodes or edges) by their `depth` string. Sigma owns one
+ * collection per item kind and, at render time, queries each depth in
+ * `depthLayers` order to obtain its items sorted by `zIndex`.
  * @module
  */
 
-export const SAFETY_CAPACITY = 5;
-
 /**
- * Clamps a zIndex value to the valid range [0, maxDepthLevels-1]
+ * A collection of depth buckets, one per declared depth layer. Each key belongs
+ * to exactly one bucket; the collection tracks that placement itself
+ * (`keyDepth`), so `set` and `remove` never need a caller-supplied depth and
+ * cannot desync from the data caches. Buckets are pre-created for the declared
+ * layers, so `set` rejects any depth outside that domain at no extra cost.
  */
-export function clampZIndex(zIndex: number, maxDepthLevels: number): number {
-  return Math.max(0, Math.min(maxDepthLevels - 1, Math.floor(zIndex)));
-}
+export class DepthBucketCollection {
+  private buckets = new Map<string, Set<string>>();
+  private keyDepth = new Map<string, string>();
 
-/**
- * Type for the function that processes an item and writes its data to the Float32Array
- */
-export type ProcessItemFunction = (key: string, startIndex: number, array: Float32Array) => void;
+  constructor(depthLayers: readonly string[]) {
+    for (const layer of depthLayers) this.buckets.set(layer, new Set());
+  }
 
-/**
- * Bucket class for managing a collection of items at a specific depth level.
- *
- * Each bucket maintains:
- * - A set of item keys
- * - A Float32Array for GPU buffer data
- * - A dirty flag for rebuild optimization
- */
-export class Bucket {
-  /** Set of item keys in this bucket */
-  private items: Set<string> = new Set();
+  /** Returns true if the key currently belongs to a bucket. */
+  has(key: string): boolean {
+    return this.keyDepth.has(key);
+  }
 
-  /** Float32Array containing the GPU buffer data */
-  private array: Float32Array = new Float32Array(0);
-
-  /** Flag indicating if the bucket needs to be rebuilt */
-  private dirty: boolean = false;
-
-  /** Number of floats per item (stride) */
-  private stride: number;
-
-  /**
-   * Current allocated capacity (number of items the array can hold).
-   * This may be larger than the actual item count to reduce reallocations.
-   * The array will be resized when:
-   * - itemCount > capacity (need more space)
-   * - itemCount < capacity / 4 (shrink to save memory)
-   * - itemCount === 0 (free memory entirely)
-   */
-  private capacity: number = 0;
-
-  constructor(stride: number) {
-    this.stride = stride;
+  /** Returns the keys at a declared depth layer, or undefined for an undeclared one. */
+  getBucket(depth: string): ReadonlySet<string> | undefined {
+    return this.buckets.get(depth);
   }
 
   /**
-   * Returns true if the bucket needs to be rebuilt
+   * Places `key` at `depth`, removing it from any previous bucket. Throws when
+   * `depth` is not a declared depth layer — no bucket was pre-created for it.
    */
-  get isDirty(): boolean {
-    return this.dirty;
+  set(key: string, depth: string): void {
+    const previous = this.keyDepth.get(key);
+    if (previous === depth) return;
+    const bucket = this.buckets.get(depth);
+    if (!bucket) throw new Error(`Sigma: "${depth}" is not a declared depth layer`);
+    if (previous !== undefined) this.buckets.get(previous)?.delete(key);
+    bucket.add(key);
+    this.keyDepth.set(key, depth);
   }
 
-  /**
-   * Returns the number of items in the bucket
-   */
-  get count(): number {
-    return this.items.size;
+  /** Removes `key` from whichever bucket holds it. No-op for an unknown key. */
+  remove(key: string): void {
+    const depth = this.keyDepth.get(key);
+    if (depth === undefined) return;
+    this.buckets.get(depth)!.delete(key);
+    this.keyDepth.delete(key);
   }
 
-  /**
-   * Returns the Float32Array containing the buffer data
-   */
-  getFloatArray(): Float32Array {
-    return this.array;
-  }
-
-  /**
-   * Returns a copy of the item keys set
-   */
-  getItems(): Set<string> {
-    return new Set(this.items);
-  }
-
-  /**
-   * Checks if an item is in this bucket
-   */
-  hasItem(key: string): boolean {
-    return this.items.has(key);
-  }
-
-  /**
-   * Adds an item to the bucket and marks it as dirty
-   */
-  addItem(key: string): void {
-    if (!this.items.has(key)) {
-      this.items.add(key);
-      this.dirty = true;
-    }
-  }
-
-  /**
-   * Removes an item from the bucket and marks it as dirty
-   */
-  removeItem(key: string): void {
-    if (this.items.has(key)) {
-      this.items.delete(key);
-      this.dirty = true;
-    }
-  }
-
-  /**
-   * Marks an item for update (marks bucket as dirty).
-   * Use this when item attributes change but zIndex stays the same.
-   */
-  updateItem(key: string): void {
-    if (this.items.has(key)) {
-      this.dirty = true;
-    }
-  }
-
-  /**
-   * Clears all items from the bucket and marks it as dirty
-   */
-  clear(): void {
-    if (this.items.size > 0) {
-      this.items.clear();
-      this.dirty = true;
-    }
-  }
-
-  /**
-   * Marks the bucket as dirty, forcing a rebuild on next render
-   */
-  markDirty(): void {
-    this.dirty = true;
-  }
-
-  /**
-   * Rebuilds the Float32Array from the current items.
-   * This compacts the buffer (no holes) and clears the dirty flag.
-   *
-   * @param processItem - Function that writes item data to the array at the given index
-   */
-  rebuild(processItem: ProcessItemFunction): void {
-    const itemCount = this.items.size;
-
-    // Reallocate if needed
-    if (itemCount === 0) {
-      // Free memory when empty
-      this.capacity = 0;
-      this.array = new Float32Array(0);
-    } else if (itemCount > this.capacity || itemCount < this.capacity / 4) {
-      // Use some buffer space to avoid frequent reallocations
-      this.capacity = itemCount + SAFETY_CAPACITY;
-      this.array = new Float32Array(this.capacity * this.stride);
-    }
-
-    // Process each item
-    let index = 0;
-    for (const key of this.items) {
-      processItem(key, index * this.stride, this.array);
-      index++;
-    }
-
-    this.dirty = false;
-  }
-
-  /**
-   * Clears the dirty flag without rebuilding.
-   * Use with caution - only when you know the data is up to date.
-   */
-  clearDirtyFlag(): void {
-    this.dirty = false;
-  }
-}
-
-/**
- * BucketCollection manages buckets indexed by zIndex.
- * This provides O(1) bucket lookup and efficient iteration by depth order.
- */
-export class BucketCollection {
-  /** Array of buckets indexed by zIndex */
-  private buckets: Bucket[];
-
-  /** Stride (floats per item) */
-  private stride: number;
-
-  /** Maximum number of depth levels */
-  private maxDepthLevels: number;
-
-  constructor(maxDepthLevels: number, stride: number = 1) {
-    this.maxDepthLevels = maxDepthLevels;
-    this.stride = stride;
-    this.buckets = [];
-    for (let z = 0; z < maxDepthLevels; z++) {
-      this.buckets.push(new Bucket(stride));
-    }
-  }
-
-  /**
-   * Gets the current maximum depth levels
-   */
-  getMaxDepthLevels(): number {
-    return this.maxDepthLevels;
-  }
-
-  /**
-   * Updates the maximum depth levels and resizes the bucket array.
-   * Items in buckets beyond the new max will be moved to the highest bucket.
-   */
-  setMaxDepthLevels(maxDepthLevels: number): void {
-    if (maxDepthLevels === this.maxDepthLevels) return;
-
-    const oldMax = this.maxDepthLevels;
-    this.maxDepthLevels = maxDepthLevels;
-
-    if (maxDepthLevels > oldMax) {
-      // Add new buckets
-      for (let z = oldMax; z < maxDepthLevels; z++) {
-        this.buckets.push(new Bucket(this.stride));
-      }
-    } else {
-      // Move items from removed buckets to the highest remaining bucket
-      const highestBucket = this.buckets[maxDepthLevels - 1];
-      for (let z = maxDepthLevels; z < oldMax; z++) {
-        const bucket = this.buckets[z];
-        for (const key of bucket.getItems()) {
-          highestBucket.addItem(key);
-        }
-      }
-      // Remove excess buckets
-      this.buckets.length = maxDepthLevels;
-    }
-  }
-
-  /**
-   * Gets the bucket for a specific zIndex
-   */
-  getBucket(zIndex: number): Bucket | null {
-    const clampedZ = clampZIndex(zIndex, this.maxDepthLevels);
-    return this.buckets[clampedZ];
-  }
-
-  /**
-   * Adds an item to the appropriate bucket
-   */
-  addItem(zIndex: number, key: string): void {
-    const bucket = this.getBucket(zIndex);
-    if (bucket) {
-      bucket.addItem(key);
-    }
-  }
-
-  /**
-   * Removes an item from a bucket
-   */
-  removeItem(zIndex: number, key: string): void {
-    const bucket = this.getBucket(zIndex);
-    if (bucket) {
-      bucket.removeItem(key);
-    }
-  }
-
-  /**
-   * Moves an item between buckets (zIndex change).
-   */
-  moveItem(oldZIndex: number, newZIndex: number, key: string): void {
-    this.removeItem(oldZIndex, key);
-    this.addItem(newZIndex, key);
-  }
-
-  /**
-   * Updates an item's attributes (marks the containing bucket as dirty)
-   */
-  updateItem(zIndex: number, key: string): void {
-    const bucket = this.getBucket(zIndex);
-    if (bucket) {
-      bucket.updateItem(key);
-    }
-  }
-
-  /**
-   * Clears all buckets
-   */
   clearAll(): void {
-    for (const bucket of this.buckets) {
-      bucket.clear();
-    }
+    for (const bucket of this.buckets.values()) bucket.clear();
+    this.keyDepth.clear();
   }
 
   /**
-   * Iterates over all buckets in zIndex order (back-to-front).
-   * Calls the callback for each non-empty bucket.
+   * Returns the keys at `depth` sorted ascending by `zIndexOf`. The result is a
+   * fresh array; an unknown or empty depth yields `[]`.
    */
-  forEachBucketByZIndex(callback: (zIndex: number, bucket: Bucket) => void): void {
-    for (let z = 0; z < this.maxDepthLevels; z++) {
-      const bucket = this.buckets[z];
-      if (bucket.count > 0) {
-        callback(z, bucket);
-      }
-    }
-  }
-
-  /**
-   * Rebuilds all dirty buckets
-   */
-  rebuildDirtyBuckets(processItem: ProcessItemFunction): void {
-    for (const bucket of this.buckets) {
-      if (bucket.isDirty) {
-        bucket.rebuild(processItem);
-      }
-    }
-  }
-
-  /**
-   * Checks if any bucket is dirty
-   */
-  hasDirtyBuckets(): boolean {
-    for (const bucket of this.buckets) {
-      if (bucket.isDirty) return true;
-    }
-    return false;
+  getSorted(depth: string, zIndexOf: (key: string) => number): string[] {
+    const bucket = this.buckets.get(depth);
+    if (!bucket || bucket.size === 0) return [];
+    return [...bucket].sort((a, b) => zIndexOf(a) - zIndexOf(b));
   }
 }

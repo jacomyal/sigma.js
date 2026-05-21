@@ -47,10 +47,10 @@ backdrops, nodes, label attachments, node labels. The `depth` and `labelDepth` s
 each element and each label go into. For example, setting `depth: "topNodes"` on a hovered node renders it on top of all
 regular nodes.
 
-Within a bucket, items are further sub-ordered by the `zIndex` style property (an integer clamped to
-`[0, maxDepthLevels - 1]`). `depth` is the coarse, categorical axis; `zIndex` is the fine, continuous axis. Moving an
-item between buckets or between `zIndex` levels re-buckets a single item. It does not re-process the rest of the graph,
-which is the main performance reason v4 uses this two-axis model instead of v3's single continuous `zIndex`.
+Within a bucket, items are further sub-ordered by the `zIndex` style property (a continuous number). `depth` is the
+coarse, categorical axis; `zIndex` is the fine, continuous axis. Changing an item's `depth` moves it between buckets
+without re-processing the rest of the graph. That's the main performance reason v4 splits v3's single `zIndex` into
+these two axes. (Changing `zIndex` reorders within a bucket and does trigger a reprocess.)
 
 You can define custom depth layers for your own use cases (e.g., a `"selectedNodes"` layer between `nodes` and
 `topNodes`). See [Depth and z-order](/concepts/depth-and-z-order/) for the full model and common recipes.
