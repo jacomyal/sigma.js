@@ -1,13 +1,3 @@
-/**
- * Type tests for Sigma.js v4 depth layers.
- *
- * These verify that `depth` style values are constrained, at compile time, to
- * the active depth domain: the default depth layers, or a custom set declared
- * through `primitives.depthLayers`.
- *
- * NOTE: Type test files (*.test-d.ts) are statically analyzed only - they don't execute.
- * Run with: npx vitest typecheck
- */
 import Graph from "graphology";
 import Sigma from "sigma";
 import { DEFAULT_STYLES } from "sigma/types";

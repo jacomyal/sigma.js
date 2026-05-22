@@ -1,0 +1,13 @@
+{
+  "name": "@sigma/browser-tests",
+  "private": true,
+  "description": "Browser-based tests for sigma.js: example screenshots and regression scenarios.",
+  "dependencies": {
+    "@playwright/test": "^1.49.1",
+    "vite": "^6.0.7"
+  },
+  "scripts": {
+    "test:e2e": "playwright test",
+    "serve:regression": "vite regression"
+  }
+}

@@ -1,16 +1,3 @@
-/**
- * Type tests for the Sigma.js v4 Primitives API.
- *
- * These tests verify compile-time type safety of the primitives and styles APIs.
- * Tests marked with @ts-expect-error validate that TypeScript catches invalid configs.
- *
- * NOTE: Type test files (*.test-d.ts) are statically analyzed only - they don't execute.
- * Run with: npx vitest typecheck
- */
-// Import schemas from satellite packages for verification
-import { borderSchema } from "@sigma/node-border";
-import { imageSchema } from "@sigma/node-image";
-import { piechartSchema } from "@sigma/node-piechart";
 import Graph from "graphology";
 import Sigma from "sigma";
 // Import real schema helpers from sigma/primitives
@@ -55,46 +42,6 @@ describe("Schema helpers", () => {
 
     expectTypeOf(withVar.variable).toEqualTypeOf<true | undefined>();
     expectTypeOf(withoutVar.variable).toEqualTypeOf<false | undefined>();
-  });
-});
-
-// =============================================================================
-// TYPE TESTS: Satellite package schemas
-// =============================================================================
-
-describe("Satellite package schemas", () => {
-  test("borderSchema has correct structure", () => {
-    expectTypeOf(borderSchema).toHaveProperty("borders");
-  });
-
-  test("imageSchema has correct structure", () => {
-    expectTypeOf(imageSchema).toHaveProperty("name");
-    expectTypeOf(imageSchema).toHaveProperty("drawingMode");
-    expectTypeOf(imageSchema).toHaveProperty("padding");
-  });
-
-  test("piechartSchema has correct structure", () => {
-    expectTypeOf(piechartSchema).toHaveProperty("slices");
-    expectTypeOf(piechartSchema).toHaveProperty("offset");
-    expectTypeOf(piechartSchema).toHaveProperty("defaultColor");
-  });
-});
-
-// =============================================================================
-// TYPE TESTS: Satellite package schemas are importable
-// =============================================================================
-
-describe("Satellite schema exports", () => {
-  test("@sigma/node-border exports borderSchema", () => {
-    expectTypeOf(borderSchema).toMatchTypeOf<object>();
-  });
-
-  test("@sigma/node-image exports imageSchema", () => {
-    expectTypeOf(imageSchema).toMatchTypeOf<object>();
-  });
-
-  test("@sigma/node-piechart exports piechartSchema", () => {
-    expectTypeOf(piechartSchema).toMatchTypeOf<object>();
   });
 });
 

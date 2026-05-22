@@ -3,7 +3,7 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/test"
+      "path": "./packages/browser-tests"
     },
     {
       "path": "./packages/sigma"

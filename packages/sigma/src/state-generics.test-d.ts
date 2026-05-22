@@ -1,12 +1,3 @@
-/**
- * Type tests for Sigma.js v4 Custom State Generics.
- *
- * These tests verify compile-time type safety when using custom state types
- * with the Sigma class.
- *
- * NOTE: Type test files (*.test-d.ts) are statically analyzed only - they don't execute.
- * Run with: npx vitest typecheck
- */
 import Graph from "graphology";
 import Sigma from "sigma";
 import type {
