@@ -721,7 +721,6 @@ export class LabelRenderer<
 
       const data: EdgeLabelBackgroundData = {
         edgeIndex: edgeDataTexture.getIndex(edge),
-        edgeAttrIndex: i,
         baseFontSize: DEFAULT_EDGE_LABEL_SIZE,
         totalTextWidth,
         positionMode,

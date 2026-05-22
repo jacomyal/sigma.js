@@ -51,8 +51,6 @@ const RIBBON_VERTICES = (RIBBON_SEGMENTS + 1) * 2;
 export interface EdgeLabelBackgroundData {
   /** Row index in the edge data texture */
   edgeIndex: number;
-  /** Row index in the edge attribute texture (for curvature, etc.) */
-  edgeAttrIndex: number;
   /** Base font size in pixels */
   baseFontSize: number;
   /** Label text width in atlas (glyph) units */
@@ -407,10 +405,21 @@ export function createEdgeLabelBackgroundProgram<
     }
 
     processEdgeLabelBackground(offset: number, labelKey: string, data: EdgeLabelBackgroundData): void {
+      // Allocate the attribute-texture row first so a_edgeAttrIndex points at
+      // it. Rows are keyed by edge, globally — not reset per depth pass — so the
+      // index must come from the texture, not from the caller's loop counter.
+      let attrIndex = 0;
+      if (this.edgeAttributeTexture && attributeLayout.floatsPerItem > 0) {
+        attrIndex = this.edgeAttributeTexture.allocate(labelKey);
+        const packed = this.packedAttributeData;
+        packAttributes(attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
+        this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
+      }
+
       const array = this.array;
       let i = offset * this.STRIDE;
       array[i++] = data.edgeIndex;
-      array[i++] = data.edgeAttrIndex;
+      array[i++] = attrIndex;
       array[i++] = data.baseFontSize;
       array[i++] = data.totalTextWidth;
       array[i++] = data.positionMode;
@@ -418,13 +427,6 @@ export function createEdgeLabelBackgroundProgram<
       array[i++] = data.padding;
       array[i++] = data.color;
       array[i++] = data.id;
-
-      if (this.edgeAttributeTexture && attributeLayout.floatsPerItem > 0) {
-        this.edgeAttributeTexture.allocate(labelKey);
-        const packed = this.packedAttributeData;
-        packAttributes(attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
-        this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
-      }
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {
