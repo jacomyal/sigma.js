@@ -390,8 +390,8 @@ export interface EdgeLabelDisplayData extends Omit<LabelDisplayData, "position">
   edgeSize: number;
   /** Perpendicular offset from path centerline (pixels) */
   offset: number;
-  /** Path curvature for curved edges (0 for straight) */
-  curvature: number;
+  /** Resolved edge display data — source for the path attributes (curvature, loop geometry, …) packed into the label attribute texture. */
+  edgeAttributes: Record<string, unknown>;
   /** Source node index in node data texture */
   sourceNodeIndex: number;
   /** Target node index in node data texture */

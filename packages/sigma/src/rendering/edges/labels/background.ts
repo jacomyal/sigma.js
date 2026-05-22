@@ -26,7 +26,7 @@ import { Attributes } from "graphology-types";
 import { DEFAULT_SDF_ATLAS_OPTIONS } from "../../../core/sdf-atlas";
 import type Sigma from "../../../sigma";
 import type { RenderParams } from "../../../types";
-import { ItemAttributeTexture, computeAttributeLayout } from "../../data-texture";
+import { ItemAttributeTexture, buildAttrDescriptors, computeAttributeLayout, packAttributes } from "../../data-texture";
 import { Program } from "../../program";
 import { InstancedProgramDefinition, ProgramInfo, numberToGLSLFloat } from "../../utils";
 import { layerPlain } from "../layers";
@@ -35,6 +35,9 @@ import type { EdgeLabelShaderConfig } from "./base";
 import { generateEdgeLabelShaderPreamble } from "./shared-shader-glsl";
 
 const ATLAS_FONT_SIZE = DEFAULT_SDF_ATLAS_OPTIONS.fontSize;
+
+// Path attributes carry no layer lifecycle hooks; packAttributes still needs a map.
+const NO_LIFECYCLES = new Map();
 
 // Ribbon tessellation: SEGMENTS + 1 sample pairs = 2*(SEGMENTS + 1) vertices
 // drawn as a triangle strip. 24 segments give smooth curves without much cost.
@@ -64,8 +67,8 @@ export interface EdgeLabelBackgroundData {
   color: number;
   /** Packed picking id from indexToColor() */
   id: number;
-  /** Path curvature (for curved edges); used to update the attribute texture */
-  curvature: number;
+  /** Resolved edge display data — source for the path attributes packed into the attribute texture. */
+  edgeAttributes: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -339,7 +342,9 @@ export function createEdgeLabelBackgroundProgram<
   // Factory-level, closure-captured state. `getDefinition()` runs inside the
   // base Program constructor (before subclass fields exist), so anything it
   // reads must live here, not on the instance.
-  const attributeLayout = computeAttributeLayout([...paths, layerPlain()]);
+  const labelLayer = layerPlain();
+  const attributeLayout = computeAttributeLayout([...paths, labelLayer]);
+  const attrDescriptors = buildAttrDescriptors([...paths, labelLayer], attributeLayout);
   let vertexShader: string | null = null;
 
   type U = string;
@@ -417,9 +422,7 @@ export function createEdgeLabelBackgroundProgram<
       if (this.edgeAttributeTexture && attributeLayout.floatsPerItem > 0) {
         this.edgeAttributeTexture.allocate(labelKey);
         const packed = this.packedAttributeData;
-        packed.fill(0);
-        const curvatureOffset = attributeLayout.offsets["curvature"];
-        if (curvatureOffset !== undefined) packed[curvatureOffset] = data.curvature;
+        packAttributes(attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
     }

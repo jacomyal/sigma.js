@@ -22,7 +22,13 @@ import { DEFAULT_SDF_ATLAS_OPTIONS, GlyphMetrics, SDFAtlasManager } from "../../
 import type Sigma from "../../../sigma";
 import type { EdgeLabelDisplayData, EdgeLabelPosition, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";
-import { ItemAttributeTexture, computeAttributeLayout } from "../../data-texture";
+import {
+  AttrDescriptor,
+  ItemAttributeTexture,
+  buildAttrDescriptors,
+  computeAttributeLayout,
+  packAttributes,
+} from "../../data-texture";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
 import { layerPlain } from "../layers";
 import { EDGE_ATTRIBUTE_TEXTURE_UNIT } from "../path-attribute-texture";
@@ -30,6 +36,9 @@ import type { EdgeLabelOptions, EdgePath } from "../types";
 import { EdgeLabelProgram, resolveEdgeLabelShaderConfig } from "./base";
 import type { EdgeLabelProgramType } from "./base";
 import { GeneratedEdgeLabelShaders, generateEdgeLabelShaders } from "./generator";
+
+// Path attributes carry no layer lifecycle hooks; packAttributes still needs a map.
+const NO_LIFECYCLES = new Map();
 
 /**
  * Converts edge label position string to numeric mode for GPU.
@@ -196,6 +205,9 @@ export function createEdgeLabelProgram<
     /** Layout describing attribute positions in the texture */
     private attributeLayout: ReturnType<typeof computeAttributeLayout>;
 
+    /** Descriptors for packing path attributes — mirrors the edge body program. */
+    private attrDescriptors: AttrDescriptor[];
+
     // -----------------------------------------------------------------------
     // Constructor
     // -----------------------------------------------------------------------
@@ -214,9 +226,10 @@ export function createEdgeLabelProgram<
 
       super(gl, pickingBuffer, renderer);
 
-      // Initialize edge attribute texture for path attributes (curvature, etc.)
+      // Initialize edge attribute texture for path attributes (curvature, loop geometry, …).
       const layer = layerPlain();
       this.attributeLayout = computeAttributeLayout([...paths, layer]);
+      this.attrDescriptors = buildAttrDescriptors([...paths, layer], this.attributeLayout);
       this.edgeAttributeTexture = new ItemAttributeTexture(gl, this.attributeLayout);
       this.packedAttributeData = new Float32Array(this.attributeLayout.floatsPerItem);
 
@@ -498,20 +511,13 @@ export function createEdgeLabelProgram<
     processEdgeLabel(labelKey: string, offset: number, data: EdgeLabelDisplayData): number {
       this.prepareLabelGlyphs(labelKey, data);
 
-      // Update edge attribute texture with path-specific attributes (curvature, etc.)
+      // Pack every path attribute (curvature, loop geometry, …) into the
+      // attribute texture, exactly as the edge body program does — so the label
+      // shader samples the same path the edge is drawn on.
       if (this.edgeAttributeTexture && !data.hidden && data.text) {
-        // Allocate texture slot for this edge label
         this.edgeAttributeTexture.allocate(labelKey);
-
-        // Pack curvature into the attribute data
         const packed = this.packedAttributeData;
-        packed.fill(0);
-        const curvatureOffset = this.attributeLayout.offsets["curvature"];
-        if (curvatureOffset !== undefined) {
-          packed[curvatureOffset] = data.curvature;
-        }
-
-        // Update the texture
+        packAttributes(this.attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
 

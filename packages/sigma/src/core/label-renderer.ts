@@ -659,7 +659,7 @@ export class LabelRenderer<
         targetShape: targetData.shape || "circle",
         edgeSize: edgeData.size,
         offset: 0,
-        curvature: (edgeData as unknown as { curvature?: number }).curvature || 0,
+        edgeAttributes: edgeData as unknown as Record<string, unknown>,
         sourceNodeIndex,
         targetNodeIndex,
         edgeIndex,
@@ -729,7 +729,7 @@ export class LabelRenderer<
         padding: edgeData.labelBackgroundPadding ?? DEFAULT_EDGE_LABEL_PADDING,
         color: bgColor,
         id: indexToColor(pickingIndex),
-        curvature: (edgeData as unknown as { curvature?: number }).curvature || 0,
+        edgeAttributes: edgeData as unknown as Record<string, unknown>,
       };
 
       edgeLabelBackgroundProgram.processEdgeLabelBackground(i, edge, data);
