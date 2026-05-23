@@ -190,3 +190,4 @@ export type SigmaEventType = keyof SigmaEvents;
 export type { CameraEvents } from "./core/camera";
 export type { MouseCaptorEvents } from "./core/captors/mouse";
 export type { TouchCaptorEvents } from "./core/captors/touch";
+export type { Attributes, SigmaGraph } from "./graph";

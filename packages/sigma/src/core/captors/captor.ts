@@ -3,7 +3,7 @@
  * ======================
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../graph";
 
 import Sigma from "../../sigma";
 import { Coordinates, EventsMapping, MouseCoords, TouchCoords, TypedEventEmitter, WheelCoords } from "../../types";

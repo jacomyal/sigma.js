@@ -12,3 +12,4 @@ import Sigma from "./sigma";
 
 export default Sigma;
 export { Sigma, Camera, MouseCaptor, TouchCaptor };
+export type { Attributes, SigmaGraph } from "./graph";

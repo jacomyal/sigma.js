@@ -9,6 +9,7 @@
   "types": "dist/sigma.cjs.d.ts",
   "files": [
     "/dist",
+    "/icebug",
     "/types",
     "/settings",
     "/rendering",
@@ -39,8 +40,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "events": "^3.3.0",
-    "graphology-utils": "^2.5.2"
+    "@ladybugmem/icebug": "^12.7.0",
+    "apache-arrow": "^21.1.0",
+    "events": "^3.3.0"
   },
   "devDependencies": {
     "vite": "^6.0.7"
@@ -56,6 +58,7 @@
   "preconstruct": {
     "entrypoints": [
       "index.ts",
+      "icebug.ts",
       "types.ts",
       "settings.ts",
       "rendering/index.ts",
@@ -72,6 +75,11 @@
       "module": "./types/dist/sigma-types.esm.js",
       "import": "./types/dist/sigma-types.cjs.mjs",
       "default": "./types/dist/sigma-types.cjs.js"
+    },
+    "./icebug": {
+      "module": "./icebug/dist/sigma-icebug.esm.js",
+      "import": "./icebug/dist/sigma-icebug.cjs.mjs",
+      "default": "./icebug/dist/sigma-icebug.cjs.js"
     },
     "./settings": {
       "module": "./settings/dist/sigma-settings.esm.js",

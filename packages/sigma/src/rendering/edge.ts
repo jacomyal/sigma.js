@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../graph";
 
 import Sigma from "../sigma";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../types";

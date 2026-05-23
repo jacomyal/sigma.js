@@ -1,4 +1,4 @@
-import { Attributes } from "graphology-types";
+import { Attributes } from "../graph";
 
 import { Settings } from "../settings";
 import { NodeDisplayData, PartialButFor } from "../types";

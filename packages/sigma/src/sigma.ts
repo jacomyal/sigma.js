@@ -3,13 +3,12 @@
  * ========
  * @module
  */
-import Graph, { Attributes } from "graphology-types";
-
 import Camera from "./core/camera";
 import { cleanMouseCoords } from "./core/captors/captor";
 import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor from "./core/captors/touch";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./core/labels";
+import { Attributes, SigmaGraph } from "./graph";
 import { AbstractEdgeProgram, AbstractNodeProgram, EdgeProgramType, NodeProgramType } from "./rendering";
 import { Settings, resolveSettings, validateSettings } from "./settings";
 import {
@@ -124,7 +123,7 @@ export default class Sigma<
   G extends Attributes = Attributes,
 > extends TypedEventEmitter<SigmaEvents> {
   private settings: Settings<N, E, G>;
-  private graph: Graph<N, E, G>;
+  private graph: SigmaGraph<N, E, G>;
   private mouseCaptor: MouseCaptor<N, E, G>;
   private touchCaptor: TouchCaptor<N, E, G>;
   private container: HTMLElement;
@@ -189,7 +188,7 @@ export default class Sigma<
 
   private camera: Camera;
 
-  constructor(graph: Graph<N, E, G>, container: HTMLElement, settings: Partial<Settings<N, E, G>> = {}) {
+  constructor(graph: SigmaGraph<N, E, G>, container: HTMLElement, settings: Partial<Settings<N, E, G>> = {}) {
     super();
 
     // Resolving settings
@@ -1787,7 +1786,7 @@ export default class Sigma<
    *
    * @return {Graph}
    */
-  getGraph(): Graph<N, E, G> {
+  getGraph(): SigmaGraph<N, E, G> {
     return this.graph;
   }
 
@@ -1796,7 +1795,7 @@ export default class Sigma<
    *
    * @return {Graph}
    */
-  setGraph(graph: Graph<N, E, G>): void {
+  setGraph(graph: SigmaGraph<N, E, G>): void {
     if (graph === this.graph) return;
 
     // Check hoveredNode and hoveredEdge

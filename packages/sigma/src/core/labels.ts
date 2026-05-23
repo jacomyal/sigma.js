@@ -5,8 +5,7 @@
  * Miscellaneous heuristics related to label display.
  * @module
  */
-import Graph from "graphology-types";
-
+import { SigmaGraph } from "../graph";
 import { Coordinates, Dimensions } from "../types";
 
 /**
@@ -128,7 +127,7 @@ export class LabelGrid {
 export function edgeLabelsToDisplayFromNodes(params: {
   displayedNodeLabels: Set<string>;
   highlightedNodes: Set<string>;
-  graph: Graph;
+  graph: SigmaGraph;
   hoveredNode: string | null;
 }): Array<string> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;

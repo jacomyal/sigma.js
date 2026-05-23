@@ -1,4 +1,4 @@
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../../graph";
 
 import { EdgeProgramType, createEdgeCompoundProgram } from "../../edge";
 import { CreateEdgeArrowHeadProgramOptions, createEdgeArrowHeadProgram } from "../edge-arrow-head";

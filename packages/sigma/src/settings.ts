@@ -5,8 +5,6 @@
  * The list of settings and some handy functions.
  * @module
  */
-import { Attributes } from "graphology-types";
-
 import {
   EdgeArrowProgram,
   EdgeLabelDrawingFunction,
@@ -20,6 +18,7 @@ import {
   drawDiscNodeLabel,
   drawStraightEdgeLabel,
 } from "./rendering";
+import { Attributes } from "./graph";
 import { AtLeastOne, EdgeDisplayData, NodeDisplayData } from "./types";
 import { assign } from "./utils";
 

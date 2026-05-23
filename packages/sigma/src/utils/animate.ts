@@ -1,5 +1,4 @@
-import Graph from "graphology-types";
-
+import { SigmaGraph } from "../graph";
 import { PlainObject } from "../types";
 import { easings } from "./easings";
 
@@ -21,7 +20,7 @@ export const ANIMATE_DEFAULTS = {
  * Function used to animate the nodes.
  */
 export function animateNodes(
-  graph: Graph,
+  graph: SigmaGraph,
   targets: PlainObject<PlainObject<number>>,
   opts: Partial<AnimateOptions>,
   callback?: () => void,

@@ -8,7 +8,7 @@
  * indicating which "corner" of the triangle to draw.
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../../graph";
 
 import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";

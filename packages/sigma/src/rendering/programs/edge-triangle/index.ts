@@ -5,7 +5,7 @@
  * Program rendering directed edges as a single triangle.
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../../graph";
 
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";

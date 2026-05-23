@@ -15,7 +15,7 @@
  * the CPU & GPU (normals are computed on the CPU side).
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../../graph";
 
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";

@@ -1,0 +1,4 @@
+{
+  "main": "dist/sigma-icebug.cjs.js",
+  "module": "dist/sigma-icebug.esm.js"
+}

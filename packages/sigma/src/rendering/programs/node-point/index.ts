@@ -7,7 +7,7 @@
  * every GPU.
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../../graph";
 
 import { NodeDisplayData, RenderParams } from "../../../types";
 import { floatColor } from "../../../utils";

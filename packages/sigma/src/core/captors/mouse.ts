@@ -5,7 +5,7 @@
  * Sigma's captor dealing with the user's mouse.
  * @module
  */
-import { Attributes } from "graphology-types";
+import { Attributes } from "../../graph";
 
 import { DEFAULT_SETTINGS, Settings } from "../../settings";
 import Sigma from "../../sigma";
