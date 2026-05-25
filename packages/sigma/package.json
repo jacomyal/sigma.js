@@ -40,7 +40,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@ladybugmem/icebug": "^12.7.0",
     "apache-arrow": "^21.1.0",
     "events": "^3.3.0"
   },

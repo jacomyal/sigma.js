@@ -60,7 +60,5 @@
       "importConditionDefaultExport": "default"
     }
   },
-  "dependencies": {
-    "@ladybugmem/icebug": "^12.8.0"
-  }
+  "dependencies": {}
 }
