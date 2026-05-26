@@ -45,10 +45,10 @@ jobs:
         run: npm run lint
 
       - name: Run unit tests
-        run: npm run test:unit
+        run: npm run test:unit -- --reporter=default --reporter=github-actions
 
       - name: Run type tests
-        run: npm run test:type
+        run: npm run test:type -- --reporter=default --reporter=github-actions
 
       - name: Run E2E tests
         run: npm run test:e2e

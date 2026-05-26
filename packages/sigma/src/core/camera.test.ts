@@ -217,24 +217,6 @@ describe("Camera", function () {
       expect(flag).toEqual(true);
     });
 
-    // TODO: Flaky in headless browser — animation takes ~400ms instead of 50ms
-    test.skip("it should return promises that resolve when animation ends, when called without callback.", async function () {
-      const camera = new Camera();
-      const targetState = {
-        x: 1,
-        y: 0,
-        ratio: 0.1,
-        angle: Math.PI,
-      };
-      const duration = 50;
-      const t0 = Date.now();
-      await camera.animate(targetState, { duration });
-      const t1 = Date.now();
-
-      expect(Math.abs(t1 - t0 - duration)).toBeLessThan(duration / 2);
-      expect(camera.getState()).toEqual(targetState);
-    });
-
     test("it should resolve promises when animation is interrupted by a new animation (using #animate).", async function () {
       const camera = new Camera();
       const targetState1 = { ...camera.getState(), x: 1 };

@@ -6,7 +6,6 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "alwaysStrict": true,
-    "baseUrl": ".",
     "declaration": true,
     "diagnostics": false,
     "emitBOM": false,
@@ -23,8 +22,8 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "listEmittedFiles": false,
     "listFiles": false,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "noEmit": false,
     "noEmitHelpers": false,
     "noEmitOnError": false,
@@ -35,9 +34,6 @@
     "noImplicitUseStrict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "paths": {
-      "*": ["@types/*"]
-    },
     "preserveConstEnums": true,
     "pretty": true,
     "removeComments": true,

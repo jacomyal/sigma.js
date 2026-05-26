@@ -1,10 +1,10 @@
-import { userEvent } from "@vitest/browser/context";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
 import { Coordinates, SigmaEventType } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { add, simulateTouchEvent, wait } from "./_test-helpers";
 

@@ -1,12 +1,12 @@
-import { userEvent } from "@vitest/browser/context";
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 
-import { rotate, simulateMouseEvent, wait } from "../../_test-helpers";
+import { rotate, simulateDoubleClick, simulateMouseEvent } from "../../_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -50,40 +50,38 @@ afterEach<SigmaTestContext>(async ({ sigma }) => {
 });
 
 describe("Sigma mouse management", () => {
-  test<SigmaTestContext>(
-    "it should zoom to the center when user double-clicks in the center",
-    async ({ sigma, container }) => {
-      const position = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 };
+  test<SigmaTestContext>("it should zoom to the center when user double-clicks in the center", async ({
+    sigma,
+    target,
+  }) => {
+    const position = { x: STAGE_WIDTH / 2, y: STAGE_HEIGHT / 2 };
 
-      await userEvent.dblClick(container, { position });
-      await wait(sigma.getSetting("doubleClickZoomingDuration") * 1.1);
-
+    await simulateDoubleClick(target, position);
+    await vi.waitFor(() =>
       expect(sigma.getCamera().getState()).toEqual({
         x: 0.5,
         y: 0.5,
         angle: 0,
         ratio: 1 / sigma.getSetting("doubleClickZoomingRatio"),
-      });
-    },
-    { retry: 2 },
-  );
+      }),
+    );
+  });
 
-  test<SigmaTestContext>(
-    "it should zoom to the mouse position when user double-clicks in the center",
-    async ({ sigma, container }) => {
-      const position = { x: STAGE_WIDTH * 0.2, y: STAGE_HEIGHT * 0.7 };
-      const originalMouseGraphCoordinates = sigma.viewportToFramedGraph(position);
+  test<SigmaTestContext>("it should zoom to the mouse position when user double-clicks in the center", async ({
+    sigma,
+    target,
+  }) => {
+    const position = { x: STAGE_WIDTH * 0.2, y: STAGE_HEIGHT * 0.7 };
+    const originalMouseGraphCoordinates = sigma.viewportToFramedGraph(position);
 
-      await userEvent.dblClick(container, { position });
-      await wait(sigma.getSetting("doubleClickZoomingDuration") * 1.1);
-
+    await simulateDoubleClick(target, position);
+    await vi.waitFor(() => {
       const newMouseGraphCoordinates = sigma.viewportToFramedGraph(position);
       (["x", "y"] as const).forEach((key) =>
         expect(newMouseGraphCoordinates[key]).toBeCloseTo(originalMouseGraphCoordinates[key], 6),
       );
-    },
-    { retry: 2 },
-  );
+    });
+  });
 
   test<SigmaTestContext>("it should dispatch an 'enterNode' event when the mouse is hover the node", async ({
     sigma,
