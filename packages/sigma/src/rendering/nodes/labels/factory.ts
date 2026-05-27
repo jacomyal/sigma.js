@@ -349,17 +349,16 @@ export function createLabelProgram<
      * @param charIndex Index of this character within the label text
      */
     protected processCharacter(index: number, labelData: LabelDisplayData, _char: string, charIndex: number): void {
-      const array = this.array;
-      const stride = this.STRIDE;
-      const startIndex = index * stride;
+      const { floats, STRIDE } = this;
+      const startIndex = index * STRIDE;
 
       // Retrieve cached glyph data
       const cache = this.labelGlyphCache.get(labelData.parentKey);
 
       if (!cache || !cache.glyphs[charIndex]) {
         // No glyph data available - write zeros to skip this character
-        for (let i = 0; i < stride; i++) {
-          array[startIndex + i] = 0;
+        for (let i = 0; i < STRIDE; i++) {
+          floats[startIndex + i] = 0;
         }
         return;
       }
@@ -378,47 +377,47 @@ export function createLabelProgram<
       let i = startIndex;
 
       // a_nodeIndex: Index into node data texture (for GPU-side position/size lookup)
-      array[i++] = labelData.nodeIndex;
+      floats[i++] = labelData.nodeIndex;
 
       // a_charOffset: Character position relative to label origin (pixels)
       // bearingX accounts for the SDF buffer: it points to the atlas region's
       // left edge (buffer pixels before the glyph body).
-      array[i++] = (xOffset + glyph.bearingX) * scale;
-      array[i++] = -glyph.bearingY * scale;
+      floats[i++] = (xOffset + glyph.bearingX) * scale;
+      floats[i++] = -glyph.bearingY * scale;
 
       // a_charSize: Character quad dimensions (pixels)
-      array[i++] = glyph.atlasWidth * scale;
-      array[i++] = glyph.atlasHeight * scale;
+      floats[i++] = glyph.atlasWidth * scale;
+      floats[i++] = glyph.atlasHeight * scale;
 
       // a_texCoords: Glyph location in atlas texture (pixels)
-      array[i++] = glyph.atlasX;
-      array[i++] = glyph.atlasY;
-      array[i++] = glyph.atlasWidth;
-      array[i++] = glyph.atlasHeight;
+      floats[i++] = glyph.atlasX;
+      floats[i++] = glyph.atlasY;
+      floats[i++] = glyph.atlasWidth;
+      floats[i++] = glyph.atlasHeight;
 
       // a_color: Packed RGBA color
-      array[i++] = color;
+      floats[i++] = color;
 
       // a_margin: Gap between node edge and label (pixels)
-      array[i++] = labelData.margin;
+      floats[i++] = labelData.margin;
 
       // a_positionMode: Label position mode for shader (from per-node style)
-      array[i++] = POSITION_MODE_MAP[labelData.position];
+      floats[i++] = POSITION_MODE_MAP[labelData.position];
 
       // a_labelWidth: Total label width in pixels (for centering/right-alignment)
-      array[i++] = cache.totalWidth * scale;
+      floats[i++] = cache.totalWidth * scale;
 
       // a_labelHeight: Font size in pixels (for SDF anti-aliasing)
-      array[i++] = labelData.size;
+      floats[i++] = labelData.size;
 
       // a_verticalCenter: Pre-computed vertical center offset (pixels)
-      array[i++] = cache.verticalCenterOffset * scale;
+      floats[i++] = cache.verticalCenterOffset * scale;
 
       // a_textHeight: Actual text height (maxAscent + maxDescent) in pixels
-      array[i++] = cache.totalHeight * scale;
+      floats[i++] = cache.totalHeight * scale;
 
       // a_labelAngle: Per-node label rotation angle in radians
-      array[i++] = labelData.labelAngle;
+      floats[i++] = labelData.labelAngle;
     }
 
     /**

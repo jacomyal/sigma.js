@@ -139,8 +139,6 @@ out float v_shapeId;              // Shape ID for multi-shape programs
 // Layer varyings
 ${layerVaryings}
 
-const float bias = 255.0 / 254.0;
-
 void main() {
   // Fetch node data from texture: vec4(x, y, size, shapeId)
   // 2D texture layout: texCoord = (index % width, index / width)
@@ -317,8 +315,6 @@ ${layerVaryings}
 // Fragment output (single target - picking handled via separate pass)
 out vec4 fragColor;
 
-const float bias = 255.0 / 254.0;
-
 // LayerContext struct - provides rendering context to all layers
 struct LayerContext {
   float sdf;             // Signed distance from shape boundary (negative inside)
@@ -376,10 +372,9 @@ void main() {
 ${layerCalls}
 
   #ifdef PICKING_MODE
-    // Picking pass: output node ID for pixels within the picking area
+    // Picking pass: output node ID for pixels within the picking area.
     if (context.sdf > u_pickingPadding * v_pixelToUV) discard;
     fragColor = v_id;
-    fragColor.a *= bias;
   #else
     // Visual pass: apply antialiasing at shape boundary
     // smoothstep provides smooth transition from opaque to transparent

@@ -324,11 +324,12 @@ export function createNodeProgram<
       textureIndex: number,
       nodeKey: string,
     ) {
-      const array = this.array;
+      const { floats, ints } = this;
 
       // Buffer: only a_nodeIndex and a_id
-      array[startIndex++] = textureIndex;
-      array[startIndex++] = nodeIndex;
+      floats[startIndex++] = textureIndex;
+      // a_id is a packed picking ID, it should be stored as an int
+      ints[startIndex++] = nodeIndex;
 
       // Pack layer attributes via pre-computed descriptors
       if (layerAttributeLayout.floatsPerItem === 0) return;

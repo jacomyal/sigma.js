@@ -81,7 +81,8 @@ function generateVertexShader(config: EdgeLabelShaderConfig): string {
   const attributeLayout = computeAttributeLayout([...paths, layer]);
   const textureFetch = generateEdgeAttributeTextureFetch(attributeLayout);
 
-  return /*glsl*/ `#version 300 es
+  // language=GLSL
+  const shader = /*glsl*/ `#version 300 es
 
 // Per-instance attributes
 in float a_edgeIndex;
@@ -248,8 +249,10 @@ ${textureFetch.varyingAssignments}
   v_alphaModifier = alphaModifier;
 }
 `;
+  return shader;
 }
 
+// language=GLSL
 const FRAGMENT_SHADER = /*glsl*/ `#version 300 es
 precision highp float;
 
@@ -262,9 +265,7 @@ out vec4 fragColor;
 void main() {
 #ifdef PICKING_MODE
   if (v_alphaModifier <= 0.0) discard;
-  const float bias = 255.0 / 254.0;
   fragColor = v_id;
-  fragColor.a *= bias;
 #else
   float alpha = v_color.a * v_alphaModifier;
   if (alpha <= 0.0) discard;
@@ -416,17 +417,18 @@ export function createEdgeLabelBackgroundProgram<
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
 
-      const array = this.array;
+      const { floats, ints } = this;
       let i = offset * this.STRIDE;
-      array[i++] = data.edgeIndex;
-      array[i++] = attrIndex;
-      array[i++] = data.baseFontSize;
-      array[i++] = data.totalTextWidth;
-      array[i++] = data.positionMode;
-      array[i++] = data.margin;
-      array[i++] = data.padding;
-      array[i++] = data.color;
-      array[i++] = data.id;
+      floats[i++] = data.edgeIndex;
+      floats[i++] = attrIndex;
+      floats[i++] = data.baseFontSize;
+      floats[i++] = data.totalTextWidth;
+      floats[i++] = data.positionMode;
+      floats[i++] = data.margin;
+      floats[i++] = data.padding;
+      floats[i++] = data.color;
+      // a_id is a packed picking ID, it should be stored as an int
+      ints[i++] = data.id;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

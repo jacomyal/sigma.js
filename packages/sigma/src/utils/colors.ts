@@ -267,37 +267,25 @@ export function colorToArray(val: string, masking?: boolean): [number, number, n
   return [r, g, b, a];
 }
 
-const FLOAT_INDEX_CACHE: { [key: number]: number } = {};
+/**
+ * Encode a picking ID into a packed RGBA uint32.
+ * The result should be written into the `Uint32Array` view of the attribute
+ * buffer. It should never be assigned to a `Float32Array` slot, or JS may
+ * canonicalize NaN bit patterns.
+ */
 export function indexToColor(index: number): number {
-  // If the index is already computed, we yield it
-  if (typeof FLOAT_INDEX_CACHE[index] !== "undefined") return FLOAT_INDEX_CACHE[index];
-
-  // To address issue #1397, one strategy is to keep encoding 4 bytes colors,
-  // but with alpha hard-set to 1.0 (or 255):
-  const r = (index & 0x00ff0000) >>> 16;
-  const g = (index & 0x0000ff00) >>> 8;
-  const b = index & 0x000000ff;
-  const a = 0x000000ff;
-
-  // The original 4 bytes color encoding was the following:
-  // const r = (index & 0xff000000) >>> 24;
-  // const g = (index & 0x00ff0000) >>> 16;
-  // const b = (index & 0x0000ff00) >>> 8;
-  // const a = index & 0x000000ff;
-
-  const color = rgbaToFloat(r, g, b, a, true);
-  FLOAT_INDEX_CACHE[index] = color;
-
-  return color;
+  const r = (index >>> 8) & 0xff;
+  const g = (index >>> 16) & 0xff;
+  const b = (index >>> 24) & 0xff;
+  const a = index & 0xff;
+  return ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
 }
 
-export function colorToIndex(r: number, g: number, b: number, _a: number): number {
-  // As for the function indexToColor, because of #1397 and the "alpha is always
-  // 1.0" strategy, we need to fix this function as well:
-  return b + (g << 8) + (r << 16);
-
-  // The original 4 bytes color decoding is the following:
-  // return a + (b << 8) + (g << 16) + (r << 24);
+/**
+ * Decode picking framebuffer bytes back to a picking ID. `(0,0,0,0)` -> 0.
+ */
+export function colorToIndex(r: number, g: number, b: number, a: number): number {
+  return ((b << 24) | (g << 16) | (r << 8) | a) >>> 0;
 }
 
 export function getPixelColor(

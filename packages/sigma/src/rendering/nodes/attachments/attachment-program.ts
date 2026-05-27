@@ -305,20 +305,21 @@ export class AttachmentProgram<
       labelAngle: number;
     },
   ): void {
+    const { floats } = this;
     const stride = this.ATTRIBUTES_ITEMS_COUNT;
     const i = offset * stride;
-    this.array[i + 0] = data.nodeIndex;
-    this.array[i + 1] = data.atlasX;
-    this.array[i + 2] = data.atlasY;
-    this.array[i + 3] = data.atlasW;
-    this.array[i + 4] = data.atlasH;
-    this.array[i + 5] = data.attachWidth;
-    this.array[i + 6] = data.attachHeight;
-    this.array[i + 7] = data.positionMode;
-    this.array[i + 8] = data.attachmentPlacement;
-    this.array[i + 9] = data.labelWidth;
-    this.array[i + 10] = data.labelHeight;
-    this.array[i + 11] = data.labelAngle;
+    floats[i + 0] = data.nodeIndex;
+    floats[i + 1] = data.atlasX;
+    floats[i + 2] = data.atlasY;
+    floats[i + 3] = data.atlasW;
+    floats[i + 4] = data.atlasH;
+    floats[i + 5] = data.attachWidth;
+    floats[i + 6] = data.attachHeight;
+    floats[i + 7] = data.positionMode;
+    floats[i + 8] = data.attachmentPlacement;
+    floats[i + 9] = data.labelWidth;
+    floats[i + 10] = data.labelHeight;
+    floats[i + 11] = data.labelAngle;
   }
 
   reallocateAttachments(count: number): void {

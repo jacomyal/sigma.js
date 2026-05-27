@@ -71,7 +71,15 @@ export abstract class Program<
   STRIDE: number;
 
   renderer: Sigma<N, E, G>;
-  array: Float32Array = new Float32Array();
+
+  // Two views over the same vertex attribute buffer:
+  // - `floats` reads/writes slots as 32-bit floats (the common case)
+  // - `ints` reads/writes the same slots as 32-bit unsigned ints (used for
+  //   packed picking IDs, which must not pass through a Float32 store)
+  // Both are rebuilt by `reallocate()` so they share a single ArrayBuffer
+  floats: Float32Array = new Float32Array();
+  ints: Uint32Array = new Uint32Array();
+
   constantArray: Float32Array = new Float32Array();
   capacity = 0;
   verticesCount = 0;
@@ -240,7 +248,7 @@ export abstract class Program<
       offset = 0;
       this.ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, program, offset)));
       if (this.uploadedGeneration.get(buffer) !== this.bufferGeneration) {
-        gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.floats, gl.DYNAMIC_DRAW);
         this.uploadedGeneration.set(buffer, this.bufferGeneration);
       }
     } else {
@@ -260,7 +268,7 @@ export abstract class Program<
       offset = this.renderOffset * this.ATTRIBUTES_ITEMS_COUNT * Float32Array.BYTES_PER_ELEMENT;
       this.ATTRIBUTES.forEach((attr) => (offset += this.bindAttribute(attr, program, offset, true)));
       if (this.uploadedGeneration.get(buffer) !== this.bufferGeneration) {
-        gl.bufferData(gl.ARRAY_BUFFER, this.array, gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.floats, gl.DYNAMIC_DRAW);
         this.uploadedGeneration.set(buffer, this.bufferGeneration);
       }
     }
@@ -355,11 +363,13 @@ export abstract class Program<
 
     this.capacity = capacity;
     this.verticesCount = this.VERTICES * capacity;
-    this.array = new Float32Array(
+    this.floats = new Float32Array(
       !this.isInstanced
         ? this.verticesCount * this.ATTRIBUTES_ITEMS_COUNT
         : this.capacity * this.ATTRIBUTES_ITEMS_COUNT,
     );
+    // Same buffer as `floats`, but used to write attributes as packed integers
+    this.ints = new Uint32Array(this.floats.buffer);
     this.invalidateBuffers();
 
     if (this.prePassOutputBuffer && this.prePassDef && capacity > 0) {

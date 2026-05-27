@@ -91,39 +91,38 @@ export function createBackdropProgram<
     }
 
     processBackdrop(offset: number, data: BackdropDisplayData): void {
-      const array = this.array;
-      const stride = this.STRIDE;
-      let i = offset * stride;
+      const { floats, STRIDE } = this;
+      let i = offset * STRIDE;
 
-      array[i++] = data.x;
-      array[i++] = data.y;
-      array[i++] = data.size;
-      array[i++] = data.shapeId;
-      array[i++] = data.labelWidth;
-      array[i++] = data.labelHeight;
-      array[i++] = POSITION_MODE_MAP[data.position];
-      array[i++] = data.labelAngle;
-      array[i++] = data.backdropColor[0];
-      array[i++] = data.backdropColor[1];
-      array[i++] = data.backdropColor[2];
-      array[i++] = data.backdropColor[3];
-      array[i++] = data.backdropShadowColor[0];
-      array[i++] = data.backdropShadowColor[1];
-      array[i++] = data.backdropShadowColor[2];
-      array[i++] = data.backdropShadowColor[3];
-      array[i++] = data.backdropShadowBlur;
-      array[i++] = data.backdropPadding;
-      array[i++] = data.backdropBorderColor[0];
-      array[i++] = data.backdropBorderColor[1];
-      array[i++] = data.backdropBorderColor[2];
-      array[i++] = data.backdropBorderColor[3];
+      floats[i++] = data.x;
+      floats[i++] = data.y;
+      floats[i++] = data.size;
+      floats[i++] = data.shapeId;
+      floats[i++] = data.labelWidth;
+      floats[i++] = data.labelHeight;
+      floats[i++] = POSITION_MODE_MAP[data.position];
+      floats[i++] = data.labelAngle;
+      floats[i++] = data.backdropColor[0];
+      floats[i++] = data.backdropColor[1];
+      floats[i++] = data.backdropColor[2];
+      floats[i++] = data.backdropColor[3];
+      floats[i++] = data.backdropShadowColor[0];
+      floats[i++] = data.backdropShadowColor[1];
+      floats[i++] = data.backdropShadowColor[2];
+      floats[i++] = data.backdropShadowColor[3];
+      floats[i++] = data.backdropShadowBlur;
+      floats[i++] = data.backdropPadding;
+      floats[i++] = data.backdropBorderColor[0];
+      floats[i++] = data.backdropBorderColor[1];
+      floats[i++] = data.backdropBorderColor[2];
+      floats[i++] = data.backdropBorderColor[3];
       // Packed vec4: [borderWidth, cornerRadius, labelPadding, area]
-      array[i++] = data.backdropBorderWidth;
-      array[i++] = data.backdropCornerRadius;
-      array[i++] = data.backdropLabelPadding;
-      array[i++] = data.backdropArea;
-      array[i++] = data.labelBoxOffset[0];
-      array[i++] = data.labelBoxOffset[1];
+      floats[i++] = data.backdropBorderWidth;
+      floats[i++] = data.backdropCornerRadius;
+      floats[i++] = data.backdropLabelPadding;
+      floats[i++] = data.backdropArea;
+      floats[i++] = data.labelBoxOffset[0];
+      floats[i++] = data.labelBoxOffset[1];
     }
 
     setUniforms(params: RenderParams, programInfo: ProgramInfo): void {

@@ -410,18 +410,19 @@ export function createEdgeProgram<
       data: EdgeDisplayData,
       edgeTextureIndex: number,
     ) {
-      const array = this.array;
+      const { floats, ints } = this;
 
       // Core vertex buffer writes
-      array[startIndex++] = edgeTextureIndex;
+      floats[startIndex++] = edgeTextureIndex;
       const opacity = data.opacity ?? 1;
       if (opacity < 1) {
         const [r, g, b, a] = colorToArray(data.color);
-        array[startIndex++] = rgbaToFloat(r, g, b, (a * opacity) | 0, true);
+        floats[startIndex++] = rgbaToFloat(r, g, b, (a * opacity) | 0, true);
       } else {
-        array[startIndex++] = floatColor(data.color);
+        floats[startIndex++] = floatColor(data.color);
       }
-      array[startIndex++] = edgeIndex;
+      // a_id is a packed picking ID, it should be stored as an int
+      ints[startIndex++] = edgeIndex;
 
       // Pack attributes into texture via pre-computed descriptors
       const packed = this.packedAttributeData;

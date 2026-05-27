@@ -402,7 +402,7 @@ export function createEdgeLabelProgram<
      * - a_color (1): Packed RGBA color
      */
     protected processCharacter(index: number, labelData: EdgeLabelDisplayData, _char: string, charIndex: number): void {
-      const array = this.array;
+      const { floats } = this;
       const stride = this.STRIDE;
       const startIndex = index * stride;
 
@@ -412,7 +412,7 @@ export function createEdgeLabelProgram<
       if (!cache || !cache.glyphs[charIndex]) {
         // No glyph data available - write zeros to skip this character
         for (let i = 0; i < stride; i++) {
-          array[startIndex + i] = 0;
+          floats[startIndex + i] = 0;
         }
         return;
       }
@@ -432,42 +432,42 @@ export function createEdgeLabelProgram<
       let i = startIndex;
 
       // a_edgeIndex: Index into edge data texture (contains node indices, thickness, head/tail ratios)
-      array[i++] = labelData.edgeIndex;
+      floats[i++] = labelData.edgeIndex;
 
       // a_edgeAttrIndex: Index into edge attribute texture (contains curvature and other path-specific attributes)
-      array[i++] = this.edgeAttributeTexture?.getIndex(labelData.parentKey) ?? 0;
+      floats[i++] = this.edgeAttributeTexture?.getIndex(labelData.parentKey) ?? 0;
 
       // a_baseFontSize: Base font size in pixels
-      array[i++] = labelData.size;
+      floats[i++] = labelData.size;
 
       // a_charMetrics: (charTextOffset, charAdvance, totalTextWidth, positionMode)
       // Position is resolved by the style system into labelData.position; the
       // background/picking reads the same style, so they can't disagree.
-      array[i++] = xOffset;
-      array[i++] = glyph.advance;
-      array[i++] = cache.totalWidth;
-      array[i++] = positionToMode(labelData.position);
+      floats[i++] = xOffset;
+      floats[i++] = glyph.advance;
+      floats[i++] = cache.totalWidth;
+      floats[i++] = positionToMode(labelData.position);
 
       // a_charDims: (charSize.x, charSize.y, charOffset.x, charOffset.y)
-      array[i++] = glyph.atlasWidth; // includes SDF buffer
-      array[i++] = glyph.atlasHeight; // includes SDF buffer
-      array[i++] = glyph.bearingX;
-      array[i++] = -glyph.bearingY; // flip Y for screen coords
+      floats[i++] = glyph.atlasWidth; // includes SDF buffer
+      floats[i++] = glyph.atlasHeight; // includes SDF buffer
+      floats[i++] = glyph.bearingX;
+      floats[i++] = -glyph.bearingY; // flip Y for screen coords
 
       // a_texCoords: (x, y, width, height)
-      array[i++] = glyph.atlasX;
-      array[i++] = glyph.atlasY;
-      array[i++] = glyph.atlasWidth;
-      array[i++] = glyph.atlasHeight;
+      floats[i++] = glyph.atlasX;
+      floats[i++] = glyph.atlasY;
+      floats[i++] = glyph.atlasWidth;
+      floats[i++] = glyph.atlasHeight;
 
       // a_labelParams: (margin, unused)
       // Use program-level margin override if specified, otherwise use labelData.margin
       const effectiveMargin = GeneratedEdgeLabelProgram.labelMargin ?? labelData.margin;
-      array[i++] = effectiveMargin;
-      array[i++] = 0; // unused
+      floats[i++] = effectiveMargin;
+      floats[i++] = 0; // unused
 
       // a_color: packed RGBA
-      array[i++] = color;
+      floats[i++] = color;
 
       // a_borderColor: packed RGBA (only if border is enabled)
       if (hasBorder && textBorder) {
@@ -480,7 +480,7 @@ export function createEdgeLabelProgram<
           // Attribute-based color with optional default
           borderColorValue = textBorder.color.color || "#ffffff";
         }
-        array[i++] = floatColor(borderColorValue);
+        floats[i++] = floatColor(borderColorValue);
       }
 
       // Path-specific attributes (except curvature which is now in edge texture)
@@ -497,7 +497,7 @@ export function createEdgeLabelProgram<
             seenAttrs.add(attrName);
             // Unknown attribute - write zeros
             for (let j = 0; j < attr.size; j++) {
-              array[i++] = 0;
+              floats[i++] = 0;
             }
           }
         }

@@ -136,7 +136,8 @@ float findEdgeDistance(vec2 direction, float size) {
 `;
   }
 
-  return /*glsl*/ `#version 300 es
+  // language=GLSL
+  const shader = /*glsl*/ `#version 300 es
 
 in vec2 a_nodePosition;
 in float a_nodeSize;
@@ -236,6 +237,7 @@ void main() {
   v_color = a_color;
 }
 `;
+  return shader;
 }
 
 const FRAGMENT_SHADER = /*glsl*/ `#version 300 es
@@ -248,9 +250,7 @@ out vec4 fragColor;
 
 void main() {
   #ifdef PICKING_MODE
-    const float bias = 255.0 / 254.0;
     fragColor = v_id;
-    fragColor.a *= bias;
   #else
     if (v_color.a <= 0.0) discard;
     // v_color is non-premultiplied RGBA (0-1); convert to premultiplied for blending
@@ -380,19 +380,20 @@ export function createLabelBackgroundProgram<
     }
 
     processLabelBackground(offset: number, data: LabelBackgroundData): void {
-      const array = this.array;
+      const { floats, ints } = this;
       let i = offset * this.STRIDE;
-      array[i++] = data.x;
-      array[i++] = data.y;
-      array[i++] = data.size;
-      array[i++] = data.shapeId;
-      array[i++] = data.id;
-      array[i++] = data.color;
-      array[i++] = data.labelWidth;
-      array[i++] = data.labelHeight;
-      array[i++] = data.positionMode;
-      array[i++] = data.labelAngle;
-      array[i++] = data.padding;
+      floats[i++] = data.x;
+      floats[i++] = data.y;
+      floats[i++] = data.size;
+      floats[i++] = data.shapeId;
+      // a_id is a packed picking ID, it should be stored as an int
+      ints[i++] = data.id;
+      floats[i++] = data.color;
+      floats[i++] = data.labelWidth;
+      floats[i++] = data.labelHeight;
+      floats[i++] = data.positionMode;
+      floats[i++] = data.labelAngle;
+      floats[i++] = data.padding;
     }
 
     setUniforms(params: RenderParams, { gl, uniformLocations }: ProgramInfo): void {

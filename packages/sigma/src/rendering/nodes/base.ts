@@ -48,7 +48,7 @@ export abstract class NodeProgram<
     // NOTE: dealing with hidden items automatically
     if (data.visibility === "hidden") {
       for (let l = i + this.STRIDE; i < l; i++) {
-        this.array[i] = 0;
+        this.floats[i] = 0;
       }
       return;
     }
