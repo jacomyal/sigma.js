@@ -42,27 +42,6 @@ export interface InstancedProgramDefinition<Uniform extends string = string> ext
   CONSTANT_DATA: number[][];
 }
 
-/**
- * Describes an optional transform feedback pre-pass for a program.
- * The pre-pass runs once per instance (POINTS draw with RASTERIZER_DISCARD),
- * writes computed values into a GPU buffer, and the main draw reads them
- * back as per-instance attributes — eliminating redundant per-vertex work.
- */
-export interface PrePassDefinition {
-  /** Vertex shader source for the pre-pass. */
-  shaderSource: string;
-  /** Transform feedback varying names (interleaved into one buffer). */
-  tfVaryingNames: string[];
-  /** Total floats written per instance (= sum of output attribute sizes). */
-  floatsPerInstance: number;
-  /** How the output buffer binds as per-instance attributes in the main shader. */
-  outputAttributes: Array<{ name: string; size: number; floatOffset: number }>;
-  /** Uniform names the pre-pass needs; the base class looks up their locations. */
-  uniformNames: string[];
-  /** Name of the single float attribute read from the instance buffer (e.g. "a_edgeIndex"). */
-  inputAttributeName: string;
-}
-
 function loadShader(type: string, gl: WebGL2RenderingContext, source: string): WebGLShader {
   const glType = type === "VERTEX" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 

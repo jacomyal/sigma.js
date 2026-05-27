@@ -21,7 +21,7 @@ import {
   packAttributes,
 } from "../data-texture";
 import { isAttributeSource } from "../nodes";
-import { PrePassDefinition, ProgramInfo } from "../utils";
+import { ProgramInfo, loadFragmentShader, loadTransformFeedbackProgram, loadVertexShader } from "../utils";
 import { EdgeProgram as BaseEdgeProgram, EdgeProgramType, ResolvedEdgeIds } from "./base";
 import { PREPASS_FLOATS_PER_EDGE, PREPASS_TF_VARYING_NAMES, generateEdgeShaders } from "./generator";
 import {
@@ -161,6 +161,15 @@ export function createEdgeProgram<
     // Offset to subtract from descriptor sourceIndex to get layerLifecycles key
     private readonly lifecycleIndexOffset = paths.length;
 
+    // Pre-pass state (see runPrePass below for what this is for).
+    private prePassProgram: WebGLProgram | null = null;
+    private prePassOutputBuffer: WebGLBuffer | null = null;
+    private prePassTF: WebGLTransformFeedback | null = null;
+    private prePassVAO: WebGLVertexArrayObject | null = null;
+    private prePassUniformLocations: Record<string, WebGLUniformLocation> = {};
+    private prePassInputAttrLoc = -1;
+    private prePassLastFrameId = -1;
+
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       // Generate shaders on first instantiation (after node shapes are registered)
       if (!generated) {
@@ -213,6 +222,8 @@ export function createEdgeProgram<
         }
       });
       this.attrDescriptors = buildAttrDescriptors([...paths, ...layers], this.layout, lifecycleMapForDescriptors);
+
+      this.setupPrePass();
     }
 
     resolveEdgeIds(data: EdgeDisplayData, isSelfLoop: boolean, isParallel: boolean): ResolvedEdgeIds {
@@ -255,7 +266,20 @@ export function createEdgeProgram<
       };
     }
 
-    protected getPrePassDefinition(): PrePassDefinition {
+    private setupPrePass(): void {
+      const gl = this.normalProgram.gl;
+
+      if (!this.prePassTF) this.prePassTF = gl.createTransformFeedback();
+      if (!this.prePassOutputBuffer) this.prePassOutputBuffer = gl.createBuffer();
+      if (!this.prePassVAO) this.prePassVAO = gl.createVertexArray();
+
+      if (this.prePassProgram) gl.deleteProgram(this.prePassProgram);
+      const vs = loadVertexShader(gl, generated!.prePassVertexShader);
+      const fs = loadFragmentShader(gl, `#version 300 es\nprecision highp float;\nout vec4 c;\nvoid main(){discard;}`);
+      this.prePassProgram = loadTransformFeedbackProgram(gl, vs, fs, PREPASS_TF_VARYING_NAMES);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
+
       const uniformNames = [
         "u_sizeRatio",
         "u_correctionRatio",
@@ -271,21 +295,43 @@ export function createEdgeProgram<
       ];
       [...paths, ...extremities].forEach((source) => source.uniforms.forEach((u) => uniformNames.push(u.name)));
 
-      return {
-        shaderSource: generated!.prePassVertexShader,
-        tfVaryingNames: PREPASS_TF_VARYING_NAMES,
-        floatsPerInstance: PREPASS_FLOATS_PER_EDGE,
-        outputAttributes: [{ name: "pre_clamp", size: 4, floatOffset: 0 }],
-        uniformNames,
-        inputAttributeName: "a_edgeIndex",
-      };
+      this.prePassUniformLocations = {};
+      for (const name of new Set(uniformNames)) {
+        const loc = gl.getUniformLocation(this.prePassProgram, name);
+        if (loc) this.prePassUniformLocations[name] = loc;
+      }
+
+      this.prePassInputAttrLoc = gl.getAttribLocation(this.prePassProgram, "a_edgeIndex");
+
+      for (const programInfo of [this.normalProgram, this.pickProgram]) {
+        if (!programInfo) continue;
+        programInfo.attributeLocations["pre_clamp"] = programInfo.gl.getAttribLocation(
+          programInfo.program,
+          "pre_clamp",
+        );
+      }
     }
 
-    protected setPrePassUniforms(
-      gl: WebGL2RenderingContext,
-      locs: Record<string, WebGLUniformLocation>,
-      params: RenderParams,
-    ): void {
+    /**
+     * Pre-pass: a GPU draw run once per edge before the visual draw, to
+     * pre-compute one vec4 ("pre_clamp") per edge. Without it, every vertex
+     * of the edge triangle strip would redundantly recompute the same
+     * per-edge value.
+     *
+     * The trick: this is a vertex-shader-only draw whose output is captured
+     * into a buffer (transform feedback) instead of pixels (rasterizer
+     * discarded). The buffer is then bound as a per-instance attribute on
+     * the main shader (see bindProgram), so each edge's vertices just read
+     * their own precomputed value.
+     */
+    private runPrePass(params: RenderParams): void {
+      if (!this.prePassProgram || !this.prePassOutputBuffer || !this.prePassTF || this.capacity === 0) return;
+
+      const gl = this.normalProgram.gl;
+      const locs = this.prePassUniformLocations;
+
+      gl.useProgram(this.prePassProgram);
+
       if (locs.u_sizeRatio) gl.uniform1f(locs.u_sizeRatio, params.sizeRatio);
       if (locs.u_correctionRatio) gl.uniform1f(locs.u_correctionRatio, params.correctionRatio);
       if (locs.u_cameraAngle) gl.uniform1f(locs.u_cameraAngle, params.cameraAngle);
@@ -337,6 +383,28 @@ export function createEdgeProgram<
           }
         }
       }
+
+      // A VAO bundles "which buffer feeds which shader input". A dedicated
+      // one keeps the pre-pass's attribute setup from clobbering the main
+      // draw's.
+      gl.bindVertexArray(this.prePassVAO);
+      if (this.prePassInputAttrLoc >= 0) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.normalProgram.buffer);
+        gl.enableVertexAttribArray(this.prePassInputAttrLoc);
+        gl.vertexAttribPointer(this.prePassInputAttrLoc, 1, gl.FLOAT, false, this.ATTRIBUTES_ITEMS_COUNT * 4, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      }
+
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.prePassTF);
+      gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.prePassOutputBuffer);
+      gl.enable(gl.RASTERIZER_DISCARD);
+      gl.beginTransformFeedback(gl.POINTS);
+      gl.drawArrays(gl.POINTS, 0, this.capacity);
+      gl.endTransformFeedback();
+      gl.disable(gl.RASTERIZER_DISCARD);
+      gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+
+      gl.bindVertexArray(null);
     }
 
     getDefinition() {
@@ -398,8 +466,7 @@ export function createEdgeProgram<
         this._pickingBuffer,
       );
 
-      // Rebuild pre-pass program with updated shaders
-      this.rebuildPrePass(gl);
+      this.setupPrePass();
     }
 
     processVisibleItem(
@@ -533,7 +600,53 @@ export function createEdgeProgram<
     protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
       this.maybeRegenerateShaders();
       this.layerLifecycles.forEach((hooks) => hooks.beforeRender?.());
+
+      if (!programInfo.isPicking && this.prePassLastFrameId !== params.frameId) {
+        this.runPrePass(params);
+        this.prePassLastFrameId = params.frameId;
+      }
+
       super.renderProgram(params, programInfo);
+    }
+
+    reallocate(capacity: number): void {
+      super.reallocate(capacity);
+
+      if (this.prePassOutputBuffer && capacity > 0) {
+        const gl = this.normalProgram.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.prePassOutputBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, capacity * PREPASS_FLOATS_PER_EDGE * 4, gl.DYNAMIC_COPY);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      }
+    }
+
+    protected bindProgram(programInfo: ProgramInfo): void {
+      super.bindProgram(programInfo);
+
+      if (this.prePassOutputBuffer) {
+        const gl = programInfo.gl;
+        const stride = PREPASS_FLOATS_PER_EDGE * Float32Array.BYTES_PER_ELEMENT;
+        const baseOffset = this.renderOffset * stride;
+        const location = programInfo.attributeLocations["pre_clamp"];
+        if (location !== undefined && location >= 0) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.prePassOutputBuffer);
+          gl.enableVertexAttribArray(location);
+          gl.vertexAttribPointer(location, 4, gl.FLOAT, false, stride, baseOffset);
+          gl.vertexAttribDivisor(location, 1);
+          gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
+      }
+    }
+
+    protected unbindProgram(programInfo: ProgramInfo): void {
+      super.unbindProgram(programInfo);
+
+      const location = programInfo.attributeLocations["pre_clamp"];
+      if (location !== undefined && location >= 0) {
+        const gl = programInfo.gl;
+        gl.disableVertexAttribArray(location);
+        gl.vertexAttribDivisor(location, 0);
+      }
     }
 
     /**
@@ -555,6 +668,12 @@ export function createEdgeProgram<
         this.edgeAttributeTexture.kill();
         this.edgeAttributeTexture = null;
       }
+
+      const gl = this.normalProgram.gl;
+      if (this.prePassProgram) gl.deleteProgram(this.prePassProgram);
+      if (this.prePassOutputBuffer) gl.deleteBuffer(this.prePassOutputBuffer);
+      if (this.prePassTF) gl.deleteTransformFeedback(this.prePassTF);
+      if (this.prePassVAO) gl.deleteVertexArray(this.prePassVAO);
 
       super.kill();
     }

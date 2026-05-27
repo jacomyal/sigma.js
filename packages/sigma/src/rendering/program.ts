@@ -12,7 +12,6 @@ import type { RenderParams } from "../types";
 import { UniformSpecification } from "./nodes";
 import {
   InstancedProgramDefinition,
-  PrePassDefinition,
   ProgramAttributeSpecification,
   ProgramDefinition,
   ProgramInfo,
@@ -20,11 +19,8 @@ import {
   killProgram,
   loadFragmentShader,
   loadProgram,
-  loadTransformFeedbackProgram,
   loadVertexShader,
 } from "./utils";
-
-export type { PrePassDefinition };
 
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.BOOL]: 1,
@@ -98,16 +94,6 @@ export abstract class Program<
 
   isInstanced: boolean;
 
-  // Transform feedback pre-pass (active when getPrePassDefinition() returns non-null)
-  private prePassProgram: WebGLProgram | null = null;
-  private prePassOutputBuffer: WebGLBuffer | null = null;
-  private prePassTF: WebGLTransformFeedback | null = null;
-  private prePassVAO: WebGLVertexArrayObject | null = null;
-  private prePassUniformLocations: Record<string, WebGLUniformLocation> = {};
-  private prePassInputAttrLoc = -1;
-  private prePassDef: PrePassDefinition | null = null;
-  private prePassLastFrameId = -1;
-
   abstract getDefinition(): ProgramDefinition<Uniform> | InstancedProgramDefinition<Uniform>;
 
   constructor(gl: WebGL2RenderingContext, _pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
@@ -165,23 +151,11 @@ export abstract class Program<
 
       this.STRIDE = this.ATTRIBUTES_ITEMS_COUNT;
     }
-
-    // Set up transform feedback pre-pass if the program opts in
-    const prePassDef = this.getPrePassDefinition();
-    if (prePassDef) this._setupPrePass(gl, prePassDef);
   }
 
   kill() {
-    const gl = this.normalProgram.gl;
     killProgram(this.normalProgram);
     if (this.pickProgram) killProgram(this.pickProgram);
-
-    if (this.prePassProgram) {
-      gl.deleteProgram(this.prePassProgram);
-      if (this.prePassOutputBuffer) gl.deleteBuffer(this.prePassOutputBuffer);
-      if (this.prePassTF) gl.deleteTransformFeedback(this.prePassTF);
-      if (this.prePassVAO) gl.deleteVertexArray(this.prePassVAO);
-    }
   }
 
   protected getProgramInfo(
@@ -274,22 +248,6 @@ export abstract class Program<
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    // Bind pre-pass output buffer as per-instance attributes
-    if (this.prePassOutputBuffer && this.prePassDef) {
-      const stride = this.prePassDef.floatsPerInstance * Float32Array.BYTES_PER_ELEMENT;
-      const baseOffset = this.renderOffset * stride;
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.prePassOutputBuffer);
-      for (const attr of this.prePassDef.outputAttributes) {
-        const location = program.attributeLocations[attr.name];
-        if (location !== undefined && location >= 0) {
-          gl.enableVertexAttribArray(location);
-          gl.vertexAttribPointer(location, attr.size, gl.FLOAT, false, stride, baseOffset + attr.floatOffset * 4);
-          gl.vertexAttribDivisor(location, 1);
-        }
-      }
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
   }
 
   protected unbindProgram(program: ProgramInfo): void {
@@ -298,17 +256,6 @@ export abstract class Program<
     } else {
       this.CONSTANT_ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, program, false));
       this.ATTRIBUTES.forEach((attr) => this.unbindAttribute(attr, program, true));
-    }
-
-    if (this.prePassDef) {
-      for (const attr of this.prePassDef.outputAttributes) {
-        const location = program.attributeLocations[attr.name];
-        if (location !== undefined && location >= 0) {
-          const { gl } = program;
-          gl.disableVertexAttribArray(location);
-          gl.vertexAttribDivisor(location, 0);
-        }
-      }
     }
   }
 
@@ -371,13 +318,6 @@ export abstract class Program<
     // Same buffer as `floats`, but used to write attributes as packed integers
     this.ints = new Uint32Array(this.floats.buffer);
     this.invalidateBuffers();
-
-    if (this.prePassOutputBuffer && this.prePassDef && capacity > 0) {
-      const gl = this.normalProgram.gl;
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.prePassOutputBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, capacity * this.prePassDef.floatsPerInstance * 4, gl.DYNAMIC_COPY);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
   }
 
   /**
@@ -429,99 +369,6 @@ export abstract class Program<
 
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
 
-  /**
-   * Returns a PrePassDefinition to opt into the transform feedback pre-pass,
-   * or null (default) to skip it.
-   */
-  protected getPrePassDefinition(): PrePassDefinition | null {
-    return null;
-  }
-
-  /**
-   * Sets uniforms on the pre-pass program. Called by the base class just
-   * before the pre-pass draw; uniformLocations contains all locations declared
-   * in PrePassDefinition.uniformNames.
-   */
-  protected setPrePassUniforms(
-    _gl: WebGL2RenderingContext,
-    _uniformLocations: Record<string, WebGLUniformLocation>,
-    _params: RenderParams,
-  ): void {}
-
-  private _setupPrePass(gl: WebGL2RenderingContext, def: PrePassDefinition): void {
-    this.prePassDef = def;
-
-    // Allocate WebGL objects on first call
-    if (!this.prePassTF) this.prePassTF = gl.createTransformFeedback();
-    if (!this.prePassOutputBuffer) this.prePassOutputBuffer = gl.createBuffer();
-    if (!this.prePassVAO) this.prePassVAO = gl.createVertexArray();
-
-    // (Re)compile the TF program
-    if (this.prePassProgram) gl.deleteProgram(this.prePassProgram);
-    const vs = loadVertexShader(gl, def.shaderSource);
-    const fs = loadFragmentShader(gl, `#version 300 es\nprecision highp float;\nout vec4 c;\nvoid main(){discard;}`);
-    this.prePassProgram = loadTransformFeedbackProgram(gl, vs, fs, def.tfVaryingNames);
-    gl.deleteShader(vs);
-    gl.deleteShader(fs);
-
-    // Collect uniform locations
-    this.prePassUniformLocations = {};
-    for (const name of new Set(def.uniformNames)) {
-      const loc = gl.getUniformLocation(this.prePassProgram, name);
-      if (loc) this.prePassUniformLocations[name] = loc;
-    }
-
-    // The pre-pass reads one attribute from the instance buffer
-    this.prePassInputAttrLoc = gl.getAttribLocation(this.prePassProgram, def.inputAttributeName);
-
-    // Register output attribute locations in main/pick programs
-    for (const programInfo of [this.normalProgram, this.pickProgram]) {
-      if (!programInfo) continue;
-      for (const attr of def.outputAttributes) {
-        programInfo.attributeLocations[attr.name] = programInfo.gl.getAttribLocation(programInfo.program, attr.name);
-      }
-    }
-  }
-
-  private _runPrePass(params: RenderParams): void {
-    if (!this.prePassProgram || !this.prePassOutputBuffer || !this.prePassTF || !this.prePassDef || this.capacity === 0)
-      return;
-
-    const gl = this.normalProgram.gl;
-
-    gl.useProgram(this.prePassProgram);
-    this.setPrePassUniforms(gl, this.prePassUniformLocations, params);
-
-    // Use a dedicated VAO so the draw doesn't disturb the main program's attribute state
-    gl.bindVertexArray(this.prePassVAO);
-    if (this.prePassInputAttrLoc >= 0) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.normalProgram.buffer);
-      gl.enableVertexAttribArray(this.prePassInputAttrLoc);
-      gl.vertexAttribPointer(this.prePassInputAttrLoc, 1, gl.FLOAT, false, this.ATTRIBUTES_ITEMS_COUNT * 4, 0);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
-
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.prePassTF);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.prePassOutputBuffer);
-    gl.enable(gl.RASTERIZER_DISCARD);
-    gl.beginTransformFeedback(gl.POINTS);
-    gl.drawArrays(gl.POINTS, 0, this.capacity);
-    gl.endTransformFeedback();
-    gl.disable(gl.RASTERIZER_DISCARD);
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
-
-    gl.bindVertexArray(null);
-  }
-
-  /**
-   * Recreates the pre-pass program after shader regeneration.
-   * Call this after rebuilding the main program in a subclass.
-   */
-  protected rebuildPrePass(gl: WebGL2RenderingContext): void {
-    const def = this.getPrePassDefinition();
-    if (def) this._setupPrePass(gl, def);
-  }
-
   protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
     const { gl, program, isPicking } = programInfo;
 
@@ -531,12 +378,6 @@ export abstract class Program<
       gl.disable(gl.BLEND);
     } else {
       gl.enable(gl.BLEND);
-    }
-
-    // Run pre-pass at most once per frame; picking pass reuses the same buffer
-    if (!isPicking && this.prePassProgram && this.prePassLastFrameId !== params.frameId) {
-      this._runPrePass(params);
-      this.prePassLastFrameId = params.frameId;
     }
 
     gl.useProgram(program);
@@ -553,7 +394,6 @@ export abstract class Program<
     const gl = this.normalProgram.gl;
 
     // Pass 1: Render to screen (with blending enabled).
-    // Runs the pre-pass (transform feedback) so that picking can reuse its output.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, params.width * params.pixelRatio, params.height * params.pixelRatio);
     this.bindProgram(this.normalProgram);
