@@ -13,9 +13,9 @@ import {
   EdgeExtremity,
   EdgeLayer,
   EdgePath,
-  EdgeProgramType,
+  EdgeProgramBundle,
   FragmentLayer,
-  NodeProgramType,
+  NodeProgramBundle,
   SDFShape,
   createEdgeProgram,
   createNodeProgram,
@@ -272,40 +272,31 @@ export function parseEdgePrimitives(edgePrimitives?: EdgePrimitives): ParsedEdge
 // =============================================================================
 
 /**
- * Result of generating a node program from primitives.
+ * Result of generating a node program suite from primitives: the node
+ * program plus its label / backdrop / label-background companions and the
+ * declared graphic variables.
  */
-export interface GeneratedNodeProgram<
+export type GeneratedNodeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> {
-  program: NodeProgramType<N, E, G>;
-  variables: VariablesDefinition;
-}
+> = NodeProgramBundle<N, E, G> & { variables: VariablesDefinition };
 
 /**
- * Result of generating an edge program from primitives.
+ * Result of generating an edge program suite from primitives: the edge
+ * program plus its label and label-background companions, the declared
+ * graphic variables, and the resolved path list.
  */
-export interface GeneratedEdgeProgram<
+export type GeneratedEdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> {
-  program: EdgeProgramType<N, E, G>;
-  variables: VariablesDefinition;
-  paths: EdgePath[];
-}
+> = EdgeProgramBundle<N, E, G> & { variables: VariablesDefinition; paths: EdgePath[] };
 
 /**
- * Generates a NodeProgram from a primitives declaration.
- *
- * This is a high-level function that:
- * 1. Parses the node primitives specs into factory outputs
- * 2. Calls createNodeProgram with the parsed shapes and layers
- * 3. Returns the program along with declared variables
- *
- * @param nodePrimitives - Node primitives declaration
- * @returns Object containing the NodeProgram class and declared variables
+ * Generates the full node program suite from a primitives declaration.
+ * Wraps `createNodeProgram` with primitive parsing and tacks on the
+ * declared graphic variables.
  */
 export function generateNodeProgram<
   N extends Attributes = Attributes,
@@ -315,7 +306,7 @@ export function generateNodeProgram<
   const { shapes, layers } = parseNodePrimitives(nodePrimitives);
   const variables = nodePrimitives?.variables || {};
 
-  const program = createNodeProgram<N, E, G>({
+  const bundle = createNodeProgram<N, E, G>({
     shapes,
     layers,
     rotateWithCamera: nodePrimitives?.rotateWithCamera,
@@ -323,19 +314,13 @@ export function generateNodeProgram<
     backdrop: nodePrimitives?.backdrop,
   });
 
-  return { program, variables };
+  return { ...bundle, variables };
 }
 
 /**
- * Generates an EdgeProgram from a primitives declaration.
- *
- * This is a high-level function that:
- * 1. Parses the edge primitives specs into factory outputs
- * 2. Calls createEdgeProgram with the parsed paths, extremities, and layers
- * 3. Returns the program along with declared variables
- *
- * @param edgePrimitives - Edge primitives declaration
- * @returns Object containing the EdgeProgram class and declared variables
+ * Generates the full edge program suite from a primitives declaration.
+ * Wraps `createEdgeProgram` with primitive parsing and tacks on the
+ * declared graphic variables and the resolved path list.
  */
 export function generateEdgeProgram<
   N extends Attributes = Attributes,
@@ -351,7 +336,7 @@ export function generateEdgeProgram<
   }
   Object.assign(variables, edgePrimitives?.variables || {});
 
-  const program = createEdgeProgram<N, E, G>({
+  const bundle = createEdgeProgram<N, E, G>({
     paths,
     extremities,
     layers,
@@ -360,5 +345,5 @@ export function generateEdgeProgram<
     label: edgePrimitives?.label,
   });
 
-  return { program, variables, paths };
+  return { ...bundle, variables, paths };
 }

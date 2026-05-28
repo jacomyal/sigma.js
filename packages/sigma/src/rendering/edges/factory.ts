@@ -24,13 +24,7 @@ import { isAttributeSource } from "../nodes";
 import { Program } from "../program";
 import { ProgramInfo, loadFragmentShader, loadTransformFeedbackProgram, loadVertexShader } from "../utils";
 import { PREPASS_FLOATS_PER_EDGE, PREPASS_TF_VARYING_NAMES, generateEdgeShaders } from "./generator";
-import {
-  type EdgeLabelBackgroundProgramType,
-  type EdgeLabelProgramType,
-  createEdgeLabelBackgroundProgram,
-  createEdgeLabelProgram,
-  resolveEdgeLabelShaderConfig,
-} from "./labels";
+import { createEdgeLabelBackgroundProgram, createEdgeLabelProgram, resolveEdgeLabelShaderConfig } from "./labels";
 import { EDGE_ATTRIBUTE_TEXTURE_UNIT } from "./path-attribute-texture";
 import {
   EdgeExtremity,
@@ -66,23 +60,25 @@ float extremity_none(vec2 uv, float lengthRatio, float widthRatio) {
 }
 
 /**
- * Creates an edge program from paths, extremities, and layers.
+ * Creates an edge program suite from paths, extremities, and layers. The
+ * suite is a flat bundle: the edge program class plus the matching label
+ * and label-background (ribbon) program classes.
  *
  * @param options - Configuration for the edge program
- * @returns An EdgeProgram class that can be used with Sigma
+ * @returns A bundle `{ program, labelProgram, labelBackgroundProgram }`
  *
  * @example
  * ```typescript
  * import { createEdgeProgram, pathLine, pathCurved, extremityArrow, layerPlain } from "sigma/rendering";
  *
  * // Simple line (no extremities needed - "none" is implicit)
- * const EdgeLineProgram = createEdgeProgram({
+ * const { program: EdgeLineProgram } = createEdgeProgram({
  *   paths: [pathLine()],
  *   layers: [layerPlain()],
  * });
  *
  * // Arrow at head
- * const EdgeArrowProgram = createEdgeProgram({
+ * const { program: EdgeArrowProgram } = createEdgeProgram({
  *   paths: [pathLine()],
  *   extremities: [extremityArrow()],
  *   layers: [layerPlain()],
@@ -90,7 +86,7 @@ float extremity_none(vec2 uv, float lengthRatio, float widthRatio) {
  * });
  *
  * // Multi-path: edges select path/extremity via attributes
- * const MultiEdgeProgram = createEdgeProgram({
+ * const { program: MultiEdgeProgram } = createEdgeProgram({
  *   paths: [pathLine(), pathCurved()],
  *   extremities: [extremityArrow()],
  *   layers: [layerPlain()],
@@ -138,22 +134,6 @@ export function createEdgeProgram<
 
   // Create the edge program class
   const EdgeProgramClass = class extends Program<string, N, E, G> {
-    // Store options with the prepended extremities array (for sigma to look up length ratios)
-    static readonly programOptions = { ...options, extremities };
-    // Name-to-index mappings (for sigma to look up indices from names)
-    static readonly pathNameToIndex = pathNameToIndex;
-    static readonly extremityNameToIndex = extremityNameToIndex;
-    // Default indices for head/tail when edge doesn't specify
-    static readonly defaultHeadIndex = defaultHeadIndex;
-    static readonly defaultTailIndex = defaultTailIndex;
-
-    static get generatedShaders() {
-      if (!generated) {
-        generated = generateEdgeShaders({ paths, extremities, layers });
-      }
-      return generated;
-    }
-
     // Lifecycle hooks storage for all layers
     private layerLifecycles: Map<number, EdgeLifecycleHooks> = new Map();
     private needsShaderRegeneration = false;
@@ -718,25 +698,30 @@ export function createEdgeProgram<
   };
   const labelShaderConfig = resolveEdgeLabelShaderConfig(labelFactoryOptions);
 
-  // Create and attach the label program (SDF text along the edge path).
+  // SDF text along the edge path, and the ribbon behind it. Both programs
+  // consume the same resolved shader config, so the ribbon cannot drift
+  // from the text it pairs with.
   const LabelProgramClass = createEdgeLabelProgram(labelFactoryOptions);
-  (EdgeProgramClass as unknown as { LabelProgram: EdgeLabelProgramType }).LabelProgram = LabelProgramClass;
-
-  // Create and attach the label background program (ribbon behind the text).
-  // Both programs consume the same resolved shader config, so the ribbon
-  // cannot drift from the text it pairs with.
   const LabelBackgroundProgramClass = createEdgeLabelBackgroundProgram({ shaderConfig: labelShaderConfig });
-  (EdgeProgramClass as unknown as { LabelBackgroundProgram: EdgeLabelBackgroundProgramType }).LabelBackgroundProgram =
-    LabelBackgroundProgramClass;
 
-  return EdgeProgramClass;
+  return {
+    program: EdgeProgramClass,
+    labelProgram: LabelProgramClass,
+    labelBackgroundProgram: LabelBackgroundProgramClass,
+  };
 }
+
+export type EdgeProgramBundle<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createEdgeProgram<N, E, G>>;
 
 export type EdgeProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createEdgeProgram<N, E, G>>;
+> = EdgeProgramBundle<N, E, G>["program"];
 
 export type EdgeProgram<
   N extends Attributes = Attributes,

@@ -9,7 +9,7 @@
 
 // Core factory function and program type aliases
 export { createNodeProgram } from "./factory";
-export type { NodeProgram, NodeProgramType } from "./factory";
+export type { NodeProgram, NodeProgramType, NodeProgramBundle } from "./factory";
 
 // Type definitions
 export type {

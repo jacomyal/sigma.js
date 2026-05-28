@@ -48,19 +48,10 @@ import {
 import {
   AttachmentManager,
   AttachmentProgram,
-  BackdropProgram,
-  BackdropProgramType,
   DepthBucketCollection,
   EdgeDataTexture,
-  EdgeLabelBackgroundProgram,
-  EdgeLabelBackgroundProgramType,
-  EdgeLabelProgram,
   EdgePath,
   EdgeProgram,
-  LabelBackgroundProgram,
-  LabelBackgroundProgramType,
-  LabelProgram,
-  LabelProgramType,
   NodeDataTexture,
   NodeProgram,
   getShapeId,
@@ -400,40 +391,23 @@ export default class Sigma<
     const sigma = this as unknown as Sigma<N, E, G>;
     const gl = this.webGLContext!;
 
-    const { program: NodeProgramClass, variables: nodeVariables } = generateNodeProgram<N, E, G>(
-      resolvedPrimitives?.nodes,
-    );
+    const {
+      program: NodeProgramClass,
+      labelProgram: NodeLabelProgramClass,
+      backdropProgram: BackdropProgramClass,
+      labelBackgroundProgram: NodeLabelBackgroundProgramClass,
+      shapeSlug: nodeShapeSlug,
+      shapeNameToIndex: nodeShapeMap,
+      shapeGlobalIds: nodeGlobalShapeIds,
+      variables: nodeVariables,
+    } = generateNodeProgram<N, E, G>(resolvedPrimitives?.nodes);
     this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
     this.nodeProgram = new NodeProgramClass(gl, null, sigma);
+    if (nodeShapeSlug) this.nodeShapeSlug = nodeShapeSlug;
 
-    // Cache shape information
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nodeProgramOptions = (NodeProgramClass as any).programOptions;
-    if (nodeProgramOptions?.shapeSlug) {
-      this.nodeShapeSlug = nodeProgramOptions.shapeSlug;
-    }
-    const nodeShapeMap: Record<string, number> | null = nodeProgramOptions?.shapeNameToIndex ?? null;
-    const nodeGlobalShapeIds: number[] | null = nodeProgramOptions?.shapeGlobalIds ?? null;
-
-    // Create label program if the node program has one
-    const LabelProgramClass = NodeProgramClass.LabelProgram as LabelProgramType<N, E, G> | undefined;
-    const labelProgram: LabelProgram<string, N, E, G> | null = LabelProgramClass
-      ? new LabelProgramClass(gl, null, sigma)
-      : null;
-
-    // Create backdrop program if the node program has one
-    const BackdropProgramClass = NodeProgramClass.BackdropProgram as BackdropProgramType<N, E, G> | undefined;
-    const backdropProgram: BackdropProgram<N, E, G> | null = BackdropProgramClass
-      ? new BackdropProgramClass(gl, null, sigma)
-      : null;
-
-    // Create label background program if the node program has one
-    const LabelBackgroundProgramClass = NodeProgramClass.LabelBackgroundProgram as
-      | LabelBackgroundProgramType<N, E, G>
-      | undefined;
-    const labelBackgroundProgram: LabelBackgroundProgram<N, E, G> | null = LabelBackgroundProgramClass
-      ? new LabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma)
-      : null;
+    const labelProgram = new NodeLabelProgramClass(gl, null, sigma);
+    const backdropProgram = new BackdropProgramClass(gl, null, sigma);
+    const labelBackgroundProgram = new NodeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma);
 
     // Create label attachment system if attachments are declared
     const labelAttachments = resolvedPrimitives?.nodes?.labelAttachments;
@@ -446,6 +420,8 @@ export default class Sigma<
 
     const {
       program: EdgeProgramClass,
+      labelProgram: EdgeLabelProgramClass,
+      labelBackgroundProgram: EdgeLabelBackgroundProgramClass,
       variables: edgeVariables,
       paths: edgePaths,
     } = generateEdgeProgram<N, E, G>(resolvedPrimitives?.edges);
@@ -453,23 +429,10 @@ export default class Sigma<
     this.edgePathsByName = new Map(edgePaths.map((p) => [p.name, p]));
     this.edgeProgram = new EdgeProgramClass(gl, null, sigma);
 
-    // Create edge label program if the edge program has one
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const EdgeLabelProgramClass = (EdgeProgramClass as any).LabelProgram;
-    const edgeLabelProgram: EdgeLabelProgram<N, E, G> | null = EdgeLabelProgramClass
-      ? new EdgeLabelProgramClass(gl, null, sigma)
-      : null;
-
-    // Create edge label background program (ribbon along the edge path).
-    // Picking framebuffer is passed so label events can be wired onto the ribbon.
-    const EdgeLabelBackgroundProgramClass = (
-      EdgeProgramClass as unknown as {
-        LabelBackgroundProgram?: EdgeLabelBackgroundProgramType<N, E, G>;
-      }
-    ).LabelBackgroundProgram;
-    const edgeLabelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G> | null = EdgeLabelBackgroundProgramClass
-      ? new EdgeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma)
-      : null;
+    const edgeLabelProgram = new EdgeLabelProgramClass(gl, null, sigma);
+    // The label background ribbon takes the picking framebuffer so label
+    // events can be wired onto it.
+    const edgeLabelBackgroundProgram = new EdgeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma);
 
     // Create the shared internals object. All reassignable fields are plain properties;
     // satellites hold a reference to this object and see updates via direct assignment.
@@ -2914,18 +2877,13 @@ export default class Sigma<
     // Kill programs:
     this.nodeProgram.kill();
     this.edgeProgram.kill();
-    this.internals.labelProgram?.kill();
-    this.internals.edgeLabelProgram?.kill();
-    this.internals.edgeLabelBackgroundProgram?.kill();
-    this.internals.backdropProgram?.kill();
-    this.internals.labelBackgroundProgram?.kill();
+    this.internals.labelProgram.kill();
+    this.internals.edgeLabelProgram.kill();
+    this.internals.edgeLabelBackgroundProgram.kill();
+    this.internals.backdropProgram.kill();
+    this.internals.labelBackgroundProgram.kill();
     this.internals.attachmentProgram?.kill();
     this.internals.attachmentManager?.kill();
-    this.internals.labelProgram = null;
-    this.internals.edgeLabelProgram = null;
-    this.internals.edgeLabelBackgroundProgram = null;
-    this.internals.backdropProgram = null;
-    this.internals.labelBackgroundProgram = null;
     this.internals.attachmentProgram = null;
     this.internals.attachmentManager = null;
 

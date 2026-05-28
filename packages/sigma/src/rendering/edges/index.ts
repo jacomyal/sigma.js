@@ -9,7 +9,7 @@
  */
 
 // Program type aliases and edge-id resolution result
-export type { EdgeProgram, EdgeProgramType, ResolvedEdgeIds } from "./factory";
+export type { EdgeProgram, EdgeProgramType, EdgeProgramBundle, ResolvedEdgeIds } from "./factory";
 
 // Types
 export type {

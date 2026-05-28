@@ -9,28 +9,23 @@
 // GLSL utilities
 export * from "./glsl";
 
-// Node programs
+// Node and edge program factories + their composable building blocks
+// (shapes, layers, paths, extremities). Sub-indices also re-export the
+// XProgram / XProgramType aliases used internally by sigma; those aren't
+// part of the advertised public API. The base label / label-background
+// classes (LabelProgram, createLabelBackgroundProgram, etc.) are
+// intentionally not re-exported — they're internals reachable only via
+// "sigma/rendering/nodes/labels" for advanced users.
 export * from "./nodes";
+export * from "./edges";
 
-// Base classes
-export type { EdgeProgram, EdgeProgramType } from "./edges";
+// Public base classes / utilities
 export { Program } from "./program";
 export type { ProgramType } from "./program";
-export { LabelProgram, createLabelBackgroundProgram } from "./nodes/labels";
-export type {
-  LabelProgramType,
-  LabelBackgroundProgram,
-  LabelBackgroundProgramType,
-  LabelBackgroundData,
-} from "./nodes/labels";
-export type { BackdropProgram, BackdropProgramType, BackdropDisplayData } from "./nodes/backdrops";
 export { DepthBucketCollection } from "./bucket";
 
 // Other various program helpers
 export * from "./utils";
-
-// Composable edge programs (v4 architecture)
-export * from "./edges";
 
 // Shape registry
 export * from "./shapes";

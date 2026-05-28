@@ -2,9 +2,9 @@
  * Sigma.js Node Program Factory
  * ==============================
  *
- * Factory function that creates a NodeProgram from SDF shapes and fragment layers.
- * The resulting program includes an automatically generated LabelProgram that uses
- * the same shape for accurate label positioning.
+ * Factory function that builds a node program suite (the node program plus
+ * shape-aware label, backdrop, and label-background programs) from SDF
+ * shapes and fragment layers.
  *
  * @module
  */
@@ -32,23 +32,24 @@ import { FragmentLayer, LayerLifecycleContext, LayerLifecycleHooks, NodeProgramO
 const LAYER_ATTRIBUTE_TEXTURE_UNIT = 5;
 
 /**
- * Creates a node program from SDF shape(s) and fragment layers.
- * The resulting program renders nodes as quads with the specified shape(s) and layers.
- * It also includes a static `LabelProgram` property for rendering shape-aware labels.
+ * Creates a node program suite from SDF shape(s) and fragment layers. The
+ * suite is a flat bundle: the node program class plus the matching label,
+ * backdrop, and label-background program classes, alongside the shape
+ * registry metadata sigma needs for multi-shape programs.
  *
  * Supports two modes:
  * - Single shape: Use `shape` for a program that renders one shape type
  * - Multi-shape: Use `shapes` for a program that can render different shapes per node
  *
  * @param options - Configuration for the node program
- * @returns A NodeProgram class that can be used with Sigma
+ * @returns A bundle `{ program, labelProgram, backdropProgram, labelBackgroundProgram, shapeSlug, shapeNameToIndex, shapeGlobalIds }`
  *
  * @example
  * ```typescript
  * // Single shape (backward compatible)
  * import { createNodeProgram, sdfCircle, layerFill } from "sigma/rendering";
  *
- * const CircleProgram = createNodeProgram({
+ * const { program: CircleProgram } = createNodeProgram({
  *   shape: sdfCircle(),
  *   layers: [layerFill()],
  * });
@@ -57,7 +58,7 @@ const LAYER_ATTRIBUTE_TEXTURE_UNIT = 5;
  * @example
  * ```typescript
  * // Multi-shape program
- * const MultiShapeProgram = createNodeProgram({
+ * const { program: MultiShapeProgram } = createNodeProgram({
  *   shapes: [sdfCircle(), sdfSquare(), sdfTriangle(), sdfDiamond()],
  *   layers: [layerFill(), layerBorder({ ... })],
  * });
@@ -132,23 +133,6 @@ export function createNodeProgram<
 
   // Create the node program class
   const NodeProgramClass = class extends Program<string, N, E, G> {
-    // Expose program configuration for Sigma to access (shape registry, multi-shape mapping)
-    static readonly programOptions = {
-      ...options,
-      shapeSlug: primaryShapeSlug,
-      shapeNameToIndex: shapes.length > 1 ? shapeNameToIndex : undefined,
-      shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
-    };
-
-    // Static reference to the associated LabelProgram
-    static LabelProgram = LabelProgramClass;
-
-    // Static reference to the associated BackdropProgram
-    static BackdropProgram = BackdropProgramClass;
-
-    // Static reference to the associated LabelBackgroundProgram
-    static LabelBackgroundProgram = LabelBackgroundProgramClass;
-
     // Static shared texture per GL context
     private static layerTextures = new WeakMap<WebGL2RenderingContext, ItemAttributeTexture>();
     private static textureRefCounts = new WeakMap<WebGL2RenderingContext, number>();
@@ -459,14 +443,29 @@ export function createNodeProgram<
     }
   };
 
-  return NodeProgramClass;
+  return {
+    program: NodeProgramClass,
+    labelProgram: LabelProgramClass,
+    backdropProgram: BackdropProgramClass,
+    labelBackgroundProgram: LabelBackgroundProgramClass,
+    // Shape registry metadata (consumed by sigma when the program is multi-shape).
+    shapeSlug: primaryShapeSlug,
+    shapeNameToIndex: shapes.length > 1 ? shapeNameToIndex : undefined,
+    shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
+  };
 }
+
+export type NodeProgramBundle<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createNodeProgram<N, E, G>>;
 
 export type NodeProgramType<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createNodeProgram<N, E, G>>;
+> = NodeProgramBundle<N, E, G>["program"];
 
 export type NodeProgram<
   N extends Attributes = Attributes,

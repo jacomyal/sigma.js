@@ -112,18 +112,11 @@ interface EdgeLabelGlyphCache {
  * The resulting program renders text labels along edge paths using SDF
  * (Signed Distance Field) atlas for crisp text at any zoom level.
  *
+ * `createEdgeProgram` calls this internally and returns the resulting
+ * class in its `labelProgram` field.
+ *
  * @param options Configuration for the edge label program
  * @returns An EdgeLabelProgram class constructor
- *
- * @example
- * ```typescript
- * const LineEdgeLabelProgram = createEdgeLabelProgram({
- *   paths: [pathLine(), pathCurved()],
- * });
- *
- * // Attach to edge program
- * ComposedEdgeLineProgram.LabelProgram = LineEdgeLabelProgram;
- * ```
  */
 export function createEdgeLabelProgram<
   N extends Attributes = Attributes,
