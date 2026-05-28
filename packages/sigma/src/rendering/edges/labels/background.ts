@@ -275,45 +275,6 @@ void main() {
 `;
 
 // ============================================================================
-// Abstract base class
-// ============================================================================
-
-export abstract class EdgeLabelBackgroundProgram<
-  Uniform extends string = string,
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> extends Program<Uniform, N, E, G> {
-  protected totalCount = 0;
-  protected bufferCapacity = 0;
-
-  abstract processEdgeLabelBackground(offset: number, labelKey: string, data: EdgeLabelBackgroundData): void;
-
-  drawWebGL(_method: number, { gl }: ProgramInfo): void {
-    if (this.totalCount === 0) return;
-    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.VERTICES, this.totalCount);
-  }
-
-  reallocate(count: number): void {
-    this.totalCount = count;
-    if (count > this.bufferCapacity) {
-      this.bufferCapacity = Math.max(count, Math.ceil(this.bufferCapacity * 1.5) || 10);
-      super.reallocate(this.bufferCapacity);
-    }
-  }
-}
-
-export type EdgeLabelBackgroundProgramType<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = new (
-  gl: WebGL2RenderingContext,
-  pickingBuffer: WebGLFramebuffer | null,
-  renderer: Sigma<N, E, G>,
-) => EdgeLabelBackgroundProgram<string, N, E, G>;
-
-// ============================================================================
 // Factory
 // ============================================================================
 
@@ -330,7 +291,7 @@ export function createEdgeLabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateEdgeLabelBackgroundProgramOptions): EdgeLabelBackgroundProgramType<N, E, G> {
+>(options: CreateEdgeLabelBackgroundProgramOptions) {
   const { shaderConfig } = options;
   const { paths, fontSizeMode } = shaderConfig;
 
@@ -348,7 +309,10 @@ export function createEdgeLabelBackgroundProgram<
 
   type U = string;
 
-  return class GeneratedEdgeLabelBackgroundProgram extends EdgeLabelBackgroundProgram<U, N, E, G> {
+  return class GeneratedEdgeLabelBackgroundProgram extends Program<U, N, E, G> {
+    protected totalCount = 0;
+    protected bufferCapacity = 0;
+
     private edgeAttributeTexture: ItemAttributeTexture | null = null;
     private packedAttributeData: Float32Array;
 
@@ -479,5 +443,30 @@ export function createEdgeLabelBackgroundProgram<
       }
       super.kill();
     }
+
+    drawWebGL(_method: number, { gl }: ProgramInfo): void {
+      if (this.totalCount === 0) return;
+      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.VERTICES, this.totalCount);
+    }
+
+    reallocate(count: number): void {
+      this.totalCount = count;
+      if (count > this.bufferCapacity) {
+        this.bufferCapacity = Math.max(count, Math.ceil(this.bufferCapacity * 1.5) || 10);
+        super.reallocate(this.bufferCapacity);
+      }
+    }
   };
 }
+
+export type EdgeLabelBackgroundProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createEdgeLabelBackgroundProgram<N, E, G>>;
+
+export type EdgeLabelBackgroundProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = InstanceType<EdgeLabelBackgroundProgramType<N, E, G>>;

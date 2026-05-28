@@ -29,12 +29,12 @@ import {
   computeAttributeLayout,
   packAttributes,
 } from "../../data-texture";
+import { LabelProgram } from "../../nodes/labels/base";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
 import { layerPlain } from "../layers";
 import { EDGE_ATTRIBUTE_TEXTURE_UNIT } from "../path-attribute-texture";
 import type { EdgeLabelOptions, EdgePath } from "../types";
-import { EdgeLabelProgram, resolveEdgeLabelShaderConfig } from "./base";
-import type { EdgeLabelProgramType } from "./base";
+import { resolveEdgeLabelShaderConfig } from "./base";
 import { GeneratedEdgeLabelShaders, generateEdgeLabelShaders } from "./generator";
 
 // Path attributes carry no layer lifecycle hooks; packAttributes still needs a map.
@@ -129,7 +129,7 @@ export function createEdgeLabelProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateEdgeLabelProgramOptions): EdgeLabelProgramType<N, E, G> {
+>(options: CreateEdgeLabelProgramOptions) {
   const { color: labelColor, margin: labelMargin, textBorder } = options;
   const labelShaderConfig = resolveEdgeLabelShaderConfig(options);
   const { paths, fontSizeMode, minVisibilityThreshold, fullVisibilityThreshold } = labelShaderConfig;
@@ -149,7 +149,7 @@ export function createEdgeLabelProgram<
   // -------------------------------------------------------------------------
   // Return the EdgeLabelProgram class
   // -------------------------------------------------------------------------
-  return class GeneratedEdgeLabelProgram extends EdgeLabelProgram<EdgeLabelUniform, N, E, G> {
+  return class GeneratedEdgeLabelProgram extends LabelProgram<EdgeLabelUniform, N, E, G, EdgeLabelDisplayData> {
     /** Static reference to the options used to create this program */
     static readonly programOptions = options;
 
@@ -521,7 +521,7 @@ export function createEdgeLabelProgram<
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
 
-      return super.processEdgeLabel(labelKey, offset, data);
+      return super.processLabel(labelKey, offset, data);
     }
 
     // -----------------------------------------------------------------------
@@ -734,3 +734,15 @@ export function createEdgeLabelProgram<
     }
   };
 }
+
+export type EdgeLabelProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createEdgeLabelProgram<N, E, G>>;
+
+export type EdgeLabelProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = InstanceType<EdgeLabelProgramType<N, E, G>>;

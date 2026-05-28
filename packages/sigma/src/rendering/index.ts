@@ -13,14 +13,17 @@ export * from "./glsl";
 export * from "./nodes";
 
 // Base classes
-export { EdgeProgram } from "./edges";
-export type { EdgeProgramType } from "./edges";
+export type { EdgeProgram, EdgeProgramType } from "./edges";
 export { Program } from "./program";
 export type { ProgramType } from "./program";
-export { LabelProgram, LabelBackgroundProgram, createLabelBackgroundProgram } from "./nodes/labels";
-export type { LabelProgramType, LabelBackgroundProgramType, LabelBackgroundData } from "./nodes/labels";
-export { BackdropProgram } from "./nodes/backdrops";
-export type { BackdropProgramType, BackdropDisplayData } from "./nodes/backdrops";
+export { LabelProgram, createLabelBackgroundProgram } from "./nodes/labels";
+export type {
+  LabelProgramType,
+  LabelBackgroundProgram,
+  LabelBackgroundProgramType,
+  LabelBackgroundData,
+} from "./nodes/labels";
+export type { BackdropProgram, BackdropProgramType, BackdropDisplayData } from "./nodes/backdrops";
 export { DepthBucketCollection } from "./bucket";
 
 // Other various program helpers

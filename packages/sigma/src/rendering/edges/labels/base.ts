@@ -1,34 +1,16 @@
 /**
- * Sigma.js WebGL Abstract Edge Label Program
- * ==========================================
+ * Sigma.js Edge Label Shader Config
+ * ==================================
  *
- * EdgeLabelProgram extends LabelProgram for edge-specific label data,
- * adding a processEdgeLabel entry point used by the label renderer.
+ * Holds the shared shader-compile-time config used by both the edge label
+ * program (character SDF shader) and the edge label background program
+ * (ribbon shader), plus the helper that resolves user options into that
+ * config. The two sub-factories consume the same resolved object so they
+ * cannot drift on body bounds, visibility ramp, or perpendicular offset.
+ *
  * @module
  */
-import { Attributes } from "graphology-types";
-
-import type Sigma from "../../../sigma";
-import type { EdgeLabelDisplayData } from "../../../types";
-import { LabelProgram } from "../../nodes/labels/base";
 import type { EdgePath } from "../types";
-
-export abstract class EdgeLabelProgram<
-  Uniform extends string = string,
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> extends LabelProgram<Uniform, N, E, G, EdgeLabelDisplayData> {
-  processEdgeLabel(labelKey: string, offset: number, data: EdgeLabelDisplayData): number {
-    return super.processLabel(labelKey, offset, data);
-  }
-
-  /**
-   * Measures a label's width in atlas (glyph) units — the unit consumed by
-   * the edge label and background shaders for `a_totalTextWidth`.
-   */
-  abstract measureLabelAtlasWidth(text: string, fontKey?: string): number;
-}
 
 /**
  * Resolved shader-compile-time config shared by the edge label program
@@ -68,13 +50,3 @@ export function resolveEdgeLabelShaderConfig(options: {
     fullVisibilityThreshold: options.fullVisibilityThreshold ?? 0.8,
   };
 }
-
-export type EdgeLabelProgramType<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = new (
-  gl: WebGL2RenderingContext,
-  pickingBuffer: WebGLFramebuffer | null,
-  renderer: Sigma<N, E, G>,
-) => EdgeLabelProgram<string, N, E, G>;

@@ -217,8 +217,8 @@ export default class Sigma<
   private edgeStyleAnalysis: StyleAnalysis = { dependency: "static", xAttribute: null, yAttribute: null };
 
   // Programs (single program per item kind)
-  private nodeProgram: NodeProgram<string, N, E, G>;
-  private edgeProgram: EdgeProgram<string, N, E, G>;
+  private nodeProgram: NodeProgram<N, E, G>;
+  private edgeProgram: EdgeProgram<N, E, G>;
 
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
   private depthLayers: readonly string[] = [...DEFAULT_DEPTH_LAYERS];
@@ -423,7 +423,7 @@ export default class Sigma<
 
     // Create backdrop program if the node program has one
     const BackdropProgramClass = NodeProgramClass.BackdropProgram as BackdropProgramType<N, E, G> | undefined;
-    const backdropProgram: BackdropProgram<string, N, E, G> | null = BackdropProgramClass
+    const backdropProgram: BackdropProgram<N, E, G> | null = BackdropProgramClass
       ? new BackdropProgramClass(gl, null, sigma)
       : null;
 
@@ -431,7 +431,7 @@ export default class Sigma<
     const LabelBackgroundProgramClass = NodeProgramClass.LabelBackgroundProgram as
       | LabelBackgroundProgramType<N, E, G>
       | undefined;
-    const labelBackgroundProgram: LabelBackgroundProgram<string, N, E, G> | null = LabelBackgroundProgramClass
+    const labelBackgroundProgram: LabelBackgroundProgram<N, E, G> | null = LabelBackgroundProgramClass
       ? new LabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma)
       : null;
 
@@ -456,7 +456,7 @@ export default class Sigma<
     // Create edge label program if the edge program has one
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const EdgeLabelProgramClass = (EdgeProgramClass as any).LabelProgram;
-    const edgeLabelProgram: EdgeLabelProgram<string, N, E, G> | null = EdgeLabelProgramClass
+    const edgeLabelProgram: EdgeLabelProgram<N, E, G> | null = EdgeLabelProgramClass
       ? new EdgeLabelProgramClass(gl, null, sigma)
       : null;
 
@@ -467,8 +467,9 @@ export default class Sigma<
         LabelBackgroundProgram?: EdgeLabelBackgroundProgramType<N, E, G>;
       }
     ).LabelBackgroundProgram;
-    const edgeLabelBackgroundProgram: EdgeLabelBackgroundProgram<string, N, E, G> | null =
-      EdgeLabelBackgroundProgramClass ? new EdgeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma) : null;
+    const edgeLabelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G> | null = EdgeLabelBackgroundProgramClass
+      ? new EdgeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma)
+      : null;
 
     // Create the shared internals object. All reassignable fields are plain properties;
     // satellites hold a reference to this object and see updates via direct assignment.

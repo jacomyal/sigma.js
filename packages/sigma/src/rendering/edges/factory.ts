@@ -11,7 +11,7 @@ import { Attributes } from "graphology-types";
 
 import Sigma from "../../sigma";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../types";
-import { colorToArray, floatColor, rgbaToFloat } from "../../utils";
+import { colorToArray, floatColor, indexToColor, rgbaToFloat } from "../../utils";
 import {
   AttrDescriptor,
   AttributeLayout,
@@ -21,8 +21,8 @@ import {
   packAttributes,
 } from "../data-texture";
 import { isAttributeSource } from "../nodes";
+import { Program } from "../program";
 import { ProgramInfo, loadFragmentShader, loadTransformFeedbackProgram, loadVertexShader } from "../utils";
-import { EdgeProgram as BaseEdgeProgram, EdgeProgramType, ResolvedEdgeIds } from "./base";
 import { PREPASS_FLOATS_PER_EDGE, PREPASS_TF_VARYING_NAMES, generateEdgeShaders } from "./generator";
 import {
   type EdgeLabelBackgroundProgramType,
@@ -98,11 +98,19 @@ float extremity_none(vec2 uv, float lengthRatio, float widthRatio) {
  * // Edges select via: { path: "curved", head: "arrow", tail: "none" }
  * ```
  */
+export interface ResolvedEdgeIds {
+  pathId: number;
+  headId: number;
+  tailId: number;
+  headLengthRatio: number;
+  tailLengthRatio: number;
+}
+
 export function createEdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: EdgeProgramOptions): EdgeProgramType<N, E, G> {
+>(options: EdgeProgramOptions) {
   const normalized = normalizeEdgeProgramOptions(options);
   const { paths, layers, defaultHead, defaultTail } = normalized;
 
@@ -129,7 +137,7 @@ export function createEdgeProgram<
   const attributeLayout: AttributeLayout = computeAttributeLayout([...paths, ...layers]);
 
   // Create the edge program class
-  const EdgeProgramClass = class extends BaseEdgeProgram<string, N, E, G> {
+  const EdgeProgramClass = class extends Program<string, N, E, G> {
     // Store options with the prepended extremities array (for sigma to look up length ratios)
     static readonly programOptions = { ...options, extremities };
     // Name-to-index mappings (for sigma to look up indices from names)
@@ -469,6 +477,25 @@ export function createEdgeProgram<
       this.setupPrePass();
     }
 
+    process(
+      edgeIndex: number,
+      offset: number,
+      sourceData: NodeDisplayData,
+      targetData: NodeDisplayData,
+      data: EdgeDisplayData,
+      edgeTextureIndex: number,
+    ): void {
+      let i = offset * this.STRIDE;
+      // Hidden source/target/edge zero out the slot so the GPU draws nothing.
+      if (data.visibility === "hidden" || sourceData.visibility === "hidden" || targetData.visibility === "hidden") {
+        for (let l = i + this.STRIDE; i < l; i++) {
+          this.floats[i] = 0;
+        }
+        return;
+      }
+      this.processVisibleItem(indexToColor(edgeIndex), i, sourceData, targetData, data, edgeTextureIndex);
+    }
+
     processVisibleItem(
       edgeIndex: number,
       startIndex: number,
@@ -702,5 +729,17 @@ export function createEdgeProgram<
   (EdgeProgramClass as unknown as { LabelBackgroundProgram: EdgeLabelBackgroundProgramType }).LabelBackgroundProgram =
     LabelBackgroundProgramClass;
 
-  return EdgeProgramClass as unknown as EdgeProgramType<N, E, G>;
+  return EdgeProgramClass;
 }
+
+export type EdgeProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createEdgeProgram<N, E, G>>;
+
+export type EdgeProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = InstanceType<EdgeProgramType<N, E, G>>;

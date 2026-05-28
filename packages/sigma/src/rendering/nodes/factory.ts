@@ -12,6 +12,7 @@ import { Attributes } from "graphology-types";
 
 import Sigma from "../../sigma";
 import { NodeDisplayData, RenderParams } from "../../types";
+import { indexToColor } from "../../utils";
 import {
   AttrDescriptor,
   ItemAttributeTexture,
@@ -19,10 +20,10 @@ import {
   computeAttributeLayout,
   packAttributes,
 } from "../data-texture";
+import { Program } from "../program";
 import { getShapeId, registerShapeInstance } from "../shapes";
 import { ProgramInfo } from "../utils";
 import { createBackdropProgram } from "./backdrops";
-import { NodeProgram, NodeProgramType } from "./base";
 import { generateShaders } from "./generator";
 import { createLabelBackgroundProgram, createLabelProgram } from "./labels";
 import { FragmentLayer, LayerLifecycleContext, LayerLifecycleHooks, NodeProgramOptions } from "./types";
@@ -69,7 +70,7 @@ export function createNodeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: NodeProgramOptions): NodeProgramType<N, E, G> {
+>(options: NodeProgramOptions) {
   const { rotateWithCamera = false, label: labelOptions = {}, shapes } = options;
 
   if (shapes.length === 0) {
@@ -130,7 +131,7 @@ export function createNodeProgram<
   const layerAttributeLayout = computeAttributeLayout(layers);
 
   // Create the node program class
-  const NodeProgramClass = class extends NodeProgram<string, N, E, G> {
+  const NodeProgramClass = class extends Program<string, N, E, G> {
     // Expose program configuration for Sigma to access (shape registry, multi-shape mapping)
     static readonly programOptions = {
       ...options,
@@ -317,6 +318,18 @@ export function createNodeProgram<
       this.layerAttributeTexture.upload();
     }
 
+    process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number, nodeKey: string): void {
+      let i = offset * this.STRIDE;
+      // Hidden nodes get zeroed out so the GPU draws nothing for them.
+      if (data.visibility === "hidden") {
+        for (let l = i + this.STRIDE; i < l; i++) {
+          this.floats[i] = 0;
+        }
+        return;
+      }
+      this.processVisibleItem(indexToColor(nodeIndex), i, data, textureIndex, nodeKey);
+    }
+
     processVisibleItem(
       nodeIndex: number,
       startIndex: number,
@@ -446,5 +459,17 @@ export function createNodeProgram<
     }
   };
 
-  return NodeProgramClass as unknown as NodeProgramType<N, E, G>;
+  return NodeProgramClass;
 }
+
+export type NodeProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createNodeProgram<N, E, G>>;
+
+export type NodeProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = InstanceType<NodeProgramType<N, E, G>>;

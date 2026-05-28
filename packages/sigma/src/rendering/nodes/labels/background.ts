@@ -260,49 +260,6 @@ void main() {
 `;
 
 // ============================================================================
-// Abstract base class
-// ============================================================================
-
-export abstract class LabelBackgroundProgram<
-  Uniform extends string = string,
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> extends Program<Uniform, N, E, G> {
-  protected totalCount = 0;
-  protected bufferCapacity = 0;
-
-  abstract processLabelBackground(offset: number, data: LabelBackgroundData): void;
-
-  hasNothingToRender(): boolean {
-    return this.totalCount === 0;
-  }
-
-  drawWebGL(_method: number, { gl }: ProgramInfo): void {
-    if (this.totalCount === 0) return;
-    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.VERTICES, this.totalCount);
-  }
-
-  reallocate(count: number): void {
-    this.totalCount = count;
-    if (count > this.bufferCapacity) {
-      this.bufferCapacity = Math.max(count, Math.ceil(this.bufferCapacity * 1.5) || 10);
-      super.reallocate(this.bufferCapacity);
-    }
-  }
-}
-
-export type LabelBackgroundProgramType<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = new (
-  gl: WebGL2RenderingContext,
-  pickingBuffer: WebGLFramebuffer | null,
-  renderer: Sigma<N, E, G>,
-) => LabelBackgroundProgram<string, N, E, G>;
-
-// ============================================================================
 // Factory
 // ============================================================================
 
@@ -317,7 +274,7 @@ export function createLabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateLabelBackgroundProgramOptions): LabelBackgroundProgramType<N, E, G> {
+>(options: CreateLabelBackgroundProgramOptions) {
   const { shapes, rotateWithCamera = false, label: labelOptions = {}, shapeGlobalIds } = options;
 
   if (shapes.length === 0) {
@@ -330,8 +287,11 @@ export function createLabelBackgroundProgram<
 
   type U = string;
 
-  return class NodeLabelBackgroundProgram extends LabelBackgroundProgram<U, N, E, G> {
+  return class NodeLabelBackgroundProgram extends Program<U, N, E, G> {
     static readonly labelMargin = labelMargin;
+
+    protected totalCount = 0;
+    protected bufferCapacity = 0;
 
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       super(gl, pickingBuffer, renderer);
@@ -418,5 +378,34 @@ export function createLabelBackgroundProgram<
         }
       }
     }
+
+    hasNothingToRender(): boolean {
+      return this.totalCount === 0;
+    }
+
+    drawWebGL(_method: number, { gl }: ProgramInfo): void {
+      if (this.totalCount === 0) return;
+      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, this.VERTICES, this.totalCount);
+    }
+
+    reallocate(count: number): void {
+      this.totalCount = count;
+      if (count > this.bufferCapacity) {
+        this.bufferCapacity = Math.max(count, Math.ceil(this.bufferCapacity * 1.5) || 10);
+        super.reallocate(this.bufferCapacity);
+      }
+    }
   };
 }
+
+export type LabelBackgroundProgramType<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = ReturnType<typeof createLabelBackgroundProgram<N, E, G>>;
+
+export type LabelBackgroundProgram<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+> = InstanceType<LabelBackgroundProgramType<N, E, G>>;
