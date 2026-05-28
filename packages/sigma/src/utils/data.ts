@@ -46,3 +46,12 @@ export function hasNewPartialProps<T extends Record<string, unknown>>(current: T
   }
   return false;
 }
+
+/**
+ * Sets whether `key` is a member of `set`. Equivalent to
+ * `present ? set.add(key) : set.delete(key)`.
+ */
+export function setMembership<T>(set: Set<T>, key: T, present: boolean): void {
+  if (present) set.add(key);
+  else set.delete(key);
+}

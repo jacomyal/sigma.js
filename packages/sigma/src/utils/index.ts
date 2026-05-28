@@ -9,6 +9,7 @@ export * from "./animate";
 export * from "./colors";
 export * from "./coordinates";
 export * from "./data";
+export * from "./display-data";
 export * from "./easings";
 export * from "./fragments";
 export * from "./graph";

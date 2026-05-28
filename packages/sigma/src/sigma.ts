@@ -104,10 +104,13 @@ import {
   getMatrixImpact,
   getPixelColor,
   getPixelRatio,
+  hasBackdrop,
+  hasForcedLabel,
   identity,
   matrixFromCamera,
   multiplyVec2,
   removePositionFromDepthRanges,
+  setMembership,
   validateGraph,
 } from "./utils";
 
@@ -1293,18 +1296,8 @@ export default class Sigma<
     this.internals.nodeDataCache[key] = data;
     this.nodeGraphCoords[key] = { x: data.x, y: data.y };
 
-    // Label:
-    // We delete and add if needed because this function is also used from
-    // update
-    this.internals.nodesWithForcedLabels.delete(key);
-    if (data.labelVisibility === "visible" && data.visibility !== "hidden")
-      this.internals.nodesWithForcedLabels.add(key);
-
-    // Backdrop visibility tracking
-    this.internals.nodesWithBackdrop.delete(key);
-    if (data.visibility !== "hidden" && data.backdropVisibility === "visible") {
-      this.internals.nodesWithBackdrop.add(key);
-    }
+    setMembership(this.internals.nodesWithForcedLabels, key, hasForcedLabel(data));
+    setMembership(this.internals.nodesWithBackdrop, key, hasBackdrop(data));
 
     // Place the node in its depth bucket; processNodes() re-sorts each bucket
     // by zIndex on the next render.
@@ -1418,12 +1411,7 @@ export default class Sigma<
 
     this.internals.edgeDataCache[key] = data;
 
-    // Forced label
-    // we filter and re push if needed because this function is also used from
-    // update
-    this.internals.edgesWithForcedLabels.delete(key);
-    if (data.labelVisibility === "visible" && data.visibility !== "hidden")
-      this.internals.edgesWithForcedLabels.add(key);
+    setMembership(this.internals.edgesWithForcedLabels, key, hasForcedLabel(data));
 
     // Place the edge in its depth bucket; processEdges() re-sorts each bucket
     // by zIndex on the next render.
@@ -1471,8 +1459,8 @@ export default class Sigma<
     this.internals.nodeDataCache = {};
     this.nodeGraphCoords = {};
     this.edgeProgramIndex = {};
-    this.internals.nodesWithForcedLabels = new Set<string>();
-    this.internals.nodesWithBackdrop = new Set<string>();
+    this.internals.nodesWithForcedLabels.clear();
+    this.internals.nodesWithBackdrop.clear();
     this.prevNodeVisibilities = {};
     // Clear bucket data
     this.itemBuckets.nodes.clearAll();
@@ -1488,7 +1476,7 @@ export default class Sigma<
     this.internals.edgeDataCache = {};
     this.edgeProgramIndex = {};
     this.edgeTextureIndexCache = {};
-    this.internals.edgesWithForcedLabels = new Set<string>();
+    this.internals.edgesWithForcedLabels.clear();
     resetKind(this.pickingState, "edge");
     // Clear bucket data
     this.itemBuckets.edges.clearAll();
@@ -2391,9 +2379,6 @@ export default class Sigma<
     const oldDepth = data.depth;
     const oldZIndex = data.zIndex;
     const oldAttachment = data.labelAttachment;
-    const oldVisibility = data.visibility;
-    const oldLabelVisibility = data.labelVisibility;
-    const oldBackdropVisibility = data.backdropVisibility;
 
     evaluateNodeStyle(
       this.stylesDeclaration!.nodes as Record<string, unknown>,
@@ -2428,20 +2413,8 @@ export default class Sigma<
       this.internals.attachmentManager.invalidateNode(node);
     }
 
-    // Update forced label tracking only if changed
-    if (data.labelVisibility !== oldLabelVisibility || data.visibility !== oldVisibility) {
-      this.internals.nodesWithForcedLabels.delete(node);
-      if (data.labelVisibility === "visible" && data.visibility !== "hidden")
-        this.internals.nodesWithForcedLabels.add(node);
-    }
-
-    // Backdrop tracking only if changed
-    if (data.backdropVisibility !== oldBackdropVisibility || data.visibility !== oldVisibility) {
-      this.internals.nodesWithBackdrop.delete(node);
-      if (data.visibility !== "hidden" && data.backdropVisibility === "visible") {
-        this.internals.nodesWithBackdrop.add(node);
-      }
-    }
+    setMembership(this.internals.nodesWithForcedLabels, node, hasForcedLabel(data));
+    setMembership(this.internals.nodesWithBackdrop, node, hasBackdrop(data));
 
     // Node data texture only if position/size/shape changed
     if (rawPositionChanged || data.size !== oldSize || data.shape !== oldShape) {
@@ -2513,8 +2486,6 @@ export default class Sigma<
     const oldParallelPath = data.parallelPath;
     const oldHead = data.head;
     const oldTail = data.tail;
-    const oldVisibility = data.visibility;
-    const oldLabelVisibility = data.labelVisibility;
 
     evaluateEdgeStyle(
       this.stylesDeclaration!.edges as Record<string, unknown>,
@@ -2529,12 +2500,7 @@ export default class Sigma<
     // Recompute spread variable for parallel edges
     this.applyEdgeSpread(edge, data, edgeState);
 
-    // Update forced label tracking only if changed
-    if (data.labelVisibility !== oldLabelVisibility || data.visibility !== oldVisibility) {
-      this.internals.edgesWithForcedLabels.delete(edge);
-      if (data.labelVisibility === "visible" && data.visibility !== "hidden")
-        this.internals.edgesWithForcedLabels.add(edge);
-    }
+    setMembership(this.internals.edgesWithForcedLabels, edge, hasForcedLabel(data));
 
     // Update the depth bucket. A depth change is reflected immediately via
     // depth ranges; a zIndex change is a reordering, escalated by the boolean

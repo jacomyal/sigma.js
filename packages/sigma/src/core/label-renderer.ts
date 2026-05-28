@@ -22,6 +22,7 @@ import {
   colorToArray,
   extend,
   floatColor,
+  hasForcedLabel,
   indexToColor,
   matrixFromCamera,
   multiplyVec2,
@@ -204,7 +205,7 @@ export class LabelRenderer<
       const { x, y } = this.internals.framedGraphToViewport(data);
       const size = this.internals.scaleSize(data.size);
 
-      if (data.labelVisibility !== "visible" && size < settings.labelRenderedSizeThreshold) continue;
+      if (!hasForcedLabel(data) && size < settings.labelRenderedSizeThreshold) continue;
 
       if (
         x < -X_LABEL_MARGIN - size ||
@@ -271,7 +272,7 @@ export class LabelRenderer<
         margin: defaultLabelMargin,
         position: data.labelPosition ?? defaultLabelPosition,
         hidden: false,
-        forceLabel: data.labelVisibility === "visible",
+        forceLabel: hasForcedLabel(data),
         type: "default",
         zIndex: data.zIndex ?? 0,
         parentType: "node",
@@ -642,7 +643,7 @@ export class LabelRenderer<
         margin: defaultEdgeLabelMargin,
         position: edgeData.labelPosition ?? defaultEdgeLabelPosition,
         hidden: false,
-        forceLabel: edgeData.labelVisibility === "visible",
+        forceLabel: hasForcedLabel(edgeData),
         type: "default",
         zIndex: edgeData.zIndex ?? 0,
         parentType: "edge",
