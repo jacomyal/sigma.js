@@ -16,6 +16,7 @@
     "directory": "packages/utils"
   },
   "scripts": {
+    "check": "tsc --noEmit",
     "test": "vitest run"
   },
   "preconstruct": {

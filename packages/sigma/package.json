@@ -18,6 +18,7 @@
   "sideEffects": false,
   "scripts": {
     "build-bundle": "vite build",
+    "check": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "cp ../../README.md ."
   },

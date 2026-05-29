@@ -11,7 +11,7 @@
     "build": "preconstruct build && npm run build-bundle --workspace=sigma",
     "prettify": "prettier --write .",
     "lint": "eslint .",
-    "check": "npm run check --workspaces --if-present",
+    "check": "npm run lint && npm run check --workspaces --if-present",
     "test": "npm run test:unit && npm run test:type && npm run test:e2e",
     "test:unit": "vitest run --project '!*:types'",
     "test:type": "vitest run --project '*:types'",

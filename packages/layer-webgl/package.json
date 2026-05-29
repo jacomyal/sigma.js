@@ -28,6 +28,9 @@
     }
   ],
   "license": "MIT",
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
   "preconstruct": {
     "entrypoints": [
       "index.ts"
