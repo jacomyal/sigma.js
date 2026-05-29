@@ -46,6 +46,7 @@
     "graphology-utils": "^2.5.2"
   },
   "devDependencies": {
+    "@types/events": "^3.0.3",
     "vite": "^6.0.7"
   },
   "keywords": [

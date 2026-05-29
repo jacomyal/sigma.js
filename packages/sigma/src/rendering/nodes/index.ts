@@ -42,8 +42,8 @@ export type { SquareOptions, TriangleOptions, DiamondOptions } from "./shapes";
 export { layerFill, type LayerFillOptions } from "./layers";
 
 // Label program creation
-export { createLabelProgram } from "./labels";
-export type { CreateLabelProgramOptions } from "./labels";
+export { createLabelProgram, LabelProgram } from "./labels";
+export type { CreateLabelProgramOptions, LabelBackgroundData, LabelBackgroundProgram } from "./labels";
 
 // Backdrop program creation
 export { createBackdropProgram } from "./backdrops";
